@@ -78,10 +78,10 @@ public class LowLevelSensor extends Sensor
 	if (!sensors.isEmpty())
 	    {
 		Iterator sensorIter = sensors.iterator();
-		currentState = ((Sensor) sensors.get(0)).requestState();
+		currentState = ((Sensor) sensorIter.next()).requestState();
 		while (sensorIter.hasNext())
 		    {
-			if (!currentState.equals((String) ((Sensor) sensorIter.next()).requestState()))
+			if ( !currentState.equals( ( (Sensor) sensorIter.next() ).requestState() ) )
 			    {
 				// System.err.println("Broken equipment: " + name + " !");
 				return null;
@@ -100,7 +100,7 @@ public class LowLevelSensor extends Sensor
 			String newState = null;
 			while (newState == null)
 			    {
-				System.out.print("Type the state for sensor " + name + " and hardwareConnection " + (String) hardwareConnections.get(0) + ":");
+				System.out.print("Type the state for sensor " + name + " (" + getDescription()  + ") and hardwareConnection " + (String) hardwareConnections.get(0) + ":");
 				System.out.flush();
 				newState =  in.readLine();
 				if (hasState(newState))
@@ -114,7 +114,7 @@ public class LowLevelSensor extends Sensor
 				    }
 			    }
 			hardwareIter.next();
-
+		
 			while (hardwareIter.hasNext())
 			    {
 				System.out.print("Type the state for sensor " + name + " and hardwareConnection " + (String) hardwareIter.next() + ":");

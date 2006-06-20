@@ -136,8 +136,9 @@ public class EOPActionRow extends EOPRow implements Cloneable
 		// Check if the previous EOPRow contains the same sensor name 
 		if (previousEOPRow.sensorToStateMap.containsKey( (String) currentSensorToState.getKey() ))
 		    {
-			// Check if the proposed state of the sensors are the same in current and previous EOPRows
-			if ( ( (String) previousEOPRow.sensorToStateMap.get( (String) currentSensorToState.getKey() ) ).equals( (String) currentSensorToState.getValue() ))
+			// Check if the proposed state of the sensors are the same in current and previous EOPRows or
+			// if the state is "*", which means that the state is not important.
+			if ( ( (String) previousEOPRow.sensorToStateMap.get( (String) currentSensorToState.getKey() ) ).equals( (String) currentSensorToState.getValue() ) || ( (String) currentSensorToState.getValue() ).equals("*") )
 			    {
 				sensorIter.remove();
 				System.err.println("Removing sensor " + (String) currentSensorToState.getKey() + " with state " + currentSensorToState.getValue());
@@ -162,7 +163,6 @@ public class EOPActionRow extends EOPRow implements Cloneable
 			if ( ( (String) previousEOPRow.actuatorToStateMap.get( (String) currentActuatorToState.getKey() ) ).equals( (String) currentActuatorToState.getValue() ))
 			    {
 				actuatorIter.remove();
-				System.err.println("Removing actuator " + (String) currentActuatorToState.getKey() + " with state " + currentActuatorToState.getValue());
 			    }
 		    }
 		else

@@ -524,6 +524,12 @@
 	<chmod file="${dist}/SupremicaJGrafchartLocal" perm="644"/>
 	<copy file="${templates}/SupremicaJGrafchartLocal.cmd" todir="${dist}"/>		
 	<chmod file="${dist}/SupremicaJGrafchartLocal.cmd" perm="644"/>
+
+	<copy file="${templates}/manufacturingTablesTestLocal" todir="${dist}"/>    	
+	<chmod file="${dist}/manufacturingTablesTestLocal" perm="644"/>
+	<copy file="${templates}/manufacturingTablesTestLocal.cmd" todir="${dist}"/>		
+	<chmod file="${dist}/manufacturingTablesTestLocal.cmd" perm="644"/>
+
 	<copy file="${templates}/SupremicaLocal.cmd" todir="${dist}"/>		
 	<chmod file="${dist}/SupremicaLocal.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaLocalMoreMem.cmd" todir="${dist}"/>

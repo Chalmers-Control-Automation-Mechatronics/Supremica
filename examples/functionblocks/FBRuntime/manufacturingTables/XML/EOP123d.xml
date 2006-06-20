@@ -1,0 +1,76 @@
+﻿<Operation opID="123">
+    <Type>alternative</Type>
+    <Comment>Rotate turntable, B->A</Comment>
+    <Machine>TT154</Machine>
+    <EOP>
+    
+        <InternalComponents>
+            <Actuator>M1</Actuator>
+            <Sensor>F7KM1-2</Sensor>
+            <Variable>New rack in cell</Variable>
+        </InternalComponents>
+      
+        <ExternalComponents>
+            <ExternalVariable>R3326#parts&gt;0</ExternalVariable>
+        </ExternalComponents>
+    
+        <InitialState>
+            <ActuatorValue>
+                <Actuator>M1</Actuator>
+                <Value>B</Value>
+            </ActuatorValue>
+            <SensorValue>
+                <Sensor>F7KM1-2</Sensor>
+                <Value>TRUE</Value>
+            </SensorValue>
+            <VariableValue>
+                <Variable>New rack in cell</Variable>
+                <Value>FALSE</Value>
+            </VariableValue>
+            <ExternalVariableValue>
+                <ExternalVariable>R3326#parts&gt;0</ExternalVariable>
+                <Value>FALSE</Value>
+            </ExternalVariableValue>
+            <InitialStateCheck>
+                <AlarmType>2</AlarmType>
+                <AlarmDelay>0</AlarmDelay>
+            </InitialStateCheck>
+        </InitialState>
+
+        <Action actionNbr="1">
+            <ActuatorValue>
+                <Actuator>M1</Actuator>
+                <Value>B</Value>
+            </ActuatorValue>
+            <SensorValue>
+                <Sensor>F7KM1-2</Sensor>
+                <Value>TRUE</Value>
+            </SensorValue>
+            <VariableValue>
+                <Variable>New rack in cell</Variable>
+                <Value>FALSE</Value>
+            </VariableValue>
+            <Zones>b(11)</Zones>
+        </Action>
+
+        <Action actionNbr="2">
+            <ActuatorValue>
+                <Actuator>M1</Actuator>
+                <Value>A</Value>
+            </ActuatorValue>
+            <SensorValue>
+                <Sensor>F7KM1-2</Sensor>
+                <Value>TRUE</Value>
+            </SensorValue>
+            <VariableValue>
+                <Variable>New rack in cell</Variable>
+                <Value>FALSE</Value>
+            </VariableValue>
+            <Zones>u(11)</Zones>
+        </Action>
+
+     </EOP>
+</Operation>
+
+
+

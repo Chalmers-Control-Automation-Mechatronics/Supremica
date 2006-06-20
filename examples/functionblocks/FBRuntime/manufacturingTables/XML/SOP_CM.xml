@@ -1,0 +1,39 @@
+<ROP id="CM V70" type="SOP">
+    <Machine>CM</Machine>
+    <Comment>Add hock SOP for CM</Comment>
+    <Relation type ="Sequence">
+       <Activity>
+            <Precondition>
+                <Predecessor>
+                     <Machine>CNV415</Machine>
+                     <Operation>21</Operation>
+                </Predecessor>	    
+                <Predecessor>
+                     <Machine>R3325</Machine>
+                     <Operation>75</Operation>
+                </Predecessor>	    
+                <Predecessor>
+                     <Machine>R3326</Machine>
+                     <Operation>95</Operation>
+                </Predecessor>	    
+            </Precondition>	
+            <Operation>1</Operation> 	
+        </Activity>
+       <Activity>
+            <Precondition>
+                <Predecessor>
+                     <Machine>R3323</Machine>
+                     <Operation>58</Operation>
+                </Predecessor>	    
+                <Predecessor>
+                     <Machine>R3324</Machine>
+                     <Operation>68</Operation>
+                </Predecessor>	    
+            </Precondition>	
+            <Operation>3</Operation> 	
+        </Activity>
+    </Relation>
+</ROP>
+
+
+

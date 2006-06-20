@@ -1,0 +1,46 @@
+<Operation opID="31">
+    <Type>basic</Type>
+    <Comment>Ready to receive part?</Comment>
+    <Machine>FIX151</Machine>
+    <EOP>
+    
+        <InternalComponents>
+            <Actuator>Y17</Actuator>
+            <Actuator>Y15</Actuator>
+            <Actuator>Y13</Actuator>
+            <Sensor>SG2</Sensor>
+            <Sensor>SG7</Sensor>
+        </InternalComponents>
+      
+        <InitialState>
+            <ActuatorValue>
+                <Actuator>Y17</Actuator>
+                <Value>home</Value>
+            </ActuatorValue>
+            <ActuatorValue>
+                <Actuator>Y15</Actuator>
+                <Value>locked</Value>
+            </ActuatorValue>
+            <ActuatorValue>
+                <Actuator>Y13</Actuator>
+                <Value>open</Value>
+            </ActuatorValue>
+            <SensorValue>
+                <Sensor>SG2</Sensor>
+                <Value>off</Value>
+            </SensorValue>
+            <SensorValue>
+                <Sensor>SG7</Sensor>
+                <Value>off</Value>
+            </SensorValue>
+            <InitialStateCheck>
+                <AlarmType>1</AlarmType>
+                <AlarmDelay>0</AlarmDelay>
+            </InitialStateCheck>
+        </InitialState>
+
+    </EOP>
+</Operation>
+
+
+

@@ -1,0 +1,151 @@
+<Operation opID="44">
+    <Type>basic</Type>
+    <Comment>move to home position</Comment>
+    <Machine>FIX152</Machine>
+    <EOP>
+    
+        <InternalComponents>
+            <Actuator>Y18</Actuator>
+            <Actuator>Y16</Actuator>
+            <Actuator>Y14</Actuator>
+            <Sensor>SG3</Sensor>
+            <Sensor>SG6</Sensor>
+        </InternalComponents>
+      
+        <ExternalComponents>
+            <ExternalVariable>R3325#parts&gt;0</ExternalVariable>
+        </ExternalComponents>
+    
+        <InitialState>
+            <ActuatorValue>
+                <Actuator>Y18</Actuator>
+                <Value>work pos</Value>
+            </ActuatorValue>
+            <ActuatorValue>
+                <Actuator>Y16</Actuator>
+                <Value>locked</Value>
+            </ActuatorValue>
+            <ActuatorValue>
+                <Actuator>Y14</Actuator>
+                <Value>closed</Value>
+            </ActuatorValue>
+            <SensorValue>
+                <Sensor>SG3</Sensor>
+                <Value>on</Value>
+            </SensorValue>
+            <SensorValue>
+                <Sensor>SG6</Sensor>
+                <Value>on</Value>
+            </SensorValue>
+            <ExternalVariableValue>
+                <ExternalVariable>R3325#parts&gt;0</ExternalVariable>
+                <Value>*</Value>
+            </ExternalVariableValue>
+            <InitialStateCheck>
+                <AlarmType>1</AlarmType>
+                <AlarmDelay>0</AlarmDelay>
+            </InitialStateCheck>
+        </InitialState>
+
+        <Action actionNbr="1">
+            <ActuatorValue>
+                <Actuator>Y18</Actuator>
+                <Value>work pos</Value>
+            </ActuatorValue>
+            <ActuatorValue>
+                <Actuator>Y16</Actuator>
+                <Value>locked</Value>
+            </ActuatorValue>
+            <ActuatorValue>
+                <Actuator>Y14</Actuator>
+                <Value>open</Value>
+            </ActuatorValue>
+            <SensorValue>
+                <Sensor>SG3</Sensor>
+                <Value>on</Value>
+            </SensorValue>
+            <SensorValue>
+                <Sensor>SG6</Sensor>
+                <Value>on</Value>
+            </SensorValue>
+            <Zones>-</Zones>
+        </Action>
+
+        <Action actionNbr="2">
+            <ActuatorValue>
+                <Actuator>Y18</Actuator>
+                <Value>work pos</Value>
+            </ActuatorValue>
+            <ActuatorValue>
+                <Actuator>Y16</Actuator>
+                <Value>unlocked</Value>
+            </ActuatorValue>
+            <ActuatorValue>
+                <Actuator>Y14</Actuator>
+                <Value>open</Value>
+            </ActuatorValue>
+            <SensorValue>
+                <Sensor>SG3</Sensor>
+                <Value>on</Value>
+            </SensorValue>
+            <SensorValue>
+                <Sensor>SG6</Sensor>
+                <Value>on</Value>
+            </SensorValue>
+            <Zones>-</Zones>
+        </Action>
+
+        <Action actionNbr="3">
+            <ActuatorValue>
+                <Actuator>Y18</Actuator>
+                <Value>home</Value>
+            </ActuatorValue>
+            <ActuatorValue>
+                <Actuator>Y16</Actuator>
+                <Value>unlocked</Value>
+            </ActuatorValue>
+            <ActuatorValue>
+                <Actuator>Y14</Actuator>
+                <Value>open</Value>
+            </ActuatorValue>
+            <SensorValue>
+                <Sensor>SG3</Sensor>
+                <Value>off</Value>
+            </SensorValue>
+            <SensorValue>
+                <Sensor>SG6</Sensor>
+                <Value>off</Value>
+            </SensorValue>
+            <Zones>-</Zones>
+        </Action>
+
+        <Action actionNbr="4">
+            <ActuatorValue>
+                <Actuator>Y18</Actuator>
+                <Value>home</Value>
+            </ActuatorValue>
+            <ActuatorValue>
+                <Actuator>Y16</Actuator>
+                <Value>locked</Value>
+            </ActuatorValue>
+            <ActuatorValue>
+                <Actuator>Y14</Actuator>
+                <Value>open</Value>
+            </ActuatorValue>
+            <SensorValue>
+                <Sensor>SG3</Sensor>
+                <Value>off</Value>
+            </SensorValue>
+            <SensorValue>
+                <Sensor>SG6</Sensor>
+                <Value>off</Value>
+            </SensorValue>
+            <Zones>u(2,4,10)</Zones>
+        </Action>
+
+    </EOP>
+</Operation>
+
+
+
+

@@ -92,7 +92,7 @@ public abstract class Sensor
 	description = newDescription;
     }
    
-    final public String getDesciption()
+    final public String getDescription()
     {
 	return description;
     }

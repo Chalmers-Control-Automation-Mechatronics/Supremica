@@ -63,6 +63,7 @@ import org.supremica.manufacturingTables.controlsystemimplementation.*;
 import org.supremica.manufacturingTables.controlsystemimplementation.Java.*;
 import org.supremica.manufacturingTables.xsd.factory.*;
 import org.supremica.manufacturingTables.xsd.eop.*;
+import org.supremica.manufacturingTables.xsd.rop.*;
 
 import java.io.*;
 import java.util.Map;
@@ -71,6 +72,10 @@ import java.util.Iterator;
 
 public class Main
 {
+    // Reads input arguments from the command line.
+    // The first argument is the xml file containing the factory description and the second argument is the file 
+    // path/directory.
+    // All eop and sop files in this directory that (".eop" or ".sop" files) are read. 
     public static void main(String[] args)
     {
 	System.err.println("main function entered");
@@ -89,11 +94,28 @@ public class Main
 		ControlSystemDataBuilder plcDataBuilder = new ControlSystemDataBuilder();
 		plcDataBuilder.buildPLCData(factory);
 		
+		String[] fileNames = (new File(path)).list();
+		for (int i = 0; i < fileNames.length; i++)
+		{
+		    if (fileNames[i].toLowerCase().startsWith("eop"))
+		    {
+			System.out.println("File: " + fileNames[i]);
+			OperationType eop = (OperationType) loader.loadEOP(path, fileNames[i]);
+			plcDataBuilder.buildEOP(eop);
+		    }
+		    else if (fileNames[i].toLowerCase().startsWith("sop"))
+		    {
+			System.out.println("File: " + fileNames[i]);
+			ROPType sop = (ROPType) loader.loadSOP(path, fileNames[i]);
+			plcDataBuilder.buildSOP(sop);
+		    }
+		}
+		
 		// build EOPs
 		for (int i = 2; i < args.length; i++)
 		    {
-			OperationType eop = (OperationType) loader.loadEOP(path, args[i]);
-			plcDataBuilder.buildEOP(eop);
+			//			OperationType eop = (OperationType) loader.loadEOP(path, args[i]);
+			//plcDataBuilder.buildEOP(eop);
 		    }
 
 		ManufacturingCell cell = plcDataBuilder.getManufacturingCell();
@@ -105,8 +127,10 @@ public class Main
 		PLCProgram plcProgram = javaPLCProgramBuilder.getPLCProgram();
 		System.err.println("Time to run the PLCProgram!");
 		plcProgram.run();
+    
 
-
+		
+		
 		
 
 		

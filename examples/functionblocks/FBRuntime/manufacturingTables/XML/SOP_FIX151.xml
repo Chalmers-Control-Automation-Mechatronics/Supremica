@@ -1,0 +1,66 @@
+﻿<ROP id="FIX151 V70" type="SOP">
+    <Machine>FIX151</Machine>
+    <Comment></Comment>
+    <Relation type ="Sequence">
+        <Activity>
+            <Operation>31</Operation> 	
+        </Activity>
+        <Activity>
+            <Precondition>
+                <Predecessor>
+                     <Machine>R3325</Machine>
+                     <Operation>73</Operation>
+                </Predecessor>	    
+                <Predecessor>
+                     <Machine>R3326</Machine>
+                     <Operation>93</Operation>
+                </Predecessor>	    
+            </Precondition>	
+            <Operation>32</Operation> 	
+            <!--Successors>
+                <Successor>
+                     <Machine>R3325</Machine>
+                     <Operation>74</Operation>
+                </Successor>	    
+                <Successor>
+                     <Machine>R3326</Machine>
+                     <Operation>94</Operation>
+                </Successor>	    
+            </Successors-->	
+        </Activity>
+        <Activity>
+            <Precondition>
+                <Predecessor>
+                     <Machine>CM</Machine>
+                     <Operation>1</Operation>
+                </Predecessor>	    
+            </Precondition>	
+            <Operation>33</Operation> 	
+        </Activity>
+        <Activity>
+            <Precondition>
+                <Predecessor>
+                     <Machine>R3323</Machine>
+                     <Operation>54</Operation>
+                </Predecessor>	    
+                <Predecessor>
+                     <Machine>R3324</Machine>
+                     <Operation>64</Operation>
+                </Predecessor>	    
+                <Predecessor>
+                     <Machine>R3325</Machine>
+                     <Operation>79</Operation>
+                </Predecessor>	    
+                <Predecessor>
+                     <Machine>R3326</Machine>
+                     <Operation>99</Operation>
+                </Predecessor>	    
+            </Precondition>	
+            <Operation>35</Operation> 	
+        </Activity>
+    </Relation>
+</ROP>
+
+
+
+

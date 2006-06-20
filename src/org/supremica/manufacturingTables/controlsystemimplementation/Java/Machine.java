@@ -96,8 +96,10 @@ public class Machine implements Listener
     {
 	if (msg.getType().equals("performEOP"))
 	    {
-		machineController.performEOP(((Integer) msg.getContent()).intValue());
 		System.err.println("Machine " +name+ " performing EOP " + ((Integer) msg.getContent()).intValue() + " .");
+		boolean EOPperformedOK = machineController.performEOP( ( (Integer) msg.getContent() ).intValue() );
+		cellMailbox.send( new Message( name,  msg.getSender(), "EOPDone", EOPperformedOK ) );
+
 	    }
 	else
 	    {

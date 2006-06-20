@@ -1,0 +1,44 @@
+﻿<Operation opID="121">
+    <Type>alternative</Type>
+    <Comment>Part ready on turntable? - old rack side A</Comment>
+    <Machine>TT154</Machine>
+    <EOP>
+    
+        <InternalComponents>
+            <Actuator>M1</Actuator>
+            <Sensor>F7KM1-2</Sensor>
+            <Variable>New rack in cell</Variable>
+        </InternalComponents>
+      
+        <ExternalComponents>
+            <ExternalVariable>R3326#parts&gt;0</ExternalVariable>
+        </ExternalComponents>
+    
+        <InitialState>
+            <ActuatorValue>
+                <Actuator>M1</Actuator>
+                <Value>A</Value>
+            </ActuatorValue>
+            <SensorValue>
+                <Sensor>F7KM1-2</Sensor>
+                <Value>*</Value>
+            </SensorValue>
+            <VariableValue>
+                <Variable>New rack in cell</Variable>
+                <Value>FALSE</Value>
+            </VariableValue>
+            <ExternalVariableValue>
+                <ExternalVariable>R3326#parts&gt;0</ExternalVariable>
+                <Value>TRUE</Value>
+            </ExternalVariableValue>
+            <InitialStateCheck>
+                <AlarmType>1</AlarmType>
+                <AlarmDelay>0</AlarmDelay>
+            </InitialStateCheck>
+        </InitialState>
+
+     </EOP>
+</Operation>
+
+
+

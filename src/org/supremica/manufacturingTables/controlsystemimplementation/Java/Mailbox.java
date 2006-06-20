@@ -80,7 +80,7 @@ public class Mailbox
 	    }
 	else 
 	    {
-		System.err.println("No listener " + msg.getReceiver() + " registred!");
+		System.err.println("No listener " + msg.getReceiver() + " registered!");
 	    }
     }
    

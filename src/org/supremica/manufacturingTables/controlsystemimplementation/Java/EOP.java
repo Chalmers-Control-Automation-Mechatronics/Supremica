@@ -61,6 +61,9 @@ package org.supremica.manufacturingTables.controlsystemimplementation.Java;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 public class EOP
 {
@@ -133,9 +136,14 @@ public class EOP
 // 	return (EOPInitialRow) ((LinkedList) EOPRows).getFirst();
 //     }
 
-    public EOPInitialRow getEOPInitialRowClone()
+    // Returns a clone of EOPInitialRow with bookingZones, unbookingZones and actuators, sensors and variables
+    // that must be checked (those that does not have a "*" as the state).
+    public EOPInitialRow getEOPInitialRowActions()
     {
-	return (EOPInitialRow) ( (EOPInitialRow) ( (LinkedList) EOPRows ).getFirst() ).clone();
+	EOPInitialRow initialRowActions =  (EOPInitialRow) ( (EOPInitialRow) ( (LinkedList) EOPRows).getFirst() ).clone();
+        initialRowActions.removeUnimportantStates();
+	startActions();
+	return initialRowActions;
     }
 
     // Append a new EOPActionRow to the end of the EOPRows list
@@ -148,6 +156,7 @@ public class EOP
     public void startActions()
     {
 	actionIterator = EOPRows.listIterator();
+	actionIterator.next();
     }
     
     // Return true if the EOP has more actions to perform.
@@ -157,7 +166,8 @@ public class EOP
     }
     
     // Returns next EOPActionRow with bookingZones, unbookingZones and only changing actuators and sensors 
-    // for the next action. Returns null if there are no more EOPActionRows.
+    // for the next action. A "*" means that the state of that component is not important and hence those are
+    // ignored as well. Returns null if there are no more EOPActionRows.
     public EOPActionRow getNextActions()
     {
 	if (!hasMoreActions())
@@ -166,10 +176,18 @@ public class EOP
 	    }
 	else
 	    {
+		EOPRow previousRow = (EOPRow) EOPRows.get( actionIterator.previousIndex() ); 
+		// previousIndex does not change the value of the iterator 
 		EOPActionRow nextActions = (EOPActionRow) ( (EOPActionRow) actionIterator.next() ).clone();
-		nextActions.removeUnchangedComponents( (EOPRow) EOPRows.get(actionIterator.previousIndex()) );
-		// previousIndex does not change the value of the iterator (?)
+		nextActions.removeUnchangedComponents(previousRow);
+
 		return nextActions;
 	    }
+    }
+    // Returns the last row. Is often used to get the last row of the whole list.
+    public EOPRow getLastRow()
+    {
+	return (EOPRow) EOPRows.get( actionIterator.previousIndex() ); 
+
     }
 }

@@ -19,6 +19,13 @@
   </xs:restriction>
  </xs:simpleType>
 
+ <xs:simpleType name="controlSystemType">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="Yes"/>
+    <xs:enumeration value="No"/>
+  </xs:restriction>
+ </xs:simpleType>
+
  <xs:simpleType name="equipmentType">
   <xs:restriction base="xs:string">
     <xs:enumeration value="Actuator"/>
@@ -113,8 +120,9 @@
    <xs:element ref="Variables" minOccurs="0" maxOccurs="1"/>
    <xs:element ref="Equipment" minOccurs="0" maxOccurs="1"/>
    </xs:sequence>  
-   <xs:attribute name="Type" type="machineType" use="required"/>
+   <xs:attribute name="type" type="machineType" use="required"/>
    <xs:attribute name="name" type="nameType" use="required"/>
+   <xs:attribute name="ownControlSystem" type="controlSystemType" use="required"/>
   </xs:complexType>
  </xs:element>
 
@@ -159,7 +167,7 @@
    <xs:element ref="Elements" minOccurs="0" maxOccurs="1"/>
    <xs:element ref="Equipment" minOccurs="0" maxOccurs="1"/>
    </xs:sequence>  
-   <xs:attribute name="Type" type="equipmentType" use="required"/>
+   <xs:attribute name="type" type="equipmentType" use="required"/>
    <xs:attribute name="name" type="nameType" use="required"/>
   </xs:complexType>
  </xs:element>
@@ -185,7 +193,7 @@
    <xs:sequence>
    <xs:element ref="Description" minOccurs="0" maxOccurs="1"/>
    </xs:sequence>  
-   <!--xs:attribute name="Type" type="elementType" use="required"/-->
+   <!--xs:attribute name="type" type="elementType" use="required"/-->
    <xs:attribute name="name" type="nameType" use="required"/>
   </xs:complexType>
  </xs:element>

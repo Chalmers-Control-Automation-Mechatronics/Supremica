@@ -60,8 +60,8 @@ package org.supremica.manufacturingTables.controlsystemimplementation.Java;
 
 public class Message
 {
-    static final String [] TYPES = {"performEOP", "EOPDone", "requestState", "checkState", 
-				    "orderState", "monitorState", "reportState", "confirmState"};
+    static final String [] TYPES = {"performSOP", "SOPDone", "operationDone", "performEOP", "EOPDone", "requestState", 
+				    "checkState", "orderState", "monitorState", "reportState", "confirmState"};
     private String type;
     private Object content;
     private String receiver;

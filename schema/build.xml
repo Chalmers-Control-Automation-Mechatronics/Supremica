@@ -61,4 +61,11 @@
     </xjc>
   </target>
 
+  <target name="gen_manufacturingtables_rop" description="Generate Manufacturing Tables ROP JAXB classes.">
+    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.rop">
+      <schema dir="${xsd_manufacturingTables}" includes="ROP.xsd"/>
+      <produces dir="${src}/org/supremica/manufacturingTables/xsd/rop"/>
+    </xjc>
+  </target>
+
 </project>

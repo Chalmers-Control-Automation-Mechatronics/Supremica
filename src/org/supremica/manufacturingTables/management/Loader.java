@@ -63,8 +63,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.io.*;
 import javax.xml.bind.*;
-import net.sourceforge.fuber.xsd.libraryelement.*;
-import net.sourceforge.fuber.xsd.libraryelement.impl.*;
+//import net.sourceforge.fuber.xsd.libraryelement.*;
+//import net.sourceforge.fuber.xsd.libraryelement.impl.*;
 
 
 public class Loader
@@ -108,10 +108,30 @@ public class Loader
 
     public Object loadEOP(String path, String fileName)
     {
-	// Create JAXBContext and unmarshaller for factory
+	// Create JAXBContext and unmarshaller for EOP
 	try
 	    {
 		jaxbContext = JAXBContext.newInstance("org.supremica.manufacturingTables.xsd.eop");
+		u = jaxbContext.createUnmarshaller();
+		// enable validation
+		u.setValidating( true );
+		
+		// Se comment about validation above.
+		return load(path, fileName);
+	    }
+	catch(JAXBException je)
+	    {
+		je.printStackTrace();
+		return null;
+	    }
+    }
+
+    public Object loadSOP(String path, String fileName)
+    {
+	// Create JAXBContext and unmarshaller for SOP
+	try
+	    {
+		jaxbContext = JAXBContext.newInstance("org.supremica.manufacturingTables.xsd.rop");
 		u = jaxbContext.createUnmarshaller();
 		// enable validation
 		u.setValidating( true );

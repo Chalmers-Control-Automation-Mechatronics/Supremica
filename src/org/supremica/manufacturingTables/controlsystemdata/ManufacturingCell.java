@@ -61,12 +61,16 @@ package org.supremica.manufacturingTables.controlsystemdata;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.LinkedList;
 
 public class ManufacturingCell
 {
     private String name;
     private String description;
     private Map machines; // HashMap will be used for quick access to the machines when registering EOPs
+    private List SOPs; // The order for the SOPs are not important but I allways iterate through all elements in the list.
+
     private Mailbox mailbox;
     private Coordinator coordinator;
 
@@ -77,6 +81,7 @@ public class ManufacturingCell
 	description = null;
 	machines = new HashMap();  //default capacity (16) and load factor (0,75) suits me fine
 	this.mailbox = mailbox;
+	SOPs = new LinkedList();
     }
 
     public String getName()
@@ -117,6 +122,16 @@ public class ManufacturingCell
     public void addMachine(Machine machineToAdd)
     {
 	machines.put(machineToAdd.getName(), machineToAdd);
+    }
+
+    public void registerSOP(SOPData SOPData)
+    {
+	SOPs.add(SOPData);
+    }
+
+    public List getSOPs()
+    {
+	return SOPs;
     }
 
 }

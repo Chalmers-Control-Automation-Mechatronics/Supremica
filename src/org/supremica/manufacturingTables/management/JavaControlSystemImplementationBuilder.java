@@ -5,9 +5,9 @@
  * However, it is freely available without fee for education,
  * research, and non-profit purposes.  By obtaining copies of
  * this and other files that comprise the Su	for (Iterator machineIter = machines.iterator(); machineIter.hasNext();)
- 	    {
-		org.supremica.manufacturingTables.controlsystemdata.Machine machineData = (org.supremica.manufacturingTables.controlsystemdata.Machine) machineIter.next();
-premica software,
+ {
+ org.supremica.manufacturingTables.controlsystemdata.Machine machineData = (org.supremica.manufacturingTables.controlsystemdata.Machine) machineIter.next();
+ premica software,
  * you, the Licensee, agree to abide by the following
  * conditions and understandings with respect to the
  * copyrighted software:
@@ -65,6 +65,7 @@ package org.supremica.manufacturingTables.management;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Map.Entry;
 import org.supremica.manufacturingTables.controlsystemdata.*;
 import org.supremica.manufacturingTables.controlsystemimplementation.PLCProgram;
@@ -93,208 +94,283 @@ public class JavaControlSystemImplementationBuilder extends ControlSystemImpleme
 	// Description
 	((PLCProgramJava) plcProgram).setDescription(cell.getDescription()); // (could be null)
 	
+	// SOPs
+	// A HashMap is used to store all activities for each machine for fast and easy access later when adding 
+	// successors at the appropriate places. For now I assume that we have only one SOP per Machine! 
+	Map< String, Map< String, org.supremica.manufacturingTables.controlsystemimplementation.Java.SOPActivity > > machinesActivities = new HashMap< String, Map< String, org.supremica.manufacturingTables.controlsystemimplementation.Java.SOPActivity > >();
+	for (Iterator SOPIter = cell.getSOPs().iterator(); SOPIter.hasNext();)
+	{
+	    // As mentioned above a HashMap is used for each Machine/SOP to store all the activities for fast and 
+	    // easy access.
+	    Map<String, org.supremica.manufacturingTables.controlsystemimplementation.Java.SOPActivity> activities = new HashMap<String, org.supremica.manufacturingTables.controlsystemimplementation.Java.SOPActivity>();
+	    
+	    SOPData SOPData = (SOPData) SOPIter.next();
+	    SOP SOP = new SOP(SOPData.getId(), SOPData.getMachine());
+	    SOP.setComment(SOPData.getComment());
+	    //SOP Activities
+	    for (Iterator activityIter = SOPData.getSOPActivities().iterator(); activityIter.hasNext();)
+	    {
+		org.supremica.manufacturingTables.controlsystemdata.SOPActivity SOPActivityData = (org.supremica.manufacturingTables.controlsystemdata.SOPActivity) activityIter.next();
+		org.supremica.manufacturingTables.controlsystemimplementation.Java.SOPActivity SOPActivity = new org.supremica.manufacturingTables.controlsystemimplementation.Java.SOPActivity(SOPActivityData.getOperation());
+		// Add activity to hashmap
+		activities.put(String.valueOf(SOPActivity.getOperation()), SOPActivity);
+		// Predecessors
+		for (Iterator predecessorIter = SOPActivityData.getPredecessors().iterator(); predecessorIter.hasNext();)
+		{
+		    Predecessor predecessorData = (Predecessor) predecessorIter.next();
+		    SOPPredecessor predecessor = new SOPPredecessor( predecessorData.getOperation(), predecessorData.getMachine() );
+		    // Add predecesor
+		    SOPActivity.addPredecessor(predecessor);
+		    // Create an Hashmap
+		}
+		// Add activity
+		SOP.addSOPActivity(SOPActivity);
+	    }
+	    // Register SOP to Coordinator
+	    coordinator.registerSOP(SOP);
+	    // Add activity map to hashmap with all activities for all machines
+	    machinesActivities.put(SOP.getMachine(), activities);
+	}
+	// Now when all SOPs are added we will iterate through them again and add successors where appropriate
+	for (Iterator machineIter = machinesActivities.entrySet().iterator(); machineIter.hasNext();)
+	{
+	    Entry entry = (Entry) machineIter.next();
+	    Map<String, org.supremica.manufacturingTables.controlsystemimplementation.Java.SOPActivity> activities = (Map<String, org.supremica.manufacturingTables.controlsystemimplementation.Java.SOPActivity>) entry.getValue();
+	    String machine = (String) entry.getKey();
+	    for (org.supremica.manufacturingTables.controlsystemimplementation.Java.SOPActivity activity : activities.values())
+	    {
+		for (SOPPredecessor predecessor : activity.getPredecessors())
+		{
+		    if ( machinesActivities.containsKey( predecessor.getMachine() ) && machinesActivities.get( predecessor.getMachine() ).containsKey( String.valueOf( predecessor.getOperation() ) ) )
+		    {
+			// && means that the second criteria will not be tested if the first one is not fullfilled 
+			// otherwise this would lead to a nullpointerException 
+			org.supremica.manufacturingTables.controlsystemimplementation.Java.SOPActivity predActivity = machinesActivities.get( predecessor.getMachine() ).get( String.valueOf( predecessor.getOperation() ) );
+			predActivity.addSuccessor( new SOPSuccessor( activity.getOperation(), machine ) );
+			System.out.println("Adding successor " + machine + ", " + activity.getOperation() + " to " + predecessor.getMachine() + ", " + predActivity.getOperation());   
+		    }
+		    else
+		    {
+			System.err.print("No SOP found for machine " + predecessor.getMachine() + " or the predecessing activity for operation " +  predecessor.getOperation() + " was not found!");	 
+			System.err.println(" (The current activity (operation) and machine is: " +  activity.getOperation() + ", " + machine + ")");  
+			
+		    }
+		}
+	    }
+	}
+	
+
 	// Machines
 	Map machines = cell.getMachines();
 	for (Iterator machineIter = machines.values().iterator(); machineIter.hasNext();)
- 	    {
-		org.supremica.manufacturingTables.controlsystemdata.Machine machineData = (org.supremica.manufacturingTables.controlsystemdata.Machine) machineIter.next();
+	{
+	    org.supremica.manufacturingTables.controlsystemdata.Machine machineData = (org.supremica.manufacturingTables.controlsystemdata.Machine) machineIter.next();
 		
-		// For now I just ignore the machines that has own control system
-		if (!(machineData.getType().equals("Fixture") || machineData.getType().equals("TurnTable")))
-		    {
-			continue; //jumps to the end of the current iteration in this for-loop
-		    } 
+	    org.supremica.manufacturingTables.controlsystemimplementation.Java.Machine machine; 
+	    // Check if the machine has own control system
 
+	    // Machines with own control system
+	    if (machineData.hasOwnControlSystem())
+	    {
+		//continue; //jumps to the end of the current iteration in this for-loop
+		org.supremica.manufacturingTables.controlsystemimplementation.Java.MachineController machineController = new org.supremica.manufacturingTables.controlsystemimplementation.Java.MachineControlCommunicator();
+		machine = new org.supremica.manufacturingTables.controlsystemimplementation.Java.Machine(machineData.getName(), machineData.getDescription(), machineController, plcProgramMailbox);
+		System.err.println("Creating Java PLCCode for machine with own control system: " + machineData.getName());
+	    } 
+
+	    // Machines with no own control system
+	    else
+	    {
 		// Machine with MachineController and mailbox are created.
 		// We have to start by creating a machine mailbox, to be able to create a MachineController, 
 		// to be able to create a Machine. The controlsystemdata mailbox and MachineController contains no
 		// information so they are actully not needed to create the Javaimplementation.
 		org.supremica.manufacturingTables.controlsystemimplementation.Java.Mailbox machineMailbox = new  org.supremica.manufacturingTables.controlsystemimplementation.Java.Mailbox(); //then you shall register() listeners to the mailbox? 
-		org.supremica.manufacturingTables.controlsystemimplementation.Java.MachineController machineController = new org.supremica.manufacturingTables.controlsystemimplementation.Java.MachineController(machineMailbox);
+		org.supremica.manufacturingTables.controlsystemimplementation.Java.MachineController machineController = new org.supremica.manufacturingTables.controlsystemimplementation.Java.MachineControlSystem(machineMailbox);
 
-		org.supremica.manufacturingTables.controlsystemimplementation.Java.Machine machine = new org.supremica.manufacturingTables.controlsystemimplementation.Java.Machine(machineData.getName(), machineData.getDescription(), machineController, plcProgramMailbox);
+		machine = new org.supremica.manufacturingTables.controlsystemimplementation.Java.Machine(machineData.getName(), machineData.getDescription(), machineController, plcProgramMailbox);
 		System.err.println("Creating Java PLCCode for machine: " + machineData.getName());
 		
-
+		
 		// EOPs
 		List EOPs = machineData.getEOPs();
 		for (Iterator EOPIter = EOPs.iterator(); EOPIter.hasNext();)
+		{
+		    EOPData EOPData = (EOPData) EOPIter.next();
+		    // Create and register EOP
+		    EOP EOP = new EOP( EOPData.getId(), EOPData.getType() );
+		    ((MachineControlSystem) machineController).registerEOP(EOP);
+		    
+		    EOP.setComment( EOPData.getComment() );
+		    System.out.println("Adding EOP with number: " + EOPData.getId());
+		    
+		    // EOP Initial Row
+		    EOPInitialRowData EOPInitialRowData = EOPData.getEOPInitialRow();
+		    EOPInitialRow EOPInitialRow = new EOPInitialRow();
+		    EOP.setEOPInitialRow(EOPInitialRow);
+		    
+		    // Set Alarm Type
+		    EOPInitialRow.setAlarmType(EOPInitialRowData.getAlarmType());
+		    // Set Alarm Delay
+		    EOPInitialRow.setAlarmDelay(EOPInitialRowData.getAlarmDelay());
+		    // Add External Variables to State
+		    for (Iterator externalIter = EOPInitialRowData.getExternalVariableToStateMap().entrySet().iterator(); externalIter.hasNext();)
 		    {
-			EOPData EOPData = (EOPData) EOPIter.next();
-			// Create and register EOP
-			EOP EOP = new EOP( EOPData.getId(), EOPData.getType() );
-			machineController.registerEOP(EOP);
-
-			EOP.setComment( EOPData.getComment() );
-			System.out.println("Adding EOP with number: " + EOPData.getId());
-
-			// EOP Initial Row
-			EOPInitialRowData EOPInitialRowData = EOPData.getEOPInitialRow();
-			EOPInitialRow EOPInitialRow = new EOPInitialRow();
-			EOP.setEOPInitialRow(EOPInitialRow);
-
-			// Set Alarm Type
-			EOPInitialRow.setAlarmType(EOPInitialRowData.getAlarmType());
-			// Set Alarm Delay
-			EOPInitialRow.setAlarmDelay(EOPInitialRowData.getAlarmDelay());
-			// Add External Variables to State
-			for (Iterator externalIter = EOPInitialRowData.getExternalVariableToStateMap().entrySet().iterator(); externalIter.hasNext();)
-			    {
-				Entry variableToState = (Entry) externalIter.next();
-				EOPInitialRow.addExternalVariableToState( (String) variableToState.getKey(), (String) variableToState.getValue() );
-			    }
+			Entry variableToState = (Entry) externalIter.next();
+			EOPInitialRow.addExternalVariableToState( (String) variableToState.getKey(), (String) variableToState.getValue() );
+		    }
+		    // Add Actuator to State
+		    for (Iterator actuatorIter = EOPInitialRowData.getActuatorToStateMap().entrySet().iterator(); actuatorIter.hasNext();)
+		    {
+			Entry actuatorToState = (Entry) actuatorIter.next();
+			EOPInitialRow.addActuatorToState( (String) actuatorToState.getKey(), (String) actuatorToState.getValue() );
+		    }
+		    // Add Sensor to State
+		    for (Iterator sensorIter = EOPInitialRowData.getSensorToStateMap().entrySet().iterator(); sensorIter.hasNext();)
+		    {
+			Entry sensorToState = (Entry) sensorIter.next();
+			EOPInitialRow.addSensorToState( (String) sensorToState.getKey(), (String) sensorToState.getValue() );
+		    }
+		    
+		    
+		    // EOP Action Rows
+		    List EOPActionRows = EOPData.getEOPActionRows();
+		    for (Iterator actionIter = EOPActionRows.iterator(); actionIter.hasNext();)
+		    {
+			EOPActionRowData actionRowData = (EOPActionRowData) actionIter.next();
+			EOPActionRow actionRow = new EOPActionRow();
+			EOP.addEOPActionRow(actionRow);
+			
+			// Add Booking Zones 
+			for (Iterator bookingIter = actionRowData.getBookingZones().iterator(); bookingIter.hasNext();)
+			{
+			    String bookingZone = (String) bookingIter.next();
+			    actionRow.addBookingZone( bookingZone );
+			}
+			
+			// Add Unbooking Zones 
+			for (Iterator unbookingIter = actionRowData.getUnbookingZones().iterator(); unbookingIter.hasNext();)
+			{
+			    String unbookingZone = (String) unbookingIter.next();
+			    actionRow.addUnbookingZone( unbookingZone );
+			}
+			
 			// Add Actuator to State
-			for (Iterator actuatorIter = EOPInitialRowData.getActuatorToStateMap().entrySet().iterator(); actuatorIter.hasNext();)
-			    {
-				Entry actuatorToState = (Entry) actuatorIter.next();
-				EOPInitialRow.addActuatorToState( (String) actuatorToState.getKey(), (String) actuatorToState.getValue() );
-			    }
+			for (Iterator actuatorIter = actionRowData.getActuatorToStateMap().entrySet().iterator(); actuatorIter.hasNext();)
+			{
+			    Entry actuatorToState = (Entry) actuatorIter.next();
+			    actionRow.addActuatorToState( (String) actuatorToState.getKey(), (String) actuatorToState.getValue() );
+			}
 			// Add Sensor to State
 			for (Iterator sensorIter = EOPInitialRowData.getSensorToStateMap().entrySet().iterator(); sensorIter.hasNext();)
-			    {
-				Entry sensorToState = (Entry) sensorIter.next();
-				EOPInitialRow.addSensorToState( (String) sensorToState.getKey(), (String) sensorToState.getValue() );
-			    }
-
-
-			// EOP Action Rows
-			List EOPActionRows = EOPData.getEOPActionRows();
-			for (Iterator actionIter = EOPActionRows.iterator(); actionIter.hasNext();)
-			    {
-				EOPActionRowData actionRowData = (EOPActionRowData) actionIter.next();
-				EOPActionRow actionRow = new EOPActionRow();
-				EOP.addEOPActionRow(actionRow);
+			{
+			    Entry sensorToState = (Entry) sensorIter.next();
+			    actionRow.addSensorToState( (String) sensorToState.getKey(), (String) sensorToState.getValue() );
+			}
 			
-				// Add Booking Zones 
-				for (Iterator bookingIter = actionRowData.getBookingZones().iterator(); bookingIter.hasNext();)
-				    {
-					String bookingZone = (String) bookingIter.next();
-					actionRow.addBookingZone( bookingZone );
-				    }
-
-				// Add Unbooking Zones 
-				for (Iterator unbookingIter = actionRowData.getUnbookingZones().iterator(); unbookingIter.hasNext();)
-				    {
-					String unbookingZone = (String) unbookingIter.next();
-					actionRow.addUnbookingZone( unbookingZone );
-				    }
-				
-				// Add Actuator to State
-				for (Iterator actuatorIter = actionRowData.getActuatorToStateMap().entrySet().iterator(); actuatorIter.hasNext();)
-				    {
-					Entry actuatorToState = (Entry) actuatorIter.next();
-					actionRow.addActuatorToState( (String) actuatorToState.getKey(), (String) actuatorToState.getValue() );
-				    }
-				// Add Sensor to State
-				for (Iterator sensorIter = EOPInitialRowData.getSensorToStateMap().entrySet().iterator(); sensorIter.hasNext();)
-				    {
-					Entry sensorToState = (Entry) sensorIter.next();
-					EOPInitialRow.addSensorToState( (String) sensorToState.getKey(), (String) sensorToState.getValue() );
-				    }
-				
-			    }
 		    }
+		}
 		
-		// Variables
-		List variables = machineData.getVariables();
-		for (Iterator variableIter = variables.iterator(); variableIter.hasNext();)
-		    {
-			org.supremica.manufacturingTables.controlsystemdata.Variable variableData = (org.supremica.manufacturingTables.controlsystemdata.Variable) variableIter.next();
-			org.supremica.manufacturingTables.controlsystemimplementation.Java.Variable variable = new org.supremica.manufacturingTables.controlsystemimplementation.Java.Variable(variableData.getName());
-			
-			machine.addVariable(variable); 
-			
-			// Values
-			List values = variableData.getValues();
-			for (Iterator valueIter = values.iterator(); valueIter.hasNext();)
-			    {
-				variable.addValue((String) valueIter.next());
-			    }
-		    }
-
+		
 		// TopLevelSensors
 		List sensors = machineData.getSensors();
 		for (Iterator sensorIter = sensors.iterator(); sensorIter.hasNext();)
+		{
+		    org.supremica.manufacturingTables.controlsystemdata.Sensor sensorData = (org.supremica.manufacturingTables.controlsystemdata.Sensor) sensorIter.next();
+		    
+		    org.supremica.manufacturingTables.controlsystemimplementation.Java.Sensor sensor = new org.supremica.manufacturingTables.controlsystemimplementation.Java.TopLevelSensor(sensorData.getName(), machineMailbox);
+		    System.err.println("Adding top level sensor: " + sensorData.getName());
+		    
+		    // Description
+		    sensor.setDescription(sensorData.getDescription());
+		    
+		    // LowLevelSensors
+		    List llSensors = sensorData.getSensors();
+		    for (Iterator llSensorIter = llSensors.iterator(); llSensorIter.hasNext();)
 		    {
-			org.supremica.manufacturingTables.controlsystemdata.Sensor sensorData = (org.supremica.manufacturingTables.controlsystemdata.Sensor) sensorIter.next();
-			
-			org.supremica.manufacturingTables.controlsystemimplementation.Java.Sensor sensor = new org.supremica.manufacturingTables.controlsystemimplementation.Java.TopLevelSensor(sensorData.getName(), machineMailbox);
-			System.err.println("Adding top level sensor: " + sensorData.getName());
-			
-			// Description
-			sensor.setDescription(sensorData.getDescription());
-			
-			// LowLevelSensors
-			List llSensors = sensorData.getSensors();
-			for (Iterator llSensorIter = llSensors.iterator(); llSensorIter.hasNext();)
-			    {
-				sensor.addSensor(createLowLevelSensor((org.supremica.manufacturingTables.controlsystemdata.Sensor) llSensorIter.next()));
-			    }
-
-			System.err.println("Adding states");
-			// States 
-			List states = sensorData.getStates();
-			for (Iterator stateIter = states.iterator(); stateIter.hasNext();)
-			    {
-				sensor.addState((String) stateIter.next());
-			    }
-			System.err.println("Adding hardwareConnections");
-			// hardwareConnections 
-			List hardware = sensorData.getHardwareConnections();
-			for (Iterator hardwareIter = hardware.iterator(); hardwareIter.hasNext();)
-			    {
-				sensor.addHardwareConnection((String) hardwareIter.next());
-			    }
+			sensor.addSensor(createLowLevelSensor((org.supremica.manufacturingTables.controlsystemdata.Sensor) llSensorIter.next()));
 		    }
+		    
+		    System.err.println("Adding states");
+		    // States 
+		    List states = sensorData.getStates();
+		    for (Iterator stateIter = states.iterator(); stateIter.hasNext();)
+		    {
+			sensor.addState((String) stateIter.next());
+		    }
+		    System.err.println("Adding hardwareConnections");
+		    // hardwareConnections 
+		    List hardware = sensorData.getHardwareConnections();
+		    for (Iterator hardwareIter = hardware.iterator(); hardwareIter.hasNext();)
+		    {
+			sensor.addHardwareConnection((String) hardwareIter.next());
+		    }
+		}
 		
 		
 		// TopLevelActuators
 		List actuators = machineData.getActuators();
 		for (Iterator actuatorIter = actuators.iterator(); actuatorIter.hasNext();)
+		{
+		    org.supremica.manufacturingTables.controlsystemdata.Actuator actuatorData = (org.supremica.manufacturingTables.controlsystemdata.Actuator) actuatorIter.next();
+		    
+		    org.supremica.manufacturingTables.controlsystemimplementation.Java.Actuator actuator = new org.supremica.manufacturingTables.controlsystemimplementation.Java.TopLevelActuator(actuatorData.getName(), machineMailbox);
+		    System.err.println("Adding top level actuator: " + actuatorData.getName());
+		    
+		    // Description
+		    actuator.setDescription(actuatorData.getDescription());
+		    
+		    System.err.println("Adding low level sensors");
+		    // LowLevelSensors
+		    List llSensors = actuatorData.getSensors();
+		    for (Iterator llSensorIter = llSensors.iterator(); llSensorIter.hasNext();)
 		    {
-			org.supremica.manufacturingTables.controlsystemdata.Actuator actuatorData = (org.supremica.manufacturingTables.controlsystemdata.Actuator) actuatorIter.next();
-			
-			org.supremica.manufacturingTables.controlsystemimplementation.Java.Actuator actuator = new org.supremica.manufacturingTables.controlsystemimplementation.Java.TopLevelActuator(actuatorData.getName(), machineMailbox);
-			System.err.println("Adding top level actuator: " + actuatorData.getName());
-			
-			// Description
-			actuator.setDescription(actuatorData.getDescription());
-			
-			System.err.println("Adding low level sensors");
-			// LowLevelSensors
-			List llSensors = actuatorData.getSensors();
-			for (Iterator llSensorIter = llSensors.iterator(); llSensorIter.hasNext();)
-			    {
-				actuator.addSensor(createLowLevelSensor((org.supremica.manufacturingTables.controlsystemdata.Sensor) llSensorIter.next()));
-			    }
-
-			System.err.println("Adding low level actuators");
-			// LowLevelActuators
-			List llActuators = actuatorData.getActuators();
-			for (Iterator llActuatorIter = llActuators.iterator(); llActuatorIter.hasNext();)
-			    {
-				actuator.addActuator(createLowLevelActuator((org.supremica.manufacturingTables.controlsystemdata.Actuator) llActuatorIter.next()));
-			    }
-			
-			System.err.println("Adding states");
-			// States 
-			List states = actuatorData.getStates();
-			for (Iterator stateIter = states.iterator(); stateIter.hasNext();)
-			    {
-				actuator.addState((String) stateIter.next());
-			    }
-
-			System.err.println("Adding hardwareConnections");
-			// hardwareConnections 
-			List hardware = actuatorData.getHardwareConnections();
-			for (Iterator hardwareIter = hardware.iterator(); hardwareIter.hasNext();)
-			    {
-				actuator.addHardwareConnection((String) hardwareIter.next());
-			    }
+			actuator.addSensor(createLowLevelSensor((org.supremica.manufacturingTables.controlsystemdata.Sensor) llSensorIter.next()));
 		    }
- 	    }
-	
- 	
+		    
+		    System.err.println("Adding low level actuators");
+		    // LowLevelActuators
+		    List llActuators = actuatorData.getActuators();
+		    for (Iterator llActuatorIter = llActuators.iterator(); llActuatorIter.hasNext();)
+		    {
+			actuator.addActuator(createLowLevelActuator((org.supremica.manufacturingTables.controlsystemdata.Actuator) llActuatorIter.next()));
+		    }
+		    
+		    System.err.println("Adding states");
+		    // States 
+		    List states = actuatorData.getStates();
+		    for (Iterator stateIter = states.iterator(); stateIter.hasNext();)
+		    {
+			actuator.addState((String) stateIter.next());
+		    }
+		    
+		    System.err.println("Adding hardwareConnections");
+		    // hardwareConnections 
+		    List hardware = actuatorData.getHardwareConnections();
+		    for (Iterator hardwareIter = hardware.iterator(); hardwareIter.hasNext();)
+		    {
+			actuator.addHardwareConnection((String) hardwareIter.next());
+		    }
+		}
+	    }
+	    // Variables
+	    List variables = machineData.getVariables();
+	    for (Iterator variableIter = variables.iterator(); variableIter.hasNext();)
+	    {
+		    org.supremica.manufacturingTables.controlsystemdata.Variable variableData = (org.supremica.manufacturingTables.controlsystemdata.Variable) variableIter.next();
+		    org.supremica.manufacturingTables.controlsystemimplementation.Java.Variable variable = new org.supremica.manufacturingTables.controlsystemimplementation.Java.Variable(variableData.getName());
+		    
+		    machine.addVariable(variable); 
+		    
+		    // Values
+		    List values = variableData.getValues();
+		    for (Iterator valueIter = values.iterator(); valueIter.hasNext();)
+		    {
+			variable.addValue((String) valueIter.next());
+		    }
+	    }
+	    
+	}
     }
     
     // Low Level Sensor
@@ -302,30 +378,30 @@ public class JavaControlSystemImplementationBuilder extends ControlSystemImpleme
     {
 	org.supremica.manufacturingTables.controlsystemimplementation.Java.Sensor sensor = new org.supremica.manufacturingTables.controlsystemimplementation.Java.LowLevelSensor(sensorData.getName());
 	System.err.println("Adding low level sensor: " + sensorData.getName());
-
+	
 	// Description
 	sensor.setDescription(sensorData.getDescription());
 	
 	// LowLevelSensors
 	List llSensors = sensorData.getSensors();
 	for (Iterator llSensorIter = llSensors.iterator(); llSensorIter.hasNext();)
-	    {
-		sensor.addSensor(createLowLevelSensor((org.supremica.manufacturingTables.controlsystemdata.Sensor) llSensorIter.next()));
-	    }
+	{
+	    sensor.addSensor(createLowLevelSensor((org.supremica.manufacturingTables.controlsystemdata.Sensor) llSensorIter.next()));
+	}
 	
 	// States 
 	List states = sensorData.getStates();
 	for (Iterator stateIter = states.iterator(); stateIter.hasNext();)
-	    {
-		sensor.addState((String) stateIter.next());
-	    }
+	{
+	    sensor.addState((String) stateIter.next());
+	}
 	
 	// hardwareConnections 
 	List hardware = sensorData.getHardwareConnections();
 	for (Iterator hardwareIter = hardware.iterator(); hardwareIter.hasNext();)
-	    {
-		sensor.addHardwareConnection((String) hardwareIter.next());
-	    }
+	{
+	    sensor.addHardwareConnection((String) hardwareIter.next());
+	}
 
 	return sensor;
     }
@@ -342,31 +418,31 @@ public class JavaControlSystemImplementationBuilder extends ControlSystemImpleme
 	// LowLevelSensors
 	List llSensors = actuatorData.getSensors();
 	for (Iterator llSensorIter = llSensors.iterator(); llSensorIter.hasNext();)
-	    {
-		actuator.addSensor(createLowLevelSensor((org.supremica.manufacturingTables.controlsystemdata.Sensor) llSensorIter.next()));
-	    }
+	{
+	    actuator.addSensor(createLowLevelSensor((org.supremica.manufacturingTables.controlsystemdata.Sensor) llSensorIter.next()));
+	}
 	
 	// LowLevelActuators
 	List llActuators = actuatorData.getActuators();
 	for (Iterator llActuatorIter = llActuators.iterator(); llActuatorIter.hasNext();)
-	    {
-		actuator.addActuator(createLowLevelActuator((org.supremica.manufacturingTables.controlsystemdata.Actuator) llActuatorIter.next()));
-	    }
+	{
+	    actuator.addActuator(createLowLevelActuator((org.supremica.manufacturingTables.controlsystemdata.Actuator) llActuatorIter.next()));
+	}
 	
 	// States 
 	List states = actuatorData.getStates();
 	for (Iterator stateIter = states.iterator(); stateIter.hasNext();)
-	    {
-		actuator.addState((String) stateIter.next());
-	    }
+	{
+	    actuator.addState((String) stateIter.next());
+	}
 	
 	// hardwareConnections 
 	List hardware = actuatorData.getHardwareConnections();
 	for (Iterator hardwareIter = hardware.iterator(); hardwareIter.hasNext();)
-	    {
-		actuator.addHardwareConnection((String) hardwareIter.next());
-	    }
+	{
+	    actuator.addHardwareConnection((String) hardwareIter.next());
+	}
    
 	return actuator;
- }
+    }
 }

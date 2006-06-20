@@ -26,6 +26,7 @@
  <xs:element name="Machine" type="xs:string"/>
  <xs:element name="Actuator" type="xs:string"/>
  <xs:element name="Sensor" type="xs:string"/>
+ <xs:element name="Variable" type="xs:string"/>
  <xs:element name="ExternalVariable" type="ExternalVariableType"/>
  <xs:element name="Value" type="xs:string"/>
  <xs:element name="Zones" type="xs:string"/>
@@ -34,8 +35,8 @@
 
 
  <!-- Definition of attributes _____________________________________-->
- <xs:attribute name="OpID" type="xs:positiveInteger"/>
- <xs:attribute name="ActionNbr" type="xs:positiveInteger"/>
+ <xs:attribute name="opID" type="xs:positiveInteger"/>
+ <xs:attribute name="actionNbr" type="xs:positiveInteger"/>
 
  <!-- Definition of complex elements _______________________________-->
 
@@ -47,7 +48,7 @@
     <xs:element ref='Machine' minOccurs='1' maxOccurs='1'/>
     <xs:element ref='EOP' minOccurs='1' maxOccurs='1'/>
    </xs:sequence>
-   <xs:attribute ref='OpID' use='required'/>
+   <xs:attribute ref='opID' use='required'/>
   </xs:complexType>
  </xs:element>
 
@@ -67,6 +68,7 @@
    <xs:sequence>
     <xs:element ref='Actuator' minOccurs='1' maxOccurs='unbounded'/>
     <xs:element ref='Sensor' minOccurs='0' maxOccurs='unbounded'/>
+    <xs:element ref='Variable' minOccurs='0' maxOccurs='unbounded'/>
    </xs:sequence>
   </xs:complexType>
  </xs:element>
@@ -84,6 +86,7 @@
    <xs:sequence>
     <xs:element ref='ActuatorValue' minOccurs='1' maxOccurs='unbounded'/>
     <xs:element ref='SensorValue' minOccurs='0' maxOccurs='unbounded'/>
+    <xs:element ref='VariableValue' minOccurs='0' maxOccurs='unbounded'/>
     <!-- xs:element ref='Zones' minOccurs='1' maxOccurs='1'/ -->
     <xs:element ref='ExternalVariableValue' minOccurs='0' maxOccurs='unbounded'/>
     <xs:element ref='InitialStateCheck' minOccurs='1' maxOccurs='1'/>
@@ -96,9 +99,10 @@
    <xs:sequence>
     <xs:element ref='ActuatorValue' minOccurs='1' maxOccurs='unbounded'/>
     <xs:element ref='SensorValue' minOccurs='0' maxOccurs='unbounded'/>
+    <xs:element ref='VariableValue' minOccurs='0' maxOccurs='unbounded'/>
     <xs:element ref='Zones' minOccurs='1' maxOccurs='1'/>
    </xs:sequence>
-   <xs:attribute ref='ActionNbr' use='required'/>
+   <xs:attribute ref='actionNbr' use='required'/>
   </xs:complexType>
  </xs:element>
 
@@ -120,7 +124,16 @@
   </xs:complexType>
  </xs:element>
 
- <xs:element name='ExternalVariableValue'>
+ <xs:element name='VariableValue'>
+  <xs:complexType>
+   <xs:sequence>
+    <xs:element ref='Variable' minOccurs='1' maxOccurs='1'/>
+    <xs:element ref='Value' minOccurs='1' maxOccurs='1'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element> 
+
+<xs:element name='ExternalVariableValue'>
   <xs:complexType>
    <xs:sequence>
     <xs:element ref='ExternalVariable' minOccurs='1' maxOccurs='1'/>

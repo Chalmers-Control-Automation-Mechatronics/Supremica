@@ -1,0 +1,47 @@
+<Operation opID="40">
+    <Type>basic</Type>
+    <Comment>Cycle start condition</Comment>
+    <Machine>FIX152</Machine>
+    <EOP>
+    
+        <InternalComponents>
+            <Actuator>Y18</Actuator>
+            <Actuator>Y16</Actuator>
+            <Actuator>Y14</Actuator>
+            <Sensor>SG3</Sensor>
+            <Sensor>SG6</Sensor>
+        </InternalComponents>
+      
+        <InitialState>
+            <ActuatorValue>
+                <Actuator>Y18</Actuator>
+                <Value>home</Value>
+            </ActuatorValue>
+            <ActuatorValue>
+                <Actuator>Y16</Actuator>
+                <Value>locked</Value>
+            </ActuatorValue>
+            <ActuatorValue>
+                <Actuator>Y14</Actuator>
+                <Value>open</Value>
+            </ActuatorValue>
+            <SensorValue>
+                <Sensor>SG3</Sensor>
+                <Value>off</Value>
+            </SensorValue>
+            <SensorValue>
+                <Sensor>SG6</Sensor>
+                <Value>off</Value>
+            </SensorValue>
+            <InitialStateCheck>
+                <AlarmType>1</AlarmType>
+                <AlarmDelay>0</AlarmDelay>
+            </InitialStateCheck>
+        </InitialState>
+
+    </EOP>
+</Operation>
+
+
+
+

@@ -48,234 +48,32 @@
  */
 
 /**
- * The MachineController reads the EOPs and sends the corresponding messages. It contains information about 
- * which mailbox to send messages to. 
+ * The abstract class MachineController is the part of the machine that handles the controll of the machine, 
+ * either as a complete control system or by forwarding the operations to the machines own control system, as
+ * with for example robots. 
  *
  *
- * Created: Mon May 15 14:20:32 2006
+ * Created: Tue Jun 13 16:24:20 2006
  *
  * @author Oscar
  * @version 1.0
  */
 package org.supremica.manufacturingTables.controlsystemimplementation.Java;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Iterator;
-public class MachineController implements Listener
+abstract public class MachineController 
 {
-    private Mailbox mailbox;
-    private boolean performsEOP;
-    private String ID;
-    private Map EOPs;  // HashMap will be used for quick access to the states
-    private EOPRow currentEOPRow;
-    private EOP currentEOP;
+    protected boolean performsEOP; // can only perform one EOP at a time
+    protected String ID;
     
-    public MachineController(Mailbox mailbox)
+    public MachineController()
     {
-	this.mailbox = mailbox;
 	performsEOP = false;
 	ID = "MachineController";
-	mailbox.register(this);
-	EOPs = new HashMap(); //default capacity (16) and load factor (0,75) suits me fine
-	currentEOPRow = null;
-	currentEOP = null;
     }
 
-    public void registerEOP(EOP EOP)  
-    {
-	EOPs.put(EOP.getId(), EOP);
-    }
-
-    public void performEOP(int EOPNbr)
-    {
-	if ( EOPs.containsKey(EOPNbr) && !performsEOP )
-	{
-	    performsEOP = true;
-	    currentEOP = (EOP) EOPs.get(EOPNbr);
-	    currentEOP.startActions();
-		
-	    // EOP Initial Row
-	    currentEOPRow = currentEOP.getEOPInitialRowClone();
-	    performInitialRow();
-	}		
-	else 
-	{
-	    System.err.println("Unknown EOP or already busy performing an EOP!");
-	}
-    }
-    
-    // Perform the control activities according to the initial EOP row, stored as currentEOPRow.
-    // The activities are different for different EOP types.
-    private void performInitialRow()
-    {
-	// I make a clone of the current EOP row to iterate through so the orders can be sent to the sensors, 
-	// actuators etc, be carried out, sent back to this MachineController and remove the performed element
-	// from the current EOP row without interfering with this iterated clone.
-	EOPInitialRow initialRow = (EOPInitialRow) ( (EOPInitialRow) currentEOPRow ).clone(); 	
-	
-	//check type
-	// Must fix so that we can have alternative EOPS, for now this is not done
-
-	// Initial Row + alternative EOP -> requestState
-	if (currentEOP.getType().equals("alternative"))
-	{
-	    System.err.println("There is currently no support for alternative EOPs!");
-	}
-	
-	// Initial Row + basic EOP -> checkState 
-	else if (currentEOP.getType().equals("basic"))
-	{
-	    // For now I dont care about the alarm types and delays
-	    //get Alarm Type and Alarm Delay
-			
-	    // External Variable
-	    for (Iterator externalIter = initialRow.getExternalVariableToStateMap().entrySet().iterator(); externalIter.hasNext();)
-	    {
-		Entry variableToState = (Entry) externalIter.next();
-		if ( !variableToState.getValue().equals("*") );
-		{
-		    //send some message to Machine with the value and key (the whole entry?)
-		}
-	    }
-	    // Actuators
-	    for (Iterator actuatorIter = initialRow.getActuatorToStateMap().entrySet().iterator(); actuatorIter.hasNext();)
-	    {
-		Entry actuatorToState = (Entry) actuatorIter.next();
-		mailbox.send( new Message( ID,  (String) actuatorToState.getKey(), "checkState", (String) actuatorToState.getValue() ) );
-			
-	    }
-	    // Sensors
-	    for (Iterator sensorIter = initialRow.getSensorToStateMap().entrySet().iterator(); sensorIter.hasNext();)
-	    {
-		Entry sensorToState = (Entry) sensorIter.next();
-		mailbox.send( new Message( ID, (String) sensorToState.getKey(), "checkState", (String) sensorToState.getValue() ) );
-		// Initial Row + sensor -> monitorState
-		mailbox.send( new Message( ID, (String) sensorToState.getKey(), "monitorState", true ) );
-	    }
-	}
-	else
-	{
-	    System.err.println("Unknown EOP type " + currentEOP.getType());
-	}
-    }
-
-    // Perform the control activities according to the current actionRow with only changing actuators and sensors left, 
-    // stored as currentEOPRow
-    private void performActions()
-    {
-	// I make a clone of the current EOP row to iterate through so the orders can be sent to the sensors, 
-	// actuators etc, be carried out, sent back to this MachineController and remove the performed element
-	// from the current EOP row without interfering with this iterated clone.
-	EOPActionRow actionRow = (EOPActionRow) ( (EOPActionRow) currentEOPRow ).clone(); 	
-
-
-	// Changed actuator or sensor -> orderState
-	
-	// Actuators
-	for (Iterator actuatorIter = actionRow.getActuatorToStateMap().entrySet().iterator(); actuatorIter.hasNext();)
-	{
-	    Entry actuatorToState = (Entry) actuatorIter.next();
-	    mailbox.send( new Message( ID,  (String) actuatorToState.getKey(), "orderState", (String) actuatorToState.getValue() ) );
-	    
-	}
-
-	// Sensors
-	for (Iterator sensorIter = actionRow.getSensorToStateMap().entrySet().iterator(); sensorIter.hasNext();)
-	{
-	    Entry sensorToState = (Entry) sensorIter.next();
-	    // Changed sensor -> monitorState off
-	    mailbox.send( new Message( ID, (String) sensorToState.getKey(), "monitorState", false ) );
-	    
-	    mailbox.send( new Message( ID, (String) sensorToState.getKey(), "orderState", (String) sensorToState.getValue() ) );
-	}
-
-	// Wait with booking and unbooking zones
-	
-    }
-	
-	
-	
-	
-	
-	
-		//read the EOP...!
-		
-		//Message.TYPE[0];
-// 		System.err.println("mailbox.send(new Message(ID,  \"152Y14\", \"orderState\", \"open\"));");
-// 		mailbox.send(new Message(ID,  "152Y14", "orderState", "open"));
-// 		System.err.println("mailbox.send(new Message(ID,  \"152Y14\", \"requestState\", null));");
-// 		mailbox.send(new Message(ID,  "152Y14", "requestState", null));
-// 		System.err.println("mailbox.send(new Message(ID,  \"152Y14\", \"checkState\", \"closed\"));");
-// 		mailbox.send(new Message(ID,  "152Y14", "checkState", "closed"));
-// 		System.err.println("mailbox.send(new Message(ID,  \"152SG3\", \"requestState\", null));");
-// 		mailbox.send(new Message(ID,  "152SG3", "requestState", null));
-// 		System.err.println("mailbox.send(new Message(ID,  \"152Y14\", \"checkState\", \"off\"));");
-// 		mailbox.send(new Message(ID,  "152SG3", "checkState", "off"));
-		
-
-    public void receiveMessage(Message msg) 
-    {
-	//confirmations from variables , booking and unbooking also has to be checked
-	
-	// Confirm State
-	if (performsEOP && msg.getType().equals("confirmState"))
-	{
-	    System.err.println("Received message in MachineController: "+ msg.getType() + ", " + msg.getContent()); 
-		
-		// Check if the confirmation was true
-		if (((Boolean) msg.getContent()).booleanValue())
-		    {
-			String sender = msg.getSender();
-			System.err.println("The component " + sender + "holds the supposed state.");
-			
-			// Actuator
-			if ( currentEOPRow.getActuatorToStateMap().containsKey( sender ) )
-			    {
-				currentEOPRow.getActuatorToStateMap().remove(  sender );
-			    }		
-			// Sensor
-			else if ( currentEOPRow.getSensorToStateMap().containsKey( sender ) )
-			    {
-				currentEOPRow.getSensorToStateMap().remove(  sender );
-			    }		
-			else
-			    {
-				System.err.println("Unknown component");
-			    }
-			
-			// Check if the EOP row has been performed
-			// Variables, booking and unbooking also has to be checked (and that they are not null)
-			if ( currentEOPRow.getActuatorToStateMap().size() == 0 &&  currentEOPRow.getSensorToStateMap().size() == 0 )
-			    {
-				System.err.println("The EOP row has been performed.");
-				if (currentEOP.hasMoreActions())
-				    {
-					currentEOPRow = currentEOP.getNextActions();
-					performActions();
-				    }
-				else
-				    {
-					performsEOP = false;
-					System.err.println("The EOP is done!");
-				    }
-
-			    }
-		    }
-		else
-		    {
-			System.err.println("The Machine has to stop due to component errors!");
-		    }
-		performsEOP = false;
-	    }
-	else
-	    {
-		System.err.println("Wrong message or message type sent to MachineController!");
-	    }
-    }
-    
-    public String getID()
+    abstract public boolean performEOP(int EOPNbr);
+        
+    final public String getID()
     {
 	return ID;
     }

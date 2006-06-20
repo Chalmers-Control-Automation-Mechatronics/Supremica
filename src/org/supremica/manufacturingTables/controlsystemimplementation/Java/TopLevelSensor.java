@@ -86,11 +86,11 @@ public class TopLevelSensor extends Sensor implements Listener
 	}
 	else if (msg.getType().equals("checkState"))
 	{
-	    mailbox.send(new Message(getID(), "MachineController", "confirmState",checkState((String) msg.getContent())));
+	    mailbox.send(new Message(getID(), "MachineController", "confirmState", checkState((String) msg.getContent())));
 	}
 	else if (msg.getType().equals("orderState"))
 	{
-	    mailbox.send(new Message(getID(), "MachineController", "confirmState",orderState((String) msg.getContent())));
+	    mailbox.send(new Message(getID(), "MachineController", "confirmState", orderState((String) msg.getContent())));
 	}
 	else if (msg.getType().equals("monitorState"))
 	{
@@ -106,11 +106,11 @@ public class TopLevelSensor extends Sensor implements Listener
     public void monitorState(boolean on)
     {
 	// Here some polling has to be done or we have to rely on the HW to tell us if the state changes
-	String monitoredState = requestState();
 	monitorOn = on;
 	if (monitorOn)
 	{
-	    System.err.println("State monitoring on!");
+	    System.err.println("State monitoring!:");
+	    String monitoredState = requestState();
 	    //while (monitorOn) if (!((String) requestState()).equals(monitoredState()) alarm!...;
 	}
 	else 
@@ -125,10 +125,10 @@ public class TopLevelSensor extends Sensor implements Listener
 	if (!sensors.isEmpty())
 	{
 	    Iterator sensorIter = sensors.iterator();
-	    currentState = ((Sensor) sensors.get(0)).requestState();
+	    currentState = ((Sensor) sensorIter.next()).requestState();
 	    while (sensorIter.hasNext())
 	    {
-		if (!currentState.equals((String) ((Sensor) sensorIter.next()).requestState()))
+		if ( !currentState.equals( ( (Sensor) sensorIter.next() ).requestState() ) )
 		{
 		    System.err.println("Broken equipment: " + name + " !");
 		    return null;
@@ -148,7 +148,7 @@ public class TopLevelSensor extends Sensor implements Listener
 		String newState = null;
 		while (newState == null)
 		{
-		    System.out.print("Type the state for sensor " + name + " and hardwareConnection " + (String) hardwareConnections.get(0) + ":");
+		    System.out.print("Type the state for sensor " + name + " (" + getDescription()  + ") and hardwareConnection " + (String) hardwareConnections.get(0) + ":");
 		    System.out.flush();
 		    newState =  in.readLine();
 		    if (hasState(newState))

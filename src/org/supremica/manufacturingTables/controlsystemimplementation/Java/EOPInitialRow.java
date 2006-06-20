@@ -60,6 +60,8 @@ package org.supremica.manufacturingTables.controlsystemimplementation.Java;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Set;
 
 public class EOPInitialRow extends EOPRow implements Cloneable
@@ -139,4 +141,38 @@ public class EOPInitialRow extends EOPRow implements Cloneable
 	return clone;
     }
 
+    // Remove the unimportant states (thos with a "*" as the state
+    public void removeUnimportantStates()
+    {
+	// Sensors
+	for (Iterator sensorIter = sensorToStateMap.entrySet().iterator(); sensorIter.hasNext();)
+	{
+	    Entry currentSensorToState = (Entry) sensorIter.next();
+	    if ( ( (String) currentSensorToState.getValue() ).equals("*"))
+	    {
+		sensorIter.remove();
+	    }
+	}
+	// Actuators
+	for (Iterator actuatorIter = actuatorToStateMap.entrySet().iterator(); actuatorIter.hasNext();)
+	{
+	    Entry currentActuatorToState = (Entry) actuatorIter.next();
+	    if ( ( (String) currentActuatorToState.getValue() ).equals("*"))
+	    {
+		actuatorIter.remove();
+	    }
+	}
+	// External varibles
+	for (Iterator externalIter = externalVariableToStateMap.entrySet().iterator(); externalIter.hasNext();)
+	{
+	    Entry externalVariableToState = (Entry) externalIter.next();
+	    if ( ( (String) externalVariableToState.getValue() ).equals("*"))
+	    {
+		externalIter.remove();
+	    }
+	}
+	
+	
+    }
+    
 }

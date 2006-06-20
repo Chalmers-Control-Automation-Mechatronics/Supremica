@@ -1,4 +1,4 @@
-<Operation OpID="44">
+<Operation opID="44">
     <Type>basic</Type>
     <Comment>move to home position</Comment>
     <Machine>FIX152</Machine>
@@ -11,11 +11,7 @@
             <Sensor>SG3</Sensor>
             <Sensor>SG6</Sensor>
         </InternalComponents>
-      
-        <ExternalComponents>
-            <ExternalVariable>R3325#parts&gt;0</ExternalVariable>
-        </ExternalComponents>
-    
+
         <InitialState>
             <ActuatorValue>
                 <Actuator>Y18</Actuator>
@@ -37,17 +33,13 @@
                 <Sensor>SG6</Sensor>
                 <Value>on</Value>
             </SensorValue>
-            <ExternalVariableValue>
-                <ExternalVariable>R3325#parts&gt;0</ExternalVariable>
-                <Value>*</Value>
-            </ExternalVariableValue>
             <InitialStateCheck>
                 <AlarmType>1</AlarmType>
                 <AlarmDelay>0</AlarmDelay>
             </InitialStateCheck>
         </InitialState>
 
-        <Action ActionNbr="1">
+        <Action actionNbr="1">
             <ActuatorValue>
                 <Actuator>Y18</Actuator>
                 <Value>work pos</Value>
@@ -71,7 +63,7 @@
             <Zones>-</Zones>
         </Action>
 
-        <Action  ActionNbr="2">
+        <Action actionNbr="2">
             <ActuatorValue>
                 <Actuator>Y18</Actuator>
                 <Value>work pos</Value>
@@ -95,7 +87,7 @@
             <Zones>-</Zones>
         </Action>
 
-        <Action ActionNbr="3">
+        <Action actionNbr="3">
             <ActuatorValue>
                 <Actuator>Y18</Actuator>
                 <Value>home</Value>
@@ -119,7 +111,7 @@
             <Zones>-</Zones>
         </Action>
 
-        <Action ActionNbr="4">
+        <Action actionNbr="4">
             <ActuatorValue>
                 <Actuator>Y18</Actuator>
                 <Value>home</Value>

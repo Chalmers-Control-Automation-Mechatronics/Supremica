@@ -70,14 +70,15 @@ public class Machine implements EquipmentContainer
     private String description;
     private List actuators; 
     // The order for the actuators (and sensors, variables and EOPs below) are not important but I allways iterate 
-    // through all elements in the list. Normally very few elements are used.
+    // through all elements in the list.
     private List sensors; 
     private Mailbox mailbox;
     private List variables;
     private List EOPs;
     private MachineController machineController;
+    private boolean ownControlSystem;
 
-    public Machine(String name, String type, MachineController machineController, Mailbox mailbox)
+    public Machine(String name, String type, MachineController machineController, Mailbox mailbox, boolean ownControlSystem)
     {
 	this.name = name;
 
@@ -95,6 +96,7 @@ public class Machine implements EquipmentContainer
 		return;
 	    }
 	    
+	this.ownControlSystem = ownControlSystem;
 	this.type = type;
 	this.machineController = machineController;
 	variables = new LinkedList();
@@ -109,7 +111,12 @@ public class Machine implements EquipmentContainer
     {
 	return name;
     }
-   
+    
+    public boolean hasOwnControlSystem()
+    {
+	return ownControlSystem;
+    }
+
     public String getType()
     {
 	return type;

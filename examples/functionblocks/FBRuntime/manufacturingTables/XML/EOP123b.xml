@@ -1,0 +1,44 @@
+﻿<Operation opID="123">
+    <Type>alternative</Type>
+    <Comment>Rotate turntable - no rotation, not empty rack</Comment>
+    <Machine>TT154</Machine>
+    <EOP>
+    
+        <InternalComponents>
+            <Actuator>M1</Actuator>
+            <Sensor>F7KM1-2</Sensor>
+            <Variable>New rack in cell</Variable>
+        </InternalComponents>
+      
+        <ExternalComponents>
+            <ExternalVariable>R3326#parts&gt;0</ExternalVariable>
+        </ExternalComponents>
+    
+        <InitialState>
+            <ActuatorValue>
+                <Actuator>M1</Actuator>
+                <Value>*</Value>
+            </ActuatorValue>
+            <SensorValue>
+                <Sensor>F7KM1-2</Sensor>
+                <Value>TRUE</Value>
+            </SensorValue>
+            <VariableValue>
+                <Variable>New rack in cell</Variable>
+                <Value>FALSE</Value>
+            </VariableValue>
+            <ExternalVariableValue>
+                <ExternalVariable>R3326#parts&gt;0</ExternalVariable>
+                <Value>TRUE</Value>
+            </ExternalVariableValue>
+            <InitialStateCheck>
+                <AlarmType>2</AlarmType>
+                <AlarmDelay>0</AlarmDelay>
+            </InitialStateCheck>
+        </InitialState>
+
+     </EOP>
+</Operation>
+
+
+

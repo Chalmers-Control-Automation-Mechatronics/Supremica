@@ -58,18 +58,49 @@
  */
 package org.supremica.manufacturingTables.controlsystemimplementation.Java;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Coordinator implements Listener
 {
     private Mailbox mailbox;
-    private boolean performsTask;
+    private boolean performsTask; // In this version of the concept, only one product at a time is allowed
     private String ID;
-
+    private Map<String, MachineCoordinator> machineCoordinators; 
+    // The Coordinator creates all the MachineCoordinators and can reach them both by references and by 
+    // message handling.
+    private Map<String, Boolean> machineCoordinatorsStarted; // used to keep track of which machines/machineControllers that are started.
+ 
     public Coordinator(Mailbox mailbox)
     {
 	this.mailbox = mailbox;
 	performsTask = false;
 	ID = "Coordinator";
 	mailbox.register(this);
+	machineCoordinators = new HashMap<String, MachineCoordinator>(); 
+	// default initital capacity (16) and load factor (0,75) suits me fine
+	machineCoordinatorsStarted = new HashMap<String, Boolean>(); 
+    }
+
+    // When a SOP shall be registerad by the Coordinator, a new MachineCoordinator is created if it has not
+    // already been created. Then the SOP is set to that MachineCoordinator. This makes it easy in the future to 
+    // distinguish between different SOPs for different products. The Coordinator hence can communicate with the
+    // machineCoordinators both directly and via the mailbox, which may be a little strange. This is also done
+    // to make it easy in the future to make the MachineCoordinator a part of the machine or to make it only a part 
+    // of the cell and remove / not use the message handling.
+    public void registerSOP(SOP SOP)
+    {
+	if ( !machineCoordinators.containsKey( SOP.getMachine() ) )
+	{
+	    MachineCoordinator machineCoordinator = new MachineCoordinator(SOP.getMachine(), mailbox);
+	    machineCoordinator.setSOP(SOP);
+	    machineCoordinators.put(machineCoordinator.getID(), machineCoordinator);
+	}
+	else
+	{
+	    System.err.println( "The SOP for machine " + SOP.getMachine() + " is changed to " + SOP.getID() );
+	    machineCoordinators.get( SOP.getMachine() ).setSOP( SOP );
+	}
     }
 
     public void performTask(String task)
@@ -77,10 +108,20 @@ public class Coordinator implements Listener
 	if (task.equals("weld floor") && !performsTask)
 	    {
 		performsTask = true;
-		//read the SOP...!
 
-		//Message.TYPE[0];
-		mailbox.send(new Message(ID, "150FIX152", "performEOP", 44));
+		// Register that the machines are started. Has to be handled separate from starting the machines /
+		// machineCoordinators since otherwise the machineCoordinatorsStarted map could be empty (making us believe 
+		// that we are done) when only a few machines has been started and finished.
+		for (MachineCoordinator machineCoordinator : machineCoordinators.values())
+		{
+		    machineCoordinatorsStarted.put(machineCoordinator.getID(), true);
+		}
+		
+		for (MachineCoordinator machineCoordinator : machineCoordinators.values())
+		{
+		    mailbox.send( new Message( ID, machineCoordinator.getID(), "performSOP", "weld floor" ) );
+		    // Otherwise the machinecoordinators start() method could be called
+		}
 	    }
 	else 
 	    {
@@ -91,23 +132,36 @@ public class Coordinator implements Listener
     // Do not need to check if the message is for me since it allways is!
     public void receiveMessage(Message msg)
     {
-	if (performsTask && msg.getType().equals("EOPDone"))
+	if (performsTask && msg.getType().equals("SOPDone"))
+	{
+	    if (((Boolean) msg.getContent()).booleanValue())
 	    {
-		// Here must be added code to check who sent the message
-		if (((Boolean) msg.getContent()).booleanValue())
+		    if (machineCoordinatorsStarted.containsKey(msg.getSender()))
 		    {
-			System.err.println("The EOP has been performed with outstanding results!");
+			System.err.println("The SOP for machine " + machineCoordinators.get(msg.getSender()).getMachine() + " has been performed with outstanding results!");
+			machineCoordinatorsStarted.remove(msg.getSender());
 		    }
-		else
+		    else
 		    {
-			System.out.println("The EOP could not be performed!");
+			System.err.println("The machine " + machineCoordinators.get(msg.getSender()).getMachine() + "has never been started!");
 		    }
+	    }
+	    else
+	    {
+		System.out.println("The SOP could not be performed!");
+		Boolean temp = machineCoordinatorsStarted.get(msg.getSender());
+		temp = Boolean.FALSE; // do not know why I have to separate this two lines
+	    }
+	    if (machineCoordinatorsStarted.isEmpty())
+	    {
+		System.out.println("The whole cell manufacturing cycle is done!");
 		performsTask = false;
 	    }
+	}
 	else
-	    {
-		System.err.println("Wrong message or message type sent to Coordinator!");
-	    }
+	{
+	    System.err.println("Wrong message or message type sent to Coordinator!");
+	}
     }
     
     public String getID()
