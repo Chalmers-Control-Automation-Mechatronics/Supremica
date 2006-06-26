@@ -372,6 +372,18 @@ class MainPopupMenu
 			expMenu.add(new SupremicaMenuItem(new SaturateAction()));
 			expMenu.add(new SupremicaMenuItem(new BuildObserverAction()));
 			expMenu.add(new SupremicaMenuItem(new SplitAction()));
+			
+			// Test
+			JMenuItem testItem = new JMenuItem("Test");
+			testItem.setToolTipText("Experimental method without a name yet");
+			testItem.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					ActionMan.testMethod(getGui());
+				}
+			});
+			expMenu.add(testItem);
 
 			expMenu.addSeparator();
 

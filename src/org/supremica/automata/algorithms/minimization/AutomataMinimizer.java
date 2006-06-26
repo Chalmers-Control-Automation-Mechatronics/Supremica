@@ -283,8 +283,13 @@ public class AutomataMinimizer
 			logger.info("The automaton with the most states had " + mostStates + " states.");
 			logger.info("The automaton with the most transitions had " + mostTransitions + " transitions.");
 		}
+		else
+		{
+			//logger.info("The automaton with the most states had " + mostStates + " states.");
+			//logger.info("The automaton with the most transitions had " + mostTransitions + " transitions.");
+		}
 		//logger.info("Timer time: " + timer);
-		logger.info(theAutomata.getName() + " & " + initialNbrOfAutomata + " & & " + mostStates + " & " + mostTransitions + " & TIME & true/false & " + AutomatonMinimizer.getWodesStatisticsLaTeX() + " & ALGO \\\\");
+		//logger.info(theAutomata.getName() + " & " + initialNbrOfAutomata + " & & " + mostStates + " & " + mostTransitions + " & TIME & true/false & " + AutomatonMinimizer.getWodesStatisticsLaTeX() + " & ALGO \\\\");
 		// Return the result of the minimization!
 		assert(theAutomata.size() == 1);
 		return theAutomata.getFirstAutomaton();

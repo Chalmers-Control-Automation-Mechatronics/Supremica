@@ -772,6 +772,10 @@ public class Automaton
 		return false;
 	}
 
+	/**
+	 * Examines if the automaton is deterministic.
+	 * @return true if automaton is deterministic.
+	 */
 	public boolean isDeterministic()
 	{
 		HashSet foundEvents = new HashSet();

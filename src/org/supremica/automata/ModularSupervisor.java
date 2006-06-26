@@ -103,7 +103,7 @@ public class ModularSupervisor
 	// Supervisor interface methods //
 	//////////////////////////////////
 	
-	public boolean isEnabled(LabeledEvent event)
+	public synchronized boolean isEnabled(LabeledEvent event)
 	{
 		// Try executing the event
 		// Save the current global state
@@ -126,7 +126,7 @@ public class ModularSupervisor
 		}
 	}
 
-	public void executeEvent(LabeledEvent event)
+	public synchronized void executeEvent(LabeledEvent event)
 		throws EventDisabledException
 	{
 		for (Automaton aut : model)
