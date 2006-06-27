@@ -152,7 +152,7 @@ public class Automaton
 
 		endTransaction();
 	}
-
+	
 	/**
 	 * Sets the type of this automaton (e.g. AutomatonType.Plant, AutomatonType.Specification).
 	 * @see AutomatonType

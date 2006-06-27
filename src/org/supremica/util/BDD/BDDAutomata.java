@@ -119,7 +119,7 @@ public class BDDAutomata
 		permute_spp2sp = createPair(tmp3, tmp2);
 		permute_sp2spp = createPair(tmp2, tmp3);
 
-		// then we create all automata  ...
+		// then we create all automata...
 		int i = 0;
 
 		size_states = 0;

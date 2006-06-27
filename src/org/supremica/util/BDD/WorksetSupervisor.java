@@ -2,6 +2,8 @@ package org.supremica.util.BDD;
 
 /**
  *
+ * This is where the workset algorithm is performed.
+ *
  * This is an optimization of the simple disjunctive algorithm when we choose a
  * new automaton to traverse only if something has happened earlier that may affect
  * that automata.

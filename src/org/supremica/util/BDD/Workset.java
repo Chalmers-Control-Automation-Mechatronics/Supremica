@@ -5,6 +5,8 @@ import org.supremica.util.BDD.graphs.*;
 
 
 /**
+ * The workset algorithm itself is performed in WorksetSupervisor.
+ * 
  * The workset algorithms works just like the PetriNet reachability algo, but it treats zappsp
  * each automaton in the same way as a single transition should be treated...
  *

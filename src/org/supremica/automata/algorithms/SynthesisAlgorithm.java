@@ -59,7 +59,7 @@ public class SynthesisAlgorithm
 	public static final SynthesisAlgorithm IDD = new SynthesisAlgorithm("IDD", false);
 	public static final SynthesisAlgorithm Unknown = new SynthesisAlgorithm("Unknown", false);
 	public static final SynthesisAlgorithm MonolithicSingleFixpoint = new SynthesisAlgorithm("Monolithic (single fixpoint)", false);    // works, but is very slow [due to lame implementation :s ]
-	public static final SynthesisAlgorithm BDD = new SynthesisAlgorithm("BDD", false);    // works, but we cant handle the results yet
+	public static final SynthesisAlgorithm BDD = new SynthesisAlgorithm("BDD", true);    // works, but we cant handle the results yet
 	private String description = null;
 
 	private SynthesisAlgorithm(String description)

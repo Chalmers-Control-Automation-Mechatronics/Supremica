@@ -55,6 +55,7 @@ import org.supremica.gui.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.minimization.*;
 import org.supremica.properties.Config;
+import org.supremica.util.BDD.OnlineBDDSupervisor;
 
 // This one is used for doMonolithic to return two values
 class MonolithicReturnValue
@@ -226,10 +227,23 @@ public class AutomataSynthesizer
 			boolean do_c = (typ == SynthesisType.Both) | (typ == SynthesisType.Controllable);
 			boolean do_nb = (typ == SynthesisType.Both) | (typ == SynthesisType.Nonblocking);
 
-			AutomataBDDSynthesizer bddSynthesizer = new AutomataBDDSynthesizer(theAutomata, do_nb, do_c);
-
-			bddSynthesizer.execute();
-			bddSynthesizer.cleanup();
+			Automata newAutomata = new Automata(theAutomata);
+			
+			AutomataBDDSynthesizer bddSynthesizer = new AutomataBDDSynthesizer(newAutomata, do_nb, do_c);
+			
+			//Perform BDD synthesis
+			OnlineBDDSupervisor supervisor = bddSynthesizer.extractOnlineSupervisor();
+			
+			//result.addAutomaton(sup);
+			try {
+				result.addAutomaton(supervisor.createAutomaton());
+			} catch(Exception ex) {
+				ex.printStackTrace();
+			} finally {
+				//clean up (this is needed because of the buddy lib)
+				supervisor.cleanup();
+				bddSynthesizer.cleanup();
+			}
 		}
 		else
 		{

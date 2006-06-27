@@ -32,7 +32,7 @@ public class AutomataBDDSynthesizer
 
 			ba = bu.getBDDAutomata();
 
-			// sup = new Supervisor(ba, ba.getAutomataVector());
+			//sup = new Supervisor(ba, ba.getAutomataVector());
 			sup = SupervisorFactory.createSupervisor(ba, ba.getAutomataVector());
 		}
 		catch (Exception pass)
@@ -104,7 +104,7 @@ public class AutomataBDDSynthesizer
 	 * Create an IEC-xxxx file that refelects the enabling-list of the supervisor
 	 *
 	 */
-	public void execute()
+	public void generateCode()
 	{
 		PrintStream ps = null;
 		JFileChooser chooser = new JFileChooser();

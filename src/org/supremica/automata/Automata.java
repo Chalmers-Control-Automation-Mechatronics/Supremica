@@ -855,6 +855,15 @@ public class Automata
 		return unionAlphabet;
 	}
 
+	public Set<Automaton> getAutomata() {
+		Iterator<Automaton> iterator = iterator();
+		Set<Automaton> automata = new HashSet<Automaton>();
+		while(iterator.hasNext()) {
+			automata.add(iterator.next());
+		}
+		return automata;
+	}
+	
 	public Automaton getAutomaton(String name)
 	{
 		return nameMap.get(name);
