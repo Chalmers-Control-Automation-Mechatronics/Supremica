@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.53 2006-05-24 13:41:28 martin Exp $
+//# $Id: EditorSurface.java,v 1.54 2006-06-29 18:14:37 flordal Exp $
 //###########################################################################
 
 
@@ -152,7 +152,7 @@ public class EditorSurface
 	 */
 	protected void printComponent(Graphics g)
 	{
-		// Paint using hairline
+		// Paint using hairline. NO! The hairline is too thin on presentation slides, for example
 		EditorObject.setBasicStroke(EditorObject.THINSTROKE);
 		paintComponent(g, true);
 		EditorObject.setBasicStroke(EditorObject.SINGLESTROKE);

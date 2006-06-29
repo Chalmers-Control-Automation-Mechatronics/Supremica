@@ -4,8 +4,8 @@
 //# PACKAGE: wnet.sourceforge.aters.gui
 //# CLASS:   EditorObject
 //###########################################################################
-//# $Id: EditorObject.java,v 1.24 2006-03-02 12:12:49 martin Exp $
-//# $Id: EditorObject.java,v 1.24 2006-03-02 12:12:49 martin Exp $
+//# $Id: EditorObject.java,v 1.25 2006-06-29 18:14:37 flordal Exp $
+//# $Id: EditorObject.java,v 1.25 2006-06-29 18:14:37 flordal Exp $
 //###########################################################################
 
 
@@ -58,7 +58,8 @@ public abstract class EditorObject
 	/** Thick line used for drawing shadows. */
 	public static final Stroke SHADOWSTROKE = new BasicStroke(10, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND);
 	/** Used as the basic stroke when printing - "hairline" width. */
-	public static final Stroke THINSTROKE = new BasicStroke(0.25f);
+	//public static final Stroke THINSTROKE = new BasicStroke(0.25f);
+	public static final Stroke THINSTROKE = new BasicStroke(); // Hairline was too thin in presentations, too thick in papers?
 	/** The default pen size. Is not {@code final} since it changes when printing. */
 	public static Stroke BASICSTROKE = SINGLESTROKE;
 
