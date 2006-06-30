@@ -94,4 +94,19 @@ public class EditorPanel
     //	    return getEditorWindowInterface();
 	}
 
+	public EditorPanelInterface getEditorPanelInterface()
+	{
+		return new EditorPanelInterfaceImpl();
+	}
+
+	class EditorPanelInterfaceImpl
+		implements EditorPanelInterface
+		{
+			public void addComponent()
+			{
+				componentsPanel.addComponent();
+			}
+		}
+
+
 }

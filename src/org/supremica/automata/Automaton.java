@@ -129,16 +129,15 @@ public class Automaton
 		comment = new String(orgAut.comment == null ? "" : orgAut.comment);
 
 		// Create all states
-		for (State orgState : orgAut)
+		for (State orgState : orgAut.iterableStates())
 		{
 			State newState = new State(orgState);
 
 			addState(newState);
 		}
 
-		for (Iterator<Arc> arcIt = orgAut.arcIterator(); arcIt.hasNext(); )
+		for (Arc arc : orgAut.iterableArcs())
 		{
-			Arc arc = arcIt.next();
 			// We can use indices which is much faster, since the indices can not have changed!
 			//State fromState = getStateWithName(arc.getFromState().getName());
 			//State toState = getStateWithName(arc.getToState().getName());
@@ -300,14 +299,9 @@ public class Automaton
 	public void remapStateIndices()
 	{
 		indexStateMap.clear();
-		//idStateMap.clear();
-
-		for (Iterator<State> stit = stateIterator(); stit.hasNext(); )
+		for (State state : iterableStates())
 		{
-			State state = stit.next();
-
 			indexStateMap.put(new Integer(state.getIndex()), state);
-			//idStateMap.put(state.getId(), state);
 		}
 	}
 
@@ -316,16 +310,16 @@ public class Automaton
 	 */
     private void checkStateIndices()
     {
-        TreeSet sort = new TreeSet();
+        TreeSet<Integer> sort = new TreeSet<Integer>();
 
-        for (Iterator<State> it = stateIterator(); it.hasNext(); )
-        {
-            sort.add(new Integer(it.next().getIndex()));
+		for (State state : iterableStates())
+		{
+            sort.add(new Integer(state.getIndex()));
         }
 
-        for (Iterator it = sort.iterator(); it.hasNext(); )
+        for (Integer i : sort )
         {
-            logger.error(it.next().toString());
+            logger.error(i.toString());
         }
     }
 
@@ -383,10 +377,8 @@ public class Automaton
 
 		// We start by computing the set of explicitly
 		// forbidden events
-		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
+		for (State currState : iterableStates())
 		{
-			State currState = stateIt.next();
-
 			for (Iterator<Arc> arcIt = currState.outgoingArcsIterator();
 					arcIt.hasNext(); )
 			{
@@ -418,9 +410,8 @@ public class Automaton
 		// forbidden events
 		Alphabet controlInconsistentEvents = new Alphabet();
 
-		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
+		for (State currState : iterableStates())
 		{
-			State currState = stateIt.next();
 
 			for (Iterator<Arc> arcIt = currState.outgoingArcsIterator();
 					arcIt.hasNext(); )
@@ -462,10 +453,8 @@ public class Automaton
 
 		// We start by computing the set of explicitly
 		// forbidden events
-		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
+		for (State currState : iterableStates())
 		{
-			State currState = stateIt.next();
-
 			for (Iterator<Arc> arcIt = currState.outgoingArcsIterator();
 					arcIt.hasNext(); )
 			{
@@ -498,10 +487,8 @@ public class Automaton
 		// forbidden events
 		Alphabet controlInconsistentEvents = new Alphabet();
 
-		for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
+		for (State currState : iterableStates())
 		{
-			State currState = stateIt.next();
-
 			for (Iterator<Arc> arcIt = currState.outgoingArcsIterator();
 					arcIt.hasNext(); )
 			{
@@ -890,6 +877,22 @@ public class Automaton
 	public StateSet getStateSet()
 	{
 		return theStates;
+	}
+
+
+	public IterableStates iterableStates()
+	{
+		return new IterableStates(theStates);
+	}
+
+	public IterableEvents iterableEvents()
+	{
+		return new IterableEvents(alphabet);
+	}
+
+	public IterableArcs iterableArcs()
+	{
+		return new IterableArcs(theStates);
 	}
 
 	public Iterator<Arc> arcIterator()

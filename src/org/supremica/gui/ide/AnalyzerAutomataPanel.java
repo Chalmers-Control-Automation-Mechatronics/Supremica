@@ -129,7 +129,7 @@ class AnalyzerAutomataPanel
 		TableColumnModel theTableColumnModel = theAutomatonTable.getColumnModel();
 		for (int i = 0; i < theAutomatonTable.getColumnCount(); i++)
 		{
-			System.out.println(tableWidth + " " + i);
+			//System.out.println(tableWidth + " " + i);
 			TableColumn currColumn = theTableColumnModel.getColumn(i);
 
 			if (i == TABLE_NAME_COLUMN)

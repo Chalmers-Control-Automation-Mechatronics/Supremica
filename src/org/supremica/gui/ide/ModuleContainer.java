@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.25 2006-03-25 15:56:47 flordal Exp $
+//# $Id: ModuleContainer.java,v 1.26 2006-06-30 15:40:17 knut Exp $
 //###########################################################################
 
 
@@ -63,11 +63,11 @@ public class ModuleContainer implements UndoInterface
 		mPrinter = new HTMLPrinter();
 		setSelectedComponent(getEditorPanel());
 	}
-    
+
 
 	//#######################################################################
 	//# Simple Access
-	public IDE getIDE() 
+	public IDE getIDE()
 	{
 	    return mIDE;
 	}
@@ -169,6 +169,11 @@ public class ModuleContainer implements UndoInterface
 		return mVisualProject;
 	}
 
+	public void addComponent()
+	{
+
+	}
+
 	//#######################################################################
 	//# Undo & Redo
 	public EditorWindowInterface getActiveEditorWindowInterface()
@@ -212,7 +217,7 @@ public class ModuleContainer implements UndoInterface
 	{
 		return mUndoManager.getRedoPresentationName();
 	}
-    
+
 	public String getUndoPresentationName()
 	{
 	    return mUndoManager.getUndoPresentationName();
@@ -240,7 +245,7 @@ public class ModuleContainer implements UndoInterface
 	{
 		mObservers.add(o);
 	}
-	
+
 	public void detach(final Observer o)
 	{
 		mObservers.remove(o);
@@ -264,8 +269,8 @@ public class ModuleContainer implements UndoInterface
 		}
 		catch (Exception ex)
 		{
-			JOptionPane.showMessageDialog(mIDE, ex.getMessage(), "Error in graph", 
-										  JOptionPane.ERROR_MESSAGE); 
+			JOptionPane.showMessageDialog(mIDE, ex.getMessage(), "Error in graph",
+										  JOptionPane.ERROR_MESSAGE);
 			ex.printStackTrace();
 			return;
 		}
@@ -289,5 +294,5 @@ public class ModuleContainer implements UndoInterface
 	private SimulatorPanel simulatorPanel = null;
 	private Component mSelectedComponent = null;
 	private VisualProject mVisualProject = new VisualProject();
- 
+
 }

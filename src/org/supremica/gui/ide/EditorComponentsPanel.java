@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.15 2006-03-25 00:25:44 flordal Exp $
+//# $Id: EditorComponentsPanel.java,v 1.16 2006-06-30 15:40:17 knut Exp $
 //###########################################################################
 
 
@@ -27,6 +27,7 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+import net.sourceforge.waters.model.expr.ExpressionParser;
 
 import org.supremica.gui.WhiteScrollPane;
 
@@ -147,6 +148,73 @@ class EditorComponentsPanel
 		}
 	}
 
+	// Open up an component dialog and allow the use to create a new component
+	public void addComponent()
+	{
+		EditorNewComponentDialog editor = new EditorNewComponentDialog(this);
+	}
+
+	public void addComponent(final AbstractSubject o)
+	{
+//		logEntry("addComponent: " + o);
+/*
+
+		boolean modified = false; // TODO Fix this
+
+		final ModuleSubject module = moduleContainer.getModule();
+
+		if (module != null)
+		{
+			modified = true;
+
+			DefaultMutableTreeNode parentNode = null;
+			TreePath parentPath = null;
+
+			if (parentPath == null)
+			{
+				//There's no selection. Default to the root node.
+				parentNode = ((ModuleTree) moduleSelectTree).getRoot();
+
+				moduleSelectTree.expandPath(new TreePath(parentNode.getPath()));
+			}
+			else
+			{
+				parentNode = (DefaultMutableTreeNode) (parentPath.getLastPathComponent());
+			}
+
+			ComponentInfo ci = (ComponentInfo) (parentNode.getUserObject());
+
+			logEntry("addComponent: Parent: " + parentNode.toString());
+
+			if (ci.getComponent() instanceof ForeachSubject)
+			{
+				((ForeachSubject) ci.getComponent()).getBodyModifiable().add(o);
+			}
+			else
+			{
+				module.getComponentListModifiable().add(o);
+			}
+
+			if ((o instanceof SimpleComponentSubject))
+			{
+				SimpleComponentSubject scp = (SimpleComponentSubject) o;
+
+				logEntry("Adding SimpleComponentSubject: " + scp.getName());
+
+				//EditorWindow ed = new EditorWindow(scp.getName() + " - Waters Editor", module, scp, this, this);
+			}
+
+			//Add node to module tree
+			((ModuleTree) moduleSelectTree).addComponent(o);
+		}
+*/
+	}
+
+	public ExpressionParser getExpressionParser()
+	{
+		return null;
+	}
+
 	private class TreeMouseAdapter
 		extends MouseAdapter
 	{
@@ -165,19 +233,19 @@ class EditorComponentsPanel
 		{
 			if (e.isPopupTrigger())
 			{
-				
+
 			}
 		}
 
 		public void mouseReleased(MouseEvent e)
 		{
-			// This is for triggering the popup 
+			// This is for triggering the popup
 			maybeShowPopup(e);
 		}
-		
+
 		public void mousePressed(MouseEvent e)
 		{
-			// This is for triggering the popup 
+			// This is for triggering the popup
 			maybeShowPopup(e);
 
 			int selRow = moduleSelectTree.getRowForLocation(e.getX(), e.getY());

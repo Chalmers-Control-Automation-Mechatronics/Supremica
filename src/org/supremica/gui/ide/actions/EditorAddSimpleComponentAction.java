@@ -3,6 +3,7 @@ package org.supremica.gui.ide.actions;
 import javax.swing.Action;
 import java.awt.event.ActionEvent;
 import java.util.List;
+import org.supremica.gui.ide.ModuleContainer;
 
 public class EditorAddSimpleComponentAction
 	extends IDEAction
@@ -28,5 +29,21 @@ public class EditorAddSimpleComponentAction
 	public void doAction()
 	{
 		System.err.println("Add Simple Component is not implemented yet!");
+
+		ModuleContainer activeModule = ide.getActiveModuleContainer();
+		//activeModule.addSimpleComponent();
+		//DefaultMutableTreeNode parentNode = null;
+		//TreePath parentPath = moduleSelectTree.getSelectionPath();
+
+		/*if (parentPath == null) {
+		//There's no selection. Default to the root node.
+		parentNode = rootNode;
+		} else {
+		parentNode = (DefaultMutableTreeNode)
+		(parentPath.getLastPathComponent());
+		}*/
+		//EditorNewDialog diag = new EditorNewDialog(this, parentNode);
+
+		//logEntry("New Simple Component requested");
 	}
 }

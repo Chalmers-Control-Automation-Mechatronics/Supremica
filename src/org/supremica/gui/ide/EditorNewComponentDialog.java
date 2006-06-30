@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorNewDialog
 //###########################################################################
-//# $Id: EditorNewComponentDialog.java,v 1.3 2005-11-03 01:24:16 robi Exp $
+//# $Id: EditorNewComponentDialog.java,v 1.4 2006-06-30 15:40:17 knut Exp $
 //###########################################################################
 
 
@@ -27,6 +27,7 @@ import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.model.expr.ExpressionParser;
 
 
 /** <p>A dialog to help users create new components in a module.</p>
@@ -50,14 +51,13 @@ public class EditorNewComponentDialog
 	private ButtonGroup group = new ButtonGroup();
 
 	//  final JComboBox kindList;
-	ModuleWindow mRoot = null;
-	private DefaultMutableTreeNode parentNode = null;
+	EditorComponentsPanel mRoot = null;
+//	private DefaultMutableTreeNode parentNode = null;
 
-	public EditorNewComponentDialog(ModuleWindow root,
-									DefaultMutableTreeNode node)
+	public EditorNewComponentDialog(EditorComponentsPanel root)
 	{
 		this.mRoot = root;
-		parentNode = node;
+//		parentNode = node;
 
 		this.setTitle("Component Editor");
 
