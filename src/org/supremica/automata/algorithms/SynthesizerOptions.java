@@ -243,4 +243,15 @@ public final class SynthesizerOptions
 	{
 		return new SynthesizerOptions(SynthesisType.Both, SynthesisAlgorithm.Modular, true, true, true, true, true);
 	}
+
+	/**
+	 * Returns the default options for synthesis.
+	 */
+	public static SynthesizerOptions getMonolithicCNBSynthesizerOptions()
+	{
+	    SynthesizerOptions options = getDefaultSynthesizerOptions();
+	    options.synthesisAlgorithm = SynthesisAlgorithm.Monolithic;
+
+	    return options;
+	}
 }

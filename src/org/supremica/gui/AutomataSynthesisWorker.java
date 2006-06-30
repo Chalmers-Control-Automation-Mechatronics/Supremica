@@ -118,17 +118,17 @@ public class AutomataSynthesisWorker
 
 			try
 			{
-				AutomataSynthesizer synthesizer = new AutomataSynthesizer(theAutomata, syncOptions,
-																		  options);
-				synthesizer.setExecutionDialog(executionDialog);
-				threadsToStop.add(synthesizer);
-				result.addAutomata(synthesizer.execute());
-				threadsToStop.remove(synthesizer);
+			    AutomataSynthesizer synthesizer = new AutomataSynthesizer(theAutomata, syncOptions,
+										      options);
+			    synthesizer.setExecutionDialog(executionDialog);
+			    threadsToStop.add(synthesizer);
+			    result.addAutomata(synthesizer.execute());
+			    threadsToStop.remove(synthesizer);
 			}
 			catch (Exception ex)
 			{
-				logger.error("Exception in AutomataSynthesisWorker. " + ex);
-				logger.debug(ex.getStackTrace());
+			    logger.error("Exception in AutomataSynthesisWorker. " + ex);
+			    logger.debug(ex.getStackTrace());
 			}
 		}
 		else  // Single automaton
