@@ -386,7 +386,7 @@ public class Workset
 	}
 
 	/**
-	 * this does the same thing as pickOne, but chosses each automaton/cluster only once.
+	 * this does the same thing as pickOne, but chooses each automaton/cluster only once.
 	 * this is used in monotonic algorithms where each automaton is added only once
 	 *
 	 * again, this is another rip-off from the PetriNetSupervisor :)

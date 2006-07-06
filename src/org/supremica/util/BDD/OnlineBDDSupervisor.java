@@ -10,43 +10,7 @@ import java.util.*;
 import java.util.List;
 import java.awt.*;
 
-/**
- * Online BDD-supervisor:
- *
- * This supervisor object is NOT an automaton. It does not reject or accept any events/strings.
- * It does however tell you if a certain global state is "safe", that is, if you from
- * some safe state "x" do a transition to another safe state "y" you are guaranteed to
- * stay the NBC sub-space.
- *
- * This object is a bit complex, however, if you follow the instructions below,
- * everything should work just fine...
- *
- *
- * 1) this code will compute a BDD supNBC and create an online object from it:
- *
- * AutomataBDDSynthesizer bddSynthesizer = new AutomataBDDSynthesizer(theAutomata, true, true);
- * OnlineBDDSupervisor ob = bddSynthesizer.extractOnlineSupervisor();
- * bddSynthesizer.cleanup();
- *
- * 2) to request a state, you must set each component [sub-state] separately. For example
- *
- * for (Iterator autIt = theAutomata.iterator(); autIt.hasNext();) {
- *      Automaton currAutomaton = (Automaton) autIt.next();
- *      ob.setPartialState( currAutomaton, currAutomaton.getInitialState());
- * }
- *
- * 3) then you can ask the BDD engine if that state is OK:
- *
- *  boolean state_is_safe = ob.isStateSafe();
- *
- *
- * 4) IMPORTANT: when you are done, you __MUST__ cleanup the mess by this call
- *
- *    ob.cleanup();
- *
- *  before you do this, the BDD package is _locked_ and may [can ?] not be used!
- *
- */
+
 public class OnlineBDDSupervisor
 {
 	private BDDAutomata ba;
@@ -205,10 +169,8 @@ public class OnlineBDDSupervisor
 	}
 
 	/**
-	 * THIS IS NOT EFFICIENT!!!!
-	 *
-	 * WE NEED A MORE EFFICIENT WAY TO  check if bdd_state \in safe_states
-	 *
+	 * THIS IS NOT EFFICIENT!
+	 * WE NEED A MORE EFFICIENT WAY TO check if bdd_state \in safe_states
 	 */
 	public boolean isStateSafe()
 	{
