@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.16 2006-06-30 15:40:17 knut Exp $
+//# $Id: EditorComponentsPanel.java,v 1.17 2006-07-08 00:40:44 knut Exp $
 //###########################################################################
 
 
@@ -28,17 +28,21 @@ import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.gui.ModuleTree;
 
 import org.supremica.gui.WhiteScrollPane;
 
 
 class EditorComponentsPanel
 	extends WhiteScrollPane
+	implements EditorPanelInterface
 {
 	private static final long serialVersionUID = 1L;
 
 	private String name;
 	private ModuleContainer moduleContainer;
+
+	private JTree moduleSelectTree;
 
 	EditorComponentsPanel(ModuleContainer moduleContainer, String name)
 	{
@@ -92,7 +96,7 @@ class EditorComponentsPanel
 		final ImageIcon instanceIcon = new ImageIcon(IDE.class.getResource("/icons/waters/instance.gif"));
 		final ImageIcon bindingIcon = null;
 
-		JTree moduleSelectTree = new JTree(treeModel);
+		moduleSelectTree = new JTree(treeModel);
 
 		moduleSelectTree.setCellRenderer(new ModuleTreeRenderer(foreachIcon, plantIcon, propertyIcon, specIcon, instanceIcon, bindingIcon));
 		moduleSelectTree.setEditable(false);
@@ -148,16 +152,22 @@ class EditorComponentsPanel
 		}
 	}
 
+	public void addComponent(SimpleComponentSubject subject)
+	{
+		((ModuleTree) moduleSelectTree).addComponent(subject);
+	}
+
 	// Open up an component dialog and allow the use to create a new component
 	public void addComponent()
 	{
 		EditorNewComponentDialog editor = new EditorNewComponentDialog(this);
 	}
 
+/*
 	public void addComponent(final AbstractSubject o)
 	{
 //		logEntry("addComponent: " + o);
-/*
+
 
 		boolean modified = false; // TODO Fix this
 
@@ -207,9 +217,9 @@ class EditorComponentsPanel
 			//Add node to module tree
 			((ModuleTree) moduleSelectTree).addComponent(o);
 		}
-*/
-	}
 
+	}
+*/
 	public ExpressionParser getExpressionParser()
 	{
 		return null;

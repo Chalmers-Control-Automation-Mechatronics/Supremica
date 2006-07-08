@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.GridBagLayout;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.ControlledSurface;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+import net.sourceforge.waters.model.expr.ExpressionParser;
 
 public class EditorPanel
 	extends MainPanel
@@ -105,6 +107,16 @@ public class EditorPanel
 			public void addComponent()
 			{
 				componentsPanel.addComponent();
+			}
+
+			public void addComponent(SimpleComponentSubject component)
+			{
+				componentsPanel.addComponent(component);
+			}
+
+			public ExpressionParser getExpressionParser()
+			{
+				return componentsPanel.getExpressionParser();
 			}
 		}
 

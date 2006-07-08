@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorNewDialog
 //###########################################################################
-//# $Id: EditorNewComponentDialog.java,v 1.4 2006-06-30 15:40:17 knut Exp $
+//# $Id: EditorNewComponentDialog.java,v 1.5 2006-07-08 00:40:44 knut Exp $
 //###########################################################################
 
 
@@ -51,10 +51,10 @@ public class EditorNewComponentDialog
 	private ButtonGroup group = new ButtonGroup();
 
 	//  final JComboBox kindList;
-	EditorComponentsPanel mRoot = null;
+	EditorPanelInterface mRoot = null;
 //	private DefaultMutableTreeNode parentNode = null;
 
-	public EditorNewComponentDialog(EditorComponentsPanel root)
+	public EditorNewComponentDialog(EditorPanelInterface root)
 	{
 		this.mRoot = root;
 //		parentNode = node;

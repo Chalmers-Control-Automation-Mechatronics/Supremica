@@ -28,10 +28,13 @@ public class EditorAddSimpleComponentAction
 
 	public void doAction()
 	{
-		System.err.println("Add Simple Component is not implemented yet!");
+		//System.err.println("Add Simple Component is not implemented yet!");
+
+		//EditorNewComponentDialog componentDialog = EditorNewComponentDialog();
 
 		ModuleContainer activeModule = ide.getActiveModuleContainer();
-		//activeModule.addSimpleComponent();
+		activeModule.getEditorPanel().getEditorPanelInterface().addComponent();
+
 		//DefaultMutableTreeNode parentNode = null;
 		//TreePath parentPath = moduleSelectTree.getSelectionPath();
 
