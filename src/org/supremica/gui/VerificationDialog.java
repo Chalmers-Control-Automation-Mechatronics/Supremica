@@ -84,7 +84,7 @@ public class VerificationDialog
 	/**
 	 * Creates modal dialog box for input of options for verification.
 	 */
-	public VerificationDialog(JFrame parentFrame, VerificationOptions verificationOptions,
+	public VerificationDialog(Frame parentFrame, VerificationOptions verificationOptions,
 							  MinimizationOptions minimizationOptions)
 	{
 		dialog = new JDialog(parentFrame, true);    // modal
@@ -320,8 +320,8 @@ public class VerificationDialog
 
 			if (verificationTypeBox.getSelectedItem() == VerificationType.Nonblocking &&
 				algorithmSelector.getSelectedItem() == VerificationAlgorithm.Monolithic ||
-				(verificationTypeBox.getSelectedItem() == VerificationType.Controllability || 
-				 verificationTypeBox.getSelectedItem() == VerificationType.InverseControllability || 
+				(verificationTypeBox.getSelectedItem() == VerificationType.Controllability ||
+				 verificationTypeBox.getSelectedItem() == VerificationType.InverseControllability ||
 				 verificationTypeBox.getSelectedItem() == VerificationType.LanguageInclusion) &&
 				algorithmSelector.getSelectedItem() == VerificationAlgorithm.Modular)
 			{
@@ -329,7 +329,7 @@ public class VerificationDialog
 			}
 			else
 			{
-				//showTrace.setSelected(false); 
+				//showTrace.setSelected(false);
 				showTrace.setEnabled(false);
 			}
 		}
@@ -456,7 +456,7 @@ public class VerificationDialog
 		public void regain(MinimizationOptions options)
 		{
 			options.setMinimizationType(EquivalenceRelation.ConflictEquivalence);
-			
+
 			options.setMinimizationStrategy((MinimizationStrategy) minimizationStrategy.getSelectedItem());
 			options.setMinimizationHeuristic((MinimizationHeuristic) minimizationHeuristic.getSelectedItem());
 			options.setUseRuleA(ruleA.isSelected());

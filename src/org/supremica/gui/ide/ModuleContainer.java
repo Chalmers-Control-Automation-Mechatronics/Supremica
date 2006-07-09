@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.28 2006-07-09 16:51:40 knut Exp $
+//# $Id: ModuleContainer.java,v 1.29 2006-07-09 21:04:59 knut Exp $
 //###########################################################################
 
 
@@ -42,6 +42,7 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
 import org.supremica.automata.IO.ProjectBuildFromWaters;
 import org.supremica.automata.Project;
+import org.supremica.automata.Automaton;
 import org.supremica.automata.Automata;
 import org.supremica.gui.VisualProject;
 import org.supremica.gui.ide.actions.Actions;
@@ -178,6 +179,19 @@ public class ModuleContainer implements UndoInterface
 	public VisualProject getVisualProject()
 	{
 		return mVisualProject;
+	}
+
+	public boolean addAutomaton(Automaton theAutomaton)
+	{
+		getVisualProject().addAutomaton(theAutomaton);
+		return true;// To Do Fix
+	}
+
+
+	public int addAutomata(Automata theAutomata)
+	{
+		getVisualProject().addAutomata(theAutomata);
+		return theAutomata.size(); // TO DO Fix
 	}
 
 

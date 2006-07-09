@@ -148,14 +148,14 @@ class SynthesizerDialogStandardPanel
 		public NonblockNote()
 		{
 			/*
-			super("Note:\n" + "Currently, the modular nonblocking algorithm\n" + 
-				  "does not guarantee global nonblocking. The only\n" + 
-				  "gurantee is that each supervisor is nonblockng\n" + 
+			super("Note:\n" + "Currently, the modular nonblocking algorithm\n" +
+				  "does not guarantee global nonblocking. The only\n" +
+				  "gurantee is that each supervisor is nonblockng\n" +
 				  "with respect to the plants that it controls");
 			*/
-			super("Note:\n" + "Modular nonblocking synthesis results in a\n" + 
-				  "compact representation of the monolithic\n" + 
-				  "supervisor that Supremica can not currently\n" + 
+			super("Note:\n" + "Modular nonblocking synthesis results in a\n" +
+				  "compact representation of the monolithic\n" +
+				  "supervisor that Supremica can not currently\n" +
 				  "make use of.");
 
 			super.setBackground(new Color(0, 0, 0, transparent));
@@ -186,14 +186,14 @@ class SynthesizerDialogStandardPanel
 
 		// Create layout!
 		Box mainBox = Box.createVerticalBox();
-		
+
 		JPanel panel = new JPanel();
 		Box box = Box.createHorizontalBox();
 		box.add(new JLabel("Property:"));
 		box.add(synthesisTypeBox);
 		panel.add(box);
 		mainBox.add(panel);
-		
+
 		panel = new JPanel();
 		box = Box.createHorizontalBox();
 		box.add(new JLabel("Algorithm: "));
@@ -207,7 +207,7 @@ class SynthesizerDialogStandardPanel
 		box.add(optimizeBox);
 		panel.add(box);
 		mainBox.add(panel);
-		
+
 		panel = new JPanel();
 		panel.add(nbNote);
 		mainBox.add(panel);
@@ -277,14 +277,14 @@ class SynthesizerDialogAdvancedPanel
 		Box advancedBox = Box.createVerticalBox();
 
 		reduceSupervisorsBox = new JCheckBox("Reduce supervisors (experimental)");
-		reduceSupervisorsBox.setToolTipText("Remove redundant states and events from " + 
+		reduceSupervisorsBox.setToolTipText("Remove redundant states and events from " +
 											"synthesized supervisors");
 
 		maximallyPermissiveBox = new JCheckBox("Maximally permissive result");
 		maximallyPermissiveBox.setToolTipText("Guarantee maximally permissive result");
 
 		maximallyPermissiveIncrementalBox = new JCheckBox("Incremental algorithm");
-		maximallyPermissiveIncrementalBox.setToolTipText("Use incremental algorithm " + 
+		maximallyPermissiveIncrementalBox.setToolTipText("Use incremental algorithm " +
 														 "for maximally permissive synthesis");
 		reduceSupervisorsBox.addActionListener(this);
 		maximallyPermissiveIncrementalBox.addActionListener(this);
@@ -293,7 +293,7 @@ class SynthesizerDialogAdvancedPanel
 		advancedBox.add(maximallyPermissiveBox);
 		advancedBox.add(maximallyPermissiveIncrementalBox);
 
-		note = new JTextArea("Note:\n" + "'Purge result' must be selected for supervisor\n" + 
+		note = new JTextArea("Note:\n" + "'Purge result' must be selected for supervisor\n" +
 							 "reduction to work.\n");
 
 		note.setBackground(new Color(0, 0, 0, 0));
@@ -335,12 +335,12 @@ public class SynthesizerDialog
 	SynthesizerDialogStandardPanel standardPanel;
 	SynthesizerDialogAdvancedPanel advancedPanel;
 	private JDialog dialog;
-	private JFrame parentFrame;
+	private Frame parentFrame;
 
 	/**
 	 * Creates modal dialog box for input of synthesizer options.
 	 */
-	public SynthesizerDialog(JFrame parentFrame, int numSelected, SynthesizerOptions synthesizerOptions)
+	public SynthesizerDialog(Frame parentFrame, int numSelected, SynthesizerOptions synthesizerOptions)
 	{
 		dialog = new JDialog(parentFrame, true);    // modal
 		this.parentFrame = parentFrame;

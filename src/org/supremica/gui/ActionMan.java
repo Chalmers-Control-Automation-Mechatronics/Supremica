@@ -210,7 +210,7 @@ public class ActionMan
     {
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
-		if (!selectedAutomata.sanityCheck(gui, 2, false, false, true, true))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 2, false, false, true, true))
 		{
 			return;
 		}
@@ -267,7 +267,7 @@ public class ActionMan
     {
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
-		if (!selectedAutomata.sanityCheck(gui, 1))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1))
 		{
 			return;
 		}
@@ -294,7 +294,7 @@ public class ActionMan
     {
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
-		if (!selectedAutomata.sanityCheck(gui, 1))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1))
 		{
 			return;
 		}
@@ -333,7 +333,7 @@ public class ActionMan
     {
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
-		if (!selectedAutomata.sanityCheck(gui, 1))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1))
 		{
 			return;
 		}
@@ -370,7 +370,7 @@ public class ActionMan
     {
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
-		if (!selectedAutomata.sanityCheck(gui, 1))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1))
 		{
 			return;
 		}
@@ -448,7 +448,7 @@ public class ActionMan
     public static void automataMove_actionPerformed(Gui gui, boolean directionIsUp, boolean allTheWay)
     {
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1))
 		{
 			return;
 		}
@@ -706,7 +706,7 @@ public class ActionMan
     {
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
-		if (!selectedAutomata.sanityCheck(gui, 1))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1))
 		{
 			return;
 		}
@@ -736,7 +736,7 @@ public class ActionMan
     {
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
-		if (!selectedAutomata.sanityCheck(gui, 1))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1))
 		{
 			return;
 		}
@@ -1094,7 +1094,7 @@ public class ActionMan
     {
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
-		if (!selectedAutomata.sanityCheck(gui, 1))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1))
 		{
 			return;
 		}
@@ -1140,7 +1140,7 @@ public class ActionMan
     {
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
-		if (!selectedAutomata.sanityCheck(gui, 1))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1))
 		{
 			return;
 		}
@@ -1180,7 +1180,7 @@ public class ActionMan
     {
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
-		if (!selectedAutomata.sanityCheck(gui, 1))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1))
 		{
 			return;
 		}
@@ -1209,7 +1209,7 @@ public class ActionMan
     {
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
-		if (!selectedAutomata.sanityCheck(gui, 1))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1))
 		{
 			return;
 		}
@@ -1237,7 +1237,7 @@ public class ActionMan
     {
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
-		if (!selectedAutomata.sanityCheck(gui, 1))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1))
 		{
 			return;
 		}
@@ -1265,7 +1265,7 @@ public class ActionMan
     {
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
-		if (!selectedAutomata.sanityCheck(gui, 1))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1))
 		{
 			return;
 		}
@@ -1299,7 +1299,7 @@ public class ActionMan
     {
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 2, true, false, true, true))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 2, true, false, true, true))
 		{
 			return;
 		}
@@ -1339,7 +1339,7 @@ public class ActionMan
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
-		if (!selectedAutomata.sanityCheck(gui, 1, true, true, true, true))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1, true, true, true, true))
 		{
 			return;
 		}
@@ -1412,7 +1412,7 @@ public class ActionMan
     {
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, true, false, true, true))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1, true, false, true, true))
 		{
 			return;
 		}
@@ -1547,7 +1547,7 @@ public class ActionMan
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
 		// Sanitycheck
-		if (!selectedAutomata.sanityCheck(gui, 1, true, false, false, true))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1, true, false, false, true))
 		{
 			return;
 		}
@@ -1573,12 +1573,12 @@ public class ActionMan
 			}
 		}
 		else
-		{    
+		{
 			// Many automata selected
 			// The AutomataExplorer can not take care of nondeterministic processes...
 			if (!selectedAutomata.isDeterministic())
 			{
-				logger.error("The current project is nondeterministic. " + 
+				logger.error("The current project is nondeterministic. " +
 							 "Exploration of nondeterministic automata " +
 							 "is currently not supported.");
 			}
@@ -1656,7 +1656,7 @@ public class ActionMan
     {
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1))
 		{
 			return;
 		}
@@ -1755,7 +1755,7 @@ public class ActionMan
 		//gui.info("Number of automata: " + nbrOfAutomata);
 
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false, true, true))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1, false, false, true, true))
 		{
 			return;
 		}
@@ -1822,7 +1822,7 @@ public class ActionMan
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
 		// Sanity check
-		if (!selectedAutomata.sanityCheck(gui, 2, false, false, true, false))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 2, false, false, true, false))
 		{
 			return;
 		}
@@ -1870,7 +1870,7 @@ public class ActionMan
     {
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false, true, false))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1, false, false, true, false))
 		{
 			return;
 		}
@@ -1898,7 +1898,7 @@ public class ActionMan
 		//logger.debug("ActionMan::automatonAlphabet_actionPerformed(gui)");
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false, true, false))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1, false, false, true, false))
 		{
 			return;
 		}
@@ -1929,7 +1929,7 @@ public class ActionMan
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
-		if (!selectedAutomata.sanityCheck(gui, 1, true, false, false, false))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1, true, false, false, false))
 		{
 			return;
 		}
@@ -2431,7 +2431,7 @@ public class ActionMan
     public static void normalizeAlphabet_actionPerformed(Gui gui)
     {
 		Automata selectedAutomata = gui.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(gui, 1, false, false, true, false))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1, false, false, true, false))
 		{
 			return;
 		}
@@ -2565,7 +2565,7 @@ public class ActionMan
     {
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
-		if (!selectedAutomata.sanityCheck(gui, 1))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1))
 		{
 			return;
 		}
@@ -2639,7 +2639,7 @@ public class ActionMan
     {
 		Automata selectedAutomata = gui.getSelectedAutomata();
 
-		if (!selectedAutomata.sanityCheck(gui, 1))
+		if (!selectedAutomata.sanityCheck(gui.getComponent(), 1))
 		{
 			return;
 		}

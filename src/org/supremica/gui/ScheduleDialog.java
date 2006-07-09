@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.GridLayout;
 import java.awt.BorderLayout;
 import java.awt.event.*;
+import java.awt.Frame;
 import java.io.*;
 
 import org.supremica.log.*;
@@ -49,7 +50,7 @@ public class ScheduleDialog
 		this(ActionMan.getGui().getFrame());
     }
 
-    public ScheduleDialog(JFrame frame)
+    public ScheduleDialog(Frame frame)
     {
 		super(frame, "Schedule Selected Automata", true);
 

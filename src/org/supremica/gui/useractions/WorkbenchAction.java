@@ -17,7 +17,7 @@ public class WorkbenchAction
 	extends AbstractAction
 {
 	private static final long serialVersionUID = 1L;
-	
+
 	private static Logger logger = LoggerFactory.createLogger(WorkbenchAction.class);
 	private Workbench wb;
 
@@ -50,7 +50,7 @@ public class WorkbenchAction
 	public void execute(VisualProject theProject, Automata theAutomata)
 		throws Exception
 	{
-		if (!theAutomata.sanityCheck(ActionMan.getGui(), 1, true, true, true, true))
+		if (!theAutomata.sanityCheck(ActionMan.getGui().getComponent(), 1, true, true, true, true))
 		{
 			return;
 		}

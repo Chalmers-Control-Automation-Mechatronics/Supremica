@@ -158,7 +158,7 @@ public final class ExecutionDialog
 	}
 
 	// -- MF -- Special case when you've got only one thread to watch
-	public ExecutionDialog(JFrame frame, String title, Stoppable threadToStop)
+	public ExecutionDialog(Frame frame, String title, Stoppable threadToStop)
 	{
 		this(frame, title, new ArrayList());
 

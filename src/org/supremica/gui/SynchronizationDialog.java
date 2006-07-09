@@ -128,7 +128,7 @@ class SynchronizationDialogAdvancedPanel
 		synchronizationTypeBox = new JComboBox(SynchronizationType.toArray());
 		synchronizationTypeBox.setToolTipText("Choose the type of composition");
 		expandForbiddenStatesBox = new JCheckBox("Expand forbidden states");
-		expandForbiddenStatesBox.setToolTipText("If checked, transitions from forbidden states are " + 
+		expandForbiddenStatesBox.setToolTipText("If checked, transitions from forbidden states are " +
 												"examined, otherwise, the states are considered terminal");
 		expandForbiddenStatesBox.addActionListener(this);
 		rememberDisabledEventsBox = new JCheckBox("Include disabled transitions");
@@ -154,7 +154,7 @@ class SynchronizationDialogAdvancedPanel
 		synchronizationTypeBox = new JComboBox(SynchronizationType.toArray());
 		synchronizationTypeBox.setToolTipText("Choose the type of composition");
 		expandForbiddenStatesBox = new JCheckBox("Expand forbidden states");
-		expandForbiddenStatesBox.setToolTipText("If cheched, transitions from forbidden states are " + 
+		expandForbiddenStatesBox.setToolTipText("If cheched, transitions from forbidden states are " +
 												"examined, otherwise, the states are considered terminal");
 		expandForbiddenStatesBox.addActionListener(this);
 		rememberDisabledEventsBox = new JCheckBox("Include disabled transitions");
@@ -180,7 +180,7 @@ class SynchronizationDialogAdvancedPanel
 		}
 		else
 		{
-			rememberDisabledEventsBox.setEnabled(true);			
+			rememberDisabledEventsBox.setEnabled(true);
 		}
 	}
 
@@ -200,7 +200,7 @@ class SynchronizationDialogAdvancedPanel
 		}
 		else
 		{
-			rememberDisabledEventsBox.setEnabled(true);			
+			rememberDisabledEventsBox.setEnabled(true);
 		}
 	}
 }
@@ -214,12 +214,12 @@ public class SynchronizationDialog
 	SynchronizationDialogStandardPanel standardPanel;
 	SynchronizationDialogAdvancedPanel advancedPanel;
 	private JDialog dialog;
-	private JFrame parentFrame;
+	private Frame parentFrame;
 
 	/**
 	 * Creates modal dialog box for input of synthesizer options.
 	 */
-	public SynchronizationDialog(JFrame parentFrame, SynchronizationOptions synchronizationOptions)
+	public SynchronizationDialog(Frame parentFrame, SynchronizationOptions synchronizationOptions)
 	{
 		dialog = new JDialog(parentFrame, true);    // modal
 		this.parentFrame = parentFrame;

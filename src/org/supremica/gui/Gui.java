@@ -33,8 +33,8 @@ public interface Gui
 
 	void close();
 
-	int addAutomata(Automata a)
-		throws Exception;
+	int addAutomata(Automata a);
+//		throws Exception;
 
 	// returns number added
 	int addProject(Project p)
@@ -50,7 +50,7 @@ public interface Gui
 	//public void addActions(Actions theActions);
 	//public void addControls(Controls theControls);
 	// Do we need this one?
-	JFrame getFrame();
+	Frame getFrame();
 
 	// this should be the main frame
 	VisualProjectContainer getVisualProjectContainer();

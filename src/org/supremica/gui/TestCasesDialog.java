@@ -136,14 +136,14 @@ class PhilosPanel
 		JPanel animationPanel = new JPanel();
 		animationPanel.add(animation);
 		animationPanel.add(memory);
-		
+
 		Box theBox = Box.createVerticalBox();
 		theBox.add(cont);
 		theBox.add(num_users);
 		theBox.add(animationPanel);
 		add(theBox, BorderLayout.NORTH);
     }
-    
+
     public Project doIt()
 		throws Exception
     {
@@ -631,21 +631,21 @@ public class TestCasesDialog
     private ExampleTab extab = new ExampleTab();
     private Project project = null;
     private Gui gui;
-	
+
     class DoitButton
 		extends JButton
     {
 		private static final long serialVersionUID = 1L;
-		
+
 		DoitButton()
 		{
 			super("Do it");
-			
+
 			setToolTipText("Go ahead and do it");
 			addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)
-					
+
 						// throws Exception // cannot do this - what the f**k!
 					{
 						try
@@ -656,23 +656,23 @@ public class TestCasesDialog
 						{
 							logger.error("Exception while constructing test case: " + ex);
 							logger.debug(ex.getStackTrace());
-						
+
 							// what are we supposed to do?
 						}
 					}
 				});
 		}
     }
-	
+
     class CancelButton
 		extends JButton
     {
 		private static final long serialVersionUID = 1L;
-		
+
 		CancelButton()
 		{
 			super("Cancel");
-			
+
 			setToolTipText("Enough of this");
 			addActionListener(new ActionListener()
 				{
@@ -682,22 +682,22 @@ public class TestCasesDialog
 					}
 				});
 		}
-		
+
 		void action()
 		{
 			dispose();
 		}
     }
-	
+
     class HelpButton
 		extends JButton
     {
 		private static final long serialVersionUID = 1L;
-		
+
 		HelpButton()
 		{
 			super("Help");
-			
+
 			setToolTipText("Want some help?");
 			addActionListener(new ActionListener()
 				{
@@ -707,42 +707,42 @@ public class TestCasesDialog
 					}
 				});
 		}
-		
+
 		void action() {}
     }
-	
+
     void doit()
 		throws Exception
     {
 		Component comp = extab.getSelectedComponent();
-		
+
 		// We know that this is actually also a TestCase (right?)
 		TestCase tc = (TestCase) comp;
-		
+
 		setVisible(false);
-		
+
 		project = tc.doIt();    // Should return a Project (named)
-		
+
 		gui.addProject(project);
 		dispose();
     }
-	
+
     /*
       Project getProject()
       {
       return project;
       }
     */
-    TestCasesDialog(JFrame frame, Gui gui)
+    TestCasesDialog(Frame frame, Gui gui)
     {
 		super(frame, "Example Generator", false);    // modal dialog with frame as parent
-		
+
 		this.gui = gui;
-		
+
 		Container pane = getContentPane();
-		
+
 		pane.setLayout(new BorderLayout(10, 10));
-		
+
 		// Utility.setupFrame(this, 400, 200);
 		// Dimension size = new Dimension(400, 200);
 		// Point point = Utility.getPosForCenter(size);
@@ -750,7 +750,7 @@ public class TestCasesDialog
 		// setLocation(point);
 		JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		JButton tmp;
-		
+
 		buttons.add(tmp = new DoitButton());
 		buttons.add(new CancelButton());
 		buttons.add(new HelpButton());
@@ -758,9 +758,9 @@ public class TestCasesDialog
 		pane.add(buttons, BorderLayout.SOUTH);
 		getRootPane().setDefaultButton(tmp);    // :)
 		pack();
-		
+
 		Point point = Utility.getPosForCenter(getSize());
-		
+
 		setLocation(point);
     }
 }

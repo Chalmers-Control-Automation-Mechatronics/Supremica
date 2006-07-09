@@ -21,12 +21,13 @@ import org.supremica.gui.ide.actions.Actions;
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
 import org.supremica.log.*;
 import org.supremica.Version;
 
 public class IDE
     extends JFrame
-    implements ChangeListener, IDEActionInterface
+    implements ChangeListener, IDEActionInterface, IDEReportInterface
 {
 	private static final long serialVersionUID = 1L;
 
@@ -286,6 +287,38 @@ public class IDE
 	{
 		ModuleContainer activeModuleContainer = getActiveModuleContainer();
 		return activeModuleContainer.getSelectedAutomata();
+	}
+
+	// ** MF ** Implementation of Gui stuff
+	public void error(String msg)
+	{
+		logger.error(msg);
+	}
+
+	public void error(String msg, Throwable t)
+	{
+		logger.error(msg, t);
+	}
+
+	public void info(String msg)
+	{
+		logger.info(msg);
+	}
+
+	public void debug(String msg)
+	{
+		logger.debug(msg);
+	}
+
+	public boolean addAutomaton(Automaton theAutomaton)
+	{
+		return getActiveModuleContainer().addAutomaton(theAutomaton);
+	}
+
+
+	public int addAutomata(Automata theAutomata)
+	{
+		return getActiveModuleContainer().addAutomata(theAutomata);
 	}
 
 	public static void main(String args[])

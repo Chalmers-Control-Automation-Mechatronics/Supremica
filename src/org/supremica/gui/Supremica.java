@@ -490,6 +490,11 @@ public class Supremica
 		return this;
 	}
 
+	public Component getComponent()
+	{
+		return getFrame();
+	}
+
 	/**
 	 * This is a deprecated method, use getSelectedAutomata instead.
 	 *
