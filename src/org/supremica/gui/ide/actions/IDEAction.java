@@ -3,6 +3,7 @@ package org.supremica.gui.ide.actions;
 
 import javax.swing.AbstractButton;
 import javax.swing.AbstractAction;
+import javax.swing.JMenuItem;
 import java.util.List;
 
 public abstract class IDEAction
@@ -13,6 +14,7 @@ public abstract class IDEAction
 	private int minimumNumberOfSelectedComponents = 0;
 	private boolean editorActiveRequired = false;
 	private boolean analyzerActiveRequired = false;
+	private JMenuItem menuItem = null;
 
 	public IDEAction(List<IDEAction> actionList)
 	{
@@ -39,6 +41,15 @@ public abstract class IDEAction
 		return theButton;
 	}
 
+	public JMenuItem getMenuItem()
+	{
+		if (menuItem == null)
+		{
+			menuItem = new JMenuItem(this);
+		}
+		return menuItem;
+	}
+
 	public void setEditorActiveRequired(boolean required)
 	{
 		editorActiveRequired = required;
@@ -56,7 +67,7 @@ public abstract class IDEAction
 
 	public boolean isEnabled()
 	{
-		// TO Do 
+		// TO Do
 		/*
 		if (editorActiveRequired)
 		{
@@ -72,7 +83,7 @@ public abstract class IDEAction
 				return false;
 			}
 		}
-		
+
 		if (minimumNumberOfSelectedComponents > ide.numberOfSelectedComponents())
 		{
 			return false;

@@ -56,6 +56,7 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.GridLayout;
 import java.awt.BorderLayout;
+import java.awt.Frame;
 import javax.swing.*;
 
 public final class ExecutionDialog
@@ -145,7 +146,7 @@ public final class ExecutionDialog
 	 * Creates dialog box for canceling the Stoppable classes in the supplied List.
 	 * @see Stoppable
 	 */
-	public ExecutionDialog(JFrame frame, String title, List threadsToStop)
+	public ExecutionDialog(Frame frame, String title, List threadsToStop)
 	{
 		super(frame);
 

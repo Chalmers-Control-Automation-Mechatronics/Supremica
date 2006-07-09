@@ -3,6 +3,7 @@ package org.supremica.gui;
 import java.awt.*;
 import javax.swing.*;
 import java.util.*;
+import org.supremica.gui.ide.IDEReportInterface;
 import org.supremica.automata.algorithms.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Project;
@@ -10,16 +11,8 @@ import org.supremica.automata.Automaton;
 import org.supremica.gui.VisualProjectContainer;
 
 public interface Gui
+	extends IDEReportInterface
 {
-	void error(String msg);
-
-	// outputs an error message
-	void error(String msg, Throwable t);
-
-	void info(String msg);
-
-	void debug(String msg);
-
 	void repaint();
 
 	String getNewAutomatonName(String str, String def);

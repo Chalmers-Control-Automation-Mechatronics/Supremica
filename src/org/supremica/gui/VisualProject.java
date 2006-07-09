@@ -209,6 +209,11 @@ public class VisualProject
 	}
 
 
+	public int numberOfSelectedAutomata()
+	{
+		return getSelectedAutomata().size();
+	}
+
 	public void clearSelection()
 	{
 		selectedAutomata = null;

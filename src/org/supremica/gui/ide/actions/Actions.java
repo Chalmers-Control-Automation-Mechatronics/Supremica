@@ -8,7 +8,8 @@ public class Actions
 	/** The ide to which the actions in this class applies. */
 	private IDEActionInterface ide;
 
-	/** A list of all actions. */
+	/** A list of all actions. This is needed because we would like to set
+	    the ideActionInterface automatically */
 	private List<IDEAction> allActions = new LinkedList<IDEAction>();
 
 	// General Actions
@@ -38,6 +39,7 @@ public class Actions
 
 	// Analyzer Actions
 	public IDEAction analyzerWorkbenchAction = new WorkbenchAction(allActions);
+	public IDEAction analyzerSynchronizerAction = new AnalyzerSynchronizerAction(allActions);
 
 	// Help Actions
 	public IDEAction helpWebAction = new HelpWebAction(allActions);

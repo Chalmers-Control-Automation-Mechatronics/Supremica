@@ -484,10 +484,6 @@ public class Supremica
 		theAutomatonTable.selectAll();
 	}
 
-	public Component getComponent()
-	{
-		return this;
-	}
 
 	public JFrame getFrame()
 	{
@@ -1020,7 +1016,7 @@ public class Supremica
 		}
 
 		try
-		{    
+		{
 			// throws Exception if the automaton already exists
 			// logger.debug("Supremica.addAutomaton");
 			getActiveProject().addAutomaton(currAutomaton);

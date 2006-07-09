@@ -52,15 +52,17 @@ package org.supremica.gui;
 import org.supremica.automata.algorithms.*;
 import javax.swing.*;
 import java.util.*;
+import java.awt.Component;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.util.ActionTimer;
+import org.supremica.gui.ide.IDEReportInterface;
 
 public class AutomataSynchronizerWorker
 	extends Thread
 	implements Stoppable
 {
-	private Gui workbench = null;
+	private IDEReportInterface workbench = null;
 	private Automata theAutomata = null;
 	private String newAutomatonName = null;
 	private final static int MODE_SYNC = 1;
@@ -70,7 +72,7 @@ public class AutomataSynchronizerWorker
 	private SynchronizationOptions syncOptions;
 	private boolean stopRequested = false;
 
-	public AutomataSynchronizerWorker(Gui workbench, Automata theAutomata, String newAutomatonName, SynchronizationOptions syncOptions)
+	public AutomataSynchronizerWorker(IDEReportInterface workbench, Automata theAutomata, String newAutomatonName, SynchronizationOptions syncOptions)
 	{
 		this.workbench = workbench;
 		this.theAutomata = theAutomata;

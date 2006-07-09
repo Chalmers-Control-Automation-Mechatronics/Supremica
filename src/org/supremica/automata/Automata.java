@@ -57,6 +57,8 @@ import javax.swing.JOptionPane;
 import java.awt.Toolkit;
 import java.io.File;
 import java.net.URL;
+import java.awt.Component;
+
 
 /**
  * An ordered set of Automaton-objects.
@@ -863,7 +865,7 @@ public class Automata
 		}
 		return automata;
 	}
-	
+
 	public Automaton getAutomaton(String name)
 	{
 		return nameMap.get(name);
@@ -1264,7 +1266,7 @@ public class Automata
 	 * @param gui If gui != null, a JOptionPane shows the results and guides the user.
 	 * @param minSize Minimum size of the automata.
 	 */
-	public boolean sanityCheck(Gui gui, int minSize)
+	public boolean sanityCheck(Component gui, int minSize)
 	{
 		return sanityCheck(gui, minSize, false, false, false, false);
 	}
@@ -1282,7 +1284,7 @@ public class Automata
 	 *
 	 * This method was originally in gui.ActionMan (to handle the gui-stuff conveniently).
 	 */
-	public boolean sanityCheck(Gui gui, int minSize,
+	public boolean sanityCheck(Component gui, int minSize,
 							   boolean mustHaveInitial, boolean mustHaveValidType,
 							   boolean mustBeControllabilityConsistent, boolean examineStructure)
 	{
@@ -1365,7 +1367,7 @@ public class Automata
 						String message = "The automaton " + currAutomaton +
 							" does not have an initial state.\n" + "Please specify an initial state.";
 						Object[] options = { "Cancel" };
-						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
+						int cont = JOptionPane.showOptionDialog(gui, message, "Alert",
 																JOptionPane.OK_OPTION,
 																JOptionPane.WARNING_MESSAGE, null,
 																options, options[0]);
@@ -1395,7 +1397,7 @@ public class Automata
 						String message = "The automaton " + currAutomaton + " is of type 'Undefined'.\n" +
 							"Please specify a type.";
 						Object[] options = { "Cancel" };
-						int cont = JOptionPane.showOptionDialog(gui.getComponent(), message, "Alert",
+						int cont = JOptionPane.showOptionDialog(gui, message, "Alert",
 																JOptionPane.OK_OPTION,
 																JOptionPane.WARNING_MESSAGE, null,
 																options, options[0]);
@@ -1434,7 +1436,7 @@ public class Automata
 			// Present result
 			if (gui != null)
 			{
-				JOptionPane.showMessageDialog(gui.getFrame(), message, "Alert", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(gui, message, "Alert", JOptionPane.ERROR_MESSAGE);
 			}
 			else
 			{

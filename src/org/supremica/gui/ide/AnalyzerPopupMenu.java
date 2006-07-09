@@ -22,7 +22,7 @@ class AnalyzerPopupMenu
 	{
 		setInvoker(parent);
 		this.ide = ide;
-		
+
 		try
 		{
 			initPopups();
@@ -36,6 +36,8 @@ class AnalyzerPopupMenu
 	private void initPopups()
 		throws Exception
 	{
-		this.add(new JMenuItem(ide.getActions().analyzerWorkbenchAction));	
+		add(ide.getActions().analyzerSynchronizerAction.getMenuItem());
+		addSeparator();
+		add(ide.getActions().analyzerWorkbenchAction.getMenuItem());
 	}
 }

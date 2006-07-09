@@ -15,10 +15,12 @@ import java.awt.Component;
 import java.awt.event.WindowEvent;
 import java.util.*;
 import org.supremica.gui.Utility;
+import org.supremica.gui.VisualProject;
 import org.supremica.gui.InterfaceManager;
 import org.supremica.gui.ide.actions.Actions;
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaProperties;
+import org.supremica.automata.Automata;
 import org.supremica.log.*;
 import org.supremica.Version;
 
@@ -204,11 +206,6 @@ public class IDE
     	currToolBar = toolBar;
 	}
 
-	public int numberOfSelectedComponents()
-	{
-		return 0; // TO DO Fix this
-	}
-
 	private IDEToolBar createToolBar()
 	{
     	ideToolBar = new IDEToolBar(this);
@@ -242,15 +239,14 @@ public class IDE
 
 	public void stateChanged(ChangeEvent e)
 	{
-		Component currTab = tabPanel.getSelectedComponent();
-		if (currTab == getActiveModuleContainer().getAnalyzerPanel())
+		if (editorActive())
 		{
 //			setToolBar(getActiveModuleContainer().getAnalyzerPanel().getToolBar(ideToolBar));
 			getActiveModuleContainer().updateAutomata();
 			getActiveModuleContainer().getEditorPanel().disablePanel();
 			getActiveModuleContainer().getAnalyzerPanel().enablePanel();
 		}
-		if (currTab == getActiveModuleContainer().getEditorPanel())
+		if (analyzerActive())
 		{
 //			setToolBar(getActiveModuleContainer().getEditorPanel().getToolBar(ideToolBar));
 			getActiveModuleContainer().getEditorPanel().enablePanel();
@@ -268,6 +264,28 @@ public class IDE
 	public EditorWindowInterface getActiveEditorWindowInterface()
 	{
 		return getActiveModuleContainer().getActiveEditorWindowInterface();
+	}
+
+	public boolean editorActive()
+	{
+		return tabPanel.getSelectedComponent() == getActiveModuleContainer().getEditorPanel();
+	}
+
+	public boolean analyzerActive()
+	{
+		return tabPanel.getSelectedComponent() == getActiveModuleContainer().getAnalyzerPanel();
+	}
+
+	public int numberOfSelectedAutomata()
+	{
+		ModuleContainer activeModuleContainer = getActiveModuleContainer();
+		return activeModuleContainer.numberOfSelectedAutomata();
+	}
+
+	public Automata getSelectedAutomata()
+	{
+		ModuleContainer activeModuleContainer = getActiveModuleContainer();
+		return activeModuleContainer.getSelectedAutomata();
 	}
 
 	public static void main(String args[])
