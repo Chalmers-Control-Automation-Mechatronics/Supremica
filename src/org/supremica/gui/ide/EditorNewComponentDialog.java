@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorNewDialog
 //###########################################################################
-//# $Id: EditorNewComponentDialog.java,v 1.5 2006-07-08 00:40:44 knut Exp $
+//# $Id: EditorNewComponentDialog.java,v 1.6 2006-07-09 02:18:50 knut Exp $
 //###########################################################################
 
 
@@ -28,6 +28,8 @@ import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 
 /** <p>A dialog to help users create new components in a module.</p>
@@ -131,7 +133,7 @@ public class EditorNewComponentDialog
 		{
 
 			//TODO: Make this create the component
-			final ExpressionParser parser = mRoot.getExpressionParser();
+			final ExpressionParser parser = new ExpressionParser(ModuleSubjectFactory.getInstance(), CompilerOperatorTable.getInstance());
 			final String nameText = mNameInput.getText();
 			IdentifierProxy ident = null;
 			try {

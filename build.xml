@@ -446,7 +446,6 @@
 		<fileset dir="${build}">
 			<!--patternset-->
 				<include name="**/*"/>
-				<exclude name="org/supremica/apps/SupremicaTeacher.class"/>
 			<!--/patternset-->			
 		</fileset>
 		<fileset dir="${images}"/>
@@ -458,6 +457,17 @@
 			fullpath="net/sourceforge/waters/valid/vw.xsl"/>
 	</jar>
 </target>
+
+<target name="jar_supremica_standalone">
+	<jar jarfile="${dist}/SupremicaStandalone.jar"> 
+		<fileset dir="${build}">
+			<!--patternset-->
+				<include name="org/supremica/automata/**/*"/>
+			<!--/patternset-->			
+		</fileset>
+	</jar>
+</target>
+
 
 <target name="jar_waters_jaxb">
 	<jar jarfile="${lib}/waters_jaxb.jar"> 

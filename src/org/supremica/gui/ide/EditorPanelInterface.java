@@ -7,5 +7,5 @@ public interface EditorPanelInterface
 {
 	public void addComponent();
 	public void addComponent(SimpleComponentSubject component);
-	public ExpressionParser getExpressionParser();
+//	public ExpressionParser getExpressionParser();
 }

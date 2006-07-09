@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.17 2006-07-08 00:40:44 knut Exp $
+//# $Id: EditorComponentsPanel.java,v 1.18 2006-07-09 02:18:50 knut Exp $
 //###########################################################################
 
 
@@ -29,6 +29,8 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.gui.ModuleTree;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+
 
 import org.supremica.gui.WhiteScrollPane;
 
@@ -220,11 +222,12 @@ class EditorComponentsPanel
 
 	}
 */
+/*
 	public ExpressionParser getExpressionParser()
 	{
 		return null;
 	}
-
+*/
 	private class TreeMouseAdapter
 		extends MouseAdapter
 	{

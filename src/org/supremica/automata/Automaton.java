@@ -420,7 +420,8 @@ public class Automaton
 				State toState = currArc.getToState();
 
 				if (!toState.isForbidden())
-				{
+
+	{
 					LabeledEvent currEvent = currArc.getEvent();
 
 					if (explicitlyForbiddenEvents.contains(currEvent))

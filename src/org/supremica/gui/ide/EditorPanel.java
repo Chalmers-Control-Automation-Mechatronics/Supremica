@@ -114,10 +114,12 @@ public class EditorPanel
 				componentsPanel.addComponent(component);
 			}
 
+/*
 			public ExpressionParser getExpressionParser()
 			{
 				return componentsPanel.getExpressionParser();
 			}
+*/
 		}
 
 
