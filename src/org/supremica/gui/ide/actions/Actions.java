@@ -40,6 +40,9 @@ public class Actions
 	// Analyzer Actions
 	public IDEAction analyzerWorkbenchAction = new WorkbenchAction(allActions);
 	public IDEAction analyzerSynchronizerAction = new AnalyzerSynchronizerAction(allActions);
+	public IDEAction analyzerSynthesizerAction = new AnalyzerSynthesizerAction(allActions);
+	public IDEAction analyzerVerifierAction = new AnalyzerVerifierAction(allActions);
+
 
 	// Help Actions
 	public IDEAction helpWebAction = new HelpWebAction(allActions);

@@ -281,4 +281,48 @@ class AnalyzerAutomataPanel
 		return selectedAutomata;
 	}
 
+	public Automata getAllAutomata()
+	{
+		return getActiveProject();
+	}
+
+
+	public Automata getUnselectedAutomata()
+	{
+		/* Simple... but flickery!
+		   invertSelection();
+		   Automata unSelectedAutomata = getSelectedAutomata();
+		   invertSelection();
+		   return unSelectedAutomata;
+		*/
+		int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
+		Automata unselectedAutomata = new Automata();
+		int j = 0;
+
+		for (int i = 0; i < theAutomatonTable.getRowCount(); i++)
+		{
+			if ((j >= selectedRowIndices.length) || (i != selectedRowIndices[j]))
+			{
+				try
+				{
+					int currIndex = i;
+					int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
+					Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
+
+					unselectedAutomata.addAutomaton(currAutomaton);
+				}
+				catch (Exception ex)
+				{
+					logger.error("Trying to get an automaton that does not exist. Index: " + i);
+					logger.debug(ex.getStackTrace());
+				}
+			}
+			else
+			{
+				j++;
+			}
+		}
+
+		return unselectedAutomata;
+	}
 }

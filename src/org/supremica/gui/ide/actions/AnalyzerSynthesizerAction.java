@@ -4,28 +4,28 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import org.supremica.gui.ide.IDE;
-import org.supremica.gui.SynchronizationDialog;
-import org.supremica.gui.AutomataSynchronizerWorker;
+import org.supremica.gui.SynthesizerDialog;
+import org.supremica.gui.AutomataSynthesisWorker;
 import java.util.List;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.log.*;
 import javax.swing.JOptionPane;
 
-public class AnalyzerSynchronizerAction
+public class AnalyzerSynthesizerAction
 	extends IDEAction
 {
 	private static final long serialVersionUID = 1L;
 	private Logger logger = LoggerFactory.createLogger(IDE.class);
 
-	public AnalyzerSynchronizerAction(List<IDEAction> actionList)
+	public AnalyzerSynthesizerAction(List<IDEAction> actionList)
 	{
 		super(actionList);
 
 		setAnalyzerActiveRequired(true);
 
-		putValue(Action.NAME, "Synchronize");
-		putValue(Action.SHORT_DESCRIPTION, "Synchronize");
+		putValue(Action.NAME, "Synthesize");
+		putValue(Action.SHORT_DESCRIPTION, "Synthesize");
 //		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Copy16.gif")));
 	}
 
@@ -34,11 +34,37 @@ public class AnalyzerSynchronizerAction
 		doAction();
 	}
 
+
 	public void doAction()
 	{
+
 		// Retrieve the selected automata and make a sanity check
 		Automata selectedAutomata = ide.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(ide.getIDE(), 2, true, false, true, true))
+
+		if (!selectedAutomata.sanityCheck(ide.getIDE(), 1, true, true, true, true))
+		{
+			return;
+		}
+
+		// Get the current options and allow the user to change them...
+		SynthesizerOptions options = new SynthesizerOptions();
+		SynthesizerDialog synthesizerDialog = new SynthesizerDialog(ide.getFrame(), selectedAutomata.size(), options);
+		synthesizerDialog.show();
+		if (!options.getDialogOK())
+		{
+			return;
+		}
+
+		AutomataSynthesisWorker worker = new AutomataSynthesisWorker(ide.getIDE(), selectedAutomata, options);
+
+
+
+
+
+/*
+		// Retrieve the selected automata and make a sanity check
+		Automata selectedAutomata = ide.getSelectedAutomata();
+		if (!selectedAutomata.sanityCheck(ide.getIDE(), 1, true, false, true, true))
 		{
 			return;
 		}
@@ -70,5 +96,8 @@ public class AnalyzerSynchronizerAction
 
 		// Start worker thread - perform the task.
 		AutomataSynchronizerWorker worker = new AutomataSynchronizerWorker(ide.getIDE(), selectedAutomata, "", synchronizationOptions);
+*/
 	}
+
+
 }

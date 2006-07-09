@@ -289,6 +289,18 @@ public class IDE
 		return activeModuleContainer.getSelectedAutomata();
 	}
 
+	public Automata getAllAutomata()
+	{
+		ModuleContainer activeModuleContainer = getActiveModuleContainer();
+		return activeModuleContainer.getAllAutomata();
+	}
+
+	public Automata getUnselectedAutomata()
+	{
+		ModuleContainer activeModuleContainer = getActiveModuleContainer();
+		return activeModuleContainer.getUnselectedAutomata();
+	}
+
 	// ** MF ** Implementation of Gui stuff
 	public void error(String msg)
 	{

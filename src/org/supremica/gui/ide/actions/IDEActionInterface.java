@@ -9,7 +9,6 @@ import org.supremica.automata.Automata;
 
 public interface IDEActionInterface
 {
-
 	public ModuleContainer createNewModuleContainer();
 	public ModuleContainer getActiveModuleContainer();
 	public void add(ModuleContainer module);
@@ -22,4 +21,6 @@ public interface IDEActionInterface
 	public void setEditorMode(IDEAction theAction);
 	public EditorWindowInterface getActiveEditorWindowInterface();
 	public Automata getSelectedAutomata();
+	public Automata getAllAutomata();
+	public Automata getUnselectedAutomata();
 }

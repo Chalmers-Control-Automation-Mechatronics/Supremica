@@ -37,6 +37,8 @@ class AnalyzerPopupMenu
 		throws Exception
 	{
 		add(ide.getActions().analyzerSynchronizerAction.getMenuItem());
+		add(ide.getActions().analyzerSynthesizerAction.getMenuItem());
+		add(ide.getActions().analyzerVerifierAction.getMenuItem());
 		addSeparator();
 		add(ide.getActions().analyzerWorkbenchAction.getMenuItem());
 	}

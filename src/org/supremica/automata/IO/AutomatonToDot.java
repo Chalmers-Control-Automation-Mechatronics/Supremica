@@ -178,7 +178,7 @@ public class AutomatonToDot
 
 		// fix page size to this:
 		pw.println("\tsize = \"" + DEFAULT_WIDTH + "," + DEFAULT_HEIGHT + "\";");
-		
+
 		if (leftToRight)
 		{
 			pw.println("\trankdir = LR;");
@@ -343,8 +343,10 @@ public class AutomatonToDot
 						}
 					}
 				}
+				pw.println("\" " + getArcColor(is_ctrl, is_prio, is_imm, is_eps, is_obs, is_prop) + "];");
 
-				pw.println("\" " + getArcColor(is_ctrl, is_prio, is_imm, is_eps, is_obs, is_prop) + ", fontname=\"Helvetica\" , fontsize=\"26\"];");
+				// Commented out large event label font. Did not like this but maybel we can include it as an option.
+				//pw.println("\" " + getArcColor(is_ctrl, is_prio, is_imm, is_eps, is_obs, is_prop) + ", fontname=\"Helvetica\" , fontsize=\"26\"];");
 			}
 		}
 

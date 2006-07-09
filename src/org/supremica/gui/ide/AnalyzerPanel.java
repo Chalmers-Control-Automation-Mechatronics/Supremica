@@ -42,7 +42,7 @@ public class AnalyzerPanel
 		splitPanelHorizontal.setResizeWeight(0.0);
 		//		splitPanelHorizontal.setPreferredSize(IDEDimensions.mainPanelPreferredSize);
 		//		splitPanelHorizontal.setMinimumSize(IDEDimensions.mainPanelMinimumSize);
-		
+
 		((GridBagLayout)getLayout()).setConstraints(splitPanelHorizontal, getGridBagConstraints());
 
 		add(splitPanelHorizontal);
@@ -56,13 +56,24 @@ public class AnalyzerPanel
 		return automataPanel.getSelectedAutomata();
 	}
 
+	public Automata getUnselectedAutomata()
+	{
+		return automataPanel.getUnselectedAutomata();
+	}
+
+	public Automata getAllAutomata()
+	{
+		return automataPanel.getAllAutomata();
+	}
+
+
 	public void addToolBarEntries(IDEToolBar toolBar)
 	{
 	}
 
 	public void disablePanel()
 	{
-		//		getActions().enableAnalyzerActions(false);
+		// getActions().enableAnalyzerActions(false);
 	}
 
 	public void enablePanel()

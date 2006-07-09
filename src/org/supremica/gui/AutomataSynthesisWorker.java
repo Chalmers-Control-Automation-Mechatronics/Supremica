@@ -57,6 +57,7 @@ import org.supremica.automata.algorithms.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.util.ActionTimer;
+import org.supremica.gui.ide.IDEReportInterface;
 
 /**
  * Thread dealing with synthesis.
@@ -70,7 +71,7 @@ public class AutomataSynthesisWorker
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataSynthesisWorker.class);
 
-	private Gui gui;
+	private IDEReportInterface gui;
 	private Automata theAutomata;
 	private SynthesizerOptions options;
 
@@ -78,7 +79,7 @@ public class AutomataSynthesisWorker
 	private boolean stopRequested = false;
 	private EventQueue eventQueue = new EventQueue();
 
-	public AutomataSynthesisWorker(Gui gui, Automata theAutomata, SynthesizerOptions options)
+	public AutomataSynthesisWorker(IDEReportInterface gui, Automata theAutomata, SynthesizerOptions options)
 	{
 		this.gui = gui;
 		this.theAutomata = theAutomata;

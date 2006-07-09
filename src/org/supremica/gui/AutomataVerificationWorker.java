@@ -58,6 +58,7 @@ import org.supremica.automata.algorithms.minimization.*;
 import org.supremica.automata.Automata;
 import org.supremica.gui.VisualProjectContainer;
 import org.supremica.util.ActionTimer;
+import org.supremica.gui.ide.IDEReportInterface;
 
 /**
  * Thread dealing with verification.
@@ -72,9 +73,9 @@ public class AutomataVerificationWorker
 	private static Logger logger = LoggerFactory.createLogger(AutomataVerificationWorker.class);
 
 	// -- MF --      private Supremica workbench = null;
-	private Gui workbench = null;
+	private IDEReportInterface workbench = null;
 	private Automata theAutomata = null;
-	private VisualProjectContainer theVisualProjectContainer = null;
+	//private VisualProjectContainer theVisualProjectContainer = null;
 
 	// private String newAutomatonName = null;
 	// private Automaton theAutomaton = null;
@@ -90,14 +91,14 @@ public class AutomataVerificationWorker
 	private static final int MODULAR = 1;
 	private static final int IDD = 2;
 
-	public AutomataVerificationWorker(Gui workbench, Automata theAutomata,
+	public AutomataVerificationWorker(IDEReportInterface workbench, Automata theAutomata,
 									  VerificationOptions verificationOptions,
 									  SynchronizationOptions synchronizationOptions,
 									  MinimizationOptions minimizationOptions)
 	{
 		this.workbench = workbench;
 		this.theAutomata = theAutomata;
-		theVisualProjectContainer = workbench.getVisualProjectContainer();
+		//theVisualProjectContainer = workbench.getVisualProjectContainer();
 
 		// this.newAutomatonName = newAutomatonName;
 		this.verificationOptions = verificationOptions;
@@ -156,7 +157,8 @@ public class AutomataVerificationWorker
 				"included in the language of the selected automata.";
 
 			// In language inclusion, not only the currently selected automata are used!
-			theAutomata = workbench.getVisualProjectContainer().getActiveProject();
+
+			//theAutomata = workbench.getAllAutomata();
 		}
 		else
 		{    // Error... this can't happen!

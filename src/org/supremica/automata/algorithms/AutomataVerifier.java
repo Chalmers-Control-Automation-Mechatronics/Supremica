@@ -218,6 +218,8 @@ public class AutomataVerifier
 				return "At least one automaton must be unselected.";
 			}
 
+//			theAutomata = theAutomata.add(verificationOptions.getInclusionAutomata());
+
 			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 			{
 				if (!theAutomata.isAllEventsPrioritized())
@@ -387,6 +389,8 @@ public class AutomataVerifier
 
 		// Maybe we should just make a copy of the whole project and modify what needs to
 		// be modified right there instead?
+
+		theAutomata.addAutomata(inclusionAutomata);
 
 		/*
 		// Make sure the alphabets have the right relation
