@@ -540,6 +540,11 @@
 	<copy file="${templates}/manufacturingTablesTestLocal.cmd" todir="${dist}"/>		
 	<chmod file="${dist}/manufacturingTablesTestLocal.cmd" perm="644"/>
 
+	<copy file="${templates}/IDELocal.cmd" todir="${dist}"/>		
+	<chmod file="${dist}/IDELocal.cmd" perm="644"/>
+	<copy file="${templates}/IDELocal" todir="${dist}"/>	
+	<chmod file="${dist}/IDELocal" perm="755"/>
+	
 	<copy file="${templates}/SupremicaLocal.cmd" todir="${dist}"/>		
 	<chmod file="${dist}/SupremicaLocal.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaLocalMoreMem.cmd" todir="${dist}"/>

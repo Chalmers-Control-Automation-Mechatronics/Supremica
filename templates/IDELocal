@@ -1,0 +1,2 @@
+#/bin/sh
+env LD_LIBRARY_PATH=. java -cp ../build:../lib/unjared:../images:../examples -enableassertions org.supremica.gui.ide.IDE -p SupremicaProperties.cfg
