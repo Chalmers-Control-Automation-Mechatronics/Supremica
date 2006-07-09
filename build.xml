@@ -612,6 +612,10 @@
 	<chmod file="${dist}/libbuddy.so" perm="644"/>
 	<copy file="${platform}/linux.x86/lib/libBisimulationEquivalence.so" todir="${dist}"/>	
 	<chmod file="${dist}/libBisimulationEquivalence.so" perm="644"/>
+	<copy file="${platform}/macosx.powerpc/libBisimulationEquivalence.dylib" todir="${dist}"/>	
+	<chmod file="${dist}/libBisimulationEquivalence.dylib" perm="644"/>
+	<copy file="${platform}/macosx.powerpc/libbuddy.dylib" todir="${dist}"/>	
+	<chmod file="${dist}/libbuddy.dylib" perm="644"/>
 </target>
 
 <!--

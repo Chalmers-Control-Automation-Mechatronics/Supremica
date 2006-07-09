@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.69 2006-06-08 15:33:01 martin Exp $
+//# $Id: ControlledSurface.java,v 1.70 2006-07-09 16:49:14 martin Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -930,6 +930,7 @@ public class ControlledSurface
 		
 		public void mouseReleased(MouseEvent e)
 		{
+			
 			if (hasDragged)
 			{
 				Command unselect = new UnSelectCommand(ControlledSurface.this, previouslySelected);

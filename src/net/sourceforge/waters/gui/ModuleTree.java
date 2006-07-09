@@ -28,10 +28,10 @@ public class ModuleTree extends JTree {
 	private DefaultMutableTreeNode mRootNode;
 	private final ProxyPrinter mPrinter;
 	private ModuleSubject mModule;
-	private ModuleWindow mModuleWindow;
+	private ModuleWindowInterface mModuleWindow;
 	private ModuleTree mSelfRef;
 	
-	public ModuleTree(ModuleWindow moduleWindow) {
+	public ModuleTree(ModuleWindowInterface moduleWindow) {
 		super();
 		
 		mPrinter = new HTMLPrinter();
@@ -80,12 +80,14 @@ public class ModuleTree extends JTree {
 		//moduleSelectTree.setCellRenderer(renderer);
 		MouseListener ml = new MouseAdapter()
 		{
-			EditorWindow ed = null;
+			EditorWindowInterface ed = null;
 			
 			public void mousePressed(MouseEvent e)
 			{
 				int selRow = getRowForLocation(e.getX(), e.getY());
 				TreePath selPath = getPathForLocation(e.getX(), e.getY());
+
+				maybeShowPopup(e, selPath);
 				
 				//possibly open editor window
 				if (selRow != -1)
@@ -107,7 +109,7 @@ public class ModuleTree extends JTree {
 							
 							if (scp != null)
 							{
-								ed = new EditorWindow(scp.getName() + " - Waters Editor", mModule, scp, mModuleWindow, mModuleWindow);
+								ed = mModuleWindow.showEditor(scp);
 							}
 						}
 						if (abstractComponent instanceof VariableSubject)
@@ -130,6 +132,9 @@ public class ModuleTree extends JTree {
 				if(selPath == null) return;
 				
 				mSelfRef.setSelectionPath(selPath);
+				maybeShowPopup(e, selPath);
+			}
+			private void maybeShowPopup(MouseEvent e, TreePath selPath) {
 				//possibly show popup menu
 				if (e.isPopupTrigger())
 				{
@@ -225,8 +230,6 @@ public class ModuleTree extends JTree {
 			if ((o instanceof SimpleComponentSubject))
 			{
 				SimpleComponentSubject scp = (SimpleComponentSubject) o;
-				
-				mModuleWindow.logEntry("Adding SimpleComponentSubject: " + scp.getName());
 			}
 			
 			expandPath(new TreePath(parentNode.getPath()));

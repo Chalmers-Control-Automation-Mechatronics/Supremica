@@ -2,6 +2,7 @@ package org.supremica.gui.ide;
 
 import javax.swing.*;
 import java.awt.GridBagLayout;
+
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;

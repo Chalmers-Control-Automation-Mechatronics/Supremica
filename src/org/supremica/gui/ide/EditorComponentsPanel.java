@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.18 2006-07-09 02:18:50 knut Exp $
+//# $Id: EditorComponentsPanel.java,v 1.19 2006-07-09 16:49:14 martin Exp $
 //###########################################################################
 
 
@@ -12,21 +12,30 @@ package org.supremica.gui.ide;
 
 import javax.swing.*;
 import javax.swing.tree.*;
+
 import java.util.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import net.sourceforge.waters.gui.ComponentInfo;
+import net.sourceforge.waters.gui.EditorEditVariableDialog;
+import net.sourceforge.waters.gui.EditorNewDialog;
+import net.sourceforge.waters.gui.EditorWindow;
+import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.ModuleTreeRenderer;
+import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.InstanceSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+import net.sourceforge.waters.subject.module.VariableSubject;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.gui.ModuleTree;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
@@ -37,14 +46,14 @@ import org.supremica.gui.WhiteScrollPane;
 
 class EditorComponentsPanel
 	extends WhiteScrollPane
-	implements EditorPanelInterface
+	implements EditorPanelInterface, ModuleWindowInterface
 {
 	private static final long serialVersionUID = 1L;
 
 	private String name;
 	private ModuleContainer moduleContainer;
 
-	private JTree moduleSelectTree;
+	private ModuleTree moduleSelectTree;
 
 	EditorComponentsPanel(ModuleContainer moduleContainer, String name)
 	{
@@ -71,89 +80,15 @@ class EditorComponentsPanel
 
 		final ModuleSubject module = moduleContainer.getModule();
 
-		if (module != null)
-		{
-			l = new ArrayList(module.getComponentList());
-			treeNode = new DefaultMutableTreeNode(new ComponentInfo("Module: " + module.getName(), null));
-		}
-		else
-		{
-			l = new ArrayList();
-			treeNode = null;
-		}
 
-		for (int i = 0; i < l.size(); i++)
-		{
-			treeNode.add(makeTreeFromComponent(l.get(i)));
-		}
-
-		DefaultMutableTreeNode rootNode = treeNode;
-		DefaultTreeModel treeModel = new DefaultTreeModel(rootNode);
-
-		//TODO: Put some proper icons in place!
-		final ImageIcon plantIcon = new ImageIcon(IDE.class.getResource("/icons/waters/plant.gif"));
-		final ImageIcon specIcon = new ImageIcon(IDE.class.getResource("/icons/waters/spec.gif"));
-		final ImageIcon propertyIcon = new ImageIcon(IDE.class.getResource("/icons/waters/property.gif"));
-		final ImageIcon foreachIcon = null;
-		final ImageIcon instanceIcon = new ImageIcon(IDE.class.getResource("/icons/waters/instance.gif"));
-		final ImageIcon bindingIcon = null;
-
-		moduleSelectTree = new JTree(treeModel);
-
-		moduleSelectTree.setCellRenderer(new ModuleTreeRenderer(foreachIcon, plantIcon, propertyIcon, specIcon, instanceIcon, bindingIcon));
-		moduleSelectTree.setEditable(false);
-		moduleSelectTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+		moduleSelectTree = new ModuleTree(this);
 
 		DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
 
-		//renderer.setLeafIcon(simpleIcon);
-		//renderer.setOpenIcon(null);
-		//renderer.setClosedIcon(null);
-		//moduleSelectTree.setCellRenderer(renderer);
-		MouseListener ml = new TreeMouseAdapter(module, moduleSelectTree);
-
-		moduleSelectTree.addMouseListener(ml);
 		getViewport().add(moduleSelectTree);
 
 	}
-
-
-	private DefaultMutableTreeNode makeTreeFromComponent(final Object e)
-	{
-		final AbstractSubject subject = (AbstractSubject) e;
-		final ProxyPrinter printer = moduleContainer.getPrinter();
-		final String text = printer.toString(subject);
-		final Object userobject = new ComponentInfo(text, subject);
-		if (subject instanceof SimpleComponentSubject) {
-			return new DefaultMutableTreeNode(userobject, false);
-		} else if (subject instanceof InstanceSubject) {
-			final InstanceSubject inst = (InstanceSubject) subject;
-			final DefaultMutableTreeNode tmp =
-				new DefaultMutableTreeNode(userobject, true);
-			final List<ParameterBindingSubject> bindings =
-				inst.getBindingListModifiable() ;
-			for (final ParameterBindingSubject binding : bindings) {
-				tmp.add(makeTreeFromComponent(binding));
-			}
-			return tmp;
-		} else if (subject instanceof ParameterBindingSubject) {
-			return new DefaultMutableTreeNode(userobject, false);
-		} else if (subject instanceof ForeachSubject) {
-			final ForeachSubject foreach = (ForeachSubject) subject;
-			final DefaultMutableTreeNode tn =
-				new DefaultMutableTreeNode(userobject, true);
-			final List<AbstractSubject> body = foreach.getBodyModifiable();
-			for (final AbstractSubject item : body) {
-				tn.add(makeTreeFromComponent(item));
-			}
-			return tn;
-		} else {
-			throw new IllegalArgumentException
-				("Don't know how to make tree from subject of type " +
-				 e.getClass().getName() + "!");
-		}
-	}
-
+	
 	public void addComponent(SimpleComponentSubject subject)
 	{
 		((ModuleTree) moduleSelectTree).addComponent(subject);
@@ -228,65 +163,67 @@ class EditorComponentsPanel
 		return null;
 	}
 */
-	private class TreeMouseAdapter
-		extends MouseAdapter
-	{
-		JTree moduleSelectTree;
-		ModuleSubject module;
-
-//		ComponentEditorPanel ed = null;
-
-		public TreeMouseAdapter(ModuleSubject module, JTree moduleSelectTree)
-		{
-			this.module = module;
-			this.moduleSelectTree = moduleSelectTree;
+	
+	public ModuleSubject getModuleSubject() {
+		return this.moduleContainer.getModule();
+	}
+	
+	public EditorWindowInterface showEditor(SimpleComponentSubject component) {
+		final EditorPanel editorPanel =
+			moduleContainer.getEditorPanel();
+		if (component != null) {
+			editorPanel.setRightComponent
+				(moduleContainer.getComponentEditorPanel(component));
 		}
-
-		private void maybeShowPopup(MouseEvent e)
-		{
-			if (e.isPopupTrigger())
+		return editorPanel.getActiveEditorWindowInterface();
+	}
+	
+	public void actionPerformed(ActionEvent e) {
+		if("add variable".equals(e.getActionCommand())) {
+			//add new variable
+			TreePath currentSelection = moduleSelectTree.getSelectionPath();
+			if (currentSelection != null) 
 			{
-
+				// Get the node in the tree
+				DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode)
+				(currentSelection.getLastPathComponent());
+				Subject component = ((ComponentInfo) 
+						targetNode.getUserObject()).getComponent();
+				
+				if(component instanceof VariableSubject) {
+					component = component.getParent().getParent();
+					EditorEditVariableDialog.showDialog(null,
+							(SimpleComponentSubject) component, moduleSelectTree);
+				} else if(component instanceof SimpleComponentSubject) {
+					EditorEditVariableDialog.showDialog(null,
+							(SimpleComponentSubject) component, moduleSelectTree);
+				} else {
+					System.err.println("ModuleWindow.actionPerformed(): " +
+					"'add variable' performed by illegal node type");
+				}
 			}
 		}
-
-		public void mouseReleased(MouseEvent e)
-		{
-			// This is for triggering the popup
-			maybeShowPopup(e);
-		}
-
-		public void mousePressed(MouseEvent e)
-		{
-			// This is for triggering the popup
-			maybeShowPopup(e);
-
-			int selRow = moduleSelectTree.getRowForLocation(e.getX(), e.getY());
-			TreePath selPath = moduleSelectTree.getPathForLocation(e.getX(), e.getY());
-
-			if (selRow != -1)
+		
+		if("edit variable".equals(e.getActionCommand())) {
+			//edit existing variable
+			TreePath currentSelection = moduleSelectTree.getSelectionPath();
+			if (currentSelection != null) 
 			{
-				if (e.getClickCount() == 2)
-				{
-					DefaultMutableTreeNode node = (DefaultMutableTreeNode) moduleSelectTree.getLastSelectedPathComponent();
-
-					if (node == null) {
-						return;
-					} else if (node.isLeaf()) {
-						final ComponentInfo compInfo =
-							(ComponentInfo) node.getUserObject();
-						final SimpleComponentSubject comp =
-							(SimpleComponentSubject) compInfo.getComponent();
-						if (comp != null) {
-							final EditorPanel editorPanel =
-								moduleContainer.getEditorPanel();
-							editorPanel.setRightComponent
-								(moduleContainer.getComponentEditorPanel(comp));
-						}
-					}
+				// Get the node in the tree
+				DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode)
+				(currentSelection.getLastPathComponent());
+				Subject component = ((ComponentInfo) 
+						targetNode.getUserObject()).getComponent();
+				
+				if(component instanceof VariableSubject) {
+					Subject parent = component.getParent().getParent();
+					EditorEditVariableDialog.showDialog((VariableSubject) component,
+							(SimpleComponentSubject) parent, moduleSelectTree);
+				} else {
+					System.err.println("ModuleWindow.actionPerformed(): " +
+					"'edit variable' performed by illegal node type");
 				}
 			}
 		}
 	}
-
 }

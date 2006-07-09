@@ -23,13 +23,13 @@ class ModuleTreePopupMenu
 	private JMenuItem editVariableItem;
 	private AbstractSubject mInvokingComponent;
 	private ModuleTree mTree;
-	private ModuleWindow mWindow;
+	private ModuleWindowInterface mWindow;
 
-	public ModuleTreePopupMenu(ModuleTree tree, ModuleWindow window, AbstractSubject c)
+	public ModuleTreePopupMenu(ModuleTree tree, ModuleWindowInterface moduleWindow, AbstractSubject c)
 	{
 		mInvokingComponent = c;
 		mTree = tree;
-		mWindow = window;
+		mWindow = moduleWindow;
 		init();
 	}
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.48 2006-06-07 01:24:28 martin Exp $
+//# $Id: ModuleWindow.java,v 1.49 2006-07-09 16:49:14 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -115,9 +115,9 @@ import org.supremica.properties.Config;
  *
  * @author Gian Perrone
  */
-public class ModuleWindow
+public class ModuleWindow 
 	extends JFrame
-	implements ActionListener, FocusListener, UndoInterface, WindowListener
+	implements FocusListener, UndoInterface, WindowListener, ModuleWindowInterface
 {
 	/**
 	 * Limits the functionality of Waters to just drawing simple components.
@@ -993,6 +993,10 @@ public class ModuleWindow
 		for (Observer o : mObservers) {
 			o.update(e);
 		}
+	}
+
+	public EditorWindowInterface showEditor(SimpleComponentSubject component) {
+		return new EditorWindow(component.getName(), module, component, this, this);
 	}
 
 	//////////////////////////////
