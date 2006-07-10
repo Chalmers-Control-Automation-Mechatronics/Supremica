@@ -43,7 +43,7 @@ public class ModuleTree extends JTree {
 		if (mModule != null)
 		{
 			l = new ArrayList(mModule.getComponentList());
-			mRootNode = new DefaultMutableTreeNode(new ComponentInfo("Module: " + mModule.getName(), null));
+			mRootNode = new DefaultMutableTreeNode(new ComponentInfo("Module: " + mModule.getName(), mModule));
 		}
 		else
 		{
@@ -57,8 +57,6 @@ public class ModuleTree extends JTree {
 		}
 
 		this.setModel(new DefaultTreeModel(mRootNode));
-
-
 
 		//TODO: Put some proper icons in place!
 		final ImageIcon plantIcon = new ImageIcon(ModuleWindow.class.getResource("/icons/waters/plant.gif"));

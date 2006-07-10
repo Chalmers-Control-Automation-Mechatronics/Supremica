@@ -6,6 +6,7 @@ import javax.swing.*;
 import org.supremica.util.VPopupMenu;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.VariableSubject;
 import net.sourceforge.waters.gui.command.Command;
@@ -70,6 +71,14 @@ class ModuleTreePopupMenu
 			item.addActionListener(mWindow);
 			this.add(item);
 			editVariableItem = item;
+		}
+		
+		if(mInvokingComponent instanceof ModuleSubject) {
+			item = new JMenuItem("Add simple component");
+			item.setActionCommand("add simple component");
+			item.addActionListener(mWindow);
+			this.add(item);
+			deleteVariableItem = item;
 		}
 	}
 }

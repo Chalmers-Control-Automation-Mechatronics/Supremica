@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.19 2006-07-09 16:49:14 martin Exp $
+//# $Id: EditorComponentsPanel.java,v 1.20 2006-07-10 04:02:22 martin Exp $
 //###########################################################################
 
 
@@ -77,9 +77,6 @@ class EditorComponentsPanel
 	{
 		final ArrayList l;
 		DefaultMutableTreeNode treeNode = null;
-
-		final ModuleSubject module = moduleContainer.getModule();
-
 
 		moduleSelectTree = new ModuleTree(this);
 
@@ -224,6 +221,10 @@ class EditorComponentsPanel
 					"'edit variable' performed by illegal node type");
 				}
 			}
+		}
+		
+		if("add simple component".equals(e.getActionCommand())) {
+			moduleContainer.getActions().editorAddSimpleComponentAction.doAction();
 		}
 	}
 }
