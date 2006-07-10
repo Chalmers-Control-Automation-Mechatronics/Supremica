@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateNodeCommand
 //###########################################################################
-//# $Id: CreateNodeCommand.java,v 1.8 2006-01-17 21:13:50 siw4 Exp $
+//# $Id: CreateNodeCommand.java,v 1.9 2006-07-10 17:02:15 knut Exp $
 //###########################################################################
 
 
@@ -45,6 +45,7 @@ public class CreateNodeCommand
      */
     public CreateNodeCommand(ControlledSurface surface, int x, int y)
     {
+		//System.err.println("CreateNodeCommand construct");
 		mSurface = surface;
 		// Find a unique name!
 		int i = 0;
@@ -65,7 +66,7 @@ public class CreateNodeCommand
 		final EventListExpressionSubject props =
 			new PlainEventListSubject(empty);
 		final SimpleNodeSubject node = new SimpleNodeSubject(name, props);
-		mCreated = new EditorNode(x, y, node, surface);       
+		mCreated = new EditorNode(x, y, node, surface);
     }
 
     /**
@@ -73,18 +74,19 @@ public class CreateNodeCommand
      */
     public void execute()
     {
+		//System.err.println("CreateNodeCommand.execute");
 		mSurface.addNode(mCreated);
 		mSurface.getEditorInterface().setDisplayed();
     }
-	
-    /** 
+
+    /**
      * Undoes the Command
-     */    
+     */
 
     public void undo()
     {
 		mSurface.delNode(mCreated);
-		mSurface.unselectAll();		
+		mSurface.unselectAll();
 		mSurface.getEditorInterface().setDisplayed();
     }
 

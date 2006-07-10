@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.21 2006-03-22 09:19:08 flordal Exp $
+//# $Id: ComponentEditorPanel.java,v 1.22 2006-07-10 17:02:15 knut Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -37,7 +37,7 @@ public class ComponentEditorPanel
 	private static final long serialVersionUID = 1L;
 
 	private ModuleContainer moduleContainer;
-	private EditorToolbar toolbar;
+//	private EditorToolbar toolbar;
 	private ControlledSurface surface;
 	private EditorEvents events;
 	private EditorMenu menu;
@@ -53,13 +53,18 @@ public class ComponentEditorPanel
 		//setTitle(title);
 		this.moduleContainer = moduleContainer;
 		this.module = moduleContainer.getModule();
-		toolbar = new EditorToolbar();
-		if (moduleContainer.getIDE().getToolBar() instanceof ControlledToolbar) {
+		//toolbar = new EditorToolbar();
+		//if (moduleContainer.getIDE().getToolBar() instanceof ControlledToolbar)
+		//{
 		    surface = new ControlledSurface(this, (ControlledToolbar)moduleContainer.getIDE().getToolBar());
-		} else {
-		    surface = new ControlledSurface(this, toolbar);
-		}
-		
+		//}
+		//else
+		//{
+		//	System.err.println("Illegal toolbar");
+		//	System.exit(0);
+		    //surface = new ControlledSurface(this, toolbar);
+		//}
+
 		surface.setPreferredSize(IDEDimensions.rightEditorPreferredSize);
 		surface.setMinimumSize(IDEDimensions.rightEditorMinimumSize);
 
@@ -96,10 +101,10 @@ public class ComponentEditorPanel
 		} else {
 		    split.setDividerLocation(events.getBestWidth());
 		}
-		System.out.println(split.getDividerLocation());
-		System.out.println("MAX :" + split.getMaximumDividerLocation());
-		System.out.println("PREF :" + events.getPreferredSize().getWidth());
-		System.out.println("WIDTH :" + moduleContainer.getEditorPanel().getRightComponent().getWidth());
+		//System.out.println(split.getDividerLocation());
+		//System.out.println("MAX :" + split.getMaximumDividerLocation());
+		//System.out.println("PREF :" + events.getPreferredSize().getWidth());
+		//System.out.println("WIDTH :" + moduleContainer.getEditorPanel().getRightComponent().getWidth());
 		//setJMenuBar(menu);
 //		pack();
 		setVisible(true);
@@ -143,7 +148,7 @@ public class ComponentEditorPanel
 	{
 		return events;
 	}
-    
+
     public void setDisplayed()
     {
 	EditorPanel editorPanel = moduleContainer.getEditorPanel();

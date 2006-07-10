@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.54 2006-06-29 18:14:37 flordal Exp $
+//# $Id: EditorSurface.java,v 1.55 2006-07-10 17:02:15 knut Exp $
 //###########################################################################
 
 
@@ -55,7 +55,7 @@ public class EditorSurface
 	/**
 	 * Increase bounds for label & guardAction panels.
 	 */
-	public static final int TEXTSHADOWMARGIN = 2; 
+	public static final int TEXTSHADOWMARGIN = 2;
 	protected boolean showGrid = true;
 	protected EditorWindowInterface root;
 	protected int gridSize = 16;
@@ -78,22 +78,22 @@ public class EditorSurface
 	protected GraphSubject graph;
     protected EditorNodeGroup newGroup = null;
 	private Rectangle drawnAreaBounds = null;
-	
+
 	public void modelChanged(ModelChangeEvent e)
 	{
 		repaint();
 	}
-	
+
 	public boolean isSelected(EditorObject o)
 	{
 		return false;
 	}
-	
+
 	public GraphProxy getGraph()
 	{
 		return graph;
 	}
-	
+
 	public int getGridSize()
 	{
 		return gridSize;
@@ -176,7 +176,7 @@ public class EditorSurface
 		{
 			paintGrid(g);
 		}
-		
+
  		// Draw nodegroups
 		for (int i = 0; i < nodeGroups.size(); i++)
 		{
@@ -222,7 +222,7 @@ public class EditorSurface
 						groups.add(n2);
 					}
 				}
-			}			
+			}
 			for (int j = 0; j < nodes.size(); j++)
 			{
 				EditorNode n2 = (EditorNode) nodes.get(j);
@@ -231,7 +231,7 @@ public class EditorSurface
 				for (int k = 0; k < groups.size(); k++)
 				{
 					EditorNodeGroup n3 = (EditorNodeGroup) groups.get(k);
-					
+
 					if (n3.getBounds().contains(n2.getPosition()))
 					{
 						notImmediate = true;
@@ -247,7 +247,7 @@ public class EditorSurface
 						children.add(n2);
 					}
 				}
-			}			
+			}
 
 			children.addAll(groups);
 			boolean ok = n.setChildNodes(children, (JComponent) this);
@@ -259,13 +259,13 @@ public class EditorSurface
 				break;
 			}
 		}
-		
+
 		// If there is a new group being created, draw it!
-		if (newGroup != null) 
+		if (newGroup != null)
 		{
 			newGroup.drawObject(g, isSelected(newGroup));
 		}
-		
+
 		// Draw edges
 		for (int i = 0; i < edges.size(); i++)
 		{
@@ -280,10 +280,10 @@ public class EditorSurface
 			{
 				double[] segment = new double[6];
 				int type = it.currentSegment(segment);
-				
+
 				g.setColor(Color.ORANGE);
 				g.drawOval((int) segment[0]-1, (int) segment[1]-1, 3, 3);
-				
+
 				it.next();
 			}
 			*/
@@ -291,7 +291,7 @@ public class EditorSurface
 
 		// Draw lines (edges being drawn)
 		for (int i = 0; i < lines.size(); i++)
-		{ 
+		{
 			int[] l = (int[]) lines.get(i);
 
 			g.setColor(Color.BLACK);
@@ -326,14 +326,14 @@ public class EditorSurface
 			{
 				Rectangle bounds = l.getBounds();
 				g.setColor(l.getShadowColor(isSelected(l) || isSelected(l.getParent())));
-				g.fillRoundRect((int) bounds.getX()-TEXTSHADOWMARGIN, 
-								(int) bounds.getY()-TEXTSHADOWMARGIN, 
-								(int) bounds.getWidth()+2*TEXTSHADOWMARGIN, 
-								(int) bounds.getHeight()+2*TEXTSHADOWMARGIN, 
+				g.fillRoundRect((int) bounds.getX()-TEXTSHADOWMARGIN,
+								(int) bounds.getY()-TEXTSHADOWMARGIN,
+								(int) bounds.getWidth()+2*TEXTSHADOWMARGIN,
+								(int) bounds.getHeight()+2*TEXTSHADOWMARGIN,
 								20, 20);
 			}
 		}
-		
+
 		// Draw guard/action blocks
 		for (int i = 0; i < mGuardActionBlocks.size(); i++)
 		{
@@ -344,10 +344,10 @@ public class EditorSurface
 			{
 				Rectangle bounds = block.getBounds();
 				g.setColor(block.getShadowColor(isSelected(block) || isSelected(block.getParent())));
-				g.fillRoundRect((int) bounds.getX()-TEXTSHADOWMARGIN, 
-								(int) bounds.getY()-TEXTSHADOWMARGIN, 
-								(int) bounds.getWidth()+2*TEXTSHADOWMARGIN, 
-								(int) bounds.getHeight()+2*TEXTSHADOWMARGIN, 
+				g.fillRoundRect((int) bounds.getX()-TEXTSHADOWMARGIN,
+								(int) bounds.getY()-TEXTSHADOWMARGIN,
+								(int) bounds.getWidth()+2*TEXTSHADOWMARGIN,
+								(int) bounds.getHeight()+2*TEXTSHADOWMARGIN,
 								20, 20);
 			}
 		}
@@ -357,7 +357,7 @@ public class EditorSurface
 		{
 			showDragSelect(g);
 		}
-		
+
 		/*
 		// Test: Print outline of drawn area (just to see that it's OK)
 		Rectangle rect = getDrawnAreaBounds();
@@ -394,12 +394,13 @@ public class EditorSurface
 
 	public void addNode(final EditorNode n)
 	{
+		//System.err.println("EditorSurface addNode");
 		final Collection<NodeSubject> subjects = graph.getNodesModifiable();
 		subjects.add(n.getSubject());
 	    nodes.add(n);
 	    addLabel(n, n.getName());
 	    repaint();
-	    examineCollisions();  
+	    examineCollisions();
 	}
 
 
@@ -438,7 +439,7 @@ public class EditorSurface
 	    Collection<Proxy> ev = Collections.emptyList();
 	    Collection<NodeProxy> ic = Collections.emptyList();
 	    BoxGeometrySubject g = new BoxGeometrySubject(new Rectangle2D.Double(x, y, w, h));
-	    GroupNodeSubject n = new GroupNodeSubject("NodeGroup" + nodeGroups.size(), new PlainEventListSubject(ev), ic, g);     
+	    GroupNodeSubject n = new GroupNodeSubject("NodeGroup" + nodeGroups.size(), new PlainEventListSubject(ev), ic, g);
 	    return addNodeGroup(n);
 	}
 
@@ -536,13 +537,13 @@ public class EditorSurface
 				delLabelGroup(g);
 			}
 		}
-		
+
 		//delete guardActionBlock
 		final EditorGuardActionBlock gA = e.getEditorGuardActionBlock();
 		if(gA != null) {
 			delGuardActionBlock(gA);
 		}
-		
+
 
 		if (e.getStartNode().getType() == EditorObject.NODEGROUP)
 		{
@@ -571,7 +572,7 @@ public class EditorSurface
 
 	public void addLabelGroup(EditorEdge edge)
 	{
-		EditorLabelGroup labelGroup = 
+		EditorLabelGroup labelGroup =
 			new EditorLabelGroup(edge, this);
 		events.add(labelGroup);
 		edge.setEditorLabelGroup(labelGroup);
@@ -584,20 +585,20 @@ public class EditorSurface
 		repaint();
 	}
 
-	public void addGuardActionBlock(EditorEdge edge) 
+	public void addGuardActionBlock(EditorEdge edge)
 	{
-		if (edge.getSubject().getGuardActionBlock() == null) 
+		if (edge.getSubject().getGuardActionBlock() == null)
 		{
 			edge.getSubject().setGuardActionBlock(new GuardActionBlockSubject("", "", null));
 		}
-		EditorGuardActionBlock guardActionBlock = 
+		EditorGuardActionBlock guardActionBlock =
 			new EditorGuardActionBlock(edge, this);
 		mGuardActionBlocks.add(guardActionBlock);
 		edge.setEditorGuardActionBlock(guardActionBlock);
 		repaint();
 	}
 
-	public void removeGuardActionBlock(EditorEdge edge) 
+	public void removeGuardActionBlock(EditorEdge edge)
 	{
 		EditorGuardActionBlock gab = edge.getEditorGuardActionBlock();
 		mGuardActionBlocks.remove(gab);
@@ -688,7 +689,7 @@ public class EditorSurface
 		g.removeFromSurface(this);
 		repaint();
 	}
-	
+
 	public void delGuardActionBlock(EditorGuardActionBlock gA)
 	{
 		mGuardActionBlocks.remove(gA);
@@ -713,7 +714,7 @@ public class EditorSurface
 		{
 			((EditorLabelGroup) events.get(i)).removeFromSurface(this);
 		}
-		
+
 		for (int i = 0; i < mGuardActionBlocks.size(); i++)
 		{
 			((EditorGuardActionBlock) mGuardActionBlocks.get(i)).removeFromSurface(this);
@@ -776,7 +777,7 @@ public class EditorSurface
 				return (EditorEdge) edges.get(i);
 			}
 		}
-		
+
 		for (int i = 0; i < nodeGroups.size(); i++)
 		{
 			if (((EditorNodeGroup) nodeGroups.get(i)).wasClicked(ex, ey))
@@ -809,7 +810,7 @@ public class EditorSurface
 			}
 		}
 
-		
+
 
 		return null;
 	}
@@ -836,7 +837,7 @@ public class EditorSurface
 				children.add((EditorLabelGroup) events.get(i));
 			}
 		}
-		
+
 		return children;
 	}
 
@@ -856,7 +857,7 @@ public class EditorSurface
 			x = dragStartX;
 			w = dragNowX - dragStartX;
 		}
-		
+
 		if (dragStartY > dragNowY)
 		{
 			y = dragNowY;
@@ -867,7 +868,7 @@ public class EditorSurface
 			y = dragStartY;
 			h = dragNowY - dragStartY;
 		}
-		
+
 		return new Rectangle(x,y,w,h);
 	}
 
@@ -880,7 +881,7 @@ public class EditorSurface
 
 		// The bounds of the drag
 		Rectangle bounds = getDragRectangle().getBounds();
-		
+
 		for (int i = 0; i < nodeGroups.size(); i++)
 		{
 			EditorNodeGroup ng = (EditorNodeGroup) nodeGroups.get(i);
@@ -894,43 +895,43 @@ public class EditorSurface
 		for (int i = 0; i < nodes.size(); i++)
 		{
 			EditorNode n = (EditorNode) nodes.get(i);
-			
+
 			if (bounds.contains(n.getRectangularOutline()))
 			{
 				selection.add(n);
 			}
 		}
-		
+
 		for (int i = 0; i < edges.size(); i++)
 		{
 			EditorEdge e = (EditorEdge) edges.get(i);
-			
+
 			if (bounds.contains(e.getSourceHandle()) && bounds.contains(e.getCenterHandle()) && bounds.contains(e.getTargetHandle()))
 			{
 				selection.add(e);
 			}
 		}
-		
+
 		for (int i = 0; i < labels.size(); i++)
 		{
 			EditorLabel l = (EditorLabel) labels.get(i);
-			
+
 			if (bounds.contains(l.getBounds()))
 			{
 				selection.add(l);
 			}
 		}
-		
+
 		for (int i = 0; i < events.size(); i++)
 		{
 			EditorLabelGroup l = (EditorLabelGroup) events.get(i);
-			
+
 			if (bounds.contains(l.getBounds()))
 			{
 				selection.add(l);
 			}
 		}
-		
+
 		return selection;
 	}
 
@@ -944,7 +945,7 @@ public class EditorSurface
 		{
 			EditorNode node = (EditorNode) it.next();
 			node.setError(nodeIsColliding(node));
-			
+
 			// Set error on children as well
 			LinkedList children = getChildren(node);
 			while (children.size() != 0)
@@ -1004,7 +1005,7 @@ public class EditorSurface
 
 		for (int i = 0; i < mGuardActionPairs.size(); i++)
 		{
-			EditorGuardActionBlock gA = 
+			EditorGuardActionBlock gA =
 				(EditorGuardActionBlock) mGuardActionPairs.get(i);
 
 			gA.setSelected(false);
@@ -1053,7 +1054,7 @@ public class EditorSurface
 			}
 			graph = cp.getGraph();
 			graph.addModelObserver(this);
-			
+
 			events.add(new EditorLabelGroup(graph.getBlockedEvents(), this));
 
 			final Collection mNodes = graph.getNodes();
@@ -1120,7 +1121,7 @@ public class EditorSurface
 						if (n.getEllipsicalOutline().intersects(r))
 						{
 							found = false;
-							
+
 							break;
 						}
 					}
@@ -1252,7 +1253,7 @@ public class EditorSurface
 		int width = (int) area.getWidth();
 		int height = (int) area.getHeight();
 
- 		/* // We want the bounds to be tight, right? Or why was this? 
+ 		/* // We want the bounds to be tight, right? Or why was this?
 		if (width < 500)
 		{
 			width = 500;
@@ -1291,63 +1292,63 @@ public class EditorSurface
 		double x;
 		double y;
 		double mod;
-		
+
 		// Nodes...
 		for (int i = 0; i < nodes.size(); i++)
 		{
 			EditorNode node = (EditorNode) nodes.get(i);
-			
+
 			x = node.getX();
 			mod = node.RADIUS + 2 + SPACING; // The 2 is there to compensate for rounding?
 			if (x + mod > maxX)
 			{
 				maxX = x + mod;
 			}
-			
+
 			if (x - mod < minX)
 			{
 				minX = x - mod;
 			}
-			
+
 			y = node.getY();
 			if (y + mod > maxY)
 			{
 				maxY = y + mod;
 			}
-			
+
 			if (y - mod < minY)
 			{
 				minY = y - mod;
 			}
-			
+
 			// For the initial state, the arrow needs to be considered!
 			if (node.isInitial())
 			{
 				x = x + (int) (EditorNode.INITARROWLENGTH * Math.sin(EditorNode.INITARROWANGLE));
 				y = y + (int) (EditorNode.INITARROWLENGTH * Math.cos(EditorNode.INITARROWANGLE));
-				
+
 				if (x + mod > maxX)
 				{
 					maxX = x + mod;
 				}
-				
+
 				if (x - mod < minX)
 				{
 					minX = x - mod;
 				}
-				
+
 				if (y + mod > maxY)
 				{
 					maxY = y + mod;
 				}
-				
+
 				if (y - mod < minY)
 				{
 					minY = y - mod;
 				}
 			}
 		}
-		
+
 		// Nodegroups...
 		for (int i = 0; i < nodeGroups.size(); i++)
 		{
@@ -1422,20 +1423,20 @@ public class EditorSurface
 				{
 					maxX = x + mod;
 				}
-				
+
 				mod = 2 + SPACING;
 				if (x - mod < minX)
 				{
 					minX = x - mod;
 				}
-				
+
 				y = bound.getY();
 				mod = bound.getHeight() + SPACING;
 				if (y + mod > maxY)
 				{
 					maxY = y + mod;
 				}
-				
+
 				mod = 2 + SPACING;
 				if (y - mod < minY)
 				{
@@ -1446,13 +1447,13 @@ public class EditorSurface
 			{
 				// Approximate curve
 				QuadCurve2D.Double curve = edge.getCurve();
-				FlatteningPathIterator it = 
+				FlatteningPathIterator it =
 					new FlatteningPathIterator(curve.getPathIterator(new AffineTransform()), 5.0, 5);
 				while (!it.isDone())
 				{
 					double[] segment = new double[6];
 					int type = it.currentSegment(segment);
-					
+
 					// Only care about the first point, it's not such a big deal, anyway?
 					x = segment[0];
 					mod = 2 + SPACING;
@@ -1460,23 +1461,23 @@ public class EditorSurface
 					{
 						maxX = x + mod;
 					}
-					
+
 					if (x - mod < minX)
 					{
 						minX = x - mod;
 					}
-					
+
 					y = segment[1];
 					if (y + mod > maxY)
 					{
 						maxY = y + mod;
 					}
-					
+
 					if (y - mod < minY)
 					{
 						minY = y - mod;
 					}
-					
+
 					it.next();
 				}
 			}
@@ -1541,7 +1542,7 @@ public class EditorSurface
 				minY = y - mod;
 			}
 		}
-		
+
 		// Guard Action Blocks
 		for (int i = 0; i < mGuardActionBlocks.size(); i++)
 		{
@@ -1644,7 +1645,7 @@ public class EditorSurface
 	// TODO: This should take a ModuleSubject as a parameter
 	public EditorSurface()
 	{
-		
+
 		nodes = new ArrayList();
 		nodeGroups = new ArrayList();
 		edges = new ArrayList();
@@ -1662,14 +1663,14 @@ public class EditorSurface
 	/**
 	 * Implementation of the Printable interface.
 	 */
-	public int print(Graphics g, PageFormat pageFormat, int page) 
-	{  
+	public int print(Graphics g, PageFormat pageFormat, int page)
+	{
 		final double INCH = 72;
-		
+
         Graphics2D g2d;
-		
+
         // Validate the page number, we only print the first page
-        if (page == 0) 
+        if (page == 0)
 		{
 			g2d = (Graphics2D) g;
 
@@ -1688,7 +1689,7 @@ public class EditorSurface
 				g2d.draw (line);
 				line.setLine (pageFormat.getImageableWidth(), 0, pageFormat.getImageableWidth(), pageFormat.getImageableHeight());
 				g2d.draw (line);
-				
+
 				// Draw the horizontal lines
 				line.setLine (0, 0, pageFormat.getImageableWidth(), 0);
 				g2d.draw (line);
@@ -1699,7 +1700,7 @@ public class EditorSurface
 
 			// Get the bounds of the actual drawing
 			Rectangle area = getDrawnAreaBounds();
- 
+
 			// This is the place to do rescaling if the figure won't fit on the page!
 			double scaleX = pageFormat.getImageableWidth() / (area.getWidth());
 			double scaleY = pageFormat.getImageableHeight() / (area.getHeight());
@@ -1708,7 +1709,7 @@ public class EditorSurface
 			{
 				System.out.println("Rescaling figure to fit page. Scale: " + scale);
 				g2d.scale(scale, scale);
-			}   
+			}
 
 			// Put drawing at (0, 0)
 			g2d.translate(-area.getX(), -area.getY());
@@ -1770,7 +1771,7 @@ public class EditorSurface
     {
 		return events;
     }
-    
+
     public java.util.List getGuardActionBlocks()
     {
     	return mGuardActionBlocks;

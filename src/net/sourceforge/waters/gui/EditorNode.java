@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNode
 //###########################################################################
-//# $Id: EditorNode.java,v 1.38 2006-07-10 00:57:32 knut Exp $
+//# $Id: EditorNode.java,v 1.39 2006-07-10 17:02:15 knut Exp $
 //###########################################################################
 
 
@@ -426,10 +426,12 @@ public class EditorNode
 
     public void modelChanged(final ModelChangeEvent event)
     {
+		//System.err.println("EditorNode modelChanged");
 		switch (event.getKind()) {
 		case ModelChangeEvent.ITEM_ADDED:
 			if (event.getValue() == mSubject) {
 				mModule = (ModuleSubject) mSubject.getDocument();
+				/*
 				if (mModule == null)
 				{
 					System.err.println("EditorNode: mModule == null");
@@ -438,6 +440,7 @@ public class EditorNode
 				{
 					System.err.println("EditorNode: mModule.getEventDeclListModifiable()  == null");
 				}
+				*/
 				mModule.getEventDeclListModifiable().addModelObserver(this);
 				updateColors();
 			} else if (event.getValue() instanceof IdentifierSubject) {

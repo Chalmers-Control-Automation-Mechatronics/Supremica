@@ -22,7 +22,7 @@ public class IDEToolBar
     private String command = "";
 
 	private List<Observer> mObservers = new ArrayList<Observer>();
-	
+
 	private List collection = new LinkedList();
 
 	private IDE ide;
@@ -68,6 +68,9 @@ public class IDEToolBar
 */
 			}
 		}
+
+		// Also copy observers
+		mObservers.addAll(toolBar.mObservers);
 	}
 
 	public JToggleButton add(Action theAction, ButtonGroup theButtonGroup)
@@ -109,30 +112,33 @@ public class IDEToolBar
 	{
 		return collection.size();
 	}
-    
+
     public String getCommand()
     {
 	    return command;
 	}
-    
+
     public void setCommand(String c)
-    {		
+    {
 	    command = c;
 		fireEditorChangedEvent(new ToolbarChangedEvent());
 	}
-	
-		public void attach(Observer o)
+
+	public void attach(Observer o)
 	{
+		//System.err.println("IDEToolBar attach");
 		mObservers.add(o);
 	}
-	
+
 	public void detach(Observer o)
 	{
+		//System.err.println("IDEToolBar detach");
 		mObservers.remove(o);
 	}
-	
+
 	public void fireEditorChangedEvent(EditorChangedEvent e)
 	{
+		//System.err.println("IDEToolBar fireEditorChangedEvent size: " + mObservers.size());
 		for (Observer o : mObservers)
 		{
 			o.update(e);

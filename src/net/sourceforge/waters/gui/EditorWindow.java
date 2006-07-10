@@ -1,10 +1,10 @@
-//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+	//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.28 2006-06-08 14:16:00 martin Exp $
+//# $Id: EditorWindow.java,v 1.29 2006-07-10 17:02:15 knut Exp $
 //###########################################################################
 
 
@@ -93,12 +93,12 @@ public class EditorWindow
 		final JScrollPane scrollsurface = new JScrollPane(surface);
 		final JScrollPane scrollevents = new JScrollPane(mEventPane);
 		final JViewport viewevents = scrollevents.getViewport();
-		
+
 		//final JSplitPane split = new JSplitPane
 		//	(JSplitPane.HORIZONTAL_SPLIT, scrollsurface, scrollevents);
 		final JSplitPane split = new JSplitPane
 			(JSplitPane.HORIZONTAL_SPLIT, scrollsurface, scrollevents);
-		
+
 		viewevents.setBackground(Color.WHITE);
 		split.setResizeWeight(1.0);
 
@@ -210,12 +210,12 @@ public class EditorWindow
 				return;
 			}
 			printJob.setPrintable((EditorSurface) getControlledSurface());
-			
+
 			// Printing attributes
 			PrintRequestAttribute name = new JobName("Waters Printing", Locale.ENGLISH);
 			PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
 			attributes.add(name);
-			
+
 			// Show printing dialog
 			if (printJob.printDialog(attributes))
 			{
@@ -237,11 +237,11 @@ public class EditorWindow
 		int returnVal = chooser.showSaveDialog(surface);
 		File file = chooser.getSelectedFile();
 		// Not OK?
-		if (returnVal != JFileChooser.APPROVE_OPTION) 
+		if (returnVal != JFileChooser.APPROVE_OPTION)
 		{
 			return;
 		}
-		
+
 		// Create output
 		try
 		{
@@ -251,7 +251,7 @@ public class EditorWindow
 			PrintRequestAttribute postscript = new Destination(file.toURI());
 			PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
 			attributes.add(postscript);
-			
+
 			// Print!
 			printJob.print(attributes);
 		}
@@ -269,11 +269,11 @@ public class EditorWindow
 		int returnVal = chooser.showSaveDialog(surface);
 		File file = chooser.getSelectedFile();
 		// Not OK?
-		if (returnVal != JFileChooser.APPROVE_OPTION) 
+		if (returnVal != JFileChooser.APPROVE_OPTION)
 		{
 			return;
 		}
-			
+
 		// Create output
 		int width = surface.getWidth();
 		int height = surface.getHeight();

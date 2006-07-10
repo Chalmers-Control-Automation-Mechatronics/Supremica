@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.30 2006-07-09 22:28:27 knut Exp $
+//# $Id: ModuleContainer.java,v 1.31 2006-07-10 17:02:15 knut Exp $
 //###########################################################################
 
 
@@ -139,11 +139,16 @@ public class ModuleContainer implements UndoInterface
 	public ComponentEditorPanel getComponentEditorPanel
 		(final SimpleComponentSubject scp)
 	{
-		if (scp == null) {
+		if (scp == null)
+		{
 			return null;
-		} else {
+		}
+		else
+		{
 			ComponentEditorPanel panel = mComponentToPanelMap.get(scp);
-			if (panel == null) {
+			if (panel == null)
+			{
+				//System.err.println("Creating new component editor table");
 				panel =	new ComponentEditorPanel(this, scp);
 				mComponentToPanelMap.put(scp, panel);
 			}

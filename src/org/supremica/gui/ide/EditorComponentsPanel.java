@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.20 2006-07-10 04:02:22 martin Exp $
+//# $Id: EditorComponentsPanel.java,v 1.21 2006-07-10 17:02:15 knut Exp $
 //###########################################################################
 
 
@@ -54,6 +54,7 @@ class EditorComponentsPanel
 	private ModuleContainer moduleContainer;
 
 	private ModuleTree moduleSelectTree;
+	private boolean modified = true;
 
 	EditorComponentsPanel(ModuleContainer moduleContainer, String name)
 	{
@@ -80,23 +81,79 @@ class EditorComponentsPanel
 
 		moduleSelectTree = new ModuleTree(this);
 
-		DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+		//DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
 
 		getViewport().add(moduleSelectTree);
 
 	}
-	
-	public void addComponent(SimpleComponentSubject subject)
-	{
-		((ModuleTree) moduleSelectTree).addComponent(subject);
-	}
 
-	// Open up an component dialog and allow the use to create a new component
+
+	// Open up an component dialog and allow the user to create a new component
 	public void addComponent()
 	{
 		EditorNewComponentDialog editor = new EditorNewComponentDialog(this);
 	}
 
+
+	public void addComponent(final AbstractSubject o)
+	{
+//		logEntry("addComponent: " + o);
+
+		ModuleSubject module = getModuleSubject();
+
+		if (module != null)
+		{
+			modified = true;
+
+			DefaultMutableTreeNode parentNode = null;
+			TreePath parentPath = moduleSelectTree.getSelectionPath();
+
+			if (parentPath == null)
+			{
+				//There's no selection. Default to the root node.
+				parentNode = ((ModuleTree) moduleSelectTree).getRoot();
+
+				moduleSelectTree.expandPath(new TreePath(parentNode.getPath()));
+			}
+			else
+			{
+				parentNode = (DefaultMutableTreeNode) (parentPath.getLastPathComponent());
+			}
+
+			ComponentInfo ci = (ComponentInfo) (parentNode.getUserObject());
+
+			//logEntry("addComponent: Parent: " + parentNode.toString());
+
+			if (ci.getComponent() instanceof ForeachSubject)
+			{
+				((ForeachSubject) ci.getComponent()).getBodyModifiable().add(o);
+			}
+			else
+			{
+				module.getComponentListModifiable().add(o);
+			}
+
+			if ((o instanceof SimpleComponentSubject))
+			{
+				SimpleComponentSubject scp = (SimpleComponentSubject) o;
+
+				//
+				//logEntry("Adding SimpleComponentSubject: " + scp.getName());
+
+				//EditorWindow ed = new EditorWindow(scp.getName() + " - Waters Editor", module, scp, this, this);
+			}
+
+			//Add node to module tree
+			((ModuleTree) moduleSelectTree).addComponent(o);
+		}
+	}
+
+/*
+	public void addComponent(SimpleComponentSubject subject)
+	{
+		((ModuleTree) moduleSelectTree).addComponent(subject);
+	}
+*/
 /*
 	public void addComponent(final AbstractSubject o)
 	{
@@ -160,12 +217,14 @@ class EditorComponentsPanel
 		return null;
 	}
 */
-	
-	public ModuleSubject getModuleSubject() {
+
+	public ModuleSubject getModuleSubject()
+	{
 		return this.moduleContainer.getModule();
 	}
-	
-	public EditorWindowInterface showEditor(SimpleComponentSubject component) {
+
+	public EditorWindowInterface showEditor(SimpleComponentSubject component)
+	{
 		final EditorPanel editorPanel =
 			moduleContainer.getEditorPanel();
 		if (component != null) {
@@ -174,19 +233,19 @@ class EditorComponentsPanel
 		}
 		return editorPanel.getActiveEditorWindowInterface();
 	}
-	
+
 	public void actionPerformed(ActionEvent e) {
 		if("add variable".equals(e.getActionCommand())) {
 			//add new variable
 			TreePath currentSelection = moduleSelectTree.getSelectionPath();
-			if (currentSelection != null) 
+			if (currentSelection != null)
 			{
 				// Get the node in the tree
 				DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode)
 				(currentSelection.getLastPathComponent());
-				Subject component = ((ComponentInfo) 
+				Subject component = ((ComponentInfo)
 						targetNode.getUserObject()).getComponent();
-				
+
 				if(component instanceof VariableSubject) {
 					component = component.getParent().getParent();
 					EditorEditVariableDialog.showDialog(null,
@@ -200,18 +259,18 @@ class EditorComponentsPanel
 				}
 			}
 		}
-		
+
 		if("edit variable".equals(e.getActionCommand())) {
 			//edit existing variable
 			TreePath currentSelection = moduleSelectTree.getSelectionPath();
-			if (currentSelection != null) 
+			if (currentSelection != null)
 			{
 				// Get the node in the tree
 				DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode)
 				(currentSelection.getLastPathComponent());
-				Subject component = ((ComponentInfo) 
+				Subject component = ((ComponentInfo)
 						targetNode.getUserObject()).getComponent();
-				
+
 				if(component instanceof VariableSubject) {
 					Subject parent = component.getParent().getParent();
 					EditorEditVariableDialog.showDialog((VariableSubject) component,
@@ -222,7 +281,7 @@ class EditorComponentsPanel
 				}
 			}
 		}
-		
+
 		if("add simple component".equals(e.getActionCommand())) {
 			moduleContainer.getActions().editorAddSimpleComponentAction.doAction();
 		}

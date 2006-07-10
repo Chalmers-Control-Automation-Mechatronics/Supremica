@@ -5,7 +5,7 @@ import java.awt.GridBagLayout;
 
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.ControlledSurface;
-import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 
 public class EditorPanel
@@ -90,8 +90,9 @@ public class EditorPanel
 
 	public EditorWindowInterface getActiveEditorWindowInterface()
 	{
-	    if (getRightComponent() instanceof EditorWindowInterface) {
-		return (EditorWindowInterface)getRightComponent();
+	    if (getRightComponent() instanceof EditorWindowInterface)
+	    {
+			return (EditorWindowInterface)getRightComponent();
 	    }
 	    return null;
     //	    return getEditorWindowInterface();
@@ -110,7 +111,7 @@ public class EditorPanel
 				componentsPanel.addComponent();
 			}
 
-			public void addComponent(SimpleComponentSubject component)
+			public void addComponent(AbstractSubject component)
 			{
 				componentsPanel.addComponent(component);
 			}
