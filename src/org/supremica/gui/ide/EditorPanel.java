@@ -7,6 +7,8 @@ import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+
 
 public class EditorPanel
 	extends MainPanel
@@ -116,13 +118,16 @@ public class EditorPanel
 				componentsPanel.addComponent(component);
 			}
 
-/*
-			public ExpressionParser getExpressionParser()
+			public DefaultListModel getEventDataList()
 			{
-				return componentsPanel.getExpressionParser();
+				return eventsPanel.getEventDataList();
 			}
-*/
-		}
 
+			public ModuleSubject getModuleSubject()
+			{
+				return componentsPanel.getModuleSubject();
+			}
+
+		}
 
 }

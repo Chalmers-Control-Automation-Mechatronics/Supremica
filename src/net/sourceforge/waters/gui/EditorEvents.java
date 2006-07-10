@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.20 2006-03-21 21:58:04 flordal Exp $
+//# $Id: EditorEvents.java,v 1.21 2006-07-10 21:59:48 knut Exp $
 //###########################################################################
 
 
@@ -89,16 +89,16 @@ public class EditorEvents
 	{
 		final TableModel model = new EventTableModel(graph, module, this);
 		final Dimension ispacing = new Dimension(0, 0);
-		
+
 		root = window;
-		
+
 		setModel(model);
 		setTableHeader(null);
 		setRowHeight(22);
 		setShowGrid(false);
 		setIntercellSpacing(ispacing);
 		setAutoResizeMode(AUTO_RESIZE_LAST_COLUMN);
-		
+
 		final TableCellRenderer iconrenderer0 =
 			getDefaultRenderer(ImageIcon.class);
 		final TableCellRenderer iconrenderer1 =
@@ -128,7 +128,7 @@ public class EditorEvents
 		mDragSource = DragSource.getDefaultDragSource();
 		mDGListener = new DGListener();
 		mDSListener = new DSListener();
-		
+
 		// component, action, listener
 		mDragSource.createDefaultDragGestureRecognizer(this,
 													  mDragAction,
@@ -171,7 +171,7 @@ public class EditorEvents
 		return model.getToolTipText(row);
 	}
 
-   
+
 
 	//#######################################################################
 	//# Editing
@@ -191,7 +191,7 @@ public class EditorEvents
 		}
 		final EventTableModel model = (EventTableModel) getModel();
 		final int row = model.createEvent();
-		if (editCellAt(row, 1)) 
+		if (editCellAt(row, 1))
 		{
 			final Component comp = getEditorComponent();
 			final Rectangle bounds = comp.getBounds();
@@ -263,7 +263,7 @@ public class EditorEvents
 		final TableCellRenderer renderer = getDefaultRenderer(Object.class);
 		final int rows = getRowCount();
 		int maxwidth = 1;
-		for (int row = 0; row < rows; row++) {			
+		for (int row = 0; row < rows; row++) {
 			int width = 0;
 			for (int i = 0; i < getColumnCount(); i++) {
 				final Object value = model.getValueAt(row, i);
@@ -272,13 +272,13 @@ public class EditorEvents
 					(this, value, false, false, row, i);
 				final Dimension size = comp.getPreferredSize();
 				width += size.width;
-				System.out.println(row + " " + i + " " + width);
+				//System.out.println(row + " " + i + " " + width);
 			}
 			if (width > maxwidth) {
 				maxwidth = width;
 			}
 		}
-		System.out.println(maxwidth);
+		//System.out.println(maxwidth);
 		return maxwidth;
 	}
 
@@ -402,7 +402,7 @@ public class EditorEvents
 				;
 			} else {
 				final EventTableModel model = (EventTableModel) getModel();
-				final int row = selmodel.getMinSelectionIndex();				
+				final int row = selmodel.getMinSelectionIndex();
 			}
 		}
 
@@ -431,7 +431,7 @@ public class EditorEvents
 		{
 			if (!isEditing()) {
 				final ListSelectionModel selmodel = getSelectionModel();
-				final int numrows = getRowCount(); 
+				final int numrows = getRowCount();
 				final int selrow = selmodel.getLeadSelectionIndex();
 				final int newrow = (selrow + numrows + mOffset) % numrows;
 				setRowSelectionInterval(newrow, newrow);
@@ -455,7 +455,7 @@ public class EditorEvents
 		// the IdentifierSubject transferred by this Object
 		Object ip_;
 		DataFlavor data_;
-		
+
 		/**
 		 * creates a new transferable object containing the specified IdentifierSubject
 		 *
@@ -467,7 +467,7 @@ public class EditorEvents
 			ip_ = ip;
 			data_ = new DataFlavor(ip.getClass(), ip.getClass().getName());
 		}
-		
+
 		public Object getTransferData(DataFlavor f)
 			throws UnsupportedFlavorException
 		{
@@ -476,7 +476,7 @@ public class EditorEvents
 			else
 				throw new UnsupportedFlavorException(f);
 		}
-	   
+
 		public DataFlavor[] getTransferDataFlavors()
 		{
 			DataFlavor[] d = new DataFlavor[1];
@@ -491,7 +491,7 @@ public class EditorEvents
 	}
 
 	private class DSListener extends DragSourceAdapter
-	{	  		
+	{
 		public void dragOver(DragSourceDragEvent e)
 		{
 			if (e.getTargetActions() == DnDConstants.ACTION_COPY) {
@@ -522,7 +522,7 @@ public class EditorEvents
 			}
 		}
 	}
-		
+
 	public EditorWindowInterface getEditorInterface()
 	{
 		return root;
@@ -550,6 +550,6 @@ public class EditorEvents
 		KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.SHIFT_MASK);
 
 	private static final String ACTNAME_DOWN = "EditorEvents.DOWN";
-	private static final String ACTNAME_UP = "EditorEvents.UP";		
+	private static final String ACTNAME_UP = "EditorEvents.UP";
 
 }

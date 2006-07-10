@@ -26,7 +26,7 @@ public class EditorAddNodeAction
 
 	public void actionPerformed(ActionEvent e)
 	{
-	    System.out.println("Node");
+	    //System.out.println("Node");
 		doAction();
 	}
 

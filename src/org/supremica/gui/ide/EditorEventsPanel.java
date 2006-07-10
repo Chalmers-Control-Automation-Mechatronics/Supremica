@@ -6,6 +6,9 @@ import java.awt.event.*;
 import org.supremica.gui.WhiteScrollPane;
 import net.sourceforge.waters.gui.EventListCell;
 import net.sourceforge.waters.model.module.*;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import java.awt.datatransfer.*;
+import java.awt.dnd.*;
 
 class EditorEventsPanel
 	extends WhiteScrollPane
@@ -16,6 +19,10 @@ class EditorEventsPanel
 	private String name;
 	private ModuleContainer moduleContainer;
 
+	private JList dataList = null;
+	private DefaultListModel data = null;
+	private boolean modified = true;
+
 	EditorEventsPanel(ModuleContainer moduleContainer, String name)
 	{
 		this.moduleContainer = moduleContainer;
@@ -25,60 +32,48 @@ class EditorEventsPanel
 
 	public String getName()
 	{
-		//System.err.println("getTitle: " + title);
 		return name;
 	}
 
 	public void createEventsPane()
 	{
 		final ArrayList l;
+		ModuleSubject module = moduleContainer.getModule();
 
-		DefaultListModel data = new DefaultListModel();
-
-		ModuleProxy module = moduleContainer.getModule();
-
+		data = new DefaultListModel();
 		if (module != null)
 		{
-			for (int i = 0; i < module.getEventDeclList().size(); i++)
+			for (final EventDeclProxy event : module.getEventDeclList())
 			{
-				data.addElement(((EventDeclProxy) (module.getEventDeclList().get(i))));
+				data.addElement(event);
 			}
 		}
 
-		JList dataList = new JList(data);
-
+		dataList = new JList(data);
 		dataList.setCellRenderer(new EventListCell());
-
 		getViewport().add(dataList);
 /*
-		JButton NewEventButton = new JButton("New Event");
+		mDragSource = DragSource.getDefaultDragSource();
+		mDGListener = new DGListener(dataList);
+		mDSListener = new DSListener();
 
-		NewEventButton.setActionCommand("newevent");
-		NewEventButton.addActionListener(this);
+		// component, action, listener
+		mDragSource.createDefaultDragGestureRecognizer(dataList,
+													   mDragAction,
+													   mDGListener);
+		mDragSource.addDragSourceListener(mDSListener);
 
-		JButton DeleteEventButton = new JButton("Delete Event");
-
-		DeleteEventButton.setActionCommand("delevent");
-		DeleteEventButton.addActionListener(this);
-
-		Box jp = new Box(BoxLayout.PAGE_AXIS);
-		JPanel p = new JPanel();
-
-		p.add(NewEventButton);
-		p.add(DeleteEventButton);
-		jp.add(new JScrollPane(dataList));
-		jp.add(p);
-
-		p = new JPanel();
-
-		p.add(jp);
-		p.setLayout(new GridLayout(1, 1));
-
-		return p;
 */
+	}
+
+	public DefaultListModel getEventDataList()
+	{
+		return data;
 	}
 
 	public void actionPerformed(ActionEvent e)
 	{
 	}
+
+
 }

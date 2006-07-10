@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.21 2006-07-10 17:02:15 knut Exp $
+//# $Id: EditorComponentsPanel.java,v 1.22 2006-07-10 21:59:48 knut Exp $
 //###########################################################################
 
 
@@ -65,6 +65,14 @@ class EditorComponentsPanel
 
 		setPreferredSize(IDEDimensions.leftEditorPreferredSize);
 		setMinimumSize(IDEDimensions.leftEditorMinimumSize);
+	}
+
+	// TO DO This is a dummy method implemted just to satisfy
+	// the EditorPanelInterface. Thies method will never be called.
+	// This solution is so ugly that it has to be removed ASAP.
+	public DefaultListModel getEventDataList()
+	{
+		return null;
 	}
 
 	public String getName()
@@ -148,75 +156,7 @@ class EditorComponentsPanel
 		}
 	}
 
-/*
-	public void addComponent(SimpleComponentSubject subject)
-	{
-		((ModuleTree) moduleSelectTree).addComponent(subject);
-	}
-*/
-/*
-	public void addComponent(final AbstractSubject o)
-	{
-//		logEntry("addComponent: " + o);
-
-
-		boolean modified = false; // TODO Fix this
-
-		final ModuleSubject module = moduleContainer.getModule();
-
-		if (module != null)
-		{
-			modified = true;
-
-			DefaultMutableTreeNode parentNode = null;
-			TreePath parentPath = null;
-
-			if (parentPath == null)
-			{
-				//There's no selection. Default to the root node.
-				parentNode = ((ModuleTree) moduleSelectTree).getRoot();
-
-				moduleSelectTree.expandPath(new TreePath(parentNode.getPath()));
-			}
-			else
-			{
-				parentNode = (DefaultMutableTreeNode) (parentPath.getLastPathComponent());
-			}
-
-			ComponentInfo ci = (ComponentInfo) (parentNode.getUserObject());
-
-			logEntry("addComponent: Parent: " + parentNode.toString());
-
-			if (ci.getComponent() instanceof ForeachSubject)
-			{
-				((ForeachSubject) ci.getComponent()).getBodyModifiable().add(o);
-			}
-			else
-			{
-				module.getComponentListModifiable().add(o);
-			}
-
-			if ((o instanceof SimpleComponentSubject))
-			{
-				SimpleComponentSubject scp = (SimpleComponentSubject) o;
-
-				logEntry("Adding SimpleComponentSubject: " + scp.getName());
-
-				//EditorWindow ed = new EditorWindow(scp.getName() + " - Waters Editor", module, scp, this, this);
-			}
-
-			//Add node to module tree
-			((ModuleTree) moduleSelectTree).addComponent(o);
-		}
-
-	}
-*/
-/*
-	public ExpressionParser getExpressionParser()
-	{
-		return null;
-	}
-*/
+//	public IndexedList<EventDeclSubject> getEventDeclListModifiable();
 
 	public ModuleSubject getModuleSubject()
 	{

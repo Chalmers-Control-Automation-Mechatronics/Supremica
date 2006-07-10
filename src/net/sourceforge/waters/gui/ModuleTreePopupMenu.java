@@ -72,9 +72,9 @@ class ModuleTreePopupMenu
 			this.add(item);
 			editVariableItem = item;
 		}
-		
+
 		if(mInvokingComponent instanceof ModuleSubject) {
-			item = new JMenuItem("Add simple component");
+			item = new JMenuItem("Create automaton");
 			item.setActionCommand("add simple component");
 			item.addActionListener(mWindow);
 			this.add(item);
