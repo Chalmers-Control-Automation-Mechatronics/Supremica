@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNode
 //###########################################################################
-//# $Id: EditorNode.java,v 1.37 2006-04-13 08:58:23 flordal Exp $
+//# $Id: EditorNode.java,v 1.38 2006-07-10 00:57:32 knut Exp $
 //###########################################################################
 
 
@@ -50,7 +50,7 @@ import net.sourceforge.waters.xsd.module.AnchorPosition;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.subject.module.IndexedIdentifierSubject;
 
-/** 
+/**
  * <p>The internal editor representation of node objects.</p>
  *
  * <p>Nodes store geometry and {@link EditorShade} information.</p>
@@ -83,7 +83,7 @@ public class EditorNode
 					   final Point2D altpos)
 	{
 		mUndo = surface.getEditorInterface().getUndoInterface();
-		
+
 		// This is a node
 		type = NODE;
 
@@ -94,8 +94,8 @@ public class EditorNode
 			subject.setPointGeometry(new PointGeometrySubject(new Point2D.Double(1000,1000)));
 		}
 		if (altpos != null) {
-			subject.getPointGeometry().setPoint(altpos);			
-		}		
+			subject.getPointGeometry().setPoint(altpos);
+		}
 
 		// Init propositions
 		propGroup = new EditorPropGroup(this, surface);
@@ -118,7 +118,7 @@ public class EditorNode
 		final List<AbstractSubject> list = props.getEventListModifiable();
 		list.add(ident);
     }
-	
+
 	public void removeProposition(IdentifierSubject ident)
 	{
 		final EventListExpressionSubject props = mSubject.getPropositions();
@@ -147,7 +147,7 @@ public class EditorNode
 		final IndexedList<EventDeclSubject> decls = mModule.getEventDeclListModifiable();
 		decls.add(new EventDeclSubject(DEFAULTNAME, EventKind.PROPOSITION));
     }
-	
+
     public void clearPropositions()
     {
 		final EventListExpressionSubject props = mSubject.getPropositions();
@@ -164,7 +164,7 @@ public class EditorNode
     {
 		mObservers.remove(o);
     }
-	
+
 	public void fireEditorChangedEvent(EditorChangedEvent e)
 	{
 		for (Observer o : mObservers)
@@ -208,14 +208,14 @@ public class EditorNode
 
 		try
 		{
-			mSubject.setName(n);			
+			mSubject.setName(n);
 		}
 		catch (final DuplicateNameException e)
 		{
 			JOptionPane.showMessageDialog(c, e.getMessage());
 
 			return false;
-		}		
+		}
 		return true;
 	}
 
@@ -242,7 +242,7 @@ public class EditorNode
 												  mSubject.getPointGeometry(),
 												  mSubject));
     }
-	
+
     public Point2D getPosition()
     {
 		return mSubject.getPointGeometry().getPoint();
@@ -265,9 +265,9 @@ public class EditorNode
 	public boolean wasClicked(int x, int y)
 	{
 		// Within the square? Why not circle?
-		return (((getX() - RADIUS) <= x) && 
-				(x <= (getX() + RADIUS)) && 
-				((getY() - RADIUS) <= y) && 
+		return (((getX() - RADIUS) <= x) &&
+				(x <= (getX() + RADIUS)) &&
+				((getY() - RADIUS) <= y) &&
 				(y <= (getY() + RADIUS)));
 	}
 
@@ -333,18 +333,18 @@ public class EditorNode
 		{
 			propGroup.setVisible(false);
 		}
-		
+
 		// Draw shadow?
 		if (shadow && isHighlighted())
 		{
-			g2d.setStroke(SHADOWSTROKE); 
-			g2d.setColor(getShadowColor(selected));				
-			g2d.drawOval(getX() - RADIUS, getY() - RADIUS, RADIUS*2, RADIUS*2);			
+			g2d.setStroke(SHADOWSTROKE);
+			g2d.setColor(getShadowColor(selected));
+			g2d.drawOval(getX() - RADIUS, getY() - RADIUS, RADIUS*2, RADIUS*2);
 			g2d.setColor(getColor(selected));
 			g2d.setStroke(BASICSTROKE);
 		}
 
-		// Draw the inside of the node	  
+		// Draw the inside of the node
 		if (mColors.size() == 0)
 		{
 			// There is no marking!
@@ -359,7 +359,7 @@ public class EditorNode
 			double deltaAngle = (double) (360/mColors.size());
 			for (final Color color : mColors) {
 				// There are markings but they are fewer than
-				// MAXDRAWNMARKINGS+1! 
+				// MAXDRAWNMARKINGS+1!
 				// Draw nice colored pies!!
 				a.setArcByCenter(getX(), getY(), RADIUS,
 								 startAngle, deltaAngle, Arc2D.PIE);
@@ -373,12 +373,12 @@ public class EditorNode
 			// More than MAXDRAWNMARKINGS markings! Use the default marking color and draw a cross on top!
 			g2d.setColor(EditorColor.DEFAULTMARKINGCOLOR);
 			g2d.fillOval(getX() - RADIUS, getY() - RADIUS, RADIUS*2, RADIUS*2);
-			
+
 			//g2d.setColor(EditorColor.DEFAULTCOLOR);
 			g2d.setColor(Color.WHITE);
 			g2d.drawLine(getX(), getY() - RADIUS, getX(), getY() + RADIUS);
 			g2d.drawLine(getX() - RADIUS, getY(), getX() + RADIUS, getY());
-		}		
+		}
 
 		// Draw the border of the node
 		g2d.setColor(getColor(selected));
@@ -392,7 +392,7 @@ public class EditorNode
 				// Draw border thicker!
 				g2d.setStroke(DOUBLESTROKE);
 		}
-		g2d.drawOval(getX()-RADIUS, getY()-RADIUS, RADIUS*2, RADIUS*2);			
+		g2d.drawOval(getX()-RADIUS, getY()-RADIUS, RADIUS*2, RADIUS*2);
 		g2d.setStroke(BASICSTROKE);
 		if (isForbidden())
 		{
@@ -403,7 +403,7 @@ public class EditorNode
 		/*
 		// Draw a double circle on marked nodes... (one color marking only?)
 		if (mColors.size() > 0)
-			g2d.drawOval(getX()-RADIUS+2, getY()-RADIUS+2, RADIUS*2-4, RADIUS*2-4);			
+			g2d.drawOval(getX()-RADIUS+2, getY()-RADIUS+2, RADIUS*2-4, RADIUS*2-4);
 		*/
 	}
 
@@ -416,7 +416,7 @@ public class EditorNode
 		int outerY = borderY + (int) (INITARROWLENGTH * Math.cos(INITARROWANGLE));
 		g2d.setStroke(BASICSTROKE);
 		g2d.drawLine(borderX, borderY, outerX, outerY);
-		
+
 		// Draw arrow
 		double theta = INITARROWANGLE;
 		int x = (int) Math.ceil(getX() + Math.sin(theta)*EditorNode.RADIUS);
@@ -430,6 +430,14 @@ public class EditorNode
 		case ModelChangeEvent.ITEM_ADDED:
 			if (event.getValue() == mSubject) {
 				mModule = (ModuleSubject) mSubject.getDocument();
+				if (mModule == null)
+				{
+					System.err.println("EditorNode: mModule == null");
+				}
+				if (mModule.getEventDeclListModifiable() == null)
+				{
+					System.err.println("EditorNode: mModule.getEventDeclListModifiable()  == null");
+				}
 				mModule.getEventDeclListModifiable().addModelObserver(this);
 				updateColors();
 			} else if (event.getValue() instanceof IdentifierSubject) {

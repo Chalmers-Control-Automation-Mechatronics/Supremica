@@ -30,15 +30,15 @@ public class ModuleTree extends JTree {
 	private ModuleSubject mModule;
 	private ModuleWindowInterface mModuleWindow;
 	private ModuleTree mSelfRef;
-	
+
 	public ModuleTree(ModuleWindowInterface moduleWindow) {
 		super();
-		
-		mPrinter = new HTMLPrinter();
+
+		mPrinter = new PlainTextPrinter();
 		mModule = moduleWindow.getModuleSubject();
 		mModuleWindow = moduleWindow;
 		mSelfRef = this;
-		
+
 		ArrayList l;
 		if (mModule != null)
 		{
@@ -50,16 +50,16 @@ public class ModuleTree extends JTree {
 			l = new ArrayList();
 			mRootNode = null;
 		}
-		
+
 		for (int i = 0; i < l.size(); i++)
 		{
 			mRootNode.add(makeTreeFromComponent((AbstractSubject) (l.get(i))));
 		}
-		
+
 		this.setModel(new DefaultTreeModel(mRootNode));
-		
-		
-		
+
+
+
 		//TODO: Put some proper icons in place!
 		final ImageIcon plantIcon = new ImageIcon(ModuleWindow.class.getResource("/icons/waters/plant.gif"));
 		final ImageIcon specIcon = new ImageIcon(ModuleWindow.class.getResource("/icons/waters/spec.gif"));
@@ -67,13 +67,13 @@ public class ModuleTree extends JTree {
 		final ImageIcon foreachIcon = null;
 		final ImageIcon instanceIcon = new ImageIcon(ModuleWindow.class.getResource("/icons/waters/instance.gif"));
 		final ImageIcon bindingIcon = null;
-		
+
 		setCellRenderer(new ModuleTreeRenderer(foreachIcon, plantIcon, propertyIcon, specIcon, instanceIcon, bindingIcon));
 		setEditable(false);
 		getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-		
+
 		DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
-		
+
 		//renderer.setLeafIcon(simpleIcon);
 		//renderer.setOpenIcon(null);
 		//renderer.setClosedIcon(null);
@@ -81,32 +81,32 @@ public class ModuleTree extends JTree {
 		MouseListener ml = new MouseAdapter()
 		{
 			EditorWindowInterface ed = null;
-			
+
 			public void mousePressed(MouseEvent e)
 			{
 				int selRow = getRowForLocation(e.getX(), e.getY());
 				TreePath selPath = getPathForLocation(e.getX(), e.getY());
 
 				maybeShowPopup(e, selPath);
-				
+
 				//possibly open editor window
 				if (selRow != -1)
 				{
 					if (e.getClickCount() == 2)
 					{
 						DefaultMutableTreeNode node = (DefaultMutableTreeNode) getLastSelectedPathComponent();
-						
+
 						if (node == null)
 						{
 							return;
 						}
-						
+
 						Object nodeInfo = node.getUserObject();
 						AbstractSubject abstractComponent = (((ComponentInfo) nodeInfo).getComponent());
 						if (abstractComponent instanceof SimpleComponentSubject)
 						{
 							SimpleComponentSubject scp = (SimpleComponentSubject) abstractComponent;
-							
+
 							if (scp != null)
 							{
 								ed = mModuleWindow.showEditor(scp);
@@ -130,7 +130,7 @@ public class ModuleTree extends JTree {
 			public void mouseReleased(MouseEvent e) {
 				TreePath selPath = getPathForLocation(e.getX(), e.getY());
 				if(selPath == null) return;
-				
+
 				mSelfRef.setSelectionPath(selPath);
 				maybeShowPopup(e, selPath);
 			}
@@ -147,18 +147,18 @@ public class ModuleTree extends JTree {
 					Object nodeInfo = node.getUserObject();
 					AbstractSubject component =
 						(((ComponentInfo) nodeInfo).getComponent());
-					
+
 					ModuleTreePopupMenu popup = new ModuleTreePopupMenu(
 							mSelfRef, mModuleWindow, component);
 					popup.show(mSelfRef, e.getX(), e.getY());
-					
+
 				}
 			}
-			
+
 		};
 		addMouseListener(ml);
 	}
-	
+
 	public void addVariable(VariableSubject variable) {
 		DefaultMutableTreeNode parentNode = null;
 		DefaultMutableTreeNode v = makeTreeFromComponent(variable);
@@ -174,38 +174,38 @@ public class ModuleTree extends JTree {
 			System.err.println("ModuleTree.addVariable(): can't add variable to node of this type");
 		}
 	}
-	
+
 	public void addComponent(AbstractSubject o) {
 		if (mModule != null)
 		{
 			DefaultMutableTreeNode parentNode = null;
 			TreePath parentPath = getSelectionPath();
-			
+
 			if (parentPath == null)
 			{
 				//There's no selection. Default to the root node.
 				parentNode = mRootNode;
-				
+
 				expandPath(new TreePath(mRootNode.getPath()));
 			}
 			else
 			{
 				parentNode = (DefaultMutableTreeNode) (parentPath.getLastPathComponent());
 			}
-			
+
 			ComponentInfo ci = (ComponentInfo) (parentNode.getUserObject());
-			
+
 			// We don't want InstanceSubject components having children
 			if (!(ci.getComponent() instanceof ForeachSubject) &&!(o instanceof ParameterBindingSubject))
 			{
 				parentNode = mRootNode;
 			}
-			
+
 			if (!(ci.getComponent() instanceof InstanceSubject) && (o instanceof ParameterBindingSubject))
 			{
 				return;
 			}
-			
+
 			//Take care of adding variables
 			if (o instanceof VariableSubject) {
 				if(ci.getComponent() instanceof SimpleComponentSubject) {
@@ -217,25 +217,25 @@ public class ModuleTree extends JTree {
 					System.out.println("ModuleTree.addComponent(): Can't add variable to object of this type");
 				}
 			}
-			
+
 			DefaultMutableTreeNode newChild = makeTreeFromComponent((AbstractSubject) o);
-			
+
 			((DefaultTreeModel) treeModel).insertNodeInto(newChild, parentNode, treeModel.getChildCount(parentNode));
-			
+
 			if (o instanceof ForeachSubject)
 			{
 				expandPath(new TreePath(newChild.getPath()));
 			}
-			
+
 			if ((o instanceof SimpleComponentSubject))
 			{
 				SimpleComponentSubject scp = (SimpleComponentSubject) o;
 			}
-			
+
 			expandPath(new TreePath(parentNode.getPath()));
 		}
 	}
-	
+
 	private DefaultMutableTreeNode makeTreeFromComponent(AbstractSubject e)
 	{
 		final String text = mPrinter.toString(e);
@@ -278,14 +278,14 @@ public class ModuleTree extends JTree {
 					e.getClass().getName() + "!");
 		}
 	}
-	
-	
+
+
 	/** Remove all nodes except the root node. */
 	private void clear() {
 		mRootNode.removeAllChildren();
 		((DefaultTreeModel) treeModel).reload();
 	}
-	
+
 	/** Remove the currently selected node. */
 	public void removeCurrentNode() {
 		TreePath currentSelection = getSelectionPath();
@@ -299,54 +299,54 @@ public class ModuleTree extends JTree {
 			}
 		}
 	}
-	
+
 	/** Add child to the currently selected node. */
 	public DefaultMutableTreeNode addObject(Object child) {
 		DefaultMutableTreeNode parentNode = null;
 		TreePath parentPath = getSelectionPath();
-		
+
 		if (parentPath == null) {
 			parentNode = mRootNode;
 		} else {
 			parentNode = (DefaultMutableTreeNode)
 			(parentPath.getLastPathComponent());
 		}
-		
+
 		return addObject(parentNode, child, true);
 	}
-	
+
 	public DefaultMutableTreeNode addObject(DefaultMutableTreeNode parent,
 			Object child) {
 		return addObject(parent, child, false);
 	}
-	
+
 	public DefaultMutableTreeNode addObject(DefaultMutableTreeNode parent,
-			Object child, 
+			Object child,
 			boolean shouldBeVisible) {
-		DefaultMutableTreeNode childNode = 
+		DefaultMutableTreeNode childNode =
 			new DefaultMutableTreeNode(child);
-		
+
 		if (parent == null) {
 			parent = mRootNode;
 		}
-		
-		((DefaultTreeModel) treeModel).insertNodeInto(childNode, parent, 
+
+		((DefaultTreeModel) treeModel).insertNodeInto(childNode, parent,
 				parent.getChildCount());
-		
+
 		//Make sure the user can see the lovely new node.
 		if (shouldBeVisible) {
 			scrollPathToVisible(new TreePath(childNode.getPath()));
 		}
 		return childNode;
 	}
-	
+
 	public DefaultMutableTreeNode getRoot() {
 		return mRootNode;
 	}
 
 	public void updateSelectedNode() {
 		TreePath selPath = this.getSelectionPath();
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) 
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode)
 			selPath.getLastPathComponent();
 		AbstractSubject c = ((ComponentInfo) node.getUserObject())
 		.getComponent();
