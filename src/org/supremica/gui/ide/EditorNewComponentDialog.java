@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorNewDialog
 //###########################################################################
-//# $Id: EditorNewComponentDialog.java,v 1.7 2006-07-10 17:02:15 knut Exp $
+//# $Id: EditorNewComponentDialog.java,v 1.8 2006-07-11 19:42:25 knut Exp $
 //###########################################################################
 
 
@@ -77,7 +77,7 @@ public class EditorNewComponentDialog
 		b.add(r2);
 		b.add(r3);
 		b.add(r4);
-		r1.add(new JLabel("<html><b>Simple Component Editor</b></html>"));
+		r1.add(new JLabel("<html><b>Create Automaton</b></html>"));
 		r2.add(new JLabel("Name: "));
 		r2.add(mNameInput);
 		mNameInput.addActionListener(this);

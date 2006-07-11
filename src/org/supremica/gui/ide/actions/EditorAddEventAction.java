@@ -32,6 +32,6 @@ public class EditorAddEventAction
 	public void doAction()
 	{
 //		EventEditorDialog diag = new EventEditorDialog(ide);
-		System.err.println("Add Event is not implemented yet!");
+//		System.err.println("Add Event is not implemented yet!");
 	}
 }

@@ -16,7 +16,7 @@ public class EditorAddSimpleComponentAction
 
 		setEditorActiveRequired(true);
 
-		putValue(Action.NAME, "Add Simple Component...");
+		putValue(Action.NAME, "Create Automaton...");
 		putValue(Action.SHORT_DESCRIPTION, "Add Simple Component");
 //		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/edge16.gif")));
 	}
