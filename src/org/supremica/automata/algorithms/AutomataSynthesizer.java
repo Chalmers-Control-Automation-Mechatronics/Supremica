@@ -180,8 +180,8 @@ public class AutomataSynthesizer
 			else if ((type == SynthesisType.Nonblocking) ||
 					 (type == SynthesisType.Both))
 			{
-				// Use supervision equivalence minimization!
-
+			    // Use supervision equivalence minimization!
+			    
 				// Prepare for synthesis
 				// Make a copy
 				theAutomata = new Automata(theAutomata);
@@ -211,11 +211,11 @@ public class AutomataSynthesizer
 				min.setName(null);
 
 				// Present result
-				if (Config.VERBOSE_MODE.isTrue() && (min.nbrOfStates() < 1000))
+				if (false && Config.VERBOSE_MODE.isTrue() && (min.nbrOfStates() < 100))
 				{
 					// This may not be true if more advanced simplification rules have been used!
 					logger.info("The states that are reachable in the maximally permissive, "
-								+ "controllable and nonblocking supervisor are: " + min.getStateSet() + ".");
+						    + "controllable and nonblocking supervisor are: " + min.getStateSet() + ".");
 				}
 				result.addAutomaton(min);
 			}
