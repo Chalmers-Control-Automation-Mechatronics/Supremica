@@ -46,18 +46,19 @@ public class IDEMenuBar
 		menu = new JMenu("Edit");
 		menu.setMnemonic(KeyEvent.VK_E);
 		add(menu);
-		menu.add(new JMenuItem(ide.getActions().editorCopyAction));
-		menu.add(new JMenuItem(ide.getActions().editorUndoAction));
-		menu.add(new JMenuItem(ide.getActions().editorRedoAction));
+		//menu.add(new JMenuItem(ide.getActions().editorCopyAction));
+		//menu.add(new JMenuItem(ide.getActions().editorUndoAction));
+		//menu.add(new JMenuItem(ide.getActions().editorRedoAction));
 
 		// Editor
 		menu = new JMenu("Editor");
 		menu.setMnemonic(KeyEvent.VK_M);
 		add(menu);
 		menu.add(new JMenuItem(ide.getActions().editorAddSimpleComponentAction));
-		menu.add(new JMenuItem(ide.getActions().editorAddForeachComponentAction));
-		menu.add(new JMenuItem(ide.getActions().editorAddInstanceAction));
-		menu.add(new JMenuItem(ide.getActions().editorAddBindingAction));
+		menu.add(new JMenuItem(ide.getActions().editorAddEventAction));
+		//menu.add(new JMenuItem(ide.getActions().editorAddForeachComponentAction));
+		//menu.add(new JMenuItem(ide.getActions().editorAddInstanceAction));
+		//menu.add(new JMenuItem(ide.getActions().editorAddBindingAction));
 
 		// Analyze
 		menu = new JMenu("Analyzer");

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.4 2005-11-03 01:24:16 robi Exp $
+//# $Id: EventEditorDialog.java,v 1.5 2006-07-12 03:59:29 knut Exp $
 //###########################################################################
 
 
@@ -28,6 +28,8 @@ import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 import org.supremica.log.*;
 
@@ -37,10 +39,10 @@ public class EventEditorDialog
 	implements ActionListener
 {
 
-	public EventEditorDialog(IDE ide)
+	public EventEditorDialog(EditorPanelInterface editor)
 	{
-		setTitle("Events Editor");
-		this.ide = ide;
+		setTitle("Event Editor");
+		this.editor = editor;
 
 		// TODO: Change the selection mode for the JList component
 		// (Single selection)
@@ -80,14 +82,17 @@ public class EventEditorDialog
 		b.add(buttons);
 
 		// Add some BorderFactory trickery to make a line separator
+
+
 		JPanel r2 = new JPanel();
 
 		r2.setLayout(new GridLayout(1, 2));
 		b.add(r2);
 
+
 		mData = new DefaultListModel();
 		dataList = new JList(mData);
-
+/*
 		r2.add(new JScrollPane(dataList));
 
 		JPanel buttonBox = new JPanel();
@@ -109,8 +114,9 @@ public class EventEditorDialog
 		buttonBox.add(tButton = new JButton("Down"));
 		tButton.setActionCommand("down");
 		tButton.addActionListener(this);
-
+*/
 		JButton cancelButton = new JButton("Cancel");
+
 		JPanel r4 = new JPanel();
 
 		r4.add(okButton);
@@ -120,6 +126,7 @@ public class EventEditorDialog
 		cancelButton.setActionCommand("cancelbutton");
 		cancelButton.addActionListener(this);
 		b.add(r4);
+
 		setContentPane(contentPanel);
 		pack();
 		setVisible(true);
@@ -142,8 +149,8 @@ public class EventEditorDialog
 				throw new IllegalStateException("Event kind not selected!");
 			}
 
-			final ModuleContainer root = ide.getActiveModuleContainer();
-			final ExpressionParser parser = root.getExpressionParser();
+			//final ModuleContainer root = editor.getModuleContainer();
+			final ExpressionParser parser = new ExpressionParser(ModuleSubjectFactory.getInstance(), CompilerOperatorTable.getInstance());
 			final String text = mName.getText();
 			try	{
 				IdentifierProxy ident = parser.parseSimpleIdentifier(text);
@@ -170,21 +177,24 @@ public class EventEditorDialog
 					return;
 				}
 			}
-			final EventDeclSubject decl =
-				new EventDeclSubject(text, eventkind, false, ranges, null);
+
+			newEvent = new EventDeclSubject(text, eventkind, true, ranges, null);
+
+			//decl =
+			//	new EventDeclSubject(text, eventkind, true, ranges, null);
 			try
 			{
-				final ModuleSubject module = root.getModule();
+				final ModuleSubject module = editor.getModuleSubject(); // Changed from root to editor here
 				final IndexedCollection<EventDeclSubject> decls =
 					module.getEventDeclListModifiable();
-				decls.insert(decl);
+				decls.insert(newEvent);
 			} catch (final DuplicateNameException exception) {
 				logger.debug("DuplicateNameException: " +
 							 exception.getMessage());
 				JOptionPane.showMessageDialog(this, "Duplicate event");
 				return;
 			}
-			mData.addElement(decl);
+			//mData.addElement(decl);
 			dispose();
 		}
 
@@ -192,7 +202,7 @@ public class EventEditorDialog
 		{
 			dispose();
 		}
-
+/*
 		if ("add".equals(e.getActionCommand()))
 		{
 			final String text =
@@ -201,8 +211,9 @@ public class EventEditorDialog
 			if (index == -1 && mData.getSize() != 0) {
 				index = mData.getSize() - 1;
 			}
-			final ModuleContainer root = ide.getActiveModuleContainer();
-			final ExpressionParser parser = root.getExpressionParser();
+			//final ModuleContainer root = editor.getActiveModuleContainer();
+			final ExpressionParser parser = new ExpressionParser(ModuleSubjectFactory.getInstance(), CompilerOperatorTable.getInstance());
+
 			try {
 				final SimpleExpressionProxy range =
 					parser.parse(text, Operator.TYPE_RANGE);
@@ -248,15 +259,21 @@ public class EventEditorDialog
 				mData.add(index + 1, o);
 			}
 		}
+*/
 	}
 
- 
+	public EventDeclSubject getEventDeclSubject()
+	{
+		return newEvent;
+	}
+
 	//#######################################################################
 	//# Data Members
 	private final JTextField mName = new JTextField(16);
 	private final JButton okButton = new JButton("OK");
 	private ButtonGroup group = new ButtonGroup();
-	IDE ide = null;
+	private EventDeclSubject newEvent = null;
+	EditorPanelInterface editor = null;
 	DefaultListModel mData = null;
 	JList dataList = null;
 

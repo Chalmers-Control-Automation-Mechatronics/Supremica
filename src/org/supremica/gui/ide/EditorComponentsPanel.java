@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.22 2006-07-10 21:59:48 knut Exp $
+//# $Id: EditorComponentsPanel.java,v 1.23 2006-07-12 03:59:29 knut Exp $
 //###########################################################################
 
 
@@ -102,6 +102,11 @@ class EditorComponentsPanel
 		EditorNewComponentDialog editor = new EditorNewComponentDialog(this);
 	}
 
+	// To do remove this
+	public void addEvent()
+	{
+
+	}
 
 	public void addComponent(final AbstractSubject o)
 	{

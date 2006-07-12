@@ -5,8 +5,11 @@ import java.util.*;
 import java.awt.event.*;
 import org.supremica.gui.WhiteScrollPane;
 import net.sourceforge.waters.gui.EventListCell;
+import net.sourceforge.waters.gui.EventTableModel;
 import net.sourceforge.waters.model.module.*;
 import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
+import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import java.awt.datatransfer.*;
 import java.awt.dnd.*;
 
@@ -69,6 +72,28 @@ class EditorEventsPanel
 	public DefaultListModel getEventDataList()
 	{
 		return data;
+	}
+
+	public void addEvent()
+	{
+		EventEditorDialog editor = new EventEditorDialog(moduleContainer.getEditorPanel().getEditorPanelInterface());
+
+		EventDeclSubject newEvent = editor.getEventDeclSubject();
+		if (newEvent != null)
+		{
+			//ModuleSubject module = moduleContainer.getModule();
+			//module.getEventDeclListModifiable().add(newEvent); // Add it to the model
+			data.addElement(newEvent); // Add it to the UI
+
+			//final EventTableModel model = (EventTableModel) moduleContainer.getEditorPanel();
+			//final EventTableModel model = (EventTableModel) mEventPane.getModel();
+
+			//EventTableModel model = (EventTableModel) moduleContainer.getComponentEditorPanel().getEventPane().getModel();
+			EventTableModel model = (EventTableModel) moduleContainer.getActiveEditorWindowInterface().getEventPane().getModel();
+
+			SimpleIdentifierSubject identifier = new SimpleIdentifierSubject(newEvent.getName());
+			model.addIdentifier(identifier);
+		}
 	}
 
 	public void actionPerformed(ActionEvent e)

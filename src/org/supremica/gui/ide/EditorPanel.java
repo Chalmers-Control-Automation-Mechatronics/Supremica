@@ -77,7 +77,7 @@ public class EditorPanel
 		toolBar.add(getActions().editorAddNodeAction, editorButtonGroup);
 		toolBar.add(getActions().editorAddNodeGroupAction, editorButtonGroup);
 		toolBar.add(getActions().editorAddEdgeAction, editorButtonGroup);
-		toolBar.add(getActions().editorAddEventAction, editorButtonGroup);
+//		toolBar.add(getActions().editorAddEventAction, editorButtonGroup);
 	}
 
 	public void disablePanel()
@@ -116,6 +116,11 @@ public class EditorPanel
 			public void addComponent(AbstractSubject component)
 			{
 				componentsPanel.addComponent(component);
+			}
+
+			public void addEvent()
+			{
+				eventsPanel.addEvent();
 			}
 
 			public DefaultListModel getEventDataList()

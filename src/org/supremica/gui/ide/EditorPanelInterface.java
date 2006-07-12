@@ -11,9 +11,7 @@ public interface EditorPanelInterface
 {
 	public void addComponent();
 	public void addComponent(AbstractSubject component);
+	public void addEvent();
 	public ModuleSubject getModuleSubject();
 	public DefaultListModel getEventDataList();
-
-//	public IndexedList<EventDeclSubject> getEventDeclListModifiable();
-//	public ExpressionParser getExpressionParser();
 }

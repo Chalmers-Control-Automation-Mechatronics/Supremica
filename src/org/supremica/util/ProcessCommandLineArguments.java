@@ -80,8 +80,8 @@ public class ProcessCommandLineArguments
 					{
 						if (!propFile.exists())
 						{
-							System.err.println("Properties file not found: " + propFile.getAbsolutePath());
-							System.err.println("Creating empty properties file: " + propFile.getAbsolutePath());
+							//System.err.println("Properties file not found: " + propFile.getAbsolutePath());
+							System.out.println("Creating property file: " + propFile.getAbsolutePath());
 							propFile.createNewFile();
 						}
 
