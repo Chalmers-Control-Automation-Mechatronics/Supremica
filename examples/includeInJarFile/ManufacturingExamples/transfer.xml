@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="" major="0" minor="9" comment="This testcase is based on the Transfer Line example from 'Notes on Control of Discrete-Event Systems' my W.M Wonham. Here with 1 serially connected, identical cells.">
+<Automaton name="B1" type="Specification">
+	<Events>
+		<Event id="0" label="M1_1_finished" controllable="false"/>
+		<Event id="1" label="M2_1_started"/>
+		<Event id="2" label="TU_1_reject" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="0" initial="true" accepting="true"/>
+		<State id="1" name="1"/>
+		<State id="2" name="2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="2" dest="1" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="B2" type="Specification">
+	<Events>
+		<Event id="0" label="M2_1_finished" controllable="false"/>
+		<Event id="1" label="TU_1_take"/>
+	</Events>
+	<States>
+		<State id="0" name="E" initial="true" accepting="true"/>
+		<State id="1" name="F"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="M1" type="Plant">
+	<Events>
+		<Event id="0" label="M1_1_finished" controllable="false"/>
+		<Event id="1" label="start"/>
+	</Events>
+	<States>
+		<State id="0" name="I1" initial="true" accepting="true"/>
+		<State id="1" name="W1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="M2" type="Plant">
+	<Events>
+		<Event id="0" label="M2_1_finished" controllable="false"/>
+		<Event id="1" label="M2_1_started"/>
+	</Events>
+	<States>
+		<State id="0" name="I2" initial="true" accepting="true"/>
+		<State id="1" name="W2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="TU" type="Plant">
+	<Events>
+		<Event id="0" label="TU_1_reject" controllable="false"/>
+		<Event id="1" label="TU_1_take"/>
+		<Event id="2" label="finish" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="IT" initial="true" accepting="true"/>
+		<State id="1" name="WT"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+</Automata>
