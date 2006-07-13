@@ -17,16 +17,6 @@
                 </Predecessor>	    
             </Precondition>	
             <Operation>42</Operation> 	
-            <!--Successors>
-                <Successor>
-                     <Machine>R3325</Machine>
-                     <Operation>74</Operation>
-                </Successor>	    
-                <Successor>
-                     <Machine>R3326</Machine>
-                     <Operation>94</Operation>
-                </Successor>	    
-            </Successors-->	
         </Activity>
         <Activity>
             <Precondition>

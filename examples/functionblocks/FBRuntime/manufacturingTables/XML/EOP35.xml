@@ -1,4 +1,4 @@
-<Operation opID="35">
+﻿<Operation opID="35">
     <Type>basic</Type>
     <Comment>move to home position</Comment>
     <Machine>FIX151</Machine>
@@ -11,6 +11,12 @@
             <Sensor>SG2</Sensor>
             <Sensor>SG7</Sensor>
         </InternalComponents>
+
+        <Zones>
+            <Zone>1</Zone>
+            <Zone>3</Zone>
+            <Zone>9</Zone>
+        </Zones>
 
         <InitialState>
             <ActuatorValue>
@@ -33,6 +39,18 @@
                 <Sensor>SG7</Sensor>
                 <Value>on</Value>
             </SensorValue>
+            <ZoneState>
+                <Zone>1</Zone>
+                <State>b</State>
+            </ZoneState>
+            <ZoneState>
+                <Zone>3</Zone>
+                <State>b</State>
+            </ZoneState>
+            <ZoneState>
+                <Zone>9</Zone>
+                <State>b</State>
+            </ZoneState>
             <InitialStateCheck>
                 <AlarmType>1</AlarmType>
                 <AlarmDelay>0</AlarmDelay>
@@ -60,7 +78,18 @@
                 <Sensor>SG7</Sensor>
                 <Value>on</Value>
             </SensorValue>
-            <Zones>-</Zones>
+            <ZoneState>
+                <Zone>1</Zone>
+                <State>b</State>
+            </ZoneState>
+            <ZoneState>
+                <Zone>3</Zone>
+                <State>b</State>
+            </ZoneState>
+            <ZoneState>
+                <Zone>9</Zone>
+                <State>b</State>
+            </ZoneState>
         </Action>
 
         <Action actionNbr="2">
@@ -84,7 +113,18 @@
                 <Sensor>SG7</Sensor>
                 <Value>on</Value>
             </SensorValue>
-            <Zones>-</Zones>
+            <ZoneState>
+                <Zone>1</Zone>
+                <State>b</State>
+            </ZoneState>
+            <ZoneState>
+                <Zone>3</Zone>
+                <State>b</State>
+            </ZoneState>
+            <ZoneState>
+                <Zone>9</Zone>
+                <State>b</State>
+            </ZoneState>
         </Action>
 
         <Action actionNbr="3">
@@ -108,7 +148,18 @@
                 <Sensor>SG7</Sensor>
                 <Value>off</Value>
             </SensorValue>
-            <Zones>-</Zones>
+            <ZoneState>
+                <Zone>1</Zone>
+                <State>b</State>
+            </ZoneState>
+            <ZoneState>
+                <Zone>3</Zone>
+                <State>b</State>
+            </ZoneState>
+            <ZoneState>
+                <Zone>9</Zone>
+                <State>b</State>
+            </ZoneState>
         </Action>
 
         <Action actionNbr="4">
@@ -132,7 +183,18 @@
                 <Sensor>SG7</Sensor>
                 <Value>off</Value>
             </SensorValue>
-            <Zones>u(1,3,9)</Zones>
+            <ZoneState>
+                <Zone>1</Zone>
+                <State>f</State>
+            </ZoneState>
+            <ZoneState>
+                <Zone>3</Zone>
+                <State>f</State>
+            </ZoneState>
+            <ZoneState>
+                <Zone>9</Zone>
+                <State>f</State>
+            </ZoneState>
         </Action>
 
     </EOP>

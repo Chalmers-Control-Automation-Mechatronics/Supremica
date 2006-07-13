@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <xs:schema 
 	xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="1.0"
@@ -7,7 +7,7 @@
 	version="1.0">  
 
  <!-- Definition of simple types ___________________________________-->
- <xs:simpleType name="ExternalVariableType">
+ <xs:simpleType name="ComponentType">
   <xs:restriction base="xs:string">
     <!--xs:pattern value="[a-zA-Z0-9{0-10}"/-->
   </xs:restriction>
@@ -27,9 +27,10 @@
  <xs:element name="Actuator" type="xs:string"/>
  <xs:element name="Sensor" type="xs:string"/>
  <xs:element name="Variable" type="xs:string"/>
- <xs:element name="ExternalVariable" type="ExternalVariableType"/>
+ <xs:element name="Component" type="ComponentType"/>
  <xs:element name="Value" type="xs:string"/>
- <xs:element name="Zones" type="xs:string"/>
+ <xs:element name="State" type="xs:string"/>
+ <xs:element name="Zone" type="xs:string"/>
  <xs:element name="AlarmType" type="xs:string"/>
  <xs:element name="AlarmDelay" type="xs:string"/>
 
@@ -57,6 +58,7 @@
    <xs:sequence>
     <xs:element ref='InternalComponents' minOccurs='1' maxOccurs='1'/>
     <xs:element ref='ExternalComponents' minOccurs='0' maxOccurs='1'/>
+    <xs:element ref='Zones' minOccurs='0' maxOccurs='1'/>
     <xs:element ref='InitialState' minOccurs='1' maxOccurs='1'/>
     <xs:element ref='Action' minOccurs='0' maxOccurs='unbounded'/>
    </xs:sequence>
@@ -66,7 +68,7 @@
  <xs:element name='InternalComponents'>
   <xs:complexType>
    <xs:sequence>
-    <xs:element ref='Actuator' minOccurs='1' maxOccurs='unbounded'/>
+    <xs:element ref='Actuator' minOccurs='0' maxOccurs='unbounded'/>
     <xs:element ref='Sensor' minOccurs='0' maxOccurs='unbounded'/>
     <xs:element ref='Variable' minOccurs='0' maxOccurs='unbounded'/>
    </xs:sequence>
@@ -76,7 +78,15 @@
  <xs:element name='ExternalComponents'>
   <xs:complexType>
    <xs:sequence>
-    <xs:element ref='ExternalVariable' minOccurs='1' maxOccurs='unbounded'/>
+    <xs:element ref='ExternalComponent' minOccurs='1' maxOccurs='unbounded'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name='Zones'>
+  <xs:complexType>
+   <xs:sequence>
+    <xs:element ref='Zone' minOccurs='1' maxOccurs='unbounded'/>
    </xs:sequence>
   </xs:complexType>
  </xs:element>
@@ -84,11 +94,11 @@
  <xs:element name='InitialState'>
   <xs:complexType>
    <xs:sequence>
-    <xs:element ref='ActuatorValue' minOccurs='1' maxOccurs='unbounded'/>
+    <xs:element ref='ActuatorValue' minOccurs='0' maxOccurs='unbounded'/>
     <xs:element ref='SensorValue' minOccurs='0' maxOccurs='unbounded'/>
     <xs:element ref='VariableValue' minOccurs='0' maxOccurs='unbounded'/>
-    <!-- xs:element ref='Zones' minOccurs='1' maxOccurs='1'/ -->
-    <xs:element ref='ExternalVariableValue' minOccurs='0' maxOccurs='unbounded'/>
+    <xs:element ref='ExternalComponentValue' minOccurs='0' maxOccurs='unbounded'/>
+    <xs:element ref='ZoneState' minOccurs='0' maxOccurs='unbounded'/>
     <xs:element ref='InitialStateCheck' minOccurs='1' maxOccurs='1'/>
    </xs:sequence>
   </xs:complexType>
@@ -97,10 +107,10 @@
  <xs:element name='Action'>
   <xs:complexType>
    <xs:sequence>
-    <xs:element ref='ActuatorValue' minOccurs='1' maxOccurs='unbounded'/>
+    <xs:element ref='ActuatorValue' minOccurs='0' maxOccurs='unbounded'/>
     <xs:element ref='SensorValue' minOccurs='0' maxOccurs='unbounded'/>
     <xs:element ref='VariableValue' minOccurs='0' maxOccurs='unbounded'/>
-    <xs:element ref='Zones' minOccurs='1' maxOccurs='1'/>
+    <xs:element ref='ZoneState' minOccurs='0' maxOccurs='unbounded'/>
    </xs:sequence>
    <xs:attribute ref='actionNbr' use='required'/>
   </xs:complexType>
@@ -133,11 +143,29 @@
   </xs:complexType>
  </xs:element> 
 
-<xs:element name='ExternalVariableValue'>
+ <xs:element name='ExternalComponentValue'>
   <xs:complexType>
    <xs:sequence>
-    <xs:element ref='ExternalVariable' minOccurs='1' maxOccurs='1'/>
+    <xs:element ref='ExternalComponent' minOccurs='1' maxOccurs='1'/>
     <xs:element ref='Value' minOccurs='1' maxOccurs='1'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name='ExternalComponent'>
+  <xs:complexType>
+   <xs:sequence>
+    <xs:element ref='Component' minOccurs='1' maxOccurs='1'/>
+    <xs:element ref='Machine' minOccurs='1' maxOccurs='1'/>
+   </xs:sequence>
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name='ZoneState'>
+  <xs:complexType>
+   <xs:sequence>
+    <xs:element ref='Zone' minOccurs='1' maxOccurs='1'/>
+    <xs:element ref='State' minOccurs='1' maxOccurs='1'/>
    </xs:sequence>
   </xs:complexType>
  </xs:element>

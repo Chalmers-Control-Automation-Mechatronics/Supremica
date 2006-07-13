@@ -11,9 +11,16 @@
         </InternalComponents>
       
         <ExternalComponents>
-            <ExternalVariable>R3325#parts&gt;0</ExternalVariable>
+            <ExternalComponent>
+                <Component>R3325#parts&gt;0</Component>
+                <Machine>R3325</Machine>
+            </ExternalComponent>
         </ExternalComponents>
     
+        <Zones>
+            <Zone>11</Zone>
+        </Zones>
+
         <InitialState>
             <ActuatorValue>
                 <Actuator>M1</Actuator>
@@ -27,10 +34,17 @@
                 <Variable>New rack in cell</Variable>
                 <Value>FALSE</Value>
             </VariableValue>
-            <ExternalVariableValue>
-                <ExternalVariable>R3325#parts&gt;0</ExternalVariable>
+            <ExternalComponentValue>
+                <ExternalComponent>
+                    <Component>R3325#parts&gt;0</Component>
+                    <Machine>R3325</Machine>
+                </ExternalComponent>
                 <Value>FALSE</Value>
-            </ExternalVariableValue>
+            </ExternalComponentValue>
+            <ZoneState>
+                <Zone>11</Zone>
+                <State>f</State>
+            </ZoneState>
             <InitialStateCheck>
                 <AlarmType>2</AlarmType>
                 <AlarmDelay>0</AlarmDelay>
@@ -50,7 +64,10 @@
                 <Variable>New rack in cell</Variable>
                 <Value>FALSE</Value>
             </VariableValue>
-            <Zones>b(11)</Zones>
+            <ZoneState>
+                <Zone>11</Zone>
+                <State>b</State>
+            </ZoneState>
         </Action>
 
         <Action actionNbr="2">
@@ -64,9 +81,31 @@
             </SensorValue>
             <VariableValue>
                 <Variable>New rack in cell</Variable>
-                <Value>FALSE</Value>
+                <Value>TRUE</Value>
             </VariableValue>
-            <Zones>u(11)</Zones>
+            <ZoneState>
+                <Zone>11</Zone>
+                <State>b</State>
+            </ZoneState>
+        </Action>
+
+        <Action actionNbr="3">
+            <ActuatorValue>
+                <Actuator>M1</Actuator>
+                <Value>B</Value>
+            </ActuatorValue>
+            <SensorValue>
+                <Sensor>F7KM1-2</Sensor>
+                <Value>TRUE</Value>
+            </SensorValue>
+            <VariableValue>
+                <Variable>New rack in cell</Variable>
+                <Value>TRUE</Value>
+            </VariableValue>
+            <ZoneState>
+                <Zone>11</Zone>
+                <State>f</State>
+            </ZoneState>
         </Action>
 
      </EOP>

@@ -49,8 +49,10 @@
 
  <!-- Definition of simple elements ________________________________-->
  <xs:element name="Value" type="xs:string"/>
+ <xs:element name="InitialValue" type="xs:string"/>
  <xs:element name="State" type="xs:string"/>
  <xs:element name="Description" type="xs:string"/>
+ <xs:element name="Zone" type="xs:string"/>
 
 
 
@@ -99,9 +101,18 @@
    <!--xs:element ref="Variable" minOccurs="0" maxOccurs="unbounded"/-->
    <!-- Equipment does not exist on this level, i.e. they are machines-->
    <!--xs:element ref="Equipment" minOccurs="0" maxOccurs="1"/-->
+   <xs:element ref="Zones" minOccurs="0" maxOccurs="1"/>
    <xs:element ref="Machines" minOccurs="1" maxOccurs="1"/>
    </xs:sequence>  
    <xs:attribute name="name" type="nameType" use="required"/>
+  </xs:complexType>
+ </xs:element>
+
+ <xs:element name="Zones">
+  <xs:complexType>
+   <xs:sequence>
+   <xs:element ref="Zone" minOccurs="1" maxOccurs="unbounded"/>
+   </xs:sequence>  
   </xs:complexType>
  </xs:element>
 
@@ -146,6 +157,7 @@
   <xs:complexType>
    <xs:sequence>
    <xs:element ref="Values" minOccurs="1" maxOccurs="1"/>
+   <xs:element ref="InitialValue" minOccurs="1" maxOccurs="1"/>
    </xs:sequence>  
    <xs:attribute name="name" type="nameType" use="required"/>
   </xs:complexType>

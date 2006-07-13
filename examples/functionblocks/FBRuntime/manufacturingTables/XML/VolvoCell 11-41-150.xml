@@ -9,9 +9,22 @@
                 <!-- Cellen vi jobbar med -->
                 <Cell name="11-41-150">
                     <!-- Variabler aer inte globala utan tillhoer en maskin. Daer aer de dock tillgaengliga foer andra maskiner
-                    <Variable>TT154 Rotation M1</Variable>
                     <Variable>TT154 full rack in cell</Variable>
                     -->
+                    <Zones>
+                        <Zone>1</Zone>
+                        <Zone>2</Zone>
+                        <Zone>3</Zone>
+                        <Zone>4</Zone>
+                        <Zone>5</Zone>
+                        <Zone>6</Zone>
+                        <Zone>7</Zone>
+                        <Zone>8</Zone>
+                        <Zone>9</Zone>
+                        <Zone>10</Zone>
+                        <Zone>11</Zone>
+                        <Zone>12</Zone>
+                    </Zones>
 
                     <!-- Cellen har ett antal olika maskiner av olika typer (robotar, fixturer etc) -->
                     <Machines>
@@ -31,6 +44,7 @@
                         </Machine>
                         <Machine type="Robot" name="150R3325" ownControlSystem="Yes">
                             <Description>Robot, material handling and spot welding</Description>
+                            <!-- The variable below belongs to the real robot and shall not be inlcuded here>   
                             <Variables>
                                 <Variable name="R3325#parts&gt;0">
                                     <Values>
@@ -38,18 +52,16 @@
                                         <Value>False</Value>
                                     </Values>
                                 </Variable>
+                                <Variable name="R3325#parts">
+                                    <Values>
+                                        ...
+                                    </Values>
+                                </Variable>
                             </Variables>
+                            <-->
                         </Machine>
                         <Machine type="Robot" name="150R3326" ownControlSystem="Yes">
                             <Description>Robot, material handling and spot welding</Description>
-                            <Variables>
-                                <Variable name="R3326#parts&gt;0">
-                                    <Values>
-                                        <Value>True</Value>
-                                        <Value>False</Value>
-                                    </Values>
-                                </Variable>    
-                            </Variables>
                         </Machine>
                         <Machine type="Memory" name="150EM" ownControlSystem="Yes">   <!-- Vad aer detta?-->
                             <Description>Escort memory read/write Machine</Description>
@@ -63,7 +75,7 @@
                             <!-- En maskin har utrustning (samling av sensorer, actuatorer etc) -->
                             <Equipment>   
                                 <!-- Varje utrustning har tillstaand (tvaa eller fler...) samt egen utrustning eller fysiska komponenter (elements) -->
-                                <EquipmentEntity type="Actuator" name="150F9VY1">                        
+                                <EquipmentEntity type="Actuator" name="Y1F9VY1">                        
                                     <Description>Monostable pneumatic valve, pressure air cell 150</Description>
                                     <States>
                                         <State>Blabla</State>
@@ -71,19 +83,19 @@
                                     </States>
                                     <!-- Element beskriver (styrning av) den fysiska utrustningen paa laegsta nivaa, d v s den nivaa daer kommunikation med kort/omvaerld sker-->
                                     <Elements>
-                                        <Element name="150F9VY1">
+                                        <Element name="Y1F9VY1">
                                             <Description>The part of the actuator that handles the communication with the real actuator</Description>
                                         </Element>
                                     </Elements>
                                 </EquipmentEntity>
-                                <EquipmentEntity type="Sensor" name="150SP1">                        
+                                <EquipmentEntity type="Sensor" name="Y1SP1">                        
                                     <Description>Pressure switch, pressure air in cell 150 ok</Description>
                                     <States>
                                         <State>Blabla</State>
                                         <State>Blabla2</State>
                                     </States>
                                     <Elements>
-                                        <Element name="150SP1">
+                                        <Element name="Y1SP1">
                                             <Description>The part of the actuator that handles the communication with the real actuator</Description>
                                         </Element>
                                     </Elements>
@@ -94,7 +106,7 @@
                         <Machine type="Other" name="150SG1" ownControlSystem="No">
                             <Description>Proximity sensor, product present in cell 150 </Description>			                  
                             <Equipment>   
-                                <EquipmentEntity type="Sensor" name="150SG1">                        
+                                <EquipmentEntity type="Sensor" name="SG1">                        
                                     <Description>Proximity sensor, product present in cell 150 </Description>
                                     <States>
                                          <State>Blabla</State>
@@ -131,7 +143,7 @@
                             <!-- En maskin har utrustning (samling av sensorer, actuatorer etc) -->
                             <Equipment>   
 			        <!-- Varje utrustning har tillstaand (tvaa eller fler...) samt egen utrustning eller fysiska komponenter (elements) -->
-                                <EquipmentEntity type="Sensor" name="151SG2">                        
+                                <EquipmentEntity type="Sensor" name="FIX151SG2">                        
                                     <Description>Proximity sensor part present on fixture </Description>
                                     <States>
                                         <State>on</State>
@@ -139,63 +151,63 @@
                                     </States>
                                     <!-- Element beskriver (styrning av) den fysiska utrustningen paa laegsta nivaa, d v s den nivaa daer kommunikation med kort/omvaerld sker -->
                                     <Elements>
-                                        <Element name="151SG2">     
+                                        <Element name="FIX151SG2">     
                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                         </Element>
                                     </Elements>
                                 </EquipmentEntity>
-                                <EquipmentEntity type="Sensor" name="151SG7">                        
+                                <EquipmentEntity type="Sensor" name="FIX151SG7">                        
                                     <Description>Proximity sensor part present on fixture </Description>
                                     <States>
                                         <State>on</State>
                                         <State>off</State>
 	                            </States>
                                     <Elements>
-                                        <Element name="151SG7"> 
+                                        <Element name="FIX151SG7"> 
                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                         </Element>
                                     </Elements>
                                 </EquipmentEntity>
-                                <EquipmentEntity type="Actuator" name="151Y13">                        
+                                <EquipmentEntity type="Actuator" name="FIX151Y13">                        
                                     <Description>ClampGroup</Description>
                                     <States>
                                         <State>open</State>
                                         <State>closed</State>
                                     </States>
                                     <Elements>
-                                        <Element name="151Y13Y">
+                                        <Element name="FIX151Y13Y">
                                             <Description>Bistable pneumatic valve </Description>
                                         </Element>
                                     </Elements>
                                     <Equipment>
 
-                                        <EquipmentEntity type="Actuator" name="151Y13C1">                        
+                                        <EquipmentEntity type="Actuator" name="FIX151Y13C1">                        
                                             <Description>Cylinder</Description>
                                             <States>
                                                 <State>open</State>
                                                 <State>closed</State>
                                             </States>
                                             <Equipment>
-                                                <EquipmentEntity type="Sensor" name="151Y13ASG1">
+                                                <EquipmentEntity type="Sensor" name="FIX151Y13ASG1">
                                                     <Description>Proximity sensor clamp 1 open</Description>
                                                     <States>
                                                         <State>open</State>
                                                         <State>not open</State>
                                                     </States>
                                                     <Elements>
-                                                        <Element name="151Y13ASG1">
+                                                        <Element name="FIX151Y13ASG1">
                                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                                         </Element>
                                                     </Elements>
                                                 </EquipmentEntity>
-                                                <EquipmentEntity type="Sensor" name="151Y13ASG2">
+                                                <EquipmentEntity type="Sensor" name="FIX151Y13ASG2">
                                                     <Description>Proximity sensor clamp 1 closed</Description>
                                                     <States>
                                                         <State>closed</State>
                                                         <State>not closed</State>
                                                     </States>
                                                     <Elements>
-                                                        <Element name="151Y13ASG2">
+                                                        <Element name="FIX151Y13ASG2">
                                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                                         </Element>
                                                     </Elements>
@@ -203,14 +215,14 @@
                                             </Equipment>
                                         </EquipmentEntity>
 
-                                        <EquipmentEntity type="Actuator" name="151Y13C2">                        
+                                        <EquipmentEntity type="Actuator" name="FIX151Y13C2">                        
                                             <Description>Cylinder</Description>
                                             <States>
                                                 <State>open</State>
                                                 <State>closed</State>
                                             </States>
                                             <Equipment>
-                                                <EquipmentEntity type="Sensor" name="151Y13BSG1">
+                                                <EquipmentEntity type="Sensor" name="FIX151Y13BSG1">
                                                     <Description>Proximity sensor clamp 2 open</Description>
                                                     <States>
                                                         <State>open</State>
@@ -222,14 +234,14 @@
                                                         </Element>
                                                     </Elements>
                                                 </EquipmentEntity>
-                                                <EquipmentEntity type="Sensor" name="151Y13BSG2">
+                                                <EquipmentEntity type="Sensor" name="FIX151Y13BSG2">
                                                     <Description>Proximity sensor clamp 2 closed</Description>
                                                     <States>
                                                         <State>closed</State>
                                                         <State>not closed</State>
                                                     </States>
                                                     <Elements>
-                                                        <Element name="151Y13BSG2">
+                                                        <Element name="FIX151Y13BSG2">
                                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                                         </Element>
                                                     </Elements>
@@ -240,46 +252,46 @@
                                     </Equipment>
                                 </EquipmentEntity>
 
-                                <EquipmentEntity type="Actuator" name="151Y15">                        
+                                <EquipmentEntity type="Actuator" name="FIX151Y15">                        
                                     <Description>Fixation pin</Description>
                                     <States>
                                         <State>locked</State>
                                         <State>unlocked</State>
                                     </States>
                                     <Elements>
-                                        <Element name="151Y15Y">
+                                        <Element name="FIX151Y15Y">
                                             <Description>Monostable pneumatic valve </Description>
                                         </Element>
                                     </Elements>
                                     <Equipment>
 
-                                        <EquipmentEntity type="Actuator" name="151Y15C1">                        
+                                        <EquipmentEntity type="Actuator" name="FIX151Y15C1">                        
                                             <Description>Cylinder</Description>
                                             <States>
                                                 <State>locked</State>
                                                 <State>unlocked</State>
                                             </States>
                                             <Equipment>
-                                                <EquipmentEntity type="Sensor" name="151Y15SG1">
+                                                <EquipmentEntity type="Sensor" name="FIX151Y15SG1">
                                                     <Description>Proximity sensor fixation pin unlocked</Description>
                                                     <States>
                                                         <State>unlocked</State>
                                                         <State>not unlocked</State>
                                                     </States>
                                                     <Elements>
-                                                        <Element name="151Y15SG1">
+                                                        <Element name="FIX151Y15SG1">
                                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                                         </Element>
                                                     </Elements>
                                                 </EquipmentEntity>
-                                                <EquipmentEntity type="Sensor" name="151Y15SG2">
+                                                <EquipmentEntity type="Sensor" name="FIX151Y15SG2">
                                                     <Description>Proximity sensor fixation pin locked</Description>
                                                     <States>
                                                         <State>locked</State>
                                                         <State>not locked</State>
                                                     </States>
                                                     <Elements>
-                                                        <Element name="151Y15SG2">
+                                                        <Element name="FIX151Y15SG2">
                                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                                         </Element>
                                                     </Elements>
@@ -290,46 +302,46 @@
                                     </Equipment>
                                 </EquipmentEntity>
 
-                                <EquipmentEntity type="Actuator" name="151Y17">                        
+                                <EquipmentEntity type="Actuator" name="FIX151Y17">                        
                                     <Description>Fixture positioning</Description>
                                     <States>
                                         <State>home</State>
                                         <State>work pos</State>
                                     </States>
                                     <Elements>
-                                        <Element name="151Y17Y">
+                                        <Element name="FIX151Y17Y">
                                             <Description>Monostable pneumatic valve </Description>
                                         </Element>
                                     </Elements>
                                     <Equipment>
 
-                                        <EquipmentEntity type="Actuator" name="151Y17C1">                        
+                                        <EquipmentEntity type="Actuator" name="FIX151Y17C1">                        
                                             <Description>Cylinder</Description>
                                             <States>
                                                 <State>home</State>
                                                 <State>work pos</State>
                                             </States>
                                             <Equipment>
-                                                <EquipmentEntity type="Sensor" name="151Y17SG1">
+                                                <EquipmentEntity type="Sensor" name="FIX151Y17SG1">
                                                     <Description>Fixture in home position</Description>
                                                     <States>
                                                         <State>home</State>
                                                         <State>not home</State>
                                                     </States>
                                                     <Elements>
-                                                        <Element name="151Y17SG1">
+                                                        <Element name="FIX151Y17SG1">
                                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                                         </Element>
                                                     </Elements>
                                                 </EquipmentEntity>
-                                                <EquipmentEntity type="Sensor" name="151Y17SG2">
+                                                <EquipmentEntity type="Sensor" name="FIX151Y17SG2">
                                                     <Description>Fixture in work position</Description>
                                                     <States>
                                                         <State>work pos</State>
                                                         <State>not work pos</State>
                                                     </States>
                                                     <Elements>
-                                                        <Element name="151Y17SG2">
+                                                        <Element name="FIX151Y17SG2">
                                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                                         </Element>
                                                     </Elements>
@@ -346,70 +358,70 @@
                         <Machine type="Fixture" name="150FIX152" ownControlSystem="No">
                             <Description>Right fixture </Description>
                             <Equipment>   
-                                <EquipmentEntity type="Sensor" name="152SG3">                        
+                                <EquipmentEntity type="Sensor" name="FIX152SG3">                        
                                     <Description>Proximity sensor part present on fixture </Description>
                                     <States>
                                         <State>on</State>
                                         <State>off</State>
                                     </States>
                                     <Elements>
-                                        <Element name="152SG3">     
+                                        <Element name="FIX152SG3">     
                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                         </Element>
                                     </Elements>
                                 </EquipmentEntity>
-                                <EquipmentEntity type="Sensor" name="152SG6">                        
+                                <EquipmentEntity type="Sensor" name="FIX152SG6">                        
                                     <Description>Proximity sensor part present on fixture </Description>
                                     <States>
                                         <State>on</State>
                                         <State>off</State>
 	                            </States>
                                     <Elements>
-                                        <Element name="152SG6"> 
+                                        <Element name="FIX152SG6"> 
                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                         </Element>
                                     </Elements>
                                 </EquipmentEntity>
-                                <EquipmentEntity type="Actuator" name="152Y14">                        
+                                <EquipmentEntity type="Actuator" name="FIX152Y14">                        
                                     <Description>ClampGroup</Description>
                                     <States>
                                         <State>open</State>
                                         <State>closed</State>
                                     </States>
                                     <Elements>
-                                        <Element name="152Y14Y">
+                                        <Element name="FIX152Y14Y">
                                             <Description>Bistable pneumatic valve </Description>
                                         </Element>
                                     </Elements>
                                     <Equipment>
 
-                                        <EquipmentEntity type="Actuator" name="152Y14C1">                        
+                                        <EquipmentEntity type="Actuator" name="FIX152Y14C1">                        
                                             <Description>Cylinder</Description>
                                             <States>
                                                 <State>open</State>
                                                 <State>closed</State>
                                             </States>
                                             <Equipment>
-                                                <EquipmentEntity type="Sensor" name="152Y14ASG1">
+                                                <EquipmentEntity type="Sensor" name="FIX152Y14ASG1">
                                                     <Description>Proximity sensor clamp 1 open</Description>
                                                     <States>
                                                         <State>open</State>
                                                         <State>not open</State>
                                                     </States>
                                                     <Elements>
-                                                        <Element name="152Y14ASG1">
+                                                        <Element name="FIX152Y14ASG1">
                                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                                         </Element>
                                                     </Elements>
                                                 </EquipmentEntity>
-                                                <EquipmentEntity type="Sensor" name="152Y14ASG2">
+                                                <EquipmentEntity type="Sensor" name="FIX152Y14ASG2">
                                                     <Description>Proximity sensor clamp 1 closed</Description>
                                                     <States>
                                                         <State>closed</State>
                                                         <State>not closed</State>
                                                     </States>
                                                     <Elements>
-                                                        <Element name="152Y14ASG2">
+                                                        <Element name="FIX152Y14ASG2">
                                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                                         </Element>
                                                     </Elements>
@@ -417,33 +429,33 @@
                                             </Equipment>
                                         </EquipmentEntity>
 
-                                        <EquipmentEntity type="Actuator" name="152Y14C2">                        
+                                        <EquipmentEntity type="Actuator" name="FIX152Y14C2">                        
                                             <Description>Cylinder</Description>
                                             <States>
                                                 <State>open</State>
                                                 <State>closed</State>
                                             </States>
                                             <Equipment>
-                                                <EquipmentEntity type="Sensor" name="152Y14BSG1">
+                                                <EquipmentEntity type="Sensor" name="FIX152Y14BSG1">
                                                     <Description>Proximity sensor clamp 2 open</Description>
                                                     <States>
                                                         <State>open</State>
                                                         <State>not open</State>
                                                      </States>
                                                     <Elements>
-                                                        <Element name="152Y14BSG1">
+                                                        <Element name="FIX152Y14BSG1">
                                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                                         </Element>
                                                     </Elements>
                                                 </EquipmentEntity>
-                                                <EquipmentEntity type="Sensor" name="152Y14BSG2">
+                                                <EquipmentEntity type="Sensor" name="FIX152Y14BSG2">
                                                     <Description>Proximity sensor clamp 2 closed</Description>
                                                     <States>
                                                         <State>closed</State>
                                                         <State>not closed</State>
                                                     </States>
                                                     <Elements>
-                                                        <Element name="152Y14BSG2">
+                                                        <Element name="FIX152Y14BSG2">
                                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                                         </Element>
                                                     </Elements>
@@ -454,46 +466,46 @@
                                     </Equipment>
                                 </EquipmentEntity>
 
-                                <EquipmentEntity type="Actuator" name="152Y16">                        
+                                <EquipmentEntity type="Actuator" name="FIX152Y16">                        
                                     <Description>Fixation pin</Description>
                                     <States>
                                         <State>locked</State>
                                         <State>unlocked</State>
                                     </States>
                                     <Elements>
-                                        <Element name="152Y16Y">
+                                        <Element name="FIX152Y16Y">
                                             <Description>Monostable pneumatic valve </Description>
                                         </Element>
                                     </Elements>
                                     <Equipment>
 
-                                        <EquipmentEntity type="Actuator" name="152Y16C1">                        
+                                        <EquipmentEntity type="Actuator" name="FIX152Y16C1">                        
                                             <Description>Cylinder</Description>
                                             <States>
                                                 <State>locked</State>
                                                 <State>unlocked</State>
                                             </States>
                                             <Equipment>
-                                                <EquipmentEntity type="Sensor" name="152Y16SG1">
+                                                <EquipmentEntity type="Sensor" name="FIX152Y16SG1">
                                                     <Description>Proximity sensor fixation pin unlocked</Description>
                                                     <States>
                                                         <State>unlocked</State>
                                                         <State>not unlocked</State>
                                                     </States>
                                                     <Elements>
-                                                        <Element name="152Y16SG1">
+                                                        <Element name="FIX152Y16SG1">
                                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                                         </Element>
                                                     </Elements>
                                                 </EquipmentEntity>
-                                                <EquipmentEntity type="Sensor" name="152Y16SG2">
+                                                <EquipmentEntity type="Sensor" name="FIX152Y16SG2">
                                                     <Description>Proximity sensor fixation pin locked</Description>
                                                     <States>
                                                         <State>locked</State>
                                                         <State>not locked</State>
                                                     </States>
                                                     <Elements>
-                                                        <Element name="152Y16SG2">
+                                                        <Element name="FIX152Y16SG2">
                                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                                         </Element>
                                                     </Elements>
@@ -504,46 +516,46 @@
                                     </Equipment>
                                 </EquipmentEntity>
 
-                                <EquipmentEntity type="Actuator" name="152Y18">                        
+                                <EquipmentEntity type="Actuator" name="FIX152Y18">                        
                                     <Description>Fixture positioning</Description>
                                     <States>
                                         <State>home</State>
                                         <State>work pos</State>
                                     </States>
                                     <Elements>
-                                        <Element name="152Y18Y">
+                                        <Element name="FIX152Y18Y">
                                             <Description>Monostable pneumatic valve </Description>
                                         </Element>
                                     </Elements>
                                     <Equipment>
 
-                                        <EquipmentEntity type="Actuator" name="152Y18C1">                        
+                                        <EquipmentEntity type="Actuator" name="FIX152Y18C1">                        
                                             <Description>Cylinder</Description>
                                             <States>
                                                 <State>home</State>
                                                 <State>work pos</State>
                                             </States>
                                             <Equipment>
-                                                <EquipmentEntity type="Sensor" name="152Y18SG1">
+                                                <EquipmentEntity type="Sensor" name="FIX152Y18SG1">
                                                     <Description>Fixture in home position</Description>
                                                     <States>
                                                         <State>home</State>
                                                         <State>not home</State>
                                                     </States>
                                                     <Elements>
-                                                        <Element name="152Y18SG1">
+                                                        <Element name="FIX152Y18SG1">
                                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                                         </Element>
                                                     </Elements>
                                                 </EquipmentEntity>
-                                                <EquipmentEntity type="Sensor" name="152Y18SG2">
+                                                <EquipmentEntity type="Sensor" name="FIX152Y18SG2">
                                                     <Description>Fixture in work position</Description>
                                                     <States>
                                                         <State>work pos</State>
                                                         <State>not work pos</State>
                                                     </States>
                                                     <Elements>
-                                                        <Element name="152Y18SG2">
+                                                        <Element name="FIX152Y18SG2">
                                                             <Description>The part of the virtual sensor that handles the communication with the real sensor</Description>
                                                         </Element>
                                                     </Elements>
@@ -560,53 +572,48 @@
                         <Machine type="TurnTable" name="150TT153" ownControlSystem="No">
                             <Description>Left Turntable</Description>	
                             <Variables>
-                                <Variable name="TT153Rotation M1">
-                                    <Values>
-                                        <Value>A</Value>
-                                        <Value>B</Value>
-                                    </Values>
-                                </Variable>
                                 <Variable name="TT153New rack in cell">
                                     <Values>
                                         <Value>TRUE</Value>
                                         <Value>FALSE</Value>
                                     </Values>
+                                    <InitialValue>TRUE</InitialValue>
                                 </Variable>
                             </Variables>
 
                             <Equipment>   
-                                <EquipmentEntity type="Sensor" name="153F7KM1-2">                        
+                                <EquipmentEntity type="Sensor" name="TT153F7KM1-2">                        
                                     <Description>Safety scanner OK</Description>
                                     <States>
                                          <State>TRUE</State>
                                          <State>FALSE</State>
                                     </States>
                                     <Elements>
-                                        <Element name="153F7KM1-2">             
+                                        <Element name="TT153F7KM1-2">             
                                             <Description>Input, operator safety scanner OK</Description>
                                         </Element>
                                    </Elements>
                                 </EquipmentEntity>
-                                <EquipmentEntity type="Actuator" name="153M1">                        
+                                <EquipmentEntity type="Actuator" name="TT153M1">                        
                                     <Description>Rotation TurnTable</Description>
                                     <States>
                                          <State>A</State>
                                          <State>B</State>
                                     </States>
                                     <Elements>
-                                        <Element name="153M1">             
+                                        <Element name="TT153M1">             
                                             <Description>Rotate TurnTable</Description>
                                          </Element>
                                     </Elements>
                                     <Equipment>   
-                                        <EquipmentEntity type="Sensor" name="153M1S">                        
+                                        <EquipmentEntity type="Sensor" name="TT153M1S">                        
                                             <Description>TurnTable Rotation Sensor</Description>
                                             <States>
                                                 <State>A</State>
                                                 <State>B</State>
                                             </States>
                                             <Elements>
-                                                <Element name="153M1S">             
+                                                <Element name="TT153M1S">             
                                                     <Description>TurnTable Rotation Sensor</Description>
                                                 </Element>
                                            </Elements>
@@ -619,52 +626,47 @@
                         <Machine type="TurnTable" name="150TT154" ownControlSystem="No">
                             <Description>Left Turntable</Description>			                  
                             <Variables>
-                                <Variable name="TT154Rotation M1">
-                                    <Values>
-                                        <Value>A</Value>
-                                        <Value>B</Value>
-                                    </Values>
-                                </Variable>
                                 <Variable name="TT154New rack in cell">
                                     <Values>
                                         <Value>TRUE</Value>
                                         <Value>FALSE</Value>
                                     </Values>
+                                    <InitialValue>TRUE</InitialValue>
                                 </Variable>
                             </Variables>
                             <Equipment>   
-                                <EquipmentEntity type="Sensor" name="154F7KM1-2">                        
+                                <EquipmentEntity type="Sensor" name="TT154F7KM1-2">                        
                                     <Description>Safety scanner OK</Description>
                                     <States>
                                          <State>TRUE</State>
                                          <State>FALSE</State>
                                     </States>
                                     <Elements>
-                                        <Element name="154F7KM1-2">             
+                                        <Element name="TT154F7KM1-2">             
                                             <Description>Input, operator safety scanner OK</Description>
                                         </Element>
                                    </Elements>
                                 </EquipmentEntity>
-                                <EquipmentEntity type="Actuator" name="154M1">                        
+                                <EquipmentEntity type="Actuator" name="TT154M1">                        
                                     <Description>Rotation TurnTable</Description>
                                     <States>
                                          <State>A</State>
                                          <State>B</State>
                                     </States>
                                     <Elements>
-                                        <Element name="154M1">             
+                                        <Element name="TT154M1">             
                                             <Description>Rotate TurnTable</Description>
                                         </Element>
                                     </Elements>
                                     <Equipment>   
-                                        <EquipmentEntity type="Sensor" name="154M1S">                        
+                                        <EquipmentEntity type="Sensor" name="TT154M1S">                        
                                             <Description>TurnTable Rotation Sensor</Description>
                                             <States>
                                                 <State>A</State>
                                                 <State>B</State>
                                             </States>
                                             <Elements>
-                                                <Element name="154M1S">             
+                                                <Element name="TT154M1S">             
                                                     <Description>TurnTable Rotation Sensor</Description>
                                                 </Element>
                                            </Elements>

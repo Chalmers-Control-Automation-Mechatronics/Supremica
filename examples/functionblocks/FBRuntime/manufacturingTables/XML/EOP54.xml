@@ -1,0 +1,42 @@
+﻿<Operation opID="54">
+    <Type>basic</Type>
+    <Comment>Weld job2, weld part hold by fixture</Comment>
+    <Machine>R3323</Machine>
+    <EOP>
+    
+        <InternalComponents>
+        </InternalComponents>
+        <Zones>
+            <Zone>5</Zone>
+        </Zones>
+      
+    
+        <InitialState>
+            <ZoneState>
+                <Zone>5</Zone>
+                <State>f</State>
+            </ZoneState>
+            <InitialStateCheck>
+                <AlarmType>1</AlarmType>
+                <AlarmDelay>0</AlarmDelay>
+            </InitialStateCheck>
+        </InitialState>
+
+        <Action actionNbr="1">
+            <ZoneState>
+                <Zone>5</Zone>
+                <State>b</State>
+            </ZoneState>
+        </Action>
+        <Action actionNbr="2">
+            <ZoneState>
+                <Zone>5</Zone>
+                <State>f</State>
+            </ZoneState>
+        </Action>
+
+     </EOP>
+</Operation>
+
+
+

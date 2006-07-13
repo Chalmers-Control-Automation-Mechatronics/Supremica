@@ -1,4 +1,4 @@
-<Operation opID="44">
+﻿<Operation opID="44">
     <Type>basic</Type>
     <Comment>move to home position</Comment>
     <Machine>FIX152</Machine>
@@ -13,7 +13,10 @@
         </InternalComponents>
       
         <ExternalComponents>
-            <ExternalVariable>R3325#parts&gt;0</ExternalVariable>
+            <ExternalComponent>
+                <Component>R3325#parts&gt;0</Component>
+                <Machine>R3325</Machine>
+            </ExternalComponent>
         </ExternalComponents>
     
         <InitialState>
@@ -37,10 +40,13 @@
                 <Sensor>SG6</Sensor>
                 <Value>on</Value>
             </SensorValue>
-            <ExternalVariableValue>
-                <ExternalVariable>R3325#parts&gt;0</ExternalVariable>
+            <ExternalComponentValue>
+                <ExternalComponent>
+                    <Component>R3325#parts&gt;0</Component>
+                    <Machine>R3325</Machine>
+                </ExternalComponent>
                 <Value>*</Value>
-            </ExternalVariableValue>
+            </ExternalComponentValue>
             <InitialStateCheck>
                 <AlarmType>1</AlarmType>
                 <AlarmDelay>0</AlarmDelay>
@@ -68,7 +74,6 @@
                 <Sensor>SG6</Sensor>
                 <Value>on</Value>
             </SensorValue>
-            <Zones>-</Zones>
         </Action>
 
         <Action actionNbr="2">
@@ -92,7 +97,6 @@
                 <Sensor>SG6</Sensor>
                 <Value>on</Value>
             </SensorValue>
-            <Zones>-</Zones>
         </Action>
 
         <Action actionNbr="3">
@@ -116,7 +120,6 @@
                 <Sensor>SG6</Sensor>
                 <Value>off</Value>
             </SensorValue>
-            <Zones>-</Zones>
         </Action>
 
         <Action actionNbr="4">

@@ -1,0 +1,77 @@
+﻿<Operation opID="72">
+    <Type>alternative</Type>
+    <Comment>Fetch part from old rack side A</Comment>
+    <Machine>R3325</Machine>
+    <EOP>
+    
+        <InternalComponents>
+            <Variable>#parts</Variable>
+        </InternalComponents>
+      
+        <ExternalComponents>
+            <ExternalComponent>
+                <Component>TT153M1</Component>
+                <Machine>TT153</Machine>
+            </ExternalComponent>
+            <ExternalComponent>
+                <Component>TT153New rack in cell</Component>
+                <Machine>TT153</Machine>
+            </ExternalComponent>
+        </ExternalComponents>
+    
+        <Zones>
+            <Zone>11</Zone>
+        </Zones>
+
+        <InitialState>
+            <VariableValue>
+                <Variable>#parts</Variable>
+                <Value>*</Value>
+            </VariableValue>
+            <ExternalComponentValue>
+                <ExternalComponent>
+                    <Component>TT153M1</Component>
+                    <Machine>TT153</Machine>
+                </ExternalComponent>
+                <Value>A</Value>
+            </ExternalComponentValue>
+            <ExternalComponentValue>
+                <ExternalComponent>
+                    <Component>TT153New rack in cell</Component>
+                    <Machine>TT153</Machine>
+                </ExternalComponent>
+                <Value>FALSE</Value>
+            </ExternalComponentValue>
+            <ZoneState>
+                <Zone>11</Zone>
+                <State>f</State>
+            </ZoneState>
+            <InitialStateCheck>
+                <AlarmType>1</AlarmType>
+                <AlarmDelay>0</AlarmDelay>
+            </InitialStateCheck>
+        </InitialState>
+
+        <Action actionNbr="1">
+            <VariableValue>
+                <Variable>#parts</Variable>
+                <Value>*</Value>
+            </VariableValue>
+            <ZoneState>
+                <Zone>11</Zone>
+                <State>b</State>
+            </ZoneState>
+        </Action>
+
+        <Action actionNbr="2">
+            <ZoneState>
+                <Zone>11</Zone>
+                <State>f</State>
+            </ZoneState>
+        </Action>
+
+     </EOP>
+</Operation>
+
+
+

@@ -1,0 +1,21 @@
+﻿<Operation opID="1">
+    <Type>basic</Type>
+    <Comment>Empty EOP, Check if acknowledgement by operator is required before start of operation</Comment>
+    <Machine>CM</Machine>
+    <EOP>
+    
+        <InternalComponents>
+        </InternalComponents>
+
+        <InitialState>
+            <InitialStateCheck>
+                <AlarmType>1</AlarmType>
+                <AlarmDelay>0</AlarmDelay>
+            </InitialStateCheck>
+        </InitialState>
+
+     </EOP>
+</Operation>
+
+
+

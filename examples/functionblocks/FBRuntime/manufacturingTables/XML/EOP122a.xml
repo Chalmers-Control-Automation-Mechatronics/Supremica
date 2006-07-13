@@ -11,7 +11,10 @@
         </InternalComponents>
       
         <ExternalComponents>
-            <ExternalVariable>R3326#parts&gt;0</ExternalVariable>
+            <ExternalComponent>
+                <Component>R3326#parts&gt;0</Component>
+                <Machine>R3326</Machine>
+            </ExternalComponent>
         </ExternalComponents>
     
         <InitialState>
@@ -27,10 +30,13 @@
                 <Variable>New rack in cell</Variable>
                 <Value>TRUE</Value>
             </VariableValue>
-            <ExternalVariableValue>
-                <ExternalVariable>R3326#parts&gt;0</ExternalVariable>
+            <ExternalComponentValue>
+                <ExternalComponent>
+                    <Component>R3326#parts&gt;0</Component>
+                    <Machine>R3326</Machine>
+                </ExternalComponent>
                 <Value>*</Value>
-            </ExternalVariableValue>
+            </ExternalComponentValue>
             <InitialStateCheck>
                 <AlarmType>-</AlarmType>
                 <AlarmDelay>0</AlarmDelay>
@@ -50,7 +56,6 @@
                 <Variable>New rack in cell</Variable>
                 <Value>FALSE</Value>
             </VariableValue>
-            <Zones>-</Zones>
         </Action>
 
      </EOP>

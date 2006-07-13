@@ -1,4 +1,4 @@
-<Operation opID="40">
+﻿<Operation opID="40">
     <Type>basic</Type>
     <Comment>Cycle start condition</Comment>
     <Machine>FIX152</Machine>

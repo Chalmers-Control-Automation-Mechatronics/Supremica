@@ -1,4 +1,4 @@
-<Operation opID="32">
+﻿<Operation opID="32">
     <Type>basic</Type>
     <Comment>move to home position</Comment>
     <Machine>FIX151</Machine>
@@ -60,7 +60,6 @@
                 <Sensor>SG7</Sensor>
                 <Value>on</Value>
             </SensorValue>
-            <Zones>-</Zones>
         </Action>
 
     </EOP>

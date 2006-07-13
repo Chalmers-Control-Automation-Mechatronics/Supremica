@@ -1,4 +1,4 @@
-<Operation opID="42">
+﻿<Operation opID="42">
     <Type>basic</Type>
     <Comment>close clamps</Comment>
     <Machine>FIX152</Machine>
@@ -60,7 +60,6 @@
                 <Sensor>SG6</Sensor>
                 <Value>on</Value>
             </SensorValue>
-            <Zones>-</Zones>
         </Action>
 
     </EOP>

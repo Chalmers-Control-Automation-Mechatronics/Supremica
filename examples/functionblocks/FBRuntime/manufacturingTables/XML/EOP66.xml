@@ -1,0 +1,55 @@
+﻿<Operation opID="66">
+    <Type>basic</Type>
+    <Comment>Weld job3, weld new part without fixture</Comment>
+    <Machine>R3324</Machine>
+    <EOP>
+    
+        <InternalComponents>
+        </InternalComponents>
+        <Zones>
+            <Zone>2</Zone>
+            <Zone>6</Zone>
+        </Zones>
+      
+    
+        <InitialState>
+            <ZoneState>
+                <Zone>2</Zone>
+                <State>f</State>
+            </ZoneState>
+            <ZoneState>
+                <Zone>6</Zone>
+                <State>f</State>
+            </ZoneState>
+            <InitialStateCheck>
+                <AlarmType>1</AlarmType>
+                <AlarmDelay>0</AlarmDelay>
+            </InitialStateCheck>
+        </InitialState>
+
+        <Action actionNbr="1">
+            <ZoneState>
+                <Zone>2</Zone>
+                <State>b</State>
+            </ZoneState>
+            <ZoneState>
+                <Zone>6</Zone>
+                <State>b</State>
+            </ZoneState>
+        </Action>
+        <Action actionNbr="2">
+            <ZoneState>
+                <Zone>2</Zone>
+                <State>f</State>
+            </ZoneState>
+            <ZoneState>
+                <Zone>6</Zone>
+                <State>f</State>
+            </ZoneState>
+        </Action>
+
+     </EOP>
+</Operation>
+
+
+
