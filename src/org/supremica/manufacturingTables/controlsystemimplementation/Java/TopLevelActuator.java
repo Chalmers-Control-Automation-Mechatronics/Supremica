@@ -101,7 +101,7 @@ public class TopLevelActuator extends Actuator implements Listener
 	    }
     }
 
-    public String requestState() 
+    protected String requestState() 
     {
 	if (!actuators.isEmpty())
 	    {
@@ -158,11 +158,15 @@ public class TopLevelActuator extends Actuator implements Listener
 	    }
 	
 	// Else if no lower level actuators or sensors exist this could be the case for actuators with no sensors, 
-	// where we assume that the state of this actuator is the last ordered state
+	// where we assume that the state of this actuator is the last ordered state, if initialized
+	if (currentState == null)
+	{
+	    System.err.println("Actuator " + name  + " has no sensors and is not initialized!");
+	}
 	return currentState; 
     }
 
-    protected boolean checkState(String desiredState)
+    private boolean checkState(String desiredState)
     {
 	if (requestState().equals(desiredState))
 	    {
@@ -175,7 +179,7 @@ public class TopLevelActuator extends Actuator implements Listener
 	    }
     }
     
-    public boolean orderState(String orderedState)
+    protected boolean orderState(String orderedState)
     {
 	// No timing is implemented now. The author is thinking about whether the hardware should report when 
 	// the state changes and what to do with the timing.

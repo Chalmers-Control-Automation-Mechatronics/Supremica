@@ -70,7 +70,7 @@ public class LowLevelActuator extends Actuator
 	currentState = null; //must be different from null for actuators with no sensors
     }
 
-    public String requestState() 
+    protected String requestState() 
     {
 	if (!actuators.isEmpty())
 	    {
@@ -131,7 +131,7 @@ public class LowLevelActuator extends Actuator
 	return currentState; 
     }
     
-    public boolean orderState(String orderedState)
+    protected boolean orderState(String orderedState)
     {
 	//check if the orderedState is one of the actuators states
 	if (!hasState(orderedState))

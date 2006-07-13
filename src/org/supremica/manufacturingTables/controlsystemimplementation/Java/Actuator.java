@@ -125,10 +125,10 @@ public abstract class Actuator
 	return states.containsKey(state); // containsValue are more expensive than containsKey
     }
     
-    abstract public String requestState(); 
+    abstract protected String requestState(); 
     
      
-    abstract public boolean orderState(String orderedState);
+    abstract protected boolean orderState(String orderedState);
     
     
     // We shall also have a statemonitor that gives an alarm if the actuator is moved when not ordered to

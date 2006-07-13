@@ -108,10 +108,11 @@ public class Coordinator implements Listener
 	if (task.equals("weld floor") && !performsTask)
 	    {
 		performsTask = true;
+		//testrad
+		// mailbox.send( new Message( ID, "Coordinator150R3325", "performSOP", "weld floor" ) );
 
 		// Register that the machines are started. Has to be handled separate from starting the machines /
-		// machineCoordinators since otherwise the machineCoordinatorsStarted map could be empty (making us believe 
-		// that we are done) when only a few machines has been started and finished.
+		// machineCoordinators since otherwise the machineCoordinatorsStarted map could be empty (making us believe 		// that we are done) when only a few machines has been started and finished.
 		for (MachineCoordinator machineCoordinator : machineCoordinators.values())
 		{
 		    machineCoordinatorsStarted.put(machineCoordinator.getID(), true);

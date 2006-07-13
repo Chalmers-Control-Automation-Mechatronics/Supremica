@@ -48,8 +48,8 @@
  */
 
 /**
- * The ManufacturingCell contains information about the Mailbox, the Coordinator 
- * and about all the Machines in the cell
+ * The ManufacturingCell contains information about the Mailbox, the Coordinator, zoneHandler 
+ * and about all the Machines and zones in the cell
  *
  *
  * Created: Mon Apr  24 13:39:32 2006
@@ -70,9 +70,11 @@ public class ManufacturingCell
     private String description;
     private Map machines; // HashMap will be used for quick access to the machines when registering EOPs
     private List SOPs; // The order for the SOPs are not important but I allways iterate through all elements in the list.
+    private List<ZoneData> zones; // -||-
 
     private Mailbox mailbox;
     private Coordinator coordinator;
+//     private ZoneHandlerData zoneHandler;
 
     public ManufacturingCell(String name, Coordinator coordinator, Mailbox mailbox)
     {
@@ -82,6 +84,7 @@ public class ManufacturingCell
 	machines = new HashMap();  //default capacity (16) and load factor (0,75) suits me fine
 	this.mailbox = mailbox;
 	SOPs = new LinkedList();
+	zones = new LinkedList<ZoneData>();
     }
 
     public String getName()
@@ -107,6 +110,16 @@ public class ManufacturingCell
     public Coordinator getCoordinator()
     {
 	return coordinator;
+    }
+
+    public List<ZoneData> getZones()
+    {
+	return zones;
+    }
+    
+    public void addZone(ZoneData zoneToAdd)
+    {
+	zones.add(zoneToAdd);
     }
 
     public Map getMachines()

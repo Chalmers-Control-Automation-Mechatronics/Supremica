@@ -67,8 +67,10 @@ public class EOPData
     private String type;
     private String comment;
     private List EOPRows; // contains initial row and action rows 
-    static final String [] TYPES = {"alternative", "basic"};
-    
+    public static final String ALTERNATIVE_TYPE = "alternative";
+    public static final String BASIC_TYPE = "basic";
+    public static final String [] TYPES = {BASIC_TYPE, ALTERNATIVE_TYPE};
+    public static final String IGNORE_TOKEN = "*";
     public EOPData(int id, String type)
     {
 	this.id = id;

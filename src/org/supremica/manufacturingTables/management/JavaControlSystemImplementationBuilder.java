@@ -4,10 +4,7 @@
  * The Supremica software is not in the public domain
  * However, it is freely available without fee for education,
  * research, and non-profit purposes.  By obtaining copies of
- * this and other files that comprise the Su	for (Iterator machineIter = machines.iterator(); machineIter.hasNext();)
- {
- org.supremica.manufacturingTables.controlsystemdata.Machine machineData = (org.supremica.manufacturingTables.controlsystemdata.Machine) machineIter.next();
- premica software,
+ * this and other files that comprise the Supremica software,
  * you, the Licensee, agree to abide by the following
  * conditions and understandings with respect to the
  * copyrighted software:
@@ -83,17 +80,23 @@ public class JavaControlSystemImplementationBuilder extends ControlSystemImpleme
     {
 	// PLCProgram with mailbox and coordinator are created.
 	// We have to start by creating a mailbox, to be able to create a coordinator, 
-	// to be able to create a PLCProgramJava. The controlsystemdata mailbox and coordinator contains no information 
-	// so they are actully not needed to create the Javaimplementation.
+	// to be able to create a PLCProgramJava. The controlsystemdata mailbox and coordinator contains 
+	// no information so they are actully not needed to create the Javaimplementation.
 	org.supremica.manufacturingTables.controlsystemimplementation.Java.Mailbox plcProgramMailbox = new  org.supremica.manufacturingTables.controlsystemimplementation.Java.Mailbox();  
 	
 	org.supremica.manufacturingTables.controlsystemimplementation.Java.Coordinator coordinator = new  org.supremica.manufacturingTables.controlsystemimplementation.Java.Coordinator(plcProgramMailbox);
 	
-	plcProgram = new PLCProgramJava(cell.getName(), coordinator);
+	// Creating zones which are registered to the PLC program mailbox
+	for ( ZoneData zoneData : cell.getZones() )
+	{
+	    new Zone(zoneData.getZoneName(), plcProgramMailbox);
+	}
 
+	plcProgram = new PLCProgramJava(cell.getName(), coordinator);
+	
 	// Description
 	((PLCProgramJava) plcProgram).setDescription(cell.getDescription()); // (could be null)
-	
+
 	// SOPs
 	// A HashMap is used to store all activities for each machine for fast and easy access later when adding 
 	// successors at the appropriate places. For now I assume that we have only one SOP per Machine! 
@@ -159,25 +162,27 @@ public class JavaControlSystemImplementationBuilder extends ControlSystemImpleme
 	    }
 	}
 	
-
+	
 	// Machines
 	Map machines = cell.getMachines();
 	for (Iterator machineIter = machines.values().iterator(); machineIter.hasNext();)
 	{
 	    org.supremica.manufacturingTables.controlsystemdata.Machine machineData = (org.supremica.manufacturingTables.controlsystemdata.Machine) machineIter.next();
-		
+	    
 	    org.supremica.manufacturingTables.controlsystemimplementation.Java.Machine machine; 
+	    org.supremica.manufacturingTables.controlsystemimplementation.Java.MachineController machineController;
+	    org.supremica.manufacturingTables.controlsystemimplementation.Java.Mailbox machineMailbox = null;
 	    // Check if the machine has own control system
-
+	    
 	    // Machines with own control system
 	    if (machineData.hasOwnControlSystem())
 	    {
 		//continue; //jumps to the end of the current iteration in this for-loop
-		org.supremica.manufacturingTables.controlsystemimplementation.Java.MachineController machineController = new org.supremica.manufacturingTables.controlsystemimplementation.Java.MachineControlCommunicator();
+		machineController = new org.supremica.manufacturingTables.controlsystemimplementation.Java.MachineControlCommunicator();
 		machine = new org.supremica.manufacturingTables.controlsystemimplementation.Java.Machine(machineData.getName(), machineData.getDescription(), machineController, plcProgramMailbox);
 		System.err.println("Creating Java PLCCode for machine with own control system: " + machineData.getName());
 	    } 
-
+	    
 	    // Machines with no own control system
 	    else
 	    {
@@ -185,93 +190,109 @@ public class JavaControlSystemImplementationBuilder extends ControlSystemImpleme
 		// We have to start by creating a machine mailbox, to be able to create a MachineController, 
 		// to be able to create a Machine. The controlsystemdata mailbox and MachineController contains no
 		// information so they are actully not needed to create the Javaimplementation.
-		org.supremica.manufacturingTables.controlsystemimplementation.Java.Mailbox machineMailbox = new  org.supremica.manufacturingTables.controlsystemimplementation.Java.Mailbox(); //then you shall register() listeners to the mailbox? 
-		org.supremica.manufacturingTables.controlsystemimplementation.Java.MachineController machineController = new org.supremica.manufacturingTables.controlsystemimplementation.Java.MachineControlSystem(machineMailbox);
-
+		machineMailbox = new  org.supremica.manufacturingTables.controlsystemimplementation.Java.Mailbox(); //then you shall register() listeners to the mailbox? 
+		machineController = new org.supremica.manufacturingTables.controlsystemimplementation.Java.MachineControlSystem(machineMailbox);
+		
 		machine = new org.supremica.manufacturingTables.controlsystemimplementation.Java.Machine(machineData.getName(), machineData.getDescription(), machineController, plcProgramMailbox);
 		System.err.println("Creating Java PLCCode for machine: " + machineData.getName());
+	    }
+	    
+
+	    // EOPs
+	    List EOPs = machineData.getEOPs();
+	    for (Iterator EOPIter = EOPs.iterator(); EOPIter.hasNext();)
+	    {
+		EOPData EOPData = (EOPData) EOPIter.next();
+		// Create and register EOP
+		EOP EOP = new EOP( EOPData.getId(), EOPData.getType() );
+		machineController.registerEOP(EOP);
 		
+		EOP.setComment( EOPData.getComment() );
+		System.out.println("Adding EOP with number: " + EOPData.getId());
 		
-		// EOPs
-		List EOPs = machineData.getEOPs();
-		for (Iterator EOPIter = EOPs.iterator(); EOPIter.hasNext();)
+		// EOP Initial Row
+		EOPInitialRowData EOPInitialRowData = EOPData.getEOPInitialRow();
+		EOPInitialRow EOPInitialRow = new EOPInitialRow();
+		EOP.setEOPInitialRow(EOPInitialRow);
+		
+		// Set Alarm Type
+		EOPInitialRow.setAlarmType(EOPInitialRowData.getAlarmType());
+		// Set Alarm Delay
+		EOPInitialRow.setAlarmDelay(EOPInitialRowData.getAlarmDelay());
+		// Add External Components to State
+		for (Iterator externalIter = EOPInitialRowData.getExternalComponentToStateMap().entrySet().iterator(); externalIter.hasNext();)
 		{
-		    EOPData EOPData = (EOPData) EOPIter.next();
-		    // Create and register EOP
-		    EOP EOP = new EOP( EOPData.getId(), EOPData.getType() );
-		    ((MachineControlSystem) machineController).registerEOP(EOP);
-		    
-		    EOP.setComment( EOPData.getComment() );
-		    System.out.println("Adding EOP with number: " + EOPData.getId());
-		    
-		    // EOP Initial Row
-		    EOPInitialRowData EOPInitialRowData = EOPData.getEOPInitialRow();
-		    EOPInitialRow EOPInitialRow = new EOPInitialRow();
-		    EOP.setEOPInitialRow(EOPInitialRow);
-		    
-		    // Set Alarm Type
-		    EOPInitialRow.setAlarmType(EOPInitialRowData.getAlarmType());
-		    // Set Alarm Delay
-		    EOPInitialRow.setAlarmDelay(EOPInitialRowData.getAlarmDelay());
-		    // Add External Variables to State
-		    for (Iterator externalIter = EOPInitialRowData.getExternalVariableToStateMap().entrySet().iterator(); externalIter.hasNext();)
-		    {
-			Entry variableToState = (Entry) externalIter.next();
-			EOPInitialRow.addExternalVariableToState( (String) variableToState.getKey(), (String) variableToState.getValue() );
-		    }
-		    // Add Actuator to State
-		    for (Iterator actuatorIter = EOPInitialRowData.getActuatorToStateMap().entrySet().iterator(); actuatorIter.hasNext();)
-		    {
-			Entry actuatorToState = (Entry) actuatorIter.next();
-			EOPInitialRow.addActuatorToState( (String) actuatorToState.getKey(), (String) actuatorToState.getValue() );
-		    }
-		    // Add Sensor to State
-		    for (Iterator sensorIter = EOPInitialRowData.getSensorToStateMap().entrySet().iterator(); sensorIter.hasNext();)
-		    {
-			Entry sensorToState = (Entry) sensorIter.next();
-			EOPInitialRow.addSensorToState( (String) sensorToState.getKey(), (String) sensorToState.getValue() );
-		    }
-		    
-		    
-		    // EOP Action Rows
-		    List EOPActionRows = EOPData.getEOPActionRows();
-		    for (Iterator actionIter = EOPActionRows.iterator(); actionIter.hasNext();)
-		    {
-			EOPActionRowData actionRowData = (EOPActionRowData) actionIter.next();
-			EOPActionRow actionRow = new EOPActionRow();
-			EOP.addEOPActionRow(actionRow);
-			
-			// Add Booking Zones 
-			for (Iterator bookingIter = actionRowData.getBookingZones().iterator(); bookingIter.hasNext();)
-			{
-			    String bookingZone = (String) bookingIter.next();
-			    actionRow.addBookingZone( bookingZone );
-			}
-			
-			// Add Unbooking Zones 
-			for (Iterator unbookingIter = actionRowData.getUnbookingZones().iterator(); unbookingIter.hasNext();)
-			{
-			    String unbookingZone = (String) unbookingIter.next();
-			    actionRow.addUnbookingZone( unbookingZone );
-			}
-			
-			// Add Actuator to State
-			for (Iterator actuatorIter = actionRowData.getActuatorToStateMap().entrySet().iterator(); actuatorIter.hasNext();)
-			{
-			    Entry actuatorToState = (Entry) actuatorIter.next();
-			    actionRow.addActuatorToState( (String) actuatorToState.getKey(), (String) actuatorToState.getValue() );
-			}
-			// Add Sensor to State
-			for (Iterator sensorIter = EOPInitialRowData.getSensorToStateMap().entrySet().iterator(); sensorIter.hasNext();)
-			{
-			    Entry sensorToState = (Entry) sensorIter.next();
-			    actionRow.addSensorToState( (String) sensorToState.getKey(), (String) sensorToState.getValue() );
-			}
-			
-		    }
+		    Entry componentToState = (Entry) externalIter.next();
+		    EOPExternalComponentData extCompData = (EOPExternalComponentData) componentToState.getKey();
+		    EOPExternalComponent externalComponent = new EOPExternalComponent(extCompData.getComponentName(), extCompData.getMachine());
+		    EOPInitialRow.addExternalComponentToState(externalComponent, (String) componentToState.getValue());
+		}
+		// Add Actuator to State
+		for (Iterator actuatorIter = EOPInitialRowData.getActuatorToStateMap().entrySet().iterator(); actuatorIter.hasNext();)
+		{
+		    Entry actuatorToState = (Entry) actuatorIter.next();
+		    EOPInitialRow.addActuatorToState( (String) actuatorToState.getKey(), (String) actuatorToState.getValue() );
+		}
+		// Add Sensor to State
+		for (Iterator sensorIter = EOPInitialRowData.getSensorToStateMap().entrySet().iterator(); sensorIter.hasNext();)
+		{
+		    Entry sensorToState = (Entry) sensorIter.next();
+		    EOPInitialRow.addSensorToState( (String) sensorToState.getKey(), (String) sensorToState.getValue() );
+		}
+		// Add Variable to Value
+		for (Iterator variableIter = EOPInitialRowData.getVariableToValueMap().entrySet().iterator(); variableIter.hasNext();)
+		{
+		    Entry variableToValue = (Entry) variableIter.next();
+		    EOPInitialRow.addVariableToValue( (String) variableToValue.getKey(), (String) variableToValue.getValue() );
+		}
+
+		// Add Zone to State
+		for (Iterator zoneIter = EOPInitialRowData.getZoneToStateMap().entrySet().iterator(); zoneIter.hasNext();)
+		{
+		    Entry zoneToState = (Entry) zoneIter.next();
+		    EOPInitialRow.addZoneToState( (String) zoneToState.getKey(), (String) zoneToState.getValue() );
 		}
 		
 		
+		// EOP Action Rows
+		List EOPActionRows = EOPData.getEOPActionRows();
+		for (Iterator actionIter = EOPActionRows.iterator(); actionIter.hasNext();)
+		{
+		    EOPActionRowData actionRowData = (EOPActionRowData) actionIter.next();
+		    EOPActionRow actionRow = new EOPActionRow();
+		    EOP.addEOPActionRow(actionRow);
+		    
+		    // Add Actuator to State
+		    for (Iterator actuatorIter = actionRowData.getActuatorToStateMap().entrySet().iterator(); actuatorIter.hasNext();)
+		    {
+			Entry actuatorToState = (Entry) actuatorIter.next();
+			actionRow.addActuatorToState( (String) actuatorToState.getKey(), (String) actuatorToState.getValue() );
+		    }
+		    // Add Sensor to State
+		    for (Iterator sensorIter = actionRowData.getSensorToStateMap().entrySet().iterator(); sensorIter.hasNext();)
+		    {
+			Entry sensorToState = (Entry) sensorIter.next();
+			actionRow.addSensorToState( (String) sensorToState.getKey(), (String) sensorToState.getValue() );
+		    }
+		    // Add Variable to Value
+		    for (Iterator variableIter = actionRowData.getVariableToValueMap().entrySet().iterator(); variableIter.hasNext();)
+		    {
+			Entry variableToValue = (Entry) variableIter.next();
+			actionRow.addVariableToValue( (String) variableToValue.getKey(), (String) variableToValue.getValue() );
+		    }
+
+		    // Add Zone to State
+		    for (Iterator zoneIter = actionRowData.getZoneToStateMap().entrySet().iterator(); zoneIter.hasNext();)
+		    {
+			Entry zoneToState = (Entry) zoneIter.next();
+			actionRow.addZoneToState( (String) zoneToState.getKey(), (String) zoneToState.getValue() );
+		    }
+		    
+		}
+	    }
+	    
+	    if (!machineData.hasOwnControlSystem())
+	    {
 		// TopLevelSensors
 		List sensors = machineData.getSensors();
 		for (Iterator sensorIter = sensors.iterator(); sensorIter.hasNext();)
@@ -352,15 +373,13 @@ public class JavaControlSystemImplementationBuilder extends ControlSystemImpleme
 			actuator.addHardwareConnection((String) hardwareIter.next());
 		    }
 		}
-	    }
-	    // Variables
-	    List variables = machineData.getVariables();
-	    for (Iterator variableIter = variables.iterator(); variableIter.hasNext();)
-	    {
+		
+		// Variables, for machines with own control system the variables should be included in that control system
+		List variables = machineData.getVariables();
+		for (Iterator variableIter = variables.iterator(); variableIter.hasNext();)
+		{
 		    org.supremica.manufacturingTables.controlsystemdata.Variable variableData = (org.supremica.manufacturingTables.controlsystemdata.Variable) variableIter.next();
-		    org.supremica.manufacturingTables.controlsystemimplementation.Java.Variable variable = new org.supremica.manufacturingTables.controlsystemimplementation.Java.Variable(variableData.getName());
-		    
-		    machine.addVariable(variable); 
+		    org.supremica.manufacturingTables.controlsystemimplementation.Java.Variable variable = new org.supremica.manufacturingTables.controlsystemimplementation.Java.Variable(variableData.getName(), machineMailbox);
 		    
 		    // Values
 		    List values = variableData.getValues();
@@ -368,7 +387,12 @@ public class JavaControlSystemImplementationBuilder extends ControlSystemImpleme
 		    {
 			variable.addValue((String) valueIter.next());
 		    }
+		    // Initial Value
+		    variable.setCurrentValue(variableData.getInitialValue());
+		}
 	    }
+	    // Set machine to machine controller
+	    machineController.setMachine(machine);
 	    
 	}
     }

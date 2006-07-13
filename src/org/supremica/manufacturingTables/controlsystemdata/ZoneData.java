@@ -48,66 +48,31 @@
  */
 
 /**
- * The Message can be sent to and from a mailbox. It consists off sender, receiver, type and the message content.
+ * The class ZoneData represents a zone of the cell / plc program.
  *
- *
- * Created: Mon Apr  24 12:27:32 2006
+ * Created: Tue Jul  04 14:23:32 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemdata;
 
-public class Message
+public class ZoneData
 {
-    static final String [] TYPES = {"performSOP", "SOPDone", "operationDone", "performEOP", "EOPDone", "requestState", 
-				    "checkState", "orderState", "monitorState", "reportState", "confirmState", 
-				    "externalCheckOfComponent", "confirmExternalComponent",
-				    "externalRequestOfComponent", "reportExternalComponent", 
-				    "confirmZoneState", "reportZoneState"};
-    private String type;
-    private Object content;
-    private String receiver;
-    private String sender;
+    private String zoneName;
+    public static final String FREE_ZONE_TOKEN = "f";
+    public static final String BOOKED_ZONE_TOKEN = "b";
 
-    public Message(String sender, String receiver, String type, Object content)
+    public ZoneData(String zoneName)
     {
-	this.content = content;
-	boolean typeOK = false;
-	for (int i=0; i<TYPES.length && !typeOK; i++)
-	    {
-		if (TYPES[i].equals(type))
-		    {
-			typeOK = true;
-		    }
-	    }
-	if (!typeOK)
-	    {
-		System.err.println("Wrong message type declared!");
-		return;
-	    }
-	this.type = type;
-	this.receiver = receiver;
-	this.sender = sender;
+	this.zoneName = zoneName;
     }
+
+    public String getZoneName()
+    {
+	return zoneName;
+    }
+
     
-    public String getType()
-    {
-	return type;
-    }
-
-    public Object getContent()
-    {
-	return content;
-    }
-    
-    public String getSender()
-    {
-	return sender;
-    }
-
-    public String getReceiver()
-    {
-	return receiver;
-    }
+   
 }

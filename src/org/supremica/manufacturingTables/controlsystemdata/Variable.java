@@ -67,6 +67,7 @@ import java.util.LinkedList;
 public class Variable
 {
     private String name;
+    private String initialValue;
     private List values; 
     // The order for the values are not important but I allways iterate through all values.
     // Normally very few elements are used.
@@ -75,6 +76,7 @@ public class Variable
     {
 	this.name = name;
 	values = new LinkedList();
+	initialValue = null;
     }
 
     public String getName()
@@ -92,4 +94,13 @@ public class Variable
 	values.add(valueToAdd);
     }
 
+    public void setInitialValue(String initialValue)
+    {
+	this.initialValue = initialValue;
+    }
+
+    public String getInitialValue()
+    {
+	return initialValue;
+    }
 }

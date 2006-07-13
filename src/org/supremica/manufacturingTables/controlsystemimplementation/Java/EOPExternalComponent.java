@@ -48,66 +48,52 @@
  */
 
 /**
- * The Message can be sent to and from a mailbox. It consists off sender, receiver, type and the message content.
+ * The EOPExternalComponent class contains the component name and the machine that has the component.
  *
  *
- * Created: Mon Apr  24 12:27:32 2006
+ * Created: Wed June 21 10:58:32 2006
  *
  * @author Oscar
  * @version 1.0
  */
 package org.supremica.manufacturingTables.controlsystemimplementation.Java;
 
-public class Message
+public class EOPExternalComponent
 {
-    static final String [] TYPES = {"performSOP", "SOPDone", "operationDone", "performEOP", "EOPDone", "requestState", 
-				    "checkState", "orderState", "monitorState", "reportState", "confirmState", 
-				    "externalCheckOfComponent", "confirmExternalComponent",
-				    "externalRequestOfComponent", "reportExternalComponent", 
-				    "confirmZoneState", "reportZoneState"};
-    private String type;
-    private Object content;
-    private String receiver;
-    private String sender;
+    private String componentName;
+    private String machine;
 
-    public Message(String sender, String receiver, String type, Object content)
+    public EOPExternalComponent(String componentName, String machine)
     {
-	this.content = content;
-	boolean typeOK = false;
-	for (int i=0; i<TYPES.length && !typeOK; i++)
-	    {
-		if (TYPES[i].equals(type))
-		    {
-			typeOK = true;
-		    }
-	    }
-	if (!typeOK)
-	    {
-		System.err.println("Wrong message type declared!");
-		return;
-	    }
-	this.type = type;
-	this.receiver = receiver;
-	this.sender = sender;
-    }
-    
-    public String getType()
-    {
-	return type;
+	this.componentName = componentName;
+	this.machine = machine;
     }
 
-    public Object getContent()
+    public String getComponentName()
     {
-	return content;
-    }
-    
-    public String getSender()
-    {
-	return sender;
+	return componentName;
     }
 
-    public String getReceiver()
+    public String getMachine()
     {
-	return receiver;
+	return machine;
     }
+
+    public boolean equals(Object equalityTest)
+    {
+	if (equalityTest instanceof EOPExternalComponent)
+	{
+	    EOPExternalComponent externalComponent = (EOPExternalComponent) equalityTest;
+	    return componentName.equals(externalComponent.getComponentName()) && 
+		machine.equals(externalComponent.getMachine());
+	}
+	else
+	{
+	    return false;
+	}
+    }
+     public int hashCode()
+     {
+ 	return (componentName + machine).hashCode();
+     }
 }

@@ -64,33 +64,19 @@ import java.util.HashSet;
 public class EOPActionRowData extends EOPRowData 
 {
     
-    private Set bookingZones;
-    private Set unbookingZones;
     
     public EOPActionRowData()
     {
 	super();
-	bookingZones = new HashSet(10); //initital capacity 10 and default load factor (0,75) suits me fine
-	unbookingZones = new HashSet(10);
     }
+ 
+//     public void addUnbookingZone(String zone)
+//     {
+// 	unbookingZones.add(zone);
+//     }
 
-    public void addBookingZone(String zone)
-    {
-	bookingZones.add(zone);
-    }
-
-    public Set getBookingZones() 
-    {
-	return bookingZones;
-    }
-    
-    public void addUnbookingZone(String zone)
-    {
-	unbookingZones.add(zone);
-    }
-
-    public Set getUnbookingZones() 
-    {
-	return unbookingZones;
-    }
+//     public Set getUnbookingZones() 
+//     {
+// 	return unbookingZones;
+//     }
 }

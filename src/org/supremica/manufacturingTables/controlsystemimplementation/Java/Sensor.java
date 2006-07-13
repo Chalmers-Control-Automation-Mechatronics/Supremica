@@ -119,6 +119,6 @@ public abstract class Sensor
 	return states.containsKey(state); // containsValue are more expensive than containsKey
     }
 
-    abstract public String requestState(); 
+    abstract protected String requestState(); 
     
 }

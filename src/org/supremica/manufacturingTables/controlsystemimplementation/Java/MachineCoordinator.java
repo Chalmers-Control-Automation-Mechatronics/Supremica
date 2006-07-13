@@ -125,6 +125,9 @@ public class MachineCoordinator implements Listener
     
     private void runSOP()
     {
+	// testrad
+	// mailbox.send( new Message( getID(), "150R3325", "performEOP", 72 ) );
+
 	if (currentActivity.hasPredecessors())
 	{
 	    for (SOPPredecessor predecessor : currentActivity.getPredecessors())
@@ -134,8 +137,9 @@ public class MachineCoordinator implements Listener
 		    // The predecessor seems to be fullfilled
 		    if (predecessorsFulfilled.get(predecessor.getID()).equals(predecessor))
 		    {
-			// The predecessor was fullfilled
-			predecessorsFulfilled.remove(predecessor.getID());
+			//System.out.println("Predecessor " + predecessor.getID() + " fullfilled and noted by machine "
+			//		   + machine ); 
+			// The predecessor was fullfilled which is OK, nothing happens
 		    }
 		    else
 		    {
@@ -146,12 +150,20 @@ public class MachineCoordinator implements Listener
 		}
 		else
 		{
+		    //System.out.println("All Predecessors not yet fulfulled in machine " + machine + " for operation "
+		    //	       + currentActivity.getOperation() + ", at least not " + predecessor.getID());
 		    // We (still) have to wait for operations from other machines
 		    return;
 		}
 	    }
+	    // Now all predecessors are fulfilled. We can not just simply clear the map but must remove the 
+	    // specific predecessors for this current operation
+	    for (SOPPredecessor predecessor : currentActivity.getPredecessors())
+	    {
+		predecessorsFulfilled.remove(predecessor.getID());
+	    }
 	}
-	// Now all (if any) predecessors are fulfilled
+	
 	// Time to run the operation (EOP)
 	mailbox.send( new Message( getID(), currentSOP.getMachine(), "performEOP", currentActivity.getOperation() ) );
 	
@@ -209,7 +221,11 @@ public class MachineCoordinator implements Listener
 		{
 		    for (SOPSuccessor successor : successors)
 		    {
-			mailbox.send( new Message( getID(), "Coordinator" + successor.getMachine(), "operationDone", new SOPPredecessor(performedOperation, machine) ) );
+			// System.err.println("Sending message to machine " +  successor.getMachine() 
+			//   + " that predecessing operation " + performedOperation
+			//   + " in machine " + machine + " is done!"); 
+			mailbox.send( new Message( getID(), "Coordinator" + successor.getMachine(), "operationDone", 
+						   new SOPPredecessor(performedOperation, machine) ) );
 		    }
 		}
 
@@ -230,7 +246,8 @@ public class MachineCoordinator implements Listener
 	}
 	else
 	{
-	    System.err.println("MachineCoordinator " + getID() + " can not handle the message " + msg.getType() + " at the present time.");
+	    System.err.println("MachineCoordinator " + getID() + " can not handle the message " + msg.getType() 
+			       + " at the present time.");
 	}
     }
     

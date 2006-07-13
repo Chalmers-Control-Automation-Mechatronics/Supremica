@@ -63,17 +63,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
 
-public class Variable
+public class Variable implements Listener
 {
     private String name;
     private Map values; // HashMap will be used for quick access to the values.
     private String currentValue;
+    private Mailbox mailbox;
 
-    public Variable(String name)
+    public Variable(String name, Mailbox mailbox)
     {
 	this.name = name;
 	values = new HashMap(5); //initital capacity 5 and default load factor (0,75) suits me fine;
 	currentValue = null;
+	this.mailbox = mailbox;
+	mailbox.register(this);
     }
 
     public String getName()
@@ -81,15 +84,17 @@ public class Variable
 	return name;
     }
     
-    public void setCurrentValue(String newValue)
+    public boolean setCurrentValue(String newValue)
     {
 	if (values.containsKey(newValue))
 	    {
 		currentValue = newValue;
+		return true;
 	    }
 	else
 	    {
 		System.err.println("The value "+ newValue  +" is not possible to set for the variable " + name + ".");
+		return false;
 	    }
     }
 
@@ -99,12 +104,32 @@ public class Variable
 	// Now Strings are used both as values and keys, but the value may in the future be a Value object
     }
 
-    // Check if the value valueToCheck is the current value of the Variable 
-    public boolean checkCurrentValue(String valueToCheck)
+    public String getID()
     {
-	return valueToCheck.equals(currentValue);
+	return getName();
     }
 
-
-
+    public void receiveMessage(Message msg) 
+    {
+	if (msg.getType().equals("requestState"))
+	{
+	    mailbox.send(new Message(getID(), "MachineController", "reportState", currentValue));
+	}
+	else if (msg.getType().equals("checkState"))
+	{
+	    boolean valueOK = ((String) msg.getContent()).equals(currentValue); 
+	    mailbox.send(new Message(getID(), "MachineController", "confirmState", valueOK) );
+	}
+	// An order is allways performed for a variable that we can control, if the value to be set is a correct
+	// value for this variable
+	else if (msg.getType().equals("orderState"))
+	{
+	    mailbox.send(new Message(getID(), "MachineController", "confirmState", setCurrentValue( (String) msg.getContent() ) ) );
+	}
+	else
+	{
+	    System.err.println("Unknown message type for the top level actuator " + name + " !");
+	}
+    }
+    
 }

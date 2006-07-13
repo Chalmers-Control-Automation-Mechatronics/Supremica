@@ -65,11 +65,15 @@ abstract public class EOPRowData
 {
     protected Map sensorToStateMap; // HashMap will be used for quick access to the states
     protected Map actuatorToStateMap;
+    protected Map variableToValueMap;
+    protected Map zoneToStateMap;
     
     public EOPRowData()
     {
 	sensorToStateMap = new HashMap(10); //initital capacity 10 and default load factor (0,75) suits me fine
 	actuatorToStateMap = new HashMap(10);
+	variableToValueMap = new HashMap(5);
+	zoneToStateMap = new HashMap(10);
     }
 
     final public void addSensorToState(String sensor, String state)
@@ -91,4 +95,36 @@ abstract public class EOPRowData
     {
 	return actuatorToStateMap;
     }
+
+    final public void addZoneToState(String zone, String state)
+    {
+	if ( state.equals(ZoneData.FREE_ZONE_TOKEN) || state.equals(ZoneData.BOOKED_ZONE_TOKEN)
+	    || state.equals(EOPData.IGNORE_TOKEN) )
+	{
+	    zoneToStateMap.put(zone, state);
+	}
+	else
+	{
+	    System.err.println("Error: Not allowed state for a zone, must be " + ZoneData.FREE_ZONE_TOKEN 
+			       + " or " + ZoneData.BOOKED_ZONE_TOKEN 
+			       + " or " + EOPData.IGNORE_TOKEN + "!");
+	}
+    }
+
+    final public Map getZoneToStateMap() 
+    {
+	return zoneToStateMap;
+    }
+
+    final public void addVariableToValue(String variable, String value)
+    {
+	variableToValueMap.put(variable, value);
+    }
+
+    final public Map getVariableToValueMap() 
+    {
+	return variableToValueMap;
+    }
+
+
 }

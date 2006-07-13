@@ -63,14 +63,14 @@ import java.util.Map;
 
 public class EOPInitialRowData extends EOPRowData
 {
-    private Map externalVariableToStateMap;
+    private Map ExternalComponentToStateMap;
     private String alarmType;
     private String alarmDelay;
     
     public EOPInitialRowData()
     {
 	super();
-	externalVariableToStateMap = new HashMap(5); //initital capacity 5 and default load factor (0,75) suits me fine
+	ExternalComponentToStateMap = new HashMap(5); //initital capacity 5 and default load factor (0,75) suits me fine
 	alarmType = null;
 	alarmDelay = null;
     }
@@ -95,14 +95,14 @@ public class EOPInitialRowData extends EOPRowData
 	return alarmDelay;
     }
 
-    public void addExternalVariableToState(String variable, String state)
+    public void addExternalComponentToState(EOPExternalComponentData component, String state)
     {
-	externalVariableToStateMap.put(variable, state);
+	ExternalComponentToStateMap.put(component, state);
     }
 
-    public Map getExternalVariableToStateMap() 
+    public Map getExternalComponentToStateMap() 
     {
-	return externalVariableToStateMap;
+	return ExternalComponentToStateMap;
     }
 
 }

@@ -72,7 +72,7 @@ public class LowLevelSensor extends Sensor
 	currentState = null;
     }
 
-    public String requestState()
+    protected String requestState()
     {
 	// For now I assume that when sensors contains sensors, the lower level sensors are equivalent
 	if (!sensors.isEmpty())

@@ -59,29 +59,20 @@
  */
 package org.supremica.manufacturingTables.controlsystemimplementation.Java;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class Machine implements Listener
 {
     protected final String [] types = {"Conveyor", "Robot", "Memory", "Fixture", "TurnTable", "Other"};
     private String name;
     private String type;
     private String description;
-    private Map variables;  // HashMap will be used for quick access to the variables
     private MachineController machineController;
     private Mailbox cellMailbox;
 
     public Machine(String name, String type, MachineController machineController, Mailbox cellMailbox)
     {
 	this.name = name;
-
-	// How do you decide if a machine has own controll system? Is it when it doesn´t contain equipment
-	// or is it allways for different types, such as robots? See JavaControlSystemImplementationBuilder.
 	this.type = type;
-
 	this.machineController = machineController;
-	variables = new HashMap(5); //initital capacity 5 and default load factor (0,75) suits me fine
 	description = null;
 	this.cellMailbox = cellMailbox;
 	cellMailbox.register(this);
@@ -95,24 +86,72 @@ public class Machine implements Listener
     public void receiveMessage(Message msg)
     {
 	if (msg.getType().equals("performEOP"))
-	    {
-		System.err.println("Machine " +name+ " performing EOP " + ((Integer) msg.getContent()).intValue() + " .");
-		boolean EOPperformedOK = machineController.performEOP( ( (Integer) msg.getContent() ).intValue() );
-		cellMailbox.send( new Message( name,  msg.getSender(), "EOPDone", EOPperformedOK ) );
-
-	    }
+	{
+	    System.err.println("Machine " +name+ " performing EOP " + ((Integer) msg.getContent()).intValue() + " .");
+	    boolean EOPperformedOK = machineController.performEOP( ( (Integer) msg.getContent() ).intValue() );
+	    cellMailbox.send( new Message( name,  msg.getSender(), "EOPDone", EOPperformedOK ) );
+	    
+	}
+	else if (msg.getType().equals("externalCheckOfComponent"))
+	{
+	    cellMailbox.send( new Message( name, msg.getSender(), "confirmExternalComponent", machineController.checkComponent( (ComponentCheck) msg.getContent() ) ) );
+	}
+	else if (msg.getType().equals("confirmExternalComponent"))
+	{
+	    machineController.confirmExternalComponent(msg.getSender(), (ComponentConfirmation) msg.getContent());
+	}
+	else if (msg.getType().equals("externalRequestOfComponent"))
+	{
+	    cellMailbox.send( new Message( name, msg.getSender(), "reportExternalComponent", machineController.requestComponent( (String) msg.getContent() ) ) );
+	}
+	else if (msg.getType().equals("reportExternalComponent"))
+	{
+	    machineController.reportExternalComponent(msg.getSender(), (ComponentReport) msg.getContent());
+	}
+	else if (msg.getType().equals("confirmZoneState"))
+	{
+	    machineController.confirmZone( msg.getSender(), ( (Boolean) msg.getContent() ).booleanValue() );
+	}
+	else if (msg.getType().equals("reportZoneState"))
+	{
+	    machineController.reportZone( msg.getSender(), (String) msg.getContent() );
+	}
 	else
-	    {
-		System.err.println("Wrong message type sent to Coordinator!");
-	    }
+	{
+	    System.err.println("Wrong message type sent to Coordinator!");
+	}
     }
 
+    public void checkExternalComponent(String machine, String componentName, String value)
+    {
+	cellMailbox.send( new Message( name, machine, "externalCheckOfComponent", new ComponentCheck(componentName, value) ) ); 
+    }
+
+    public void requestExternalComponent(String machine, String componentName)
+    {
+	cellMailbox.send( new Message( name, machine, "externalRequestOfComponent", componentName ) ); 
+    }
+    
+    public void orderZone(String zone, String state)
+    {
+	cellMailbox.send( new Message( name, zone, "orderState", state ) );
+    }
+
+    public void checkZone(String zone, String state)
+    {
+	cellMailbox.send( new Message( name, zone, "checkState", state ) );
+    }
+
+    public void requestZone(String zone)
+    {
+	cellMailbox.send( new Message( name, zone, "requestState", null ) );
+    }
 
     public String getName()
     {
 	return name;
     }
-   
+    
     public String getType()
     {
 	return type;
@@ -128,31 +167,4 @@ public class Machine implements Listener
 	description = descriptionToSet;
     }
 
-    public void addVariable(Variable variableToAdd)
-    {
-	variables.put(variableToAdd.getName(), variableToAdd);
-    }
-
-    public void setVariable(String variableName, String valueToSet)
-    {
-	if (variables.containsKey(variableName)) 
-	    {
-		((Variable) variables.get(variableName)).setCurrentValue(valueToSet);
-	    }
-	else
-	    {
-		System.err.println("The variable "+ variableName  +" is unknown for the machine " + name + ".");
-	    }
-    }
-
-    // Check if the value is the current value of the specified variable of this machine.
-    public boolean checkVariable(String variableName, String valueToCheck)
-    {
-	if (!variables.containsKey(variableName))
-	    {
-		System.err.println("The variable "+ variableName  +" is unknown for the machine " + name + ".");
-		return false;
-	    }
-	return ((Variable) variables.get(variableName)).checkCurrentValue(valueToCheck); 
-    }
 }

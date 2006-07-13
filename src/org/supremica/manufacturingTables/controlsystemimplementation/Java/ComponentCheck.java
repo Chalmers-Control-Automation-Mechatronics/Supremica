@@ -48,66 +48,35 @@
  */
 
 /**
- * The Message can be sent to and from a mailbox. It consists off sender, receiver, type and the message content.
+ * The ComponentCheck is used to ask a machine confirmation that the value of
+ * the component is the supposed one.
  *
  *
- * Created: Mon Apr  24 12:27:32 2006
+ * Created: Wed June 21 10:58:32 2006
  *
  * @author Oscar
  * @version 1.0
  */
 package org.supremica.manufacturingTables.controlsystemimplementation.Java;
 
-public class Message
+public class ComponentCheck
 {
-    static final String [] TYPES = {"performSOP", "SOPDone", "operationDone", "performEOP", "EOPDone", "requestState", 
-				    "checkState", "orderState", "monitorState", "reportState", "confirmState", 
-				    "externalCheckOfComponent", "confirmExternalComponent",
-				    "externalRequestOfComponent", "reportExternalComponent", 
-				    "confirmZoneState", "reportZoneState"};
-    private String type;
-    private Object content;
-    private String receiver;
-    private String sender;
+    private String component;
+    private String valueToCheck;
 
-    public Message(String sender, String receiver, String type, Object content)
+    public ComponentCheck(String component, String valueToCheck)
     {
-	this.content = content;
-	boolean typeOK = false;
-	for (int i=0; i<TYPES.length && !typeOK; i++)
-	    {
-		if (TYPES[i].equals(type))
-		    {
-			typeOK = true;
-		    }
-	    }
-	if (!typeOK)
-	    {
-		System.err.println("Wrong message type declared!");
-		return;
-	    }
-	this.type = type;
-	this.receiver = receiver;
-	this.sender = sender;
-    }
-    
-    public String getType()
-    {
-	return type;
+	this.component = component;
+	this.valueToCheck = valueToCheck;
     }
 
-    public Object getContent()
+    public String getComponentName()
     {
-	return content;
-    }
-    
-    public String getSender()
-    {
-	return sender;
+	return component;
     }
 
-    public String getReceiver()
+    public String getValueToCheck()
     {
-	return receiver;
+	return valueToCheck;
     }
 }

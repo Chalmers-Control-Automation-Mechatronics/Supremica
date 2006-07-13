@@ -103,7 +103,7 @@ public class TopLevelSensor extends Sensor implements Listener
     }
 
 
-    public void monitorState(boolean on)
+    private void monitorState(boolean on)
     {
 	// Here some polling has to be done or we have to rely on the HW to tell us if the state changes
 	monitorOn = on;
@@ -119,7 +119,7 @@ public class TopLevelSensor extends Sensor implements Listener
 	}
     }
     
-    public String requestState()
+    protected String requestState()
     {
 	// For now I assume that when sensors contains sensors, the lower level sensors are equivalent
 	if (!sensors.isEmpty())

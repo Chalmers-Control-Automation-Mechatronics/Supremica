@@ -71,9 +71,14 @@ public class EOP
     private String type;
     private String comment;
     private List EOPRows; // contains initial row and action rows 
-    static final String [] TYPES = {"alternative", "basic"};
     private ListIterator actionIterator;
-    
+
+    public static final String ALTERNATIVE_TYPE = 
+	org.supremica.manufacturingTables.controlsystemdata.EOPData.ALTERNATIVE_TYPE;
+    public static final String BASIC_TYPE = org.supremica.manufacturingTables.controlsystemdata.EOPData.BASIC_TYPE;
+    public static final String [] TYPES = {BASIC_TYPE, ALTERNATIVE_TYPE};
+    public static final String IGNORE_TOKEN = org.supremica.manufacturingTables.controlsystemdata.EOPData.IGNORE_TOKEN;
+
     public EOP(int id, String type)
     {
 	this.id = id;
@@ -137,13 +142,21 @@ public class EOP
 //     }
 
     // Returns a clone of EOPInitialRow with bookingZones, unbookingZones and actuators, sensors and variables
-    // that must be checked (those that does not have a "*" as the state).
+    // that must be checked (those that does not have a EOP.IGNORE_TOKEN as the state).
     public EOPInitialRow getEOPInitialRowActions()
     {
 	EOPInitialRow initialRowActions =  (EOPInitialRow) ( (EOPInitialRow) ( (LinkedList) EOPRows).getFirst() ).clone();
         initialRowActions.removeUnimportantStates();
 	startActions();
 	return initialRowActions;
+    }
+
+    // Returns a clone of EOPInitialRow 
+    public EOPInitialRow getEOPInitialRowClone()
+    {
+	EOPInitialRow initialRow =  (EOPInitialRow) ( (EOPInitialRow) ( (LinkedList) EOPRows).getFirst() ).clone();
+	startActions();
+	return initialRow;
     }
 
     // Append a new EOPActionRow to the end of the EOPRows list
@@ -166,7 +179,7 @@ public class EOP
     }
     
     // Returns next EOPActionRow with bookingZones, unbookingZones and only changing actuators and sensors 
-    // for the next action. A "*" means that the state of that component is not important and hence those are
+    // for the next action. A EOP.IGNORE_TOKEN means that the state of that component is not important and hence those are
     // ignored as well. Returns null if there are no more EOPActionRows.
     public EOPActionRow getNextActions()
     {
@@ -189,5 +202,11 @@ public class EOP
     {
 	return (EOPRow) EOPRows.get( actionIterator.previousIndex() ); 
 
+    }
+    
+    // returns the number of the current row, 0 for the initial row, 1 for the first action row etc.
+    public int getCurrentRowIndex()
+    {
+	return actionIterator.previousIndex();
     }
 }

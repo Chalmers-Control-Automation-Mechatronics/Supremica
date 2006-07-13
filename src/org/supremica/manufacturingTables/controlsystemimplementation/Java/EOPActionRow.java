@@ -58,62 +58,42 @@
  */
 package org.supremica.manufacturingTables.controlsystemimplementation.Java;
 
-import java.util.Set;
-import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.Iterator;
 
 public class EOPActionRow extends EOPRow implements Cloneable
 {
     
-    private Set bookingZones;
-    private Set unbookingZones;
+//     private Set<String> bookingZones;
+//     private Set<String> unbookingZones;
     
     public EOPActionRow()
     {
 	super();
-	bookingZones = new HashSet(10); //initital capacity 10 and default load factor (0,75) suits me fine
-	unbookingZones = new HashSet(10);
     }
 
-    public void addBookingZone(String zone)
+    // An EOPActionRow contains no external components
+    public Map<EOPExternalComponent, String> getExternalComponentToStateMap() 
     {
-	bookingZones.add(zone);
-    }
-
-    public Set getBookingZones() 
-    {
-	return bookingZones;
+ 	return null;
     }
     
-    public void addUnbookingZone(String zone)
-    {
-	unbookingZones.add(zone);
-    }
-
-    public Set getUnbookingZones() 
-    {
-	return unbookingZones;
-    }
-
-    // An EOPActionRow contains no variables
-    public Map getExternalVariableToStateMap() 
-    {
-	return null;
-    }
-
     public Object clone() 
     {
 	EOPActionRow clone = null;
 	try
 	    {
 		clone =(EOPActionRow) super.clone(); // Create space and clone the trivial data
-		// The sensor- and actuatorToStateMap has to be cloned separately since we want to be able to 
+		// The maps and sets has to be cloned separately since we want to be able to 
 		// remove elements from the cloned maps and not effect the original maps.
 		clone.sensorToStateMap = (Map) ((HashMap) this.sensorToStateMap).clone();
 		clone.actuatorToStateMap = (Map) ((HashMap) this.actuatorToStateMap).clone();
+		clone.variableToValueMap = (Map) ((HashMap) this.variableToValueMap).clone();
+		clone.zoneToStateMap = (Map) ((HashMap) this.zoneToStateMap).clone();
 		// The order of the original map may be changed when elements are removed from the cloned hashmap
 		// but this does not matter since the order is not important.
 	    }
@@ -128,6 +108,7 @@ public class EOPActionRow extends EOPRow implements Cloneable
     // of this EOPActionRow. The sensor and actuator maps are ought to contain the same components/keys when started
     public void removeUnchangedComponents(EOPRow previousEOPRow)
     {
+	// Sensors
 	Iterator sensorIter = sensorToStateMap.entrySet().iterator();
 	while (sensorIter.hasNext())
 	    {
@@ -137,11 +118,10 @@ public class EOPActionRow extends EOPRow implements Cloneable
 		if (previousEOPRow.sensorToStateMap.containsKey( (String) currentSensorToState.getKey() ))
 		    {
 			// Check if the proposed state of the sensors are the same in current and previous EOPRows or
-			// if the state is "*", which means that the state is not important.
-			if ( ( (String) previousEOPRow.sensorToStateMap.get( (String) currentSensorToState.getKey() ) ).equals( (String) currentSensorToState.getValue() ) || ( (String) currentSensorToState.getValue() ).equals("*") )
+			// if the state is EOP.IGNORE_TOKEN, which means that the state is not important.
+			if ( ( (String) previousEOPRow.sensorToStateMap.get( (String) currentSensorToState.getKey() ) ).equals( (String) currentSensorToState.getValue() ) || ( (String) currentSensorToState.getValue() ).equals(EOP.IGNORE_TOKEN) )
 			    {
 				sensorIter.remove();
-				System.err.println("Removing sensor " + (String) currentSensorToState.getKey() + " with state " + currentSensorToState.getValue());
 			    }
 		    }
 		else
@@ -149,27 +129,71 @@ public class EOPActionRow extends EOPRow implements Cloneable
 			System.err.println("The previos EOPRow does not contain the sensor " + (String) currentSensorToState.getKey() + "!");
 		    }
 	    }
-	// It is not absolutely necessary to remove unchanged actuators, but is better not to send messages that
+	// Actuators. It is not absolutely necessary to remove unchanged actuators, but is better not to send messages that
 	// are of no meaning.
 	Iterator actuatorIter = actuatorToStateMap.entrySet().iterator();
 	while (actuatorIter.hasNext())
+	{
+	    Entry currentActuatorToState = (Entry) actuatorIter.next();
+	    
+	    // Check if the previous EOPRow contains the same actuator name 
+	    if (previousEOPRow.actuatorToStateMap.containsKey( (String) currentActuatorToState.getKey() ))
 	    {
-		Entry currentActuatorToState = (Entry) actuatorIter.next();
-		
-		// Check if the previous EOPRow contains the same actuator name 
-		if (previousEOPRow.actuatorToStateMap.containsKey( (String) currentActuatorToState.getKey() ))
+		// Check if the proposed state of the actuators are the same in current and previous EOPRows
+		if ( ( (String) previousEOPRow.actuatorToStateMap.get( (String) currentActuatorToState.getKey() ) ).equals( (String) currentActuatorToState.getValue() )  || ( (String) currentActuatorToState.getValue() ).equals(EOP.IGNORE_TOKEN) )
+		{
+		    actuatorIter.remove();
+		}
+	    }
+	    else
+	    {
+		System.err.println("The previos EOPRow does not contain the actuator " + (String) currentActuatorToState.getKey() + "!");
+	    }
+	}
+	// Variables
+	Iterator variableIter = variableToValueMap.entrySet().iterator();
+	while (variableIter.hasNext())
+	{
+	    Entry currentVariableToValue = (Entry) variableIter.next();
+	    
+	    // Check if the previous EOPRow contains the same variable name 
+	    if (previousEOPRow.variableToValueMap.containsKey( (String) currentVariableToValue.getKey() ))
 		    {
-			// Check if the proposed state of the actuators are the same in current and previous EOPRows
-			if ( ( (String) previousEOPRow.actuatorToStateMap.get( (String) currentActuatorToState.getKey() ) ).equals( (String) currentActuatorToState.getValue() ))
+			// Check if the proposed state of the variables are the same in current and previous EOPRows
+			if ( ( (String) previousEOPRow.variableToValueMap.get( (String) currentVariableToValue.getKey() ) ).equals( (String) currentVariableToValue.getValue() )  || ( (String) currentVariableToValue.getValue() ).equals(EOP.IGNORE_TOKEN) )
+			{
+			    variableIter.remove();
+			}
+		    }
+	    else
+	    {
+		System.err.println("The previos EOPRow does not contain the variable " + (String) currentVariableToValue.getKey() + "!");
+	    }
+	}
+
+	// Zones
+	Iterator zoneIter = zoneToStateMap.entrySet().iterator();
+	while (zoneIter.hasNext())
+	    {
+		Entry currentZoneToState = (Entry) zoneIter.next();
+		
+		// Check if the previous EOPRow contains the same zone name 
+		if (previousEOPRow.zoneToStateMap.containsKey( (String) currentZoneToState.getKey() ))
+		    {
+			// Check if the proposed state of the zones are the same in current and previous EOPRows or
+			// if the state is EOP.IGNORE_TOKEN, which means that the state is not important.
+			if ( ( (String) previousEOPRow.zoneToStateMap.get( (String) currentZoneToState.getKey() ) ).equals( (String) currentZoneToState.getValue() ) || ( (String) currentZoneToState.getValue() ).equals(EOP.IGNORE_TOKEN) )
 			    {
-				actuatorIter.remove();
+				zoneIter.remove();
 			    }
 		    }
 		else
 		    {
-			System.err.println("The previos EOPRow does not contain the actuator " + (String) currentActuatorToState.getKey() + "!");
+			System.err.println("The previos EOPRow does not contain the zone " + (String) currentZoneToState.getKey() + "!");
 		    }
 	    }
+
+
 
     }
 }

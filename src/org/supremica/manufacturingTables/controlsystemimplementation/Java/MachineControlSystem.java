@@ -60,53 +60,73 @@
 package org.supremica.manufacturingTables.controlsystemimplementation.Java;
 
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Iterator;
 public class MachineControlSystem extends MachineController implements Listener 
 {
     private Mailbox mailbox;
-    private boolean EOPperformedOK; // to tell the machine whether the EOP was performed successfully or not
-    private Map EOPs;  // HashMap will be used for quick access to the states
-    private EOPRow currentEOPRow;
-    private EOP currentEOP;
-    
+    private boolean EOPPerformedOK; // to tell the machine whether the EOP was performed successfully or not
+    private Map<String, ComponentConfirmation> componentChecks; // stores which components are checked externally
+    private Map<String, ComponentReport> componentRequests; // stores which components are requested externally
+
     public MachineControlSystem(Mailbox mailbox)
     {
 	super();
 	this.mailbox = mailbox;
-	EOPperformedOK = false;
+	EOPPerformedOK = false;
 	mailbox.register(this);
-	EOPs = new HashMap(); //default capacity (16) and load factor (0,75) suits me fine
-	currentEOPRow = null;
-	currentEOP = null;
-    }
-    
-    public void registerEOP(EOP EOP)  
-    {
-	EOPs.put(EOP.getId(), EOP);
+	componentChecks = new HashMap<String, ComponentConfirmation>(5); // initial capacity (5) and default load factor (0,75) suits me fine
+	componentRequests = new HashMap<String, ComponentReport>(5);
     }
     
     public boolean performEOP(int EOPNbr)
     {
-	if ( EOPs.containsKey(EOPNbr) && !performsEOP )
+	// The line below can be changed to test only the SOPs and not perform the actual EOPs
+	if (EOPNbr==0)
+	    return true;
+
+	EOPPerformedOK = false; // this means that if the EOP is empty, a false will be returned
+	
+	List<EOP> EOPList = EOPs.get(EOPNbr);
+	if ( EOPList!=null && !performsEOP )
 	{
-	    System.out.println("Performing EOP: " + ((EOP) EOPs.get(EOPNbr)).getId());
+	    System.out.println("Performing EOP: " + EOPNbr);
 	    performsEOP = true;
-	    EOPperformedOK = false; // this means that if the EOP is empty, a false will be returned
-	    currentEOP = (EOP) EOPs.get(EOPNbr);
+
+	    // Put all alternative EOPs in a map with their initial rows
+	    currAltEOPToInitRowMap.clear();  
+	    for(EOP EOP: EOPList)
+	    {
+		currAltEOPToInitRowMap.put(EOP,(EOPInitialRow) EOP.getEOPInitialRowClone());
+	    }
+	    
+	    // Start with the first alternative
+	    // I thereby require that all alternatives have the same components, it´s just the values/states
+	    // that may differ
+	    currentEOP = EOPList.get(0);
 	    
 	    // EOP Initial Row
+	    // For basic EOPs I ignore components and variables who's state/value is unimportant (EOP.IGNORE_TOKEN).
 	    currentEOPRow = currentEOP.getEOPInitialRowActions();
-	    performInitialRow();
+	    if (currentEOP.getType().equals(EOP.ALTERNATIVE_TYPE))
+	    {
+		// For alternative EOPs I will ask for the state of all components and variables.
+		currentEOPRow = currentEOP.getEOPInitialRowClone();
+	    }
 	    currentEOP.startActions();
-	}		
+	    performInitialRow();
+	    
+	}
+	
 	else 
 	{
 	    System.err.println("Unknown EOP or already busy performing an EOP!");
 	}
 	
-	return EOPperformedOK;
+	return EOPPerformedOK;
     }
     
     // Perform the control activities according to the initial EOP row, stored as currentEOPRow.
@@ -118,84 +138,97 @@ public class MachineControlSystem extends MachineController implements Listener
 	// from the current EOP row without interfering with this iterated clone.
 	EOPInitialRow initialRow = (EOPInitialRow) ( (EOPInitialRow) currentEOPRow ).clone(); 	
 	
-	//check type
-	// Must fix so that we can have alternative EOPS, for now this is not done
+	String stateInquiryType = "checkState"; 
+	// For basic EOPs we should check that the machine is in the desired initial state
+ 	// (i.e. Initial Row + basic EOP -> checkState) 
+ 	if (currentEOP.getType().equals(EOP.ALTERNATIVE_TYPE))
+	{
+	    stateInquiryType = "requestState";
+	    // For alternative EOPs we request the state of the machine and compares it with the different alternatives 
+	    // (i.e. Initial Row + alternative EOP -> requestState)
+	}
 	
-// 	// Initial Row + alternative EOP -> requestState
-// 	if (currentEOP.getType().equals("alternative"))
-// 	{
-// 	    System.err.println("There is currently no support for alternative EOPs!");
-// 	}
+	// For now I dont care about the alarm types and delays
+	// get Alarm Type and Alarm Delay
 	
-// 	// Initial Row + basic EOP -> checkState 
-// 	else if (currentEOP.getType().equals("basic"))
-// 	{
-	    // For now I dont care about the alarm types and delays
-	    // get Alarm Type and Alarm Delay
-	    
-	    // External Variable
-	    for (Iterator externalIter = initialRow.getExternalVariableToStateMap().entrySet().iterator(); externalIter.hasNext();)
+	// External Component
+	for (Iterator externalIter = initialRow.getExternalComponentToStateMap().entrySet().iterator(); externalIter.hasNext();)
+	{
+	    Entry componentToState = (Entry) externalIter.next();
+	    EOPExternalComponent extComp = (EOPExternalComponent) componentToState.getKey();
+	    String state = (String) componentToState.getValue();
+	    if (currentEOP.getType().equals(EOP.ALTERNATIVE_TYPE))
 	    {
-		Entry variableToState = (Entry) externalIter.next();
-		if ( !variableToState.getValue().equals("*") );
-		{
-		    //send some message to Machine with the value and key (the whole entry?)
-		}
+		machine.requestExternalComponent(extComp.getMachine(), extComp.getComponentName());
 	    }
-	    // Actuators
-	    for (Iterator actuatorIter = initialRow.getActuatorToStateMap().entrySet().iterator(); actuatorIter.hasNext();)
+	    else 
 	    {
-		Entry actuatorToState = (Entry) actuatorIter.next();
-// 		if (!actuatorToState.getValue().equals("*"))
-// 		{
-		sendMessage( new Message( ID,  (String) actuatorToState.getKey(), "checkState", (String) actuatorToState.getValue() ) );
-// 		}
-// 		else
-// 		{
-// 		    System.err.println("* for actuator was removed: " + currentEOPRow.getActuatorToStateMap().remove( (String) actuatorToState.getKey() ) );
-// 		}
-	    }
-	    // Sensors
-	    for (Iterator sensorIter = initialRow.getSensorToStateMap().entrySet().iterator(); sensorIter.hasNext();)
-	    {
-		Entry sensorToState = (Entry) sensorIter.next();
-// 		if (!sensorToState.getValue().equals("*"))
-// 		{
- 		    // Initial Row + sensor -> monitorState
- 		    sendMessage( new Message( ID, (String) sensorToState.getKey(), "monitorState", true ) );
-		    
- 		    sendMessage( new Message( ID, (String) sensorToState.getKey(), "checkState", (String) sensorToState.getValue() ) );
-// 		}
-// 		else
-// 		{
-// 		    System.err.println("* for sensor was removed: " + currentEOPRow.getSensorToStateMap().remove( (String) sensorToState.getKey() ) );
-// 		}
+		machine.checkExternalComponent(extComp.getMachine(), extComp.getComponentName(), state);
 	    }
 	}
-// 	else
-// 	{
-// 	    System.err.println("Unknown EOP type " + currentEOP.getType());
-// 	}
-//     }
+	
+	// Actuators
+	for (Iterator actuatorIter = initialRow.getActuatorToStateMap().entrySet().iterator(); actuatorIter.hasNext();)
+	{
+	    Entry actuatorToState = (Entry) actuatorIter.next();
+	    sendMessage( new Message( ID,  (String) actuatorToState.getKey(), stateInquiryType, (String) actuatorToState.getValue() ) );
+	}
+	// Variables
+	for (Iterator variableIter = initialRow.getVariableToValueMap().entrySet().iterator(); variableIter.hasNext();)
+	{
+	    Entry variableToValue = (Entry) variableIter.next();
+	    sendMessage( new Message( ID,  (String) variableToValue.getKey(), stateInquiryType, (String) variableToValue.getValue() ) );
+	}
+	// Sensors
+	for (Iterator sensorIter = initialRow.getSensorToStateMap().entrySet().iterator(); sensorIter.hasNext();)
+	{
+	    Entry sensorToState = (Entry) sensorIter.next();
+	    // Initial Row + sensor -> monitorState
+	    // State monitoring can be put on for all sensors for alternative EOPs
+	    sendMessage( new Message( ID, (String) sensorToState.getKey(), "monitorState", true ) );
+	    
+	    sendMessage( new Message( ID, (String) sensorToState.getKey(), stateInquiryType, (String) sensorToState.getValue() ) );
+	}
+	// Zones
+	for (Iterator zoneIter = initialRow.getZoneToStateMap().entrySet().iterator(); zoneIter.hasNext();)
+	{
+	    Entry zoneToState = (Entry) zoneIter.next();
+	    if (currentEOP.getType().equals(EOP.ALTERNATIVE_TYPE))
+	    {
+		machine.requestZone( (String) zoneToState.getKey() );
+	    }
+	    else
+	    {
+		machine.checkZone( (String) zoneToState.getKey(), (String) zoneToState.getValue() );
+	    }
+	}
+
+    }
     
     // Private method for sending messages. Sends messages to the actuators and sensors only if the machine is
     // running (performsEOP == true). Code could be added to allow to send messages to the cell if machine has 
     // been stopped. 
+    // This has been improved since a running machine is not the same as one performing an eop. A machine should be 
+    // able to send messages as responses to other machines even when not performing an eop.
     private void sendMessage(Message msg)
     {
-	if (performsEOP)
+	if (performsEOP  || 
+	    ( ( (String) msg.getType() ).equals("checkState") && !componentChecks.isEmpty() ) ||
+	    ( ( (String) msg.getType() ).equals("requestState") && !componentRequests.isEmpty() ) )
 	{
 	    System.out.println("Sending message " + msg.getType() + " with content " +  msg.getContent() + " to " + msg.getReceiver() + ".");
 	    mailbox.send(msg);
 	}
 	else
 	{
-	    System.err.println("The machine has been stopped!");
+	    System.err.println("Message could not be sent. The machine " + machine.getName() 
+			       + " is not performing an EOP.");
+	    System.err.println("Message type is " + (String) msg.getType());
 	}
     }
     
-    // Perform the control activities according to the current actionRow with only changing actuators and sensors left, 
-    // stored as currentEOPRow
+    // Perform the control activities according to the current actionRow, with only changing actuators, sensors 
+    // variables and zones left, stored as currentEOPRow
     private void performActions()
     {
 	
@@ -205,7 +238,7 @@ public class MachineControlSystem extends MachineController implements Listener
 	EOPActionRow actionRow = (EOPActionRow) ( (EOPActionRow) currentEOPRow ).clone(); 	
 	
 	
-	// Changed actuator or sensor -> orderState
+	// Changed actuator, variable or sensor -> orderState
 	
 	// Actuators
 	for (Iterator actuatorIter = actionRow.getActuatorToStateMap().entrySet().iterator(); actuatorIter.hasNext();)
@@ -214,7 +247,13 @@ public class MachineControlSystem extends MachineController implements Listener
 	    sendMessage( new Message( ID,  (String) actuatorToState.getKey(), "orderState", (String) actuatorToState.getValue() ) );
 	    
 	}
-	
+	// Variables
+	for (Iterator variableIter = actionRow.getVariableToValueMap().entrySet().iterator(); variableIter.hasNext();)
+	{
+	    Entry variableToValue = (Entry) variableIter.next();
+	    sendMessage( new Message( ID,  (String) variableToValue.getKey(), "orderState", (String) variableToValue.getValue() ) );
+	    
+	}
 	// Sensors
 	for (Iterator sensorIter = actionRow.getSensorToStateMap().entrySet().iterator(); sensorIter.hasNext();)
 	{
@@ -224,26 +263,126 @@ public class MachineControlSystem extends MachineController implements Listener
 	    
 	    sendMessage( new Message( ID, (String) sensorToState.getKey(), "orderState", (String) sensorToState.getValue() ) );
 	}
+
+	// Zones
+	for (Iterator zoneIter = actionRow.getZoneToStateMap().entrySet().iterator(); zoneIter.hasNext();)
+	{
+	    Entry zoneToState = (Entry) zoneIter.next();
+	    machine.orderZone( (String) zoneToState.getKey(), (String) zoneToState.getValue() );
+	}
 	
-	// Wait with booking and unbooking zones
+	// The following line is necessary if one EOP row is equal to the last 
+	checkEOPRowPerformed();
 	
+
     }
     
     public void receiveMessage(Message msg) 
     {
-	//confirmations from variables , booking and unbooking also has to be checked
+	//confirmations from booking and unbooking also has to be checked
+
+	// Stores the sender of the message
+	String sender = msg.getSender();
+	System.err.println("Received message in MachineController: "+ msg.getType() + ", " + msg.getContent()); 
+
+	// Report State
+	if ( msg.getType().equals("reportState") )
+	{
+	    // reportState for component that is requested by another machine
+	    if ( !componentRequests.isEmpty() && componentRequests.containsKey( sender ) )
+	    {
+		///The following does not change the element in the map
+		// 		ComponentReport componentReport = componentRequests.get(sender);
+		// 		componentReport = new ComponentReport( sender, (String) msg.getContent() );
+		
+		// So I have to do this:
+		ComponentReport componentReport = componentRequests.remove(sender);
+		componentReport = new ComponentReport( sender, (String) msg.getContent() );
+		componentRequests.put(sender, componentReport);
+	    }
+	    // Handle reportStates for alternative EOPs
+	    else if (performsEOP)
+	    {
+		for (Iterator<Entry<EOP, EOPInitialRow>> EOPIter = currAltEOPToInitRowMap.entrySet().iterator(); 
+		     EOPIter.hasNext();)
+		{
+		    EOPRow EOPRow = EOPIter.next().getValue();
+		    
+		    // Actuator
+		    if ( EOPRow.getActuatorToStateMap().containsKey( sender ) )
+		    {
+			String state = (String) EOPRow.getActuatorToStateMap().remove(  sender );
+// 			System.out.println("EOP " + currentEOP.getId() + ": actuator " + sender 
+// 					   + " with state " + state + " was removed."); 
+			if (! ( state.equals( (String) msg.getContent() ) || state.equals(EOP.IGNORE_TOKEN) ) )
+			{
+			    EOPIter.remove();
+// 			    System.out.println("The entire alternative EOP was removed");
+			}
+		    }		
+		    // Sensor
+		    else if ( EOPRow.getSensorToStateMap().containsKey( sender ) )
+		    {
+			String state = (String) EOPRow.getSensorToStateMap().remove(  sender );
+			if (! ( state.equals( (String) msg.getContent() ) || state.equals(EOP.IGNORE_TOKEN) ) )
+			{
+			    EOPIter.remove();
+			}
+		    }		
+		    // Variable
+		    else if ( EOPRow.getVariableToValueMap().containsKey( sender ) )
+		    {
+			String value = (String) EOPRow.getVariableToValueMap().remove(  sender );
+			if (! ( value.equals( (String) msg.getContent() ) || value.equals(EOP.IGNORE_TOKEN) ) )
+			{
+			    EOPIter.remove();
+			}
+		    }		
+	
+		    else
+		    {
+			System.err.println("Unknown component");
+		    }
+		}
+		if (currAltEOPToInitRowMap.size() == 1)
+		{
+		    Entry<EOP, EOPInitialRow> EOPToInitRowEntry = currAltEOPToInitRowMap.entrySet().iterator().next();
+		    currentEOP = EOPToInitRowEntry.getKey();
+		    currentEOPRow = EOPToInitRowEntry.getValue();
+		    System.out.println("Only one alternative left!");
+		    
+		    checkEOPRowPerformed();
+		}
+		
+		
+		
+		
+	    }
+	    else 
+	    {
+		System.out.println("Unknown reportState sent to machineController in machine " + machine.getName());
+	    }
+	}
 	
 	// Confirm State
-	if (performsEOP && msg.getType().equals("confirmState"))
+	else if ( msg.getType().equals("confirmState"))
 	{
-	    System.err.println("Received message in MachineController: "+ msg.getType() + ", " + msg.getContent()); 
+	    
+	    // confirmState for component that is checked by a request/check from another machine
+	    // I handle those before the confirmations for this machine and EOP
+	    if ( componentChecks.containsKey( sender ) )
+	    {
+		ComponentConfirmation compConf = componentChecks.remove(sender);
+		compConf = new ComponentConfirmation( sender, ( (Boolean) msg.getContent() ).booleanValue() );
+		componentChecks.put(sender, compConf);
+	    }
 	    
 	    // Check if the confirmation was true
-	    if (((Boolean) msg.getContent()).booleanValue())
+	    else if (performsEOP && ((Boolean) msg.getContent()).booleanValue())
 	    {
-		String sender = msg.getSender();
 		System.err.println("The component " + sender + " holds the supposed state.");
 		
+
 		// Actuator
 		if ( currentEOPRow.getActuatorToStateMap().containsKey( sender ) )
 		{
@@ -254,38 +393,16 @@ public class MachineControlSystem extends MachineController implements Listener
 		{
 		    currentEOPRow.getSensorToStateMap().remove(  sender );
 		}		
+		// Variable
+		else if ( currentEOPRow.getVariableToValueMap().containsKey( sender ) )
+		{
+		    currentEOPRow.getVariableToValueMap().remove(  sender );
+		}		
 		else
 		{
 		    System.err.println("Unknown component");
 		}
-		
-		// Check if the EOP row has been performed
-		// Variables, booking and unbooking also has to be checked (and that they are not null)
-		if ( currentEOPRow.getActuatorToStateMap().size() == 0 &&  currentEOPRow.getSensorToStateMap().size() == 0 )
-		{
-		    System.err.println("The EOP row has been performed.");
-		    if (currentEOP.hasMoreActions())
-		    {
-			currentEOPRow = currentEOP.getNextActions();
-			performActions();
-		    }
-		    else
-		    {
-			// sensors + last row -> monitorState off
-			EOPRow lastRow = currentEOP.getLastRow();
-			for (Iterator sensorIter = lastRow.getSensorToStateMap().entrySet().iterator(); sensorIter.hasNext();)
-			{
-			    Entry sensorToState = (Entry) sensorIter.next();
-			    sendMessage( new Message( ID, (String) sensorToState.getKey(), "monitorState", false ) );
-			}
-			
-			performsEOP = false;
-			System.err.println("The EOP is done!");
-			EOPperformedOK = true;
-			
-		    }
-		    
-		}
+		checkEOPRowPerformed();
 	    }
 	    else
 	    {
@@ -299,4 +416,64 @@ public class MachineControlSystem extends MachineController implements Listener
 	}
     }
     
+    private boolean EOPRowPerformed()
+    {
+ 	return ( performsEOP 
+		 && currentEOPRow.getActuatorToStateMap().size() == 0 &&  currentEOPRow.getSensorToStateMap().size() == 0 
+		 && currentEOPRow.getVariableToValueMap().size() == 0 
+		 && ( currentEOPRow.getExternalComponentToStateMap() == null ||
+		      currentEOPRow.getExternalComponentToStateMap().size() == 0 ) 
+		 && ( currentEOPRow.getZoneToStateMap().size() == 0 ) );
+	
+    }
+    
+    // Check if the EOP row has been performed. If so perform the next row. If no more rows, the EOP is done.
+    protected void checkEOPRowPerformed()
+    {
+ 	if (EOPRowPerformed())
+	{
+	    System.err.println("The EOP row has been performed.");
+	    if (currentEOP.hasMoreActions())
+	    {
+		currentEOPRow = currentEOP.getNextActions();
+		performActions();
+	    }
+	    else
+	    {
+		// sensors + last row -> monitorState off
+		// It is OK to set state monitoring off for all sensors, even those who were not started.
+ 		EOPRow lastRow = currentEOP.getLastRow();
+ 		for (Iterator sensorIter = lastRow.getSensorToStateMap().entrySet().iterator(); sensorIter.hasNext();)
+ 		{
+ 		    Entry sensorToState = (Entry) sensorIter.next();
+ 		    sendMessage( new Message( ID, (String) sensorToState.getKey(), "monitorState", false ) );
+ 		}
+		
+		performsEOP = false;
+		System.err.println("The EOP is done!");
+		EOPPerformedOK = true;
+		
+	    }
+	    
+	}
+    }
+    
+    // I assume that I get some answer when the question is forwared to the component via the mailbox,
+    // and that answer will set the confirmation of the current component and I will send it to the asking 
+    // machine. The code is a bit clumsy when I get a normal
+    // Java method request and I have to send messages through mailboxes to get the answer.
+    public ComponentConfirmation checkComponent(ComponentCheck componentCheck)
+    {
+	componentChecks.put(componentCheck.getComponentName(), null);
+	sendMessage( new Message( ID, componentCheck.getComponentName(), "checkState", componentCheck.getValueToCheck() ) );
+	return componentChecks.remove(componentCheck.getComponentName());
+    }
+    
+    public ComponentReport requestComponent(String componentName)
+    {
+	componentRequests.put(componentName, null);
+	sendMessage( new Message( ID, componentName, "requestState", null ) );
+	return componentRequests.remove(componentName);
+    }
+
 }
