@@ -5,6 +5,7 @@
   <property name="src" location="../src"/>
   <property name="lib" location="../lib"/>
   <property name="xsd_iec61499" location="iec61499/xsd"/>
+  <property name="xsd_iec61131" location="iec61131/xsd"/>  
   <property name="xsd_manufacturingTables" location="manufacturingTables/xsd"/>
 
   <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
@@ -44,6 +45,13 @@
     <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.functionblocks.xsd.libraryelement">
       <schema dir="${xsd_iec61499}" includes="LibraryElement.xsd"/>
       <produces dir="${src}/org/supremica/functionblocks/xsd/libraryelement"/>
+    </xjc>
+  </target>
+
+  <target name="gen_iec61131" description="Generate IEC 61131 JAXB classes.">
+    <xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.external.iec61131">
+      <schema dir="${xsd_iec61131}" includes="TC6_XML_V10.xsd"/>
+      <produces dir="${src}/org/supremica/external/iec61131"/>
     </xjc>
   </target>
 
