@@ -4,23 +4,22 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ModuleConstantAliasListHandler
 //###########################################################################
-//# $Id: ModuleConstantAliasListHandler.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ModuleConstantAliasListHandler.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.util.List;
-import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.module.AliasProxy;
 
-import net.sourceforge.waters.xsd.module.ConstantAliasListType;
-import net.sourceforge.waters.xsd.module.ModuleType;
+import net.sourceforge.waters.xsd.module.ConstantAliasList;
+import net.sourceforge.waters.xsd.module.Module;
 import net.sourceforge.waters.xsd.module.ObjectFactory;
 
 
 class ModuleConstantAliasListHandler
-  extends JAXBListHandler<ModuleType,ConstantAliasListType,AliasProxy>
+  extends JAXBListHandler<Module,ConstantAliasList,AliasProxy>
 {
 
 
@@ -39,20 +38,19 @@ class ModuleConstantAliasListHandler
 
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBListHandler
-  ConstantAliasListType createListElement(final ModuleType container)
-    throws JAXBException
+  ConstantAliasList createListElement(final Module container)
   {
-    final ConstantAliasListType listelem = mFactory.createConstantAliasList();
+    final ConstantAliasList listelem = mFactory.createConstantAliasList();
     container.setConstantAliasList(listelem);
     return listelem;
   }
 
-  ConstantAliasListType getListElement(final ModuleType container)
+  ConstantAliasList getListElement(final Module container)
   {
     return container.getConstantAliasList();
   }
 
-  List getList(final ConstantAliasListType listelem)
+  List getList(final ConstantAliasList listelem)
   {
     return listelem.getList();
   }

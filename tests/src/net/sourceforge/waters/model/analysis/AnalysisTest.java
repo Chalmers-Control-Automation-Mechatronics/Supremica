@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   AlgorithmsTest
 //###########################################################################
-//# $Id: AnalysisTest.java,v 1.3 2006-02-20 22:20:22 robi Exp $
+//# $Id: AnalysisTest.java,v 1.4 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -30,12 +30,14 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
-import net.sourceforge.waters.junit.WatersTestCase;
+import net.sourceforge.waters.junit.AbstractWatersTest;
 
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.xml.sax.SAXException;
 
-public class AnalysisTest extends WatersTestCase
+
+public class AnalysisTest extends AbstractWatersTest
 {
 
   //#########################################################################
@@ -100,7 +102,7 @@ public class AnalysisTest extends WatersTestCase
   //#########################################################################
   //# Overrides for junit.framework.TestCase
   protected void setUp()
-    throws JAXBException
+    throws JAXBException, SAXException
   {
     mInputDirectory = new File(getInputRoot(), "handwritten");
     mOutputDirectory = getOutputDirectory();
@@ -108,7 +110,7 @@ public class AnalysisTest extends WatersTestCase
     mProductDESFactory = ProductDESElementFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     mModuleMarshaller = new JAXBModuleMarshaller(mModuleFactory, optable);
-    mDocumentManager = new DocumentManager<DocumentProxy>();
+    mDocumentManager = new DocumentManager();
     mDocumentManager.registerMarshaller(mModuleMarshaller);
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
   }
@@ -131,6 +133,6 @@ public class AnalysisTest extends WatersTestCase
   private ModuleProxyFactory mModuleFactory;
   private ProductDESProxyFactory mProductDESFactory;
   private JAXBModuleMarshaller mModuleMarshaller;
-  private DocumentManager<DocumentProxy> mDocumentManager;
+  private DocumentManager mDocumentManager;
 
 }

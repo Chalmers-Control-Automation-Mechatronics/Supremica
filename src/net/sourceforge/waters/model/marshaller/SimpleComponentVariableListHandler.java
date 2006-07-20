@@ -4,30 +4,28 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   SimpleComponentVariableListHandler
 //###########################################################################
-//# $Id: SimpleComponentVariableListHandler.java,v 1.2 2006-03-02 12:12:50 martin Exp $
+//# $Id: SimpleComponentVariableListHandler.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.util.List;
-import javax.xml.bind.JAXBException;
-
 
 import net.sourceforge.waters.model.module.VariableProxy;
 
-import net.sourceforge.waters.xsd.module.VariableListType;
-import net.sourceforge.waters.xsd.module.SimpleComponentType;
+import net.sourceforge.waters.xsd.module.VariableList;
+import net.sourceforge.waters.xsd.module.SimpleComponent;
 import net.sourceforge.waters.xsd.module.ObjectFactory;
 
 
 class SimpleComponentVariableListHandler
-  extends JAXBListHandler<SimpleComponentType,VariableListType,VariableProxy>
+  extends JAXBListHandler<SimpleComponent,VariableList,VariableProxy>
 {
 
 
   //#########################################################################
   //# Constructors
-	SimpleComponentVariableListHandler()
+  SimpleComponentVariableListHandler()
   {
     this(null);
   }
@@ -40,20 +38,19 @@ class SimpleComponentVariableListHandler
 
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBCheckedListHandler
-  VariableListType createListElement(final SimpleComponentType container)
-    throws JAXBException
+  VariableList createListElement(final SimpleComponent container)
   {
-    final VariableListType listelem = mFactory.createVariableList();
+    final VariableList listelem = mFactory.createVariableList();
     container.setVariableList(listelem);
     return listelem;
   }
   
-  VariableListType getListElement(final SimpleComponentType container)
+  VariableList getListElement(final SimpleComponent container)
   {
     return container.getVariableList();
   }
 
-  List getList(final VariableListType listelem)
+  List getList(final VariableList listelem)
   {
     return listelem.getList();
   }

@@ -9,18 +9,17 @@ public class CompoundCommand
 {
 	private boolean mInProgress;
 	private List<Command> mCommands;
-	private String mDescription;
+	private final String mDescription;
 	
 	public CompoundCommand()
 	{
-		mInProgress = true;
-		mCommands = new ArrayList();
-		mDescription = "Compound Command";
+		this("Compound Command");
 	}
 	
 	public CompoundCommand(String name)
 	{
-		this();
+		mInProgress = true;
+		mCommands = new ArrayList();
 		mDescription = name;
 	}
 	

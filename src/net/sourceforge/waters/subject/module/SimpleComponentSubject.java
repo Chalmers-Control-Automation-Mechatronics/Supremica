@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SimpleComponentSubject
 //###########################################################################
-//# $Id: SimpleComponentSubject.java,v 1.6 2006-05-24 09:13:02 markus Exp $
+//# $Id: SimpleComponentSubject.java,v 1.7 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -13,6 +13,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.waters.model.base.EqualCollection;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.GraphProxy;
@@ -99,18 +101,57 @@ public final class SimpleComponentSubject
 
 
   //#########################################################################
-  //# Equality
-  public boolean equals(final Object partner)
+  //# Equality and Hashcode
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final SimpleComponentSubject downcast = (SimpleComponentSubject) partner;
       return
         mKind.equals(downcast.mKind) &&
-        mGraph.equals(downcast.mGraph) &&
-        mVariables.equals(downcast.mVariables);
+        mGraph.equalsByContents(downcast.mGraph) &&
+        EqualCollection.isEqualListByContents
+          (mVariables, downcast.mVariables);
     } else {
       return false;
     }
+  }
+
+  public boolean equalsWithGeometry(final Proxy partner)
+  {
+    if (super.equalsByContents(partner)) {
+      final SimpleComponentSubject downcast = (SimpleComponentSubject) partner;
+      return
+        mKind.equals(downcast.mKind) &&
+        mGraph.equalsWithGeometry(downcast.mGraph) &&
+        EqualCollection.isEqualListWithGeometry
+          (mVariables, downcast.mVariables);
+    } else {
+      return false;
+    }
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mKind.hashCode();
+    result *= 5;
+    result += mGraph.hashCodeByContents();
+    result *= 5;
+    result += EqualCollection.getListHashCodeByContents(mVariables);
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mKind.hashCode();
+    result *= 5;
+    result += mGraph.hashCodeWithGeometry();
+    result *= 5;
+    result += EqualCollection.getListHashCodeWithGeometry(mVariables);
+    return result;
   }
 
 

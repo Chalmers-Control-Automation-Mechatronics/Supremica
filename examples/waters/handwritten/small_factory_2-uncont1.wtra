@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SafetyTrace Name="small_factory_2-uncont1" ProductDES="small_factory_2"
+  xmlns="http://waters.sourceforge.net/xsd/des">
+
+<AutomatonRefList>
+  <AutomatonRef Name="buffer"/>
+  <AutomatonRef Name="repair"/>
+  <AutomatonRef Name="machine1"/>
+  <AutomatonRef Name="machine2"/>
+</AutomatonRefList>
+
+<TraceStepList>
+  <EventRef Name="start1"/>
+  <EventRef Name="finish1"/>
+  <EventRef Name="start1"/>
+  <EventRef Name="finish1"/>
+</TraceStepList>
+
+</SafetyTrace>

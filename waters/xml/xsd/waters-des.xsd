@@ -56,8 +56,8 @@
   <xs:complexType>
     <xs:complexContent>
       <xs:extension base="B:NamedType">
-	<xs:attribute name="Kind" type="B:EventKind" use="required"/>
-	<xs:attribute name="Observable" type="xs:boolean" default="true"/>
+        <xs:attribute name="Kind" type="B:EventKind" use="required"/>
+        <xs:attribute name="Observable" type="xs:boolean" default="true"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -183,6 +183,134 @@
     </xs:complexContent>
   </xs:complexType>
 </xs:element>
+
+
+<!-- ==================================================================== -->
+<!-- Trace                                                                -->
+<!-- ==================================================================== -->
+
+<xs:complexType name="TraceType">
+  <xs:complexContent>
+    <xs:extension base="B:NamedType">
+      <xs:sequence>
+        <xs:element ref="D:AutomatonRefList" minOccurs="0"/>
+        <xs:element ref="D:TraceStepList" minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute name="ProductDES" type="xs:string" use="required"/>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:element name="SafetyTrace">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="D:TraceType"/>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="ConflictTrace">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="D:TraceType">
+        <xs:attribute name="Kind" type="D:ConflictKind" default="CONFLICT"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="LoopTrace">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="D:TraceType">
+        <xs:attribute name="LoopIndex" type="xs:int" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="AutomatonRefList">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="D:AutomatonRef" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="List"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="TraceStepList">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="D:TraceStateTuple" minOccurs="0">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="InitialState"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+          <xs:sequence maxOccurs="unbounded">
+            <xs:element ref="D:EventRef"/>
+            <xs:element ref="D:TraceStateTuple" minOccurs="0"/>
+          </xs:sequence>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+
+<xs:element name="AutomatonRef">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:NamedType"/>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="TraceStateTuple">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="D:TraceState" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="List"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="TraceState">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:attribute name="Automaton" type="xs:string" use="required"/>
+        <xs:attribute name="State" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:simpleType name="ConflictKind">
+  <xs:annotation><xs:appinfo>
+    <jaxb:typesafeEnumClass/>
+  </xs:appinfo></xs:annotation>
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="CONFLICT"/>
+    <xs:enumeration value="DEADLOCK"/>
+    <xs:enumeration value="LIVELOCK"/>
+  </xs:restriction>
+</xs:simpleType>
 
 
 </xs:schema>

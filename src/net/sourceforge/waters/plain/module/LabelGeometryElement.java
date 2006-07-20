@@ -4,13 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   LabelGeometryElement
 //###########################################################################
-//# $Id: LabelGeometryElement.java,v 1.5 2006-05-24 09:13:02 markus Exp $
+//# $Id: LabelGeometryElement.java,v 1.6 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
 
 import java.awt.geom.Point2D;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
@@ -67,10 +68,10 @@ public final class LabelGeometryElement
 
 
   //#########################################################################
-  //# Equality
-  public boolean equals(final Object partner)
+  //# Equality and Hashcode
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final LabelGeometryElement downcast = (LabelGeometryElement) partner;
       return
         mOffset.equals(downcast.mOffset) &&
@@ -78,6 +79,16 @@ public final class LabelGeometryElement
     } else {
       return false;
     }
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mOffset.hashCode();
+    result *= 5;
+    result += mAnchor.hashCode();
+    return result;
   }
 
 

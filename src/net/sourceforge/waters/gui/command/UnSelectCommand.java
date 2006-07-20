@@ -5,22 +5,24 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.gui.ControlledSurface;
-import net.sourceforge.waters.gui.EditorObject;
-import net.sourceforge.waters.gui.EditorLabelGroup;
+
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.ProxySubject;
 
 public class UnSelectCommand
 	implements Command
 {
-	private final List<EditorObject> mUnSelected;
+	private final List<ProxySubject> mUnSelected;
 	private final ControlledSurface mSurface;
-	private final CompoundCommand mCommands;
+	//private final CompoundCommand mCommands;
 	
 	public UnSelectCommand(ControlledSurface surface,
-						 List<? extends EditorObject> unselected)
+						 List<? extends ProxySubject> unselected)
 	{
 		mUnSelected = new ArrayList(unselected);
-		mCommands = new CompoundCommand();
-		for (EditorObject o : unselected)
+		//mCommands = new CompoundCommand();
+		//at this point I think i'll handle this differently now
+		/*for (Subject s : unselected)
 		{
 			if (o instanceof EditorLabelGroup)
 			{
@@ -28,34 +30,34 @@ public class UnSelectCommand
 				Command c = new UnSelectLabelCommand(l, l.getSelected());
 				mCommands.addCommand(c);
 			}
-		}
-		mCommands.end();
+		}*/
+		//mCommands.end();
 		mSurface = surface;
 	}
 	
 	public UnSelectCommand(ControlledSurface surface,
-						 EditorObject unselected)
+						 	ProxySubject unselected)
 	{
 		this(surface, Collections.singletonList(unselected));
 	}
 	
 	public void execute()
 	{
-		mCommands.execute();
-		for (EditorObject o : mUnSelected)
+		//mCommands.execute();
+		for (ProxySubject s : mUnSelected)
 		{
-			mSurface.unselect(o);			
+			mSurface.unselect(s);			
 		}
 		mSurface.getEditorInterface().setDisplayed();
 	}
 	
 	public void undo()
 	{
-		for (EditorObject o : mUnSelected)
+		for (ProxySubject s : mUnSelected)
 		{
-			mSurface.select(o);
+			mSurface.select(s);
 		}
-		mCommands.undo();
+		//mCommands.undo();
 		mSurface.getEditorInterface().setDisplayed();
 	}
 	

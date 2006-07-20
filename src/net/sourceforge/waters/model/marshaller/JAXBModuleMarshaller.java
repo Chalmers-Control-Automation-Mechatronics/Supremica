@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleMarshaller
 //###########################################################################
-//# $Id: JAXBModuleMarshaller.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: JAXBModuleMarshaller.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 
@@ -15,22 +15,25 @@ import javax.xml.bind.JAXBException;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.xsd.module.ModuleType;
+import net.sourceforge.waters.xsd.module.Module;
+
+import org.xml.sax.SAXException;
 
 
 public class JAXBModuleMarshaller
-  extends JAXBMarshaller<ModuleProxy,ModuleType>
+  extends JAXBMarshaller<ModuleProxy,Module>
 {
 
   //#########################################################################
   //# Constructors
   public JAXBModuleMarshaller(final ModuleProxyFactory factory,
                               final OperatorTable optable)
-    throws JAXBException
+    throws JAXBException, SAXException
   {
     super(new JAXBModuleExporter(),
           new JAXBModuleImporter(factory, optable),
-          "net.sourceforge.waters.xsd.module");
+          "net.sourceforge.waters.xsd.module",
+          "waters-module.xsd");
   }
 
 
@@ -46,9 +49,9 @@ public class JAXBModuleMarshaller
     return ModuleProxy.class;
   }
 
-  public Class<ModuleType> getElementClass()
+  public Class<Module> getElementClass()
   {
-    return ModuleType.class;
+    return Module.class;
   }
 
 }

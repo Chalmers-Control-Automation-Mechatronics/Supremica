@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.element.base
 //# CLASS:   CloningGeometryListElement
 //###########################################################################
-//# $Id: CloningGeometryListElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: CloningGeometryListElement.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.base;
@@ -26,7 +26,7 @@ import net.sourceforge.waters.model.unchecked.Casting;
  * geometry information (e.g., for {@link java.awt.geom.Point2D Point2D
  * Point2D} objects), which can be modified by accessing their data
  * members. To ensure the immutable character of the model implementation,
- * this list class clones eny objects before inserting them into the list,
+ * this list class clones any objects before inserting them into the list,
  * and only returns copies of its elements in its retrieve methods. This is
  * an immutable list, so modification methods throw {@link
  * UnsupportedOperationException}.

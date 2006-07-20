@@ -196,6 +196,27 @@
     </ComponentList>
   </ForeachComponent>
   <SimpleComponent Kind="PLANT">
+    <SimpleIdentifier Name="turn"/>
+    <Graph>
+      <NodeList>
+        <SimpleNode Name="white" Initial="true"/>
+        <SimpleNode Name="black"/>
+      </NodeList>
+      <EdgeList>
+        <Edge Source="white" Target="black">
+          <LabelBlock>
+            <SimpleIdentifier Name="white"/>
+          </LabelBlock>
+        </Edge>
+        <Edge Source="black" Target="white">
+          <LabelBlock>
+            <SimpleIdentifier Name="black"/>
+          </LabelBlock>
+        </Edge>
+      </EdgeList>
+    </Graph>
+  </SimpleComponent>
+  <SimpleComponent Kind="PLANT">
     <SimpleIdentifier Name="game_over"/>
     <Graph>
       <NodeList>

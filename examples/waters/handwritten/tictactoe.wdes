@@ -346,6 +346,52 @@
 	<Transition Event="draw" Source="black" Target="black"/>
       </TransitionList>
     </Automaton>
+    <Automaton Kind="PLANT" Name="turn">
+      <EventRefList>
+        <EventRef Name="black[1][1]"/>
+        <EventRef Name="black[1][2]"/>
+        <EventRef Name="black[1][3]"/>
+        <EventRef Name="black[2][1]"/>
+        <EventRef Name="black[2][2]"/>
+        <EventRef Name="black[2][3]"/>
+        <EventRef Name="black[3][1]"/>
+        <EventRef Name="black[3][2]"/>
+        <EventRef Name="black[3][3]"/>
+        <EventRef Name="white[1][1]"/>
+        <EventRef Name="white[1][2]"/>
+        <EventRef Name="white[1][3]"/>
+        <EventRef Name="white[2][1]"/>
+        <EventRef Name="white[2][2]"/>
+        <EventRef Name="white[2][3]"/>
+        <EventRef Name="white[3][1]"/>
+        <EventRef Name="white[3][2]"/>
+        <EventRef Name="white[3][3]"/>
+      </EventRefList>
+      <StateList>
+        <State Name="black"/>
+        <State Initial="true" Name="white"/>
+      </StateList>
+      <TransitionList>
+        <Transition Target="white" Source="black" Event="black[1][1]"/>
+        <Transition Target="white" Source="black" Event="black[1][2]"/>
+        <Transition Target="white" Source="black" Event="black[1][3]"/>
+        <Transition Target="white" Source="black" Event="black[2][1]"/>
+        <Transition Target="white" Source="black" Event="black[2][2]"/>
+        <Transition Target="white" Source="black" Event="black[2][3]"/>
+        <Transition Target="white" Source="black" Event="black[3][1]"/>
+        <Transition Target="white" Source="black" Event="black[3][2]"/>
+        <Transition Target="white" Source="black" Event="black[3][3]"/>
+        <Transition Target="black" Source="white" Event="white[1][1]"/>
+        <Transition Target="black" Source="white" Event="white[1][2]"/>
+        <Transition Target="black" Source="white" Event="white[1][3]"/>
+        <Transition Target="black" Source="white" Event="white[2][1]"/>
+        <Transition Target="black" Source="white" Event="white[2][2]"/>
+        <Transition Target="black" Source="white" Event="white[2][3]"/>
+        <Transition Target="black" Source="white" Event="white[3][1]"/>
+        <Transition Target="black" Source="white" Event="white[3][2]"/>
+        <Transition Target="black" Source="white" Event="white[3][3]"/>
+      </TransitionList>
+    </Automaton>
     <Automaton Kind="SPEC" Name="white_never_wins">
       <EventRefList>
 	<EventRef Name="white_win_d1"/>

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   IndexedTreeSet
 //###########################################################################
-//# $Id: IndexedTreeSet.java,v 1.2 2005-11-03 01:24:15 robi Exp $
+//# $Id: IndexedTreeSet.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -120,7 +120,7 @@ public class IndexedTreeSet<P extends NamedProxy>
       final NamedProxy proxy = (NamedProxy) object;
       final String name = proxy.getName();
       final P found = get(name);
-      return found.equals(proxy);
+      return found != null && found.equals(proxy);
     } else {
       return false;
     }
@@ -158,7 +158,7 @@ public class IndexedTreeSet<P extends NamedProxy>
     }
   }
 
-  public void checkUnique(final P proxy)
+  public void checkUnique(final NamedProxy proxy)
   {
     final String name = proxy.getName();
     final P found = find(name);

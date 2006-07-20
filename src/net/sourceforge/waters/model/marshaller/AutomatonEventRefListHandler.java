@@ -4,23 +4,22 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   AutomatonEventRefListHandler
 //###########################################################################
-//# $Id: AutomatonEventRefListHandler.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: AutomatonEventRefListHandler.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.util.List;
-import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.des.EventProxy;
 
-import net.sourceforge.waters.xsd.des.AutomatonType;
-import net.sourceforge.waters.xsd.des.EventRefListType;
+import net.sourceforge.waters.xsd.des.Automaton;
+import net.sourceforge.waters.xsd.des.EventRefList;
 import net.sourceforge.waters.xsd.des.ObjectFactory;
 
 
 class AutomatonEventRefListHandler
-  extends JAXBCheckedListHandler<AutomatonType,EventRefListType,EventProxy>
+  extends JAXBCheckedListHandler<Automaton,EventRefList,EventProxy>
 {
   
   //#########################################################################
@@ -38,20 +37,19 @@ class AutomatonEventRefListHandler
   
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBListHandler
-  EventRefListType createListElement(AutomatonType container)
-    throws JAXBException
+  EventRefList createListElement(Automaton container)
   {
-    final EventRefListType listelem = mFactory.createEventRefList();
+    final EventRefList listelem = mFactory.createEventRefList();
     container.setEventRefList(listelem);
     return listelem;
   }
 
-  EventRefListType getListElement(AutomatonType container)
+  EventRefList getListElement(Automaton container)
   {
     return container.getEventRefList();
   }
 
-  List getList(EventRefListType listelem)
+  List getList(EventRefList listelem)
   {
     return listelem.getList();
   }

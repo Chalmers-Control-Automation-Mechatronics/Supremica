@@ -4,14 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBListHandler
 //###########################################################################
-//# $Id: JAXBListHandler.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: JAXBListHandler.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.util.Collection;
 import java.util.List;
-import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
@@ -28,8 +27,7 @@ abstract class JAXBListHandler
 
   //#########################################################################
   //# Provided by Subclasses
-  abstract L createListElement(C container)
-    throws JAXBException;
+  abstract L createListElement(C container);
 
   abstract L getListElement(C container);
 
@@ -41,7 +39,7 @@ abstract class JAXBListHandler
   void toJAXB(final ProxyVisitor exporter,
 	      final Collection<? extends P> proxies,
 	      final C container)
-    throws JAXBException, VisitorException
+    throws VisitorException
   {
     if (!proxies.isEmpty()) {
       final L listelem = createListElement(container);

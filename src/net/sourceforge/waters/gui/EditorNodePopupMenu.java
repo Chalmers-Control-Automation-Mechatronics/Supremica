@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorLabel
 //###########################################################################
-//# $Id: EditorNodePopupMenu.java,v 1.11 2006-03-20 22:50:27 flordal Exp $
+//# $Id: EditorNodePopupMenu.java,v 1.12 2006-07-20 02:28:36 robi Exp $
 //###########################################################################
 
 
@@ -17,6 +17,13 @@ import org.supremica.util.VPopupMenu;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.DeleteNodeCommand;
+import net.sourceforge.waters.gui.command.SetNodeInitialCommand;
+import net.sourceforge.waters.gui.command.ToggleNodeInitialCommand;
+
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
+import net.sourceforge.waters.gui.renderer.LabelProxyShape;
+import net.sourceforge.waters.gui.command.CreateEdgeCommand;
+import java.awt.geom.Point2D;
 
 /**
  * Popup for editing attributes of a node.
@@ -25,16 +32,17 @@ class EditorNodePopupMenu
 	extends VPopupMenu
 	implements ActionListener
 {
-	private EditorNode node;
+	private SimpleNodeSubject node;
 	private ControlledSurface parent;
 
 	private JMenuItem deleteItem;
 	private JMenuItem initialItem;	
 	private JMenuItem recallItem;	
 	private JMenuItem markItem;	
-	private JMenuItem clearItem;	
+	private JMenuItem clearItem;
+  private JMenuItem createSelfLoop;
 
-	public EditorNodePopupMenu(ControlledSurface parent, EditorNode node)
+	public EditorNodePopupMenu(ControlledSurface parent, SimpleNodeSubject node)
 	{
 		this.parent = parent;
 		this.node = node;
@@ -53,15 +61,23 @@ class EditorNodePopupMenu
 		item.addActionListener(this);
 		this.add(item);
 		deleteItem = item;
-
-		item = new JMenuItem("Make initial");
-		item.addActionListener(this);
-		this.add(item);
-		// Disable "initial" is node already is initial
-		if (node.isInitial())
+		if (parent.getGraph().isDeterministic())
 		{
-			item.setEnabled(false);
-			item.setToolTipText("State is already initial");
+			item = new JMenuItem("Make initial");
+			item.addActionListener(this);
+			this.add(item);
+			// Disable "initial" is node already is initial
+			if (node.isInitial())
+			{
+				item.setEnabled(false);
+				item.setToolTipText("State is already initial");
+			}
+		}
+		else
+		{
+			item = new JMenuItem("Toggle initial");
+			item.addActionListener(this);
+			this.add(item);
 		}
 		initialItem = item;
 
@@ -69,8 +85,8 @@ class EditorNodePopupMenu
 		item.addActionListener(this);
 		this.add(item);
 		// Disable "recall" if label is in right position (or maybe instead if it is close enough?)
-		if ((parent.getLabel(node).getOffsetX() == EditorLabel.DEFAULTOFFSETX) && 
-			(parent.getLabel(node).getOffsetY() == EditorLabel.DEFAULTOFFSETY))
+		if ((node.getLabelGeometry().getOffset().getX() == LabelProxyShape.DEFAULTOFFSETX) && 
+			(node.getLabelGeometry().getOffset().getY() == LabelProxyShape.DEFAULTOFFSETY))
 		{
 			item.setEnabled(false);
 			item.setToolTipText("Label is already in default position");
@@ -81,7 +97,7 @@ class EditorNodePopupMenu
 		item.addActionListener(this);
 		this.add(item);
 		// Disable if there are no propositions
-		if (node.hasPropositions())
+		if (!node.getPropositions().getEventList().isEmpty())
 		{
 			item.setEnabled(false);
 			item.setToolTipText("State is marked already");
@@ -92,46 +108,63 @@ class EditorNodePopupMenu
 		item.addActionListener(this);
 		this.add(item);
 		// Disable if there are no propositions
-		if (!node.hasPropositions())
+		if (node.getPropositions().getEventList().isEmpty())
 		{
 			item.setEnabled(false);
 			item.setToolTipText("State has no marking");
 		}
 		clearItem = item;
+    item = new JMenuItem("Create Self Loop");
+    item.addActionListener(this);
+    this.add(item);
+    createSelfLoop = item;
 	}
 
 	public void actionPerformed(ActionEvent e) 
 	{
 		if (e.getSource() == deleteItem)
 		{
-			Command deleteNode = new DeleteNodeCommand(parent, node);
+			Command deleteNode = new DeleteNodeCommand(parent.getGraph(), node);
 			parent.getEditorInterface().getUndoInterface().executeCommand(deleteNode);
 		}
 
 		if (e.getSource() == initialItem)
 		{
-			if (!node.getSubject().isInitial())
+			Command initial;
+			if (parent.getGraph().isDeterministic())
 			{
-				parent.unsetAllInitial();
-				node.getSubject().setInitial(true);
+				initial = new SetNodeInitialCommand(parent.getGraph(), node);
 			}
+			else
+			{
+				initial = new ToggleNodeInitialCommand(node);
+			}
+			parent.getEditorInterface().getUndoInterface().executeCommand(initial);
 		}
 
 		if (e.getSource() == recallItem) {
-			final EditorLabel label = parent.getLabel(node);
+			System.out.println("Re-Implement Later with Command");
+			/*final EditorLabel label = parent.getLabel(node);
 			label.setOffset(EditorLabel.DEFAULTOFFSETX,
-							EditorLabel.DEFAULTOFFSETY);
+							EditorLabel.DEFAULTOFFSETY);*/
 		}
 
 		if (e.getSource() == markItem)
 		{
-			node.addDefaultProposition();
+			//node.addDefaultProposition();
 		}
 
 		if (e.getSource() == clearItem)
 		{
-			node.clearPropositions();
+			System.out.println("Re-Implement Later with Command");
+		/*	node.clearPropositions();*/
 		}
+    
+    if (e.getSource() == createSelfLoop) {
+      Point2D p = node.getPointGeometry().getPoint();
+      Command selfLoop = new CreateEdgeCommand(parent.getGraph(), node, node, p, p);
+      parent.getEditorInterface().getUndoInterface().executeCommand(selfLoop);
+    }
 
 		this.hide();
 		parent.repaint();

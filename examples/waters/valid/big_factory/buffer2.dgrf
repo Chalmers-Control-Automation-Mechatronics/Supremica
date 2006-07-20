@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="buffer2" version="1.0" valid="1"
+	hasGeometry="1" width="148" height="160"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-05-13 04:12:59 GMT" modificationDate="2005-05-13 04:14:43 GMT">
+	<events>
+		<event controllable="0" name="finish1"/>
+		<event controllable="0" name="finish2"/>
+		<event controllable="1" name="start1"/>
+		<event controllable="1" name="start2"/>
+		<event controllable="1" name="start3"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="144" y="160"/></rendering>
+			<label name="s2">
+				<rendering><point x="12" y="6"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="144" y="32"/></rendering>
+			<label name="s0">
+				<rendering><point x="12" y="5"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="144" y="96"/></rendering>
+			<label name="s1">
+				<rendering><point x="14" y="6"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="104" y="96"/></rendering>
+			<source name="s1"/>
+			<labelGroup>
+				<rendering><point x="-35" y="-4"/></rendering>
+				<label name="start1"/>
+				<label name="start2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="160" y="129"/></rendering>
+			<source name="s1"/>
+			<target name="s2"/>
+			<labelGroup>
+				<rendering><point x="6" y="-5"/></rendering>
+				<label name="finish1"/>
+				<label name="finish2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="130" y="64"/></rendering>
+			<source name="s1"/>
+			<target name="s0"/>
+			<labelGroup>
+				<rendering><point x="-39" y="5"/></rendering>
+				<label name="start3"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="128" y="128"/></rendering>
+			<source name="s2"/>
+			<target name="s1"/>
+			<labelGroup>
+				<rendering><point x="-37" y="5"/></rendering>
+				<label name="start3"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="159" y="65"/></rendering>
+			<source name="s0"/>
+			<target name="s1"/>
+			<labelGroup>
+				<rendering><point x="5" y="-6"/></rendering>
+				<label name="finish1"/>
+				<label name="finish2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="105" y="32"/></rendering>
+			<source name="s0"/>
+			<labelGroup>
+				<rendering><point x="-36" y="-4"/></rendering>
+				<label name="start1"/>
+				<label name="start2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

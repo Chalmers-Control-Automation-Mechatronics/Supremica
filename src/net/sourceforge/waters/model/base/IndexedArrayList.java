@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   IndexedArrayList
 //###########################################################################
-//# $Id: IndexedArrayList.java,v 1.2 2005-11-03 01:24:15 robi Exp $
+//# $Id: IndexedArrayList.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -90,32 +90,6 @@ public class IndexedArrayList<P extends NamedProxy>
 
 
   //#########################################################################
-  //# Equals and Hashcode
-  public boolean equalsWithGeometry(final Object partner)
-  {
-    if (!(partner instanceof List<?>)) {
-      return false;
-    }
-    final List<?> list = (List<?>) partner;
-    if (size() != list.size()) {
-      return false;
-    }
-    final Iterator<P> iter1 = iterator();
-    final Iterator<?> iter2 = list.iterator();
-    while (iter1.hasNext()) {
-      final P item1 = iter1.next();
-      final Object item2 = iter2.next();
-      if (item1 == null && item2 != null) {
-        return false;
-      } else if (!item1.equalsWithGeometry(item2)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-
-  //#########################################################################
   //# Interface java.util.List
   public void add(final int index, final P proxy)
   {
@@ -128,7 +102,7 @@ public class IndexedArrayList<P extends NamedProxy>
       final NamedProxy proxy = (NamedProxy) item;
       final String name = proxy.getName();
       final P found = mProxyMap.get(name);
-      return found.equals(proxy);
+      return found != null && found.equals(proxy);
     } else {
       return false;
     }
@@ -195,7 +169,7 @@ public class IndexedArrayList<P extends NamedProxy>
     }
   }
 
-  public void checkUnique(final P proxy)
+  public void checkUnique(final NamedProxy proxy)
   {
     final String name = proxy.getName();
     final P found = find(name);

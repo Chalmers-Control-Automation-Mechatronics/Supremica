@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   SimpleNodeElement
 //###########################################################################
-//# $Id: SimpleNodeElement.java,v 1.5 2006-05-24 09:13:02 markus Exp $
+//# $Id: SimpleNodeElement.java,v 1.6 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -12,7 +12,7 @@ package net.sourceforge.waters.plain.module;
 import java.util.Collections;
 import java.util.Set;
 
-import net.sourceforge.waters.model.base.Geometry;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
@@ -90,10 +90,10 @@ public final class SimpleNodeElement
 
 
   //#########################################################################
-  //# Equality
-  public boolean equals(final Object partner)
+  //# Equality and Hashcode
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final SimpleNodeElement downcast = (SimpleNodeElement) partner;
       return
         (mIsInitial == downcast.mIsInitial);
@@ -102,18 +102,53 @@ public final class SimpleNodeElement
     }
   }
 
-  public boolean equalsWithGeometry(final Object partner)
+  public boolean equalsWithGeometry(final Proxy partner)
   {
-    if (super.equalsWithGeometry(partner)) {
+    if (super.equalsByContents(partner)) {
       final SimpleNodeElement downcast = (SimpleNodeElement) partner;
       return
         (mIsInitial == downcast.mIsInitial) &&
-        Geometry.equalGeometry(mPointGeometry, downcast.mPointGeometry) &&
-        Geometry.equalGeometry(mInitialArrowGeometry, downcast.mInitialArrowGeometry) &&
-        Geometry.equalGeometry(mLabelGeometry, downcast.mLabelGeometry);
+        (mPointGeometry == null ? downcast.mPointGeometry == null :
+         mPointGeometry.equalsWithGeometry(downcast.mPointGeometry)) &&
+        (mInitialArrowGeometry == null ? downcast.mInitialArrowGeometry == null :
+         mInitialArrowGeometry.equalsWithGeometry(downcast.mInitialArrowGeometry)) &&
+        (mLabelGeometry == null ? downcast.mLabelGeometry == null :
+         mLabelGeometry.equalsWithGeometry(downcast.mLabelGeometry));
     } else {
       return false;
     }
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    if (mIsInitial) {
+      result++;
+    }
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    if (mIsInitial) {
+      result++;
+    }
+    result *= 5;
+    if (mPointGeometry != null) {
+      result += mPointGeometry.hashCodeWithGeometry();
+    }
+    result *= 5;
+    if (mInitialArrowGeometry != null) {
+      result += mInitialArrowGeometry.hashCodeWithGeometry();
+    }
+    result *= 5;
+    if (mLabelGeometry != null) {
+      result += mLabelGeometry.hashCodeWithGeometry();
+    }
+    return result;
   }
 
 

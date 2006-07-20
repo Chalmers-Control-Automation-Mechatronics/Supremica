@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SubjectModuleTest
 //###########################################################################
-//# $Id: SubjectModuleTest.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: SubjectModuleTest.java,v 1.3 2006-07-20 02:28:38 robi Exp $
 //###########################################################################
 
 
@@ -18,12 +18,12 @@ import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.SetSubject;
 import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.model.module.AbstractModuleTest;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.ModuleTest;
 
 
-public class SubjectModuleTest extends ModuleTest
+public class SubjectModuleTest extends AbstractModuleTest
 {
 
   //#########################################################################

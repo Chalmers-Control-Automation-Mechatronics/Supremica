@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   ProductDESElement
 //###########################################################################
-//# $Id: ProductDESElement.java,v 1.5 2006-02-22 03:35:07 robi Exp $
+//# $Id: ProductDESElement.java,v 1.6 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -16,9 +16,11 @@ import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.DuplicateNameException;
+import net.sourceforge.waters.model.base.EqualCollection;
 import net.sourceforge.waters.model.base.IndexedHashSet;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.NameNotFoundException;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -68,15 +70,17 @@ public class ProductDESElement
     super(name, location);
     final EventSet eventscopy =
       events == null ? new EventSet() : new EventSet(events);
-    final AutomataSet automatacopy = new AutomataSet(automata.size());
-    if (automata != null) {
+    mEvents = Collections.unmodifiableSet(eventscopy);
+    if (automata == null || automata.isEmpty()) {
+      mAutomata = Collections.emptySet();
+    } else {
+      final AutomataSet automatacopy = new AutomataSet(automata.size());
       for (final AutomatonProxy aut : automata) {
         eventscopy.checkAllUnique(aut.getEvents());
         automatacopy.insertUnique(aut);
       }
+      mAutomata = Collections.unmodifiableSet(automatacopy);
     }
-    mEvents = Collections.unmodifiableSet(eventscopy);
-    mAutomata = Collections.unmodifiableSet(automatacopy);
   }
 
   /**
@@ -170,18 +174,27 @@ public class ProductDESElement
 
   //#########################################################################
   //# Equals and Hashcode
-  public boolean equals(final Object partner)
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final ProductDESElement des = (ProductDESElement) partner;
       return
-        mEvents.equals(des.mEvents) &&
-        mAutomata.equals(des.mAutomata);
+        EqualCollection.isEqualSetByContents(mEvents, des.mEvents) &&
+        EqualCollection.isEqualSetByContents(mAutomata, des.mAutomata);
     } else {
       return false;
     }    
   }
 
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += EqualCollection.getSetHashCodeByContents(mEvents);
+    result *= 5;
+    result += EqualCollection.getSetHashCodeByContents(mAutomata);
+    return result;
+  }
 
   //#########################################################################
   //# Auxiliary Methods
@@ -255,21 +268,21 @@ public class ProductDESElement
     {
       return new ItemNotFoundException
         ("Product DES '" + getName() +
-         "' does not contain the state named '" + name + "'!");
+         "' does not contain the automaton named '" + name + "'!");
     }
 
     protected NameNotFoundException createNameNotFound(final String name)
     {
       return new NameNotFoundException
         ("Product DES '" + getName() +
-         "' does not contain a state named '" + name + "'!");
+         "' does not contain an automaton named '" + name + "'!");
     }
 
     protected DuplicateNameException createDuplicateName(final String name)
     {
       return new DuplicateNameException
         ("Product DES '" + getName() +
-         "' already contains a state named '" + name + "'!");
+         "' already contains an automaton named '" + name + "'!");
     }
   
   }

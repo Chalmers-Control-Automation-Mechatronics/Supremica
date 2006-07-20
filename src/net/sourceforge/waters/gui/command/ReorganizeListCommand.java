@@ -11,7 +11,6 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import net.sourceforge.waters.gui.ControlledSurface;
-import net.sourceforge.waters.gui.EditorLabelGroup;
 
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
@@ -26,9 +25,9 @@ public class ReorganizeListCommand
 	private final int mNewPosition;
 	private final String mDescription = "Move Event";
 	
-	public ReorganizeListCommand(EventListExpressionSubject group,								 
-								 List<? extends AbstractSubject> identifiers,
-								 int newPosition)
+	public ReorganizeListCommand(EventListExpressionSubject group,
+                               List<? extends AbstractSubject> identifiers,
+                               int newPosition)
 	{		
 		mList = group;
 		mIdentifiers = new ArrayList<AbstractSubject>(identifiers.size());
@@ -38,7 +37,7 @@ public class ReorganizeListCommand
 			public int compare(AbstractSubject a1, AbstractSubject a2)
 			{
 				return (mList.getEventListModifiable().indexOf(a1) -
-						mList.getEventListModifiable().indexOf(a2));
+                mList.getEventListModifiable().indexOf(a2));
 			}
 			
 			public boolean equals(Object o)
@@ -57,8 +56,7 @@ public class ReorganizeListCommand
 	
 	public void execute()
 	{		
-		final List<AbstractSubject> list =
-						mList.getEventListModifiable();
+		final List<AbstractSubject> list = mList.getEventListModifiable();
 		list.removeAll(mIdentifiers);
 		int i = 0;
 		for (AbstractSubject a : mIdentifiers)

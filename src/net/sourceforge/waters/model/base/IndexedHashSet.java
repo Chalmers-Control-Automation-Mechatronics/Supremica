@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   IndexedHashSet
 //###########################################################################
-//# $Id: IndexedHashSet.java,v 1.3 2006-05-04 15:09:20 martin Exp $
+//# $Id: IndexedHashSet.java,v 1.4 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -129,9 +129,7 @@ public class IndexedHashSet<P extends NamedProxy>
       final NamedProxy proxy = (NamedProxy) object;
       final String name = proxy.getName();
       final P found = get(name);
-      if(found != null) {
-    	  return found.equals(proxy);
-      } else return false;
+      return found != null && found.equals(proxy);
     } else {
       return false;
     }
@@ -169,7 +167,7 @@ public class IndexedHashSet<P extends NamedProxy>
     }
   }
 
-  public void checkUnique(final P proxy)
+  public void checkUnique(final NamedProxy proxy)
   {
     final String name = proxy.getName();
     final P found = find(name);

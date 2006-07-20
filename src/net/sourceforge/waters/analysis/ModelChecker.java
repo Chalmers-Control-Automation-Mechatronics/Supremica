@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ModelChecker
 //###########################################################################
-//# $Id: ModelChecker.java,v 1.1 2005-05-08 00:24:31 robi Exp $
+//# $Id: ModelChecker.java,v 1.2 2006-07-20 02:28:36 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -11,6 +11,8 @@ package net.sourceforge.waters.analysis;
 import java.util.List;
 
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.TraceProxy;
 
 
 /**
@@ -32,7 +34,11 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
  * all can be done with the following code.</P>
  *
  * <P>
- * <CODE>ModelChecker checker = new ControllabilityChecker(des);
+ * <CODE>{@link ProductDESProxyFactory} factory =
+ *   {@link net.sourceforge.waters.plain.des.ProductDESElementFactory}.{@link
+ *   net.sourceforge.waters.plain.des.ProductDESElementFactory#getInstance()
+ *   getInstance}();</CODE><BR>
+ * <CODE>ModelChecker checker = new ControllabilityChecker(des, factory);
  * //</CODE> <I>e.g.</I><BR>
  * <CODE>checker.{@link #run()};</CODE><BR>
  * <CODE>boolean result = checker.{@link #getResult()};</CODE><BR>
@@ -40,8 +46,8 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
  * <CODE>&nbsp;&nbsp;//</CODE> <I>property satisfied ...</I><BR>
  * <CODE>} else {</CODE><BR>
  * <CODE>&nbsp;&nbsp;//</CODE> <I>property not satisfied ...</I><BR>
- * <CODE>&nbsp;&nbsp;{@link List} counterexample =
- *   checker.{@link #getCounterExample()};</CODE><BR>
+ * <CODE>&nbsp;&nbsp;{@link net.sourceforge.waters.model.des.SafetyTraceProxy}
+ *   counterexample = checker.{@link #getCounterExample()};</CODE><BR>
  * <CODE>}</CODE></P>
  *
  * <P>This class is to be subclassed to implement model checking
@@ -60,10 +66,13 @@ public abstract class ModelChecker
   /**
    * Creates a new model checker to check a particular model.
    * @param  model   The model to be checked by this model checker.
+   * @param  factory Factory used for trace construction.
    */
-  public ModelChecker(final ProductDESProxy model)
+  public ModelChecker(final ProductDESProxy model,
+		      final ProductDESProxyFactory factory)
   {
     mModel = model;
+    mFactory = factory;
   }
 
 
@@ -90,11 +99,20 @@ public abstract class ModelChecker
    * Gets the model under investigation by this model checker.
    * @return The model checked by this model checker,
    *         as passed into its constructor
-   *         {@link #ModelChecker(ProductDESProxy) ModelChecker()}.
+   *         {@link #ModelChecker(ProductDESProxy,ProductDESProxyFactory)
+   *         ModelChecker()}.
    */
   public ProductDESProxy getModel()
   {
     return mModel;
+  }
+
+  /**
+   * Gets the factory used for trace construction.
+   */
+  public ProductDESProxyFactory getFactory()
+  {
+    return mFactory;
   }
 
   /**
@@ -110,16 +128,14 @@ public abstract class ModelChecker
   /**
    * Gets a counterexample if model checking has found that the
    * property checked is not satisfied.
-   * @return A list of events of type
-   *         {@link net.sourceforge.waters.model.des.EventProxy EventProxy}
-   *         representing an error trace. The event objects returned
-   *         must be part of the model that was checked.
+   * @return A trace object constructed for the model that was checked.
+   *         It shares events and automata with the input model.
    * @throws IllegalStateException if this method is called before
    *         model checking has completed, i.e., before {@link #run()}
    *         has been called, or model checking has found that the
    *         property is satisfied and there is no counterexample.
    */
-  public abstract List getCounterExample();
+  public abstract TraceProxy getCounterExample();
   
 
   //#########################################################################
@@ -128,5 +144,10 @@ public abstract class ModelChecker
    * The model under investigation by this model checker.
    */
   private final ProductDESProxy mModel;
+
+  /**
+   * The factory used for trace construction.
+   */
+  private final ProductDESProxyFactory mFactory;
 
 }

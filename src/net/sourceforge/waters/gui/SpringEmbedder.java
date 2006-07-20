@@ -21,7 +21,7 @@ import net.sourceforge.waters.model.module.EdgeProxy;
 
 public class SpringEmbedder
 {	
-	static public void run(EditorSurface s, GraphProxy g, int iterations)
+/*	static public void run(EditorSurface s, GraphProxy g, int iterations)
 	{
 		Map<Proxy, Object> movements = new IdentityHashMap<Proxy, Object>();
 		Collection<Proxy> proxyies = new ArrayList<Proxy>();
@@ -332,5 +332,5 @@ public class SpringEmbedder
 			edge.getGeometry().getPoints().get(0).setLocation(p);
 			return null;
 		}
-	}
+	}*/
 }

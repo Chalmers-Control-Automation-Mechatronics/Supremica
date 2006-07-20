@@ -5,42 +5,43 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.gui.ControlledSurface;
-import net.sourceforge.waters.gui.EditorObject;
+
+import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.base.ProxySubject;
 
 public class SelectCommand
 	implements Command
 {
-	private final List<EditorObject> mSelected;
+	private final List<ProxySubject> mSelected;
 	private final ControlledSurface mSurface;
 	
 	public SelectCommand(ControlledSurface surface,
-						 List<? extends EditorObject> selected)
+						 List<? extends ProxySubject> selected)
 	{
-		mSelected = new ArrayList(selected.size());
-		mSelected.addAll(selected);
+		mSelected = new ArrayList(selected);
 		mSurface = surface;
 	}
 	
 	public SelectCommand(ControlledSurface surface,
-						 EditorObject selected)
+						 ProxySubject selected)
 	{
 		this(surface, Collections.singletonList(selected));
 	}
 	
 	public void execute()
 	{
-		for (EditorObject o : mSelected)
+		for (ProxySubject s: mSelected)
 		{
-			mSurface.select(o);
+			mSurface.select(s);
 		}
 		mSurface.getEditorInterface().setDisplayed();
 	}
 	
 	public void undo()
 	{
-		for (EditorObject o : mSelected)
+		for (ProxySubject s: mSelected)
 		{
-			mSurface.unselect(o);
+			mSurface.unselect(s);
 		}
 		mSurface.getEditorInterface().setDisplayed();
 	}

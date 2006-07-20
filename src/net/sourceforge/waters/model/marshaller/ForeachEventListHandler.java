@@ -4,23 +4,22 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ForeachEventListHandler
 //###########################################################################
-//# $Id: ForeachEventListHandler.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ForeachEventListHandler.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.util.List;
-import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.base.Proxy;
 
 import net.sourceforge.waters.xsd.module.EventListType;
-import net.sourceforge.waters.xsd.module.ForeachEventType;
+import net.sourceforge.waters.xsd.module.ForeachEvent;
 import net.sourceforge.waters.xsd.module.ObjectFactory;
 
 
 class ForeachEventListHandler
-  extends JAXBListHandler<ForeachEventType,EventListType,Proxy>
+  extends JAXBListHandler<ForeachEvent,EventListType,Proxy>
 {
 
 
@@ -39,15 +38,14 @@ class ForeachEventListHandler
 
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBListHandler
-  EventListType createListElement(final ForeachEventType container)
-    throws JAXBException
+  EventListType createListElement(final ForeachEvent container)
   {
-    final EventListType listelem = mFactory.createEventList();
+    final EventListType listelem = mFactory.createEventListType();
     container.setEventList(listelem);
     return listelem;
   }
 
-  EventListType getListElement(final ForeachEventType container)
+  EventListType getListElement(final ForeachEvent container)
   {
     return container.getEventList();
   }

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ExpressionParser
 //###########################################################################
-//# $Id: ExpressionParser.java,v 1.6 2006-05-29 11:30:17 martin Exp $
+//# $Id: ExpressionParser.java,v 1.7 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -351,7 +351,7 @@ public class ExpressionParser {
     case Token.OPERATOR:
       final UnaryOperator op = token.getUnaryOperator();
       if (op != null) {
-        final Token nextToken = mScanner.next();
+        mScanner.next();
         final ParseResult subResult =
           parseResult(op.getPriority(), BinaryOperator.ASSOC_NONE);
         final SimpleExpressionProxy subTerm = subResult.getExpression(); 
@@ -513,7 +513,7 @@ public class ExpressionParser {
       final String typeName = getTypeName(mask);
       if (token == null) {
         throw createParseException
-          ("Expression is not of type " + typeName + "!", token);
+          ("Expression is not of type " + typeName + "!", null);
       } else {
         throw createParseException
           ("Subterm '" + expr + "' is not of type " + typeName + "!", token);

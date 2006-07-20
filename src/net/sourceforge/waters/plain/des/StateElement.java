@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   StateElement
 //###########################################################################
-//# $Id: StateElement.java,v 1.4 2006-02-22 03:35:07 robi Exp $
+//# $Id: StateElement.java,v 1.5 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.EqualCollection;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -112,16 +113,29 @@ public final class StateElement
 
   //#########################################################################
   //# Equals and Hashcode
-  public boolean equals(final Object partner)
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final StateElement state = (StateElement) partner;
       return
         (isInitial() == state.isInitial()) &&
-        EqualCollection.equalSet(mPropositions, state.mPropositions);
+        EqualCollection.isEqualSetByContents
+          (mPropositions, state.mPropositions);
     } else {
       return false;
-    }    
+    }
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    if (isInitial()) {
+      result++;
+    }
+    result *= 5;
+    result += EqualCollection.getSetHashCodeByContents(mPropositions);
+    return result;
   }
 
 

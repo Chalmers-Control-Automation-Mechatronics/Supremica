@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   IdentifiedElement
 //###########################################################################
-//# $Id: IdentifiedElement.java,v 1.4 2006-05-24 09:13:02 markus Exp $
+//# $Id: IdentifiedElement.java,v 1.5 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.IdentifiedProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.plain.base.AbstractNamedElement;
@@ -46,16 +47,24 @@ public abstract class IdentifiedElement
 
 
   //#########################################################################
-  //# Equality
-  public boolean equals(final Object partner)
+  //# Equality and Hashcode
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final IdentifiedElement downcast = (IdentifiedElement) partner;
       return
-        mIdentifier.equals(downcast.mIdentifier);
+        mIdentifier.equalsByContents(downcast.mIdentifier);
     } else {
       return false;
     }
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mIdentifier.hashCodeByContents();
+    return result;
   }
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   NamedProxy
 //###########################################################################
-//# $Id: NamedProxy.java,v 1.2 2005-11-03 01:24:15 robi Exp $
+//# $Id: NamedProxy.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -40,5 +40,10 @@ public interface NamedProxy
    * This method considers two elements as equal if they have the same name.
    */
   public boolean refequals(NamedProxy partner);
+
+  /**
+   * Computes a hash code based on the name of this element.
+   */
+  public int refHashCode();
 
 }

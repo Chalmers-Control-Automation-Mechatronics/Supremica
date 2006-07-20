@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.31 2006-07-10 17:02:15 knut Exp $
+//# $Id: ModuleContainer.java,v 1.32 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 
@@ -20,6 +20,7 @@ import javax.swing.JToolBar;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
@@ -219,6 +220,18 @@ public class ModuleContainer implements UndoInterface
 
 	public void addUndoable(UndoableEdit e)
 	{
+		if (e.isSignificant())
+		{
+			mInsignificant.end();
+			mUndoManager.addEdit(mInsignificant);
+			mInsignificant = new CompoundEdit();
+			mUndoManager.addEdit(e);
+			fireEditorChangedEvent(new UndoRedoEvent());
+		}
+		else
+		{
+			mInsignificant.addEdit(e);
+		}
 		mUndoManager.addEdit(e);
 		mIDE.getActions().editorRedoAction.setEnabled(canRedo());
 		mIDE.getActions().editorUndoAction.setEnabled(canUndo());
@@ -261,6 +274,9 @@ public class ModuleContainer implements UndoInterface
 
 	public void redo() throws CannotRedoException
 	{
+		mInsignificant.end();
+		mInsignificant.undo();
+		mInsignificant = new CompoundEdit();
 		mUndoManager.redo();
 		mIDE.getActions().editorRedoAction.setEnabled(canRedo());
 		mIDE.getActions().editorUndoAction.setEnabled(canUndo());
@@ -269,6 +285,9 @@ public class ModuleContainer implements UndoInterface
 
 	public void undo() throws CannotUndoException
 	{
+		mInsignificant.end();
+		mInsignificant.undo();
+		mInsignificant = new CompoundEdit();
 		mUndoManager.undo();
 		mIDE.getActions().editorRedoAction.setEnabled(canRedo());
 		mIDE.getActions().editorUndoAction.setEnabled(canUndo());
@@ -320,6 +339,7 @@ public class ModuleContainer implements UndoInterface
 	private final ExpressionParser mExpressionParser;
 	private final ProxyPrinter mPrinter;
 	private final UndoManager mUndoManager = new UndoManager();
+	private CompoundEdit mInsignificant = new CompoundEdit();
     private final Collection<Observer> mObservers = new LinkedList<Observer>();
 	private final Map<SimpleComponentSubject,ComponentEditorPanel>
 		mComponentToPanelMap =

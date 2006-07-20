@@ -42,11 +42,30 @@
 <property name="javalibs.dir" value="lib/unjared"/>
 
 <!-- Waters -->
-<property name="xml" location="waters/xml"/>
-<property name="xsd" location="${xml}/xsd"/>
-<property name="xsl" location="${xml}/xsl"/>
-<property name="logs" location="logs"/>
+<property name="waters.dir" location="waters"/>
+<property name="waters.xml" location="${waters.dir}/xml"/>
+<property name="waters.xsd" location="${waters.xml}/xsd"/>
+<property name="waters.xsl" location="${waters.xml}/xsl"/>
+<property name="waters.jaxbjar"
+  location="${waters.dir}/java/jar/waters_jaxb.jar"/>
 
+<!-- JAXB -->
+<property name="activation.jar" location="${lib}/activation.jar"/>
+<property name="jaxb-api.jar" location="${lib}/jaxb-api.jar"/>
+<property name="jaxb-impl.jar" location="${lib}/jaxb-impl.jar"/>
+<property name="jsr173_api.jar" location="${lib}/jsr173_1.0_api.jar"/>
+
+<path id="jaxb.classpath">
+  <pathelement location="${activation.jar}"/>
+  <pathelement location="${jaxb-api.jar}"/>
+  <pathelement location="${jaxb-impl.jar}"/>
+  <pathelement location="${jsr173_api.jar}"/>
+</path>
+
+<path id="supremica.classpath">
+  <path refid="jaxb.classpath"/>
+  <pathelement location="${dist}/SupremicaLib.jar"/>
+</path>
 
 <!-- Enables emacs warning and error mesages. This is equal to calling jikes +E -->
 <!-- Put this in TextPad to get clickable error messages
@@ -75,8 +94,8 @@
 </target>
 -->
 
-<target name="initialize_jars">	
-    <!-- PLEASE ADD COMMENTS DESCRIBING THE DIFFERENT LIBRARIES. -->
+<target name="initialize_jars" depends="jar_waters_jaxb">	
+        <!-- PLEASE ADD COMMENTS DESCRIBING THE DIFFERENT LIBRARIES. -->
 	<unjar src="${lib}/JGo.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/JGoLayout.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/antlr.jar" dest="${lib}/${unjared}"/>
@@ -101,7 +120,7 @@
 	<unjar src="${lib}/CCOM.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/jacorb.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/jutils.jar" dest="${lib}/${unjared}"/>	
-	<unjar src="${lib}/xalan.jar" dest="${lib}/${unjared}"/>	
+<!--	<unjar src="${lib}/xalan.jar" dest="${lib}/${unjared}"/>-->
 	<unjar src="${lib}/xmlBlaster.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/xtdash.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/jgrafchart.jar" dest="${lib}/${unjared}"/>	
@@ -109,23 +128,17 @@
 	<unjar src="${lib}/WMFWriter2D.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/sysutils.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/swixml.jar" dest="${lib}/${unjared}"/>
-	<unjar src="${lib}/jaxb-api.jar" dest="${lib}/${unjared}"/>
-	<unjar src="${lib}/jaxb-impl.jar" dest="${lib}/${unjared}"/>
-	<unjar src="${lib}/jaxb-libs.jar" dest="${lib}/${unjared}"/>
-	<unjar src="${lib}/jax-qname.jar" dest="${lib}/${unjared}"/>
-	<unjar src="${lib}/namespace.jar" dest="${lib}/${unjared}"/>
-	<unjar src="${lib}/relaxngDatatype.jar" dest="${lib}/${unjared}"/>
-	<unjar src="${lib}/xsdlib.jar" dest="${lib}/${unjared}"/>	
-	<unjar src="${lib}/waters_jaxb.jar" dest="${lib}/${unjared}"/>		
-	<unjar src="${lib}/fuber.jar" dest="${lib}/${unjared}"/>		
-	<unjar src="${lib}/automationobjects_jaxb.jar" dest="${lib}/${unjared}"/>	
-	<unjar src="${lib}/manufacturingTables_jaxb.jar" dest="${lib}/${unjared}"/>	
-	<unjar src="${lib}/itext.jar" dest="${lib}/${unjared}"/>		
+	<unjar src="${waters.jaxbjar}" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/fuber.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/automationobjects_jaxb.jar"
+               dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/manufacturingTables_jaxb.jar"
+               dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/itext.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/java_cup.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/bsh.jar" dest="${lib}/${unjared}"/>	
-	<unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>	
+	<unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>
 	<unjar src="${lib}/swing-worker.jar" dest="${resources}"/>	
-	
 	<!-- Ant 1.6.0 is not able to unjar empty jar files -->
 	<!--
 	<mkdir dir="${lib}/licensed"/>
@@ -148,6 +161,7 @@
 	<mkdir dir="${testsbuild}"/>
 	<delete dir="${benchmarksbuild}"/>
 	<mkdir dir="${benchmarksbuild}"/>
+	<ant dir="${waters.dir}" target="clean" inheritAll="false"/>
 </target>
 
 
@@ -211,31 +225,29 @@
 *	Reuses existing class files, but recompiles those
 *	source files that have changed.
 -->
-<target name="compile" depends="compile_supremica,compile_tests_supremica">
-</target>
 
-<!-- Compile:
-*	Reuses existing class files, but recompiles those
-*	source files that have changed.
--->
+<target name="compile" depends="compile_supremica,compile_tests_supremica"/>
+
 <target name="compile_supremica" depends="startfiles_local_supremica">
-	<javac
-		debug="on"
-		debuglevel="lines,source"
-		srcdir="${src}"
-		destdir="${build}"
-		classpath="${lib}/${unjared}"
-		includeJavaRuntime="yes"
-		deprecation="false"
-		verbose="false"
-		nowarn="true"
-        excludes="
-			${jgrafchart_basedir}/**,
-			${supremica_basedir}/external/robotCoordination/**,
-			${supremica_basedir}/automationobjects/xsd/**"	
-		fork="true"
-		memoryMaximumSize="128M"
-	/>
+  <javac debug="on"
+         debuglevel="lines,source"
+         srcdir="${src}"
+         destdir="${build}"
+         includeJavaRuntime="yes"
+         deprecation="false"
+         verbose="false"
+         nowarn="true"
+         excludes="${jgrafchart_basedir}/**,
+                   ${supremica_basedir}/external/robotCoordination/**,
+                   ${supremica_basedir}/automationobjects/xsd/**"       
+         source="1.5"
+         fork="true"
+         memoryMaximumSize="128M">
+    <classpath>    
+      <path refid="jaxb.classpath"/>
+      <pathelement location="${lib}/${unjared}"/>
+    </classpath>
+  </javac>
 </target>
 
 <target name="compile_automationobjects_jaxb">
@@ -247,9 +259,8 @@
 		deprecation="false"
 		verbose="false"
 		nowarn="true"
-		includes="${supremica_basedir}/automationobjects/xsd/**"		
-		source="1.5"
-	/>
+		includes="${supremica_basedir}/automationobjects/xsd/**"
+		source="1.5"/>
 </target>
 
 <!-- Compile:
@@ -295,22 +306,20 @@
 *	source files that have changed.
 -->
 <target name="compile_tests_supremica">
-	<javac
-		debug="on"
-		debuglevel="lines,source"
-		srcdir="${testssrc}"
-		destdir="${testsbuild}"
-                excludes="net/sourceforge/waters/junit/**/*.java"
-		includeJavaRuntime="yes"
-		deprecation="false"
-		verbose="false"
-		source="1.5"
-		>
-		<classpath>	
-			<pathelement location="${build}" />
-			<pathelement path="${lib}/${unjared}" />
-		</classpath>
-	</javac>
+  <javac debug="on"
+         debuglevel="lines,source"
+         srcdir="${testssrc}"
+         destdir="${testsbuild}"
+         excludes="net/sourceforge/waters/**/*.java"
+         includeJavaRuntime="yes"
+         deprecation="false"
+         verbose="false"
+         source="1.5">
+    <classpath> 
+      <pathelement location="${build}"/>
+      <pathelement path="${lib}/${unjared}"/>
+    </classpath>
+  </javac>
 </target>
 
 <!-- Compile Supremica Benchmarks
@@ -441,21 +450,38 @@
 	</jar>
 </target>
 
-<target name="jar_supremica">
-	<jar jarfile="${dist}/Supremica.jar" manifest="${templates}/SUPREMICA_MANIFEST.MF"> 
-		<fileset dir="${build}">
-			<!--patternset-->
-				<include name="**/*"/>
-			<!--/patternset-->			
-		</fileset>
-		<fileset dir="${images}"/>
-		<fileset dir="${examples}"/>
-		<fileset dir="${animations}"/>		
-		<fileset dir="${userinterfaces}"/>	
-		<fileset dir="${runtimesoftplcbuild}"/>			
-		<zipfileset file="${xsl}/vw.xsl"
-			fullpath="net/sourceforge/waters/valid/vw.xsl"/>
-	</jar>
+<target name="downloads_supremica">
+  <pathconvert refid="supremica.classpath"
+      pathsep=" " property="manifest.pathlist">
+    <mapper type="flatten"/>
+  </pathconvert>
+  <echo file="${build}/manifest.txt">Manifest-Version: 1.0
+Created-By: Knut Akesson
+Main-Class: org.supremica.apps.Supremica
+Class-Path: ${manifest.pathlist}</echo>
+  <pathconvert refid="jaxb.classpath"
+      pathsep=" " property="copy.pathlist">
+    <mapper type="flatten"/>
+  </pathconvert>
+  <copy flatten="true" todir="${dist}">
+    <fileset dir="${lib}" includes="${copy.pathlist}"/>
+  </copy>
+</target>
+
+<target name="jar_supremica" depends="downloads_supremica">
+  <jar jarfile="${dist}/Supremica.jar" manifest="${build}/manifest.txt"> 
+    <fileset dir="${build}"/>
+    <fileset dir="${images}"/>
+    <fileset dir="${examples}"/>
+    <fileset dir="${animations}"/>              
+    <fileset dir="${userinterfaces}"/>  
+    <fileset dir="${runtimesoftplcbuild}"/>                     
+    <zipfileset file="${waters.xsl}/vw.xsl"
+                fullpath="net/sourceforge/waters/valid/vw.xsl"/>
+    <zipfileset dir="${waters.xsd}"
+                includes="*.xsd"
+                prefix="net/sourceforge/waters/model/marshaller"/>
+  </jar>
 </target>
 
 <target name="jar_supremica_standalone">
@@ -470,25 +496,7 @@
 
 
 <target name="jar_waters_jaxb">
-	<jar jarfile="${lib}/waters_jaxb.jar"> 
-		<fileset dir="${build}/">
-			<include name="org/w3/**"/>
-			<include name="net/sourceforge/waters/xsd/**"/>
-		</fileset>
-		<fileset dir="${src}/">
-			<include name="**/*.properties"/>
-			<include name="**/*.ser"/>
-		</fileset>
-	</jar>
-	<delete>
-		<fileset dir="${lib}">
-			<!--patternset id="cleanjaxbunjaredclassfiles"-->
-				<include name="org/w3/**"/>
-				<include name="net/sourceforge/waters/xsd/**"/>
-			<!--/patternset-->
-		</fileset>
-	</delete>
-	<unjar src="${lib}/waters_jaxb.jar" dest="${lib}/${unjared}"/>		
+  <ant dir="${waters.dir}" target="jaxb-jar" inheritAll="false"/>
 </target>
 
 <target name="jar_automationobjects_jaxb" depends="compile_automationobjects_jaxb">
@@ -679,38 +687,9 @@
 	</junit>
 </target>
 
-<target name="run_tests_waters" depends="compile_supremica,compile_tests_supremica">
-	<mkdir dir="${logs}/des"/>
-	<mkdir dir="${logs}/module"/>
-	<mkdir dir="${logs}/expression"/>
-	<mkdir dir="${logs}/compiler"/>
-	<mkdir dir="${logs}/algorithms"/>
-	<mkdir dir="${logs}/analysis"/>
-	<mkdir dir="${logs}/maze"/>
-	<mkdir dir="${logs}/valid"/>
-	<junit printsummary="on" fork="true">
-		<formatter type="brief" extension=".log"/>
-		<test name="net.sourceforge.waters.junit.ProductDESTest"
-			outfile="logs/des/testrun"/>
-		<test name="net.sourceforge.waters.junit.ModuleTest"
-			outfile="logs/module/testrun"/>
-		<test name="net.sourceforge.waters.junit.ExpressionTest"
-			outfile="logs/expression/testrun"/>
-		<test name="net.sourceforge.waters.junit.CompilerTest"
-			outfile="logs/compiler/testrun"/>
-		<test name="net.sourceforge.waters.junit.AnalysisTest"
-			outfile="logs/analysis/testrun"/>
-		<test name="net.sourceforge.waters.junit.AlgorithmsTest"
-			outfile="logs/algorithms/testrun"/>
-		<test name="net.sourceforge.waters.junit.MazeTest"
-			outfile="logs/maze/testrun"/>
-		<test name="net.sourceforge.waters.junit.ValidTest"
-			outfile="logs/valid/testrun"/>
-		<classpath>
-			<path refid="external-classpath"/>
-			<pathelement location="${jar.file}"/>
-		</classpath>
-	</junit>
+<target name="run_tests_waters"
+        depends="compile_supremica,compile_tests_supremica">
+  <ant dir="${waters.dir}" target="test-java" inheritAll="false"/>
 </target>
 
 <target name="bdd_tests" depends="compile_supremica,startfiles_supremica">

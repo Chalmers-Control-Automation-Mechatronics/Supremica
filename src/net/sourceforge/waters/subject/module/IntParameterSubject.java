@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   IntParameterSubject
 //###########################################################################
-//# $Id: IntParameterSubject.java,v 1.5 2006-05-24 09:13:02 markus Exp $
+//# $Id: IntParameterSubject.java,v 1.6 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;

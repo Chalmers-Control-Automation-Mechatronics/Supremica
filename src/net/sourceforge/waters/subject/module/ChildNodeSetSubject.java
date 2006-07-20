@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ChildNodeSetSubject
 //###########################################################################
-//# $Id: ChildNodeSetSubject.java,v 1.3 2006-03-29 12:13:46 flordal Exp $
+//# $Id: ChildNodeSetSubject.java,v 1.4 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -95,36 +95,6 @@ class ChildNodeSetSubject
     } catch (final CloneNotSupportedException exception) {
       throw new WatersRuntimeException(exception);
     }
-  }
-
-
-  //#########################################################################
-  //# Equals and Hashcode
-  public boolean equalsWithGeometry(final Object partner)
-  {
-    if (!(partner instanceof Set<?>)) {
-      return false;
-    }
-    final Set<?> set = (Set<?>) partner;
-    if (size() != set.size()) {
-      return false;
-    }
-    for (final Object item2 : set) {
-      if (!contains(item2)) {
-        return false;
-      } else {
-        for (final NodeSubject node1 : this) {
-          if (node1.equals(item2)) {
-            if (node1.equalsWithGeometry(item2)) {
-              break;
-            } else {
-              return false;
-            }
-          }
-        }
-      }
-    }
-    return true;
   }
 
 

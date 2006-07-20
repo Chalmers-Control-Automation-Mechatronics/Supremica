@@ -4,23 +4,22 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ModuleComponentListHandler
 //###########################################################################
-//# $Id: ModuleComponentListHandler.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ModuleComponentListHandler.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.util.List;
-import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.base.Proxy;
 
-import net.sourceforge.waters.xsd.module.ComponentListType;
-import net.sourceforge.waters.xsd.module.ModuleType;
+import net.sourceforge.waters.xsd.module.ComponentList;
+import net.sourceforge.waters.xsd.module.Module;
 import net.sourceforge.waters.xsd.module.ObjectFactory;
 
 
 class ModuleComponentListHandler
-  extends JAXBListHandler<ModuleType,ComponentListType,Proxy>
+  extends JAXBListHandler<Module,ComponentList,Proxy>
 {
 
 
@@ -39,20 +38,19 @@ class ModuleComponentListHandler
 
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBListHandler
-  ComponentListType createListElement(final ModuleType container)
-    throws JAXBException
+  ComponentList createListElement(final Module container)
   {
-    final ComponentListType listelem = mFactory.createComponentList();
+    final ComponentList listelem = mFactory.createComponentList();
     container.setComponentList(listelem);
     return listelem;
   }
 
-  ComponentListType getListElement(final ModuleType container)
+  ComponentList getListElement(final Module container)
   {
     return container.getComponentList();
   }
 
-  List getList(final ComponentListType listelem)
+  List getList(final ComponentList listelem)
   {
     return listelem.getList();
   }

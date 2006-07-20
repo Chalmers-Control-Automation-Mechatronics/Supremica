@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorOptions
 //###########################################################################
-//# $Id: EditorOptions.java,v 1.4 2005-08-17 14:59:09 flordal Exp $
+//# $Id: EditorOptions.java,v 1.5 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -17,6 +17,7 @@ import java.awt.dnd.*;
 import java.awt.event.*;
 import java.util.*;
 import java.beans.*;
+import net.sourceforge.waters.gui.renderer.EdgeProxyShape;
 
 public class EditorOptions
 	extends JDialog
@@ -192,8 +193,8 @@ public class EditorOptions
 		JPanel edgeArrowPanel = new JPanel();
 		JLabel edgeArrowLabel = new JLabel("Edge arrow position");
 		ButtonGroup edgeArrowButtons = new ButtonGroup();
-		JRadioButton inTheMiddle = new JRadioButton("In the middle", !EditorEdge.getArrowAtEnd());
-		JRadioButton atTheEnd = new JRadioButton("At the end", EditorEdge.getArrowAtEnd());
+		JRadioButton inTheMiddle = new JRadioButton("In the middle", !EdgeProxyShape.getArrowAtEnd());
+		JRadioButton atTheEnd = new JRadioButton("At the end", EdgeProxyShape.getArrowAtEnd());
 		edgeArrowButtons.add(inTheMiddle);
 		edgeArrowButtons.add(atTheEnd);
 		edgeArrowPanel.add(edgeArrowLabel);
@@ -206,7 +207,7 @@ public class EditorOptions
 			{
 				JRadioButton b = (JRadioButton) e.getSource();
 				
-				EditorEdge.setArrowAtEnd(!b.isSelected());
+				EdgeProxyShape.setArrowAtEnd(!b.isSelected());
 				r.repaint();
 			}
 		});

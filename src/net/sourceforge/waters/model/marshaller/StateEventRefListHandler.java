@@ -4,23 +4,22 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   StateEventRefListHandler
 //###########################################################################
-//# $Id: StateEventRefListHandler.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: StateEventRefListHandler.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.util.List;
-import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.des.EventProxy;
 
-import net.sourceforge.waters.xsd.des.EventRefListType;
+import net.sourceforge.waters.xsd.des.EventRefList;
 import net.sourceforge.waters.xsd.des.ObjectFactory;
-import net.sourceforge.waters.xsd.des.StateType;
+import net.sourceforge.waters.xsd.des.State;
 
 
 class StateEventRefListHandler
-  extends JAXBCheckedListHandler<StateType,EventRefListType,EventProxy>
+  extends JAXBCheckedListHandler<State,EventRefList,EventProxy>
 {
   
   //#########################################################################
@@ -38,20 +37,19 @@ class StateEventRefListHandler
   
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBListHandler
-  EventRefListType createListElement(StateType container)
-    throws JAXBException
+  EventRefList createListElement(State container)
   {
-    final EventRefListType listelem = mFactory.createEventRefList();
+    final EventRefList listelem = mFactory.createEventRefList();
     container.setPropositions(listelem);
     return listelem;
   }
 
-  EventRefListType getListElement(StateType container)
+  EventRefList getListElement(State container)
   {
     return container.getPropositions();
   }
 
-  List getList(EventRefListType listelem)
+  List getList(EventRefList listelem)
   {
     return listelem.getList();
   }

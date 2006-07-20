@@ -21,7 +21,7 @@ public class EditorSelectAction
 		putValue(Action.NAME, "Select");
 		putValue(Action.SHORT_DESCRIPTION, "Select");
 		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/select16.gif")));
-		putValue(Action.ACTION_COMMAND_KEY, ControlledSurface.SELECT);
+		putValue(Action.ACTION_COMMAND_KEY, ControlledSurface.Tool.SELECT.toString());
 	}
 
 	public void actionPerformed(ActionEvent e)

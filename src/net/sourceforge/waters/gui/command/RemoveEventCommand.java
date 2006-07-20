@@ -5,7 +5,6 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import net.sourceforge.waters.gui.ControlledSurface;
-import net.sourceforge.waters.gui.EditorLabelGroup;
 
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
@@ -22,7 +21,7 @@ public class RemoveEventCommand
 							  AbstractSubject identifier) 
 	{
 		mList = group;
-		mIdentifier = identifier.clone();
+		mIdentifier = identifier;
 		mPosition = mList.getEventListModifiable().indexOf(mIdentifier);
 	}
 	

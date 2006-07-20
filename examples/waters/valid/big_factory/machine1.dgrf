@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="machine1" version="1.0" valid="1"
+	hasGeometry="1" width="153" height="122"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2004-03-29 21:40:31 GMT" modificationDate="2004-04-20 21:24:15 GMT">
+	<events>
+		<event controllable="0" name="break1"/>
+		<event controllable="0" name="finish1"/>
+		<event controllable="1" name="repair1"/>
+		<event controllable="1" name="start1"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="144" y="64"/></rendering>
+			<label name="IDLE">
+				<rendering><point x="10" y="1"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="96" y="144"/></rendering>
+			<label name="WORKING">
+				<rendering><point x="-28" y="23"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="192" y="144"/></rendering>
+			<label name="DOWN">
+				<rendering><point x="-20" y="23"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<source name="WORKING"/>
+			<target name="DOWN"/>
+			<labelGroup>
+				<rendering><point x="-20" y="-3"/></rendering>
+				<label name="break1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="108" y="100"/></rendering>
+			<source name="WORKING"/>
+			<target name="IDLE"/>
+			<labelGroup>
+				<rendering><point x="-40" y="-6"/></rendering>
+				<label name="finish1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="DOWN"/>
+			<target name="IDLE"/>
+			<labelGroup>
+				<rendering><point x="1" y="-1"/></rendering>
+				<label name="repair1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="130" y="112"/></rendering>
+			<source name="IDLE"/>
+			<target name="WORKING"/>
+			<labelGroup>
+				<rendering><point x="-13" y="2"/></rendering>
+				<label name="start1"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

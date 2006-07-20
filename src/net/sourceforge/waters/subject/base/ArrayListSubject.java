@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   ArrayListSubject
 //###########################################################################
-//# $Id: ArrayListSubject.java,v 1.3 2006-02-16 04:06:18 robi Exp $
+//# $Id: ArrayListSubject.java,v 1.4 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -113,22 +113,61 @@ public class ArrayListSubject<P extends ProxySubject>
 
   //#########################################################################
   //# Equals and Hashcode
-  public boolean equalsWithGeometry(final Object partner)
+  /**
+   * Checks whether this list has the same contents as another list.
+   * To be considered equal, the two lists must have the same size,
+   * and contain proxies that are considered as equal by their
+   * {@link Proxy#equalsByContents(Proxy) equalsByContents()} methods,
+   * in the proper order.
+   */
+  public boolean equalsByContents(final List<? extends Proxy> partner)
   {
-    if (!(partner instanceof List<?>)) {
-      return false;
-    }
-    final List<?> list = (List<?>) partner;
-    if (size() != list.size()) {
+    if (size() != partner.size()) {
       return false;
     }
     final Iterator<P> iter1 = iterator();
-    final Iterator<?> iter2 = list.iterator();
+    final Iterator<? extends Proxy> iter2 = partner.iterator();
     while (iter1.hasNext()) {
-      final P elem1 = iter1.next();
-      final Object elem2 = iter2.next();
-      if (!elem1.equalsWithGeometry(elem2)) {
-        return false;
+      final P item1 = iter1.next();
+      final Proxy item2 = iter2.next();
+      if (item1 == null) {
+        if (item2 != null) {
+          return false;
+        } 
+      } else {
+        if (!item1.equalsByContents(item2)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Checks whether this list has the same contents and geometry
+   * information as another list. To be considered equal, the two lists
+   * must have the same size, and contain proxies that are considered as
+   * equal by their {@link Proxy#equalsWithGeometry(Proxy)
+   * equalsWithGeometry()} methods, in the proper order.
+   */
+  public boolean equalsWithGeometry(final List<? extends Proxy> partner)
+  {
+    if (size() != partner.size()) {
+      return false;
+    }
+    final Iterator<P> iter1 = iterator();
+    final Iterator<? extends Proxy> iter2 = partner.iterator();
+    while (iter1.hasNext()) {
+      final P item1 = iter1.next();
+      final Proxy item2 = iter2.next();
+      if (item1 == null) {
+        if (item2 != null) {
+          return false;
+        }
+      } else {
+        if (!item1.equalsWithGeometry(item2)) {
+          return false;
+        }
       }
     }
     return true;

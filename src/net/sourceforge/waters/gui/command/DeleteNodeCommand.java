@@ -1,9 +1,10 @@
 package net.sourceforge.waters.gui.command;
 
 import net.sourceforge.waters.gui.ControlledSurface;
-import net.sourceforge.waters.gui.EditorNode;
-import net.sourceforge.waters.gui.EditorEdge;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
+import net.sourceforge.waters.subject.module.GraphSubject;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -11,6 +12,7 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.CompoundEdit;
+import net.sourceforge.waters.subject.module.EdgeSubject;
 
 /**
  * the Command for Creation of nodes
@@ -21,64 +23,61 @@ import javax.swing.undo.CompoundEdit;
 public class DeleteNodeCommand 
     implements Command
 {
-    /** The ControlledSurface Edited with this Command */
-    private final ControlledSurface mSurface;
-    /** The Node Removed by this Command */
-    private final EditorNode mDeleted;
-    /** the Edge Deletion Commands Associated with this Command */
-    private final CompoundCommand mCommands = new CompoundCommand();
-    private final String mDescription = "Node Deletion";
+  /** The ControlledSurface Edited with this Command */
+  private final GraphSubject mGraph;
+  /** The Node Removed by this Command */
+  private final SimpleNodeSubject mDeleted;
+  /** the Edge Deletion Commands Associated with this Command */
+  private final CompoundCommand mCommands = new CompoundCommand();
+  private final String mDescription = "Node Deletion";
 
-    /**
-     * Constructs a new DeleteNodeCommand with the specified surface and
-     * deletes the node specified
-     *
-     * @param surface the surface edited by this command
-     * @param node the node which is to be removed
-     */
-    public DeleteNodeCommand(ControlledSurface surface, EditorNode node)
-    {
-		mSurface = surface;
-		mDeleted = node;
-		//find all attached edges
-		for (Object o: surface.getEdges()) {
-			EditorEdge e = (EditorEdge)o;
-			if ((e.getEndNode() == node) || (e.getStartNode() == node)) {
-				mCommands.addCommand(new DeleteEdgeCommand(mSurface, e));
-			}
-		}
-		mCommands.end();
+  /**
+   * Constructs a new DeleteNodeCommand with the specified surface and
+   * deletes the node specified
+   *
+   * @param surface the surface edited by this command
+   * @param node the node which is to be removed
+   */
+  public DeleteNodeCommand(GraphSubject graph, SimpleNodeSubject node)
+  {
+    mGraph = graph;
+    mDeleted = node;
+    //find all attached edges
+    for (EdgeSubject e : mGraph.getEdgesModifiable()) {
+      if ((e.getSource() == node) || (e.getTarget() == node)) {
+        mCommands.addCommand(new DeleteEdgeCommand(mGraph, e));
+      }
     }
+    mCommands.end();
+  }
 
-    /**
-     * Executes the Creation of the Node
-     */
+  /**
+   * Executes the Creation of the Node
+   */
 
-    public void execute()
-    {
-		mCommands.execute();
-		mSurface.delNode(mDeleted);
-		mSurface.getEditorInterface().setDisplayed();
-    }
+  public void execute()
+  {
+    mCommands.execute();
+    mGraph.getNodesModifiable().remove(mDeleted);
+  }
 
-    /** 
-     * Undoes the Command
-     */    
+  /** 
+   * Undoes the Command
+   */    
 
-    public void undo()
-    {
-		mSurface.addNode(mDeleted);
-		mCommands.undo();
-		mSurface.getEditorInterface().setDisplayed();
-    }
+  public void undo()
+  {
+    mGraph.getNodesModifiable().add(mDeleted);
+    mCommands.undo();
+  }
 
 	public boolean isSignificant()
 	{
 		return true;
 	}
 	
-    public String getName()
-    {
-		return mDescription;
-    }
+  public String getName()
+  {
+    return mDescription;
+  }
 }

@@ -24,7 +24,7 @@ import net.sourceforge.waters.model.expr.Value;
 /**
  * <P>The guard expression operator table.</P>
  *
- * @author Martin Byröd
+ * @author Martin Byr&ouml;d
  */
 
 public class GuardExpressionOperatorTable extends AbstractOperatorTable {

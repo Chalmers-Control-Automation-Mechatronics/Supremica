@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   GeometryProxy
 //###########################################################################
-//# $Id: GeometryProxy.java,v 1.3 2006-03-29 12:13:46 flordal Exp $
+//# $Id: GeometryProxy.java,v 1.4 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -17,8 +17,6 @@ package net.sourceforge.waters.model.base;
  * <P>This is just a marker interface to be implemented by all classes that
  * represent some kind of rendering information. These classes usually
  * contain some geometric objects from the java.awt package.</P>
- *
- * @see Geometry
  *
  * @author Robi Malik
  */

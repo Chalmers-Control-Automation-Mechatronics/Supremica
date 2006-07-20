@@ -4,23 +4,22 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ProductDESEventListHandler
 //###########################################################################
-//# $Id: ProductDESEventListHandler.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ProductDESEventListHandler.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.util.List;
-import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.des.EventProxy;
 
-import net.sourceforge.waters.xsd.des.EventListType;
+import net.sourceforge.waters.xsd.des.EventList;
 import net.sourceforge.waters.xsd.des.ObjectFactory;
-import net.sourceforge.waters.xsd.des.ProductDESType;
+import net.sourceforge.waters.xsd.des.ProductDES;
 
 
 class ProductDESEventListHandler
-  extends JAXBCheckedListHandler<ProductDESType,EventListType,EventProxy>
+  extends JAXBCheckedListHandler<ProductDES,EventList,EventProxy>
 {
   
   //#########################################################################
@@ -38,20 +37,19 @@ class ProductDESEventListHandler
   
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBListHandler
-  EventListType createListElement(ProductDESType container)
-    throws JAXBException
+  EventList createListElement(ProductDES container)
   {
-    final EventListType listelem = mFactory.createEventList();
+    final EventList listelem = mFactory.createEventList();
     container.setEventList(listelem);
     return listelem;
   }
 
-  EventListType getListElement(ProductDESType container)
+  EventList getListElement(ProductDES container)
   {
     return container.getEventList();
   }
 
-  List getList(EventListType listelem)
+  List getList(EventList listelem)
   {
     return listelem.getList();
   }

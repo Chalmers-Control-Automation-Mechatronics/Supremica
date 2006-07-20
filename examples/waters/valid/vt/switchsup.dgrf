@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+
+<graph name="switchsup"
+       valid="1"
+       hasGeometry="0"
+       generatorName="Dpr2Vmod"
+       generatorVersion="2.8"
+       version="1.0"
+       creationDate="2005-05-08 14:19:10 GMT+12:00"
+       modificationDate="2005-05-08 14:19:10 GMT+12:00">
+<events>
+<event name="curve" controllable="1"/>
+<event name="straight" controllable="1"/>
+<event name="req.1" controllable="1"/>
+<event name="req.2" controllable="1"/>
+</events>
+<nodes labelScheme="switchsup">
+<node initial="1" marked="1">
+<label name="IDLE"/>
+</node>
+<node>
+<label name="SWITCH"/>
+</node>
+</nodes>
+<edges>
+<edge>
+<source name="IDLE"/>
+<target name="SWITCH"/>
+<labelGroup>
+<label name="req.1"/>
+<label name="req.2"/>
+</labelGroup>
+</edge>
+<edge>
+<source name="SWITCH"/>
+<target name="IDLE"/>
+<labelGroup>
+<label name="curve"/>
+<label name="straight"/>
+</labelGroup>
+</edge>
+</edges>
+</graph>

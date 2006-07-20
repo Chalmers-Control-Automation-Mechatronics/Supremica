@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorToolbar
 //###########################################################################
-//# $Id: EditorToolbar.java,v 1.12 2006-03-30 15:21:55 flordal Exp $
+//# $Id: EditorToolbar.java,v 1.13 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.ToolbarChangedEvent;
+import net.sourceforge.waters.gui.ControlledSurface.Tool;
 
 /** The primary editor toolbar.
  * The toolbar sits to the left of the editor window and allows for tool selections.
@@ -41,11 +42,16 @@ public class EditorToolbar
 	public EditorToolbar()
 	{
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));		
-		mLastSelected = createButton(ControlledSurface.SELECT, "Select", true);
-		createButton(ControlledSurface.NODE, "Create Nodes", false);
-		createButton(ControlledSurface.NODEGROUP, "Create Group Nodes", false);
-		createButton(ControlledSurface.INITIAL, "Set Initial Node", false);
-		createButton(ControlledSurface.EDGE, "Create Edges", false);
+		mLastSelected = createButton(ControlledSurface.Tool.SELECT.toString()
+                                 , "Select", true);
+		createButton(ControlledSurface.Tool.NODE.toString()
+                 , "Create Nodes", false);
+		createButton(ControlledSurface.Tool.NODEGROUP.toString()
+                 , "Create Group Nodes", false);
+		createButton(ControlledSurface.Tool.INITIAL.toString()
+                 , "Set Initial Node", false);
+		createButton(ControlledSurface.Tool.EDGE.toString()
+                 , "Create Edges", false);
 	}
 
 	//#########################################################################
@@ -67,7 +73,7 @@ public class EditorToolbar
 	{
 		final JPanel panel = new JPanel();
 		final JRadioButton button = new JRadioButton();
-		final String iconname = "/icons/waters/" + command + ".gif";
+		final String iconname = "/icons/waters/" + command.toLowerCase() + ".gif";
 		final ImageIcon icon = new ImageIcon(EditorToolbar.class.getResource(iconname));
 
 		button.setActionCommand(command);
@@ -142,10 +148,11 @@ public class EditorToolbar
 		}
 	}
 
-    public String getCommand()
-    {
-		return mGroup.getSelection().getActionCommand();
-    }
+  public ControlledSurface.Tool getCommand()
+  {
+		return Enum.valueOf(ControlledSurface.Tool.class
+                        , mGroup.getSelection().getActionCommand());
+  }
 	
 	public void attach(Observer o)
 	{

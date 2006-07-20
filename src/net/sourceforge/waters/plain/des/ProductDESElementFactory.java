@@ -4,22 +4,30 @@
 //# PACKAGE: net.sourceforge.waters.plain.des;
 //# CLASS:   ProductDESElementFactory
 //###########################################################################
-//# $Id: ProductDESElementFactory.java,v 1.4 2006-02-20 22:20:22 robi Exp $
+//# $Id: ProductDESElementFactory.java,v 1.5 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.xsd.des.ConflictKind;
 
 /**
  * <P>A factory for the <I>plain</I> implementation of the Automaton
@@ -59,6 +67,27 @@ public class ProductDESElementFactory
     return new AutomatonElement(name, kind);
   }
 
+  public ConflictTraceElement createConflictTraceProxy
+    (final String name,
+     final URI location,
+     final ProductDESProxy des,
+     final Collection<? extends AutomatonProxy> automata,
+     final List<? extends TraceStepProxy> steps,
+     final ConflictKind kind)
+  {
+    return
+      new ConflictTraceElement(name, location, des, automata, steps, kind);
+  }
+
+  public ConflictTraceElement createConflictTraceProxy
+    (final String name,
+     final ProductDESProxy des,
+     final List<? extends EventProxy> events,
+     final ConflictKind kind)
+  {
+    return new ConflictTraceElement(name, des, events, kind);
+  }
+
   public EventElement createEventProxy
     (final String name,
      final EventKind kind,
@@ -70,6 +99,26 @@ public class ProductDESElementFactory
   public EventElement createEventProxy(final String name, final EventKind kind)
   {
     return new EventElement(name, kind);
+  }
+
+  public LoopTraceElement createLoopTraceProxy
+    (final String name,
+     final URI location,
+     final ProductDESProxy des,
+     final Collection<? extends AutomatonProxy> automata,
+     final List<? extends TraceStepProxy> steps,
+     final int index)
+  {
+    return new LoopTraceElement(name, location, des, automata, steps, index);
+  }
+
+  public LoopTraceElement createLoopTraceProxy
+    (final String name,
+     final ProductDESProxy des,
+     final List<? extends EventProxy> events,
+     final int index)
+  {
+    return new LoopTraceElement(name, des, events, index);
   }
 
   public ProductDESElement createProductDESProxy
@@ -94,6 +143,24 @@ public class ProductDESElementFactory
     return new ProductDESElement(name);
   }
 
+  public SafetyTraceElement createSafetyTraceProxy
+    (final String name,
+     final URI location,
+     final ProductDESProxy des,
+     final Collection<? extends AutomatonProxy> automata,
+     final List<? extends TraceStepProxy> steps)
+  {
+    return new SafetyTraceElement(name, location, des, automata, steps);
+  }
+
+  public SafetyTraceElement createSafetyTraceProxy
+    (final String name,
+     final ProductDESProxy des,
+     final List<? extends EventProxy> events)
+  {
+    return new SafetyTraceElement(name, des, events);
+  }
+
   public StateElement createStateProxy
     (final String name,
      final boolean initial,
@@ -105,6 +172,18 @@ public class ProductDESElementFactory
   public StateElement createStateProxy(final String name)
   {
     return new StateElement(name);
+  }
+
+  public TraceStepElement createTraceStepProxy
+    (final EventProxy event,
+     final Map<AutomatonProxy,StateProxy> statemap)
+  {
+    return new TraceStepElement(event, statemap);
+  }
+
+  public TraceStepElement createTraceStepProxy(final EventProxy event)
+  {
+    return new TraceStepElement(event);
   }
 
   public TransitionElement createTransitionProxy

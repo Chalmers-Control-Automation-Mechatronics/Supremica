@@ -4,23 +4,22 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   EventListExpressionEventListHandler
 //###########################################################################
-//# $Id: EventListExpressionEventListHandler.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: EventListExpressionEventListHandler.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.util.List;
-import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.base.Proxy;
 
-import net.sourceforge.waters.xsd.module.EventListExpressionType;
+import net.sourceforge.waters.xsd.module.EventListExpression;
 import net.sourceforge.waters.xsd.module.EventListType;
 import net.sourceforge.waters.xsd.module.ObjectFactory;
 
 
 class EventListExpressionEventListHandler
-  extends JAXBListHandler<EventListExpressionType,EventListType,Proxy>
+  extends JAXBListHandler<EventListExpression,EventListType,Proxy>
 {
 
 
@@ -39,15 +38,14 @@ class EventListExpressionEventListHandler
 
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBListHandler
-  EventListType createListElement(final EventListExpressionType container)
-    throws JAXBException
+  EventListType createListElement(final EventListExpression container)
   {
-    final EventListType listelem = mFactory.createEventList();
+    final EventListType listelem = mFactory.createEventListType();
     container.setEventList(listelem);
     return listelem;
   }
 
-  EventListType getListElement(final EventListExpressionType container)
+  EventListType getListElement(final EventListExpression container)
   {
     return container.getEventList();
   }

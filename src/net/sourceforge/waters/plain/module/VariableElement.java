@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   VariableElement
 //###########################################################################
-//# $Id: VariableElement.java,v 1.4 2006-05-24 09:13:02 markus Exp $
+//# $Id: VariableElement.java,v 1.5 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
@@ -76,20 +77,36 @@ public final class VariableElement
 
 
   //#########################################################################
-  //# Equality
-  public boolean equals(final Object partner)
+  //# Equality and Hashcode
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final VariableElement downcast = (VariableElement) partner;
       return
         mName.equals(downcast.mName) &&
-        mType.equals(downcast.mType) &&
-        mInitialValue.equals(downcast.mInitialValue) &&
+        mType.equalsByContents(downcast.mType) &&
+        mInitialValue.equalsByContents(downcast.mInitialValue) &&
         (mMarkedValue == null ? downcast.mMarkedValue == null :
-         mMarkedValue.equals(downcast.mMarkedValue));
+         mMarkedValue.equalsByContents(downcast.mMarkedValue));
     } else {
       return false;
     }
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mName.hashCode();
+    result *= 5;
+    result += mType.hashCodeByContents();
+    result *= 5;
+    result += mInitialValue.hashCodeByContents();
+    result *= 5;
+    if (mMarkedValue != null) {
+      result += mMarkedValue.hashCodeByContents();
+    }
+    return result;
   }
 
 

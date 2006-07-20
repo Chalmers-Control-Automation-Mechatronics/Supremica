@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   GroupNodeSubject
 //###########################################################################
-//# $Id: GroupNodeSubject.java,v 1.7 2006-05-24 09:13:02 markus Exp $
+//# $Id: GroupNodeSubject.java,v 1.8 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -13,8 +13,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-import net.sourceforge.waters.model.base.Geometry;
+import net.sourceforge.waters.model.base.EqualCollection;
 import net.sourceforge.waters.model.base.IndexedSet;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
@@ -118,28 +119,51 @@ public final class GroupNodeSubject
 
 
   //#########################################################################
-  //# Equality
-  public boolean equals(final Object partner)
+  //# Equality and Hashcode
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final GroupNodeSubject downcast = (GroupNodeSubject) partner;
       return
-        mImmediateChildNodes.equals(downcast.mImmediateChildNodes);
+        EqualCollection.isEqualSetByContents
+          (mImmediateChildNodes, downcast.mImmediateChildNodes);
     } else {
       return false;
     }
   }
 
-  public boolean equalsWithGeometry(final Object partner)
+  public boolean equalsWithGeometry(final Proxy partner)
   {
-    if (super.equalsWithGeometry(partner)) {
+    if (super.equalsByContents(partner)) {
       final GroupNodeSubject downcast = (GroupNodeSubject) partner;
       return
-        Geometry.equalSet(mImmediateChildNodes, downcast.mImmediateChildNodes) &&
-        Geometry.equalGeometry(mGeometry, downcast.mGeometry);
+        EqualCollection.isEqualSetWithGeometry
+          (mImmediateChildNodes, downcast.mImmediateChildNodes) &&
+        (mGeometry == null ? downcast.mGeometry == null :
+         mGeometry.equalsWithGeometry(downcast.mGeometry));
     } else {
       return false;
     }
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += EqualCollection.getSetHashCodeByContents(mImmediateChildNodes);
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += EqualCollection.getSetHashCodeWithGeometry(mImmediateChildNodes);
+    result *= 5;
+    if (mGeometry != null) {
+      result += mGeometry.hashCodeWithGeometry();
+    }
+    return result;
   }
 
 

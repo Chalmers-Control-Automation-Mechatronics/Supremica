@@ -15,7 +15,7 @@ package net.sourceforge.waters.model.expr;
  *
  * @see Operator
  *
- * @author Martin Byröd
+ * @author Martin Byr&ouml;d
  */
 
 public interface BooleanOperator extends Operator {

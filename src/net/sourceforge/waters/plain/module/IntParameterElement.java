@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   IntParameterElement
 //###########################################################################
-//# $Id: IntParameterElement.java,v 1.4 2006-05-24 09:13:02 markus Exp $
+//# $Id: IntParameterElement.java,v 1.5 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;

@@ -4,8 +4,9 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ShadeDialog
 //###########################################################################
-//# $Id: ShadeDialog.java,v 1.2 2005-02-18 03:09:06 knut Exp $
+//# $Id: ShadeDialog.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
+/*
 package net.sourceforge.waters.gui;
 
 import javax.swing.*;
@@ -79,4 +80,4 @@ public class ShadeDialog
 		this.pack();
 		this.setVisible(true);
 	}
-}
+}*/

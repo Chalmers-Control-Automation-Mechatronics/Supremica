@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ModuleSubject
 //###########################################################################
-//# $Id: ModuleSubject.java,v 1.6 2006-05-24 09:13:02 markus Exp $
+//# $Id: ModuleSubject.java,v 1.7 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.Geometry;
+import net.sourceforge.waters.model.base.EqualCollection;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -145,35 +145,77 @@ public final class ModuleSubject
 
 
   //#########################################################################
-  //# Equality
-  public boolean equals(final Object partner)
+  //# Equality and Hashcode
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final ModuleSubject downcast = (ModuleSubject) partner;
       return
-        mParameterList.equals(downcast.mParameterList) &&
-        mConstantAliasList.equals(downcast.mConstantAliasList) &&
-        mEventDeclList.equals(downcast.mEventDeclList) &&
-        mEventAliasList.equals(downcast.mEventAliasList) &&
-        mComponentList.equals(downcast.mComponentList);
+        EqualCollection.isEqualListByContents
+          (mParameterList, downcast.mParameterList) &&
+        EqualCollection.isEqualListByContents
+          (mConstantAliasList, downcast.mConstantAliasList) &&
+        EqualCollection.isEqualListByContents
+          (mEventDeclList, downcast.mEventDeclList) &&
+        EqualCollection.isEqualListByContents
+          (mEventAliasList, downcast.mEventAliasList) &&
+        EqualCollection.isEqualListByContents
+          (mComponentList, downcast.mComponentList);
     } else {
       return false;
     }
   }
 
-  public boolean equalsWithGeometry(final Object partner)
+  public boolean equalsWithGeometry(final Proxy partner)
   {
-    if (super.equalsWithGeometry(partner)) {
+    if (super.equalsByContents(partner)) {
       final ModuleSubject downcast = (ModuleSubject) partner;
       return
-        Geometry.equalList(mParameterList, downcast.mParameterList) &&
-        Geometry.equalList(mConstantAliasList, downcast.mConstantAliasList) &&
-        Geometry.equalList(mEventDeclList, downcast.mEventDeclList) &&
-        Geometry.equalList(mEventAliasList, downcast.mEventAliasList) &&
-        Geometry.equalList(mComponentList, downcast.mComponentList);
+        EqualCollection.isEqualListWithGeometry
+          (mParameterList, downcast.mParameterList) &&
+        EqualCollection.isEqualListWithGeometry
+          (mConstantAliasList, downcast.mConstantAliasList) &&
+        EqualCollection.isEqualListWithGeometry
+          (mEventDeclList, downcast.mEventDeclList) &&
+        EqualCollection.isEqualListWithGeometry
+          (mEventAliasList, downcast.mEventAliasList) &&
+        EqualCollection.isEqualListWithGeometry
+          (mComponentList, downcast.mComponentList);
     } else {
       return false;
     }
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += EqualCollection.getListHashCodeByContents(mParameterList);
+    result *= 5;
+    result += EqualCollection.getListHashCodeByContents(mConstantAliasList);
+    result *= 5;
+    result += EqualCollection.getListHashCodeByContents(mEventDeclList);
+    result *= 5;
+    result += EqualCollection.getListHashCodeByContents(mEventAliasList);
+    result *= 5;
+    result += EqualCollection.getListHashCodeByContents(mComponentList);
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += EqualCollection.getListHashCodeWithGeometry(mParameterList);
+    result *= 5;
+    result += EqualCollection.getListHashCodeWithGeometry(mConstantAliasList);
+    result *= 5;
+    result += EqualCollection.getListHashCodeWithGeometry(mEventDeclList);
+    result *= 5;
+    result += EqualCollection.getListHashCodeWithGeometry(mEventAliasList);
+    result *= 5;
+    result += EqualCollection.getListHashCodeWithGeometry(mComponentList);
+    return result;
   }
 
 

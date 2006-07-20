@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ProxyPrinter
 //###########################################################################
-//# $Id: ProxyPrinter.java,v 1.4 2005-11-10 21:54:42 robi Exp $
+//# $Id: ProxyPrinter.java,v 1.5 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;
@@ -20,6 +20,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.base.AbstractProxyVisitor;
 import net.sourceforge.waters.model.base.ComparableProxy;
+import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -166,6 +167,36 @@ public class ProxyPrinter
     }
   }
 
+  public void printEmptyRefCollection
+    (final Collection<? extends NamedProxy> collection)
+    throws VisitorException
+  {
+    if (collection.isEmpty()) {
+      print("{}");
+    } else {
+      println('{');
+      indentIn();
+      for (final NamedProxy proxy : collection) {
+        println(proxy.getName());
+      }
+      indentOut();
+      print('}');
+    }
+  }
+
+  public void printRefCollection
+    (final String label,
+     final Collection<? extends NamedProxy> collection)
+    throws VisitorException
+  {
+    if (!collection.isEmpty()) {
+      print(label);
+      print(' ');
+      printEmptyRefCollection(collection);
+      println();
+    }
+  }
+
   public <P extends ComparableProxy<? super P>>
   void printSortedCollection(final String label,
                              final Collection<? extends P> collection)
@@ -192,6 +223,16 @@ public class ProxyPrinter
     final List<P> list = new ArrayList<P>(collection);
     Collections.sort(list);
     printEmptyCollection(list);
+  }
+
+  public void printSortedRefCollection
+    (final String label,
+     final Collection<? extends NamedProxy> collection)
+    throws VisitorException
+  {
+    final List<NamedProxy> list = new ArrayList<NamedProxy>(collection);
+    Collections.sort(list);
+    printRefCollection(label, list);
   }
 
 

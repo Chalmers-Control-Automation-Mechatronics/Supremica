@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   IdentifiedSubject
 //###########################################################################
-//# $Id: IdentifiedSubject.java,v 1.5 2006-05-24 09:13:02 markus Exp $
+//# $Id: IdentifiedSubject.java,v 1.6 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.IdentifiedProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.subject.base.AbstractNamedSubject;
@@ -51,16 +52,24 @@ public abstract class IdentifiedSubject
 
 
   //#########################################################################
-  //# Equality
-  public boolean equals(final Object partner)
+  //# Equality and Hashcode
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final IdentifiedSubject downcast = (IdentifiedSubject) partner;
       return
-        mIdentifier.equals(downcast.mIdentifier);
+        mIdentifier.equalsByContents(downcast.mIdentifier);
     } else {
       return false;
     }
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mIdentifier.hashCodeByContents();
+    return result;
   }
 
 

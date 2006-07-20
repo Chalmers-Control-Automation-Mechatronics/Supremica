@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ProxyMarshaller
 //###########################################################################
-//# $Id: ProxyUnmarshaller.java,v 1.3 2006-02-20 22:20:21 robi Exp $
+//# $Id: ProxyUnmarshaller.java,v 1.4 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -16,7 +16,7 @@ import java.util.Collection;
 import net.sourceforge.waters.model.base.DocumentProxy;
 
 /**
- * <P>A helper class to write Waters documents to files.</P>
+ * <P>A helper class to read Waters documents from files.</P>
  *
  * <P>The ProxyUnmarshaller is a simple wrapper that provides an easy way
  * to load a document from a file.</P> 
@@ -60,5 +60,20 @@ public interface ProxyUnmarshaller<D extends DocumentProxy>
    * by this marshaller.
    */
   public Collection<String> getSupportedExtensions();
+
+
+  //#########################################################################
+  //# Entity Resolving
+  /**
+   * Gets the document manager used by this unmarshaller to resolve
+   * references to other files.
+   */
+  public DocumentManager getDocumentManager();
+
+  /**
+   * Sets a document manager to used by this unmarshaller to resolve
+   * references to other files.
+   */
+  public void setDocumentManager(DocumentManager manager);
 
 }

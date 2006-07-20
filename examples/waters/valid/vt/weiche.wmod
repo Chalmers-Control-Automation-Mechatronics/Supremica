@@ -1,0 +1,1386 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="weiche" xmlns="http://waters.sourceforge.net/xsd/module">
+<ConstantAliasList>
+<ConstantAlias>
+<SimpleIdentifier Name="TRAINS"/>
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</ConstantAlias>
+<ConstantAlias>
+<SimpleIdentifier Name="POS"/>
+<EnumSetExpression>
+<SimpleIdentifier Name="l1"/>
+<SimpleIdentifier Name="l2"/>
+<SimpleIdentifier Name="m1"/>
+<SimpleIdentifier Name="m2"/>
+<SimpleIdentifier Name="r1"/>
+<SimpleIdentifier Name="r2"/>
+</EnumSetExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Name="not_at">
+<EnumSetExpression>
+<SimpleIdentifier Name="r1"/>
+<SimpleIdentifier Name="r2"/>
+<SimpleIdentifier Name="l1"/>
+<SimpleIdentifier Name="l2"/>
+<SimpleIdentifier Name="m1"/>
+<SimpleIdentifier Name="m2"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="stopped">
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="at">
+<EnumSetExpression>
+<SimpleIdentifier Name="r2"/>
+<SimpleIdentifier Name="l2"/>
+<SimpleIdentifier Name="m1"/>
+<SimpleIdentifier Name="m2"/>
+<SimpleIdentifier Name="r1"/>
+<SimpleIdentifier Name="l1"/>
+</EnumSetExpression>
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="straight"/>
+<EventDecl Kind="CONTROLLABLE" Name="req">
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="curve"/>
+<EventDecl Kind="CONTROLLABLE" Name="enable">
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name=":omega"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="coll_l1r1_m1"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l2"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l2"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m1"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m1"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r2"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r2"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="req">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="req">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="T12">
+<PointGeometry>
+<Point Y="112" X="352"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="21" X="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="T1">
+<PointGeometry>
+<Point Y="112" X="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="25" X="-8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="T2">
+<PointGeometry>
+<Point Y="272" X="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-12" X="-7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="T21">
+<PointGeometry>
+<Point Y="272" X="352"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-9" X="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="IN">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="187" X="161"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="6" X="12"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="T12" Source="T12">
+<LabelBlock>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="req">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="-27"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="66" X="354"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="T2" Source="T12">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m1"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-37" X="13"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="T2" Source="T2">
+<LabelBlock>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="req">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-18" X="-3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="315" X="236"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="T21" Source="T2">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l2"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r2"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="-17"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="IN" Source="T2">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m1"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="3" X="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="248" X="180"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="T21" Source="T21">
+<LabelBlock>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="req">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-14" X="-2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="317" X="356"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="T1" Source="T21">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m1"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="36" X="10"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="T12" Source="T1">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l2"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r2"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-14" X="-18"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="T1" Source="T1">
+<LabelBlock>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="req">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-3" X="-8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="65" X="242"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="IN" Source="T1">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m1"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-11" X="-28"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="131" X="187"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="T2" Source="IN">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l2"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r2"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-24" X="-9"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="T1" Source="IN">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l2"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r2"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-4" X="-7"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="IN" Source="IN">
+<LabelBlock>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="-19"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="187" X="113"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="coll_m1_m2"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l1"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l1"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m2"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m2"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r1"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r1"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="T12">
+<PointGeometry>
+<Point Y="112" X="352"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="21" X="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="T1">
+<PointGeometry>
+<Point Y="112" X="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="25" X="-8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="T2">
+<PointGeometry>
+<Point Y="272" X="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-14" X="-7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="T21">
+<PointGeometry>
+<Point Y="272" X="352"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-9" X="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="IN">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="187" X="161"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="6" X="12"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="IN" Source="IN">
+<LabelBlock>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="-19"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="187" X="113"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="T1" Source="IN">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l1"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r1"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-5" X="-13"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="T2" Source="IN">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l1"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r1"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-18" X="-13"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="T12" Source="T12">
+<LabelBlock>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-11" X="-22"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="66" X="354"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="T2" Source="T12">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m2"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-47" X="8"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="IN" Source="T1">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m2"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-14" X="-25"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="131" X="187"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="T12" Source="T1">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l1"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r1"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="-21"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="T1" Source="T1">
+<LabelBlock>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-11" X="-25"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="65" X="242"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="T1" Source="T21">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m2"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="29" X="11"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="T21" Source="T21">
+<LabelBlock>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="5" X="-27"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="317" X="356"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="IN" Source="T2">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m2"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="7" X="-27"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="248" X="180"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="T21" Source="T2">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l1"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r1"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="-21"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="T2" Source="T2">
+<LabelBlock>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-14" X="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="315" X="236"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<ForeachComponent Name="T">
+<SimpleIdentifier Name="TRAINS"/>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="interd">
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l1"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l2"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m1"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m2"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r1"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r2"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="out">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="176" X="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="5" X="-32"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="l1r1">
+<PointGeometry>
+<Point Y="176" X="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="23" X="-1"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="r2">
+<PointGeometry>
+<Point Y="256" X="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="24" X="-8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="l2">
+<PointGeometry>
+<Point Y="96" X="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-13" X="-7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="m1">
+<PointGeometry>
+<Point Y="176" X="352"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-11" X="3"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="out" Source="m1">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m2"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-19" X="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="315" X="175"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="l1r1" Source="l2">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l1"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-23" X="-3"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="l1r1" Source="r2">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r1"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-24" X="-34"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="m1" Source="l1r1">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m1"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-25" X="-22"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="l2" Source="out">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l2"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-19" X="-37"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="r2" Source="out">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r2"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-24" X="-6"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+<ForeachComponent Name="P">
+<SimpleIdentifier Name="POS"/>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="sensor">
+<SimpleIdentifier Name="P"/>
+</IndexedIdentifier>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="P"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="P"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="not_at">
+<SimpleIdentifier Name="P"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="OFF">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="160" X="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="18" X="-28"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ON">
+<PointGeometry>
+<Point Y="160" X="336"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="18" X="6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="OFF" Source="OFF">
+<LabelBlock>
+<IndexedIdentifier Name="not_at">
+<SimpleIdentifier Name="P"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-23" X="-56"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="133" X="171"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="ON" Source="OFF">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="P"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="P"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-29" X="-19"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="124" X="240"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="OFF" Source="ON">
+<LabelBlock>
+<IndexedIdentifier Name="not_at">
+<SimpleIdentifier Name="P"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="6" X="-24"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="194" X="237"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="switch1"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="curve"/>
+<SimpleIdentifier Name="straight"/>
+<IndexedIdentifier Name="req">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="req">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l2"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r2"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m1"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="RQR"/>
+<SimpleNode Name="RQL"/>
+<SimpleNode Initial="true" Name="OUT">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="SWR"/>
+<SimpleNode Name="SWL"/>
+<SimpleNode Name="MOVE"/>
+</NodeList>
+<EdgeList>
+<Edge Target="RQR" Source="RQR">
+<LabelBlock>
+<IndexedIdentifier Name="req">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="curve"/>
+<SimpleIdentifier Name="straight"/>
+</LabelBlock>
+</Edge>
+<Edge Target="SWR" Source="RQR">
+<LabelBlock>
+<IndexedIdentifier Name="req">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+</LabelBlock>
+</Edge>
+<Edge Target="RQL" Source="RQL">
+<LabelBlock>
+<IndexedIdentifier Name="req">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="curve"/>
+<SimpleIdentifier Name="straight"/>
+</LabelBlock>
+</Edge>
+<Edge Target="SWL" Source="RQL">
+<LabelBlock>
+<IndexedIdentifier Name="req">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+</LabelBlock>
+</Edge>
+<Edge Target="RQR" Source="OUT">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r2"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+</LabelBlock>
+</Edge>
+<Edge Target="RQL" Source="OUT">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l2"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+</LabelBlock>
+</Edge>
+<Edge Target="OUT" Source="OUT">
+<LabelBlock>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="req">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="curve"/>
+<SimpleIdentifier Name="straight"/>
+</LabelBlock>
+</Edge>
+<Edge Target="MOVE" Source="SWR">
+<LabelBlock>
+<SimpleIdentifier Name="straight"/>
+</LabelBlock>
+</Edge>
+<Edge Target="MOVE" Source="SWL">
+<LabelBlock>
+<SimpleIdentifier Name="curve"/>
+</LabelBlock>
+</Edge>
+<Edge Target="OUT" Source="MOVE">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m1"/>
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+</LabelBlock>
+</Edge>
+<Edge Target="MOVE" Source="MOVE">
+<LabelBlock>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="switch2"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="curve"/>
+<SimpleIdentifier Name="straight"/>
+<IndexedIdentifier Name="req">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="req">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l2"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r2"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m1"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="RQR"/>
+<SimpleNode Name="RQL"/>
+<SimpleNode Initial="true" Name="OUT">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="SWR"/>
+<SimpleNode Name="SWL"/>
+<SimpleNode Name="MOVE"/>
+</NodeList>
+<EdgeList>
+<Edge Target="RQR" Source="RQR">
+<LabelBlock>
+<IndexedIdentifier Name="req">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="curve"/>
+<SimpleIdentifier Name="straight"/>
+</LabelBlock>
+</Edge>
+<Edge Target="SWR" Source="RQR">
+<LabelBlock>
+<IndexedIdentifier Name="req">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+</LabelBlock>
+</Edge>
+<Edge Target="RQL" Source="RQL">
+<LabelBlock>
+<IndexedIdentifier Name="req">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="curve"/>
+<SimpleIdentifier Name="straight"/>
+</LabelBlock>
+</Edge>
+<Edge Target="SWL" Source="RQL">
+<LabelBlock>
+<IndexedIdentifier Name="req">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+</LabelBlock>
+</Edge>
+<Edge Target="RQR" Source="OUT">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r2"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+</LabelBlock>
+</Edge>
+<Edge Target="RQL" Source="OUT">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l2"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+</LabelBlock>
+</Edge>
+<Edge Target="OUT" Source="OUT">
+<LabelBlock>
+<IndexedIdentifier Name="req">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="curve"/>
+<SimpleIdentifier Name="straight"/>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+</LabelBlock>
+</Edge>
+<Edge Target="MOVE" Source="SWR">
+<LabelBlock>
+<SimpleIdentifier Name="straight"/>
+</LabelBlock>
+</Edge>
+<Edge Target="MOVE" Source="SWL">
+<LabelBlock>
+<SimpleIdentifier Name="curve"/>
+</LabelBlock>
+</Edge>
+<Edge Target="OUT" Source="MOVE">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m1"/>
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+</LabelBlock>
+</Edge>
+<Edge Target="MOVE" Source="MOVE">
+<LabelBlock>
+<IndexedIdentifier Name="enable">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="switchsup"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="curve"/>
+<SimpleIdentifier Name="straight"/>
+<IndexedIdentifier Name="req">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="req">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+</SimpleNode>
+<SimpleNode Name="SWITCH"/>
+</NodeList>
+<EdgeList>
+<Edge Target="SWITCH" Source="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="req">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="req">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+</LabelBlock>
+</Edge>
+<Edge Target="IDLE" Source="SWITCH">
+<LabelBlock>
+<SimpleIdentifier Name="curve"/>
+<SimpleIdentifier Name="straight"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<ForeachComponent Name="T">
+<SimpleIdentifier Name="TRAINS"/>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="train">
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="enable">
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stopped">
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="MOVE">
+<PointGeometry>
+<Point Y="146" X="296"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="24" X="-8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="146" X="149"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="24" X="-8"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="IDLE" Source="MOVE">
+<LabelBlock>
+<IndexedIdentifier Name="stopped">
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-16" X="-29"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="126" X="224"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="MOVE" Source="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="enable">
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="-22"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="163" X="222"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+<ForeachComponent Name="T">
+<SimpleIdentifier Name="TRAINS"/>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="tsensor">
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l1"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l2"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m1"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m2"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r1"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r2"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="enable">
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stopped">
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="144" X="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-10" X="-30"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="HIT">
+<PointGeometry>
+<Point Y="144" X="384"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-11" X="-3"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="MOVE">
+<PointGeometry>
+<Point Y="144" X="288"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-12" X="-7"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="MOVE" Source="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="enable">
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-25" X="-25"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="121" X="232"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="IDLE" Source="MOVE">
+<LabelBlock>
+<IndexedIdentifier Name="stopped">
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="4" X="-22"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="167" X="233"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="HIT" Source="MOVE">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l1"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="l2"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r1"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="r2"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m1"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="m2"/>
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-95" X="-16"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="IDLE" Source="HIT">
+<LabelBlock>
+<IndexedIdentifier Name="stopped">
+<SimpleIdentifier Name="T"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="3" X="-23"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="230" X="276"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</Module>
+

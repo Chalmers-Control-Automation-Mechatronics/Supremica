@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   EventElement
 //###########################################################################
-//# $Id: EventElement.java,v 1.3 2005-11-03 03:45:57 robi Exp $
+//# $Id: EventElement.java,v 1.4 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -94,9 +95,9 @@ public class EventElement
 
   //#########################################################################
   //# Equals and Hashcode
-  public boolean equals(final Object partner)
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final EventElement event = (EventElement) partner;
       return
 	mKind.equals(event.mKind) &&
@@ -104,6 +105,18 @@ public class EventElement
     } else {
       return false;
     }    
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mKind.hashCode();
+    result *= 5;
+    if (mIsObservable) {
+      result++;
+    }
+    return result;
   }
 
 

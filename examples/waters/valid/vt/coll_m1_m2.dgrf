@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="coll_m1_m2" version="1.0" valid="1"
+	hasGeometry="1" width="298" height="292"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-05-08 02:18:12 GMT" modificationDate="2005-05-08 02:18:12 GMT">
+	<events>
+		<event controllable="0" name="at.l1.1"/>
+		<event controllable="0" name="at.l1.2"/>
+		<event controllable="0" name="at.m2.1"/>
+		<event controllable="0" name="at.m2.2"/>
+		<event controllable="0" name="at.r1.1"/>
+		<event controllable="0" name="at.r1.2"/>
+		<event controllable="1" name="enable.1"/>
+		<event controllable="1" name="enable.2"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="352" y="112"/></rendering>
+			<label name="T12">
+				<rendering><point x="5" y="21"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="240" y="112"/></rendering>
+			<label name="T1">
+				<rendering><point x="-8" y="25"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="240" y="272"/></rendering>
+			<label name="T2">
+				<rendering><point x="-7" y="-14"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="352" y="272"/></rendering>
+			<label name="T21">
+				<rendering><point x="5" y="-9"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="161" y="187"/></rendering>
+			<label name="IN">
+				<rendering><point x="12" y="6"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="113" y="187"/></rendering>
+			<source name="IN"/>
+			<labelGroup>
+				<rendering><point x="-19" y="-2"/></rendering>
+				<label name="enable.1"/>
+				<label name="enable.2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="IN"/>
+			<target name="T1"/>
+			<labelGroup>
+				<rendering><point x="-13" y="5"/></rendering>
+				<label name="at.l1.1"/>
+				<label name="at.r1.1">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="IN"/>
+			<target name="T2"/>
+			<labelGroup>
+				<rendering><point x="-13" y="-8"/></rendering>
+				<label name="at.l1.2"/>
+				<label name="at.r1.2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="354" y="66"/></rendering>
+			<source name="T12"/>
+			<labelGroup>
+				<rendering><point x="-22" y="-1"/></rendering>
+				<label name="enable.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="T12"/>
+			<target name="T2"/>
+			<labelGroup>
+				<rendering><point x="8" y="-37"/></rendering>
+				<label name="at.m2.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="187" y="131"/></rendering>
+			<source name="T1"/>
+			<target name="IN"/>
+			<labelGroup>
+				<rendering><point x="-25" y="-4"/></rendering>
+				<label name="at.m2.1"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="T1"/>
+			<target name="T12"/>
+			<labelGroup>
+				<rendering><point x="-21" y="-2"/></rendering>
+				<label name="at.l1.2"/>
+				<label name="at.r1.2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="242" y="65"/></rendering>
+			<source name="T1"/>
+			<labelGroup>
+				<rendering><point x="-25" y="-1"/></rendering>
+				<label name="enable.1"/>
+				<label name="enable.2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="T21"/>
+			<target name="T1"/>
+			<labelGroup>
+				<rendering><point x="11" y="39"/></rendering>
+				<label name="at.m2.2"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="356" y="317"/></rendering>
+			<source name="T21"/>
+			<labelGroup>
+				<rendering><point x="-27" y="15"/></rendering>
+				<label name="enable.2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="180" y="248"/></rendering>
+			<source name="T2"/>
+			<target name="IN"/>
+			<labelGroup>
+				<rendering><point x="-27" y="17"/></rendering>
+				<label name="at.m2.2"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="T2"/>
+			<target name="T21"/>
+			<labelGroup>
+				<rendering><point x="-21" y="-2"/></rendering>
+				<label name="at.l1.1"/>
+				<label name="at.r1.1">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="236" y="315"/></rendering>
+			<source name="T2"/>
+			<labelGroup>
+				<rendering><point x="-20" y="-4"/></rendering>
+				<label name="enable.1"/>
+				<label name="enable.2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

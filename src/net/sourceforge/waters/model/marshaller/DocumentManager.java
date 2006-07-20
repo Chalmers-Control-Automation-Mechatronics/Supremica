@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   DocumentManager
 //###########################################################################
-//# $Id: DocumentManager.java,v 1.5 2006-03-19 01:55:29 robi Exp $
+//# $Id: DocumentManager.java,v 1.6 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -41,9 +41,10 @@ import net.sourceforge.waters.model.unchecked.Casting;
  * appropriate proxy marshaller for each class of documents to be
  * handled. For example:</P>
  * <PRE>
- *   final DocumentManager manager = new {@link #DocumentManager()};
- *   final {@link net.sourceforge.waters.model.module.ModuleProxyFactory ModuleProxyFactory} factory = new {@link net.sourceforge.waters.plain.module.ModuleElementFactory ModuleElementFactory}();
- *   final {@link JAXBMarshaller}&lt;{@link net.sourceforge.waters.model.module.ModuleProxy}&gt; marshaller = new {@link JAXBModuleMarshaller}();
+ *   final DocumentManager manager = new {@link #DocumentManager() DocumentManager()};
+ *   final {@link net.sourceforge.waters.model.module.ModuleProxyFactory ModuleProxyFactory} factory = {@link net.sourceforge.waters.plain.module.ModuleElementFactory}.{@link net.sourceforge.waters.plain.module.ModuleElementFactory#getInstance() getInstance}();
+ *   final {@link net.sourceforge.waters.model.expr.OperatorTable OperatorTable} optable = {@link net.sourceforge.waters.model.compiler.CompilerOperatorTable CompilerOperatorTable}.{@link net.sourceforge.waters.model.compiler.CompilerOperatorTable#getInstance() getInstance}();
+ *   final {@link JAXBMarshaller}&lt;{@link net.sourceforge.waters.model.module.ModuleProxy}&gt; marshaller = new {@link JAXBModuleMarshaller}(factory, optable);
  *   manager.{@link #registerMarshaller(ProxyMarshaller) registerMarshaller}(marshaller);
  *   manager.{@link #registerUnmarshaller(ProxyUnmarshaller) registerUnmarshaller}(marshaller);
  *   final {@link File} file = new File("myfile.wmod");
@@ -53,12 +54,12 @@ import net.sourceforge.waters.model.unchecked.Casting;
  * @author Robi Malik
  */
 
-public class DocumentManager<D extends DocumentProxy> {
+public class DocumentManager {
 
   //#########################################################################
   //# Constructors
   /**
-   * Create a new document manager.
+   * Creates a new document manager.
    * Initially, the document manager will not support marshalling or
    * unmarshalling of any file types. To be useful, some {@link
    * ProxyMarshaller} or {@link ProxyUnmarshaller} objects need to be
@@ -69,12 +70,14 @@ public class DocumentManager<D extends DocumentProxy> {
   public DocumentManager()
   {
     mClassMarshallerMap =
-      new HashMap<Class<? extends D>,ProxyMarshaller<? extends D>>(4);
+      new HashMap<Class<? extends DocumentProxy>,
+                  ProxyMarshaller<? extends DocumentProxy>>(4);
     mClassUnmarshallerMap =
-      new HashMap<Class<? extends D>,List<ProxyUnmarshaller<? extends D>>>(4);
+      new HashMap<Class<? extends DocumentProxy>,
+                  List<ProxyUnmarshaller<? extends DocumentProxy>>>(4);
     mExtensionUnmarshallerMap =
-      new HashMap<String,ProxyUnmarshaller<? extends D>>(4);
-    mDocumentCache = new HashMap<URI,D>(32);
+      new HashMap<String,ProxyUnmarshaller<? extends DocumentProxy>>(4);
+    mDocumentCache = new HashMap<URI,DocumentProxy>(32);
   }
 
 
@@ -101,7 +104,7 @@ public class DocumentManager<D extends DocumentProxy> {
    *                      {@link ProxyMarshaller} for the given class was
    *                      found.
    */
-  public <DD extends D> DD load
+  public <DD extends DocumentProxy> DD load
     (final URI uri, final String name, final Class<DD> clazz)
     throws WatersUnmarshalException, IOException
   {
@@ -110,7 +113,7 @@ public class DocumentManager<D extends DocumentProxy> {
     for (final ProxyUnmarshaller<? extends DD> unmarshaller : unmarshallers) {
       final String extname = name + unmarshaller.getDefaultExtension();
       final URI resolved = resolve(uri, extname);
-      final D cached = mDocumentCache.get(resolved);
+      final DocumentProxy cached = mDocumentCache.get(resolved);
       if (cached != null) {
         return clazz.cast(cached);
       }
@@ -136,22 +139,22 @@ public class DocumentManager<D extends DocumentProxy> {
    * @throws IOException  to indicate that the input file could not be
    *                      opened or read.
    */
-  public D load(final URI uri)
+  public DocumentProxy load(final URI uri)
     throws WatersUnmarshalException, IOException
   {
-    final D cached = mDocumentCache.get(uri);
+    final DocumentProxy cached = mDocumentCache.get(uri);
     if (cached != null) {
       return cached;
     }
     final String path = uri.getRawSchemeSpecificPart();
     final int dotpos = path.lastIndexOf(".");
     final String extension = dotpos >= 0 ? path.substring(dotpos) : "";
-    final ProxyUnmarshaller<? extends D> unmarshaller =
+    final ProxyUnmarshaller<? extends DocumentProxy> unmarshaller =
       mExtensionUnmarshallerMap.get(extension);
     if (unmarshaller == null) {
       throw new BadFileTypeException(uri);
     }
-    final D loaded = unmarshaller.unmarshal(uri);
+    final DocumentProxy loaded = unmarshaller.unmarshal(uri);
     mDocumentCache.put(uri, loaded);
     return loaded;
   }
@@ -177,7 +180,7 @@ public class DocumentManager<D extends DocumentProxy> {
    *                      {@link ProxyMarshaller} for the given class was
    *                      found.
    */
-  public <DD extends D> DD load
+  public <DD extends DocumentProxy> DD load
     (final File path, final String name, final Class<DD> clazz)
     throws WatersUnmarshalException, IOException
   {
@@ -187,7 +190,7 @@ public class DocumentManager<D extends DocumentProxy> {
       final String extname = name + unmarshaller.getDefaultExtension();
       final File filename = new File(path, extname);
       final URI uri = filename.toURI();
-      final D cached = mDocumentCache.get(uri);
+      final DocumentProxy cached = mDocumentCache.get(uri);
       if (cached != null) {
         return clazz.cast(cached);
       }
@@ -215,7 +218,7 @@ public class DocumentManager<D extends DocumentProxy> {
    * @throws IOException  to indicate that the input file could not be
    *                      opened or read.
    */
-  public D load(final URL url)
+  public DocumentProxy load(final URL url)
     throws WatersUnmarshalException, IOException
   {
     try {
@@ -238,7 +241,7 @@ public class DocumentManager<D extends DocumentProxy> {
    * @throws IOException  to indicate that the input file could not be
    *                      opened or read.
    */
-  public D load(final File filename)
+  public DocumentProxy load(final File filename)
     throws WatersUnmarshalException, IOException
   {
     final URI uri = filename.toURI();
@@ -261,11 +264,12 @@ public class DocumentManager<D extends DocumentProxy> {
    *                      {@link ProxyMarshaller} for the given class was
    *                      found.
    */
-  public void saveAs(final D doc, final File filename)
+  public void saveAs(final DocumentProxy doc, final File filename)
     throws WatersMarshalException, IOException
   {
-    final Class<D> clazz = Casting.toClass(doc.getClass());
-    final ProxyMarshaller<D> marshaller = findProxyMarshaller(clazz);
+    final Class<DocumentProxy> clazz = Casting.toClass(doc.getClass());
+    final ProxyMarshaller<DocumentProxy> marshaller =
+      findProxyMarshaller(clazz);
     final URI newuri = filename.toURI();
     final URI olduri = doc.getLocation();
     marshaller.marshal(doc, filename);
@@ -277,13 +281,29 @@ public class DocumentManager<D extends DocumentProxy> {
   }
 
 
+  /**
+   * Adds a new document to this document manager.
+   * This method adds the given document to the cache maintained by the
+   * document manager, under the location given by the document.
+   * It does not make any attempt to save the document to disk.
+   * If the document manager has already stored a document at the
+   * given location, the new document will replace the existing one.
+   * @param  doc          The document to be added.
+   */
+  public void newDocument(final DocumentProxy doc)
+  {
+    final URI uri = doc.getLocation();
+    mDocumentCache.put(uri, doc);
+  }
+
+
   //#########################################################################
   //# Registering Marshallers
   /**
    * Registers a proxy marshaller.
    * @param  marshaller   The proxy marshaller to be registered.
    */
-  public <DD extends D>
+  public <DD extends DocumentProxy>
     void registerMarshaller(final ProxyMarshaller<DD> marshaller)
   {
     final Class<DD> clazz = marshaller.getDocumentClass();
@@ -302,14 +322,14 @@ public class DocumentManager<D extends DocumentProxy> {
    * use it to load documents of the type supported by it.
    * @param  unmarshaller The proxy unmarshaller to be registered.
    */
-  public <DD extends D>
+  public <DD extends DocumentProxy>
     void registerUnmarshaller(final ProxyUnmarshaller<DD> unmarshaller)
   {
     final Class<DD> clazz = unmarshaller.getDocumentClass();
-    List<ProxyUnmarshaller<? extends D>> list =
+    List<ProxyUnmarshaller<? extends DocumentProxy>> list =
       mClassUnmarshallerMap.get(clazz);
     if (list == null) {
-      list = new LinkedList<ProxyUnmarshaller<? extends D>>();
+      list = new LinkedList<ProxyUnmarshaller<? extends DocumentProxy>>();
       mClassUnmarshallerMap.put(clazz, list);
     }
     list.add(unmarshaller);
@@ -323,6 +343,7 @@ public class DocumentManager<D extends DocumentProxy> {
       }
       mExtensionUnmarshallerMap.put(extension, unmarshaller);
     }
+    unmarshaller.setDocumentManager(this);
   }
 
 
@@ -340,7 +361,7 @@ public class DocumentManager<D extends DocumentProxy> {
    *                      {@link ProxyMarshaller} for the given class was
    *                      found.
    */
-  public <DD extends D>
+  public <DD extends DocumentProxy>
     ProxyMarshaller<DD> findProxyMarshaller(final Class<DD> clazz)
   {
     final ProxyMarshaller marshaller = getProxyMarshaller(clazz);
@@ -363,11 +384,12 @@ public class DocumentManager<D extends DocumentProxy> {
    *                      {@link ProxyUnmarshaller} for the given class was
    *                      found.
    */
-  public <DD extends D>
+  public <DD extends DocumentProxy>
     Collection<ProxyUnmarshaller<? extends DD>>
     findProxyUnmarshallers(final Class<DD> clazz)
   {
-    final Collection<ProxyUnmarshaller<? extends D>> unmarshallers =
+    final Collection<ProxyUnmarshaller<? extends DocumentProxy>>
+      unmarshallers =
       mClassUnmarshallerMap.get(clazz);
     if (unmarshallers != null) {
       return Casting.toCollection(unmarshallers);
@@ -376,7 +398,6 @@ public class DocumentManager<D extends DocumentProxy> {
         ("Unsupported document class " + clazz.getName() + "!");
     }
   }
-
 
   //#########################################################################
   //# Auxiliary Methods
@@ -429,12 +450,14 @@ public class DocumentManager<D extends DocumentProxy> {
 
   //#########################################################################
   //# Data Members
-  private final Map<Class<? extends D>,ProxyMarshaller<? extends D>>
+  private final Map<Class<? extends DocumentProxy>,
+                    ProxyMarshaller<? extends DocumentProxy>>
     mClassMarshallerMap;
-  private final Map<Class<? extends D>,List<ProxyUnmarshaller<? extends D>>>
+  private final Map<Class<? extends DocumentProxy>,
+                    List<ProxyUnmarshaller<? extends DocumentProxy>>>
     mClassUnmarshallerMap;
-  private final Map<String,ProxyUnmarshaller<? extends D>>
+  private final Map<String,ProxyUnmarshaller<? extends DocumentProxy>>
     mExtensionUnmarshallerMap;
-  private final Map<URI,D> mDocumentCache;
+  private final Map<URI,DocumentProxy> mDocumentCache;
 
 }

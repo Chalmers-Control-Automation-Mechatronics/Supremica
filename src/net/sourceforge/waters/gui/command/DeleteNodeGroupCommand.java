@@ -1,16 +1,18 @@
 package net.sourceforge.waters.gui.command;
 
 import net.sourceforge.waters.gui.ControlledSurface;
-import net.sourceforge.waters.gui.EditorEdge;
-import net.sourceforge.waters.gui.EditorNode;
-import net.sourceforge.waters.gui.EditorNodeGroup;
+
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+
+import net.sourceforge.waters.subject.module.GroupNodeSubject;
+import net.sourceforge.waters.subject.module.GraphSubject;
 
 import java.util.Collection;
 import java.util.LinkedList;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
+import net.sourceforge.waters.subject.module.EdgeSubject;
 
 /**
  * the Command for Creation of nodes
@@ -22,9 +24,9 @@ public class DeleteNodeGroupCommand
     implements Command
 {
     /** The ControlledSurface Edited with this Command */
-    private final ControlledSurface mSurface;
+    private final GraphSubject mGraph;
     /** The Node Created by this Command */
-    private final EditorNodeGroup mDeleted;
+    private final GroupNodeSubject mDeleted;
     /** the Edge Deletion Commands Associated with this Command */
     private final CompoundCommand mCommands = new CompoundCommand();
     private final String mDescription = "Group Node Deletion";
@@ -35,15 +37,14 @@ public class DeleteNodeGroupCommand
      *
      * @param surface the surface edited by this command
      */
-    public DeleteNodeGroupCommand(ControlledSurface surface, EditorNodeGroup nodeGroup)
+    public DeleteNodeGroupCommand(GraphSubject graph, GroupNodeSubject nodeGroup)
     {
-		mSurface = surface;
+		mGraph = graph;
 		// Find a unique name!
 		mDeleted = nodeGroup;
-		for (Object o: surface.getEdges()) {
-			EditorEdge e = (EditorEdge)o;
-			if ((e.getStartNode() == nodeGroup)) {
-				mCommands.addCommand(new DeleteEdgeCommand(mSurface, e));
+		for (EdgeSubject e : mGraph.getEdgesModifiable()) {
+			if ((e.getSource() == nodeGroup || (e.getTarget() == nodeGroup))) {
+				mCommands.addCommand(new DeleteEdgeCommand(mGraph, e));
 			}
 		}
 		mCommands.end();
@@ -56,8 +57,7 @@ public class DeleteNodeGroupCommand
     public void execute()
     {
 		mCommands.execute();
-		mSurface.delNodeGroup(mDeleted);
-		mSurface.getEditorInterface().setDisplayed();
+		mGraph.getNodesModifiable().remove(mDeleted);
     }
 
     /** 
@@ -71,9 +71,8 @@ public class DeleteNodeGroupCommand
 	 
     public void undo()
     {
-		mSurface.addNodeGroup(mDeleted);
+		mGraph.getNodesModifiable().add(mDeleted);
 		mCommands.undo();
-		mSurface.getEditorInterface().setDisplayed();
     }
 
     public String getName()

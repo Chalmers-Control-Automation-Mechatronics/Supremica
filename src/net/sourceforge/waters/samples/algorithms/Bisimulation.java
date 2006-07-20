@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.waters.samples.algorithms
 //# CLASS:   Bisimulation
 //###########################################################################
-//# $Id: Bisimulation.java,v 1.3 2005-11-03 01:24:16 robi Exp $
+//# $Id: Bisimulation.java,v 1.4 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 
@@ -55,7 +55,6 @@ public class Bisimulation {
                        final String resultname,
                        final ProductDESProxyFactory factory)
   {
-    final Collection states = aut.getStates();
     mAutomaton = aut;
     mResultName = resultname;
     mAdjacency = new AdjacencyMap(aut, AdjacencyMap.EXITING);

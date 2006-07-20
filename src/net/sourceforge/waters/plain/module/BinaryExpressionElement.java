@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   BinaryExpressionElement
 //###########################################################################
-//# $Id: BinaryExpressionElement.java,v 1.5 2006-05-24 09:13:02 markus Exp $
+//# $Id: BinaryExpressionElement.java,v 1.6 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -55,18 +56,30 @@ public final class BinaryExpressionElement
 
 
   //#########################################################################
-  //# Equality
-  public boolean equals(final Object partner)
+  //# Equality and Hashcode
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final BinaryExpressionElement downcast = (BinaryExpressionElement) partner;
       return
         mOperator.equals(downcast.mOperator) &&
-        mLeft.equals(downcast.mLeft) &&
-        mRight.equals(downcast.mRight);
+        mLeft.equalsByContents(downcast.mLeft) &&
+        mRight.equalsByContents(downcast.mRight);
     } else {
       return false;
     }
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mOperator.hashCode();
+    result *= 5;
+    result += mLeft.hashCodeByContents();
+    result *= 5;
+    result += mRight.hashCodeByContents();
+    return result;
   }
 
 

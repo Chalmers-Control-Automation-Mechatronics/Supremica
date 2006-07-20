@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.algorithms
 //# CLASS:   SimulatorMain
 //###########################################################################
-//# $Id: SimulatorMain.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: SimulatorMain.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.algorithms;
@@ -98,8 +98,7 @@ public class SimulatorMain
         new JAXBModuleMarshaller(moduleFactory, optable);
       final JAXBProductDESMarshaller desMarshaller =
         new JAXBProductDESMarshaller(desFactory);
-      final DocumentManager<DocumentProxy> docManager =
-        new DocumentManager<DocumentProxy>();
+      final DocumentManager docManager = new DocumentManager();
       docManager.registerUnmarshaller(desMarshaller);
       docManager.registerUnmarshaller(moduleMarshaller);
       docManager.registerUnmarshaller(importer);

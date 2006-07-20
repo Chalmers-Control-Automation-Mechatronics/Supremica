@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   MoveEdgeCommand
 //###########################################################################
-//# $Id: MoveEdgeCommand.java,v 1.4 2006-01-17 21:13:50 siw4 Exp $
+//# $Id: MoveEdgeCommand.java,v 1.5 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 
@@ -21,14 +21,15 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import net.sourceforge.waters.gui.ControlledSurface;
-import net.sourceforge.waters.gui.EditorEdge;
-import net.sourceforge.waters.gui.EditorNode;
-import net.sourceforge.waters.gui.EditorNodeGroup;
-import net.sourceforge.waters.gui.EditorObject;
+import net.sourceforge.waters.gui.renderer.GeometryTools;
+
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
+import net.sourceforge.waters.subject.module.PointGeometrySubject;
+import net.sourceforge.waters.subject.module.SplineGeometrySubject;
+import net.sourceforge.waters.xsd.module.SplineKind;
 
 
 /**
@@ -51,31 +52,30 @@ public class MoveEdgeCommand
      * @param y the position upon which the node is created
      */
     public MoveEdgeCommand(final ControlledSurface surface,
-						   final EditorEdge edge,
-						   final EditorObject neo,
+						   final EdgeSubject edge,
+						   final NodeSubject neo,
 						   boolean source,
 						   int x,
 						   int y)
     {
-		mSurface = surface;
-		mEdge = edge;
-		mNew = neo;
-		mSource = source;
-		mNPos = new Point(x, y);
-		mOPos = new Point();
-		mOPos.setLocation(edge.getSubject().getStartPoint().getPoint());
-		if (source)
-		{
-			mOld = edge.getStartNode();
-			mDescription = "Change Edge Source";
-		}
-		else
-		{
-			mOld = edge.getEndNode();
-			mDescription = "Change Edge Target";
-		}
-		mOTPoint = new Point2D.Double();
-		mOTPoint.setLocation(edge.getPosition());
+      mSurface = surface;
+      mEdge = edge;
+      mNew = neo;
+      mSource = source;
+      mNPos = new PointGeometrySubject(new Point(x, y));
+      if (source)
+      {
+        mOPos = new PointGeometrySubject(edge.getStartPoint().getPoint());
+        mOld = edge.getSource();
+        mDescription = "Change Edge Source";
+      }
+      else
+      {
+        mOPos = new PointGeometrySubject(edge.getEndPoint().getPoint());
+        mOld = edge.getTarget();
+        mDescription = "Change Edge Target";
+      }
+		  mOTPoint = edge.getGeometry().clone();
     }
 
     /**
@@ -85,12 +85,19 @@ public class MoveEdgeCommand
     {
 		if (mSource)
 		{
-			mEdge.setStartNode(mNew, (int)mNPos.getX(), (int)mNPos.getY());
+			mEdge.setSource(mNew);
+			mEdge.setStartPoint(mNPos);
 		}
 		else
 		{
-			mEdge.setEndNode((EditorNode)mNew);
+			mEdge.setTarget(mNew);
+			mEdge.setEndPoint(mNPos);
 		}
+		final Collection<Point2D> points = Collections.singleton(
+			GeometryTools.getMidPoint(mEdge.getStartPoint().getPoint(),
+										mEdge.getEndPoint().getPoint()));
+		mEdge.setGeometry(
+			new SplineGeometrySubject(points, SplineKind.INTERPOLATING));
 		mSurface.getEditorInterface().setDisplayed();
     }
 
@@ -99,16 +106,18 @@ public class MoveEdgeCommand
      */    
     public void undo()
     {
-		if (mSource)
-		{
-			mEdge.setStartNode(mOld, (int)mOPos.getX(), (int)mOPos.getY());
-		}
-		else
-		{
-			mEdge.setEndNode((EditorNode)mOld);
-		}
-		mEdge.setPosition(mOTPoint.getX(), mOTPoint.getY());
-		mSurface.getEditorInterface().setDisplayed();
+      if (mSource)
+      {
+        mEdge.setSource(mOld);
+        mEdge.setStartPoint(mOPos);
+      }
+      else
+      {
+        mEdge.setTarget(mOld);
+        mEdge.setEndPoint(mOPos);
+      }
+      mEdge.setGeometry(mOTPoint);
+      mSurface.getEditorInterface().setDisplayed();
     }
 	
 	public boolean isSignificant()
@@ -116,21 +125,21 @@ public class MoveEdgeCommand
 		return true;
 	}
 
-    public String getName()
-    {
+  public String getName()
+  {
 		return mDescription;
-    }
+  }
 
 
 	//#######################################################################
 	//# Data Members
 	private final ControlledSurface mSurface;
-	private final EditorEdge mEdge;
-	private final EditorObject mOld;
-	private final EditorObject mNew;
+	private final EdgeSubject mEdge;
+	private final NodeSubject mOld;
+	private final NodeSubject mNew;
 	private final boolean mSource;
-	private final Point2D mNPos;
-	private final Point2D mOPos;
-	private final Point2D mOTPoint;
+	private final PointGeometrySubject mNPos;
+	private final PointGeometrySubject mOPos;
+	private final SplineGeometrySubject mOTPoint;
 	private final String mDescription;	
 }

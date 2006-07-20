@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   IndexedHashSetSubject
 //###########################################################################
-//# $Id: IndexedHashSetSubject.java,v 1.3 2006-02-16 04:06:18 robi Exp $
+//# $Id: IndexedHashSetSubject.java,v 1.4 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -207,7 +207,7 @@ public class IndexedHashSetSubject<P extends NamedSubject>
     }
   }
 
-  public void checkUnique(final P proxy)
+  public void checkUnique(final NamedProxy proxy)
     throws NameNotFoundException, ItemNotFoundException
   {
     final String name = proxy.getName();

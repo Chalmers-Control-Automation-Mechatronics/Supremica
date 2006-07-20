@@ -26,7 +26,7 @@ public class ExpressionHandler {
 
 	protected final Set<String> constants = new HashSet<String>(
 				Arrays.asList(new String[] {"true", "false"}));
-	protected final Set mReservedWords;
+	protected final Set<String> mReservedWords;
 	protected ModuleSubjectFactory mFactory;
 	protected SimpleExpressionSubject mExpression;
 	protected boolean mExpressionSet;
@@ -35,7 +35,7 @@ public class ExpressionHandler {
 	public ExpressionHandler() {
 		//we separate reserved words from constants in
 	    //case we want to add more reserved words later.
-		mReservedWords = new HashSet();
+		mReservedWords = new HashSet<String>();
 		mReservedWords.addAll(constants);
 		
 		mVariables = new HashMap<String, AbstractVariable>();

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.49 2006-07-09 16:49:14 martin Exp $
+//# $Id: ModuleWindow.java,v 1.50 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -28,6 +28,7 @@ import javax.swing.tree.*;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import javax.xml.bind.JAXBException;
@@ -49,6 +50,7 @@ import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.UndoRedoEvent;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
@@ -104,6 +106,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.automata.IO.ProjectBuildFromWaters;
 import org.supremica.automata.Project;
+import org.xml.sax.SAXException;
 
 import org.supremica.properties.Config;
 
@@ -150,6 +153,7 @@ public class ModuleWindow
 		setVisible(true);
 	}
 
+
 	/**
 	 * Load a Waters module into the module viewer.
 	 * @param wmodf The file to load the module from
@@ -158,19 +162,11 @@ public class ModuleWindow
 	{
 		logEntry("Attempting to load: " + wmodf);
 		try {
-			final ModuleProxyFactory factory =
-				ModuleSubjectFactory.getInstance();
-			final OperatorTable optable = CompilerOperatorTable.getInstance();
 			final ProxyUnmarshaller<ModuleProxy> unMarshaller =
-				new JAXBModuleMarshaller(factory, optable);
+				getJAXBMarshaller();
 			final URI uri = wmodf.toURI();
 			module = (ModuleSubject) unMarshaller.unmarshal(uri);
 			clearList();
-		} catch (final JAXBException exception) {
-			JOptionPane.showMessageDialog(this,
-										  "Error loading module file:" +
-										  exception.getMessage());
-			logEntry("JAXBException - Failed to load  '" + wmodf + "'!");
 		} catch (final WatersUnmarshalException exception) {
 			JOptionPane.showMessageDialog(this,
 										  "Error loading module file:" +
@@ -189,17 +185,9 @@ public class ModuleWindow
 	{
 		logEntry("Saving module to: " + wmodf);
 		try	{
-			final ModuleProxyFactory factory =
-				ModuleSubjectFactory.getInstance();
-			final OperatorTable optable = CompilerOperatorTable.getInstance();
 			final ProxyMarshaller<ModuleProxy> marshaller =
-				new JAXBModuleMarshaller(factory, optable);
+				getJAXBMarshaller();
 			marshaller.marshal(module, wmodf);
-		} catch (final JAXBException exception) {
-			JOptionPane.showMessageDialog(this,
-										  "Error saving module file:" +
-										  exception.getMessage());
-			logEntry("JAXBException - Failed to save  '" + wmodf + "'!");
 		} catch (final WatersMarshalException exception) {
 			JOptionPane.showMessageDialog(this,
 										  "Error saving module file:" +
@@ -211,6 +199,20 @@ public class ModuleWindow
 										  "Error saving module file:" +
 										  exception.getMessage());
 			logEntry("IOException - Failed to save  '" + wmodf + "'!");
+		}
+	}
+
+	private JAXBModuleMarshaller getJAXBMarshaller()
+	{
+		try {
+			final ModuleProxyFactory factory =
+				ModuleSubjectFactory.getInstance();
+			final OperatorTable optable = CompilerOperatorTable.getInstance();
+			return new JAXBModuleMarshaller(factory, optable);
+		} catch (final JAXBException exception) {
+			throw new WatersRuntimeException(exception);
+		} catch (final SAXException exception) {
+			throw new WatersRuntimeException(exception);
 		}
 	}
 
@@ -928,8 +930,18 @@ public class ModuleWindow
 
 	public void addUndoable(UndoableEdit e)
 	{
-		mUndoManager.addEdit(e);
-		fireEditorChangedEvent(new UndoRedoEvent());
+		if (e.isSignificant())
+		{
+			mInsignificant.end();
+			mUndoManager.addEdit(mInsignificant);
+			mInsignificant = new CompoundEdit();
+			mUndoManager.addEdit(e);
+			fireEditorChangedEvent(new UndoRedoEvent());
+		}
+		else
+		{
+			mInsignificant.addEdit(e);
+		}
 	}
 
 	public void executeCommand(Command c)
@@ -968,12 +980,18 @@ public class ModuleWindow
 
 	public void redo() throws CannotRedoException
 	{
+		mInsignificant.end();
+		mInsignificant.undo();
+		mInsignificant = new CompoundEdit();
 		mUndoManager.redo();
 		fireEditorChangedEvent(new UndoRedoEvent());
 	}
 
 	public void undo() throws CannotUndoException
 	{
+		mInsignificant.end();
+		mInsignificant.undo();
+		mInsignificant = new CompoundEdit();
 		mUndoManager.undo();
 		fireEditorChangedEvent(new UndoRedoEvent());
 	}
@@ -1200,6 +1218,7 @@ public class ModuleWindow
 	private final ExpressionParser mExpressionParser;
 	private final ProxyPrinter mPrinter;
 	private final UndoManager mUndoManager = new UndoManager();
+	private CompoundEdit mInsignificant = new CompoundEdit();
 
 	private static Languages WLang;
 	

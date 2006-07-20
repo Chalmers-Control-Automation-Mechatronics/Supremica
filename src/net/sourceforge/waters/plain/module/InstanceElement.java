@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   InstanceElement
 //###########################################################################
-//# $Id: InstanceElement.java,v 1.5 2006-05-24 09:13:02 markus Exp $
+//# $Id: InstanceElement.java,v 1.6 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -14,6 +14,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.waters.model.base.EqualCollection;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -82,17 +84,28 @@ public final class InstanceElement
 
 
   //#########################################################################
-  //# Equality
-  public boolean equals(final Object partner)
+  //# Equality and Hashcode
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final InstanceElement downcast = (InstanceElement) partner;
       return
         mModuleName.equals(downcast.mModuleName) &&
-        mBindingList.equals(downcast.mBindingList);
+        EqualCollection.isEqualListByContents
+          (mBindingList, downcast.mBindingList);
     } else {
       return false;
     }
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mModuleName.hashCode();
+    result *= 5;
+    result += EqualCollection.getListHashCodeByContents(mBindingList);
+    return result;
   }
 
 

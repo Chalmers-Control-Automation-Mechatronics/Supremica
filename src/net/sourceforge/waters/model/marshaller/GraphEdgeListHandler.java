@@ -4,23 +4,22 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   GraphEdgeListHandler
 //###########################################################################
-//# $Id: GraphEdgeListHandler.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: GraphEdgeListHandler.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.util.List;
-import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.module.EdgeProxy;
 
-import net.sourceforge.waters.xsd.module.EdgeListType;
-import net.sourceforge.waters.xsd.module.GraphType;
+import net.sourceforge.waters.xsd.module.EdgeList;
+import net.sourceforge.waters.xsd.module.Graph;
 import net.sourceforge.waters.xsd.module.ObjectFactory;
 
 
 class GraphEdgeListHandler
-  extends JAXBListHandler<GraphType,EdgeListType,EdgeProxy>
+  extends JAXBListHandler<Graph,EdgeList,EdgeProxy>
 {
 
 
@@ -39,20 +38,19 @@ class GraphEdgeListHandler
 
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBListHandler
-  EdgeListType createListElement(final GraphType container)
-    throws JAXBException
+  EdgeList createListElement(final Graph container)
   {
-    final EdgeListType listelem = mFactory.createEdgeList();
+    final EdgeList listelem = mFactory.createEdgeList();
     container.setEdgeList(listelem);
     return listelem;
   }
 
-  EdgeListType getListElement(final GraphType container)
+  EdgeList getListElement(final Graph container)
   {
     return container.getEdgeList();
   }
 
-  List getList(final EdgeListType listelem)
+  List getList(final EdgeList listelem)
   {
     return listelem.getList();
   }

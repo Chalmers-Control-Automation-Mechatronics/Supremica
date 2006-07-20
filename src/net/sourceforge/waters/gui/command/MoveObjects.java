@@ -1,16 +1,32 @@
 package net.sourceforge.waters.gui.command;
 
-import net.sourceforge.waters.gui.ControlledSurface;
-import net.sourceforge.waters.gui.EditorObject;
-import net.sourceforge.waters.gui.EditorNodeGroup;
-
 import java.awt.geom.Point2D;
-
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
+
+import net.sourceforge.waters.gui.ControlledSurface;
+import net.sourceforge.waters.gui.renderer.GeometryTools;
+import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.xsd.module.SplineKind;
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
+import net.sourceforge.waters.subject.module.GroupNodeSubject;
+import net.sourceforge.waters.subject.module.LabelBlockSubject;
+import net.sourceforge.waters.subject.module.LabelGeometrySubject;
+import net.sourceforge.waters.subject.module.PointGeometrySubject;
+import net.sourceforge.waters.subject.module.BoxGeometrySubject;
+import net.sourceforge.waters.subject.module.SplineGeometrySubject;
+import net.sourceforge.waters.subject.module.NodeSubject;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * the Command for Creation of nodes
@@ -19,142 +35,320 @@ import javax.swing.undo.CannotUndoException;
  */
 
 public class MoveObjects
-    implements Move
+  implements Command
 {
 
-    /** The ControlledSurface Edited with this Command */
-    private final ControlledSurface mSurface;
-    /** The Objects moved by this command */
-    private final Collection<EditorObject> mMoved;
-    /** The Original Position of the Object */
-    private final Point2D mDisplacement = new Point2D.Double();
-    private final String mDescription;
+  /**  the commands to be executed */
+  private final CompoundCommand mCommands;
+  private final String mDescription;
 
-    /**
-     * Constructs a new CreateNodeCommand with the specified surface and
-     * creates the node in the x,y position specified
-     *
-     * @param surface the surface edited by this command
-     * @param displacement the position upon which the node is created
-     */
-    public MoveObjects(ControlledSurface surface, Collection<? extends EditorObject> moved, Point2D displacement)
-    {
-		mSurface = surface;
-		mMoved = new ArrayList(moved);	
-		setDisplacement(displacement);
-		boolean node = false;
-		boolean edge = false;
-		for (EditorObject o: mMoved)
-		{
-			if (o.getType() == EditorObject.EDGE)
-			{
-				edge = true;
-			}
-			if (o.getType() == EditorObject.NODE ||
-				o.getType() == EditorObject.NODEGROUP)
-			{
-				node = true;
-				break;
-			}
-		}
-		if (node)
-		{
-			mDescription = "Node Movement";
-		}
-		else if (edge)
-		{
-			mDescription = "Edge Reshaping";
-		}
-		else
-		{
-			mDescription = "Label Movement";
-		}
+  /**
+   * Constructs a new CreateNodeCommand with the specified surface and
+   * creates the node in the x,y position specified
+   *
+   * @param surface the surface edited by this command
+   * @param displacement the position upon which the node is created
+   */
+  public MoveObjects(Map<ProxySubject, ProxySubject> objects)
+  {
+    mCommands = new CompoundCommand();
+    for (Map.Entry<ProxySubject, ProxySubject> entry : objects.entrySet()) {
+      Command c = null;
+      if (entry.getKey() instanceof SimpleNodeSubject) {
+        c = new MoveSimpleNode((SimpleNodeSubject) entry.getKey(),
+                               (SimpleNodeSubject) entry.getValue());
+      } else if (entry.getKey() instanceof GroupNodeSubject) {
+        c = new MoveGroupNode((GroupNodeSubject) entry.getKey(),
+                              (GroupNodeSubject) entry.getValue());
+      } else if (entry.getKey() instanceof EdgeSubject) {
+        c = new MoveEdge((EdgeSubject) entry.getKey(),
+                         (EdgeSubject) entry.getValue());
+      } else if (entry.getKey() instanceof LabelBlockSubject) {
+        c = new MoveLabelBlock((LabelBlockSubject) entry.getKey(),
+                               (LabelBlockSubject) entry.getValue());
+      } else if (entry.getKey() instanceof LabelGeometrySubject) {
+        c = new MoveLabelGeometry((LabelGeometrySubject) entry.getKey(),
+                                  (LabelGeometrySubject) entry.getValue());
+      } else {
+        assert(false);
+      }
+      mCommands.addCommand(c);
     }
+    mCommands.end();
+    mDescription = "movement";
+  }
 
-    public void execute()
-    {
-		for (EditorObject o : mMoved)
-		{
-			if (o.getType() == EditorObject.NODEGROUP)
-			{
-				EditorNodeGroup ng = (EditorNodeGroup) o;
-				if (ng.getResizing())
-				{
-					ng.resize((int)(ng.getX() + mDisplacement.getX()), (int)(ng.getY() + mDisplacement.getY()));
-					continue;
-				}
-			}
-			if ((o.getType() == EditorObject.LABELGROUP || o.getType() == EditorObject.LABEL)
-				&& mDescription.equals("Label Movement"))
-			{
-				o.setPosition(o.getX() + mDisplacement.getX(), o.getY() + mDisplacement.getY());
-			}
-			if (o.getType() == EditorObject.EDGE 
-				&& mDescription.equals("Edge Reshaping"))
-			{
-				o.setPosition(o.getX() + mDisplacement.getX(), o.getY() + mDisplacement.getY());
-			}
-			if (o.getType() == EditorObject.NODE 
-				&& mDescription.equals("Node Movement"))
-			{
-				o.setPosition(o.getX() + mDisplacement.getX(), o.getY() + mDisplacement.getY());
-			}
-		}
-    }
+  public void execute()
+  {
+    mCommands.execute();
+  }
 
-    /** 
-     * Undoes the Command
-     */    
+  /** 
+   * Undoes the Command
+   */    
 
-    public void undo()
-    {
-		for (EditorObject o : mMoved)
-		{
-			if (o.getType() == EditorObject.NODEGROUP)
-			{
-				EditorNodeGroup ng = (EditorNodeGroup) o;
-				if (ng.getResizing())
-				{
-					ng.resize((int)(ng.getX() - mDisplacement.getX()), (int)(ng.getY() - mDisplacement.getY()));
-					continue;
-				}
-			}
-			if ((o.getType() == EditorObject.LABELGROUP || o.getType() == EditorObject.LABEL)
-				&& mDescription.equals("Label Movement"))
-			{
-				o.setPosition(o.getX() - mDisplacement.getX(), o.getY() - mDisplacement.getY());
-			}
-			if (o.getType() == EditorObject.EDGE 
-				&& mDescription.equals("Edge Reshaping"))
-			{
-				o.setPosition(o.getX() - mDisplacement.getX(), o.getY() - mDisplacement.getY());
-			}
-			if (o.getType() == EditorObject.NODE 
-				&& mDescription.equals("Node Movement"))
-			{
-				o.setPosition(o.getX() - mDisplacement.getX(), o.getY() - mDisplacement.getY());
-			}
-		}
-		mSurface.getEditorInterface().setDisplayed();  
-    }
-	
+  public void undo()
+  {
+    mCommands.undo();
+  }
+
 	public boolean isSignificant()
 	{
-		return true;
+		return mCommands.isSignificant();
 	}
 
+  public String getName()
+  {
+    return mDescription;
+  }
+  
+  private class MoveSimpleNode
+    implements Command
+  {
+    private final SimpleNodeSubject mNode;
+    private final PointGeometrySubject mOrig;
+    private final PointGeometrySubject mNew;
+    private final PointGeometrySubject mOArrow;
+    private final PointGeometrySubject mNArrow;
+    private final MoveLabelGeometry mLabel;
+    
+    public MoveSimpleNode(SimpleNodeSubject orig, SimpleNodeSubject dummy)
+    {
+      mNode = orig;
+      mOrig = mNode.getPointGeometry().clone();
+      mNew = dummy.getPointGeometry().clone();
+      if (mNode.getInitialArrowGeometry() != null) {
+        mOArrow = mNode.getInitialArrowGeometry().clone();
+        mNArrow = dummy.getInitialArrowGeometry().clone();
+      } else {
+        mOArrow = null;
+        mNArrow = null;
+      }
+      mLabel = new MoveLabelGeometry(orig.getLabelGeometry(),
+                                     dummy.getLabelGeometry());
+    }
+    
+    public void execute()
+    {
+      mNode.setPointGeometry(mNew);
+      mNode.setInitialArrowGeometry(mNArrow);
+      mLabel.execute();
+    }
+    
+    public void undo()
+    {
+      mNode.setPointGeometry(mOrig);
+      mNode.setInitialArrowGeometry(mOArrow);
+      mLabel.undo();
+    }
+    
+    public boolean isSignificant()
+    {
+      return true;
+    }
+    
     public String getName()
     {
-	return mDescription;
+      return "Move Node";
     }
-
-    public void setDisplacement(Point2D neo) 
+  }
+  
+  private class MoveGroupNode
+    implements Command
+  {
+    private final GroupNodeSubject mNode;
+    private final BoxGeometrySubject mOrig;
+    private final BoxGeometrySubject mNew;
+    private final Set<NodeSubject> mOChildren;
+    private final Set<NodeSubject> mNChildren;
+    
+    public MoveGroupNode(GroupNodeSubject orig, GroupNodeSubject dummy)
     {
-	mDisplacement.setLocation(neo);
+      mNode = orig;
+      mOrig = mNode.getGeometry().clone();
+      mNew = dummy.getGeometry().clone();
+      if (mNode.getImmediateChildNodes().equals(dummy.getImmediateChildNodes())) {
+        mOChildren = new HashSet(mNode.getImmediateChildNodesModifiable());
+        mNChildren = new HashSet(dummy.getImmediateChildNodesModifiable());
+      } else {
+        mOChildren = null;
+        mNChildren = null;
+      }
     }
-
-    public Point2D getDisplacement()
+    
+    public void execute()
     {
-	return (Point2D)mDisplacement.clone();
+      mNode.setGeometry(mNew);
+      Set<NodeSubject> children = mNode.getImmediateChildNodesModifiable();
+      children.clear();
+      children.addAll(mNChildren);
     }
+    
+    public void undo()
+    {
+      mNode.setGeometry(mOrig);
+      Set<NodeSubject> children = mNode.getImmediateChildNodesModifiable();
+      children.clear();
+      children.addAll(mOChildren);
+    }
+    
+    public boolean isSignificant()
+    {
+      return true;
+    }
+    
+    public String getName()
+    {
+      return "Move Node";
+    }
+  }
+  
+  private class MoveEdge
+    implements Command
+  {
+    private final EdgeSubject mEdge;
+    private final SplineGeometrySubject mOrig;
+    private final SplineGeometrySubject mNew;
+    private final PointGeometrySubject mOStart;
+    private final PointGeometrySubject mNStart;
+    private final PointGeometrySubject mOEnd;
+    private final PointGeometrySubject mNEnd;
+    /*private final NodeSubject mOSour;
+    private final NodeSubject mNSour;
+    private final NodeSubject mOTarg;
+    private final NodeSubject mNTarg;*/
+    
+    public MoveEdge(EdgeSubject orig, EdgeSubject dummy)
+    {
+      mEdge = orig;
+      if (mEdge.getGeometry() != null) {
+        mOrig = mEdge.getGeometry().clone();
+      } else {
+        final Collection<Point2D> points = Collections.singleton(
+        GeometryTools.getMidPoint(GeometryTools.getPosition(mEdge.getSource()),
+                                  GeometryTools.getPosition(mEdge.getTarget())
+                                  ));
+        mOrig = new SplineGeometrySubject(points, SplineKind.INTERPOLATING);
+      }
+      if (mEdge.getStartPoint() == null) {
+        mOStart = new PointGeometrySubject(
+                     GeometryTools.defaultPosition(mEdge.getSource(),
+                                                   mOrig.getPoints().get(0)));
+      } else {
+        mOStart = mEdge.getStartPoint().clone();
+      }
+      if (mEdge.getEndPoint() == null) {
+        mOEnd = new PointGeometrySubject(
+                     GeometryTools.defaultPosition(mEdge.getTarget(),
+                                                   mOrig.getPoints().get(0)));
+      } else {
+        mOEnd = mEdge.getEndPoint().clone();
+      }
+      mNew = dummy.getGeometry().clone();
+      mNStart = dummy.getStartPoint().clone();
+      mNEnd = dummy.getEndPoint().clone();
+      /*mOSour = orig.getSource();
+      mNSour = dummy.getSource();
+      mOTarg = orig.getTarget();
+      mNTarg = dummy.getTarget();*/
+    }
+    
+    public void execute()
+    {
+      mEdge.setGeometry(mNew);
+      mEdge.setStartPoint(mNStart);
+      mEdge.setEndPoint(mNEnd);
+      //mEdge.setSource(mNSour);
+      //mEdge.setTarget(mNTarg);
+    }
+    
+    public void undo()
+    {
+      mEdge.setGeometry(mOrig);
+      mEdge.setStartPoint(mOStart);
+      mEdge.setEndPoint(mOEnd);
+      //mEdge.setSource(mOSour);
+      //mEdge.setTarget(mOTarg);
+    }
+    
+    public boolean isSignificant()
+    {
+      return true;
+    }
+    
+    public String getName()
+    {
+      return "Move Edge";
+    }
+  }
+  
+  private class MoveLabelBlock
+    implements Command
+  {
+    private final LabelBlockSubject mLabel;
+    private final LabelGeometrySubject mOrig;
+    private final LabelGeometrySubject mNew;
+    
+    public MoveLabelBlock(LabelBlockSubject orig, LabelBlockSubject dummy)
+    {
+      mLabel = orig;
+      mOrig = mLabel.getGeometry().clone();
+      mNew = dummy.getGeometry().clone();
+    }
+    
+    public void execute()
+    {
+      mLabel.setGeometry(mNew);
+    }
+    
+    public void undo()
+    {
+      mLabel.setGeometry(mOrig);
+    }
+    
+    public boolean isSignificant()
+    {
+      return true;
+    }
+    
+    public String getName()
+    {
+      return "Move LabelBlock";
+    }
+  }
+  
+  private class MoveLabelGeometry
+    implements Command
+  {
+    private final LabelGeometrySubject mLabel;
+    private final Point2D mOrig;
+    private final Point2D mNew;
+    
+    public MoveLabelGeometry(LabelGeometrySubject orig, LabelGeometrySubject dummy)
+    {
+      mLabel = orig;
+      mOrig = mLabel.getOffset();
+      mNew = dummy.getOffset();
+    }
+    
+    public void execute()
+    {
+      mLabel.setOffset(mNew);
+    }
+    
+    public void undo()
+    {
+      mLabel.setOffset(mOrig);
+    }
+    
+    public boolean isSignificant()
+    {
+      return true;
+    }
+    
+    public String getName()
+    {
+      return "Move Label";
+    }
+  }
 }

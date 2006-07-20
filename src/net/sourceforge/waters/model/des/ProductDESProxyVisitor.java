@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   ProductDESProxyVisitor
 //###########################################################################
-//# $Id: ProductDESProxyVisitor.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ProductDESProxyVisitor.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.des;
@@ -20,13 +20,28 @@ public interface ProductDESProxyVisitor
   public Object visitAutomatonProxy(AutomatonProxy proxy)
     throws VisitorException;
 
+  public Object visitConflictTraceProxy(ConflictTraceProxy proxy)
+    throws VisitorException;
+
   public Object visitEventProxy(EventProxy proxy)
+    throws VisitorException;
+
+  public Object visitLoopTraceProxy(LoopTraceProxy proxy)
     throws VisitorException;
 
   public Object visitProductDESProxy(ProductDESProxy proxy)
     throws VisitorException;
 
+  public Object visitSafetyTraceProxy(SafetyTraceProxy proxy)
+    throws VisitorException;
+
   public Object visitStateProxy(StateProxy proxy)
+    throws VisitorException;
+
+  public Object visitTraceProxy(TraceProxy proxy)
+    throws VisitorException;
+
+  public Object visitTraceStepProxy(TraceStepProxy proxy)
     throws VisitorException;
 
   public Object visitTransitionProxy(TransitionProxy proxy)

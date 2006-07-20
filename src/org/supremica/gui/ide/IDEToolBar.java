@@ -1,3 +1,11 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica IDE
+//# PACKAGE: org.supremica.gui.ide
+//# CLASS:   IDEToolBar
+//###########################################################################
+//# $Id: IDEToolBar.java,v 1.10 2006-07-20 02:28:37 robi Exp $
+//###########################################################################
 
 package org.supremica.gui.ide;
 
@@ -11,6 +19,8 @@ import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.ToolbarChangedEvent;
+import net.sourceforge.waters.gui.ControlledSurface;
+import net.sourceforge.waters.gui.ControlledSurface.Tool;
 
 public class IDEToolBar
 	extends JToolBar
@@ -113,11 +123,12 @@ public class IDEToolBar
 		return collection.size();
 	}
 
-    public String getCommand()
-    {
-	    return command;
-	}
-
+  public ControlledSurface.Tool getCommand()
+  {
+		return Enum.valueOf(ControlledSurface.Tool.class
+                        , command);
+  }
+    
     public void setCommand(String c)
     {
 	    command = c;

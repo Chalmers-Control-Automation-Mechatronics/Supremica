@@ -4,23 +4,22 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   GraphNodeListHandler
 //###########################################################################
-//# $Id: GraphNodeListHandler.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: GraphNodeListHandler.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.util.List;
-import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.module.NodeProxy;
 
-import net.sourceforge.waters.xsd.module.GraphType;
-import net.sourceforge.waters.xsd.module.NodeListType;
+import net.sourceforge.waters.xsd.module.Graph;
+import net.sourceforge.waters.xsd.module.NodeList;
 import net.sourceforge.waters.xsd.module.ObjectFactory;
 
 
 class GraphNodeListHandler
-  extends JAXBCheckedListHandler<GraphType,NodeListType,NodeProxy>
+  extends JAXBCheckedListHandler<Graph,NodeList,NodeProxy>
 {
 
 
@@ -39,20 +38,19 @@ class GraphNodeListHandler
 
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBCheckedListHandler
-  NodeListType createListElement(final GraphType container)
-    throws JAXBException
+  NodeList createListElement(final Graph container)
   {
-    final NodeListType listelem = mFactory.createNodeList();
+    final NodeList listelem = mFactory.createNodeList();
     container.setNodeList(listelem);
     return listelem;
   }
 
-  NodeListType getListElement(final GraphType container)
+  NodeList getListElement(final Graph container)
   {
     return container.getNodeList();
   }
 
-  List getList(final NodeListType listelem)
+  List getList(final NodeList listelem)
   {
     return listelem.getList();
   }

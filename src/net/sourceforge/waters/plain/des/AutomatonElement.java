@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   AutomatonElement
 //###########################################################################
-//# $Id: AutomatonElement.java,v 1.4 2006-02-22 03:35:07 robi Exp $
+//# $Id: AutomatonElement.java,v 1.5 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -21,6 +21,7 @@ import net.sourceforge.waters.model.base.EqualCollection;
 import net.sourceforge.waters.model.base.IndexedHashSet;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.NameNotFoundException;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -77,20 +78,22 @@ public final class AutomatonElement
       events == null ? new EventSet() : new EventSet(events);
     final StateSet statescopy =
       states == null ? new StateSet() : new StateSet(states);
-    final List<TransitionProxy> transitionscopy =
-      new ArrayList<TransitionProxy>(transitions.size());
-    if (transitions != null) {
+    mKind = kind;
+    mEvents = Collections.unmodifiableSet(eventscopy);
+    mStates = Collections.unmodifiableSet(statescopy);
+    if (transitions == null || transitions.isEmpty()) {
+      mTransitions = Collections.emptyList();
+    } else {
+      final List<TransitionProxy> transitionscopy =
+        new ArrayList<TransitionProxy>(transitions.size());
       for (final TransitionProxy trans : transitions) {
         statescopy.checkUnique(trans.getSource());
         eventscopy.checkUnique(trans.getEvent());
         statescopy.checkUnique(trans.getTarget());
         transitionscopy.add(trans);
       }
+      mTransitions = Collections.unmodifiableList(transitionscopy);
     }
-    mKind = kind;
-    mEvents = Collections.unmodifiableSet(eventscopy);
-    mStates = Collections.unmodifiableSet(statescopy);
-    mTransitions = Collections.unmodifiableList(transitionscopy);
   }
 
   /**
@@ -174,18 +177,32 @@ public final class AutomatonElement
 
   //#########################################################################
   //# Equals and Hashcode
-  public boolean equals(final Object partner)
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final AutomatonElement aut = (AutomatonElement) partner;
       return
         mKind.equals(mKind) &&
-        mEvents.equals(aut.mEvents) &&
-        mStates.equals(aut.mStates) &&
-        EqualCollection.equalSet(mTransitions, aut.mTransitions);
+        EqualCollection.isEqualSetByContents(mEvents, aut.mEvents) &&
+        EqualCollection.isEqualSetByContents(mStates, aut.mStates) &&
+        EqualCollection.isEqualSetByContents(mTransitions, aut.mTransitions);
     } else {
       return false;
     }    
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mKind.hashCode();
+    result *= 5;
+    result += EqualCollection.getSetHashCodeByContents(mEvents);
+    result *= 5;
+    result += EqualCollection.getSetHashCodeByContents(mStates);
+    result *= 5;
+    result += EqualCollection.getSetHashCodeByContents(mTransitions);
+    return result;
   }
 
 

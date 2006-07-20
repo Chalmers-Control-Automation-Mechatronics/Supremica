@@ -4,13 +4,11 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.11 2006-05-24 09:13:02 markus Exp $
+//# $Id: JAXBModuleImporter.java,v 1.12 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
-import java.awt.Color;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.net.URI;
 import java.util.Collection;
@@ -79,56 +77,58 @@ import net.sourceforge.waters.xsd.base.ElementType;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.base.NamedType;
 import net.sourceforge.waters.xsd.module.AnchorPosition;
-import net.sourceforge.waters.xsd.module.BinaryExpressionType;
-import net.sourceforge.waters.xsd.module.BoxGeometryType;
-import net.sourceforge.waters.xsd.module.BoxType;
-import net.sourceforge.waters.xsd.module.ColorGeometryType;
-import net.sourceforge.waters.xsd.module.ColorType;
-import net.sourceforge.waters.xsd.module.ConstantAliasType;
-import net.sourceforge.waters.xsd.module.EdgeType;
-import net.sourceforge.waters.xsd.module.EnumSetExpressionType;
-import net.sourceforge.waters.xsd.module.EventAliasType;
+import net.sourceforge.waters.xsd.module.BinaryExpression;
+import net.sourceforge.waters.xsd.module.BoxGeometry;
+import net.sourceforge.waters.xsd.module.Box;
+import net.sourceforge.waters.xsd.module.ColorGeometry;
+import net.sourceforge.waters.xsd.module.Color;
+import net.sourceforge.waters.xsd.module.ConstantAlias;
+import net.sourceforge.waters.xsd.module.Edge;
+import net.sourceforge.waters.xsd.module.EnumSetExpression;
+import net.sourceforge.waters.xsd.module.EventAlias;
 import net.sourceforge.waters.xsd.module.EventBaseType;
-import net.sourceforge.waters.xsd.module.EventDeclType;
-import net.sourceforge.waters.xsd.module.EventListExpressionType;
-import net.sourceforge.waters.xsd.module.EventParameterType;
+import net.sourceforge.waters.xsd.module.EventDecl;
+import net.sourceforge.waters.xsd.module.EventListExpression;
+import net.sourceforge.waters.xsd.module.EventParameter;
 import net.sourceforge.waters.xsd.module.ExpressionType;
-import net.sourceforge.waters.xsd.module.ForeachComponentType;
-import net.sourceforge.waters.xsd.module.ForeachEventAliasType;
-import net.sourceforge.waters.xsd.module.ForeachEventType;
+import net.sourceforge.waters.xsd.module.ForeachComponent;
+import net.sourceforge.waters.xsd.module.ForeachEventAlias;
+import net.sourceforge.waters.xsd.module.ForeachEvent;
 import net.sourceforge.waters.xsd.module.ForeachType;
-import net.sourceforge.waters.xsd.module.GraphType;
-import net.sourceforge.waters.xsd.module.GroupNodeType;
+import net.sourceforge.waters.xsd.module.Graph;
+import net.sourceforge.waters.xsd.module.GroupNode;
 import net.sourceforge.waters.xsd.module.IdentifiedType;
 import net.sourceforge.waters.xsd.module.IdentifierType;
-import net.sourceforge.waters.xsd.module.IndexedIdentifierType;
-import net.sourceforge.waters.xsd.module.InstanceType;
-import net.sourceforge.waters.xsd.module.IntConstantType;
-import net.sourceforge.waters.xsd.module.IntParameterType;
-import net.sourceforge.waters.xsd.module.LabelBlockType;
-import net.sourceforge.waters.xsd.module.LabelGeometryType;
-import net.sourceforge.waters.xsd.module.ModuleType;
+import net.sourceforge.waters.xsd.module.IndexedIdentifier;
+import net.sourceforge.waters.xsd.module.Instance;
+import net.sourceforge.waters.xsd.module.IntConstant;
+import net.sourceforge.waters.xsd.module.IntParameter;
+import net.sourceforge.waters.xsd.module.LabelBlock;
+import net.sourceforge.waters.xsd.module.LabelGeometry;
+import net.sourceforge.waters.xsd.module.Module;
 import net.sourceforge.waters.xsd.module.NodeType;
-import net.sourceforge.waters.xsd.module.NodeRefType;
-import net.sourceforge.waters.xsd.module.ParameterBindingType;
+import net.sourceforge.waters.xsd.module.NodeRef;
+import net.sourceforge.waters.xsd.module.ParameterBinding;
 import net.sourceforge.waters.xsd.module.PointGeometryType;
-import net.sourceforge.waters.xsd.module.PointType;
-import net.sourceforge.waters.xsd.module.RangeParameterType;
-import net.sourceforge.waters.xsd.module.SimpleComponentType;
+import net.sourceforge.waters.xsd.module.Point;
+import net.sourceforge.waters.xsd.module.RangeParameter;
+import net.sourceforge.waters.xsd.module.SimpleComponent;
 import net.sourceforge.waters.xsd.module.SimpleExpressionType;
-import net.sourceforge.waters.xsd.module.SimpleIdentifierType;
-import net.sourceforge.waters.xsd.module.SimpleNodeType;
+import net.sourceforge.waters.xsd.module.SimpleIdentifier;
+import net.sourceforge.waters.xsd.module.SimpleNode;
 import net.sourceforge.waters.xsd.module.SimpleParameterType;
-import net.sourceforge.waters.xsd.module.SplineGeometryType;
+import net.sourceforge.waters.xsd.module.SplineGeometry;
 import net.sourceforge.waters.xsd.module.SplineKind;
-import net.sourceforge.waters.xsd.module.UnaryExpressionType;
+import net.sourceforge.waters.xsd.module.UnaryExpression;
 //EFA----------------
-import net.sourceforge.waters.xsd.module.GuardActionBlockType;
-import net.sourceforge.waters.xsd.module.VariableType;
-import net.sourceforge.waters.xsd.module.BooleanConstantType;
+import net.sourceforge.waters.xsd.module.GuardActionBlock;
+import net.sourceforge.waters.xsd.module.Variable;
+import net.sourceforge.waters.xsd.module.BooleanConstant;
 //-------------------
+
+
 public class JAXBModuleImporter
-  extends JAXBDocumentImporter<ModuleProxy,ModuleType>
+  extends JAXBDocumentImporter<ModuleProxy,Module>
 {
   //#########################################################################
   //# Constructors
@@ -143,7 +143,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public BinaryExpressionProxy importElement(final ElementType element)
       {
-        final BinaryExpressionType downcast = (BinaryExpressionType) element;
+        final BinaryExpression downcast = (BinaryExpression) element;
         return importBinaryExpression(downcast);
       }
     };
@@ -152,7 +152,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public BoxGeometryProxy importElement(final ElementType element)
       {
-        final BoxGeometryType downcast = (BoxGeometryType) element;
+        final BoxGeometry downcast = (BoxGeometry) element;
         return importBoxGeometry(downcast);
       }
     };
@@ -161,7 +161,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public Rectangle importElement(final ElementType element)
       {
-        final BoxType downcast = (BoxType) element;
+        final Box downcast = (Box) element;
         return importRectangle(downcast);
       }
     };
@@ -170,16 +170,16 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public ColorGeometryProxy importElement(final ElementType element)
       {
-        final ColorGeometryType downcast = (ColorGeometryType) element;
+        final ColorGeometry downcast = (ColorGeometry) element;
         return importColorGeometry(downcast);
       }
     };
     mHandlerMap.put
       (net.sourceforge.waters.xsd.module.ColorGeometry.class, handler);
     handler = new ImportHandler() {
-      public Color importElement(final ElementType element)
+      public java.awt.Color importElement(final ElementType element)
       {
-        final ColorType downcast = (ColorType) element;
+        final Color downcast = (Color) element;
         return importColor(downcast);
       }
     };
@@ -188,7 +188,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public AliasProxy importElement(final ElementType element)
       {
-        final ConstantAliasType downcast = (ConstantAliasType) element;
+        final ConstantAlias downcast = (ConstantAlias) element;
         return importConstantAlias(downcast);
       }
     };
@@ -197,7 +197,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public EdgeProxy importElement(final ElementType element)
       {
-        final EdgeType downcast = (EdgeType) element;
+        final Edge downcast = (Edge) element;
         return importEdge(downcast);
       }
     };
@@ -208,7 +208,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
         public GuardActionBlockProxy importElement(final ElementType element)
         {
-          final GuardActionBlockType downcast = (GuardActionBlockType) element;
+          final GuardActionBlock downcast = (GuardActionBlock) element;
           return importGuardActionBlock(downcast);
         }
       };
@@ -218,7 +218,7 @@ public class JAXBModuleImporter
       handler = new ImportHandler() {
       public BooleanConstantProxy importElement(final ElementType element)
       {
-        final BooleanConstantType downcast = (BooleanConstantType) element;
+        final BooleanConstant downcast = (BooleanConstant) element;
         return importBooleanConstant(downcast);
       }
     };
@@ -227,7 +227,7 @@ public class JAXBModuleImporter
     
       handler = new ImportHandler() {
  			public VariableProxy importElement(final ElementType element) {
- 				final VariableType downcast = (VariableType) element;
+ 				final Variable downcast = (Variable) element;
  				return importVariable(downcast);
  			}
  		};
@@ -240,7 +240,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public EnumSetExpressionProxy importElement(final ElementType element)
       {
-        final EnumSetExpressionType downcast = (EnumSetExpressionType) element;
+        final EnumSetExpression downcast = (EnumSetExpression) element;
         return importEnumSetExpression(downcast);
       }
     };
@@ -249,7 +249,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public AliasProxy importElement(final ElementType element)
       {
-        final EventAliasType downcast = (EventAliasType) element;
+        final EventAlias downcast = (EventAlias) element;
         return importEventAlias(downcast);
       }
     };
@@ -258,7 +258,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public EventDeclProxy importElement(final ElementType element)
       {
-        final EventDeclType downcast = (EventDeclType) element;
+        final EventDecl downcast = (EventDecl) element;
         return importEventDecl(downcast);
       }
     };
@@ -267,8 +267,8 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public PlainEventListProxy importElement(final ElementType element)
       {
-        final EventListExpressionType downcast =
-          (EventListExpressionType) element;
+        final EventListExpression downcast =
+          (EventListExpression) element;
         return importPlainEventList(downcast);
       }
     };
@@ -277,7 +277,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public EventParameterProxy importElement(final ElementType element)
       {
-        final EventParameterType downcast = (EventParameterType) element;
+        final EventParameter downcast = (EventParameter) element;
         return importEventParameter(downcast);
       }
     };
@@ -286,7 +286,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public ForeachComponentProxy importElement(final ElementType element)
       {
-        final ForeachComponentType downcast = (ForeachComponentType) element;
+        final ForeachComponent downcast = (ForeachComponent) element;
         return importForeachComponent(downcast);
       }
     };
@@ -295,7 +295,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public ForeachEventAliasProxy importElement(final ElementType element)
       {
-        final ForeachEventAliasType downcast = (ForeachEventAliasType) element;
+        final ForeachEventAlias downcast = (ForeachEventAlias) element;
         return importForeachEventAlias(downcast);
       }
     };
@@ -304,7 +304,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public ForeachEventProxy importElement(final ElementType element)
       {
-        final ForeachEventType downcast = (ForeachEventType) element;
+        final ForeachEvent downcast = (ForeachEvent) element;
         return importForeachEvent(downcast);
       }
     };
@@ -312,7 +312,7 @@ public class JAXBModuleImporter
 				handler);
 		handler = new ImportHandler() {
 			public GraphProxy importElement(final ElementType element) {
-				final GraphType downcast = (GraphType) element;
+				final Graph downcast = (Graph) element;
 				return importGraph(downcast);
 			}
 		};
@@ -322,7 +322,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public GroupNodeProxy importElement(final ElementType element)
       {
-        final GroupNodeType downcast = (GroupNodeType) element;
+        final GroupNode downcast = (GroupNode) element;
         return importGroupNode(downcast);
       }
     };
@@ -331,7 +331,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public IndexedIdentifierProxy importElement(final ElementType element)
       {
-        final IndexedIdentifierType downcast = (IndexedIdentifierType) element;
+        final IndexedIdentifier downcast = (IndexedIdentifier) element;
         return importIndexedIdentifier(downcast);
       }
     };
@@ -340,7 +340,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public InstanceProxy importElement(final ElementType element)
       {
-        final InstanceType downcast = (InstanceType) element;
+        final Instance downcast = (Instance) element;
         return importInstance(downcast);
       }
     };
@@ -349,7 +349,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public IntConstantProxy importElement(final ElementType element)
       {
-        final IntConstantType downcast = (IntConstantType) element;
+        final IntConstant downcast = (IntConstant) element;
         return importIntConstant(downcast);
       }
     };
@@ -358,7 +358,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public IntParameterProxy importElement(final ElementType element)
       {
-        final IntParameterType downcast = (IntParameterType) element;
+        final IntParameter downcast = (IntParameter) element;
         return importIntParameter(downcast);
       }
     };
@@ -368,7 +368,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public LabelBlockProxy importElement(final ElementType element)
       {
-        final LabelBlockType downcast = (LabelBlockType) element;
+        final LabelBlock downcast = (LabelBlock) element;
         return importLabelBlock(downcast);
       }
     };
@@ -378,7 +378,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public LabelGeometryProxy importElement(final ElementType element)
       {
-        final LabelGeometryType downcast = (LabelGeometryType) element;
+        final LabelGeometry downcast = (LabelGeometry) element;
         return importLabelGeometry(downcast);
       }
     };
@@ -389,7 +389,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public ModuleProxy importElement(final ElementType element)
       {
-        final ModuleType downcast = (ModuleType) element;
+        final Module downcast = (Module) element;
         return importModule(downcast);
       }
     };
@@ -398,7 +398,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public ParameterBindingProxy importElement(final ElementType element)
       {
-        final ParameterBindingType downcast = (ParameterBindingType) element;
+        final ParameterBinding downcast = (ParameterBinding) element;
         return importParameterBinding(downcast);
       }
     };
@@ -408,15 +408,15 @@ public class JAXBModuleImporter
       public PointGeometryProxy importElement(final ElementType element)
       {
         final PointGeometryType downcast = (PointGeometryType) element;
-        return importPointGeometry(downcast);
+        return importPointGeometryType(downcast);
       }
     };
     mHandlerMap.put
-      (net.sourceforge.waters.xsd.module.PointGeometry.class, handler);
+      (net.sourceforge.waters.xsd.module.PointGeometryType.class, handler);
     handler = new ImportHandler() {
-      public Point importElement(final ElementType element)
+      public java.awt.Point importElement(final ElementType element)
       {
-        final PointType downcast = (PointType) element;
+        final Point downcast = (Point) element;
         return importPoint(downcast);
       }
     };
@@ -425,7 +425,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public SimpleComponentProxy importElement(final ElementType element)
       {
-        final SimpleComponentType downcast = (SimpleComponentType) element;
+        final SimpleComponent downcast = (SimpleComponent) element;
         return importSimpleComponent(downcast);
       }
     };
@@ -434,7 +434,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public RangeParameterProxy importElement(final ElementType element)
       {
-        final RangeParameterType downcast = (RangeParameterType) element;
+        final RangeParameter downcast = (RangeParameter) element;
         return importRangeParameter(downcast);
       }
     };
@@ -443,7 +443,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public SimpleIdentifierProxy importElement(final ElementType element)
       {
-        final SimpleIdentifierType downcast = (SimpleIdentifierType) element;
+        final SimpleIdentifier downcast = (SimpleIdentifier) element;
         return importSimpleIdentifier(downcast);
       }
     };
@@ -452,7 +452,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public SimpleNodeProxy importElement(final ElementType element)
       {
-        final SimpleNodeType downcast = (SimpleNodeType) element;
+        final SimpleNode downcast = (SimpleNode) element;
         return importSimpleNode(downcast);
       }
     };
@@ -461,7 +461,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public SplineGeometryProxy importElement(final ElementType element)
       {
-        final SplineGeometryType downcast = (SplineGeometryType) element;
+        final SplineGeometry downcast = (SplineGeometry) element;
         return importSplineGeometry(downcast);
       }
     };
@@ -470,7 +470,7 @@ public class JAXBModuleImporter
     handler = new ImportHandler() {
       public UnaryExpressionProxy importElement(final ElementType element)
       {
-        final UnaryExpressionType downcast = (UnaryExpressionType) element;
+        final UnaryExpression downcast = (UnaryExpression) element;
         return importUnaryExpression(downcast);
       }
     };
@@ -503,7 +503,7 @@ public class JAXBModuleImporter
     return handler.importElement(element);
   }
 
-  public ModuleProxy importDocument(final ModuleType element,
+  public ModuleProxy importDocument(final Module element,
                                     final URI uri)
   {
     return importModule(element, uri);
@@ -513,53 +513,54 @@ public class JAXBModuleImporter
   //#########################################################################
   //# Importing Elements
   private BinaryExpressionProxy importBinaryExpression
-    (final BinaryExpressionType element)
+    (final BinaryExpression element)
   {
     final String operatorName = element.getOperator();
     final BinaryOperator operator =
       mOperatorTable.getBinaryOperator(operatorName);
-    final SimpleExpressionType leftElement = element.getLeft();
+    final List<SimpleExpressionType> subterms = element.getSubterms();
+    final SimpleExpressionType leftElement = subterms.get(0);
     final SimpleExpressionProxy left =
       (SimpleExpressionProxy) importElement(leftElement);
-    final SimpleExpressionType rightElement = element.getRight();
+    final SimpleExpressionType rightElement = subterms.get(1);
     final SimpleExpressionProxy right =
       (SimpleExpressionProxy) importElement(rightElement);
     return mFactory.createBinaryExpressionProxy(operator, left, right);
   }
 
-  private BoxGeometryProxy importBoxGeometry(final BoxGeometryType element)
+  private BoxGeometryProxy importBoxGeometry(final BoxGeometry element)
   {
     if (element == null) {
       return null;
     } else {
-      final BoxType boxElement = element.getBox();
+      final Box boxElement = element.getBox();
       final Rectangle rectangle = importRectangle(boxElement);
       return mFactory.createBoxGeometryProxy(rectangle);
     }
   }
 
-  private Color importColor(final ColorType element)
+  private java.awt.Color importColor(final Color element)
   {
     final int red = element.getRed();
     final int green = element.getGreen();
     final int blue = element.getBlue();
-    return new Color(red, green, blue);
+    return new java.awt.Color(red, green, blue);
   }
 
   private ColorGeometryProxy importColorGeometry
-    (final ColorGeometryType element)
+    (final ColorGeometry element)
   {
     if (element == null) {
       return null;
     } else {
-      final ColorType colorElement = element.getColor();
-      final Color color = importColor(colorElement);
-      final Set<Color> colorSet = Collections.singleton(color);
+      final Color colorElement = element.getColor();
+      final java.awt.Color color = importColor(colorElement);
+      final Set<java.awt.Color> colorSet = Collections.singleton(color);
       return mFactory.createColorGeometryProxy(colorSet);
     }
   }
 
-  private AliasProxy importConstantAlias(final ConstantAliasType element)
+  private AliasProxy importConstantAlias(final ConstantAlias element)
   {
     final IdentifierType identifierElement = element.getIdentifier();
     final IdentifierProxy identifier =
@@ -572,13 +573,13 @@ public class JAXBModuleImporter
   
   
 //EFA----------------------
-  private BooleanConstantProxy importBooleanConstant(final BooleanConstantType element)
+  private BooleanConstantProxy importBooleanConstant(final BooleanConstant element)
   {
     final boolean value = element.isValue();
     return mFactory.createBooleanConstantProxy(value);
   }
 
-  private VariableProxy importVariable(final VariableType element) {
+  private VariableProxy importVariable(final Variable element) {
 		final SimpleExpressionType typeElement = element.getType();
 		final SimpleExpressionProxy type = (SimpleExpressionProxy) importElement(typeElement);
 
@@ -599,7 +600,7 @@ public class JAXBModuleImporter
 		}
 	}
   private GuardActionBlockProxy importGuardActionBlock(
-			final GuardActionBlockType element) {
+			final GuardActionBlock element) {
 		
 	  if(element != null) {
 		  
@@ -614,29 +615,30 @@ public class JAXBModuleImporter
 	}
 
    // ------------------------
- private EdgeProxy importEdge(final EdgeType element)
+ private EdgeProxy importEdge(final Edge element)
   {
     final String sourceName = element.getSource();
     final NodeProxy source = mGraphNodeList.find(sourceName);
     final String targetName = element.getTarget();
     final NodeProxy target = mGraphNodeList.find(targetName);
 
-    final LabelBlockType labelBlockElement = element.getLabelBlock();
+    final LabelBlock labelBlockElement = element.getLabelBlock();
     final LabelBlockProxy labelBlock = importLabelBlock(labelBlockElement);
     
-    final GuardActionBlockType guardActionBlockElement = element.getGuardActionBlock();
-    final GuardActionBlockProxy guardActionBlock = importGuardActionBlock(guardActionBlockElement);
-    
-    
-    final SplineGeometryType geometryElement = element.getSplineGeometry();
+    final GuardActionBlock guardActionBlockElement =
+      element.getGuardActionBlock();
+    final GuardActionBlockProxy guardActionBlock =
+      importGuardActionBlock(guardActionBlockElement);
+
+    final SplineGeometry geometryElement = element.getSplineGeometry();
     final SplineGeometryProxy geometry = importSplineGeometry(geometryElement);
     final PointGeometryType startPointElement =
       element.getStartPointGeometry();
     final PointGeometryProxy startPoint =
-      importPointGeometry(startPointElement);
+      importPointGeometryType(startPointElement);
     final PointGeometryType endPointElement = element.getEndPointGeometry();
     final PointGeometryProxy endPoint =
-      importPointGeometry(endPointElement);
+      importPointGeometryType(endPointElement);
     return mFactory.createEdgeProxy(source,
                                     target,
                                     labelBlock,
@@ -647,13 +649,13 @@ public class JAXBModuleImporter
   }
 
   private EnumSetExpressionProxy importEnumSetExpression
-    (final EnumSetExpressionType element)
+    (final EnumSetExpression element)
   {
     final List<SimpleIdentifierProxy> items =
       new LinkedList<SimpleIdentifierProxy>();
-    final List<SimpleIdentifierType> itemsElement =
+    final List<SimpleIdentifier> itemsElement =
       Casting.toList(element.getItems());
-    for (final SimpleIdentifierType itemElement : itemsElement) {
+    for (final SimpleIdentifier itemElement : itemsElement) {
       final SimpleIdentifierProxy itemProxy =
         importSimpleIdentifier(itemElement);
       items.add(itemProxy);
@@ -661,12 +663,12 @@ public class JAXBModuleImporter
     return mFactory.createEnumSetExpressionProxy(items);
   }
 
-  private AliasProxy importEventAlias(final EventAliasType element)
+  private AliasProxy importEventAlias(final EventAlias element)
   {
     final IdentifierType identifierElement = element.getIdentifier();
     final IdentifierProxy identifier =
       (IdentifierProxy) importElement(identifierElement);
-    final EventListExpressionType eventListElement = element.getExpression();
+    final EventListExpression eventListElement = element.getExpression();
     final EventListExpressionProxy eventList =
       importPlainEventList(eventListElement);
     return mFactory.createAliasProxy(identifier, eventList);
@@ -686,7 +688,7 @@ public class JAXBModuleImporter
         (SimpleExpressionProxy) importElement(itemElement);
       ranges.add(itemProxy);
     }
-    final ColorGeometryType colorGeometryElement = element.getColorGeometry();
+    final ColorGeometry colorGeometryElement = element.getColorGeometry();
     final ColorGeometryProxy colorGeometry =
       importColorGeometry(colorGeometryElement);
     return mFactory.createEventDeclProxy(name,
@@ -697,7 +699,7 @@ public class JAXBModuleImporter
   }
 
   private EventParameterProxy importEventParameter
-    (final EventParameterType element)
+    (final EventParameter element)
   {
     final String name = element.getName();
     final boolean required = element.isRequired();
@@ -706,58 +708,64 @@ public class JAXBModuleImporter
   }
 
   private ForeachComponentProxy importForeachComponent
-    (final ForeachComponentType element)
+    (final ForeachComponent element)
   {
     final String name = element.getName();
-    final SimpleExpressionType rangeElement = element.getRange();
+    final List<SimpleExpressionType> list = element.getRangeAndGuard();
+    final SimpleExpressionType rangeElement = list.get(0);
     final SimpleExpressionProxy range =
       (SimpleExpressionProxy) importElement(rangeElement);
-    final SimpleExpressionType guardElement = element.getGuard();
-    final SimpleExpressionProxy guard =
-      guardElement == null ? null :
-      (SimpleExpressionProxy) importElement(guardElement);
+    SimpleExpressionProxy guard = null;
+    if (list.size() > 1) {
+      final SimpleExpressionType guardElement = list.get(1);
+      guard = (SimpleExpressionProxy) importElement(guardElement);
+    }
     final List<Proxy> body = new LinkedList<Proxy>();
     mForeachComponentListHandler.fromJAXB(this, element, body);
     return mFactory.createForeachComponentProxy(name, range, guard, body);
   }
 
   private ForeachEventAliasProxy importForeachEventAlias
-    (final ForeachEventAliasType element)
+    (final ForeachEventAlias element)
   {
     final String name = element.getName();
-    final SimpleExpressionType rangeElement = element.getRange();
+    final List<SimpleExpressionType> list = element.getRangeAndGuard();
+    final SimpleExpressionType rangeElement = list.get(0);
     final SimpleExpressionProxy range =
       (SimpleExpressionProxy) importElement(rangeElement);
-    final SimpleExpressionType guardElement = element.getGuard();
-    final SimpleExpressionProxy guard =
-      guardElement == null ? null :
-      (SimpleExpressionProxy) importElement(guardElement);
+    SimpleExpressionProxy guard = null;
+    if (list.size() > 1) {
+      final SimpleExpressionType guardElement = list.get(1);
+      guard = (SimpleExpressionProxy) importElement(guardElement);
+    }
     final List<Proxy> body = new LinkedList<Proxy>();
     mForeachEventAliasListHandler.fromJAXB(this, element, body);
     return mFactory.createForeachEventAliasProxy(name, range, guard, body);
   }
 
-  private ForeachEventProxy importForeachEvent(final ForeachEventType element)
+  private ForeachEventProxy importForeachEvent(final ForeachEvent element)
   {
     final String name = element.getName();
-    final SimpleExpressionType rangeElement = element.getRange();
+    final List<SimpleExpressionType> list = element.getRangeAndGuard();
+    final SimpleExpressionType rangeElement = list.get(0);
     final SimpleExpressionProxy range =
       (SimpleExpressionProxy) importElement(rangeElement);
-    final SimpleExpressionType guardElement = element.getGuard();
-    final SimpleExpressionProxy guard =
-      guardElement == null ? null :
-      (SimpleExpressionProxy) importElement(guardElement);
+    SimpleExpressionProxy guard = null;
+    if (list.size() > 1) {
+      final SimpleExpressionType guardElement = list.get(1);
+      guard = (SimpleExpressionProxy) importElement(guardElement);
+    }
     final List<Proxy> body = new LinkedList<Proxy>();
     mForeachEventListHandler.fromJAXB(this, element, body);
     return mFactory.createForeachEventProxy(name, range, guard, body);
   }
 
 
-  private GraphProxy importGraph(final GraphType element)
+  private GraphProxy importGraph(final Graph element)
   {
     try {
       final boolean deterministic = element.isDeterministic();
-      final LabelBlockType blockedEventsElement = element.getBlockedEvents();
+      final LabelBlock blockedEventsElement = element.getBlockedEvents();
       final LabelBlockProxy blockedEvents =
         importLabelBlock(blockedEventsElement);
       mGraphNodeList =
@@ -774,7 +782,7 @@ public class JAXBModuleImporter
     }
   }
 
-  private GroupNodeProxy importGroupNode(final GroupNodeType element)
+  private GroupNodeProxy importGroupNode(final GroupNode element)
   {
     final String name = element.getName();
     final List<Proxy> eventList = new LinkedList<Proxy>();
@@ -783,13 +791,13 @@ public class JAXBModuleImporter
       mFactory.createPlainEventListProxy(eventList);
     final Collection<NodeProxy> immediateChildNodes =
       new CheckedImportSet<NodeProxy>(GroupNodeProxy.class, name, "node");
-    final List<NodeRefType> immediateChildNodesElement =
+    final List<NodeRef> immediateChildNodesElement =
       Casting.toList(element.getNodes());
-    for (final NodeRefType ref : immediateChildNodesElement) {
+    for (final NodeRef ref : immediateChildNodesElement) {
       final NodeProxy itemProxy = importNodeRef(ref);
       immediateChildNodes.add(itemProxy);
     }
-    final BoxGeometryType geometryElement = element.getBoxGeometry();
+    final BoxGeometry geometryElement = element.getBoxGeometry();
     final BoxGeometryProxy geometry =
       importBoxGeometry(geometryElement);
     return mFactory.createGroupNodeProxy(name,
@@ -799,7 +807,7 @@ public class JAXBModuleImporter
   }
 
   private IndexedIdentifierProxy importIndexedIdentifier
-    (final IndexedIdentifierType element)
+    (final IndexedIdentifier element)
   {
     final String name = element.getName();
     final List<SimpleExpressionProxy> indexes =
@@ -814,7 +822,7 @@ public class JAXBModuleImporter
     return mFactory.createIndexedIdentifierProxy(name, indexes);
   }
 
-  private InstanceProxy importInstance(final InstanceType element)
+  private InstanceProxy importInstance(final Instance element)
   {
     final IdentifierType identifierElement = element.getIdentifier();
     final IdentifierProxy identifier =
@@ -822,9 +830,9 @@ public class JAXBModuleImporter
     final String moduleName = element.getModuleName();
     final List<ParameterBindingProxy> bindingList =
       new LinkedList<ParameterBindingProxy>();
-    final List<ParameterBindingType> bindingListElement =
+    final List<ParameterBinding> bindingListElement =
       Casting.toList(element.getBindings());
-    for (final ParameterBindingType itemElement : bindingListElement) {
+    for (final ParameterBinding itemElement : bindingListElement) {
       final ParameterBindingProxy itemProxy =
         importParameterBinding(itemElement);
       bindingList.add(itemProxy);
@@ -832,13 +840,13 @@ public class JAXBModuleImporter
     return mFactory.createInstanceProxy(identifier, moduleName, bindingList);
   }
 
-  private IntConstantProxy importIntConstant(final IntConstantType element)
+  private IntConstantProxy importIntConstant(final IntConstant element)
   {
     final int value = element.getValue();
     return mFactory.createIntConstantProxy(value);
   }
 
-  private IntParameterProxy importIntParameter(final IntParameterType element)
+  private IntParameterProxy importIntParameter(final IntParameter element)
   {
     final String name = element.getName();
     final boolean required = element.isRequired();
@@ -848,7 +856,7 @@ public class JAXBModuleImporter
     return mFactory.createIntParameterProxy(name, required, defaultValue);
   }
 
-  private LabelBlockProxy importLabelBlock(final LabelBlockType element)
+  private LabelBlockProxy importLabelBlock(final LabelBlock element)
   {
     if (element != null) {
       final List<Proxy> eventList = new LinkedList<Proxy>();
@@ -858,7 +866,7 @@ public class JAXBModuleImporter
         final Proxy itemProxy = (Proxy) importElement(itemElement);
         eventList.add(itemProxy);
       }
-      final LabelGeometryType geometryElement = element.getLabelGeometry();
+      final LabelGeometry geometryElement = element.getLabelGeometry();
       final LabelGeometryProxy geometry = importLabelGeometry(geometryElement);
       return mFactory.createLabelBlockProxy(eventList, geometry);
     } else {
@@ -867,24 +875,24 @@ public class JAXBModuleImporter
   }
 
   private LabelGeometryProxy importLabelGeometry
-    (final LabelGeometryType element)
+    (final LabelGeometry element)
   {
     if (element == null) {
       return null;
     } else {
-      final PointType offsetElement = element.getPoint();
-      final Point offset = importPoint(offsetElement);
+      final Point offsetElement = element.getPoint();
+      final java.awt.Point offset = importPoint(offsetElement);
       final AnchorPosition anchor = element.getAnchor();
       return mFactory.createLabelGeometryProxy(offset, anchor);
     }
   }
 
-  private ModuleProxy importModule(final ModuleType element)
+  private ModuleProxy importModule(final Module element)
   {
     return importModule(element, null);
   }
 
-  private ModuleProxy importModule(final ModuleType element,
+  private ModuleProxy importModule(final Module element,
                                    final URI uri)
   {
     final String name = element.getName();
@@ -909,7 +917,7 @@ public class JAXBModuleImporter
                                       componentList);
   }
 
-  private NodeProxy importNodeRef(final NodeRefType element)
+  private NodeProxy importNodeRef(final NodeRef element)
     throws NameNotFoundException
   {
     final String name = element.getName();
@@ -917,7 +925,7 @@ public class JAXBModuleImporter
   }
 
   private ParameterBindingProxy importParameterBinding
-    (final ParameterBindingType element)
+    (final ParameterBinding element)
   {
     final String name = element.getName();
     final ExpressionType expressionElement = element.getExpression();
@@ -927,34 +935,34 @@ public class JAXBModuleImporter
   }
 
   private PlainEventListProxy importPlainEventList
-    (final EventListExpressionType element)
+    (final EventListExpression element)
   {
     final List<Proxy> eventList = new LinkedList<Proxy>();
     mEventListExpressionEventListHandler.fromJAXB(this, element, eventList);
     return mFactory.createPlainEventListProxy(eventList);
   }
 
-  private Point importPoint(final PointType element)
+  private java.awt.Point importPoint(final Point element)
   {
     final int x = element.getX();
     final int y = element.getY();
-    return new Point(x, y);
+    return new java.awt.Point(x, y);
   }
 
-  private PointGeometryProxy importPointGeometry
+  private PointGeometryProxy importPointGeometryType
     (final PointGeometryType element)
   {
     if (element == null) {
       return null;
     } else {
-      final PointType pointElement = element.getPoint();
-      final Point point = importPoint(pointElement);
+      final Point pointElement = element.getPoint();
+      final java.awt.Point point = importPoint(pointElement);
       return mFactory.createPointGeometryProxy(point);
     }
   }
 
   private RangeParameterProxy importRangeParameter
-    (final RangeParameterType element)
+    (final RangeParameter element)
   {
     final String name = element.getName();
     final boolean required = element.isRequired();
@@ -964,7 +972,7 @@ public class JAXBModuleImporter
     return mFactory.createRangeParameterProxy(name, required, defaultValue);
   }
 
-  private Rectangle importRectangle(final BoxType element)
+  private Rectangle importRectangle(final Box element)
   {
     final int x = element.getX();
     final int y = element.getY();
@@ -973,27 +981,31 @@ public class JAXBModuleImporter
     return new Rectangle(x, y, width, height);
   }
 
-  private SimpleComponentProxy importSimpleComponent(
-			final SimpleComponentType element) {
-		// EFA----------------
-		final List<VariableProxy> variables = new LinkedList<VariableProxy>();
-		mSimpleComponentVariableListHandler.fromJAXB(this, element, variables);
-		// ------------------
-		final IdentifierType identifierElement = element.getIdentifier();
-		final IdentifierProxy identifier = (IdentifierProxy) importElement(identifierElement);
-		final ComponentKind kind = element.getKind();
-		final GraphType graphElement = element.getGraph();
-		final GraphProxy graph = importGraph(graphElement);
-		return mFactory.createSimpleComponentProxy(identifier, kind, graph, variables);
-	}
+  private SimpleComponentProxy importSimpleComponent
+    (final SimpleComponent element)
+  {
+    // EFA----------------
+    final List<VariableProxy> variables = new LinkedList<VariableProxy>();
+    mSimpleComponentVariableListHandler.fromJAXB(this, element, variables);
+    // ------------------
+    final IdentifierType identifierElement = element.getIdentifier();
+    final IdentifierProxy identifier =
+      (IdentifierProxy) importElement(identifierElement);
+    final ComponentKind kind = element.getKind();
+    final Graph graphElement = element.getGraph();
+    final GraphProxy graph = importGraph(graphElement);
+    return mFactory.createSimpleComponentProxy
+      (identifier, kind, graph, variables);
+  }
 
-	private SimpleIdentifierProxy importSimpleIdentifier(
-			final SimpleIdentifierType element) {
-		final String name = element.getName();
-		return mFactory.createSimpleIdentifierProxy(name);
-	}
+  private SimpleIdentifierProxy importSimpleIdentifier
+    (final SimpleIdentifier element)
+  {
+    final String name = element.getName();
+    return mFactory.createSimpleIdentifierProxy(name);
+  }
 
-  private SimpleNodeProxy importSimpleNode(final SimpleNodeType element)
+  private SimpleNodeProxy importSimpleNode(final SimpleNode element)
   {
     final String name = element.getName();
     final List<Proxy> eventList = new LinkedList<Proxy>();
@@ -1003,12 +1015,12 @@ public class JAXBModuleImporter
     final boolean initial = element.isInitial();
     final PointGeometryType pointGeometryElement = element.getPointGeometry();
     final PointGeometryProxy pointGeometry =
-      importPointGeometry(pointGeometryElement);
+      importPointGeometryType(pointGeometryElement);
     final PointGeometryType arrowGeometryElement =
       element.getInitialArrowGeometry();
     final PointGeometryProxy arrowGeometry =
-      importPointGeometry(arrowGeometryElement);
-    final LabelGeometryType labelGeometryElement = element.getLabelGeometry();
+      importPointGeometryType(arrowGeometryElement);
+    final LabelGeometry labelGeometryElement = element.getLabelGeometry();
     final LabelGeometryProxy labelGeometry =
       importLabelGeometry(labelGeometryElement);
     return mFactory.createSimpleNodeProxy(name,
@@ -1020,16 +1032,16 @@ public class JAXBModuleImporter
   }
 
   private SplineGeometryProxy importSplineGeometry
-    (final SplineGeometryType element)
+    (final SplineGeometry element)
   {
     if (element == null) {
       return null;
     } else {
-      final List<Point> points = new LinkedList<Point>();
-      final List<PointType> pointsElement =
+      final List<java.awt.Point> points = new LinkedList<java.awt.Point>();
+      final List<Point> pointsElement =
         Casting.toList(element.getPoints());
-      for (final PointType pointElement : pointsElement) {
-        final Point point = importPoint(pointElement);
+      for (final Point pointElement : pointsElement) {
+        final java.awt.Point point = importPoint(pointElement);
         points.add(point);
       }
       final SplineKind kind = element.getKind();
@@ -1038,7 +1050,7 @@ public class JAXBModuleImporter
   }
 
   private UnaryExpressionProxy importUnaryExpression
-    (final UnaryExpressionType element)
+    (final UnaryExpression element)
   {
     final String operatorName = element.getOperator();
     final UnaryOperator operator =

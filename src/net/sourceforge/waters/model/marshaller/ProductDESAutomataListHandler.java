@@ -4,24 +4,23 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ProductDESAutomataListHandler
 //###########################################################################
-//# $Id: ProductDESAutomataListHandler.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ProductDESAutomataListHandler.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.util.List;
-import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
 
-import net.sourceforge.waters.xsd.des.AutomataListType;
+import net.sourceforge.waters.xsd.des.AutomataList;
 import net.sourceforge.waters.xsd.des.ObjectFactory;
-import net.sourceforge.waters.xsd.des.ProductDESType;
+import net.sourceforge.waters.xsd.des.ProductDES;
 
 
 class ProductDESAutomataListHandler
   extends JAXBCheckedListHandler
-            <ProductDESType,AutomataListType,AutomatonProxy>
+            <ProductDES,AutomataList,AutomatonProxy>
 {
   
   //#########################################################################
@@ -39,20 +38,19 @@ class ProductDESAutomataListHandler
   
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBListHandler
-  AutomataListType createListElement(ProductDESType container)
-    throws JAXBException
+  AutomataList createListElement(ProductDES container)
   {
-    final AutomataListType listelem = mFactory.createAutomataList();
+    final AutomataList listelem = mFactory.createAutomataList();
     container.setAutomataList(listelem);
     return listelem;
   }
 
-  AutomataListType getListElement(ProductDESType container)
+  AutomataList getListElement(ProductDES container)
   {
     return container.getAutomataList();
   }
 
-  List getList(AutomataListType listelem)
+  List getList(AutomataList listelem)
   {
     return listelem.getList();
   }

@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   SimpleParameterElement
 //###########################################################################
-//# $Id: SimpleParameterElement.java,v 1.4 2006-05-24 09:13:02 markus Exp $
+//# $Id: SimpleParameterElement.java,v 1.5 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleParameterProxy;
 
@@ -65,16 +66,24 @@ public abstract class SimpleParameterElement
 
 
   //#########################################################################
-  //# Equality
-  public boolean equals(final Object partner)
+  //# Equality and Hashcode
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final SimpleParameterElement downcast = (SimpleParameterElement) partner;
       return
-        mDefaultValue.equals(downcast.mDefaultValue);
+        mDefaultValue.equalsByContents(downcast.mDefaultValue);
     } else {
       return false;
     }
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mDefaultValue.hashCodeByContents();
+    return result;
   }
 
 

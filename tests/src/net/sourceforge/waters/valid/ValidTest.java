@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ValidTest
 //###########################################################################
-//# $Id: ValidTest.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ValidTest.java,v 1.3 2006-07-20 02:28:38 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.valid;
@@ -33,14 +33,22 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
-import net.sourceforge.waters.junit.WatersTestCase;
+import net.sourceforge.waters.junit.AbstractWatersTest;
+
+import org.xml.sax.SAXException;
 
 
-public class ValidTest extends WatersTestCase
+public class ValidTest extends AbstractWatersTest
 {
 
   //#########################################################################
   //# Successful Test Cases
+  public void testImport_bfactory()
+    throws IOException, WatersException
+  {
+    testImport("big_factory", "bfactory");
+  }
+
   public void testImport_bmw_fh()
     throws IOException, WatersException
   {
@@ -121,6 +129,12 @@ public class ValidTest extends WatersTestCase
     testImport("small", "small");
   }
 
+  public void testImport_small_uncont()
+    throws IOException, WatersException
+  {
+    testImport("small", "small_uncont");
+  }
+
   public void testImport_smdreset()
     throws IOException, WatersException
   {
@@ -137,6 +151,12 @@ public class ValidTest extends WatersTestCase
     throws IOException, WatersException
   {
     testImport("tline_0", "transferline_templ");
+  }
+
+  public void testImport_weiche()
+    throws IOException, WatersException
+  {
+    testImport("vt", "weiche");
   }
 
   public void testImport_wonham_templ()
@@ -211,7 +231,9 @@ public class ValidTest extends WatersTestCase
   ModuleProxy testImport(final File infilename, final File outfilename)
     throws IOException, WatersException
   {
-    final ModuleProxy module = (ModuleProxy) mDocumentManager.load(infilename);
+    final ModuleProxy module =
+      (ModuleProxy) mDocumentManager.load(infilename);
+    ensureParentDirectoryExists(outfilename);
     mModuleMarshaller.marshal(module, outfilename);
     return module;
   }
@@ -223,6 +245,7 @@ public class ValidTest extends WatersTestCase
     final ModuleCompiler compiler =
       new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
     final ProductDESProxy des = compiler.compile();
+    ensureParentDirectoryExists(outfilename);
     mProductDESMarshaller.marshal(des, outfilename);
     return des;
   }
@@ -242,7 +265,7 @@ public class ValidTest extends WatersTestCase
   //#########################################################################
   //# Overrides for junit.framework.TestCase
   protected void setUp()
-    throws JAXBException
+    throws JAXBException, SAXException
   {
     mInputDirectory = new File(getInputRoot(), "valid");
     mOutputDirectory = getOutputDirectory();
@@ -254,7 +277,7 @@ public class ValidTest extends WatersTestCase
       new ValidUnmarshaller(moduleFactory, optable);
     mModuleMarshaller = new JAXBModuleMarshaller(moduleFactory, optable);
     mProductDESMarshaller = new JAXBProductDESMarshaller(mProductDESFactory);
-    mDocumentManager = new DocumentManager<DocumentProxy>();
+    mDocumentManager = new DocumentManager();
     mDocumentManager.registerMarshaller(mModuleMarshaller);
     mDocumentManager.registerMarshaller(mProductDESMarshaller);
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
@@ -280,6 +303,6 @@ public class ValidTest extends WatersTestCase
   private ProductDESProxyFactory mProductDESFactory;
   private JAXBModuleMarshaller mModuleMarshaller;
   private JAXBProductDESMarshaller mProductDESMarshaller;
-  private DocumentManager<DocumentProxy> mDocumentManager;
+  private DocumentManager mDocumentManager;
 
 }

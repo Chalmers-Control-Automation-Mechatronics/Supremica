@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "module" "module.dtd">
+
+<module name="weiche_main"
+        legacy="1"
+        arity="0"
+        generatorName="VALID-II"
+        generatorVersion="2.9b2"
+        version="1.0"
+        creationDate="2005-05-08 14:11:56 GMT+12:00"
+        modificationDate="2005-05-08 14:19:28 GMT+12:00">
+<interface/>
+<definitions>
+<typeDefinition name="TRAINS" expression="{1..2}"/>
+<typeDefinition name="POS" expression="{l1 l2 m1 m2 r1 r2}"/>
+</definitions>
+<local>
+<event name="not_at"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{r1 r2 l1 l2 m1 m2}">
+<alias old="not_at.$_0" new="not_at[$_0]"/>
+</foreach-alias>
+<event name="stopped"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="stopped.$_0" new="stopped[$_0]"/>
+</foreach-alias>
+<event name="at"
+       controllable="0"
+       arity="2">
+</event>
+<foreach-alias dummy="_0" range="{r2 l2 m1 m2 r1 l1}">
+<foreach-alias dummy="_1" range="{1..2}">
+<alias old="at.$_0.$_1" new="at[$_0][$_1]"/>
+</foreach-alias>
+</foreach-alias>
+<event name="straight"
+       controllable="1"
+       arity="0">
+</event>
+<event name="req"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="req.$_0" new="req[$_0]"/>
+</foreach-alias>
+<event name="curve"
+       controllable="1"
+       arity="0">
+</event>
+<event name="enable"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..2}">
+<alias old="enable.$_0" new="enable[$_0]"/>
+</foreach-alias>
+</local>
+<parts>
+<foreach-instance dummy="T" range="$TRAINS">
+<instance name="tsensor[$T]" module="tsensor_plant">
+<nameParam name="enable" value="enable[$T]"/>
+<nameParam name="at_l2_T" value="at[l2][$T]"/>
+<nameParam name="at_m1_T" value="at[m1][$T]"/>
+<nameParam name="at_m2_T" value="at[m2][$T]"/>
+<nameParam name="at_r1_T" value="at[r1][$T]"/>
+<nameParam name="at_r2_T" value="at[r2][$T]"/>
+<nameParam name="at_l1_T" value="at[l1][$T]"/>
+<nameParam name="stopped" value="stopped[$T]"/>
+</instance>
+</foreach-instance>
+<component graph="switchsup" kind="spec"/>
+<foreach-instance dummy="T" range="$TRAINS">
+<instance name="interd[$T]" module="interd_plant">
+<nameParam name="at_l1_T" value="at[l1][$T]"/>
+<nameParam name="at_l2_T" value="at[l2][$T]"/>
+<nameParam name="at_m1_T" value="at[m1][$T]"/>
+<nameParam name="at_m2_T" value="at[m2][$T]"/>
+<nameParam name="at_r1_T" value="at[r1][$T]"/>
+<nameParam name="at_r2_T" value="at[r2][$T]"/>
+</instance>
+</foreach-instance>
+<component graph="coll_l1r1_m1" kind="spec"/>
+<component graph="switch1" kind="spec"/>
+<component graph="switch2" kind="spec"/>
+<component graph="coll_m1_m2" kind="spec"/>
+<foreach-instance dummy="T" range="$TRAINS">
+<instance name="train[$T]" module="train_plant">
+<nameParam name="enable" value="enable[$T]"/>
+<nameParam name="stopped" value="stopped[$T]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="P" range="$POS">
+<instance name="sensor[$P]" module="sensor_plant">
+<nameParam name="at_P_1" value="at[$P][1]"/>
+<nameParam name="at_P_2" value="at[$P][2]"/>
+<nameParam name="not_at" value="not_at[$P]"/>
+</instance>
+</foreach-instance>
+</parts>
+</module>

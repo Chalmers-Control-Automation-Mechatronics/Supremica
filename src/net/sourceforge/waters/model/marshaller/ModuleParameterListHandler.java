@@ -4,23 +4,22 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ModuleParameterListHandler
 //###########################################################################
-//# $Id: ModuleParameterListHandler.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ModuleParameterListHandler.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.util.List;
-import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.module.ParameterProxy;
 
-import net.sourceforge.waters.xsd.module.ModuleType;
+import net.sourceforge.waters.xsd.module.Module;
 import net.sourceforge.waters.xsd.module.ObjectFactory;
-import net.sourceforge.waters.xsd.module.ParameterListType;
+import net.sourceforge.waters.xsd.module.ParameterList;
 
 
 class ModuleParameterListHandler
-  extends JAXBListHandler<ModuleType,ParameterListType,ParameterProxy>
+  extends JAXBListHandler<Module,ParameterList,ParameterProxy>
 {
 
 
@@ -39,20 +38,19 @@ class ModuleParameterListHandler
 
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBListHandler
-  ParameterListType createListElement(final ModuleType container)
-    throws JAXBException
+  ParameterList createListElement(final Module container)
   {
-    final ParameterListType listelem = mFactory.createParameterList();
+    final ParameterList listelem = mFactory.createParameterList();
     container.setParameterList(listelem);
     return listelem;
   }
 
-  ParameterListType getListElement(final ModuleType container)
+  ParameterList getListElement(final Module container)
   {
     return container.getParameterList();
   }
 
-  List getList(final ParameterListType listelem)
+  List getList(final ParameterList listelem)
   {
     return listelem.getList();
   }

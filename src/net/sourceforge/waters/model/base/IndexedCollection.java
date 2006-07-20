@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   IndexedCollection
 //###########################################################################
-//# $Id: IndexedCollection.java,v 1.2 2005-11-03 01:24:15 robi Exp $
+//# $Id: IndexedCollection.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -50,7 +50,7 @@ public interface IndexedCollection<P extends NamedProxy>
    *                     an item with the same name as the argument, which
    *                     is not the same object as the argument.
    */
-  public void checkUnique(P proxy);
+  public void checkUnique(NamedProxy proxy);
 
   /**
    * Checks whether this collection contains an item with a given name.

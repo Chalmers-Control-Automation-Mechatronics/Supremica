@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControllabilityChecker
 //###########################################################################
-//# $Id: ControllabilityMain.java,v 1.2 2005-11-03 01:24:15 robi Exp $
+//# $Id: ControllabilityMain.java,v 1.3 2006-07-20 02:28:36 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -19,6 +19,7 @@ import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
@@ -97,8 +98,7 @@ public class ControllabilityMain
         new JAXBModuleMarshaller(moduleFactory, optable);
       final JAXBProductDESMarshaller desMarshaller =
         new JAXBProductDESMarshaller(desFactory);
-      final DocumentManager<DocumentProxy> docManager =
-        new DocumentManager<DocumentProxy>();
+      final DocumentManager docManager = new DocumentManager();
       docManager.registerUnmarshaller(desMarshaller);
       docManager.registerUnmarshaller(moduleMarshaller);
       docManager.registerUnmarshaller(importer);
@@ -117,7 +117,7 @@ public class ControllabilityMain
           des = compiler.compile();
         }
         final ControllabilityChecker checker =
-          new ControllabilityChecker(des);
+          new ControllabilityChecker(des, desFactory);
         System.out.print(des.getName() + " ... ");
         System.out.flush();
         final boolean result = checker.run();
@@ -126,12 +126,8 @@ public class ControllabilityMain
         } else {
           System.out.println("NOT controllable");
           System.out.println("Counterexample:");
-          final List counterex = checker.getCounterExample();
-          final Iterator iter = counterex.iterator();
-          while (iter.hasNext()) {
-            final EventProxy event = (EventProxy) iter.next();
-            System.out.println("  " + event.getName());
-          }
+          final SafetyTraceProxy counterex = checker.getCounterExample();
+          System.out.println(counterex.toString());
         }
       }
 

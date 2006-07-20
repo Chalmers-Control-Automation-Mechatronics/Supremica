@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   AbstractProductDESProxyVisitor
 //###########################################################################
-//# $Id: AbstractProductDESProxyVisitor.java,v 1.2 2005-11-03 01:24:15 robi Exp $
+//# $Id: AbstractProductDESProxyVisitor.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.des;
@@ -24,10 +24,22 @@ public class AbstractProductDESProxyVisitor
     return visitNamedProxy(proxy);
   }
 
+  public Object visitConflictTraceProxy(final ConflictTraceProxy proxy)
+    throws VisitorException
+  {
+    return visitTraceProxy(proxy);
+  }
+
   public Object visitEventProxy(final EventProxy proxy)
     throws VisitorException
   {
     return visitNamedProxy(proxy);
+  }
+
+  public Object visitLoopTraceProxy(final LoopTraceProxy proxy)
+    throws VisitorException
+  {
+    return visitTraceProxy(proxy);
   }
 
   public Object visitProductDESProxy(final ProductDESProxy proxy)
@@ -36,10 +48,28 @@ public class AbstractProductDESProxyVisitor
     return visitDocumentProxy(proxy);
   }
 
+  public Object visitSafetyTraceProxy(final SafetyTraceProxy proxy)
+    throws VisitorException
+  {
+    return visitTraceProxy(proxy);
+  }
+
   public Object visitStateProxy(final StateProxy proxy)
     throws VisitorException
   {
     return visitNamedProxy(proxy);
+  }
+
+  public Object visitTraceProxy(final TraceProxy proxy)
+    throws VisitorException
+  {
+    return visitDocumentProxy(proxy);
+  }
+
+  public Object visitTraceStepProxy(final TraceStepProxy proxy)
+    throws VisitorException
+  {
+    return visitProxy(proxy);
   }
 
   public Object visitTransitionProxy(final TransitionProxy proxy)

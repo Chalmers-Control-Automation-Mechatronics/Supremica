@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBProductDESImporter
 //###########################################################################
-//# $Id: JAXBProductDESImporter.java,v 1.3 2006-02-20 22:20:21 robi Exp $
+//# $Id: JAXBProductDESImporter.java,v 1.4 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -27,16 +27,16 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.ElementType;
 import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.xsd.des.AutomatonType;
-import net.sourceforge.waters.xsd.des.EventRefType;
-import net.sourceforge.waters.xsd.des.EventType;
-import net.sourceforge.waters.xsd.des.ProductDESType;
-import net.sourceforge.waters.xsd.des.StateType;
-import net.sourceforge.waters.xsd.des.TransitionType;
+import net.sourceforge.waters.xsd.des.Automaton;
+import net.sourceforge.waters.xsd.des.EventRef;
+import net.sourceforge.waters.xsd.des.Event;
+import net.sourceforge.waters.xsd.des.ProductDES;
+import net.sourceforge.waters.xsd.des.State;
+import net.sourceforge.waters.xsd.des.Transition;
 
 
 class JAXBProductDESImporter
-  extends JAXBDocumentImporter<ProductDESProxy,ProductDESType>
+  extends JAXBDocumentImporter<ProductDESProxy,ProductDES>
 {
 
   //#########################################################################
@@ -51,16 +51,16 @@ class JAXBProductDESImporter
   //# Overrides for Abstract Base Class JAXBImporter
   Proxy importElement(final ElementType element)
   {
-    if (element instanceof TransitionType) {
-      return importTransition((TransitionType) element);
-    } else if (element instanceof StateType) {
-      return importState((StateType) element);
-    } else if (element instanceof EventType) {
-      return importEvent((EventType) element);
-    } else if (element instanceof AutomatonType) {
-      return importAutomaton((AutomatonType) element);
-    } else if (element instanceof ProductDESType) {
-      return importProductDES((ProductDESType) element);
+    if (element instanceof Transition) {
+      return importTransition((Transition) element);
+    } else if (element instanceof State) {
+      return importState((State) element);
+    } else if (element instanceof Event) {
+      return importEvent((Event) element);
+    } else if (element instanceof Automaton) {
+      return importAutomaton((Automaton) element);
+    } else if (element instanceof ProductDES) {
+      return importProductDES((ProductDES) element);
     } else {
       throw new ClassCastException
         ("JAXBProductDESImporter cannot handle element of type " +
@@ -68,7 +68,7 @@ class JAXBProductDESImporter
     }
   }
 
-  public ProductDESProxy importDocument(final ProductDESType element,
+  public ProductDESProxy importDocument(final ProductDES element,
                                         final URI uri)
   {
     return importProductDES(element, uri);
@@ -77,12 +77,12 @@ class JAXBProductDESImporter
 
   //#########################################################################
   //# Importing Elements
-  private ProductDESProxy importProductDES(final ProductDESType element)
+  private ProductDESProxy importProductDES(final ProductDES element)
   {
     return importProductDES(element, null);
   }
 
-  private ProductDESProxy importProductDES(final ProductDESType element,
+  private ProductDESProxy importProductDES(final ProductDES element,
                                            final URI uri)
   {
     try {
@@ -104,7 +104,7 @@ class JAXBProductDESImporter
     }
   }
 
-  private AutomatonProxy importAutomaton(final AutomatonType element)
+  private AutomatonProxy importAutomaton(final Automaton element)
   {
     try {
       final String name = element.getName();
@@ -130,7 +130,7 @@ class JAXBProductDESImporter
     }
   }
 
-  private EventProxy importEvent(final EventType element)
+  private EventProxy importEvent(final Event element)
   {
     final String name = element.getName();
     final EventKind kind = element.getKind();
@@ -138,7 +138,7 @@ class JAXBProductDESImporter
     return mFactory.createEventProxy(name, kind, observable);
   }
 
-  private StateProxy importState(final StateType element)
+  private StateProxy importState(final State element)
   {
     final String name = element.getName();
     final boolean initial = element.isInitial();
@@ -148,7 +148,7 @@ class JAXBProductDESImporter
     return mFactory.createStateProxy(name, initial, propositions);
   }
 
-  private TransitionProxy importTransition(final TransitionType element)
+  private TransitionProxy importTransition(final Transition element)
   {
     final String sourcename = element.getSource();
     final StateProxy source = mAutomatonStates.find(sourcename);
@@ -162,7 +162,7 @@ class JAXBProductDESImporter
 
   //#########################################################################
   //# Inner Class EventRefImporter
-  private class EventRefImporter
+  private static class EventRefImporter
     extends JAXBImporter
   {
 
@@ -177,7 +177,7 @@ class JAXBProductDESImporter
     //# Overrides for Abstract Base Class JAXBImporter
     EventProxy importElement(final ElementType element)
     {
-      final EventRefType eventref = (EventRefType) element;
+      final EventRef eventref = (EventRef) element;
       final String name = eventref.getName();
       return mAlphabet.find(name);
     }

@@ -6,5 +6,5 @@ DIR=`pwd`
 export LD_LIBRARY_PATH=$DIR
 
 cd "../examples/waters"
-java -cp "$DIR/Supremica.jar:$DIR/SupremicaLib.jar" -enableassertions net.sourceforge.waters.gui.ModuleWindow $*
+java -cp "$DIR/Supremica.jar" -enableassertions net.sourceforge.waters.gui.ModuleWindow $*
 

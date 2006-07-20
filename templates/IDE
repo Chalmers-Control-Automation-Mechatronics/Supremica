@@ -5,6 +5,6 @@ DIR=`pwd`
 
 export LD_LIBRARY_PATH=$DIR
 
-java -cp "$DIR/Supremica.jar:$DIR/SupremicaLib.jar" -enableassertions \
+java -cp "$DIR/Supremica.jar" -enableassertions \
   org.supremica.gui.ide.IDE -p SupremicaProperties.cfg $*
 

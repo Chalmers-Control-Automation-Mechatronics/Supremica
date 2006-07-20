@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   TransitionElement
 //###########################################################################
-//# $Id: TransitionElement.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: TransitionElement.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -96,9 +97,9 @@ public class TransitionElement
    * Two transitions are considered as equal if their source and target
    * states, and their events all have the same names.
    */
-  public boolean equals(final Object partner)
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final TransitionElement trans = (TransitionElement) partner;
       return
         getSource().refequals(trans.getSource()) &&
@@ -109,12 +110,12 @@ public class TransitionElement
     }    
   }
 
-  public int hashCode()
+  public int hashCodeByContents()
   {
     return
-      getSource().hashCode() +
-      5 * getEvent().hashCode() +
-      25 * getTarget().hashCode();
+      getSource().refHashCode() +
+      5 * getEvent().refHashCode() +
+      25 * getTarget().refHashCode();
   }
 
 

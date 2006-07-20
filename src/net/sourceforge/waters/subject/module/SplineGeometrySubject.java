@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SplineGeometrySubject
 //###########################################################################
-//# $Id: SplineGeometrySubject.java,v 1.7 2006-05-24 09:13:02 markus Exp $
+//# $Id: SplineGeometrySubject.java,v 1.8 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
@@ -83,10 +84,10 @@ public final class SplineGeometrySubject
 
 
   //#########################################################################
-  //# Equality
-  public boolean equals(final Object partner)
+  //# Equality and Hashcode
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final SplineGeometrySubject downcast = (SplineGeometrySubject) partner;
       return
         mPoints.equals(downcast.mPoints) &&
@@ -94,6 +95,16 @@ public final class SplineGeometrySubject
     } else {
       return false;
     }
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mPoints.hashCode();
+    result *= 5;
+    result += mKind.hashCode();
+    return result;
   }
 
 

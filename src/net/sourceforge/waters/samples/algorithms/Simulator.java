@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.waters.samples.algorithms
 //# CLASS:   Simulator
 //###########################################################################
-//# $Id: Simulator.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: Simulator.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 
@@ -199,7 +199,7 @@ public class Simulator
 
   //#########################################################################
   //# Inner Class AutomatEntry
-  private class AutomatonEntry {
+  private static class AutomatonEntry {
 
     //#######################################################################
     //# Constructors
@@ -275,13 +275,7 @@ public class Simulator
 
     private void executeEvent(final EventProxy event)
     {
-      final StateProxy state = getSuccessorState(event);
-      if (state == null) {
-	throw new IllegalArgumentException
-	  ("Automaton '" + mAutomaton.getName() + "' cannot execute event '" +
-	   event.getName() + "' in state '" + mState.getName() + "'!");
-      }
-      mState = state;
+      mState = findSuccessorState(event);
     }
 
     private void setState(final StateProxy state)

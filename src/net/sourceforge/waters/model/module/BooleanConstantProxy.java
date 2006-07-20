@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   BooleanConstantProxy
 //###########################################################################
-//# $Id: BooleanConstantProxy.java,v 1.2 2006-03-02 12:12:49 martin Exp $
+//# $Id: BooleanConstantProxy.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -13,7 +13,7 @@ package net.sourceforge.waters.model.module;
 /**
  * An expression representing an integer constant.
  *
- * @author Markus Sköldstam
+ * @author Markus Sk&ouml;ldstam
  */
 
 

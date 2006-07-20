@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBProductDESMarshaller
 //###########################################################################
-//# $Id: JAXBProductDESMarshaller.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: JAXBProductDESMarshaller.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 
@@ -14,21 +14,24 @@ import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.xsd.des.ProductDESType;
+import net.sourceforge.waters.xsd.des.ProductDES;
+
+import org.xml.sax.SAXException;
 
 
 public class JAXBProductDESMarshaller
-  extends JAXBMarshaller<ProductDESProxy,ProductDESType>
+  extends JAXBMarshaller<ProductDESProxy,ProductDES>
 {
 
   //#########################################################################
   //# Constructors
   public JAXBProductDESMarshaller(final ProductDESProxyFactory factory)
-    throws JAXBException
+    throws JAXBException, SAXException
   {
     super(new JAXBProductDESExporter(),
           new JAXBProductDESImporter(factory),
-          "net.sourceforge.waters.xsd.des");
+          "net.sourceforge.waters.xsd.des",
+          "waters-des.xsd");
   }
 
 
@@ -44,9 +47,9 @@ public class JAXBProductDESMarshaller
     return ProductDESProxy.class;
   }
 
-  public Class<ProductDESType> getElementClass()
+  public Class<ProductDES> getElementClass()
   {
-    return ProductDESType.class;
+    return ProductDES.class;
   }
 
 }

@@ -4,13 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   NodeEventListHandler
 //###########################################################################
-//# $Id: NodeEventListHandler.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: NodeEventListHandler.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.util.List;
-import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.base.Proxy;
 
@@ -40,9 +39,8 @@ class NodeEventListHandler
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBCheckedListHandler
   EventListType createListElement(final NodeType container)
-    throws JAXBException
   {
-    final EventListType listelem = mFactory.createEventList();
+    final EventListType listelem = mFactory.createEventListType();
     container.setPropositions(listelem);
     return listelem;
   }

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   GraphSubject
 //###########################################################################
-//# $Id: GraphSubject.java,v 1.6 2006-05-24 09:13:02 markus Exp $
+//# $Id: GraphSubject.java,v 1.7 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -14,7 +14,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.waters.model.base.Geometry;
+import net.sourceforge.waters.model.base.EqualCollection;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -24,6 +25,7 @@ import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
+import net.sourceforge.waters.subject.base.IndexedSetSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.MutableSubject;
@@ -110,33 +112,69 @@ public final class GraphSubject
 
 
   //#########################################################################
-  //# Equality
-  public boolean equals(final Object partner)
+  //# Equality and Hashcode
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final GraphSubject downcast = (GraphSubject) partner;
       return
         (mIsDeterministic == downcast.mIsDeterministic) &&
-        mBlockedEvents.equals(downcast.mBlockedEvents) &&
-        mNodes.equals(downcast.mNodes) &&
-        mEdges.equals(downcast.mEdges);
+        mBlockedEvents.equalsByContents(downcast.mBlockedEvents) &&
+        EqualCollection.isEqualSetByContents
+          (mNodes, downcast.mNodes) &&
+        EqualCollection.isEqualListByContents
+          (mEdges, downcast.mEdges);
     } else {
       return false;
     }
   }
 
-  public boolean equalsWithGeometry(final Object partner)
+  public boolean equalsWithGeometry(final Proxy partner)
   {
-    if (super.equalsWithGeometry(partner)) {
+    if (super.equalsByContents(partner)) {
       final GraphSubject downcast = (GraphSubject) partner;
       return
         (mIsDeterministic == downcast.mIsDeterministic) &&
         mBlockedEvents.equalsWithGeometry(downcast.mBlockedEvents) &&
-        Geometry.equalSet(mNodes, downcast.mNodes) &&
-        Geometry.equalList(mEdges, downcast.mEdges);
+        EqualCollection.isEqualSetWithGeometry
+          (mNodes, downcast.mNodes) &&
+        EqualCollection.isEqualListWithGeometry
+          (mEdges, downcast.mEdges);
     } else {
       return false;
     }
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    if (mIsDeterministic) {
+      result++;
+    }
+    result *= 5;
+    result += mBlockedEvents.hashCodeByContents();
+    result *= 5;
+    result += EqualCollection.getSetHashCodeByContents(mNodes);
+    result *= 5;
+    result += EqualCollection.getListHashCodeByContents(mEdges);
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    if (mIsDeterministic) {
+      result++;
+    }
+    result *= 5;
+    result += mBlockedEvents.hashCodeWithGeometry();
+    result *= 5;
+    result += EqualCollection.getSetHashCodeWithGeometry(mNodes);
+    result *= 5;
+    result += EqualCollection.getListHashCodeWithGeometry(mEdges);
+    return result;
   }
 
 
@@ -210,7 +248,7 @@ public final class GraphSubject
   /**
    * Gets the modifiable set of nodes of this graph.
    */
-  public NodeSetSubject getNodesModifiable()
+  public IndexedSetSubject<NodeSubject> getNodesModifiable()
   {
     return mNodes;
   }
@@ -241,7 +279,7 @@ public final class GraphSubject
   //# Data Members
   private boolean mIsDeterministic;
   private LabelBlockSubject mBlockedEvents;
-  private NodeSetSubject mNodes;
+  private IndexedSetSubject<NodeSubject> mNodes;
   private ListSubject<EdgeSubject> mEdges;
 
 }

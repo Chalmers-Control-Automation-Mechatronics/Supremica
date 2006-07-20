@@ -4,11 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateEdgeCommand
 //###########################################################################
-//# $Id: CreateEdgeCommand.java,v 1.8 2006-03-02 12:12:50 martin Exp $
+//# $Id: CreateEdgeCommand.java,v 1.9 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui.command;
+
+import java.awt.geom.Point2D;
+import java.awt.Point;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -16,15 +19,20 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
+
 import net.sourceforge.waters.gui.ControlledSurface;
-import net.sourceforge.waters.gui.EditorEdge;
-import net.sourceforge.waters.gui.EditorNode;
-import net.sourceforge.waters.gui.EditorNodeGroup;
-import net.sourceforge.waters.gui.EditorObject;
+import net.sourceforge.waters.gui.renderer.GeometryTools;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.subject.module.PointGeometrySubject;
+import net.sourceforge.waters.subject.module.SplineGeometrySubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
+import net.sourceforge.waters.subject.module.GraphSubject;
+
+import net.sourceforge.waters.xsd.module.SplineKind;
 
 
 /**
@@ -46,21 +54,34 @@ public class CreateEdgeCommand
      * @param x the position upon which the node is created
      * @param y the position upon which the node is created
      */
-    public CreateEdgeCommand(final ControlledSurface surface,
-							 final EditorObject source,
-							 final EditorNode target,
-							 final int x,
-							 final int y)
+    public CreateEdgeCommand(final GraphSubject graph,
+                             final NodeSubject source,
+                             final NodeSubject target,
+                             final Point2D startPoint,
+                             final Point2D endPoint)
     {
-		mSurface = surface;
-		final NodeSubject sourceSubject = (NodeSubject) source.getSubject();
-		final NodeSubject targetSubject = (NodeSubject) target.getSubject(); 
+		mGraph = graph; 
 		final Collection<Proxy> empty = Collections.emptyList();
-		final LabelBlockSubject labelBlock =
-			new LabelBlockSubject(empty, null);
-		final EdgeSubject edgeSubject =
-			new EdgeSubject(sourceSubject, targetSubject, labelBlock);
-		mCreated = new EditorEdge(source, target, x, y, edgeSubject, surface);
+    final Collection<Point2D> points;
+    if (!startPoint.equals(endPoint)) {
+       points = Collections.singleton(
+         GeometryTools.getMidPoint(startPoint, endPoint));
+    } else {
+      points = Collections.singleton((Point2D) new Point((int)endPoint.getX() + 20,
+                                                         (int)endPoint.getY() + 20));
+    }
+		final LabelGeometrySubject offset = new LabelGeometrySubject(
+			new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
+						LabelBlockProxyShape.DEFAULTOFFSETY));
+		final LabelBlockSubject labelBlock = 
+			new LabelBlockSubject(empty, offset);
+		final SplineGeometrySubject spline = 
+			new SplineGeometrySubject(points, SplineKind.INTERPOLATING);
+		final PointGeometrySubject start = new PointGeometrySubject(startPoint);
+		final PointGeometrySubject end = new PointGeometrySubject(endPoint);
+		
+		mCreated =	new EdgeSubject(source, target, labelBlock, null,
+									spline, start, end);
     }
 
     /**
@@ -68,8 +89,7 @@ public class CreateEdgeCommand
      */
     public void execute()
     {
-		mSurface.addEdge(mCreated);
-		mSurface.getEditorInterface().setDisplayed();
+		mGraph.getEdgesModifiable().add(mCreated);
     }
 
     /** 
@@ -77,8 +97,7 @@ public class CreateEdgeCommand
      */
     public void undo()
     {
-		mSurface.delEdge(mCreated);
-		mSurface.getEditorInterface().setDisplayed();
+		mGraph.getEdgesModifiable().remove(mCreated);
     }
 
     public String getName()
@@ -95,9 +114,9 @@ public class CreateEdgeCommand
 	//#######################################################################
 	//# Data Members
     /** The ControlledSurface Edited with this Command */
-    private final ControlledSurface mSurface;
+    private final GraphSubject mGraph;
     /** The Node Created by this Command */
-    private final EditorEdge mCreated;
+    private final EdgeSubject mCreated;
     private final String mDescription = "Edge Creation";
 
 }

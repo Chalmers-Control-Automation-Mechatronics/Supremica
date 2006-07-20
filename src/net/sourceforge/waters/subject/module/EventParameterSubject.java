@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   EventParameterSubject
 //###########################################################################
-//# $Id: EventParameterSubject.java,v 1.5 2006-05-24 09:13:02 markus Exp $
+//# $Id: EventParameterSubject.java,v 1.6 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -73,27 +74,43 @@ public final class EventParameterSubject
 
 
   //#########################################################################
-  //# Equality
-  public boolean equals(final Object partner)
+  //# Equality and Hashcode
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final EventParameterSubject downcast = (EventParameterSubject) partner;
       return
-        mEventDecl.equals(downcast.mEventDecl);
+        mEventDecl.equalsByContents(downcast.mEventDecl);
     } else {
       return false;
     }
   }
 
-  public boolean equalsWithGeometry(final Object partner)
+  public boolean equalsWithGeometry(final Proxy partner)
   {
-    if (super.equalsWithGeometry(partner)) {
+    if (super.equalsByContents(partner)) {
       final EventParameterSubject downcast = (EventParameterSubject) partner;
       return
         mEventDecl.equalsWithGeometry(downcast.mEventDecl);
     } else {
       return false;
     }
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mEventDecl.hashCodeByContents();
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mEventDecl.hashCodeWithGeometry();
+    return result;
   }
 
 

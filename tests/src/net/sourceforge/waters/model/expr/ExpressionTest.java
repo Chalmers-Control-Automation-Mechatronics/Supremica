@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ExpressionTest
 //###########################################################################
-//# $Id: ExpressionTest.java,v 1.4 2006-03-07 21:25:43 robi Exp $
+//# $Id: ExpressionTest.java,v 1.5 2006-07-20 02:28:38 robi Exp $
 //###########################################################################
 
 
@@ -259,7 +259,7 @@ public class ExpressionTest extends TestCase
   {
     try {
       final SimpleExpressionProxy parsed = mParser.parse(text, mask);
-      assertTrue("Unexpected result!", parsed.equals(expr));
+      assertTrue("Unexpected result!", parsed.equalsByContents(expr));
     } catch (final ParseException exception) {
       final int pos = exception.getErrorOffset();
       System.out.println(text);

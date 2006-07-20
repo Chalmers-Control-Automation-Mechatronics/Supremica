@@ -21,7 +21,7 @@ public class EditorAddNodeGroupAction
 		putValue(Action.NAME, "Add Node Group");
 		putValue(Action.SHORT_DESCRIPTION, "Add Node Group");
 		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/nodegroup16.gif")));
-		putValue(Action.ACTION_COMMAND_KEY, ControlledSurface.NODEGROUP);
+		putValue(Action.ACTION_COMMAND_KEY, ControlledSurface.Tool.NODEGROUP.toString());
 	}
 
 	public void actionPerformed(ActionEvent e)

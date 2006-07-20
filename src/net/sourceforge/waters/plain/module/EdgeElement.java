@@ -4,12 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   EdgeElement
 //###########################################################################
-//# $Id: EdgeElement.java,v 1.5 2006-05-24 09:13:02 markus Exp $
+//# $Id: EdgeElement.java,v 1.6 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
 
-import net.sourceforge.waters.model.base.Geometry;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -96,37 +96,85 @@ public final class EdgeElement
 
 
   //#########################################################################
-  //# Equality
-  public boolean equals(final Object partner)
+  //# Equality and Hashcode
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final EdgeElement downcast = (EdgeElement) partner;
       return
-        mSource.equals(downcast.mSource) &&
-        mTarget.equals(downcast.mTarget) &&
-        mLabelBlock.equals(downcast.mLabelBlock) &&
+        mSource.equalsByContents(downcast.mSource) &&
+        mTarget.equalsByContents(downcast.mTarget) &&
+        mLabelBlock.equalsByContents(downcast.mLabelBlock) &&
         (mGuardActionBlock == null ? downcast.mGuardActionBlock == null :
-         mGuardActionBlock.equals(downcast.mGuardActionBlock));
+         mGuardActionBlock.equalsByContents(downcast.mGuardActionBlock));
     } else {
       return false;
     }
   }
 
-  public boolean equalsWithGeometry(final Object partner)
+  public boolean equalsWithGeometry(final Proxy partner)
   {
-    if (super.equalsWithGeometry(partner)) {
+    if (super.equalsByContents(partner)) {
       final EdgeElement downcast = (EdgeElement) partner;
       return
-        mSource.equals(downcast.mSource) &&
-        mTarget.equals(downcast.mTarget) &&
+        mSource.equalsWithGeometry(downcast.mSource) &&
+        mTarget.equalsWithGeometry(downcast.mTarget) &&
         mLabelBlock.equalsWithGeometry(downcast.mLabelBlock) &&
-        mGuardActionBlock.equalsWithGeometry(downcast.mGuardActionBlock) &&
-        Geometry.equalGeometry(mGeometry, downcast.mGeometry) &&
-        Geometry.equalGeometry(mStartPoint, downcast.mStartPoint) &&
-        Geometry.equalGeometry(mEndPoint, downcast.mEndPoint);
+        (mGuardActionBlock == null ? downcast.mGuardActionBlock == null :
+         mGuardActionBlock.equalsWithGeometry(downcast.mGuardActionBlock)) &&
+        (mGeometry == null ? downcast.mGeometry == null :
+         mGeometry.equalsWithGeometry(downcast.mGeometry)) &&
+        (mStartPoint == null ? downcast.mStartPoint == null :
+         mStartPoint.equalsWithGeometry(downcast.mStartPoint)) &&
+        (mEndPoint == null ? downcast.mEndPoint == null :
+         mEndPoint.equalsWithGeometry(downcast.mEndPoint));
     } else {
       return false;
     }
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mSource.hashCodeByContents();
+    result *= 5;
+    result += mTarget.hashCodeByContents();
+    result *= 5;
+    result += mLabelBlock.hashCodeByContents();
+    result *= 5;
+    if (mGuardActionBlock != null) {
+      result += mGuardActionBlock.hashCodeByContents();
+    }
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mSource.hashCodeWithGeometry();
+    result *= 5;
+    result += mTarget.hashCodeWithGeometry();
+    result *= 5;
+    result += mLabelBlock.hashCodeWithGeometry();
+    result *= 5;
+    if (mGuardActionBlock != null) {
+      result += mGuardActionBlock.hashCodeWithGeometry();
+    }
+    result *= 5;
+    if (mGeometry != null) {
+      result += mGeometry.hashCodeWithGeometry();
+    }
+    result *= 5;
+    if (mStartPoint != null) {
+      result += mStartPoint.hashCodeWithGeometry();
+    }
+    result *= 5;
+    if (mEndPoint != null) {
+      result += mEndPoint.hashCodeWithGeometry();
+    }
+    return result;
   }
 
 

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "module" "module.dtd">
+
+<module name="bfactory_main"
+        legacy="1"
+        arity="0"
+        generatorName="VALID-II"
+        generatorVersion="2.9b2"
+        version="1.0"
+        creationDate="2004-06-24 13:30:24 GMT+12:00"
+        modificationDate="2005-05-13 16:19:02 GMT+12:00">
+<interface/>
+<local>
+<event name="repair1"
+       controllable="1"
+       arity="0">
+</event>
+<event name="repair2"
+       controllable="1"
+       arity="0">
+</event>
+<event name="repair3"
+       controllable="1"
+       arity="0">
+</event>
+<event name="finish1"
+       controllable="0"
+       arity="0">
+</event>
+<event name="finish2"
+       controllable="0"
+       arity="0">
+</event>
+<event name="finish3"
+       controllable="0"
+       arity="0">
+</event>
+<event name="break1"
+       controllable="0"
+       arity="0">
+</event>
+<event name="break2"
+       controllable="0"
+       arity="0">
+</event>
+<event name="break3"
+       controllable="0"
+       arity="0">
+</event>
+<event name="start1"
+       controllable="1"
+       arity="0">
+</event>
+<event name="start2"
+       controllable="1"
+       arity="0">
+</event>
+<event name="start3"
+       controllable="1"
+       arity="0">
+</event>
+</local>
+<parts>
+<component graph="machine1" kind="plant"/>
+<component graph="machine2" kind="plant"/>
+<component graph="machine3" kind="plant"/>
+<component graph="buffer2" kind="spec"/>
+</parts>
+</module>

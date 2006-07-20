@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   BooleanConstantSubject
 //###########################################################################
-//# $Id: BooleanConstantSubject.java,v 1.4 2006-05-24 09:13:02 markus Exp $
+//# $Id: BooleanConstantSubject.java,v 1.5 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.BooleanConstantProxy;
@@ -49,16 +50,26 @@ public final class BooleanConstantSubject
 
 
   //#########################################################################
-  //# Equality
-  public boolean equals(final Object partner)
+  //# Equality and Hashcode
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final BooleanConstantSubject downcast = (BooleanConstantSubject) partner;
       return
         (mIsValue == downcast.mIsValue);
     } else {
       return false;
     }
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    if (mIsValue) {
+      result++;
+    }
+    return result;
   }
 
 

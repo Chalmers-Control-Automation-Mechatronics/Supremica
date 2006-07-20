@@ -4,23 +4,22 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   AutomatonStateListHandler
 //###########################################################################
-//# $Id: AutomatonStateListHandler.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: AutomatonStateListHandler.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.util.List;
-import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.des.StateProxy;
 
-import net.sourceforge.waters.xsd.des.AutomatonType;
+import net.sourceforge.waters.xsd.des.Automaton;
 import net.sourceforge.waters.xsd.des.ObjectFactory;
-import net.sourceforge.waters.xsd.des.StateListType;
+import net.sourceforge.waters.xsd.des.StateList;
 
 
 class AutomatonStateListHandler
-  extends JAXBCheckedListHandler<AutomatonType,StateListType,StateProxy>
+  extends JAXBCheckedListHandler<Automaton,StateList,StateProxy>
 {
   
   //#########################################################################
@@ -38,20 +37,19 @@ class AutomatonStateListHandler
   
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBListHandler
-  StateListType createListElement(final AutomatonType container)
-    throws JAXBException
+  StateList createListElement(final Automaton container)
   {
-    final StateListType listelem = mFactory.createStateList();
+    final StateList listelem = mFactory.createStateList();
     container.setStateList(listelem);
     return listelem;
   }
 
-  StateListType getListElement(final AutomatonType container)
+  StateList getListElement(final Automaton container)
   {
     return container.getStateList();
   }
 
-  List getList(final StateListType listelem)
+  List getList(final StateList listelem)
   {
     return listelem.getList();
   }

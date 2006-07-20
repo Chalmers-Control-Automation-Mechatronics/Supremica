@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   OpenAction
 //###########################################################################
-//# $Id: OpenAction.java,v 1.12 2006-03-25 15:56:47 flordal Exp $
+//# $Id: OpenAction.java,v 1.13 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 
@@ -36,6 +36,8 @@ import net.sourceforge.waters.valid.ValidUnmarshaller;
 import org.supremica.gui.FileDialogs;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
+
+import org.xml.sax.SAXException;
 
 
 public class OpenAction
@@ -112,6 +114,8 @@ public class OpenAction
 				final ModuleSubject module =
 					(ModuleSubject) unmarshaller.unmarshal(uri);
 				installContainer(module);
+			} catch (final SAXException exception) {
+				showParseError("Could not parse module file", file, exception);
 			} catch (final JAXBException exception) {
 				showParseError("Could not parse module file", file, exception);
 			} catch (final WatersUnmarshalException exception) {
@@ -162,6 +166,9 @@ public class OpenAction
 				final ModuleSubject module =
 					(ModuleSubject) unmarshaller.unmarshal(uri);
 				installContainer(module);
+			} catch (final SAXException exception) {
+				showParseError
+					("Error importing from VALID module", file, exception);
 			} catch (final JAXBException exception) {
 				showParseError
 					("Error importing from VALID module", file, exception);

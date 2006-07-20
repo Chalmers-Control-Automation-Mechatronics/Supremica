@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   MazeCompiler
 //###########################################################################
-//# $Id: MazeCompiler.java,v 1.5 2006-02-20 22:20:22 robi Exp $
+//# $Id: MazeCompiler.java,v 1.6 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
@@ -26,6 +26,7 @@ import net.sourceforge.waters.model.base.IndexedSet;
 import net.sourceforge.waters.model.base.IndexedTreeSet;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
@@ -49,6 +50,8 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.xml.sax.SAXException;
+
 
 public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
 {
@@ -58,7 +61,7 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
   public MazeCompiler(final File inputdir,
                       final File outputdir,
                       final ModuleProxyFactory factory)
-    throws JAXBException
+    throws JAXBException, SAXException
   {
     this(inputdir, outputdir, factory,
          new JAXBModuleMarshaller(factory, null));
@@ -68,12 +71,12 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
                       final File outputdir,
                       final ModuleProxyFactory factory,
                       final JAXBModuleMarshaller marshaller)
-    throws JAXBException
   {
     mInputDir = inputdir;
     mOutputDir = outputdir;
     mFactory = factory;
     mJAXBMarshaller = marshaller;
+    mUseLanguageInclusion = true;
     mReader = new MazeReader();
     mCopiedModules = new HashSet<String>(16);
   }
@@ -91,6 +94,11 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
   {
     mOutputDir = outputdir;
     mCopiedModules.clear();
+  }
+
+  public void setUseLanguageInclusion(final boolean inclusion)
+  {
+    mUseLanguageInclusion = inclusion;
   }
 
 
@@ -125,6 +133,15 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
     return EXTENSIONS;
   }
 
+  public DocumentManager getDocumentManager()
+  {
+    return null;
+  }
+
+  public void setDocumentManager(DocumentManager manager)
+  {
+  }
+
 
   //#########################################################################
   //# Compiling Maze Files
@@ -147,11 +164,8 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
       final SimpleComponentProxy prop = createProperty(escapes);
       components.add(prop);
     }
-    final List<ParameterProxy> parameters = Collections.emptyList();
-    final List<AliasProxy> constants = Collections.emptyList();
-    final List<Proxy> aliases = Collections.emptyList();
     return mFactory.createModuleProxy
-      (name, uri, parameters, constants, mEvents, aliases, components);
+      (name, uri, null, null, mEvents, null, components);
   }
 
   private InstanceProxy createInstance(final Square square,
@@ -178,12 +192,12 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
 
   private SimpleComponentProxy createProperty(final Collection<Action> escapes)
   {
-    final ComponentKind kind = ComponentKind.PROPERTY;
+    final ComponentKind kind =
+      mUseLanguageInclusion ? ComponentKind.PROPERTY : ComponentKind.SPEC;
     final SimpleIdentifierProxy ident =
       mFactory.createSimpleIdentifierProxy("property");
-    final List<Proxy> empty = Collections.emptyList();
     final EventListExpressionProxy props =
-      mFactory.createPlainEventListProxy(empty);  
+      mFactory.createPlainEventListProxy(null);  
     final SimpleNodeProxy node =
       mFactory.createSimpleNodeProxy("q0", props, true, null, null, null);
     final List<SimpleNodeProxy> nodes = Collections.singletonList(node);
@@ -194,9 +208,8 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
     }
     final LabelBlockProxy labelBlock =
       mFactory.createLabelBlockProxy(blocked, null);
-    final List<EdgeProxy> edges = Collections.emptyList();
     final GraphProxy graph =
-      mFactory.createGraphProxy(true, labelBlock, nodes, edges);
+      mFactory.createGraphProxy(true, labelBlock, nodes, null);
     return mFactory.createSimpleComponentProxy(ident, kind, graph);
   }
 
@@ -223,9 +236,8 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
     final String name = action.getName();
     if (!mEvents.containsName(name)) {
       final EventKind kind = EventKind.UNCONTROLLABLE;
-      final List<SimpleExpressionProxy> empty = Collections.emptyList();
       final EventDeclProxy decl =
-        mFactory.createEventDeclProxy(name, kind, true, empty, null);
+        mFactory.createEventDeclProxy(name, kind, true, null, null);
       mEvents.add(decl);
       if (action.isEscapeAction()) {
         escapes.add(action);
@@ -255,6 +267,7 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
   //# Data Members
   private File mInputDir;
   private File mOutputDir;
+  private boolean mUseLanguageInclusion;
 
   private final ModuleProxyFactory mFactory;
   private final JAXBModuleMarshaller mJAXBMarshaller;

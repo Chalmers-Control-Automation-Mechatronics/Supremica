@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBDocumentImporter
 //###########################################################################
-//# $Id: JAXBDocumentImporter.java,v 1.3 2006-02-20 22:20:21 robi Exp $
+//# $Id: JAXBDocumentImporter.java,v 1.4 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -23,6 +23,25 @@ public abstract class JAXBDocumentImporter
 
   //#########################################################################
   //# Invocation
-  public abstract D importDocument(final T element, final URI uri);
+  public abstract D importDocument(final T element, final URI uri)
+    throws WatersUnmarshalException;
+
+
+  //#########################################################################
+  //# Entity Resolving
+  public DocumentManager getDocumentManager()
+  {
+    return mDocumentManager;
+  }
+
+  public void setDocumentManager(DocumentManager manager)
+  {
+    mDocumentManager = manager;
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private DocumentManager mDocumentManager;
 
 }

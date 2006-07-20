@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   NodeSetSubject
 //###########################################################################
-//# $Id: NodeSetSubject.java,v 1.3 2006-03-29 12:13:46 flordal Exp $
+//# $Id: NodeSetSubject.java,v 1.4 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -181,7 +181,7 @@ class NodeSetSubject
     }
   }
 
-  public void checkUnique(final NodeSubject node)
+  public void checkUnique(final NamedProxy node)
   {
     final String name = node.getName();
     final NodeSubject found = find(name);

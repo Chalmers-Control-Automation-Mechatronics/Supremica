@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="sensor" version="1.0" valid="1"
+	hasGeometry="1" width="252" height="129"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-05-08 02:18:12 GMT" modificationDate="2005-05-08 02:18:12 GMT">
+	<events>
+		<event controllable="0" name="at.P.1"/>
+		<event controllable="0" name="at.P.2"/>
+		<event controllable="0" name="not_at.P"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="144" y="160"/></rendering>
+			<label name="OFF">
+				<rendering><point x="-28" y="18"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="336" y="160"/></rendering>
+			<label name="ON">
+				<rendering><point x="6" y="18"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="171" y="133"/></rendering>
+			<source name="OFF"/>
+			<labelGroup>
+				<rendering><point x="-56" y="-13"/></rendering>
+				<label name="not_at.P"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="240" y="124"/></rendering>
+			<source name="OFF"/>
+			<target name="ON"/>
+			<labelGroup>
+				<rendering><point x="-19" y="-19"/></rendering>
+				<label name="at.P.1"/>
+				<label name="at.P.2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="237" y="194"/></rendering>
+			<source name="ON"/>
+			<target name="OFF"/>
+			<labelGroup>
+				<rendering><point x="-24" y="16"/></rendering>
+				<label name="not_at.P"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

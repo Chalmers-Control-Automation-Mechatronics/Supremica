@@ -21,7 +21,7 @@ public class EditorAddEdgeAction
 		putValue(Action.NAME, "Add Edge");
 		putValue(Action.SHORT_DESCRIPTION, "Add Edge");
 		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/edge16.gif")));
-		putValue(Action.ACTION_COMMAND_KEY, ControlledSurface.EDGE);
+		putValue(Action.ACTION_COMMAND_KEY, ControlledSurface.Tool.EDGE.toString());
 	}
 
 	public void actionPerformed(ActionEvent e)

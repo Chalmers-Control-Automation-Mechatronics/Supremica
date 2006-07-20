@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   Maze
 //###########################################################################
-//# $Id: Maze.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: Maze.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 
@@ -13,10 +13,12 @@ package net.sourceforge.waters.samples.maze;
 import java.awt.Point;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 class Maze
@@ -32,7 +34,8 @@ class Maze
       final Point pos = square.getPosition();
       mSquares.put(pos, square);
     }
-    mKeys = new KeyRing();
+    mAvailableKeys = new KeyRing();
+    mCollectedKeys = new HashSet<String>();
     mHasLockedDoors = false;
   }
 
@@ -47,6 +50,91 @@ class Maze
   Collection<Square> getSquares()
   {
     return mSquares.values();
+  }
+
+
+  //#########################################################################
+  //# Action Evaluation
+  boolean applyMove(final Point source, final Point target)
+  {
+    final Square sourceSquare = mSquares.get(source);
+    if (sourceSquare == null || sourceSquare.getSquareKind() != Square.HERO) {
+      throw new IllegalStateException("No hero at position " + source + "!");
+    }
+    final Point dir = new Point(target.x - source.x, target.y - source.y);
+    if (!dir.equals(NORTH) && !dir.equals(SOUTH) &&
+        !dir.equals(EAST) && !dir.equals(WEST)) {
+      throw new IllegalArgumentException
+        ("Can't move from " + source + " to " + target + " in one step!");
+    }
+    final Square targetSquare = mSquares.get(target);
+    if (targetSquare == null) {
+      throw new IllegalStateException
+        ("Target square " + target + " is not accessible!");
+    }
+    final Square newSourceSquare = new SquareFree(source);
+    final Square newTargetSquare = new SquareHero(target);
+    switch (targetSquare.getSquareKind()) {
+    case Square.FREE:
+      mSquares.put(source, newSourceSquare);
+      mSquares.put(target, newTargetSquare);
+      return false;
+    case Square.HERO:
+      throw new IllegalStateException
+        ("Target square " + target + " contains another hero!");
+    case Square.EXIT:
+      mSquares.put(source, newSourceSquare);
+      return true;
+    case Square.ROCK:
+      {
+        final Point behind = new Point(target.x + dir.x, target.y + dir.y);
+        final Square behindSquare = mSquares.get(behind);
+        if (behindSquare == null) {
+          throw new IllegalStateException
+            ("Trying to push rock from " + target +
+             " to inaccessible square " + behind + "!");
+        }
+        switch (behindSquare.getSquareKind()) {
+        case Square.FREE:
+        case Square.EXIT:
+        case Square.DOOR:
+        case Square.KEY:
+          final Square newBehindSquare = new SquareRock(behind);
+          mSquares.put(source, newSourceSquare);
+          mSquares.put(target, newTargetSquare);
+          mSquares.put(behind, newBehindSquare);
+          return false;
+        default:
+          throw new IllegalStateException
+            ("Trying to push rock from " + target + " to blocked square " +
+             behind + "!");
+        }
+      }
+    case Square.DOOR:
+    case Square.GATE:
+      {
+        final String key = targetSquare.getKeyName();
+        if (mCollectedKeys.contains(key)) {
+          mSquares.put(source, newSourceSquare);
+          mSquares.put(target, newTargetSquare);
+          return false;
+        } else {
+          throw new IllegalStateException
+            ("Can't unlock at " + target + " without key '" + key + "'!");
+        }
+      }
+    case Square.KEY:
+      {
+        final String key = targetSquare.getKeyName();
+        mCollectedKeys.add(key);
+        mSquares.put(source, newSourceSquare);
+        mSquares.put(target, newTargetSquare);
+        return false;
+      }
+    default:
+      throw new IllegalStateException
+        ("Illegal target square type " + targetSquare.getSquareKind() + "!");
+    }
   }
 
 
@@ -92,14 +180,20 @@ class Maze
 
   private void createUnlockActions()
   {
-    for (final Key key : mKeys.getKeys()) {
+    for (final Key key : mAvailableKeys.getKeys()) {
       final Collection<Square> locations = key.getLocations();
       final Collection<Square> locks = key.getLocks();
       for (final Square lock : locks) {
+        final Point lockpos = lock.getPosition();
 	for (final Square location : locations) {
           final Collection<Action> pickups =
 	    location.getActions(Action.PICKUP);
-          lock.addActions(Action.UNLOCK, pickups);
+          for (final Action pickup : pickups) {
+            final Point startpos = pickup.getSource();
+            if (!lockpos.equals(startpos)) {
+              lock.addAction(Action.UNLOCK, pickup);
+            }
+          }
         }
       }
     }
@@ -132,21 +226,24 @@ class Maze
   {
     boolean changed = false;
     mHasLockedDoors = false;
-    mKeys.clear();
+    mAvailableKeys.clear();
     for (final Square square : mSquares.values()) {
-      mKeys.add(square);
+      mAvailableKeys.add(square);
     }
-    for (final Key key : mKeys.getKeys()) {
+    for (final Key key : mAvailableKeys.getKeys()) {
       final Collection<Square> locations = key.getLocations();
       if (locations.isEmpty()) {
-        changed = true;
         for (final Square lock : key.getLocks()) {
           if (lock.getSquareKind() == Square.DOOR) {
             final SquareDoor door = (SquareDoor) lock;
-            door.setUnlockable(false);
-            mHasLockedDoors = true;
+            if (door.isUnlockable()) {
+              door.setUnlockable(false);
+              mHasLockedDoors = true;
+              changed = true;
+            }
           } else {
             removeSquare(lock);
+            changed = true;
           }
         }
       }
@@ -281,7 +378,8 @@ class Maze
   //# Data Members
   private final String mName;
   private final Map<Point,Square> mSquares;
-  private final KeyRing mKeys;
+  private final KeyRing mAvailableKeys;
+  private final Set<String> mCollectedKeys;
 
   private boolean mHasLockedDoors;
 

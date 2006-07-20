@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.algorithms
 //# CLASS:   AlgorithmsTest
 //###########################################################################
-//# $Id: AlgorithmsTest.java,v 1.3 2006-02-20 22:20:22 robi Exp $
+//# $Id: AlgorithmsTest.java,v 1.4 2006-07-20 02:28:38 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.algorithms;
@@ -37,10 +37,12 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.valid.ValidUnmarshaller;
 
-import net.sourceforge.waters.junit.WatersTestCase;
+import net.sourceforge.waters.junit.AbstractWatersTest;
+
+import org.xml.sax.SAXException;
 
 
-public class AlgorithmsTest extends WatersTestCase
+public class AlgorithmsTest extends AbstractWatersTest
 {
 
   //#########################################################################
@@ -257,6 +259,7 @@ public class AlgorithmsTest extends WatersTestCase
     final String outextname =
       filename + mProductDESMarshaller.getDefaultExtension();
     final File outfilename = new File(mOutputDirectory, outextname);
+    ensureParentDirectoryExists(outfilename);
     mProductDESMarshaller.marshal(des, outfilename);
   }                     
 
@@ -305,8 +308,7 @@ public class AlgorithmsTest extends WatersTestCase
   {
     final String name = aut.getName();
     final AutomatonProxy expectedaut = findAutomaton(expected, name);
-    assertEquals("Unexpected result!", aut, expectedaut);
-    assertEquals("Unexpected result!", expectedaut, aut);
+    assertTrue("Unexpected result!", aut.equalsByContents(expectedaut));
   }
 
   private String eliminateStrangeCharacters(final String name)
@@ -358,7 +360,7 @@ public class AlgorithmsTest extends WatersTestCase
   //#########################################################################
   //# Overrides for junit.framework.TestCase
   protected void setUp()
-    throws JAXBException
+    throws JAXBException, SAXException
   {
     mWatersInputDirectory = new File(getInputRoot(), "handwritten");
     mValidInputDirectory = new File(getInputRoot(), "valid");
@@ -370,7 +372,7 @@ public class AlgorithmsTest extends WatersTestCase
     mModuleMarshaller = new JAXBModuleMarshaller(moduleFactory, optable);
     mProductDESMarshaller = new JAXBProductDESMarshaller(mProductDESFactory);
     mValidUnmarshaller = new ValidUnmarshaller(moduleFactory, optable);
-    mDocumentManager = new DocumentManager<DocumentProxy>();
+    mDocumentManager = new DocumentManager();
     mDocumentManager.registerMarshaller(mModuleMarshaller);
     mDocumentManager.registerMarshaller(mProductDESMarshaller);
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
@@ -400,6 +402,6 @@ public class AlgorithmsTest extends WatersTestCase
   private ValidUnmarshaller mValidUnmarshaller;
   private JAXBModuleMarshaller mModuleMarshaller;
   private JAXBProductDESMarshaller mProductDESMarshaller;
-  private DocumentManager<DocumentProxy> mDocumentManager;
+  private DocumentManager mDocumentManager;
 
 }

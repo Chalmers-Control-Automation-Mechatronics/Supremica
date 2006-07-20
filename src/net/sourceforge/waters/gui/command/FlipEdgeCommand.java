@@ -1,14 +1,15 @@
 package net.sourceforge.waters.gui.command;
 
 import net.sourceforge.waters.gui.ControlledSurface;
-import net.sourceforge.waters.gui.EditorEdge;
-import net.sourceforge.waters.gui.EditorNode;
-import net.sourceforge.waters.gui.EditorObject;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
+import net.sourceforge.waters.subject.module.NodeSubject;
+import net.sourceforge.waters.subject.module.PointGeometrySubject;
+import net.sourceforge.waters.subject.module.EdgeSubject;
+import java.awt.geom.Point2D;
 
 /**
  * Command for the flipping of edges
@@ -19,17 +20,17 @@ public class FlipEdgeCommand
     implements Command
 {
     /** The Edge Edited by this Command */
-    private final EditorEdge edge;
-    private final String description = "Edge Flipping";
+    private final EdgeSubject mEdge;
+    private final String mDescription = "Edge Flipping";
 
     /**
      * Flips an edge on the specified surface.
      *
      * @param surface the surface edited by this command
      */
-    public FlipEdgeCommand(EditorEdge edge)
+    public FlipEdgeCommand(EdgeSubject edge)
     {
-		this.edge = edge;
+		mEdge = edge;
     }
 
     /**
@@ -37,7 +38,14 @@ public class FlipEdgeCommand
      */
     public void execute()
     {
-		edge.flipEdge();
+      NodeSubject node1 = mEdge.getSource();
+      NodeSubject node2 = mEdge.getTarget();
+      Point2D p1 = mEdge.getStartPoint().getPoint();
+      Point2D p2 = mEdge.getEndPoint().getPoint();
+      mEdge.setSource(node2);
+      mEdge.setTarget(node1);
+      mEdge.setStartPoint(new PointGeometrySubject(p2));
+      mEdge.setEndPoint(new PointGeometrySubject(p1));
     }
 
     /** 
@@ -45,7 +53,7 @@ public class FlipEdgeCommand
      */    
     public void undo()
     {
-		edge.flipEdge();
+		execute();
     }
 
    	public boolean isSignificant()
@@ -54,8 +62,8 @@ public class FlipEdgeCommand
 		return true;
 	}
 
-    public String getName()
-    {
-		return description;
-    }
+  public String getName()
+  {
+    return mDescription;
+  }
 }

@@ -8,6 +8,8 @@ import org.supremica.util.VPopupMenu;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.DeleteEdgeCommand;
+import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.LabelBlockSubject;
 
 /**
  * Popup for editing attributes of a label block.
@@ -16,18 +18,16 @@ class EditorLabelBlockPopupMenu
 	extends VPopupMenu
 	implements ActionListener
 {
-	private EditorEdge edge;
+	private EdgeSubject mEdge;
 	private ControlledSurface parent;
 
 	private JMenuItem editEdgeItem;
-	private EditorLabelGroup mBlock;	
-	private EditorGuardActionBlock mGA;
-	public EditorLabelBlockPopupMenu(ControlledSurface parent, EditorLabelGroup block)
+		
+	public EditorLabelBlockPopupMenu(ControlledSurface parent, 
+								LabelBlockSubject block)
 	{
 		this.parent = parent;
-		this.mBlock = block;
-		edge = mBlock.getParent();
-		mGA = edge.getEditorGuardActionBlock();
+		mEdge = (EdgeSubject)block.getParent();
 
 		init();
 	}
@@ -49,7 +49,7 @@ class EditorLabelBlockPopupMenu
 	{
 		if (e.getSource() == editEdgeItem)
 		{
-			EditorEditEdgeDialog.showDialog(edge.getSubject());
+			EditorEditEdgeDialog.showDialog(mEdge);
 		}
 		parent.repaint();
 	}

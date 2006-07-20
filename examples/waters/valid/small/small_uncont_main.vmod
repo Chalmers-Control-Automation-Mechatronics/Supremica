@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "module" "module.dtd">
+
+<module name="small_uncont_main"
+        legacy="1"
+        arity="0"
+        generatorName="VALID-II"
+        generatorVersion="2.9b2"
+        version="1.0"
+        creationDate="2000-11-23 15:45:10 GMT"
+        modificationDate="2006-07-19 16:20:07 GMT+12:00">
+<interface/>
+<definitions>
+<typeDefinition name="MACHS" expression="{1..2}"/>
+</definitions>
+<local>
+<event name="finish"
+       controllable="0"
+       arity="1"
+       legacyCode="0">
+<comment>
+Machine finishes operation.
+</comment>
+<posParam pos="0" value="$MACHS"/>
+</event>
+<foreach-alias dummy="_0" range="$MACHS">
+<alias old="finish.$_0" new="finish[$_0]"/>
+</foreach-alias>
+<event name="break"
+       controllable="0"
+       arity="1"
+       legacyCode="0">
+<comment>
+Machine breaks down.
+</comment>
+<posParam pos="0" value="$MACHS"/>
+</event>
+<foreach-alias dummy="_0" range="$MACHS">
+<alias old="break.$_0" new="break[$_0]"/>
+</foreach-alias>
+<event name="start"
+       controllable="1"
+       arity="1">
+<comment>
+Start a machine.
+This code fragment should start operation of the machine given as its
+parameter.
+</comment>
+<posParam pos="0" value="$MACHS"/>
+</event>
+<foreach-alias dummy="_0" range="$MACHS">
+<alias old="start.$_0" new="start[$_0]"/>
+</foreach-alias>
+<event name="repair"
+       controllable="1"
+       arity="1">
+<comment>
+Repair a machine.
+This code fragment should initiate the repair of the machine given as
+its parameter.
+
+&quot;Yeah, yeah, yeah &amp; yeah!&quot;
+</comment>
+<posParam pos="0" value="$MACHS"/>
+</event>
+<foreach-alias dummy="_0" range="$MACHS">
+<alias old="repair.$_0" new="repair[$_0]"/>
+</foreach-alias>
+</local>
+<parts>
+<foreach-instance dummy="MACH" range="$MACHS">
+<instance name="machine[$MACH]" module="mach_plant">
+<nameParam name="repair" value="repair[$MACH]"/>
+<nameParam name="start" value="start[$MACH]"/>
+<nameParam name="break" value="break[$MACH]"/>
+<nameParam name="finish" value="finish[$MACH]"/>
+</instance>
+</foreach-instance>
+<component graph="buffer_uncont" kind="spec"/>
+</parts>
+</module>

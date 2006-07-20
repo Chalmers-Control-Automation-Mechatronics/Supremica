@@ -4,23 +4,22 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ForeachEventAliasListHandler
 //###########################################################################
-//# $Id: ForeachEventAliasListHandler.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ForeachEventAliasListHandler.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.util.List;
-import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.base.Proxy;
 
-import net.sourceforge.waters.xsd.module.EventAliasListType;
-import net.sourceforge.waters.xsd.module.ForeachEventAliasType;
+import net.sourceforge.waters.xsd.module.EventAliasList;
+import net.sourceforge.waters.xsd.module.ForeachEventAlias;
 import net.sourceforge.waters.xsd.module.ObjectFactory;
 
 
 class ForeachEventAliasListHandler
-  extends JAXBListHandler<ForeachEventAliasType,EventAliasListType,Proxy>
+  extends JAXBListHandler<ForeachEventAlias,EventAliasList,Proxy>
 {
 
 
@@ -39,20 +38,19 @@ class ForeachEventAliasListHandler
 
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBListHandler
-  EventAliasListType createListElement(final ForeachEventAliasType container)
-    throws JAXBException
+  EventAliasList createListElement(final ForeachEventAlias container)
   {
-    final EventAliasListType listelem = mFactory.createEventAliasList();
+    final EventAliasList listelem = mFactory.createEventAliasList();
     container.setEventAliasList(listelem);
     return listelem;
   }
 
-  EventAliasListType getListElement(final ForeachEventAliasType container)
+  EventAliasList getListElement(final ForeachEventAlias container)
   {
     return container.getEventAliasList();
   }
 
-  List getList(final EventAliasListType listelem)
+  List getList(final EventAliasList listelem)
   {
     return listelem.getList();
   }

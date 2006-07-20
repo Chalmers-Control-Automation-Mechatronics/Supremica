@@ -73,7 +73,7 @@ public class EditorPanel
 		editorButtonGroup = new ButtonGroup();
 		toolBar.addSeparator();
 		(toolBar.add(getActions().editorSelectAction, editorButtonGroup)).setSelected(true);
-		toolBar.setCommand(ControlledSurface.SELECT);
+		toolBar.setCommand(ControlledSurface.Tool.SELECT.toString());
 		toolBar.add(getActions().editorAddNodeAction, editorButtonGroup);
 		toolBar.add(getActions().editorAddNodeGroupAction, editorButtonGroup);
 		toolBar.add(getActions().editorAddEdgeAction, editorButtonGroup);

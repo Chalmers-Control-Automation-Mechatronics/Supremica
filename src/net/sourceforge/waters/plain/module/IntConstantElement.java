@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   IntConstantElement
 //###########################################################################
-//# $Id: IntConstantElement.java,v 1.4 2006-05-24 09:13:02 markus Exp $
+//# $Id: IntConstantElement.java,v 1.5 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.IntConstantProxy;
@@ -47,16 +48,24 @@ public final class IntConstantElement
 
 
   //#########################################################################
-  //# Equality
-  public boolean equals(final Object partner)
+  //# Equality and Hashcode
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final IntConstantElement downcast = (IntConstantElement) partner;
       return
         (mValue == downcast.mValue);
     } else {
       return false;
     }
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mValue;
+    return result;
   }
 
 

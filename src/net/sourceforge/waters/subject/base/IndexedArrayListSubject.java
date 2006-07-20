@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   IndexedArrayListSubject
 //###########################################################################
-//# $Id: IndexedArrayListSubject.java,v 1.3 2006-02-16 04:06:18 robi Exp $
+//# $Id: IndexedArrayListSubject.java,v 1.4 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -23,6 +23,7 @@ import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.NameNotFoundException;
 import net.sourceforge.waters.model.base.NamedProxy;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.unchecked.Casting;
 
@@ -128,30 +129,6 @@ public class IndexedArrayListSubject<P extends NamedSubject>
 
 
   //#########################################################################
-  //# Equals and Hashcode
-  public boolean equalsWithGeometry(final Object partner)
-  {
-    if (!(partner instanceof List<?>)) {
-      return false;
-    }
-    final List<?> list = (List<?>) partner;
-    if (size() != list.size()) {
-      return false;
-    }
-    final Iterator<P> iter1 = iterator();
-    final Iterator<?> iter2 = list.iterator();
-    while (iter1.hasNext()) {
-      final P elem1 = iter1.next();
-      final Object elem2 = iter2.next();
-      if (!elem1.equalsWithGeometry(elem2)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-
-  //#########################################################################
   //# Interface java.util.List
   public void add(final int index, final P proxy)
   {
@@ -236,7 +213,7 @@ public class IndexedArrayListSubject<P extends NamedSubject>
     }
   }
 
-  public void checkUnique(final P proxy)
+  public void checkUnique(final NamedProxy proxy)
     throws NameNotFoundException, ItemNotFoundException
   {
     final String name = proxy.getName();

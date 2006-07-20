@@ -3,7 +3,7 @@
 //# PACKAGE: waters.samples.maze
 //# CLASS:   Action
 //###########################################################################
-//# $Id: Action.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: Action.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 
@@ -31,7 +31,7 @@ class Action
   //# Equality and Hashcode
   public boolean equals(final Object partner)
   {
-    if (partner != null & partner.getClass() == getClass()) {
+    if (partner != null && partner.getClass() == getClass()) {
       final Action action = (Action) partner;
       return
 	mKind == action.mKind &&
@@ -72,6 +72,19 @@ class Action
   static String getTemplateName(final int kind)
   {
     return TEMPLNAME[kind];
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  Point getSource()
+  {
+    return mSource;
+  }
+
+  Point getTarget()
+  {
+    return mTarget;
   }
 
 

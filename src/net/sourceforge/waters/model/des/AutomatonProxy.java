@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   AutomatonProxy
 //###########################################################################
-//# $Id: AutomatonProxy.java,v 1.4 2005-11-03 01:24:15 robi Exp $
+//# $Id: AutomatonProxy.java,v 1.5 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.des;
@@ -39,6 +39,17 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 public interface AutomatonProxy
   extends NamedProxy
 {
+
+  //#########################################################################
+  //# Cloning
+  /**
+   * Creates and returns a copy of this automaton. This method supports the
+   * general contract of the {@link java.lang.Object#clone() clone()}
+   * method. Its precise semantics differs for different implementations of
+   * the <CODE>Proxy</CODE> interface.
+   */
+  public AutomatonProxy clone();
+
 
   //#########################################################################
   //# Getters and Setters

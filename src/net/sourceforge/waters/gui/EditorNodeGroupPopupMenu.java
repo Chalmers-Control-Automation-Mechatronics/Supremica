@@ -9,6 +9,8 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.DeleteNodeGroupCommand;
 
+import net.sourceforge.waters.subject.module.GroupNodeSubject;
+
 /**
  * Popup for editing attributes of a node.
  */
@@ -16,7 +18,7 @@ class EditorNodeGroupPopupMenu
 	extends VPopupMenu
 	implements ActionListener
 {
-	private EditorNodeGroup nodegroup;
+	private GroupNodeSubject nodegroup;
 	private ControlledSurface parent;
 
 	private JMenuItem renameItem;
@@ -24,7 +26,7 @@ class EditorNodeGroupPopupMenu
 	//private JCheckBox initialBox;
 	private JMenuItem initialItem;	
 
-	public EditorNodeGroupPopupMenu(ControlledSurface parent, EditorNodeGroup nodegroup)
+	public EditorNodeGroupPopupMenu(ControlledSurface parent, GroupNodeSubject nodegroup)
 	{
 		this.parent = parent;
 		this.nodegroup = nodegroup;
@@ -49,7 +51,7 @@ class EditorNodeGroupPopupMenu
 	{
 		if (e.getSource() == deleteItem)
 		{
-			Command deleteNodeGroup = new DeleteNodeGroupCommand(parent, nodegroup);
+			Command deleteNodeGroup = new DeleteNodeGroupCommand(parent.getGraph(), nodegroup);
 			parent.getEditorInterface().getUndoInterface().executeCommand(deleteNodeGroup);		
 			this.hide();
 		}

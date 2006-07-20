@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   FieldGlue
 //###########################################################################
-//# $Id: FieldGlue.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: FieldGlue.java,v 1.3 2006-07-20 02:28:38 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -78,16 +78,21 @@ class FieldGlue implements Comparable<FieldGlue>, WritableGlue {
     try {
       final Field field = javaclass.getField(mFieldName);
       final Class fieldtype = field.getType();
+      final int mod = field.getModifiers();
       final Class gluetype = getJavaType();
       if (gluetype != null && gluetype != fieldtype) {
         reporter.reportError
           ("Field " + mFieldName + " in class " + javaclass.getName() +
            " is not of type " + gluetype.getName() + "!");
-      } else if (field.getModifiers() !=
-                 (Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL)) {
+      } else if (!Modifier.isPublic(mod) ||
+                 !Modifier.isStatic(mod) ||
+                 !Modifier.isFinal(mod) ||
+                 Modifier.isStrict(mod) ||
+                 Modifier.isTransient(mod) ||
+                 Modifier.isVolatile(mod)) {
         reporter.reportError
           ("Field " + mFieldName + " in class " + javaclass.getName() +
-           " is not static final!");
+           " is not public static final, is " + Modifier.toString(mod) + "!");
       }
     } catch (final NoSuchFieldException exception) {
       reporter.reportError

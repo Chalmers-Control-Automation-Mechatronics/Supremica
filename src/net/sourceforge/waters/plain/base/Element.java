@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.base
 //# CLASS:   Element
 //###########################################################################
-//# $Id: Element.java,v 1.3 2005-11-10 21:54:42 robi Exp $
+//# $Id: Element.java,v 1.4 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.base;
@@ -66,16 +66,15 @@ public abstract class Element
 
 
   //#########################################################################
-  //# Equals and Hashcode
+  //# Comparing
   /**
-   * Checks whether two elements are equal.
-   * This method implements content-based equality, i.e., two elements
-   * will be equal if their contents are the same. This method can
-   * be slow for large structures and therefore should be used with
-   * care.
-   * @see #equalsWithGeometry(Object) equalsWithGeometry()
+   * Checks whether two elements are equal. This method implements
+   * content-based equality, i.e., two elements will be equal if their
+   * contents are the same. Since elements have no contents by themselves,
+   * this default implementation considers two elements as equal if they
+   * have the same class.
    */
-  public boolean equals(final Object partner)
+  public boolean equalsByContents(final Proxy partner)
   {
     return partner != null && getClass() == partner.getClass();
   }
@@ -83,28 +82,37 @@ public abstract class Element
   /**
    * Checks whether two elements are equal and have the same geometry
    * information. This method implements content-based equality, i.e., two
-   * elements will be equal if their contents are the same. While the
-   * standard {@link #equals(Object) equals()} method only considers structural
-   * contents, this method also takes the layout information of graphical
-   * objects such as nodes and edges into account. This method is very slow
-   * for large structures and so far is only used for testing purposes.
+   * elements will be equal if their contents and geometry information are
+   * the same. The default implementation simply calls {@link
+   * #equalsByContents(Proxy) equalsByContents()}.
    */
-  public boolean equalsWithGeometry(final Object partner)
+  public boolean equalsWithGeometry(final Proxy partner)
   {
-    return equals(partner);
+    return equalsByContents(partner);
   }
 
   /**
-   * Returns a hash code value for this element.
-   * This is an implementation of the hashCode() function as documented in
-   * the Java API. Care has been taken to satisfy the general hashCode()
-   * contract, so the hash code does only depend on the immutable members
-   * of an element. As a consequence, the method is not always as effective
-   * as might be desired.
+   * Computes a hash code based on this object's contents. This method is
+   * used to compute a hash code to match the equality defined by the
+   * {@link #equalsByContents(Proxy) equalsByContents()} method. The
+   * default implementation for elements computes the hash code based only
+   * on the object's class.
    */
-  public int hashCode()
+  public int hashCodeByContents()
   {
     return getClass().hashCode();
+  }
+
+  /**
+   * Computes a hash code based on this object's contents and geometry
+   * information. This method is used to compute a hash code to match the
+   * equality defined by the {@link #equalsWithGeometry(Proxy)
+   * equalsWithGeometry()} method. The default implementation for elements
+   * simply calls {@link #hashCodeByContents()}.
+   */
+  public int hashCodeWithGeometry()
+  {
+    return hashCodeByContents();
   }
 
 

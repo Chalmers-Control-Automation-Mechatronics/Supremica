@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ValidUnmarshaller
 //###########################################################################
-//# $Id: ValidUnmarshaller.java,v 1.5 2006-02-20 22:20:22 robi Exp $
+//# $Id: ValidUnmarshaller.java,v 1.6 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.valid;
@@ -12,24 +12,32 @@ package net.sourceforge.waters.valid;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBDocumentImporter;
+import net.sourceforge.waters.model.marshaller.JAXBMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBModuleImporter;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 
-import net.sourceforge.waters.xsd.module.ModuleType;
+import net.sourceforge.waters.xsd.module.Module;
+
+import org.xml.sax.SAXException;
 
 
 public class ValidUnmarshaller
@@ -40,12 +48,16 @@ public class ValidUnmarshaller
   //# Constructor
   public ValidUnmarshaller(final ModuleProxyFactory factory,
                            final OperatorTable optable)
-    throws JAXBException
+    throws JAXBException, SAXException
   {
+    final SchemaFactory schemafactory =
+      SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    final URL url = JAXBMarshaller.class.getResource("waters-module.xsd");
+    final Schema schema = schemafactory.newSchema(url);
     final JAXBContext context =
       JAXBContext.newInstance("net.sourceforge.waters.xsd.module");
     mUnmarshaller = context.createUnmarshaller();
-    mUnmarshaller.setValidating(false);
+    mUnmarshaller.setSchema(schema);
     mImporter = new JAXBModuleImporter(factory, optable);
   }
 
@@ -65,7 +77,7 @@ public class ValidUnmarshaller
       final ValidTransformer transformer = new ValidTransformer(uri);
       final Source source = transformer.getSource();
       transformer.start();
-      final ModuleType module = (ModuleType) mUnmarshaller.unmarshal(source);
+      final Module module = (Module) mUnmarshaller.unmarshal(source);
       final ModuleProxy modproxy = mImporter.importDocument(module, null);
       return modproxy;
     } catch (final JAXBException exception) {
@@ -92,11 +104,20 @@ public class ValidUnmarshaller
     return EXTENSIONS;
   }
 
+  public DocumentManager getDocumentManager()
+  {
+    return null;
+  }
+
+  public void setDocumentManager(DocumentManager manager)
+  {
+  }
+
 
   //#########################################################################
   //# Data Members
   private final Unmarshaller mUnmarshaller;
-  private final JAXBDocumentImporter<ModuleProxy,ModuleType> mImporter;
+  private final JAXBDocumentImporter<ModuleProxy,Module> mImporter;
 
   private static final Collection<String> EXTENSIONS;
   private static final String EXT_VMOD = ".vmod";

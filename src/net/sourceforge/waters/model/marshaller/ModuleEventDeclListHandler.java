@@ -4,23 +4,22 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ModuleEventDeclListHandler
 //###########################################################################
-//# $Id: ModuleEventDeclListHandler.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ModuleEventDeclListHandler.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.util.List;
-import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.module.EventDeclProxy;
 
-import net.sourceforge.waters.xsd.module.EventDeclListType;
-import net.sourceforge.waters.xsd.module.ModuleType;
+import net.sourceforge.waters.xsd.module.EventDeclList;
+import net.sourceforge.waters.xsd.module.Module;
 import net.sourceforge.waters.xsd.module.ObjectFactory;
 
 
 class ModuleEventDeclListHandler
-  extends JAXBListHandler<ModuleType,EventDeclListType,EventDeclProxy>
+  extends JAXBListHandler<Module,EventDeclList,EventDeclProxy>
 {
 
 
@@ -39,20 +38,19 @@ class ModuleEventDeclListHandler
 
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBListHandler
-  EventDeclListType createListElement(final ModuleType container)
-    throws JAXBException
+  EventDeclList createListElement(final Module container)
   {
-    final EventDeclListType listelem = mFactory.createEventDeclList();
+    final EventDeclList listelem = mFactory.createEventDeclList();
     container.setEventDeclList(listelem);
     return listelem;
   }
 
-  EventDeclListType getListElement(final ModuleType container)
+  EventDeclList getListElement(final Module container)
   {
     return container.getEventDeclList();
   }
 
-  List getList(final EventDeclListType listelem)
+  List getList(final EventDeclList listelem)
   {
     return listelem.getList();
   }

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   PlainProductDESTest
 //###########################################################################
-//# $Id: PlainProductDESTest.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: PlainProductDESTest.java,v 1.3 2006-07-20 02:28:38 robi Exp $
 //###########################################################################
 
 
@@ -13,11 +13,11 @@ package net.sourceforge.waters.plain.des;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.model.des.AbstractProductDESTest;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.ProductDESTest;
 
 
-public class PlainProductDESTest extends ProductDESTest
+public class PlainProductDESTest extends AbstractProductDESTest
 {
 
   //#########################################################################

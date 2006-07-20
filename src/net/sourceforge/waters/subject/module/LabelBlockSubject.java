@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   LabelBlockSubject
 //###########################################################################
-//# $Id: LabelBlockSubject.java,v 1.7 2006-05-24 09:13:02 markus Exp $
+//# $Id: LabelBlockSubject.java,v 1.8 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.Geometry;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -78,16 +77,27 @@ public final class LabelBlockSubject
 
 
   //#########################################################################
-  //# Equality
-  public boolean equalsWithGeometry(final Object partner)
+  //# Equality and Hashcode
+  public boolean equalsWithGeometry(final Proxy partner)
   {
-    if (super.equalsWithGeometry(partner)) {
+    if (super.equalsByContents(partner)) {
       final LabelBlockSubject downcast = (LabelBlockSubject) partner;
       return
-        Geometry.equalGeometry(mGeometry, downcast.mGeometry);
+        (mGeometry == null ? downcast.mGeometry == null :
+         mGeometry.equalsWithGeometry(downcast.mGeometry));
     } else {
       return false;
     }
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    if (mGeometry != null) {
+      result += mGeometry.hashCodeWithGeometry();
+    }
+    return result;
   }
 
 

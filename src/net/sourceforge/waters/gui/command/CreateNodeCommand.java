@@ -4,11 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateNodeCommand
 //###########################################################################
-//# $Id: CreateNodeCommand.java,v 1.9 2006-07-10 17:02:15 knut Exp $
+//# $Id: CreateNodeCommand.java,v 1.10 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui.command;
+
+import java.awt.Point;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -17,11 +19,14 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
 import net.sourceforge.waters.gui.ControlledSurface;
-import net.sourceforge.waters.gui.EditorNode;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
 import net.sourceforge.waters.subject.module.PlainEventListSubject;
+import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.PointGeometrySubject;
+import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
+import net.sourceforge.waters.gui.renderer.LabelProxyShape;
 
 
 /**
@@ -36,64 +41,53 @@ public class CreateNodeCommand
 
 	//#######################################################################
 	//# Constructor
-    /**
-     * Constructs a new CreateNodeCommand with the specified surface and
-     * creates the node in the x,y position specified
-     * @param surface the surface edited by this command
-     * @param x the position upon which the node is created
-     * @param y the position upon which the node is created
-     */
-    public CreateNodeCommand(ControlledSurface surface, int x, int y)
-    {
-		//System.err.println("CreateNodeCommand construct");
-		mSurface = surface;
-		// Find a unique name!
-		int i = 0;
-		for (i = 0; i <= mSurface.getNodes().size(); i++) {
-			boolean found = false;
-			for (int j=0; j<mSurface.getNodes().size(); j++) {
-				if (((EditorNode) mSurface.getNodes().get(j)).getName().equals("s" + i)) {
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				break;
-			}
-		}
-		final String name = "s" + i;
-		final Collection<Proxy> empty = Collections.emptyList();
-		final EventListExpressionSubject props =
-			new PlainEventListSubject(empty);
-		final SimpleNodeSubject node = new SimpleNodeSubject(name, props);
-		mCreated = new EditorNode(x, y, node, surface);
+  /**
+   * Constructs a new CreateNodeCommand with the specified surface and
+   * creates the node in the x,y position specified
+   * @param surface the surface edited by this command
+   * @param x the position upon which the node is created
+   * @param y the position upon which the node is created
+   */
+  public CreateNodeCommand(GraphSubject graph, int x, int y)
+  {
+    mGraph = graph;
+    // Find a unique name!
+    final Collection<Proxy> empty = Collections.emptyList();
+    final EventListExpressionSubject props =
+      new PlainEventListSubject(empty);
+    final PointGeometrySubject point = new PointGeometrySubject(
+      new Point(x, y));
+    final LabelGeometrySubject label = new LabelGeometrySubject(
+      new Point(LabelProxyShape.DEFAULTOFFSETX, LabelProxyShape.DEFAULTOFFSETY));
+    
+    String n = "S0";
+    for (int i = 0; graph.getNodesModifiable().containsName(n); i++) {
+      n = "S" + i;
     }
+    mCreated = new SimpleNodeSubject(n, props, false, point, null, label);
+  }
 
-    /**
-     * Executes the Creation of the Node
-     */
-    public void execute()
-    {
-		//System.err.println("CreateNodeCommand.execute");
-		mSurface.addNode(mCreated);
-		mSurface.getEditorInterface().setDisplayed();
-    }
+  /**
+   * Executes the Creation of the Node
+   */
+  public void execute()
+  {
+    mGraph.getNodesModifiable().add(mCreated);
+  }
 
-    /**
-     * Undoes the Command
-     */
+  /** 
+   * Undoes the Command
+   */    
 
-    public void undo()
-    {
-		mSurface.delNode(mCreated);
-		mSurface.unselectAll();
-		mSurface.getEditorInterface().setDisplayed();
-    }
+  public void undo()
+  {
+    mGraph.getNodesModifiable().remove(mCreated);
+  }
 
-    public String getName()
-    {
-		return mDescription;
-    }
+  public String getName()
+  {
+  return mDescription;
+  }
 
 	public boolean isSignificant()
 	{
@@ -102,11 +96,11 @@ public class CreateNodeCommand
 
 	//#######################################################################
 	//# Data Members
-    /** The ControlledSurface Edited with this Command */
-    private final ControlledSurface mSurface;
-    /** The Node Created by this Command */
-    private final EditorNode mCreated;
-    /** Description of Command */
-    private final String mDescription = "Node Creation";
+  /** The ControlledSurface Edited with this Command */
+  private final GraphSubject mGraph;
+  /** The Node Created by this Command */
+  private final SimpleNodeSubject mCreated;
+  /** Description of Command */
+  private final String mDescription = "Node Creation";
 
 }

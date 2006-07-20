@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   GraphElement
 //###########################################################################
-//# $Id: GraphElement.java,v 1.5 2006-05-24 09:13:02 markus Exp $
+//# $Id: GraphElement.java,v 1.6 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -15,7 +15,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.waters.model.base.Geometry;
+import net.sourceforge.waters.model.base.EqualCollection;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -97,33 +98,69 @@ public final class GraphElement
 
 
   //#########################################################################
-  //# Equality
-  public boolean equals(final Object partner)
+  //# Equality and Hashcode
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final GraphElement downcast = (GraphElement) partner;
       return
         (mIsDeterministic == downcast.mIsDeterministic) &&
-        mBlockedEvents.equals(downcast.mBlockedEvents) &&
-        mNodes.equals(downcast.mNodes) &&
-        mEdges.equals(downcast.mEdges);
+        mBlockedEvents.equalsByContents(downcast.mBlockedEvents) &&
+        EqualCollection.isEqualSetByContents
+          (mNodes, downcast.mNodes) &&
+        EqualCollection.isEqualListByContents
+          (mEdges, downcast.mEdges);
     } else {
       return false;
     }
   }
 
-  public boolean equalsWithGeometry(final Object partner)
+  public boolean equalsWithGeometry(final Proxy partner)
   {
-    if (super.equalsWithGeometry(partner)) {
+    if (super.equalsByContents(partner)) {
       final GraphElement downcast = (GraphElement) partner;
       return
         (mIsDeterministic == downcast.mIsDeterministic) &&
         mBlockedEvents.equalsWithGeometry(downcast.mBlockedEvents) &&
-        Geometry.equalSet(mNodes, downcast.mNodes) &&
-        Geometry.equalList(mEdges, downcast.mEdges);
+        EqualCollection.isEqualSetWithGeometry
+          (mNodes, downcast.mNodes) &&
+        EqualCollection.isEqualListWithGeometry
+          (mEdges, downcast.mEdges);
     } else {
       return false;
     }
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    if (mIsDeterministic) {
+      result++;
+    }
+    result *= 5;
+    result += mBlockedEvents.hashCodeByContents();
+    result *= 5;
+    result += EqualCollection.getSetHashCodeByContents(mNodes);
+    result *= 5;
+    result += EqualCollection.getListHashCodeByContents(mEdges);
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    if (mIsDeterministic) {
+      result++;
+    }
+    result *= 5;
+    result += mBlockedEvents.hashCodeWithGeometry();
+    result *= 5;
+    result += EqualCollection.getSetHashCodeWithGeometry(mNodes);
+    result *= 5;
+    result += EqualCollection.getListHashCodeWithGeometry(mEdges);
+    return result;
   }
 
 

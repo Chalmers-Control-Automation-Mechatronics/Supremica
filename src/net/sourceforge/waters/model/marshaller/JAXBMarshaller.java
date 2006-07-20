@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBMarshaller
 //###########################################################################
-//# $Id: JAXBMarshaller.java,v 1.3 2006-02-20 22:20:21 robi Exp $
+//# $Id: JAXBMarshaller.java,v 1.4 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -18,15 +18,20 @@ import java.net.URL;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ModelException;
 
 import net.sourceforge.waters.xsd.base.NamedType;
+
+import org.xml.sax.SAXException;
 
 
 /**
@@ -54,14 +59,19 @@ public abstract class JAXBMarshaller
   //# Constructors
   public JAXBMarshaller(final JAXBDocumentExporter<D,T> exporter,
                         final JAXBDocumentImporter<D,T> importer,
-                        final String packname)
-    throws JAXBException
+                        final String packname,
+                        final String schemaname)
+    throws JAXBException, SAXException
   {
     mExporter = exporter;
     mImporter = importer;
+    final SchemaFactory factory =
+      SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    final URL url = JAXBMarshaller.class.getResource(schemaname);
+    final Schema schema = factory.newSchema(url);
     final JAXBContext context = JAXBContext.newInstance(packname);
     mJAXBUnmarshaller = context.createUnmarshaller();
-    mJAXBUnmarshaller.setValidating(true);
+    mJAXBUnmarshaller.setSchema(schema);
     mJAXBMarshaller = context.createMarshaller();
     mJAXBMarshaller.setProperty
       (Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
@@ -129,6 +139,16 @@ public abstract class JAXBMarshaller
   {
     final String ext = getDefaultExtension();
     return Collections.singletonList(ext);
+  }
+
+  public DocumentManager getDocumentManager()
+  {
+    return mImporter.getDocumentManager();
+  }
+
+  public void setDocumentManager(DocumentManager manager)
+  {
+    mImporter.setDocumentManager(manager);
   }
 
 

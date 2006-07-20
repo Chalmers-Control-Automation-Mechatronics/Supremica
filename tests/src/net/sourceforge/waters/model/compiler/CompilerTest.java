@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   JAXBTestCase
 //###########################################################################
-//# $Id: CompilerTest.java,v 1.5 2006-03-21 22:13:30 robi Exp $
+//# $Id: CompilerTest.java,v 1.6 2006-07-20 02:28:38 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -45,11 +45,13 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
-import net.sourceforge.waters.junit.WatersTestCase;
+import net.sourceforge.waters.junit.AbstractWatersTest;
+
+import org.xml.sax.SAXException;
 
 
 public class CompilerTest
-  extends WatersTestCase
+  extends AbstractWatersTest
 {
 
   //#########################################################################
@@ -336,6 +338,7 @@ public class CompilerTest
     final URI uri = infilename.toURI();
     final ModuleProxy module = mModuleMarshaller.unmarshal(uri);
     final ProductDESProxy des = compile(module);
+    ensureParentDirectoryExists(outfilename);
     mProductDESMarshaller.marshal(des, outfilename);
   }
 
@@ -354,14 +357,14 @@ public class CompilerTest
     final URI uri2 = filename2.toURI();
     final DocumentProxy proxy1 = mProductDESMarshaller.unmarshal(uri1);
     final DocumentProxy proxy2 = mProductDESMarshaller.unmarshal(uri2);
-    assertEquals("Unexpected result!", proxy2, proxy1);
+    assertTrue("Unexpected result!", proxy2.equalsByContents(proxy1));
   }
 
 
   //#########################################################################
   //# Overrides for junit.framework.TestCase
   protected void setUp()
-    throws JAXBException
+    throws JAXBException, SAXException
   { 
     mInputDirectory = new File(getInputRoot(), "handwritten");
     mOutputDirectory = getOutputDirectory();
@@ -370,7 +373,7 @@ public class CompilerTest
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     mModuleMarshaller = new JAXBModuleMarshaller(mModuleFactory, optable);
     mProductDESMarshaller = new JAXBProductDESMarshaller(mProductDESFactory);
-    mDocumentManager = new DocumentManager<DocumentProxy>();
+    mDocumentManager = new DocumentManager();
     mDocumentManager.registerMarshaller(mModuleMarshaller);
     mDocumentManager.registerMarshaller(mProductDESMarshaller);
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
@@ -397,6 +400,6 @@ public class CompilerTest
   private ProductDESProxyFactory mProductDESFactory;
   private JAXBModuleMarshaller mModuleMarshaller;
   private JAXBProductDESMarshaller mProductDESMarshaller;
-  private DocumentManager<DocumentProxy> mDocumentManager;
+  private DocumentManager mDocumentManager;
 
 }

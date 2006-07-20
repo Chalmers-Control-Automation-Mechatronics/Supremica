@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   AbstractNamedSubject
 //###########################################################################
-//# $Id: AbstractNamedSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: AbstractNamedSubject.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.NamedProxy;
 
 
@@ -21,9 +22,9 @@ import net.sourceforge.waters.model.base.NamedProxy;
  * codes and ordering without affecting any hash tables or ordered
  * lists. While not actually providing the name member, this abstract base
  * class uses the {@link #getName()} method to provide implementations for
- * the {@link #refequals(NamedProxy) refequals()}, {@link #equals(Object)
- * equals()}, {@link #hashCode()}, and {@link #compareTo(NamedProxy)
- * compareTo()} methods.</P>
+ * the {@link #refequals(NamedProxy) refequals()}, {@link
+ * #equalsByContents(Proxy) equals()}, {@link #hashCodeByContents()}, and
+ * {@link #compareTo(NamedProxy) compareTo()} methods.</P>
  *
  * @author Robi Malik
  */
@@ -70,9 +71,15 @@ public abstract class AbstractNamedSubject
 
   //#########################################################################
   //# Equals and Hashcode
-  public boolean equals(final Object partner)
+  /**
+   * Checks whether two subjects are equal. This method implements
+   * content-based equality, i.e., two subjects will be equal if their
+   * contents are the same. In addition to calling the superclass
+   * method, this method compares the names of the two subjects.
+   */
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final AbstractNamedSubject named = (AbstractNamedSubject) partner;
       return getName().equals(named.getName());
     } else {
@@ -80,13 +87,18 @@ public abstract class AbstractNamedSubject
     }
   }
 
-  /**
-   * Returns a hash code value for this subject.
-   * This method uses the subject's name to calculate the hash code.
-   */
-  public int hashCode()
+  public int refHashCode()
   {
     return getName().hashCode();
+  }
+
+  /**
+   * Computes a hash code based on this object's contents.
+   * This method uses the subject's name to calculate the hash code.
+   */
+  public int hashCodeByContents()
+  {
+    return super.hashCodeByContents() + 5 * getName().hashCode();
   }
 
 

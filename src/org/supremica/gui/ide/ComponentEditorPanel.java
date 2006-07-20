@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.22 2006-07-10 17:02:15 knut Exp $
+//# $Id: ComponentEditorPanel.java,v 1.23 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -53,18 +53,9 @@ public class ComponentEditorPanel
 		//setTitle(title);
 		this.moduleContainer = moduleContainer;
 		this.module = moduleContainer.getModule();
-		//toolbar = new EditorToolbar();
-		//if (moduleContainer.getIDE().getToolBar() instanceof ControlledToolbar)
-		//{
-		    surface = new ControlledSurface(this, (ControlledToolbar)moduleContainer.getIDE().getToolBar());
-		//}
-		//else
-		//{
-		//	System.err.println("Illegal toolbar");
-		//	System.exit(0);
-		    //surface = new ControlledSurface(this, toolbar);
-		//}
-
+		surface = new ControlledSurface
+			(element.getGraph(), module, this,
+			 (ControlledToolbar) moduleContainer.getIDE().getToolBar());
 		surface.setPreferredSize(IDEDimensions.rightEditorPreferredSize);
 		surface.setMinimumSize(IDEDimensions.rightEditorMinimumSize);
 
@@ -110,11 +101,6 @@ public class ComponentEditorPanel
 		setVisible(true);
 
 		this.element = element;
-
-		if ((element != null) && (module != null))
-		{
-			surface.loadElement(module, element);
-		}
 
 		surface.createOptions(this);
 	}

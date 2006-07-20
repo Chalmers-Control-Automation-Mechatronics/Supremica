@@ -44,20 +44,34 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="M:AbstractParameter" maxOccurs="unbounded">
+          <xs:group ref="M:ParameterListEntry" maxOccurs="unbounded">
             <xs:annotation><xs:appinfo>
               <jaxb:property name="List"/>
             </xs:appinfo></xs:annotation>
-          </xs:element>
+          </xs:group>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 </xs:element>
 
-<xs:element name="AbstractParameter" abstract="true"/>
+<xs:group name="ParameterListEntry">
+  <xs:choice>
+    <xs:element ref="M:IntParameter"/>
+    <xs:element ref="M:RangeParameter"/>
+    <xs:element ref="M:EventParameter"/>
+  </xs:choice>
+</xs:group>
 
-<xs:element name="IntParameter" substitutionGroup="M:AbstractParameter">
+<xs:complexType name="SimpleParameterType">
+  <xs:complexContent>
+    <xs:extension base="B:NamedType">
+      <xs:attribute name="Required" type="xs:boolean" default="true"/>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:element name="IntParameter">
   <xs:complexType>
     <xs:complexContent>
       <xs:extension base="M:SimpleParameterType">
@@ -71,7 +85,7 @@
   </xs:complexType>
 </xs:element>
 
-<xs:element name="RangeParameter" substitutionGroup="M:AbstractParameter">
+<xs:element name="RangeParameter">
   <xs:complexType>
     <xs:complexContent>
       <xs:extension base="M:SimpleParameterType">
@@ -85,7 +99,7 @@
   </xs:complexType>
 </xs:element>
 
-<xs:element name="EventParameter" substitutionGroup="M:AbstractParameter">
+<xs:element name="EventParameter">
   <xs:complexType>
     <xs:complexContent>
       <xs:extension base="M:EventBaseType">
@@ -94,14 +108,6 @@
     </xs:complexContent>
   </xs:complexType>
 </xs:element>
-
-<xs:complexType name="SimpleParameterType">
-  <xs:complexContent>
-    <xs:extension base="B:NamedType">
-      <xs:attribute name="Required" type="xs:boolean" default="true"/>
-    </xs:extension>
-  </xs:complexContent>
-</xs:complexType>
 
 
 <!-- ==================================================================== -->
@@ -145,20 +151,25 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="M:AbstractEventAlias" maxOccurs="unbounded">
+          <xs:group ref="M:EventAliasListEntry" maxOccurs="unbounded">
             <xs:annotation><xs:appinfo>
               <jaxb:property name="List"/>
             </xs:appinfo></xs:annotation>
-          </xs:element>
+          </xs:group>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 </xs:element>
 
-<xs:element name="AbstractEventAlias" abstract="true"/>
+<xs:group name="EventAliasListEntry">
+  <xs:choice>
+    <xs:element ref="M:EventAlias"/>
+    <xs:element ref="M:ForeachEventAlias"/>
+  </xs:choice>
+</xs:group>
 
-<xs:element name="EventAlias" substitutionGroup="M:AbstractEventAlias">
+<xs:element name="EventAlias">
   <xs:complexType>
     <xs:complexContent>
       <xs:extension base="M:IdentifiedType">
@@ -174,7 +185,7 @@
   </xs:complexType>
 </xs:element>
 
-<xs:element name="ForeachEventAlias" substitutionGroup="M:AbstractEventAlias">
+<xs:element name="ForeachEventAlias">
   <xs:complexType>
     <xs:complexContent>
       <xs:extension base="M:ForeachType">
@@ -262,7 +273,7 @@
   <xs:complexContent>
     <xs:extension base="B:ElementType">
       <xs:sequence>
-        <xs:group ref="M:EventListMember" maxOccurs="unbounded">
+        <xs:group ref="M:EventListEntry" maxOccurs="unbounded">
           <xs:annotation><xs:appinfo>
             <jaxb:property name="List"/>
           </xs:appinfo></xs:annotation>
@@ -272,7 +283,7 @@
   </xs:complexContent>
 </xs:complexType>
 
-<xs:group name="EventListMember">
+<xs:group name="EventListEntry">
   <xs:choice>
     <xs:group ref="M:Identifier"/>
     <xs:element ref="M:ForeachEvent"/>
@@ -293,7 +304,7 @@
 
 <xs:group name="Expression">
   <xs:choice>
-    <xs:element ref="M:SimpleExpression"/>
+    <xs:group ref="M:SimpleExpression"/>
     <xs:element ref="M:EventListExpression"/>
   </xs:choice>
 </xs:group>
@@ -308,20 +319,26 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="M:AbstractComponent" maxOccurs="unbounded">
+          <xs:group ref="M:ComponentListEntry" maxOccurs="unbounded">
             <xs:annotation><xs:appinfo>
               <jaxb:property name="List"/>
             </xs:appinfo></xs:annotation>
-          </xs:element>
+          </xs:group>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 </xs:element>
 
-<xs:element name="AbstractComponent" abstract="true"/>
+<xs:group name="ComponentListEntry">
+  <xs:choice>
+    <xs:element ref="M:SimpleComponent"/>
+    <xs:element ref="M:Instance"/>
+    <xs:element ref="M:ForeachComponent"/>
+  </xs:choice>
+</xs:group>
 
-<xs:element name="SimpleComponent" substitutionGroup="M:AbstractComponent">
+<xs:element name="SimpleComponent">
   <xs:complexType>
     <xs:complexContent>
       <xs:extension base="M:IdentifiedType">
@@ -335,7 +352,7 @@
   </xs:complexType>
 </xs:element>
 
-<xs:element name="Instance" substitutionGroup="M:AbstractComponent">
+<xs:element name="Instance">
   <xs:complexType>
     <xs:complexContent>
       <xs:extension base="M:IdentifiedType">
@@ -369,7 +386,7 @@
   </xs:complexType>
 </xs:element>
 
-<xs:element name="ForeachComponent" substitutionGroup="M:AbstractComponent">
+<xs:element name="ForeachComponent">
   <xs:complexType>
     <xs:complexContent>
       <xs:extension base="M:ForeachType">
@@ -410,11 +427,11 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="M:AbstractNode" maxOccurs="unbounded">
+          <xs:group ref="M:NodeListEntry" maxOccurs="unbounded">
             <xs:annotation><xs:appinfo>
               <jaxb:property name="List"/>
             </xs:appinfo></xs:annotation>
-          </xs:element>
+          </xs:group>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -437,7 +454,12 @@
   </xs:complexType>
 </xs:element>
 
-<xs:element name="AbstractNode" abstract="true"/>
+<xs:group name="NodeListEntry">
+  <xs:choice>
+    <xs:element ref="M:SimpleNode"/>
+    <xs:element ref="M:GroupNode"/>
+  </xs:choice>
+</xs:group>
 
 <xs:complexType name="NodeType">
   <xs:complexContent>
@@ -453,7 +475,7 @@
   </xs:complexContent>
 </xs:complexType>
 
-<xs:element name="SimpleNode" substitutionGroup="M:AbstractNode">
+<xs:element name="SimpleNode">
   <xs:complexType>
     <xs:complexContent>
       <xs:extension base="M:NodeType">
@@ -468,7 +490,7 @@
   </xs:complexType>
 </xs:element>
 
-<xs:element name="GroupNode" substitutionGroup="M:AbstractNode">
+<xs:element name="GroupNode">
   <xs:complexType>
     <xs:complexContent>
       <xs:extension base="M:NodeType">
@@ -540,9 +562,11 @@
 <xs:element name="Guard" type="xs:string"/>
 <xs:element name="Action" type="xs:string"/>
 
+
 <!-- ==================================================================== -->
 <!-- Variables                                                            -->
 <!-- ==================================================================== -->
+
 <xs:element name="VariableList">
   <xs:complexType>
     <xs:complexContent>
@@ -680,17 +704,25 @@
 
 <xs:element name="Point">
   <xs:complexType>
-    <xs:attribute name="X" type="xs:int" use="required"/>
-    <xs:attribute name="Y" type="xs:int" use="required"/>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+	<xs:attribute name="X" type="xs:int" use="required"/>
+	<xs:attribute name="Y" type="xs:int" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
   </xs:complexType>
 </xs:element>
 
 <xs:element name="Box">
   <xs:complexType>
-    <xs:attribute name="X" type="xs:int" use="required"/>
-    <xs:attribute name="Y" type="xs:int" use="required"/>
-    <xs:attribute name="Width" type="xs:int" use="required"/>
-    <xs:attribute name="Height" type="xs:int" use="required"/>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:attribute name="X" type="xs:int" use="required"/>
+        <xs:attribute name="Y" type="xs:int" use="required"/>
+        <xs:attribute name="Width" type="xs:int" use="required"/>
+        <xs:attribute name="Height" type="xs:int" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
   </xs:complexType>
 </xs:element>
 
@@ -723,9 +755,13 @@
 
 <xs:element name="Color">
   <xs:complexType>
-    <xs:attribute name="Red" type="xs:int" use="required"/>
-    <xs:attribute name="Green" type="xs:int" use="required"/>
-    <xs:attribute name="Blue" type="xs:int" use="required"/>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:attribute name="Red" type="xs:int" use="required"/>
+        <xs:attribute name="Green" type="xs:int" use="required"/>
+        <xs:attribute name="Blue" type="xs:int" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
   </xs:complexType>
 </xs:element>
 
@@ -740,117 +776,17 @@
   </xs:complexContent>
 </xs:complexType>
 
-<xs:element name="SimpleExpression" type="M:SimpleExpressionType"
-    abstract="true"/>
-
-<xs:complexType name="IdentifierType">
-  <xs:complexContent>
-    <xs:extension base="M:SimpleExpressionType">
-      <xs:attribute name="Name" type="xs:string" use="required"/>
-    </xs:extension>
-  </xs:complexContent>
-</xs:complexType>
-
-<xs:element name="SimpleIdentifier" substitutionGroup="M:SimpleExpression">
-  <xs:complexType>
-    <xs:complexContent>
-      <xs:extension base="M:IdentifierType"/>
-    </xs:complexContent>
-  </xs:complexType>
-</xs:element>
-
-<xs:element name="IndexedIdentifier" substitutionGroup="M:SimpleExpression">
-  <xs:complexType>
-    <xs:complexContent>
-      <xs:extension base="M:IdentifierType">
-        <xs:sequence>
-          <xs:group ref="M:ArithmeticExpression"
-                    minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Indexes"/>
-            </xs:appinfo></xs:annotation>
-	  </xs:group>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-</xs:element>
-
-<xs:element name="IntConstant" substitutionGroup="M:SimpleExpression">
-  <xs:complexType>
-    <xs:complexContent>
-      <xs:extension base="M:SimpleExpressionType">
-        <xs:attribute name="Value" type="xs:int" use="required"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-</xs:element>
-
-<xs:element name="BooleanConstant" substitutionGroup="M:SimpleExpression">
-  <xs:complexType>
-    <xs:complexContent>
-      <xs:extension base="M:SimpleExpressionType">
-        <xs:attribute name="Value" type="xs:boolean" use="required"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-</xs:element>
-
-<xs:element name="UnaryExpression" substitutionGroup="M:SimpleExpression">
-  <xs:complexType>
-    <xs:complexContent>
-      <xs:extension base="M:SimpleExpressionType">
-        <xs:sequence>
-          <xs:group ref="M:ArithmeticExpression">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="SubTerm"/>
-            </xs:appinfo></xs:annotation>
-          </xs:group>
-        </xs:sequence>
-        <xs:attribute name="Operator" type="M:UnaryOperator" use="required"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-</xs:element>
-
-<xs:element name="BinaryExpression" substitutionGroup="M:SimpleExpression">
-  <xs:complexType>
-    <xs:complexContent>
-      <xs:extension base="M:SimpleExpressionType">
-        <xs:sequence>
-          <xs:group ref="M:ArithmeticExpression">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Left"/>
-            </xs:appinfo></xs:annotation>
-          </xs:group>
-          <xs:group ref="M:ArithmeticExpression">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Right"/>
-            </xs:appinfo></xs:annotation>
-          </xs:group>
-        </xs:sequence>
-        <xs:attribute name="Operator" type="M:BinaryOperator" use="required"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-</xs:element>
-
-<xs:element name="EnumSetExpression" substitutionGroup="M:SimpleExpression">
-  <xs:complexType>
-    <xs:complexContent>
-      <xs:extension base="M:SimpleExpressionType">
-        <xs:sequence>
-          <xs:element ref="M:SimpleIdentifier"
-                      minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Items"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-</xs:element>
+<xs:group name="SimpleExpression">
+  <xs:choice>
+    <xs:element ref="M:SimpleIdentifier"/>
+    <xs:element ref="M:IndexedIdentifier"/>
+    <xs:element ref="M:IntConstant"/>
+    <xs:element ref="M:BooleanConstant"/>
+    <xs:element ref="M:UnaryExpression"/>
+    <xs:element ref="M:BinaryExpression"/>
+    <xs:element ref="M:EnumSetExpression"/>
+  </xs:choice>
+</xs:group>
 
 <xs:group name="Identifier">
   <xs:choice>
@@ -869,11 +805,11 @@
 
 <xs:group name="ArithmeticExpression">
   <xs:choice>
-    <xs:element ref="M:SimpleIdentifier"/>
-    <xs:element ref="M:IntConstant"/>
-    <xs:element ref="M:BooleanConstant"/>
-    <xs:element ref="M:UnaryExpression"/>
     <xs:element ref="M:BinaryExpression"/>
+    <xs:element ref="M:BooleanConstant"/>
+    <xs:element ref="M:IntConstant"/>
+    <xs:element ref="M:SimpleIdentifier"/>
+    <xs:element ref="M:UnaryExpression"/>
   </xs:choice>
 </xs:group>
 
@@ -881,11 +817,116 @@
   <xs:choice>
     <xs:element ref="M:SimpleIdentifier"/>
     <xs:element ref="M:IntConstant"/>
+    <xs:element ref="M:BooleanConstant"/>
     <xs:element ref="M:UnaryExpression"/>
     <xs:element ref="M:BinaryExpression"/>
     <xs:element ref="M:EnumSetExpression"/>
   </xs:choice>
 </xs:group>
+
+<xs:complexType name="IdentifierType">
+  <xs:complexContent>
+    <xs:extension base="M:SimpleExpressionType">
+      <xs:attribute name="Name" type="xs:string" use="required"/>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:element name="SimpleIdentifier">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:IdentifierType"/>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="IndexedIdentifier">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:IdentifierType">
+        <xs:sequence>
+          <xs:group ref="M:ArithmeticExpression"
+                    minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Indexes"/>
+            </xs:appinfo></xs:annotation>
+	  </xs:group>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="IntConstant">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:SimpleExpressionType">
+        <xs:attribute name="Value" type="xs:int" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="BooleanConstant">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:SimpleExpressionType">
+        <xs:attribute name="Value" type="xs:boolean" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="UnaryExpression">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:SimpleExpressionType">
+        <xs:sequence>
+          <xs:group ref="M:ArithmeticExpression">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="SubTerm"/>
+            </xs:appinfo></xs:annotation>
+          </xs:group>
+        </xs:sequence>
+        <xs:attribute name="Operator" type="M:UnaryOperator" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="BinaryExpression">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:SimpleExpressionType">
+        <xs:sequence>
+          <xs:group ref="M:ArithmeticExpression" minOccurs="2" maxOccurs="2">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Subterms"/>
+            </xs:appinfo></xs:annotation>
+          </xs:group>
+        </xs:sequence>
+        <xs:attribute name="Operator" type="M:BinaryOperator" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="EnumSetExpression">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="M:SimpleExpressionType">
+        <xs:sequence>
+          <xs:element ref="M:SimpleIdentifier"
+                      minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Items"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
 
 <xs:simpleType name="UnaryOperator">
   <xs:restriction base="xs:string">
@@ -925,6 +966,12 @@
   <xs:complexContent>
     <xs:extension base="B:NamedType">
       <xs:sequence>
+        <xs:group ref="M:ArithmeticOrRangeExpression" maxOccurs="2">
+          <xs:annotation><xs:appinfo>
+            <jaxb:property name="RangeAndGuard"/>
+          </xs:appinfo></xs:annotation>
+        </xs:group>
+        <!--
         <xs:group ref="M:RangeExpression">
           <xs:annotation><xs:appinfo>
             <jaxb:property name="Range"/>
@@ -935,6 +982,7 @@
             <jaxb:property name="Guard"/>
           </xs:appinfo></xs:annotation>
         </xs:group>
+        -->
       </xs:sequence>
     </xs:extension>
   </xs:complexContent>

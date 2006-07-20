@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   Proxy
 //###########################################################################
-//# $Id: Proxy.java,v 1.2 2005-11-03 01:24:15 robi Exp $
+//# $Id: Proxy.java,v 1.3 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -31,16 +31,48 @@ public interface Proxy {
   //#########################################################################
   //# Comparing
   /**
-   * Checks whether two elements are equal and have the same geometry
-   * information.  This method implements content-based equality, i.e., two
-   * elements will be equal if their contents are the same. While the
-   * standard {@link java.lang.Object#equals(Object) equals()} method only
-   * considers structural contents, this method also takes the layout
-   * information of graphical objects such as nodes and edges into
-   * account. This method can be very slow for large structures and is
-   * intended for testing purposes only.
+   * Checks whether two elements are equal. This method implements
+   * content-based equality, i.e., two elements will be equal if their
+   * contents are the same. It considers all structural contents of the
+   * object, except for geometry information.
+   * @see #equalsWithGeometry(Proxy) equalsWithGeometry()
+   * @see #hashCodeByContents()
    */
-  public boolean equalsWithGeometry(Object partner);
+  public boolean equalsByContents(Proxy partner);
+
+  /**
+   * Checks whether two elements are equal and have the same geometry
+   * information. This method implements content-based equality, i.e., two
+   * elements will be equal if their contents are the same.  In contrast to
+   * the {@link #equalsByContents(Proxy) equalsByContents()} method, this
+   * method also takes the layout information of graphical objects such as
+   * nodes and edges into account.
+   * @see #equalsByContents(Proxy) equalsByContents()
+   * @see #hashCodeWithGeometry()
+   */
+  public boolean equalsWithGeometry(Proxy partner);
+
+  /**
+   * Computes a hash code based on this object's contents. This method is
+   * used to compute a hash code to match the equality defined by the
+   * {@link #equalsByContents(Proxy) equalsByContents()} method. All
+   * structural contents of the object, except for geometry information,
+   * are taken into account.
+   * @see #equalsByContents(Proxy) equalsByContents()
+   * @see #hashCodeWithGeometry()
+   */
+  public int hashCodeByContents();
+
+  /**
+   * Computes a hash code based on this object's contents and geometry
+   * information. This method is used to compute a hash code to match the
+   * equality defined by the {@link #equalsWithGeometry(Proxy)
+   * equalsWithGeometry()} method. All structural contents of the object
+   * including geometry information, are taken into account.
+   * @see #equalsWithGeometry(Proxy) equalsWithGeometry()
+   * @see #hashCodeWithGeometry()
+   */
+  public int hashCodeWithGeometry();
 
 
   //#########################################################################

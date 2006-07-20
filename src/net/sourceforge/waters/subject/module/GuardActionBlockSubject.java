@@ -4,12 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   GuardActionBlockSubject
 //###########################################################################
-//# $Id: GuardActionBlockSubject.java,v 1.7 2006-05-24 09:03:07 markus Exp $
+//# $Id: GuardActionBlockSubject.java,v 1.8 2006-07-20 02:28:37 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
 
-import net.sourceforge.waters.model.base.Geometry;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
@@ -79,34 +79,55 @@ public final class GuardActionBlockSubject
 
 
   //#########################################################################
-  //# Equality
-  public boolean equals(final Object partner)
+  //# Equality and Hashcode
+  public boolean equalsByContents(final Proxy partner)
   {
-    if (super.equals(partner)) {
+    if (super.equalsByContents(partner)) {
       final GuardActionBlockSubject downcast = (GuardActionBlockSubject) partner;
       return
-        (mGuard == null ? downcast.mGuard == null :
-         mGuard.equals(downcast.mGuard)) &&
-        (mAction == null ? downcast.mAction == null :
-         mAction.equals(downcast.mAction));
+        mGuard.equals(downcast.mGuard) &&
+        mAction.equals(downcast.mAction);
     } else {
       return false;
     }
   }
 
-  public boolean equalsWithGeometry(final Object partner)
+  public boolean equalsWithGeometry(final Proxy partner)
   {
-    if (super.equalsWithGeometry(partner)) {
+    if (super.equalsByContents(partner)) {
       final GuardActionBlockSubject downcast = (GuardActionBlockSubject) partner;
       return
-        (mGuard == null ? downcast.mGuard == null :
-         mGuard.equals(downcast.mGuard)) &&
-        (mAction == null ? downcast.mAction == null :
-         mAction.equals(downcast.mAction)) &&
-        Geometry.equalGeometry(mGeometry, downcast.mGeometry);
+        mGuard.equals(downcast.mGuard) &&
+        mAction.equals(downcast.mAction) &&
+        (mGeometry == null ? downcast.mGeometry == null :
+         mGeometry.equalsWithGeometry(downcast.mGeometry));
     } else {
       return false;
     }
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mGuard.hashCode();
+    result *= 5;
+    result += mAction.hashCode();
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mGuard.hashCode();
+    result *= 5;
+    result += mAction.hashCode();
+    result *= 5;
+    if (mGeometry != null) {
+      result += mGeometry.hashCodeWithGeometry();
+    }
+    return result;
   }
 
 

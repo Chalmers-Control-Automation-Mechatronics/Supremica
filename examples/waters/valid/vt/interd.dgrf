@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="interd" version="1.0" valid="1"
+	hasGeometry="1" width="331" height="249"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-05-08 02:18:12 GMT" modificationDate="2005-05-08 02:18:12 GMT">
+	<events>
+		<event controllable="0" name="at.l1.T"/>
+		<event controllable="0" name="at.l2.T"/>
+		<event controllable="0" name="at.m1.T"/>
+		<event controllable="0" name="at.m2.T"/>
+		<event controllable="0" name="at.r1.T"/>
+		<event controllable="0" name="at.r2.T"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="80" y="176"/></rendering>
+			<label name="out">
+				<rendering><point x="-32" y="5"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="240" y="176"/></rendering>
+			<label name="l1r1">
+				<rendering><point x="-1" y="23"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="160" y="256"/></rendering>
+			<label name="r2">
+				<rendering><point x="-8" y="24"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="160" y="96"/></rendering>
+			<label name="l2">
+				<rendering><point x="-7" y="-13"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="352" y="176"/></rendering>
+			<label name="m1">
+				<rendering><point x="3" y="-11"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="175" y="315"/></rendering>
+			<source name="m1"/>
+			<target name="out"/>
+			<labelGroup>
+				<rendering><point x="-20" y="-9"/></rendering>
+				<label name="at.m2.T"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="l2"/>
+			<target name="l1r1"/>
+			<labelGroup>
+				<rendering><point x="-3" y="-13"/></rendering>
+				<label name="at.l1.T"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="r2"/>
+			<target name="l1r1"/>
+			<labelGroup>
+				<rendering><point x="-34" y="-14"/></rendering>
+				<label name="at.r1.T"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="l1r1"/>
+			<target name="m1"/>
+			<labelGroup>
+				<rendering><point x="-22" y="-15"/></rendering>
+				<label name="at.m1.T"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="out"/>
+			<target name="l2"/>
+			<labelGroup>
+				<rendering><point x="-37" y="-9"/></rendering>
+				<label name="at.l2.T"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="out"/>
+			<target name="r2"/>
+			<labelGroup>
+				<rendering><point x="-6" y="-14"/></rendering>
+				<label name="at.r2.T"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>
