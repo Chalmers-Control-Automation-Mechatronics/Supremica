@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControllabilityCheckerTest
 //###########################################################################
-//# $Id: ControllabilityCheckerTest.java,v 1.2 2006-07-20 02:28:37 robi Exp $
+//# $Id: ControllabilityCheckerTest.java,v 1.3 2006-07-23 10:19:14 js173 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -82,16 +82,14 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     String name = "never_blow_up.wdes";
     runControllabilityChecker(group, dir, name, false);
   }
-
-  /*
+ 
   public void testCentral_locking() throws Exception
   {
     String group = "valid";
     String dir  = "central_locking";
     String name = "koordwsp.wdes";
     runControllabilityChecker(group, dir, name, true);
-  }
-  */
+  } 
   
   public void testDebounce() throws Exception
   {
