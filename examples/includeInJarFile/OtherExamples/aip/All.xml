@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Automata name="Single Visual Project" major="0" minor="9" comment="The 'Atelier Inter-établissement de Productique' (AIP) example described in 'Hierarchical Interface-based Supervisory Control' by R.J. Leduc. Here, the silly 'NewEvents'-models have been removed, otherwise everything is as in the report except for the names of the models which vary slightly. The models can be divided into three disjoint groups - TU4, AS3 and the rest - having no events in common. The model being incomplete has to do with the limitation of the methods used in the mentioned thesis.">
+<Automata name="Single Visual Project" major="0" minor="9" comment="The 'Atelier Inter-établissement de Productique' (AIP) example described in 'Hierarchical Interface-based Supervisory Control' by R.J. Leduc. Here, the redundant 'NewEvents'-models have been removed, otherwise everything is as in the report except for the names of the models which vary slightly. The models can be divided into three disjoint groups - TU4, AS3 and the rest - having no events in common. The model being incomplete has to do with the limitation of the methods used in the mentioned thesis.">
 <Automaton name="h_ASStoreUpState.AS1" type="Plant">
 	<Events>
 		<Event id="0" label="ASDwn.AS1"/>

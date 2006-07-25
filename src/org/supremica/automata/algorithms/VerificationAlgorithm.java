@@ -56,7 +56,7 @@ public class VerificationAlgorithm
 	private static Collection collection = new LinkedList();
 	public static final VerificationAlgorithm Monolithic = new VerificationAlgorithm("Monolithic");
 	public static final VerificationAlgorithm Modular = new VerificationAlgorithm("Modular");
-	public static final VerificationAlgorithm Compositional = new VerificationAlgorithm("Compositional");
+	public static final VerificationAlgorithm Compositional = new VerificationAlgorithm("Compositional", false);
 	public static final VerificationAlgorithm BDD = new VerificationAlgorithm("BDD");
 	public static final VerificationAlgorithm IDD = new VerificationAlgorithm("IDD", false);
 	public static final VerificationAlgorithm Undefined = new VerificationAlgorithm("Undefined", false);

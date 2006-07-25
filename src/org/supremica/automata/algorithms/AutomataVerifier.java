@@ -179,10 +179,12 @@ public class AutomataVerifier
 				return "Some automaton has no marked states. This system is blocking!";
 			}
 
+			/*
 			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 			{
 				return "Not implemented, try the compositional algorithm.";
 			}
+			*/
 		}
 
 		// Check MutuallyNonblocking
@@ -292,14 +294,13 @@ public class AutomataVerifier
 				{
 					return BDDNonblockingVerification();
 				}
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
+				{
+					// This is the compositional algorithm, there is no "modular" algorithm
+					return compositionalNonblockingVerification();
+				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Compositional)
 				{
-					// This algorithm is under implementation!!
-					//return modularNonblockingVerification();
-
-					// This algorithm only verifies pairwise nonblocking!!!
-					// return pairwiseNonblockingVerification();
-
 					return compositionalNonblockingVerification();
 				}
 				else
