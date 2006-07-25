@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Automata name="Single Visual Project" major="0" minor="9" comment="All the AIP models except for AS3 and TU4 which are disjoint from the rest. The reason for this, in the words of the model designer: 'The AIP example is a work in process. As our technology allows us to handle bigger systems, we add more details to the model.'.">
+<Automata name="Single Visual Project" major="0" minor="9" comment="All the AIP models except for AS3 and TU4 which are disjoint from the rest.">
+<!-- 
+The reason for this, in the words of the model designer: 'The AIP example is a work in process. As our technology allows us to handle bigger systems, we add more details to the model.'.
+-->
 <Automaton name="h_ASStoreUpState.AS1" type="Plant">
 	<Events>
 		<Event id="0" label="ASDwn.AS1"/>

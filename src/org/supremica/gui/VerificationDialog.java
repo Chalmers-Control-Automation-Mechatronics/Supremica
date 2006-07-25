@@ -173,6 +173,9 @@ public class VerificationDialog
 		}
 	}
 
+	/**
+	 * The choices for algorithm.
+	 */
 	private static class AlgorithmSelector
 		extends JComboBox
 	{

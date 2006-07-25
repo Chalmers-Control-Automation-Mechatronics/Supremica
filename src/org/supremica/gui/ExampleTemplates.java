@@ -282,6 +282,7 @@ public class ExampleTemplates
 		thisGroup.addItem(new TemplateItem("Robot Assembly Cell", prefix + "robotAssemblyCell.xml"));
 		thisGroup.addItem(new TemplateItem("Simple Manufacturing Example", prefix + "simpleManufacturingExample.xml"));
 		thisGroup.addItem(new TemplateItem("Tank Process", prefix + "tankProcess.xml"));
+		thisGroup.addItem(new TemplateItem("Transfer Line", prefix + "transfer.xml"));
 		thisGroup.addItem(new TemplateItem("Train Testbed", prefix + "tbed_ctct.xml"));
 		thisGroup.addItem(new TemplateItem("Train Testbed (variant)", prefix + "tbed_valid.xml"));
 		thisGroup.addItem(new TemplateItem("Welding Robots", prefix + "weldingRobots.xml"));

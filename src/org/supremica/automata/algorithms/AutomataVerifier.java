@@ -65,6 +65,7 @@ import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
 import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
 import org.supremica.automata.algorithms.minimization.AutomataMinimizer;
+import org.supremica.automata.algorithms.minimization.MinimizationHelper;
 import org.supremica.automata.algorithms.standard.Determinizer;
 import org.supremica.util.BDD.*;
 import org.supremica.properties.Config;
@@ -155,11 +156,12 @@ public class AutomataVerifier
 				return "At least two automata must be selected.";
 			}
 
-			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
+			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular || 
+				verificationOptions.getAlgorithmType() == VerificationAlgorithm.Compositional)
 			{
 				if (!theAutomata.isAllEventsPrioritized())
 				{
-					return "All events must be prioritized in the modular algorithm.";
+					return "All events must be prioritized.";
 				}
 			}
 		}
@@ -177,12 +179,10 @@ public class AutomataVerifier
 				return "Some automaton has no marked states. This system is blocking!";
 			}
 
-			/*
 			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
 			{
-				return "The modular nonblocking algorithm \n" + "is not fully implemented!";
+				return "Not implemented, try the compositional algorithm.";
 			}
-			*/
 		}
 
 		// Check MutuallyNonblocking
@@ -264,6 +264,10 @@ public class AutomataVerifier
 				{
 					return modularControllabilityVerification();
 				}
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Compositional)
+				{
+					return compositionalControllabilityVerification();
+				}
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
 				{
 					return BDDControllabilityVerification(theAutomata);
@@ -288,7 +292,7 @@ public class AutomataVerifier
 				{
 					return BDDNonblockingVerification();
 				}
-				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Compositional)
 				{
 					// This algorithm is under implementation!!
 					//return modularNonblockingVerification();
@@ -494,7 +498,6 @@ public class AutomataVerifier
 					//if (!currEvent.isControllable())
 					if (!controllableEventsTable[currEvent.getIndex()])
 					{
-
 						// Note that in the language inclusion case, the
 						// uncontrollableEventToPlantsMap has been adjusted...
 						if (uncontrollableEventToPlantsMap.get(currEvent) != null)
@@ -581,7 +584,7 @@ public class AutomataVerifier
 	}
 
 	/**
-	 * Performs modular controllablity verification on one module using AutomataSynchronizerExecuter.
+	 * Performs monolithic controllablity verification on one module using AutomataSynchronizerExecuter.
 	 *
 	 *@param  selectedAutomata the automata that should be verified
 	 *@return  true if controllable, false if not or false if don't know.
@@ -738,16 +741,14 @@ public class AutomataVerifier
 										"no chance for controllability.");
 
 							// CAN'T BE DONE... TRACE NOT REMEMBERED...
-							/*
 							// Print the uncontrollable state(s)...
-							synchHelper.printUncontrollableStates();
+							//synchHelper.printUncontrollableStates();
 
 							// Print event trace reaching uncontrollable state
-							if (verificationOptions.showBadTrace())
-							{
-								synchHelper.displayTrace();
-							}
-							*/
+							//if (verificationOptions.showBadTrace())
+							//{
+							//	synchHelper.displayTrace();
+							//}
 						}
 
 						return false;
@@ -1632,8 +1633,30 @@ public class AutomataVerifier
 		return message;
 	}
 
+
 	/**
-	 * Incrementally composes and minimizes the automata and examines the end result...
+	 * Compositionally minimizes the automata and examines the end result...
+	 *
+	 * Does not use the synchHelper.
+	 */
+	private boolean compositionalControllabilityVerification()
+		throws Exception
+	{
+		// Mark all states in all automata
+		for (Automaton automaton : theAutomata)
+		{
+			automaton.setAllStatesAsAccepting();
+		}
+
+		// Plantify all automata
+		MinimizationHelper.plantify(theAutomata);		
+		
+		// Verify nonblocking (yep, that's right)
+		return compositionalNonblockingVerification();
+	}
+
+	/**
+	 * Compositionally minimizes the automata and examines the end result...
 	 *
 	 * Does not use the synchHelper.
 	 */
@@ -1892,9 +1915,9 @@ public class AutomataVerifier
 	}
 
 	/**
-	 * Standard method for modular nonblocking verification on theAutomaton.
+	 * Standard method for compositional nonblocking verification on theAutomaton.
 	 */
-	public static boolean verifyModularNonblocking(Automata automata)
+	public static boolean verifyCompositionalNonblocking(Automata automata)
 		throws Exception
 	{
 		VerificationOptions verificationOptions;
@@ -1908,6 +1931,28 @@ public class AutomataVerifier
 		minimizationOptions.setMinimizationHeuristic(MinimizationHeuristic.MostLocal);
 
 		AutomataVerifier verifier = new AutomataVerifier(automata, verificationOptions, synchronizationOptions, minimizationOptions);
+
+		return verifier.verify();
+	}
+
+	/**
+	 * Standard method for performing compositional controllability verification on theAutomata.
+	 */
+	public static boolean verifyCompositionalControllability(Automata theAutomata)
+		throws Exception
+	{
+		SynchronizationOptions synchronizationOptions;
+		VerificationOptions verificationOptions;
+		MinimizationOptions minimizationOptions;
+
+		synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
+		verificationOptions = VerificationOptions.getDefaultControllabilityOptions();
+		verificationOptions.setAlgorithmType(VerificationAlgorithm.Compositional);
+		minimizationOptions = MinimizationOptions.getDefaultNonblockingOptions();
+		minimizationOptions.setMinimizationStrategy(MinimizationStrategy.FewestTransitionsFirst);
+		minimizationOptions.setMinimizationHeuristic(MinimizationHeuristic.MostLocal);
+
+		AutomataVerifier verifier = new AutomataVerifier(theAutomata, verificationOptions, synchronizationOptions, minimizationOptions);
 
 		return verifier.verify();
 	}

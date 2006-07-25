@@ -1650,11 +1650,13 @@ public class Automaton
 		endTransaction();
 	}
 
+	/**
+	 * Change the marking of all states in the automaon.
+	 */
 	public void setAllStatesAsAccepting()
 	{
 		setAllStatesAsAccepting(false);
 	}
-
 	public void setAllStatesAsAccepting(boolean keepForbidden)
 	{
 		beginTransaction();

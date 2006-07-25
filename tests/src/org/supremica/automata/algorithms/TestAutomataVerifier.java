@@ -106,6 +106,7 @@ public class TestAutomataVerifier
 			assertTrue(theVerifier.verify());
 			// The same test again (hopefully)
 			assertTrue(AutomataVerifier.verifyModularControllability(theProject));
+			assertTrue(AutomataVerifier.verifyCompositionalControllability(theProject));
 		}
 		catch (Exception ex)
 		{
@@ -206,7 +207,7 @@ public class TestAutomataVerifier
 		}
 	}
 
-	public void testModularNonblockingArbiter()
+	public void testCompositionalNonblockingArbiter()
 	{
 		// Arbiter example, turned out not to work for some sizes (22,
 		// 24, 32, 33) at one point so it is now a testcase...
@@ -217,7 +218,7 @@ public class TestAutomataVerifier
 				Arbiter arbiter = new Arbiter(i, false);
 				Project theProject = arbiter.getProject();
 				
-				assertTrue(AutomataVerifier.verifyModularNonblocking(theProject));
+				assertTrue(AutomataVerifier.verifyCompositionalNonblocking(theProject));
 			}
 		}
 		catch (Exception ex)
@@ -227,14 +228,14 @@ public class TestAutomataVerifier
 		}
 	}
 
-	public void testModularBlocking()
+	public void testCompositionalBlocking()
 	{
 		try
 		{
 			ProjectBuildFromXml builder = new ProjectBuildFromXml();
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.AutomaticCarParkGate));
 
-			assertTrue(!AutomataVerifier.verifyModularNonblocking(theProject));
+			assertTrue(!AutomataVerifier.verifyCompositionalNonblocking(theProject));
 		}
 		catch (Exception ex)
 		{

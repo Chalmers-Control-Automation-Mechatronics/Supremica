@@ -55,7 +55,7 @@ import org.supremica.util.BDD.Options;
 /**
  * Properties for Supremica.
  * All properties are added in the Config class.
- **/
+ */
 public final class SupremicaProperties
 {
 	private SupremicaProperties()
