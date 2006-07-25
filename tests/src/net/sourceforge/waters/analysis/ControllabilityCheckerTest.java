@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControllabilityCheckerTest
 //###########################################################################
-//# $Id: ControllabilityCheckerTest.java,v 1.3 2006-07-23 10:19:14 js173 Exp $
+//# $Id: ControllabilityCheckerTest.java,v 1.4 2006-07-25 22:06:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -83,14 +83,6 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     runControllabilityChecker(group, dir, name, false);
   }
  
-  public void testCentral_locking() throws Exception
-  {
-    String group = "valid";
-    String dir  = "central_locking";
-    String name = "koordwsp.wdes";
-    runControllabilityChecker(group, dir, name, true);
-  } 
-  
   public void testDebounce() throws Exception
   {
     String group = "valid";
@@ -107,6 +99,14 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     runControllabilityChecker(group, dir, name, true);
   }
   
+  public void testFtuer() throws Exception
+  {
+    String group = "valid";
+    String dir  = "central_locking";
+    String name = "ftuer.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  } 
+  
   public void testFischertechnik() throws Exception
   {
     String group = "valid";
@@ -115,12 +115,27 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     runControllabilityChecker(group, dir, name, false);
   }
   
+  public void testKoordwsp() throws Exception
+  {
+    String group = "valid";
+    String dir  = "central_locking";
+    String name = "koordwsp.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  } 
+  
   public void testMazes() throws Exception
   {
     String group = "valid";
     String dir = "mazes";
     String name = "mazes.wdes";
     runControllabilityChecker(group, dir, name, true);
+  }
+  
+  public void testMx27() throws Exception
+  {
+    String group = "nasty_tests";
+    String name = "mx27.wdes";
+    runControllabilityChecker(group, name, false);
   }
   
   public void testSafetydisplay() throws Exception
@@ -147,14 +162,12 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     runControllabilityChecker(group, dir, name, false);
   }
 
-  /*
   public void testSmallFactory2() throws Exception
   {
     String group = "handwritten";
     String name = "small_factory_2.wdes";
-    runControllabilityChecker(group, name, false);
+    runControllabilityChecker(group, name, true);
   }
-  */
   
   public void testSmd() throws Exception
   {

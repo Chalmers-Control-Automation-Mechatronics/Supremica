@@ -58,10 +58,9 @@
 </EventRefList>
 <StateList>
 <State Initial="true" Name="exit"/>
-<State Name="gone"/>
 </StateList>
 <TransitionList>
-<Transition Event="escape" Source="exit" Target="gone"/>
+<Transition Event="escape" Source="exit" Target="exit"/>
 </TransitionList>
 </Automaton>
 <Automaton Kind="PLANT" Name="exit_rock">
@@ -75,13 +74,12 @@
 <StateList>
 <State Initial="true" Name="exit"/>
 <State Name="free"/>
-<State Name="gone"/>
 <State Name="hero"/>
 <State Name="rock"/>
 </StateList>
 <TransitionList>
 <Transition Event="crush" Source="exit" Target="rock"/>
-<Transition Event="escape" Source="exit" Target="gone"/>
+<Transition Event="escape" Source="exit" Target="exit"/>
 <Transition Event="clear" Source="rock" Target="hero"/>
 <Transition Event="exit" Source="hero" Target="free"/>
 <Transition Event="crush" Source="free" Target="rock"/>

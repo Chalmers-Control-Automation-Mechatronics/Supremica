@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   MazeCompiler
 //###########################################################################
-//# $Id: MazeCompiler.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: MazeCompiler.java,v 1.7 2006-07-25 22:06:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
@@ -158,7 +158,9 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
     final Collection<Square> squares = maze.getSquares();
     for (final Square square : squares) {
       final InstanceProxy inst = createInstance(square, escapes);
-      components.add(inst);
+      if (inst != null) {
+        components.add(inst);
+      }
     }
     if (!escapes.isEmpty()) {
       final SimpleComponentProxy prop = createProperty(escapes);
@@ -173,21 +175,25 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
     throws WatersUnmarshalException, IOException
   {
     final String templname = square.getTemplateName();
-    copyModule(templname);
-    final String name = square.getName();
-    final SimpleIdentifierProxy ident =
-      mFactory.createSimpleIdentifierProxy(name);
-    final List<ParameterBindingProxy> bindings =
-      new LinkedList<ParameterBindingProxy>();
-    for (final int kind : square.getActionKinds()) {
-      final String param = Action.getTemplateName(kind);
-      final Collection<Action> actions = square.getActions(kind);
-      final ExpressionProxy value = createEventList(actions, escapes);
-      final ParameterBindingProxy binding =
-        mFactory.createParameterBindingProxy(param, value);
-      bindings.add(binding);
+    if (templname == null) {
+      return null;
+    } else {
+      copyModule(templname);
+      final String name = square.getName();
+      final SimpleIdentifierProxy ident =
+        mFactory.createSimpleIdentifierProxy(name);
+      final List<ParameterBindingProxy> bindings =
+        new LinkedList<ParameterBindingProxy>();
+      for (final int kind : square.getActionKinds()) {
+        final String param = Action.getTemplateName(kind);
+        final Collection<Action> actions = square.getActions(kind);
+        final ExpressionProxy value = createEventList(actions, escapes);
+        final ParameterBindingProxy binding =
+          mFactory.createParameterBindingProxy(param, value);
+        bindings.add(binding);
+      }
+      return mFactory.createInstanceProxy(ident, templname, bindings);
     }
-    return mFactory.createInstanceProxy(ident, templname, bindings);
   }
 
   private SimpleComponentProxy createProperty(final Collection<Action> escapes)

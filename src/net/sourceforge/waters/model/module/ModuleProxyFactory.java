@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleProxyFactory
 //###########################################################################
-//# $Id: ModuleProxyFactory.java,v 1.8 2006-05-24 09:13:02 markus Exp $
+//# $Id: ModuleProxyFactory.java,v 1.9 2006-07-25 22:06:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -254,7 +254,7 @@ public interface ModuleProxyFactory
    * @param deterministic The determinism status of the new graph.
    * @param blockedEvents The list of blocked events of the new graph.
    * @param nodes The set of nodes of the new graph, or <CODE>null</CODE> if empty.
-   * @param edges The list of edges of the new graph, or <CODE>null</CODE> if empty.
+   * @param edges The collection of edges of the new graph, or <CODE>null</CODE> if empty.
    */
   public GraphProxy createGraphProxy
       (boolean deterministic,
@@ -267,7 +267,7 @@ public interface ModuleProxyFactory
    * This method creates a graph with
    * the determinism status set to <CODE>true</CODE>,
    * an empty set of nodes, and
-   * an empty list of edges.
+   * an empty collection of edges.
    * @param blockedEvents The list of blocked events of the new graph.
    */
   public GraphProxy createGraphProxy

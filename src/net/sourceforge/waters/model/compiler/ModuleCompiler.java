@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.37 2006-07-20 02:28:37 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.38 2006-07-25 22:06:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -139,7 +139,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       for (final Proxy proxy : mModule.getComponentList()) {
         if (proxy instanceof SimpleComponentProxy) {
           final SimpleComponentProxy comp = (SimpleComponentProxy) proxy;
-          final List<EdgeProxy> edges = comp.getGraph().getEdges();
+          final Collection<EdgeProxy> edges = comp.getGraph().getEdges();
           mIsEFA = mIsEFA || componentHasNonEmptyGuardActionBlock(edges);
         } else {
           mIsEFA = false;

@@ -1,21 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
 <graph name="exit_norock" version="1.0" valid="1"
-	hasGeometry="1" width="176" height="30"
+	hasGeometry="1" width="88" height="62"
 	generatorName="DGE" generatorVersion="2.9b2"
-	creationDate="2004-11-30 21:14:53 GMT" modificationDate="2004-11-30 21:59:22 GMT">
+	creationDate="2004-11-30 21:14:53 GMT" modificationDate="2006-07-24 22:18:34 GMT">
 	<events>
 		<event controllable="1" name="enter"/>
 		<event controllable="1" name="escape"/>
 		<event controllable="1" name="exit"/>
 	</events>
 	<nodes>
-		<node>
-			<rendering><point x="208" y="208"/></rendering>
-			<label name="gone">
-				<rendering><point x="14" y="4"/></rendering>
-			</label>
-		</node>
 		<node initial="1">
 			<rendering><point x="112" y="208"/></rendering>
 			<label name="exit">
@@ -24,11 +18,11 @@
 		</node>
 	</nodes>
 	<edges>
-		<edge>
+		<edge isLoop="1">
+			<rendering><point x="139" y="181"/></rendering>
 			<source name="exit"/>
-			<target name="gone"/>
 			<labelGroup>
-				<rendering><point x="-20" y="-3"/></rendering>
+				<rendering><point x="-20" y="-8"/></rendering>
 				<label name="escape"/>
 			</labelGroup>
 		</edge>

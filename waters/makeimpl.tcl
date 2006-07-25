@@ -588,10 +588,9 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 	  Java_WriteLn $stream $umap \
 	      "    $membername = new ${impltype}($paramname);"
 	} else {
-          regsub {^unmodifiable} $transformer "empty" creator
+          set call [Java_AttribGetEmptyCollectionsCall $attrib $impl]
 	  Java_WriteLn $stream $umap "    if ($paramname == null) \{"
-	  Java_WriteLn $stream $umap \
-              "      $membername = Collections.${creator}();"
+	  Java_WriteLn $stream $umap "      $membername = $call;"
 	  Java_WriteLn $stream $umap "    \} else \{"
 	  Java_WriteLn $stream $umap \
               "      final $type ${paramname}Modifiable ="
@@ -735,7 +734,7 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 	  if {[string compare $refstatus "owned"] == 0} {
 	    if {$iscoll || [regexp {Proxy$} $decltype all]} {
 	      set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
-	      if {[string compare $decltype "List<EdgeProxy>"] == 0} {
+	      if {[string compare $decltype "Collection<EdgeProxy>"] == 0} {
 		set impltype \
 		    [Java_AttribGetImplementationType $attrib $impl classMap]
 		set membertype \

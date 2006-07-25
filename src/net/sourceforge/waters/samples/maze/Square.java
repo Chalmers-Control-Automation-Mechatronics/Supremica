@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   Square
 //###########################################################################
-//# $Id: Square.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: Square.java,v 1.3 2006-07-25 22:06:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
@@ -63,6 +63,11 @@ abstract class Square
   void setCanGetRock(final boolean canget)
   {
     mCanGetRock = canget;
+  }
+
+  boolean canExit()
+  {
+    return true;
   }
 
 
@@ -161,7 +166,7 @@ abstract class Square
   private static final String TEMPLNAME_NOROCK[] = {
     "free_norock",
     "hero_norock",
-    "exit_norock",
+    null,
     null,
     "door_norock",
     "door_norock",

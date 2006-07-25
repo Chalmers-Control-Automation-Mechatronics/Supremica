@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   Maze
 //###########################################################################
-//# $Id: Maze.java,v 1.3 2006-07-20 02:28:37 robi Exp $
+//# $Id: Maze.java,v 1.4 2006-07-25 22:06:07 robi Exp $
 //###########################################################################
 
 
@@ -150,27 +150,29 @@ class Maze
   private void createMoveActions()
   {
     for (final Square square : mSquares.values()) {
-      final Point pos = square.getPosition();
-      square.createActions();
-      for (int i = 0; i < DIRECTIONS.length; i++) {
-        final Point direction = DIRECTIONS[i];
-        final Square neighbour = getNeighbour(pos, direction);
-        if (neighbour != null) {
-          final Point npos = neighbour.getPosition();
-          final int[] kinds = neighbour.getEnteringActions();
-          for (int j = 0; j < kinds.length; j++) {
-            final int kind = kinds[j];
-            final Action action = new Action(kind, pos, npos);
-            square.addAction(Action.EXIT, action);
-            neighbour.addAction(kind, action);
-          }
-	  if (neighbour.canGetRock()) {
-	    final Square crushed = getNeighbour(npos, direction);
-	    if (crushed != null) {
-	      final Action action = new Action(Action.PUSH, pos, npos);
-	      square.addAction(Action.EXIT, action);
-	      neighbour.addAction(Action.CLEAR, action);
-	      crushed.addAction(Action.CRUSH, action);
+      if (square.canExit()) {
+        final Point pos = square.getPosition();
+        square.createActions();
+        for (int i = 0; i < DIRECTIONS.length; i++) {
+          final Point direction = DIRECTIONS[i];
+          final Square neighbour = getNeighbour(pos, direction);
+          if (neighbour != null) {
+            final Point npos = neighbour.getPosition();
+            final int[] kinds = neighbour.getEnteringActions();
+            for (int j = 0; j < kinds.length; j++) {
+              final int kind = kinds[j];
+              final Action action = new Action(kind, pos, npos);
+              square.addAction(Action.EXIT, action);
+              neighbour.addAction(kind, action);
+            }
+            if (neighbour.canGetRock()) {
+              final Square crushed = getNeighbour(npos, direction);
+              if (crushed != null && crushed.canGetRock()) {
+                final Action action = new Action(Action.PUSH, pos, npos);
+                square.addAction(Action.EXIT, action);
+                neighbour.addAction(Action.CLEAR, action);
+                crushed.addAction(Action.CRUSH, action);
+              }
 	    }
           }
         }
@@ -285,6 +287,7 @@ class Maze
         open.add(west);
       }
     }
+    mNumExits = 0;
     boolean changed = false;
     final Iterator<Square> iter = mSquares.values().iterator();
     while (iter.hasNext()) {
@@ -292,6 +295,8 @@ class Maze
       if (!square.isReachable()) {
         iter.remove();
         changed = true;
+      } else if (square.getSquareKind() == Square.EXIT) {
+        mNumExits++;
       }
     }
     return changed;
@@ -314,28 +319,16 @@ class Maze
       if (north != null) {
         final Square south = getNeighbour(pos, SOUTH);
         if (south != null) {
-          if (!north.canGetRock()) {
-            north.setCanGetRock(true);
-            open.add(north);
-          }
-          if (!south.canGetRock()) {
-            south.setCanGetRock(true);
-            open.add(south);
-          }
+          visitRock(south, open);
+          visitRock(north, open);
         }
       }
       final Square east = getNeighbour(pos, EAST);
       if (east != null) {
         final Square west = getNeighbour(pos, WEST);
         if (west != null) {
-          if (!east.canGetRock()) {
-            east.setCanGetRock(true);
-            open.add(east);
-          }
-          if (!west.canGetRock()) {
-            west.setCanGetRock(true);
-            open.add(west);
-          }
+          visitRock(west, open);
+          visitRock(east, open);
         }
       }
     }
@@ -355,7 +348,19 @@ class Maze
     }
     return changed;
   }
-    
+
+  private boolean visitRock(final Square square, final List<Square> open)
+  {
+    if (!square.canGetRock() &&
+        !(mNumExits == 1 && square.getSquareKind() == Square.EXIT)) {
+      square.setCanGetRock(true);
+      open.add(square);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
 
   //#########################################################################
   //# Accessing Squares
@@ -382,6 +387,7 @@ class Maze
   private final Set<String> mCollectedKeys;
 
   private boolean mHasLockedDoors;
+  private int mNumExits;
 
 
   //#########################################################################

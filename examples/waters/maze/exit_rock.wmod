@@ -11,15 +11,14 @@
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="exit_rock"/>
 <Graph>
+<LabelBlock>
+<SimpleIdentifier Name="clear"/>
+<SimpleIdentifier Name="crush"/>
+<SimpleIdentifier Name="enter"/>
+<SimpleIdentifier Name="escape"/>
+<SimpleIdentifier Name="exit"/>
+</LabelBlock>
 <NodeList>
-<SimpleNode Name="gone">
-<PointGeometry>
-<Point X="208" Y="208"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="14" Y="4"/>
-</LabelGeometry>
-</SimpleNode>
 <SimpleNode Initial="true" Name="exit">
 <PointGeometry>
 <Point X="112" Y="208"/>
@@ -57,40 +56,43 @@
 <Edge Source="rock" Target="hero">
 <LabelBlock>
 <SimpleIdentifier Name="clear"/>
-<LabelGeometry>
-<Point X="-15" Y="11"/>
+<LabelGeometry Anchor="NW">
+<Point X="-15" Y="1"/>
 </LabelGeometry>
 </LabelBlock>
 </Edge>
 <Edge Source="exit" Target="rock">
 <LabelBlock>
 <SimpleIdentifier Name="crush"/>
-<LabelGeometry>
-<Point X="4" Y="7"/>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-3"/>
 </LabelGeometry>
 </LabelBlock>
 </Edge>
-<Edge Source="exit" Target="gone">
+<Edge Source="exit" Target="exit">
 <LabelBlock>
 <SimpleIdentifier Name="escape"/>
-<LabelGeometry>
-<Point X="-21" Y="13"/>
+<LabelGeometry Anchor="NW">
+<Point X="-37" Y="20"/>
 </LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="152" Y="208"/>
+</SplineGeometry>
 </Edge>
 <Edge Source="free" Target="rock">
 <LabelBlock>
 <SimpleIdentifier Name="crush"/>
-<LabelGeometry>
-<Point X="-36" Y="-3"/>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="-13"/>
 </LabelGeometry>
 </LabelBlock>
 </Edge>
 <Edge Source="free" Target="hero">
 <LabelBlock>
 <SimpleIdentifier Name="enter"/>
-<LabelGeometry>
-<Point X="-18" Y="8"/>
+<LabelGeometry Anchor="NW">
+<Point X="-18" Y="-2"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
@@ -100,8 +102,8 @@
 <Edge Source="hero" Target="free">
 <LabelBlock>
 <SimpleIdentifier Name="exit"/>
-<LabelGeometry>
-<Point X="1" Y="-5"/>
+<LabelGeometry Anchor="NW">
+<Point X="1" Y="-15"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>

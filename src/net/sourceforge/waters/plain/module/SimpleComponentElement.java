@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   SimpleComponentElement
 //###########################################################################
-//# $Id: SimpleComponentElement.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: SimpleComponentElement.java,v 1.7 2006-07-25 22:06:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;

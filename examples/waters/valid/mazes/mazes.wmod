@@ -190,14 +190,6 @@
 <SimpleIdentifier Name="exit"/>
 </LabelBlock>
 <NodeList>
-<SimpleNode Name="gone">
-<PointGeometry>
-<Point X="208" Y="208"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="14" Y="4"/>
-</LabelGeometry>
-</SimpleNode>
 <SimpleNode Initial="true" Name="exit">
 <PointGeometry>
 <Point X="112" Y="208"/>
@@ -208,13 +200,16 @@
 </SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Source="exit" Target="gone">
+<Edge Source="exit" Target="exit">
 <LabelBlock>
 <SimpleIdentifier Name="escape"/>
 <LabelGeometry Anchor="NW">
-<Point X="-20" Y="-13"/>
+<Point X="-20" Y="-18"/>
 </LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="139" Y="181"/>
+</SplineGeometry>
 </Edge>
 </EdgeList>
 </Graph>
@@ -230,14 +225,6 @@
 <SimpleIdentifier Name="exit"/>
 </LabelBlock>
 <NodeList>
-<SimpleNode Name="gone">
-<PointGeometry>
-<Point X="208" Y="208"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="14" Y="4"/>
-</LabelGeometry>
-</SimpleNode>
 <SimpleNode Initial="true" Name="exit">
 <PointGeometry>
 <Point X="112" Y="208"/>
@@ -288,13 +275,16 @@
 </LabelGeometry>
 </LabelBlock>
 </Edge>
-<Edge Source="exit" Target="gone">
+<Edge Source="exit" Target="exit">
 <LabelBlock>
 <SimpleIdentifier Name="escape"/>
 <LabelGeometry Anchor="NW">
-<Point X="-21" Y="3"/>
+<Point X="-37" Y="20"/>
 </LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="152" Y="208"/>
+</SplineGeometry>
 </Edge>
 <Edge Source="free" Target="rock">
 <LabelBlock>

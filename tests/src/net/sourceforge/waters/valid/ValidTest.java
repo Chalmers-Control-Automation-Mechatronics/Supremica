@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ValidTest
 //###########################################################################
-//# $Id: ValidTest.java,v 1.3 2006-07-20 02:28:38 robi Exp $
+//# $Id: ValidTest.java,v 1.4 2006-07-25 22:06:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.valid;
@@ -258,6 +258,8 @@ public class ValidTest extends AbstractWatersTest
     final DocumentProxy doc2 = mDocumentManager.load(filename);
     assertTrue("Identical documents from different sources!", doc != doc2);
     assertTrue("Unexpected " + kindname + " contents!",
+               doc.equalsByContents(doc2));
+    assertTrue("Unexpected " + kindname + " geometry!",
                doc.equalsWithGeometry(doc2));
   }
 

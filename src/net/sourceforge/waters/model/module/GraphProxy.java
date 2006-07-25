@@ -4,12 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   GraphProxy
 //###########################################################################
-//# $Id: GraphProxy.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: GraphProxy.java,v 1.3 2006-07-25 22:06:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
@@ -56,8 +56,11 @@ public interface GraphProxy extends Proxy {
   public Set<NodeProxy> getNodes();
 
   /**
-   * Gets the list of edges of this graph.
+   * Gets the collection of edges of this graph.
+   * Although duplicate edges are meaningless, implementations are not
+   * required to check for duplicates, so the collection returned by
+   * this method may or may not contain duplicate entries.
    */
-  public List<EdgeProxy> getEdges();
+  public Collection<EdgeProxy> getEdges();
 
 }

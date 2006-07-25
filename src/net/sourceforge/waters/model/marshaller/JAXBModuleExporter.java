@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleExporter
 //###########################################################################
-//# $Id: JAXBModuleExporter.java,v 1.11 2006-07-20 02:28:37 robi Exp $
+//# $Id: JAXBModuleExporter.java,v 1.12 2006-07-25 22:06:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -843,7 +843,7 @@ public Object visitExpressionProxy
         mGraphNodeList.insertUnique(node);
       }
       mGraphNodeListHandler.toJAXB(this, mGraphNodeList, element);
-      final List<EdgeProxy> edgesProxy = proxy.getEdges();
+      final Collection<EdgeProxy> edgesProxy = proxy.getEdges();
       mGraphEdgeListHandler.toJAXB(this, edgesProxy, element);
     } finally {
       mGraphNodeList = null;

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   GraphElement
 //###########################################################################
-//# $Id: GraphElement.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: GraphElement.java,v 1.7 2006-07-25 22:06:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -45,7 +45,7 @@ public final class GraphElement
    * @param deterministic The determinism status of the new graph.
    * @param blockedEvents The list of blocked events of the new graph.
    * @param nodes The set of nodes of the new graph, or <CODE>null</CODE> if empty.
-   * @param edges The list of edges of the new graph, or <CODE>null</CODE> if empty.
+   * @param edges The collection of edges of the new graph, or <CODE>null</CODE> if empty.
    */
   public GraphElement(final boolean deterministic,
                       final LabelBlockProxy blockedEvents,
@@ -65,10 +65,10 @@ public final class GraphElement
     if (edges == null) {
       mEdges = Collections.emptyList();
     } else {
-      final List<EdgeProxy> edgesModifiable =
+      final Collection<EdgeProxy> edgesModifiable =
         new ArrayList<EdgeProxy>(edges);
       mEdges =
-        Collections.unmodifiableList(edgesModifiable);
+        Collections.unmodifiableCollection(edgesModifiable);
     }
   }
 
@@ -77,7 +77,7 @@ public final class GraphElement
    * This constructor creates a graph with
    * the determinism status set to <CODE>true</CODE>,
    * an empty set of nodes, and
-   * an empty list of edges.
+   * an empty collection of edges.
    * @param blockedEvents The list of blocked events of the new graph.
    */
   public GraphElement(final LabelBlockProxy blockedEvents)
@@ -108,7 +108,7 @@ public final class GraphElement
         mBlockedEvents.equalsByContents(downcast.mBlockedEvents) &&
         EqualCollection.isEqualSetByContents
           (mNodes, downcast.mNodes) &&
-        EqualCollection.isEqualListByContents
+        EqualCollection.isEqualSetByContents
           (mEdges, downcast.mEdges);
     } else {
       return false;
@@ -124,7 +124,7 @@ public final class GraphElement
         mBlockedEvents.equalsWithGeometry(downcast.mBlockedEvents) &&
         EqualCollection.isEqualSetWithGeometry
           (mNodes, downcast.mNodes) &&
-        EqualCollection.isEqualListWithGeometry
+        EqualCollection.isEqualSetWithGeometry
           (mEdges, downcast.mEdges);
     } else {
       return false;
@@ -143,7 +143,7 @@ public final class GraphElement
     result *= 5;
     result += EqualCollection.getSetHashCodeByContents(mNodes);
     result *= 5;
-    result += EqualCollection.getListHashCodeByContents(mEdges);
+    result += EqualCollection.getSetHashCodeByContents(mEdges);
     return result;
   }
 
@@ -159,7 +159,7 @@ public final class GraphElement
     result *= 5;
     result += EqualCollection.getSetHashCodeWithGeometry(mNodes);
     result *= 5;
-    result += EqualCollection.getListHashCodeWithGeometry(mEdges);
+    result += EqualCollection.getSetHashCodeWithGeometry(mEdges);
     return result;
   }
 
@@ -191,7 +191,7 @@ public final class GraphElement
     return mNodes;
   }
 
-  public List<EdgeProxy> getEdges()
+  public Collection<EdgeProxy> getEdges()
   {
     return mEdges;
   }
@@ -215,6 +215,6 @@ public final class GraphElement
   private final boolean mIsDeterministic;
   private final LabelBlockProxy mBlockedEvents;
   private final Set<NodeProxy> mNodes;
-  private final List<EdgeProxy> mEdges;
+  private final Collection<EdgeProxy> mEdges;
 
 }

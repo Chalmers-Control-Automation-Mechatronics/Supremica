@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   ModuleElementFactory
 //###########################################################################
-//# $Id: ModuleElementFactory.java,v 1.8 2006-05-24 09:13:02 markus Exp $
+//# $Id: ModuleElementFactory.java,v 1.9 2006-07-25 22:06:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -378,7 +378,7 @@ public class ModuleElementFactory
    * @param deterministic The determinism status of the new graph.
    * @param blockedEvents The list of blocked events of the new graph.
    * @param nodes The set of nodes of the new graph, or <CODE>null</CODE> if empty.
-   * @param edges The list of edges of the new graph, or <CODE>null</CODE> if empty.
+   * @param edges The collection of edges of the new graph, or <CODE>null</CODE> if empty.
    */
   public GraphElement createGraphProxy
       (final boolean deterministic,
@@ -397,7 +397,7 @@ public class ModuleElementFactory
    * This method creates a graph with
    * the determinism status set to <CODE>true</CODE>,
    * an empty set of nodes, and
-   * an empty list of edges.
+   * an empty collection of edges.
    * @param blockedEvents The list of blocked events of the new graph.
    */
   public GraphElement createGraphProxy

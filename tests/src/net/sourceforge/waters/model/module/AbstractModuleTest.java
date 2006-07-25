@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   AbstractModuleTest
 //###########################################################################
-//# $Id: AbstractModuleTest.java,v 1.2 2006-07-20 02:28:38 robi Exp $
+//# $Id: AbstractModuleTest.java,v 1.3 2006-07-25 22:06:07 robi Exp $
 //###########################################################################
 
 
@@ -16,6 +16,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.LinkedList;
@@ -433,9 +434,11 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
              " in graph '" + comp.getName() + "'!");
       }
     }
-    final List<EdgeProxy> edges = graph.getEdges();
+    final Collection<EdgeProxy> edges = graph.getEdges();
     for (final EdgeProxy edge : edges) {
       final NodeProxy source = edge.getSource();
+      System.err.println
+        ("Source " + source.getName() + " (" + source.hashCode() + ")");
       assertTrue("Bad source node '" + source.getName() +
                  "' in graph '" + comp.getName() + "'!",
                  map.containsKey(source));

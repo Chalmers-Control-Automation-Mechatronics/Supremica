@@ -22,23 +22,18 @@
 <Point X="-33" Y="5"/>
 </LabelGeometry>
 </SimpleNode>
-<SimpleNode Name="gone">
-<PointGeometry>
-<Point X="208" Y="208"/>
-</PointGeometry>
-<LabelGeometry>
-<Point X="14" Y="4"/>
-</LabelGeometry>
-</SimpleNode>
 </NodeList>
 <EdgeList>
-<Edge Source="exit" Target="gone">
+<Edge Source="exit" Target="exit">
 <LabelBlock>
 <SimpleIdentifier Name="escape"/>
-<LabelGeometry>
-<Point X="-20" Y="-3"/>
+<LabelGeometry Anchor="NW">
+<Point X="-20" Y="-18"/>
 </LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="139" Y="181"/>
+</SplineGeometry>
 </Edge>
 </EdgeList>
 </Graph>

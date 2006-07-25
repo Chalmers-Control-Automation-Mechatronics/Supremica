@@ -3,7 +3,7 @@
 //# PACKAGE: waters.samples.maze
 //# CLASS:   SquareExit
 //###########################################################################
-//# $Id: SquareExit.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: SquareExit.java,v 1.2 2006-07-25 22:06:07 robi Exp $
 //###########################################################################
 
 
@@ -32,12 +32,18 @@ class SquareExit extends Square
   
   int[] getEnteringActions()
   {
-    return ENTERING;
+    return canGetRock() ? ENTERING_ROCK : ENTERING_NOROCK;
+  }
+
+  boolean canExit()
+  {
+    return canGetRock();
   }
 
 
   //#########################################################################
   //# Class Constants
-  private static final int[] ENTERING = {Action.MOVE, Action.ESCAPE};
+  private static final int[] ENTERING_ROCK = {Action.MOVE, Action.ESCAPE};
+  private static final int[] ENTERING_NOROCK = {Action.ESCAPE};
 
 }

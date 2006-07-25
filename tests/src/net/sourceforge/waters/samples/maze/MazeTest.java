@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   MazeTest
 //###########################################################################
-//# $Id: MazeTest.java,v 1.4 2006-07-20 02:28:38 robi Exp $
+//# $Id: MazeTest.java,v 1.5 2006-07-25 22:06:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
@@ -74,6 +74,12 @@ public class MazeTest extends AbstractWatersTest
     throws IOException, JAXBException, WatersException
   {
     testMaze("maze4_3", true);
+  }
+
+  public void testMaze_maze4_10()
+    throws IOException, JAXBException, WatersException
+  {
+    testMaze("maze4_10", true);
   }
 
   public void testMaze_maze4_6()
@@ -148,6 +154,26 @@ public class MazeTest extends AbstractWatersTest
     testMaze("maze14a", true);
   }
 
+  /*
+  public void testMaze_maze15()
+    throws IOException, JAXBException, WatersException
+  {
+    testMaze("maze15", true);
+  }
+
+  public void testMaze_maze15a()
+    throws IOException, JAXBException, WatersException
+  {
+    testMaze("maze15a", true);
+  }
+
+  public void testMaze_maze15b()
+    throws IOException, JAXBException, WatersException
+  {
+    testMaze("maze15b", false);
+  }
+  */
+
   public void testMaze_maze16()
     throws IOException, JAXBException, WatersException
   {
@@ -196,6 +222,14 @@ public class MazeTest extends AbstractWatersTest
     testMaze("mx07", true);
   }
 
+  /*
+  public void testMaze_mx08()
+    throws IOException, JAXBException, WatersException
+  {
+    testMaze("mx08", true);
+  }
+  */
+
   public void testMaze_mx09()
     throws IOException, JAXBException, WatersException
   {
@@ -207,6 +241,14 @@ public class MazeTest extends AbstractWatersTest
   {
     testMaze("mx10", true);
   }
+
+  /*
+  public void testMaze_mx11()
+    throws IOException, JAXBException, WatersException
+  {
+    testMaze("mx11", true);
+  }
+  */
 
   public void testMaze_mx12()
     throws IOException, JAXBException, WatersException
@@ -238,11 +280,25 @@ public class MazeTest extends AbstractWatersTest
     testMaze("mx16", true);
   }
 
+  public void testMaze_mx17()
+    throws IOException, JAXBException, WatersException
+  {
+    testMaze("mx16", true);
+  }
+
   public void testMaze_mx18()
     throws IOException, JAXBException, WatersException
   {
     testMaze("mx18", true);
   }
+
+  /*
+  public void testMaze_mx19()
+    throws IOException, JAXBException, WatersException
+  {
+    testMaze("mx18", true);
+  }
+  */
 
   public void testMaze_mx20()
     throws IOException, JAXBException, WatersException
@@ -280,6 +336,12 @@ public class MazeTest extends AbstractWatersTest
     testMaze("mx25", true);
   }
 
+  public void testMaze_mx26()
+    throws IOException, JAXBException, WatersException
+  {
+    testMaze("mx26", true);
+  }
+
   /*
   public void testMaze_mx26a()
     throws IOException, JAXBException, WatersException
@@ -287,6 +349,24 @@ public class MazeTest extends AbstractWatersTest
     testMaze("mx26a", false);
   }
   */
+
+  public void testMaze_mx27()
+    throws IOException, JAXBException, WatersException
+  {
+    testMaze("mx27", true);
+  }
+
+  public void testMaze_mx28()
+    throws IOException, JAXBException, WatersException
+  {
+    testMaze("mx28", true);
+  }
+
+  public void testMaze_mx29()
+    throws IOException, JAXBException, WatersException
+  {
+    testMaze("mx29", true);
+  }
 
   public void testMaze_peter()
     throws IOException, JAXBException, WatersException

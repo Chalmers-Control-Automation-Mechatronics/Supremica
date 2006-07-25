@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   GraphSubject
 //###########################################################################
-//# $Id: GraphSubject.java,v 1.7 2006-07-20 02:28:37 robi Exp $
+//# $Id: GraphSubject.java,v 1.8 2006-07-25 22:06:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -49,7 +49,7 @@ public final class GraphSubject
    * @param deterministic The determinism status of the new graph.
    * @param blockedEvents The list of blocked events of the new graph.
    * @param nodes The set of nodes of the new graph, or <CODE>null</CODE> if empty.
-   * @param edges The list of edges of the new graph, or <CODE>null</CODE> if empty.
+   * @param edges The collection of edges of the new graph, or <CODE>null</CODE> if empty.
    */
   public GraphSubject(final boolean deterministic,
                       final LabelBlockProxy blockedEvents,
@@ -79,7 +79,7 @@ public final class GraphSubject
    * This constructor creates a graph with
    * the determinism status set to <CODE>true</CODE>,
    * an empty set of nodes, and
-   * an empty list of edges.
+   * an empty collection of edges.
    * @param blockedEvents The list of blocked events of the new graph.
    */
   public GraphSubject(final LabelBlockProxy blockedEvents)
@@ -122,7 +122,7 @@ public final class GraphSubject
         mBlockedEvents.equalsByContents(downcast.mBlockedEvents) &&
         EqualCollection.isEqualSetByContents
           (mNodes, downcast.mNodes) &&
-        EqualCollection.isEqualListByContents
+        EqualCollection.isEqualSetByContents
           (mEdges, downcast.mEdges);
     } else {
       return false;
@@ -138,7 +138,7 @@ public final class GraphSubject
         mBlockedEvents.equalsWithGeometry(downcast.mBlockedEvents) &&
         EqualCollection.isEqualSetWithGeometry
           (mNodes, downcast.mNodes) &&
-        EqualCollection.isEqualListWithGeometry
+        EqualCollection.isEqualSetWithGeometry
           (mEdges, downcast.mEdges);
     } else {
       return false;
@@ -157,7 +157,7 @@ public final class GraphSubject
     result *= 5;
     result += EqualCollection.getSetHashCodeByContents(mNodes);
     result *= 5;
-    result += EqualCollection.getListHashCodeByContents(mEdges);
+    result += EqualCollection.getSetHashCodeByContents(mEdges);
     return result;
   }
 
@@ -173,7 +173,7 @@ public final class GraphSubject
     result *= 5;
     result += EqualCollection.getSetHashCodeWithGeometry(mNodes);
     result *= 5;
-    result += EqualCollection.getListHashCodeWithGeometry(mEdges);
+    result += EqualCollection.getSetHashCodeWithGeometry(mEdges);
     return result;
   }
 
@@ -206,10 +206,10 @@ public final class GraphSubject
     return Collections.unmodifiableSet(downcast);
   }
 
-  public List<EdgeProxy> getEdges()
+  public Collection<EdgeProxy> getEdges()
   {
-    final List<EdgeProxy> downcast = Casting.toList(mEdges);
-    return Collections.unmodifiableList(downcast);
+    final Collection<EdgeProxy> downcast = Casting.toCollection(mEdges);
+    return Collections.unmodifiableCollection(downcast);
   }
 
 
@@ -254,7 +254,7 @@ public final class GraphSubject
   }
 
   /**
-   * Gets the modifiable list of edges of this graph.
+   * Gets the modifiable collection of edges of this graph.
    */
   public ListSubject<EdgeSubject> getEdgesModifiable()
   {

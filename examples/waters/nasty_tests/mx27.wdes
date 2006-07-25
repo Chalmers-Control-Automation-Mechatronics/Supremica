@@ -1,0 +1,943 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="mx27" xmlns="http://waters.sourceforge.net/xsd/des">
+<EventList>
+<Event Kind="UNCONTROLLABLE" Name="escape_1_3_1_4"/>
+<Event Kind="UNCONTROLLABLE" Name="escape_2_4_1_4"/>
+<Event Kind="UNCONTROLLABLE" Name="pickup_3_5_4_5"/>
+<Event Kind="UNCONTROLLABLE" Name="pickup_4_4_4_5"/>
+<Event Kind="UNCONTROLLABLE" Name="pickup_5_5_4_5"/>
+<Event Kind="UNCONTROLLABLE" Name="push_1_3_2_3"/>
+<Event Kind="UNCONTROLLABLE" Name="push_1_4_2_4"/>
+<Event Kind="UNCONTROLLABLE" Name="push_2_3_2_4"/>
+<Event Kind="UNCONTROLLABLE" Name="push_2_3_3_3"/>
+<Event Kind="UNCONTROLLABLE" Name="push_2_4_3_4"/>
+<Event Kind="UNCONTROLLABLE" Name="push_2_5_2_4"/>
+<Event Kind="UNCONTROLLABLE" Name="push_2_5_3_5"/>
+<Event Kind="UNCONTROLLABLE" Name="push_3_3_2_3"/>
+<Event Kind="UNCONTROLLABLE" Name="push_3_3_3_4"/>
+<Event Kind="UNCONTROLLABLE" Name="push_3_3_4_3"/>
+<Event Kind="UNCONTROLLABLE" Name="push_3_4_2_4"/>
+<Event Kind="UNCONTROLLABLE" Name="push_3_4_3_5"/>
+<Event Kind="UNCONTROLLABLE" Name="push_3_4_4_4"/>
+<Event Kind="UNCONTROLLABLE" Name="push_3_5_3_4"/>
+<Event Kind="UNCONTROLLABLE" Name="push_3_5_4_5"/>
+<Event Kind="UNCONTROLLABLE" Name="push_3_6_3_5"/>
+<Event Kind="UNCONTROLLABLE" Name="push_4_3_3_3"/>
+<Event Kind="UNCONTROLLABLE" Name="push_4_3_4_4"/>
+<Event Kind="UNCONTROLLABLE" Name="push_4_3_5_3"/>
+<Event Kind="UNCONTROLLABLE" Name="push_4_4_3_4"/>
+<Event Kind="UNCONTROLLABLE" Name="push_4_4_5_4"/>
+<Event Kind="UNCONTROLLABLE" Name="push_4_5_3_5"/>
+<Event Kind="UNCONTROLLABLE" Name="push_4_5_4_4"/>
+<Event Kind="UNCONTROLLABLE" Name="push_4_5_5_5"/>
+<Event Kind="UNCONTROLLABLE" Name="push_5_3_4_3"/>
+<Event Kind="UNCONTROLLABLE" Name="push_5_3_5_4"/>
+<Event Kind="UNCONTROLLABLE" Name="push_5_3_6_3"/>
+<Event Kind="UNCONTROLLABLE" Name="push_5_4_4_4"/>
+<Event Kind="UNCONTROLLABLE" Name="push_5_4_6_4"/>
+<Event Kind="UNCONTROLLABLE" Name="push_5_5_4_5"/>
+<Event Kind="UNCONTROLLABLE" Name="push_5_5_5_4"/>
+<Event Kind="UNCONTROLLABLE" Name="push_5_5_6_5"/>
+<Event Kind="UNCONTROLLABLE" Name="push_6_3_5_3"/>
+<Event Kind="UNCONTROLLABLE" Name="push_6_3_6_4"/>
+<Event Kind="UNCONTROLLABLE" Name="push_6_4_5_4"/>
+<Event Kind="UNCONTROLLABLE" Name="push_6_4_6_5"/>
+<Event Kind="UNCONTROLLABLE" Name="push_6_5_5_5"/>
+<Event Kind="UNCONTROLLABLE" Name="push_6_5_6_4"/>
+<Event Kind="UNCONTROLLABLE" Name="push_6_6_6_5"/>
+<Event Kind="UNCONTROLLABLE" Name="push_7_3_6_3"/>
+<Event Kind="UNCONTROLLABLE" Name="push_7_3_7_4"/>
+<Event Kind="UNCONTROLLABLE" Name="push_7_4_6_4"/>
+<Event Kind="UNCONTROLLABLE" Name="push_7_5_6_5"/>
+<Event Kind="UNCONTROLLABLE" Name="push_7_5_7_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_1_3_1_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_1_3_2_3"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_1_4_1_3"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_1_4_2_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_2_3_1_3"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_2_3_2_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_2_3_3_3"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_2_4_1_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_2_4_2_3"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_2_4_2_5"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_2_4_3_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_2_5_2_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_2_5_3_5"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_3_3_2_3"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_3_3_3_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_3_3_4_3"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_3_4_2_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_3_4_3_3"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_3_4_3_5"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_3_4_4_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_3_5_2_5"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_3_5_3_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_3_5_3_6"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_3_5_4_5"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_3_6_3_5"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_4_3_3_3"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_4_3_4_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_4_3_5_3"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_4_4_3_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_4_4_4_3"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_4_4_4_5"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_4_4_5_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_4_5_3_5"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_4_5_4_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_4_5_5_5"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_5_3_4_3"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_5_3_5_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_5_3_6_3"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_5_4_4_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_5_4_5_3"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_5_4_5_5"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_5_4_6_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_5_5_4_5"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_5_5_5_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_5_5_6_5"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_6_3_5_3"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_6_3_6_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_6_3_7_3"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_6_4_5_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_6_4_6_3"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_6_4_6_5"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_6_4_7_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_6_5_5_5"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_6_5_6_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_6_5_6_6"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_6_5_7_5"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_6_6_6_5"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_7_3_6_3"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_7_3_7_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_7_4_6_4"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_7_4_7_3"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_7_4_7_5"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_7_5_6_5"/>
+<Event Kind="UNCONTROLLABLE" Name="walk_7_5_7_4"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="SPEC" Name="property">
+<EventRefList>
+<EventRef Name="escape_1_3_1_4"/>
+<EventRef Name="escape_2_4_1_4"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="q0"/>
+</StateList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sq_1_3.free_rock">
+<EventRefList>
+<EventRef Name="escape_1_3_1_4"/>
+<EventRef Name="push_1_3_2_3"/>
+<EventRef Name="push_3_3_2_3"/>
+<EventRef Name="walk_1_3_1_4"/>
+<EventRef Name="walk_1_3_2_3"/>
+<EventRef Name="walk_1_4_1_3"/>
+<EventRef Name="walk_2_3_1_3"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="free"/>
+<State Name="hero"/>
+<State Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Target="rock" Source="free" Event="push_3_3_2_3"/>
+<Transition Target="hero" Source="free" Event="walk_1_4_1_3"/>
+<Transition Target="hero" Source="free" Event="walk_2_3_1_3"/>
+<Transition Target="free" Source="hero" Event="escape_1_3_1_4"/>
+<Transition Target="free" Source="hero" Event="push_1_3_2_3"/>
+<Transition Target="free" Source="hero" Event="walk_1_3_1_4"/>
+<Transition Target="free" Source="hero" Event="walk_1_3_2_3"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sq_1_4.exit_rock">
+<EventRefList>
+<EventRef Name="escape_1_3_1_4"/>
+<EventRef Name="escape_2_4_1_4"/>
+<EventRef Name="push_1_4_2_4"/>
+<EventRef Name="push_3_4_2_4"/>
+<EventRef Name="walk_1_3_1_4"/>
+<EventRef Name="walk_1_4_1_3"/>
+<EventRef Name="walk_1_4_2_4"/>
+<EventRef Name="walk_2_4_1_4"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="exit"/>
+<State Name="free"/>
+<State Name="gone"/>
+<State Name="hero"/>
+<State Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Target="gone" Source="exit" Event="escape_1_3_1_4"/>
+<Transition Target="gone" Source="exit" Event="escape_2_4_1_4"/>
+<Transition Target="rock" Source="exit" Event="push_3_4_2_4"/>
+<Transition Target="rock" Source="free" Event="push_3_4_2_4"/>
+<Transition Target="hero" Source="free" Event="walk_1_3_1_4"/>
+<Transition Target="hero" Source="free" Event="walk_2_4_1_4"/>
+<Transition Target="free" Source="hero" Event="push_1_4_2_4"/>
+<Transition Target="free" Source="hero" Event="walk_1_4_1_3"/>
+<Transition Target="free" Source="hero" Event="walk_1_4_2_4"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sq_2_3.rock">
+<EventRefList>
+<EventRef Name="push_1_3_2_3"/>
+<EventRef Name="push_2_3_2_4"/>
+<EventRef Name="push_2_3_3_3"/>
+<EventRef Name="push_2_5_2_4"/>
+<EventRef Name="push_3_3_2_3"/>
+<EventRef Name="push_4_3_3_3"/>
+<EventRef Name="walk_1_3_2_3"/>
+<EventRef Name="walk_2_3_1_3"/>
+<EventRef Name="walk_2_3_2_4"/>
+<EventRef Name="walk_2_3_3_3"/>
+<EventRef Name="walk_2_4_2_3"/>
+<EventRef Name="walk_3_3_2_3"/>
+</EventRefList>
+<StateList>
+<State Name="free"/>
+<State Name="hero"/>
+<State Initial="true" Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Target="rock" Source="free" Event="push_2_5_2_4"/>
+<Transition Target="rock" Source="free" Event="push_4_3_3_3"/>
+<Transition Target="hero" Source="free" Event="walk_1_3_2_3"/>
+<Transition Target="hero" Source="free" Event="walk_2_4_2_3"/>
+<Transition Target="hero" Source="free" Event="walk_3_3_2_3"/>
+<Transition Target="free" Source="hero" Event="push_2_3_2_4"/>
+<Transition Target="free" Source="hero" Event="push_2_3_3_3"/>
+<Transition Target="free" Source="hero" Event="walk_2_3_1_3"/>
+<Transition Target="free" Source="hero" Event="walk_2_3_2_4"/>
+<Transition Target="free" Source="hero" Event="walk_2_3_3_3"/>
+<Transition Target="hero" Source="rock" Event="push_1_3_2_3"/>
+<Transition Target="hero" Source="rock" Event="push_3_3_2_3"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sq_2_4.rock">
+<EventRefList>
+<EventRef Name="escape_2_4_1_4"/>
+<EventRef Name="push_1_4_2_4"/>
+<EventRef Name="push_2_3_2_4"/>
+<EventRef Name="push_2_4_3_4"/>
+<EventRef Name="push_2_5_2_4"/>
+<EventRef Name="push_3_4_2_4"/>
+<EventRef Name="push_4_4_3_4"/>
+<EventRef Name="walk_1_4_2_4"/>
+<EventRef Name="walk_2_3_2_4"/>
+<EventRef Name="walk_2_4_1_4"/>
+<EventRef Name="walk_2_4_2_3"/>
+<EventRef Name="walk_2_4_2_5"/>
+<EventRef Name="walk_2_4_3_4"/>
+<EventRef Name="walk_2_5_2_4"/>
+<EventRef Name="walk_3_4_2_4"/>
+</EventRefList>
+<StateList>
+<State Name="free"/>
+<State Name="hero"/>
+<State Initial="true" Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Target="rock" Source="free" Event="push_4_4_3_4"/>
+<Transition Target="hero" Source="free" Event="walk_1_4_2_4"/>
+<Transition Target="hero" Source="free" Event="walk_2_3_2_4"/>
+<Transition Target="hero" Source="free" Event="walk_2_5_2_4"/>
+<Transition Target="hero" Source="free" Event="walk_3_4_2_4"/>
+<Transition Target="free" Source="hero" Event="escape_2_4_1_4"/>
+<Transition Target="free" Source="hero" Event="push_2_4_3_4"/>
+<Transition Target="free" Source="hero" Event="walk_2_4_1_4"/>
+<Transition Target="free" Source="hero" Event="walk_2_4_2_3"/>
+<Transition Target="free" Source="hero" Event="walk_2_4_2_5"/>
+<Transition Target="free" Source="hero" Event="walk_2_4_3_4"/>
+<Transition Target="hero" Source="rock" Event="push_1_4_2_4"/>
+<Transition Target="hero" Source="rock" Event="push_2_3_2_4"/>
+<Transition Target="hero" Source="rock" Event="push_2_5_2_4"/>
+<Transition Target="hero" Source="rock" Event="push_3_4_2_4"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sq_2_5.gate_rock">
+<EventRefList>
+<EventRef Name="pickup_3_5_4_5"/>
+<EventRef Name="pickup_4_4_4_5"/>
+<EventRef Name="pickup_5_5_4_5"/>
+<EventRef Name="push_2_3_2_4"/>
+<EventRef Name="push_2_5_2_4"/>
+<EventRef Name="push_2_5_3_5"/>
+<EventRef Name="push_4_5_3_5"/>
+<EventRef Name="walk_2_4_2_5"/>
+<EventRef Name="walk_2_5_2_4"/>
+<EventRef Name="walk_2_5_3_5"/>
+<EventRef Name="walk_3_5_2_5"/>
+</EventRefList>
+<StateList>
+<State Name="free"/>
+<State Initial="true" Name="gate"/>
+<State Name="hero"/>
+<State Name="rock"/>
+<State Name="unlocked"/>
+</StateList>
+<TransitionList>
+<Transition Target="rock" Source="free" Event="push_2_3_2_4"/>
+<Transition Target="rock" Source="free" Event="push_4_5_3_5"/>
+<Transition Target="hero" Source="free" Event="walk_2_4_2_5"/>
+<Transition Target="hero" Source="free" Event="walk_3_5_2_5"/>
+<Transition Target="unlocked" Source="gate" Event="pickup_3_5_4_5"/>
+<Transition Target="unlocked" Source="gate" Event="pickup_4_4_4_5"/>
+<Transition Target="unlocked" Source="gate" Event="pickup_5_5_4_5"/>
+<Transition Target="free" Source="hero" Event="push_2_5_2_4"/>
+<Transition Target="free" Source="hero" Event="push_2_5_3_5"/>
+<Transition Target="free" Source="hero" Event="walk_2_5_2_4"/>
+<Transition Target="free" Source="hero" Event="walk_2_5_3_5"/>
+<Transition Target="hero" Source="unlocked" Event="walk_2_4_2_5"/>
+<Transition Target="hero" Source="unlocked" Event="walk_3_5_2_5"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sq_3_3.gate_rock">
+<EventRefList>
+<EventRef Name="pickup_3_5_4_5"/>
+<EventRef Name="pickup_4_4_4_5"/>
+<EventRef Name="pickup_5_5_4_5"/>
+<EventRef Name="push_1_3_2_3"/>
+<EventRef Name="push_2_3_3_3"/>
+<EventRef Name="push_3_3_2_3"/>
+<EventRef Name="push_3_3_3_4"/>
+<EventRef Name="push_3_3_4_3"/>
+<EventRef Name="push_3_5_3_4"/>
+<EventRef Name="push_4_3_3_3"/>
+<EventRef Name="push_5_3_4_3"/>
+<EventRef Name="walk_2_3_3_3"/>
+<EventRef Name="walk_3_3_2_3"/>
+<EventRef Name="walk_3_3_3_4"/>
+<EventRef Name="walk_3_3_4_3"/>
+<EventRef Name="walk_3_4_3_3"/>
+<EventRef Name="walk_4_3_3_3"/>
+</EventRefList>
+<StateList>
+<State Name="free"/>
+<State Initial="true" Name="gate"/>
+<State Name="hero"/>
+<State Name="rock"/>
+<State Name="unlocked"/>
+</StateList>
+<TransitionList>
+<Transition Target="rock" Source="free" Event="push_1_3_2_3"/>
+<Transition Target="rock" Source="free" Event="push_3_5_3_4"/>
+<Transition Target="rock" Source="free" Event="push_5_3_4_3"/>
+<Transition Target="hero" Source="free" Event="walk_2_3_3_3"/>
+<Transition Target="hero" Source="free" Event="walk_3_4_3_3"/>
+<Transition Target="hero" Source="free" Event="walk_4_3_3_3"/>
+<Transition Target="unlocked" Source="gate" Event="pickup_3_5_4_5"/>
+<Transition Target="unlocked" Source="gate" Event="pickup_4_4_4_5"/>
+<Transition Target="unlocked" Source="gate" Event="pickup_5_5_4_5"/>
+<Transition Target="free" Source="hero" Event="push_3_3_2_3"/>
+<Transition Target="free" Source="hero" Event="push_3_3_3_4"/>
+<Transition Target="free" Source="hero" Event="push_3_3_4_3"/>
+<Transition Target="free" Source="hero" Event="walk_3_3_2_3"/>
+<Transition Target="free" Source="hero" Event="walk_3_3_3_4"/>
+<Transition Target="free" Source="hero" Event="walk_3_3_4_3"/>
+<Transition Target="hero" Source="rock" Event="push_2_3_3_3"/>
+<Transition Target="hero" Source="rock" Event="push_4_3_3_3"/>
+<Transition Target="hero" Source="unlocked" Event="walk_2_3_3_3"/>
+<Transition Target="hero" Source="unlocked" Event="walk_3_4_3_3"/>
+<Transition Target="hero" Source="unlocked" Event="walk_4_3_3_3"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sq_3_4.rock">
+<EventRefList>
+<EventRef Name="push_1_4_2_4"/>
+<EventRef Name="push_2_4_3_4"/>
+<EventRef Name="push_3_3_3_4"/>
+<EventRef Name="push_3_4_2_4"/>
+<EventRef Name="push_3_4_3_5"/>
+<EventRef Name="push_3_4_4_4"/>
+<EventRef Name="push_3_5_3_4"/>
+<EventRef Name="push_3_6_3_5"/>
+<EventRef Name="push_4_4_3_4"/>
+<EventRef Name="push_5_4_4_4"/>
+<EventRef Name="walk_2_4_3_4"/>
+<EventRef Name="walk_3_3_3_4"/>
+<EventRef Name="walk_3_4_2_4"/>
+<EventRef Name="walk_3_4_3_3"/>
+<EventRef Name="walk_3_4_3_5"/>
+<EventRef Name="walk_3_4_4_4"/>
+<EventRef Name="walk_3_5_3_4"/>
+<EventRef Name="walk_4_4_3_4"/>
+</EventRefList>
+<StateList>
+<State Name="free"/>
+<State Name="hero"/>
+<State Initial="true" Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Target="rock" Source="free" Event="push_1_4_2_4"/>
+<Transition Target="rock" Source="free" Event="push_3_6_3_5"/>
+<Transition Target="rock" Source="free" Event="push_5_4_4_4"/>
+<Transition Target="hero" Source="free" Event="walk_2_4_3_4"/>
+<Transition Target="hero" Source="free" Event="walk_3_3_3_4"/>
+<Transition Target="hero" Source="free" Event="walk_3_5_3_4"/>
+<Transition Target="hero" Source="free" Event="walk_4_4_3_4"/>
+<Transition Target="free" Source="hero" Event="push_3_4_2_4"/>
+<Transition Target="free" Source="hero" Event="push_3_4_3_5"/>
+<Transition Target="free" Source="hero" Event="push_3_4_4_4"/>
+<Transition Target="free" Source="hero" Event="walk_3_4_2_4"/>
+<Transition Target="free" Source="hero" Event="walk_3_4_3_3"/>
+<Transition Target="free" Source="hero" Event="walk_3_4_3_5"/>
+<Transition Target="free" Source="hero" Event="walk_3_4_4_4"/>
+<Transition Target="hero" Source="rock" Event="push_2_4_3_4"/>
+<Transition Target="hero" Source="rock" Event="push_3_3_3_4"/>
+<Transition Target="hero" Source="rock" Event="push_3_5_3_4"/>
+<Transition Target="hero" Source="rock" Event="push_4_4_3_4"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sq_3_5.door_rock">
+<EventRefList>
+<EventRef Name="pickup_3_5_4_5"/>
+<EventRef Name="push_2_5_3_5"/>
+<EventRef Name="push_3_3_3_4"/>
+<EventRef Name="push_3_4_3_5"/>
+<EventRef Name="push_3_5_3_4"/>
+<EventRef Name="push_3_5_4_5"/>
+<EventRef Name="push_3_6_3_5"/>
+<EventRef Name="push_4_5_3_5"/>
+<EventRef Name="push_5_5_4_5"/>
+<EventRef Name="walk_2_5_3_5"/>
+<EventRef Name="walk_3_4_3_5"/>
+<EventRef Name="walk_3_5_2_5"/>
+<EventRef Name="walk_3_5_3_4"/>
+<EventRef Name="walk_3_5_3_6"/>
+<EventRef Name="walk_3_5_4_5"/>
+<EventRef Name="walk_3_6_3_5"/>
+<EventRef Name="walk_4_5_3_5"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="door"/>
+<State Name="free"/>
+<State Name="hero"/>
+<State Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Target="rock" Source="door" Event="push_3_3_3_4"/>
+<Transition Target="rock" Source="door" Event="push_5_5_4_5"/>
+<Transition Target="rock" Source="free" Event="push_3_3_3_4"/>
+<Transition Target="rock" Source="free" Event="push_5_5_4_5"/>
+<Transition Target="hero" Source="free" Event="walk_2_5_3_5"/>
+<Transition Target="hero" Source="free" Event="walk_3_4_3_5"/>
+<Transition Target="hero" Source="free" Event="walk_3_6_3_5"/>
+<Transition Target="hero" Source="free" Event="walk_4_5_3_5"/>
+<Transition Target="free" Source="hero" Event="pickup_3_5_4_5"/>
+<Transition Target="free" Source="hero" Event="push_3_5_3_4"/>
+<Transition Target="free" Source="hero" Event="push_3_5_4_5"/>
+<Transition Target="free" Source="hero" Event="walk_3_5_2_5"/>
+<Transition Target="free" Source="hero" Event="walk_3_5_3_4"/>
+<Transition Target="free" Source="hero" Event="walk_3_5_3_6"/>
+<Transition Target="free" Source="hero" Event="walk_3_5_4_5"/>
+<Transition Target="hero" Source="rock" Event="push_2_5_3_5"/>
+<Transition Target="hero" Source="rock" Event="push_3_4_3_5"/>
+<Transition Target="hero" Source="rock" Event="push_3_6_3_5"/>
+<Transition Target="hero" Source="rock" Event="push_4_5_3_5"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sq_3_6.free_rock">
+<EventRefList>
+<EventRef Name="push_3_4_3_5"/>
+<EventRef Name="push_3_6_3_5"/>
+<EventRef Name="walk_3_5_3_6"/>
+<EventRef Name="walk_3_6_3_5"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="free"/>
+<State Name="hero"/>
+<State Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Target="rock" Source="free" Event="push_3_4_3_5"/>
+<Transition Target="hero" Source="free" Event="walk_3_5_3_6"/>
+<Transition Target="free" Source="hero" Event="push_3_6_3_5"/>
+<Transition Target="free" Source="hero" Event="walk_3_6_3_5"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sq_4_3.free_rock">
+<EventRefList>
+<EventRef Name="push_2_3_3_3"/>
+<EventRef Name="push_3_3_4_3"/>
+<EventRef Name="push_4_3_3_3"/>
+<EventRef Name="push_4_3_4_4"/>
+<EventRef Name="push_4_3_5_3"/>
+<EventRef Name="push_4_5_4_4"/>
+<EventRef Name="push_5_3_4_3"/>
+<EventRef Name="push_6_3_5_3"/>
+<EventRef Name="walk_3_3_4_3"/>
+<EventRef Name="walk_4_3_3_3"/>
+<EventRef Name="walk_4_3_4_4"/>
+<EventRef Name="walk_4_3_5_3"/>
+<EventRef Name="walk_4_4_4_3"/>
+<EventRef Name="walk_5_3_4_3"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="free"/>
+<State Name="hero"/>
+<State Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Target="rock" Source="free" Event="push_2_3_3_3"/>
+<Transition Target="rock" Source="free" Event="push_4_5_4_4"/>
+<Transition Target="rock" Source="free" Event="push_6_3_5_3"/>
+<Transition Target="hero" Source="free" Event="walk_3_3_4_3"/>
+<Transition Target="hero" Source="free" Event="walk_4_4_4_3"/>
+<Transition Target="hero" Source="free" Event="walk_5_3_4_3"/>
+<Transition Target="free" Source="hero" Event="push_4_3_3_3"/>
+<Transition Target="free" Source="hero" Event="push_4_3_4_4"/>
+<Transition Target="free" Source="hero" Event="push_4_3_5_3"/>
+<Transition Target="free" Source="hero" Event="walk_4_3_3_3"/>
+<Transition Target="free" Source="hero" Event="walk_4_3_4_4"/>
+<Transition Target="free" Source="hero" Event="walk_4_3_5_3"/>
+<Transition Target="hero" Source="rock" Event="push_3_3_4_3"/>
+<Transition Target="hero" Source="rock" Event="push_5_3_4_3"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sq_4_4.rock">
+<EventRefList>
+<EventRef Name="pickup_4_4_4_5"/>
+<EventRef Name="push_2_4_3_4"/>
+<EventRef Name="push_3_4_4_4"/>
+<EventRef Name="push_4_3_4_4"/>
+<EventRef Name="push_4_4_3_4"/>
+<EventRef Name="push_4_4_5_4"/>
+<EventRef Name="push_4_5_4_4"/>
+<EventRef Name="push_5_4_4_4"/>
+<EventRef Name="push_6_4_5_4"/>
+<EventRef Name="walk_3_4_4_4"/>
+<EventRef Name="walk_4_3_4_4"/>
+<EventRef Name="walk_4_4_3_4"/>
+<EventRef Name="walk_4_4_4_3"/>
+<EventRef Name="walk_4_4_4_5"/>
+<EventRef Name="walk_4_4_5_4"/>
+<EventRef Name="walk_4_5_4_4"/>
+<EventRef Name="walk_5_4_4_4"/>
+</EventRefList>
+<StateList>
+<State Name="free"/>
+<State Name="hero"/>
+<State Initial="true" Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Target="rock" Source="free" Event="push_2_4_3_4"/>
+<Transition Target="rock" Source="free" Event="push_6_4_5_4"/>
+<Transition Target="hero" Source="free" Event="walk_3_4_4_4"/>
+<Transition Target="hero" Source="free" Event="walk_4_3_4_4"/>
+<Transition Target="hero" Source="free" Event="walk_4_5_4_4"/>
+<Transition Target="hero" Source="free" Event="walk_5_4_4_4"/>
+<Transition Target="free" Source="hero" Event="pickup_4_4_4_5"/>
+<Transition Target="free" Source="hero" Event="push_4_4_3_4"/>
+<Transition Target="free" Source="hero" Event="push_4_4_5_4"/>
+<Transition Target="free" Source="hero" Event="walk_4_4_3_4"/>
+<Transition Target="free" Source="hero" Event="walk_4_4_4_3"/>
+<Transition Target="free" Source="hero" Event="walk_4_4_4_5"/>
+<Transition Target="free" Source="hero" Event="walk_4_4_5_4"/>
+<Transition Target="hero" Source="rock" Event="push_3_4_4_4"/>
+<Transition Target="hero" Source="rock" Event="push_4_3_4_4"/>
+<Transition Target="hero" Source="rock" Event="push_4_5_4_4"/>
+<Transition Target="hero" Source="rock" Event="push_5_4_4_4"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sq_4_5.key_rock">
+<EventRefList>
+<EventRef Name="pickup_3_5_4_5"/>
+<EventRef Name="pickup_4_4_4_5"/>
+<EventRef Name="pickup_5_5_4_5"/>
+<EventRef Name="push_2_5_3_5"/>
+<EventRef Name="push_3_5_4_5"/>
+<EventRef Name="push_4_3_4_4"/>
+<EventRef Name="push_4_5_3_5"/>
+<EventRef Name="push_4_5_4_4"/>
+<EventRef Name="push_4_5_5_5"/>
+<EventRef Name="push_5_5_4_5"/>
+<EventRef Name="push_6_5_5_5"/>
+<EventRef Name="walk_3_5_4_5"/>
+<EventRef Name="walk_4_4_4_5"/>
+<EventRef Name="walk_4_5_3_5"/>
+<EventRef Name="walk_4_5_4_4"/>
+<EventRef Name="walk_4_5_5_5"/>
+<EventRef Name="walk_5_5_4_5"/>
+</EventRefList>
+<StateList>
+<State Name="free"/>
+<State Name="hero"/>
+<State Initial="true" Name="key"/>
+<State Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Target="rock" Source="free" Event="push_2_5_3_5"/>
+<Transition Target="rock" Source="free" Event="push_4_3_4_4"/>
+<Transition Target="rock" Source="free" Event="push_6_5_5_5"/>
+<Transition Target="hero" Source="free" Event="walk_3_5_4_5"/>
+<Transition Target="hero" Source="free" Event="walk_4_4_4_5"/>
+<Transition Target="hero" Source="free" Event="walk_5_5_4_5"/>
+<Transition Target="free" Source="hero" Event="push_4_5_3_5"/>
+<Transition Target="free" Source="hero" Event="push_4_5_4_4"/>
+<Transition Target="free" Source="hero" Event="push_4_5_5_5"/>
+<Transition Target="free" Source="hero" Event="walk_4_5_3_5"/>
+<Transition Target="free" Source="hero" Event="walk_4_5_4_4"/>
+<Transition Target="free" Source="hero" Event="walk_4_5_5_5"/>
+<Transition Target="hero" Source="key" Event="pickup_3_5_4_5"/>
+<Transition Target="hero" Source="key" Event="pickup_4_4_4_5"/>
+<Transition Target="hero" Source="key" Event="pickup_5_5_4_5"/>
+<Transition Target="rock" Source="key" Event="push_2_5_3_5"/>
+<Transition Target="rock" Source="key" Event="push_4_3_4_4"/>
+<Transition Target="rock" Source="key" Event="push_6_5_5_5"/>
+<Transition Target="hero" Source="rock" Event="push_3_5_4_5"/>
+<Transition Target="hero" Source="rock" Event="push_5_5_4_5"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sq_5_3.hero_rock">
+<EventRefList>
+<EventRef Name="push_3_3_4_3"/>
+<EventRef Name="push_4_3_5_3"/>
+<EventRef Name="push_5_3_4_3"/>
+<EventRef Name="push_5_3_5_4"/>
+<EventRef Name="push_5_3_6_3"/>
+<EventRef Name="push_5_5_5_4"/>
+<EventRef Name="push_6_3_5_3"/>
+<EventRef Name="push_7_3_6_3"/>
+<EventRef Name="walk_4_3_5_3"/>
+<EventRef Name="walk_5_3_4_3"/>
+<EventRef Name="walk_5_3_5_4"/>
+<EventRef Name="walk_5_3_6_3"/>
+<EventRef Name="walk_5_4_5_3"/>
+<EventRef Name="walk_6_3_5_3"/>
+</EventRefList>
+<StateList>
+<State Name="free"/>
+<State Initial="true" Name="hero"/>
+<State Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Target="rock" Source="free" Event="push_3_3_4_3"/>
+<Transition Target="rock" Source="free" Event="push_5_5_5_4"/>
+<Transition Target="rock" Source="free" Event="push_7_3_6_3"/>
+<Transition Target="hero" Source="free" Event="walk_4_3_5_3"/>
+<Transition Target="hero" Source="free" Event="walk_5_4_5_3"/>
+<Transition Target="hero" Source="free" Event="walk_6_3_5_3"/>
+<Transition Target="free" Source="hero" Event="push_5_3_4_3"/>
+<Transition Target="free" Source="hero" Event="push_5_3_5_4"/>
+<Transition Target="free" Source="hero" Event="push_5_3_6_3"/>
+<Transition Target="free" Source="hero" Event="walk_5_3_4_3"/>
+<Transition Target="free" Source="hero" Event="walk_5_3_5_4"/>
+<Transition Target="free" Source="hero" Event="walk_5_3_6_3"/>
+<Transition Target="hero" Source="rock" Event="push_4_3_5_3"/>
+<Transition Target="hero" Source="rock" Event="push_6_3_5_3"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sq_5_4.rock">
+<EventRefList>
+<EventRef Name="push_3_4_4_4"/>
+<EventRef Name="push_4_4_5_4"/>
+<EventRef Name="push_5_3_5_4"/>
+<EventRef Name="push_5_4_4_4"/>
+<EventRef Name="push_5_4_6_4"/>
+<EventRef Name="push_5_5_5_4"/>
+<EventRef Name="push_6_4_5_4"/>
+<EventRef Name="push_7_4_6_4"/>
+<EventRef Name="walk_4_4_5_4"/>
+<EventRef Name="walk_5_3_5_4"/>
+<EventRef Name="walk_5_4_4_4"/>
+<EventRef Name="walk_5_4_5_3"/>
+<EventRef Name="walk_5_4_5_5"/>
+<EventRef Name="walk_5_4_6_4"/>
+<EventRef Name="walk_5_5_5_4"/>
+<EventRef Name="walk_6_4_5_4"/>
+</EventRefList>
+<StateList>
+<State Name="free"/>
+<State Name="hero"/>
+<State Initial="true" Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Target="rock" Source="free" Event="push_3_4_4_4"/>
+<Transition Target="rock" Source="free" Event="push_7_4_6_4"/>
+<Transition Target="hero" Source="free" Event="walk_4_4_5_4"/>
+<Transition Target="hero" Source="free" Event="walk_5_3_5_4"/>
+<Transition Target="hero" Source="free" Event="walk_5_5_5_4"/>
+<Transition Target="hero" Source="free" Event="walk_6_4_5_4"/>
+<Transition Target="free" Source="hero" Event="push_5_4_4_4"/>
+<Transition Target="free" Source="hero" Event="push_5_4_6_4"/>
+<Transition Target="free" Source="hero" Event="walk_5_4_4_4"/>
+<Transition Target="free" Source="hero" Event="walk_5_4_5_3"/>
+<Transition Target="free" Source="hero" Event="walk_5_4_5_5"/>
+<Transition Target="free" Source="hero" Event="walk_5_4_6_4"/>
+<Transition Target="hero" Source="rock" Event="push_4_4_5_4"/>
+<Transition Target="hero" Source="rock" Event="push_5_3_5_4"/>
+<Transition Target="hero" Source="rock" Event="push_5_5_5_4"/>
+<Transition Target="hero" Source="rock" Event="push_6_4_5_4"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sq_5_5.free_rock">
+<EventRefList>
+<EventRef Name="pickup_5_5_4_5"/>
+<EventRef Name="push_3_5_4_5"/>
+<EventRef Name="push_4_5_5_5"/>
+<EventRef Name="push_5_3_5_4"/>
+<EventRef Name="push_5_5_4_5"/>
+<EventRef Name="push_5_5_5_4"/>
+<EventRef Name="push_5_5_6_5"/>
+<EventRef Name="push_6_5_5_5"/>
+<EventRef Name="push_7_5_6_5"/>
+<EventRef Name="walk_4_5_5_5"/>
+<EventRef Name="walk_5_4_5_5"/>
+<EventRef Name="walk_5_5_4_5"/>
+<EventRef Name="walk_5_5_5_4"/>
+<EventRef Name="walk_5_5_6_5"/>
+<EventRef Name="walk_6_5_5_5"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="free"/>
+<State Name="hero"/>
+<State Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Target="rock" Source="free" Event="push_3_5_4_5"/>
+<Transition Target="rock" Source="free" Event="push_5_3_5_4"/>
+<Transition Target="rock" Source="free" Event="push_7_5_6_5"/>
+<Transition Target="hero" Source="free" Event="walk_4_5_5_5"/>
+<Transition Target="hero" Source="free" Event="walk_5_4_5_5"/>
+<Transition Target="hero" Source="free" Event="walk_6_5_5_5"/>
+<Transition Target="free" Source="hero" Event="pickup_5_5_4_5"/>
+<Transition Target="free" Source="hero" Event="push_5_5_4_5"/>
+<Transition Target="free" Source="hero" Event="push_5_5_5_4"/>
+<Transition Target="free" Source="hero" Event="push_5_5_6_5"/>
+<Transition Target="free" Source="hero" Event="walk_5_5_4_5"/>
+<Transition Target="free" Source="hero" Event="walk_5_5_5_4"/>
+<Transition Target="free" Source="hero" Event="walk_5_5_6_5"/>
+<Transition Target="hero" Source="rock" Event="push_4_5_5_5"/>
+<Transition Target="hero" Source="rock" Event="push_6_5_5_5"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sq_6_3.rock">
+<EventRefList>
+<EventRef Name="push_4_3_5_3"/>
+<EventRef Name="push_5_3_6_3"/>
+<EventRef Name="push_6_3_5_3"/>
+<EventRef Name="push_6_3_6_4"/>
+<EventRef Name="push_6_5_6_4"/>
+<EventRef Name="push_7_3_6_3"/>
+<EventRef Name="walk_5_3_6_3"/>
+<EventRef Name="walk_6_3_5_3"/>
+<EventRef Name="walk_6_3_6_4"/>
+<EventRef Name="walk_6_3_7_3"/>
+<EventRef Name="walk_6_4_6_3"/>
+<EventRef Name="walk_7_3_6_3"/>
+</EventRefList>
+<StateList>
+<State Name="free"/>
+<State Name="hero"/>
+<State Initial="true" Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Target="rock" Source="free" Event="push_4_3_5_3"/>
+<Transition Target="rock" Source="free" Event="push_6_5_6_4"/>
+<Transition Target="hero" Source="free" Event="walk_5_3_6_3"/>
+<Transition Target="hero" Source="free" Event="walk_6_4_6_3"/>
+<Transition Target="hero" Source="free" Event="walk_7_3_6_3"/>
+<Transition Target="free" Source="hero" Event="push_6_3_5_3"/>
+<Transition Target="free" Source="hero" Event="push_6_3_6_4"/>
+<Transition Target="free" Source="hero" Event="walk_6_3_5_3"/>
+<Transition Target="free" Source="hero" Event="walk_6_3_6_4"/>
+<Transition Target="free" Source="hero" Event="walk_6_3_7_3"/>
+<Transition Target="hero" Source="rock" Event="push_5_3_6_3"/>
+<Transition Target="hero" Source="rock" Event="push_7_3_6_3"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sq_6_4.rock">
+<EventRefList>
+<EventRef Name="push_4_4_5_4"/>
+<EventRef Name="push_5_4_6_4"/>
+<EventRef Name="push_6_3_6_4"/>
+<EventRef Name="push_6_4_5_4"/>
+<EventRef Name="push_6_4_6_5"/>
+<EventRef Name="push_6_5_6_4"/>
+<EventRef Name="push_6_6_6_5"/>
+<EventRef Name="push_7_4_6_4"/>
+<EventRef Name="walk_5_4_6_4"/>
+<EventRef Name="walk_6_3_6_4"/>
+<EventRef Name="walk_6_4_5_4"/>
+<EventRef Name="walk_6_4_6_3"/>
+<EventRef Name="walk_6_4_6_5"/>
+<EventRef Name="walk_6_4_7_4"/>
+<EventRef Name="walk_6_5_6_4"/>
+<EventRef Name="walk_7_4_6_4"/>
+</EventRefList>
+<StateList>
+<State Name="free"/>
+<State Name="hero"/>
+<State Initial="true" Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Target="rock" Source="free" Event="push_4_4_5_4"/>
+<Transition Target="rock" Source="free" Event="push_6_6_6_5"/>
+<Transition Target="hero" Source="free" Event="walk_5_4_6_4"/>
+<Transition Target="hero" Source="free" Event="walk_6_3_6_4"/>
+<Transition Target="hero" Source="free" Event="walk_6_5_6_4"/>
+<Transition Target="hero" Source="free" Event="walk_7_4_6_4"/>
+<Transition Target="free" Source="hero" Event="push_6_4_5_4"/>
+<Transition Target="free" Source="hero" Event="push_6_4_6_5"/>
+<Transition Target="free" Source="hero" Event="walk_6_4_5_4"/>
+<Transition Target="free" Source="hero" Event="walk_6_4_6_3"/>
+<Transition Target="free" Source="hero" Event="walk_6_4_6_5"/>
+<Transition Target="free" Source="hero" Event="walk_6_4_7_4"/>
+<Transition Target="hero" Source="rock" Event="push_5_4_6_4"/>
+<Transition Target="hero" Source="rock" Event="push_6_3_6_4"/>
+<Transition Target="hero" Source="rock" Event="push_6_5_6_4"/>
+<Transition Target="hero" Source="rock" Event="push_7_4_6_4"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sq_6_5.free_rock">
+<EventRefList>
+<EventRef Name="push_4_5_5_5"/>
+<EventRef Name="push_5_5_6_5"/>
+<EventRef Name="push_6_3_6_4"/>
+<EventRef Name="push_6_4_6_5"/>
+<EventRef Name="push_6_5_5_5"/>
+<EventRef Name="push_6_5_6_4"/>
+<EventRef Name="push_6_6_6_5"/>
+<EventRef Name="push_7_5_6_5"/>
+<EventRef Name="walk_5_5_6_5"/>
+<EventRef Name="walk_6_4_6_5"/>
+<EventRef Name="walk_6_5_5_5"/>
+<EventRef Name="walk_6_5_6_4"/>
+<EventRef Name="walk_6_5_6_6"/>
+<EventRef Name="walk_6_5_7_5"/>
+<EventRef Name="walk_6_6_6_5"/>
+<EventRef Name="walk_7_5_6_5"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="free"/>
+<State Name="hero"/>
+<State Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Target="rock" Source="free" Event="push_4_5_5_5"/>
+<Transition Target="rock" Source="free" Event="push_6_3_6_4"/>
+<Transition Target="hero" Source="free" Event="walk_5_5_6_5"/>
+<Transition Target="hero" Source="free" Event="walk_6_4_6_5"/>
+<Transition Target="hero" Source="free" Event="walk_6_6_6_5"/>
+<Transition Target="hero" Source="free" Event="walk_7_5_6_5"/>
+<Transition Target="free" Source="hero" Event="push_6_5_5_5"/>
+<Transition Target="free" Source="hero" Event="push_6_5_6_4"/>
+<Transition Target="free" Source="hero" Event="walk_6_5_5_5"/>
+<Transition Target="free" Source="hero" Event="walk_6_5_6_4"/>
+<Transition Target="free" Source="hero" Event="walk_6_5_6_6"/>
+<Transition Target="free" Source="hero" Event="walk_6_5_7_5"/>
+<Transition Target="hero" Source="rock" Event="push_5_5_6_5"/>
+<Transition Target="hero" Source="rock" Event="push_6_4_6_5"/>
+<Transition Target="hero" Source="rock" Event="push_6_6_6_5"/>
+<Transition Target="hero" Source="rock" Event="push_7_5_6_5"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sq_6_6.free_rock">
+<EventRefList>
+<EventRef Name="push_6_4_6_5"/>
+<EventRef Name="push_6_6_6_5"/>
+<EventRef Name="walk_6_5_6_6"/>
+<EventRef Name="walk_6_6_6_5"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="free"/>
+<State Name="hero"/>
+<State Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Target="rock" Source="free" Event="push_6_4_6_5"/>
+<Transition Target="hero" Source="free" Event="walk_6_5_6_6"/>
+<Transition Target="free" Source="hero" Event="push_6_6_6_5"/>
+<Transition Target="free" Source="hero" Event="walk_6_6_6_5"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sq_7_3.free_rock">
+<EventRefList>
+<EventRef Name="push_5_3_6_3"/>
+<EventRef Name="push_7_3_6_3"/>
+<EventRef Name="push_7_3_7_4"/>
+<EventRef Name="push_7_5_7_4"/>
+<EventRef Name="walk_6_3_7_3"/>
+<EventRef Name="walk_7_3_6_3"/>
+<EventRef Name="walk_7_3_7_4"/>
+<EventRef Name="walk_7_4_7_3"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="free"/>
+<State Name="hero"/>
+<State Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Target="rock" Source="free" Event="push_5_3_6_3"/>
+<Transition Target="rock" Source="free" Event="push_7_5_7_4"/>
+<Transition Target="hero" Source="free" Event="walk_6_3_7_3"/>
+<Transition Target="hero" Source="free" Event="walk_7_4_7_3"/>
+<Transition Target="free" Source="hero" Event="push_7_3_6_3"/>
+<Transition Target="free" Source="hero" Event="push_7_3_7_4"/>
+<Transition Target="free" Source="hero" Event="walk_7_3_6_3"/>
+<Transition Target="free" Source="hero" Event="walk_7_3_7_4"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sq_7_4.free_rock">
+<EventRefList>
+<EventRef Name="push_5_4_6_4"/>
+<EventRef Name="push_7_3_7_4"/>
+<EventRef Name="push_7_4_6_4"/>
+<EventRef Name="push_7_5_7_4"/>
+<EventRef Name="walk_6_4_7_4"/>
+<EventRef Name="walk_7_3_7_4"/>
+<EventRef Name="walk_7_4_6_4"/>
+<EventRef Name="walk_7_4_7_3"/>
+<EventRef Name="walk_7_4_7_5"/>
+<EventRef Name="walk_7_5_7_4"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="free"/>
+<State Name="hero"/>
+<State Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Target="rock" Source="free" Event="push_5_4_6_4"/>
+<Transition Target="hero" Source="free" Event="walk_6_4_7_4"/>
+<Transition Target="hero" Source="free" Event="walk_7_3_7_4"/>
+<Transition Target="hero" Source="free" Event="walk_7_5_7_4"/>
+<Transition Target="free" Source="hero" Event="push_7_4_6_4"/>
+<Transition Target="free" Source="hero" Event="walk_7_4_6_4"/>
+<Transition Target="free" Source="hero" Event="walk_7_4_7_3"/>
+<Transition Target="free" Source="hero" Event="walk_7_4_7_5"/>
+<Transition Target="hero" Source="rock" Event="push_7_3_7_4"/>
+<Transition Target="hero" Source="rock" Event="push_7_5_7_4"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sq_7_5.free_rock">
+<EventRefList>
+<EventRef Name="push_5_5_6_5"/>
+<EventRef Name="push_7_3_7_4"/>
+<EventRef Name="push_7_5_6_5"/>
+<EventRef Name="push_7_5_7_4"/>
+<EventRef Name="walk_6_5_7_5"/>
+<EventRef Name="walk_7_4_7_5"/>
+<EventRef Name="walk_7_5_6_5"/>
+<EventRef Name="walk_7_5_7_4"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="free"/>
+<State Name="hero"/>
+<State Name="rock"/>
+</StateList>
+<TransitionList>
+<Transition Target="rock" Source="free" Event="push_5_5_6_5"/>
+<Transition Target="rock" Source="free" Event="push_7_3_7_4"/>
+<Transition Target="hero" Source="free" Event="walk_6_5_7_5"/>
+<Transition Target="hero" Source="free" Event="walk_7_4_7_5"/>
+<Transition Target="free" Source="hero" Event="push_7_5_6_5"/>
+<Transition Target="free" Source="hero" Event="push_7_5_7_4"/>
+<Transition Target="free" Source="hero" Event="walk_7_5_6_5"/>
+<Transition Target="free" Source="hero" Event="walk_7_5_7_4"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+
