@@ -30,6 +30,10 @@ public class NodeExpander
     /** Maps every event that is specified to the corresponing specification automaton, in order to speed up the expansion */
     protected Hashtable<LabeledEvent, Integer> specEventTable;
 
+
+	//Tillf (test)
+	private Alphabet unbookingAlphabet = null;
+
 	//     /** Needed for manual expansion */
 	//     protected int[][][] outgoingEventsTable;
 
@@ -142,6 +146,86 @@ public class NodeExpander
 
 		return children;
     }
+
+	//Tillf (Test)
+	public Collection expandNodeManually(double[] node, int[] activeAutomataIndex, boolean prioritizeUnbookingEvents) 
+	{
+		// If this method was called by mistake and the unbooking events are not prioritized
+		if (!prioritizeUnbookingEvents)
+		{
+			return expandNodeManually(node, activeAutomataIndex);
+		}
+
+		// Initialize the unbooking alphabet (containing all the unbooking events) if it is null
+		if (unbookingAlphabet == null)
+		{
+			unbookingAlphabet = new Alphabet();
+
+			for (Iterator<Automaton> autIt = theAutomata.getSpecificationAutomata().iterator(); autIt.hasNext(); )
+			{
+				Automaton currZone = autIt.next();
+				unbookingAlphabet.addEvents(currZone.getAlphabet().minus(currZone.getInitialState().activeEvents(false)));
+			}
+		}
+
+		ArrayList children = new ArrayList();
+
+		for (int i=0; i<activeAutomataIndex.length; i++)
+		{
+			int automatonIndex = activeAutomataIndex[i]; 
+			int stateIndex = (int)node[automatonIndex];
+
+			State st = theAutomata.getAutomatonAt(automatonIndex).getStateWithIndex(stateIndex);
+			Iterator<Arc> arcIt = st.outgoingArcsIterator();
+
+			boolean expansionDone = false;
+			while (arcIt.hasNext()) 
+			{
+				LabeledEvent currEvent = arcIt.next().getEvent();
+
+				// If there is an unbooking event, only this event (and the state that it leads to) are returned
+				if (unbookingAlphabet.contains(currEvent))
+				{
+					children.clear();
+					expansionDone = true;
+				}
+
+
+				Object currSpecIndexObj = specEventTable.get(currEvent);
+
+				if (currSpecIndexObj == null) 
+				{
+					children.add(newNode(node, new int[]{i}, new int[]{st.nextState(currEvent).getIndex()}, st.nextState(currEvent).getCost()));
+				}
+				else 
+				{
+					int currSpecIndex = ((Integer)currSpecIndexObj).intValue();
+					Iterator<State> enabledStatesIt = theAutomata.getAutomatonAt(currSpecIndex).statesThatEnableEventIterator(currEvent.getLabel());
+
+					while (enabledStatesIt.hasNext()) 
+					{
+						State specState = enabledStatesIt.next();
+						if (node[currSpecIndex] == specState.getIndex()) 
+						{
+							int[] changedIndices = new int[]{activeAutomataIndex[i], currSpecIndex};
+							int[] newStateIndices = new int[]{st.nextState(currEvent).getIndex(), specState.nextState(currEvent).getIndex()};
+
+							children.add(newNode(node, changedIndices, newStateIndices, st.nextState(currEvent).getCost()));
+
+							break;
+						}
+					}
+				}
+
+				// ... yes, here...
+				if (expansionDone == true)
+					return children;
+			}
+		}
+
+		return children;
+    }
+	
 
 	//     public boolean isEnabled(int[] node, LabeledEvent event) {
 	// 	Object currSpecIndexObj = specEventTable.get(event);

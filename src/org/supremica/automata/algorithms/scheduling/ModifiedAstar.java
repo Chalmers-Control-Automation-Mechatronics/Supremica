@@ -79,7 +79,11 @@ public class ModifiedAstar
 
 			if (currNodeIsAddedToClosed)
 			{
+				// tillf (test)
+// 				Iterator childIter = expander.expandNodeManually(currNode, activeAutomataIndex, true).iterator();
 				Iterator childIter = expander.expandNode(currNode, activeAutomataIndex).iterator();
+
+
 // 				//tillf (test)
 // 				Collection childColl = expander.expandNode(currNode, activeAutomataIndex);
 // 				if (childColl.size() > 0 && searchDepthCounter++ > 30)

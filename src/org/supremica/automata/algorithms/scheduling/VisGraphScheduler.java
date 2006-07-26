@@ -251,7 +251,14 @@ public class VisGraphScheduler
 			if (e.getMessage().equals(ACCEPTING_NODE_NOT_FOUND_EXCEPTION))
 			{
 				vertices.remove(0);
-				return Double.MAX_VALUE;
+				
+// 				return Double.MAX_VALUE;
+				double maxCycleTime = 0;
+				for (int i=0; i<goalTimes.length; i++)
+				{
+					maxCycleTime += goalTimes[i];
+				}
+				return maxCycleTime;
 			}
 			else
 			{
@@ -298,7 +305,13 @@ public class VisGraphScheduler
 			return 0;
 		}
 
-		double minCostToGoal = Double.MAX_VALUE;
+// 		double minCostToGoal = Double.MAX_VALUE;
+		double minCostToGoal = 0;
+		for (int i=0; i<goalTimes.length; i++)
+		{
+			minCostToGoal += goalTimes[i];
+		}
+
 		//tillf
 		ActionTimer visCheckTimer = new ActionTimer();
 		visCheckTimer.restart();
@@ -319,7 +332,9 @@ public class VisGraphScheduler
 				visibilityChecker.setStart(fromTimes);
 				visibilityChecker.setGoal(vertices.get(visibleVerticeIndices.get(i)));
 				if (visibilityChecker.isVisible())
+				{
 					minCostToGoal = costToGoal;
+				}
 			}
 		}
 		

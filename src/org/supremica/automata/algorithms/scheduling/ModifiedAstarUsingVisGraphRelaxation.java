@@ -149,7 +149,7 @@ public class ModifiedAstarUsingVisGraphRelaxation
 		}
 
 		//Tillf
-		boolean approximation = true;
+		boolean approximation = false;
 		if (approximation)
 		{
 			double xWeight = 200;

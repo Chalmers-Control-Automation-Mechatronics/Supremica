@@ -66,7 +66,7 @@ public class VisibilityChecker {
 				}
 			}
 			else
-			{
+ 			{
 				double[] firstVertice = new double[]{intersectionEdges.get(i)[0], intersectionEdges.get(i)[1]};
 				double[] secondVertice = new double[]{intersectionEdges.get(i)[2], intersectionEdges.get(i)[3]};
 				
@@ -74,7 +74,7 @@ public class VisibilityChecker {
 				{
 					return false;
 				}
-			}
+ 			}
 		}
 
 		return true;
@@ -155,6 +155,7 @@ public class VisibilityChecker {
 		}
 		
 		return false;
+>>>>>>> 1.8
     }
 
     public void setStart(double[] start) 

@@ -28,7 +28,42 @@ public class ScheduleAction
 	 */
 	public void actionPerformed(ActionEvent e)
 	{
-		ScheduleDialog dlg = new ScheduleDialog();
-		dlg.show();
+		ScheduleDialog dlg = null;
+
+		try 
+		{
+			dlg = new ScheduleDialog();
+			dlg.show();
+		}
+		catch (Exception ex) 
+		{
+			if (ex.getMessage().contains("javax") || ex.getMessage().contains("java.awt"))
+			{
+			}
+			else if (dlg != null)
+			{
+				dlg.done();
+			}
+		}
+	}
+
+	private void launchScheduleDialog()
+		throws Exception
+	{
+		try 
+		{
+			ScheduleDialog dlg = new ScheduleDialog();
+			dlg.show();
+		}
+		catch (Exception ex) 
+		{
+			if (ex.getMessage().contains("javax") || ex.getMessage().contains("java.awt"))
+			{
+			}
+			else
+			{
+				throw ex;
+			}
+		}
 	}
 }

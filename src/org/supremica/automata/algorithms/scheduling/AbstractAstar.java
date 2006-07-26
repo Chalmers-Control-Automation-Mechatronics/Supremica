@@ -313,7 +313,6 @@ public abstract class AbstractAstar
 			if (isRunning)
 			{
 				totalTimer.restart();
-
 				init();
 			}
 
@@ -330,11 +329,13 @@ public abstract class AbstractAstar
 					//Tillf
 					if (this instanceof ModifiedAstarUsingVisGraphRelaxation)
 					{
-						logger.info("Nr of VisGraphRelaxations = " + visGraphRelax.size());
+						logger.info("Nr of stored VisGraphRelaxations = " + visGraphRelax.size());
 						logger.info("scheduleFromTime = " + scheduleFromTime + "; scheduleFromCounter = " + scheduleFromCounter + "; " + scheduleFromCounter/(scheduleFromTime+0.0) + " relax_counts/ms");
 						int visCheckTime = 0;
 						for (Iterator<VisGraphScheduler> it = visibilityGraphs.values().iterator(); it.hasNext(); )
+						{
 							visCheckTime += it.next().totalVisCheckTime;
+						}
 						logger.info("total_visibility_check_time = " + visCheckTime);
 					}
 				}
@@ -617,6 +618,8 @@ public abstract class AbstractAstar
 
 		if (currNode == null || ! isAcceptingNode(currNode))
 		{
+			logger.error("currNode = " + printArray(currNode));
+			logger.error("openTree.size = " + openTree.size() + "; closedTree.size = " + closedTree.size());
 // 			if (currNode != null)
 // 				logger.error("currnode = " + printArray(currNode) + "; activeAutomataIndex = " + printArray(activeAutomataIndex));
 
@@ -897,10 +900,8 @@ public abstract class AbstractAstar
 //  		if (fParent > fNode)
 // 		{
 // 			//logger.warn("Consistency ensurance");
-// 			//logger.info("(P) node = " + printArray(node) + "; estimation = " + fParent);
 //  			return fParent;
 // 		}
-
 
 // 		logger.info("node = " + printArray(node) + "; estimation = " + fNode);
 
