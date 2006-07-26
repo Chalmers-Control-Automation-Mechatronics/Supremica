@@ -143,7 +143,6 @@ public class Automata
 	{
 		for (Automaton automaton : oldAutomata)
 		{
-			System.err.println("Adding: " + automaton.getName());
 			addAutomaton(automaton);
 		}
 	}
@@ -803,23 +802,23 @@ public class Automata
 	}
 
 	/**
-	 * Set the synchronization indicies. The returned alphabet is the union alphabet
+	 * Set the synchronization indices. The returned alphabet is the union alphabet
 	 * and contains the synchronization index of all the events in this automata.
 	 */
-	public Alphabet setIndicies()
+	public Alphabet setIndices()
 	{
 		// Get the union alphabet (ignoring consistency)
 		Alphabet theAlphabet = getUnionAlphabet();
 
 		// Adjust the indices of the alphabet
-		theAlphabet.setIndicies();
+		theAlphabet.setIndices();
 
 		// Adjust the indices of the automata
 		int i = 0;
 		// Examine each automata
 		for (Automaton automaton : this)
 		{
-			automaton.setIndicies(i++, theAlphabet);
+			automaton.setIndices(i++, theAlphabet);
 		}
 
 		return theAlphabet;

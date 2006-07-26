@@ -100,7 +100,7 @@ public class TestAutomata
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
 			assertTrue(theProject.nbrOfAutomata() == 3);
 
-			theProject.setIndicies();
+			theProject.setIndices();
 
 			Alphabet unionAlphabet = AlphabetHelpers.getUnionAlphabet(theProject);
 			assertTrue(unionAlphabet.size() == 5);

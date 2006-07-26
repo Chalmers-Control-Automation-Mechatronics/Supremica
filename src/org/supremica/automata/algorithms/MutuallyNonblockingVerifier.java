@@ -1196,7 +1196,7 @@ public class MutuallyNonblockingVerifier
 		int[] blockValue = new int[alphabetSize];
 		Alphabet theAlphabet = new Alphabet(theAutomaton.getAlphabet());
 
-		theAlphabet.setIndicies();
+		theAlphabet.setIndices();
 
 		boolean noValue = true;
 

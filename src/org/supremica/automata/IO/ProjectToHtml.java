@@ -83,7 +83,7 @@ public class ProjectToHtml
 	public void serialize()
 		throws Exception
 	{
-		project.setIndicies();
+		project.setIndices();
 		serializeProject();
 
 		// Serialize all automata

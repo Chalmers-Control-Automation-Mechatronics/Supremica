@@ -88,7 +88,7 @@ public class AutomatonMinimizer
     private static int totalOE = 0;
     private static int totalArcs = 0;
 
-    // Use short names
+    // Use short names (state names are either integers or based on their parent states)
     private boolean useShortNames = false;
 
     /**
@@ -396,9 +396,9 @@ public class AutomatonMinimizer
             totalArcs += removedArcs-addedArcs;
         }
 
-        // Remove from alphabet epsilon events that are never used
+		// Remove from alphabet epsilon events that are never used
         removeUnusedEpsilonEvents(theAutomaton);
-
+			
 		// Message
 		if (Config.VERBOSE_MODE.isTrue())
 		{
@@ -543,20 +543,28 @@ public class AutomatonMinimizer
         {
             EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
             State currState = currEquivClass.getSingleStateRepresentation();
-            if (currEquivClass.hasInitialState())
+			if (currEquivClass.hasInitialState())
             {
-                currState.setInitial(true);
+				// This is where the problem is... the name may have been used already!
+				// we should set the name already in the getSingleStateRepresentation method!
+				/* 
                 if (useShortNames)
                 {
                     currState.setName("q" + 0);
                 }
+				*/
+				newAutomaton.addState(currState);
+                newAutomaton.setInitialState(currState);
             }
             else
             {
+				/*
                 if (useShortNames)
                 {
                     currState.setName("q" + stateNumber++);
                 }
+				*/
+				newAutomaton.addState(currState);
             }
         }
 
@@ -603,7 +611,7 @@ public class AutomatonMinimizer
         }
 
         // Give the automaton an appropriate comment
-        newAutomaton.setComment("min(" + theAutomaton.getName() + ")");
+        newAutomaton.setName(theAutomaton.getName());
 
 		// Start listening again
 		newAutomaton.endTransaction();
@@ -1599,7 +1607,7 @@ public class AutomatonMinimizer
                     if (!useShortNames)
                     {
                         State toState = outArc.getToState();
-                        toState.setName(state.getName() + Config.GENERAL_STATE_SEPARATOR.get() +
+                        toState.setName(state.getName() + Config.GENERAL_STATELABEL_SEPARATOR.get() +
                                         toState.getName());
                     }
                 }

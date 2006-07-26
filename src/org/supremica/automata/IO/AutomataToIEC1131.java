@@ -85,7 +85,7 @@ public class AutomataToIEC1131
 
     private void initialize()
     {
-	allEvents = theProject.setIndicies();
+	allEvents = theProject.setIndices();
     }
 
     void printBeginProgram(PrintWriter pw)

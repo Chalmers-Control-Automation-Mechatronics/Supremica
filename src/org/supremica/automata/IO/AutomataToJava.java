@@ -107,7 +107,7 @@ public class AutomataToJava
 
 	private void initialize()
 	{
-		allEvents = theProject.setIndicies();
+		allEvents = theProject.setIndices();
 	}
 
 	void printFileHeader(PrintWriter pw)

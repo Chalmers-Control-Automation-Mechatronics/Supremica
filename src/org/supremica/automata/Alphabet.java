@@ -716,7 +716,7 @@ public class Alphabet
 		return subAlphabet;
 	}
 
-	public void setIndicies()
+	public void setIndices()
 	{
 		int i = 0;
 
@@ -728,7 +728,7 @@ public class Alphabet
 		}
 	}
 
-	public void setIndicies(Alphabet otherAlphabet)
+	public void setIndices(Alphabet otherAlphabet)
 		throws IllegalArgumentException
 	{
 		for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )

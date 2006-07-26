@@ -407,14 +407,14 @@ public class Project
 	}
 
 	/**
-	 * Set the synchronization indicies. The returned alphabet is the union alphabet
+	 * Set the synchronization indices. The returned alphabet is the union alphabet
 	 * and contains the synchronization index of all the events in this automata.
 	 */
-	public Alphabet setIndicies()
+	public Alphabet setIndices()
 	{
 		theTimers.setIndices();
 
-		return super.setIndicies();
+		return super.setIndices();
 	}
 
 	public void clear()

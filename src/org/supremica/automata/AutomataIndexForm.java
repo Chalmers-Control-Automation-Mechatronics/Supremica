@@ -129,10 +129,10 @@ public final class AutomataIndexForm
 		indexMap = new AutomataIndexMap(theAutomata);
 
 		// Set the indices of the events in theAutomata (this method returns the union alphabet)
-		Alphabet unionAlphabet = theAutomata.setIndicies();
+		Alphabet unionAlphabet = theAutomata.setIndices();
 		theAutomaton.getAlphabet().union(unionAlphabet);
 
-		//theAutomaton.setIndicies();
+		//theAutomaton.setIndices();
 
 		generateAutomataIndices(theAutomata);
 
@@ -150,8 +150,10 @@ public final class AutomataIndexForm
 
 		generateStateIndices(theAutomata);
 
-		// Sometimes stuff go wrong here... perhaps because some State.index has been messed up
-		// as a result of an Automaton.merge? It does not seem to be easily reproducible?
+		// Sometimes stuff go wrong here... perhaps because some
+		// State.index has been messed up as a result of an
+		// MinimizationHelper.mergeStates? It does not seem to be
+		// easily reproducible?
 		generateNextStateTransitionIndices(theAutomata, theAutomaton);
 		generatePrevStatesTransitionIndices(theAutomata, theAutomaton);
 
@@ -215,11 +217,12 @@ public final class AutomataIndexForm
 		return theAutomata.size();
 	}
 
+	/**
+	 * Give each automaton a unique index Remember that this index
+	 * must be consistent with getAutomatonAt(int) in Automata
+	 */
 	public void generateAutomataIndices(Automata theAutomata)
 	{
-		// Give each automaton a unique index
-		// Remember that this index must be consistent with
-		// getAutomatonAt(int) in Automata
 		typeIsPlantTable = new boolean[theAutomata.size()];
 		typeIsSupSpecTable = new boolean[theAutomata.size()];
 		automataSize = new int[theAutomata.size()];

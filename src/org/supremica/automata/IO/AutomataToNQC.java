@@ -74,7 +74,7 @@ public class AutomataToNQC
 
 	private void initialize()
 	{
-		allEvents = theAutomata.setIndicies();
+		allEvents = theAutomata.setIndices();
 	}
 
 	void printBeginProgram(PrintWriter pw)

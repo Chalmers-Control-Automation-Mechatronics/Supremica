@@ -684,72 +684,77 @@ public class AutomataMinimizer
      * events.
      */
     private Automaton monolithicMinimization(Automata automata, Alphabet hideThese)
-	throws Exception
+		throws Exception
     {
-	//System.err.println("Minimizing " + automata + ", hiding: " + hideThese);
-	
-	// Do we care about state names?
-	boolean useShortStateNames = options.getMinimizationType() != EquivalenceRelation.SupervisionEquivalence;
-	// Synchronize, or if there's just one automaton, just find it
-	Automaton aut;
-	if (automata.size() > 1)
-	{
-	    // Synch
-	    SynchronizationOptions synchOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
-	    synchOptions.setUseShortStateNames(useShortStateNames);
-	    aut = AutomataSynchronizer.synchronizeAutomata(automata, synchOptions);
-	}
-	else
-	{
-	    aut = automata.getFirstAutomaton();
-	    // This could be one of the originals, so we might need to make a copy!
-	    if (options.getKeepOriginal())
-	    {
-		aut = new Automaton(aut);
-	    }
-	}
-	
-	// If supervision equivalence, make the result a kripke automaton!
-	if (options.getMinimizationType() == EquivalenceRelation.SupervisionEquivalence)
-	{
-	    aut = new KripkeAutomaton(aut);
-	}
-	
-	// Hide the events!
-	boolean preserveControllability = options.getMinimizationType() == EquivalenceRelation.SupervisionEquivalence;
-	aut.hide(hideThese, preserveControllability);
-	// Examine for largest sizes
-	if (aut.nbrOfStates() > mostStates)
-	{
-	    mostStates = aut.nbrOfStates();
-	}
-	if (aut.nbrOfTransitions() > mostTransitions)
-	{
-	    mostTransitions = aut.nbrOfTransitions();
-	}
-	
-	//ActionMan.getGui().addAutomaton(new Automaton(aut));
-	
-	// Is it at all possible to minimize? (It may actually be possible even
-	// if there are no epsilons)
-	if (aut.nbrOfEpsilonTransitions() > 0)
-	{
-	    // Minimize!
-	    AutomatonMinimizer minimizer = new AutomatonMinimizer(aut);
-	    minimizer.useShortStateNames(useShortStateNames);
-	    threadToStop = minimizer;
-	    Automaton newAut = minimizer.getMinimizedAutomaton(options);
-	    aut = newAut;
-	    threadToStop = null;
-	    if (stopRequested)
-	    {
-		return null;
-	    }
-	}
-	
-	//ActionMan.getGui().addAutomaton(new Automaton(aut));
-	
-	return aut;
+		//System.err.println("Minimizing " + automata + ", hiding: " + hideThese);
+		
+		// Do we care about state names?
+		boolean useShortStateNames = options.getMinimizationType() != EquivalenceRelation.SupervisionEquivalence;
+		// Synchronize, or if there's just one automaton, just find it
+		Automaton aut;
+		if (automata.size() > 1)
+		{
+			//logger.warn(automata);
+			//ActionMan.getGui().addAutomata(automata);
+
+			// Synch
+			SynchronizationOptions synchOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
+			synchOptions.setUseShortStateNames(useShortStateNames);
+			aut = AutomataSynchronizer.synchronizeAutomata(automata, synchOptions);
+
+			//ActionMan.getGui().addAutomaton(aut);
+		}
+		else
+		{
+			aut = automata.getFirstAutomaton();
+			// This could be one of the originals, so we might need to make a copy!
+			if (options.getKeepOriginal())
+			{
+				aut = new Automaton(aut);
+			}
+		}		
+
+		// If supervision equivalence, make the result a kripke automaton!
+		if (options.getMinimizationType() == EquivalenceRelation.SupervisionEquivalence)
+		{
+			aut = new KripkeAutomaton(aut);
+		}
+		
+		// Hide the events!
+		boolean preserveControllability = options.getMinimizationType() == EquivalenceRelation.SupervisionEquivalence;
+		aut.hide(hideThese, preserveControllability);
+		// Examine for largest sizes
+		if (aut.nbrOfStates() > mostStates)
+		{
+			mostStates = aut.nbrOfStates();
+		}
+		if (aut.nbrOfTransitions() > mostTransitions)
+		{
+			mostTransitions = aut.nbrOfTransitions();
+		}
+		
+		//ActionMan.getGui().addAutomaton(new Automaton(aut));
+		
+		// Is it at all possible to minimize? (It may actually be possible even
+		// if there are no epsilons)
+		if (aut.nbrOfEpsilonTransitions() > 0)
+		{
+			// Minimize!
+			AutomatonMinimizer minimizer = new AutomatonMinimizer(aut);
+			minimizer.useShortStateNames(useShortStateNames);
+			threadToStop = minimizer;
+			Automaton newAut = minimizer.getMinimizedAutomaton(options);
+			aut = newAut;
+			threadToStop = null;
+			if (stopRequested)
+			{
+				return null;
+			}
+		}
+		
+		//ActionMan.getGui().addAutomaton(new Automaton(aut));
+		
+		return aut;
     }
 
     /**

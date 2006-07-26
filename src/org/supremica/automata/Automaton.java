@@ -1367,24 +1367,24 @@ public class Automaton
 		remapStateIndices();
 	}
 
-	public void setIndicies()
+	public void setIndices()
 	{
-		setIndicies(0);
+		setIndices(0);
 	}
 
-	void setIndicies(int automatonIndex)
+	void setIndices(int automatonIndex)
 	{
 		index = automatonIndex;
 
-		alphabet.setIndicies();
+		alphabet.setIndices();
 		setStateIndices();
 	}
 
-	void setIndicies(int automatonIndex, Alphabet otherAlphabet)
+	void setIndices(int automatonIndex, Alphabet otherAlphabet)
 	{
 		index = automatonIndex;
 
-		alphabet.setIndicies(otherAlphabet);
+		alphabet.setIndices(otherAlphabet);
 		setStateIndices();
 	}
 

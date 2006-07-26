@@ -88,13 +88,13 @@ public class AutomataToIEC61499
 	public AutomataToIEC61499(Project theProject)
 	{
 		this.theProject = theProject;
-		allEvents = this.theProject.setIndicies();
+		allEvents = this.theProject.setIndices();
 	}
 
 	private AutomataToIEC61499(Project theProject,boolean comments, boolean useXmlns)
 	{
 		this.theProject = theProject;
-		allEvents = this.theProject.setIndicies();
+		allEvents = this.theProject.setIndices();
 		this.comments = comments;
 		this.useXmlns = useXmlns;
 	}

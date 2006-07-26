@@ -143,7 +143,7 @@ public class TestAlphabet
 			assertTrue(alph2.size() == 3);
 		}
 
-		alph1.setIndicies();
+		alph1.setIndices();
 		int minIndex = 0;
 		int maxIndex = alph1.size() - 1;
 		for (Iterator<LabeledEvent> evIt = alph1.iterator(); evIt.hasNext(); )

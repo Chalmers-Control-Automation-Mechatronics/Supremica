@@ -240,7 +240,6 @@ public class StateSet
 
 	/**
 	 * Creates a new state named as the composition of the states in this set
-	 * Should use the globally defined state separator
 	 *
 	 * The "initial" attribute should be set in the automaton that this state
 	 * should be long to, not here!
@@ -250,9 +249,10 @@ public class StateSet
 		// boolean i = false;   // initial?
 		boolean d = false;    // desired?
 		boolean x = false;    // forbidden?
+
+		// Find new name
 		StringBuffer buf = new StringBuffer();
 		Iterator stateit = iterator();
-
 		while (stateit.hasNext())
 		{
 			State state = (State) stateit.next();
@@ -261,22 +261,15 @@ public class StateSet
 			buf.append(state.getName());
 			if (stateit.hasNext())
 			{
-				buf.append(Config.GENERAL_STATE_SEPARATOR.get());
+				buf.append(Config.GENERAL_STATELABEL_SEPARATOR.get());
 			}
 
 			// i |= state.isInitial();
 			d |= state.isAccepting();
 			x |= state.isForbidden();
 		}
-
 		// Get name for new state
 		String newName = buf.toString();
-		/*
-		if (newName.length() > nameLimit)
-		    {
-		newName = newName.substring(0, nameLimit) + Math.random() + "...";
-		}
-		*/
 
 		// Create new state
 		State newstate = new State(newName);
@@ -301,7 +294,7 @@ public class StateSet
 	}
 
 	/**
-	 * Returns true if at least one state in this equivalence class is marked as 'initial'
+	 * Returns true if at least one state in this StateSet is marked as 'initial'
 	 */
 	public boolean hasInitialState()
 	{
@@ -319,7 +312,7 @@ public class StateSet
 	}
 
 	/**
-	 * Returns true if at least one state in this equivalence class is marked as 'accepting'
+	 * Returns true if at least one state in this StateSet is marked as 'accepting'
 	 */
 	public boolean hasAcceptingState()
 	{
@@ -337,7 +330,7 @@ public class StateSet
 	}
 
 	/**
-	 * Returns true if at least one state in this equivalence class is marked as 'forbidden'
+	 * Returns true if at least one state in this StateSet is marked as 'forbidden'
 	 */
 	public boolean hasForbiddenState()
 	{

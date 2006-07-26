@@ -107,7 +107,7 @@ public class DefaultEventRenamer
 		}
 
 		// Build union alphabet
-		Alphabet unionAlphabet = theAutomata.setIndicies();
+		Alphabet unionAlphabet = theAutomata.setIndices();
 
 		// Build a map from old events to new.
 		HashMap oldToNew = new HashMap();

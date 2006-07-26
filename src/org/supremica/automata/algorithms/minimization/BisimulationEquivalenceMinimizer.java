@@ -126,7 +126,7 @@ public class BisimulationEquivalenceMinimizer
         throws UnsatisfiedLinkError
     {
         // Set the indices in the automaton.
-        aut.setIndicies();
+        aut.setIndices();
 
         // States...
         State[] states = new State[aut.nbrOfStates()];
