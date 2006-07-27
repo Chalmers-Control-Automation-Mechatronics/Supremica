@@ -8,7 +8,7 @@ public class RenderingInformation
 	private final Color mColor;
 	private final Color mShadowColor;
 	private final boolean mIsHighlighted;
-  private final int mPriority;
+	private final int mPriority;
 	
 	/*public RenderingInformation(EditorObject o)
 	{
@@ -16,13 +16,13 @@ public class RenderingInformation
 	}*/
 	
 	public RenderingInformation(boolean showHandles, boolean isHighlighted,
-                              Color color, Color shadowColor, int priority)
+								Color color, Color shadowColor, int priority)
 	{
 		mShowHandles = showHandles;
 		mIsHighlighted = isHighlighted;
 		mColor = color;
 		mShadowColor = shadowColor;
-    mPriority = priority;
+		mPriority = priority;
 	}
 	
 	public boolean showHandles()
@@ -45,8 +45,8 @@ public class RenderingInformation
 		return mShadowColor;
 	}
   
-  public int getPriority()
-  {
-    return mPriority;
-  }
+	public int getPriority()
+	{
+		return mPriority;
+	}
 }

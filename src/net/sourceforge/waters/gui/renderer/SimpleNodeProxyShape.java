@@ -120,16 +120,14 @@ public class SimpleNodeProxyShape
 												  WIDTH, WIDTH);
 		mShape = new Arc2D.Double(rect, 0, 360, Arc2D.OPEN);
 		isInitial = getProxy().isInitial();
-    if (proxy.getInitialArrowGeometry() != null) {
-      mArrow = getProxy().getInitialArrowGeometry().getPoint();
-    } else {
-      mArrow = new Point(-5, -5);
-    }
-    if (isInitial) {
-      mHandles.add(
-         new InitialStateHandle(Math.atan2(mArrow.getY(), mArrow.getX())
-                                , p, RADIUS));
-    }
+		if (proxy.getInitialArrowGeometry() != null) {
+			mArrow = getProxy().getInitialArrowGeometry().getPoint();
+		} else {
+			mArrow = new Point(-5, -5);
+		}
+		if (isInitial) {
+			mHandles.add(new InitialStateHandle(Math.atan2(mArrow.getY(), mArrow.getX()), p, RADIUS));
+		}
 	}
 	
 	public Arc2D getShape()
@@ -144,7 +142,7 @@ public class SimpleNodeProxyShape
   
   public List<Handle> getHandles()
   {
-    return mHandles;
+	  return mHandles;
   }
 	
   private List<Handle> mHandles;

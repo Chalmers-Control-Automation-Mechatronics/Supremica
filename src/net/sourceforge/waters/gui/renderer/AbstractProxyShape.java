@@ -19,15 +19,15 @@ public abstract class AbstractProxyShape
 		mProxy = proxy;
 	}
   
-  public void draw(Graphics2D g, RenderingInformation status)
-  {
-    super.draw(g, status);
-    if (status.showHandles()) {
-      for (RendererShape handle : getHandles()) {
-        handle.draw(g, status);
-      }
-    }
-  }
+	public void draw(Graphics2D g, RenderingInformation status)
+	{
+		super.draw(g, status);
+		if (status.showHandles()) {
+			for (RendererShape handle : getHandles()) {
+				handle.draw(g, status);
+			}
+		}
+	}
 	
 	public Proxy getProxy()
 	{

@@ -33,8 +33,8 @@ public abstract class EdgeProxyShape
 		else
 		{
 			mTurn = GeometryTools.getMidPoint(
-				GeometryTools.getPosition(edge.getSource()), 
-				GeometryTools.getPosition(edge.getTarget()));
+											  GeometryTools.getPosition(edge.getSource()), 
+											  GeometryTools.getPosition(edge.getTarget()));
 		}
 		if (edge.getStartPoint() != null)
 		{
@@ -52,13 +52,13 @@ public abstract class EdgeProxyShape
 		{
 			mEnd = GeometryTools.defaultPosition(edge.getTarget(), mTurn);
 		}
-    mHandles = new ArrayList<Handle>(2);
+		mHandles = new ArrayList<Handle>(2);
 	}
 	
-  public List<Handle> getHandles()
-  {
-    return mHandles;
-  }
+	public List<Handle> getHandles()
+	{
+		return mHandles;
+	}
   
 	public Point2D getTurningPoint()
 	{
@@ -85,86 +85,23 @@ public abstract class EdgeProxyShape
 		super.draw(g, status);
 		g.setStroke(BASICSTROKE);
 		g.setColor(status.getColor());
-    double dx = Math.sin(arrowAngle()) * 4.5;
-    double dy = Math.cos(arrowAngle()) * 4.5;
-		drawArrow((int)(mTurn.getX() - dx), (int)(mTurn.getY() - dy), arrowAngle(),
-              g);
+		double dx = Math.sin(arrowAngle()) * 4.5;
+		double dy = Math.cos(arrowAngle()) * 4.5;
+		if (ARROWATEND)
+		{
+			// Need to know the direction of the line when it intersects the target...
+			// Uff... seems like too much work right now...
+
+			// Use the arrow in the middle for now... 
+			drawArrow((int)(mTurn.getX() - dx), (int)(mTurn.getY() - dy), arrowAngle(), g);
+		}
+		else
+		{
+			drawArrow((int)(mTurn.getX() - dx), (int)(mTurn.getY() - dy), arrowAngle(), g);
+		}
 	}
 	
 	protected abstract double arrowAngle();
-	
-  /**
-	 * Draws an arrow at the point (posX, posY), which is presumed to be the middle of the edge from 
-	 * (x1, y1) to (x2, y2). If the edge is a self-loop the argument loop should be true.
-	 *
-	 * This is the "original" drawArrow method, the methods below this one are cleaned up
-	 * versions. This one, however is still used for drawing arrows "in the middle" of edges.
-	 *
-	 * @param x1 x-coordinate of starting point of edge
-	 * @param y1 y-coordinate of starting point of edge
-	 * @param x2 x-coordinate of ending point of edge
-	 * @param y2 y-coordinate of ending point of edge
-	 * @param posX x-coordinate of arrow point
-	 * @param posY y-coordinate of arrow point
-	 * @param loop true if edge is a loop
-	 * @param g2d the graphical surface where the arrow should be drawn
-	 */ 
-	private static void drawArrow(double x1, double y1, 
-						   double x2, double y2, 
-						   int posX, int posY, 
-						   boolean loop, Graphics2D g2d)
-	{
-		double theta;
-		double phi = Math.PI / 6.0;
-		int length = 9;
-		int direction;
-
-		if (y1 >= y2)
-		{
-			direction = 1;
-		}
-		else
-		{
-			direction = -1;
-		}
-
-		if (y1 == y2)
-		{
-			theta = Math.PI / 2.0;
-
-			if (x1 < x2)
-			{
-				theta *= -1;
-			}
-		}
-		else
-		{
-			theta = Math.atan((double) (x1 - x2) / (double) (y1 - y2));
-		}
-
-		if (loop)
-		{
-			theta -= Math.PI / 2.0;
-		}
-		
-		int[] xcoords = new int[3];
-		int[] ycoords = new int[3];
-
-		// The first pair of coordinates is the point of the arrow, it is adjusted somewhat
-		// from (posX, posY)
-		//xcoords[0] = posX - direction * (int) ((Math.sqrt(Math.pow(length, 2) + Math.pow(length, 2)) / 2) * Math.sin(theta));
-		//ycoords[0] = posY - direction * (int) ((Math.sqrt(Math.pow(length, 2) + Math.pow(length, 2)) / 2) * Math.cos(theta));
-		xcoords[0] = posX - direction * (int) (length / Math.sqrt(2) * Math.sin(theta)); // The same as above?
-		ycoords[0] = posY - direction * (int) (length / Math.sqrt(2) * Math.cos(theta)); // The same as above?
-		xcoords[1] = xcoords[0] + (int) (length * Math.sin(theta - phi)) * direction;
-		ycoords[1] = ycoords[0] + (int) (length * Math.cos(theta - phi)) * direction;
-		xcoords[2] = xcoords[0] + (int) (length * Math.cos(Math.PI / 2.0 - (theta + phi))) * direction;
-		ycoords[2] = ycoords[0] + (int) (length * Math.sin(Math.PI / 2.0 - (theta + phi))) * direction;
-
-		g2d.fillPolygon(xcoords, ycoords, 3);
-
-		//drawArrow(posX, posY, theta, g2d);
-	}
 
 	/**
 	 * Draws an arrow with its point EditorNode.RADIUS away from (x2, y2) pointing in the direction 
@@ -215,11 +152,6 @@ public abstract class EdgeProxyShape
 	 */
 	public static void drawArrow(int x, int y, double theta, Graphics2D g2d)
 	{
-		// The length of the side of the arrow
-		int length = 9;
-		// The angular width of the arrow (half of it actually)
-		double phi = Math.PI / 9.0;
-		
 		// Arrays of coordinates for the corners
 		int[] xcoords = new int[3];
 		int[] ycoords = new int[3];		
@@ -227,10 +159,10 @@ public abstract class EdgeProxyShape
 		// Draw arrow, the first pair of coordinates is the point
 		xcoords[0] = x;
 		ycoords[0] = y;
-		xcoords[1] = xcoords[0] + (int) Math.round(length * Math.sin(theta - phi));
-		ycoords[1] = ycoords[0] + (int) Math.round(length * Math.cos(theta - phi));
-		xcoords[2] = xcoords[0] + (int) Math.round(length * Math.cos(Math.PI / 2.0 - (theta + phi)));
-		ycoords[2] = ycoords[0] + (int) Math.round(length * Math.sin(Math.PI / 2.0 - (theta + phi)));
+		xcoords[1] = xcoords[0] + (int) Math.round(ARROWSIDE * Math.sin(theta - ARROWANGLEWIDTH));
+		ycoords[1] = ycoords[0] + (int) Math.round(ARROWSIDE * Math.cos(theta - ARROWANGLEWIDTH));
+		xcoords[2] = xcoords[0] + (int) Math.round(ARROWSIDE * Math.cos(Math.PI / 2.0 - (theta + ARROWANGLEWIDTH)));
+		ycoords[2] = ycoords[0] + (int) Math.round(ARROWSIDE * Math.sin(Math.PI / 2.0 - (theta + ARROWANGLEWIDTH)));
 		
 		// Do the drawing!
 		g2d.fillPolygon(xcoords, ycoords, 3); 
@@ -245,30 +177,30 @@ public abstract class EdgeProxyShape
 			Point2D p1 = getStartPoint();
 			Point2D p2 = getEndPoint();
 			Point2D c = getTurningPoint();
-      double r = SimpleNodeProxyShape.RADIUS;
-      QuadCurve2D curve = new QuadCurve2D.Double(p1.getX(), p1.getY(), c.getX(),
-                                               c.getY(), p2.getX(), p2.getY());
-      // set quadcurve to be on edge of node
-      if (e.getSource() instanceof SimpleNodeProxy) {
-        if (p1.equals(((SimpleNodeProxy)e.getSource())
-                      .getPointGeometry().getPoint())) {
-          p1 = GeometryTools.getRadialPoint(GeometryTools.getControlPoint(curve)
-                                            , p1, r);
-        }
-      }
-      if (e.getTarget() instanceof SimpleNodeProxy) {
-        if (p2.equals(((SimpleNodeProxy)e.getTarget())
-                      .getPointGeometry().getPoint())) {
-          p2 = GeometryTools.getRadialPoint(GeometryTools.getControlPoint(curve)
-                                            , p2, r);
-        }
-      }
+			double r = SimpleNodeProxyShape.RADIUS;
+			QuadCurve2D curve = new QuadCurve2D.Double(p1.getX(), p1.getY(), c.getX(),
+													   c.getY(), p2.getX(), p2.getY());
+			// set quadcurve to be on edge of node
+			if (e.getSource() instanceof SimpleNodeProxy) {
+				if (p1.equals(((SimpleNodeProxy)e.getSource())
+							  .getPointGeometry().getPoint())) {
+					p1 = GeometryTools.getRadialPoint(GeometryTools.getControlPoint(curve)
+													  , p1, r);
+				}
+			}
+			if (e.getTarget() instanceof SimpleNodeProxy) {
+				if (p2.equals(((SimpleNodeProxy)e.getTarget())
+							  .getPointGeometry().getPoint())) {
+					p2 = GeometryTools.getRadialPoint(GeometryTools.getControlPoint(curve)
+													  , p2, r);
+				}
+			}
 			mCurve = new QuadCurve2D.Double(p1.getX(), p1.getY(), c.getX(),
-                                      c.getY(), p2.getX(), p2.getY());
+											c.getY(), p2.getX(), p2.getY());
 			mCurve.setCurve(p1, convertToControl(c, mCurve), p2);
-      // change to control point
-      mHandles.add(new DefaultHandle(p1, Handle.HandleType.SOURCE));
-      mHandles.add(new DefaultHandle(p2, Handle.HandleType.TARGET));
+			// change to control point
+			mHandles.add(new DefaultHandle(p1, Handle.HandleType.SOURCE));
+			mHandles.add(new DefaultHandle(p2, Handle.HandleType.TARGET));
 		}
 		
 		public QuadCurve2D getShape()
@@ -278,11 +210,11 @@ public abstract class EdgeProxyShape
 		
 		public boolean isClicked(int ex, int ey)
 		{
-      for (Handle h : getHandles()) {
-        if (h.isClicked(ex, ey)) {
-          return true;
-        }
-      }
+			for (Handle h : getHandles()) {
+				if (h.isClicked(ex, ey)) {
+					return true;
+				}
+			}
 			Rectangle2D rect = new Rectangle2D.Double(ex - 2, ey - 2, 4, 4);
 			QuadCurve2D q1 = new QuadCurve2D.Double();
 			QuadCurve2D q2 = new QuadCurve2D.Double();
@@ -341,20 +273,20 @@ public abstract class EdgeProxyShape
 													  r * 2, r * 2);
 			Arc2D arc = new Arc2D.Double(rect, -(Math.toDegrees(theta) + ARCEXTENT/2),
 										 ARCEXTENT, Arc2D.OPEN);
-      // different r for setting up where the handle is positioned
-      r = SimpleNodeProxyShape.RADIUS;
-      Point2D p1;
-      Point2D p2;
-      if (e.getSource() instanceof  SimpleNodeProxy) {
-        p1 = GeometryTools.getRadialPoint(arc.getStartPoint(), p, r);
-      } else {
-        p1 = p;
-      }
-      if (e.getTarget() instanceof  SimpleNodeProxy) {
-      p2 = GeometryTools.getRadialPoint(arc.getEndPoint(), p, r);
-      } else {
-        p2 = p;
-      }
+			// different r for setting up where the handle is positioned
+			r = SimpleNodeProxyShape.RADIUS;
+			Point2D p1;
+			Point2D p2;
+			if (e.getSource() instanceof  SimpleNodeProxy) {
+				p1 = GeometryTools.getRadialPoint(arc.getStartPoint(), p, r);
+			} else {
+				p1 = p;
+			}
+			if (e.getTarget() instanceof  SimpleNodeProxy) {
+				p2 = GeometryTools.getRadialPoint(arc.getEndPoint(), p, r);
+			} else {
+				p2 = p;
+			}
 			Line2D line1 = new Line2D.Double(p1, arc.getStartPoint());
 			Line2D line2 = new Line2D.Double(arc.getEndPoint(), p2);
 			mCurve = new GeneralPath(GeneralPath.WIND_NON_ZERO, 3);
@@ -362,8 +294,8 @@ public abstract class EdgeProxyShape
 			mCurve.append(arc , true);
 			mCurve.append(line2, true);
 			mCurve.closePath();
-      mHandles.add(new DefaultHandle(p1, Handle.HandleType.SOURCE));
-      mHandles.add(new DefaultHandle(p2, Handle.HandleType.TARGET));
+			mHandles.add(new DefaultHandle(p1, Handle.HandleType.SOURCE));
+			mHandles.add(new DefaultHandle(p2, Handle.HandleType.TARGET));
 		}
 		
 		public GeneralPath getShape()
@@ -373,11 +305,11 @@ public abstract class EdgeProxyShape
 		
 		public boolean isClicked(int ex, int ey)
 		{
-      for (Handle h : getHandles()) {
-        if (h.isClicked(ex, ey)) {
-          return true;
-        }
-      }
+			for (Handle h : getHandles()) {
+				if (h.isClicked(ex, ey)) {
+					return true;
+				}
+			}
 			Rectangle2D rect = new Rectangle2D.Double(ex - 2, ey - 2, 4, 4);
 			return (getShape().intersects(rect) && !getShape().contains(rect));
 		}
@@ -395,7 +327,7 @@ public abstract class EdgeProxyShape
 		private final GeneralPath mCurve;
 	}
   
-  public static boolean getArrowAtEnd()
+	public static boolean getArrowAtEnd()
 	{
 		return ARROWATEND;
 	}
@@ -403,12 +335,17 @@ public abstract class EdgeProxyShape
 	{
 		ARROWATEND = set;
 	}
-  
-  /** Arrows at end of edge or in the middle? */
+	
+	/** Arrows at end of edge or in the middle? */
 	private static boolean ARROWATEND = ModuleWindow.DES_COURSE_VERSION;
 	
-  protected final List<Handle> mHandles;
+	protected final List<Handle> mHandles;
 	private final Point2D mTurn;
 	private final Point2D mStart;
 	private final Point2D mEnd;
+
+	/** The length of the side of the arrow. */
+	public static final int ARROWSIDE = 9;
+	/** The width of the point of the arrow. */
+	public static final double ARROWANGLEWIDTH = Math.PI / 7.0;
 }
