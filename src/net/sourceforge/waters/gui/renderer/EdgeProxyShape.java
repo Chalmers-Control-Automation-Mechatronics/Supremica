@@ -6,6 +6,8 @@ import java.awt.Shape;
 
 import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.FlatteningPathIterator;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
@@ -85,32 +87,54 @@ public abstract class EdgeProxyShape
 		super.draw(g, status);
 		g.setStroke(BASICSTROKE);
 		g.setColor(status.getColor());
-		double dx = Math.sin(arrowAngle()) * 4.5;
-		double dy = Math.cos(arrowAngle()) * 4.5;
 		if (ARROWATEND)
 		{
-			// Need to know the direction of the line when it intersects the target...
-			// Uff... seems like too much work right now...
+			// The direction of the arrow calculated from two
+			// coordinate pairs. Per default startpoint to endpoint,
+			// but the start, (x1, y1), needs to be changed if the
+			// line is curved...
+			double x1 = mStart.getX(); // Default
+			double y1 = mStart.getY(); // Default
+			double x2 = mEnd.getX();
+			double y2 = mEnd.getY();
 
-			// Use the arrow in the middle for now... 
-			drawArrow((int)(mTurn.getX() - dx), (int)(mTurn.getY() - dy), arrowAngle(), g);
+			// Need to find the real direction of the line when it
+			// reaches the endpoint...
+
+			// Get the shape of the line
+			Shape curve = getShape();
+			
+			// Find the coordinate of the second-to-last segment of the curve
+			FlatteningPathIterator it = 
+				new FlatteningPathIterator(curve.getPathIterator(new AffineTransform()), 0.5, 25);
+			while (!it.isDone())
+			{
+				double[] segment = new double[6];
+				int type = it.currentSegment(segment);				
+				it.next();
+				
+				// If there is another one (the last one?) take the current one!
+				if (!it.isDone())
+				{
+					x1 = segment[0];				
+					y1 = segment[1];
+				}
+			}
+
+			// Draw arrow, pointing in the direction given by (x1,y1),
+			// (x2,y2), at a distance SimpleNodeProxyShape.RADIUS from
+			// the end point!
+			drawArrow(x1, y1, x2, y2, SimpleNodeProxyShape.RADIUS, g);
 		}
 		else
 		{
+			double dx = Math.sin(arrowAngle()) * 4.5;
+			double dy = Math.cos(arrowAngle()) * 4.5;
 			drawArrow((int)(mTurn.getX() - dx), (int)(mTurn.getY() - dy), arrowAngle(), g);
 		}
 	}
 	
 	protected abstract double arrowAngle();
-
-	/**
-	 * Draws an arrow with its point EditorNode.RADIUS away from (x2, y2) pointing in the direction 
-	 * indicated by the two points (x1, y1) and (x2, y2).
-	 */
-	private static void drawArrow(double x1, double y1, double x2, double y2, Graphics2D g2d)
-	{
-		drawArrow(x1, y1, x2, y2, SimpleNodeProxyShape.RADIUS, g2d);
-	}
 
 	/**
 	 * Draws an arrow with its point {@code distance} away from (x2, y2) pointing in the direction indicated 

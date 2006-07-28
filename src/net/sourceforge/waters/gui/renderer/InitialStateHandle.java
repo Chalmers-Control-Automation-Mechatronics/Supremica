@@ -30,21 +30,23 @@ public class InitialStateHandle
 	 * arrows. This since they are rendered using different
 	 * fill-methods? 
 	 */
-	private static GeneralPath createArrow(double x, double y, double arrowAngle)
+	private static GeneralPath createArrow(double x, double y, double theta)
 	{
 		//int length = 9;
 		//double phi = Math.PI / 9.0;
 		int length = EdgeProxyShape.ARROWSIDE;       // Same as edge arrows
 		double phi = EdgeProxyShape.ARROWANGLEWIDTH; // Same as edge arrows
+		length = length - 1; // Strangely enough, it's too big otherwise (and still is)!!
 		double[] xcoords = new double[3];
 		double[] ycoords = new double[3];
+
 		// Draw arrow, the first pair of coordinates is the point
 		xcoords[0] = x;
 		ycoords[0] = y;
-		xcoords[1] = xcoords[0] + length * Math.cos(arrowAngle - phi);
-		ycoords[1] = ycoords[0] + length * Math.sin(arrowAngle - phi);
-		xcoords[2] = xcoords[0] + length * Math.cos(arrowAngle + phi);
-		ycoords[2] = ycoords[0] + length * Math.sin(arrowAngle + phi);
+		xcoords[1] = xcoords[0] + length * Math.cos(theta - phi);
+		ycoords[1] = ycoords[0] + length * Math.sin(theta - phi);
+		xcoords[2] = xcoords[0] + length * Math.cos(theta + phi);
+		ycoords[2] = ycoords[0] + length * Math.sin(theta + phi);
 		GeneralPath arrow = new GeneralPath(GeneralPath.WIND_NON_ZERO, 3);
 		arrow.append(new Line2D.Double(xcoords[0], ycoords[0],
 									   xcoords[1], ycoords[1]), false);
