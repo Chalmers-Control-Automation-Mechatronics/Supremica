@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControllabilityCheckerTest
 //###########################################################################
-//# $Id: ControllabilityCheckerTest.java,v 1.4 2006-07-25 22:06:07 robi Exp $
+//# $Id: ControllabilityCheckerTest.java,v 1.5 2006-07-28 08:02:49 js173 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -299,7 +299,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
       final int accepted = checkCounterExample(aut, eventlist);
       if (akind.equals(ComponentKind.PLANT)){
 	assertTrue("Counterexample not accepted by plant " +
-		   aut.getName() + "!",
+		   aut.getName() + "!"+" accepted "+accepted+" len "+len,
 		   accepted == len);
       } else if(akind.equals(ComponentKind.SPEC)){
 	assertFalse("Counterexample rejected too early (step " + accepted +
@@ -340,7 +340,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
             break;
           }
         }
-        if(!found){
+        if(!found){        	
           return steps;
         }
       }
