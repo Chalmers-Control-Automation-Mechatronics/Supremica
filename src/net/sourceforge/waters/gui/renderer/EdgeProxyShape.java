@@ -122,9 +122,9 @@ public abstract class EdgeProxyShape
 			}
 
 			// Draw arrow, pointing in the direction given by (x1,y1),
-			// (x2,y2), at a distance SimpleNodeProxyShape.RADIUS from
+			// (x2,y2), at a distance SimpleNodeProxyShape.RADIUS+1 from
 			// the end point!
-			drawArrow(x1, y1, x2, y2, SimpleNodeProxyShape.RADIUS, g);
+			drawArrow(x1, y1, x2, y2, SimpleNodeProxyShape.RADIUS+1, g);
 		}
 		else
 		{
@@ -183,12 +183,13 @@ public abstract class EdgeProxyShape
 		// Draw arrow, the first pair of coordinates is the point
 		xcoords[0] = x;
 		ycoords[0] = y;
-		xcoords[1] = xcoords[0] + (int) Math.round(ARROWSIDE * Math.sin(theta - ARROWANGLEWIDTH));
-		ycoords[1] = ycoords[0] + (int) Math.round(ARROWSIDE * Math.cos(theta - ARROWANGLEWIDTH));
-		xcoords[2] = xcoords[0] + (int) Math.round(ARROWSIDE * Math.cos(Math.PI / 2.0 - (theta + ARROWANGLEWIDTH)));
-		ycoords[2] = ycoords[0] + (int) Math.round(ARROWSIDE * Math.sin(Math.PI / 2.0 - (theta + ARROWANGLEWIDTH)));
+		xcoords[1] = xcoords[0] + (int) Math.round(ARROWSIDE * Math.sin(theta - ARROWANGLEWIDTH/2.0));
+		ycoords[1] = ycoords[0] + (int) Math.round(ARROWSIDE * Math.cos(theta - ARROWANGLEWIDTH/2.0));
+		xcoords[2] = xcoords[0] + (int) Math.round(ARROWSIDE * Math.cos(Math.PI / 2.0 - (theta + ARROWANGLEWIDTH/2.0)));
+		ycoords[2] = ycoords[0] + (int) Math.round(ARROWSIDE * Math.sin(Math.PI / 2.0 - (theta + ARROWANGLEWIDTH/2.0)));
 		
 		// Do the drawing!
+		g2d.drawPolygon(xcoords, ycoords, 3);
 		g2d.fillPolygon(xcoords, ycoords, 3); 
 	}
 	
@@ -369,7 +370,8 @@ public abstract class EdgeProxyShape
 	private final Point2D mEnd;
 
 	/** The length of the side of the arrow. */
-	public static final int ARROWSIDE = 9;
+	public static final int ARROWSIDE = 8;
 	/** The width of the point of the arrow. */
-	public static final double ARROWANGLEWIDTH = Math.PI / 7.0;
+	public static final double ARROWANGLEWIDTH = Math.PI / 3.5;
+	//public static final double ARROWANGLEWIDTH = Math.PI / 2;
 }
