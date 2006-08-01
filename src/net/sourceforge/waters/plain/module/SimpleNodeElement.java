@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   SimpleNodeElement
 //###########################################################################
-//# $Id: SimpleNodeElement.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: SimpleNodeElement.java,v 1.7 2006-08-01 04:14:47 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -15,10 +15,10 @@ import java.util.Set;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
@@ -46,7 +46,7 @@ public final class SimpleNodeElement
    * @param labelGeometry The geometric position of the label of the new simple node, or <CODE>null</CODE>.
    */
   public SimpleNodeElement(final String name,
-                           final EventListExpressionProxy propositions,
+                           final PlainEventListProxy propositions,
                            final boolean initial,
                            final PointGeometryProxy pointGeometry,
                            final PointGeometryProxy initialArrowGeometry,
@@ -70,7 +70,7 @@ public final class SimpleNodeElement
    * @param propositions The list of propositions of the new simple node.
    */
   public SimpleNodeElement(final String name,
-                           final EventListExpressionProxy propositions)
+                           final PlainEventListProxy propositions)
   {
     this(name,
          propositions,

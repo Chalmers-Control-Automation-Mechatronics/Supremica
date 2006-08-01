@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   AbstractModuleTest
 //###########################################################################
-//# $Id: AbstractModuleTest.java,v 1.3 2006-07-25 22:06:07 robi Exp $
+//# $Id: AbstractModuleTest.java,v 1.4 2006-08-01 04:14:47 robi Exp $
 //###########################################################################
 
 
@@ -238,7 +238,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     final String compname = "comp";
     final String modname = "emptyedge";
 
-    final EventListExpressionProxy props =
+    final PlainEventListProxy props =
       factory.createPlainEventListProxy(null);
     final SimpleNodeProxy node =
       factory.createSimpleNodeProxy("s0", props, true, null, null, null);
@@ -271,7 +271,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     final String compname = "comp";
     final String modname = "initarrow";
 
-    final EventListExpressionProxy props =
+    final PlainEventListProxy props =
       factory.createPlainEventListProxy(null);
     final Point2D point = new Point(48, 48);
     final PointGeometryProxy pointgeo =
@@ -312,14 +312,14 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     final EventDeclProxy decl = factory.createEventDeclProxy
       (eventname, EventKind.CONTROLLABLE);
 
-    final EventListExpressionProxy nprops =
+    final PlainEventListProxy nprops =
       factory.createPlainEventListProxy(null);
     final Point2D point = new Point(50, 50);
     final PointGeometryProxy pointgeo =
       factory.createPointGeometryProxy(point);
     final SimpleNodeProxy node =
       factory.createSimpleNodeProxy("s0", nprops, true, pointgeo, null, null);
-    final EventListExpressionProxy gprops =
+    final PlainEventListProxy gprops =
       factory.createPlainEventListProxy(null);
     final Rectangle2D rect = new Rectangle(0, 0, 100, 100);
     final BoxGeometryProxy boxgeo = factory.createBoxGeometryProxy(rect);

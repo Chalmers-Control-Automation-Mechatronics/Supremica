@@ -4,14 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   NodeSubject
 //###########################################################################
-//# $Id: NodeSubject.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: NodeSubject.java,v 1.7 2006-08-01 04:14:47 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
 
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.NamedSubject;
 
@@ -35,10 +35,10 @@ public abstract class NodeSubject
    * @param propositions The list of propositions of the new node.
    */
   protected NodeSubject(final String name,
-                        final EventListExpressionProxy propositions)
+                        final PlainEventListProxy propositions)
   {
     super(name);
-    mPropositions = (EventListExpressionSubject) propositions;
+    mPropositions = (PlainEventListSubject) propositions;
     mPropositions.setParent(this);
   }
 
@@ -78,7 +78,7 @@ public abstract class NodeSubject
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.NodeProxy
-  public EventListExpressionSubject getPropositions()
+  public PlainEventListSubject getPropositions()
   {
     return mPropositions;
   }
@@ -89,7 +89,7 @@ public abstract class NodeSubject
   /**
    * Sets the list of propositions of this node.
    */
-  public void setPropositions(final EventListExpressionSubject propositions)
+  public void setPropositions(final PlainEventListSubject propositions)
   {
     if (mPropositions == propositions) {
       return;
@@ -105,6 +105,6 @@ public abstract class NodeSubject
 
   //#########################################################################
   //# Data Members
-  private EventListExpressionSubject mPropositions;
+  private PlainEventListSubject mPropositions;
 
 }

@@ -1,10 +1,10 @@
-//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateNodeCommand
 //###########################################################################
-//# $Id: CreateNodeCommand.java,v 1.10 2006-07-20 02:28:37 robi Exp $
+//# $Id: CreateNodeCommand.java,v 1.11 2006-08-01 04:14:47 robi Exp $
 //###########################################################################
 
 
@@ -12,21 +12,14 @@ package net.sourceforge.waters.gui.command;
 
 import java.awt.Point;
 
-import java.util.Collection;
-import java.util.Collections;
-import javax.swing.undo.AbstractUndoableEdit;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-
-import net.sourceforge.waters.gui.ControlledSurface;
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.subject.module.EventListExpressionSubject;
-import net.sourceforge.waters.subject.module.PlainEventListSubject;
-import net.sourceforge.waters.subject.module.GraphSubject;
-import net.sourceforge.waters.subject.module.PointGeometrySubject;
-import net.sourceforge.waters.subject.module.LabelGeometrySubject;
-import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.gui.renderer.LabelProxyShape;
+import net.sourceforge.waters.subject.base.IndexedSetSubject;
+import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.LabelGeometrySubject;
+import net.sourceforge.waters.subject.module.NodeSubject;
+import net.sourceforge.waters.subject.module.PlainEventListSubject;
+import net.sourceforge.waters.subject.module.PointGeometrySubject;
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
 
 /**
@@ -36,11 +29,11 @@ import net.sourceforge.waters.gui.renderer.LabelProxyShape;
  */
 
 public class CreateNodeCommand
-    implements Command
+  implements Command
 {
 
-	//#######################################################################
-	//# Constructor
+  //#########################################################################
+  //# Constructor
   /**
    * Constructs a new CreateNodeCommand with the specified surface and
    * creates the node in the x,y position specified
@@ -51,20 +44,20 @@ public class CreateNodeCommand
   public CreateNodeCommand(GraphSubject graph, int x, int y)
   {
     mGraph = graph;
-    // Find a unique name!
-    final Collection<Proxy> empty = Collections.emptyList();
-    final EventListExpressionSubject props =
-      new PlainEventListSubject(empty);
+    final PlainEventListSubject props =
+      new PlainEventListSubject(null);
     final PointGeometrySubject point = new PointGeometrySubject(
       new Point(x, y));
     final LabelGeometrySubject label = new LabelGeometrySubject(
-      new Point(LabelProxyShape.DEFAULTOFFSETX, LabelProxyShape.DEFAULTOFFSETY));
-    
-    String n = "S0";
-    for (int i = 0; graph.getNodesModifiable().containsName(n); i++) {
-      n = "S" + i;
+      new Point(LabelProxyShape.DEFAULTOFFSETX,
+                LabelProxyShape.DEFAULTOFFSETY));
+    final IndexedSetSubject<NodeSubject> nodes = graph.getNodesModifiable();
+    // Find a unique name!
+    String name = "S0";
+    for (int i = 0; nodes.containsName(name); i++) {
+      name = "S" + i;
     }
-    mCreated = new SimpleNodeSubject(n, props, false, point, null, label);
+    mCreated = new SimpleNodeSubject(name, props, false, point, null, label);
   }
 
   /**
@@ -78,7 +71,6 @@ public class CreateNodeCommand
   /** 
    * Undoes the Command
    */    
-
   public void undo()
   {
     mGraph.getNodesModifiable().remove(mCreated);
@@ -86,16 +78,17 @@ public class CreateNodeCommand
 
   public String getName()
   {
-  return mDescription;
+    return mDescription;
   }
 
-	public boolean isSignificant()
-	{
-		return true;
-	}
+  public boolean isSignificant()
+  {
+    return true;
+  }
 
-	//#######################################################################
-	//# Data Members
+
+  //#########################################################################
+  //# Data Members
   /** The ControlledSurface Edited with this Command */
   private final GraphSubject mGraph;
   /** The Node Created by this Command */

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SimpleNodeSubject
 //###########################################################################
-//# $Id: SimpleNodeSubject.java,v 1.9 2006-07-20 02:28:37 robi Exp $
+//# $Id: SimpleNodeSubject.java,v 1.10 2006-08-01 04:14:47 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -15,10 +15,10 @@ import java.util.Set;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
@@ -47,7 +47,7 @@ public final class SimpleNodeSubject
    * @param labelGeometry The geometric position of the label of the new simple node, or <CODE>null</CODE>.
    */
   public SimpleNodeSubject(final String name,
-                           final EventListExpressionProxy propositions,
+                           final PlainEventListProxy propositions,
                            final boolean initial,
                            final PointGeometryProxy pointGeometry,
                            final PointGeometryProxy initialArrowGeometry,
@@ -80,7 +80,7 @@ public final class SimpleNodeSubject
    * @param propositions The list of propositions of the new simple node.
    */
   public SimpleNodeSubject(final String name,
-                           final EventListExpressionProxy propositions)
+                           final PlainEventListProxy propositions)
   {
     this(name,
          propositions,

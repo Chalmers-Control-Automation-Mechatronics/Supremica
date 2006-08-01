@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.12 2006-07-20 02:28:37 robi Exp $
+//# $Id: JAXBModuleImporter.java,v 1.13 2006-08-01 04:14:47 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -787,7 +787,7 @@ public class JAXBModuleImporter
     final String name = element.getName();
     final List<Proxy> eventList = new LinkedList<Proxy>();
     mNodeEventListHandler.fromJAXB(this, element, eventList);
-    final EventListExpressionProxy propositions =
+    final PlainEventListProxy propositions =
       mFactory.createPlainEventListProxy(eventList);
     final Collection<NodeProxy> immediateChildNodes =
       new CheckedImportSet<NodeProxy>(GroupNodeProxy.class, name, "node");
@@ -1010,7 +1010,7 @@ public class JAXBModuleImporter
     final String name = element.getName();
     final List<Proxy> eventList = new LinkedList<Proxy>();
     mNodeEventListHandler.fromJAXB(this, element, eventList);
-    final EventListExpressionProxy propositions =
+    final PlainEventListProxy propositions =
       mFactory.createPlainEventListProxy(eventList);
     final boolean initial = element.isInitial();
     final PointGeometryType pointGeometryElement = element.getPointGeometry();

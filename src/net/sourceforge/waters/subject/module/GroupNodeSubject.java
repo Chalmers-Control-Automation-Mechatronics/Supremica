@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   GroupNodeSubject
 //###########################################################################
-//# $Id: GroupNodeSubject.java,v 1.8 2006-07-20 02:28:37 robi Exp $
+//# $Id: GroupNodeSubject.java,v 1.9 2006-08-01 04:14:47 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -19,10 +19,10 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
-import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.SetSubject;
@@ -49,7 +49,7 @@ public final class GroupNodeSubject
    * @param geometry The geometric information of the new group node, or <CODE>null</CODE>.
    */
   public GroupNodeSubject(final String name,
-                          final EventListExpressionProxy propositions,
+                          final PlainEventListProxy propositions,
                           final Collection<? extends NodeProxy> immediateChildNodes,
                           final BoxGeometryProxy geometry)
   {
@@ -75,7 +75,7 @@ public final class GroupNodeSubject
    * @param propositions The list of propositions of the new group node.
    */
   public GroupNodeSubject(final String name,
-                          final EventListExpressionProxy propositions)
+                          final PlainEventListProxy propositions)
   {
     this(name,
          propositions,

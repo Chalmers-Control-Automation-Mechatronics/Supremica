@@ -4,14 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   NodeElement
 //###########################################################################
-//# $Id: NodeElement.java,v 1.5 2006-07-20 02:28:37 robi Exp $
+//# $Id: NodeElement.java,v 1.6 2006-08-01 04:14:47 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
 
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.plain.base.NamedElement;
 
 
@@ -34,7 +34,7 @@ public abstract class NodeElement
    * @param propositions The list of propositions of the new node.
    */
   protected NodeElement(final String name,
-                        final EventListExpressionProxy propositions)
+                        final PlainEventListProxy propositions)
   {
     super(name);
     mPropositions = propositions;
@@ -73,7 +73,7 @@ public abstract class NodeElement
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.NodeProxy
-  public EventListExpressionProxy getPropositions()
+  public PlainEventListProxy getPropositions()
   {
     return mPropositions;
   }
@@ -81,6 +81,6 @@ public abstract class NodeElement
 
   //#########################################################################
   //# Data Members
-  private final EventListExpressionProxy mPropositions;
+  private final PlainEventListProxy mPropositions;
 
 }

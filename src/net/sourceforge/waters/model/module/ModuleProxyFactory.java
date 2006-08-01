@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleProxyFactory
 //###########################################################################
-//# $Id: ModuleProxyFactory.java,v 1.9 2006-07-25 22:06:07 robi Exp $
+//# $Id: ModuleProxyFactory.java,v 1.10 2006-08-01 04:14:47 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -282,7 +282,7 @@ public interface ModuleProxyFactory
    */
   public GroupNodeProxy createGroupNodeProxy
       (String name,
-       EventListExpressionProxy propositions,
+       PlainEventListProxy propositions,
        Collection<? extends NodeProxy> immediateChildNodes,
        BoxGeometryProxy geometry);
 
@@ -296,7 +296,7 @@ public interface ModuleProxyFactory
    */
   public GroupNodeProxy createGroupNodeProxy
       (String name,
-       EventListExpressionProxy propositions);
+       PlainEventListProxy propositions);
 
   /**
    * Creates a new guard action block.
@@ -552,7 +552,7 @@ public interface ModuleProxyFactory
    */
   public SimpleNodeProxy createSimpleNodeProxy
       (String name,
-       EventListExpressionProxy propositions,
+       PlainEventListProxy propositions,
        boolean initial,
        PointGeometryProxy pointGeometry,
        PointGeometryProxy initialArrowGeometry,
@@ -570,7 +570,7 @@ public interface ModuleProxyFactory
    */
   public SimpleNodeProxy createSimpleNodeProxy
       (String name,
-       EventListExpressionProxy propositions);
+       PlainEventListProxy propositions);
 
   /**
    * Creates a new spline geometry.

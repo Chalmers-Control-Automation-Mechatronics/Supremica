@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   MazeCompiler
 //###########################################################################
-//# $Id: MazeCompiler.java,v 1.7 2006-07-25 22:06:07 robi Exp $
+//# $Id: MazeCompiler.java,v 1.8 2006-08-01 04:14:47 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
@@ -33,7 +33,6 @@ import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
@@ -42,6 +41,7 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.ParameterProxy;
+import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
@@ -202,8 +202,8 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
       mUseLanguageInclusion ? ComponentKind.PROPERTY : ComponentKind.SPEC;
     final SimpleIdentifierProxy ident =
       mFactory.createSimpleIdentifierProxy("property");
-    final EventListExpressionProxy props =
-      mFactory.createPlainEventListProxy(null);  
+    final PlainEventListProxy props =
+      mFactory.createPlainEventListProxy();  
     final SimpleNodeProxy node =
       mFactory.createSimpleNodeProxy("q0", props, true, null, null, null);
     final List<SimpleNodeProxy> nodes = Collections.singletonList(node);

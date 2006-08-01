@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ModuleSubjectFactory
 //###########################################################################
-//# $Id: ModuleSubjectFactory.java,v 1.9 2006-07-25 22:06:07 robi Exp $
+//# $Id: ModuleSubjectFactory.java,v 1.10 2006-08-01 04:14:47 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -23,7 +23,6 @@ import net.sourceforge.waters.model.module.BoxGeometryProxy;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
@@ -34,6 +33,7 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.ParameterProxy;
+import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
@@ -415,7 +415,7 @@ public class ModuleSubjectFactory
    */
   public GroupNodeSubject createGroupNodeProxy
       (final String name,
-       final EventListExpressionProxy propositions,
+       final PlainEventListProxy propositions,
        final Collection<? extends NodeProxy> immediateChildNodes,
        final BoxGeometryProxy geometry)
   {
@@ -435,7 +435,7 @@ public class ModuleSubjectFactory
    */
   public GroupNodeSubject createGroupNodeProxy
       (final String name,
-       final EventListExpressionProxy propositions)
+       final PlainEventListProxy propositions)
   {
     return new GroupNodeSubject(name,
                                 propositions);
@@ -794,7 +794,7 @@ public class ModuleSubjectFactory
    */
   public SimpleNodeSubject createSimpleNodeProxy
       (final String name,
-       final EventListExpressionProxy propositions,
+       final PlainEventListProxy propositions,
        final boolean initial,
        final PointGeometryProxy pointGeometry,
        final PointGeometryProxy initialArrowGeometry,
@@ -820,7 +820,7 @@ public class ModuleSubjectFactory
    */
   public SimpleNodeSubject createSimpleNodeProxy
       (final String name,
-       final EventListExpressionProxy propositions)
+       final PlainEventListProxy propositions)
   {
     return new SimpleNodeSubject(name,
                                  propositions);
