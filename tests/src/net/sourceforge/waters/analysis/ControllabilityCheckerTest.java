@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControllabilityCheckerTest
 //###########################################################################
-//# $Id: ControllabilityCheckerTest.java,v 1.5 2006-07-28 08:02:49 js173 Exp $
+//# $Id: ControllabilityCheckerTest.java,v 1.6 2006-08-01 22:05:24 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -39,7 +39,6 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
   //# Overrides for base class junit.framework.TestCase
   public void setUp() throws Exception
   {    
-    //setup document manager
     mFactory = ProductDESElementFactory.getInstance();
     mTraceMarshaller = new JAXBTraceMarshaller(mFactory);
     mDESMarshaller = new JAXBProductDESMarshaller(mFactory);
@@ -260,10 +259,16 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
       (ProductDESProxy) mDocumentManager.load(filename);
     final ControllabilityChecker checker =
       new ControllabilityChecker(des, mFactory);
-    assertEquals(expect, checker.run());
-    if (!expect) {
-      final SafetyTraceProxy counterexample = checker.getCounterExample();
+    final boolean result = checker.run();
+    SafetyTraceProxy counterexample = null;
+    if (!result) {
+      counterexample = checker.getCounterExample();
       saveCounterExample(counterexample);
+    }
+    assertEquals("Wrong result from controllability checker: got " +
+                 result + " but should have been " + expect + "!",
+                 result, expect);
+    if (!expect) {
       checkCounterExample(des, counterexample);
     }
   }
