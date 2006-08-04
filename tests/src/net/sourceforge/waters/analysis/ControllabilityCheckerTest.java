@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControllabilityCheckerTest
 //###########################################################################
-//# $Id: ControllabilityCheckerTest.java,v 1.6 2006-08-01 22:05:24 robi Exp $
+//# $Id: ControllabilityCheckerTest.java,v 1.7 2006-08-04 06:45:23 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -56,8 +56,37 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     junit.textui.TestRunner.run(suite()); 
   }
 
+
   //#########################################################################
-  //# Test Cases
+  //# Test Cases --- handwritten
+  public void testSmallFactory2() throws Exception
+  {
+    String group = "handwritten";
+    String name = "small_factory_2.wdes";
+    runControllabilityChecker(group, name, true);
+  }
+  
+  public void testTictactoe() throws Exception
+  {
+    String group = "handwritten";
+    String name = "tictactoe.wdes";
+    runControllabilityChecker(group, name, false);
+  }
+
+
+  //#########################################################################
+  //# Test Cases --- tests
+  public void testMx27() throws Exception
+  {
+    String group = "tests";
+    String dir  = "nasty";
+    String name = "mx27.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+
+  //#########################################################################
+  //# Test Cases --- valid
   public void testBigFactory() throws Exception
   {
     String group = "valid";
@@ -130,13 +159,6 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     runControllabilityChecker(group, dir, name, true);
   }
   
-  public void testMx27() throws Exception
-  {
-    String group = "nasty_tests";
-    String name = "mx27.wdes";
-    runControllabilityChecker(group, name, false);
-  }
-  
   public void testSafetydisplay() throws Exception
   {
     String group = "valid";
@@ -161,26 +183,12 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     runControllabilityChecker(group, dir, name, false);
   }
 
-  public void testSmallFactory2() throws Exception
-  {
-    String group = "handwritten";
-    String name = "small_factory_2.wdes";
-    runControllabilityChecker(group, name, true);
-  }
-  
   public void testSmd() throws Exception
   {
     String group = "valid";
     String dir = "smd";
     String name = "smdreset.wdes";
     runControllabilityChecker(group, dir, name, true);
-  }
-
-  public void testTictactoe() throws Exception
-  {
-    String group = "handwritten";
-    String name = "tictactoe.wdes";
-    runControllabilityChecker(group, name, false);
   }
 
   public void testTline_0() throws Exception
