@@ -287,7 +287,7 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/samples/maze/*Test.java"/>
+          <include name="net/sourceforge/waters/analysis/BlockedArrayListTest.java"/>
         </fileset>
       </batchtest>
       <classpath>
@@ -363,7 +363,8 @@
     <delete dir="${javadoc}"/>
     <delete dir="${javah.dir}"/>
     <delete dir="${jniglue.outdir}"/>
-    <exec executable="${native.make}" dir="${cpp}">
+    <exec executable="${native.make}" dir="${cpp}"
+          failifexecutionfails="false">
       <arg value="clean"/>
     </exec>
   </target>
