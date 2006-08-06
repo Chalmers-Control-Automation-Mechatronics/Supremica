@@ -1,0 +1,875 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="gb20" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Name="req_stop"/>
+<EventDecl Kind="CONTROLLABLE" Name="close_in"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="s2_on"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="s1_off"/>
+<EventDecl Kind="CONTROLLABLE" Name="open_in"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="req_start"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="jelly"/>
+<EventDecl Kind="CONTROLLABLE" Name="close_out"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="s2_off"/>
+<EventDecl Kind="CONTROLLABLE" Name="stirrer_on"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="s1_on"/>
+<EventDecl Kind="CONTROLLABLE" Name="stirrer_off"/>
+<EventDecl Kind="CONTROLLABLE" Name="open_out"/>
+<EventDecl Kind="PROPOSITION" Name=":omega"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="a_stopFlowThrough"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="close_in"/>
+<SimpleIdentifier Name="close_out"/>
+<SimpleIdentifier Name="open_in"/>
+<SimpleIdentifier Name="open_out"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="CLOSED">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="48" X="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-9" X="-65"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="OUT_OPEN">
+<PointGeometry>
+<Point Y="48" X="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="31" X="-11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="IN_OPEN">
+<PointGeometry>
+<Point Y="160" X="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="9" X="17"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="CLOSED" Source="OUT_OPEN">
+<LabelBlock>
+<SimpleIdentifier Name="close_out"/>
+<LabelGeometry Anchor="NW">
+<Point Y="7" X="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="65" X="152"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="CLOSED" Source="IN_OPEN">
+<LabelBlock>
+<SimpleIdentifier Name="close_in"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="104" X="112"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="OUT_OPEN" Source="CLOSED">
+<LabelBlock>
+<SimpleIdentifier Name="open_out"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-16" X="-25"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="32" X="153"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="IN_OPEN" Source="CLOSED">
+<LabelBlock>
+<SimpleIdentifier Name="open_in"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="-51"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="104" X="80"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="b_tankMustBeFull"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="open_out"/>
+<SimpleIdentifier Name="s2_off"/>
+<SimpleIdentifier Name="s2_on"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="CANNOTDISCHARGE">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="48" X="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-20" X="-50"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="CANDISCHARGE">
+<PointGeometry>
+<Point Y="160" X="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="24" X="-39"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="CANNOTDISCHARGE" Source="CANNOTDISCHARGE">
+<LabelBlock>
+<SimpleIdentifier Name="s2_off"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="47" X="133"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="CANDISCHARGE" Source="CANNOTDISCHARGE">
+<LabelBlock>
+<SimpleIdentifier Name="s2_on"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="-42"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="105" X="80"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="CANNOTDISCHARGE" Source="CANDISCHARGE">
+<LabelBlock>
+<SimpleIdentifier Name="open_out"/>
+<SimpleIdentifier Name="s2_off"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-10" X="7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="106" X="113"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="c_reqSpec"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="open_out"/>
+<SimpleIdentifier Name="req_start"/>
+<SimpleIdentifier Name="req_stop"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="CANDISCHARGE">
+<PointGeometry>
+<Point Y="304" X="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="30" X="-50"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="CANNOTDISCHARGE">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="192" X="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-16" X="-58"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="CANNOTDISCHARGE" Source="CANNOTDISCHARGE">
+<LabelBlock>
+<SimpleIdentifier Name="req_stop"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="192" X="145"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="CANDISCHARGE" Source="CANNOTDISCHARGE">
+<LabelBlock>
+<SimpleIdentifier Name="req_start"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-5" X="-59"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="250" X="96"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="CANNOTDISCHARGE" Source="CANDISCHARGE">
+<LabelBlock>
+<SimpleIdentifier Name="req_stop"/>
+<SimpleIdentifier Name="open_out"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-10" X="9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="250" X="129"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="d_stopDischarge"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="close_out"/>
+<SimpleIdentifier Name="open_out"/>
+<SimpleIdentifier Name="req_start"/>
+<SimpleIdentifier Name="req_stop"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="STOPPING">
+<PointGeometry>
+<Point Y="144" X="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="29" X="-32"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="START">
+<PointGeometry>
+<Point Y="64" X="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="33" X="-10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="STOP">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="64" X="80"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="31" X="-18"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="STOPPING" Source="START">
+<LabelBlock>
+<SimpleIdentifier Name="req_stop"/>
+<LabelGeometry Anchor="NW">
+<Point Y="13" X="-1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="117" X="192"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="START" Source="STOP">
+<LabelBlock>
+<SimpleIdentifier Name="open_out"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-22" X="-28"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="47" X="144"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="STOP" Source="STOP">
+<LabelBlock>
+<SimpleIdentifier Name="req_start"/>
+<SimpleIdentifier Name="req_stop"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-47" X="-18"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="61" X="42"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="START" Source="STOPPING">
+<LabelBlock>
+<SimpleIdentifier Name="req_start"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-20" X="-42"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="99" X="170"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="STOP" Source="STOPPING">
+<LabelBlock>
+<SimpleIdentifier Name="close_out"/>
+<LabelGeometry Anchor="NW">
+<Point Y="9" X="-53"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="e_stir"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="close_in"/>
+<SimpleIdentifier Name="open_in"/>
+<SimpleIdentifier Name="s1_off"/>
+<SimpleIdentifier Name="s1_on"/>
+<SimpleIdentifier Name="stirrer_off"/>
+<SimpleIdentifier Name="stirrer_on"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="NOTNEEDSTIR">
+<PointGeometry>
+<Point Y="208" X="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="27" X="-36"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="NEEDSTIR">
+<PointGeometry>
+<Point Y="112" X="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-14" X="-28"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="STIROFF">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="160" X="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="30" X="-30"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="STIRON">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="160" X="352"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="30" X="-14"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="STIROFF" Source="NOTNEEDSTIR">
+<LabelBlock>
+<SimpleIdentifier Name="stirrer_off"/>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="-40"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="192" X="162"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="STIRON" Source="NEEDSTIR">
+<LabelBlock>
+<SimpleIdentifier Name="stirrer_on"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-13" X="-1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="128" X="321"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="NOTNEEDSTIR" Source="STIRON">
+<LabelBlock>
+<SimpleIdentifier Name="s1_off"/>
+<LabelGeometry Anchor="NW">
+<Point Y="11" X="-4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="192" X="321"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="STIRON" Source="STIRON">
+<LabelBlock>
+<SimpleIdentifier Name="open_in"/>
+<SimpleIdentifier Name="close_in"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-15" X="7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="161" X="388"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="NEEDSTIR" Source="STIROFF">
+<LabelBlock>
+<SimpleIdentifier Name="s1_on"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-23" X="-19"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="128" X="162"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="STIROFF" Source="STIROFF">
+<LabelBlock>
+<SimpleIdentifier Name="open_in"/>
+<SimpleIdentifier Name="close_in"/>
+<SimpleIdentifier Name="s1_off"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-13" X="-47"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="160" X="91"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="prop_no_jelly"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="jelly"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="96" X="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="24" X="-8"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="requests"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="req_start"/>
+<SimpleIdentifier Name="req_stop"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="REQ">
+<PointGeometry>
+<Point Y="144" X="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="16" X="8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="NOREQ">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="144" X="112"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="17" X="-57"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="REQ" Source="NOREQ">
+<LabelBlock>
+<SimpleIdentifier Name="req_start"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="-29"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="128" X="152"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="NOREQ" Source="REQ">
+<LabelBlock>
+<SimpleIdentifier Name="req_stop"/>
+<LabelGeometry Anchor="NW">
+<Point Y="4" X="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="160" X="152"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="sensors"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="jelly"/>
+<SimpleIdentifier Name="s1_off"/>
+<SimpleIdentifier Name="s1_on"/>
+<SimpleIdentifier Name="s2_off"/>
+<SimpleIdentifier Name="s2_on"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="EMPTY">
+<PointGeometry>
+<Point Y="256" X="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="5" X="-60"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="FULL">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="128" X="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="5" X="-45"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="PARTIAL">
+<PointGeometry>
+<Point Y="192" X="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="6" X="-67"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="FULL" Source="FULL">
+<LabelBlock>
+<SimpleIdentifier Name="jelly"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="127" X="216"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="PARTIAL" Source="FULL">
+<LabelBlock>
+<SimpleIdentifier Name="s2_off"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-4" X="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="159" X="191"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="PARTIAL" Source="EMPTY">
+<LabelBlock>
+<SimpleIdentifier Name="s1_on"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-5" X="-41"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="223" X="160"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="FULL" Source="PARTIAL">
+<LabelBlock>
+<SimpleIdentifier Name="s2_on"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-3" X="-41"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="158" X="161"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="EMPTY" Source="PARTIAL">
+<LabelBlock>
+<SimpleIdentifier Name="s1_off"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-4" X="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="223" X="191"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="PARTIAL" Source="PARTIAL">
+<LabelBlock>
+<SimpleIdentifier Name="jelly"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-5" X="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="193" X="217"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="stirrer"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="jelly"/>
+<SimpleIdentifier Name="stirrer_off"/>
+<SimpleIdentifier Name="stirrer_on"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="OFF">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="112" X="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="5" X="-34"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ON">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="112" X="224"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="5" X="13"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="OFF" Source="OFF">
+<LabelBlock>
+<SimpleIdentifier Name="jelly"/>
+<LabelGeometry Anchor="NW">
+<Point Y="6" X="-40"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="80" X="145"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="ON" Source="OFF">
+<LabelBlock>
+<SimpleIdentifier Name="stirrer_on"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-13" X="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="96" X="185"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="OFF" Source="ON">
+<LabelBlock>
+<SimpleIdentifier Name="stirrer_off"/>
+<LabelGeometry Anchor="NW">
+<Point Y="4" X="-22"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="127" X="185"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="valve_in"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="close_in"/>
+<SimpleIdentifier Name="jelly"/>
+<SimpleIdentifier Name="open_in"/>
+<SimpleIdentifier Name="s1_on"/>
+<SimpleIdentifier Name="s2_on"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="OPEN">
+<PointGeometry>
+<Point Y="112" X="224"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="17" X="8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="CLOSED">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="112" X="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="17" X="-62"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="OPEN" Source="OPEN">
+<LabelBlock>
+<SimpleIdentifier Name="s1_on"/>
+<SimpleIdentifier Name="s2_on"/>
+<LabelGeometry Anchor="NW">
+<Point Y="2" X="16"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="80" X="224"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="CLOSED" Source="OPEN">
+<LabelBlock>
+<SimpleIdentifier Name="close_in"/>
+<LabelGeometry Anchor="NW">
+<Point Y="3" X="-22"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="128" X="183"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="OPEN" Source="CLOSED">
+<LabelBlock>
+<SimpleIdentifier Name="open_in"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="-23"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="96" X="184"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="CLOSED" Source="CLOSED">
+<LabelBlock>
+<SimpleIdentifier Name="jelly"/>
+<LabelGeometry Anchor="NW">
+<Point Y="7" X="-40"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="80" X="143"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="valve_out"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="close_out"/>
+<SimpleIdentifier Name="jelly"/>
+<SimpleIdentifier Name="open_out"/>
+<SimpleIdentifier Name="s1_off"/>
+<SimpleIdentifier Name="s2_off"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="CLOSED">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="112" X="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="17" X="-63"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="OPEN">
+<PointGeometry>
+<Point Y="112" X="224"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="17" X="8"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="CLOSED" Source="CLOSED">
+<LabelBlock>
+<SimpleIdentifier Name="jelly"/>
+<LabelGeometry Anchor="NW">
+<Point Y="6" X="-40"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="80" X="144"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="OPEN" Source="CLOSED">
+<LabelBlock>
+<SimpleIdentifier Name="open_out"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-11" X="-28"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="97" X="185"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="CLOSED" Source="OPEN">
+<LabelBlock>
+<SimpleIdentifier Name="close_out"/>
+<LabelGeometry Anchor="NW">
+<Point Y="1" X="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="127" X="184"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="OPEN" Source="OPEN">
+<LabelBlock>
+<SimpleIdentifier Name="s1_off"/>
+<SimpleIdentifier Name="s2_off"/>
+<LabelGeometry Anchor="NW">
+<Point Y="2" X="16"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="80" X="225"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
+
+

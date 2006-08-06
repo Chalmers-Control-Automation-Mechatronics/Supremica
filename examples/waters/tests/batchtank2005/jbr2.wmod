@@ -1,0 +1,796 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="jbr2" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Name="req_stop"/>
+<EventDecl Kind="CONTROLLABLE" Name="close_in"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="s2_on"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="s1_off"/>
+<EventDecl Kind="CONTROLLABLE" Name="open_in"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="req_start"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="jelly"/>
+<EventDecl Kind="CONTROLLABLE" Name="close_out"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="s2_off"/>
+<EventDecl Kind="CONTROLLABLE" Name="stirrer_on"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="s1_on"/>
+<EventDecl Kind="CONTROLLABLE" Name="stirrer_off"/>
+<EventDecl Kind="CONTROLLABLE" Name="open_out"/>
+<EventDecl Kind="PROPOSITION" Name=":omega"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="NeverJelly"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="jelly"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="NotJelly">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="128" X="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="26" X="-21"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="prop_no_jelly"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="jelly"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="96" X="160"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="24" X="-8"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="requests"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="req_start"/>
+<SimpleIdentifier Name="req_stop"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="REQ">
+<PointGeometry>
+<Point Y="144" X="304"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="27" X="22"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="NOREQ">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="144" X="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="27" X="-39"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="NOREQ" Source="REQ">
+<LabelBlock>
+<SimpleIdentifier Name="req_stop"/>
+<LabelGeometry Anchor="NW">
+<Point Y="15" X="-27"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="166" X="222"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="REQ" Source="NOREQ">
+<LabelBlock>
+<SimpleIdentifier Name="req_start"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-24" X="-27"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="127" X="226"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="sensors"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="jelly"/>
+<SimpleIdentifier Name="s1_off"/>
+<SimpleIdentifier Name="s1_on"/>
+<SimpleIdentifier Name="s2_off"/>
+<SimpleIdentifier Name="s2_on"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="PARTIAL">
+<PointGeometry>
+<Point Y="192" X="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="6" X="-67"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="EMPTY">
+<PointGeometry>
+<Point Y="128" X="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="5" X="-60"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="FULL">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="256" X="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="5" X="-45"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="FULL" Source="FULL">
+<LabelBlock>
+<SimpleIdentifier Name="jelly"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="255" X="216"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="PARTIAL" Source="FULL">
+<LabelBlock>
+<SimpleIdentifier Name="s2_off"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="-42"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="225" X="161"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="PARTIAL" Source="EMPTY">
+<LabelBlock>
+<SimpleIdentifier Name="s1_on"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="161" X="192"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="FULL" Source="PARTIAL">
+<LabelBlock>
+<SimpleIdentifier Name="s2_on"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="226" X="191"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="EMPTY" Source="PARTIAL">
+<LabelBlock>
+<SimpleIdentifier Name="s1_off"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="-40"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="161" X="161"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="PARTIAL" Source="PARTIAL">
+<LabelBlock>
+<SimpleIdentifier Name="jelly"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-5" X="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="193" X="217"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="stirrer"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="jelly"/>
+<SimpleIdentifier Name="stirrer_off"/>
+<SimpleIdentifier Name="stirrer_on"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="OFF">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="112" X="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="4" X="-38"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ON">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="112" X="288"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="6" X="-31"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="OFF" Source="ON">
+<LabelBlock>
+<SimpleIdentifier Name="stirrer_off"/>
+<LabelGeometry Anchor="NW">
+<Point Y="9" X="-31"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="137" X="218"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="ON" Source="OFF">
+<LabelBlock>
+<SimpleIdentifier Name="stirrer_on"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-17" X="-25"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="89" X="216"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="OFF" Source="OFF">
+<LabelBlock>
+<SimpleIdentifier Name="jelly"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-8" X="-40"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="112" X="94"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="TopOrBottomOpen"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="close_in"/>
+<SimpleIdentifier Name="close_out"/>
+<SimpleIdentifier Name="open_in"/>
+<SimpleIdentifier Name="open_out"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="OutOpen">
+<PointGeometry>
+<Point Y="288" X="272"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="2" X="14"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="BothClosed">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="176" X="272"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="6" X="15"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="InOpen">
+<PointGeometry>
+<Point Y="80" X="272"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="5" X="20"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="BothClosed" Source="OutOpen">
+<LabelBlock>
+<SimpleIdentifier Name="close_out"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-10" X="-62"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="233" X="252"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="BothClosed" Source="InOpen">
+<LabelBlock>
+<SimpleIdentifier Name="close_in"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="128" X="293"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="OutOpen" Source="BothClosed">
+<LabelBlock>
+<SimpleIdentifier Name="open_out"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-8" X="10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="234" X="292"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="InOpen" Source="BothClosed">
+<LabelBlock>
+<SimpleIdentifier Name="open_in"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="-64"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="124" X="255"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="valve_in"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="close_in"/>
+<SimpleIdentifier Name="jelly"/>
+<SimpleIdentifier Name="open_in"/>
+<SimpleIdentifier Name="s1_on"/>
+<SimpleIdentifier Name="s2_on"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="OPEN">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="112" X="256"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="7" X="-51"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="CLOSED">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="112" X="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="4" X="-69"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="CLOSED" Source="CLOSED">
+<LabelBlock>
+<SimpleIdentifier Name="jelly"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-41" X="-35"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="109" X="48"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="OPEN" Source="CLOSED">
+<LabelBlock>
+<SimpleIdentifier Name="open_in"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="94" X="200"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="CLOSED" Source="OPEN">
+<LabelBlock>
+<SimpleIdentifier Name="close_in"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="-54"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="130" X="199"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="OPEN" Source="OPEN">
+<LabelBlock>
+<SimpleIdentifier Name="s1_on"/>
+<SimpleIdentifier Name="s2_on"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-16" X="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="112" X="295"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="valve_out"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="close_out"/>
+<SimpleIdentifier Name="jelly"/>
+<SimpleIdentifier Name="open_out"/>
+<SimpleIdentifier Name="s1_off"/>
+<SimpleIdentifier Name="s2_off"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="OPEN">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="128" X="288"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="5" X="-53"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="CLOSED">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="112" X="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="5" X="-70"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="OPEN" Source="OPEN">
+<LabelBlock>
+<SimpleIdentifier Name="s1_off"/>
+<SimpleIdentifier Name="s2_off"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-13" X="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="128" X="327"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="CLOSED" Source="OPEN">
+<LabelBlock>
+<SimpleIdentifier Name="close_out"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-5" X="-62"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="145" X="211"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="OPEN" Source="CLOSED">
+<LabelBlock>
+<SimpleIdentifier Name="open_out"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="95" X="219"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="CLOSED" Source="CLOSED">
+<LabelBlock>
+<SimpleIdentifier Name="jelly"/>
+<LabelGeometry Anchor="NW">
+<Point Y="13" X="-34"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="115" X="51"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="ValveInController"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="close_in"/>
+<SimpleIdentifier Name="open_in"/>
+<SimpleIdentifier Name="stirrer_off"/>
+<SimpleIdentifier Name="stirrer_on"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="ValveClosed">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="256" X="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="14" X="-79"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="StirrerOnValveOpen">
+<PointGeometry>
+<Point Y="192" X="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-4" X="14"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ValveOpen">
+<PointGeometry>
+<Point Y="160" X="128"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-12" X="-47"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="ValveOpen" Source="ValveOpen">
+<LabelBlock>
+<SimpleIdentifier Name="stirrer_off"/>
+<LabelGeometry Anchor="NW">
+<Point Y="6" X="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="190" X="148"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="StirrerOnValveOpen" Source="ValveOpen">
+<LabelBlock>
+<SimpleIdentifier Name="stirrer_on"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-24" X="-16"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="161" X="179"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="ValveOpen" Source="ValveClosed">
+<LabelBlock>
+<SimpleIdentifier Name="open_in"/>
+<LabelGeometry Anchor="NW">
+<Point Y="0" X="-52"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="218" X="115"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="ValveClosed" Source="ValveClosed">
+<LabelBlock>
+<SimpleIdentifier Name="stirrer_on"/>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="-25"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="304" X="154"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="ValveClosed" Source="StirrerOnValveOpen">
+<LabelBlock>
+<SimpleIdentifier Name="close_in"/>
+<LabelGeometry Anchor="NW">
+<Point Y="0" X="9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="240" X="190"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="StirrerOnValveOpen" Source="StirrerOnValveOpen">
+<LabelBlock>
+<SimpleIdentifier Name="stirrer_on"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="11"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="212" X="258"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="ValveOutController"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="close_out"/>
+<SimpleIdentifier Name="open_out"/>
+<SimpleIdentifier Name="s1_off"/>
+<SimpleIdentifier Name="stirrer_off"/>
+<SimpleIdentifier Name="stirrer_on"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="TankEmpty">
+<PointGeometry>
+<Point Y="192" X="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="22" X="-48"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="ValveClosed">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="208" X="224"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="9" X="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="StirrerOnValveOpen">
+<PointGeometry>
+<Point Y="128" X="288"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-11" X="-3"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ValveOpen">
+<PointGeometry>
+<Point Y="112" X="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="0" X="-75"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="ValveClosed" Source="TankEmpty">
+<LabelBlock>
+<SimpleIdentifier Name="close_out"/>
+<LabelGeometry Anchor="NW">
+<Point Y="8" X="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="210" X="156"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="TankEmpty" Source="ValveOpen">
+<LabelBlock>
+<SimpleIdentifier Name="s1_off"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-13" X="-48"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="141" X="124"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="ValveOpen" Source="ValveOpen">
+<LabelBlock>
+<SimpleIdentifier Name="stirrer_off"/>
+<LabelGeometry Anchor="NW">
+<Point Y="8" X="-2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="135" X="209"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="StirrerOnValveOpen" Source="ValveOpen">
+<LabelBlock>
+<SimpleIdentifier Name="stirrer_on"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-21" X="-32"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="95" X="242"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="StirrerOnValveOpen" Source="StirrerOnValveOpen">
+<LabelBlock>
+<SimpleIdentifier Name="stirrer_on"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-5" X="7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="149" X="324"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="ValveClosed" Source="StirrerOnValveOpen">
+<LabelBlock>
+<SimpleIdentifier Name="close_out"/>
+<LabelGeometry Anchor="NW">
+<Point Y="6" X="16"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="178" X="265"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="ValveOpen" Source="ValveClosed">
+<LabelBlock>
+<SimpleIdentifier Name="open_out"/>
+<LabelGeometry Anchor="NW">
+<Point Y="13" X="-47"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="164" X="177"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="ValveClosed" Source="ValveClosed">
+<LabelBlock>
+<SimpleIdentifier Name="stirrer_on"/>
+<LabelGeometry Anchor="NW">
+<Point Y="6" X="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="247" X="234"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
+
+

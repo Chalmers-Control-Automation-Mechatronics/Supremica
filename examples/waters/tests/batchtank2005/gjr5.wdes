@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="gjr5" xmlns="http://waters.sourceforge.net/xsd/des">
+<EventList>
+<Event Kind="PROPOSITION" Name=":omega"/>
+<Event Kind="CONTROLLABLE" Name="close_in"/>
+<Event Kind="CONTROLLABLE" Name="close_out"/>
+<Event Kind="UNCONTROLLABLE" Name="jelly"/>
+<Event Kind="CONTROLLABLE" Name="open_in"/>
+<Event Kind="CONTROLLABLE" Name="open_out"/>
+<Event Kind="UNCONTROLLABLE" Name="req_start"/>
+<Event Kind="UNCONTROLLABLE" Name="req_stop"/>
+<Event Kind="UNCONTROLLABLE" Name="s1_off"/>
+<Event Kind="UNCONTROLLABLE" Name="s1_on"/>
+<Event Kind="UNCONTROLLABLE" Name="s2_off"/>
+<Event Kind="UNCONTROLLABLE" Name="s2_on"/>
+<Event Kind="CONTROLLABLE" Name="stirrer_off"/>
+<Event Kind="CONTROLLABLE" Name="stirrer_on"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="SPEC" Name="DosingControl">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="close_in"/>
+<EventRef Name="close_out"/>
+<EventRef Name="open_in"/>
+<EventRef Name="open_out"/>
+<EventRef Name="s1_off"/>
+<EventRef Name="s1_on"/>
+<EventRef Name="s2_off"/>
+<EventRef Name="s2_on"/>
+<EventRef Name="stirrer_off"/>
+<EventRef Name="stirrer_on"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="Empty"/>
+<State Name="Emptying_StirrerOff"/>
+<State Name="Emptying_StirrerOn"/>
+<State Name="Emptying_StirrerOn_s2off"/>
+<State Name="Emptying_s1off_s2off_StirrerOn"/>
+<State Name="Emptying_s2off"/>
+<State Name="Filling"/>
+<State Name="Full"/>
+<State Name="Full_StirrerOn"/>
+<State Name="Full_ValvesClosed_StirrerOn">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="InValveClosed"/>
+<State Name="InValveOpen"/>
+<State Name="StirrerOff"/>
+<State Name="StirrerOn"/>
+<State Name="StirrerOn_BothValvesShut"/>
+</StateList>
+<TransitionList>
+<Transition Target="InValveOpen" Source="Empty" Event="open_in"/>
+<Transition Target="Emptying_StirrerOff" Source="Emptying_s1off_s2off_StirrerOn" Event="stirrer_off"/>
+<Transition Target="Emptying_StirrerOff" Source="Emptying_s2off" Event="s1_off"/>
+<Transition Target="Emptying_StirrerOn_s2off" Source="Emptying_s2off" Event="stirrer_on"/>
+<Transition Target="Empty" Source="Emptying_StirrerOff" Event="close_out"/>
+<Transition Target="Emptying_StirrerOn_s2off" Source="Emptying_StirrerOn" Event="s2_off"/>
+<Transition Target="StirrerOff" Source="Emptying_StirrerOn" Event="stirrer_off"/>
+<Transition Target="StirrerOn_BothValvesShut" Source="Emptying_StirrerOn_s2off" Event="close_out"/>
+<Transition Target="Emptying_s1off_s2off_StirrerOn" Source="Emptying_StirrerOn_s2off" Event="s1_off"/>
+<Transition Target="Emptying_s2off" Source="Emptying_StirrerOn_s2off" Event="stirrer_off"/>
+<Transition Target="Full" Source="Filling" Event="s2_on"/>
+<Transition Target="StirrerOn" Source="Filling" Event="stirrer_on"/>
+<Transition Target="Full_StirrerOn" Source="Full" Event="stirrer_on"/>
+<Transition Target="Full_ValvesClosed_StirrerOn" Source="Full_StirrerOn" Event="close_in"/>
+<Transition Target="Emptying_StirrerOn" Source="Full_ValvesClosed_StirrerOn" Event="open_out"/>
+<Transition Target="StirrerOn" Source="InValveClosed" Event="open_in"/>
+<Transition Target="Filling" Source="InValveOpen" Event="s1_on"/>
+<Transition Target="Emptying_s2off" Source="StirrerOff" Event="s2_off"/>
+<Transition Target="InValveClosed" Source="StirrerOn" Event="close_in"/>
+<Transition Target="Full_StirrerOn" Source="StirrerOn" Event="s2_on"/>
+<Transition Target="Filling" Source="StirrerOn" Event="stirrer_off"/>
+<Transition Target="Emptying_StirrerOn_s2off" Source="StirrerOn_BothValvesShut" Event="open_out"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="prop_no_jelly">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="jelly"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="s0">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+</StateList>
+</Automaton>
+<Automaton Kind="PLANT" Name="requests">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="req_start"/>
+<EventRef Name="req_stop"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="NOREQ">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="REQ"/>
+</StateList>
+<TransitionList>
+<Transition Target="REQ" Source="NOREQ" Event="req_start"/>
+<Transition Target="NOREQ" Source="REQ" Event="req_stop"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sensors">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="jelly"/>
+<EventRef Name="s1_off"/>
+<EventRef Name="s1_on"/>
+<EventRef Name="s2_off"/>
+<EventRef Name="s2_on"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="EMPTY"/>
+<State Name="FULL">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="PARTIAL"/>
+</StateList>
+<TransitionList>
+<Transition Target="PARTIAL" Source="EMPTY" Event="s1_on"/>
+<Transition Target="FULL" Source="FULL" Event="jelly"/>
+<Transition Target="PARTIAL" Source="FULL" Event="s2_off"/>
+<Transition Target="PARTIAL" Source="PARTIAL" Event="jelly"/>
+<Transition Target="EMPTY" Source="PARTIAL" Event="s1_off"/>
+<Transition Target="FULL" Source="PARTIAL" Event="s2_on"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="stirrer">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="jelly"/>
+<EventRef Name="stirrer_off"/>
+<EventRef Name="stirrer_on"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="OFF">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="ON">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Target="OFF" Source="OFF" Event="jelly"/>
+<Transition Target="ON" Source="OFF" Event="stirrer_on"/>
+<Transition Target="OFF" Source="ON" Event="stirrer_off"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="valve_in">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="close_in"/>
+<EventRef Name="jelly"/>
+<EventRef Name="open_in"/>
+<EventRef Name="s1_on"/>
+<EventRef Name="s2_on"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="CLOSED">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="OPEN">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Target="CLOSED" Source="CLOSED" Event="jelly"/>
+<Transition Target="OPEN" Source="CLOSED" Event="open_in"/>
+<Transition Target="CLOSED" Source="OPEN" Event="close_in"/>
+<Transition Target="OPEN" Source="OPEN" Event="s1_on"/>
+<Transition Target="OPEN" Source="OPEN" Event="s2_on"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="valve_out">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="close_out"/>
+<EventRef Name="jelly"/>
+<EventRef Name="open_out"/>
+<EventRef Name="s1_off"/>
+<EventRef Name="s2_off"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="CLOSED">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="OPEN">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Target="CLOSED" Source="CLOSED" Event="jelly"/>
+<Transition Target="OPEN" Source="CLOSED" Event="open_out"/>
+<Transition Target="CLOSED" Source="OPEN" Event="close_out"/>
+<Transition Target="OPEN" Source="OPEN" Event="s1_off"/>
+<Transition Target="OPEN" Source="OPEN" Event="s2_off"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+
+

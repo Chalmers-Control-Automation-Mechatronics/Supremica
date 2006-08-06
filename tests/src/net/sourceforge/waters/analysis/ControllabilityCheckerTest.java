@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControllabilityCheckerTest
 //###########################################################################
-//# $Id: ControllabilityCheckerTest.java,v 1.7 2006-08-04 06:45:23 robi Exp $
+//# $Id: ControllabilityCheckerTest.java,v 1.8 2006-08-06 00:53:25 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -61,26 +61,226 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
   //# Test Cases --- handwritten
   public void testSmallFactory2() throws Exception
   {
-    String group = "handwritten";
-    String name = "small_factory_2.wdes";
+    final String group = "handwritten";
+    final String name = "small_factory_2.wdes";
     runControllabilityChecker(group, name, true);
   }
   
   public void testTictactoe() throws Exception
   {
-    String group = "handwritten";
-    String name = "tictactoe.wdes";
+    final String group = "handwritten";
+    final String name = "tictactoe.wdes";
     runControllabilityChecker(group, name, false);
   }
 
 
   //#########################################################################
   //# Test Cases --- tests
+  public void test_Batchtank2005_amk14() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "amk14.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_Batchtank2005_cjn5() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "cjn5.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_Batchtank2005_cs37() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "cs37.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_Batchtank2005_ez1() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "ez1.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_Batchtank2005_gb20() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "gb20.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_Batchtank2005_gb21() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "gb21.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_Batchtank2005_gjr5() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "gjr5.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_Batchtank2005_grj3() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "grj3.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_Batchtank2005_imr1() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "imr1.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_Batchtank2005_jbr2() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "jbr2.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_Batchtank2005_jmr30() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "jmr30.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_Batchtank2005_jpt10() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "jpt10.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_Batchtank2005_kah18() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "kah18.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_Batchtank2005_lsr1_1() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "lsr1_1.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_Batchtank2005_lsr1_2() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "lsr1_2.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_Batchtank2005_lz136_1() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "lz136_1.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_Batchtank2005_lz136_2() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "lz136_2.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_Batchtank2005_rch11() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "rch11.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_Batchtank2005_ry27() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "ry27.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_Batchtank2005_scs10() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "scs10.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_Batchtank2005_sjw41() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "sjw41.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_Batchtank2005_smr26() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "smr26.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_Batchtank2005_tk27() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "tk27.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_Batchtank2005_tp20() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "tp20.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_Batchtank2005_vl6() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "batchtank2005";
+    final String name = "vl6.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
   public void testMx27() throws Exception
   {
-    String group = "tests";
-    String dir  = "nasty";
-    String name = "mx27.wdes";
+    final String group = "tests";
+    final String dir  = "nasty";
+    final String name = "mx27.wdes";
     runControllabilityChecker(group, dir, name, false);
   }
 
@@ -89,129 +289,129 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
   //# Test Cases --- valid
   public void testBigFactory() throws Exception
   {
-    String group = "valid";
-    String dir  = "big_factory";
-    String name = "bfactory.wdes";
+    final String group = "valid";
+    final String dir  = "big_factory";
+    final String name = "bfactory.wdes";
     runControllabilityChecker(group, dir, name, false);
   }
   
   public void testBmw_fh() throws Exception
   {
-    String group = "valid";
-    String dir  = "bmw_fh";
-    String name = "bmw_fh.wdes";
+    final String group = "valid";
+    final String dir  = "bmw_fh";
+    final String name = "bmw_fh.wdes";
     runControllabilityChecker(group, dir, name, true);
   }
   
   public void testBorder_cases() throws Exception
   {
-    String group = "valid";
-    String dir  = "border_cases";
-    String name = "never_blow_up.wdes";
+    final String group = "valid";
+    final String dir  = "border_cases";
+    final String name = "never_blow_up.wdes";
     runControllabilityChecker(group, dir, name, false);
   }
  
   public void testDebounce() throws Exception
   {
-    String group = "valid";
-    String dir = "debounce";
-    String name = "debounce.wdes";
+    final String group = "valid";
+    final String dir = "debounce";
+    final String name = "debounce.wdes";
     runControllabilityChecker(group, dir, name, true);
   }
   
   public void testFalko() throws Exception
   {
-    String group = "valid";
-    String dir = "falko";
-    String name = "falko.wdes";
+    final String group = "valid";
+    final String dir = "falko";
+    final String name = "falko.wdes";
     runControllabilityChecker(group, dir, name, true);
   }
   
   public void testFtuer() throws Exception
   {
-    String group = "valid";
-    String dir  = "central_locking";
-    String name = "ftuer.wdes";
+    final String group = "valid";
+    final String dir  = "central_locking";
+    final String name = "ftuer.wdes";
     runControllabilityChecker(group, dir, name, true);
   } 
   
   public void testFischertechnik() throws Exception
   {
-    String group = "valid";
-    String dir = "fischertechnik";
-    String name = "fischertechnik.wdes";
+    final String group = "valid";
+    final String dir = "fischertechnik";
+    final String name = "fischertechnik.wdes";
     runControllabilityChecker(group, dir, name, false);
   }
   
   public void testKoordwsp() throws Exception
   {
-    String group = "valid";
-    String dir  = "central_locking";
-    String name = "koordwsp.wdes";
+    final String group = "valid";
+    final String dir  = "central_locking";
+    final String name = "koordwsp.wdes";
     runControllabilityChecker(group, dir, name, true);
   } 
   
   public void testMazes() throws Exception
   {
-    String group = "valid";
-    String dir = "mazes";
-    String name = "mazes.wdes";
+    final String group = "valid";
+    final String dir = "mazes";
+    final String name = "mazes.wdes";
     runControllabilityChecker(group, dir, name, true);
   }
   
   public void testSafetydisplay() throws Exception
   {
-    String group = "valid";
-    String dir = "safetydisplay";
-    String name = "safetydisplay.wdes";
+    final String group = "valid";
+    final String dir = "safetydisplay";
+    final String name = "safetydisplay.wdes";
     runControllabilityChecker(group, dir, name, true);
   }
   
   public void testSmallFactory() throws Exception
   {
-    String group = "valid";
-    String dir = "small";
-    String name = "small.wdes";
+    final String group = "valid";
+    final String dir = "small";
+    final String name = "small.wdes";
     runControllabilityChecker(group, dir, name, true);
   }
   
   public void testSmallFactoryUncont() throws Exception
   {
-    String group = "valid";
-    String dir = "small";
-    String name = "small_uncont.wdes";
+    final String group = "valid";
+    final String dir = "small";
+    final String name = "small_uncont.wdes";
     runControllabilityChecker(group, dir, name, false);
   }
 
   public void testSmd() throws Exception
   {
-    String group = "valid";
-    String dir = "smd";
-    String name = "smdreset.wdes";
+    final String group = "valid";
+    final String dir = "smd";
+    final String name = "smdreset.wdes";
     runControllabilityChecker(group, dir, name, true);
   }
 
   public void testTline_0() throws Exception
   {
-    String group = "valid";
-    String dir = "tline_0";
-    String name = "transferline_templ.wdes";
+    final String group = "valid";
+    final String dir = "tline_0";
+    final String name = "transferline_templ.wdes";
     runControllabilityChecker(group, dir, name, true);
   }
   
   public void testTline_1() throws Exception
   {
-    String group = "valid";
-    String dir = "tline_1";
-    String name = "tline_1.wdes";
+    final String group = "valid";
+    final String dir = "tline_1";
+    final String name = "tline_1.wdes";
     runControllabilityChecker(group, dir, name, true);
   }
 
   public void testWeiche() throws Exception
   {
-    String group = "valid";
-    String dir = "vt";
-    String name = "weiche.wdes";
+    final String group = "valid";
+    final String dir = "vt";
+    final String name = "weiche.wdes";
     runControllabilityChecker(group, dir, name, true);
   }
 
