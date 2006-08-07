@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControllabilityCheckerTest
 //###########################################################################
-//# $Id: ControllabilityCheckerTest.java,v 1.9 2006-08-07 04:44:06 robi Exp $
+//# $Id: ControllabilityCheckerTest.java,v 1.10 2006-08-07 08:46:34 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -51,11 +51,6 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     return testSuite;
   }
 
-  public static void main(String[] args) { 
-    
-    junit.textui.TestRunner.run(suite()); 
-  }
-
 
   //#########################################################################
   //# Test Cases --- handwritten
@@ -74,7 +69,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
   }
 
 
-  /*
+
   //#########################################################################
   //# Test Cases --- tests
   public void test_Batchtank2005_amk14() throws Exception
@@ -476,7 +471,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String name = "yip1.wdes";
     runControllabilityChecker(group, dir, name, true);
   }
-  */
+
 
   //#########################################################################
   //# Test Cases --- valid
@@ -610,7 +605,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
 
 
   //#########################################################################
-  //# Auxiliary Methods  
+  //# Auxiliary Methods
   private void runControllabilityChecker(final String group,
 					 final String name,
 					 final boolean expect)
@@ -651,7 +646,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     runControllabilityChecker(filename, expect);
   }
 
-
+    
   private void runControllabilityChecker(final File filename,
 					 final boolean expect)
     throws Exception

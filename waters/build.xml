@@ -260,7 +260,7 @@
 
   <target name="runtest-java" depends="test-jar">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true">
+    <junit printsummary="on" fork="true" maxmemory="512m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
@@ -283,7 +283,7 @@
 
   <target name="test1" depends="test-jar">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" forkmode="perTest">
+    <junit printsummary="on" fork="true" maxmemory="512m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
