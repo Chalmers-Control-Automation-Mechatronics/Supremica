@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ValidToWaters
 //###########################################################################
-//# $Id: ValidToWaters.java,v 1.5 2006-08-04 06:45:23 robi Exp $
+//# $Id: ValidToWaters.java,v 1.6 2006-08-07 22:55:00 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.valid;
@@ -36,9 +36,11 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
  *
  * <P>This class provides a simple application that accepts a list
  * of VALID file names on the command line, which it then tries to
- * convert to Waters format.</P>
+ * convert to Waters format. When Supremica has been installed
+ * successfully, the converter can be run using the script called
+ * <CODE>vw</CODE> in Supremica's <CODE>dist</CODE> directory as follows.</P>
  *
- * <P><CODE>java ValidToWaters [-compile] [-q]
+ * <P><CODE>vw [--compile|-c|--Compile|-C] [--quiet|-q]
  * &lt;<I>file1</I>&gt; &lt;<I>file2</I>&gt; ...</CODE></P>
  *
  * <P>The following file formats and extensions are supported.</P>
@@ -60,10 +62,26 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
  *     modules. If present, their extension is replaced by <CODE>.wmod</CODE>
  *     for the output file, otherwise <CODE>.wmod</CODE> is appended to the
  *     file name.</DD>
- * <DD>If the <CODE>-compile</CODE> option is specified, then all modules
- *     are compiled into a product DES, and that product DES is saved in
- *     a <CODE>.wdes</CODE> file with the same name prefix. In this case,
- *     no <CODE>.wmod</CODE> files are written.
+ * </DL>
+ *
+ * <P>The converter can be controlled by the following command line
+ * options.</P>
+ * <DL>
+ * <DT><CODE>--compile</CODE>, <CODE>-c</CODE></DT>
+ * <DD>If this option is specified, then in addition to converting the
+ *     VALID models into Waters modules, they are are compiled into
+ *     product DES form, and that product DES is saved in a
+ *     <CODE>.wdes</CODE> file with the same name prefix.</DD>
+ * <DT><CODE>--Compile</CODE>, <CODE>-C</CODE></DT>
+ * <DD>This option behaves like the <CODE>--compile</CODE> option,
+ *     but it suppresses the creation of Waters module (<CODE>.wmod</CODE>)
+ *     files.</DD>
+ * <DT><CODE>--quiet</CODE>, <CODE>-q</CODE></DT>
+ * <DD>This option suppresses the progress messages that are normally
+ *     written to the console.</DD>
+ * <DT><CODE>--</CODE></DT>
+ * <DD>This stops option parsing and treats all remaining command
+ *     line arguments as file names.</DD>
  * </DL>
  *
  * @author Robi Malik
@@ -73,9 +91,19 @@ public class ValidToWaters
 {
 
   //#########################################################################
+  //# Constructors
+  /**
+   * Dummy constructor to prevent instantiation of class.
+   */
+  private ValidToWaters()
+  {
+  }
+
+
+  //#########################################################################
   //# Main
   /**
-   * Main routine.
+   * Program entry point.
    */
   public static void main(final String[] args)
   {
@@ -89,7 +117,7 @@ public class ValidToWaters
         start++;
         if (arg.equals("-c") || arg.equals("--compile")) {
           compile = true;
-        } else if (arg.equals("-C")) {
+        } else if (arg.equals("-C") || arg.equals("--Compile")) {
           compile = true;
           save = false;
         } else if (arg.equals("-q") || arg.equals("--quiet")) {
