@@ -64,10 +64,11 @@ import org.supremica.log.*;
  * lamp_off        c_on            switching_on
  * switching_on    E_on            lamp_on
  *
- * This short excerpt mentions two events, 'c_on' and 'E_on', Controllable and uncontrollable
- * respectively ('c_' stands for 'command' and 'E_' for 'event' (response)). It also
- * mentions three states, 'lamp_off', 'switching_on' and 'lamp_on'. This defines the automaton.
- *
+ * This short excerpt mentions two events, 'c_on' and 'E_on',
+ * Controllable and uncontrollable respectively ('c_' stands for
+ * 'command' and 'E_' for 'event' (response)). It also mentions three
+ * states, 'lamp_off', 'switching_on' and 'lamp_on'. The first state
+ * is the initial state. This defines the automaton.
  */
 public class ProjectBuildFromHYB
 {

@@ -1,5 +1,5 @@
 //# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
-//# $Id: FileDialogs.java,v 1.30 2006-03-28 10:10:20 knut Exp $
+//# $Id: FileDialogs.java,v 1.31 2006-08-07 09:00:59 flordal Exp $
 
 /*
  * Supremica Software License Agreement
@@ -83,6 +83,7 @@ public class FileDialogs
 	private FileFilter wmodFilter = null;
 	private FileFilter dgrfFilter = null;
 	private FileFilter hybFilter = null;
+	private FileFilter hiscFilter = null;
 	private FileFilter dsxFilter = null;
 	private FileFilter dotFilter = null;
 	private FileFilter epsFilter = null;
@@ -239,6 +240,17 @@ public class FileDialogs
 		fileImporter.resetChoosableFileFilters();
 		fileImporter.addChoosableFileFilter(fd.getHYBFilter());
 		fileImporter.setFileFilter(fd.getHYBFilter());
+
+		return fileImporter;
+	}
+
+	public static JFileChooser getHISCFileImporter()
+	{
+		JFileChooser fileImporter = fd.getFileImporter();
+
+		fileImporter.resetChoosableFileFilters();
+		fileImporter.addChoosableFileFilter(fd.getHISCFilter());
+		fileImporter.setFileFilter(fd.getHISCFilter());
 
 		return fileImporter;
 	}
@@ -559,6 +571,16 @@ public class FileDialogs
 		}
 
 		return hybFilter;
+	}
+
+	private FileFilter getHISCFilter()
+	{
+		if (hiscFilter == null)
+		{
+			hiscFilter = makeFileFilter(".prj", "HISC project file (*.prj)");
+		}
+
+		return hiscFilter;
 	}
 
 	private FileFilter getDSXFilter()

@@ -2063,6 +2063,17 @@ public class ActionMan
 				importHYBFile(g, f);
 			}
 		};
+	}    
+ 
+    public static void fileImportHISC(Gui gui)
+    {
+		new FileImporter(FileDialogs.getHISCFileImporter(), gui)    // anonymous class
+		{
+			void openFile(Gui g, File f)
+			{
+				importHISCFile(g, f);
+			}
+		};
     }
 
     public static void fileImportUMDES(Gui gui)
@@ -2367,6 +2378,27 @@ public class ActionMan
 		try
 		{
 			ProjectBuildFromHYB builder = new ProjectBuildFromHYB(new VisualProjectFactory());
+			Automata currAutomata = builder.build(file.toURL());
+			int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
+
+			gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
+		}
+		catch (Exception ex)
+		{
+			logger.error("Error while importing " + file.getAbsolutePath() + ". ", ex);
+			logger.debug(ex.getStackTrace());
+
+			return;
+		}
+    }
+ 
+    public static void importHISCFile(Gui gui, File file)
+    {
+		gui.info("Importing " + file.getAbsolutePath() + " ...");
+
+		try
+		{
+			ProjectBuildFromHISC builder = new ProjectBuildFromHISC(new VisualProjectFactory());
 			Automata currAutomata = builder.build(file.toURL());
 			int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
 

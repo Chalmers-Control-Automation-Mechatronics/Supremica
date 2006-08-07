@@ -273,6 +273,17 @@ public class MainMenuBar
 			}
 			});
 			*/
+ 
+			// File.Import.HISC
+			JMenuItem menuFileImportHISC = new JMenuItem("From HISC...");
+			menuFileImport.add(menuFileImportHISC);
+			menuFileImportHISC.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						ActionMan.fileImportHISC(ActionMan.getGui());
+					}
+				});
 
 			/*
 			//File.Import.RobotCoordination
