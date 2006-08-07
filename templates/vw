@@ -1,0 +1,9 @@
+#!/bin/sh
+
+THIS=`readlink -f $0`
+DIR=`dirname $THIS`
+
+export LD_LIBRARY_PATH=$DIR
+
+java -cp "$DIR/Supremica.jar" -enableassertions \
+    net.sourceforge.waters.valid.ValidToWaters "$@"

@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="sgc9_2" xmlns="http://waters.sourceforge.net/xsd/des">
+<EventList>
+<Event Kind="PROPOSITION" Name=":omega"/>
+<Event Kind="UNCONTROLLABLE" Name="arrive[side]"/>
+<Event Kind="UNCONTROLLABLE" Name="enter[main]"/>
+<Event Kind="UNCONTROLLABLE" Name="enter[side]"/>
+<Event Kind="CONTROLLABLE" Name="green[main]"/>
+<Event Kind="CONTROLLABLE" Name="green[side]"/>
+<Event Kind="UNCONTROLLABLE" Name="leave[main]"/>
+<Event Kind="UNCONTROLLABLE" Name="leave[side]"/>
+<Event Kind="CONTROLLABLE" Name="red[main]"/>
+<Event Kind="CONTROLLABLE" Name="red[side]"/>
+<Event Kind="UNCONTROLLABLE" Name="tick"/>
+<Event Kind="CONTROLLABLE" Name="yellow[main]"/>
+<Event Kind="CONTROLLABLE" Name="yellow[side]"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="arrive">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="arrive[side]"/>
+<EventRef Name="enter[side]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="FREE">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="WAIT"/>
+</StateList>
+<TransitionList>
+<Transition Target="WAIT" Source="FREE" Event="arrive[side]"/>
+<Transition Target="FREE" Source="WAIT" Event="enter[side]"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="enter[main]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="enter[main]"/>
+<EventRef Name="green[main]"/>
+<EventRef Name="red[main]"/>
+<EventRef Name="yellow[main]"/>
+</EventRefList>
+<StateList>
+<State Name="GO">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Initial="true" Name="STOP">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Target="GO" Source="GO" Event="enter[main]"/>
+<Transition Target="GO" Source="GO" Event="green[main]"/>
+<Transition Target="STOP" Source="GO" Event="red[main]"/>
+<Transition Target="GO" Source="GO" Event="yellow[main]"/>
+<Transition Target="GO" Source="STOP" Event="green[main]"/>
+<Transition Target="STOP" Source="STOP" Event="red[main]"/>
+<Transition Target="GO" Source="STOP" Event="yellow[main]"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="enter[side]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="enter[side]"/>
+<EventRef Name="green[side]"/>
+<EventRef Name="red[side]"/>
+<EventRef Name="yellow[side]"/>
+</EventRefList>
+<StateList>
+<State Name="GO">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Initial="true" Name="STOP">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Target="GO" Source="GO" Event="enter[side]"/>
+<Transition Target="GO" Source="GO" Event="green[side]"/>
+<Transition Target="STOP" Source="GO" Event="red[side]"/>
+<Transition Target="GO" Source="GO" Event="yellow[side]"/>
+<Transition Target="GO" Source="STOP" Event="green[side]"/>
+<Transition Target="STOP" Source="STOP" Event="red[side]"/>
+<Transition Target="GO" Source="STOP" Event="yellow[side]"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="leave[main]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="enter[main]"/>
+<EventRef Name="leave[main]"/>
+<EventRef Name="tick"/>
+</EventRefList>
+<StateList>
+<State Name="CROSS0"/>
+<State Name="CROSS1"/>
+<State Initial="true" Name="OUT">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Target="OUT" Source="CROSS0" Event="leave[main]"/>
+<Transition Target="CROSS1" Source="CROSS0" Event="tick"/>
+<Transition Target="OUT" Source="CROSS1" Event="leave[main]"/>
+<Transition Target="CROSS0" Source="OUT" Event="enter[main]"/>
+<Transition Target="OUT" Source="OUT" Event="tick"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="leave[side]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="enter[side]"/>
+<EventRef Name="leave[side]"/>
+<EventRef Name="tick"/>
+</EventRefList>
+<StateList>
+<State Name="CROSS0"/>
+<State Name="CROSS1"/>
+<State Initial="true" Name="OUT">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Target="OUT" Source="CROSS0" Event="leave[side]"/>
+<Transition Target="CROSS1" Source="CROSS0" Event="tick"/>
+<Transition Target="OUT" Source="CROSS1" Event="leave[side]"/>
+<Transition Target="CROSS0" Source="OUT" Event="enter[side]"/>
+<Transition Target="OUT" Source="OUT" Event="tick"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="lights_ctrl">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="green[main]"/>
+<EventRef Name="green[side]"/>
+<EventRef Name="red[main]"/>
+<EventRef Name="red[side]"/>
+<EventRef Name="yellow[main]"/>
+<EventRef Name="yellow[side]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="m_green">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="m_red"/>
+<State Name="m_yellow"/>
+<State Name="s_green"/>
+<State Name="s_red"/>
+<State Name="s_yellow"/>
+</StateList>
+<TransitionList>
+<Transition Target="m_yellow" Source="m_green" Event="yellow[main]"/>
+<Transition Target="s_green" Source="m_red" Event="green[side]"/>
+<Transition Target="m_red" Source="m_yellow" Event="red[main]"/>
+<Transition Target="s_yellow" Source="s_green" Event="yellow[side]"/>
+<Transition Target="m_green" Source="s_red" Event="green[main]"/>
+<Transition Target="s_red" Source="s_yellow" Event="red[side]"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="lights_main">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="green[main]"/>
+<EventRef Name="red[main]"/>
+<EventRef Name="yellow[main]"/>
+</EventRefList>
+<StateList>
+<State Name="GREEN">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Initial="true" Name="RED"/>
+<State Name="YELLOW"/>
+</StateList>
+<TransitionList>
+<Transition Target="RED" Source="GREEN" Event="red[main]"/>
+<Transition Target="YELLOW" Source="GREEN" Event="yellow[main]"/>
+<Transition Target="GREEN" Source="RED" Event="green[main]"/>
+<Transition Target="YELLOW" Source="RED" Event="yellow[main]"/>
+<Transition Target="GREEN" Source="YELLOW" Event="green[main]"/>
+<Transition Target="RED" Source="YELLOW" Event="red[main]"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="lights_side">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="green[side]"/>
+<EventRef Name="red[side]"/>
+<EventRef Name="yellow[side]"/>
+</EventRefList>
+<StateList>
+<State Name="GREEN"/>
+<State Initial="true" Name="RED">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="YELLOW"/>
+</StateList>
+<TransitionList>
+<Transition Target="RED" Source="GREEN" Event="red[side]"/>
+<Transition Target="YELLOW" Source="GREEN" Event="yellow[side]"/>
+<Transition Target="GREEN" Source="RED" Event="green[side]"/>
+<Transition Target="YELLOW" Source="RED" Event="yellow[side]"/>
+<Transition Target="GREEN" Source="YELLOW" Event="green[side]"/>
+<Transition Target="RED" Source="YELLOW" Event="red[side]"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="main_ctrl">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="green[main]"/>
+<EventRef Name="red[main]"/>
+<EventRef Name="tick"/>
+<EventRef Name="yellow[main]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="green">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="red"/>
+<State Name="s0"/>
+<State Name="s1"/>
+<State Name="s2"/>
+<State Name="s3"/>
+<State Name="yellow"/>
+</StateList>
+<TransitionList>
+<Transition Target="s0" Source="green" Event="tick"/>
+<Transition Target="green" Source="red" Event="green[main]"/>
+<Transition Target="red" Source="red" Event="tick"/>
+<Transition Target="s1" Source="s0" Event="tick"/>
+<Transition Target="s2" Source="s1" Event="tick"/>
+<Transition Target="s2" Source="s2" Event="tick"/>
+<Transition Target="yellow" Source="s2" Event="yellow[main]"/>
+<Transition Target="red" Source="s3" Event="red[main]"/>
+<Transition Target="s3" Source="s3" Event="tick"/>
+<Transition Target="s3" Source="yellow" Event="tick"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="prop_nocrash">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="enter[main]"/>
+<EventRef Name="enter[side]"/>
+<EventRef Name="leave[main]"/>
+<EventRef Name="leave[side]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="EMPTY">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="FULL"/>
+</StateList>
+<TransitionList>
+<Transition Target="FULL" Source="EMPTY" Event="enter[main]"/>
+<Transition Target="FULL" Source="EMPTY" Event="enter[side]"/>
+<Transition Target="EMPTY" Source="FULL" Event="leave[main]"/>
+<Transition Target="EMPTY" Source="FULL" Event="leave[side]"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="side_ctrl">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="green[side]"/>
+<EventRef Name="red[side]"/>
+<EventRef Name="tick"/>
+<EventRef Name="yellow[side]"/>
+</EventRefList>
+<StateList>
+<State Name="green"/>
+<State Initial="true" Name="red">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="s0"/>
+<State Name="s1"/>
+<State Name="s2"/>
+<State Name="s3"/>
+<State Name="yellow"/>
+</StateList>
+<TransitionList>
+<Transition Target="s0" Source="green" Event="tick"/>
+<Transition Target="green" Source="red" Event="green[side]"/>
+<Transition Target="red" Source="red" Event="tick"/>
+<Transition Target="s1" Source="s0" Event="tick"/>
+<Transition Target="s2" Source="s1" Event="tick"/>
+<Transition Target="s2" Source="s2" Event="tick"/>
+<Transition Target="yellow" Source="s2" Event="yellow[side]"/>
+<Transition Target="red" Source="s3" Event="red[side]"/>
+<Transition Target="s3" Source="s3" Event="tick"/>
+<Transition Target="s3" Source="yellow" Event="tick"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="time">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="tick"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="TIME">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Target="TIME" Source="TIME" Event="tick"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+
+

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ValidTest
 //###########################################################################
-//# $Id: ValidTest.java,v 1.4 2006-07-25 22:06:07 robi Exp $
+//# $Id: ValidTest.java,v 1.5 2006-08-07 04:44:06 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.valid;
@@ -66,6 +66,12 @@ public class ValidTest extends AbstractWatersTest
     throws IOException, WatersException
   {
     testImport("debounce", "debounce");
+  }
+
+  public void testImport_dreitueren()
+    throws IOException, WatersException
+  {
+    testImport("central_locking", "dreitueren");
   }
 
   public void testImport_falko()

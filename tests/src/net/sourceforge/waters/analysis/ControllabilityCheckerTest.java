@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControllabilityCheckerTest
 //###########################################################################
-//# $Id: ControllabilityCheckerTest.java,v 1.8 2006-08-06 00:53:25 robi Exp $
+//# $Id: ControllabilityCheckerTest.java,v 1.9 2006-08-07 04:44:06 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -74,6 +74,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
   }
 
 
+  /*
   //#########################################################################
   //# Test Cases --- tests
   public void test_Batchtank2005_amk14() throws Exception
@@ -284,6 +285,198 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     runControllabilityChecker(group, dir, name, false);
   }
 
+  public void test_TrafficLights2006_ac61() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "ac61.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_TrafficLights2006_al29() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "al29.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_TrafficLights2006_asjc1() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "asjc1.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_TrafficLights2006_dal9() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "dal9.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_TrafficLights2006_dmt10() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "dmt10.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_TrafficLights2006_ejtrw1() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "ejtrw1.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_TrafficLights2006_ekb2() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "ekb2.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_TrafficLights2006_gat7() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "gat7.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_TrafficLights2006_jdm18() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "jdm18.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_TrafficLights2006_jlm39() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "jlm39.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_TrafficLights2006_jpg7() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "jpg7.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_TrafficLights2006_jpm22() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "jpm22.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_TrafficLights2006_jrv2() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "jrv2.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_TrafficLights2006_js173() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "js173.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_TrafficLights2006_lz173() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "lz173.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_TrafficLights2006_meb16() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "meb16.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_TrafficLights2006_mjd29() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "mjd29.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_TrafficLights2006_ncj3() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "ncj3.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_TrafficLights2006_rjo6() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "rjo6.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_TrafficLights2006_rms33() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "rms33.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_TrafficLights2006_sdh7() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "sdh7.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+
+  public void test_TrafficLights2006_sgc9_1() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "sgc9_1.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_TrafficLights2006_sgc9_2() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "sgc9_2.wdes";
+    runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_TrafficLights2006_yip1() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "yip1.wdes";
+    runControllabilityChecker(group, dir, name, true);
+  }
+  */
 
   //#########################################################################
   //# Test Cases --- valid
@@ -350,7 +543,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String name = "koordwsp.wdes";
     runControllabilityChecker(group, dir, name, true);
   } 
-  
+
   public void testMazes() throws Exception
   {
     final String group = "valid";

@@ -241,7 +241,7 @@
 
   <target name="runtest-cpp" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true">
+    <junit printsummary="on" fork="true" forkmode="once">
       <formatter type="xml"/>
       <test name="net.sourceforge.waters.model.analysis.AnalysisTest"
             todir="${logs.results}"/>
@@ -283,11 +283,11 @@
 
   <target name="test1" depends="test-jar">
     <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true">
+    <junit printsummary="on" fork="true" forkmode="perTest">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/analysis/BlockedArrayListTest.java"/>
+          <include name="net/sourceforge/waters/analysis/ControllabilityCheckerTest.java"/>
         </fileset>
       </batchtest>
       <classpath>
