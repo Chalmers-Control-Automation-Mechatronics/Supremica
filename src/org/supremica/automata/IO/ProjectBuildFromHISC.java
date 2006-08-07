@@ -134,7 +134,6 @@ public class ProjectBuildFromHISC
 		for (String line = readLineNoComments(reader); line != null; 
 			 line = readLineNoComments(reader))
 		{
-			logger.info(line);
 			try
 			{
 				// Look for brackets with tags
@@ -222,7 +221,9 @@ public class ProjectBuildFromHISC
 						String name = readLineNoComments(reader);
 						if (name.startsWith("["))
 							throw new Exception("Expected the name of an interface.");
-						Automaton aut = loadAutomaton(pathName+"/"+directoryName+"/"+name+".hsc");
+						if (!name.endsWith(".hsc"))
+							name = name + ".hsc";
+						Automaton aut = loadAutomaton(pathName+"/"+directoryName+"/"+name);
 						aut.setName(name);
 						aut.setType(AutomatonType.Undefined);
 						project.addAutomaton(aut);
@@ -236,7 +237,9 @@ public class ProjectBuildFromHISC
 							String name = readLineNoComments(reader);
 							if (name.startsWith("["))
 								throw new Exception("Expected another plant name.");
-							Automaton aut = loadAutomaton(pathName+"/"+directoryName+"/"+name+".hsc");
+							if (!name.endsWith(".hsc"))
+								name = name + ".hsc";
+							Automaton aut = loadAutomaton(pathName+"/"+directoryName+"/"+name);
 							aut.setName(name);
 							aut.setType(AutomatonType.Plant);
 							project.addAutomaton(aut);
@@ -251,7 +254,9 @@ public class ProjectBuildFromHISC
 							String name = readLineNoComments(reader);
 							if (name.startsWith("["))
 								throw new Exception("Expected another specification name.");
-							Automaton aut = loadAutomaton(pathName+"/"+directoryName+"/"+name+".hsc");
+							if (!name.endsWith(".hsc"))
+								name = name + ".hsc";
+							Automaton aut = loadAutomaton(pathName+"/"+directoryName+"/"+name);
 							aut.setName(name);
 							aut.setType(AutomatonType.Specification);
 							project.addAutomaton(aut);
