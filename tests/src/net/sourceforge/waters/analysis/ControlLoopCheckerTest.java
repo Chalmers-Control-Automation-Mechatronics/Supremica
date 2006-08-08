@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopCheckerTest
 //###########################################################################
-//# $Id: ControlLoopCheckerTest.java,v 1.1 2006-08-08 22:32:37 yip1 Exp $
+//# $Id: ControlLoopCheckerTest.java,v 1.2 2006-08-08 23:53:14 yip1 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -534,7 +534,8 @@ public class ControlLoopCheckerTest extends AbstractWatersTest
     final String name = "fischertechnik.wdes";
     runControlLoopChecker(group, dir, name, false);
   }
-  */
+  */  
+  
   /*
   public void testKoordwsp() throws Exception
   {
@@ -542,7 +543,7 @@ public class ControlLoopCheckerTest extends AbstractWatersTest
     final String dir  = "central_locking";
     final String name = "koordwsp.wdes";
     runControlLoopChecker(group, dir, name, true);
-  } 
+  }
   */
   
   public void testSafetydisplay() throws Exception

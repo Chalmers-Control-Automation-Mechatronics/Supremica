@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopChecker
 //###########################################################################
-//# $Id: ControlLoopChecker.java,v 1.1 2006-08-08 22:32:37 yip1 Exp $
+//# $Id: ControlLoopChecker.java,v 1.2 2006-08-08 23:53:14 yip1 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -47,8 +47,11 @@ public class ControlLoopChecker extends ModelChecker
 
     /** a list of events in the model. */
     private ArrayList<EventProxy> mEventList;
+
+    /** a list of controllable events in the model */
+    private ArrayList<EventProxy> mConEventList;
     
-    /** */
+    /** a map of state tuple in synchronized model */
     private Map<ArrayList<StateProxy>, StateProperty> mGlobalStateMap;
 
     /** a list of unvisited state tuple. */
@@ -72,6 +75,45 @@ public class ControlLoopChecker extends ModelChecker
 			      final ProductDESProxyFactory factory)
     {
 	super(model, factory);
+
+	final ProductDESProxy des = getModel();
+	
+	mControlLoopFree = true;
+	mAutomataList = new ArrayList<AutomatonProxy>();
+	mEventList = new ArrayList<EventProxy>();
+	mConEventList = new ArrayList<EventProxy>();
+	
+	mGlobalStateMap = new HashMap<ArrayList<StateProxy>, StateProperty>();
+	mUnvisitedList = new LinkedList<ArrayList<StateProxy>>();
+	
+	mInitialStateTuple = new ArrayList<StateProxy>();
+	
+	// create Automaton list
+	for(final AutomatonProxy aProxy: des.getAutomata()){
+	    mAutomataList.add(aProxy);
+	}
+	
+	// create Event list
+	for(final EventProxy eProxy: des.getEvents()){
+	    mEventList.add(eProxy);
+	}
+	
+	// find controllable events
+	for(final EventProxy eProxy: mEventList){
+	    if(eProxy.getKind() == EventKind.CONTROLLABLE){
+		mConEventList.add(eProxy);
+	    }
+	}
+	
+	// create initial state tuple
+	for(final AutomatonProxy aProxy: mAutomataList){
+	    for(final StateProxy sProxy: aProxy.getStates()){
+		if(sProxy.isInitial() == true){
+		    mInitialStateTuple.add(sProxy);
+		    break;
+		}
+	    }
+	}
     }
     
     
@@ -96,12 +138,12 @@ public class ControlLoopChecker extends ModelChecker
         ///////////////////////////////////////////////////////////////////////////////
         ///////////////// GETTING RUNTIME OF THE CONTROL LOOP CHECKER /////////////////
         ///////////////////////////////////////////////////////////////////////////////
-	// long startTime = System.currentTimeMillis();
+	long startTime = System.currentTimeMillis();
 
 	boolean result = getResult();
 
-        // long endTime = System.currentTimeMillis();
-        // System.out.println("    Total Time (in milliSeconds): " + (endTime - startTime));
+        long endTime = System.currentTimeMillis();
+        System.out.println("    Total Time (in milliSeconds): " + (endTime - startTime));
         ///////////////////////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////
 
@@ -116,43 +158,13 @@ public class ControlLoopChecker extends ModelChecker
      *         <CODE>false</CODE> otherwise.
      */
     public boolean getResult()
-    {
-	ProductDESProxy des = getModel();
-
-	mControlLoopFree = true;
-	mAutomataList = new ArrayList<AutomatonProxy>();
-	mEventList = new ArrayList<EventProxy>();
-
-	mGlobalStateMap = new HashMap<ArrayList<StateProxy>, StateProperty>();
-	mUnvisitedList = new LinkedList<ArrayList<StateProxy>>();
-
-	mInitialStateTuple = new ArrayList<StateProxy>();
-	
-	// create Automaton list
-	for(final AutomatonProxy aProxy: des.getAutomata()){
-	    mAutomataList.add(aProxy);
-	}
-
-	// create Event list
-	for(final EventProxy eProxy: des.getEvents()){
-	    mEventList.add(eProxy);
-	}
-
-	// create initial state tuple
-	for(final AutomatonProxy aProxy: mAutomataList){
-	    for(final StateProxy sProxy: aProxy.getStates()){
-		if(sProxy.isInitial() == true){
-		    mInitialStateTuple.add(sProxy);
-		    break;
-		}
-	    }
-	}
-	
+    {	
 	// insert initial state tuple to global state and state list
 	final StateProperty initSp = new StateProperty(mInitialStateTuple);
+	
 	mGlobalStateMap.put(mInitialStateTuple, initSp);
 	mUnvisitedList.add(mInitialStateTuple);
-
+	
 	while(!mUnvisitedList.isEmpty()){
 	    final ArrayList<StateProxy> currTuple = mUnvisitedList.get(0);
 
@@ -170,7 +182,8 @@ public class ControlLoopChecker extends ModelChecker
     }
 
     /**
-     * Description:
+     * This method visits each state tuple in the synchronized product.
+     * If it tries to visit state tuple that has been visited before, it detects a loop.
      * @param state current state tuple property
      */
     public void visit(ArrayList<StateProxy> currTuple)
@@ -179,50 +192,10 @@ public class ControlLoopChecker extends ModelChecker
 	currSp.setInComponent(false);
 	currSp.setVisited(true);
 
-	for(EventProxy eProxy: mEventList){
-	    ArrayList<StateProxy> nextTuple = new ArrayList<StateProxy>();
-	    boolean eventAvailable = true;
+	for(final EventProxy eProxy: mEventList){
+	    ArrayList<StateProxy> nextTuple = eventAvailable(currTuple, eProxy);
 	    
-	    for(int i = 0; i < mAutomataList.size(); i++){
-		StateProxy nextState = currTuple.get(i);
-		boolean eventExist = false;
-		boolean transitionExist = false;
-		eventAvailable = true;
-
-		/////////////////////////////////////////////////////////////////////////
-		// need to hashmap or lookup events in automaton to make search faster //
-		/////////////////////////////////////////////////////////////////////////
-		for(EventProxy e: mAutomataList.get(i).getEvents()){ // Find event exists
-		    if(e == eProxy){
-			eventExist = true;
-			break;
-		    }
-		}
-
-		if(eventExist){
-		    for(TransitionProxy t: mAutomataList.get(i).getTransitions()){ // Find transition exists
-			if(t.getSource() == currTuple.get(i) && t.getEvent() == eProxy){
-			    nextState = t.getTarget();
-			    transitionExist = true;
-			    break;
-			}
-		    }
-		}
-		//////////////////////////////////////////////////////////////////////////
-
-		if(!eventExist){ // if event does not exist: nextTuple[i] = currTuple[i]
-		    nextTuple.add(currTuple.get(i));
-		}
-		else if(transitionExist){ // else if exists transition: nextTuple[i] = getNextTransition(currTuple[i])
-		    nextTuple.add(nextState);
-		}
-		else{ // else: event is not available
-		    eventAvailable = false;
-		    break;
-		}
-	    }
-
-	    if(eventAvailable){
+	    if(nextTuple != null){
 		if(eProxy.getKind() == EventKind.CONTROLLABLE){
 		    final StateProperty nextSp;
 		    
@@ -250,7 +223,6 @@ public class ControlLoopChecker extends ModelChecker
 			    if(mControlLoopFree){
 				mControlLoopFree = false;
 				mRootStateTuple = currSp.getNode();
-				// mRootStateTuple = nextSp.getNode();
 			    }
 			    return;
 			}
@@ -292,14 +264,6 @@ public class ControlLoopChecker extends ModelChecker
 	final Collection<EventProxy> events = des.getEvents();
 	final List<EventProxy> tracelist = new LinkedList<EventProxy>();
 
-	// find controllable events
-	final List<EventProxy> conEvents = new ArrayList<EventProxy>();
-	for(EventProxy e: events){
-	    if(e.getKind() == EventKind.CONTROLLABLE){
-		conEvents.add(e);
-	    }
-	}
-
 	/* FIND COUNTEREXAMPLE TRACE HERE */
 	/* Counterexample = The shortest path from mInitialStateTuple to mRootStateTuple 
 	                  + The shortest path from mRootStateTuple to mRootStateTuple */
@@ -323,48 +287,11 @@ public class ControlLoopChecker extends ModelChecker
 	    for(int i = (indexSize==1)?0:(indexList.get(indexSize-2)+1); i <= indexList.get(indexSize-1); i++){
 		currTuple = list.get(i);
 		
-		for(EventProxy eProxy: conEvents){
-		    ArrayList<StateProxy> nextTuple = new ArrayList<StateProxy>();
-		    boolean eventAvailable = true;
+		for(final EventProxy eProxy: mConEventList){
+		    ArrayList<StateProxy> nextTuple = eventAvailable(currTuple, eProxy);
 		    
-		    for(int j = 0; j < mAutomataList.size(); j++){
-			StateProxy nextState = currTuple.get(j);
-			boolean eventExist = false;
-			boolean transitionExist = false;
-			eventAvailable = true;
-			
-			for(EventProxy e: mAutomataList.get(j).getEvents()){ // Find event exists
-			    if(e == eProxy){
-				eventExist = true;
-				break;
-			    }
-			}
-			
-			if(eventExist){
-			    for(TransitionProxy t: mAutomataList.get(j).getTransitions()){ // Find transition exists
-				if(t.getSource() == currTuple.get(j) && t.getEvent() == eProxy){
-				    nextState = t.getTarget();
-				    transitionExist = true;
-				    break;
-				}
-			    }
-			}
-			
-			if(!eventExist){ // if event does not exist: nextTuple[i] = currTuple[i]
-			    nextTuple.add(currTuple.get(j));
-			}
-			else if(transitionExist){ // else if exists transition: nextTuple[i] = getNextTransition(currTuple[i])
-			    nextTuple.add(nextState);
-			}
-			else{ // else: event is not available
-			    eventAvailable = false;
-			    break;
-			}
-		    }
-		    
-		    if(eventAvailable){
+		    if(nextTuple != null){
 			if(nextTuple.equals(mRootStateTuple)){
-			    // lastTuple = currTuple;
 			    lastEvent = eProxy;
 			    break loop;
 			}
@@ -399,46 +326,10 @@ public class ControlLoopChecker extends ModelChecker
 		for(int j = start; j <= end; j++){
 		    ArrayList<StateProxy> curr = list.get(j);
 		    
-		    for(EventProxy eProxy: conEvents){
-			ArrayList<StateProxy> next = new ArrayList<StateProxy>();
-			boolean eventAvailable = true;
-		    
-			for(int k = 0; k < mAutomataList.size(); k++){
-			    StateProxy nextState = curr.get(k);
-			    boolean eventExist = false;
-			    boolean transitionExist = false;
-			    eventAvailable = true;
-			    
-			    for(EventProxy e: mAutomataList.get(k).getEvents()){ // Find event exists
-				if(e == eProxy){
-				    eventExist = true;
-				    break;
-				}
-			    }
-			    
-			    if(eventExist){
-				for(TransitionProxy t: mAutomataList.get(k).getTransitions()){ // Find transition exists
-				    if(t.getSource() == curr.get(k) && t.getEvent() == eProxy){
-					nextState = t.getTarget();
-					transitionExist = true;
-					break;
-				    }
-				}
-			    }
-			    
-			    if(!eventExist){ // if event does not exist: nextTuple[i] = currTuple[i]
-				next.add(curr.get(k));
-			    }
-			    else if(transitionExist){ // else if exists transition: nextTuple[i] = getNextTransition(currTuple[i])
-				next.add(nextState);
-			    }
-			    else{ // else: event is not available
-				eventAvailable = false;
-				break;
-			    }
-			}
+		    for(final EventProxy eProxy: mConEventList){
+			ArrayList<StateProxy> next = eventAvailable(curr, eProxy);
 			
-			if(eventAvailable){
+			if(next != null){
 			    if(next.equals(target)){
 				loopStates.add(new TransitionProperty(curr, next, eProxy));
 				target = curr;
@@ -468,48 +359,11 @@ public class ControlLoopChecker extends ModelChecker
 		for(int i = (indexSize==1)?0:(indexList.get(indexSize-2)+1); i <= indexList.get(indexSize-1); i++){
 		    currTuple = list.get(i);
 		    
-		    for(EventProxy eProxy: mEventList){
-			final ArrayList<StateProxy> nextTuple = new ArrayList<StateProxy>();
-			boolean eventAvailable = true;
+		    for(final EventProxy eProxy: mEventList){
+			final ArrayList<StateProxy> nextTuple = eventAvailable(currTuple, eProxy);
 			
-			for(int j = 0; j < mAutomataList.size(); j++){
-			    StateProxy nextState = currTuple.get(j);
-			    boolean eventExist = false;
-			    boolean transitionExist = false;
-			    eventAvailable = true;
-			    
-			    for(EventProxy e: mAutomataList.get(j).getEvents()){ // Find event exists
-				if(e == eProxy){
-				    eventExist = true;
-				    break;
-				}
-			    }
-			    
-			    if(eventExist){
-				for(TransitionProxy t: mAutomataList.get(j).getTransitions()){ // Find transition exists
-				    if(t.getSource() == currTuple.get(j) && t.getEvent() == eProxy){
-					nextState = t.getTarget();
-					transitionExist = true;
-					break;
-				    }
-				}
-			    }
-			    
-			    if(!eventExist){ // if event does not exist: nextTuple[i] = currTuple[i]
-				nextTuple.add(currTuple.get(j));
-			    }
-			    else if(transitionExist){ // else if exists transition: nextTuple[i] = getNextTransition(currTuple[i])
-				nextTuple.add(nextState);
-			    }
-			    else{ // else: event is not available
-				eventAvailable = false;
-				break;
-			    }
-			}
-			
-			if(eventAvailable){
-			    if(inLoop(nextTuple, loopStates)){
-				// lastTuple = currTuple;
+			if(nextTuple != null){
+			    if(isInLoop(nextTuple, loopStates)){
 				tracelist.add(0, eProxy);
 				mRootStateTuple = nextTuple;
 				break loop2;
@@ -541,46 +395,10 @@ public class ControlLoopChecker extends ModelChecker
 		for(int j = start; j <= end; j++){
 		    ArrayList<StateProxy> curr = list.get(j);
 		    
-		    for(EventProxy eProxy: mEventList){
-			ArrayList<StateProxy> next = new ArrayList<StateProxy>();
-			boolean eventAvailable = true;
-		    
-			for(int k = 0; k < mAutomataList.size(); k++){
-			    StateProxy nextState = curr.get(k);
-			    boolean eventExist = false;
-			    boolean transitionExist = false;
-			    eventAvailable = true;
-			    
-			    for(EventProxy e: mAutomataList.get(k).getEvents()){ // Find event exists
-				if(e == eProxy){
-				    eventExist = true;
-				    break;
-				}
-			    }
-			    
-			    if(eventExist){
-				for(TransitionProxy t: mAutomataList.get(k).getTransitions()){ // Find transition exists
-				    if(t.getSource() == curr.get(k) && t.getEvent() == eProxy){
-					nextState = t.getTarget();
-					transitionExist = true;
-					break;
-				    }
-				}
-			    }
-			    
-			    if(!eventExist){ // if event does not exist: nextTuple[i] = currTuple[i]
-				next.add(curr.get(k));
-			    }
-			    else if(transitionExist){ // else if exists transition: nextTuple[i] = getNextTransition(currTuple[i])
-				next.add(nextState);
-			    }
-			    else{ // else: event is not available
-				eventAvailable = false;
-				break;
-			    }
-			}
-			
-			if(eventAvailable){
+		    for(final EventProxy eProxy: mEventList){
+			ArrayList<StateProxy> next = eventAvailable(curr, eProxy);
+
+			if(next != null){
 			    if(next.equals(target)){
 				tracelist.add(0, eProxy);
 				target = curr;
@@ -595,7 +413,7 @@ public class ControlLoopChecker extends ModelChecker
 	int loopIndex = tracelist.size() + 1;
 	
 	while(loopStates.size() > 0){
-	    for(TransitionProperty tp: loopStates){
+	    for(final TransitionProperty tp: loopStates){
 		if(mRootStateTuple.equals(tp.getSourceTuple())){
 		    tracelist.add(tp.getEvent());
 		    mRootStateTuple = tp.getTargetTuple();
@@ -609,9 +427,61 @@ public class ControlLoopChecker extends ModelChecker
 	return trace;
     }
 
-    public boolean inLoop(ArrayList<StateProxy> currTuple, Set<TransitionProperty> loopStates)
+    /**
+     * It checks event is available from current state tuple.
+     * @param currTuple current state tuple
+     * @param event current event
+     * @return return null if event is not available from current event, or return next state tuple
+     */
+    public ArrayList<StateProxy> eventAvailable(ArrayList<StateProxy> currTuple, EventProxy event)
     {
-	for(TransitionProperty tp: loopStates){
+	ArrayList<StateProxy> nextTuple = new ArrayList<StateProxy>();
+
+	for(int i = 0; i < mAutomataList.size(); i++){
+	    StateProxy nextState = currTuple.get(i);
+	    boolean eventExist = false;
+	    boolean transitionExist = false;
+	    
+	    for(final EventProxy eProxy: mAutomataList.get(i).getEvents()){ // Find event exists
+		if(eProxy == event){
+		    eventExist = true;
+		    break;
+		}
+	    }
+	    
+	    if(eventExist){
+		for(final TransitionProxy t: mAutomataList.get(i).getTransitions()){ // Find transition exists
+		    if(t.getSource() == currTuple.get(i) && t.getEvent() == event){
+			nextState = t.getTarget();
+			transitionExist = true;
+			break;
+		    }
+		}
+	    }
+	    
+	    if(!eventExist){ // if event does not exist: nextTuple[i] = currTuple[i]
+		nextTuple.add(currTuple.get(i));
+	    }
+	    else if(transitionExist){ // else if exists transition: nextTuple[i] = getNextTransition(currTuple[i])
+		nextTuple.add(nextState);
+	    }
+	    else{ // else: event is not available
+		return null;
+	    }
+	}
+
+	return nextTuple;
+    }
+
+    /**
+     * It checks current state tuple is in the control loop
+     * @param currTuple current state tuple
+     * @param loopStates transitions in the control loop
+     * @return return true if state tuple is in the loop, false otherwise
+     */
+    public boolean isInLoop(ArrayList<StateProxy> currTuple, Set<TransitionProperty> loopStates)
+    {
+	for(final TransitionProperty tp: loopStates){
 	    if(currTuple.equals(tp.getSourceTuple())){
 		return true;
 	    }
