@@ -302,6 +302,27 @@
     </junit>
   </target>
 
+  <target name="test2" depends="test-jar">
+    <mkdir dir="${logs.results}"/>
+    <junit printsummary="on" fork="true" maxmemory="512m">
+      <formatter type="xml"/>
+      <batchtest todir="${logs.results}">
+        <fileset dir="${supremica.testsrc}">
+          <include name="net/sourceforge/waters/analysis/ControlLoopCheckerTest.java"/>
+        </fileset>
+      </batchtest>
+      <classpath>
+        <path refid="jaxb.classpath"/>
+        <pathelement location="${jaxb.jar}"/>
+        <pathelement location="${waters.jar}"/>
+        <pathelement location="${test.jar}"/>
+        <pathelement location="${junit.jar}"/>
+      </classpath>
+      <sysproperty key="waters.test.inputdir" value="${examples}"/>
+      <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+    </junit>
+  </target>
+
   <target name="test-report">
     <mkdir dir="${logs.reports}"/>
     <junitreport todir="${logs.reports}">
