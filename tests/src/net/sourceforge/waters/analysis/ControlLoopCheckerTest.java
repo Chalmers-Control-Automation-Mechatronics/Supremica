@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopCheckerTest
 //###########################################################################
-//# $Id: ControlLoopCheckerTest.java,v 1.2 2006-08-08 23:53:14 yip1 Exp $
+//# $Id: ControlLoopCheckerTest.java,v 1.3 2006-08-08 23:58:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -54,23 +54,20 @@ public class ControlLoopCheckerTest extends AbstractWatersTest
 
   //#########################################################################
   //# Test Cases --- handwritten
-  /*
   public void testSmallFactory2() throws Exception
   {
     final String group = "handwritten";
     final String name = "small_factory_2.wdes";
-    runControlLoopChecker(group, name, true|false);
+    runControlLoopChecker(group, name, true);
   }
-  */
 
-  /*
   public void testTictactoe() throws Exception
   {
     final String group = "handwritten";
     final String name = "tictactoe.wdes";
-    runControlLoopChecker(group, name, true|false);
+    runControlLoopChecker(group, name, true);
   }
-  */
+
 
   //#########################################################################
   //# Test Cases --- tests
@@ -283,7 +280,7 @@ public class ControlLoopCheckerTest extends AbstractWatersTest
     runControlLoopChecker(group, dir, name, true|false);
   }
   */
-  /*
+
   public void test_TrafficLights2006_ac61() throws Exception
   {
     final String group = "tests";
@@ -475,7 +472,8 @@ public class ControlLoopCheckerTest extends AbstractWatersTest
     final String name = "yip1.wdes";
     runControlLoopChecker(group, dir, name, true);
   }
-  */
+
+
   //#########################################################################
   //# Test Cases --- valid
   public void testBigFactory() throws Exception
@@ -570,15 +568,13 @@ public class ControlLoopCheckerTest extends AbstractWatersTest
     runControlLoopChecker(group, dir, name, true);
   }
   
-  /*
   public void testSmd() throws Exception
   {
     final String group = "valid";
     final String dir = "smd";
     final String name = "smdreset.wdes";
-    runControlLoopChecker(group, dir, name, true|false);
+    runControlLoopChecker(group, dir, name, true);
   }
-  */
 
   public void testTline_0() throws Exception
   {
@@ -603,6 +599,7 @@ public class ControlLoopCheckerTest extends AbstractWatersTest
     final String name = "weiche.wdes";
     runControlLoopChecker(group, dir, name, true);
   }
+
 
   //#########################################################################
   //# Auxiliary Methods
