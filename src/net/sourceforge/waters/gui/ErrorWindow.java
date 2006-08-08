@@ -4,12 +4,15 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ErrorWindow
 //###########################################################################
-//# $Id: ErrorWindow.java,v 1.3 2005-02-20 23:32:54 robi Exp $
+//# $Id: ErrorWindow.java,v 1.4 2006-08-08 23:59:21 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
+import java.awt.Container;
+import java.awt.Component;
+import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -63,13 +66,15 @@ public class ErrorWindow
 	 * and its position, and asks the user whether they want to
 	 * continue their editing, or stop and revert to the last correct
 	 * value of their input.
-	 * @param  owner      The Frame from which the dialog is displayed.
+	 * @param  owner      The parent window from which the dialog is displayed.
+	 *                    Must be a {@link Frame} or {@link Dialog},
+	 *                    or <CODE>null</CODE>.
 	 * @param  exception  The parse exception that caused the error.
 	 * @param  input      The input which caused the error.
 	 * @return <CODE>true</CODE> if the user chooses to cancel their edit,
 	 *         <CODE>false</CODE> otherwise.
 	 */
-	public static boolean askRevert(final Frame owner,
+	public static boolean askRevert(final Container owner,
 									final ParseException exception,
 									final String input)
 	{
@@ -85,13 +90,15 @@ public class ErrorWindow
 	 * and its position, and asks the user whether they want to
 	 * continue their editing, or stop and revert to the last correct
 	 * value of their input.
-	 * @param  owner      The Frame from which the dialog is displayed.
+	 * @param  owner      The parent window from which the dialog is displayed.
+	 *                    Must be a {@link Frame} or {@link Dialog},
+	 *                    or <CODE>null</CODE>.
 	 * @param  exception  The parse exception that caused the error.
 	 * @param  input      The input which caused the error.
 	 * @return <CODE>true</CODE> if the user chooses to cancel their edit,
 	 *         <CODE>false</CODE> otherwise.
 	 */
-	public static boolean askRevert(final Frame owner,
+	public static boolean askRevert(final Container owner,
 									final java.text.ParseException exception,
 									final String input)
 	{
@@ -107,7 +114,9 @@ public class ErrorWindow
 	 * and its position, and asks the user whether they want to
 	 * continue their editing, or stop and revert to the last correct
 	 * value of their input.
-	 * @param  owner      The Frame from which the dialog is displayed.
+	 * @param  owner      The parent window from which the dialog is displayed.
+	 *                    Must be a {@link Frame} or {@link Dialog},
+	 *                    or <CODE>null</CODE>.
 	 * @param  message    The error message to be shown.
 	 * @param  input      The input which caused the error.
 	 * @param  pos        The offset within the input where the error
@@ -115,12 +124,22 @@ public class ErrorWindow
 	 * @return <CODE>true</CODE> if the user chooses to cancel their edit,
 	 *         <CODE>false</CODE> otherwise.
 	 */
-	public static boolean askRevert(final Frame owner,
+	public static boolean askRevert(final Container owner,
 									final String message,
 									final String input,
 									final int pos)
 	{
-		final ErrorWindow window = new ErrorWindow(owner, message, input, pos);
+		ErrorWindow window;
+		if (owner instanceof Frame) {
+			final Frame frame = (Frame) owner;
+			window = new ErrorWindow(frame, message, input, pos);
+		} else if (owner instanceof Dialog) {
+			final Dialog dialog = (Dialog) owner;
+			window = new ErrorWindow(dialog, message, input, pos);
+		} else {
+			throw new ClassCastException
+				("Unknown parent type: " + owner.getClass().getName() + "!");
+		}
 		return window.isCancelled();
 	}
 
@@ -133,7 +152,7 @@ public class ErrorWindow
 	 * and its position, and asking the user whether they want to
 	 * continue their editing, or stop and revert to the last correct
 	 * value of their input.
-	 * @param  owner      The Frame from which the dialog is displayed.
+	 * @param  owner      The parent window from which the dialog is displayed.
 	 * @param  message    The error message to be shown.
 	 * @param  input      The input which caused the error.
 	 * @param  pos        The offset within the input where the error
@@ -145,6 +164,37 @@ public class ErrorWindow
 					   final int pos)
 	{
 		super(owner, "Waters - Error!", true);
+		initialize(owner, message, input, pos);
+	}
+
+
+	/**
+	 * Creates an error dialog window.
+	 * This method creates a dialog describing a parse error message
+	 * and its position, and asking the user whether they want to
+	 * continue their editing, or stop and revert to the last correct
+	 * value of their input.
+	 * @param  owner      The parent window from which the dialog is displayed.
+	 * @param  message    The error message to be shown.
+	 * @param  input      The input which caused the error.
+	 * @param  pos        The offset within the input where the error
+	 *                    occurred, -1 if not applicable.
+	 */
+	public ErrorWindow(final Dialog owner,
+					   final String message,
+					   final String input,
+					   final int pos)
+	{
+		super(owner, "Waters - Error!", true);
+		initialize(owner, message, input, pos);
+	}
+
+
+	private void initialize(final Component owner,
+							final String message,
+							final String input,
+							final int pos)
+	{
 		setLocationRelativeTo(owner);
 
 		final JPanel contentPane = new JPanel();

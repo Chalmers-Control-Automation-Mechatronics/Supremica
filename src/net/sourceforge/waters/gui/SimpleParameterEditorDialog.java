@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventParameterEditorDialog
 //###########################################################################
-//# $Id: SimpleParameterEditorDialog.java,v 1.4 2005-11-03 01:24:15 robi Exp $
+//# $Id: SimpleParameterEditorDialog.java,v 1.5 2006-08-08 23:59:21 robi Exp $
 //###########################################################################
 
 
@@ -167,9 +167,6 @@ public class SimpleParameterEditorDialog
 							   exception.getMessage());
 				return;
 			}
-
-			final DefaultListModel paramData = mRoot.getParameterDataList();
-			paramData.addElement(param);
 			dispose();
 		}
 

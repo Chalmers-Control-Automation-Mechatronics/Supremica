@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.18 2006-07-20 02:28:37 robi Exp $
+//# $Id: EventTableModel.java,v 1.19 2006-08-08 23:59:21 robi Exp $
 //###########################################################################
 
 
@@ -550,10 +550,9 @@ public class EventTableModel
     {
       mModel.addIdentifier(mIdentifier);
     }
-		
+
     /** 
-     * Undoes the Command
-     *
+     * Undoes the command.
      */    
     public void undo()
     {

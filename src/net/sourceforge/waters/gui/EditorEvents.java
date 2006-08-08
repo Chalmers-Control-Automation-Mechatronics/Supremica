@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.21 2006-07-10 21:59:48 knut Exp $
+//# $Id: EditorEvents.java,v 1.22 2006-08-08 23:59:21 robi Exp $
 //###########################################################################
 
 
@@ -31,7 +31,6 @@ import java.awt.dnd.DragSourceListener;
 import java.awt.dnd.InvalidDnDOperationException;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
-import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JFormattedTextField;
@@ -109,7 +108,8 @@ public class EditorEvents
 		final TableCellRenderer textrenderer1 =
 			new RendererNoFocus(textrenderer0, true);
 		setDefaultRenderer(Object.class, textrenderer1);
-		final TableCellEditor editor = new IdentifierEditor(parser);
+		final TableCellEditor editor =
+			new SimpleExpressionEditor(Operator.TYPE_NAME, parser);
 		setDefaultEditor(Object.class, editor);
 
 		setPreferredSizes();
@@ -318,55 +318,6 @@ public class EditorEvents
 		//# Data Members
 		private final TableCellRenderer mRenderer;
 		private final boolean mFocusable;
-
-	}
-
-
-
-	//#######################################################################
-	//# Local Class IdentifierEditor
-	private static class IdentifierEditor
-		extends DefaultCellEditor
-	{
-
-		//###################################################################
-		//# Constructors
-		private IdentifierEditor(final ExpressionParser parser)
-		{
-			super(new SimpleExpressionCell(Operator.TYPE_NAME, parser));
-		}
-
-
-
-		//###################################################################
-		//# Overrides for base class javax.swing.DefaultCellEditor
-		public Component getTableCellEditorComponent
-			(final JTable table, final Object value, final boolean isSelected,
-			 final int row, final int column)
-		{
-			final SimpleExpressionCell textfield =
-				(SimpleExpressionCell) super.getTableCellEditorComponent
-				    (table, value, isSelected, row, column);
-			textfield.setValue(value);
-			return textfield;
-		}
-
-
-		public Object getCellEditorValue()
-		{
-			final SimpleExpressionCell textfield =
-				(SimpleExpressionCell) getComponent();
-
-			return textfield.getValue();
-		}
-
-
-		public boolean stopCellEditing()
-		{
-			final SimpleExpressionCell textfield =
-				(SimpleExpressionCell) getComponent();
-			return textfield.verify() && super.stopCellEditing();
-		}
 
 	}
 

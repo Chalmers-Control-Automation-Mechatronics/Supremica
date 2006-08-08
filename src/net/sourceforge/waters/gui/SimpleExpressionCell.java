@@ -1,342 +1,318 @@
-//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.gui
-//# CLASS:   EventListCell
+//# PACKAGE: net.sourceforge.waters.gui
+//# CLASS:   SimpleExpressionCell
 //###########################################################################
-//# $Id: SimpleExpressionCell.java,v 1.7 2005-11-03 01:24:15 robi Exp $
+//# $Id: SimpleExpressionCell.java,v 1.8 2006-08-08 23:59:21 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
-import java.awt.Frame;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
-import javax.swing.KeyStroke;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.JTextComponent;
-import javax.swing.text.Keymap;
 
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
 
 public class SimpleExpressionCell
-	extends JFormattedTextField
+  extends JFormattedTextField
 {
 
-	//#######################################################################
-	//# Constructors
-	public SimpleExpressionCell(final ExpressionParser parser)
-	{
-		this(Operator.TYPE_ANY, parser);
-	}
+  //#########################################################################
+  //# Constructors
+  public SimpleExpressionCell(final ExpressionParser parser)
+  {
+    this(Operator.TYPE_ANY, parser);
+  }
+
+  public SimpleExpressionCell(final int mask,
+                              final ExpressionParser parser)
+  {
+    this(new DefaultInputParser(mask, parser));
+  }
+
+  public SimpleExpressionCell(final Object value,
+                              final ExpressionParser parser)
+  {
+    this(value, Operator.TYPE_ANY, parser);
+  }
+
+  public SimpleExpressionCell(final Object value,
+                              final int mask,
+                              final ExpressionParser parser)
+  {
+    this(value, new DefaultInputParser(mask, parser));
+  }
+
+  public SimpleExpressionCell(final FormattedInputParser parser)
+  {
+    this(null, parser);
+  }
+
+  public SimpleExpressionCell(final Object value,
+                              final FormattedInputParser parser)
+  {
+    mAllowNull = (value == null);
+    mParser = parser;
+    mVerifier = new SimpleExpressionVerifier();
+    final JFormattedTextField.AbstractFormatter formatter =
+      new SimpleExpressionFormatter();
+    final DefaultFormatterFactory factory =
+      new DefaultFormatterFactory(formatter);
+    setFormatterFactory(factory);
+    setInputVerifier(mVerifier);
+    if (value != null) {
+      setValue(value);
+    }
+  }
 
 
-	public SimpleExpressionCell(final int mask,
-								final ExpressionParser parser)
-	{
-		this(null, mask, parser);
-	}
+  //#########################################################################
+  //# Input Verification
+  public boolean shouldYieldFocus()
+  {
+    return mVerifier.shouldYieldFocus(this);
+  }
+
+  public void revert()
+  {
+    final Object oldvalue = getValue();
+    setValue(oldvalue);
+  }
 
 
-	public SimpleExpressionCell(final SimpleExpressionSubject expr,
-								final ExpressionParser parser)
-	{
-		this(expr, Operator.TYPE_ANY, parser);
-	}
+  //#########################################################################
+  //# Error Display
+  public ErrorDisplay getErrorDisplay()
+  {
+    return mErrorDisplay;
+  }
+
+  public void setErrorDisplay(final ErrorDisplay display)
+  {
+    mErrorDisplay = display;
+  }
 
 
-	public SimpleExpressionCell(final SimpleExpressionSubject expr,
-								final int mask,
-								final ExpressionParser parser)
-	{
-		mTypeMask = mask;
-		mParser = parser;
-		mFilter = new SimpleExpressionFilter();
-		mVerifier = new SimpleExpressionVerifier();
+  //#########################################################################
+  //# Auxiliary Methods
+  public void setErrorMessage(final String msg)
+  {
+    if (mErrorDisplay != null) {
+      mErrorDisplay.displayError(msg);
+    }
+  }
 
-		final DefaultFormatter formatter =
-			new SimpleExpressionFormatter(false);
-		final DefaultFormatter nullformatter =
-			new SimpleExpressionFormatter(true);
-		final DefaultFormatterFactory factory =
-			new DefaultFormatterFactory(formatter, formatter,
-										formatter, nullformatter);
-		setFormatterFactory(factory);
-		setInputVerifier(mVerifier);
-
-		final Action action = new EnterAction();
-		final Action[] actions = {action};
-		final Keymap keymap = getKeymap();
-		JTextComponent.loadKeymap(keymap, BINDINGS, actions);
-
-		if (expr != null)
-		{
-			setValue(expr);
-		}
-	}
+  public void clearErrorMessage()
+  {
+    if (mErrorDisplay != null) {
+      mErrorDisplay.clearDisplay();
+    }
+  }
 
 
+  //#########################################################################
+  //# Local Class DefaultInputParser
+  private static class DefaultInputParser
+    extends DocumentFilter
+    implements FormattedInputParser
+  {
 
-	//#######################################################################
-	//# Input Verification
-	public boolean verify()
-	{
-		return mVerifier.verify(this);
-	}
-
-
-	public void revert()
-	{
-		final Object oldvalue = getValue();
-		setValue(oldvalue);
-	}
-
-
-
-	//#######################################################################
-	//# Local Class SimpleExpressionFormatter
-	private class SimpleExpressionFormatter
-		extends DefaultFormatter
-	{
-
-		//###################################################################
-		//# Constructors
-		private SimpleExpressionFormatter(final boolean allownull)
-		{
-			mAllowNull = allownull;
-			setCommitsOnValidEdit(false);
-		}
+    //#######################################################################
+    //# Constructors
+    private DefaultInputParser(final int mask, final ExpressionParser parser)
+    {
+      mParser = parser;
+      mTypeMask = mask;
+    }
 
 
+    //#######################################################################
+    //# Interface net.sourceforge.waters.gui.FormattedInputParser
+    public SimpleExpressionProxy parse(final String text)
+      throws ParseException
+    {
+      return mParser.parse(text, mTypeMask);
+    }
 
-		//###################################################################
-		//# Overrides for class javax.swing.text.DefaultFormatter
-		public Object stringToValue(final String input)
-			throws java.text.ParseException
-		{
-			if (input.length() != 0) {
-				try {
-					return mParser.parse(input, mTypeMask);
-				} catch (final ParseException exception) {
-					throw exception.getJavaException();
-				}
-			} else if (mAllowNull) {
-				return null;
-			} else {
-				throw new java.text.ParseException("Empty input!", 0);
-			}
-		}
+    public DocumentFilter getDocumentFilter()
+    {
+      return this;
+    }
 
 
-		public String valueToString(final Object value)
-		{
-			if (value == null) {
-				return "";
-			} else {
-				return value.toString();
-			}
-		}
+    //#######################################################################
+    //# Overrides for class javax.swing.DocumentFilter
+    public void insertString(final DocumentFilter.FilterBypass bypass,
+                             final int offset,
+                             final String text,
+                             final AttributeSet attribs)
+      throws BadLocationException
+    {
+      final String filtered = filter(text);
+      if (filtered != null) {
+        super.insertString(bypass, offset, filtered, attribs);
+      }
+    }
+
+    public void replace(final DocumentFilter.FilterBypass bypass,
+                        final int offset,
+                        final int length,
+                        final String text,
+                        final AttributeSet attribs)
+      throws BadLocationException
+    {
+      final String filtered = filter(text);
+      if (filtered != null) {
+        super.replace(bypass, offset, length, filtered, attribs);
+      }
+    }
 
 
-		protected DocumentFilter getDocumentFilter()
-		{
-			return mFilter;
-		}
+    //#######################################################################
+    //# Auxiliary Methods
+    private String filter(final String text)
+    {
+      if (text == null) {
+        return null;
+      } else {
+        final int len = text.length();
+        final StringBuffer buffer = new StringBuffer(len);
+        for (int i = 0; i < len; i++) {
+          final char ch = text.charAt(i);
+          if (mParser.isExpressionCharacter(ch)) {
+            buffer.append(ch);
+          }
+        }
+        if (buffer.length() == 0) {
+          return null;
+        } else {
+          return buffer.toString();
+        }
+      }
+    }
 
 
+    //#######################################################################
+    //# Data Members
+    private final ExpressionParser mParser;
+    private final int mTypeMask;
 
-		//###################################################################
-		//# Data Members
-		private final boolean mAllowNull;
-
-	}
-
-
-
-	//#######################################################################
-	//# Local Class SimpleExpressionVerifier
-	private class SimpleExpressionVerifier
-		extends InputVerifier
-	{
-
-		//###################################################################
-		//# Overrides for class javax.swing.InputVerifier
-		public boolean verify(final JComponent input)
-		{
-			if (input instanceof JFormattedTextField)
-			{
-				final SimpleExpressionCell textfield =
-					(SimpleExpressionCell) input;
-
-				try
-				{
-					textfield.commitEdit();
-
-					return true;
-				}
-				catch (final java.text.ParseException exception)
-				{
-					final String text = textfield.getText();
-					if (text.length() == 0) {
-						return false;
-					}
-					final Frame root = (Frame) getTopLevelAncestor();
-					final boolean revert =
-						ErrorWindow.askRevert(root, exception, text);
-					if (revert) {
-						textfield.revert();
-					} else {
-						final int pos = exception.getErrorOffset();
-						textfield.setCaretPosition(pos);
-					}
-					return revert;
-				}
-			}
-			else
-			{
-				return true;
-			}
-		}
-
-		public boolean shouldYieldFocus(final JComponent input)
-		{
-			return verify(input);
-		}
-
-	}
+  }
 
 
+  //#########################################################################
+  //# Local Class SimpleExpressionFormatter
+  private class SimpleExpressionFormatter extends DefaultFormatter
+  {
 
-	//#######################################################################
-	//# Local Class SimpleExpressionFilter
-	private class SimpleExpressionFilter extends DocumentFilter
-	{
-
-		//###################################################################
-		//# Overrides for class javax.swing.DocumentFilter
-		public void insertString(final DocumentFilter.FilterBypass bypass,
-								 final int offset,
-								 final String text,
-								 final AttributeSet attribs)
-			throws BadLocationException
-		{
-			final String filtered = filter(text);
-			if (filtered != null) {
-				super.insertString(bypass, offset, filtered, attribs);
-			}
-		}
+    //#######################################################################
+    //# Constructors
+    private SimpleExpressionFormatter()
+    {
+      setCommitsOnValidEdit(false);
+    }
 
 
-		public void replace(final DocumentFilter.FilterBypass bypass,
-							final int offset,
-							final int length,
-							final String text,
-							final AttributeSet attribs)
-			throws BadLocationException
-		{
-			final String filtered = filter(text);
-			if (filtered != null) {
-				super.replace(bypass, offset, length, filtered, attribs);
-			}
-		}
+    //#######################################################################
+    //# Overrides for class javax.swing.text.DefaultFormatter
+    public Object stringToValue(final String text)
+      throws java.text.ParseException
+    {
+      if (text.length() != 0) {
+        try {
+          final Object value = mParser.parse(text);
+          clearErrorMessage();
+          return value;
+        } catch (final ParseException exception) {
+          final String msg = exception.getMessage();
+          setErrorMessage(msg);
+          throw exception.getJavaException();
+        }
+      } else if (mAllowNull) {
+        return null;
+      } else {
+        final String msg = "Empty name!";
+        setErrorMessage(msg);
+        throw new java.text.ParseException(msg, 0);
+      }
+    }
+
+    public String valueToString(final Object value)
+    {
+      if (value == null) {
+        return "";
+      } else {
+        return value.toString();
+      }
+    }
+
+    protected DocumentFilter getDocumentFilter()
+    {
+      return mParser.getDocumentFilter();
+    }
+
+  }
 
 
+  //#########################################################################
+  //# Local Class SimpleExpressionVerifier
+  private class SimpleExpressionVerifier
+    extends InputVerifier
+  {
 
-		//###################################################################
-		//# Auxiliary Methods
-		private String filter(final String text)
-		{
-			if (text == null) {
-				return null;
-			} else {
-				final int len = text.length();
-				final StringBuffer buffer = new StringBuffer(len);
-				for (int i = 0; i < len; i++) {
-					final char ch = text.charAt(i);
-					if (mParser.isExpressionCharacter(ch)) {
-						buffer.append(ch);
-					}
-				}
-				if (buffer.length() == 0) {
-					return null;
-				} else {
-					return buffer.toString();
-				}
-			}
-		}
+    //#######################################################################
+    //# Overrides for class javax.swing.InputVerifier
+    public boolean verify(final JComponent input)
+    {
+      try {
+        final JFormattedTextField textfield = (JFormattedTextField) input;
+        final JFormattedTextField.AbstractFormatter formatter =
+          textfield.getFormatter();
+        final String text = textfield.getText();
+        formatter.stringToValue(text);
+        return true;
+      } catch (final java.text.ParseException exception) {
+        return false;
+      }
+    }
 
-	}
+    public boolean shouldYieldFocus(final JComponent input)
+    {
+      final SimpleExpressionCell textfield = (SimpleExpressionCell) input;
+      try {
+        textfield.commitEdit();
+        return true;
+      } catch (final java.text.ParseException exception) {
+        final int pos = exception.getErrorOffset();
+        textfield.setCaretPosition(pos);
+        return false;
+      }
+    }
 
-
-
-	//#######################################################################
-	//# Local Class EnterAction
-	/**
-	 * This handles the <CODE>&lt;ENTER&gt;</CODE> key.
-	 * When pressed, we need to verify the input and, if successful,
-	 * fire an {@link ActionEvent} to notify any registered listeners.
-	 * Other keys such as <CODE>&lt;TAB&gt;</CODE> are handled automatically
-	 * as focus changes. 
-	 */
-	private class EnterAction extends AbstractAction
-	{
-
-		//###################################################################
-		//# Constructors
-		private EnterAction()
-		{
-			super(ACTNAME_ENTER);
-		}
+  }
 
 
-
-		//###################################################################
-		//# Interface java.awt.event.ActionListener
-		public void actionPerformed(final ActionEvent event)
-		{
-			if (verify()) {
-				fireActionPerformed();
-			}
-		}
-
-	}
-
-
-
-	//#######################################################################
-	//# Data Members
-	private final int mTypeMask;
-	private final ExpressionParser mParser;
-	private final DocumentFilter mFilter;
-	private final InputVerifier mVerifier;
-
-
-
-	//#######################################################################
-	//# Class Constants
-	private static final String ACTNAME_ENTER = "SimpleExpressionCell.ENTER";
-	private static final KeyStroke STROKE_ENTER =
-		KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
-	private static final JTextComponent.KeyBinding BINDING_ENTER =
-		new JTextComponent.KeyBinding(STROKE_ENTER, ACTNAME_ENTER);
-
-	private static final JTextComponent.KeyBinding[] BINDINGS = {
-		BINDING_ENTER
-	};
+  //#########################################################################
+  //# Data Members
+  private final boolean mAllowNull;
+  private final FormattedInputParser mParser;
+  private final SimpleExpressionVerifier mVerifier;
+  private ErrorDisplay mErrorDisplay;
 
 }
