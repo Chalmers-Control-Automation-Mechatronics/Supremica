@@ -538,22 +538,22 @@ Class-Path: ${manifest.pathlist}</echo>
 </target>
 
 <target name="startfiles_local_supremica">
-	<copy file="${templates}/SupremicaJGrafchartLocal" todir="${dist}"/>    	
+	<copy file="${templates}/SupremicaJGrafchartLocal" todir="${dist}"/>
 	<chmod file="${dist}/SupremicaJGrafchartLocal" perm="644"/>
-	<copy file="${templates}/SupremicaJGrafchartLocal.cmd" todir="${dist}"/>		
+	<copy file="${templates}/SupremicaJGrafchartLocal.cmd"
+	      todir="${dist}"/>
 	<chmod file="${dist}/SupremicaJGrafchartLocal.cmd" perm="644"/>
-
-	<copy file="${templates}/manufacturingTablesTestLocal" todir="${dist}"/>    	
+	<copy file="${templates}/manufacturingTablesTestLocal"
+	      todir="${dist}"/>
 	<chmod file="${dist}/manufacturingTablesTestLocal" perm="644"/>
-	<copy file="${templates}/manufacturingTablesTestLocal.cmd" todir="${dist}"/>		
+	<copy file="${templates}/manufacturingTablesTestLocal.cmd"
+	      todir="${dist}"/>
 	<chmod file="${dist}/manufacturingTablesTestLocal.cmd" perm="644"/>
-
-	<copy file="${templates}/IDELocal.cmd" todir="${dist}"/>		
+	<copy file="${templates}/IDELocal.cmd" todir="${dist}"/>
 	<chmod file="${dist}/IDELocal.cmd" perm="644"/>
 	<copy file="${templates}/IDELocal" todir="${dist}"/>	
 	<chmod file="${dist}/IDELocal" perm="755"/>
-	
-	<copy file="${templates}/SupremicaLocal.cmd" todir="${dist}"/>		
+	<copy file="${templates}/SupremicaLocal.cmd" todir="${dist}"/>
 	<chmod file="${dist}/SupremicaLocal.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaLocalMoreMem.cmd" todir="${dist}"/>
 	<chmod file="${dist}/SupremicaLocalMoreMem.cmd" perm="644"/>
@@ -570,6 +570,8 @@ Class-Path: ${manifest.pathlist}</echo>
 	<chmod file="${dist}/IDE.cmd" perm="644"/>
 	<copy file="${templates}/IDE" todir="${dist}"/>	
 	<chmod file="${dist}/IDE" perm="755"/>
+	<copy file="${templates}/vw" todir="${dist}"/>	
+	<chmod file="${dist}/vw" perm="755"/>	
 	<copy file="${templates}/Waters.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/Waters.cmd" perm="644"/>
 	<copy file="${templates}/Waters" todir="${dist}"/>	
@@ -582,47 +584,47 @@ Class-Path: ${manifest.pathlist}</echo>
 	<chmod file="${dist}/Fuber" perm="755"/>
 	<copy file="${templates}/Fuber.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/Fuber.cmd" perm="644"/>
-	<copy file="${templates}/manufacturingTablesTest" todir="${dist}"/>	
+	<copy file="${templates}/manufacturingTablesTest" todir="${dist}"/>
 	<chmod file="${dist}/manufacturingTablesTest" perm="755"/>
-	<copy file="${templates}/manufacturingTablesTest.cmd" todir="${dist}"/>	
+	<copy file="${templates}/manufacturingTablesTest.cmd" todir="${dist}"/>
 	<chmod file="${dist}/manufacturingTablesTest.cmd" perm="755"/>
-	<copy file="${templates}/SupremicaProfiling.cmd" todir="${dist}"/>	
+	<copy file="${templates}/SupremicaProfiling.cmd" todir="${dist}"/>
 	<chmod file="${dist}/SupremicaProfiling.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaProfiling" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaProfiling" perm="755"/>
-	<copy file="${templates}/SupremicaStandard.cmd" todir="${dist}"/>	
+	<copy file="${templates}/SupremicaStandard.cmd" todir="${dist}"/>
 	<chmod file="${dist}/SupremicaStandard.cmd" perm="644"/>
-	<copy file="${templates}/SupremicaApplet.html" todir="${dist}"/>	
+	<copy file="${templates}/SupremicaApplet.html" todir="${dist}"/>
 	<chmod file="${dist}/SupremicaApplet.html" perm="644"/>	
-	<copy file="${templates}/SupremicaAppletViewer.html" todir="${dist}"/>	
+	<copy file="${templates}/SupremicaAppletViewer.html" todir="${dist}"/>
 	<chmod file="${dist}/SupremicaAppletViewer.html" perm="644"/>	
 <!--
-	<copy file="${templates}/SupremicaProperties.cfg" todir="${dist}"/>	
+	<copy file="${templates}/SupremicaProperties.cfg" todir="${dist}"/>
 	<chmod file="${dist}/SupremicaProperties.cfg" perm="644"/>	
-	<copy file="${templates}/SupremicaPropertiesStandard.cfg" todir="${dist}"/>	
+	<copy file="${templates}/SupremicaPropertiesStandard.cfg" todir="${dist}"/>
 	<chmod file="${dist}/SupremicaPropertiesStandard.cfg" perm="644"/>
 -->
-	<copy file="${platform}/win.x86/lib/buddy.dll" todir="${dist}"/>	
+	<copy file="${platform}/win.x86/lib/buddy.dll" todir="${dist}"/>
 	<chmod file="${dist}/buddy.dll" perm="644"/> 
-    <copy file="${platform}/win.x86/lib/BisimulationEquivalence.dll" todir="${dist}"/>	
+    <copy file="${platform}/win.x86/lib/BisimulationEquivalence.dll" todir="${dist}"/>
 	<chmod file="${dist}/BisimulationEquivalence.dll" perm="644"/> 
-	<copy file="${platform}/win.x86/lib/izmjnicom.dll" todir="${dist}"/>	
+	<copy file="${platform}/win.x86/lib/izmjnicom.dll" todir="${dist}"/>
 	<chmod file="${dist}/izmjnicom.dll" perm="644"/>
 <!-- JacoZoom license removed.
-	<copy file="${platform}/win.x86/lib/21100280.LIC" todir="${dist}"/>	
+	<copy file="${platform}/win.x86/lib/21100280.LIC" todir="${dist}"/>
 	<chmod file="${dist}/21100280.LIC" perm="644"/>
 -->
-	<copy file="${platform}/win.x86/lib/JavaClipboard.dll" todir="${dist}"/>	
+	<copy file="${platform}/win.x86/lib/JavaClipboard.dll" todir="${dist}"/>
 	<chmod file="${dist}/JavaClipboard.dll" perm="644"/>
-	<copy file="${platform}/win.x86/lib/glpk_bridge.dll" todir="${dist}"/>	
+	<copy file="${platform}/win.x86/lib/glpk_bridge.dll" todir="${dist}"/>
 	<chmod file="${dist}/glpk_bridge.dll" perm="644"/> 
-	<copy file="${platform}/linux.x86/lib/libbuddy.so" todir="${dist}"/>	
+	<copy file="${platform}/linux.x86/lib/libbuddy.so" todir="${dist}"/>
 	<chmod file="${dist}/libbuddy.so" perm="644"/>
-	<copy file="${platform}/linux.x86/lib/libBisimulationEquivalence.so" todir="${dist}"/>	
+	<copy file="${platform}/linux.x86/lib/libBisimulationEquivalence.so" todir="${dist}"/>
 	<chmod file="${dist}/libBisimulationEquivalence.so" perm="644"/>
-	<copy file="${platform}/macosx.powerpc/libBisimulationEquivalence.dylib" todir="${dist}"/>	
+	<copy file="${platform}/macosx.powerpc/libBisimulationEquivalence.dylib" todir="${dist}"/>
 	<chmod file="${dist}/libBisimulationEquivalence.dylib" perm="644"/>
-	<copy file="${platform}/macosx.powerpc/libbuddy.dylib" todir="${dist}"/>	
+	<copy file="${platform}/macosx.powerpc/libbuddy.dylib" todir="${dist}"/>
 	<chmod file="${dist}/libbuddy.dylib" perm="644"/>
 </target>
 

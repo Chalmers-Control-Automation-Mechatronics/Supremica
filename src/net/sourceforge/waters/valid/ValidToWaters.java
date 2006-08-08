@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ValidToWaters
 //###########################################################################
-//# $Id: ValidToWaters.java,v 1.6 2006-08-07 22:55:00 robi Exp $
+//# $Id: ValidToWaters.java,v 1.7 2006-08-08 23:56:45 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.valid;
@@ -126,7 +126,7 @@ public class ValidToWaters
           break;
         } else {
           System.err.println
-            ("USAGE: vw [-c|--compile] [-q|--quiet] <file> ...");
+            ("USAGE: vw [-c|--compile|-C|--Compile] [-q|--quiet] <file> ...");
           System.exit(1);
         }
       } else {
