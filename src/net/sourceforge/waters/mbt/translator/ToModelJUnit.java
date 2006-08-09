@@ -91,7 +91,7 @@ public class ToModelJUnit extends AbstractProductDESProxyVisitor {
 	public static void main(String args[])
 	throws Exception
 	{
-		if (args.length > 0)
+		if (args.length <= 0)
 		{
 			System.err.println("Args:  module.wmod");
 		}
