@@ -4,30 +4,24 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.24 2006-08-09 02:53:58 robi Exp $
+//# $Id: EditorComponentsPanel.java,v 1.25 2006-08-09 10:22:16 robi Exp $
 //###########################################################################
 
 
 package org.supremica.gui.ide;
 
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.*;
 import javax.swing.*;
 import javax.swing.tree.*;
 
 import net.sourceforge.waters.gui.ComponentInfo;
 import net.sourceforge.waters.gui.EditorEditVariableDialog;
 import net.sourceforge.waters.gui.EditorNewDialog;
-import net.sourceforge.waters.gui.EditorWindow;
-import net.sourceforge.waters.gui.EditorWindowInterface;
-import net.sourceforge.waters.gui.ModuleTreeRenderer;
+import net.sourceforge.waters.gui.ModuleTree;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
-import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
@@ -35,19 +29,14 @@ import net.sourceforge.waters.subject.module.InstanceSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.VariableSubject;
-import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.gui.ModuleTree;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-
 
 import org.supremica.gui.WhiteScrollPane;
 
 
 class EditorComponentsPanel
 	extends WhiteScrollPane
-	implements EditorPanelInterface, ModuleWindowInterface
+	implements EditorPanelInterface
 {
 	private static final long serialVersionUID = 1L;
 
@@ -57,13 +46,13 @@ class EditorComponentsPanel
 	private ModuleTree moduleSelectTree;
 	private boolean modified = true;
 
-	EditorComponentsPanel(ModuleContainer moduleContainer, String name)
+	EditorComponentsPanel(final ModuleContainer moduleContainer,
+						  final ModuleWindowInterface root,
+						  final String name)
 	{
 		this.moduleContainer = moduleContainer;
 		this.name = name;
-
-		createContentPane();
-
+		createContentPane(root);
 		setPreferredSize(IDEDimensions.leftEditorPreferredSize);
 		setMinimumSize(IDEDimensions.leftEditorMinimumSize);
 	}
@@ -71,42 +60,30 @@ class EditorComponentsPanel
 	public String getName()
 	{
 		return name;
-//		return moduleContainer.getModule().getName();
 	}
 
-
-	private void createContentPane()
+	private void createContentPane(final ModuleWindowInterface root)
 	{
-		final ArrayList l;
-		DefaultMutableTreeNode treeNode = null;
-
-		moduleSelectTree = new ModuleTree(this);
-
-		//DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
-
+		moduleSelectTree = new ModuleTree(root);
 		getViewport().add(moduleSelectTree);
-
 	}
 
 
-	// Open up an component dialog and allow the user to create a new component
+	//#######################################################################
+	//# org.supremica.gui.ide.EditorPanelInterface
 	public void addComponent()
 	{
-		EditorNewComponentDialog editor = new EditorNewComponentDialog(this);
+		new EditorNewComponentDialog(this);
 	}
 
 	// To do remove this
 	public void addEvent()
 	{
-
 	}
 
 	public void addComponent(final AbstractSubject o)
 	{
-//		logEntry("addComponent: " + o);
-
-		ModuleSubject module = getModuleSubject();
-
+		final ModuleSubject module = getModuleSubject();
 		if (module != null)
 		{
 			modified = true;
@@ -154,36 +131,14 @@ class EditorComponentsPanel
 		}
 	}
 
-
-	//######################################################################
-	//# Interface net.sourceforge.waters.gui.ModuleWindowInterface
 	public ModuleSubject getModuleSubject()
 	{
 		return moduleContainer.getModule();
 	}
 
-	public ExpressionParser getExpressionParser()
-	{
-		return moduleContainer.getExpressionParser();
-	}
-	
-	public Frame getRootWindow()
-	{
-		return (Frame) getTopLevelAncestor();
-	}
 
-	public EditorWindowInterface showEditor(SimpleComponentSubject component)
-	{
-		final EditorPanel editorPanel =
-			moduleContainer.getEditorPanel();
-		if (component != null) {
-			editorPanel.setRightComponent
-				(moduleContainer.getComponentEditorPanel(component));
-		}
-		return editorPanel.getActiveEditorWindowInterface();
-	}
-
-
+	//######################################################################
+	//# Interface java.awt.event.ActionListener
 	public void actionPerformed(ActionEvent e) {
 		if("add variable".equals(e.getActionCommand())) {
 			//add new variable

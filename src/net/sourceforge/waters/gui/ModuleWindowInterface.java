@@ -4,13 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindowInterface
 //###########################################################################
-//# $Id: ModuleWindowInterface.java,v 1.2 2006-08-09 02:53:58 robi Exp $
+//# $Id: ModuleWindowInterface.java,v 1.3 2006-08-09 10:22:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
 
 import java.awt.Frame;
 
+import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.model.expr.ExpressionParser;
@@ -29,6 +30,11 @@ import net.sourceforge.waters.model.expr.ExpressionParser;
 
 public interface ModuleWindowInterface
 {
+
+  /**
+   * Gets the undo manager used to pass commands to this GUI.
+   */
+  public UndoInterface getUndoInterface();
 
   /**
    * Gets the module edited by the GUI represented by this inteface.

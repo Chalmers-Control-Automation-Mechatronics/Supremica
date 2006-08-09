@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.52 2006-08-09 02:53:58 robi Exp $
+//# $Id: ModuleWindow.java,v 1.53 2006-08-09 10:22:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -988,6 +988,11 @@ public class ModuleWindow
 
   //########################################################################
   //# Interface net.sourceforge.waters.gui.ModuleWindowInterface
+  public UndoInterface getUndoInterface()
+  {
+    return this;
+  }
+
   public ModuleSubject getModuleSubject()
   {
     return mModule;

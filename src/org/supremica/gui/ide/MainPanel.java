@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   MainPanel
 //###########################################################################
-//# $Id: MainPanel.java,v 1.13 2006-08-09 02:53:58 robi Exp $
+//# $Id: MainPanel.java,v 1.14 2006-08-09 10:22:16 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -21,9 +21,11 @@ import javax.swing.JToolBar;
 
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
+import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+
 import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.ide.actions.Actions;
 
@@ -65,6 +67,11 @@ abstract class MainPanel
 
 	//######################################################################
 	//# Interface net.sourceforge.waters.gui.ModuleWindowInterface
+	public UndoInterface getUndoInterface()
+	{
+		return moduleContainer;
+	}
+
 	public ModuleSubject getModuleSubject()
 	{
 		return moduleContainer.getModule();

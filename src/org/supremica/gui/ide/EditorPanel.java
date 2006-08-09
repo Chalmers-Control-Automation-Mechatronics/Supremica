@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorPanel
 //###########################################################################
-//# $Id: EditorPanel.java,v 1.38 2006-08-09 02:53:58 robi Exp $
+//# $Id: EditorPanel.java,v 1.39 2006-08-09 10:22:16 robi Exp $
 //###########################################################################
 
 
@@ -36,7 +36,6 @@ public class EditorPanel
 	public EditorPanel(ModuleContainer moduleContainer, String name)
 	{
 		super(moduleContainer, name);
-
 		tabPanel = new JTabbedPane(JTabbedPane.BOTTOM);
 		tabPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
 		tabPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
@@ -47,7 +46,8 @@ public class EditorPanel
 		aliasesPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
 		tabPanel.add(aliasesPanel);
 */
-		componentsPanel = new EditorComponentsPanel(moduleContainer, "Components");
+		componentsPanel =
+			new EditorComponentsPanel(moduleContainer, this, "Components");
 		componentsPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
 		componentsPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
 		tabPanel.add(componentsPanel);
@@ -137,7 +137,7 @@ public class EditorPanel
 
 			public ModuleSubject getModuleSubject()
 			{
-				return componentsPanel.getModuleSubject();
+				return getModuleSubject();
 			}
 
 		}
