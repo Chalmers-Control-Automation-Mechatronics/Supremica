@@ -40,6 +40,9 @@ class ModuleTreePopupMenu
 	private void init()
 	{
 		JMenuItem item;
+		// *** BUG *** need to handle actions differently!
+		final ActionListener listener = (ActionListener) mWindow;
+		// *** BUG ***
 
 		if(mInvokingComponent instanceof SimpleComponentSubject) {
 /*			item = new JMenuItem("Add variable");
@@ -54,7 +57,7 @@ class ModuleTreePopupMenu
 				mInvokingComponent instanceof VariableSubject) {
 			item = new JMenuItem("Add variable");
 			item.setActionCommand("add variable");
-			item.addActionListener(mWindow);
+			item.addActionListener(listener);
 			this.add(item);
 			addVariableItem = item;
 		}
@@ -62,13 +65,13 @@ class ModuleTreePopupMenu
 		if(mInvokingComponent instanceof VariableSubject) {
 			item = new JMenuItem("Delete variable");
 			item.setActionCommand("remove component");
-			item.addActionListener(mWindow);
+			item.addActionListener(listener);
 			this.add(item);
 			deleteVariableItem = item;
 
 			item = new JMenuItem("Edit variable");
 			item.setActionCommand("edit variable");
-			item.addActionListener(mWindow);
+			item.addActionListener(listener);
 			this.add(item);
 			editVariableItem = item;
 		}
@@ -76,7 +79,7 @@ class ModuleTreePopupMenu
 		if(mInvokingComponent instanceof ModuleSubject) {
 			item = new JMenuItem("Create automaton");
 			item.setActionCommand("add simple component");
-			item.addActionListener(mWindow);
+			item.addActionListener(listener);
 			this.add(item);
 			deleteVariableItem = item;
 		}

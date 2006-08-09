@@ -1,18 +1,36 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica IDE
+//# PACKAGE: org.supremica.gui.ide
+//# CLASS:   MainPanel
+//###########################################################################
+//# $Id: MainPanel.java,v 1.13 2006-08-09 02:53:58 robi Exp $
+//###########################################################################
+
 package org.supremica.gui.ide;
 
-import javax.swing.JToolBar;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JScrollPane;
 import java.awt.Dimension;
-import javax.swing.JComponent;
-import java.awt.GridBagLayout;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JToolBar;
+
+import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.ModuleWindowInterface;
+import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.ide.actions.Actions;
 
+
 abstract class MainPanel
 	extends JPanel
+	implements ModuleWindowInterface
 {
 	private IDEToolBar thisToolBar = null;
 	private IDEToolBar currParentToolBar = null;
@@ -44,6 +62,38 @@ abstract class MainPanel
 		constraints.fill = GridBagConstraints.BOTH;
 	}
 
+
+	//######################################################################
+	//# Interface net.sourceforge.waters.gui.ModuleWindowInterface
+	public ModuleSubject getModuleSubject()
+	{
+		return moduleContainer.getModule();
+	}
+
+	public ExpressionParser getExpressionParser()
+	{
+		return moduleContainer.getExpressionParser();
+	}
+	
+	public Frame getRootWindow()
+	{
+		return (Frame) getTopLevelAncestor();
+	}
+
+	public EditorWindowInterface showEditor(SimpleComponentSubject component)
+	{
+		final EditorPanel editorPanel =
+			moduleContainer.getEditorPanel();
+		if (component != null) {
+			editorPanel.setRightComponent
+				(moduleContainer.getComponentEditorPanel(component));
+		}
+		return editorPanel.getActiveEditorWindowInterface();
+	}
+
+
+	//######################################################################
+	//#
 	public String getName()
 	{
 		return name;

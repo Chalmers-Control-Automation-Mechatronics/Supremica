@@ -5,7 +5,7 @@ import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
-import javax.swing.DefaultListModel;
+
 
 public interface EditorPanelInterface
 {
@@ -13,5 +13,4 @@ public interface EditorPanelInterface
 	public void addComponent(AbstractSubject component);
 	public void addEvent();
 	public ModuleSubject getModuleSubject();
-	public DefaultListModel getEventDataList();
 }

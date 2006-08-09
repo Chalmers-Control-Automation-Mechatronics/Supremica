@@ -1,12 +1,21 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica IDE
+//# PACKAGE: org.supremica.gui.ide
+//# CLASS:   EditorPanel
+//###########################################################################
+//# $Id: EditorPanel.java,v 1.38 2006-08-09 02:53:58 robi Exp $
+//###########################################################################
+
+
 package org.supremica.gui.ide;
 
-import javax.swing.*;
 import java.awt.GridBagLayout;
+import javax.swing.*;
 
-import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.ControlledSurface;
+import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.subject.base.AbstractSubject;
-import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 
 
@@ -68,6 +77,9 @@ public class EditorPanel
 		add(splitPanelHorizontal);
 	}
 
+
+	//######################################################################
+	//#
 	public void addToolBarEntries(IDEToolBar toolBar)
 	{
 		editorButtonGroup = new ButtonGroup();
@@ -121,11 +133,6 @@ public class EditorPanel
 			public void addEvent()
 			{
 				eventsPanel.addEvent();
-			}
-
-			public DefaultListModel getEventDataList()
-			{
-				return eventsPanel.getEventDataList();
 			}
 
 			public ModuleSubject getModuleSubject()

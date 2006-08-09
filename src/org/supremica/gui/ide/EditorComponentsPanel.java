@@ -4,20 +4,20 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.23 2006-07-12 03:59:29 knut Exp $
+//# $Id: EditorComponentsPanel.java,v 1.24 2006-08-09 02:53:58 robi Exp $
 //###########################################################################
 
 
 package org.supremica.gui.ide;
 
-import javax.swing.*;
-import javax.swing.tree.*;
-
-import java.util.*;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.tree.*;
 
 import net.sourceforge.waters.gui.ComponentInfo;
 import net.sourceforge.waters.gui.EditorEditVariableDialog;
@@ -26,6 +26,7 @@ import net.sourceforge.waters.gui.EditorWindow;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.ModuleTreeRenderer;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
+import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.Subject;
@@ -65,14 +66,6 @@ class EditorComponentsPanel
 
 		setPreferredSize(IDEDimensions.leftEditorPreferredSize);
 		setMinimumSize(IDEDimensions.leftEditorMinimumSize);
-	}
-
-	// TO DO This is a dummy method implemted just to satisfy
-	// the EditorPanelInterface. Thies method will never be called.
-	// This solution is so ugly that it has to be removed ASAP.
-	public DefaultListModel getEventDataList()
-	{
-		return null;
 	}
 
 	public String getName()
@@ -161,11 +154,22 @@ class EditorComponentsPanel
 		}
 	}
 
-//	public IndexedList<EventDeclSubject> getEventDeclListModifiable();
 
+	//######################################################################
+	//# Interface net.sourceforge.waters.gui.ModuleWindowInterface
 	public ModuleSubject getModuleSubject()
 	{
-		return this.moduleContainer.getModule();
+		return moduleContainer.getModule();
+	}
+
+	public ExpressionParser getExpressionParser()
+	{
+		return moduleContainer.getExpressionParser();
+	}
+	
+	public Frame getRootWindow()
+	{
+		return (Frame) getTopLevelAncestor();
 	}
 
 	public EditorWindowInterface showEditor(SimpleComponentSubject component)
@@ -178,6 +182,7 @@ class EditorComponentsPanel
 		}
 		return editorPanel.getActiveEditorWindowInterface();
 	}
+
 
 	public void actionPerformed(ActionEvent e) {
 		if("add variable".equals(e.getActionCommand())) {

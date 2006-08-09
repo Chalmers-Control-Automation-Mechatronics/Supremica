@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.8 2006-08-08 23:59:21 robi Exp $
+//# $Id: EventEditorDialog.java,v 1.9 2006-08-09 02:53:58 robi Exp $
 //###########################################################################
 
 
@@ -77,37 +77,38 @@ public class EventEditorDialog
 
   //#########################################################################
   //# Constructor
-  public EventEditorDialog(final ModuleWindow root)
+  public EventEditorDialog(final ModuleWindowInterface root)
   {
     this(root, false, false);
   }
 
-  public EventEditorDialog(final ModuleWindow root,
+  public EventEditorDialog(final ModuleWindowInterface root,
                            final boolean moreoptions,
                            final boolean isparam)
   {
     this(root, true, moreoptions, createDefaultItem(isparam));
   }
 
-  public EventEditorDialog(final ModuleWindow root,
+  public EventEditorDialog(final ModuleWindowInterface root,
                            final boolean moreoptions,
                            final EventDeclSubject decl)
   {
     this(root, false, moreoptions, decl);
   }
 
-  public EventEditorDialog(final ModuleWindow root,
+  public EventEditorDialog(final ModuleWindowInterface root,
                            final boolean moreoptions,
                            final EventParameterSubject param)
   {
     this(root, false, moreoptions, param);
   }
 
-  private EventEditorDialog(final ModuleWindow root,
+  private EventEditorDialog(final ModuleWindowInterface root,
                             final boolean createnew,
                             final boolean moreoptions,
                             final NamedSubject item)
   {
+    super(root.getRootWindow());
     if (createnew) {
       setTitle("Creating new event declation");
     } else {
@@ -119,7 +120,7 @@ public class EventEditorDialog
     mEditedItem = item;
     createComponents();
     layoutComponents();
-    setLocationRelativeTo(root);
+    setLocationRelativeTo(mRoot.getRootWindow());
     mNameInput.requestFocusInWindow();
     setVisible(true);
   }
@@ -1054,7 +1055,7 @@ public class EventEditorDialog
   //#########################################################################
   //# Data Members
   // Dialog state
-  private final ModuleWindow mRoot;
+  private final ModuleWindowInterface mRoot;
   private boolean mCreating;
   private boolean mDisplayingMoreOptions;
 

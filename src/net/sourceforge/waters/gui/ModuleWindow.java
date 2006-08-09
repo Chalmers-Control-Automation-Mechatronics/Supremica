@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.51 2006-08-08 23:59:21 robi Exp $
+//# $Id: ModuleWindow.java,v 1.52 2006-08-09 02:53:58 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -12,7 +12,19 @@ package net.sourceforge.waters.gui;
 import java.awt.GridLayout;
 import java.awt.Dimension;
 import java.awt.Component;
+import java.awt.Frame;
 import java.awt.event.*;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragSourceAdapter;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceListener;
+import java.awt.dnd.InvalidDnDOperationException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -32,18 +44,6 @@ import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 import javax.xml.bind.JAXBException;
-
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DragSource;
-import java.awt.dnd.DragGestureEvent;
-import java.awt.dnd.DragGestureListener;
-import java.awt.dnd.DragSourceAdapter;
-import java.awt.dnd.DragSourceDragEvent;
-import java.awt.dnd.DragSourceListener;
-import java.awt.dnd.InvalidDnDOperationException;
 
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoableCommand;
@@ -107,7 +107,7 @@ import org.xml.sax.SAXException;
 
 public class ModuleWindow 
   extends JFrame
-  implements FocusListener, UndoInterface,
+  implements ActionListener, FocusListener, UndoInterface,
              WindowListener, ModuleWindowInterface
 {
   /**
@@ -672,7 +672,7 @@ public class ModuleWindow
 
     if ("newevent".equals(e.getActionCommand()))
       {
-        new EventEditorDialog(this, true, false);
+        new EventEditorDialog(this, !DES_COURSE_VERSION, false);
         logEntry("New event requested");
       }
 
@@ -689,7 +689,7 @@ public class ModuleWindow
 
     if ("neweventparam".equals(e.getActionCommand()))
       {
-        new EventEditorDialog(this, true, true);
+        new EventEditorDialog(this, !DES_COURSE_VERSION, true);
         logEntry("New event parameter requested");
       }
 
@@ -878,11 +878,6 @@ public class ModuleWindow
     ;
   }
 
-  public ModuleSubject getModuleSubject()
-  {
-    return mModule;
-  }
-
   public void addUndoable(UndoableEdit e)
   {
     if (e.isSignificant())
@@ -968,14 +963,9 @@ public class ModuleWindow
     }
   }
 
-  public EditorWindowInterface showEditor(SimpleComponentSubject component) {
-    return new EditorWindow(component.getName(), mModule, component, this, this);
-  }
 
-  //////////////////////////////
-  // WindowListener interface //
-  //////////////////////////////
-
+  //########################################################################
+  //# Interface java.awt.event.WindowListener
   public void windowActivated(WindowEvent e) {}
   public void windowClosed(WindowEvent e) {}
   public void windowClosing(WindowEvent e)
@@ -995,18 +985,38 @@ public class ModuleWindow
   public void windowIconified(WindowEvent e) {}
   public void windowOpened(WindowEvent e) {}
 
+
   //########################################################################
-  //# Access the Module
+  //# Interface net.sourceforge.waters.gui.ModuleWindowInterface
+  public ModuleSubject getModuleSubject()
+  {
+    return mModule;
+  }
+
   public ExpressionParser getExpressionParser()
   {
     return mExpressionParser;
   }
 
+  public Frame getRootWindow()
+  {
+    return this;
+  }
+
+  public EditorWindowInterface showEditor(final SimpleComponentSubject comp)
+  {
+    return new EditorWindow(comp.getName(), mModule, comp, this, this);
+  }
+
+  // to be added to interface?
   public ProxyPrinter getPrinter()
   {
     return mPrinter;
   }
-	
+
+
+  //########################################################################
+  //# Inner Class IdentifierTransfer
   private class IdentifierTransfer implements Transferable
   {
     // the IdentifierSubject transferred by this Object

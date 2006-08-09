@@ -572,6 +572,8 @@ Class-Path: ${manifest.pathlist}</echo>
 	<chmod file="${dist}/IDE" perm="755"/>
 	<copy file="${templates}/vw" todir="${dist}"/>	
 	<chmod file="${dist}/vw" perm="755"/>	
+	<copy file="${templates}/MBTTranslate" todir="${dist}"/>	
+	<chmod file="${dist}/MBTTranslate" perm="755"/>	
 	<copy file="${templates}/Waters.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/Waters.cmd" perm="644"/>
 	<copy file="${templates}/Waters" todir="${dist}"/>	
