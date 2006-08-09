@@ -120,6 +120,7 @@ public class AutomatonSynthesizer
 		theAutomaton.setName(null);
 		return didSomething;
 	}
+
 	public void initializeAcceptingStates()
 	{
 		Iterator stateIt = theAutomaton.stateIterator();
@@ -133,6 +134,7 @@ public class AutomatonSynthesizer
 			}
 		}
 	}
+
 	// Synthesize a controllable, nonblocking and observable supervisor
 	protected boolean synthesizeControllableNonblockingObservable()
 		throws Exception
@@ -174,6 +176,7 @@ public class AutomatonSynthesizer
 		}
 		return true;
 	}
+
 	// Synthesize a controllable and nonblocking supervisor
 	protected boolean synthesizeControllableNonblocking()
 		throws Exception
@@ -222,6 +225,7 @@ public class AutomatonSynthesizer
 		theAutomaton.setType(AutomatonType.Supervisor);
 		return didSomething;
 	}
+
 	// Synthesize a controllable supervisor
 	protected boolean synthesizeControllable()
 		throws Exception
@@ -261,6 +265,7 @@ public class AutomatonSynthesizer
 		theAutomaton.setType(AutomatonType.Supervisor);
 		return didSomething;
 	}
+
 	protected boolean synthesizeNonblocking()
 		throws Exception
 	{
@@ -290,6 +295,7 @@ public class AutomatonSynthesizer
 		theAutomaton.setType(AutomatonType.Supervisor);
 		return didSomething;
 	}
+
 	/**
 	 * Sets the cost of all non-coreachable states to MAX_COST.
 	 *
@@ -350,6 +356,7 @@ public class AutomatonSynthesizer
 		logger.debug("found " + nbrOfNewUnsafeStates + " new blocking states");
 		return stateStack;    // return the set of non-coreachable states
 	}
+
 	// returns true if uncontrollable states found
 	protected boolean doControllable(Collection<State> stateStack)
 		throws Exception
@@ -378,6 +385,7 @@ public class AutomatonSynthesizer
 		logger.debug("found " + nbrOfNewUnsafeStates + " new uncontrollable states");
 		return newUnsafeStates;
 	}
+
 	/**
 	 * This one does for one state
 	 */
@@ -405,6 +413,7 @@ public class AutomatonSynthesizer
 		}
 		return stateStack;
 	}
+
 	/**
 	 * Sets the cost of all non reachable states to State.MAX_COST. Forbidden states 
 	 * stop reachability "synthesis style".
@@ -413,6 +422,7 @@ public class AutomatonSynthesizer
 	{
 		doReachable(false);
 	}
+
 	/**
 	 * Sets the cost of all non reachable states to State.MAX_COST. The treatment of
 	 * forbidden states as stops for reachability is selectable through the argument.
@@ -457,6 +467,7 @@ public class AutomatonSynthesizer
 				}
 			}
 		}
+
 		// Set max cost on the states that can't be reached
 		Iterator stateIt = theAutomaton.stateIterator();
 		while (stateIt.hasNext())
@@ -469,6 +480,7 @@ public class AutomatonSynthesizer
 			}
 		}
 	}
+
 	/**
 	 * Returns the set of UNCONTROLLABLE events that needed to be
 	 * disabled in the synthesis.  If not
@@ -480,6 +492,7 @@ public class AutomatonSynthesizer
 	{
 		return disabledUncontrollableEvents;
 	}
+
 	protected void computeDisabledUncontrollableEvents()
 	{
 		disabledUncontrollableEvents = new Alphabet();
@@ -513,6 +526,7 @@ public class AutomatonSynthesizer
 			}
 		}
 	}
+
 	public void purge()
 	{
 		List<State> stateList = new LinkedList<State>();
@@ -535,6 +549,7 @@ public class AutomatonSynthesizer
 		}
 		stateList.clear();
 	}
+
 	/**
 	 * Return the previously computed result.
 	 */
@@ -542,6 +557,7 @@ public class AutomatonSynthesizer
 	{
 		return theAutomaton;
 	}
+
 	/**
 	 * Method that stops the synthesizer as soon as possible.
 	 *

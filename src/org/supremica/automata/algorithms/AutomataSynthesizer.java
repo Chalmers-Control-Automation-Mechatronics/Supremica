@@ -499,6 +499,7 @@ public class AutomataSynthesizer
 	{
 		return doMonolithic(automata, false);
 	}
+
 	/**
 	 * This method synchronizes the given automata, and calculates
 	 * the forbidden states.
@@ -661,8 +662,11 @@ public class AutomataSynthesizer
 	}
 
 	/**
-	 * Removes unnecessary automata, i.e. synthesized supervisors that don't affect the controllability.
-	 * Note: At the moment, only controllability is checked, no non-blocking.
+	 * Removes unnecessary automata, i.e. synthesized supervisors that
+	 * don't affect the controllability.
+	 *
+	 * Note: At the moment, only controllability is checked, no
+	 * non-blocking.
 	 *
 	 * After this method has completed, the unnecessary supervisors have been removed from
 	 * candidateSupervisors.
@@ -755,63 +759,6 @@ public class AutomataSynthesizer
 				executionDialog.setProgress(progress);
 			}
 		}
-
-		/*
-		AutomataVerifier theVerifier;
-		VerificationOptions theVerificationOptions = new VerificationOptions();
-
-		// Get the selected synchronizationOptions
-		SynchronizationOptions syncOptions;
-		try
-		{
-			syncOptions = new SynchronizationOptions();
-		}
-		catch (Exception ex)
-		{
-			logger.error("Exception in SynchronizationOptions." + ex);
-			logger.debug(ex.getStackTrace());
-
-			return;
-		}
-
-		// Is this the only necessary option?
-		theVerificationOptions.setVerificationType(VerificationType.Controllability);
-
-		// Remove the new automata one by one and examine if it had impact on the result.
-		for (int i = newSupervisors.size() - 1; i >= 0; i--)
-		{
-			currAutomata.removeAutomaton(newSupervisors.getAutomatonAt(i));
-
-			try
-			{
-                // Verify controllability with one automaton removed
-				theVerifier = new AutomataVerifier(currAutomata, syncOptions, theVerificationOptions);
-
-				if (theVerifier.verify())
-				{    // This supervisor had no impact, throw it away!
-					candidateSupervisors.removeAutomaton(candidateSupervisors.getAutomatonAt(i));
-				}
-				else
-				{    // It had impact, put it back!
-					currAutomata.addAutomaton(newSupervisors.getAutomatonAt(i));
-				}
-			}
-			catch (IllegalArgumentException ex)
-			{
-				logger.error("AutomataSynthesizer.optimize: Illegal argument " + ex);
-				logger.debug(ex.getStackTrace());
-
-				return;
-			}
-			catch (Exception ex)
-			{
-				logger.error("Exception in AutomataSynthesizer.optimize. " + ex);
-				logger.debug(ex.getStackTrace());
-
-				return;
-			}
-		}
-		*/
 	}
 
 	public void setExecutionDialog(ExecutionDialog dialog)
@@ -835,5 +782,19 @@ public class AutomataSynthesizer
 		{
 			threadToStop.requestStop();
 		}
+	}
+
+	/**
+	 * Default method for synthesizing a controllable and nonblocking supervisor.
+	 */
+	public static Supervisor synthesizeControllableNonblocking(Automata model)
+		throws Exception
+	{
+		SynchronizationOptions synchOptions = SynchronizationOptions.getDefaultSynthesisOptions();
+		SynthesizerOptions synthOptions = SynthesizerOptions.getDefaultMonolithicCNBSynthesizerOptions();
+		AutomataSynthesizer synthesizer = new AutomataSynthesizer(model, synchOptions, synthOptions);
+		Automata result = synthesizer.execute();
+
+		return new ModularSupervisor(result);
 	}
 }

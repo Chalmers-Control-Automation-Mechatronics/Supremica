@@ -247,7 +247,7 @@ public final class SynthesizerOptions
 	/**
 	 * Returns the default options for synthesis.
 	 */
-	public static SynthesizerOptions getMonolithicCNBSynthesizerOptions()
+	public static SynthesizerOptions getDefaultMonolithicCNBSynthesizerOptions()
 	{
 	    SynthesizerOptions options = getDefaultSynthesizerOptions();
 	    options.synthesisAlgorithm = SynthesisAlgorithm.Monolithic;

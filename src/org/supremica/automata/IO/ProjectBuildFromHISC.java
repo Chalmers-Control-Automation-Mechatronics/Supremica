@@ -113,9 +113,12 @@ public class ProjectBuildFromHISC
 		String line = "";
 		while (line.equals(""))
 		{
+			// Read line
 			line = reader.readLine();
 			if (line == null)
 				return null;
+
+			// Strip comments and whitespaces
 			if (line.contains("#"))
 				line = line.substring(0,line.indexOf("#")).trim();
 			else
@@ -155,7 +158,7 @@ public class ProjectBuildFromHISC
 						for (int i=0; i<nbrOfLows; i++)
 						{
 							String lowLine = readLineNoComments(reader);
-							if (lowLine.startsWith("["))
+							if (lowLine == null || lowLine.startsWith("["))
 								throw new Exception("Expected another low level name.");
 							loadSubSystem(lowLine);
 						}
@@ -164,16 +167,18 @@ public class ProjectBuildFromHISC
 					{
 						// The next line contains the name of the high level directory
 						String highLine = readLineNoComments(reader);
+						if (highLine == null || highLine.startsWith("["))
+							throw new Exception("Expected high level name.");
 						loadSubSystem(highLine);
 					}
 					else
 					{
-						throw new Exception("Unknown tag.");
+						throw new Exception("Unknown tag: '" + currentTag + "'.");
 					}
 				}
 				else
 				{
-					throw new Exception("Syntax error: " + line + ".");
+					throw new Exception("Syntax error: '" + line + "'.");
 				}
 			}
 			catch(Exception ex)
@@ -184,6 +189,7 @@ public class ProjectBuildFromHISC
 		}
 
 		// Return
+		logger.warn("There is a problem when converting HISC projects since the concepts of answer and request events do not automatically translate to ordinary supervisory control.");
 		return project;
 	}
 
@@ -219,12 +225,12 @@ public class ProjectBuildFromHISC
 					{
 						// The next line contains the name of the interface
 						String name = readLineNoComments(reader);
-						if (name.startsWith("["))
-							throw new Exception("Expected the name of an interface.");
+						if (name == null || name.startsWith("["))
+							throw new Exception("Expected the name of an interface, got '" + name +"'.");
 						if (!name.endsWith(".hsc"))
 							name = name + ".hsc";
 						Automaton aut = loadAutomaton(pathName+"/"+directoryName+"/"+name);
-						aut.setName(name);
+						aut.setName(name.substring(0,name.indexOf(".hsc")));
 						aut.setType(AutomatonType.Undefined);
 						project.addAutomaton(aut);
 					}
@@ -235,12 +241,12 @@ public class ProjectBuildFromHISC
 						for (int i=0; i<nbrOfPlants; i++)
 						{
 							String name = readLineNoComments(reader);
-							if (name.startsWith("["))
-								throw new Exception("Expected another plant name.");
+							if (name == null || name.startsWith("["))
+								throw new Exception("Expected another plant name, got '" + name +"'.");
 							if (!name.endsWith(".hsc"))
 								name = name + ".hsc";
 							Automaton aut = loadAutomaton(pathName+"/"+directoryName+"/"+name);
-							aut.setName(name);
+							aut.setName(name.substring(0,name.indexOf(".hsc")));
 							aut.setType(AutomatonType.Plant);
 							project.addAutomaton(aut);
 						}
@@ -252,24 +258,24 @@ public class ProjectBuildFromHISC
 						for (int i=0; i<nbrOfSpecs; i++)
 						{
 							String name = readLineNoComments(reader);
-							if (name.startsWith("["))
-								throw new Exception("Expected another specification name.");
+							if (name == null || name.startsWith("["))
+								throw new Exception("Expected another specification name, got '" + name +"'.");
 							if (!name.endsWith(".hsc"))
 								name = name + ".hsc";
 							Automaton aut = loadAutomaton(pathName+"/"+directoryName+"/"+name);
-							aut.setName(name);
+							aut.setName(name.substring(0,name.indexOf(".hsc")));
 							aut.setType(AutomatonType.Specification);
 							project.addAutomaton(aut);
 						}
 					}
 					else
 					{
-						throw new Exception("Unknown tag.");
+						throw new Exception("Unknown tag: '" + currentTag + "'.");
 					}
 				}
 				else
 				{
-					throw new Exception("Syntax error: " + line + ".");
+					throw new Exception("Syntax error: '"+ line + "'.");
 				}
 			}
 			catch(Exception ex)
@@ -308,8 +314,8 @@ public class ProjectBuildFromHISC
 						for (int i=0; i<nbrOfStates; i++)
 						{
 							String name = readLineNoComments(reader);
-							if (name.startsWith("["))
-								throw new Exception("Expected another state name.");
+							if (name == null || name.startsWith("["))
+								throw new Exception("Expected another state name, got '" + name +"'.");
 							State state = new State(name);
 							aut.addState(state);
 						}
@@ -433,12 +439,12 @@ public class ProjectBuildFromHISC
 					}
 					else
 					{
-						throw new Exception("Unknown tag.");
+						throw new Exception("Unknown tag: '" + currentTag + "'.");
 					}
 				}
 				else
 				{
-					throw new Exception("Syntax error: " + line + ".");
+				throw new Exception("Syntax error: '" + line + "'.");
 				}
 			}
 			catch(Exception ex)

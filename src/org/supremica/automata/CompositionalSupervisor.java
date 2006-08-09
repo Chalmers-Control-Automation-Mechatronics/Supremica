@@ -100,12 +100,12 @@ public class CompositionalSupervisor
 		// Save the current global state
 		State[] currentStateSave = (State[]) currentGlobalState.clone();
 		// We would end up (hypotetically) in some other state...
-		State[] hypoteticalState;
+		State[] hypotheticalState;
 		try 
 		{
 			// Try executing the event
 			executeEvent(event);
-			hypoteticalState = currentGlobalState;
+			hypotheticalState = currentGlobalState;
 			// Restore order
 			currentGlobalState = currentStateSave;
 		}
@@ -119,7 +119,7 @@ public class CompositionalSupervisor
 			return false;
 		}
 
-		// ... examine if hypoteticalState maps to "OK" or "BAD".
+		// ... examine if hypotheticalState maps to "OK" or "BAD".
 
 		// INSERT CODE HERE
 

@@ -1345,7 +1345,7 @@ public class Automata
 		{
 			if (isSeveralSystems())
 			{
-				// Warning has been written in the log window by isSeveralSystems.
+				// Warning has been written in the log window by isSeveralSystems().
 			}
 		}
 

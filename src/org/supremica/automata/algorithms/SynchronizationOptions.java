@@ -289,8 +289,12 @@ public final class SynchronizationOptions
 	public static SynchronizationOptions getDefaultSynthesisOptions()
 	{
 		SynchronizationOptions options = getDefaultSynchronizationOptions();
-		options.setForbidUncontrollableStates(true); // This is important!
-		options.setExpandForbiddenStates(false); // Don't need to do that if we're not using it anyway...
+		// This is important!
+		options.setForbidUncontrollableStates(true); 
+		// Don't need to do expand forbidden if we're not using them anyway...
+		options.setExpandForbiddenStates(false); 
+
+		// Return result
 		return options;
 	}
 

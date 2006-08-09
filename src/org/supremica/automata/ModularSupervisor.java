@@ -138,6 +138,7 @@ public class ModularSupervisor
 			if (aut.getAlphabet().contains(event))
 			{				
 				// Supposes that the system is deterministic!
+				assert(aut.isDeterministic());
 				State nextState = currentGlobalState[index].nextState(event);
 				if (nextState == null)
 				{
