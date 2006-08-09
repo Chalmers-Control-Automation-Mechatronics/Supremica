@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopCheckerTest
 //###########################################################################
-//# $Id: ControlLoopCheckerTest.java,v 1.3 2006-08-08 23:58:18 robi Exp $
+//# $Id: ControlLoopCheckerTest.java,v 1.4 2006-08-09 10:26:36 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -271,16 +271,6 @@ public class ControlLoopCheckerTest extends AbstractWatersTest
     runControlLoopChecker(group, dir, name, false);
   }
 
-  /*
-  public void testMx27() throws Exception
-  {
-    final String group = "tests";
-    final String dir  = "nasty";
-    final String name = "mx27.wdes";
-    runControlLoopChecker(group, dir, name, true|false);
-  }
-  */
-
   public void test_TrafficLights2006_ac61() throws Exception
   {
     final String group = "tests";
@@ -289,188 +279,12 @@ public class ControlLoopCheckerTest extends AbstractWatersTest
     runControlLoopChecker(group, dir, name, true);
   }
 
-  public void test_TrafficLights2006_al29() throws Exception
+  public void test_TrafficLights2006_plants() throws Exception
   {
     final String group = "tests";
     final String dir = "trafficlights2006";
-    final String name = "al29.wdes";
-    runControlLoopChecker(group, dir, name, true);
-  }
-
-  public void test_TrafficLights2006_asjc1() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "asjc1.wdes";
-    runControlLoopChecker(group, dir, name, true);
-  }
-
-  public void test_TrafficLights2006_dal9() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "dal9.wdes";
-    runControlLoopChecker(group, dir, name, true);
-  }
-
-  public void test_TrafficLights2006_dmt10() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "dmt10.wdes";
-    runControlLoopChecker(group, dir, name, true);
-  }
-
-  public void test_TrafficLights2006_ejtrw1() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "ejtrw1.wdes";
-    runControlLoopChecker(group, dir, name, true);
-  }
-
-  public void test_TrafficLights2006_ekb2() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "ekb2.wdes";
-    runControlLoopChecker(group, dir, name, true);
-  }
-
-  public void test_TrafficLights2006_gat7() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "gat7.wdes";
-    runControlLoopChecker(group, dir, name, true);
-  }
-
-  public void test_TrafficLights2006_jdm18() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "jdm18.wdes";
-    runControlLoopChecker(group, dir, name, true);
-  }
-
-  public void test_TrafficLights2006_jlm39() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "jlm39.wdes";
-    runControlLoopChecker(group, dir, name, true);
-  }
-
-  public void test_TrafficLights2006_jpg7() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "jpg7.wdes";
-    runControlLoopChecker(group, dir, name, true);
-  }
-
-  public void test_TrafficLights2006_jpm22() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "jpm22.wdes";
-    runControlLoopChecker(group, dir, name, true);
-  }
-
-  public void test_TrafficLights2006_jrv2() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "jrv2.wdes";
-    runControlLoopChecker(group, dir, name, true);
-  }
-
-  public void test_TrafficLights2006_js173() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "js173.wdes";
-    runControlLoopChecker(group, dir, name, true);
-  }
-
-  public void test_TrafficLights2006_lz173() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "lz173.wdes";
-    runControlLoopChecker(group, dir, name, true);
-  }
-
-  public void test_TrafficLights2006_meb16() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "meb16.wdes";
-    runControlLoopChecker(group, dir, name, true);
-  }
-
-  public void test_TrafficLights2006_mjd29() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "mjd29.wdes";
-    runControlLoopChecker(group, dir, name, true);
-  }
-
-  public void test_TrafficLights2006_ncj3() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "ncj3.wdes";
-    runControlLoopChecker(group, dir, name, true);
-  }
-
-  public void test_TrafficLights2006_rjo6() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "rjo6.wdes";
-    runControlLoopChecker(group, dir, name, true);
-  }
-
-  public void test_TrafficLights2006_rms33() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "rms33.wdes";
-    runControlLoopChecker(group, dir, name, true);
-  }
-
-  public void test_TrafficLights2006_sdh7() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "sdh7.wdes";
-    runControlLoopChecker(group, dir, name, true);
-  }
-
-  public void test_TrafficLights2006_sgc9_1() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "sgc9_1.wdes";
-    runControlLoopChecker(group, dir, name, true);
-  }
-
-  public void test_TrafficLights2006_sgc9_2() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "sgc9_2.wdes";
-    runControlLoopChecker(group, dir, name, true);
-  }
-
-  public void test_TrafficLights2006_yip1() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "trafficlights2006";
-    final String name = "yip1.wdes";
-    runControlLoopChecker(group, dir, name, true);
+    final String name = "plants.wdes";
+    runControlLoopChecker(group, dir, name, false);
   }
 
 
@@ -693,7 +507,8 @@ public class ControlLoopCheckerTest extends AbstractWatersTest
     
     // 1. All events in the loops are controllable
     for(int i = loopIndex; i < len; i++){
-      assertTrue("Event " + eventlist.get(i).getName() + "in loop is not controllable", 
+      assertTrue("Event " + eventlist.get(i).getName() +
+                 "in loop is not controllable", 
                  eventlist.get(i).getKind() == EventKind.CONTROLLABLE);
     }
     
@@ -739,8 +554,8 @@ public class ControlLoopCheckerTest extends AbstractWatersTest
 
       if(events.contains(eProxy)){
         boolean found = false;
-        for(final TransitionProxy trans: transitions){
-          if(trans.getSource().equals(currState) && trans.getEvent().equals(eProxy)){
+        for (final TransitionProxy trans : transitions) {
+          if (trans.getSource() == currState && trans.getEvent() == eProxy) {
             currState = trans.getTarget();
             found = true;
             break;

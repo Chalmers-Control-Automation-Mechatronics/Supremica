@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControllabilityCheckerTest
 //###########################################################################
-//# $Id: ControllabilityCheckerTest.java,v 1.10 2006-08-07 08:46:34 robi Exp $
+//# $Id: ControllabilityCheckerTest.java,v 1.11 2006-08-09 10:26:36 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -278,6 +278,14 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String dir  = "nasty";
     final String name = "mx27.wdes";
     runControllabilityChecker(group, dir, name, false);
+  }
+
+  public void test_TrafficLights2006_plants() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "trafficlights2006";
+    final String name = "plants.wdes";
+    runControllabilityChecker(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_ac61() throws Exception
