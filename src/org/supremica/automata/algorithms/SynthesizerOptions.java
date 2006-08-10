@@ -226,14 +226,13 @@ public final class SynthesizerOptions
 	 */
 	public void saveOptions()
 	{
-		Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.set(maximallyPermissiveIncremental);
-		Config.SYNTHESIS_REDUCE_SUPERVISORS.set(reduceSupervisors);
 		Config.SYNTHESIS_SYNTHESIS_TYPE.set(synthesisType.toString());
 		Config.SYNTHESIS_ALGORITHM_TYPE.set(synthesisAlgorithm.toString());
 		Config.SYNTHESIS_PURGE.set(purge);
 		Config.SYNTHESIS_OPTIMIZE.set(optimize);
 		Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.set(maximallyPermissive);
 		Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.set(maximallyPermissiveIncremental);
+		Config.SYNTHESIS_REDUCE_SUPERVISORS.set(reduceSupervisors);
 	}
 
 	/**
@@ -251,6 +250,8 @@ public final class SynthesizerOptions
 	{
 	    SynthesizerOptions options = getDefaultSynthesizerOptions();
 	    options.synthesisAlgorithm = SynthesisAlgorithm.Monolithic;
+		options.optimize = false;
+		options.reduceSupervisors = false;
 
 	    return options;
 	}

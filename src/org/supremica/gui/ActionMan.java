@@ -3629,12 +3629,26 @@ public class ActionMan
 	 */
 	public static void testMethod(Gui gui)
 	{
-		Automata selectedAutomata = gui.getSelectedAutomata();
-		for (Automaton automaton: selectedAutomata)
+		try
 		{
-			automaton.setAllStatesAsAccepting();
+		    /*
+		    // Test plantification
+		    Automata selectedAutomata = gui.getSelectedAutomata();
+			for (Automaton automaton: selectedAutomata)
+			{
+			    automaton.setAllStatesAsAccepting();
+			}
+			MinimizationHelper.plantify(selectedAutomata);
+			*/
+
+			// Test defaultsynthesismethod
+			Automata selectedAutomata = gui.getSelectedAutomata();
+			Supervisor sup = AutomataSynthesizer.synthesizeControllableNonblocking(selectedAutomata);
 		}
-		MinimizationHelper.plantify(selectedAutomata);
+		catch (Exception ex)
+		{
+			logger.error("Test failed: " + ex);
+		}
 	}
 
     /**

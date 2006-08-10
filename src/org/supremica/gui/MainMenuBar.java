@@ -321,7 +321,6 @@ public class MainMenuBar
 
 		if (false && Config.FILE_ALLOW_EXPORT.isTrue())
 		{
-
 			// File.Export
 			JMenu menuFileExport = new JMenu("Export");
 			menuFile.add(menuFileExport);

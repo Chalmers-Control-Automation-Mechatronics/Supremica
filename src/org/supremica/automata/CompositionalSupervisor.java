@@ -90,7 +90,8 @@ public class CompositionalSupervisor
 
    	////////////////////////////////////////
 	// Supervisor interface methods       //
-	// (inherited from ModularSupervisor) //
+	// (inherited from ModularSupervisor  //
+    // and overridden here)               //
 	////////////////////////////////////////
 	
 	// We need to override this one
