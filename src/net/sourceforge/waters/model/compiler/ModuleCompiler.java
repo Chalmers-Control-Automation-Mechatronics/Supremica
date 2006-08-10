@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.38 2006-07-25 22:06:07 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.39 2006-08-10 02:29:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -118,6 +118,12 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
   public ProductDESProxy compile()
     throws EvalException
   {
+    return compile(null);
+  }
+
+  public ProductDESProxy compile(final List<ParameterBindingProxy> bindings)
+    throws EvalException
+  {
     try {
       final String name = mModule.getName();
       final URI moduleLocation = mModule.getLocation();
@@ -135,7 +141,12 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       mContext = new CompilerContext(mModule);
       mGlobalAlphabet = new TreeSet<EventProxy>();
       mAutomata = new TreeMap<String, AutomatonProxy>();
-      mIsEFA=false;
+      if (bindings != null) {
+        mParameterMap = new TreeMap<String,CompiledParameterBinding>();
+        visitCollection(bindings);
+      }
+      // begin EFA
+      mIsEFA = false;
       for (final Proxy proxy : mModule.getComponentList()) {
         if (proxy instanceof SimpleComponentProxy) {
           final SimpleComponentProxy comp = (SimpleComponentProxy) proxy;
@@ -146,6 +157,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
           break;
         }
       }
+      // end EFA
       visitModuleProxy(mModule);
       return mFactory.createProductDESProxy
         (name, desLocation, mGlobalAlphabet, mAutomata.values());

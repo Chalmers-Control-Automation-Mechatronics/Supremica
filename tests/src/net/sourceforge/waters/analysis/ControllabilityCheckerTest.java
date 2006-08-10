@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControllabilityCheckerTest
 //###########################################################################
-//# $Id: ControllabilityCheckerTest.java,v 1.11 2006-08-09 10:26:36 robi Exp $
+//# $Id: ControllabilityCheckerTest.java,v 1.12 2006-08-10 02:29:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -12,43 +12,37 @@ package net.sourceforge.waters.analysis;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+import java.util.LinkedList;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.junit.AbstractWatersTest;
-import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
-import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
-public class ControllabilityCheckerTest extends AbstractWatersTest
+public class ControllabilityCheckerTest extends AbstractModelCheckerTest
 {
 
   //#########################################################################
-  //# Overrides for base class junit.framework.TestCase
-  public void setUp() throws Exception
-  {    
-    mFactory = ProductDESElementFactory.getInstance();
-    mTraceMarshaller = new JAXBTraceMarshaller(mFactory);
-    mDESMarshaller = new JAXBProductDESMarshaller(mFactory);
-    mDocumentManager = new DocumentManager();
-    mDocumentManager.registerUnmarshaller(mDESMarshaller);
-  } 
-  
+  //# Entry points in junit.framework.TestCase
   public static Test suite() { 
     TestSuite testSuite = new TestSuite(ControllabilityCheckerTest.class);     
     return testSuite;
+  }
+
+  public static void main(final String[] args)
+  {
+    junit.textui.TestRunner.run(suite()); 
   }
 
 
@@ -58,16 +52,15 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
   {
     final String group = "handwritten";
     final String name = "small_factory_2.wdes";
-    runControllabilityChecker(group, name, true);
+    runModelChecker(group, name, true);
   }
   
   public void testTictactoe() throws Exception
   {
     final String group = "handwritten";
     final String name = "tictactoe.wdes";
-    runControllabilityChecker(group, name, false);
+    runModelChecker(group, name, false);
   }
-
 
 
   //#########################################################################
@@ -77,7 +70,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "amk14.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_Batchtank2005_cjn5() throws Exception
@@ -85,7 +78,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "cjn5.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_Batchtank2005_cs37() throws Exception
@@ -93,7 +86,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "cs37.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_Batchtank2005_ez1() throws Exception
@@ -101,7 +94,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "ez1.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_Batchtank2005_gb20() throws Exception
@@ -109,7 +102,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "gb20.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_Batchtank2005_gb21() throws Exception
@@ -117,7 +110,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "gb21.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_Batchtank2005_gjr5() throws Exception
@@ -125,7 +118,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "gjr5.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_Batchtank2005_grj3() throws Exception
@@ -133,7 +126,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "grj3.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_Batchtank2005_imr1() throws Exception
@@ -141,7 +134,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "imr1.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_Batchtank2005_jbr2() throws Exception
@@ -149,7 +142,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "jbr2.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_Batchtank2005_jmr30() throws Exception
@@ -157,7 +150,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "jmr30.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_Batchtank2005_jpt10() throws Exception
@@ -165,7 +158,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "jpt10.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_Batchtank2005_kah18() throws Exception
@@ -173,7 +166,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "kah18.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_Batchtank2005_lsr1_1() throws Exception
@@ -181,7 +174,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "lsr1_1.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_Batchtank2005_lsr1_2() throws Exception
@@ -189,7 +182,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "lsr1_2.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_Batchtank2005_lz136_1() throws Exception
@@ -197,7 +190,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "lz136_1.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_Batchtank2005_lz136_2() throws Exception
@@ -205,7 +198,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "lz136_2.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_Batchtank2005_rch11() throws Exception
@@ -213,7 +206,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "rch11.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_Batchtank2005_ry27() throws Exception
@@ -221,7 +214,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "ry27.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_Batchtank2005_scs10() throws Exception
@@ -229,7 +222,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "scs10.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_Batchtank2005_sjw41() throws Exception
@@ -237,7 +230,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "sjw41.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_Batchtank2005_smr26() throws Exception
@@ -245,7 +238,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "smr26.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_Batchtank2005_tk27() throws Exception
@@ -253,7 +246,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "tk27.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_Batchtank2005_tp20() throws Exception
@@ -261,7 +254,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "tp20.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_Batchtank2005_vl6() throws Exception
@@ -269,7 +262,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "vl6.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void testMx27() throws Exception
@@ -277,7 +270,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir  = "nasty";
     final String name = "mx27.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_plants() throws Exception
@@ -285,7 +278,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "plants.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_ac61() throws Exception
@@ -293,7 +286,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "ac61.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_al29() throws Exception
@@ -301,7 +294,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "al29.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_asjc1() throws Exception
@@ -309,7 +302,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "asjc1.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_dal9() throws Exception
@@ -317,7 +310,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "dal9.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_dmt10() throws Exception
@@ -325,7 +318,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "dmt10.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_ejtrw1() throws Exception
@@ -333,7 +326,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "ejtrw1.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_ekb2() throws Exception
@@ -341,7 +334,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "ekb2.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_gat7() throws Exception
@@ -349,7 +342,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "gat7.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_jdm18() throws Exception
@@ -357,7 +350,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "jdm18.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_jlm39() throws Exception
@@ -365,7 +358,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "jlm39.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_jpg7() throws Exception
@@ -373,7 +366,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "jpg7.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_jpm22() throws Exception
@@ -381,7 +374,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "jpm22.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_jrv2() throws Exception
@@ -389,7 +382,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "jrv2.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_js173() throws Exception
@@ -397,7 +390,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "js173.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_lz173() throws Exception
@@ -405,7 +398,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "lz173.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_meb16() throws Exception
@@ -413,7 +406,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "meb16.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_mjd29() throws Exception
@@ -421,7 +414,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "mjd29.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_ncj3() throws Exception
@@ -429,7 +422,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "ncj3.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_rjo6() throws Exception
@@ -437,7 +430,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "rjo6.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_rms33() throws Exception
@@ -445,7 +438,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "rms33.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_sdh7() throws Exception
@@ -453,7 +446,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "sdh7.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_sgc9_1() throws Exception
@@ -461,7 +454,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "sgc9_1.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_sgc9_2() throws Exception
@@ -469,7 +462,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "sgc9_2.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_yip1() throws Exception
@@ -477,7 +470,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "yip1.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
 
@@ -488,7 +481,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "valid";
     final String dir  = "big_factory";
     final String name = "bfactory.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
   
   public void testBmw_fh() throws Exception
@@ -496,7 +489,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "valid";
     final String dir  = "bmw_fh";
     final String name = "bmw_fh.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
   
   public void testBorder_cases() throws Exception
@@ -504,7 +497,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "valid";
     final String dir  = "border_cases";
     final String name = "never_blow_up.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
  
   public void testDebounce() throws Exception
@@ -512,7 +505,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "valid";
     final String dir = "debounce";
     final String name = "debounce.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
   
   public void testFalko() throws Exception
@@ -520,7 +513,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "valid";
     final String dir = "falko";
     final String name = "falko.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
   
   public void testFtuer() throws Exception
@@ -528,7 +521,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "valid";
     final String dir  = "central_locking";
     final String name = "ftuer.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   } 
   
   public void testFischertechnik() throws Exception
@@ -536,7 +529,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "valid";
     final String dir = "fischertechnik";
     final String name = "fischertechnik.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
   
   public void testKoordwsp() throws Exception
@@ -544,7 +537,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "valid";
     final String dir  = "central_locking";
     final String name = "koordwsp.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   } 
 
   public void testMazes() throws Exception
@@ -552,7 +545,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "valid";
     final String dir = "mazes";
     final String name = "mazes.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
   
   public void testSafetydisplay() throws Exception
@@ -560,7 +553,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "valid";
     final String dir = "safetydisplay";
     final String name = "safetydisplay.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
   
   public void testSmallFactory() throws Exception
@@ -568,7 +561,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "valid";
     final String dir = "small";
     final String name = "small.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
   
   public void testSmallFactoryUncont() throws Exception
@@ -576,7 +569,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "valid";
     final String dir = "small";
     final String name = "small_uncont.wdes";
-    runControllabilityChecker(group, dir, name, false);
+    runModelChecker(group, dir, name, false);
   }
 
   public void testSmd() throws Exception
@@ -584,23 +577,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "valid";
     final String dir = "smd";
     final String name = "smdreset.wdes";
-    runControllabilityChecker(group, dir, name, true);
-  }
-
-  public void testTline_0() throws Exception
-  {
-    final String group = "valid";
-    final String dir = "tline_0";
-    final String name = "transferline_templ.wdes";
-    runControllabilityChecker(group, dir, name, true);
-  }
-  
-  public void testTline_1() throws Exception
-  {
-    final String group = "valid";
-    final String dir = "tline_1";
-    final String name = "tline_1.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
   public void testWeiche() throws Exception
@@ -608,90 +585,63 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     final String group = "valid";
     final String dir = "vt";
     final String name = "weiche.wdes";
-    runControllabilityChecker(group, dir, name, true);
+    runModelChecker(group, dir, name, true);
   }
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  private void runControllabilityChecker(final String group,
-					 final String name,
-					 final boolean expect)
-    throws Exception
+  //# Test Cases -- Parameterised
+  public void testTransferline__1() throws Exception
   {
-    final File rootdir = getInputRoot();
-    final File groupdir = new File(rootdir, group);
-    runControllabilityChecker(groupdir, name, expect);
+    checkTransferline(1);
   }
 
-  private void runControllabilityChecker(final String group,
-					 final String subdir,
-					 final String name,
-					 final boolean expect)
-    throws Exception
+  public void testTransferline__2() throws Exception
   {
-    final File rootdir = getInputRoot();
-    final File groupdir = new File(rootdir, group);
-    runControllabilityChecker(groupdir, subdir, name, expect);
+    checkTransferline(2);
   }
 
-  private void runControllabilityChecker(final File groupdir,
-					 final String subdir,
-					 final String name,
-					 final boolean expect)
-    throws Exception
+  public void testTransferline__3() throws Exception
   {
-    final File dir = new File(groupdir, subdir);
-    runControllabilityChecker(dir, name, expect);
+    checkTransferline(3);
   }
 
-  private void runControllabilityChecker(final File dir,
-					 final String name,
-					 final boolean expect)
-    throws Exception
+  public void testTransferline__4() throws Exception
   {
-    final File filename = new File(dir, name);
-    runControllabilityChecker(filename, expect);
+    checkTransferline(4);
   }
 
-    
-  private void runControllabilityChecker(final File filename,
-					 final boolean expect)
-    throws Exception
+  public void testTransferline__5() throws Exception
   {
-    final ProductDESProxy des =
-      (ProductDESProxy) mDocumentManager.load(filename);
-    final ControllabilityChecker checker =
-      new ControllabilityChecker(des, mFactory);
-    final boolean result = checker.run();
-    SafetyTraceProxy counterexample = null;
-    if (!result) {
-      counterexample = checker.getCounterExample();
-      saveCounterExample(counterexample);
-    }
-    assertEquals("Wrong result from controllability checker: got " +
-                 result + " but should have been " + expect + "!",
-                 result, expect);
-    if (!expect) {
-      checkCounterExample(des, counterexample);
-    }
+    checkTransferline(5);
   }
 
-  private void saveCounterExample(final SafetyTraceProxy counterexample)
-    throws Exception
+  public void checkTransferline(final int n) throws Exception
   {
-    final String name = counterexample.getName();
-    final String ext = mTraceMarshaller.getDefaultExtension();
-    final File dir = getOutputDirectory();
-    final File filename = new File(dir, name + ext);
-    ensureParentDirectoryExists(filename);
-    mTraceMarshaller.marshal(counterexample, filename);
+    final String group = "handwritten";
+    final String name = "transferline.wmod";
+    final List<ParameterBindingProxy> bindings =
+      new LinkedList<ParameterBindingProxy>();
+    final ParameterBindingProxy binding = createBinding("N", n);
+    bindings.add(binding);
+    runModelChecker(group, name, bindings, true);
   }
 
-  private void checkCounterExample(final ProductDESProxy des,
-				   final SafetyTraceProxy counterexample)
+
+  //#########################################################################
+  //# Overrides for abstract base class
+  //# net.sourceforge.waters.analysis.AbstractModelCheckerTest
+  ModelChecker createModelChecker(final ProductDESProxy des,
+                                  final ProductDESProxyFactory factory)
   {
-    assertNotNull(counterexample);
+    return new ControllabilityChecker(des, factory);
+  }
+
+  void checkCounterExample(final ProductDESProxy des,
+                           final TraceProxy trace)
+  {
+    assertNotNull(trace);
+    final SafetyTraceProxy counterexample = (SafetyTraceProxy) trace;
   	
     final List<EventProxy> eventlist = counterexample.getEvents();
     final int len = eventlist.size();
@@ -710,7 +660,7 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
 	assertTrue("Counterexample not accepted by plant " +
 		   aut.getName() + "!"+" accepted "+accepted+" len "+len,
 		   accepted == len);
-      } else if(akind.equals(ComponentKind.SPEC)){
+      } else if (akind.equals(ComponentKind.SPEC)) {
 	assertFalse("Counterexample rejected too early (step " + accepted +
 		    ") by spec " + aut.getName() + "!",
 		    accepted < len - 1);
@@ -720,8 +670,8 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     assertTrue("Counterexample not rejected by any spec!", rejected);
   }
   
-  private  int checkCounterExample(final AutomatonProxy aut,
-                                   final List<EventProxy> counterexample)
+  private int checkCounterExample(final AutomatonProxy aut,
+                                  final List<EventProxy> counterexample)
   {
     final Collection<EventProxy> events = aut.getEvents();
     final Collection<StateProxy> states = aut.getStates();
@@ -756,13 +706,5 @@ public class ControllabilityCheckerTest extends AbstractWatersTest
     }
     return steps + 1;
   }
-
-
-  //#########################################################################
-  //# Data Members
-  private ProductDESProxyFactory mFactory;
-  private JAXBProductDESMarshaller mDESMarshaller;
-  private JAXBTraceMarshaller mTraceMarshaller;
-  private DocumentManager mDocumentManager;	
 
 }

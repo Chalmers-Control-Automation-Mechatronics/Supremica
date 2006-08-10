@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   JAXBTestCase
 //###########################################################################
-//# $Id: CompilerTest.java,v 1.6 2006-07-20 02:28:38 robi Exp $
+//# $Id: CompilerTest.java,v 1.7 2006-08-10 02:29:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import javax.xml.bind.JAXBException;
 
@@ -37,6 +38,7 @@ import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
+import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
@@ -184,6 +186,32 @@ public class CompilerTest
     compile("tictactoe");
   }
 
+  public void testCompile_transferline()
+    throws IOException, WatersException
+  {
+    compile("transferline");
+  }
+
+  public void testCompile_transferline__1()
+    throws IOException, WatersException
+  {
+    final List<ParameterBindingProxy> bindings =
+      new LinkedList<ParameterBindingProxy>();
+    final ParameterBindingProxy binding = createBinding("N", 1);
+    bindings.add(binding);
+    compile("transferline", bindings, false);
+  }
+
+  public void testCompile_transferline__2()
+    throws IOException, WatersException
+  {
+    final List<ParameterBindingProxy> bindings =
+      new LinkedList<ParameterBindingProxy>();
+    final ParameterBindingProxy binding = createBinding("N", 2);
+    bindings.add(binding);
+    compile("transferline", bindings, true);
+  }
+
   public void testCompile_winemerchant()
     throws IOException, WatersException
   {
@@ -196,19 +224,20 @@ public class CompilerTest
   public void testCompile_edge0()
     throws IOException, WatersException
   {
-    compileError("edge0", EmptyLabelBlockException.class);
+    compileError("edge0", null, EmptyLabelBlockException.class);
   }
 
   public void testCompile_error1_small()
     throws IOException, WatersException
   {
-    compileError("error1_small", DuplicateIdentifierException.class, "'mach'");
+    compileError("error1_small", null,
+                 DuplicateIdentifierException.class, "'mach'");
   }
 
   public void testCompile_error2_small()
     throws IOException, WatersException
   {
-    compileError("error2_small",
+    compileError("error2_small",null, 
                  UndefinedIdentifierException.class,
                  "required parameter 'break'");
   }
@@ -216,76 +245,80 @@ public class CompilerTest
   public void testCompile_error3_small()
     throws IOException, WatersException
   {
-    compileError("error3_small",
-                 UndefinedIdentifierException.class,
-                 "'finish_after'");
+    compileError("error3_small", null,
+                 UndefinedIdentifierException.class, "'finish_after'");
   }
 
   public void testCompile_error4_small()
     throws IOException, WatersException
   {
-    compileError("error4_small", EventKindException.class, "'start1'");
+    compileError("error4_small", null, EventKindException.class, "'start1'");
   }
 
   public void testCompile_error5_small()
     throws IOException, WatersException
   {
-    compileError("error5_small",
-                 UndefinedIdentifierException.class,
-                 "'finish_before'");
+    compileError("error5_small", null, 
+                 UndefinedIdentifierException.class, "'finish_before'");
   }
 
   public void testCompile_error6_small()
     throws IOException, WatersException
   {
-    compileError("error6_small", EventKindException.class, "'start2'");
+    compileError("error6_small", null, EventKindException.class, "'start2'");
   }
 
   public void testCompile_markus1()
     throws IOException, WatersException
   {
-    compileError("markus1", NondeterminismException.class, "'s0'", "'a'");
+    compileError("markus1", null,
+                 NondeterminismException.class, "'s0'", "'a'");
   }
 
   public void testCompile_nodegroup3()
     throws IOException, WatersException
   {
-    compileError("nodegroup3", NondeterminismException.class, "'q0'", "'e'");
+    compileError("nodegroup3", null,
+                 NondeterminismException.class, "'q0'", "'e'");
   }
 
 
   //#########################################################################
   //# Utilities
-  void compileError(final String name,
-                    final Class<? extends WatersException> exclass)
+  private void compileError(final String name,
+                            final List<ParameterBindingProxy> bindings,
+                            final Class<? extends WatersException> exclass)
     throws IOException, WatersException
   {
     final String[] culprits = {};
-    compileError(name, exclass, culprits);
+    compileError(name, bindings, exclass, culprits);
   }
 
-  void compileError(final String name,
-                    final Class<? extends WatersException> exclass,
-                    final String culprit)
+  private void compileError(final String name,
+                            final List<ParameterBindingProxy> bindings,
+                            final Class<? extends WatersException> exclass,
+                            final String culprit)
     throws IOException, WatersException
   {
     final String[] culprits = {culprit};
-    compileError(name, exclass, culprits);
+    compileError(name, bindings, exclass, culprits);
   }
 
-  void compileError(final String name,
-                    final Class<? extends WatersException> exclass,
-                    final String culprit1,
-                    final String culprit2)
+  private void compileError(final String name,
+                            final List<ParameterBindingProxy> bindings,
+                            final Class<? extends WatersException> exclass,
+                            final String culprit1,
+                            final String culprit2)
     throws IOException, WatersException
   {
     final String[] culprits = {culprit1, culprit2};
-    compileError(name, exclass, culprits);
+    compileError(name, bindings, exclass, culprits);
   }
 
-  void compileError(final String name,
-                    final Class<? extends WatersException> exclass,
-                    final String[] culprits)
+  private void compileError(final String name,
+                            final List<ParameterBindingProxy> bindings,
+                            final Class<? extends WatersException> exclass,
+                            final String[] culprits)
     throws IOException, WatersException
   {
     try {
@@ -294,7 +327,7 @@ public class CompilerTest
       final String outextname =
         name + mProductDESMarshaller.getDefaultExtension();
       final File outfilename = new File(mOutputDirectory, outextname);
-      compile(infilename, outfilename);
+      compile(infilename, outfilename, bindings);
       fail("Expected " + exclass.getName() + " not caught!");
     } catch (final WatersException exception) {
       if (exception.getClass() == exclass) {
@@ -319,38 +352,62 @@ public class CompilerTest
     }
   }
 
-  void compile(final String name)
+  private void compile(final String name)
+    throws IOException, WatersException
+  {
+    compile(name, null, false);
+  }
+
+  private void compile(final String name,
+                       final List<ParameterBindingProxy> bindings,
+                       final boolean appendToName)
     throws IOException, WatersException
   {
     final String inextname = name + mModuleMarshaller.getDefaultExtension();
     final File infilename = new File(mInputDirectory, inextname);
-    final String outextname =
-      name + mProductDESMarshaller.getDefaultExtension();
+    final StringBuffer buffer = new StringBuffer(name);
+    if (bindings != null && appendToName) {
+      for (final ParameterBindingProxy binding : bindings) {
+        buffer.append('-');
+        buffer.append(binding.getExpression().toString());
+      }
+    }
+    buffer.append(mProductDESMarshaller.getDefaultExtension());
+    final String outextname = buffer.toString();
     final File outfilename = new File(mOutputDirectory, outextname);
-    compile(infilename, outfilename);
+    compile(infilename, outfilename, bindings);
     final File compfilename = new File(mInputDirectory, outextname);
     compare(outfilename, compfilename);
   }
 
-  void compile(final File infilename, final File outfilename)
+  private void compile(final File infilename,
+                       final File outfilename,
+                       final List<ParameterBindingProxy> bindings)
     throws IOException, WatersException
   {
     final URI uri = infilename.toURI();
     final ModuleProxy module = mModuleMarshaller.unmarshal(uri);
-    final ProductDESProxy des = compile(module);
+    final ProductDESProxy des = compile(module, bindings);
     ensureParentDirectoryExists(outfilename);
     mProductDESMarshaller.marshal(des, outfilename);
   }
 
-  ProductDESProxy compile(final ModuleProxy module)
+  private ProductDESProxy compile(final ModuleProxy module)
+    throws EvalException
+  {
+    return compile(module, null);
+  }
+
+  private ProductDESProxy compile(final ModuleProxy module,
+                                  final List<ParameterBindingProxy> bindings)
     throws EvalException
   {
     final ModuleCompiler compiler =
       new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
-    return compiler.compile();
+    return compiler.compile(bindings);
   }
 
-  void compare(final File filename1, final File filename2)
+  private void compare(final File filename1, final File filename2)
     throws IOException, WatersUnmarshalException
   {
     final URI uri1 = filename1.toURI();
@@ -358,6 +415,13 @@ public class CompilerTest
     final DocumentProxy proxy1 = mProductDESMarshaller.unmarshal(uri1);
     final DocumentProxy proxy2 = mProductDESMarshaller.unmarshal(uri2);
     assertTrue("Unexpected result!", proxy2.equalsByContents(proxy1));
+  }
+
+  private ParameterBindingProxy createBinding(final String name,
+                                              final int value)
+  {
+    final IntConstantProxy expr = mModuleFactory.createIntConstantProxy(value);
+    return mModuleFactory.createParameterBindingProxy(name, expr);
   }
 
 
