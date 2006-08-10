@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="transferline" xmlns="http://waters.sourceforge.net/xsd/des">
+<EventList>
+<Event Kind="PROPOSITION" Name=":omega"/>
+<Event Kind="CONTROLLABLE" Name="machine_load[1]"/>
+<Event Kind="CONTROLLABLE" Name="machine_load[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="machine_unload[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="machine_unload[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="tu_accept[0]"/>
+<Event Kind="UNCONTROLLABLE" Name="tu_accept[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="tu_accept[2]"/>
+<Event Kind="CONTROLLABLE" Name="tu_load[0]"/>
+<Event Kind="CONTROLLABLE" Name="tu_load[1]"/>
+<Event Kind="CONTROLLABLE" Name="tu_load[2]"/>
+<Event Kind="UNCONTROLLABLE" Name="tu_reject[1]"/>
+<Event Kind="UNCONTROLLABLE" Name="tu_reject[2]"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="SPEC" Name="b1sup1[1]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="tu_accept[0]"/>
+<EventRef Name="tu_accept[1]"/>
+<EventRef Name="tu_load[0]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="EMPTY">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="FILLED1"/>
+<State Name="FILLED2"/>
+<State Name="FILLED3"/>
+</StateList>
+<TransitionList>
+<Transition Target="FILLED1" Source="EMPTY" Event="tu_accept[0]"/>
+<Transition Target="EMPTY" Source="EMPTY" Event="tu_accept[1]"/>
+<Transition Target="EMPTY" Source="EMPTY" Event="tu_load[0]"/>
+<Transition Target="FILLED2" Source="FILLED1" Event="tu_accept[0]"/>
+<Transition Target="EMPTY" Source="FILLED1" Event="tu_accept[1]"/>
+<Transition Target="FILLED1" Source="FILLED1" Event="tu_load[0]"/>
+<Transition Target="FILLED3" Source="FILLED2" Event="tu_accept[0]"/>
+<Transition Target="FILLED1" Source="FILLED2" Event="tu_accept[1]"/>
+<Transition Target="FILLED2" Source="FILLED2" Event="tu_load[0]"/>
+<Transition Target="FILLED2" Source="FILLED3" Event="tu_accept[1]"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="b1sup1[2]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="tu_accept[1]"/>
+<EventRef Name="tu_accept[2]"/>
+<EventRef Name="tu_load[1]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="EMPTY">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="FILLED1"/>
+<State Name="FILLED2"/>
+<State Name="FILLED3"/>
+</StateList>
+<TransitionList>
+<Transition Target="FILLED1" Source="EMPTY" Event="tu_accept[1]"/>
+<Transition Target="EMPTY" Source="EMPTY" Event="tu_accept[2]"/>
+<Transition Target="EMPTY" Source="EMPTY" Event="tu_load[1]"/>
+<Transition Target="FILLED2" Source="FILLED1" Event="tu_accept[1]"/>
+<Transition Target="EMPTY" Source="FILLED1" Event="tu_accept[2]"/>
+<Transition Target="FILLED1" Source="FILLED1" Event="tu_load[1]"/>
+<Transition Target="FILLED3" Source="FILLED2" Event="tu_accept[1]"/>
+<Transition Target="FILLED1" Source="FILLED2" Event="tu_accept[2]"/>
+<Transition Target="FILLED2" Source="FILLED2" Event="tu_load[1]"/>
+<Transition Target="FILLED2" Source="FILLED3" Event="tu_accept[2]"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="b1sup2[1]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="machine_load[1]"/>
+<EventRef Name="tu_accept[0]"/>
+<EventRef Name="tu_reject[1]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="EMPTY">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="FILLED1"/>
+<State Name="FILLED2"/>
+<State Name="FILLED3"/>
+</StateList>
+<TransitionList>
+<Transition Target="FILLED1" Source="EMPTY" Event="tu_accept[0]"/>
+<Transition Target="FILLED1" Source="EMPTY" Event="tu_reject[1]"/>
+<Transition Target="EMPTY" Source="FILLED1" Event="machine_load[1]"/>
+<Transition Target="FILLED2" Source="FILLED1" Event="tu_accept[0]"/>
+<Transition Target="FILLED2" Source="FILLED1" Event="tu_reject[1]"/>
+<Transition Target="FILLED1" Source="FILLED2" Event="machine_load[1]"/>
+<Transition Target="FILLED3" Source="FILLED2" Event="tu_accept[0]"/>
+<Transition Target="FILLED3" Source="FILLED2" Event="tu_reject[1]"/>
+<Transition Target="FILLED2" Source="FILLED3" Event="machine_load[1]"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="b1sup2[2]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="machine_load[2]"/>
+<EventRef Name="tu_accept[1]"/>
+<EventRef Name="tu_reject[2]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="EMPTY">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="FILLED1"/>
+<State Name="FILLED2"/>
+<State Name="FILLED3"/>
+</StateList>
+<TransitionList>
+<Transition Target="FILLED1" Source="EMPTY" Event="tu_accept[1]"/>
+<Transition Target="FILLED1" Source="EMPTY" Event="tu_reject[2]"/>
+<Transition Target="EMPTY" Source="FILLED1" Event="machine_load[2]"/>
+<Transition Target="FILLED2" Source="FILLED1" Event="tu_accept[1]"/>
+<Transition Target="FILLED2" Source="FILLED1" Event="tu_reject[2]"/>
+<Transition Target="FILLED1" Source="FILLED2" Event="machine_load[2]"/>
+<Transition Target="FILLED3" Source="FILLED2" Event="tu_accept[1]"/>
+<Transition Target="FILLED3" Source="FILLED2" Event="tu_reject[2]"/>
+<Transition Target="FILLED2" Source="FILLED3" Event="machine_load[2]"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="b2sup[1]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="machine_load[1]"/>
+<EventRef Name="machine_unload[1]"/>
+<EventRef Name="tu_load[1]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="EMPTY">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="FULL"/>
+</StateList>
+<TransitionList>
+<Transition Target="EMPTY" Source="EMPTY" Event="machine_load[1]"/>
+<Transition Target="FULL" Source="EMPTY" Event="machine_unload[1]"/>
+<Transition Target="EMPTY" Source="FULL" Event="tu_load[1]"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="SPEC" Name="b2sup[2]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="machine_load[2]"/>
+<EventRef Name="machine_unload[2]"/>
+<EventRef Name="tu_load[2]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="EMPTY">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="FULL"/>
+</StateList>
+<TransitionList>
+<Transition Target="EMPTY" Source="EMPTY" Event="machine_load[2]"/>
+<Transition Target="FULL" Source="EMPTY" Event="machine_unload[2]"/>
+<Transition Target="EMPTY" Source="FULL" Event="tu_load[2]"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="init">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="tu_accept[0]"/>
+<EventRef Name="tu_load[0]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="IDLE">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="WORKING"/>
+</StateList>
+<TransitionList>
+<Transition Target="WORKING" Source="IDLE" Event="tu_load[0]"/>
+<Transition Target="IDLE" Source="WORKING" Event="tu_accept[0]"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="machine[1]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="machine_load[1]"/>
+<EventRef Name="machine_unload[1]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="IDLE">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="WORKING"/>
+</StateList>
+<TransitionList>
+<Transition Target="WORKING" Source="IDLE" Event="machine_load[1]"/>
+<Transition Target="IDLE" Source="WORKING" Event="machine_unload[1]"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="machine[2]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="machine_load[2]"/>
+<EventRef Name="machine_unload[2]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="IDLE">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="WORKING"/>
+</StateList>
+<TransitionList>
+<Transition Target="WORKING" Source="IDLE" Event="machine_load[2]"/>
+<Transition Target="IDLE" Source="WORKING" Event="machine_unload[2]"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="testunit[1]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="tu_accept[1]"/>
+<EventRef Name="tu_load[1]"/>
+<EventRef Name="tu_reject[1]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="IDLE">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="WORKING"/>
+</StateList>
+<TransitionList>
+<Transition Target="WORKING" Source="IDLE" Event="tu_load[1]"/>
+<Transition Target="IDLE" Source="WORKING" Event="tu_accept[1]"/>
+<Transition Target="IDLE" Source="WORKING" Event="tu_reject[1]"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="testunit[2]">
+<EventRefList>
+<EventRef Name=":omega"/>
+<EventRef Name="tu_accept[2]"/>
+<EventRef Name="tu_load[2]"/>
+<EventRef Name="tu_reject[2]"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="IDLE">
+<EventRefList>
+<EventRef Name=":omega"/>
+</EventRefList>
+</State>
+<State Name="WORKING"/>
+</StateList>
+<TransitionList>
+<Transition Target="WORKING" Source="IDLE" Event="tu_load[2]"/>
+<Transition Target="IDLE" Source="WORKING" Event="tu_accept[2]"/>
+<Transition Target="IDLE" Source="WORKING" Event="tu_reject[2]"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

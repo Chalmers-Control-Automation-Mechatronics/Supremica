@@ -1,0 +1,845 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="transferline" xmlns="http://waters.sourceforge.net/xsd/module">
+<ParameterList>
+<IntParameter Required="false" Name="N">
+<IntConstant Value="1"/>
+</IntParameter>
+</ParameterList>
+<ConstantAliasList>
+<ConstantAlias>
+<SimpleIdentifier Name="GROUPS"/>
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</ConstantAlias>
+<ConstantAlias>
+<SimpleIdentifier Name="IGROUPS"/>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<SimpleIdentifier Name="N"/>
+</BinaryExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Name="tu_reject">
+<SimpleIdentifier Name="GROUPS"/>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="tu_load">
+<SimpleIdentifier Name="IGROUPS"/>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="tu_accept">
+<SimpleIdentifier Name="IGROUPS"/>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="machine_unload">
+<SimpleIdentifier Name="GROUPS"/>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="machine_load">
+<SimpleIdentifier Name="GROUPS"/>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name=":omega"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="init"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="tu_accept">
+<IntConstant Value="0"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tu_load">
+<IntConstant Value="0"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="WORKING">
+<PointGeometry>
+<Point Y="249" X="214"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="5" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="162" X="214"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-5" X="-5"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="5" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="WORKING" Source="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="tu_load">
+<IntConstant Value="0"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-11" X="-68"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="162" X="214"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="207" X="192"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="249" X="214"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="IDLE" Source="WORKING">
+<LabelBlock>
+<IndexedIdentifier Name="tu_accept">
+<IntConstant Value="0"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="7"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="249" X="214"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="206" X="235"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="162" X="214"/>
+</EndPointGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<ForeachComponent Name="G">
+<SimpleIdentifier Name="GROUPS"/>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="machine">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="machine_load">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="machine_unload">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="WORKING">
+<PointGeometry>
+<Point Y="249" X="234"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="5" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="162" X="234"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-5" X="-5"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="5" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="WORKING" Source="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="machine_load">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-10" X="-102"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="162" X="234"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="205" X="208"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="249" X="234"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="IDLE" Source="WORKING">
+<LabelBlock>
+<IndexedIdentifier Name="machine_unload">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="7"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="249" X="234"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="206" X="258"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="162" X="234"/>
+</EndPointGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="testunit">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="tu_accept">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tu_load">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tu_reject">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="WORKING">
+<PointGeometry>
+<Point Y="249" X="198"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-3" X="9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="162" X="198"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-5" X="-5"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-5" X="13"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="IDLE" Source="WORKING">
+<LabelBlock>
+<IndexedIdentifier Name="tu_reject">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tu_accept">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-18" X="3"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="249" X="198"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="208" X="224"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="162" X="198"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="WORKING" Source="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="tu_load">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-11" X="-71"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="162" X="198"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="207" X="171"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="249" X="198"/>
+</EndPointGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<IndexedIdentifier Name="b1sup1">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="tu_accept">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tu_accept">
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="G"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tu_load">
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="G"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="EMPTY">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="80" X="208"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-5" X="-5"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-3" X="-51"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="FILLED1">
+<PointGeometry>
+<Point Y="160" X="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="0" X="-58"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="FILLED2">
+<PointGeometry>
+<Point Y="240" X="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="0" X="-59"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="FILLED3">
+<PointGeometry>
+<Point Y="320" X="208"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-1" X="-57"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="FILLED2" Source="FILLED2">
+<LabelBlock>
+<IndexedIdentifier Name="tu_load">
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="G"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-4" X="3"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="240" X="208"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="240" X="250"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="240" X="208"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="FILLED3" Source="FILLED2">
+<LabelBlock>
+<IndexedIdentifier Name="tu_accept">
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="G"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-10" X="-94"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="240" X="208"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="280" X="192"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="320" X="208"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="FILLED1" Source="FILLED2">
+<LabelBlock>
+<IndexedIdentifier Name="tu_accept">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="4"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="240" X="208"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="199" X="226"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="160" X="208"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="EMPTY" Source="EMPTY">
+<LabelBlock>
+<IndexedIdentifier Name="tu_accept">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tu_load">
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="G"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-19" X="5"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="80" X="208"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="82" X="251"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="80" X="208"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="FILLED1" Source="EMPTY">
+<LabelBlock>
+<IndexedIdentifier Name="tu_accept">
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="G"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-11" X="-98"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="80" X="208"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="120" X="190"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="160" X="208"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="FILLED2" Source="FILLED3">
+<LabelBlock>
+<IndexedIdentifier Name="tu_accept">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-8" X="10"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="320" X="208"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="280" X="225"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="240" X="208"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="FILLED2" Source="FILLED1">
+<LabelBlock>
+<IndexedIdentifier Name="tu_accept">
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="G"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="-96"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="160" X="208"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="200" X="191"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="240" X="208"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="EMPTY" Source="FILLED1">
+<LabelBlock>
+<IndexedIdentifier Name="tu_accept">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-10" X="8"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="160" X="208"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="120" X="226"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="80" X="208"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="FILLED1" Source="FILLED1">
+<LabelBlock>
+<IndexedIdentifier Name="tu_load">
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="G"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-5" X="6"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="160" X="208"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="162" X="249"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="160" X="208"/>
+</EndPointGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<IndexedIdentifier Name="b1sup2">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="machine_load">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tu_accept">
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="G"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tu_reject">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="EMPTY">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="64" X="192"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-5" X="-5"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="5" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="FILLED1">
+<PointGeometry>
+<Point Y="144" X="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="5" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="FILLED2">
+<PointGeometry>
+<Point Y="224" X="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="5" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="FILLED3">
+<PointGeometry>
+<Point Y="304" X="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="5" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="FILLED3" Source="FILLED2">
+<LabelBlock>
+<IndexedIdentifier Name="tu_accept">
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="G"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tu_reject">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-16" X="-94"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="224" X="192"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="264" X="174"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="304" X="192"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="FILLED1" Source="FILLED2">
+<LabelBlock>
+<IndexedIdentifier Name="machine_load">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-11" X="7"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="224" X="192"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="186" X="210"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="144" X="192"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="FILLED2" Source="FILLED3">
+<LabelBlock>
+<IndexedIdentifier Name="machine_load">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="6"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="304" X="192"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="264" X="212"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="224" X="192"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="FILLED2" Source="FILLED1">
+<LabelBlock>
+<IndexedIdentifier Name="tu_accept">
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="G"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tu_reject">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-18" X="-96"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="144" X="192"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="186" X="175"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="224" X="192"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="EMPTY" Source="FILLED1">
+<LabelBlock>
+<IndexedIdentifier Name="machine_load">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="4"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="144" X="192"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="105" X="210"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="64" X="192"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="FILLED1" Source="EMPTY">
+<LabelBlock>
+<IndexedIdentifier Name="tu_accept">
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="G"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tu_reject">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-20" X="-94"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="64" X="192"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="104" X="175"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="144" X="192"/>
+</EndPointGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<IndexedIdentifier Name="b2sup">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="machine_load">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="machine_unload">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tu_load">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="EMPTY">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="176" X="224"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="0" X="-10"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-4" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="FULL">
+<PointGeometry>
+<Point Y="256" X="224"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-5" X="8"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="EMPTY" Source="FULL">
+<LabelBlock>
+<IndexedIdentifier Name="tu_load">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-11" X="4"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="256" X="224"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="214" X="242"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="176" X="224"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="FULL" Source="EMPTY">
+<LabelBlock>
+<IndexedIdentifier Name="machine_unload">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-11" X="-122"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="176" X="224"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="215" X="207"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="256" X="224"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="EMPTY" Source="EMPTY">
+<LabelBlock>
+<IndexedIdentifier Name="machine_load">
+<SimpleIdentifier Name="G"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="5" X="-68"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="176" X="224"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="136" X="225"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="176" X="224"/>
+</EndPointGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</Module>
+
