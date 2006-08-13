@@ -217,8 +217,8 @@ public final class VerificationOptions
 	public static VerificationOptions getDefaultControllabilityOptions()
 	{
 		VerificationOptions options = new VerificationOptions();
-		options.setVerificationType(VerificationType.Controllability);
-		options.setAlgorithmType(VerificationAlgorithm.Modular);
+		options.setVerificationType(VerificationType.CONTROLLABILITY);
+		options.setAlgorithmType(VerificationAlgorithm.MODULAR);
 		options.setOneEventAtATime(false);
 		options.setSkipUncontrollabilityCheck(false);
 		return options;
@@ -230,8 +230,8 @@ public final class VerificationOptions
 	public static VerificationOptions getDefaultNonblockingOptions()
 	{
 		VerificationOptions options = new VerificationOptions();
-		options.setVerificationType(VerificationType.Nonblocking);
-		options.setAlgorithmType(VerificationAlgorithm.Modular);
+		options.setVerificationType(VerificationType.NONBLOCKING);
+		options.setAlgorithmType(VerificationAlgorithm.MODULAR);
 		//options.setAlgorithmType(VerificationAlgorithm.Compositional);
 		return options;
 	}
@@ -242,7 +242,7 @@ public final class VerificationOptions
 	public static VerificationOptions getDefaultLanguageInclusionOptions()
 	{
 		VerificationOptions options = getDefaultControllabilityOptions();
-		options.setVerificationType(VerificationType.LanguageInclusion);
+		options.setVerificationType(VerificationType.LANGUAGEINCLUSION);
 		return options;
 	}
 }

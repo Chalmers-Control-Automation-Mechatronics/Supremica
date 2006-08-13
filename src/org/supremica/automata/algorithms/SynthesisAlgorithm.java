@@ -51,85 +51,63 @@ package org.supremica.automata.algorithms;
 
 import java.util.*;
 
-public class SynthesisAlgorithm
+public enum SynthesisAlgorithm
 {
-	private static Collection types = new LinkedList();
-	public static final SynthesisAlgorithm Monolithic = new SynthesisAlgorithm("Monolithic");
-	public static final SynthesisAlgorithm Modular = new SynthesisAlgorithm("Modular");
-	public static final SynthesisAlgorithm Compositional = new SynthesisAlgorithm("Compositional");
-	public static final SynthesisAlgorithm IDD = new SynthesisAlgorithm("IDD", false);
-	public static final SynthesisAlgorithm Unknown = new SynthesisAlgorithm("Unknown", false);
-	public static final SynthesisAlgorithm MonolithicSingleFixpoint = new SynthesisAlgorithm("Monolithic (single fixpoint)", false);    // works, but is very slow [due to lame implementation :s ]
-	public static final SynthesisAlgorithm BDD = new SynthesisAlgorithm("BDD", true);    // works, but we cant handle the results yet
-	private String description = null;
-
-	private SynthesisAlgorithm(String description)
-	{
-		this(description, true);
-	}
-
-	private SynthesisAlgorithm(String description, boolean selectable)
-	{
-		if (selectable)
-		{
-			types.add(this);
-		}
-
-		this.description = description;
-	}
-
-	public static Iterator iterator()
-	{
-		return types.iterator();
-	}
-
-	public String toString()
-	{
-		return description;
-	}
-
-	public static SynthesisAlgorithm toAlgorithm(String algorithm)
-	{
-		if (algorithm.equals(Monolithic.toString()))
-		{
-			return Monolithic;
-		}
-
-		if (algorithm.equals(MonolithicSingleFixpoint.toString()))
-		{
-			return MonolithicSingleFixpoint;
-		}
-
-		if (algorithm.equals(Modular.toString()))
-		{
-			return Modular;
-		}
-
-		if (algorithm.equals(IDD.toString()))
-		{
-			return IDD;
-		}
-
-		if (algorithm.equals(BDD.toString()))
-		{
-			return BDD;
-		}
-
-		return Unknown;
-	}
-
-	public static Object[] toArray()
-	{
-		return types.toArray();
-	}
-
-	public static Object[] toArray_oneAutomaton()
-	{
-		Object[] ret = new Object[2];
-
-		ret[0] = Monolithic;
-		ret[1] = MonolithicSingleFixpoint;
-
-		return ret;
-	}
+    Monolithic("Monolithic", true, true),
+    Modular("Modular"),
+    Compositional("Compositional", false),
+    IDD("IDD", false),
+    MonolithicSingleFixpoint("Monolithic (single fixpoint)", false, true),    // works, but is very slow [due to lame implementation :s ]
+    BDD("BDD");    // works, but we cant handle the results yet
+    
+    /** Textual description. */
+    private final String description;
+    /** If false, this instance is not included in dialogs. */
+    private final boolean enabled;
+    /** True if this algo prefers working on modular systems. */
+    private final boolean modular;
+    
+    private SynthesisAlgorithm(String description)
+    {
+        this(description, true);
+    }
+    
+    private SynthesisAlgorithm(String description, boolean enabled)
+    {
+        this(description, enabled, true);
+    }
+    
+    private SynthesisAlgorithm(String description, boolean enabled, boolean modular)
+    {
+        this.description = description;
+        this.enabled = enabled;
+        this.modular = modular;
+    }
+    
+    public String toString()
+    {
+        return description;
+    }
+    
+    public boolean isEnabled()
+    {
+        return enabled;
+    }
+    
+    public boolean isModular()
+    {
+        return modular;
+    }
+    
+    public static SynthesisAlgorithm toAlgorithm(String description)
+    {
+        for (SynthesisAlgorithm algo: values())
+        {
+            if (algo.description.equals(description))
+            {
+                return algo;
+            }
+        }
+        return null;
+    }
 }

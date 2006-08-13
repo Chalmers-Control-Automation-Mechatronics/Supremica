@@ -1426,7 +1426,7 @@ public class ActionMan
 		{
 			return;
 		}
-		if (vOptions.getVerificationType() == VerificationType.LanguageInclusion)
+		if (vOptions.getVerificationType() == VerificationType.LANGUAGEINCLUSION)
 		{
 			vOptions.setInclusionAutomata(gui.getUnselectedAutomata());
 		}

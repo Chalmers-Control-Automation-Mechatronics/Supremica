@@ -119,10 +119,6 @@ public final class SynthesizerOptions
 				return("BDD algorithms currently only support supNB+C synthesis.");
 			}
 		}
-		else if (synthesisAlgorithm == SynthesisAlgorithm.Unknown)
-		{
-			return "Unknown synthesis algorithm.";
-		}
 		else if (synthesisAlgorithm == SynthesisAlgorithm.IDD)
 		{
 			return "IDD synthesis is not implemented.";

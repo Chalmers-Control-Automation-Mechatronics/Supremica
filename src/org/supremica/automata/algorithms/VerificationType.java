@@ -51,69 +51,52 @@ package org.supremica.automata.algorithms;
 
 import java.util.*;
 
-public class VerificationType
+/**
+ * Different types of verification.
+ */
+public enum VerificationType
 {
-	private static Collection types = new LinkedList();
-	public static final VerificationType Controllability = new VerificationType("Controllability", true);
-	public static final VerificationType InverseControllability = new VerificationType("Inverse Controllability", true);
-	public static final VerificationType Nonblocking = new VerificationType("Nonblocking", true);
-	public static final VerificationType MutuallyNonblocking = new VerificationType("Mutual Nonblocking", false);
-	public static final VerificationType LanguageInclusion = new VerificationType("Language Inclusion", true);
-	public static final VerificationType Unknown = new VerificationType("Unknown", false);
-	private String description = null;
-
-	private VerificationType(String description)
-	{
-		this(description, true);
-	}
-
-	private VerificationType(String description, boolean selectable)
-	{
-		if (selectable)
-		{
-			types.add(this);
-		}
-
-		this.description = description;
-	}
-
-	public static Iterator iterator()
-	{
-		return types.iterator();
-	}
-
-	public String toString()
-	{
-		return description;
-	}
-
-	public static VerificationType toType(String type)
-	{
-		if (type.equals(Controllability.toString()))
-		{
-			return Controllability;
-		}
-
-		if (type.equals(LanguageInclusion.toString()))
-		{
-			return LanguageInclusion;
-		}
-
-		if (type.equals(MutuallyNonblocking.toString()))
-		{
-			return MutuallyNonblocking;
-		}
-
-		if (type.equals(Nonblocking.toString()))
-		{
-			return Nonblocking;
-		}
-
-		return Unknown;
-	}
-
-	public static Object[] toArray()
-	{
-		return types.toArray();
-	}
+    CONTROLLABILITY("Controllability"),
+    INVERSECONTROLLABILITY("Inverse Controllability"),
+    NONBLOCKING("Nonblocking"),
+    MUTUALLYNONBLOCKING("Mutual Nonblocking", false),
+    LANGUAGEINCLUSION("Language Inclusion");
+    
+    /** Textual description. */
+    private final String description;
+    /** If false, this instance is not included in dialogs. */
+    private final boolean enabled;
+    
+    private VerificationType(String description)
+    {
+        this(description, true);
+    }
+    
+    private VerificationType(String description, boolean enabled)
+    {
+        this.description = description;
+        this.enabled = enabled;
+    }
+    
+    public String toString()
+    {
+        return description;
+    }
+    
+    public boolean isEnabled()
+    {
+        return enabled;
+    }
+    
+    public static VerificationType toType(String description)
+    {
+        for (VerificationType type: values())
+        {
+            if (type.description.equals(description))
+            {
+                return type;
+            }
+        }
+        return null;
+    }
 }

@@ -59,22 +59,35 @@ public enum SynchronizationType
 	
 	/** Textual description of the type. */
 	private final String description;
+        /** If false, this instance is not included in dialogs. */ 
+        private final boolean enabled;
 	
 	private SynchronizationType(String description)
 	{
-		this.description = description;
+            this(description, true);
+	}
+	
+	private SynchronizationType(String description, boolean enabled)
+	{
+            this.description = description;
+            this.enabled = enabled;
 	}
 	
 	public String toString()
 	{
-		return description;
+            return description;
 	}
 	
+        public boolean isEnabled()
+        {
+            return enabled;
+        }
+        
 	public static SynchronizationType toType(String description)
 	{
 		for (SynchronizationType type: values())
 		{
-			if (type.toString().equals(description))
+			if (type.description.equals(description))
 			{
 				return type;
 			}

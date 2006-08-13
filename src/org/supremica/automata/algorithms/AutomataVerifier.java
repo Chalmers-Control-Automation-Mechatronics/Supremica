@@ -135,41 +135,39 @@ public class AutomataVerifier
 
 	public static String validOptions(Automata theAutomata, VerificationOptions verificationOptions)
 	{
-		// Modular algorithms demand systems with more than one module...
-		if ((verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular) && (theAutomata.size() < 2))
+		// MODULAR algorithms demand systems with more than one module...
+		if ((verificationOptions.getAlgorithmType() == VerificationAlgorithm.MODULAR) && (theAutomata.size() < 2))
 		{
 			logger.warn("Using monolithic algorithm instead, since the system is not modular.");
-			verificationOptions.setAlgorithmType(VerificationAlgorithm.Monolithic);
+			verificationOptions.setAlgorithmType(VerificationAlgorithm.MONOLITHIC);
 		}
 
-		/*
 		// Check IDD
 		if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
 		{
 			return "The IDD Algorithm is not fully implemented yet.";
 		}
-		*/
 
 		// Check Controllability
-		if (verificationOptions.getVerificationType() == VerificationType.Controllability)
+		if (verificationOptions.getVerificationType() == VerificationType.CONTROLLABILITY)
 		{
 			if (theAutomata.size() < 2)
 			{
 				return "At least two automata must be selected.";
 			}
 
-			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
+			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MODULAR)
 				//||	verificationOptions.getAlgorithmType() == VerificationAlgorithm.Compositional)
 			{
 				if (!theAutomata.isAllEventsPrioritized())
 				{
-					return "All events must be prioritized.";
+        				return "All events must be prioritized.";
 				}
 			}
 		}
 
 		// Check Nonblocking
-		if (verificationOptions.getVerificationType() == VerificationType.Nonblocking)
+		if (verificationOptions.getVerificationType() == VerificationType.NONBLOCKING)
 		{
 			if (theAutomata.size() < 1)
 			{
@@ -182,7 +180,7 @@ public class AutomataVerifier
 			}
 
 			/*
-			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
+			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MODULAR)
 			{
 				return "Not implemented, try the compositional algorithm.";
 			}
@@ -190,7 +188,7 @@ public class AutomataVerifier
 		}
 
 		// Check MutuallyNonblocking
-		if (verificationOptions.getVerificationType() == VerificationType.MutuallyNonblocking)
+		if (verificationOptions.getVerificationType() == VerificationType.MUTUALLYNONBLOCKING)
 		{
 			if (theAutomata.size() < 1)
 			{
@@ -202,14 +200,14 @@ public class AutomataVerifier
 				return "Some automaton has no marked states!";
 			}
 
-			if (verificationOptions.getAlgorithmType() != VerificationAlgorithm.Modular)
+			if (verificationOptions.getAlgorithmType() != VerificationAlgorithm.MODULAR)
 			{
 				return "The mutual nonblocking algorithm \n" + "is a modular algorithm!";
 			}
 		}
-
+                 
 		// Check Language Inclusion
-		if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
+		if (verificationOptions.getVerificationType() == VerificationType.LANGUAGEINCLUSION)
 		{
 			if (theAutomata.size() < 1)
 			{
@@ -224,7 +222,7 @@ public class AutomataVerifier
 
 //			theAutomata = theAutomata.add(verificationOptions.getInclusionAutomata());
 
-			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
+			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MODULAR)
 			{
 				if (!theAutomata.isAllEventsPrioritized())
 				{
@@ -246,34 +244,32 @@ public class AutomataVerifier
 		try
 		{
 			// Find out what should be done and do it!
-			if ((verificationOptions.getVerificationType() == VerificationType.Controllability) ||
-			   	(verificationOptions.getVerificationType() == VerificationType.InverseControllability))
+			if ((verificationOptions.getVerificationType() == VerificationType.CONTROLLABILITY) ||
+			   	(verificationOptions.getVerificationType() == VerificationType.INVERSECONTROLLABILITY))
 			{
 				// We're gonna do some serious synchronization! Initialize a synchronization helper!
 				synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
 				synchHelper.setExecutionDialog(executionDialog);
 
 				// Inverse controllability? Invert controllability!
-				if (verificationOptions.getVerificationType() == VerificationType.InverseControllability)
+				if (verificationOptions.getVerificationType() == VerificationType.INVERSECONTROLLABILITY)
 				{
 					prepareForInverseControllability();
 				}
 
 				// Work!
-				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
+				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MONOLITHIC)
 				{
 					return monolithicControllabilityVerification();
 				}
-				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MODULAR)
 				{
 					return modularControllabilityVerification();
 				}
-				/*
-				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Compositional)
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL)
 				{
 					return compositionalControllabilityVerification();
 				}
-				*/
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
 				{
 					return BDDControllabilityVerification(theAutomata);
@@ -283,9 +279,9 @@ public class AutomataVerifier
 					throw new UnsupportedOperationException("The selected algorithm is not implemented");
 				}
 			}
-			else if (verificationOptions.getVerificationType() == VerificationType.Nonblocking)
+			else if (verificationOptions.getVerificationType() == VerificationType.NONBLOCKING)
 			{
-				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
+				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MONOLITHIC)
 				{
 					// We're gonna do some serious synchronization! Initialize a synchronization helper!
 					synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
@@ -298,26 +294,24 @@ public class AutomataVerifier
 				{
 					return BDDNonblockingVerification();
 				}
-				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MODULAR)
 				{
 					// This is the compositional algorithm, there is no "modular" algorithm
 					return compositionalNonblockingVerification();
 				}
-				/*
-				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Compositional)
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL)
 				{
 					return compositionalNonblockingVerification();
 				}
-				*/
 				else
 				{
 					throw new UnsupportedOperationException("The selected algorithm is not implemented");
 				}
 			}
-			else if (verificationOptions.getVerificationType() == VerificationType.MutuallyNonblocking)
+			else if (verificationOptions.getVerificationType() == VerificationType.MUTUALLYNONBLOCKING)
 			{
 				// Work!
-				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
+				if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MODULAR)
 				{
 					// This algorithm is under implementation!!
 					return modularMutuallyNonblockingVerification();
@@ -327,7 +321,7 @@ public class AutomataVerifier
 					throw new UnsupportedOperationException("The selected algorithm is not implemented");
 				}
 			}
-			else if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
+			else if (verificationOptions.getVerificationType() == VerificationType.LANGUAGEINCLUSION)
 			{
 				// We're gonna do some serious synchronization! Initialize a synchronization helper!
 				synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
@@ -341,12 +335,12 @@ public class AutomataVerifier
 				{
 					return BDDLanguageInclusionVerification();
 				}
-				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Monolithic)
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MONOLITHIC)
 				{
 					// Language inclusion is performed as a controllability verification!
 					return monolithicControllabilityVerification();
 				}
-				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
+				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MODULAR)
 				{
 					// Language inclusion is performed as a controllability verification!
 					return modularControllabilityVerification();
@@ -1913,7 +1907,7 @@ public class AutomataVerifier
 		VerificationOptions verificationOptions;
 
 		verificationOptions = VerificationOptions.getDefaultNonblockingOptions();
-		verificationOptions.setAlgorithmType(VerificationAlgorithm.Monolithic);
+		verificationOptions.setAlgorithmType(VerificationAlgorithm.MONOLITHIC);
 		synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
 
 		AutomataVerifier verifier = new AutomataVerifier(automata, verificationOptions, synchronizationOptions, null);
@@ -1954,7 +1948,7 @@ public class AutomataVerifier
 
 		synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
 		verificationOptions = VerificationOptions.getDefaultControllabilityOptions();
-		verificationOptions.setAlgorithmType(VerificationAlgorithm.Modular);
+		verificationOptions.setAlgorithmType(VerificationAlgorithm.MODULAR);
 		minimizationOptions = MinimizationOptions.getDefaultNonblockingOptions();
 		minimizationOptions.setMinimizationStrategy(MinimizationStrategy.FewestTransitionsFirst);
 		minimizationOptions.setMinimizationHeuristic(MinimizationHeuristic.MostLocal);

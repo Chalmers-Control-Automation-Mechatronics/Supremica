@@ -189,13 +189,13 @@ public class VerificationDialog
 		public void forceMonolithic()
 		{
 			allowAll();
-			removeItem(VerificationAlgorithm.Modular);
+			removeItem(VerificationAlgorithm.MODULAR);
 		}
 
 		public void forceModular()
 		{
 			allowAll();
-			removeItem(VerificationAlgorithm.Monolithic);
+			removeItem(VerificationAlgorithm.MONOLITHIC);
 		}
 
 		public void allowAll()
@@ -207,7 +207,10 @@ public class VerificationDialog
 			removeAllItems();		   
 			for (VerificationAlgorithm algo :VerificationAlgorithm.values())
 			{
+                            if (algo.isEnabled())
+                            {
 				addItem(algo);
+                            }
 			}
 			
 			// Reselect
@@ -233,7 +236,14 @@ public class VerificationDialog
 
 		public VerificationDialogStandardPanel()
 		{
-			verificationTypeBox = new JComboBox(VerificationType.toArray());
+			verificationTypeBox = new JComboBox();
+                        for (VerificationType type: VerificationType.values())
+                        {
+                            if (type.isEnabled())
+                            {
+                                verificationTypeBox.addItem(type);
+                            }
+                        }
 			verificationTypeBox.addActionListener(this);
 
 			algorithmSelector = new AlgorithmSelector();
@@ -285,9 +295,9 @@ public class VerificationDialog
 			int advancedTabIndex = 1;
 
 			// Change the advanced panel
-			if ((verificationTypeBox.getSelectedItem() == VerificationType.Controllability ||
-				 verificationTypeBox.getSelectedItem() == VerificationType.InverseControllability) &&
-				(algorithmSelector.getSelectedItem() == VerificationAlgorithm.Modular))
+			if ((verificationTypeBox.getSelectedItem() == VerificationType.CONTROLLABILITY ||
+				 verificationTypeBox.getSelectedItem() == VerificationType.INVERSECONTROLLABILITY) &&
+				(algorithmSelector.getSelectedItem() == VerificationAlgorithm.MODULAR))
 			{
 				// Show advanced controllability options!
 				//tabbedPane.add("Advanced options", null, advancedPanelControllability, "Advanced options");
@@ -295,8 +305,8 @@ public class VerificationDialog
 				tabbedPane.setComponentAt(advancedTabIndex, advancedPanelControllability);
 				tabbedPane.setEnabledAt(advancedTabIndex, true);
 			}
-			else if ((verificationTypeBox.getSelectedItem() == VerificationType.Nonblocking) &&
-				  (algorithmSelector.getSelectedItem() == VerificationAlgorithm.Modular))
+			else if ((verificationTypeBox.getSelectedItem() == VerificationType.NONBLOCKING) &&
+				  (algorithmSelector.getSelectedItem() == VerificationAlgorithm.MODULAR))
 			{
 				// Show advanced nonblocking options!
 				//tabbedPane.remove(advancedPanelControllability);
@@ -310,7 +320,7 @@ public class VerificationDialog
 			}
 
 			// Force things depending on earlier choice
-			if (verificationTypeBox.getSelectedItem() == VerificationType.MutuallyNonblocking)
+			if (verificationTypeBox.getSelectedItem() == VerificationType.MUTUALLYNONBLOCKING)
 			{
 				// Force the modular algorithm
 				algorithmSelector.forceModular();
@@ -321,12 +331,12 @@ public class VerificationDialog
 				algorithmSelector.allowAll();
 			}
 
-			if (verificationTypeBox.getSelectedItem() == VerificationType.Nonblocking &&
-				algorithmSelector.getSelectedItem() == VerificationAlgorithm.Monolithic ||
-				(verificationTypeBox.getSelectedItem() == VerificationType.Controllability ||
-				 verificationTypeBox.getSelectedItem() == VerificationType.InverseControllability ||
-				 verificationTypeBox.getSelectedItem() == VerificationType.LanguageInclusion) &&
-				algorithmSelector.getSelectedItem() == VerificationAlgorithm.Modular)
+			if (verificationTypeBox.getSelectedItem() == VerificationType.NONBLOCKING &&
+				algorithmSelector.getSelectedItem() == VerificationAlgorithm.MONOLITHIC ||
+				(verificationTypeBox.getSelectedItem() == VerificationType.CONTROLLABILITY ||
+				 verificationTypeBox.getSelectedItem() == VerificationType.INVERSECONTROLLABILITY ||
+				 verificationTypeBox.getSelectedItem() == VerificationType.LANGUAGEINCLUSION) &&
+				algorithmSelector.getSelectedItem() == VerificationAlgorithm.MODULAR)
 			{
 				showTrace.setEnabled(true);
 			}
@@ -343,21 +353,21 @@ public class VerificationDialog
 		private void updateNote()
 		{
 			// Change the note
-			if (verificationTypeBox.getSelectedItem() == VerificationType.Nonblocking &&
-				algorithmSelector.getSelectedItem() == VerificationAlgorithm.Modular)
+			if (verificationTypeBox.getSelectedItem() == VerificationType.NONBLOCKING &&
+				algorithmSelector.getSelectedItem() == VerificationAlgorithm.MODULAR)
 			{
 				note.setText("Note:\n" + "This algorithm uses incremental\n" +
 							 "composition and minimization with\n" +
 							 "respect to conflict equivalence.");
 				note.setVisible(true);
 			}
-			else if (verificationTypeBox.getSelectedItem() == VerificationType.MutuallyNonblocking)
+			else if (verificationTypeBox.getSelectedItem() == VerificationType.MUTUALLYNONBLOCKING)
 			{
 				note.setText("Note:\n" + "Mutual nonblocking is inherently modular\n" +
 							 "and hence there is no monolithic algoritm.");
 				note.setVisible(true);
 			}
-			else if (verificationTypeBox.getSelectedItem() == VerificationType.LanguageInclusion)
+			else if (verificationTypeBox.getSelectedItem() == VerificationType.LANGUAGEINCLUSION)
 			{
 				note.setText("Note:\n" + "This verifies whether the language of the unselected\n" +
 							 "automata is included in the inverse projection of\n" +
@@ -366,7 +376,7 @@ public class VerificationDialog
 							 "include the alphabet of the selected automata.");
 				note.setVisible(true);
 			}
-			else if (verificationTypeBox.getSelectedItem() == VerificationType.InverseControllability)
+			else if (verificationTypeBox.getSelectedItem() == VerificationType.INVERSECONTROLLABILITY)
 			{
 				note.setText("Note:\n" + "This verifies whether the controllable events in the\n" +
 							 "supervisor candidate are always accepted by\n" +

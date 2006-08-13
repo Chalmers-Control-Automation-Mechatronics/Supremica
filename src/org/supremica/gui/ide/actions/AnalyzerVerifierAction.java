@@ -54,7 +54,7 @@ public class AnalyzerVerifierAction
 		{
 			return;
 		}
-		if (vOptions.getVerificationType() == VerificationType.LanguageInclusion)
+		if (vOptions.getVerificationType() == VerificationType.LANGUAGEINCLUSION)
 		{
 			vOptions.setInclusionAutomata(ide.getUnselectedAutomata());
 		}

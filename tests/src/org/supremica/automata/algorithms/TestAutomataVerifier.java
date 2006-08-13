@@ -100,7 +100,7 @@ public class TestAutomataVerifier
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3));
 			SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
 			VerificationOptions verificationOptions = new VerificationOptions();
-			verificationOptions.setVerificationType(VerificationType.Controllability);
+			verificationOptions.setVerificationType(VerificationType.CONTROLLABILITY);
 			AutomataVerifier theVerifier = new AutomataVerifier(theProject, verificationOptions, 
 																synchronizationOptions, null);
 			assertTrue(theVerifier.verify());
@@ -123,7 +123,7 @@ public class TestAutomataVerifier
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3Uncontrollable));
 			SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
 			VerificationOptions verificationOptions = new VerificationOptions();
-			verificationOptions.setVerificationType(VerificationType.Controllability);
+			verificationOptions.setVerificationType(VerificationType.CONTROLLABILITY);
 			AutomataVerifier theVerifier = new AutomataVerifier(theProject, verificationOptions, 
 																synchronizationOptions, null);
 			assertTrue(!theVerifier.verify());
@@ -252,7 +252,7 @@ public class TestAutomataVerifier
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3LanguageInclusion));
 			SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
 			VerificationOptions verificationOptions = new VerificationOptions();
-			verificationOptions.setVerificationType(VerificationType.LanguageInclusion);
+			verificationOptions.setVerificationType(VerificationType.LANGUAGEINCLUSION);
 			AutomataVerifier theVerifier = new AutomataVerifier(theProject, verificationOptions, 
 																synchronizationOptions, null);
 			Automata inclusionAutomata = new Automata(theProject,true);
@@ -278,7 +278,7 @@ public class TestAutomataVerifier
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3LanguageExclusion));
 			SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
 			VerificationOptions verificationOptions = new VerificationOptions();
-			verificationOptions.setVerificationType(VerificationType.LanguageInclusion);
+			verificationOptions.setVerificationType(VerificationType.LANGUAGEINCLUSION);
 			AutomataVerifier theVerifier = new AutomataVerifier(theProject, verificationOptions, 
 																synchronizationOptions, null);
 			Automata inclusionAutomata = new Automata(theProject,true);

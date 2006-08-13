@@ -177,8 +177,8 @@ public final class Config
 	public static final StringProperty SYNC_AUTOMATON_NAME_SEPARATOR = new StringProperty(PropertyType.ALGORITHMS_SYNC, "synchAutomatonNameSeparator", "||", "Automata name separator");
 
 	// ALGORITHMS_VERIFICATION
-	public static final StringProperty VERIFY_VERIFICATION_TYPE = new StringProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyVerificationType", org.supremica.automata.algorithms.VerificationType.Controllability.toString(), "Default verificaton type");
-	public static final StringProperty VERIFY_ALGORITHM_TYPE  = new StringProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyAlgorithmType", org.supremica.automata.algorithms.VerificationAlgorithm.Modular.toString(), "Default verificaton algorithm");
+	public static final StringProperty VERIFY_VERIFICATION_TYPE = new StringProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyVerificationType", org.supremica.automata.algorithms.VerificationType.CONTROLLABILITY.toString(), "Default verificaton type");
+	public static final StringProperty VERIFY_ALGORITHM_TYPE  = new StringProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyAlgorithmType", org.supremica.automata.algorithms.VerificationAlgorithm.MODULAR.toString(), "Default verificaton algorithm");
 	public static final IntegerProperty VERIFY_EXCLUSION_STATE_LIMIT = new IntegerProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyExclusionStateLimit", 1000, "Exclusion state limit", false, 1);
 	public static final IntegerProperty VERIFY_REACHABILITY_STATE_LIMIT = new IntegerProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyReachabilityStateLimit", 1000, "Reachability state limit", false, 1);
 	public static final BooleanProperty VERIFY_ONE_EVENT_AT_A_TIME = new BooleanProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyOneEventAtATime", false, "Verify one event at a time");

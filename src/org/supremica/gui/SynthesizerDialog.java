@@ -55,380 +55,399 @@ import javax.swing.*;
 import org.supremica.automata.algorithms.*;
 
 abstract class SynthesizerPanel
-	extends JPanel
+    extends JPanel
 {
-	public abstract void update(SynthesizerOptions s);
-
-	public abstract void regain(SynthesizerOptions s);
+    public abstract void update(SynthesizerOptions s);
+    
+    public abstract void regain(SynthesizerOptions s);
 }
 
 class SynthesizerDialogStandardPanel
-	extends SynthesizerPanel
-	implements ActionListener
+    extends SynthesizerPanel
+    implements ActionListener
 {
-	private static final long serialVersionUID = 1L;
-	private SynthesisSelector synthesisTypeBox;
-	private AlgorithmSelector algorithmTypeBox;
-	private JCheckBox purgeBox;
-	private JCheckBox optimizeBox;
-	private NonblockNote nbNote;
-
-	static class AlgorithmSelector
-		extends JComboBox
-	{
-		private static final long serialVersionUID = 1L;
-
-		private AlgorithmSelector(Object[] array)
-		{
-			super(array);
-		}
-
-		private AlgorithmSelector(SynthesisAlgorithm algo)
-		{
-			addItem(algo);
-		}
-
-		public SynthesisAlgorithm getAlgorithm()
-		{
-			return (SynthesisAlgorithm) getSelectedItem();
-		}
-
-		public void setAlgorithm(SynthesisAlgorithm algo)
-		{
-			setSelectedItem(algo);
-		}
-
-		public static AlgorithmSelector create(int num)
-		{
-			if (num == 1)
-			{
-
-				// return new AlgorithmSelector(SynthesisAlgorithm.Monolithic);
-				return new AlgorithmSelector(SynthesisAlgorithm.toArray_oneAutomaton());
-			}
-			else
-			{
-				return new AlgorithmSelector(SynthesisAlgorithm.toArray());
-			}
-		}
-	}
-
-	static class SynthesisSelector
-		extends JComboBox
-	{
-		private static final long serialVersionUID = 1L;
-
-		private SynthesisSelector()
-		{
-			super(SynthesisType.toArray());
-		}
-
-		public SynthesisType getType()
-		{
-			return (SynthesisType) getSelectedItem();
-		}
-
-		public void setType(SynthesisType type)
-		{
-			setSelectedItem(type);
-		}
-
-		public static SynthesisSelector create()
-		{
-			return new SynthesisSelector();
-		}
-	}
-
-	class NonblockNote
-		extends JTextArea
-	{
-		private static final long serialVersionUID = 1L;
-		private static final int transparent = 0;
-
-		public NonblockNote()
-		{
-			/*
-			super("Note:\n" + "Currently, the modular nonblocking algorithm\n" +
-				  "does not guarantee global nonblocking. The only\n" +
-				  "gurantee is that each supervisor is nonblockng\n" +
-				  "with respect to the plants that it controls");
-			*/
-			super("Note:\n" + "Modular nonblocking synthesis results in a\n" +
-				  "compact representation of the monolithic\n" +
-				  "supervisor that Supremica can not currently\n" +
-				  "make use of.");
-
-			super.setBackground(new Color(0, 0, 0, transparent));
-		}
-	}
-
-	public SynthesizerDialogStandardPanel(int num)
-	{
-		algorithmTypeBox = AlgorithmSelector.create(num);
-		algorithmTypeBox.addActionListener(this);
-
-		synthesisTypeBox = SynthesisSelector.create();
-		synthesisTypeBox.addActionListener(this);
-
-		purgeBox = new JCheckBox("Purge result");
-		purgeBox.setToolTipText("Remove all forbidden states");
-
-		optimizeBox = new JCheckBox("Optimize result");
-		optimizeBox.setToolTipText("Remove supervisors that don't affect the controllability");
-
-		nbNote = new NonblockNote();
-
-		if (num == 1)
-		{
-			optimizeBox.setEnabled(false);
-			nbNote.setVisible(false);
-		}
-
-		// Create layout!
-		Box mainBox = Box.createVerticalBox();
-
-		JPanel panel = new JPanel();
-		Box box = Box.createHorizontalBox();
-		box.add(new JLabel("Property:"));
-		box.add(synthesisTypeBox);
-		panel.add(box);
-		mainBox.add(panel);
-
-		panel = new JPanel();
-		box = Box.createHorizontalBox();
-		box.add(new JLabel("Algorithm: "));
-		box.add(algorithmTypeBox);
-		panel.add(box);
-		mainBox.add(panel);
-
-		panel = new JPanel();
-		box = Box.createHorizontalBox();
-		box.add(purgeBox);
-		box.add(optimizeBox);
-		panel.add(box);
-		mainBox.add(panel);
-
-		panel = new JPanel();
-		panel.add(nbNote);
-		mainBox.add(panel);
-
-		// Add components
-		this.add(mainBox);
-	}
-
-	public void update(SynthesizerOptions synthesizerOptions)
-	{
-		synthesisTypeBox.setType(synthesizerOptions.getSynthesisType());
-		algorithmTypeBox.setAlgorithm(synthesizerOptions.getSynthesisAlgorithm());
-		purgeBox.setSelected(synthesizerOptions.doPurge());
-		optimizeBox.setSelected(synthesizerOptions.getOptimize());
-	}
-
-	public void regain(SynthesizerOptions synthesizerOptions)
-	{
-		synthesizerOptions.setSynthesisType(synthesisTypeBox.getType());
-		synthesizerOptions.setSynthesisAlgorithm(algorithmTypeBox.getAlgorithm());
-		synthesizerOptions.setPurge(purgeBox.isSelected());
-		synthesizerOptions.setOptimize(optimizeBox.isSelected());
-	}
-
-	public void actionPerformed(ActionEvent e)
-	{
-		//X stands for "Should be setEnabled but setEnabled does not work as it should."
-
-		// Default
-		purgeBox.setVisible(true); //X
-		optimizeBox.setVisible(true); //X
-		nbNote.setVisible(false);
-
-		if (algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.Monolithic)
-		{
-			optimizeBox.setVisible(false); //X
-		}
-		else if (algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
-		{
-			optimizeBox.setVisible(false); //X
-		}
-		else if (algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.Modular)
-		{
-			if ((synthesisTypeBox.getType() == SynthesisType.Nonblocking) ||
-					 (synthesisTypeBox.getType() == SynthesisType.Both))
-			{
-				purgeBox.setVisible(false); //X
-				optimizeBox.setVisible(false); //X
-				nbNote.setVisible(true);
-			}
-		}
-	}
+    private static final long serialVersionUID = 1L;
+    private SynthesisSelector synthesisTypeBox;
+    private AlgorithmSelector algorithmTypeBox;
+    private JCheckBox purgeBox;
+    private JCheckBox optimizeBox;
+    private NonblockNote nbNote;
+    
+    static class AlgorithmSelector
+        extends JComboBox
+    {
+        private static final long serialVersionUID = 1L;
+        
+        private AlgorithmSelector()
+        {
+            super();
+        }
+        
+        private AlgorithmSelector(Object[] array)
+        {
+            super(array);
+        }
+        
+        private AlgorithmSelector(SynthesisAlgorithm algo)
+        {
+            addItem(algo);
+        }
+        
+        public SynthesisAlgorithm getAlgorithm()
+        {
+            return (SynthesisAlgorithm) getSelectedItem();
+        }
+        
+        public void setAlgorithm(SynthesisAlgorithm algo)
+        {
+            setSelectedItem(algo);
+        }
+        
+        public static AlgorithmSelector create(int num)
+        {
+            if (num == 1)
+            {
+                AlgorithmSelector selector = new AlgorithmSelector();
+                for (SynthesisAlgorithm algo: SynthesisAlgorithm.values())
+                {
+                    if (algo.isEnabled() && !algo.isModular())
+                    {
+                        selector.addItem(algo);
+                    }
+                }
+                return selector;
+            }
+            else
+            {
+                AlgorithmSelector selector = new AlgorithmSelector();
+                for (SynthesisAlgorithm algo: SynthesisAlgorithm.values())
+                {
+                    if (algo.isEnabled())
+                    {
+                        selector.addItem(algo);
+                    }
+                }
+                return selector;
+            }
+        }
+    }
+    
+    static class SynthesisSelector
+        extends JComboBox
+    {
+        private static final long serialVersionUID = 1L;
+        
+        private SynthesisSelector()
+        {
+            super(SynthesisType.toArray());
+        }
+        
+        public SynthesisType getType()
+        {
+            return (SynthesisType) getSelectedItem();
+        }
+        
+        public void setType(SynthesisType type)
+        {
+            setSelectedItem(type);
+        }
+        
+        public static SynthesisSelector create()
+        {
+            return new SynthesisSelector();
+        }
+    }
+    
+    class NonblockNote
+        extends JTextArea
+    {
+        private static final long serialVersionUID = 1L;
+        private static final int transparent = 0;
+        
+        public NonblockNote()
+        {
+                        /*
+                        super("Note:\n" + "Currently, the modular nonblocking algorithm\n" +
+                                  "does not guarantee global nonblocking. The only\n" +
+                                  "gurantee is that each supervisor is nonblockng\n" +
+                                  "with respect to the plants that it controls");
+                         */
+            super("Note:\n" + "Modular nonblocking synthesis results in a\n" +
+                "compact representation of the monolithic\n" +
+                "supervisor that Supremica can not currently\n" +
+                "make use of.");
+            
+            super.setBackground(new Color(0, 0, 0, transparent));
+        }
+    }
+    
+    public SynthesizerDialogStandardPanel(int num)
+    {
+        algorithmTypeBox = AlgorithmSelector.create(num);
+        algorithmTypeBox.addActionListener(this);
+        
+        synthesisTypeBox = SynthesisSelector.create();
+        synthesisTypeBox.addActionListener(this);
+        
+        purgeBox = new JCheckBox("Purge result");
+        purgeBox.setToolTipText("Remove all forbidden states");
+        
+        optimizeBox = new JCheckBox("Optimize result");
+        optimizeBox.setToolTipText("Remove supervisors that don't affect the controllability");
+        
+        nbNote = new NonblockNote();
+        
+        if (num == 1)
+        {
+            optimizeBox.setEnabled(false);
+            nbNote.setVisible(false);
+        }
+        
+        // Create layout!
+        Box mainBox = Box.createVerticalBox();
+        
+        JPanel panel = new JPanel();
+        Box box = Box.createHorizontalBox();
+        box.add(new JLabel("Property:"));
+        box.add(synthesisTypeBox);
+        panel.add(box);
+        mainBox.add(panel);
+        
+        panel = new JPanel();
+        box = Box.createHorizontalBox();
+        box.add(new JLabel("Algorithm: "));
+        box.add(algorithmTypeBox);
+        panel.add(box);
+        mainBox.add(panel);
+        
+        panel = new JPanel();
+        box = Box.createHorizontalBox();
+        box.add(purgeBox);
+        box.add(optimizeBox);
+        panel.add(box);
+        mainBox.add(panel);
+        
+        panel = new JPanel();
+        panel.add(nbNote);
+        mainBox.add(panel);
+        
+        // Add components
+        this.add(mainBox);
+    }
+    
+    public void update(SynthesizerOptions synthesizerOptions)
+    {
+        synthesisTypeBox.setType(synthesizerOptions.getSynthesisType());
+        algorithmTypeBox.setAlgorithm(synthesizerOptions.getSynthesisAlgorithm());
+        purgeBox.setSelected(synthesizerOptions.doPurge());
+        optimizeBox.setSelected(synthesizerOptions.getOptimize());
+    }
+    
+    public void regain(SynthesizerOptions synthesizerOptions)
+    {
+        synthesizerOptions.setSynthesisType(synthesisTypeBox.getType());
+        synthesizerOptions.setSynthesisAlgorithm(algorithmTypeBox.getAlgorithm());
+        synthesizerOptions.setPurge(purgeBox.isSelected());
+        synthesizerOptions.setOptimize(optimizeBox.isSelected());
+    }
+    
+    public void actionPerformed(ActionEvent e)
+    {
+        //X stands for "Should be setEnabled but setEnabled does not work as it should."
+        
+        // Default
+        purgeBox.setVisible(true); //X
+        optimizeBox.setVisible(true); //X
+        nbNote.setVisible(false);
+        
+        if (algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.Monolithic)
+        {
+            optimizeBox.setVisible(false); //X
+        }
+        else if (algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
+        {
+            optimizeBox.setVisible(false); //X
+        }
+        else if (algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.Modular)
+        {
+            if ((synthesisTypeBox.getType() == SynthesisType.Nonblocking) ||
+                (synthesisTypeBox.getType() == SynthesisType.Both))
+            {
+                purgeBox.setVisible(false); //X
+                optimizeBox.setVisible(false); //X
+                nbNote.setVisible(true);
+            }
+        }
+    }
 }
 
 class SynthesizerDialogAdvancedPanel
-	extends SynthesizerPanel
-	implements ActionListener
+    extends SynthesizerPanel
+    implements ActionListener
 {
-	private static final long serialVersionUID = 1L;
-	private JCheckBox reduceSupervisorsBox;
-	private JCheckBox maximallyPermissiveBox;
-	private JCheckBox maximallyPermissiveIncrementalBox;
-	private JTextArea note;
-
-	public SynthesizerDialogAdvancedPanel()
-	{
-		Box advancedBox = Box.createVerticalBox();
-
-		reduceSupervisorsBox = new JCheckBox("Reduce supervisors (experimental)");
-		reduceSupervisorsBox.setToolTipText("Remove redundant states and events from " +
-											"synthesized supervisors");
-
-		maximallyPermissiveBox = new JCheckBox("Maximally permissive result");
-		maximallyPermissiveBox.setToolTipText("Guarantee maximally permissive result");
-
-		maximallyPermissiveIncrementalBox = new JCheckBox("Incremental algorithm");
-		maximallyPermissiveIncrementalBox.setToolTipText("Use incremental algorithm " +
-														 "for maximally permissive synthesis");
-		reduceSupervisorsBox.addActionListener(this);
-		maximallyPermissiveIncrementalBox.addActionListener(this);
-		maximallyPermissiveBox.addActionListener(this);
-		advancedBox.add(reduceSupervisorsBox);
-		advancedBox.add(maximallyPermissiveBox);
-		advancedBox.add(maximallyPermissiveIncrementalBox);
-
-		note = new JTextArea("Note:\n" + "'Purge result' must be selected for supervisor\n" +
-							 "reduction to work.\n");
-
-		note.setBackground(new Color(0, 0, 0, 0));
-		note.setVisible(false);
-		this.add(advancedBox, BorderLayout.CENTER);
-		this.add(note, BorderLayout.SOUTH);
-	}
-
-	public void update(SynthesizerOptions synthesizerOptions)
-	{
-		reduceSupervisorsBox.setSelected(synthesizerOptions.getReduceSupervisors());
-		maximallyPermissiveBox.setSelected(synthesizerOptions.getMaximallyPermissive());
-		maximallyPermissiveIncrementalBox.setSelected(synthesizerOptions.getMaximallyPermissiveIncremental());
-	}
-
-	public void regain(SynthesizerOptions synthesizerOptions)
-	{
-		synthesizerOptions.setReduceSupervisors(reduceSupervisorsBox.isSelected());
-		synthesizerOptions.setMaximallyPermissive(maximallyPermissiveBox.isSelected());
-		synthesizerOptions.setMaximallyPermissiveIncremental(maximallyPermissiveIncrementalBox.isSelected());
-	}
-
-	public void actionPerformed(ActionEvent e)
-	{
-		// Incremental box enabled?
-		maximallyPermissiveIncrementalBox.setEnabled(maximallyPermissiveBox.isSelected());
-
-		// Display note?
-		note.setVisible(reduceSupervisorsBox.isSelected());
-	}
+    private static final long serialVersionUID = 1L;
+    private JCheckBox reduceSupervisorsBox;
+    private JCheckBox maximallyPermissiveBox;
+    private JCheckBox maximallyPermissiveIncrementalBox;
+    private JTextArea note;
+    
+    public SynthesizerDialogAdvancedPanel()
+    {
+        Box advancedBox = Box.createVerticalBox();
+        
+        reduceSupervisorsBox = new JCheckBox("Reduce supervisors (experimental)");
+        reduceSupervisorsBox.setToolTipText("Remove redundant states and events from " +
+            "synthesized supervisors");
+        
+        maximallyPermissiveBox = new JCheckBox("Maximally permissive result");
+        maximallyPermissiveBox.setToolTipText("Guarantee maximally permissive result");
+        
+        maximallyPermissiveIncrementalBox = new JCheckBox("Incremental algorithm");
+        maximallyPermissiveIncrementalBox.setToolTipText("Use incremental algorithm " +
+            "for maximally permissive synthesis");
+        reduceSupervisorsBox.addActionListener(this);
+        maximallyPermissiveIncrementalBox.addActionListener(this);
+        maximallyPermissiveBox.addActionListener(this);
+        advancedBox.add(reduceSupervisorsBox);
+        advancedBox.add(maximallyPermissiveBox);
+        advancedBox.add(maximallyPermissiveIncrementalBox);
+        
+        note = new JTextArea("Note:\n" + "'Purge result' must be selected for supervisor\n" +
+            "reduction to work.\n");
+        
+        note.setBackground(new Color(0, 0, 0, 0));
+        note.setVisible(false);
+        this.add(advancedBox, BorderLayout.CENTER);
+        this.add(note, BorderLayout.SOUTH);
+    }
+    
+    public void update(SynthesizerOptions synthesizerOptions)
+    {
+        reduceSupervisorsBox.setSelected(synthesizerOptions.getReduceSupervisors());
+        maximallyPermissiveBox.setSelected(synthesizerOptions.getMaximallyPermissive());
+        maximallyPermissiveIncrementalBox.setSelected(synthesizerOptions.getMaximallyPermissiveIncremental());
+    }
+    
+    public void regain(SynthesizerOptions synthesizerOptions)
+    {
+        synthesizerOptions.setReduceSupervisors(reduceSupervisorsBox.isSelected());
+        synthesizerOptions.setMaximallyPermissive(maximallyPermissiveBox.isSelected());
+        synthesizerOptions.setMaximallyPermissiveIncremental(maximallyPermissiveIncrementalBox.isSelected());
+    }
+    
+    public void actionPerformed(ActionEvent e)
+    {
+        // Incremental box enabled?
+        maximallyPermissiveIncrementalBox.setEnabled(maximallyPermissiveBox.isSelected());
+        
+        // Display note?
+        note.setVisible(reduceSupervisorsBox.isSelected());
+    }
 }
 
 public class SynthesizerDialog
-	implements ActionListener
+    implements ActionListener
 {
-	private JButton okButton;
-	private JButton cancelButton;
-	private SynthesizerOptions synthesizerOptions;
-	SynthesizerDialogStandardPanel standardPanel;
-	SynthesizerDialogAdvancedPanel advancedPanel;
-	private JDialog dialog;
-	private Frame parentFrame;
-
-	/**
-	 * Creates modal dialog box for input of synthesizer options.
-	 */
-	public SynthesizerDialog(Frame parentFrame, int numSelected, SynthesizerOptions synthesizerOptions)
-	{
-		dialog = new JDialog(parentFrame, true);    // modal
-		this.parentFrame = parentFrame;
-		this.synthesizerOptions = synthesizerOptions;
-
-		dialog.setTitle("Synthesizer options");
-		dialog.setSize(new Dimension(400, 300));
-
-		Container contentPane = dialog.getContentPane();
-
-		standardPanel = new SynthesizerDialogStandardPanel(numSelected);
-		advancedPanel = new SynthesizerDialogAdvancedPanel();
-
-		JTabbedPane tabbedPane = new JTabbedPane();
-
-		tabbedPane.addTab("Standard options", null, standardPanel, "Standard options");
-		tabbedPane.addTab("Advanced options", null, advancedPanel, "Advanced options");
-
-		// buttonPanel
-		JPanel buttonPanel = new JPanel();
-
-		okButton = addButton(buttonPanel, "OK");
-		cancelButton = addButton(buttonPanel, "Cancel");
-
-		contentPane.add("Center", tabbedPane);
-		contentPane.add("South", buttonPanel);
-		Utility.setDefaultButton(dialog, okButton);
-
-		// ** MF ** Fix to get the frigging thing centered
-		Dimension dim = dialog.getMinimumSize();
-
-		dialog.setLocation(Utility.getPosForCenter(dim));
-		dialog.setResizable(false);
-		update();
-	}
-
-	/**
-	 * Updates the information in the dialog from what is recorded in SynthesizerOptions.
-	 * @see SynthesizerOptions
-	 */
-	public void update()
-	{
-		standardPanel.update(synthesizerOptions);
-		advancedPanel.update(synthesizerOptions);
-	}
-
-	private JButton addButton(Container container, String name)
-	{
-		JButton button = new JButton(name);
-
-		button.addActionListener(this);
-		container.add(button);
-
-		return button;
-	}
-
-	public void show()
-	{
-		dialog.setVisible(true);
-	}
-
-	public void actionPerformed(ActionEvent event)
-	{
-		Object source = event.getSource();
-
-		if (source == okButton)
-		{
-			standardPanel.regain(synthesizerOptions);
-			advancedPanel.regain(synthesizerOptions);
-
-			if (synthesizerOptions.isValid())
-			{
-				synthesizerOptions.saveOptions();
-				synthesizerOptions.setDialogOK(true);
-
-				dialog.setVisible(false);
-				dialog.dispose();
-			}
-			else
-			{
-				JOptionPane.showMessageDialog(parentFrame, "Invalid combination of type and algorithm", "Alert", JOptionPane.ERROR_MESSAGE);
-			}
-		}
-		else if (source == cancelButton)
-		{
-			synthesizerOptions.setDialogOK(false);    // Already done...
-			dialog.setVisible(false);
-			dialog.dispose();
-		}
-	}
+    private JButton okButton;
+    private JButton cancelButton;
+    private SynthesizerOptions synthesizerOptions;
+    SynthesizerDialogStandardPanel standardPanel;
+    SynthesizerDialogAdvancedPanel advancedPanel;
+    private JDialog dialog;
+    private Frame parentFrame;
+    
+    /**
+     * Creates modal dialog box for input of synthesizer options.
+     */
+    public SynthesizerDialog(Frame parentFrame, int numSelected, SynthesizerOptions synthesizerOptions)
+    {
+        dialog = new JDialog(parentFrame, true);    // modal
+        this.parentFrame = parentFrame;
+        this.synthesizerOptions = synthesizerOptions;
+        
+        dialog.setTitle("Synthesizer options");
+        dialog.setSize(new Dimension(400, 300));
+        
+        Container contentPane = dialog.getContentPane();
+        
+        standardPanel = new SynthesizerDialogStandardPanel(numSelected);
+        advancedPanel = new SynthesizerDialogAdvancedPanel();
+        
+        JTabbedPane tabbedPane = new JTabbedPane();
+        
+        tabbedPane.addTab("Standard options", null, standardPanel, "Standard options");
+        tabbedPane.addTab("Advanced options", null, advancedPanel, "Advanced options");
+        
+        // buttonPanel
+        JPanel buttonPanel = new JPanel();
+        
+        okButton = addButton(buttonPanel, "OK");
+        cancelButton = addButton(buttonPanel, "Cancel");
+        
+        contentPane.add("Center", tabbedPane);
+        contentPane.add("South", buttonPanel);
+        Utility.setDefaultButton(dialog, okButton);
+        
+        // ** MF ** Fix to get the frigging thing centered
+        Dimension dim = dialog.getMinimumSize();
+        
+        dialog.setLocation(Utility.getPosForCenter(dim));
+        dialog.setResizable(false);
+        update();
+    }
+    
+    /**
+     * Updates the information in the dialog from what is recorded in SynthesizerOptions.
+     * @see SynthesizerOptions
+     */
+    public void update()
+    {
+        standardPanel.update(synthesizerOptions);
+        advancedPanel.update(synthesizerOptions);
+    }
+    
+    private JButton addButton(Container container, String name)
+    {
+        JButton button = new JButton(name);
+        
+        button.addActionListener(this);
+        container.add(button);
+        
+        return button;
+    }
+    
+    public void show()
+    {
+        dialog.setVisible(true);
+    }
+    
+    public void actionPerformed(ActionEvent event)
+    {
+        Object source = event.getSource();
+        
+        if (source == okButton)
+        {
+            standardPanel.regain(synthesizerOptions);
+            advancedPanel.regain(synthesizerOptions);
+            
+            if (synthesizerOptions.isValid())
+            {
+                synthesizerOptions.saveOptions();
+                synthesizerOptions.setDialogOK(true);
+                
+                dialog.setVisible(false);
+                dialog.dispose();
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(parentFrame, "Invalid combination of type and algorithm", "Alert", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        else if (source == cancelButton)
+        {
+            synthesizerOptions.setDialogOK(false);    // Already done...
+            dialog.setVisible(false);
+            dialog.dispose();
+        }
+    }
 }

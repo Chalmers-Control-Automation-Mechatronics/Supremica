@@ -51,36 +51,52 @@ package org.supremica.automata.algorithms;
 
 import java.util.*;
 
+/**
+ * Different kinds of algorithms for verification.
+ */
 public enum VerificationAlgorithm
 {
-	Monolithic("Monolithic"),
-	Modular("Modular"),
-	Compositional("Compositional"),
-	BDD("BDD");
-	//IDD("IDD");
-	
-	/** Textual description. */
-	private String description;
-	
-	private VerificationAlgorithm(String description)
-	{
-		this.description = description;
-	}
-
-	public String toString()
-	{
-		return description;
-	}
-
-	public static VerificationAlgorithm toAlgorithm(String description)
-	{
-		for (VerificationAlgorithm algo: values())
-		{
-			if (algo.toString().equals(description))
-			{
-				return algo;
-			}
-		}
-		return null;
-	}
+    MONOLITHIC("Monolithic"),
+    MODULAR("Modular"),
+    COMPOSITIONAL("Compositional", false),
+    BDD("BDD"),
+    IDD("IDD", false);
+    
+    /** Textual description. */
+    private final String description;
+    /** If false, this instance is not included in dialogs. */
+    private final boolean enabled;
+    
+    private VerificationAlgorithm(String description)
+    {
+        this(description, true);
+    }
+    
+    private VerificationAlgorithm(String description, boolean enabled)
+    {
+        this.description = description;
+        this.enabled = enabled;
+    }
+    
+    public String toString()
+    {
+        return description;
+    }
+    
+    public boolean isEnabled()
+    {
+        return enabled;
+    }
+    
+    public static VerificationAlgorithm toAlgorithm(String description)
+    {
+        for (VerificationAlgorithm algo: values())
+        {
+            if (algo.description.equals(description))
+            {
+                return algo;
+            }
+        }
+        return null;
+    }
 }

@@ -127,20 +127,20 @@ public class AutomataVerificationWorker
 		}
 
 		// Perform verification according to the VerificationType.
-		if ((verificationOptions.getVerificationType() == VerificationType.Controllability)
-			|| (verificationOptions.getVerificationType() == VerificationType.InverseControllability))
+		if ((verificationOptions.getVerificationType() == VerificationType.CONTROLLABILITY)
+			|| (verificationOptions.getVerificationType() == VerificationType.INVERSECONTROLLABILITY))
 		{
 			// Controllability verification...
 			successMessage = "The system is controllable!";
 			failureMessage = "The system is NOT controllable!";
 		}
-		else if (verificationOptions.getVerificationType() == VerificationType.Nonblocking)
+		else if (verificationOptions.getVerificationType() == VerificationType.NONBLOCKING)
 		{
 			// Nonblocking verification...
 			successMessage = "The system is nonblocking!";
 			failureMessage = "The system is blocking!";
 		}
-		else if (verificationOptions.getVerificationType() == VerificationType.MutuallyNonblocking)
+		else if (verificationOptions.getVerificationType() == VerificationType.MUTUALLYNONBLOCKING)
 		{
 			// Mutual nonblocking verification...
 			successMessage = "The system is mutually nonblocking!";
@@ -148,7 +148,7 @@ public class AutomataVerificationWorker
 			//failureMessage = "The system is (globally and mutually) blocking!";
 			failureMessage = "The system might be blocking...";
 		}
-		else if (verificationOptions.getVerificationType() == VerificationType.LanguageInclusion)
+		else if (verificationOptions.getVerificationType() == VerificationType.LANGUAGEINCLUSION)
 		{
 			// Language inclusion verification...
 			successMessage = "The language of the unselected automata is \n" +
