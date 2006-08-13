@@ -135,7 +135,6 @@ public final class Config
 	public static final BooleanProperty GENERAL_REDIRECT_STDERR = new BooleanProperty(PropertyType.GENERAL, "generalRedirectStderr", true, "Redirect stderr");
 	public static final BooleanProperty VERBOSE_MODE = new BooleanProperty(PropertyType.GENERAL, "verboseMode", false, "Verbose mode");
 
-
 	// GENERAL_LOG
 	public static final BooleanProperty LOG_TO_CONSOLE = new BooleanProperty(PropertyType.GENERAL_LOG, "logToConsole", false, "Log to Console");
 	public static final BooleanProperty LOG_TO_GUI = new BooleanProperty(PropertyType.GENERAL_LOG, "logToGUI", false, "Log to Graphical User Interface");

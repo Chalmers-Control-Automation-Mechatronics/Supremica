@@ -183,7 +183,7 @@ public class VerificationDialog
 
 		public AlgorithmSelector()
 		{
-			super(VerificationAlgorithm.toArray());
+			super(VerificationAlgorithm.values());
 		}
 
 		public void forceMonolithic()
@@ -200,17 +200,17 @@ public class VerificationDialog
 
 		public void allowAll()
 		{
+			// Remember current selection
 			VerificationAlgorithm selected = (VerificationAlgorithm) getSelectedItem();
-
-			removeAllItems();
-
-			Object[] alternatives = VerificationAlgorithm.toArray();
-
-			for (int i = 0; i < alternatives.length; i++)
+			
+			// Clear, then add all
+			removeAllItems();		   
+			for (VerificationAlgorithm algo :VerificationAlgorithm.values())
 			{
-				addItem(alternatives[i]);
+				addItem(algo);
 			}
-
+			
+			// Reselect
 			setSelectedItem(selected);
 		}
 	}

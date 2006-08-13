@@ -56,7 +56,7 @@ import org.supremica.util.SupremicaException;
 public final class SynchronizationOptions
 {
 	private static Logger logger = LoggerFactory.createLogger(SynchronizationOptions.class);
-	private SynchronizationType syncType;    // Prioritized, Full, Broadcast, Unknown
+	private SynchronizationType syncType;    // PRIORITIZED, FULL, Broadcast, Unknown
 	private boolean forbidUnconStates;    // mark uc-states as uncontrollable
 	private boolean expandForbiddenStates;    // expand beyond an uc-state
 	private int initialHashtableSize;
@@ -91,7 +91,7 @@ public final class SynchronizationOptions
 			//			throw new SupremicaException("Error in SupremicaProperties. The property synchNbrOfExecuters must be at least 1.");
 		}
 
-		this.syncType = SynchronizationType.Prioritized;
+		this.syncType = SynchronizationType.PRIORITIZED;
 		assert this.syncType != null;
 
 		this.initialHashtableSize = Config.SYNC_INITIAL_HASHTABLE_SIZE.get();
@@ -261,7 +261,7 @@ public final class SynchronizationOptions
 	public static SynchronizationOptions getDefaultSynchronizationOptions()
 	{
 		SynchronizationOptions options = new SynchronizationOptions();
-		options.setSynchronizationType(SynchronizationType.Full);
+		options.setSynchronizationType(SynchronizationType.FULL);
 		// options.setForbidUncontrollableStates(true);  // This is controversial!
 		options.setForbidUncontrollableStates(false);   // So why was it like that?
 		options.setExpandForbiddenStates(true);

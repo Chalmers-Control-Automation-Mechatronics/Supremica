@@ -163,7 +163,7 @@ public class AutomatonSynthesizer
 			observerAndSupervisor.addAutomaton(theAutomaton);
 			// observerAndSupervisor.setIndicies();
 			SynchronizationOptions observerSynchOptions = new SynchronizationOptions();
-			observerSynchOptions.setSynchronizationType(SynchronizationType.Full);
+			observerSynchOptions.setSynchronizationType(SynchronizationType.FULL);
 			AutomataSynchronizer observerSynchronizer = new AutomataSynchronizer(observerAndSupervisor, observerSynchOptions);
 			observerSynchronizer.execute();
 			Automaton newSystem = observerSynchronizer.getAutomaton();

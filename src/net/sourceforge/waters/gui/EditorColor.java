@@ -16,7 +16,7 @@ import net.sourceforge.waters.model.module.LabelGeometryProxy;
 public class EditorColor
 {
 	/** The alpha value of the shadow-colors. */
-	private static final int SHADOWALPHA = 32;
+	private static final int SHADOWALPHA = 48;
 
 	/** The default color of disabled text. */
 	public static final Color DISABLED = Color.GRAY;
@@ -57,8 +57,8 @@ public class EditorColor
 	public static boolean shadow = true;
 
 	/**
-	 * Returns a transparent variant of the supplied color. The alpha-value is changed to 
-	 * SHADOWALPHA.
+	 * Returns a transparent variant of the supplied color. The
+	 * alpha-value is changed to SHADOWALPHA.
 	 *
 	 * @see #SHADOWALPHA
 	 */
@@ -85,7 +85,8 @@ public class EditorColor
 		{
 			if(o instanceof SimpleNodeProxy)
 			{
-				// Slightly different color, to distinguish nodes from nodegroups more clearly. Overkill?
+				// Slightly different color, to distinguish nodes from
+				// nodegroups more clearly. Overkill?
 				return EditorColor.ERRORCOLOR_NODE;
 			}
 			return EditorColor.ERRORCOLOR;

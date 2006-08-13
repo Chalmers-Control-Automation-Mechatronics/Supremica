@@ -95,7 +95,7 @@ public class AutomataToJava
 	private static Logger logger = LoggerFactory.createLogger(AutomataToJava.class);
 	private Project theProject;
 	private AutomataSynchronizerHelper syncHelper;
-	private SynchronizationType syncType = SynchronizationType.Prioritized;
+	private SynchronizationType syncType = SynchronizationType.PRIORITIZED;
 	private Alphabet allEvents;
 	private String classname;
 
@@ -729,7 +729,7 @@ public class AutomataToJava
 				automaton = (Automaton) autIt.next();
 				alphabet = automaton.getAlphabet();
 
-				if (syncType == SynchronizationType.Prioritized)
+				if (syncType == SynchronizationType.PRIORITIZED)
 				{    // All automata that has this event as prioritized must be able to execute it
 					if (alphabet.containsEqualEvent(event) && alphabet.isPrioritized(event))
 					{    // Find all states that enables this event

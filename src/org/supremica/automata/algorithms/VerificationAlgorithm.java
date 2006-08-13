@@ -51,35 +51,20 @@ package org.supremica.automata.algorithms;
 
 import java.util.*;
 
-public class VerificationAlgorithm
+public enum VerificationAlgorithm
 {
-	private static Collection collection = new LinkedList();
-	public static final VerificationAlgorithm Monolithic = new VerificationAlgorithm("Monolithic");
-	public static final VerificationAlgorithm Modular = new VerificationAlgorithm("Modular");
-	public static final VerificationAlgorithm Compositional = new VerificationAlgorithm("Compositional", false);
-	public static final VerificationAlgorithm BDD = new VerificationAlgorithm("BDD");
-	public static final VerificationAlgorithm IDD = new VerificationAlgorithm("IDD", false);
-	public static final VerificationAlgorithm Undefined = new VerificationAlgorithm("Undefined", false);
-	private String description = null;
-
+	Monolithic("Monolithic"),
+	Modular("Modular"),
+	Compositional("Compositional"),
+	BDD("BDD");
+	//IDD("IDD");
+	
+	/** Textual description. */
+	private String description;
+	
 	private VerificationAlgorithm(String description)
 	{
-		this(description, true);
-	}
-
-	private VerificationAlgorithm(String description, boolean selectable)
-	{
-		if (selectable)
-		{
-			collection.add(this);
-		}
-
 		this.description = description;
-	}
-
-	public static Iterator iterator()
-	{
-		return collection.iterator();
 	}
 
 	public String toString()
@@ -87,22 +72,15 @@ public class VerificationAlgorithm
 		return description;
 	}
 
-	public static VerificationAlgorithm toAlgorithm(String string)
+	public static VerificationAlgorithm toAlgorithm(String description)
 	{
-		for (Iterator it = collection.iterator(); it.hasNext(); )
+		for (VerificationAlgorithm algo: values())
 		{
-			VerificationAlgorithm thisOne = (VerificationAlgorithm) it.next();
-			if (string.equals(thisOne.toString()))
+			if (algo.toString().equals(description))
 			{
-				return thisOne;
+				return algo;
 			}
 		}
-
-		return Undefined;
-	}
-
-	public static Object[] toArray()
-	{
-		return collection.toArray();
+		return null;
 	}
 }

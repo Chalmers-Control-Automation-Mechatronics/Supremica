@@ -51,62 +51,34 @@ package org.supremica.automata.algorithms;
 
 import java.util.*;
 
-public class SynchronizationType
+public enum SynchronizationType
 {
-	private static Collection types = new LinkedList();
-	public static final SynchronizationType Prioritized = new SynchronizationType("Prioritized Synchronization");
-	public static final SynchronizationType Full = new SynchronizationType("Full Synchronization");
-	public static final SynchronizationType Broadcast = new SynchronizationType("Broadcast Synchronization");
-	public static final SynchronizationType Unknown = new SynchronizationType("Unknown", false);
-	private String description = null;
-
+	PRIORITIZED("Prioritized Synchronization"),
+	FULL("Full Synchronization"),
+	BROADCAST("Broadcast Synchronization");
+	
+	/** Textual description of the type. */
+	private final String description;
+	
 	private SynchronizationType(String description)
 	{
-		this(description, true);
-	}
-
-	private SynchronizationType(String description, boolean selectable)
-	{
-		if (selectable)
-		{
-			types.add(this);
-		}
-
 		this.description = description;
 	}
-
-	public static Iterator iterator()
-	{
-		return types.iterator();
-	}
-
+	
 	public String toString()
 	{
 		return description;
 	}
-
-	public static SynchronizationType toType(String type)
+	
+	public static SynchronizationType toType(String description)
 	{
-		if (type.equals(Prioritized.toString()))
+		for (SynchronizationType type: values())
 		{
-			return Prioritized;
+			if (type.toString().equals(description))
+			{
+				return type;
+			}
 		}
-
-		if (type.equals(Full.toString()))
-		{
-			return Full;
-		}
-
-		if (type.equals(Broadcast.toString()))
-		{
-			return Broadcast;
-		}
-
-		return Unknown;
-	}
-
-	public static Object[] toArray()
-	{
-		return types.toArray();
+		return null;
 	}
 }

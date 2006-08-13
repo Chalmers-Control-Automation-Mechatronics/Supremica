@@ -413,7 +413,7 @@ public final class AutomataSynchronizerExecuter
 
 				// logger.debug("checking event " + currAutEventIndex + " in aut " + currAutIndex);
 
-				if (syncType == SynchronizationType.Prioritized)
+				if (syncType == SynchronizationType.PRIORITIZED)
 				{
 					// If the event is prioritized in this automaton (and hence is in the alphabet)
 					if (prioritizedEventsTable[currAutIndex][currEventIndex])
@@ -433,7 +433,7 @@ public final class AutomataSynchronizerExecuter
 						}
 					}
 				}
-				else if (syncType == SynchronizationType.Full)
+				else if (syncType == SynchronizationType.FULL)
 				{
 					// If the event is in the alphabet (and hence is considered prioritized)
 					if (alphabetEventsTable[currAutIndex][currEventIndex])
@@ -453,7 +453,7 @@ public final class AutomataSynchronizerExecuter
 						}
 					}
 				}
-				else if (syncType == SynchronizationType.Broadcast)
+				else if (syncType == SynchronizationType.BROADCAST)
 				{
 					// Why is this?
 					if (typeIsPlantTable[currAutIndex])

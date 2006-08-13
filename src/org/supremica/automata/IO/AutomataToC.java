@@ -63,7 +63,7 @@ public class AutomataToC
 	private static Logger logger = LoggerFactory.createLogger(AutomataToC.class);
 	private Automata theAutomata;
 	private AutomataSynchronizerHelper syncHelper;
-	private SynchronizationType syncType = SynchronizationType.Prioritized;
+	private SynchronizationType syncType = SynchronizationType.PRIORITIZED;
 	private Alphabet allEvents;
 
 	public AutomataToC(Automata theAutomata)
@@ -220,7 +220,7 @@ public class AutomataToC
 				Alphabet currAlphabet = currAutomaton.getAlphabet();
 				int currAutomatonIndex = currAutomaton.getSynchIndex();
 
-				if (syncType == SynchronizationType.Prioritized)
+				if (syncType == SynchronizationType.PRIORITIZED)
 				{    // All automata that has this event as prioritized must be able to execute it
 					if (currAlphabet.containsEqualEvent(currEvent) && currAlphabet.isPrioritized(currEvent))
 					{    // Find all states that enables this event

@@ -150,7 +150,7 @@ public class TestAutomataSynchronizer
 
 			// Test Full synchronization
 			{
-				syncOptions.setSynchronizationType(SynchronizationType.Full);
+				syncOptions.setSynchronizationType(SynchronizationType.FULL);
 				AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
 				synchronizer.execute();
 				assertTrue(synchronizer.getNumberOfStates() == 8);
@@ -194,7 +194,7 @@ public class TestAutomataSynchronizer
 
 			// Test Broadcast synchronization
 			{
-				syncOptions.setSynchronizationType(SynchronizationType.Broadcast);
+				syncOptions.setSynchronizationType(SynchronizationType.BROADCAST);
 				AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
 				synchronizer.execute();
 				assertTrue(synchronizer.getNumberOfStates() == 12);
@@ -302,7 +302,7 @@ public class TestAutomataSynchronizer
 
 			// Test Full synchronization
 			{
-				syncOptions.setSynchronizationType(SynchronizationType.Full);
+				syncOptions.setSynchronizationType(SynchronizationType.FULL);
 				AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
 				synchronizer.execute();
 				assertTrue(synchronizer.getNumberOfStates() == 8);
@@ -325,7 +325,7 @@ public class TestAutomataSynchronizer
 
 			// Test Broadcast synchronization
 			{
-				syncOptions.setSynchronizationType(SynchronizationType.Broadcast);
+				syncOptions.setSynchronizationType(SynchronizationType.BROADCAST);
 				AutomataSynchronizer synchronizer = new AutomataSynchronizer(theProject, syncOptions);
 				synchronizer.execute();
 				assertTrue(synchronizer.getNumberOfStates() == 12);

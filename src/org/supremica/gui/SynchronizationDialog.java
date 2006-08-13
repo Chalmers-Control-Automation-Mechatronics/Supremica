@@ -125,7 +125,7 @@ class SynchronizationDialogAdvancedPanel
 	{
 		this.setLayout(new BorderLayout());
 
-		synchronizationTypeBox = new JComboBox(SynchronizationType.toArray());
+		synchronizationTypeBox = new JComboBox(SynchronizationType.values());
 		synchronizationTypeBox.setToolTipText("Choose the type of composition");
 		expandForbiddenStatesBox = new JCheckBox("Expand forbidden states");
 		expandForbiddenStatesBox.setToolTipText("If checked, transitions from forbidden states are " +

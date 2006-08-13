@@ -142,11 +142,13 @@ public class AutomataVerifier
 			verificationOptions.setAlgorithmType(VerificationAlgorithm.Monolithic);
 		}
 
+		/*
 		// Check IDD
 		if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
 		{
 			return "The IDD Algorithm is not fully implemented yet.";
 		}
+		*/
 
 		// Check Controllability
 		if (verificationOptions.getVerificationType() == VerificationType.Controllability)
@@ -156,8 +158,8 @@ public class AutomataVerifier
 				return "At least two automata must be selected.";
 			}
 
-			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular || 
-				verificationOptions.getAlgorithmType() == VerificationAlgorithm.Compositional)
+			if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Modular)
+				//||	verificationOptions.getAlgorithmType() == VerificationAlgorithm.Compositional)
 			{
 				if (!theAutomata.isAllEventsPrioritized())
 				{
@@ -266,10 +268,12 @@ public class AutomataVerifier
 				{
 					return modularControllabilityVerification();
 				}
+				/*
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Compositional)
 				{
 					return compositionalControllabilityVerification();
 				}
+				*/
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
 				{
 					return BDDControllabilityVerification(theAutomata);
@@ -299,10 +303,12 @@ public class AutomataVerifier
 					// This is the compositional algorithm, there is no "modular" algorithm
 					return compositionalNonblockingVerification();
 				}
+				/*
 				else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.Compositional)
 				{
 					return compositionalNonblockingVerification();
 				}
+				*/
 				else
 				{
 					throw new UnsupportedOperationException("The selected algorithm is not implemented");
@@ -1948,7 +1954,7 @@ public class AutomataVerifier
 
 		synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
 		verificationOptions = VerificationOptions.getDefaultControllabilityOptions();
-		verificationOptions.setAlgorithmType(VerificationAlgorithm.Compositional);
+		verificationOptions.setAlgorithmType(VerificationAlgorithm.Modular);
 		minimizationOptions = MinimizationOptions.getDefaultNonblockingOptions();
 		minimizationOptions.setMinimizationStrategy(MinimizationStrategy.FewestTransitionsFirst);
 		minimizationOptions.setMinimizationHeuristic(MinimizationHeuristic.MostLocal);

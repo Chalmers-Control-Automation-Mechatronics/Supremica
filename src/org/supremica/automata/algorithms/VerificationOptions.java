@@ -231,7 +231,8 @@ public final class VerificationOptions
 	{
 		VerificationOptions options = new VerificationOptions();
 		options.setVerificationType(VerificationType.Nonblocking);
-		options.setAlgorithmType(VerificationAlgorithm.Compositional);
+		options.setAlgorithmType(VerificationAlgorithm.Modular);
+		//options.setAlgorithmType(VerificationAlgorithm.Compositional);
 		return options;
 	}
 
