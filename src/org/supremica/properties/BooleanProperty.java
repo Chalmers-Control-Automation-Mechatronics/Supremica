@@ -49,65 +49,65 @@
 package org.supremica.properties;
 
 public class BooleanProperty
-	extends Property
+    extends Property
 {
-	private boolean defaultValue;
-	private boolean value;
-
-	public BooleanProperty(PropertyType type, String key, boolean value, String comment)
-	{
-		this(type, key, value, comment, false);
-	}
-
-	public BooleanProperty(PropertyType type, String key, boolean value, String comment, boolean immutable)
-	{
-		super(type, key, comment, immutable);
-		this.defaultValue = value;
-		this.value = value;
-	}
-
-	public boolean get()
-	{
-		return isTrue();
-	}
-
-	public boolean isTrue()
-	{
-		return value;
-	}
-
-	public boolean isFalse()
-	{
-		return !isTrue();
-	}
-
-	public void set(String value)
-	{
-		if (isImmutable())
-		{
-			throw new IllegalStateException("This object is immutable, calling the set method is illegal");
-		}
-		this.value = Boolean.parseBoolean(value);
-	}
-
-	public void set(boolean value)
-	{
-		if (isImmutable())
-		{
-			throw new IllegalStateException("This object is immutable, calling the set method is illegal");
-		}
-
-		this.value = value;
-	}
-
-	public String valueToString()
-	{
-		return Boolean.toString(value);
-	}
-
-	public boolean currentValueDifferentFromDefaultValue()
-	{
-		return defaultValue != value;
-	}
-
+    private boolean defaultValue;
+    private boolean value;
+    
+    public BooleanProperty(PropertyType type, String key, boolean value, String comment)
+    {
+        this(type, key, value, comment, false);
+    }
+    
+    public BooleanProperty(PropertyType type, String key, boolean value, String comment, boolean immutable)
+    {
+        super(type, key, comment, immutable);
+        this.defaultValue = value;
+        this.value = value;
+    }
+    
+    public boolean get()
+    {
+        return isTrue();
+    }
+    
+    public boolean isTrue()
+    {
+        return value;
+    }
+    
+    public boolean isFalse()
+    {
+        return !isTrue();
+    }
+    
+    public void set(String value)
+    {
+        if (isImmutable())
+        {
+            throw new IllegalStateException("This object is immutable, calling the set method is illegal");
+        }
+        this.value = Boolean.parseBoolean(value);
+    }
+    
+    public void set(boolean value)
+    {
+        if (isImmutable())
+        {
+            throw new IllegalStateException("This object is immutable, calling the set method is illegal");
+        }
+        
+        this.value = value;
+    }
+    
+    public String valueToString()
+    {
+        return Boolean.toString(value);
+    }
+    
+    public boolean currentValueDifferentFromDefaultValue()
+    {
+        return defaultValue != value;
+    }
+    
 }

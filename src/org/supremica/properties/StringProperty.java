@@ -49,192 +49,197 @@
 package org.supremica.properties;
 
 public class StringProperty
-	extends Property
+    extends Property
 {
-	private String defaultValue;
-	private String value;
-	private String[] legalValues;
-	boolean ignoreCase = false;
-
-	public StringProperty(PropertyType type, String key, String value, String comment)
-	{
-		this(type, key, value, comment, false);
-	}
-
-	public StringProperty(PropertyType type, String key, String value, String comment, boolean immutable)
-	{
-		this(type, key, value, comment, immutable, null);
-	}
-
-	public StringProperty(PropertyType type, String key, String value, String comment, boolean immutable, String[] legalValues)
-	{
-		this(type, key, value, comment, immutable, legalValues, false);
-	}
-
-	public StringProperty(PropertyType type, String key, String value, String comment, boolean immutable, String[] legalValues, boolean ignoreCase)
-	{
-		super(type, key, comment, immutable);
-		this.defaultValue = value;
-		this.value = value;
-		this.legalValues = legalValues;
-		this.ignoreCase = ignoreCase;
-		if (!isValid(value))
-		{
-			throw new IllegalArgumentException("Illegal value");
-		}
-	}
-
-	public String get()
-	{
-		return value;
-	}
-
-	public void set(String value)
-	{
-		if (isImmutable())
-		{
-			throw new IllegalStateException("This object is immutable, calling the set method is illegal");
-		}
-
-		this.value = value;
-	}
-
-	public boolean isValid(String value)
-	{
-		if (value == null)
-		{
-			throw new IllegalArgumentException("null strings is not allowed");
-		}
-		if (legalValues == null)
-		{
-			return true;
-		}
-		for (int i = 0; i < legalValues.length; i++)
-		{
-			if (!ignoreCase)
-			{
-				if (value.equals(legalValues[i]))
-				{
-					return true;
-				}
-			}
-			else
-			{
-				if (value.equalsIgnoreCase(legalValues[i]))
-				{
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	public String valueToString()
-	{
-		return get();
-	}
-
-	public String valueToEscapedString()
-	{
-		return StringProperty.convert(get(), false);
-	}
-
-	public boolean currentValueDifferentFromDefaultValue()
-	{
-			if (!ignoreCase)
-			{
-				return !defaultValue.equals(value);
-			}
-			else
-			{
-				return !defaultValue.equalsIgnoreCase(value);
-			}
-	}
-
-	// --------------------------------------------------------------
-	// ALL OF THIS IS COMING FROM THE JAVA SDK CODE (Properties.java)
-	private static char toHex(int nibble)
-	{
-		return hexDigit[(nibble & 0xF)];
-	}
-
-	/** A table of hex digits */
-	private static final char[] hexDigit = { '0', '1', '2', '3', '4', '5',
-											 '6', '7', '8', '9', 'A', 'B',
-											 'C', 'D', 'E', 'F' };
-	private static final String keyValueSeparators = "=: \t\r\n\f";
-	private static final String strictKeyValueSeparators = "=:";
-	private static final String specialSaveChars = "=: \t\r\n\f#!";
-	private static final String whiteSpaceChars = " \t\r\n\f";
-
-	private static String convert(String theString, boolean escapeSpace)
-	{
-		int len = theString.length();
-		StringBuffer outBuffer = new StringBuffer(len * 2);
-
-		for (int x = 0; x < len; x++)
-		{
-			char aChar = theString.charAt(x);
-
-			switch (aChar)
-			{
-
-			case ' ' :
-				if ((x == 0) || escapeSpace)
-				{
-					outBuffer.append('\\');
-				}
-
-				outBuffer.append(' ');
-				break;
-
-			case '\\' :
-				outBuffer.append('\\');
-				outBuffer.append('\\');
-				break;
-
-			case '\t' :
-				outBuffer.append('\\');
-				outBuffer.append('t');
-				break;
-
-			case '\n' :
-				outBuffer.append('\\');
-				outBuffer.append('n');
-				break;
-
-			case '\r' :
-				outBuffer.append('\\');
-				outBuffer.append('r');
-				break;
-
-			case '\f' :
-				outBuffer.append('\\');
-				outBuffer.append('f');
-				break;
-
-			default :
-				if ((aChar < 0x0020) || (aChar > 0x007e))
-				{
-					outBuffer.append('\\');
-					outBuffer.append('u');
-					outBuffer.append(toHex((aChar >> 12) & 0xF));
-					outBuffer.append(toHex((aChar >> 8) & 0xF));
-					outBuffer.append(toHex((aChar >> 4) & 0xF));
-					outBuffer.append(toHex(aChar & 0xF));
-				}
-				else
-				{
-					if (specialSaveChars.indexOf(aChar) != -1)
-					{
-						outBuffer.append('\\');
-					}
-
-					outBuffer.append(aChar);
-				}
-			}
-		}
-
-		return outBuffer.toString();
-	}
+    private String defaultValue;
+    private String value;
+    private Object[] legalValues;
+    boolean ignoreCase = false;
+    
+    public StringProperty(PropertyType type, String key, Object value, String comment)
+    {
+        this(type, key, value, comment, null);
+    }
+    
+    public StringProperty(PropertyType type, String key, Object value, String comment, Object[] legalValues)
+    {
+        this(type, key, value, comment, legalValues, false);
+    }
+    
+    public StringProperty(PropertyType type, String key, Object value, String comment, Object[] legalValues, boolean immutable)
+    {
+        this(type, key, value, comment, legalValues, immutable, false);
+    }
+    
+    public StringProperty(PropertyType type, String key, Object value, String comment, Object[] legalValues, boolean immutable, boolean ignoreCase)
+    {
+        super(type, key, comment, immutable);
+        this.defaultValue = value.toString();
+        this.value = value.toString();
+        this.legalValues = legalValues;
+        this.ignoreCase = ignoreCase;
+        if (!isValid(this.value))
+        {
+            throw new IllegalArgumentException("Illegal value");
+        }
+    }
+    
+    public String get()
+    {
+        return value;
+    }
+    
+    public void set(String value)
+    {
+        if (isImmutable())
+        {
+            throw new IllegalStateException("This object is immutable, calling the set method is illegal");
+        }
+        
+        this.value = value;
+    }
+    
+    public boolean isValid(String value)
+    {
+        if (value == null)
+        {
+            throw new IllegalArgumentException("null strings is not allowed");
+        }
+        if (legalValues == null)
+        {
+            return true;
+        }
+        for (int i = 0; i < legalValues.length; i++)
+        {
+            if (!ignoreCase)
+            {
+                if (value.equals(legalValues[i].toString()))
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                if (value.equalsIgnoreCase(legalValues[i].toString()))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    public Object[] legalValues()
+    {
+        return legalValues;        
+    }
+    
+    public String valueToString()
+    {
+        return get();
+    }
+    
+    public String valueToEscapedString()
+    {
+        return StringProperty.convert(get(), false);
+    }
+    
+    public boolean currentValueDifferentFromDefaultValue()
+    {
+        if (!ignoreCase)
+        {
+            return !defaultValue.equals(value);
+        }
+        else
+        {
+            return !defaultValue.equalsIgnoreCase(value);
+        }
+    }
+    
+    // --------------------------------------------------------------
+    // ALL OF THIS IS COMING FROM THE JAVA SDK CODE (Properties.java)
+    private static char toHex(int nibble)
+    {
+        return hexDigit[(nibble & 0xF)];
+    }
+    
+    /** A table of hex digits */
+    private static final char[] hexDigit = { '0', '1', '2', '3', '4', '5',
+    '6', '7', '8', '9', 'A', 'B',
+    'C', 'D', 'E', 'F' };
+    private static final String keyValueSeparators = "=: \t\r\n\f";
+    private static final String strictKeyValueSeparators = "=:";
+    private static final String specialSaveChars = "=: \t\r\n\f#!";
+    private static final String whiteSpaceChars = " \t\r\n\f";
+    
+    private static String convert(String theString, boolean escapeSpace)
+    {
+        int len = theString.length();
+        StringBuffer outBuffer = new StringBuffer(len * 2);
+        
+        for (int x = 0; x < len; x++)
+        {
+            char aChar = theString.charAt(x);
+            
+            switch (aChar)
+            {
+                
+                case ' ' :
+                    if ((x == 0) || escapeSpace)
+                    {
+                        outBuffer.append('\\');
+                    }
+                    
+                    outBuffer.append(' ');
+                    break;
+                    
+                case '\\' :
+                    outBuffer.append('\\');
+                    outBuffer.append('\\');
+                    break;
+                    
+                case '\t' :
+                    outBuffer.append('\\');
+                    outBuffer.append('t');
+                    break;
+                    
+                case '\n' :
+                    outBuffer.append('\\');
+                    outBuffer.append('n');
+                    break;
+                    
+                case '\r' :
+                    outBuffer.append('\\');
+                    outBuffer.append('r');
+                    break;
+                    
+                case '\f' :
+                    outBuffer.append('\\');
+                    outBuffer.append('f');
+                    break;
+                    
+                default :
+                    if ((aChar < 0x0020) || (aChar > 0x007e))
+                    {
+                        outBuffer.append('\\');
+                        outBuffer.append('u');
+                        outBuffer.append(toHex((aChar >> 12) & 0xF));
+                        outBuffer.append(toHex((aChar >> 8) & 0xF));
+                        outBuffer.append(toHex((aChar >> 4) & 0xF));
+                        outBuffer.append(toHex(aChar & 0xF));
+                    }
+                    else
+                    {
+                        if (specialSaveChars.indexOf(aChar) != -1)
+                        {
+                            outBuffer.append('\\');
+                        }
+                        
+                        outBuffer.append(aChar);
+                    }
+            }
+        }
+        
+        return outBuffer.toString();
+    }
 }

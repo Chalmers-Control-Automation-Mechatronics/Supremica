@@ -52,128 +52,99 @@ package org.supremica.automata.algorithms.minimization;
 import java.util.*;
 import org.supremica.automata.*;
 
-public class MinimizationStrategy
+public enum MinimizationStrategy
 {
-	private enum Type {MAXIMIZE, MINIMIZE, SPECIAL}
-
-	private static Collection collection = new LinkedList();
-	public static final MinimizationStrategy AtLeastOneLocal =
-		new MinimizationStrategy("At least one local", true, Type.SPECIAL);
-	public static final MinimizationStrategy AtLeastOneLocalMaxThree =
-		new MinimizationStrategy("At least one local, max three", true, Type.SPECIAL);
-	public static final MinimizationStrategy FewestTransitionsFirst =
-		new MinimizationStrategy("Pair with fewest transition automaton", true, Type.MINIMIZE);
-	public static final MinimizationStrategy FewestStatesFirst =
-		new MinimizationStrategy("Pair with fewest states automaton", true, Type.MINIMIZE);
-	public static final MinimizationStrategy FewestEventsFirst =
-		new MinimizationStrategy("Pair with fewest events automaton", true, Type.MINIMIZE);
-	public static final MinimizationStrategy MostTransitionsFirst =
-		new MinimizationStrategy("Pair with most transitions automaton", true, Type.MAXIMIZE);
-	public static final MinimizationStrategy MostStatesFirst =
-		new MinimizationStrategy("Pair with most states automaton", true, Type.MAXIMIZE);
-	public static final MinimizationStrategy MostEventsFirst =
-		new MinimizationStrategy("Pair with most events automaton", true, Type.MAXIMIZE);
-	public static final MinimizationStrategy RandomFirst =
-		new MinimizationStrategy("Pair with random automaton", true, Type.MAXIMIZE);
-	public static final MinimizationStrategy ExperimentalMin =
-		new MinimizationStrategy("Experimental min", true, Type.MINIMIZE);
-	public static final MinimizationStrategy ExperimentalMax =
-		new MinimizationStrategy("Experimental max", true, Type.MAXIMIZE);
-	public static final MinimizationStrategy Undefined =
-		new MinimizationStrategy("Undefined", false, Type.SPECIAL);
-
-	private String description = null;
-	private Type type;
-
-	private MinimizationStrategy(String description, boolean selectable, Type type)
-	{
-		if (selectable)
-		{
-			collection.add(this);
-		}
-
-		this.description = description;
-		this.type = type;
-	}
-
-	public static Iterator iterator()
-	{
-		return collection.iterator();
-	}
-
-	public String toString()
-	{
-		return description;
-	}
-
-	public static MinimizationStrategy toStrategy(String string)
-	{
-		for (Iterator it = collection.iterator(); it.hasNext(); )
-		{
-			MinimizationStrategy thisOne = (MinimizationStrategy) it.next();
-			if (string.equals(thisOne.toString()))
-			{
-				return thisOne;
-			}
-		}
-
-		return Undefined;
-	}
-
-	public static Object[] toArray()
-	{
-		return collection.toArray();
-	}
-
-	/**
-	 * Return the value of automata in this strategy.
-	 */ 
-	public int value(Automaton aut)
-		throws Exception
-	{
-		if (this == MostStatesFirst || this == FewestStatesFirst)
-			return aut.nbrOfStates();
-		else if (this == MostTransitionsFirst || this == FewestTransitionsFirst) 
-			return aut.nbrOfTransitions();
-		else if (this == MostEventsFirst || this == FewestEventsFirst)
-			return aut.nbrOfEvents();
-		else if (this == ExperimentalMax || this == ExperimentalMin)
-			return aut.nbrOfTransitions() + 1*aut.nbrOfEpsilonTransitions();
-		else if (this == RandomFirst)
-			return (int) (Math.random()*10000.0);
-		else 
-			throw new Exception("Unknown strategy.");
-	}
-
+    AtLeastOneLocal("At least one local", Type.SPECIAL),
+    AtLeastOneLocalMaxThree("At least one local, max three", Type.SPECIAL),
+    FewestTransitionsFirst("Pair with fewest transition automaton", Type.MINIMIZE),
+    FewestStatesFirst("Pair with fewest states automaton", Type.MINIMIZE),
+    FewestEventsFirst("Pair with fewest events automaton", Type.MINIMIZE),
+    MostTransitionsFirst("Pair with most transitions automaton", Type.MAXIMIZE),
+    MostStatesFirst("Pair with most states automaton", Type.MAXIMIZE),
+    MostEventsFirst("Pair with most events automaton", Type.MAXIMIZE),
+    RandomFirst("Pair with random automaton", Type.MAXIMIZE),
+    ExperimentalMin("Experimental min", Type.MINIMIZE),
+    ExperimentalMax("Experimental max", Type.MAXIMIZE);
+    
+    private enum Type {MAXIMIZE, MINIMIZE, SPECIAL}
+    
+    /** Textual description. */
+    private final String description;
+    
+    private final Type type;
+    
+    private MinimizationStrategy(String description, Type type)
+    {
+        this.description = description;
+        this.type = type;
+    }
+    
+    public String toString()
+    {
+        return description;
+    }
+    
+    public static MinimizationStrategy toStrategy(String description)
+    {
+        for (MinimizationStrategy strategy: values())
+        {
+            if (strategy.description.equals(description))
+            {
+                return strategy;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Return the value of automata in this strategy.
+     */
+    public int value(Automaton aut)
+    throws Exception
+    {
+        if (this == MostStatesFirst || this == FewestStatesFirst)
+            return aut.nbrOfStates();
+        else if (this == MostTransitionsFirst || this == FewestTransitionsFirst)
+            return aut.nbrOfTransitions();
+        else if (this == MostEventsFirst || this == FewestEventsFirst)
+            return aut.nbrOfEvents();
+        else if (this == ExperimentalMax || this == ExperimentalMin)
+            return aut.nbrOfTransitions() + 1*aut.nbrOfEpsilonTransitions();
+        else if (this == RandomFirst)
+            return (int) (Math.random()*10000.0);
+        else
+            throw new Exception("Unknown strategy.");
+    }
+    
     /**
      * Maximization criteria?
      */
-	public boolean maximize()
-	{
-		return type == Type.MAXIMIZE;
-	}
-
+    public boolean maximize()
+    {
+        return type == Type.MAXIMIZE;
+    }
+    
     /**
      * Minimization criteria?
      */
-	public boolean minimize()
-	{
-		return type == Type.MINIMIZE;
-	}
-
+    public boolean minimize()
+    {
+        return type == Type.MINIMIZE;
+    }
+    
     /**
      * Special strategy? Does not return values.
      */
-	public boolean isSpecial()
-	{
-		return type == Type.SPECIAL;
-	}
-
-	/**
-	 * The initial value for improvement comparisons.
-	 */
-	public int worstValue()
-	{
-		return (maximize() ? Integer.MIN_VALUE : Integer.MAX_VALUE);
-	}
+    public boolean isSpecial()
+    {
+        return type == Type.SPECIAL;
+    }
+    
+    /**
+     * The initial value for improvement comparisons.
+     */
+    public int worstValue()
+    {
+        return (maximize() ? Integer.MIN_VALUE : Integer.MAX_VALUE);
+    }
 }

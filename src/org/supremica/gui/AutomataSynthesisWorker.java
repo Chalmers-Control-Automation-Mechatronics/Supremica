@@ -66,204 +66,206 @@ import org.supremica.gui.ide.IDEReportInterface;
  *@since November 18, 2004
  */
 public class AutomataSynthesisWorker
-	extends Thread
-	implements Stoppable
+    extends Thread
+    implements Stoppable
 {
-	private static Logger logger = LoggerFactory.createLogger(AutomataSynthesisWorker.class);
-
-	private IDEReportInterface gui;
-	private Automata theAutomata;
-	private SynthesizerOptions options;
-
-	private ExecutionDialog executionDialog;
-	private boolean stopRequested = false;
-	private EventQueue eventQueue = new EventQueue();
-
-	public AutomataSynthesisWorker(IDEReportInterface gui, Automata theAutomata, SynthesizerOptions options)
-	{
-		this.gui = gui;
-		this.theAutomata = theAutomata;
-		this.options = options;
-
-		this.start();
-	}
-
-	public void run()
-	{
-		// Initialize the ExecutionDialog
-		ArrayList threadsToStop = new ArrayList();
-		threadsToStop.add(this);
-		executionDialog = new ExecutionDialog(gui.getFrame(), "Synthesizing", threadsToStop);
-		executionDialog.setMode(ExecutionDialogMode.synthesizing);
-
-		// OK options?
-		String errorMessage = options.validOptions();
-		if (errorMessage != null)
-		{
-			JOptionPane.showMessageDialog(gui.getFrame(), errorMessage, "Alert", JOptionPane.ERROR_MESSAGE);
-			requestStop();
-			return;
-		}
-
-		// Timer
-		ActionTimer timer = new ActionTimer();
-		timer.start();
-
-		// Do the work!!
-		Automata result = new Automata();
-		// Are there many or just one automaton?
-		if (theAutomata.size() > 1)
-		{
-			// Get default synchronization options
-			SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynthesisOptions();
-
-			try
-			{
-			    AutomataSynthesizer synthesizer = new AutomataSynthesizer(theAutomata, syncOptions,
-										      options);
-			    synthesizer.setExecutionDialog(executionDialog);
-			    threadsToStop.add(synthesizer);
-			    result.addAutomata(synthesizer.execute());
-			    threadsToStop.remove(synthesizer);
-			}
-			catch (Exception ex)
-			{
-			    logger.error("Exception in AutomataSynthesisWorker. " + ex);
-			    logger.debug(ex.getStackTrace());
-			}
-		}
-		else  // Single automaton
-		{
-			// Make copy
-			Automaton theAutomaton = new Automaton(theAutomata.getFirstAutomaton());
-
-			try
-			{
-				// ARASH: this is IDIOTIC! why didn't we prepare for more than one monolithc algorithm???
-				// (this is a dirty fix, should use a factory instead)
-				AutomatonSynthesizer synthesizer = (options.getSynthesisAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
-					? new AutomatonSynthesizerSingleFixpoint(theAutomaton, options)
-					: new AutomatonSynthesizer(theAutomaton, options);
-				threadsToStop.add(synthesizer);
-				synthesizer.synthesize();
-				result.addAutomaton(synthesizer.getAutomaton());
-				threadsToStop.remove(synthesizer);
-			}
-			catch (Exception ex)
-			{
-				logger.error("Exception in AutomataSynthesisWorker. Automaton: " + theAutomaton.getName(), ex);
-				logger.debug(ex.getStackTrace());
-			}
-		}
-
-		// Timer
-		timer.stop();
-
-		// Hide execution dialog
-		EventQueue.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				if (executionDialog != null)
-				{
-					executionDialog.setMode(ExecutionDialogMode.hide);
-				}
-			}
-		});
-
-		// Present result
-		if (!stopRequested)
-		{
-			logger.info("Execution completed after " + timer.toString());
-
-			// Add new automata
-			try
-			{
-				gui.addAutomata(result);
-			}
-			catch (Exception ex)
-			{
-				logger.error(ex);
-			}
-		}
-		else
-		{
-			logger.info("Execution stopped after " + timer.toString());
-		}
-
-		// We're finished! Make sure to kill the ExecutionDialog!
-		if (executionDialog != null)
-		{
-			executionDialog.setMode(ExecutionDialogMode.hide);
-		}
-	}
-
-	/**
-	 * Does the actual work.
-	 *
-	 * @return The brand new supervisors.     .
-	 */
-	private Automata work()
-	{
-		Automata result = new Automata();
-
-		// Are there many or just one automaton?
-		if (theAutomata.size() > 1)
-		{
-			// Get default synchronization options
-			SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynthesisOptions();
-
-			try
-			{
-				AutomataSynthesizer synthesizer = new AutomataSynthesizer(theAutomata, syncOptions,
-																		  options);
-				result.addAutomata(synthesizer.execute());
-			}
-			catch (Exception ex)
-			{
-				logger.error("Exception in AutomataSynthesisWorker. " + ex);
-				logger.debug(ex.getStackTrace());
-			}
-		}
-		else    // single automaton selected
-		{
-			Automaton theAutomaton = theAutomata.getFirstAutomaton();
-
-			try
-			{
-				// ARASH: this is IDIOTIC! why didnt we prepare for more than one monolithc algorithm???
-				// (this is a dirty fix, should use a factory instead)
-				AutomatonSynthesizer synthesizer = (options.getSynthesisAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
-					? new AutomatonSynthesizerSingleFixpoint(theAutomaton, options)
-					: new AutomatonSynthesizer(theAutomaton, options);
-
-				// AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton,synthesizerOptions);
-				synthesizer.synthesize();
-			}
-			catch (Exception ex)
-			{
-				logger.error("Exception in AutomataSynthesisWorker. Automaton: " + theAutomaton.getName(), ex);
-				logger.debug(ex.getStackTrace());
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * Method that stops the worker as soon as possible.
-	 *
-	 *@see  ExecutionDialog
-	 */
-	public void requestStop()
-	{
-		stopRequested = true;
-
-		logger.debug("AutomataSynthesisWorker requested to stop.");
-
-		if (executionDialog != null)
-		{
-			executionDialog.setMode(ExecutionDialogMode.hide);
-		}
-	}
+    private static Logger logger = LoggerFactory.createLogger(AutomataSynthesisWorker.class);
+    
+    private IDEReportInterface gui;
+    private Automata theAutomata;
+    private SynthesizerOptions options;
+    
+    private ExecutionDialog executionDialog;
+    private boolean stopRequested = false;
+    private EventQueue eventQueue = new EventQueue();
+    
+    public AutomataSynthesisWorker(IDEReportInterface gui, Automata theAutomata, SynthesizerOptions options)
+    {
+        this.gui = gui;
+        this.theAutomata = theAutomata;
+        this.options = options;
+        
+        this.start();
+    }
+    
+    public void run()
+    {
+        // Initialize the ExecutionDialog
+        ArrayList threadsToStop = new ArrayList();
+        threadsToStop.add(this);
+        executionDialog = new ExecutionDialog(gui.getFrame(), "Synthesizing", threadsToStop);
+        executionDialog.setMode(ExecutionDialogMode.synthesizing);
+        
+        // OK options?
+        String errorMessage = options.validOptions();
+        if (errorMessage != null)
+        {
+            JOptionPane.showMessageDialog(gui.getFrame(), errorMessage, "Alert", JOptionPane.ERROR_MESSAGE);
+            requestStop();
+            return;
+        }
+        
+        // Timer
+        ActionTimer timer = new ActionTimer();
+        timer.start();
+        
+        // Do the work!!
+        Automata result = new Automata();
+        // Are there many or just one automaton?
+        if (theAutomata.size() > 1)
+        {
+            // Get default synchronization options
+            SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynthesisOptions();
+            
+            try
+            {
+                AutomataSynthesizer synthesizer = new AutomataSynthesizer(theAutomata, syncOptions,
+                    options);
+                synthesizer.setExecutionDialog(executionDialog);
+                threadsToStop.add(synthesizer);
+                result.addAutomata(synthesizer.execute());
+                threadsToStop.remove(synthesizer);
+            }
+            catch (Exception ex)
+            {
+                logger.error("Exception in AutomataSynthesisWorker. " + ex);
+                logger.debug(ex.getStackTrace());
+            }
+        }
+        else  // Single automaton
+        {
+            // Make copy
+            Automaton theAutomaton = new Automaton(theAutomata.getFirstAutomaton());
+            
+            try
+            {
+                // ARASH: this is IDIOTIC! why didn't we prepare for more than one monolithc algorithm???
+                // (this is a dirty fix, should use a factory instead)
+                //AutomatonSynthesizer synthesizer = (options.getSynthesisAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
+                //? new AutomatonSynthesizerSingleFixpoint(theAutomaton, options)
+                //: new AutomatonSynthesizer(theAutomaton, options);
+                AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton, options);
+                threadsToStop.add(synthesizer);
+                synthesizer.synthesize();
+                result.addAutomaton(synthesizer.getAutomaton());
+                threadsToStop.remove(synthesizer);
+            }
+            catch (Exception ex)
+            {
+                logger.error("Exception in AutomataSynthesisWorker. Automaton: " + theAutomaton.getName(), ex);
+                logger.debug(ex.getStackTrace());
+            }
+        }
+        
+        // Timer
+        timer.stop();
+        
+        // Hide execution dialog
+        EventQueue.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                if (executionDialog != null)
+                {
+                    executionDialog.setMode(ExecutionDialogMode.hide);
+                }
+            }
+        });
+        
+        // Present result
+        if (!stopRequested)
+        {
+            logger.info("Execution completed after " + timer.toString());
+            
+            // Add new automata
+            try
+            {
+                gui.addAutomata(result);
+            }
+            catch (Exception ex)
+            {
+                logger.error(ex);
+            }
+        }
+        else
+        {
+            logger.info("Execution stopped after " + timer.toString());
+        }
+        
+        // We're finished! Make sure to kill the ExecutionDialog!
+        if (executionDialog != null)
+        {
+            executionDialog.setMode(ExecutionDialogMode.hide);
+        }
+    }
+    
+    /**
+     * Does the actual work.
+     *
+     * @return The brand new supervisors.     .
+     */
+    private Automata work()
+    {
+        Automata result = new Automata();
+        
+        // Are there many or just one automaton?
+        if (theAutomata.size() > 1)
+        {
+            // Get default synchronization options
+            SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynthesisOptions();
+            
+            try
+            {
+                AutomataSynthesizer synthesizer = new AutomataSynthesizer(theAutomata, syncOptions,
+                    options);
+                result.addAutomata(synthesizer.execute());
+            }
+            catch (Exception ex)
+            {
+                logger.error("Exception in AutomataSynthesisWorker. " + ex);
+                logger.debug(ex.getStackTrace());
+            }
+        }
+        else    // single automaton selected
+        {
+            Automaton theAutomaton = theAutomata.getFirstAutomaton();
+            
+            try
+            {
+                // ARASH: this is IDIOTIC! why didnt we prepare for more than one monolithc algorithm???
+                // (this is a dirty fix, should use a factory instead)
+                //AutomatonSynthesizer synthesizer = (options.getSynthesisAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
+                //? new AutomatonSynthesizerSingleFixpoint(theAutomaton, options)
+                //: new AutomatonSynthesizer(theAutomaton, options);
+                AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton, options);
+                    
+                // AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton,synthesizerOptions);
+                synthesizer.synthesize();
+            }
+            catch (Exception ex)
+            {
+                logger.error("Exception in AutomataSynthesisWorker. Automaton: " + theAutomaton.getName(), ex);
+                logger.debug(ex.getStackTrace());
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Method that stops the worker as soon as possible.
+     *
+     *@see  ExecutionDialog
+     */
+    public void requestStop()
+    {
+        stopRequested = true;
+        
+        logger.debug("AutomataSynthesisWorker requested to stop.");
+        
+        if (executionDialog != null)
+        {
+            executionDialog.setMode(ExecutionDialogMode.hide);
+        }
+    }
 }

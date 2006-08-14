@@ -161,7 +161,7 @@ public class AutomatonMinimizer
 
         // Find out what to do
         EquivalenceRelation equivalenceRelation = options.getMinimizationType();
-        if (equivalenceRelation == EquivalenceRelation.BisimulationEquivalence)
+        if (equivalenceRelation == EquivalenceRelation.BISIMULATIONEQUIVALENCE)
         {
 			// Check if the library with the native methods is ok
 			if (!BisimulationEquivalenceMinimizer.libraryLoaded())
@@ -183,7 +183,7 @@ public class AutomatonMinimizer
 			// Finished!
             return theAutomaton;
         }
-		else if (equivalenceRelation == EquivalenceRelation.SupervisionEquivalence)
+		else if (equivalenceRelation == EquivalenceRelation.SUPERVISIONEQUIVALENCE)
 		{
 			//Coreachability is strange, forbidden and MAX_COST
 			//coincides? Why!? I'll ignore forbidden states for now.
@@ -226,7 +226,7 @@ public class AutomatonMinimizer
 		}
 		// All the below relations use partitioning with respect to
 		// observation equivalence!
-		else if (equivalenceRelation == EquivalenceRelation.LanguageEquivalence)
+		else if (equivalenceRelation == EquivalenceRelation.LANGUAGEEQUIVALENCE)
         {
             // Is this automaton nondeterministic?
             if (!theAutomaton.isDeterministic())
@@ -240,8 +240,8 @@ public class AutomatonMinimizer
 
             // Now we're ready for partitioning!
         }
-        else if (equivalenceRelation == EquivalenceRelation.ObservationEquivalence ||
-                 equivalenceRelation == EquivalenceRelation.ConflictEquivalence)
+        else if (equivalenceRelation == EquivalenceRelation.OBSERVATIONEQUIVALENCE ||
+                 equivalenceRelation == EquivalenceRelation.CONFLICTEQUIVALENCE)
         {
             // Merge silent loops and other obvious OE stuff (to save computation later)...
             // Don't bother if there is only one event in alphabet (epsilon or not)
@@ -280,7 +280,7 @@ public class AutomatonMinimizer
             // specific stuff        //
             ///////////////////////////
 
-            if (equivalenceRelation == EquivalenceRelation.ConflictEquivalence)
+            if (equivalenceRelation == EquivalenceRelation.CONFLICTEQUIVALENCE)
             {
                 // If there is just one event and it's epsilon,
                 // it's easy! (If we don't care about state names.)
@@ -374,7 +374,7 @@ public class AutomatonMinimizer
         }
 
 		// Some more conflict equivalent reductions may be possible now...
-        if (equivalenceRelation == EquivalenceRelation.ConflictEquivalence)
+        if (equivalenceRelation == EquivalenceRelation.CONFLICTEQUIVALENCE)
         {
             //////////////////////////
             // RULES A, AA, B, C, F //

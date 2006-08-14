@@ -51,68 +51,35 @@ package org.supremica.automata.algorithms;
 
 import java.util.*;
 
-public class SynthesisType
+public enum SynthesisType
 {
-	private static Collection types = new LinkedList();
-	public static final SynthesisType Controllable = new SynthesisType("Controllable");
-	public static final SynthesisType Nonblocking = new SynthesisType("Nonblocking");
-	public static final SynthesisType Both = new SynthesisType("Nonblocking and controllable");
-	public static final SynthesisType Observable = new SynthesisType("Nonblocking, controllable and observable");
-	public static final SynthesisType Unknown = new SynthesisType("Unknown", false);
-	private String description = null;
-
-	private SynthesisType(String description)
-	{
-		this(description, true);
-	}
-
-	private SynthesisType(String description, boolean selectable)
-	{
-		if (selectable)
-		{
-			types.add(this);
-		}
-
-		this.description = description;
-	}
-
-	public static Iterator iterator()
-	{
-		return types.iterator();
-	}
-
-	public String toString()
-	{
-		return description;
-	}
-
-	public static SynthesisType toType(String type)
-	{
-		if (type.equals(Controllable.toString()))
-		{
-			return Controllable;
-		}
-
-		if (type.equals(Nonblocking.toString()))
-		{
-			return Nonblocking;
-		}
-
-		if (type.equals(Both.toString()))
-		{
-			return Both;
-		}
-
-		if (type.equals(Observable.toString()))
-		{
-			return Observable;
-		}
-
-		return Unknown;
-	}
-
-	public static Object[] toArray()
-	{
-		return types.toArray();
-	}
+    Controllable("Controllable"),
+    Nonblocking("Nonblocking"),
+    Both("Nonblocking and controllable"),
+    Observable("Nonblocking, controllable and observable");
+    
+    /** Textual description. */
+    private final String description;
+    
+    private SynthesisType(String description)
+    {
+        this.description = description;
+    }
+    
+    public String toString()
+    {
+        return description;
+    }
+    
+    public static SynthesisType toType(String description)
+    {
+        for (SynthesisType type: values())
+        {
+            if (type.description.equals(description))
+            {
+                return type;
+            }
+        }
+        return null;
+    }
 }

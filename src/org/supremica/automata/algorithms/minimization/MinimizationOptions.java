@@ -157,7 +157,7 @@ public final class MinimizationOptions
 
 	public String validOptions()
 	{
-		if (equivalenceRelation == EquivalenceRelation.ConflictEquivalence)
+		if (equivalenceRelation == EquivalenceRelation.CONFLICTEQUIVALENCE)
 		{
 			if (ignoreMarking)
 			{
@@ -167,7 +167,7 @@ public final class MinimizationOptions
 			}
 		}
 
-		if (equivalenceRelation == EquivalenceRelation.SupervisionEquivalence)
+		if (equivalenceRelation == EquivalenceRelation.SUPERVISIONEQUIVALENCE)
 		{
 			if (skipLast)
 			{
@@ -346,7 +346,7 @@ public final class MinimizationOptions
 	public static MinimizationOptions getDefaultMinimizationOptions()
 	{
 		MinimizationOptions options = new MinimizationOptions();
-		options.setMinimizationType(EquivalenceRelation.LanguageEquivalence);
+		options.setMinimizationType(EquivalenceRelation.LANGUAGEEQUIVALENCE);
 		options.setAlsoTransitions(true);
 		options.setKeepOriginal(true);
 		options.setIgnoreMarking(false);
@@ -360,7 +360,7 @@ public final class MinimizationOptions
 	public static MinimizationOptions getDefaultNonblockingOptions()
 	{
 		MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
-		options.setMinimizationType(EquivalenceRelation.ConflictEquivalence);
+		options.setMinimizationType(EquivalenceRelation.CONFLICTEQUIVALENCE);
 		options.setAlsoTransitions(true);
 		options.setKeepOriginal(false);
 		options.setCompositionalMinimization(true);
@@ -384,7 +384,7 @@ public final class MinimizationOptions
 	public static MinimizationOptions getDefaultSynthesisOptions()
 	{
 		MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
-		options.setMinimizationType(EquivalenceRelation.SupervisionEquivalence);
+		options.setMinimizationType(EquivalenceRelation.SUPERVISIONEQUIVALENCE);
 		options.setAlsoTransitions(true);
 		options.setKeepOriginal(false);
 		options.setCompositionalMinimization(true);

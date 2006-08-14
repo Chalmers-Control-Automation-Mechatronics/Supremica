@@ -51,74 +51,63 @@ package org.supremica.automata.algorithms;
 
 import java.util.*;
 
-public class EquivalenceRelation
+public enum EquivalenceRelation
 {
-	private static List collection = new LinkedList();
-	/** Language equivalence. */
-	public static final EquivalenceRelation LanguageEquivalence =
-		new EquivalenceRelation("Language equivalence", true);
-	/** Conflict equivalence. */
-	public static final EquivalenceRelation ConflictEquivalence =
-		new EquivalenceRelation("Conflict equivalence", true);
-	/** Supervision equivalence. */
-	public static final EquivalenceRelation SupervisionEquivalence =
-		new EquivalenceRelation("Supervision equivalence", true);
-	/** Observation equivalence (aka Weak bisimulation equivalence). */
-	public static final EquivalenceRelation ObservationEquivalence =
-		new EquivalenceRelation("Observation equivalence", true);
-	/** Bisimulation equivalence (aka Strong bisimulation equivalence). */
-	public static final EquivalenceRelation BisimulationEquivalence =
-		new EquivalenceRelation("Bisimulation equivalence", true);
-	/** Failures equivalence. */
-	public static final EquivalenceRelation FailureEquivalence =
-		new EquivalenceRelation("Failure equivalence", false);
-	/** Undefined equivalence relation. */
-	public static final EquivalenceRelation Undefined =
-		new EquivalenceRelation("Undefined", false);
+    /** Language equivalence. */
+    LANGUAGEEQUIVALENCE("Language equivalence"),
+    /** Conflict equivalence. */
+    CONFLICTEQUIVALENCE("Conflict equivalence"),
+    /** Supervision equivalence. */
+    SUPERVISIONEQUIVALENCE("Supervision equivalence"),
+    /** Observation equivalence (aka Weak bisimulation equivalence). */
+    OBSERVATIONEQUIVALENCE("Observation equivalence"),
+    /** Bisimulation equivalence (aka Strong bisimulation equivalence). */
+    BISIMULATIONEQUIVALENCE("Bisimulation equivalence");
+    /** Failures equivalence. */
+    //FAILURESEQUIVALENCE("Failures equivalence", false);
+    
+    /** Textual description. */
+    private final String description;
 
-	/** For minimization using the conflict equivalence minimization rules only. */
-	public static final EquivalenceRelation ConflictEquivalenceMinimizationRules =
-		new EquivalenceRelation("Conflict equivalence minimization rules", false);
-
-	/**	The name of the equivalence relation. */
-	private String identifier;
-
-	private EquivalenceRelation(String identifier, boolean add)
-	{
-		if (add)
-		{
-			collection.add(this);
-		}
-
-		this.identifier = identifier;
-	}
-
-	public static Iterator iterator()
-	{
-		return collection.iterator();
-	}
-
-	public String toString()
-	{
-		return identifier;
-	}
-
-	public static EquivalenceRelation toType(String string)
-	{
-		for (Iterator it = collection.iterator(); it.hasNext(); )
-		{
-			EquivalenceRelation thisOne = (EquivalenceRelation) it.next();
-			if (string.equals(thisOne.toString()))
-			{
-				return thisOne;
-			}
-		}
-
-		return Undefined;
-	}
-
-	public static Object[] toArray()
-	{
-		return collection.toArray();
-	}
+    private EquivalenceRelation(String description)
+    {
+        this.description = description;
+    }
+    
+    public String toString()
+    {
+        return description;
+    }
+    
+    public static EquivalenceRelation toType(String description)
+    {
+        for (EquivalenceRelation relation: values())
+        {
+            if (relation.description.equals(description))
+            {
+                return relation;
+            }
+        }
+        return null;
+    }
+     
+    /* // Would like to override values()...
+    public static EquivalenceRelation[] enabledValues()
+    {
+        int enabledCount = 0;
+        for (EquivalenceRelation rel: values())
+        {
+            if (rel.isEnabled())
+                enabledCount++;
+        }
+        EquivalenceRelation[] relations = new EquivalenceRelation[enabledCount];
+        int i = 0;
+        for (EquivalenceRelation rel: values())
+        {
+            if (rel.isEnabled())
+                relations[i++] = rel;
+        }
+        return relations;
+    }
+    */
 }

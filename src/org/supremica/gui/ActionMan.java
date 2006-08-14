@@ -1957,6 +1957,7 @@ public class ActionMan
         }
     }
     
+     /*
     // Variable declared here, wanted it to be local to this func, but...
     static PreferencesDialog thePreferencesDialog = null;
     
@@ -1969,7 +1970,21 @@ public class ActionMan
         
         thePreferencesDialog.setVisible(true);
     }
+      */
+
+    // Variable declared here, wanted it to be local to this func, but...
+    static PropertiesDialog thePropertiesDialog = null;
     
+    public static void configurePreferences_actionPerformed(Gui gui)
+    {
+        if (thePropertiesDialog == null)
+        {
+            thePropertiesDialog = new PropertiesDialog(gui.getFrame());
+        }
+                
+        thePropertiesDialog.setVisible(true);
+    }
+
     // File.Exit action performed
     public static void fileExit(Gui gui)
     {

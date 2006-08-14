@@ -53,17 +53,15 @@ import java.util.*;
 
 public enum SynthesisAlgorithm
 {
-    Monolithic("Monolithic", true, true),
+    Monolithic("Monolithic", false),
     Modular("Modular"),
-    Compositional("Compositional", false),
-    IDD("IDD", false),
-    MonolithicSingleFixpoint("Monolithic (single fixpoint)", false, true),    // works, but is very slow [due to lame implementation :s ]
+    Compositional("Compositional"),
+    //IDD("IDD"),
+    //MonolithicSingleFixpoint("Monolithic (single fixpoint)", false),    // works, but is very slow [due to lame implementation :s ]
     BDD("BDD");    // works, but we cant handle the results yet
     
     /** Textual description. */
     private final String description;
-    /** If false, this instance is not included in dialogs. */
-    private final boolean enabled;
     /** True if this algo prefers working on modular systems. */
     private final boolean preferModular;
     
@@ -72,26 +70,15 @@ public enum SynthesisAlgorithm
         this(description, true);
     }
     
-    private SynthesisAlgorithm(String description, boolean enabled)
-    {
-        this(description, enabled, true);
-    }
-    
-    private SynthesisAlgorithm(String description, boolean enabled, boolean preferModular)
+    private SynthesisAlgorithm(String description, boolean preferModular)
     {
         this.description = description;
-        this.enabled = enabled;
         this.preferModular = preferModular;
     }
     
     public String toString()
     {
         return description;
-    }
-    
-    public boolean isEnabled()
-    {
-        return enabled;
     }
     
     public boolean prefersModular()

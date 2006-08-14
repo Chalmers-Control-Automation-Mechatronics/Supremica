@@ -115,7 +115,7 @@ public class TestAutomatonMinimizer
             synch.hide(hide, false);
 
             MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
-            options.setMinimizationType(EquivalenceRelation.LanguageEquivalence);
+            options.setMinimizationType(EquivalenceRelation.LANGUAGEEQUIVALENCE);
 
             // Test language equivalence minimization
             AutomatonMinimizer minimizer = new AutomatonMinimizer(synch);
@@ -138,7 +138,7 @@ public class TestAutomatonMinimizer
             ProjectBuildFromXml builder = new ProjectBuildFromXml();
             Project theProject = builder.build(TestFiles.getFile(TestFiles.ObservationEquivalence));
             MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
-            options.setMinimizationType(EquivalenceRelation.ObservationEquivalence);
+            options.setMinimizationType(EquivalenceRelation.OBSERVATIONEQUIVALENCE);
             options.setAlsoTransitions(true);
             options.setKeepOriginal(true);
 
@@ -187,7 +187,7 @@ public class TestAutomatonMinimizer
             ProjectBuildFromXml builder = new ProjectBuildFromXml();
             Project theProject = builder.build(TestFiles.getFile(TestFiles.BisimulationEquivalence));
             MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
-            options.setMinimizationType(EquivalenceRelation.BisimulationEquivalence);
+            options.setMinimizationType(EquivalenceRelation.BISIMULATIONEQUIVALENCE);
             options.setAlsoTransitions(true);
             options.setKeepOriginal(true);
 
@@ -237,7 +237,7 @@ public class TestAutomatonMinimizer
                 // Minimize this one
                 AutomatonMinimizer minimizer = new AutomatonMinimizer(currAutomaton);
                 MinimizationOptions options = new MinimizationOptions();
-                options.setMinimizationType(EquivalenceRelation.ConflictEquivalence);
+                options.setMinimizationType(EquivalenceRelation.CONFLICTEQUIVALENCE);
                 options.setCompositionalMinimization(false);
                 options.setAlsoTransitions(true);
                 options.setKeepOriginal(true);

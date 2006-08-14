@@ -110,7 +110,7 @@ class SynthesizerDialogStandardPanel
                 AlgorithmSelector selector = new AlgorithmSelector();
                 for (SynthesisAlgorithm algo: SynthesisAlgorithm.values())
                 {
-                    if (algo.isEnabled() && !algo.prefersModular())
+                    if (!algo.prefersModular())
                     {
                         selector.addItem(algo);
                     }
@@ -122,10 +122,7 @@ class SynthesizerDialogStandardPanel
                 AlgorithmSelector selector = new AlgorithmSelector();
                 for (SynthesisAlgorithm algo: SynthesisAlgorithm.values())
                 {
-                    if (algo.isEnabled())
-                    {
-                        selector.addItem(algo);
-                    }
+                    selector.addItem(algo);
                 }
                 return selector;
             }
@@ -139,7 +136,7 @@ class SynthesizerDialogStandardPanel
         
         private SynthesisSelector()
         {
-            super(SynthesisType.toArray());
+            super(SynthesisType.values());
         }
         
         public SynthesisType getType()
@@ -264,10 +261,12 @@ class SynthesizerDialogStandardPanel
         {
             optimizeBox.setVisible(false); //X
         }
+        /*
         else if (algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
         {
             optimizeBox.setVisible(false); //X
         }
+        */
         else if (algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.Modular)
         {
             if ((synthesisTypeBox.getType() == SynthesisType.Nonblocking) ||

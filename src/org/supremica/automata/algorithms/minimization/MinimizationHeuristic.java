@@ -52,218 +52,186 @@ package org.supremica.automata.algorithms.minimization;
 import java.util.*;
 import org.supremica.automata.*;
 
-public class MinimizationHeuristic
+public enum MinimizationHeuristic
 {
-	private enum Type {MAXIMIZE, MINIMIZE, SPECIAL}
+    MostLocal("Highest local ratio", Type.MAXIMIZE),
+    MostCommon("Highest common ratio", Type.MAXIMIZE),
+    LeastExtension("Least extension of alphabet", Type.MINIMIZE),
+    FewestTransitions("Fewest transitions", Type.MINIMIZE),
+    FewestStates("Fewest states", Type.MINIMIZE),
+    FewestEvents("Fewest events", Type.MINIMIZE),
+    FewestAutomata("Fewest automata", Type.MINIMIZE),
+    MostTransitions("Most transitions", Type.MAXIMIZE),
+    MostStates("Most states", Type.MAXIMIZE),
+    MostEvents("Most events", Type.MAXIMIZE),
+    MostAutomata("Most automata", Type.MAXIMIZE),
+    Random("Random order", Type.MAXIMIZE);
+    
+    private enum Type {MAXIMIZE, MINIMIZE, SPECIAL}
+    
+    private String description = null;
+    private Type type;
+    
+    private MinimizationHeuristic(String description, Type type)
+    {
+        this.description = description;
+        this.type = type;
+    }
+    
+    public String toString()
+    {
+        return description;
+    }
 
-	private static Collection collection = new LinkedList();
-	public static final MinimizationHeuristic MostLocal =
-		new MinimizationHeuristic("Highest local ratio", true, Type.MAXIMIZE);
-	public static final MinimizationHeuristic MostCommon =
-		new MinimizationHeuristic("Highest common ratio", true, Type.MAXIMIZE);
-	public static final MinimizationHeuristic LeastExtension =
-		new MinimizationHeuristic("Least extension of alphabet", true, Type.MINIMIZE);
-	public static final MinimizationHeuristic FewestTransitions =
-		new MinimizationHeuristic("Fewest transitions", true, Type.MINIMIZE);
-	public static final MinimizationHeuristic FewestStates =
-		new MinimizationHeuristic("Fewest states", true, Type.MINIMIZE);
-	public static final MinimizationHeuristic FewestEvents =
-		new MinimizationHeuristic("Fewest events", true, Type.MINIMIZE);
-	public static final MinimizationHeuristic FewestAutomata =
-		new MinimizationHeuristic("Fewest automata", true, Type.MINIMIZE);
-	public static final MinimizationHeuristic MostTransitions =
-		new MinimizationHeuristic("Most transitions", true, Type.MAXIMIZE);
-	public static final MinimizationHeuristic MostStates =
-		new MinimizationHeuristic("Most states", true, Type.MAXIMIZE);
-	public static final MinimizationHeuristic MostEvents =
-		new MinimizationHeuristic("Most events", true, Type.MAXIMIZE);
-	public static final MinimizationHeuristic MostAutomata =
-		new MinimizationHeuristic("Most automata", true, Type.MAXIMIZE);
-	public static final MinimizationHeuristic Random =
-		new MinimizationHeuristic("Random order", true, Type.MAXIMIZE);
-	public static final MinimizationHeuristic Undefined =
-		new MinimizationHeuristic("Undefined", false, Type.SPECIAL);
-
-	private String description = null;
-	private Type type;
-
-	private MinimizationHeuristic(String description, boolean selectable, Type type)
-	{
-		if (selectable)
-		{
-			collection.add(this);
-		}
-
-		this.description = description;
-		this.type = type;
-	}
-
-	public static Iterator iterator()
-	{
-		return collection.iterator();
-	}
-
-	public String toString()
-	{
-		return description;
-	}
-
-	public static MinimizationHeuristic toHeuristic(String string)
-	{
-		for (Iterator it = collection.iterator(); it.hasNext(); )
-		{
-			MinimizationHeuristic thisOne = (MinimizationHeuristic) it.next();
-			if (string.equals(thisOne.toString()))
-			{
-				return thisOne;
-			}
-		}
-
-		return Undefined;
-	}
-
-	public static Object[] toArray()
-	{
-		return collection.toArray();
-	}
-
-	/**
-	 * Return the value of automata in this heuristic.
-	 *
-	 * @param eventToAutomataMap is a map from all (global) events to all (global) automata.
-	 */ 
-	public double value(Automata selection, EventToAutomataMap eventToAutomataMap, Alphabet targetAlphabet)
-		throws Exception
-	{
-		if (this == MostLocal)
-		{
-			Alphabet localEvents = MinimizationHelper.getLocalEvents(selection, eventToAutomataMap);
-			localEvents.minus(targetAlphabet);
-			int nbrOfLocalEvents = localEvents.size();
-			int unionAlphabetSize = selection.getUnionAlphabet().size();
-			//System.err.println(" Value: " + (int) (1000 * ((double) nbrOfLocalEvents)/((double) unionAlphabetSize)) +  " aut: " + selection);
-			return ((double) nbrOfLocalEvents)/((double) unionAlphabetSize);
-		}
-		else if (this == MostCommon)
-		{
-			/*
-			int unionAlphabetSize = selection.getUnionAlphabet().size();
-			Automaton smallest = null;
-			for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
-			{
-				Automaton aut = autIt.next();
-				if (smallest == null || aut.getAlphabet().size() < smallest.getAlphabet().size())
-				{
-					smallest = aut;
-				}
-			}
-			Alphabet common = new Alphabet(smallest.getAlphabet());
-			for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
-			{
-				Automaton aut = autIt.next();
-				if (aut == smallest)
-				{
-					continue;
-				}
-				common.intersect(aut.getAlphabet());
-			}
-			int nbrOfCommonEvents = common.size();
-			return ((double) nbrOfCommonEvents)/((double) unionAlphabetSize);
-			*/
-			Alphabet commonEvents = MinimizationHelper.getCommonEvents(selection, eventToAutomataMap);
-			int nbrOfCommonEvents = commonEvents.size();
-			int unionAlphabetSize = selection.getUnionAlphabet().size();
-			return ((double) nbrOfCommonEvents)/((double) unionAlphabetSize);
-		}
-		else if (this == LeastExtension)
-		{
-			int unionAlphabetSize = selection.getUnionAlphabet().size();
-			int largestAlphabetSize = 0;
-			for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
-			{
-				int size = autIt.next().getAlphabet().size();
-				if (size > largestAlphabetSize)
-				{
-					largestAlphabetSize = size;
-				}
-			}
-			return ((double) unionAlphabetSize)/((double) largestAlphabetSize);
-		}
-		else if (this == MostStates || this == FewestStates)
-		{
-			/*
-			// Prod
-			int value = 1;
-			for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
-				value *= autIt.next().nbrOfStates();
-			*/
-			// Least squares
-			int value = 0;
-			for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
-				value += Math.pow(autIt.next().nbrOfStates(), 2);
-
-			return value;			
-		}
-		else if (this == MostEvents || this == FewestEvents) 
-		{
-			return selection.getUnionAlphabet().size();
-		}
-		else if (this == MostTransitions || this == FewestTransitions) 
-		{
-			/*
-			// Prod
-			int value = 1;
-			for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
-				value *= autIt.next().nbrOfTransitions();
-			*/
-			// Least squares
-			int value = 0;
-			for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
-				value += Math.pow(autIt.next().nbrOfTransitions(), 2);
-
-			return value;
-		}
-		else if (this == MostAutomata || this == FewestAutomata)
-		{
-			return selection.size();
-		}
-		else if (this == Random)
-		{
-			return Math.random();
-		}
-
-		throw new Exception("Unknown heuristic.");
-	}
-
+    public static MinimizationHeuristic toHeuristic(String description)
+    {
+        for (MinimizationHeuristic heuristic: values())
+        {
+            if (heuristic.description.equals(description))
+            {
+                return heuristic;
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Return the value of automata in this heuristic.
+     *
+     * @param eventToAutomataMap is a map from all (global) events to all (global) automata.
+     */
+    public double value(Automata selection, EventToAutomataMap eventToAutomataMap, Alphabet targetAlphabet)
+    throws Exception
+    {
+        if (this == MostLocal)
+        {
+            Alphabet localEvents = MinimizationHelper.getLocalEvents(selection, eventToAutomataMap);
+            localEvents.minus(targetAlphabet);
+            int nbrOfLocalEvents = localEvents.size();
+            int unionAlphabetSize = selection.getUnionAlphabet().size();
+            //System.err.println(" Value: " + (int) (1000 * ((double) nbrOfLocalEvents)/((double) unionAlphabetSize)) +  " aut: " + selection);
+            return ((double) nbrOfLocalEvents)/((double) unionAlphabetSize);
+        }
+        else if (this == MostCommon)
+        {
+                        /*
+                        int unionAlphabetSize = selection.getUnionAlphabet().size();
+                        Automaton smallest = null;
+                        for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
+                        {
+                                Automaton aut = autIt.next();
+                                if (smallest == null || aut.getAlphabet().size() < smallest.getAlphabet().size())
+                                {
+                                        smallest = aut;
+                                }
+                        }
+                        Alphabet common = new Alphabet(smallest.getAlphabet());
+                        for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
+                        {
+                                Automaton aut = autIt.next();
+                                if (aut == smallest)
+                                {
+                                        continue;
+                                }
+                                common.intersect(aut.getAlphabet());
+                        }
+                        int nbrOfCommonEvents = common.size();
+                        return ((double) nbrOfCommonEvents)/((double) unionAlphabetSize);
+                         */
+            Alphabet commonEvents = MinimizationHelper.getCommonEvents(selection, eventToAutomataMap);
+            int nbrOfCommonEvents = commonEvents.size();
+            int unionAlphabetSize = selection.getUnionAlphabet().size();
+            return ((double) nbrOfCommonEvents)/((double) unionAlphabetSize);
+        }
+        else if (this == LeastExtension)
+        {
+            int unionAlphabetSize = selection.getUnionAlphabet().size();
+            int largestAlphabetSize = 0;
+            for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
+            {
+                int size = autIt.next().getAlphabet().size();
+                if (size > largestAlphabetSize)
+                {
+                    largestAlphabetSize = size;
+                }
+            }
+            return ((double) unionAlphabetSize)/((double) largestAlphabetSize);
+        }
+        else if (this == MostStates || this == FewestStates)
+        {
+                        /*
+                        // Prod
+                        int value = 1;
+                        for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
+                                value *= autIt.next().nbrOfStates();
+                         */
+            // Least squares
+            int value = 0;
+            for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
+                value += Math.pow(autIt.next().nbrOfStates(), 2);
+            
+            return value;
+        }
+        else if (this == MostEvents || this == FewestEvents)
+        {
+            return selection.getUnionAlphabet().size();
+        }
+        else if (this == MostTransitions || this == FewestTransitions)
+        {
+                        /*
+                        // Prod
+                        int value = 1;
+                        for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
+                                value *= autIt.next().nbrOfTransitions();
+                         */
+            // Least squares
+            int value = 0;
+            for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
+                value += Math.pow(autIt.next().nbrOfTransitions(), 2);
+            
+            return value;
+        }
+        else if (this == MostAutomata || this == FewestAutomata)
+        {
+            return selection.size();
+        }
+        else if (this == Random)
+        {
+            return Math.random();
+        }
+        
+        throw new Exception("Unknown heuristic.");
+    }
+    
     /**
      * Maximization criteria?
      */
-	public boolean maximize()
-	{
-		return type == Type.MAXIMIZE;
-	}
-
+    public boolean maximize()
+    {
+        return type == Type.MAXIMIZE;
+    }
+    
     /**
      * Minimization criteria?
      */
-	public boolean minimize()
-	{
-		return type == Type.MINIMIZE;
-	}
-
+    public boolean minimize()
+    {
+        return type == Type.MINIMIZE;
+    }
+    
     /**
      * Minimization criteria?
      */
-	public boolean isSpecial()
-	{
-		return type == Type.SPECIAL;
-	}
-
-	/**
-	 * The initial value for improvement comparisons.
-	 */
-	public double worstValue()
-	{
-		return (maximize() ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY);
-	}
+    public boolean isSpecial()
+    {
+        return type == Type.SPECIAL;
+    }
+    
+    /**
+     * The initial value for improvement comparisons.
+     */
+    public double worstValue()
+    {
+        return (maximize() ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY);
+    }
 }

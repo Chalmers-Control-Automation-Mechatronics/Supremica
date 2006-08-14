@@ -408,8 +408,8 @@ public class VerificationDialog
         
         public VerificationDialogAdvancedPanelModularNonblocking()
         {
-            minimizationStrategy = new JComboBox(MinimizationStrategy.toArray());
-            minimizationHeuristic = new JComboBox(MinimizationHeuristic.toArray());
+            minimizationStrategy = new JComboBox(MinimizationStrategy.values());
+            minimizationHeuristic = new JComboBox(MinimizationHeuristic.values());
             ruleA = new JCheckBox("Rule A");
             ruleAA = new JCheckBox("Rule AA");
             ruleB = new JCheckBox("Rule B");
@@ -456,7 +456,7 @@ public class VerificationDialog
         
         public void regain(MinimizationOptions options)
         {
-            options.setMinimizationType(EquivalenceRelation.ConflictEquivalence);
+            options.setMinimizationType(EquivalenceRelation.CONFLICTEQUIVALENCE);
             
             options.setMinimizationStrategy((MinimizationStrategy) minimizationStrategy.getSelectedItem());
             options.setMinimizationHeuristic((MinimizationHeuristic) minimizationHeuristic.getSelectedItem());
