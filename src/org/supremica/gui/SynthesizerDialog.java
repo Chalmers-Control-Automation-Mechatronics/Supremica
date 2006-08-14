@@ -110,7 +110,7 @@ class SynthesizerDialogStandardPanel
                 AlgorithmSelector selector = new AlgorithmSelector();
                 for (SynthesisAlgorithm algo: SynthesisAlgorithm.values())
                 {
-                    if (algo.isEnabled() && !algo.isModular())
+                    if (algo.isEnabled() && !algo.prefersModular())
                     {
                         selector.addItem(algo);
                     }

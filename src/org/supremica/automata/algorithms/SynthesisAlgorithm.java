@@ -65,7 +65,7 @@ public enum SynthesisAlgorithm
     /** If false, this instance is not included in dialogs. */
     private final boolean enabled;
     /** True if this algo prefers working on modular systems. */
-    private final boolean modular;
+    private final boolean preferModular;
     
     private SynthesisAlgorithm(String description)
     {
@@ -77,11 +77,11 @@ public enum SynthesisAlgorithm
         this(description, enabled, true);
     }
     
-    private SynthesisAlgorithm(String description, boolean enabled, boolean modular)
+    private SynthesisAlgorithm(String description, boolean enabled, boolean preferModular)
     {
         this.description = description;
         this.enabled = enabled;
-        this.modular = modular;
+        this.preferModular = preferModular;
     }
     
     public String toString()
@@ -94,9 +94,9 @@ public enum SynthesisAlgorithm
         return enabled;
     }
     
-    public boolean isModular()
+    public boolean prefersModular()
     {
-        return modular;
+        return preferModular;
     }
     
     public static SynthesisAlgorithm toAlgorithm(String description)
