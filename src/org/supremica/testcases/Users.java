@@ -17,7 +17,7 @@ class User
 	{
 		super("User " + id);
 
-		setType(AutomatonType.Plant);
+		setType(AutomatonType.PLANT);
 
 		State init = new State("I");    // initial state - only one
 
@@ -65,7 +65,7 @@ class Fifo
 	{
 		super("Fifo " + resrc + ":" + id1 + "x" + id2);
 
-		setType(AutomatonType.Specification);
+		setType(AutomatonType.SPECIFICATION);
 
 		LabeledEvent a1 = new LabeledEvent("a" + id1 + "." + resrc);
 		LabeledEvent a2 = new LabeledEvent("a" + id2 + "." + resrc);
@@ -116,7 +116,7 @@ class Mutex
 	{
 		super("Mutex " + resrc + ":" + id1 + "x" + id2);
 
-		setType(AutomatonType.Specification);
+		setType(AutomatonType.SPECIFICATION);
 
 		LabeledEvent b1 = new LabeledEvent("b" + id1 + "." + resrc);
 		LabeledEvent b2 = new LabeledEvent("b" + id2 + "." + resrc);

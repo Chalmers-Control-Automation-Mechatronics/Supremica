@@ -96,7 +96,7 @@ public class Specification
 
 		Automaton currShoe = new Automaton("shoeSpec" + nr);
 
-		currShoe.setType(AutomatonType.Specification);
+		currShoe.setType(AutomatonType.SPECIFICATION);
 
 		currAlphabet = currShoe.getAlphabet();
 

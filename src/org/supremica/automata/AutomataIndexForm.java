@@ -233,8 +233,8 @@ public final class AutomataIndexForm
 			int i = indexMap.getAutomatonIndex(currAutomaton);
 			AutomatonType currAutomatonType = currAutomaton.getType();
 
-			typeIsPlantTable[i] = currAutomatonType == AutomatonType.Plant;
-			typeIsSupSpecTable[i] = ((currAutomatonType == AutomatonType.Supervisor) || (currAutomatonType == AutomatonType.Specification));
+			typeIsPlantTable[i] = currAutomatonType == AutomatonType.PLANT;
+			typeIsSupSpecTable[i] = ((currAutomatonType == AutomatonType.SUPERVISOR) || (currAutomatonType == AutomatonType.SPECIFICATION));
 			automataSize[i] = currAutomaton.nbrOfStates();
 		}
 	}

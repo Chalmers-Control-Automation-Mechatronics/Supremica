@@ -54,195 +54,194 @@ import org.supremica.automata.Automata;
 
 public final class VerificationOptions
 {
-	private boolean dialogOK = false;
-
-	// Options
-	private VerificationType verificationType;
-	private VerificationAlgorithm algorithmType;
-	private int exclusionStateLimit;
-	private int reachabilityStateLimit;
-	private boolean oneEventAtATime;
-	private boolean skipUncontrollabilityCheck;
-	private int nbrOfAttempts;
-	private boolean showBadTrace;
-
-	private Automata inclusionAutomata = null;
-
-	/**
-	 * The current options, based on earlier user preferences.
-	 */
-	public VerificationOptions()
-	{
-		this(VerificationType.toType(Config.VERIFY_VERIFICATION_TYPE.get()), VerificationAlgorithm.toAlgorithm(Config.VERIFY_ALGORITHM_TYPE.get()), Config.VERIFY_EXCLUSION_STATE_LIMIT.get(), Config.VERIFY_REACHABILITY_STATE_LIMIT.get(), Config.VERIFY_ONE_EVENT_AT_A_TIME.get(), Config.VERIFY_SKIP_UNCONTROLLABILITY_CHECK.get(), Config.VERIFY_NBR_OF_ATTEMPTS.get(), Config.VERIFY_SHOW_BAD_TRACE.get());
-	}
-
-	/**
-	 * This is not a good constructor so it is private, it is
-	 * impossible to read in the code.  Use the "getDefault..."-
-	 * methods in this class instead and, when they won't suit you,
-	 * modify the necessary options one by one, starting from default
-	 * (see below)! Much more readable and also more practical when
-	 * adding new options.
-	 */
-	private VerificationOptions(VerificationType verificationType, VerificationAlgorithm algorithmType, int exclusionStateLimit, int reachabilityStateLimit, boolean oneEventAtATime, boolean skipUncontrollabilityCheck, int nbrOfAttempts, boolean showBadTrace)
-	{
-		this.verificationType = verificationType;
-		this.algorithmType = algorithmType;
-		this.exclusionStateLimit = exclusionStateLimit;
-		this.reachabilityStateLimit = reachabilityStateLimit;
-		this.oneEventAtATime = oneEventAtATime;
-		this.skipUncontrollabilityCheck = skipUncontrollabilityCheck;
-		this.nbrOfAttempts = nbrOfAttempts;
-		this.showBadTrace = showBadTrace;
-	}
-
-	public void setDialogOK(boolean bool)
-	{
-		dialogOK = bool;
-	}
-
-	public boolean getDialogOK()
-	{
-		return dialogOK;
-	}
-
-	public void setVerificationType(VerificationType type)
-	{
-		verificationType = type;
-	}
-
-	public VerificationType getVerificationType()
-	{
-		return verificationType;
-	}
-
-	public void setAlgorithmType(VerificationAlgorithm algorithm)
-	{
-		algorithmType = algorithm;
-	}
-
-	public VerificationAlgorithm getAlgorithmType()
-	{
-		return algorithmType;
-	}
-
-	public void setExclusionStateLimit(int limit)
-	{
-		exclusionStateLimit = limit;
-	}
-
-	public int getExclusionStateLimit()
-	{
-		return exclusionStateLimit;
-	}
-
-	public void setReachabilityStateLimit(int limit)
-	{
-		reachabilityStateLimit = limit;
-	}
-
-	public int getReachabilityStateLimit()
-	{
-		return reachabilityStateLimit;
-	}
-
-	public void setOneEventAtATime(boolean bool)
-	{
-		oneEventAtATime = bool;
-	}
-
-	public boolean getOneEventAtATime()
-	{
-		return oneEventAtATime;
-	}
-
-	public void setSkipUncontrollabilityCheck(boolean bool)
-	{
-		skipUncontrollabilityCheck = bool;
-	}
-
-	public boolean getSkipUncontrollabilityCheck()
-	{
-		return skipUncontrollabilityCheck;
-	}
-
-	public void setNbrOfAttempts(int nbr)
-	{
-		nbrOfAttempts = nbr;
-	}
-
-	public int getNbrOfAttempts()
-	{
-		return nbrOfAttempts;
-	}
-
-	public void setShowBadTrace(boolean bool)
-	{
-		showBadTrace = bool;
-	}
-
-	public boolean showBadTrace()
-	{
-		return showBadTrace;
-	}
-
-	public void setInclusionAutomata(Automata aut)
-	{
-		inclusionAutomata = aut;
-	}
-
-	public Automata getInclusionAutomata()
-	{
-		return inclusionAutomata;
-	}
-
-	/**
-	 * Stores the current set of options in Config.
-	 */
-	public void saveOptions()
-	{
-		Config.VERIFY_VERIFICATION_TYPE.set(verificationType.toString());
-		Config.VERIFY_ALGORITHM_TYPE.set(algorithmType.toString());
-		Config.VERIFY_EXCLUSION_STATE_LIMIT.set(exclusionStateLimit);
-		Config.VERIFY_REACHABILITY_STATE_LIMIT.set(reachabilityStateLimit);
-		Config.VERIFY_ONE_EVENT_AT_A_TIME.set(oneEventAtATime);
-		Config.VERIFY_SKIP_UNCONTROLLABILITY_CHECK.set(skipUncontrollabilityCheck);
-		Config.VERIFY_NBR_OF_ATTEMPTS.set(nbrOfAttempts);
-		Config.VERIFY_SHOW_BAD_TRACE.set(showBadTrace);
-	}
-
-	/**
-	 * Returns the default options for controllability verification.
-	 */
-	public static VerificationOptions getDefaultControllabilityOptions()
-	{
-		VerificationOptions options = new VerificationOptions();
-		options.setVerificationType(VerificationType.CONTROLLABILITY);
-		options.setAlgorithmType(VerificationAlgorithm.MODULAR);
-		options.setOneEventAtATime(false);
-		options.setSkipUncontrollabilityCheck(false);
-		return options;
-	}
-
-	/**
-	 * Returns the default options for nonblocking verification.
-	 */
-	public static VerificationOptions getDefaultNonblockingOptions()
-	{
-		VerificationOptions options = new VerificationOptions();
-		options.setVerificationType(VerificationType.NONBLOCKING);
-		options.setAlgorithmType(VerificationAlgorithm.MODULAR);
-		//options.setAlgorithmType(VerificationAlgorithm.Compositional);
-		return options;
-	}
-
-	/**
-	 * Returns the default options for language inclusion verification.
-	 */
-	public static VerificationOptions getDefaultLanguageInclusionOptions()
-	{
-		VerificationOptions options = getDefaultControllabilityOptions();
-		options.setVerificationType(VerificationType.LANGUAGEINCLUSION);
-		return options;
-	}
+    private boolean dialogOK = false;
+    
+    // Options
+    private VerificationType verificationType;
+    private VerificationAlgorithm algorithmType;
+    private int exclusionStateLimit;
+    private int reachabilityStateLimit;
+    private boolean oneEventAtATime;
+    private boolean skipUncontrollabilityCheck;
+    private int nbrOfAttempts;
+    private boolean showBadTrace;
+    
+    private Automata inclusionAutomata = null;
+    
+    /**
+     * The current options, based on earlier user preferences.
+     */
+    public VerificationOptions()
+    {
+        this(VerificationType.toType(Config.VERIFY_VERIFICATION_TYPE.get()), VerificationAlgorithm.toAlgorithm(Config.VERIFY_ALGORITHM_TYPE.get()), Config.VERIFY_EXCLUSION_STATE_LIMIT.get(), Config.VERIFY_REACHABILITY_STATE_LIMIT.get(), Config.VERIFY_ONE_EVENT_AT_A_TIME.get(), Config.VERIFY_SKIP_UNCONTROLLABILITY_CHECK.get(), Config.VERIFY_NBR_OF_ATTEMPTS.get(), Config.VERIFY_SHOW_BAD_TRACE.get());
+    }
+    
+    /**
+     * This is not a good constructor so it is private, it is
+     * impossible to read in the code.  Use the "getDefault..."-
+     * methods in this class instead and, when they won't suit you,
+     * modify the necessary options one by one, starting from default
+     * (see below)! Much more readable and also more practical when
+     * adding new options.
+     */
+    private VerificationOptions(VerificationType verificationType, VerificationAlgorithm algorithmType, int exclusionStateLimit, int reachabilityStateLimit, boolean oneEventAtATime, boolean skipUncontrollabilityCheck, int nbrOfAttempts, boolean showBadTrace)
+    {
+        this.verificationType = verificationType;
+        this.algorithmType = algorithmType;
+        this.exclusionStateLimit = exclusionStateLimit;
+        this.reachabilityStateLimit = reachabilityStateLimit;
+        this.oneEventAtATime = oneEventAtATime;
+        this.skipUncontrollabilityCheck = skipUncontrollabilityCheck;
+        this.nbrOfAttempts = nbrOfAttempts;
+        this.showBadTrace = showBadTrace;
+    }
+    
+    public void setDialogOK(boolean bool)
+    {
+        dialogOK = bool;
+    }
+    
+    public boolean getDialogOK()
+    {
+        return dialogOK;
+    }
+    
+    public void setVerificationType(VerificationType type)
+    {
+        verificationType = type;
+    }
+    
+    public VerificationType getVerificationType()
+    {
+        return verificationType;
+    }
+    
+    public void setAlgorithmType(VerificationAlgorithm algorithm)
+    {
+        algorithmType = algorithm;
+    }
+    
+    public VerificationAlgorithm getAlgorithmType()
+    {
+        return algorithmType;
+    }
+    
+    public void setExclusionStateLimit(int limit)
+    {
+        exclusionStateLimit = limit;
+    }
+    
+    public int getExclusionStateLimit()
+    {
+        return exclusionStateLimit;
+    }
+    
+    public void setReachabilityStateLimit(int limit)
+    {
+        reachabilityStateLimit = limit;
+    }
+    
+    public int getReachabilityStateLimit()
+    {
+        return reachabilityStateLimit;
+    }
+    
+    public void setOneEventAtATime(boolean bool)
+    {
+        oneEventAtATime = bool;
+    }
+    
+    public boolean getOneEventAtATime()
+    {
+        return oneEventAtATime;
+    }
+    
+    public void setSkipUncontrollabilityCheck(boolean bool)
+    {
+        skipUncontrollabilityCheck = bool;
+    }
+    
+    public boolean getSkipUncontrollabilityCheck()
+    {
+        return skipUncontrollabilityCheck;
+    }
+    
+    public void setNbrOfAttempts(int nbr)
+    {
+        nbrOfAttempts = nbr;
+    }
+    
+    public int getNbrOfAttempts()
+    {
+        return nbrOfAttempts;
+    }
+    
+    public void setShowBadTrace(boolean bool)
+    {
+        showBadTrace = bool;
+    }
+    
+    public boolean showBadTrace()
+    {
+        return showBadTrace;
+    }
+    
+    public void setInclusionAutomata(Automata aut)
+    {
+        inclusionAutomata = aut;
+    }
+    
+    public Automata getInclusionAutomata()
+    {
+        return inclusionAutomata;
+    }
+    
+    /**
+     * Stores the current set of options in Config.
+     */
+    public void saveOptions()
+    {
+        Config.VERIFY_VERIFICATION_TYPE.set(verificationType.toString());
+        Config.VERIFY_ALGORITHM_TYPE.set(algorithmType.toString());
+        Config.VERIFY_EXCLUSION_STATE_LIMIT.set(exclusionStateLimit);
+        Config.VERIFY_REACHABILITY_STATE_LIMIT.set(reachabilityStateLimit);
+        Config.VERIFY_ONE_EVENT_AT_A_TIME.set(oneEventAtATime);
+        Config.VERIFY_SKIP_UNCONTROLLABILITY_CHECK.set(skipUncontrollabilityCheck);
+        Config.VERIFY_NBR_OF_ATTEMPTS.set(nbrOfAttempts);
+        Config.VERIFY_SHOW_BAD_TRACE.set(showBadTrace);
+    }
+    
+    /**
+     * Returns the default options for controllability verification.
+     */
+    public static VerificationOptions getDefaultControllabilityOptions()
+    {
+        VerificationOptions options = new VerificationOptions();
+        options.setVerificationType(VerificationType.CONTROLLABILITY);
+        options.setAlgorithmType(VerificationAlgorithm.MODULAR);
+        options.setOneEventAtATime(false);
+        options.setSkipUncontrollabilityCheck(false);
+        return options;
+    }
+    
+    /**
+     * Returns the default options for nonblocking verification.
+     */
+    public static VerificationOptions getDefaultNonblockingOptions()
+    {
+        VerificationOptions options = new VerificationOptions();
+        options.setVerificationType(VerificationType.NONBLOCKING);
+        options.setAlgorithmType(VerificationAlgorithm.COMPOSITIONAL);
+        return options;
+    }
+    
+    /**
+     * Returns the default options for language inclusion verification.
+     */
+    public static VerificationOptions getDefaultLanguageInclusionOptions()
+    {
+        VerificationOptions options = getDefaultControllabilityOptions();
+        options.setVerificationType(VerificationType.LANGUAGEINCLUSION);
+        return options;
+    }
 }

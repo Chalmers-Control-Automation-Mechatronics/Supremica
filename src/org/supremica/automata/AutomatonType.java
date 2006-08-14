@@ -54,82 +54,82 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 
 public class AutomatonType
 {
-	private static List collection = new LinkedList();
-	public static final AutomatonType Undefined = new AutomatonType("Undefined", false);
-	public static final AutomatonType Plant = new AutomatonType("Plant", true);
-	public static final AutomatonType Specification = new AutomatonType("Specification", true);
-	public static final AutomatonType Supervisor = new AutomatonType("Supervisor", true);
-	public static final AutomatonType Property = new AutomatonType("Property", true);
-
-	private String identifier;
-
-	private AutomatonType(String identifier, boolean add)
-	{
-		if (add)
-		{
-			collection.add(this);
-		}
-
-		this.identifier = identifier;
-	}
-
-	public static Iterator iterator()
-	{
-		return collection.iterator();
-	}
-
-	public String toString()
-	{
-		return identifier;
-	}
-
-	public static AutomatonType toType(String type)
-	{
-		for (Iterator it = collection.iterator(); it.hasNext(); )
-		{
-			AutomatonType thisOne = (AutomatonType) it.next();
-			if (equals(thisOne, type))
-			{
-				return thisOne;
-			}
-		}
-
-		return Undefined;
-	}
-
-	public static AutomatonType toType(ComponentKind type)
-	{
-		if (type == ComponentKind.PLANT)
-		{
-			return Plant;
-		}
-
-		if (type == ComponentKind.SPEC)
-		{
-			return Specification;
-		}
-
-		if (type == ComponentKind.PROPERTY)
-		{
-			return Property;
-		}
-
-		return Undefined;
-	}
-
-
-	public static Object[] toArray()
-	{
-		return collection.toArray();
-	}
-
-	private static boolean equals(AutomatonType type, String ident)
-	{
-		if ((type == null) || (ident == null))
-		{
-			return false;
-		}
-
-		return ident.toLowerCase().equals(type.toString().toLowerCase());
-	}
+    private static List collection = new LinkedList();
+    public static final AutomatonType UNDEFINED = new AutomatonType("Undefined", false);
+    public static final AutomatonType PLANT = new AutomatonType("Plant", true);
+    public static final AutomatonType SPECIFICATION = new AutomatonType("Specification", true);
+    public static final AutomatonType SUPERVISOR = new AutomatonType("Supervisor", true);
+    public static final AutomatonType PROPERTY = new AutomatonType("Property", true);
+    
+    private String identifier;
+    
+    private AutomatonType(String identifier, boolean add)
+    {
+        if (add)
+        {
+            collection.add(this);
+        }
+        
+        this.identifier = identifier;
+    }
+    
+    public static Iterator iterator()
+    {
+        return collection.iterator();
+    }
+    
+    public String toString()
+    {
+        return identifier;
+    }
+    
+    public static AutomatonType toType(String type)
+    {
+        for (Iterator it = collection.iterator(); it.hasNext(); )
+        {
+            AutomatonType thisOne = (AutomatonType) it.next();
+            if (equals(thisOne, type))
+            {
+                return thisOne;
+            }
+        }
+        
+        return UNDEFINED;
+    }
+    
+    public static AutomatonType toType(ComponentKind type)
+    {
+        if (type == ComponentKind.PLANT)
+        {
+            return PLANT;
+        }
+        
+        if (type == ComponentKind.SPEC)
+        {
+            return SPECIFICATION;
+        }
+        
+        if (type == ComponentKind.PROPERTY)
+        {
+            return PROPERTY;
+        }
+        
+        return UNDEFINED;
+    }
+    
+    
+    public static Object[] toArray()
+    {
+        return collection.toArray();
+    }
+    
+    private static boolean equals(AutomatonType type, String ident)
+    {
+        if ((type == null) || (ident == null))
+        {
+            return false;
+        }
+        
+        return ident.toLowerCase().equals(type.toString().toLowerCase());
+    }
 }

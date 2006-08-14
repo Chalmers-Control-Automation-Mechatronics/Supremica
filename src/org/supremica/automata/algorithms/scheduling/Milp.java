@@ -449,7 +449,7 @@ public class Milp
 
 				Automaton restrictedRobot = synthesizer.execute().getAutomatonAt(0);
 				restrictedRobot.setName(currRobotName);
-				restrictedRobot.setType(AutomatonType.Plant);
+				restrictedRobot.setType(AutomatonType.PLANT);
 				
 				// Set the state costs for the resulting synthesized automaton in an appropriate way
 				for (Iterator<State> stateIter = restrictedRobot.stateIterator(); stateIter.hasNext(); )

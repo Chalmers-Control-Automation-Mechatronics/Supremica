@@ -1107,11 +1107,11 @@ public class MutuallyNonblockingVerifier
 
 			if (thePlantAutomata.containsAutomaton(currAutomaton.getName()))    // Equal name? Is this enough?
 			{
-				currAutomaton.setType(AutomatonType.Plant);
+				currAutomaton.setType(AutomatonType.PLANT);
 			}
 			else
 			{
-				currAutomaton.setType(AutomatonType.Specification);
+				currAutomaton.setType(AutomatonType.SPECIFICATION);
 			}
 
 			Alphabet currAlphabet = currAutomaton.getAlphabet();

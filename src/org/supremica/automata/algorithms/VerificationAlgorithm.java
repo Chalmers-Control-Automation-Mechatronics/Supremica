@@ -58,34 +58,21 @@ public enum VerificationAlgorithm
 {
     MONOLITHIC("Monolithic"),
     MODULAR("Modular"),
-    COMPOSITIONAL("Compositional", false),
+    COMPOSITIONAL("Compositional"),
     BDD("BDD"),
-    IDD("IDD", false);
+    IDD("IDD");
     
     /** Textual description. */
     private final String description;
-    /** If false, this instance is not included in dialogs. */
-    private final boolean enabled;
     
     private VerificationAlgorithm(String description)
     {
-        this(description, true);
-    }
-    
-    private VerificationAlgorithm(String description, boolean enabled)
-    {
         this.description = description;
-        this.enabled = enabled;
     }
-    
+
     public String toString()
     {
         return description;
-    }
-    
-    public boolean isEnabled()
-    {
-        return enabled;
     }
     
     public static VerificationAlgorithm toAlgorithm(String description)

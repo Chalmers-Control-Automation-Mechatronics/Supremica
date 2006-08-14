@@ -368,19 +368,19 @@ public class AutomataBuildFromVALID
 		// Set automaton type
 		if (type.toLowerCase().equals("plant"))
 		{
-			currAutomaton.setType(AutomatonType.Plant);
+			currAutomaton.setType(AutomatonType.PLANT);
 		}
 		else if (type.toLowerCase().equals("spec"))
 		{
-			currAutomaton.setType(AutomatonType.Specification);
+			currAutomaton.setType(AutomatonType.SPECIFICATION);
 		}
 		else if (type.toLowerCase().equals("sup"))
 		{
-			currAutomaton.setType(AutomatonType.Supervisor);
+			currAutomaton.setType(AutomatonType.SUPERVISOR);
 		}
 		else
 		{
-			currAutomaton.setType(AutomatonType.Undefined);
+			currAutomaton.setType(AutomatonType.UNDEFINED);
 		}
 
 		// Build alphabet

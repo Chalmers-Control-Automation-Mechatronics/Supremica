@@ -261,12 +261,12 @@ public class AutomataToSMV
 			// Note, that we do not make a difference between supervisor or plant.
 			if (filter)
 			{
-				if (selectPlant &&!(currAutomaton.getType() == AutomatonType.Plant))
+				if (selectPlant &&!(currAutomaton.getType() == AutomatonType.PLANT))
 				{
 					continue;
 				}
 
-				if (!selectPlant &&!((currAutomaton.getType() == AutomatonType.Supervisor) || (currAutomaton.getType() == AutomatonType.Specification)))
+				if (!selectPlant &&!((currAutomaton.getType() == AutomatonType.SUPERVISOR) || (currAutomaton.getType() == AutomatonType.SPECIFICATION)))
 				{
 					continue;
 				}

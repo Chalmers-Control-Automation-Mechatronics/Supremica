@@ -111,7 +111,7 @@ public class TestAutomataSynchronizer
 				assertTrue(synchronizer.getNumberOfStates() == 8);
 				Automaton theAutomaton = synchronizer.getAutomaton();
 				Alphabet theAlphabet = theAutomaton.getAlphabet();
-				assertTrue("Type", theAutomaton.getType() == AutomatonType.Plant);
+				assertTrue("Type", theAutomaton.getType() == AutomatonType.PLANT);
 				assertTrue("nbrOfStates", theAutomaton.nbrOfStates() == 8);
 				assertTrue("nbrOfAcceptingStates", theAutomaton.nbrOfAcceptingStates() == 2);
 				assertTrue(theAutomaton.nbrOfForbiddenStates() == 3);
@@ -156,7 +156,7 @@ public class TestAutomataSynchronizer
 				assertTrue(synchronizer.getNumberOfStates() == 8);
 				Automaton theAutomaton = synchronizer.getAutomaton();
 				Alphabet theAlphabet = theAutomaton.getAlphabet();
-				assertTrue(theAutomaton.getType() == AutomatonType.Plant);
+				assertTrue(theAutomaton.getType() == AutomatonType.PLANT);
 				assertTrue(theAutomaton.nbrOfStates() == 8);
 				assertTrue(theAutomaton.nbrOfAcceptingStates() == 2);
 				assertTrue(theAutomaton.nbrOfForbiddenStates() == 3);
@@ -200,7 +200,7 @@ public class TestAutomataSynchronizer
 				assertTrue(synchronizer.getNumberOfStates() == 12);
 				Automaton theAutomaton = synchronizer.getAutomaton();
 				Alphabet theAlphabet = theAutomaton.getAlphabet();
-				assertTrue(theAutomaton.getType() == AutomatonType.Plant);
+				assertTrue(theAutomaton.getType() == AutomatonType.PLANT);
 				assertTrue(theAutomaton.nbrOfStates() == 12);
 				assertTrue(theAutomaton.nbrOfAcceptingStates() == 4);
 				assertTrue(theAutomaton.nbrOfForbiddenStates() == 0);

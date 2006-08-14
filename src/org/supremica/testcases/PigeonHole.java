@@ -70,7 +70,7 @@ public class PigeonHole
 				p.addArc(new Arc(si, s, invadeEvent(i, j)));
 			}
 
-			p.setType(AutomatonType.Plant);
+			p.setType(AutomatonType.PLANT);
 			project.addAutomaton(p);
 		}
 
@@ -107,7 +107,7 @@ public class PigeonHole
 				last = next;
 			}
 
-			h.setType(AutomatonType.Specification);
+			h.setType(AutomatonType.SPECIFICATION);
 			project.addAutomaton(h);
 		}
 	}

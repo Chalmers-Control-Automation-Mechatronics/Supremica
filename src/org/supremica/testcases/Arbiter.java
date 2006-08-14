@@ -156,7 +156,7 @@ public class Arbiter
 			arbiter.addArc(new Arc(states[8], states[0], rs));
 			arbiter.addArc(new Arc(states[9], states[2], rs));
 			arbiter.addArc(new Arc(states[10], states[1], rs));
-			arbiter.setType(AutomatonType.Specification);
+			arbiter.setType(AutomatonType.SPECIFICATION);
 		}
 
 		// Communication channel C0
@@ -185,7 +185,7 @@ public class Arbiter
 			arb0.addArc(new Arc(states[3], states[4], r0));
 			arb0.addArc(new Arc(states[4], states[5], t0));
 			arb0.addArc(new Arc(states[5], states[0], a0));
-			arb0.setType(AutomatonType.Specification);
+			arb0.setType(AutomatonType.SPECIFICATION);
 		}
 
 		// Communication channel C1
@@ -214,7 +214,7 @@ public class Arbiter
 			arb1.addArc(new Arc(states[3], states[4], r1));
 			arb1.addArc(new Arc(states[4], states[5], t1));
 			arb1.addArc(new Arc(states[5], states[0], a1));
-			arb1.setType(AutomatonType.Specification);
+			arb1.setType(AutomatonType.SPECIFICATION);
 		}
 
 		// Communication channel Cp
@@ -249,7 +249,7 @@ public class Arbiter
 			arbs.addArc(new Arc(states[6], states[8], as));
 			arbs.addArc(new Arc(states[7], states[0], t0));
 			arbs.addArc(new Arc(states[8], states[0], t1));
-			arbs.setType(AutomatonType.Specification);
+			arbs.setType(AutomatonType.SPECIFICATION);
 		}
 
 		if (doSynchronize)
@@ -315,7 +315,7 @@ public class Arbiter
 		server.addArc(new Arc(states[1], states[2], a));
 		server.addArc(new Arc(states[2], states[3], r));
 		server.addArc(new Arc(states[3], states[0], a));
-		server.setType(AutomatonType.Plant);
+		server.setType(AutomatonType.PLANT);
 
 		return name;
 	}
@@ -347,7 +347,7 @@ public class Arbiter
 		user.addArc(new Arc(states[1], states[2], a));
 		user.addArc(new Arc(states[2], states[3], r));
 		user.addArc(new Arc(states[3], states[0], a));
-		user.setType(AutomatonType.Plant);
+		user.setType(AutomatonType.PLANT);
 		users.addAutomaton(user);
 
 		return name;

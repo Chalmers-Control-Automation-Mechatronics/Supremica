@@ -173,27 +173,6 @@ public class VerificationDialog
         }
     }
     
-    /**
-     * The choices for algorithm.
-     */
-    private static class AlgorithmSelector
-        extends JComboBox
-    {
-        private static final long serialVersionUID = 1L;
-        
-        public AlgorithmSelector()
-        {
-        }
-        
-        public void addItem(VerificationAlgorithm algo)
-        {
-            if (algo.isEnabled())
-            {
-                super.addItem(algo);
-            }
-        }
-    }
-    
     private class VerificationDialogStandardPanel
         extends JPanel
         implements VerificationPanel, ActionListener
@@ -201,7 +180,7 @@ public class VerificationDialog
         private static final long serialVersionUID = 1L;
         
         private JComboBox verificationTypeBox;
-        private AlgorithmSelector algorithmSelector;
+        private JComboBox algorithmSelector;
         private JCheckBox showTrace;
         private JTextArea note;
         
@@ -222,7 +201,7 @@ public class VerificationDialog
             }
             verificationTypeBox.addActionListener(this);
             
-            algorithmSelector = new AlgorithmSelector();
+            algorithmSelector = new JComboBox();
             algorithmSelector.addActionListener(this);
             
             showTrace = new JCheckBox("Show trace to bad states");
@@ -319,11 +298,17 @@ public class VerificationDialog
             else if (verificationTypeBox.getSelectedItem() == VerificationType.NONBLOCKING)
             {
                 algorithmSelector.addItem(VerificationAlgorithm.MONOLITHIC);
-                algorithmSelector.addItem(VerificationAlgorithm.MODULAR);
+                //algorithmSelector.addItem(VerificationAlgorithm.MODULAR);
                 algorithmSelector.addItem(VerificationAlgorithm.COMPOSITIONAL);
                 algorithmSelector.addItem(VerificationAlgorithm.BDD);
             }
-            // Reselect
+            else if (verificationTypeBox.getSelectedItem() == VerificationType.CONTROLLABILITYNONBLOCKING)
+            {
+                algorithmSelector.addItem(VerificationAlgorithm.COMPOSITIONAL);
+            }
+            // Default selection
+            algorithmSelector.setSelectedIndex(0);
+            // Reselect previously selected item if possible
             algorithmSelector.setSelectedItem(selected);
 
             // Show trace?

@@ -54,7 +54,7 @@ public class RoundRobin
 			resource.addArc(new Arc(state, initialState, sb));
 		}
 
-		resource.setType(AutomatonType.Plant);
+		resource.setType(AutomatonType.PLANT);
 
 		return resource;
 	}
@@ -84,7 +84,7 @@ public class RoundRobin
 			alpha.addEvent(bp);
 			buffer.addArc(new Arc(initialState, otherState, sb));
 			buffer.addArc(new Arc(otherState, initialState, bp));
-			buffer.setType(AutomatonType.Plant);
+			buffer.setType(AutomatonType.PLANT);
 			buffers.addAutomaton(buffer);
 		}
 
@@ -148,7 +148,7 @@ public class RoundRobin
 			proc.addArc(new Arc(state2, state4, bp));
 			proc.addArc(new Arc(state3, initialState, bp));
 			proc.addArc(new Arc(state4, initialState, tkNext));
-			proc.setType(AutomatonType.Plant);
+			proc.setType(AutomatonType.PLANT);
 			procs.addAutomaton(proc);
 		}
 
@@ -185,7 +185,7 @@ public class RoundRobin
 
 		alpha.addEvent(tk);
 		spec.addArc(new Arc(lastState, initialState, tk));
-		spec.setType(AutomatonType.Specification);
+		spec.setType(AutomatonType.SPECIFICATION);
 
 		return spec;
 	}

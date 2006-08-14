@@ -763,7 +763,7 @@ public class CellExaminer
 	{
 	    // Add new automaton
 	    Automaton aut = new Automaton(zoneIt.next().getName());
-	    aut.setType(AutomatonType.Specification);
+	    aut.setType(AutomatonType.SPECIFICATION);
 			
 	    // Add two states, Free and Booked
 	    State state = new State(FREESTATE_NAME);
@@ -803,7 +803,7 @@ public class CellExaminer
 	    ////////////////////////////////////////
 
 	    Automaton aut = new Automaton(robot.getName());
-	    aut.setType(AutomatonType.Plant);
+	    aut.setType(AutomatonType.PLANT);
 	    // Build the states...
 	    State initial = new State(STARTSTATE_NAME);
 	    initial.setInitial(true);
@@ -930,7 +930,7 @@ public class CellExaminer
 		visited.setAccepting(true);
 		aut.addState(notVisited);
 		aut.addState(visited);
-		aut.setType(AutomatonType.Specification);				
+		aut.setType(AutomatonType.SPECIFICATION);				
 				
 		aut.setComment("This automaton is not ready generated!");
 		automata.addAutomaton(aut);

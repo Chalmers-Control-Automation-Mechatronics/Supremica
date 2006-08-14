@@ -346,7 +346,7 @@ public class RSCell
 		  String zoneName = zones.getEntities().item(Converter.var(i)).getName();
 		  Automaton aut = new Automaton(zoneName);
 
-		  aut.setType(AutomatonType.Specification);
+		  aut.setType(AutomatonType.SPECIFICATION);
 
 		  // Add two states, Free and Booked
 		  State state = aut.createAndAddUniqueState(null);
@@ -395,7 +395,7 @@ public class RSCell
 	    
 	    // ONE AUTOMATON FOR THE ROBOT ITSELF //
 	    Automaton aut = new Automaton(robot.getName());
-	    aut.setType(AutomatonType.Plant);
+	    aut.setType(AutomatonType.PLANT);
 	    // Build the states...
 	    State initial = new State(CellExaminer.STARTSTATE_NAME);
 	    initial.setInitial(true);
@@ -519,7 +519,7 @@ public class RSCell
 		visited.setAccepting(true);
 		aut.addState(notVisited);
 		aut.addState(visited);
-		aut.setType(AutomatonType.Specification);
+		aut.setType(AutomatonType.SPECIFICATION);
 		
 		/*
 		// Add transitions
@@ -551,7 +551,7 @@ public class RSCell
 	    /*
 	    // ONE AUTOMATON FOR THE SEQUENCE LENGTH //
 	    aut = new Automaton(robot.getName() + "_seq");
-	    aut.setType(AutomatonType.Plant);
+	    aut.setType(AutomatonType.PLANT);
 	    aut.setComment("This automaton is not ready generated!");
 	    robotAut.addAutomaton(aut);
 	    */
@@ -614,7 +614,7 @@ public class RSCell
 		  Robot robot = (Robot) listIt.next();
 		  Automaton aut = new Automaton(robot.getName());
 
-		  aut.setType(AutomatonType.Plant);
+		  aut.setType(AutomatonType.PLANT);
 
 		  // Add automaton
 		  result.addAutomaton(aut);
@@ -1396,7 +1396,7 @@ public class RSCell
 
 						// Add new automaton
 						Automaton aut = new Automaton(zoneName);
-						aut.setType(AutomatonType.Specification);
+						aut.setType(AutomatonType.SPECIFICATION);
 
 						// Add two states, Free and Booked
 						State state = new State(CellExaminer.FREESTATE_NAME);

@@ -115,7 +115,7 @@ public class TestProjectBuildFromFSM
 				assertTrue(autName != null);
 				assertTrue(currAlphabet != null);
 
-				assertTrue(currAutomaton.getType() == AutomatonType.Specification);
+				assertTrue(currAutomaton.getType() == AutomatonType.SPECIFICATION);
 				assertTrue(currAutomaton.nbrOfStates() == 4);
 				assertTrue(currAutomaton.nbrOfEvents() == 5);
 				assertTrue(currAutomaton.nbrOfTransitions() == 4);
@@ -216,7 +216,7 @@ public class TestProjectBuildFromFSM
 				assertTrue(autName != null);
 				assertTrue(currAlphabet != null);
 
-				assertTrue(currAutomaton.getType() == AutomatonType.Specification);
+				assertTrue(currAutomaton.getType() == AutomatonType.SPECIFICATION);
 				assertTrue(currAutomaton.nbrOfStates() == 3);
 				assertTrue(currAutomaton.nbrOfEvents() == 5);
 				assertTrue(currAutomaton.nbrOfTransitions() == 5);

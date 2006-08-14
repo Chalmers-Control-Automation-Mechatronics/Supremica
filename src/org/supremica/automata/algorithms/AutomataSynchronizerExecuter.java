@@ -1123,20 +1123,20 @@ public final class AutomataSynchronizerExecuter
 
 			if (helper.isAllAutomataPlants())
 			{
-				theAutomaton.setType(AutomatonType.Plant);
+				theAutomaton.setType(AutomatonType.PLANT);
 			}
 			else if (helper.isAllAutomataSupervisors())
 			{
-				theAutomaton.setType(AutomatonType.Supervisor);
+				theAutomaton.setType(AutomatonType.SUPERVISOR);
 			}
 			else if (helper.isAllAutomataSpecifications())
 			{
-				theAutomaton.setType(AutomatonType.Specification);
+				theAutomaton.setType(AutomatonType.SPECIFICATION);
 			}
 			else
 			{
 				// theAutomaton.setType(AutomatonType.Undefined);
-				theAutomaton.setType(AutomatonType.Plant);
+				theAutomaton.setType(AutomatonType.PLANT);
 			}
 
 			return true;

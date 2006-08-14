@@ -86,7 +86,7 @@ public class PlantDEMO
 		int X = nrOfSlots + table_type * nrOfSlots;
 		Automaton currTable = new Automaton("Table" + table_id);
 
-		currTable.setType(AutomatonType.Plant);
+		currTable.setType(AutomatonType.PLANT);
 
 		currAlphabet[table_id] = currTable.getAlphabet();
 
@@ -172,7 +172,7 @@ public class PlantDEMO
 
 		station = new Automaton("Station_" + table_id + "_" + station_id);
 
-		station.setType(AutomatonType.Plant);
+		station.setType(AutomatonType.PLANT);
 
 		stationAlphabet[sAindex] = station.getAlphabet();
 
@@ -400,7 +400,7 @@ public class PlantDEMO
 	{
 		Automaton IO0 = new Automaton("IO_0");
 
-		IO0.setType(AutomatonType.Plant);
+		IO0.setType(AutomatonType.PLANT);
 
 		IOAlphabet[Iindex] = IO0.getAlphabet();
 
@@ -426,7 +426,7 @@ public class PlantDEMO
 
 		Automaton IO1 = new Automaton("IO_1");
 
-		IO1.setType(AutomatonType.Plant);
+		IO1.setType(AutomatonType.PLANT);
 
 		IOAlphabet[Iindex] = IO1.getAlphabet();
 

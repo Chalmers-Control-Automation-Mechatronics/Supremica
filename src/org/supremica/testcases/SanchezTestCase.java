@@ -110,9 +110,9 @@ public class SanchezTestCase
 		a3.addArc(new Arc(s21, s22, e34));
 		a3.addArc(new Arc(s22, s21, e31));
 		a3.addArc(new Arc(s21, s20, e32));
-		a1.setType(AutomatonType.Plant);
-		a3.setType(AutomatonType.Plant);
-		a2.setType(AutomatonType.Plant);
+		a1.setType(AutomatonType.PLANT);
+		a3.setType(AutomatonType.PLANT);
+		a2.setType(AutomatonType.PLANT);
 		project.addAutomaton(a1);
 		project.addAutomaton(a2);
 		project.addAutomaton(a3);
@@ -167,8 +167,8 @@ public class SanchezTestCase
 		m2.addArc(new Arc(s20, s20, e12));
 		m2.addArc(new Arc(s20, s20, e13));
 		m2.addArc(new Arc(s20, s20, e14));
-		m1.setType(AutomatonType.Plant);
-		m2.setType(AutomatonType.Plant);
+		m1.setType(AutomatonType.PLANT);
+		m2.setType(AutomatonType.PLANT);
 		project.addAutomaton(m1);
 		project.addAutomaton(m2);
 	}

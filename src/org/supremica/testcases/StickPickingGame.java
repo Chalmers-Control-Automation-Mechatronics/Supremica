@@ -43,7 +43,7 @@ class Sticks
 	{
 		super("Sticks:" + num);
 
-		setType(AutomatonType.Plant);
+		setType(AutomatonType.PLANT);
 
 		sticks = new State[num + 1];    // one more state than sticks
 		sticks[0] = new State(Integer.toString(num));    // starting at "num" and counting down
@@ -125,7 +125,7 @@ class Players
 	{
 		super("Players:" + num);
 
-		setType(AutomatonType.Plant);
+		setType(AutomatonType.PLANT);
 
 		// One state for each player
 		// First player is special (initial and accepting)

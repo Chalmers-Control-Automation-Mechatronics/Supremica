@@ -222,7 +222,7 @@ public class AutomatonSynthesizer
 				didSomething = true;
 			}
 		}
-		theAutomaton.setType(AutomatonType.Supervisor);
+		theAutomaton.setType(AutomatonType.SUPERVISOR);
 		return didSomething;
 	}
 
@@ -262,7 +262,7 @@ public class AutomatonSynthesizer
 				didSomething = true;
 			}
 		}
-		theAutomaton.setType(AutomatonType.Supervisor);
+		theAutomaton.setType(AutomatonType.SUPERVISOR);
 		return didSomething;
 	}
 
@@ -292,7 +292,7 @@ public class AutomatonSynthesizer
 				didSomething = true;
 			}
 		}
-		theAutomaton.setType(AutomatonType.Supervisor);
+		theAutomaton.setType(AutomatonType.SUPERVISOR);
 		return didSomething;
 	}
 

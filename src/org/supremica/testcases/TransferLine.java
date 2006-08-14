@@ -118,7 +118,7 @@ public class TransferLine
 			// B1 & B2
 			Automaton b12 = new Automaton("B_" + (i + 1));
 
-			b12.setType(AutomatonType.Specification);
+			b12.setType(AutomatonType.SPECIFICATION);
 			createBuffer2(b12, cap1, e2, e3, e4, e5, e8);
 			project.addAutomaton(b12);
 		}
@@ -128,22 +128,22 @@ public class TransferLine
 			// B1 & B2
 			Automaton b1 = new Automaton("B1_" + (i + 1));
 
-			b1.setType(AutomatonType.Specification);
+			b1.setType(AutomatonType.SPECIFICATION);
 			createBuffer(b1, cap1, e2, e3, e8);
 			project.addAutomaton(b1);
 
 			Automaton b2 = new Automaton("B2_" + (i + 1));
 
-			b2.setType(AutomatonType.Specification);
+			b2.setType(AutomatonType.SPECIFICATION);
 			createBuffer(b2, cap2, e4, e5, null);
 			project.addAutomaton(b2);
 		}
 
 		// TU:
 		createTU(tu, e5, e6, e8);
-		m1.setType(AutomatonType.Plant);
-		m2.setType(AutomatonType.Plant);
-		tu.setType(AutomatonType.Plant);
+		m1.setType(AutomatonType.PLANT);
+		m2.setType(AutomatonType.PLANT);
+		tu.setType(AutomatonType.PLANT);
 		project.addAutomaton(m1);
 		project.addAutomaton(m2);
 		project.addAutomaton(tu);

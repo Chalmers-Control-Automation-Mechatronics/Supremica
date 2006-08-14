@@ -85,7 +85,7 @@ class BrickBuilder
 		number = (r - 1) * cols + c;
 		automaton = new Automaton("Brick" + number);
 
-		automaton.setType(AutomatonType.Plant);
+		automaton.setType(AutomatonType.PLANT);
 		shared_states[r][c].setInitial(true);
 
 		// the initial state for this automaton
@@ -133,7 +133,7 @@ class BrickBuilder
 		number = 0;
 		automaton = new Automaton("Brick0");
 
-		automaton.setType(AutomatonType.Plant);
+		automaton.setType(AutomatonType.PLANT);
 		shared_states[rows][cols].setInitial(true);
 
 		// the initial state for this automaton

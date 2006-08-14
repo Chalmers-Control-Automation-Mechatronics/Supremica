@@ -81,7 +81,7 @@ public class ProjectBuildFromSwingEngine
 			String currId = (String) idIt.next();
 
 			Automaton currAutomaton = new Automaton(currId);
-			currAutomaton.setType(AutomatonType.Plant);
+			currAutomaton.setType(AutomatonType.PLANT);
 
 			State initialState = new State(currId + "_initial");
 			initialState.setInitial(true);

@@ -410,8 +410,8 @@ public class ProjectBuildFromXml
 
 		String type = attributes.getValue("type");
 
-		// AutomatonType currType = AutomatonType.Undefined; // Changed to specification
-		AutomatonType currType = AutomatonType.Specification;
+		// AutomatonType currType = AutomatonType.UNDEFINED; // Changed to specification
+		AutomatonType currType = AutomatonType.SPECIFICATION;
 
 		if (type != null)
 		{
@@ -419,9 +419,9 @@ public class ProjectBuildFromXml
 		}
 
 		// To deal with old files
-		if (currType == AutomatonType.Undefined)
+		if (currType == AutomatonType.UNDEFINED)
 		{
-			currType = AutomatonType.Specification;
+			currType = AutomatonType.SPECIFICATION;
 		}
 
 		currAutomaton.setType(currType);

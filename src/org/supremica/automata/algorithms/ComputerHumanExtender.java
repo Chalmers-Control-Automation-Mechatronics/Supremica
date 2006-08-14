@@ -180,7 +180,7 @@ public class ComputerHumanExtender
 		newAutomaton = new Automaton();
 
 		newAutomaton.setName("E^{k=" + k + ", m=" + m +"}");
-		newAutomaton.setType(AutomatonType.Plant);
+		newAutomaton.setType(AutomatonType.PLANT);
 
 		Alphabet newAutAlphabet = newAutomaton.getAlphabet();
 

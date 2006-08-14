@@ -121,7 +121,7 @@ public class TestProjectBuildFromXml
 				if (autName.equals("Spec"))
 				{
 					specAutomaton = currAutomaton;
-					assertTrue(currAutomaton.getType() == AutomatonType.Specification);
+					assertTrue(currAutomaton.getType() == AutomatonType.SPECIFICATION);
 					assertTrue(currAutomaton.nbrOfStates() == 3);
 					assertTrue(currAutomaton.nbrOfEvents() == 3);
 					assertTrue(currAutomaton.nbrOfTransitions() == 3);
@@ -174,7 +174,7 @@ public class TestProjectBuildFromXml
 				else if (autName.equals("Robot"))
 				{
 					robotAutomaton = currAutomaton;
-					assertTrue(currAutomaton.getType() == AutomatonType.Plant);
+					assertTrue(currAutomaton.getType() == AutomatonType.PLANT);
 					assertTrue(currAutomaton.nbrOfStates() == 2);
 					assertTrue(currAutomaton.nbrOfEvents() == 2);
 					assertTrue(currAutomaton.nbrOfTransitions() == 2);
@@ -220,7 +220,7 @@ public class TestProjectBuildFromXml
 				else if (autName.equals("Machine"))
 				{
 					machineAutomaton = currAutomaton;
-					assertTrue(currAutomaton.getType() == AutomatonType.Plant);
+					assertTrue(currAutomaton.getType() == AutomatonType.PLANT);
 					assertTrue(currAutomaton.nbrOfStates() == 2);
 					assertTrue(currAutomaton.nbrOfEvents() == 3);
 					assertTrue(currAutomaton.nbrOfTransitions() == 3);

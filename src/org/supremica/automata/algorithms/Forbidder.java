@@ -178,7 +178,7 @@ public class Forbidder
 		{
 			Automaton automaton = the_automata[i];
 			// set copy to be plant
-			automaton.setType(AutomatonType.Plant);
+			automaton.setType(AutomatonType.PLANT);
 			// uc-saturate copy
 			automaton.saturateLoop(automaton.getAlphabet().getUncontrollableAlphabet());
 			// rename copy
@@ -221,7 +221,7 @@ public class Forbidder
 	private Automaton makeSpec(ForbiddenEvent x_event)
 	{
 		Automaton spec = new Automaton(x_event.getLabel()); // same name as the event-label
-		spec.setType(AutomatonType.Specification);
+		spec.setType(AutomatonType.SPECIFICATION);
 		spec.getAlphabet().addEvent(x_event);
 		State init_state = new State("q0");
 		init_state.setInitial(true);

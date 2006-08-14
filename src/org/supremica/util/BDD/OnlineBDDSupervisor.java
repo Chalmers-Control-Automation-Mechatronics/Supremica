@@ -192,7 +192,7 @@ public class OnlineBDDSupervisor
 					new org.supremica.automata.Automaton[0]);
 		int nAutomata = automata.length;
 		Automaton supervisor = new Automaton();
-		supervisor.setType(AutomatonType.Supervisor);
+		supervisor.setType(AutomatonType.SUPERVISOR);
 		String supervisorName = "sup(" + automata[0].getName();
 		for(int i = 1; i < automata.length; i++) {
 			supervisorName += Config.SYNC_AUTOMATON_NAME_SEPARATOR.get() + 

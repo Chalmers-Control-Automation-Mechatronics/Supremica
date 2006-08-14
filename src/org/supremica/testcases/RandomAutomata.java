@@ -96,7 +96,7 @@ public class RandomAutomata
 				random.addArc(new Arc(state_vector[transitions[s].s0], state_vector[transitions[s].s1], events_vector[transitions[s].event]));
 			}
 
-			random.setType(AutomatonType.Plant);
+			random.setType(AutomatonType.PLANT);
 			project.addAutomaton(random);
 		}
 	}

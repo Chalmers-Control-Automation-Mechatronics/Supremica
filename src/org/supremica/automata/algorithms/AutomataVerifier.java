@@ -60,6 +60,7 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.EventToAutomataMap;
 import org.supremica.automata.State;
 import org.supremica.automata.Arc;
+import org.supremica.automata.AutomatonType;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
@@ -139,6 +140,22 @@ public class AutomataVerifier
      */
     public static String validOptions(Automata theAutomata, VerificationOptions verificationOptions)
     {
+        // At least one automaton
+        if (theAutomata.size() < 1)
+        {
+            return "At least one automaton must be selected.";
+        }
+        
+        // Must be prioritizes?
+        if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MODULAR ||
+            verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL)
+        {
+            if (!theAutomata.isAllEventsPrioritized())
+            {
+                return "All events must be prioritized.";
+            }
+        }
+        
         // MODULAR algorithms demand systems with more than one module...
         if ((verificationOptions.getAlgorithmType() == VerificationAlgorithm.MODULAR) && (theAutomata.size() < 2))
         {
@@ -155,50 +172,22 @@ public class AutomataVerifier
         // Check Controllability
         if (verificationOptions.getVerificationType() == VerificationType.CONTROLLABILITY)
         {
-            if (theAutomata.size() < 2)
-            {
-                return "At least two automata must be selected.";
-            }
-            
-            if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MODULAR ||
-                verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL)
-            {
-                if (!theAutomata.isAllEventsPrioritized())
-                {
-                    return "All events must be prioritized.";
-                }
-            }
+            if (theAutomata.hasNoPlants() || theAutomata.hasNoSpecificationsAndSupervisors())
+                return "At least one plant and one specification/supervisor must be selected.";
         }
         
         // Check Nonblocking
         if (verificationOptions.getVerificationType() == VerificationType.NONBLOCKING)
         {
-            if (theAutomata.size() < 1)
-            {
-                return "At least one automaton must be selected.";
-            }
-            
             if (!theAutomata.hasAcceptingState())
             {
-                return "Some automaton has no marked states. This system is blocking!";
+                return "Some automaton has no marked states. This system is trivially blocking!";
             }
-            
-                        /*
-                        if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MODULAR)
-                        {
-                                return "Not implemented, try the compositional algorithm.";
-                        }
-                         */
         }
         
         // Check MutuallyNonblocking
         if (verificationOptions.getVerificationType() == VerificationType.MUTUALLYNONBLOCKING)
         {
-            if (theAutomata.size() < 1)
-            {
-                return "At least one automaton must be selected!";
-            }
-            
             if (!theAutomata.hasAcceptingState())
             {
                 return "Some automaton has no marked states!";
@@ -206,33 +195,20 @@ public class AutomataVerifier
             
             if (verificationOptions.getAlgorithmType() != VerificationAlgorithm.MODULAR)
             {
-                return "The mutual nonblocking algorithm \n" + "is a modular algorithm!";
+                return "The mutual nonblocking algorithm is a modular algorithm!";
             }
         }
         
         // Check Language Inclusion
         if (verificationOptions.getVerificationType() == VerificationType.LANGUAGEINCLUSION)
         {
-            if (theAutomata.size() < 1)
-            {
-                return "At least one automaton must be selected.";
-            }
-            
             if ((verificationOptions.getInclusionAutomata() != null) &&
                 (verificationOptions.getInclusionAutomata().size() < 1))
             {
                 return "At least one automaton must be unselected.";
             }
             
-//			theAutomata = theAutomata.add(verificationOptions.getInclusionAutomata());
-            
-            if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MODULAR)
-            {
-                if (!theAutomata.isAllEventsPrioritized())
-                {
-                    return "All event must be prioritized in the modular algorithm.";
-                }
-            }
+            // theAutomata = theAutomata.add(verificationOptions.getInclusionAutomata());
         }
         
         // Everything seems OK!
@@ -248,18 +224,28 @@ public class AutomataVerifier
         try
         {
             // Find out what should be done and do it!
-            if ((verificationOptions.getVerificationType() == VerificationType.CONTROLLABILITY) ||
-                (verificationOptions.getVerificationType() == VerificationType.INVERSECONTROLLABILITY))
+            if (verificationOptions.getVerificationType() == VerificationType.CONTROLLABILITY ||
+                verificationOptions.getVerificationType() == VerificationType.INVERSECONTROLLABILITY ||
+                verificationOptions.getVerificationType() == VerificationType.LANGUAGEINCLUSION)
             {
-                // We're gonna do some serious synchronization! Initialize a synchronization helper!
-                synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
-                synchHelper.setExecutionDialog(executionDialog);
+                // All of these verification types use the same algorithm. Just need to do some preparation first...
                 
                 // Inverse controllability? Invert controllability!
                 if (verificationOptions.getVerificationType() == VerificationType.INVERSECONTROLLABILITY)
                 {
+                    // Invert controllability and plant/spec status
                     prepareForInverseControllability();
                 }
+                else if (verificationOptions.getVerificationType() == VerificationType.LANGUAGEINCLUSION)
+                {
+                    // Treat the unselected automata as plants (and the rest as supervisors, implicitly)
+                    prepareForLanguageInclusion(verificationOptions.getInclusionAutomata());
+                }
+                
+                // We're gonna do some synchronization! Initialize a synchronization helper!
+                // Only some of the below algorithms use this helper?
+                synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
+                synchHelper.setExecutionDialog(executionDialog);
                 
                 // Work!
                 if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MONOLITHIC)
@@ -283,6 +269,17 @@ public class AutomataVerifier
                     throw new UnsupportedOperationException("The selected algorithm is not implemented");
                 }
             }
+            else if (verificationOptions.getVerificationType() == VerificationType.CONTROLLABILITYNONBLOCKING)
+            {
+                if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL)
+                {
+                    return compositionalControllabilityNonblockingVerification();
+                }
+                else
+                {
+                    throw new UnsupportedOperationException("The selected algorithm is not implemented");
+                }  
+            }
             else if (verificationOptions.getVerificationType() == VerificationType.NONBLOCKING)
             {
                 if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MONOLITHIC)
@@ -297,11 +294,6 @@ public class AutomataVerifier
                 else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
                 {
                     return BDDNonblockingVerification();
-                }
-                else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MODULAR)
-                {
-                    // This is the compositional algorithm, there is no "modular" algorithm
-                    return compositionalNonblockingVerification();
                 }
                 else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL)
                 {
@@ -319,35 +311,6 @@ public class AutomataVerifier
                 {
                     // This algorithm is under implementation!!
                     return modularMutuallyNonblockingVerification();
-                }
-                else
-                {
-                    throw new UnsupportedOperationException("The selected algorithm is not implemented");
-                }
-            }
-            else if (verificationOptions.getVerificationType() == VerificationType.LANGUAGEINCLUSION)
-            {
-                // We're gonna do some serious synchronization! Initialize a synchronization helper!
-                synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
-                synchHelper.setExecutionDialog(executionDialog);
-                
-                // Treat the unselected automata as plants (and the rest as supervisors, implicitly)
-                prepareForLanguageInclusion(verificationOptions.getInclusionAutomata());
-                
-                // Work!
-                if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
-                {
-                    return BDDLanguageInclusionVerification();
-                }
-                else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MONOLITHIC)
-                {
-                    // Language inclusion is performed as a controllability verification!
-                    return monolithicControllabilityVerification();
-                }
-                else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MODULAR)
-                {
-                    // Language inclusion is performed as a controllability verification!
-                    return modularControllabilityVerification();
                 }
                 else
                 {
@@ -373,14 +336,25 @@ public class AutomataVerifier
      */
     public void prepareForInverseControllability()
     {
-        Automata specifications = theAutomata.getSpecificationAndSupervisorAutomata();
-        
-        // Redefined plant status
-        synchHelper.getAutomataIndexForm().defineTypeIsPlantTable(specifications);
-        uncontrollableEventToPlantsMap = AlphabetHelpers.buildEventToAutomataMap(specifications);
-        
-        // Invert controllability status in helper
-        synchHelper.invertControllability();
+        // Make a copy and invert the properties!
+        theAutomata = new Automata(theAutomata);
+        for (Automaton aut: theAutomata)
+        {
+            if (aut.isPlant())
+            {
+                aut.setType(AutomatonType.SPECIFICATION);
+            }
+            else
+            {
+                aut.setType(AutomatonType.PLANT);
+            }
+            
+            Alphabet alpha = aut.getAlphabet();
+            for (LabeledEvent ev: alpha)
+            {
+                ev.setControllable(!ev.isControllable());
+            }
+        }
     }
     
     /**
@@ -395,31 +369,45 @@ public class AutomataVerifier
         {
             throw new IllegalArgumentException("Inclusion automata must be non null for language inclusion verification.");
         }
+
+        // Make a copy and modify!
+
+        // We shall verify if the language of    L(autA) \subseteq L(autB)
+        Automata autA = new Automata(inclusionAutomata);
+        Automata autB = new Automata(theAutomata);
+
+        // Make autA plants
+        for (Automaton aut: autA)
+        {
+            aut.setType(AutomatonType.PLANT);
+            Alphabet alpha = aut.getAlphabet();
+            for (LabeledEvent ev: alpha)
+            {
+                ev.setControllable(false);
+            }
+        }
+
+        // Make autB specifications
+        for (Automaton aut: autB)
+        {
+            aut.setType(AutomatonType.SPECIFICATION);
+            Alphabet alpha = aut.getAlphabet();
+            for (LabeledEvent ev: alpha)
+            {
+                ev.setControllable(false);
+            }
+        }
+
+        theAutomata = new Automata();
+        theAutomata.addAutomata(autA);
+        theAutomata.addAutomata(autB);
         
+        /*
         // Maybe we should just make a copy of the whole project and modify what needs to
-        // be modified right there instead?
+        // be modified right there instead? Yup.
         
         theAutomata.addAutomata(inclusionAutomata);
-        
-                /*
-                // Make sure the alphabets have the right relation
-                Automata exclusionAutomata = new Automata();
-                for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext();)
-                {
-                        Automaton currAut = autIt.next();
-                        if (!inclusionAutomata.containsAutomaton(currAut))
-                        {
-                                exclusionAutomata.addAutomaton(currAut);
-                        }
-                }
-                 
-                // The "exclusionAutomata"'s alphabet must be included in the "inclusionAutomata"
-                if (Alphabet.minus(exclusionAutomata.getUnionAlphabet(), inclusionAutomata.getUnionAlphabet()).size() > 0)
-                {
-                        logger.warn("Warning, the alphabets are not well related for language inclusion.");
-                }
-                 */
-        
+                
         // After these preparations, controllability verification verifies language inclusion
         synchHelper.getAutomataIndexForm().defineTypeIsPlantTable(inclusionAutomata);
         
@@ -428,6 +416,7 @@ public class AutomataVerifier
         // This last one is not really good... we'd like to do this only once! Perhaps
         // a switch in the synchronizeroptions or verificationoptions instead? FIXA!!
         synchHelper.considerAllEventsUncontrollable();
+        */
     }
     
     /**
@@ -485,7 +474,7 @@ public class AutomataVerifier
             Automaton currSupervisorAutomaton = supIt.next();
             
             // To enable the overriding the AutomatonType of automata we use typeIsSupSpecTable!
-            // if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) || (currSupervisorAutomaton.getType() == AutomatonType.Specification))
+            // if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) || (currSupervisorAutomaton.getType() == AutomatonType.SPECIFICATION))
             // if (!typeIsPlantTable[currSupervisorAutomaton.getIndex()])
             if (typeIsSupSpecTable[currSupervisorAutomaton.getIndex()])
             {
@@ -1335,7 +1324,7 @@ public class AutomataVerifier
         boolean ret;
         
         // why compute when we already know the answer: L(P) = \Sigma^*  ?
-        if (theAutomata.isNoAutomataPlants())
+        if (theAutomata.hasNoPlants())
         {
             return true;
         }
@@ -1344,7 +1333,6 @@ public class AutomataVerifier
         
         switch (Options.inclsuion_algorithm)
         {
-            
             case Options.INCLUSION_ALGO_MONOLITHIC :
                 AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata);
                 
@@ -1640,7 +1628,8 @@ public class AutomataVerifier
     
     
     /**
-     * Compositionally minimizes the automata and examines the end result...
+     * Verifies controllability by transforming controllbility problems to blocking problems
+     * and using a nonblocking verification algorithm.
      *
      * Does not use the synchHelper.
      */
@@ -1654,6 +1643,21 @@ public class AutomataVerifier
         }
         
         // Plantify all automata
+        MinimizationHelper.plantify(theAutomata);
+        
+        // Verify nonblocking (yep, that's right)
+        return compositionalNonblockingVerification();
+    }
+    
+    /**
+     * Verifies both controllability and nonblocking simultaneously using a compositional approach.
+     *
+     * Does not use the synchHelper.
+     */
+    private boolean compositionalControllabilityNonblockingVerification()
+    throws Exception
+    {
+        // Plantify all automata (transform controllability problems to blocking problems)
         MinimizationHelper.plantify(theAutomata);
         
         // Verify nonblocking (yep, that's right)

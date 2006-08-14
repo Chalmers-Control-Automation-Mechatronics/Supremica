@@ -65,7 +65,7 @@ class Philosopher
 
 		// Here we create the "template" automaton, philo
 		philo = new Automaton("Philo template");
-		philo.setType(AutomatonType.Plant);
+		philo.setType(AutomatonType.PLANT);
 
 		// These are fivestate project
 		states[0].setInitial(true);
@@ -188,7 +188,7 @@ class EatingPhilosopher
 
 		// Here we create the "template" automaton, philo
 		philo = new Automaton("Philo template");
-		philo.setType(AutomatonType.Plant);
+		philo.setType(AutomatonType.PLANT);
 
 		// These are fivestate project
 		states[0].setInitial(true);
@@ -358,7 +358,7 @@ class Chopstick
 		}
 
 		fork = new Automaton("Fork template");
-		fork.setType(AutomatonType.Specification);
+		fork.setType(AutomatonType.SPECIFICATION);
 
 		// First the states
 		states[0].setInitial(true);
@@ -453,7 +453,7 @@ class MemoryChopstick
 		}
 
 		fork = new Automaton("Fork template");
-		fork.setType(AutomatonType.Specification);
+		fork.setType(AutomatonType.SPECIFICATION);
 
 		// First the states
 		states[0].setInitial(true);

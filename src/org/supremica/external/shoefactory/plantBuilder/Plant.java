@@ -103,7 +103,7 @@ public class Plant
 		int X = nrOfSlots + table_type * nrOfSlots;
 		Automaton currTable = new Automaton("Table" + table_id);
 
-		currTable.setType(AutomatonType.Plant);
+		currTable.setType(AutomatonType.PLANT);
 
 		currAlphabet[table_id] = currTable.getAlphabet();
 
@@ -191,7 +191,7 @@ public class Plant
 
 		station = new Automaton("Station_" + table_id + "_" + station_id);
 
-		station.setType(AutomatonType.Plant);
+		station.setType(AutomatonType.PLANT);
 
 		stationAlphabet[sAindex] = station.getAlphabet();
 
@@ -538,7 +538,7 @@ public class Plant
 
 		Automaton IO = new Automaton("IO_" + IOnr);
 
-		IO.setType(AutomatonType.Plant);
+		IO.setType(AutomatonType.PLANT);
 
 		IOAlphabet[Iindex] = IO.getAlphabet();
 

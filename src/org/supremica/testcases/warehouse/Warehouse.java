@@ -31,7 +31,7 @@ class Resource
 		this.u2 = u2;
 		theAutomaton = new Automaton("Zone_" + identity);
 
-		theAutomaton.setType(AutomatonType.Specification);
+		theAutomaton.setType(AutomatonType.SPECIFICATION);
 
 		State initialState = theAutomaton.createUniqueState("idle");
 
@@ -396,7 +396,7 @@ class User
 		}
 
 		//theAutomaton.setAlphabet(theAlphabet);
-		theAutomaton.setType(AutomatonType.Plant);
+		theAutomaton.setType(AutomatonType.PLANT);
 
 		return theAutomaton;
 	}

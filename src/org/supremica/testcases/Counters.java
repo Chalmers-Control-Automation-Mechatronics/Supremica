@@ -50,7 +50,7 @@ public class Counters
 				counter.addArc(new Arc(state_vector[s], state_vector[(s + 1) % states], event));
 			}
 
-			counter.setType(AutomatonType.Plant);
+			counter.setType(AutomatonType.PLANT);
 			project.addAutomaton(counter);
 		}
 	}

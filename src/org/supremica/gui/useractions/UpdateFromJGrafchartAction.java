@@ -259,7 +259,7 @@ public class UpdateFromJGrafchartAction
 		public void updateData(WorkspaceObject theWorkspace)
 		{
 			theName = "";
-			theType = AutomatonType.Specification;
+			theType = AutomatonType.SPECIFICATION;
 
 			String workspaceLabel = theWorkspace.getName();
 
@@ -296,7 +296,7 @@ public class UpdateFromJGrafchartAction
 
 				theType = AutomatonType.toType(currentParameter);
 
-				if (theType == AutomatonType.Undefined)
+				if (theType == AutomatonType.UNDEFINED)
 				{
 					logger.error("Unknown parameter: " + currentParameter);
 				}

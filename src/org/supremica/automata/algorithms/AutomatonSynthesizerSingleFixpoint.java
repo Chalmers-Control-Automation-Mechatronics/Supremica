@@ -420,7 +420,7 @@ public class AutomatonSynthesizerSingleFixpoint
 						}
 				}
 
-				theAutomaton.setType(AutomatonType.Supervisor);
+				theAutomaton.setType(AutomatonType.SUPERVISOR);
 				return true; // TODO: should use didSomething
 				*/
 	}
@@ -471,7 +471,7 @@ public class AutomatonSynthesizerSingleFixpoint
 		// 3. writeback
 		org_count -= forbiddIfNot(SET_MARK);
 
-		theAutomaton.setType(AutomatonType.Supervisor);
+		theAutomaton.setType(AutomatonType.SUPERVISOR);
 
 		return (org_count != 0);    /* did Something */
 	}
@@ -518,7 +518,7 @@ public class AutomatonSynthesizerSingleFixpoint
 		// 3. write back
 		org_count -= forbiddIf(SET_QX);
 
-		theAutomaton.setType(AutomatonType.Supervisor);
+		theAutomaton.setType(AutomatonType.SUPERVISOR);
 
 		return (org_count != 0);    /* did Something */
 	}

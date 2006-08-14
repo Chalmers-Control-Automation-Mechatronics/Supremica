@@ -231,7 +231,7 @@ public class ProjectBuildFromHISC
 							name = name + ".hsc";
 						Automaton aut = loadAutomaton(pathName+"/"+directoryName+"/"+name);
 						aut.setName(name.substring(0,name.indexOf(".hsc")));
-						aut.setType(AutomatonType.Undefined);
+						aut.setType(AutomatonType.UNDEFINED);
 						project.addAutomaton(aut);
 					}
 					else if (currentTag.equals("PLANT"))
@@ -247,7 +247,7 @@ public class ProjectBuildFromHISC
 								name = name + ".hsc";
 							Automaton aut = loadAutomaton(pathName+"/"+directoryName+"/"+name);
 							aut.setName(name.substring(0,name.indexOf(".hsc")));
-							aut.setType(AutomatonType.Plant);
+							aut.setType(AutomatonType.PLANT);
 							project.addAutomaton(aut);
 						}
 					}
@@ -264,7 +264,7 @@ public class ProjectBuildFromHISC
 								name = name + ".hsc";
 							Automaton aut = loadAutomaton(pathName+"/"+directoryName+"/"+name);
 							aut.setName(name.substring(0,name.indexOf(".hsc")));
-							aut.setType(AutomatonType.Specification);
+							aut.setType(AutomatonType.SPECIFICATION);
 							project.addAutomaton(aut);
 						}
 					}

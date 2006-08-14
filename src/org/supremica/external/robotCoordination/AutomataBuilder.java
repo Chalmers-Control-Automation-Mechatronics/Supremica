@@ -123,7 +123,7 @@ public class AutomataBuilder
 			//System.out.println(currRobot);
 			Automaton currAutomaton = new Automaton(currRobot);
 
-			currAutomaton.setType(AutomatonType.Plant);
+			currAutomaton.setType(AutomatonType.PLANT);
 
 			State initialState = currAutomaton.createUniqueState("initial");
 
@@ -517,7 +517,7 @@ public class AutomataBuilder
 								{
 									Automaton currAutomaton = new Automaton(currResource);
 
-									currAutomaton.setType(AutomatonType.Specification);
+									currAutomaton.setType(AutomatonType.SPECIFICATION);
 
 									State idleState = currAutomaton.createUniqueState("idle");
 

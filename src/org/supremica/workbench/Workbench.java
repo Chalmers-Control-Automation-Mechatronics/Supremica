@@ -187,7 +187,7 @@ public class Workbench
 			buttons.reachButton.setEnabled(true);
 			buttons.purgeButton.setEnabled(true);
 			buttons.doneButton.setEnabled(true);
-			if (automata.isNoAutomataPlants())
+			if (automata.hasNoPlants())
 			{
 				buttons.compareButton.setEnabled(false);
 			}
@@ -337,7 +337,7 @@ class SynchButton
 			// user will be prompted with a suggested name, and
 			// prompted again until a unique name is given
 			wb.automaton.setName("sup(" + wb.automaton.getComment() + ")");
-			wb.automaton.setType(AutomatonType.Supervisor);
+			wb.automaton.setType(AutomatonType.SUPERVISOR);
 			// Note that there may be explicitly specified uc-states
 			// These are not "new" in a direct sense, but...
 			wb.showMessage(wb.automaton.nbrOfForbiddenStates() +

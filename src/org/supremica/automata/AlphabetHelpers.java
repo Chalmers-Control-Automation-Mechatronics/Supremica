@@ -212,10 +212,11 @@ public class AlphabetHelpers
 		return map;
 	}
 
-	/** 
-	 * Builds an returns a map mapping uncontrollable events to sets of plant automata.
-	 * (uncontrollable LabeledEvent) -> (Set of AutomatonType.Plant Automaton-objects).
-	 */
+	/**
+     * 
+     * Builds an returns a map mapping uncontrollable events to sets of plant automata.
+     * (uncontrollable LabeledEvent) -> (Set of AutomatonType.PLANT Automaton-objects).
+     */
 	public static EventToAutomataMap buildUncontrollableEventToPlantsMap(Automata anAutomata)
 	{
 		//HashMap map = new HashMap();
@@ -226,7 +227,7 @@ public class AlphabetHelpers
 		{
 			Automaton currAutomaton = (Automaton) automataIt.next();
 
-			if (currAutomaton.getType() == AutomatonType.Plant)
+			if (currAutomaton.getType() == AutomatonType.PLANT)
 			{
 				Alphabet currAlphabet = (Alphabet) currAutomaton.getAlphabet();
 

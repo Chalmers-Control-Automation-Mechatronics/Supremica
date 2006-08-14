@@ -82,7 +82,7 @@ public class Automaton
 	//private ArcSet theArcs;
 	private State initialState;
 	private boolean isDisabled = false;
-	private AutomatonType type = AutomatonType.Specification;
+	private AutomatonType type = AutomatonType.SPECIFICATION;
 	private int uniqueStateIndex = 0;
 
 	// Graphical stuff
@@ -153,9 +153,10 @@ public class Automaton
 	}
 	
 	/**
-	 * Sets the type of this automaton (e.g. AutomatonType.Plant, AutomatonType.Specification).
-	 * @see AutomatonType
-	 */
+     * Sets the type of this automaton (e.g. AutomatonType.PLANT, AutomatonType.SPECIFICATION).
+     * 
+     * @see AutomatonType
+     */
 	public void setType(AutomatonType type)
 		throws IllegalArgumentException
 	{
@@ -174,7 +175,7 @@ public class Automaton
 	{
 		if (type == null)
 		{
-			return AutomatonType.Undefined;
+			return AutomatonType.UNDEFINED;
 		}
 
 		return type;
@@ -182,22 +183,22 @@ public class Automaton
 
 	public boolean isSupervisor()
 	{
-		return type == AutomatonType.Supervisor;
+		return type == AutomatonType.SUPERVISOR;
 	}
 
 	public boolean isSpecification()
 	{
-		return type == AutomatonType.Specification;
+		return type == AutomatonType.SPECIFICATION;
 	}
 
 	public boolean isPlant()
 	{
-		return type == AutomatonType.Plant;
+		return type == AutomatonType.PLANT;
 	}
 
 	public boolean isUndefined()
 	{
-		return type == AutomatonType.Undefined;
+		return type == AutomatonType.UNDEFINED;
 	}
 
 	/**
