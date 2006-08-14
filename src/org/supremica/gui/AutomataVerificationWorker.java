@@ -72,7 +72,6 @@ public class AutomataVerificationWorker
 {
     private static Logger logger = LoggerFactory.createLogger(AutomataVerificationWorker.class);
     
-    // -- MF --      private Supremica workbench = null;
     private IDEReportInterface workbench = null;
     private Automata theAutomata = null;
     //private VisualProjectContainer theVisualProjectContainer = null;
@@ -85,11 +84,6 @@ public class AutomataVerificationWorker
     private ExecutionDialog executionDialog;
     private boolean stopRequested = false;
     private EventQueue eventQueue = new EventQueue();
-    
-    // Make sure these match what's defined in VerificationDialogStandardPanel
-    private static final int MONOLITHIC = 0;
-    private static final int MODULAR = 1;
-    private static final int IDD = 2;
     
     public AutomataVerificationWorker(IDEReportInterface workbench, Automata theAutomata,
         VerificationOptions verificationOptions,
@@ -164,7 +158,7 @@ public class AutomataVerificationWorker
             
             // In language inclusion, not only the currently selected automata are used!
             
-            //theAutomata = workbench.getAllAutomata();
+            //theAutomata = workbench.getAllAutomata(); // They are sent through the options instead
         }
         else
         {

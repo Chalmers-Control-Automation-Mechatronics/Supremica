@@ -348,6 +348,13 @@ public class VerificationDialog
                     "and hence there is no monolithic algoritm.");
                 note.setVisible(true);
             }
+            else if (verificationTypeBox.getSelectedItem() == VerificationType.CONTROLLABILITYNONBLOCKING)
+            {
+                note.setText("Note:\n" + "Verifies both controllability and nonblocking in\n" +
+                    "one run. Currently, Supremica will not distinguish\n" +
+                    "controllability problems from blocking problems");
+                note.setVisible(true);
+            }
             else if (verificationTypeBox.getSelectedItem() == VerificationType.LANGUAGEINCLUSION)
             {
                 note.setText("Note:\n" + "This verifies whether the language of the unselected\n" +
