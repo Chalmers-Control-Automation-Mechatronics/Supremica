@@ -186,8 +186,6 @@ public class PropertiesDialog
     public void doCancel()
     {
         setVisible(false);
-        
-        //dispose();
     }
     
     public void doApply()
@@ -383,8 +381,6 @@ class PropertiesControllerPanel
 {
     private static final long serialVersionUID = 1L;
     private PropertiesDialog theDialog = null;
-    private JButton applyButton = null;
-    private JButton cancelButton = null;
     
     public PropertiesControllerPanel(PropertiesDialog theDialog)
     {
@@ -392,37 +388,58 @@ class PropertiesControllerPanel
         
         Box buttonBox = new Box(BoxLayout.X_AXIS);
         
-        applyButton = new JButton("Apply");
-        applyButton.setToolTipText("Saves the preferences and closes this dialog");
-        cancelButton = new JButton("Cancel");
-        cancelButton.setToolTipText("Cancel the dialog without saving the preferences");
-        
+        Action applyAction = new ApplyChangesAction(theDialog);
+        JButton applyButton = new JButton(applyAction);
+        theDialog.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0),"apply");
+        theDialog.getRootPane().getActionMap().put("apply", applyAction);
         add(applyButton, BorderLayout.CENTER);
+
+        Action cancelAction = new CancelDialogAction(theDialog);
+        JButton cancelButton = new JButton(cancelAction);
+        theDialog.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE,0),"cancel");
+        theDialog.getRootPane().getActionMap().put("cancel", cancelAction);
         add(cancelButton, BorderLayout.CENTER);
+    }
+    
+    private class CancelDialogAction
+        extends AbstractAction
+    {
+        private final JDialog dialog;
         
-        applyButton.addActionListener(new ActionListener()
+        public CancelDialogAction(JDialog dialog)
         {
-            public void actionPerformed(ActionEvent e)
-            {
-                apply_actionPerformed(e);
-            }
-        });
-        cancelButton.addActionListener(new ActionListener()
+            super("Cancel");
+            putValue(SHORT_DESCRIPTION, "Cancel the dialog without saving the preferences");
+            putValue(MNEMONIC_KEY, KeyEvent.VK_C);
+            putValue(ACCELERATOR_KEY, KeyEvent.VK_ESCAPE); // Does not work?
+      
+            this.dialog = dialog;
+        }
+
+        public void actionPerformed(ActionEvent e)
         {
-            public void actionPerformed(ActionEvent e)
-            {
-                cancel_actionPerformed(e);
-            }
-        });
+            dialog.setVisible(false);
+        }
     }
-    
-    public void cancel_actionPerformed(ActionEvent e)
+
+    private class ApplyChangesAction
+        extends AbstractAction
     {
-        theDialog.doCancel();
-    }
-    
-    public void apply_actionPerformed(ActionEvent e)
-    {
-        theDialog.doApply();
+        private final PropertiesDialog dialog;
+        
+        public ApplyChangesAction(PropertiesDialog dialog)
+        {
+            super("Apply");
+            putValue(SHORT_DESCRIPTION, "Saves the preferences and closes this dialog");
+            putValue(MNEMONIC_KEY, KeyEvent.VK_A);
+            putValue(ACCELERATOR_KEY, KeyEvent.VK_ENTER);
+        
+            this.dialog = dialog;
+        }
+
+        public void actionPerformed(ActionEvent e)
+        {
+            theDialog.doApply();
+        }
     }
 }
