@@ -5,7 +5,7 @@ $-
 //# PACKAGE: jni.templates
 //# CLASS:   Template for a plain glue class implementation file
 //###########################################################################
-//# $Id: PlainGlue.cpp,v 1.4 2005-11-07 23:45:47 robi Exp $
+//# $Id: PlainGlue.cpp,v 1.5 2006-08-15 01:43:06 robi Exp $
 //###########################################################################
 
 $+
@@ -144,9 +144,9 @@ $CSPC       $ $ENDFOR$=
 $FOREACH-ARG
 $IF-GLUE
 $IF-ENUM
-  jobject obj_$ARGNAME = $GLUETYPENAME::toJavaObject(arg_$ARGNAME, cache);
+  jobject obj_$ARGNAME$ = $GLUETYPENAME::toJavaObject(arg_$ARGNAME, cache);
 $ELSE
-  jobject obj_$ARGNAME = arg_$ARGNAME->getJavaObject();
+  jobject obj_$ARGNAME$ = arg_$ARGNAME$ ? arg_$ARGNAME->getJavaObject() : 0;
 $ENDIF
 $ENDIF
 $ENDFOR

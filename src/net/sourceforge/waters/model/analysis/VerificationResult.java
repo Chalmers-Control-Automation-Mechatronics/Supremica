@@ -1,35 +1,49 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.analysis
-//# CLASS:   AnalysisResult
+//# CLASS:   VerificationResult
 //###########################################################################
-//# $Id: AnalysisResult.java,v 1.2 2006-08-15 01:43:06 robi Exp $
+//# $Id: VerificationResult.java,v 1.1 2006-08-15 01:43:06 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
 
+import net.sourceforge.waters.model.des.TraceProxy;
 
-public class AnalysisResult
+
+public class VerificationResult extends AnalysisResult
 {
 
   //#########################################################################
   //# Constructors
-  public AnalysisResult(final boolean satisfied)
+  public VerificationResult()
   {
-    mSatisfied = satisfied;
+    this(true, null);
+  }
+
+  public VerificationResult(final TraceProxy counterexample)
+  {
+    this(false, counterexample);
+  }
+
+  public VerificationResult(final boolean satisfied,
+			    final TraceProxy counterexample)
+  {
+    super(satisfied);
+    mCounterExample = counterexample;
   }
 
 
   //#########################################################################
   //# Simple Access Methods
-  public boolean isSatisfied()
+  public TraceProxy getCounterExample()
   {
-    return mSatisfied;
+    return mCounterExample;
   }
 
 
   //#########################################################################
   //# Data Members
-  private final boolean mSatisfied;
+  private final TraceProxy mCounterExample;
 
 }

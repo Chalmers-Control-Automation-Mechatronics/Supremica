@@ -53,11 +53,12 @@
   <property name="waters.classes" location="${classes}/waters"/>
   <property name="waters424.jar" location="${jar}/waters424.jar"/>
 
-  <condition property="native.make" value="echo">
-    <not>
-      <isset property="native.make"/>
-    </not>
-  </condition>
+  <pathconvert property="waters.library.path" targetos="unix">
+    <path>
+      <pathelement path="${java.library.path}"/>
+      <pathelement location="${cpplib}"/>
+    </path>
+  </pathconvert>
 
   <target name="init">
     <tstamp/>
@@ -167,7 +168,8 @@
           description="Create JNI headers.">
     <mkdir dir="${javah.dir}"/>
     <javah outputFile="${javah.file}" classpath="${waters.classes}">
-      <class name="net.sourceforge.waters.model.analysis.ProductDESCopier"/>
+      <class name=
+        "net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker"/>
     </javah>
   </target>
 
@@ -208,7 +210,8 @@
 
   <target name="cpp" depends="javah,jniglue"
           description="Build native library.">
-    <exec executable="${native.make}" dir="${cpp}" failonerror="true"/>
+    <exec executable="${native.make}" dir="${cpp}"
+          failonerror="true" failifexecutionfails="false"/>
   </target>
 
   <target name="waters" depends="waters-jar,cpp"
@@ -239,26 +242,7 @@
     </jar>
   </target>
 
-  <target name="runtest-cpp" depends="test-jar,cpp">
-    <mkdir dir="${logs.results}"/>
-    <junit printsummary="on" fork="true" forkmode="once">
-      <formatter type="xml"/>
-      <test name="net.sourceforge.waters.model.analysis.AnalysisTest"
-            todir="${logs.results}"/>
-      <classpath>
-        <path refid="jaxb.classpath"/>
-        <pathelement location="${jaxb.jar}"/>
-        <pathelement location="${waters.jar}"/>
-        <pathelement location="${test.jar}"/>
-        <pathelement location="${junit.jar}"/>
-      </classpath>
-      <sysproperty key="waters.test.inputdir" value="${examples}"/>
-      <sysproperty key="waters.test.outputdir" value="${logs}"/>
-      <env key="LD_LIBRARY_PATH" path="${cpplib}"/>
-    </junit>
-  </target>
-
-  <target name="runtest-java" depends="test-jar">
+  <target name="runtest" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
     <junit printsummary="on" fork="true" maxmemory="512m">
       <formatter type="xml"/>
@@ -266,7 +250,13 @@
         <fileset dir="${supremica.testsrc}">
           <include name="net/sourceforge/waters/**/*Test.java"/>
           <exclude name="**/Abstract*.java"/>
-          <exclude name="net/sourceforge/waters/model/analysis/**/*"/>
+          <exclude name="net/sourceforge/waters/cpp/**/*"/>
+        </fileset>
+      </batchtest>
+      <batchtest todir="${logs.results}" if="native.make">
+        <fileset dir="${supremica.testsrc}">
+          <include name="net/sourceforge/waters/cpp/**/*Test.java"/>
+          <exclude name="**/Abstract*.java"/>
         </fileset>
       </batchtest>
       <classpath>
@@ -278,16 +268,18 @@
       </classpath>
       <sysproperty key="waters.test.inputdir" value="${examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+      <sysproperty key="java.library.path" value="${waters.library.path}"/>
     </junit>
   </target>
 
-  <target name="test1" depends="test-jar">
+  <target name="runtest1" depends="test-jar,cpp">
     <mkdir dir="${logs.results}"/>
     <junit printsummary="on" fork="true" maxmemory="512m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/analysis/ControllabilityCheckerTest.java"/>
+          <include name="net/sourceforge/waters/cpp/**/*Test.java"/>
+          <exclude name="**/Abstract*.java"/>
         </fileset>
       </batchtest>
       <classpath>
@@ -299,6 +291,7 @@
       </classpath>
       <sysproperty key="waters.test.inputdir" value="${examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+      <sysproperty key="java.library.path" value="${waters.library.path}"/>
     </junit>
   </target>
 
@@ -333,11 +326,11 @@
     </junitreport>
   </target>
 
-  <target name="test-java" depends="runtest-java,test-report"
-          description="Run the Java test cases."/>
+  <target name="test" depends="runtest,test-report"
+          description="Run the test cases."/>
 
-  <target name="test" depends="runtest-java,runtest-cpp,test-report"
-          description="Run the Java and native test cases."/>
+  <target name="test1" depends="runtest1,test-report"
+          description="Run some test cases."/>
 
   <target name="doc" depends="jaxb-generate"
           description="Generate Javadoc documentation.">
