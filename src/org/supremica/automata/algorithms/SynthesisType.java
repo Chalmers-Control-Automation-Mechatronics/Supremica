@@ -53,10 +53,10 @@ import java.util.*;
 
 public enum SynthesisType
 {
-    Controllable("Controllable"),
-    Nonblocking("Nonblocking"),
-    Both("Nonblocking and controllable"),
-    Observable("Nonblocking, controllable and observable");
+    CONTROLLABLE("Controllable"),
+    NONBLOCKING("Nonblocking"),
+    NONBLOCKINGCONTROLLABLE("Nonblocking and controllable"),
+    NONBLOCKINGCONTROLLABLEOBSERVABLE("Nonblocking, controllable and observable");
     
     /** Textual description. */
     private final String description;
@@ -71,13 +71,13 @@ public enum SynthesisType
         return description;
     }
     
-    public static SynthesisType toType(String description)
+    public static SynthesisType fromDescription(String description)
     {
-        for (SynthesisType type: values())
+        for (SynthesisType value: values())
         {
-            if (type.description.equals(description))
+            if (value.description.equals(description))
             {
-                return type;
+                return value;
             }
         }
         return null;

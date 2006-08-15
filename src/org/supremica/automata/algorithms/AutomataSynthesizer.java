@@ -102,7 +102,7 @@ public class AutomataSynthesizer
         this.maximallyPermissive = synthesizerOptions.getMaximallyPermissive();
         
         // Some sanity tests (should already have been tested from ActionMan?)
-        if ((synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Modular) &&
+        if ((synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MODULAR) &&
             !theAutomata.isAllEventsPrioritized())
         {
             throw new IllegalArgumentException("All events are not prioritized!");
@@ -151,9 +151,9 @@ public class AutomataSynthesizer
         }
         else
          */
-        if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Monolithic)
+        if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MONOLITHIC)
         {
-            // Monolithic synthesis, just whack the entire stuff into the monolithic algo
+            // MONOLITHIC synthesis, just whack the entire stuff into the monolithic algo
             MonolithicReturnValue retval = doMonolithic(theAutomata, false);
             
             if (stopRequested)
@@ -163,14 +163,14 @@ public class AutomataSynthesizer
             
             result.addAutomaton(retval.automaton);
         }
-        else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.Modular)
+        else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MODULAR)
         {
             SynthesisType type = synthesizerOptions.getSynthesisType();
             
             // What type of synthesis are we talking about?
-            if (type == SynthesisType.Controllable)
+            if (type == SynthesisType.CONTROLLABLE)
             {
-                // Modular (controllability) synthesis
+                // MODULAR (controllability) synthesis
                 Automata newSupervisors = doModular(theAutomata);
                 
                 if (stopRequested)
@@ -180,15 +180,15 @@ public class AutomataSynthesizer
                 
                 result.addAutomata(newSupervisors);
             }
-            else if ((type == SynthesisType.Nonblocking) ||
-                (type == SynthesisType.Both))
+            else if ((type == SynthesisType.NONBLOCKING) ||
+                (type == SynthesisType.NONBLOCKINGCONTROLLABLE))
             {
                 // Use supervision equivalence minimization!
                 
                 // Prepare for synthesis
                 // Make a copy
                 theAutomata = new Automata(theAutomata);
-                if (type == SynthesisType.Nonblocking)
+                if (type == SynthesisType.NONBLOCKING)
                 {
                     // Only nonblocking? Then everything should be considered controllable!
                     for (Automaton automaton : theAutomata)
@@ -199,9 +199,9 @@ public class AutomataSynthesizer
                         }
                     }
                 }
-                else if (type == SynthesisType.Both)
+                else if (type == SynthesisType.NONBLOCKINGCONTROLLABLE)
                 {
-                    // Nonblocking and controllable. Plantify the specifications and supervisors!
+                    // NONBLOCKING and controllable. Plantify the specifications and supervisors!
                     MinimizationHelper.plantify(theAutomata);
                 }
                 
@@ -227,8 +227,8 @@ public class AutomataSynthesizer
         {
             // BDD synthesis
             SynthesisType type = synthesizerOptions.getSynthesisType();
-            boolean do_c = (type == SynthesisType.Both) | (type == SynthesisType.Controllable);
-            boolean do_nb = (type == SynthesisType.Both) | (type == SynthesisType.Nonblocking);
+            boolean do_c = (type == SynthesisType.NONBLOCKINGCONTROLLABLE) | (type == SynthesisType.CONTROLLABLE);
+            boolean do_nb = (type == SynthesisType.NONBLOCKINGCONTROLLABLE) | (type == SynthesisType.NONBLOCKING);
             
             Automata newAutomata = new Automata(theAutomata);
             
@@ -486,8 +486,8 @@ public class AutomataSynthesizer
                 "can be used to supervise the system.");
         }
         
-        // Nonblocking synthesis is not implemented...
-        if ((synthesizerOptions.getSynthesisType() == SynthesisType.Nonblocking) || (synthesizerOptions.getSynthesisType() == SynthesisType.Both))
+        // NONBLOCKING synthesis is not implemented...
+        if ((synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKING) || (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKINGCONTROLLABLE))
         {
             logger.warn("Currently global nonblocking is NOT guaranteed. The only guarantee " +
                 "is that each supervisor is individually nonblocking with respect to the " +
@@ -531,7 +531,7 @@ public class AutomataSynthesizer
         // permissive supervisor. See Introduction to Discrete Event
         // Systems, Cassandras, Lafortune for a discussion about this
         // problem.
-        if (synthesizerOptions.getSynthesisType() == SynthesisType.Observable)
+        if (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKINGCONTROLLABLEOBSERVABLE)
         {
             Alphabet unionAlphabet = AlphabetHelpers.getUnionAlphabet(automata);
             Alphabet problemEvents = new Alphabet();
@@ -595,7 +595,7 @@ public class AutomataSynthesizer
         
         // We must keep track of all events that we have disabled
         // This is used when checking for observability
-        if (synthesizerOptions.getSynthesisType() == SynthesisType.Observable)
+        if (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKINGCONTROLLABLEOBSERVABLE)
         {
             synchronizationOptions.setRememberDisabledEvents(true);
         }
@@ -614,14 +614,14 @@ public class AutomataSynthesizer
         retval.automaton = syncher.getAutomaton();
         retval.didSomething |= !syncher.getHelper().getAutomataIsControllable();
         
-        if (synthesizerOptions.getSynthesisType() == SynthesisType.Observable)
+        if (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKINGCONTROLLABLEOBSERVABLE)
         {
             // Reset the synchronization type
             synchronizationOptions.setRememberDisabledEvents(orgRememberDisabledEvents);
         }
         
         // We need to synthesize even if the result above is controllable
-        // Nonblocking may ruin controllability
+        // NONBLOCKING may ruin controllability
         // ARASH: choose between triple and the single fixpoint algorithms:
         AutomatonSynthesizer synthesizer = singleFixpoint
             ? new AutomatonSynthesizerSingleFixpoint(retval.automaton, synthesizerOptions)

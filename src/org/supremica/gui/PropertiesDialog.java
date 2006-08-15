@@ -95,10 +95,18 @@ public class PropertiesDialog
         controlPanel = new PropertiesControllerPanel(this);
         dialogPanel.add(controlPanel, BorderLayout.SOUTH);
         
+        // For all types of properties
         for (PropertyType type: PropertyType.values())
         {
             JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
             
+            /*
+            JPanel panel = new JPanel();
+            BoxLayout layout = new BoxLayout(panel, BoxLayout.PAGE_AXIS);
+            panel.setLayout(layout);
+            */
+
+            // Find all properties of this type and add to the panel
             Iterator<Property> it = Property.iterator();
             for (Property property = it.next(); it.hasNext(); property = it.next())
             {
@@ -126,7 +134,7 @@ public class PropertiesDialog
                         chooser.setEnabled(!property.isImmutable());
                         chooserList.add(chooser);
                         panel.add(chooser);
-                    }    
+                    }
                 }
             }
             
@@ -135,10 +143,15 @@ public class PropertiesDialog
             pane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
             pane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED); 
             */
-            tabbedPane.add(type.toString(), panel);
+            
+            // Add panel to tabbed pane (only add nonempty panels)
+            if (panel.getComponentCount() > 0)
+            {
+                tabbedPane.add(type.toString(), panel);
+            }
         }
         
-        setSize(600, 400);
+        setSize(700, 500);
         //pack();
         
         // Center the window
@@ -259,7 +272,8 @@ public class PropertiesDialog
         
         public void setInConfig()
         {
-            property.set(isSelected());
+            if (!property.isImmutable())
+                property.set(isSelected());
         }
         
         public void getFromConfig()
@@ -284,7 +298,8 @@ public class PropertiesDialog
             super();
             JLabel label = new JLabel(property.getComment());
             this.add(label);
-            text = new JTextField(6);
+            text = new JTextField();
+            text.setColumns(Math.max((property.get()+"").length()+1,5));
             this.add(text);
 
             this.property = property;
@@ -292,14 +307,15 @@ public class PropertiesDialog
         
         public void setInConfig()
         {
-            try
-            {
-                property.set(Integer.parseInt(text.getText()));
-            }
-            catch (NumberFormatException ex)
-            {
-                // Error in number format, ignore this result without error message!
-            }
+            if (!property.isImmutable())
+                try
+                {
+                    property.set(Integer.parseInt(text.getText()));
+                }
+                catch (NumberFormatException ex)
+                {
+                    // Error in number format, ignore this result without error message!
+                }
         }
         
         public void getFromConfig()
@@ -319,8 +335,8 @@ public class PropertiesDialog
     {
         private final StringProperty property;
         
-        JTextField text = null;
-        JComboBox selector = null;
+        private JTextField text = null;
+        private JComboBox selector = null;
                 
         StringChooser(StringProperty property)
         {
@@ -331,6 +347,7 @@ public class PropertiesDialog
             if (property.legalValues() == null)
             {
                 text = new JTextField();
+                text.setColumns(Math.max(property.get().length()+1,5));
                 this.add(text);
             }
             else
@@ -344,10 +361,11 @@ public class PropertiesDialog
         
         public void setInConfig()
         {
-            if (text != null)
-                property.set(text.getText());
-            else
-                property.set(selector.getSelectedItem().toString());
+            if (!property.isImmutable())
+                if (text != null)
+                    property.set(text.getText());
+                else
+                    property.set(selector.getSelectedItem().toString());
         }
         
         public void getFromConfig()

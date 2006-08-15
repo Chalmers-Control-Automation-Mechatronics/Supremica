@@ -1,6 +1,7 @@
 package org.supremica.util.BDD;
 
 import java.util.*;
+import org.supremica.properties.Config;
 
 // XXX: sythesis code NOT tested after we added these variables:
 //        s_cube, sp_cube, e_cube, perm_s2sp, perm_sp2s;
@@ -148,7 +149,7 @@ public class Supervisor
 		StringBuffer sb = new StringBuffer();
 
 		sb.append(" ");
-		sb.append(Options.REACH_ALGO_NAMES[Options.algo_family]);
+		sb.append(Config.BDD_ALGORITHM.get());
 		sb.append(": ");
 
 		// frontier set

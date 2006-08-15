@@ -53,11 +53,11 @@ import java.util.*;
 
 public enum SynthesisAlgorithm
 {
-    Monolithic("Monolithic", false),
-    Modular("Modular"),
-    Compositional("Compositional"),
+    MONOLITHIC("Monolithic", false),
+    MODULAR("Modular"),
+    COMPOSITIONAL("Compositional"),
     //IDD("IDD"),
-    //MonolithicSingleFixpoint("Monolithic (single fixpoint)", false),    // works, but is very slow [due to lame implementation :s ]
+    //MonolithicSingleFixpoint("MONOLITHIC (single fixpoint)", false),    // works, but is very slow [due to lame implementation :s ]
     BDD("BDD");    // works, but we cant handle the results yet
     
     /** Textual description. */
@@ -86,13 +86,13 @@ public enum SynthesisAlgorithm
         return preferModular;
     }
     
-    public static SynthesisAlgorithm toAlgorithm(String description)
+    public static SynthesisAlgorithm fromDescription(String description)
     {
-        for (SynthesisAlgorithm algo: values())
+        for (SynthesisAlgorithm value: values())
         {
-            if (algo.description.equals(description))
+            if (value.description.equals(description))
             {
-                return algo;
+                return value;
             }
         }
         return null;

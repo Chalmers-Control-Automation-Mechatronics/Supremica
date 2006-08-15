@@ -186,19 +186,12 @@ public class VerificationDialog
         
         //private JTextArea note;// = new JTextArea("Bananas...");
         //final String[] verificationData = { "Controllability",  // keep them in this order, for God's sake!
-        //   "nonblocking",        // No! God has nothing to do with programming!!
-        //   "Language inclusion"};// Programming is fate-driven!
+        //   "nonblocking",         // No! God has nothing to do with programming!!
+        //   "Language inclusion"}; // Programming is fate-driven!
         
         public VerificationDialogStandardPanel()
         {
-            verificationTypeBox = new JComboBox();
-            for (VerificationType type: VerificationType.values())
-            {
-                if (type.isEnabled())
-                {
-                    verificationTypeBox.addItem(type);
-                }
-            }
+            verificationTypeBox = new JComboBox(VerificationType.values());
             verificationTypeBox.addActionListener(this);
             
             algorithmSelector = new JComboBox();

@@ -57,26 +57,18 @@ import java.util.*;
 public enum VerificationType
 {
     CONTROLLABILITY("Controllability"),
-    INVERSECONTROLLABILITY("Inverse Controllability"),
+    INVERSECONTROLLABILITY("Inverse controllability"),
     NONBLOCKING("Nonblocking"),
     CONTROLLABILITYNONBLOCKING("Controllability and nonblocking"),
-    MUTUALLYNONBLOCKING("Mutual Nonblocking", false),
-    LANGUAGEINCLUSION("Language Inclusion");
+    MUTUALLYNONBLOCKING("Mutual nonblocking"),
+    LANGUAGEINCLUSION("Language inclusion");
     
     /** Textual description. */
     private final String description;
-    /** If false, this instance is not included in dialogs. */
-    private final boolean enabled;
     
     private VerificationType(String description)
     {
-        this(description, true);
-    }
-    
-    private VerificationType(String description, boolean enabled)
-    {
         this.description = description;
-        this.enabled = enabled;
     }
     
     public String toString()
@@ -84,18 +76,13 @@ public enum VerificationType
         return description;
     }
     
-    public boolean isEnabled()
+    public static VerificationType fromDescription(String description)
     {
-        return enabled;
-    }
-    
-    public static VerificationType toType(String description)
-    {
-        for (VerificationType type: values())
+        for (VerificationType value: values())
         {
-            if (type.description.equals(description))
+            if (value.description.equals(description))
             {
-                return type;
+                return value;
             }
         }
         return null;

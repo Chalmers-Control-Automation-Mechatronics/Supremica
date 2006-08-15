@@ -57,28 +57,11 @@ import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
 import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
 import org.supremica.util.BDD.Options;
 
+/**
+ * Configurable options. All of these are automatically added to a GUI for editing.
+ */
 public final class Config
 {
-    // Boolean:
-    //
-    // BooleanProperty(PropertyType type, String key, boolean value, String comment)
-    // BooleanProperty(PropertyType type, String key, boolean value, String comment, boolean immutable)
-    //
-    // Integer:
-    //
-    // IntegerProperty(PropertyType type, String key, int value, String comment)
-    // IntegerProperty(PropertyType type, String key, int value, String comment, boolean immutable)
-    // IntegerProperty(PropertyType type, String key, int value, String comment, boolean immutable, int min)
-    // IntegerProperty(PropertyType type, String key, int value, String comment, boolean immutable, int min, int max)
-    //
-    // String:
-    //
-    // StringProperty(PropertyType type, String key, String value, String comment)
-    // StringProperty(PropertyType type, String key, String value, String comment, boolean immutable)
-    // StringProperty(PropertyType type, String key, String value, String comment, boolean immutable, String[] legalValues)
-    // StringProperty(PropertyType type, String key, String value, String comment, boolean immutable, String[] legalValues, boolean ignoreCase)
-    
-    
     // Valid PropertyTypes:
     //   GENERAL
     //   GENERAL_LOG
@@ -98,8 +81,7 @@ public final class Config
     //   ALGORITHMS_MINIMIZATION
     //   ALGORITHMS_BDD
     //   ALGORITHMS_HMI
-    //   MISC
-    
+    //   MISC    
     
     // GENERAL_COMM_XMLRPC
     public static final BooleanProperty XML_RPC_ACTIVE = new BooleanProperty(PropertyType.GENERAL_COMM_XMLRPC, "xmlRpcActive", false, "XML-RPC Active");
@@ -123,14 +105,16 @@ public final class Config
     // GENERAL
     /**
      * Possible values for look and feel
+     * System : All platforms
      * Metal : All platforms
      * javax.swing.plaf.metal.MetalLookAndFeel : All platforms
      * com.sun.java.swing.plaf.windows.WindowsLookAndFeel : Windows only
      * com.sun.java.swing.plaf.motif.MotifLookAndFeel : All platforms
      * javax.swing.plaf.mac.MacLookAndFeel : Mac only
-     * System : All platforms
      */
-    public static final StringProperty GENERAL_LOOKANDFEEL  = new StringProperty(PropertyType.GENERAL, "generalLookAndFeel", "System", "Look and feel");
+    private static final String[] LOOKANDFEEL_LEGALVALUES= {"System", "Metal", "javax.swing.plaf.metal.MetalLookAndFeel",
+    "com.sun.java.swing.plaf.windows.WindowsLookAndFeel", "com.sun.java.swing.plaf.motif.MotifLookAndFeel", "javax.swing.plaf.mac.MacLookAndFeel"};
+    public static final StringProperty GENERAL_LOOKANDFEEL  = new StringProperty(PropertyType.GENERAL, "generalLookAndFeel", "System", "Look and feel (needs restart)", LOOKANDFEEL_LEGALVALUES);
     public static final StringProperty GENERAL_STATE_SEPARATOR  = new StringProperty(PropertyType.GENERAL, "generalStateSeparator", ".", "State separator character");
     public static final StringProperty GENERAL_STATELABEL_SEPARATOR  = new StringProperty(PropertyType.GENERAL, "generalStateLabelSeparator", ",", "State label separator character");
     public static final StringProperty GENERAL_SILENT_EVENT_NAME  = new StringProperty(PropertyType.GENERAL, "generalSilentEventName", "tau", "Silent event name");
@@ -194,8 +178,8 @@ public final class Config
     public static final BooleanProperty VERIFY_SHOW_BAD_TRACE = new BooleanProperty(PropertyType.ALGORITHMS_VERIFICATION, "showBadTrace", false, "Show bad trace");
     
     // ALGORITHMS_SYNTHESIS
-    public static final StringProperty SYNTHESIS_SYNTHESIS_TYPE = new StringProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisSynthesisType", SynthesisType.Both, "Default synthesis type", SynthesisType.values());
-    public static final StringProperty SYNTHESIS_ALGORITHM_TYPE  = new StringProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisAlgorithmType", SynthesisAlgorithm.Monolithic, "Default synthesis algorithm", SynthesisAlgorithm.values());
+    public static final StringProperty SYNTHESIS_SYNTHESIS_TYPE = new StringProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisSynthesisType", SynthesisType.NONBLOCKINGCONTROLLABLE, "Default synthesis type", SynthesisType.values());
+    public static final StringProperty SYNTHESIS_ALGORITHM_TYPE  = new StringProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisAlgorithmType", SynthesisAlgorithm.MONOLITHIC, "Default synthesis algorithm", SynthesisAlgorithm.values());
     public static final BooleanProperty SYNTHESIS_PURGE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisPurge", false, "Remove forbidden states after synthesis");
     public static final BooleanProperty SYNTHESIS_OPTIMIZE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisOptimize", false, "Try to remove supervisors that are not necessary");
     public static final BooleanProperty SYNTHESIS_MAXIMALLY_PERMISSIVE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisMaximallyPermissive", true, "Synthesize a maximally permissive supervisor");
@@ -211,6 +195,7 @@ public final class Config
     public static final StringProperty MINIMIZATION_HEURISTIC = new StringProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationHeuristic", MinimizationHeuristic.MostLocal.toString(), "Minimization heuristics", MinimizationHeuristic.values());
     
     // ALGORITHMS_BDD
+    // Most of the IntegerProperty:s here should be StringProperty:s with apropriate legal values...
     public static final IntegerProperty BDD_ALGORITHM = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddAlgorithm", Options.algo_family, "Algorithm");
     public static final IntegerProperty BDD_SHOW_GROW = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddShowGrowth", Options.show_grow, "Show growth");
     public static final BooleanProperty BDD_SIZE_WATCH = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddSizeWatch", Options.size_watch, "Size watch");
@@ -220,7 +205,7 @@ public final class Config
     public static final BooleanProperty BDD_NB_OPTIMISTIC = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddNBOptimistic", Options.nb_optimistic, "nb optimistic");
     public static final BooleanProperty BDD_LOCAL_SATURATION = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddLocalSaturation", Options.local_saturation, "Local saturation");
     public static final BooleanProperty BDD_TRACE_ON = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddTraceOn", Options.trace_on, "Trace on");
-    public static final BooleanProperty BDD_PROFILE_ON = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddProfileOn", Options.profile_on, "Profile on");
+    public static final BooleanProperty BDD_PROFILE_ON = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddProfileOn", Options.profile_on, "Profiling");
     public static final IntegerProperty BDD_COUNT_ALGO = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddCountAlgorithm", Options.count_algo, "Count algorithm");
     public static final IntegerProperty BDD_LI_ALGO = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddLanguageInclusionAlgorithm", Options.inclsuion_algorithm, "Inclusion algorithm");
     public static final IntegerProperty BDD_ORDER_ALGO = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddAutomataOrderingAlgorithm", Options.ordering_algorithm, "Automata ordering algorithm");
@@ -230,6 +215,7 @@ public final class Config
     public static final IntegerProperty BDD_H1 = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddH1", Options.es_heuristics, "ES Heuristics");
     public static final IntegerProperty BDD_H2 = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddH2", Options.ndas_heuristics, "NDAS Heuristics");
     public static final IntegerProperty BDD_DSSI_HEURISTIC = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddDelayedStarSelection", Options.dssi_heuristics, "DSSI heuristics");
+    // This really is an IntegerProperty
     public static final IntegerProperty BDD_PARTITION_MAX = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddMaxPartitionSize", Options.max_partition_size, "Max Partition Size");
     public static final IntegerProperty BDD_ENCODING_ALGO = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddStateEncodingAlgorithm", Options.encoding_algorithm, "Encoding algorithm");
     public static final StringProperty BDD_LIB_PATH  = new StringProperty(PropertyType.ALGORITHMS_BDD, "bddLibPath", Options.extraLibPath, "Extra Library path");

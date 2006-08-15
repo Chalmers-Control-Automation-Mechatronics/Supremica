@@ -163,11 +163,13 @@ public class AutomataVerifier
             verificationOptions.setAlgorithmType(VerificationAlgorithm.MONOLITHIC);
         }
         
+        /*
         // Check IDD
         if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
         {
             return "The IDD Algorithm is not fully implemented yet.";
         }
+        */
         
         // Check Controllability
         if (verificationOptions.getVerificationType() == VerificationType.CONTROLLABILITY)

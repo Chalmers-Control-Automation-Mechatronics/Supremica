@@ -118,7 +118,7 @@ public final class MinimizationOptions
 	 */
 	public MinimizationOptions()
 	{
-		this(EquivalenceRelation.toType(Config.MINIMIZATION_EQUIVALENCE_RELATION.get()),
+		this(EquivalenceRelation.fromDescription(Config.MINIMIZATION_EQUIVALENCE_RELATION.get()),
 			 Config.MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS.get(),
 			 Config.MINIMIZATION_KEEP_ORIGINAL.get(),
 			 Config.MINIMIZATION_IGNORE_MARKING.get(),

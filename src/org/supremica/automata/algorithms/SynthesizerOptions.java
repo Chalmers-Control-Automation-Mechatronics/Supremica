@@ -71,7 +71,7 @@ public final class SynthesizerOptions
      */
     public SynthesizerOptions()
     {
-        this(SynthesisType.toType(Config.SYNTHESIS_SYNTHESIS_TYPE.get()), SynthesisAlgorithm.toAlgorithm(Config.SYNTHESIS_ALGORITHM_TYPE.get()), Config.SYNTHESIS_PURGE.get(), Config.SYNTHESIS_OPTIMIZE.get(), Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.get(), Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.get(), Config.SYNTHESIS_REDUCE_SUPERVISORS.get());
+        this(SynthesisType.fromDescription(Config.SYNTHESIS_SYNTHESIS_TYPE.get()), SynthesisAlgorithm.fromDescription(Config.SYNTHESIS_ALGORITHM_TYPE.get()), Config.SYNTHESIS_PURGE.get(), Config.SYNTHESIS_OPTIMIZE.get(), Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.get(), Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.get(), Config.SYNTHESIS_REDUCE_SUPERVISORS.get());
     }
     
     /**
@@ -112,9 +112,9 @@ public final class SynthesizerOptions
         
         if (synthesisAlgorithm == SynthesisAlgorithm.BDD)
         {
-            if ((synthesisType != SynthesisType.Both) &&
-                (synthesisType != SynthesisType.Controllable) &&
-                (synthesisType != SynthesisType.Nonblocking))
+            if ((synthesisType != SynthesisType.NONBLOCKINGCONTROLLABLE) &&
+                (synthesisType != SynthesisType.CONTROLLABLE) &&
+                (synthesisType != SynthesisType.NONBLOCKING))
             {
                 return("BDD algorithms currently only support supNB+C synthesis.");
             }
@@ -232,7 +232,7 @@ public final class SynthesizerOptions
      */
     public static SynthesizerOptions getDefaultSynthesizerOptions()
     {
-        return new SynthesizerOptions(SynthesisType.Both, SynthesisAlgorithm.Modular, true, true, true, true, true);
+        return new SynthesizerOptions(SynthesisType.NONBLOCKINGCONTROLLABLE, SynthesisAlgorithm.MODULAR, true, true, true, true, true);
     }
     
     /**
@@ -241,7 +241,7 @@ public final class SynthesizerOptions
     public static SynthesizerOptions getDefaultMonolithicCNBSynthesizerOptions()
     {
         SynthesizerOptions options = getDefaultSynthesizerOptions();
-        options.synthesisAlgorithm = SynthesisAlgorithm.Monolithic;
+        options.synthesisAlgorithm = SynthesisAlgorithm.MONOLITHIC;
         options.optimize = false;
         options.reduceSupervisors = false;
         

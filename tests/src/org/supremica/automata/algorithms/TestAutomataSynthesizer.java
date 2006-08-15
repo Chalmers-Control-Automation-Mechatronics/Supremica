@@ -100,8 +100,8 @@ public class TestAutomataSynthesizer
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.AGV));
 			assertTrue(theProject.nbrOfAutomata() == 17);
 			SynthesizerOptions syntOptions = new SynthesizerOptions();
-			syntOptions.setSynthesisType(SynthesisType.Controllable);
-			syntOptions.setSynthesisAlgorithm(SynthesisAlgorithm.Modular);
+			syntOptions.setSynthesisType(SynthesisType.CONTROLLABLE);
+			syntOptions.setSynthesisAlgorithm(SynthesisAlgorithm.MODULAR);
 			syntOptions.setPurge(true);
 			syntOptions.setMaximallyPermissive(true);
 

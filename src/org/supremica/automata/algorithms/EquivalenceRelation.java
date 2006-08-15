@@ -79,32 +79,33 @@ public enum EquivalenceRelation
         return description;
     }
     
-    public static EquivalenceRelation toType(String description)
+    public static EquivalenceRelation fromDescription(String description)
     {
-        for (EquivalenceRelation relation: values())
+        for (EquivalenceRelation value: values())
         {
-            if (relation.description.equals(description))
+            if (value.description.equals(description))
             {
-                return relation;
+                return value;
             }
         }
         return null;
     }
      
-    /* // Would like to override values()...
+    /*
+    // Would like to override values()...
     public static EquivalenceRelation[] enabledValues()
     {
         int enabledCount = 0;
-        for (EquivalenceRelation rel: values())
+        for (EquivalenceRelation value: values())
         {
-            if (rel.isEnabled())
+            if (value.isEnabled())
                 enabledCount++;
         }
         EquivalenceRelation[] relations = new EquivalenceRelation[enabledCount];
         int i = 0;
-        for (EquivalenceRelation rel: values())
+        for (EquivalenceRelation value: values())
         {
-            if (rel.isEnabled())
+            if (value.isEnabled())
                 relations[i++] = rel;
         }
         return relations;

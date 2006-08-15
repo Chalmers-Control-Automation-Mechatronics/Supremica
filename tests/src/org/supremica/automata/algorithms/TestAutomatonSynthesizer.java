@@ -110,7 +110,7 @@ public class TestAutomatonSynthesizer
 			Automaton theAutomaton1 = new Automaton(theAutomaton);
 
 			SynthesizerOptions synthOptions = new SynthesizerOptions();
-			synthOptions.setSynthesisType(SynthesisType.Controllable);
+			synthOptions.setSynthesisType(SynthesisType.CONTROLLABLE);
 
 			AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton, synthOptions);
 			synthesizer.synthesize();

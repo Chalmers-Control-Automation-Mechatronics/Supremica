@@ -439,8 +439,8 @@ public class Milp
 			if (toBeSynthesized.size() > 1)
 			{
 				SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
-				synthesizerOptions.setSynthesisType(SynthesisType.Both);
-				synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.Monolithic);
+				synthesizerOptions.setSynthesisType(SynthesisType.NONBLOCKINGCONTROLLABLE);
+				synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.MONOLITHIC);
 				synthesizerOptions.setPurge(true);
 				synthesizerOptions.setMaximallyPermissive(true);
 				synthesizerOptions.setMaximallyPermissiveIncremental(true);

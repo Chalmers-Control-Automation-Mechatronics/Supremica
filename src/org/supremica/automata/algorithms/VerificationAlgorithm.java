@@ -59,8 +59,8 @@ public enum VerificationAlgorithm
     MONOLITHIC("Monolithic"),
     MODULAR("Modular"),
     COMPOSITIONAL("Compositional"),
-    BDD("BDD"),
-    IDD("IDD");
+    BDD("BDD");
+    //IDD("IDD");
     
     /** Textual description. */
     private final String description;
@@ -74,14 +74,14 @@ public enum VerificationAlgorithm
     {
         return description;
     }
-    
-    public static VerificationAlgorithm toAlgorithm(String description)
+
+    public static VerificationAlgorithm fromDescription(String description)
     {
-        for (VerificationAlgorithm algo: values())
+        for (VerificationAlgorithm value: values())
         {
-            if (algo.description.equals(description))
+            if (value.description.equals(description))
             {
-                return algo;
+                return value;
             }
         }
         return null;

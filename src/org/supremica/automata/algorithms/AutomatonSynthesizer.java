@@ -87,19 +87,19 @@ public class AutomatonSynthesizer
         theAutomaton.beginTransaction();
         SynthesisType synthesisType = synthesizerOptions.getSynthesisType();
         boolean didSomething = false;    // records whether we actually did anything
-        if (synthesisType == SynthesisType.Controllable)
+        if (synthesisType == SynthesisType.CONTROLLABLE)
         {
             didSomething = synthesizeControllable();
         }
-        else if (synthesisType == SynthesisType.Nonblocking)
+        else if (synthesisType == SynthesisType.NONBLOCKING)
         {
             didSomething = synthesizeNonblocking();
         }
-        else if (synthesisType == SynthesisType.Both)
+        else if (synthesisType == SynthesisType.NONBLOCKINGCONTROLLABLE)
         {
             didSomething = synthesizeControllableNonblocking();
         }
-        else if (synthesisType == SynthesisType.Observable)
+        else if (synthesisType == SynthesisType.NONBLOCKINGCONTROLLABLEOBSERVABLE)
         {
             didSomething = synthesizeControllableNonblockingObservable();
         }

@@ -257,7 +257,7 @@ class SynthesizerDialogStandardPanel
         optimizeBox.setVisible(true); //X
         nbNote.setVisible(false);
         
-        if (algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.Monolithic)
+        if (algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.MONOLITHIC)
         {
             optimizeBox.setVisible(false); //X
         }
@@ -267,10 +267,10 @@ class SynthesizerDialogStandardPanel
             optimizeBox.setVisible(false); //X
         }
         */
-        else if (algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.Modular)
+        else if (algorithmTypeBox.getAlgorithm() == SynthesisAlgorithm.MODULAR)
         {
-            if ((synthesisTypeBox.getType() == SynthesisType.Nonblocking) ||
-                (synthesisTypeBox.getType() == SynthesisType.Both))
+            if ((synthesisTypeBox.getType() == SynthesisType.NONBLOCKING) ||
+                (synthesisTypeBox.getType() == SynthesisType.NONBLOCKINGCONTROLLABLE))
             {
                 purgeBox.setVisible(false); //X
                 optimizeBox.setVisible(false); //X
