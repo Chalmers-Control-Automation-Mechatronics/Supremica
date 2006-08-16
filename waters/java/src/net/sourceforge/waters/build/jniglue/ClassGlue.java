@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   ClassGlue
 //###########################################################################
-//# $Id: ClassGlue.java,v 1.4 2005-11-05 09:47:15 robi Exp $
+//# $Id: ClassGlue.java,v 1.5 2006-08-16 02:56:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -134,6 +134,10 @@ abstract class ClassGlue implements Comparable, FileWritableGlue {
   boolean addMethod(final MethodGlue method, final ErrorReporter reporter)
   {
     final boolean added = mMethods.add(method);
+    if (!added) {
+      System.err.println("NOT added : " + method.getMethodName());
+      System.err.println("? " + mMethods.contains(method));
+    }
     if (added && mJavaClass != null) {
       method.verify(mJavaClass, reporter);
     }

@@ -4,7 +4,7 @@
 //# PACKAGE: jni.javah
 //# CLASS:   ClassCache
 //###########################################################################
-//# $Id: ClassCache.h,v 1.2 2005-11-07 23:45:47 robi Exp $
+//# $Id: ClassCache.h,v 1.3 2006-08-16 02:56:42 robi Exp $
 //###########################################################################
 
 
@@ -51,7 +51,7 @@ public:
   //# Hash Methods
   virtual waters::uint32 hash(const void* key) const;
   virtual bool equals(const void* key1, const void* key2) const;
-  virtual void* getKey(const void* value) const
+  virtual const void* getKey(const void* value) const
     {return ((ClassGlue*) value)->getJavaClass();};
   virtual void* getDefaultValue() const {return 0;};  
 

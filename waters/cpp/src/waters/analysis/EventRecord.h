@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   EventRecord
 //###########################################################################
-//# $Id: EventRecord.h,v 1.1 2006-08-15 03:08:53 robi Exp $
+//# $Id: EventRecord.h,v 1.2 2006-08-16 02:56:42 robi Exp $
 //###########################################################################
 
 
@@ -29,7 +29,29 @@ namespace jni {
 
 namespace waters {
 
+class HashAccessor;
 class TransitionRecord;
+
+
+//###########################################################################
+//# Class EventRecordHashAccessor
+//###########################################################################
+
+class EventRecordHashAccessor : public HashAccessor
+{
+public:
+  //##########################################################################
+  //# Constructors & Destructors
+  explicit EventRecordHashAccessor() {};
+
+  //##########################################################################
+  //# Hash Methods
+  virtual uint32 hash(const void* key) const;
+  virtual bool equals(const void* key1, const void* key2) const;
+  virtual const void* getKey(const void* value) const;
+  virtual void* getDefaultValue() const {return 0;}  
+};
+
 
 
 //############################################################################
@@ -41,15 +63,19 @@ class EventRecord
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit EventRecord(const jni::EventGlue& event, jni::ClassCache* cache);
+  explicit EventRecord(jni::EventGlue event,
+		       bool controllable,
+		       jni::ClassCache* cache);
+
+  //##########################################################################
+  //# Simple Access
+  bool isControllable() const {return mIsControllable;}
+  const jni::EventGlue& getJavaEvent() const {return mJavaEvent;}
 
 private:
   //##########################################################################
-  //# Auxiliary Methods
-
-  //##########################################################################
   //# Data Members
-  const jni::EventGlue& mJavaEvent;
+  jni::EventGlue mJavaEvent;
   bool mIsControllable;
   TransitionRecord* mTransitionRecords;
 };

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   HashTable
 //###########################################################################
-//# $Id: HashTable.h,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: HashTable.h,v 1.2 2006-08-16 02:56:42 robi Exp $
 //###########################################################################
 
 
@@ -49,7 +49,7 @@ public:
 
   //##########################################################################
   //# Iteration
-  void step();
+  void skip();
 
 private:
   //##########################################################################
@@ -79,8 +79,9 @@ public:
 
   //##########################################################################
   //# Iteration
+  int size() const {return mNumElements;}
   HashTableIterator iterator() const;
-  bool hasNext(const HashTableIterator& iter) const;
+  bool hasNext(HashTableIterator& iter) const;
   void* untypedNext(HashTableIterator& iter) const;
 
 private:
@@ -88,7 +89,8 @@ private:
   //# Auxiliary Methods
   bool isfound(const void* key, void* value) const;
   void* found(const void* key, void* value) const;
-  void advance(HashTableIterator& iter) const;
+  void* advance(HashTableIterator& iter) const;
+  void skip(HashTableIterator& iter) const;
   HashOverflowBucket* newBucket();
   HashOverflowPair* newSlot();
   void recycle(HashOverflowBucket* bucket);

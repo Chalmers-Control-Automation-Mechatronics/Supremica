@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   ControllabilityChecker
 //###########################################################################
-//# $Id: ControllabilityChecker.h,v 1.1 2006-08-15 03:08:53 robi Exp $
+//# $Id: ControllabilityChecker.h,v 1.2 2006-08-16 02:56:42 robi Exp $
 //###########################################################################
 
 
@@ -41,9 +41,9 @@ class ControllabilityChecker
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit ControllabilityChecker(const jni::ProductDESGlue& des,
+  explicit ControllabilityChecker(jni::ProductDESGlue des,
 				  jni::ClassCache* cache);
-  ~ControllabilityChecker();
+  virtual ~ControllabilityChecker();
 
 private:
   //##########################################################################

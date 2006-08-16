@@ -5,7 +5,7 @@ $-
 //# PACKAGE: jni.templates
 //# CLASS:   Template for a plain glue class implementation file
 //###########################################################################
-//# $Id: PlainGlue.cpp,v 1.5 2006-08-15 01:43:06 robi Exp $
+//# $Id: PlainGlue.cpp,v 1.6 2006-08-16 02:56:42 robi Exp $
 //###########################################################################
 
 $+
@@ -55,7 +55,7 @@ toEnum(jobject javaobject, ClassCache* cache)
 {
   ClassGlue* cls = cache->getClass(CLASS_$CLASSNAME);
   JNIEnv* env = cls->getEnvironment();
-  jmethodID mid = cls->getMethodID(METHOD_Object_equals);
+  jmethodID mid = cls->getMethodID(METHOD_Object_equals_0);
   for (waters::uint32 fieldcode = 0; fieldcode < $NUMFIELDS; fieldcode++) {
     jobject item = cls->getStaticFinalField(fieldcode);
     jboolean eq = env->CallBooleanMethod(javaobject, mid, item);

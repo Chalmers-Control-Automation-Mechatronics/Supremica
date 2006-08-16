@@ -4,9 +4,12 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   EventRecord
 //###########################################################################
-//# $Id: EventRecord.cpp,v 1.1 2006-08-15 03:08:53 robi Exp $
+//# $Id: EventRecord.cpp,v 1.2 2006-08-16 02:56:42 robi Exp $
 //###########################################################################
 
+#ifdef __GNUG__
+#pragma implementation
+#endif
 
 #include <new>
 
@@ -21,6 +24,41 @@
 namespace waters {
 
 //############################################################################
+//# class EventRecordHashAccessor
+//############################################################################
+
+//############################################################################
+//# EventRecordHashAccessor: Hash Methods
+
+uint32 EventRecordHashAccessor::
+hash(const void* key)
+  const
+{
+  const jni::EventGlue* event = (const jni::EventGlue*) key;
+  return (uint32) event->hashCode();
+}
+
+
+bool EventRecordHashAccessor::
+equals(const void* key1, const void* key2)
+  const
+{
+  const jni::EventGlue* event1 = (const jni::EventGlue*) key1;
+  const jni::EventGlue* event2 = (const jni::EventGlue*) key2;
+  return event1->equals(event2);
+}
+
+
+const void* EventRecordHashAccessor::
+getKey(const void* value)
+  const
+{
+  const EventRecord* record = (const EventRecord*) value;
+  return &record->getJavaEvent();
+}
+
+
+//############################################################################
 //# class EventRecord
 //############################################################################
 
@@ -28,20 +66,13 @@ namespace waters {
 //# EventRecord: Constructors & Destructors
 
 EventRecord::
-EventRecord(const jni::EventGlue& event, jni::ClassCache* cache)
-  : mJavaEvent(event)
+EventRecord(jni::EventGlue event,
+            bool controllable,
+            jni::ClassCache* cache)
+  : mJavaEvent(event),
+    mIsControllable(controllable),
+    mTransitionRecords(0)
 {
-  switch (event.getKindGlue(cache)) {
-  case jni::EventKind_UNCONTROLLABLE:
-    mIsControllable = true;
-    break;
-  case jni::EventKind_CONTROLLABLE:
-    mIsControllable = false;
-    break;
-  default:
-    break;
-  }
-  mTransitionRecords = 0;
 }
 
 

@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   ClassTypeGlue
 //###########################################################################
-//# $Id: ClassTypeGlue.java,v 1.3 2005-11-05 09:47:15 robi Exp $
+//# $Id: ClassTypeGlue.java,v 1.4 2006-08-16 02:56:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -33,7 +33,7 @@ class ClassTypeGlue extends TypeGlue {
   {
     if (partner != null && getClass() == partner.getClass()) {
       final ClassTypeGlue type = (ClassTypeGlue) partner;
-      return mClass == type.mClass;
+      return mClass == type.mClass && mUseGlue == type.mUseGlue;
     } else {
       return false;
     }
@@ -41,7 +41,11 @@ class ClassTypeGlue extends TypeGlue {
 
   public int hashCode()
   {
-    return mClass.hashCode();
+    int result = mClass.hashCode();
+    if (mUseGlue) {
+      result++;
+    }
+    return result;
   }
 
 
@@ -51,7 +55,14 @@ class ClassTypeGlue extends TypeGlue {
   {
     if (partner instanceof ClassTypeGlue) {
       final ClassTypeGlue classtype = (ClassTypeGlue) partner;
-      return mClass.compareTo(classtype.mClass);
+      final int classcmp = mClass.compareTo(classtype.mClass);
+      if (classcmp != 0) {
+	return classcmp;
+      } else if (mUseGlue) {
+	return classtype.mUseGlue ? 0 : 1;
+      } else {
+	return classtype.mUseGlue ? -1 : 0;
+      }
     } else {
       return 1;
     }

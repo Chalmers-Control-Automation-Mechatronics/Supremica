@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   HashTable
 //###########################################################################
-//# $Id: HashTable.cpp,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: HashTable.cpp,v 1.2 2006-08-16 02:56:42 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -155,7 +155,7 @@ rehash(UntypedHashTable* table)
 //# HashTableIterator: Iteration
 
 void HashTableIterator::
-step()
+skip()
 {
   mIndex++;
   if (mBucket && mIndex == mBucket->iterationSize()) {
@@ -232,7 +232,7 @@ add(void* value)
   uint32 index = mAccessor->hash(key) & mTableMask;
   void** ref = &mTable[index];
   void* present = *ref;
-  if (present == 0) {
+  if (present == mDefault) {
     mNumElements++;
     *ref = value;
     return value;
@@ -300,16 +300,15 @@ iterator()
   const
 {
   HashTableIterator iter(mOverflowList);
-  advance(iter);
   return iter;
 }
 
 
 bool UntypedHashTable::
-hasNext(const HashTableIterator& iter)
+hasNext(HashTableIterator& iter)
   const
 {
-  return iter.getBucket() || iter.getIndex() <= mTableMask;
+  return advance(iter) != mDefault;
 }
 
 
@@ -317,14 +316,11 @@ void* UntypedHashTable::
 untypedNext(HashTableIterator& iter)
   const
 {
-  uint32 index = iter.getIndex();
-  const HashOverflowBucket* bucket = iter.getBucket();
-  advance(iter);
-  if (bucket) {
-    return bucket->iterationGet(index);
-  } else {
-    return mTable[index];
+  void* item = advance(iter);
+  if (item != mDefault) {
+    skip(iter);
   }
+  return item;
 }
 
 
@@ -350,25 +346,36 @@ found(const void* key, void* value) const
 }
 
   
-void UntypedHashTable::
+void* UntypedHashTable::
 advance(HashTableIterator& iter)
   const
 {
-  void* item;
-  do {
-    iter.step();
-    uint32 index = iter.getIndex();
+  while (true) {
+    const uint32 index = iter.getIndex();
     if (const HashOverflowBucket* bucket = iter.getBucket()) {
-      item = bucket->iterationGet(index);
-    } else if (index > mTableMask) {
-      break;
+      void* item = bucket->iterationGet(index);
+      if (((uint32) item & 1) == 0) {
+        return item;
+      }
     } else {
-      item = mTable[index];
-      if (item == mDefault) {
-        continue;
+      if (index > mTableMask) {
+        return mDefault;
+      }
+      void* item = mTable[index];
+      if (item != mDefault && ((uint32) item & 1) == 0) {
+        return item;
       }
     }
-  } while ((uint32) item & 1);
+    skip(iter);
+  }
+}
+      
+
+void UntypedHashTable::
+skip(HashTableIterator& iter)
+  const
+{
+  iter.skip();
 }
 
 

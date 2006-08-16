@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   ObjectClassGlue
 //###########################################################################
-//# $Id: ObjectClassGlue.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ObjectClassGlue.java,v 1.3 2006-08-16 02:56:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -26,6 +26,14 @@ class ObjectClassGlue extends PlainClassGlue {
     final MethodGlue equalsmethod =
       new PlainMethodGlue(SimpleTypeGlue.TYPE_BOOLEAN, "equals", parameters);
     addMethod(equalsmethod, reporter);
+    final TypeGlue typeglue = new ClassTypeGlue(this, true);
+    final ParameterGlue paramglue = new ParameterGlue("partner", typeglue);
+    final List<ParameterGlue> parametersglue =
+      Collections.singletonList(paramglue);
+    final MethodGlue equalsgluemethod =
+      new PlainMethodGlue(SimpleTypeGlue.TYPE_BOOLEAN,
+                          "equals", parametersglue);
+    addMethod(equalsgluemethod, reporter);
     final MethodGlue hashmethod =
       new PlainMethodGlue(SimpleTypeGlue.TYPE_INT, "hashCode");
     addMethod(hashmethod, reporter);

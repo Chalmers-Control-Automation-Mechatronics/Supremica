@@ -4,9 +4,12 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   ControllabilityChecker
 //###########################################################################
-//# $Id: ControllabilityChecker.cpp,v 1.2 2006-08-15 03:08:53 robi Exp $
+//# $Id: ControllabilityChecker.cpp,v 1.3 2006-08-16 02:56:42 robi Exp $
 //###########################################################################
 
+#ifdef __GNUG__
+#pragma implementation
+#endif
 
 #include <new>
 
@@ -24,6 +27,7 @@
 
 #include "waters/analysis/ControllabilityChecker.h"
 #include "waters/analysis/EventRecord.h"
+#include "waters/base/HashTable.h"
 #include "waters/javah/Invocations.h"
 
 
@@ -37,27 +41,45 @@ namespace waters {
 //# ControllabilityChecker: Constructors & Destructors
 
 ControllabilityChecker::
-ControllabilityChecker(const jni::ProductDESGlue& des,
+ControllabilityChecker(const jni::ProductDESGlue des,
                        jni::ClassCache* cache)
 {
   const jni::SetGlue events = des.getEventsGlue(cache);
+  const int numevents = events.size();
   const jni::IteratorGlue iter = events.iteratorGlue(cache);
-  mNumEventRecords = events.size();
-  mEventRecords = new EventRecord*[mNumEventRecords];
-  int i = 0;
+  EventRecordHashAccessor accessor;
+  HashTable<jni::EventGlue*,EventRecord*> eventmap(&accessor, numevents);
+  mEventRecords = new EventRecord*[numevents];
+  mNumEventRecords = 0;
   while (iter.hasNext()) {
     jobject javaobject = iter.next();
     jni::EventGlue event(javaobject, cache);
+    bool controllable;
     switch (event.getKindGlue(cache)) {
     case jni::EventKind_UNCONTROLLABLE:
+      controllable = false;
+      break;
     case jni::EventKind_CONTROLLABLE:
-      mEventRecords[i++] = new EventRecord(event, cache);
+      controllable = true;
       break;
     default:
-      break;
+      continue;
     }
+    EventRecord* record = new EventRecord(event, controllable, cache);
+    eventmap.add(record);
   }
-  mNumEventRecords = i;
+ 
+  mNumEventRecords = eventmap.size();
+  if (mNumEventRecords > 0) {
+    mEventRecords = new EventRecord*[mNumEventRecords];
+    HashTableIterator hiter = eventmap.iterator();
+    int i = 0;
+    while (eventmap.hasNext(hiter)) {
+      mEventRecords[i++] = eventmap.next(hiter);
+    }
+  } else {
+    mEventRecords = 0;
+  }
 }
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: jni.base
 //# CLASS:   ClassCache
 //###########################################################################
-//# $Id: ClassCache.cpp,v 1.2 2005-11-07 23:45:47 robi Exp $
+//# $Id: ClassCache.cpp,v 1.3 2006-08-16 02:56:42 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -59,7 +59,7 @@ bool ClassCacheHashAccessor::
 equals(const void* key1, const void* key2)
   const
 {
-  jmethodID mid = mClassGlue->getMethodID(METHOD_Object_equals);
+  jmethodID mid = mClassGlue->getMethodID(METHOD_Object_equals_0);
   jobject javaobject1 = (jobject) key1;
   jobject javaobject2 = (jobject) key2;
   jboolean result =

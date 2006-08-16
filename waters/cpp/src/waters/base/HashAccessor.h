@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   HashAccessor
 //###########################################################################
-//# $Id: HashAccessor.h,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: HashAccessor.h,v 1.2 2006-08-16 02:56:42 robi Exp $
 //###########################################################################
 
 
@@ -33,14 +33,14 @@ class HashAccessor
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit HashAccessor() {};
+  explicit HashAccessor() {}
   virtual ~HashAccessor() {}
 
   //##########################################################################
   //# Hash Methods
   virtual uint32 hash(const void* key) const = 0;
   virtual bool equals(const void* key1, const void* key2) const = 0;
-  virtual void* getKey(const void* value) const = 0;
+  virtual const void* getKey(const void* value) const = 0;
   virtual void* getDefaultValue() const = 0;
 };
 
