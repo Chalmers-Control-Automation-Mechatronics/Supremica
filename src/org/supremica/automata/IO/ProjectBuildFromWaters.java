@@ -93,7 +93,7 @@ public class ProjectBuildFromWaters
 		ModuleCompiler compiler =
 			new ModuleCompiler(mDocumentManager, factory, module);
 
-		ProductDESProxy des = des = compiler.compile();
+		ProductDESProxy des = compiler.compile();
 		if (des == null)
 		{
 			return currProject;
