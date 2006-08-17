@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   ProductDESElement
 //###########################################################################
-//# $Id: ProductDESElement.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: ProductDESElement.java,v 1.7 2006-08-17 13:03:01 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -190,9 +190,9 @@ public class ProductDESElement
   {
     int result = super.hashCodeByContents();
     result *= 5;
-    result += EqualCollection.getSetHashCodeByContents(mEvents);
+    result += EqualCollection.getSetHashCodeByContentsOfCollection(mEvents);
     result *= 5;
-    result += EqualCollection.getSetHashCodeByContents(mAutomata);
+    result += EqualCollection.getSetHashCodeByContentsOfCollection(mAutomata);
     return result;
   }
 

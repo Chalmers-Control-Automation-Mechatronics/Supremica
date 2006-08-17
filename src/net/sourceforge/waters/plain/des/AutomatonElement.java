@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   AutomatonElement
 //###########################################################################
-//# $Id: AutomatonElement.java,v 1.5 2006-07-20 02:28:37 robi Exp $
+//# $Id: AutomatonElement.java,v 1.6 2006-08-17 13:03:01 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -185,7 +185,7 @@ public final class AutomatonElement
         mKind.equals(mKind) &&
         EqualCollection.isEqualSetByContents(mEvents, aut.mEvents) &&
         EqualCollection.isEqualSetByContents(mStates, aut.mStates) &&
-        EqualCollection.isEqualSetByContents(mTransitions, aut.mTransitions);
+        EqualCollection.isEqualSetByContentsOfCollection(mTransitions, aut.mTransitions);
     } else {
       return false;
     }    
@@ -197,11 +197,11 @@ public final class AutomatonElement
     result *= 5;
     result += mKind.hashCode();
     result *= 5;
-    result += EqualCollection.getSetHashCodeByContents(mEvents);
+    result += EqualCollection.getSetHashCodeByContentsOfCollection(mEvents);
     result *= 5;
-    result += EqualCollection.getSetHashCodeByContents(mStates);
+    result += EqualCollection.getSetHashCodeByContentsOfCollection(mStates);
     result *= 5;
-    result += EqualCollection.getSetHashCodeByContents(mTransitions);
+    result += EqualCollection.getSetHashCodeByContentsOfCollection(mTransitions);
     return result;
   }
 

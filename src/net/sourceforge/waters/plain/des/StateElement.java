@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   StateElement
 //###########################################################################
-//# $Id: StateElement.java,v 1.5 2006-07-20 02:28:37 robi Exp $
+//# $Id: StateElement.java,v 1.6 2006-08-17 13:03:01 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -119,7 +119,7 @@ public final class StateElement
       final StateElement state = (StateElement) partner;
       return
         (isInitial() == state.isInitial()) &&
-        EqualCollection.isEqualSetByContents
+        EqualCollection.isEqualSetByContentsOfCollection
           (mPropositions, state.mPropositions);
     } else {
       return false;
@@ -134,7 +134,7 @@ public final class StateElement
       result++;
     }
     result *= 5;
-    result += EqualCollection.getSetHashCodeByContents(mPropositions);
+    result += EqualCollection.getSetHashCodeByContentsOfCollection(mPropositions);
     return result;
   }
 

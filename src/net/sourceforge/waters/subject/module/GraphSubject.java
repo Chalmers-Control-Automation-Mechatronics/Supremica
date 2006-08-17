@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   GraphSubject
 //###########################################################################
-//# $Id: GraphSubject.java,v 1.8 2006-07-25 22:06:07 robi Exp $
+//# $Id: GraphSubject.java,v 1.9 2006-08-17 13:03:01 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -122,7 +122,7 @@ public final class GraphSubject
         mBlockedEvents.equalsByContents(downcast.mBlockedEvents) &&
         EqualCollection.isEqualSetByContents
           (mNodes, downcast.mNodes) &&
-        EqualCollection.isEqualSetByContents
+        EqualCollection.isEqualSetByContentsOfCollection
           (mEdges, downcast.mEdges);
     } else {
       return false;
@@ -138,7 +138,7 @@ public final class GraphSubject
         mBlockedEvents.equalsWithGeometry(downcast.mBlockedEvents) &&
         EqualCollection.isEqualSetWithGeometry
           (mNodes, downcast.mNodes) &&
-        EqualCollection.isEqualSetWithGeometry
+        EqualCollection.isEqualSetWithGeometryOfCollection
           (mEdges, downcast.mEdges);
     } else {
       return false;
@@ -155,9 +155,9 @@ public final class GraphSubject
     result *= 5;
     result += mBlockedEvents.hashCodeByContents();
     result *= 5;
-    result += EqualCollection.getSetHashCodeByContents(mNodes);
+    result += EqualCollection.getSetHashCodeByContentsOfCollection(mNodes);
     result *= 5;
-    result += EqualCollection.getSetHashCodeByContents(mEdges);
+    result += EqualCollection.getSetHashCodeByContentsOfCollection(mEdges);
     return result;
   }
 
@@ -171,9 +171,9 @@ public final class GraphSubject
     result *= 5;
     result += mBlockedEvents.hashCodeWithGeometry();
     result *= 5;
-    result += EqualCollection.getSetHashCodeWithGeometry(mNodes);
+    result += EqualCollection.getSetHashCodeWithGeometryOfCollection(mNodes);
     result *= 5;
-    result += EqualCollection.getSetHashCodeWithGeometry(mEdges);
+    result += EqualCollection.getSetHashCodeWithGeometryOfCollection(mEdges);
     return result;
   }
 

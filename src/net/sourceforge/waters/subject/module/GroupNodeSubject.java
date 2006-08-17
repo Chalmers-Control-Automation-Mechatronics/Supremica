@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   GroupNodeSubject
 //###########################################################################
-//# $Id: GroupNodeSubject.java,v 1.9 2006-08-01 04:14:47 robi Exp $
+//# $Id: GroupNodeSubject.java,v 1.10 2006-08-17 13:03:01 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -150,7 +150,7 @@ public final class GroupNodeSubject
   {
     int result = super.hashCodeByContents();
     result *= 5;
-    result += EqualCollection.getSetHashCodeByContents(mImmediateChildNodes);
+    result += EqualCollection.getSetHashCodeByContentsOfCollection(mImmediateChildNodes);
     return result;
   }
 
@@ -158,7 +158,7 @@ public final class GroupNodeSubject
   {
     int result = super.hashCodeByContents();
     result *= 5;
-    result += EqualCollection.getSetHashCodeWithGeometry(mImmediateChildNodes);
+    result += EqualCollection.getSetHashCodeWithGeometryOfCollection(mImmediateChildNodes);
     result *= 5;
     if (mGeometry != null) {
       result += mGeometry.hashCodeWithGeometry();
