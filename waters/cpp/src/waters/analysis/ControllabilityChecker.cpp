@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   ControllabilityChecker
 //###########################################################################
-//# $Id: ControllabilityChecker.cpp,v 1.3 2006-08-16 02:56:42 robi Exp $
+//# $Id: ControllabilityChecker.cpp,v 1.4 2006-08-17 05:02:25 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -43,6 +43,7 @@ namespace waters {
 ControllabilityChecker::
 ControllabilityChecker(const jni::ProductDESGlue des,
                        jni::ClassCache* cache)
+  : mEncoding(des, cache)
 {
   const jni::SetGlue events = des.getEventsGlue(cache);
   const int numevents = events.size();

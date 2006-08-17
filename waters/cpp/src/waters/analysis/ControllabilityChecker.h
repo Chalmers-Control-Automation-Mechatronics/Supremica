@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   ControllabilityChecker
 //###########################################################################
-//# $Id: ControllabilityChecker.h,v 1.2 2006-08-16 02:56:42 robi Exp $
+//# $Id: ControllabilityChecker.h,v 1.3 2006-08-17 05:02:25 robi Exp $
 //###########################################################################
 
 
@@ -20,6 +20,8 @@
 #endif
 
 #include "waters/base/IntTypes.h"
+#include "waters/analysis/AutomatonEncoding.h"
+
 
 namespace jni {
   class ClassCache;
@@ -51,6 +53,7 @@ private:
 
   //##########################################################################
   //# Data Members
+  AutomatonEncoding mEncoding;
   int mNumEventRecords;
   EventRecord** mEventRecords;
 

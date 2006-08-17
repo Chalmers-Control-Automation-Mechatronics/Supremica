@@ -4,7 +4,7 @@
 //# PACKAGE: jni.glue
 //# PURPOSE: List of classes and methods to be converted to C++/JNI code
 //###########################################################################
-//# $Id: Classes.txt,v 1.7 2006-08-15 01:43:06 robi Exp $
+//# $Id: Classes.txt,v 1.8 2006-08-17 05:02:25 robi Exp $
 //###########################################################################
 
 
@@ -53,22 +53,33 @@ enum class EventKind {PROPOSITION, UNCONTROLLABLE, CONTROLLABLE}
 
 
 //###########################################################################
+package net.sourceforge.waters.model.base;
+//###########################################################################
+
+glue class NamedProxy {
+  String getName();
+  int compareTo(glue Object partner);
+}
+
+
+//###########################################################################
 package net.sourceforge.waters.model.des;
 //###########################################################################
 
-glue class EventProxy {
-  String getName();
+glue class EventProxy extends NamedProxy {
   glue EventKind getKind();
 }
 
-glue class AutomatonProxy {
-  String getName();
+glue class AutomatonProxy extends NamedProxy {
   glue ComponentKind getKind();
+  glue Set getEvents();
+  glue Set getStates();
+  glue Collection getTransitions();
 }
 
-glue class ProductDESProxy {
-  String getName();
+glue class ProductDESProxy extends NamedProxy {
   glue Set getEvents();
+  glue Set getAutomata();
 }
 
 glue class ProductDESProxyFactory {
