@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   EqualCollection
 //###########################################################################
-//# $Id: EqualCollection.java,v 1.3 2006-07-20 02:28:37 robi Exp $
+//# $Id: EqualCollection.java,v 1.4 2006-08-17 13:02:11 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -42,7 +42,7 @@ public class EqualCollection
    * equalsByContents()} provided by the {@link Proxy} interface is used
    * for comparison of individual elements.
    */
-  public static boolean isEqualSetByContents
+  public static boolean isEqualSetByContentsOfCollection
     (final Collection<? extends Proxy> coll1,
      final Collection<? extends Proxy> coll2)
   {
@@ -118,7 +118,7 @@ public class EqualCollection
    * {@link Proxy} interface is used for comparison of individual
    * elements.
    */
-  public static boolean isEqualSetWithGeometry
+  public static boolean isEqualSetWithGeometryOfCollection
     (final Collection<? extends Proxy> coll1,
      final Collection<? extends Proxy> coll2)
   {
@@ -208,7 +208,7 @@ public class EqualCollection
    * set, i.e., duplicate entries do not affect the resultant hash code.
    */
   public static <P extends Proxy>
-    int getSetHashCodeByContents(final Collection<P> coll)
+    int getSetHashCodeByContentsOfCollection(final Collection<P> coll)
   {
     final ProxyAccessorMap<P> map =
       new ProxyAccessorHashMapByContents<P>(coll);
@@ -260,7 +260,7 @@ public class EqualCollection
    * not affect the resultant hash code.
    */
   public static <P extends Proxy>
-    int getSetHashCodeWithGeometry(final Collection<P> coll)
+    int getSetHashCodeWithGeometryOfCollection(final Collection<P> coll)
   {
     final ProxyAccessorMap<P> map =
       new ProxyAccessorHashMapWithGeometry<P>(coll);
