@@ -60,7 +60,7 @@ public enum VerificationType
     INVERSECONTROLLABILITY("Inverse controllability"),
     NONBLOCKING("Nonblocking"),
     CONTROLLABILITYNONBLOCKING("Controllability and nonblocking"),
-    MUTUALLYNONBLOCKING("Mutual nonblocking"),
+    //MUTUALLYNONBLOCKING("Mutually nonblocking"),
     LANGUAGEINCLUSION("Language inclusion");
     
     /** Textual description. */

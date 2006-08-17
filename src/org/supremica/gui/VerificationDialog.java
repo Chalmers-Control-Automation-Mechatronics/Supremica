@@ -274,12 +274,7 @@ public class VerificationDialog
             // Clear, then add the ones that are implemented
             algorithmSelector.removeAllItems();
             // Which type of verification?
-            if (verificationTypeBox.getSelectedItem() == VerificationType.MUTUALLYNONBLOCKING)
-            {
-                // Only modular algo implemented
-                algorithmSelector.addItem(VerificationAlgorithm.MODULAR);
-            }
-            else if (verificationTypeBox.getSelectedItem() == VerificationType.CONTROLLABILITY ||
+            if (verificationTypeBox.getSelectedItem() == VerificationType.CONTROLLABILITY ||
                 verificationTypeBox.getSelectedItem() == VerificationType.INVERSECONTROLLABILITY ||
                  verificationTypeBox.getSelectedItem() == VerificationType.LANGUAGEINCLUSION)
             {
@@ -288,6 +283,13 @@ public class VerificationDialog
                 algorithmSelector.addItem(VerificationAlgorithm.COMPOSITIONAL);
                 algorithmSelector.addItem(VerificationAlgorithm.BDD);
             }
+            /*
+            else if (verificationTypeBox.getSelectedItem() == VerificationType.MUTUALLYNONBLOCKING)
+            {
+                // Only modular algo implemented
+                algorithmSelector.addItem(VerificationAlgorithm.MODULAR);
+            }
+            */
             else if (verificationTypeBox.getSelectedItem() == VerificationType.NONBLOCKING)
             {
                 algorithmSelector.addItem(VerificationAlgorithm.MONOLITHIC);
@@ -335,12 +337,14 @@ public class VerificationDialog
                     "respect to conflict equivalence.");
                 note.setVisible(true);
             }
+            /*
             else if (verificationTypeBox.getSelectedItem() == VerificationType.MUTUALLYNONBLOCKING)
             {
                 note.setText("Note:\n" + "Mutual nonblocking is inherently modular\n" +
                     "and hence there is no monolithic algoritm.");
                 note.setVisible(true);
             }
+            */
             else if (verificationTypeBox.getSelectedItem() == VerificationType.CONTROLLABILITYNONBLOCKING)
             {
                 note.setText("Note:\n" + "Verifies both controllability and nonblocking in\n" +

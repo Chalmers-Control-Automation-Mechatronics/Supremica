@@ -140,6 +140,7 @@ public class AutomataVerificationWorker
             successMessage = "The system is nonblocking!";
             failureMessage = "The system is blocking!";
         }
+        /*
         else if (verificationOptions.getVerificationType() == VerificationType.MUTUALLYNONBLOCKING)
         {
             // Mutual nonblocking verification...
@@ -148,6 +149,7 @@ public class AutomataVerificationWorker
             //failureMessage = "The system is (globally and mutually) blocking!";
             failureMessage = "The system might be blocking...";
         }
+        */
         else if (verificationOptions.getVerificationType() == VerificationType.LANGUAGEINCLUSION)
         {
             // Language inclusion verification...

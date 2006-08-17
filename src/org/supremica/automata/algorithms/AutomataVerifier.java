@@ -187,6 +187,7 @@ public class AutomataVerifier
             }
         }
         
+        /*
         // Check MutuallyNonblocking
         if (verificationOptions.getVerificationType() == VerificationType.MUTUALLYNONBLOCKING)
         {
@@ -200,6 +201,7 @@ public class AutomataVerifier
                 return "The mutual nonblocking algorithm is a modular algorithm!";
             }
         }
+        */
         
         // Check Language Inclusion
         if (verificationOptions.getVerificationType() == VerificationType.LANGUAGEINCLUSION)
@@ -306,6 +308,7 @@ public class AutomataVerifier
                     throw new UnsupportedOperationException("The selected algorithm is not implemented");
                 }
             }
+            /*
             else if (verificationOptions.getVerificationType() == VerificationType.MUTUALLYNONBLOCKING)
             {
                 // Work!
@@ -319,6 +322,7 @@ public class AutomataVerifier
                     throw new UnsupportedOperationException("The selected algorithm is not implemented");
                 }
             }
+            */
             else
             {
                 throw new UnsupportedOperationException("The selected type of verification " +

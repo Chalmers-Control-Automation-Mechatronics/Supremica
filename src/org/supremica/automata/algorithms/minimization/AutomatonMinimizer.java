@@ -1679,7 +1679,7 @@ public class AutomatonMinimizer
 		int count = 0;
 		
 		// Get/create silent event tau
-		String silentName = Config.GENERAL_SILENT_EVENT_NAME.get();
+		String silentName = Config.MINIMIZATION_SILENT_EVENT_NAME.get();
 		LabeledEvent tau = aut.getAlphabet().getEvent(silentName);
 		if (tau == null)
 		{
@@ -1728,7 +1728,7 @@ public class AutomatonMinimizer
 		int count = 0;
 
         // Add silent event (if it's not already there)
-		String silentUName = Config.GENERAL_SILENT_UNCONTROLLABLE_EVENT_NAME.get();
+		String silentUName = Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.get();
 		LabeledEvent tau_u = aut.getAlphabet().getEvent(silentUName);
 		if (tau_u == null)
 		{
@@ -2105,7 +2105,7 @@ public class AutomatonMinimizer
 			while (innerChange)
 			{
 				// Find new states
-				StateSet newStates = blockingStates.previousStates(Config.GENERAL_SILENT_UNCONTROLLABLE_EVENT_NAME.get());
+				StateSet newStates = blockingStates.previousStates(Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.get());
 				// Remove outgoing arcs from newStates
 				for (State state : newStates)
 				{
