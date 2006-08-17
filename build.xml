@@ -148,7 +148,9 @@
 	<unjar src="${lib}/licensed/JGoLayout.jar" dest="${lib}/${unjared}"/>
 	-->
 	<!-- JAXB-stuff -->
-	<unjar src="${jaxb-api.jar}" dest="${lib}/${unjared}"/>	
+	<unjar src="${activation.jar}" dest="${lib}/${unjared}"/>	
+	<unjar src="${jaxb-api.jar}" dest="${lib}/${unjared}"/>
+	<unjar src="${jaxb-impl.jar}" dest="${lib}/${unjared}"/>	
 	<unjar src="${jsr173_api.jar}" dest="${lib}/${unjared}"/>	
 </target>
 
@@ -247,7 +249,6 @@
          fork="true"
          memoryMaximumSize="128M">
     <classpath>    
-      <path refid="jaxb.classpath"/>
       <pathelement location="${lib}/${unjared}"/>
     </classpath>
   </javac>
