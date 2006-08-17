@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   EventRecord
 //###########################################################################
-//# $Id: EventRecord.cpp,v 1.2 2006-08-16 02:56:42 robi Exp $
+//# $Id: EventRecord.cpp,v 1.3 2006-08-17 10:15:12 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -63,16 +63,41 @@ getKey(const void* value)
 //############################################################################
 
 //############################################################################
+//# EventRecord: Class Variables
+
+const EventRecordHashAccessor EventRecord::theHashAccessor;
+
+
+//############################################################################
 //# EventRecord: Constructors & Destructors
 
 EventRecord::
 EventRecord(jni::EventGlue event,
             bool controllable,
-            jni::ClassCache* cache)
+            jni::ClassCache* /* cache */)
   : mJavaEvent(event),
     mIsControllable(controllable),
     mTransitionRecords(0)
 {
+}
+
+
+//############################################################################
+//# EventRecord: Comparing
+
+int EventRecord::
+compareTo(const EventRecord* partner)
+  const
+{
+  return mJavaEvent.compareTo(&partner->mJavaEvent);
+}
+
+int EventRecord::
+compare(const void* elem1, const void* elem2)
+{
+  const EventRecord* val1 = *((const EventRecord**) elem1);
+  const EventRecord* val2 = *((const EventRecord**) elem2);
+  return val1->compareTo(val2);
 }
 
 

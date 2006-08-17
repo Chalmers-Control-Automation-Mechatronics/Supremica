@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   AutomatonEncoding
 //###########################################################################
-//# $Id: AutomatonEncoding.h,v 1.1 2006-08-17 05:02:25 robi Exp $
+//# $Id: AutomatonEncoding.h,v 1.2 2006-08-17 10:15:12 robi Exp $
 //###########################################################################
 
 
@@ -40,11 +40,13 @@ class HashAccessor;
 
 class AutomatonRecordHashAccessor : public HashAccessor
 {
-public:
+private:
   //##########################################################################
   //# Constructors & Destructors
   explicit AutomatonRecordHashAccessor() {};
+  friend class AutomatonRecord;
 
+public:
   //##########################################################################
   //# Hash Methods
   virtual uint32 hash(const void* key) const;
@@ -74,15 +76,21 @@ public:
   bool isSpec() const {return mIsSpec;}
   int getNumberOfStates() const {return mNumStates;}
   int getNumberOfBits() const {return mNumBits;}
+  int getAutomatonIndex() const {return mAutomatonIndex;}
   int getWordIndex() const {return mWordIndex;}
   int getShift() const {return mShift;}
   int getBitMask() const {return mBitMask;}
-  void allocate(int wordindex, int shift);
 
   //##########################################################################
-  //# Comparing
+  //# Comparing and Hashing
   int compareTo(const AutomatonRecord* partner) const;
   static int compare(const void* elem1, const void* elem2);
+  static const HashAccessor* getHashAccessor() {return &theHashAccessor;}
+
+  //##########################################################################
+  //# Setting up
+  void allocate(int wordindex, int shift);
+  void setAutomatonIndex(int index) {mAutomatonIndex = index;}
 
 private:
   //##########################################################################
@@ -91,9 +99,14 @@ private:
   bool mIsSpec;
   int mNumStates;
   int mNumBits;
+  int mAutomatonIndex;
   int mWordIndex;
   int mShift;
   uint32 mBitMask;
+
+  //##########################################################################
+  //# Class Variables
+  static const AutomatonRecordHashAccessor theHashAccessor;
 };
 
 
@@ -110,6 +123,19 @@ public:
   explicit AutomatonEncoding(const jni::ProductDESGlue des,
 			     jni::ClassCache* cache);
   ~AutomatonEncoding();
+
+  //##########################################################################
+  //# Simple Access
+  int getNumRecords() const {return mNumRecords;}
+  const AutomatonRecord* getRecord(int index) const
+    {return mAutomatonRecords[index];}
+
+  //##########################################################################
+  //# Encoding and Decoding
+  void encode(const uint32* decoded, uint32* encoded) const;
+  void decode(const uint32* encoded, uint32* decoded) const;
+  uint32 get(const uint32* encoded, int index) const;
+  void set(uint32* encoded, int index, uint32 code) const;
 
   //##########################################################################
   //# Debug Output

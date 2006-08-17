@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   EventRecord
 //###########################################################################
-//# $Id: EventRecord.h,v 1.2 2006-08-16 02:56:42 robi Exp $
+//# $Id: EventRecord.h,v 1.3 2006-08-17 10:15:12 robi Exp $
 //###########################################################################
 
 
@@ -39,11 +39,13 @@ class TransitionRecord;
 
 class EventRecordHashAccessor : public HashAccessor
 {
-public:
+private:
   //##########################################################################
   //# Constructors & Destructors
   explicit EventRecordHashAccessor() {};
+  friend class EventRecord;
 
+public:
   //##########################################################################
   //# Hash Methods
   virtual uint32 hash(const void* key) const;
@@ -72,12 +74,22 @@ public:
   bool isControllable() const {return mIsControllable;}
   const jni::EventGlue& getJavaEvent() const {return mJavaEvent;}
 
+  //##########################################################################
+  //# Comparing and Hashing
+  int compareTo(const EventRecord* partner) const;
+  static int compare(const void* elem1, const void* elem2);
+  static const HashAccessor* getHashAccessor() {return &theHashAccessor;}
+
 private:
   //##########################################################################
   //# Data Members
   jni::EventGlue mJavaEvent;
   bool mIsControllable;
   TransitionRecord* mTransitionRecords;
+
+  //##########################################################################
+  //# Class Variables
+  static const EventRecordHashAccessor theHashAccessor;
 };
 
 }   /* namespace waters */

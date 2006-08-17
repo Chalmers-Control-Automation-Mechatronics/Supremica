@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   AutomatonEncoding
 //###########################################################################
-//# $Id: AutomatonEncoding.cpp,v 1.1 2006-08-17 05:02:25 robi Exp $
+//# $Id: AutomatonEncoding.cpp,v 1.2 2006-08-17 10:15:12 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -91,6 +91,12 @@ getKey(const void* value)
 //############################################################################
 
 //############################################################################
+//# AutomatonRecord: Class Variables
+
+const AutomatonRecordHashAccessor AutomatonRecord::theHashAccessor;
+
+
+//############################################################################
 //# AutomatonRecord: Constructors & Destructors
 
 AutomatonRecord::
@@ -110,19 +116,7 @@ AutomatonRecord(const jni::AutomatonGlue aut,
 
 
 //############################################################################
-//# AutomatonEncoding: Simple Access
-
-void AutomatonRecord::
-allocate(int wordindex, int shift)
-{
-  mWordIndex = wordindex;
-  mShift = shift;
-  mBitMask = (mNumBits - 1) << shift;
-}
-
-
-//############################################################################
-//# AutomatonEncoding: Comparing
+//# AutomatonRecord: Comparing
 
 int AutomatonRecord::
 compareTo(const AutomatonRecord* partner)
@@ -142,6 +136,18 @@ compare(const void* elem1, const void* elem2)
   const AutomatonRecord* val1 = *((const AutomatonRecord**) elem1);
   const AutomatonRecord* val2 = *((const AutomatonRecord**) elem2);
   return val1->compareTo(val2);
+}
+
+
+//############################################################################
+//# AutomatonRecord: Setting up
+
+void AutomatonRecord::
+allocate(int wordindex, int shift)
+{
+  mWordIndex = wordindex;
+  mShift = shift;
+  mBitMask = (mNumBits - 1) << shift;
 }
 
 
@@ -227,8 +233,9 @@ AutomatonEncoding(const jni::ProductDESGlue des,
   for (a = 0; a < mNumRecords; a++) {
     AutomatonRecord* record = records[a];
     w = record->getWordIndex();
-    const int j = used[w]++;
-    mAutomatonRecords[j] = record;
+    const int index = used[w]++;
+    mAutomatonRecords[index] = record;
+    record->setAutomatonIndex(index);
   }
 
   // clean up ...
@@ -248,6 +255,68 @@ AutomatonEncoding::
   }
   delete [] mAutomatonRecords;
   delete [] mWordStop;
+}
+
+
+//############################################################################
+//# AutomatonEncoding: Encoding and Decoding
+
+void AutomatonEncoding::
+encode(const uint32* decoded, uint32* encoded)
+  const
+{
+  int a = 0;
+  for (int w = 0; w < mNumWords; w++) {
+    const int end = mWordStop[w];
+    uint32 word = 0;
+    for (; a < end; a++) {
+      const AutomatonRecord* record = mAutomatonRecords[a];
+      const int shift = record->getShift();
+      const uint32 code = decoded[a];
+      word |= (code << shift);
+    }
+    encoded[w] = word;
+  }
+}
+
+void AutomatonEncoding::
+decode(const uint32* encoded, uint32* decoded)
+  const
+{
+  int a = 0;
+  for (int w = 0; w < mNumWords; w++) {
+    const int end = mWordStop[w];
+    const uint32 word = encoded[w];
+    for (; a < end; a++) {
+      const AutomatonRecord* record = mAutomatonRecords[a];
+      const int shift = record->getShift();
+      const uint32 mask = record->getBitMask();
+      decoded[a] = (word & mask) >> shift;
+    }
+  }
+}
+
+uint32 AutomatonEncoding::
+get(const uint32* encoded, int index)
+  const
+{
+  const AutomatonRecord* record = mAutomatonRecords[index];
+  const int w = record->getWordIndex();
+  const uint32 word = encoded[w];
+  const int shift = record->getShift();
+  const uint32 mask = record->getBitMask();
+  return (word & mask) >> shift;
+}
+
+void AutomatonEncoding::
+set(uint32* encoded, int index, uint32 code)
+  const
+{
+  const AutomatonRecord* record = mAutomatonRecords[index];
+  const int w = record->getWordIndex();
+  const int shift = record->getShift();
+  const uint32 mask = record->getBitMask();
+  encoded[w] = (encoded[w] & ~mask) | (code << shift);
 }
 
 

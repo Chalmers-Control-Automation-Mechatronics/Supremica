@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   HashTable
 //###########################################################################
-//# $Id: HashTable.cpp,v 1.2 2006-08-16 02:56:42 robi Exp $
+//# $Id: HashTable.cpp,v 1.3 2006-08-17 10:15:12 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -201,8 +201,27 @@ UntypedHashTable::
 //###########################################################################
 //# UntypedHashTable: Access
 
+void UntypedHashTable::
+clear()
+{
+  mNumElements = 0;
+  for (uint32 i = 0; i <= mTableMask; i++) {
+    mTable[i] = mDefault;
+  }
+  if (mOverflowList != 0) {
+    HashOverflowBucket* last = mOverflowList;
+    while (HashOverflowBucket* next = last->getNext()) {
+      last = next;
+    }
+    last->setNext(mRecycledList);
+    mRecycledList = mOverflowList;
+    mOverflowList = 0;
+  }
+}
+
 void* UntypedHashTable::
-get(const void* key) const
+get(const void* key)
+  const
 {
   uint32 index = mAccessor->hash(key) & mTableMask;
   void* value = mTable[index];
@@ -224,7 +243,7 @@ get(const void* key) const
 void* UntypedHashTable::
 add(void* value)
 {
-  if (mNumElements >= mTableMask) {
+  if (mNumElements >= (int) mTableMask) {
     rehash(mTableMask + 2);
   }
 
@@ -265,12 +284,13 @@ rehash(uint32 newsize)
   uint32 oldsize = mTableMask + 1;
   void** oldtable = mTable;
   HashOverflowBucket* oldoverflow = mOverflowList;
+  uint32 i;
 
   newsize = newsize < 16 ? 16 : tablesize(newsize);
   mNumElements = 0;
   mTableMask = newsize - 1;
   mTable = new void*[newsize];
-  for (int i = 0; i < newsize; i++) {
+  for (i = 0; i < newsize; i++) {
     mTable[i] = 0;
   }
   mOverflowList = 0;
@@ -281,7 +301,7 @@ rehash(uint32 newsize)
     recycle(oldoverflow);
     oldoverflow = next;
   }
-  for (int i = 0; i < oldsize; i++) {
+  for (i = 0; i < oldsize; i++) {
     void* value = oldtable[i];
     if (value != 0 && ((uint32) value & 1) == 0) {
       add(value);
@@ -384,13 +404,13 @@ newBucket()
 {
   HashOverflowBucket* bucket;
   if (mRecycledList == 0) {
-    bucket = new HashOverflowBucket();
+    bucket = new HashOverflowBucket(mOverflowList);
   } else {
-    HashOverflowBucket* bucket = mRecycledList;
+    bucket = mRecycledList;
     mRecycledList = bucket->getNext();
     bucket->reset();
+    bucket->setNext(mOverflowList);
   }
-  bucket->setNext(mOverflowList);
   mOverflowList = bucket;
   return bucket;
 }

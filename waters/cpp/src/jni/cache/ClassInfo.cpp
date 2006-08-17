@@ -4,7 +4,7 @@
 //# PACKAGE: jni.base
 //# CLASS:   ClassInfo
 //###########################################################################
-//# $Id: ClassInfo.cpp,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: ClassInfo.cpp,v 1.2 2006-08-17 10:15:12 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -54,7 +54,7 @@ const MethodInfo* ClassInfo::
 getMethodInfo(waters::uint32 methodcode)
   const
 {
-  int firstcode = getFirstCode();
+  waters::uint32 firstcode = getFirstCode();
   if (methodcode < firstcode) {
     return mBaseClass->getMethodInfo(methodcode);
   } else {

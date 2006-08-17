@@ -46,7 +46,7 @@ ifdef JAVA_HOME
   JNI_INC       = -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
 endif
 
-export CFLAGS   = -O2 -g -fPIC -DDEBUG
+export CFLAGS   = -O2 -g -fPIC -DDEBUG -Wall
 export INCDIRS	= -I$(SRCDIR) $(JNI_INC)
 
 
