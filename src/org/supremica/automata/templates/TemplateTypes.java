@@ -55,10 +55,10 @@ public class TemplateTypes
 {
 	private static List collection = new LinkedList();
 	public static final TemplateTypes Undefined = new TemplateTypes("Undefined");
-	public static final TemplateTypes CCSBookExample = new TemplateTypes("CCS-Book Examples");
-	public static final TemplateTypes CCSBookExercise = new TemplateTypes("CCS-Book Exercises");
-	public static final TemplateTypes CCSCourseAssignment = new TemplateTypes("CCS-Course Assignments");
-	public static final TemplateTypes CCSCourseAssignmentSolutions = new TemplateTypes("CCS-Course Assignment Solutions");
+	public static final TemplateTypes DESBookExample = new TemplateTypes("DES-Book Examples");
+	public static final TemplateTypes DESBookExercise = new TemplateTypes("DES-Book Exercises");
+	public static final TemplateTypes DESCourseAssignment = new TemplateTypes("DES-Course Assignments");
+	public static final TemplateTypes DESCourseAssignmentSolutions = new TemplateTypes("DES-Course Assignment Solutions");
 	public static final TemplateTypes OtherExample = new TemplateTypes("Other Examples");
 	public static final TemplateTypes AIPExample = new TemplateTypes("AIP Examples");
 	public static final TemplateTypes CentralLockExample = new TemplateTypes("Central Lock Examples");
