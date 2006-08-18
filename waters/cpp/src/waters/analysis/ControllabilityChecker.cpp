@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   ControllabilityChecker
 //###########################################################################
-//# $Id: ControllabilityChecker.cpp,v 1.5 2006-08-17 10:15:12 robi Exp $
+//# $Id: ControllabilityChecker.cpp,v 1.6 2006-08-18 06:39:29 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -30,7 +30,7 @@
 
 #include "waters/analysis/ControllabilityChecker.h"
 #include "waters/analysis/EventRecord.h"
-#include "waters/analysis/StateRecord.h"
+//#include "waters/analysis/StateRecord.h"
 #include "waters/base/HashTable.h"
 #include "waters/javah/Invocations.h"
 
@@ -75,6 +75,7 @@ ControllabilityChecker(const jni::ProductDESGlue des,
     eventmap.add(record);
   }
 
+  /*
   //  Collect transitions ...
   const HashAccessor* stateaccessor = StateRecord::getHashAccessor();
   HashTable<jni::StateGlue*,StateRecord*> statemap(stateaccessor, 256);
@@ -93,6 +94,7 @@ ControllabilityChecker(const jni::ProductDESGlue des,
     }
     statemap.clear();
   }
+  */
 
   // Establish compact event list ...
   mNumEventRecords = eventmap.size();

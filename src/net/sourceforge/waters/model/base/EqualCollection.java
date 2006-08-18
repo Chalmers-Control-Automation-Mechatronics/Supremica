@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   EqualCollection
 //###########################################################################
-//# $Id: EqualCollection.java,v 1.4 2006-08-17 13:02:11 torda Exp $
+//# $Id: EqualCollection.java,v 1.5 2006-08-18 06:39:29 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -35,21 +35,18 @@ public class EqualCollection
   /**
    * Checks whether two collections have the same contents. This method
    * compares two collections of proxies, and checks whether they have
-   * elements with the same contents. The collections are only compared as
-   * sets, i.e., it is not considered to make any difference if one
-   * collection contains a different number of equal items of the same
-   * kind. The equality method {@link Proxy#equalsByContents(Proxy)
-   * equalsByContents()} provided by the {@link Proxy} interface is used
-   * for comparison of individual elements.
+   * elements with the same contents. The equality method {@link
+   * Proxy#equalsByContents(Proxy) equalsByContents()} provided by the
+   * {@link Proxy} interface is used for comparison of individual elements.
    */
-  public static boolean isEqualSetByContentsOfCollection
+  public static boolean isEqualCollectionByContents
     (final Collection<? extends Proxy> coll1,
      final Collection<? extends Proxy> coll2)
   {
-    final ProxyAccessorMap<Proxy> map1 =
-      new ProxyAccessorHashMapByContents<Proxy>(coll1);
-    final ProxyAccessorMap<Proxy> map2 =
-      new ProxyAccessorHashMapByContents<Proxy>(coll2);
+    final ProxyAccessorCollection<Proxy> map1 =
+      new ProxyAccessorHashCollectionByContents<Proxy>(coll1);
+    final ProxyAccessorCollection<Proxy> map2 =
+      new ProxyAccessorHashCollectionByContents<Proxy>(coll2);
     return map1.equalsByAccessorEquality(map2);
   }
 
@@ -60,20 +57,20 @@ public class EqualCollection
    * Proxy#equalsByContents(Proxy) equalsByContents()} provided by the
    * {@link Proxy} interface is used for comparison of individual
    * elements.
+   * This method can compare sets or collections, duplicates are not
+   * considered significant in either case.
    */
   public static boolean isEqualSetByContents
-    (final Set<? extends Proxy> set1,
-     final Set<? extends Proxy> set2)
+    (final Collection<? extends Proxy> set1,
+     final Collection<? extends Proxy> set2)
   {
-    if (set1.size() == set2.size()) {
-      final ProxyAccessorMap<Proxy> map1 =
-        new ProxyAccessorHashMapByContents<Proxy>(set1);
-      final ProxyAccessorMap<Proxy> map2 =
-        new ProxyAccessorHashMapByContents<Proxy>(set2);
-      return map1.equalsByAccessorEquality(map2);
-    } else {
-      return false;
-    }
+    // Can't rely on set size as sets my have distinct elements that
+    // are equal under content-based equality.
+    final ProxyAccessorMap<Proxy> map1 =
+      new ProxyAccessorHashMapByContents<Proxy>(set1);
+    final ProxyAccessorMap<Proxy> map2 =
+      new ProxyAccessorHashMapByContents<Proxy>(set2);
+    return map1.equalsByAccessorEquality(map2);
   }
 
   /**
@@ -110,22 +107,19 @@ public class EqualCollection
   /**
    * Checks whether two collections have the same contents and
    * geometry. This method compares two collections of proxies, and checks
-   * whether they have elements with the same contents. The collections are
-   * only compared as sets, i.e., it is not considered to make any
-   * difference if one collection contains a different number of equal
-   * items of the same kind. The equality method {@link
-   * Proxy#equalsWithGeometry(Proxy) equalsWithGeometry()} provided by the
-   * {@link Proxy} interface is used for comparison of individual
+   * whether they have elements with the same contents. The equality method
+   * {@link Proxy#equalsWithGeometry(Proxy) equalsWithGeometry()} provided
+   * by the {@link Proxy} interface is used for comparison of individual
    * elements.
    */
-  public static boolean isEqualSetWithGeometryOfCollection
+  public static boolean isEqualCollectionWithGeometry
     (final Collection<? extends Proxy> coll1,
      final Collection<? extends Proxy> coll2)
   {
-    final ProxyAccessorMap<Proxy> map1 =
-      new ProxyAccessorHashMapWithGeometry<Proxy>(coll1);
-    final ProxyAccessorMap<Proxy> map2 =
-      new ProxyAccessorHashMapWithGeometry<Proxy>(coll2);
+    final ProxyAccessorCollection<Proxy> map1 =
+      new ProxyAccessorHashCollectionWithGeometry<Proxy>(coll1);
+    final ProxyAccessorCollection<Proxy> map2 =
+      new ProxyAccessorHashCollectionWithGeometry<Proxy>(coll2);
     return map1.equalsByAccessorEquality(map2);
   }
 
@@ -136,20 +130,20 @@ public class EqualCollection
    * Proxy#equalsWithGeometry(Proxy) equalsWithGeometry()} provided by the
    * {@link Proxy} interface is used for comparison of individual
    * elements.
+   * This method can compare sets or collections, duplicates are not
+   * considered significant in either case.
    */
   public static boolean isEqualSetWithGeometry
-    (final Set<? extends Proxy> set1,
-     final Set<? extends Proxy> set2)
+    (final Collection<? extends Proxy> set1,
+     final Collection<? extends Proxy> set2)
   {
-    if (set1.size() == set2.size()) {
-      final ProxyAccessorMap<Proxy> map1 =
-        new ProxyAccessorHashMapWithGeometry<Proxy>(set1);
-      final ProxyAccessorMap<Proxy> map2 =
-        new ProxyAccessorHashMapWithGeometry<Proxy>(set2);
-      return map1.equalsByAccessorEquality(map2);
-    } else {
-      return false;
-    }
+    // Can't rely on set size as sets my have distinct elements that
+    // are equal under content-based equality.
+    final ProxyAccessorMap<Proxy> map1 =
+      new ProxyAccessorHashMapWithGeometry<Proxy>(set1);
+    final ProxyAccessorMap<Proxy> map2 =
+      new ProxyAccessorHashMapWithGeometry<Proxy>(set2);
+    return map1.equalsByAccessorEquality(map2);
   }
 
   /**
@@ -184,36 +178,38 @@ public class EqualCollection
   //#########################################################################
   //# Hash Code by Contents
   /**
-   * Calculates a hash code for a set of proxies based on the contents of
-   * the set. The hash codes of all elements of the set are considered, as
-   * obtained through the Proxy#hashCodeByContents() hashCodeByContents()}
-   * provided by the {@link Proxy} interface.
+   * Calculates a hash code for a collection of proxies based on the
+   * contents of the collection. The hash codes of all elements of the
+   * collection are considered, as obtained through the
+   * Proxy#hashCodeByContents() hashCodeByContents()} provided by the
+   * {@link Proxy} interface.
    */
-  public static int getSetHashCodeByContents(final Set<? extends Proxy> set)
+  public static int getCollectionHashCodeByContents
+    (final Collection<? extends Proxy> coll)
   {
     int result = 0;
-    for (final Proxy proxy : set) {
+    for (final Proxy proxy : coll) {
       result += proxy.hashCodeByContents();
     }
     return result;
   }
 
-
   /**
-   * Calculates a hash code for a collection of proxies based on the
-   * contents of the collection. The hash codes of all elements of the
-   * collection are considered, as obtained through the
-   * Proxy#hashCodeByContents() hashCodeByContents()} provided by the
-   * {@link Proxy} interface. This method considers the collection as a
-   * set, i.e., duplicate entries do not affect the resultant hash code.
+   * Calculates a hash code for a set of proxies based on the contents of
+   * the set. The hash codes of all elements of the set are considered, as
+   * obtained through the Proxy#hashCodeByContents() hashCodeByContents()}
+   * provided by the {@link Proxy} interface.
+   * This method can be applied to a set or collection, duplicates are not
+   * considered significant in either case.
    */
-  public static <P extends Proxy>
-    int getSetHashCodeByContentsOfCollection(final Collection<P> coll)
+  public static int getSetHashCodeByContents
+    (final Collection<? extends Proxy> set)
   {
-    final ProxyAccessorMap<P> map =
-      new ProxyAccessorHashMapByContents<P>(coll);
+    final ProxyAccessorMap<Proxy> map =
+      new ProxyAccessorHashMapByContents<Proxy>(set);
     return map.hashCodeByAccessorEquality();
   }
+
 
   /**
    * Calculates a hash code for a list of proxies based on the contents of
@@ -235,35 +231,36 @@ public class EqualCollection
   //#########################################################################
   //# Hash Code with Geometry
   /**
-   * Calculates a hash code for a set of proxies based on the contents and
-   * geometry information of the set's elements. The hash codes of all
-   * elements of the set are considered, as obtained through the
-   * Proxy#hashCodeWithGeometry() hashCodeWithGeometry()} provided by the
-   * {@link Proxy} interface.
+   * Calculates a hash code for a collection of proxies based on the
+   * contents and geometry information of the collection's elements. The
+   * hash codes of all elements of the collection are considered, as
+   * obtained through the Proxy#hashCodeWithGeometry()
+   * hashCodeWithGeometry()} provided by the {@link Proxy} interface.
    */
-  public static int getSetHashCodeWithGeometry(final Set<? extends Proxy> set)
+  public static int getCollectionHashCodeWithGeometry
+    (final Collection<? extends Proxy> coll)
   {
     int result = 0;
-    for (final Proxy proxy : set) {
+    for (final Proxy proxy : coll) {
       result += proxy.hashCodeWithGeometry();
     }
     return result;
   }
 
   /**
-   * Calculates a hash code for a collection of proxies based on the
-   * contents and geometry information of the collection's elements. The
-   * hash codes of all elements of the collection are considered, as
-   * obtained through the Proxy#hashCodeWithGeometry()
-   * hashCodeWithGeometry()} provided by the {@link Proxy} interface. This
-   * method considers the collection as a set, i.e., duplicate entries do
-   * not affect the resultant hash code.
+   * Calculates a hash code for a set of proxies based on the contents and
+   * geometry information of the set's elements. The hash codes of all
+   * elements of the set are considered, as obtained through the
+   * Proxy#hashCodeWithGeometry() hashCodeWithGeometry()} provided by the
+   * {@link Proxy} interface.
+   * This method can be applied to a set or collection, duplicates are not
+   * considered significant in either case.
    */
-  public static <P extends Proxy>
-    int getSetHashCodeWithGeometryOfCollection(final Collection<P> coll)
+  public static int getSetHashCodeWithGeometry
+    (final Collection<? extends Proxy> set)
   {
-    final ProxyAccessorMap<P> map =
-      new ProxyAccessorHashMapWithGeometry<P>(coll);
+    final ProxyAccessorMap<Proxy> map =
+      new ProxyAccessorHashMapWithGeometry<Proxy>(set);
     return map.hashCodeByAccessorEquality();
   }
 

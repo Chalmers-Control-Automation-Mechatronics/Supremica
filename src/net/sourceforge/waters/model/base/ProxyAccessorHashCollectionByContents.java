@@ -1,0 +1,61 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.model.base
+//# CLASS:   ProxyAccessorHashCollectionByContents
+//###########################################################################
+//# $Id: ProxyAccessorHashCollectionByContents.java,v 1.1 2006-08-18 06:39:29 robi Exp $
+//###########################################################################
+
+package net.sourceforge.waters.model.base;
+
+import java.util.Collection;
+import java.util.Map;
+
+
+/**
+ * @author Robi Malik
+ */
+
+public class ProxyAccessorHashCollectionByContents<P extends Proxy>
+  extends ProxyAccessorHashCollection<P>
+{
+
+  //#########################################################################
+  //# Constructors
+  public ProxyAccessorHashCollectionByContents()
+  {
+  }
+
+  public ProxyAccessorHashCollectionByContents(final int initialCapacity)
+  {
+    super(initialCapacity);
+  }
+
+  public ProxyAccessorHashCollectionByContents(final int initialCapacity,
+                                               final float loadFactor)
+  {
+    super(initialCapacity, loadFactor);
+  }
+
+  public ProxyAccessorHashCollectionByContents
+    (final Map<ProxyAccessor<P>,Integer> map)
+  {
+    super(map);
+  }
+
+  public ProxyAccessorHashCollectionByContents
+    (final Collection<? extends P> collection)
+  {
+    super(collection);
+  }
+
+
+  //#########################################################################
+  //# Overrides for abstract base class ProxyAccessorHashCollection
+  public ProxyAccessor<P> createAccessor(final P proxy)
+  {
+    return new ProxyAccessorByContents<P>(proxy);
+  }
+
+}

@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopChecker
 //###########################################################################
-//# $Id: ControlLoopChecker.java,v 1.2 2006-08-08 23:53:14 yip1 Exp $
+//# $Id: ControlLoopChecker.java,v 1.3 2006-08-18 06:39:29 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -183,8 +183,9 @@ public class ControlLoopChecker extends ModelChecker
 
     /**
      * This method visits each state tuple in the synchronized product.
-     * If it tries to visit state tuple that has been visited before, it detects a loop.
-     * @param state current state tuple property
+     * If it tries to visit a state tuple that has been visited before,
+     * it detects a loop.
+     * @param currTuple Current state tuple.
      */
     public void visit(ArrayList<StateProxy> currTuple)
     {

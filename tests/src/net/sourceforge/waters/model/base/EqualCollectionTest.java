@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   EqualCollectionTest
 //###########################################################################
-//# $Id: EqualCollectionTest.java,v 1.2 2006-07-20 02:28:38 robi Exp $
+//# $Id: EqualCollectionTest.java,v 1.3 2006-08-18 06:39:29 robi Exp $
 //###########################################################################
 
 
@@ -45,10 +45,10 @@ public class EqualCollectionTest extends TestCase
     assertTrue(EqualCollection.isEqualSetByContents(empty1, empty2));
     assertTrue(EqualCollection.isEqualSetByContents(empty2, empty1));
     final Collection<StringProxy> empty3 = new LinkedList<StringProxy>();
-    assertTrue(EqualCollection.isEqualSetByContents(empty1, empty3));
-    assertTrue(EqualCollection.isEqualSetByContents(empty3, empty1));
-    assertTrue(EqualCollection.isEqualSetByContents(empty2, empty3));
-    assertTrue(EqualCollection.isEqualSetByContents(empty3, empty2));
+    assertTrue(EqualCollection.isEqualCollectionByContents(empty1, empty3));
+    assertTrue(EqualCollection.isEqualCollectionByContents(empty3, empty1));
+    assertTrue(EqualCollection.isEqualCollectionByContents(empty2, empty3));
+    assertTrue(EqualCollection.isEqualCollectionByContents(empty3, empty2));
   }
 
   public void testSingletonEquals()
@@ -65,13 +65,13 @@ public class EqualCollectionTest extends TestCase
     assertTrue(EqualCollection.isEqualSetByContents(single2, single1));
     final Collection<StringProxy> single3 = new LinkedList<StringProxy>();
     single3.add(item3);
-    assertTrue(EqualCollection.isEqualSetByContents(single1, single3));
-    assertTrue(EqualCollection.isEqualSetByContents(single3, single1));
-    assertTrue(EqualCollection.isEqualSetByContents(single2, single3));
-    assertTrue(EqualCollection.isEqualSetByContents(single3, single2));
+    assertTrue(EqualCollection.isEqualCollectionByContents(single1, single3));
+    assertTrue(EqualCollection.isEqualCollectionByContents(single3, single1));
+    assertTrue(EqualCollection.isEqualCollectionByContents(single2, single3));
+    assertTrue(EqualCollection.isEqualCollectionByContents(single3, single2));
   }
 
-  public void testTwoElementsEquals()
+  public void testTwoElementsCollectionEquals()
   {
     final StringProxy item1 = new StringProxy("didel");
     final StringProxy item2 = new StringProxy("dum");
@@ -81,13 +81,50 @@ public class EqualCollectionTest extends TestCase
     final Collection<StringProxy> list2 = new LinkedList<StringProxy>();
     list2.add(item2);
     list2.add(item1);
-    assertTrue(EqualCollection.isEqualSetByContents(list1, list1));
-    assertTrue(EqualCollection.isEqualSetByContents(list1, list2));
-    assertTrue(EqualCollection.isEqualSetByContents(list2, list1));
-    assertTrue(EqualCollection.isEqualSetByContents(list2, list2));
+    assertTrue(EqualCollection.isEqualCollectionByContents(list1, list1));
+    assertTrue(EqualCollection.isEqualCollectionByContents(list1, list2));
+    assertTrue(EqualCollection.isEqualCollectionByContents(list2, list1));
+    assertTrue(EqualCollection.isEqualCollectionByContents(list2, list2));
   }
 
-  public void testNotEquals()
+  public void testTwoElementsSetEquals()
+  {
+    final StringProxy item1 = new StringProxy("didel");
+    final StringProxy item2 = new StringProxy("dum");
+    final Set<StringProxy> set1 = new HashSet<StringProxy>();
+    set1.add(item1);
+    set1.add(item2);
+    final Set<StringProxy> set2 = new HashSet<StringProxy>();
+    set2.add(item2);
+    set2.add(item1);
+    assertTrue(EqualCollection.isEqualSetByContents(set1, set1));
+    assertTrue(EqualCollection.isEqualSetByContents(set1, set2));
+    assertTrue(EqualCollection.isEqualSetByContents(set2, set1));
+    assertTrue(EqualCollection.isEqualSetByContents(set2, set2));
+  }
+
+  public void testDoubleUps()
+  {
+    final StringProxy item1 = new StringProxy("didel");
+    final Collection<StringProxy> list1 = new HashSet<StringProxy>();
+    list1.add(item1);
+    final Collection<StringProxy> list2 = new LinkedList<StringProxy>();
+    list2.add(item1);
+    list2.add(item1);
+    assertTrue(EqualCollection.isEqualCollectionByContents(list1, list1));
+    assertFalse(EqualCollection.isEqualCollectionByContents(list1, list2));
+    assertFalse(EqualCollection.isEqualCollectionByContents(list2, list1));
+    assertTrue(EqualCollection.isEqualCollectionByContents(list2, list2));
+    final StringProxy item2 = new StringProxy("dum");
+    list1.add(item2);
+    list2.add(item2);
+    assertTrue(EqualCollection.isEqualCollectionByContents(list1, list1));
+    assertFalse(EqualCollection.isEqualCollectionByContents(list1, list2));
+    assertFalse(EqualCollection.isEqualCollectionByContents(list2, list1));
+    assertTrue(EqualCollection.isEqualCollectionByContents(list2, list2));
+  }
+
+  public void testCollectionNotEquals()
   {
     final StringProxy item1 = new StringProxy("ei");
     final StringProxy item2 = new StringProxy("didel");
@@ -99,6 +136,29 @@ public class EqualCollectionTest extends TestCase
     list2.add(item2);
     list2.add(item3);
     final Collection<StringProxy> list3 = new LinkedList<StringProxy>();
+    list3.add(item1);
+    list3.add(item2);
+    list3.add(item3);
+    assertFalse(EqualCollection.isEqualCollectionByContents(list1, list2));
+    assertFalse(EqualCollection.isEqualCollectionByContents(list2, list1));
+    assertFalse(EqualCollection.isEqualCollectionByContents(list1, list3));
+    assertFalse(EqualCollection.isEqualCollectionByContents(list3, list1));
+    assertFalse(EqualCollection.isEqualCollectionByContents(list2, list3));
+    assertFalse(EqualCollection.isEqualCollectionByContents(list3, list2));
+  }
+
+  public void testSetNotEquals()
+  {
+    final StringProxy item1 = new StringProxy("ei");
+    final StringProxy item2 = new StringProxy("didel");
+    final StringProxy item3 = new StringProxy("dum");
+    final Set<StringProxy> list1 = new HashSet<StringProxy>();
+    list1.add(item1);
+    list1.add(item2);
+    final Set<StringProxy> list2 = new HashSet<StringProxy>();
+    list2.add(item2);
+    list2.add(item3);
+    final Set<StringProxy> list3 = new HashSet<StringProxy>();
     list3.add(item1);
     list3.add(item2);
     list3.add(item3);

@@ -850,8 +850,12 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 	  if {[regexp {^[a-z]} $type all]} {
 	    Java_Write $stream $umap \
 		"        ($membername == downcast.$membername)"
-	  } elseif {[regexp {^Collection<[a-zA-Z]*Proxy>$} $type all] ||
-                    [regexp {^Set<[a-zA-Z]*Proxy>} $type all]} {
+	  } elseif {[regexp {^Collection<[a-zA-Z]*Proxy>$} $type all]} {
+	    Java_WriteLn $stream $umap \
+		"        EqualCollection.isEqualCollectionByContents"
+	    Java_Write $stream $umap \
+                "          ($membername, downcast.$membername)"
+	  } elseif {[regexp {^Set<[a-zA-Z]*Proxy>} $type all]} {
 	    Java_WriteLn $stream $umap \
 		"        EqualCollection.isEqualSetByContents"
 	    Java_Write $stream $umap \
@@ -914,8 +918,12 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
           if {[regexp {^[a-z]} $type all]} {
             Java_Write $stream $umap \
                 "        ($membername == downcast.$membername)"
-          } elseif {[regexp {^Collection<[a-zA-Z]*Proxy>$} $type all] ||
-                    [regexp {^Set<[a-zA-Z]*Proxy>} $type all]} {
+          } elseif {[regexp {^Collection<[a-zA-Z]*Proxy>$} $type all]} {
+            Java_WriteLn $stream $umap \
+                "        EqualCollection.isEqualCollectionWithGeometry"
+            Java_Write $stream $umap \
+                "          ($membername, downcast.$membername)"
+          } elseif {[regexp {^Set<[a-zA-Z]*Proxy>} $type all]} {
             Java_WriteLn $stream $umap \
                 "        EqualCollection.isEqualSetWithGeometry"
             Java_Write $stream $umap \
@@ -970,8 +978,11 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
             Java_WriteLn $stream $umap "    \}"
           } elseif {[regexp {^[a-z]} $type all]} {
             Java_WriteLn $stream $umap "    result += $membername;"
-          } elseif {[regexp {^Collection<[a-zA-Z]*Proxy>$} $type all] ||
-                    [regexp {^Set<[a-zA-Z]*Proxy>} $type all]} {
+          } elseif {[regexp {^Collection<[a-zA-Z]*Proxy>$} $type all]} {
+            Java_Write $stream $umap "    result += "
+            Java_WriteLn $stream $umap \
+                "EqualCollection.getCollectionHashCodeByContents($membername);"
+          } elseif {[regexp {^Set<[a-zA-Z]*Proxy>} $type all]} {
             Java_Write $stream $umap "    result += "
             Java_WriteLn $stream $umap \
                 "EqualCollection.getSetHashCodeByContents($membername);"
@@ -1024,8 +1035,11 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
             Java_WriteLn $stream $umap "    \}"
           } elseif {[regexp {^[a-z]} $type all]} {
             Java_WriteLn $stream $umap "    result += $membername;"
-          } elseif {[regexp {^Collection<[a-zA-Z]*Proxy>$} $type all] ||
-                    [regexp {^Set<[a-zA-Z]*Proxy>} $type all]} {
+          } elseif {[regexp {^Collection<[a-zA-Z]*Proxy>$} $type all]} {
+            Java_Write $stream $umap "    result += "
+            Java_WriteLn $stream $umap \
+              "EqualCollection.getCollectionHashCodeWithGeometry($membername);"
+          } elseif {[regexp {^Set<[a-zA-Z]*Proxy>} $type all]} {
             Java_Write $stream $umap "    result += "
             Java_WriteLn $stream $umap \
                 "EqualCollection.getSetHashCodeWithGeometry($membername);"

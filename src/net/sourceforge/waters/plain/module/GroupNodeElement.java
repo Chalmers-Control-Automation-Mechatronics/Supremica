@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   GroupNodeElement
 //###########################################################################
-//# $Id: GroupNodeElement.java,v 1.8 2006-08-17 13:03:01 torda Exp $
+//# $Id: GroupNodeElement.java,v 1.9 2006-08-18 06:39:29 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -120,7 +120,7 @@ public final class GroupNodeElement
   {
     int result = super.hashCodeByContents();
     result *= 5;
-    result += EqualCollection.getSetHashCodeByContentsOfCollection(mImmediateChildNodes);
+    result += EqualCollection.getSetHashCodeByContents(mImmediateChildNodes);
     return result;
   }
 
@@ -128,7 +128,7 @@ public final class GroupNodeElement
   {
     int result = super.hashCodeByContents();
     result *= 5;
-    result += EqualCollection.getSetHashCodeWithGeometryOfCollection(mImmediateChildNodes);
+    result += EqualCollection.getSetHashCodeWithGeometry(mImmediateChildNodes);
     result *= 5;
     if (mGeometry != null) {
       result += mGeometry.hashCodeWithGeometry();

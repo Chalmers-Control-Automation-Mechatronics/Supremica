@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   ProxyAccessorMap
 //###########################################################################
-//# $Id: ProxyAccessorMap.java,v 1.2 2006-07-20 02:28:37 robi Exp $
+//# $Id: ProxyAccessorMap.java,v 1.3 2006-08-18 06:39:29 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -14,6 +14,13 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
+ * An alternative set interface that allows {@link Proxy} objects to
+ * be treated using alternative equalities.
+ * A proxy accessor map essentially is a map that maps {@link ProxyAccessor}
+ * objects to the actual {@link Proxy} objects. This interface provides
+ * set-like access to this set.
+ *
+ * @see ProxyAccessorCollection
  * @author Robi Malik
  */
 
