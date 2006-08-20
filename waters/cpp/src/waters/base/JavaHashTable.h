@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   JavaHashTable
 //###########################################################################
-//# $Id: JavaHashTable.h,v 1.1 2006-08-20 08:39:41 robi Exp $
+//# $Id: JavaHashTable.h,v 1.2 2006-08-20 11:02:43 robi Exp $
 //###########################################################################
 
 
@@ -23,10 +23,6 @@
 
 #include "waters/base/HashTable.h"
 
-namespace jni {
-  class ObjectGlue;
-}
-
 
 namespace waters {
 
@@ -39,15 +35,10 @@ class HashAccessor;
 
 class ObjectHashAccessor : public HashAccessor
 {
-private:
-  //##########################################################################
-  //# Constructors & Destructors
-  explicit ObjectHashAccessor() {};
-
 public:
   //##########################################################################
-  //# Construction
-  static const HashAccessor* getInstance() {return &theInstance;}
+  //# Constructors & Destructors
+  explicit ObjectHashAccessor(jni::ClassCache* cache) : mCache(cache) {};
 
   //##########################################################################
   //# Hash Methods
@@ -58,8 +49,8 @@ public:
 
 private:
   //##########################################################################
-  //# Class Variables
-  static const ObjectHashAccessor theInstance;
+  //# Data Members
+  jni::ClassCache* mCache;
 };
 
 
@@ -78,23 +69,22 @@ public:
   //# Access
   jni::ClassCache* getCache() const {return &mCache;}
   void clear() {mTable.clear();}
-  jni::ObjectGlue* get(jni::ObjectGlue* key) const
-    {return mTable.get(key);}
-  jni::ObjectGlue* add(jni::ObjectGlue* value) {return mTable.add(value);}
+  jobject get(jobject key) const {return mTable.get(key);}
+  jobject add(jobject value) {return mTable.add(value);}
 
   //##########################################################################
   //# Iteration
   int size() const {return mTable.size();}
   HashTableIterator iterator() const {return mTable.iterator();}
   bool hasNext(HashTableIterator& iter) const {return mTable.hasNext(iter);}
-  jni::ObjectGlue* next(HashTableIterator& iter) const
-    {return mTable.next(iter);}
+  jobject next(HashTableIterator& iter) const {return mTable.next(iter);}
 
 private:
   //##########################################################################
   //# Data Members
   mutable jni::ClassCache mCache;
-  waters::HashTable<jni::ObjectGlue*,jni::ObjectGlue*> mTable;
+  const ObjectHashAccessor mAccessor;
+  HashTable<jobject,jobject> mTable;
 };
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: jni.cache
 //# CLASS:   ObjectBase
 //###########################################################################
-//# $Id: ObjectBase.cpp,v 1.4 2005-11-07 23:45:47 robi Exp $
+//# $Id: ObjectBase.cpp,v 1.5 2006-08-20 11:02:43 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -35,12 +35,16 @@ ObjectBase(waters::uint32 classcode, ClassCache* cache)
 }
 
 ObjectBase::
-ObjectBase(jobject javaobject, waters::uint32 classcode, ClassCache* cache)
+ObjectBase(jobject javaobject,
+           waters::uint32 classcode,
+           ClassCache* cache,
+           bool global)
 {
   if (javaobject == 0) {
     mObjectReference = 0;
   } else {
-    mObjectReference = new ObjectReference(javaobject, classcode, cache);
+    mObjectReference =
+      new ObjectReference(javaobject, classcode, cache, global);
   }
 }
 

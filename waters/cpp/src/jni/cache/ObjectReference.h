@@ -4,7 +4,7 @@
 //# PACKAGE: jni.cache
 //# CLASS:   ObjectReference
 //###########################################################################
-//# $Id: ObjectReference.h,v 1.1 2005-11-06 09:01:52 robi Exp $
+//# $Id: ObjectReference.h,v 1.2 2006-08-20 11:02:43 robi Exp $
 //###########################################################################
 
 
@@ -41,7 +41,8 @@ public:
   explicit ObjectReference(waters::uint32 classcode, ClassCache* cache);
   explicit ObjectReference(jobject javaobject,
 			   waters::uint32 classcode,
-			   ClassCache* cache);
+			   ClassCache* cache,
+			   bool global = false);
   ~ObjectReference();
 
   //##########################################################################
@@ -50,8 +51,8 @@ public:
   jobject getJavaObject() const {return mJavaObject;};
   jobject returnJavaObject();
   void initJavaObject(jobject javaobject);
-  waters::uint32 addReference() {return ++mRefCount;}
-  waters::uint32 removeReference() {return --mRefCount;}
+  waters::uint32 addReference();
+  waters::uint32 removeReference();
 
 private:
   //##########################################################################

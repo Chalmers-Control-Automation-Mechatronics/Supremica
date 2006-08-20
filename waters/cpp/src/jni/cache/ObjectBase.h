@@ -4,7 +4,7 @@
 //# PACKAGE: jni.cache
 //# CLASS:   ObjectBase
 //###########################################################################
-//# $Id: ObjectBase.h,v 1.4 2005-11-07 23:45:47 robi Exp $
+//# $Id: ObjectBase.h,v 1.5 2006-08-20 11:02:43 robi Exp $
 //###########################################################################
 
 
@@ -55,7 +55,8 @@ protected:
   explicit ObjectBase(waters::uint32 classcode, ClassCache* cache);
   explicit ObjectBase(jobject javaobject,
                       waters::uint32 classcode,
-                      ClassCache* cache);
+                      ClassCache* cache,
+		      bool global = false);
   ObjectBase(const ObjectBase& partner);
   ~ObjectBase();
   ObjectBase& operator= (const ObjectBase& Partner);

@@ -5,7 +5,7 @@ $-
 //# PACKAGE: jni.templates
 //# CLASS:   Template for a plain glue class implementation file
 //###########################################################################
-//# $Id: PlainGlue.cpp,v 1.6 2006-08-16 02:56:42 robi Exp $
+//# $Id: PlainGlue.cpp,v 1.7 2006-08-20 11:02:43 robi Exp $
 //###########################################################################
 
 $+
@@ -92,18 +92,21 @@ $CPPCLASSNAME(waters::uint32 classcode, ClassCache* cache)
 
 
 $CPPCLASSNAME::
-$CPPCLASSNAME(jobject javaobject, waters::uint32 classcode, ClassCache* cache)
+$CPPCLASSNAME(jobject javaobject,
+$CSPC       $ waters::uint32 classcode,
+$CSPC       $ ClassCache* cache,
+$CSPC       $ bool global)
   : $IF-HASBASECLASS $CPPBASECLASSNAME $ELSE ObjectBase$ENDIF$=
-      (javaobject, classcode, cache)
+  (javaobject, classcode, cache, global)
 {
 }
 
 
 $ENDIF
 $CPPCLASSNAME::
-$CPPCLASSNAME(jobject javaobject, ClassCache* cache)
+$CPPCLASSNAME(jobject javaobject, ClassCache* cache, bool global)
   : $IF-HASBASECLASS $CPPBASECLASSNAME $ELSE ObjectBase$ENDIF$=
-      (javaobject, CLASS_$CLASSNAME, cache)
+  (javaobject, CLASS_$CLASSNAME, cache, global)
 {
 }
 

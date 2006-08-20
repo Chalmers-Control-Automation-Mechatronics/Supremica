@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   JavaHashTable
 //###########################################################################
-//# $Id: JavaHashTable.cpp,v 1.1 2006-08-20 08:39:41 robi Exp $
+//# $Id: JavaHashTable.cpp,v 1.2 2006-08-20 11:02:43 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -28,20 +28,16 @@ namespace waters {
 //############################################################################
 
 //############################################################################
-//# ObjectHashAccessor: Class Variables
-
-const ObjectHashAccessor ObjectHashAccessor::theInstance;
-
-
-//############################################################################
 //# ObjectHashAccessor: Hash Methods
 
 uint32 ObjectHashAccessor::
 hash(const void* key)
   const
 {
-  const jni::ObjectGlue* object = (const jni::ObjectGlue*) key;
-  const int javahash = object->hashCode();
+  const jobject object = (const jobject) key;
+  const jni::ObjectGlue glue(object, mCache, true);
+  const int javahash = glue.hashCode();
+  const int javahash2 = glue.hashCode();
   return waters::hashInt(javahash);
 }
 
@@ -50,9 +46,10 @@ bool ObjectHashAccessor::
 equals(const void* key1, const void* key2)
   const
 {
-  const jni::ObjectGlue* object1 = (const jni::ObjectGlue*) key1;
-  const jni::ObjectGlue* object2 = (const jni::ObjectGlue*) key2;
-  return object1->equals(object2);
+  const jobject object1 = (const jobject) key1;
+  const jni::ObjectGlue glue1(object1, mCache, true);
+  const jobject object2 = (const jobject) key2;
+  return glue1.equals(object2) != JNI_FALSE;
 }
 
 
@@ -67,7 +64,8 @@ equals(const void* key1, const void* key2)
 JavaHashTable::
 JavaHashTable(JNIEnv* env, jint initsize)
   : mCache(env),
-    mTable(waters::ObjectHashAccessor::getInstance(), initsize)
+    mAccessor(&mCache),
+    mTable(&mAccessor, initsize)
 {
 }
 
@@ -93,10 +91,8 @@ Java_net_sourceforge_waters_cpp_analysis_NativeHashSet_destroyNativeHashSet
   waters::JavaHashTable* table = (waters::JavaHashTable*) handler;
   waters::HashTableIterator iter = table->iterator();
   while (table->hasNext(iter) && !env->ExceptionOccurred()) {
-    jni::ObjectGlue* next = table->next(iter);
-    jobject victim = next->getJavaObject();
+    jobject victim = table->next(iter);
     env->DeleteGlobalRef(victim);
-    delete next;
   }
   delete table;
 }
@@ -114,14 +110,7 @@ Java_net_sourceforge_waters_cpp_analysis_NativeHashSet_containsNative
   (JNIEnv* /* env */, jobject /* nset */, jint handler, jobject item)
 {
   const waters::JavaHashTable* table = (const waters::JavaHashTable*) handler;
-  jni::ClassCache* cache = table->getCache();
-  try {
-    jni::ObjectGlue glue(item, cache);
-    return table->get(&glue) ? JNI_TRUE : JNI_FALSE;
-  } catch (const jni::PreJavaException& pre) {
-    cache->throwJavaException(pre);
-    return JNI_FALSE;
-  }
+  return table->get(item) ? JNI_TRUE : JNI_FALSE;
 }
 
 JNIEXPORT jboolean JNICALL
@@ -129,20 +118,12 @@ Java_net_sourceforge_waters_cpp_analysis_NativeHashSet_addNative
   (JNIEnv *env, jobject /* nset */, jint handler, jobject item)
 {
   waters::JavaHashTable* table = (waters::JavaHashTable*) handler;
-  jni::ClassCache* cache = table->getCache();
-  try {
-    jobject gitem = env->NewGlobalRef(item);
-    jni::ObjectGlue* gglue = new jni::ObjectGlue(gitem, cache);
-    jni::ObjectGlue* added = table->add(gglue);
-    if (gglue == added) {
-      return JNI_TRUE;
-    } else {
-      env->DeleteGlobalRef(gitem);
-      delete gglue;
-      return JNI_FALSE;
-    }
-  } catch (const jni::PreJavaException& pre) {
-    cache->throwJavaException(pre);
+  jobject gitem = env->NewGlobalRef(item);
+  jobject added = table->add(gitem);
+  if (gitem == added) {
+    return JNI_TRUE;
+  } else {
+    env->DeleteGlobalRef(gitem);
     return JNI_FALSE;
   }
 }
@@ -178,8 +159,7 @@ Java_net_sourceforge_waters_cpp_analysis_NativeHashSet_getNativeNext
 {
   const waters::JavaHashTable* table = (const waters::JavaHashTable*) thandler;
   waters::HashTableIterator* iter = (waters::HashTableIterator*) ihandler;
-  jni::ObjectGlue* next = table->next(*iter);
-  return next->getJavaObject();
+  return table->next(*iter);
 }
 
 JNIEXPORT jboolean JNICALL
@@ -188,6 +168,6 @@ Java_net_sourceforge_waters_cpp_analysis_NativeHashSet_hasNativeNext
 {
   const waters::JavaHashTable* table = (const waters::JavaHashTable*) thandler;
   waters::HashTableIterator* iter = (waters::HashTableIterator*) ihandler;
-  bool result = table->hasNext(*iter);
+  const bool result = table->hasNext(*iter);
   return result ? JNI_TRUE : JNI_FALSE;
 }

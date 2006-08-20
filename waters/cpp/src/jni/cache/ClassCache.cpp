@@ -4,7 +4,7 @@
 //# PACKAGE: jni.base
 //# CLASS:   ClassCache
 //###########################################################################
-//# $Id: ClassCache.cpp,v 1.4 2006-08-20 08:39:41 robi Exp $
+//# $Id: ClassCache.cpp,v 1.5 2006-08-20 11:02:43 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -59,16 +59,11 @@ bool ClassCacheHashAccessor::
 equals(const void* key1, const void* key2)
   const
 {
-  jmethodID mid = mClassGlue->getMethodID(METHOD_Object_equals_0);
   jobject javaobject1 = (jobject) key1;
   jobject javaobject2 = (jobject) key2;
-  jboolean result =
-    mEnvironment->CallBooleanMethod(javaobject1, mid, javaobject2);
-  if (jthrowable exception = mEnvironment->ExceptionOccurred()) {
-    throw exception;
-  }
-  return result != JNI_FALSE;
+  return mEnvironment->IsSameObject(javaobject1, javaobject2);
 }
+
 
 
 //###########################################################################

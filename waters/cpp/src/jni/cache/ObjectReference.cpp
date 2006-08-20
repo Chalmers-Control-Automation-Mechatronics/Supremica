@@ -4,7 +4,7 @@
 //# PACKAGE: jni.cache
 //# CLASS:   ObjectReference
 //###########################################################################
-//# $Id: ObjectReference.cpp,v 1.1 2005-11-06 09:01:52 robi Exp $
+//# $Id: ObjectReference.cpp,v 1.2 2006-08-20 11:02:43 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -34,13 +34,14 @@ ObjectReference(waters::uint32 classcode, ClassCache* cache)
 ObjectReference::
 ObjectReference(jobject javaobject,
                 waters::uint32 classcode,
-                ClassCache* cache)
+                ClassCache* cache,
+                bool global)
 {
   if ( (mJavaObject = javaobject) ) {
     JNIEnv* env = cache->getEnvironment();
     jclass javaclass = env->GetObjectClass(javaobject);
     mClass = cache->getClass(javaclass, classcode);
-    mRefCount = 1;
+    mRefCount = global ? UNDEF_UINT32 : 1;
   } else {
     cache->throwJavaException
       (CLASS_NullPointerException, "Trying to create NULL object!");
@@ -64,13 +65,30 @@ returnJavaObject()
   addReference();
   return getJavaObject();
 }
- 
 
 void ObjectReference::
 initJavaObject(jobject javaobject)
 {
   mJavaObject = javaobject;
   mRefCount = 1;
+}
+
+waters::uint32 ObjectReference::
+addReference()
+{
+  if (mRefCount < UNDEF_UINT32) {
+    mRefCount++;
+  }
+  return mRefCount;
+}
+
+waters::uint32 ObjectReference::
+removeReference()
+{
+  if (mRefCount < UNDEF_UINT32) {
+    mRefCount--;
+  }
+  return mRefCount;
 }
 
 
