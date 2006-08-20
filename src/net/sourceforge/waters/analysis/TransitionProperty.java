@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   TransitionProperty
 //###########################################################################
-//# $Id: TransitionProperty.java,v 1.1 2006-08-08 22:32:37 yip1 Exp $
+//# $Id: TransitionProperty.java,v 1.2 2006-08-20 22:51:38 yip1 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -25,13 +25,13 @@ import net.sourceforge.waters.model.des.EventProxy;
 public class TransitionProperty
 {
     /** Source tuple of transition */
-    private ArrayList<StateProxy> sourceTuple;
+    private ArrayList<Integer> sourceTuple;
 
     /** Target tuple of transition */
-    private ArrayList<StateProxy> targetTuple;
+    private ArrayList<Integer> targetTuple;
 
     /** Event of transition */
-    private EventProxy event;
+    private int event;
 
 
     //#########################################################################
@@ -43,7 +43,7 @@ public class TransitionProperty
      * @param  targetTuple target of transition tuple
      * @param  event event of transition
      */
-    public TransitionProperty(ArrayList<StateProxy> sourceTuple, ArrayList<StateProxy> targetTuple, EventProxy event)
+    public TransitionProperty(ArrayList<Integer> sourceTuple, ArrayList<Integer> targetTuple, int event)
     {
 	this.sourceTuple = sourceTuple;
 	this.targetTuple = targetTuple;
@@ -53,17 +53,29 @@ public class TransitionProperty
     
     //#########################################################################
     //# Invocation
-    public ArrayList<StateProxy> getSourceTuple()
+    /**
+     * returns source state tuple
+     * @return source state tuple
+     */
+    public ArrayList<Integer> getSourceTuple()
     {
 	return this.sourceTuple;
     }
 
-    public ArrayList<StateProxy> getTargetTuple()
+    /**
+     * returns target state tuple
+     * @return target state tuple
+     */
+    public ArrayList<Integer> getTargetTuple()
     {
 	return this.targetTuple;
     }
 
-    public EventProxy getEvent()
+    /**
+     * returns event
+     * @return event between source and target
+     */
+    public int getEvent()
     {
 	return this.event;
     }

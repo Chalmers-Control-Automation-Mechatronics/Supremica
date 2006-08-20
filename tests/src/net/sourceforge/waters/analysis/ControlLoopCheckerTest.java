@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopCheckerTest
 //###########################################################################
-//# $Id: ControlLoopCheckerTest.java,v 1.5 2006-08-10 02:29:16 robi Exp $
+//# $Id: ControlLoopCheckerTest.java,v 1.6 2006-08-20 22:51:38 yip1 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -342,7 +342,6 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
   }
   */  
   
-  /*
   public void testKoordwsp() throws Exception
   {
     final String group = "valid";
@@ -350,7 +349,6 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String name = "koordwsp.wdes";
     runModelChecker(group, dir, name, true);
   }
-  */
   
   public void testSafetydisplay() throws Exception
   {
@@ -424,6 +422,16 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
   public void testTransferline__3() throws Exception
   {
     checkTransferline(3);
+  }
+
+  public void testTransferline__4() throws Exception
+  {
+    checkTransferline(4);
+  }
+
+  public void testTransferline__5() throws Exception
+  {
+    checkTransferline(5);
   }
 
   public void checkTransferline(final int n) throws Exception

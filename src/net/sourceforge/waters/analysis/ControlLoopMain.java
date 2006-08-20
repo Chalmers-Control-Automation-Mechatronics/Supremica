@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopChecker
 //##########################################################################
-//# $Id: ControlLoopMain.java,v 1.1 2006-08-08 22:32:37 yip1 Exp $
+//# $Id: ControlLoopMain.java,v 1.2 2006-08-20 22:51:38 yip1 Exp $
 //##########################################################################
 
 package net.sourceforge.waters.analysis;

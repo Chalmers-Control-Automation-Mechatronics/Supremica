@@ -18,6 +18,7 @@
   <property name="jsr173_api.jar"
     location="${supremica.lib}/jsr173_1.0_api.jar"/>
   <property name="junit.jar" location="${supremica.lib}/junit.jar"/>
+  <property name="trove.jar" location="${supremica.lib}/trove.jar"/>
 
   <path id="jaxb.classpath">
     <pathelement location="${activation.jar}"/>
@@ -117,6 +118,7 @@
       <classpath>
         <path refid="jaxb.classpath"/>
         <pathelement location="${jaxb.jar}"/>
+        <pathelement location="${trove.jar}"/>
       </classpath>
       <compilerarg value="-Xlint:unchecked"/>
       <compilerarg value="-Xlint:deprecation"/>
@@ -266,6 +268,7 @@
         <pathelement location="${waters.jar}"/>
         <pathelement location="${test.jar}"/>
         <pathelement location="${junit.jar}"/>
+        <pathelement location="${trove.jar}"/>
       </classpath>
       <sysproperty key="waters.test.inputdir" value="${examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
@@ -289,6 +292,7 @@
         <pathelement location="${waters.jar}"/>
         <pathelement location="${test.jar}"/>
         <pathelement location="${junit.jar}"/>
+        <pathelement location="${trove.jar}"/>
       </classpath>
       <sysproperty key="waters.test.inputdir" value="${examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
@@ -311,6 +315,7 @@
         <pathelement location="${waters.jar}"/>
         <pathelement location="${test.jar}"/>
         <pathelement location="${junit.jar}"/>
+        <pathelement location="${trove.jar}"/>
       </classpath>
       <sysproperty key="waters.test.inputdir" value="${examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>

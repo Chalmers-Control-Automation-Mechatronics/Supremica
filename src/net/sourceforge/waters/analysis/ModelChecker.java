@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ModelChecker
 //###########################################################################
-//# $Id: ModelChecker.java,v 1.2 2006-07-20 02:28:36 robi Exp $
+//# $Id: ModelChecker.java,v 1.3 2006-08-20 22:51:38 yip1 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
