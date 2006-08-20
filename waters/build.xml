@@ -170,6 +170,7 @@
     <javah outputFile="${javah.file}" classpath="${waters.classes}">
       <class name=
         "net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker"/>
+      <class name="net.sourceforge.waters.cpp.analysis.NativeHashSet"/>
     </javah>
   </target>
 
@@ -278,9 +279,7 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/model/base/E*Test.java"/>
-          <include name="net/sourceforge/waters/samples/algorithms/*Test.java"/>
-          <!-- <include name="net/sourceforge/waters/cpp/**/*Test.java"/> -->
+          <include name="net/sourceforge/waters/cpp/**/*Test.java"/>
           <exclude name="**/Abstract*.java"/>
         </fileset>
       </batchtest>

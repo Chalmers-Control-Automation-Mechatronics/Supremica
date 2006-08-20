@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   AutomatonEncoding
 //###########################################################################
-//# $Id: AutomatonEncoding.cpp,v 1.2 2006-08-17 10:15:12 robi Exp $
+//# $Id: AutomatonEncoding.cpp,v 1.3 2006-08-20 08:39:41 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -26,26 +26,6 @@
 #include "jni/glue/ProductDESGlue.h"
 
 #include "waters/analysis/AutomatonEncoding.h"
-
-
-//############################################################################
-//# Static functions for this file
-//############################################################################
-
-static int log2(waters::uint32 x)
-{
-  if (x == 0) {
-    return 0;
-  } else {
-    int result = 0;
-    while (x) {
-      result++;
-      x >>= 1;
-    }
-    return result;
-  }
-}
-
 
 
 namespace waters {

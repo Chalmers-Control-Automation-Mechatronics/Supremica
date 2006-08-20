@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   HashAccessor
 //###########################################################################
-//# $Id: HashAccessor.cpp,v 1.1 2005-02-18 01:30:10 robi Exp $
+//# $Id: HashAccessor.cpp,v 1.2 2006-08-20 08:39:41 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -54,6 +54,12 @@ uint32 hashInt(uint32 key)
   c -= a; c -= b; c ^= (b >> 15);
 
   return c;
+}
+
+
+uint32 hashInt(int key)
+{
+  return hashInt((uint32) key);
 }
 
 

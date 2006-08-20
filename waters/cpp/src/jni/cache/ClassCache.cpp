@@ -4,7 +4,7 @@
 //# PACKAGE: jni.base
 //# CLASS:   ClassCache
 //###########################################################################
-//# $Id: ClassCache.cpp,v 1.3 2006-08-16 02:56:42 robi Exp $
+//# $Id: ClassCache.cpp,v 1.4 2006-08-20 08:39:41 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -51,7 +51,7 @@ hash(const void* key)
   if (jthrowable exception = mEnvironment->ExceptionOccurred()) {
     throw exception;
   }
-  return waters::hashInt((waters::uint32) result);
+  return waters::hashInt(result);
 }
 
 

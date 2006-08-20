@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   HashTable
 //###########################################################################
-//# $Id: HashTable.h,v 1.3 2006-08-17 10:15:12 robi Exp $
+//# $Id: HashTable.h,v 1.4 2006-08-20 08:39:41 robi Exp $
 //###########################################################################
 
 
@@ -131,12 +131,12 @@ public:
   //# Access
   Value get(Key key) const
   {
-    return (Value) UntypedHashTable::get((void*) key);
+    return (Value) UntypedHashTable::get((const void*) key);
   }
 
-  bool add(const Value value)
+  Value add(const Value value)
   {
-    return UntypedHashTable::add((void*) value);
+    return (Value) UntypedHashTable::add((void*) value);
   }
 
   //##########################################################################

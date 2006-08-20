@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   HashTable
 //###########################################################################
-//# $Id: HashTable.cpp,v 1.3 2006-08-17 10:15:12 robi Exp $
+//# $Id: HashTable.cpp,v 1.4 2006-08-20 08:39:41 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -140,7 +140,7 @@ rehash(UntypedHashTable* table)
     void* value = mSlots[i].mValue;
     table->add(value);
     value = mSlots[i].mNext;
-    if ((uint32) value & 1 == 0) {
+    if (((uint32) value & 1) == 0) {
       table->add(value);
     }
   }
@@ -291,7 +291,7 @@ rehash(uint32 newsize)
   mTableMask = newsize - 1;
   mTable = new void*[newsize];
   for (i = 0; i < newsize; i++) {
-    mTable[i] = 0;
+    mTable[i] = mDefault;
   }
   mOverflowList = 0;
 
@@ -303,7 +303,7 @@ rehash(uint32 newsize)
   }
   for (i = 0; i < oldsize; i++) {
     void* value = oldtable[i];
-    if (value != 0 && ((uint32) value & 1) == 0) {
+    if ((value != mDefault) && (((uint32) value & 1) == 0)) {
       add(value);
     }
   }

@@ -4,7 +4,7 @@
 //# PACKAGE: jni.base
 //# CLASS:   ClassGlue
 //###########################################################################
-//# $Id: ClassGlue.cpp,v 1.2 2005-11-05 09:47:15 robi Exp $
+//# $Id: ClassGlue.cpp,v 1.3 2006-08-20 08:39:41 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -33,7 +33,7 @@ ClassGlue::
 ClassGlue(const ClassInfo* info, jclass javaclass, JNIEnv* env)
 {
   mClassInfo = info;
-  mJavaClass = javaclass;
+  mJavaClass = (jclass) env->NewGlobalRef(javaclass);
   if (waters::uint32 methodcount = info->getNumMethods()) {
     mMethodTable = new jmethodID[methodcount];
     for (waters::uint32 i = 0; i < methodcount; i++) {
@@ -64,7 +64,7 @@ ClassGlue::
     }
     delete [] mStaticFinalFieldTable;
   }
-  mEnvironment->DeleteLocalRef(mJavaClass);
+  mEnvironment->DeleteGlobalRef(mJavaClass);
 }
 
 

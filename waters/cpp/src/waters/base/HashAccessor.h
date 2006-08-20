@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   HashAccessor
 //###########################################################################
-//# $Id: HashAccessor.h,v 1.2 2006-08-16 02:56:42 robi Exp $
+//# $Id: HashAccessor.h,v 1.3 2006-08-20 08:39:41 robi Exp $
 //###########################################################################
 
 
@@ -50,6 +50,7 @@ public:
 //############################################################################
 
 uint32 hashInt(uint32 key);
+uint32 hashInt(int key);
 uint32 hashInt(const void* key);
 
 uint32 hashString(const char* key);
