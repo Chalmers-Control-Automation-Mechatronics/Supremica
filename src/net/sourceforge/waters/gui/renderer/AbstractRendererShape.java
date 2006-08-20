@@ -42,8 +42,9 @@ public abstract class AbstractRendererShape
     public static final Stroke DOUBLESTROKE = new BasicStroke(2);
     /** Thick line used for drawing shadows. */
     public static final Stroke SHADOWSTROKE = new BasicStroke(10, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND);
-    /** Used as the basic stroke when printing - "hairline" width. */
-    public static final Stroke THINSTROKE = new BasicStroke(0.25f);
+    /** Used as the basic stroke when printing--thinner than ordinary lines. */
+    //public static final Stroke THINSTROKE = new BasicStroke(0.25f); // Too thin
+    public static final Stroke THINSTROKE = new BasicStroke(0.5f);
     /** The default pen size. Is not {@code final} since it changes when printing. */
     public static Stroke BASICSTROKE = SINGLESTROKE;
 }

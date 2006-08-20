@@ -136,7 +136,7 @@ public class SimpleNodeProxyShape
         }
         else
         {
-            mArrow = new Point(-5, -5);
+            mArrow = new Point(-5, -5); // Why 5?
         }
         if (isInitial)
         {

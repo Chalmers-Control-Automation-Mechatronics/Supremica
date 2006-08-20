@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.57 2006-08-20 13:40:44 flordal Exp $
+//# $Id: EditorSurface.java,v 1.58 2006-08-20 14:21:18 flordal Exp $
 //###########################################################################
 
 
@@ -19,6 +19,7 @@ import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.Rectangle;
 import javax.swing.JComponent;
+import net.sourceforge.waters.gui.renderer.AbstractRendererShape;
 import net.sourceforge.waters.gui.renderer.MiscShape;
 import net.sourceforge.waters.gui.renderer.ProxyShape;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
@@ -54,7 +55,6 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
  *
  * @author Gian Perrone
  */
-
 public class EditorSurface
     extends JComponent
     implements Printable,
@@ -192,10 +192,10 @@ public class EditorSurface
      */
     protected void printComponent(Graphics g)
     {
-        // Paint using hairline
-        //ProxyShape.setBasicStroke(ProxyShape.THINSTROKE);
+        // Paint using thin stroke
+        AbstractRendererShape.setBasicStroke(AbstractRendererShape.THINSTROKE);
         paintComponent(g, true);
-        //ProxyShape.setBasicStroke(ProxyShape.SINGLESTROKE);
+        AbstractRendererShape.setBasicStroke(AbstractRendererShape.SINGLESTROKE);
     }
     
     /**

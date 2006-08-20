@@ -106,7 +106,7 @@ public abstract class EdgeProxyShape
             
             // Find the coordinate of the second-to-last segment of the curve
             FlatteningPathIterator it =
-                new FlatteningPathIterator(curve.getPathIterator(new AffineTransform()), 0.5, 25);
+                new FlatteningPathIterator(curve.getPathIterator(new AffineTransform()), 0.05);
             while (!it.isDone())
             {
                 double[] segment = new double[6];
@@ -122,9 +122,9 @@ public abstract class EdgeProxyShape
             }
             
             // Draw arrow, pointing in the direction given by (x1,y1),
-            // (x2,y2), at a distance SimpleNodeProxyShape.RADIUS+1 from
+            // (x2,y2), at a distance SimpleNodeProxyShape.RADIUS from
             // the end point!
-            drawArrow(x1, y1, x2, y2, SimpleNodeProxyShape.RADIUS+1, g);
+            drawArrow(x1, y1, x2, y2, SimpleNodeProxyShape.RADIUS, g);
         }
         else
         {
