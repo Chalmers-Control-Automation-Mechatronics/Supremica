@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeHashSetTest
 //###########################################################################
-//# $Id: NativeHashSetTest.java,v 1.1 2006-08-20 08:39:41 robi Exp $
+//# $Id: NativeHashSetTest.java,v 1.2 2006-08-20 11:09:59 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;
@@ -66,7 +66,7 @@ public class NativeHashSetTest extends AbstractWatersTest
     for (int i = 0; i < TESTSIZE; i++) {
       assertEquals(i, set.size());
       final boolean added = set.add(mTestData[i]);
-      assertTrue("Unexpected result from add()!", added);
+      assertTrue("Unexpected result from add(" + i + ")!", added);
     }
     for (int i = 0; i < TESTSIZE; i++) {
       final int item = mTestData[i];
@@ -81,7 +81,7 @@ public class NativeHashSetTest extends AbstractWatersTest
     for (int i = 0; i < TESTSIZE; i++) {
       assertEquals(i, set.size());
       final boolean added = set.add(mTestData[TESTSIZE - i - 1]);
-      assertTrue("Unexpected result from add()!", added);
+      assertTrue("Unexpected result from add(" + i + ")!", added);
     }
     boolean found[] = new boolean[TESTSIZE];
     for (int i = 0; i < TESTSIZE; i++) {
@@ -158,6 +158,16 @@ public class NativeHashSetTest extends AbstractWatersTest
     assertTrue(set.contains(0));
     set.clear();
     assertFalse(set.contains(0));
+  }
+
+  public void testEquality()
+  {
+    final Set<Integer> set = new NativeHashSet<Integer>();
+    assertTrue(set.add(0));
+    assertTrue(set.contains(0));
+    for (int i = 1; i < TESTSIZE; i++) {
+      assertFalse(set.contains(i));
+    }
   }
 
 
