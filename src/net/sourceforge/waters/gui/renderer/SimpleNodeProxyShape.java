@@ -40,119 +40,133 @@ import net.sourceforge.waters.xsd.module.AnchorPosition;
 import net.sourceforge.waters.gui.renderer.Handle.HandleType;
 
 public class SimpleNodeProxyShape
-	extends AbstractProxyShape
+    extends AbstractProxyShape
 {
-	public void draw(Graphics2D g, RenderingInformation status)
-	{
-		updateColors();
-		super.draw(g, status);
-		Rectangle2D rect = getShape().getBounds();
-		rect.setRect(rect.getX() + 1, rect.getY() + 1,
-					 rect.getWidth() - 1, rect.getHeight() - 1);
-		Arc2D arc;
-		double i = 0;
-		double degrees = ((double)360 / (double)mColors.size());
-		if (mColors.isEmpty())
-		{
-			arc = new Arc2D.Double(rect, 0, 360, Arc2D.OPEN);
-			g.setColor(FILLCOLOR);
-			g.fill(arc);
-		}
-		else
-		{
-			for (Color c : mColors)
-			{
-				arc = new Arc2D.Double(rect, i, degrees, Arc2D.PIE);
-				g.setColor(c);
-				g.fill(arc);
-				i += degrees;
-			}
-		}
-		g.setColor(status.getColor());
-		if (isInitial)
-		{
-			mHandles.get(0).draw(g, status);
-		}
-	}
-	
-	private void updateColors()
-	{
-		mColors.clear();
-		if (mModule != null) {
-			Map<String, EventDeclProxy> map = 
-				new HashMap<String, EventDeclProxy>(mModule.getEventDeclList().size());
-			final List<Proxy> list = 
-				getProxy().getPropositions().getEventList();
-			if (list.isEmpty())
-			{
-				return;
-			}
-			for (EventDeclProxy e : mModule.getEventDeclList())
-			{
-				map.put(e.getName(), e);
-			}
-			for (final Proxy prop : list)
-			{
-				// BUG: ForeachEventSubject not supported!
-				final IdentifierProxy p = (IdentifierProxy)prop;
-				final EventDeclProxy decl = map.get(p.getName());
-				if (decl == null) {
-					mColors.add(EditorColor.DEFAULTMARKINGCOLOR);
-					continue;
-				}
-				final ColorGeometryProxy geo = decl.getColorGeometry();
-				if (geo == null) {
-					mColors.add(EditorColor.DEFAULTMARKINGCOLOR);
-					continue;
-				}
-				mColors.addAll(geo.getColorSet());
-			}
-		}
-	}
-	
-	public SimpleNodeProxyShape(SimpleNodeProxy proxy, ModuleProxy module)
-	{
-		super(proxy);
-    mHandles = new ArrayList<Handle>(1);
-		mModule = module;
-		Point2D p = getProxy().getPointGeometry().getPoint();
-		Rectangle2D rect = new Rectangle2D.Double(p.getX() - RADIUS, p.getY() - RADIUS,
-												  WIDTH, WIDTH);
-		mShape = new Arc2D.Double(rect, 0, 360, Arc2D.OPEN);
-		isInitial = getProxy().isInitial();
-		if (proxy.getInitialArrowGeometry() != null) {
-			mArrow = getProxy().getInitialArrowGeometry().getPoint();
-		} else {
-			mArrow = new Point(-5, -5);
-		}
-		if (isInitial) {
-			mHandles.add(new InitialStateHandle(Math.atan2(mArrow.getY(), mArrow.getX()), p, RADIUS));
-		}
-	}
-	
-	public Arc2D getShape()
-	{
-		return mShape;
-	}
-	
-	public SimpleNodeProxy getProxy()
-	{
-		return (SimpleNodeProxy)super.getProxy();
-	}
-  
-  public List<Handle> getHandles()
-  {
-	  return mHandles;
-  }
-	
-  private List<Handle> mHandles;
-	private Collection<Color> mColors = new ArrayList<Color>();
-	private final ModuleProxy mModule;
-	private final Arc2D mShape;
-	private final boolean isInitial;
-  private final Point2D mArrow;
-	
-	public static int RADIUS = 6;
-	public static int WIDTH = RADIUS * 2;
-	private static Color FILLCOLOR = Color.WHITE;
+    public void draw(Graphics2D g, RenderingInformation status)
+    {
+        // Draw the filling (depends on marking)
+        updateColors();
+        Rectangle2D rect = getShape().getBounds();
+        // Hm... +1,+1,-2,-2 is right in theory and in the postscript 
+        // output but wrong on screen in the editor... never mind...
+        //rect.setRect(rect.getX() + 1, rect.getY() + 1, rect.getWidth() - 2, rect.getHeight() - 2);
+        Arc2D arc;
+        double i = 0;
+        double degrees = ((double)360 / (double)mColors.size());
+        if (mColors.isEmpty())
+        {
+            arc = new Arc2D.Double(rect, 0, 360, Arc2D.OPEN);
+            g.setColor(FILLCOLOR);
+            g.fill(arc);
+        }
+        else
+        {
+            for (Color c : mColors)
+            {
+                arc = new Arc2D.Double(rect, i, degrees, Arc2D.PIE);
+                g.setColor(c);
+                g.fill(arc);
+                i += degrees;
+            }
+        }
+        g.setColor(status.getColor());
+        if (isInitial)
+        {
+            mHandles.get(0).draw(g, status);
+        }
+        
+        // Draw the basic shape (the outline)
+        super.draw(g, status);
+    }
+    
+    /**
+     * Updates the color set of marked nodes (I think).
+     */
+    private void updateColors()
+    {
+        mColors.clear();
+        if (mModule != null)
+        {
+            Map<String, EventDeclProxy> map =
+                new HashMap<String, EventDeclProxy>(mModule.getEventDeclList().size());
+            final List<Proxy> list =
+                getProxy().getPropositions().getEventList();
+            if (list.isEmpty())
+            {
+                return;
+            }
+            for (EventDeclProxy e : mModule.getEventDeclList())
+            {
+                map.put(e.getName(), e);
+            }
+            for (final Proxy prop : list)
+            {
+                // BUG: ForeachEventSubject not supported!
+                final IdentifierProxy p = (IdentifierProxy)prop;
+                final EventDeclProxy decl = map.get(p.getName());
+                if (decl == null)
+                {
+                    mColors.add(EditorColor.DEFAULTMARKINGCOLOR);
+                    continue;
+                }
+                final ColorGeometryProxy geo = decl.getColorGeometry();
+                if (geo == null)
+                {
+                    mColors.add(EditorColor.DEFAULTMARKINGCOLOR);
+                    continue;
+                }
+                mColors.addAll(geo.getColorSet());
+            }
+        }
+    }
+    
+    public SimpleNodeProxyShape(SimpleNodeProxy proxy, ModuleProxy module)
+    {
+        super(proxy);
+        mHandles = new ArrayList<Handle>(1);
+        mModule = module;
+        Point2D p = getProxy().getPointGeometry().getPoint();
+        Rectangle2D rect = new Rectangle2D.Double(p.getX() - RADIUS, p.getY() - RADIUS,
+            WIDTH, WIDTH);
+        mShape = new Arc2D.Double(rect, 0, 360, Arc2D.OPEN);
+        isInitial = getProxy().isInitial();
+        if (proxy.getInitialArrowGeometry() != null)
+        {
+            mArrow = getProxy().getInitialArrowGeometry().getPoint();
+        }
+        else
+        {
+            mArrow = new Point(-5, -5);
+        }
+        if (isInitial)
+        {
+            mHandles.add(new InitialStateHandle(Math.atan2(mArrow.getY(), mArrow.getX()), p, RADIUS));
+        }
+    }
+    
+    public Arc2D getShape()
+    {
+        return mShape;
+    }
+    
+    public SimpleNodeProxy getProxy()
+    {
+        return (SimpleNodeProxy)super.getProxy();
+    }
+    
+    public List<Handle> getHandles()
+    {
+        return mHandles;
+    }
+    
+    private List<Handle> mHandles;
+    private Collection<Color> mColors = new ArrayList<Color>();
+    private final ModuleProxy mModule;
+    private final Arc2D mShape;
+    private final boolean isInitial;
+    private final Point2D mArrow;
+    
+    public static int RADIUS = 6;
+    public static int WIDTH = RADIUS * 2;
+    private static Color FILLCOLOR = Color.WHITE;
 }

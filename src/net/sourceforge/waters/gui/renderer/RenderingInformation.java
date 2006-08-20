@@ -7,7 +7,7 @@ public class RenderingInformation
 	private final boolean mShowHandles;
 	private final Color mColor;
 	private final Color mShadowColor;
-	private final boolean mIsHighlighted;
+	private final boolean mIsFocused;
 	private final int mPriority;
 	
 	/*public RenderingInformation(EditorObject o)
@@ -15,11 +15,11 @@ public class RenderingInformation
 		this(false, false, false, EditorObject.NOTDRAG, o);
 	}*/
 	
-	public RenderingInformation(boolean showHandles, boolean isHighlighted,
+	public RenderingInformation(boolean showHandles, boolean isFocused,
 								Color color, Color shadowColor, int priority)
 	{
 		mShowHandles = showHandles;
-		mIsHighlighted = isHighlighted;
+		mIsFocused = isFocused;
 		mColor = color;
 		mShadowColor = shadowColor;
 		mPriority = priority;
@@ -30,9 +30,9 @@ public class RenderingInformation
 		return mShowHandles;
 	}
 	
-	public boolean isHighlighted()
+	public boolean isFocused()
 	{
-		return mIsHighlighted;
+		return mIsFocused;
 	}
 	
 	public Color getColor()

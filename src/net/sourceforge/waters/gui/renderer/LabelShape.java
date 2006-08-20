@@ -44,7 +44,7 @@ public class LabelShape
 		g.setFont(mFont);
 		g.setColor(status.getColor());		
 		g.drawString(mName, (int)mPoint.getX(), (int)mPoint.getY());
-		if (status.isHighlighted())
+		if (status.isFocused())
 		{
 			g.setColor(status.getShadowColor());
 			g.fill(getShape());

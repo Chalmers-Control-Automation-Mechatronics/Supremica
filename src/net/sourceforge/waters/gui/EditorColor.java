@@ -15,118 +15,110 @@ import net.sourceforge.waters.model.module.LabelGeometryProxy;
  */
 public class EditorColor
 {
-	/** The alpha value of the shadow-colors. */
-	private static final int SHADOWALPHA = 48;
-
-	/** The default color of disabled text. */
-	public static final Color DISABLED = Color.GRAY;
-
-	/** The default color of marked (accepting) nodes. */
-	public static Color DEFAULTMARKINGCOLOR = Color.GRAY;
-
-	/** The color of guard expressions. */
-	public static Color GUARDCOLOR = Color.GREEN.darker().darker();
-
-	/** The color of action expressions. */
-	public static Color ACTIONCOLOR = Color.BLUE; 
-
-	/** The color of the drag-select area. */
-	public static Color DRAGSELECTCOLOR = new Color(0,0,255,32); 
-
-	/** The default color of objects. */
-	public static Color DEFAULTCOLOR = Color.BLACK; 
-	public static Color DEFAULTCOLOR_LABEL = (Color.GREEN).darker().darker(); 
-	public static Color DEFAULTCOLOR_NODEGROUP = Color.lightGray; 
-
-	/** The color of erring objects. For example colliding nodes and nodegroups. */
-	public static Color ERRORCOLOR = Color.RED; 
-	public static Color ERRORCOLOR_NODE = ERRORCOLOR.darker();
-
-	/** The color of selected objects. */
-	public static Color SELECTCOLOR = Color.BLUE; 
-
-	public static Color HIGHLIGHTCOLOR = Color.CYAN; 
-
+    /** The alpha value of the shadow-colors. */
+    private static final int SHADOWALPHA = 48;
+    
+    /** The default color of disabled text. */
+    public static final Color DISABLEDCOLOR = Color.GRAY;
+    
+    /** The default color of marked (accepting) nodes. */
+    public static Color DEFAULTMARKINGCOLOR = Color.GRAY;
+    
+    /** The color of guard expressions. */
+    public static Color GUARDCOLOR = Color.GREEN.darker().darker();
+    
+    /** The color of action expressions. */
+    public static Color ACTIONCOLOR = Color.BLUE;
+    
+    /** The color of the drag-select area. */
+    public static Color DRAGSELECTCOLOR = new Color(0,0,255,32);
+    
+    /** The default color of objects. */
+    public static Color DEFAULTCOLOR = Color.BLACK;
+    public static Color DEFAULTCOLOR_LABEL = (Color.GREEN).darker().darker();
+    public static Color DEFAULTCOLOR_NODEGROUP = Color.lightGray;
+    
+    /** The color of erring objects. For example colliding nodes and nodegroups. */
+    public static Color ERRORCOLOR = Color.RED;
+    public static Color ERRORCOLOR_NODE = ERRORCOLOR.darker();
+    
+    /** The color of selected objects. */
+    public static Color SELECTCOLOR = Color.BLUE;
+    
     /** the color of acceptable drag objects */
-    public static Color CANDROP = (Color.GREEN).darker().darker();
-    public static Color CANTDROP = Color.RED;
-
-	/** Invisible color. */
-	public static Color INVISIBLE = new Color(0,0,0,0);
-	
-	public static boolean shadow = true;
-
-	/**
-	 * Returns a transparent variant of the supplied color. The
-	 * alpha-value is changed to SHADOWALPHA.
-	 *
-	 * @see #SHADOWALPHA
-	 */
-	public static Color shadow(Color color)
-	{
-		return new Color(color.getRed(), color.getGreen(), color.getBlue(), SHADOWALPHA);
-	}
-	
-	/**
-	 * Returns the apropriate color for painting this object.
-	 */
-	public static Color getColor(Proxy o, int dragOver, boolean selected,
-								 boolean highlighted, boolean error)
-	{
-		// In order of importance
-		if(dragOver != EditorSurface.NOTDRAG)
-		{
-			if (dragOver == EditorSurface.CANDROP)
-				return EditorColor.CANDROP;
-			else if(dragOver == EditorSurface.CANTDROP)
-				return EditorColor.CANTDROP;
-		}
-		else if(error)
-		{
-			if(o instanceof SimpleNodeProxy)
-			{
-				// Slightly different color, to distinguish nodes from
-				// nodegroups more clearly. Overkill?
-				return EditorColor.ERRORCOLOR_NODE;
-			}
-			return EditorColor.ERRORCOLOR;
-		}
-		else if(selected)
-		{
-			return EditorColor.SELECTCOLOR;
-		}
-		else if(highlighted && !shadow) // With shadows, highlighting is not necessary
-		{
-			return EditorColor.HIGHLIGHTCOLOR;
-		}
-
-		// Defaults
-		if(o instanceof GroupNodeProxy)
-		{
-			return EditorColor.DEFAULTCOLOR_NODEGROUP;
-		}
-		else if(o instanceof LabelGeometryProxy)
-		{
-			return EditorColor.DEFAULTCOLOR_LABEL;
-		}
-		return EditorColor.DEFAULTCOLOR;
-	}		
-
-	/**
-	 * Returns a lighter shade of the color of the object for drawing a "shadow".
-	 */
-	public static Color getShadowColor(Proxy o, int dragOver, boolean selected,
-								 	   boolean highlighted, boolean error)
-	{
-		// Overrides
-		if(selected && !error && o instanceof GroupNodeProxy)
-		{
-			// Unfortunately, the light gray color gives a too weak shadow!
-			return shadow(getColor(o, dragOver, selected, highlighted,
-									error).darker().darker().darker());
-		}
-
-		// Return the shadowed variant of the ordinary color of this object
-		return shadow(getColor(o, dragOver, selected, highlighted, error));
-	}
+    public static Color CANDROPCOLOR = (Color.GREEN).darker().darker();
+    public static Color CANTDROPCOLOR = Color.RED;
+    
+    /** Invisible color. */
+    public static Color INVISIBLE = new Color(0,0,0,0);
+    
+    /**
+     * Returns a transparent variant of the supplied color. The
+     * alpha-value is changed to SHADOWALPHA.
+     *
+     * @see #SHADOWALPHA
+     */
+    public static Color shadow(Color color)
+    {
+        return new Color(color.getRed(), color.getGreen(), color.getBlue(), SHADOWALPHA);
+    }
+    
+    /**
+     * Returns the apropriate color for painting this object.
+     */
+    public static Color getColor(Proxy o, EditorSurface.DRAGOVERSTATUS dragOver, boolean selected,
+        boolean error)
+    {
+        // In order of importance
+        if(dragOver != EditorSurface.DRAGOVERSTATUS.NOTDRAG)
+        {
+            if (dragOver == EditorSurface.DRAGOVERSTATUS.CANDROP)
+                return EditorColor.CANDROPCOLOR;
+            else if(dragOver == EditorSurface.DRAGOVERSTATUS.CANTDROP)
+                return EditorColor.CANTDROPCOLOR;
+        }
+        else if(error)
+        {
+            if(o instanceof SimpleNodeProxy)
+            {
+                // Slightly different color, to distinguish nodes from
+                // nodegroups more clearly. Overkill?
+                return EditorColor.ERRORCOLOR_NODE;
+            }
+            return EditorColor.ERRORCOLOR;
+        }
+        else if(selected)
+        {
+            return EditorColor.SELECTCOLOR;
+        }
+        
+        // Defaults
+        if(o instanceof GroupNodeProxy)
+        {
+            return EditorColor.DEFAULTCOLOR_NODEGROUP;
+        }
+        else if(o instanceof LabelGeometryProxy)
+        {
+            return EditorColor.DEFAULTCOLOR_LABEL;
+        }
+        return EditorColor.DEFAULTCOLOR;
+    }
+    
+    /**
+     * Returns a lighter shade of the color of the object for drawing a "shadow".
+     */
+    public static Color getShadowColor(Proxy o, EditorSurface.DRAGOVERSTATUS dragOver, boolean selected,
+        boolean error)
+    {
+        // Overrides
+        if(selected && !error && o instanceof GroupNodeProxy)
+        {
+            // Unfortunately, the light gray color gives a too weak shadow!
+            return shadow(getColor(o, dragOver, selected,
+                error).darker().darker().darker());
+        }
+        
+        // Return the shadowed variant of the ordinary color of this object
+        return shadow(getColor(o, dragOver, selected, error));
+    }
 }
