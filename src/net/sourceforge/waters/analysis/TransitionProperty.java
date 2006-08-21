@@ -3,19 +3,14 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   TransitionProperty
 //###########################################################################
-//# $Id: TransitionProperty.java,v 1.2 2006-08-20 22:51:38 yip1 Exp $
+//# $Id: TransitionProperty.java,v 1.3 2006-08-21 03:45:51 yip1 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
 
-import java.util.List;
-import java.util.ArrayList;
-import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.EventProxy;
-
 
 /**
- * <P>Transition Property of state tuple</P>
+ * <P>Transition between two state tuples</P>
  *
  * <P>It contains the property of transition between two state tuples</P>
  *
@@ -25,10 +20,10 @@ import net.sourceforge.waters.model.des.EventProxy;
 public class TransitionProperty
 {
     /** Source tuple of transition */
-    private ArrayList<Integer> sourceTuple;
+    private StateTuple sourceTuple;
 
     /** Target tuple of transition */
-    private ArrayList<Integer> targetTuple;
+    private StateTuple targetTuple;
 
     /** Event of transition */
     private int event;
@@ -43,7 +38,7 @@ public class TransitionProperty
      * @param  targetTuple target of transition tuple
      * @param  event event of transition
      */
-    public TransitionProperty(ArrayList<Integer> sourceTuple, ArrayList<Integer> targetTuple, int event)
+    public TransitionProperty(StateTuple sourceTuple, StateTuple targetTuple, int event)
     {
 	this.sourceTuple = sourceTuple;
 	this.targetTuple = targetTuple;
@@ -57,7 +52,7 @@ public class TransitionProperty
      * returns source state tuple
      * @return source state tuple
      */
-    public ArrayList<Integer> getSourceTuple()
+    public StateTuple getSourceTuple()
     {
 	return this.sourceTuple;
     }
@@ -66,7 +61,7 @@ public class TransitionProperty
      * returns target state tuple
      * @return target state tuple
      */
-    public ArrayList<Integer> getTargetTuple()
+    public StateTuple getTargetTuple()
     {
 	return this.targetTuple;
     }

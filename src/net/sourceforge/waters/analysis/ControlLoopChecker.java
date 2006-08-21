@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopChecker
 //###########################################################################
-//# $Id: ControlLoopChecker.java,v 1.4 2006-08-20 22:51:38 yip1 Exp $
+//# $Id: ControlLoopChecker.java,v 1.5 2006-08-21 03:45:51 yip1 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -26,7 +26,6 @@ import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.LoopTraceProxy;
-
 
 /**
  * <P>An implementation of a control loop checker.</P>
@@ -60,16 +59,16 @@ public class ControlLoopChecker extends ModelChecker
     private ArrayList<ArrayList<TransitionProxy>> mTransitionList;
     
     /** a map of state tuple in synchronized model */
-    private Map<ArrayList<Integer>, boolean[]> mGlobalStateMap;
+    private Map<StateTuple, boolean[]> mGlobalStateMap;
     
     /** a list of unvisited state tuple. */
-    private List<ArrayList<Integer>> mUnvisitedList;
+    private List<StateTuple> mUnvisitedList;
     
     /** it holds the initial state tuple of the model. */
-    private ArrayList<Integer> mInitialStateTuple;
+    private StateTuple mInitialStateTuple;
     
     /** for tracing counterexample: it holds the root state of the control loop. */
-    private ArrayList<Integer> mRootStateTuple;
+    private StateTuple mRootStateTuple;
     
     /** global event map: true is controllable, false is uncontrollable */
     private boolean[] mGlobalEventMap;
@@ -79,6 +78,9 @@ public class ControlLoopChecker extends ModelChecker
     
     /** a map for available transitions */
     private static ArrayList<int[][]> mTransitionListMap;
+
+    /** a global state tuple for storing next state tuple */
+    private StateTuple mNextTuple;
 
     
     //#########################################################################
@@ -98,7 +100,7 @@ public class ControlLoopChecker extends ModelChecker
 	mControlLoopFree = true;
 	mAutomataList = new ArrayList<AutomatonProxy>();
 	mEventList = new ArrayList<EventProxy>();
-
+	
 	mTransitionList = new ArrayList<ArrayList<TransitionProxy>>();
 	
 	// create Automaton list
@@ -110,7 +112,7 @@ public class ControlLoopChecker extends ModelChecker
 	for(final EventProxy eProxy: des.getEvents()){
 	    mEventList.add(eProxy);
 	}
-
+	
 	// create Transition list
 	for(final AutomatonProxy aProxy: mAutomataList){
 	    final ArrayList<TransitionProxy> tmpTran = new ArrayList<TransitionProxy>();
@@ -119,10 +121,10 @@ public class ControlLoopChecker extends ModelChecker
 	    }
 	    mTransitionList.add(tmpTran);
 	}
-
+	
 	// get number of automata
 	mNumAutomata = mAutomataList.size();
-
+	
 	// get number of events
 	mNumEvent = mEventList.size();
 	
@@ -141,10 +143,10 @@ public class ControlLoopChecker extends ModelChecker
 	// initialize maps
 	byte[] currEvents;
 	int[][] currTrans;
-
+	
 	Set<StateProxy> stateSet;
 	ArrayList<StateProxy> stateList;
-
+	
 	int counter = 0;
 	for(final AutomatonProxy aProxy: mAutomataList){
 	    
@@ -174,27 +176,32 @@ public class ControlLoopChecker extends ModelChecker
 		    = stateList.indexOf(tProxy.getTarget());
 	    }
 	    mTransitionListMap.add(currTrans);
-
+	    
 	    counter++;
 	}
 	
 	// initialise state tuple list
-	mGlobalStateMap = new HashMap<ArrayList<Integer>, boolean[]>();
-	mUnvisitedList = new LinkedList<ArrayList<Integer>>();
+	mGlobalStateMap = new HashMap<StateTuple, boolean[]>();
+	mUnvisitedList = new LinkedList<StateTuple>();
 	
-	mInitialStateTuple = new ArrayList<Integer>();
+	mInitialStateTuple = new StateTuple(mNumAutomata);
 	
 	// create initial state tuple
+	int i = 0;
 	for(final AutomatonProxy aProxy: mAutomataList){
-	    int i = 0;
+	    int j = 0;
 	    for(final StateProxy sProxy: aProxy.getStates()){
 		if(sProxy.isInitial() == true){
-		    mInitialStateTuple.add(i);
+		    mInitialStateTuple.set(i, j);
 		    break;
 		}
-		i++;
+		j++;
 	    }
+	    i++;
 	}
+	
+	// set a buffer for storing next state tuple
+	mNextTuple = new StateTuple(mNumAutomata);
     }
     
     
@@ -247,7 +254,7 @@ public class ControlLoopChecker extends ModelChecker
 	mUnvisitedList.add(mInitialStateTuple);
 	
 	while(!mUnvisitedList.isEmpty()){
-	    final ArrayList<Integer> currTuple = mUnvisitedList.get(0);
+	    final StateTuple currTuple = mUnvisitedList.get(0);
 	    final boolean sp[] = mGlobalStateMap.get(currTuple);
 	    if(sp != null){
 		if(sp[0] == false){
@@ -265,20 +272,19 @@ public class ControlLoopChecker extends ModelChecker
      * If it tries to visit state tuple that has been visited before, it detects a loop.
      * @param state current state tuple property
      */
-    public void visit(ArrayList<Integer> currTuple)
+    public void visit(StateTuple currTuple)
     {
 	boolean[] currSp = mGlobalStateMap.get(currTuple);
 	currSp[0] = true;
 
 	for(int i = 0; i < mNumEvent; i++){
-	    ArrayList<Integer> nextTuple = eventAvailable(currTuple, i, false);
-	    
-	    if(nextTuple != null){
-                if(mGlobalEventMap[i]){
+	    if(eventAvailable(currTuple, i, false)){
+                if(mGlobalEventMap[i]){ // CONTROLLABLE
 		    boolean[] nextSp;
 		    
-		    if(mGlobalStateMap.get(nextTuple) == null){
+		    if(mGlobalStateMap.get(mNextTuple) == null){
 			nextSp = new boolean[2];
+			StateTuple nextTuple = new StateTuple(mNextTuple);
 			mGlobalStateMap.put(nextTuple, nextSp);
 			mUnvisitedList.add(nextTuple);
 			visit(nextTuple);
@@ -287,6 +293,7 @@ public class ControlLoopChecker extends ModelChecker
 			}
 		    }
 		    else{
+			StateTuple nextTuple = new StateTuple(mNextTuple);
 			nextSp = mGlobalStateMap.get(nextTuple);
 			if(nextSp[0] == false){
 			    visit(nextTuple);
@@ -307,8 +314,9 @@ public class ControlLoopChecker extends ModelChecker
 		    }
 		}
 		else{ // UNCONTROLLABLE
-		    if(mGlobalStateMap.get(nextTuple) == null){
-			boolean nextSp[] = new boolean[2];
+		    if(mGlobalStateMap.get(mNextTuple) == null){
+			boolean nextSp[] = new boolean[2];			
+			StateTuple nextTuple = new StateTuple(mNextTuple);
 			mGlobalStateMap.put(nextTuple, nextSp);
 			mUnvisitedList.add(nextTuple);
 		    }
@@ -340,6 +348,8 @@ public class ControlLoopChecker extends ModelChecker
 	final String desname = des.getName();
 	final String tracename = desname + ":has a control loop";
 	final List<EventProxy> tracelist = new LinkedList<EventProxy>();
+
+	// return null;
 	
 	/* FIND COUNTEREXAMPLE TRACE HERE */
 	/* Counterexample = The shortest path from mInitialStateTuple to mRootStateTuple 
@@ -348,12 +358,12 @@ public class ControlLoopChecker extends ModelChecker
 	// find a shortest path from mRootStateTuple to mRootStateTuple: only for controllable events
 	final Set<TransitionProperty> loopStates = new HashSet<TransitionProperty>();
 
-        List<ArrayList<Integer>> list = new LinkedList<ArrayList<Integer>>();
-        Set<ArrayList<Integer>> set = new HashSet<ArrayList<Integer>>();
+        List<StateTuple> list = new LinkedList<StateTuple>();
+        Set<StateTuple> set = new HashSet<StateTuple>();
         
-	List<Integer> indexList = new ArrayList<Integer>();
+	ArrayList<Integer> indexList = new ArrayList<Integer>();
         
-        ArrayList<Integer> currTuple = new ArrayList<Integer>();
+        StateTuple currTuple = new StateTuple(mNumAutomata);
         
         int lastEvent = -1;
 	
@@ -369,9 +379,8 @@ public class ControlLoopChecker extends ModelChecker
 		
                 for(int j = 0; j < mNumEvent; j++){
                     if(mGlobalEventMap[j]){
-			ArrayList<Integer> nextTuple = eventAvailable(currTuple, j, true);
-			
-			if(nextTuple != null){
+			if(eventAvailable(currTuple, j, true)){
+			    StateTuple nextTuple = new StateTuple(mNextTuple);
 			    if(nextTuple.equals(mRootStateTuple)){
                                 lastEvent = j;
 				break loop;
@@ -398,7 +407,7 @@ public class ControlLoopChecker extends ModelChecker
 	}
 	else{
 	    loopStates.add(new TransitionProperty(currTuple, mRootStateTuple, lastEvent));
-            ArrayList<Integer> target = currTuple;
+            StateTuple target = currTuple;
 
 	    for(int i = indexList.size()-2; i >= 0; i--){
 		int start = (indexList.get(i)==0)?0:indexList.get(i-1)+1;
@@ -406,13 +415,12 @@ public class ControlLoopChecker extends ModelChecker
 
 		next:
 		for(int j = start; j <= end; j++){
-                    ArrayList<Integer> curr = list.get(j);
+                    StateTuple curr = list.get(j);
 		    
                     for(int k = 0; k < mNumEvent; k++){
                         if(mGlobalEventMap[k]){
-			    ArrayList<Integer> next = eventAvailable(curr, k, true);
-                            
-			    if(next != null){
+			    if(eventAvailable(curr, k, true)){
+				StateTuple next = new StateTuple(mNextTuple);
 				if(next.equals(target)){
 				    loopStates.add(new TransitionProperty(curr, next, k));
 				    target = curr;
@@ -428,8 +436,8 @@ public class ControlLoopChecker extends ModelChecker
 	// find a shortest path from mInitialStateTuple to mRootStateTuple: for both controllable events and uncontrollable events
 	// if mInitialStateTuple != mRootStateTuple
 	if(!mInitialStateTuple.equals(mRootStateTuple)){
-	    list = new LinkedList<ArrayList<Integer>>();
-	    set = new HashSet<ArrayList<Integer>>();
+	    list = new LinkedList<StateTuple>();
+	    set = new HashSet<StateTuple>();
 	    indexList = new ArrayList<Integer>();
 	    lastEvent = -1;
 	    
@@ -444,9 +452,8 @@ public class ControlLoopChecker extends ModelChecker
 		    currTuple = list.get(i);
 		    
                     for(int j = 0; j < mNumEvent; j++){
-			final ArrayList<Integer> nextTuple = eventAvailable(currTuple, j, false);
-                        
-			if(nextTuple != null){
+			if(eventAvailable(currTuple, j, false)){
+			    StateTuple nextTuple = new StateTuple(mNextTuple);
 			    if(isInLoop(nextTuple, loopStates)){
                                 tracelist.add(0, mEventList.get(j));
 				mRootStateTuple = nextTuple;
@@ -469,7 +476,7 @@ public class ControlLoopChecker extends ModelChecker
 	    }
 	    
 	    // Add to tracelist here
-	    ArrayList<Integer> target = currTuple;
+	    StateTuple target = currTuple;
 	    
 	    for(int i = indexList.size()-2; i >= 0; i--){
 		int start = (indexList.get(i)==0)?0:indexList.get(i-1)+1;
@@ -477,12 +484,11 @@ public class ControlLoopChecker extends ModelChecker
 
 		next2:
 		for(int j = start; j <= end; j++){
-		    ArrayList<Integer> curr = list.get(j);
+		    StateTuple curr = list.get(j);
 		    
                     for(int k = 0; k < mNumEvent; k++){
-                        ArrayList<Integer> next = eventAvailable(curr, k, false);
-                        
-			if(next != null){
+			if(eventAvailable(curr, k, false)){
+			    StateTuple next = new StateTuple(mNextTuple);
 			    if(next.equals(target)){
 				tracelist.add(0, mEventList.get(k));
 				target = curr;
@@ -497,11 +503,11 @@ public class ControlLoopChecker extends ModelChecker
 	int loopIndex = tracelist.size() + 1;
 	
 	while(loopStates.size() > 0){
-	    for(final TransitionProperty tp: loopStates){
-		if(mRootStateTuple.equals(tp.getSourceTuple())){
-		    tracelist.add(mEventList.get(tp.getEvent()));
-		    mRootStateTuple = tp.getTargetTuple();
-		    loopStates.remove(tp);
+	    for(final TransitionProperty tt: loopStates){
+		if(mRootStateTuple.equals(tt.getSourceTuple())){
+		    tracelist.add(mEventList.get(tt.getEvent()));
+		    mRootStateTuple = tt.getTargetTuple();
+		    loopStates.remove(tt);
 		    break;
 		}
 	    }
@@ -510,7 +516,7 @@ public class ControlLoopChecker extends ModelChecker
 	final LoopTraceProxy trace = factory.createLoopTraceProxy(tracename, des, tracelist, loopIndex);
 	return trace;
     }
-
+    
     /**
      * It checks event is available from current state tuple.
      * @param currTuple current state tuple
@@ -518,10 +524,8 @@ public class ControlLoopChecker extends ModelChecker
      * @param onlyControllable true if system needs to find only controllable events
      * @return return null if event is not available from current event, or return next state tuple
      */
-    public ArrayList<Integer> eventAvailable(ArrayList<Integer> currTuple, int event, boolean onlyControllable)
+    public boolean eventAvailable(StateTuple currTuple, int event, boolean onlyControllable)
     {
-	ArrayList<Integer> nextTuple = new ArrayList<Integer>(mNumAutomata);
-	
 	for(int i = 0; i < mNumAutomata; i++){
 	    int nextState = currTuple.get(i);
 	    boolean eventExist = false;
@@ -547,17 +551,17 @@ public class ControlLoopChecker extends ModelChecker
 	    }
 	    
 	    if(!eventExist){ // if event does not exist: nextTuple[i] = currTuple[i]
-		nextTuple.add(currTuple.get(i));
+		mNextTuple.set(i, currTuple.get(i));
 	    }
 	    else if(transitionExist){ // else if exists transition: nextTuple[i] = getNextTransition(currTuple[i])
-		nextTuple.add(nextState);
+		mNextTuple.set(i, nextState);
 	    }
 	    else{ // else: event is not available
-		return null;
+		return false;
 	    }
 	}
 	
-	return nextTuple;
+	return true;
     }
     
     /**
@@ -566,7 +570,7 @@ public class ControlLoopChecker extends ModelChecker
      * @param loopStates transitions in the control loop
      * @return return true if state tuple is in the loop, false otherwise
      */
-    public boolean isInLoop(ArrayList<Integer> currTuple, Set<TransitionProperty> loopStates)
+    public boolean isInLoop(StateTuple currTuple, Set<TransitionProperty> loopStates)
 	{
 	for(final TransitionProperty tp: loopStates){
 	    if(currTuple.equals(tp.getSourceTuple())){
