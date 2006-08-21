@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   StateRecord
 //###########################################################################
-//# $Id: StateRecord.h,v 1.1 2006-08-18 06:50:03 robi Exp $
+//# $Id: StateRecord.h,v 1.2 2006-08-21 05:41:39 robi Exp $
 //###########################################################################
 
 
@@ -19,11 +19,11 @@
 #pragma once
 #endif
 
+#include "jni/glue/StateGlue.h"
 #include "waters/base/IntTypes.h"
 
 namespace jni {
   class ClassCache;
-  class StateGlue;
 }
 
 

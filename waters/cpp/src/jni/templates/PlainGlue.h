@@ -5,7 +5,7 @@ $-
 //# PACKAGE: jni.templates
 //# CLASS:   Template for a plain glue class header file
 //###########################################################################
-//# $Id: PlainGlue.h,v 1.4 2006-08-20 11:02:43 robi Exp $
+//# $Id: PlainGlue.h,v 1.5 2006-08-21 05:41:39 robi Exp $
 //###########################################################################
 
 $+
@@ -87,6 +87,7 @@ $ENDIF
   explicit $CPPCLASSNAME(jobject javaobject,
            $CSPC       $ ClassCache* cache,
            $CSPC       $ bool global = false);
+  $CPPCLASSNAME(const $CPPCLASSNAME& partner);
 $IF-ENUM
   explicit $CPPCLASSNAME($CLASSNAME$ item, ClassCache* cache);
 $ENDIF

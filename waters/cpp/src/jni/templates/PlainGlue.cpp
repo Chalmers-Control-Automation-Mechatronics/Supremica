@@ -5,7 +5,7 @@ $-
 //# PACKAGE: jni.templates
 //# CLASS:   Template for a plain glue class implementation file
 //###########################################################################
-//# $Id: PlainGlue.cpp,v 1.7 2006-08-20 11:02:43 robi Exp $
+//# $Id: PlainGlue.cpp,v 1.8 2006-08-21 05:41:39 robi Exp $
 //###########################################################################
 
 $+
@@ -107,6 +107,13 @@ $CPPCLASSNAME::
 $CPPCLASSNAME(jobject javaobject, ClassCache* cache, bool global)
   : $IF-HASBASECLASS $CPPBASECLASSNAME $ELSE ObjectBase$ENDIF$=
   (javaobject, CLASS_$CLASSNAME, cache, global)
+{
+}
+
+
+$CPPCLASSNAME::
+$CPPCLASSNAME(const $CPPCLASSNAME& partner)
+  : $IF-HASBASECLASS $CPPBASECLASSNAME $ELSE ObjectBase$ENDIF(partner)
 {
 }
 

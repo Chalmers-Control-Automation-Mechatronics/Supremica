@@ -4,12 +4,14 @@
 //# PACKAGE: jni.cache
 //# CLASS:   ObjectBase
 //###########################################################################
-//# $Id: ObjectBase.cpp,v 1.5 2006-08-20 11:02:43 robi Exp $
+//# $Id: ObjectBase.cpp,v 1.6 2006-08-21 05:41:39 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
 #pragma implementation
 #endif
+
+#include <iostream>
 
 #include "jni/cache/ClassCache.h"
 #include "jni/cache/ObjectBase.h"

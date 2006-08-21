@@ -4,13 +4,14 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   ControllabilityChecker
 //###########################################################################
-//# $Id: ControllabilityChecker.cpp,v 1.7 2006-08-20 08:39:41 robi Exp $
+//# $Id: ControllabilityChecker.cpp,v 1.8 2006-08-21 05:41:39 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
 #pragma implementation
 #endif
 
+#include <iostream>
 #include <new>
 
 #include <jni.h>
@@ -19,13 +20,16 @@
 #include "jni/cache/ClassCache.h"
 #include "jni/cache/PreJavaException.h"
 #include "jni/glue/AutomatonGlue.h"
+#include "jni/glue/CollectionGlue.h"
 #include "jni/glue/EventGlue.h"
+#include "jni/glue/EventKindGlue.h"
 #include "jni/glue/IteratorGlue.h"
 #include "jni/glue/NativeControllabilityCheckerGlue.h"
 #include "jni/glue/ProductDESGlue.h"
 #include "jni/glue/ProductDESProxyFactoryGlue.h"
 #include "jni/glue/SetGlue.h"
 #include "jni/glue/StateGlue.h"
+#include "jni/glue/TransitionGlue.h"
 #include "jni/glue/VerificationResultGlue.h"
 
 #include "waters/analysis/ControllabilityChecker.h"
@@ -80,27 +84,63 @@ ControllabilityChecker(const jni::ProductDESGlue des,
   HashTable<jni::StateGlue*,StateRecord*> statemap(stateaccessor, 256);
   const int numaut = mEncoding.getNumRecords();
   for (int a = 0; a < numaut; a++) {
-    const AutomatonRecord* record = mEncoding.getRecord(a);
-    const jni::AutomatonGlue aut = record->getJavaAutomaton();
+    const AutomatonRecord* autrecord = mEncoding.getRecord(a);
+    const jni::AutomatonGlue aut = autrecord->getJavaAutomaton();
     const jni::SetGlue states = aut.getStatesGlue(cache);
-    const jni::IteratorGlue iter = states.iteratorGlue(cache);
+    const jni::IteratorGlue stateiter = states.iteratorGlue(cache);
     uint32 code = 0;
-    while (iter.hasNext()) {
-      jobject javaobject = iter.next();
+    while (stateiter.hasNext()) {
+      jobject javaobject = stateiter.next();
       jni::StateGlue state(javaobject, cache);
-      StateRecord* srecord = new StateRecord(state, code++, cache);
-      statemap.add(srecord);
+      StateRecord* staterecord = new StateRecord(state, code++, cache);
+      statemap.add(staterecord);
+    }
+    const jni::CollectionGlue transitions = aut.getTransitionsGlue(cache);
+    const jni::IteratorGlue transiter = transitions.iteratorGlue(cache);
+    while (transiter.hasNext()) {
+      jobject javaobject = transiter.next();
+      jni::TransitionGlue trans(javaobject, cache);
+      jni::EventGlue event = trans.getEventGlue(cache);
+      EventRecord* eventrecord = eventmap.get(&event);
+      jni::StateGlue source = trans.getSourceGlue(cache);
+      StateRecord* sourcerecord = statemap.get(&source);
+      jni::StateGlue target = trans.getTargetGlue(cache);
+      StateRecord* targetrecord = statemap.get(&target);
+      eventrecord->addTransition(autrecord, sourcerecord, targetrecord);
     }
     statemap.clear();
+    const jni::SetGlue events = aut.getEventsGlue(cache);
+    const jni::IteratorGlue eventiter = events.iteratorGlue(cache);
+    while (eventiter.hasNext()) {
+      jobject javaobject = eventiter.next();
+      jni::EventGlue event(javaobject, cache);
+      jni::EventKind kind = event.getKindGlue(cache);
+      if (kind == jni::EventKind_UNCONTROLLABLE ||
+          kind == jni::EventKind_CONTROLLABLE) {
+        EventRecord* eventrecord = eventmap.get(&event);
+        eventrecord->normalize(autrecord);
+      }
+    }
   }
 
   // Establish compact event list ...
   mNumEventRecords = eventmap.size();
+  HashTableIterator hiter1 = eventmap.iterator();
+  while (eventmap.hasNext(hiter1)) {
+    const EventRecord* eventrecord = eventmap.next(hiter1);
+    if (eventrecord->isSkippable()) {
+      mNumEventRecords--;
+    }
+  }
   mEventRecords = new EventRecord*[mNumEventRecords];
-  HashTableIterator hiter = eventmap.iterator();
+  HashTableIterator hiter2 = eventmap.iterator();
   int i = 0;
-  while (eventmap.hasNext(hiter)) {
-    mEventRecords[i++] = eventmap.next(hiter);
+  while (eventmap.hasNext(hiter2)) {
+    EventRecord* eventrecord = eventmap.next(hiter2);
+    if (!eventrecord->isSkippable()) {
+      eventrecord->sortTransitionRecords();
+      mEventRecords[i++] = eventrecord;
+    }
   }
   qsort(mEventRecords, mNumEventRecords, sizeof(EventRecord*),
         EventRecord::compare);

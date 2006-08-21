@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   AutomatonEncoding
 //###########################################################################
-//# $Id: AutomatonEncoding.cpp,v 1.3 2006-08-20 08:39:41 robi Exp $
+//# $Id: AutomatonEncoding.cpp,v 1.4 2006-08-21 05:41:39 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -81,10 +81,10 @@ const AutomatonRecordHashAccessor AutomatonRecord::theHashAccessor;
 
 AutomatonRecord::
 AutomatonRecord(const jni::AutomatonGlue aut,
-                bool spec,
+                bool plant,
                 jni::ClassCache* cache)
   : mJavaAutomaton(aut),
-    mIsSpec(spec),
+    mIsPlant(plant),
     mWordIndex(0),
     mShift(0),
     mBitMask(0)
@@ -155,18 +155,18 @@ AutomatonEncoding(const jni::ProductDESGlue des,
   while(iter.hasNext()) {
     jobject javaobject = iter.next();
     jni::AutomatonGlue aut(javaobject, cache);
-    bool spec;
+    bool plant;
     switch (aut.getKindGlue(cache)) {
     case jni::ComponentKind_PLANT:
-      spec = false;
+      plant = true;
       break;
     case jni::ComponentKind_SPEC:
-      spec = true;
+      plant = false;
       break;
     default:
       continue;
     }
-    AutomatonRecord* record = new AutomatonRecord(aut, spec, cache);
+    AutomatonRecord* record = new AutomatonRecord(aut, plant, cache);
     totalbits += record->getNumberOfBits();
     records[a++] = record;
   }

@@ -4,7 +4,7 @@
 //# PACKAGE: jni.glue
 //# PURPOSE: List of classes and methods to be converted to C++/JNI code
 //###########################################################################
-//# $Id: Classes.txt,v 1.9 2006-08-17 10:15:12 robi Exp $
+//# $Id: Classes.txt,v 1.10 2006-08-21 05:41:39 robi Exp $
 //###########################################################################
 
 
@@ -72,6 +72,12 @@ glue class EventProxy extends NamedProxy {
 
 glue class StateProxy extends NamedProxy {
   boolean isInitial();
+}
+
+glue class TransitionProxy {
+  glue StateProxy getSource();
+  glue StateProxy getTarget();
+  glue EventProxy getEvent();
 }
 
 glue class AutomatonProxy extends NamedProxy {

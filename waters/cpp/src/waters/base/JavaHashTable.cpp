@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   JavaHashTable
 //###########################################################################
-//# $Id: JavaHashTable.cpp,v 1.2 2006-08-20 11:02:43 robi Exp $
+//# $Id: JavaHashTable.cpp,v 1.3 2006-08-21 05:41:39 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -37,7 +37,6 @@ hash(const void* key)
   const jobject object = (const jobject) key;
   const jni::ObjectGlue glue(object, mCache, true);
   const int javahash = glue.hashCode();
-  const int javahash2 = glue.hashCode();
   return waters::hashInt(javahash);
 }
 

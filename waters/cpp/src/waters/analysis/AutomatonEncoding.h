@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   AutomatonEncoding
 //###########################################################################
-//# $Id: AutomatonEncoding.h,v 1.2 2006-08-17 10:15:12 robi Exp $
+//# $Id: AutomatonEncoding.h,v 1.3 2006-08-21 05:41:39 robi Exp $
 //###########################################################################
 
 
@@ -21,6 +21,7 @@
 
 #include "jni/glue/AutomatonGlue.h"
 
+#include "waters/base/HashAccessor.h"
 #include "waters/base/IntTypes.h"
 
 namespace jni {
@@ -30,8 +31,6 @@ namespace jni {
 
 
 namespace waters {
-
-class HashAccessor;
 
 
 //###########################################################################
@@ -67,13 +66,13 @@ public:
   //##########################################################################
   //# Constructors & Destructors
   explicit AutomatonRecord(const jni::AutomatonGlue aut,
-			   bool spec,
+			   bool plant,
 			   jni::ClassCache* cache);
 
   //##########################################################################
   //# Simple Access
   const jni::AutomatonGlue& getJavaAutomaton() const {return mJavaAutomaton;}
-  bool isSpec() const {return mIsSpec;}
+  bool isPlant() const {return mIsPlant;}
   int getNumberOfStates() const {return mNumStates;}
   int getNumberOfBits() const {return mNumBits;}
   int getAutomatonIndex() const {return mAutomatonIndex;}
@@ -96,7 +95,7 @@ private:
   //##########################################################################
   //# Data Members
   jni::AutomatonGlue mJavaAutomaton;
-  bool mIsSpec;
+  bool mIsPlant;
   int mNumStates;
   int mNumBits;
   int mAutomatonIndex;

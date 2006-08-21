@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   EventRecord
 //###########################################################################
-//# $Id: EventRecord.h,v 1.3 2006-08-17 10:15:12 robi Exp $
+//# $Id: EventRecord.h,v 1.4 2006-08-21 05:41:39 robi Exp $
 //###########################################################################
 
 
@@ -29,7 +29,9 @@ namespace jni {
 
 namespace waters {
 
+class AutomatonRecord;
 class HashAccessor;
+class StateRecord;
 class TransitionRecord;
 
 
@@ -68,10 +70,13 @@ public:
   explicit EventRecord(jni::EventGlue event,
 		       bool controllable,
 		       jni::ClassCache* cache);
+  ~EventRecord();
 
   //##########################################################################
   //# Simple Access
   bool isControllable() const {return mIsControllable;}
+  bool isGloballyDisabled() const {return mIsGloballyDisabled;}
+  bool isSkippable() const;
   const jni::EventGlue& getJavaEvent() const {return mJavaEvent;}
 
   //##########################################################################
@@ -80,11 +85,20 @@ public:
   static int compare(const void* elem1, const void* elem2);
   static const HashAccessor* getHashAccessor() {return &theHashAccessor;}
 
+  //##########################################################################
+  //# Set up
+  bool addTransition(const AutomatonRecord* aut,
+		     const StateRecord* source,
+		     const StateRecord* target);
+  void normalize(const AutomatonRecord* aut);
+  void sortTransitionRecords();
+
 private:
   //##########################################################################
   //# Data Members
   jni::EventGlue mJavaEvent;
   bool mIsControllable;
+  bool mIsGloballyDisabled;
   TransitionRecord* mTransitionRecords;
 
   //##########################################################################

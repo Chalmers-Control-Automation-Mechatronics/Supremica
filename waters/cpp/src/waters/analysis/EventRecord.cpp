@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   EventRecord
 //###########################################################################
-//# $Id: EventRecord.cpp,v 1.3 2006-08-17 10:15:12 robi Exp $
+//# $Id: EventRecord.cpp,v 1.4 2006-08-21 05:41:39 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -18,7 +18,9 @@
 #include "jni/cache/ClassCache.h"
 #include "jni/glue/EventGlue.h"
 
+#include "waters/analysis/AutomatonEncoding.h"
 #include "waters/analysis/EventRecord.h"
+#include "waters/analysis/TransitionRecord.h"
 
 
 namespace waters {
@@ -77,8 +79,26 @@ EventRecord(jni::EventGlue event,
             jni::ClassCache* /* cache */)
   : mJavaEvent(event),
     mIsControllable(controllable),
+    mIsGloballyDisabled(false),
     mTransitionRecords(0)
 {
+}
+
+EventRecord::
+~EventRecord()
+{
+  delete mTransitionRecords;
+}
+
+
+//############################################################################
+//# EventRecord: Simple Access
+
+bool EventRecord::
+isSkippable()
+  const
+{
+  return mIsGloballyDisabled || mTransitionRecords == 0;
 }
 
 
@@ -89,7 +109,13 @@ int EventRecord::
 compareTo(const EventRecord* partner)
   const
 {
-  return mJavaEvent.compareTo(&partner->mJavaEvent);
+  const int cont1 = mIsControllable ? 1 : 0;
+  const int cont2 = partner->mIsControllable ? 1 : 0;
+  if (cont1 != cont2) {
+    return cont1 - cont2;
+  } else {
+    return mJavaEvent.compareTo(&partner->mJavaEvent);
+  }
 }
 
 int EventRecord::
@@ -98,6 +124,51 @@ compare(const void* elem1, const void* elem2)
   const EventRecord* val1 = *((const EventRecord**) elem1);
   const EventRecord* val2 = *((const EventRecord**) elem2);
   return val1->compareTo(val2);
+}
+
+
+//############################################################################
+//# Set up
+
+bool EventRecord::
+addTransition(const AutomatonRecord* aut,
+              const StateRecord* source,
+              const StateRecord* target)
+{
+  if (mIsGloballyDisabled) {
+    return true;
+  } else {
+    if (mTransitionRecords == 0 ||
+        mTransitionRecords->getAutomaton() != aut) {
+      mTransitionRecords = new TransitionRecord(aut, mTransitionRecords);
+    }
+    return mTransitionRecords->addTransition(source, target);
+  }
+}
+
+void EventRecord::
+normalize(const AutomatonRecord* aut)
+{
+  if (mTransitionRecords != 0 &&
+      mTransitionRecords->getAutomaton() == aut) {
+    mTransitionRecords->normalize();
+    mIsGloballyDisabled = false;
+  } else if (mIsControllable || aut->isPlant()) {
+    delete mTransitionRecords;
+    mTransitionRecords = 0;
+    mIsGloballyDisabled = true;
+  } else {
+    mTransitionRecords = new TransitionRecord(aut, mTransitionRecords);
+    mIsGloballyDisabled = false;
+  }
+}
+
+void EventRecord::
+sortTransitionRecords()
+{
+  TransitionRecordList list(mTransitionRecords);
+  list.qsort();
+  mTransitionRecords = list.getHead();
 }
 
 

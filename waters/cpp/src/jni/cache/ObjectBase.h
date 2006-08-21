@@ -4,7 +4,7 @@
 //# PACKAGE: jni.cache
 //# CLASS:   ObjectBase
 //###########################################################################
-//# $Id: ObjectBase.h,v 1.5 2006-08-20 11:02:43 robi Exp $
+//# $Id: ObjectBase.h,v 1.6 2006-08-21 05:41:39 robi Exp $
 //###########################################################################
 
 
@@ -59,7 +59,7 @@ protected:
 		      bool global = false);
   ObjectBase(const ObjectBase& partner);
   ~ObjectBase();
-  ObjectBase& operator= (const ObjectBase& Partner);
+  ObjectBase& operator= (const ObjectBase& partner);
 
   //##########################################################################
   //# Protected Access
