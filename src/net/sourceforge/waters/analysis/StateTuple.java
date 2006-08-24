@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   StateTuple
 //###########################################################################
-//# $Id: StateTuple.java,v 1.1 2006-08-21 03:45:51 yip1 Exp $
+//# $Id: StateTuple.java,v 1.2 2006-08-24 11:04:03 yip1 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -19,18 +19,37 @@ public class StateTuple
 {
     /** Array of integers for state tuple */
     private int[] mStateCodes;
-
-
+    //private boolean mVisited;
+    //private boolean mInComponent;
+    
+    
+    //#########################################################################
+    //# Constructor
     /**
-     * <P>A state tuple in synchronized model.</P>
-     *
-     * @author Peter Yunil Park
+     * Create state tuple with given size
+     * @param size size of state (same as number of automaton in the model)
      */
     public StateTuple(int size)
     {
 	mStateCodes = new int[size];
     }
-    
+
+    /**
+     * Create state tuple with given integer array
+     * @param tuple original tuple information
+     */    
+    public StateTuple(int[] stateCodes)
+    {
+	mStateCodes = new int[stateCodes.length];
+	for(int i = 0; i < stateCodes.length; i++){
+	    mStateCodes[i] = stateCodes[i];
+	}
+    }
+
+    /**
+     * Create state tuple with given tuple (copying tuple)
+     * @param tuple original tuple information
+     */    
     public StateTuple(StateTuple tuple)
     {
 	mStateCodes = new int[tuple.mStateCodes.length];
@@ -39,9 +58,41 @@ public class StateTuple
 	}
     }
     
+    /*
+    public boolean getVisited()
+    {
+	return mVisited;
+    }
+
+    public void setVisited(boolean visited)
+    {
+	mVisited = visited;
+    }
+
+    public boolean getInComponent()
+    {
+	return mInComponent;
+    }
+
+    public void setInComponent(boolean inComponent)
+    {
+	mInComponent = inComponent;
+    }
+    */
     
     /**
+     * Get whole state codes
+     * @return
+     */
+    public int[] getCodes()
+    {
+	return mStateCodes;
+    }
+
+    /**
      * Get required state from state tuple
+     * @param index
+     * @return
      */
     public int get(int index)
     {
@@ -50,6 +101,8 @@ public class StateTuple
     
     /**
      * Set state tuple
+     * @param
+     * @param
      */
     public void set(int index, int state)
     {
@@ -58,6 +111,7 @@ public class StateTuple
     
     /**
      * Get hash code of state tuple
+     * @return
      */
     public int hashCode()
     {
@@ -71,6 +125,8 @@ public class StateTuple
     
     /**
      * Check if passed object is same as current state tuple
+     * @param other
+     * @return
      */
     public boolean equals(Object other)
     {

@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopChecker
 //###########################################################################
-//# $Id: ControlLoopChecker.java,v 1.5 2006-08-21 03:45:51 yip1 Exp $
+//# $Id: ControlLoopChecker.java,v 1.6 2006-08-24 11:04:03 yip1 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -40,6 +40,9 @@ import net.sourceforge.waters.model.des.LoopTraceProxy;
 
 public class ControlLoopChecker extends ModelChecker
 {
+    /** Constant: number of bits for integer buffer */
+    private static final int SIZE_INT = 32;
+
     /** a sentinel that states if the model is control loop free. */
     private boolean mControlLoopFree;
     
@@ -59,16 +62,22 @@ public class ControlLoopChecker extends ModelChecker
     private ArrayList<ArrayList<TransitionProxy>> mTransitionList;
     
     /** a map of state tuple in synchronized model */
-    private Map<StateTuple, boolean[]> mGlobalStateMap;
+    private Map<EncodedStateTuple, EncodedStateTuple> mGlobalStateMap;
     
     /** a list of unvisited state tuple. */
-    private List<StateTuple> mUnvisitedList;
+    private List<EncodedStateTuple> mUnvisitedList;
     
     /** it holds the initial state tuple of the model. */
     private StateTuple mInitialStateTuple;
     
+    /** it holds the initial encoded state tuple of the model. */
+    private EncodedStateTuple mInitialEncodedStateTuple;
+    
     /** for tracing counterexample: it holds the root state of the control loop. */
     private StateTuple mRootStateTuple;
+    
+    /** for tracing counterexample: it holds the root encoded state of the control loop. */
+    private EncodedStateTuple mRootEncodedStateTuple;
     
     /** global event map: true is controllable, false is uncontrollable */
     private boolean[] mGlobalEventMap;
@@ -79,8 +88,34 @@ public class ControlLoopChecker extends ModelChecker
     /** a map for available transitions */
     private static ArrayList<int[][]> mTransitionListMap;
 
+    /** a global state tuple for storing current state tuple */
+    private StateTuple mCurrTuple;
+    
+    /** a global encoded state tuple for storing current state tuple */
+    private EncodedStateTuple mEncodedCurrTuple;
+    
     /** a global state tuple for storing next state tuple */
     private StateTuple mNextTuple;
+    
+    /** a global encodedstate tuple for storing next state tuple */
+    private EncodedStateTuple mEncodedNextTuple;
+    
+    //#########################################################################
+    //# Variables used for encoding/decoding
+    /** a list contains number of bits needed for each automaton */
+    private int mNumBits[];
+    
+    /** a list contains masks needed for each automaton */
+    private int mNumBitsMasks[];
+    
+    /** a number of integers used to encode synchronized state */
+    private int mNumInts;
+    
+    /** an index of first automaton in each integer buffer */
+    private int mIndexAutomata[];
+    
+    /** a global integer array to store decoded integer state tuple */
+    private int mDecoded[];
 
     
     //#########################################################################
@@ -113,6 +148,55 @@ public class ControlLoopChecker extends ModelChecker
 	    mEventList.add(eProxy);
 	}
 	
+	// get number of automata
+	mNumAutomata = mAutomataList.size();
+	
+	// get number of events
+	mNumEvent = mEventList.size();
+	
+	//
+	// ORDER AUTOMATA HERE (mAutomataList)
+	//
+	
+	// get encoding information
+	mNumBits = new int[mNumAutomata];
+	mNumBitsMasks = new int[mNumAutomata];
+	
+	mNumInts = 1;
+	int totalBits = SIZE_INT;
+	int counter = 0;
+	for(final AutomatonProxy aProxy: mAutomataList){
+	    int bits = getBitLength(aProxy);
+	    mNumBits[counter] = bits;
+	    mNumBitsMasks[counter] = (1 << bits) - 1;
+	    if(totalBits >= bits){ // if current buffer can store this automaton
+		totalBits -= bits;
+	    }
+	    else{
+		mNumInts++;
+		totalBits = SIZE_INT;
+	    }
+	    counter++;
+	}
+	
+	// get index
+	counter = 0;
+	totalBits = SIZE_INT;
+	mIndexAutomata = new int[mNumInts + 1];
+	mIndexAutomata[0] = counter++;
+	for(int i = 0; i < mNumAutomata; i++){
+	    if(totalBits >= mNumBits[i]){
+		totalBits -= mNumBits[i];
+	    }
+	    else{
+		mIndexAutomata[counter++] = i;
+		totalBits = SIZE_INT;
+	    }
+	}
+	mIndexAutomata[mNumInts] = mNumAutomata;
+	
+	mDecoded = new int[mNumAutomata];
+		
 	// create Transition list
 	for(final AutomatonProxy aProxy: mAutomataList){
 	    final ArrayList<TransitionProxy> tmpTran = new ArrayList<TransitionProxy>();
@@ -121,12 +205,6 @@ public class ControlLoopChecker extends ModelChecker
 	    }
 	    mTransitionList.add(tmpTran);
 	}
-	
-	// get number of automata
-	mNumAutomata = mAutomataList.size();
-	
-	// get number of events
-	mNumEvent = mEventList.size();
 	
         // create global event map
         mGlobalEventMap = new boolean[mNumEvent];
@@ -147,7 +225,7 @@ public class ControlLoopChecker extends ModelChecker
 	Set<StateProxy> stateSet;
 	ArrayList<StateProxy> stateList;
 	
-	int counter = 0;
+	counter = 0;
 	for(final AutomatonProxy aProxy: mAutomataList){
 	    
 	    stateSet = aProxy.getStates();
@@ -181,12 +259,11 @@ public class ControlLoopChecker extends ModelChecker
 	}
 	
 	// initialise state tuple list
-	mGlobalStateMap = new HashMap<StateTuple, boolean[]>();
-	mUnvisitedList = new LinkedList<StateTuple>();
-	
-	mInitialStateTuple = new StateTuple(mNumAutomata);
+	mGlobalStateMap = new HashMap<EncodedStateTuple, EncodedStateTuple>();
+	mUnvisitedList = new LinkedList<EncodedStateTuple>();
 	
 	// create initial state tuple
+	mInitialStateTuple = new StateTuple(mNumAutomata);
 	int i = 0;
 	for(final AutomatonProxy aProxy: mAutomataList){
 	    int j = 0;
@@ -199,6 +276,8 @@ public class ControlLoopChecker extends ModelChecker
 	    }
 	    i++;
 	}
+	int initialEncodedStateTuple[] = encoding(mInitialStateTuple.getCodes());
+	mInitialEncodedStateTuple = new EncodedStateTuple(initialEncodedStateTuple);
 	
 	// set a buffer for storing next state tuple
 	mNextTuple = new StateTuple(mNumAutomata);
@@ -248,18 +327,13 @@ public class ControlLoopChecker extends ModelChecker
     public boolean getResult()
     {	
 	// insert initial state tuple to global state and state list
-	boolean[] initSp = new boolean[2];
-	
-	mGlobalStateMap.put(mInitialStateTuple, initSp);
-	mUnvisitedList.add(mInitialStateTuple);
+	mGlobalStateMap.put(mInitialEncodedStateTuple, mInitialEncodedStateTuple);
+	mUnvisitedList.add(mInitialEncodedStateTuple);
 	
 	while(!mUnvisitedList.isEmpty()){
-	    final StateTuple currTuple = mUnvisitedList.get(0);
-	    final boolean sp[] = mGlobalStateMap.get(currTuple);
-	    if(sp != null){
-		if(sp[0] == false){
-		    visit(currTuple);
-		}
+	    mEncodedCurrTuple = mUnvisitedList.get(0);
+	    if(mEncodedCurrTuple.getVisited() == false){
+		visit(mEncodedCurrTuple);
 	    }
 	    mUnvisitedList.remove(0);
 	}
@@ -272,59 +346,59 @@ public class ControlLoopChecker extends ModelChecker
      * If it tries to visit state tuple that has been visited before, it detects a loop.
      * @param state current state tuple property
      */
-    public void visit(StateTuple currTuple)
+    public void visit(EncodedStateTuple encodedCurrTuple)
     {
-	boolean[] currSp = mGlobalStateMap.get(currTuple);
-	currSp[0] = true;
-
+	encodedCurrTuple.setVisited(true);
+	decoding(encodedCurrTuple.getCodes()); // current code in mDecoded
+	final StateTuple currTuple = new StateTuple(mDecoded);
+	
 	for(int i = 0; i < mNumEvent; i++){
 	    if(eventAvailable(currTuple, i, false)){
                 if(mGlobalEventMap[i]){ // CONTROLLABLE
-		    boolean[] nextSp;
-		    
-		    if(mGlobalStateMap.get(mNextTuple) == null){
-			nextSp = new boolean[2];
-			StateTuple nextTuple = new StateTuple(mNextTuple);
-			mGlobalStateMap.put(nextTuple, nextSp);
-			mUnvisitedList.add(nextTuple);
-			visit(nextTuple);
+		    final int encodedNextCodes[] = encoding(mNextTuple.getCodes());
+		    EncodedStateTuple encodedNextTuple = new EncodedStateTuple(encodedNextCodes);
+
+		    if(mGlobalStateMap.get(encodedNextTuple) == null){
+			mGlobalStateMap.put(encodedNextTuple, encodedNextTuple);
+			mUnvisitedList.add(encodedNextTuple);
+			visit(encodedNextTuple);
 			if(!mControlLoopFree){
 			    return;
 			}
 		    }
 		    else{
-			StateTuple nextTuple = new StateTuple(mNextTuple);
-			nextSp = mGlobalStateMap.get(nextTuple);
-			if(nextSp[0] == false){
-			    visit(nextTuple);
+			encodedNextTuple = mGlobalStateMap.get(encodedNextTuple);
+			if(encodedNextTuple.getVisited() == false){
+			    visit(encodedNextTuple);
 			    if(!mControlLoopFree){
 				return;
 			    }
 			}
 		    }
 		    
-		    if(nextSp[1] == false){
-			if(nextSp[0] == true){ // control loop detected here
+		    if(encodedNextTuple.getInComponent() == false){
+			if(encodedNextTuple.getVisited() == true){ // control loop detected here
 			    if(mControlLoopFree){
 				mControlLoopFree = false;
 				mRootStateTuple = currTuple;
+				mRootEncodedStateTuple = encodedCurrTuple;
 			    }
 			    return;
 			}
 		    }
 		}
 		else{ // UNCONTROLLABLE
-		    if(mGlobalStateMap.get(mNextTuple) == null){
-			boolean nextSp[] = new boolean[2];			
-			StateTuple nextTuple = new StateTuple(mNextTuple);
-			mGlobalStateMap.put(nextTuple, nextSp);
-			mUnvisitedList.add(nextTuple);
+		    final int encodedNextCodes[] = encoding(mNextTuple.getCodes());
+		    final EncodedStateTuple encodedNextTuple = new EncodedStateTuple(encodedNextCodes);
+		    if(mGlobalStateMap.get(encodedNextTuple) == null){
+			mGlobalStateMap.put(encodedNextTuple, encodedNextTuple);
+			mUnvisitedList.add(encodedNextTuple);
 		    }
 		}
 	    }
 	}
 	
-	currSp[1] = true;
+	encodedCurrTuple.setInComponent(true);
     }
     
     /**
@@ -348,8 +422,8 @@ public class ControlLoopChecker extends ModelChecker
 	final String desname = des.getName();
 	final String tracename = desname + ":has a control loop";
 	final List<EventProxy> tracelist = new LinkedList<EventProxy>();
-
-	// return null;
+	
+	//return null;
 	
 	/* FIND COUNTEREXAMPLE TRACE HERE */
 	/* Counterexample = The shortest path from mInitialStateTuple to mRootStateTuple 
@@ -364,6 +438,7 @@ public class ControlLoopChecker extends ModelChecker
 	ArrayList<Integer> indexList = new ArrayList<Integer>();
         
         StateTuple currTuple = new StateTuple(mNumAutomata);
+        EncodedStateTuple encodedcurrTuple = new EncodedStateTuple(mNumInts);
         
         int lastEvent = -1;
 	
@@ -376,7 +451,6 @@ public class ControlLoopChecker extends ModelChecker
 	    indexSize = indexList.size();
 	    for(int i = (indexSize==1)?0:(indexList.get(indexSize-2)+1); i <= indexList.get(indexSize-1); i++){
 		currTuple = list.get(i);
-		
                 for(int j = 0; j < mNumEvent; j++){
                     if(mGlobalEventMap[j]){
 			if(eventAvailable(currTuple, j, true)){
@@ -416,7 +490,6 @@ public class ControlLoopChecker extends ModelChecker
 		next:
 		for(int j = start; j <= end; j++){
                     StateTuple curr = list.get(j);
-		    
                     for(int k = 0; k < mNumEvent; k++){
                         if(mGlobalEventMap[k]){
 			    if(eventAvailable(curr, k, true)){
@@ -600,5 +673,44 @@ public class ControlLoopChecker extends ModelChecker
 	}
 
 	return (bits == 0)?1:bits;
+    }
+
+    /**
+     * It will take a single state tuple as a parameter and encode it.
+     * @param stateTuple state tuple that will be encoded
+     * @return encoded state tuple
+     */
+    public int[] encoding(final int[] stateCodes)
+    {
+	int encoded[] = new int[mNumInts];
+	
+	for(int i = 0; i < mNumInts; i++){
+	    for(int j = mIndexAutomata[i]; j < mIndexAutomata[i+1]; j++){
+		encoded[i] <<= mNumBits[j];
+		encoded[i] |= stateCodes[j];
+	    }
+	}
+	
+	return encoded;
+    }
+
+    /**
+     * It will take an encoded state tuple as a parameter and decode it.
+     * @param encodedStateCodes state tuple that will be decoded
+     */
+    public void decoding(final int[] encodedStateCodes)
+    {
+	// use global buffer: mDecoded[]
+	int index = 0;
+	
+	for(int i = 0; i < mNumInts; i++){
+	    int tmp = encodedStateCodes[i];
+	    for(int j = mIndexAutomata[i+1]-1; j >= mIndexAutomata[i]; j--){
+		int mask = mNumBitsMasks[j];
+		int value = tmp & mask;
+		mDecoded[j] = value;
+		tmp = tmp >> mNumBits[j];
+	    } 
+	}
     }
 }
