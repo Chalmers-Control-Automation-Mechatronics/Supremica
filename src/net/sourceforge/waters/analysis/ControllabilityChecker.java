@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControllabilityChecker
 //###########################################################################
-//# $Id: ControllabilityChecker.java,v 1.4 2006-07-28 08:02:49 js173 Exp $
+//# $Id: ControllabilityChecker.java,v 1.5 2006-08-24 04:15:22 js173 Exp $
 //###########################################################################
 
 //Name: Jinjian Shi
@@ -37,55 +37,57 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
- * <P>A dummy implementation of a controllability checker.</P>
+ * <P>An implementation of a controllability checker.</P>
  *
- * <P>The {@link #run()} method of this model checker does nothing,
- * and simply claims that every model is controllable.</P>
+ * <P>The {@link #run()} method of this model checker will check
+ * the controllability of models.</P>
  *
  * @see ModelChecker
  *
- * @author Robi Malik
+ * @author Jinjian Shi
  */
 
 public class ControllabilityChecker extends ModelChecker
 {
   //
-  private static ProductDESProxy model;                 
+  private ProductDESProxy model;                 
   
   //
-	private static Set<AutomatonProxy> automatonSet;	
-	//private static AutomatonProxy[] automatonList;	
+	private Set<AutomatonProxy> automatonSet;	
 	
 	//Transition map
-	private static ArrayList<int[][]> plantTransitionMap;
-	private static ArrayList<int[][]> specTransitionMap;
+	private ArrayList<int[][]> plantTransitionMap;
+	private ArrayList<int[][]> specTransitionMap;
 	
 	//Level states storage
-	private static ArrayList<Integer> indexList;
-	private static BlockedArrayList<BigInteger> stateList;
+	private ArrayList<Integer> indexList;
+	private BlockedArrayList<StateTuple> stateList;
 	
 	//For encoding/decoding
-  private static ArrayList<ArrayList<StateProxy>> codingList;
-	private static ArrayList<EventProxy> eventCodingList;
-	private static ArrayList<byte[]> plantEventList;
-	private static ArrayList<byte[]> specEventList;	
-	private static int[] bitlengthList;
-	private static BigInteger[] maskList;
+	private ArrayList<StateProxy> codes;
+  private ArrayList<ArrayList<StateProxy>> codingList;
+  private byte[] aneventCodingList;	
+	private ArrayList<EventProxy> eventCodingList;
+	private ArrayList<byte[]> plantEventList;
+	private ArrayList<byte[]> specEventList;	
+	private int[] bitlengthList;	
+	private int[] maskList;
+	private int[] codePosition;
+	private StateTuple stateTuple;	
 	
-	//Temporate Variables	
-	private int i,j,k;
+	//Frequently used temporary variable	
+	private int i,j,k,result,temp;
+	
+	//Size
 	private int automatonSize;
 	private int eventSize;
-	private int plantSize;
-	private Integer a;
-	private BigInteger bi;	
+	private int plantSize;	
+	private int stSize;		
 	
-	private Integer temp;	
-	private Integer errorEvent;
-	private ArrayList<StateProxy> codes;
+	//For computing successor and counterexample
 	private int[] systemState;
-	private int[] successor;	
-	private byte[] aneventCodingList;	
+	private int[] successor;
+	private Integer errorEvent;	
 	
 	private static long startTime;
 	private static long endTime;
@@ -108,14 +110,13 @@ public class ControllabilityChecker extends ModelChecker
 		specTransitionMap = new ArrayList<int[][]>();
 		
     indexList = new ArrayList<Integer>();
-    stateList = new BlockedArrayList<BigInteger>(BigInteger.class);        
+    stateList = new BlockedArrayList<StateTuple>(StateTuple.class);        
 		
     codes = new ArrayList<StateProxy>();
     codingList = new ArrayList<ArrayList<StateProxy>>();	
 		eventCodingList = new ArrayList<EventProxy>(model.getEvents());		
 		plantEventList = new ArrayList<byte[]>();
-		specEventList = new ArrayList<byte[]>();
-		bi = BigInteger.valueOf(0);
+		specEventList = new ArrayList<byte[]>();		
 		
 		startTime = 0;
 		endTime = 0;
@@ -131,8 +132,6 @@ public class ControllabilityChecker extends ModelChecker
    * the result of checking the property is known and can be queried
    * using the {@link #getResult()} and {@link #getCounterExample()}
    * methods.
-   * Presently, this is a dummy implementation that nothing but always
-   * returns <CODE>true</CODE>.
    * @return <CODE>true</CODE> if the model is controllable, or
    *         <CODE>false</CODE> if it is not.
    *         The same value can be queried using the {@link #getResult()}
@@ -151,23 +150,23 @@ public class ControllabilityChecker extends ModelChecker
   /**
    * Gets the result of controllability checking.
    * @return <CODE>true</CODE> if the model was found to be controllable,
-   *         <CODE>false</CODE> otherwise.
-   * @throws IllegalStateException in all cases, because this method is
-   *         not yet implemented.
+   *         <CODE>false</CODE> otherwise.   
    */
   public boolean getResult() 
   {		
 		Set<StateProxy> stateSet;
-		ArrayList<ArrayList<StateProxy>> specCodingList = new ArrayList<ArrayList<StateProxy>>();	
+		ArrayList<ArrayList<StateProxy>> specCodingList = new ArrayList<ArrayList<StateProxy>>();		
 		int ck = 0;	
 		int bl = 0;
-		BigInteger mask = BigInteger.valueOf(0);
+		int mask = 0;
+		int codeLength = 0;
+		int cp = 0;
 		
 		eventSize = eventCodingList.size();
 		automatonSize = automatonSet.size();
 		bitlengthList = new int[automatonSize];
-		maskList = new BigInteger[automatonSize];
-		//automatonList = new AutomatonProxy[automatonSize];
+		maskList = new int[automatonSize];	
+		codePosition = new int[automatonSize];	
 		
 		//Count Plant size
 		for (AutomatonProxy ap : automatonSet) {
@@ -189,9 +188,9 @@ public class ControllabilityChecker extends ModelChecker
 			for (EventProxy evp : ap.getEvents()) {
 				aneventCodingList[eventCodingList.indexOf(evp)] = 1;
 			}
-			//Encoding trantions to binary values
+			//Encoding transitions to binary values
 			int stateSize = codes.size();
-			int[][] atransition = new int[stateSize][eventSize];
+			int[][] atransition = new int[stateSize][eventSize];			
 			for (i=0;i<stateSize;i++){
 				for (j=0;j<eventSize;j++) {
 					atransition[i][j] = -1;
@@ -203,15 +202,15 @@ public class ControllabilityChecker extends ModelChecker
 			}
 			//Compute bit length and mask
 			bl = BigInteger.valueOf(stateSize).bitLength();
-			mask = BigInteger.valueOf((1 << BigInteger.valueOf(codes.size()).bitLength())-1);
+			mask = (1 << bl)-1;			
     	
     	//Find initial state
     	StateProxy initialState = null;
     	for (StateProxy sp : stateSet) {
     		if (sp.isInitial()) {initialState = sp; break;}
-    	}    	
+    	} 
+    	//Store all the information by automaton type   	
     	if (ap.getKind() == ComponentKind.PLANT) {    		
-    		//automatonList[ck] = ap;
     		codingList.add(codes);    		
     		systemState[ck] = codes.indexOf(initialState);
 				plantEventList.add(aneventCodingList);				
@@ -220,12 +219,8 @@ public class ControllabilityChecker extends ModelChecker
 				maskList[ck] = mask;
 				ck++;
     	}
-    	else if (ap.getKind() == ComponentKind.SPEC){
-    	  //automatonList[ck+plantSize] = ap;
-    	  specCodingList.add(codes);  
-    	  //
-    	  //System.out.println(k);
-    	  //System.out.println(k+plantSize+" out of boundry "+(automatonSize-1)+" plant size: "+plantSize);  	  
+    	else if (ap.getKind() == ComponentKind.SPEC){    	  
+    	  specCodingList.add(codes);     	    	  
     	  systemState[k+plantSize] = codes.indexOf(initialState);
 				specEventList.add(aneventCodingList);				
 				specTransitionMap.add(atransition);
@@ -233,57 +228,73 @@ public class ControllabilityChecker extends ModelChecker
 				maskList[k+plantSize] = mask;
 				k++;
       }      
-    }		
-    codingList.addAll(specCodingList);   
+    }	
+    //Combine the plant coding list and spec coding list together	
+    codingList.addAll(specCodingList); 
+    
+    //Set the codePosition list
+    for (i=0;i<automatonSize;i++) {
+			codeLength += bitlengthList[i];
+			if (codeLength <= 32){
+			  codePosition[i] = cp;
+			} else {
+				codeLength = bitlengthList[i];
+				cp++;
+				codePosition[i] = cp;
+			} 
+		}
+		stSize = cp+1;		
 		System.out.println("\nStart ...............");		
 		startTime = System.currentTimeMillis();
-    return this.isControllable(systemState);
+		return this.isControllable(systemState);
   }
   
-  /**   
-   * @parameter HashMap<AutomatonProxy, StateProxy> stateSet
+  /** 
+   * Check the controllability of the model with a parameter of  
+   * initial synchronous product. 
+   * @parameter sState The initial synchronous product of the model
    * @return <CODE>true</CODE> if the model is controllable, or
    *         <CODE>false</CODE> if it is not.   
    */  
   private boolean isControllable(int[] sState){
 	  
-		Set<BigInteger> systemSet = new HashSet<BigInteger>(); // Future changable
-		
-    boolean transitionPossible = true;
-    boolean enabled            = true;
-    boolean controllable       = false;
-    
+		Set<StateTuple> systemSet = new HashSet<StateTuple>(); // Future changable			
+   
+    boolean enabled = true;
+   
+    //Add the initial synchronous product in systemSet and stateList
 		successor = new int[automatonSize];
-    systemSet.add(encode(sState));
-    stateList.add(encode(sState));
+		stateTuple = new StateTuple(stSize);		
+		encode(sState,stateTuple);		
+    systemSet.add(stateTuple);
+    stateList.add(stateTuple);
     indexList.add(stateList.size()-1);    
     
-    int indexSize = 0 ;
+    int indexSize = 0;
 		int eventSize = eventCodingList.size();   
+		j = 0;
     
 		while(true){			
 			//For each current state in the current level, check its controllability			
 			indexSize = indexList.size();
-			for (j=(indexSize==1)?0:(indexList.get(indexSize-2)+1);j<=indexList.get(indexSize-1);j++){			
-			  systemState = decode(stateList.get(j));					
+			for (j=(indexSize==1)?0:(indexList.get(indexSize-2)+1);j<=indexList.get(indexSize-1);j++){				
+			  decode(stateList.get(j),systemState);						
 				for (int e=0;e<eventSize;e++) {
 				  // Retrieve all enabled events									
-				  enabled = true;
-					transitionPossible = true;
-				  for (i=0; i<plantSize;i++) {
-						successor[i] = systemState[i];
-				    if (plantEventList.get(i)[e] == 1){							
-				      transitionPossible = false;							
-							temp = plantTransitionMap.get(i)[systemState[i]][e];							
-				      if (temp > -1){
-								transitionPossible = true;
-								successor[i] = temp;							
+				  enabled = true;					
+				  for (i=0; i<plantSize;i++) {						
+				    if (plantEventList.get(i)[e] == 1){				     				
+							temp = plantTransitionMap.get(i)[systemState[i]][e];	
+							if (temp == -1) {
+								enabled = false;
+								break;
+							}						
+				      else if (temp > -1){								
+								successor[i] = temp;	
+								continue;						
 							}
 						}
-						if (!transitionPossible) {
-							enabled = false;
-							break;
-						}						
+						successor[i] = systemState[i];										
 					}
 					if (!enabled) {						
 						continue;
@@ -291,51 +302,48 @@ public class ControllabilityChecker extends ModelChecker
 				
 					// Check controllability of current state				  
 				  if (eventCodingList.get(e).getKind() == EventKind.UNCONTROLLABLE) {						
-				    for (i=0; i<automatonSize-plantSize;i++) {
-							successor[i+plantSize] = systemState[i+plantSize];							
-				    	if (specEventList.get(i)[e] == 1){
-				    	  controllable = false;								
+				    for (i=0; i<automatonSize-plantSize;i++) {													
+				    	if (specEventList.get(i)[e] == 1){				    	 					
 								temp = specTransitionMap.get(i)[systemState[i+plantSize]][e];
-								if (temp > -1){
-									controllable = true;
-									successor[i+plantSize] = temp;									
-								}				    	  
-				    	  if (!controllable) {			    	    
+								if (temp == -1) {			    	    
 									System.out.println(systemSet.size());
 									errorEvent = e;									
 									endTime = System.currentTimeMillis();
 				    	    return false;
 				    	  }
-				    	}							
+								if (temp > -1){									
+									successor[i+plantSize] = temp;	
+									continue;								
+								}				    	  
+				    	}
+				    	successor[i+plantSize] = systemState[i+plantSize];								
 				  	}
 				  } else {					
-				  	for (k=0;k<automatonSize-plantSize;k++){
-							transitionPossible = true;
-							successor[k+plantSize] = systemState[k+plantSize];
-				    	if (specEventList.get(k)[e] == 1) {
-				      	transitionPossible = false;
+				  	for (k=0;k<automatonSize-plantSize;k++){						
+				    	if (specEventList.get(k)[e] == 1) {				      	
 								temp = specTransitionMap.get(k)[systemState[k+plantSize]][e];
-				      	if (temp > -1){
-									transitionPossible = true;
-									successor[k+plantSize] = temp;										
-				      	}
-				      	if (!transitionPossible) {																					
+								if (temp == -1) {	
+								  enabled = false;																				
 									break;
 								}
-				    	}							
+				      	if (temp > -1){									
+									successor[k+plantSize] = temp;	
+									continue;									
+				      	}				      	
+				    	}	
+				    	successor[k+plantSize] = systemState[k+plantSize];						
 				  	}								
-				  	if (!transitionPossible) {
-				    	enabled = false;
+				  	if (!enabled) {				    	 
 				    	continue;
 				  	}		
 				  }					  				  
 					
-				 	// Encode the new system state and put it into stateList					
-				 	bi = encode(successor);	
-					
-				 	if (!systemSet.contains(bi)) {						
-				    stateList.add(bi);
-				    systemSet.add(bi);
+				 	// Encode the new system state and put it into stateList
+					stateTuple = new StateTuple(stSize);
+				 	encode(successor,stateTuple);				
+							
+				 	if (systemSet.add(stateTuple)) {							
+						stateList.add(stateTuple);						
 				  }
 				}
       }
@@ -350,36 +358,76 @@ public class ControllabilityChecker extends ModelChecker
 		return true;
 	}  	
   
-	//Encoding
-  private BigInteger encode(int[] sState){
-		bi = BigInteger.valueOf(0);
-		for (i = 0; i<automatonSize; i++){
-		  codes = codingList.get(i);
-			a = sState[i];
-			bi = bi.shiftLeft(bitlengthList[i]).add(BigInteger.valueOf(a));
-		}
-		return bi;
-	}
-	//Decoding
-	private int[] decode(BigInteger bi){		
-		for (i=automatonSize-1;i>-1;i--){
-		  codes = codingList.get(i);
-			a = bi.and(maskList[i]).intValue();
-			bi = bi.shiftRight(bitlengthList[i]);
-			systemState[i] = a;			
-		}
-		return systemState;
+  //#########################################################################
+  //# Encoding
+  /** 
+   * Encode the synchronous product into StateTuple
+   * @parameter sState  The state to be encoded   
+   * @parameter sTuple The encoded StateTuple     
+   */ 
+  private void encode(int[] sState,StateTuple sTuple){		
+		k = 0;
+		result = 0;
+		for (i = 0; i<automatonSize; i++) {
+			if (codePosition[i] == k) {
+				result <<= bitlengthList[i];
+				//System.out.println("Automaton "+i+" length "+bitlengthList[i]);
+				result |= sState[i];
+				if (i == automatonSize-1) {
+					sTuple.set(k,result);
+				}
+			}
+			else {
+				sTuple.set(k,result);
+				result = 0;
+				result <<= bitlengthList[i];
+				//System.out.println("Automaton "+i+" length "+bitlengthList[i]);
+				result |= sState[i];
+				k++;
+			}		 
+		}	
 	}
 	
+  //#########################################################################
+  //# Decoding
+	/** 
+   * Decode the StateTuple  
+   * @parameter sTuple The StateTuple to be decoded
+   * @parameter state  The decoded state   
+   */ 
+	private void decode(StateTuple sTuple,int[] state){		
+		k = codePosition[automatonSize-1];		
+		temp = sTuple.get(k);		
+		for (i=automatonSize-1;i>-1;i--){	
+			if (codePosition[i] == k) {
+				result = temp;
+				result &= maskList[i];
+				state[i] = result;
+				//System.out.println("temp "+temp+" mask "+maskList[i]+" state "+i+" = "+result);
+				temp >>= bitlengthList[i];
+			}	
+			else if (codePosition[i] < k) {
+				k--;
+			  temp = sTuple.get(k);
+			  result = temp;
+				result &= maskList[i];
+				state[i] = result;
+				//System.out.println("temp "+temp+" mask "+maskList[i]+" state "+i+" = "+result);
+				temp >>= bitlengthList[i];
+			} 						
+		}		
+	}
+	
+	
 	private void printStateList(){
-	  for (BigInteger bi : stateList){
+	  for (StateTuple bi : stateList){
 	    System.out.print(bi+" ");	    
 	  }
 		System.out.print("\n");
 	}
 	
 	private void printState(int[] systemState){
-	  for (Integer sp : systemState) {
+	  for (int sp : systemState) {
 		  System.out.print(sp+" ");
 		}
 		System.out.println("\n");
@@ -405,78 +453,69 @@ public class ControllabilityChecker extends ModelChecker
   public SafetyTraceProxy getCounterExample()
   {
     // The following creates a trace that consists of all the events in
-    // the input model.
-    // This code is only here to demonstrate the use of the interfaces.
-    // IT DOES NOT GIVE A CORRECT TRACE!
+    // the input model.    
 		final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();
     final String desname = des.getName();
     final String tracename = desname + ":uncontrollable";   
     final List<EventProxy> tracelist = new LinkedList<EventProxy>();
 		
-		boolean transitionPossible;
-    boolean enabled;
+		boolean enabled;  
 		
 		boolean found = false;
-		int indexSize = indexList.size();    
+		int indexSize = indexList.size();     
     
-    AutomatonProxy ap ;
-    AutomatonProxy as ;
 		int[] errorState = new int[automatonSize];		
 		
-		tracelist.add(0,eventCodingList.get(errorEvent));	
+		tracelist.add(0,eventCodingList.get(errorEvent));			
 		
-		for (i = 0;i<automatonSize;i++) {			
-			errorState[i] = systemState[i];	
-		}				
-		
-		while(true){		
+		while(true){
+			for (i = 0;i<automatonSize;i++) {			
+				errorState[i] = systemState[i];	
+			}			
 			indexList.remove(--indexSize);
-			if(indexList.size()==0) break;				
-			for (j=(indexSize==1)?0:(indexList.get(indexSize-2)+1);j<=indexList.get(indexSize-1);j++){			
-			  systemState = decode(stateList.get(j));					
-				for (int e=0;e<eventSize;e++) {
-				  // Retrieve all enabled events									
-				  enabled = true;
-					transitionPossible = true;
-				  for (i=0; i<plantSize;i++) {
-						successor[i] = systemState[i];
-				    if (plantEventList.get(i)[e] == 1){							
-				      transitionPossible = false;							
-							temp = plantTransitionMap.get(i)[systemState[i]][e];							
-				      if (temp > -1){
-								transitionPossible = true;
-								successor[i] = temp;							
+			if(indexList.size()==0) break;
+			//Backward search the previous level states, compute their
+			//successors and compare them with the error state				
+			for (j=(indexSize==1)?0:(indexList.get(indexSize-2)+1);j<=indexList.get(indexSize-1);j++){				
+			  decode(stateList.get(j),systemState);						
+				for (int e=0;e<eventSize;e++) {				 								
+				  enabled = true;					
+				  for (i=0; i<plantSize;i++) {						
+				    if (plantEventList.get(i)[e] == 1){				     				
+							temp = plantTransitionMap.get(i)[systemState[i]][e];	
+							if (temp == -1) {
+								enabled = false;
+								break;
+							}						
+				      else if (temp > -1){								
+								successor[i] = temp;	
+								continue;						
 							}
 						}
-						if (!transitionPossible) {
-							enabled = false;
-							break;
-						}						
+						successor[i] = systemState[i];										
 					}
 					if (!enabled) {						
 						continue;
 					}
-										
-				  for (k=0;k<automatonSize-plantSize;k++){
-						transitionPossible = true;
-						successor[k+plantSize] = systemState[k+plantSize];
-				   	if (specEventList.get(k)[e] == 1) {
-				     	transitionPossible = false;
+									
+				  for (k=0;k<automatonSize-plantSize;k++){						
+				   	if (specEventList.get(k)[e] == 1) {				      	
 							temp = specTransitionMap.get(k)[systemState[k+plantSize]][e];
-				     	if (temp > -1){
-								transitionPossible = true;
-								successor[k+plantSize] = temp;										
-				     	}
-				     	if (!transitionPossible) {																					
+							if (temp == -1) {	
+							  enabled = false;																				
 								break;
 							}
-				    }							
-				  }								
-				 	if (!transitionPossible) {
-				   	enabled = false;
+				     	if (temp > -1){									
+								successor[k+plantSize] = temp;	
+								continue;									
+				     	}				      	
+				   	}	
+				   	successor[k+plantSize] = systemState[k+plantSize];						
+				 	}								
+				 	if (!enabled) {				    	 
 				   	continue;
-				 	}
+				 	}				  
 				 	/*
 				 	System.out.print("System State: ");		
 				 	printState(systemState);				 
@@ -485,9 +524,6 @@ public class ControllabilityChecker extends ModelChecker
 				 	System.out.println("by Event: "+eventCodingList.get(e).getName()+"\n");	
 				 		*/		 			 
 					if(Arrays.equals(successor,errorState)){					
-				 		for (i = 0;i<automatonSize;i++) {			
-							errorState[i] = systemState[i];	
-						}	
 						found = true;  
 						tracelist.add(0,eventCodingList.get(e));
 						break;
