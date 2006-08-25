@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControllabilityChecker
 //###########################################################################
-//# $Id: ControllabilityChecker.java,v 1.5 2006-08-24 04:15:22 js173 Exp $
+//# $Id: ControllabilityChecker.java,v 1.6 2006-08-25 03:16:54 js173 Exp $
 //###########################################################################
 
 //Name: Jinjian Shi
@@ -74,10 +74,7 @@ public class ControllabilityChecker extends ModelChecker
 	private int[] maskList;
 	private int[] codePosition;
 	private StateTuple stateTuple;	
-	
-	//Frequently used temporary variable	
-	private int i,j,k,result,temp;
-	
+
 	//Size
 	private int automatonSize;
 	private int eventSize;
@@ -155,7 +152,8 @@ public class ControllabilityChecker extends ModelChecker
   public boolean getResult() 
   {		
 		Set<StateProxy> stateSet;
-		ArrayList<ArrayList<StateProxy>> specCodingList = new ArrayList<ArrayList<StateProxy>>();		
+		ArrayList<ArrayList<StateProxy>> specCodingList = new ArrayList<ArrayList<StateProxy>>();
+		int i,j,k = 0;		
 		int ck = 0;	
 		int bl = 0;
 		int mask = 0;
@@ -272,7 +270,7 @@ public class ControllabilityChecker extends ModelChecker
     
     int indexSize = 0;
 		int eventSize = eventCodingList.size();   
-		j = 0;
+		int i,j,k,temp;
     
 		while(true){			
 			//For each current state in the current level, check its controllability			
@@ -365,26 +363,23 @@ public class ControllabilityChecker extends ModelChecker
    * @parameter sState  The state to be encoded   
    * @parameter sTuple The encoded StateTuple     
    */ 
-  private void encode(int[] sState,StateTuple sTuple){		
-		k = 0;
-		result = 0;
+  private void encode(int[] sState,StateTuple sTuple){
+  	int i;		
+		int k = 0;
+		int result = 0;
 		for (i = 0; i<automatonSize; i++) {
 			if (codePosition[i] == k) {
-				result <<= bitlengthList[i];
-				//System.out.println("Automaton "+i+" length "+bitlengthList[i]);
+				result <<= bitlengthList[i];				
 				result |= sState[i];
-				if (i == automatonSize-1) {
-					sTuple.set(k,result);
-				}
 			}
 			else {
-				sTuple.set(k,result);
-				result = 0;
-				result <<= bitlengthList[i];
-				//System.out.println("Automaton "+i+" length "+bitlengthList[i]);
-				result |= sState[i];
+				sTuple.set(k,result);				
+				result = sState[i];				
 				k++;
 			}		 
+			if (i == automatonSize-1) {
+				sTuple.set(k,result);
+			}
 		}	
 	}
 	
@@ -395,15 +390,15 @@ public class ControllabilityChecker extends ModelChecker
    * @parameter sTuple The StateTuple to be decoded
    * @parameter state  The decoded state   
    */ 
-	private void decode(StateTuple sTuple,int[] state){		
-		k = codePosition[automatonSize-1];		
-		temp = sTuple.get(k);		
+	private void decode(StateTuple sTuple,int[] state){	
+		int i,result;	
+		int k = codePosition[automatonSize-1];		
+		int temp = sTuple.get(k);		
 		for (i=automatonSize-1;i>-1;i--){	
 			if (codePosition[i] == k) {
 				result = temp;
 				result &= maskList[i];
-				state[i] = result;
-				//System.out.println("temp "+temp+" mask "+maskList[i]+" state "+i+" = "+result);
+				state[i] = result;				
 				temp >>= bitlengthList[i];
 			}	
 			else if (codePosition[i] < k) {
@@ -412,27 +407,11 @@ public class ControllabilityChecker extends ModelChecker
 			  result = temp;
 				result &= maskList[i];
 				state[i] = result;
-				//System.out.println("temp "+temp+" mask "+maskList[i]+" state "+i+" = "+result);
 				temp >>= bitlengthList[i];
 			} 						
 		}		
 	}
-	
-	
-	private void printStateList(){
-	  for (StateTuple bi : stateList){
-	    System.out.print(bi+" ");	    
-	  }
-		System.out.print("\n");
-	}
-	
-	private void printState(int[] systemState){
-	  for (int sp : systemState) {
-		  System.out.print(sp+" ");
-		}
-		System.out.println("\n");
-	}
-	
+
   /**
    * Gets a counterexample if the model was found to be not controllable.
    * representing a controllability error trace. A controllability error
@@ -460,9 +439,10 @@ public class ControllabilityChecker extends ModelChecker
     final String tracename = desname + ":uncontrollable";   
     final List<EventProxy> tracelist = new LinkedList<EventProxy>();
 		
-		boolean enabled;  
-		
+		boolean enabled;
+			
 		boolean found = false;
+		int i,j,k,temp;	
 		int indexSize = indexList.size();     
     
 		int[] errorState = new int[automatonSize];		
@@ -516,13 +496,7 @@ public class ControllabilityChecker extends ModelChecker
 				 	if (!enabled) {				    	 
 				   	continue;
 				 	}				  
-				 	/*
-				 	System.out.print("System State: ");		
-				 	printState(systemState);				 
-				 	System.out.print("generates Successor: ");		
-				 	printState(successor);
-				 	System.out.println("by Event: "+eventCodingList.get(e).getName()+"\n");	
-				 		*/		 			 
+ 			 
 					if(Arrays.equals(successor,errorState)){					
 						found = true;  
 						tracelist.add(0,eventCodingList.get(e));
