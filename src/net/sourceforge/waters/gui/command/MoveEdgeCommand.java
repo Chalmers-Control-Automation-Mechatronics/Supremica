@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   MoveEdgeCommand
 //###########################################################################
-//# $Id: MoveEdgeCommand.java,v 1.5 2006-07-20 02:28:37 robi Exp $
+//# $Id: MoveEdgeCommand.java,v 1.6 2006-08-25 02:12:52 robi Exp $
 //###########################################################################
 
 
@@ -93,9 +93,16 @@ public class MoveEdgeCommand
 			mEdge.setTarget(mNew);
 			mEdge.setEndPoint(mNPos);
 		}
-		final Collection<Point2D> points = Collections.singleton(
-			GeometryTools.getMidPoint(mEdge.getStartPoint().getPoint(),
+		final Collection<Point2D> points;
+    if (mEdge.getTarget() != mEdge.getSource()) {
+      points = Collections.singleton(
+                    GeometryTools.getMidPoint(mEdge.getStartPoint().getPoint(),
 										mEdge.getEndPoint().getPoint()));
+    } else {
+      Point2D p = mEdge.getStartPoint().getPoint();
+      p.setLocation(p.getX() + 20, p.getY() + 20);
+      points = Collections.singleton(p);
+    }
 		mEdge.setGeometry(
 			new SplineGeometrySubject(points, SplineKind.INTERPOLATING));
 		mSurface.getEditorInterface().setDisplayed();

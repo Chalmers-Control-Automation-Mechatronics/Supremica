@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.53 2006-08-09 10:22:16 robi Exp $
+//# $Id: ModuleWindow.java,v 1.54 2006-08-25 02:12:52 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -806,7 +806,6 @@ public class ModuleWindow
         saveWmodFile(file);
 			
         modified = false;
-			
         logEntry("File saved: " + file);
       }
     else
@@ -842,24 +841,18 @@ public class ModuleWindow
 
         logEntry("addComponent: Parent: " + parentNode.toString());
 
-        if (ci.getComponent() instanceof ForeachSubject)
-          {
-            ((ForeachSubject) ci.getComponent()).getBodyModifiable().add(o);
-          }
-        else
-          {
-            mModule.getComponentListModifiable().add(o);
-          }
-			
-        if ((o instanceof SimpleComponentSubject))
-          {
-            SimpleComponentSubject scp = (SimpleComponentSubject) o;
-				
-            logEntry("Adding SimpleComponentSubject: " + scp.getName());
-
-            EditorWindow ed = new EditorWindow(scp.getName() + " - Waters Editor", mModule, scp, this, this);
-          }
-			
+        if (ci.getComponent() instanceof ForeachSubject) {
+          ((ForeachSubject) ci.getComponent()).getBodyModifiable().add(o);
+        } else {
+          mModule.getComponentListModifiable().add(o);
+        }
+        if (o instanceof SimpleComponentSubject) {
+          SimpleComponentSubject scp = (SimpleComponentSubject) o;
+          logEntry("Adding SimpleComponentSubject: " + scp.getName());
+          EditorWindow ed =
+            new EditorWindow(scp.getName() + " - Waters Editor", mModule,
+                             scp, this, this);
+        }
         //Add node to module tree
         ((ModuleTree) moduleSelectTree).addComponent(o);
       }

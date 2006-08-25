@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.25 2006-07-20 02:28:36 robi Exp $
+//# $Id: EditorMenu.java,v 1.26 2006-08-25 02:12:52 robi Exp $
 //###########################################################################
 
 
@@ -264,15 +264,17 @@ public class EditorMenu
 		
 		if (e.getSource() == mEmbedder)
 		{
-			try 
+		/*	try 
 			{
 				int iterations = Integer.parseInt(JOptionPane.showInputDialog(this, "Input number of iterations for the embedder", new Integer(100)));
+        Thread t = new Thread(new SpringEmbedder(surface.getGraph() , iterations));
+        t.start();
 				//SpringEmbedder.run(surface, surface.getGraph() , iterations);
 			}
 			catch(Throwable t)
 			{
 				JOptionPane.showMessageDialog(this, "Input must be an Integer");
-			}												  
+			}					*/							  
 		}
 
 		if (e.getSource() == editExportPostscriptMenu)

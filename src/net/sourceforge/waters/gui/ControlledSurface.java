@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.73 2006-08-20 13:40:44 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.74 2006-08-25 02:12:52 robi Exp $
 //###########################################################################
  
 package net.sourceforge.waters.gui;
@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Set;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.DocumentEvent;
 
 import net.sourceforge.waters.gui.command.*;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -145,6 +147,11 @@ public class ControlledSurface
   //#########################################################################
   public void examineCollisions() {
     
+  }
+  
+  public ModuleSubject getModule()
+  {
+    return (ModuleSubject) super.getModule();
   }
   
   public List<ProxySubject> getObjectsAtPosition(int ex, int ey)
@@ -762,8 +769,8 @@ public class ControlledSurface
     public boolean isFocused(ProxySubject s)
     {
     ProxySubject object = s;
-        List<Proxy> children = getChildren(focusedObject);
-        return object.equals(focusedObject) || children.contains(object);
+        List<Proxy> children = getChildren(mHighlightedObject);
+        return object.equals(mHighlightedObject) || children.contains(object);
     }
     
     public DRAGOVERSTATUS getDragOver(ProxySubject s)
@@ -991,19 +998,19 @@ public class ControlledSurface
     }
 
 		// Unhighlight highligted stuff not in focus
-		if ((focusedObject != null) && !focusedObject.equals(s))
+		if ((mHighlightedObject != null) && !mHighlightedObject.equals(s))
 		{
 			// Unhighlight object
-			focusedObject = null;
+			mHighlightedObject = null;
 
 			needRepaint = true;
 		}
 
 		// Highlight stuff in focus!
-		if (s != null && !s.equals(focusedObject))
+		if (s != null && !s.equals(mHighlightedObject))
 		{
 			// Highlight object
-			focusedObject = s;
+			mHighlightedObject = s;
 			needRepaint = true;
 		}
 
@@ -1084,10 +1091,10 @@ public class ControlledSurface
   {
     //#######################################################################
     //# Interface java.awt.dnd.DropTargetAdapter
-		
     public void dragOver(final DropTargetDragEvent e)
     {
-      mLine = null;
+      updateHighlighting(e.getLocation());
+      Line2D.Double line = null;
       int operation = DnDConstants.ACTION_MOVE;
       mDragOver = EditorSurface.DRAGOVERSTATUS.NOTDRAG;
       ProxySubject s = null;			
@@ -1096,7 +1103,7 @@ public class ControlledSurface
           e.getTransferable().getTransferData(FLAVOUR);
         final EventKind ek = i.getKind();
         final IdentifierSubject ip = i.getIdentifier();
-        s = focusedObject;
+        s = mHighlightedObject;
         if (ek == null) {
           if (s instanceof SimpleNodeSubject) {
             operation = DnDConstants.ACTION_COPY;
@@ -1126,10 +1133,12 @@ public class ControlledSurface
                 ProxyShape shape = getShapeProducer().getShape(proxy);
                 Rectangle2D r = shape.getShape().getBounds();
                 if (p.getY() < r.getCenterY()) {
-                  System.err.println("P: " + p + " r: " + r.getCenterY());
-                  mLine = new Line2D.Double(r.getMinX(), r.getMinY(),
-                                            r.getMaxX(), r.getMinY());
+                  line = new Line2D.Double(r.getMinX(), r.getMinY(),
+                                           r.getMaxX(), r.getMinY());
                   break;
+                } else {
+                  line = new Line2D.Double(r.getMinX(), r.getMaxY(),
+                                           r.getMaxX(), r.getMaxY());
                 }
               } catch (VisitorException v) {
                 v.printStackTrace();
@@ -1153,7 +1162,11 @@ public class ControlledSurface
           mDragOver = EditorSurface.DRAGOVERSTATUS.CANTDROP;
         }
       }
-      updateHighlighting(e.getLocation());
+      if ((line != null && !line.equals(mLine))
+          || (line == null && mLine != null)) {
+        mLine = line;
+        repaint();
+      }
       e.getDropTargetContext().getDropTarget().setDefaultActions(operation);
       e.acceptDrag(operation);
     }
@@ -1180,9 +1193,7 @@ public class ControlledSurface
               final IdentifierWithKind i = (IdentifierWithKind)
                 e.getTransferable().getTransferData(FLAVOUR);
               final IdentifierSubject ip = i.getIdentifier();
-              final ProxySubject s =
-                getObjectAtPosition((int) e.getLocation().getX(),
-                                    (int) e.getLocation().getY());
+              final ProxySubject s = mHighlightedObject;
               mDragOver = EditorSurface.DRAGOVERSTATUS.NOTDRAG;
               if (s instanceof SimpleNodeSubject) {
                 addToNode((SimpleNodeSubject) s, ip);
@@ -1336,7 +1347,7 @@ public class ControlledSurface
         // Singleclick?
         if (e.getClickCount() == 1) {	
           // What was clicked?
-          ProxySubject s = focusedObject;
+          ProxySubject s = mHighlightedObject;
           // Special stuff for labelgroup clicks?
           // (This is not working properly!)
           if (isSelected(s) && s != null &&
@@ -1395,8 +1406,8 @@ public class ControlledSurface
              }
              }
           */
-					
-          // What was clicked? 
+
+          // What was clicked?
           ProxySubject s = getObjectAtPosition(e.getX(), e.getY());
           if (s != null) {
             if (s instanceof LabelGeometrySubject) {
@@ -1424,7 +1435,7 @@ public class ControlledSurface
           lastX = e.getX();
           lastY = e.getY();
 	
-          ProxySubject s = focusedObject;
+          ProxySubject s = mHighlightedObject;
           if (s == null)
             {
               // Clicking on whitespace!
@@ -1743,13 +1754,21 @@ public class ControlledSurface
               */										
             }				
           // Doubleclick?
-          else if (e.getClickCount() == 2)
-            {
-					
+          else if (e.getClickCount() == 2) {
+            // What was clicked? 
+            ProxySubject s = getObjectAtPosition(e.getX(), e.getY());
+            if (s != null && s instanceof LabelGeometrySubject) {
+              LabelGeometrySubject l = (LabelGeometrySubject) s;
+              JTextField text = new NameEditField(l);
+              ControlledSurface.this.add(text);
+              text.setVisible(true);
+              text.requestFocus();
             }
+          }
         }
 			
-      // Repaint is done when you release the mouse button? (But that's before the click?)
+      // Repaint is done when you release the mouse button?
+      // (But that's before the click?)
       repaint();
     }
 		
@@ -1763,7 +1782,7 @@ public class ControlledSurface
           lastX = e.getX();
           lastY = e.getY();
 	
-          ProxySubject s = focusedObject;
+          ProxySubject s = mHighlightedObject;
           if (s == null)
             {
               // Clicking on whitespace!
@@ -1960,7 +1979,7 @@ public class ControlledSurface
           lastX = e.getX();
           lastY = e.getY();
 	
-          ProxySubject s = focusedObject;
+          ProxySubject s = mHighlightedObject;
           if (s == null)
             {
               if (!e.isControlDown())
@@ -2187,7 +2206,7 @@ public class ControlledSurface
           lastX = e.getX();
           lastY = e.getY();
 	
-          ProxySubject o = focusedObject;
+          ProxySubject o = mHighlightedObject;
           if (o == null)
             {
 	
@@ -2372,22 +2391,28 @@ public class ControlledSurface
     
     public void mousePressed(MouseEvent e)
     {
-      setDrag(e);      
-      ProxySubject o = focusedObject;
-      if (!(o instanceof SimpleNodeSubject))
-        {
+      maybeShowPopup(e);
+      setDrag(e);
+      if (e.getButton() == MouseEvent.BUTTON1) {
+        ProxySubject o = mHighlightedObject;
+        if (o instanceof SimpleNodeSubject) {
           return;
         }
-      SimpleNodeSubject n = (SimpleNodeSubject) o;
-      Command initial = new SetNodeInitialCommand(getGraph(), n);
-      root.getUndoInterface().executeCommand(initial);
-      repaint();
+        SimpleNodeSubject n = (SimpleNodeSubject) o;
+        Command initial = new SetNodeInitialCommand(getGraph(), n);
+        root.getUndoInterface().executeCommand(initial);
+        repaint();
+      }
+    }
+    
+    public void mouseReleased(MouseEvent e)
+    {
+      maybeShowPopup(e);
     }
 		
     public void mouseDragged(MouseEvent e)
     {
       updateHighlighting(e.getPoint());
-      ;
     }
 		
     public void mouseMoved(MouseEvent e)
@@ -2562,9 +2587,16 @@ public class ControlledSurface
       setOpaque(false);
       addFocusListener(new NameEditSpy());
       addActionListener(new NameEditSpy());
-      addKeyListener(new KeyAdapter()
-        {
-          public void keyPressed(KeyEvent e)
+      getDocument().addDocumentListener(new DocumentListener() {
+          public void changedUpdate(final DocumentEvent event)
+          {
+            setSize(getPreferredSize());
+          }
+          public void insertUpdate(final DocumentEvent event)
+          {
+            setSize(getPreferredSize());
+          }
+          public void removeUpdate(final DocumentEvent event)
           {
             setSize(getPreferredSize());
           }
@@ -2769,7 +2801,7 @@ public class ControlledSurface
   private Line2D mLine = null;
   
   /** The currently highlighted EditorObject (under the mouse pointer). */
-  private ProxySubject focusedObject = null;
+  private ProxySubject mHighlightedObject = null;
 
   private EditorGraph mDummy = null;
   
