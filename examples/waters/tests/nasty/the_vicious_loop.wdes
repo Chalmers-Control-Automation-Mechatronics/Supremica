@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="the_vicious_loop" xmlns="http://waters.sourceforge.net/xsd/des">
+<EventList>
+<Event Observable="true" Kind="UNCONTROLLABLE" Name="a"/>
+<Event Observable="true" Kind="UNCONTROLLABLE" Name="b"/>
+<Event Observable="true" Kind="UNCONTROLLABLE" Name="c"/>
+<Event Observable="true" Kind="CONTROLLABLE" Name="loop"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="the_vicious_loop">
+<EventRefList>
+<EventRef Name="a"/>
+<EventRef Name="b"/>
+<EventRef Name="c"/>
+<EventRef Name="loop"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0"/>
+<State Name="S1"/>
+<State Name="S2"/>
+<State Name="S3"/>
+</StateList>
+<TransitionList>
+<Transition Target="S1" Source="S0" Event="a"/>
+<Transition Target="S2" Source="S0" Event="b"/>
+<Transition Target="S3" Source="S0" Event="c"/>
+<Transition Target="S2" Source="S2" Event="loop"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+
