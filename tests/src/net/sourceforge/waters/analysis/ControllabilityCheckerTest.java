@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControllabilityCheckerTest
 //###########################################################################
-//# $Id: ControllabilityCheckerTest.java,v 1.12 2006-08-10 02:29:16 robi Exp $
+//# $Id: ControllabilityCheckerTest.java,v 1.13 2006-08-29 00:30:36 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -273,6 +273,38 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     runModelChecker(group, dir, name, false);
   }
 
+  public void testProfisafeI4Host() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_i4_host.wdes";
+    runModelChecker(group, dir, name, true);
+  }
+  
+  public void testProfisafeI4Slave() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_i4_slave.wdes";
+    runModelChecker(group, dir, name, true);
+  }
+  
+  public void testProfisafeO4Host() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_o4_host.wdes";
+    runModelChecker(group, dir, name, true);
+  }
+  
+  public void testProfisafeO4Slave() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_o4_slave.wdes";
+    runModelChecker(group, dir, name, true);
+  }
+  
   public void test_TrafficLights2006_plants() throws Exception
   {
     final String group = "tests";
@@ -507,6 +539,14 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String name = "debounce.wdes";
     runModelChecker(group, dir, name, true);
   }
+  
+  public void testDreitueren() throws Exception
+  {
+    final String group = "valid";
+    final String dir  = "central_locking";
+    final String name = "dreitueren.wdes";
+    runModelChecker(group, dir, name, true);
+  } 
   
   public void testFalko() throws Exception
   {
