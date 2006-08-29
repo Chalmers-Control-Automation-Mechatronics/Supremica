@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopCheckerTest
 //###########################################################################
-//# $Id: ControlLoopCheckerTest.java,v 1.7 2006-08-29 03:33:00 robi Exp $
+//# $Id: ControlLoopCheckerTest.java,v 1.8 2006-08-29 10:23:59 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -265,11 +265,19 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     runModelChecker(group, dir, name, false);
   }
 
-  public void test_Nasty_TheVicousLoop() throws Exception
+  public void test_Nasty_TheVicousLoop1() throws Exception
   {
     final String group = "tests";
     final String dir = "nasty";
-    final String name = "the_vicious_loop.wdes";
+    final String name = "the_vicious_loop1.wdes";
+    runModelChecker(group, dir, name, false);
+  }
+
+  public void test_Nasty_TheVicousLoop2() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "the_vicious_loop2.wdes";
     runModelChecker(group, dir, name, false);
   }
 

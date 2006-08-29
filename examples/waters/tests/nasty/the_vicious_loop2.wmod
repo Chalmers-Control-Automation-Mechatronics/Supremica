@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="the_vicious_loop" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="the_vicious_loop2" xmlns="http://waters.sourceforge.net/xsd/module">
 <EventDeclList>
-<EventDecl Observable="true" Kind="UNCONTROLLABLE" Name="a"/>
-<EventDecl Observable="true" Kind="UNCONTROLLABLE" Name="b"/>
-<EventDecl Observable="true" Kind="UNCONTROLLABLE" Name="c"/>
+<EventDecl Observable="true" Kind="CONTROLLABLE" Name="a"/>
+<EventDecl Observable="true" Kind="CONTROLLABLE" Name="b"/>
+<EventDecl Observable="true" Kind="CONTROLLABLE" Name="c"/>
 <EventDecl Observable="true" Kind="CONTROLLABLE" Name="loop"/>
 </EventDeclList>
 <ComponentList>

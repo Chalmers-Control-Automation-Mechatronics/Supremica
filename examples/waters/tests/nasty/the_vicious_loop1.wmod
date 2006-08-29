@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="the_vicious_loop1" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Observable="true" Kind="UNCONTROLLABLE" Name="a"/>
+<EventDecl Observable="true" Kind="UNCONTROLLABLE" Name="b"/>
+<EventDecl Observable="true" Kind="UNCONTROLLABLE" Name="c"/>
+<EventDecl Observable="true" Kind="CONTROLLABLE" Name="loop"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="the_vicious_loop"/>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<PointGeometry>
+<Point Y="192" X="144"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="-9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point Y="128" X="224"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="8" X="1"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S2">
+<PointGeometry>
+<Point Y="192" X="224"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S3">
+<PointGeometry>
+<Point Y="256" X="224"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="0"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="S2" Source="S0">
+<LabelBlock>
+<SimpleIdentifier Name="b"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-19" X="6"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="192" X="144"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="192" X="184"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="192" X="224"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="S1" Source="S0">
+<LabelBlock>
+<SimpleIdentifier Name="a"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-16" X="-19"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="192" X="144"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="160" X="184"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="128" X="224"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="S3" Source="S0">
+<LabelBlock>
+<SimpleIdentifier Name="c"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-13" X="8"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="192" X="144"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="224" X="184"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="256" X="224"/>
+</EndPointGeometry>
+</Edge>
+<Edge Target="S2" Source="S2">
+<LabelBlock>
+<SimpleIdentifier Name="loop"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-8" X="3"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point Y="192" X="224"/>
+</StartPointGeometry>
+<SplineGeometry>
+<Point Y="192" X="269"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point Y="192" X="224"/>
+</EndPointGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
+
