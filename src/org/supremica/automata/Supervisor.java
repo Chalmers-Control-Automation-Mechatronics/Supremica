@@ -61,20 +61,30 @@ import org.supremica.util.SupremicaException;
  */
 public interface Supervisor
 {
-	/**
-	 * Returns true if the event <code>event</code> is enabled by the
-	 * supervisor in its current state.
-	 */
-	public boolean isEnabled(LabeledEvent event);
+    /**
+     * Returns true if the event <code>event</code> is enabled by the
+     * supervisor in its current state.
+     */
+    public boolean isEnabled(LabeledEvent event);
+    
+    /**
+     * Executes the event <code>event</code>; changes the current
+     * internal state of the supervisor.
+     *
+     * @throws EventDisabledException if the event was not enabled.
+     */
+    public void executeEvent(LabeledEvent event)
+	throws EventDisabledException;
 
-	/**
-	 * Executes the event <code>event</code>; changes the current
-	 * internal state of the supervisor.
-	 *
-	 * @throws EventDisabledException if the event was not enabled.
-	 */
-	public void executeEvent(LabeledEvent event)
-		throws EventDisabledException;
+    /**
+     * Returns the alphabet of the supervisor.
+     */
+    public Alphabet getAlphabet();
+
+    /**
+     * Returns the supervisor to its initial state.
+     */
+    public void reset();
 }
 
 /**

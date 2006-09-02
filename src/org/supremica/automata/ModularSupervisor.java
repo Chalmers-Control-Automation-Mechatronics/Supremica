@@ -63,89 +63,105 @@ import org.supremica.automata.State;
 public class ModularSupervisor
 	implements Supervisor
 {
-	/** The current global state. */
-	State[] currentGlobalState;
+    /** The initial state. */
+    State[] initialState;
 
-	/** The system model. */
-	Automata model;
-
-	/**
-	 * Creates a modular supervisor. 
-	 *
-	 * @param model is an Automata containing all the modules in
-	 * the supervisor.
-	 */
-	public ModularSupervisor(Automata model)
-		throws SupremicaException
+    /** The current global state. */
+    State[] currentGlobalState;
+    
+    /** The system model. */
+    Automata model;
+    
+    /**
+     * Creates a modular supervisor. 
+     *
+     * @param model is an Automata containing all the modules in
+     * the supervisor.
+     */
+    public ModularSupervisor(Automata model)
+	throws SupremicaException
+    {
+	if (!model.isDeterministic())
 	{
-		if (!model.isDeterministic())
-		{
-			throw new SupremicaException("The supervisor is not deterministic.");
-		}
-
-		if (!model.hasInitialState())
-		{
-			throw new SupremicaException("The supervisor has no initial state, supervision is not possible.");
-		}
-
-		// Set the current global state to the initial state
-		currentGlobalState = new State[model.size()];
-		for (Automaton aut : model)
-		{
-			currentGlobalState[model.getAutomatonIndex(aut)] = aut.getInitialState();
-		}
-
-		// Set system model
-		this.model = model;
+	    throw new SupremicaException("The supervisor is not deterministic.");
 	}
-
-   	//////////////////////////////////
-	// Supervisor interface methods //
-	//////////////////////////////////
 	
-	public synchronized boolean isEnabled(LabeledEvent event)
+	if (!model.hasInitialState())
 	{
-		// Try executing the event
-		// Save the current global state
-		State[] currentStateSave = (State[]) currentGlobalState.clone();
-		try 
-		{
-			// Try executing the event
-			executeEvent(event);
-			// Restore order
-			currentGlobalState = currentStateSave;
-			// It went well--the event must have been enabled!
-			return true;
-		}
-		catch (EventDisabledException ex)
-		{
-			// Restore order
-			currentGlobalState = currentStateSave;
-			// The event is disabled!
-			return false;
-		}
+	    throw new SupremicaException("The supervisor has no initial state, supervision is not possible.");
 	}
-
-	public synchronized void executeEvent(LabeledEvent event)
-		throws EventDisabledException
+	
+	// Set the current global state and the initial state to the initial state
+	currentGlobalState = new State[model.size()];
+	initialState = new State[model.size()];
+	for (Automaton aut : model)
 	{
-		for (Automaton aut : model)
-		{
-			// Get automaton index
-			int index = model.getAutomatonIndex(aut);
-
-			// If the event is included in the alphabet, change state!
-			if (aut.getAlphabet().contains(event))
-			{				
-				// Supposes that the system is deterministic!
-				assert(aut.isDeterministic());
-				State nextState = currentGlobalState[index].nextState(event);
-				if (nextState == null)
-				{
-					throw new EventDisabledException();
-				}
-				currentGlobalState[index] = nextState;
-			}
-		}
+	    currentGlobalState[model.getAutomatonIndex(aut)] = aut.getInitialState();
+	    initialState[model.getAutomatonIndex(aut)] = aut.getInitialState();
 	}
+	
+	// Set system model
+	this.model = model;
+    }
+    
+    //////////////////////////////////
+    // Supervisor interface methods //
+    //////////////////////////////////
+    
+    public synchronized boolean isEnabled(LabeledEvent event)
+    {
+	// Try executing the event
+	// Save the current global state
+	State[] currentStateSave = (State[]) currentGlobalState.clone();
+	try 
+	{
+	    // Try executing the event
+	    executeEvent(event);
+	    // Restore order
+	    currentGlobalState = currentStateSave;
+	    // It went well--the event must have been enabled!
+	    return true;
+	}
+	catch (EventDisabledException ex)
+	{
+	    // Restore order
+	    currentGlobalState = currentStateSave;
+	    // The event is disabled!
+	    return false;
+	}
+    }
+    
+    public synchronized void executeEvent(LabeledEvent event)
+	throws EventDisabledException
+    {
+	for (Automaton aut : model)
+	{
+	    // Get automaton index
+	    int index = model.getAutomatonIndex(aut);
+	    
+	    // If the event is included in the alphabet, change state!
+	    if (aut.getAlphabet().contains(event))
+	    {				
+		// Supposes that the system is deterministic!
+		assert(aut.isDeterministic());
+		State nextState = currentGlobalState[index].nextState(event);
+		if (nextState == null)
+		{
+		    throw new EventDisabledException();
+		}
+		currentGlobalState[index] = nextState;
+	    }
+	}
+    }
+
+    public Alphabet getAlphabet()
+    {
+	return model.getUnionAlphabet();
+    }
+
+    public void reset()
+    {
+	for (int i = 0; i<currentGlobalState.length; i++)
+	    currentGlobalState[i] = initialState[i];
+    }
 }
