@@ -4,7 +4,7 @@
 //# PACKAGE: jni.glue
 //# PURPOSE: List of classes and methods to be converted to C++/JNI code
 //###########################################################################
-//# $Id: Classes.txt,v 1.10 2006-08-21 05:41:39 robi Exp $
+//# $Id: Classes.txt,v 1.11 2006-09-03 06:38:42 robi Exp $
 //###########################################################################
 
 
@@ -17,6 +17,8 @@ ref class Class {}
 ref class IllegalArgumentException {}
 
 ref class NullPointerException {}
+
+glue class Exception {}
 
 
 //###########################################################################
@@ -109,6 +111,18 @@ glue class TraceProxy {
 }
 
 glue class SafetyTraceProxy extends TraceProxy {
+}
+
+
+//###########################################################################
+package net.sourceforge.waters.model.compiler;
+//###########################################################################
+
+glue class NondeterminismException extends Exception {
+  NondeterminismException(String compname, glue StateProxy state);
+  NondeterminismException(String compname,
+			  glue StateProxy state,
+			  glue EventProxy event);
 }
 
 

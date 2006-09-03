@@ -4,7 +4,7 @@
 //# PACKAGE: jni.javah
 //# CLASS:   ClassCache
 //###########################################################################
-//# $Id: ClassCache.h,v 1.3 2006-08-16 02:56:42 robi Exp $
+//# $Id: ClassCache.h,v 1.4 2006-09-03 06:38:42 robi Exp $
 //###########################################################################
 
 
@@ -29,6 +29,7 @@
 namespace jni {
 
 class ClassInfo;
+class ExceptionGlue;
 class PreJavaException;
 
 
@@ -36,7 +37,7 @@ class PreJavaException;
 //# Class ClassCacheHashAccessor
 //###########################################################################
 
-class ClassCacheHashAccessor : public waters::HashAccessor
+class ClassCacheHashAccessor : public waters::PtrHashAccessor
 {
 public:
   //##########################################################################
@@ -53,7 +54,6 @@ public:
   virtual bool equals(const void* key1, const void* key2) const;
   virtual const void* getKey(const void* value) const
     {return ((ClassGlue*) value)->getJavaClass();};
-  virtual void* getDefaultValue() const {return 0;};  
 
 private:
   //##########################################################################
@@ -86,6 +86,7 @@ public:
   //# Exceptions
   jint throwJavaException(waters::uint32 classcode, const char* msg);
   jint throwJavaException(const PreJavaException& pre);
+  jthrowable throwJavaException(const ExceptionGlue& glue);
   
 private:
   //##########################################################################

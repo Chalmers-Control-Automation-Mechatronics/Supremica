@@ -4,12 +4,14 @@
 //# PACKAGE: waters.base
 //# CLASS:   HashTable
 //###########################################################################
-//# $Id: HashTable.cpp,v 1.4 2006-08-20 08:39:41 robi Exp $
+//# $Id: HashTable.cpp,v 1.5 2006-09-03 06:38:42 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
 #pragma implementation
 #endif
+
+#include <iostream>
 
 #include "waters/base/HashAccessor.h"
 #include "waters/base/HashTable.h"
@@ -136,11 +138,12 @@ iterationGet(uint32 iter)
 void HashOverflowBucket::
 rehash(UntypedHashTable* table)
 {
+  const HashAccessor* accessor = table->getHashAccessor();
   for (uint32 i = 0; i < mNextSlot; i++) {
     void* value = mSlots[i].mValue;
     table->add(value);
     value = mSlots[i].mNext;
-    if (((uint32) value & 1) == 0) {
+    if (!accessor->isLink(value)) {
       table->add(value);
     }
   }
@@ -228,8 +231,8 @@ get(const void* key)
   if (value == mDefault) {
     return value;
   }
-  while ((uint32) value & 1) {
-    HashOverflowPair* pair = (HashOverflowPair*) ((uint32) value & ~1);
+  while (void* link = mAccessor->detagLink(value)) {
+    HashOverflowPair* pair = (HashOverflowPair*) link;
     value = pair->mValue;
     if (isfound(key, value)) {
       return value;
@@ -256,8 +259,8 @@ add(void* value)
     *ref = value;
     return value;
   }
-  while ((uint32) present & 1) {
-    HashOverflowPair* pair = (HashOverflowPair*) ((uint32) present & ~1);
+  while (void* link = mAccessor->detagLink(present)) {
+    HashOverflowPair* pair = (HashOverflowPair*) link;
     present = pair->mValue;
     if (isfound(key, present)) {
       return present;
@@ -270,7 +273,7 @@ add(void* value)
   } else {
     mNumElements++;
     HashOverflowPair* pair = newSlot();
-    *ref = (void*) ((uint32) pair | 1);
+    *ref = mAccessor->entagLink(pair);
     pair->mValue = present;
     pair->mNext = value;
     return value;
@@ -303,7 +306,7 @@ rehash(uint32 newsize)
   }
   for (i = 0; i < oldsize; i++) {
     void* value = oldtable[i];
-    if ((value != mDefault) && (((uint32) value & 1) == 0)) {
+    if (value != mDefault && !mAccessor->isLink(value))  {
       add(value);
     }
   }
@@ -374,7 +377,7 @@ advance(HashTableIterator& iter)
     const uint32 index = iter.getIndex();
     if (const HashOverflowBucket* bucket = iter.getBucket()) {
       void* item = bucket->iterationGet(index);
-      if (((uint32) item & 1) == 0) {
+      if (!mAccessor->isLink(item)) {
         return item;
       }
     } else {
@@ -382,7 +385,7 @@ advance(HashTableIterator& iter)
         return mDefault;
       }
       void* item = mTable[index];
-      if (item != mDefault && ((uint32) item & 1) == 0) {
+      if (item != mDefault && !mAccessor->isLink(item)) {
         return item;
       }
     }

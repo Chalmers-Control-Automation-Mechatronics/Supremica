@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   AutomatonEncoding
 //###########################################################################
-//# $Id: AutomatonEncoding.cpp,v 1.4 2006-08-21 05:41:39 robi Exp $
+//# $Id: AutomatonEncoding.cpp,v 1.5 2006-09-03 06:38:42 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -21,9 +21,12 @@
 #include <stdlib.h>
 
 #include "jni/cache/ClassCache.h"
+#include "jni/cache/ClassGlue.h"
+#include "jni/cache/JavaString.h"
 #include "jni/glue/IteratorGlue.h"
-#include "jni/glue/SetGlue.h"
 #include "jni/glue/ProductDESGlue.h"
+#include "jni/glue/SetGlue.h"
+#include "jni/glue/StateGlue.h"
 
 #include "waters/analysis/AutomatonEncoding.h"
 
@@ -90,8 +93,49 @@ AutomatonRecord(const jni::AutomatonGlue aut,
     mBitMask(0)
 {
   const jni::SetGlue states = aut.getStatesGlue(cache);
+  const jni::IteratorGlue iter = states.iteratorGlue(cache);
   mNumStates = states.size();
   mNumBits = log2(mNumStates);
+  mJavaStates = (jni::StateGlue*) malloc(mNumStates * sizeof(jni::StateGlue));
+  uint32 code = 0;
+  while (iter.hasNext()) {
+    jobject javaobject = iter.next();
+    new (&mJavaStates[code++]) jni::StateGlue(javaobject, cache);
+  }
+}
+
+AutomatonRecord::
+~AutomatonRecord()
+{
+  for (int i = 0; i < mNumStates; i++) {
+    mJavaStates[i].jni::StateGlue::~StateGlue();
+  }
+  free(mJavaStates);
+}
+
+
+//############################################################################
+//# AutomatonRecord: Simple Access
+
+jni::JavaString AutomatonRecord::
+getName()
+  const
+{
+  const jni::ClassGlue* cls = mJavaAutomaton.getClass();
+  JNIEnv* env = cls->getEnvironment();
+  jstring jname = mJavaAutomaton.getName();
+  return jni::JavaString(env, jname);
+}
+
+jni::JavaString AutomatonRecord::
+getStateName(uint32 code)
+  const
+{
+  const jni::StateGlue& state = mJavaStates[code];
+  const jni::ClassGlue* cls = state.getClass();
+  JNIEnv* env = cls->getEnvironment();
+  jstring jname = state.getName();
+  return jni::JavaString(env, jname);
 }
 
 
@@ -127,7 +171,7 @@ allocate(int wordindex, int shift)
 {
   mWordIndex = wordindex;
   mShift = shift;
-  mBitMask = (mNumBits - 1) << shift;
+  mBitMask = ((1 << mNumBits) - 1) << shift;
 }
 
 
@@ -207,7 +251,7 @@ AutomatonEncoding(const jni::ProductDESGlue des,
   int prev = 0;
   for (w = 0; w < mNumWords; w++) {
     used[w] = prev;
-    prev = mWordStop[w] += prev;
+    prev = (mWordStop[w] += prev);
   }
   mAutomatonRecords = new AutomatonRecord*[mNumRecords];
   for (a = 0; a < mNumRecords; a++) {
@@ -223,7 +267,7 @@ AutomatonEncoding(const jni::ProductDESGlue des,
   delete[] used;
 
 #ifdef DEBUG
-  dump(cache);
+  dump();
 #endif /* DEBUG */
 }
 
@@ -306,28 +350,59 @@ set(uint32* encoded, int index, uint32 code)
 #ifdef DEBUG
 
 void AutomatonEncoding::
-dump(jni::ClassCache* cache)
+dump()
   const
 {
-  JNIEnv* env = cache->getEnvironment();
   std::cerr << "ENCODING DUMP:" << std::endl;
   std::cerr << "  Number of automata: " << mNumRecords << std::endl;
   std::cerr << "  Number of words: " << mNumWords << std::endl;
   for (int a = 0; a < mNumRecords; a++) {
     const AutomatonRecord* record = mAutomatonRecords[a];
-    const jni::AutomatonGlue aut = record->getJavaAutomaton();
-    const jstring jname = aut.getName();
-    const char *name = env->GetStringUTFChars(jname, 0);
+    const jni::JavaString name = record->getName();
     const int numstates = record->getNumberOfStates();
     const int numbits = record->getNumberOfBits();
     const int shift = record->getShift();
     const int w = record->getWordIndex();
-    std::cerr << "  #" << a << ": " << name << " (" << numstates
+    std::cerr << "  #" << a << ": " << (const char*) name << " (" << numstates
               << " states) : " << w << ":" << shift << ":" << numbits
               << std::endl;
-    env->ReleaseStringUTFChars(jname, name);
   }
   std::cerr << "END OF ENCODING DUMP" << std::endl;
+}
+
+void AutomatonEncoding::
+dumpEncodedState(const uint32* encoded)
+  const
+{
+  std::cerr << '(';
+  for (int w = 0; w < mNumWords; w++) {
+    if (w > 0) {
+      std::cerr << ',';
+    }
+    std::cerr << encoded[w];
+  }
+  std::cerr << ") = ";
+  uint32* decoded = new uint32[mNumRecords];
+  decode(encoded, decoded);
+  dumpDecodedState(decoded);
+  delete [] decoded;
+}
+
+void AutomatonEncoding::
+dumpDecodedState(const uint32* decoded)
+  const
+{
+  std::cerr << '(';
+  for (int a = 0; a < mNumRecords; a++) {
+    const AutomatonRecord* record = mAutomatonRecords[a];
+    const uint32 code = decoded[a];
+    const jni::JavaString name = record->getStateName(code);
+    if (a > 0) {
+      std::cerr << ',';
+    }
+    std::cerr << (const char*) name;
+  }
+  std::cerr << ')' << std::endl;
 }
 
 #endif /* DEBUG */

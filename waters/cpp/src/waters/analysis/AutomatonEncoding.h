@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   AutomatonEncoding
 //###########################################################################
-//# $Id: AutomatonEncoding.h,v 1.3 2006-08-21 05:41:39 robi Exp $
+//# $Id: AutomatonEncoding.h,v 1.4 2006-09-03 06:38:42 robi Exp $
 //###########################################################################
 
 
@@ -26,7 +26,9 @@
 
 namespace jni {
   class ClassCache;
+  class JavaString;
   class ProductDESGlue;
+  class StateGlue;
 }
 
 
@@ -37,7 +39,7 @@ namespace waters {
 //# Class AutomatonRecordHashAccessor
 //###########################################################################
 
-class AutomatonRecordHashAccessor : public HashAccessor
+class AutomatonRecordHashAccessor : public PtrHashAccessor
 {
 private:
   //##########################################################################
@@ -51,7 +53,6 @@ public:
   virtual uint32 hash(const void* key) const;
   virtual bool equals(const void* key1, const void* key2) const;
   virtual const void* getKey(const void* value) const;
-  virtual void* getDefaultValue() const {return 0;}  
 };
 
 
@@ -68,6 +69,7 @@ public:
   explicit AutomatonRecord(const jni::AutomatonGlue aut,
 			   bool plant,
 			   jni::ClassCache* cache);
+  ~AutomatonRecord();
 
   //##########################################################################
   //# Simple Access
@@ -79,6 +81,8 @@ public:
   int getWordIndex() const {return mWordIndex;}
   int getShift() const {return mShift;}
   int getBitMask() const {return mBitMask;}
+  jni::JavaString getName() const;
+  jni::JavaString getStateName(uint32 code) const;
 
   //##########################################################################
   //# Comparing and Hashing
@@ -95,6 +99,7 @@ private:
   //##########################################################################
   //# Data Members
   jni::AutomatonGlue mJavaAutomaton;
+  jni::StateGlue* mJavaStates;
   bool mIsPlant;
   int mNumStates;
   int mNumBits;
@@ -125,6 +130,7 @@ public:
 
   //##########################################################################
   //# Simple Access
+  int getNumWords() const {return mNumWords;}
   int getNumRecords() const {return mNumRecords;}
   const AutomatonRecord* getRecord(int index) const
     {return mAutomatonRecords[index];}
@@ -139,7 +145,9 @@ public:
   //##########################################################################
   //# Debug Output
 #ifdef DEBUG
-  void dump(jni::ClassCache* cache) const;
+  void dump() const;
+  void dumpEncodedState(const uint32* encoded) const;
+  void dumpDecodedState(const uint32* decoded) const;
 #endif /* DEBUG */
 
 private:

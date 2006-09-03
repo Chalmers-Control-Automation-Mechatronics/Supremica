@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.39 2006-08-10 02:29:16 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.40 2006-09-03 06:38:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -577,6 +577,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       createAutomatonEvents(blocked);
       final Collection<NodeProxy> nodes = graph.getNodes();
       mStates = new TreeSet<StateProxy>();
+      mMaxInitialStates = deterministic ? 1 : -1;
       mPrecompiledNodes =
         new IdentityHashMap<NodeProxy, CompiledNode>(nodes.size());
       visitCollection(nodes);
@@ -730,6 +731,19 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
     }
     final StateProxy state =
       mFactory.createStateProxy(name, initial, stateProps);
+    if (initial) {
+      switch (mMaxInitialStates) {
+      case 1:
+        mMaxInitialStates = 0;
+        break;
+      case 0:
+        final NondeterminismException exception =
+          new NondeterminismException(mCurrentComponentName, state);
+        throw wrap(exception);
+      default:
+        break;
+      }
+    }
     mStates.add(state);
     final CompiledNode compiled = new CompiledNode(proxy, state);
     mPrecompiledNodes.put(proxy, compiled);
@@ -1598,11 +1612,8 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
             create = false;
             break;
           } else if (deterministic) {
-            throw new NondeterminismException("Multiple transitions labelled '"
-                                              + event.getName()
-                                              + "' originating from state '"
-                                              + source.getName() + "'!",
-                                              source);
+            throw new NondeterminismException
+              (mCurrentComponentName, sourceState, event);
           }
         }
         if (create) {
@@ -1770,6 +1781,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
   private Map<String,AutomatonProxy> mAutomata;
   private Map<NodeProxy,CompiledNode> mPrecompiledNodes;
   private String mCurrentComponentName;
+  private int mMaxInitialStates;
   private Set<EventProxy> mGlobalAlphabet;
   private Set<EventProxy> mLocalAlphabet;
   private Set<StateProxy> mStates;

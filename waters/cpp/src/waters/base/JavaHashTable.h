@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   JavaHashTable
 //###########################################################################
-//# $Id: JavaHashTable.h,v 1.2 2006-08-20 11:02:43 robi Exp $
+//# $Id: JavaHashTable.h,v 1.3 2006-09-03 06:38:42 robi Exp $
 //###########################################################################
 
 
@@ -33,7 +33,7 @@ class HashAccessor;
 //# Class ObjectHashAccessor
 //###########################################################################
 
-class ObjectHashAccessor : public HashAccessor
+class ObjectHashAccessor : public PtrHashAccessor
 {
 public:
   //##########################################################################
@@ -45,7 +45,6 @@ public:
   virtual uint32 hash(const void* key) const;
   virtual bool equals(const void* key1, const void* key2) const;
   virtual const void* getKey(const void* value) const {return value;};
-  virtual void* getDefaultValue() const {return 0;}  
 
 private:
   //##########################################################################

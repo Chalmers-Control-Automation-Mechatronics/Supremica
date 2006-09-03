@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   ControllabilityChecker
 //###########################################################################
-//# $Id: ControllabilityChecker.cpp,v 1.8 2006-08-21 05:41:39 robi Exp $
+//# $Id: ControllabilityChecker.cpp,v 1.9 2006-09-03 06:38:42 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -25,6 +25,7 @@
 #include "jni/glue/EventKindGlue.h"
 #include "jni/glue/IteratorGlue.h"
 #include "jni/glue/NativeControllabilityCheckerGlue.h"
+#include "jni/glue/NondeterminismExceptionGlue.h"
 #include "jni/glue/ProductDESGlue.h"
 #include "jni/glue/ProductDESProxyFactoryGlue.h"
 #include "jni/glue/SetGlue.h"
@@ -35,6 +36,8 @@
 #include "waters/analysis/ControllabilityChecker.h"
 #include "waters/analysis/EventRecord.h"
 #include "waters/analysis/StateRecord.h"
+#include "waters/analysis/StateSpace.h"
+#include "waters/analysis/TransitionRecord.h"
 #include "waters/base/HashTable.h"
 #include "waters/javah/Invocations.h"
 
@@ -51,21 +54,67 @@ namespace waters {
 ControllabilityChecker::
 ControllabilityChecker(const jni::ProductDESGlue des,
                        jni::ClassCache* cache)
-  : mEncoding(des, cache)
+  : mCache(cache),
+    mModel(des),
+    mEncoding(0),
+    mStateSpace(0),
+    mNumEventRecords(0),
+    mEventRecords(0),
+    mCurrentTuple(0)
 {
+}
+
+
+ControllabilityChecker::
+~ControllabilityChecker()
+{
+  delete mEncoding;
+  delete mStateSpace;
+  for (int i = 0; i < mNumEventRecords; i++) {
+    delete mEventRecords[i];
+  }
+  delete [] mEventRecords;
+  delete [] mCurrentTuple;
+}
+
+
+//############################################################################
+//# ControllabilityChecker: Constructors & Destructors
+
+bool ControllabilityChecker::
+run()
+{
+  try {
+    setup();
+    bool result = checkProperty();
+    teardown();
+    return result;
+  } catch (...) {
+    teardown();
+    throw;
+  }
+}
+
+void ControllabilityChecker::
+setup()
+{
+  // Establish automaton encoding ...
+  mEncoding = new AutomatonEncoding(mModel, mCache);
+  mStateSpace = new StateSpace(mEncoding);
+
   // Establish initial event map ...
-  const jni::SetGlue events = des.getEventsGlue(cache);
+  const jni::SetGlue events = mModel.getEventsGlue(mCache);
   const int numevents = events.size();
-  const jni::IteratorGlue iter = events.iteratorGlue(cache);
+  const jni::IteratorGlue iter = events.iteratorGlue(mCache);
   const HashAccessor* eventaccessor = EventRecord::getHashAccessor();
   HashTable<jni::EventGlue*,EventRecord*> eventmap(eventaccessor, numevents);
   mEventRecords = new EventRecord*[numevents];
   mNumEventRecords = 0;
   while (iter.hasNext()) {
     jobject javaobject = iter.next();
-    jni::EventGlue event(javaobject, cache);
+    jni::EventGlue event(javaobject, mCache);
     bool controllable;
-    switch (event.getKindGlue(cache)) {
+    switch (event.getKindGlue(mCache)) {
     case jni::EventKind_UNCONTROLLABLE:
       controllable = false;
       break;
@@ -75,46 +124,70 @@ ControllabilityChecker(const jni::ProductDESGlue des,
     default:
       continue;
     }
-    EventRecord* record = new EventRecord(event, controllable, cache);
+    EventRecord* record = new EventRecord(event, controllable, mCache);
     eventmap.add(record);
   }
 
-  //  Collect transitions ...
+  // Prepare initial state ...
+  const int numaut = mEncoding->getNumRecords();
+  mCurrentTuple = new uint32[numaut];
+  int a;
+  for (a = 0; a < numaut; a++) {
+    mCurrentTuple[a] = UNDEF_UINT32;
+  }    
+
+  // Collect transitions ...
   const HashAccessor* stateaccessor = StateRecord::getHashAccessor();
   HashTable<jni::StateGlue*,StateRecord*> statemap(stateaccessor, 256);
-  const int numaut = mEncoding.getNumRecords();
-  for (int a = 0; a < numaut; a++) {
-    const AutomatonRecord* autrecord = mEncoding.getRecord(a);
+  for (a = 0; a < numaut; a++) {
+    const AutomatonRecord* autrecord = mEncoding->getRecord(a);
     const jni::AutomatonGlue aut = autrecord->getJavaAutomaton();
-    const jni::SetGlue states = aut.getStatesGlue(cache);
-    const jni::IteratorGlue stateiter = states.iteratorGlue(cache);
+    const jni::SetGlue states = aut.getStatesGlue(mCache);
+    const jni::IteratorGlue stateiter = states.iteratorGlue(mCache);
     uint32 code = 0;
     while (stateiter.hasNext()) {
       jobject javaobject = stateiter.next();
-      jni::StateGlue state(javaobject, cache);
-      StateRecord* staterecord = new StateRecord(state, code++, cache);
+      jni::StateGlue state(javaobject, mCache);
+      StateRecord* staterecord = new StateRecord(state, code, mCache);
       statemap.add(staterecord);
+      if (state.isInitial()) {
+        if (mCurrentTuple[a] == UNDEF_UINT32) {
+          mCurrentTuple[a] = code;
+        } else {
+          jstring compname = aut.getName();
+          jni::NondeterminismExceptionGlue exception(compname, &state, mCache);
+          throw mCache->throwJavaException(exception);
+        }
+      }
+      code++;
     }
-    const jni::CollectionGlue transitions = aut.getTransitionsGlue(cache);
-    const jni::IteratorGlue transiter = transitions.iteratorGlue(cache);
+    const jni::CollectionGlue transitions = aut.getTransitionsGlue(mCache);
+    const jni::IteratorGlue transiter = transitions.iteratorGlue(mCache);
     while (transiter.hasNext()) {
       jobject javaobject = transiter.next();
-      jni::TransitionGlue trans(javaobject, cache);
-      jni::EventGlue event = trans.getEventGlue(cache);
+      jni::TransitionGlue trans(javaobject, mCache);
+      jni::EventGlue event = trans.getEventGlue(mCache);
       EventRecord* eventrecord = eventmap.get(&event);
-      jni::StateGlue source = trans.getSourceGlue(cache);
+      jni::StateGlue source = trans.getSourceGlue(mCache);
       StateRecord* sourcerecord = statemap.get(&source);
-      jni::StateGlue target = trans.getTargetGlue(cache);
+      jni::StateGlue target = trans.getTargetGlue(mCache);
       StateRecord* targetrecord = statemap.get(&target);
-      eventrecord->addTransition(autrecord, sourcerecord, targetrecord);
+      bool det =
+        eventrecord->addTransition(autrecord, sourcerecord, targetrecord);
+      if (!det) {
+        jstring compname = aut.getName();
+        jni::NondeterminismExceptionGlue
+          exception(compname, &source, &event, mCache);
+        throw mCache->throwJavaException(exception);
+      }
     }
     statemap.clear();
-    const jni::SetGlue events = aut.getEventsGlue(cache);
-    const jni::IteratorGlue eventiter = events.iteratorGlue(cache);
+    const jni::SetGlue events = aut.getEventsGlue(mCache);
+    const jni::IteratorGlue eventiter = events.iteratorGlue(mCache);
     while (eventiter.hasNext()) {
       jobject javaobject = eventiter.next();
-      jni::EventGlue event(javaobject, cache);
-      jni::EventKind kind = event.getKindGlue(cache);
+      jni::EventGlue event(javaobject, mCache);
+      jni::EventKind kind = event.getKindGlue(mCache);
       if (kind == jni::EventKind_UNCONTROLLABLE ||
           kind == jni::EventKind_CONTROLLABLE) {
         EventRecord* eventrecord = eventmap.get(&event);
@@ -146,14 +219,82 @@ ControllabilityChecker(const jni::ProductDESGlue des,
         EventRecord::compare);
 }
 
-
-ControllabilityChecker::
-~ControllabilityChecker()
+bool ControllabilityChecker::
+checkProperty()
 {
+  // Store initial state ...
+  const int numaut = mEncoding->getNumRecords();
+  for (int a = 0; a < numaut; a++) {
+    if (mCurrentTuple[a] == UNDEF_UINT32) {
+      return true;
+    }
+  }
+  uint32* packed = mStateSpace->prepare();
+  mEncoding->encode(mCurrentTuple, packed);
+  mStateSpace->add();
+
+  // Main loop ...
+  uint32 current = 0;
+  while (current < mStateSpace->size()) {
+    packed = mStateSpace->get(current);
+    mEncoding->decode(packed, mCurrentTuple);
+    for (int e = 0; e < mNumEventRecords; e++) {
+      EventRecord* event = mEventRecords[e];
+      bool enabled = true;
+      for (TransitionRecord* trans = event->getTransitionRecord();
+           trans != 0;
+           trans = trans->getNext()) {
+        if (trans->isAlwaysEnabled()) {
+          break;
+        }
+        const AutomatonRecord* aut = trans->getAutomaton();
+        const int a = aut->getAutomatonIndex();
+        const uint32 source = mCurrentTuple[a];
+        const uint32 target = trans->getSuccessor(source);
+        if (target == UNDEF_UINT32) {
+          if (aut->isPlant() || event->isControllable()) {
+            enabled = false;
+            break;
+          } else {
+            return false;
+          }
+        }
+      }
+      if (enabled) {
+        packed = mStateSpace->prepare(current);
+        for (TransitionRecord* trans = event->getTransitionRecord();
+             trans != 0;
+             trans = trans->getNext()) {
+          const AutomatonRecord* aut = trans->getAutomaton();
+          const int a = aut->getAutomatonIndex();
+          const uint32 source = mCurrentTuple[a];
+          const uint32 target = trans->getSuccessor(source);
+          mEncoding->set(packed, a, target);
+        }
+        mStateSpace->add();
+      }
+    }
+    current++;
+  }
+
+  return true;
+}
+
+void ControllabilityChecker::
+teardown()
+{
+  delete mEncoding;
+  mEncoding = 0;
+  delete mStateSpace;
+  mStateSpace = 0;
   for (int i = 0; i < mNumEventRecords; i++) {
     delete mEventRecords[i];
   }
+  mNumEventRecords = 0;
   delete [] mEventRecords;
+  mEventRecords = 0;
+  delete [] mCurrentTuple;
+  mCurrentTuple = 0;
 }
 
 
@@ -174,10 +315,11 @@ Java_net_sourceforge_waters_cpp_analysis_NativeControllabilityChecker_runNativeA
       jni::NativeControllabilityCheckerGlue gchecker(jchecker, &cache);
       jni::ProductDESGlue des = gchecker.getInputGlue(&cache);
       waters::ControllabilityChecker checker(des, &cache);
+      bool result = checker.run();
       jni::ProductDESProxyFactoryGlue factory =
         gchecker.getFactoryGlue(&cache);
-      jni::VerificationResultGlue result(true, 0, &cache);
-      return result.returnJavaObject();
+      jni::VerificationResultGlue vresult(result, 0, &cache);
+      return vresult.returnJavaObject();
     } catch (const jni::PreJavaException& pre) {
       cache.throwJavaException(pre);
       return 0;

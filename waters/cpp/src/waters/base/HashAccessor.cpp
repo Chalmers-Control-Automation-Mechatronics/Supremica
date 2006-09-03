@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   HashAccessor
 //###########################################################################
-//# $Id: HashAccessor.cpp,v 1.2 2006-08-20 08:39:41 robi Exp $
+//# $Id: HashAccessor.cpp,v 1.3 2006-09-03 06:38:42 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -66,6 +66,36 @@ uint32 hashInt(int key)
 uint32 hashInt(const void* key)
 {
   return hashInt((uint32) key);
+}
+
+
+uint32 hashIntArray(const uint32* key, const int len)
+{
+  register uint32 a = gold;
+  register uint32 b = gold;
+  register uint32 c = gold;
+  register int rest = len;
+
+  // Handle most of the key ...
+  while (rest >= 3) {
+    a += key[0];
+    b += key[1];
+    c += key[2];
+    mix(a,b,c);
+    key += 3;
+    rest -= 3;
+  }
+
+  // Handle the last 1 or 2 words ...
+  switch(rest) {
+    // all the case statements fall through ...
+  case 2: b += key[1];
+  case 1: a += key[0];
+    // case 0: nothing left to add
+  }
+  mix(a,b,c);
+ 
+  return c;
 }
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   JAXBTestCase
 //###########################################################################
-//# $Id: CompilerTest.java,v 1.7 2006-08-10 02:29:16 robi Exp $
+//# $Id: CompilerTest.java,v 1.8 2006-09-03 06:38:43 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -280,6 +280,13 @@ public class CompilerTest
   {
     compileError("nodegroup3", null,
                  NondeterminismException.class, "'q0'", "'e'");
+  }
+
+  public void testCompile_twoinit()
+    throws IOException, WatersException
+  {
+    compileError("twoinit", null,
+                 NondeterminismException.class, "'comp'");
   }
 
 

@@ -1,15 +1,15 @@
 //# This may look like C code, but it really is -*- C++ -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.analysis
-//# CLASS:   ControllabilityChecker
+//# PACKAGE: waters.base
+//# CLASS:   ArrayList
 //###########################################################################
-//# $Id: ControllabilityChecker.h,v 1.4 2006-09-03 06:38:42 robi Exp $
+//# $Id: ArrayList.h,v 1.1 2006-09-03 06:38:42 robi Exp $
 //###########################################################################
 
 
-#ifndef _ControllabilityChecker_h_
-#define _ControllabilityChecker_h_
+#ifndef _ArrayList_h_
+#define _ArrayList_h_
 
 #ifdef __GNUG__
 #pragma interface
@@ -20,58 +20,82 @@
 #endif
 
 #include "waters/base/IntTypes.h"
-#include "waters/analysis/AutomatonEncoding.h"
-
-
-namespace jni {
-  class ClassCache;
-  class ProductDESGlue;
-}
 
 
 namespace waters {
 
-class EventRecord;
-class StateSpace;
-
 
 //############################################################################
-//# class ControllabilityChecker
+//# template ArrayList <typed>
 //############################################################################
 
-class ControllabilityChecker
+template <class Value>
+class ArrayList
 {
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit ControllabilityChecker(jni::ProductDESGlue des,
-				  jni::ClassCache* cache);
-  virtual ~ControllabilityChecker();
+  explicit ArrayList(uint32 size = 16) :
+    mNumElements(0),
+    mArraySize(size),
+    mArray(new Value[size])
+  {
+  }
 
-public:
+  ~ArrayList()
+  {
+    delete [] mArray;
+  }
+
   //##########################################################################
-  //# Invocation
-  bool run();
-  void setup();
-  bool checkProperty();
-  void teardown();
+  //# Access
+  uint32 size()
+    const
+  {
+    return mNumElements;
+  }
+
+  Value get(uint32 index)
+    const
+  {
+    return mArray[index];
+  }
+
+  void add(const Value value)
+  {
+    grow(mNumElements + 1);
+    mArray[mNumElements++] = value;
+  }
+
+  void clear()
+  {
+    mNumElements = 0;
+  }
 
 private:
   //##########################################################################
   //# Auxiliary Methods
+  void grow(uint32 newsize)
+  {
+    if (newsize > mArraySize) {
+      mArraySize <<= 1;
+      Value* newarray = new Value[mArraySize];
+      for (uint32 i = 0; i < mNumElements; i++) {
+	newarray[i] = mArray[i];
+      }
+      delete [] mArray;
+      mArray = newarray;
+    }      
+  }
 
   //##########################################################################
   //# Data Members
-  jni::ClassCache* mCache;
-  jni::ProductDESGlue mModel;
-  AutomatonEncoding* mEncoding;
-  StateSpace* mStateSpace;
-  int mNumEventRecords;
-  EventRecord** mEventRecords;
-  uint32* mCurrentTuple;
-
+  uint32 mNumElements;
+  uint32 mArraySize;
+  Value* mArray;
 };
+
 
 }   /* namespace waters */
 
-#endif  /* !_ControllabilityChecker_h_ */
+#endif  /* !_ArrayList_h_ */

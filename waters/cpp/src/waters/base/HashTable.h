@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   HashTable
 //###########################################################################
-//# $Id: HashTable.h,v 1.4 2006-08-20 08:39:41 robi Exp $
+//# $Id: HashTable.h,v 1.5 2006-09-03 06:38:42 robi Exp $
 //###########################################################################
 
 
@@ -77,6 +77,7 @@ public:
   void* get(const void* key) const;
   void* add(void* value);
   void rehash(uint32 newsize);
+  const HashAccessor* getHashAccessor() const {return mAccessor;}
 
   //##########################################################################
   //# Iteration

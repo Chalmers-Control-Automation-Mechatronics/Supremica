@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   StateRecord
 //###########################################################################
-//# $Id: StateRecord.cpp,v 1.1 2006-08-18 06:50:03 robi Exp $
+//# $Id: StateRecord.cpp,v 1.2 2006-09-03 06:38:42 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -16,7 +16,8 @@
 #include <jni.h>
 
 #include "jni/cache/ClassCache.h"
-#include "jni/glue/StateGlue.h"
+#include "jni/cache/ClassGlue.h"
+#include "jni/cache/JavaString.h"
 
 #include "waters/analysis/StateRecord.h"
 
@@ -78,6 +79,20 @@ StateRecord(jni::StateGlue state,
   : mJavaState(state),
     mStateCode(code)
 {
+}
+
+
+//############################################################################
+//# StateRecord: Simple Access
+
+jni::JavaString StateRecord::
+getName()
+  const
+{
+  const jni::ClassGlue* cls = mJavaState.getClass();
+  JNIEnv* env = cls->getEnvironment();
+  jstring jname = mJavaState.getName();
+  return jni::JavaString(env, jname);
 }
 
 

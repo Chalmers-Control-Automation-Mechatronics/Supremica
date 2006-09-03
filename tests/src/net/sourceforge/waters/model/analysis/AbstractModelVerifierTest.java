@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractModelVerifierTest
 //###########################################################################
-//# $Id: AbstractModelVerifierTest.java,v 1.1 2006-08-15 01:43:06 robi Exp $
+//# $Id: AbstractModelVerifierTest.java,v 1.2 2006-09-03 06:38:43 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -219,21 +219,25 @@ public abstract class AbstractModelVerifierTest extends AbstractWatersTest
                                   final List<ParameterBindingProxy> bindings)
     throws Exception
   {
-    final String name = counterexample.getName();
-    final String ext = mTraceMarshaller.getDefaultExtension();
-    final StringBuffer buffer = new StringBuffer(name);
-    if (bindings != null) {
-      for (final ParameterBindingProxy binding : bindings) {
-        buffer.append('-');
-        buffer.append(binding.getExpression().toString());
+    if (counterexample == null) {
+      System.err.println("WARNING: Got NULL counterexample");
+    } else {
+      final String name = counterexample.getName();
+      final String ext = mTraceMarshaller.getDefaultExtension();
+      final StringBuffer buffer = new StringBuffer(name);
+      if (bindings != null) {
+        for (final ParameterBindingProxy binding : bindings) {
+          buffer.append('-');
+          buffer.append(binding.getExpression().toString());
+        }
       }
+      buffer.append(ext);
+      final String extname = buffer.toString();
+      final File dir = getOutputDirectory();
+      final File filename = new File(dir, extname);
+      ensureParentDirectoryExists(filename);
+      mTraceMarshaller.marshal(counterexample, filename);
     }
-    buffer.append(ext);
-    final String extname = buffer.toString();
-    final File dir = getOutputDirectory();
-    final File filename = new File(dir, extname);
-    ensureParentDirectoryExists(filename);
-    mTraceMarshaller.marshal(counterexample, filename);
   }
 
 

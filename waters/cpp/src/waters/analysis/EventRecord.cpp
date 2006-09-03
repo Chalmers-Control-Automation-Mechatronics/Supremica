@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   EventRecord
 //###########################################################################
-//# $Id: EventRecord.cpp,v 1.4 2006-08-21 05:41:39 robi Exp $
+//# $Id: EventRecord.cpp,v 1.5 2006-09-03 06:38:42 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -16,7 +16,8 @@
 #include <jni.h>
 
 #include "jni/cache/ClassCache.h"
-#include "jni/glue/EventGlue.h"
+#include "jni/cache/ClassGlue.h"
+#include "jni/cache/JavaString.h"
 
 #include "waters/analysis/AutomatonEncoding.h"
 #include "waters/analysis/EventRecord.h"
@@ -99,6 +100,16 @@ isSkippable()
   const
 {
   return mIsGloballyDisabled || mTransitionRecords == 0;
+}
+
+jni::JavaString EventRecord::
+getName()
+  const
+{
+  const jni::ClassGlue* cls = mJavaEvent.getClass();
+  JNIEnv* env = cls->getEnvironment();
+  jstring jname = mJavaEvent.getName();
+  return jni::JavaString(env, jname);
 }
 
 

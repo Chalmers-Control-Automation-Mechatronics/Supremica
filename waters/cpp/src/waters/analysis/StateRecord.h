@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   StateRecord
 //###########################################################################
-//# $Id: StateRecord.h,v 1.2 2006-08-21 05:41:39 robi Exp $
+//# $Id: StateRecord.h,v 1.3 2006-09-03 06:38:42 robi Exp $
 //###########################################################################
 
 
@@ -24,6 +24,7 @@
 
 namespace jni {
   class ClassCache;
+  class JavaString;
 }
 
 
@@ -36,7 +37,7 @@ class HashAccessor;
 //# Class StateRecordHashAccessor
 //###########################################################################
 
-class StateRecordHashAccessor : public HashAccessor
+class StateRecordHashAccessor : public PtrHashAccessor
 {
 private:
   //##########################################################################
@@ -50,7 +51,6 @@ public:
   virtual uint32 hash(const void* key) const;
   virtual bool equals(const void* key1, const void* key2) const;
   virtual const void* getKey(const void* value) const;
-  virtual void* getDefaultValue() const {return 0;}  
 };
 
 
@@ -70,8 +70,9 @@ public:
 
   //##########################################################################
   //# Simple Access
-  const jni::StateGlue& getJavaState() const {return mJavaState;}
   uint32 getStateCode() const {return mStateCode;}
+  const jni::StateGlue& getJavaState() const {return mJavaState;}
+  jni::JavaString getName() const;
 
   //##########################################################################
   //# Comparing and Hashing

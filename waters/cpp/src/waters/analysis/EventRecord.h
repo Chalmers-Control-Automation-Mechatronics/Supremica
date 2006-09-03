@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   EventRecord
 //###########################################################################
-//# $Id: EventRecord.h,v 1.4 2006-08-21 05:41:39 robi Exp $
+//# $Id: EventRecord.h,v 1.5 2006-09-03 06:38:42 robi Exp $
 //###########################################################################
 
 
@@ -19,11 +19,12 @@
 #pragma once
 #endif
 
+#include "jni/glue/EventGlue.h"
 #include "waters/base/IntTypes.h"
 
 namespace jni {
   class ClassCache;
-  class EventGlue;
+  class JavaString;
 }
 
 
@@ -39,7 +40,7 @@ class TransitionRecord;
 //# Class EventRecordHashAccessor
 //###########################################################################
 
-class EventRecordHashAccessor : public HashAccessor
+class EventRecordHashAccessor : public PtrHashAccessor
 {
 private:
   //##########################################################################
@@ -53,7 +54,6 @@ public:
   virtual uint32 hash(const void* key) const;
   virtual bool equals(const void* key1, const void* key2) const;
   virtual const void* getKey(const void* value) const;
-  virtual void* getDefaultValue() const {return 0;}  
 };
 
 
@@ -78,6 +78,8 @@ public:
   bool isGloballyDisabled() const {return mIsGloballyDisabled;}
   bool isSkippable() const;
   const jni::EventGlue& getJavaEvent() const {return mJavaEvent;}
+  jni::JavaString getName() const;
+  TransitionRecord* getTransitionRecord() const {return mTransitionRecords;}
 
   //##########################################################################
   //# Comparing and Hashing
