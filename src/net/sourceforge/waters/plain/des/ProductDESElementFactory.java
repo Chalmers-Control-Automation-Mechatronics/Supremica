@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des;
 //# CLASS:   ProductDESElementFactory
 //###########################################################################
-//# $Id: ProductDESElementFactory.java,v 1.5 2006-07-20 02:28:37 robi Exp $
+//# $Id: ProductDESElementFactory.java,v 1.6 2006-09-03 17:09:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -159,6 +159,13 @@ public class ProductDESElementFactory
      final List<? extends EventProxy> events)
   {
     return new SafetyTraceElement(name, des, events);
+  }
+
+  public SafetyTraceElement createSafetyTraceProxy
+    (final ProductDESProxy des,
+     final List<? extends EventProxy> events)
+  {
+    return new SafetyTraceElement(des, events);
   }
 
   public StateElement createStateProxy

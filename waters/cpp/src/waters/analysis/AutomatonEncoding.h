@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   AutomatonEncoding
 //###########################################################################
-//# $Id: AutomatonEncoding.h,v 1.4 2006-09-03 06:38:42 robi Exp $
+//# $Id: AutomatonEncoding.h,v 1.5 2006-09-03 17:09:15 robi Exp $
 //###########################################################################
 
 
@@ -141,6 +141,14 @@ public:
   void decode(const uint32* encoded, uint32* decoded) const;
   uint32 get(const uint32* encoded, int index) const;
   void set(uint32* encoded, int index, uint32 code) const;
+
+  //##########################################################################
+  //# Masking
+  void initMask(uint32* mask) const;
+  void addToMask(uint32* mask, int index) const;
+  bool equals(const uint32* encoded1,
+	      const uint32* encoded2,
+	      const uint32* nmask) const;
 
   //##########################################################################
   //# Debug Output

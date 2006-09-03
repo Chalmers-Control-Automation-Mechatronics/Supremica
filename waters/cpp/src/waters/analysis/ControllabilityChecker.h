@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   ControllabilityChecker
 //###########################################################################
-//# $Id: ControllabilityChecker.h,v 1.4 2006-09-03 06:38:42 robi Exp $
+//# $Id: ControllabilityChecker.h,v 1.5 2006-09-03 17:09:15 robi Exp $
 //###########################################################################
 
 
@@ -19,12 +19,16 @@
 #pragma once
 #endif
 
+#include "jni/glue/ProductDESProxyFactoryGlue.h"
+#include "jni/glue/SafetyTraceGlue.h"
+#include "waters/base/ArrayList.h"
 #include "waters/base/IntTypes.h"
 #include "waters/analysis/AutomatonEncoding.h"
 
 
 namespace jni {
   class ClassCache;
+  class ListGlue;
   class ProductDESGlue;
 }
 
@@ -52,13 +56,16 @@ public:
   //##########################################################################
   //# Invocation
   bool run();
-  void setup();
-  bool checkProperty();
-  void teardown();
+  jni::SafetyTraceGlue getCounterExample
+    (const jni::ProductDESProxyFactoryGlue& factory) const;
 
 private:
   //##########################################################################
   //# Auxiliary Methods
+  void setup();
+  bool checkProperty();
+  void computeCounterExample();
+  void teardown();
 
   //##########################################################################
   //# Data Members
@@ -66,10 +73,13 @@ private:
   jni::ProductDESGlue mModel;
   AutomatonEncoding* mEncoding;
   StateSpace* mStateSpace;
+  ArrayList<uint32>* mDepthMap;
   int mNumEventRecords;
   EventRecord** mEventRecords;
   uint32* mCurrentTuple;
-
+  uint32 mBadState;
+  const EventRecord* mBadEvent;
+  jni::ListGlue* mTraceList;
 };
 
 }   /* namespace waters */

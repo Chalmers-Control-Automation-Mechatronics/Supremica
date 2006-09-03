@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeControllabilityCheckerTest
 //###########################################################################
-//# $Id: NativeControllabilityCheckerTest.java,v 1.3 2006-09-03 06:38:43 robi Exp $
+//# $Id: NativeControllabilityCheckerTest.java,v 1.4 2006-09-03 17:09:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;
@@ -36,15 +36,15 @@ public class NativeControllabilityCheckerTest extends AbstractModelVerifierTest
 
   //#########################################################################
   //# Entry points in junit.framework.TestCase
-  public static Test suite() { 
+  public static Test suite() {
     TestSuite testSuite =
-      new TestSuite(NativeControllabilityCheckerTest.class);     
+      new TestSuite(NativeControllabilityCheckerTest.class);
     return testSuite;
   }
 
   public static void main(final String[] args)
   {
-    junit.textui.TestRunner.run(suite()); 
+    junit.textui.TestRunner.run(suite());
   }
 
 
@@ -275,6 +275,38 @@ public class NativeControllabilityCheckerTest extends AbstractModelVerifierTest
     runModelVerifier(group, dir, name, false);
   }
 
+  public void testProfisafeI4Host() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_i4_host.wdes";
+    runModelVerifier(group, dir, name, true);
+  }
+
+  public void testProfisafeI4Slave() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_i4_slave.wdes";
+    runModelVerifier(group, dir, name, true);
+  }
+
+  public void testProfisafeO4Host() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_o4_host.wdes";
+    runModelVerifier(group, dir, name, true);
+  }
+
+  public void testProfisafeO4Slave() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_o4_slave.wdes";
+    runModelVerifier(group, dir, name, true);
+  }
+
   public void test_TrafficLights2006_plants() throws Exception
   {
     final String group = "tests";
@@ -485,7 +517,7 @@ public class NativeControllabilityCheckerTest extends AbstractModelVerifierTest
     final String name = "bfactory.wdes";
     runModelVerifier(group, dir, name, false);
   }
-  
+
   public void testBmw_fh() throws Exception
   {
     final String group = "valid";
@@ -493,7 +525,7 @@ public class NativeControllabilityCheckerTest extends AbstractModelVerifierTest
     final String name = "bmw_fh.wdes";
     runModelVerifier(group, dir, name, true);
   }
-  
+
   public void testBorder_cases() throws Exception
   {
     final String group = "valid";
@@ -501,7 +533,7 @@ public class NativeControllabilityCheckerTest extends AbstractModelVerifierTest
     final String name = "never_blow_up.wdes";
     runModelVerifier(group, dir, name, false);
   }
- 
+
   public void testDebounce() throws Exception
   {
     final String group = "valid";
@@ -509,7 +541,7 @@ public class NativeControllabilityCheckerTest extends AbstractModelVerifierTest
     final String name = "debounce.wdes";
     runModelVerifier(group, dir, name, true);
   }
-  
+
   public void testFalko() throws Exception
   {
     final String group = "valid";
@@ -517,14 +549,14 @@ public class NativeControllabilityCheckerTest extends AbstractModelVerifierTest
     final String name = "falko.wdes";
     runModelVerifier(group, dir, name, true);
   }
-  
+
   public void testFtuer() throws Exception
   {
     final String group = "valid";
     final String dir  = "central_locking";
     final String name = "ftuer.wdes";
     runModelVerifier(group, dir, name, true);
-  } 
+  }
 
   public void testFischertechnik() throws Exception
   {
@@ -540,7 +572,7 @@ public class NativeControllabilityCheckerTest extends AbstractModelVerifierTest
     final String dir  = "central_locking";
     final String name = "koordwsp.wdes";
     runModelVerifier(group, dir, name, true);
-  } 
+  }
 
   public void testMazes() throws Exception
   {
@@ -549,7 +581,7 @@ public class NativeControllabilityCheckerTest extends AbstractModelVerifierTest
     final String name = "mazes.wdes";
     runModelVerifier(group, dir, name, true);
   }
-  
+
   public void testSafetydisplay() throws Exception
   {
     final String group = "valid";
@@ -557,7 +589,7 @@ public class NativeControllabilityCheckerTest extends AbstractModelVerifierTest
     final String name = "safetydisplay.wdes";
     runModelVerifier(group, dir, name, true);
   }
-  
+
   public void testSmallFactory() throws Exception
   {
     final String group = "valid";
@@ -565,7 +597,7 @@ public class NativeControllabilityCheckerTest extends AbstractModelVerifierTest
     final String name = "small.wdes";
     runModelVerifier(group, dir, name, true);
   }
-  
+
   public void testSmallFactoryUncont() throws Exception
   {
     final String group = "valid";
@@ -642,7 +674,6 @@ public class NativeControllabilityCheckerTest extends AbstractModelVerifierTest
   protected void checkCounterExample(final ProductDESProxy des,
                                      final TraceProxy trace)
   {
-    /*
     assertNotNull(trace);
     final SafetyTraceProxy counterexample = (SafetyTraceProxy) trace;
   	
@@ -657,12 +688,11 @@ public class NativeControllabilityCheckerTest extends AbstractModelVerifierTest
     final Collection<AutomatonProxy> automata = des.getAutomata();
     boolean rejected = false;
     for (final AutomatonProxy aut : automata){
-      final ComponentKind akind =aut.getKind();
+      final ComponentKind akind = aut.getKind();
       final int accepted = checkCounterExample(aut, eventlist);
       if (akind.equals(ComponentKind.PLANT)){
 	assertTrue("Counterexample not accepted by plant " +
-		   aut.getName() + "!"+" accepted "+accepted+" len "+len,
-		   accepted == len);
+		   aut.getName() + "!", accepted == len);
       } else if (akind.equals(ComponentKind.SPEC)) {
 	assertFalse("Counterexample rejected too early (step " + accepted +
 		    ") by spec " + aut.getName() + "!",
@@ -671,16 +701,15 @@ public class NativeControllabilityCheckerTest extends AbstractModelVerifierTest
       }
     }
     assertTrue("Counterexample not rejected by any spec!", rejected);
-    */
   }
-  
+
   private int checkCounterExample(final AutomatonProxy aut,
                                   final List<EventProxy> counterexample)
   {
     final Collection<EventProxy> events = aut.getEvents();
     final Collection<StateProxy> states = aut.getStates();
     final Collection<TransitionProxy> transitions = aut.getTransitions();
-    
+
     int steps = -1;
     StateProxy current = null;
     for (final StateProxy state : states){

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   AutomatonEncoding
 //###########################################################################
-//# $Id: AutomatonEncoding.cpp,v 1.5 2006-09-03 06:38:42 robi Exp $
+//# $Id: AutomatonEncoding.cpp,v 1.6 2006-09-03 17:09:15 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -265,10 +265,6 @@ AutomatonEncoding(const jni::ProductDESGlue des,
   // clean up ...
   delete[] records;
   delete[] used;
-
-#ifdef DEBUG
-  dump();
-#endif /* DEBUG */
 }
 
 AutomatonEncoding::
@@ -341,6 +337,41 @@ set(uint32* encoded, int index, uint32 code)
   const int shift = record->getShift();
   const uint32 mask = record->getBitMask();
   encoded[w] = (encoded[w] & ~mask) | (code << shift);
+}
+
+
+//############################################################################
+//# AutomatonEncoding: Masking
+
+void AutomatonEncoding::
+initMask(uint32* mask)
+  const
+{
+  for (int w = 0; w < mNumWords; w++) {
+    mask[w] = 0;
+  }
+}
+
+void AutomatonEncoding::
+addToMask(uint32* mask, int index)
+  const
+{
+  const AutomatonRecord* record = mAutomatonRecords[index];
+  const int w = record->getWordIndex();
+  const uint32 imask = record->getBitMask();
+  mask[w] |= imask;
+}
+
+bool AutomatonEncoding::
+equals(const uint32* encoded1, const uint32* encoded2, const uint32* nmask)
+  const
+{
+  for (int w = 0; w < mNumWords; w++) {
+    if ((encoded1[w] ^ encoded2[w]) & ~nmask[w]) {
+      return false;
+    }
+  }
+  return true;
 }
 
 

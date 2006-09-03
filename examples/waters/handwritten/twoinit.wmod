@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="twoinit" xmlns="http://waters.sourceforge.net/xsd/module">
+<ComponentList>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="comp"/>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<PointGeometry>
+<Point X="48" Y="48"/>
+</PointGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="s1">
+<PointGeometry>
+<Point X="96" Y="96"/>
+</PointGeometry>
+</SimpleNode>
+</NodeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
+

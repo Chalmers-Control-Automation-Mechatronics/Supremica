@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   ControllabilityChecker
 //###########################################################################
-//# $Id: ControllabilityChecker.cpp,v 1.9 2006-09-03 06:38:42 robi Exp $
+//# $Id: ControllabilityChecker.cpp,v 1.10 2006-09-03 17:09:15 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -18,16 +18,17 @@
 #include <stdlib.h>
 
 #include "jni/cache/ClassCache.h"
+#include "jni/cache/JavaString.h"
 #include "jni/cache/PreJavaException.h"
 #include "jni/glue/AutomatonGlue.h"
 #include "jni/glue/CollectionGlue.h"
 #include "jni/glue/EventGlue.h"
 #include "jni/glue/EventKindGlue.h"
 #include "jni/glue/IteratorGlue.h"
+#include "jni/glue/LinkedListGlue.h"
 #include "jni/glue/NativeControllabilityCheckerGlue.h"
 #include "jni/glue/NondeterminismExceptionGlue.h"
 #include "jni/glue/ProductDESGlue.h"
-#include "jni/glue/ProductDESProxyFactoryGlue.h"
 #include "jni/glue/SetGlue.h"
 #include "jni/glue/StateGlue.h"
 #include "jni/glue/TransitionGlue.h"
@@ -58,9 +59,13 @@ ControllabilityChecker(const jni::ProductDESGlue des,
     mModel(des),
     mEncoding(0),
     mStateSpace(0),
+    mDepthMap(0),
     mNumEventRecords(0),
     mEventRecords(0),
-    mCurrentTuple(0)
+    mCurrentTuple(0),
+    mBadState(UNDEF_UINT32),
+    mBadEvent(0),
+    mTraceList(0)
 {
 }
 
@@ -70,16 +75,18 @@ ControllabilityChecker::
 {
   delete mEncoding;
   delete mStateSpace;
+  delete mDepthMap;
   for (int i = 0; i < mNumEventRecords; i++) {
     delete mEventRecords[i];
   }
   delete [] mEventRecords;
   delete [] mCurrentTuple;
+  delete mTraceList;
 }
 
 
 //############################################################################
-//# ControllabilityChecker: Constructors & Destructors
+//# ControllabilityChecker: Invocation
 
 bool ControllabilityChecker::
 run()
@@ -87,6 +94,9 @@ run()
   try {
     setup();
     bool result = checkProperty();
+    if (!result) {
+      computeCounterExample();
+    }
     teardown();
     return result;
   } catch (...) {
@@ -95,12 +105,24 @@ run()
   }
 }
 
+jni::SafetyTraceGlue ControllabilityChecker::
+getCounterExample(const jni::ProductDESProxyFactoryGlue& factory)
+  const
+{
+  return factory.createSafetyTraceProxyGlue(&mModel, mTraceList, mCache);
+}
+
+
+//############################################################################
+//# ControllabilityChecker: Auxiliary Methods
+
 void ControllabilityChecker::
 setup()
 {
   // Establish automaton encoding ...
   mEncoding = new AutomatonEncoding(mModel, mCache);
   mStateSpace = new StateSpace(mEncoding);
+  mDepthMap = new ArrayList<uint32>(128);
 
   // Establish initial event map ...
   const jni::SetGlue events = mModel.getEventsGlue(mCache);
@@ -233,9 +255,14 @@ checkProperty()
   mEncoding->encode(mCurrentTuple, packed);
   mStateSpace->add();
 
+  uint32 numstates = mStateSpace->size();
+  uint32 nextlevel = numstates;
+  mDepthMap->add(0);
+  mDepthMap->add(nextlevel);
+
   // Main loop ...
   uint32 current = 0;
-  while (current < mStateSpace->size()) {
+  while (current < numstates) {
     packed = mStateSpace->get(current);
     mEncoding->decode(packed, mCurrentTuple);
     for (int e = 0; e < mNumEventRecords; e++) {
@@ -256,6 +283,8 @@ checkProperty()
             enabled = false;
             break;
           } else {
+            mBadState = current;
+            mBadEvent = event;
             return false;
           }
         }
@@ -269,15 +298,88 @@ checkProperty()
           const int a = aut->getAutomatonIndex();
           const uint32 source = mCurrentTuple[a];
           const uint32 target = trans->getSuccessor(source);
-          mEncoding->set(packed, a, target);
+          if (source != target) {
+            mEncoding->set(packed, a, target);
+          }
         }
         mStateSpace->add();
+        numstates = mStateSpace->size();
       }
     }
-    current++;
+    if (++current == nextlevel) {
+      nextlevel = numstates;
+      mDepthMap->add(nextlevel);
+    }
   }
 
   return true;
+}
+
+void ControllabilityChecker::
+computeCounterExample()
+{
+  mTraceList = new jni::LinkedListGlue(mCache);
+  jni::EventGlue eventglue = mBadEvent->getJavaEvent();
+  mTraceList->add(0, &eventglue);
+
+  const int numaut = mEncoding->getNumRecords();
+  const int numwords = mEncoding->getNumWords();
+  uint32* mask = new uint32[numwords];
+  uint32 target = mBadState;
+  uint32* packedtarget = mStateSpace->get(target);
+  uint32* targettuple = new uint32[numaut];
+  mEncoding->decode(packedtarget, targettuple);
+
+  uint32 level = mDepthMap->size() - 2;
+  while (level-- != 0) {
+    bool found = false;
+    uint32 current = mDepthMap->get(level);
+    do {
+      uint32* packedcurrent = mStateSpace->get(current);
+      mEncoding->decode(packedcurrent, mCurrentTuple);
+      for (int e = 0; e < mNumEventRecords; e++) {
+        EventRecord* event = mEventRecords[e];
+        found = true;
+        for (TransitionRecord* trans = event->getTransitionRecord();
+             trans != 0;
+             trans = trans->getNext()) {
+          const AutomatonRecord* aut = trans->getAutomaton();
+          const int a = aut->getAutomatonIndex();
+          const uint32 state = mCurrentTuple[a];
+          const uint32 succ = trans->getSuccessor(state);
+          if (succ != targettuple[a]) {
+            found = false;
+            break;
+          }
+        }
+        if (found) {
+          mEncoding->initMask(mask);
+          for (TransitionRecord* trans = event->getTransitionRecord();
+               trans != 0;
+               trans = trans->getNext()) {
+            const AutomatonRecord* aut = trans->getAutomaton();
+            const int a = aut->getAutomatonIndex();
+            mEncoding->addToMask(mask, a);
+          }
+          found = mEncoding->equals(packedcurrent, packedtarget, mask);
+          if (found) {
+            jni::EventGlue eventglue = event->getJavaEvent();
+            mTraceList->add(0, &eventglue);
+            target = current;
+            packedtarget = packedcurrent;
+            uint32* temp = mCurrentTuple;
+            mCurrentTuple = targettuple;
+            targettuple = temp;
+            break;
+          }
+        }
+      }
+      current++;
+    } while (!found);
+  }
+
+  delete [] mask;
+  delete [] targettuple;
 }
 
 void ControllabilityChecker::
@@ -287,6 +389,8 @@ teardown()
   mEncoding = 0;
   delete mStateSpace;
   mStateSpace = 0;
+  delete mDepthMap;
+  mDepthMap = 0;
   for (int i = 0; i < mNumEventRecords; i++) {
     delete mEventRecords[i];
   }
@@ -316,10 +420,16 @@ Java_net_sourceforge_waters_cpp_analysis_NativeControllabilityChecker_runNativeA
       jni::ProductDESGlue des = gchecker.getInputGlue(&cache);
       waters::ControllabilityChecker checker(des, &cache);
       bool result = checker.run();
-      jni::ProductDESProxyFactoryGlue factory =
-        gchecker.getFactoryGlue(&cache);
-      jni::VerificationResultGlue vresult(result, 0, &cache);
-      return vresult.returnJavaObject();
+      if (result) {
+        jni::VerificationResultGlue vresult(result, 0, &cache);
+        return vresult.returnJavaObject();
+      } else {
+        jni::ProductDESProxyFactoryGlue factory =
+          gchecker.getFactoryGlue(&cache);
+        jni::SafetyTraceGlue trace = checker.getCounterExample(factory);
+        jni::VerificationResultGlue vresult(result, &trace, &cache);
+        return vresult.returnJavaObject();
+      }
     } catch (const jni::PreJavaException& pre) {
       cache.throwJavaException(pre);
       return 0;

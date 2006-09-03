@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   SafetyTraceElement
 //###########################################################################
-//# $Id: SafetyTraceElement.java,v 1.2 2006-07-20 02:28:37 robi Exp $
+//# $Id: SafetyTraceElement.java,v 1.3 2006-09-03 17:09:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -84,6 +84,27 @@ public class SafetyTraceElement
                      final List<? extends EventProxy> events)
   {
     super(name, des, events);
+  }
+
+  /**
+   * Creates a new safety trace using default values.  This constructor
+   * provides a simple interface to create a controllability error trace
+   * for a deterministic product DES. It creates a trace with a
+   * <CODE>null</CODE> file location, with the name of the product DES
+   * catenated with <CODE>&quot:uncontrollable&quot;</CODE>, with a set of
+   * automata equal to that of the product DES, and without any state
+   * information in the trace steps.
+   * @param  des          The product DES for which the new trace is
+   *                      generated.
+   * @param  events       The list of events constituting the new trace,
+   *                      or <CODE>null</CODE> if empty.
+   * @throws ItemNotFoundException to indicate that one of the given
+   *                      events cannot be found in the product DES.
+   */
+  SafetyTraceElement(final ProductDESProxy des,
+                     final List<? extends EventProxy> events)
+  {
+    this(des.getName() + ":uncontrollable", des, events);
   }
 
 

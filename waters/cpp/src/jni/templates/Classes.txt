@@ -4,7 +4,7 @@
 //# PACKAGE: jni.glue
 //# PURPOSE: List of classes and methods to be converted to C++/JNI code
 //###########################################################################
-//# $Id: Classes.txt,v 1.11 2006-09-03 06:38:42 robi Exp $
+//# $Id: Classes.txt,v 1.12 2006-09-03 17:09:15 robi Exp $
 //###########################################################################
 
 
@@ -35,13 +35,19 @@ glue class Collection {
   glue Iterator iterator();
 }
 
-glue class List extends Collection {}
+glue class List extends Collection {
+  void add(int index, glue Object element);
+}
 
 glue class Set extends Collection {}
 
 glue class Collections {
   static glue List emptyList();
   static glue Set emptySet();
+}
+
+glue class LinkedList extends List {
+  LinkedList();
 }
 
 
@@ -94,6 +100,12 @@ glue class ProductDESProxy extends NamedProxy {
   glue Set getAutomata();
 }
 
+glue class TraceProxy {
+}
+
+glue class SafetyTraceProxy extends TraceProxy {
+}
+
 glue class ProductDESProxyFactory {
   glue AutomatonProxy createAutomatonProxy(String name,
 					   glue ComponentKind kind,
@@ -105,12 +117,8 @@ glue class ProductDESProxyFactory {
 					     glue Collection events,
 					     glue Collection automata);
   glue ProductDESProxy createProductDESProxy(String name);
-}
-
-glue class TraceProxy {
-}
-
-glue class SafetyTraceProxy extends TraceProxy {
+  glue SafetyTraceProxy createSafetyTraceProxy(glue ProductDESProxy des,
+					       glue List events);
 }
 
 

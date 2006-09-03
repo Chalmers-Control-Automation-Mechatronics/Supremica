@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   ProductDESProxyFactory
 //###########################################################################
-//# $Id: ProductDESProxyFactory.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: ProductDESProxyFactory.java,v 1.7 2006-09-03 17:09:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.des;
@@ -237,7 +237,7 @@ public interface ProductDESProxyFactory
      final List<? extends TraceStepProxy> steps);
 
   /**
-   * Creates a new safety trace using default values.  This constructor
+   * Creates a new safety trace using default values.  This method
    * provides a simple interface to create a trace for a deterministic
    * product DES. It creates a trace with a <CODE>null</CODE> file
    * location, with a set of automata equal to that of the product DES, and
@@ -253,6 +253,25 @@ public interface ProductDESProxyFactory
   public SafetyTraceProxy createSafetyTraceProxy
     (final String name,
      final ProductDESProxy des,
+     final List<? extends EventProxy> events);
+
+  /**
+   * Creates a new safety trace using default values.  This method
+   * provides a simple interface to create a controllability error trace
+   * for a deterministic product DES. It creates a trace with a
+   * <CODE>null</CODE> file location, with the name of the product DES
+   * catenated with <CODE>&quot:uncontrollable&quot;</CODE>, with a set of
+   * automata equal to that of the product DES, and without any state
+   * information in the trace steps.
+   * @param  des          The product DES for which the new trace is
+   *                      generated.
+   * @param  events       The list of events constituting the new trace,
+   *                      or <CODE>null</CODE> if empty.
+   * @throws ItemNotFoundException to indicate that one of the given
+   *                      events cannot be found in the product DES.
+   */
+  public SafetyTraceProxy createSafetyTraceProxy
+    (final ProductDESProxy des,
      final List<? extends EventProxy> events);
 
   /**

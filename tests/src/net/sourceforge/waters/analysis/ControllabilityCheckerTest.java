@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControllabilityCheckerTest
 //###########################################################################
-//# $Id: ControllabilityCheckerTest.java,v 1.13 2006-08-29 00:30:36 robi Exp $
+//# $Id: ControllabilityCheckerTest.java,v 1.14 2006-09-03 17:09:15 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -35,14 +35,14 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
 
   //#########################################################################
   //# Entry points in junit.framework.TestCase
-  public static Test suite() { 
-    TestSuite testSuite = new TestSuite(ControllabilityCheckerTest.class);     
+  public static Test suite() {
+    TestSuite testSuite = new TestSuite(ControllabilityCheckerTest.class);
     return testSuite;
   }
 
   public static void main(final String[] args)
   {
-    junit.textui.TestRunner.run(suite()); 
+    junit.textui.TestRunner.run(suite());
   }
 
 
@@ -54,7 +54,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String name = "small_factory_2.wdes";
     runModelChecker(group, name, true);
   }
-  
+
   public void testTictactoe() throws Exception
   {
     final String group = "handwritten";
@@ -280,7 +280,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String name = "profisafe_i4_host.wdes";
     runModelChecker(group, dir, name, true);
   }
-  
+
   public void testProfisafeI4Slave() throws Exception
   {
     final String group = "tests";
@@ -288,7 +288,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String name = "profisafe_i4_slave.wdes";
     runModelChecker(group, dir, name, true);
   }
-  
+
   public void testProfisafeO4Host() throws Exception
   {
     final String group = "tests";
@@ -296,7 +296,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String name = "profisafe_o4_host.wdes";
     runModelChecker(group, dir, name, true);
   }
-  
+
   public void testProfisafeO4Slave() throws Exception
   {
     final String group = "tests";
@@ -304,7 +304,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String name = "profisafe_o4_slave.wdes";
     runModelChecker(group, dir, name, true);
   }
-  
+
   public void test_TrafficLights2006_plants() throws Exception
   {
     final String group = "tests";
@@ -515,7 +515,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String name = "bfactory.wdes";
     runModelChecker(group, dir, name, false);
   }
-  
+
   public void testBmw_fh() throws Exception
   {
     final String group = "valid";
@@ -523,7 +523,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String name = "bmw_fh.wdes";
     runModelChecker(group, dir, name, true);
   }
-  
+
   public void testBorder_cases() throws Exception
   {
     final String group = "valid";
@@ -531,7 +531,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String name = "never_blow_up.wdes";
     runModelChecker(group, dir, name, false);
   }
- 
+
   public void testDebounce() throws Exception
   {
     final String group = "valid";
@@ -539,15 +539,15 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String name = "debounce.wdes";
     runModelChecker(group, dir, name, true);
   }
-  
+
   public void testDreitueren() throws Exception
   {
     final String group = "valid";
     final String dir  = "central_locking";
     final String name = "dreitueren.wdes";
     runModelChecker(group, dir, name, true);
-  } 
-  
+  }
+
   public void testFalko() throws Exception
   {
     final String group = "valid";
@@ -555,15 +555,15 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String name = "falko.wdes";
     runModelChecker(group, dir, name, true);
   }
-  
+
   public void testFtuer() throws Exception
   {
     final String group = "valid";
     final String dir  = "central_locking";
     final String name = "ftuer.wdes";
     runModelChecker(group, dir, name, true);
-  } 
-  
+  }
+
   public void testFischertechnik() throws Exception
   {
     final String group = "valid";
@@ -571,14 +571,14 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String name = "fischertechnik.wdes";
     runModelChecker(group, dir, name, false);
   }
-  
+
   public void testKoordwsp() throws Exception
   {
     final String group = "valid";
     final String dir  = "central_locking";
     final String name = "koordwsp.wdes";
     runModelChecker(group, dir, name, true);
-  } 
+  }
 
   public void testMazes() throws Exception
   {
@@ -587,7 +587,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String name = "mazes.wdes";
     runModelChecker(group, dir, name, true);
   }
-  
+
   public void testSafetydisplay() throws Exception
   {
     final String group = "valid";
@@ -595,7 +595,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String name = "safetydisplay.wdes";
     runModelChecker(group, dir, name, true);
   }
-  
+
   public void testSmallFactory() throws Exception
   {
     final String group = "valid";
@@ -603,7 +603,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String name = "small.wdes";
     runModelChecker(group, dir, name, true);
   }
-  
+
   public void testSmallFactoryUncont() throws Exception
   {
     final String group = "valid";
@@ -709,14 +709,14 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     }
     assertTrue("Counterexample not rejected by any spec!", rejected);
   }
-  
+
   private int checkCounterExample(final AutomatonProxy aut,
                                   final List<EventProxy> counterexample)
   {
     final Collection<EventProxy> events = aut.getEvents();
     final Collection<StateProxy> states = aut.getStates();
     final Collection<TransitionProxy> transitions = aut.getTransitions();
-    
+
     int steps = -1;
     StateProxy current = null;
     for (final StateProxy state : states){
