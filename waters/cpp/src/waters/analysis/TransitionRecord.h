@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   TransitionRecord
 //###########################################################################
-//# $Id: TransitionRecord.h,v 1.1 2006-08-21 05:41:39 robi Exp $
+//# $Id: TransitionRecord.h,v 1.2 2006-09-04 11:04:41 robi Exp $
 //###########################################################################
 
 
@@ -47,6 +47,7 @@ public:
   uint32 getSuccessor(uint32 source) const {return mSuccessorStates[source];}
   bool isAlwaysDisabled() const {return mWeight == 0;}
   bool isAlwaysEnabled() const {return mWeight == PROBABILITY_1;}
+  bool isAllSelfloops() const {return mIsOnlySelfloops && isAlwaysEnabled();}
   TransitionRecord* getNext() const {return mNext;}
   void setNext(TransitionRecord* next) {mNext = next;}
 
@@ -65,6 +66,7 @@ private:
   //# Data Members
   const AutomatonRecord* mAutomaton;
   int mWeight;
+  bool mIsOnlySelfloops;
   uint32* mSuccessorStates;
   TransitionRecord* mNext;
 

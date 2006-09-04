@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   EventRecord
 //###########################################################################
-//# $Id: EventRecord.cpp,v 1.5 2006-09-03 06:38:42 robi Exp $
+//# $Id: EventRecord.cpp,v 1.6 2006-09-04 11:04:41 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -163,14 +163,20 @@ normalize(const AutomatonRecord* aut)
   if (mTransitionRecords != 0 &&
       mTransitionRecords->getAutomaton() == aut) {
     mTransitionRecords->normalize();
-    mIsGloballyDisabled = false;
-  } else if (mIsControllable || aut->isPlant()) {
-    delete mTransitionRecords;
-    mTransitionRecords = 0;
-    mIsGloballyDisabled = true;
+    if (mTransitionRecords->isAllSelfloops()) {
+      TransitionRecord* victim = mTransitionRecords;
+      mTransitionRecords = mTransitionRecords->getNext();
+      victim->setNext(0);
+      delete victim;
+    }
   } else {
-    mTransitionRecords = new TransitionRecord(aut, mTransitionRecords);
-    mIsGloballyDisabled = false;
+    if (mIsControllable || aut->isPlant()) {
+      delete mTransitionRecords;
+      mTransitionRecords = 0;
+      mIsGloballyDisabled = true;
+    } else {
+      mTransitionRecords = new TransitionRecord(aut, mTransitionRecords);
+    }
   }
 }
 

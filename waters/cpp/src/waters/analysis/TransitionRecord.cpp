@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   TransitionRecord
 //###########################################################################
-//# $Id: TransitionRecord.cpp,v 1.1 2006-08-21 05:41:39 robi Exp $
+//# $Id: TransitionRecord.cpp,v 1.2 2006-09-04 11:04:41 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -31,6 +31,7 @@ TransitionRecord::
 TransitionRecord(const AutomatonRecord* aut, TransitionRecord* next)
   : mAutomaton(aut),
     mWeight(0),
+    mIsOnlySelfloops(true),
     mNext(next)
 {
   const uint32 numstates = (uint32) aut->getNumberOfStates();
@@ -93,6 +94,9 @@ addTransition(const StateRecord* source, const StateRecord* target)
   if (mSuccessorStates[sourcecode] == UNDEF_UINT32) {
     mSuccessorStates[sourcecode] = targetcode;
     mWeight++;
+    if (sourcecode != targetcode) {
+      mIsOnlySelfloops = false;
+    }
     return true;
   } else {
     return false;
