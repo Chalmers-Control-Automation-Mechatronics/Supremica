@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   EventRecord
 //###########################################################################
-//# $Id: EventRecord.cpp,v 1.6 2006-09-04 11:04:41 robi Exp $
+//# $Id: EventRecord.cpp,v 1.7 2006-09-04 12:44:31 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -169,7 +169,7 @@ normalize(const AutomatonRecord* aut)
       victim->setNext(0);
       delete victim;
     }
-  } else {
+  } else if (!mIsGloballyDisabled) {
     if (mIsControllable || aut->isPlant()) {
       delete mTransitionRecords;
       mTransitionRecords = 0;
