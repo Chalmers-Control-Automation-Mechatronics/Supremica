@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   Maze
 //###########################################################################
-//# $Id: Maze.java,v 1.4 2006-07-25 22:06:07 robi Exp $
+//# $Id: Maze.java,v 1.5 2006-09-04 12:48:53 robi Exp $
 //###########################################################################
 
 
@@ -233,8 +233,20 @@ class Maze
       mAvailableKeys.add(square);
     }
     for (final Key key : mAvailableKeys.getKeys()) {
+      final ReachabilityVisitor visitor = new KeyReachabilityVisitor(key);
+      reachability(visitor);
       final Collection<Square> locations = key.getLocations();
-      if (locations.isEmpty()) {
+      int numkeys = locations.size();
+      for (final Square location : locations) {
+        if (!location.isReachable()) {
+          final Point pos = location.getPosition();
+          final Square free = new SquareFree(pos);
+          mSquares.put(pos, free);
+          numkeys--;
+          changed = true;
+        }
+      }
+      if (numkeys == 0) {
         for (final Square lock : key.getLocks()) {
           if (lock.getSquareKind() == Square.DOOR) {
             final SquareDoor door = (SquareDoor) lock;
@@ -255,38 +267,8 @@ class Maze
 
   private boolean locateHero()
   {
-    final List<Square> open = new LinkedList<Square>();
-    for (final Square square : mSquares.values()) {
-      final boolean ishero = (square.getSquareKind() == Square.HERO);
-      square.setReachable(ishero);
-      if (ishero) {
-        open.add(square);
-      }
-    }
-    while (!open.isEmpty()) {
-      final Square square = open.remove(0);
-      final Point pos = square.getPosition();
-      final Square north = getNeighbour(pos, NORTH);
-      if (north != null && !north.isReachable()) {
-        north.setReachable(true);
-        open.add(north);
-      }
-      final Square south = getNeighbour(pos, SOUTH);
-      if (south != null && !south.isReachable()) {
-        south.setReachable(true);
-        open.add(south);
-      }
-      final Square east = getNeighbour(pos, EAST);
-      if (east != null && !east.isReachable()) {
-        east.setReachable(true);
-        open.add(east);
-      }
-      final Square west = getNeighbour(pos, WEST);
-      if (west != null && !west.isReachable()) {
-        west.setReachable(true);
-        open.add(west);
-      }
-    }
+    final ReachabilityVisitor visitor = new WalkingReachabilityVisitor();
+    reachability(visitor);
     mNumExits = 0;
     boolean changed = false;
     final Iterator<Square> iter = mSquares.values().iterator();
@@ -363,6 +345,40 @@ class Maze
 
 
   //#########################################################################
+  //# Reachability
+  private void reachability(ReachabilityVisitor visitor)
+  {
+    final List<Square> open = new LinkedList<Square>();
+    for (final Square square : mSquares.values()) {
+      square.setReachable(false);
+      if (square.getSquareKind() == Square.HERO && visitor.visit(square)) {
+        open.add(square);
+      }
+    }
+    while (!open.isEmpty()) {
+      final Square square = open.remove(0);
+      final Point pos = square.getPosition();
+      final Square north = getNeighbour(pos, NORTH);
+      if (north != null && !north.isReachable() && visitor.visit(north)) {
+        open.add(north);
+      }
+      final Square south = getNeighbour(pos, SOUTH);
+      if (south != null && !south.isReachable() && visitor.visit(south)) {
+        open.add(south);
+      }
+      final Square east = getNeighbour(pos, EAST);
+      if (east != null && !east.isReachable() && visitor.visit(east)) {
+        open.add(east);
+      }
+      final Square west = getNeighbour(pos, WEST);
+      if (west != null && !west.isReachable() && visitor.visit(west)) {
+        open.add(west);
+      }
+    }
+  }
+
+
+  //#########################################################################
   //# Accessing Squares
   private Square getNeighbour(final Point pos, final Point direction)
   {
@@ -377,6 +393,41 @@ class Maze
     final Point pos = square.getPosition();
     mSquares.remove(pos);
   }
+
+
+  //#########################################################################
+  //# Inner Class ReachabilityVisitor
+  private interface ReachabilityVisitor {
+    public boolean visit(Square square);
+  }
+
+  private class WalkingReachabilityVisitor
+    implements ReachabilityVisitor
+  {
+    public boolean visit(final Square square)
+    {
+      square.setReachable(true);
+      return true;
+    }
+  }
+
+  private class KeyReachabilityVisitor
+    implements ReachabilityVisitor
+  {
+    private KeyReachabilityVisitor(final Key key)
+    {
+      mKeyName = key.getName();
+    }
+
+    public boolean visit(final Square square)
+    {
+      square.setReachable(true);
+      final String keyname = square.getKeyName();
+      return !mKeyName.equals(keyname);
+    }
+
+    private final String mKeyName;
+  }        
 
 
   //#########################################################################

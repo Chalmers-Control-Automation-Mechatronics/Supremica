@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   MazeTest
 //###########################################################################
-//# $Id: MazeTest.java,v 1.5 2006-07-25 22:06:07 robi Exp $
+//# $Id: MazeTest.java,v 1.6 2006-09-04 12:48:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
@@ -222,13 +222,11 @@ public class MazeTest extends AbstractWatersTest
     testMaze("mx07", true);
   }
 
-  /*
   public void testMaze_mx08()
     throws IOException, JAXBException, WatersException
   {
     testMaze("mx08", true);
   }
-  */
 
   public void testMaze_mx09()
     throws IOException, JAXBException, WatersException
@@ -242,13 +240,11 @@ public class MazeTest extends AbstractWatersTest
     testMaze("mx10", true);
   }
 
-  /*
   public void testMaze_mx11()
     throws IOException, JAXBException, WatersException
   {
     testMaze("mx11", true);
   }
-  */
 
   public void testMaze_mx12()
     throws IOException, JAXBException, WatersException
@@ -292,13 +288,11 @@ public class MazeTest extends AbstractWatersTest
     testMaze("mx18", true);
   }
 
-  /*
   public void testMaze_mx19()
     throws IOException, JAXBException, WatersException
   {
-    testMaze("mx18", true);
+    testMaze("mx19", false);
   }
-  */
 
   public void testMaze_mx20()
     throws IOException, JAXBException, WatersException
