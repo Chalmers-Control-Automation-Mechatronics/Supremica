@@ -54,6 +54,19 @@
   <property name="waters.classes" location="${classes}/waters"/>
   <property name="waters424.jar" location="${jar}/waters424.jar"/>
 
+  <path id="waters.compile.classpath">
+    <path refid="jaxb.classpath"/>
+    <pathelement location="${jaxb.jar}"/>
+    <pathelement location="${trove.jar}"/>
+  </path>
+
+  <path id="waters.test.classpath">
+    <path refid="waters.compile.classpath"/>
+    <pathelement location="${waters.jar}"/>
+    <pathelement location="${test.jar}"/>
+    <pathelement location="${junit.jar}"/>
+  </path>
+
   <pathconvert property="waters.library.path" targetos="unix">
     <path>
       <pathelement path="${java.library.path}"/>
@@ -115,11 +128,7 @@
            excludes="net/sourceforge/waters/gui/**/*.java
                      net/sourceforge/waters/model/unchecked/**/*.java"
            debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}">
-      <classpath>
-        <path refid="jaxb.classpath"/>
-        <pathelement location="${jaxb.jar}"/>
-        <pathelement location="${trove.jar}"/>
-      </classpath>
+      <classpath refid="waters.compile.classpath"/>
       <compilerarg value="-Xlint:unchecked"/>
       <compilerarg value="-Xlint:deprecation"/>
     </javac>
@@ -226,8 +235,7 @@
            includes="net/sourceforge/waters/**/*.java"
            debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}">
       <classpath>
-        <path refid="jaxb.classpath"/>
-        <pathelement location="${jaxb.jar}"/>
+        <path refid="waters.compile.classpath"/>
         <pathelement location="${waters.jar}"/>
         <pathelement location="${junit.jar}"/>
       </classpath>
@@ -253,23 +261,15 @@
         <fileset dir="${supremica.testsrc}">
           <include name="net/sourceforge/waters/**/*Test.java"/>
           <exclude name="**/Abstract*.java"/>
-          <exclude name="net/sourceforge/waters/cpp/**/*"/>
+          <exclude name="**/Native*.java"/>
         </fileset>
       </batchtest>
       <batchtest todir="${logs.results}" if="native.make">
         <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/cpp/**/*Test.java"/>
-          <exclude name="**/Abstract*.java"/>
+          <include name="**/Native*.java"/>
         </fileset>
       </batchtest>
-      <classpath>
-        <path refid="jaxb.classpath"/>
-        <pathelement location="${jaxb.jar}"/>
-        <pathelement location="${waters.jar}"/>
-        <pathelement location="${test.jar}"/>
-        <pathelement location="${junit.jar}"/>
-        <pathelement location="${trove.jar}"/>
-      </classpath>
+      <classpath refid="waters.test.classpath"/>
       <sysproperty key="waters.test.inputdir" value="${examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
       <sysproperty key="java.library.path" value="${waters.library.path}"/>
@@ -282,18 +282,10 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/cpp/**/*Test.java"/>
-          <exclude name="**/Abstract*.java"/>
+          <include name="**/Native*.java"/>
         </fileset>
       </batchtest>
-      <classpath>
-        <path refid="jaxb.classpath"/>
-        <pathelement location="${jaxb.jar}"/>
-        <pathelement location="${waters.jar}"/>
-        <pathelement location="${test.jar}"/>
-        <pathelement location="${junit.jar}"/>
-        <pathelement location="${trove.jar}"/>
-      </classpath>
+      <classpath refid="waters.test.classpath"/>
       <sysproperty key="waters.test.inputdir" value="${examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
       <sysproperty key="java.library.path" value="${waters.library.path}"/>
@@ -309,14 +301,7 @@
           <include name="net/sourceforge/waters/analysis/ControlLoopCheckerTest.java"/>
         </fileset>
       </batchtest>
-      <classpath>
-        <path refid="jaxb.classpath"/>
-        <pathelement location="${jaxb.jar}"/>
-        <pathelement location="${waters.jar}"/>
-        <pathelement location="${test.jar}"/>
-        <pathelement location="${junit.jar}"/>
-        <pathelement location="${trove.jar}"/>
-      </classpath>
+      <classpath refid="waters.test.classpath"/>
       <sysproperty key="waters.test.inputdir" value="${examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
     </junit>

@@ -4,19 +4,18 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   MazeTest
 //###########################################################################
-//# $Id: MazeTest.java,v 1.7 2006-09-04 15:42:06 robi Exp $
+//# $Id: NativeMazeTest.java,v 1.1 2006-09-04 15:42:06 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
 
-import net.sourceforge.waters.analysis.ControllabilityChecker;
+import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
 
 
-public class MazeTest extends AbstractMazeTest
+public class NativeMazeTest extends AbstractMazeTest
 {
 
   //#########################################################################
@@ -24,11 +23,10 @@ public class MazeTest extends AbstractMazeTest
   protected VerificationResult checkControllability
     (final ProductDESProxy des, final ProductDESProxyFactory factory)
   {
-    final ControllabilityChecker checker =
-      new ControllabilityChecker(des, factory);
-    final boolean result = checker.run();
-    final SafetyTraceProxy trace = result ? null : checker.getCounterExample();
-    return new VerificationResult(result, trace);
+    final NativeControllabilityChecker checker =
+      new NativeControllabilityChecker(des, factory);
+    checker.run();
+    return checker.getAnalysisResult();
   }
 
 }
