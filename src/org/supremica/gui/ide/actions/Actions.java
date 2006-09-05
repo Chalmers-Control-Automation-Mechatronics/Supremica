@@ -42,7 +42,8 @@ public class Actions
 	public IDEAction analyzerSynchronizerAction = new AnalyzerSynchronizerAction(allActions);
 	public IDEAction analyzerSynthesizerAction = new AnalyzerSynthesizerAction(allActions);
 	public IDEAction analyzerVerifierAction = new AnalyzerVerifierAction(allActions);
-
+	public IDEAction analyzerOptionsAction = new AnalyzerOptionsAction(allActions);
+	
 
 	// Help Actions
 	public IDEAction helpWebAction = new HelpWebAction(allActions);

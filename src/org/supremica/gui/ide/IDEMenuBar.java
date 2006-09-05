@@ -71,6 +71,7 @@ public class IDEMenuBar
 		menu.setMnemonic(KeyEvent.VK_C);
 		add(menu);
 		menu.add(new JMenuItem(ide.getActions().editorOptionsAction));
+		menu.add(new JMenuItem(ide.getActions().analyzerOptionsAction));
 
 		// Modules
 		menu = new JMenu("Modules");

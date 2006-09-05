@@ -18,7 +18,7 @@ public class EditorOptionsAction
 
 		putValue(Action.NAME, "Editor Options...");
 		putValue(Action.SHORT_DESCRIPTION, "Editor Options");
-//		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/edge16.gif")));
+		// putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/edge16.gif")));
 	}
 
 	public void actionPerformed(ActionEvent e)
@@ -28,8 +28,13 @@ public class EditorOptionsAction
 
 	public void doAction()
 	{
-		ModuleContainer moduleContainer = ide.getActiveModuleContainer();
-
-//			root.getControlledSurface().setOptionsVisible(true);
+		try
+		{
+			ide.getActiveModuleContainer().getEditorPanel().getActiveEditorWindowInterface().getControlledSurface().setOptionsVisible(true);
+		}
+		catch (NullPointerException ex)
+		{
+			// No panel opened?
+		}
 	}
 }
