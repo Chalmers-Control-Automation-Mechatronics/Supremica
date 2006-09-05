@@ -47,8 +47,10 @@ public class IDEMenuBar
 		menu.setMnemonic(KeyEvent.VK_E);
 		add(menu);
 		//menu.add(new JMenuItem(ide.getActions().editorCopyAction));
-		//menu.add(new JMenuItem(ide.getActions().editorUndoAction));
-		//menu.add(new JMenuItem(ide.getActions().editorRedoAction));
+                menu.add(new JMenuItem(ide.getActions().editorUndoAction));
+                ide.getActions().editorUndoAction.setEnabled(false);
+                menu.add(new JMenuItem(ide.getActions().editorRedoAction));
+                ide.getActions().editorRedoAction.setEnabled(false);
 
 		// Editor
 		menu = new JMenu("Editor");

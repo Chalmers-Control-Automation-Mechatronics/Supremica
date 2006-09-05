@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.26 2006-08-25 02:12:52 robi Exp $
+//# $Id: EditorMenu.java,v 1.27 2006-09-05 18:46:24 flordal Exp $
 //###########################################################################
 
 
@@ -104,7 +104,7 @@ public class EditorMenu
 		menuItem.addActionListener(this);
 		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK));
 		menuItem.setEnabled(root.getUndoInterface().canUndo());
-		menuItem.setToolTipText("Not implemented yet");
+		menuItem.setToolTipText("Undo the last command");
 		menu.add(menuItem);
 		mEditUndo = menuItem;
 
@@ -112,7 +112,7 @@ public class EditorMenu
 		menuItem.addActionListener(this);
 		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.CTRL_MASK));
 		menuItem.setEnabled(root.getUndoInterface().canRedo());
-		menuItem.setToolTipText("Not implemented yet");
+		menuItem.setToolTipText("Redo the last command that was undone");
 		menu.add(menuItem);
 		mEditRedo = menuItem;
 
@@ -246,8 +246,8 @@ public class EditorMenu
 			root.copyAsWMFToClipboard();
 		}
 
-		if (e.getSource() == mEditUndo)
-		{
+                if (e.getSource() == mEditUndo)
+                {
 			if (root.getUndoInterface().canUndo()) {
 				root.getUndoInterface().undo();
 			}
@@ -298,3 +298,4 @@ public class EditorMenu
 		}
 	}
 }
+

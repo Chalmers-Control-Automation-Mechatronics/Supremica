@@ -304,18 +304,18 @@ public class IDE
 	// ** MF ** Implementation of Gui stuff
 	public void error(String msg)
 	{
-		logger.error(msg);
-	}
+            logger.error(msg);
+        }
 
-	public void error(String msg, Throwable t)
-	{
-		logger.error(msg, t);
-	}
+        public void error(String msg, Throwable t)
+        {
+            logger.error(msg, t);
+        }
 
-	public void info(String msg)
-	{
-		logger.info(msg);
-	}
+        public void info(String msg)
+        {
+            logger.info(msg);
+        }
 
 	public void debug(String msg)
 	{

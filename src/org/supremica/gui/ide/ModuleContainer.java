@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.32 2006-07-20 02:28:37 robi Exp $
+//# $Id: ModuleContainer.java,v 1.33 2006-09-05 18:46:24 flordal Exp $
 //###########################################################################
 
 
@@ -220,24 +220,25 @@ public class ModuleContainer implements UndoInterface
 
 	public void addUndoable(UndoableEdit e)
 	{
-		if (e.isSignificant())
-		{
-			mInsignificant.end();
-			mUndoManager.addEdit(mInsignificant);
-			mInsignificant = new CompoundEdit();
-			mUndoManager.addEdit(e);
-			fireEditorChangedEvent(new UndoRedoEvent());
-		}
-		else
-		{
-			mInsignificant.addEdit(e);
-		}
-		mUndoManager.addEdit(e);
-		mIDE.getActions().editorRedoAction.setEnabled(canRedo());
-		mIDE.getActions().editorUndoAction.setEnabled(canUndo());
-		fireEditorChangedEvent(new UndoRedoEvent());
-	}
+            if (e.isSignificant())
+            {
+                mInsignificant.end();
+                mUndoManager.addEdit(mInsignificant);
+                mInsignificant = new CompoundEdit();
+                mUndoManager.addEdit(e);
+                fireEditorChangedEvent(new UndoRedoEvent());
+            }
+            else
+            {
+                mInsignificant.addEdit(e);
+            }
+            mUndoManager.addEdit(e);
+            mIDE.getActions().editorRedoAction.setEnabled(canRedo());
+            mIDE.getActions().editorUndoAction.setEnabled(canUndo());
+            fireEditorChangedEvent(new UndoRedoEvent());
+        }
 
+            
 	public void executeCommand(Command c)
 	{
 		c.execute();
