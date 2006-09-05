@@ -34,7 +34,7 @@ public class EditorUndoAction
 
         public void doAction()
         {
-            ide.info("The first undo throws an exception, after that it works fine (for one editor panel).");
+            ide.getIDE().info("The first undo throws an exception, after that it works fine (for one editor panel).");
             if (ide.getActiveModuleContainer() != null)
             {
                 if (ide.getActiveModuleContainer().canUndo())

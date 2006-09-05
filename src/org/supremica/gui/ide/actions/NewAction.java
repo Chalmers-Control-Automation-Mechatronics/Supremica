@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.gui.ide.IDE;
 import java.util.List;
+import javax.swing.KeyStroke;
 
 public class NewAction
 	extends IDEAction
@@ -20,6 +21,7 @@ public class NewAction
 		putValue(Action.NAME, "New");
 		putValue(Action.SHORT_DESCRIPTION, "New module");
 		putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_N));
+                putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
 		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/New16.gif")));
 	}
 

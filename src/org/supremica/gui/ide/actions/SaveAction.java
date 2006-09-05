@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   SaveAction
 //###########################################################################
-//# $Id: SaveAction.java,v 1.9 2006-07-20 02:28:37 robi Exp $
+//# $Id: SaveAction.java,v 1.10 2006-09-05 21:29:48 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -12,13 +12,13 @@ package org.supremica.gui.ide.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.gui.*;
@@ -54,6 +54,7 @@ public class SaveAction
 		putValue(Action.NAME, "Save...");
 		putValue(Action.SHORT_DESCRIPTION, "Save the project");
 		putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_S));
+		putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
 		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Save16.gif")));
 	}
 

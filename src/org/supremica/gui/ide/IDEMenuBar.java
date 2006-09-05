@@ -37,7 +37,7 @@ public class IDEMenuBar
 		menu.add(new JMenuItem(ide.getActions().saveAction));
 		menu.addSeparator();
 		//		menu.add(new JMenuItem(ide.getActions().importAction));
-		menu.add(new JMenuItem(ide.getActions().printAction));
+		menu.add(new JMenuItem(ide.getActions().editorPrintAction));
 		menu.add(new JMenuItem(ide.getActions().editorPrintPDFAction));
 		menu.addSeparator();
 		menu.add(new JMenuItem(ide.getActions().exitAction));
