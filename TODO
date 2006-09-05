@@ -1,0 +1,17 @@
+To Do
+-----
+
+CVS to Subversion
+License
+Installer
+Common logging system
+Internal layout engine
+Simulation of automata
+Misc editor and analyzer fixes
+        - full IDE functionality
+	- modifying events
+	- analyzer functionality
+	- bugs
+Compiler
+Framework for executing algorithms
+Compressed datastructure for reachable states
