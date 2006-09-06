@@ -81,7 +81,7 @@ public final class Config
     //   ALGORITHMS_MINIMIZATION
     //   ALGORITHMS_BDD
     //   ALGORITHMS_HMI
-    //   MISC    
+    //   MISC
     
     // GENERAL_COMM_XMLRPC
     public static final BooleanProperty XML_RPC_ACTIVE = new BooleanProperty(PropertyType.GENERAL_COMM_XMLRPC, "xmlRpcActive", false, "XML-RPC Active");
@@ -105,15 +105,14 @@ public final class Config
     // GENERAL
     /**
      * Possible values for look and feel
-     * System : All platforms
-     * Metal : All platforms
-     * javax.swing.plaf.metal.MetalLookAndFeel : All platforms
+     * System: All platforms
+     * Metal: All platforms   (javax.swing.plaf.metal.MetalLookAndFeel)
+     * Motif: All platforms   (com.sun.java.swing.plaf.motif.MotifLookAndFeel)
      * com.sun.java.swing.plaf.windows.WindowsLookAndFeel : Windows only
-     * com.sun.java.swing.plaf.motif.MotifLookAndFeel : All platforms
      * javax.swing.plaf.mac.MacLookAndFeel : Mac only
      */
-    private static final String[] LOOKANDFEEL_LEGALVALUES= {"System", "Metal", "javax.swing.plaf.metal.MetalLookAndFeel",
-    "com.sun.java.swing.plaf.windows.WindowsLookAndFeel", "com.sun.java.swing.plaf.motif.MotifLookAndFeel", "javax.swing.plaf.mac.MacLookAndFeel"};
+    private static final String[] LOOKANDFEEL_LEGALVALUES= {"System", "Metal", "Motif",
+    "com.sun.java.swing.plaf.windows.WindowsLookAndFeel", "javax.swing.plaf.mac.MacLookAndFeel"};
     public static final StringProperty GENERAL_LOOKANDFEEL  = new StringProperty(PropertyType.GENERAL, "generalLookAndFeel", "System", "Look and feel (needs restart)", LOOKANDFEEL_LEGALVALUES);
     public static final StringProperty GENERAL_STATE_SEPARATOR  = new StringProperty(PropertyType.GENERAL, "generalStateSeparator", ".", "State separator character");
     public static final StringProperty GENERAL_STATELABEL_SEPARATOR  = new StringProperty(PropertyType.GENERAL, "generalStateLabelSeparator", ",", "State label separator character");
@@ -228,12 +227,20 @@ public final class Config
     // ALGORITHMS_HMI
     public static final BooleanProperty INCLUDE_USERINTERFACE = new BooleanProperty(PropertyType.ALGORITHMS_HMI, "includeUserInterface", false, "Include SwiXML analyzer tools");
     
-    static Config instance = new Config();
+    private static Config instance = null;
     
     /**
      * This class should only be instantiated to guarantee that it is loaded.
      */
     private Config()
-    { 
-    }    
+    {
+    }
+    
+    public static Config getInstance()
+    {
+        if (instance == null)
+            instance = new Config();
+        return instance;
+    }
 }
+

@@ -335,7 +335,7 @@ public class AutomataSynthesizer
     throws Exception
     {
         // Automata that collects the calculated supervisors
-        Automata modSupervisors = new Automata();
+        Automata supervisors = new Automata();
         
         // Selector - always start with non-max perm
         AutomataSelector selector = new AutomataSelector(aut);
@@ -438,7 +438,7 @@ public class AutomataSynthesizer
                     }
                 }
                 
-                modSupervisors.addAutomaton(retval.automaton);
+                supervisors.addAutomaton(retval.automaton);
             }
             
             // Update execution dialog
@@ -463,7 +463,7 @@ public class AutomataSynthesizer
             
             if (retval.didSomething)
             {
-                modSupervisors.addAutomaton(retval.automaton);
+                supervisors.addAutomaton(retval.automaton);
             }
         }
         
@@ -473,14 +473,14 @@ public class AutomataSynthesizer
             if (executionDialog != null)
             {
                 executionDialog.setMode(ExecutionDialogMode.synthesizingOptimizing);
-                executionDialog.initProgressBar(0, modSupervisors.size());
+                executionDialog.initProgressBar(0, supervisors.size());
             }
             
-            optimize(aut, modSupervisors);
+            optimize(aut, supervisors);
         }
         
         // Did we do anything at all?
-        if (modSupervisors.size() == 0)
+        if (supervisors.size() == 0)
         {
             logger.info("No problems found, the current specifications and supervisors " +
                 "can be used to supervise the system.");
@@ -495,7 +495,7 @@ public class AutomataSynthesizer
         }
         
         // Return the new supervisors
-        return modSupervisors;
+        return supervisors;
     }
     
     /**

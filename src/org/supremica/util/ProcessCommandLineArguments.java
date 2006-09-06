@@ -57,74 +57,74 @@ import java.io.*;
 
 public class ProcessCommandLineArguments
 {
-	public static void process(String[] args)
-	{
-		boolean quit = false;
-
-		for (int i = 0; i < args.length; i++)
-		{
-			if (args[i].equals("-h") || args[i].equals("-?") || args[i].equals("--help") || args[i].equals("--usage"))
-			{
-				printUsage();
-				quit = true;
-			}
-			else if (args[i].equals("-p") || args[i].equals("--properties"))
-			{
-				if (i + 1 < args.length)
-				{
-					String fileName = args[i + 1];
-					i++;
-					File propFile = new File(fileName);
-
-					try
-					{
-						if (!propFile.exists())
-						{
-							//System.err.println("Properties file not found: " + propFile.getAbsolutePath());
-							System.out.println("Creating property file: " + propFile.getAbsolutePath());
-							propFile.createNewFile();
-						}
-
-						SupremicaProperties.loadProperties(propFile);
-					}
-					catch (Exception e)
-					{
-						System.err.println("Error reading properties file: " + propFile.getAbsolutePath());
-					}
-				}
-			}
-			else if (args[i].equals("-l") || args[i].equals("--list"))
-			{
-				System.out.println(SupremicaProperties.getProperties());
-			}
-			else if (args[i].equals("-v") || args[i].equals("--version"))
-			{
-				System.out.println("Supremica version: " + Version.version());
-				quit = true;
-			}
-			else
-			{
-				System.out.println("Invalid usage.\n");
-				ProcessCommandLineArguments.printUsage();
-				quit = true;
-			}
-		}
-
-		if (quit)
-		{
-			System.exit(0);
-		}
-	}
-
-	private static void printUsage()
-	{
-		System.out.println("Supremica: " + org.supremica.Version.version());
-		System.out.println("More information about Supremica is available at www.supremica.org\n");
-		System.out.println("Usage: Supremica [OPTION]\n");
-		System.out.println("Property options: \n  -p, --properties FILE\t\t Load properties from FILE");
-		System.out.println("List: \n  -l, --list [FILE]\t\t List properties with current values (or values in FILE)");
-		System.out.println("Help options: \n  -?, -h, --help, --usage\t show this help message");
-		System.out.println("Version: \n  -v, --version \t\t show version");
-		System.out.println("");
-	}
+    public static void process(String[] args)
+    {
+        boolean quit = false;
+        
+        for (int i = 0; i < args.length; i++)
+        {
+            if (args[i].equals("-h") || args[i].equals("-?") || args[i].equals("--help") || args[i].equals("--usage"))
+            {
+                printUsage();
+                quit = true;
+            }
+            else if (args[i].equals("-p") || args[i].equals("--properties"))
+            {
+                if (i + 1 < args.length)
+                {
+                    String fileName = args[i + 1];
+                    i++;
+                    File propFile = new File(fileName);
+                    
+                    try
+                    {
+                        if (!propFile.exists())
+                        {
+                            //System.err.println("Properties file not found: " + propFile.getAbsolutePath());
+                            System.out.println("Creating property file: " + propFile.getAbsolutePath());
+                            propFile.createNewFile();
+                        }
+                        
+                        SupremicaProperties.loadProperties(propFile);
+                    }
+                    catch (Exception e)
+                    {
+                        System.err.println("Error reading properties file: " + propFile.getAbsolutePath());
+                    }
+                }
+            }
+            else if (args[i].equals("-l") || args[i].equals("--list"))
+            {
+                System.out.println(SupremicaProperties.getProperties());
+            }
+            else if (args[i].equals("-v") || args[i].equals("--version"))
+            {
+                System.out.println("Supremica version: " + Version.version());
+                quit = true;
+            }
+            else
+            {
+                System.out.println("Invalid usage.\n");
+                ProcessCommandLineArguments.printUsage();
+                quit = true;
+            }
+        }
+        
+        if (quit)
+        {
+            System.exit(0);
+        }
+    }
+    
+    private static void printUsage()
+    {
+        System.out.println("Supremica: " + org.supremica.Version.version());
+        System.out.println("More information about Supremica is available at www.supremica.org\n");
+        System.out.println("Usage: Supremica [OPTION]\n");
+        System.out.println("Property options: \n  -p, --properties FILE\t\t Load properties from FILE");
+        System.out.println("List: \n  -l, --list [FILE]\t\t List properties with current values (or values in FILE)");
+        System.out.println("Help options: \n  -?, -h, --help, --usage\t show this help message");
+        System.out.println("Version: \n  -v, --version \t\t show version");
+        System.out.println("");
+    }
 }

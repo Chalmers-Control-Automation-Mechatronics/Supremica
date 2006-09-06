@@ -55,43 +55,51 @@ import org.supremica.properties.*;
 public class InterfaceManager
 {
 //	private static Logger logger = LoggerFactory.createLogger(InterfaceManager.class);
-	private static InterfaceManager instance = null;
-
-	private InterfaceManager()
-	{
-		try
-		{
-			String lookAndFeel = Config.GENERAL_LOOKANDFEEL.get();
-
-			if ((lookAndFeel == null) || "System".equalsIgnoreCase(lookAndFeel))
-			{
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			}
-			else if ("Metal".equalsIgnoreCase(lookAndFeel))
-			{
-				UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-			}
-			else
-			{
-				UIManager.setLookAndFeel(lookAndFeel);
-			}
-		}
-		catch (Exception ex)
-		{
+    private static InterfaceManager instance = null;
+    
+    private InterfaceManager()
+    {
+        try
+        {
+            Config.getInstance();
+            
+            String lookAndFeel = Config.GENERAL_LOOKANDFEEL.get();
+            
+            //System.err.println(lookAndFeel + " ");
+            
+            if ((lookAndFeel == null) || "System".equalsIgnoreCase(lookAndFeel))
+            {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            }
+            else if ("Metal".equalsIgnoreCase(lookAndFeel))
+            {
+                UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+            }
+            else if ("Motif".equalsIgnoreCase(lookAndFeel))
+            {
+                UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+            }
+            else
+            {
+                UIManager.setLookAndFeel(lookAndFeel);
+            }
+        }
+        catch (Exception ex)
+        {
 //			logger.fatal("Error while setting LookAndFeel");
 //			logger.debug(ex.getStackTrace());
-			System.err.println(ex);
-			System.exit(0);
-		}
-	}
-
-	public static synchronized InterfaceManager getInstance()
-	{
-		if (instance == null)
-		{
-			instance = new InterfaceManager();
-		}
-
-		return instance;
-	}
+            System.err.println(ex);
+            System.exit(0);
+        }
+    }
+    
+    public static synchronized InterfaceManager getInstance()
+    {
+        if (instance == null)
+        {
+            instance = new InterfaceManager();
+        }
+        
+        return instance;
+    }
 }

@@ -29,315 +29,314 @@ public class IDE
     extends JFrame
     implements ChangeListener, IDEActionInterface, IDEReportInterface
 {
-	private static final long serialVersionUID = 1L;
-
-	static
-	{
-		Config.XML_RPC_ACTIVE.set(false);
-		Config.DOT_USE.set(true);
-		Config.LOG_TO_CONSOLE.set(false);
-		Config.LOG_TO_GUI.set(true);
-	}
-	private static Logger logger = LoggerFactory.createLogger(IDE.class);
-	private final static InterfaceManager interfaceManager = InterfaceManager.getInstance();
-
-	private Actions theActions;
-
-	private JPanel contentPanel;
-	private BorderLayout contentLayout;
-
-	private IDEMenuBar menuBar;
-	private IDEToolBar ideToolBar;
-	private JToolBar currToolBar = null;
-
-	private ModuleContainers moduleContainers;
-
-	private LogPanel logPanel;
-
-	private JTabbedPane tabPanel;
-	private JSplitPane splitPanelVertical;
-
-	private final String ideName = "Supremica";
-
+    private static final long serialVersionUID = 1L;
+    
+    static
+    {
+        Config.XML_RPC_ACTIVE.set(false);
+        Config.DOT_USE.set(true);
+        Config.LOG_TO_CONSOLE.set(false);
+        Config.LOG_TO_GUI.set(true);
+    }
+    private static Logger logger = LoggerFactory.createLogger(IDE.class);
+    private final static InterfaceManager interfaceManager = InterfaceManager.getInstance();
+    
+    private Actions theActions;
+    
+    private JPanel contentPanel;
+    private BorderLayout contentLayout;
+    
+    private IDEMenuBar menuBar;
+    private IDEToolBar ideToolBar;
+    private JToolBar currToolBar = null;
+    
+    private ModuleContainers moduleContainers;
+    
+    private LogPanel logPanel;
+    
+    private JTabbedPane tabPanel;
+    private JSplitPane splitPanelVertical;
+    
+    private final String ideName = "Supremica";
+    
     public IDE()
     {
-		Utility.setupFrame(this, IDEDimensions.mainWindowPreferredSize);
-		setTitle(getName());
-		moduleContainers = new ModuleContainers(this);
-		ModuleContainer defaultModule = createNewModuleContainer();
-		moduleContainers.add(defaultModule);
-		moduleContainers.setActive(defaultModule);
-
-		contentPanel = (JPanel)getContentPane();
-		contentLayout = new BorderLayout();
-		contentPanel.setLayout(contentLayout);
-
-		theActions = new Actions(this);
-
-    	menuBar = new IDEMenuBar(this);
-    	setJMenuBar(menuBar);
-
-		setToolBar(createToolBar());
-
-		tabPanel = new JTabbedPane();
-		tabPanel.addChangeListener(this);
-
-		ModuleContainer currModuleContainer = moduleContainers.getActiveModuleContainer();
-		tabPanel.add(currModuleContainer.getEditorPanel());
-		tabPanel.add(currModuleContainer.getAnalyzerPanel());
-		//tabPanel.add(currModuleContainer.getSimulatorPanel());
-
-		tabPanel.validate();
-
-		logPanel = new LogPanel(this, "Logger");
-
-		splitPanelVertical = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tabPanel, logPanel);
-		splitPanelVertical.setContinuousLayout(false);
-		splitPanelVertical.setOneTouchExpandable(false);
-		splitPanelVertical.setDividerLocation(0.8);
-		splitPanelVertical.setResizeWeight(1.0);
-
-		contentPanel.add(splitPanelVertical, BorderLayout.CENTER);
-
-		//pack();
-		//validate();
-
-		logger.info("Supremica version: " + (new Version()).toString());
+        Utility.setupFrame(this, IDEDimensions.mainWindowPreferredSize);
+        setTitle(getName());
+        moduleContainers = new ModuleContainers(this);
+        ModuleContainer defaultModule = createNewModuleContainer();
+        moduleContainers.add(defaultModule);
+        moduleContainers.setActive(defaultModule);
+        
+        contentPanel = (JPanel)getContentPane();
+        contentLayout = new BorderLayout();
+        contentPanel.setLayout(contentLayout);
+        
+        theActions = new Actions(this);
+        
+        menuBar = new IDEMenuBar(this);
+        setJMenuBar(menuBar);
+        
+        setToolBar(createToolBar());
+        
+        tabPanel = new JTabbedPane();
+        tabPanel.addChangeListener(this);
+        
+        ModuleContainer currModuleContainer = moduleContainers.getActiveModuleContainer();
+        tabPanel.add(currModuleContainer.getEditorPanel());
+        tabPanel.add(currModuleContainer.getAnalyzerPanel());
+        //tabPanel.add(currModuleContainer.getSimulatorPanel());
+        
+        tabPanel.validate();
+        
+        logPanel = new LogPanel(this, "Logger");
+        
+        splitPanelVertical = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tabPanel, logPanel);
+        splitPanelVertical.setContinuousLayout(false);
+        splitPanelVertical.setOneTouchExpandable(false);
+        splitPanelVertical.setDividerLocation(0.8);
+        splitPanelVertical.setResizeWeight(1.0);
+        
+        contentPanel.add(splitPanelVertical, BorderLayout.CENTER);
+        
+        //pack();
+        //validate();
+        
+        logger.info("Supremica version: " + (new Version()).toString());
     }
-
-
-
-	public Actions getActions()
-	{
-		return theActions;
-	}
-
-	public Iterator moduleContainerIterator()
-	{
-		return moduleContainers.iterator();
-	}
-
-	public void add(ModuleContainer moduleContainer)
-	{
-		moduleContainers.add(moduleContainer);
-	}
-
-	public void remove(ModuleContainer moduleContainer)
-	{
-		ModuleContainer activeModuleContainer = getActiveModuleContainer();
-		ModuleContainer nextModuleContainer = null;
-
-		if (activeModuleContainer == moduleContainer)
-		{
-			if (moduleContainers.size() <= 1)
-			{
-				nextModuleContainer = createNewModuleContainer();
-				moduleContainers.add(nextModuleContainer);
-			}
-			else
-			{
-				nextModuleContainer = moduleContainers.getNext(moduleContainer);
-			}
-		}
-		setActive(nextModuleContainer);
-		moduleContainers.remove(moduleContainer);
-	}
-
-	public ModuleContainer getActiveModuleContainer()
-	{
-		return moduleContainers.getActiveModuleContainer();
-	}
-
-	public void setActive(ModuleContainer moduleContainer)
-	{
-		ModuleContainer oldModuleContainer = getActiveModuleContainer();
-		if (moduleContainer != oldModuleContainer)
-		{
-			moduleContainers.setActive(moduleContainer);
-
-			oldModuleContainer.setSelectedComponent(tabPanel.getSelectedComponent());
-
-			tabPanel.remove(oldModuleContainer.getEditorPanel());
-			tabPanel.remove(oldModuleContainer.getAnalyzerPanel());
-			//tabPanel.remove(oldModuleContainer.getSimulatorPanel());
-
-			tabPanel.add(moduleContainer.getEditorPanel());
-			tabPanel.add(moduleContainer.getAnalyzerPanel());
-			//tabPanel.add(moduleContainer.getSimulatorPanel());
-
-			tabPanel.setSelectedComponent(moduleContainer.getSelectedComponent());
-		}
-	}
-
-	public String getName()
-	{
-		return ideName;
-	}
-
-	public ModuleContainer createNewModuleContainer()
-	{
-		return moduleContainers.createNewModuleContainer();
-	}
-
-	public JFrame getFrame()
-	{
-		return this;
-	}
-
-	public IDE getIDE()
-	{
-		return this;
-	}
-
-	private void setToolBar(JToolBar toolBar)
-	{
-		if (toolBar == null)
-		{
-			return;
-		}
-		if (toolBar == currToolBar)
-		{
-			return;
-		}
-		if (currToolBar != null)
-		{
-			contentPanel.remove(currToolBar);
-		}
-    	contentPanel.add(toolBar, BorderLayout.NORTH);
-    	currToolBar = toolBar;
-	}
-
-	private IDEToolBar createToolBar()
-	{
-    	ideToolBar = new IDEToolBar(this);
-
-		// Set standard actions
-		ideToolBar.add(getActions().newAction);
-		ideToolBar.add(getActions().openAction);
-		ideToolBar.add(getActions().saveAction);
-
-		getActiveModuleContainer().getAnalyzerPanel().addToolBarEntries(ideToolBar);
-		getActiveModuleContainer().getEditorPanel().addToolBarEntries(ideToolBar);
-		return ideToolBar;
-	}
-
-        public IDEToolBar getToolBar()
+    
+    
+    
+    public Actions getActions()
+    {
+        return theActions;
+    }
+    
+    public Iterator moduleContainerIterator()
+    {
+        return moduleContainers.iterator();
+    }
+    
+    public void add(ModuleContainer moduleContainer)
+    {
+        moduleContainers.add(moduleContainer);
+    }
+    
+    public void remove(ModuleContainer moduleContainer)
+    {
+        ModuleContainer activeModuleContainer = getActiveModuleContainer();
+        ModuleContainer nextModuleContainer = null;
+        
+        if (activeModuleContainer == moduleContainer)
         {
-	    return ideToolBar;
-	}
-
-	// Overridden so we can exit when window is closed
-	protected void processWindowEvent(WindowEvent e)
-	{
-		super.processWindowEvent(e);
-
-		if (e.getID() == WindowEvent.WINDOW_CLOSING)
-		{
-			getActions().exitAction.doAction();
-			System.exit(0);
-		}
-	}
-
-	public void stateChanged(ChangeEvent e)
-	{
-		if (editorActive())
-		{
+            if (moduleContainers.size() <= 1)
+            {
+                nextModuleContainer = createNewModuleContainer();
+                moduleContainers.add(nextModuleContainer);
+            }
+            else
+            {
+                nextModuleContainer = moduleContainers.getNext(moduleContainer);
+            }
+        }
+        setActive(nextModuleContainer);
+        moduleContainers.remove(moduleContainer);
+    }
+    
+    public ModuleContainer getActiveModuleContainer()
+    {
+        return moduleContainers.getActiveModuleContainer();
+    }
+    
+    public void setActive(ModuleContainer moduleContainer)
+    {
+        ModuleContainer oldModuleContainer = getActiveModuleContainer();
+        if (moduleContainer != oldModuleContainer)
+        {
+            moduleContainers.setActive(moduleContainer);
+            
+            oldModuleContainer.setSelectedComponent(tabPanel.getSelectedComponent());
+            
+            tabPanel.remove(oldModuleContainer.getEditorPanel());
+            tabPanel.remove(oldModuleContainer.getAnalyzerPanel());
+            //tabPanel.remove(oldModuleContainer.getSimulatorPanel());
+            
+            tabPanel.add(moduleContainer.getEditorPanel());
+            tabPanel.add(moduleContainer.getAnalyzerPanel());
+            //tabPanel.add(moduleContainer.getSimulatorPanel());
+            
+            tabPanel.setSelectedComponent(moduleContainer.getSelectedComponent());
+        }
+    }
+    
+    public String getName()
+    {
+        return ideName;
+    }
+    
+    public ModuleContainer createNewModuleContainer()
+    {
+        return moduleContainers.createNewModuleContainer();
+    }
+    
+    public JFrame getFrame()
+    {
+        return this;
+    }
+    
+    public IDE getIDE()
+    {
+        return this;
+    }
+    
+    private void setToolBar(JToolBar toolBar)
+    {
+        if (toolBar == null)
+        {
+            return;
+        }
+        if (toolBar == currToolBar)
+        {
+            return;
+        }
+        if (currToolBar != null)
+        {
+            contentPanel.remove(currToolBar);
+        }
+        contentPanel.add(toolBar, BorderLayout.NORTH);
+        currToolBar = toolBar;
+    }
+    
+    private IDEToolBar createToolBar()
+    {
+        ideToolBar = new IDEToolBar(this);
+        
+        // Set standard actions
+        ideToolBar.add(getActions().newAction);
+        ideToolBar.add(getActions().openAction);
+        ideToolBar.add(getActions().saveAction);
+        
+        getActiveModuleContainer().getAnalyzerPanel().addToolBarEntries(ideToolBar);
+        getActiveModuleContainer().getEditorPanel().addToolBarEntries(ideToolBar);
+        return ideToolBar;
+    }
+    
+    public IDEToolBar getToolBar()
+    {
+        return ideToolBar;
+    }
+    
+    // Overridden so we can exit when window is closed
+    protected void processWindowEvent(WindowEvent e)
+    {
+        super.processWindowEvent(e);
+        
+        if (e.getID() == WindowEvent.WINDOW_CLOSING)
+        {
+            getActions().exitAction.doAction();
+            System.exit(0);
+        }
+    }
+    
+    public void stateChanged(ChangeEvent e)
+    {
+        if (editorActive())
+        {
 //			setToolBar(getActiveModuleContainer().getAnalyzerPanel().getToolBar(ideToolBar));
-			getActiveModuleContainer().updateAutomata();
-			getActiveModuleContainer().getEditorPanel().disablePanel();
-			getActiveModuleContainer().getAnalyzerPanel().enablePanel();
-		}
-		if (analyzerActive())
-		{
+            getActiveModuleContainer().updateAutomata();
+            getActiveModuleContainer().getEditorPanel().disablePanel();
+            getActiveModuleContainer().getAnalyzerPanel().enablePanel();
+        }
+        if (analyzerActive())
+        {
 //			setToolBar(getActiveModuleContainer().getEditorPanel().getToolBar(ideToolBar));
-			getActiveModuleContainer().getEditorPanel().enablePanel();
-			getActiveModuleContainer().getAnalyzerPanel().disablePanel();
-		}
-		//validate();
-		repaint();
-	}
-
-	public void setEditorMode(IDEAction theAction)
-	{
-	    ideToolBar.setCommand((String)theAction.getValue(Action.ACTION_COMMAND_KEY));
-	}
-
-	public EditorWindowInterface getActiveEditorWindowInterface()
-	{
-		return getActiveModuleContainer().getActiveEditorWindowInterface();
-	}
-
-	public boolean editorActive()
-	{
-		return tabPanel.getSelectedComponent() == getActiveModuleContainer().getEditorPanel();
-	}
-
-	public boolean analyzerActive()
-	{
-		return tabPanel.getSelectedComponent() == getActiveModuleContainer().getAnalyzerPanel();
-	}
-
-	public int numberOfSelectedAutomata()
-	{
-		ModuleContainer activeModuleContainer = getActiveModuleContainer();
-		return activeModuleContainer.numberOfSelectedAutomata();
-	}
-
-	public Automata getSelectedAutomata()
-	{
-		ModuleContainer activeModuleContainer = getActiveModuleContainer();
-		return activeModuleContainer.getSelectedAutomata();
-	}
-
-	public Automata getAllAutomata()
-	{
-		ModuleContainer activeModuleContainer = getActiveModuleContainer();
-		return activeModuleContainer.getAllAutomata();
-	}
-
-	public Automata getUnselectedAutomata()
-	{
-		ModuleContainer activeModuleContainer = getActiveModuleContainer();
-		return activeModuleContainer.getUnselectedAutomata();
-	}
-
-	// ** MF ** Implementation of Gui stuff
-	public void error(String msg)
-	{
-            logger.error(msg);
+            getActiveModuleContainer().getEditorPanel().enablePanel();
+            getActiveModuleContainer().getAnalyzerPanel().disablePanel();
         }
-
-        public void error(String msg, Throwable t)
-        {
-            logger.error(msg, t);
-        }
-
-        public void info(String msg)
-        {
-            logger.info(msg);
-        }
-
-	public void debug(String msg)
-	{
-		logger.debug(msg);
-	}
-
-	public boolean addAutomaton(Automaton theAutomaton)
-	{
-		return getActiveModuleContainer().addAutomaton(theAutomaton);
-	}
-
-
-	public int addAutomata(Automata theAutomata)
-	{
-		return getActiveModuleContainer().addAutomata(theAutomata);
-	}
-
-	public static void main(String args[])
-	{
-		ProcessCommandLineArguments.process(args);
-
-		IDE ide = new IDE();
-		ide.setVisible(true);
-	}
+        //validate();
+        repaint();
+    }
+    
+    public void setEditorMode(IDEAction theAction)
+    {
+        ideToolBar.setCommand((String)theAction.getValue(Action.ACTION_COMMAND_KEY));
+    }
+    
+    public EditorWindowInterface getActiveEditorWindowInterface()
+    {
+        return getActiveModuleContainer().getActiveEditorWindowInterface();
+    }
+    
+    public boolean editorActive()
+    {
+        return tabPanel.getSelectedComponent() == getActiveModuleContainer().getEditorPanel();
+    }
+    
+    public boolean analyzerActive()
+    {
+        return tabPanel.getSelectedComponent() == getActiveModuleContainer().getAnalyzerPanel();
+    }
+    
+    public int numberOfSelectedAutomata()
+    {
+        ModuleContainer activeModuleContainer = getActiveModuleContainer();
+        return activeModuleContainer.numberOfSelectedAutomata();
+    }
+    
+    public Automata getSelectedAutomata()
+    {
+        ModuleContainer activeModuleContainer = getActiveModuleContainer();
+        return activeModuleContainer.getSelectedAutomata();
+    }
+    
+    public Automata getAllAutomata()
+    {
+        ModuleContainer activeModuleContainer = getActiveModuleContainer();
+        return activeModuleContainer.getAllAutomata();
+    }
+    
+    public Automata getUnselectedAutomata()
+    {
+        ModuleContainer activeModuleContainer = getActiveModuleContainer();
+        return activeModuleContainer.getUnselectedAutomata();
+    }
+    
+    // ** MF ** Implementation of Gui stuff
+    public void error(String msg)
+    {
+        logger.error(msg);
+    }
+    
+    public void error(String msg, Throwable t)
+    {
+        logger.error(msg, t);
+    }
+    
+    public void info(String msg)
+    {
+        logger.info(msg);
+    }
+    
+    public void debug(String msg)
+    {
+        logger.debug(msg);
+    }
+    
+    public boolean addAutomaton(Automaton theAutomaton)
+    {
+        return getActiveModuleContainer().addAutomaton(theAutomaton);
+    }    
+    
+    public int addAutomata(Automata theAutomata)
+    {
+        return getActiveModuleContainer().addAutomata(theAutomata);
+    }
+    
+    public static void main(String args[])
+    {
+        ProcessCommandLineArguments.process(args);
+        
+        IDE ide = new IDE();
+        ide.setVisible(true);
+    }
 }

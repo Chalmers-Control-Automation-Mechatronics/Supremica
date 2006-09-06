@@ -261,9 +261,9 @@ public final class SupremicaProperties
             Options.show_level_graph = Config.BDD_LEVEL_GRAPHS.get();
         }
     }
-      
+    
     private static SupremicaProperties supremicaProperties;
-    private static Config config = Config.instance;
+    private static Config config = Config.getInstance();
     private static File propertyFile = null;
     
     static
@@ -271,7 +271,7 @@ public final class SupremicaProperties
         supremicaProperties = new SupremicaProperties();
         updateBDDOptions(false);
     }
-       
+    
     public static void main(String[] args)
     {
         System.out.println(supremicaProperties.toString());
