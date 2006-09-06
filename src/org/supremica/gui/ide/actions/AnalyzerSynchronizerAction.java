@@ -13,62 +13,62 @@ import org.supremica.log.*;
 import javax.swing.JOptionPane;
 
 public class AnalyzerSynchronizerAction
-	extends IDEAction
+    extends IDEAction
 {
-	private static final long serialVersionUID = 1L;
-	private Logger logger = LoggerFactory.createLogger(IDE.class);
-
-	public AnalyzerSynchronizerAction(List<IDEAction> actionList)
-	{
-		super(actionList);
-
-		setAnalyzerActiveRequired(true);
-
-		putValue(Action.NAME, "Synchronize");
-		putValue(Action.SHORT_DESCRIPTION, "Synchronize");
-//		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Copy16.gif")));
-	}
-
-	public void actionPerformed(ActionEvent e)
-	{
-		doAction();
-	}
-
-	public void doAction()
-	{
-		// Retrieve the selected automata and make a sanity check
-		Automata selectedAutomata = ide.getSelectedAutomata();
-		if (!selectedAutomata.sanityCheck(ide.getIDE(), 2, true, false, true, true))
-		{
-			return;
-		}
-
-		// Get the current options
-		SynchronizationOptions synchronizationOptions;
-
-		try
-		{
-			synchronizationOptions = new SynchronizationOptions();
-		}
-		catch (Exception ex)
-		{
-			JOptionPane.showMessageDialog(ide.getFrame(), "Error constructing synchronizationOptions: " + ex.getMessage(), "Alert", JOptionPane.ERROR_MESSAGE);
-			logger.debug(ex.getStackTrace());
-
-			return;
-		}
-
-		// Start a dialog to allow the user changing the options
-		SynchronizationDialog synchronizationDialog = new SynchronizationDialog(ide.getFrame(), synchronizationOptions);
-
-		synchronizationDialog.show();
-
-		if (!synchronizationOptions.getDialogOK())
-		{
-			return;
-		}
-
-		// Start worker thread - perform the task.
-		AutomataSynchronizerWorker worker = new AutomataSynchronizerWorker(ide.getIDE(), selectedAutomata, "", synchronizationOptions);
-	}
+    private static final long serialVersionUID = 1L;
+    private Logger logger = LoggerFactory.createLogger(IDE.class);
+    
+    public AnalyzerSynchronizerAction(List<IDEAction> actionList)
+    {
+        super(actionList);
+        
+        setAnalyzerActiveRequired(true);
+        
+        putValue(Action.NAME, "Synchronize");
+        putValue(Action.SHORT_DESCRIPTION, "Synchronize");
+        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/synchronize16.gif")));
+    }
+    
+    public void actionPerformed(ActionEvent e)
+    {
+        doAction();
+    }
+    
+    public void doAction()
+    {
+        // Retrieve the selected automata and make a sanity check
+        Automata selectedAutomata = ide.getSelectedAutomata();
+        if (!selectedAutomata.sanityCheck(ide.getIDE(), 2, true, false, true, true))
+        {
+            return;
+        }
+        
+        // Get the current options
+        SynchronizationOptions synchronizationOptions;
+        
+        try
+        {
+            synchronizationOptions = new SynchronizationOptions();
+        }
+        catch (Exception ex)
+        {
+            JOptionPane.showMessageDialog(ide.getFrame(), "Error constructing synchronizationOptions: " + ex.getMessage(), "Alert", JOptionPane.ERROR_MESSAGE);
+            logger.debug(ex.getStackTrace());
+            
+            return;
+        }
+        
+        // Start a dialog to allow the user changing the options
+        SynchronizationDialog synchronizationDialog = new SynchronizationDialog(ide.getFrame(), synchronizationOptions);
+        
+        synchronizationDialog.show();
+        
+        if (!synchronizationOptions.getDialogOK())
+        {
+            return;
+        }
+        
+        // Start worker thread - perform the task.
+        AutomataSynchronizerWorker worker = new AutomataSynchronizerWorker(ide.getIDE(), selectedAutomata, "", synchronizationOptions);
+    }
 }

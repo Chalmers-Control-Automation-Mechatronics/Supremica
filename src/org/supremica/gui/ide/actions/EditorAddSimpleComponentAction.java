@@ -4,7 +4,9 @@ import javax.swing.Action;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
+import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
+import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
 public class EditorAddSimpleComponentAction
@@ -21,7 +23,7 @@ public class EditorAddSimpleComponentAction
         putValue(Action.NAME, "Create Automaton...");
         putValue(Action.SHORT_DESCRIPTION, "Add Simple Component");
         putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
-//		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/edge16.gif")));
+        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/automaton16.gif")));
     }
     
     public void actionPerformed(ActionEvent e)
