@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleExporter
 //###########################################################################
-//# $Id: JAXBModuleExporter.java,v 1.12 2006-07-25 22:06:07 robi Exp $
+//# $Id: JAXBModuleExporter.java,v 1.13 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -1077,6 +1077,8 @@ public Object visitExpressionProxy
        final SimpleExpressionType element)
     throws VisitorException
   {
+    final String text = proxy.getPlainText();
+    element.setText(text);
     copyExpressionProxy(proxy, element);
   }
 

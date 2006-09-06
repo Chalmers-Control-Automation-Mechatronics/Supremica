@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   IndexedIdentifierSubject
 //###########################################################################
-//# $Id: IndexedIdentifierSubject.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: IndexedIdentifierSubject.java,v 1.7 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -40,13 +40,15 @@ public final class IndexedIdentifierSubject
   //# Constructors
   /**
    * Creates a new indexed identifier.
+   * @param plainText The original text of the new indexed identifier, or <CODE>null</CODE>.
    * @param name The name of the new indexed identifier.
    * @param indexes The list of array indexes of the new indexed identifier, or <CODE>null</CODE> if empty.
    */
-  public IndexedIdentifierSubject(final String name,
+  public IndexedIdentifierSubject(final String plainText,
+                                  final String name,
                                   final Collection<? extends SimpleExpressionProxy> indexes)
   {
-    super(name);
+    super(plainText, name);
     if (indexes == null) {
       mIndexes = new ArrayListSubject<SimpleExpressionSubject>();
     } else {
@@ -59,13 +61,16 @@ public final class IndexedIdentifierSubject
   /**
    * Creates a new indexed identifier using default values.
    * This constructor creates an indexed identifier with
-   * an empty list of array indexes.
+   * the original text set to <CODE>null</CODE>.
    * @param name The name of the new indexed identifier.
+   * @param indexes The list of array indexes of the new indexed identifier, or <CODE>null</CODE> if empty.
    */
-  public IndexedIdentifierSubject(final String name)
+  public IndexedIdentifierSubject(final String name,
+                                  final Collection<? extends SimpleExpressionProxy> indexes)
   {
-    this(name,
-         emptySimpleExpressionProxyList());
+    this(null,
+         name,
+         indexes);
   }
 
 
@@ -94,11 +99,31 @@ public final class IndexedIdentifierSubject
     }
   }
 
+  public boolean equalsWithGeometry(final Proxy partner)
+  {
+    if (super.equalsWithGeometry(partner)) {
+      final IndexedIdentifierSubject downcast = (IndexedIdentifierSubject) partner;
+      return
+        EqualCollection.isEqualListWithGeometry
+          (mIndexes, downcast.mIndexes);
+    } else {
+      return false;
+    }
+  }
+
   public int hashCodeByContents()
   {
     int result = super.hashCodeByContents();
     result *= 5;
     result += EqualCollection.getListHashCodeByContents(mIndexes);
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeWithGeometry();
+    result *= 5;
+    result += EqualCollection.getListHashCodeWithGeometry(mIndexes);
     return result;
   }
 
@@ -130,14 +155,6 @@ public final class IndexedIdentifierSubject
   public ListSubject<SimpleExpressionSubject> getIndexesModifiable()
   {
     return mIndexes;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static List<SimpleExpressionProxy> emptySimpleExpressionProxyList()
-  {
-    return Collections.emptyList();
   }
 
 

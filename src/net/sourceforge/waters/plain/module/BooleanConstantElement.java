@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   BooleanConstantElement
 //###########################################################################
-//# $Id: BooleanConstantElement.java,v 1.5 2006-07-20 02:28:37 robi Exp $
+//# $Id: BooleanConstantElement.java,v 1.6 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -31,11 +31,26 @@ public final class BooleanConstantElement
   //# Constructors
   /**
    * Creates a new boolean constant.
+   * @param plainText The original text of the new boolean constant, or <CODE>null</CODE>.
+   * @param value The boolean value of the new boolean constant.
+   */
+  public BooleanConstantElement(final String plainText,
+                                final boolean value)
+  {
+    super(plainText);
+    mIsValue = value;
+  }
+
+  /**
+   * Creates a new boolean constant using default values.
+   * This constructor creates a boolean constant with
+   * the original text set to <CODE>null</CODE>.
    * @param value The boolean value of the new boolean constant.
    */
   public BooleanConstantElement(final boolean value)
   {
-    mIsValue = value;
+    this(null,
+         value);
   }
 
 
@@ -60,9 +75,30 @@ public final class BooleanConstantElement
     }
   }
 
+  public boolean equalsWithGeometry(final Proxy partner)
+  {
+    if (super.equalsWithGeometry(partner)) {
+      final BooleanConstantElement downcast = (BooleanConstantElement) partner;
+      return
+        (mIsValue == downcast.mIsValue);
+    } else {
+      return false;
+    }
+  }
+
   public int hashCodeByContents()
   {
     int result = super.hashCodeByContents();
+    result *= 5;
+    if (mIsValue) {
+      result++;
+    }
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeWithGeometry();
     result *= 5;
     if (mIsValue) {
       result++;

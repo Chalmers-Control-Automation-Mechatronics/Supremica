@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   SimpleParameterElement
 //###########################################################################
-//# $Id: SimpleParameterElement.java,v 1.5 2006-07-20 02:28:37 robi Exp $
+//# $Id: SimpleParameterElement.java,v 1.6 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -78,11 +78,30 @@ public abstract class SimpleParameterElement
     }
   }
 
+  public boolean equalsWithGeometry(final Proxy partner)
+  {
+    if (super.equalsByContents(partner)) {
+      final SimpleParameterElement downcast = (SimpleParameterElement) partner;
+      return
+        mDefaultValue.equalsWithGeometry(downcast.mDefaultValue);
+    } else {
+      return false;
+    }
+  }
+
   public int hashCodeByContents()
   {
     int result = super.hashCodeByContents();
     result *= 5;
     result += mDefaultValue.hashCodeByContents();
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mDefaultValue.hashCodeWithGeometry();
     return result;
   }
 

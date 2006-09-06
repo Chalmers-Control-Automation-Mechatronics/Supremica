@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   EnumSetExpressionElement
 //###########################################################################
-//# $Id: EnumSetExpressionElement.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: EnumSetExpressionElement.java,v 1.7 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -38,10 +38,13 @@ public final class EnumSetExpressionElement
   //# Constructors
   /**
    * Creates a new enumerated range.
+   * @param plainText The original text of the new enumerated range, or <CODE>null</CODE>.
    * @param items The list of items of the new enumerated range, or <CODE>null</CODE> if empty.
    */
-  public EnumSetExpressionElement(final Collection<? extends SimpleIdentifierProxy> items)
+  public EnumSetExpressionElement(final String plainText,
+                                  final Collection<? extends SimpleIdentifierProxy> items)
   {
+    super(plainText);
     if (items == null) {
       mItems = Collections.emptyList();
     } else {
@@ -55,11 +58,13 @@ public final class EnumSetExpressionElement
   /**
    * Creates a new enumerated range using default values.
    * This constructor creates an enumerated range with
-   * an empty list of items.
+   * the original text set to <CODE>null</CODE>.
+   * @param items The list of items of the new enumerated range, or <CODE>null</CODE> if empty.
    */
-  public EnumSetExpressionElement()
+  public EnumSetExpressionElement(final Collection<? extends SimpleIdentifierProxy> items)
   {
-    this(emptySimpleIdentifierProxyList());
+    this(null,
+         items);
   }
 
 
@@ -85,11 +90,31 @@ public final class EnumSetExpressionElement
     }
   }
 
+  public boolean equalsWithGeometry(final Proxy partner)
+  {
+    if (super.equalsWithGeometry(partner)) {
+      final EnumSetExpressionElement downcast = (EnumSetExpressionElement) partner;
+      return
+        EqualCollection.isEqualListWithGeometry
+          (mItems, downcast.mItems);
+    } else {
+      return false;
+    }
+  }
+
   public int hashCodeByContents()
   {
     int result = super.hashCodeByContents();
     result *= 5;
     result += EqualCollection.getListHashCodeByContents(mItems);
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeWithGeometry();
+    result *= 5;
+    result += EqualCollection.getListHashCodeWithGeometry(mItems);
     return result;
   }
 
@@ -109,14 +134,6 @@ public final class EnumSetExpressionElement
   public List<SimpleIdentifierProxy> getItems()
   {
     return mItems;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static List<SimpleIdentifierProxy> emptySimpleIdentifierProxyList()
-  {
-    return Collections.emptyList();
   }
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   IndexedIdentifierElement
 //###########################################################################
-//# $Id: IndexedIdentifierElement.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: IndexedIdentifierElement.java,v 1.7 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -38,13 +38,15 @@ public final class IndexedIdentifierElement
   //# Constructors
   /**
    * Creates a new indexed identifier.
+   * @param plainText The original text of the new indexed identifier, or <CODE>null</CODE>.
    * @param name The name of the new indexed identifier.
    * @param indexes The list of array indexes of the new indexed identifier, or <CODE>null</CODE> if empty.
    */
-  public IndexedIdentifierElement(final String name,
+  public IndexedIdentifierElement(final String plainText,
+                                  final String name,
                                   final Collection<? extends SimpleExpressionProxy> indexes)
   {
-    super(name);
+    super(plainText, name);
     if (indexes == null) {
       mIndexes = Collections.emptyList();
     } else {
@@ -58,13 +60,16 @@ public final class IndexedIdentifierElement
   /**
    * Creates a new indexed identifier using default values.
    * This constructor creates an indexed identifier with
-   * an empty list of array indexes.
+   * the original text set to <CODE>null</CODE>.
    * @param name The name of the new indexed identifier.
+   * @param indexes The list of array indexes of the new indexed identifier, or <CODE>null</CODE> if empty.
    */
-  public IndexedIdentifierElement(final String name)
+  public IndexedIdentifierElement(final String name,
+                                  final Collection<? extends SimpleExpressionProxy> indexes)
   {
-    this(name,
-         emptySimpleExpressionProxyList());
+    this(null,
+         name,
+         indexes);
   }
 
 
@@ -90,11 +95,31 @@ public final class IndexedIdentifierElement
     }
   }
 
+  public boolean equalsWithGeometry(final Proxy partner)
+  {
+    if (super.equalsWithGeometry(partner)) {
+      final IndexedIdentifierElement downcast = (IndexedIdentifierElement) partner;
+      return
+        EqualCollection.isEqualListWithGeometry
+          (mIndexes, downcast.mIndexes);
+    } else {
+      return false;
+    }
+  }
+
   public int hashCodeByContents()
   {
     int result = super.hashCodeByContents();
     result *= 5;
     result += EqualCollection.getListHashCodeByContents(mIndexes);
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeWithGeometry();
+    result *= 5;
+    result += EqualCollection.getListHashCodeWithGeometry(mIndexes);
     return result;
   }
 
@@ -114,14 +139,6 @@ public final class IndexedIdentifierElement
   public List<SimpleExpressionProxy> getIndexes()
   {
     return mIndexes;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static List<SimpleExpressionProxy> emptySimpleExpressionProxyList()
-  {
-    return Collections.emptyList();
   }
 
 

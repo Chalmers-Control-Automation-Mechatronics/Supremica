@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   VariableElement
 //###########################################################################
-//# $Id: VariableElement.java,v 1.5 2006-07-20 02:28:37 robi Exp $
+//# $Id: VariableElement.java,v 1.6 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -93,6 +93,21 @@ public final class VariableElement
     }
   }
 
+  public boolean equalsWithGeometry(final Proxy partner)
+  {
+    if (super.equalsByContents(partner)) {
+      final VariableElement downcast = (VariableElement) partner;
+      return
+        mName.equals(downcast.mName) &&
+        mType.equalsWithGeometry(downcast.mType) &&
+        mInitialValue.equalsWithGeometry(downcast.mInitialValue) &&
+        (mMarkedValue == null ? downcast.mMarkedValue == null :
+         mMarkedValue.equalsWithGeometry(downcast.mMarkedValue));
+    } else {
+      return false;
+    }
+  }
+
   public int hashCodeByContents()
   {
     int result = super.hashCodeByContents();
@@ -105,6 +120,22 @@ public final class VariableElement
     result *= 5;
     if (mMarkedValue != null) {
       result += mMarkedValue.hashCodeByContents();
+    }
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mName.hashCode();
+    result *= 5;
+    result += mType.hashCodeWithGeometry();
+    result *= 5;
+    result += mInitialValue.hashCodeWithGeometry();
+    result *= 5;
+    if (mMarkedValue != null) {
+      result += mMarkedValue.hashCodeWithGeometry();
     }
     return result;
   }

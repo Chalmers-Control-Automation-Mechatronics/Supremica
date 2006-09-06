@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.13 2006-08-01 04:14:47 robi Exp $
+//# $Id: JAXBModuleImporter.java,v 1.14 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -515,6 +515,7 @@ public class JAXBModuleImporter
   private BinaryExpressionProxy importBinaryExpression
     (final BinaryExpression element)
   {
+    final String text = element.getText();
     final String operatorName = element.getOperator();
     final BinaryOperator operator =
       mOperatorTable.getBinaryOperator(operatorName);
@@ -525,7 +526,7 @@ public class JAXBModuleImporter
     final SimpleExpressionType rightElement = subterms.get(1);
     final SimpleExpressionProxy right =
       (SimpleExpressionProxy) importElement(rightElement);
-    return mFactory.createBinaryExpressionProxy(operator, left, right);
+    return mFactory.createBinaryExpressionProxy(text, operator, left, right);
   }
 
   private BoxGeometryProxy importBoxGeometry(final BoxGeometry element)
@@ -573,10 +574,12 @@ public class JAXBModuleImporter
   
   
 //EFA----------------------
-  private BooleanConstantProxy importBooleanConstant(final BooleanConstant element)
+  private BooleanConstantProxy importBooleanConstant
+    (final BooleanConstant element)
   {
+    final String text = element.getText();
     final boolean value = element.isValue();
-    return mFactory.createBooleanConstantProxy(value);
+    return mFactory.createBooleanConstantProxy(text, value);
   }
 
   private VariableProxy importVariable(final Variable element) {
@@ -651,6 +654,7 @@ public class JAXBModuleImporter
   private EnumSetExpressionProxy importEnumSetExpression
     (final EnumSetExpression element)
   {
+    final String text = element.getText();
     final List<SimpleIdentifierProxy> items =
       new LinkedList<SimpleIdentifierProxy>();
     final List<SimpleIdentifier> itemsElement =
@@ -660,7 +664,7 @@ public class JAXBModuleImporter
         importSimpleIdentifier(itemElement);
       items.add(itemProxy);
     }
-    return mFactory.createEnumSetExpressionProxy(items);
+    return mFactory.createEnumSetExpressionProxy(text, items);
   }
 
   private AliasProxy importEventAlias(final EventAlias element)
@@ -809,6 +813,7 @@ public class JAXBModuleImporter
   private IndexedIdentifierProxy importIndexedIdentifier
     (final IndexedIdentifier element)
   {
+    final String text = element.getText();
     final String name = element.getName();
     final List<SimpleExpressionProxy> indexes =
       new LinkedList<SimpleExpressionProxy>();
@@ -819,7 +824,7 @@ public class JAXBModuleImporter
         (SimpleExpressionProxy) importElement(itemElement);
       indexes.add(itemProxy);
     }
-    return mFactory.createIndexedIdentifierProxy(name, indexes);
+    return mFactory.createIndexedIdentifierProxy(text, name, indexes);
   }
 
   private InstanceProxy importInstance(final Instance element)
@@ -842,8 +847,9 @@ public class JAXBModuleImporter
 
   private IntConstantProxy importIntConstant(final IntConstant element)
   {
+    final String text = element.getText();
     final int value = element.getValue();
-    return mFactory.createIntConstantProxy(value);
+    return mFactory.createIntConstantProxy(text, value);
   }
 
   private IntParameterProxy importIntParameter(final IntParameter element)
@@ -1001,8 +1007,9 @@ public class JAXBModuleImporter
   private SimpleIdentifierProxy importSimpleIdentifier
     (final SimpleIdentifier element)
   {
+    final String text = element.getText();
     final String name = element.getName();
-    return mFactory.createSimpleIdentifierProxy(name);
+    return mFactory.createSimpleIdentifierProxy(text, name);
   }
 
   private SimpleNodeProxy importSimpleNode(final SimpleNode element)
@@ -1052,13 +1059,14 @@ public class JAXBModuleImporter
   private UnaryExpressionProxy importUnaryExpression
     (final UnaryExpression element)
   {
+    final String text = element.getText();
     final String operatorName = element.getOperator();
     final UnaryOperator operator =
       mOperatorTable.getUnaryOperator(operatorName);
     final SimpleExpressionType subTermElement = element.getSubTerm();
     final SimpleExpressionProxy subTerm =
       (SimpleExpressionProxy) importElement(subTermElement);
-    return mFactory.createUnaryExpressionProxy(operator, subTerm);
+    return mFactory.createUnaryExpressionProxy(text, operator, subTerm);
   }
 
 

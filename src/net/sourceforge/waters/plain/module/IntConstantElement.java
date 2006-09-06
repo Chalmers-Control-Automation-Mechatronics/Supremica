@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   IntConstantElement
 //###########################################################################
-//# $Id: IntConstantElement.java,v 1.5 2006-07-20 02:28:37 robi Exp $
+//# $Id: IntConstantElement.java,v 1.6 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -31,11 +31,26 @@ public final class IntConstantElement
   //# Constructors
   /**
    * Creates a new integer constant.
+   * @param plainText The original text of the new integer constant, or <CODE>null</CODE>.
+   * @param value The integer value of the new integer constant.
+   */
+  public IntConstantElement(final String plainText,
+                            final int value)
+  {
+    super(plainText);
+    mValue = value;
+  }
+
+  /**
+   * Creates a new integer constant using default values.
+   * This constructor creates an integer constant with
+   * the original text set to <CODE>null</CODE>.
    * @param value The integer value of the new integer constant.
    */
   public IntConstantElement(final int value)
   {
-    mValue = value;
+    this(null,
+         value);
   }
 
 
@@ -60,9 +75,28 @@ public final class IntConstantElement
     }
   }
 
+  public boolean equalsWithGeometry(final Proxy partner)
+  {
+    if (super.equalsWithGeometry(partner)) {
+      final IntConstantElement downcast = (IntConstantElement) partner;
+      return
+        (mValue == downcast.mValue);
+    } else {
+      return false;
+    }
+  }
+
   public int hashCodeByContents()
   {
     int result = super.hashCodeByContents();
+    result *= 5;
+    result += mValue;
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeWithGeometry();
     result *= 5;
     result += mValue;
     return result;

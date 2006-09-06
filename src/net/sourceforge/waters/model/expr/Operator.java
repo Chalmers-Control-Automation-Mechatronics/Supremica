@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.waters.model.expr
 //# CLASS:   Operator
 //###########################################################################
-//# $Id: Operator.java,v 1.3 2006-03-02 12:12:50 martin Exp $
+//# $Id: Operator.java,v 1.4 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -33,12 +33,15 @@ public interface Operator {
 
   //#########################################################################
   //# Class Constants
-  public static final int TYPE_INT = 1;
-  public static final int TYPE_ATOM = 2;
-  public static final int TYPE_RANGE = 4;
-  public static final int TYPE_NAME = 8;
-  public static final int TYPE_BOOLEAN = 16;
+  public static final int TYPE_BOOLEAN = 1;
+  public static final int TYPE_INT = 2;
+  public static final int TYPE_ATOM = 4;
+  public static final int TYPE_RANGE = 8;
+  public static final int TYPE_NAME = 16;
+
+  public static final int TYPE_INDEX = 
+    TYPE_BOOLEAN | TYPE_INT | TYPE_ATOM;
   public static final int TYPE_ANY =
-    TYPE_INT | TYPE_ATOM | TYPE_RANGE | TYPE_NAME | TYPE_BOOLEAN;
+    TYPE_BOOLEAN | TYPE_INT | TYPE_ATOM | TYPE_RANGE | TYPE_NAME;
 
 }

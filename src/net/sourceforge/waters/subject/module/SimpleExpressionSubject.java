@@ -4,12 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SimpleExpressionSubject
 //###########################################################################
-//# $Id: SimpleExpressionSubject.java,v 1.5 2006-05-24 09:13:02 markus Exp $
+//# $Id: SimpleExpressionSubject.java,v 1.6 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 
 
 /**
@@ -27,9 +29,21 @@ public abstract class SimpleExpressionSubject
   //# Constructors
   /**
    * Creates a new simple expression.
+   * @param plainText The original text of the new simple expression, or <CODE>null</CODE>.
+   */
+  protected SimpleExpressionSubject(final String plainText)
+  {
+    mPlainText = plainText;
+  }
+
+  /**
+   * Creates a new simple expression using default values.
+   * This constructor creates a simple expression with
+   * the original text set to <CODE>null</CODE>.
    */
   protected SimpleExpressionSubject()
   {
+    this(null);
   }
 
 
@@ -37,7 +51,61 @@ public abstract class SimpleExpressionSubject
   //# Cloning
   public SimpleExpressionSubject clone()
   {
-    return (SimpleExpressionSubject) super.clone();
+    final SimpleExpressionSubject cloned = (SimpleExpressionSubject) super.clone();
+    return cloned;
   }
+
+
+  //#########################################################################
+  //# Equality and Hashcode
+  public boolean equalsWithGeometry(final Proxy partner)
+  {
+    if (super.equalsByContents(partner)) {
+      final SimpleExpressionSubject downcast = (SimpleExpressionSubject) partner;
+      return
+        (mPlainText == null ? downcast.mPlainText == null :
+         mPlainText.equals(downcast.mPlainText));
+    } else {
+      return false;
+    }
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mPlainText.hashCode();
+    return result;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.module.SimpleExpressionProxy
+  public String getPlainText()
+  {
+    return mPlainText;
+  }
+
+
+  //#########################################################################
+  //# Setters
+  /**
+   * Sets the original text of this expression.
+   */
+  public void setPlainText(final String plainText)
+  {
+    if (mPlainText.equals(plainText)) {
+      return;
+    }
+    mPlainText = plainText;
+    final ModelChangeEvent event =
+      ModelChangeEvent.createGeometryChanged(this, mPlainText);
+    fireModelChanged(event);
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private String mPlainText;
 
 }

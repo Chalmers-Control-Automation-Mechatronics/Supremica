@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ExpressionParser
 //###########################################################################
-//# $Id: ExpressionParser.java,v 1.7 2006-07-20 02:28:37 robi Exp $
+//# $Id: ExpressionParser.java,v 1.8 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -16,14 +16,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.module.BinaryExpressionProxy;
-import net.sourceforge.waters.model.module.BooleanConstantProxy;
-import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
-import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
 /**
@@ -157,11 +153,10 @@ public class ExpressionParser {
   public SimpleExpressionProxy parse(String input, final int mask)
     throws ParseException
   {
-	  input = removeBlanks(input);
-	  if(input == "") return null;
+    input = removeBlanks(input);
     try {
       final Reader reader = new StringReader(input);
-      return parse(reader, mask);
+      return parse(reader, mask, input);
     } catch (final IOException exception) {
       throw new WatersRuntimeException(exception);
     }
@@ -187,27 +182,51 @@ public class ExpressionParser {
   public SimpleExpressionProxy parse(final Reader reader, final int mask)
     throws IOException, ParseException
   {
+    return parse(reader, mask, null);
+  }
+
+  /**
+   * Parses an expression from an input stream.
+   * This method tries to read the entire stream and produce an expression
+   * out of it. It is an error if the stream contains extra characters
+   * at the end.
+   * @param  reader      A reader providing input from a stream.
+   * @param  mask        A bit mask identifying the expected type of the
+   *                     evaluated expression, using the type constants
+   *                     {@link Operator#TYPE_INT},
+   *                     {@link Operator#TYPE_ATOM},
+   *                     {@link Operator#TYPE_RANGE},
+   *                     and {@link Operator#TYPE_NAME}.
+   * @param  input       The original text of the expression.
+   *                     If non-<CODE>null</CODE>, this string is provided
+   *                     as (optional) rendering text to the parsed
+   *                     expression.
+   * @throws ParseException to indicate that the input could not be
+   *                     parsed because of some syntax error.
+   * @throws IOException to indicate that reading from the input stream
+   *                     has failed.
+   */
+  public SimpleExpressionProxy parse(final Reader reader,
+                                     final int mask,
+                                     final String input)
+    throws IOException, ParseException
+  {
     try {
       mScanner.setInputStream(reader);
       final ParseResult result = parseResult(Token.END, null);
       checkType(result, mask, null);
-      return result.getExpression();
+      final SimpleExpressionProxy expr = result.createProxy(mFactory);
+      if (input == null || expr.toString().equals(input)) {
+        return expr;
+      } else {
+        return result.createProxy(mFactory, input);
+      }
     } finally {
       mScanner.setInputStream(null);
     }
   }
 
-  private String removeBlanks(String str) {
-	  	if(str.equals("")) return "";
-		int i = 0;
-		char c = str.charAt(0);
-		while(isWhitespace(c)) {
-			i++;
-			if(i == str.length()) return "";
-			c = str.charAt(i);
-		}
-		return str.substring(i);
-	}
+
   //#########################################################################
   //# Character Classes
   /**
@@ -302,9 +321,32 @@ public class ExpressionParser {
   }
 
 
+  private String removeBlanks(final String text)
+  {
+    final int len = text.length();
+    int start = 0;
+    char c;
+    for (; start < len; start++) {
+      c = text.charAt(start);
+      if (!isWhitespace(c)) {
+        break;
+      }
+    }
+    if (start == len) {
+      return "";
+    }
+    int end = len;
+    do {
+      c = text.charAt(--end);
+    } while (isWhitespace(c));
+    return text.substring(start, end + 1);
+  }
+
+
   //#########################################################################
   //# Auxiliary Methods for Parsing
-  private ParseResult parseResult(final int limit, final Token opening)
+  private ParseResult parseResult(final int limit,
+                                  final Token opening)
     throws IOException, ParseException
   {
     final ParseResult result =
@@ -352,21 +394,20 @@ public class ExpressionParser {
       final UnaryOperator op = token.getUnaryOperator();
       if (op != null) {
         mScanner.next();
-        final ParseResult subResult =
+        final ParseResult subresult =
           parseResult(op.getPriority(), BinaryOperator.ASSOC_NONE);
-        final SimpleExpressionProxy subTerm = subResult.getExpression(); 
-        final int subTypes = subResult.getTypeMask();
-        final int resultTypes = op.getReturnTypes(subTypes);
-        if (resultTypes == 0) {
-          final String subTypesName = getTypeName(subTypes);
+        final ParseResult result = new UnaryExpressionResult(op, subresult);
+        final int types = result.getTypeMask();
+        if (types == 0) {
+          final SimpleExpressionProxy subterm =
+            subresult.createProxy(mFactory); 
+          final int subtypes = subresult.getTypeMask();
+          final String subtypesname = getTypeName(subtypes);
           throw createParseException
             ("Operator " + op.getName() +
-             " cannot be applied to argument '" + subTerm +
-             "' of type " + subTypesName, token);
+             " cannot be applied to argument '" + subterm +
+             "' of type " + subtypesname, token);
         }
-        final SimpleExpressionProxy resultTerm = 
-          mFactory.createUnaryExpressionProxy(op, subTerm);
-        final ParseResult result = new ParseResult(resultTypes, resultTerm);
         return parseResult(result, token, outerpri, outerassoc);
       } else {
         throw createUnexpectedTokenException(token);
@@ -379,9 +420,7 @@ public class ExpressionParser {
       } catch (final NumberFormatException exception) {
         throw createParseException("Integer constant out of range!", token);
       }
-      final SimpleExpressionProxy number =
-        mFactory.createIntConstantProxy(value);
-      final ParseResult result = new ParseResult(Operator.TYPE_INT, number);
+      final ParseResult result = new IntConstantResult(value);
       return parseResult(result, token, outerpri, outerassoc);
     case Token.SYMBOL:
       mScanner.next();
@@ -414,12 +453,13 @@ public class ExpressionParser {
       mScanner.next();
       final int innerassoc = op.getAssociativity();
       final ParseResult rhs = parseResult(innerpri, innerassoc);
-      final SimpleExpressionProxy lhsExpr = lhs.getExpression();
-      final SimpleExpressionProxy rhsExpr = rhs.getExpression();
-      final int lhsTypes = lhs.getTypeMask();
-      final int rhsTypes = rhs.getTypeMask();
-      final int resultTypes = op.getReturnTypes(lhsTypes, rhsTypes);
+      final ParseResult result = new BinaryExpressionResult(op, lhs, rhs);
+      final int resultTypes = result.getTypeMask();
       if (resultTypes == 0) {
+        final SimpleExpressionProxy lhsExpr = lhs.createProxy(mFactory);
+        final SimpleExpressionProxy rhsExpr = rhs.createProxy(mFactory);
+        final int lhsTypes = lhs.getTypeMask();
+        final int rhsTypes = rhs.getTypeMask();
         final String lhsTypesName = getTypeName(lhsTypes);
         final String rhsTypesName = getTypeName(rhsTypes);
         throw createParseException
@@ -427,9 +467,6 @@ public class ExpressionParser {
            " cannot be applied to '" + lhsExpr + "' of type " + lhsTypesName +
            " and '" + rhsExpr + "' of type " + rhsTypesName, lhstoken);
       }
-      final SimpleExpressionProxy resultExpr =
-        mFactory.createBinaryExpressionProxy(op, lhsExpr, rhsExpr);
-      final ParseResult result = new ParseResult(resultTypes, resultExpr);
       return parseResult(result, token, outerpri, outerassoc);      
     } else {
       return lhs;
@@ -439,36 +476,17 @@ public class ExpressionParser {
   private ParseResult parseIdentifierResult(final String name)
     throws IOException, ParseException
   {
+    final List<ParseResult> indexes = new LinkedList<ParseResult>();
     Token token = mScanner.peek(false);
-    if (token.getType() == Token.OPENSQ) {
-      final List<SimpleExpressionProxy> indexes =
-        new LinkedList<SimpleExpressionProxy>();
-      while (token.getType() == Token.OPENSQ) {
-        final Token indexToken = mScanner.next();
-        final ParseResult indexResult = parseResult(Token.CLOSESQ, token);
-        checkType(indexResult, Operator.TYPE_INT, indexToken);
-        final SimpleExpressionProxy index = indexResult.getExpression();
-        indexes.add(index);
-        token = mScanner.peek();
-      }
-      final IdentifierProxy expr =
-        mFactory.createIndexedIdentifierProxy(name, indexes);      
-      return new ParseResult(Operator.TYPE_NAME, expr);
-    } else {
-    	if(name.equals("true") || name.equals("TRUE")) {
-    		final BooleanConstantProxy expr =
-    			mFactory.createBooleanConstantProxy(true);
-    	      	return new ParseResult(Operator.TYPE_ANY, expr);
-    	} else if(name.equals("false") || name.equals("FALSE")) {
-    		final BooleanConstantProxy expr =
-    			mFactory.createBooleanConstantProxy(false);
-    	      	return new ParseResult(Operator.TYPE_ANY, expr);
-    	} else {
-    		final IdentifierProxy expr =
-    			mFactory.createSimpleIdentifierProxy(name);
-    	      	return new ParseResult(Operator.TYPE_ANY, expr);
-    	}
+    while (token.getType() == Token.OPENSQ) {
+      mScanner.next();
+      final Token indexToken = mScanner.peek();
+      final ParseResult index = parseResult(Token.CLOSESQ, token);
+      checkType(index, Operator.TYPE_INDEX, indexToken);
+      indexes.add(index);
+      token = mScanner.peek();
     }
+    return new IdentifierResult(name, indexes);
   }
 
   private ParseResult parseEnumSetResult()
@@ -495,9 +513,7 @@ public class ExpressionParser {
         token = mScanner.next();
       }
     }
-    final EnumSetExpressionProxy expr =
-      mFactory.createEnumSetExpressionProxy(items);
-    return new ParseResult(Operator.TYPE_RANGE, expr);
+    return new EnumSetExpressionResult(items);
   }
 
 
@@ -509,12 +525,12 @@ public class ExpressionParser {
     throws ParseException
   {
     if ((result.getTypeMask() & mask) == 0) {
-      final SimpleExpressionProxy expr = result.getExpression();
       final String typeName = getTypeName(mask);
       if (token == null) {
         throw createParseException
           ("Expression is not of type " + typeName + "!", null);
       } else {
+        final SimpleExpressionProxy expr = result.createProxy(mFactory);
         throw createParseException
           ("Subterm '" + expr + "' is not of type " + typeName + "!", token);
       }
@@ -538,6 +554,7 @@ public class ExpressionParser {
    * Gets a readable representation of a type mask.
    * @param  mask        A bit mask composed of the values
    *                     {@link Operator#TYPE_INT},
+   *                     {@link Operator#TYPE_BOOLEAN},
    *                     {@link Operator#TYPE_ATOM},
    *                     {@link Operator#TYPE_RANGE},
    *                     and {@link Operator#TYPE_NAME}.
@@ -551,6 +568,14 @@ public class ExpressionParser {
     if ((mask & Operator.TYPE_INT) != 0) {
       first = false;
       buffer.append(TYPENAME_INT);
+    }
+    if ((mask & Operator.TYPE_BOOLEAN) != 0) {
+      if (first) {
+	first = false;
+      } else {
+	buffer.append(" or ");
+      }
+      buffer.append(TYPENAME_BOOLEAN);
     }
     if ((mask & Operator.TYPE_ATOM) != 0) {
       if (first) {
@@ -581,44 +606,13 @@ public class ExpressionParser {
 
 
   //#########################################################################
-  //# Inner Class ParseResult
-  private static class ParseResult
-  {
-
-    //#######################################################################
-    //# Constructor
-    private ParseResult(final int typeMask, final SimpleExpressionProxy expr)
-    {
-      mTypeMask = typeMask;
-      mExpression = expr;
-    }
-
-    //#######################################################################
-    //# Constructor
-    private int getTypeMask()
-    {
-      return mTypeMask;
-    }
-
-    private SimpleExpressionProxy getExpression()
-    {
-      return mExpression;
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final int mTypeMask;
-    private final SimpleExpressionProxy mExpression;
-
-  }
-
-
-  //#########################################################################
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final ExpressionScanner mScanner;
+  private boolean mHasExplicitParentheses;
 
   private static final String TYPENAME_INT = "INTEGER";
+  private static final String TYPENAME_BOOLEAN = "BOOLEAN";
   private static final String TYPENAME_ATOM = "ATOM";
   private static final String TYPENAME_RANGE = "RANGE";
   private static final String TYPENAME_NAME = "NAME";

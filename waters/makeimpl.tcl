@@ -68,6 +68,7 @@ proc Java_ExtractFileInfo {srcname importMapName} {
   set incomment 0
   set optional 0
   set ref 0
+  set forcedgeo 0
   set short ""
   set dftvalue ""
   set instream [open $srcname r]
@@ -147,6 +148,9 @@ proc Java_ExtractFileInfo {srcname importMapName} {
 	} elseif {[regexp {^// +@ref} $line all]} {
 	  set ref 1
 	  set line ""
+	} elseif {[regexp {^// +@geometry} $line all]} {
+	  set forcedgeo 1
+	  set line ""
 	} elseif {[regexp {^// +@default ([a-zA-Z0-9_\.]+)} \
                        $line all dftvalue]} {
 	  set line ""
@@ -162,8 +166,9 @@ proc Java_ExtractFileInfo {srcname importMapName} {
 	    if {$optional} {
 	      set eqstatus "optional"
 	      set optional 0
-	    } elseif {[regexp {Geometry} $type all]} {
+	    } elseif {$forcedgeo || [regexp {Geometry} $type all]} {
 	      set eqstatus "geometry"
+              set forcedgeo 0
 	    } else {
 	      set eqstatus "required"
 	    }
@@ -409,18 +414,23 @@ proc Java_AddGeometryInformation {classMapName interfacename} {
   set attribs [Java_ClassGetAttributes $classinfo]
   foreach attrib $attribs {
     set type [Java_AttribGetDeclaredType $attrib ""]
-    set parts [split $type "<>, "]
-    foreach part $parts {
-      set subgeo [Java_AddGeometryInformation classMap $part]
-      if {$subgeo == 3} {
-	set geo 2
-	break
-      } elseif {$subgeo > 0} {
-        set geo 1
+    set eqstatus [Java_AttribGetEqualityStatus $attrib ""]
+    if {[string compare $eqstatus "geometry"] == 0} {
+      set geo 2
+    } else {
+      set parts [split $type "<>, "]
+      foreach part $parts {
+        set subgeo [Java_AddGeometryInformation classMap $part]
+        if {$subgeo == 3} {
+          set geo 2
+          break
+        } elseif {$subgeo > 0} {
+          set geo 1
+        }
       }
-    }
-    if {$geo == 2} {
-      break
+      if {$geo == 2} {
+        break
+      }
     }
   }
   set classinfo [Java_ClassSetGeometryStatus $classinfo $geo]
@@ -847,6 +857,11 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 	  }
 	  set type [Java_AttribGetDeclaredType $attrib $impl]
 	  set membername [Java_AttribGetMemberName $attrib $impl]
+          if {[info exists classMap($type)]} {
+            set equals "equalsByContents"
+          } else {
+            set equals "equals"
+          }
 	  if {[regexp {^[a-z]} $type all]} {
 	    Java_Write $stream $umap \
 		"        ($membername == downcast.$membername)"
@@ -865,17 +880,14 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 		"        EqualCollection.isEqualListByContents"
 	    Java_Write $stream $umap \
                 "          ($membername, downcast.$membername)"
-	  } elseif {![info exists classMap($type)]} {
-	    Java_Write $stream $umap \
-		"        $membername.equals(downcast.$membername)"
 	  } elseif {[string compare $eqstatus "required"] == 0} {
 	    Java_Write $stream $umap \
-		"        $membername.equalsByContents(downcast.$membername)"
+		"        $membername.${equals}(downcast.$membername)"
 	  } else {
 	    Java_WriteLn $stream $umap \
 		"        ($membername == null ? downcast.$membername == null :"
 	    Java_Write $stream $umap \
-		"         $membername.equalsByContents(downcast.$membername))"
+		"         $membername.${equals}(downcast.$membername))"
 	  }
 	  if {$i < $numattribs} {
 	    Java_WriteLn $stream $umap " &&"
@@ -914,6 +926,9 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
           if {[info exists classMap($type)]} {
             set typeinfo $classMap($type)
             set typegeo [Java_ClassGetGeometryStatus $typeinfo]
+            set equals "equalsWithGeometry"
+          } else {
+            set equals "equals"
           }
           if {[regexp {^[a-z]} $type all]} {
             Java_Write $stream $umap \
@@ -933,17 +948,14 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
                 "        EqualCollection.isEqualListWithGeometry"
             Java_Write $stream $umap \
                 "          ($membername, downcast.$membername)"
-          } elseif {![info exists classMap($type)]} {
-            Java_Write $stream $umap \
-                "        $membername.equals(downcast.$membername)"
           } elseif {[string compare $eqstatus "required"] == 0} {
             Java_Write $stream $umap \
-                "        $membername.equalsWithGeometry(downcast.$membername)"
+                "        $membername.${equals}(downcast.$membername)"
           } else {
             Java_WriteLn $stream $umap \
                 "        ($membername == null ? downcast.$membername == null :"
             Java_Write $stream $umap \
-              "         $membername.equalsWithGeometry(downcast.$membername))"
+                "         $membername.${equals}(downcast.$membername))"
           }
           if {$i < $numattribs} {
             Java_WriteLn $stream $umap " &&"
@@ -1980,9 +1992,12 @@ proc Java_AttribGetRefStatus {attrib impl} {
 proc Java_AttribGetDefaultValue {attrib impl} {
   set dftvalue [lindex $attrib 4]
   set emptytype [Java_AttribGetEmptyCollectionType $attrib $impl]
-  if {[string compare $dftvalue ""] != 0} {
+  set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
+  if {[string compare $dftvalue "none"] == 0} {
+    return ""
+  } elseif {[string compare $dftvalue ""] != 0} {
     return $dftvalue
-  } elseif {[regexp {GeometryProxy$} $emptytype all]} {
+  } elseif {[string compare $eqstatus "geometry"] == 0} {
     return "null"
   } elseif {[Java_IsCollectionType $emptytype] &&
             [regexp {^([A-Z][a-z]+)<([A-Za-z0-9_]+)>$} \

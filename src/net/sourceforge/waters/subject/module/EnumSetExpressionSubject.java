@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   EnumSetExpressionSubject
 //###########################################################################
-//# $Id: EnumSetExpressionSubject.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: EnumSetExpressionSubject.java,v 1.7 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -40,10 +40,13 @@ public final class EnumSetExpressionSubject
   //# Constructors
   /**
    * Creates a new enumerated range.
+   * @param plainText The original text of the new enumerated range, or <CODE>null</CODE>.
    * @param items The list of items of the new enumerated range, or <CODE>null</CODE> if empty.
    */
-  public EnumSetExpressionSubject(final Collection<? extends SimpleIdentifierProxy> items)
+  public EnumSetExpressionSubject(final String plainText,
+                                  final Collection<? extends SimpleIdentifierProxy> items)
   {
+    super(plainText);
     if (items == null) {
       mItems = new ArrayListSubject<SimpleIdentifierSubject>();
     } else {
@@ -56,11 +59,13 @@ public final class EnumSetExpressionSubject
   /**
    * Creates a new enumerated range using default values.
    * This constructor creates an enumerated range with
-   * an empty list of items.
+   * the original text set to <CODE>null</CODE>.
+   * @param items The list of items of the new enumerated range, or <CODE>null</CODE> if empty.
    */
-  public EnumSetExpressionSubject()
+  public EnumSetExpressionSubject(final Collection<? extends SimpleIdentifierProxy> items)
   {
-    this(emptySimpleIdentifierProxyList());
+    this(null,
+         items);
   }
 
 
@@ -89,11 +94,31 @@ public final class EnumSetExpressionSubject
     }
   }
 
+  public boolean equalsWithGeometry(final Proxy partner)
+  {
+    if (super.equalsWithGeometry(partner)) {
+      final EnumSetExpressionSubject downcast = (EnumSetExpressionSubject) partner;
+      return
+        EqualCollection.isEqualListWithGeometry
+          (mItems, downcast.mItems);
+    } else {
+      return false;
+    }
+  }
+
   public int hashCodeByContents()
   {
     int result = super.hashCodeByContents();
     result *= 5;
     result += EqualCollection.getListHashCodeByContents(mItems);
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeWithGeometry();
+    result *= 5;
+    result += EqualCollection.getListHashCodeWithGeometry(mItems);
     return result;
   }
 
@@ -125,14 +150,6 @@ public final class EnumSetExpressionSubject
   public ListSubject<SimpleIdentifierSubject> getItemsModifiable()
   {
     return mItems;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static List<SimpleIdentifierProxy> emptySimpleIdentifierProxyList()
-  {
-    return Collections.emptyList();
   }
 
 

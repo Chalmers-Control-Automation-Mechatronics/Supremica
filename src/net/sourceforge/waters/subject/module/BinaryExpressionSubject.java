@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   BinaryExpressionSubject
 //###########################################################################
-//# $Id: BinaryExpressionSubject.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: BinaryExpressionSubject.java,v 1.7 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -34,6 +34,28 @@ public final class BinaryExpressionSubject
   //# Constructors
   /**
    * Creates a new binary expression.
+   * @param plainText The original text of the new binary expression, or <CODE>null</CODE>.
+   * @param operator The operator of the new binary expression.
+   * @param left The left subterm of the new binary expression.
+   * @param right The right subterm of the new binary expression.
+   */
+  public BinaryExpressionSubject(final String plainText,
+                                 final BinaryOperator operator,
+                                 final SimpleExpressionProxy left,
+                                 final SimpleExpressionProxy right)
+  {
+    super(plainText);
+    mOperator = operator;
+    mLeft = (SimpleExpressionSubject) left;
+    mLeft.setParent(this);
+    mRight = (SimpleExpressionSubject) right;
+    mRight.setParent(this);
+  }
+
+  /**
+   * Creates a new binary expression using default values.
+   * This constructor creates a binary expression with
+   * the original text set to <CODE>null</CODE>.
    * @param operator The operator of the new binary expression.
    * @param left The left subterm of the new binary expression.
    * @param right The right subterm of the new binary expression.
@@ -42,11 +64,10 @@ public final class BinaryExpressionSubject
                                  final SimpleExpressionProxy left,
                                  final SimpleExpressionProxy right)
   {
-    mOperator = operator;
-    mLeft = (SimpleExpressionSubject) left;
-    mLeft.setParent(this);
-    mRight = (SimpleExpressionSubject) right;
-    mRight.setParent(this);
+    this(null,
+         operator,
+         left,
+         right);
   }
 
 
@@ -78,6 +99,19 @@ public final class BinaryExpressionSubject
     }
   }
 
+  public boolean equalsWithGeometry(final Proxy partner)
+  {
+    if (super.equalsWithGeometry(partner)) {
+      final BinaryExpressionSubject downcast = (BinaryExpressionSubject) partner;
+      return
+        mOperator.equals(downcast.mOperator) &&
+        mLeft.equalsWithGeometry(downcast.mLeft) &&
+        mRight.equalsWithGeometry(downcast.mRight);
+    } else {
+      return false;
+    }
+  }
+
   public int hashCodeByContents()
   {
     int result = super.hashCodeByContents();
@@ -87,6 +121,18 @@ public final class BinaryExpressionSubject
     result += mLeft.hashCodeByContents();
     result *= 5;
     result += mRight.hashCodeByContents();
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeWithGeometry();
+    result *= 5;
+    result += mOperator.hashCode();
+    result *= 5;
+    result += mLeft.hashCodeWithGeometry();
+    result *= 5;
+    result += mRight.hashCodeWithGeometry();
     return result;
   }
 

@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   Token
 //###########################################################################
-//# $Id: Token.java,v 1.3 2005-11-03 01:24:16 robi Exp $
+//# $Id: Token.java,v 1.4 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -63,6 +63,15 @@ class Token {
   int getPosition()
   {
     return mPosition;
+  }
+
+
+  //#########################################################################
+  //# Overides for Baseclass java.lang.Object
+  public String toString()
+  {
+    return
+      "{Token '" + mText + "'; type=" + mType + "; pos=" + mPosition + "}";
   }
 
 

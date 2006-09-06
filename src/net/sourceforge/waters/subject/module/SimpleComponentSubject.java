@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SimpleComponentSubject
 //###########################################################################
-//# $Id: SimpleComponentSubject.java,v 1.7 2006-07-20 02:28:37 robi Exp $
+//# $Id: SimpleComponentSubject.java,v 1.8 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -118,7 +118,7 @@ public final class SimpleComponentSubject
 
   public boolean equalsWithGeometry(final Proxy partner)
   {
-    if (super.equalsByContents(partner)) {
+    if (super.equalsWithGeometry(partner)) {
       final SimpleComponentSubject downcast = (SimpleComponentSubject) partner;
       return
         mKind.equals(downcast.mKind) &&
@@ -144,7 +144,7 @@ public final class SimpleComponentSubject
 
   public int hashCodeWithGeometry()
   {
-    int result = super.hashCodeByContents();
+    int result = super.hashCodeWithGeometry();
     result *= 5;
     result += mKind.hashCode();
     result *= 5;

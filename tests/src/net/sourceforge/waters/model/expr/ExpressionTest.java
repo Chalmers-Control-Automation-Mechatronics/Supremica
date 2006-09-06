@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ExpressionTest
 //###########################################################################
-//# $Id: ExpressionTest.java,v 1.5 2006-07-20 02:28:38 robi Exp $
+//# $Id: ExpressionTest.java,v 1.6 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 
@@ -232,21 +232,21 @@ public class ExpressionTest extends TestCase
   //# Unsuccessful Parse Tests
   public void testError_event_1to2()
   {
-    testExpression("event[1..2]", "'1..2'");
+    testExpression("event[1..2]", "1..2");
   }
 
   public void testError_event_1_plus_event_2()
   {
-    testExpression("event[1] + event[2]", "'event[1]'");
+    testExpression("event[1] + event[2]", "event[1]");
   }
 
   public void testError_eq_s_multi()
   {
-    testExpression("=s", "'='");
-    testExpression("=s", "'='");
-    testExpression("=s", "'='");
-    testExpression("=s", "'='");
-    testExpression("=s", "'='");
+    testExpression("=s", "=");
+    testExpression("=s", "=");
+    testExpression("=s", "=");
+    testExpression("=s", "=");
+    testExpression("=s", "=");
   }
 
 
@@ -259,7 +259,10 @@ public class ExpressionTest extends TestCase
   {
     try {
       final SimpleExpressionProxy parsed = mParser.parse(text, mask);
-      assertTrue("Unexpected result!", parsed.equalsByContents(expr));
+      assertTrue("Unexpected result! - expected: <" + expr +
+                 ">, but got <" + parsed + ">!",
+                 parsed.equalsByContents(expr));
+      assertEquals("Wrong plain text!", text, parsed.toString());
     } catch (final ParseException exception) {
       final int pos = exception.getErrorOffset();
       System.out.println(text);
@@ -278,9 +281,18 @@ public class ExpressionTest extends TestCase
       fail("Expected ParseException not caught!");
     } catch (final ParseException exception) {
       final String msg = exception.getMessage();
+      final String eculprit = "'" + culprit + "'";
       assertTrue("Caught ParseException <" + msg +
                  "> does not mention culprit <" + culprit + ">!",
-                 msg.indexOf(culprit) >= 0);
+                 msg.indexOf(eculprit) >= 0);
+      final int pos = exception.getErrorOffset();
+      final int len = culprit.length();
+      final String substring = text.substring(pos, pos + len);
+      System.out.println(msg);
+      assertEquals("Indicated error position " + pos +
+                   " in parsed string '" + text +
+                   "' does not contain expected culprit '" + culprit + "'!",
+                   culprit, substring);
     }
   }
 

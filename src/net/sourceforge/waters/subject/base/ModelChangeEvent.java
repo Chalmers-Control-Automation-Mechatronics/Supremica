@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   ModelChangeEvent
 //###########################################################################
-//# $Id: ModelChangeEvent.java,v 1.3 2006-02-16 04:06:18 robi Exp $
+//# $Id: ModelChangeEvent.java,v 1.4 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -109,7 +109,7 @@ public class ModelChangeEvent extends EventObject
    *         and the new geometry information as value.
    */
   public static ModelChangeEvent createGeometryChanged
-    (final Subject item, final GeometrySubject geo)
+    (final Subject item, final Object geo)
   {
     return new ModelChangeEvent(item, GEOMETRY_CHANGED, geo);
   }

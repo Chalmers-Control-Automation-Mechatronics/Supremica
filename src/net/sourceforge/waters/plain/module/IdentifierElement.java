@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   IdentifierElement
 //###########################################################################
-//# $Id: IdentifierElement.java,v 1.5 2006-07-20 02:28:37 robi Exp $
+//# $Id: IdentifierElement.java,v 1.6 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -28,11 +28,26 @@ public abstract class IdentifierElement
   //# Constructors
   /**
    * Creates a new identifier.
+   * @param plainText The original text of the new identifier, or <CODE>null</CODE>.
+   * @param name The name of the new identifier.
+   */
+  protected IdentifierElement(final String plainText,
+                              final String name)
+  {
+    super(plainText);
+    mName = name;
+  }
+
+  /**
+   * Creates a new identifier using default values.
+   * This constructor creates an identifier with
+   * the original text set to <CODE>null</CODE>.
    * @param name The name of the new identifier.
    */
   protected IdentifierElement(final String name)
   {
-    mName = name;
+    this(null,
+         name);
   }
 
 
@@ -57,9 +72,28 @@ public abstract class IdentifierElement
     }
   }
 
+  public boolean equalsWithGeometry(final Proxy partner)
+  {
+    if (super.equalsWithGeometry(partner)) {
+      final IdentifierElement downcast = (IdentifierElement) partner;
+      return
+        mName.equals(downcast.mName);
+    } else {
+      return false;
+    }
+  }
+
   public int hashCodeByContents()
   {
     int result = super.hashCodeByContents();
+    result *= 5;
+    result += mName.hashCode();
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeWithGeometry();
     result *= 5;
     result += mName.hashCode();
     return result;

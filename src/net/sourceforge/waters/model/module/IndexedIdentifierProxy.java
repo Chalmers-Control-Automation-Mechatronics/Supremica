@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   IndexedIdentifierProxy
 //###########################################################################
-//# $Id: IndexedIdentifierProxy.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: IndexedIdentifierProxy.java,v 1.3 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -39,6 +39,7 @@ public interface IndexedIdentifierProxy extends IdentifierProxy {
    *         indexes into the array identified by the identifier's name.
    *         Each element is of type {@link SimpleExpressionProxy}.
    */
+  // @default none
   public List<SimpleExpressionProxy> getIndexes();
 
 }

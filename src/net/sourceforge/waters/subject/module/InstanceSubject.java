@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   InstanceSubject
 //###########################################################################
-//# $Id: InstanceSubject.java,v 1.7 2006-07-20 02:28:37 robi Exp $
+//# $Id: InstanceSubject.java,v 1.8 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -103,6 +103,19 @@ public final class InstanceSubject
     }
   }
 
+  public boolean equalsWithGeometry(final Proxy partner)
+  {
+    if (super.equalsWithGeometry(partner)) {
+      final InstanceSubject downcast = (InstanceSubject) partner;
+      return
+        mModuleName.equals(downcast.mModuleName) &&
+        EqualCollection.isEqualListWithGeometry
+          (mBindingList, downcast.mBindingList);
+    } else {
+      return false;
+    }
+  }
+
   public int hashCodeByContents()
   {
     int result = super.hashCodeByContents();
@@ -110,6 +123,16 @@ public final class InstanceSubject
     result += mModuleName.hashCode();
     result *= 5;
     result += EqualCollection.getListHashCodeByContents(mBindingList);
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeWithGeometry();
+    result *= 5;
+    result += mModuleName.hashCode();
+    result *= 5;
+    result += EqualCollection.getListHashCodeWithGeometry(mBindingList);
     return result;
   }
 

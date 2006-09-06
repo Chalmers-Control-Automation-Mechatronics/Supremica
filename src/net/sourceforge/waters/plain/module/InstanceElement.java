@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   InstanceElement
 //###########################################################################
-//# $Id: InstanceElement.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: InstanceElement.java,v 1.7 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -98,6 +98,19 @@ public final class InstanceElement
     }
   }
 
+  public boolean equalsWithGeometry(final Proxy partner)
+  {
+    if (super.equalsWithGeometry(partner)) {
+      final InstanceElement downcast = (InstanceElement) partner;
+      return
+        mModuleName.equals(downcast.mModuleName) &&
+        EqualCollection.isEqualListWithGeometry
+          (mBindingList, downcast.mBindingList);
+    } else {
+      return false;
+    }
+  }
+
   public int hashCodeByContents()
   {
     int result = super.hashCodeByContents();
@@ -105,6 +118,16 @@ public final class InstanceElement
     result += mModuleName.hashCode();
     result *= 5;
     result += EqualCollection.getListHashCodeByContents(mBindingList);
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeWithGeometry();
+    result *= 5;
+    result += mModuleName.hashCode();
+    result *= 5;
+    result += EqualCollection.getListHashCodeWithGeometry(mBindingList);
     return result;
   }
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   AliasElement
 //###########################################################################
-//# $Id: AliasElement.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: AliasElement.java,v 1.7 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -65,11 +65,30 @@ public final class AliasElement
     }
   }
 
+  public boolean equalsWithGeometry(final Proxy partner)
+  {
+    if (super.equalsWithGeometry(partner)) {
+      final AliasElement downcast = (AliasElement) partner;
+      return
+        mExpression.equalsWithGeometry(downcast.mExpression);
+    } else {
+      return false;
+    }
+  }
+
   public int hashCodeByContents()
   {
     int result = super.hashCodeByContents();
     result *= 5;
     result += mExpression.hashCodeByContents();
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeWithGeometry();
+    result *= 5;
+    result += mExpression.hashCodeWithGeometry();
     return result;
   }
 

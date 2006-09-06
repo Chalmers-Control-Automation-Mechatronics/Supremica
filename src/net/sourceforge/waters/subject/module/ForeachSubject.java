@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ForeachSubject
 //###########################################################################
-//# $Id: ForeachSubject.java,v 1.7 2006-07-20 02:28:37 robi Exp $
+//# $Id: ForeachSubject.java,v 1.8 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -118,6 +118,21 @@ public abstract class ForeachSubject
     }
   }
 
+  public boolean equalsWithGeometry(final Proxy partner)
+  {
+    if (super.equalsByContents(partner)) {
+      final ForeachSubject downcast = (ForeachSubject) partner;
+      return
+        mRange.equalsWithGeometry(downcast.mRange) &&
+        (mGuard == null ? downcast.mGuard == null :
+         mGuard.equalsWithGeometry(downcast.mGuard)) &&
+        EqualCollection.isEqualListWithGeometry
+          (mBody, downcast.mBody);
+    } else {
+      return false;
+    }
+  }
+
   public int hashCodeByContents()
   {
     int result = super.hashCodeByContents();
@@ -129,6 +144,20 @@ public abstract class ForeachSubject
     }
     result *= 5;
     result += EqualCollection.getListHashCodeByContents(mBody);
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mRange.hashCodeWithGeometry();
+    result *= 5;
+    if (mGuard != null) {
+      result += mGuard.hashCodeWithGeometry();
+    }
+    result *= 5;
+    result += EqualCollection.getListHashCodeWithGeometry(mBody);
     return result;
   }
 

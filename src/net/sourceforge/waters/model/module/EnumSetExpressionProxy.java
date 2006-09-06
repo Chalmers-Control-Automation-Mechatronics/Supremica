@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   EnumSetExpressionProxy
 //###########################################################################
-//# $Id: EnumSetExpressionProxy.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: EnumSetExpressionProxy.java,v 1.3 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -39,6 +39,7 @@ public interface EnumSetExpressionProxy extends SimpleExpressionProxy {
    * Gets the list of items in this enumeration.
    * @return An unmodifiable list of enumerated items.
    */
+  // @default none
   public List<SimpleIdentifierProxy> getItems();
 
 }

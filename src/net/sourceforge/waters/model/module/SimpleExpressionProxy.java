@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   SimpleExpressionProxy
 //###########################################################################
-//# $Id: SimpleExpressionProxy.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: SimpleExpressionProxy.java,v 1.3 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -24,5 +24,16 @@ package net.sourceforge.waters.model.module;
 public interface SimpleExpressionProxy
   extends ExpressionProxy
 {
+
+  /**
+   * Gets the original text of this expression.
+   * If present, this string contains the original text entered by
+   * the user, including all redundant parentheses and whitespace exactly
+   * as it was typed.
+   * @return The original text, or <CODE>null</CODE> to indicate that no
+   *         original text is available.
+   */
+  // @geometry
+  public String getPlainText();
 
 }

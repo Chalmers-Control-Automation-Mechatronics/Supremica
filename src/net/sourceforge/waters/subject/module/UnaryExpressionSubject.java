@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   UnaryExpressionSubject
 //###########################################################################
-//# $Id: UnaryExpressionSubject.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: UnaryExpressionSubject.java,v 1.7 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -34,15 +34,33 @@ public final class UnaryExpressionSubject
   //# Constructors
   /**
    * Creates a new unary expression.
+   * @param plainText The original text of the new unary expression, or <CODE>null</CODE>.
+   * @param operator The operator of the new unary expression.
+   * @param subTerm The subterm of the new unary expression.
+   */
+  public UnaryExpressionSubject(final String plainText,
+                                final UnaryOperator operator,
+                                final SimpleExpressionProxy subTerm)
+  {
+    super(plainText);
+    mOperator = operator;
+    mSubTerm = (SimpleExpressionSubject) subTerm;
+    mSubTerm.setParent(this);
+  }
+
+  /**
+   * Creates a new unary expression using default values.
+   * This constructor creates an unary expression with
+   * the original text set to <CODE>null</CODE>.
    * @param operator The operator of the new unary expression.
    * @param subTerm The subterm of the new unary expression.
    */
   public UnaryExpressionSubject(final UnaryOperator operator,
                                 final SimpleExpressionProxy subTerm)
   {
-    mOperator = operator;
-    mSubTerm = (SimpleExpressionSubject) subTerm;
-    mSubTerm.setParent(this);
+    this(null,
+         operator,
+         subTerm);
   }
 
 
@@ -71,6 +89,18 @@ public final class UnaryExpressionSubject
     }
   }
 
+  public boolean equalsWithGeometry(final Proxy partner)
+  {
+    if (super.equalsWithGeometry(partner)) {
+      final UnaryExpressionSubject downcast = (UnaryExpressionSubject) partner;
+      return
+        mOperator.equals(downcast.mOperator) &&
+        mSubTerm.equalsWithGeometry(downcast.mSubTerm);
+    } else {
+      return false;
+    }
+  }
+
   public int hashCodeByContents()
   {
     int result = super.hashCodeByContents();
@@ -78,6 +108,16 @@ public final class UnaryExpressionSubject
     result += mOperator.hashCode();
     result *= 5;
     result += mSubTerm.hashCodeByContents();
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeWithGeometry();
+    result *= 5;
+    result += mOperator.hashCode();
+    result *= 5;
+    result += mSubTerm.hashCodeWithGeometry();
     return result;
   }
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SimpleIdentifierSubject
 //###########################################################################
-//# $Id: SimpleIdentifierSubject.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: SimpleIdentifierSubject.java,v 1.7 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -30,11 +30,25 @@ public final class SimpleIdentifierSubject
   //# Constructors
   /**
    * Creates a new simple identifier.
+   * @param plainText The original text of the new simple identifier, or <CODE>null</CODE>.
+   * @param name The name of the new simple identifier.
+   */
+  public SimpleIdentifierSubject(final String plainText,
+                                 final String name)
+  {
+    super(plainText, name);
+  }
+
+  /**
+   * Creates a new simple identifier using default values.
+   * This constructor creates a simple identifier with
+   * the original text set to <CODE>null</CODE>.
    * @param name The name of the new simple identifier.
    */
   public SimpleIdentifierSubject(final String name)
   {
-    super(name);
+    this(null,
+         name);
   }
 
 

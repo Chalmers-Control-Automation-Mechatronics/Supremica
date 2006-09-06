@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   IdentifiedElement
 //###########################################################################
-//# $Id: IdentifiedElement.java,v 1.5 2006-07-20 02:28:37 robi Exp $
+//# $Id: IdentifiedElement.java,v 1.6 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -59,11 +59,30 @@ public abstract class IdentifiedElement
     }
   }
 
+  public boolean equalsWithGeometry(final Proxy partner)
+  {
+    if (super.equalsWithGeometry(partner)) {
+      final IdentifiedElement downcast = (IdentifiedElement) partner;
+      return
+        mIdentifier.equalsWithGeometry(downcast.mIdentifier);
+    } else {
+      return false;
+    }
+  }
+
   public int hashCodeByContents()
   {
     int result = super.hashCodeByContents();
     result *= 5;
     result += mIdentifier.hashCodeByContents();
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeWithGeometry();
+    result *= 5;
+    result += mIdentifier.hashCodeWithGeometry();
     return result;
   }
 

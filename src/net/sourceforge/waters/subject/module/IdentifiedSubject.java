@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   IdentifiedSubject
 //###########################################################################
-//# $Id: IdentifiedSubject.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: IdentifiedSubject.java,v 1.7 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -64,11 +64,30 @@ public abstract class IdentifiedSubject
     }
   }
 
+  public boolean equalsWithGeometry(final Proxy partner)
+  {
+    if (super.equalsWithGeometry(partner)) {
+      final IdentifiedSubject downcast = (IdentifiedSubject) partner;
+      return
+        mIdentifier.equalsWithGeometry(downcast.mIdentifier);
+    } else {
+      return false;
+    }
+  }
+
   public int hashCodeByContents()
   {
     int result = super.hashCodeByContents();
     result *= 5;
     result += mIdentifier.hashCodeByContents();
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeWithGeometry();
+    result *= 5;
+    result += mIdentifier.hashCodeWithGeometry();
     return result;
   }
 

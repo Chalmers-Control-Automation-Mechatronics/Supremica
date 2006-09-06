@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   GuardActionBlockElement
 //###########################################################################
-//# $Id: GuardActionBlockElement.java,v 1.5 2006-07-20 02:28:37 robi Exp $
+//# $Id: GuardActionBlockElement.java,v 1.6 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -76,8 +76,10 @@ public final class GuardActionBlockElement
     if (super.equalsByContents(partner)) {
       final GuardActionBlockElement downcast = (GuardActionBlockElement) partner;
       return
-        mGuard.equals(downcast.mGuard) &&
-        mAction.equals(downcast.mAction);
+        (mGuard == null ? downcast.mGuard == null :
+         mGuard.equals(downcast.mGuard)) &&
+        (mAction == null ? downcast.mAction == null :
+         mAction.equals(downcast.mAction));
     } else {
       return false;
     }
@@ -88,8 +90,10 @@ public final class GuardActionBlockElement
     if (super.equalsByContents(partner)) {
       final GuardActionBlockElement downcast = (GuardActionBlockElement) partner;
       return
-        mGuard.equals(downcast.mGuard) &&
-        mAction.equals(downcast.mAction) &&
+        (mGuard == null ? downcast.mGuard == null :
+         mGuard.equals(downcast.mGuard)) &&
+        (mAction == null ? downcast.mAction == null :
+         mAction.equals(downcast.mAction)) &&
         (mGeometry == null ? downcast.mGeometry == null :
          mGeometry.equalsWithGeometry(downcast.mGeometry));
     } else {

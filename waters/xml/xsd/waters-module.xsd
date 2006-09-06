@@ -772,7 +772,9 @@
 
 <xs:complexType name="SimpleExpressionType">
   <xs:complexContent>
-    <xs:extension base="M:ExpressionType"/>
+    <xs:extension base="M:ExpressionType">
+      <xs:attribute name="Text" type="xs:string"/>
+    </xs:extension>
   </xs:complexContent>
 </xs:complexType>
 

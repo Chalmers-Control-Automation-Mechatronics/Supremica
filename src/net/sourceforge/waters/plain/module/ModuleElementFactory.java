@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   ModuleElementFactory
 //###########################################################################
-//# $Id: ModuleElementFactory.java,v 1.10 2006-08-01 04:14:47 robi Exp $
+//# $Id: ModuleElementFactory.java,v 1.11 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -75,6 +75,27 @@ public class ModuleElementFactory
 
   /**
    * Creates a new binary expression.
+   * @param plainText The original text of the new binary expression, or <CODE>null</CODE>.
+   * @param operator The operator of the new binary expression.
+   * @param left The left subterm of the new binary expression.
+   * @param right The right subterm of the new binary expression.
+   */
+  public BinaryExpressionElement createBinaryExpressionProxy
+      (final String plainText,
+       final BinaryOperator operator,
+       final SimpleExpressionProxy left,
+       final SimpleExpressionProxy right)
+  {
+    return new BinaryExpressionElement(plainText,
+                                       operator,
+                                       left,
+                                       right);
+  }
+
+  /**
+   * Creates a new binary expression using default values.
+   * This method creates a binary expression with
+   * the original text set to <CODE>null</CODE>.
    * @param operator The operator of the new binary expression.
    * @param left The left subterm of the new binary expression.
    * @param right The right subterm of the new binary expression.
@@ -91,6 +112,21 @@ public class ModuleElementFactory
 
   /**
    * Creates a new boolean constant.
+   * @param plainText The original text of the new boolean constant, or <CODE>null</CODE>.
+   * @param value The boolean value of the new boolean constant.
+   */
+  public BooleanConstantElement createBooleanConstantProxy
+      (final String plainText,
+       final boolean value)
+  {
+    return new BooleanConstantElement(plainText,
+                                      value);
+  }
+
+  /**
+   * Creates a new boolean constant using default values.
+   * This method creates a boolean constant with
+   * the original text set to <CODE>null</CODE>.
    * @param value The boolean value of the new boolean constant.
    */
   public BooleanConstantElement createBooleanConstantProxy
@@ -180,22 +216,27 @@ public class ModuleElementFactory
 
   /**
    * Creates a new enumerated range.
+   * @param plainText The original text of the new enumerated range, or <CODE>null</CODE>.
+   * @param items The list of items of the new enumerated range, or <CODE>null</CODE> if empty.
+   */
+  public EnumSetExpressionElement createEnumSetExpressionProxy
+      (final String plainText,
+       final Collection<? extends SimpleIdentifierProxy> items)
+  {
+    return new EnumSetExpressionElement(plainText,
+                                        items);
+  }
+
+  /**
+   * Creates a new enumerated range using default values.
+   * This method creates an enumerated range with
+   * the original text set to <CODE>null</CODE>.
    * @param items The list of items of the new enumerated range, or <CODE>null</CODE> if empty.
    */
   public EnumSetExpressionElement createEnumSetExpressionProxy
       (final Collection<? extends SimpleIdentifierProxy> items)
   {
     return new EnumSetExpressionElement(items);
-  }
-
-  /**
-   * Creates a new enumerated range using default values.
-   * This method creates an enumerated range with
-   * an empty list of items.
-   */
-  public EnumSetExpressionElement createEnumSetExpressionProxy()
-  {
-    return new EnumSetExpressionElement();
   }
 
   /**
@@ -471,6 +512,24 @@ public class ModuleElementFactory
 
   /**
    * Creates a new indexed identifier.
+   * @param plainText The original text of the new indexed identifier, or <CODE>null</CODE>.
+   * @param name The name of the new indexed identifier.
+   * @param indexes The list of array indexes of the new indexed identifier, or <CODE>null</CODE> if empty.
+   */
+  public IndexedIdentifierElement createIndexedIdentifierProxy
+      (final String plainText,
+       final String name,
+       final Collection<? extends SimpleExpressionProxy> indexes)
+  {
+    return new IndexedIdentifierElement(plainText,
+                                        name,
+                                        indexes);
+  }
+
+  /**
+   * Creates a new indexed identifier using default values.
+   * This method creates an indexed identifier with
+   * the original text set to <CODE>null</CODE>.
    * @param name The name of the new indexed identifier.
    * @param indexes The list of array indexes of the new indexed identifier, or <CODE>null</CODE> if empty.
    */
@@ -480,18 +539,6 @@ public class ModuleElementFactory
   {
     return new IndexedIdentifierElement(name,
                                         indexes);
-  }
-
-  /**
-   * Creates a new indexed identifier using default values.
-   * This method creates an indexed identifier with
-   * an empty list of array indexes.
-   * @param name The name of the new indexed identifier.
-   */
-  public IndexedIdentifierElement createIndexedIdentifierProxy
-      (final String name)
-  {
-    return new IndexedIdentifierElement(name);
   }
 
   /**
@@ -527,6 +574,21 @@ public class ModuleElementFactory
 
   /**
    * Creates a new integer constant.
+   * @param plainText The original text of the new integer constant, or <CODE>null</CODE>.
+   * @param value The integer value of the new integer constant.
+   */
+  public IntConstantElement createIntConstantProxy
+      (final String plainText,
+       final int value)
+  {
+    return new IntConstantElement(plainText,
+                                  value);
+  }
+
+  /**
+   * Creates a new integer constant using default values.
+   * This method creates an integer constant with
+   * the original text set to <CODE>null</CODE>.
    * @param value The integer value of the new integer constant.
    */
   public IntConstantElement createIntConstantProxy
@@ -775,6 +837,21 @@ public class ModuleElementFactory
 
   /**
    * Creates a new simple identifier.
+   * @param plainText The original text of the new simple identifier, or <CODE>null</CODE>.
+   * @param name The name of the new simple identifier.
+   */
+  public SimpleIdentifierElement createSimpleIdentifierProxy
+      (final String plainText,
+       final String name)
+  {
+    return new SimpleIdentifierElement(plainText,
+                                       name);
+  }
+
+  /**
+   * Creates a new simple identifier using default values.
+   * This method creates a simple identifier with
+   * the original text set to <CODE>null</CODE>.
    * @param name The name of the new simple identifier.
    */
   public SimpleIdentifierElement createSimpleIdentifierProxy
@@ -852,6 +929,24 @@ public class ModuleElementFactory
 
   /**
    * Creates a new unary expression.
+   * @param plainText The original text of the new unary expression, or <CODE>null</CODE>.
+   * @param operator The operator of the new unary expression.
+   * @param subTerm The subterm of the new unary expression.
+   */
+  public UnaryExpressionElement createUnaryExpressionProxy
+      (final String plainText,
+       final UnaryOperator operator,
+       final SimpleExpressionProxy subTerm)
+  {
+    return new UnaryExpressionElement(plainText,
+                                      operator,
+                                      subTerm);
+  }
+
+  /**
+   * Creates a new unary expression using default values.
+   * This method creates an unary expression with
+   * the original text set to <CODE>null</CODE>.
    * @param operator The operator of the new unary expression.
    * @param subTerm The subterm of the new unary expression.
    */

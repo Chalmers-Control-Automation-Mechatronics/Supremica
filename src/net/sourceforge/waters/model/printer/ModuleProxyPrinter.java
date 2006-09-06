@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ModuleProxyPrinter
 //###########################################################################
-//# $Id: ModuleProxyPrinter.java,v 1.5 2006-05-24 12:01:56 martin Exp $
+//# $Id: ModuleProxyPrinter.java,v 1.6 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;
@@ -137,31 +137,36 @@ public class ModuleProxyPrinter
       (final BinaryExpressionProxy proxy)
     throws VisitorException
   {
-    final int savedPriority = mPriority; 
-    final boolean savedAssocBraces = mAssocBraces;
-    try {
-      final BinaryOperator operator = proxy.getOperator();
-      mPriority = operator.getPriority();
-      final int associativity = operator.getAssociativity();
-      final boolean needBraces =
-        (mPriority < savedPriority) ||
-        (mPriority == savedPriority) && savedAssocBraces;
-      if (needBraces) {
-        print('(');
+    final String text = proxy.getPlainText();
+    if (text != null) {
+      print(text);
+    } else {
+      final int savedPriority = mPriority; 
+      final boolean savedAssocBraces = mAssocBraces;
+      try {
+        final BinaryOperator operator = proxy.getOperator();
+        mPriority = operator.getPriority();
+        final int associativity = operator.getAssociativity();
+        final boolean needBraces =
+          (mPriority < savedPriority) ||
+          (mPriority == savedPriority) && savedAssocBraces;
+        if (needBraces) {
+          print('(');
+        }
+        mAssocBraces = (associativity == BinaryOperator.ASSOC_RIGHT);
+        final SimpleExpressionProxy left = proxy.getLeft();
+        left.acceptVisitor(this);
+        print(operator.getName());
+        mAssocBraces = (associativity == BinaryOperator.ASSOC_LEFT);
+        final SimpleExpressionProxy right = proxy.getRight();
+        right.acceptVisitor(this);
+        if (needBraces) {
+          print(')');
+        }
+      } finally {
+        mPriority = savedPriority;
+        mAssocBraces = savedAssocBraces;
       }
-      mAssocBraces = (associativity == BinaryOperator.ASSOC_RIGHT);
-      final SimpleExpressionProxy left = proxy.getLeft();
-      left.acceptVisitor(this);
-      print(operator.getName());
-      mAssocBraces = (associativity == BinaryOperator.ASSOC_LEFT);
-      final SimpleExpressionProxy right = proxy.getRight();
-      right.acceptVisitor(this);
-      if (needBraces) {
-        print(')');
-      }
-    } finally {
-      mPriority = savedPriority;
-      mAssocBraces = savedAssocBraces;
     }
     return null;
   }
@@ -206,17 +211,22 @@ public class ModuleProxyPrinter
       (final EnumSetExpressionProxy proxy)
     throws VisitorException
   {
-    print('{');
-    final List<SimpleIdentifierProxy> items = proxy.getItems();
-    final Iterator<SimpleIdentifierProxy> iter = items.iterator();
-    while (iter.hasNext()) {
-      final SimpleIdentifierProxy item = iter.next();
-      visitSimpleIdentifierProxy(item);
-      if (iter.hasNext()) {
-        print(", ");
+    final String text = proxy.getPlainText();
+    if (text != null) {
+      print(text);
+    } else {
+      print('{');
+      final List<SimpleIdentifierProxy> items = proxy.getItems();
+      final Iterator<SimpleIdentifierProxy> iter = items.iterator();
+      while (iter.hasNext()) {
+        final SimpleIdentifierProxy item = iter.next();
+        visitSimpleIdentifierProxy(item);
+        if (iter.hasNext()) {
+          print(", ");
+        }
       }
+      print('}');
     }
-    print('}');
     return null;
   }
 
@@ -351,23 +361,29 @@ public class ModuleProxyPrinter
       (final IndexedIdentifierProxy proxy)
     throws VisitorException
   {
-    final int savedPriority = mPriority; 
-    final boolean savedAssocBraces = mAssocBraces;
-    try {
-      visitIdentifierProxy(proxy);
-      mPriority = OperatorTable.PRIORITY_OUTER;
-      mAssocBraces = false;
-      final List<SimpleExpressionProxy> indexes = proxy.getIndexes();
-      for (final SimpleExpressionProxy expr : indexes) {
-        print('[');
-        expr.acceptVisitor(this);
-        print(']');
+    final String text = proxy.getPlainText();
+    if (text != null) {
+      print(text);
+    } else {
+      final int savedPriority = mPriority; 
+      final boolean savedAssocBraces = mAssocBraces;
+      try {
+        visitIdentifierProxy(proxy);
+        mPriority = OperatorTable.PRIORITY_OUTER;
+        mAssocBraces = false;
+        final List<SimpleExpressionProxy> indexes = proxy.getIndexes();
+        for (final SimpleExpressionProxy expr : indexes) {
+          print('[');
+          expr.acceptVisitor(this);
+          print(']');
+        }
+        return null;
+      } finally {
+        mPriority = savedPriority; 
+        mAssocBraces = savedAssocBraces;
       }
-      return null;
-    } finally {
-      mPriority = savedPriority; 
-      mAssocBraces = savedAssocBraces;
     }
+    return null;
   }
 
   public Object visitInstanceProxy
@@ -403,7 +419,12 @@ public class ModuleProxyPrinter
       (final IntConstantProxy proxy)
     throws VisitorException
   {
-    print(proxy.getValue());
+    final String text = proxy.getPlainText();
+    if (text != null) {
+      print(text);
+    } else {
+      print(proxy.getValue());
+    }
     return null;
   }
 
@@ -532,7 +553,13 @@ public class ModuleProxyPrinter
       (final SimpleIdentifierProxy proxy)
     throws VisitorException
   {
-    return visitIdentifierProxy(proxy);
+    final String text = proxy.getPlainText();
+    if (text != null) {
+      print(text);
+      return null;
+    } else {
+      return visitIdentifierProxy(proxy);
+    }
   }
 
   public Object visitSimpleNodeProxy
@@ -566,25 +593,30 @@ public class ModuleProxyPrinter
       (final UnaryExpressionProxy proxy)
     throws VisitorException
   {
-    final int savedPriority = mPriority; 
-    final boolean savedAssocBraces = mAssocBraces;
-    try {
-      final UnaryOperator operator = proxy.getOperator();
-      mPriority = operator.getPriority();
-      final boolean needBraces = (mPriority < savedPriority);
-      if (needBraces) {
-        print('(');
+    final String text = proxy.getPlainText();
+    if (text != null) {
+      print(text);
+    } else {
+      final int savedPriority = mPriority; 
+      final boolean savedAssocBraces = mAssocBraces;
+      try {
+        final UnaryOperator operator = proxy.getOperator();
+        mPriority = operator.getPriority();
+        final boolean needBraces = (mPriority < savedPriority);
+        if (needBraces) {
+          print('(');
+        }
+        mAssocBraces = false;
+        print(operator.getName());
+        final SimpleExpressionProxy subTerm = proxy.getSubTerm();
+        subTerm.acceptVisitor(this);
+        if (needBraces) {
+          print(')');
+        }
+      } finally {
+        mPriority = savedPriority;
+        mAssocBraces = savedAssocBraces;
       }
-      mAssocBraces = false;
-      print(operator.getName());
-      final SimpleExpressionProxy subTerm = proxy.getSubTerm();
-      subTerm.acceptVisitor(this);
-      if (needBraces) {
-        print(')');
-      }
-    } finally {
-      mPriority = savedPriority;
-      mAssocBraces = savedAssocBraces;
     }
     return null;
   }

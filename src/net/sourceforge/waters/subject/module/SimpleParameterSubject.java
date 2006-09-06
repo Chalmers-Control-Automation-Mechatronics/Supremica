@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SimpleParameterSubject
 //###########################################################################
-//# $Id: SimpleParameterSubject.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: SimpleParameterSubject.java,v 1.7 2006-09-06 11:52:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -83,11 +83,30 @@ public abstract class SimpleParameterSubject
     }
   }
 
+  public boolean equalsWithGeometry(final Proxy partner)
+  {
+    if (super.equalsByContents(partner)) {
+      final SimpleParameterSubject downcast = (SimpleParameterSubject) partner;
+      return
+        mDefaultValue.equalsWithGeometry(downcast.mDefaultValue);
+    } else {
+      return false;
+    }
+  }
+
   public int hashCodeByContents()
   {
     int result = super.hashCodeByContents();
     result *= 5;
     result += mDefaultValue.hashCodeByContents();
+    return result;
+  }
+
+  public int hashCodeWithGeometry()
+  {
+    int result = super.hashCodeByContents();
+    result *= 5;
+    result += mDefaultValue.hashCodeWithGeometry();
     return result;
   }
 
