@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNodePopupMenu
 //###########################################################################
-//# $Id: EditorNodePopupMenu.java,v 1.14 2006-08-25 02:12:52 robi Exp $
+//# $Id: EditorNodePopupMenu.java,v 1.15 2006-09-07 06:58:28 robi Exp $
 //###########################################################################
 
 
@@ -26,7 +26,7 @@ import net.sourceforge.waters.gui.command.ToggleNodeInitialCommand;
 import net.sourceforge.waters.gui.renderer.LabelProxyShape;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
-import net.sourceforge.waters.subject.module.IndexedIdentifierSubject;
+import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -167,7 +167,7 @@ class EditorNodePopupMenu
           }
           Command c = new AddEventCommand
             (node.getPropositions(),
-             new IndexedIdentifierSubject(DEFAULTNAME),
+             new SimpleIdentifierSubject(DEFAULTNAME),
              0);
           parent.getEditorInterface().getUndoInterface().executeCommand(c);
         }
