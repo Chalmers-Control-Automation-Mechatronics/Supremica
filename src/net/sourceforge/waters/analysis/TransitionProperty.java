@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   TransitionProperty
 //###########################################################################
-//# $Id: TransitionProperty.java,v 1.3 2006-08-21 03:45:51 yip1 Exp $
+//# $Id: TransitionProperty.java,v 1.4 2006-09-07 23:19:17 yip1 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -20,10 +20,10 @@ package net.sourceforge.waters.analysis;
 public class TransitionProperty
 {
     /** Source tuple of transition */
-    private StateTuple sourceTuple;
+    private EncodedStateTuple sourceTuple;
 
     /** Target tuple of transition */
-    private StateTuple targetTuple;
+    private EncodedStateTuple targetTuple;
 
     /** Event of transition */
     private int event;
@@ -34,11 +34,11 @@ public class TransitionProperty
     /**
      * Creates a new transition tuple. It creates a transition of state tuple
      * from given parameters
-     * @param  sourceTuple source of transition tuple
-     * @param  targetTuple target of transition tuple
+     * @param  sourceTuple source transition tuple
+     * @param  targetTuple target transition tuple
      * @param  event event of transition
      */
-    public TransitionProperty(StateTuple sourceTuple, StateTuple targetTuple, int event)
+    public TransitionProperty(EncodedStateTuple sourceTuple, EncodedStateTuple targetTuple, int event)
     {
 	this.sourceTuple = sourceTuple;
 	this.targetTuple = targetTuple;
@@ -52,18 +52,18 @@ public class TransitionProperty
      * returns source state tuple
      * @return source state tuple
      */
-    public StateTuple getSourceTuple()
+    public EncodedStateTuple getSourceTuple()
     {
-	return this.sourceTuple;
+	return sourceTuple;
     }
 
     /**
      * returns target state tuple
      * @return target state tuple
      */
-    public StateTuple getTargetTuple()
+    public EncodedStateTuple getTargetTuple()
     {
-	return this.targetTuple;
+	return targetTuple;
     }
 
     /**
@@ -72,6 +72,6 @@ public class TransitionProperty
      */
     public int getEvent()
     {
-	return this.event;
+	return event;
     }
 }

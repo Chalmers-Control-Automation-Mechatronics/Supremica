@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopCheckerTest
 //###########################################################################
-//# $Id: ControlLoopCheckerTest.java,v 1.8 2006-08-29 10:23:59 robi Exp $
+//# $Id: ControlLoopCheckerTest.java,v 1.9 2006-09-07 23:19:17 yip1 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -494,7 +494,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     }
     
     // 2. Loop must not be empty
-    assertTrue("Loop is empty", len - loopIndex > 0);
+    assertTrue("Loop is empty", len - (loopIndex-1) > 0);
     
     // 3. Check trace is available in each automaton
     // 3.1. Check control loop is actually a loop
