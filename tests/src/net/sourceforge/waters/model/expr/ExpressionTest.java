@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ExpressionTest
 //###########################################################################
-//# $Id: ExpressionTest.java,v 1.6 2006-09-06 11:52:21 robi Exp $
+//# $Id: ExpressionTest.java,v 1.7 2006-09-07 14:51:44 robi Exp $
 //###########################################################################
 
 
@@ -58,7 +58,7 @@ public class ExpressionTest extends TestCase
   public void testExpression_1eqm100()
     throws ParseException
   {
-    testExpression("1 == -100", mExpr_1eqm100, Operator.TYPE_INT);
+    testExpression("1 == -100", mExpr_1eqm100, Operator.TYPE_BOOLEAN);
   }
 
   public void testExpression_1minusm100()
@@ -82,7 +82,7 @@ public class ExpressionTest extends TestCase
   public void testExpression_1plus1eq2()
     throws ParseException
   {
-    testExpression("1 + 1 == 2", mExpr_1plus1eq2, Operator.TYPE_INT);
+    testExpression("1 + 1 == 2", mExpr_1plus1eq2, Operator.TYPE_BOOLEAN);
   }
 
   public void testExpression_1plus1plus2__1()
@@ -112,7 +112,7 @@ public class ExpressionTest extends TestCase
   public void testExpression_2eq1plus1()
     throws ParseException
   {
-    testExpression("2 == 1 + 1", mExpr_2eq1plus1, Operator.TYPE_INT);
+    testExpression("2 == 1 + 1", mExpr_2eq1plus1, Operator.TYPE_BOOLEAN);
   }
 
   public void testExpression_2minus1()

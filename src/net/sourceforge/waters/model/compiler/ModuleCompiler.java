@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.40 2006-09-03 06:38:42 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.41 2006-09-07 14:51:44 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1677,8 +1677,14 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
   private boolean evalBoolean(final SimpleExpressionProxy expr)
     throws VisitorException
   {
-    final IntValue value = evalTyped(expr, IntValue.class, "INTEGER");
-    return value.getValue() != 0;
+    final IntValue value = evalTyped(expr, IntValue.class, "BOOLEAN");
+    final int number = value.getValue();
+    if (number < 0 || number > 1) {
+      final TypeMismatchException exception =
+        new TypeMismatchException(expr, value, "BOOLEAN");
+      throw wrap(exception);
+    }
+    return number != 0;
   }
 
   private IndexValue evalIndex(final SimpleExpressionProxy expr)

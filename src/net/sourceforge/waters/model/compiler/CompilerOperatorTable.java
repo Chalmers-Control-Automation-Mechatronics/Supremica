@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompilerOperatorTable
 //###########################################################################
-//# $Id: CompilerOperatorTable.java,v 1.4 2006-03-16 12:09:16 flordal Exp $
+//# $Id: CompilerOperatorTable.java,v 1.5 2006-09-07 14:51:44 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -39,23 +39,37 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   //# Constructors
   private CompilerOperatorTable()
   {
-    super(16, OPCHAR_MIN, OPCHAR_MAX);
+    super(32, OPCHAR_MIN, OPCHAR_MAX);
     store(new BinaryPlusOperator());
     store(new BinaryMinusOperator());
+    store(new BinaryTimesOperator());
+    store(new BinaryDivideOperator());
+    store(new BinaryModuloOperator());
+    store(new UnaryMinusOperator());
     store(new BinaryEqualsOperator());
     store(new BinaryNotEqualsOperator());
+    store(new BinaryGreaterThanOperator());
+    store(new BinaryGreaterEqualsOperator());
+    store(new BinaryLessThanOperator());
+    store(new BinaryLessEqualsOperator());
     store(new BinaryRangeOperator());
-    store(new UnaryMinusOperator());
-
-    store(new BinaryIncreaseOperator());
-    store(new BinaryDecreaseOperator());
+    store(new BinaryAndOperator());
+    store(new BinaryOrOperator());
+    store(new UnaryNotOperator());
+    store(new BinaryIncrementOperator());
+    store(new BinaryDecrementOperator());
     store(new BinaryAssignmentOperator());
   }
 
 
   //#########################################################################
-  //# Inner Class BinaryIntOperator
-  private static abstract class BinaryIntOperator implements BinaryOperator
+  //# Inner Class AbstractBinaryIntOperator
+  /**
+   * The abstract type of all binary operators that combine two integer
+   * values and return another integer.
+   */
+  private static abstract class AbstractBinaryIntOperator
+    implements BinaryOperator
   {
 
     //#######################################################################
@@ -92,6 +106,12 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       return new CompiledIntValue(result);
     }
 
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public int getAssociativity()
+    {
+      return BinaryOperator.ASSOC_LEFT;
+    }
 
     //#######################################################################
     //# Provided by Subclasses
@@ -102,8 +122,158 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
 
   //#########################################################################
-  //# Inner Class UnaryIntOperator
-  private static abstract class UnaryIntOperator implements UnaryOperator
+  //# Inner Class BinaryPlusOperator
+  private static class BinaryPlusOperator extends AbstractBinaryIntOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public String getName()
+    {
+      return OPNAME_PLUS;
+    }
+
+    public int getPriority()
+    {
+      return PRIORITY_PLUS;
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Baseclass AbstractBinaryIntOperator
+    int eval(final int lhs, final int rhs)
+    {
+      return lhs + rhs;
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class BinaryMinusOperator
+  private static class BinaryMinusOperator extends AbstractBinaryIntOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public String getName()
+    {
+      return OPNAME_MINUS;
+    }
+
+    public int getPriority()
+    {
+      return PRIORITY_PLUS;
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Baseclass AbstractBinaryIntOperator
+    int eval(final int lhs, final int rhs)
+    {
+      return lhs - rhs;
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class BinaryTimesOperator
+  private static class BinaryTimesOperator extends AbstractBinaryIntOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public String getName()
+    {
+      return OPNAME_TIMES;
+    }
+
+    public int getPriority()
+    {
+      return PRIORITY_TIMES;
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Baseclass AbstractBinaryIntOperator
+    int eval(final int lhs, final int rhs)
+    {
+      return lhs * rhs;
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class BinaryDivideOperator
+  private static class BinaryDivideOperator extends AbstractBinaryIntOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public String getName()
+    {
+      return OPNAME_DIVIDE;
+    }
+
+    public int getPriority()
+    {
+      return PRIORITY_TIMES;
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Baseclass AbstractBinaryIntOperator
+    int eval(final int lhs, final int rhs)
+      throws DivisionByZeroException
+    {
+      if (rhs != 0) {
+        return lhs / rhs;
+      } else {
+        throw new DivisionByZeroException();
+      }
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class BinaryModuloOperator
+  private static class BinaryModuloOperator extends AbstractBinaryIntOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public String getName()
+    {
+      return OPNAME_MODULO;
+    }
+
+    public int getPriority()
+    {
+      return PRIORITY_TIMES;
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Baseclass AbstractBinaryIntOperator
+    int eval(final int lhs, final int rhs)
+      throws DivisionByZeroException
+    {
+      if (rhs != 0) {
+        return lhs % rhs;
+      } else {
+        throw new DivisionByZeroException();
+      }
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class AbstractUnaryIntOperator
+  /**
+   * The abstract type of all unary operators that take an integer value
+   * and return another integer.
+   */
+  private static abstract class AbstractUnaryIntOperator
+    implements UnaryOperator
   {
 
     //#######################################################################
@@ -112,7 +282,6 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     {
       return PRIORITY_UNARY;
     }
-
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.UnaryOperator
@@ -147,142 +316,9 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   }
 
 
-  private static class BinaryPlusOperator extends BinaryIntOperator
-  {
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.expr.Operator
-    public String getName()
-    {
-      return OPNAME_PLUS;
-    }
-
-    public int getPriority()
-    {
-      return PRIORITY_PLUS;
-    }
-
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
-    public int getAssociativity()
-    {
-      return BinaryOperator.ASSOC_LEFT;
-    }
-
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class BinaryIntOperator
-    int eval(final int lhs, final int rhs)
-    {
-      return lhs + rhs;
-    }
-
-  }
-  
-  private static class BinaryIncreaseOperator extends BinaryIntOperator
-  {
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.expr.Operator
-    public String getName()
-    {
-      return OPNAME_INCREASE;
-    }
-
-    public int getPriority()
-    {
-      return PRIORITY_ASSIGNMENT;
-    }
-
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
-    public int getAssociativity()
-    {
-      return BinaryOperator.ASSOC_LEFT;
-    }
-
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class BinaryIntOperator
-    int eval(final int lhs, final int rhs)
-    {
-      return lhs + rhs;
-    }
-
-  }
-  
-  private static class BinaryDecreaseOperator extends BinaryIntOperator
-  {
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.expr.Operator
-    public String getName()
-    {
-      return OPNAME_DECREASE;
-    }
-
-    public int getPriority()
-    {
-      return PRIORITY_ASSIGNMENT;
-    }
-
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
-    public int getAssociativity()
-    {
-      return BinaryOperator.ASSOC_LEFT;
-    }
-
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class BinaryIntOperator
-    int eval(final int lhs, final int rhs)
-    {
-      return lhs - rhs;
-    }
-
-  }
-  
-  private static class BinaryAssignmentOperator extends BinaryIntOperator
-  {
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.expr.Operator
-    public String getName()
-    {
-      return OPNAME_ASSIGNMENT;
-    }
-
-    public int getPriority()
-    {
-      return PRIORITY_ASSIGNMENT;
-    }
-
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
-    public int getAssociativity()
-    {
-      return BinaryOperator.ASSOC_LEFT;
-    }
-
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class BinaryIntOperator
-    int eval(final int lhs, final int rhs)
-    {
-      return rhs;
-    }
-
-  }
-
-
   //#########################################################################
-  //# Inner Class BinaryMinusOperator
-  private static class BinaryMinusOperator extends BinaryIntOperator
+  //# Inner Class UnaryMinusOperator
+  private static class UnaryMinusOperator extends AbstractUnaryIntOperator
   {
 
     //#######################################################################
@@ -292,25 +328,52 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       return OPNAME_MINUS;
     }
 
-    public int getPriority()
+    //#######################################################################
+    //# Overrides for Abstract Baseclass AbstractUnaryIntOperator
+    int eval(final int arg)
     {
-      return PRIORITY_PLUS;
+      return -arg;
     }
 
+  }
+
+
+  //#########################################################################
+  //# Inner Class AbstractBinaryEqualsOperator
+  /**
+   * The abstract type of all binary operators that take combine values of
+   * arbitrary, but matching types and return a boolean value as result.
+   */
+  private abstract static class AbstractBinaryEqualsOperator
+    implements BinaryOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public int getLHSTypes()
+    {
+      return Operator.TYPE_ANY;
+    }
+
+    public int getRHSTypes()
+    {
+      return Operator.TYPE_ANY;
+    }
+
+    public int getReturnTypes(final int lhsType, final int rhsType)
+    {
+      if ((lhsType & rhsType) != 0) {
+        return Operator.TYPE_BOOLEAN;
+      } else {
+        return 0;
+      }
+    }
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
     public int getAssociativity()
     {
-      return BinaryOperator.ASSOC_LEFT;
-    }
-
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class BinaryIntOperator
-    int eval(final int lhs, final int rhs)
-    {
-      return lhs - rhs;
+      return BinaryOperator.ASSOC_RIGHT;
     }
 
   }
@@ -318,7 +381,8 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
   //#########################################################################
   //# Inner Class BinaryEqualsOperator
-  private static class BinaryEqualsOperator implements BinaryOperator
+  private static class BinaryEqualsOperator
+    extends AbstractBinaryEqualsOperator
   {
 
     //#######################################################################
@@ -333,33 +397,8 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       return PRIORITY_EQUALS;
     }
 
-
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.BinaryOperator
-    public int getAssociativity()
-    {
-      return BinaryOperator.ASSOC_RIGHT;
-    }
-
-    public int getLHSTypes()
-    {
-      return Operator.TYPE_ANY;
-    }
-
-    public int getRHSTypes()
-    {
-      return Operator.TYPE_ANY;
-    }
-
-    public int getReturnTypes(final int lhsType, final int rhsType)
-    {
-      if ((lhsType & rhsType) != 0) {
-        return Operator.TYPE_INT;
-      } else {
-        return 0;
-      }
-    }
-
     public CompiledIntValue eval(final Value lhsValue, final Value rhsValue)
     {
       final boolean result = lhsValue.equals(rhsValue);
@@ -368,21 +407,389 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
   }
 
+
   //#########################################################################
-  //# Inner Class BinaryNotEqualsOperator, inherits from BinaryEqualsOperator
-  private static class BinaryNotEqualsOperator extends BinaryEqualsOperator
+  //# Inner Class BinaryNotEqualsOperator
+  private static class BinaryNotEqualsOperator
+    extends AbstractBinaryEqualsOperator
   {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
     public String getName()
     {
       return OPNAME_NOTEQUALS;
     }
 
+    public int getPriority()
+    {
+      return PRIORITY_EQUALS;
+    }
+
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
     public CompiledIntValue eval(final Value lhsValue, final Value rhsValue)
     {
-      final boolean result = lhsValue.equals(rhsValue);
-      return new CompiledIntValue(!result);     
+      final boolean result = !lhsValue.equals(rhsValue);
+      return new CompiledIntValue(result);
     }
+
   }
+
+
+  //#########################################################################
+  //# Inner Class AbstractBinaryComparisonOperator
+  /**
+   * The abstract type of all binary operators that combine two integer
+   * values and return a boolean result.
+   */
+  private static abstract class AbstractBinaryComparisonOperator
+    implements BinaryOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public int getLHSTypes()
+    {
+      return Operator.TYPE_INT;
+    }
+
+    public int getRHSTypes()
+    {
+      return Operator.TYPE_INT;
+    }
+
+    public int getReturnTypes(final int lhsType, final int rhsType)
+    {
+      if ((lhsType & rhsType & Operator.TYPE_INT) != 0) {
+        return Operator.TYPE_BOOLEAN;
+      } else {
+        return 0;
+      }
+    }
+
+    public Value eval(final Value lhsValue, final Value rhsValue)
+      throws EvalException
+    {
+      if (!(lhsValue instanceof IntValue)) {
+        throw new TypeMismatchException(lhsValue, "INTEGER");
+      }
+      if (!(rhsValue instanceof IntValue)) {
+        throw new TypeMismatchException(rhsValue, "INTEGER");
+      }
+      final IntValue lhsIntValue = (IntValue) lhsValue;
+      final IntValue rhsIntValue = (IntValue) rhsValue;
+      final int lhs = lhsIntValue.getValue();
+      final int rhs = rhsIntValue.getValue();
+      final boolean result = eval(lhs, rhs);
+      return new CompiledIntValue(result);
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public int getPriority()
+    {
+      return PRIORITY_EQUALS;
+    }
+
+    public int getAssociativity()
+    {
+      return BinaryOperator.ASSOC_RIGHT;
+    }
+
+    //#######################################################################
+    //# Provided by Subclasses
+    abstract boolean eval(int lhs, int rhs)
+      throws EvalException;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class BinaryGreaterThanOperator
+  private static class BinaryGreaterThanOperator
+    extends AbstractBinaryComparisonOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public String getName()
+    {
+      return OPNAME_GREATER_THAN;
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Baseclass AbstractBinaryComparisonOperator
+    boolean eval(final int lhs, final int rhs)
+    {
+      return lhs > rhs;
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class BinaryGreaterEqualsOperator
+  private static class BinaryGreaterEqualsOperator
+    extends AbstractBinaryComparisonOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public String getName()
+    {
+      return OPNAME_GREATER_EQUALS;
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Baseclass AbstractBinaryComparisonOperator
+    boolean eval(final int lhs, final int rhs)
+    {
+      return lhs >= rhs;
+    }
+
+  }
+
+  //#########################################################################
+  //# Inner Class BinaryLessThanOperator
+  private static class BinaryLessThanOperator
+    extends AbstractBinaryComparisonOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public String getName()
+    {
+      return OPNAME_LESS_THAN;
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Baseclass AbstractBinaryComparisonOperator
+    boolean eval(final int lhs, final int rhs)
+    {
+      return lhs < rhs;
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class BinaryLessEqualsOperator
+  private static class BinaryLessEqualsOperator
+    extends AbstractBinaryComparisonOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public String getName()
+    {
+      return OPNAME_LESS_EQUALS;
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Baseclass AbstractBinaryComparisonOperator
+    boolean eval(final int lhs, final int rhs)
+    {
+      return lhs <= rhs;
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class AbstractBinaryBooleanOperator
+  /**
+   * The abstract type of all binary operators that combine two Boolean
+   * values and return another Boolean.
+   */
+  private static abstract class AbstractBinaryBooleanOperator
+    implements BinaryOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public int getLHSTypes()
+    {
+      return Operator.TYPE_BOOLEAN;
+    }
+
+    public int getRHSTypes()
+    {
+      return Operator.TYPE_BOOLEAN;
+    }
+
+    public int getReturnTypes(final int lhsType, final int rhsType)
+    {
+      return lhsType & rhsType & Operator.TYPE_BOOLEAN;
+    }
+
+    public Value eval(final Value lhsValue, final Value rhsValue)
+      throws EvalException
+    {
+      if (!(lhsValue instanceof IntValue)) {
+        throw new TypeMismatchException(lhsValue, "BOOLEAN");
+      }
+      final IntValue lhsIntValue = (IntValue) lhsValue;
+      final int lhs = lhsIntValue.getValue();
+      if (lhs < 0 || lhs > 1) {
+        throw new TypeMismatchException(lhsValue, "BOOLEAN");
+      }
+      if (!(rhsValue instanceof IntValue)) {
+        throw new TypeMismatchException(rhsValue, "BOOLEAN");
+      }
+      final IntValue rhsIntValue = (IntValue) rhsValue;
+      final int rhs = rhsIntValue.getValue();
+      if (rhs < 0 || rhs > 1) {
+        throw new TypeMismatchException(rhsValue, "BOOLEAN");
+      }
+      final boolean result = eval(lhs != 0, rhs != 0);
+      return new CompiledIntValue(result);
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public int getAssociativity()
+    {
+      return BinaryOperator.ASSOC_LEFT;
+    }
+
+    //#######################################################################
+    //# Provided by Subclasses
+    abstract boolean eval(boolean lhs, boolean rhs)
+      throws EvalException;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class BinaryAndOperator
+  private static class BinaryAndOperator extends AbstractBinaryBooleanOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public String getName()
+    {
+      return OPNAME_AND;
+    }
+
+    public int getPriority()
+    {
+      return PRIORITY_AND;
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Baseclass AbstractBinaryBooleanOperator
+    boolean eval(final boolean lhs, final boolean rhs)
+    {
+      return lhs && rhs;
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class BinaryOrOperator
+  private static class BinaryOrOperator extends AbstractBinaryBooleanOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public String getName()
+    {
+      return OPNAME_OR;
+    }
+
+    public int getPriority()
+    {
+      return PRIORITY_OR;
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Baseclass AbstractBinaryBooleanOperator
+    boolean eval(final boolean lhs, final boolean rhs)
+    {
+      return lhs || rhs;
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class AbstractUnaryBooleanOperator
+  /**
+   * The abstract type of all unary operators that take a Boolean value
+   * and return another Boolean.
+   */
+  private static abstract class AbstractUnaryBooleanOperator
+    implements UnaryOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public int getPriority()
+    {
+      return PRIORITY_UNARY;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.UnaryOperator
+    public int getArgTypes()
+    {
+      return Operator.TYPE_BOOLEAN;
+    }
+
+    public int getReturnTypes(final int argType)
+    {
+      return argType & Operator.TYPE_BOOLEAN;
+    }
+
+    public CompiledIntValue eval(final Value argValue)
+      throws EvalException
+    {
+      if (!(argValue instanceof IntValue)) {
+        throw new TypeMismatchException(argValue, "BOOLEAN");
+      }
+      final IntValue argIntValue = (IntValue) argValue;
+      final int arg = argIntValue.getValue();
+      if (arg < 0 || arg > 1) {
+        throw new TypeMismatchException(argValue, "BOOLEAN");
+      }
+      final boolean result = eval(arg != 0);
+      return new CompiledIntValue(result);
+    }
+
+
+    //#######################################################################
+    //# Provided by Subclasses
+    abstract boolean eval(boolean arg)
+      throws EvalException;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class UnaryMinusOperator
+  private static class UnaryNotOperator extends AbstractUnaryBooleanOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public String getName()
+    {
+      return OPNAME_NOT;
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Baseclass AbstractUnaryBooleanOperator
+    boolean eval(final boolean arg)
+    {
+      return !arg;
+    }
+
+  }
+
 
   //#########################################################################
   //# Inner Class BinaryRangeOperator
@@ -449,23 +856,135 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
 
   //#########################################################################
-  //# Inner Class UnaryMinusOperator
-  private static class UnaryMinusOperator extends UnaryIntOperator
+  //# Inner Class AbstractBinaryAssignmentOperator
+  /**
+   * The abstract type of all binary assignment operators.
+   * These operators take a symbol as their first argument and
+   * an arbitrary expression as their second argument.
+   * They cannot be evaluated, they have to be compiled into another
+   * representation by the model compiler.
+   */
+  private abstract static class AbstractBinaryAssignmentOperator
+    implements BinaryOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public int getPriority()
+    {
+      return PRIORITY_ASSIGNMENT;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public int getLHSTypes()
+    {
+      return Operator.TYPE_NAME;
+    }
+
+    public int getRHSTypes()
+    {
+      return Operator.TYPE_ANY;
+    }
+
+    public int getReturnTypes(final int lhsType, final int rhsType)
+    {
+      if ((lhsType & Operator.TYPE_NAME) != 0) {
+        return rhsType;
+      } else {
+        return 0;
+      }
+    }
+
+    public int getAssociativity()
+    {
+      return BinaryOperator.ASSOC_RIGHT;
+    }
+
+    public Value eval(Value lhs, Value rhs) throws EvalException
+    {
+      throw new IllegalStateException
+        ("Assignment operation cannot be evaluated!");
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class BinaryAssignmentOperator
+  private static class BinaryAssignmentOperator
+    extends AbstractBinaryAssignmentOperator
   {
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.expr.Operator
     public String getName()
     {
-      return OPNAME_MINUS;
+      return OPNAME_ASSIGNMENT;
     }
 
+  }
+
+
+  //#########################################################################
+  //# Inner Class BinaryIncrementOperator
+  private static class BinaryIncrementOperator
+    extends AbstractBinaryAssignmentOperator
+  {
 
     //#######################################################################
-    //# Overrides for Abstract Base Class UnaryIntOperator
-    int eval(final int arg)
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public int getRHSTypes()
     {
-      return -arg;
+      return Operator.TYPE_INT;
+    }
+
+    public int getReturnTypes(final int lhsType, final int rhsType)
+    {
+      if ((rhsType & Operator.TYPE_INT) != 0) {
+        return super.getReturnTypes(lhsType, rhsType);
+      } else {
+        return 0;
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public String getName()
+    {
+      return OPNAME_INCREMENT;
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class BinaryDecrementOperator
+  private static class BinaryDecrementOperator
+    extends AbstractBinaryAssignmentOperator
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.BinaryOperator
+    public int getRHSTypes()
+    {
+      return Operator.TYPE_INT;
+    }
+
+    public int getReturnTypes(final int lhsType, final int rhsType)
+    {
+      if ((rhsType & Operator.TYPE_INT) != 0) {
+        return super.getReturnTypes(lhsType, rhsType);
+      } else {
+        return 0;
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.expr.Operator
+    public String getName()
+    {
+      return OPNAME_DECREMENT;
     }
 
   }
@@ -478,15 +997,25 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
   private static final String OPNAME_EQUALS = "==";
   private static final String OPNAME_NOTEQUALS = "!=";
+  private static final String OPNAME_GREATER_THAN = ">";
+  private static final String OPNAME_GREATER_EQUALS = ">=";
+  private static final String OPNAME_LESS_THAN = "<";
+  private static final String OPNAME_LESS_EQUALS = "<=";
   private static final String OPNAME_MINUS = "-";
   private static final String OPNAME_PLUS = "+";
+  private static final String OPNAME_TIMES = "*";
+  private static final String OPNAME_DIVIDE = "/";
+  private static final String OPNAME_MODULO = "%";
   private static final String OPNAME_RANGE = "..";
-  private static final String OPNAME_INCREASE = "+=";
-  private static final String OPNAME_DECREASE = "-=";
+  private static final String OPNAME_AND = "&";
+  private static final String OPNAME_OR = "|";
+  private static final String OPNAME_NOT = "!";
+  private static final String OPNAME_INCREMENT = "+=";
+  private static final String OPNAME_DECREMENT = "-=";
   private static final String OPNAME_ASSIGNMENT = "=";
 
   private static final int PRIORITY_UNARY = 90;
-  private static final int PRIORITY_MULT = 80;
+  private static final int PRIORITY_TIMES = 80;
   private static final int PRIORITY_PLUS = 70;
   private static final int PRIORITY_RANGE = 60;
   private static final int PRIORITY_EQUALS = 50;
