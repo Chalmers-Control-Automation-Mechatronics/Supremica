@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   StateEncoding
 //###########################################################################
-//# $Id: EncodedStateTuple.java,v 1.1 2006-08-24 11:04:03 yip1 Exp $
+//# $Id: EncodedStateTuple.java,v 1.2 2006-09-07 10:37:35 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -34,8 +34,7 @@ public class EncodedStateTuple
     }
 
     /**
-     * Create state encoding with given integer array
-     * @param size number of integers used to store encoded state
+     * Creates state encoding with given integer array.
      */
     public EncodedStateTuple(int[] encodedStateCodes)
     {

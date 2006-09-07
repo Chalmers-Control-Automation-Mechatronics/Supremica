@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopChecker
 //###########################################################################
-//# $Id: ControlLoopChecker.java,v 1.6 2006-08-24 11:04:03 yip1 Exp $
+//# $Id: ControlLoopChecker.java,v 1.7 2006-09-07 10:37:35 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -343,8 +343,9 @@ public class ControlLoopChecker extends ModelChecker
 
     /**
      * This method visits each state tuple in the synchronized product.
-     * If it tries to visit state tuple that has been visited before, it detects a loop.
-     * @param state current state tuple property
+     * If it tries to visit state tuple that has been visited before,
+     * it detects a loop.
+     * @param encodedCurrTuple The state tuple to be visited.
      */
     public void visit(EncodedStateTuple encodedCurrTuple)
     {
@@ -676,9 +677,9 @@ public class ControlLoopChecker extends ModelChecker
     }
 
     /**
-     * It will take a single state tuple as a parameter and encode it.
-     * @param stateTuple state tuple that will be encoded
-     * @return encoded state tuple
+     * Takes a single state tuple as a parameter and encode it.
+     * @param  stateCodes  Array of state codes to be encoded.
+     * @return Encoded state tuple.
      */
     public int[] encoding(final int[] stateCodes)
     {

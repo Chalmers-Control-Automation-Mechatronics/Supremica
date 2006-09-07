@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   StateTuple
 //###########################################################################
-//# $Id: StateTuple.java,v 1.2 2006-08-24 11:04:03 yip1 Exp $
+//# $Id: StateTuple.java,v 1.3 2006-09-07 10:37:35 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -35,8 +35,7 @@ public class StateTuple
     }
 
     /**
-     * Create state tuple with given integer array
-     * @param tuple original tuple information
+     * Creates state tuple with given integer array.
      */    
     public StateTuple(int[] stateCodes)
     {
@@ -82,7 +81,6 @@ public class StateTuple
     
     /**
      * Get whole state codes
-     * @return
      */
     public int[] getCodes()
     {
@@ -91,8 +89,6 @@ public class StateTuple
 
     /**
      * Get required state from state tuple
-     * @param index
-     * @return
      */
     public int get(int index)
     {
@@ -101,8 +97,6 @@ public class StateTuple
     
     /**
      * Set state tuple
-     * @param
-     * @param
      */
     public void set(int index, int state)
     {
@@ -111,7 +105,6 @@ public class StateTuple
     
     /**
      * Get hash code of state tuple
-     * @return
      */
     public int hashCode()
     {
@@ -125,8 +118,6 @@ public class StateTuple
     
     /**
      * Check if passed object is same as current state tuple
-     * @param other
-     * @return
      */
     public boolean equals(Object other)
     {
