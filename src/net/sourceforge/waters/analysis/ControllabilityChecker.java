@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControllabilityChecker
 //###########################################################################
-//# $Id: ControllabilityChecker.java,v 1.6 2006-08-25 03:16:54 js173 Exp $
+//# $Id: ControllabilityChecker.java,v 1.7 2006-09-08 14:04:26 robi Exp $
 //###########################################################################
 
 //Name: Jinjian Shi
@@ -50,8 +50,8 @@ import net.sourceforge.waters.xsd.base.EventKind;
 public class ControllabilityChecker extends ModelChecker
 {
   //
-  private ProductDESProxy model;                 
-  
+  private ProductDESProxy model;
+
   //
 	private Set<AutomatonProxy> automatonSet;	
 	
@@ -61,7 +61,7 @@ public class ControllabilityChecker extends ModelChecker
 	
 	//Level states storage
 	private ArrayList<Integer> indexList;
-	private BlockedArrayList<StateTuple> stateList;
+	private BlockedArrayList<EncodedStateTuple> stateList;
 	
 	//For encoding/decoding
 	private ArrayList<StateProxy> codes;
@@ -73,7 +73,7 @@ public class ControllabilityChecker extends ModelChecker
 	private int[] bitlengthList;	
 	private int[] maskList;
 	private int[] codePosition;
-	private StateTuple stateTuple;	
+	private EncodedStateTuple stateTuple;	
 
 	//Size
 	private int automatonSize;
@@ -101,13 +101,13 @@ public class ControllabilityChecker extends ModelChecker
   {
     super(model, factory);
     this.model = model;
-    
-    automatonSet = this.getModel().getAutomata();   
+
+    automatonSet = this.getModel().getAutomata();
 		plantTransitionMap = new ArrayList<int[][]>();
 		specTransitionMap = new ArrayList<int[][]>();
 		
     indexList = new ArrayList<Integer>();
-    stateList = new BlockedArrayList<StateTuple>(StateTuple.class);        
+    stateList = new BlockedArrayList<EncodedStateTuple>(EncodedStateTuple.class);
 		
     codes = new ArrayList<StateProxy>();
     codingList = new ArrayList<ArrayList<StateProxy>>();	
@@ -147,9 +147,9 @@ public class ControllabilityChecker extends ModelChecker
   /**
    * Gets the result of controllability checking.
    * @return <CODE>true</CODE> if the model was found to be controllable,
-   *         <CODE>false</CODE> otherwise.   
+   *         <CODE>false</CODE> otherwise.
    */
-  public boolean getResult() 
+  public boolean getResult()
   {		
 		Set<StateProxy> stateSet;
 		ArrayList<ArrayList<StateProxy>> specCodingList = new ArrayList<ArrayList<StateProxy>>();
@@ -206,7 +206,7 @@ public class ControllabilityChecker extends ModelChecker
     	StateProxy initialState = null;
     	for (StateProxy sp : stateSet) {
     		if (sp.isInitial()) {initialState = sp; break;}
-    	} 
+    	}
     	//Store all the information by automaton type   	
     	if (ap.getKind() == ComponentKind.PLANT) {    		
     		codingList.add(codes);    		
@@ -217,19 +217,19 @@ public class ControllabilityChecker extends ModelChecker
 				maskList[ck] = mask;
 				ck++;
     	}
-    	else if (ap.getKind() == ComponentKind.SPEC){    	  
-    	  specCodingList.add(codes);     	    	  
+    	else if (ap.getKind() == ComponentKind.SPEC){    	
+    	  specCodingList.add(codes);     	    	
     	  systemState[k+plantSize] = codes.indexOf(initialState);
 				specEventList.add(aneventCodingList);				
 				specTransitionMap.add(atransition);
 				bitlengthList[k+plantSize] = bl;
 				maskList[k+plantSize] = mask;
 				k++;
-      }      
+      }
     }	
     //Combine the plant coding list and spec coding list together	
-    codingList.addAll(specCodingList); 
-    
+    codingList.addAll(specCodingList);
+
     //Set the codePosition list
     for (i=0;i<automatonSize;i++) {
 			codeLength += bitlengthList[i];
@@ -239,39 +239,39 @@ public class ControllabilityChecker extends ModelChecker
 				codeLength = bitlengthList[i];
 				cp++;
 				codePosition[i] = cp;
-			} 
+			}
 		}
 		stSize = cp+1;		
 		System.out.println("\nStart ...............");		
 		startTime = System.currentTimeMillis();
 		return this.isControllable(systemState);
   }
-  
-  /** 
-   * Check the controllability of the model with a parameter of  
-   * initial synchronous product. 
+
+  /**
+   * Check the controllability of the model with a parameter of
+   * initial synchronous product.
    * @parameter sState The initial synchronous product of the model
    * @return <CODE>true</CODE> if the model is controllable, or
-   *         <CODE>false</CODE> if it is not.   
-   */  
+   *         <CODE>false</CODE> if it is not.
+   */
   private boolean isControllable(int[] sState){
-	  
-		Set<StateTuple> systemSet = new HashSet<StateTuple>(); // Future changable			
-   
+	
+		Set<EncodedStateTuple> systemSet = new HashSet<EncodedStateTuple>(); // Future changable			
+
     boolean enabled = true;
-   
+
     //Add the initial synchronous product in systemSet and stateList
 		successor = new int[automatonSize];
-		stateTuple = new StateTuple(stSize);		
+		stateTuple = new EncodedStateTuple(stSize);		
 		encode(sState,stateTuple);		
     systemSet.add(stateTuple);
     stateList.add(stateTuple);
-    indexList.add(stateList.size()-1);    
-    
+    indexList.add(stateList.size()-1);
+
     int indexSize = 0;
-		int eventSize = eventCodingList.size();   
+		int eventSize = eventCodingList.size();
 		int i,j,k,temp;
-    
+
 		while(true){			
 			//For each current state in the current level, check its controllability			
 			indexSize = indexList.size();
@@ -298,12 +298,12 @@ public class ControllabilityChecker extends ModelChecker
 						continue;
 					}					
 				
-					// Check controllability of current state				  
+					// Check controllability of current state				
 				  if (eventCodingList.get(e).getKind() == EventKind.UNCONTROLLABLE) {						
 				    for (i=0; i<automatonSize-plantSize;i++) {													
 				    	if (specEventList.get(i)[e] == 1){				    	 					
 								temp = specTransitionMap.get(i)[systemState[i+plantSize]][e];
-								if (temp == -1) {			    	    
+								if (temp == -1) {			    	
 									System.out.println(systemSet.size());
 									errorEvent = e;									
 									endTime = System.currentTimeMillis();
@@ -312,7 +312,7 @@ public class ControllabilityChecker extends ModelChecker
 								if (temp > -1){									
 									successor[i+plantSize] = temp;	
 									continue;								
-								}				    	  
+								}				    	
 				    	}
 				    	successor[i+plantSize] = systemState[i+plantSize];								
 				  	}
@@ -331,13 +331,13 @@ public class ControllabilityChecker extends ModelChecker
 				    	}	
 				    	successor[k+plantSize] = systemState[k+plantSize];						
 				  	}								
-				  	if (!enabled) {				    	 
+				  	if (!enabled) {				    	
 				    	continue;
 				  	}		
-				  }					  				  
+				  }					  				
 					
 				 	// Encode the new system state and put it into stateList
-					stateTuple = new StateTuple(stSize);
+					stateTuple = new EncodedStateTuple(stSize);
 				 	encode(successor,stateTuple);				
 							
 				 	if (systemSet.add(stateTuple)) {							
@@ -355,42 +355,44 @@ public class ControllabilityChecker extends ModelChecker
 		endTime = System.currentTimeMillis();
 		return true;
 	}  	
-  
+
   //#########################################################################
   //# Encoding
-  /** 
-   * Encode the synchronous product into StateTuple
-   * @parameter sState  The state to be encoded   
-   * @parameter sTuple The encoded StateTuple     
-   */ 
-  private void encode(int[] sState,StateTuple sTuple){
-  	int i;		
-		int k = 0;
-		int result = 0;
-		for (i = 0; i<automatonSize; i++) {
-			if (codePosition[i] == k) {
-				result <<= bitlengthList[i];				
-				result |= sState[i];
-			}
-			else {
-				sTuple.set(k,result);				
-				result = sState[i];				
-				k++;
-			}		 
-			if (i == automatonSize-1) {
-				sTuple.set(k,result);
-			}
-		}	
-	}
-	
+  /**
+   * Encode the synchronous product into EncodedStateTuple
+   * @parameter sState The state to be encoded
+   * @parameter sTuple The encoded EncodedStateTuple
+   */
+  private void encode(final int[] sState, final EncodedStateTuple sTuple)
+  {
+    int i;
+    int k = 0;
+    int result = 0;
+    final int[] codes = sTuple.getCodes();
+    for (i = 0; i < automatonSize; i++) {
+      if (codePosition[i] == k) {
+        result <<= bitlengthList[i];
+        result |= sState[i];
+      } else {
+        codes[k] = result;
+        result = sState[i];		
+        k++;
+      }
+      if (i == automatonSize - 1) {
+        codes[k] = result;
+      }
+    }
+  }
+
+
   //#########################################################################
   //# Decoding
 	/** 
-   * Decode the StateTuple  
-   * @parameter sTuple The StateTuple to be decoded
+   * Decode the EncodedStateTuple  
+   * @parameter sTuple The EncodedStateTuple to be decoded
    * @parameter state  The decoded state   
    */ 
-	private void decode(StateTuple sTuple,int[] state){	
+	private void decode(EncodedStateTuple sTuple,int[] state){	
 		int i,result;	
 		int k = codePosition[automatonSize-1];		
 		int temp = sTuple.get(k);		
