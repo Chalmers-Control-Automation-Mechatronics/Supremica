@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopCheckerTest
 //###########################################################################
-//# $Id: ControlLoopCheckerTest.java,v 1.9 2006-09-07 23:19:17 yip1 Exp $
+//# $Id: ControlLoopCheckerTest.java,v 1.10 2006-09-08 07:45:50 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -494,19 +494,21 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     }
     
     // 2. Loop must not be empty
-    assertTrue("Loop is empty", len - (loopIndex-1) > 0);
+    assertTrue("Loop is empty!", len - loopIndex > 0);
     
     // 3. Check trace is available in each automaton
     // 3.1. Check control loop is actually a loop
     for(final AutomatonProxy aProxy: automata){
-      final boolean accepted = checkCounterExample(aProxy, eventlist, loopIndex);
-      assertTrue("Counterexample not accepted by " + aProxy.getName(), accepted);
+      final boolean accepted =
+        checkCounterExample(aProxy, eventlist, loopIndex);
+      assertTrue("Counterexample not accepted by " +
+                 aProxy.getName(), accepted);
     }
   }
   
   private boolean checkCounterExample(final AutomatonProxy automaton,
-                                  final List<EventProxy> counterexample,
-                                  final int loopIndex)
+                                      final List<EventProxy> counterexample,
+                                      final int loopIndex)
   {
     final Collection<EventProxy> events = automaton.getEvents();
     final Collection<StateProxy> states = automaton.getStates();
@@ -525,15 +527,13 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
       return false;
     }
 
-    int index = 1;
+    int index = 0;
     StateProxy loopStart = null;
-    for(final EventProxy eProxy: counterexample){
-      if(index == loopIndex){
+    for (final EventProxy eProxy: counterexample){
+      if (index++ == loopIndex) {
         loopStart = currState;
       }
-      index++;
-
-      if(events.contains(eProxy)){
+      if (events.contains(eProxy)) {
         boolean found = false;
         for (final TransitionProxy trans : transitions) {
           if (trans.getSource() == currState && trans.getEvent() == eProxy) {
@@ -542,7 +542,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
             break;
           }
         }
-        if(!found){
+        if (!found) {
           return false;
         }
       }
