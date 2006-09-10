@@ -15,7 +15,7 @@ public class NewEventAction
 	{
 		super(actionList);
 
-                putValue(Action.NAME, "New Event");
+                putValue(Action.NAME, "New Event...");
                 putValue(Action.SHORT_DESCRIPTION, "New event");
                 putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_N));
     		putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));

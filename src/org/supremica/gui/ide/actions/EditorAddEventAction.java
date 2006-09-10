@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorAddEventAction
 //###########################################################################
-//# $Id: EditorAddEventAction.java,v 1.12 2006-09-05 21:29:48 flordal Exp $
+//# $Id: EditorAddEventAction.java,v 1.13 2006-09-10 19:01:53 flordal Exp $
 //###########################################################################
 
 
@@ -31,8 +31,8 @@ public class EditorAddEventAction
 
 		setEditorActiveRequired(true);
 
-		putValue(Action.NAME, "Create Event");
-		putValue(Action.SHORT_DESCRIPTION, "Add Event");
+		putValue(Action.NAME, "New Event...");
+		putValue(Action.SHORT_DESCRIPTION, "Add a new event to the project");
 		putValue(Action.SMALL_ICON,
 				 new ImageIcon(IDE.class.getResource("/icons/waters/event16.gif")));
 		putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));

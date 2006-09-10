@@ -24,8 +24,8 @@ public class AnalyzerSynchronizerAction
         
         setAnalyzerActiveRequired(true);
         
-        putValue(Action.NAME, "Synchronize");
-        putValue(Action.SHORT_DESCRIPTION, "Synchronize");
+        putValue(Action.NAME, "Synchronize...");
+        putValue(Action.SHORT_DESCRIPTION, "Synchronize the selected automata");
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/synchronize16.gif")));
     }
     

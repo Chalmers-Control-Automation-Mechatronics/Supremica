@@ -28,7 +28,7 @@ public class WorkbenchAction
     {
         super(actionList);
         
-        putValue(Action.NAME, "Workbench");
+        putValue(Action.NAME, "Workbench...");
         putValue(Action.SHORT_DESCRIPTION, "Launch workbench");
         putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_W));
         putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.CTRL_MASK));

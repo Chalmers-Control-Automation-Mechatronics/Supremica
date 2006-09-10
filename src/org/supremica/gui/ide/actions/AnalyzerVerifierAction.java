@@ -25,8 +25,8 @@ public class AnalyzerVerifierAction
         
         setAnalyzerActiveRequired(true);
         
-        putValue(Action.NAME, "Verify");
-        putValue(Action.SHORT_DESCRIPTION, "Verify");
+        putValue(Action.NAME, "Verify...");
+        putValue(Action.SHORT_DESCRIPTION, "Run verification on the selected automata");
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/verify16.gif")));        
     }
     

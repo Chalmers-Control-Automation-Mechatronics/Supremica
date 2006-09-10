@@ -23,8 +23,8 @@ public class AnalyzerSynthesizerAction
         
         setAnalyzerActiveRequired(true);
         
-        putValue(Action.NAME, "Synthesize");
-        putValue(Action.SHORT_DESCRIPTION, "Synthesize");
+        putValue(Action.NAME, "Synthesize...");
+        putValue(Action.SHORT_DESCRIPTION, "Synthesize a supervisor for the selected automata");
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/synthesize16.gif")));        
     }
     
