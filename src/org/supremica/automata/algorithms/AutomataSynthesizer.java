@@ -141,12 +141,12 @@ public class AutomataSynthesizer
         if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
         {
                 MonolithicReturnValue retval = doMonolithic(theAutomata, true);
-
+         
                 if (stopRequested)
                 {
                         return new Automata();
                 }
-
+         
                 result.addAutomaton(retval.automaton);
         }
         else
@@ -165,63 +165,58 @@ public class AutomataSynthesizer
         }
         else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MODULAR)
         {
+            // MODULAR (controllability) synthesis
+            Automata newSupervisors = doModular(theAutomata);
+
+            if (stopRequested)
+            {
+                return new Automata();
+            }
+
+            result.addAutomata(newSupervisors);
+        }
+        else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.COMPOSITIONAL)
+        {
             SynthesisType type = synthesizerOptions.getSynthesisType();
             
-            // What type of synthesis are we talking about?
-            if (type == SynthesisType.CONTROLLABLE)
+            // Use supervision equivalence minimization!
+            
+            // Prepare for synthesis
+            // Make a copy
+            theAutomata = new Automata(theAutomata);
+            if (type == SynthesisType.NONBLOCKING)
             {
-                // MODULAR (controllability) synthesis
-                Automata newSupervisors = doModular(theAutomata);
-                
-                if (stopRequested)
+                // Only nonblocking? Then everything should be considered controllable!
+                for (Automaton automaton : theAutomata)
                 {
-                    return new Automata();
-                }
-                
-                result.addAutomata(newSupervisors);
-            }
-            else if ((type == SynthesisType.NONBLOCKING) ||
-                (type == SynthesisType.NONBLOCKINGCONTROLLABLE))
-            {
-                // Use supervision equivalence minimization!
-                
-                // Prepare for synthesis
-                // Make a copy
-                theAutomata = new Automata(theAutomata);
-                if (type == SynthesisType.NONBLOCKING)
-                {
-                    // Only nonblocking? Then everything should be considered controllable!
-                    for (Automaton automaton : theAutomata)
+                    for (LabeledEvent event : automaton.getAlphabet())
                     {
-                        for (LabeledEvent event : automaton.getAlphabet())
-                        {
-                            event.setControllable(true);
-                        }
+                        event.setControllable(true);
                     }
                 }
-                else if (type == SynthesisType.NONBLOCKINGCONTROLLABLE)
-                {
-                    // NONBLOCKING and controllable. Plantify the specifications and supervisors!
-                    MinimizationHelper.plantify(theAutomata);
-                }
-                
-                // Do the stuff!
-                AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
-                minimizer.setExecutionDialog(executionDialog);
-                MinimizationOptions options = MinimizationOptions.getDefaultSynthesisOptions();
-                Automaton min = minimizer.getCompositionalMinimization(options);
-                min.setComment("sup(" + min.getName() + ")");
-                min.setName(null);
-                
-                // Present result
-                if (false && Config.VERBOSE_MODE.isTrue() && (min.nbrOfStates() < 100))
-                {
-                    // This may not be true if more advanced simplification rules have been used!
-                    logger.info("The states that are reachable in the maximally permissive, "
-                        + "controllable and nonblocking supervisor are: " + min.getStateSet() + ".");
-                }
-                result.addAutomaton(min);
             }
+            else if (type == SynthesisType.NONBLOCKINGCONTROLLABLE)
+            {
+                // NONBLOCKING and controllable. Plantify the specifications and supervisors!
+                MinimizationHelper.plantify(theAutomata);
+            }
+            
+            // Do the stuff!
+            AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
+            minimizer.setExecutionDialog(executionDialog);
+            MinimizationOptions options = MinimizationOptions.getDefaultSynthesisOptions();
+            Automaton min = minimizer.getCompositionalMinimization(options);
+            min.setComment("sup(" + min.getName() + ")");
+            min.setName(null);
+            
+            // Present result
+            if (false && Config.VERBOSE_MODE.isTrue() && (min.nbrOfStates() < 100))
+            {
+                // This may not be true if more advanced simplification rules have been used!
+                logger.info("The states that are reachable in the maximally permissive, "
+                    + "controllable and nonblocking supervisor are: " + min.getStateSet() + ".");
+            }
+            result.addAutomaton(min);            
         }
         else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD)
         {
@@ -790,6 +785,11 @@ public class AutomataSynthesizer
         {
             threadToStop.requestStop();
         }
+    }
+    
+    public boolean isStopped()
+    {
+        return stopRequested;
     }
     
     /**

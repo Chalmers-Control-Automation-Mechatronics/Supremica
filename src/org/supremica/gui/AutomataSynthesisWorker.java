@@ -268,4 +268,9 @@ public class AutomataSynthesisWorker
             executionDialog.setMode(ExecutionDialogMode.hide);
         }
     }
+    
+    public boolean isStopped()
+    {
+        return stopRequested;
+    }
 }

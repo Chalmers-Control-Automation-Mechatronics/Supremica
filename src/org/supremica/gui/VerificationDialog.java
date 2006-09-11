@@ -253,8 +253,7 @@ public class VerificationDialog
                 tabbedPane.setComponentAt(advancedTabIndex, advancedPanelControllability);
                 tabbedPane.setEnabledAt(advancedTabIndex, true);
             }
-            else if ((verificationTypeBox.getSelectedItem() == VerificationType.NONBLOCKING) &&
-                (algorithmSelector.getSelectedItem() == VerificationAlgorithm.MODULAR))
+            else if (algorithmSelector.getSelectedItem() == VerificationAlgorithm.COMPOSITIONAL)
             {
                 // Show advanced nonblocking options!
                 //tabbedPane.remove(advancedPanelControllability);
@@ -276,7 +275,7 @@ public class VerificationDialog
             // Which type of verification?
             if (verificationTypeBox.getSelectedItem() == VerificationType.CONTROLLABILITY ||
                 verificationTypeBox.getSelectedItem() == VerificationType.INVERSECONTROLLABILITY ||
-                 verificationTypeBox.getSelectedItem() == VerificationType.LANGUAGEINCLUSION)
+                verificationTypeBox.getSelectedItem() == VerificationType.LANGUAGEINCLUSION)
             {
                 algorithmSelector.addItem(VerificationAlgorithm.MONOLITHIC);
                 algorithmSelector.addItem(VerificationAlgorithm.MODULAR);
@@ -289,7 +288,7 @@ public class VerificationDialog
                 // Only modular algo implemented
                 algorithmSelector.addItem(VerificationAlgorithm.MODULAR);
             }
-            */
+             */
             else if (verificationTypeBox.getSelectedItem() == VerificationType.NONBLOCKING)
             {
                 algorithmSelector.addItem(VerificationAlgorithm.MONOLITHIC);
@@ -305,7 +304,7 @@ public class VerificationDialog
             algorithmSelector.setSelectedIndex(0);
             // Reselect previously selected item if possible
             algorithmSelector.setSelectedItem(selected);
-
+            
             // Show trace?
             if (verificationTypeBox.getSelectedItem() == VerificationType.NONBLOCKING &&
                 algorithmSelector.getSelectedItem() == VerificationAlgorithm.MONOLITHIC ||
@@ -344,7 +343,7 @@ public class VerificationDialog
                     "and hence there is no monolithic algoritm.");
                 note.setVisible(true);
             }
-            */
+             */
             else if (verificationTypeBox.getSelectedItem() == VerificationType.CONTROLLABILITYNONBLOCKING)
             {
                 note.setText("Note:\n" + "Verifies both controllability and nonblocking in\n" +

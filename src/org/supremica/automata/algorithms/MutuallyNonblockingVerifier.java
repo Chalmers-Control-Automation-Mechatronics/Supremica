@@ -1376,6 +1376,11 @@ public class MutuallyNonblockingVerifier
             theVerifier.requestStop();
         }
     }
+        
+    public boolean isStopped()
+    {
+        return stopRequested;
+    }    
 }
 
 class AutomataToEventMap

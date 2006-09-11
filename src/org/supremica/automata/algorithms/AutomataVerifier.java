@@ -1902,13 +1902,23 @@ public class AutomataVerifier
         {
             ((AutomataSynchronizerExecuter) synchronizationExecuters.get(i)).requestStop();
         }
+        
         if (threadToStop != null)
         {
             threadToStop.requestStop();
         }
-        
+
+        if (executionDialog != null)
+        {
+            executionDialog.stopAllThreads();
+        }
         // Clear!
         executionDialog = null;
+    }
+       
+    public boolean isStopped()
+    {
+        return stopRequested;
     }
     
     /**

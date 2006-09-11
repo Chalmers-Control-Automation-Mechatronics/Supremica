@@ -116,10 +116,17 @@ public class AutomataMinimizer
     throws Exception
     {
         this.options = options;
-        
+             
         // Are the options valid?
         if (!options.isValid())
         {
+            return null;
+        }
+        
+        if (options.getMinimizationType() == EquivalenceRelation.CONFLICTEQUIVALENCE &&
+            theAutomata.hasForbiddenState())
+        {
+            logger.warn("All forbidden states must be removed before attempting the compositional approach.");
             return null;
         }
         
@@ -765,5 +772,10 @@ public class AutomataMinimizer
         {
             threadToStop.requestStop();
         }
+    }
+    
+    public boolean isStopped()
+    {
+        return stopRequested;
     }
 }

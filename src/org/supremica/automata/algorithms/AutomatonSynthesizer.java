@@ -565,4 +565,9 @@ public class AutomatonSynthesizer
         stopRequested = true;
         logger.debug("AutomatonSynthesizer requested to stop.");
     }
+            
+    public boolean isStopped()
+    {
+        return stopRequested;
+    }
 }

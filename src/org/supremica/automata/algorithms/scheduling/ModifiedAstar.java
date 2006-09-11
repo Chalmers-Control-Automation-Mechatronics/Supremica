@@ -23,67 +23,67 @@ import org.supremica.gui.ScheduleDialog;
 import org.supremica.log.*;
 import org.supremica.util.ActionTimer;
 
-public class ModifiedAstar 
-	extends AbstractAstar {
-
-	private static Logger logger = LoggerFactory.createLogger(ModifiedAstar.class);
-
-	//tillf
-	private int searchDepthCounter;
-
-    public ModifiedAstar(Automata theAutomata, boolean buildSchedule, ScheduleDialog gui) 
-		throws Exception  
-	{
-		super(theAutomata, "1-product relax", buildSchedule, gui);
+public class ModifiedAstar
+    extends AbstractAstar
+{    
+    private static Logger logger = LoggerFactory.createLogger(ModifiedAstar.class);
+    
+    //tillf
+    private int searchDepthCounter;
+    
+    public ModifiedAstar(Automata theAutomata, boolean buildSchedule, ScheduleDialog gui)
+    throws Exception
+    {
+        super(theAutomata, "1-product relax", buildSchedule, gui);
     }
-	
-    public ModifiedAstar(Automata theAutomata, String heuristic, boolean buildSchedule, ScheduleDialog gui) 
-		throws Exception 
-	{
-		super(theAutomata, heuristic, true, false, buildSchedule, gui);
+    
+    public ModifiedAstar(Automata theAutomata, String heuristic, boolean buildSchedule, ScheduleDialog gui)
+    throws Exception
+    {
+        super(theAutomata, heuristic, true, false, buildSchedule, gui);
     }
-	
-    public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean iterativeSearch, boolean buildSchedule, ScheduleDialog gui) 
-		throws Exception 
-	{
-		super(theAutomata, heuristic, manualExpansion, iterativeSearch, buildSchedule, gui);
+    
+    public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean iterativeSearch, boolean buildSchedule, ScheduleDialog gui)
+    throws Exception
+    {
+        super(theAutomata, heuristic, manualExpansion, iterativeSearch, buildSchedule, gui);
     }
-
-	public ModifiedAstar(Automata theAutomata, boolean manualExpansion, boolean buildSchedule, ScheduleDialog gui)
-		throws Exception
-	{
-		super(theAutomata, manualExpansion, buildSchedule, gui);
-	}
-
-	/**
-	 * The defalut relaxation, used for estimation of the remaining cost. This method is overriden 
-	 * in the subclasses. Is used if no relaxation is chosen (i.e. brute force search).
-	 */
-	double getRelaxation(double[] node)
-		throws Exception
-	{
-		return 0; 
-	}
-
-	/**
-	 * Updates the closed tree if necessary, i.e. if the currently examined
-	 * node with better estimate value already is present on that tree.
-	 * If the node is added to the closed tree, its descendants are put on the 
-	 * open tree, according to the estimated remaining cost value.
-	 */
-	protected void branch(double[] currNode) 
-	{
-		try 
-		{
-			boolean currNodeIsAddedToClosed = updateClosedTree(currNode);
-
-			if (currNodeIsAddedToClosed)
-			{
-				// tillf (test)
+    
+    public ModifiedAstar(Automata theAutomata, boolean manualExpansion, boolean buildSchedule, ScheduleDialog gui)
+    throws Exception
+    {
+        super(theAutomata, manualExpansion, buildSchedule, gui);
+    }
+    
+    /**
+     * The defalut relaxation, used for estimation of the remaining cost. This method is overriden
+     * in the subclasses. Is used if no relaxation is chosen (i.e. brute force search).
+     */
+    double getRelaxation(double[] node)
+    throws Exception
+    {
+        return 0;
+    }
+    
+    /**
+     * Updates the closed tree if necessary, i.e. if the currently examined
+     * node with better estimate value already is present on that tree.
+     * If the node is added to the closed tree, its descendants are put on the
+     * open tree, according to the estimated remaining cost value.
+     */
+    protected void branch(double[] currNode)
+    {
+        try
+        {
+            boolean currNodeIsAddedToClosed = updateClosedTree(currNode);
+            
+            if (currNodeIsAddedToClosed)
+            {
+                // tillf (test)
 // 				Iterator childIter = expander.expandNodeManually(currNode, activeAutomataIndex, true).iterator();
-				Iterator childIter = expander.expandNode(currNode, activeAutomataIndex).iterator();
-
-
+                Iterator childIter = expander.expandNode(currNode, activeAutomataIndex).iterator();
+                
+                
 // 				//tillf (test)
 // 				Collection childColl = expander.expandNode(currNode, activeAutomataIndex);
 // 				if (childColl.size() > 0 && searchDepthCounter++ > 30)
@@ -107,58 +107,58 @@ public class ModifiedAstar
 // 					searchDepthCounter = 0;
 // 				}
 // 				Iterator childIter = childColl.iterator();
-				while (childIter.hasNext()) 
-				{
-					double[] nextNode = (double[])childIter.next();
-										
-					// Calculate the estimate function of the expanded node and store it at the appropriate position
-					nextNode[ESTIMATE_INDEX] = calcEstimatedCost(nextNode);					
-					
-					openTree.add(nextNode);
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 * Converts the representation of the initial state to the double[]-representation of a node. 
-	 * double[] node consists of [states.getIndex() AutomataIndexFormHelper-info (-1 0 normally) 
-	 * parentStates.getIndex() states.getCurrentCost() accumulatedCost estimatedCost]. 
-	 * double[] initialNode is thus [initialStates.getIndex() AutomataIndexFormHelper-info 
-	 * null initialStates.getCost() 0 -1].
-	 */
+                while (childIter.hasNext())
+                {
+                    double[] nextNode = (double[])childIter.next();
+                    
+                    // Calculate the estimate function of the expanded node and store it at the appropriate position
+                    nextNode[ESTIMATE_INDEX] = calcEstimatedCost(nextNode);
+                    
+                    openTree.add(nextNode);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Converts the representation of the initial state to the double[]-representation of a node.
+     * double[] node consists of [states.getIndex() AutomataIndexFormHelper-info (-1 0 normally)
+     * parentStates.getIndex() states.getCurrentCost() accumulatedCost estimatedCost].
+     * double[] initialNode is thus [initialStates.getIndex() AutomataIndexFormHelper-info
+     * null initialStates.getCost() 0 -1].
+     */
     protected double[] makeInitialNode()
-	{
-		int[] initialStates = AutomataIndexFormHelper.createState(theAutomata.size());
-		double[] initialCosts = new double[getActiveLength() + 2];
-
-		int nrOfPlants = plantAutomata.size(); 
-	
-		// Initial state indices are stored
-		for (int i=0; i<theAutomata.size(); i++) 
-		{
-			initialStates[i] = theAutomata.getAutomatonAt(i).getInitialState().getIndex();
-		}
-
-		// Initial state costs are stored
-		for (int i=0; i<nrOfPlants; i++) 
-		{
-			initialCosts[i] = plantAutomata.getAutomatonAt(i).getInitialState().getCost();
-		}
-
-		// The initial accumulated cost is zero
-		initialCosts[nrOfPlants] = 0;
-
-		// The initial estimate is set to -1
-		initialCosts[nrOfPlants + 1] = -1;
-
-		// The NodeExpander combines the information, together with the parent-information, 
-		// which is null for the initial state. 
+    {
+        int[] initialStates = AutomataIndexFormHelper.createState(theAutomata.size());
+        double[] initialCosts = new double[getActiveLength() + 2];
+        
+        int nrOfPlants = plantAutomata.size();
+        
+        // Initial state indices are stored
+        for (int i=0; i<theAutomata.size(); i++)
+        {
+            initialStates[i] = theAutomata.getAutomatonAt(i).getInitialState().getIndex();
+        }
+        
+        // Initial state costs are stored
+        for (int i=0; i<nrOfPlants; i++)
+        {
+            initialCosts[i] = plantAutomata.getAutomatonAt(i).getInitialState().getCost();
+        }
+        
+        // The initial accumulated cost is zero
+        initialCosts[nrOfPlants] = 0;
+        
+        // The initial estimate is set to -1
+        initialCosts[nrOfPlants + 1] = -1;
+        
+        // The NodeExpander combines the information, together with the parent-information,
+        // which is null for the initial state.
 // 		return expander.makeNode(initialStates, null, initialCosts);
-		return expander.makeNode(initialStates, -1, initialCosts);
+        return expander.makeNode(initialStates, -1, initialCosts);
     }
 }
