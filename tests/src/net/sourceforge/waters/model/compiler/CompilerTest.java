@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   JAXBTestCase
 //###########################################################################
-//# $Id: CompilerTest.java,v 1.8 2006-09-03 06:38:43 robi Exp $
+//# $Id: CompilerTest.java,v 1.9 2006-09-11 15:37:39 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -216,6 +216,33 @@ public class CompilerTest
     throws IOException, WatersException
   {
     compile("winemerchant");
+  }
+
+
+  //#########################################################################
+  //# Successful Test Cases using EFA
+  public void testCompile_EFA0()
+    throws IOException, WatersException
+  {
+    compile("EFA0");
+  }
+
+  public void testCompile_GlobalAndLocalVariables()
+    throws IOException, WatersException
+  {
+    compile("GlobalAndLocalVariables");
+  }
+
+  public void testCompile_sensoractuator()
+    throws IOException, WatersException
+  {
+    compile("sensoractuator");
+  }
+
+  public void testCompile_stick_picking_game()
+    throws IOException, WatersException
+  {
+    compile("stick_picking_game");
   }
 
 
