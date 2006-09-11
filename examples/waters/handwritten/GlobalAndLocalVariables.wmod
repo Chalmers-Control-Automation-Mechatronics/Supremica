@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="GlobalAndLocalVariables"
+   xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="a"/>
+<EventDecl Kind="CONTROLLABLE" Name="b"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="C1"/>
+<Graph Deterministic="true">
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<PointGeometry>
+<Point X="112" Y="288"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="false" Name="s1">
+<PointGeometry>
+<Point X="224" Y="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="false" Name="s2">
+<PointGeometry>
+<Point X="336" Y="288"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="a"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="112" Y="288"/>
+</StartPointGeometry>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="168" Y="240"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point X="224" Y="192"/>
+</EndPointGeometry>
+<GuardActionBlock>
+<Guard>x==2 | X==0
+
+ </Guard>
+<Action>x=1</Action>
+</GuardActionBlock>
+</Edge>
+<Edge Source="s1" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="b"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="224" Y="192"/>
+</StartPointGeometry>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="280" Y="240"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point X="336" Y="288"/>
+</EndPointGeometry>
+<GuardActionBlock>
+<Guard/>
+<Action/>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+<VariableList>
+<Variable Name="x">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+<IntConstant Value="0"/>
+<IntConstant Value="2"/>
+</Variable>
+</VariableList>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="C2"/>
+<Graph Deterministic="true">
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<PointGeometry>
+<Point X="96" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="false" Name="s1">
+<PointGeometry>
+<Point X="240" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="b"/>
+<LabelGeometry Anchor="NW">
+<Point X="-59" Y="41"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="96" Y="176"/>
+</StartPointGeometry>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="168" Y="176"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point X="240" Y="176"/>
+</EndPointGeometry>
+<GuardActionBlock>
+<Guard>X==2 | y==0 |Y==2</Guard>
+<Action>y=2</Action>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+<VariableList>
+<Variable Name="y">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+<IntConstant Value="0"/>
+<IntConstant Value="2"/>
+</Variable>
+</VariableList>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="GlobalVariables"/>
+<Graph Deterministic="true">
+<NodeList>
+<SimpleNode Initial="true" Name="IDLE">
+<PointGeometry>
+<Point X="224" Y="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="IDLE" Target="IDLE">
+<LabelBlock>
+<SimpleIdentifier Name="a"/>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="10"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="224" Y="176"/>
+</StartPointGeometry>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="163" Y="253"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point X="224" Y="176"/>
+</EndPointGeometry>
+<GuardActionBlock>
+<Guard/>
+<Action>Y=1</Action>
+</GuardActionBlock>
+</Edge>
+<Edge Source="IDLE" Target="IDLE">
+<LabelBlock>
+<SimpleIdentifier Name="b"/>
+<LabelGeometry Anchor="NW">
+<Point X="-30" Y="4"/>
+</LabelGeometry>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="224" Y="176"/>
+</StartPointGeometry>
+<SplineGeometry Kind="INTERPOLATING">
+<Point X="316" Y="98"/>
+</SplineGeometry>
+<EndPointGeometry>
+<Point X="224" Y="176"/>
+</EndPointGeometry>
+<GuardActionBlock>
+<Guard/>
+<Action>X=2</Action>
+</GuardActionBlock>
+</Edge>
+</EdgeList>
+</Graph>
+<VariableList>
+<Variable Name="X">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+<IntConstant Value="0"/>
+<IntConstant Value="2"/>
+</Variable>
+<Variable Name="Y">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+<IntConstant Value="0"/>
+<IntConstant Value="2"/>
+</Variable>
+</VariableList>
+</SimpleComponent>
+</ComponentList>
+</Module>
+
