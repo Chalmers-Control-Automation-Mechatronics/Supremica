@@ -2,8 +2,9 @@ package net.sourceforge.waters.mbt.translator;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
-public class EdgesHashMap extends HashMap {
+public class EdgesHashMap extends HashMap<String,List<EdgeNode>> {
 
 	// constructor
 
@@ -13,12 +14,12 @@ public class EdgesHashMap extends HashMap {
 
 	public void add(final String event, final String begin, final String end) {
 
-		LinkedList<EdgeNode> EdgesList;
+		List<EdgeNode> EdgesList;
 		EdgeNode EdgeN;
 
 		if (this.containsKey(event)) {
 
-			EdgesList = (LinkedList) this.get(event);
+			EdgesList = get(event);
 
 		} else {
 
