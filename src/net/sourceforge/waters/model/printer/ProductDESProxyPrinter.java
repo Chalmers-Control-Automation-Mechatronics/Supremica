@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ProductDESProxyPrinter
 //###########################################################################
-//# $Id: ProductDESProxyPrinter.java,v 1.5 2006-09-08 07:45:50 robi Exp $
+//# $Id: ProductDESProxyPrinter.java,v 1.6 2006-09-12 14:57:53 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;
@@ -218,10 +218,10 @@ public class ProductDESProxyPrinter
     indentIn();
     int index = 0;
     for (final TraceStepProxy step : trace.getTraceSteps()) {
+      visitTraceStepProxy(step);
       if (index++ == loop) {
         println("Loop begins here:");
       }
-      visitTraceStepProxy(step);
     }
     indentOut();
     println('}');

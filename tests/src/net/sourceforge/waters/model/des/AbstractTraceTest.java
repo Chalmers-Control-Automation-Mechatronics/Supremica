@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   AbstractTraceTest
 //###########################################################################
-//# $Id: AbstractTraceTest.java,v 1.2 2006-07-20 02:28:38 robi Exp $
+//# $Id: AbstractTraceTest.java,v 1.3 2006-09-12 14:57:53 robi Exp $
 //###########################################################################
 
 
@@ -66,6 +66,18 @@ public abstract class AbstractTraceTest extends AbstractJAXBTest<TraceProxy>
     throws WatersMarshalException, WatersUnmarshalException, IOException
   {
     testMarshal("handwritten", "small_factory_2-uncont1");
+  }
+
+  public void testParse_looptrace()
+    throws Exception
+  {
+    testParse("tests", "nasty", "the_vicious_loop1");
+  }
+
+  public void testMarshal_looptrace()
+    throws WatersMarshalException, WatersUnmarshalException, IOException
+  {
+    testMarshal("tests", "nasty", "the_vicious_loop1");
   }
 
 
