@@ -50,10 +50,16 @@
 package org.supremica.automata;
 
 import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.NamedProxy;
+import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.plain.base.AbstractNamedElement;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 
 public class LabeledEvent
-	implements Comparable
+	implements EventProxy
 {
 	/** The label is what shows in the dot-figures, this is the
 	 * global identifier of an event, appearing in the alphabet. */
@@ -107,9 +113,14 @@ public class LabeledEvent
 		{
 			proposition = true;
 		}
-		
+
 		observable = e.isObservable();
 
+	}
+
+	public LabeledEvent clone()
+	{
+		return new LabeledEvent(this);
 	}
 
 	public String toString()
@@ -266,7 +277,13 @@ public class LabeledEvent
 		return getSynchIndex();
 	}
 
+/*
 	public int compareTo(Object event)
+	{
+		return label.compareTo(((LabeledEvent) event).label);
+	}
+*/
+	public int compareTo(NamedProxy event)
 	{
 		return label.compareTo(((LabeledEvent) event).label);
 	}
@@ -274,10 +291,79 @@ public class LabeledEvent
 	/**
 	 * Ordinary LabeledEvents are not forbidden, but their children
 	 * ForbiddenEvents are. This is overridden in ForbiddenEvent to
-	 * always return true. 
+	 * always return true.
 	 **/
 	public boolean isForbidden()
 	{
 		return false;
+	}
+
+	//#########################################################################
+	//# Methods that implements the EventProxy interface
+	//# Some methods is defined above
+
+
+	public String getName()
+	{
+		return getLabel();
+	}
+
+	public Object acceptVisitor(final ProxyVisitor visitor)
+		throws VisitorException
+	{
+		final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
+		return desvisitor.visitEventProxy(this);
+	}
+
+	public EventKind getKind()
+	{
+		if (proposition)
+		{
+			return EventKind.PROPOSITION;
+		}
+		if (controllable)
+		{
+			return EventKind.CONTROLLABLE;
+		}
+		return EventKind.UNCONTROLLABLE;
+	}
+
+	public boolean equalsByContents(final Proxy partner)
+	{
+		LabeledEvent partnerEvent = (LabeledEvent)partner;
+		return getName().equals(partnerEvent.getName()) && getKind().equals(partnerEvent.getKind()) && isObservable() == partnerEvent.isObservable();
+	}
+
+	public boolean equalsWithGeometry(final Proxy partner)
+	{
+		return equalsByContents(partner);
+	}
+
+	public int hashCodeByContents()
+	{
+		int result = refHashCode();
+		result *= 5;
+		result += getKind().hashCode();
+		result *= 5;
+		if (isObservable())
+		{
+			result++;
+		}
+		return result;
+	}
+
+	public int hashCodeWithGeometry()
+	{
+		return hashCodeByContents();
+	}
+
+	public boolean refequals(final NamedProxy partner)
+	{
+		return getName().equals(partner.getName());
+	}
+
+	public int refHashCode()
+	{
+		return getName().hashCode();
 	}
 }
