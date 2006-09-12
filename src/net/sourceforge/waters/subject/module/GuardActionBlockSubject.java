@@ -4,17 +4,27 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   GuardActionBlockSubject
 //###########################################################################
-//# $Id: GuardActionBlockSubject.java,v 1.9 2006-09-06 11:52:21 robi Exp $
+//# $Id: GuardActionBlockSubject.java,v 1.10 2006-09-12 14:32:17 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import net.sourceforge.waters.model.base.EqualCollection;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.unchecked.Casting;
+import net.sourceforge.waters.subject.base.ArrayListSubject;
+import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.MutableSubject;
 
@@ -34,16 +44,28 @@ public final class GuardActionBlockSubject
   //# Constructors
   /**
    * Creates a new guard action block.
-   * @param guard The guard of the new guard action block, or <CODE>null</CODE>.
-   * @param action The action of the new guard action block, or <CODE>null</CODE>.
+   * @param guards The guards of the new guard action block, or <CODE>null</CODE> if empty.
+   * @param actions The actions of the new guard action block, or <CODE>null</CODE> if empty.
    * @param geometry The geometry of the new guard action block, or <CODE>null</CODE>.
    */
-  public GuardActionBlockSubject(final String guard,
-                                 final String action,
+  public GuardActionBlockSubject(final Collection<? extends SimpleExpressionProxy> guards,
+                                 final Collection<? extends BinaryExpressionProxy> actions,
                                  final LabelGeometryProxy geometry)
   {
-    mGuard = guard;
-    mAction = action;
+    if (guards == null) {
+      mGuards = new ArrayListSubject<SimpleExpressionSubject>();
+    } else {
+      mGuards = new ArrayListSubject<SimpleExpressionSubject>
+        (guards, SimpleExpressionSubject.class);
+    }
+    mGuards.setParent(this);
+    if (actions == null) {
+      mActions = new ArrayListSubject<BinaryExpressionSubject>();
+    } else {
+      mActions = new ArrayListSubject<BinaryExpressionSubject>
+        (actions, BinaryExpressionSubject.class);
+    }
+    mActions.setParent(this);
     mGeometry = (LabelGeometrySubject) geometry;
     if (mGeometry != null) {
       mGeometry.setParent(this);
@@ -53,14 +75,14 @@ public final class GuardActionBlockSubject
   /**
    * Creates a new guard action block using default values.
    * This constructor creates a guard action block with
-   * the guard set to <CODE>null</CODE>,
-   * the action set to <CODE>null</CODE>, and
+   * an empty guards,
+   * an empty actions, and
    * the geometry set to <CODE>null</CODE>.
    */
   public GuardActionBlockSubject()
   {
-    this(null,
-         null,
+    this(emptySimpleExpressionProxyList(),
+         emptyBinaryExpressionProxyList(),
          null);
   }
 
@@ -70,6 +92,10 @@ public final class GuardActionBlockSubject
   public GuardActionBlockSubject clone()
   {
     final GuardActionBlockSubject cloned = (GuardActionBlockSubject) super.clone();
+    cloned.mGuards = mGuards.clone();
+    cloned.mGuards.setParent(cloned);
+    cloned.mActions = mActions.clone();
+    cloned.mActions.setParent(cloned);
     if (mGeometry != null) {
       cloned.mGeometry = mGeometry.clone();
       cloned.mGeometry.setParent(cloned);
@@ -85,10 +111,10 @@ public final class GuardActionBlockSubject
     if (super.equalsByContents(partner)) {
       final GuardActionBlockSubject downcast = (GuardActionBlockSubject) partner;
       return
-        (mGuard == null ? downcast.mGuard == null :
-         mGuard.equals(downcast.mGuard)) &&
-        (mAction == null ? downcast.mAction == null :
-         mAction.equals(downcast.mAction));
+        EqualCollection.isEqualListByContents
+          (mGuards, downcast.mGuards) &&
+        EqualCollection.isEqualListByContents
+          (mActions, downcast.mActions);
     } else {
       return false;
     }
@@ -99,10 +125,10 @@ public final class GuardActionBlockSubject
     if (super.equalsByContents(partner)) {
       final GuardActionBlockSubject downcast = (GuardActionBlockSubject) partner;
       return
-        (mGuard == null ? downcast.mGuard == null :
-         mGuard.equals(downcast.mGuard)) &&
-        (mAction == null ? downcast.mAction == null :
-         mAction.equals(downcast.mAction)) &&
+        EqualCollection.isEqualListWithGeometry
+          (mGuards, downcast.mGuards) &&
+        EqualCollection.isEqualListWithGeometry
+          (mActions, downcast.mActions) &&
         (mGeometry == null ? downcast.mGeometry == null :
          mGeometry.equalsWithGeometry(downcast.mGeometry));
     } else {
@@ -114,9 +140,9 @@ public final class GuardActionBlockSubject
   {
     int result = super.hashCodeByContents();
     result *= 5;
-    result += mGuard.hashCode();
+    result += EqualCollection.getListHashCodeByContents(mGuards);
     result *= 5;
-    result += mAction.hashCode();
+    result += EqualCollection.getListHashCodeByContents(mActions);
     return result;
   }
 
@@ -124,9 +150,9 @@ public final class GuardActionBlockSubject
   {
     int result = super.hashCodeByContents();
     result *= 5;
-    result += mGuard.hashCode();
+    result += EqualCollection.getListHashCodeWithGeometry(mGuards);
     result *= 5;
-    result += mAction.hashCode();
+    result += EqualCollection.getListHashCodeWithGeometry(mActions);
     result *= 5;
     if (mGeometry != null) {
       result += mGeometry.hashCodeWithGeometry();
@@ -147,14 +173,16 @@ public final class GuardActionBlockSubject
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.GuardActionBlockProxy
-  public String getGuard()
+  public List<SimpleExpressionProxy> getGuards()
   {
-    return mGuard;
+    final List<SimpleExpressionProxy> downcast = Casting.toList(mGuards);
+    return Collections.unmodifiableList(downcast);
   }
 
-  public String getAction()
+  public List<BinaryExpressionProxy> getActions()
   {
-    return mAction;
+    final List<BinaryExpressionProxy> downcast = Casting.toList(mActions);
+    return Collections.unmodifiableList(downcast);
   }
 
   public LabelGeometrySubject getGeometry()
@@ -165,26 +193,14 @@ public final class GuardActionBlockSubject
 
   //#########################################################################
   //# Setters
-  public void setGuard(final String guard)
+  public ListSubject<SimpleExpressionSubject> getGuardsModifiable()
   {
-    if (mGuard.equals(guard)) {
-      return;
-    }
-    mGuard = guard;
-    final ModelChangeEvent event =
-      ModelChangeEvent.createStateChanged(this);
-    fireModelChanged(event);
+    return mGuards;
   }
 
-  public void setAction(final String action)
+  public ListSubject<BinaryExpressionSubject> getActionsModifiable()
   {
-    if (mAction.equals(action)) {
-      return;
-    }
-    mAction = action;
-    final ModelChangeEvent event =
-      ModelChangeEvent.createStateChanged(this);
-    fireModelChanged(event);
+    return mActions;
   }
 
   public void setGeometry(final LabelGeometrySubject geometry)
@@ -206,9 +222,22 @@ public final class GuardActionBlockSubject
 
 
   //#########################################################################
+  //# Auxiliary Methods
+  private static List<SimpleExpressionProxy> emptySimpleExpressionProxyList()
+  {
+    return Collections.emptyList();
+  }
+
+  private static List<BinaryExpressionProxy> emptyBinaryExpressionProxyList()
+  {
+    return Collections.emptyList();
+  }
+
+
+  //#########################################################################
   //# Data Members
-  private String mGuard;
-  private String mAction;
+  private ListSubject<SimpleExpressionSubject> mGuards;
+  private ListSubject<BinaryExpressionSubject> mActions;
   private LabelGeometrySubject mGeometry;
 
 }

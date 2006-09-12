@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="sensoractuator" xmlns="http://waters.sourceforge.net/xsd/des">
+<EventList>
+<Event Kind="PROPOSITION" Name="@omega"/>
+<Event Kind="CONTROLLABLE" Name="change_direction_11"/>
+<Event Kind="CONTROLLABLE" Name="change_direction_12"/>
+<Event Kind="CONTROLLABLE" Name="change_direction_13"/>
+<Event Kind="CONTROLLABLE" Name="change_direction_14"/>
+<Event Kind="CONTROLLABLE" Name="change_direction_15"/>
+<Event Kind="CONTROLLABLE" Name="change_direction_16"/>
+<Event Kind="CONTROLLABLE" Name="change_direction_17"/>
+<Event Kind="CONTROLLABLE" Name="change_direction_18"/>
+<Event Kind="CONTROLLABLE" Name="change_direction_19"/>
+<Event Kind="CONTROLLABLE" Name="change_direction_20"/>
+<Event Kind="UNCONTROLLABLE" Name="move_left_21"/>
+<Event Kind="UNCONTROLLABLE" Name="move_left_22"/>
+<Event Kind="UNCONTROLLABLE" Name="move_left_23"/>
+<Event Kind="UNCONTROLLABLE" Name="move_left_24"/>
+<Event Kind="UNCONTROLLABLE" Name="move_right_25"/>
+<Event Kind="UNCONTROLLABLE" Name="move_right_26"/>
+<Event Kind="UNCONTROLLABLE" Name="move_right_27"/>
+<Event Kind="UNCONTROLLABLE" Name="move_right_28"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="Sensoractuator">
+<EventRefList>
+<EventRef Name="@omega"/>
+<EventRef Name="change_direction_11"/>
+<EventRef Name="change_direction_12"/>
+<EventRef Name="change_direction_13"/>
+<EventRef Name="change_direction_14"/>
+<EventRef Name="change_direction_15"/>
+<EventRef Name="change_direction_16"/>
+<EventRef Name="change_direction_17"/>
+<EventRef Name="change_direction_18"/>
+<EventRef Name="change_direction_19"/>
+<EventRef Name="change_direction_20"/>
+<EventRef Name="move_left_21"/>
+<EventRef Name="move_left_22"/>
+<EventRef Name="move_left_23"/>
+<EventRef Name="move_left_24"/>
+<EventRef Name="move_right_25"/>
+<EventRef Name="move_right_26"/>
+<EventRef Name="move_right_27"/>
+<EventRef Name="move_right_28"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="Sensoractuator(A)">
+<EventRefList>
+<EventRef Name="@omega"/>
+</EventRefList>
+</State>
+<State Name="Sensoractuator(B)"/>
+<State Name="Sensoractuator(C)"/>
+<State Name="Sensoractuator(D)"/>
+<State Name="Sensoractuator(E)"/>
+</StateList>
+<TransitionList>
+<Transition Target="Sensoractuator(A)" Source="Sensoractuator(A)" Event="change_direction_11"/>
+<Transition Target="Sensoractuator(A)" Source="Sensoractuator(A)" Event="change_direction_12"/>
+<Transition Target="Sensoractuator(B)" Source="Sensoractuator(A)" Event="move_right_25"/>
+<Transition Target="Sensoractuator(B)" Source="Sensoractuator(B)" Event="change_direction_13"/>
+<Transition Target="Sensoractuator(B)" Source="Sensoractuator(B)" Event="change_direction_14"/>
+<Transition Target="Sensoractuator(A)" Source="Sensoractuator(B)" Event="move_left_21"/>
+<Transition Target="Sensoractuator(C)" Source="Sensoractuator(B)" Event="move_right_26"/>
+<Transition Target="Sensoractuator(C)" Source="Sensoractuator(C)" Event="change_direction_15"/>
+<Transition Target="Sensoractuator(C)" Source="Sensoractuator(C)" Event="change_direction_16"/>
+<Transition Target="Sensoractuator(B)" Source="Sensoractuator(C)" Event="move_left_22"/>
+<Transition Target="Sensoractuator(D)" Source="Sensoractuator(C)" Event="move_right_27"/>
+<Transition Target="Sensoractuator(D)" Source="Sensoractuator(D)" Event="change_direction_17"/>
+<Transition Target="Sensoractuator(D)" Source="Sensoractuator(D)" Event="change_direction_18"/>
+<Transition Target="Sensoractuator(C)" Source="Sensoractuator(D)" Event="move_left_23"/>
+<Transition Target="Sensoractuator(E)" Source="Sensoractuator(D)" Event="move_right_28"/>
+<Transition Target="Sensoractuator(E)" Source="Sensoractuator(E)" Event="change_direction_19"/>
+<Transition Target="Sensoractuator(E)" Source="Sensoractuator(E)" Event="change_direction_20"/>
+<Transition Target="Sensoractuator(D)" Source="Sensoractuator(E)" Event="move_left_24"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="forward">
+<EventRefList>
+<EventRef Name="change_direction_11"/>
+<EventRef Name="change_direction_12"/>
+<EventRef Name="change_direction_13"/>
+<EventRef Name="change_direction_14"/>
+<EventRef Name="change_direction_15"/>
+<EventRef Name="change_direction_16"/>
+<EventRef Name="change_direction_17"/>
+<EventRef Name="change_direction_18"/>
+<EventRef Name="change_direction_19"/>
+<EventRef Name="change_direction_20"/>
+<EventRef Name="move_left_21"/>
+<EventRef Name="move_left_22"/>
+<EventRef Name="move_left_23"/>
+<EventRef Name="move_left_24"/>
+<EventRef Name="move_right_25"/>
+<EventRef Name="move_right_26"/>
+<EventRef Name="move_right_27"/>
+<EventRef Name="move_right_28"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="forward=0"/>
+<State Name="forward=1"/>
+</StateList>
+<TransitionList>
+<Transition Target="forward=1" Source="forward=0" Event="change_direction_12"/>
+<Transition Target="forward=1" Source="forward=0" Event="change_direction_14"/>
+<Transition Target="forward=1" Source="forward=0" Event="change_direction_16"/>
+<Transition Target="forward=1" Source="forward=0" Event="change_direction_18"/>
+<Transition Target="forward=1" Source="forward=0" Event="change_direction_20"/>
+<Transition Target="forward=0" Source="forward=0" Event="move_left_21"/>
+<Transition Target="forward=0" Source="forward=0" Event="move_left_22"/>
+<Transition Target="forward=0" Source="forward=0" Event="move_left_23"/>
+<Transition Target="forward=0" Source="forward=0" Event="move_left_24"/>
+<Transition Target="forward=0" Source="forward=1" Event="change_direction_11"/>
+<Transition Target="forward=0" Source="forward=1" Event="change_direction_13"/>
+<Transition Target="forward=0" Source="forward=1" Event="change_direction_15"/>
+<Transition Target="forward=0" Source="forward=1" Event="change_direction_17"/>
+<Transition Target="forward=0" Source="forward=1" Event="change_direction_19"/>
+<Transition Target="forward=1" Source="forward=1" Event="move_right_25"/>
+<Transition Target="forward=1" Source="forward=1" Event="move_right_26"/>
+<Transition Target="forward=1" Source="forward=1" Event="move_right_27"/>
+<Transition Target="forward=1" Source="forward=1" Event="move_right_28"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sensor1">
+<EventRefList>
+<EventRef Name="move_left_21"/>
+<EventRef Name="move_left_22"/>
+<EventRef Name="move_right_25"/>
+<EventRef Name="move_right_26"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="sensor1=0"/>
+<State Name="sensor1=1"/>
+</StateList>
+<TransitionList>
+<Transition Target="sensor1=0" Source="sensor1=0" Event="move_left_21"/>
+<Transition Target="sensor1=1" Source="sensor1=0" Event="move_left_22"/>
+<Transition Target="sensor1=1" Source="sensor1=0" Event="move_right_25"/>
+<Transition Target="sensor1=0" Source="sensor1=0" Event="move_right_26"/>
+<Transition Target="sensor1=0" Source="sensor1=1" Event="move_left_21"/>
+<Transition Target="sensor1=1" Source="sensor1=1" Event="move_left_22"/>
+<Transition Target="sensor1=1" Source="sensor1=1" Event="move_right_25"/>
+<Transition Target="sensor1=0" Source="sensor1=1" Event="move_right_26"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sensor2">
+<EventRefList>
+<EventRef Name="move_left_23"/>
+<EventRef Name="move_left_24"/>
+<EventRef Name="move_right_27"/>
+<EventRef Name="move_right_28"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="sensor2=0"/>
+<State Name="sensor2=1"/>
+</StateList>
+<TransitionList>
+<Transition Target="sensor2=0" Source="sensor2=0" Event="move_left_23"/>
+<Transition Target="sensor2=1" Source="sensor2=0" Event="move_left_24"/>
+<Transition Target="sensor2=1" Source="sensor2=0" Event="move_right_27"/>
+<Transition Target="sensor2=0" Source="sensor2=0" Event="move_right_28"/>
+<Transition Target="sensor2=0" Source="sensor2=1" Event="move_left_23"/>
+<Transition Target="sensor2=1" Source="sensor2=1" Event="move_left_24"/>
+<Transition Target="sensor2=1" Source="sensor2=1" Event="move_right_27"/>
+<Transition Target="sensor2=0" Source="sensor2=1" Event="move_right_28"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

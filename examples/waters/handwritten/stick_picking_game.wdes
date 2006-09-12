@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="stick_picking_game"
+            xmlns="http://waters.sourceforge.net/xsd/des">
+<EventList>
+<Event Kind="PROPOSITION" Name="@omega"/>
+<Event Kind="CONTROLLABLE" Name="player1_remove_one_1"/>
+<Event Kind="CONTROLLABLE" Name="player1_remove_two_2"/>
+<Event Kind="UNCONTROLLABLE" Name="player2_remove_one_3"/>
+<Event Kind="UNCONTROLLABLE" Name="player2_remove_two_4"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="Two_players">
+<EventRefList>
+<EventRef Name="@omega"/>
+<EventRef Name="player1_remove_one_1"/>
+<EventRef Name="player1_remove_two_2"/>
+<EventRef Name="player2_remove_one_3"/>
+<EventRef Name="player2_remove_two_4"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="Two_players(player1)"/>
+<State Name="Two_players(player2)">
+<EventRefList>
+<EventRef Name="@omega"/>
+</EventRefList>
+</State>
+</StateList>
+<TransitionList>
+<Transition Target="Two_players(player2)" Source="Two_players(player1)" Event="player1_remove_one_1"/>
+<Transition Target="Two_players(player2)" Source="Two_players(player1)" Event="player1_remove_two_2"/>
+<Transition Target="Two_players(player1)" Source="Two_players(player2)" Event="player2_remove_one_3"/>
+<Transition Target="Two_players(player1)" Source="Two_players(player2)" Event="player2_remove_two_4"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="sticks">
+<EventRefList>
+<EventRef Name="player1_remove_one_1"/>
+<EventRef Name="player1_remove_two_2"/>
+<EventRef Name="player2_remove_one_3"/>
+<EventRef Name="player2_remove_two_4"/>
+</EventRefList>
+<StateList>
+<State Name="sticks=0"/>
+<State Name="sticks=1"/>
+<State Name="sticks=2"/>
+<State Name="sticks=3"/>
+<State Name="sticks=4"/>
+<State Initial="true" Name="sticks=5"/>
+</StateList>
+<TransitionList>
+<Transition Target="sticks=0" Source="sticks=1" Event="player1_remove_one_1"/>
+<Transition Target="sticks=0" Source="sticks=1" Event="player2_remove_one_3"/>
+<Transition Target="sticks=1" Source="sticks=2" Event="player1_remove_one_1"/>
+<Transition Target="sticks=0" Source="sticks=2" Event="player1_remove_two_2"/>
+<Transition Target="sticks=1" Source="sticks=2" Event="player2_remove_one_3"/>
+<Transition Target="sticks=0" Source="sticks=2" Event="player2_remove_two_4"/>
+<Transition Target="sticks=2" Source="sticks=3" Event="player1_remove_one_1"/>
+<Transition Target="sticks=1" Source="sticks=3" Event="player1_remove_two_2"/>
+<Transition Target="sticks=2" Source="sticks=3" Event="player2_remove_one_3"/>
+<Transition Target="sticks=1" Source="sticks=3" Event="player2_remove_two_4"/>
+<Transition Target="sticks=3" Source="sticks=4" Event="player1_remove_one_1"/>
+<Transition Target="sticks=2" Source="sticks=4" Event="player1_remove_two_2"/>
+<Transition Target="sticks=3" Source="sticks=4" Event="player2_remove_one_3"/>
+<Transition Target="sticks=2" Source="sticks=4" Event="player2_remove_two_4"/>
+<Transition Target="sticks=4" Source="sticks=5" Event="player1_remove_one_1"/>
+<Transition Target="sticks=3" Source="sticks=5" Event="player1_remove_two_2"/>
+<Transition Target="sticks=4" Source="sticks=5" Event="player2_remove_one_3"/>
+<Transition Target="sticks=3" Source="sticks=5" Event="player2_remove_two_4"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

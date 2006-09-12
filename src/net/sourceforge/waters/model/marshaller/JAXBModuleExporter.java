@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleExporter
 //###########################################################################
-//# $Id: JAXBModuleExporter.java,v 1.13 2006-09-06 11:52:21 robi Exp $
+//# $Id: JAXBModuleExporter.java,v 1.14 2006-09-12 14:32:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -118,10 +118,13 @@ import net.sourceforge.waters.xsd.module.SimpleParameterType;
 import net.sourceforge.waters.xsd.module.SplineGeometry;
 import net.sourceforge.waters.xsd.module.UnaryExpression;
 //EFA-----------------
-import net.sourceforge.waters.xsd.module.GuardActionBlock;
-import net.sourceforge.waters.xsd.module.Variable;
+import net.sourceforge.waters.xsd.module.Actions;
 import net.sourceforge.waters.xsd.module.BooleanConstant;
+import net.sourceforge.waters.xsd.module.GuardActionBlock;
+import net.sourceforge.waters.xsd.module.Guards;
+import net.sourceforge.waters.xsd.module.Variable;
 //-----------------------
+
 public class JAXBModuleExporter
   extends JAXBDocumentExporter<ModuleProxy,Module>
   implements ModuleProxyVisitor
@@ -544,10 +547,22 @@ public Object visitExpressionProxy
      final GuardActionBlock element)
     throws VisitorException
   {
-    final String action = proxy.getAction();
-    element.setAction(action);
-    final String guard = proxy.getGuard();
-    element.setGuard(guard);
+    final List<SimpleExpressionProxy> guardsProxy = proxy.getGuards();
+    if (!guardsProxy.isEmpty()) {
+      final Guards guardsElement = mFactory.createGuards();
+      final List<ElementType> guardsList =
+        Casting.toList(guardsElement.getList());
+      copyCollection(guardsProxy, guardsList);
+      element.setGuards(guardsElement);
+    }
+    final List<BinaryExpressionProxy> actionsProxy = proxy.getActions();
+    if (!actionsProxy.isEmpty()) {
+      final Actions actionsElement = mFactory.createActions();
+      final List<ElementType> actionsList =
+        Casting.toList(actionsElement.getList());
+      copyCollection(actionsProxy, actionsList);
+      element.setActions(actionsElement);
+    }
     final LabelGeometryProxy geometryProxy = proxy.getGeometry();
     if (geometryProxy != null) {
       final LabelGeometry geometryElement =

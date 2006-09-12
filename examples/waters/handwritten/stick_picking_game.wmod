@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="stick_picking_game" xmlns="http://waters.sourceforge.net/xsd/module">
-<ParameterList>
-<EventParameter Required="true" Kind="CONTROLLABLE" Name="player1_remove_one"/>
-<EventParameter Required="true" Kind="CONTROLLABLE" Name="player1_remove_two"/>
-<EventParameter Required="true" Kind="UNCONTROLLABLE" Name="player2_remove_one"/>
-<EventParameter Required="true" Kind="UNCONTROLLABLE" Name="player2_remove_two"/>
-<EventParameter Required="true" Kind="PROPOSITION" Name="@omega"/>
-</ParameterList>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="player1_remove_one"/>
+<EventDecl Kind="CONTROLLABLE" Name="player1_remove_two"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="player2_remove_one"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="player2_remove_two"/>
+<EventDecl Kind="PROPOSITION" Name="@omega"/>
+</EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="Two_players"/>
@@ -50,8 +50,18 @@
 <Point X="224" Y="256"/>
 </EndPointGeometry>
 <GuardActionBlock>
-<Guard> sticks > 0 </Guard>
-<Action> sticks-=1;</Action>
+<Guards>
+<BinaryExpression Operator="&gt;">
+<SimpleIdentifier Name="sticks"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="sticks"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="player1" Target="player2">
@@ -71,8 +81,18 @@
 <Point X="224" Y="256"/>
 </EndPointGeometry>
 <GuardActionBlock>
-<Guard> sticks &gt;1 </Guard>
-<Action> sticks-=2;</Action>
+<Guards>
+<BinaryExpression Operator="&gt;">
+<SimpleIdentifier Name="sticks"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="sticks"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="player2" Target="player1">
@@ -92,8 +112,18 @@
 <Point X="224" Y="112"/>
 </EndPointGeometry>
 <GuardActionBlock>
-<Guard> sticks &gt; 0 </Guard>
-<Action> sticks-=1; </Action>
+<Guards>
+<BinaryExpression Operator="&gt;">
+<SimpleIdentifier Name="sticks"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="sticks"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="player2" Target="player1">
@@ -113,8 +143,18 @@
 <Point X="224" Y="112"/>
 </EndPointGeometry>
 <GuardActionBlock>
-<Guard> sticks &gt;1 </Guard>
-<Action>sticks-=2;</Action>
+<Guards>
+<BinaryExpression Operator="&gt;">
+<SimpleIdentifier Name="sticks"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="sticks"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 </EdgeList>
@@ -126,7 +166,6 @@
 <IntConstant Value="5"/>
 </BinaryExpression>
 <IntConstant Value="5"/>
-<IntConstant Value="0"/>
 </Variable>
 </VariableList>
 </SimpleComponent>

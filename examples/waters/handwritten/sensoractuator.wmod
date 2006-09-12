@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="sensoractuator" xmlns="http://waters.sourceforge.net/xsd/module">
-<ParameterList>
-<EventParameter Required="true" Kind="UNCONTROLLABLE" Name="move_right"/>
-<EventParameter Required="true" Kind="UNCONTROLLABLE" Name="move_left"/>
-<EventParameter Required="true" Kind="CONTROLLABLE" Name="change_direction"/>
-<EventParameter Required="true" Kind="PROPOSITION" Name="@omega"/>
-</ParameterList>
+<ConstantAliasList>
+<ConstantAlias>
+<SimpleIdentifier Name="boolean"/>
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Name="move_right"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="move_left"/>
+<EventDecl Kind="CONTROLLABLE" Name="change_direction"/>
+<EventDecl Kind="PROPOSITION" Name="@omega"/>
+</EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="Sensoractuator"/>
@@ -63,18 +72,17 @@
 <Point X="-63" Y="-51"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="144" Y="160"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="280" Y="99"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="416" Y="160"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard>forward==true</Guard>
-<Action> sensor1 = true; </Action>
+<Guards><SimpleIdentifier Name="forward"/></Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="B" Target="C">
@@ -84,18 +92,17 @@
 <Point X="-8" Y="-63"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="416" Y="160"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="536" Y="137"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="672" Y="176"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard>forward==true</Guard>
-<Action> sensor1 = false; </Action>
+<Guards><SimpleIdentifier Name="forward"/></Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor1"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="C" Target="D">
@@ -105,18 +112,17 @@
 <Point X="4" Y="-47"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="672" Y="176"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="803" Y="228"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="864" Y="336"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard>forward==true</Guard>
-<Action> sensor2 = true;</Action>
+<Guards><SimpleIdentifier Name="forward"/></Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor2"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="D" Target="E">
@@ -126,18 +132,17 @@
 <Point X="10" Y="10"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="864" Y="336"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="901" Y="462"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="832" Y="576"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard>forward==true</Guard>
-<Action> sensor2 = false; </Action>
+<Guards><SimpleIdentifier Name="forward"/></Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor2"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="E" Target="D">
@@ -147,18 +152,21 @@
 <Point X="-92" Y="-37"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="832" Y="576"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="820" Y="466"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="864" Y="336"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard>forward==false</Guard>
-<Action> sensor2 = true; </Action>
+<Guards>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="forward"/>
+</UnaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor2"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="D" Target="C">
@@ -168,18 +176,21 @@
 <Point X="-63" Y="1"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="864" Y="336"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="762" Y="283"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="672" Y="176"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard>forward==false</Guard>
-<Action> sensor2 = false;</Action>
+<Guards>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="forward"/>
+</UnaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor2"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="C" Target="B">
@@ -189,18 +200,21 @@
 <Point X="0" Y="10"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="672" Y="176"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="526" Y="194"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="416" Y="160"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard>forward==false</Guard>
-<Action> sensor1 = true;</Action>
+<Guards>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="forward"/>
+</UnaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="B" Target="A">
@@ -210,18 +224,21 @@
 <Point X="0" Y="10"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="416" Y="160"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="283" Y="186"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="144" Y="160"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard>forward==false</Guard>
-<Action> sensor1 = false;</Action>
+<Guards>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="forward"/>
+</UnaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="sensor1"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="A" Target="A">
@@ -231,18 +248,17 @@
 <Point X="-3" Y="18"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="144" Y="160"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="61" Y="60"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="16" Y="16"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard>forward==true</Guard>
-<Action> forward = false;</Action>
+<Guards><SimpleIdentifier Name="forward"/></Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="forward"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="A" Target="A">
@@ -252,18 +268,21 @@
 <Point X="-55" Y="-66"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="144" Y="160"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="187" Y="268"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="16" Y="16"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard>forward==false</Guard>
-<Action> forward = true;</Action>
+<Guards>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="forward"/>
+</UnaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="forward"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="B" Target="B">
@@ -273,18 +292,17 @@
 <Point X="-13" Y="13"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="416" Y="160"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="426" Y="48"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="80" Y="16"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard>forward==true</Guard>
-<Action> forward = false;</Action>
+<Guards><SimpleIdentifier Name="forward"/></Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="forward"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="B" Target="B">
@@ -294,18 +312,21 @@
 <Point X="-29" Y="-65"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="416" Y="160"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="416" Y="277"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="80" Y="16"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard>forward==false</Guard>
-<Action> forward = true;</Action>
+<Guards>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="forward"/>
+</UnaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="forward"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="C" Target="C">
@@ -315,18 +336,17 @@
 <Point X="-74" Y="23"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="672" Y="176"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="750" Y="66"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="144" Y="16"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard>forward==true</Guard>
-<Action> forward = false;</Action>
+<Guards><SimpleIdentifier Name="forward"/></Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="forward"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="C" Target="C">
@@ -336,18 +356,21 @@
 <Point X="-35" Y="-71"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="672" Y="176"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="665" Y="292"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="144" Y="16"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard>forward==false</Guard>
-<Action> forward = true; </Action>
+<Guards>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="forward"/>
+</UnaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="forward"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="D" Target="D">
@@ -357,18 +380,17 @@
 <Point X="-88" Y="3"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="864" Y="336"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="986" Y="300"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="16" Y="80"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard>forward==true</Guard>
-<Action> forward = false;</Action>
+<Guards><SimpleIdentifier Name="forward"/></Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="forward"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="D" Target="D">
@@ -378,18 +400,21 @@
 <Point X="13" Y="-32"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="864" Y="336"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="742" Y="379"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="16" Y="80"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard>forward==false</Guard>
-<Action> forward = true; </Action>
+<Guards>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="forward"/>
+</UnaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="forward"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="E" Target="E">
@@ -399,18 +424,17 @@
 <Point X="-84" Y="-58"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="832" Y="576"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="946" Y="659"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="80" Y="80"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard>forward==true</Guard>
-<Action> forward = false; </Action>
+<Guards><SimpleIdentifier Name="forward"/></Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="forward"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="E" Target="E">
@@ -420,18 +444,21 @@
 <Point X="21" Y="-21"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="832" Y="576"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="689" Y="562"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="80" Y="80"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard>forward==false</Guard>
-<Action> forward = true;</Action>
+<Guards>
+<UnaryExpression Operator="!">
+<SimpleIdentifier Name="forward"/>
+</UnaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="forward"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 </EdgeList>
@@ -439,15 +466,15 @@
 <VariableList>
 <Variable Name="forward">
 <SimpleIdentifier Name="boolean"/>
-<BooleanConstant Value="false"/>
+<IntConstant Value="0"/>
 </Variable>
 <Variable Name="sensor1">
 <SimpleIdentifier Name="boolean"/>
-<BooleanConstant Value="false"/>
+<IntConstant Value="0"/>
 </Variable>
 <Variable Name="sensor2">
 <SimpleIdentifier Name="boolean"/>
-<BooleanConstant Value="false"/>
+<IntConstant Value="0"/>
 </Variable>
 </VariableList>
 </SimpleComponent>

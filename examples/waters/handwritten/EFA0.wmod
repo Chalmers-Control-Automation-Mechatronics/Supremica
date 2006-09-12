@@ -42,18 +42,11 @@
 <Point X="0" Y="10"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="112" Y="240"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="160" Y="184"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="208" Y="128"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard>true</Guard>
-<Action/>
+<Guards><IntConstant Value="1"/></Guards>
 </GuardActionBlock>
 </Edge>
 <Edge Source="s0" Target="s2">
@@ -63,18 +56,11 @@
 <Point X="0" Y="10"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="112" Y="240"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="200" Y="280"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="288" Y="320"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard>false</Guard>
-<Action/>
+<Guards><IntConstant Value="0"/></Guards>
 </GuardActionBlock>
 </Edge>
 </EdgeList>
@@ -82,4 +68,3 @@
 </SimpleComponent>
 </ComponentList>
 </Module>
-

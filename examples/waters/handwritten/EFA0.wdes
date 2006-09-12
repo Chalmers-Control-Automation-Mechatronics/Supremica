@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="EFA0" xmlns="http://waters.sourceforge.net/xsd/des">
+<EventList>
+<Event Kind="CONTROLLABLE" Name="e1_1"/>
+<Event Kind="CONTROLLABLE" Name="e2"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="A">
+<EventRefList>
+<EventRef Name="e1_1"/>
+<EventRef Name="e2"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="A(s0)"/>
+<State Name="A(s1)"/>
+<State Name="A(s2)"/>
+</StateList>
+<TransitionList>
+<Transition Target="A(s1)" Source="A(s0)" Event="e1_1"/>
+<Transition Target="A(s2)" Source="A(s0)" Event="e2"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

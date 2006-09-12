@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.14 2006-09-06 11:52:21 robi Exp $
+//# $Id: JAXBModuleImporter.java,v 1.15 2006-09-12 14:32:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -121,9 +121,11 @@ import net.sourceforge.waters.xsd.module.SplineGeometry;
 import net.sourceforge.waters.xsd.module.SplineKind;
 import net.sourceforge.waters.xsd.module.UnaryExpression;
 //EFA----------------
-import net.sourceforge.waters.xsd.module.GuardActionBlock;
-import net.sourceforge.waters.xsd.module.Variable;
+import net.sourceforge.waters.xsd.module.Actions;
 import net.sourceforge.waters.xsd.module.BooleanConstant;
+import net.sourceforge.waters.xsd.module.GuardActionBlock;
+import net.sourceforge.waters.xsd.module.Guards;
+import net.sourceforge.waters.xsd.module.Variable;
 //-------------------
 
 
@@ -582,43 +584,65 @@ public class JAXBModuleImporter
     return mFactory.createBooleanConstantProxy(text, value);
   }
 
-  private VariableProxy importVariable(final Variable element) {
-		final SimpleExpressionType typeElement = element.getType();
-		final SimpleExpressionProxy type = (SimpleExpressionProxy) importElement(typeElement);
+  private VariableProxy importVariable(final Variable element)
+  {
+    final SimpleExpressionType typeElement = element.getType();
+    final SimpleExpressionProxy type =
+      (SimpleExpressionProxy) importElement(typeElement);
+    final SimpleExpressionType initialValueElement = element.getInitialValue();
+    final SimpleExpressionProxy initialValue =
+      (SimpleExpressionProxy) importElement(initialValueElement);
+    final String name = element.getName();
+    if (element.getMarkedValue() != null) {
+      final SimpleExpressionType markedValueElement = element.getMarkedValue();
+      final SimpleExpressionProxy markedValue =
+        (SimpleExpressionProxy) importElement(markedValueElement);
+      return mFactory.createVariableProxy
+        (name, type, initialValue, markedValue);
+    } else {
+      return mFactory.createVariableProxy(name, type, initialValue);
+    }
+  }
+  
+  private GuardActionBlockProxy importGuardActionBlock
+    (final GuardActionBlock element)
+  {
+    if (element == null) {
+      return null;
+    } else {
+      final Guards guards = element.getGuards();
+      final List<SimpleExpressionProxy> guardList =
+        new LinkedList<SimpleExpressionProxy>();
+      if (guards != null) {
+        final List<SimpleExpressionType> guardListElement =
+          Casting.toList(guards.getList());
+        for (final SimpleExpressionType exprElement : guardListElement) {
+          final SimpleExpressionProxy exprProxy =
+            (SimpleExpressionProxy) importElement(exprElement);
+          guardList.add(exprProxy);
+        }
+      }
+      final Actions actions = element.getActions();
+      final List<BinaryExpressionProxy> actionList =
+        new LinkedList<BinaryExpressionProxy>();
+      if (actions != null) {
+        final List<BinaryExpression> actionListElement =
+          Casting.toList(actions.getList());
+        for (final BinaryExpression exprElement : actionListElement) {
+          final BinaryExpressionProxy exprProxy =
+            (BinaryExpressionProxy) importElement(exprElement);
+          actionList.add(exprProxy);
+        }
+      }
+      final LabelGeometryProxy geometry =
+        (LabelGeometryProxy) element.getLabelGeometry(); 
+      return mFactory.createGuardActionBlockProxy
+        (guardList, actionList, geometry);
+    }
+  }
+  // ------------------------
 
-		final SimpleExpressionType initialValueElement = element
-				.getInitialValue();
-		final SimpleExpressionProxy initialValue = (SimpleExpressionProxy) importElement(initialValueElement);
-		final String name = element.getName();
-
-		if (element.getMarkedValue() != null) {
-			final SimpleExpressionType markedValueElement = element
-					.getMarkedValue();
-			final SimpleExpressionProxy markedValue = (SimpleExpressionProxy) importElement(markedValueElement);
-			return mFactory.createVariableProxy(name, type, initialValue, markedValue);
-		}
-
-		else {
-			return mFactory.createVariableProxy(name, type, initialValue);
-		}
-	}
-  private GuardActionBlockProxy importGuardActionBlock(
-			final GuardActionBlock element) {
-		
-	  if(element != null) {
-		  
-		  final String guard = element.getGuard();
-		  final String action = element.getAction();
-		  final LabelGeometryProxy geometry = (LabelGeometryProxy) element.getLabelGeometry(); 
-		  return mFactory
-		  .createGuardActionBlockProxy(guard, action, geometry);
-	  } else {
-		  return null;
-	  }
-	}
-
-   // ------------------------
- private EdgeProxy importEdge(final Edge element)
+  private EdgeProxy importEdge(final Edge element)
   {
     final String sourceName = element.getSource();
     final NodeProxy source = mGraphNodeList.find(sourceName);

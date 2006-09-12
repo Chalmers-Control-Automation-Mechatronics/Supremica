@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.41 2006-09-07 14:51:44 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.42 2006-09-12 14:32:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -23,11 +25,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Set;
-
-import java.lang.ClassCastException;
-
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
@@ -71,6 +68,7 @@ import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.IntParameterProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.ParameterProxy;
@@ -87,11 +85,7 @@ import net.sourceforge.waters.model.module.VariableProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 //
 
-import net.sourceforge.waters.subject.base.ArrayListSubject;
-import net.sourceforge.waters.subject.base.ListSubject;
-import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -101,18 +95,23 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
   //##########################################################################
   //# Constructors
   public ModuleCompiler(final DocumentManager manager,
-                        final ProductDESProxyFactory factory,
+                        final ProductDESProxyFactory desfactory,
                         final ModuleProxy module)
   {
     mDocumentManager = manager;
-    mFactory = factory;
+    mDESFactory = desfactory;
+    mModuleFactory = ModuleElementFactory.getInstance();
+    mOperatorTable = CompilerOperatorTable.getInstance();
+    mComparator = new ExpressionComparator();
+    mDNFConverter =
+      new DNFConverter(mModuleFactory, mOperatorTable, mComparator);
     mModule = module;
     mContext = null;
     mParameterMap = null;
     mCurrentEventID = 1;
   }
 
-	
+
   //##########################################################################
   //# Invocation
   public ProductDESProxy compile()
@@ -159,7 +158,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       }
       // end EFA
       visitModuleProxy(mModule);
-      return mFactory.createProductDESProxy
+      return mDESFactory.createProductDESProxy
         (name, desLocation, mGlobalAlphabet, mAutomata.values());
     } catch (final VisitorException exception) {
       final Throwable cause = exception.getCause();
@@ -246,7 +245,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       throw wrap(exception);
     }
   }
-  
+
   public Object visitEdgeProxy(final EdgeProxy proxy)
     throws VisitorException
   {
@@ -557,8 +556,8 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
    * Map<String,AutomatonProxy>?
    */
   public AutomatonProxy visitSimpleComponentProxy
-    (final SimpleComponentProxy proxy) 
-    throws VisitorException 
+    (final SimpleComponentProxy proxy)
+    throws VisitorException
   {
     try {
       final IdentifierProxy ident = proxy.getIdentifier();
@@ -588,7 +587,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       //EFA with shared variables---------
       mSimpleComponents.add(proxy);
       //---------------------
-			
+
       for (final NodeProxy source : nodes) {
         final CompiledNode sourceEntry = mPrecompiledNodes.get(source);
         for (final EdgeProxy edge : sourceEntry.getEdges()) {
@@ -603,7 +602,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
         }
         sourceEntry.clearProperChildNodes();
       }
-			
+
       /*
        * States in different Automata are considered equal if the names are
        * the same.  This must be fixed since it leads to problems in the
@@ -613,35 +612,35 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 
       /*
        * The automaton is created. If it is an EFA-automaton
-       * the events will be relabeled, transitions divided and 
+       * the events will be relabeled, transitions divided and
        * variableAutmata will be created in the method compileEFA().
-       * 
+       *
        */
       if (mIsEFA) {
-        Map <StateProxy, StateProxy> stateStateMap = 
+        Map <StateProxy, StateProxy> stateStateMap =
           new HashMap<StateProxy, StateProxy>();
         /*
          * Rename all states.
          */
         for(StateProxy state: mStates){
           final StateProxy s =
-            mFactory.createStateProxy(name+"("+state.getName()+")",
+            mDESFactory.createStateProxy(name+"("+state.getName()+")",
                                       state.isInitial(),
                                       state.getPropositions());
           stateStateMap.put(state,s);
         }
         /*
-         * Rename all transitions. Update mapping: transition to 
+         * Rename all transitions. Update mapping: transition to
          * GuardActionBlock.
          */
-        LinkedList<TransitionProxy> Transitions = 
+        LinkedList<TransitionProxy> Transitions =
           new LinkedList<TransitionProxy>();
-        
+
         for (TransitionProxy transition : mTransitions) {
-          
+
           StateProxy source = transition.getSource();
           StateProxy target = transition.getTarget();
-          
+
           for (StateProxy state : mStates) {
             if (transition.getSource().equals(state)) {
               source = stateStateMap.get(state);
@@ -649,10 +648,10 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
             if (transition.getTarget().equals(state)) {
               target = stateStateMap.get(state);
             }
-            
+
           }
           TransitionProxy trans =
-            mFactory.createTransitionProxy(source,
+            mDESFactory.createTransitionProxy(source,
                                            transition.getEvent(),
                                            target);
           if (mEFATransitionGuardActionBlockMap.containsKey(transition)){
@@ -670,7 +669,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
         mStates.clear();
         mStates.addAll(stateStateMap.values());
         final AutomatonProxy aut =
-          mFactory.createAutomatonProxy(mCurrentComponentName,
+          mDESFactory.createAutomatonProxy(mCurrentComponentName,
                                         kind, mLocalAlphabet,
                                         mStates, mTransitions);
         for (TransitionProxy trans : mTransitions) {
@@ -680,7 +679,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
         return aut;
       } else {
         final AutomatonProxy aut =
-          mFactory.createAutomatonProxy(mCurrentComponentName,
+          mDESFactory.createAutomatonProxy(mCurrentComponentName,
                                         kind, mLocalAlphabet,
                                         mStates, mTransitions);
         mAutomata.put(mCurrentComponentName, aut);
@@ -730,7 +729,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       stateProps.add(eventProxy);
     }
     final StateProxy state =
-      mFactory.createStateProxy(name, initial, stateProps);
+      mDESFactory.createStateProxy(name, initial, stateProps);
     if (initial) {
       switch (mMaxInitialStates) {
       case 1:
@@ -770,7 +769,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       throw wrap(exception);
     }
   }
-  
+
   public Value visitUnaryExpressionProxy
     (final UnaryExpressionProxy proxy)
     throws VisitorException
@@ -789,371 +788,281 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 
   //##########################################################################
   //# EFA
-  private void compileEFA() {
-		
+  private void compileEFA()
+    throws VisitorException
+  {
     /*
      * Mappings used to create variable automata instanciated.
      */
-    mEFAEventGuardClauseMap = new HashMap<EventProxy, SimpleExpressionSubject>();
-    mEFAEventActionListsMap = new HashMap<EventProxy, List<List<BinaryExpressionProxy>>>();
-    
+    mEFAEventGuardClauseMap = new HashMap<EventProxy,SimpleExpressionProxy>();
+    mEFAEventActionListsMap =
+      new HashMap<EventProxy, List<List<BinaryExpressionProxy>>>();
+
     /*
      * Copy the GlobalAlphabet.
      */
     final Set<EventProxy> newEvents = new HashSet<EventProxy>();
     newEvents.addAll(mOriginalAlphabet);
-		
-    for (EventProxy event : mOriginalAlphabet) {
-      /*
-       * Find all possible transitions (synch-combinations between the automata)
-       * that the event can trigger(allTrans = allPaths).
-       */
-      List<List<TransitionProxy>> allTrans = allPossibleTransitions(event);
-      
-      /*
-       * Collect guard and actions. Split the guards into andClauses.
-       * Update the automata with the final events and
-       * transitions. Fill mappings, mEFAEventGuardClauseMap and
-       * mEFAEventActionListMap, needed to build variable automata. 
-       */
-      for (List<TransitionProxy> path : allTrans) {
+
+    try {
+      for (final EventProxy event : mOriginalAlphabet) {
         /*
-         * The event is renamed in two steps: first for each path and
-         * then for each andClause in the guard expression.
+         * Find all possible transitions
+         * (synch-combinations between the automata)
+         * that the event can trigger(allTrans = allPaths).
          */
-        if (!path.isEmpty()) {
-          /*
-           * Debugging
-           */
-          //System.out.println("path: " + path);
-          
-          newEvents.remove(event);
-          
-          SimpleExpressionSubject guardExpression = collectGuard(path);
-          List<List<BinaryExpressionProxy>> actionLists = collectAction(path);
-          
-          GuardExpressionHandler handler = new GuardExpressionHandler();
-          handler.setExpression(guardExpression);
-          List<SimpleExpressionSubject> andClauses = handler
-            .getAndClauses();
-          
-          for (SimpleExpressionSubject andClause : andClauses) {
-            final EventProxy relabeledEvent = mFactory
-              .createEventProxy(event.getName() + "_"
-                                + mCurrentEventID, event.getKind(),
-                                event.isObservable());
-            mEFAEventGuardClauseMap.put(relabeledEvent, andClause);
-            mEFAEventActionListsMap
-              .put(relabeledEvent, actionLists);
-            newEvents.add(relabeledEvent);
-            
-            mEFAEventEventMap.put(relabeledEvent, event);
-            
-            mCurrentEventID++;
-            /*
-             * New transitions with the new event names are added to
-             * the automata.
-             */
-            addNewTransitionsToAutomtata(relabeledEvent, path);
-            
+        List<List<TransitionProxy>> allTrans = allPossibleTransitions(event);
+        /*
+         * Collect guard and actions. Split the guards into andClauses.
+         * Update the automata with the final events and
+         * transitions. Fill mappings, mEFAEventGuardClauseMap and
+         * mEFAEventActionListMap, needed to build variable automata.
+         */
+        for (List<TransitionProxy> path : allTrans) {
+          // The event is renamed in two steps: first for each path and
+          // then for each andClause in the guard expression.
+          final SimpleExpressionProxy guard = collectGuard(path);
+          final CompiledNormalForm dnf = mDNFConverter.convertToDNF(guard);
+          final Collection<CompiledClause> andClauses = dnf.getClauses();
+          if (!andClauses.isEmpty()) {
+            final List<SimpleExpressionProxy> sortedAndClauses =
+              mDNFConverter.createSortedClauseList(dnf);
+            newEvents.remove(event);
+            final List<List<BinaryExpressionProxy>> actionLists =
+              collectAction(path);
+            for (final SimpleExpressionProxy expr : sortedAndClauses) {
+              final String eventname =
+                event.getName() + "_" + mCurrentEventID++;
+              final EventProxy relabeledEvent =
+                mDESFactory.createEventProxy(eventname,
+                                             event.getKind(),
+                                             event.isObservable());
+              mEFAEventGuardClauseMap.put(relabeledEvent, expr);
+              mEFAEventActionListsMap.put(relabeledEvent, actionLists);
+              newEvents.add(relabeledEvent);
+              mEFAEventEventMap.put(relabeledEvent, event);
+              // New transitions with the new event names are added to
+              // the automata.
+              addNewTransitionsToAutomtata(relabeledEvent, path);
+            }
           }
-          
         }
       }
-      
+      removeOldTransitionsFromAutomtata();
+      mGlobalAlphabet.clear();
+      mGlobalAlphabet.addAll(newEvents);
+      /*
+       * The variable automata are constructed using mSimpleComponents,
+       * mEFAEventGuardClauseMap and mEFAEventActionListMap.
+       */
+      buildVariableAutomata();
+    } catch (final EvalException exception) {
+      throw wrap(exception);
     }
-    removeOldTransitionsFromAutomtata();
-    mGlobalAlphabet.clear();
-    mGlobalAlphabet.addAll(newEvents);
-    
-    /*
-     * The variable automata are constructed using mSimpleComponents,
-     * mEFAEventGuardClauseMap and mEFAEventActionListMap.
-     */
-    buildVariableAutomata();
   }
-	
-	
-  private void removeOldTransitionsFromAutomtata() {
-    Map<String, AutomatonProxy> Automata = new TreeMap<String, AutomatonProxy>();
-    for(AutomatonProxy aut: mAutomata.values()){
-      
-      Set<EventProxy> efaEvents = new TreeSet<EventProxy>();
-      Collection<TransitionProxy> efaTransitions = new TreeSet<TransitionProxy>();
+
+  private void removeOldTransitionsFromAutomtata()
+  {
+    final Map<String,AutomatonProxy> newAutomata =
+      new TreeMap<String,AutomatonProxy>();
+    for (final AutomatonProxy aut: mAutomata.values()) {
+      final Set<EventProxy> efaEvents = new TreeSet<EventProxy>();
+      final Collection<TransitionProxy> efaTransitions =
+        new TreeSet<TransitionProxy>();
       efaEvents.addAll(aut.getEvents());
       efaTransitions.addAll(aut.getTransitions());
-      for(EventProxy event: mEFAEventEventMap.values()){
+      for (final EventProxy event: mEFAEventEventMap.values()) {
         efaEvents.remove(event);
-        for(TransitionProxy trans: aut.getTransitions()){
-          if(trans.getEvent().equals(event)){
+        for (final TransitionProxy trans: aut.getTransitions()){
+          if (trans.getEvent() == event) {
             efaTransitions.remove(trans);
           }
         }
       }
-      Automata.put(aut.getName(),
-                   mFactory.createAutomatonProxy(aut.getName(),
-                                                 aut.getKind(),
-                                                 efaEvents,
-                                                 aut.getStates(),
-                                                 efaTransitions));
-		
+      newAutomata.put(aut.getName(),
+                      mDESFactory.createAutomatonProxy(aut.getName(),
+                                                       aut.getKind(),
+                                                       efaEvents,
+                                                       aut.getStates(),
+                                                       efaTransitions));
     }
     mAutomata.clear();
-    mAutomata.putAll(Automata);
-    
+    mAutomata.putAll(newAutomata);
   }
 
-  private void buildVariableAutomata() {
-    for (SimpleComponentProxy simpleComponent : mSimpleComponents)
-      {
-        
-        /*
-         * Get the EFA variables.
-         */
-        final List<VariableProxy> variables = simpleComponent
-          .getVariables();
-        
-        /*
-         * Create an automaton for each variable, the alphabet for each
-         * automaton is a subset of mEFAEvent.
-         */
-        for (VariableProxy variable : variables) {
-          final AutomatonProxy variableAutomaton = createVariableAutomaton(
-                                                                           simpleComponent.getKind(), variable);
-          // Add variable automaton to mAutomata.
-          mAutomata.put(variable.getName(), variableAutomaton);
-        }
+  private void buildVariableAutomata()
+    throws VisitorException
+  {
+    for (SimpleComponentProxy comp : mSimpleComponents) {
+      // Get the EFA variables.
+      final Collection<VariableProxy> variables = comp.getVariables();
+      // Create an automaton for each variable, the alphabet for each
+      // automaton is a subset of mEFAEvent.
+      for (VariableProxy variable : variables) {
+        final AutomatonProxy variableAutomaton =
+          createVariableAutomaton(comp.getKind(), variable);
+        // Add variable automaton to mAutomata.
+        mAutomata.put(variable.getName(), variableAutomaton);
       }
-  }
-  private AutomatonProxy createVariableAutomaton(ComponentKind kind,
-                                                 VariableProxy variable) {
-		
-    
-    /*
-     * Create an expression handler to handle the guard expressions.
-     */
-    GuardExpressionHandler handler = new GuardExpressionHandler();
-    /*
-     * Declare variable, enum not yet implemented. (TODO remove comment when
-     * implemented).
-     */
-    if (variable.getType() instanceof SimpleIdentifierProxy) {
-      handler.declareVariable(variable.getName(),
-                              GuardExpressionHandler.Type.BOOLEAN);
-    } else {
-      handler.declareVariable(variable.getName(),
-                              GuardExpressionHandler.Type.INTEGER);
     }
-    List<StateProxy> variableStates = new LinkedList<StateProxy>();
-    /*
-     * Create states corresponding to the different states of the variable.
-     */
-    createVariableStates(variable, variableStates);
-    
-    /*
-     * Create transitions corresponding to all allowed updates of the variable.
-     */
-    /*
-     * Copy the relabeledAlphabet. Events that translates into
-     * selfloops in all variable states will be removed.
-     */
+  }
+
+  private AutomatonProxy createVariableAutomaton(ComponentKind kind,
+                                                 VariableProxy variable)
+    throws VisitorException
+  {
+    // Evaluate the state range.
+    final SimpleExpressionProxy rangeexpr = variable.getType();
+    final RangeValue range = evalRange(rangeexpr);
+    final int numstates = range.size();
+    // Create states corresponding to the different states of the variable.
+    final Map<IndexValue,StateProxy> variableStates =
+      new HashMap<IndexValue,StateProxy>(numstates);
+    createVariableStates(variable, range, variableStates);
+    // Copy the relabeledAlphabet. Events that translates into
+    // selfloops in all variable states will be removed.
     final Set<EventProxy> variableAlphabet = new HashSet<EventProxy>();
     variableAlphabet.addAll(mEFAEventGuardClauseMap.keySet());
-    
-    Set<TransitionProxy> variableTransitions = 
+    // Create transitions corresponding to all allowed updates of the variable.
+    Set<TransitionProxy> variableTransitions =
       createVariableTransitions(variable,
+                                range,
                                 variableAlphabet,
-                                handler,
                                 variableStates);
-    
     //Create variable automaton.
-    final AutomatonProxy variableAutomaton = 
-      mFactory.createAutomatonProxy(variable.getName(),
-                                    kind, 
-                                    variableAlphabet,
-                                    variableStates,
-                                    variableTransitions);
+    final AutomatonProxy variableAutomaton =
+      mDESFactory.createAutomatonProxy(variable.getName(),
+                                       kind,
+                                       variableAlphabet,
+                                       variableStates.values(),
+                                       variableTransitions);
     return variableAutomaton;
   }
-  
-  private Set<TransitionProxy>
-    createVariableTransitions(VariableProxy variable,
-                              Set<EventProxy> variableAlphabet,
-                              GuardExpressionHandler handler,
-                              List<StateProxy> variableStates) {
-		
-    Set<TransitionProxy> variableTransitions = new TreeSet<TransitionProxy>();
-    
-    for (EventProxy relabeledEvent : mEFAEventGuardClauseMap.keySet()) {
-      
-      //Get the right action.
-      final List <List<BinaryExpressionProxy>> actionLists = mEFAEventActionListsMap
-        .get(relabeledEvent);
-      
-      /*
-       * For each variable, find the action that updates this variable.
-       * Only one of the actionLists is allowed to update each variable.
-       */
-      final BinaryExpressionProxy action = findAction(variable.getName(),
-                                                      actionLists);
-      
-      //...and the corresponding guard
-      final SimpleExpressionSubject guardClause = (SimpleExpressionSubject) mEFAEventGuardClauseMap
-        .get(relabeledEvent);
-      handler.setPureAndExpression(guardClause);
-      
-      /*
-       * Translate the action to a transition in the variable automaton
-       * and add this transition in the variable states where the guard is
-       * true.
-       * 
-       * Remark: Here we require the action to be in the format:
-       * identifier-actionOperator-constant.
-       */
-      
-      if (!handler.variableInExpression(variable) && action == null) {
-        // The action does not update this variable and it does
-        // not occur in the guard expression => we can remove
-        // the corresponding event from the local alphabet.
-        variableAlphabet.remove(relabeledEvent);
-      }
-      else {
-        //variable type = finite integer
-        if (variable.getType() instanceof BinaryExpressionProxy) {
-          createIntegerVariableTransition(variable, handler, variableStates,
-                                          variableTransitions, relabeledEvent, action);
-        }
-        //variable type = boolean
-        else if (variable.getType() instanceof SimpleIdentifierProxy) {
-          createBooleanVariableTransition(variable, handler, variableStates,
-                                          variableTransitions,
-                                          relabeledEvent, action);
-        }
-        //variable type = enum
-        else if (variable.getType() instanceof EnumSetExpressionProxy) {
-          // TODO: implement this.
-        }
-        
-        else {
-          System.err.println("ModuleCompiler: Invalid variable type");
-        }
-      }
+
+  private void createVariableStates(final VariableProxy variable,
+                                    final RangeValue range,
+                                    final Map<IndexValue,StateProxy> states)
+    throws VisitorException
+  {
+    final String prefix = variable.getName() + "=";
+    final SimpleExpressionProxy initexpr = variable.getInitialValue();
+    final IndexValue initvalue = evalIndex(initexpr, range);
+    final SimpleExpressionProxy markedexpr = variable.getMarkedValue();
+    IndexValue markedvalue = null;
+    EventProxy prop = null;
+    if (markedexpr != null) {
+      markedvalue = evalIndex(markedexpr, range);
+      // BUG!!! Must use shared event for this!!!
+      prop = mDESFactory.createEventProxy("variableMarking",
+                                          EventKind.PROPOSITION);
     }
-    
-    return variableTransitions;
+    for (final IndexValue item : range.getValues()) {
+      final String name = prefix + item.toString();
+      final boolean initial = item.equals(initvalue);
+      Collection<EventProxy> props;
+      if (item.equals(markedvalue)) {
+        props = Collections.singletonList(prop);
+      } else {
+        props = Collections.emptyList();
+      }
+      final StateProxy state =
+        mDESFactory.createStateProxy(name, initial, props);
+      states.put(item, state);
+    }
   }
-  
-  private void createVariableStates(VariableProxy variable,
-                                    List<StateProxy> variableStates ) {
-    
-    final Collection<EventProxy> markedState = new TreeSet<EventProxy>();
-    final Collection<EventProxy> unMarkedState = new TreeSet<EventProxy>();
-    boolean hasMarking = false;
-    EventProxy  variableMarking = 
-      mFactory.createEventProxy("variableMarking", EventKind.PROPOSITION);
-    markedState.add(variableMarking);
-    
-    SimpleExpressionProxy markedValue;
-    
-    if(variable.getMarkedValue()!= null){
-      hasMarking = true;
-      markedValue = variable.getMarkedValue();
-    } else {
-      markedValue = null;
-    }
-    SimpleExpressionProxy type = variable.getType();
-    
-    if (type instanceof SimpleIdentifierProxy) {
-      if (((SimpleIdentifierProxy) type).getName().equals("boolean")) {
-        Collection<EventProxy> marking;
-        if (variable.getInitialValue() instanceof BooleanConstantProxy) {
-          boolean initialValue = ((BooleanConstantProxy) variable
-                                  .getInitialValue()).isValue();
-          
-          if(hasMarking) {
-            Boolean castMarkedValue = ((BooleanConstantProxy) markedValue).isValue();
-            marking = (castMarkedValue == true ? markedState : unMarkedState);
-          } else {
-            marking = markedState;
-          }
-          final StateProxy variableTrueState = mFactory
-            .createStateProxy(variable.getName() + "="
-                              + "false", initialValue == false,
-                              marking);
-          variableStates.add(variableTrueState);
-          
-          if(hasMarking) {
-            Boolean castMarkedValue = ((BooleanConstantProxy) markedValue).isValue();
-            marking = (castMarkedValue == false ? markedState : unMarkedState);
-          } else {
-            marking = markedState;
-          }
-          final StateProxy variableFalseState = mFactory
-            .createStateProxy(
-                              variable.getName() + "=" + "true",
-                              initialValue == true,
-                              marking);
-          variableStates.add(variableFalseState);
-          
+
+  private Set<TransitionProxy>
+    createVariableTransitions(final VariableProxy variable,
+                              final RangeValue range,
+                              final Set<EventProxy> variableAlphabet,
+                              final Map<IndexValue,StateProxy> variableStates)
+    throws VisitorException
+  {
+    try {
+      final VariableSearcher searcher = new VariableSearcher(variable);
+      final Set<TransitionProxy> variableTransitions =
+        new TreeSet<TransitionProxy>();
+      for (EventProxy relabeledEvent : mEFAEventGuardClauseMap.keySet()) {
+        // Get the right action.
+        final List<List<BinaryExpressionProxy>> actionLists =
+          mEFAEventActionListsMap.get(relabeledEvent);
+        // For each variable, find the action that updates this variable.
+        // Only one of the actionLists is allowed to update each variable.
+        final BinaryExpressionProxy action =
+          findAction(variable.getName(), actionLists);
+        // ... and the corresponding guard
+        final SimpleExpressionProxy guardClause =
+          mEFAEventGuardClauseMap.get(relabeledEvent);
+
+        if (action == null && !searcher.search(guardClause)) {
+          // The action does not update this variable and it does
+          // not occur in the guard expression => we can remove
+          // the corresponding event from the local alphabet.
+          variableAlphabet.remove(relabeledEvent);
         } else {
-          System.err.println("ModuleCompiler: Invalid initialValue");
-        }
-      } else {
-        System.err.println("ModuleCompiler: Invalid variable type "
-                           + ((SimpleIdentifierProxy) type).getName());
-      }
-    }
-    
-    else if (type instanceof EnumSetExpressionProxy) {
-      List<SimpleIdentifierProxy> itemList = ((EnumSetExpressionProxy) type)
-        .getItems();
-      for (SimpleIdentifierProxy item : itemList) {
-        final boolean isInitial = (item.getName() == ((SimpleIdentifierProxy) variable
-                                                      .getInitialValue()).getName());
-        final StateProxy variableState = mFactory.createStateProxy(
-                                                                   variable.getName() + "=" + item.getName().toString(),
-                                                                   isInitial, markedState);
-        variableStates.add(variableState);
-      }
-    }
-    
-    else if (type instanceof BinaryExpressionProxy) {
-      BinaryExpressionProxy binExpr = (BinaryExpressionProxy) type;
-      Collection<EventProxy> marking;
-      if (binExpr.getOperator().getName().equals("..")) {
-        int lower = ((IntConstantProxy) binExpr.getLeft()).getValue();
-        int higher = ((IntConstantProxy) binExpr.getRight()).getValue();
-        int initialValue = ((IntConstantProxy) variable
-                            .getInitialValue()).getValue();
-        for (Integer i = lower; i <= higher; i++) {
-          if(hasMarking) {
-            Integer castMarkedValue = ((IntConstantProxy) markedValue).getValue();
-            marking = (castMarkedValue == i ? markedState : unMarkedState);
-          } else {
-            marking = markedState;
+          // Translate the action to a transition in the variable automaton and
+          // add this transition in the variable states where the guard is
+          // true.
+          final String name = variable.getName();
+          for (final IndexValue item : range.getValues()) {
+            final StateProxy source = variableStates.get(item);
+            mContext.add(name, item);
+            try {
+              if (evaluatePartialGuard(guardClause, searcher)) {
+                StateProxy target;
+                if (action == null) {
+                  target = source;
+                } else {
+                  final IndexValue result = evalIndex(action, range);
+                  target = variableStates.get(result);
+                }
+                final TransitionProxy actionTransition =
+                  mDESFactory.createTransitionProxy(source,
+                                                    relabeledEvent,
+                                                    target);
+                variableTransitions.add(actionTransition);
+              }
+            } finally {
+              mContext.unset(name);
+            }
           }
-          
-          final StateProxy variableState = mFactory.createStateProxy(
-                                                                     variable.getName() + "=" + i.toString(),
-                                                                     initialValue == i, 
-                                                                     marking);
-          variableStates.add(variableState);
-          
         }
-      } else {
-        System.err
-          .println("ModuleCompiler: invalid range operator in variable declaration");
       }
+      return variableTransitions;
+    } catch (final DuplicateIdentifierException exception) {
+      exception.provideLocation(variable);
+      throw wrap(exception);
     }
-    
-    else {
-      System.err.println("ModuleCompiler: Invalid type");
+  }
+
+  private boolean evaluatePartialGuard(final SimpleExpressionProxy clause,
+                                       final VariableSearcher searcher)
+    throws VisitorException
+  {
+    if (clause instanceof IntConstantProxy) {
+      return evalBoolean(clause);
+    } else if (!searcher.search(clause)) {
+      return true;
+    } else if (!(clause instanceof BinaryExpressionProxy)) {
+      return evalBoolean(clause);
+    } else {
+      final BinaryExpressionProxy binary = (BinaryExpressionProxy) clause;
+      final BinaryOperator op = binary.getOperator();
+      if (op != mOperatorTable.getAndOperator()) {
+        return evalBoolean(clause);
+      }
+      final SimpleExpressionProxy lhs = binary.getLeft();
+      if (!evaluatePartialGuard(lhs, searcher)) {
+        return false;
+      }
+      final SimpleExpressionProxy rhs = binary.getRight();
+      return evaluatePartialGuard(lhs, searcher);
     }
-    
-  } /* EFA */
-  
-  private BinaryExpressionProxy findAction(String name,
-                                           List<List<BinaryExpressionProxy>> actionLists) {
+  }
+
+  private BinaryExpressionProxy findAction
+    (String name, List<List<BinaryExpressionProxy>> actionLists)
+  {
     //TODO: check that only one automaton updates each variable.
     for (List<BinaryExpressionProxy> actions : actionLists){
       for (BinaryExpressionProxy action : actions) {
@@ -1165,192 +1074,91 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       }
     }
     return null;
-    
   }
-  
-  private void createBooleanVariableTransition(VariableProxy variable,
-                                               GuardExpressionHandler handler,
-                                               List<StateProxy> variableStates,
-                                               Set<TransitionProxy> variableTransitions,
-                                               EventProxy relabeledEvent,
-                                               BinaryExpressionProxy action) {
-    
-    int targetIndex;
-    Set<Boolean> booleanValues = new HashSet<Boolean>();
-    booleanValues.add(true);
-    booleanValues.add(false);
-    
-    for(Boolean value: booleanValues) {
-      handler.assignValueToVariable(variable.getName(), value);
-      int sourceIndex = value ? 1 : 0;
-      
-      //Evaluate guard function for this variable.
-      Boolean guardValue = evaluatePartialGuard(variable, handler);
-      
-      // Create action transition if guard == true.
-      if (guardValue) {
-        final StateProxy source = variableStates.get(sourceIndex);
-        if(action != null) {
-          final boolean constant = ((BooleanConstantProxy) action
-                                    .getRight()).isValue();
-          targetIndex = constant ? 1 : 0;
-        } else {
-          //action is null => no update takes place.
-          targetIndex = sourceIndex;
-        }
-        final StateProxy target = variableStates
-          .get(targetIndex);
-        final TransitionProxy actionTransition = mFactory
-          .createTransitionProxy(source, relabeledEvent, target);
-        variableTransitions.add(actionTransition);
-      }
+
+  private List<List<TransitionProxy>> allPossibleTransitions
+    (final EventProxy event)
+  {
+    if (event.getKind() == EventKind.PROPOSITION) {
+      return Collections.emptyList();
     }
-  }
-  
-  private void createIntegerVariableTransition(VariableProxy variable,
-                                               GuardExpressionHandler handler,
-                                               List<StateProxy> variableStates,
-                                               Set<TransitionProxy> variableTransitions,
-                                               EventProxy relabeledEvent, BinaryExpressionProxy action) {
-    
-    BinaryExpressionProxy binExpr = ((BinaryExpressionProxy) variable
-                                     .getType());
-    
-    final int lower = ((IntConstantProxy) binExpr.getLeft()).getValue();
-    final int upper = ((IntConstantProxy) binExpr.getRight()).getValue();
-    final int range = upper - lower + 1;
-    
-    for (int sourceIndex = 0; sourceIndex < range; sourceIndex++) {
-      int targetIndex = sourceIndex;
-      
-      // Set the variable to the right value.
-      handler.assignValueToVariable(variable.getName(), sourceIndex
-                                    + lower);
-      
-      // Evaluate the guard function for this variable.
-      Boolean guardValue;
-      guardValue = evaluatePartialGuard(variable, handler);
-      
-      // Create action transition if guard == true.
-      if (guardValue) {
-        if (action != null) {
-          // Get right hand side of action expression.
-          int constant = ((IntConstantProxy) action.getRight())
-            .getValue();
-          
-          // Get action expression operator.
-          String operator = action.getOperator().getName();
-          
-          // Calculate transition
-          if (operator.equals("+=")) {
-            targetIndex = modulo((sourceIndex + constant), range);
-          } else if (operator.equals("-=")) {
-            targetIndex = modulo((sourceIndex - constant), range);
-          } else if (operator.equals("=")) {
-            targetIndex = modulo(constant, range);
-          } else {
-            targetIndex = -1;
-            System.err.println("ModuleCompiler: Invalid operator");
-            // EFA TODO throw exception
-          }
-        } else {
-          // action is null => no update takes place.
-          targetIndex = sourceIndex;
-        }
-        // Create transition
-        final StateProxy source = variableStates.get(sourceIndex);
-        final StateProxy target = variableStates.get(targetIndex);
-        final TransitionProxy actionTransition = mFactory
-          .createTransitionProxy(source, relabeledEvent, target);
-        variableTransitions.add(actionTransition);
-      }
-    }
-  }
-  
-  private List<List<TransitionProxy>> allPossibleTransitions(EventProxy event) {
-    LinkedList<List<TransitionProxy>> transitions = new LinkedList<List<TransitionProxy>>();
-    /*
-     * It is important that events with different GuardActionBlocks are
-     * translated to separate transitions.(mEFATransitions)
-     */
-    for (AutomatonProxy automaton : mAutomata.values()) {
-      List<TransitionProxy> transInAutomaton = new LinkedList<TransitionProxy>();
-      
-      for (TransitionProxy transition : automaton.getTransitions()) {
-        if (transition.getEvent().equals(event)) {
+    final List<List<TransitionProxy>> transitions =
+      new LinkedList<List<TransitionProxy>>();
+    // It is important that events with different GuardActionBlocks are
+    // translated to separate transitions. (mEFATransitions)
+    for (final AutomatonProxy automaton : mAutomata.values()) {
+      final List<TransitionProxy> transInAutomaton =
+        new LinkedList<TransitionProxy>();
+      for (final TransitionProxy transition : automaton.getTransitions()) {
+        if (transition.getEvent() == event) {
           transInAutomaton.add(transition);
-        }
-        else if(mEFAEventEventMap.get(transition.getEvent())!= null){
-          
-          if(mEFAEventEventMap.get(transition.getEvent()).equals(event)){
-            
+        } else if (mEFAEventEventMap.get(transition.getEvent()) != null) {
+          if (mEFAEventEventMap.get(transition.getEvent()) == event) {
             transInAutomaton.add(transition);
           }
-          
         }
       }
-      if (transInAutomaton.isEmpty()
-          && automaton.getEvents().contains(event)) {
+      if (transInAutomaton.isEmpty() &&
+          automaton.getEvents().contains(event)) {
         transitions.clear();
         break;
-      } else if(!transInAutomaton.isEmpty()){
+      } else if (!transInAutomaton.isEmpty()) {
         transitions.add(transInAutomaton);
       }
     }
     List<List<TransitionProxy>> allPaths = allPossiblePaths(transitions);
     /*
      * For debugging
-     * 
+    System.err.println("Event: " + event);
+    System.err.println("Paths: " + allPaths);
      */
-    //System.out.println("Event: " + event);
-    //System.out.println("Paths: " + allPaths);
     return allPaths;
   }
-  
-  
-  private List<List<TransitionProxy>> allPossiblePaths(
-                                                       LinkedList<List<TransitionProxy>> transitions) {
-    if(transitions.isEmpty()) {
-      List<List<TransitionProxy>> noPaths = new LinkedList<List<TransitionProxy>>();
+
+  private List<List<TransitionProxy>> allPossiblePaths
+    (final List<List<TransitionProxy>> transitions)
+  {
+    if (transitions.isEmpty()) {
+      final List<List<TransitionProxy>> noPaths =
+        new LinkedList<List<TransitionProxy>>();
       noPaths.add(new LinkedList<TransitionProxy>());
       return noPaths;
-    }
-    
-    List<TransitionProxy> transInAut = transitions.removeFirst();
-    List<List<TransitionProxy>> subPaths = allPossiblePaths(transitions);
-    
-    List<List<TransitionProxy>> paths = new LinkedList<List<TransitionProxy>>();
-    
-    for (List<TransitionProxy> subPath : subPaths) {
-      
-      for (TransitionProxy trans : transInAut) {
-        List<TransitionProxy> p = new LinkedList<TransitionProxy>();
-        p.addAll(subPath);
-        p.add(trans);
-        paths.add(p);
+    } else {
+      final List<TransitionProxy> transInAut = transitions.remove(0);
+      final List<List<TransitionProxy>> subPaths =
+        allPossiblePaths(transitions);
+      final List<List<TransitionProxy>> paths =
+        new LinkedList<List<TransitionProxy>>();
+      for (List<TransitionProxy> subPath : subPaths) {
+        for (TransitionProxy trans : transInAut) {
+          final List<TransitionProxy> p = new LinkedList<TransitionProxy>();
+          p.addAll(subPath);
+          p.add(trans);
+          paths.add(p);
+        }
       }
+      return paths;
     }
-    return paths;
   }
-  
+
   private void addNewTransitionsToAutomtata(EventProxy relabeledEvent, List<TransitionProxy> path) {
     for(TransitionProxy trans: path){
       Set<EventProxy> relabeledEvents = new TreeSet<EventProxy>();
       Collection<TransitionProxy> relabeledTransitions = new TreeSet<TransitionProxy>();
-      
-      
+
+
       /*
        * Finding the original automata.
        */
-      
+
       AutomatonProxy aut= mEFATransitionAutomatonMap.get(trans);
-      
+
       /*
        * Add the relabeledEvent to relabeledEvents.
        *
-       * It may still exist old transitions with the 
-       * old event name. Therefore we cannot remove 
-       * the old events here. 
+       * It may still exist old transitions with the
+       * old event name. Therefore we cannot remove
+       * the old events here.
        */
       relabeledEvents.addAll(mAutomata.
                              get(aut.getName()).getEvents());
@@ -1361,16 +1169,16 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       relabeledTransitions.addAll(mAutomata.
                                   get(aut.getName()).getTransitions());
       TransitionProxy relabeledTransition =
-        mFactory.createTransitionProxy(trans.getSource(),
+        mDESFactory.createTransitionProxy(trans.getSource(),
                                        relabeledEvent,
                                        trans.getTarget());
       relabeledTransitions.add(relabeledTransition);
-      
+
       /*
        * Create updated automaton.
        */
       AutomatonProxy relabeledAutomaton =
-        mFactory.createAutomatonProxy(aut.getName(),
+        mDESFactory.createAutomatonProxy(aut.getName(),
                                       aut.getKind(),
                                       relabeledEvents,
                                       aut.getStates(),
@@ -1380,103 +1188,61 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
        */
       mAutomata.put(aut.getName(),relabeledAutomaton);
     }
-    
+
   }
 
-  private SimpleExpressionSubject collectGuard(List<TransitionProxy> path) {
-    SimpleExpressionSubject guardExpression;
-    String guardString= new String("true");
-    for (TransitionProxy transition : path) {
-      if (mEFATransitionGuardActionBlockMap.get(transition) != null) {
-        String partialGuardString = mEFATransitionGuardActionBlockMap
-          .get(transition).getGuard();
-        if(removeBlanks(partialGuardString).equals("")) continue;
-        guardString = guardString + "&" + partialGuardString;
+  private SimpleExpressionProxy collectGuard
+    (final List<TransitionProxy> path)
+  {
+    SimpleExpressionProxy result = null;
+    for (final TransitionProxy trans : path) {
+      final GuardActionBlockProxy block =
+        mEFATransitionGuardActionBlockMap.get(trans);
+      if (block != null) {
+        for (final SimpleExpressionProxy guard : block.getGuards()) {
+          if (result == null) {
+            result = guard;
+          } else {
+            final BinaryOperator andop = mOperatorTable.getAndOperator();
+            result =
+              mModuleFactory.createBinaryExpressionProxy(andop, result, guard);
+          }
+        }
       }
-      
     }
-    /*
-     * For debugging
-     * 
-     */
-    //System.out.println("guardString: " + guardString);
-    
-    ExpressionParser parser = new ExpressionParser(ModuleSubjectFactory
-                                                   .getInstance(), GuardExpressionOperatorTable.getInstance());
-    try {
-      guardExpression = (SimpleExpressionSubject)parser.parse(guardString);
-    } catch (ParseException e) {
-      guardExpression = null;
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+    if (result == null) {
+      return mModuleFactory.createIntConstantProxy(1);
+    } else {
+      return result;
     }
-    return guardExpression;
   }
-  
-  private List <List <BinaryExpressionProxy>> collectAction(List<TransitionProxy> path) {
-    List <List <BinaryExpressionProxy>> actionLists = 
-      new LinkedList<List <BinaryExpressionProxy>>();
-    ExpressionParser actionParser = new ExpressionParser(ModuleSubjectFactory
-                                                         .getInstance(), CompilerOperatorTable.getInstance());
-    for(TransitionProxy transition: path){
-      if(mEFATransitionGuardActionBlockMap.get(transition)!= null){
-        String[] actions = mEFATransitionGuardActionBlockMap
-          .get(transition).getAction().split(";");
-        List<BinaryExpressionProxy> actionList = 
-          new LinkedList<BinaryExpressionProxy>();
-        for(String action: actions) {
-          BinaryExpressionProxy actionExpr;
-          try {
-            actionExpr = (BinaryExpressionSubject) actionParser.parse(action);
-          } catch (ParseException e) {
-            e.printStackTrace();
-            actionExpr = null;
-          } catch (ClassCastException e) {
-            e.printStackTrace();
-            actionExpr = null;
-          }
-          if(actionExpr != null) {
-            actionList.add(actionExpr);
-          }
-        }
-        if(!actionList.isEmpty()){
-          actionLists.add
-            (actionList);
-        }
+
+  private List<List<BinaryExpressionProxy>>
+    collectAction(final List<TransitionProxy> path)
+  {
+    final List<List<BinaryExpressionProxy>> actionLists =
+      new LinkedList<List<BinaryExpressionProxy>>();
+    for (final TransitionProxy trans : path) {
+      final GuardActionBlockProxy block =
+        mEFATransitionGuardActionBlockMap.get(trans);
+      if (block != null) {
+        final List<BinaryExpressionProxy> actions = block.getActions();
+        actionLists.add(actions);
       }
-      
     }
     return actionLists;
   }
-  
-  private boolean componentHasNonEmptyGuardActionBlock(Collection<EdgeProxy> edges) {
-    for(EdgeProxy edge: edges){
-      if(edge.getGuardActionBlock() != null){
+
+  private boolean componentHasNonEmptyGuardActionBlock
+    (Collection<EdgeProxy> edges)
+  {
+    for (final EdgeProxy edge: edges){
+      if (edge.getGuardActionBlock() != null){
         return true;
       }
     }
     return false;
   }
-
-  private Boolean evaluatePartialGuard(VariableProxy variable,
-                                       GuardExpressionHandler handler) {
-    Boolean guardValue;
-    try {
-      guardValue = handler.evaluatePartialExpression(variable.getName());
-    } catch (EvalException e) {
-      guardValue = null;
-      e.printStackTrace();
-    }
-    return guardValue;
-  }
-
-  private int modulo(int i, int range) {
-    i = i % range;
-    i = i + range;
-    i = i % range;
-    return i;
-  }
-
 
 
   //#########################################################################
@@ -1530,7 +1296,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
         final String name = event.getName();
         final EventKind kind = event.getKind();
         final boolean observable = event.isObservable();
-        proxy = mFactory.createEventProxy(name, kind, observable);
+        proxy = mDESFactory.createEventProxy(name, kind, observable);
         event.setEventProxy(proxy);
         mGlobalAlphabet.add(proxy);
         mOriginalAlphabet.add(proxy);
@@ -1559,7 +1325,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       }
     }
   }
-  
+
   private void createTransitions(final SimpleNodeProxy source,
                                  final CompiledEventListValue events,
                                  final NodeProxy target,
@@ -1619,8 +1385,8 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
         if (create) {
           final NodeProxy group = groupEntry.getNode();
           if (duplicate == null) {
-            final TransitionProxy trans =
-              mFactory.createTransitionProxy(sourceState, event, targetState);
+            final TransitionProxy trans = mDESFactory.createTransitionProxy
+              (sourceState, event, targetState);
             //EFA with shared variables----------
             mEFATransitionGuardActionBlockMap.put
               (trans, edge.getGuardActionBlock());
@@ -1639,27 +1405,27 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
                 if (!mEFATransitionGuardActionBlockMap.get(trans).equals
                       (edge.getGuardActionBlock())) {
                   final EventProxy relabeledEvent =
-                    mFactory.createEventProxy(trans.getEvent().getName()
-                                              + "_" + mCurrentEventID,
-                                              trans.getEvent().getKind(),
-                                              trans.getEvent()
-                                              .isObservable());
+                    mDESFactory.createEventProxy(trans.getEvent().getName()
+                                                 + "_" + mCurrentEventID,
+                                                 trans.getEvent().getKind(),
+                                                 trans.getEvent()
+                                                 .isObservable());
                   mCurrentEventID++;
                   final EventProxy key =
-                    mFactory.createEventProxy(trans.getEvent().getName()
-                                              + "_" + mCurrentEventID,
-                                              trans.getEvent().getKind(),
-                                              trans.getEvent()
-                                              .isObservable());
+                    mDESFactory.createEventProxy(trans.getEvent().getName()
+                                                 + "_" + mCurrentEventID,
+                                                 trans.getEvent().getKind(),
+                                                 trans.getEvent()
+                                                 .isObservable());
                   mCurrentEventID++;
                   mEFAEventEventMap.put(key, relabeledEvent);
                   mGlobalAlphabet.add(relabeledEvent);
                   mLocalAlphabet.add(relabeledEvent);
                   mEFAEventEventMap.put(relabeledEvent, trans.getEvent());
                   final TransitionProxy efaCopy =
-                    mFactory.createTransitionProxy(trans.getSource(),
-                                                   relabeledEvent,
-                                                   trans.getTarget());
+                    mDESFactory.createTransitionProxy(trans.getSource(),
+                                                      relabeledEvent,
+                                                      trans.getTarget());
                   mEFATransitionGuardActionBlockMap.put
                     (efaCopy, edge.getGuardActionBlock());
                   mTransitions.add(efaCopy);
@@ -1691,6 +1457,20 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
     throws VisitorException
   {
     return evalTyped(expr, IndexValue.class, "INDEX");
+  }
+
+  private IndexValue evalIndex(final SimpleExpressionProxy expr,
+                               final RangeValue range)
+    throws VisitorException
+  {
+    final IndexValue value = evalIndex(expr);
+    if (range.contains(value)) {
+      return value;
+    } else {
+      final TypeMismatchException exception =
+        new TypeMismatchException(expr, value, range.toString());
+      throw wrap(exception);
+    }
   }
 
   private RangeValue evalRange(final SimpleExpressionProxy expr)
@@ -1727,23 +1507,6 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
     }
   }
 
-  private String removeBlanks(String str) {
-    if(str.equals("")) return "";
-    int i = 0;
-    char c = str.charAt(0);
-    while(isWhitespace(c)) {
-      i++;
-      if(i == str.length()) return "";
-      c = str.charAt(i);
-    }
-    return str.substring(i);
-  }
-  
-  private boolean isWhitespace(final int ch)
-  {
-    return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r';
-  }
-
 
   //#########################################################################
   //# Inner Class NameCompiler
@@ -1775,12 +1538,83 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 
 
   //#########################################################################
+  //# Inner Class NameCompiler
+  private static class VariableSearcher extends AbstractModuleProxyVisitor {
+
+    //#######################################################################
+    //# Constructor
+    private VariableSearcher(final VariableProxy variable)
+    {
+      mSoughtName = variable.getName();
+    }
+
+    //#######################################################################
+    //# Invocation
+    private boolean search(final SimpleExpressionProxy expr)
+      throws VisitorException
+    {
+      final Boolean found = (Boolean) expr.acceptVisitor(this);
+      return found;
+    }
+
+    private boolean search(final CompiledClause clause)
+      throws VisitorException
+    {
+      final Collection<SimpleExpressionProxy> literals = clause.getLiterals();
+      for (final SimpleExpressionProxy literal : literals) {
+        if (search(literal)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public Boolean visitBinaryExpressionProxy
+      (final BinaryExpressionProxy expr)
+      throws VisitorException
+    {
+      final SimpleExpressionProxy lhs = expr.getLeft();
+      final SimpleExpressionProxy rhs = expr.getRight();
+      return search(lhs) || search(rhs);
+    }
+
+    public Boolean visitSimpleExpressionProxy
+      (final SimpleExpressionProxy expr)
+    {
+      return false;
+    }
+
+    public Boolean visitSimpleIdentifierProxy
+      (final SimpleIdentifierProxy ident)
+    {
+      return ident.getName().equals(mSoughtName);
+    }
+
+    public Boolean visitUnaryExpressionProxy
+      (final UnaryExpressionProxy expr)
+      throws VisitorException
+    {
+      final SimpleExpressionProxy subterm = expr.getSubTerm();
+      return search(subterm);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final String mSoughtName;
+
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final DocumentManager mDocumentManager;
-  private final ProductDESProxyFactory mFactory;
+  private final ProductDESProxyFactory mDESFactory;
+  private final ModuleProxyFactory mModuleFactory;
   private final ModuleProxy mModule;
   private final NameCompiler mNameCompiler = new NameCompiler();
-  
+
   private CompilerContext mContext;
   private CompiledEventListValue mEventList;
   private Map<String,CompiledParameterBinding> mParameterMap;
@@ -1794,17 +1628,20 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
   private Collection<TransitionProxy> mTransitions;
 
   // EFA---------------------
+  private final CompilerOperatorTable mOperatorTable;
+  private final Comparator<SimpleExpressionProxy> mComparator;
+  private final DNFConverter mDNFConverter;
   /*
    * Mappings needed for EFA with guards on shared variables.
    */
   private Map<TransitionProxy, AutomatonProxy> mEFATransitionAutomatonMap;
   private Map<TransitionProxy, GuardActionBlockProxy>
     mEFATransitionGuardActionBlockMap;
-  private Map<EventProxy, SimpleExpressionSubject> mEFAEventGuardClauseMap;
+  private Map<EventProxy,SimpleExpressionProxy> mEFAEventGuardClauseMap;
   private Map<EventProxy, List<List<BinaryExpressionProxy>>>
     mEFAEventActionListsMap;
   private List<SimpleComponentProxy> mSimpleComponents;
-  private Map <EventProxy, EventProxy> mEFAEventEventMap;
+  private Map<EventProxy, EventProxy> mEFAEventEventMap;
   private Integer mCurrentEventID;
   private Set<EventProxy> mOriginalAlphabet;
   private boolean mIsEFA;

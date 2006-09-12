@@ -4,10 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompilerOperatorTable
 //###########################################################################
-//# $Id: CompilerOperatorTable.java,v 1.5 2006-09-07 14:51:44 robi Exp $
+//# $Id: CompilerOperatorTable.java,v 1.6 2006-09-12 14:32:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import net.sourceforge.waters.model.expr.AbstractOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
@@ -20,8 +23,12 @@ import net.sourceforge.waters.model.expr.Value;
 
 
 /**
- * <P>The standard operator table.</P>
- *
+ * The operator table used by the EFA compilers.
+ * In addition to providing access to operators by names as defined by
+ * the {@link net.sourceforge.waters.model.expr.OperatorTable OperatorTable}
+ * interface, this class facilitates semantic access to logical and
+ * assignment operators.
+ * 
  * @author Robi Malik
  */
 
@@ -40,25 +47,84 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   private CompilerOperatorTable()
   {
     super(32, OPCHAR_MIN, OPCHAR_MAX);
+    mComplementMap = new HashMap<BinaryOperator,BinaryOperator>(16);
+
+    mAndOperator = new BinaryAndOperator();
+    mOrOperator= new BinaryOrOperator();
+    mNotOperator = new UnaryNotOperator();
+    mAssignmentOperator = new BinaryAssignmentOperator();
+    mIncrementOperator = new BinaryIncrementOperator();
+    mDecrementOperator = new BinaryDecrementOperator();
+    final BinaryOperator eqop = new BinaryEqualsOperator();
+    final BinaryOperator neqop = new BinaryNotEqualsOperator();
+    final BinaryOperator gtop = new BinaryGreaterThanOperator();
+    final BinaryOperator geqop = new BinaryGreaterEqualsOperator();
+    final BinaryOperator ltop = new BinaryLessThanOperator();
+    final BinaryOperator leqop = new BinaryLessEqualsOperator();
+
+    store(mAndOperator);
+    store(mOrOperator);
+    store(mNotOperator);
+    store(mAssignmentOperator);
+    store(mIncrementOperator);
+    store(mDecrementOperator);
     store(new BinaryPlusOperator());
     store(new BinaryMinusOperator());
     store(new BinaryTimesOperator());
     store(new BinaryDivideOperator());
     store(new BinaryModuloOperator());
     store(new UnaryMinusOperator());
-    store(new BinaryEqualsOperator());
-    store(new BinaryNotEqualsOperator());
-    store(new BinaryGreaterThanOperator());
-    store(new BinaryGreaterEqualsOperator());
-    store(new BinaryLessThanOperator());
-    store(new BinaryLessEqualsOperator());
     store(new BinaryRangeOperator());
-    store(new BinaryAndOperator());
-    store(new BinaryOrOperator());
-    store(new UnaryNotOperator());
-    store(new BinaryIncrementOperator());
-    store(new BinaryDecrementOperator());
-    store(new BinaryAssignmentOperator());
+    storeComplements(eqop, neqop);
+    storeComplements(ltop, geqop);
+    storeComplements(gtop, leqop);
+  }
+
+  private void storeComplements(final BinaryOperator op1,
+                                final BinaryOperator op2)
+  {
+    store(op1);
+    store(op2);
+    mComplementMap.put(op1, op2);
+    mComplementMap.put(op2, op1);
+  }
+
+
+  //#########################################################################
+  //# Acess by Logic Semantics
+  BinaryOperator getAndOperator()
+  {
+    return mAndOperator;
+  }
+
+  BinaryOperator getOrOperator()
+  {
+    return mOrOperator;
+  }
+
+  UnaryOperator getNotOperator()
+  {
+    return mNotOperator;
+  }
+
+  BinaryOperator getAssignmentOperator()
+  {
+    return mAssignmentOperator;
+  }
+
+  BinaryOperator getIncrementOperator()
+  {
+    return mIncrementOperator;
+  }
+
+  BinaryOperator getDecrementOperator()
+  {
+    return mDecrementOperator;
+  }
+
+  BinaryOperator getComplementaryOperator(final BinaryOperator op)
+  {
+    return mComplementMap.get(op);
   }
 
 
@@ -861,8 +927,7 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
    * The abstract type of all binary assignment operators.
    * These operators take a symbol as their first argument and
    * an arbitrary expression as their second argument.
-   * They cannot be evaluated, they have to be compiled into another
-   * representation by the model compiler.
+   * When evaluated, they produce the result of the assignment.
    */
   private abstract static class AbstractBinaryAssignmentOperator
     implements BinaryOperator
@@ -901,12 +966,6 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       return BinaryOperator.ASSOC_RIGHT;
     }
 
-    public Value eval(Value lhs, Value rhs) throws EvalException
-    {
-      throw new IllegalStateException
-        ("Assignment operation cannot be evaluated!");
-    }
-
   }
 
 
@@ -921,6 +980,11 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     public String getName()
     {
       return OPNAME_ASSIGNMENT;
+    }
+
+    public Value eval(final Value lhsValue, final Value rhsValue)
+    {
+      return rhsValue;
     }
 
   }
@@ -955,6 +1019,23 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       return OPNAME_INCREMENT;
     }
 
+    public Value eval(final Value lhsValue, final Value rhsValue)
+      throws EvalException
+    {
+      if (!(lhsValue instanceof IntValue)) {
+        throw new TypeMismatchException(lhsValue, "INTEGER");
+      }
+      if (!(rhsValue instanceof IntValue)) {
+        throw new TypeMismatchException(rhsValue, "INTEGER");
+      }
+      final IntValue lhsIntValue = (IntValue) lhsValue;
+      final IntValue rhsIntValue = (IntValue) rhsValue;
+      final int lhs = lhsIntValue.getValue();
+      final int rhs = rhsIntValue.getValue();
+      final int result = lhs + rhs;
+      return new CompiledIntValue(result);
+    }
+
   }
 
 
@@ -987,7 +1068,35 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
       return OPNAME_DECREMENT;
     }
 
+    public Value eval(final Value lhsValue, final Value rhsValue)
+      throws EvalException
+    {
+      if (!(lhsValue instanceof IntValue)) {
+        throw new TypeMismatchException(lhsValue, "INTEGER");
+      }
+      if (!(rhsValue instanceof IntValue)) {
+        throw new TypeMismatchException(rhsValue, "INTEGER");
+      }
+      final IntValue lhsIntValue = (IntValue) lhsValue;
+      final IntValue rhsIntValue = (IntValue) rhsValue;
+      final int lhs = lhsIntValue.getValue();
+      final int rhs = rhsIntValue.getValue();
+      final int result = lhs - rhs;
+      return new CompiledIntValue(result);
+    }
+
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private final BinaryOperator mAndOperator;
+  private final BinaryOperator mOrOperator;
+  private final UnaryOperator mNotOperator;
+  private final BinaryOperator mAssignmentOperator;
+  private final BinaryOperator mIncrementOperator;
+  private final BinaryOperator mDecrementOperator;
+  private final Map<BinaryOperator,BinaryOperator> mComplementMap;
 
 
   //#########################################################################

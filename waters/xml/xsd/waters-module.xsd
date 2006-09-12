@@ -546,21 +546,50 @@
 </xs:element>
 
 <xs:element name="GuardActionBlock">
- <xs:complexType>
-  <xs:complexContent>
-    <xs:extension base="B:ElementType">
-      <xs:sequence>
-        <xs:element ref="M:Guard" minOccurs="0"/>
-        <xs:element ref="M:Action" minOccurs="0"/>
-        <xs:element ref="M:LabelGeometry" minOccurs="0"/>
-      </xs:sequence>
-    </xs:extension>
-  </xs:complexContent>
- </xs:complexType>
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="M:Guards" minOccurs="0"/>
+          <xs:element ref="M:Actions" minOccurs="0"/>
+          <xs:element ref="M:LabelGeometry" minOccurs="0"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
 </xs:element>
 
-<xs:element name="Guard" type="xs:string"/>
-<xs:element name="Action" type="xs:string"/>
+<xs:element name="Guards">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+	  <xs:group ref="M:SimpleExpression" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="List"/>
+            </xs:appinfo></xs:annotation>
+          </xs:group>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="Actions">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="B:ElementType">
+        <xs:sequence>
+          <xs:element ref="M:BinaryExpression" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="List"/>
+            </xs:appinfo></xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
 
 
 <!-- ==================================================================== -->

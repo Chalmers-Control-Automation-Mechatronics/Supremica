@@ -18,7 +18,7 @@
 <Point X="5" Y="20"/>
 </LabelGeometry>
 </SimpleNode>
-<SimpleNode Initial="false" Name="s1">
+<SimpleNode Name="s1">
 <PointGeometry>
 <Point X="224" Y="192"/>
 </PointGeometry>
@@ -26,7 +26,7 @@
 <Point X="5" Y="20"/>
 </LabelGeometry>
 </SimpleNode>
-<SimpleNode Initial="false" Name="s2">
+<SimpleNode Name="s2">
 <PointGeometry>
 <Point X="336" Y="288"/>
 </PointGeometry>
@@ -43,20 +43,28 @@
 <Point X="0" Y="10"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="112" Y="288"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="168" Y="240"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="224" Y="192"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard>x==2 | X==0
-
- </Guard>
-<Action>x=1</Action>
+<Guards>
+<BinaryExpression Operator="|">
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="x"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="X"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="x"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="s1" Target="s2">
@@ -66,19 +74,9 @@
 <Point X="0" Y="10"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="224" Y="192"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="280" Y="240"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="336" Y="288"/>
-</EndPointGeometry>
-<GuardActionBlock>
-<Guard/>
-<Action/>
-</GuardActionBlock>
 </Edge>
 </EdgeList>
 </Graph>
@@ -89,7 +87,6 @@
 <IntConstant Value="2"/>
 </BinaryExpression>
 <IntConstant Value="0"/>
-<IntConstant Value="2"/>
 </Variable>
 </VariableList>
 </SimpleComponent>
@@ -105,7 +102,7 @@
 <Point X="5" Y="20"/>
 </LabelGeometry>
 </SimpleNode>
-<SimpleNode Initial="false" Name="s1">
+<SimpleNode Name="s1">
 <PointGeometry>
 <Point X="240" Y="176"/>
 </PointGeometry>
@@ -122,18 +119,34 @@
 <Point X="-59" Y="41"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="96" Y="176"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="168" Y="176"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="240" Y="176"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard>X==2 | y==0 |Y==2</Guard>
-<Action>y=2</Action>
+<Guards>
+<BinaryExpression Operator="|">
+<BinaryExpression Operator="|">
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="X"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="y"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="Y"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="y"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 </EdgeList>
@@ -145,7 +158,6 @@
 <IntConstant Value="2"/>
 </BinaryExpression>
 <IntConstant Value="0"/>
-<IntConstant Value="2"/>
 </Variable>
 </VariableList>
 </SimpleComponent>
@@ -170,18 +182,16 @@
 <Point X="0" Y="10"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="224" Y="176"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="163" Y="253"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="224" Y="176"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard/>
-<Action>Y=1</Action>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Y"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="IDLE" Target="IDLE">
@@ -191,18 +201,16 @@
 <Point X="-30" Y="4"/>
 </LabelGeometry>
 </LabelBlock>
-<StartPointGeometry>
-<Point X="224" Y="176"/>
-</StartPointGeometry>
 <SplineGeometry Kind="INTERPOLATING">
 <Point X="316" Y="98"/>
 </SplineGeometry>
-<EndPointGeometry>
-<Point X="224" Y="176"/>
-</EndPointGeometry>
 <GuardActionBlock>
-<Guard/>
-<Action>X=2</Action>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="X"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</Actions>
 </GuardActionBlock>
 </Edge>
 </EdgeList>
@@ -214,7 +222,6 @@
 <IntConstant Value="2"/>
 </BinaryExpression>
 <IntConstant Value="0"/>
-<IntConstant Value="2"/>
 </Variable>
 <Variable Name="Y">
 <BinaryExpression Operator="..">
@@ -222,7 +229,6 @@
 <IntConstant Value="2"/>
 </BinaryExpression>
 <IntConstant Value="0"/>
-<IntConstant Value="2"/>
 </Variable>
 </VariableList>
 </SimpleComponent>

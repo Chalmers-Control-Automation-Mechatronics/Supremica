@@ -1,4 +1,15 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.model.compiler
+//# CLASS:   ExpressionComparator
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+
 package net.sourceforge.waters.gui;
+
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -6,187 +17,231 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.*;
 
-import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.GuardExpressionOperatorTable;
-import net.sourceforge.waters.model.module.BinaryExpressionProxy;
-import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.subject.base.ArrayListSubject;
-import net.sourceforge.waters.subject.base.ListSubject;
+import net.sourceforge.waters.model.compiler.TypeMismatchException;
+import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.Operator;
+import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 
-public class EditorEditEdgeDialog extends JDialog
-implements ActionListener, ItemListener{
-	private static final int fieldHeight = 100;
-	private static final int fieldWidth = 200;
-	private JButton okButton, cancelButton;
-	private JTextPane guardField, actionField;
-	private final JLabel guardLabel = new JLabel("Guard:");
-	private final JLabel actionLabel = new JLabel("Action:");
-	private GridBagLayout layout;
-	private ExpressionParser actionParser, guardParser;
-	private ModuleSubjectFactory m = ModuleSubjectFactory.getInstance();
-	private EdgeSubject edgeModel;
-	
-	public EditorEditEdgeDialog(EdgeSubject edge) {
-		edgeModel = edge;
-		actionParser = new ExpressionParser(m, CompilerOperatorTable.getInstance());
-		guardParser = new ExpressionParser(m, GuardExpressionOperatorTable.getInstance());
-		
-		GridBagConstraints con = new GridBagConstraints();
-		
-		setModal(true);
-		setLocationRelativeTo(null);
-		this.setTitle("Edit Edge");
-		
-		//setup layout manager
-		layout = new GridBagLayout();
-		this.setLayout(layout);
-		
-		//Button panel
-		FlowLayout buttonLayout = new FlowLayout(FlowLayout.RIGHT, 5, 5);
-		JPanel buttonPanel = new JPanel();
-		buttonPanel.setLayout(buttonLayout);
-		
-		con.gridx = 2;
-		con.gridy = 3;
-		con.weightx = 0;
-		con.weighty = 0;
-		con.anchor = con.EAST;
-		layout.setConstraints(buttonPanel, con);
-		buttonPanel.setAlignmentX(JPanel.RIGHT_ALIGNMENT);
-		this.add(buttonPanel);
-		
-		//ok button
-		okButton = new JButton();
-		okButton.setText("Ok");
-		buttonPanel.add(okButton);
-		okButton.setActionCommand("OK");
-		okButton.addActionListener(this);
-		buttonPanel.add(okButton);
-		
-		this.getRootPane().setDefaultButton(okButton);
-		
-		//cancel button
-		cancelButton = new JButton();
-		cancelButton.setText("Cancel");
-		this.add(cancelButton);
-		cancelButton.setActionCommand("Cancel");
-		cancelButton.addActionListener(this);
-		buttonPanel.add(cancelButton);
-		
-		//guard field
-		con = new GridBagConstraints();
-		con.gridx = 1;
-		con.gridy = 1;
-		con.insets = new Insets(5,5,5,5);
-		layout.setConstraints(guardLabel, con);
-		add(guardLabel);
-		
-		guardField = new JTextPane();
-		String guardText;
-		if(edge.getGuardActionBlock() != null) {
-			guardText = edge.getGuardActionBlock().getGuard();
-		} else {
-			guardText = "";
-			edge.setGuardActionBlock(m.createGuardActionBlockProxy("", "", null));
-		}
-		guardField.setText(guardText);
-		guardField.setMargin(new Insets(5,5,5,5));
-		JScrollPane scrollPaneG = new JScrollPane(guardField);
-		scrollPaneG.setPreferredSize(new Dimension(fieldWidth, fieldHeight));
-		con.gridx = 2;
-		con.gridy = 1;
-		con.weightx = 1;
-		con.weighty = 1;
-		con.fill = GridBagConstraints.BOTH;
-		con.insets = new Insets(5,5,5,5);
-		layout.setConstraints(scrollPaneG, con);
-		add(scrollPaneG);
-		
-		//action field
-		con = new GridBagConstraints();
-		con.gridx = 1;
-		con.gridy = 2;
-		con.insets = new Insets(5,5,5,5);
-		layout.setConstraints(actionLabel, con);
-		add(actionLabel);
-		
-		actionField = new JTextPane();
-		String actionText = "";
-		actionText = edge.getGuardActionBlock().getAction();
-		actionField.setText(actionText);
-		actionField.setMargin(new Insets(5,5,5,5));
-		JScrollPane scrollPaneA = new JScrollPane(actionField);
-		scrollPaneA.setPreferredSize(new Dimension(fieldWidth, fieldHeight));
-		con.gridx = 2;
-		con.gridy = 2;
-		con.weightx = 1;
-		con.weighty = 1;
-		con.fill = GridBagConstraints.BOTH;
-		con.insets = new Insets(5,5,5,5);
-		layout.setConstraints(scrollPaneA, con);
-		add(scrollPaneA);
-		
-		pack();
-		setVisible(true);
+
+public class EditorEditEdgeDialog
+  extends JDialog
+  implements ActionListener
+{
+
+  //#########################################################################
+  //# Constructors
+  public EditorEditEdgeDialog(EdgeSubject edge)
+  {
+    edgeModel = edge;
+    mParser = new ExpressionParser(m, CompilerOperatorTable.getInstance());
+
+    GridBagConstraints con = new GridBagConstraints();
+
+    setModal(true);
+    setLocationRelativeTo(null);
+    setTitle("Edit Edge");
+
+    //setup layout manager
+    layout = new GridBagLayout();
+    setLayout(layout);
+
+    //Button panel
+    FlowLayout buttonLayout = new FlowLayout(FlowLayout.RIGHT, 5, 5);
+    JPanel buttonPanel = new JPanel();
+    buttonPanel.setLayout(buttonLayout);
+
+    con.gridx = 2;
+    con.gridy = 3;
+    con.weightx = 0;
+    con.weighty = 0;
+    con.anchor = con.EAST;
+    layout.setConstraints(buttonPanel, con);
+    buttonPanel.setAlignmentX(JPanel.RIGHT_ALIGNMENT);
+    add(buttonPanel);
+
+    //ok button
+    okButton = new JButton();
+    okButton.setText("Ok");
+    buttonPanel.add(okButton);
+    okButton.setActionCommand("OK");
+    okButton.addActionListener(this);
+    buttonPanel.add(okButton);
+
+    getRootPane().setDefaultButton(okButton);
+
+    //cancel button
+    cancelButton = new JButton();
+    cancelButton.setText("Cancel");
+    add(cancelButton);
+    cancelButton.setActionCommand("Cancel");
+    cancelButton.addActionListener(this);
+    buttonPanel.add(cancelButton);
+
+    //guard field
+    con = new GridBagConstraints();
+    con.gridx = 1;
+    con.gridy = 1;
+    con.insets = new Insets(5,5,5,5);
+    layout.setConstraints(guardLabel, con);
+    add(guardLabel);
+
+    GuardActionBlockSubject block = edge.getGuardActionBlock();
+    if (block == null) {
+      block = m.createGuardActionBlockProxy();
+      edge.setGuardActionBlock(block);
+    }
+
+    guardField = new JTextPane();
+    final List<SimpleExpressionSubject> guards = block.getGuardsModifiable();
+    if (!guards.isEmpty()) {
+      final SimpleExpressionSubject guard = guards.iterator().next();
+      final String guardText = guard.toString();
+      guardField.setText(guardText);
+    }
+    guardField.setMargin(new Insets(5, 5, 5, 5));
+    JScrollPane scrollPaneG = new JScrollPane(guardField);
+    scrollPaneG.setPreferredSize(new Dimension(fieldWidth, fieldHeight));
+    con.gridx = 2;
+    con.gridy = 1;
+    con.weightx = 1;
+    con.weighty = 1;
+    con.fill = GridBagConstraints.BOTH;
+    con.insets = new Insets(5,5,5,5);
+    layout.setConstraints(scrollPaneG, con);
+    add(scrollPaneG);
+
+    //action field
+    con = new GridBagConstraints();
+    con.gridx = 1;
+    con.gridy = 2;
+    con.insets = new Insets(5,5,5,5);
+    layout.setConstraints(actionLabel, con);
+    add(actionLabel);
+
+    actionField = new JTextPane();
+    final List<BinaryExpressionSubject> actions = block.getActionsModifiable();
+    final StringBuffer buffer = new StringBuffer();
+    boolean first = true;
+    for (final BinaryExpressionSubject action : actions) {
+      if (first) {
+	first = false;
+      } else {
+	buffer.append("; ");
+      }
+      final String text = action.toString();
+      buffer.append(text);
+    }
+    final String actionText = buffer.toString();
+    actionField.setText(actionText);
+    actionField.setMargin(new Insets(5, 5, 5, 5));
+    JScrollPane scrollPaneA = new JScrollPane(actionField);
+    scrollPaneA.setPreferredSize(new Dimension(fieldWidth, fieldHeight));
+    con.gridx = 2;
+    con.gridy = 2;
+    con.weightx = 1;
+    con.weighty = 1;
+    con.fill = GridBagConstraints.BOTH;
+    con.insets = new Insets(5,5,5,5);
+    layout.setConstraints(scrollPaneA, con);
+    add(scrollPaneA);
+
+    pack();
+    setVisible(true);
+  }
+
+  public static void showDialog(EdgeSubject edge)
+  {
+    new EditorEditEdgeDialog(edge);
+  }
+
+
+  //#########################################################################
+  //# Interface java.awt.event.ActionListener
+  public void actionPerformed(final ActionEvent event)
+  {
+    if (event.getActionCommand().equals("OK")) {
+      // Get guard ...
+      SimpleExpressionSubject guard;
+      try {
+	final String text = guardField.getText();
+	guard =
+	  (SimpleExpressionSubject) mParser.parse(text, Operator.TYPE_BOOLEAN);
+      } catch (final ParseException exception) {
+	JOptionPane.showMessageDialog(this, exception.getMessage(),
+				      "Syntax error in guard!",
+				      JDialog.DO_NOTHING_ON_CLOSE);
+	return;
+      }
+      // Get actions ...
+      final String[] texts = actionField.getText().split(";");
+      final List<BinaryExpressionSubject> actions =
+	new ArrayList<BinaryExpressionSubject>(texts.length);
+      for (final String text : texts) {
+	if (text.length() > 0) {
+	  try {
+	    final SimpleExpressionSubject action = 
+	      (SimpleExpressionSubject) mParser.parse(text);
+	    if (!(action instanceof BinaryExpressionSubject)) {
+	      throw new TypeMismatchException(action, "ACTION");
+	    }
+	    final BinaryExpressionSubject binaction =
+	      (BinaryExpressionSubject) action;
+	    actions.add(binaction);
+	  } catch (final ParseException exception) {
+	    JOptionPane.showMessageDialog(this, exception.getMessage(),
+					  "Syntax error in action!",
+					  JDialog.DO_NOTHING_ON_CLOSE);
+	    return;
+	  } catch (final TypeMismatchException exception) {
+	    JOptionPane.showMessageDialog(this, exception.getMessage(),
+					  "Syntax error in action!",
+					  JDialog.DO_NOTHING_ON_CLOSE);
+	    return;
+	  }
 	}
-	
-	public static void showDialog(EdgeSubject edge) {
-		EditorEditEdgeDialog dialog = new EditorEditEdgeDialog(edge);
-	}
-	
-	public void actionPerformed(ActionEvent arg0) {
-		if(arg0.getActionCommand().equals("OK")) {
-			//set guard
-			//check syntax
-			try {
-				guardParser.parse(guardField.getText());
-			} catch (ParseException e) {
-				JOptionPane.showMessageDialog(this, e.getMessage(), "Syntax error", JDialog.DO_NOTHING_ON_CLOSE);
-			}
-			edgeModel.getGuardActionBlock().setGuard(guardField.getText());
-			
-			//set action
-			//check syntax
-			String[] actions = actionField.getText().split(";");
-			ListSubject<BinaryExpressionSubject> actionList = 
-				new ArrayListSubject<BinaryExpressionSubject>();
-			for(String action: actions) {
-				BinaryExpressionSubject actionExpr;
-				try {
-					actionExpr = (BinaryExpressionSubject) actionParser.parse(action);
-				} catch (ParseException e) {
-					//e.printStackTrace();
-					JOptionPane.showMessageDialog(this, e.getMessage(), "Syntax error", JDialog.DO_NOTHING_ON_CLOSE);
-					actionExpr = null;
-				} catch (ClassCastException e) {
-					JOptionPane.showMessageDialog(this, "Incomplete action expression", "Syntax error", JDialog.DO_NOTHING_ON_CLOSE);
-					actionExpr = null;
-				}
-				if(actionExpr != null) {
-					actionList.add(actionExpr);
-				}
-			}
-			edgeModel.getGuardActionBlock().setAction(actionField.getText());
-			
-			dispose();
-		} else if (arg0.getActionCommand().equals("Cancel")) {
-			dispose();
-		}
-	}
-	
-	public void itemStateChanged(ItemEvent arg0) {
-		// TODO Auto-generated method stub
-		
-	}
+      }
+      // Store parsed results ...
+      final GuardActionBlockSubject block = edgeModel.getGuardActionBlock();
+      final List<SimpleExpressionSubject> bguards = block.getGuardsModifiable();
+      bguards.clear();
+      bguards.add(guard);
+      final List<BinaryExpressionSubject> bactions =
+	block.getActionsModifiable();
+      bactions.clear();
+      bactions.addAll(actions);
+      dispose();
+    } else if (event.getActionCommand().equals("Cancel")) {
+      dispose();
+    }
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private JButton okButton, cancelButton;
+  private JTextPane guardField, actionField;
+  private final JLabel guardLabel = new JLabel("Guard:");
+  private final JLabel actionLabel = new JLabel("Action:");
+  private GridBagLayout layout;
+  private final ExpressionParser mParser;
+  private ModuleSubjectFactory m = ModuleSubjectFactory.getInstance();
+  private EdgeSubject edgeModel;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final int fieldHeight = 100;
+  private static final int fieldWidth = 200;
+
 }

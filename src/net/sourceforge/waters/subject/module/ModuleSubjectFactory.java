@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ModuleSubjectFactory
 //###########################################################################
-//# $Id: ModuleSubjectFactory.java,v 1.11 2006-09-06 11:52:21 robi Exp $
+//# $Id: ModuleSubjectFactory.java,v 1.12 2006-09-12 14:32:17 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -19,6 +19,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.AliasProxy;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -484,25 +485,25 @@ public class ModuleSubjectFactory
 
   /**
    * Creates a new guard action block.
-   * @param guard The guard of the new guard action block, or <CODE>null</CODE>.
-   * @param action The action of the new guard action block, or <CODE>null</CODE>.
+   * @param guards The guards of the new guard action block, or <CODE>null</CODE> if empty.
+   * @param actions The actions of the new guard action block, or <CODE>null</CODE> if empty.
    * @param geometry The geometry of the new guard action block, or <CODE>null</CODE>.
    */
   public GuardActionBlockSubject createGuardActionBlockProxy
-      (final String guard,
-       final String action,
+      (final Collection<? extends SimpleExpressionProxy> guards,
+       final Collection<? extends BinaryExpressionProxy> actions,
        final LabelGeometryProxy geometry)
   {
-    return new GuardActionBlockSubject(guard,
-                                       action,
+    return new GuardActionBlockSubject(guards,
+                                       actions,
                                        geometry);
   }
 
   /**
    * Creates a new guard action block using default values.
    * This method creates a guard action block with
-   * the guard set to <CODE>null</CODE>,
-   * the action set to <CODE>null</CODE>, and
+   * an empty guards,
+   * an empty actions, and
    * the geometry set to <CODE>null</CODE>.
    */
   public GuardActionBlockSubject createGuardActionBlockProxy()
