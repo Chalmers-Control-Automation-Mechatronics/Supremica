@@ -547,9 +547,8 @@ public class MainMenuBar
                     ActionMan.testCases(ActionMan.getGui());
                 }
                 catch (Exception excp)
-                {
-                    
-                    // what the f*** do we do?
+                {                    
+                    // Do nothing?
                 }
             }
         });

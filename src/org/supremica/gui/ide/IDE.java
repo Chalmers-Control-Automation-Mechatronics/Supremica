@@ -103,9 +103,7 @@ public class IDE
         //validate();
         
         logger.info("Supremica version: " + (new Version()).toString());
-    }
-    
-    
+    }        
     
     public Actions getActions()
     {

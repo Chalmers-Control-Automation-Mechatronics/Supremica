@@ -52,6 +52,12 @@ public class IDEMenuBar
         menu.add(new JMenuItem(ide.getActions().editorRedoAction));
         ide.getActions().editorRedoAction.setEnabled(false);
         
+        // Tools
+        menu = new JMenu("Tools");
+        menu.setMnemonic(KeyEvent.VK_T);
+        add(menu);
+        menu.add(new JMenuItem(ide.getActions().toolsTestCasesAction));
+        
         // Editor
         menu = new JMenu("Editor");
         menu.setMnemonic(KeyEvent.VK_M);

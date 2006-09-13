@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   OpenAction
 //###########################################################################
-//# $Id: OpenAction.java,v 1.14 2006-09-10 19:01:53 flordal Exp $
+//# $Id: OpenAction.java,v 1.15 2006-09-13 14:36:46 flordal Exp $
 //###########################################################################
 
 
@@ -118,8 +118,7 @@ public class OpenAction
                 final ProxyUnmarshaller<ModuleProxy> unmarshaller =
                     new JAXBModuleMarshaller(factory, optable);
                 final URI uri = file.toURI();
-                final ModuleSubject module =
-                    (ModuleSubject) unmarshaller.unmarshal(uri);
+                final ModuleSubject module = (ModuleSubject) unmarshaller.unmarshal(uri);
                 installContainer(module);
             }
             catch (final SAXException exception)
@@ -138,9 +137,7 @@ public class OpenAction
             {
                 showParseError("Could not parse module file", file, exception);
             }
-        }
-        
-        
+        }                
         
         private void openFileVprj(final File vprjfile)
         {
@@ -208,19 +205,14 @@ public class OpenAction
             }
         }
         
-        
-        
         //###################################################################
         //# Auxiliary Methods
         private void installContainer(final ModuleSubject module)
         {
-            final ModuleContainer moduleContainer =
-                new ModuleContainer(ide.getIDE(), module);
+            final ModuleContainer moduleContainer = new ModuleContainer(ide.getIDE(), module);
             ide.add(moduleContainer);
             ide.setActive(moduleContainer);
         }
-        
-        
         
         //###################################################################
         //# Error Handling

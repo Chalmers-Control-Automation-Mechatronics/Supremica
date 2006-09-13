@@ -44,6 +44,8 @@ public class Actions
     public IDEAction analyzerVerifierAction = new AnalyzerVerifierAction(allActions);
     public IDEAction analyzerOptionsAction = new AnalyzerOptionsAction(allActions);
     
+    // Tools Actions
+    public IDEAction toolsTestCasesAction = new ToolsTestCasesAction(allActions);
     
     // Help Actions
     public IDEAction helpWebAction = new HelpWebAction(allActions);

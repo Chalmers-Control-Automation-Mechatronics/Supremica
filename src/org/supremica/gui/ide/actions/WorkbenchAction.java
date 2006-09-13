@@ -48,14 +48,20 @@ public class WorkbenchAction
         try
         {
             VisualProject visualProject = ide.getIDE().getActiveModuleContainer().getVisualProject();
-            Automata automata = ide.getIDE().getActiveModuleContainer().getAnalyzerPanel().getSelectedAutomata();
+            Automata selection = ide.getIDE().getActiveModuleContainer().getAnalyzerPanel().getSelectedAutomata();
             
-            Workbench workbench = new Workbench(visualProject, automata);
+            if (selection.size() <= 0)
+            {
+                ide.getIDE().info("No automata selected.");
+                return;
+            }
+            
+            Workbench workbench = new Workbench(visualProject, selection);
             workbench.setVisible(true);
         }
         catch (Exception ex)
         {
-            System.err.println("Error starting Workbench.");
+            ide.getIDE().error("Error starting Workbench.");
         }
     }
 }
