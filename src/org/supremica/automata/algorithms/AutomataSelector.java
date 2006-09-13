@@ -64,9 +64,8 @@ class AutomataSelector
     private Automata globalSet;
     private Automata partialSet = new Automata();
     private Iterator specIterator;
-    private EventToAutomataMap eventToAutomataMap;
+    private Map<LabeledEvent,Automata> eventToAutomataMap;
     private int progress = 0;
-    private boolean seenSpec = false;    // keep track of wether no spec exists, may need to do some job anyway
     
     public AutomataSelector(Automata globalSet)
     throws Exception
@@ -92,7 +91,6 @@ class AutomataSelector
             // Is this really a sup/spec?
             if (currSupervisorAutomaton.isSupervisor() || currSupervisorAutomaton.isSpecification())
             {
-                seenSpec = true;    // yes, we've found a spec/sup
                 progress++;
                 
                 // Examine uncontrollable events in currSupervisorAutomaton and select plants accordingly
@@ -140,23 +138,23 @@ class AutomataSelector
         {
             partialSet.addAutomata(eventToAutomataMap.get(currEvent));
             
-                        /*
+            /*
                         Iterator plantIterator = eventToAutomataMap.get(currEvent).iterator();
                         while (plantIterator.hasNext())
                         {
                                 Automaton currPlantAutomaton = (Automaton) plantIterator.next();
-                         
+             
                                 // This check is performed in eventToAutomataMap
                                 // if (currPlantAutomaton.getType() == AutomatonType.Plant)
                                 if (!partialSet.containsAutomaton(currPlantAutomaton))
                                 {
                                         partialSet.addAutomaton(currPlantAutomaton);
                                         logger.debug("AutomataSelector::Added plant " + currPlantAutomaton.getName());
-                         
+             
                                         // closedSet stuff removed
                                 }
                         }
-                         */
+             */
         }
         
         return partialSet;    // return the updated set
@@ -173,14 +171,6 @@ class AutomataSelector
         }
         
         return partialSet;
-    }
-    
-    /**
-     * Return wether we've seen a spec/sup or not
-     */
-    boolean hadSpec()
-    {
-        return seenSpec;
     }
     
     /**

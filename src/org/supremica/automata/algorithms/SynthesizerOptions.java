@@ -65,6 +65,9 @@ public final class SynthesizerOptions
     private boolean maximallyPermissiveIncremental;
     private boolean reduceSupervisors;
     private boolean rememberDisabledUncontrollableEvents;
+
+    private boolean oneEventAtATime;
+    private boolean addOnePlantAtATime;
     
     /**
      * The current options, based on earlier user preferences.

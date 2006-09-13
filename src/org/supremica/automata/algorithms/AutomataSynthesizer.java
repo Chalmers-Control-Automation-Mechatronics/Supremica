@@ -168,7 +168,7 @@ public class AutomataSynthesizer
             // MODULAR (controllability) synthesis
             Automata newSupervisors = doModular(theAutomata);
 
-            if (stopRequested)
+            if (stopRequested || newSupervisors == null)
             {
                 return new Automata();
             }
@@ -413,17 +413,11 @@ public class AutomataSynthesizer
                     // We do not care about max perm, but could at least notify
                     if (disabledUncontrollableEvents.size() > 0)
                     {
-                        // Not guranteed to be max perm
+                        // Not guaranteed to be max perm
                         logger.info("The synthesized supervisor '" + retval.automaton.getComment() +
-                            "' might not be maximally permissive since:");
-                        
-                        for (Iterator evIt = disabledUncontrollableEvents.iterator(); evIt.hasNext(); )
-                        {
-                            LabeledEvent currEvent = (LabeledEvent) evIt.next();
-                            
-                            logger.info(currEvent + " is included in the plant but not " +
-                                "in the supervisor.");
-                        }
+                            "' might not be maximally permissive since the events " +
+                            disabledUncontrollableEvents + " are included in the plant but not " +
+                            "in the supervisor.");
                     }
                     else
                     {
@@ -445,9 +439,10 @@ public class AutomataSynthesizer
         
         // If no spec/sup is in the selected automata, only nonblocking requires work
         // if we've not seen any spec, do monolithic synthesis on the entire set
-        if (selector.hadSpec() == false)
+        /*
+        if (!selector.hadSpec())
         {
-            logger.debug("No spec/sup seen, doing monolithic synthesis on the entire set.");
+            logger.debug("No spec/sup seen, performing monolithic synthesis on the entire set.");
             
             MonolithicReturnValue retval = doMonolithic(aut);
             
@@ -461,7 +456,8 @@ public class AutomataSynthesizer
                 supervisors.addAutomaton(retval.automaton);
             }
         }
-        
+        */
+         
         // Should we optimize the result (throw unnecessary supervisors away)
         if (synthesizerOptions.getOptimize())
         {

@@ -127,7 +127,7 @@ public class AutomataVerifier
     {
         Automaton currAutomaton;
         
-        this.theAutomata = theAutomata;
+        this.theAutomata = new Automata(theAutomata);
         this.verificationOptions = verificationOptions;
         this.synchronizationOptions = synchronizationOptions;
         this.minimizationOptions = minimizationOptions;
@@ -342,8 +342,7 @@ public class AutomataVerifier
      */
     public void prepareForInverseControllability()
     {
-        // Make a copy and invert the properties!
-        theAutomata = new Automata(theAutomata);
+        // Invert the properties!
         for (Automaton aut: theAutomata)
         {
             if (aut.isPlant())
@@ -1647,7 +1646,7 @@ public class AutomataVerifier
         {
             automaton.setAllStatesAsAccepting();
         }
-        
+
         // Plantify all automata
         MinimizationHelper.plantify(theAutomata);
         
@@ -1678,9 +1677,6 @@ public class AutomataVerifier
     private boolean compositionalNonblockingVerification()
     throws Exception
     {
-        // Make a copy that we can fiddle with
-        Automata theAutomata = new Automata(this.theAutomata);
-        
         // Initialize execution dialog
         java.awt.EventQueue.invokeLater(new Runnable()
         {
