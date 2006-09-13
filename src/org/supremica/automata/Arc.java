@@ -51,9 +51,19 @@ package org.supremica.automata;
 
 import org.supremica.log.*;
 import java.util.Comparator;
+import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.NamedProxy;
+import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.plain.base.AbstractNamedElement;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
+import net.sourceforge.waters.model.des.TransitionProxy;
 
 public class Arc
-	implements Comparable<Arc>
+	implements TransitionProxy
 {
 	private static Logger logger = LoggerFactory.createLogger(Arc.class);
 	private LabeledEvent event;
@@ -109,6 +119,19 @@ public class Arc
 		this.event = event;
 	}
 
+	public Arc(Arc other)
+	{
+		this.event = other.event;
+		this.fromState = other.fromState;
+		this.toState = other.toState;
+	}
+
+
+	public TransitionProxy clone()
+	{
+		return new Arc(this);
+	}
+
 	public LabeledEvent getEvent()
 	{
 		return event;
@@ -124,6 +147,11 @@ public class Arc
 		return toState;
 	}
 
+	public State getTarget()
+	{
+		return getToState();
+	}
+
 	public void setToState(State toState)
 	{
 		this.toState = toState;
@@ -132,6 +160,11 @@ public class Arc
 	public State getFromState()
 	{
 		return fromState;
+	}
+
+	public State getSource()
+	{
+		return getFromState();
 	}
 
 	public void setFromState(State fromState)
@@ -356,30 +389,24 @@ public class Arc
 			firingAutomata[i] = false;
 		}
 	}
-	
+
 	/**
 	 * Compares this arc to another arc. The event is compared first,
 	 * then the toState and last the fromState.
 	 */
-	public int compareTo(Arc other)
+	public int compareTo(TransitionProxy trans)
 	{
-		int compare = this.event.compareTo(other.event);
-		if (compare != 0)
+		final int compsource = getSource().compareTo(trans.getSource());
+		if (compsource != 0)
 		{
-			return compare;
+			return compsource;
 		}
-		else
+		final int compevent = getEvent().compareTo(trans.getEvent());
+		if (compevent != 0)
 		{
-			compare = this.toState.compareTo(other.toState);
-			if (compare != 0)
-			{
-				return compare;
-			}
-			else
-			{
-				return this.fromState.compareTo(other.fromState);
-			}
+			return compevent;
 		}
+		return getTarget().compareTo(trans.getTarget());
 	}
 
 	/**
@@ -393,4 +420,34 @@ public class Arc
 			return one.getEvent().compareTo(two.getEvent());
 		}
 	}
+
+	public Object acceptVisitor(final ProxyVisitor visitor)
+		throws VisitorException
+	{
+		final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
+		return desvisitor.visitTransitionProxy(this);
+	}
+
+	public boolean equalsByContents(final Proxy partner)
+	{
+		Arc partnerArc = (Arc)partner;
+		return getSource().refequals(partnerArc.getSource()) && getTarget().refequals(partnerArc.getTarget()) && getEvent().refequals(partnerArc.getEvent());
+    }
+
+	public boolean equalsWithGeometry(final Proxy partner)
+	{
+		return equalsByContents(partner);
+	}
+
+	public int hashCodeByContents()
+	{
+	return getSource().refHashCode() + 5 * getEvent().refHashCode() + 25 * getTarget().refHashCode();
+	}
+
+	public int hashCodeWithGeometry()
+	{
+		return hashCodeByContents();
+	}
+
+
 }

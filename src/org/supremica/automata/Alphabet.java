@@ -63,6 +63,7 @@ import org.supremica.log.*;
  *@see  org.supremica.automata.AlphabetHelpers
  */
 public class Alphabet
+	extends AbstractSet<LabeledEvent>
 	implements Iterable<LabeledEvent>
 {
 	private static Logger logger = LoggerFactory.createLogger(Alphabet.class);
@@ -153,8 +154,8 @@ public class Alphabet
 	}
 
 	/**
-	 * Add an event. Thorws exception if the event is null, has null label or 
-	 * is already in the alphabet(!). 
+	 * Add an event. Thorws exception if the event is null, has null label or
+	 * is already in the alphabet(!).
 	 */
 	public void addEvent(LabeledEvent ev)
 		throws IllegalArgumentException
@@ -474,8 +475,8 @@ public class Alphabet
 		return theEvents.values();
 	}
 
-	/** 
-	 * Must be called after an event label is modified. 
+	/**
+	 * Must be called after an event label is modified.
 	 */
 	public void rehash()
 	{
@@ -584,7 +585,7 @@ public class Alphabet
 					}
 				}
 				catch (Exception ex)
-				{   
+				{
 					// This should be impossible
 					logger.error("Alphabet.minus. Trying to remove a non-existing event. " + ex);
 					logger.debug(ex.getStackTrace());
@@ -673,7 +674,7 @@ public class Alphabet
 					addEvent(newEvent);
 				}
 				catch (Exception ex)
-				{    
+				{
                     // This should be impossible
 					logger.error("Alphabet.union. Trying to add an existing event. " + ex);
 					logger.debug(ex.getStackTrace());
@@ -681,7 +682,7 @@ public class Alphabet
 			}
 		}
 		*/
-		
+
 		theEvents.putAll(other.theEvents);
 	}
 
