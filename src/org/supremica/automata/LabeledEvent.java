@@ -80,7 +80,13 @@ public class LabeledEvent
 
 	public LabeledEvent(String label)
 	{
+		this(label, false);
+	}
+
+	public LabeledEvent(String label, boolean isProposition)
+	{
 		this.label = label;
+		this.proposition = isProposition;
 	}
 
 	public LabeledEvent(LabeledEvent e)
@@ -308,13 +314,6 @@ public class LabeledEvent
 		return getLabel();
 	}
 
-	public Object acceptVisitor(final ProxyVisitor visitor)
-		throws VisitorException
-	{
-		final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
-		return desvisitor.visitEventProxy(this);
-	}
-
 	public EventKind getKind()
 	{
 		if (proposition)
@@ -326,6 +325,13 @@ public class LabeledEvent
 			return EventKind.CONTROLLABLE;
 		}
 		return EventKind.UNCONTROLLABLE;
+	}
+
+	public Object acceptVisitor(final ProxyVisitor visitor)
+		throws VisitorException
+	{
+		final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
+		return desvisitor.visitEventProxy(this);
 	}
 
 	public boolean equalsByContents(final Proxy partner)

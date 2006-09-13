@@ -52,14 +52,26 @@ package org.supremica.automata;
 import java.util.*;
 import java.awt.Point;
 
+import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.NamedProxy;
+import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.plain.base.AbstractNamedElement;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
+
 public class State
-	implements Comparable<State>
+	implements StateProxy
 {
 	public final static int MIN_COST = 0;
 	public final static int MAX_COST = Integer.MAX_VALUE;
 	public final static int UNDEF_COST = -1;
 	public final static int UNDEF_POS = Integer.MIN_VALUE;
 	private int index = -1;
+
+	private static final LabeledEvent acceptingProposition = new LabeledEvent("accepting", true);
 
 	/**
 	 * id is the internal identifier, i.e. for directing arcs etc.
@@ -90,9 +102,9 @@ public class State
 
 	private Listeners listeners = null;
 
-	/** 
+	/**
 	 * This is used to speed up set operations in the
-	 * AutomatonSynthesizerSingleFixpoint algorithm 
+	 * AutomatonSynthesizerSingleFixpoint algorithm
 	 */
 	public int sethelper;
 
@@ -168,6 +180,11 @@ public class State
 		// Här är skurken.....
 		// Vilken jäv**a skurk? Skriv ordentliga kommentarer, skurkar!!!
 		//              outgoingArcs = otherState.outgoingArcs;
+	}
+
+	public NamedProxy clone()
+	{
+		return new State(this);
 	}
 
 	private String getId()
@@ -255,7 +272,7 @@ public class State
 	{
 		this.initial = initial;
 	}
-	
+
 	public boolean isInitial()
 	{
 		return initial;
@@ -563,7 +580,7 @@ public class State
 	{
 		return outgoingArcs.iterator();
 	}
-	
+
 	/**
 	 * Returns the set of outgoing arcs from this state
 	 */
@@ -789,10 +806,10 @@ public class State
 
 		return count;
 		*/
-		
+
 		int count = outgoingArcs.size();
 		Object[] arcs = outgoingArcs.toArray();
-		outgoingArcs.clear();		
+		outgoingArcs.clear();
 		for (Object arc : arcs)
 		{
 			((Arc) arc).clear();
@@ -821,7 +838,7 @@ public class State
 
 		return count;
 		*/
-		
+
 		int count = incomingArcs.size();
 		Object[] arcs = incomingArcs.toArray();
 		incomingArcs.clear();
@@ -978,11 +995,11 @@ public class State
 			{
 				Arc currArc = arcIt.next();
 				State state = currArc.getToState();
-				
+
 				// Is this an epsilon event that we care about?
 				if (currArc.getEvent().isEpsilon() && !currArc.isSelfLoop() && !result.contains(state) &&
-					((includeControllable && includeUncontrollable) || 
-					 (includeControllable && currArc.getEvent().isControllable()) || 
+					((includeControllable && includeUncontrollable) ||
+					 (includeControllable && currArc.getEvent().isControllable()) ||
 					 (includeUncontrollable && !currArc.getEvent().isControllable())))
 				{
 					statesToExamine.add(state);
@@ -1161,11 +1178,18 @@ public class State
 	/**
 	 * Implementation of the Comparable interface. Compares the id of the states.
 	 */
+
+	public int compareTo(NamedProxy partner)
+	{
+		return id.compareTo(((State) partner).id);
+	}
+
+/*
 	public int compareTo(State other)
 	{
 		return this.getId().compareTo(other.getId());
 	}
-
+*/
 	//////////////////
 	// Kripke stuff //
 	//////////////////
@@ -1196,5 +1220,72 @@ public class State
 	public void setKripkeLabels(Set<KripkeLabel> set)
 	{
 		labels = set;
+	}
+
+
+	public Object acceptVisitor(final ProxyVisitor visitor)
+		throws VisitorException
+	{
+		final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
+		return desvisitor.visitStateProxy(this);
+	}
+
+	public boolean equalsByContents(final Proxy partner)
+	{
+		State partnerState = (State)partner;
+		return getName().equals(partnerState.getName()) && isInitial() == partnerState.isInitial() && isAccepting() == partnerState.isAccepting() && isForbidden() == partnerState.isForbidden();
+	}
+
+	public boolean equalsWithGeometry(final Proxy partner)
+	{
+		return equalsByContents(partner);
+	}
+
+	public int hashCodeByContents()
+	{
+		int result = refHashCode();
+		result *= 5;
+		if (isInitial())
+		{
+			result *= 5;
+			result += "initial".hashCode();
+		}
+		if (isAccepting())
+		{
+			result *= 5;
+			result += "accepting".hashCode();
+		}
+		if (isForbidden())
+		{
+			result *= 5;
+			result += "forbidden".hashCode();
+		}
+		return result;
+	}
+
+	public int hashCodeWithGeometry()
+	{
+		return hashCodeByContents();
+	}
+
+	public boolean refequals(final NamedProxy partner)
+	{
+		return getName().equals(partner.getName());
+	}
+
+	public int refHashCode()
+	{
+		return getName().hashCode();
+	}
+
+	public Collection<EventProxy> getPropositions()
+	{
+		LinkedList<EventProxy> currPropositions = new LinkedList<EventProxy>();
+		if (isAccepting())
+		{
+			currPropositions.add(acceptingProposition);
+		}
+		return currPropositions;
+
 	}
 }
