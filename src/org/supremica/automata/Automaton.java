@@ -1384,10 +1384,7 @@ public class Automaton
 
 	public Set<EventProxy> getEvents()
 	{
-		Set<EventProxy> events = getAlphabet().getWatersEvents();
-		// Add propositions
-		events.add(State.acceptingProposition);
-		return events;
+		return getAlphabet().getWatersEventsWithAcceptingProposition();
 	}
 
 	/**

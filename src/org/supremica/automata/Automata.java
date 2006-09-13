@@ -56,16 +56,32 @@ import org.supremica.automata.IO.ProjectBuildFromXml;
 import javax.swing.JOptionPane;
 import java.awt.Toolkit;
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.awt.Component;
 
-
+import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.NamedProxy;
+import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.base.EqualCollection;
+import net.sourceforge.waters.plain.base.AbstractNamedElement;
+import net.sourceforge.waters.plain.base.DocumentElement;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 /**
  * An ordered set of Automaton-objects.
  * @see Automaton
  */
 public class Automata
-    implements AutomatonListener, Iterable<Automaton>
+	extends DocumentElement
+    implements AutomatonListener, Iterable<Automaton>, ProductDESProxy
 {
     private static Logger logger = LoggerFactory.createLogger(Automata.class);
     private ArrayList<Automaton> theAutomata;
@@ -73,13 +89,27 @@ public class Automata
     private String name = null;
     private String comment = null;
     private AutomataListeners listeners = null;
-    
+	private static File watersDummyFile = null;
+
+	static
+	{
+		try
+		{
+			watersDummyFile = File.createTempFile("watersDummy", "");
+		}
+		catch(IOException ex)
+		{
+			logger.error(ex);
+		}
+	}
+
     public Automata()
     {
+		super("WatersDummy", watersDummyFile.toURI());
         theAutomata = new ArrayList<Automaton>();
         nameMap = new HashMap<String,Automaton>();
     }
-    
+
     /**
      * Copy constructor that also makes a (deep) copy of all the
      * automata contained in oldAutomata. Calling this is equal to
@@ -89,24 +119,24 @@ public class Automata
     {
         this(oldAutomata, false);
     }
-    
+
     /**
      * Construct an Automata object with a single automaton.
      */
     public Automata(Automaton theAutomaton)
     {
         this();
-        
+
         addAutomaton(theAutomaton);
     }
-    
+
     /**
      * Does not make a new copy of the contained automata unless shallowCopy is false
      */
     public Automata(Automata oldAutomata, boolean shallowCopy)
     {
         this();
-        
+
         if (shallowCopy)
         {
             shallowAutomataCopy(oldAutomata);
@@ -116,21 +146,22 @@ public class Automata
             deepAutomataCopy(oldAutomata);
         }
     }
-    
+
     public Automata(URL url)
-    throws Exception
+    	throws Exception
     {
+		super("No Name", url.toURI());
         ProjectBuildFromXml builder = new ProjectBuildFromXml();
         Project theProject = builder.build(url);
         shallowAutomataCopy(theProject);
     }
-    
+
     public Automata(File file)
-    throws Exception
+    	throws Exception
     {
         this(file.toURL());
     }
-    
+
     private void deepAutomataCopy(Automata oldAutomata)
     {
         for (Automaton automaton : oldAutomata)
@@ -138,7 +169,7 @@ public class Automata
             addAutomaton(new Automaton(automaton));
         }
     }
-    
+
     private void shallowAutomataCopy(Automata oldAutomata)
     {
         for (Automaton automaton : oldAutomata)
@@ -146,7 +177,7 @@ public class Automata
             addAutomaton(automaton);
         }
     }
-    
+
     /**
      * Adds the automaton aut to this Automata. If there already is an automaton with the
      * same name as aut, aut is NOT added.
@@ -161,7 +192,7 @@ public class Automata
             notifyListeners(AutomataListeners.MODE_AUTOMATON_ADDED, aut);
         }
     }
-    
+
     /**
      * Adds all automata in 'automata' to this Automata. Automata with the same name as
      * already present automata are NOT added.
@@ -171,10 +202,10 @@ public class Automata
         for (Automaton automaton : automata)
         {
             addAutomaton(automaton);
-            
+
         }
     }
-    
+
     /**
      * Iterates over all automata in automata.
      * If an automaton with the same name is not in the cureent
@@ -190,11 +221,11 @@ public class Automata
             {
                 removeAutomaton(automaton.getName());
             }
-            
+
             addAutomaton(automaton);
         }
     }
-    
+
     public void removeAutomaton(Automaton aut)
     {
         if (containsAutomaton(aut))
@@ -204,7 +235,7 @@ public class Automata
             notifyListeners(AutomataListeners.MODE_AUTOMATON_REMOVED, aut);
         }
     }
-    
+
     public void removeAutomata(Automata automata)
     {
         for (Automaton automaton : automata)
@@ -212,23 +243,23 @@ public class Automata
             removeAutomaton(automaton.getName());
         }
     }
-    
+
     public void removeAutomaton(String name)
     {
         Automaton currAutomaton = getAutomaton(name);
-        
+
         if (currAutomaton != null)
         {
             removeAutomaton(currAutomaton);
         }
     }
-    
+
     // Moves automaton one step up or down in the ArrayList
     public void moveAutomaton(Automaton aut, boolean directionIsUp)
     {
         int firstAutomatonIndex = theAutomata.indexOf(aut);
         int secondAutomatonIndex;
-        
+
         if (directionIsUp)
         {
             secondAutomatonIndex = firstAutomatonIndex - 1;
@@ -237,20 +268,20 @@ public class Automata
         {
             secondAutomatonIndex = firstAutomatonIndex + 1;
         }
-        
+
         Automaton firstAutomaton = aut;
         Automaton secondAutomaton = (Automaton) theAutomata.get(secondAutomatonIndex);
-        
+
         theAutomata.set(firstAutomatonIndex, secondAutomaton);
         theAutomata.set(secondAutomatonIndex, firstAutomaton);
         notifyListeners();
     }
-    
+
     // Moves automaton to arbitrary destination
     public void moveAutomaton(Automaton aut, int destinationIndex)
     {
         int originIndex = theAutomata.indexOf(aut);
-        
+
         if (originIndex > destinationIndex)
         {
             for (int i = originIndex; i > destinationIndex; i--)
@@ -266,18 +297,18 @@ public class Automata
             }
         }
     }
-    
+
     public void renameAutomaton(Automaton aut, String newName)
     {
         aut.setName(newName);
     }
-    
-    
+
+
     public Iterator<Automaton> iterator()
     {
         return theAutomata.iterator();
     }
-    
+
     /**
      * Iterates backwards through the automata... necessary
      * in the automataMove_actionPerformed in ActionMan when
@@ -293,15 +324,15 @@ public class Automata
         {
             backwardList.add(0, forwardIterator.next());
         }
-        
+
         return backwardList.iterator();
     }
-    
+
     public Iterator<Automaton> plantIterator()
     {
         return new AutomatonTypeIterator(AutomatonType.PLANT);
     }
-    
+
     /**
      * Returns a new automata object with all plant
      * in this automata. Note that this reuses the references
@@ -310,22 +341,22 @@ public class Automata
     public Automata getPlantAutomata()
     {
         Automata newAutomata = new Automata();
-        
+
         for (Iterator theIt = plantIterator(); theIt.hasNext(); )
         {
             Automaton currAutomaton = (Automaton) theIt.next();
-            
+
             newAutomata.addAutomaton(currAutomaton);
         }
-        
+
         return newAutomata;
     }
-    
+
     public Iterator<Automaton> specificationIterator()
     {
         return new AutomatonTypeIterator(AutomatonType.SPECIFICATION);
     }
-    
+
     /**
      * Returns a new automata object with all specifications
      * in this automata. Note that this reuses the references
@@ -334,22 +365,22 @@ public class Automata
     public Automata getSpecificationAutomata()
     {
         Automata newAutomata = new Automata();
-        
+
         for (Iterator theIt = specificationIterator(); theIt.hasNext(); )
         {
             Automaton currAutomaton = (Automaton) theIt.next();
-            
+
             newAutomata.addAutomaton(currAutomaton);
         }
-        
+
         return newAutomata;
     }
-    
+
     public Iterator<Automaton> supervisorIterator()
     {
         return new AutomatonTypeIterator(AutomatonType.SUPERVISOR);
     }
-    
+
     /**
      * Returns a new automata object with all supervisors
      * in this automata. Note that this reuses the references
@@ -358,17 +389,17 @@ public class Automata
     public Automata getSupervisorAutomata()
     {
         Automata newAutomata = new Automata();
-        
+
         for (Iterator theIt = supervisorIterator(); theIt.hasNext(); )
         {
             Automaton currAutomaton = (Automaton) theIt.next();
-            
+
             newAutomata.addAutomaton(currAutomaton);
         }
-        
+
         return newAutomata;
     }
-    
+
     /**
      * Returns a new automata object with all specification and supervisor
      * automata in this automata. Note that this reuses the references
@@ -377,31 +408,31 @@ public class Automata
     public Automata getSpecificationAndSupervisorAutomata()
     {
         Automata newAutomata = new Automata();
-        
+
         for (Iterator theIt = specificationIterator(); theIt.hasNext(); )
         {
             Automaton currAutomaton = (Automaton) theIt.next();
-            
+
             newAutomata.addAutomaton(currAutomaton);
         }
-        
+
         for (Iterator theIt = supervisorIterator(); theIt.hasNext(); )
         {
             Automaton currAutomaton = (Automaton) theIt.next();
-            
+
             newAutomata.addAutomaton(currAutomaton);
         }
-        
+
         return newAutomata;
     }
-    
+
     /**
      * Returns true if all automata are deterministic
      */
     public boolean isDeterministic()
     {
         boolean deterministic = true;
-        
+
         for (Automaton automaton : this)
         {
             if (!automaton.isDeterministic())
@@ -410,10 +441,10 @@ public class Automata
                 deterministic = false;
             }
         }
-        
+
         return deterministic;
     }
-    
+
     /**
      * Returns true if all automata have initial states
      */
@@ -426,10 +457,10 @@ public class Automata
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     /**
      * Returns true if each automaton has at least one accepting state
      * Of course, this is no guarantee that the composition will have
@@ -444,10 +475,10 @@ public class Automata
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     /**
      * Returns true if any of the automata has a forbidden state.
      */
@@ -460,22 +491,22 @@ public class Automata
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Returns name of first automaton found that has no accepting states. Returns null
      * if all automata have at least one accepting state.
      */
-    
+
         /*
         public String hasAcceptingState()
         {
                         for (Iterator automataIterator = iterator(); automataIterator.hasNext(); )
                         {
                                         Automaton automaton = (Automaton) automataIterator.next();
-         
+
                                         if(!automaton.hasAcceptingState())
                                         {
                                                         return automaton.getName();
@@ -484,7 +515,7 @@ public class Automata
                         return null;
         }
          */
-    
+
     /**
      * Returns true if all automata have all events prioritized
      */
@@ -497,10 +528,10 @@ public class Automata
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     /**
      * True if all automata are plants
      */
@@ -513,10 +544,10 @@ public class Automata
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     /**
      * True if all automata are supervisors
      */
@@ -529,10 +560,10 @@ public class Automata
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     /**
      * True if all automata are specifications
      */
@@ -545,10 +576,10 @@ public class Automata
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     /**
      * True if NONE of the automata are plants.
      */
@@ -561,10 +592,10 @@ public class Automata
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     /**
      * True if no automaton is  either specification OR supervisor.
      * This is good to for early termination in algorithms :)
@@ -578,10 +609,10 @@ public class Automata
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     /**
      * Returns true if at least one automaton has the event as prioritized.
      * Returns false if the event is not included in any alphabet or
@@ -596,10 +627,10 @@ public class Automata
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Returns true if the system is really several systems, i.e. can be divided into sets of
      * automata that have disjoint alphabets.
@@ -609,7 +640,7 @@ public class Automata
         Automata autA = new Automata(this.getFirstAutomaton());
         Alphabet unionAlpha = autA.getUnionAlphabet();
         boolean change = true;
-        
+
         while (change)
         {
             change = false;
@@ -620,7 +651,7 @@ public class Automata
                     continue;
                 }
                 Alphabet alpha = theAut.getAlphabet();
-                
+
                                 /*
                                 // Compare the alphabets!
                                 Alphabet diff = Alphabet.minus(unionAlpha, alpha);
@@ -650,7 +681,7 @@ public class Automata
                 }
             }
         }
-        
+
         // What's the result?
         if (autA.size() < this.size())
         {
@@ -664,10 +695,10 @@ public class Automata
                     autA.getFirstAutomaton() + " is disconnected from the rest.");
             return true;
         }
-        
+
         return false;
     }
-    
+
     /**
      * Returns true if the controllability is consistent through all the automata.
      */
@@ -680,22 +711,22 @@ public class Automata
             for (Automaton automaton : this)
             {
                 Alphabet currAlpha = automaton.getAlphabet();
-                
+
                 if (currAlpha.contains(currEvent.getLabel()))
                 {
                     if (currEvent.isEpsilon() != currAlpha.getEvent(currEvent.getLabel()).isEpsilon())
                     {
                         logger.error("The event " + currEvent + " is not epsilon consistent.");
-                        
+
                         return false;
                     }
                 }
             }
         }
-        
+
         return true;
     }
-    
+
     /**
      * Returns true if the controllability is consistent through all the automata.
      */
@@ -703,7 +734,7 @@ public class Automata
     {
         // Get the union alphabet (ignoring consistency here)
         Alphabet unionAlphabet = getUnionAlphabet();
-        
+
         return isEventControllabilityConsistent(unionAlphabet);
     }
     /**
@@ -714,7 +745,7 @@ public class Automata
         // Iterate over the alphabet and examine all automata
         for (LabeledEvent currEvent : unionAlphabet)
         {
-            
+
             // Examine each automata
             for (Automaton automaton : this)
             {
@@ -724,16 +755,16 @@ public class Automata
                     if (currEvent.isControllable() != currAlpha.getEvent(currEvent.getLabel()).isControllable())
                     {
                         logger.error("The event " + currEvent + " is not controllability consistent.");
-                        
+
                         return false;
                     }
                 }
             }
         }
-        
+
         return true;
     }
-    
+
     /**
      * Returns true if any automaton has a self loop
      */
@@ -747,10 +778,10 @@ public class Automata
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Returns the number of Automaton:s in this Automata.
      */
@@ -758,7 +789,7 @@ public class Automata
     {
         return theAutomata.size();
     }
-    
+
     /**
      * Returns the number of Automaton:s in this Automata.
      */
@@ -766,24 +797,24 @@ public class Automata
     {
         return size();
     }
-    
+
     public boolean containsAutomaton(String name)
     {
         return nameMap.containsKey(name);
     }
-    
+
     public boolean containsAutomaton(Automaton otherAutomaton)
     {
         Automaton thisAutomaton = nameMap.get(otherAutomaton.getName());
-        
+
         if (thisAutomaton == null)
         {
             return false;
         }
-        
+
         return thisAutomaton == otherAutomaton;
     }
-    
+
     /**
      * When exporting to files some automata names may be illegal.
      * In Windows the following characters are illegal in file names: \/:*?"<>|
@@ -800,7 +831,7 @@ public class Automata
             renameAutomaton(currAutomaton, newAutomatonName);
         }
     }
-    
+
     /**
      * Set the synchronization indices. The returned alphabet is the union alphabet
      * and contains the synchronization index of all the events in this automata.
@@ -809,10 +840,10 @@ public class Automata
     {
         // Get the union alphabet (ignoring consistency)
         Alphabet theAlphabet = getUnionAlphabet();
-        
+
         // Adjust the indices of the alphabet
         theAlphabet.setIndices();
-        
+
         // Adjust the indices of the automata
         int i = 0;
         // Examine each automata
@@ -820,10 +851,10 @@ public class Automata
         {
             automaton.setIndices(i++, theAlphabet);
         }
-        
+
         return theAlphabet;
     }
-    
+
     /**
      * Returns the union alphabet of all represented automata.
      */
@@ -834,7 +865,7 @@ public class Automata
                 {
                         return new Alphabet();
                 }
-                 
+
                 try
                 {
                         // If consistency is important, that has to be said explicitly
@@ -845,7 +876,7 @@ public class Automata
                         throw new RuntimeException(ex);
                 }
                  */
-        
+
         // Add all alphabets to a new one...
         Alphabet unionAlphabet = new Alphabet();
         // Examine each automata
@@ -855,48 +886,53 @@ public class Automata
         }
         return unionAlphabet;
     }
-    
-    public Set<Automaton> getAutomata()
+
+    public Set<AutomatonProxy> getAutomata()
     {
         Iterator<Automaton> iterator = iterator();
-        Set<Automaton> automata = new HashSet<Automaton>();
+        Set<AutomatonProxy> automata = new HashSet<AutomatonProxy>();
         while(iterator.hasNext())
         {
             automata.add(iterator.next());
         }
         return automata;
     }
-    
+
+    public Set<EventProxy> getEvents()
+    {
+		return getUnionAlphabet().getWatersEventsWithAcceptingProposition();
+	}
+
     public Automaton getAutomaton(String name)
     {
         return nameMap.get(name);
     }
-    
+
     public Automaton getAutomatonAt(int i)
     {
         return theAutomata.get(i);
     }
-    
+
     public Automaton getFirstAutomaton()
     {
         return getAutomatonAt(0);
     }
-    
+
     public int getAutomatonIndex(Automaton theAutomaton)
     {
         for (int i = 0; i < theAutomata.size(); i++)
         {
             Automaton currAutomaton = getAutomatonAt(i);
-            
+
             if (currAutomaton == theAutomaton)
             {
                 return i;
             }
         }
-        
+
         return -1;
     }
-    
+
     /**
      * Compares two automata objects for equality. This test is supposed
      * to a quick test, therefor we do not check for language equality
@@ -910,12 +946,12 @@ public class Automata
         {
             return false;
         }
-        
+
         if (!getName().equals(other.getName()))
         {
             return false;
         }
-        
+
         for (Iterator<Automaton> thisAutIt = iterator(), otherAutIt = other.iterator();
         thisAutIt.hasNext() || otherAutIt.hasNext(); )
         {
@@ -925,120 +961,120 @@ public class Automata
                 //System.err.println("automata i this");
                 return false;
             }
-            
+
             if (!otherAutIt.hasNext())
             {
                 //System.err.println("automata i other");
                 return false;
             }
-            
+
             Automaton thisAutomaton = (Automaton) thisAutIt.next();
             Automaton otherAutomaton = (Automaton) otherAutIt.next();
-            
+
             if (!thisAutomaton.equalAutomaton(otherAutomaton))
             {
                 //System.err.println("unequal automaton");
                 return false;
             }
         }
-        
+
         //System.err.println("equal automaton");
         return true;
     }
-    
+
     public void setName(String name)
     {
         this.name = name;
     }
-    
+
     public String getName()
     {
         if (name == null)
         {
             return "";
         }
-        
+
         return name;
     }
-    
+
     public void setComment(String comment)
     {
         this.comment = comment;
     }
-    
+
     public String getComment()
     {
         if (comment == null)
         {
             return "";
         }
-        
+
         return comment;
     }
-    
+
     public void clear()
     {
                 /*
                 ArrayList theAutomataCopy = new ArrayList(theAutomat)a;
-                 
+
                 for (Iterator autIt = theAutomataCopy.iterator(); autIt.hasNext(); )
                 {
                         Automaton currAutomaton = (Automaton) autIt.next();
-                 
+
                         removeAutomaton(currAutomaton.getName());
                 }
                  */
-        
+
         while (size() != 0)
         {
             removeAutomaton(getFirstAutomaton());
         }
-        
+
         theAutomata.clear();
         nameMap.clear();
     }
-    
+
     public String getUniqueAutomatonName()
     {
         return getUniqueAutomatonName("Untitled");
     }
-    
+
     public String getUniqueAutomatonName(String prefix)
     {
         if (prefix == null)
         {
             return getUniqueAutomatonName();
         }
-        
+
         if (!containsAutomaton(prefix))
         {
             return prefix;
         }
-        
+
         int index = 1;
         String newName;
-        
+
         do
         {
             newName = prefix + "(" + index++ + ")";
         }
         while (containsAutomaton(newName));
-        
+
         return newName;
     }
-    
+
     public String getUniqueEventLabel()
     {
         return getUniqueEventLabel("e");
     }
-    
+
     public String getUniqueEventLabel(String prefix)
     {
         if(prefix == null)	// clever recursion here :-)
         {
             return getUniqueEventLabel();
         }
-        
+
         Alphabet alpha = getUnionAlphabet();
         StringBuffer buf = new StringBuffer(prefix);
         int num = 1; // number to append to prefix
@@ -1048,58 +1084,58 @@ public class Automata
         }
         return buf.toString();
     }
-    
+
     public void stateAdded(Automaton aut, State q)
     {    // Do nothing
     }
-    
+
     public void stateRemoved(Automaton aut, State q)
     {    // Do nothing
     }
-    
+
     public void arcAdded(Automaton aut, Arc a)
     {    // Do nothing
     }
-    
+
     public void arcRemoved(Automaton aut, Arc a)
     {    // Do nothing
     }
-    
+
     public void attributeChanged(Automaton aut)
     {    // Do nothing
     }
-    
+
     public void automatonRenamed(Automaton aut, String oldName)
     {
         nameMap.remove(oldName);
         nameMap.put(aut.getName(), aut);
         notifyListeners(AutomataListeners.MODE_AUTOMATON_RENAMED, aut);
     }
-    
+
     public void updated(Object obj)
     {
         notifyListeners();
     }
-    
+
     public AutomataListeners getListeners()
     {
         if (listeners == null)
         {
             listeners = new AutomataListeners(this);
         }
-        
+
         return listeners;
     }
-    
+
     public void addListener(AutomataListener listener)
     {
         // Semantic Warning: Local "listeners" shadows a field of the same name in "org.supremica.automata.Automata".
         // AutomataListeners listeners = getListeners();
         // listeners.addListener(listener);
-        
+
         getListeners().addListener(listener);
     }
-    
+
     void notifyListeners()
     {
         if (listeners != null)
@@ -1107,7 +1143,7 @@ public class Automata
             listeners.notifyListeners();
         }
     }
-    
+
     void notifyListeners(int mode, Automaton a)
     {
         // logger.debug("Automata.notifyListeners Start");
@@ -1117,7 +1153,7 @@ public class Automata
             listeners.notifyListeners(mode, a);
         }
     }
-    
+
     public void beginTransaction()
     {
         if (listeners != null)
@@ -1125,7 +1161,7 @@ public class Automata
             listeners.beginTransaction();
         }
     }
-    
+
     public void endTransaction()
     {
         if (listeners != null)
@@ -1133,77 +1169,77 @@ public class Automata
             listeners.endTransaction();
         }
     }
-    
+
     class AutomatonTypeIterator
         implements Iterator<Automaton>
     {
         private Iterator autIt;
         private AutomatonType theType;
         private Automaton theAutomaton = null;
-        
+
         public AutomatonTypeIterator(AutomatonType theType)
         {
             this.autIt = theAutomata.iterator();
             this.theType = theType;
-            
+
             findNext();
         }
-        
+
         public boolean hasNext()
         {
             return theAutomaton != null;
         }
-        
+
         public Automaton next()
         {
             Automaton returnAutomaton = theAutomaton;
-            
+
             findNext();
-            
+
             return returnAutomaton;
         }
-        
+
         public void remove()
         {
             throw new UnsupportedOperationException();
         }
-        
+
         private void findNext()
         {
             while (autIt.hasNext())
             {
                 theAutomaton = (Automaton) autIt.next();
-                
+
                 if (theAutomaton.getType() == theType)
                 {
                     return;
                 }
             }
-            
+
             theAutomaton = null;
         }
     }
-    
+
     // Useful for debugging (among other things)
     public String toDebugString()
     {
         StringBuffer sbuf = new StringBuffer();
-        
+
         for (Iterator it = iterator(); it.hasNext(); )
         {
             Automaton automaton = (Automaton) it.next();
-            
+
             sbuf.append(automaton.toString());
             sbuf.append("\n");
         }
-        
+
         return sbuf.toString();
     }
-    
+
     public String toString()
     {
         StringBuffer sbuf = new StringBuffer("{");
-        
+
         if (size() > 0)
         {
             // Examine each automata
@@ -1211,56 +1247,56 @@ public class Automata
             {
                 sbuf.append(automaton.toString() + ", ");
             }
-            
+
             sbuf.delete(sbuf.length() - 2, sbuf.length());
         }
-        
+
         sbuf.append("}");
         return sbuf.toString();
     }
-    
+
     // Useful for debugging (among other things) - writes Java code
     public String toCode()
     {
         StringBuffer sbuf = new StringBuffer();
-        
+
         // Examine each automata
         for (Automaton automaton : this)
         {
             sbuf.append(automaton.toCode());
             sbuf.append("\n");
         }
-        
+
         sbuf.append("Automata automata = new Automata();\n");
-        
+
         // Examine each automata
         for (Automaton automaton : this)
         {
             sbuf.append("automata.addAutomaton(" + automaton.getName() + ");");
             sbuf.append("\n");
         }
-        
+
         return sbuf.toString();
     }
-    
+
     public String stateToString(int[] arrstate)
     {
         StringBuffer sbuf = new StringBuffer();
         int i = 0;
-        
+
         // Examine each automata
         for (Automaton automaton : this)
         {
             State state = automaton.getStateWithIndex(arrstate[i]);
-            
+
             sbuf.append(state.getName() + ".");
-            
+
             ++i;
         }
-        
+
         return sbuf.toString();
     }
-    
+
     /**
      * Examines automata size.
      *
@@ -1271,7 +1307,7 @@ public class Automata
     {
         return sanityCheck(gui, minSize, false, false, false, false);
     }
-    
+
     /**
      * Examines automata size and - optionally - some other stuff.
      *
@@ -1300,7 +1336,7 @@ public class Automata
             logger.warn("Skipping sanity...");
             return true;
         }
-        
+
         // Examine if there are inadequate events...
         // Examine each automata
         for (Automaton automaton : this)
@@ -1316,17 +1352,17 @@ public class Automata
                         " are selflooped in all states.");
             }
         }
-        
+
         // Get the union alphabet (ignoring consistency here)
         Alphabet unionAlphabet = getUnionAlphabet();
-        
+
         // Warns if there are events with equal (lowercase) names.
         // Always do this check (irritating? well yes... but those are really bad names!)
         if (!AlphabetHelpers.isEventNamesSafe(unionAlphabet))
         {
             // Warning has been written in log window by isEventNamesSafe.
         }
-        
+
         // Examines controllability consistency
         if (mustBeControllabilityConsistent)
         {
@@ -1334,13 +1370,13 @@ public class Automata
             {
                 return false;
             }
-            
+
             if (!isEventEpsilonConsistent(unionAlphabet))
             {
                 return false;
             }
         }
-        
+
         // Warns if the system has disjoint modules (the system can be divided into at least two sets
         // of modules whose union alphabets are disjoint)
         if (examineStructure)
@@ -1350,7 +1386,7 @@ public class Automata
                 // Warning has been written in the log window by isSeveralSystems().
             }
         }
-        
+
         // Examines each automaton for an initial state
         if (mustHaveInitial)
         {
@@ -1359,7 +1395,7 @@ public class Automata
             // but it doesn't tell which automaton breaks the test...
             for (Automaton currAutomaton : this)
             {
-                
+
                 // Does this automaton have an initial state?
                 if (!currAutomaton.hasInitialState())
                 {
@@ -1377,13 +1413,13 @@ public class Automata
                     {
                         logger.error("The automaton " + currAutomaton + " has no initial state.");
                     }
-                    
+
                     // This is iNsanE!
                     return false;
                 }
             }
         }
-        
+
         // Examines the type of each automaton
         if (mustHaveValidType && (size() > 1))
         {
@@ -1408,13 +1444,13 @@ public class Automata
                         logger.error("The automaton " + currAutomaton +
                             " is of type 'Undefined'. Please specify a type.");
                     }
-                    
+
                     // This is iNsaNe!
                     return false;
                 }
             }
         }
-        
+
         // Make sure the automata has the right size!
         if ((minSize > 0) && (size() < minSize))
         {
@@ -1433,7 +1469,7 @@ public class Automata
                 size = minSize + " automata";
             }
             String message = "At least " + size + " must be selected!";
-            
+
             // Present result
             if (gui != null)
             {
@@ -1443,12 +1479,56 @@ public class Automata
             {
                 logger.error(message);
             }
-            
+
             // This is inSaNe!
             return false;
         }
-        
+
         // Perfectly sane!
         return true;
     }
+
+
+	public Object acceptVisitor(final ProxyVisitor visitor)
+		throws VisitorException
+	{
+		final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
+		return desvisitor.visitProductDESProxy(this);
+	}
+
+	public boolean equalsByContents(final Proxy partner)
+	{
+		final Automata des = (Automata) partner;
+
+		return	EqualCollection.isEqualSetByContents(getEvents(), des.getEvents()) &&
+				EqualCollection.isEqualSetByContents(getAutomata(), des.getAutomata());
+	}
+
+	public boolean equalsWithGeometry(final Proxy partner)
+	{
+		return equalsByContents(partner);
+	}
+
+	public int hashCodeByContents()
+	{
+		int result = EqualCollection.getSetHashCodeByContents(getEvents());
+		result *= 5;
+		result += EqualCollection.getSetHashCodeByContents(getAutomata());
+		return result;
+	}
+
+	public int hashCodeWithGeometry()
+	{
+		return hashCodeByContents();
+	}
+
+	public boolean refequals(final NamedProxy partner)
+	{
+		return getName().equals(partner.getName());
+	}
+
+	public int refHashCode()
+	{
+		return getName().hashCode();
+	}
 }

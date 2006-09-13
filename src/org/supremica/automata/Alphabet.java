@@ -128,6 +128,13 @@ public class Alphabet
 		return new TreeSet<EventProxy>(this);
 	}
 
+	Set<EventProxy> getWatersEventsWithAcceptingProposition()
+	{
+		Set<EventProxy> currSet = getWatersEvents();
+		currSet.add(State.acceptingProposition);
+		return currSet;
+	}
+
 	/**
 	 * Return an iterator to the events.
 	 *
