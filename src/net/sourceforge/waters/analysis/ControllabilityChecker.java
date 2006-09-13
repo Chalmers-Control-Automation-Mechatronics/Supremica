@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControllabilityChecker
 //###########################################################################
-//# $Id: ControllabilityChecker.java,v 1.7 2006-09-08 14:04:26 robi Exp $
+//# $Id: ControllabilityChecker.java,v 1.8 2006-09-13 10:47:04 js173 Exp $
 //###########################################################################
 
 //Name: Jinjian Shi
@@ -17,13 +17,13 @@ import java.io.PrintStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.BitSet;
 import java.util.Arrays;
+import gnu.trove.THashSet;
 
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -256,7 +256,7 @@ public class ControllabilityChecker extends ModelChecker
    */
   private boolean isControllable(int[] sState){
 	
-		Set<EncodedStateTuple> systemSet = new HashSet<EncodedStateTuple>(); // Future changable			
+		THashSet systemSet = new THashSet();	
 
     boolean enabled = true;
 

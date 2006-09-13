@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControllabilityCheckerTest
 //###########################################################################
-//# $Id: ControllabilityCheckerTest.java,v 1.14 2006-09-03 17:09:15 robi Exp $
+//# $Id: ControllabilityCheckerTest.java,v 1.15 2006-09-13 10:47:04 js173 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -48,6 +48,13 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
 
   //#########################################################################
   //# Test Cases --- handwritten
+  public void testSmallFactory2_F() throws Exception
+  {
+    final String group = "handwritten";
+    final String name = "small_factory_2.wdes";
+    runModelChecker(group, name, true);
+  }
+  
   public void testSmallFactory2() throws Exception
   {
     final String group = "handwritten";
