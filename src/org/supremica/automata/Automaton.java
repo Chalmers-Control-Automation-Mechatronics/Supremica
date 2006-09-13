@@ -54,10 +54,21 @@ import java.util.*;
 import org.supremica.log.*;
 import org.supremica.util.SupremicaIterator;
 import org.supremica.properties.Config;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.NamedProxy;
+import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.base.EqualCollection;
+import net.sourceforge.waters.plain.base.AbstractNamedElement;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 
 public class Automaton
-	implements Iterable<State>
+	implements AutomatonProxy, Iterable<State>
 {
 	private static Logger logger = LoggerFactory.createLogger(Automaton.class);
 
@@ -151,10 +162,15 @@ public class Automaton
 
 		endTransaction();
 	}
-	
+
+	public AutomatonProxy clone()
+	{
+		return new Automaton(this);
+	}
+
 	/**
      * Sets the type of this automaton (e.g. AutomatonType.PLANT, AutomatonType.SPECIFICATION).
-     * 
+     *
      * @see AutomatonType
      */
 	public void setType(AutomatonType type)
@@ -881,6 +897,11 @@ public class Automaton
 		return theStates;
 	}
 
+	public Set<StateProxy> getStates()
+	{
+		return getStateSet().getWatersStates();
+	}
+
 
 	public IterableStates iterableStates()
 	{
@@ -900,6 +921,19 @@ public class Automaton
 	public Iterator<Arc> arcIterator()
 	{
 		return theStates.outgoingArcsIterator();
+	}
+
+	public Collection<TransitionProxy> getTransitions()
+	{
+		LinkedList<TransitionProxy> transitions = new LinkedList<TransitionProxy>();
+
+		for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
+		{
+			Arc currArc = arcIt.next();
+			transitions.add(currArc);
+		}
+
+		return transitions;
 	}
 
 /*
@@ -1346,6 +1380,14 @@ public class Automaton
 	public Alphabet getAlphabet()
 	{
 		return alphabet;
+	}
+
+	public Set<EventProxy> getEvents()
+	{
+		Set<EventProxy> events = getAlphabet().getWatersEvents();
+		// Add propositions
+		events.add(State.acceptingProposition);
+		return events;
 	}
 
 	/**
@@ -2296,6 +2338,70 @@ public class Automaton
 		return inadequate;
 	}
 
+	public Object acceptVisitor(final ProxyVisitor visitor)
+		throws VisitorException
+	{
+		final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
+		return desvisitor.visitAutomatonProxy(this);
+	}
+
+	public boolean equalsByContents(final Proxy partner)
+	{
+		Automaton partnerAutomaton = (Automaton)partner;
+		if (getName().equals(partnerAutomaton.getName()))
+		{
+			return
+				getKind().equals(partnerAutomaton.getKind()) &&
+				EqualCollection.isEqualSetByContents(getEvents(), partnerAutomaton.getEvents()) &&
+				EqualCollection.isEqualSetByContents(getStates(), partnerAutomaton.getStates()) &&
+				EqualCollection.isEqualSetByContents(getTransitions(), partnerAutomaton.getTransitions());
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	public boolean equalsWithGeometry(final Proxy partner)
+	{
+		return equalsByContents(partner);
+	}
+
+	public int hashCodeByContents()
+	{
+		int result = refHashCode();
+		result *= 5;
+		result += getKind().hashCode();
+		result *= 5;
+		result += EqualCollection.getSetHashCodeByContents(getEvents());
+		result *= 5;
+		result += EqualCollection.getSetHashCodeByContents(getStates());
+		result *= 5;
+		result += EqualCollection.getSetHashCodeByContents(getTransitions());
+		return result;
+	}
+
+	public int hashCodeWithGeometry()
+	{
+		return hashCodeByContents();
+	}
+
+	public boolean refequals(final NamedProxy partner)
+	{
+		return getName().equals(partner.getName());
+	}
+
+	public int refHashCode()
+	{
+		return getName().hashCode();
+	}
+
+	public int compareTo(NamedProxy partner)
+	{
+		return getName().compareTo(((Automaton) partner).getName());
+	}
+
+
 	public static void main(String[] args)
 	{
 		Automaton theAutomaton = new Automaton();
@@ -2492,4 +2598,10 @@ public class Automaton
 
 		return sbuf.toString();
 	}
+
+	public ComponentKind getKind()
+	{
+		return AutomatonType.toKind(type);
+	}
+
 }

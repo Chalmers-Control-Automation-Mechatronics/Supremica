@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   AutomatonElement
 //###########################################################################
-//# $Id: AutomatonElement.java,v 1.7 2006-08-18 06:39:29 robi Exp $
+//# $Id: AutomatonElement.java,v 1.8 2006-09-13 12:28:21 knut Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -182,13 +182,13 @@ public final class AutomatonElement
     if (super.equalsByContents(partner)) {
       final AutomatonElement aut = (AutomatonElement) partner;
       return
-        mKind.equals(mKind) &&
+        mKind.equals(aut.mKind) &&
         EqualCollection.isEqualSetByContents(mEvents, aut.mEvents) &&
         EqualCollection.isEqualSetByContents(mStates, aut.mStates) &&
         EqualCollection.isEqualSetByContents(mTransitions, aut.mTransitions);
     } else {
       return false;
-    }    
+    }
   }
 
   public int hashCodeByContents()
@@ -262,7 +262,7 @@ public final class AutomatonElement
         ("Automaton '" + getName() +
          "' already contains an event named '" + name + "'!");
     }
-  
+
   }
 
 
@@ -304,7 +304,7 @@ public final class AutomatonElement
         ("Automaton '" + getName() +
          "' already contains a state named '" + name + "'!");
     }
-  
+
   }
 
 

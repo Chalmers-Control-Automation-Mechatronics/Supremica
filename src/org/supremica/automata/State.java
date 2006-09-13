@@ -71,7 +71,7 @@ public class State
 	public final static int UNDEF_POS = Integer.MIN_VALUE;
 	private int index = -1;
 
-	private static final LabeledEvent acceptingProposition = new LabeledEvent("accepting", true);
+	static final LabeledEvent acceptingProposition = new LabeledEvent("accepting", true);
 
 	/**
 	 * id is the internal identifier, i.e. for directing arcs etc.

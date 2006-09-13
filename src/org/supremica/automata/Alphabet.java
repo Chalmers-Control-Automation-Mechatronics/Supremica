@@ -51,6 +51,7 @@ package org.supremica.automata;
 
 import java.util.*;
 import org.supremica.log.*;
+import net.sourceforge.waters.model.des.EventProxy;
 
 /**
  * Important note:
@@ -64,7 +65,6 @@ import org.supremica.log.*;
  */
 public class Alphabet
 	extends AbstractSet<LabeledEvent>
-	implements Iterable<LabeledEvent>
 {
 	private static Logger logger = LoggerFactory.createLogger(Alphabet.class);
 	private int idIndex = 0;
@@ -121,6 +121,11 @@ public class Alphabet
 	public Map getEvents()
 	{
 		return theEvents;
+	}
+
+	Set<EventProxy> getWatersEvents()
+	{
+		return new TreeSet<EventProxy>(this);
 	}
 
 	/**

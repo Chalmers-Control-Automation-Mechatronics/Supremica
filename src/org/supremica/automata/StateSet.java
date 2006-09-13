@@ -12,6 +12,7 @@ package org.supremica.automata;
 
 import java.util.*;
 import org.supremica.properties.Config;
+import net.sourceforge.waters.model.des.StateProxy;
 
 public class StateSet
 	extends TreeSet<State>
@@ -30,6 +31,11 @@ public class StateSet
 	public StateSet(Collection<? extends State> collection)
 	{
 		super(collection);
+	}
+
+	Set<StateProxy> getWatersStates()
+	{
+		return new TreeSet<StateProxy>(this);
 	}
 
 	public boolean add(State state)
