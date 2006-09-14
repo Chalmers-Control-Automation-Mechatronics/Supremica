@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ProxyMarshaller
 //###########################################################################
-//# $Id: ProxyUnmarshaller.java,v 1.4 2006-07-20 02:28:37 robi Exp $
+//# $Id: ProxyUnmarshaller.java,v 1.5 2006-09-14 21:10:21 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -12,6 +12,7 @@ package net.sourceforge.waters.model.marshaller;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
+import javax.swing.filechooser.FileFilter;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 
@@ -60,7 +61,12 @@ public interface ProxyUnmarshaller<D extends DocumentProxy>
    * by this marshaller.
    */
   public Collection<String> getSupportedExtensions();
-
+  
+  /**
+   * Gets a list of file filters that may be handled
+   * by this marshaller.
+   */
+  public Collection<FileFilter> getSupportedFileFilters();
 
   //#########################################################################
   //# Entity Resolving

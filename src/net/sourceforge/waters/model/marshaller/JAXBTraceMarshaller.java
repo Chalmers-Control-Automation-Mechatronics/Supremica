@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBTraceMarshaller
 //###########################################################################
-//# $Id: JAXBTraceMarshaller.java,v 1.2 2006-07-20 02:28:37 robi Exp $
+//# $Id: JAXBTraceMarshaller.java,v 1.3 2006-09-14 21:10:21 flordal Exp $
 //###########################################################################
 
 
@@ -45,6 +45,11 @@ public class JAXBTraceMarshaller
   public Class<TraceProxy> getDocumentClass()
   {
     return TraceProxy.class;
+  }
+
+  public String getDescription()
+  {
+      return "Waters Trace files [*.wtra]";
   }
 
   public Class<TraceType> getElementClass()

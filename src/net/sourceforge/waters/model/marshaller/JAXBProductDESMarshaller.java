@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBProductDESMarshaller
 //###########################################################################
-//# $Id: JAXBProductDESMarshaller.java,v 1.3 2006-07-20 02:28:37 robi Exp $
+//# $Id: JAXBProductDESMarshaller.java,v 1.4 2006-09-14 21:10:21 flordal Exp $
 //###########################################################################
 
 
@@ -39,7 +39,12 @@ public class JAXBProductDESMarshaller
   //# Overrides for Abstract Base Class JAXBMarshaller
   public String getDefaultExtension()
   {
-    return ".wdes";
+      return ".wdes";
+  }
+  
+  public String getDescription()
+  {
+      return "Instantiated Waters automata [*.wdes]";
   }
 
   public Class<ProductDESProxy> getDocumentClass()

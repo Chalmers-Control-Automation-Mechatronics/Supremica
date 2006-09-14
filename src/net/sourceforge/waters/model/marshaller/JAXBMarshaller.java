@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBMarshaller
 //###########################################################################
-//# $Id: JAXBMarshaller.java,v 1.4 2006-07-20 02:28:37 robi Exp $
+//# $Id: JAXBMarshaller.java,v 1.5 2006-09-14 21:10:21 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -18,6 +18,7 @@ import java.net.URL;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
+import javax.swing.filechooser.FileFilter;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -30,6 +31,7 @@ import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ModelException;
 
 import net.sourceforge.waters.xsd.base.NamedType;
+import org.supremica.gui.StandardExtensionFileFilter;
 
 import org.xml.sax.SAXException;
 
@@ -141,6 +143,14 @@ public abstract class JAXBMarshaller
     return Collections.singletonList(ext);
   }
 
+  public Collection<FileFilter> getSupportedFileFilters()
+  {
+      final String ext = getDefaultExtension();
+      final String description = getDescription();
+      FileFilter filter = new StandardExtensionFileFilter(ext, description);
+      return Collections.singletonList(filter);
+  }
+      
   public DocumentManager getDocumentManager()
   {
     return mImporter.getDocumentManager();
@@ -174,7 +184,7 @@ public abstract class JAXBMarshaller
   //#########################################################################
   //# Provided by Subclasses
   public abstract Class<T> getElementClass();
-
+  public abstract String getDescription();
 
   //#########################################################################
   //# Data Members

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleMarshaller
 //###########################################################################
-//# $Id: JAXBModuleMarshaller.java,v 1.3 2006-07-20 02:28:37 robi Exp $
+//# $Id: JAXBModuleMarshaller.java,v 1.4 2006-09-14 21:10:21 flordal Exp $
 //###########################################################################
 
 
@@ -42,6 +42,11 @@ public class JAXBModuleMarshaller
   public String getDefaultExtension()
   {
     return ".wmod";
+  }
+  
+  public String getDescription()
+  {
+      return "Waters Module files [*.wmod]";
   }
 
   public Class<ModuleProxy> getDocumentClass()

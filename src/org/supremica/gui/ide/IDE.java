@@ -1,6 +1,11 @@
 
 package org.supremica.gui.ide;
 
+import javax.xml.bind.JAXBException;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.valid.ValidUnmarshaller;
 import org.supremica.util.ProcessCommandLineArguments;
 import org.supremica.gui.ide.actions.IDEAction;
 import org.supremica.gui.ide.actions.IDEActionInterface;
@@ -11,19 +16,24 @@ import javax.swing.*;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.event.WindowEvent;
 import java.util.*;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import org.supremica.gui.Utility;
-import org.supremica.gui.VisualProject;
 import org.supremica.gui.InterfaceManager;
 import org.supremica.gui.ide.actions.Actions;
 import org.supremica.properties.Config;
-import org.supremica.properties.SupremicaProperties;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.log.*;
 import org.supremica.Version;
+import org.supremica.automata.IO.SupremicaUnmarshaller;
+import org.xml.sax.SAXException;
 
 public class IDE
     extends JFrame
@@ -40,6 +50,13 @@ public class IDE
     }
     private static Logger logger = LoggerFactory.createLogger(IDE.class);
     private final static InterfaceManager interfaceManager = InterfaceManager.getInstance();
+    
+    // Document importing
+    private final ModuleProxyFactory mModuleFactory;
+    private final JAXBModuleMarshaller mModuleMarshaller;
+    private final ProxyUnmarshaller<ModuleProxy> validUnmarshaller;
+    private final ProxyUnmarshaller<ModuleProxy> supremicaUnmarshaller;
+    private final DocumentManager documentManager;
     
     private Actions theActions;
     
@@ -60,6 +77,7 @@ public class IDE
     private final String ideName = "Supremica";
     
     public IDE()
+    throws JAXBException, SAXException
     {
         Utility.setupFrame(this, IDEDimensions.mainWindowPreferredSize);
         setTitle(getName());
@@ -71,6 +89,17 @@ public class IDE
         contentPanel = (JPanel)getContentPane();
         contentLayout = new BorderLayout();
         contentPanel.setLayout(contentLayout);
+        
+        documentManager = new DocumentManager();
+        mModuleFactory = ModuleSubjectFactory.getInstance();
+        final OperatorTable optable = CompilerOperatorTable.getInstance();
+        mModuleMarshaller = new JAXBModuleMarshaller(mModuleFactory, optable);
+        validUnmarshaller = new ValidUnmarshaller(mModuleFactory, optable);
+        supremicaUnmarshaller = new SupremicaUnmarshaller(mModuleFactory, documentManager);
+        documentManager.registerMarshaller(mModuleMarshaller);
+        documentManager.registerUnmarshaller(mModuleMarshaller);
+        documentManager.registerUnmarshaller(supremicaUnmarshaller);
+        documentManager.registerUnmarshaller(validUnmarshaller);
         
         theActions = new Actions(this);
         
@@ -103,7 +132,7 @@ public class IDE
         //validate();
         
         logger.info("Supremica version: " + (new Version()).toString());
-    }        
+    }
     
     public Actions getActions()
     {
@@ -177,6 +206,15 @@ public class IDE
         return moduleContainers.createNewModuleContainer();
     }
     
+    //###################################################################
+    //# Auxiliary Methods
+    public void installContainer(final ModuleSubject module)
+    {
+        final ModuleContainer moduleContainer = new ModuleContainer(this, module);
+        add(moduleContainer);
+        setActive(moduleContainer);
+    }
+    
     public JFrame getFrame()
     {
         return this;
@@ -185,6 +223,11 @@ public class IDE
     public IDE getIDE()
     {
         return this;
+    }
+    
+    public DocumentManager getDocumentManager()
+    {
+        return documentManager;
     }
     
     private void setToolBar(JToolBar toolBar)
@@ -323,7 +366,7 @@ public class IDE
     public boolean addAutomaton(Automaton theAutomaton)
     {
         return getActiveModuleContainer().addAutomaton(theAutomaton);
-    }    
+    }
     
     public int addAutomata(Automata theAutomata)
     {
@@ -331,6 +374,7 @@ public class IDE
     }
     
     public static void main(String args[])
+    throws Exception
     {
         ProcessCommandLineArguments.process(args);
         

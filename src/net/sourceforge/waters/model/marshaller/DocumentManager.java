@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   DocumentManager
 //###########################################################################
-//# $Id: DocumentManager.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: DocumentManager.java,v 1.7 2006-09-14 21:10:21 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -16,11 +16,12 @@ import java.net.URL;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import javax.swing.filechooser.FileFilter;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.unchecked.Casting;
@@ -77,6 +78,7 @@ public class DocumentManager {
                   List<ProxyUnmarshaller<? extends DocumentProxy>>>(4);
     mExtensionUnmarshallerMap =
       new HashMap<String,ProxyUnmarshaller<? extends DocumentProxy>>(4);
+    mFileFilters = new LinkedList<FileFilter>();
     mDocumentCache = new HashMap<URI,DocumentProxy>(32);
   }
 
@@ -343,6 +345,7 @@ public class DocumentManager {
       }
       mExtensionUnmarshallerMap.put(extension, unmarshaller);
     }
+    mFileFilters.addAll(unmarshaller.getSupportedFileFilters());
     unmarshaller.setDocumentManager(this);
   }
 
@@ -399,6 +402,11 @@ public class DocumentManager {
     }
   }
 
+  public Collection<FileFilter> getSupportedFileFilters()
+  {
+      return Collections.unmodifiableList(mFileFilters);
+  }
+  
   //#########################################################################
   //# Auxiliary Methods
   private ProxyMarshaller getProxyMarshaller(final Class clazz)
@@ -458,6 +466,7 @@ public class DocumentManager {
     mClassUnmarshallerMap;
   private final Map<String,ProxyUnmarshaller<? extends DocumentProxy>>
     mExtensionUnmarshallerMap;
+  private final List<FileFilter> mFileFilters;
   private final Map<URI,DocumentProxy> mDocumentCache;
 
 }

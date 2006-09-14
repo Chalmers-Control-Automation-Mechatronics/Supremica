@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ValidUnmarshaller
 //###########################################################################
-//# $Id: ValidUnmarshaller.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: ValidUnmarshaller.java,v 1.7 2006-09-14 21:10:21 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.valid;
@@ -16,6 +16,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
+import javax.swing.filechooser.FileFilter;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -36,6 +37,7 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 
 import net.sourceforge.waters.xsd.module.Module;
+import org.supremica.gui.StandardExtensionFileFilter;
 
 import org.xml.sax.SAXException;
 
@@ -104,6 +106,11 @@ public class ValidUnmarshaller
     return EXTENSIONS;
   }
 
+  public Collection<FileFilter> getSupportedFileFilters()
+  {
+      return FILTERS;
+  }
+  
   public DocumentManager getDocumentManager()
   {
     return null;
@@ -120,6 +127,7 @@ public class ValidUnmarshaller
   private final JAXBDocumentImporter<ModuleProxy,Module> mImporter;
 
   private static final Collection<String> EXTENSIONS;
+  private static final Collection<FileFilter> FILTERS;
   private static final String EXT_VMOD = ".vmod";
   private static final String EXT_VPRJ = ".vprj";
 
@@ -128,6 +136,11 @@ public class ValidUnmarshaller
     exts.add(EXT_VMOD);
     exts.add(EXT_VPRJ);
     EXTENSIONS = Collections.unmodifiableCollection(exts);
+    
+    final Collection<FileFilter> filters = new LinkedList<FileFilter>();
+    filters.add(new StandardExtensionFileFilter(EXT_VMOD, "VALID Module files [*.vmod]"));
+    filters.add(new StandardExtensionFileFilter(EXT_VPRJ, "VALID Project files [*.vprj]"));
+    FILTERS = Collections.unmodifiableCollection(filters);
   }
 
 }

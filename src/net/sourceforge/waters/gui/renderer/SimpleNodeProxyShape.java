@@ -47,7 +47,7 @@ public class SimpleNodeProxyShape
         // Draw the filling (depends on marking)
         updateColors();
         Rectangle2D rect = getShape().getBounds();
-        // Hm... +1,+1,-2,-2 is right in theory and in the postscript 
+        // Hm... +1,+1,-2,-2 is right in theory and in the postscript
         // output but wrong on screen in the editor... never mind...
         //rect.setRect(rect.getX() + 1, rect.getY() + 1, rect.getWidth() - 2, rect.getHeight() - 2);
         Arc2D arc;

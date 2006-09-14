@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   MazeCompiler
 //###########################################################################
-//# $Id: MazeCompiler.java,v 1.8 2006-08-01 04:14:47 robi Exp $
+//# $Id: MazeCompiler.java,v 1.9 2006-09-14 21:10:21 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
@@ -19,19 +19,15 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import javax.swing.filechooser.FileFilter;
 import javax.xml.bind.JAXBException;
-
-import net.sourceforge.waters.model.base.DuplicateNameException;
 import net.sourceforge.waters.model.base.IndexedSet;
 import net.sourceforge.waters.model.base.IndexedTreeSet;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
-import net.sourceforge.waters.model.module.AliasProxy;
-import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
@@ -40,15 +36,14 @@ import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.model.module.ParameterProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+import org.supremica.gui.StandardExtensionFileFilter;
 
 import org.xml.sax.SAXException;
 
@@ -131,6 +126,11 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
   public Collection<String> getSupportedExtensions()
   {
     return EXTENSIONS;
+  }
+
+  public Collection<FileFilter> getSupportedFileFilters()
+  {
+    return FILTERS;
   }
 
   public DocumentManager getDocumentManager()
@@ -285,5 +285,8 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
   private static final String MAZEEXT = ".txt";
   private static final Collection<String> EXTENSIONS =
     Collections.singletonList(MAZEEXT);
-
+  
+  private static final FileFilter MAZEFILTER = new StandardExtensionFileFilter(MAZEEXT, "Maze description files [*.txt]");
+  private static final Collection<FileFilter> FILTERS = 
+      Collections.singletonList(MAZEFILTER);
 }

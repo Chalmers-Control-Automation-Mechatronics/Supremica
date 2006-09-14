@@ -5,6 +5,10 @@ import javax.swing.Action;
 import javax.swing.KeyStroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import net.sourceforge.waters.model.marshaller.ProductDESImporter;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import org.supremica.automata.Project;
 import org.supremica.gui.TestCasesDialog;
 
@@ -43,16 +47,7 @@ public class ToolsTestCasesAction
      */
     public void doAction()
     {
-        TestCasesDialog testCasesDialog = new TestCasesDialog(ide.getIDE(), null);
+        TestCasesDialog testCasesDialog = new TestCasesDialog(ide.getIDE(), ide.getIDE());
         testCasesDialog.setVisible(true);
-        
-        // Get Supremica project
-        Project project = testCasesDialog.getProject();
-        
-        ide.getIDE().info("Can not convert (old) Supremica project to Waters module.");
-        
-        // Compile into Waters module
-
-        // Add as a new module (see OpenFileAction)
     }
 }

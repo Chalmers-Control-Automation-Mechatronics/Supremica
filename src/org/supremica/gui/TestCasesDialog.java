@@ -5,7 +5,11 @@ package org.supremica.gui;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import net.sourceforge.waters.model.marshaller.ProductDESImporter;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import org.supremica.automata.Project;
+import org.supremica.gui.ide.IDE;
 import org.supremica.log.*;
 import org.supremica.testcases.Users;
 import org.supremica.testcases.BricksGame;
@@ -630,7 +634,7 @@ public class TestCasesDialog
     private static Logger logger = LoggerFactory.createLogger(TestCasesDialog.class);
     private ExampleTab extab = new ExampleTab();
     private Project project = null;
-    private Gui gui;
+    private Object gui;
     
     class DoitButton
         extends JButton
@@ -724,17 +728,33 @@ public class TestCasesDialog
         
         project = tc.doIt();    // Should return a Project (named)
         
-        if (gui != null)
-            gui.addProject(project);
+        if (gui instanceof Gui)
+        {
+            ((Gui) gui).addProject(project);
+        }
+        else if (gui instanceof IDE)
+        {
+            IDE ide = (IDE) gui;
+            
+            // Get Supremica project
+            Project project = getProject();
+
+            // Compile into Waters module
+            ProductDESImporter importer = new ProductDESImporter(ModuleSubjectFactory.getInstance());
+            ModuleSubject module = (ModuleSubject) importer.importModule(project);
+
+            // Add as a new module (see OpenFileAction)
+            ide.installContainer(module);
+        }
         dispose();
     }
-        
+    
     public Project getProject()
     {
         return project;
     }
     
-    public TestCasesDialog(Frame frame, Gui gui)
+    public TestCasesDialog(Frame frame, Object gui)
     {
         super(frame, "Example Generator", false);    // modal dialog with frame as parent
         

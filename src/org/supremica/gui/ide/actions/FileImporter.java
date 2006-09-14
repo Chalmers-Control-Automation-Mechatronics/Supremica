@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   OpenAction
 //###########################################################################
-//# $Id: FileImporter.java,v 1.4 2005-03-24 10:09:16 torda Exp $
+//# $Id: FileImporter.java,v 1.5 2006-09-14 21:10:21 flordal Exp $
 //###########################################################################
 
 
@@ -15,26 +15,26 @@ import java.io.File;
 
 abstract class FileImporter
 {
-	FileImporter(JFileChooser fileOpener, IDEActionInterface ide)
-	{
-		if (fileOpener.showOpenDialog(ide.getFrame()) == JFileChooser.APPROVE_OPTION)
-		{
-			File[] currFiles = fileOpener.getSelectedFiles();
-
-			if (currFiles != null)
-			{
-				for (int i = 0; i < currFiles.length; i++)
-				{
-					if (currFiles[i].isFile())
-					{
-						openFile(currFiles[i]);
-					}
-				}
-			}
-
-			ide.repaint();
-		}
-	}
-
-	abstract void openFile(File file);
+    FileImporter(JFileChooser fileOpener, IDEActionInterface ide)
+    {
+        if (fileOpener.showOpenDialog(ide.getFrame()) == JFileChooser.APPROVE_OPTION)
+        {
+            File[] currFiles = fileOpener.getSelectedFiles();
+            
+            if (currFiles != null)
+            {
+                for (int i = 0; i < currFiles.length; i++)
+                {
+                    if (currFiles[i].isFile())
+                    {
+                        openFile(currFiles[i]);
+                    }
+                }
+            }
+            
+            ide.repaint();
+        }
+    }
+    
+    abstract void openFile(File file);
 }

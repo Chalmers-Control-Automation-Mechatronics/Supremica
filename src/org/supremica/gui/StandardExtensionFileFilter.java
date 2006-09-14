@@ -52,39 +52,39 @@ package org.supremica.gui;
 import javax.swing.filechooser.*;
 
 public class StandardExtensionFileFilter
-	extends FileFilter
+    extends FileFilter
 {
-	private String extension;
-	private String description;
-
-	public StandardExtensionFileFilter(String extension, String description)
-	{
-		this.extension = extension;
-		this.description = description;
-	}
-
-	public boolean accept(java.io.File f)
-	{
-		return f.getName().toLowerCase().endsWith(extension.toLowerCase()) || f.isDirectory();
-	}
-
-	public String getDescription()
-	{
-		return description;
-	}
-
-	public String getExtension()
-	{
-		return extension;
-	}
-
-	public boolean hasExtension(String filename)
-	{
-		if (filename == null)
-		{
-			return false;
-		}
-
-		return filename.toLowerCase().endsWith(extension.toLowerCase());
-	}
+    private String extension;
+    private String description;
+    
+    public StandardExtensionFileFilter(String extension, String description)
+    {
+        this.extension = extension;
+        this.description = description;
+    }
+    
+    public boolean accept(java.io.File f)
+    {
+        return f.getName().toLowerCase().endsWith(extension.toLowerCase()) || f.isDirectory();
+    }
+    
+    public String getDescription()
+    {
+        return description;
+    }
+    
+    public String getExtension()
+    {
+        return extension;
+    }
+    
+    public boolean hasExtension(String filename)
+    {
+        if (filename == null)
+        {
+            return false;
+        }
+        
+        return filename.toLowerCase().endsWith(extension.toLowerCase());
+    }
 }

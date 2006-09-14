@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ProductDESToModuleUnmarshaller
 //###########################################################################
-//# $Id: ProductDESToModuleUnmarshaller.java,v 1.1 2006-09-14 11:31:12 robi Exp $
+//# $Id: ProductDESToModuleUnmarshaller.java,v 1.2 2006-09-14 21:10:21 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -12,6 +12,7 @@ package net.sourceforge.waters.model.marshaller;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
+import javax.swing.filechooser.FileFilter;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -69,6 +70,11 @@ public class ProductDESToModuleUnmarshaller
   public Collection<String> getSupportedExtensions()
   {
     return mUnmarshaller.getSupportedExtensions();
+  }
+
+  public Collection<FileFilter> getSupportedFileFilters()
+  {
+      return mUnmarshaller.getSupportedFileFilters();
   }
 
   public DocumentManager getDocumentManager()
