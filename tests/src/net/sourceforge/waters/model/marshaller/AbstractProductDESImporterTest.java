@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   AbstractProductDESImporterTest
 //###########################################################################
-//# $Id: AbstractProductDESImporterTest.java,v 1.1 2006-09-14 11:31:12 robi Exp $
+//# $Id: AbstractProductDESImporterTest.java,v 1.2 2006-09-14 13:44:06 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -31,22 +31,18 @@ public abstract class AbstractProductDESImporterTest
 
   //#########################################################################
   //# Test Cases
+  public void testEmpty()
+    throws Exception
+  {
+    final ProductDESProxy des =
+      mProductDESProxyFactory.createProductDESProxy("empty");
+    testImport(des);
+  }
+
   public void testBuffer()
     throws Exception
   {
     testImport("handwritten", "buffer_sf1.wdes");
-  }
-
-  public void testMachine()
-    throws Exception
-  {
-    testImport("handwritten", "machine.wdes");
-  }
-
-  public void testNever()
-    throws Exception
-  {
-    testImport("handwritten", "never.wdes");
   }
 
   public void testSmallFactory()
@@ -83,6 +79,12 @@ public abstract class AbstractProductDESImporterTest
     throws Exception
   {
     testImport("tests", "profisafe", "profisafe_o4_host.wdes");
+  }
+
+  public void testNever()
+    throws Exception
+  {
+    testImport("valid", "border_cases", "never_blow_up.wdes");
   }
 
   public void testDebounce()
@@ -122,9 +124,15 @@ public abstract class AbstractProductDESImporterTest
   {
     final File infile = new File(indir, filename);
     final URI inuri = infile.toURI();
-    final ProductDESProxy des1 = mProductDESMarshaller.unmarshal(inuri);
-    final String name = des1.getName();
-    final ModuleProxy module = mImporter.importModule(des1);
+    final ProductDESProxy des = mProductDESMarshaller.unmarshal(inuri);
+    return testImport(des);
+  }
+
+  protected ModuleProxy testImport(final ProductDESProxy des)
+    throws Exception
+  {
+    final String name = des.getName();
+    final ModuleProxy module = mImporter.importModule(des);
     final File outdir = getOutputDirectory();
     final String modext = mModuleMarshaller.getDefaultExtension();
     final File outmodfile = new File(outdir, name + modext);
@@ -132,12 +140,12 @@ public abstract class AbstractProductDESImporterTest
     mIntegrityChecker.check(module);
     final ModuleCompiler compiler =
       new ModuleCompiler(mDocumentManager, mProductDESProxyFactory, module);
-    final ProductDESProxy des2 = compiler.compile();
+    final ProductDESProxy compileddes = compiler.compile();
     final String desext = mProductDESMarshaller.getDefaultExtension();
     final File outdesfile = new File(outdir, name + desext);
-    mProductDESMarshaller.marshal(des2, outdesfile);
+    mProductDESMarshaller.marshal(compileddes, outdesfile);
     assertTrue("Compilation of imported module does not yield original DES!",
-               des1.equalsByContents(des2));
+               des.equalsByContents(compileddes));
     return module;
   }
 
