@@ -254,7 +254,6 @@
   </target>
 
   <target name="runtest" depends="test-jar,cpp">
-    <mkdir dir="${logs.results}"/>
     <junit printsummary="on" fork="true" maxmemory="512m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
@@ -277,12 +276,12 @@
   </target>
 
   <target name="runtest1" depends="test-jar,cpp">
-    <mkdir dir="${logs.results}"/>
     <junit printsummary="on" fork="true" maxmemory="512m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="**/compiler/*.java"/>
+          <exclude name="**/Abstract*.java"/>
+          <include name="**/*ProductDESImporterTest.java"/>
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>
@@ -293,7 +292,6 @@
   </target>
 
   <target name="test2" depends="test-jar">
-    <mkdir dir="${logs.results}"/>
     <junit printsummary="on" fork="true" maxmemory="512m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">

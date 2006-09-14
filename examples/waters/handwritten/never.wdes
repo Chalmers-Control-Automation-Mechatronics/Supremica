@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="never" xmlns="http://waters.sourceforge.net/xsd/des">
+<EventList>
+<Event Kind="UNCONTROLLABLE" Name="blow_up"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="SPEC" Name="never">
+<EventRefList>
+<EventRef Name="blow_up"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="never"/>
+</StateList>
+</Automaton>
+</AutomataList>
+</ProductDES>
+

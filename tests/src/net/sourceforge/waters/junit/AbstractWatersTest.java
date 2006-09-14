@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   AbstractWatersTest
 //###########################################################################
-//# $Id: AbstractWatersTest.java,v 1.2 2006-07-20 02:28:37 robi Exp $
+//# $Id: AbstractWatersTest.java,v 1.3 2006-09-14 11:31:12 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.junit;
@@ -46,12 +46,13 @@ public abstract class AbstractWatersTest
 
   protected File getOutputDirectory()
   {
-    final String packname = getClass().getPackage().getName();
-    final String[] parts = packname.split("\\.");
+    final String classname = getClass().getName();
+    final String[] parts = classname.split("\\.");
     File result = mOutputRoot;
     for (int i = 3; i < parts.length; i++) {
       result = new File(result, parts[i]);
     }
+    ensureDirectoryExists(result);
     return result;
   }
 
