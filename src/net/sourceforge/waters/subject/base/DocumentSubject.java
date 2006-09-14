@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   DocumentSubject
 //###########################################################################
-//# $Id: DocumentSubject.java,v 1.3 2006-02-20 22:20:22 robi Exp $
+//# $Id: DocumentSubject.java,v 1.4 2006-09-14 11:51:27 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -18,13 +18,12 @@ import net.sourceforge.waters.model.base.DocumentProxy;
 
 
 /**
- * <P>An immutable implementation of the {@link DocumentProxy} interface.</P>
+ * <P>The subject implementation of the {@link DocumentProxy} interface.</P>
  *
  * <P>This abstract extends the behaviour of a {@link NamedSubject} by
- * adding a settable member reprenting the document's file name. Although
- * the element is considered immutable its target file name is changeable,
- * so as to make it possible to write the same document into different
- * files.</P>
+ * adding a settable member reprenting the document's file name.
+ * In this implementation, changes to the file location do not produce
+ * any change events.</P>
  *
  * @author Robi Malik
  */
@@ -37,11 +36,22 @@ public abstract class DocumentSubject
   //#########################################################################
   //# Constructors
   /**
+   * Creates a document without specified file location.
+   * @param  name        The name of the new document.
+   */
+  protected DocumentSubject(final String name)
+  {
+    this(name, null);
+  }
+
+  /**
    * Creates a document.
-   * @param  name        The name of the new element.
+   * @param  name        The name of the new document.
+   * @param  location    The file location for the new document,
+   *                     or <CODE>null</CODE>.
    */
   protected DocumentSubject(final String name,
-                            final URI location)
+			    final URI location)
   {
     super(name);
     mLocation = location;
@@ -49,7 +59,7 @@ public abstract class DocumentSubject
 
   /**
    * Creates a copy of a document.
-   * @param  partner     The object to be copied from.
+   * @param  partner     The document to be copied from.
    */
   protected DocumentSubject(final DocumentProxy partner)
   {

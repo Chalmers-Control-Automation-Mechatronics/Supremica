@@ -254,6 +254,7 @@
   </target>
 
   <target name="runtest" depends="test-jar,cpp">
+    <mkdir dir="${logs.results}"/>
     <junit printsummary="on" fork="true" maxmemory="512m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
@@ -276,6 +277,7 @@
   </target>
 
   <target name="runtest1" depends="test-jar,cpp">
+    <mkdir dir="${logs.results}"/>
     <junit printsummary="on" fork="true" maxmemory="512m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
@@ -292,6 +294,7 @@
   </target>
 
   <target name="test2" depends="test-jar">
+    <mkdir dir="${logs.results}"/>
     <junit printsummary="on" fork="true" maxmemory="512m">
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
@@ -343,10 +346,7 @@
             offline="true" packagelistLoc="${docsrc}/offline/jaxme"/>
       <link href="${junit.api.url}"
             offline="true" packagelistLoc="${docsrc}/offline/junit"/>
-      <classpath>
-        <path refid="jaxb.classpath"/>
-        <pathelement location="${junit.jar}"/>
-      </classpath>
+      <classpath refid="waters.test.classpath"/>
     </javadoc>
   </target>
 

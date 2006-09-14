@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.base
 //# CLASS:   DocumentElement
 //###########################################################################
-//# $Id: DocumentElement.java,v 1.3 2006-02-20 22:20:21 robi Exp $
+//# $Id: DocumentElement.java,v 1.4 2006-09-14 11:51:27 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.base;
@@ -36,8 +36,19 @@ public abstract class DocumentElement
   //#########################################################################
   //# Constructors
   /**
+   * Creates a document without specified file location.
+   * @param  name        The name of the new document.
+   */
+  protected DocumentElement(final String name)
+  {
+    this(name, null);
+  }
+
+  /**
    * Creates a document.
-   * @param  name        The name of the new element.
+   * @param  name        The name of the new document.
+   * @param  location    The file location for the new document,
+   *                     or <CODE>null</CODE>.
    */
   protected DocumentElement(final String name,
 			    final URI location)
@@ -47,13 +58,13 @@ public abstract class DocumentElement
   }
 
   /**
-   * Creates a copy of a named element.
+   * Creates a copy of a document.
    * @param  partner     The object to be copied from.
    */
-  protected DocumentElement(final DocumentElement partner)
+  protected DocumentElement(final DocumentProxy partner)
   {
     super(partner);
-    mLocation = partner.mLocation;
+    mLocation = partner.getLocation();
   }
 
 
