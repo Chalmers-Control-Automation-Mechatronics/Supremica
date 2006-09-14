@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   AbstractModelCheckerTest
 //###########################################################################
-//# $Id: AbstractModelCheckerTest.java,v 1.1 2006-08-10 02:29:16 robi Exp $
+//# $Id: AbstractModelCheckerTest.java,v 1.2 2006-09-14 14:09:04 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -42,9 +42,9 @@ public abstract class AbstractModelCheckerTest extends AbstractWatersTest
   public void setUp() throws Exception
   {
     super.setUp();   
-    mProductDESFactory = ProductDESElementFactory.getInstance();
-    mTraceMarshaller = new JAXBTraceMarshaller(mProductDESFactory);
-    mProductDESMarshaller = new JAXBProductDESMarshaller(mProductDESFactory);
+    mProductDESProxyFactory = ProductDESElementFactory.getInstance();
+    mTraceMarshaller = new JAXBTraceMarshaller(mProductDESProxyFactory);
+    mProductDESMarshaller = new JAXBProductDESMarshaller(mProductDESProxyFactory);
     mModuleFactory = ModuleElementFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     final JAXBModuleMarshaller modmarshaller =
@@ -108,7 +108,7 @@ public abstract class AbstractModelCheckerTest extends AbstractWatersTest
   {
     final ModuleProxy module = (ModuleProxy) mDocumentManager.load(filename);
     final ModuleCompiler compiler =
-      new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
+      new ModuleCompiler(mDocumentManager, mProductDESProxyFactory, module);
     final ProductDESProxy des = compiler.compile(bindings);
     runModelChecker(des, bindings, expect);
   }
@@ -175,7 +175,7 @@ public abstract class AbstractModelCheckerTest extends AbstractWatersTest
                        final boolean expect)
     throws Exception
   {
-    final ModelChecker checker = createModelChecker(des, mProductDESFactory);
+    final ModelChecker checker = createModelChecker(des, mProductDESProxyFactory);
     final boolean result = checker.run();
     TraceProxy counterexample = null;
     if (!result) {
@@ -201,7 +201,12 @@ public abstract class AbstractModelCheckerTest extends AbstractWatersTest
 
 
   //#########################################################################
-  //# Creating bindings
+  //# Accessing the Factories
+  ProductDESProxyFactory getProductDESProxyFactory()
+  {
+    return mProductDESProxyFactory;
+  }
+
   ParameterBindingProxy createBinding(final String name, final int value)
   {
     final IntConstantProxy expr = mModuleFactory.createIntConstantProxy(value);
@@ -235,7 +240,7 @@ public abstract class AbstractModelCheckerTest extends AbstractWatersTest
 
   //#########################################################################
   //# Data Members
-  private ProductDESProxyFactory mProductDESFactory;
+  private ProductDESProxyFactory mProductDESProxyFactory;
   private ModuleProxyFactory mModuleFactory;
   private JAXBProductDESMarshaller mProductDESMarshaller;
   private JAXBTraceMarshaller mTraceMarshaller;

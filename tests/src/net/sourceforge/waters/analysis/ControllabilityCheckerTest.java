@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControllabilityCheckerTest
 //###########################################################################
-//# $Id: ControllabilityCheckerTest.java,v 1.15 2006-09-13 10:47:04 js173 Exp $
+//# $Id: ControllabilityCheckerTest.java,v 1.16 2006-09-14 14:09:04 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -47,14 +47,18 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
 
 
   //#########################################################################
-  //# Test Cases --- handwritten
-  public void testSmallFactory2_F() throws Exception
+  //# Test Cases --- handcrafted
+  public void testEmpty()
+    throws Exception
   {
-    final String group = "handwritten";
-    final String name = "small_factory_2.wdes";
-    runModelChecker(group, name, true);
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    final ProductDESProxy des = factory.createProductDESProxy("empty");
+    runModelChecker(des, true);
   }
-  
+
+
+  //#########################################################################
+  //# Test Cases --- handwritten
   public void testSmallFactory2() throws Exception
   {
     final String group = "handwritten";

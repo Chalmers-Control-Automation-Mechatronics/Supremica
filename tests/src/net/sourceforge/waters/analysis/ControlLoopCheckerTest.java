@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopCheckerTest
 //###########################################################################
-//# $Id: ControlLoopCheckerTest.java,v 1.10 2006-09-08 07:45:50 robi Exp $
+//# $Id: ControlLoopCheckerTest.java,v 1.11 2006-09-14 14:09:04 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -43,6 +43,17 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
   public static void main(final String[] args)
   {
     junit.textui.TestRunner.run(suite()); 
+  }
+
+
+  //#########################################################################
+  //# Test Cases --- handcrafted
+  public void testEmpty()
+    throws Exception
+  {
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    final ProductDESProxy des = factory.createProductDESProxy("empty");
+    runModelChecker(des, true);
   }
 
 

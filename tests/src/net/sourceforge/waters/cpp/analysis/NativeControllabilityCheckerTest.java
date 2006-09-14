@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeControllabilityCheckerTest
 //###########################################################################
-//# $Id: NativeControllabilityCheckerTest.java,v 1.4 2006-09-03 17:09:15 robi Exp $
+//# $Id: NativeControllabilityCheckerTest.java,v 1.5 2006-09-14 14:09:04 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;
@@ -45,6 +45,17 @@ public class NativeControllabilityCheckerTest extends AbstractModelVerifierTest
   public static void main(final String[] args)
   {
     junit.textui.TestRunner.run(suite());
+  }
+
+
+  //#########################################################################
+  //# Test Cases --- handcrafted
+  public void testEmpty()
+    throws Exception
+  {
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    final ProductDESProxy des = factory.createProductDESProxy("empty");
+    runModelVerifier(des, true);
   }
 
 
