@@ -128,6 +128,7 @@
 	<unjar src="${lib}/WMFWriter2D.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/sysutils.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/swixml.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/trove.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${waters.jaxbjar}" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/fuber.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/automationobjects_jaxb.jar"
