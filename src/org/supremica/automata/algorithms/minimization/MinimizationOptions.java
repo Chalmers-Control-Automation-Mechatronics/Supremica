@@ -297,7 +297,7 @@ public final class MinimizationOptions
     {
         useRuleA = bool;
     }
-    public boolean getUseRuleA()
+    public boolean getUseRuleSC()
     {
         return useRuleA;
     }
@@ -305,7 +305,7 @@ public final class MinimizationOptions
     {
         useRuleAA = bool;
     }
-    public boolean getUseRuleAA()
+    public boolean getUseRuleOSI()
     {
         return useRuleAA;
     }
@@ -313,7 +313,7 @@ public final class MinimizationOptions
     {
         useRuleB = bool;
     }
-    public boolean getUseRuleB()
+    public boolean getUseRuleAE()
     {
         return useRuleB;
     }
@@ -321,7 +321,7 @@ public final class MinimizationOptions
     {
         useRuleF = bool;
     }
-    public boolean getUseRuleF()
+    public boolean getUseRuleOSO()
     {
         return useRuleF;
     }

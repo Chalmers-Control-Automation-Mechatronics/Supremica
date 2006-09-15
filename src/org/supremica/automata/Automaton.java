@@ -2033,66 +2033,54 @@ public class Automaton
         // Should type, name, comment really be considered?
         if (!getName().equals(other.getName()))
         {
-            logger.debug("equalAutomaton::non equal name");
             return false;
         }
         if (getType() != other.getType())
         {
-            logger.debug("equalAutomaton::non equal type");
             return false;
         }
         if (!getComment().equals(other.getComment()))
         {
-            logger.debug("equalAutomaton::non equal comment");
             return false;
         }
         
         // The following stuff seems useful to consider
         if (hasAcceptingState() != other.hasAcceptingState())
         {
-            logger.debug("equalAutomaton::non equal accepting state");
             return false;
         }
         if (hasSelfLoop() != other.hasSelfLoop())
         {
-            logger.debug("equalAutomaton::non equal has self loop");
             return false;
         }
         if (isDeterministic() != other.isDeterministic())
         {
-            logger.debug("equalAutomaton::non equal is deterministic");
             return false;
         }
         if (isAllEventsPrioritized() != other.isAllEventsPrioritized())
         {
-            logger.debug("equalAutomaton::non equal is all events prioritized");
             return false;
         }
         if (nbrOfAcceptingStates() != other.nbrOfAcceptingStates())
         {
-            logger.debug("equalAutomaton::non equal name nbr of accepting states");
             return false;
         }
         if (nbrOfForbiddenStates() != other.nbrOfForbiddenStates())
         {
-            logger.debug("equalAutomaton::non equal nbr of forbidden states");
             return false;
         }
         if (nbrOfAcceptingAndForbiddenStates() != other.nbrOfAcceptingAndForbiddenStates())
         {
-            logger.debug("equalAutomaton::non equal name nbr of accepting and forbidden states");
             return false;
         }
         if (!alphabet.equalAlphabet(other.alphabet))
         {
-            logger.debug("equalAutomaton::non equal alphabet");
             return false;
         }
         
         return true;
     }
     
-    // proxy?? //MF
     public void setCorrespondingAutomatonProxy(AutomatonProxy correspondingAutomatonProxy)
     {
         this.correspondingAutomatonProxy = correspondingAutomatonProxy;

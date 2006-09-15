@@ -79,12 +79,12 @@ public class AutomatonMinimizer
     private MinimizationOptions options;
     
     // Local debug stuff... to be erased when things are stable!
-    private static int totalA = 0;
-    private static int totalAA = 0;
-    private static int totalB = 0;
-    private static int totalC = 0;
+    private static int totalSC = 0;
+    private static int totalOSI = 0;
+    private static int totalAE = 0;
+    private static int totalCC = 0;
     private static int totalD = 0;
-    private static int totalF = 0;
+    private static int totalOSO = 0;
     private static int totalOE = 0;
     private static int totalArcs = 0;
     
@@ -267,7 +267,7 @@ public class AutomatonMinimizer
             ////////////
             
             // Adjust marking based on epsilon transitions
-            int countD = ruleD(theAutomaton);
+            int countD = rulePropagateMarking(theAutomaton);
             totalD += countD;
             
             if (stopRequested)
@@ -920,6 +920,8 @@ public class AutomatonMinimizer
      */
     public int runConflictEquivalenceRules(Automaton aut)
     {
+        //assert(!hasEpsilonSelfloops(aut));
+
         int total = 0;
         
         try
@@ -929,65 +931,65 @@ public class AutomatonMinimizer
             {
                 // Remove redundant transitions
                 int countArcs = removeRedundantTransitions(aut);
-                int countA = 0;
-                int countAA = 0;
-                int countB = 0;
-                int countC = 0;
-                int countF = 0;
+                int countSC = 0;
+                int countOSI = 0;
+                int countAE = 0;
+                int countCC = 0;
+                int countOSO = 0;
                 
                 // Merge conflict equivalent states and stuff...
                 // Rule A
-                if (options.getUseRuleA())
+                if (options.getUseRuleSC())
                 {
-                    countA = silentContinuationRule(aut);
-                    totalA += countA;
+                    countSC = silentContinuationRule(aut);
+                    totalSC += countSC;
                 }
-                if (countA > 0)
+                if (countSC > 0)
                 {
                     countArcs += removeRedundantTransitions(aut);
                 }
                 // Rule B
-                if (options.getUseRuleB())
+                if (options.getUseRuleAE())
                 {
-                    countB = activeEventsRule(aut);
-                    totalB += countB;
+                    countAE = activeEventsRule(aut);
+                    totalAE += countAE;
                 }
-                if (countB > 0)
+                if (countAE > 0)
                 {
                     countArcs += removeRedundantTransitions(aut);
                 }
                 // Rule AA
-                if (options.getUseRuleAA())
+                if (options.getUseRuleOSI())
                 {
-                    countAA = ruleAA(aut);
-                    totalAA += countAA;
+                    countOSI = ruleOnlySilentIn(aut);
+                    totalOSI += countOSI;
                 }
-                if (countAA > 0)
+                if (countOSI > 0)
                 {
                     countArcs += removeRedundantTransitions(aut);
                 }
                 // Rule C
                 if (true)
                 {
-                    countC = certainConflictsRule(aut);
-                    totalC += countC;
+                    countCC = certainConflictsRule(aut);
+                    totalCC += countCC;
                 }
-                // Rule F
-                if (options.getUseRuleF())
+                // Rule F (the most frequent to call for repeats, has its own loop...)
+                if (options.getUseRuleOSO())
                 {
-                    countF = ruleF(aut);
-                    totalF += countF;
+                    do
+                    {
+                        countOSO = ruleOnlySilentOut(aut);
+                        totalOSO += countOSO;
+                        if (countOSO > 0)
+                            countArcs += removeRedundantTransitions(aut);
+                    } while (countOSO > 0);
                 }
                 
-                totalArcs += countArcs;
-                if (countArcs > 0)
-                {
-                    logger.debug("Removed " + countArcs + " redundant transitions.");
-                }
-                
-                logger.debug("Rule A: " + countA + ", rule AA: " + countAA + ", rule B: " + countB +
-                    ", rule C: " + countC + ", rule F: " + countF);
-                count = countA+countAA+countB+countC+countF;
+                logger.debug("Rule SC: " + countSC + ", rule AE: " + countAE +
+                    ", rule CC: " + countCC + ", rule OSI: " + countOSI + 
+                    ", rule OSO: " + countOSO + ", arcs: " + countArcs);
+                count = countSC+countOSI+countAE+countCC+countOSO;
                 total += count;
             } while (count > 0);
         }
@@ -1009,6 +1011,8 @@ public class AutomatonMinimizer
     public int silentContinuationRule(Automaton aut)
     throws Exception
     {
+        //assert(!hasEpsilonSelfloops(aut));
+
         ////////////
         // RULE A //
         ////////////
@@ -1079,19 +1083,21 @@ public class AutomatonMinimizer
     }
     
     /**
-     * Rule AA, only silent incoming and not stable (obsevation equivalence "backwards" and then silentContinuation).
+     * Rule AA, only silent incoming and not stable (observation equivalence "backwards" and then silentContinuation).
      *
      * @return the number of states that have been removed or -1 if method didn't complete successfully.
      */
-    public int ruleAA(Automaton aut)
+    public int ruleOnlySilentIn(Automaton aut)
     throws Exception
     {
+        assert(!hasEpsilonSelfloops(aut));
+
         /////////////
         // RULE AA //
         /////////////
         
         // Count the removed states
-        int countAA = 0;
+        int count = 0;
         
         // If there is at least one outgoing epsilon transition AND this is not the initial
         // state AND all incoming transitions are epsilon!
@@ -1116,19 +1122,52 @@ public class AutomatonMinimizer
             // Examine this state
             // Is there at least one epsilon outgoing?
             boolean ok = false;
+            List<Arc> toBeRemoved = new LinkedList<Arc>();
             for (Iterator<Arc> outIt = one.outgoingArcsIterator(); outIt.hasNext(); )
             {
                 Arc arc = outIt.next();
-                if (arc.getEvent().isEpsilon() && !arc.isSelfLoop())
+                if (arc.getEvent().isEpsilon())
                 {
-                    ok = true;
-                    break;
+                    if (!arc.isSelfLoop())
+                    {
+                        ok = true;
+                        break;
+                    }
+                    else
+                    {
+                        //toBeRemoved.add(arc);
+                    }
                 }
             }
+            /*
+            while (toBeRemoved.size() > 0)
+            {
+                Arc arc = toBeRemoved.remove(0);
+                logger.fatal("Remove arc: " + arc);
+                ActionMan.getGui().addAutomaton(aut);
+                Thread.sleep(500);
+                aut.removeArc(arc);
+            }
+             **/
             
             //mergeEpsilonLoops(aut);
-            //countArcs += removeRedundantTransitions(aut);
-                    
+            //removeRedundantTransitions(aut);
+            /*
+            if(hasEpsilonSelfloops(aut))
+            {
+                logger.fatal("State: " + one);
+                for (Iterator<Arc> inIt = one.incomingArcsIterator(); inIt.hasNext(); )
+                {
+                    logger.warn("Inarc: " + inIt.next());
+                }                
+                for (Iterator<Arc> inIt = one.outgoingArcsIterator(); inIt.hasNext(); )
+                {
+                    logger.warn("Outarc: " + inIt.next());
+                }                
+                ActionMan.getGui().addAutomaton(aut);
+                Thread.sleep(500);
+            }
+             */
 
             // Are all incoming epsilon?
             if (ok && (one.nbrOfIncomingArcs() == one.nbrOfIncomingEpsilonArcs()))
@@ -1136,7 +1175,7 @@ public class AutomatonMinimizer
                 // "Copy" outgoing arcs from one to the previous states.
                 for (Iterator<Arc> inIt = one.incomingArcsIterator(); inIt.hasNext(); )
                 {
-                    Arc inArc = inIt.next();
+                    Arc inArc = inIt.next(); // ConcurrentModificationError!?
                     State fromState = inArc.getFromState();
 
                     // Should be epsilon!
@@ -1156,11 +1195,11 @@ public class AutomatonMinimizer
                 }
                 
                 aut.removeState(one);
-                countAA++;
+                count++;
             }
         }
         
-        return countAA;
+        return count;
     }
     
     /**
@@ -1171,12 +1210,14 @@ public class AutomatonMinimizer
     public int activeEventsRule(Automaton aut)
     throws Exception
     {
+        //assert(!hasEpsilonSelfloops(aut));
+        
         ////////////
         // RULE B //
         ////////////
         
         // Count the removed states
-        int countB = 0;
+        int count = 0;
         
         // If two states have the same incoming arcs (from the same state(s) and with the same
         // event(s)) AND if both states have the same events active, then they can be merged!
@@ -1206,7 +1247,7 @@ public class AutomatonMinimizer
                     // Merge states!
                     //logger.info("Merging " + old.getState() + " and " + info.getState() + ".");
                     State merge = MinimizationHelper.mergeStates(aut, old.getState(), info.getState(), useShortNames);
-                    countB++;
+                    count++;
                     old.setState(merge);
                     
                     // There can be no more of this characterization in the list
@@ -1218,7 +1259,7 @@ public class AutomatonMinimizer
         }
         infoHash.clear();
         
-        return countB;
+        return count;
     }
     
     /**
@@ -1229,12 +1270,14 @@ public class AutomatonMinimizer
     public int certainConflictsRule(Automaton aut)
     throws Exception
     {
+        //assert(!hasEpsilonSelfloops(aut));
+        
         ////////////////////////////
         // RULE C (not all cases) //
         ////////////////////////////
         
         // Count the removed states
-        int countC = 0;
+        int count = 0;
         
         // Mark noncoreachable states with State.MAX_COST
         SynthesizerOptions synthOptions = SynthesizerOptions.getDefaultSynthesizerOptions();
@@ -1368,10 +1411,10 @@ public class AutomatonMinimizer
             logger.debug("Nonreachable state: " + remove);
             
             aut.removeState(remove);
-            countC++;
+            count++;
         }
         
-        return countC;
+        return count;
     }
     
     
@@ -1383,14 +1426,14 @@ public class AutomatonMinimizer
      * @return the number of states that have been marked or -1 if the method didn't complete successfully.
      */
     //public int adjustMarking(Automaton aut)
-    public int ruleD(Automaton aut)
+    public int rulePropagateMarking(Automaton aut)
     {
         ////////////
         // RULE D //
         ////////////
         
         // Count the states that get marked
-        int countD = 0;
+        int count = 0;
         
         if (aut == null || stopRequested)
         {
@@ -1441,12 +1484,12 @@ public class AutomatonMinimizer
                 if (!state.isAccepting())
                 {
                     state.setAccepting(true);
-                    countD++;
+                    count++;
                 }
             }
         }
         
-        return countD;
+        return count;
     }
     
     /**
@@ -1454,17 +1497,19 @@ public class AutomatonMinimizer
      *
      * @return the number of states that have been removed or -1 if the method didn't complete successfully.
      */
-    public int ruleF(Automaton aut)
+    public int ruleOnlySilentOut(Automaton aut)
     throws Exception
     {
-        StateSet statesToExamine = new StateSet(aut.getStateSet());
-        
+        //assert(!hasEpsilonSelfloops(aut));
+
         ////////////
         // RULE F //
         ////////////
         
+        StateSet statesToExamine = new StateSet(aut.getStateSet());
+        
         // Count the removed states
-        int countF = 0;
+        int count = 0;
         
         // States that only have epsilon events as outgoing can be bypassed!
         loop: while (statesToExamine.size() != 0)
@@ -1534,7 +1579,7 @@ public class AutomatonMinimizer
                 
                 aut.removeState(state);
                 //logger.error("Removed state " + state + ", added " + arcCount + " arcs.");
-                countF++;
+                count++;
             }
             
             /*
@@ -1556,34 +1601,34 @@ public class AutomatonMinimizer
                 }
              
                 aut.removeState(state);
-                countF++;
+                count++;
             }
              */
         }
         
-        return countF;
+        return count;
     }
     
     public static String getStatistics()
     {
-        return ("Reduction statistics: silentCont: " + totalA + ", onlySilentIn: " + totalAA + ", activeEvent: " + totalB + ", certainConf: " + totalC + ", D: " + totalD + ", onlySilentOut: " + totalF + ", OE: " + totalOE + ", Arcs: " + totalArcs + ".");
+        return ("Reduction statistics: silentCont: " + totalSC + ", onlySilentIn: " + totalOSI + ", activeEvent: " + totalAE + ", certainConf: " + totalCC + ", D: " + totalD + ", onlySilentOut: " + totalOSO + ", OE: " + totalOE + ", Arcs: " + totalArcs + ".");
     }
     public static String getStatisticsLaTeX()
     {
-        return(totalB + " & " + totalA + " & " + totalAA + " & " + totalF + " & " + totalC + " & " + totalOE + " & " + totalArcs);
+        return(totalAE + " & " + totalSC + " & " + totalOSI + " & " + totalOSO + " & " + totalCC + " & " + totalOE + " & " + totalArcs);
     }
     public static String getWodesStatisticsLaTeX()
     {
-        return(totalB + " & " + totalA + " & " + totalC + " & " + (totalAA + totalF) + " & " + totalOE + " & " + totalArcs);
+        return(totalAE + " & " + totalSC + " & " + totalCC + " & " + (totalOSI + totalOSO) + " & " + totalOE + " & " + totalArcs);
     }
     public static void resetTotal()
     {
-        totalA = 0;
-        totalAA = 0;
-        totalB = 0;
-        totalC = 0;
+        totalSC = 0;
+        totalOSI = 0;
+        totalAE = 0;
+        totalCC = 0;
         totalD = 0;
-        totalF = 0;
+        totalOSO = 0;
         totalOE = 0;
         totalArcs = 0;
     }
@@ -1819,6 +1864,24 @@ public class AutomatonMinimizer
         return amount;
     }
          */
+
+    /**
+     * True if there are epsilon selfloops in aut.
+     */
+    private static boolean hasEpsilonSelfloops(Automaton aut)
+    {
+        for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
+        {
+            Arc arc = arcIt.next();
+            if (arc.isSelfLoop() && arc.getEvent().isEpsilon())
+            {
+                logger.fatal("Epsilon selfloop: " + arc);
+                ActionMan.getGui().addAutomaton(aut);
+                return true;
+            }
+        }
+        return false;
+    }
     
     /**
      * Algorithm inspired by "Minimizing the Number of Transitions with Respect to Observation

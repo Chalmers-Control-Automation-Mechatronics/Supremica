@@ -444,10 +444,10 @@ public class VerificationDialog
         {
             minimizationStrategy.setSelectedItem(options.getMinimizationStrategy());
             minimizationHeuristic.setSelectedItem(options.getMinimizationHeuristic());
-            ruleA.setSelected(options.getUseRuleA());
-            ruleAA.setSelected(options.getUseRuleAA());
-            ruleB.setSelected(options.getUseRuleB());
-            ruleF.setSelected(options.getUseRuleF());
+            ruleA.setSelected(options.getUseRuleSC());
+            ruleAA.setSelected(options.getUseRuleOSI());
+            ruleB.setSelected(options.getUseRuleAE());
+            ruleF.setSelected(options.getUseRuleOSO());
         }
         
         public void regain(MinimizationOptions options)
