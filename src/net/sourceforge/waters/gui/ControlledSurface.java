@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.76 2006-09-15 09:05:07 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.77 2006-09-15 11:34:52 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -891,9 +891,24 @@ public class ControlledSurface
     
     public boolean isFocused(ProxySubject s)
     {
+        // Special case
+        if (mFocusedObject == null)
+            return false;
+
+        // Check if object is focused or the child or parent of something focused
         ProxySubject object = s;
-        List<Proxy> children = getChildren(mHighlightedObject);
-        return object.equals(mHighlightedObject) || children.contains(object);
+        // Find children
+        List<Proxy> childrenOfFocused = getChildren(mFocusedObject);
+        // Find parents
+        Subject parentSubject = mFocusedObject.getParent();
+        Proxy parentOfFocused;
+        // Is there a parent?
+        if (parentSubject != null && parentSubject instanceof Proxy)
+            parentOfFocused = (Proxy) parentSubject;
+        else
+            parentOfFocused = mFocusedObject;
+        
+        return object.equals(mFocusedObject) || childrenOfFocused.contains(object) || object.equals(parentOfFocused);
     }
     
     public DRAGOVERSTATUS getDragOver(ProxySubject s)
@@ -1132,19 +1147,19 @@ public class ControlledSurface
         }
         
         // Unhighlight highligted stuff not in focus
-        if ((mHighlightedObject != null) && !mHighlightedObject.equals(s))
+        if ((mFocusedObject != null) && !mFocusedObject.equals(s))
         {
             // Unhighlight object
-            mHighlightedObject = null;
+            mFocusedObject = null;
             
             needRepaint = true;
         }
         
         // Highlight stuff in focus!
-        if (s != null && !s.equals(mHighlightedObject))
+        if (s != null && !s.equals(mFocusedObject))
         {
             // Highlight object
-            mHighlightedObject = s;
+            mFocusedObject = s;
             needRepaint = true;
         }
         
@@ -1244,7 +1259,7 @@ public class ControlledSurface
                 e.getTransferable().getTransferData(FLAVOUR);
                 final EventKind ek = i.getKind();
                 final IdentifierSubject ip = i.getIdentifier();
-                s = mHighlightedObject;
+                s = mFocusedObject;
                 if (ek == null)
                 {
                     if (s instanceof SimpleNodeSubject)
@@ -1364,7 +1379,7 @@ public class ControlledSurface
                     final IdentifierWithKind i = (IdentifierWithKind)
                     e.getTransferable().getTransferData(FLAVOUR);
                     final IdentifierSubject ip = i.getIdentifier();
-                    final ProxySubject s = mHighlightedObject;
+                    final ProxySubject s = mFocusedObject;
                     mDragOver = EditorSurface.DRAGOVERSTATUS.NOTDRAG;
                     if (s instanceof SimpleNodeSubject)
                     {
@@ -1545,7 +1560,7 @@ public class ControlledSurface
                 if (e.getClickCount() == 1)
                 {
                     // What was clicked?
-                    ProxySubject s = mHighlightedObject;
+                    ProxySubject s = mFocusedObject;
                     // Special stuff for labelgroup clicks?
                     // (This is not working properly!)
                     if (isSelected(s) && s != null &&
@@ -1650,7 +1665,7 @@ public class ControlledSurface
                 lastX = e.getX();
                 lastY = e.getY();
                 
-                ProxySubject s = mHighlightedObject;
+                ProxySubject s = mFocusedObject;
                 if (s == null)
                 {
                     // Clicking on whitespace!
@@ -2007,7 +2022,7 @@ public class ControlledSurface
                 lastX = e.getX();
                 lastY = e.getY();
                 
-                ProxySubject s = mHighlightedObject;
+                ProxySubject s = mFocusedObject;
                 if (s == null)
                 {
                     // Clicking on whitespace!
@@ -2214,7 +2229,7 @@ public class ControlledSurface
                 lastX = e.getX();
                 lastY = e.getY();
                 
-                ProxySubject s = mHighlightedObject;
+                ProxySubject s = mFocusedObject;
                 if (s == null)
                 {
                     if (!e.isControlDown())
@@ -2446,7 +2461,7 @@ public class ControlledSurface
                 lastX = e.getX();
                 lastY = e.getY();
                 
-                ProxySubject o = mHighlightedObject;
+                ProxySubject o = mFocusedObject;
                 if (o == null)
                 {
                     
@@ -2643,7 +2658,7 @@ public class ControlledSurface
             setDrag(e);
             if (e.getButton() == MouseEvent.BUTTON1)
             {
-                ProxySubject o = mHighlightedObject;
+                ProxySubject o = mFocusedObject;
                 if (o instanceof SimpleNodeSubject)
                 {
                     return;
@@ -3058,7 +3073,7 @@ public class ControlledSurface
     private Line2D mLine = null;
     
     /** The currently highlighted EditorObject (under the mouse pointer). */
-    private ProxySubject mHighlightedObject = null;
+    private ProxySubject mFocusedObject = null;
     
     private EditorGraph mDummy = null;
     

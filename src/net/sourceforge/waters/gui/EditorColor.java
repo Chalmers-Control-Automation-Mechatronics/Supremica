@@ -73,9 +73,9 @@ public class EditorColor
         if(dragOver != EditorSurface.DRAGOVERSTATUS.NOTDRAG)
         {
             if (dragOver == EditorSurface.DRAGOVERSTATUS.CANDROP)
-                return EditorColor.CANDROPCOLOR;
+                return CANDROPCOLOR;
             else if(dragOver == EditorSurface.DRAGOVERSTATUS.CANTDROP)
-                return EditorColor.CANTDROPCOLOR;
+                return CANTDROPCOLOR;
         }
         else if(error)
         {
@@ -83,25 +83,25 @@ public class EditorColor
             {
                 // Slightly different color, to distinguish nodes from
                 // nodegroups more clearly. Overkill?
-                return EditorColor.ERRORCOLOR_NODE;
+                return ERRORCOLOR_NODE;
             }
-            return EditorColor.ERRORCOLOR;
+            return ERRORCOLOR;
         }
         else if(selected)
         {
-            return EditorColor.SELECTCOLOR;
+            return SELECTCOLOR;
         }
         
         // Defaults
         if(o instanceof GroupNodeProxy)
         {
-            return EditorColor.DEFAULTCOLOR_NODEGROUP;
+            return DEFAULTCOLOR_NODEGROUP;
         }
         else if(o instanceof LabelGeometryProxy)
         {
-            return EditorColor.DEFAULTCOLOR_LABEL;
+            return DEFAULTCOLOR_LABEL;
         }
-        return EditorColor.DEFAULTCOLOR;
+        return DEFAULTCOLOR;
     }
     
     /**
@@ -110,14 +110,13 @@ public class EditorColor
     public static Color getShadowColor(Proxy o, EditorSurface.DRAGOVERSTATUS dragOver, boolean selected,
         boolean error)
     {
-        // Overrides
-        if(selected && !error && o instanceof GroupNodeProxy)
+        // Overrides, if not selected and not error (then the color is normal...)
+        if(!selected && !error && o instanceof GroupNodeProxy)
         {
             // Unfortunately, the light gray color gives a too weak shadow!
-            return shadow(getColor(o, dragOver, selected,
-                error).darker().darker().darker());
+            return shadow(getColor(o, dragOver, selected, error).darker().darker().darker());
         }
-        
+
         // Return the shadowed variant of the ordinary color of this object
         return shadow(getColor(o, dragOver, selected, error));
     }
