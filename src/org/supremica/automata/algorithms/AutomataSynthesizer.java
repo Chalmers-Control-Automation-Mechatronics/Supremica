@@ -167,12 +167,12 @@ public class AutomataSynthesizer
         {
             // MODULAR (controllability) synthesis
             Automata newSupervisors = doModular(theAutomata);
-
+            
             if (stopRequested || newSupervisors == null)
             {
                 return new Automata();
             }
-
+            
             result.addAutomata(newSupervisors);
         }
         else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.COMPOSITIONAL)
@@ -216,7 +216,7 @@ public class AutomataSynthesizer
                 logger.info("The states that are reachable in the maximally permissive, "
                     + "controllable and nonblocking supervisor are: " + min.getStateSet() + ".");
             }
-            result.addAutomaton(min);            
+            result.addAutomaton(min);
         }
         else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD)
         {
@@ -366,8 +366,11 @@ public class AutomataSynthesizer
                 int previousSize = 0;
                 while (uncontrollableEvents.size() > previousSize)
                 {
-                    automata = selector.addPlants(uncontrollableEvents);
+                    // Count current amount of uncontrollable
                     previousSize = uncontrollableEvents.size();
+                    // Add plants that share those events
+                    automata = selector.addPlants(uncontrollableEvents);
+                    // Which uncontrollable exist now?
                     uncontrollableEvents = automata.getUnionAlphabet().getUncontrollableAlphabet();
                 }
             }
@@ -443,21 +446,21 @@ public class AutomataSynthesizer
         if (!selector.hadSpec())
         {
             logger.debug("No spec/sup seen, performing monolithic synthesis on the entire set.");
-            
+         
             MonolithicReturnValue retval = doMonolithic(aut);
-            
+         
             if (stopRequested)
             {
                 return new Automata();
             }
-            
+         
             if (retval.didSomething)
             {
                 supervisors.addAutomaton(retval.automaton);
             }
         }
-        */
-         
+         */
+        
         // Should we optimize the result (throw unnecessary supervisors away)
         if (synthesizerOptions.getOptimize())
         {
@@ -506,7 +509,7 @@ public class AutomataSynthesizer
     private MonolithicReturnValue doMonolithic(Automata automata, boolean singleFixpoint)
     throws Exception
     {
-        logger.debug("AutomataSynthesizer::doMonolithic");
+        logger.verbose("Attempting monolithic synthesis for: " + automata);
         
         MonolithicReturnValue retval = new MonolithicReturnValue();
         

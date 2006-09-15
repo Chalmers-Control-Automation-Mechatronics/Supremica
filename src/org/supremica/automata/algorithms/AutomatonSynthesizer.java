@@ -503,20 +503,24 @@ public class AutomatonSynthesizer
             {
                 for (Iterator<Arc> evIt = currState.incomingArcsIterator(); evIt.hasNext(); )
                 {
-                    LabeledEvent currEvent = evIt.next().getEvent();
-                    if (!currEvent.isControllable())
+                    Arc arc = evIt.next();
+                    if (!arc.isSelfLoop())
                     {
-                        try
+                        LabeledEvent currEvent = arc.getEvent();
+                        if (!currEvent.isControllable())
                         {
-                            if (!disabledUncontrollableEvents.contains(currEvent.getLabel()))
+                            try
                             {
-                                disabledUncontrollableEvents.addEvent(currEvent);
-                            }
+                                if (!disabledUncontrollableEvents.contains(currEvent.getLabel()))
+                                {
+                                    disabledUncontrollableEvents.addEvent(currEvent);
+                                }
                         }
-                        catch (Exception ex)
-                        {
-                            logger.error("AutomatonSynthesizer::computeDisabledUncontrollableEvents: " + ex.getMessage());
-                            logger.debug(ex.getStackTrace());
+                            catch (Exception ex)
+                            {
+                                logger.error("AutomatonSynthesizer::computeDisabledUncontrollableEvents: " + ex.getMessage());
+                                logger.debug(ex.getStackTrace());
+                            }
                         }
                     }
                 }
