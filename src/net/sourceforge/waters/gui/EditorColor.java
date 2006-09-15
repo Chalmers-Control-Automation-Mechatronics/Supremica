@@ -22,35 +22,35 @@ public class EditorColor
     public static final Color DISABLEDCOLOR = Color.GRAY;
     
     /** The default color of marked (accepting) nodes. */
-    public static Color DEFAULTMARKINGCOLOR = Color.GRAY;
+    public static final Color DEFAULTMARKINGCOLOR = Color.GRAY;
     
     /** The color of guard expressions. */
-    public static Color GUARDCOLOR = Color.GREEN.darker().darker();
+    public static final Color GUARDCOLOR = Color.GREEN.darker().darker();
     
     /** The color of action expressions. */
-    public static Color ACTIONCOLOR = Color.BLUE;
+    public static final Color ACTIONCOLOR = Color.BLUE;
     
     /** The color of the drag-select area. */
-    public static Color DRAGSELECTCOLOR = new Color(0,0,255,32);
+    public static final Color DRAGSELECTCOLOR = new Color(0,0,255,32);
     
     /** The default color of objects. */
-    public static Color DEFAULTCOLOR = Color.BLACK;
-    public static Color DEFAULTCOLOR_LABEL = (Color.GREEN).darker().darker();
-    public static Color DEFAULTCOLOR_NODEGROUP = Color.lightGray;
+    public static final Color DEFAULTCOLOR = Color.BLACK;
+    public static final Color DEFAULTCOLOR_LABEL = (Color.GREEN).darker().darker();
+    public static final Color DEFAULTCOLOR_NODEGROUP = Color.lightGray;
     
     /** The color of erring objects. For example colliding nodes and nodegroups. */
-    public static Color ERRORCOLOR = Color.RED;
-    public static Color ERRORCOLOR_NODE = ERRORCOLOR.darker();
+    public static final Color ERRORCOLOR = Color.RED;
+    public static final Color ERRORCOLOR_NODE = ERRORCOLOR.darker();
     
     /** The color of selected objects. */
-    public static Color SELECTCOLOR = Color.BLUE;
+    public static final Color SELECTCOLOR = Color.BLUE;
     
-    /** the color of acceptable drag objects */
-    public static Color CANDROPCOLOR = (Color.GREEN).darker().darker();
-    public static Color CANTDROPCOLOR = Color.RED;
+    /** The color of objects when showing wether stuff can be dropped on them. */
+    public static final Color CANDROPCOLOR = (Color.GREEN).darker().darker();
+    public static final Color CANTDROPCOLOR = Color.RED;
     
     /** Invisible color. */
-    public static Color INVISIBLE = new Color(0,0,0,0);
+    public static final Color INVISIBLE = new Color(0,0,0,0);
     
     /**
      * Returns a transparent variant of the supplied color. The
@@ -107,8 +107,8 @@ public class EditorColor
     /**
      * Returns a lighter shade of the color of the object for drawing a "shadow".
      */
-    public static Color getShadowColor(Proxy o, EditorSurface.DRAGOVERSTATUS dragOver, boolean selected,
-        boolean error)
+    public static Color getShadowColor(Proxy o, EditorSurface.DRAGOVERSTATUS dragOver, 
+        boolean selected, boolean error)
     {
         // Overrides, if not selected and not error (then the color is normal...)
         if(!selected && !error && o instanceof GroupNodeProxy)
