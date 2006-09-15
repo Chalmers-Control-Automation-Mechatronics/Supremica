@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ValidUnmarshaller
 //###########################################################################
-//# $Id: ValidUnmarshaller.java,v 1.7 2006-09-14 21:10:21 flordal Exp $
+//# $Id: ValidUnmarshaller.java,v 1.8 2006-09-15 09:26:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.valid;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -32,12 +33,12 @@ import net.sourceforge.waters.model.marshaller.JAXBDocumentImporter;
 import net.sourceforge.waters.model.marshaller.JAXBMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBModuleImporter;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 
 import net.sourceforge.waters.xsd.module.Module;
-import org.supremica.gui.StandardExtensionFileFilter;
 
 import org.xml.sax.SAXException;
 
@@ -71,9 +72,9 @@ public class ValidUnmarshaller
   {
     try {
       final String name = uri.toString();
-      if (name.endsWith(".vprj")) {
+      if (VPRJFILTER.accept(name)) {
         final int len = name.length();
-        final String newname = name.substring(0, len - 5) + "_main.vmod";
+        final String newname = name.substring(0, len - 5) + EXT_MAINVMOD;
         uri = new URI(newname);
       }
       final ValidTransformer transformer = new ValidTransformer(uri);
@@ -108,7 +109,7 @@ public class ValidUnmarshaller
 
   public Collection<FileFilter> getSupportedFileFilters()
   {
-      return FILTERS;
+    return FILTERS;
   }
   
   public DocumentManager getDocumentManager()
@@ -122,6 +123,36 @@ public class ValidUnmarshaller
 
 
   //#########################################################################
+  //# Inner Class MainVmodFileFiler
+  private static class MainVmodFileFiler
+    extends FileFilter
+  {
+    //#######################################################################
+    //# Overrides for Abstract Baseclass javax.swing.filechooser.FileFilter
+    public boolean accept(final File file)
+    {
+      if (file.isDirectory()) {
+        return true;
+      } else {
+        final String filename = file.getName();
+        final int lastunderscore = filename.lastIndexOf('_');
+        if (lastunderscore > 0 && lastunderscore < filename.length() - 1) {
+          final String ext = filename.substring(lastunderscore);
+          return ext.equalsIgnoreCase(EXT_MAINVMOD);
+        } else {
+          return false;
+        }
+      }
+    }
+    
+    public String getDescription()
+    {
+      return DESCR_VMOD;
+    }
+  }
+    
+
+  //#########################################################################
   //# Data Members
   private final Unmarshaller mUnmarshaller;
   private final JAXBDocumentImporter<ModuleProxy,Module> mImporter;
@@ -129,17 +160,22 @@ public class ValidUnmarshaller
   private static final Collection<String> EXTENSIONS;
   private static final Collection<FileFilter> FILTERS;
   private static final String EXT_VMOD = ".vmod";
+  private static final String EXT_MAINVMOD = "_main.vmod";
   private static final String EXT_VPRJ = ".vprj";
+  private static final String DESCR_VMOD = "VALID Main Module files [*.vmod]";
+  private static final String DESCR_VPRJ = "VALID Project files [*.vprj]";
+  private static final FileFilter VMODFILTER = new MainVmodFileFiler();
+  private static final StandardExtensionFileFilter VPRJFILTER =
+    new StandardExtensionFileFilter(EXT_VPRJ, DESCR_VPRJ);
 
   static {
     final Collection<String> exts = new LinkedList<String>();
     exts.add(EXT_VMOD);
     exts.add(EXT_VPRJ);
     EXTENSIONS = Collections.unmodifiableCollection(exts);
-    
     final Collection<FileFilter> filters = new LinkedList<FileFilter>();
-    filters.add(new StandardExtensionFileFilter(EXT_VMOD, "VALID Module files [*.vmod]"));
-    filters.add(new StandardExtensionFileFilter(EXT_VPRJ, "VALID Project files [*.vprj]"));
+    filters.add(VMODFILTER);
+    filters.add(VPRJFILTER);
     FILTERS = Collections.unmodifiableCollection(filters);
   }
 

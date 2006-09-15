@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   DocumentManager
 //###########################################################################
-//# $Id: DocumentManager.java,v 1.7 2006-09-14 21:10:21 flordal Exp $
+//# $Id: DocumentManager.java,v 1.8 2006-09-15 09:26:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -149,10 +149,11 @@ public class DocumentManager {
       return cached;
     }
     final String path = uri.getRawSchemeSpecificPart();
-    final int dotpos = path.lastIndexOf(".");
+    final int dotpos = path.lastIndexOf('.');
     final String extension = dotpos >= 0 ? path.substring(dotpos) : "";
+    final String lowerext = extension.toLowerCase();
     final ProxyUnmarshaller<? extends DocumentProxy> unmarshaller =
-      mExtensionUnmarshallerMap.get(extension);
+      mExtensionUnmarshallerMap.get(lowerext);
     if (unmarshaller == null) {
       throw new BadFileTypeException(uri);
     }
@@ -290,7 +291,9 @@ public class DocumentManager {
    * It does not make any attempt to save the document to disk.
    * If the document manager has already stored a document at the
    * given location, the new document will replace the existing one.
-   * @param  doc          The document to be added.
+   * @param  doc          The document to be added. It should provide a
+   *                      valid file location where the document can be
+   *                      looked up and saved.
    */
   public void newDocument(final DocumentProxy doc)
   {
@@ -338,12 +341,13 @@ public class DocumentManager {
     final Collection<String> extensions =
       unmarshaller.getSupportedExtensions();
     for (String extension : extensions) {
-      if (mExtensionUnmarshallerMap.containsKey(extension)) {
+      final String lowerext = extension.toLowerCase();
+      if (mExtensionUnmarshallerMap.containsKey(lowerext)) {
         throw new IllegalArgumentException
           ("Registering a second unmarshaller for extension '" +
            extension + "'!");
       }
-      mExtensionUnmarshallerMap.put(extension, unmarshaller);
+      mExtensionUnmarshallerMap.put(lowerext, unmarshaller);
     }
     mFileFilters.addAll(unmarshaller.getSupportedFileFilters());
     unmarshaller.setDocumentManager(this);
@@ -404,9 +408,10 @@ public class DocumentManager {
 
   public Collection<FileFilter> getSupportedFileFilters()
   {
-      return Collections.unmodifiableList(mFileFilters);
+    return Collections.unmodifiableList(mFileFilters);
   }
-  
+
+
   //#########################################################################
   //# Auxiliary Methods
   private ProxyMarshaller getProxyMarshaller(final Class clazz)

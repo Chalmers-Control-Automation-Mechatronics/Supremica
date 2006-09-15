@@ -95,7 +95,7 @@ public class IDE
         final OperatorTable optable = CompilerOperatorTable.getInstance();
         mModuleMarshaller = new JAXBModuleMarshaller(mModuleFactory, optable);
         validUnmarshaller = new ValidUnmarshaller(mModuleFactory, optable);
-        supremicaUnmarshaller = new SupremicaUnmarshaller(mModuleFactory, documentManager);
+        supremicaUnmarshaller = new SupremicaUnmarshaller(mModuleFactory);
         documentManager.registerMarshaller(mModuleMarshaller);
         documentManager.registerUnmarshaller(mModuleMarshaller);
         documentManager.registerUnmarshaller(supremicaUnmarshaller);

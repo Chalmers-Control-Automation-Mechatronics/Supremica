@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ProductDESImporter
 //###########################################################################
-//# $Id: ProductDESImporter.java,v 1.2 2006-09-14 21:10:21 flordal Exp $
+//# $Id: ProductDESImporter.java,v 1.3 2006-09-15 09:26:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -316,15 +316,11 @@ public class ProductDESImporter
     }
     final String ext = marshaller.getDefaultExtension();
     final String name = des.getName();
-
-    try 
-    {
-        return deslocation.resolve(name + ext);
-    }
-    catch (IllegalArgumentException ex)
-    {
-        // Bad name, use null
-        return null;
+    try {
+      return deslocation.resolve(name + ext);
+    } catch (final IllegalArgumentException exception) {
+      // Bad name, use null, i.e., no file location ...
+      return null;
     }
   }
 

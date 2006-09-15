@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBProductDESMarshaller
 //###########################################################################
-//# $Id: JAXBProductDESMarshaller.java,v 1.4 2006-09-14 21:10:21 flordal Exp $
+//# $Id: JAXBProductDESMarshaller.java,v 1.5 2006-09-15 09:26:13 robi Exp $
 //###########################################################################
 
 
@@ -44,7 +44,7 @@ public class JAXBProductDESMarshaller
   
   public String getDescription()
   {
-      return "Instantiated Waters automata [*.wdes]";
+      return "Instantiated Waters automata files [*.wdes]";
   }
 
   public Class<ProductDESProxy> getDocumentClass()

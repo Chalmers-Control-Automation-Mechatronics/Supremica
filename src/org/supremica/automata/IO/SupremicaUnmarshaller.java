@@ -1,10 +1,10 @@
-//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//# -*- indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   SupremicaUnmarshaller
 //###########################################################################
-//# $Id: SupremicaUnmarshaller.java,v 1.1 2006-09-14 21:10:21 flordal Exp $
+//# $Id: SupremicaUnmarshaller.java,v 1.2 2006-09-15 09:26:13 robi Exp $
 //###########################################################################
 
 package org.supremica.automata.IO;
@@ -18,9 +18,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
@@ -44,15 +42,8 @@ public class SupremicaUnmarshaller
         builder = new ProjectBuildFromXml();
         mImporter = new ProductDESImporter(modfactory);
     }
-    
-    public SupremicaUnmarshaller(final ModuleProxyFactory modfactory,
-        final DocumentManager manager)
-        throws JAXBException, SAXException
-    {
-        this(modfactory);
-        setDocumentManager(manager);
-    }    
-    
+
+
     //#########################################################################
     //# Interface net.sourceforge.waters.model.marshaller.ProxyUnmarshaller
     public ModuleProxy unmarshal(final URI uri)

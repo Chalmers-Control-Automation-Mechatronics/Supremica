@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBMarshaller
 //###########################################################################
-//# $Id: JAXBMarshaller.java,v 1.5 2006-09-14 21:10:21 flordal Exp $
+//# $Id: JAXBMarshaller.java,v 1.6 2006-09-15 09:26:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -29,9 +29,7 @@ import javax.xml.validation.SchemaFactory;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ModelException;
-
 import net.sourceforge.waters.xsd.base.NamedType;
-import org.supremica.gui.StandardExtensionFileFilter;
 
 import org.xml.sax.SAXException;
 
@@ -42,8 +40,8 @@ import org.xml.sax.SAXException;
  * <P>The JAXBMarshaller is a simple wrapper that provides an easy way
  * to convert between XML files and their corresponding object structures.
  * The object structures obtained are called <I>documents</I> and all
- * implement the {@link DocumentProxy} interface.</P> 
- * 
+ * implement the {@link DocumentProxy} interface.</P>
+ *
  * <P>This abstract base class implements the core of the wrapper
  * functionality, but is not intended to be used directly. Instead, use one
  * of the subclasses depending on the type of document you want to
@@ -145,12 +143,13 @@ public abstract class JAXBMarshaller
 
   public Collection<FileFilter> getSupportedFileFilters()
   {
-      final String ext = getDefaultExtension();
-      final String description = getDescription();
-      FileFilter filter = new StandardExtensionFileFilter(ext, description);
-      return Collections.singletonList(filter);
+    final String ext = getDefaultExtension();
+    final String description = getDescription();
+    final FileFilter filter =
+      new StandardExtensionFileFilter(ext, description);
+    return Collections.singletonList(filter);
   }
-      
+
   public DocumentManager getDocumentManager()
   {
     return mImporter.getDocumentManager();
@@ -185,6 +184,7 @@ public abstract class JAXBMarshaller
   //# Provided by Subclasses
   public abstract Class<T> getElementClass();
   public abstract String getDescription();
+
 
   //#########################################################################
   //# Data Members

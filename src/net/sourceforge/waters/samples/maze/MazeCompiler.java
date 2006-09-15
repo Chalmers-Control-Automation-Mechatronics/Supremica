@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   MazeCompiler
 //###########################################################################
-//# $Id: MazeCompiler.java,v 1.9 2006-09-14 21:10:21 flordal Exp $
+//# $Id: MazeCompiler.java,v 1.10 2006-09-15 09:26:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
@@ -27,6 +27,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
@@ -43,7 +44,6 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
-import org.supremica.gui.StandardExtensionFileFilter;
 
 import org.xml.sax.SAXException;
 
@@ -203,7 +203,7 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
     final SimpleIdentifierProxy ident =
       mFactory.createSimpleIdentifierProxy("property");
     final PlainEventListProxy props =
-      mFactory.createPlainEventListProxy();  
+      mFactory.createPlainEventListProxy();
     final SimpleNodeProxy node =
       mFactory.createSimpleNodeProxy("q0", props, true, null, null, null);
     final List<SimpleNodeProxy> nodes = Collections.singletonList(node);
@@ -285,8 +285,9 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
   private static final String MAZEEXT = ".txt";
   private static final Collection<String> EXTENSIONS =
     Collections.singletonList(MAZEEXT);
-  
-  private static final FileFilter MAZEFILTER = new StandardExtensionFileFilter(MAZEEXT, "Maze description files [*.txt]");
-  private static final Collection<FileFilter> FILTERS = 
-      Collections.singletonList(MAZEFILTER);
+  private static final FileFilter MAZEFILTER =
+    new StandardExtensionFileFilter(MAZEEXT, "Maze description files [*.txt]");
+  private static final Collection<FileFilter> FILTERS =
+    Collections.singletonList(MAZEFILTER);
+
 }

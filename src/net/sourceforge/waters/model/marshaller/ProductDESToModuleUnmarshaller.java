@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ProductDESToModuleUnmarshaller
 //###########################################################################
-//# $Id: ProductDESToModuleUnmarshaller.java,v 1.2 2006-09-14 21:10:21 flordal Exp $
+//# $Id: ProductDESToModuleUnmarshaller.java,v 1.3 2006-09-15 09:26:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -37,14 +37,6 @@ public class ProductDESToModuleUnmarshaller
       ProductDESElementFactory.getInstance();
     mUnmarshaller = new JAXBProductDESMarshaller(desfactory);
     mImporter = new ProductDESImporter(modfactory);
-  }
-
-  public ProductDESToModuleUnmarshaller(final ModuleProxyFactory modfactory,
-                                        final DocumentManager manager)
-    throws JAXBException, SAXException
-  {
-    this(modfactory);
-    setDocumentManager(manager);
   }
 
 
