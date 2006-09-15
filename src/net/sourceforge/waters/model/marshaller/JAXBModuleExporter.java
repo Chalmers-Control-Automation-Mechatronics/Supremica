@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleExporter
 //###########################################################################
-//# $Id: JAXBModuleExporter.java,v 1.14 2006-09-12 14:32:16 robi Exp $
+//# $Id: JAXBModuleExporter.java,v 1.15 2006-09-15 13:04:14 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -73,6 +73,7 @@ import net.sourceforge.waters.model.unchecked.Casting;
 
 import net.sourceforge.waters.xsd.base.ElementType;
 import net.sourceforge.waters.xsd.base.NamedType;
+import net.sourceforge.waters.xsd.module.AnchorPosition;
 import net.sourceforge.waters.xsd.module.BinaryExpression;
 import net.sourceforge.waters.xsd.module.BoxGeometry;
 import net.sourceforge.waters.xsd.module.Box;
@@ -116,6 +117,7 @@ import net.sourceforge.waters.xsd.module.SimpleIdentifier;
 import net.sourceforge.waters.xsd.module.SimpleNode;
 import net.sourceforge.waters.xsd.module.SimpleParameterType;
 import net.sourceforge.waters.xsd.module.SplineGeometry;
+import net.sourceforge.waters.xsd.module.SplineKind;
 import net.sourceforge.waters.xsd.module.UnaryExpression;
 //EFA-----------------
 import net.sourceforge.waters.xsd.module.Actions;
@@ -275,7 +277,7 @@ public class JAXBModuleExporter
   }
 
 
-public Object visitExpressionProxy
+  public Object visitExpressionProxy
       (final ExpressionProxy proxy)
     throws VisitorException
   {
@@ -758,7 +760,9 @@ public Object visitExpressionProxy
   {
     copyNamedProxy(proxy, element);
     element.setKind(proxy.getKind());
-    element.setObservable(proxy.isObservable());
+    if (!proxy.isObservable()) {
+      element.setObservable(false);
+    }
     final List<SimpleExpressionProxy> rangesProxy = proxy.getRanges();
     final List<ElementType> rangesElement =
       Casting.toList(element.getRanges());
@@ -778,7 +782,9 @@ public Object visitExpressionProxy
   {
     final EventDeclProxy eventDeclProxy = proxy.getEventDecl();
     copyEventDeclProxy(eventDeclProxy, element);
-    element.setRequired(proxy.isRequired());
+    if (!proxy.isRequired()) {
+      element.setRequired(false);
+    }
   }
 
   private void copyExpressionProxy
@@ -845,7 +851,9 @@ public Object visitExpressionProxy
   {
     try {
       copyProxy(proxy, element);
-      element.setDeterministic(proxy.isDeterministic());
+      if (!proxy.isDeterministic()) {
+        element.setDeterministic(false);
+      }
       final LabelBlockProxy blockedEventsProxy = proxy.getBlockedEvents();
       if (!blockedEventsProxy.getEventList().isEmpty()) {
         final LabelBlock blockedEventsElement =
@@ -984,7 +992,10 @@ public Object visitExpressionProxy
     final Point2D pointProxy = proxy.getOffset();
     final Point pointElement = createPoint(pointProxy);
     element.setPoint(pointElement);
-    element.setAnchor(proxy.getAnchor());
+    final AnchorPosition anchor = proxy.getAnchor();
+    if (anchor != AnchorPosition.SW) {
+      element.setAnchor(anchor);
+    }
   }
 
   private void copyModuleProxy
@@ -1111,7 +1122,9 @@ public Object visitExpressionProxy
     throws VisitorException
   {
     copyNodeProxy(proxy, element);
-    element.setInitial(proxy.isInitial());
+    if (proxy.isInitial()) {
+      element.setInitial(true);
+    }
     final PointGeometryProxy pointGeometryProxy = proxy.getPointGeometry();
     if (pointGeometryProxy != null) {
       final PointGeometryType pointGeometryElement =
@@ -1154,7 +1167,10 @@ public Object visitExpressionProxy
       final Point pointElement = createPoint(pointProxy);
       pointListElement.add(pointElement);
     }
-    element.setKind(proxy.getKind());
+    final SplineKind kind = proxy.getKind();
+    if (kind != SplineKind.INTERPOLATING) {
+      element.setKind(kind);
+    }
   }
 
   private void copyUnaryExpressionProxy

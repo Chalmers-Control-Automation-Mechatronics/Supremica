@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBProductDESExporter
 //###########################################################################
-//# $Id: JAXBProductDESElementExporter.java,v 1.2 2006-07-20 02:28:37 robi Exp $
+//# $Id: JAXBProductDESElementExporter.java,v 1.3 2006-09-15 13:04:14 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -190,7 +190,9 @@ abstract class JAXBProductDESElementExporter
   {
     copyNamedProxy(proxy, element);
     element.setKind(proxy.getKind());
-    element.setObservable(proxy.isObservable());
+    if (!proxy.isObservable()) {
+      element.setObservable(false);
+    }
   }
 
   private void copyLoopTraceProxy(final LoopTraceProxy proxy,
@@ -232,7 +234,9 @@ abstract class JAXBProductDESElementExporter
     throws VisitorException
   {
     copyNamedProxy(proxy, element);
-    element.setInitial(proxy.isInitial());
+    if (proxy.isInitial()) {
+      element.setInitial(true);
+    }
     final Collection<EventProxy> props = proxy.getPropositions();
     mStateEventRefListHandler.toJAXB
       (mAutomatonEventRefExporter, props, element);
