@@ -83,7 +83,8 @@ public class NodeExpander
      *               "manual" technique (adjusted for scheduling)          *
      ***********************************************************************/
 
-    protected void initSpecEventTable() {
+    protected void initSpecEventTable() 
+	{
 		specEventTable = new Hashtable<LabeledEvent, Integer>();
 
 		for (int i=0; i<theAutomata.size(); i++) 
