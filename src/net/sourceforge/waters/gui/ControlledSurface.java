@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.75 2006-09-14 21:10:21 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.76 2006-09-15 09:05:07 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -97,6 +97,9 @@ public class ControlledSurface
             if (node instanceof SimpleNodeSubject)
             {
                 SimpleNodeSubject simpleNode = (SimpleNodeSubject) node;
+                
+                //System.out.println("Placed node " + simpleNode.getName());
+                
                 if (simpleNode.getPointGeometry() == null)
                 {
                     simpleNode.setPointGeometry(new PointGeometrySubject(new Point2D.Double(
@@ -131,7 +134,13 @@ public class ControlledSurface
                     );
                 if (edge.getSource() == edge.getTarget())
                 {
+                    // Add offset
                     point.setLocation(point.getX()+32, point.getY()+32);
+                }
+                else
+                {
+                    // Add random offset (now edges are likely not to end up on top of other edges)
+                    point.setLocation(point.getX()+Math.random()*32-16, point.getY()+Math.random()*32-16);                    
                 }
                 final Collection<Point2D> points =
                     Collections.singleton(point);
