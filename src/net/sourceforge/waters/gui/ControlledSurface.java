@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.77 2006-09-15 11:34:52 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.78 2006-09-15 17:29:21 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -130,17 +130,17 @@ public class ControlledSurface
             if (edge.getGeometry() == null)
             {
                 Point2D point = GeometryTools.getMidPoint(GeometryTools.getPosition(edge.getSource()),
-                    GeometryTools.getPosition(edge.getTarget())
-                    );
+                    GeometryTools.getPosition(edge.getTarget()));
                 if (edge.getSource() == edge.getTarget())
                 {
-                    // Add offset
+                    // Add offset to selfloops, otherwise the user can't see them...
                     point.setLocation(point.getX()+32, point.getY()+32);
                 }
                 else
                 {
                     // Add random offset (now edges are likely not to end up on top of other edges)
-                    point.setLocation(point.getX()+Math.random()*32-16, point.getY()+Math.random()*32-16);                    
+                    // Not good, no geometry is supposed to mean "straight line"...
+                    //point.setLocation(point.getX()+Math.random()*32-16, point.getY()+Math.random()*32-16);                    
                 }
                 final Collection<Point2D> points =
                     Collections.singleton(point);

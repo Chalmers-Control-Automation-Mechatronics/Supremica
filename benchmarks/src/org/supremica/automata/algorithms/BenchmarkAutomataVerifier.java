@@ -83,52 +83,7 @@ public class BenchmarkAutomataVerifier
         TestSuite suite = new TestSuite(BenchmarkAutomataVerifier.class);
         return suite;
     }
-    
-    public void testBenchmarkModularControllability()
-    throws Exception
-    {
-        // Init options and verifier
-        VerificationOptions vOptions;
-        SynchronizationOptions sOptions;
-        MinimizationOptions mOptions;
-        vOptions = VerificationOptions.getDefaultControllabilityOptions();
-        sOptions = SynchronizationOptions.getDefaultVerificationOptions();
-        mOptions = MinimizationOptions.getDefaultVerificationOptions();
-        
-        ///////////////////////////////////
-        // "Industrial" model benchmarks //
-        ///////////////////////////////////
-        
-        // Benchmark path
-        //String prefix = "/users/s2/flordal/benchmark/";
-        String prefix = "benchmarks/benchmarkfiles/";
-        // Benchmarks
-        String[] test =
-        {
-            "FMS", "verriegel3",
-            "verriegel4",
-            "agv", "agvb",
-            "IPC",
-            "FMS", "SMS", "PMS",
-            "bmw_fh", "big_bmw",
-            "fzelle",
-            "ftechnik", "ftechnik_nocoll",
-            "profisafe_i4",
-            "AIP_minus_AS3_TU4",
-            "tbed_valid", "tbed_ctct"
-        };
-        
-        ProjectBuildFromXml builder = new ProjectBuildFromXml();
-        Project theProject;
-        
-        // Run tests
-        for (int k=0; k<test.length; k++)
-        {
-            theProject = builder.build(new File(prefix + test[k] + ".xml"));
-            benchmarkControllability(test[k], theProject, vOptions, sOptions, mOptions);
-        }
-    }
-    
+       
     public void testBenchmarkCompositionalNonblockingVerification()
     throws Exception
     {
@@ -252,6 +207,51 @@ public class BenchmarkAutomataVerifier
         }
     }
     
+    public void testBenchmarkModularControllability()
+    throws Exception
+    {
+        // Init options and verifier
+        VerificationOptions vOptions;
+        SynchronizationOptions sOptions;
+        MinimizationOptions mOptions;
+        vOptions = VerificationOptions.getDefaultControllabilityOptions();
+        sOptions = SynchronizationOptions.getDefaultVerificationOptions();
+        mOptions = MinimizationOptions.getDefaultVerificationOptions();
+        
+        ///////////////////////////////////
+        // "Industrial" model benchmarks //
+        ///////////////////////////////////
+        
+        // Benchmark path
+        //String prefix = "/users/s2/flordal/benchmark/";
+        String prefix = "benchmarks/benchmarkfiles/";
+        // Benchmarks
+        String[] test =
+        {
+            "FMS", "verriegel3",
+            "verriegel4",
+            "agv", "agvb",
+            "IPC",
+            "FMS", "SMS", "PMS",
+            "bmw_fh", "big_bmw",
+            "fzelle",
+            "ftechnik", "ftechnik_nocoll",
+            "profisafe_i4",
+            "AIP_minus_AS3_TU4",
+            "tbed_valid", "tbed_ctct"
+        };
+        
+        ProjectBuildFromXml builder = new ProjectBuildFromXml();
+        Project theProject;
+        
+        // Run tests
+        for (int k=0; k<test.length; k++)
+        {
+            theProject = builder.build(new File(prefix + test[k] + ".xml"));
+            benchmarkControllability(test[k], theProject, vOptions, sOptions, mOptions);
+        }
+    }
+
     private void benchmarkControllability(String name, Project theProject,
         VerificationOptions vOptions,
         SynchronizationOptions sOptions,

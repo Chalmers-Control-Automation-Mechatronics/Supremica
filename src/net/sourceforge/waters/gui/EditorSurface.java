@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.58 2006-08-20 14:21:18 flordal Exp $
+//# $Id: EditorSurface.java,v 1.59 2006-09-15 17:29:21 flordal Exp $
 //###########################################################################
 
 
@@ -67,8 +67,6 @@ public class EditorSurface
     protected boolean showGrid = true;
     protected EditorWindowInterface root;
     protected int gridSize = 16;
-    protected Color backgroundColor = new Color(1.0f, 1.0f, 1.0f);
-    protected Color gridColor = new Color(0.9f, 0.9f, 0.9f);
     protected int dragStartX;
     protected int dragStartY;
     protected int dragNowX;
@@ -161,9 +159,9 @@ public class EditorSurface
     
     protected void paintGrid(Graphics g)
     {
-        g.setColor(backgroundColor);
+        g.setColor(EditorColor.BACKGROUNDCOLOR);
         g.fillRect(0, 0, getWidth(), getHeight());
-        g.setColor(gridColor);
+        g.setColor(EditorColor.GRIDCOLOR);
         
         // Draw grid iff showGrid is true
         if (showGrid)

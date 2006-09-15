@@ -285,7 +285,7 @@ public class AutomatonMinimizer
                 // If there is just one event and it's epsilon,
                 // it's easy! (If we don't care about state names.)
                 if ((theAutomaton.getAlphabet().size() == 1) &&
-                    (theAutomaton.nbrOfEpsilonEvents() == 1) &&
+                    (theAutomaton.getAlphabet().nbrOfEpsilonEvents() == 1) &&
                     useShortNames)
                 {
                     // The conflict equivalent automaton is just one state, the initial state.
@@ -1079,7 +1079,7 @@ public class AutomatonMinimizer
     }
     
     /**
-     * Rule AA, only silent incoming and not stable (silentContinuation backwards and then obervation equivalence).
+     * Rule AA, only silent incoming and not stable (obsevation equivalence "backwards" and then silentContinuation).
      *
      * @return the number of states that have been removed or -1 if method didn't complete successfully.
      */
@@ -1118,13 +1118,18 @@ public class AutomatonMinimizer
             boolean ok = false;
             for (Iterator<Arc> outIt = one.outgoingArcsIterator(); outIt.hasNext(); )
             {
-                if (outIt.next().getEvent().isEpsilon())
+                Arc arc = outIt.next();
+                if (arc.getEvent().isEpsilon() && !arc.isSelfLoop())
                 {
                     ok = true;
                     break;
                 }
             }
             
+            //mergeEpsilonLoops(aut);
+            //countArcs += removeRedundantTransitions(aut);
+                    
+
             // Are all incoming epsilon?
             if (ok && (one.nbrOfIncomingArcs() == one.nbrOfIncomingEpsilonArcs()))
             {
@@ -1132,22 +1137,19 @@ public class AutomatonMinimizer
                 for (Iterator<Arc> inIt = one.incomingArcsIterator(); inIt.hasNext(); )
                 {
                     Arc inArc = inIt.next();
-                    // Skip selfloops... I though there wouldn't be any!??
-                    // But they may appear as a result of this rule!!!
-                    if (inArc.isSelfLoop())
-                        continue;
                     State fromState = inArc.getFromState();
+
+                    // Should be epsilon!
+                    assert(inArc.getEvent().isEpsilon());
+                    // Should not be a selfloop
+                    assert(!inArc.isSelfLoop());
                     
                     for (Iterator<Arc> outIt = one.outgoingArcsIterator(); outIt.hasNext(); )
                     {
-                        Arc arc = outIt.next();
-                        // Skip selfloops... I though there wouldn't be any!?? /hguo
-                        // But they may appear as a result of this rule!!!
-                        if ((arc.getEvent().isEpsilon() && arc.isSelfLoop()))
-                            continue;
-                        State toState = arc.getToState();
-                        LabeledEvent event = arc.getEvent();
-                        
+                        Arc outArc = outIt.next();
+                        State toState = outArc.getToState();
+                        LabeledEvent event = outArc.getEvent();
+
                         Arc newArc = new Arc(fromState, toState, event);
                         aut.addArc(newArc);
                     }

@@ -21,6 +21,12 @@ public class EditorColor
     /** The default color of disabled text. */
     public static final Color DISABLEDCOLOR = Color.GRAY;
     
+    /** The background color in the editor. */
+    public static final Color BACKGROUNDCOLOR = Color.WHITE;
+        
+    /** The color of the grid in the editor. */
+    public static final Color GRIDCOLOR = new Color(0.875f, 0.875f, 0.875f);
+    
     /** The default color of marked (accepting) nodes. */
     public static final Color DEFAULTMARKINGCOLOR = Color.GRAY;
     
@@ -35,7 +41,7 @@ public class EditorColor
     
     /** The default color of objects. */
     public static final Color DEFAULTCOLOR = Color.BLACK;
-    public static final Color DEFAULTCOLOR_LABEL = (Color.GREEN).darker().darker();
+    public static final Color DEFAULTCOLOR_LABEL = Color.GREEN.darker().darker();
     public static final Color DEFAULTCOLOR_NODEGROUP = Color.lightGray;
     
     /** The color of erring objects. For example colliding nodes and nodegroups. */
@@ -45,8 +51,8 @@ public class EditorColor
     /** The color of selected objects. */
     public static final Color SELECTCOLOR = Color.BLUE;
     
-    /** The color of objects when showing wether stuff can be dropped on them. */
-    public static final Color CANDROPCOLOR = (Color.GREEN).darker().darker();
+    /** The color of objects when showing whether stuff can be dropped on them. */
+    public static final Color CANDROPCOLOR = Color.GREEN.darker().darker();
     public static final Color CANTDROPCOLOR = Color.RED;
     
     /** Invisible color. */
