@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControllabilityChecker
 //###########################################################################
-//# $Id: ControllabilityChecker.java,v 1.8 2006-09-13 10:47:04 js173 Exp $
+//# $Id: ControllabilityChecker.java,v 1.9 2006-09-16 10:18:10 js173 Exp $
 //###########################################################################
 
 //Name: Jinjian Shi
@@ -162,9 +162,13 @@ public class ControllabilityChecker extends ModelChecker
 		
 		eventSize = eventCodingList.size();
 		automatonSize = automatonSet.size();
+		
+		//Empty case
+		if (automatonSize == 0) return true;
+		
 		bitlengthList = new int[automatonSize];
 		maskList = new int[automatonSize];	
-		codePosition = new int[automatonSize];	
+		codePosition = new int[automatonSize];		
 		
 		//Count Plant size
 		for (AutomatonProxy ap : automatonSet) {
