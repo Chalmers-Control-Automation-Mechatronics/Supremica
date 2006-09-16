@@ -12,25 +12,25 @@ import org.supremica.automata.algorithms.EnumerateStates;
 import org.supremica.automata.Automata;
 
 public class StateEnumerator
-	extends AbstractAction
+    extends AbstractAction
 {
-	private static final long serialVersionUID = 1L;
-	private static Logger logger = LoggerFactory.createLogger(StateEnumerator.class);
-
-	public StateEnumerator()
-	{
-		putValue(NAME, "Enumerate States");
-		putValue(SHORT_DESCRIPTION, "Rename states with q0, q1, etc");
-	}
-
-	public void actionPerformed(ActionEvent event)
-	{
-		// Get the selected automata
-		Automata automata = ActionMan.getGui().getSelectedAutomata();
-
-		// No dialog just yet, prefix is always 'q'
-		EnumerateStates enumer = new EnumerateStates(automata, "q");
-
-		enumer.execute();
-	}
+    private static final long serialVersionUID = 1L;
+    private static Logger logger = LoggerFactory.createLogger(StateEnumerator.class);
+    
+    public StateEnumerator()
+    {
+        putValue(NAME, "Enumerate States");
+        putValue(SHORT_DESCRIPTION, "Rename states with q0, q1, etc");
+    }
+    
+    public void actionPerformed(ActionEvent event)
+    {
+        // Get the selected automata
+        Automata automata = ActionMan.getGui().getSelectedAutomata();
+        
+        // No dialog just yet, prefix is always 'q'
+        EnumerateStates enumer = new EnumerateStates(automata, "q");
+        
+        enumer.execute();
+    }
 }

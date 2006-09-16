@@ -397,19 +397,19 @@ public class VerificationDialog
         
         JComboBox minimizationStrategy;
         JComboBox minimizationHeuristic;
-        JCheckBox ruleA;
-        JCheckBox ruleAA;
-        JCheckBox ruleB;
-        JCheckBox ruleF;
+        JCheckBox ruleSC;
+        JCheckBox ruleOSI;
+        JCheckBox ruleAE;
+        JCheckBox ruleOSO;
         
         public VerificationDialogAdvancedPanelModularNonblocking()
         {
             minimizationStrategy = new JComboBox(MinimizationStrategy.values());
             minimizationHeuristic = new JComboBox(MinimizationHeuristic.values());
-            ruleA = new JCheckBox("Rule A");
-            ruleAA = new JCheckBox("Rule AA");
-            ruleB = new JCheckBox("Rule B");
-            ruleF = new JCheckBox("Rule F");
+            ruleSC = new JCheckBox("Rule SC");
+            ruleOSI = new JCheckBox("Rule OSI");
+            ruleAE = new JCheckBox("Rule AE");
+            ruleOSO = new JCheckBox("Rule OSO");
             
             // Create layout!
             Box mainBox = Box.createVerticalBox();
@@ -429,11 +429,11 @@ public class VerificationDialog
             mainBox.add(panel);
             
             panel = new JPanel();
-            panel.add(new JLabel("Rules to use: "));
-            panel.add(ruleA);
-            panel.add(ruleAA);
-            panel.add(ruleB);
-            panel.add(ruleF);
+            panel.add(new JLabel("Rules: "));
+            panel.add(ruleSC);
+            panel.add(ruleOSI);
+            panel.add(ruleAE);
+            panel.add(ruleOSO);
             mainBox.add(panel);
             
             // Add components
@@ -444,10 +444,10 @@ public class VerificationDialog
         {
             minimizationStrategy.setSelectedItem(options.getMinimizationStrategy());
             minimizationHeuristic.setSelectedItem(options.getMinimizationHeuristic());
-            ruleA.setSelected(options.getUseRuleSC());
-            ruleAA.setSelected(options.getUseRuleOSI());
-            ruleB.setSelected(options.getUseRuleAE());
-            ruleF.setSelected(options.getUseRuleOSO());
+            ruleSC.setSelected(options.getUseRuleSC());
+            ruleOSI.setSelected(options.getUseRuleOSI());
+            ruleAE.setSelected(options.getUseRuleAE());
+            ruleOSO.setSelected(options.getUseRuleOSO());
         }
         
         public void regain(MinimizationOptions options)
@@ -456,10 +456,10 @@ public class VerificationDialog
             
             options.setMinimizationStrategy((MinimizationStrategy) minimizationStrategy.getSelectedItem());
             options.setMinimizationHeuristic((MinimizationHeuristic) minimizationHeuristic.getSelectedItem());
-            options.setUseRuleA(ruleA.isSelected());
-            options.setUseRuleA(ruleAA.isSelected());
-            options.setUseRuleB(ruleB.isSelected());
-            options.setUseRuleF(ruleF.isSelected());
+            options.setUseRuleSC(ruleSC.isSelected());
+            options.setUseRuleOSI(ruleOSI.isSelected());
+            options.setUseRuleAE(ruleAE.isSelected());
+            options.setUseRuleOSO(ruleOSO.isSelected());
         }
     }
     

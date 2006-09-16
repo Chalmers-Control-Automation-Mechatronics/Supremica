@@ -925,7 +925,8 @@ public final class AutomataSynchronizerExecuter
 			org.supremica.automata.State dumpState = null;
 			if (rememberDisabledEvents)
 			{
-				dumpState = theAutomaton.createAndAddUniqueState("qf");
+				dumpState = theAutomaton.createUniqueState("qf");
+                                theAutomaton.addState(dumpState);
 				dumpState.setForbidden(true);
 			}
 

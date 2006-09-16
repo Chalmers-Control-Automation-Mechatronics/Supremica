@@ -104,13 +104,13 @@ public final class MinimizationOptions
     private Alphabet targetAlphabet;
     
     /** Use conflict equivalence rule A? */
-    private boolean useRuleA = true;
+    private boolean useRuleSC = true;
     /** Use conflict equivalence rule AA? */
-    private boolean useRuleAA = true;
+    private boolean useRuleOSI = true;
     /** Use conflict equivalence rule B? */
-    private boolean useRuleB = true;
+    private boolean useRuleAE = true;
     /** Use conflict equivalence rule F? */
-    private boolean useRuleF = true;
+    private boolean useRuleOSO = true;
     
     /**
      * This constructor returns the options previously chosen by the user as per the
@@ -293,37 +293,37 @@ public final class MinimizationOptions
         return targetAlphabet;
     }
     
-    public void setUseRuleA(boolean bool)
+    public void setUseRuleSC(boolean bool)
     {
-        useRuleA = bool;
+        useRuleSC = bool;
     }
     public boolean getUseRuleSC()
     {
-        return useRuleA;
+        return useRuleSC;
     }
-    public void setUseRuleAA(boolean bool)
+    public void setUseRuleOSI(boolean bool)
     {
-        useRuleAA = bool;
+        useRuleOSI = bool;
     }
     public boolean getUseRuleOSI()
     {
-        return useRuleAA;
+        return useRuleOSI;
     }
-    public void setUseRuleB(boolean bool)
+    public void setUseRuleAE(boolean bool)
     {
-        useRuleB = bool;
+        useRuleAE = bool;
     }
     public boolean getUseRuleAE()
     {
-        return useRuleB;
+        return useRuleAE;
     }
-    public void setUseRuleF(boolean bool)
+    public void setUseRuleOSO(boolean bool)
     {
-        useRuleF = bool;
+        useRuleOSO = bool;
     }
     public boolean getUseRuleOSO()
     {
-        return useRuleF;
+        return useRuleOSO;
     }
     
     /**

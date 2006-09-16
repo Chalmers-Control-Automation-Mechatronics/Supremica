@@ -54,448 +54,455 @@ import org.supremica.automata.*;
 
 public class PlantDEMO
 {
-	State[] filledOneState = new State[100];
-	protected Project thePlant = null;
-	private int[] nrOfStationsPerTable = { 0, 1, 1 };
-	private State[][] table_SMatr = new State[3][25];
-	private State[][] station_SMatr = new State[2][2];
-	private State[] IOSTate = new State[6];
-	private int s_SMindex = 0, index = 0, IOindex = 0, IOAlfindex = 0,
-				Iindex = 0;
-	private Automaton station = null;
-	private Alphabet[] currAlphabet = new Alphabet[3];
-	private Alphabet[] stationAlphabet = new Alphabet[2];
-	private Alphabet[] IOAlphabet = new Alphabet[2];
-	private int nrOfSlots = 12;
-	private int sAindex = 0, sind = 0;
-	private ArrayList shoesInSystem = new ArrayList(1);
-
-	public PlantDEMO()
-	{
-		thePlant = new Project();
-
-		shoesInSystem.add(new Integer(1));
-		createTable(0, 0);
-		createTable(1, 1);
-		createTable(2, 1);
-		createIO();
-	}
-
-	public void createTable(int table_id, int table_type)
-	{
-		int X = nrOfSlots + table_type * nrOfSlots;
-		Automaton currTable = new Automaton("Table" + table_id);
-
-		currTable.setType(AutomatonType.PLANT);
-
-		currAlphabet[table_id] = currTable.getAlphabet();
-
-		for (int i = 0; i < X + 1; i++)
-		{
-			filledOneState[i] = currTable.createAndAddUniqueState("q");
-			table_SMatr[table_id][i] = filledOneState[i];
-		}
-
-		filledOneState[0].setInitial(true);
-		filledOneState[0].setAccepting(true);
-		currTable.setInitialState(filledOneState[0]);
-
-		if (table_type == 0)
-		{
-			LabeledEvent putEventL = new LabeledEvent("Shoe_1put_T" + table_id + "L");
-			LabeledEvent getEventL = new LabeledEvent("Shoe_1get_T" + table_id + "L");
-
-			currAlphabet[table_id].addEvent(putEventL);
-			currAlphabet[table_id].addEvent(getEventL);
-
-			LabeledEvent putEventR = new LabeledEvent("Shoe_1put_T" + table_id + "R");
-			LabeledEvent getEventR = new LabeledEvent("Shoe_1get_T" + table_id + "R");
-
-			currAlphabet[table_id].addEvent(putEventR);
-			currAlphabet[table_id].addEvent(getEventR);
-
-			Arc putArcL;
-			Arc getArcL;
-			Arc getArcR;
-			Arc putArcR;
-
-			for (int i = 0; i < X; i++)
-			{
-				putArcL = new Arc(filledOneState[i], filledOneState[i + 1], putEventL);
-				getArcL = new Arc(filledOneState[i + 1], filledOneState[i], getEventL);
-				putArcR = new Arc(filledOneState[i], filledOneState[i + 1], putEventR);
-				getArcR = new Arc(filledOneState[i + 1], filledOneState[i], getEventR);
-			}
-		}
-		else
-		{
-			LabeledEvent putEvent = new LabeledEvent("Shoe_1put_T" + table_id);
-			LabeledEvent getEvent = new LabeledEvent("Shoe_1get_T" + table_id);
-
-			currAlphabet[table_id].addEvent(putEvent);
-			currAlphabet[table_id].addEvent(getEvent);
-
-			Arc putArc;
-			Arc getArc;
-
-			for (int i = 0; i < X; i++)
-			{
-				putArc = new Arc(filledOneState[i], filledOneState[i + 1], putEvent);
-				getArc = new Arc(filledOneState[i + 1], filledOneState[i], getEvent);
-			}
-		}
-
-		LabeledEvent CreatedEvents[] = new LabeledEvent[2];
-
-		if (table_type == 1)
-		{
-			for (int j = 0; j < nrOfStationsPerTable[table_id]; j++)
-			{
-				CreatedEvents = createStation(table_id, sind, currAlphabet[table_id]);
-
-				for (int i = 0; i < X; i++)
-				{
-					Arc putArc = new Arc(filledOneState[i], filledOneState[i + 1], CreatedEvents[0]);
-					Arc getArc = new Arc(filledOneState[i + 1], filledOneState[i], CreatedEvents[1]);
-				}
-
-				sind++;
-			}
-		}
-
-		thePlant.addAutomaton(currTable);
-	}
-
-	public LabeledEvent[] createStation(int table_id, int station_id, Alphabet tableAlphabet)
-	{
-		LabeledEvent[] returnedEvents = new LabeledEvent[2];
-
-		station = new Automaton("Station_" + table_id + "_" + station_id);
-
-		station.setType(AutomatonType.PLANT);
-
-		stationAlphabet[sAindex] = station.getAlphabet();
-
-		LabeledEvent putEvent = new LabeledEvent("Shoe_1put_T" + table_id + "_S" + station_id);
-		LabeledEvent getEvent = new LabeledEvent("Shoe_1get_T" + table_id + "_S" + station_id);
-
-		stationAlphabet[sAindex].addEvent(putEvent);
-		stationAlphabet[sAindex].addEvent(getEvent);
-		tableAlphabet.addEvent(putEvent);
-		tableAlphabet.addEvent(getEvent);
-
-		returnedEvents[0] = putEvent;
-		returnedEvents[1] = getEvent;
-
-		State initialState = station.createAndAddUniqueState("q");
-
-		initialState.setInitial(true);
-		initialState.setAccepting(true);
-		station.setInitialState(initialState);
-
-		State workState = station.createAndAddUniqueState("q");
-
-		station_SMatr[s_SMindex][0] = initialState;
-		station_SMatr[s_SMindex][1] = workState;
-
-		s_SMindex++;
-
-		Arc getArc = new Arc(initialState, workState, getEvent);
-		Arc putArc = new Arc(workState, initialState, putEvent);
-
-		thePlant.addAutomaton(station);
-
-		sAindex++;
-
-		return returnedEvents;
-	}
-
-	public void add_shoe(int snmbr, boolean newShoe)
-	{
-		sAindex = 0;
-		index = 0;
-		sind = 0;
-		IOAlfindex = 0;
-
-		int X = nrOfSlots;
-
-		if (newShoe)
-		{
-			shoesInSystem.add(new Integer(snmbr));
-		}
-
-		LabeledEvent putEventL = new LabeledEvent("Shoe_" + snmbr + "put_T0L");
-		LabeledEvent getEventL = new LabeledEvent("Shoe_" + snmbr + "get_T0L");
-
-		currAlphabet[0].addEvent(putEventL);
-		currAlphabet[0].addEvent(getEventL);
-
-		LabeledEvent putEventR = new LabeledEvent("Shoe_" + snmbr + "put_T0R");
-		LabeledEvent getEventR = new LabeledEvent("Shoe_" + snmbr + "get_T0R");
-
-		currAlphabet[0].addEvent(putEventR);
-		currAlphabet[0].addEvent(getEventR);
-
-		for (int j = 0; j < 12; j++)
-		{
-			Arc putArcL = new Arc(table_SMatr[0][j], table_SMatr[0][j + 1], putEventL);
-			Arc getArcL = new Arc(table_SMatr[0][j + 1], table_SMatr[0][j], getEventL);
-			Arc putArcR = new Arc(table_SMatr[0][j], table_SMatr[0][j + 1], putEventR);
-			Arc getArcR = new Arc(table_SMatr[0][j + 1], table_SMatr[0][j], getEventR);
-		}
-
-		//Add events to tables with stations
-		for (int i = 1; i < 3; i++)
-		{
-			LabeledEvent putEvent = new LabeledEvent("Shoe_" + snmbr + "put_T" + i);
-			LabeledEvent getEvent = new LabeledEvent("Shoe_" + snmbr + "get_T" + i);
-
-			currAlphabet[i].addEvent(putEvent);
-			currAlphabet[i].addEvent(getEvent);
-
-			for (int j = 0; j < 24; j++)
-			{
-				Arc putArc = new Arc(table_SMatr[i][j], table_SMatr[i][j + 1], putEvent);
-				Arc getArc = new Arc(table_SMatr[i][j + 1], table_SMatr[i][j], getEvent);
-			}
-		}
-
-		//Add events to stations
-		for (int i = 1; i < 3; i++)
-		{
-			for (int k = 0; k < nrOfStationsPerTable[i]; k++)
-			{
-				LabeledEvent putEvent = new LabeledEvent("Shoe_" + snmbr + "put_T" + i + "_S" + sind);
-				LabeledEvent getEvent = new LabeledEvent("Shoe_" + snmbr + "get_T" + i + "_S" + sind);
-
-				stationAlphabet[index].addEvent(putEvent);
-				stationAlphabet[index].addEvent(getEvent);
-				currAlphabet[i].addEvent(putEvent);
-				currAlphabet[i].addEvent(getEvent);
-
-				for (int j = 0; j < 24; j++)
-				{
-					Arc putArc = new Arc(table_SMatr[i][j], table_SMatr[i][j + 1], putEvent);
-					Arc getArc = new Arc(table_SMatr[i][j + 1], table_SMatr[i][j], getEvent);
-				}
-
-				Arc putArc = new Arc(station_SMatr[index][0], station_SMatr[index][1], getEvent);
-				Arc getArc = new Arc(station_SMatr[index][1], station_SMatr[index][0], putEvent);
-
-				index++;
-				sind++;
-			}
-		}
-
-		index = 0;
-
-		LabeledEvent putEvent0 = new LabeledEvent("Shoe_" + snmbr + "put_T0L");
-
-		IOAlphabet[IOAlfindex].addEvent(putEvent0);
-
-		IOAlfindex++;
-
-		Arc putArc0 = new Arc(IOSTate[index], IOSTate[index], putEvent0);
-
-		index++;
-
-		LabeledEvent putEvent1 = new LabeledEvent("Shoe_" + snmbr + "put_T0R");
-		LabeledEvent putEvent2 = new LabeledEvent("Shoe_" + snmbr + "put_T1");
-		LabeledEvent putEvent3 = new LabeledEvent("Shoe_" + snmbr + "put_T2");
-		LabeledEvent getEvent1 = new LabeledEvent("Shoe_" + snmbr + "get_T0R");
-		LabeledEvent getEvent2 = new LabeledEvent("Shoe_" + snmbr + "get_T1");
-		LabeledEvent getEvent3 = new LabeledEvent("Shoe_" + snmbr + "get_T2");
-
-		IOAlphabet[IOAlfindex].addEvent(putEvent1);
-		IOAlphabet[IOAlfindex].addEvent(putEvent2);
-		IOAlphabet[IOAlfindex].addEvent(putEvent3);
-		IOAlphabet[IOAlfindex].addEvent(getEvent1);
-		IOAlphabet[IOAlfindex].addEvent(getEvent2);
-		IOAlphabet[IOAlfindex].addEvent(getEvent3);
-
-		IOAlfindex++;
-
-		Arc putArc1 = new Arc(IOSTate[index + 1], IOSTate[index], putEvent1);
-		Arc putArc2 = new Arc(IOSTate[index + 1], IOSTate[index], putEvent2);
-		Arc putArc3 = new Arc(IOSTate[index + 1], IOSTate[index], putEvent3);
-		Arc getArc1 = new Arc(IOSTate[index], IOSTate[index + 1], getEvent1);
-		Arc getArc2 = new Arc(IOSTate[index], IOSTate[index + 1], getEvent2);
-		Arc getArc3 = new Arc(IOSTate[index], IOSTate[index + 1], getEvent3);
-		Arc putArc4 = new Arc(IOSTate[index + 2], IOSTate[index + 1], putEvent1);
-		Arc putArc5 = new Arc(IOSTate[index + 2], IOSTate[index + 1], putEvent2);
-		Arc putArc6 = new Arc(IOSTate[index + 2], IOSTate[index + 1], putEvent3);
-		Arc getArc4 = new Arc(IOSTate[index + 1], IOSTate[index + 2], getEvent1);
-		Arc getArc5 = new Arc(IOSTate[index + 1], IOSTate[index + 2], getEvent2);
-		Arc getArc6 = new Arc(IOSTate[index + 1], IOSTate[index + 2], getEvent3);
-		Arc putArc7 = new Arc(IOSTate[index + 3], IOSTate[index + 2], putEvent1);
-		Arc putArc8 = new Arc(IOSTate[index + 3], IOSTate[index + 2], putEvent2);
-		Arc putArc9 = new Arc(IOSTate[index + 3], IOSTate[index + 2], putEvent3);
-		Arc getArc7 = new Arc(IOSTate[index + 2], IOSTate[index + 3], getEvent1);
-		Arc getArc8 = new Arc(IOSTate[index + 2], IOSTate[index + 3], getEvent2);
-		Arc getArc9 = new Arc(IOSTate[index + 2], IOSTate[index + 3], getEvent3);
-
-		index += 4;
-	}
-
-	public void remove_shoe(int snmbr)
-	{
-		shoesInSystem.remove(shoesInSystem.indexOf(new Integer(snmbr)));
-
-		for (int j = 0; j < currAlphabet.length; j++)
-		{
-			currAlphabet[j].clear();
-		}
-
-		for (int i = 0; i < station_SMatr.length; i++)
-		{
-			for (int j = 0; j < station_SMatr[0].length; j++)
-			{
-				if (station_SMatr[i][j] != null)
-				{
-					station_SMatr[i][j].removeArcs();
-				}
-			}
-		}
-
-		for (int i = 0; i < table_SMatr.length; i++)
-		{
-			for (int j = 0; j < table_SMatr[i].length; j++)
-			{
-				if (table_SMatr[i][j] != null)
-				{
-					table_SMatr[i][j].removeArcs();
-				}
-			}
-		}
-
-		for (int i = 0; i < IOSTate.length; i++)
-		{
-			if (IOSTate[i] != null)
-			{
-				IOSTate[i].removeArcs();
-			}
-		}
-
-		for (int j = 0; j < stationAlphabet.length; j++)
-		{
-			stationAlphabet[j].clear();
-		}
-
-		for (int j = 0; j < IOAlphabet.length; j++)
-		{
-			if (IOAlphabet[j] != null)
-			{
-				IOAlphabet[j].clear();
-			}
-		}
-
-		for (int i = 0; i < shoesInSystem.size(); i++)
-		{
-			add_shoe(((Integer) (shoesInSystem.get(i))).intValue(), false);
-			shoesInSystem.trimToSize();
-		}
-	}
-
-	public void createIO()
-	{
-		Automaton IO0 = new Automaton("IO_0");
-
-		IO0.setType(AutomatonType.PLANT);
-
-		IOAlphabet[Iindex] = IO0.getAlphabet();
-
-		LabeledEvent putEvent = new LabeledEvent("Shoe_1put_T0L");
-
-		IOAlphabet[Iindex].addEvent(putEvent);
-
-		State initialState0 = IO0.createAndAddUniqueState("q");
-
-		IOSTate[IOindex] = initialState0;
-
-		IOindex++;
-
-		initialState0.setInitial(true);
-		initialState0.setAccepting(true);
-		IO0.setInitialState(initialState0);
-
-		Arc putArc = new Arc(initialState0, initialState0, putEvent);
-
-		thePlant.addAutomaton(IO0);
-
-		Iindex++;
-
-		Automaton IO1 = new Automaton("IO_1");
-
-		IO1.setType(AutomatonType.PLANT);
-
-		IOAlphabet[Iindex] = IO1.getAlphabet();
-
-		LabeledEvent putEvent1 = new LabeledEvent("Shoe_1put_T0R");
-		LabeledEvent putEvent2 = new LabeledEvent("Shoe_1put_T1");
-		LabeledEvent putEvent3 = new LabeledEvent("Shoe_1put_T2");
-		LabeledEvent getEvent1 = new LabeledEvent("Shoe_1get_T0R");
-		LabeledEvent getEvent2 = new LabeledEvent("Shoe_1get_T1");
-		LabeledEvent getEvent3 = new LabeledEvent("Shoe_1get_T2");
-
-		IOAlphabet[Iindex].addEvent(putEvent1);
-		IOAlphabet[Iindex].addEvent(putEvent2);
-		IOAlphabet[Iindex].addEvent(putEvent3);
-		IOAlphabet[Iindex].addEvent(getEvent1);
-		IOAlphabet[Iindex].addEvent(getEvent2);
-		IOAlphabet[Iindex].addEvent(getEvent3);
-
-		State initialState1 = IO1.createAndAddUniqueState("q");
-
-		IOSTate[IOindex] = initialState1;
-
-		IOindex++;
-
-		initialState1.setInitial(true);
-		initialState1.setAccepting(true);
-		IO1.setInitialState(initialState1);
-
-		State workState1 = IO1.createAndAddUniqueState("q");
-		State workState2 = IO1.createAndAddUniqueState("q");
-		State workState3 = IO1.createAndAddUniqueState("q");
-
-		IOSTate[IOindex] = workState1;
-
-		IOindex++;
-
-		IOSTate[IOindex] = workState2;
-
-		IOindex++;
-
-		IOSTate[IOindex] = workState3;
-
-		IOindex++;
-
-		Arc putArc1 = new Arc(workState1, initialState1, putEvent1);
-		Arc putArc2 = new Arc(workState1, initialState1, putEvent2);
-		Arc putArc3 = new Arc(workState1, initialState1, putEvent3);
-		Arc getArc1 = new Arc(initialState1, workState1, getEvent1);
-		Arc getArc2 = new Arc(initialState1, workState1, getEvent2);
-		Arc getArc3 = new Arc(initialState1, workState1, getEvent3);
-		Arc putArc4 = new Arc(workState2, workState1, putEvent1);
-		Arc putArc5 = new Arc(workState2, workState1, putEvent2);
-		Arc putArc6 = new Arc(workState2, workState1, putEvent3);
-		Arc getArc4 = new Arc(workState1, workState2, getEvent1);
-		Arc getArc5 = new Arc(workState1, workState2, getEvent2);
-		Arc getArc6 = new Arc(workState1, workState2, getEvent3);
-		Arc putArc7 = new Arc(workState3, workState2, putEvent1);
-		Arc putArc8 = new Arc(workState3, workState2, putEvent2);
-		Arc putArc9 = new Arc(workState3, workState2, putEvent3);
-		Arc getArc7 = new Arc(workState2, workState3, getEvent1);
-		Arc getArc8 = new Arc(workState2, workState3, getEvent2);
-		Arc getArc9 = new Arc(workState2, workState3, getEvent3);
-
-		thePlant.addAutomaton(IO1);
-
-		Iindex++;
-	}
-
-	public Project getPlant()
-	{
-		return thePlant;
-	}
+    State[] filledOneState = new State[100];
+    protected Project thePlant = null;
+    private int[] nrOfStationsPerTable = { 0, 1, 1 };
+    private State[][] table_SMatr = new State[3][25];
+    private State[][] station_SMatr = new State[2][2];
+    private State[] IOSTate = new State[6];
+    private int s_SMindex = 0, index = 0, IOindex = 0, IOAlfindex = 0,
+        Iindex = 0;
+    private Automaton station = null;
+    private Alphabet[] currAlphabet = new Alphabet[3];
+    private Alphabet[] stationAlphabet = new Alphabet[2];
+    private Alphabet[] IOAlphabet = new Alphabet[2];
+    private int nrOfSlots = 12;
+    private int sAindex = 0, sind = 0;
+    private ArrayList shoesInSystem = new ArrayList(1);
+    
+    public PlantDEMO()
+    {
+        thePlant = new Project();
+        
+        shoesInSystem.add(new Integer(1));
+        createTable(0, 0);
+        createTable(1, 1);
+        createTable(2, 1);
+        createIO();
+    }
+    
+    public void createTable(int table_id, int table_type)
+    {
+        int X = nrOfSlots + table_type * nrOfSlots;
+        Automaton currTable = new Automaton("Table" + table_id);
+        
+        currTable.setType(AutomatonType.PLANT);
+        
+        currAlphabet[table_id] = currTable.getAlphabet();
+        
+        for (int i = 0; i < X + 1; i++)
+        {
+            filledOneState[i] = createNewState(currTable,"q");
+            table_SMatr[table_id][i] = filledOneState[i];
+        }
+        
+        filledOneState[0].setInitial(true);
+        filledOneState[0].setAccepting(true);
+        currTable.setInitialState(filledOneState[0]);
+        
+        if (table_type == 0)
+        {
+            LabeledEvent putEventL = new LabeledEvent("Shoe_1put_T" + table_id + "L");
+            LabeledEvent getEventL = new LabeledEvent("Shoe_1get_T" + table_id + "L");
+            
+            currAlphabet[table_id].addEvent(putEventL);
+            currAlphabet[table_id].addEvent(getEventL);
+            
+            LabeledEvent putEventR = new LabeledEvent("Shoe_1put_T" + table_id + "R");
+            LabeledEvent getEventR = new LabeledEvent("Shoe_1get_T" + table_id + "R");
+            
+            currAlphabet[table_id].addEvent(putEventR);
+            currAlphabet[table_id].addEvent(getEventR);
+            
+            Arc putArcL;
+            Arc getArcL;
+            Arc getArcR;
+            Arc putArcR;
+            
+            for (int i = 0; i < X; i++)
+            {
+                putArcL = new Arc(filledOneState[i], filledOneState[i + 1], putEventL);
+                getArcL = new Arc(filledOneState[i + 1], filledOneState[i], getEventL);
+                putArcR = new Arc(filledOneState[i], filledOneState[i + 1], putEventR);
+                getArcR = new Arc(filledOneState[i + 1], filledOneState[i], getEventR);
+            }
+        }
+        else
+        {
+            LabeledEvent putEvent = new LabeledEvent("Shoe_1put_T" + table_id);
+            LabeledEvent getEvent = new LabeledEvent("Shoe_1get_T" + table_id);
+            
+            currAlphabet[table_id].addEvent(putEvent);
+            currAlphabet[table_id].addEvent(getEvent);
+            
+            Arc putArc;
+            Arc getArc;
+            
+            for (int i = 0; i < X; i++)
+            {
+                putArc = new Arc(filledOneState[i], filledOneState[i + 1], putEvent);
+                getArc = new Arc(filledOneState[i + 1], filledOneState[i], getEvent);
+            }
+        }
+        
+        LabeledEvent CreatedEvents[] = new LabeledEvent[2];
+        
+        if (table_type == 1)
+        {
+            for (int j = 0; j < nrOfStationsPerTable[table_id]; j++)
+            {
+                CreatedEvents = createStation(table_id, sind, currAlphabet[table_id]);
+                
+                for (int i = 0; i < X; i++)
+                {
+                    Arc putArc = new Arc(filledOneState[i], filledOneState[i + 1], CreatedEvents[0]);
+                    Arc getArc = new Arc(filledOneState[i + 1], filledOneState[i], CreatedEvents[1]);
+                }
+                
+                sind++;
+            }
+        }
+        
+        thePlant.addAutomaton(currTable);
+    }
+    
+    public LabeledEvent[] createStation(int table_id, int station_id, Alphabet tableAlphabet)
+    {
+        LabeledEvent[] returnedEvents = new LabeledEvent[2];
+        
+        station = new Automaton("Station_" + table_id + "_" + station_id);
+        
+        station.setType(AutomatonType.PLANT);
+        
+        stationAlphabet[sAindex] = station.getAlphabet();
+        
+        LabeledEvent putEvent = new LabeledEvent("Shoe_1put_T" + table_id + "_S" + station_id);
+        LabeledEvent getEvent = new LabeledEvent("Shoe_1get_T" + table_id + "_S" + station_id);
+        
+        stationAlphabet[sAindex].addEvent(putEvent);
+        stationAlphabet[sAindex].addEvent(getEvent);
+        tableAlphabet.addEvent(putEvent);
+        tableAlphabet.addEvent(getEvent);
+        
+        returnedEvents[0] = putEvent;
+        returnedEvents[1] = getEvent;
+        
+        State initialState = createNewState(station,"q");
+        
+        initialState.setInitial(true);
+        initialState.setAccepting(true);
+        station.setInitialState(initialState);
+        
+        State workState = createNewState(station,"q");
+        
+        station_SMatr[s_SMindex][0] = initialState;
+        station_SMatr[s_SMindex][1] = workState;
+        
+        s_SMindex++;
+        
+        Arc getArc = new Arc(initialState, workState, getEvent);
+        Arc putArc = new Arc(workState, initialState, putEvent);
+        
+        thePlant.addAutomaton(station);
+        
+        sAindex++;
+        
+        return returnedEvents;
+    }
+    
+    public void add_shoe(int snmbr, boolean newShoe)
+    {
+        sAindex = 0;
+        index = 0;
+        sind = 0;
+        IOAlfindex = 0;
+        
+        int X = nrOfSlots;
+        
+        if (newShoe)
+        {
+            shoesInSystem.add(new Integer(snmbr));
+        }
+        
+        LabeledEvent putEventL = new LabeledEvent("Shoe_" + snmbr + "put_T0L");
+        LabeledEvent getEventL = new LabeledEvent("Shoe_" + snmbr + "get_T0L");
+        
+        currAlphabet[0].addEvent(putEventL);
+        currAlphabet[0].addEvent(getEventL);
+        
+        LabeledEvent putEventR = new LabeledEvent("Shoe_" + snmbr + "put_T0R");
+        LabeledEvent getEventR = new LabeledEvent("Shoe_" + snmbr + "get_T0R");
+        
+        currAlphabet[0].addEvent(putEventR);
+        currAlphabet[0].addEvent(getEventR);
+        
+        for (int j = 0; j < 12; j++)
+        {
+            Arc putArcL = new Arc(table_SMatr[0][j], table_SMatr[0][j + 1], putEventL);
+            Arc getArcL = new Arc(table_SMatr[0][j + 1], table_SMatr[0][j], getEventL);
+            Arc putArcR = new Arc(table_SMatr[0][j], table_SMatr[0][j + 1], putEventR);
+            Arc getArcR = new Arc(table_SMatr[0][j + 1], table_SMatr[0][j], getEventR);
+        }
+        
+        //Add events to tables with stations
+        for (int i = 1; i < 3; i++)
+        {
+            LabeledEvent putEvent = new LabeledEvent("Shoe_" + snmbr + "put_T" + i);
+            LabeledEvent getEvent = new LabeledEvent("Shoe_" + snmbr + "get_T" + i);
+            
+            currAlphabet[i].addEvent(putEvent);
+            currAlphabet[i].addEvent(getEvent);
+            
+            for (int j = 0; j < 24; j++)
+            {
+                Arc putArc = new Arc(table_SMatr[i][j], table_SMatr[i][j + 1], putEvent);
+                Arc getArc = new Arc(table_SMatr[i][j + 1], table_SMatr[i][j], getEvent);
+            }
+        }
+        
+        //Add events to stations
+        for (int i = 1; i < 3; i++)
+        {
+            for (int k = 0; k < nrOfStationsPerTable[i]; k++)
+            {
+                LabeledEvent putEvent = new LabeledEvent("Shoe_" + snmbr + "put_T" + i + "_S" + sind);
+                LabeledEvent getEvent = new LabeledEvent("Shoe_" + snmbr + "get_T" + i + "_S" + sind);
+                
+                stationAlphabet[index].addEvent(putEvent);
+                stationAlphabet[index].addEvent(getEvent);
+                currAlphabet[i].addEvent(putEvent);
+                currAlphabet[i].addEvent(getEvent);
+                
+                for (int j = 0; j < 24; j++)
+                {
+                    Arc putArc = new Arc(table_SMatr[i][j], table_SMatr[i][j + 1], putEvent);
+                    Arc getArc = new Arc(table_SMatr[i][j + 1], table_SMatr[i][j], getEvent);
+                }
+                
+                Arc putArc = new Arc(station_SMatr[index][0], station_SMatr[index][1], getEvent);
+                Arc getArc = new Arc(station_SMatr[index][1], station_SMatr[index][0], putEvent);
+                
+                index++;
+                sind++;
+            }
+        }
+        
+        index = 0;
+        
+        LabeledEvent putEvent0 = new LabeledEvent("Shoe_" + snmbr + "put_T0L");
+        
+        IOAlphabet[IOAlfindex].addEvent(putEvent0);
+        
+        IOAlfindex++;
+        
+        Arc putArc0 = new Arc(IOSTate[index], IOSTate[index], putEvent0);
+        
+        index++;
+        
+        LabeledEvent putEvent1 = new LabeledEvent("Shoe_" + snmbr + "put_T0R");
+        LabeledEvent putEvent2 = new LabeledEvent("Shoe_" + snmbr + "put_T1");
+        LabeledEvent putEvent3 = new LabeledEvent("Shoe_" + snmbr + "put_T2");
+        LabeledEvent getEvent1 = new LabeledEvent("Shoe_" + snmbr + "get_T0R");
+        LabeledEvent getEvent2 = new LabeledEvent("Shoe_" + snmbr + "get_T1");
+        LabeledEvent getEvent3 = new LabeledEvent("Shoe_" + snmbr + "get_T2");
+        
+        IOAlphabet[IOAlfindex].addEvent(putEvent1);
+        IOAlphabet[IOAlfindex].addEvent(putEvent2);
+        IOAlphabet[IOAlfindex].addEvent(putEvent3);
+        IOAlphabet[IOAlfindex].addEvent(getEvent1);
+        IOAlphabet[IOAlfindex].addEvent(getEvent2);
+        IOAlphabet[IOAlfindex].addEvent(getEvent3);
+        
+        IOAlfindex++;
+        
+        Arc putArc1 = new Arc(IOSTate[index + 1], IOSTate[index], putEvent1);
+        Arc putArc2 = new Arc(IOSTate[index + 1], IOSTate[index], putEvent2);
+        Arc putArc3 = new Arc(IOSTate[index + 1], IOSTate[index], putEvent3);
+        Arc getArc1 = new Arc(IOSTate[index], IOSTate[index + 1], getEvent1);
+        Arc getArc2 = new Arc(IOSTate[index], IOSTate[index + 1], getEvent2);
+        Arc getArc3 = new Arc(IOSTate[index], IOSTate[index + 1], getEvent3);
+        Arc putArc4 = new Arc(IOSTate[index + 2], IOSTate[index + 1], putEvent1);
+        Arc putArc5 = new Arc(IOSTate[index + 2], IOSTate[index + 1], putEvent2);
+        Arc putArc6 = new Arc(IOSTate[index + 2], IOSTate[index + 1], putEvent3);
+        Arc getArc4 = new Arc(IOSTate[index + 1], IOSTate[index + 2], getEvent1);
+        Arc getArc5 = new Arc(IOSTate[index + 1], IOSTate[index + 2], getEvent2);
+        Arc getArc6 = new Arc(IOSTate[index + 1], IOSTate[index + 2], getEvent3);
+        Arc putArc7 = new Arc(IOSTate[index + 3], IOSTate[index + 2], putEvent1);
+        Arc putArc8 = new Arc(IOSTate[index + 3], IOSTate[index + 2], putEvent2);
+        Arc putArc9 = new Arc(IOSTate[index + 3], IOSTate[index + 2], putEvent3);
+        Arc getArc7 = new Arc(IOSTate[index + 2], IOSTate[index + 3], getEvent1);
+        Arc getArc8 = new Arc(IOSTate[index + 2], IOSTate[index + 3], getEvent2);
+        Arc getArc9 = new Arc(IOSTate[index + 2], IOSTate[index + 3], getEvent3);
+        
+        index += 4;
+    }
+    
+    public void remove_shoe(int snmbr)
+    {
+        shoesInSystem.remove(shoesInSystem.indexOf(new Integer(snmbr)));
+        
+        for (int j = 0; j < currAlphabet.length; j++)
+        {
+            currAlphabet[j].clear();
+        }
+        
+        for (int i = 0; i < station_SMatr.length; i++)
+        {
+            for (int j = 0; j < station_SMatr[0].length; j++)
+            {
+                if (station_SMatr[i][j] != null)
+                {
+                    station_SMatr[i][j].removeArcs();
+                }
+            }
+        }
+        
+        for (int i = 0; i < table_SMatr.length; i++)
+        {
+            for (int j = 0; j < table_SMatr[i].length; j++)
+            {
+                if (table_SMatr[i][j] != null)
+                {
+                    table_SMatr[i][j].removeArcs();
+                }
+            }
+        }
+        
+        for (int i = 0; i < IOSTate.length; i++)
+        {
+            if (IOSTate[i] != null)
+            {
+                IOSTate[i].removeArcs();
+            }
+        }
+        
+        for (int j = 0; j < stationAlphabet.length; j++)
+        {
+            stationAlphabet[j].clear();
+        }
+        
+        for (int j = 0; j < IOAlphabet.length; j++)
+        {
+            if (IOAlphabet[j] != null)
+            {
+                IOAlphabet[j].clear();
+            }
+        }
+        
+        for (int i = 0; i < shoesInSystem.size(); i++)
+        {
+            add_shoe(((Integer) (shoesInSystem.get(i))).intValue(), false);
+            shoesInSystem.trimToSize();
+        }
+    }
+    
+    public void createIO()
+    {
+        Automaton IO0 = new Automaton("IO_0");
+        
+        IO0.setType(AutomatonType.PLANT);
+        
+        IOAlphabet[Iindex] = IO0.getAlphabet();
+        
+        LabeledEvent putEvent = new LabeledEvent("Shoe_1put_T0L");
+        
+        IOAlphabet[Iindex].addEvent(putEvent);
+        
+        State initialState0 = createNewState(IO0,"q");
+        
+        IOSTate[IOindex] = initialState0;
+        
+        IOindex++;
+        
+        initialState0.setInitial(true);
+        initialState0.setAccepting(true);
+        IO0.setInitialState(initialState0);
+        
+        Arc putArc = new Arc(initialState0, initialState0, putEvent);
+        
+        thePlant.addAutomaton(IO0);
+        
+        Iindex++;
+        
+        Automaton IO1 = new Automaton("IO_1");
+        
+        IO1.setType(AutomatonType.PLANT);
+        
+        IOAlphabet[Iindex] = IO1.getAlphabet();
+        
+        LabeledEvent putEvent1 = new LabeledEvent("Shoe_1put_T0R");
+        LabeledEvent putEvent2 = new LabeledEvent("Shoe_1put_T1");
+        LabeledEvent putEvent3 = new LabeledEvent("Shoe_1put_T2");
+        LabeledEvent getEvent1 = new LabeledEvent("Shoe_1get_T0R");
+        LabeledEvent getEvent2 = new LabeledEvent("Shoe_1get_T1");
+        LabeledEvent getEvent3 = new LabeledEvent("Shoe_1get_T2");
+        
+        IOAlphabet[Iindex].addEvent(putEvent1);
+        IOAlphabet[Iindex].addEvent(putEvent2);
+        IOAlphabet[Iindex].addEvent(putEvent3);
+        IOAlphabet[Iindex].addEvent(getEvent1);
+        IOAlphabet[Iindex].addEvent(getEvent2);
+        IOAlphabet[Iindex].addEvent(getEvent3);
+        
+        State initialState1 = createNewState(IO1,"q");
+        
+        IOSTate[IOindex] = initialState1;
+        
+        IOindex++;
+        
+        initialState1.setInitial(true);
+        initialState1.setAccepting(true);
+        IO1.setInitialState(initialState1);
+        
+        State workState1 = createNewState(IO1,"q");
+        State workState2 = createNewState(IO1,"q");
+        State workState3 = createNewState(IO1,"q");
+        
+        IOSTate[IOindex] = workState1;
+        
+        IOindex++;
+        
+        IOSTate[IOindex] = workState2;
+        
+        IOindex++;
+        
+        IOSTate[IOindex] = workState3;
+        
+        IOindex++;
+        
+        Arc putArc1 = new Arc(workState1, initialState1, putEvent1);
+        Arc putArc2 = new Arc(workState1, initialState1, putEvent2);
+        Arc putArc3 = new Arc(workState1, initialState1, putEvent3);
+        Arc getArc1 = new Arc(initialState1, workState1, getEvent1);
+        Arc getArc2 = new Arc(initialState1, workState1, getEvent2);
+        Arc getArc3 = new Arc(initialState1, workState1, getEvent3);
+        Arc putArc4 = new Arc(workState2, workState1, putEvent1);
+        Arc putArc5 = new Arc(workState2, workState1, putEvent2);
+        Arc putArc6 = new Arc(workState2, workState1, putEvent3);
+        Arc getArc4 = new Arc(workState1, workState2, getEvent1);
+        Arc getArc5 = new Arc(workState1, workState2, getEvent2);
+        Arc getArc6 = new Arc(workState1, workState2, getEvent3);
+        Arc putArc7 = new Arc(workState3, workState2, putEvent1);
+        Arc putArc8 = new Arc(workState3, workState2, putEvent2);
+        Arc putArc9 = new Arc(workState3, workState2, putEvent3);
+        Arc getArc7 = new Arc(workState2, workState3, getEvent1);
+        Arc getArc8 = new Arc(workState2, workState3, getEvent2);
+        Arc getArc9 = new Arc(workState2, workState3, getEvent3);
+        
+        thePlant.addAutomaton(IO1);
+        
+        Iindex++;
+    }
+    
+    public Project getPlant()
+    {
+        return thePlant;
+    }
+    
+    private State createNewState(Automaton aut, String prefix)
+    {
+        State state = aut.createUniqueState(prefix);
+        aut.addState(state);
+        return state;
+    }
 }

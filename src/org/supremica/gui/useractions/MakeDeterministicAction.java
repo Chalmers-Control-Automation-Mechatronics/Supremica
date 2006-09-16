@@ -172,7 +172,8 @@ public class MakeDeterministicAction
 	 */
 	private void epsilonize(Arc arc, Automaton automaton)
 	{
-		State x = automaton.createAndAddUniqueState("");    // This is the new intermediate state
+		State x = automaton.createUniqueState();    // This is the new intermediate state
+                automaton.addState(x);
 		Arc arc1 = new Arc(arc.getFromState(), x, epsilon);
 		Arc arc2 = new Arc(x, arc.getToState(), arc.getEvent());
 

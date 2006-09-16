@@ -356,6 +356,7 @@ public class Automaton
         
         if (theStates.contains(state))
         {
+            logger.warn("Automaton " + this + " already contains the state " + state + ".");
             return 1;
         }
         
@@ -686,7 +687,7 @@ public class Automaton
         
         if ((prefix == null) || prefix.equals(""))
         {
-            name = new StringBuffer("q");
+            name = new StringBuffer("r");
         }
         else
         {
@@ -700,23 +701,10 @@ public class Automaton
         
         return new State(name.toString());
     }
+    
     public State createUniqueState()
     {
-        return createUniqueState("q");
-    }
-    
-    /**
-     * Returns a uniquely named (and id'ed) state.
-     * Add it to the state set
-     * Passing null or empty prefix sets prefix to 'q'
-     */ //is this one really necessary? clogs the interface. Besides, for exception-safet, one function, one task //MF
-    public State createAndAddUniqueState(String prefix)
-    {
-        State newstate = createUniqueState(prefix);
-        
-        addState(newstate);
-        
-        return newstate;
+        return createUniqueState("p");
     }
     
     /**
@@ -1401,7 +1389,7 @@ public class Automaton
         {
             State currState = stateIt.next();
             
-            currState.setName("q" + currState.getIndex());
+            currState.setName("n" + currState.getIndex());
         }
         
         remapStateIndices();
@@ -1466,9 +1454,7 @@ public class Automaton
             uniqueStateIndex++;
         }
         
-        uniqueStateIndex++;
-        
-        return uniqueStateIndex - 1;
+        return uniqueStateIndex;
     }
     
     public void clearVisitedStates()
