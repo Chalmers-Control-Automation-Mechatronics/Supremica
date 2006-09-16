@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.34 2006-09-13 14:36:46 flordal Exp $
+//# $Id: ModuleContainer.java,v 1.35 2006-09-16 16:58:48 flordal Exp $
 //###########################################################################
 
 
@@ -315,6 +315,9 @@ public class ModuleContainer implements UndoInterface
         }
     }
     
+    /**
+     * Updates the automata in the analyzer-tab.
+     */
     public void updateAutomata()
     {
         try

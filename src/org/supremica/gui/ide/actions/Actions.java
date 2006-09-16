@@ -37,12 +37,16 @@ public class Actions
     public IDEAction editorAddInstanceAction = new EditorAddInstanceAction(allActions);
     public IDEAction editorAddBindingAction = new EditorAddBindingAction(allActions);
     
+    // Analyzer Options
+    public IDEAction analyzerOptionsAction = new AnalyzerOptionsAction(allActions);
     // Analyzer Actions
     public IDEAction analyzerWorkbenchAction = new WorkbenchAction(allActions);
     public IDEAction analyzerSynchronizerAction = new AnalyzerSynchronizerAction(allActions);
     public IDEAction analyzerSynthesizerAction = new AnalyzerSynthesizerAction(allActions);
     public IDEAction analyzerVerifierAction = new AnalyzerVerifierAction(allActions);
-    public IDEAction analyzerOptionsAction = new AnalyzerOptionsAction(allActions);
+    public IDEAction analyzerSendToEditorAction = new AnalyzerSendToEditorAction(allActions);
+    public IDEAction analyzerDeleteSelectedAction = new AnalyzerDeleteSelectedAutomataAction(allActions);
+    public IDEAction analyzerDeleteAllAction = new AnalyzerDeleteAllAutomataAction(allActions);
     
     // Tools Actions
     public IDEAction toolsTestCasesAction = new ToolsTestCasesAction(allActions);

@@ -6,17 +6,17 @@ import org.supremica.gui.Supremica;
 import org.supremica.gui.ActionMan;
 
 public class DeleteAction
-	extends AbstractAction
+    extends AbstractAction
 {
-	public DeleteAction()
-	{
-		super("Delete...", new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Delete16.gif")));
-
-		putValue(SHORT_DESCRIPTION, "Delete selected automata");
-	}
-
-	public void actionPerformed(ActionEvent e)
-	{
-		ActionMan.automataDelete_actionPerformed(ActionMan.getGui());
-	}
+    public DeleteAction()
+    {
+        super("Delete...", new ImageIcon(Supremica.class.getResource("/toolbarButtonGraphics/general/Delete16.gif")));
+        
+        putValue(SHORT_DESCRIPTION, "Delete selected automata");
+    }
+    
+    public void actionPerformed(ActionEvent e)
+    {
+        ActionMan.automataDelete_actionPerformed(ActionMan.getGui());
+    }
 }

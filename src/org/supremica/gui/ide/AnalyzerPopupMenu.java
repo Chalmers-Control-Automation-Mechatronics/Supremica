@@ -11,35 +11,40 @@ import org.supremica.log.*;
 import org.supremica.gui.ide.actions.IDEActionInterface;
 
 class AnalyzerPopupMenu
-	extends VPopupMenu
+    extends VPopupMenu
 {
-	private static Logger logger = LoggerFactory.createLogger(AnalyzerPopupMenu.class);
-
-	private static final long serialVersionUID = 1L;
-	private IDEActionInterface ide;
-
-	public AnalyzerPopupMenu(JFrame parent, IDEActionInterface ide)
-	{
-		setInvoker(parent);
-		this.ide = ide;
-
-		try
-		{
-			initPopups();
-		}
-		catch (Exception ex)
-		{
-			logger.error(ex);
-		}
-	}
-
-	private void initPopups()
-		throws Exception
-	{
-		add(ide.getActions().analyzerSynchronizerAction.getMenuItem());
-		add(ide.getActions().analyzerSynthesizerAction.getMenuItem());
-		add(ide.getActions().analyzerVerifierAction.getMenuItem());
-		addSeparator();
-		add(ide.getActions().analyzerWorkbenchAction.getMenuItem());
-	}
+    private static Logger logger = LoggerFactory.createLogger(AnalyzerPopupMenu.class);
+    
+    private static final long serialVersionUID = 1L;
+    private IDEActionInterface ide;
+    
+    public AnalyzerPopupMenu(JFrame parent, IDEActionInterface ide)
+    {
+        setInvoker(parent);
+        this.ide = ide;
+        
+        try
+        {
+            initPopups();
+        }
+        catch (Exception ex)
+        {
+            logger.error(ex);
+        }
+    }
+    
+    private void initPopups()
+    throws Exception
+    {
+        add(ide.getActions().analyzerDeleteSelectedAction.getMenuItem());
+        add(ide.getActions().analyzerDeleteAllAction.getMenuItem());
+        addSeparator();
+        add(ide.getActions().analyzerWorkbenchAction.getMenuItem());
+        addSeparator();
+        add(ide.getActions().analyzerSynchronizerAction.getMenuItem());
+        add(ide.getActions().analyzerSynthesizerAction.getMenuItem());
+        add(ide.getActions().analyzerVerifierAction.getMenuItem());
+        addSeparator();
+        add(ide.getActions().analyzerSendToEditorAction.getMenuItem());
+    }
 }

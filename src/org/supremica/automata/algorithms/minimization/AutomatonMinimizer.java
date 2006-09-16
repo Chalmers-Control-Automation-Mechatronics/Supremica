@@ -85,8 +85,8 @@ public class AutomatonMinimizer
     private static int totalCC = 0;
     private static int totalD = 0;
     private static int totalOSO = 0;
-    private static int totalOE = 0;
-    private static int totalArcs = 0;
+    private static int totalOES = 0;
+    private static int totalOET = 0;
     
     // Use short names (state names are either integers or based on their parent states)
     private boolean useShortNames = false;
@@ -259,7 +259,7 @@ public class AutomatonMinimizer
                     logger.verbose("Removed " + loopCount + " states involved in silent loops " +
                         "before running the partitioning.");
                 }
-                totalOE = totalOE + trivialCount + loopCount;
+                totalOES = totalOES + trivialCount + loopCount;
             }
             
             ////////////
@@ -361,7 +361,7 @@ public class AutomatonMinimizer
             theAutomaton.beginTransaction();
         }
         int diffSize = statesBefore - theAutomaton.nbrOfStates();
-        totalOE += diffSize;
+        totalOES += diffSize;
         if (diffSize > 0)
         {
             logger.verbose("Removed " + diffSize + " states based on partitioning with " +
@@ -393,7 +393,7 @@ public class AutomatonMinimizer
         {
             int addedArcs = epsilonSaturate(theAutomaton, false);
             int removedArcs = removeRedundantTransitions(theAutomaton);
-            totalArcs += removedArcs-addedArcs;
+            totalOET += removedArcs-addedArcs;
         }
         
         // Remove from alphabet epsilon events that are never used
@@ -947,7 +947,7 @@ public class AutomatonMinimizer
             do
             {
                 // Remove redundant transitions
-                int countArcs = removeRedundantTransitions(aut);
+                int countOET = removeRedundantTransitions(aut);
                 int countSC = 0;
                 int countOSI = 0;
                 int countAE = 0;
@@ -963,7 +963,7 @@ public class AutomatonMinimizer
                 }
                 if (countSC > 0)
                 {
-                    countArcs += removeRedundantTransitions(aut);
+                    countOET += removeRedundantTransitions(aut);
                 }
                 // Rule B
                 if (options.getUseRuleAE())
@@ -973,7 +973,7 @@ public class AutomatonMinimizer
                 }
                 if (countAE > 0)
                 {
-                    countArcs += removeRedundantTransitions(aut);
+                    countOET += removeRedundantTransitions(aut);
                 }
                 // Rule AA
                 if (options.getUseRuleOSI())
@@ -983,7 +983,7 @@ public class AutomatonMinimizer
                 }
                 if (countOSI > 0)
                 {
-                    countArcs += removeRedundantTransitions(aut);
+                    countOET += removeRedundantTransitions(aut);
                 }
                 // Rule C
                 if (true)
@@ -999,13 +999,14 @@ public class AutomatonMinimizer
                         countOSO = ruleOnlySilentOut(aut);
                         totalOSO += countOSO;
                         if (countOSO > 0)
-                            countArcs += removeRedundantTransitions(aut);
+                            countOET += removeRedundantTransitions(aut);
                     } while (countOSO > 0);
                 }
+                totalOET += countOET;
                 
                 logger.debug("Rule SC: " + countSC + ", rule AE: " + countAE +
                     ", rule CC: " + countCC + ", rule OSI: " + countOSI + 
-                    ", rule OSO: " + countOSO + ", arcs: " + countArcs);
+                    ", rule OSO: " + countOSO + ", count OET: " + countOET);
                 count = countSC+countOSI+countAE+countCC+countOSO;
                 total += count;
             } while (count > 0);
@@ -1744,15 +1745,15 @@ public class AutomatonMinimizer
     
     public static String getStatistics()
     {
-        return ("Reduction statistics: silentCont: " + totalSC + ", onlySilentIn: " + totalOSI + ", activeEvent: " + totalAE + ", certainConf: " + totalCC + ", D: " + totalD + ", onlySilentOut: " + totalOSO + ", OE: " + totalOE + ", Arcs: " + totalArcs + ".");
+        return ("Reduction statistics: activeEvent: " + totalAE + ", silentCont: " + totalSC + ", certainConf: " + totalCC + ", onlySilentIn: " + totalOSI + ", onlySilentOut: " + totalOSO + ", D: " + totalD + ", OES: " + totalOES + ", OET: " + totalOET + ".");
     }
     public static String getStatisticsLaTeX()
     {
-        return(totalAE + " & " + totalSC + " & " + totalOSI + " & " + totalOSO + " & " + totalCC + " & " + totalOE + " & " + totalArcs);
+        return(totalAE + " & " + totalSC + " & " + totalOSI + " & " + totalOSO + " & " + totalCC + " & " + totalOES + " & " + totalOET);
     }
     public static String getWodesStatisticsLaTeX()
     {
-        return(totalAE + " & " + totalSC + " & " + totalCC + " & " + (totalOSI + totalOSO) + " & " + totalOE + " & " + totalArcs);
+        return(totalAE + " & " + totalSC + " & " + totalCC + " & " + (totalOSI + totalOSO) + " & " + totalOES + " & " + totalOET);
     }
     public static void resetTotal()
     {
@@ -1762,8 +1763,8 @@ public class AutomatonMinimizer
         totalCC = 0;
         totalD = 0;
         totalOSO = 0;
-        totalOE = 0;
-        totalArcs = 0;
+        totalOES = 0;
+        totalOET = 0;
     }
     
     /**
