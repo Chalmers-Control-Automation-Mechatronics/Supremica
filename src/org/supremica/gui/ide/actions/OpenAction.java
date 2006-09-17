@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   OpenAction
 //###########################################################################
-//# $Id: OpenAction.java,v 1.17 2006-09-17 10:24:00 flordal Exp $
+//# $Id: OpenAction.java,v 1.18 2006-09-17 18:04:16 flordal Exp $
 //###########################################################################
 
 
@@ -44,7 +44,7 @@ public class OpenAction
     }
 
     /**
-     * Ugly override, we need the ide...
+     * Ugly override, we need the IDE for initialisation...
      */
     public void setIDEActionInterface(IDEActionInterface ide)
     {
@@ -97,7 +97,8 @@ public class OpenAction
             ModuleSubject module;
             try
             {
-                 module = (ModuleSubject) ide.getIDE().getDocumentManager().load(file);
+                // The documentmanager does the loading, by extension
+                module = (ModuleSubject) ide.getIDE().getDocumentManager().load(file);
             }
             catch (RuntimeException ex)
             {

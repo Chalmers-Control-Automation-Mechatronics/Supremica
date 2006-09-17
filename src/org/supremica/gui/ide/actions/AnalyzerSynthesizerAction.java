@@ -3,6 +3,7 @@ package org.supremica.gui.ide.actions;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.SynthesizerDialog;
 import org.supremica.gui.AutomataSynthesisWorker;
@@ -24,6 +25,8 @@ public class AnalyzerSynthesizerAction
         setAnalyzerActiveRequired(true);
         
         putValue(Action.NAME, "Synthesize...");
+        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_Y));
+        //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));        
         putValue(Action.SHORT_DESCRIPTION, "Synthesize a supervisor for the selected automata");
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/synthesize16.gif")));        
     }

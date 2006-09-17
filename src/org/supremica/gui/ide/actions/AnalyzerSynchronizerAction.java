@@ -3,6 +3,7 @@ package org.supremica.gui.ide.actions;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.SynchronizationDialog;
 import org.supremica.gui.AutomataSynchronizerWorker;
@@ -23,9 +24,12 @@ public class AnalyzerSynchronizerAction
         super(actionList);
         
         setAnalyzerActiveRequired(true);
+        setMinimumNumberOfSelectedComponents(2);
         
         putValue(Action.NAME, "Synchronize...");
         putValue(Action.SHORT_DESCRIPTION, "Synchronize the selected automata");
+        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_S));
+        //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/synchronize16.gif")));
     }
     

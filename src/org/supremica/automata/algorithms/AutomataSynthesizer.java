@@ -195,6 +195,17 @@ public class AutomataSynthesizer
                     }
                 }
             }
+            else if (type == SynthesisType.CONTROLLABLE)
+            {
+                // Only controllable? Then everything should be considered marked... 
+                // and AFTER that, the specs must be plantified!
+                for (Automaton automaton : theAutomata)
+                {
+                    automaton.setAllStatesAccepting();
+                }                
+                // Plantify specs
+                MinimizationHelper.plantify(theAutomata);
+            }
             else if (type == SynthesisType.NONBLOCKINGCONTROLLABLE)
             {
                 // NONBLOCKING and controllable. Plantify the specifications and supervisors!
@@ -333,7 +344,7 @@ public class AutomataSynthesizer
         Automata supervisors = new Automata();
         
         // Selector - always start with non-max perm
-        AutomataSelector selector = new AutomataSelector(aut);
+        AutomataSelector selector = AutomataSelectorFactory.getAutomataSelector(aut, synthesizerOptions);
         
         // Initialize execution dialog
         java.awt.EventQueue.invokeLater(new Runnable()

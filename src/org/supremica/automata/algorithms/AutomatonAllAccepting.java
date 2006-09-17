@@ -62,6 +62,6 @@ public class AutomatonAllAccepting
 
 	public void execute()
 	{
-		theAutomaton.setAllStatesAsAccepting();
+		theAutomaton.setAllStatesAccepting();
 	}
 }

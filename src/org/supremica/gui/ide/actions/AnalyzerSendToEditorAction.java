@@ -31,7 +31,7 @@ public class AnalyzerSendToEditorAction
         setEditorActiveRequired(false);
         setAnalyzerActiveRequired(false);
         
-        putValue(Action.NAME, "Send to editor");
+        putValue(Action.NAME, "To editor");
         putValue(Action.SHORT_DESCRIPTION, "Send selected automata to editor");
         putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_E));
         //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));

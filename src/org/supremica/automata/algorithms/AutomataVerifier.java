@@ -1644,7 +1644,7 @@ public class AutomataVerifier
         // Mark all states in all automata
         for (Automaton automaton : theAutomata)
         {
-            automaton.setAllStatesAsAccepting();
+            automaton.setAllStatesAccepting();
         }
 
         // Plantify all automata

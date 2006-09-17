@@ -407,6 +407,7 @@ public class Automata
      */
     public Automata getSpecificationAndSupervisorAutomata()
     {
+        /*
         Automata newAutomata = new Automata();
         
         for (Iterator theIt = specificationIterator(); theIt.hasNext(); )
@@ -422,6 +423,12 @@ public class Automata
             
             newAutomata.addAutomaton(currAutomaton);
         }
+        
+        return newAutomata;
+        */
+
+        Automata newAutomata = getSpecificationAutomata();
+        newAutomata.addAutomata(getSupervisorAutomata());
         
         return newAutomata;
     }

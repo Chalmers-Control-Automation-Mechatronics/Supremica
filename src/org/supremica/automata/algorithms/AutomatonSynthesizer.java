@@ -79,14 +79,18 @@ public class AutomatonSynthesizer
         this.synthesizerOptions = synthesizerOptions;
     }
     
-    // Synthesize a monolithic supervisor
+    /**
+     * Synthesize a monolithic supervisor.
+     */
     public boolean synthesize()
     throws Exception
     {
-        logger.debug("AutomatonSynthesizer::synthesize()");
+        logger.debug("AutomatonSynthesizer.synthesize...");
         theAutomaton.beginTransaction();
-        SynthesisType synthesisType = synthesizerOptions.getSynthesisType();
+
+        // Find out which type of synthesis and do it!
         boolean didSomething = false;    // records whether we actually did anything
+        SynthesisType synthesisType = synthesizerOptions.getSynthesisType();
         if (synthesisType == SynthesisType.CONTROLLABLE)
         {
             didSomething = synthesizeControllable();
@@ -103,14 +107,24 @@ public class AutomatonSynthesizer
         {
             didSomething = synthesizeControllableNonblockingObservable();
         }
+        else
+        {
+            throw new IllegalArgumentException("Unknown synthesis type " + synthesisType);
+        }
+        
+        // Compute which uncontrollable were disabled?
         if (synthesizerOptions.doRememberDisabledUncontrollableEvents())
         {
             computeDisabledUncontrollableEvents();
         }
+        
+        // Purge?
         if (synthesizerOptions.doPurge() || forcedPurge)
         {
             purge();
         }
+        
+        // Finish
         theAutomaton.invalidate();
         theAutomaton.endTransaction();
         theAutomaton.setComment("sup(" + theAutomaton.getName() + ")");
@@ -121,18 +135,20 @@ public class AutomatonSynthesizer
     public void initializeAcceptingStates()
     {
         Iterator stateIt = theAutomaton.stateIterator();
-        logger.debug("AutomatonSynthesizer::initializeAcceptingStates");
+        logger.debug("AutomatonSynthesizer.initializeAcceptingStates...");
         while (stateIt.hasNext())
         {
             State currState = (State) stateIt.next();
-            if (currState.isAccepting() &&!currState.isForbidden())
+            if (currState.isAccepting() && !currState.isForbidden())
             {
                 acceptingStates.add(currState);
             }
         }
     }
     
-    // Synthesize a controllable, nonblocking and observable supervisor
+    /**
+     * Synthesize a controllable, nonblocking and observable supervisor.
+     */
     protected boolean synthesizeControllableNonblockingObservable()
     throws Exception
     {
@@ -174,12 +190,14 @@ public class AutomatonSynthesizer
         return true;
     }
     
-    // Synthesize a controllable and nonblocking supervisor
+    /**
+     * Synthesize a controllable and nonblocking supervisor.
+     */
     protected boolean synthesizeControllableNonblocking()
     throws Exception
     {
         StateSet stateList = new StateSet();
-        logger.debug("AutomatonSynthesizer::synthesizeControllableNonblocking");
+        logger.debug("AutomatonSynthesizer.synthesizeControllableNonblocking...");
         for (Iterator stateIt = theAutomaton.stateIterator();
         stateIt.hasNext(); )
         {
@@ -207,6 +225,7 @@ public class AutomatonSynthesizer
             }
         }
         while (newUnsafeStates);
+        // Reachability
         doReachable();
         // Forbid the states with MAX_COST set
         boolean didSomething = false;
@@ -223,11 +242,13 @@ public class AutomatonSynthesizer
         return didSomething;
     }
     
-    // Synthesize a controllable supervisor
+    /**
+     * Synthesize a controllable supervisor.
+     */
     protected boolean synthesizeControllable()
     throws Exception
     {
-        logger.debug("AutomatonSynthesizer::synthesizeControllable");
+        logger.debug("AutomatonSynthesizer.synthesizeControllable...");
         // boolean newUnsafeStates;
         LinkedList stateList = new LinkedList();
         Iterator stateIt = theAutomaton.stateIterator();
@@ -266,7 +287,7 @@ public class AutomatonSynthesizer
     protected boolean synthesizeNonblocking()
     throws Exception
     {
-        logger.debug("AutomatonSynthesizer::synthesizeNonblocking");
+        logger.debug("AutomatonSynthesizer.synthesizeNonblocking...");
         boolean newUnsafeStates;
         StateSet stateList = new StateSet();
         initializeAcceptingStates();
@@ -301,7 +322,7 @@ public class AutomatonSynthesizer
     public StateSet doCoreachable()
     throws Exception
     {
-        logger.debug("AutomatonSynthesizer::doCoreachable");
+        logger.debug("AutomatonSynthesizer.doCoreachable...");
         theAutomaton.clearVisitedStates();
         // Push all marked states on the stack
         // Mark the state as visited
@@ -354,11 +375,13 @@ public class AutomatonSynthesizer
         return stateStack;    // return the set of non-coreachable states
     }
     
-    // returns true if uncontrollable states found
+    /**
+     * returns true if uncontrollable states found.
+     */
     protected boolean doControllable(Collection<State> stateStack)
     throws Exception
     {
-        logger.debug("AutomatonSynthesizer::doControllable");
+        logger.debug("AutomatonSynthesizer.doControllable...");
         boolean newUnsafeStates = false;
         int nbrOfNewUnsafeStates = 0;
         // Do propagate uncontrollability
@@ -429,7 +452,7 @@ public class AutomatonSynthesizer
      */
     public void doReachable(boolean expandForbidden)
     {
-        logger.debug("AutomatonSynthesizer::doReachable");
+        logger.debug("AutomatonSynthesizer.doReachable...");
         theAutomaton.clearVisitedStates();
         // Push the initial state on the stack
         // Mark the state as visited
@@ -480,10 +503,10 @@ public class AutomatonSynthesizer
     
     /**
      * Returns the set of UNCONTROLLABLE events that needed to be
-     * disabled in the synthesis.  If not
-     * rememberDisabledUncontrollableEvents are set to true then null
-     * is returned.  This method must only be called after synthesize
-     * has returned.
+     * disabled in the synthesis. If not
+     * rememberDisabledUncontrollableEvents is set to true then null
+     * is returned.  This method must only be called after completed 
+     * synthesis.
      */
     public Alphabet getDisabledUncontrollableEvents()
     {
@@ -493,32 +516,33 @@ public class AutomatonSynthesizer
     protected void computeDisabledUncontrollableEvents()
     {
         disabledUncontrollableEvents = new Alphabet();
-        for (Iterator stateIt = theAutomaton.stateIterator();
-        stateIt.hasNext(); )
+        for (State state : theAutomaton)
         {
-            State currState = (State) stateIt.next();
-            // Is this a forbidden state (so all incoming from
-            // nonforbidden states should be disabled)
-            if (currState.getCost() == State.MAX_COST)
+            // Is this a forbidden state (then all incoming from
+            // previous states must be disabled (unless the previous state were
+            // forbidden for other reasons?))
+            if (state.getCost() == State.MAX_COST)
             {
-                for (Iterator<Arc> evIt = currState.incomingArcsIterator(); evIt.hasNext(); )
+                // Look through the incoming arcs
+                for (Iterator<Arc> evIt = state.incomingArcsIterator(); evIt.hasNext(); )
                 {
                     Arc arc = evIt.next();
+                    // Don't count selfloops!
                     if (!arc.isSelfLoop())
                     {
-                        LabeledEvent currEvent = arc.getEvent();
-                        if (!currEvent.isControllable())
+                        LabeledEvent event = arc.getEvent();
+                        if (!event.isControllable())
                         {
                             try
                             {
-                                if (!disabledUncontrollableEvents.contains(currEvent.getLabel()))
+                                if (!disabledUncontrollableEvents.contains(event.getLabel()))
                                 {
-                                    disabledUncontrollableEvents.addEvent(currEvent);
+                                    disabledUncontrollableEvents.addEvent(event);
                                 }
-                        }
+                            }
                             catch (Exception ex)
                             {
-                                logger.error("AutomatonSynthesizer::computeDisabledUncontrollableEvents: " + ex.getMessage());
+                                logger.error("Error in AutomatonSynthesizer: " + ex.getMessage());
                                 logger.debug(ex.getStackTrace());
                             }
                         }

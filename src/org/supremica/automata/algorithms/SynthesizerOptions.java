@@ -66,8 +66,8 @@ public final class SynthesizerOptions
     private boolean reduceSupervisors;
     private boolean rememberDisabledUncontrollableEvents;
 
-    private boolean oneEventAtATime;
-    private boolean addOnePlantAtATime;
+    public boolean oneEventAtATime = false;
+    public boolean addOnePlantAtATime = false;
     
     /**
      * The current options, based on earlier user preferences.
@@ -235,7 +235,7 @@ public final class SynthesizerOptions
      */
     public static SynthesizerOptions getDefaultSynthesizerOptions()
     {
-        return new SynthesizerOptions(SynthesisType.NONBLOCKINGCONTROLLABLE, SynthesisAlgorithm.MODULAR, true, true, true, true, true);
+        return new SynthesizerOptions(SynthesisType.CONTROLLABLE, SynthesisAlgorithm.MODULAR, true, true, true, true, true);
     }
     
     /**

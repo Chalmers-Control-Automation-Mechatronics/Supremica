@@ -1679,7 +1679,7 @@ public class Automaton
     /**
      * Change the marking of all states in the automaon.
      */
-    public void setAllStatesAsAccepting()
+    public void setAllStatesAccepting()
     {
         setAllStatesAsAccepting(false);
     }
