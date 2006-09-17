@@ -157,8 +157,8 @@ public class AutomataStateViewer
 
 	public void update()
 	{
-
-		// The order of theese are changed, for states to be properly forbidden...
+		// The order of theese are changed, for states to be properly
+		// forbidden...
 		forwardEvents.setCurrState(currState);
 		backwardEvents.setCurrState(currState);
 		stateDisplayer.setCurrState(currState);

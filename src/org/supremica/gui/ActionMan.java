@@ -112,7 +112,7 @@ abstract class FileImporter
 }
 
 /**
- * Handles most of the actions in Supremica. Will be reimplement to Action:s.
+ * Handles most of the actions in Supremica. Will be reimplemented to IDEAction:s.
  */
 public class ActionMan
 {
