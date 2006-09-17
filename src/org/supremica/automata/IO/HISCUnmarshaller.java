@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   SupremicaUnmarshaller
 //###########################################################################
-//# $Id: SupremicaUnmarshaller.java,v 1.3 2006-09-17 10:23:51 flordal Exp $
+//# $Id: HISCUnmarshaller.java,v 1.1 2006-09-17 10:23:51 flordal Exp $
 //###########################################################################
 
 package org.supremica.automata.IO;
@@ -29,16 +29,16 @@ import org.supremica.gui.StandardExtensionFileFilter;
 import org.xml.sax.SAXException;
 
 
-public class SupremicaUnmarshaller
+public class HISCUnmarshaller
     implements ProxyUnmarshaller<ModuleProxy>
 {
     
     //#########################################################################
     //# Constructor
-    public SupremicaUnmarshaller(final ModuleProxyFactory modfactory)
+    public HISCUnmarshaller(final ModuleProxyFactory modfactory)
     throws JAXBException, SAXException
     {
-        builder = new ProjectBuildFromXml();
+        builder = new ProjectBuildFromHISC();
         mImporter = new ProductDESImporter(modfactory);
     }
 
@@ -68,7 +68,7 @@ public class SupremicaUnmarshaller
     
     public String getDefaultExtension()
     {
-        return ".xml";
+        return ".prj";
     }
     
     public Collection<String> getSupportedExtensions()
@@ -78,7 +78,7 @@ public class SupremicaUnmarshaller
     
     public Collection<FileFilter> getSupportedFileFilters()
     {
-        FileFilter filter = new StandardExtensionFileFilter(getDefaultExtension(), "Supremica Project files [*.xml]");
+        FileFilter filter = new StandardExtensionFileFilter(getDefaultExtension(), "HISC Project files [*.prj]");
         return Collections.singletonList(filter);
     }
     
@@ -91,10 +91,9 @@ public class SupremicaUnmarshaller
     {
         mImporter.setDocumentManager(manager);
     }
-    
-    
+        
     //#########################################################################
     //# Data Members
-    private final ProjectBuildFromXml builder;
+    private final ProjectBuildFromHISC builder;
     private final ProductDESImporter mImporter;    
 }

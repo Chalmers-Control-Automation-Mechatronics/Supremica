@@ -32,7 +32,9 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.log.*;
 import org.supremica.Version;
+import org.supremica.automata.IO.HISCUnmarshaller;
 import org.supremica.automata.IO.SupremicaUnmarshaller;
+import org.supremica.automata.IO.UMDESUnmarshaller;
 import org.xml.sax.SAXException;
 
 public class IDE
@@ -56,6 +58,8 @@ public class IDE
     private final JAXBModuleMarshaller mModuleMarshaller;
     private final ProxyUnmarshaller<ModuleProxy> validUnmarshaller;
     private final ProxyUnmarshaller<ModuleProxy> supremicaUnmarshaller;
+    private final ProxyUnmarshaller<ModuleProxy> hiscUnmarshaller;
+    private final ProxyUnmarshaller<ModuleProxy> umdesUnmarshaller;
     private final DocumentManager documentManager;
     
     private Actions theActions;
@@ -94,12 +98,17 @@ public class IDE
         mModuleFactory = ModuleSubjectFactory.getInstance();
         final OperatorTable optable = CompilerOperatorTable.getInstance();
         mModuleMarshaller = new JAXBModuleMarshaller(mModuleFactory, optable);
-        validUnmarshaller = new ValidUnmarshaller(mModuleFactory, optable);
         supremicaUnmarshaller = new SupremicaUnmarshaller(mModuleFactory);
+        validUnmarshaller = new ValidUnmarshaller(mModuleFactory, optable);
+        hiscUnmarshaller = new HISCUnmarshaller(mModuleFactory);
+        umdesUnmarshaller = new UMDESUnmarshaller(mModuleFactory);
         documentManager.registerMarshaller(mModuleMarshaller);
+        // Add unmarshallers in the order of importance
         documentManager.registerUnmarshaller(mModuleMarshaller);
         documentManager.registerUnmarshaller(supremicaUnmarshaller);
         documentManager.registerUnmarshaller(validUnmarshaller);
+        documentManager.registerUnmarshaller(hiscUnmarshaller);
+        documentManager.registerUnmarshaller(umdesUnmarshaller);
         
         theActions = new Actions(this);
         

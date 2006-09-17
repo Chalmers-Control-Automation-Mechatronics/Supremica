@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   OpenAction
 //###########################################################################
-//# $Id: OpenAction.java,v 1.16 2006-09-14 21:10:21 flordal Exp $
+//# $Id: OpenAction.java,v 1.17 2006-09-17 10:24:00 flordal Exp $
 //###########################################################################
 
 
@@ -36,8 +36,8 @@ public class OpenAction
     {
         super(actionList);
         
-        putValue(Action.NAME, "Open...");
-        putValue(Action.SHORT_DESCRIPTION, "Open a project");
+        putValue(Action.NAME, "Open/Import...");
+        putValue(Action.SHORT_DESCRIPTION, "Open/import a project");
         putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_O));
         putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Open16.gif")));

@@ -743,7 +743,8 @@ public class ActionMan
         }
         
         if ((exportMode == Format.FSM_DEBUG) || (exportMode == Format.FSM))
-        {    // UMDES cannot deal with forbidden states
+        {    
+            // UMDES cannot deal with forbidden states
             if (selectedAutomata.hasForbiddenState())
             {
                 JOptionPane.showMessageDialog(gui.getComponent(), "UMDES cannot handle forbidden states", "Alert", JOptionPane.ERROR_MESSAGE);
