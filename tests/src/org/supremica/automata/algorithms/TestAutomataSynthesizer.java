@@ -58,86 +58,85 @@ import org.supremica.automata.*;
 import org.supremica.automata.IO.*;
 
 public class TestAutomataSynthesizer
-	extends TestCase
+    extends TestCase
 {
-	public TestAutomataSynthesizer(String name)
-	{
-		super(name);
-	}
-
-	/**
-	 * Sets up the test fixture.
-	 * Called before every test case method.
-	 */
-	protected void setUp()
-	{
-	}
-
-	/**
-	 * Tears down the test fixture.
-	 * Called after every test case method.
-	 */
-	protected void tearDown()
-	{
-	}
-
-	/**
-	 * Assembles and returns a test suite
-	 * for all the test methods of this test case.
-	 */
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(TestAutomataSynthesizer.class);
-		return suite;
-	}
-
-	public void testAGV()
-	{
-		try
-		{
-
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
-			Project theProject = builder.build(TestFiles.getFile(TestFiles.AGV));
-			assertTrue(theProject.nbrOfAutomata() == 17);
-			SynthesizerOptions syntOptions = new SynthesizerOptions();
-			syntOptions.setSynthesisType(SynthesisType.CONTROLLABLE);
-			syntOptions.setSynthesisAlgorithm(SynthesisAlgorithm.MODULAR);
-			syntOptions.setPurge(true);
-			syntOptions.setMaximallyPermissive(true);
-
-			SynchronizationOptions syncOptions = new SynchronizationOptions();
-
-			// Test Prioritized synchronization, although all events are prioritized in this example
-			{
-				AutomataSynthesizer synthesizer = new AutomataSynthesizer(theProject, syncOptions, syntOptions);
-				Automata supAutomata = synthesizer.execute();
-
+    public TestAutomataSynthesizer(String name)
+    {
+        super(name);
+    }
+    
+    /**
+     * Sets up the test fixture.
+     * Called before every test case method.
+     */
+    protected void setUp()
+    {
+    }
+    
+    /**
+     * Tears down the test fixture.
+     * Called after every test case method.
+     */
+    protected void tearDown()
+    {
+    }
+    
+    /**
+     * Assembles and returns a test suite
+     * for all the test methods of this test case.
+     */
+    public static Test suite()
+    {
+        TestSuite suite = new TestSuite(TestAutomataSynthesizer.class);
+        return suite;
+    }
+    
+    public void testAGV()
+    {
+        try
+        {            
+            ProjectBuildFromXml builder = new ProjectBuildFromXml();
+            Project theProject = builder.build(TestFiles.getFile(TestFiles.AGV));
+            assertTrue(theProject.nbrOfAutomata() == 17);
+            SynthesizerOptions syntOptions = new SynthesizerOptions();
+            syntOptions.setSynthesisType(SynthesisType.CONTROLLABLE);
+            syntOptions.setSynthesisAlgorithm(SynthesisAlgorithm.MODULAR);
+            syntOptions.setPurge(true);
+            syntOptions.setMaximallyPermissive(true);
+            
+            SynchronizationOptions syncOptions = new SynchronizationOptions();
+            
+            // Test Prioritized synchronization, although all events are prioritized in this example
+            {
+                AutomataSynthesizer synthesizer = new AutomataSynthesizer(theProject, syncOptions, syntOptions);
+                Automata supAutomata = synthesizer.execute();
+                
 /*
-				assertTrue(synchronizer.getNumberOfStates() == 8);
-				//Automaton theAutomaton = synchronizer.getAutomaton();
-				Alphabet theAlphabet = theAutomaton.getAlphabet();
-				assertTrue(theAutomaton.getType() == AutomatonType.Specification);
-				assertTrue(theAutomaton.nbrOfStates() == 8);
-				assertTrue(theAutomaton.nbrOfAcceptingStates() == 2);
-				assertTrue(theAutomaton.nbrOfForbiddenStates() == 3);
-				assertTrue(theAutomaton.nbrOfTransitions() == 11);
-				assertTrue(theAutomaton.isAllEventsPrioritized());
-				assertTrue(theAutomaton.hasInitialState());
-				assertTrue(!theAutomaton.isNullAutomaton());
-				assertTrue(theAlphabet.nbrOfEvents() == 5);
-				assertTrue(theAlphabet.nbrOfControllableEvents() == 4);
-				assertTrue(theAlphabet.nbrOfPrioritizedEvents() == 5);
-				assertTrue(theAlphabet.nbrOfImmediateEvents() == 0);
-				assertTrue(theAlphabet.nbrOfEpsilonEvents() == 0);
-*/
-			}
-
-		}
-		catch (Exception ex)
-		{
-			ex.printStackTrace();
-			assertTrue(false);
-		}
-	}
+                                assertTrue(synchronizer.getNumberOfStates() == 8);
+                                //Automaton theAutomaton = synchronizer.getAutomaton();
+                                Alphabet theAlphabet = theAutomaton.getAlphabet();
+                                assertTrue(theAutomaton.getType() == AutomatonType.Specification);
+                                assertTrue(theAutomaton.nbrOfStates() == 8);
+                                assertTrue(theAutomaton.nbrOfAcceptingStates() == 2);
+                                assertTrue(theAutomaton.nbrOfForbiddenStates() == 3);
+                                assertTrue(theAutomaton.nbrOfTransitions() == 11);
+                                assertTrue(theAutomaton.isAllEventsPrioritized());
+                                assertTrue(theAutomaton.hasInitialState());
+                                assertTrue(!theAutomaton.isNullAutomaton());
+                                assertTrue(theAlphabet.nbrOfEvents() == 5);
+                                assertTrue(theAlphabet.nbrOfControllableEvents() == 4);
+                                assertTrue(theAlphabet.nbrOfPrioritizedEvents() == 5);
+                                assertTrue(theAlphabet.nbrOfImmediateEvents() == 0);
+                                assertTrue(theAlphabet.nbrOfEpsilonEvents() == 0);
+ */
+            }
+            
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            assertTrue(false);
+        }
+    }
 }
 

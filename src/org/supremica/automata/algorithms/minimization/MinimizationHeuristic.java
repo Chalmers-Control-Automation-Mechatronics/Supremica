@@ -100,7 +100,7 @@ public enum MinimizationHeuristic
      *
      * @param eventToAutomataMap is a map from all (global) events to all (global) automata.
      */
-    public double value(Automata selection, EventToAutomataMap eventToAutomataMap, Alphabet targetAlphabet)
+    public double value(Automata selection, Map<LabeledEvent,Automata> eventToAutomataMap, Alphabet targetAlphabet)
     throws Exception
     {
         if (this == MostLocal)

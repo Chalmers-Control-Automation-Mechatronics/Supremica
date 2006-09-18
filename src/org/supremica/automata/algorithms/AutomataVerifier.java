@@ -91,7 +91,7 @@ public class AutomataVerifier
      *
      *@see  AlphabetAnalyzer
      */
-    private EventToAutomataMap uncontrollableEventToPlantsMap = null;
+    private Map<LabeledEvent,Automata> uncontrollableEventToPlantsMap = null;
     private AutomataSynchronizerHelper synchHelper;
     private ArrayList synchronizationExecuters = new ArrayList();
     private StateMemorizer potentiallyUncontrollableStates;
@@ -169,7 +169,7 @@ public class AutomataVerifier
         {
             return "The IDD Algorithm is not fully implemented yet.";
         }
-        */
+         */
         
         // Check Controllability
         if (verificationOptions.getVerificationType() == VerificationType.CONTROLLABILITY)
@@ -195,13 +195,13 @@ public class AutomataVerifier
             {
                 return "Some automaton has no marked states!";
             }
-            
+         
             if (verificationOptions.getAlgorithmType() != VerificationAlgorithm.MODULAR)
             {
                 return "The mutual nonblocking algorithm is a modular algorithm!";
             }
         }
-        */
+         */
         
         // Check Language Inclusion
         if (verificationOptions.getVerificationType() == VerificationType.LANGUAGEINCLUSION)
@@ -282,7 +282,7 @@ public class AutomataVerifier
                 else
                 {
                     throw new UnsupportedOperationException("The selected algorithm is not implemented");
-                }  
+                }
             }
             else if (verificationOptions.getVerificationType() == VerificationType.NONBLOCKING)
             {
@@ -322,7 +322,7 @@ public class AutomataVerifier
                     throw new UnsupportedOperationException("The selected algorithm is not implemented");
                 }
             }
-            */
+             */
             else
             {
                 throw new UnsupportedOperationException("The selected type of verification " +
@@ -374,13 +374,13 @@ public class AutomataVerifier
         {
             throw new IllegalArgumentException("Inclusion automata must be non null for language inclusion verification.");
         }
-
+        
         // Make a copy and modify!
-
+        
         // We shall verify if the language of    L(autA) \subseteq L(autB)
         Automata autA = new Automata(inclusionAutomata);
         Automata autB = new Automata(theAutomata);
-
+        
         // Make autA plants
         for (Automaton aut: autA)
         {
@@ -391,7 +391,7 @@ public class AutomataVerifier
                 ev.setControllable(false);
             }
         }
-
+        
         // Make autB specifications
         for (Automaton aut: autB)
         {
@@ -402,7 +402,7 @@ public class AutomataVerifier
                 ev.setControllable(false);
             }
         }
-
+        
         theAutomata = new Automata();
         theAutomata.addAutomata(autA);
         theAutomata.addAutomata(autB);
@@ -410,18 +410,18 @@ public class AutomataVerifier
         /*
         // Maybe we should just make a copy of the whole project and modify what needs to
         // be modified right there instead? Yup.
-        
+         
         theAutomata.addAutomata(inclusionAutomata);
-                
+         
         // After these preparations, controllability verification verifies language inclusion
         synchHelper.getAutomataIndexForm().defineTypeIsPlantTable(inclusionAutomata);
-        
+         
         uncontrollableEventToPlantsMap = AlphabetHelpers.buildEventToAutomataMap(inclusionAutomata);
-        
+         
         // This last one is not really good... we'd like to do this only once! Perhaps
         // a switch in the synchronizeroptions or verificationoptions instead? FIXA!!
         synchHelper.considerAllEventsUncontrollable();
-        */
+         */
     }
     
     /**
@@ -461,7 +461,7 @@ public class AutomataVerifier
     {
         if (uncontrollableEventToPlantsMap == null)
         {
-            uncontrollableEventToPlantsMap = AlphabetHelpers.buildUncontrollableEventToPlantsMap(theAutomata);
+            uncontrollableEventToPlantsMap = AlphabetHelpers.buildUncontrollableEventToAutomataMap(theAutomata.getPlantAutomata());
         }
         
         potentiallyUncontrollableStates = synchHelper.getStateMemorizer();
@@ -472,45 +472,35 @@ public class AutomataVerifier
         boolean[] controllableEventsTable = synchHelper.getAutomataIndexForm().getControllableEventsTable();
         
         // Iterate over supervisors/specifications
-        loop:
-            for (Iterator<Automaton> supIt = theAutomata.iterator();
-        supIt.hasNext(); )
-            {
-            Automaton currSupervisorAutomaton = supIt.next();
-            
+        loop: for (Automaton supervisor: theAutomata)
+        {
             // To enable the overriding the AutomatonType of automata we use typeIsSupSpecTable!
-            // if ((currSupervisorAutomaton.getType() == AutomatonType.Supervisor) || (currSupervisorAutomaton.getType() == AutomatonType.SPECIFICATION))
-            // if (!typeIsPlantTable[currSupervisorAutomaton.getIndex()])
-            if (typeIsSupSpecTable[currSupervisorAutomaton.getIndex()])
+            // if ((supervisor.getType() == AutomatonType.Supervisor) || (supervisor.getType() == AutomatonType.SPECIFICATION))
+            // if (!typeIsPlantTable[supervisor.getIndex()])
+            if (typeIsSupSpecTable[supervisor.getIndex()])
             {
                 // This is a relevant automaton!
-                selectedAutomata.addAutomaton(currSupervisorAutomaton);
+                selectedAutomata.addAutomaton(supervisor);
                 
-                // Examine uncontrollable events in currSupervisorAutomaton
+                // Examine uncontrollable events in supervisor
                 // and select plants containing these events
-                for (Iterator<LabeledEvent> eventIt = currSupervisorAutomaton.eventIterator();
-                eventIt.hasNext(); )
+                for (LabeledEvent event : supervisor.getAlphabet())
                 {
-                    LabeledEvent currEvent = eventIt.next();
-                    
                     // To enable overriding the controllability status of events!
-                    //if (!currEvent.isControllable())
-                    if (!controllableEventsTable[currEvent.getIndex()])
+                    //if (!event.isControllable())
+                    if (!controllableEventsTable[event.getIndex()])
                     {
                         // Note that in the language inclusion case, the
                         // uncontrollableEventToPlantsMap has been adjusted...
-                        if (uncontrollableEventToPlantsMap.get(currEvent) != null)
+                        if (uncontrollableEventToPlantsMap.get(event) != null)
                         {
                             // Iterate over the plants and add them to selectedAutomata
-                            //for (Iterator plantIt = ((Set) uncontrollableEventToPlantsMap.get(currEvent)).iterator();
-                            for (Iterator plantIt = uncontrollableEventToPlantsMap.get(currEvent).iterator();
-                            plantIt.hasNext(); )
+                            //for (Iterator plantIt = ((Set) uncontrollableEventToPlantsMap.get(event)).iterator();
+                            for (Automaton plant : uncontrollableEventToPlantsMap.get(event))
                             {
-                                Automaton currPlantAutomaton = (Automaton) plantIt.next();
-                                
-                                if (!selectedAutomata.containsAutomaton(currPlantAutomaton))
+                                if (!selectedAutomata.containsAutomaton(plant))
                                 {
-                                    selectedAutomata.addAutomaton(currPlantAutomaton);
+                                    selectedAutomata.addAutomaton(plant);
                                 }
                             }
                             
@@ -535,7 +525,7 @@ public class AutomataVerifier
                                     
                                     // Clean selectedAutomata before continuing
                                     selectedAutomata.clear();
-                                    selectedAutomata.addAutomaton(currSupervisorAutomaton);
+                                    selectedAutomata.addAutomaton(supervisor);
                                 }
                             }
                         }
@@ -566,7 +556,7 @@ public class AutomataVerifier
                 // Clean selectedAutomata before continuing
                 selectedAutomata.clear();
             }
-            }
+        }
         
         // Did the loop finish without failure?
         if (failure)
@@ -1646,7 +1636,7 @@ public class AutomataVerifier
         {
             automaton.setAllStatesAccepting();
         }
-
+        
         // Plantify all automata
         MinimizationHelper.plantify(theAutomata);
         
@@ -1903,7 +1893,7 @@ public class AutomataVerifier
         {
             threadToStop.requestStop();
         }
-
+        
         if (executionDialog != null)
         {
             executionDialog.stopAllThreads();
@@ -1911,7 +1901,7 @@ public class AutomataVerifier
         // Clear!
         executionDialog = null;
     }
-       
+    
     public boolean isStopped()
     {
         return stopRequested;

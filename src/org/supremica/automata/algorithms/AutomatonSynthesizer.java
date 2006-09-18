@@ -168,7 +168,7 @@ public class AutomatonSynthesizer
             observerBuilder.execute();
             observable = observerBuilder.isObservable();
             Automaton currObserver = observerBuilder.getNewAutomaton();
-            currObserver.setAllStatesAsAccepting(true);
+            currObserver.setAllStatesAccepting(true);
             currObserver.setName("Observer");
             logger.info("Number of states in observer: " + currObserver.nbrOfStates() + " nbr forb states: " + currObserver.nbrOfForbiddenStates());
             Automata observerAndSupervisor = new Automata();

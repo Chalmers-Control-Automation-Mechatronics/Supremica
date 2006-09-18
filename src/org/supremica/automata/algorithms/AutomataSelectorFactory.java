@@ -63,14 +63,135 @@ class AutomataSelectorFactory
     public static AutomataSelector getAutomataSelector(Automata automata, SynthesizerOptions options)
     throws Exception
     {
-        //if (!options.oneEventAtATime)
+        if (!options.oneEventAtATime)
         {
+            // Maybe it's just as easy to put it all in the same 
+            // class anyway... the factory was unnecessary...
             return new PerSpecificationAutomataSelector(automata, options);
+        }
+        else
+        {
+            return new PerEventAutomataSelector(automata, options);
         }
 
         //return null;
     }
         
+    static class PerEventAutomataSelector
+        extends PerSpecificationAutomataSelector
+    {
+        /**
+         * Map keeping track of which uncontrollable events each spec 
+         * has left that has not been taken care of.
+         */
+        private Map<Automaton,Alphabet> specToEventsLeftMap;
+
+        /**
+         * The spec currently being examined.
+         */
+        private Automaton spec;
+        
+        public PerEventAutomataSelector(Automata automata, SynthesizerOptions options)
+        throws Exception
+        {
+            super(automata, options);
+            
+            // Initiate spec to events map
+            specToEventsLeftMap = new TreeMap<Automaton,Alphabet>();
+            for (Automaton spec : super.globalSet)
+            {
+                System.out.println("Added " + spec + " with " + spec.getAlphabet().getUncontrollableAlphabet());
+                
+                // Add spec and its uncontrollable alphabet, assert that 
+                Alphabet alreadyThere = specToEventsLeftMap.put(spec, spec.getAlphabet().getUncontrollableAlphabet());
+                assert(alreadyThere == null);
+            }
+        }
+        
+        public Automata next()
+        {
+            super.partialSet.clear();
+
+            for (Map.Entry<Automaton,Alphabet> entry : specToEventsLeftMap.entrySet())
+            {
+                // If there are no events left, we don't need synthesis
+                if (entry.getValue().size() == 0)
+                {
+                    // Then we're done
+                    continue;
+                }
+                
+                // This is the spec
+                spec = entry.getKey();
+                super.partialSet.addAutomaton(spec);
+                
+                // This is an event that has not been taken care of
+                LabeledEvent event = entry.getValue().iterator().next();
+                // After this we're done examining this event!
+                entry.getValue().remove(event);
+                // Build alphabet
+                Alphabet ucAlpha = new Alphabet();
+                ucAlpha.addEvent(event);
+
+                // Add plant
+                if (super.options.addOnePlantAtATime)
+                    // Add one plant
+                    addPlant(ucAlpha);
+                else
+                    // Add all plants
+                    addPlants(ucAlpha);  
+    
+                // Did we find any plants?
+                if (super.partialSet.size() > 1)
+                {
+                    // Nice! Then we're ready
+                    break;
+                }
+                
+                super.partialSet.clear();                
+            }
+            
+            System.out.println("The task is " + super.partialSet);
+            
+            return super.partialSet;
+        }
+
+        public Automata addPlant(Alphabet alpha)
+        {
+            Automata result = super.addPlant(alpha);
+            removeCoveredEvents();
+            
+            System.out.println("The task is now " + super.partialSet);
+
+            return result;
+        }
+        
+        public Automata addPlants(Alphabet alpha)
+        {
+            Automata result = super.addPlants(alpha);
+            removeCoveredEvents();
+
+            System.out.println("The task is now " + super.partialSet);
+
+            return result;
+       }
+
+        private void removeCoveredEvents()
+        {
+            // Remove all events that are now covered
+            Alphabet specUC = specToEventsLeftMap.get(spec);
+            for (Automaton automaton : super.partialSet.getPlantAutomata())
+            {
+                for (LabeledEvent event : automaton.getAlphabet().getUncontrollableAlphabet())
+                {
+                    if (specUC.contains(event))
+                        specUC.removeEvent(event);
+                }
+            }
+            System.out.println("These events are not covered: " + specUC + " for spec " + spec);
+        }
+    }
+    
     /**
      * AutomataSelector a set of specs/sups/plants,
      * For each spec/sup it returns that automaton together with the plants with which
@@ -85,11 +206,15 @@ class AutomataSelectorFactory
         private Automata globalSet;
         private Automata partialSet = new Automata();
         private Iterator specIterator;
-        private Map<LabeledEvent,Automata> eventToPlantMap;
+        private Map<LabeledEvent,Automata> ucEventToPlantMap;
         private int progress = 0;
         private int progressMax;
         private SynthesizerOptions options;
                 
+        /**
+         * Selects specifications and plants depending on how uncontrollable 
+         * events are shared.
+         */
         public PerSpecificationAutomataSelector(Automata automata, SynthesizerOptions options)
         throws Exception
         {
@@ -98,7 +223,7 @@ class AutomataSelectorFactory
             progressMax = automata.size();
             this.options = options;
             
-            eventToPlantMap = AlphabetHelpers.buildUncontrollableEventToPlantsMap(automata);
+            ucEventToPlantMap = AlphabetHelpers.buildUncontrollableEventToAutomataMap(automata.getPlantAutomata());
         }
         
         /**
@@ -135,11 +260,9 @@ class AutomataSelectorFactory
                     // Nice! Then we're ready
                     break;
                 }
-                else
-                {
-                    // Have another go... get a new spec etc...
-                    partialSet.clear();
-                }
+
+                // Have another go... get a new spec etc...
+                partialSet.clear();
             }
             
             // This will be empty (cleared) only when we're done!
@@ -153,9 +276,9 @@ class AutomataSelectorFactory
         {
             for (LabeledEvent event : events)
             {
-                if (eventToPlantMap.get(event) != null)
+                if (ucEventToPlantMap.get(event) != null)
                 {
-                    partialSet.addAutomata(eventToPlantMap.get(event));
+                    partialSet.addAutomata(ucEventToPlantMap.get(event));
                 }
             }
             
@@ -170,9 +293,9 @@ class AutomataSelectorFactory
         {
             for (LabeledEvent event : events)
             {
-                if (eventToPlantMap.get(event) != null)
+                if (ucEventToPlantMap.get(event) != null)
                 {
-                    Automata sharers = eventToPlantMap.get(event);
+                    Automata sharers = ucEventToPlantMap.get(event);
                     for (Automaton plant : sharers)
                     {
                         if (!partialSet.containsAutomaton(plant))

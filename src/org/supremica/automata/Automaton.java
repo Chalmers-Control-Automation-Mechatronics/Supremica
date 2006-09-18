@@ -1442,8 +1442,7 @@ public class Automaton
     {
         return getIndex();
     }
-    
-    
+
     /**
      * Don't do this in public
      */
@@ -1681,9 +1680,9 @@ public class Automaton
      */
     public void setAllStatesAccepting()
     {
-        setAllStatesAsAccepting(false);
+        setAllStatesAccepting(false);
     }
-    public void setAllStatesAsAccepting(boolean keepForbidden)
+    public void setAllStatesAccepting(boolean keepForbidden)
     {
         beginTransaction();
         
@@ -2013,7 +2012,8 @@ public class Automaton
      *
      * Shouldn't there really be a CompareAutomata class?
      * This class should have methods like isIsomorphic() and languageEqual()
-     */ // yes, definitively there should be a CompareAutomata class //MF
+     * // yes, definitively there should be a CompareAutomata class //MF
+     */ 
     public boolean equalAutomaton(Automaton other)
     {
         // Should type, name, comment really be considered?
@@ -2021,10 +2021,12 @@ public class Automaton
         {
             return false;
         }
+        
         if (getType() != other.getType())
         {
             return false;
         }
+        
         if (!getComment().equals(other.getComment()))
         {
             return false;

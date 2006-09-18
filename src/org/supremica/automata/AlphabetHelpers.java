@@ -57,252 +57,242 @@ import org.supremica.log.*;
  */
 public class AlphabetHelpers
 {
-	private static Logger logger = LoggerFactory.createLogger(AlphabetHelpers.class);
-
-	public static Alphabet getUnionAlphabet(Automata theAutomata)
-		throws Exception
-	{
-		return getUnionAlphabet(theAutomata, true, true);
-	}
-
-	public static Alphabet getUnionAlphabet(Automata theAutomata, boolean requireConsistentControllability, boolean requireConsistentImmediate)
-		throws Exception
-	{
-		EventsSet eventsSet = new EventsSet();
-
-		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
-		{
-			Automaton currAutomaton = (Automaton) autIt.next();
-			Alphabet currAlphabet = currAutomaton.getAlphabet();
-
-			eventsSet.add(currAlphabet);
-		}
-
-		return getUnionAlphabet(eventsSet, requireConsistentControllability, requireConsistentImmediate);
-	}
-
-	public static Alphabet getUnionAlphabet(EventsSet alphas)
-		throws IllegalArgumentException, Exception
-	{
-		return getUnionAlphabet(alphas, /* "", */ true, true);
-	}
-
-	private static Alphabet getUnionAlphabet(EventsSet alphabets, String idPrefix)
-		throws IllegalArgumentException, Exception
-	{
-		return getUnionAlphabet(alphabets, /* idPrefix, */ true, true);
-	}
-
-	/**
-	 * Compute a new alphabet as the union of a set of alphabets.
-	 * Adjust the Event attributes properly.
-	 *
-	 *@param  alphabets Description of the Parameter
-	 *@return  The unionAlphabet value
-	 *@exception  IllegalArgumentException Description of the Exception
-	 *@exception  Exception Description of the Exception
-	 */
-	private static Alphabet getUnionAlphabet(EventsSet alphabets, boolean requireConsistentControllability, boolean requireConsistentImmediate)
-		throws IllegalArgumentException, Exception
-	{
-		if (alphabets.size() < 1)
-		{
-			throw new IllegalArgumentException("At least one alphabet is necessary");
-		}
-
-		EventsSet eventsSet = new EventsSet();
-		Alphabet unionEvents = AlphabetHelpers.union(alphabets);
-		Alphabet newAlphabet = new Alphabet();
-
-		// Iterate over all events - check consistency and add one for each label
-		Iterator eventsIt = unionEvents.iterator();
-
-		while (eventsIt.hasNext())
-		{
-			LabeledEvent currEvent = (LabeledEvent) eventsIt.next();
-
-			eventsSet.clear();
-
-			// Iterate over all alphabets, and find those alphabets that
-			// contain an event with currEvent.getLabel
-			Iterator alphabetIt = alphabets.iterator();
-			while (alphabetIt.hasNext())
-			{
-				Alphabet currAlphabet = (Alphabet) alphabetIt.next();
-
-				if (currAlphabet.contains(currEvent.getLabel()))
-				{
-					eventsSet.add(currAlphabet.getEvent(currEvent.getLabel()));
-				}
-			}
-
-			LabeledEvent newEvent = EventHelpers.createEvent(eventsSet, requireConsistentControllability, requireConsistentImmediate);
-
-			// If we get here, the events are consistent (or consistency is not to be checked)
-			// newEvent.setId(newAlphabet.getUniqueId(idPrefix));
-			newAlphabet.addEvent(newEvent);
-		}
-
-		return newAlphabet;
-	}
-
-	/**
-	 * Computes the union of all events in eventsSet.
-	 * No manipulation of the events.
-	 *
-	 *@param  eventsSet Description of the Parameter
-	 *@return  Description of the Return Value
-	 *@exception  IllegalArgumentException Description of the Exception
-	 *@exception  Exception Description of the Exception
-	 */
-	private static Alphabet union(EventsSet eventsSet)
-		throws IllegalArgumentException, Exception
-	{
-		if (eventsSet.size() >= 1)
-		{
-			// this was >= 2 but why could we not have union over 1 or even 0 number of elements??
-			// Build the new set of events
-			Iterator eventsSetIt = eventsSet.iterator();
-			Collection currEvents = ((Alphabet) eventsSetIt.next()).values();
-			TreeSet tmpEvents = new TreeSet(currEvents);
-
-			while (eventsSetIt.hasNext())
-			{
-				tmpEvents.addAll((Collection) ((Alphabet) eventsSetIt.next()).values());
-			}
-
-			// Add all events to an Alphabet
-			Iterator eventIt = tmpEvents.iterator();
-			Alphabet theEvents = new Alphabet();
-			while (eventIt.hasNext())
-			{
-				theEvents.addEvent((LabeledEvent) eventIt.next());
-			}
-
-			return theEvents;
-		}
-
-		// at least 1 (not two ::MF) arguments are necessary
-		throw new IllegalArgumentException("Not enough elements of events");
-	}
-
-	/** 
-	 * Builds an returns a map mapping events to sets of automata.
-	 * (LabeledEvent) -> (Set of Automaton-objects).
-	 */
-	public static EventToAutomataMap buildEventToAutomataMap(Automata anAutomata)
-	{
-		//HashMap map = new HashMap();
-		EventToAutomataMap map = new EventToAutomataMap();
-
-		// Loop over automata
-		for (Iterator automataIt = anAutomata.iterator(); automataIt.hasNext(); )
-		{
-			Automaton currAutomaton = (Automaton) automataIt.next();
-			Alphabet currAlphabet = currAutomaton.getAlphabet();
-
-			// Loop over alphabet
-			for (Iterator<LabeledEvent> eventIt = currAlphabet.iterator(); eventIt.hasNext(); )
-			{ 
-				// Insert in map
-				map.insert(eventIt.next(), currAutomaton);
-			}
-		}
-
-		return map;
-	}
-
-	/**
-     * 
-     * Builds an returns a map mapping uncontrollable events to sets of plant automata.
-     * (uncontrollable LabeledEvent) -> (Set of AutomatonType.PLANT Automaton-objects).
+    private static Logger logger = LoggerFactory.createLogger(AlphabetHelpers.class);
+    
+    public static Alphabet getUnionAlphabet(Automata theAutomata)
+    throws Exception
+    {
+        return getUnionAlphabet(theAutomata, true, true);
+    }
+    
+    public static Alphabet getUnionAlphabet(Automata theAutomata, boolean requireConsistentControllability, boolean requireConsistentImmediate)
+    throws Exception
+    {
+        EventsSet eventsSet = new EventsSet();
+        
+        for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+        {
+            Automaton currAutomaton = (Automaton) autIt.next();
+            Alphabet currAlphabet = currAutomaton.getAlphabet();
+            
+            eventsSet.add(currAlphabet);
+        }
+        
+        return getUnionAlphabet(eventsSet, requireConsistentControllability, requireConsistentImmediate);
+    }
+    
+    public static Alphabet getUnionAlphabet(EventsSet alphas)
+    throws IllegalArgumentException, Exception
+    {
+        return getUnionAlphabet(alphas, /* "", */ true, true);
+    }
+    
+    private static Alphabet getUnionAlphabet(EventsSet alphabets, String idPrefix)
+    throws IllegalArgumentException, Exception
+    {
+        return getUnionAlphabet(alphabets, /* idPrefix, */ true, true);
+    }
+    
+    /**
+     * Compute a new alphabet as the union of a set of alphabets.
+     * Adjust the Event attributes properly.
+     *
+     *@param  alphabets Description of the Parameter
+     *@return  The unionAlphabet value
+     *@exception  IllegalArgumentException Description of the Exception
+     *@exception  Exception Description of the Exception
      */
-	public static EventToAutomataMap buildUncontrollableEventToPlantsMap(Automata anAutomata)
-	{
-		//HashMap map = new HashMap();
-		EventToAutomataMap map = new EventToAutomataMap();
-
-		// Loop over automata
-		for (Iterator automataIt = anAutomata.iterator(); automataIt.hasNext(); )
-		{
-			Automaton currAutomaton = (Automaton) automataIt.next();
-
-			if (currAutomaton.getType() == AutomatonType.PLANT)
-			{
-				Alphabet currAlphabet = (Alphabet) currAutomaton.getAlphabet();
-
-				Iterator eventIt = currAlphabet.iterator();
-				while (eventIt.hasNext())
-				{
-					LabeledEvent currEvent = (LabeledEvent) eventIt.next();
-					if (!currEvent.isControllable())
-					{
-						map.insert(currEvent, currAutomaton);
-					}
-				}
-			}
-		}
-
-		return map;
-	}
-
-	/**
-	 * Computes and returns "a1 minus a2"
-	 */
-	public static Alphabet minus(Alphabet a1, Alphabet a2)
-	{
-		Alphabet result = new Alphabet(a1);
-
-		result.minus(a2);
-
-		return result;
-	}
-
-	/**
-	 * Computes and returns "a1 intersection a2"
-	 */
-	public static Alphabet intersect(Alphabet a1, Alphabet a2)
-	{
-		Alphabet result = new Alphabet(a1);
-
-		result.intersect(a2);
-
-		return result;
-	}
-
-	/**
-	 * Computes and returns "a1 union a2"
-	 */
-	public static Alphabet union(Alphabet a1, Alphabet a2)
-	{
-		Alphabet result = new Alphabet(a1);
-
-		result.union(a2);
-
-		return result;
-	}
-
-	/**
-	 * Returns true if there are no events with alphabetically equal names, i.e.
-	 * lowercase equal.
-	 *
-	 * Also warns if there are events that start or end with blank spaces.
-	 */
-	public static boolean isEventNamesSafe(Alphabet alphabet)
-	{
-		// Check that there are no spaces in the start or end of event names!
-		for (Iterator<LabeledEvent> evIt = alphabet.iterator(); evIt.hasNext(); )
-		{
-			LabeledEvent event = evIt.next();
-			if (event.getLabel().startsWith(" ") || event.getLabel().endsWith(" "))
-			{
-				logger.warn("The event " + event + " has spaces in the beginning or end of its label. This is not recommended.");
-			}
-		}
-
-		// Chech that no event names have the same alphabetic value
-		return !alphabet.hasEqualEventNamesIgnoringCase();
-	}
-
-
+    private static Alphabet getUnionAlphabet(EventsSet alphabets, boolean requireConsistentControllability, boolean requireConsistentImmediate)
+    throws IllegalArgumentException, Exception
+    {
+        if (alphabets.size() < 1)
+        {
+            throw new IllegalArgumentException("At least one alphabet is necessary");
+        }
+        
+        EventsSet eventsSet = new EventsSet();
+        Alphabet unionEvents = AlphabetHelpers.union(alphabets);
+        Alphabet newAlphabet = new Alphabet();
+        
+        // Iterate over all events - check consistency and add one for each label
+        Iterator eventsIt = unionEvents.iterator();
+        
+        while (eventsIt.hasNext())
+        {
+            LabeledEvent currEvent = (LabeledEvent) eventsIt.next();
+            
+            eventsSet.clear();
+            
+            // Iterate over all alphabets, and find those alphabets that
+            // contain an event with currEvent.getLabel
+            Iterator alphabetIt = alphabets.iterator();
+            while (alphabetIt.hasNext())
+            {
+                Alphabet currAlphabet = (Alphabet) alphabetIt.next();
+                
+                if (currAlphabet.contains(currEvent.getLabel()))
+                {
+                    eventsSet.add(currAlphabet.getEvent(currEvent.getLabel()));
+                }
+            }
+            
+            LabeledEvent newEvent = EventHelpers.createEvent(eventsSet, requireConsistentControllability, requireConsistentImmediate);
+            
+            // If we get here, the events are consistent (or consistency is not to be checked)
+            // newEvent.setId(newAlphabet.getUniqueId(idPrefix));
+            newAlphabet.addEvent(newEvent);
+        }
+        
+        return newAlphabet;
+    }
+    
+    /**
+     * Computes the union of all events in eventsSet.
+     * No manipulation of the events.
+     *
+     *@param  eventsSet Description of the Parameter
+     *@return  Description of the Return Value
+     *@exception  IllegalArgumentException Description of the Exception
+     *@exception  Exception Description of the Exception
+     */
+    private static Alphabet union(EventsSet eventsSet)
+    throws IllegalArgumentException, Exception
+    {
+        if (eventsSet.size() >= 1)
+        {
+            // this was >= 2 but why could we not have union over 1 or even 0 number of elements??
+            // Build the new set of events
+            Iterator eventsSetIt = eventsSet.iterator();
+            Collection currEvents = ((Alphabet) eventsSetIt.next()).values();
+            TreeSet tmpEvents = new TreeSet(currEvents);
+            
+            while (eventsSetIt.hasNext())
+            {
+                tmpEvents.addAll((Collection) ((Alphabet) eventsSetIt.next()).values());
+            }
+            
+            // Add all events to an Alphabet
+            Iterator eventIt = tmpEvents.iterator();
+            Alphabet theEvents = new Alphabet();
+            while (eventIt.hasNext())
+            {
+                theEvents.addEvent((LabeledEvent) eventIt.next());
+            }
+            
+            return theEvents;
+        }
+        
+        // at least 1 (not two ::MF) arguments are necessary
+        throw new IllegalArgumentException("Not enough elements of events");
+    }
+    
+    /**
+     * Builds an returns a map mapping events to sets of automata.
+     * (LabeledEvent) -> (Set of Automaton-objects).
+     */
+    public static EventToAutomataMap buildEventToAutomataMap(Automata automata)
+    {
+        //HashMap map = new HashMap();
+        EventToAutomataMap map = new EventToAutomataMap();
+        
+        // Loop over automata
+        for (Automaton automaton : automata)
+        {
+            // Loop over alphabet
+            for (LabeledEvent event : automaton.getAlphabet())
+            {
+                // Insert in map
+                map.insert(event, automaton);
+            }
+        }
+        
+        return map;
+    }
+    
+    /**
+     *
+     * Builds an returns a map mapping uncontrollable events to sets automata.
+     * (uncontrollable LabeledEvent) -> (Set of Automata-objects).
+     */
+    public static EventToAutomataMap buildUncontrollableEventToAutomataMap(Automata automata)
+    {
+        //HashMap map = new HashMap();
+        EventToAutomataMap map = new EventToAutomataMap();
+        
+        // Loop over automata
+        for (Automaton automaton : automata)
+        {
+            // Loop over alphabet
+            for (LabeledEvent event : automaton.getAlphabet())
+            {
+                if (!event.isControllable())
+                {
+                    // Insert in map
+                    map.insert(event, automaton);
+                }
+            }
+        }
+        
+        return map;
+    }
+    
+    /**
+     * Computes and returns "a1 minus a2"
+     */
+    public static Alphabet minus(Alphabet a1, Alphabet a2)
+    {
+        Alphabet result = new Alphabet(a1);
+        
+        result.minus(a2);
+        
+        return result;
+    }
+    
+    /**
+     * Computes and returns "a1 intersection a2"
+     */
+    public static Alphabet intersect(Alphabet a1, Alphabet a2)
+    {
+        Alphabet result = new Alphabet(a1);
+        
+        result.intersect(a2);
+        
+        return result;
+    }
+    
+    /**
+     * Computes and returns "a1 union a2"
+     */
+    public static Alphabet union(Alphabet a1, Alphabet a2)
+    {
+        Alphabet result = new Alphabet(a1);
+        
+        result.union(a2);
+        
+        return result;
+    }
+    
+    /**
+     * Returns true if there are no events with alphabetically equal names, i.e.
+     * lowercase equal.
+     *
+     * Also warns if there are events that start or end with blank spaces.
+     */
+    public static boolean isEventNamesSafe(Alphabet alphabet)
+    {
+        // Check that there are no spaces in the start or end of event names!
+        for (Iterator<LabeledEvent> evIt = alphabet.iterator(); evIt.hasNext(); )
+        {
+            LabeledEvent event = evIt.next();
+            if (event.getLabel().startsWith(" ") || event.getLabel().endsWith(" "))
+            {
+                logger.warn("The event " + event + " has spaces in the beginning or end of its label. This is not recommended.");
+            }
+        }
+        
+        // Chech that no event names have the same alphabetic value
+        return !alphabet.hasEqualEventNamesIgnoringCase();
+    }
+    
+    
 }

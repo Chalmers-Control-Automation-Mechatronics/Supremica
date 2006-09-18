@@ -379,9 +379,8 @@ public class AutomataMinimizer
             {
                 // Look through the map and find the best set of automata
                 double bestValue = heuristic.worstValue();
-                loop: for (Iterator<LabeledEvent> evIt = eventToAutomataMap.eventIterator(); evIt.hasNext(); )
+                loop: for (LabeledEvent event : eventToAutomataMap.keySet())
                 {
-                    LabeledEvent event = evIt.next();
                     // Skip the events in targetAlphabet and epsilon events!
                     if (targetAlphabet.contains(event) || event.isEpsilon())
                     {

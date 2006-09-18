@@ -55,74 +55,30 @@ import java.util.*;
  * Map for mapping LabeledEvent:s to Automata-objects.
  */
 public class EventToAutomataMap
-	extends HashMap<LabeledEvent,Automata>
+    extends HashMap<LabeledEvent,Automata>
 {
-	/*
-	public void insert(LabeledEvent ev, Automaton aut)
-	{
-		Automata automata = (Automata) get(ev);
-		
-		if (automata == null)
-		{   
-			// There were no automata in the map for this event,
-			automata = new Automata();
-			put(ev, automata);
-		}
-		
-		automata.add(aut);			
-	}
-	*/
-
-	/**
-	 * Get the Automata that the LabeledEvent ev is associated with.
-	 */
-	/*
-	public Automata get(LabeledEvent ev)
-	{
-		return super.get(ev);
-	}
-	*/
-
-	/**
-	 * Inserts Automaton aut in the Automata that is found using the
-	 * LabeledEvent ev as a key in the map. Creates new Automata if there is none.
-	 */
-	public Automata insert(LabeledEvent ev, Automaton aut)
-	{
-		Automata automata = get(ev);
-		if (automata == null)
-		{   
-			// There were no automata in the map for this event,
-			automata = new Automata();
-			super.put(ev, automata);
-
-			// Add and return
-			automata.addAutomaton(aut);			
-			return null;
-		}
-		else
-		{
-			// There was one already, add and return
-			automata.addAutomaton(aut);			
-			return automata;
-		}
-	}
-
-	/**
-	 * Iterate over the events, that is the keys in this map.
-	 */
-    public Iterator<LabeledEvent> eventIterator()
+    /**
+     * Inserts Automaton aut in the Automata that is found using the
+     * LabeledEvent ev as a key in the map. Creates new Automata if there is none.
+     */
+    public Automata insert(LabeledEvent ev, Automaton aut)
     {
-        return keySet().iterator();
+        Automata automata = get(ev);
+        if (automata == null)
+        {
+            // There were no automata in the map for this event,
+            automata = new Automata();
+            super.put(ev, automata);
+            
+            // Add and return
+            automata.addAutomaton(aut);
+            return null;
+        }
+        else
+        {
+            // There was one already, add and return
+            automata.addAutomaton(aut);
+            return automata;
+        }
     }
-
-	/**
-	 * Iterate over the events, that is the keys in this map.
-	 */
-	/*
-    public EventIterator iterator()
-    {
-        return eventIterator();
-    }
-	*/
 }

@@ -75,7 +75,7 @@ public class AutomataSynthesizer
     private static Logger logger = LoggerFactory.createLogger(AutomataSynthesizer.class);
     private Automata theAutomata;
     private int nbrOfExecuters;
-    private EventToAutomataMap eventToAutomataMap;
+    private Map<LabeledEvent,Automata> ucEventToPlantMap;
     private AutomataSynchronizerHelper synchHelper;
     private ArrayList synchronizationExecuters;
     private SynchronizationOptions synchronizationOptions;
@@ -120,7 +120,7 @@ public class AutomataSynthesizer
         {
             synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
             
-            eventToAutomataMap = AlphabetHelpers.buildUncontrollableEventToPlantsMap(theAutomata);
+            ucEventToPlantMap = AlphabetHelpers.buildUncontrollableEventToAutomataMap(theAutomata.getPlantAutomata());
         }
         catch (Exception e)
         {
@@ -294,8 +294,8 @@ public class AutomataSynthesizer
             for (Iterator evIt = disabledUncontrollableEvents.iterator(); evIt.hasNext(); )
             {
                 LabeledEvent currEvent = (LabeledEvent) evIt.next();
-                //Set currAutomata = (Set) eventToAutomataMap.get(currEvent);
-                Automata currAutomata = eventToAutomataMap.get(currEvent);
+                //Set currAutomata = (Set) ucEventToPlantMap.get(currEvent);
+                Automata currAutomata = ucEventToPlantMap.get(currEvent);
                 boolean removeEvent = true;
                 
                 // currAutomata contains those plant automata that contain this event.

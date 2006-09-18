@@ -919,13 +919,9 @@ public class Supremica
         assert (currAutomata.size() != 0);
         
         int nbrOfAddedAutomata = 0;
-        Iterator autIt = currAutomata.iterator();
-        
-        while (autIt.hasNext())
+        for (Automaton automaton : currAutomata)
         {
-            Automaton currAutomaton = (Automaton) autIt.next();
-            
-            if (addAutomaton(currAutomaton))
+            if (addAutomaton(automaton))
             {
                 nbrOfAddedAutomata++;
             }
