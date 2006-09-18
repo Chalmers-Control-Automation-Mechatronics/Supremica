@@ -56,8 +56,8 @@ import org.supremica.automata.*;
 interface AutomataSelector
 {
     public Automata next();
-    public Automata addPlants(LabeledEvent event);
     public Automata addPlants(Alphabet alphabet);
+    public Automata addPlant(Alphabet alphabet);
     public int getProgress();
 }
    

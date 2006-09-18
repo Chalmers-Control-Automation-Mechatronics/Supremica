@@ -1684,7 +1684,7 @@ public class AutomataVerifier
             {
                 if (executionDialog != null)
                 {
-                    executionDialog.setMode(ExecutionDialogMode.verifyingNonblocking);
+                    executionDialog.setMode(ExecutionDialogMode.VERIFYINGNONBLOCKING);
                 }
             }
         });

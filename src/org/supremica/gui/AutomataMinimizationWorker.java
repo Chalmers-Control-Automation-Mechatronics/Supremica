@@ -93,15 +93,15 @@ public class AutomataMinimizationWorker
     {
         // Initialize the ExecutionDialog
         //threadsToStop.add(this);
-        executionDialog = new ExecutionDialog(gui.getFrame(), "Minimizing", this);
-        // Different depending on number of automata it will look different
+        executionDialog = new ExecutionDialog(gui.getFrame(), "Minimizing", this);        
+        // Depending on number of automata it will look different
         if (theAutomata.size() > 1)
         {
-            executionDialog.setMode(ExecutionDialogMode.minimizing);
+            executionDialog.setMode(ExecutionDialogMode.MINIMIZING);
         }
         else
         {
-            executionDialog.setMode(ExecutionDialogMode.minimizingSingle);
+            executionDialog.setMode(ExecutionDialogMode.MINIMIZINGSINGLE);
         }
         
         // OK options?
@@ -198,13 +198,6 @@ public class AutomataMinimizationWorker
                 {
                     result.addAutomaton(newAutomaton);
                 }
-                                /*
-                                else
-                                {
-                                        requestStop();
-                                        return;
-                                }
-                                 */
             }
             catch (Exception ex)
             {
@@ -230,7 +223,7 @@ public class AutomataMinimizationWorker
             {
                 if (executionDialog != null)
                 {
-                    executionDialog.setMode(ExecutionDialogMode.hide);
+                    executionDialog.setMode(ExecutionDialogMode.HIDE);
                 }
             }
         });
@@ -258,7 +251,7 @@ public class AutomataMinimizationWorker
         // We're finished! Make sure to kill the ExecutionDialog!
         if (executionDialog != null)
         {
-            executionDialog.setMode(ExecutionDialogMode.hide);
+            executionDialog.setMode(ExecutionDialogMode.HIDE);
             executionDialog = null;
         }
     }
@@ -283,7 +276,7 @@ public class AutomataMinimizationWorker
         
         if (executionDialog != null)
         {
-            executionDialog.setMode(ExecutionDialogMode.hide);
+            executionDialog.setMode(ExecutionDialogMode.HIDE);
         }
     }
     

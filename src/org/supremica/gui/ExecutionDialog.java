@@ -138,7 +138,7 @@ public final class ExecutionDialog
         contentPanel.add(buttonPanel, BorderLayout.SOUTH);
         
         // Hit it!
-        setMode(ExecutionDialogMode.uninitialized);
+        setMode(ExecutionDialogMode.UNINITIALIZED);
         setVisible(true);
     }
     
@@ -244,7 +244,7 @@ public final class ExecutionDialog
         // Update labels
         if (newMode)
         {
-            if (currentMode == ExecutionDialogMode.hide)
+            if (currentMode == ExecutionDialogMode.HIDE)
             {
                 setVisible(false);
                 
@@ -413,7 +413,7 @@ public final class ExecutionDialog
                 threadsToStop = null;    // Helping the garbage collector...
             }
             
-            setMode(ExecutionDialogMode.hide);
+            setMode(ExecutionDialogMode.HIDE);
         }
         else
         {

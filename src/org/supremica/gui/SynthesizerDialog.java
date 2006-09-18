@@ -329,7 +329,7 @@ class SynthesizerDialogAdvancedPanel
     {
         Box advancedBox = Box.createVerticalBox();
         
-        oneEventAtATimeBox = new JCheckBox("One event at a time");
+        oneEventAtATimeBox = new JCheckBox("One event at a time (experimental)");
         oneEventAtATimeBox.setToolTipText("Synthesize with respect to one event at a time");
         
         maximallyPermissiveBox = new JCheckBox("Maximally permissive result");
@@ -340,7 +340,7 @@ class SynthesizerDialogAdvancedPanel
         maximallyPermissiveIncrementalBox.setToolTipText("Use incremental algorithm for maximally permissive synthesis");
         maximallyPermissiveIncrementalBox.addActionListener(this);
         
-        maximallyPermissiveOnePlantAtATimeBox = new JCheckBox("One plant at a time");
+        maximallyPermissiveOnePlantAtATimeBox = new JCheckBox("One plant at a time (experimental)");
         maximallyPermissiveOnePlantAtATimeBox.setToolTipText("Increment by one plant at a time");
         
         reduceSupervisorsBox = new JCheckBox("Reduce supervisors (experimental)");

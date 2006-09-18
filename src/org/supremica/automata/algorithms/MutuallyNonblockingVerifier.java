@@ -260,7 +260,7 @@ public class MutuallyNonblockingVerifier
                 
                 if (executionDialog != null)
                 {
-                    executionDialog.setMode(ExecutionDialogMode.verifyingMutualNonblockingFirstRun);
+                    executionDialog.setMode(ExecutionDialogMode.VERIFYINGMUTUALNONBLOCKINGFIRSTRUN);
                     executionDialog.initProgressBar(0, theAutomata.size());
                 }
             }
@@ -304,7 +304,7 @@ public class MutuallyNonblockingVerifier
                 {
                     if (executionDialog != null)
                     {
-                        executionDialog.setMode(ExecutionDialogMode.verifyingMutualNonblockingSecondRun);
+                        executionDialog.setMode(ExecutionDialogMode.VERIFYINGMUTUALNONBLOCKINGSECONDRUN);
                         executionDialog.initProgressBar(0, theAutomata.size());
                     }
                 }

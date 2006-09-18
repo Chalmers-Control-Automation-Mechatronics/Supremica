@@ -935,7 +935,7 @@ public final class AutomataSynchronizerExecuter
 			if (executionDialog != null)
 			{
 				executionDialog.initProgressBar(0, helper.getStateTableSize());
-				executionDialog.setMode(ExecutionDialogMode.synchronizingBuildingStates);
+				executionDialog.setMode(ExecutionDialogMode.SYNCHRONIZINGBUILDINGSTATES);
 			}
 
 			// Create all states
@@ -1013,7 +1013,7 @@ public final class AutomataSynchronizerExecuter
 			if (executionDialog != null)
 			{
 				executionDialog.initProgressBar(0, currStateTable.length);
-				executionDialog.setMode(ExecutionDialogMode.synchronizingBuildingTransitions);
+				executionDialog.setMode(ExecutionDialogMode.SYNCHRONIZINGBUILDINGTRANSITIONS);
 			}
 
 			// Create all transitions

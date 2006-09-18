@@ -94,7 +94,7 @@ public class AutomataSynthesisWorker
         ArrayList threadsToStop = new ArrayList();
         threadsToStop.add(this);
         executionDialog = new ExecutionDialog(gui.getFrame(), "Synthesizing", threadsToStop);
-        executionDialog.setMode(ExecutionDialogMode.synthesizing);
+        executionDialog.setMode(ExecutionDialogMode.SYNTHESIZING);
         
         // OK options?
         String errorMessage = options.validOptions();
@@ -167,7 +167,7 @@ public class AutomataSynthesisWorker
             {
                 if (executionDialog != null)
                 {
-                    executionDialog.setMode(ExecutionDialogMode.hide);
+                    executionDialog.setMode(ExecutionDialogMode.HIDE);
                 }
             }
         });
@@ -195,7 +195,7 @@ public class AutomataSynthesisWorker
         // We're finished! Make sure to kill the ExecutionDialog!
         if (executionDialog != null)
         {
-            executionDialog.setMode(ExecutionDialogMode.hide);
+            executionDialog.setMode(ExecutionDialogMode.HIDE);
         }
     }
     
@@ -265,7 +265,7 @@ public class AutomataSynthesisWorker
         
         if (executionDialog != null)
         {
-            executionDialog.setMode(ExecutionDialogMode.hide);
+            executionDialog.setMode(ExecutionDialogMode.HIDE);
         }
     }
     

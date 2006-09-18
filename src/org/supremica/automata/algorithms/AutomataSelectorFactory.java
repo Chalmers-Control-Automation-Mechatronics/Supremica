@@ -65,7 +65,7 @@ class AutomataSelectorFactory
     {
         //if (!options.oneEventAtATime)
         {
-            return new PerSpecificationAutomataSelector(automata);
+            return new PerSpecificationAutomataSelector(automata, options);
         }
 
         //return null;
@@ -85,18 +85,20 @@ class AutomataSelectorFactory
         private Automata globalSet;
         private Automata partialSet = new Automata();
         private Iterator specIterator;
-        private Map<LabeledEvent,Automata> eventToAutomataMap;
+        private Map<LabeledEvent,Automata> eventToPlantMap;
         private int progress = 0;
         private int progressMax;
+        private SynthesizerOptions options;
                 
-        public PerSpecificationAutomataSelector(Automata automata)
+        public PerSpecificationAutomataSelector(Automata automata, SynthesizerOptions options)
         throws Exception
         {
             globalSet = automata.getSpecificationAndSupervisorAutomata();
             specIterator = globalSet.iterator();
             progressMax = automata.size();
+            this.options = options;
             
-            eventToAutomataMap = AlphabetHelpers.buildUncontrollableEventToPlantsMap(automata);
+            eventToPlantMap = AlphabetHelpers.buildUncontrollableEventToPlantsMap(automata);
         }
         
         /**
@@ -119,14 +121,13 @@ class AutomataSelectorFactory
                 logger.debug("AutomataSelector added spec/sup " + spec.getName());
                 
                 // Add plants for all uncontrollable events
-                for (LabeledEvent event : spec.getAlphabet())
-                {
-                    // Add plants for uncontrollable events only
-                    if (!event.isControllable())
-                    {
-                        addPlants(event);
-                    }
-                }
+                Alphabet ucAlpha = spec.getAlphabet().getUncontrollableAlphabet();
+                if (options.addOnePlantAtATime)
+                    // Add one plant
+                    addPlant(ucAlpha);
+                else
+                    // Add all plants
+                    addPlants(ucAlpha);
                 
                 // Did we find any plants?
                 if (partialSet.size() > 1)
@@ -146,26 +147,41 @@ class AutomataSelectorFactory
         }
         
         /**
-         * To the current selection of spec and plants, add all plants that have this event
+         * To your current selection of spec and plants, add all plants that have these events..
          */
-        public Automata addPlants(LabeledEvent currEvent)
+        public Automata addPlants(Alphabet events)
         {
-            if (eventToAutomataMap.get(currEvent) != null)
+            for (LabeledEvent event : events)
             {
-                partialSet.addAutomata(eventToAutomataMap.get(currEvent));
+                if (eventToPlantMap.get(event) != null)
+                {
+                    partialSet.addAutomata(eventToPlantMap.get(event));
+                }
             }
             
             return partialSet;
         }
         
         /**
-         * To your current selection of spec and plants, add all plants that have these events
+         * To your current selection of spec and plants, add one plant that has at least one 
+         * of these events and that has not been added before, if there is one...
          */
-        public Automata addPlants(Alphabet events)
+        public Automata addPlant(Alphabet events)
         {
             for (LabeledEvent event : events)
             {
-                addPlants(event);
+                if (eventToPlantMap.get(event) != null)
+                {
+                    Automata sharers = eventToPlantMap.get(event);
+                    for (Automaton plant : sharers)
+                    {
+                        if (!partialSet.containsAutomaton(plant))
+                        {
+                            partialSet.addAutomaton(plant);
+                            return partialSet;
+                        }
+                    }
+                }
             }
             
             return partialSet;

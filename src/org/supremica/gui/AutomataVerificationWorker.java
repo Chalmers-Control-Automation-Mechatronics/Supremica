@@ -200,7 +200,7 @@ public class AutomataVerificationWorker
         threadsToStop.add(this);
         threadsToStop.add(automataVerifier);
         executionDialog = new ExecutionDialog(workbench.getFrame(), "Verifying", threadsToStop);
-        executionDialog.setMode(ExecutionDialogMode.verifying);
+        executionDialog.setMode(ExecutionDialogMode.VERIFYING);
         automataVerifier.setExecutionDialog(executionDialog);
         
         // Solve the problem and measure the time it takes!
@@ -218,7 +218,7 @@ public class AutomataVerificationWorker
             {
                 if (executionDialog != null)
                 {
-                    executionDialog.setMode(ExecutionDialogMode.hide);
+                    executionDialog.setMode(ExecutionDialogMode.HIDE);
                 }
             }
         });
@@ -251,7 +251,7 @@ public class AutomataVerificationWorker
         // We're finished! Bail out! Make sure to kill the ExecutionDialog!
         if (executionDialog != null)
         {
-            executionDialog.setMode(ExecutionDialogMode.hide);
+            executionDialog.setMode(ExecutionDialogMode.HIDE);
             executionDialog = null;
         }
     }
@@ -269,7 +269,7 @@ public class AutomataVerificationWorker
         
         if (executionDialog != null)
         {
-            executionDialog.setMode(ExecutionDialogMode.hide);
+            executionDialog.setMode(ExecutionDialogMode.HIDE);
         }
     }
     

@@ -197,12 +197,12 @@ public class AutomataSynthesizer
             }
             else if (type == SynthesisType.CONTROLLABLE)
             {
-                // Only controllable? Then everything should be considered marked... 
+                // Only controllable? Then everything should be considered marked...
                 // and AFTER that, the specs must be plantified!
                 for (Automaton automaton : theAutomata)
                 {
                     automaton.setAllStatesAccepting();
-                }                
+                }
                 // Plantify specs
                 MinimizationHelper.plantify(theAutomata);
             }
@@ -409,7 +409,12 @@ public class AutomataSynthesizer
                     {
                         // Note that in the nonincremental approach, this will add no new plants
                         // since they are already added!
-                        automata = selector.addPlants(disabledUncontrollableEvents);
+                        if (synthesizerOptions.addOnePlantAtATime)
+                            // Add one plant
+                            automata = selector.addPlant(disabledUncontrollableEvents);
+                        else
+                            // Add all plants
+                            automata = selector.addPlants(disabledUncontrollableEvents);
                         
                         // Do monolithic synthesis on this subsystem
                         retval = doMonolithic(automata);
@@ -451,12 +456,12 @@ public class AutomataSynthesizer
             }
         }
         
-        // If no spec/sup is in the selected automata, only nonblocking requires work
-        // if we've not seen any spec, do monolithic synthesis on the entire set
         /*
+        // If no spec/sup is in the selected automata, only nonblocking requires work
+        // if we've not seen any spec, do monolithic synthesis on each plant individually
         if (!selector.hadSpec())
         {
-            logger.debug("No spec/sup seen, performing monolithic synthesis on the entire set.");
+            logger.debug("No spec/sup seen, performing monolithic synthesis on the each plant.");
          
             MonolithicReturnValue retval = doMonolithic(aut);
          
@@ -477,7 +482,7 @@ public class AutomataSynthesizer
         {
             if (executionDialog != null)
             {
-                executionDialog.setMode(ExecutionDialogMode.synthesizingOptimizing);
+                executionDialog.setMode(ExecutionDialogMode.SYNTHESISOPTIMIZING);
                 executionDialog.initProgressBar(0, supervisors.size());
             }
             
@@ -652,7 +657,7 @@ public class AutomataSynthesizer
         {
             if (executionDialog != null)
             {
-                executionDialog.setMode(ExecutionDialogMode.synthesizingReducing);
+                executionDialog.setMode(ExecutionDialogMode.SYNTHESISREDUCING);
             }
             
             // Supervisor reduction only works if the supervisor is purged
@@ -666,7 +671,7 @@ public class AutomataSynthesizer
             
             if (executionDialog != null)
             {
-                executionDialog.setMode(ExecutionDialogMode.synthesizing);
+                executionDialog.setMode(ExecutionDialogMode.SYNTHESIZING);
             }
         }
         
@@ -803,7 +808,7 @@ public class AutomataSynthesizer
     }
     
     /**
-     * Default method for synthesizing a controllable and nonblocking supervisor.
+     * Default method for SYNTHESIZING a controllable and nonblocking supervisor.
      */
     public static Supervisor synthesizeControllableNonblocking(Automata model)
     throws Exception

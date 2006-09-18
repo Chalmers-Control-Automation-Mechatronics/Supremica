@@ -49,56 +49,59 @@
  */
 package org.supremica.gui;
 
+/**
+ * Different modes that the exececution dialog can display.
+ */
 public class ExecutionDialogMode
 {
-	// Arguments are ExecutionDialogMode(String id, String txt, boolean value, boolean progress)
-
-	// Keep these in alphabetical order for convenience
-	public static final ExecutionDialogMode hide = new ExecutionDialogMode("Hide", "", false, false);
-	public static final ExecutionDialogMode minimizing = new ExecutionDialogMode("Minimizing...", "", false, true);
-	public static final ExecutionDialogMode minimizingSingle = new ExecutionDialogMode("Minimizing...", "Number of partitions", true, false);
-	public static final ExecutionDialogMode synchronizing = new ExecutionDialogMode("Synchronizing...", "Number of states:", true, false);
-	public static final ExecutionDialogMode synchronizingBuildingStates = new ExecutionDialogMode("Building automaton...", "Building states", false, true);
-	public static final ExecutionDialogMode synchronizingBuildingTransitions = new ExecutionDialogMode("Building automaton...", "Building transitions", false, true);
-	public static final ExecutionDialogMode synchronizingMatchingStates = new ExecutionDialogMode("Matching States...", "", false, true);
-	public static final ExecutionDialogMode synthesizing = new ExecutionDialogMode("Synthesizing...", "", false, true);
-	public static final ExecutionDialogMode synthesizingOptimizing = new ExecutionDialogMode("Optimizing...", "", false, true);
-	public static final ExecutionDialogMode synthesizingReducing = new ExecutionDialogMode("Reducing...", "", false, true);
-	public static final ExecutionDialogMode verifying = new ExecutionDialogMode("Verifying...", "", true, false);
-	public static final ExecutionDialogMode verifyingNonblocking = new ExecutionDialogMode("Verifying nonblocking...", "", false, true);
-	public static final ExecutionDialogMode verifyingMutualNonblockingFirstRun = new ExecutionDialogMode("Verifying mutual nonblocking...", "First run", false, true);
-	public static final ExecutionDialogMode verifyingMutualNonblockingSecondRun = new ExecutionDialogMode("Verifying mutual nonblocking...", "Second run", false, true);
-	public static final ExecutionDialogMode uninitialized = new ExecutionDialogMode("Uninitialized", "", false, false);
-	private final String id;
-	private String text;
-	private boolean show_value;
-	private boolean show_progress;
-
-	private ExecutionDialogMode(String id, String txt, boolean value, boolean progress)
-	{
-		this.id = id;
-		this.text = txt;
-		this.show_value = value;
-		this.show_progress = progress;
-	}
-
-	public String getId()
-	{
-		return id;
-	}
-
-	public String getText()
-	{
-		return text;
-	}
-
-	public boolean showValue()
-	{
-		return show_value;
-	}
-
-	public boolean showProgress()
-	{
-		return show_progress;
-	}
+    // Arguments are ExecutionDialogMode(String ID, String txt, boolean value, boolean progress)
+    
+    // Keep these in alphabetical order for convenience
+    public static final ExecutionDialogMode HIDE = new ExecutionDialogMode("Hide", "", false, false);
+    public static final ExecutionDialogMode MINIMIZING = new ExecutionDialogMode("Minimizing...", "", false, true);
+    public static final ExecutionDialogMode MINIMIZINGSINGLE = new ExecutionDialogMode("Minimizing...", "Number of partitions", true, false);
+    public static final ExecutionDialogMode SYNCHRONIZING = new ExecutionDialogMode("Synchronizing...", "Number of states:", true, false);
+    public static final ExecutionDialogMode SYNCHRONIZINGBUILDINGSTATES = new ExecutionDialogMode("Building automaton...", "Building states", false, true);
+    public static final ExecutionDialogMode SYNCHRONIZINGBUILDINGTRANSITIONS = new ExecutionDialogMode("Building automaton...", "Building transitions", false, true);
+    public static final ExecutionDialogMode SYNTHESIZING = new ExecutionDialogMode("Synthesizing...", "", false, true);
+    public static final ExecutionDialogMode SYNTHESISOPTIMIZING = new ExecutionDialogMode("Optimizing...", "", false, true);
+    public static final ExecutionDialogMode SYNTHESISREDUCING = new ExecutionDialogMode("Reducing...", "", false, true);
+    public static final ExecutionDialogMode VERIFYING = new ExecutionDialogMode("Verifying...", "", true, false);
+    public static final ExecutionDialogMode VERIFYINGNONBLOCKING = new ExecutionDialogMode("Verifying nonblocking...", "", false, true);
+    public static final ExecutionDialogMode VERIFYINGMUTUALNONBLOCKINGFIRSTRUN = new ExecutionDialogMode("Verifying mutual nonblocking...", "First run", false, true);
+    public static final ExecutionDialogMode VERIFYINGMUTUALNONBLOCKINGSECONDRUN = new ExecutionDialogMode("Verifying mutual nonblocking...", "Second run", false, true);
+    public static final ExecutionDialogMode UNINITIALIZED = new ExecutionDialogMode("Uninitialized", "", false, false);
+    
+    private final String ID;
+    private final String TEXT;
+    private final boolean SHOWVALUE;
+    private final boolean SHOWPROGRESS;
+    
+    private ExecutionDialogMode(String id, String txt, boolean value, boolean progress)
+    {
+        this.ID = id;
+        this.TEXT = txt;
+        this.SHOWVALUE = value;
+        this.SHOWPROGRESS = progress;
+    }
+    
+    public String getId()
+    {
+        return ID;
+    }
+    
+    public String getText()
+    {
+        return TEXT;
+    }
+    
+    public boolean showValue()
+    {
+        return SHOWVALUE;
+    }
+    
+    public boolean showProgress()
+    {
+        return SHOWPROGRESS;
+    }
 }
