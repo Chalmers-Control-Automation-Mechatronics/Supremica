@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.25 2006-08-09 10:22:16 robi Exp $
+//# $Id: EditorComponentsPanel.java,v 1.26 2006-09-18 10:57:23 knut Exp $
 //###########################################################################
 
 
@@ -16,6 +16,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.*;
 import javax.swing.tree.*;
+import java.util.*;
 
 import net.sourceforge.waters.gui.ComponentInfo;
 import net.sourceforge.waters.gui.EditorEditVariableDialog;
@@ -30,6 +31,8 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.VariableSubject;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.NamedProxy;
 
 import org.supremica.gui.WhiteScrollPane;
 
@@ -91,6 +94,17 @@ class EditorComponentsPanel
 			DefaultMutableTreeNode parentNode = null;
 			TreePath parentPath = moduleSelectTree.getSelectionPath();
 
+/*
+			if ((o instanceof SimpleComponentSubject))
+			{
+				SimpleComponentSubject scp = (SimpleComponentSubject) o;
+				if (!componentNameAvailable(scp.getName()))
+				{
+					System.err.println("Componentname not available");
+				}
+			}
+
+*/
 			if (parentPath == null)
 			{
 				//There's no selection. Default to the root node.
@@ -116,15 +130,6 @@ class EditorComponentsPanel
 				module.getComponentListModifiable().add(o);
 			}
 
-			if ((o instanceof SimpleComponentSubject))
-			{
-				SimpleComponentSubject scp = (SimpleComponentSubject) o;
-
-				//
-				//logEntry("Adding SimpleComponentSubject: " + scp.getName());
-
-				//EditorWindow ed = new EditorWindow(scp.getName() + " - Waters Editor", module, scp, this, this);
-			}
 
 			//Add node to module tree
 			((ModuleTree) moduleSelectTree).addComponent(o);
@@ -134,6 +139,27 @@ class EditorComponentsPanel
 	public ModuleSubject getModuleSubject()
 	{
 		return moduleContainer.getModule();
+	}
+
+	public boolean componentNameAvailable(String name)
+	{
+		if (name == null)
+		{
+			return false;
+		}
+
+		ModuleSubject subject = getModuleSubject();
+		List<Proxy> componentList = subject.getComponentList();
+		for(Proxy proxy : componentList)
+		{
+			NamedProxy namedProxy = (NamedProxy)proxy;
+			String currName = namedProxy.getName();
+			if (name.equals(currName))
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
 

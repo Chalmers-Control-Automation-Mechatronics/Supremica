@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   MainPanel
 //###########################################################################
-//# $Id: MainPanel.java,v 1.15 2006-09-18 09:21:00 knut Exp $
+//# $Id: MainPanel.java,v 1.16 2006-09-18 10:57:23 knut Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -189,7 +189,8 @@ abstract class MainPanel
 
 	public void actionPerformed(ActionEvent e)
 	{
-		logger.error("MainPanel: actionPerformed not implemented");
+
+		getActions().editorAddSimpleComponentAction.actionPerformed(e);
 	}
 
  	class EmptyRightPanel

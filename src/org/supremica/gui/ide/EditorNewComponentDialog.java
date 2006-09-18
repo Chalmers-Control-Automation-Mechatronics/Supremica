@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorNewDialog
 //###########################################################################
-//# $Id: EditorNewComponentDialog.java,v 1.8 2006-07-11 19:42:25 knut Exp $
+//# $Id: EditorNewComponentDialog.java,v 1.9 2006-09-18 10:57:23 knut Exp $
 //###########################################################################
 
 
@@ -142,6 +142,14 @@ public class EditorNewComponentDialog
 				ErrorWindow.askRevert(exception, nameText);
 				return;
 			}
+
+			if (!mRoot.componentNameAvailable(nameText))
+			{
+            	JOptionPane.showMessageDialog(this, "Duplicate name: " + nameText, "Duplicate Name", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
+
 			ComponentKind kind;
 			final String key = group.getSelection().getActionCommand();
 			if (key.equals("Plant")) {
@@ -159,6 +167,7 @@ public class EditorNewComponentDialog
 			final SimpleComponentSubject comp =
 				new SimpleComponentSubject(ident, kind, graph);
 			//TODO: Make this create the component
+
 			mRoot.addComponent(comp);
 			dispose();
 /*
