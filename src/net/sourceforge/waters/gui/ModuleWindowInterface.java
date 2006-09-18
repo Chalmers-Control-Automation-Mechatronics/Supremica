@@ -4,12 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindowInterface
 //###########################################################################
-//# $Id: ModuleWindowInterface.java,v 1.3 2006-08-09 10:22:16 robi Exp $
+//# $Id: ModuleWindowInterface.java,v 1.4 2006-09-18 09:21:00 knut Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
 
 import java.awt.Frame;
+import java.awt.event.ActionListener;
 
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -29,6 +30,7 @@ import net.sourceforge.waters.model.expr.ExpressionParser;
  */
 
 public interface ModuleWindowInterface
+	extends ActionListener
 {
 
   /**

@@ -25,7 +25,7 @@ class ModuleTreePopupMenu
     private AbstractSubject mInvokingComponent;
     private ModuleTree mTree;
     private ModuleWindowInterface mWindow;
-    
+
     public ModuleTreePopupMenu(ModuleTree tree, ModuleWindowInterface moduleWindow, AbstractSubject c)
     {
         mInvokingComponent = c;
@@ -33,17 +33,14 @@ class ModuleTreePopupMenu
         mWindow = moduleWindow;
         init();
     }
-    
+
     /**
      * Initialize the menu.
      */
     private void init()
     {
         JMenuItem item;
-        // *** BUG *** need to handle actions differently!
-        final ActionListener listener = (ActionListener) mWindow;
-        // *** BUG ***
-        
+
         if(mInvokingComponent instanceof SimpleComponentSubject)
         {
 /*			item = new JMenuItem("Add variable");
@@ -53,37 +50,37 @@ class ModuleTreePopupMenu
                         addVariableItem = item;
  */
         }
-        
+
         if(mInvokingComponent instanceof SimpleComponentSubject ||
             mInvokingComponent instanceof VariableSubject)
         {
             item = new JMenuItem("Add variable");
             item.setActionCommand("add variable");
-            item.addActionListener(listener);
+            item.addActionListener((ActionListener)mWindow);
             this.add(item);
             addVariableItem = item;
         }
-        
+
         if(mInvokingComponent instanceof VariableSubject)
         {
             item = new JMenuItem("Delete variable");
             item.setActionCommand("remove component");
-            item.addActionListener(listener);
+            item.addActionListener((ActionListener)mWindow);
             this.add(item);
             deleteVariableItem = item;
-            
+
             item = new JMenuItem("Edit variable");
             item.setActionCommand("edit variable");
-            item.addActionListener(listener);
+            item.addActionListener((ActionListener)mWindow);
             this.add(item);
             editVariableItem = item;
         }
-        
+
         if(mInvokingComponent instanceof ModuleSubject)
         {
             item = new JMenuItem("Create automaton");
             item.setActionCommand("add simple component");
-            item.addActionListener(listener);
+            item.addActionListener((ActionListener)mWindow);
             this.add(item);
             deleteVariableItem = item;
         }

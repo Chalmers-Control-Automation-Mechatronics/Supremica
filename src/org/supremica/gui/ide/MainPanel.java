@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   MainPanel
 //###########################################################################
-//# $Id: MainPanel.java,v 1.14 2006-08-09 10:22:16 robi Exp $
+//# $Id: MainPanel.java,v 1.15 2006-09-18 09:21:00 knut Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -13,6 +13,7 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -26,6 +27,8 @@ import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
+import org.supremica.log.*;
+
 import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.ide.actions.Actions;
 
@@ -34,6 +37,8 @@ abstract class MainPanel
 	extends JPanel
 	implements ModuleWindowInterface
 {
+    private static Logger logger = LoggerFactory.createLogger(MainPanel.class);
+
 	private IDEToolBar thisToolBar = null;
 	private IDEToolBar currParentToolBar = null;
 
@@ -81,7 +86,7 @@ abstract class MainPanel
 	{
 		return moduleContainer.getExpressionParser();
 	}
-	
+
 	public Frame getRootWindow()
 	{
 		return (Frame) getTopLevelAncestor();
@@ -180,6 +185,11 @@ abstract class MainPanel
 			return thisToolBar;
 		}
 		return null;
+	}
+
+	public void actionPerformed(ActionEvent e)
+	{
+		logger.error("MainPanel: actionPerformed not implemented");
 	}
 
  	class EmptyRightPanel
