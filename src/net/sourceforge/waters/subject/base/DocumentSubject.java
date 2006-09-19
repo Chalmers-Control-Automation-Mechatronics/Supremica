@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   DocumentSubject
 //###########################################################################
-//# $Id: DocumentSubject.java,v 1.4 2006-09-14 11:51:27 robi Exp $
+//# $Id: DocumentSubject.java,v 1.5 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -15,6 +15,7 @@ import java.net.URI;
 import java.net.URL;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
+import net.sourceforge.waters.model.base.Proxy;
 
 
 /**
@@ -36,24 +37,29 @@ public abstract class DocumentSubject
   //#########################################################################
   //# Constructors
   /**
-   * Creates a document without specified file location.
+   * Creates a document without specified file location, and with no
+   * comment.
    * @param  name        The name of the new document.
    */
   protected DocumentSubject(final String name)
   {
-    this(name, null);
+    this(name, null, null);
   }
 
   /**
    * Creates a document.
    * @param  name        The name of the new document.
+   * @param  comment     The comment string for the new document,
+   *                     or <CODE>null</CODE>.
    * @param  location    The file location for the new document,
    *                     or <CODE>null</CODE>.
    */
   protected DocumentSubject(final String name,
+                            final String comment,
 			    final URI location)
   {
     super(name);
+    mComment = comment;
     mLocation = location;
   }
 
@@ -64,6 +70,7 @@ public abstract class DocumentSubject
   protected DocumentSubject(final DocumentProxy partner)
   {
     super(partner);
+    mComment = partner.getComment();
     mLocation = partner.getLocation();
   }
 
@@ -73,6 +80,7 @@ public abstract class DocumentSubject
   public DocumentSubject clone()
   {
     final DocumentSubject cloned = (DocumentSubject) super.clone();
+    cloned.mComment = mComment;
     cloned.mLocation = null;
     return cloned;
   }
@@ -80,6 +88,20 @@ public abstract class DocumentSubject
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.DocumentProxy
+  public String getComment()
+  {
+    return mComment;
+  }
+
+  /**
+   * Assigns a new comment to this document.
+   * @param  comment     The new comment string, or <CODE>null</CODE>.
+   */
+  public void setComment(final String comment)
+  {
+    mComment = comment;
+  }
+
   public URI getLocation()
   {
     return mLocation;
@@ -105,6 +127,31 @@ public abstract class DocumentSubject
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.base.Proxy
+  public boolean equalsByContents(final Proxy partner)
+  {
+    if (super.equalsByContents(partner)) {
+      final DocumentSubject doc = (DocumentSubject) partner;
+      return
+	mComment == null ?
+	doc.mComment == null :
+	mComment.equals(doc.mComment);
+    } else {
+      return false;
+    }
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    if (mComment != null) { 
+      result += 5 * mComment.hashCode();
+    }
+    return result;
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.Subject
   public DocumentSubject getDocument()
   {
@@ -114,6 +161,7 @@ public abstract class DocumentSubject
 
   //#########################################################################
   //# Data Members
+  private String mComment;
   private URI mLocation;
 
 }

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   ModuleElement
 //###########################################################################
-//# $Id: ModuleElement.java,v 1.8 2006-07-25 22:06:07 robi Exp $
+//# $Id: ModuleElement.java,v 1.9 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -43,6 +43,7 @@ public final class ModuleElement
   /**
    * Creates a new module.
    * @param name The name of the new module.
+   * @param comment The comment of the new module, or <CODE>null</CODE>.
    * @param location The location of the new module.
    * @param parameterList The parameter list of the new module, or <CODE>null</CODE> if empty.
    * @param constantAliasList The constant definition list of the new module, or <CODE>null</CODE> if empty.
@@ -51,6 +52,7 @@ public final class ModuleElement
    * @param componentList The component list of the new module, or <CODE>null</CODE> if empty.
    */
   public ModuleElement(final String name,
+                       final String comment,
                        final URI location,
                        final Collection<? extends ParameterProxy> parameterList,
                        final Collection<? extends AliasProxy> constantAliasList,
@@ -58,7 +60,7 @@ public final class ModuleElement
                        final Collection<? extends Proxy> eventAliasList,
                        final Collection<? extends Proxy> componentList)
   {
-    super(name, location);
+    super(name, comment, location);
     if (parameterList == null) {
       mParameterList = Collections.emptyList();
     } else {
@@ -104,6 +106,7 @@ public final class ModuleElement
   /**
    * Creates a new module using default values.
    * This constructor creates a module with
+   * the comment set to <CODE>null</CODE>,
    * an empty parameter list,
    * an empty constant definition list,
    * an empty event declaration list,
@@ -116,6 +119,7 @@ public final class ModuleElement
                        final URI location)
   {
     this(name,
+         null,
          location,
          emptyParameterProxyList(),
          emptyAliasProxyList(),

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   TraceElement
 //###########################################################################
-//# $Id: TraceElement.java,v 1.2 2006-07-20 02:28:37 robi Exp $
+//# $Id: TraceElement.java,v 1.3 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -50,6 +50,8 @@ public abstract class TraceElement
   /**
    * Creates a new trace.
    * @param  name         The name to be given to the new trace.
+   * @param  comment      A comment describing the new trace,
+   *                      or <CODE>null</CODE>.
    * @param  location     The URI to be associated with the new
    *                      document, or <CODE>null</CODE>.
    * @param  des          The product DES for which this trace is
@@ -65,12 +67,13 @@ public abstract class TraceElement
    *                      in the product DES.
    */
   TraceElement(final String name,
+               final String comment,
                final URI location,
                final ProductDESProxy des,
                final Collection<? extends AutomatonProxy> automata,
                final List<? extends TraceStepProxy> steps)
   {
-    super(name, location);
+    super(name, comment, location);
     mProductDES = des;
     if (automata == null) {
       mAutomata = Collections.emptySet();
@@ -101,7 +104,7 @@ public abstract class TraceElement
                final ProductDESProxy des,
                final List<? extends EventProxy> events)
   {
-    super(name, null);
+    super(name);
     mProductDES = des;
     final Set<AutomatonProxy> automata = des.getAutomata();
     if (des instanceof ProductDESElement) {

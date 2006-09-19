@@ -21,7 +21,7 @@
 <xs:element name="ProductDES">
   <xs:complexType>
     <xs:complexContent>
-      <xs:extension base="B:NamedType">
+      <xs:extension base="B:DocumentType">
         <xs:sequence>
           <xs:element ref="D:EventList" minOccurs="0"/>
           <xs:element ref="D:AutomataList" minOccurs="0"/>
@@ -191,7 +191,7 @@
 
 <xs:complexType name="TraceType">
   <xs:complexContent>
-    <xs:extension base="B:NamedType">
+    <xs:extension base="B:DocumentType">
       <xs:sequence>
         <xs:element ref="D:AutomatonRefList" minOccurs="0"/>
         <xs:element ref="D:TraceStepList" minOccurs="0"/>

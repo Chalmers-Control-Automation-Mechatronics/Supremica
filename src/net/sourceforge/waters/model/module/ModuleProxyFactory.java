@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleProxyFactory
 //###########################################################################
-//# $Id: ModuleProxyFactory.java,v 1.12 2006-09-12 14:32:17 robi Exp $
+//# $Id: ModuleProxyFactory.java,v 1.13 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -470,6 +470,7 @@ public interface ModuleProxyFactory
   /**
    * Creates a new module.
    * @param name The name of the new module.
+   * @param comment The comment of the new module, or <CODE>null</CODE>.
    * @param location The location of the new module.
    * @param parameterList The parameter list of the new module, or <CODE>null</CODE> if empty.
    * @param constantAliasList The constant definition list of the new module, or <CODE>null</CODE> if empty.
@@ -479,6 +480,7 @@ public interface ModuleProxyFactory
    */
   public ModuleProxy createModuleProxy
       (String name,
+       String comment,
        URI location,
        Collection<? extends ParameterProxy> parameterList,
        Collection<? extends AliasProxy> constantAliasList,
@@ -489,6 +491,7 @@ public interface ModuleProxyFactory
   /**
    * Creates a new module using default values.
    * This method creates a module with
+   * the comment set to <CODE>null</CODE>,
    * an empty parameter list,
    * an empty constant definition list,
    * an empty event declaration list,

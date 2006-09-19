@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   ProductDESProxy
 //###########################################################################
-//# $Id: ProductDESProxy.java,v 1.4 2005-11-03 01:24:15 robi Exp $
+//# $Id: ProductDESProxy.java,v 1.5 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.des;
@@ -38,6 +38,11 @@ import net.sourceforge.waters.model.base.DocumentProxy;
 public interface ProductDESProxy
   extends DocumentProxy
 {
+
+  //#########################################################################
+  //# Cloning
+  public ProductDESProxy clone();
+
 
   //#########################################################################
   //# Getters and Setters

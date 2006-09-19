@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBExporter
 //###########################################################################
-//# $Id: JAXBExporter.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: JAXBExporter.java,v 1.3 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -21,6 +21,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.base.VisitorException;
 
+import net.sourceforge.waters.xsd.base.DocumentType;
 import net.sourceforge.waters.xsd.base.ElementType;
 import net.sourceforge.waters.xsd.base.NamedType;
 
@@ -69,9 +70,10 @@ abstract class JAXBExporter
     element.setName(proxy.getName());
   }
 
-  void copyDocumentProxy(final DocumentProxy proxy, final NamedType element)
+  void copyDocumentProxy(final DocumentProxy proxy, final DocumentType element)
   {
     copyNamedProxy(proxy, element);
+    element.setComment(proxy.getComment());
   }
 
   void copyCollection(final Collection<? extends Proxy> proxies,

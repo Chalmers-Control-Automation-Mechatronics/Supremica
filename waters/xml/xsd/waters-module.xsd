@@ -21,7 +21,7 @@
 <xs:element name="Module">
   <xs:complexType>
     <xs:complexContent>
-      <xs:extension base="B:NamedType">
+      <xs:extension base="B:DocumentType">
         <xs:sequence>
           <xs:element ref="M:ParameterList" minOccurs="0"/>
           <xs:element ref="M:ConstantAliasList" minOccurs="0"/>

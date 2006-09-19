@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   DocumentProxy
 //###########################################################################
-//# $Id: DocumentProxy.java,v 1.3 2006-02-20 22:20:21 robi Exp $
+//# $Id: DocumentProxy.java,v 1.4 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -37,9 +37,17 @@ public interface DocumentProxy
   //#########################################################################
   //# Getters and Setters
   /**
+   * Gets the comment associated with this document.
+   * The comment is a human-readable description of the document's contents
+   * that may extend over several lines.
+   */
+  public String getComment();
+ 
+  /**
    * Gets the URL associated with this document.
    */
   public URI getLocation();
+
   /**
    * Gets the file name associated with this document.
    * @return The file name used for reading and writing this document.
@@ -47,6 +55,7 @@ public interface DocumentProxy
    *                            associated with a writable file.
    */
   public File getFileLocation() throws MalformedURLException;
+
   /**
    * Sets the file name associated with this document to a new value.
    */

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   JAXBTestCase
 //###########################################################################
-//# $Id: CompilerTest.java,v 1.9 2006-09-11 15:37:39 robi Exp $
+//# $Id: CompilerTest.java,v 1.10 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -67,7 +67,8 @@ public class CompilerTest
     final List<EventDeclProxy> eventList = Collections.emptyList();
     final List<Proxy> proxyList = Collections.emptyList();
     final ModuleProxy module = mModuleFactory.createModuleProxy
-      (name, null, paramList, aliasList, eventList, proxyList, proxyList);
+      (name, null, null,
+       paramList, aliasList, eventList, proxyList, proxyList);
     final ProductDESProxy des = compile(module);
     assertTrue("Unexpected name!", des.getName().equals(name));
     assertTrue("Unexpected location!", des.getLocation() == null);
@@ -91,7 +92,7 @@ public class CompilerTest
       final List<EventDeclProxy> eventList = Collections.emptyList();
       final List<Proxy> proxyList = Collections.emptyList();
       final ModuleProxy module = mModuleFactory.createModuleProxy
-        (modname, null,
+        (modname, null, null,
          paramList, aliasList, eventList, proxyList,
          Collections.singletonList(instance));
       final ProductDESProxy des = compile(module);

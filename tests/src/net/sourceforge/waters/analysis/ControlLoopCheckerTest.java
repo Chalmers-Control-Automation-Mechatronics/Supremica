@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopCheckerTest
 //###########################################################################
-//# $Id: ControlLoopCheckerTest.java,v 1.11 2006-09-14 14:09:04 robi Exp $
+//# $Id: ControlLoopCheckerTest.java,v 1.12 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -290,6 +290,38 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String dir = "nasty";
     final String name = "the_vicious_loop2.wdes";
     runModelChecker(group, dir, name, false);
+  }
+
+  public void testProfisafeI4Host() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_i4_host.wdes";
+    runModelChecker(group, dir, name, true);
+  }
+
+  public void testProfisafeI4Slave() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_i4_slave.wdes";
+    runModelChecker(group, dir, name, true);
+  }
+
+  public void testProfisafeO4Host() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_o4_host.wdes";
+    runModelChecker(group, dir, name, true);
+  }
+
+  public void testProfisafeO4Slave() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_o4_slave.wdes";
+    runModelChecker(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_ac61() throws Exception

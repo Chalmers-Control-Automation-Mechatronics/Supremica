@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBTraceImporter
 //###########################################################################
-//# $Id: JAXBTraceImporter.java,v 1.2 2006-07-20 02:28:37 robi Exp $
+//# $Id: JAXBTraceImporter.java,v 1.3 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -92,13 +92,14 @@ class JAXBTraceImporter
     throws WatersUnmarshalException
   {
     final String name = element.getName();
+    final String comment = element.getComment();
     final ProductDESProxy des = getProductDES(element, uri);
     final IndexedSet<AutomatonProxy> automata = getAutomata(element, des);
     final TraceStepList listelem = element.getTraceStepList();
     final List<TraceStepProxy> steps = getTraceSteps(listelem, des, automata);
     final ConflictKind kind = element.getKind();
     return mFactory.createConflictTraceProxy
-      (name, uri, des, automata, steps, kind);
+      (name, comment, uri, des, automata, steps, kind);
   }
 
   private LoopTraceProxy importLoopTrace(final LoopTrace element,
@@ -106,13 +107,14 @@ class JAXBTraceImporter
     throws WatersUnmarshalException
   {
     final String name = element.getName();
+    final String comment = element.getComment();
     final ProductDESProxy des = getProductDES(element, uri);
     final IndexedSet<AutomatonProxy> automata = getAutomata(element, des);
     final TraceStepList listelem = element.getTraceStepList();
     final List<TraceStepProxy> steps = getTraceSteps(listelem, des, automata);
     final int loopindex = element.getLoopIndex();
     return mFactory.createLoopTraceProxy
-      (name, uri, des, automata, steps, loopindex);
+      (name, comment, uri, des, automata, steps, loopindex);
   }
 
   private SafetyTraceProxy importSafetyTrace(final SafetyTrace element,
@@ -120,11 +122,13 @@ class JAXBTraceImporter
     throws WatersUnmarshalException
   {
     final String name = element.getName();
+    final String comment = element.getComment();
     final ProductDESProxy des = getProductDES(element, uri);
     final IndexedSet<AutomatonProxy> automata = getAutomata(element, des);
     final TraceStepList listelem = element.getTraceStepList();
     final List<TraceStepProxy> steps = getTraceSteps(listelem, des, automata);
-    return mFactory.createSafetyTraceProxy(name, uri, des, automata, steps);
+    return mFactory.createSafetyTraceProxy
+      (name, comment, uri, des, automata, steps);
   }
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBProductDESImporter
 //###########################################################################
-//# $Id: JAXBProductDESImporter.java,v 1.4 2006-07-20 02:28:37 robi Exp $
+//# $Id: JAXBProductDESImporter.java,v 1.5 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -87,6 +87,7 @@ class JAXBProductDESImporter
   {
     try {
       final String name = element.getName();
+      final String comment = element.getComment();
       mProductDESEvents = new CheckedImportSet<EventProxy>
         (ProductDESProxy.class, name, "event");
       mProductDESEventRefImporter = new EventRefImporter(mProductDESEvents);
@@ -97,7 +98,7 @@ class JAXBProductDESImporter
         (ProductDESProxy.class, name, "automaton");
       mProductDESAutomataListHandler.fromJAXBChecked(this, element, automata);
       return mFactory.createProductDESProxy
-        (name, uri, mProductDESEvents, automata);
+        (name, comment, uri, mProductDESEvents, automata);
     } finally {
       mProductDESEvents = null;
       mProductDESEventRefImporter = null;

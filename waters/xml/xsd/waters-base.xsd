@@ -22,6 +22,16 @@
   </xs:complexContent>
 </xs:complexType>
 
+<xs:complexType name="DocumentType">
+  <xs:complexContent>
+    <xs:extension base="B:NamedType">
+      <xs:sequence>
+        <xs:element name="Comment" type="xs:string" minOccurs="0"/>
+      </xs:sequence>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
 
 <!-- ==================================================================== -->
 <!-- Enumerations                                                         -->

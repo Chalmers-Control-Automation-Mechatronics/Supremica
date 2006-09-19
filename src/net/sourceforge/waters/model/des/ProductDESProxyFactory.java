@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   ProductDESProxyFactory
 //###########################################################################
-//# $Id: ProductDESProxyFactory.java,v 1.7 2006-09-03 17:09:15 robi Exp $
+//# $Id: ProductDESProxyFactory.java,v 1.8 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.des;
@@ -55,6 +55,8 @@ public interface ProductDESProxyFactory
   /**
    * Creates a new conflict trace.
    * @param  name         The name to be given to the new trace.
+   * @param  comment      A comment describing the new trace,
+   *                      or <CODE>null</CODE>.
    * @param  location     The URI to be associated with the new
    *                      document, or <CODE>null</CODE>.
    * @param  des          The product DES for which this trace is
@@ -74,19 +76,20 @@ public interface ProductDESProxyFactory
    *                      in the product DES.
    */
   public ConflictTraceProxy createConflictTraceProxy
-    (final String name,
-     final URI location,
-     final ProductDESProxy des,
-     final Collection<? extends AutomatonProxy> automata,
-     final List<? extends TraceStepProxy> steps,
-     final ConflictKind kind);
+    (String name,
+     String comment,
+     URI location,
+     ProductDESProxy des,
+     Collection<? extends AutomatonProxy> automata,
+     List<? extends TraceStepProxy> steps,
+     ConflictKind kind);
 
   /**
-   * Creates a new conflict trace using default values.  This constructor
+   * Creates a new conflict trace using default values. This constructor
    * provides a simple interface to create a trace for a deterministic
    * product DES. It creates a trace with a <CODE>null</CODE> file
-   * location, with a set of automata equal to that of the product DES, and
-   * without any state information in the trace steps.
+   * location, with no comment, with a set of automata equal to that of the
+   * product DES, and without any state information in the trace steps.
    * @param  name         The name to be given to the new trace.
    * @param  des          The product DES for which the new trace is
    *                      generated.
@@ -100,10 +103,10 @@ public interface ProductDESProxyFactory
    *                      events cannot be found in the product DES.
    */
   public ConflictTraceProxy createConflictTraceProxy
-    (final String name,
-     final ProductDESProxy des,
-     final List<? extends EventProxy> events,
-     final ConflictKind kind);
+    (String name,
+     ProductDESProxy des,
+     List<? extends EventProxy> events,
+     ConflictKind kind);
 
   /**
    * Creates a new event.
@@ -129,6 +132,8 @@ public interface ProductDESProxyFactory
   /**
    * Creates a new loop trace.
    * @param  name         The name to be given to the new trace.
+   * @param  comment      A comment describing the new trace,
+   *                      or <CODE>null</CODE>.
    * @param  location     The URI to be associated with the new
    *                      document, or <CODE>null</CODE>.
    * @param  des          The product DES for which this trace is
@@ -145,19 +150,20 @@ public interface ProductDESProxyFactory
    *                      in the product DES.
    */
   public LoopTraceProxy createLoopTraceProxy
-    (final String name,
-     final URI location,
-     final ProductDESProxy des,
-     final Collection<? extends AutomatonProxy> automata,
-     final List<? extends TraceStepProxy> steps,
-     final int index);
+    (String name,
+     String comment,
+     URI location,
+     ProductDESProxy des,
+     Collection<? extends AutomatonProxy> automata,
+     List<? extends TraceStepProxy> steps,
+     int index);
 
   /**
    * Creates a new loop trace using default values.  This constructor
    * provides a simple interface to create a trace for a deterministic
    * product DES. It creates a trace with a <CODE>null</CODE> file
-   * location, with a set of automata equal to that of the product DES, and
-   * without any state information in the trace steps.
+   * location, with no comment, with a set of automata equal to that of
+   * the product DES, and without any state information in the trace steps.
    * @param  name         The name to be given to the new trace.
    * @param  des          The product DES for which the new trace is
    *                      generated.
@@ -168,14 +174,16 @@ public interface ProductDESProxyFactory
    *                      events cannot be found in the product DES.
    */
   public LoopTraceProxy createLoopTraceProxy
-    (final String name,
-     final ProductDESProxy des,
-     final List<? extends EventProxy> events,
-     final int index);
+    (String name,
+     ProductDESProxy des,
+     List<? extends EventProxy> events,
+     int index);
 
   /**
    * Creates a new product DES.
    * @param name         The name of the new product DES.
+   * @param comment      The comment to be associated with the new product DES,
+   *                     or <CODE>null</CODE>.
    * @param location     The file location of the new product DES,
    *                     or <CODE>null</CODE>.
    * @param events       The event alphabet of the new product DES,
@@ -185,13 +193,15 @@ public interface ProductDESProxyFactory
    */
   public ProductDESProxy createProductDESProxy
       (String name,
+       String comment,
        URI location,
        Collection<? extends EventProxy> events,
        Collection<? extends AutomatonProxy> automata);
 
   /**
    * Creates a new product DES using default values.
-   * This method creates a product DES with a <CODE>null</CODE> file location.
+   * This method creates a product DES with a <CODE>null</CODE> file location,
+   * and with no associated comment.
    * @param name         The name of the new product DES.
    * @param events       The event alphabet of the new product DES,
    *                     or <CODE>null</CODE> if empty.
@@ -215,6 +225,8 @@ public interface ProductDESProxyFactory
   /**
    * Creates a new safety trace.
    * @param  name         The name to be given to the new trace.
+   * @param  comment      A comment describing the new trace,
+   *                      or <CODE>null</CODE>.
    * @param  location     The URI to be associated with the new
    *                      document, or <CODE>null</CODE>.
    * @param  des          The product DES for which this trace is
@@ -230,17 +242,18 @@ public interface ProductDESProxyFactory
    *                      in the product DES.
    */
   public SafetyTraceProxy createSafetyTraceProxy
-    (final String name,
-     final URI location,
-     final ProductDESProxy des,
-     final Collection<? extends AutomatonProxy> automata,
-     final List<? extends TraceStepProxy> steps);
+    (String name,
+     String comment,
+     URI location,
+     ProductDESProxy des,
+     Collection<? extends AutomatonProxy> automata,
+     List<? extends TraceStepProxy> steps);
 
   /**
-   * Creates a new safety trace using default values.  This method
-   * provides a simple interface to create a trace for a deterministic
-   * product DES. It creates a trace with a <CODE>null</CODE> file
-   * location, with a set of automata equal to that of the product DES, and
+   * Creates a new safety trace using default values. This method provides
+   * a simple interface to create a trace for a deterministic product DES. 
+   * It creates a trace with a <CODE>null</CODE> file location, with no
+   * comment, with a set of automata equal to that of the product DES, and
    * without any state information in the trace steps.
    * @param  name         The name to be given to the new trace.
    * @param  des          The product DES for which the new trace is
@@ -251,9 +264,9 @@ public interface ProductDESProxyFactory
    *                      events cannot be found in the product DES.
    */
   public SafetyTraceProxy createSafetyTraceProxy
-    (final String name,
-     final ProductDESProxy des,
-     final List<? extends EventProxy> events);
+    (String name,
+     ProductDESProxy des,
+     List<? extends EventProxy> events);
 
   /**
    * Creates a new safety trace using default values.  This method
@@ -271,8 +284,8 @@ public interface ProductDESProxyFactory
    *                      events cannot be found in the product DES.
    */
   public SafetyTraceProxy createSafetyTraceProxy
-    (final ProductDESProxy des,
-     final List<? extends EventProxy> events);
+    (ProductDESProxy des,
+     List<? extends EventProxy> events);
 
   /**
    * Creates a new state.
@@ -306,14 +319,14 @@ public interface ProductDESProxyFactory
    *                      <CODE>null</CODE> for an empty map.
    */
   public TraceStepProxy createTraceStepProxy
-    (final EventProxy event,
-     final Map<AutomatonProxy,StateProxy> statemap);
+    (EventProxy event,
+     Map<AutomatonProxy,StateProxy> statemap);
 
   /**
    * Creates a new trace step with an empty state map.
    * @param  event        The event associated with the new step.
    */
-  public TraceStepProxy createTraceStepProxy(final EventProxy event);
+  public TraceStepProxy createTraceStepProxy(EventProxy event);
 
   /**
    * Creates a new transition.

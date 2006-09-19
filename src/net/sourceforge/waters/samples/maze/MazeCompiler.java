@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   MazeCompiler
 //###########################################################################
-//# $Id: MazeCompiler.java,v 1.10 2006-09-15 09:26:13 robi Exp $
+//# $Id: MazeCompiler.java,v 1.11 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
@@ -149,6 +149,8 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
     throws WatersUnmarshalException, IOException
   {
     final String name = maze.getName();
+    final String comment =
+      "Automatically generated from maze description '" + name + "'.";
     final String extname = name + mJAXBMarshaller.getDefaultExtension();
     final File outputfile = new File(mOutputDir, extname);
     final URI uri = outputfile.toURI();
@@ -167,7 +169,7 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
       components.add(prop);
     }
     return mFactory.createModuleProxy
-      (name, uri, null, null, mEvents, null, components);
+      (name, comment, uri, null, null, mEvents, null, components);
   }
 
   private InstanceProxy createInstance(final Square square,

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   SafetyTraceElement
 //###########################################################################
-//# $Id: SafetyTraceElement.java,v 1.3 2006-09-03 17:09:15 robi Exp $
+//# $Id: SafetyTraceElement.java,v 1.4 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -42,6 +42,8 @@ public class SafetyTraceElement
   /**
    * Creates a new safety trace.
    * @param  name         The name to be given to the new trace.
+   * @param  comment      A comment describing the new trace,
+   *                      or <CODE>null</CODE>.
    * @param  location     The URI to be associated with the new
    *                      document, or <CODE>null</CODE>.
    * @param  des          The product DES for which this trace is
@@ -57,12 +59,13 @@ public class SafetyTraceElement
    *                      in the product DES.
    */
   SafetyTraceElement(final String name,
+                     final String comment,
                      final URI location,
                      final ProductDESProxy des,
                      final Collection<? extends AutomatonProxy> automata,
                      final List<? extends TraceStepProxy> steps)
   {
-    super(name, location, des, automata, steps);
+    super(name, comment, location, des, automata, steps);
   }
 
   /**

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ProductDESImporter
 //###########################################################################
-//# $Id: ProductDESImporter.java,v 1.3 2006-09-15 09:26:13 robi Exp $
+//# $Id: ProductDESImporter.java,v 1.4 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -125,6 +125,7 @@ public class ProductDESImporter
   public ModuleProxy importModule(final ProductDESProxy des)
   {
     final String name = des.getName();
+    final String comment = des.getComment();
     final URI location = getOutputLocation(des);
     final Set<EventProxy> events = des.getEvents();
     final int numevents = events.size();
@@ -143,7 +144,7 @@ public class ProductDESImporter
       comps.add(comp);
     }
     return mFactory.createModuleProxy
-      (name, location, null, null, decls, null, comps);
+      (name, comment, location, null, null, decls, null, comps);
   }
 
   /**

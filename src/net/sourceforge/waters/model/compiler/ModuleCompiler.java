@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.42 2006-09-12 14:32:16 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.43 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -125,6 +125,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
   {
     try {
       final String name = mModule.getName();
+      final String comment = mModule.getComment();
       final URI moduleLocation = mModule.getLocation();
       URI desLocation = null;
       if (moduleLocation != null) {
@@ -159,7 +160,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       // end EFA
       visitModuleProxy(mModule);
       return mDESFactory.createProductDESProxy
-        (name, desLocation, mGlobalAlphabet, mAutomata.values());
+        (name, comment, desLocation, mGlobalAlphabet, mAutomata.values());
     } catch (final VisitorException exception) {
       final Throwable cause = exception.getCause();
       if (cause instanceof EvalException) {

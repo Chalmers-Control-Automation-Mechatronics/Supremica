@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ModuleSubjectFactory
 //###########################################################################
-//# $Id: ModuleSubjectFactory.java,v 1.12 2006-09-12 14:32:17 robi Exp $
+//# $Id: ModuleSubjectFactory.java,v 1.13 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -681,6 +681,7 @@ public class ModuleSubjectFactory
   /**
    * Creates a new module.
    * @param name The name of the new module.
+   * @param comment The comment of the new module, or <CODE>null</CODE>.
    * @param location The location of the new module.
    * @param parameterList The parameter list of the new module, or <CODE>null</CODE> if empty.
    * @param constantAliasList The constant definition list of the new module, or <CODE>null</CODE> if empty.
@@ -690,6 +691,7 @@ public class ModuleSubjectFactory
    */
   public ModuleSubject createModuleProxy
       (final String name,
+       final String comment,
        final URI location,
        final Collection<? extends ParameterProxy> parameterList,
        final Collection<? extends AliasProxy> constantAliasList,
@@ -698,6 +700,7 @@ public class ModuleSubjectFactory
        final Collection<? extends Proxy> componentList)
   {
     return new ModuleSubject(name,
+                             comment,
                              location,
                              parameterList,
                              constantAliasList,
@@ -709,6 +712,7 @@ public class ModuleSubjectFactory
   /**
    * Creates a new module using default values.
    * This method creates a module with
+   * the comment set to <CODE>null</CODE>,
    * an empty parameter list,
    * an empty constant definition list,
    * an empty event declaration list,

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des;
 //# CLASS:   ProductDESElementFactory
 //###########################################################################
-//# $Id: ProductDESElementFactory.java,v 1.6 2006-09-03 17:09:15 robi Exp $
+//# $Id: ProductDESElementFactory.java,v 1.7 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -69,14 +69,15 @@ public class ProductDESElementFactory
 
   public ConflictTraceElement createConflictTraceProxy
     (final String name,
+     final String comment,
      final URI location,
      final ProductDESProxy des,
      final Collection<? extends AutomatonProxy> automata,
      final List<? extends TraceStepProxy> steps,
      final ConflictKind kind)
   {
-    return
-      new ConflictTraceElement(name, location, des, automata, steps, kind);
+    return new ConflictTraceElement(name, comment, location, des,
+                                    automata, steps, kind);
   }
 
   public ConflictTraceElement createConflictTraceProxy
@@ -103,13 +104,15 @@ public class ProductDESElementFactory
 
   public LoopTraceElement createLoopTraceProxy
     (final String name,
+     final String comment,
      final URI location,
      final ProductDESProxy des,
      final Collection<? extends AutomatonProxy> automata,
      final List<? extends TraceStepProxy> steps,
      final int index)
   {
-    return new LoopTraceElement(name, location, des, automata, steps, index);
+    return new LoopTraceElement(name, comment, location, des,
+                                automata, steps, index);
   }
 
   public LoopTraceElement createLoopTraceProxy
@@ -123,11 +126,12 @@ public class ProductDESElementFactory
 
   public ProductDESElement createProductDESProxy
     (final String name,
+     final String comment,
      final URI location,
      final Collection<? extends EventProxy> events,
      final Collection<? extends AutomatonProxy> automata)
   {
-    return new ProductDESElement(name, location, events, automata);
+    return new ProductDESElement(name, comment, location, events, automata);
   }
 
   public ProductDESElement createProductDESProxy
@@ -145,12 +149,14 @@ public class ProductDESElementFactory
 
   public SafetyTraceElement createSafetyTraceProxy
     (final String name,
+     final String comment,
      final URI location,
      final ProductDESProxy des,
      final Collection<? extends AutomatonProxy> automata,
      final List<? extends TraceStepProxy> steps)
   {
-    return new SafetyTraceElement(name, location, des, automata, steps);
+    return new SafetyTraceElement(name, comment, location, des,
+                                  automata, steps);
   }
 
   public SafetyTraceElement createSafetyTraceProxy

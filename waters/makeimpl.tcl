@@ -243,6 +243,9 @@ proc Java_InitClassMap {classMapName} {
   set attribLocation \
       [Java_AttribCreate "URI" "Location" "ignored" "owned" "" \
            "file system location"]
+  set attribComment \
+      [Java_AttribCreate "String" "Comment" "optional" "owned" "null" \
+           "comment"]
   set classMap(Proxy) \
       [Java_ClassCreateAbstract "Proxy" "proxy" "" "" ""]
   set classMap(GeometryProxy) \
@@ -255,7 +258,7 @@ proc Java_InitClassMap {classMapName} {
            "Proxy" "" [list $attribName]]
   set classMap(DocumentProxy) \
       [Java_ClassCreateAbstract "DocumentProxy" "document" \
-           "NamedProxy" "" [list $attribLocation]]
+           "NamedProxy" "" [list $attribComment $attribLocation]]
 }
 
 

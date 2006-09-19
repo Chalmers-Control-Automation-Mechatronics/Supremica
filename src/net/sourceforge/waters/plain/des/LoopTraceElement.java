@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   LoopTraceElement
 //###########################################################################
-//# $Id: LoopTraceElement.java,v 1.2 2006-07-20 02:28:37 robi Exp $
+//# $Id: LoopTraceElement.java,v 1.3 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -43,6 +43,8 @@ public class LoopTraceElement
   /**
    * Creates a new loop trace.
    * @param  name         The name to be given to the new trace.
+   * @param  comment      A comment describing the new trace,
+   *                      or <CODE>null</CODE>.
    * @param  location     The URI to be associated with the new
    *                      document, or <CODE>null</CODE>.
    * @param  des          The product DES for which this trace is
@@ -59,13 +61,14 @@ public class LoopTraceElement
    *                      in the product DES.
    */
   LoopTraceElement(final String name,
+                   final String comment,
                    final URI location,
                    final ProductDESProxy des,
                    final Collection<? extends AutomatonProxy> automata,
                    final List<? extends TraceStepProxy> steps,
                    final int index)
   {
-    super(name, location, des, automata, steps);
+    super(name, comment, location, des, automata, steps);
     mLoopIndex = index;
   }
 

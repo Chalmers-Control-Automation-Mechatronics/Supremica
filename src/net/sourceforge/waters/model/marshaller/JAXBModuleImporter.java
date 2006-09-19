@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.15 2006-09-12 14:32:16 robi Exp $
+//# $Id: JAXBModuleImporter.java,v 1.16 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -926,6 +926,7 @@ public class JAXBModuleImporter
                                    final URI uri)
   {
     final String name = element.getName();
+    final String comment = element.getComment();
     final List<ParameterProxy> parameterList =
       new LinkedList<ParameterProxy>();
     mModuleParameterListHandler.fromJAXB(this, element, parameterList);
@@ -939,6 +940,7 @@ public class JAXBModuleImporter
     final List<Proxy> componentList = new LinkedList<Proxy>();
     mModuleComponentListHandler.fromJAXB(this, element, componentList);
     return mFactory.createModuleProxy(name,
+                                      comment,
                                       uri,
                                       parameterList,
                                       constantAliasList,

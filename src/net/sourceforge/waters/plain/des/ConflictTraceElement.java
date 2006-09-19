@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   ConflictTraceElement
 //###########################################################################
-//# $Id: ConflictTraceElement.java,v 1.2 2006-07-20 02:28:37 robi Exp $
+//# $Id: ConflictTraceElement.java,v 1.3 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -45,6 +45,8 @@ public class ConflictTraceElement
   /**
    * Creates a new conflict trace.
    * @param  name         The name to be given to the new trace.
+   * @param  comment      A comment describing the new trace,
+   *                      or <CODE>null</CODE>.
    * @param  location     The URI to be associated with the new
    *                      document, or <CODE>null</CODE>.
    * @param  des          The product DES for which this trace is
@@ -64,13 +66,14 @@ public class ConflictTraceElement
    *                      in the product DES.
    */
   ConflictTraceElement(final String name,
+                       final String comment,
                        final URI location,
                        final ProductDESProxy des,
                        final Collection<? extends AutomatonProxy> automata,
                        final List<? extends TraceStepProxy> steps,
                        final ConflictKind kind)
   {
-    super(name, location, des, automata, steps);
+    super(name, comment, location, des, automata, steps);
     mKind = kind;
   }
 

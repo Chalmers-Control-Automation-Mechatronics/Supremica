@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.base
 //# CLASS:   DocumentElement
 //###########################################################################
-//# $Id: DocumentElement.java,v 1.4 2006-09-14 11:51:27 robi Exp $
+//# $Id: DocumentElement.java,v 1.5 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.base;
@@ -14,6 +14,7 @@ import java.net.URI;
 import java.net.URL;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
+import net.sourceforge.waters.model.base.Proxy;
 
 
 /**
@@ -36,25 +37,30 @@ public abstract class DocumentElement
   //#########################################################################
   //# Constructors
   /**
-   * Creates a document without specified file location.
-   * @param  name        The name of the new document.
-   */
-  protected DocumentElement(final String name)
-  {
-    this(name, null);
-  }
-
-  /**
    * Creates a document.
    * @param  name        The name of the new document.
+   * @param  comment     The comment describing the new document.
    * @param  location    The file location for the new document,
    *                     or <CODE>null</CODE>.
    */
   protected DocumentElement(final String name,
+			    final String comment,
 			    final URI location)
   {
     super(name);
+    mComment = comment;
     mLocation = location;
+  }
+
+  /**
+   * Creates a document with default values.
+   * This constructor creates a document with no specified file location,
+   * and with no associated comment.
+   * @param  name        The name of the new document.
+   */
+  protected DocumentElement(final String name)
+  {
+    this(name, null, null);
   }
 
   /**
@@ -64,6 +70,7 @@ public abstract class DocumentElement
   protected DocumentElement(final DocumentProxy partner)
   {
     super(partner);
+    mComment = partner.getComment();
     mLocation = partner.getLocation();
   }
 
@@ -73,13 +80,19 @@ public abstract class DocumentElement
   public DocumentElement clone()
   {
     final DocumentElement cloned = (DocumentElement) super.clone();
+    cloned.mComment = mComment;
     cloned.mLocation = null;
     return cloned;
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.base.DocumentElement
+  //# Interface net.sourceforge.waters.model.base.DocumentProxy
+  public String getComment()
+  {
+    return mComment;
+  }
+
   public URI getLocation()
   {
     return mLocation;
@@ -105,7 +118,33 @@ public abstract class DocumentElement
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.base.Proxy
+  public boolean equalsByContents(final Proxy partner)
+  {
+    if (super.equalsByContents(partner)) {
+      final DocumentElement doc = (DocumentElement) partner;
+      return
+	mComment == null ?
+	doc.mComment == null :
+	mComment.equals(doc.mComment);
+    } else {
+      return false;
+    }
+  }
+
+  public int hashCodeByContents()
+  {
+    int result = super.hashCodeByContents();
+    if (mComment != null) { 
+      result += 5 * mComment.hashCode();
+    }
+    return result;
+  }
+
+
+  //#########################################################################
   //# Data Members
+  private String mComment;
   private URI mLocation;
 
 }

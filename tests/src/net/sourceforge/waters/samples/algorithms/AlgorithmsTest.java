@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.algorithms
 //# CLASS:   AlgorithmsTest
 //###########################################################################
-//# $Id: AlgorithmsTest.java,v 1.4 2006-07-20 02:28:38 robi Exp $
+//# $Id: AlgorithmsTest.java,v 1.5 2006-09-19 15:53:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.algorithms;
@@ -60,7 +60,7 @@ public class AlgorithmsTest extends AbstractWatersTest
     final AutomatonProxy aut2 = hide(des1, name, hidden, false);
     newautomata.add(aut2);
     final ProductDESProxy des2 = mProductDESFactory.createProductDESProxy
-      (name, null, events, newautomata);
+      (name, events, newautomata);
     save(des2, aut2);
     final ProductDESProxy expected = getExpectedHandwritten(aut2);
     testExpected(aut2, expected);
@@ -81,7 +81,7 @@ public class AlgorithmsTest extends AbstractWatersTest
     final AutomatonProxy aut2 = hide(des1, name, hidden, false);
     newautomata.add(aut2);
     final ProductDESProxy des2 = mProductDESFactory.createProductDESProxy
-      (name, null, events, newautomata);
+      (name, events, newautomata);
     save(des2, aut2);
     final ProductDESProxy expected = getExpectedHandwritten(aut2);
     testExpected(aut2, expected);
@@ -104,14 +104,14 @@ public class AlgorithmsTest extends AbstractWatersTest
     final AutomatonProxy aut2 = hide(des1, name, hidden, false);
     newautomata.add(aut2);
     final ProductDESProxy des2 = mProductDESFactory.createProductDESProxy
-      (name, null, events, newautomata);
+      (name, events, newautomata);
     save(des2, aut2);
     final ProductDESProxy expected = getExpectedValid(subdirname, aut2);
     testExpected(aut2, expected);
     final AutomatonProxy aut3 = reduce(aut2, ":reduced");
     newautomata.add(aut3);
     final ProductDESProxy des3 = mProductDESFactory.createProductDESProxy
-      (name, null, events, newautomata);
+      (name, events, newautomata);
     save(des3, aut2);
     testExpected(aut3, expected);
     final AutomatonProxy aut4 = reduce(aut3);
@@ -133,14 +133,14 @@ public class AlgorithmsTest extends AbstractWatersTest
     final AutomatonProxy aut2 = hide(des1, name, hidden, false);
     newautomata.add(aut2);
     final ProductDESProxy des2 = mProductDESFactory.createProductDESProxy
-      (name, null, events, newautomata);
+      (name, events, newautomata);
     save(des2, aut2);
     final ProductDESProxy expected = getExpectedValid(subdirname, aut2);
     testExpected(aut2, expected);
     final AutomatonProxy aut3 = reduce(aut2, ":reduced");
     newautomata.add(aut3);
     final ProductDESProxy des3 = mProductDESFactory.createProductDESProxy
-      (name, null, events, newautomata);
+      (name, events, newautomata);
     save(des3, aut2);
     testExpected(aut3, expected);
     final AutomatonProxy aut4 = reduce(aut3);

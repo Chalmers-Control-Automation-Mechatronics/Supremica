@@ -89,23 +89,11 @@ public class Automata
     private String name = null;
     private String comment = null;
     private AutomataListeners listeners = null;
-    private static File watersDummyFile = null;
     
-    static
-    {
-        try
-        {
-            watersDummyFile = File.createTempFile("watersDummy", "");
-        }
-        catch(IOException ex)
-        {
-            logger.error(ex);
-        }
-    }
     
     public Automata()
     {
-        super("WatersDummy", watersDummyFile.toURI());
+        super("WatersDummy");
         theAutomata = new ArrayList<Automaton>();
         nameMap = new HashMap<String,Automaton>();
     }
@@ -150,7 +138,7 @@ public class Automata
     public Automata(URL url)
     throws Exception
     {
-        super("No Name", url.toURI());
+        super("No Name", null, url.toURI());
         ProjectBuildFromXml builder = new ProjectBuildFromXml();
         Project theProject = builder.build(url);
         shallowAutomataCopy(theProject);
@@ -161,7 +149,12 @@ public class Automata
     {
         this(file.toURL());
     }
-    
+
+    public Automata clone()
+    {
+      return new Automata(this, false);
+    }
+
     private void deepAutomataCopy(Automata oldAutomata)
     {
         for (Automaton automaton : oldAutomata)
