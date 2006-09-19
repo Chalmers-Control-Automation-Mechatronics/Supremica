@@ -3,14 +3,14 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   StateEncoding
 //###########################################################################
-//# $Id: EncodedStateTuple.java,v 1.5 2006-09-12 14:32:16 robi Exp $
+//# $Id: EncodedStateTuple.java,v 1.6 2006-09-19 04:52:50 yip1 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
 
 
 /**
- * <P>Encoding synchronized state</P>
+ * <P>Encoded synchronized state tuple</P>
  *
  * @author Peter Yunil Park
  */
@@ -20,15 +20,20 @@ public class EncodedStateTuple
     /** Encoded state tuple */
     private int mEncodedStateCodes[];
     
-    /** Check if current state tuple has been visited already */
+    /** Check if current state tuple has been already visited */
     private boolean mVisited;
     
-    /** Check if current state tuple is in some component already */
+    /** Check if current state tuple is already in some component */
     private boolean mInComponent;
     
     
     //#########################################################################
     //# Constructor
+    /**
+     * It creates an empty state tuple.
+     */
+    public EncodedStateTuple(){}
+
     /**
      * It creates an empty state tuple.
      * @param size number of integers used to store encoded state
@@ -40,6 +45,7 @@ public class EncodedStateTuple
 
     /**
      * It creates a state tuple with given encoded state tuple (integer array).
+     * @param size number of integers used to store encoded state
      */
     public EncodedStateTuple(int[] encodedStateCodes)
     {

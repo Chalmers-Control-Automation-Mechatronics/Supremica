@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopChecker
 //###########################################################################
-//# $Id: ControlLoopChecker.java,v 1.10 2006-09-12 14:32:16 robi Exp $
+//# $Id: ControlLoopChecker.java,v 1.11 2006-09-19 04:52:50 yip1 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -64,7 +64,7 @@ public class ControlLoopChecker extends ModelChecker
     private ArrayList<ArrayList<TransitionProxy>> mTransitionList;
     
     /** a map of state tuple in synchronized model */
-    private Map<EncodedStateTuple, EncodedStateTuple> mGlobalStateMap;
+    private StateHashSet mGlobalStateSet;
     
     /** a list of unvisited state tuple. */
     private List<EncodedStateTuple> mUnvisitedList;
@@ -255,7 +255,7 @@ public class ControlLoopChecker extends ModelChecker
 	}
 	
 	// initialise state tuple list
-	mGlobalStateMap = new HashMap<EncodedStateTuple, EncodedStateTuple>();
+	mGlobalStateSet = new StateHashSet(SIZE_BUFFER);
 	mUnvisitedList = new ArrayList<EncodedStateTuple>(SIZE_BUFFER);
 	
 	// create initial state tuple
@@ -325,7 +325,7 @@ public class ControlLoopChecker extends ModelChecker
     public boolean getResult()
     {	
 	// insert initial state tuple to global state and state list
-	mGlobalStateMap.put(mEncodedInitialStateTuple, mEncodedInitialStateTuple);
+	mGlobalStateSet.add(mEncodedInitialStateTuple);
 	mUnvisitedList.add(mEncodedInitialStateTuple);
 	
 	int counter = 0;
@@ -346,13 +346,12 @@ public class ControlLoopChecker extends ModelChecker
 
     /**
      * This method visits each state tuple in the synchronized product.
-     * If it tries to visit state tuple that has been visited before,
-     * it detects a loop.
-     * @param encodedCurrTuple The state tuple to be visited.
+     * If it tries to visit state tuple that has been visited before, it detects a loop.
+     * @param state current state tuple property
      */
     public void visit(EncodedStateTuple encodedCurrTuple)
     {
-	int currTuple[] = new int[mNumAutomata]; // new memory allocation to store current state tuple
+	final int currTuple[] = new int[mNumAutomata]; // new memory allocation to store current state tuple
 	encodedCurrTuple.setVisited(true);
 	decoding(encodedCurrTuple.getCodes(), currTuple); // current state tuple now in currTuple
 	
@@ -361,17 +360,16 @@ public class ControlLoopChecker extends ModelChecker
 	    if(eventAvailable(currTuple, i, false)){
                 if(mGlobalEventMap[i]){ // CONTROLLABLE
 		    EncodedStateTuple encodedNextTuple = new EncodedStateTuple(encoding(mNextTuple));
-		    
-		    if(mGlobalStateMap.get(encodedNextTuple) == null){
-			mGlobalStateMap.put(encodedNextTuple, encodedNextTuple);
+
+		    if(mGlobalStateSet.add(encodedNextTuple)){
 			mUnvisitedList.add(encodedNextTuple);
 			visit(encodedNextTuple);
 			if(!mControlLoopFree){
 			    return;
 			}
-		    }
+		    }		    
 		    else{
-			encodedNextTuple = mGlobalStateMap.get(encodedNextTuple);
+			encodedNextTuple = mGlobalStateSet.get(encodedNextTuple);
 			if(encodedNextTuple.getVisited() == false){
 			    visit(encodedNextTuple);
 			    if(!mControlLoopFree){
@@ -379,7 +377,7 @@ public class ControlLoopChecker extends ModelChecker
 			    }
 			}
 		    }
-		    
+
 		    if(encodedNextTuple.getInComponent() == false){
 			if(encodedNextTuple.getVisited() == true){ // control loop detected here
 			    if(mControlLoopFree){
@@ -392,8 +390,8 @@ public class ControlLoopChecker extends ModelChecker
 		}
 		else{ // UNCONTROLLABLE
 		    final EncodedStateTuple encodedNextTuple = new EncodedStateTuple(encoding(mNextTuple));
-		    if(mGlobalStateMap.get(encodedNextTuple) == null){
-			mGlobalStateMap.put(encodedNextTuple, encodedNextTuple);
+
+		    if(mGlobalStateSet.add(encodedNextTuple)){
 			mUnvisitedList.add(encodedNextTuple);
 		    }
 		}
@@ -601,7 +599,7 @@ public class ControlLoopChecker extends ModelChecker
 	    }
 	}
 	
-	int loopIndex = tracelist.size() + 1;
+	int loopIndex = tracelist.size();
 	
 	while(loopStates.size() > 0){
 	    for(final TransitionProperty tp: loopStates){
@@ -627,41 +625,24 @@ public class ControlLoopChecker extends ModelChecker
      */
     public boolean eventAvailable(int currTuple[], int event, boolean onlyControllable)
     {
+	final int threshold = onlyControllable?2:1; // 2: controllable events only, 1: for all events
+	int temp;
+	
 	for(int i = 0; i < mNumAutomata; i++){
-	    int nextState = currTuple[i];
-	    boolean eventExist = false;
-	    boolean transitionExist = false;
-	    
-	    if(onlyControllable){ // 2: controllable events
-		if(mEventListMap.get(i)[event] == 2){
-		    eventExist = true;
+	    if(mEventListMap.get(i)[event] >= threshold){
+		temp = mTransitionListMap.get(i)[currTuple[i]][event];
+		if(temp > -1){ // next state exists
+		    mNextTuple[i] = temp;
+		} 
+		else{ // event is not available
+		    return false;
 		}
 	    }
-	    else{ // 1: uncontrollable events & 2: controllable events
-		if(mEventListMap.get(i)[event] > 0){
-		    eventExist = true;
-		}
-	    }
-	    
-	    if(eventExist){
-		int temp = mTransitionListMap.get(i)[currTuple[i]][event];
-		if(temp > -1){
-		    nextState = temp;
-		    transitionExist = true;
-		}
-	    }
-	    
-	    if(!eventExist){ // if event does not exist: nextTuple[i] = currTuple[i]
+	    else{ // event is not in the automaton
 		mNextTuple[i] = currTuple[i];
 	    }
-	    else if(transitionExist){ // else if exists transition: nextTuple[i] = getNextTransition(currTuple[i])
-		mNextTuple[i] = nextState;
-	    }
-	    else{ // else: event is not available
-		return false;
-	    }
 	}
-	
+
 	return true;
     }
     
@@ -722,15 +703,15 @@ public class ControlLoopChecker extends ModelChecker
 
     /**
      * It will take a single state tuple as a parameter and encode it.
-     * @param stateCodes state tuple that will be encoded
+     * @param stateTuple state tuple that will be encoded
      * @return encoded state tuple
      */
     public int[] encoding(final int[] stateCodes)
     {
-	int encoded[] = new int[mNumInts];
+	int encoded[] = new int[mNumInts], i, j;
 	
-	for(int i = 0; i < mNumInts; i++){
-	    for(int j = mIndexAutomata[i]; j < mIndexAutomata[i+1]; j++){
+	for(i = 0; i < mNumInts; i++){
+	    for(j = mIndexAutomata[i]; j < mIndexAutomata[i+1]; j++){
 		encoded[i] <<= mNumBits[j];
 		encoded[i] |= stateCodes[j];
 	    }
@@ -747,13 +728,13 @@ public class ControlLoopChecker extends ModelChecker
      */
     public void decoding(final int[] encodedStateCodes, final int[] currTuple)
     {
-	int index = 0;
+	int index = 0, tmp, mask, value, i, j;
 	
-	for(int i = 0; i < mNumInts; i++){
-	    int tmp = encodedStateCodes[i];
-	    for(int j = mIndexAutomata[i+1]-1; j >= mIndexAutomata[i]; j--){
-		int mask = mNumBitsMasks[j];
-		int value = tmp & mask;
+	for(i = 0; i < mNumInts; i++){
+	    tmp = encodedStateCodes[i];
+	    for(j = mIndexAutomata[i+1]-1; j >= mIndexAutomata[i]; j--){
+		mask = mNumBitsMasks[j];
+		value = tmp & mask;
 		currTuple[j] = value;
 		tmp = tmp >> mNumBits[j];
 	    } 
