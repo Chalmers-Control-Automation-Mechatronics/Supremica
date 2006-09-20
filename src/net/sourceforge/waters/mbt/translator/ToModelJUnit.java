@@ -5,8 +5,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
 import java.util.regex.*;
 
@@ -14,24 +14,19 @@ import javax.xml.bind.JAXBException;
 
 import org.xml.sax.SAXException;
 
-import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.des.AbstractProductDESProxyVisitor;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
-import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
+import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
@@ -43,13 +38,7 @@ public class ToModelJUnit extends AbstractModuleProxyVisitor {
 
 	private String mFSMname;
 
-	private String[] mNodes;
-
 	private String mIniNode;
-
-	private String[] mEvents;
-
-	private String[] mEdges;
 
 	protected DocumentManager mDocumentManager;
 
@@ -104,7 +93,7 @@ public class ToModelJUnit extends AbstractModuleProxyVisitor {
 
 		// Get the Component
 		mSimpleComponentProxy = (SimpleComponentProxy) moduleproxy
-				.getComponentList().get(3);
+				.getComponentList().get(2);
 
 	}
 
@@ -117,7 +106,7 @@ public class ToModelJUnit extends AbstractModuleProxyVisitor {
 
 	public void setFSMname() {
 
-		mFSMname = mSimpleComponentProxy.getName();
+		mFSMname = mSimpleComponentProxy.getName().toUpperCase() + "_";
 
 	}
 
@@ -127,39 +116,17 @@ public class ToModelJUnit extends AbstractModuleProxyVisitor {
 
 	}
 
-	public void setNodes() {
-		Object[] oNodes;
-		oNodes = mGraphProxy.getNodes().toArray();
-		mNodes = new String[oNodes.length];
-		for (int i = 0; i < oNodes.length; i++) {
-			mNodes[i] = oNodes[i].toString();
-		}
-	}
+	// public void setNodes() {
+	// Object[] oNodes;
+	// oNodes = mGraphProxy.getNodes().toArray();
+	// mNodes = new String[oNodes.length];
+	// for (int i = 0; i < oNodes.length; i++) {
+	// mNodes[i] = oNodes[i].toString();
+	// }
+	// }
+	public void setIniNode(String s) {
 
-	public void setIniNode() {
-
-		if (mNodes != null) {
-
-			for (int i = 0; i < mNodes.length; i++) {
-				String s = mNodes[i];
-				// System.out.println(s);
-				Pattern p = Pattern.compile("^initial");
-				Matcher m = p.matcher(s);
-
-				if (m.find()) {
-
-					// String[] result = p.split(s);
-					// StringBuffer sb = new StringBuffer(20);
-					mIniNode = m.replaceAll("").trim();
-				} else {
-
-					// Initial not found error
-
-				}
-			}
-
-		}
-
+		mIniNode = s;
 	}
 
 	public String getIniNode() {
@@ -167,149 +134,134 @@ public class ToModelJUnit extends AbstractModuleProxyVisitor {
 		return mIniNode;
 	}
 
-	public void setEvents() {
-		Object[] oEvents;
-		oEvents = mGraphProxy.getNodes().toArray();
-		mEvents = new String[oEvents.length];
-		for (int i = 0; i < oEvents.length; i++) {
-			mEvents[i] = oEvents[i].toString();
-		}
-	}
-
-	public void setEdges() {
-		Object[] oEdges;
-		oEdges = mGraphProxy.getEdges().toArray();
-		mEdges = new String[oEdges.length];
-		for (int i = 0; i < oEdges.length; i++) {
-			mEdges[i] = oEdges[i].toString();
-		}
-	}
-
 	protected void createJava() {
 
-		// Head
-		StringBuffer head = new StringBuffer();
-		head.append("package ").append(packagePath).append(";\n");
-
-		head.append("public class " + mFSMname + "FSM implements FsmModel\n");
-		head.append("{\n");
-		head.append("private String state;\n");
-		head.append(" public FSM() \n");
-		head.append(" { state = " + mIniNode + "; } \n");
-		head.append(" public String getState() \n");
-		head.append("{ return state; } \n");
-
-		head.append(" public void reset(boolean testing) \n");
-		head.append("{ state = " + mIniNode + ";} \n");
-
-		// Body
 		String begin;
 		String end;
 		String event;
+
+		LabelBlockProxy lb = null;
+		List<Proxy> el = null;
+
 		EdgesHashMap eHM = new EdgesHashMap();
 		Vector<String> vEvents = new Vector<String>();
 		LinkedList EdgesList;
 		EdgeNode EdgeN;
 
-		for (String s : mEdges) {
+		// e.getGuardActionBlock().getGuard() etc. ... }
 
-			Pattern p = Pattern.compile("[->\\{\\}\\\n\\ ]+");
+		for (EdgeProxy e : mGraphProxy.getEdges()) {
+			begin = e.getSource().toString();
 
-			String[] result = p.split(s);
-			begin = result[0];
-			end = result[1];
-			event = result[2];
-			eHM.add(event, begin, end);
-			if (vEvents.indexOf(event) < 0) {
+			Pattern p1 = Pattern.compile("^initial");
+			Matcher m1 = p1.matcher(begin);
 
-				vEvents.add(event);
+			if (m1.find()) {
+				mIniNode = m1.replaceAll("").trim();
+				begin = m1.replaceAll("").trim();
+			} else {
+
+				// Initial not found error
+
+			}
+
+			end = e.getTarget().toString();
+
+			Matcher m2 = p1.matcher(end);
+
+			if (m2.find()) {
+
+				end = m2.replaceAll("").trim();
+			}
+
+			lb = e.getLabelBlock();
+			el = (List<Proxy>) lb.getEventList();
+			for (Proxy p : el) {
+
+				event = p.toString();
+
+				eHM.add(event, begin, end);
+				if (vEvents.indexOf(event) < 0) {
+
+					vEvents.add(event);
+				}
 			}
 
 		}
 
+		// Head
+		StringBuffer javaString = new StringBuffer();
+//		javaString.append("package ").append(packagePath).append(";\n\n");
+		javaString.append("import net.sourceforge.czt.modeljunit.*;\n\n");
+
+		javaString.append("public class " + mFSMname + "FSM implements FsmModel\n");
+		javaString.append("{\n\n");
+		javaString.append(" private String state;\n\n");
+		javaString.append(" public " + mFSMname + "FSM() \n");
+		javaString.append(" { state = \"" + mIniNode + "\"; } \n\n");
+		javaString.append(" public String getState() \n");
+		javaString.append(" { return state; } \n\n");
+
+		javaString.append(" public void reset(boolean testing) \n");
+		javaString.append(" { state = \"" + mIniNode + "\";} \n\n");
+
+		// Body
 		for (int i = 0; i < vEvents.size(); i++) {
 
 			event = vEvents.elementAt(i).toString();
 
 			EdgesList = (LinkedList) eHM.get(event);
-			// Iterator ii = EdgesList.iterator();
 			if (EdgesList.size() == 1) {
 
-				// Iterator ii = EdgesList.iterator();
-				// while (ii.hasNext()) {
-
 				EdgesList.get(0);
-
-				// EdgeN = (EdgeNode) ii.next();
 
 				EdgeN = (EdgeNode) EdgesList.get(0);
 				begin = EdgeN.getBegin();
 				end = EdgeN.getEnd();
-				head.append("public boolean " + event
-						+ "Guard() { return state == " + begin + "; }\n");
-				head.append("public @Action void " + event + "()\n");
-				head.append("{\n");
-				head.append(" System.out.println(\"" + event + ": state --> "
-						+ end + "\");\n");
-				head.append(" state = " + end + ";\n");
-				head.append("}\n");
-
-				// }
+				javaString.append(" public boolean " + event
+						+ "Guard() { return state.equals(\"" + begin
+						+ "\"); }\n");
+				javaString.append(" public @Action void " + event + "()\n");
+				javaString.append(" {\n");
+				javaString.append("  System.out.println(\"" + event
+						+ ": \" + state + \" --> " + end + "\");\n");
+				javaString.append("  state = \"" + end + "\";\n");
+				javaString.append(" }\n\n");
 
 			} else if (EdgesList.size() > 1) {
 
 				EdgeN = (EdgeNode) EdgesList.get(0);
 				begin = EdgeN.getBegin();
-				head.append("public boolean " + event
-						+ "Guard() { return state == " + begin);
+				javaString.append(" public boolean " + event
+						+ "Guard() { return state.equals(\"" + begin + "\")");
 				for (int j = 1; j < EdgesList.size(); j++) {
 					EdgeN = (EdgeNode) EdgesList.get(j);
 					begin = EdgeN.getBegin();
-					head.append(" || state == " + begin);
+					javaString.append(" || state.equals(\"" + begin + "\")");
 
 				}
-				head.append("; }\n");
+				javaString.append("; }\n");
 
-				head.append("public @Action void " + event + "()\n");
-				head.append("{\n");
+				javaString.append(" public @Action void " + event + "()\n");
+				javaString.append(" {\n");
 
 				for (int k = 0; k < EdgesList.size(); k++) {
 					EdgeN = (EdgeNode) EdgesList.get(k);
 					begin = EdgeN.getBegin();
 					end = EdgeN.getEnd();
-					head.append("if ( state == " + begin + "){\n");
-					head.append(" System.out.println(\"" + event
-							+ ": state --> " + end + "\");\n");
-					head.append(" state = " + end + ";\n");
-					head.append("}\n");
+					javaString.append("  if ( state.equals(\"" + begin + "\")){\n");
+					javaString.append("    System.out.println(\"" + event
+							+ ": \" + state + \" --> " + end + "\");\n");
+					javaString.append("    state = \"" + end + "\";\n");
+					javaString.append("  }\n\n");
 				}
-				head.append("}\n");
+				javaString.append(" }\n\n");
 			}
 
 		}
-		head.append("}\n");
-		// System.out.println(eHM.keySet());
-		System.out.print(head);
+		javaString.append("}\n");
+		System.out.print(javaString);
 	}
-
-	// if (begin != null && end != null && event != null){
-	// head.append("public boolean " + event
-	// + "Guard() { return state == " + begin + "; }\n");
-	// head.append("public @Action void " + event + "()\n");
-	// head.append("{\n");
-	// head.append(" System.out.println(\"" + event + ": state --> "
-	// + end + "\");\n");
-	// head.append(" state = " + end + ";\n");
-	// head.append("}\n");
-	// }
-	// else{
-	// //No begin, end, event found error
-	// break;
-	// }
-
-	// }
-	// head.append("}\n");
-	// System.out.print(head);
 
 	public static void writeFile(String message, String path, boolean append) {
 		FileWriter os = null;
@@ -336,31 +288,8 @@ public class ToModelJUnit extends AbstractModuleProxyVisitor {
 			translator.setSimpleComponentProxy(new File(args[0]).toURL());
 			translator.setGraphProxy();
 			translator.setFSMname();
-			// translator.setEvents();
-			translator.setNodes();
-			translator.setIniNode();
-			translator.setEdges();
-
-			// System.out.println(translator.getFSMname());
-			// System.out.println(translator.getIniNode());
-			// System.out.println("-------");
-			// System.out.println(translator.mNodes[0]);
-			// System.out.println(translator.mNodes[1]);
-			// System.out.println(translator.mNodes[2]);
-
-			// System.out.println(translator.mEdges[0]);
-			// System.out.println(translator.mEdges[1]);
-			// System.out.println(translator.mEdges[2]);
-			//			
-			// translator.createHead();
 			System.out.println("--------------------------");
 			translator.createJava();
-			// Object[] s = translator.mGraphProxy.getNodes().toArray();
-			// String s1 = s[2].toString();
-			// System.out.print(s1);
-
-			// System.out.println(translator.mNodes);
-			// translator.translate(new File(args[0]).toURL());
 		}
 	}
 
