@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorNewDialog
 //###########################################################################
-//# $Id: EditorNewComponentDialog.java,v 1.9 2006-09-18 10:57:23 knut Exp $
+//# $Id: EditorNewComponentDialog.java,v 1.10 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 
@@ -161,8 +161,7 @@ public class EditorNewComponentDialog
 			} else {
 				throw new IllegalStateException("No component kind selected!");
 			}
-			final LabelBlockSubject blocked = new LabelBlockSubject();
-			final GraphSubject graph = new GraphSubject(blocked);
+			final GraphSubject graph = new GraphSubject();
 
 			final SimpleComponentSubject comp =
 				new SimpleComponentSubject(ident, kind, graph);

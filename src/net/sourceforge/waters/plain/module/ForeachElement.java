@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   ForeachElement
 //###########################################################################
-//# $Id: ForeachElement.java,v 1.7 2006-09-06 11:52:21 robi Exp $
+//# $Id: ForeachElement.java,v 1.8 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -73,7 +73,7 @@ public abstract class ForeachElement
     this(name,
          range,
          null,
-         emptyProxyList());
+         null);
   }
 
 
@@ -161,14 +161,6 @@ public abstract class ForeachElement
   public List<Proxy> getBody()
   {
     return mBody;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static List<Proxy> emptyProxyList()
-  {
-    return Collections.emptyList();
   }
 
 

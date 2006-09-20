@@ -584,14 +584,24 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
       set refstatus [Java_AttribGetRefStatus $attrib $impl]
       if {[string compare $transformer ""] == 0} {
 	set membertype [Java_AttribGetMemberType $attrib $impl classMap]
+        set dftvalue [Java_AttribGetDefaultValue $attrib $impl]
+        if {[regexp {Subject$} $membertype all]} {
+          set typecast "($membertype) "
+        } else {
+          set typecast ""
+        }
         if {[regexp {2D$} $decltype all]} {
 	  Java_WriteLn $stream $umap \
               "    $membername = ($decltype) $paramname.clone();"
-	} elseif {[regexp {Subject$} $membertype all]} {
-	  Java_WriteLn $stream $umap \
-	      "    $membername = ($membertype) $paramname;"
+	} elseif {[string compare $dftvalue "empty"] == 0 &&
+                  [regexp {Proxy$} $decltype all]} {
+	  Java_WriteLn $stream $umap "    if ($paramname == null) \{"
+	  Java_WriteLn $stream $umap "      $membername = new ${impltype}();"
+	  Java_WriteLn $stream $umap "    \} else \{"
+	  Java_WriteLn $stream $umap "      $membername = $typecast$paramname;"
+	  Java_WriteLn $stream $umap "    \}"
 	} else {
-	  Java_WriteLn $stream $umap "    $membername = $paramname;"
+	  Java_WriteLn $stream $umap "    $membername = $typecast$paramname;"
 	}
 	set impltype $membertype
       } elseif {[string compare $impl "plain"] == 0} {
@@ -646,7 +656,6 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
     Java_WriteLn $stream $umap "  \}"
     Java_WriteLn $stream $umap ""
 
-    set emptydefaults ""
     if {$numdefaults > 0} {
       Java_WriteConstructorComment $stream $umap $impl \
           "constructor" $short $allattribs 1
@@ -665,13 +674,8 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
             Java_Write $stream $umap $indent
             incr i
           }
-        } elseif {[Java_IsCollectionType $decltype] &&
-                  ![info exists emptynames($decltype)]} {
-          set emptynames($decltype) 1
-          lappend emptydefaults $attrib
         }
       }
-      catch {unset emptynames}
       Java_WriteLn $stream $umap ")"
       Java_WriteExceptionDeclaration $stream $umap $exceptions
       Java_WriteLn $stream $umap "  \{"
@@ -682,7 +686,9 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
       set i 1
       foreach attrib $allattribs {
         set dftvalue [Java_AttribGetDefaultValue $attrib $impl]
-        if {[string compare $dftvalue ""] != 0} {
+        if {[string compare $dftvalue "empty"] == 0} {
+          Java_Write $stream $umap "null"
+        } elseif {[string compare $dftvalue ""] != 0} {
           Java_Write $stream $umap $dftvalue
         } else {
           set paramname [Java_AttribGetParameterName $attrib $impl]
@@ -1117,7 +1123,7 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
         if {[regexp {2D$} $type all]} {
 	  Java_WriteLn $stream $umap "    return ($type) $membername.clone();"
 	} elseif {[string compare $transformer ""] == 0 ||
-	    [string compare $impl "plain"] == 0} {
+                  [string compare $impl "plain"] == 0} {
 	  Java_WriteLn $stream $umap "    return $membername;"
 	} else {
 	  Java_WriteLn $stream $umap \
@@ -1247,22 +1253,6 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 	foreach line $body {
 	  Java_WriteLn $stream $umap "    $line"
 	}
-	Java_WriteLn $stream $umap "  \}"
-	Java_WriteLn $stream $umap ""
-      }
-    }
-
-  ############################################################################
-  # Auxiliary Methods
-    if {[llength $emptydefaults] > 0} {
-      Java_GenerateSeparatorComment $stream $umap "Auxiliary Methods"
-      foreach attrib $emptydefaults {
-        set header [Java_AttribGetDefaultValue $attrib $impl]
-        set call [Java_AttribGetEmptyCollectionsCall $attrib $impl]
-        set emptytype [Java_AttribGetEmptyCollectionType $attrib $impl]
-	Java_WriteLn $stream $umap "  private static $emptytype $header"
-	Java_WriteLn $stream $umap "  \{"
-	Java_WriteLn $stream $umap "    return $call;"
 	Java_WriteLn $stream $umap "  \}"
 	Java_WriteLn $stream $umap ""
       }
@@ -1923,6 +1913,8 @@ proc Java_AttribGetImplementationType {attrib impl classMapName} {
   } elseif {[regexp {^Set<(.*)>$} $type all elemtype]} {
     return "HashSet<$elemtype>"
   } else {
+    set suffix [Java_GetImplObjectName $impl]
+    regsub {Proxy$} $type $suffix type
     return $type
   }
 }
@@ -2002,10 +1994,8 @@ proc Java_AttribGetDefaultValue {attrib impl} {
     return $dftvalue
   } elseif {[string compare $eqstatus "geometry"] == 0} {
     return "null"
-  } elseif {[Java_IsCollectionType $emptytype] &&
-            [regexp {^([A-Z][a-z]+)<([A-Za-z0-9_]+)>$} \
-                 $emptytype all collectiontype elemtype]} {
-    return "empty${elemtype}${collectiontype}()"
+  } elseif {[Java_IsCollectionType $emptytype]} {
+    return "null"
   } else {
     return ""
   }
@@ -2157,7 +2147,8 @@ proc Java_WriteConstructorComment {stream umap impl methodkind
       if {[string compare $dftvalue ""] != 0} {
         set descr [Java_AttribGetEnglishDescription $attrib $impl]
         set type [Java_AttribGetDeclaredType $attrib $impl]
-        if {[Java_IsCollectionType $type]} {
+        if {[Java_IsCollectionType $type] ||
+            [string compare $dftvalue "empty"] == 0} {
           Java_Write $stream $umap "   * an empty $descr"
         } else {
           Java_Write $stream $umap \
@@ -2176,19 +2167,17 @@ proc Java_WriteConstructorComment {stream umap impl methodkind
     }
   }  
   Java_WriteLn $stream $umap "."
-  set dftvalue ""
   foreach attrib $attribs {
-    if {$withdft} {
-      set dftvalue [Java_AttribGetDefaultValue $attrib $impl]
-    }
-    if {[string compare $dftvalue ""] == 0} {
+    set dftvalue [Java_AttribGetDefaultValue $attrib $impl]
+    if {!$withdft || [string compare $dftvalue ""] == 0} {
       set name [Java_AttribGetParameterName $attrib $impl]
       set descr [Java_AttribGetEnglishDescription $attrib $impl]
       set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
       set transformer [Java_AttribGetCollectionTransformerName $attrib $impl]
       Java_Write $stream $umap \
           "   * @param $name The $descr of the new $short"
-      if {[string compare $transformer ""] != 0} {
+      if {[string compare $transformer ""] != 0 ||
+          [string compare $dftvalue "empty"] == 0} {
         Java_Write $stream $umap ", or <CODE>null</CODE> if empty"
       } elseif {[string compare $eqstatus "geometry"] == 0 ||
                 [string compare $eqstatus "optional"] == 0} {

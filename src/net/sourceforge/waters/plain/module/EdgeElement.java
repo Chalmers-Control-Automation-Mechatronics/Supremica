@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   EdgeElement
 //###########################################################################
-//# $Id: EdgeElement.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: EdgeElement.java,v 1.7 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -39,7 +39,7 @@ public final class EdgeElement
    * Creates a new edge.
    * @param source The source node of the new edge.
    * @param target The target node of the new edge.
-   * @param labelBlock The label block of the new edge.
+   * @param labelBlock The label block of the new edge, or <CODE>null</CODE> if empty.
    * @param guardActionBlock The guard action block of the new edge, or <CODE>null</CODE>.
    * @param geometry The rendering information of the new edge, or <CODE>null</CODE>.
    * @param startPoint The rendering information for the start point of the new edge, or <CODE>null</CODE>.
@@ -55,7 +55,11 @@ public final class EdgeElement
   {
     mSource = source;
     mTarget = target;
-    mLabelBlock = labelBlock;
+    if (labelBlock == null) {
+      mLabelBlock = new LabelBlockElement();
+    } else {
+      mLabelBlock = labelBlock;
+    }
     mGuardActionBlock = guardActionBlock;
     mGeometry = geometry;
     mStartPoint = startPoint;
@@ -65,21 +69,20 @@ public final class EdgeElement
   /**
    * Creates a new edge using default values.
    * This constructor creates an edge with
+   * an empty label block,
    * the guard action block set to <CODE>null</CODE>,
    * the rendering information set to <CODE>null</CODE>,
    * the rendering information for the start point set to <CODE>null</CODE>, and
    * the rendering information for the end point set to <CODE>null</CODE>.
    * @param source The source node of the new edge.
    * @param target The target node of the new edge.
-   * @param labelBlock The label block of the new edge.
    */
   public EdgeElement(final NodeProxy source,
-                     final NodeProxy target,
-                     final LabelBlockProxy labelBlock)
+                     final NodeProxy target)
   {
     this(source,
          target,
-         labelBlock,
+         null,
          null,
          null,
          null,

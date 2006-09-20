@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ModuleHierarchyChecker
 //###########################################################################
-//# $Id: ModuleHierarchyChecker.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ModuleHierarchyChecker.java,v 1.3 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -62,11 +62,10 @@ class ModuleHierarchyChecker
 
   //#########################################################################
   //# Invocation
-  public void check(final ModuleProxy module)
+  public void check(final Proxy proxy)
     throws VisitorException
   {
-    checkParent(module, null);
-    visitModuleProxy(module);
+    proxy.acceptVisitor(this);
   }
 
 

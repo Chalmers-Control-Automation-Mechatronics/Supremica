@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   ModuleElement
 //###########################################################################
-//# $Id: ModuleElement.java,v 1.9 2006-09-19 15:53:20 robi Exp $
+//# $Id: ModuleElement.java,v 1.10 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -121,11 +121,11 @@ public final class ModuleElement
     this(name,
          null,
          location,
-         emptyParameterProxyList(),
-         emptyAliasProxyList(),
-         emptyEventDeclProxyList(),
-         emptyProxyList(),
-         emptyProxyList());
+         null,
+         null,
+         null,
+         null,
+         null);
   }
 
 
@@ -247,29 +247,6 @@ public final class ModuleElement
   public List<Proxy> getComponentList()
   {
     return mComponentList;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static List<ParameterProxy> emptyParameterProxyList()
-  {
-    return Collections.emptyList();
-  }
-
-  private static List<AliasProxy> emptyAliasProxyList()
-  {
-    return Collections.emptyList();
-  }
-
-  private static List<EventDeclProxy> emptyEventDeclProxyList()
-  {
-    return Collections.emptyList();
-  }
-
-  private static List<Proxy> emptyProxyList()
-  {
-    return Collections.emptyList();
   }
 
 

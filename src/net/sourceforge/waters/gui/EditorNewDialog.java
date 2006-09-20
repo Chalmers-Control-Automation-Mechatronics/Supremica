@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNewDialog
 //###########################################################################
-//# $Id: EditorNewDialog.java,v 1.7 2006-05-11 10:04:17 flordal Exp $
+//# $Id: EditorNewDialog.java,v 1.8 2006-09-20 16:24:12 robi Exp $
 //###########################################################################
 
 
@@ -124,9 +124,7 @@ public class EditorNewDialog
 			} else {
 				throw new IllegalStateException("No component kind selected!");
 			}
-			final LabelBlockSubject blocked = new LabelBlockSubject();
-			final GraphSubject graph = new GraphSubject(blocked);
-			
+			final GraphSubject graph = new GraphSubject();
 			final SimpleComponentSubject comp =
 				new SimpleComponentSubject(ident, kind, graph);
 			//TODO: Make this create the component

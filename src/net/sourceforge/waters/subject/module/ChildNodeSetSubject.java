@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ChildNodeSetSubject
 //###########################################################################
-//# $Id: ChildNodeSetSubject.java,v 1.4 2006-07-20 02:28:37 robi Exp $
+//# $Id: ChildNodeSetSubject.java,v 1.5 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -106,6 +106,11 @@ class ChildNodeSetSubject
       final GroupNodeSubject group = (GroupNodeSubject) getParent();
       final NodeSetSubject nodeset =
         group == null ? null : (NodeSetSubject) group.getParent();
+      if (nodeset != null && nodeset != node.getParent()) {
+        throw new IllegalArgumentException
+          ("Trying to add node '" + node.getName() +
+           "' as child of group node of a different graph!");
+      }
       try {
         mProxySet.add(node);
         if (nodeset != null) {

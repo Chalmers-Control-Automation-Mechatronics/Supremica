@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   InstanceSubject
 //###########################################################################
-//# $Id: InstanceSubject.java,v 1.8 2006-09-06 11:52:21 robi Exp $
+//# $Id: InstanceSubject.java,v 1.9 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -73,7 +73,7 @@ public final class InstanceSubject
   {
     this(identifier,
          moduleName,
-         emptyParameterBindingProxyList());
+         null);
   }
 
 
@@ -183,14 +183,6 @@ public final class InstanceSubject
   public IndexedListSubject<ParameterBindingSubject> getBindingListModifiable()
   {
     return mBindingList;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static List<ParameterBindingProxy> emptyParameterBindingProxyList()
-  {
-    return Collections.emptyList();
   }
 
 

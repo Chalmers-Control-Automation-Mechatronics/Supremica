@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   GuardActionBlockSubject
 //###########################################################################
-//# $Id: GuardActionBlockSubject.java,v 1.10 2006-09-12 14:32:17 robi Exp $
+//# $Id: GuardActionBlockSubject.java,v 1.11 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -81,8 +81,8 @@ public final class GuardActionBlockSubject
    */
   public GuardActionBlockSubject()
   {
-    this(emptySimpleExpressionProxyList(),
-         emptyBinaryExpressionProxyList(),
+    this(null,
+         null,
          null);
   }
 
@@ -218,19 +218,6 @@ public final class GuardActionBlockSubject
     final ModelChangeEvent event =
       ModelChangeEvent.createGeometryChanged(this, mGeometry);
     fireModelChanged(event);
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static List<SimpleExpressionProxy> emptySimpleExpressionProxyList()
-  {
-    return Collections.emptyList();
-  }
-
-  private static List<BinaryExpressionProxy> emptyBinaryExpressionProxyList()
-  {
-    return Collections.emptyList();
   }
 
 

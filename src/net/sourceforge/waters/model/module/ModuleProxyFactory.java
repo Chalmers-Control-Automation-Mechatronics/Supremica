@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleProxyFactory
 //###########################################################################
-//# $Id: ModuleProxyFactory.java,v 1.13 2006-09-19 15:53:20 robi Exp $
+//# $Id: ModuleProxyFactory.java,v 1.14 2006-09-20 16:24:12 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -105,7 +105,7 @@ public interface ModuleProxyFactory
    * Creates a new edge.
    * @param source The source node of the new edge.
    * @param target The target node of the new edge.
-   * @param labelBlock The label block of the new edge.
+   * @param labelBlock The label block of the new edge, or <CODE>null</CODE> if empty.
    * @param guardActionBlock The guard action block of the new edge, or <CODE>null</CODE>.
    * @param geometry The rendering information of the new edge, or <CODE>null</CODE>.
    * @param startPoint The rendering information for the start point of the new edge, or <CODE>null</CODE>.
@@ -123,18 +123,17 @@ public interface ModuleProxyFactory
   /**
    * Creates a new edge using default values.
    * This method creates an edge with
+   * an empty label block,
    * the guard action block set to <CODE>null</CODE>,
    * the rendering information set to <CODE>null</CODE>,
    * the rendering information for the start point set to <CODE>null</CODE>, and
    * the rendering information for the end point set to <CODE>null</CODE>.
    * @param source The source node of the new edge.
    * @param target The target node of the new edge.
-   * @param labelBlock The label block of the new edge.
    */
   public EdgeProxy createEdgeProxy
       (NodeProxy source,
-       NodeProxy target,
-       LabelBlockProxy labelBlock);
+       NodeProxy target);
 
   /**
    * Creates a new enumerated range.
@@ -282,7 +281,7 @@ public interface ModuleProxyFactory
   /**
    * Creates a new graph.
    * @param deterministic The determinism status of the new graph.
-   * @param blockedEvents The list of blocked events of the new graph.
+   * @param blockedEvents The list of blocked events of the new graph, or <CODE>null</CODE> if empty.
    * @param nodes The set of nodes of the new graph, or <CODE>null</CODE> if empty.
    * @param edges The collection of edges of the new graph, or <CODE>null</CODE> if empty.
    */
@@ -296,17 +295,16 @@ public interface ModuleProxyFactory
    * Creates a new graph using default values.
    * This method creates a graph with
    * the determinism status set to <CODE>true</CODE>,
+   * an empty list of blocked events,
    * an empty set of nodes, and
    * an empty collection of edges.
-   * @param blockedEvents The list of blocked events of the new graph.
    */
-  public GraphProxy createGraphProxy
-      (LabelBlockProxy blockedEvents);
+  public GraphProxy createGraphProxy();
 
   /**
    * Creates a new group node.
    * @param name The name of the new group node.
-   * @param propositions The list of propositions of the new group node.
+   * @param propositions The list of propositions of the new group node, or <CODE>null</CODE> if empty.
    * @param immediateChildNodes The set of immediate child nodes of the new group node, or <CODE>null</CODE> if empty.
    * @param geometry The geometric information of the new group node, or <CODE>null</CODE>.
    */
@@ -319,14 +317,13 @@ public interface ModuleProxyFactory
   /**
    * Creates a new group node using default values.
    * This method creates a group node with
-   * an empty set of immediate child nodes and
+   * an empty list of propositions,
+   * an empty set of immediate child nodes, and
    * the geometric information set to <CODE>null</CODE>.
    * @param name The name of the new group node.
-   * @param propositions The list of propositions of the new group node.
    */
   public GroupNodeProxy createGroupNodeProxy
-      (String name,
-       PlainEventListProxy propositions);
+      (String name);
 
   /**
    * Creates a new guard action block.
@@ -603,7 +600,7 @@ public interface ModuleProxyFactory
   /**
    * Creates a new simple node.
    * @param name The name of the new simple node.
-   * @param propositions The list of propositions of the new simple node.
+   * @param propositions The list of propositions of the new simple node, or <CODE>null</CODE> if empty.
    * @param initial The initial status of the new simple node.
    * @param pointGeometry The geometric position of the new simple node, or <CODE>null</CODE>.
    * @param initialArrowGeometry The position of the initial state arrow of the new simple node, or <CODE>null</CODE>.
@@ -620,16 +617,15 @@ public interface ModuleProxyFactory
   /**
    * Creates a new simple node using default values.
    * This method creates a simple node with
+   * an empty list of propositions,
    * the initial status set to <CODE>false</CODE>,
    * the geometric position set to <CODE>null</CODE>,
    * the position of the initial state arrow set to <CODE>null</CODE>, and
    * the geometric position of the label set to <CODE>null</CODE>.
    * @param name The name of the new simple node.
-   * @param propositions The list of propositions of the new simple node.
    */
   public SimpleNodeProxy createSimpleNodeProxy
-      (String name,
-       PlainEventListProxy propositions);
+      (String name);
 
   /**
    * Creates a new spline geometry.

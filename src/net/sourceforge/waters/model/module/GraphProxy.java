@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   GraphProxy
 //###########################################################################
-//# $Id: GraphProxy.java,v 1.3 2006-07-25 22:06:07 robi Exp $
+//# $Id: GraphProxy.java,v 1.4 2006-09-20 16:24:12 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -48,6 +48,7 @@ public interface GraphProxy extends Proxy {
    * specify that certain events globally disabled in any system where an
    * automaton is used.
    */
+  // @default empty
   public LabelBlockProxy getBlockedEvents();
 
   /**

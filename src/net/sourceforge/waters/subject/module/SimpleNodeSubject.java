@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SimpleNodeSubject
 //###########################################################################
-//# $Id: SimpleNodeSubject.java,v 1.10 2006-08-01 04:14:47 robi Exp $
+//# $Id: SimpleNodeSubject.java,v 1.11 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -40,7 +40,7 @@ public final class SimpleNodeSubject
   /**
    * Creates a new simple node.
    * @param name The name of the new simple node.
-   * @param propositions The list of propositions of the new simple node.
+   * @param propositions The list of propositions of the new simple node, or <CODE>null</CODE> if empty.
    * @param initial The initial status of the new simple node.
    * @param pointGeometry The geometric position of the new simple node, or <CODE>null</CODE>.
    * @param initialArrowGeometry The position of the initial state arrow of the new simple node, or <CODE>null</CODE>.
@@ -72,18 +72,17 @@ public final class SimpleNodeSubject
   /**
    * Creates a new simple node using default values.
    * This constructor creates a simple node with
+   * an empty list of propositions,
    * the initial status set to <CODE>false</CODE>,
    * the geometric position set to <CODE>null</CODE>,
    * the position of the initial state arrow set to <CODE>null</CODE>, and
    * the geometric position of the label set to <CODE>null</CODE>.
    * @param name The name of the new simple node.
-   * @param propositions The list of propositions of the new simple node.
    */
-  public SimpleNodeSubject(final String name,
-                           final PlainEventListProxy propositions)
+  public SimpleNodeSubject(final String name)
   {
     this(name,
-         propositions,
+         null,
          false,
          null,
          null,

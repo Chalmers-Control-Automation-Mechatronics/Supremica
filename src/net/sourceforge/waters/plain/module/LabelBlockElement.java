@@ -4,14 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   LabelBlockElement
 //###########################################################################
-//# $Id: LabelBlockElement.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: LabelBlockElement.java,v 1.7 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -54,7 +52,7 @@ public final class LabelBlockElement
    */
   public LabelBlockElement()
   {
-    this(emptyProxyList(),
+    this(null,
          null);
   }
 
@@ -107,14 +105,6 @@ public final class LabelBlockElement
   public LabelGeometryProxy getGeometry()
   {
     return mGeometry;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static List<Proxy> emptyProxyList()
-  {
-    return Collections.emptyList();
   }
 
 

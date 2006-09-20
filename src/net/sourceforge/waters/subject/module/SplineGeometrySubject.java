@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SplineGeometrySubject
 //###########################################################################
-//# $Id: SplineGeometrySubject.java,v 1.8 2006-07-20 02:28:37 robi Exp $
+//# $Id: SplineGeometrySubject.java,v 1.9 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -67,7 +67,7 @@ public final class SplineGeometrySubject
    */
   public SplineGeometrySubject()
   {
-    this(emptyPoint2DList(),
+    this(null,
          SplineKind.INTERPOLATING);
   }
 
@@ -155,14 +155,6 @@ public final class SplineGeometrySubject
     final ModelChangeEvent event =
       ModelChangeEvent.createGeometryChanged(source, this);
     fireModelChanged(event);
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static List<Point2D> emptyPoint2DList()
-  {
-    return Collections.emptyList();
   }
 
 

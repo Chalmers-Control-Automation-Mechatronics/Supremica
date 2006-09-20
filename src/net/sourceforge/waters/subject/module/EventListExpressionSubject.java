@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   EventListExpressionSubject
 //###########################################################################
-//# $Id: EventListExpressionSubject.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: EventListExpressionSubject.java,v 1.7 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -57,7 +57,7 @@ public abstract class EventListExpressionSubject
    */
   protected EventListExpressionSubject()
   {
-    this(emptyProxyList());
+    this(null);
   }
 
 
@@ -112,14 +112,6 @@ public abstract class EventListExpressionSubject
   public ListSubject<AbstractSubject> getEventListModifiable()
   {
     return mEventList;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static List<Proxy> emptyProxyList()
-  {
-    return Collections.emptyList();
   }
 
 

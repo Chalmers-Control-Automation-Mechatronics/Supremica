@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   NodeSubject
 //###########################################################################
-//# $Id: NodeSubject.java,v 1.7 2006-08-01 04:14:47 robi Exp $
+//# $Id: NodeSubject.java,v 1.8 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -32,14 +32,30 @@ public abstract class NodeSubject
   /**
    * Creates a new node.
    * @param name The name of the new node.
-   * @param propositions The list of propositions of the new node.
+   * @param propositions The list of propositions of the new node, or <CODE>null</CODE> if empty.
    */
   protected NodeSubject(final String name,
                         final PlainEventListProxy propositions)
   {
     super(name);
-    mPropositions = (PlainEventListSubject) propositions;
+    if (propositions == null) {
+      mPropositions = new PlainEventListSubject();
+    } else {
+      mPropositions = (PlainEventListSubject) propositions;
+    }
     mPropositions.setParent(this);
+  }
+
+  /**
+   * Creates a new node using default values.
+   * This constructor creates a node with
+   * an empty list of propositions.
+   * @param name The name of the new node.
+   */
+  protected NodeSubject(final String name)
+  {
+    this(name,
+         null);
   }
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ProductDESImporter
 //###########################################################################
-//# $Id: ProductDESImporter.java,v 1.4 2006-09-19 15:53:20 robi Exp $
+//# $Id: ProductDESImporter.java,v 1.5 2006-09-20 16:24:12 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -213,8 +213,8 @@ public class ProductDESImporter
         }
         final LabelBlockProxy labelblock =
           mFactory.createLabelBlockProxy(labels, null);
-        final EdgeProxy edge =
-          mFactory.createEdgeProxy(source, target, labelblock);
+        final EdgeProxy edge = mFactory.createEdgeProxy
+          (source, target, labelblock, null, null, null, null);
         edges.add(edge);
       }
       final int numblocked = mCurrentBlockedEvents.size();

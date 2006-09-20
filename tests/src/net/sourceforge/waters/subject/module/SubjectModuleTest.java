@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SubjectModuleTest
 //###########################################################################
-//# $Id: SubjectModuleTest.java,v 1.3 2006-07-20 02:28:38 robi Exp $
+//# $Id: SubjectModuleTest.java,v 1.4 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 
@@ -47,7 +47,8 @@ public class SubjectModuleTest extends AbstractModuleTest
 
 
   //#########################################################################
-  //# Overrides for Abstract Base Class JAXBTestCase
+  //# Overrides for Abstract Base Class
+  //# net.sourceforge.waters.model.marshaller.AbstractJAXBTest
   protected void checkIntegrity(final ModuleProxy module)
     throws Exception
   {

@@ -4,14 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   SplineGeometryElement
 //###########################################################################
-//# $Id: SplineGeometryElement.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: SplineGeometryElement.java,v 1.7 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
 
 import java.awt.geom.Point2D;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.Proxy;
@@ -58,7 +57,7 @@ public final class SplineGeometryElement
    */
   public SplineGeometryElement()
   {
-    this(emptyPoint2DList(),
+    this(null,
          SplineKind.INTERPOLATING);
   }
 
@@ -116,14 +115,6 @@ public final class SplineGeometryElement
   public SplineKind getKind()
   {
     return mKind;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static List<Point2D> emptyPoint2DList()
-  {
-    return Collections.emptyList();
   }
 
 

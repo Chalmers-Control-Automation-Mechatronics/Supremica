@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SimpleComponentSubject
 //###########################################################################
-//# $Id: SimpleComponentSubject.java,v 1.8 2006-09-06 11:52:21 robi Exp $
+//# $Id: SimpleComponentSubject.java,v 1.9 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -83,7 +83,7 @@ public final class SimpleComponentSubject
     this(identifier,
          kind,
          graph,
-         emptyVariableProxyList());
+         null);
   }
 
 
@@ -213,14 +213,6 @@ public final class SimpleComponentSubject
   public ListSubject<VariableSubject> getVariablesModifiable()
   {
     return mVariables;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static List<VariableProxy> emptyVariableProxyList()
-  {
-    return Collections.emptyList();
   }
 
 

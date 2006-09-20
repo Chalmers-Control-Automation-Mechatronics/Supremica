@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   EdgeSubject
 //###########################################################################
-//# $Id: EdgeSubject.java,v 1.8 2006-07-20 02:28:37 robi Exp $
+//# $Id: EdgeSubject.java,v 1.9 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -41,7 +41,7 @@ public final class EdgeSubject
    * Creates a new edge.
    * @param source The source node of the new edge.
    * @param target The target node of the new edge.
-   * @param labelBlock The label block of the new edge.
+   * @param labelBlock The label block of the new edge, or <CODE>null</CODE> if empty.
    * @param guardActionBlock The guard action block of the new edge, or <CODE>null</CODE>.
    * @param geometry The rendering information of the new edge, or <CODE>null</CODE>.
    * @param startPoint The rendering information for the start point of the new edge, or <CODE>null</CODE>.
@@ -57,7 +57,11 @@ public final class EdgeSubject
   {
     mSource = (NodeSubject) source;
     mTarget = (NodeSubject) target;
-    mLabelBlock = (LabelBlockSubject) labelBlock;
+    if (labelBlock == null) {
+      mLabelBlock = new LabelBlockSubject();
+    } else {
+      mLabelBlock = (LabelBlockSubject) labelBlock;
+    }
     mLabelBlock.setParent(this);
     mGuardActionBlock = (GuardActionBlockSubject) guardActionBlock;
     if (mGuardActionBlock != null) {
@@ -80,21 +84,20 @@ public final class EdgeSubject
   /**
    * Creates a new edge using default values.
    * This constructor creates an edge with
+   * an empty label block,
    * the guard action block set to <CODE>null</CODE>,
    * the rendering information set to <CODE>null</CODE>,
    * the rendering information for the start point set to <CODE>null</CODE>, and
    * the rendering information for the end point set to <CODE>null</CODE>.
    * @param source The source node of the new edge.
    * @param target The target node of the new edge.
-   * @param labelBlock The label block of the new edge.
    */
   public EdgeSubject(final NodeProxy source,
-                     final NodeProxy target,
-                     final LabelBlockProxy labelBlock)
+                     final NodeProxy target)
   {
     this(source,
          target,
-         labelBlock,
+         null,
          null,
          null,
          null,
@@ -318,6 +321,9 @@ public final class EdgeSubject
     fireModelChanged(event);
   }
 
+  /**
+   * Sets the label block of this edge.
+   */
   public void setLabelBlock(final LabelBlockSubject labelBlock)
   {
     if (mLabelBlock == labelBlock) {

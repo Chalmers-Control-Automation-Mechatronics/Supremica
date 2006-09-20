@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   GraphElement
 //###########################################################################
-//# $Id: GraphElement.java,v 1.9 2006-08-18 06:39:29 robi Exp $
+//# $Id: GraphElement.java,v 1.10 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -12,7 +12,6 @@ package net.sourceforge.waters.plain.module;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.EqualCollection;
@@ -43,7 +42,7 @@ public final class GraphElement
   /**
    * Creates a new graph.
    * @param deterministic The determinism status of the new graph.
-   * @param blockedEvents The list of blocked events of the new graph.
+   * @param blockedEvents The list of blocked events of the new graph, or <CODE>null</CODE> if empty.
    * @param nodes The set of nodes of the new graph, or <CODE>null</CODE> if empty.
    * @param edges The collection of edges of the new graph, or <CODE>null</CODE> if empty.
    */
@@ -53,7 +52,11 @@ public final class GraphElement
                       final Collection<? extends EdgeProxy> edges)
   {
     mIsDeterministic = deterministic;
-    mBlockedEvents = blockedEvents;
+    if (blockedEvents == null) {
+      mBlockedEvents = new LabelBlockElement();
+    } else {
+      mBlockedEvents = blockedEvents;
+    }
     if (nodes == null) {
       mNodes = Collections.emptySet();
     } else {
@@ -76,16 +79,16 @@ public final class GraphElement
    * Creates a new graph using default values.
    * This constructor creates a graph with
    * the determinism status set to <CODE>true</CODE>,
+   * an empty list of blocked events,
    * an empty set of nodes, and
    * an empty collection of edges.
-   * @param blockedEvents The list of blocked events of the new graph.
    */
-  public GraphElement(final LabelBlockProxy blockedEvents)
+  public GraphElement()
   {
     this(true,
-         blockedEvents,
-         emptyNodeProxySet(),
-         emptyEdgeProxyList());
+         null,
+         null,
+         null);
   }
 
 
@@ -194,19 +197,6 @@ public final class GraphElement
   public Collection<EdgeProxy> getEdges()
   {
     return mEdges;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static Set<NodeProxy> emptyNodeProxySet()
-  {
-    return Collections.emptySet();
-  }
-
-  private static List<EdgeProxy> emptyEdgeProxyList()
-  {
-    return Collections.emptyList();
   }
 
 

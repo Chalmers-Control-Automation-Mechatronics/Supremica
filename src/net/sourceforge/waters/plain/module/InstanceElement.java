@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   InstanceElement
 //###########################################################################
-//# $Id: InstanceElement.java,v 1.7 2006-09-06 11:52:21 robi Exp $
+//# $Id: InstanceElement.java,v 1.8 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -71,7 +71,7 @@ public final class InstanceElement
   {
     this(identifier,
          moduleName,
-         emptyParameterBindingProxyList());
+         null);
   }
 
 
@@ -152,14 +152,6 @@ public final class InstanceElement
   public List<ParameterBindingProxy> getBindingList()
   {
     return mBindingList;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static List<ParameterBindingProxy> emptyParameterBindingProxyList()
-  {
-    return Collections.emptyList();
   }
 
 

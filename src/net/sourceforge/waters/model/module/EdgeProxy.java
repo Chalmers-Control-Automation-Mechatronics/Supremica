@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   EdgeProxy
 //###########################################################################
-//# $Id: EdgeProxy.java,v 1.3 2006-03-02 12:12:49 martin Exp $
+//# $Id: EdgeProxy.java,v 1.4 2006-09-20 16:24:12 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -47,14 +47,16 @@ public interface EdgeProxy extends Proxy {
   // @ref
   public NodeProxy getTarget();
   
-  
-  
+  /**
+   * Gets the label block of this edge. The label block contains a list
+   * of labels, each representing one event and therefore one transition
+   * in the automaton obtained from this graph.
+   */
+  // @default empty  
   public LabelBlockProxy getLabelBlock();
   
   // @optional
   public GuardActionBlockProxy getGuardActionBlock();
-  
-  
 
   /**
    * Gets the rendering information for this edge.

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   AbstractModuleTest
 //###########################################################################
-//# $Id: AbstractModuleTest.java,v 1.6 2006-09-19 15:53:20 robi Exp $
+//# $Id: AbstractModuleTest.java,v 1.7 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 
@@ -243,7 +243,8 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     final SimpleNodeProxy node =
       factory.createSimpleNodeProxy("s0", props, true, null, null, null);
     final LabelBlockProxy labelblock = factory.createLabelBlockProxy();
-    final EdgeProxy edge = factory.createEdgeProxy(node, node, labelblock);
+    final EdgeProxy edge =
+      factory.createEdgeProxy(node, node, labelblock, null, null, null, null);
     final LabelBlockProxy blocked = factory.createLabelBlockProxy();
     final List<SimpleNodeProxy> nodes = Collections.singletonList(node);
     final List<EdgeProxy> edges = Collections.singletonList(edge);

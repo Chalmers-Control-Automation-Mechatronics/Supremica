@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   EventDeclSubject
 //###########################################################################
-//# $Id: EventDeclSubject.java,v 1.8 2006-07-20 02:28:37 robi Exp $
+//# $Id: EventDeclSubject.java,v 1.9 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -88,7 +88,7 @@ public final class EventDeclSubject
     this(name,
          kind,
          true,
-         emptySimpleExpressionProxyList(),
+         null,
          null);
   }
 
@@ -263,14 +263,6 @@ public final class EventDeclSubject
     final ModelChangeEvent event =
       ModelChangeEvent.createGeometryChanged(this, mColorGeometry);
     fireModelChanged(event);
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static List<SimpleExpressionProxy> emptySimpleExpressionProxyList()
-  {
-    return Collections.emptyList();
   }
 
 

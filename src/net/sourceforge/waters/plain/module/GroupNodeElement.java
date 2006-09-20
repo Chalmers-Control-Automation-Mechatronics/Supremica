@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   GroupNodeElement
 //###########################################################################
-//# $Id: GroupNodeElement.java,v 1.9 2006-08-18 06:39:29 robi Exp $
+//# $Id: GroupNodeElement.java,v 1.10 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -41,7 +41,7 @@ public final class GroupNodeElement
   /**
    * Creates a new group node.
    * @param name The name of the new group node.
-   * @param propositions The list of propositions of the new group node.
+   * @param propositions The list of propositions of the new group node, or <CODE>null</CODE> if empty.
    * @param immediateChildNodes The set of immediate child nodes of the new group node, or <CODE>null</CODE> if empty.
    * @param geometry The geometric information of the new group node, or <CODE>null</CODE>.
    */
@@ -65,17 +65,16 @@ public final class GroupNodeElement
   /**
    * Creates a new group node using default values.
    * This constructor creates a group node with
-   * an empty set of immediate child nodes and
+   * an empty list of propositions,
+   * an empty set of immediate child nodes, and
    * the geometric information set to <CODE>null</CODE>.
    * @param name The name of the new group node.
-   * @param propositions The list of propositions of the new group node.
    */
-  public GroupNodeElement(final String name,
-                          final PlainEventListProxy propositions)
+  public GroupNodeElement(final String name)
   {
     this(name,
-         propositions,
-         emptyNodeProxySet(),
+         null,
+         null,
          null);
   }
 
@@ -157,14 +156,6 @@ public final class GroupNodeElement
   public BoxGeometryProxy getGeometry()
   {
     return mGeometry;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static Set<NodeProxy> emptyNodeProxySet()
-  {
-    return Collections.emptySet();
   }
 
 

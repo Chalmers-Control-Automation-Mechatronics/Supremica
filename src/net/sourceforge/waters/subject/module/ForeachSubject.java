@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ForeachSubject
 //###########################################################################
-//# $Id: ForeachSubject.java,v 1.8 2006-09-06 11:52:21 robi Exp $
+//# $Id: ForeachSubject.java,v 1.9 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -80,7 +80,7 @@ public abstract class ForeachSubject
     this(name,
          range,
          null,
-         emptyProxyList());
+         null);
   }
 
 
@@ -225,14 +225,6 @@ public abstract class ForeachSubject
   public ListSubject<AbstractSubject> getBodyModifiable()
   {
     return mBody;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static List<Proxy> emptyProxyList()
-  {
-    return Collections.emptyList();
   }
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ModuleSubjectFactory
 //###########################################################################
-//# $Id: ModuleSubjectFactory.java,v 1.13 2006-09-19 15:53:20 robi Exp $
+//# $Id: ModuleSubjectFactory.java,v 1.14 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -170,7 +170,7 @@ public class ModuleSubjectFactory
    * Creates a new edge.
    * @param source The source node of the new edge.
    * @param target The target node of the new edge.
-   * @param labelBlock The label block of the new edge.
+   * @param labelBlock The label block of the new edge, or <CODE>null</CODE> if empty.
    * @param guardActionBlock The guard action block of the new edge, or <CODE>null</CODE>.
    * @param geometry The rendering information of the new edge, or <CODE>null</CODE>.
    * @param startPoint The rendering information for the start point of the new edge, or <CODE>null</CODE>.
@@ -197,22 +197,20 @@ public class ModuleSubjectFactory
   /**
    * Creates a new edge using default values.
    * This method creates an edge with
+   * an empty label block,
    * the guard action block set to <CODE>null</CODE>,
    * the rendering information set to <CODE>null</CODE>,
    * the rendering information for the start point set to <CODE>null</CODE>, and
    * the rendering information for the end point set to <CODE>null</CODE>.
    * @param source The source node of the new edge.
    * @param target The target node of the new edge.
-   * @param labelBlock The label block of the new edge.
    */
   public EdgeSubject createEdgeProxy
       (final NodeProxy source,
-       final NodeProxy target,
-       final LabelBlockProxy labelBlock)
+       final NodeProxy target)
   {
     return new EdgeSubject(source,
-                           target,
-                           labelBlock);
+                           target);
   }
 
   /**
@@ -418,7 +416,7 @@ public class ModuleSubjectFactory
   /**
    * Creates a new graph.
    * @param deterministic The determinism status of the new graph.
-   * @param blockedEvents The list of blocked events of the new graph.
+   * @param blockedEvents The list of blocked events of the new graph, or <CODE>null</CODE> if empty.
    * @param nodes The set of nodes of the new graph, or <CODE>null</CODE> if empty.
    * @param edges The collection of edges of the new graph, or <CODE>null</CODE> if empty.
    */
@@ -438,20 +436,19 @@ public class ModuleSubjectFactory
    * Creates a new graph using default values.
    * This method creates a graph with
    * the determinism status set to <CODE>true</CODE>,
+   * an empty list of blocked events,
    * an empty set of nodes, and
    * an empty collection of edges.
-   * @param blockedEvents The list of blocked events of the new graph.
    */
-  public GraphSubject createGraphProxy
-      (final LabelBlockProxy blockedEvents)
+  public GraphSubject createGraphProxy()
   {
-    return new GraphSubject(blockedEvents);
+    return new GraphSubject();
   }
 
   /**
    * Creates a new group node.
    * @param name The name of the new group node.
-   * @param propositions The list of propositions of the new group node.
+   * @param propositions The list of propositions of the new group node, or <CODE>null</CODE> if empty.
    * @param immediateChildNodes The set of immediate child nodes of the new group node, or <CODE>null</CODE> if empty.
    * @param geometry The geometric information of the new group node, or <CODE>null</CODE>.
    */
@@ -470,17 +467,15 @@ public class ModuleSubjectFactory
   /**
    * Creates a new group node using default values.
    * This method creates a group node with
-   * an empty set of immediate child nodes and
+   * an empty list of propositions,
+   * an empty set of immediate child nodes, and
    * the geometric information set to <CODE>null</CODE>.
    * @param name The name of the new group node.
-   * @param propositions The list of propositions of the new group node.
    */
   public GroupNodeSubject createGroupNodeProxy
-      (final String name,
-       final PlainEventListProxy propositions)
+      (final String name)
   {
-    return new GroupNodeSubject(name,
-                                propositions);
+    return new GroupNodeSubject(name);
   }
 
   /**
@@ -868,7 +863,7 @@ public class ModuleSubjectFactory
   /**
    * Creates a new simple node.
    * @param name The name of the new simple node.
-   * @param propositions The list of propositions of the new simple node.
+   * @param propositions The list of propositions of the new simple node, or <CODE>null</CODE> if empty.
    * @param initial The initial status of the new simple node.
    * @param pointGeometry The geometric position of the new simple node, or <CODE>null</CODE>.
    * @param initialArrowGeometry The position of the initial state arrow of the new simple node, or <CODE>null</CODE>.
@@ -893,19 +888,17 @@ public class ModuleSubjectFactory
   /**
    * Creates a new simple node using default values.
    * This method creates a simple node with
+   * an empty list of propositions,
    * the initial status set to <CODE>false</CODE>,
    * the geometric position set to <CODE>null</CODE>,
    * the position of the initial state arrow set to <CODE>null</CODE>, and
    * the geometric position of the label set to <CODE>null</CODE>.
    * @param name The name of the new simple node.
-   * @param propositions The list of propositions of the new simple node.
    */
   public SimpleNodeSubject createSimpleNodeProxy
-      (final String name,
-       final PlainEventListProxy propositions)
+      (final String name)
   {
-    return new SimpleNodeSubject(name,
-                                 propositions);
+    return new SimpleNodeSubject(name);
   }
 
   /**

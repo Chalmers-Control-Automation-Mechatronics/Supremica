@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   EventDeclElement
 //###########################################################################
-//# $Id: EventDeclElement.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: EventDeclElement.java,v 1.7 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -83,7 +83,7 @@ public final class EventDeclElement
     this(name,
          kind,
          true,
-         emptySimpleExpressionProxyList(),
+         null,
          null);
   }
 
@@ -191,14 +191,6 @@ public final class EventDeclElement
   public ColorGeometryProxy getColorGeometry()
   {
     return mColorGeometry;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static List<SimpleExpressionProxy> emptySimpleExpressionProxyList()
-  {
-    return Collections.emptyList();
   }
 
 

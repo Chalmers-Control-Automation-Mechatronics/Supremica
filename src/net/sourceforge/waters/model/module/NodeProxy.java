@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   NodeProxy
 //###########################################################################
-//# $Id: NodeProxy.java,v 1.4 2006-08-01 04:14:47 robi Exp $
+//# $Id: NodeProxy.java,v 1.5 2006-09-20 16:24:12 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -42,6 +42,7 @@ public interface NodeProxy extends NamedProxy {
    * @return An event list that defines the proposition events for this
    *         node.
    */
+  // @default empty
   public PlainEventListProxy getPropositions();
 
   /**

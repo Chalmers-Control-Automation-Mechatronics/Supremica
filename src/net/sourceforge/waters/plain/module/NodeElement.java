@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   NodeElement
 //###########################################################################
-//# $Id: NodeElement.java,v 1.6 2006-08-01 04:14:47 robi Exp $
+//# $Id: NodeElement.java,v 1.7 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -31,13 +31,29 @@ public abstract class NodeElement
   /**
    * Creates a new node.
    * @param name The name of the new node.
-   * @param propositions The list of propositions of the new node.
+   * @param propositions The list of propositions of the new node, or <CODE>null</CODE> if empty.
    */
   protected NodeElement(final String name,
                         final PlainEventListProxy propositions)
   {
     super(name);
-    mPropositions = propositions;
+    if (propositions == null) {
+      mPropositions = new PlainEventListElement();
+    } else {
+      mPropositions = propositions;
+    }
+  }
+
+  /**
+   * Creates a new node using default values.
+   * This constructor creates a node with
+   * an empty list of propositions.
+   * @param name The name of the new node.
+   */
+  protected NodeElement(final String name)
+  {
+    this(name,
+         null);
   }
 
 

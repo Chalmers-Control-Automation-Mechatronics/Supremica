@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   ColorGeometryElement
 //###########################################################################
-//# $Id: ColorGeometryElement.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: ColorGeometryElement.java,v 1.7 2006-09-20 16:24:12 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -59,7 +59,7 @@ public final class ColorGeometryElement
    */
   public ColorGeometryElement()
   {
-    this(emptyColorSet());
+    this(null);
   }
 
 
@@ -108,14 +108,6 @@ public final class ColorGeometryElement
   public Set<Color> getColorSet()
   {
     return mColorSet;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static Set<Color> emptyColorSet()
-  {
-    return Collections.emptySet();
   }
 
 

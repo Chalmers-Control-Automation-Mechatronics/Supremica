@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   SimpleComponentElement
 //###########################################################################
-//# $Id: SimpleComponentElement.java,v 1.8 2006-09-06 11:52:21 robi Exp $
+//# $Id: SimpleComponentElement.java,v 1.9 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -80,7 +80,7 @@ public final class SimpleComponentElement
     this(identifier,
          kind,
          graph,
-         emptyVariableProxyList());
+         null);
   }
 
 
@@ -172,14 +172,6 @@ public final class SimpleComponentElement
   public List<VariableProxy> getVariables()
   {
     return mVariables;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static List<VariableProxy> emptyVariableProxyList()
-  {
-    return Collections.emptyList();
   }
 
 

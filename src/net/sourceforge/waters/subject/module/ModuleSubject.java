@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ModuleSubject
 //###########################################################################
-//# $Id: ModuleSubject.java,v 1.8 2006-09-19 15:53:20 robi Exp $
+//# $Id: ModuleSubject.java,v 1.9 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -121,11 +121,11 @@ public final class ModuleSubject
     this(name,
          null,
          location,
-         emptyParameterProxyList(),
-         emptyAliasProxyList(),
-         emptyEventDeclProxyList(),
-         emptyProxyList(),
-         emptyProxyList());
+         null,
+         null,
+         null,
+         null,
+         null);
   }
 
 
@@ -306,29 +306,6 @@ public final class ModuleSubject
   public ListSubject<AbstractSubject> getComponentListModifiable()
   {
     return mComponentList;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static List<ParameterProxy> emptyParameterProxyList()
-  {
-    return Collections.emptyList();
-  }
-
-  private static List<AliasProxy> emptyAliasProxyList()
-  {
-    return Collections.emptyList();
-  }
-
-  private static List<EventDeclProxy> emptyEventDeclProxyList()
-  {
-    return Collections.emptyList();
-  }
-
-  private static List<Proxy> emptyProxyList()
-  {
-    return Collections.emptyList();
   }
 
 

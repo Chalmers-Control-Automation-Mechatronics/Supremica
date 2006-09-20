@@ -4,14 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   LabelBlockSubject
 //###########################################################################
-//# $Id: LabelBlockSubject.java,v 1.8 2006-07-20 02:28:37 robi Exp $
+//# $Id: LabelBlockSubject.java,v 1.9 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -58,7 +56,7 @@ public final class LabelBlockSubject
    */
   public LabelBlockSubject()
   {
-    this(emptyProxyList(),
+    this(null,
          null);
   }
 
@@ -136,14 +134,6 @@ public final class LabelBlockSubject
     final ModelChangeEvent event =
       ModelChangeEvent.createGeometryChanged(this, mGeometry);
     fireModelChanged(event);
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static List<Proxy> emptyProxyList()
-  {
-    return Collections.emptyList();
   }
 
 

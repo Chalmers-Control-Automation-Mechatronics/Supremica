@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   GuardActionBlockElement
 //###########################################################################
-//# $Id: GuardActionBlockElement.java,v 1.7 2006-09-12 14:32:17 robi Exp $
+//# $Id: GuardActionBlockElement.java,v 1.8 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -77,8 +77,8 @@ public final class GuardActionBlockElement
    */
   public GuardActionBlockElement()
   {
-    this(emptySimpleExpressionProxyList(),
-         emptyBinaryExpressionProxyList(),
+    this(null,
+         null,
          null);
   }
 
@@ -173,19 +173,6 @@ public final class GuardActionBlockElement
   public LabelGeometryProxy getGeometry()
   {
     return mGeometry;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static List<SimpleExpressionProxy> emptySimpleExpressionProxyList()
-  {
-    return Collections.emptyList();
-  }
-
-  private static List<BinaryExpressionProxy> emptyBinaryExpressionProxyList()
-  {
-    return Collections.emptyList();
   }
 
 

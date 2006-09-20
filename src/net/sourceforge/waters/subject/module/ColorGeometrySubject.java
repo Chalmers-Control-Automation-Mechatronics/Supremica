@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ColorGeometrySubject
 //###########################################################################
-//# $Id: ColorGeometrySubject.java,v 1.6 2006-07-20 02:28:37 robi Exp $
+//# $Id: ColorGeometrySubject.java,v 1.7 2006-09-20 16:24:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -59,7 +59,7 @@ public final class ColorGeometrySubject
    */
   public ColorGeometrySubject()
   {
-    this(emptyColorSet());
+    this(null);
   }
 
 
@@ -123,14 +123,6 @@ public final class ColorGeometrySubject
   public SimpleSetSubject<Color> getColorSetModifiable()
   {
     return mColorSet;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private static Set<Color> emptyColorSet()
-  {
-    return Collections.emptySet();
   }
 
 
