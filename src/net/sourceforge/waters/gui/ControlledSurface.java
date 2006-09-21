@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.78 2006-09-15 17:29:21 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.79 2006-09-21 14:03:12 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -1045,11 +1045,11 @@ public class ControlledSurface
                         EditorLabelBlockPopupMenu(this, label);
                     popup.show(this, e.getX(), e.getY());
                 }
-            }
-            else
-            {
-                EditorSurfacePopupMenu popup = new EditorSurfacePopupMenu(this, selectedObjects);
-                popup.show(this, e.getX(), e.getY());
+            } else {
+              final EditorWindowInterface iface = getEditorInterface();
+              final EditorSurfacePopupMenu popup =
+                new EditorSurfacePopupMenu(iface, selectedObjects);
+              popup.show(this, e.getX(), e.getY());
             }
         }
     }
@@ -1531,8 +1531,7 @@ public class ControlledSurface
             {
                 if (draggingSource || draggingTarget)
                 {
-                    return -1;
-                }
+                    return -1;                }
                 return 3;
             }
             else if (s instanceof LabelBlockSubject)

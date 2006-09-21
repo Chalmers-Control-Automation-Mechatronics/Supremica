@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.9 2006-08-09 02:53:58 robi Exp $
+//# $Id: EventEditorDialog.java,v 1.10 2006-09-21 14:03:12 robi Exp $
 //###########################################################################
 
 
@@ -31,6 +31,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.LinkedList;
 import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -123,6 +124,7 @@ public class EventEditorDialog
     setLocationRelativeTo(mRoot.getRootWindow());
     mNameInput.requestFocusInWindow();
     setVisible(true);
+    mActionListeners = new LinkedList<ActionListener>();
   }
 
   private static NamedSubject createDefaultItem(final boolean isparam)
@@ -139,19 +141,46 @@ public class EventEditorDialog
 
   //#########################################################################
   //# Access to Created Item
-  public EventDeclSubject getEventDeclSubject()
+  /**
+   * Gets the Waters subject edited by this dialog.
+   * It may be of type {@link EventDeclSubject} or
+   * {@link EventParameterSubject}.
+   * @return A reference to the object being edited by this dialog.
+   */
+  public NamedSubject getEditedItem()
   {
-    if (mEditedItem instanceof EventDeclSubject) {
-      return (EventDeclSubject) mEditedItem;
-    } else {
-      final EventParameterSubject param = (EventParameterSubject) mEditedItem;
-      return param.getEventDecl();
-    }
+    return mEditedItem;
+  }
+
+
+  //#########################################################################
+  //# Action Listeners
+  /**
+   * Adds an action listener to this dialog. The action listeners of an
+   * event editor dialog are triggered when the user commits the dialog,
+   * after the event or parameter declaration has been created and added
+   * to the module. Therefore, they can query the value of {@link
+   * #getEditedItem()} to determine which subject was created. The
+   * {@link ActionEvent} passed to the listener is the event that caused
+   * the dialog to be comitted.
+   */
+  public void addActionListener(final ActionListener listener)
+  {
+    mActionListeners.add(listener);
+  }
+
+  /**
+   * Removes an action listener from this dialog.
+   * @see #addActionListener(ActionListener)
+   */
+  public void removeActionListener(final ActionListener listener)
+  {
+    mActionListeners.remove(listener);
   }
 
 	
   //#########################################################################
-  //# Initialisation and layout of Components
+  //# Initialisation and Layout of Components
   /**
    * Initialise buttons and components that have not yet been initialised.
    * If {@link #mDisplayingMoreOptions} is <CODE>true</CODE> all components
@@ -180,6 +209,7 @@ public class EventEditorDialog
       commithandler = new ActionListener() {
         public void actionPerformed(final ActionEvent event) {
           commitDialog();
+          fireActionPerformed(event);
         }
       };
       mNameInput.addActionListener(commithandler);
@@ -922,6 +952,13 @@ public class EventEditorDialog
     }
   }
 
+  private void fireActionPerformed(final ActionEvent event)
+  {
+    for (final ActionListener listener : mActionListeners) {
+      listener.actionPerformed(event);
+    }
+  }
+
 
   //#########################################################################
   //# Auxiliary Access
@@ -1084,7 +1121,11 @@ public class EventEditorDialog
   private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
 
-  /**
+  // Action Listeners
+  private final List<ActionListener> mActionListeners;
+
+  // Created Item
+ /**
    * The Waters subject edited by this dialog.
    * It may be of type {@link EventDeclSubject} or
    * {@link EventParameterSubject}.

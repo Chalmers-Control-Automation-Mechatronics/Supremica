@@ -4,27 +4,31 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.23 2006-07-20 02:28:37 robi Exp $
+//# $Id: ComponentEditorPanel.java,v 1.24 2006-09-21 14:03:12 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
 
-import javax.swing.*;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
+import javax.swing.*;
 
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.EditorEvents;
 import net.sourceforge.waters.gui.EditorMenu;
-import net.sourceforge.waters.gui.EditorToolbar;
 import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.EventEditorDialog;
+import net.sourceforge.waters.gui.EventTableModel;
+import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.base.NamedSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
 import org.supremica.gui.GraphicsToClipboard;
 
@@ -36,13 +40,12 @@ public class ComponentEditorPanel
 {
 	private static final long serialVersionUID = 1L;
 
-	private ModuleContainer moduleContainer;
-//	private EditorToolbar toolbar;
+	private ModuleContainer mModuleContainer;
 	private ControlledSurface surface;
 	private EditorEvents events;
 	private EditorMenu menu;
 	private SimpleComponentSubject element = null;
-	private ModuleSubject module = null;
+	private ModuleSubject mModule = null;
 	private boolean isSaved = false;
 	private GraphicsToClipboard toClipboard = null;
 
@@ -51,16 +54,16 @@ public class ComponentEditorPanel
 	{
 		//setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		//setTitle(title);
-		this.moduleContainer = moduleContainer;
-		this.module = moduleContainer.getModule();
+		mModuleContainer = moduleContainer;
+		mModule = moduleContainer.getModule();
 		surface = new ControlledSurface
-			(element.getGraph(), module, this,
-			 (ControlledToolbar) moduleContainer.getIDE().getToolBar());
+			(element.getGraph(), mModule, this,
+			 (ControlledToolbar) mModuleContainer.getIDE().getToolBar());
 		surface.setPreferredSize(IDEDimensions.rightEditorPreferredSize);
 		surface.setMinimumSize(IDEDimensions.rightEditorMinimumSize);
 
-		final ExpressionParser parser = moduleContainer.getExpressionParser();
-		events = new EditorEvents(module, element, parser, this);
+		final ExpressionParser parser = mModuleContainer.getExpressionParser();
+		events = new EditorEvents(mModule, element, parser, this);
 		menu = new EditorMenu(surface, this);
 
 		// final Container panel = getContentPane();
@@ -87,15 +90,15 @@ public class ComponentEditorPanel
 
 		gridbag.setConstraints(split, constraints);
 		add(split);
-		if (events.getBestWidth() > moduleContainer.getEditorPanel().getRightComponent().getWidth()/2) {
-		    split.setDividerLocation((int)moduleContainer.getEditorPanel().getRightComponent().getWidth()/2);
+		if (events.getBestWidth() > mModuleContainer.getEditorPanel().getRightComponent().getWidth()/2) {
+		    split.setDividerLocation((int)mModuleContainer.getEditorPanel().getRightComponent().getWidth()/2);
 		} else {
 		    split.setDividerLocation(events.getBestWidth());
 		}
 		//System.out.println(split.getDividerLocation());
 		//System.out.println("MAX :" + split.getMaximumDividerLocation());
 		//System.out.println("PREF :" + events.getPreferredSize().getWidth());
-		//System.out.println("WIDTH :" + moduleContainer.getEditorPanel().getRightComponent().getWidth());
+		//System.out.println("WIDTH :" + mModuleContainer.getEditorPanel().getRightComponent().getWidth());
 		//setJMenuBar(menu);
 //		pack();
 		setVisible(true);
@@ -115,14 +118,9 @@ public class ComponentEditorPanel
 		isSaved = s;
 	}
 
-	public java.util.List getEventDeclList()
-	{
-		return module.getEventDeclList();
-	}
-
 	public JFrame getFrame()
 	{
-		return moduleContainer.getFrame();
+		return mModuleContainer.getFrame();
 	}
 
 	public ControlledSurface getControlledSurface()
@@ -137,13 +135,13 @@ public class ComponentEditorPanel
 
     public void setDisplayed()
     {
-	EditorPanel editorPanel = moduleContainer.getEditorPanel();
+	EditorPanel editorPanel = mModuleContainer.getEditorPanel();
 	editorPanel.setRightComponent(this);
     }
 
     public UndoInterface getUndoInterface()
     {
-	return moduleContainer;
+	return mModuleContainer;
     }
 
 	public void copyAsWMFToClipboard()
@@ -179,5 +177,24 @@ public class ComponentEditorPanel
 
 	public void printFigure() {}
 
-	public void createEvent() {}
+	public void createEvent()
+	{
+		final ModuleWindowInterface root = mModuleContainer.getEditorPanel();
+		final EditorWindowInterface gedit =
+			mModuleContainer.getActiveEditorWindowInterface();
+		final EventEditorDialog diag = new EventEditorDialog(root);
+		diag.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent event) {
+					final NamedSubject decl = diag.getEditedItem();
+					final String name = decl.getName();
+					final SimpleIdentifierSubject ident =
+						new SimpleIdentifierSubject(name);
+					final EditorEvents eventpane = gedit.getEventPane();
+					final EventTableModel model =
+						(EventTableModel) eventpane.getModel();
+					model.addIdentifier(ident);
+				}
+			});
+	}
+
 }

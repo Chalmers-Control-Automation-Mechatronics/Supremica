@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.59 2006-09-15 17:29:21 flordal Exp $
+//# $Id: EditorSurface.java,v 1.60 2006-09-21 14:03:12 robi Exp $
 //###########################################################################
 
 
@@ -596,7 +596,7 @@ public class EditorSurface
     {
         repaint(true);
     }
-    
+
     public EditorWindowInterface getEditorInterface()
     {
         return root;

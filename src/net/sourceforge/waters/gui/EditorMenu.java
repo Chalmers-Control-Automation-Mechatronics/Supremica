@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.28 2006-09-05 21:29:48 flordal Exp $
+//# $Id: EditorMenu.java,v 1.29 2006-09-21 14:03:12 robi Exp $
 //###########################################################################
 
 
@@ -230,9 +230,8 @@ public class EditorMenu
         
         if (e.getSource() == mToolsCreateEvent)
         {
-            // Is there a point in having a special way to add events
-            // here? Why not simply use the EventEditorDialog?
-            //root.getEventPane().createEvent();
+            // Events created from a graph are added to the graph's event
+			// pane as well. Therefore, EventEditorDialog is not good enough.
             root.createEvent();
         }
         

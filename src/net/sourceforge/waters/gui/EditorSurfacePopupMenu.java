@@ -1,57 +1,75 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.gui
+//# CLASS:   EditorSurfacePopupMenu
+//###########################################################################
+//# $Id: EditorSurfacePopupMenu.java,v 1.2 2006-09-21 14:03:12 robi Exp $
+//###########################################################################
+
 
 package net.sourceforge.waters.gui;
 
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
-import org.supremica.util.VPopupMenu;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import java.util.List;
+import javax.swing.*;
+
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
+
+import org.supremica.util.VPopupMenu;
+
 
 /**
- * Popup for editing general stuff redarding the selected objects.
+ * Popup menu for editing general stuff regarding the selected objects.
+ * This menu shows up when the user pushes the right mouse button in the
+ * graph window, while the cursor is not over any item.
  */
+
 class EditorSurfacePopupMenu
-	extends VPopupMenu
-	implements ActionListener
+  extends VPopupMenu
+  implements ActionListener
 {
-	private List selectedObjects;
-	private ControlledSurface parent;
 
-	private JMenuItem renameItem;
-	private JMenuItem deleteItem;
-	private JMenuItem initialItem;	
-	private JMenuItem recallItem;	
+  //#########################################################################
+  //# Constructor
+  public EditorSurfacePopupMenu(final EditorWindowInterface master,
+				final List selectedObjects)
+  {
+    mMaster = master;
+    mSelectedObjects = selectedObjects;
 
-	public EditorSurfacePopupMenu(ControlledSurface parent, List selectedObjects)
-	{
-		this.parent = parent;
-		this.selectedObjects = selectedObjects;
+    mDeleteItem = new JMenuItem("Delete selected objects");
+    mDeleteItem.addActionListener(this);
+    add(mDeleteItem);
+    mCreateEventItem = new JMenuItem("Create new event ...");
+    mCreateEventItem.addActionListener(this);
+    add(mCreateEventItem);
+  }
 
-		init();
-	}
 
-	/**
-	 * Initialize the menu.
-	 */
-	private void init()
-	{
-		JMenuItem item;
+  //#########################################################################
+  //# Interface java.awt.event.ActionListener
+  public void actionPerformed(final ActionEvent event) 
+  {
+    final Object source = event.getSource();
+    if (source == mDeleteItem) {
+      final ControlledSurface surface = mMaster.getControlledSurface();
+      surface.deleteSelected();
+      hide();
+    } else if (source == mCreateEventItem) {
+      mMaster.createEvent();
+      hide();
+    }
+    mMaster.repaint();
+  }
 
-		item = new JMenuItem("Delete selected objects");
-		item.addActionListener(this);
-		this.add(item);
-		deleteItem = item;
-	}
 
-	public void actionPerformed(ActionEvent e) 
-	{
-		if (e.getSource() == deleteItem)
-		{
-			parent.deleteSelected();
-			this.hide();
-		}
+  //#########################################################################
+  //# Data Members
+  private final List mSelectedObjects;
+  private final EditorWindowInterface mMaster;
+  private final JMenuItem mDeleteItem;
+  private final JMenuItem mCreateEventItem;
 
-		parent.repaint();
-	}
 }

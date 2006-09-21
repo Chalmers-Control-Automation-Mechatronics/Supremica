@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.30 2006-07-20 02:28:37 robi Exp $
+//# $Id: EditorWindow.java,v 1.31 2006-09-21 14:03:12 robi Exp $
 //###########################################################################
 
 
@@ -15,45 +15,44 @@ import com.lowagie.text.pdf.*;
 
 import java.awt.*;
 import java.awt.dnd.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Rectangle2D;
+import java.awt.print.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Locale;
+import javax.print.attribute.*;
+import javax.print.attribute.standard.*;
 import javax.swing.*;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
-import net.sourceforge.waters.gui.observer.UndoRedoEvent;
-
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoInterface;
+import net.sourceforge.waters.gui.observer.UndoRedoEvent;
 import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.subject.base.NamedSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
 import org.supremica.gui.GraphicsToClipboard;
 
-// Printing
-import java.awt.print.*;
-import javax.print.attribute.*;
-import javax.print.attribute.standard.*;
-import java.util.Locale;
-import java.net.URI;
 
 public class EditorWindow
   extends JFrame
   implements EditorWindowInterface
 {
+
   //#########################################################################
   //# Constructor
   public EditorWindow(final String title,
@@ -146,11 +145,6 @@ public class EditorWindow
   public void setSaved(boolean s)
   {
     isSaved = s;
-  }
-
-  public java.util.List getEventDeclList()
-  {
-    return mModule.getEventDeclList();
   }
 
   public JFrame getFrame()
@@ -312,16 +306,28 @@ public class EditorWindow
     document.close();
   }
 
+  /**
+   * Creates a new event declaration for addition to a graph.
+   * This methods pops up the event editor dialog. When finished, it
+   * retrieves the event created by the dialog and adds an entry with
+   * the same name to the graphs window's event pane.
+   */ 
   public void createEvent()
   {
-    EventEditorDialog diag = new EventEditorDialog(mModuleWindow);
-    EventDeclSubject newEvent = diag.getEventDeclSubject();
-    if (newEvent != null)
-      {
-        final EventTableModel model = (EventTableModel) mEventPane.getModel();
-        model.addIdentifier(new SimpleIdentifierSubject(newEvent.getName()));
-      }
+    final EventEditorDialog diag = new EventEditorDialog(mModuleWindow);
+    diag.addActionListener(new ActionListener() {
+        public void actionPerformed(final ActionEvent event) {
+          final NamedSubject decl = diag.getEditedItem();
+          final String name = decl.getName();
+          final SimpleIdentifierSubject ident =
+            new SimpleIdentifierSubject(name);
+          final EventTableModel model =
+            (EventTableModel) mEventPane.getModel();
+          model.addIdentifier(ident);
+        }
+      });
   }
+
 
   //#########################################################################
   //# Data Members

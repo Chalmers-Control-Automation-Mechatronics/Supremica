@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindowInterface.java,v 1.7 2006-03-21 21:58:04 flordal Exp $
+//# $Id: EditorWindowInterface.java,v 1.8 2006-09-21 14:03:12 robi Exp $
 //###########################################################################
 
 
@@ -23,8 +23,6 @@ public interface EditorWindowInterface
 	public boolean isSaved();
 
 	public void setSaved(boolean s);
-
-	public List getEventDeclList();
 
 	public JFrame getFrame();
 
