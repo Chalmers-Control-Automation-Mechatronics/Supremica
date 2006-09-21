@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   IndexedListModel
 //###########################################################################
-//# $Id: IndexedListModel.java,v 1.1 2006-08-08 23:59:21 robi Exp $
+//# $Id: IndexedListModel.java,v 1.2 2006-09-21 16:42:13 robi Exp $
 //###########################################################################
 
 
@@ -77,9 +77,9 @@ public class IndexedListModel<E extends NamedSubject>
     case ModelChangeEvent.ITEM_ADDED:
       if (source == mSubject) {
         final NamedSubject value = (NamedSubject) event.getValue();
-        final String name = value.getName();
         final int index = Collections.binarySearch(mSortedMirror, value);
         if (index >= 0) {
+          final String name = value.getName();
           throw new IllegalStateException
             ("Inserted item '" + name + "' already contained in mirror!");
         }
@@ -91,9 +91,9 @@ public class IndexedListModel<E extends NamedSubject>
     case ModelChangeEvent.ITEM_REMOVED:
       if (source == mSubject) {
         final NamedSubject value = (NamedSubject) event.getValue();
-        final String name = value.getName();
         final int index = Collections.binarySearch(mSortedMirror, value);
         if (index < 0) {
+          final String name = value.getName();
           throw new IllegalStateException
             ("Removed item '" + name + "' not found in mirror!");
         }
@@ -111,9 +111,9 @@ public class IndexedListModel<E extends NamedSubject>
     case ModelChangeEvent.STATE_CHANGED:
       {
         final NamedSubject value = getChangeRoot(source);
-        final String name = value.getName();
         final int index = Collections.binarySearch(mSortedMirror, value);
         if (index < 0) {
+          final String name = value.getName();
           throw new IllegalStateException
             ("Modified item '" + name + "' not found in mirror!");
         }

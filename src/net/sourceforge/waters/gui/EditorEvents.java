@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.22 2006-08-08 23:59:21 robi Exp $
+//# $Id: EditorEvents.java,v 1.23 2006-09-21 16:42:13 robi Exp $
 //###########################################################################
 
 
@@ -399,48 +399,6 @@ public class EditorEvents
 
 
 
-	//#######################################################################
-	//# Representation of Transferable
-	private class IdentifierTransfer implements Transferable
-	{
-		// the IdentifierSubject transferred by this Object
-		Object ip_;
-		DataFlavor data_;
-
-		/**
-		 * creates a new transferable object containing the specified IdentifierSubject
-		 *
-		 * @param ip the IdentifierSubject being transferred
-		 */
-
-		public IdentifierTransfer(Object ip)
-		{
-			ip_ = ip;
-			data_ = new DataFlavor(ip.getClass(), ip.getClass().getName());
-		}
-
-		public Object getTransferData(DataFlavor f)
-			throws UnsupportedFlavorException
-		{
-			if (isDataFlavorSupported(f))
-				return ip_;
-			else
-				throw new UnsupportedFlavorException(f);
-		}
-
-		public DataFlavor[] getTransferDataFlavors()
-		{
-			DataFlavor[] d = new DataFlavor[1];
-			d[0] = data_;
-			return d;
-		}
-
-		public boolean isDataFlavorSupported(DataFlavor f)
-		{
-			return f.getRepresentationClass().isAssignableFrom(data_.getRepresentationClass());
-		}
-	}
-
 	private class DSListener extends DragSourceAdapter
 	{
 		public void dragOver(DragSourceDragEvent e)
@@ -457,19 +415,19 @@ public class EditorEvents
 
 	private class DGListener implements DragGestureListener
 	{
-		public void dragGestureRecognized(DragGestureEvent e)
+		public void dragGestureRecognized(final DragGestureEvent event)
 		{
-			final int row = rowAtPoint(e.getDragOrigin());
-			if (row == -1) {
+			final int row = rowAtPoint(event.getDragOrigin());
+			if (row < 0) {
 				return;
 			}
 			final EventTableModel model = (EventTableModel) getModel();
-			final Transferable t = new IdentifierTransfer
-				(model.createIdentifierWithKind(model.getEvent(row)));
+			final IdentifierSubject ident = model.getEvent(row);
+			final Transferable trans = model.createIdentifierTransfer(ident);
 			try {
-				e.startDrag(DragSource.DefaultCopyDrop, t);
-			} catch (InvalidDnDOperationException idoe) {
-				throw new IllegalArgumentException(idoe);
+				event.startDrag(DragSource.DefaultCopyDrop, trans);
+			} catch (InvalidDnDOperationException exception) {
+				throw new IllegalArgumentException(exception);
 			}
 		}
 	}
@@ -478,6 +436,7 @@ public class EditorEvents
 	{
 		return root;
 	}
+
 
 	//#######################################################################
 	//# Data Members

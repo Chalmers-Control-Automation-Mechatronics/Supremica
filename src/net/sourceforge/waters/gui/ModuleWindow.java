@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.54 2006-08-25 02:12:52 robi Exp $
+//# $Id: ModuleWindow.java,v 1.55 2006-09-21 16:42:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -14,17 +14,6 @@ import java.awt.Dimension;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.event.*;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DragSource;
-import java.awt.dnd.DragGestureEvent;
-import java.awt.dnd.DragGestureListener;
-import java.awt.dnd.DragSourceAdapter;
-import java.awt.dnd.DragSourceDragEvent;
-import java.awt.dnd.DragSourceListener;
-import java.awt.dnd.InvalidDnDOperationException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -78,7 +67,6 @@ import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.EventParameterSubject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
-import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.InstanceSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
@@ -86,7 +74,6 @@ import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.ParameterSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
-import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.VariableSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -253,43 +240,24 @@ public class ModuleWindow
 
   public JPanel createEventsPane()
   {
-    final IndexedListSubject<EventDeclSubject> events =
-      mModule.getEventDeclListModifiable();
-    mEventListModel = new IndexedListModel<EventDeclSubject>(events);
-    mEventList = new JList(mEventListModel);
-    mEventList.setCellRenderer(new EventListCell());
-
+    mEventList = new EventDeclListView(mModule);
     JButton newEventButton = new JButton("New Event");
     newEventButton.setActionCommand("newevent");
     newEventButton.addActionListener(this);
-
     JButton deleteEventButton = new JButton("Delete Event");
     deleteEventButton.setActionCommand("delevent");
     deleteEventButton.addActionListener(this);
 
     Box jp = new Box(BoxLayout.PAGE_AXIS);
     JPanel p = new JPanel();
-
     p.add(newEventButton);
     p.add(deleteEventButton);
     jp.add(new JScrollPane(mEventList));
     jp.add(p);
 
     p = new JPanel();
-
     p.add(jp);
     p.setLayout(new GridLayout(1, 1));
-		
-    mDragSource = DragSource.getDefaultDragSource();
-    mDGListener = new DGListener(mEventList);
-    mDSListener = new DSListener();
-		
-    // component, action, listener
-    mDragSource.createDefaultDragGestureRecognizer(mEventList,
-                                                   mDragAction,
-                                                   mDGListener);
-    mDragSource.addDragSourceListener(mDSListener);
-
     return p;
   }
 
@@ -1014,115 +982,6 @@ public class ModuleWindow
 
 
   //########################################################################
-  //# Inner Class IdentifierTransfer
-  private class IdentifierTransfer implements Transferable
-  {
-    // the IdentifierSubject transferred by this Object
-    Object ip_;
-    DataFlavor data_;
-		
-    /**
-     * creates a new transferable object containing the specified IdentifierSubject
-     *
-     * @param ip the IdentifierSubject being transferred
-     */
-
-    public IdentifierTransfer(Object ip)
-    {
-      ip_ = ip;
-      data_ = new DataFlavor(ip.getClass(), ip.getClass().getName());
-    }
-		
-    public Object getTransferData(DataFlavor f)
-      throws UnsupportedFlavorException
-    {
-      if (isDataFlavorSupported(f))
-        return ip_;
-      else
-        throw new UnsupportedFlavorException(f);
-    }
-	   
-    public DataFlavor[] getTransferDataFlavors()
-    {
-      DataFlavor[] d = new DataFlavor[1];
-      d[0] = data_;
-      return d;
-    }
-
-    public boolean isDataFlavorSupported(DataFlavor f)
-    {
-      return f.getRepresentationClass().isAssignableFrom(data_.getRepresentationClass());
-    }
-  }
-
-  private class DSListener extends DragSourceAdapter
-  {	  		
-    public void dragOver(DragSourceDragEvent e)
-    {
-      if (e.getTargetActions() == DnDConstants.ACTION_COPY) {
-        e.getDragSourceContext().setCursor
-          (DragSource.DefaultCopyDrop);
-      } else {
-        e.getDragSourceContext().setCursor
-          (DragSource.DefaultCopyNoDrop);
-      }
-    }
-  }
-
-  private class DGListener implements DragGestureListener
-  {
-    final JList mList;
-		
-    public DGListener(JList list)
-    {
-      mList = list;
-    }
-		
-    private EventKind guessEventKind(final IdentifierSubject ident)
-    {		
-      if (ident == null || mModule == null) {
-        return null;
-      }
-      final String name = ident.getName();
-      final IndexedList<EventDeclSubject> decls =
-        mModule.getEventDeclListModifiable();
-      final EventDeclSubject decl = decls.get(name);
-      if (decl != null) {
-        return decl.getKind();
-      }
-      final IndexedList<ParameterSubject> params =
-        mModule.getParameterListModifiable();
-      final ParameterSubject param = params.get(name);
-      if (param != null && param instanceof EventParameterSubject) {
-        final EventParameterSubject eparam = (EventParameterSubject) param;
-        final EventDeclSubject edecl = eparam.getEventDecl();
-        return edecl.getKind();
-      }
-      return null;
-    }
-		
-    public void dragGestureRecognized(DragGestureEvent e)
-    {		
-      final int row = mList.locationToIndex(e.getDragOrigin());
-      //System.out.println(row);
-      if (row == -1) {
-        return;
-      }
-      EventDeclProxy ident = (EventDeclProxy)mList.getModel().getElementAt(row);
-      final Transferable t = new IdentifierTransfer
-        (new IdentifierWithKind(
-                                new SimpleIdentifierSubject(ident.getName()),
-                                ident.getKind()));
-      try {
-        e.startDrag(DragSource.DefaultCopyDrop, t);
-      } catch (InvalidDnDOperationException idoe) {
-        throw new IllegalArgumentException(idoe);
-      }
-    }
-  }
-
-
-  //########################################################################
   //# Main Routine
   public static void main(String[] args)
   {
@@ -1186,9 +1045,5 @@ public class ModuleWindow
   private CompoundEdit mInsignificant = new CompoundEdit();
 
   private static Languages WLang;
-	
-  private DragSource mDragSource;
-  private DragGestureListener mDGListener;
-  private DragSourceListener mDSListener;
-  private int mDragAction = DnDConstants.ACTION_COPY;
+
 }

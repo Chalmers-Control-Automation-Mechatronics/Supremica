@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.19 2006-08-08 23:59:21 robi Exp $
+//# $Id: EventTableModel.java,v 1.20 2006-09-21 16:42:13 robi Exp $
 //###########################################################################
 
 
@@ -346,9 +346,11 @@ public class EventTableModel
     }
   }
 
-  public IdentifierWithKind createIdentifierWithKind(IdentifierSubject ip_)
+  public IdentifierTransfer createIdentifierTransfer
+    (final IdentifierSubject ident)
   {
-    return new IdentifierWithKind(ip_, guessEventKind(ip_));
+    final EventKind kind = guessEventKind(ident);
+    return new IdentifierTransfer(ident, kind);
   }
 
 
