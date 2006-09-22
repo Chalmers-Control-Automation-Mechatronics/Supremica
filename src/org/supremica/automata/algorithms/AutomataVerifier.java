@@ -766,7 +766,8 @@ public class AutomataVerifier
                         {
                             // Uncontrollable state found!
                             if (Config.VERBOSE_MODE.isTrue() || verificationOptions.showBadTrace())
-                            {    // Print the uncontrollable state(s)...
+                            {    
+                                // Print the uncontrollable state(s)...
                                 uncontrollabilityCheckHelper.printUncontrollableStates();
                             }
                             if (verificationOptions.showBadTrace())
@@ -902,7 +903,7 @@ public class AutomataVerifier
             }
         }
         
-        // Return an array of apropriate length
+        // Return an array of appropriate length
         int[] outArray = new int[count];
         
         System.arraycopy(tempArray, 0, outArray, 0, count);
@@ -922,7 +923,6 @@ public class AutomataVerifier
      */
     private double compareAlphabets(Alphabet leftAlphabet, Alphabet rightAlphabet)
     {
-        //
         // USE Alphabet.nbrOfCommonEvents INSTEAD!!!!
         // Naaaah... that's not the same thing, but this method should be in Alphabet.java
         //
@@ -1811,8 +1811,8 @@ public class AutomataVerifier
             aut.removeState(examinedState);
         }
         
-        // Present result (if in verbose mode)
-        if (Config.VERBOSE_MODE.isTrue())
+        // Present result (if ordered to)
+        if (verificationOptions.showBadTrace())
         {
             // Show all blocking states? They can be many!
             stateIterator = aut.stateIterator();
