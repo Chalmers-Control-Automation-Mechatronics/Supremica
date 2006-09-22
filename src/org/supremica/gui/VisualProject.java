@@ -131,9 +131,6 @@ public class VisualProject
 		}
 
 		projectFile = null;
-
-		setName(null);
-		setComment(null);
 	}
 
 	public void automatonRenamed(Automaton aut, String oldName)

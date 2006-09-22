@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.24 2006-09-21 14:03:12 robi Exp $
+//# $Id: ComponentEditorPanel.java,v 1.25 2006-09-22 16:44:31 knut Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -52,8 +52,7 @@ public class ComponentEditorPanel
 	public ComponentEditorPanel(final ModuleContainer moduleContainer,
 								final SimpleComponentSubject element)
 	{
-		//setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		//setTitle(title);
+		this.element = element;
 		mModuleContainer = moduleContainer;
 		mModule = moduleContainer.getModule();
 		surface = new ControlledSurface
@@ -89,22 +88,28 @@ public class ComponentEditorPanel
 		constraints.fill = GridBagConstraints.BOTH;
 
 		gridbag.setConstraints(split, constraints);
-		add(split);
+/*
 		if (events.getBestWidth() > mModuleContainer.getEditorPanel().getRightComponent().getWidth()/2) {
 		    split.setDividerLocation((int)mModuleContainer.getEditorPanel().getRightComponent().getWidth()/2);
 		} else {
 		    split.setDividerLocation(events.getBestWidth());
 		}
-		//System.out.println(split.getDividerLocation());
-		//System.out.println("MAX :" + split.getMaximumDividerLocation());
-		//System.out.println("PREF :" + events.getPreferredSize().getWidth());
-		//System.out.println("WIDTH :" + mModuleContainer.getEditorPanel().getRightComponent().getWidth());
-		//setJMenuBar(menu);
-//		pack();
-		setVisible(true);
+*/
+		add(split);
+		validate();
 
-		this.element = element;
-
+		final int splitwidth = split.getSize().width;
+		final int surfacewidth = surface.getSize().width;
+		final int eventswidth = events.getSize().width;
+		final int separatorwidth = splitwidth - surfacewidth - eventswidth;
+		final int halfwidth = (splitwidth - separatorwidth) >> 1;
+		if (halfwidth > 0)
+		{
+			final int prefeventswidth = events.getPreferredSize().width;
+			System.err.println(prefeventswidth);
+			final int setwidth = Math.min(prefeventswidth, halfwidth);
+			split.setDividerLocation(setwidth);
+		}
 		surface.createOptions(this);
 	}
 

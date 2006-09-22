@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorNewDialog
 //###########################################################################
-//# $Id: EditorNewComponentDialog.java,v 1.10 2006-09-20 16:24:13 robi Exp $
+//# $Id: EditorNewComponentDialog.java,v 1.11 2006-09-22 16:44:31 knut Exp $
 //###########################################################################
 
 
@@ -135,6 +135,12 @@ public class EditorNewComponentDialog
 			//TODO: Make this create the component
 			final ExpressionParser parser = new ExpressionParser(ModuleSubjectFactory.getInstance(), CompilerOperatorTable.getInstance());
 			final String nameText = mNameInput.getText();
+			if (nameText == null || nameText.equals(""))
+			{
+            	JOptionPane.showMessageDialog(this, "No name specified", "No name", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
 			IdentifierProxy ident = null;
 			try {
 				ident = parser.parseIdentifier(nameText);

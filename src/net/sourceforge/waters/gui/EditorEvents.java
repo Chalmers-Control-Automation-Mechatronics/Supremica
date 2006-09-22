@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.23 2006-09-21 16:42:13 robi Exp $
+//# $Id: EditorEvents.java,v 1.24 2006-09-22 16:44:31 knut Exp $
 //###########################################################################
 
 
@@ -257,12 +257,13 @@ public class EditorEvents
 		return maxwidth;
 	}
 
+/*
 	public int getBestWidth()
 	{
 		final TableModel model = getModel();
 		final TableCellRenderer renderer = getDefaultRenderer(Object.class);
 		final int rows = getRowCount();
-		int maxwidth = 1;
+		int maxwidth = 100;
 		for (int row = 0; row < rows; row++) {
 			int width = 0;
 			for (int i = 0; i < getColumnCount(); i++) {
@@ -281,7 +282,7 @@ public class EditorEvents
 		//System.out.println(maxwidth);
 		return maxwidth;
 	}
-
+*/
 	//#######################################################################
 	//# Local Class RendererNoFocus
 	private static class RendererNoFocus

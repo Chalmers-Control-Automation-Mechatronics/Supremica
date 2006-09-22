@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   EventDeclProxy
 //###########################################################################
-//# $Id: EventDeclProxy.java,v 1.3 2005-11-03 01:24:16 robi Exp $
+//# $Id: EventDeclProxy.java,v 1.4 2006-09-22 16:44:31 knut Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -87,5 +87,8 @@ public interface EventDeclProxy extends NamedProxy {
    *         is specified.
    */
   public ColorGeometryProxy getColorGeometry();
+
+
+  public static final String DEFAULT_MARKING_NAME = ":accepting";
 
 }

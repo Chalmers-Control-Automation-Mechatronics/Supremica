@@ -6,7 +6,8 @@ import java.awt.Dimension;
 public class IDEDimensions
 {
 	private final static int MAINWINDOWWIDTH = 800;
-	private final static int MAINWINDOWHEIGHT = 600;
+	private final static int MAINWINDOWHEIGHT = 600
+	;
 	public static Dimension mainWindowPreferredSize = new Dimension(MAINWINDOWWIDTH, MAINWINDOWHEIGHT);
 	public static Dimension mainWindowMinimumSize = new Dimension(100, 100);
 
@@ -22,10 +23,10 @@ public class IDEDimensions
 	public static Dimension rightEditorPreferredSize = new Dimension(MAINWINDOWWIDTH*2/3, MAINWINDOWHEIGHT*2/3);
 	public static Dimension rightEditorMinimumSize = new Dimension(100, 50);
 
-	public static Dimension leftAnalyzerPreferredSize = leftEditorPreferredSize;
+	public static Dimension leftAnalyzerPreferredSize = new Dimension(MAINWINDOWWIDTH*2/5, MAINWINDOWHEIGHT*2/3);
 	public static Dimension leftAnalyzerMinimumSize = leftEditorMinimumSize;
 
-	public static Dimension rightAnalyzerPreferredSize = rightEditorPreferredSize;
+	public static Dimension rightAnalyzerPreferredSize = new Dimension(MAINWINDOWWIDTH*3/5, MAINWINDOWHEIGHT*2/3);
 	public static Dimension rightAnalyzerMinimumSize = rightEditorMinimumSize;
 
 	public static Dimension rightEmptyPreferredSize = leftEditorPreferredSize;

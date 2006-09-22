@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.26 2006-09-18 10:57:23 knut Exp $
+//# $Id: EditorComponentsPanel.java,v 1.27 2006-09-22 16:44:31 knut Exp $
 //###########################################################################
 
 
@@ -33,6 +33,8 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.VariableSubject;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.NamedProxy;
+import net.sourceforge.waters.model.module.ForeachComponentProxy;
+
 
 import org.supremica.gui.WhiteScrollPane;
 
@@ -94,17 +96,6 @@ class EditorComponentsPanel
 			DefaultMutableTreeNode parentNode = null;
 			TreePath parentPath = moduleSelectTree.getSelectionPath();
 
-/*
-			if ((o instanceof SimpleComponentSubject))
-			{
-				SimpleComponentSubject scp = (SimpleComponentSubject) o;
-				if (!componentNameAvailable(scp.getName()))
-				{
-					System.err.println("Componentname not available");
-				}
-			}
-
-*/
 			if (parentPath == null)
 			{
 				//There's no selection. Default to the root node.
@@ -143,7 +134,7 @@ class EditorComponentsPanel
 
 	public boolean componentNameAvailable(String name)
 	{
-		if (name == null)
+		if (name == null || name.equals(""))
 		{
 			return false;
 		}
@@ -152,11 +143,14 @@ class EditorComponentsPanel
 		List<Proxy> componentList = subject.getComponentList();
 		for(Proxy proxy : componentList)
 		{
-			NamedProxy namedProxy = (NamedProxy)proxy;
-			String currName = namedProxy.getName();
-			if (name.equals(currName))
+			if (!(proxy instanceof ForeachComponentProxy))
 			{
-				return false;
+				NamedProxy namedProxy = (NamedProxy)proxy;
+				String currName = namedProxy.getName();
+				if (name.equals(currName))
+				{
+					return false;
+				}
 			}
 		}
 		return true;

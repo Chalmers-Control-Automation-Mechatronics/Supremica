@@ -784,7 +784,7 @@ Class-Path: ${manifest.pathlist}</echo>
 
 
 <target name="run">
-	<java classname="${supremica_basepackage}.apps.Supremica" fork="yes">
+	<java classname="${supremica_basepackage}.gui.ide.IDE" fork="yes">
 		<classpath>
 			<pathelement location="${dist}/Supremica.jar" />
 			<pathelement location="${dist}/SupremicaLib.jar" />

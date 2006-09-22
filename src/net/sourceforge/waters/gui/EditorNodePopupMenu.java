@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNodePopupMenu
 //###########################################################################
-//# $Id: EditorNodePopupMenu.java,v 1.16 2006-09-22 13:23:57 flordal Exp $
+//# $Id: EditorNodePopupMenu.java,v 1.17 2006-09-22 16:44:31 knut Exp $
 //###########################################################################
 
 
@@ -24,6 +24,7 @@ import net.sourceforge.waters.gui.command.RemoveEventCommand;
 import net.sourceforge.waters.gui.command.SetNodeInitialCommand;
 import net.sourceforge.waters.gui.command.ToggleNodeInitialCommand;
 import net.sourceforge.waters.gui.renderer.LabelProxyShape;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
@@ -38,33 +39,31 @@ class EditorNodePopupMenu
     extends VPopupMenu
     implements ActionListener
 {
-    public static final String DEFAULTNAME = "omega";
-    
     private SimpleNodeSubject node;
     private ControlledSurface parent;
-    
+
     private JMenuItem deleteItem;
     private JMenuItem initialItem;
     private JMenuItem recallItem;
     private JMenuItem markItem;
     private JMenuItem clearItem;
     private JMenuItem createSelfLoop;
-    
+
     public EditorNodePopupMenu(ControlledSurface parent, SimpleNodeSubject node)
     {
         this.parent = parent;
         this.node = node;
-        
+
         init();
     }
-    
+
     /**
      * Initialize the menu.
      */
     private void init()
     {
         JMenuItem item;
-        
+
         item = new JMenuItem("Delete node");
         item.addActionListener(this);
         this.add(item);
@@ -88,7 +87,7 @@ class EditorNodePopupMenu
             this.add(item);
         }
         initialItem = item;
-        
+
         item = new JMenuItem("Recall label");
         item.addActionListener(this);
         this.add(item);
@@ -100,7 +99,7 @@ class EditorNodePopupMenu
             item.setToolTipText("Label is already in default position");
         }
         recallItem = item;
-        
+
         item = new JMenuItem("Mark state");
         item.addActionListener(this);
         this.add(item);
@@ -111,7 +110,7 @@ class EditorNodePopupMenu
             item.setToolTipText("State is marked already");
         }
         markItem = item;
-        
+
         item = new JMenuItem("Clear marking");
         item.addActionListener(this);
         this.add(item);
@@ -127,7 +126,7 @@ class EditorNodePopupMenu
         this.add(item);
         createSelfLoop = item;
     }
-    
+
     public void actionPerformed(ActionEvent e)
     {
         if (e.getSource() == deleteItem)
@@ -135,7 +134,7 @@ class EditorNodePopupMenu
             Command deleteNode = new DeleteNodeCommand(parent.getGraph(), node);
             parent.getEditorInterface().getUndoInterface().executeCommand(deleteNode);
         }
-        
+
         if (e.getSource() == initialItem)
         {
             Command initial;
@@ -149,7 +148,7 @@ class EditorNodePopupMenu
             }
             parent.getEditorInterface().getUndoInterface().executeCommand(initial);
         }
-        
+
         if (e.getSource() == recallItem)
         {
             System.out.println("Re-Implement Later with Command");
@@ -157,23 +156,23 @@ class EditorNodePopupMenu
               label.setOffset(EditorLabel.DEFAULTOFFSETX,
               EditorLabel.DEFAULTOFFSETY);*/
         }
-        
+
         if (e.getSource() == markItem)
         {
-            EventDeclSubject d = new EventDeclSubject(DEFAULTNAME,
+            EventDeclSubject d = new EventDeclSubject(EventDeclProxy.DEFAULT_MARKING_NAME,
                 EventKind.PROPOSITION);
             if (!parent.getModule().getEventDeclListModifiable()
-            .containsName(DEFAULTNAME))
+            .containsName(EventDeclProxy.DEFAULT_MARKING_NAME))
             {
                 parent.getModule().getEventDeclListModifiable().add(d);
             }
             Command c = new AddEventCommand
                 (node.getPropositions(),
-                new SimpleIdentifierSubject(DEFAULTNAME),
+                new SimpleIdentifierSubject(EventDeclProxy.DEFAULT_MARKING_NAME),
                 0);
             parent.getEditorInterface().getUndoInterface().executeCommand(c);
         }
-        
+
         if (e.getSource() == clearItem)
         {
             // Should not be a loop... one undo should do it all!
@@ -186,14 +185,14 @@ class EditorNodePopupMenu
                 parent.getEditorInterface().getUndoInterface().executeCommand(c);
             }
         }
-        
+
         if (e.getSource() == createSelfLoop)
         {
             Point2D p = node.getPointGeometry().getPoint();
             Command selfLoop = new CreateEdgeCommand(parent.getGraph(), node, node, p, p);
             parent.getEditorInterface().getUndoInterface().executeCommand(selfLoop);
         }
-        
+
         this.hide();
         parent.repaint();
     }

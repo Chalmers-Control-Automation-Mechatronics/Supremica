@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   MainPanel
 //###########################################################################
-//# $Id: MainPanel.java,v 1.16 2006-09-18 10:57:23 knut Exp $
+//# $Id: MainPanel.java,v 1.17 2006-09-22 16:44:31 knut Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -133,6 +133,7 @@ abstract class MainPanel
 		if (oldComponent != newComponent)
 		{
 			JScrollPane emptyRightPanel = getEmptyRightPanel();
+			int dividerLocation = splitPanelHorizontal.getDividerLocation();
 			Dimension oldSize = emptyRightPanel.getSize();
 
 			if (oldComponent != null)
@@ -155,6 +156,7 @@ abstract class MainPanel
 				splitPanelHorizontal.setRightComponent(newComponent);
 				enablePanel();
 			}
+			splitPanelHorizontal.setDividerLocation(dividerLocation);
 		}
 		validate();
 	}
