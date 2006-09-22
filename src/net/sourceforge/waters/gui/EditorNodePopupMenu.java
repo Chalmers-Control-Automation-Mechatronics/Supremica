@@ -4,13 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNodePopupMenu
 //###########################################################################
-//# $Id: EditorNodePopupMenu.java,v 1.15 2006-09-07 06:58:28 robi Exp $
+//# $Id: EditorNodePopupMenu.java,v 1.16 2006-09-22 13:23:57 flordal Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
-import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Point2D;
 import javax.swing.*;
@@ -21,10 +20,11 @@ import net.sourceforge.waters.gui.command.AddEventCommand;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.CreateEdgeCommand;
 import net.sourceforge.waters.gui.command.DeleteNodeCommand;
+import net.sourceforge.waters.gui.command.RemoveEventCommand;
 import net.sourceforge.waters.gui.command.SetNodeInitialCommand;
 import net.sourceforge.waters.gui.command.ToggleNodeInitialCommand;
 import net.sourceforge.waters.gui.renderer.LabelProxyShape;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
@@ -35,41 +35,41 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * Popup for editing attributes of a node.
  */
 class EditorNodePopupMenu
-  extends VPopupMenu
-  implements ActionListener
+    extends VPopupMenu
+    implements ActionListener
 {
-  public static final String DEFAULTNAME = "omega";
-
-  private SimpleNodeSubject node;
-  private ControlledSurface parent;
+    public static final String DEFAULTNAME = "omega";
     
-  private JMenuItem deleteItem;
-  private JMenuItem initialItem;
-  private JMenuItem recallItem;
-  private JMenuItem markItem;
-  private JMenuItem clearItem;
-  private JMenuItem createSelfLoop;
+    private SimpleNodeSubject node;
+    private ControlledSurface parent;
     
-  public EditorNodePopupMenu(ControlledSurface parent, SimpleNodeSubject node)
-  {
-    this.parent = parent;
-    this.node = node;
+    private JMenuItem deleteItem;
+    private JMenuItem initialItem;
+    private JMenuItem recallItem;
+    private JMenuItem markItem;
+    private JMenuItem clearItem;
+    private JMenuItem createSelfLoop;
+    
+    public EditorNodePopupMenu(ControlledSurface parent, SimpleNodeSubject node)
+    {
+        this.parent = parent;
+        this.node = node;
         
-    init();
-  }
+        init();
+    }
     
-  /**
-   * Initialize the menu.
-   */
-  private void init()
-  {
-    JMenuItem item;
+    /**
+     * Initialize the menu.
+     */
+    private void init()
+    {
+        JMenuItem item;
         
-    item = new JMenuItem("Delete node");
-    item.addActionListener(this);
-    this.add(item);
-    deleteItem = item;
-    if (parent.getGraph().isDeterministic())
+        item = new JMenuItem("Delete node");
+        item.addActionListener(this);
+        this.add(item);
+        deleteItem = item;
+        if (parent.getGraph().isDeterministic())
         {
             item = new JMenuItem("Make initial");
             item.addActionListener(this);
@@ -158,24 +158,33 @@ class EditorNodePopupMenu
               EditorLabel.DEFAULTOFFSETY);*/
         }
         
-        if (e.getSource() == markItem) {
-          EventDeclSubject d = new EventDeclSubject(DEFAULTNAME,
-                                                    EventKind.PROPOSITION);
-          if (!parent.getModule().getEventDeclListModifiable()
-              .containsName(DEFAULTNAME)) {
-            parent.getModule().getEventDeclListModifiable().add(d);
-          }
-          Command c = new AddEventCommand
-            (node.getPropositions(),
-             new SimpleIdentifierSubject(DEFAULTNAME),
-             0);
-          parent.getEditorInterface().getUndoInterface().executeCommand(c);
+        if (e.getSource() == markItem)
+        {
+            EventDeclSubject d = new EventDeclSubject(DEFAULTNAME,
+                EventKind.PROPOSITION);
+            if (!parent.getModule().getEventDeclListModifiable()
+            .containsName(DEFAULTNAME))
+            {
+                parent.getModule().getEventDeclListModifiable().add(d);
+            }
+            Command c = new AddEventCommand
+                (node.getPropositions(),
+                new SimpleIdentifierSubject(DEFAULTNAME),
+                0);
+            parent.getEditorInterface().getUndoInterface().executeCommand(c);
         }
         
         if (e.getSource() == clearItem)
         {
-            System.out.println("Re-Implement Later with Command");
-            /* node.clearPropositions();*/
+            // Should not be a loop... one undo should do it all!
+            while (node.getPropositions().getEventList().size() > 0)
+            {
+                AbstractSubject proposition = node.getPropositions().getEventListModifiable().get(0);
+                Command c = new RemoveEventCommand
+                    (node.getPropositions(),
+                    proposition);
+                parent.getEditorInterface().getUndoInterface().executeCommand(c);
+            }
         }
         
         if (e.getSource() == createSelfLoop)

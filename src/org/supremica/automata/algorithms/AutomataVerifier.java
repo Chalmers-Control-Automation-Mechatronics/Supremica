@@ -924,7 +924,7 @@ public class AutomataVerifier
     private double compareAlphabets(Alphabet leftAlphabet, Alphabet rightAlphabet)
     {
         // USE Alphabet.nbrOfCommonEvents INSTEAD!!!!
-        // Naaaah... that's not the same thing, but this method should be in Alphabet.java
+        // Naaaah... that's not the same thing, but this method should be in AlphabetHelpers
         //
         int amountOfCommon = 0;
         int amountOfUnique = 0;
@@ -952,7 +952,6 @@ public class AutomataVerifier
         
         if (amountOfUnique > 0)
         {
-            
             // return (double)amountOfCommon; // Another way of doing it...
             return (double) amountOfCommon / (double) amountOfUnique;
         }
