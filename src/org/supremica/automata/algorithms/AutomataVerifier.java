@@ -1163,11 +1163,8 @@ public class AutomataVerifier
             
             uncontrollabilityCheckHelper = new AutomataSynchronizerHelper(synchHelper);
             
-            if (Config.VERBOSE_MODE.isTrue())
-            {
-                // It's important that setRememberTrace occurs before initialize()!
-                uncontrollabilityCheckHelper.setRememberTrace(true);
-            }
+            // It's important that setRememberTrace occurs before initialize()!
+            uncontrollabilityCheckHelper.setRememberTrace(verificationOptions.showBadTrace());
             uncontrollabilityCheckHelper.setCoExecute(true);
             uncontrollabilityCheckHelper.setCoExecuter(onlineSynchronizer);
             uncontrollabilityCheckHelper.setExhaustiveSearch(true);
