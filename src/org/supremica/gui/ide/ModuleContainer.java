@@ -4,17 +4,19 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.35 2006-09-16 16:58:48 flordal Exp $
+//# $Id: ModuleContainer.java,v 1.36 2006-09-22 19:32:20 robi Exp $
 //###########################################################################
 
 
 package org.supremica.gui.ide;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JToolBar;
 import javax.swing.undo.AbstractUndoableEdit;
@@ -140,21 +142,15 @@ public class ModuleContainer implements UndoInterface
     public ComponentEditorPanel getComponentEditorPanel
         (final SimpleComponentSubject scp)
     {
-        if (scp == null)
-        {
-            return null;
-        }
-        else
-        {
-            ComponentEditorPanel panel = mComponentToPanelMap.get(scp);
-            if (panel == null)
-            {
-                //System.err.println("Creating new component editor table");
-                panel =	new ComponentEditorPanel(this, scp);
-                mComponentToPanelMap.put(scp, panel);
-            }
-            return panel;
-        }
+		ComponentEditorPanel panel = mComponentToPanelMap.get(scp);
+		if (panel == null) {
+			final EditorPanel editorPanel = getEditorPanel();
+			final JComponent right = editorPanel.getRightComponent();
+			final Dimension oldsize = right.getSize();
+			panel =	new ComponentEditorPanel(this, scp, oldsize);
+			mComponentToPanelMap.put(scp, panel);
+		}
+		return panel;
     }
     
     public void setSelectedComponent(Component selectedComponent)
@@ -329,7 +325,8 @@ public class ModuleContainer implements UndoInterface
         }
         catch (Exception ex)
         {
-            JOptionPane.showMessageDialog(mIDE, ex.getMessage(), "Error in graph",
+            JOptionPane.showMessageDialog(mIDE, ex.getMessage(),
+										  "Error in graph",
                 JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
             return;

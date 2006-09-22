@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.25 2006-09-22 16:44:31 knut Exp $
+//# $Id: ComponentEditorPanel.java,v 1.26 2006-09-22 19:32:20 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -33,6 +33,15 @@ import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import org.supremica.gui.GraphicsToClipboard;
 
 
+/**
+ * A Swing component for editing a Waters graph.
+ * A component editor panel allows the user to edit an object of type
+ * {@link SimpleComponentSubject} graphically. It consists of a splitpane
+ * with two windows: the event list to the left and the graph editor
+ * surface to the right.
+ *
+ * @author Knut &Aring;kesson
+ */
 
 public class ComponentEditorPanel
 	extends JPanel
@@ -49,8 +58,18 @@ public class ComponentEditorPanel
 	private boolean isSaved = false;
 	private GraphicsToClipboard toClipboard = null;
 
+
+	/**
+	 * Creates a new component editor panel.
+	 * @param  moduleContainer  the module container as a handle to the
+	 *                          IDE application.
+	 * @param  element          the simple component containing the graph
+	 *                          to be edited.
+	 * @param  size             the expected total size of the panel.
+	 */
 	public ComponentEditorPanel(final ModuleContainer moduleContainer,
-								final SimpleComponentSubject element)
+								final SimpleComponentSubject element,
+								final Dimension size)
 	{
 		this.element = element;
 		mModuleContainer = moduleContainer;
@@ -65,51 +84,21 @@ public class ComponentEditorPanel
 		events = new EditorEvents(mModule, element, parser, this);
 		menu = new EditorMenu(surface, this);
 
-		// final Container panel = getContentPane();
-		final GridBagLayout gridbag = new GridBagLayout();
-		final GridBagConstraints constraints = new GridBagConstraints();
-
-		constraints.gridy = 0;
-		constraints.weighty = 1.0;
-		constraints.anchor = GridBagConstraints.NORTH;
-
-		setLayout(gridbag);
-		//gridbag.setConstraints(toolbar, constraints);
-		//add(toolbar);
+		final LayoutManager layout = new BorderLayout();
+		setLayout(layout);
 
 		final JScrollPane scrollsurface = new JScrollPane(surface);
 		final JScrollPane scrollevents = new JScrollPane(events);
 		final JViewport viewevents = scrollevents.getViewport();
+		viewevents.setBackground(Color.WHITE);
 		final JSplitPane split = new JSplitPane
 			(JSplitPane.HORIZONTAL_SPLIT, scrollevents, scrollsurface);
-		viewevents.setBackground(Color.WHITE);
+		final int halfwidth = size.width >> 1;
+		final int prefeventswidth = events.getPreferredSize().width;
+		final int divide = Math.min(prefeventswidth, halfwidth);
+		split.setDividerLocation(divide);
+		add(split, BorderLayout.CENTER);
 
-		constraints.weightx = 1.0;
-		constraints.fill = GridBagConstraints.BOTH;
-
-		gridbag.setConstraints(split, constraints);
-/*
-		if (events.getBestWidth() > mModuleContainer.getEditorPanel().getRightComponent().getWidth()/2) {
-		    split.setDividerLocation((int)mModuleContainer.getEditorPanel().getRightComponent().getWidth()/2);
-		} else {
-		    split.setDividerLocation(events.getBestWidth());
-		}
-*/
-		add(split);
-		validate();
-
-		final int splitwidth = split.getSize().width;
-		final int surfacewidth = surface.getSize().width;
-		final int eventswidth = events.getSize().width;
-		final int separatorwidth = splitwidth - surfacewidth - eventswidth;
-		final int halfwidth = (splitwidth - separatorwidth) >> 1;
-		if (halfwidth > 0)
-		{
-			final int prefeventswidth = events.getPreferredSize().width;
-			System.err.println(prefeventswidth);
-			final int setwidth = Math.min(prefeventswidth, halfwidth);
-			split.setDividerLocation(setwidth);
-		}
 		surface.createOptions(this);
 	}
 
@@ -140,13 +129,13 @@ public class ComponentEditorPanel
 
     public void setDisplayed()
     {
-	EditorPanel editorPanel = mModuleContainer.getEditorPanel();
-	editorPanel.setRightComponent(this);
+		EditorPanel editorPanel = mModuleContainer.getEditorPanel();
+		editorPanel.setRightComponent(this);
     }
 
     public UndoInterface getUndoInterface()
     {
-	return mModuleContainer;
+		return mModuleContainer;
     }
 
 	public void copyAsWMFToClipboard()
