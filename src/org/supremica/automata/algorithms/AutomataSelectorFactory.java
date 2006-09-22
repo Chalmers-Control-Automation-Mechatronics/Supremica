@@ -247,12 +247,15 @@ class AutomataSelectorFactory
                 
                 // Add plants for all uncontrollable events
                 Alphabet ucAlpha = spec.getAlphabet().getUncontrollableAlphabet();
+                /*
                 if (options.addOnePlantAtATime)
                     // Add one plant
                     addPlant(ucAlpha);
                 else
                     // Add all plants
                     addPlants(ucAlpha);
+                */
+                addPlants(ucAlpha); 
                 
                 // Did we find any plants?
                 if (partialSet.size() > 1)

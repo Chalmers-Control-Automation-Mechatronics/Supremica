@@ -306,7 +306,6 @@ public class AutomataSynthesizer
                     
                     if (currAutomaton.isPlant())
                     {
-                        
                         // Check if there is a plant not included in this
                         // modular supervisor. If no such plant exists then remove this
                         // event from the set of disabled events.
