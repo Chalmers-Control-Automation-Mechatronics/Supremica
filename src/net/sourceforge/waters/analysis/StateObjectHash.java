@@ -30,7 +30,7 @@ import java.util.Arrays;
  * Created: Sun Nov  4 08:56:06 2001
  *
  * @author Eric D. Friedman
- * @version $Id: StateObjectHash.java,v 1.1 2006-09-19 04:52:50 yip1 Exp $
+ * @version $Id: StateObjectHash.java,v 1.2 2006-09-22 19:42:11 robi Exp $
  */
 abstract public class StateObjectHash extends StateHash implements Serializable, StateObjectHashingStrategy {
     /** the set of Objects */
@@ -212,8 +212,8 @@ abstract public class StateObjectHash extends StateHash implements Serializable,
      * This is the default implementation of StateObjectHashingStrategy:
      * it delegates hashing to the Object's hashCode method.
      *
-     * @param object for which the hashcode is to be computed
-     * @return the hashCode
+     * @param o the object for which the hashcode is to be computed.
+     * @return the hashCode.
      * @see Object#hashCode()
      */
     public final int computeHashCode(EncodedStateTuple o) {

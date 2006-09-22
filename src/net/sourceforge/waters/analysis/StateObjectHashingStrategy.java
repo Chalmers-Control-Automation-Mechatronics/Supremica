@@ -29,7 +29,7 @@ import java.io.Serializable;
  * Created: Sat Aug 17 10:52:32 2002
  *
  * @author Eric Friedman
- * @version $Id: StateObjectHashingStrategy.java,v 1.1 2006-09-19 04:52:50 yip1 Exp $
+ * @version $Id: StateObjectHashingStrategy.java,v 1.2 2006-09-22 19:42:11 robi Exp $
  */
 
 public interface StateObjectHashingStrategy extends Serializable {
@@ -39,8 +39,8 @@ public interface StateObjectHashingStrategy extends Serializable {
      * can use the object's own <tt>hashCode</tt> method, the Java
      * runtime's <tt>identityHashCode</tt>, or a custom scheme.
      * 
-     * @param object for which the hashcode is to be computed
-     * @return the hashCode
+     * @param o the object for which the hashcode is to be computed.
+     * @return the hashCode.
      */
     public int computeHashCode(EncodedStateTuple o);
 
