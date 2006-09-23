@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorAddEventAction
 //###########################################################################
-//# $Id: EditorAddEventAction.java,v 1.13 2006-09-10 19:01:53 flordal Exp $
+//# $Id: EditorAddComponentEventAction.java,v 1.1 2006-09-23 15:42:42 knut Exp $
 //###########################################################################
 
 
@@ -20,21 +20,21 @@ import org.supremica.gui.ide.IDE;
 import net.sourceforge.waters.gui.ControlledSurface;
 import org.supremica.gui.ide.ModuleContainer;
 
-public class EditorAddEventAction
+public class EditorAddComponentEventAction
 	extends IDEAction
 {
 	private static final long serialVersionUID = 1L;
 
-	public EditorAddEventAction(List<IDEAction> actionList)
+	public EditorAddComponentEventAction(List<IDEAction> actionList)
 	{
 		super(actionList);
 
 		setEditorActiveRequired(true);
 
-		putValue(Action.NAME, "New Event...");
-		putValue(Action.SHORT_DESCRIPTION, "Add a new event to the project");
-		putValue(Action.SMALL_ICON,
-				 new ImageIcon(IDE.class.getResource("/icons/waters/event16.gif")));
+		putValue(Action.NAME, "New Component Event...");
+		putValue(Action.SHORT_DESCRIPTION, "Add a new event to the component");
+//		putValue(Action.SMALL_ICON,
+//				 new ImageIcon(IDE.class.getResource("/icons/waters/event16.gif")));
 		putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
 		putValue(Action.ACTION_COMMAND_KEY,
 				 ControlledSurface.Tool.EVENT.toString());
@@ -48,6 +48,6 @@ public class EditorAddEventAction
 	public void doAction()
 	{
 		ModuleContainer activeModule = ide.getActiveModuleContainer();
-		activeModule.getEditorPanel().getEditorPanelInterface().addEvent();
+		activeModule.getEditorPanel().getEditorPanelInterface().addComponentEvent();
 	}
 }

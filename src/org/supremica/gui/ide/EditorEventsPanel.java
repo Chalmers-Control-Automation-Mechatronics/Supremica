@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorEventsPanel
 //###########################################################################
-//# $Id: EditorEventsPanel.java,v 1.13 2006-09-21 16:42:13 robi Exp $
+//# $Id: EditorEventsPanel.java,v 1.14 2006-09-23 15:42:42 knut Exp $
 //###########################################################################
 
 
@@ -47,7 +47,7 @@ class EditorEventsPanel
 	public void addEvent()
 	{
 		final EditorPanel panel = moduleContainer.getEditorPanel();
-        new EventEditorDialog(panel, true, false);
+        new EventEditorDialog(panel, false, false);
 	}
 
 }

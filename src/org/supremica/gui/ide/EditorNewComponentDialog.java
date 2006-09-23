@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorNewDialog
 //###########################################################################
-//# $Id: EditorNewComponentDialog.java,v 1.11 2006-09-22 16:44:31 knut Exp $
+//# $Id: EditorNewComponentDialog.java,v 1.12 2006-09-23 15:42:42 knut Exp $
 //###########################################################################
 
 
@@ -61,7 +61,7 @@ public class EditorNewComponentDialog
 		this.mRoot = root;
 //		parentNode = node;
 
-		this.setTitle("Component Editor");
+		this.setTitle("Create Component");
 
 		// Center this element on the screen
 		setModal(true);
@@ -77,7 +77,7 @@ public class EditorNewComponentDialog
 		b.add(r2);
 		b.add(r3);
 		b.add(r4);
-		r1.add(new JLabel("<html><b>Create Automaton</b></html>"));
+//		r1.add(new JLabel("<html><b>Create Component</b></html>"));
 		r2.add(new JLabel("Name: "));
 		r2.add(mNameInput);
 		mNameInput.addActionListener(this);
@@ -101,13 +101,13 @@ public class EditorNewComponentDialog
 		k1.setActionCommand("Specification");
 		group.add(k1);
 		kBox.add(k1);
-
+/*
 		k1 = new JRadioButton("Property");
 
 		k1.setActionCommand("Property");
 		group.add(k1);
 		kBox.add(k1);
-
+*/
 		//String[] kindStrings = { "Plant", "Specification", "Property" };
 
 		/*kindList = new JComboBox(kindStrings);

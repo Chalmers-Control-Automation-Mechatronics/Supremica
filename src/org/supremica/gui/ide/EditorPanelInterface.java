@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   MainPanel
 //###########################################################################
-//# $Id: EditorPanelInterface.java,v 1.9 2006-09-18 10:57:23 knut Exp $
+//# $Id: EditorPanelInterface.java,v 1.10 2006-09-23 15:42:42 knut Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -24,7 +24,9 @@ public interface EditorPanelInterface
 
 	public void addComponent(AbstractSubject component);
 
-	public void addEvent();
+	public void addComponentEvent();
+
+	public void addModuleEvent();
 
 	public ModuleSubject getModuleSubject();
 

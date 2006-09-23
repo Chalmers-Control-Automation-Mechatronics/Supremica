@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.10 2006-09-21 14:03:12 robi Exp $
+//# $Id: EventEditorDialog.java,v 1.11 2006-09-23 15:42:42 knut Exp $
 //###########################################################################
 
 
@@ -178,7 +178,7 @@ public class EventEditorDialog
     mActionListeners.remove(listener);
   }
 
-	
+
   //#########################################################################
   //# Initialisation and Layout of Components
   /**
@@ -275,9 +275,11 @@ public class EventEditorDialog
     if (mDisplayingMoreOptions && mIndexPanel == null) {
       // Initialising with more options, and index panel not used before.
       // Need to create extra components for name panel ...
+ /*
       mObservableButton = new JCheckBox("Observable");
       mObservableButton.setRequestFocusEnabled(false);
       mObservableButton.setSelected(decl.isObservable());
+*/
       mParameterButton = new JCheckBox("Parameter");
       mParameterButton.setRequestFocusEnabled(false);
       mParameterButton.setSelected(param != null);
@@ -286,11 +288,12 @@ public class EventEditorDialog
             updateRequiredEnabled();
           }
         });
+
       mRequiredButton = new JCheckBox("Required");
       mRequiredButton.setRequestFocusEnabled(false);
       mRequiredButton.setSelected(param == null || param.isRequired());
       updateRequiredEnabled();
-      mColourButton = new JButton("Colour ...");
+      mColourButton = new JButton("Color ...");
       mColourButton.setRequestFocusEnabled(false);
       // ... add listeners to enable/disable the colour button ...
       final ActionListener kindlistener = new ActionListener() {
@@ -383,7 +386,7 @@ public class EventEditorDialog
 
 
   /**
-   * Fill the panels and layout all buttons and components.  
+   * Fill the panels and layout all buttons and components.
    * This method uses the {@link #mDisplayingMoreOptions} member to
    * determine whether the full dialog ore only the reduced version is to
    * be shown. It is assumed that all needed components have been
@@ -427,7 +430,7 @@ public class EventEditorDialog
   /**
    * Fill and layout the name panel with components for the simple
    * version of the dialog.
-   */ 
+   */
   private void layoutSimpleNamePanel()
   {
     final GridBagLayout nameLayout = new GridBagLayout();
@@ -483,7 +486,7 @@ public class EventEditorDialog
   /**
    * Fill and layout the name panel with components for the extended
    * version of the dialog.
-   */ 
+   */
   private void layoutExtendedNamePanel()
   {
     final GridBagLayout layout = new GridBagLayout();
@@ -1134,7 +1137,7 @@ public class EventEditorDialog
    * with default values.
    * The edited state is stored only in the dialog. Changes are only
    * committed to the model when the OK button is pressed.
-   */ 
+   */
   private NamedSubject mEditedItem;
 
 

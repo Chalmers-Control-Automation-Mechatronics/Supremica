@@ -16,14 +16,14 @@ public class IDEMenuBar
 {
     private IDE ide;
     private int startPoint = 0;
-    
+
     public IDEMenuBar(IDE ide)
     {
         this.ide = ide;
-        
+
         initMenubar();
     }
-    
+
     private void initMenubar()
     {
         // File
@@ -41,7 +41,7 @@ public class IDEMenuBar
         menu.add(ide.getActions().editorPrintPDFAction.getMenuItem());
         menu.addSeparator();
         menu.add(ide.getActions().exitAction.getMenuItem());
-        
+
         // Edit
         menu = new JMenu("Edit");
         menu.setMnemonic(KeyEvent.VK_E);
@@ -51,23 +51,24 @@ public class IDEMenuBar
         ide.getActions().editorUndoAction.setEnabled(false);
         menu.add(ide.getActions().editorRedoAction.getMenuItem());
         ide.getActions().editorRedoAction.setEnabled(false);
-        
+
         // Tools
         menu = new JMenu("Tools");
         menu.setMnemonic(KeyEvent.VK_T);
         add(menu);
         menu.add(ide.getActions().toolsTestCasesAction.getMenuItem());
-        
+
         // Editor
         menu = new JMenu("Editor");
         menu.setMnemonic(KeyEvent.VK_M);
         add(menu);
         menu.add(ide.getActions().editorAddSimpleComponentAction.getMenuItem());
-        menu.add(ide.getActions().editorAddEventAction.getMenuItem());
+        menu.add(ide.getActions().editorAddComponentEventAction.getMenuItem());
+        menu.add(ide.getActions().editorAddModuleEventAction.getMenuItem());
         //menu.add(ide.getActions().editorAddForeachComponentAction.getMenuItem());
         //menu.add(ide.getActions().editorAddInstanceAction.getMenuItem());
         //menu.add(ide.getActions().editorAddBindingAction.getMenuItem());
-        
+
         // Analyze
         menu = new JMenu("Analyzer");
         menu.setMnemonic(KeyEvent.VK_A);
@@ -78,14 +79,14 @@ public class IDEMenuBar
         menu.add(new JMenuItem(ide.getActions().analyzerVerifierAction));
         menu.add(new JMenuItem(ide.getActions().analyzerSynchronizerAction));
         menu.add(new JMenuItem(ide.getActions().analyzerSynthesizerAction));
-        
+
         // Configure
         menu = new JMenu("Configure");
         menu.setMnemonic(KeyEvent.VK_C);
         add(menu);
         menu.add(ide.getActions().editorOptionsAction.getMenuItem());
         menu.add(ide.getActions().analyzerOptionsAction.getMenuItem());
-        
+
         // Modules
         menu = new JMenu("Modules");
         menu.setMnemonic(KeyEvent.VK_M);
@@ -98,17 +99,17 @@ public class IDEMenuBar
             {
                 createModuleList(ev);
             }
-            
+
             public void menuDeselected(MenuEvent ev)
             {
             }
-            
+
             public void menuCanceled(MenuEvent ev)
             {
             }
         }
         );
-        
+
         // Help
         menu = new JMenu();
         menu.setText("Help");
@@ -118,23 +119,23 @@ public class IDEMenuBar
         menu.addSeparator();
         menu.add(ide.getActions().helpAboutAction.getMenuItem());
     }
-    
+
     public void createModuleList(MenuEvent ev)
     {
         if (startPoint < 0)
         {
             return;
         }
-        
+
         JMenu menu = (JMenu)ev.getSource();
-        
-        
+
+
         // Remove any windows now in the list
         while (startPoint < menu.getItemCount())
         {
             menu.remove(startPoint);
         }
-        
+
         for (Iterator modIt = ide.moduleContainerIterator(); modIt.hasNext(); )
         {
             ModuleContainer currContainer = (ModuleContainer)modIt.next();
@@ -143,19 +144,19 @@ public class IDEMenuBar
             menu.add(currMenuItem);
         }
     }
-    
+
     private class ModuleMenuActionListener
         implements ActionListener
     {
         private IDE ide;
         private ModuleContainer moduleContainer;
-        
+
         public ModuleMenuActionListener(IDE ide, ModuleContainer moduleContainer)
         {
             this.ide = ide;
             this.moduleContainer = moduleContainer;
         }
-        
+
         public void actionPerformed(ActionEvent e)
         {
             ide.setActive(moduleContainer);

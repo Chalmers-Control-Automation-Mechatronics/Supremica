@@ -290,16 +290,13 @@ public class IDE
 
     public void stateChanged(ChangeEvent e)
     {
-		System.err.println("IDE stateChanged");
         if (editorActive())
         {
-			System.err.println("editorActive");
             getActiveModuleContainer().getEditorPanel().disablePanel();
             getActiveModuleContainer().getAnalyzerPanel().enablePanel();
         }
         if (analyzerActive())
         {
-			System.err.println("analyzerActive");
             if (getActiveModuleContainer().updateAutomata())
             {
             	getActiveModuleContainer().getEditorPanel().enablePanel();
