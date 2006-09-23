@@ -1107,6 +1107,11 @@ public class Automata
         notifyListeners(AutomataListeners.MODE_AUTOMATON_RENAMED, aut);
     }
 
+	public void updated()
+	{
+		updated(null);
+	}
+
     public void updated(Object obj)
     {
         notifyListeners();
