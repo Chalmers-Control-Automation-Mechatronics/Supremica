@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.26 2006-09-22 19:32:20 robi Exp $
+//# $Id: ComponentEditorPanel.java,v 1.27 2006-09-23 18:24:51 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -90,7 +90,6 @@ public class ComponentEditorPanel
 		final JScrollPane scrollsurface = new JScrollPane(surface);
 		final JScrollPane scrollevents = new JScrollPane(events);
 		final JViewport viewevents = scrollevents.getViewport();
-		viewevents.setBackground(Color.WHITE);
 		final JSplitPane split = new JSplitPane
 			(JSplitPane.HORIZONTAL_SPLIT, scrollevents, scrollsurface);
 		final int halfwidth = size.width >> 1;

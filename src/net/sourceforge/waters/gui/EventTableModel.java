@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.20 2006-09-21 16:42:13 robi Exp $
+//# $Id: EventTableModel.java,v 1.21 2006-09-23 18:24:51 robi Exp $
 //###########################################################################
 
 
@@ -192,7 +192,7 @@ public class EventTableModel
         if (ident == null) {
           Command c = new RemoveFromTableCommand(this, old);
           mTable.getEditorInterface().getUndoInterface().executeCommand(c);
-        } else if (old == null || !old.equals(ident)) {
+        } else if (old == null || !old.equalsByContents(ident)) {
           if (old != null) {
             Command c = new ChangeEventNameCommand(mGraph, this, old, ident);
             mTable.getEditorInterface().getUndoInterface().executeCommand(c);

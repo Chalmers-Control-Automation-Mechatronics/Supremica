@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.11 2006-09-23 15:42:42 knut Exp $
+//# $Id: EventEditorDialog.java,v 1.12 2006-09-23 18:24:51 robi Exp $
 //###########################################################################
 
 
@@ -275,11 +275,9 @@ public class EventEditorDialog
     if (mDisplayingMoreOptions && mIndexPanel == null) {
       // Initialising with more options, and index panel not used before.
       // Need to create extra components for name panel ...
- /*
       mObservableButton = new JCheckBox("Observable");
       mObservableButton.setRequestFocusEnabled(false);
       mObservableButton.setSelected(decl.isObservable());
-*/
       mParameterButton = new JCheckBox("Parameter");
       mParameterButton.setRequestFocusEnabled(false);
       mParameterButton.setSelected(param != null);

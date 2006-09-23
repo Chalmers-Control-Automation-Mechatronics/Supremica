@@ -4,13 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.24 2006-09-22 16:44:31 knut Exp $
+//# $Id: EditorEvents.java,v 1.25 2006-09-23 18:24:51 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -97,6 +98,8 @@ public class EditorEvents
 		setShowGrid(false);
 		setIntercellSpacing(ispacing);
 		setAutoResizeMode(AUTO_RESIZE_LAST_COLUMN);
+		setSurrendersFocusOnKeystroke(true);
+		setRowSelectionAllowed(true);
 
 		final TableCellRenderer iconrenderer0 =
 			getDefaultRenderer(ImageIcon.class);
@@ -167,10 +170,20 @@ public class EditorEvents
 	{
         final Point point = event.getPoint();
         final int row = rowAtPoint(point);
-		final EventTableModel model = (EventTableModel) getModel();
-		return model.getToolTipText(row);
+		if (row >= 0) {
+			final EventTableModel model = (EventTableModel) getModel();
+			return model.getToolTipText(row);
+		} else {
+			return null;
+		}
 	}
 
+
+	public boolean getScrollableTracksViewportHeight()
+	{
+		final Container viewport = getParent();
+		return getPreferredSize().height < viewport.getHeight();
+	}
 
 
 	//#######################################################################
@@ -196,9 +209,10 @@ public class EditorEvents
 			final Component comp = getEditorComponent();
 			final Rectangle bounds = comp.getBounds();
 			scrollRectToVisible(bounds);
-			comp.requestFocus();
+			comp.requestFocusInWindow();
 		}
 	}
+
 
 	//#######################################################################
 	//# Calculating Column Widths
@@ -257,32 +271,7 @@ public class EditorEvents
 		return maxwidth;
 	}
 
-/*
-	public int getBestWidth()
-	{
-		final TableModel model = getModel();
-		final TableCellRenderer renderer = getDefaultRenderer(Object.class);
-		final int rows = getRowCount();
-		int maxwidth = 100;
-		for (int row = 0; row < rows; row++) {
-			int width = 0;
-			for (int i = 0; i < getColumnCount(); i++) {
-				final Object value = model.getValueAt(row, i);
-				final Component comp =
-					renderer.getTableCellRendererComponent
-					(this, value, false, false, row, i);
-				final Dimension size = comp.getPreferredSize();
-				width += size.width;
-				//System.out.println(row + " " + i + " " + width);
-			}
-			if (width > maxwidth) {
-				maxwidth = width;
-			}
-		}
-		//System.out.println(maxwidth);
-		return maxwidth;
-	}
-*/
+
 	//#######################################################################
 	//# Local Class RendererNoFocus
 	private static class RendererNoFocus
@@ -351,10 +340,9 @@ public class EditorEvents
 			} else if (event.getValueIsAdjusting()) {
 				// Ignore extra messages ...
 			} else if (selmodel.isSelectionEmpty()) {
-				;
+				// nothing ?
 			} else {
-				final EventTableModel model = (EventTableModel) getModel();
-				final int row = selmodel.getMinSelectionIndex();
+				// nothing ?
 			}
 		}
 
