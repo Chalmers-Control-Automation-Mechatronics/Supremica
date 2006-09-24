@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorNewDialog
 //###########################################################################
-//# $Id: EditorNewComponentDialog.java,v 1.12 2006-09-23 15:42:42 knut Exp $
+//# $Id: EditorNewComponentDialog.java,v 1.13 2006-09-24 13:08:43 knut Exp $
 //###########################################################################
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorPanel
 //###########################################################################
-//# $Id: EditorPanel.java,v 1.42 2006-09-23 15:42:42 knut Exp $
+//# $Id: EditorPanel.java,v 1.43 2006-09-24 13:08:43 knut Exp $
 //###########################################################################
 
 
@@ -132,12 +132,12 @@ public class EditorPanel
 
         public void addModuleEvent()
         {
-            eventsPanel.addEvent();
+            eventsPanel.addModuleEvent();
         }
 
         public void addComponentEvent()
         {
-            eventsPanel.addEvent();
+            eventsPanel.addComponentEvent();
         }
 
         public ModuleSubject getModuleSubject()
