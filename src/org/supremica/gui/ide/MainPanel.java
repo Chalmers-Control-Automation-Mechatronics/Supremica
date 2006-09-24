@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   MainPanel
 //###########################################################################
-//# $Id: MainPanel.java,v 1.17 2006-09-22 16:44:31 knut Exp $
+//# $Id: MainPanel.java,v 1.18 2006-09-24 18:18:33 knut Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -191,11 +191,9 @@ abstract class MainPanel
 
 	public void actionPerformed(ActionEvent e)
 	{
-
-		getActions().editorAddSimpleComponentAction.actionPerformed(e);
 	}
 
- 	class EmptyRightPanel
+ class EmptyRightPanel
  		extends WhiteScrollPane
  	{
 		private static final long serialVersionUID = 1L;

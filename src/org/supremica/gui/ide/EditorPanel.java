@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorPanel
 //###########################################################################
-//# $Id: EditorPanel.java,v 1.43 2006-09-24 13:08:43 knut Exp $
+//# $Id: EditorPanel.java,v 1.44 2006-09-24 18:18:33 knut Exp $
 //###########################################################################
 
 
@@ -12,6 +12,7 @@ package org.supremica.gui.ide;
 
 import java.awt.GridBagLayout;
 import javax.swing.*;
+import java.awt.event.ActionEvent;
 
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.EditorWindowInterface;
@@ -116,6 +117,11 @@ public class EditorPanel
     {
         return new EditorPanelInterfaceImpl();
     }
+
+	public void actionPerformed(ActionEvent e)
+	{
+		componentsPanel.actionPerformed(e);
+	}
 
     class EditorPanelInterfaceImpl
         implements EditorPanelInterface

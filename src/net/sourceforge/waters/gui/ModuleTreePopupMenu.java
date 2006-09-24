@@ -21,6 +21,7 @@ class ModuleTreePopupMenu
 {
     private JMenuItem addVariableItem;
     private JMenuItem deleteVariableItem;
+    private JMenuItem deleteComponentItem;
     private JMenuItem editVariableItem;
     private JMenuItem addComponentItem;
     private AbstractSubject mInvokingComponent;
@@ -42,30 +43,25 @@ class ModuleTreePopupMenu
     {
         JMenuItem item;
 
-/*
         if(mInvokingComponent instanceof SimpleComponentSubject)
-        {			item = new JMenuItem("Add variable");
-                        item.setActionCommand("add variable");
-                        item.addActionListener(mWindow);
-                        this.add(item);
-                        addVariableItem = item;
-        }
-*/
-
-        if(mInvokingComponent instanceof SimpleComponentSubject ||
-            mInvokingComponent instanceof VariableSubject)
         {
             item = new JMenuItem("Add variable");
             item.setActionCommand("add variable");
             item.addActionListener(mWindow);
             this.add(item);
             addVariableItem = item;
-        }
+
+             item = new JMenuItem("Delete component");
+             item.setActionCommand("delete component");
+             item.addActionListener(mWindow);
+             this.add(item);
+            deleteComponentItem = item;
+ 		}
 
         if(mInvokingComponent instanceof VariableSubject)
         {
             item = new JMenuItem("Delete variable");
-            item.setActionCommand("remove component");
+            item.setActionCommand("delete variable");
             item.addActionListener(mWindow);
             this.add(item);
             deleteVariableItem = item;
@@ -79,7 +75,7 @@ class ModuleTreePopupMenu
 
         if(mInvokingComponent instanceof ModuleSubject)
         {
-            item = new JMenuItem("Create automaton");
+            item = new JMenuItem("Add component");
             item.setActionCommand("add simple component");
             item.addActionListener(mWindow);
             this.add(item);

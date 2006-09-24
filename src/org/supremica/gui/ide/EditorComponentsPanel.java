@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.28 2006-09-23 15:42:42 knut Exp $
+//# $Id: EditorComponentsPanel.java,v 1.29 2006-09-24 18:18:33 knut Exp $
 //###########################################################################
 
 
@@ -24,6 +24,7 @@ import net.sourceforge.waters.gui.EditorNewDialog;
 import net.sourceforge.waters.gui.ModuleTree;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.InstanceSubject;
@@ -34,6 +35,7 @@ import net.sourceforge.waters.subject.module.VariableSubject;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.module.ForeachComponentProxy;
+
 
 
 import org.supremica.gui.WhiteScrollPane;
@@ -211,6 +213,81 @@ class EditorComponentsPanel
 					"'edit variable' performed by illegal node type");
 				}
 			}
+		}
+
+		if("delete variable".equals(e.getActionCommand())) {
+			//edit existing variable
+			TreePath currentSelection = moduleSelectTree.getSelectionPath();
+			if (currentSelection != null)
+			{
+				// Get the node in the tree
+				DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode)
+				(currentSelection.getLastPathComponent());
+				Subject component = ((ComponentInfo)
+						targetNode.getUserObject()).getComponent();
+
+				if(component instanceof VariableSubject) {
+					Subject parent = component.getParent().getParent();
+
+
+				//mVariable = new VariableSubject(name.getText(), type, initial, marked);
+				//mComponent.getVariablesModifiable().add(mVariable);
+		    	//mTree.addVariable(mVariable);
+
+					System.err.println("Delete variable not implemented");
+					//EditorEditVariableDialog.showDialog((VariableSubject) component,(SimpleComponentSubject) parent, moduleSelectTree);
+				} else {
+					System.err.println("ModuleWindow.actionPerformed(): " +
+					"'delete variable' performed by illegal node type");
+				}
+			}
+		}
+
+		if("delete component".equals(e.getActionCommand())) {
+			TreePath currentSelection = moduleSelectTree.getSelectionPath();
+			if (currentSelection != null)
+			  {
+				// Find the depth of the component...
+				int depth = currentSelection.getPathCount()-1;
+				// Get the node in the tree
+				DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) (currentSelection.getLastPathComponent());
+
+				//Special treatment for variables
+				AbstractSubject component = ((ComponentInfo)
+											 targetNode.getUserObject()).getComponent();
+				if(component instanceof VariableSubject) {
+				  //remove from model (take getParent()x2 because a variableSubject is the child of a list.)
+				  ((SimpleComponentSubject) component.getParent().getParent())
+					.getVariablesModifiable().remove(component);
+
+				  //remove from module tree view
+				  moduleSelectTree.removeCurrentNode();
+				  return;
+				}
+
+				// Find the way to the component in the module
+				ListSubject<AbstractSubject> rootList = getModuleSubject().getComponentListModifiable();
+				ListSubject<AbstractSubject> currentList = rootList;
+				for (int i=1; i<depth; i++)
+				  {
+					// We're (depth-i) levels too deep
+					DefaultMutableTreeNode currentNode = targetNode;
+					for (int j=0; j<(depth-i); j++)
+					  {
+						currentNode = (DefaultMutableTreeNode) (currentNode.getParent());
+					  }
+					// Find currentNode (a ForeachSubject) in currentList and unfold a new ListSubject
+					ForeachSubject foreachSubject = (ForeachSubject) currentList.get(currentList.indexOf(((ComponentInfo) currentNode.getUserObject()).getComponent()));
+					currentList = foreachSubject.getBodyModifiable();
+				  }
+				// I just realised there's a nicer way to do this... well, well.
+
+				// Remove component from module
+				currentList.remove(((ComponentInfo) targetNode.getUserObject()).getComponent());
+
+				// Remove the component visually
+				moduleSelectTree.removeCurrentNode();
+			  }
 		}
 
 		if("add simple component".equals(e.getActionCommand())) {
