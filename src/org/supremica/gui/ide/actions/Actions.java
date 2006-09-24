@@ -40,13 +40,13 @@ public class Actions
 
     // Analyzer Options
     public IDEAction analyzerOptionsAction = new AnalyzerOptionsAction(allActions);
+
     // Analyzer Actions
     public IDEAction analyzerStatisticsAction = new AnalyzerStatisticsAction(allActions);
     public IDEAction analyzerExploreStatesAction = new AnalyzerExploreStatesAction(allActions);
     public IDEAction analyzerFindStatesAction = new AnalyzerFindStatesAction(allActions);
 
-
-    // Analyzer Actions
+    // Analyzer View Actions
     public IDEAction analyzerViewAutomatonAction = new AnalyzerViewAutomatonAction(allActions);
     public IDEAction analyzerViewAlphabetAction = new AnalyzerViewAlphabetAction(allActions);
     public IDEAction analyzerViewStatesAction = new AnalyzerViewStatesAction(allActions);
@@ -60,6 +60,12 @@ public class Actions
     public IDEAction analyzerSendToEditorAction = new AnalyzerSendToEditorAction(allActions);
     public IDEAction analyzerDeleteSelectedAction = new AnalyzerDeleteSelectedAutomataAction(allActions);
     public IDEAction analyzerDeleteAllAction = new AnalyzerDeleteAllAutomataAction(allActions);
+    public IDEAction analyzerMinimizeAction = new AnalyzerMinimizeAction(allActions);
+    public IDEAction analyzerPurgeAction = new AnalyzerPurgeAction(allActions);
+    public IDEAction analyzerEventHiderAction = new AnalyzerEventHiderAction(allActions);
+    public IDEAction analyzerRenameAction = new AnalyzerRenameAction(allActions);
+    public IDEAction analyzerExportAction = new AnalyzerExportAction(allActions);
+
 
     // Tools Actions
     public IDEAction toolsTestCasesAction = new ToolsTestCasesAction(allActions);

@@ -6,6 +6,7 @@ import org.supremica.gui.ide.IDE;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import javax.swing.JFrame;
 import org.supremica.automata.Automata;
+import org.supremica.automata.Project;
 
 public interface IDEActionInterface
 {
@@ -21,6 +22,7 @@ public interface IDEActionInterface
 	public void setEditorMode(IDEAction theAction);
 	public EditorWindowInterface getActiveEditorWindowInterface();
 	public Automata getSelectedAutomata();
+	public Project getSelectedProject();
 	public Automata getAllAutomata();
 	public Automata getUnselectedAutomata();
 }

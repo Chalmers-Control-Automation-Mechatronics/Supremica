@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.GridBagLayout;
 
 import org.supremica.automata.Automata;
+import org.supremica.automata.Project;
 
 public class AnalyzerPanel
 	extends MainPanel
@@ -50,6 +51,11 @@ public class AnalyzerPanel
 	public Automata getSelectedAutomata()
 	{
 		return automataPanel.getSelectedAutomata();
+	}
+
+	public Project getSelectedProject()
+	{
+		return automataPanel.getSelectedProject();
 	}
 
 	public Automata getUnselectedAutomata()

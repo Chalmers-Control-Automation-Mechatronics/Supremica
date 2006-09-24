@@ -29,6 +29,7 @@ import org.supremica.gui.InterfaceManager;
 import org.supremica.gui.ide.actions.Actions;
 import org.supremica.properties.Config;
 import org.supremica.automata.Automata;
+import org.supremica.automata.Project;
 import org.supremica.automata.Automaton;
 import org.supremica.log.*;
 import org.supremica.Version;
@@ -342,6 +343,12 @@ public class IDE
         return activeModuleContainer.getSelectedAutomata();
     }
 
+    public Project getSelectedProject()
+    {
+        ModuleContainer activeModuleContainer = getActiveModuleContainer();
+        return activeModuleContainer.getSelectedProject();
+    }
+
     public Automata getAllAutomata()
     {
         ModuleContainer activeModuleContainer = getActiveModuleContainer();
@@ -383,6 +390,36 @@ public class IDE
     public int addAutomata(Automata theAutomata)
     {
         return getActiveModuleContainer().addAutomata(theAutomata);
+    }
+
+    public String getNewAutomatonName(String msg, String nameSuggestion)
+    {
+        boolean finished = false;
+        String newName = "";
+
+        while (!finished)
+        {
+            newName = (String) JOptionPane.showInputDialog(this, msg, "Enter a new name.", JOptionPane.QUESTION_MESSAGE, null, null, nameSuggestion);
+
+            if (newName == null)
+            {
+                return null;
+            }
+            else if (newName.equals(""))
+            {
+                JOptionPane.showMessageDialog(this, "An empty name is not allowed.", "Alert", JOptionPane.ERROR_MESSAGE);
+            }
+            else if (getActiveModuleContainer().getVisualProject().containsAutomaton(newName))
+            {
+                JOptionPane.showMessageDialog(this, "'" + newName + "' already exists.", "Alert", JOptionPane.ERROR_MESSAGE);
+            }
+            else
+            {
+                finished = true;
+            }
+        }
+
+        return newName;
     }
 
     public static void main(String args[])

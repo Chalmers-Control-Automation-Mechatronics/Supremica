@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.37 2006-09-23 14:55:55 knut Exp $
+//# $Id: ModuleContainer.java,v 1.38 2006-09-24 16:21:39 knut Exp $
 //###########################################################################
 
 
@@ -172,6 +172,11 @@ public class ModuleContainer implements UndoInterface
     public Automata getSelectedAutomata()
     {
         return getAnalyzerPanel().getSelectedAutomata();
+    }
+
+    public Project getSelectedProject()
+    {
+        return getAnalyzerPanel().getSelectedProject();
     }
 
     public Automata getUnselectedAutomata()

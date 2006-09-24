@@ -135,4 +135,10 @@ public class EventHider
 		// Throw up the dialog, let the user select the alphabet
 		EventHiderDialog dlg = new EventHiderDialog(automata);
 	}
+
+	public void doAction(Automata theAutomata)
+	{
+		EventHiderDialog dlg = new EventHiderDialog(theAutomata);
+
+	}
 }

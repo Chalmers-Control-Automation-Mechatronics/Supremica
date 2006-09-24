@@ -21,6 +21,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Automata;
+import org.supremica.automata.Project;
 
 
 class AnalyzerAutomataPanel
@@ -280,6 +281,45 @@ class AnalyzerAutomataPanel
 
 		return selectedAutomata;
 	}
+
+    /**
+     * Same as getSelectedAutomata but include execution information
+     */
+    public Project getSelectedProject()
+    {
+        int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
+        Project selectedProject = new Project();
+
+        for (int i = 0; i < selectedRowIndices.length; i++)
+        {
+            try
+            {
+                int currIndex = selectedRowIndices[i];
+                int orgIndex = theTableSorter.getOriginalRowIndex(currIndex);
+                Automaton currAutomaton = getActiveProject().getAutomatonAt(orgIndex);
+
+                selectedProject.addAutomaton(currAutomaton);
+            }
+            catch (Exception ex)
+            {
+                logger.error("Trying to get an automaton that does not exist. Index: " + i);
+                logger.debug(ex.getStackTrace());
+            }
+        }
+
+        Project activeProject = getActiveProject();
+
+        if (activeProject != null)
+        {
+            selectedProject.addAttributes(activeProject);
+
+            //selectedProject.addActions(activeProject.getActions());
+            //selectedProject.addControls(activeProject.getControls());
+            //selectedProject.setAnimationURL(activeProject.getAnimationURL());
+        }
+
+        return selectedProject;
+    }
 
 	public Automata getAllAutomata()
 	{
