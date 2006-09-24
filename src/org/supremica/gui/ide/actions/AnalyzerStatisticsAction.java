@@ -33,7 +33,7 @@ public class AnalyzerStatisticsAction
         putValue(Action.NAME, "Statistics");
         putValue(Action.SHORT_DESCRIPTION, "Statistics");
 //        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
-        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
+//        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
 //        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Icon.gif")));
     }
 
