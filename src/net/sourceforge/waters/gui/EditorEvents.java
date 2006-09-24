@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.25 2006-09-23 18:24:51 robi Exp $
+//# $Id: EditorEvents.java,v 1.26 2006-09-24 20:40:49 knut Exp $
 //###########################################################################
 
 
@@ -146,6 +146,8 @@ public class EditorEvents
 	public void tableChanged(final TableModelEvent event)
 	{
 		super.tableChanged(event);
+
+//		System.err.println("tableChanged");
 
 		final int row0 = event.getFirstRow();
 		final int row1 = event.getLastRow();

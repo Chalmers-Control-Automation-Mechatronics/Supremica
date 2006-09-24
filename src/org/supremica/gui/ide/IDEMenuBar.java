@@ -11,11 +11,31 @@ import javax.swing.event.MenuListener;
 import javax.swing.event.MenuEvent;
 import java.util.*;
 
+import org.supremica.automata.templates.TemplateItem;
+import org.supremica.automata.templates.TemplateGroup;
+import org.supremica.gui.ExampleTemplates;
+
 public class IDEMenuBar
     extends JMenuBar
 {
     private IDE ide;
     private int startPoint = 0;
+
+	class NewFromTemplateHandler
+		implements ActionListener
+	{
+		private TemplateItem item = null;
+
+		public NewFromTemplateHandler(TemplateItem item)
+		{
+			this.item = item;
+		}
+
+		public void actionPerformed(ActionEvent e)
+		{
+			((org.supremica.gui.ide.actions.ExamplesStaticAction)ide.getActions().examplesStaticAction).doAction(item);
+		}
+	}
 
     public IDEMenuBar(IDE ide)
     {
@@ -52,12 +72,6 @@ public class IDEMenuBar
         menu.add(ide.getActions().editorRedoAction.getMenuItem());
         ide.getActions().editorRedoAction.setEnabled(false);
 
-        // Tools
-        menu = new JMenu("Tools");
-        menu.setMnemonic(KeyEvent.VK_T);
-        add(menu);
-        menu.add(ide.getActions().toolsTestCasesAction.getMenuItem());
-
         // Editor
         menu = new JMenu("Editor");
         menu.setMnemonic(KeyEvent.VK_M);
@@ -80,12 +94,45 @@ public class IDEMenuBar
         menu.add(new JMenuItem(ide.getActions().analyzerSynchronizerAction));
         menu.add(new JMenuItem(ide.getActions().analyzerSynthesizerAction));
 
+        // Tools
+        menu = new JMenu("Examples");
+        menu.setMnemonic(KeyEvent.VK_T);
+        add(menu);
+        menu.add(ide.getActions().toolsTestCasesAction.getMenuItem());
+
+		// File.NewFromTemplate
+		JMenu menuFileNewFromTemplate = new JMenu();
+
+		menuFileNewFromTemplate.setText("Static examples");
+		menu.add(menuFileNewFromTemplate);
+
+		ExampleTemplates exTempl = ExampleTemplates.getInstance();
+		for (Iterator groupIt = exTempl.iterator(); groupIt.hasNext(); )
+		{
+			TemplateGroup currGroup = (TemplateGroup) groupIt.next();
+			JMenu menuFileNewFromTemplateGroup = new JMenu();
+
+			menuFileNewFromTemplateGroup.setText(currGroup.getDescription());
+			menuFileNewFromTemplate.add(menuFileNewFromTemplateGroup);
+
+			for (Iterator itemIt = currGroup.iterator(); itemIt.hasNext(); )
+			{
+				TemplateItem currItem = (TemplateItem) itemIt.next();
+				JMenuItem menuItem = new JMenuItem();
+
+				menuItem.setText(currItem.getDescription());
+				menuFileNewFromTemplateGroup.add(menuItem);
+				menuItem.addActionListener(new NewFromTemplateHandler(currItem));
+			}
+		}
+
         // Configure
         menu = new JMenu("Configure");
         menu.setMnemonic(KeyEvent.VK_C);
         add(menu);
         menu.add(ide.getActions().editorOptionsAction.getMenuItem());
         menu.add(ide.getActions().analyzerOptionsAction.getMenuItem());
+
 
         // Modules
         menu = new JMenu("Modules");

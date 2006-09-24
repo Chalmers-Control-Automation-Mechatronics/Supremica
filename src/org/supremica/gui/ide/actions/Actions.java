@@ -67,8 +67,10 @@ public class Actions
     public IDEAction analyzerExportAction = new AnalyzerExportAction(allActions);
 
 
-    // Tools Actions
+    // Examples Actions
     public IDEAction toolsTestCasesAction = new ToolsTestCasesAction(allActions);
+    public IDEAction examplesStaticAction = new ExamplesStaticAction(allActions);
+
 
     // Help Actions
     public IDEAction helpWebAction = new HelpWebAction(allActions);

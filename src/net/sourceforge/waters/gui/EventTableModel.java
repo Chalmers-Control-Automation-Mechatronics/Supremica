@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.21 2006-09-23 18:24:51 robi Exp $
+//# $Id: EventTableModel.java,v 1.22 2006-09-24 20:40:49 knut Exp $
 //###########################################################################
 
 
@@ -64,7 +64,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
 public class EventTableModel
   extends AbstractTableModel
   implements ModelObserver
-{  
+{
 
   //#########################################################################
   //# Constructors
@@ -168,7 +168,7 @@ public class EventTableModel
       }
     }
   }
-	
+
   public void removeIdentifier(final IdentifierSubject ident)
   {
     final EventEntry entry = new EventEntry(ident);
@@ -187,6 +187,10 @@ public class EventTableModel
       case 0:
         return;
       case 1:
+        if (value == null)
+        {
+			deleteEvent(row);
+		}
         final IdentifierSubject ident = ((IdentifierSubject) value).clone();
         final IdentifierSubject old = getEvent(row);
         if (ident == null) {
@@ -223,8 +227,16 @@ public class EventTableModel
     final EventEntry entry = new EventEntry();
     mEvents.add(entry);
     fireTableRowsInserted(row, row);
-    return row;		
+    return row;
   }
+
+	void deleteEvent(int row)
+	{
+//		final EventDeclSubject victim = (EventDeclSubject) mEventListModel.getElementAt(row);
+//		final IndexedListSubject<EventDeclSubject> events = mModule.getEventDeclListModifiable();
+//		events.remove(victim);
+	}
+
 
   String getToolTipText(final int row)
   {
@@ -434,11 +446,11 @@ public class EventTableModel
   {
     public void tableChanged(final TableModelEvent event)
     {
-      Collections.sort(mEvents);			
-      mTable.repaint();			
+      Collections.sort(mEvents);
+      mTable.repaint();
     }
   }
-	
+
 
   //#########################################################################
   //# Local Class ChangeEventNameCommand
@@ -455,13 +467,13 @@ public class EventTableModel
       mNew = neo;
       mModel = model;
       mCommands = new CompoundCommand();
-      if (mOld != null) {			
+      if (mOld != null) {
         mCommands.addCommand(new RemoveFromTableCommand(mModel, mOld));
       }
       if (!mModel.containsEvent(mNew)) {
         mCommands.addCommand(new AddToTableCommand(mModel, mNew));
       }
-      if (mOld != null) {			
+      if (mOld != null) {
         addCommandsFromList(mGraph.getBlockedEvents());
         for (final EdgeSubject edge : mGraph.getEdgesModifiable()) {
           addCommandsFromList(edge.getLabelBlock());
@@ -504,25 +516,25 @@ public class EventTableModel
     {
       mCommands.execute();
     }
-	
-    /** 
+
+    /**
      * Undoes the Command
-     */    
+     */
     public void undo()
     {
       mCommands.undo();
     }
-	
+
     public boolean isSignificant()
     {
       return true;
     }
-		
+
     public String getName()
     {
       return mDescription;
     }
-		
+
     private final GraphSubject mGraph;
     private final IdentifierSubject mOld;
     private final IdentifierSubject mNew;
@@ -540,40 +552,40 @@ public class EventTableModel
     private final EventTableModel mModel;
     private final IdentifierSubject mIdentifier;
     private final String mDescription = "Add Event";
-		
+
     public AddToTableCommand(EventTableModel model,
                              IdentifierSubject identifier)
     {
       mModel = model;
       mIdentifier = identifier;
     }
-		
+
     public void execute()
     {
       mModel.addIdentifier(mIdentifier);
     }
 
-    /** 
+    /**
      * Undoes the command.
-     */    
+     */
     public void undo()
     {
       System.out.println("Undo addition" + mModel.getRowCount());
       mModel.removeIdentifier(mIdentifier);
       System.out.println("Undo addition" + mModel.getRowCount());
     }
-		
+
     public boolean isSignificant()
     {
       return true;
     }
-	
+
     public String getName()
     {
       return mDescription;
     }
   }
-	
+
 
   //#########################################################################
   //# Local Class AddToTableCommand
@@ -583,32 +595,32 @@ public class EventTableModel
     private final EventTableModel mModel;
     private final IdentifierSubject mIdentifier;
     private final String mDescription = "Add Event";
-		
+
     public RemoveFromTableCommand(EventTableModel model,
                                   IdentifierSubject identifier)
     {
       mModel = model;
       mIdentifier = identifier;
     }
-		
+
     public void execute()
     {
       mModel.removeIdentifier(mIdentifier);
     }
-		
-    /** 
+
+    /**
      * Undoes the Command.
-     */    
+     */
     public void undo()
     {
       mModel.addIdentifier(mIdentifier);
     }
-		
+
     public boolean isSignificant()
     {
       return true;
     }
-	
+
     public String getName()
     {
       return mDescription;
