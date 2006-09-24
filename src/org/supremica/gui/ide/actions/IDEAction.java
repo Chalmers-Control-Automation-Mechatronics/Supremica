@@ -14,57 +14,53 @@ public abstract class IDEAction
     private int minimumNumberOfSelectedComponents = 0;
     private boolean editorActiveRequired = false;
     private boolean analyzerActiveRequired = false;
-    private JMenuItem menuItem = null;
-    
+//    private JMenuItem menuItem = null;
+
     public IDEAction(List<IDEAction> actionList)
     {
         this.ide = null;
-        
+
         assert(actionList != null);
         actionList.add(this);
     }
-    
+
     public void setIDEActionInterface(IDEActionInterface ide)
     {
         this.ide = ide;
     }
-    
+
     public abstract void doAction();
-    
+
     public void setButton(AbstractButton theButton)
     {
         this.theButton = theButton;
     }
-    
+
     public AbstractButton getButton()
     {
         return theButton;
     }
-    
+
     public JMenuItem getMenuItem()
     {
-        if (menuItem == null)
-        {
-            menuItem = new JMenuItem(this);
-        }
-        return menuItem;
+        return new JMenuItem(this);
     }
-    
+
     public void setEditorActiveRequired(boolean required)
     {
         editorActiveRequired = required;
     }
-    
+
     public void setAnalyzerActiveRequired(boolean required)
     {
         analyzerActiveRequired = required;
     }
-    
+
     public void setMinimumNumberOfSelectedComponents(int numberOfComponents)
     {
         minimumNumberOfSelectedComponents = numberOfComponents;
     }
-    
+
     public boolean isEnabled()
     {
         // TO Do
@@ -83,7 +79,7 @@ public abstract class IDEAction
                                 return false;
                         }
                 }
-                 
+
                 if (minimumNumberOfSelectedComponents > ide.numberOfSelectedComponents())
                 {
                         return false;

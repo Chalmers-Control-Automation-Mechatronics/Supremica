@@ -87,12 +87,40 @@ public class IDEMenuBar
         menu = new JMenu("Analyzer");
         menu.setMnemonic(KeyEvent.VK_A);
         add(menu);
+/*
         menu.add(new JMenuItem(ide.getActions().analyzerDeleteSelectedAction));
         menu.add(new JMenuItem(ide.getActions().analyzerWorkbenchAction));
         menu.addSeparator();
         menu.add(new JMenuItem(ide.getActions().analyzerVerifierAction));
         menu.add(new JMenuItem(ide.getActions().analyzerSynchronizerAction));
         menu.add(new JMenuItem(ide.getActions().analyzerSynthesizerAction));
+*/
+		JMenu viewMenu = new JMenu("View");
+		menu.add(viewMenu);
+		viewMenu.add(ide.getActions().analyzerViewAutomatonAction.getMenuItem());
+		viewMenu.add(ide.getActions().analyzerViewAlphabetAction.getMenuItem());
+		viewMenu.add(ide.getActions().analyzerViewStatesAction.getMenuItem());
+		viewMenu.add(ide.getActions().analyzerViewModularStructureAction.getMenuItem());
+		menu.addSeparator();
+		menu.add(ide.getActions().analyzerSynchronizerAction.getMenuItem());
+		menu.add(ide.getActions().analyzerSynthesizerAction.getMenuItem());
+		menu.add(ide.getActions().analyzerVerifierAction.getMenuItem());
+		menu.add(ide.getActions().analyzerMinimizeAction.getMenuItem());
+		menu.add(ide.getActions().analyzerEventHiderAction.getMenuItem());
+		menu.add(ide.getActions().analyzerPurgeAction.getMenuItem());
+		menu.addSeparator();
+		menu.add(ide.getActions().analyzerExploreStatesAction.getMenuItem());
+		menu.add(ide.getActions().analyzerFindStatesAction.getMenuItem());
+		menu.add(ide.getActions().analyzerWorkbenchAction.getMenuItem());
+		menu.addSeparator();
+		menu.add(ide.getActions().analyzerStatisticsAction.getMenuItem());
+		menu.add(ide.getActions().analyzerExportAction.getMenuItem());
+		menu.addSeparator();
+		menu.add(ide.getActions().analyzerDeleteSelectedAction.getMenuItem());
+		menu.add(ide.getActions().analyzerDeleteAllAction.getMenuItem());
+		menu.add(ide.getActions().analyzerRenameAction.getMenuItem());
+		menu.add(ide.getActions().analyzerSendToEditorAction.getMenuItem());
+
 
         // Tools
         menu = new JMenu("Examples");
