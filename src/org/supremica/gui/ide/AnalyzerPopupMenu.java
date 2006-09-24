@@ -36,8 +36,12 @@ class AnalyzerPopupMenu
     private void initPopups()
     throws Exception
     {
-        add(ide.getActions().analyzerDeleteSelectedAction.getMenuItem());
-        add(ide.getActions().analyzerDeleteAllAction.getMenuItem());
+        JMenu viewMenu = new JMenu("View");
+        add(viewMenu);
+        viewMenu.add(ide.getActions().analyzerViewAutomatonAction.getMenuItem());
+        viewMenu.add(ide.getActions().analyzerViewAlphabetAction.getMenuItem());
+        viewMenu.add(ide.getActions().analyzerViewStatesAction.getMenuItem());
+        viewMenu.add(ide.getActions().analyzerViewModularStructureAction.getMenuItem());
         addSeparator();
         add(ide.getActions().analyzerWorkbenchAction.getMenuItem());
         addSeparator();
@@ -49,6 +53,9 @@ class AnalyzerPopupMenu
         add(ide.getActions().analyzerFindStatesAction.getMenuItem());
   		addSeparator();
         add(ide.getActions().analyzerStatisticsAction.getMenuItem());
-
+        addSeparator();
+        add(ide.getActions().analyzerDeleteSelectedAction.getMenuItem());
+        add(ide.getActions().analyzerDeleteAllAction.getMenuItem());
     }
 }
+

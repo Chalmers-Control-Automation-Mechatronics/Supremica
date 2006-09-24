@@ -46,6 +46,13 @@ public class Actions
     public IDEAction analyzerFindStatesAction = new AnalyzerFindStatesAction(allActions);
 
 
+    // Analyzer Actions
+    public IDEAction analyzerViewAutomatonAction = new AnalyzerViewAutomatonAction(allActions);
+    public IDEAction analyzerViewAlphabetAction = new AnalyzerViewAlphabetAction(allActions);
+    public IDEAction analyzerViewStatesAction = new AnalyzerViewStatesAction(allActions);
+    public IDEAction analyzerViewModularStructureAction = new AnalyzerViewModularStructureAction(allActions);
+
+
     public IDEAction analyzerWorkbenchAction = new WorkbenchAction(allActions);
     public IDEAction analyzerSynchronizerAction = new AnalyzerSynchronizerAction(allActions);
     public IDEAction analyzerSynthesizerAction = new AnalyzerSynthesizerAction(allActions);
