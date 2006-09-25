@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.22 2006-09-24 20:40:49 knut Exp $
+//# $Id: EventTableModel.java,v 1.23 2006-09-25 08:06:54 knut Exp $
 //###########################################################################
 
 
@@ -189,7 +189,7 @@ public class EventTableModel
       case 1:
         if (value == null)
         {
-			deleteEvent(row);
+			return;
 		}
         final IdentifierSubject ident = ((IdentifierSubject) value).clone();
         final IdentifierSubject old = getEvent(row);
@@ -229,14 +229,14 @@ public class EventTableModel
     fireTableRowsInserted(row, row);
     return row;
   }
-
+/*
 	void deleteEvent(int row)
 	{
 //		final EventDeclSubject victim = (EventDeclSubject) mEventListModel.getElementAt(row);
 //		final IndexedListSubject<EventDeclSubject> events = mModule.getEventDeclListModifiable();
 //		events.remove(victim);
 	}
-
+*/
 
   String getToolTipText(final int row)
   {
