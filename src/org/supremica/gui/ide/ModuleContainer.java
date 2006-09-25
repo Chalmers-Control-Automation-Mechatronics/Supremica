@@ -4,12 +4,13 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.38 2006-09-24 16:21:39 knut Exp $
+//# $Id: ModuleContainer.java,v 1.39 2006-09-25 03:55:30 siw4 Exp $
 //###########################################################################
 
 
 package org.supremica.gui.ide;
 
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.util.Collection;
@@ -148,8 +149,12 @@ public class ModuleContainer implements UndoInterface
 			final EditorPanel editorPanel = getEditorPanel();
 			final JComponent right = editorPanel.getRightComponent();
 			final Dimension oldsize = right.getSize();
-			panel =	new ComponentEditorPanel(this, scp, oldsize);
-			mComponentToPanelMap.put(scp, panel);
+      try {
+        panel =	new ComponentEditorPanel(this, scp, oldsize);
+        mComponentToPanelMap.put(scp, panel);
+      } catch (GeometryAbsentException g) {
+        JOptionPane.showMessageDialog(mIDE, g.getMessage());
+      }
 		}
 		return panel;
     }

@@ -4,12 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.31 2006-09-21 14:03:12 robi Exp $
+//# $Id: EditorWindow.java,v 1.32 2006-09-25 03:55:30 siw4 Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
 
@@ -48,6 +49,16 @@ import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import org.supremica.gui.GraphicsToClipboard;
 
 
+// Printing
+import java.awt.print.*;
+import javax.print.attribute.*;
+import javax.print.attribute.standard.*;
+import java.util.Locale;
+import java.net.URI;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+
+
 public class EditorWindow
   extends JFrame
   implements EditorWindowInterface
@@ -60,6 +71,7 @@ public class EditorWindow
                       final SimpleComponentSubject subject,
                       final ModuleWindow root,
                       final UndoInterface undoInterface)
+    throws GeometryAbsentException
   {
     mUndoInterface = undoInterface;
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -89,9 +101,17 @@ public class EditorWindow
     gridbag.setConstraints(toolbar, constraints);
     panel.add(toolbar);
 
-    final JScrollPane scrollsurface = new JScrollPane(surface);
+    scrollsurface = new JScrollPane(surface);
     final JScrollPane scrollevents = new JScrollPane(mEventPane);
     final JViewport viewevents = scrollevents.getViewport();
+    /*surface.addComponentListener(new ComponentAdapter()
+    {
+      public void componentResized(ComponentEvent e)
+      {
+        scrollsurface.getHorizontalScrollBar().getModel().setMinimum(0);
+        scrollsurface.getVerticalScrollBar().getModel().setMinimum(0);
+      }
+    });*/
 
     /* EFA variable pane
     final JScrollPane scrollvariables = new JScrollPane(mEventPane);
@@ -334,6 +354,7 @@ public class EditorWindow
   private EditorToolbar toolbar;
   private ControlledSurface surface;
   private EditorMenu menu;
+  private final JScrollPane scrollsurface;
   private final EditorEvents mEventPane;
   private final SimpleComponentSubject mSubject;
   private final ModuleSubject mModule;

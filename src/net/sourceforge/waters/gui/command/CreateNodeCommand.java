@@ -4,12 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateNodeCommand
 //###########################################################################
-//# $Id: CreateNodeCommand.java,v 1.12 2006-08-25 02:12:52 robi Exp $
+//# $Id: CreateNodeCommand.java,v 1.13 2006-09-25 03:55:30 siw4 Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui.command;
 
+import net.sourceforge.waters.gui.EditorGraph;
 import java.awt.Point;
 
 import net.sourceforge.waters.gui.renderer.LabelProxyShape;
@@ -67,6 +68,7 @@ public class CreateNodeCommand
   public void execute()
   {
     mGraph.getNodesModifiable().add(mCreated);
+    EditorGraph.updateChildNodes(mGraph);
   }
 
   /** 
@@ -75,6 +77,7 @@ public class CreateNodeCommand
   public void undo()
   {
     mGraph.getNodesModifiable().remove(mCreated);
+    EditorGraph.updateChildNodes(mGraph);
   }
 
   public String getName()

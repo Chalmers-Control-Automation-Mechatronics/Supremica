@@ -1,5 +1,19 @@
 package net.sourceforge.waters.gui.renderer;
 
+import net.sourceforge.waters.subject.module.GroupNodeSubject;
+import java.awt.geom.Point2D;
+import java.awt.Point;
+import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.LabelGeometrySubject;
+import net.sourceforge.waters.xsd.module.SplineKind;
+import net.sourceforge.waters.subject.module.SplineGeometrySubject;
+import java.util.Collections;
+import java.util.Collection;
+import net.sourceforge.waters.subject.module.PointGeometrySubject;
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
+import java.util.Random;
+import net.sourceforge.waters.subject.module.NodeSubject;
+import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
 import net.sourceforge.waters.model.base.Proxy;
 
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -20,11 +34,82 @@ public class SubjectShapeProducer
 	extends ProxyShapeProducer
 	implements ModelObserver
 {
-	public SubjectShapeProducer(Subject graph, ModuleProxy module)
+	public SubjectShapeProducer(GraphSubject graph, ModuleProxy module)
+    throws GeometryAbsentException
 	{
 		super(module);
+    boolean runEmbedder = false;
+    Random rand = new Random();
+    System.out.println("setGeo");
+    for (NodeSubject node : graph.getNodesModifiable()) {
+      if (node instanceof SimpleNodeSubject) {
+        SimpleNodeSubject n = (SimpleNodeSubject) node;
+        if (n.isInitial()) {
+          if (n.getInitialArrowGeometry() == null) {
+            n.setInitialArrowGeometry
+              (new PointGeometrySubject(new Point(-5, -5)));
+          }
+        }
+        if (n.getPointGeometry() == null) {
+          System.out.println("setGeometry");
+          runEmbedder = true;
+          n.setPointGeometry(new PointGeometrySubject(new Point(rand.nextInt(1000),
+                                                                rand.nextInt(1000)))
+                                                               );
+        }
+        if (n.getLabelGeometry() == null) {
+          n.setLabelGeometry(new LabelGeometrySubject(new Point(5, 5)));
+        }
+      } else if (node instanceof GroupNodeSubject) {
+        if (((GroupNodeSubject)node).getGeometry() == null) {
+          throw new GeometryAbsentException("Their is no geometry information"
+                                            + " for a group node in this graph");
+        }
+      }
+    }
+    for (EdgeSubject edge : graph.getEdgesModifiable()) {
+      if (edge.getGeometry() == null) {
+        final Collection<Point2D> points =
+          Collections.singleton(GeometryTools.getMidPoint
+                                 (GeometryTools.getPosition(edge.getSource()),
+                                  GeometryTools.getPosition(edge.getTarget())
+                                 ));
+        edge.setGeometry(new SplineGeometrySubject(points,
+                                                   SplineKind.INTERPOLATING));
+      }
+      if (edge.getStartPoint() == null) {
+        Point2D p1 = edge.getGeometry().getPoints().get(0);
+        PointGeometrySubject p =
+          new PointGeometrySubject
+            (GeometryTools.defaultPosition(edge.getSource(), p1));
+        edge.setStartPoint(p);
+      }
+      if (edge.getEndPoint() == null) {
+        PointGeometrySubject p = new PointGeometrySubject(
+                              GeometryTools.defaultPosition(edge.getTarget(),
+                                      edge.getGeometry().getPoints().get(0)));
+        edge.setEndPoint(p);
+      }
+      if (edge.getLabelBlock().getGeometry() == null) {
+        LabelGeometrySubject offset =
+          new LabelGeometrySubject
+            (new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
+                       LabelBlockProxyShape.DEFAULTOFFSETY));
+        edge.getLabelBlock().setGeometry(offset);
+      }
+    }
+    if (runEmbedder) {
+      Thread t = new Thread(new SpringEmbedder(graph));
+      t.start();
+    }
 		graph.addModelObserver(this);
 	}
+  
+  public SubjectShapeProducer(Subject graph, ModuleProxy module)
+  {
+    super(module);
+    graph.addModelObserver(this);
+  }
 	
 	private void removeMapping(NodeProxy node)
 	{

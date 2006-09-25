@@ -357,10 +357,6 @@ public class EditorGraph
   
   public Map<ProxySubject, ProxySubject> getChanged()
   {
-    if (mNodeMoved) {
-      updateChildNodes();
-      mNodeMoved = false;
-    }
     IdentityHashMap<ProxySubject, ProxySubject> changed = 
       new IdentityHashMap<ProxySubject, ProxySubject>(mChanged.size());
     for (Subject s : mChanged) {
@@ -415,9 +411,9 @@ public class EditorGraph
 		return new PointGeometrySubject(p);
 	}
   
-  private void updateChildNodes() {
+  public static void updateChildNodes(GraphSubject graph) {
     List<GroupNodeSubject> groups = new ArrayList<GroupNodeSubject>();
-    for (NodeSubject n : mNodes) {
+    for (NodeSubject n : graph.getNodesModifiable()) {
       if (n instanceof GroupNodeSubject) {
         ((GroupNodeSubject) n).getImmediateChildNodesModifiable().clear();
         groups.add((GroupNodeSubject) n);
@@ -434,7 +430,7 @@ public class EditorGraph
       }
     });
     // go through all the nodes
-    for (NodeSubject n : mNodes) {
+    for (NodeSubject n : graph.getNodesModifiable()) {
       Rectangle2D r1;
       if (n instanceof GroupNodeSubject) {
         r1 = ((GroupNodeSubject) n).getGeometry().getRectangle();
@@ -688,84 +684,6 @@ public class EditorGraph
 				}
 				mRect.setRect(getNodeSubject().getGeometry().getRectangle());
 			}
-		}
-
-		public void updateChildNodes()
-		{
-			List<GroupNodeSubject> groups = new ArrayList<GroupNodeSubject>();
-			List<NodeSubject> children = new ArrayList<NodeSubject>();
-
-			for (NodeSubject node : mNodes)
-			{
-				if (node instanceof GroupNodeSubject)
-				{
-					GroupNodeSubject n = (GroupNodeSubject)node;
-
-					if (getNodeSubject() == n)
-					{
-						continue;
-					}
-
-					if (getNodeSubject().getGeometry().getRectangle().contains(
-							n.getGeometry().getRectangle()))
-					{
-						boolean notImmediate = false;
-
-						for (GroupNodeSubject n2 : groups)
-						{
-							if (n2.getGeometry().getRectangle().contains(
-									n.getGeometry().getRectangle()))
-							{
-								notImmediate = true;
-
-								break;
-							}
-							else if (n.getGeometry().getRectangle().contains(
-										n2.getGeometry().getRectangle()))
-							{
-								groups.remove(n2);
-
-								break;
-							}
-						}
-
-						if (!notImmediate)
-						{
-							groups.add(n);
-						}
-					}
-				}
-			}
-			for (NodeSubject node : mNodes)
-			{
-				if (node instanceof SimpleNodeSubject)
-				{
-					SimpleNodeSubject n = (SimpleNodeSubject)node;
-					if (getNodeSubject().getGeometry().getRectangle().contains(
-							n.getPointGeometry().getPoint()))
-					{
-						boolean notImmediate = false;
-						for (GroupNodeSubject n2 : groups)
-						{
-							if (n2.getGeometry().getRectangle().contains(
-									n.getPointGeometry().getPoint()))
-							{
-								notImmediate = true;
-
-								break;
-							}
-						}
-
-						if (!notImmediate)
-						{
-							children.add(n);
-						}
-					}
-				}
-			}			
-
-			children.addAll(groups);
-			getNodeSubject().setImmediateChildNodes(children);
 		}
 
 		private final Rectangle2D mRect;

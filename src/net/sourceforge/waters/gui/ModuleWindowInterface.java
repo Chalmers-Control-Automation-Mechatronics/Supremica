@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindowInterface
 //###########################################################################
-//# $Id: ModuleWindowInterface.java,v 1.4 2006-09-18 09:21:00 knut Exp $
+//# $Id: ModuleWindowInterface.java,v 1.5 2006-09-25 03:55:30 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
 
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import java.awt.Frame;
 import java.awt.event.ActionListener;
 
@@ -57,6 +58,7 @@ public interface ModuleWindowInterface
   /**
    * Opens a graph editor for the given component.
    */
-  public EditorWindowInterface showEditor(SimpleComponentSubject comp);
+  public EditorWindowInterface showEditor(SimpleComponentSubject comp)
+    throws GeometryAbsentException;
 
 }

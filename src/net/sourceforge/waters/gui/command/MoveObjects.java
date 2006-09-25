@@ -1,5 +1,7 @@
 package net.sourceforge.waters.gui.command;
 
+import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.gui.EditorGraph;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,6 +43,7 @@ public class MoveObjects
   /**  the commands to be executed */
   private final CompoundCommand mCommands;
   private final String mDescription;
+  private final GraphSubject mGraph;
 
   /**
    * Constructs a new CreateNodeCommand with the specified surface and
@@ -49,8 +52,10 @@ public class MoveObjects
    * @param surface the surface edited by this command
    * @param displacement the position upon which the node is created
    */
-  public MoveObjects(Map<ProxySubject, ProxySubject> objects)
+  public MoveObjects(Map<ProxySubject, ProxySubject> objects,
+                     GraphSubject graph)
   {
+    mGraph = graph;
     mCommands = new CompoundCommand();
     for (Map.Entry<ProxySubject, ProxySubject> entry : objects.entrySet()) {
       Command c = null;
@@ -81,6 +86,7 @@ public class MoveObjects
   public void execute()
   {
     mCommands.execute();
+    EditorGraph.updateChildNodes(mGraph);
   }
 
   /** 
@@ -90,6 +96,7 @@ public class MoveObjects
   public void undo()
   {
     mCommands.undo();
+    EditorGraph.updateChildNodes(mGraph);
   }
 
 	public boolean isSignificant()
@@ -130,6 +137,7 @@ public class MoveObjects
     
     public void execute()
     {
+      System.out.println("new pos:" + mNew.getPoint());
       mNode.setPointGeometry(mNew);
       mNode.setInitialArrowGeometry(mNArrow);
       mLabel.execute();
@@ -159,37 +167,23 @@ public class MoveObjects
     private final GroupNodeSubject mNode;
     private final BoxGeometrySubject mOrig;
     private final BoxGeometrySubject mNew;
-    private final Set<NodeSubject> mOChildren;
-    private final Set<NodeSubject> mNChildren;
     
     public MoveGroupNode(GroupNodeSubject orig, GroupNodeSubject dummy)
     {
       mNode = orig;
       mOrig = mNode.getGeometry().clone();
       mNew = dummy.getGeometry().clone();
-      if (mNode.getImmediateChildNodes().equals(dummy.getImmediateChildNodes())) {
-        mOChildren = new HashSet(mNode.getImmediateChildNodesModifiable());
-        mNChildren = new HashSet(dummy.getImmediateChildNodesModifiable());
-      } else {
-        mOChildren = null;
-        mNChildren = null;
-      }
     }
     
     public void execute()
     {
       mNode.setGeometry(mNew);
-      Set<NodeSubject> children = mNode.getImmediateChildNodesModifiable();
-      children.clear();
-      children.addAll(mNChildren);
+
     }
     
     public void undo()
     {
       mNode.setGeometry(mOrig);
-      Set<NodeSubject> children = mNode.getImmediateChildNodesModifiable();
-      children.clear();
-      children.addAll(mOChildren);
     }
     
     public boolean isSignificant()

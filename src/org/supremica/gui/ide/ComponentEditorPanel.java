@@ -4,10 +4,14 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.27 2006-09-23 18:24:51 robi Exp $
+//# $Id: ComponentEditorPanel.java,v 1.28 2006-09-25 03:55:30 siw4 Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
+
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
+import javax.swing.*;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -68,8 +72,10 @@ public class ComponentEditorPanel
 	 * @param  size             the expected total size of the panel.
 	 */
 	public ComponentEditorPanel(final ModuleContainer moduleContainer,
-								final SimpleComponentSubject element,
-								final Dimension size)
+                              final SimpleComponentSubject element,
+                              final Dimension size)
+    throws GeometryAbsentException
+								
 	{
 		this.element = element;
 		mModuleContainer = moduleContainer;

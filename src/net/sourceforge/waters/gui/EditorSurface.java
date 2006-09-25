@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.60 2006-09-21 14:03:12 robi Exp $
+//# $Id: EditorSurface.java,v 1.61 2006-09-25 03:55:30 siw4 Exp $
 //###########################################################################
 
 
@@ -75,7 +75,7 @@ public class EditorSurface
     private final GraphProxy mGraph;
     private final ModuleProxy mModule;
     private final ProxyShapeProducer mShapeProducer;
-    private Rectangle drawnAreaBounds = null;
+    protected Rectangle drawnAreaBounds = null;
 
     /** Different status values for objects being dragged. */
     public enum DRAGOVERSTATUS
@@ -166,21 +166,15 @@ public class EditorSurface
         // Draw grid iff showGrid is true
         if (showGrid)
         {
-            int x = 0;
-            int y = 0;
+            int x = -(int)getLocation().getX();
+            int y = -(int)getLocation().getY();
             
-            while (x < getWidth())
-            {
-                g.drawLine(x, 0, x, getHeight());
-                
-                x += gridSize;
+            for (int i = 0; i < getHeight(); i += gridSize) {
+                g.drawLine(i, y, i, getHeight());
             }
             
-            while (y < getHeight())
-            {
-                g.drawLine(0, y, getWidth(), y);
-                
-                y += gridSize;
+            for (int i = 0; i < getHeight(); i += gridSize) {
+                g.drawLine(x, i, getWidth(), i);
             }
         }
     }
@@ -213,8 +207,7 @@ public class EditorSurface
         if (!printing)
         {
             paintGrid(g);
-        }
-        
+        }        
                 /*
                 // Don't do anything if there is nothing to do!
                 if ((nodes == null) || (nodes.size() == 0))
@@ -224,7 +217,7 @@ public class EditorSurface
                  */
         Renderer renderer = new Renderer();
         renderer.renderGraph(getDrawnGraph(), getDrawnObjects(), this,
-            getShapeProducer(), (Graphics2D)g);
+                             getShapeProducer(), (Graphics2D)g);
         
                 /*
                 // Test: Print outline of drawn area (just to see that it's OK)
@@ -404,7 +397,7 @@ public class EditorSurface
                 }
                  */
         
-        setPreferredSize(new Dimension(width + gridSize * 10, height + gridSize * 10));
+        //setPreferredSize(new Dimension(width + gridSize * 10, height + gridSize * 10));
     }
     
     /**
@@ -420,12 +413,12 @@ public class EditorSurface
         
         // How much spacing should there be
         int SPACING = 0;
-        
+        /*
         // The extreme values
         double minX = Double.MAX_VALUE;
-        double maxX = 0;
+        double maxX = Double.MIN_VALUE;
         double minY = Double.MAX_VALUE;
-        double maxY = 0;
+        double maxY = Double.MIN_VALUE;
         
         // Local measures
         Rectangle2D bounds;
@@ -442,15 +435,15 @@ public class EditorSurface
             {
                 maxY = bounds.getMaxY() + mod;
             }
-            if (bounds.getMinX() + mod > minX)
+            if (bounds.getMinX() - mod < minX)
             {
-                minX = bounds.getMinX() + mod;
+                minX = bounds.getMinX() - mod;
             }
-            if (bounds.getMaxY() + mod > minY)
+            if (bounds.getMinY() - mod < minY)
             {
-                minY = bounds.getMinY() + mod;
+                minY = bounds.getMinY() - mod;
             }
-        }
+        }*/
         
         // Guard Action Blocks
                 /*
@@ -485,15 +478,15 @@ public class EditorSurface
                 }*/
         
         //Avoid stupid values
-        if ((maxX < minX) || (maxY < minY))
+        /*if ((maxX < minX) || (maxY < minY))
         {
             drawnAreaBounds = new Rectangle(0,0,0,0);
         }
         else
         {
-            drawnAreaBounds = new Rectangle((int) minX, (int) minY, (int) (maxX-minX),(int) (maxY-minY));
-        }
-        
+            drawnAreaBounds = new Rectangle(0, 0, (int) (maxX),(int) (maxY));
+        }*/
+        drawnAreaBounds = getShapeProducer().getMinimumBoundingRectangle();
         return drawnAreaBounds;
     }
     
@@ -585,18 +578,17 @@ public class EditorSurface
     {
         if (boundsMaybeChanged)
         {
-            minimizeSize();
-            drawnAreaBounds = null;
+            System.out.println("bounds:" + getBounds());
         }
         
         super.repaint();
     }
     
-    public void repaint()
+    /*public void repaint()
     {
         repaint(true);
-    }
-
+    }*/
+    
     public EditorWindowInterface getEditorInterface()
     {
         return root;

@@ -1,5 +1,6 @@
 package net.sourceforge.waters.gui.command;
 
+import net.sourceforge.waters.gui.EditorGraph;
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
@@ -57,6 +58,7 @@ public class CreateNodeGroupCommand
   public void execute()
   {
     mGraph.getNodesModifiable().add(mCreated);
+    EditorGraph.updateChildNodes(mGraph);
   }
 
   /** 
@@ -66,6 +68,7 @@ public class CreateNodeGroupCommand
   public void undo()
   {
     mGraph.getNodesModifiable().remove(mCreated);
+    EditorGraph.updateChildNodes(mGraph);
   }
 	
 	public boolean isSignificant()

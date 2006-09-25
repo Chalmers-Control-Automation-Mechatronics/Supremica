@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.55 2006-09-21 16:42:13 robi Exp $
+//# $Id: ModuleWindow.java,v 1.56 2006-09-25 03:55:30 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
 
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import java.awt.GridLayout;
 import java.awt.Dimension;
 import java.awt.Component;
@@ -817,9 +818,14 @@ public class ModuleWindow
         if (o instanceof SimpleComponentSubject) {
           SimpleComponentSubject scp = (SimpleComponentSubject) o;
           logEntry("Adding SimpleComponentSubject: " + scp.getName());
-          EditorWindow ed =
-            new EditorWindow(scp.getName() + " - Waters Editor", mModule,
-                             scp, this, this);
+          try {
+            EditorWindow ed =
+              new EditorWindow(scp.getName() + " - Waters Editor", mModule,
+                               scp, this, this);
+          } catch (GeometryAbsentException g) {
+            // this should never happen
+            g.printStackTrace();
+          }
         }
         //Add node to module tree
         ((ModuleTree) moduleSelectTree).addComponent(o);
@@ -970,6 +976,7 @@ public class ModuleWindow
   }
 
   public EditorWindowInterface showEditor(final SimpleComponentSubject comp)
+    throws GeometryAbsentException
   {
     return new EditorWindow(comp.getName(), mModule, comp, this, this);
   }

@@ -4,11 +4,16 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.79 2006-09-21 14:03:12 robi Exp $
+//# $Id: ControlledSurface.java,v 1.80 2006-09-25 03:55:30 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
 
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
+import java.awt.Point;
+import net.sourceforge.waters.model.module.GroupNodeProxy;
+import java.util.Random;
+import java.awt.Dimension;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -62,13 +67,13 @@ public class ControlledSurface
     extends EditorSurface
     implements Observer, ModelObserver
 {
-    
     //#########################################################################
     //# Constructor
     public ControlledSurface(GraphSubject graph,
         ModuleSubject module,
         EditorWindowInterface r,
         ControlledToolbar t)
+      throws GeometryAbsentException
     {
         super(graph, module, new SubjectShapeProducer(graph, module));
         graph.addModelObserver(this);
@@ -171,44 +176,37 @@ public class ControlledSurface
                 edge.getLabelBlock().setGeometry(offset);
             }
         }
-        for (NodeSubject node : graph.getNodesModifiable())
-        {
-            if (node instanceof SimpleNodeSubject)
-            {
-                SimpleNodeSubject n = (SimpleNodeSubject) node;
-                if (n.isInitial())
-                {
-                    if (n.getInitialArrowGeometry() == null)
-                    {
-                        n.setInitialArrowGeometry
-                            (new PointGeometrySubject(new Point(-5, -5)));
-                    }
-                }
-            }
-        }
-    }
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.subject.base.ModelObserver
+  public void modelChanged(ModelChangeEvent e)
+  {
+    //minimizeSize();
+    drawnAreaBounds = null;
+    Rectangle area = getDrawnAreaBounds();
+    /*setBounds(0, 0,//-((int)drawnAreaBounds.getMinX() - 5 * gridSize), 
+              //-((int)drawnAreaBounds.getMinY() - 5 * gridSize),
+              ((int)drawnAreaBounds.getWidth() + 10 * gridSize),
+              ((int)drawnAreaBounds.getHeight() + 10 * gridSize));*/
+    setPreferredSize(new Dimension((int)drawnAreaBounds.getWidth() + gridSize * 10,
+                     (int)drawnAreaBounds.getHeight() + gridSize * 10));
+    repaint();
+  }
+
+  
+  //#########################################################################
+  public void examineCollisions() {
     
-    
-    //#########################################################################
-    //# Interface net.sourceforge.waters.subject.base.ModelObserver
-    public void modelChanged(ModelChangeEvent e)
-    {
-        repaint();
-    }
-    
-    
-    //#########################################################################
-    public void examineCollisions()
-    {
-        
-    }
-    
-    public ModuleSubject getModule()
-    {
-        return (ModuleSubject) super.getModule();
-    }
-    
-    public List<ProxySubject> getObjectsAtPosition(int ex, int ey)
+  }
+  
+  public ModuleSubject getModule()
+  {
+    return (ModuleSubject) super.getModule();
+  }
+  
+  public List<ProxySubject> getObjectsAtPosition(int ex, int ey)
     {
         List<ProxySubject> objects = new ArrayList<ProxySubject>();
         for (NodeProxy node : getGraph().getNodes())
@@ -432,53 +430,44 @@ public class ControlledSurface
         }
     }
     
-    private void updateModel(MouseEvent e)
-    {
-        if (!draggingSource && !draggingTarget)
-        {
-            assert(mDummy != null);
-            Command move = new MoveObjects(mDummy.getChanged());
-            root.getUndoInterface().executeCommand(move);
+  private void updateModel(MouseEvent e)
+  {
+    if (!draggingSource && !draggingTarget) {
+      assert(mDummy != null);
+      Command move = new MoveObjects(mDummy.getChanged(), getGraph());
+      root.getUndoInterface().executeCommand(move);
+    } else {
+      EdgeSubject edge = (EdgeSubject) selectedObjects.get(0);
+      NodeSubject node =
+          (NodeSubject)getNodeOrNodeGroupAtPosition(e.getX(), e.getY());
+      Point2D p = e.getPoint();
+      if (node != null) {
+        if ((draggingSource && node != edge.getSource())
+            || (draggingTarget && node != edge.getTarget())) {
+          if (node instanceof SimpleNodeProxy) {
+            p = ((SimpleNodeProxy)node).getPointGeometry().getPoint();
+          } else {
+            p = GeometryTools.findIntersection(
+                 ((GroupNodeSubject)node).getGeometry().getRectangle(), p);
+          }
+          Command move = new MoveEdgeCommand(this, edge,
+                                             node, draggingSource,
+                                             (int)p.getX(), (int)p.getY());
+          root.getUndoInterface().executeCommand(move);
         }
-        else
-        {
-            EdgeSubject edge = (EdgeSubject) selectedObjects.get(0);
-            NodeSubject node =
-                (NodeSubject)getNodeOrNodeGroupAtPosition(e.getX(), e.getY());
-            Point2D p = e.getPoint();
-            if (node != null)
-            {
-                if ((draggingSource && node != edge.getSource())
-                || (draggingTarget && node != edge.getTarget()))
-                {
-                    if (node instanceof SimpleNodeProxy)
-                    {
-                        p = ((SimpleNodeProxy)node).getPointGeometry().getPoint();
-                    }
-                    else
-                    {
-                        p = GeometryTools.findIntersection(
-                            ((GroupNodeSubject)node).getGeometry().getRectangle(), p);
-                    }
-                    Command move = new MoveEdgeCommand(this, edge,
-                        node, draggingSource,
-                        (int)p.getX(), (int)p.getY());
-                    root.getUndoInterface().executeCommand(move);
-                }
-            }
-            mDontDraw.remove(edge);
-        }
-        if (mDummy != null)
-        {
-            mDummy.removeModelObserver(this);
-            mDummy = null;
-        }
-        mDummyShape = null;
-        draggingSource = false;
-        draggingTarget = false;
-        draggingInitial = false;
-        root.getUndoInterface().executeCommand(new UpdateErrorCommand(this));
+      }
+      mDontDraw.remove(edge);
     }
+    if (mDummy != null) {
+      mDummy.removeModelObserver(this);
+      mDummy = null;
+    }
+    mDummyShape = null;
+    draggingSource = false;
+    draggingTarget = false;
+    draggingInitial = false;
+    root.getUndoInterface().executeCommand(new UpdateErrorCommand(this));
+  }
     
     private void setObjectPosition(Subject s, int dx, int dy)
     {
@@ -2690,11 +2679,19 @@ public class ControlledSurface
         implements MouseMotionListener
     {
         public abstract int getHighlightPriority(ProxySubject s);
+        
+        public void mouseMoved(MouseEvent e)
+        {
+         
+          updateHighlighting(e.getPoint());
+        }
     }
-    
-    private class KeySpy
-        extends KeyAdapter
-    {
+  
+	
+  private class KeySpy
+    extends KeyAdapter
+  {	
+
         public void keyPressed(KeyEvent e)
         {
             //System.err.println(e.getKeyCode());
