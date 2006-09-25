@@ -41,6 +41,8 @@ public class SubjectShapeProducer
     boolean runEmbedder = false;
     Random rand = new Random();
     System.out.println("setGeo");
+    int nbrOfNodes = graph.getNodesModifiable().size();
+    int nodeNumber = 0;
     for (NodeSubject node : graph.getNodesModifiable()) {
       if (node instanceof SimpleNodeSubject) {
         SimpleNodeSubject n = (SimpleNodeSubject) node;
@@ -50,13 +52,22 @@ public class SubjectShapeProducer
               (new PointGeometrySubject(new Point(-5, -5)));
           }
         }
+
         if (n.getPointGeometry() == null) {
           System.out.println("setGeometry");
-          runEmbedder = true;
-          n.setPointGeometry(new PointGeometrySubject(new Point(rand.nextInt(1000),
-                                                                rand.nextInt(1000)))
-                                                               );
+	  n.setPointGeometry
+	    (new PointGeometrySubject
+	     (new Point2D.Double
+	      (200+150*Math.cos(Math.PI+Math.PI*2/nbrOfNodes*nodeNumber),
+	       200+150*Math.sin(Math.PI+Math.PI*2/nbrOfNodes*nodeNumber))));
+	  nodeNumber++;
+	  // runEmbedder = true;
+          // n.setPointGeometry(new PointGeometrySubject
+	  //		     (new Point(rand.nextInt(1000),
+	  //				rand.nextInt(1000)))
+	  //		     );
         }
+
         if (n.getLabelGeometry() == null) {
           n.setLabelGeometry(new LabelGeometrySubject(new Point(5, 5)));
         }
