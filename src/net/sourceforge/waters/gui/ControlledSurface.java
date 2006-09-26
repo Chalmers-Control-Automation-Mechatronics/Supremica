@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.82 2006-09-26 03:12:57 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.83 2006-09-26 03:30:11 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -1107,7 +1107,7 @@ public class ControlledSurface
         
         // Highlight things that are moved over...
         ProxySubject s = null;
-        if (mController.getHighlightPriority(object) >= 0)
+        if (mController.getHighlightPriority(object) >= 0 || mDND)
         {
             s = object;
         }
@@ -1214,6 +1214,7 @@ public class ControlledSurface
         //# Interface java.awt.dnd.DropTargetAdapter
         public void dragOver(final DropTargetDragEvent e)
         {
+            mDND = true;
             updateHighlighting(e.getLocation());
             Line2D.Double line = null;
             int operation = DnDConstants.ACTION_MOVE;
@@ -1325,11 +1326,13 @@ public class ControlledSurface
         
         public void dragExit(DropTargetEvent e)
         {
-            mDragOver = EditorSurface.DRAGOVERSTATUS.NOTDRAG;
+          mDND = false;
+          mDragOver = EditorSurface.DRAGOVERSTATUS.NOTDRAG;
         }
         
         public void drop(final DropTargetDropEvent e)
         {
+            mDND = false;
             mLine = null;
             try
             {
@@ -3073,6 +3076,7 @@ public class ControlledSurface
         EVENT;
     }
     
+    public static boolean mDND = false;
     /** is not being draggedOver*/
     public static final int NOTDRAG = 0;
     /** is being draggedOver and can drop data*/
