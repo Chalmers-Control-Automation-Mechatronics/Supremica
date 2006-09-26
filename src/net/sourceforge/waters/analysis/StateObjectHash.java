@@ -22,7 +22,6 @@ import java.io.Serializable;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Arrays;
 
 /**
  * An open addressed hashing implementation for Object types.
@@ -30,7 +29,7 @@ import java.util.Arrays;
  * Created: Sun Nov  4 08:56:06 2001
  *
  * @author Eric D. Friedman
- * @version $Id: StateObjectHash.java,v 1.2 2006-09-22 19:42:11 robi Exp $
+ * @version $Id: StateObjectHash.java,v 1.3 2006-09-26 05:41:50 yip1 Exp $
  */
 abstract public class StateObjectHash extends StateHash implements Serializable, StateObjectHashingStrategy {
     /** the set of Objects */
@@ -38,8 +37,6 @@ abstract public class StateObjectHash extends StateHash implements Serializable,
     
     /** the strategy used to hash objects in this collection. */
     protected StateObjectHashingStrategy _hashingStrategy;
-    
-    protected static final EncodedStateTuple REMOVED = new EncodedStateTuple(), FREE = new EncodedStateTuple();
 
     /**
      * Creates a new <code>StateObjectHash</code> instance with the
@@ -73,7 +70,6 @@ abstract public class StateObjectHash extends StateHash implements Serializable,
 
         capacity = super.setUp(initialCapacity);
         _set = new EncodedStateTuple[capacity];
-        Arrays.fill(_set, FREE);
         return capacity;
     }
 
@@ -81,6 +77,16 @@ abstract public class StateObjectHash extends StateHash implements Serializable,
         return _set.length;
     }
 
+    /**
+     * Searches the set for <tt>obj</tt>
+     *
+     * @param obj an <code>Object</code> value
+     * @return a <code>boolean</code> value
+     */
+    public boolean contains(EncodedStateTuple obj) {
+        return index(obj) >= 0;
+    }
+    
     /**
      * Return <tt>obj</tt> from the set
      *
@@ -96,6 +102,29 @@ abstract public class StateObjectHash extends StateHash implements Serializable,
 	
         return null;
     }
+
+    /**
+     * Finds a value from the set, if not exists, inserts a value into the set.
+     *
+     * @param obj an <code>Object</code> value
+     * @return null if the set was modified by the add operation, the found value if it is found.
+     */
+    public EncodedStateTuple getOrAdd(EncodedStateTuple obj) {
+	int i = index(obj);
+
+	if(i >= 0){
+	    return _set[i];
+	}
+	
+        i = insertionIndex(obj);
+
+        EncodedStateTuple old = _set[i];
+        _set[i] = obj;
+	
+        postInsertHook(old == null);
+        return null;            // yes, we added something
+    }
+
 
     /**
      * Locates the index of <tt>obj</tt>.
@@ -114,22 +143,22 @@ abstract public class StateObjectHash extends StateHash implements Serializable,
         index = hash % length;
         cur = set[index];
 
-        if (cur != FREE
-            && (cur == REMOVED || ! _hashingStrategy.equals(cur, obj))) {
+        if (cur != null
+            && (! _hashingStrategy.equals(cur, obj))) {
             // see Knuth, p. 529
             probe = 1 + (hash % (length - 2));
-
+	    
             do {
                 index -= probe;
                 if (index < 0) {
                     index += length;
                 }
                 cur = set[index];
-            } while (cur != FREE
-                     && (cur == REMOVED || ! _hashingStrategy.equals(cur, obj)));
+	    } while (cur != null
+                     && (! _hashingStrategy.equals(cur, obj)));
         }
 
-        return cur == FREE ? -1 : index;
+        return cur == null ? -1 : index;
     }
 
     /**
@@ -153,7 +182,7 @@ abstract public class StateObjectHash extends StateHash implements Serializable,
         index = hash % length;
         cur = set[index];
 
-        if (cur == FREE) {
+        if (cur == null) {
             return index;       // empty, all done
         } else if (_hashingStrategy.equals(cur, obj)) {
             return -index -1;   // already stored
@@ -172,48 +201,28 @@ abstract public class StateObjectHash extends StateHash implements Serializable,
             // is possible.
             // finding a matching value means that we've found that our desired
             // key is already in the table
-            if (cur != REMOVED) {
-                // starting at the natural offset, probe until we find an
-                // offset that isn't full.
-                do {
-                    index -= probe;
-                    if (index < 0) {
-                        index += length;
-                    }
-                    cur = set[index];
-                } while (cur != FREE
-                         && cur != REMOVED
-                         && ! _hashingStrategy.equals(cur, obj));
-            }
-
-            // if the index we found was removed: continue probing until we
-            // locate a free location or an element which equal()s the
-            // one we have.
-            if (cur == REMOVED) {
-                int firstRemoved = index;
-                while (cur != FREE
-                       && (cur == REMOVED || ! _hashingStrategy.equals(cur, obj))) {
-                    index -= probe;
-                    if (index < 0) {
-                        index += length;
-                    }
-                    cur = set[index];
-                }
-                return (cur != FREE
-                        && cur != REMOVED) ? -index -1 : firstRemoved;
-            }
+	    
+	    // starting at the natural offset, probe until we find an
+	    // offset that isn't full.
+	    do {
+		index -= probe;
+		if (index < 0) {
+		    index += length;
+		}
+		cur = set[index];
+	    } while (cur != null && ! _hashingStrategy.equals(cur, obj));
+	    
             // if it's full, the key is already stored
-            return (cur != FREE
-                    && cur != REMOVED) ? -index -1 : index;
-        }
+            return (cur != null) ? -index -1 : index;
+	}
     }
-
+    
     /**
      * This is the default implementation of StateObjectHashingStrategy:
      * it delegates hashing to the Object's hashCode method.
      *
-     * @param o the object for which the hashcode is to be computed.
-     * @return the hashCode.
+     * @param object for which the hashcode is to be computed
+     * @return the hashCode
      * @see Object#hashCode()
      */
     public final int computeHashCode(EncodedStateTuple o) {

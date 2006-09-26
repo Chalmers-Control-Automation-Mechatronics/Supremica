@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
@@ -34,7 +33,7 @@ import java.util.Set;
  * Created: Sat Nov  3 10:38:17 2001
  *
  * @author Eric D. Friedman
- * @version $Id: StateHashSet.java,v 1.1 2006-09-19 04:52:50 yip1 Exp $
+ * @version $Id: StateHashSet.java,v 1.2 2006-09-26 05:41:50 yip1 Exp $
  */
 
 public class StateHashSet extends StateObjectHash implements Serializable {
@@ -61,26 +60,6 @@ public class StateHashSet extends StateObjectHash implements Serializable {
     }
 
     /**
-     * Inserts a value into the set.
-     *
-     * @param obj an <code>Object</code> value
-     * @return true if the set was modified by the add operation
-     */
-    public boolean add(EncodedStateTuple obj) {
-        int index = insertionIndex(obj);
-
-        if (index < 0) {
-            return false;       // already present in set, nothing to add
-        }
-
-        EncodedStateTuple old = _set[index];
-        _set[index] = obj;
-
-        postInsertHook(old == FREE);
-        return true;            // yes, we added something
-    }
-
-    /**
      * Expands the set to accomodate new values.
      *
      * @param newCapacity an <code>int</code> value
@@ -90,10 +69,9 @@ public class StateHashSet extends StateObjectHash implements Serializable {
         EncodedStateTuple oldSet[] = _set;
 
         _set = new EncodedStateTuple[newCapacity];
-        Arrays.fill(_set, FREE);
 
         for (int i = oldCapacity; i-- > 0;) {
-            if(oldSet[i] != FREE && oldSet[i] != REMOVED) {
+            if(oldSet[i] != null) {
                 EncodedStateTuple o = oldSet[i];
                 int index = insertionIndex(o);
                 if (index < 0) { // everyone pays for this because some people can't RTFM

@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopChecker
 //###########################################################################
-//# $Id: ControlLoopChecker.java,v 1.12 2006-09-22 19:42:11 robi Exp $
+//# $Id: ControlLoopChecker.java,v 1.13 2006-09-26 05:41:50 yip1 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -65,7 +65,7 @@ public class ControlLoopChecker extends ModelChecker
     
     /** a map of state tuple in synchronized model */
     private StateHashSet mGlobalStateSet;
-    
+
     /** a list of unvisited state tuple. */
     private List<EncodedStateTuple> mUnvisitedList;
     
@@ -116,7 +116,7 @@ public class ControlLoopChecker extends ModelChecker
     /** an index of first automaton in each integer buffer */
     private int mIndexAutomata[];
 
-    
+
     //#########################################################################
     //# Constructor
     /**
@@ -253,11 +253,7 @@ public class ControlLoopChecker extends ModelChecker
 	    
 	    counter++;
 	}
-	
-	// initialise state tuple list
-	mGlobalStateSet = new StateHashSet(SIZE_BUFFER);
-	mUnvisitedList = new ArrayList<EncodedStateTuple>(SIZE_BUFFER);
-	
+
 	// create initial state tuple
 	mInitialStateTuple = new int[mNumAutomata];
 	int i = 0;
@@ -272,13 +268,19 @@ public class ControlLoopChecker extends ModelChecker
 	    }
 	    i++;
 	}
-	mEncodedInitialStateTuple = new EncodedStateTuple(encoding(mInitialStateTuple));
 
 	// set a buffer for storing current state tuple
 	mCurrTuple = new int[mNumAutomata];
 	
 	// set a buffer for storing next state tuple
 	mNextTuple = new int[mNumAutomata];
+
+	// set the initial state tuple
+	mEncodedInitialStateTuple = new EncodedStateTuple(encoding(mInitialStateTuple));
+
+	// initialise state tuple list
+	mGlobalStateSet = new StateHashSet(SIZE_BUFFER);
+	mUnvisitedList = new ArrayList<EncodedStateTuple>(SIZE_BUFFER);
     }
     
     
@@ -298,16 +300,15 @@ public class ControlLoopChecker extends ModelChecker
      */
     public boolean run()
     {
-        ///////////////////////////////////////////////////////////////////////////////
-        ///////////////// GETTING RUNTIME OF THE CONTROL LOOP CHECKER /////////////////
+	///////////////////////////////////////////////////////////////////////////////
+	// TEMP: getting the runtime of the control loop checker
         ///////////////////////////////////////////////////////////////////////////////
 	long startTime = System.currentTimeMillis();
 
 	boolean result = getResult();
 
         long endTime = System.currentTimeMillis();
-        System.out.println("    Total Time (in milliSeconds): " + (endTime - startTime));
-        ///////////////////////////////////////////////////////////////////////////////
+        System.out.println("\tTotal Time (in milliSeconds): " + (endTime - startTime));
         ///////////////////////////////////////////////////////////////////////////////
 	
 	return result;
@@ -324,14 +325,16 @@ public class ControlLoopChecker extends ModelChecker
      */
     public boolean getResult()
     {	
+	int counter = 0;
+
 	// insert initial state tuple to global state and state list
-	mGlobalStateSet.add(mEncodedInitialStateTuple);
+	mGlobalStateSet.getOrAdd(mEncodedInitialStateTuple);
 	mUnvisitedList.add(mEncodedInitialStateTuple);
 	
-	int counter = 0;
 	while(true){
 	    if(counter < mUnvisitedList.size()){
 	        mEncodedCurrTuple = mUnvisitedList.get(counter++);
+		
 	        if(mEncodedCurrTuple.getVisited() == false){
 		    visit(mEncodedCurrTuple);
 	        }
@@ -341,14 +344,19 @@ public class ControlLoopChecker extends ModelChecker
 	    }
 	}
 	
+	///////////////////////////////////////////////////////////////////////////////
+	// TEMP: display number of states visited
+	///////////////////////////////////////////////////////////////////////////////
+	System.out.println("\n\tNumber of states visited: " + mGlobalStateSet.size());
+        ///////////////////////////////////////////////////////////////////////////////
+
 	return mControlLoopFree;
     }
 
     /**
      * This method visits each state tuple in the synchronized product.
-     * If it tries to visit state tuple that has been visited before,
-     * it detects a loop.
-     * @param encodedCurrTuple the current state tuple.
+     * If it tries to visit state tuple that has been visited before, it detects a loop.
+     * @param state current state tuple property
      */
     public void visit(EncodedStateTuple encodedCurrTuple)
     {
@@ -361,14 +369,14 @@ public class ControlLoopChecker extends ModelChecker
 	    if(eventAvailable(currTuple, i, false)){
                 if(mGlobalEventMap[i]){ // CONTROLLABLE
 		    EncodedStateTuple encodedNextTuple = new EncodedStateTuple(encoding(mNextTuple));
-
-		    if(mGlobalStateSet.add(encodedNextTuple)){
+		    
+		    if(mGlobalStateSet.getOrAdd(encodedNextTuple) == null){
 			mUnvisitedList.add(encodedNextTuple);
 			visit(encodedNextTuple);
 			if(!mControlLoopFree){
 			    return;
 			}
-		    }		    
+		    }
 		    else{
 			encodedNextTuple = mGlobalStateSet.get(encodedNextTuple);
 			if(encodedNextTuple.getVisited() == false){
@@ -392,7 +400,7 @@ public class ControlLoopChecker extends ModelChecker
 		else{ // UNCONTROLLABLE
 		    final EncodedStateTuple encodedNextTuple = new EncodedStateTuple(encoding(mNextTuple));
 
-		    if(mGlobalStateSet.add(encodedNextTuple)){
+		    if(mGlobalStateSet.getOrAdd(encodedNextTuple) == null){
 			mUnvisitedList.add(encodedNextTuple);
 		    }
 		}
@@ -424,7 +432,7 @@ public class ControlLoopChecker extends ModelChecker
 	final String tracename = desname + ":has a control loop";
 	final List<EventProxy> tracelist = new LinkedList<EventProxy>();
 	
-	// return null;
+	//return null;
 	
 	/* FIND COUNTEREXAMPLE TRACE HERE */
 	/* Counterexample = The shortest path from mInitialStateTuple to mRootStateTuple 
@@ -704,8 +712,8 @@ public class ControlLoopChecker extends ModelChecker
 
     /**
      * It will take a single state tuple as a parameter and encode it.
-     * @param stateCodes the state tuple that will be encoded.
-     * @return encoded state tuple.
+     * @param stateTuple state tuple that will be encoded
+     * @return encoded state tuple
      */
     public int[] encoding(final int[] stateCodes)
     {
