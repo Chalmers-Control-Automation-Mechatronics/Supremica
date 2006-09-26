@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.81 2006-09-26 01:50:08 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.82 2006-09-26 03:12:57 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -2626,12 +2626,11 @@ public class ControlledSurface
                 ProxySubject o = mFocusedObject;
                 if (o instanceof SimpleNodeSubject)
                 {
-                    return;
+                  SimpleNodeSubject n = (SimpleNodeSubject) o;
+                  Command initial = new SetNodeInitialCommand(getGraph(), n);
+                  root.getUndoInterface().executeCommand(initial);
+                  repaint();
                 }
-                SimpleNodeSubject n = (SimpleNodeSubject) o;
-                Command initial = new SetNodeInitialCommand(getGraph(), n);
-                root.getUndoInterface().executeCommand(initial);
-                repaint();
             }
         }
         
