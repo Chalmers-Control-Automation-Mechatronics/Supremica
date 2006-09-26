@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.56 2006-09-25 03:55:30 siw4 Exp $
+//# $Id: ModuleWindow.java,v 1.57 2006-09-26 02:39:40 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -141,6 +141,7 @@ public class ModuleWindow
       final URI uri = wmodf.toURI();
       mModule = (ModuleSubject) unMarshaller.unmarshal(uri);
       clearList();
+      mChanged = false;
     } catch (final WatersUnmarshalException exception) {
       JOptionPane.showMessageDialog(this,
                                     "Error loading module file:" +
@@ -162,6 +163,7 @@ public class ModuleWindow
       final ProxyMarshaller<ModuleProxy> marshaller =
         getJAXBMarshaller();
       marshaller.marshal(mModule, wmodf);
+      mChanged = false;
     } catch (final WatersMarshalException exception) {
       JOptionPane.showMessageDialog(this,
                                     "Error saving module file:" +
@@ -723,6 +725,16 @@ public class ModuleWindow
 
     if (e.getSource() == FileOpenMenu)
       {
+        if (mChanged)
+        {
+          int yesNo = 
+            JOptionPane.showConfirmDialog(this,
+                                          "Do you want to save the module before loading?",
+                                          "Save before loading?",
+                                          JOptionPane.YES_NO_OPTION);
+          if (yesNo == JOptionPane.YES_OPTION)
+            saveAs();
+        }
         int returnVal = fileChooser.showOpenDialog(this);
 
         if (returnVal == JFileChooser.APPROVE_OPTION)
@@ -849,6 +861,7 @@ public class ModuleWindow
   {
     if (e.isSignificant())
       {
+        mChanged = true;
         mInsignificant.end();
         mUndoManager.addEdit(mInsignificant);
         mInsignificant = new CompoundEdit();
@@ -897,6 +910,7 @@ public class ModuleWindow
 
   public void redo() throws CannotRedoException
   {
+    mChanged = true;
     mInsignificant.end();
     mInsignificant.undo();
     mInsignificant = new CompoundEdit();
@@ -906,6 +920,7 @@ public class ModuleWindow
 
   public void undo() throws CannotUndoException
   {
+    mChanged = true;
     mInsignificant.end();
     mInsignificant.undo();
     mInsignificant = new CompoundEdit();
@@ -937,9 +952,7 @@ public class ModuleWindow
   public void windowClosed(WindowEvent e) {}
   public void windowClosing(WindowEvent e)
   {
-    // If modified, opt to save changes!
-    // "modified" does not work properly as of yet.
-    //if (modified)
+    if (mChanged)
     {
       int yesNo = JOptionPane.showConfirmDialog(this, "Do you want to save the module before exiting?", "Save before exit?", JOptionPane.YES_NO_OPTION);
       if (yesNo == JOptionPane.YES_OPTION)
@@ -1052,5 +1065,7 @@ public class ModuleWindow
   private CompoundEdit mInsignificant = new CompoundEdit();
 
   private static Languages WLang;
+  
+  private boolean mChanged = false;
 
 }

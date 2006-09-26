@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNodePopupMenu
 //###########################################################################
-//# $Id: EditorNodePopupMenu.java,v 1.17 2006-09-22 16:44:31 knut Exp $
+//# $Id: EditorNodePopupMenu.java,v 1.18 2006-09-26 02:39:40 siw4 Exp $
 //###########################################################################
 
 
@@ -20,6 +20,7 @@ import net.sourceforge.waters.gui.command.AddEventCommand;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.CreateEdgeCommand;
 import net.sourceforge.waters.gui.command.DeleteNodeCommand;
+import net.sourceforge.waters.gui.command.RecallLabelCommand;
 import net.sourceforge.waters.gui.command.RemoveEventCommand;
 import net.sourceforge.waters.gui.command.SetNodeInitialCommand;
 import net.sourceforge.waters.gui.command.ToggleNodeInitialCommand;
@@ -151,10 +152,8 @@ class EditorNodePopupMenu
 
         if (e.getSource() == recallItem)
         {
-            System.out.println("Re-Implement Later with Command");
-            /*final EditorLabel label = parent.getLabel(node);
-              label.setOffset(EditorLabel.DEFAULTOFFSETX,
-              EditorLabel.DEFAULTOFFSETY);*/
+            parent.getEditorInterface().getUndoInterface()
+                  .executeCommand(new RecallLabelCommand(node.getLabelGeometry()));
         }
 
         if (e.getSource() == markItem)
