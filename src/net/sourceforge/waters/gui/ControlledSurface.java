@@ -4,22 +4,24 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.80 2006-09-25 03:55:30 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.81 2006-09-26 01:50:08 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
 
-import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
-import java.awt.Point;
-import net.sourceforge.waters.model.module.GroupNodeProxy;
-import java.util.Random;
-import java.awt.Dimension;
+import net.sourceforge.waters.gui.renderer.EdgeProxyShape;
+import java.awt.geom.Line2D;
+import java.awt.geom.GeneralPath;
+import net.sourceforge.waters.gui.renderer.SimpleNodeProxyShape;
+import java.awt.geom.Arc2D;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.Dimension;
 import java.awt.dnd.*;
 import java.awt.event.*;
 import java.awt.geom.*;
+import java.awt.Point;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,18 +31,21 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
-import net.sourceforge.waters.gui.EditorSurface.DRAGOVERSTATUS;
+import javax.swing.event.DocumentListener;
 
 import net.sourceforge.waters.gui.command.*;
+import net.sourceforge.waters.gui.EditorSurface.DRAGOVERSTATUS;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.ToolbarChangedEvent;
 import net.sourceforge.waters.gui.renderer.GeneralShape;
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.renderer.GeometryTools;
 import net.sourceforge.waters.gui.renderer.Handle;
 import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
@@ -53,6 +58,7 @@ import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.*;
+import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
@@ -75,108 +81,26 @@ public class ControlledSurface
         ControlledToolbar t)
       throws GeometryAbsentException
     {
-        super(graph, module, new SubjectShapeProducer(graph, module));
-        graph.addModelObserver(this);
-        root = r;
-        mToolbar = t;
-        t.attach(this);
-        mController = new SelectListener();
-        addMouseListener(mController);
-        addMouseListener(new MouseAdapter()
-        {
-            public void mousePressed(MouseEvent e)
-            {
-                ControlledSurface.this.requestFocusInWindow();
-            }
-        });
-        addMouseMotionListener(mController);
-        addKeyListener(new KeySpy());
-        setFocusable(true);
-        dtListener = new DTListener();
-        dropTarget = new DropTarget(this, dtListener);
-        
-        int nbrOfNodes = graph.getNodesModifiable().size();
-        int nodeNumber = 0;
-        for (NodeSubject node : graph.getNodesModifiable())
-        {
-            if (node instanceof SimpleNodeSubject)
-            {
-                SimpleNodeSubject simpleNode = (SimpleNodeSubject) node;
-                
-                //System.out.println("Placed node " + simpleNode.getName());
-                
-                if (simpleNode.getPointGeometry() == null)
-                {
-                    simpleNode.setPointGeometry(new PointGeometrySubject(new Point2D.Double(
-                        200+150*Math.cos(Math.PI+Math.PI*2/nbrOfNodes*nodeNumber),
-                        200+150*Math.sin(Math.PI+Math.PI*2/nbrOfNodes*nodeNumber))));
-                    nodeNumber++;
-                }
-                
-                if (simpleNode.getLabelGeometry() == null)
-                {
-                    simpleNode.setLabelGeometry(new LabelGeometrySubject(new Point(
-                        LabelProxyShape.DEFAULTOFFSETX,
-                        LabelProxyShape.DEFAULTOFFSETY)));
-                }
-            }
-            else if (node instanceof GroupNodeSubject)
-            {
-                GroupNodeSubject groupNode = (GroupNodeSubject) node;
-                if (groupNode.getGeometry() == null)
-                {
-                    throw new IllegalArgumentException("Can not automatically generate geometry for GroupNodes.");
-                }
-            }
-        }
-        
-        for (EdgeSubject edge : graph.getEdgesModifiable())
-        {
-            if (edge.getGeometry() == null)
-            {
-                Point2D point = GeometryTools.getMidPoint(GeometryTools.getPosition(edge.getSource()),
-                    GeometryTools.getPosition(edge.getTarget()));
-                if (edge.getSource() == edge.getTarget())
-                {
-                    // Add offset to selfloops, otherwise the user can't see them...
-                    point.setLocation(point.getX()+32, point.getY()+32);
-                }
-                else
-                {
-                    // Add random offset (now edges are likely not to end up on top of other edges)
-                    // Not good, no geometry is supposed to mean "straight line"...
-                    //point.setLocation(point.getX()+Math.random()*32-16, point.getY()+Math.random()*32-16);                    
-                }
-                final Collection<Point2D> points =
-                    Collections.singleton(point);
-                edge.setGeometry(new SplineGeometrySubject(points,
-                    SplineKind.INTERPOLATING));
-            }
-            if (edge.getStartPoint() == null)
-            {
-                Point2D p1 = edge.getGeometry().getPoints().get(0);
-                PointGeometrySubject p =
-                    new PointGeometrySubject
-                    (GeometryTools.defaultPosition(edge.getSource(), p1));
-                edge.setStartPoint(p);
-            }
-            if (edge.getEndPoint() == null)
-            {
-                PointGeometrySubject p = new PointGeometrySubject(
-                    GeometryTools.defaultPosition(edge.getTarget(),
-                    edge.getGeometry().getPoints().get(0)));
-                edge.setEndPoint(p);
-            }
-            if (edge.getLabelBlock().getGeometry() == null)
-            {
-                LabelGeometrySubject offset =
-                    new LabelGeometrySubject
-                    (new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
-                    LabelBlockProxyShape.DEFAULTOFFSETY));
-                edge.getLabelBlock().setGeometry(offset);
-            }
-        }
-  }
+      super(graph, module, new SubjectShapeProducer(graph, module));
+      graph.addModelObserver(this);
+      root = r;
+      mToolbar = t;
+      t.attach(this);
+      mController = new SelectListener();
+      addMouseListener(mController);
+      addMouseListener(new MouseAdapter()
+      {
+          public void mousePressed(MouseEvent e)
+          {
+              ControlledSurface.this.requestFocusInWindow();
+          }
+      });
+      addMouseMotionListener(mController);
+      addKeyListener(new KeySpy());
+      setFocusable(true);
+      dtListener = new DTListener();
+      dropTarget = new DropTarget(this, dtListener);
+    }
 
 
   //#########################################################################
@@ -318,6 +242,39 @@ public class ControlledSurface
         return mError.contains(subject);
     }
     
+    private Shape edgeshape(Point2D p1, Point2D p2)
+    {
+      if (p1.equals(p2)) {
+        double ARCEXTENT = EdgeProxyShape.Tear.ARCEXTENT;
+        double TEARRATIO = EdgeProxyShape.Tear.TEARRATIO;
+        Point2D p = p1;
+        Point2D c = new Point((int)p1.getX() - 15, (int)p2.getY() - 15);
+        double dist = (double) Math.sqrt(Math.pow(c.getX() - p.getX(), 2) +
+                                         Math.pow(c.getY() - p.getY(), 2));
+        double r = (dist * (1 -TEARRATIO)) / 2;
+        double theta = Math.atan2(c.getY() - p.getY(), c.getX() - p.getX());
+        Rectangle2D rect = new Rectangle2D.Double(Math.cos(theta) * (dist - r) + p.getX() - r,
+                                                  Math.sin(theta) * (dist - r) + p.getY() - r,
+                                                  r * 2, r * 2);
+        Arc2D arc = new Arc2D.Double(rect, -(Math.toDegrees(theta) + ARCEXTENT/2),
+            ARCEXTENT, Arc2D.OPEN);
+        // different r for setting up where the handle is positioned
+        r = SimpleNodeProxyShape.RADIUS;
+        p1 = GeometryTools.getRadialPoint(arc.getStartPoint(), p, r);
+        p2 = GeometryTools.getRadialPoint(arc.getEndPoint(), p, r);
+        Line2D line1 = new Line2D.Double(p1, arc.getStartPoint());
+        Line2D line2 = new Line2D.Double(arc.getEndPoint(), p2);
+        GeneralPath curve = new GeneralPath(GeneralPath.WIND_NON_ZERO, 3);
+        curve.append(line1, false);
+        curve.append(arc , true);
+        curve.append(line2, true);
+        curve.closePath();
+        return curve;
+      } else {
+        return new Line2D.Double(p1, p2);
+      }
+    }
+    
     public List<MiscShape> getDrawnObjects()
     {
         List<MiscShape> shapes = new ArrayList<MiscShape>();
@@ -334,32 +291,52 @@ public class ControlledSurface
         if (hasDragged && (nodeIsSelected() || nodeGroupIsSelected())
         && getCommand() == Tool.EDGE)
         {
-            shapes.add(new GeneralShape(new Line2D.Double(new Point(dragStartX
-                , dragStartY),
-                new Point(dragNowX
-                , dragNowY))
-                , EditorColor.SELECTCOLOR
-                , null));
+          NodeSubject n1 = (NodeSubject) selectedObjects.get(0);
+          ProxySubject s = getObjectAtPosition(dragNowX, dragNowY);
+          Point2D p1 = GeometryTools.defaultPosition(n1, new Point(dragStartX,
+                                                                   dragStartY));
+          Point2D p2;
+          if (s instanceof NodeSubject) {
+            p2 = GeometryTools.defaultPosition((NodeProxy)s,
+                                               new Point(dragNowX, dragNowY));
+          } else {
+            p2 = new Point(dragNowX, dragNowY);
+          }
+          shapes.add(new GeneralShape(edgeshape(p1, p2)
+                                      , EditorColor.SELECTCOLOR
+                                      , null));
         }
         if (draggingTarget)
         {
             EdgeSubject edge = (EdgeSubject) selectedObjects.get(0);
-            shapes.add(new GeneralShape(new Line2D.Double(edge.getStartPoint()
-            .getPoint(),
-                new Point(dragNowX
-                , dragNowY))
-                , EditorColor.SELECTCOLOR
-                , null));
+            Point2D p1 = edge.getStartPoint().getPoint();
+            ProxySubject s = getObjectAtPosition(dragNowX, dragNowY);
+            Point2D p2;
+            if (s instanceof NodeSubject) {
+              p2 = GeometryTools.defaultPosition((NodeProxy)s,
+                                                 new Point(dragNowX, dragNowY));
+            } else {
+              p2 = new Point(dragNowX, dragNowY);
+            }
+            shapes.add(new GeneralShape(edgeshape(p1, p2)
+                                        , EditorColor.SELECTCOLOR
+                                        , null));
         }
         if (draggingSource)
         {
             EdgeSubject edge = (EdgeSubject) selectedObjects.get(0);
-            shapes.add(new GeneralShape(new Line2D.Double(edge.getEndPoint()
-            .getPoint(),
-                new Point(dragNowX
-                , dragNowY))
-                , EditorColor.SELECTCOLOR
-                , null));
+            Point2D p2 = edge.getEndPoint().getPoint();
+            ProxySubject s = getObjectAtPosition(dragNowX, dragNowY);
+            Point2D p1;
+            if (s instanceof NodeSubject) {
+              p1 = GeometryTools.defaultPosition((NodeProxy)s,
+                                                 new Point(dragNowX, dragNowY));
+            } else {
+              p1 = new Point(dragNowX, dragNowY);
+            }
+            shapes.add(new GeneralShape(edgeshape(p1, p2)
+                                        , EditorColor.SELECTCOLOR
+                                        , null));
         }
         if (mLine != null)
         {

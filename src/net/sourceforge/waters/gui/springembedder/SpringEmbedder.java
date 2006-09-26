@@ -91,9 +91,9 @@ public class SpringEmbedder
 		private final GraphProxy mGraph;
 		static public double EDGEATTRACTION = .005;
     static public double SPRINGCONSTANT = .005;
-		static public double REPULSIONCONST = 40;
-		static public double REPULSIONCONST2 = 10;
-		static public double EDGEREPULSE = 1;
+		static public double REPULSIONCONST = 400;
+		static public double REPULSIONCONST2 = 100;
+		static public double EDGEREPULSE = 10;
 		
 		private int nodes = 0;
 		private int edges = 0;

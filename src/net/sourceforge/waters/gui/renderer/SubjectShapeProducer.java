@@ -1,34 +1,32 @@
 package net.sourceforge.waters.gui.renderer;
 
-import net.sourceforge.waters.subject.module.GroupNodeSubject;
 import java.awt.geom.Point2D;
 import java.awt.Point;
-import net.sourceforge.waters.subject.module.EdgeSubject;
-import net.sourceforge.waters.subject.module.LabelGeometrySubject;
-import net.sourceforge.waters.xsd.module.SplineKind;
-import net.sourceforge.waters.subject.module.SplineGeometrySubject;
-import java.util.Collections;
 import java.util.Collection;
-import net.sourceforge.waters.subject.module.PointGeometrySubject;
-import net.sourceforge.waters.subject.module.SimpleNodeSubject;
+import java.util.Collections;
 import java.util.Random;
-import net.sourceforge.waters.subject.module.NodeSubject;
+
 import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
 import net.sourceforge.waters.model.base.Proxy;
-
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-
-import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
+import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.Subject;
-
-import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
+import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.GroupNodeSubject;
+import net.sourceforge.waters.subject.module.LabelGeometrySubject;
+import net.sourceforge.waters.subject.module.NodeSubject;
+import net.sourceforge.waters.subject.module.PointGeometrySubject;
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
+import net.sourceforge.waters.subject.module.SplineGeometrySubject;
+import net.sourceforge.waters.xsd.module.SplineKind;
 
 public class SubjectShapeProducer
 	extends ProxyShapeProducer
@@ -48,24 +46,18 @@ public class SubjectShapeProducer
         SimpleNodeSubject n = (SimpleNodeSubject) node;
         if (n.isInitial()) {
           if (n.getInitialArrowGeometry() == null) {
-            n.setInitialArrowGeometry
+              n.setInitialArrowGeometry
               (new PointGeometrySubject(new Point(-5, -5)));
           }
         }
 
         if (n.getPointGeometry() == null) {
           System.out.println("setGeometry");
-	  n.setPointGeometry
-	    (new PointGeometrySubject
-	     (new Point2D.Double
-	      (200+150*Math.cos(Math.PI+Math.PI*2/nbrOfNodes*nodeNumber),
-	       200+150*Math.sin(Math.PI+Math.PI*2/nbrOfNodes*nodeNumber))));
-	  nodeNumber++;
-	  // runEmbedder = true;
-          // n.setPointGeometry(new PointGeometrySubject
-	  //		     (new Point(rand.nextInt(1000),
-	  //				rand.nextInt(1000)))
-	  //		     );
+          runEmbedder = true;
+          n.setPointGeometry(new PointGeometrySubject(new Point2D.Double(
+              200+150*Math.cos(Math.PI+Math.PI*2/nbrOfNodes*nodeNumber),
+              200+150*Math.sin(Math.PI+Math.PI*2/nbrOfNodes*nodeNumber))));
+          nodeNumber++;
         }
 
         if (n.getLabelGeometry() == null) {
