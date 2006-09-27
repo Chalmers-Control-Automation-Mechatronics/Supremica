@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.83 2006-09-26 03:30:11 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.84 2006-09-27 03:13:44 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -1220,6 +1220,7 @@ public class ControlledSurface
             int operation = DnDConstants.ACTION_MOVE;
             mDragOver = EditorSurface.DRAGOVERSTATUS.NOTDRAG;
             ProxySubject s = null;
+            EventListExpressionSubject el = null;
             try
             {
                 final IdentifierWithKind i = (IdentifierWithKind)
@@ -1231,68 +1232,79 @@ public class ControlledSurface
                 {
                     if (s instanceof SimpleNodeSubject)
                     {
-                        operation = DnDConstants.ACTION_COPY;
+                      el = ((SimpleNodeSubject)s).getPropositions();
                     }
                     else if (s instanceof EdgeSubject)
                     {
-                        operation = DnDConstants.ACTION_COPY;
+                      el = ((EdgeSubject)s).getLabelBlock();
                     }
                     else if (s instanceof LabelBlockSubject)
                     {
-                        operation = DnDConstants.ACTION_COPY;
+                      el = (LabelBlockSubject)s;
                     }
                     else if (s instanceof LabelGeometrySubject)
                     {
-                        operation = DnDConstants.ACTION_COPY;
+                      el = ((SimpleNodeSubject)s.getParent()).getPropositions();
                     }
                 }
                 else if (ek.equals(EventKind.PROPOSITION))
                 {
                     if (s instanceof SimpleNodeSubject)
                     {
-                        operation = DnDConstants.ACTION_COPY;
+                      el = ((SimpleNodeSubject)s).getPropositions();
                     }
                     else if (s instanceof LabelGeometrySubject)
                     {
-                        operation = DnDConstants.ACTION_COPY;
+                      el = ((SimpleNodeSubject)s.getParent()).getPropositions();
                     }
                 }
                 else if (ek.equals(EventKind.CONTROLLABLE) ||
                     ek.equals(EventKind.UNCONTROLLABLE))
                 {
-                    if (s instanceof EdgeSubject)
-                    {
-                        operation = DnDConstants.ACTION_COPY;
-                    }
-                    else if (s instanceof LabelBlockSubject)
-                    {
-                        operation = DnDConstants.ACTION_COPY;
-                        LabelBlockSubject l = (LabelBlockSubject) s;
-                        Point2D p = e.getLocation();
-                        for (Proxy proxy : l.getEventList())
-                        {
-                            try
-                            {
-                                ProxyShape shape = getShapeProducer().getShape(proxy);
-                                Rectangle2D r = shape.getShape().getBounds();
-                                if (p.getY() < r.getCenterY())
-                                {
-                                    line = new Line2D.Double(r.getMinX(), r.getMinY(),
-                                        r.getMaxX(), r.getMinY());
-                                    break;
-                                }
-                                else
-                                {
-                                    line = new Line2D.Double(r.getMinX(), r.getMaxY(),
-                                        r.getMaxX(), r.getMaxY());
-                                }
-                            }
-                            catch (VisitorException v)
-                            {
-                                v.printStackTrace();
-                            }
+                  if (s instanceof EdgeSubject)
+                  {
+                      el = ((EdgeSubject)s).getLabelBlock();
+                  }
+                  else if (s instanceof LabelBlockSubject)
+                  {
+                    el = (LabelBlockSubject)s;
+                    LabelBlockSubject l = (LabelBlockSubject) s;
+                    Point2D p = e.getLocation();
+                    try {
+                      double x1 = getShapeProducer().getShape(l).getShape()
+                                                    .getBounds().getMinX();
+                      double x2 = getShapeProducer().getShape(l).getShape()
+                                                    .getBounds().getMaxX();
+                      for (Proxy proxy : l.getEventList()) {
+                        ProxyShape shape = getShapeProducer().getShape(proxy);
+                        Rectangle2D r = shape.getShape().getBounds();
+                        if (p.getY() < r.getCenterY()) {
+                          line = new Line2D.Double(x1, r.getMinY(),
+                                                   x2, r.getMinY());
+                          break;
+                        } else {
+                          line = new Line2D.Double(x1, r.getMaxY(),
+                                                   x2, r.getMaxY());
                         }
+                      }
+                    } catch (VisitorException v) {
+                      v.printStackTrace();
                     }
+                  }
+                }
+                if (el != null) {
+                  boolean present = false;
+                  for (Object o : el.getEventList()) {
+                    if (o.toString().equals(ip.toString())) {
+                      present = true;
+                      break;
+                    }
+                  }
+                  if (present) {
+                    line = null;
+                  } else {
+                    operation = DnDConstants.ACTION_COPY;
+                  }
                 }
             }
             catch (final UnsupportedFlavorException exception)
