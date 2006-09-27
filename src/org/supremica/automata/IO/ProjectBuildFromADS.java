@@ -192,6 +192,7 @@ public class ProjectBuildFromADS
 	private Project build(InputStream is)
 		throws Exception
 	{
+		//System.err.println("build");
 		InputStreamReader isReader = new InputStreamReader(is);
 		BufferedReader reader = new BufferedReader(isReader);
 		Project currProject = theProjectFactory.getProject();
@@ -209,6 +210,7 @@ public class ProjectBuildFromADS
 
 		while (currLine != null)
 		{
+			//System.err.println("reading: " + currLine);
 			boolean skip = false;
 
 			if (isComment(currLine))
@@ -318,10 +320,13 @@ public class ProjectBuildFromADS
 				}
 				else if (currParserState == STATE_READ_TRANSITIONS)
 				{
-					String sourceStateName = currToken;
-					String eventLabel = tokenizer.nextToken();
-					String destStateName = tokenizer.nextToken();
 
+					String sourceStateName = currToken;
+					//System.err.println("source: " + sourceStateName);
+					String eventLabel = tokenizer.nextToken();
+					//System.err.println("label: " + eventLabel);
+					String destStateName = tokenizer.nextToken();
+					//System.err.println("dest: " + destStateName);
 
 					if (sourceStateName == null)
 					{
@@ -369,7 +374,7 @@ public class ProjectBuildFromADS
 						{
 							currLabeledEvent.setControllable(true);
 						}
-						currAlphabet.add(currLabeledEvent);
+						currAlphabet.addEvent(currLabeledEvent);
 					}
 
 					State sourceState = currAutomaton.getStateWithName(String.valueOf(sourceStateNumber));
@@ -380,9 +385,11 @@ public class ProjectBuildFromADS
 				}
 
 			}
+			//System.err.println("readline");
 			currLine = reader.readLine();
 		}
 
+		//System.err.println("return project");
 
 		return currProject;
 	}

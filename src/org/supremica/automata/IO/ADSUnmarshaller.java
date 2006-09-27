@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   SupremicaUnmarshaller
 //###########################################################################
-//# $Id: ADSUnmarshaller.java,v 1.1 2006-09-27 18:09:05 knut Exp $
+//# $Id: ADSUnmarshaller.java,v 1.2 2006-09-27 19:44:17 knut Exp $
 //###########################################################################
 
 package org.supremica.automata.IO;
@@ -56,6 +56,7 @@ public class ADSUnmarshaller
         }
         catch (Exception ex)
         {
+			ex.printStackTrace();
             throw new WatersUnmarshalException(ex);
         }
         return mImporter.importModule(des);
