@@ -36,6 +36,7 @@ import org.supremica.Version;
 import org.supremica.automata.IO.HISCUnmarshaller;
 import org.supremica.automata.IO.SupremicaUnmarshaller;
 import org.supremica.automata.IO.UMDESUnmarshaller;
+import org.supremica.automata.IO.ADSUnmarshaller;
 import org.xml.sax.SAXException;
 
 public class IDE
@@ -61,6 +62,7 @@ public class IDE
     private final ProxyUnmarshaller<ModuleProxy> supremicaUnmarshaller;
     private final ProxyUnmarshaller<ModuleProxy> hiscUnmarshaller;
     private final ProxyUnmarshaller<ModuleProxy> umdesUnmarshaller;
+    private final ProxyUnmarshaller<ModuleProxy> adsUnmarshaller;
     private final DocumentManager documentManager;
 
     private Actions theActions;
@@ -103,6 +105,7 @@ public class IDE
         validUnmarshaller = new ValidUnmarshaller(mModuleFactory, optable);
         hiscUnmarshaller = new HISCUnmarshaller(mModuleFactory);
         umdesUnmarshaller = new UMDESUnmarshaller(mModuleFactory);
+        adsUnmarshaller = new ADSUnmarshaller(mModuleFactory);
         documentManager.registerMarshaller(mModuleMarshaller);
         // Add unmarshallers in the order of importance
         documentManager.registerUnmarshaller(mModuleMarshaller);
@@ -110,6 +113,7 @@ public class IDE
         documentManager.registerUnmarshaller(validUnmarshaller);
         documentManager.registerUnmarshaller(hiscUnmarshaller);
         documentManager.registerUnmarshaller(umdesUnmarshaller);
+        documentManager.registerUnmarshaller(adsUnmarshaller);
 
         theActions = new Actions(this);
 

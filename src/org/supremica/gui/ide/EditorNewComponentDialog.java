@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorNewDialog
 //###########################################################################
-//# $Id: EditorNewComponentDialog.java,v 1.13 2006-09-24 13:08:43 knut Exp $
+//# $Id: EditorNewComponentDialog.java,v 1.14 2006-09-27 18:09:05 knut Exp $
 //###########################################################################
 
 
@@ -90,13 +90,13 @@ public class EditorNewComponentDialog
 		b2.addActionListener(this);
 
 		Box kBox = new Box(BoxLayout.PAGE_AXIS);
-		JRadioButton k1 = new JRadioButton("Plant", true);
+		JRadioButton k1 = new JRadioButton("Plant", false);
 
 		k1.setActionCommand("Plant");
 		group.add(k1);
 		kBox.add(k1);
 
-		k1 = new JRadioButton("Specification");
+		k1 = new JRadioButton("Specification", true);
 
 		k1.setActionCommand("Specification");
 		group.add(k1);

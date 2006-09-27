@@ -89,9 +89,9 @@ public class MoveObjects
     EditorGraph.updateChildNodes(mGraph);
   }
 
-  /** 
+  /**
    * Undoes the Command
-   */    
+   */
 
   public void undo()
   {
@@ -108,7 +108,7 @@ public class MoveObjects
   {
     return mDescription;
   }
-  
+
   private class MoveSimpleNode
     implements Command
   {
@@ -118,7 +118,7 @@ public class MoveObjects
     private final PointGeometrySubject mOArrow;
     private final PointGeometrySubject mNArrow;
     private final MoveLabelGeometry mLabel;
-    
+
     public MoveSimpleNode(SimpleNodeSubject orig, SimpleNodeSubject dummy)
     {
       mNode = orig;
@@ -134,69 +134,69 @@ public class MoveObjects
       mLabel = new MoveLabelGeometry(orig.getLabelGeometry(),
                                      dummy.getLabelGeometry());
     }
-    
+
     public void execute()
     {
-      System.out.println("new pos:" + mNew.getPoint());
+      //System.out.println("new pos:" + mNew.getPoint());
       mNode.setPointGeometry(mNew);
       mNode.setInitialArrowGeometry(mNArrow);
       mLabel.execute();
     }
-    
+
     public void undo()
     {
       mNode.setPointGeometry(mOrig);
       mNode.setInitialArrowGeometry(mOArrow);
       mLabel.undo();
     }
-    
+
     public boolean isSignificant()
     {
       return true;
     }
-    
+
     public String getName()
     {
       return "Move Node";
     }
   }
-  
+
   private class MoveGroupNode
     implements Command
   {
     private final GroupNodeSubject mNode;
     private final BoxGeometrySubject mOrig;
     private final BoxGeometrySubject mNew;
-    
+
     public MoveGroupNode(GroupNodeSubject orig, GroupNodeSubject dummy)
     {
       mNode = orig;
       mOrig = mNode.getGeometry().clone();
       mNew = dummy.getGeometry().clone();
     }
-    
+
     public void execute()
     {
       mNode.setGeometry(mNew);
 
     }
-    
+
     public void undo()
     {
       mNode.setGeometry(mOrig);
     }
-    
+
     public boolean isSignificant()
     {
       return true;
     }
-    
+
     public String getName()
     {
       return "Move Node";
     }
   }
-  
+
   private class MoveEdge
     implements Command
   {
@@ -211,7 +211,7 @@ public class MoveObjects
     private final NodeSubject mNSour;
     private final NodeSubject mOTarg;
     private final NodeSubject mNTarg;*/
-    
+
     public MoveEdge(EdgeSubject orig, EdgeSubject dummy)
     {
       mEdge = orig;
@@ -246,7 +246,7 @@ public class MoveObjects
       mOTarg = orig.getTarget();
       mNTarg = dummy.getTarget();*/
     }
-    
+
     public void execute()
     {
       mEdge.setGeometry(mNew);
@@ -255,7 +255,7 @@ public class MoveObjects
       //mEdge.setSource(mNSour);
       //mEdge.setTarget(mNTarg);
     }
-    
+
     public void undo()
     {
       mEdge.setGeometry(mOrig);
@@ -264,82 +264,82 @@ public class MoveObjects
       //mEdge.setSource(mOSour);
       //mEdge.setTarget(mOTarg);
     }
-    
+
     public boolean isSignificant()
     {
       return true;
     }
-    
+
     public String getName()
     {
       return "Move Edge";
     }
   }
-  
+
   private class MoveLabelBlock
     implements Command
   {
     private final LabelBlockSubject mLabel;
     private final LabelGeometrySubject mOrig;
     private final LabelGeometrySubject mNew;
-    
+
     public MoveLabelBlock(LabelBlockSubject orig, LabelBlockSubject dummy)
     {
       mLabel = orig;
       mOrig = mLabel.getGeometry().clone();
       mNew = dummy.getGeometry().clone();
     }
-    
+
     public void execute()
     {
       mLabel.setGeometry(mNew);
     }
-    
+
     public void undo()
     {
       mLabel.setGeometry(mOrig);
     }
-    
+
     public boolean isSignificant()
     {
       return true;
     }
-    
+
     public String getName()
     {
       return "Move LabelBlock";
     }
   }
-  
+
   private class MoveLabelGeometry
     implements Command
   {
     private final LabelGeometrySubject mLabel;
     private final Point2D mOrig;
     private final Point2D mNew;
-    
+
     public MoveLabelGeometry(LabelGeometrySubject orig, LabelGeometrySubject dummy)
     {
       mLabel = orig;
       mOrig = mLabel.getOffset();
       mNew = dummy.getOffset();
     }
-    
+
     public void execute()
     {
       mLabel.setOffset(mNew);
     }
-    
+
     public void undo()
     {
       mLabel.setOffset(mOrig);
     }
-    
+
     public boolean isSignificant()
     {
       return true;
     }
-    
+
     public String getName()
     {
       return "Move Label";
