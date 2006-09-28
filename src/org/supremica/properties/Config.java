@@ -82,13 +82,13 @@ public final class Config
     //   ALGORITHMS_BDD
     //   ALGORITHMS_HMI
     //   MISC
-    
+
     // GENERAL_COMM_XMLRPC
     public static final BooleanProperty XML_RPC_ACTIVE = new BooleanProperty(PropertyType.GENERAL_COMM_XMLRPC, "xmlRpcActive", false, "XML-RPC Active");
     public static final IntegerProperty XML_RPC_PORT = new IntegerProperty(PropertyType.GENERAL_COMM_XMLRPC, "xmlRpcPort", 9112, "XML-RPC Port", false, 0);
     public static final StringProperty XML_RPC_FILTER = new StringProperty(PropertyType.GENERAL_COMM_XMLRPC, "xmlRpcFilter", "127.0.0.1", "XML-RPC Filter");
     public static final BooleanProperty XML_RPC_DEBUG = new BooleanProperty(PropertyType.GENERAL_COMM_XMLRPC, "xmlRpcDebug", false, "XML-RPC Debug");
-    
+
     // GUI_DOT
     public static final BooleanProperty DOT_USE = new BooleanProperty(PropertyType.GUI_DOT, "dotUse", true, "Use Dot");
     public static final StringProperty DOT_EXECUTE_COMMAND = new StringProperty(PropertyType.GUI_DOT, "dotExecuteCommand", "dot", "Dot command");
@@ -101,7 +101,7 @@ public final class Config
     public static final BooleanProperty DOT_USE_ARC_COLORS = new BooleanProperty(PropertyType.GUI_DOT, "dotUseArcColors", false, "Use colors for arcs");
     public static final BooleanProperty DOT_USE_MULTI_LABELS = new BooleanProperty(PropertyType.GUI_DOT, "dotUseMultiLabels", true, "Draw multiple labels on one arc");
     public static final BooleanProperty DOT_AUTOMATIC_UPDATE = new BooleanProperty(PropertyType.GUI_DOT, "dotAutomaticUpdate", true, "Do automatic update of the layout");
-    
+
     // GENERAL
     /**
      * Possible values for look and feel
@@ -118,14 +118,14 @@ public final class Config
     public static final StringProperty GENERAL_STATELABEL_SEPARATOR  = new StringProperty(PropertyType.GENERAL, "generalStateLabelSeparator", ",", "State label separator character");
     public static final BooleanProperty GENERAL_USE_SECURITY = new BooleanProperty(PropertyType.GENERAL, "generalUseSecurity", false, "Use file security");
     public static final BooleanProperty GENERAL_STUDENT_VERSION = new BooleanProperty(PropertyType.GENERAL, "generalStudentVersion", false, "Student version (needs restart)");
-    
+
     // GENERAL_LOG
     public static final BooleanProperty LOG_TO_CONSOLE = new BooleanProperty(PropertyType.GENERAL_LOG, "logToConsole", false, "Log to Console");
     public static final BooleanProperty LOG_TO_GUI = new BooleanProperty(PropertyType.GENERAL_LOG, "logToGUI", false, "Log to Graphical User Interface");
     public static final BooleanProperty GENERAL_REDIRECT_STDOUT = new BooleanProperty(PropertyType.GENERAL_LOG, "generalRedirectStdout", true, "Redirect stdout");
     public static final BooleanProperty GENERAL_REDIRECT_STDERR = new BooleanProperty(PropertyType.GENERAL_LOG, "generalRedirectStderr", true, "Redirect stderr");
     public static final BooleanProperty VERBOSE_MODE = new BooleanProperty(PropertyType.GENERAL_LOG, "verboseMode", false, "Verbose mode");
-    
+
     // GENERAL_FILE
     public static final StringProperty FILE_OPEN_PATH = new StringProperty(PropertyType.GENERAL_FILE, "fileOpenPath", LocalSystem.getHomeDirectory(), "Default file open path");
     public static final StringProperty FILE_SAVE_PATH = new StringProperty(PropertyType.GENERAL_FILE, "fileSavePath", LocalSystem.getHomeDirectory(), "Default file save path");
@@ -134,27 +134,30 @@ public final class Config
     public static final BooleanProperty FILE_ALLOW_IMPORT = new BooleanProperty(PropertyType.GENERAL_FILE, "fileAllowImport", true, "Allow user to import file");
     public static final BooleanProperty FILE_ALLOW_EXPORT = new BooleanProperty(PropertyType.GENERAL_FILE, "fileAllowExport", true, "Allow user to export file");
     public static final BooleanProperty FILE_ALLOW_QUIT = new BooleanProperty(PropertyType.GENERAL_FILE, "fileAllowQuit", true, "Allow user to quit Supremica");
-    
+
     // GENERAL_SOFTPLC
     public static final BooleanProperty INCLUDE_SOFTPLC = new BooleanProperty(PropertyType.GENERAL_SOFTPLC, "includeSoftPLC", false, "Include soft PLC");
     public static final IntegerProperty SOFTPLC_CYCLE_TIME = new IntegerProperty(PropertyType.GENERAL_SOFTPLC, "softplcCycleTime", 40, "SoftPLC Cycle time (ms)", false, 1);
     public static final StringProperty SOFTPLC_INTERFACES = new StringProperty(PropertyType.GENERAL_SOFTPLC, "softplcInterfaces", "org.supremica.softplc.Simulator.BTSim", "Default interface");
-    
+
     // GUI
     public static final BooleanProperty INCLUDE_JGRAFCHART = new BooleanProperty(PropertyType.GUI, "includeJGrafchart", false, "Include JGrafchart");
     public static final BooleanProperty INCLUDE_SHOE_FACTORY = new BooleanProperty(PropertyType.GUI, "includeShoeFactory", false, "Include Shoe factory simulation");
-    
+
+    // GUI_EDITOR
+    public static final BooleanProperty GUI_EDITOR_USE_SPRING_EMBEDDER = new BooleanProperty(PropertyType.GUI_EDITOR, "useSpringEmbedder", false, "Use spring embedder for automatic graph layout");
+
     // GUI_ANALYZER
     public static final BooleanProperty INCLUDE_BOUNDED_UNCON_TOOLS = new BooleanProperty(PropertyType.GUI_ANALYZER, "includeBoundedUnconTools", false, "Include unbounded controllability tools");
-    
+
     // GUI_SIMULATOR
     public static final BooleanProperty INCLUDE_ANIMATOR = new BooleanProperty(PropertyType.GUI_SIMULATOR, "includeAnimator", false, "Include 2D Graphical Animator");
     public static final BooleanProperty SIMULATION_IS_EXTERNAL = new BooleanProperty(PropertyType.GUI_SIMULATOR, "simulationIsExternal", false, "External simulation process");
     public static final IntegerProperty SIMULATION_CYCLE_TIME = new IntegerProperty(PropertyType.GUI_SIMULATOR, "simulationCycleTime", 100, "Simulator Cycle time (ms)", false, 0);
-    
+
     // ALGORITHMS
     public static final BooleanProperty INCLUDE_EXPERIMENTAL_ALGORITHMS = new BooleanProperty(PropertyType.ALGORITHMS, "includeExperimentalAlgorithms", false, "Include experimental algorithms");
-    
+
     // ALGORITHMS_SYNC
     public static final BooleanProperty SYNC_FORBID_UNCON_STATES = new BooleanProperty(PropertyType.ALGORITHMS_SYNC, "syncForbidUncontrollableStates", true, "Forbid uncontrollable states when synchronizing");
     public static final BooleanProperty SYNC_EXPAND_FORBIDDEN_STATES = new BooleanProperty(PropertyType.ALGORITHMS_SYNC, "syncExpandUncontrollableStates", true, "Expand forbidden states when synchronizing");
@@ -162,7 +165,7 @@ public final class Config
     public static final BooleanProperty SYNC_EXPAND_HASHTABLE = new BooleanProperty(PropertyType.ALGORITHMS_SYNC, "syncExpandHashtable", true, "Expand hashtable");
     public static final IntegerProperty SYNC_NBR_OF_EXECUTERS = new IntegerProperty(PropertyType.ALGORITHMS_SYNC, "synchNbrOfExecuters", 1, "Number of synchronization threads", false, 1);
     public static final StringProperty SYNC_AUTOMATON_NAME_SEPARATOR = new StringProperty(PropertyType.ALGORITHMS_SYNC, "synchAutomatonNameSeparator", "||", "Automata name separator");
-    
+
     // ALGORITHMS_VERIFICATION
     public static final StringProperty VERIFY_VERIFICATION_TYPE = new StringProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyVerificationType", VerificationType.CONTROLLABILITY, "Default verificaton type", VerificationType.values());
     public static final StringProperty VERIFY_ALGORITHM_TYPE  = new StringProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyAlgorithmType", VerificationAlgorithm.MODULAR, "Default verificaton algorithm", VerificationAlgorithm.values());
@@ -172,7 +175,7 @@ public final class Config
     public static final BooleanProperty VERIFY_SKIP_UNCONTROLLABILITY_CHECK = new BooleanProperty(PropertyType.ALGORITHMS_VERIFICATION, "skipUncontrollabilityCheck", false, "Skip uncontrollability check");
     public static final IntegerProperty VERIFY_NBR_OF_ATTEMPTS = new IntegerProperty(PropertyType.ALGORITHMS_VERIFICATION, "nbrOfAttempts", 5, "Number of attempts", false, 1);
     public static final BooleanProperty VERIFY_SHOW_BAD_TRACE = new BooleanProperty(PropertyType.ALGORITHMS_VERIFICATION, "showBadTrace", false, "Show trace to bad state");
-    
+
     // ALGORITHMS_SYNTHESIS
     public static final StringProperty SYNTHESIS_SYNTHESIS_TYPE = new StringProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisSynthesisType", SynthesisType.NONBLOCKINGCONTROLLABLE, "Default synthesis type", SynthesisType.values());
     public static final StringProperty SYNTHESIS_ALGORITHM_TYPE  = new StringProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisAlgorithmType", SynthesisAlgorithm.MONOLITHIC, "Default synthesis algorithm", SynthesisAlgorithm.values());
@@ -181,7 +184,7 @@ public final class Config
     public static final BooleanProperty SYNTHESIS_MAXIMALLY_PERMISSIVE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisMaximallyPermissive", true, "Synthesize a maximally permissive supervisor");
     public static final BooleanProperty SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisMaximallyPermissiveIncremental", true, "Use incremental algorithm when synthesizing");
     public static final BooleanProperty SYNTHESIS_REDUCE_SUPERVISORS = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisReduceSupervisors", false, "Try to minimize supervisors");
-    
+
     // ALGORITHMS_MINIMIZATION
     public static final StringProperty MINIMIZATION_EQUIVALENCE_RELATION = new StringProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationEquivalenceRelation", EquivalenceRelation.LANGUAGEEQUIVALENCE.toString(), "Default equivalence relation", EquivalenceRelation.values());
     public static final BooleanProperty MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS = new BooleanProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationAlsoMinimizeTransitions", true, "Minimize the number of transitions");
@@ -192,7 +195,7 @@ public final class Config
     public static final StringProperty MINIMIZATION_SILENT_EVENT_NAME = new StringProperty(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentEventName", "tau", "Silent event name");
     public static final StringProperty MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME = new StringProperty(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentControllableEventName", "tau_c", "Silent controllable event name");
     public static final StringProperty MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME = new StringProperty(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentUnontrollableEventName", "tau_u", "Silent uncontrollable event name");
-    
+
     // ALGORITHMS_BDD
     // Most of the IntegerProperty:s here should be StringProperty:s with appropriate legal values...
     public static final IntegerProperty BDD_ALGORITHM = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddAlgorithm", Options.algo_family, "Algorithm");
@@ -223,19 +226,19 @@ public final class Config
     public static final IntegerProperty BDD_TRANSITION_OPTIMIZER_ALGO = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddTransitionOptimizerAlgo", Options.transition_optimizer_algo, "Transition optimizer algorithm");
     public static final BooleanProperty BDD_INTERLEAVED_VARIABLES = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddInterleavedVariables", Options.interleaved_variables, "Interleaved or seperated variable orders");
     public static final BooleanProperty BDD_LEVEL_GRAPHS = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddLevelGraphs", Options.show_level_graph, "Shows the fillness of the workset sent to H1");
-    
+
     // ALGORITHMS_HMI
     public static final BooleanProperty INCLUDE_USERINTERFACE = new BooleanProperty(PropertyType.ALGORITHMS_HMI, "includeUserInterface", false, "Include SwiXML analyzer tools");
-    
+
     private static Config instance = null;
-    
+
     /**
      * This class should only be instantiated to guarantee that it is loaded.
      */
     private Config()
     {
     }
-    
+
     public static Config getInstance()
     {
         if (instance == null)

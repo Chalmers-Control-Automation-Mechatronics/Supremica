@@ -28,17 +28,22 @@ import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.subject.module.SplineGeometrySubject;
 import net.sourceforge.waters.xsd.module.SplineKind;
 
+import org.supremica.log.*;
+import org.supremica.properties.Config;
+
 public class SubjectShapeProducer
 	extends ProxyShapeProducer
 	implements ModelObserver
 {
+    private static Logger logger = LoggerFactory.createLogger(SubjectShapeProducer.class);
+
 	public SubjectShapeProducer(GraphSubject graph, ModuleProxy module)
     throws GeometryAbsentException
 	{
 		super(module);
-    boolean runEmbedder = false;
+    boolean runEmbedder = Config.GUI_EDITOR_USE_SPRING_EMBEDDER.isTrue();
     Random rand = new Random();
-    System.out.println("setGeo");
+    logger.debug("setGeo");
     for (NodeSubject node : graph.getNodesModifiable()) {
       if (node instanceof SimpleNodeSubject) {
         SimpleNodeSubject n = (SimpleNodeSubject) node;
@@ -50,8 +55,8 @@ public class SubjectShapeProducer
         }
 
         if (n.getPointGeometry() == null) {
-          System.out.println("setGeometry");
-          runEmbedder = true;
+		  logger.debug("setGeometry");
+          runEmbedder = Config.GUI_EDITOR_USE_SPRING_EMBEDDER.isTrue();
           n.setPointGeometry(new PointGeometrySubject
 			     (new Point(100 + rand.nextInt(500),
 					100 + rand.nextInt(500))));
@@ -103,35 +108,35 @@ public class SubjectShapeProducer
     }
 		graph.addModelObserver(this);
 	}
-  
+
   public SubjectShapeProducer(Subject graph, ModuleProxy module)
   {
     super(module);
     graph.addModelObserver(this);
   }
-	
+
 	private void removeMapping(NodeProxy node)
 	{
 		getMap().remove(node);
 		removeMapping(node.getName());
 	}
-	
+
 	private void removeMapping(GroupNodeProxy node)
 	{
 		getMap().remove(node);
 	}
-	
+
 	private void removeMapping(String label)
 	{
 		getMap().remove(label);
 	}
-	
+
 	private void removeMapping(EdgeProxy edge)
 	{
 		getMap().remove(edge);
 		removeMapping(edge.getLabelBlock());
 	}
-	
+
 	private void removeMapping(LabelBlockProxy label)
 	{
 		getMap().remove(label);
@@ -140,7 +145,7 @@ public class SubjectShapeProducer
 			getMap().remove(p);
 		}
 	}
-	
+
 	private void removeMapping(Subject subject)
 	{
 		if (subject instanceof SimpleNodeProxy)
@@ -160,12 +165,12 @@ public class SubjectShapeProducer
 			removeMapping((LabelBlockProxy)subject);
 		}
 	}
-	
+
 	public void modelChanged(ModelChangeEvent event)
 	{
-		if (event.getKind() == ModelChangeEvent.ITEM_REMOVED || 
+		if (event.getKind() == ModelChangeEvent.ITEM_REMOVED ||
         event.getKind() == ModelChangeEvent.ITEM_ADDED)
-		{			
+		{
 			if (event.getSource().getParent() instanceof EventListExpressionSubject)
 			{
 				Subject subject = event.getSource().getParent();
