@@ -31,17 +31,19 @@ import net.sourceforge.waters.xsd.module.SplineKind;
 import org.supremica.log.*;
 import org.supremica.properties.Config;
 
+
 public class SubjectShapeProducer
 	extends ProxyShapeProducer
 	implements ModelObserver
 {
-    private static Logger logger = LoggerFactory.createLogger(SubjectShapeProducer.class);
+  private static final Logger logger =
+    LoggerFactory.createLogger(SubjectShapeProducer.class);
 
-	public SubjectShapeProducer(GraphSubject graph, ModuleProxy module)
+  public SubjectShapeProducer(GraphSubject graph, ModuleProxy module)
     throws GeometryAbsentException
-	{
-		super(module);
-    boolean runEmbedder = Config.GUI_EDITOR_USE_SPRING_EMBEDDER.isTrue();
+  {
+    super(module);
+    boolean runEmbedder = false;
     Random rand = new Random();
     logger.debug("setGeo");
     for (NodeSubject node : graph.getNodesModifiable()) {
@@ -55,7 +57,7 @@ public class SubjectShapeProducer
         }
 
         if (n.getPointGeometry() == null) {
-		  logger.debug("setGeometry");
+	  logger.debug("setGeometry");
           runEmbedder = Config.GUI_EDITOR_USE_SPRING_EMBEDDER.isTrue();
           n.setPointGeometry(new PointGeometrySubject
 			     (new Point(100 + rand.nextInt(500),
@@ -66,7 +68,7 @@ public class SubjectShapeProducer
         }
       } else if (node instanceof GroupNodeSubject) {
         if (((GroupNodeSubject)node).getGeometry() == null) {
-          throw new GeometryAbsentException("Their is no geometry information"
+          throw new GeometryAbsentException("There is no geometry information"
                                             + " for a group node in this graph");
         }
       }

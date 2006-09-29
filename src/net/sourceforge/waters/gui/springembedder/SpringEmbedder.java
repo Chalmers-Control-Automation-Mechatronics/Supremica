@@ -1,338 +1,357 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.gui.springembedder
+//# CLASS:   SpringEmbedder
+//###########################################################################
+//# $Id: SpringEmbedder.java,v 1.3 2006-09-29 13:35:21 robi Exp $
+//###########################################################################
+
+
 package net.sourceforge.waters.gui.springembedder;
 
-import java.util.TimerTask;
-import javax.swing.WindowConstants;
-import java.util.Timer;
-import javax.swing.JLabel;
-import javax.swing.JFrame;
-import net.sourceforge.waters.subject.module.GraphSubject;
-import net.sourceforge.waters.subject.module.EdgeSubject;
-import net.sourceforge.waters.subject.module.SimpleNodeSubject;
-import net.sourceforge.waters.model.module.GroupNodeProxy;
-import java.util.Random;
-import net.sourceforge.waters.model.base.Proxy;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.IdentityHashMap;
+import java.util.HashMap;
 import java.util.Map;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
-import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.model.module.GraphProxy;
-import net.sourceforge.waters.model.module.NodeProxy;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import java.util.Random;
+import javax.swing.SwingUtilities;
+
+import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.NodeSubject;
+import net.sourceforge.waters.subject.module.PointGeometrySubject;
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
+import net.sourceforge.waters.subject.module.SplineGeometrySubject;
+
 
 public class SpringEmbedder
   implements Runnable
 {
-  private final GraphSubject mGraph;
-  
+
+  //#########################################################################
+  //# Constructors
   public SpringEmbedder(GraphSubject graph)
   {
-    mGraph = graph;
+    this(graph, 228424);
   }
-  
-  public void run()
-	{
-    TimeFrame time = new TimeFrame(30000);
-		Collection<NodeWrapper> nodes = new ArrayList<NodeWrapper>();
-    Collection<EdgeWrapper> edges = new ArrayList<EdgeWrapper>();
-    for (NodeProxy node : mGraph.getNodes()) {
+
+  public SpringEmbedder(GraphSubject graph, final int seed)
+  {
+    mRandom = new Random(seed);
+    mGraph = graph;
+    final Collection<NodeSubject> nodes = graph.getNodesModifiable();
+    mNodeMap = new HashMap<SimpleNodeSubject,NodeWrapper>(nodes.size());
+    final Collection<EdgeSubject> edges = graph.getEdgesModifiable();
+    mEdgeMap = new HashMap<EdgeSubject,EdgeWrapper>(edges.size());
+    for (final NodeSubject node : nodes) {
       if (node instanceof SimpleNodeSubject) {
-        SimpleNodeSubject n = (SimpleNodeSubject) node;
-        nodes.add(new NodeWrapper(n));
+        final SimpleNodeSubject simple = (SimpleNodeSubject) node;
+        final NodeWrapper wrapper = new NodeWrapper(simple);
+        mNodeMap.put(simple, wrapper);
+      } else {
+        throw new IllegalArgumentException
+          ("SpringEmbedder does not support nodes of type " +
+           node.getClass().getName() + "!");
       }
     }
-    for (EdgeSubject edge : mGraph.getEdgesModifiable()) {
-      edges.add(new EdgeWrapper(edge));
-    }
-		//proxyies.addAll(g.getEdges());
-		try
-		{
-			DisplacementCalculator d = new DisplacementCalculator(mGraph);
-			while(true) {
-				for (NodeWrapper node : nodes) {
-					node.setPoint((Point2D)node.getSubject().acceptVisitor(d));
-				}
-        for (EdgeWrapper edge : edges) {
-					edge.setPoint((Point2D)edge.getSubject().acceptVisitor(d));
-				}
-        double max = Double.NEGATIVE_INFINITY;
-        for (NodeWrapper node : nodes) {
-					double tmp = node.update();
-          if (tmp > max) {
-            max = tmp;
-          }
-				}
-        for (EdgeWrapper edge : edges) {
-					double tmp = edge.update();
-          if (tmp > max) {
-            max = tmp;
-          }
-				}
-        System.out.println(max);
-				if (max < .01 || !time.isVisible())
-				{
-					break;
-				}
-        Thread.yield();
-			}
-		}
-		catch (Throwable t)
-		{
-			t.printStackTrace();
-		}
-    time.setVisible(false);
-	}
-	
-	static private class DisplacementCalculator
-			extends AbstractModuleProxyVisitor
-	{
-		private final GraphProxy mGraph;
-		static public double EDGEATTRACTION = .005;
-    static public double SPRINGCONSTANT = .005;
-		static public double REPULSIONCONST = 400;
-		static public double REPULSIONCONST2 = 100;
-		static public double EDGEREPULSE = 10;
-		
-		private int nodes = 0;
-		private int edges = 0;
-		
-		public DisplacementCalculator(final GraphProxy graph)
-		{			
-			mGraph = graph;
-		}
-		
-		private Point2D repulsion(Point2D p1, Point2D p2, double constant)
-		{
-			double dx = p1.getX() - p2.getX();
-			double dy = p1.getY() - p2.getY();
-			double len = dx * dx + dy * dy;	
-			if (len != 0)
-			{
-				return new Point2D.Double((dx / len) * constant,
-										  (dy / len) * constant);
-			}
-			else
-			{			
-				Random rand = new Random();				
-				return new Point2D.Double(rand.nextDouble(), rand.nextDouble());
-			}
-		}		
-		
-		private Point2D attraction(Point2D p1, Point2D p2, double constant)
-		{
-			double dx = p1.getX() - p2.getX();
-			double dy = p1.getY() - p2.getY();
-			return new Point2D.Double(-dx*constant, -dy*constant);
-		}
-		
-		public Object visitSimpleNodeProxy(final SimpleNodeProxy node)
-		{
-			nodes++;
-			double dx = 0;
-			double dy = 0;
-      Point2D pos = node.getPointGeometry().getPoint();
-			for (NodeProxy n : mGraph.getNodes())
-			{
-				if (n instanceof SimpleNodeProxy && n != node)
-				{
-					SimpleNodeProxy node2 = (SimpleNodeProxy)n;
-          Point2D pos2 = node2.getPointGeometry().getPoint();
-					Point2D p = repulsion(pos,
-                                pos2,
-                                REPULSIONCONST);
-					dx += p.getX();
-					dy += p.getY();
-				}
-			}
-			for (EdgeProxy e : mGraph.getEdges())
-			{
-				NodeProxy n = null;
-				if (node == e.getSource())
-				{
-					n = e.getTarget();
-				}
-				else if(node == e.getTarget())
-				{
-					n = e.getSource();
-				}
-				if (n instanceof SimpleNodeProxy)
-				{
-					SimpleNodeProxy node2 = (SimpleNodeProxy)n;
-          Point2D pos2 = node2.getPointGeometry().getPoint();
-					Point2D p = attraction(pos,
-                                 pos2,
-                                 SPRINGCONSTANT);
-					dx += p.getX();
-					dy += p.getY();
-				}
-			}
-      System.out.println(dx + "," + dy);
-			//System.out.println("Node" + nodes + ": " + mPositions.get(node));
-			return new Point2D.Double(pos.getX() + dx,
-                                pos.getY() + dy);
-		}
-		
-		public Object visitGroupNodeProxy(GroupNodeProxy node)
-		{
-			// maybe do something here later
-			return node.getGeometry().getRectangle();
-		}
-		
-		public Object visitEdgeProxy(EdgeProxy edge)
-		{
-			edges++;
-			double dx = 0;
-			double dy = 0;
-			Point2D p;
-      Point2D pos = edge.getGeometry().getPoints().get(0);
-			for (EdgeProxy e : mGraph.getEdges())
-			{
-        Point2D pos2 = e.getGeometry().getPoints().get(0);
-				if (edge != e)
-				{
-					p = repulsion(pos,
-                        pos2,
-                        EDGEREPULSE);
-					dx += p.getX();
-					dy += p.getY();
-				}
-			}
-      Point2D pos2 = ((SimpleNodeProxy)edge.getSource()).getPointGeometry().getPoint();
-			p = attraction(pos,
-                     pos2,
-                     EDGEATTRACTION);
-			dx += p.getX();
-			dy += p.getY();
-      pos2 = ((SimpleNodeProxy)edge.getTarget()).getPointGeometry().getPoint();
-			p = attraction(pos,
-                     pos2,
-                     EDGEATTRACTION);
-			dx += p.getX();
-			dy += p.getY();
-			if (edge.getSource() == edge.getTarget())
-			{
-        p = repulsion(pos,
-                      pos2,
-                      REPULSIONCONST2);
-        dx += p.getX();
-        dy += p.getY();
-			}
-			//System.out.println("Edge" + edges + ": " + mPositions.get(edge));
-			p.setLocation(pos.getX() + dx,
-                    pos.getY() + dy);
-			return p;
-		}
-	}
-  
-  static private class NodeWrapper
-  {
-    private final SimpleNodeSubject mSubject;
-    private Point2D mPoint;
-    
-    public NodeWrapper(SimpleNodeSubject subject)
-    {
-      mSubject = subject;
-      mPoint = null;
-    }
-    
-    public SimpleNodeSubject getSubject()
-    {
-      return mSubject;
-    }
-    
-    public void setPoint(Point2D newPoint)
-    {
-      mPoint = newPoint;
-    }
-    
-    public double update()
-    {
-      double dx = Math.abs(mSubject.getPointGeometry().getPoint().getX() 
-                           - mPoint.getX());
-      double dy = Math.abs(mSubject.getPointGeometry().getPoint().getY() 
-                           - mPoint.getY());
-      double dist = Math.pow(Math.pow(dx, 2) + Math.pow(dy, 2), .5);
-      System.out.println("Dist: " + dist + " dx:" + dx + " dy:" + dy);
-      mSubject.getPointGeometry().setPoint(mPoint);
-      mPoint = null;
-      return dist;
+    for (final EdgeSubject edge : edges) {
+      final EdgeWrapper wrapper = new EdgeWrapper(edge);
+      mEdgeMap.put(edge, wrapper);
     }
   }
 
-  static private class EdgeWrapper
+
+  //#########################################################################
+  //# Interface java.lang.Runnable
+  public void run()
   {
-    private final EdgeSubject mSubject;
-    private Point2D mPoint;
-    
-    public EdgeWrapper(EdgeSubject subject)
-    {
-      mSubject = subject;
-      mPoint = null;
-    }
-    
-    public EdgeSubject getSubject()
-    {
-      return mSubject;
-    }
-    
-    public void setPoint(Point2D newPoint)
-    {
-      mPoint = newPoint;
-    }
-    
-    public double update()
-    {
-      double dist = mSubject.getGeometry().getPoints().get(0).distance(mPoint);
-      mSubject.getGeometry().getPointsModifiable().set(0, mPoint);
-      mSubject.getStartPoint().setPoint(((SimpleNodeProxy)mSubject.getSource())
-                                        .getPointGeometry().getPoint());
-      mSubject.getEndPoint().setPoint(((SimpleNodeProxy)mSubject.getTarget())
-                                      .getPointGeometry().getPoint());
-      mPoint = null;
-      return dist;
-    }
-  }
-  
-  static private class TimeFrame
-    extends JFrame
-  {
-    private final JLabel mLabel;
-    private final Timer mTimer;
-    private final int mTime;
-    private int cTime;
-    
-    public TimeFrame(int time)
-    {
-      mTime = time;
-      mTimer = new Timer(true);
-      mLabel = new JLabel();
-      cTime = 0;
-      mTimer.scheduleAtFixedRate(new TimerTask()
-      {
-        public void run()
-        {
-          cTime++;
-          mLabel.setText(Integer.toString(cTime));
-          if (cTime >= mTime) {
-            setVisible(false);
-          }
-        }
-      }, 1000, 1000);
-      setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-      setSize(300, 300);
-      add(mLabel);
-      pack();
-      setVisible(true);
-    }
-    
-    public void setVisible(boolean vis) 
-    {
-      if (!vis) {
-        mTimer.cancel();
+    int count = 0;
+    double maxdelta;
+    do {
+      maxdelta = calculateDisplacements();
+      if (count++ >= UPDATE_CONST) {
+        count = 0;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+              updateModel();
+            }
+          });
+        Thread.yield();
       }
-      super.setVisible(vis);
+    } while (maxdelta > CONVERGENCE_CONST);
+    SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+          updateModel();
+        }
+      });
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private synchronized double calculateDisplacements()
+  {
+    double maxdelta = 0.0;
+    for (final NodeWrapper wrapper : mNodeMap.values()) {
+      final double delta = wrapper.calculateDisplacement();
+      if (delta > maxdelta) {
+        maxdelta = delta;
+      }
+    }
+    for (final EdgeWrapper wrapper : mEdgeMap.values()) {
+      final double delta = wrapper.calculateDisplacement();
+      if (delta > maxdelta) {
+        maxdelta = delta;
+      }
+    }
+    for (final NodeWrapper wrapper : mNodeMap.values()) {
+      wrapper.updatePoint();
+    }
+    for (final EdgeWrapper wrapper : mEdgeMap.values()) {
+      wrapper.updatePoint();
+    }
+    return maxdelta;
+  }
+
+  private synchronized void updateModel()
+  {
+    for (final NodeWrapper wrapper : mNodeMap.values()) {
+      wrapper.updateModel();
+    }
+    for (final EdgeWrapper wrapper : mEdgeMap.values()) {
+      wrapper.updateModel();
     }
   }
+
+  private Point2D repulsion(final Point2D p1,
+                            final Point2D p2,
+                            final double constant)
+  {
+    final double dx = p1.getX() - p2.getX();
+    final double dy = p1.getY() - p2.getY();
+    final double len = dx * dx + dy * dy;   
+    if (len != 0) {
+      return new Point2D.Double((dx / len) * constant,
+                                (dy / len) * constant);
+    } else {                       
+      return new Point2D.Double(mRandom.nextDouble(), mRandom.nextDouble());
+    }
+  }           
+                
+  private Point2D attraction(final Point2D p1,
+                             final Point2D p2,
+                             final double constant)
+  {
+    final double dx = p1.getX() - p2.getX();
+    final double dy = p1.getY() - p2.getY();
+    return new Point2D.Double(-dx * constant, -dy * constant);
+  }
+
+
+  //#########################################################################
+  //# Inner Class NodeWrapper
+  private class NodeWrapper
+  {
+
+    //#######################################################################
+    //# Constructor
+    private NodeWrapper(final SimpleNodeSubject node)
+    {
+      mGeometry = node.getPointGeometry();
+      mOldPoint = mGeometry.getPoint();
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private Point2D getNewPoint()
+    {
+      return mNewPoint;
+    }
+
+    private void setNewPoint(final Point2D point)
+    {
+      mNewPoint = point;
+    }
+    
+    //#######################################################################
+    //# Auxiliary Methods
+    private void updatePoint()
+    {
+      mOldPoint = mNewPoint;
+    }
+
+    private void updateModel()
+    {
+      mGeometry.setPoint(mNewPoint);
+    }
+
+    private double calculateDisplacement()
+    {
+      double dx = 0.0;
+      double dy = 0.0;
+      for (final NodeWrapper other : mNodeMap.values()) {
+        if (other != this) {
+          final Point2D delta = repulsion(mOldPoint,
+                                          other.mOldPoint,
+                                          NODE_REPULSION);
+          dx += delta.getX();
+          dy += delta.getY();
+        }
+      }
+      for (final EdgeWrapper edge : mEdgeMap.values()) {
+        final NodeWrapper other;
+        if (edge.getSource() == this) {
+          other = edge.getTarget();
+        } else if (edge.getTarget() == this) {
+          other = edge.getSource();
+        } else {
+          other = null;
+        }
+        if (other != null && other != this) {
+          final Point2D delta = attraction(mOldPoint,
+                                           other.mOldPoint,
+                                           NODE_ATTRACTION);
+          dx += delta.getX();
+          dy += delta.getY();
+        }
+      }
+      final double x = mOldPoint.getX() + dx;
+      final double y = mOldPoint.getY() + dy;
+      mNewPoint = new Point2D.Double(x, y);
+      return mOldPoint.distance(mNewPoint);
+    }
+
+
+    //#######################################################################
+    //# Data Members
+    private final PointGeometrySubject mGeometry;
+    private Point2D mOldPoint;
+    private Point2D mNewPoint;
+  }
+
+
+  //#########################################################################
+  //# Inner Class EdgeWrapper
+  private class EdgeWrapper
+  {
+
+    //#######################################################################
+    //# Constructor
+    private EdgeWrapper(final EdgeSubject edge)
+    {
+      mGeometry = edge.getGeometry();
+      mStartPoint = edge.getStartPoint();
+      mEndPoint = edge.getEndPoint();
+      mOldPoint = mGeometry.getPoints().get(0);
+      final NodeSubject source = edge.getSource();
+      mSource = mNodeMap.get(source);
+      final NodeSubject target = edge.getTarget();
+      mTarget = mNodeMap.get(target);
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private NodeWrapper getSource()
+    {
+      return mSource;
+    }
+
+    private NodeWrapper getTarget()
+    {
+      return mTarget;
+    }
+
+    private void setNewPoint(final Point2D point)
+    {
+      mNewPoint = point;
+    }
+    
+    //#######################################################################
+    //# Auxiliary Methods
+    private void updatePoint()
+    {
+      mOldPoint = mNewPoint;
+    }
+    
+    private void updateModel()
+    {
+      mGeometry.getPointsModifiable().set(0, mNewPoint);
+      mStartPoint.setPoint(mSource.getNewPoint());
+      mEndPoint.setPoint(mTarget.getNewPoint());
+    }
+
+    private double calculateDisplacement()
+    {
+      double dx = 0.0;
+      double dy = 0.0;
+      for (final EdgeWrapper other : mEdgeMap.values()) {
+        if (other != this) {
+          final Point2D delta = repulsion(mOldPoint,
+                                          other.mOldPoint,
+                                          EDGE_REPULSION);
+          dx += delta.getX();
+          dy += delta.getY();
+        }
+      }
+      for (final NodeWrapper node : mNodeMap.values()) {
+        if (node != mSource && node != mTarget) {
+          final Point2D delta = repulsion(mOldPoint,
+                                          node.mOldPoint,
+                                          NODEEDGE_REPULSION);
+          dx += delta.getX();
+          dy += delta.getY();
+        } else {
+          final Point2D delta = attraction(mOldPoint,
+                                           node.mOldPoint,
+                                           EDGE_ATTRACTION);
+          dx += delta.getX();
+          dy += delta.getY();
+        }
+      }
+      if (mSource == mTarget) {
+        final Point2D delta = repulsion(mOldPoint,
+                                        mSource.mOldPoint,
+                                        SELFLOOP_REPULSION);
+        dx += delta.getX();
+        dy += delta.getY();
+      }
+      final double x = mOldPoint.getX() + dx;
+      final double y = mOldPoint.getY() + dy;
+      mNewPoint = new Point2D.Double(x, y);
+      return mOldPoint.distance(mNewPoint);
+    }
+
+
+    //#######################################################################
+    //# Data Members
+    private final SplineGeometrySubject mGeometry;
+    private final PointGeometrySubject mStartPoint;
+    private final PointGeometrySubject mEndPoint;
+    private final NodeWrapper mSource;
+    private final NodeWrapper mTarget;
+    private Point2D mOldPoint;
+    private Point2D mNewPoint;
+  }
+
+
+  //###########################################################################
+  //# Data Members
+  private final Random mRandom;
+  private final GraphSubject mGraph;
+  private final Map<SimpleNodeSubject,NodeWrapper> mNodeMap;
+  private final Map<EdgeSubject,EdgeWrapper> mEdgeMap;
+
+
+  //###########################################################################
+  //# Class Constants
+  private static final double EDGE_ATTRACTION = 0.04;
+  private static final double NODE_ATTRACTION = 0.05;
+  private static final double NODE_REPULSION = 400.0;
+  private static final double SELFLOOP_REPULSION = 100.0;
+  private static final double EDGE_REPULSION = 10.0;
+  private static final double NODEEDGE_REPULSION = 20.0;
+
+  private static final double CONVERGENCE_CONST = 0.025;
+  private static final int UPDATE_CONST = 5;
 }
