@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.4 2006-09-29 19:51:44 robi Exp $
+//# $Id: SpringEmbedder.java,v 1.5 2006-09-29 20:59:15 flordal Exp $
 //###########################################################################
 
 
@@ -189,6 +189,7 @@ public class SpringEmbedder
     private NodeWrapper(final SimpleNodeSubject node)
     {
       mGeometry = node.getPointGeometry();
+      isInitial = node.isInitial();
       mOldPoint = mGeometry.getPoint();
     }
 
@@ -249,6 +250,17 @@ public class SpringEmbedder
           dy += delta.getY();
         }
       }
+      // Pull initial state towards the upper left corner...
+      // Makes it easier to find and gives more consistently drawn graphs with
+      // a natural flow from upper left towards lower right
+      if (isInitial)
+      {
+          final Point2D delta = attraction(mOldPoint,
+                                           POINT_ZERO,
+                                           INITIALSTATE_ATTRACTION);   
+          dx += delta.getX();
+          dy += delta.getY();
+      }
       final double x = mOldPoint.getX() + dx;
       final double y = mOldPoint.getY() + dy;
       mNewPoint = new Point2D.Double(x, y);
@@ -261,6 +273,7 @@ public class SpringEmbedder
     private final PointGeometrySubject mGeometry;
     private Point2D mOldPoint;
     private Point2D mNewPoint;
+    private boolean isInitial;
   }
 
 
@@ -392,6 +405,7 @@ public class SpringEmbedder
   private static final double BACKGROUND_ATTRACTION = 0.05;
   private static final double EDGE_ATTRACTION = 0.05;
   private static final double NODE_ATTRACTION = 0.05;
+  private static final double INITIALSTATE_ATTRACTION = BACKGROUND_ATTRACTION/10;
   private static final double NODE_REPULSION = 1600.0;
   private static final double SELFLOOP_REPULSION = 100.0;
   private static final double EDGE_REPULSION = 80.0;

@@ -56,6 +56,8 @@ import junit.framework.TestSuite;
 import java.io.File;
 import org.supremica.util.ActionTimer;
 
+import org.supremica.automata.algorithms.*;
+    
 //import org.supremica.testhelpers.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.minimization.*;
@@ -84,16 +86,34 @@ public class BenchmarkAutomataVerifier
         return suite;
     }
        
-    public void testBenchmarkCompositionalNonblockingVerification()
+    public void testBenchmarkVerification()
     throws Exception
-    {
+    {        
         // Init options and verifier
         VerificationOptions vOptions;
         SynchronizationOptions sOptions;
         MinimizationOptions mOptions;
-        vOptions = VerificationOptions.getDefaultNonblockingOptions();
         sOptions = SynchronizationOptions.getDefaultVerificationOptions();
         mOptions = MinimizationOptions.getDefaultNonblockingOptions();
+        
+        // Controllability / Nonblocking
+        if (true)
+            // Nonblocking
+            vOptions = VerificationOptions.getDefaultNonblockingOptions();
+        else
+            // Controllability
+            vOptions = VerificationOptions.getDefaultControllabilityOptions();
+        if (true)
+            // Both
+            vOptions.setVerificationType(VerificationType.BOTH);
+        
+        // Compositional / Modular
+        if (true)
+            // Compositional
+            vOptions.setAlgorithmType(VerificationAlgorithm.COMPOSITIONAL);
+        else
+            // Modular
+            vOptions.setAlgorithmType(VerificationAlgorithm.MODULAR);
         
         // Strategies
         MinimizationStrategy[] strategyArray =
@@ -128,12 +148,9 @@ public class BenchmarkAutomataVerifier
                 
                 // Go!
                 System.out.println("");
-                System.out.println("BENCHMARKING MODULAR NONBLOCKING VERIFICATION ALGORITHMS");
+                System.out.println("BENCHMARKING COMPOSITIONAL NONBLOCKING VERIFICATION ALGORITHMS");
                 System.out.println("Primary 1:st stage heuristic: " + mOptions.getMinimizationStrategy());
                 System.out.println("Primary 2:nd stage heuristic: " + mOptions.getMinimizationHeuristic());
-                
-                ProjectBuildFromXml builder = new ProjectBuildFromXml();
-                Project theProject;
                 
                 ///////////////////////////////////
                 // Instantiated model benchmarks //
@@ -141,6 +158,9 @@ public class BenchmarkAutomataVerifier
                 
                 if (false)
                 {
+                    Project theProject;
+                
+                    /*
                     // Dining philosophers
                     DiningPhilosophers philo = new DiningPhilosophers(256, true, true, false, false,
                         false, false);
@@ -152,6 +172,7 @@ public class BenchmarkAutomataVerifier
                     philo = new DiningPhilosophers(1024, true, true, false, false, false, false);
                     theProject = philo.getProject();
                     benchmarkNonblocking("1024philo", theProject, vOptions, sOptions, mOptions);
+                     */
                     // Arbiter
                     Arbiter arbiter = new Arbiter(128, false);
                     theProject = arbiter.getProject();
@@ -179,7 +200,6 @@ public class BenchmarkAutomataVerifier
                 ///////////////////////////////////
                 
                 // Benchmark path
-                //String prefix = "/users/s2/flordal/benchmark/";
                 String prefix = "benchmarks/benchmarkfiles/";
                 // Benchmarks
                 String[] test =
@@ -200,108 +220,15 @@ public class BenchmarkAutomataVerifier
                 // Run tests
                 for (int k=0; k<test.length; k++)
                 {
-                    theProject = builder.build(new File(prefix + test[k] + ".xml"));
+                    ProjectBuildFromXml builder = new ProjectBuildFromXml();
+                    Project theProject = builder.build(new File(prefix + test[k] + ".xml"));
                     benchmarkNonblocking(test[k], theProject, vOptions, sOptions, mOptions);
                 }
             }
         }
-    }
+    }    
     
-    public void testBenchmarkModularControllability()
-    throws Exception
-    {
-        // Init options and verifier
-        VerificationOptions vOptions;
-        SynchronizationOptions sOptions;
-        MinimizationOptions mOptions;
-        vOptions = VerificationOptions.getDefaultControllabilityOptions();
-        sOptions = SynchronizationOptions.getDefaultVerificationOptions();
-        mOptions = MinimizationOptions.getDefaultVerificationOptions();
-        
-        ///////////////////////////////////
-        // "Industrial" model benchmarks //
-        ///////////////////////////////////
-        
-        // Benchmark path
-        //String prefix = "/users/s2/flordal/benchmark/";
-        String prefix = "benchmarks/benchmarkfiles/";
-        // Benchmarks
-        String[] test =
-        {
-            "FMS", "verriegel3",
-            "verriegel4",
-            "agv", "agvb",
-            "IPC",
-            "FMS", "SMS", "PMS",
-            "bmw_fh", "big_bmw",
-            "fzelle",
-            "ftechnik", "ftechnik_nocoll",
-            "profisafe_i4",
-            "AIP_minus_AS3_TU4",
-            "tbed_valid", "tbed_ctct"
-        };
-        
-        ProjectBuildFromXml builder = new ProjectBuildFromXml();
-        Project theProject;
-        
-        // Run tests
-        for (int k=0; k<test.length; k++)
-        {
-            theProject = builder.build(new File(prefix + test[k] + ".xml"));
-            benchmarkControllability(test[k], theProject, vOptions, sOptions, mOptions);
-        }
-    }
-
-    private void benchmarkControllability(String name, Project theProject,
-        VerificationOptions vOptions,
-        SynchronizationOptions sOptions,
-        MinimizationOptions mOptions)
-    {
-        try
-        {
-            System.out.println("");
-            System.out.flush();
-            System.out.println("CURRENT BENCHMARK: " + name);
-            System.out.flush();
-            AutomataVerifier verifier = new AutomataVerifier(theProject, vOptions, sOptions, mOptions);
-            ActionTimer timer = new ActionTimer();
-            //System.out.println("Verifying...");
-            // Run the benchmark!
-            timer.start();
-            boolean result = verifier.verify();
-            timer.stop();
-                        /*
-                        {
-                                String message = verifier.getTheMessage();
-                                message = message.replaceFirst("NAME", name);
-                                message = message.replaceFirst("TIME", "" + timer);
-                                message = message.replaceFirst("BLOCK", "" + !nonblocking);
-                                System.out.println(message);
-                        }
-                         */
-            System.out.println("TIME: " + timer + ", CONTROLLABLE: " + result);
-            System.out.flush();
-        }
-        catch (Throwable ex)
-        {
-            System.out.println("Failed! " + ex);
-        }
-        
-        // Garbage collect now!
-        try
-        {
-            System.runFinalization();
-            System.gc();
-            System.out.println("Running garbage collector...");
-            Thread.sleep(5000);
-        }
-        catch (Throwable ex)
-        {
-            System.out.println("Garbage collection failed! " + ex);
-        }
-    }
-    
-    private void benchmarkNonblocking(String name, Project theProject,
+    private void runBenchmark(String name, Project theProject,
         VerificationOptions vOptions,
         SynchronizationOptions sOptions,
         MinimizationOptions mOptions)
@@ -326,7 +253,7 @@ public class BenchmarkAutomataVerifier
                                 System.out.println(message);
                         }
                          */
-            System.out.println("TIME: " + timer + ", BLOCKING: " + !nonblocking);
+            System.out.println("TIME: " + timer + ", RESULT (NONBLOCKING/CONTROLLABLE): " + nonblocking);
         }
         catch (Throwable ex)
         {
