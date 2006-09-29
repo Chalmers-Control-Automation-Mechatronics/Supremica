@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.5 2006-09-29 20:59:15 flordal Exp $
+//# $Id: SpringEmbedder.java,v 1.6 2006-09-29 21:12:36 flordal Exp $
 //###########################################################################
 
 
@@ -253,6 +253,10 @@ public class SpringEmbedder
       // Pull initial state towards the upper left corner...
       // Makes it easier to find and gives more consistently drawn graphs with
       // a natural flow from upper left towards lower right
+      //   This also means that the best position for node labels will be above
+      // and to the right of the node... not below and to the left!
+      //   It would be nice if in the initial random layout, the initial state
+      // was put close to the top left corner!
       if (isInitial)
       {
           final Point2D delta = attraction(mOldPoint,
