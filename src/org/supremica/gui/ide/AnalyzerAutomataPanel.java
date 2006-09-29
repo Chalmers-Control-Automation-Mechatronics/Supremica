@@ -285,6 +285,7 @@ class AnalyzerAutomataPanel
     /**
      * Same as getSelectedAutomata but include execution information
      */
+     /*
     public Project getSelectedProject()
     {
         int[] selectedRowIndices = theAutomatonTable.getSelectedRows();
@@ -319,7 +320,7 @@ class AnalyzerAutomataPanel
         }
 
         return selectedProject;
-    }
+    }*/
 
 	public Automata getAllAutomata()
 	{

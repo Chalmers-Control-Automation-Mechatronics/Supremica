@@ -70,7 +70,7 @@ public class AnalyzerMinimizeAction
         {
             return;
         }
-		Project currProject = ide.getActiveModuleContainer().getSelectedProject();
+		Project currProject = ide.getActiveModuleContainer().getVisualProject();
         AutomataMinimizationWorker worker = new AutomataMinimizationWorker(ide.getFrame(), selectedAutomata, currProject, options);
     }
 }

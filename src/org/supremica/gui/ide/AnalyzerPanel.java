@@ -53,10 +53,12 @@ public class AnalyzerPanel
 		return automataPanel.getSelectedAutomata();
 	}
 
+/*
 	public Project getSelectedProject()
 	{
 		return automataPanel.getSelectedProject();
 	}
+*/
 
 	public Automata getUnselectedAutomata()
 	{

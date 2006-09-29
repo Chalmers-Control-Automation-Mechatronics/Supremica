@@ -112,7 +112,7 @@ public class AnalyzerExportAction
         // Proper design would have solved this problem
         if (exportMode == ExportFormat.XML_DEBUG)
         {
-            AutomataToXml xport = new AutomataToXml(ide.getSelectedProject());
+            AutomataToXml xport = new AutomataToXml(selectedAutomata);
             TextFrame textframe = new TextFrame("XML debug output");
 
             xport.serialize(textframe.getPrintWriter());
@@ -122,14 +122,13 @@ public class AnalyzerExportAction
 
         if (exportMode == ExportFormat.SP_DEBUG)
         {
-            ProjectToSP exporter = new ProjectToSP(ide.getSelectedProject());
+            ProjectToSP exporter = new ProjectToSP(ide.getActiveProject());
             TextFrame textframe = new TextFrame("SP debug output");
 
             exporter.serialize(textframe.getPrintWriter());
 
             return;
         }
-
         if (exportMode == ExportFormat.DOT_DEBUG)
         {
             for (Iterator autIt = selectedAutomata.iterator();
@@ -287,7 +286,7 @@ public class AnalyzerExportAction
             {
                 fileExporter = FileDialogs.getXMLFileExporter();
 
-                return;
+                //return;
             }
             else if (exportMode == ExportFormat.SP)
             {
@@ -298,7 +297,7 @@ public class AnalyzerExportAction
                 return;
             }
 
-            Project selectedProject = ide.getIDE().getSelectedProject();
+            Project selectedProject = ide.getIDE().getActiveProject();
 
             fileExporter.setDialogTitle("Save Project as ...");
 
@@ -403,13 +402,13 @@ public class AnalyzerExportAction
                         }
                         else if (exportMode == ExportFormat.SP)
                         {
-                            Project selectedProject = ide.getSelectedProject();
-                            Project newProject = new Project();
-                            newProject.addAttributes(selectedProject);
+                            Project activeProject = ide.getActiveProject();
+                            //Project newProject = new Project();
+                            //newProject.addAttributes(selectedProject);
                             //newProject.addActions(selectedProject.getActions());
                             //newProject.addControls(selectedProject.getControls());
                             //newProject.setAnimationURL(selectedProject.getAnimationURL());
-                            ProjectToSP exporter = new ProjectToSP(newProject);
+                            ProjectToSP exporter = new ProjectToSP(activeProject);
                             exporter.serialize(currFile);
                         }
 

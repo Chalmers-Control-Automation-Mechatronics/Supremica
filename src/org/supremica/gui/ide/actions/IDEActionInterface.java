@@ -22,7 +22,7 @@ public interface IDEActionInterface
 	public void setEditorMode(IDEAction theAction);
 	public EditorWindowInterface getActiveEditorWindowInterface();
 	public Automata getSelectedAutomata();
-	public Project getSelectedProject();
+	public Project getActiveProject();
 	public Automata getAllAutomata();
 	public Automata getUnselectedAutomata();
 }

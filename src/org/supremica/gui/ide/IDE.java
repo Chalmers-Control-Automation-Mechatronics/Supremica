@@ -184,6 +184,8 @@ public class IDE
         moduleContainers.remove(moduleContainer);
     }
 
+
+
     public ModuleContainer getActiveModuleContainer()
     {
         return moduleContainers.getActiveModuleContainer();
@@ -347,10 +349,10 @@ public class IDE
         return activeModuleContainer.getSelectedAutomata();
     }
 
-    public Project getSelectedProject()
+    public Project getActiveProject()
     {
         ModuleContainer activeModuleContainer = getActiveModuleContainer();
-        return activeModuleContainer.getSelectedProject();
+        return activeModuleContainer.getVisualProject();
     }
 
     public Automata getAllAutomata()
