@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.3 2006-09-29 13:35:21 robi Exp $
+//# $Id: SpringEmbedder.java,v 1.4 2006-09-29 19:51:44 robi Exp $
 //###########################################################################
 
 
@@ -41,8 +41,10 @@ public class SpringEmbedder
     mRandom = new Random(seed);
     mGraph = graph;
     final Collection<NodeSubject> nodes = graph.getNodesModifiable();
-    mNodeMap = new HashMap<SimpleNodeSubject,NodeWrapper>(nodes.size());
+    final int numnodes = nodes.size();
+    mNodeMap = new HashMap<SimpleNodeSubject,NodeWrapper>(numnodes);
     final Collection<EdgeSubject> edges = graph.getEdgesModifiable();
+    final int numedges = edges.size();
     mEdgeMap = new HashMap<EdgeSubject,EdgeWrapper>(edges.size());
     for (final NodeSubject node : nodes) {
       if (node instanceof SimpleNodeSubject) {
@@ -59,6 +61,10 @@ public class SpringEmbedder
       final EdgeWrapper wrapper = new EdgeWrapper(edge);
       mEdgeMap.put(edge, wrapper);
     }
+    mBackgroundAttraction = BACKGROUND_ATTRACTION / numnodes;
+    mNodeRepulsion = NODE_REPULSION / numnodes;
+    mNodeEdgeRepulsion = NODEEDGE_REPULSION / numnodes;
+    mEdgeRepulsion = EDGE_REPULSION / numedges;
   }
 
 
@@ -148,6 +154,30 @@ public class SpringEmbedder
     return new Point2D.Double(-dx * constant, -dy * constant);
   }
 
+  private Point2D edgeAttraction(final Point2D p,
+                                 final Point2D start,
+                                 final Point2D end,
+                                 final double constant)
+  {
+    final double px = p.getX();
+    final double py = p.getY();
+    final double mx = 0.5 * (end.getX() + start.getX());
+    final double my = 0.5 * (end.getY() + start.getY());
+    final double dx = end.getX() - start.getX();
+    final double dy = end.getY() - start.getY();
+    final double det = dx * dx + dy * dy;
+    if (det > 0.0) {
+      final double factor = (dy * (py - my) + dx * (px - mx)) / det;
+      final double x = px - factor * dx;
+      final double y = py - factor * dy;
+      final Point2D base = new Point2D.Double(x, y);
+      return attraction(p, base, constant);
+    } else {
+      return POINT_ZERO;
+    }
+  }
+
+  private int i = 0;
 
   //#########################################################################
   //# Inner Class NodeWrapper
@@ -188,16 +218,19 @@ public class SpringEmbedder
 
     private double calculateDisplacement()
     {
-      double dx = 0.0;
-      double dy = 0.0;
+      final Point2D delta2 = attraction(mOldPoint,
+                                        POINT_CENTER,
+                                        mBackgroundAttraction);
+      double dx = delta2.getX();
+      double dy = delta2.getY();
       for (final NodeWrapper other : mNodeMap.values()) {
         if (other != this) {
-          final Point2D delta = repulsion(mOldPoint,
-                                          other.mOldPoint,
-                                          NODE_REPULSION);
-          dx += delta.getX();
-          dy += delta.getY();
-        }
+          final Point2D delta1 = repulsion(mOldPoint,
+                                           other.mOldPoint,
+                                           mNodeRepulsion);
+          dx += delta1.getX();
+          dy += delta1.getY();
+         }
       }
       for (final EdgeWrapper edge : mEdgeMap.values()) {
         final NodeWrapper other;
@@ -289,7 +322,7 @@ public class SpringEmbedder
         if (other != this) {
           final Point2D delta = repulsion(mOldPoint,
                                           other.mOldPoint,
-                                          EDGE_REPULSION);
+                                          mEdgeRepulsion);
           dx += delta.getX();
           dy += delta.getY();
         }
@@ -298,7 +331,7 @@ public class SpringEmbedder
         if (node != mSource && node != mTarget) {
           final Point2D delta = repulsion(mOldPoint,
                                           node.mOldPoint,
-                                          NODEEDGE_REPULSION);
+                                          mNodeEdgeRepulsion);
           dx += delta.getX();
           dy += delta.getY();
         } else {
@@ -313,6 +346,13 @@ public class SpringEmbedder
         final Point2D delta = repulsion(mOldPoint,
                                         mSource.mOldPoint,
                                         SELFLOOP_REPULSION);
+        dx += delta.getX();
+        dy += delta.getY();
+      } else {
+        final Point2D delta = edgeAttraction(mOldPoint,
+                                             mSource.mOldPoint,
+                                             mTarget.mOldPoint,
+                                             EDGE_ATTRACTION);
         dx += delta.getX();
         dy += delta.getY();
       }
@@ -341,17 +381,25 @@ public class SpringEmbedder
   private final GraphSubject mGraph;
   private final Map<SimpleNodeSubject,NodeWrapper> mNodeMap;
   private final Map<EdgeSubject,EdgeWrapper> mEdgeMap;
+  private final double mBackgroundAttraction;
+  private final double mNodeRepulsion;
+  private final double mNodeEdgeRepulsion;
+  private final double mEdgeRepulsion;
 
 
   //###########################################################################
   //# Class Constants
-  private static final double EDGE_ATTRACTION = 0.04;
+  private static final double BACKGROUND_ATTRACTION = 0.05;
+  private static final double EDGE_ATTRACTION = 0.05;
   private static final double NODE_ATTRACTION = 0.05;
-  private static final double NODE_REPULSION = 400.0;
+  private static final double NODE_REPULSION = 1600.0;
   private static final double SELFLOOP_REPULSION = 100.0;
-  private static final double EDGE_REPULSION = 10.0;
-  private static final double NODEEDGE_REPULSION = 20.0;
+  private static final double EDGE_REPULSION = 80.0;
+  private static final double NODEEDGE_REPULSION = 150.0;
 
   private static final double CONVERGENCE_CONST = 0.025;
   private static final int UPDATE_CONST = 5;
+
+  private static final Point2D POINT_ZERO = new Point2D.Double(0.0, 0.0);
+  private static final Point2D POINT_CENTER = new Point2D.Double(300.0, 300.0);
 }
