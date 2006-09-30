@@ -24,7 +24,7 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.Project;
 
 
-class AnalyzerAutomataPanel
+public class AnalyzerAutomataPanel
 	extends WhiteScrollPane
 	implements TableModelListener
 {
