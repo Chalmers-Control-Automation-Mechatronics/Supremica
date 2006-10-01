@@ -602,8 +602,7 @@ public final class AutomataSynchronizerHelper
             LabeledEvent currEvent = (LabeledEvent) eventIterator.next();
             
             if (currEvent.getExpansionPriority() < 0)
-            {
-                
+            {                
                 // The events are already ordered after synchIndex!
                 // eventPriority[currEvent.getSynchIndex()] = 10;
                 eventPriority[index++] = 10;
@@ -642,6 +641,11 @@ public final class AutomataSynchronizerHelper
             logger.info("Operation statistics:\n\t" + (helperData.getNumberOfCheckedStates() - 1) + " transitions were examined.\n\t" + helperData.getNumberOfReachableStates() + " reachable states were found.\n\t" + helperData.getNumberOfForbiddenStates() + " forbidden states were found.\n\t" + helperData.getNumberOfDeadlockedStates() + " deadlocked states were found.");
         }
     }
+
+	public String getInfo()
+	{
+		return helperData.getNumberOfReachableStates() + " & " + (helperData.getNumberOfCheckedStates() - 1);
+	}
     
     /**
      * Displays the event-trace leading to the uncontrollable state.

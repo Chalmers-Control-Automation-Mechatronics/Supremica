@@ -307,7 +307,7 @@ public class AutomataMinimizer
      */
     public String getStatisticsLine()
     {
-        return "\\texttt{NAME} & " + initialNbrOfAutomata + " & SIZE & " + mostStates + " & " + mostTransitions + " & TIME & BLOCK & " + AutomatonMinimizer.getWodesStatisticsLaTeX() + " & ALGO1 & ALGO2 \\\\";
+        return "\\texttt{NAME} & " + initialNbrOfAutomata + " & SIZE & " + mostStates + " & " + mostTransitions + " & TIME & BLOCK & " + AutomatonMinimizer.getStatisticsLaTeX() + " & ALGO1 & ALGO2 \\\\";
     }
     
     /**

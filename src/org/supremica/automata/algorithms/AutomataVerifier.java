@@ -569,6 +569,9 @@ public class AutomataVerifier
             return false;
         }
         
+        //return "\\texttt{NAME} & " + initialNbrOfAutomata + " & SIZE & " + mostStates + " & " + mostTransitions + " & TIME & BLOCK & " + AutomatonMinimizer.getWodesStatisticsLaTeX() + " & ALGO1 & ALGO2 \\\\";
+		message = "\\texttt{NAME} & " + theAutomata.size() + " & SIZE & " + synchHelper.getInfo() + " & TIME & " + !allModulesControllable;
+
         return allModulesControllable;
     }
     
@@ -1610,7 +1613,7 @@ public class AutomataVerifier
         }
          */
     
-    // JUNK
+    // BENCHMARKING JUNK
     private static String message = "";
     public String getTheMessage()
     {
@@ -1679,7 +1682,7 @@ public class AutomataVerifier
         Automaton result;
         try
         {
-            // JUNK
+            // BENCHMARKING
             message = "";
             
             // Minimizer

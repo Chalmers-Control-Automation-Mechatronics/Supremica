@@ -650,9 +650,11 @@ Class-Path: ${manifest.pathlist}</echo>
 
 <!-- Should probably be divided into several separate benchmarks as new ones appear. -->
 <target name="run_benchmarks_supremica" depends="compile_supremica,compile_benchmarks_supremica">
-	<java fork="yes" classname="junit.textui.TestRunner" maxmemory="128m" taskname="junit" failonerror="true">
+	<java fork="yes" classname="junit.textui.TestRunner" taskname="junit" failonerror="true">
 		<arg value="org.supremica.BenchmarkPackageSupremica"/>
-        	<jvmarg value="-Djava.library.path=${dist}"/>
+        <jvmarg value="-Xmx64m"/>
+        <jvmarg value="-Xms64m"/>
+        <jvmarg value="-Djava.library.path=${dist}"/>
 		<classpath>	
 			<pathelement location="${build}" />
 			<pathelement location="${benchmarksbuild}" />

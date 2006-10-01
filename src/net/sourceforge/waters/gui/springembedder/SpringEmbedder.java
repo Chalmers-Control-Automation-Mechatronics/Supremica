@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.6 2006-09-29 21:12:36 flordal Exp $
+//# $Id: SpringEmbedder.java,v 1.7 2006-10-01 09:28:27 flordal Exp $
 //###########################################################################
 
 
@@ -256,7 +256,8 @@ public class SpringEmbedder
       //   This also means that the best position for node labels will be above
       // and to the right of the node... not below and to the left!
       //   It would be nice if in the initial random layout, the initial state
-      // was put close to the top left corner!
+      // was put close to the top left corner to reduce the slow rotation of 
+      // symmetric figures...
       if (isInitial)
       {
           final Point2D delta = attraction(mOldPoint,
