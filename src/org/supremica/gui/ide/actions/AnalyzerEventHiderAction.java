@@ -58,7 +58,7 @@ public class AnalyzerEventHiderAction
         {
             return;
         }
-		EventHider eventHider = new EventHider();
+		EventHider eventHider = new EventHider(ide.getIDE());
 		eventHider.doAction(selectedAutomata);
     }
 }

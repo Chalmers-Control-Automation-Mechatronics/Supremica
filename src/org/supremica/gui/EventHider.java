@@ -21,6 +21,7 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
+import org.supremica.gui.ide.IDEReportInterface;
 
 /**
  * Gaaaah! LanguageRestrictorDialog has lots of stuff in it that should be somewhere else.
@@ -35,7 +36,9 @@ class EventHiderDialog
 
 	private static Logger logger = LoggerFactory.createLogger(EventHiderDialog.class);
 
-	public EventHiderDialog(Automata automata)
+	private IDEReportInterface ide;
+
+	public EventHiderDialog(IDEReportInterface ide, Automata automata)
 	{
 		super(automata);
 		super.setTitle("Event hider");
@@ -43,6 +46,7 @@ class EventHiderDialog
 		super.okButton = new OkButton();
 
 		super.pack();
+		this.ide = ide;
 	}
 
 	private class OkButton
@@ -104,7 +108,7 @@ class EventHiderDialog
 
 		try
 		{
-			ActionMan.gui.addAutomata(newAutomata);
+			ide.addAutomata(newAutomata);
 		}
 		catch (Exception ex)
 		{
@@ -120,11 +124,13 @@ public class EventHider
 	private static final long serialVersionUID = 1L;
 
 	private static Logger logger = LoggerFactory.createLogger(EventHider.class);
+	private IDEReportInterface ide;
 
-	public EventHider()
+	public EventHider(IDEReportInterface ide)
 	{
 		putValue(NAME, "Event hider");
 		putValue(SHORT_DESCRIPTION, "Stop observing selected events");
+		this.ide = ide;
 	}
 
 	public void actionPerformed(ActionEvent event)
@@ -133,12 +139,12 @@ public class EventHider
 		Automata automata = ActionMan.getGui().getSelectedAutomata();
 
 		// Throw up the dialog, let the user select the alphabet
-		EventHiderDialog dlg = new EventHiderDialog(automata);
+		EventHiderDialog dlg = new EventHiderDialog(ide, automata);
 	}
 
 	public void doAction(Automata theAutomata)
 	{
-		EventHiderDialog dlg = new EventHiderDialog(theAutomata);
+		EventHiderDialog dlg = new EventHiderDialog(ide, theAutomata);
 
 	}
 }
