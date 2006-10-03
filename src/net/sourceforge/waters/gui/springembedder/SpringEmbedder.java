@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.11 2006-10-03 16:03:21 knut Exp $
+//# $Id: SpringEmbedder.java,v 1.12 2006-10-03 16:23:19 knut Exp $
 //###########################################################################
 
 
@@ -78,6 +78,7 @@ public class SpringEmbedder
     do {
       maxdelta = calculateDisplacements();
       if (count++ >= UPDATE_CONST) {
+		updateGraphLocation();
         count = 0;
         nbrOfUpdates++;
 
@@ -185,7 +186,6 @@ public class SpringEmbedder
 
   private synchronized void updateModel()
   {
-	updateGraphLocation();
     for (final NodeWrapper wrapper : mNodeMap.values()) {
       wrapper.updateModel();
     }
