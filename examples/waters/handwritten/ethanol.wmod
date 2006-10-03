@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="Module1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name="Coal">
+            <ColorGeometry>
+                <Color Red="0" Green="0" Blue="0"/>
+            </ColorGeometry>
+        </EventDecl>
+        <EventDecl Kind="PROPOSITION" Name="Oxygen">
+            <ColorGeometry>
+                <Color Red="255" Green="0" Blue="0"/>
+            </ColorGeometry>
+        </EventDecl>
+        <EventDecl Kind="PROPOSITION" Name="Hydrogen">
+            <ColorGeometry>
+                <Color Red="255" Green="255" Blue="255"/>
+            </ColorGeometry>
+        </EventDecl>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT">
+            <SimpleIdentifier Name="Ethanol"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="C1">
+                        <EventList>
+                            <SimpleIdentifier Name="Coal"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="C2">
+                        <EventList>
+                            <SimpleIdentifier Name="Coal"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="H2">
+                        <EventList>
+                            <SimpleIdentifier Name="Hydrogen"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="H1">
+                        <EventList>
+                            <SimpleIdentifier Name="Hydrogen"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="H3">
+                        <EventList>
+                            <SimpleIdentifier Name="Hydrogen"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="H4">
+                        <EventList>
+                            <SimpleIdentifier Name="Hydrogen"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="H5">
+                        <EventList>
+                            <SimpleIdentifier Name="Hydrogen"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="O">
+                        <EventList>
+                            <SimpleIdentifier Name="Oxygen"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="H6">
+                        <EventList>
+                            <SimpleIdentifier Name="Hydrogen"/>
+                        </EventList>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="C2" Source="C1">
+                    </Edge>
+                    <Edge Target="H3" Source="C1">
+                    </Edge>
+                    <Edge Target="H1" Source="C1">
+                    </Edge>
+                    <Edge Target="H2" Source="C1">
+                    </Edge>
+                    <Edge Target="H4" Source="C2">
+                    </Edge>
+                    <Edge Target="H5" Source="C2">
+                    </Edge>
+                    <Edge Target="O" Source="C2">
+                    </Edge>
+                    <Edge Target="H6" Source="O">
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>
+

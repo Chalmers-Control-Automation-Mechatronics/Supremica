@@ -146,7 +146,7 @@ public class AutomataVerifier
             return "At least one automaton must be selected.";
         }
         
-        // Must be prioritizes?
+        // Must be prioritized?
         if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MODULAR ||
             verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL)
         {
@@ -289,6 +289,8 @@ public class AutomataVerifier
                 if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MONOLITHIC)
                 {
                     // We're gonna do some serious synchronization! Initialize a synchronization helper!
+                    synchronizationOptions.setForbidUncontrollableStates(false);
+                    synchronizationOptions.setExpandForbiddenStates(true);
                     synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions);
                     synchHelper.setExecutionDialog(executionDialog);
                     

@@ -6,13 +6,14 @@ import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import org.supremica.gui.ide.ModuleContainer;
+import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
+import net.sourceforge.waters.subject.module.GraphSubject;
 import org.supremica.gui.ide.IDE;
 
 /**
  * A new action
  */
-public class ActionTemplate
+public class EditorRunEmbedderAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
@@ -20,17 +21,17 @@ public class ActionTemplate
     /**
      * Constructor.
      */
-    public ActionTemplate(List<IDEAction> actionList)
+    public EditorRunEmbedderAction(List<IDEAction> actionList)
     {
         super(actionList);
         
         setEditorActiveRequired(false);
         setAnalyzerActiveRequired(false);
         
-        putValue(Action.NAME, "Action name");
-        putValue(Action.SHORT_DESCRIPTION, "Action description");
-        //putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
-        //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
+        putValue(Action.NAME, "Layout graph");
+        putValue(Action.SHORT_DESCRIPTION, "Makes an automatic layout of the graph");
+        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_L));
+        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.CTRL_MASK));
         //putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Icon.gif")));
     }
     
@@ -44,5 +45,11 @@ public class ActionTemplate
      */
     public void doAction()
     {
+        GraphSubject graph = ide.getIDE().getActiveEditorWindowInterface().getControlledSurface().getGraph();
+        if (graph != null)
+        {
+            Thread t = new Thread(new SpringEmbedder(graph));
+            t.start();
+        }
     }
 }

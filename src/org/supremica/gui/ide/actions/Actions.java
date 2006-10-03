@@ -37,6 +37,7 @@ public class Actions
     public IDEAction editorAddForeachComponentAction = new EditorAddForeachComponentAction(allActions);
     public IDEAction editorAddInstanceAction = new EditorAddInstanceAction(allActions);
     public IDEAction editorAddBindingAction = new EditorAddBindingAction(allActions);
+    public IDEAction editorRunEmbedderAction = new EditorRunEmbedderAction(allActions);
 
     // Analyzer Options
     public IDEAction analyzerOptionsAction = new AnalyzerOptionsAction(allActions);

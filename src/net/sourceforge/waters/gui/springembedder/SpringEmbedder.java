@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.7 2006-10-01 09:28:27 flordal Exp $
+//# $Id: SpringEmbedder.java,v 1.8 2006-10-03 10:00:40 flordal Exp $
 //###########################################################################
 
 
@@ -36,7 +36,7 @@ public class SpringEmbedder
     this(graph, 228424);
   }
 
-  public SpringEmbedder(GraphSubject graph, final int seed)
+  private SpringEmbedder(GraphSubject graph, final int seed)
   {
     mRandom = new Random(seed);
     mGraph = graph;
