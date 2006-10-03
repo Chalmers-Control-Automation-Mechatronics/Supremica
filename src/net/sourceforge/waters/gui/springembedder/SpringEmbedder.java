@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.8 2006-10-03 10:00:40 flordal Exp $
+//# $Id: SpringEmbedder.java,v 1.9 2006-10-03 14:57:07 knut Exp $
 //###########################################################################
 
 
@@ -120,8 +120,60 @@ public class SpringEmbedder
     return maxdelta;
   }
 
+  private synchronized void updateGraphLocation()
+  {
+	double minX = Double.MAX_VALUE;
+	double minY = Double.MAX_VALUE;
+
+    for (final NodeWrapper wrapper : mNodeMap.values())
+    {
+		Point2D currPoint = wrapper.getNewPoint();
+		double currX = currPoint.getX();
+		double currY = currPoint.getY();
+		if (currX < minX)
+		{
+			minX = currX;
+		}
+		if (currY < minY)
+		{
+			minY = currY;
+		}
+    }
+
+    for (final EdgeWrapper wrapper : mEdgeMap.values())
+    {
+		Point2D currPoint = wrapper.getNewPoint();
+		double currX = currPoint.getX();
+		double currY = currPoint.getY();
+		if (currX < minX)
+		{
+			minX = currX;
+		}
+		if (currY < minY)
+		{
+			minY = currY;
+		}
+    }
+
+    double moveX = -(minX - GRAPH_MARGINAL_CONST);
+    double moveY = -(minY - GRAPH_MARGINAL_CONST);
+
+	POINT_CENTER.setLocation(POINT_CENTER.getX() + moveX, POINT_CENTER.getY() + moveY);
+	for (final NodeWrapper wrapper : mNodeMap.values())
+	{
+		wrapper.moveNewPoint(moveX, moveY);
+	}
+
+	for (final EdgeWrapper wrapper : mEdgeMap.values())
+	{
+		wrapper.moveNewPoint(moveX, moveY);
+	}
+  }
+
   private synchronized void updateModel()
   {
+    updateGraphLocation();
+
     for (final NodeWrapper wrapper : mNodeMap.values()) {
       wrapper.updateModel();
     }
@@ -136,15 +188,15 @@ public class SpringEmbedder
   {
     final double dx = p1.getX() - p2.getX();
     final double dy = p1.getY() - p2.getY();
-    final double len = dx * dx + dy * dy;   
+    final double len = dx * dx + dy * dy;
     if (len != 0) {
       return new Point2D.Double((dx / len) * constant,
                                 (dy / len) * constant);
-    } else {                       
+    } else {
       return new Point2D.Double(mRandom.nextDouble(), mRandom.nextDouble());
     }
-  }           
-                
+  }
+
   private Point2D attraction(final Point2D p1,
                              final Point2D p2,
                              final double constant)
@@ -204,7 +256,12 @@ public class SpringEmbedder
     {
       mNewPoint = point;
     }
-    
+
+    private void moveNewPoint(double dx, double dy)
+    {
+		mNewPoint.setLocation(mNewPoint.getX() + dx, mNewPoint.getY() + dy);
+	}
+
     //#######################################################################
     //# Auxiliary Methods
     private void updatePoint()
@@ -256,13 +313,13 @@ public class SpringEmbedder
       //   This also means that the best position for node labels will be above
       // and to the right of the node... not below and to the left!
       //   It would be nice if in the initial random layout, the initial state
-      // was put close to the top left corner to reduce the slow rotation of 
+      // was put close to the top left corner to reduce the slow rotation of
       // symmetric figures...
       if (isInitial)
       {
           final Point2D delta = attraction(mOldPoint,
-                                           POINT_ZERO,
-                                           INITIALSTATE_ATTRACTION);   
+                                           POINT_INITIAL_ZERO,
+                                           INITIALSTATE_ATTRACTION);
           dx += delta.getX();
           dy += delta.getY();
       }
@@ -317,14 +374,24 @@ public class SpringEmbedder
     {
       mNewPoint = point;
     }
-    
+
+    private Point2D getNewPoint()
+    {
+      return mNewPoint;
+    }
+
+    private void moveNewPoint(double dx, double dy)
+    {
+		mNewPoint.setLocation(mNewPoint.getX() + dx, mNewPoint.getY() + dy);
+	}
+
     //#######################################################################
     //# Auxiliary Methods
     private void updatePoint()
     {
       mOldPoint = mNewPoint;
     }
-    
+
     private void updateModel()
     {
       mGeometry.getPointsModifiable().set(0, mNewPoint);
@@ -417,8 +484,12 @@ public class SpringEmbedder
   private static final double NODEEDGE_REPULSION = 150.0;
 
   private static final double CONVERGENCE_CONST = 0.025;
+
+  private static final double GRAPH_MARGINAL_CONST = 50.0;
+
   private static final int UPDATE_CONST = 5;
 
   private static final Point2D POINT_ZERO = new Point2D.Double(0.0, 0.0);
-  private static final Point2D POINT_CENTER = new Point2D.Double(300.0, 300.0);
+  private static final Point2D POINT_INITIAL_ZERO = new Point2D.Double(0.0, 0.0);
+  private static final Point2D POINT_CENTER = new Point2D.Double(200.0, 200.0);
 }
