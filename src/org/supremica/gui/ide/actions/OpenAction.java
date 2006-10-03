@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   OpenAction
 //###########################################################################
-//# $Id: OpenAction.java,v 1.18 2006-09-17 18:04:16 flordal Exp $
+//# $Id: OpenAction.java,v 1.19 2006-10-03 09:15:11 knut Exp $
 //###########################################################################
 
 
@@ -29,13 +29,13 @@ public class OpenAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
-   
+
     private JFileChooser chooser;
-                
+
     public OpenAction(List<IDEAction> actionList)
     {
         super(actionList);
-        
+
         putValue(Action.NAME, "Open/Import...");
         putValue(Action.SHORT_DESCRIPTION, "Open/import a project");
         putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_O));
@@ -62,34 +62,41 @@ public class OpenAction
         // Select the first filter
         chooser.setFileFilter(ide.getIDE().getDocumentManager().getSupportedFileFilters().iterator().next());
     }
-    
+
     public void actionPerformed(ActionEvent e)
     {
         doAction();
     }
-    
+
     public void doAction()
     {
         final FileImporter importer = new WatersFileImporter(chooser);
     }
-    
-    
-    
+
+    public void doAction(List<File> theFiles)
+    {
+        final FileImporter importer = new WatersFileImporter(theFiles);
+    }
+
+
     //#######################################################################
     //# Local Class WatersFileImporter
-    private 
+    private
         class WatersFileImporter extends FileImporter
     {
-        
+
         //###################################################################
         //# Constructors
         private WatersFileImporter(JFileChooser chooser)
         {
             super(chooser, ide);
         }
-        
-        
-        
+
+        private WatersFileImporter(List<File> theFiles)
+        {
+            super(theFiles, ide);
+        }
+
         //###################################################################
         //# Overrides for Base Class org.supremica.gui.ide.actions.FileImporter
         void openFile(final File file)

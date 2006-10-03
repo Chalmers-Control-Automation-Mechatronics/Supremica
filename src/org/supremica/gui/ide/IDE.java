@@ -18,6 +18,7 @@ import javax.swing.event.ChangeEvent;
 import java.awt.BorderLayout;
 import java.awt.event.WindowEvent;
 import java.util.*;
+import java.io.File;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
@@ -27,6 +28,7 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import org.supremica.gui.Utility;
 import org.supremica.gui.InterfaceManager;
 import org.supremica.gui.ide.actions.Actions;
+import org.supremica.gui.ide.actions.OpenAction;
 import org.supremica.properties.Config;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Project;
@@ -367,6 +369,12 @@ public class IDE
         return activeModuleContainer.getUnselectedAutomata();
     }
 
+	public boolean openFiles(List<File> filesToOpen)
+	{
+		((OpenAction)theActions.openAction).doAction(filesToOpen);
+		return true;
+	}
+
     // ** MF ** Implementation of Gui stuff
     public void error(String msg)
     {
@@ -431,9 +439,10 @@ public class IDE
     public static void main(String args[])
     throws Exception
     {
-        ProcessCommandLineArguments.process(args);
+        List<File> filesToOpen = ProcessCommandLineArguments.process(args);
 
         IDE ide = new IDE();
         ide.setVisible(true);
+        ide.openFiles(filesToOpen);
     }
 }

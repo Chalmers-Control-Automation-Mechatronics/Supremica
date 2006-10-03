@@ -54,13 +54,16 @@ import org.supremica.Version;
 
 import java.lang.Exception;
 import java.io.*;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ProcessCommandLineArguments
 {
-    public static void process(String[] args)
+    public static List<File> process(String[] args)
     {
         boolean quit = false;
-        
+        List<File> filesToOpen = new LinkedList<File>();
+
         for (int i = 0; i < args.length; i++)
         {
             if (args[i].equals("-h") || args[i].equals("-?") || args[i].equals("--help") || args[i].equals("--usage"))
@@ -75,7 +78,7 @@ public class ProcessCommandLineArguments
                     String fileName = args[i + 1];
                     i++;
                     File propFile = new File(fileName);
-                    
+
                     try
                     {
                         if (!propFile.exists())
@@ -84,7 +87,7 @@ public class ProcessCommandLineArguments
                             System.out.println("Creating property file: " + propFile.getAbsolutePath());
                             propFile.createNewFile();
                         }
-                        
+
                         SupremicaProperties.loadProperties(propFile);
                     }
                     catch (Exception e)
@@ -104,23 +107,34 @@ public class ProcessCommandLineArguments
             }
             else
             {
-                System.out.println("Invalid usage.\n");
-                ProcessCommandLineArguments.printUsage();
-                quit = true;
+				String filename = args[i];
+				File  currFile = new File(filename);
+				if (!currFile.exists())
+				{
+                	System.out.println("Invalid usage.\n");
+                	ProcessCommandLineArguments.printUsage();
+                	quit = true;
+				}
+				else
+				{
+					filesToOpen.add(currFile);
+				}
             }
         }
-        
+
         if (quit)
         {
             System.exit(0);
         }
+
+        return filesToOpen;
     }
-    
+
     private static void printUsage()
     {
         System.out.println("Supremica: " + org.supremica.Version.version());
         System.out.println("More information about Supremica is available at www.supremica.org\n");
-        System.out.println("Usage: Supremica [OPTION]\n");
+        System.out.println("Usage: Supremica [OPTION] MODULE_FILES\n");
         System.out.println("Property options: \n  -p, --properties FILE\t\t Load properties from FILE");
         System.out.println("List: \n  -l, --list [FILE]\t\t List properties with current values (or values in FILE)");
         System.out.println("Help options: \n  -?, -h, --help, --usage\t show this help message");
