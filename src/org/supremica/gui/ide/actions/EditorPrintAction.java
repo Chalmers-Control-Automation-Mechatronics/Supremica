@@ -2,8 +2,10 @@ package org.supremica.gui.ide.actions;
 
 import javax.swing.Action;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.List;
 import javax.swing.ImageIcon;
+import javax.swing.KeyStroke;
 import org.supremica.gui.ide.IDE;
 
 public class EditorPrintAction
@@ -19,6 +21,8 @@ public class EditorPrintAction
         
         putValue(Action.NAME, "Print...");
         putValue(Action.SHORT_DESCRIPTION, "Print");
+        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_P));
+        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Print16.gif")));
     }
     

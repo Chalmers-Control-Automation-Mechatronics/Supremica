@@ -21,8 +21,10 @@ public class EditorAddSimpleComponentAction
         setEditorActiveRequired(true);
         
         putValue(Action.NAME, "New Automaton...");
+        
         putValue(Action.SHORT_DESCRIPTION, "Add new simple component to the project");
         putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
+        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/automaton16.gif")));
     }
     
