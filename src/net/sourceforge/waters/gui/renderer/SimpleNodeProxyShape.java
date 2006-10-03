@@ -47,9 +47,6 @@ public class SimpleNodeProxyShape
         // Draw the filling (depends on marking)
         updateColors();
         Rectangle2D rect = getShape().getBounds();
-        // Hm... +1,+1,-2,-2 is right in theory and in the postscript
-        // output but wrong on screen in the editor... never mind...
-        //rect.setRect(rect.getX() + 1, rect.getY() + 1, rect.getWidth() - 2, rect.getHeight() - 2);
         Arc2D arc;
         double i = 0;
         double degrees = ((double)360 / (double)mColors.size());
@@ -69,6 +66,8 @@ public class SimpleNodeProxyShape
                 i += degrees;
             }
         }
+        
+        // Draw initial state arrow
         g.setColor(status.getColor());
         if (isInitial)
         {
@@ -77,6 +76,16 @@ public class SimpleNodeProxyShape
         
         // Draw the basic shape (the outline)
         super.draw(g, status);
+        
+        // Cross out if forbidden
+        //if (isForbidden)
+        if (false)
+        {
+            g.setColor(EditorColor.ERRORCOLOR);
+            g.setStroke(DOUBLESTROKE);
+            g.drawLine((int) rect.getMaxX(), (int) rect.getMaxY(), (int) rect.getMinX(), (int) rect.getMinY());
+            g.drawLine((int) rect.getMaxX(), (int) rect.getMinY(), (int) rect.getMinX(), (int) rect.getMaxY());
+        }
     }
     
     /**
