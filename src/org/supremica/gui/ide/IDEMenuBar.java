@@ -86,15 +86,8 @@ public class IDEMenuBar
         // Analyze
         menu = new JMenu("Analyzer");
         menu.setMnemonic(KeyEvent.VK_A);
-        add(menu);
-/*
-        menu.add(new JMenuItem(ide.getActions().analyzerDeleteSelectedAction));
-        menu.add(new JMenuItem(ide.getActions().analyzerWorkbenchAction));
-        menu.addSeparator();
-        menu.add(new JMenuItem(ide.getActions().analyzerVerifierAction));
-        menu.add(new JMenuItem(ide.getActions().analyzerSynchronizerAction));
-        menu.add(new JMenuItem(ide.getActions().analyzerSynthesizerAction));
-*/
+//        add(menu);
+
 		JMenu viewMenu = new JMenu("View");
 		menu.add(viewMenu);
 		viewMenu.add(ide.getActions().analyzerViewAutomatonAction.getMenuItem());
