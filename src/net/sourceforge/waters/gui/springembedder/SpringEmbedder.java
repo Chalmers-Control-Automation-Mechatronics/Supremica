@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.10 2006-10-03 15:53:18 knut Exp $
+//# $Id: SpringEmbedder.java,v 1.11 2006-10-03 16:03:21 knut Exp $
 //###########################################################################
 
 
@@ -502,7 +502,7 @@ public class SpringEmbedder
 
   private static final int UPDATE_CONST = 5;
 
-  private static final Point2D POINT_ZERO = new Point2D.Double(0.0, 0.0);
-  private static final Point2D POINT_INITIAL_ZERO = new Point2D.Double(0.0, 0.0);
-  private static final Point2D POINT_CENTER = new Point2D.Double(200.0, 200.0);
+  private final Point2D POINT_ZERO = new Point2D.Double(0.0, 0.0);
+  private final Point2D POINT_INITIAL_ZERO = new Point2D.Double(0.0, 0.0);
+  private final Point2D POINT_CENTER = new Point2D.Double(200.0, 200.0);
 }
