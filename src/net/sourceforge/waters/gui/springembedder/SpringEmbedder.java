@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.9 2006-10-03 14:57:07 knut Exp $
+//# $Id: SpringEmbedder.java,v 1.10 2006-10-03 15:53:18 knut Exp $
 //###########################################################################
 
 
@@ -72,12 +72,15 @@ public class SpringEmbedder
   //# Interface java.lang.Runnable
   public void run()
   {
+	int nbrOfUpdates = 0;
     int count = 0;
     double maxdelta;
     do {
       maxdelta = calculateDisplacements();
       if (count++ >= UPDATE_CONST) {
         count = 0;
+        nbrOfUpdates++;
+
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
               updateModel();
@@ -85,12 +88,12 @@ public class SpringEmbedder
           });
         Thread.yield();
       }
-    } while (maxdelta > CONVERGENCE_CONST);
-    SwingUtilities.invokeLater(new Runnable() {
-        public void run() {
-          updateModel();
-        }
-      });
+    } while ((maxdelta > CONVERGENCE_CONST || getGraphLocationDisplacementError() > 5.0) && nbrOfUpdates <= 10000);
+	SwingUtilities.invokeLater(new Runnable() {
+		public void run() {
+		  updateModel();
+		}
+	  });
   }
 
 
@@ -158,6 +161,9 @@ public class SpringEmbedder
     double moveX = -(minX - GRAPH_MARGINAL_CONST);
     double moveY = -(minY - GRAPH_MARGINAL_CONST);
 
+	moveX = moveX / 5.0;
+	moveY = moveY / 5.0;
+
 	POINT_CENTER.setLocation(POINT_CENTER.getX() + moveX, POINT_CENTER.getY() + moveY);
 	for (final NodeWrapper wrapper : mNodeMap.values())
 	{
@@ -168,12 +174,18 @@ public class SpringEmbedder
 	{
 		wrapper.moveNewPoint(moveX, moveY);
 	}
+
+   	maxGraphLocationDisplacementError = Math.max(Math.abs(moveX), Math.abs(moveY));
+  }
+
+  private double getGraphLocationDisplacementError()
+  {
+	  return maxGraphLocationDisplacementError;
   }
 
   private synchronized void updateModel()
   {
-    updateGraphLocation();
-
+	updateGraphLocation();
     for (final NodeWrapper wrapper : mNodeMap.values()) {
       wrapper.updateModel();
     }
@@ -470,6 +482,7 @@ public class SpringEmbedder
   private final double mNodeRepulsion;
   private final double mNodeEdgeRepulsion;
   private final double mEdgeRepulsion;
+  private double maxGraphLocationDisplacementError;
 
 
   //###########################################################################
