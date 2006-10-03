@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.40 2006-09-29 15:41:02 knut Exp $
+//# $Id: ModuleContainer.java,v 1.41 2006-10-03 19:33:06 knut Exp $
 //###########################################################################
 
 
@@ -16,6 +16,7 @@ import java.awt.Dimension;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -35,13 +36,21 @@ import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.UndoRedoEvent;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.marshaller.ProductDESImporter;
+import net.sourceforge.waters.model.module.GraphProxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
+
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
@@ -328,6 +337,37 @@ public class ModuleContainer implements UndoInterface
         }
     }
 
+    public GraphProxy getFlatGraphProxy(String name)
+    {
+		List<Proxy> components = flatModule.getComponentList();
+		for (Proxy proxy : components)
+		{
+			if (proxy instanceof NamedProxy)
+			{
+				NamedProxy namedProxy = (NamedProxy)proxy;
+				if (name.equals(namedProxy.getName()))
+				{
+					if (proxy instanceof SimpleComponentProxy)
+					{
+						return ((SimpleComponentProxy)proxy).getGraph();
+					}
+					else
+					{
+						System.err.println("ModuleContainer.getFlatGraphProxy proxy: " + name + " not a GraphProxy");
+						return null;
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
+	public ModuleProxy getFlatModuleProxy()
+	{
+		return flatModule;
+	}
+
     /**
      * Updates the automata in the analyzer-tab.
      */
@@ -358,6 +398,11 @@ public class ModuleContainer implements UndoInterface
 		mVisualProject.clear();
 		mVisualProject.addAutomata(supremicaProject);
 		mVisualProject.updated();
+
+/*
+		ProductDESImporter importer = new ProductDESImporter(ModuleSubjectFactory.getInstance());
+		flatModule = (ModuleSubject) importer.importModule(mVisualProject);
+*/
 		return true;
     }
 
@@ -366,6 +411,7 @@ public class ModuleContainer implements UndoInterface
     //# Data Members
     private final IDE mIDE;
     private final ModuleSubject mModule;
+    private ModuleSubject flatModule = null;
     private final ExpressionParser mExpressionParser;
     private final ProxyPrinter mPrinter;
     private final UndoManager mUndoManager = new UndoManager();

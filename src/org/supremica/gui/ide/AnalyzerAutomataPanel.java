@@ -22,6 +22,12 @@ import java.awt.event.KeyEvent;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Project;
+import net.sourceforge.waters.gui.EditorSurface;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.GraphProxy;
+import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 
 
 public class AnalyzerAutomataPanel
@@ -188,9 +194,39 @@ public class AnalyzerAutomataPanel
 						}
 						else if (selectedAutomata.size() == 1)
 						{
-							Automaton selectedAutomaton = selectedAutomata.getFirstAutomaton();
-							AnalyzerAutomatonViewerPanel automatonPanel = new AnalyzerAutomatonViewerPanel(moduleContainer, "Dot View", selectedAutomaton);
-							analyzerPanel.setRightComponent(automatonPanel);
+							boolean use_dot = true;
+							if (use_dot)
+							{
+								Automaton selectedAutomaton = selectedAutomata.getFirstAutomaton();
+								AnalyzerAutomatonViewerPanel automatonPanel = new AnalyzerAutomatonViewerPanel(moduleContainer, "Dot View", selectedAutomaton);
+								analyzerPanel.setRightComponent(automatonPanel);
+							}
+							else
+							{
+								Automaton selectedAutomaton = selectedAutomata.getFirstAutomaton();
+								GraphProxy currGraphProxy = moduleContainer.getFlatGraphProxy(selectedAutomaton.getName());
+								ModuleProxy currModuleProxy = moduleContainer.getFlatModuleProxy();
+								if (currGraphProxy == null)
+								{
+									logger.error("AnalyzerAutomataPanel.currGraphProxy == null");
+									return;
+								}
+								if (currModuleProxy == null)
+								{
+									logger.error("AnalyzerAutomataPanel.currModuleProxy == null");
+									return;
+								}
+								try
+								{
+									EditorSurface surface = new EditorSurface(currGraphProxy, currModuleProxy, new SubjectShapeProducer((GraphSubject)currGraphProxy, currModuleProxy));
+									analyzerPanel.setRightComponent(surface);
+								}
+								catch(GeometryAbsentException ex)
+								{
+									logger.error("AnalyzerAutomataPanel.currModuleProxy gemotryAbsentException");
+									return;
+								}
+							}
 						}
 						else
 						{

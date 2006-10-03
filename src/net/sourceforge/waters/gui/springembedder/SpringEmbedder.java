@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.12 2006-10-03 16:23:19 knut Exp $
+//# $Id: SpringEmbedder.java,v 1.13 2006-10-03 19:33:06 knut Exp $
 //###########################################################################
 
 
@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Random;
 import javax.swing.SwingUtilities;
 
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
@@ -93,6 +94,8 @@ public class SpringEmbedder
 	SwingUtilities.invokeLater(new Runnable() {
 		public void run() {
 		  updateModel();
+		  ModelChangeEvent changeEvent = new ModelChangeEvent(getGraph(), ModelChangeEvent.GEOMETRY_CHANGED);
+		  getGraph().fireModelChanged(changeEvent);
 		}
 	  });
   }
@@ -182,6 +185,11 @@ public class SpringEmbedder
   private double getGraphLocationDisplacementError()
   {
 	  return maxGraphLocationDisplacementError;
+  }
+
+  private GraphSubject getGraph()
+  {
+	  return mGraph;
   }
 
   private synchronized void updateModel()

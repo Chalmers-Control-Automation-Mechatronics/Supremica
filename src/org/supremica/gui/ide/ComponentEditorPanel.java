@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.28 2006-09-25 03:55:30 siw4 Exp $
+//# $Id: ComponentEditorPanel.java,v 1.29 2006-10-03 19:33:06 knut Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -75,7 +75,7 @@ public class ComponentEditorPanel
                               final SimpleComponentSubject element,
                               final Dimension size)
     throws GeometryAbsentException
-								
+
 	{
 		this.element = element;
 		mModuleContainer = moduleContainer;
@@ -131,6 +131,15 @@ public class ComponentEditorPanel
 	{
 		return events;
 	}
+
+/*
+	public void repaint()
+	{
+		System.err.println("ComponentEditorPanel.repaint");
+		//scrollsurface.invalidate();
+		super.repaint();
+	}
+*/
 
     public void setDisplayed()
     {
