@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.30 2006-10-04 15:41:37 knut Exp $
+//# $Id: ComponentEditorPanel.java,v 1.31 2006-10-04 16:01:25 knut Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -16,12 +16,15 @@ import javax.swing.plaf.basic.BasicSplitPaneUI;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
+import java.io.*;
 import javax.swing.*;
 import java.awt.print.*;
 import java.util.Locale;
 import javax.print.attribute.*;
 import javax.print.attribute.standard.*;
+
+import com.lowagie.text.*;
+import com.lowagie.text.pdf.*;
 
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.ControlledToolbar;
@@ -183,7 +186,52 @@ public class ComponentEditorPanel
 	}
 
 
-	public void exportPDF() {}
+  public void exportPDF()
+  {
+    // Get file to export to
+    JFileChooser chooser = new JFileChooser();
+    chooser.setSelectedFile(new File(mModule.getName() + ".pdf"));
+    int returnVal = chooser.showSaveDialog(surface);
+    File file = chooser.getSelectedFile();
+    // Not OK?
+    if (returnVal != JFileChooser.APPROVE_OPTION)
+      {
+        return;
+      }
+
+    // Create output
+    int width = surface.getWidth();
+    int height = surface.getHeight();
+    Document document = new Document(new com.lowagie.text.Rectangle(width, height));
+
+    try
+      {
+        PdfWriter writer= PdfWriter.getInstance(document,  new FileOutputStream(file));
+
+        document.addAuthor("Supremica");
+        document.open();
+
+        PdfContentByte cb = writer.getDirectContent();
+        PdfTemplate tp = cb.createTemplate(width, height);
+        Graphics2D g2 = tp.createGraphics(width, height, new DefaultFontMapper());
+        surface.print(g2);
+        //Rectangle2D rectangle2D = new Rectangle2D.Double(0, 0, width, height);
+        //chart.draw(g2, rectangle2D);
+        g2.dispose();
+        cb.addTemplate(tp, 0, 0);
+
+      }
+    catch (DocumentException de)
+      {
+        System.err.println(de.getMessage());
+      }
+    catch (IOException ioe)
+      {
+        System.err.println(ioe.getMessage());
+      }
+
+    document.close();
+  }
 
 	public void exportPostscript() {}
 

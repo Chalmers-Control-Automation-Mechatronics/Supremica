@@ -28,8 +28,14 @@ public class PrintAction
 
 	public void doAction()
 	{
-		ModuleContainer moduleContainer = ide.getActiveModuleContainer();
-		EditorWindowInterface editorInterface = moduleContainer.getActiveEditorWindowInterface();
-		editorInterface.printFigure();
+        try
+        {
+            ide.getActiveModuleContainer().getEditorPanel().getActiveEditorWindowInterface().printFigure();
+        }
+        catch (NullPointerException ex)
+        {
+            // This action should only be enabled when theres an editor panel open!
+            ide.getIDE().info("Must have an editor panel open.");
+        }
 	}
 }
