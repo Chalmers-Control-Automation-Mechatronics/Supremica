@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="pointgeo" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="event"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="comp"/>
+<Graph Deterministic="true">
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<PointGeometry>
+<Point X="50" Y="50"/>
+</PointGeometry>
+</SimpleNode>
+<GroupNode Name="g0">
+<NodeRef Name="s0"/>
+<BoxGeometry>
+<Box Height="100" Width="100" X="0" Y="0"/>
+</BoxGeometry>
+</GroupNode>
+</NodeList>
+<EdgeList>
+<Edge Source="g0" Target="g0">
+<LabelBlock>
+<SimpleIdentifier Name="event"/>
+</LabelBlock>
+<StartPointGeometry>
+<Point X="0" Y="25"/>
+</StartPointGeometry>
+<EndPointGeometry>
+<Point X="50" Y="25"/>
+</EndPointGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
+

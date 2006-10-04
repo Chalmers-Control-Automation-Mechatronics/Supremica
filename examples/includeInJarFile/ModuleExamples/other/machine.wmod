@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Module xmlns="http://waters.sourceforge.net/xsd/module" Name="machine">
+<ParameterList>
+  <EventParameter Name="start" Kind="CONTROLLABLE"/>
+  <EventParameter Name="finish" Kind="UNCONTROLLABLE"/>
+  <EventParameter Name="break" Kind="UNCONTROLLABLE" Required="false"/>
+  <EventParameter Name="repair" Kind="CONTROLLABLE" Required="false"/>
+  <EventParameter Name="@omega" Kind="PROPOSITION"/>
+</ParameterList>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+  <SimpleIdentifier Name="machine"/>
+  <Graph>
+  <NodeList>
+    <SimpleNode Name="idle" Initial="true">
+      <EventList>
+        <SimpleIdentifier Name="@omega"/>
+      </EventList>
+    </SimpleNode>
+    <SimpleNode Name="working"/>
+    <SimpleNode Name="down"/>
+  </NodeList>
+  <EdgeList>
+    <Edge Source="idle" Target="working">
+      <LabelBlock><SimpleIdentifier Name="start"/></LabelBlock>
+    </Edge>
+    <Edge Source="working" Target="idle">
+      <LabelBlock><SimpleIdentifier Name="finish"/></LabelBlock>
+    </Edge>
+    <Edge Source="working" Target="down">
+      <LabelBlock><SimpleIdentifier Name="break"/></LabelBlock>
+    </Edge>
+    <Edge Source="down" Target="idle">
+      <LabelBlock><SimpleIdentifier Name="repair"/></LabelBlock>
+    </Edge>
+  </EdgeList>
+  </Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>

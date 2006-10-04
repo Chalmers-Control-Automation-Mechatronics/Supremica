@@ -1,0 +1,670 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="wonham_templ" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ConstantAliasList>
+        <ConstantAlias>
+            <SimpleIdentifier Name="GROUPS"/>
+            <BinaryExpression Operator="..">
+                <IntConstant Value="1"/>
+                <IntConstant Value="1"/>
+            </BinaryExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
+    <EventDeclList>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="tu_reject">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="1"/>
+                <IntConstant Value="1"/>
+            </BinaryExpression>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Observable="true" Name="tu_load">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="0"/>
+                <IntConstant Value="1"/>
+            </BinaryExpression>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="tu_accept">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="0"/>
+                <IntConstant Value="1"/>
+            </BinaryExpression>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="machine_unload">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="1"/>
+                <IntConstant Value="1"/>
+            </BinaryExpression>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Observable="true" Name="machine_load">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="1"/>
+                <IntConstant Value="1"/>
+            </BinaryExpression>
+        </EventDecl>
+        <EventDecl Kind="PROPOSITION" Observable="true" Name=":omega"/>
+    </EventDeclList>
+    <ComponentList>
+        <ForeachComponent Name="_0">
+            <EnumSetExpression/>
+            <ComponentList>
+                <SimpleComponent Kind="SPEC">
+                    <IndexedIdentifier Name="b1sup1">
+                        <SimpleIdentifier Name="_0"/>
+                    </IndexedIdentifier>
+                    <Graph Deterministic="true">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <SimpleIdentifier Name="GROUP"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="tu_accept">
+                                <SimpleIdentifier Name="PREV"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="tu_load">
+                                <SimpleIdentifier Name="PREV"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                        <NodeList>
+                            <SimpleNode Initial="true" Name="EMPTY">
+                                <EventList>
+                                    <SimpleIdentifier Name=":omega"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point X="208" Y="80"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="SW">
+                                    <Point X="-53" Y="5"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Initial="false" Name="FILLED1">
+                                <PointGeometry>
+                                    <Point X="208" Y="160"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="SW">
+                                    <Point X="-60" Y="5"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Initial="false" Name="FILLED2">
+                                <PointGeometry>
+                                    <Point X="208" Y="240"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="SW">
+                                    <Point X="-63" Y="7"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Initial="false" Name="FILLED3">
+                                <PointGeometry>
+                                    <Point X="208" Y="320"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="SW">
+                                    <Point X="-61" Y="7"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Source="FILLED2" Target="FILLED2">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="tu_load">
+                                        <SimpleIdentifier Name="PREV"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="3" Y="-4"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry Kind="INTERPOLATING">
+                                    <Point X="244" Y="240"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Source="FILLED2" Target="FILLED3">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="tu_accept">
+                                        <SimpleIdentifier Name="PREV"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-97" Y="-5"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry Kind="INTERPOLATING">
+                                    <Point X="176" Y="279"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Source="FILLED2" Target="FILLED1">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="tu_accept">
+                                        <SimpleIdentifier Name="GROUP"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="6" Y="-5"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry Kind="INTERPOLATING">
+                                    <Point X="242" Y="199"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Source="EMPTY" Target="EMPTY">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="tu_accept">
+                                        <SimpleIdentifier Name="GROUP"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="tu_load">
+                                        <SimpleIdentifier Name="PREV"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="6" Y="-13"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry Kind="INTERPOLATING">
+                                    <Point X="242" Y="80"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Source="EMPTY" Target="FILLED1">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="tu_accept">
+                                        <SimpleIdentifier Name="PREV"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-95" Y="-5"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry Kind="INTERPOLATING">
+                                    <Point X="176" Y="120"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Source="FILLED3" Target="FILLED2">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="tu_accept">
+                                        <SimpleIdentifier Name="GROUP"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="6" Y="-6"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry Kind="INTERPOLATING">
+                                    <Point X="243" Y="279"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Source="FILLED1" Target="FILLED2">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="tu_accept">
+                                        <SimpleIdentifier Name="PREV"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-96" Y="-6"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry Kind="INTERPOLATING">
+                                    <Point X="176" Y="201"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Source="FILLED1" Target="EMPTY">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="tu_accept">
+                                        <SimpleIdentifier Name="GROUP"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="5" Y="-5"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry Kind="INTERPOLATING">
+                                    <Point X="242" Y="119"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Source="FILLED1" Target="FILLED1">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="tu_load">
+                                        <SimpleIdentifier Name="PREV"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="6" Y="-5"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry Kind="INTERPOLATING">
+                                    <Point X="242" Y="160"/>
+                                </SplineGeometry>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+            </ComponentList>
+        </ForeachComponent>
+        <ForeachComponent Name="_0">
+            <EnumSetExpression/>
+            <ComponentList>
+                <SimpleComponent Kind="SPEC">
+                    <IndexedIdentifier Name="b1sup2">
+                        <SimpleIdentifier Name="_0"/>
+                    </IndexedIdentifier>
+                    <Graph Deterministic="true">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="machine_load">
+                                <SimpleIdentifier Name="GROUP"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="tu_accept">
+                                <SimpleIdentifier Name="PREV"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="tu_reject">
+                                <SimpleIdentifier Name="GROUP"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                        <NodeList>
+                            <SimpleNode Initial="true" Name="EMPTY">
+                                <EventList>
+                                    <SimpleIdentifier Name=":omega"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point X="192" Y="64"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="SW">
+                                    <Point X="11" Y="5"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Initial="false" Name="FILLED1">
+                                <PointGeometry>
+                                    <Point X="192" Y="144"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="SW">
+                                    <Point X="11" Y="5"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Initial="false" Name="FILLED2">
+                                <PointGeometry>
+                                    <Point X="192" Y="224"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="SW">
+                                    <Point X="11" Y="5"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Initial="false" Name="FILLED3">
+                                <PointGeometry>
+                                    <Point X="192" Y="304"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="SW">
+                                    <Point X="11" Y="5"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Source="FILLED2" Target="FILLED3">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="tu_accept">
+                                        <SimpleIdentifier Name="PREV"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="tu_reject">
+                                        <SimpleIdentifier Name="GROUP"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-99" Y="-14"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry Kind="INTERPOLATING">
+                                    <Point X="159" Y="262"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Source="FILLED2" Target="FILLED1">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="machine_load">
+                                        <SimpleIdentifier Name="GROUP"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="5" Y="-5"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry Kind="INTERPOLATING">
+                                    <Point X="226" Y="184"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Source="FILLED3" Target="FILLED2">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="machine_load">
+                                        <SimpleIdentifier Name="GROUP"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="7" Y="-5"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry Kind="INTERPOLATING">
+                                    <Point X="225" Y="264"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Source="FILLED1" Target="FILLED2">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="tu_accept">
+                                        <SimpleIdentifier Name="PREV"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="tu_reject">
+                                        <SimpleIdentifier Name="GROUP"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-100" Y="-14"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry Kind="INTERPOLATING">
+                                    <Point X="158" Y="183"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Source="FILLED1" Target="EMPTY">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="machine_load">
+                                        <SimpleIdentifier Name="GROUP"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="6" Y="-5"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry Kind="INTERPOLATING">
+                                    <Point X="225" Y="103"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Source="EMPTY" Target="FILLED1">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="tu_accept">
+                                        <SimpleIdentifier Name="PREV"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="tu_reject">
+                                        <SimpleIdentifier Name="GROUP"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-100" Y="-17"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry Kind="INTERPOLATING">
+                                    <Point X="159" Y="103"/>
+                                </SplineGeometry>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+            </ComponentList>
+        </ForeachComponent>
+        <ForeachComponent Name="GROUP">
+            <SimpleIdentifier Name="GROUPS"/>
+            <ComponentList>
+                <SimpleComponent Kind="SPEC">
+                    <IndexedIdentifier Name="b2sup">
+                        <SimpleIdentifier Name="GROUP"/>
+                    </IndexedIdentifier>
+                    <Graph Deterministic="true">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="machine_load">
+                                <SimpleIdentifier Name="GROUP"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="machine_unload">
+                                <SimpleIdentifier Name="GROUP"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="tu_load">
+                                <SimpleIdentifier Name="GROUP"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                        <NodeList>
+                            <SimpleNode Initial="true" Name="EMPTY">
+                                <EventList>
+                                    <SimpleIdentifier Name=":omega"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point X="224" Y="176"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="SW">
+                                    <Point X="11" Y="5"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Initial="false" Name="FULL">
+                                <PointGeometry>
+                                    <Point X="224" Y="256"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="SW">
+                                    <Point X="11" Y="5"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Source="FULL" Target="EMPTY">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="tu_load">
+                                        <SimpleIdentifier Name="GROUP"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="6" Y="-7"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry Kind="INTERPOLATING">
+                                    <Point X="257" Y="216"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Source="EMPTY" Target="FULL">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="machine_unload">
+                                        <SimpleIdentifier Name="GROUP"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-146" Y="-7"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry Kind="INTERPOLATING">
+                                    <Point X="190" Y="215"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Source="EMPTY" Target="EMPTY">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="machine_load">
+                                        <SimpleIdentifier Name="GROUP"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-53" Y="-13"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry Kind="INTERPOLATING">
+                                    <Point X="225" Y="138"/>
+                                </SplineGeometry>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+            </ComponentList>
+        </ForeachComponent>
+        <SimpleComponent Kind="PLANT">
+            <SimpleIdentifier Name="init"/>
+            <Graph Deterministic="true">
+                <LabelBlock>
+                    <IndexedIdentifier Name="tu_accept">
+                        <IntConstant Value="0"/>
+                    </IndexedIdentifier>
+                    <IndexedIdentifier Name="tu_load">
+                        <IntConstant Value="0"/>
+                    </IndexedIdentifier>
+                </LabelBlock>
+                <NodeList>
+                    <SimpleNode Initial="false" Name="WORKING">
+                        <PointGeometry>
+                            <Point X="214" Y="249"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="SW">
+                            <Point X="11" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="IDLE">
+                        <EventList>
+                            <SimpleIdentifier Name=":omega"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="214" Y="162"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="SW">
+                            <Point X="11" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="IDLE" Target="WORKING">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_load">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-57" Y="-5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry Kind="INTERPOLATING">
+                            <Point X="176" Y="201"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="WORKING" Target="IDLE">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="5" Y="-7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry Kind="INTERPOLATING">
+                            <Point X="256" Y="203"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <ForeachComponent Name="GROUP">
+            <SimpleIdentifier Name="GROUPS"/>
+            <ComponentList>
+                <SimpleComponent Kind="PLANT">
+                    <IndexedIdentifier Name="machine">
+                        <SimpleIdentifier Name="GROUP"/>
+                    </IndexedIdentifier>
+                    <Graph Deterministic="true">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="machine_load">
+                                <SimpleIdentifier Name="GROUP"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="machine_unload">
+                                <SimpleIdentifier Name="GROUP"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                        <NodeList>
+                            <SimpleNode Initial="false" Name="WORKING">
+                                <PointGeometry>
+                                    <Point X="234" Y="249"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="SW">
+                                    <Point X="11" Y="5"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Initial="true" Name="IDLE">
+                                <EventList>
+                                    <SimpleIdentifier Name=":omega"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point X="234" Y="162"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="SW">
+                                    <Point X="11" Y="5"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Source="IDLE" Target="WORKING">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="machine_load">
+                                        <SimpleIdentifier Name="GROUP"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-132" Y="-6"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry Kind="INTERPOLATING">
+                                    <Point X="192" Y="201"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Source="WORKING" Target="IDLE">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="machine_unload">
+                                        <SimpleIdentifier Name="GROUP"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="6" Y="-7"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry Kind="INTERPOLATING">
+                                    <Point X="274" Y="201"/>
+                                </SplineGeometry>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+            </ComponentList>
+        </ForeachComponent>
+        <ForeachComponent Name="GROUP">
+            <SimpleIdentifier Name="GROUPS"/>
+            <ComponentList>
+                <SimpleComponent Kind="PLANT">
+                    <IndexedIdentifier Name="testunit">
+                        <SimpleIdentifier Name="GROUP"/>
+                    </IndexedIdentifier>
+                    <Graph Deterministic="true">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="tu_accept">
+                                <SimpleIdentifier Name="GROUP"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="tu_load">
+                                <SimpleIdentifier Name="GROUP"/>
+                            </IndexedIdentifier>
+                            <IndexedIdentifier Name="tu_reject">
+                                <SimpleIdentifier Name="GROUP"/>
+                            </IndexedIdentifier>
+                        </LabelBlock>
+                        <NodeList>
+                            <SimpleNode Initial="false" Name="WORKING">
+                                <PointGeometry>
+                                    <Point X="198" Y="249"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="SW">
+                                    <Point X="11" Y="5"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                            <SimpleNode Initial="true" Name="IDLE">
+                                <EventList>
+                                    <SimpleIdentifier Name=":omega"/>
+                                </EventList>
+                                <PointGeometry>
+                                    <Point X="198" Y="162"/>
+                                </PointGeometry>
+                                <LabelGeometry Anchor="SW">
+                                    <Point X="11" Y="5"/>
+                                </LabelGeometry>
+                            </SimpleNode>
+                        </NodeList>
+                        <EdgeList>
+                            <Edge Source="WORKING" Target="IDLE">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="tu_reject">
+                                        <SimpleIdentifier Name="GROUP"/>
+                                    </IndexedIdentifier>
+                                    <IndexedIdentifier Name="tu_accept">
+                                        <SimpleIdentifier Name="GROUP"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="5" Y="-13"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry Kind="INTERPOLATING">
+                                    <Point X="241" Y="201"/>
+                                </SplineGeometry>
+                            </Edge>
+                            <Edge Source="IDLE" Target="WORKING">
+                                <LabelBlock>
+                                    <IndexedIdentifier Name="tu_load">
+                                        <SimpleIdentifier Name="GROUP"/>
+                                    </IndexedIdentifier>
+                                    <LabelGeometry Anchor="NW">
+                                        <Point X="-90" Y="-6"/>
+                                    </LabelGeometry>
+                                </LabelBlock>
+                                <SplineGeometry Kind="INTERPOLATING">
+                                    <Point X="159" Y="201"/>
+                                </SplineGeometry>
+                            </Edge>
+                        </EdgeList>
+                    </Graph>
+                </SimpleComponent>
+            </ComponentList>
+        </ForeachComponent>
+    </ComponentList>
+</Module>
+

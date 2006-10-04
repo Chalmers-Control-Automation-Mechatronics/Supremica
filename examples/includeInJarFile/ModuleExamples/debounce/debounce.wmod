@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="debounce" xmlns="http://waters.sourceforge.net/xsd/module">
+<ConstantAliasList>
+<ConstantAlias>
+<SimpleIdentifier Name="BITS"/>
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="chg_value">
+<SimpleIdentifier Name="BITS"/>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="reset">
+<SimpleIdentifier Name="BITS"/>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="timer">
+<SimpleIdentifier Name="BITS"/>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="timeout">
+<SimpleIdentifier Name="BITS"/>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="new_value">
+<SimpleIdentifier Name="BITS"/>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name=":omega"/>
+</EventDeclList>
+<ComponentList>
+<ForeachComponent Name="I">
+<SimpleIdentifier Name="BITS"/>
+<ComponentList>
+<SimpleComponent Kind="SPEC">
+<IndexedIdentifier Name="debouncing_ok">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<Graph>
+<LabelBlock>
+<IndexedIdentifier Name="chg_value">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="new_value">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timer">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="FLIP">
+<PointGeometry>
+<Point X="256" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="11" Y="7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="INIT">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="256" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="11" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="CHG">
+<PointGeometry>
+<Point X="256" Y="336"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="12" Y="7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="WAIT">
+<PointGeometry>
+<Point X="256" Y="256"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="11" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="CHG" Target="INIT">
+<LabelBlock>
+<IndexedIdentifier Name="new_value">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="chg_value">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="11" Y="69"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="159" Y="217"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="INIT" Target="INIT">
+<LabelBlock>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="296" Y="96"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="INIT" Target="FLIP">
+<LabelBlock>
+<IndexedIdentifier Name="new_value">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="WAIT" Target="CHG">
+<LabelBlock>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="WAIT" Target="INIT">
+<LabelBlock>
+<IndexedIdentifier Name="new_value">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-19" Y="30"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="191" Y="177"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="FLIP" Target="INIT">
+<LabelBlock>
+<IndexedIdentifier Name="new_value">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-48" Y="21"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="223" Y="137"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="FLIP" Target="WAIT">
+<LabelBlock>
+<IndexedIdentifier Name="timer">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="256" Y="216"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="FLIP" Target="FLIP">
+<LabelBlock>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="296" Y="177"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+<ForeachComponent Name="I">
+<SimpleIdentifier Name="BITS"/>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="sensor_and_filter">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<Graph>
+<LabelBlock>
+<IndexedIdentifier Name="new_value">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="183" Y="195"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s0" Target="s0">
+<LabelBlock>
+<IndexedIdentifier Name="new_value">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="14" Y="7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="210" Y="168"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+<ForeachComponent Name="I">
+<SimpleIdentifier Name="BITS"/>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="timer">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<Graph>
+<LabelBlock>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timer">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="on">
+<PointGeometry>
+<Point X="144" Y="48"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="12" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="off">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="48" Y="48"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-25" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="off" Target="on">
+<LabelBlock>
+<IndexedIdentifier Name="timer">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-16" Y="6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="97" Y="65"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="on" Target="off">
+<LabelBlock>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="I"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-21" Y="-29"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="96" Y="32"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</Module>
+

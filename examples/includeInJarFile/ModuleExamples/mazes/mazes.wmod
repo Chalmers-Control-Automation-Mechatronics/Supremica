@@ -1,0 +1,1021 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="mazes" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="enter"/>
+<EventDecl Kind="CONTROLLABLE" Name="pickup"/>
+<EventDecl Kind="CONTROLLABLE" Name="escape"/>
+<EventDecl Kind="CONTROLLABLE" Name="crush"/>
+<EventDecl Kind="CONTROLLABLE" Name="exit"/>
+<EventDecl Kind="CONTROLLABLE" Name="clear"/>
+<EventDecl Kind="CONTROLLABLE" Name="unlock"/>
+<EventDecl Kind="PROPOSITION" Name=":omega"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="door_norock"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<SimpleIdentifier Name="exit"/>
+<SimpleIdentifier Name="unlock"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="hero">
+<PointGeometry>
+<Point X="208" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-11" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="door">
+<PointGeometry>
+<Point X="112" Y="80"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-13" Y="-9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="free">
+<PointGeometry>
+<Point X="208" Y="80"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-11" Y="-9"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="hero" Target="free">
+<LabelBlock>
+<SimpleIdentifier Name="exit"/>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="225" Y="129"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="free" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<LabelGeometry Anchor="NW">
+<Point X="-38" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="193" Y="129"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="door" Target="free">
+<LabelBlock>
+<SimpleIdentifier Name="unlock"/>
+<LabelGeometry Anchor="NW">
+<Point X="-18" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="door_rock"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="clear"/>
+<SimpleIdentifier Name="crush"/>
+<SimpleIdentifier Name="enter"/>
+<SimpleIdentifier Name="exit"/>
+<SimpleIdentifier Name="unlock"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="free">
+<PointGeometry>
+<Point X="208" Y="80"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-11" Y="-9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="door">
+<PointGeometry>
+<Point X="112" Y="80"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-13" Y="-9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="rock">
+<PointGeometry>
+<Point X="112" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-12" Y="22"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="hero">
+<PointGeometry>
+<Point X="208" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-11" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="rock" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="clear"/>
+<LabelGeometry Anchor="NW">
+<Point X="-15" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="free" Target="rock">
+<LabelBlock>
+<SimpleIdentifier Name="crush"/>
+<LabelGeometry Anchor="NW">
+<Point X="-25" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="free" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<LabelGeometry Anchor="NW">
+<Point X="-22" Y="-1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="197" Y="131"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="door" Target="rock">
+<LabelBlock>
+<SimpleIdentifier Name="crush"/>
+<LabelGeometry Anchor="NW">
+<Point X="-33" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="door" Target="free">
+<LabelBlock>
+<SimpleIdentifier Name="unlock"/>
+<LabelGeometry Anchor="NW">
+<Point X="-18" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="hero" Target="free">
+<LabelBlock>
+<SimpleIdentifier Name="exit"/>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="219" Y="126"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="exit_norock"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<SimpleIdentifier Name="escape"/>
+<SimpleIdentifier Name="exit"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="exit">
+<PointGeometry>
+<Point X="112" Y="208"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-33" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="exit" Target="exit">
+<LabelBlock>
+<SimpleIdentifier Name="escape"/>
+<LabelGeometry Anchor="NW">
+<Point X="-20" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="139" Y="181"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="exit_rock"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="clear"/>
+<SimpleIdentifier Name="crush"/>
+<SimpleIdentifier Name="enter"/>
+<SimpleIdentifier Name="escape"/>
+<SimpleIdentifier Name="exit"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="exit">
+<PointGeometry>
+<Point X="112" Y="208"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-33" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="rock">
+<PointGeometry>
+<Point X="112" Y="128"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-37" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="hero">
+<PointGeometry>
+<Point X="208" Y="128"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="14" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="free">
+<PointGeometry>
+<Point X="160" Y="48"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-10" Y="-14"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="rock" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="clear"/>
+<LabelGeometry Anchor="NW">
+<Point X="-15" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="exit" Target="rock">
+<LabelBlock>
+<SimpleIdentifier Name="crush"/>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="exit" Target="exit">
+<LabelBlock>
+<SimpleIdentifier Name="escape"/>
+<LabelGeometry Anchor="NW">
+<Point X="-37" Y="20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="152" Y="208"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="free" Target="rock">
+<LabelBlock>
+<SimpleIdentifier Name="crush"/>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="free" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<LabelGeometry Anchor="NW">
+<Point X="-18" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="176" Y="96"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="hero" Target="free">
+<LabelBlock>
+<SimpleIdentifier Name="exit"/>
+<LabelGeometry Anchor="NW">
+<Point X="1" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="192" Y="81"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="free_norock"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<SimpleIdentifier Name="exit"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="hero">
+<PointGeometry>
+<Point X="160" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-11" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="free">
+<PointGeometry>
+<Point X="160" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-10" Y="-14"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="hero" Target="free">
+<LabelBlock>
+<SimpleIdentifier Name="exit"/>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="176" Y="136"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="free" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<LabelGeometry Anchor="NW">
+<Point X="-39" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="145" Y="137"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="free_rock"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="clear"/>
+<SimpleIdentifier Name="crush"/>
+<SimpleIdentifier Name="enter"/>
+<SimpleIdentifier Name="exit"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="free">
+<PointGeometry>
+<Point X="160" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-10" Y="-14"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="hero">
+<PointGeometry>
+<Point X="208" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-11" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="rock">
+<PointGeometry>
+<Point X="112" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-12" Y="22"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="hero" Target="free">
+<LabelBlock>
+<SimpleIdentifier Name="exit"/>
+<LabelGeometry Anchor="NW">
+<Point X="1" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="192" Y="129"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="rock" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="clear"/>
+<LabelGeometry Anchor="NW">
+<Point X="-15" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="free" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<LabelGeometry Anchor="NW">
+<Point X="-18" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="176" Y="144"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="free" Target="rock">
+<LabelBlock>
+<SimpleIdentifier Name="crush"/>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="gate_norock"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<SimpleIdentifier Name="exit"/>
+<SimpleIdentifier Name="unlock"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="gate">
+<PointGeometry>
+<Point X="128" Y="208"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-35" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="free">
+<PointGeometry>
+<Point X="208" Y="48"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-10" Y="-14"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="unlocked">
+<PointGeometry>
+<Point X="208" Y="208"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="14" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="hero">
+<PointGeometry>
+<Point X="208" Y="128"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="14" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="free" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<LabelGeometry Anchor="NW">
+<Point X="-35" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="192" Y="90"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="gate" Target="unlocked">
+<LabelBlock>
+<SimpleIdentifier Name="unlock"/>
+<LabelGeometry Anchor="NW">
+<Point X="-21" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="unlocked" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="hero" Target="free">
+<LabelBlock>
+<SimpleIdentifier Name="exit"/>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="223" Y="87"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="gate_rock"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="clear"/>
+<SimpleIdentifier Name="crush"/>
+<SimpleIdentifier Name="enter"/>
+<SimpleIdentifier Name="exit"/>
+<SimpleIdentifier Name="unlock"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="free">
+<PointGeometry>
+<Point X="160" Y="48"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-10" Y="-14"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="hero">
+<PointGeometry>
+<Point X="208" Y="128"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="14" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="rock">
+<PointGeometry>
+<Point X="112" Y="128"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-37" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="gate">
+<PointGeometry>
+<Point X="112" Y="208"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-35" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="unlocked">
+<PointGeometry>
+<Point X="208" Y="208"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="14" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="rock" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="clear"/>
+<LabelGeometry Anchor="NW">
+<Point X="-15" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="gate" Target="unlocked">
+<LabelBlock>
+<SimpleIdentifier Name="unlock"/>
+<LabelGeometry Anchor="NW">
+<Point X="-21" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="hero" Target="free">
+<LabelBlock>
+<SimpleIdentifier Name="exit"/>
+<LabelGeometry Anchor="NW">
+<Point X="1" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="192" Y="81"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="free" Target="rock">
+<LabelBlock>
+<SimpleIdentifier Name="crush"/>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="free" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<LabelGeometry Anchor="NW">
+<Point X="-18" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="176" Y="96"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="unlocked" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="hero_norock"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<SimpleIdentifier Name="exit"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="free">
+<PointGeometry>
+<Point X="160" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-10" Y="-14"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="hero">
+<PointGeometry>
+<Point X="160" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-11" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="hero" Target="free">
+<LabelBlock>
+<SimpleIdentifier Name="exit"/>
+<LabelGeometry Anchor="NW">
+<Point X="8" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="176" Y="136"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="free" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<LabelGeometry Anchor="NW">
+<Point X="-39" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="145" Y="137"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="hero_rock"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="clear"/>
+<SimpleIdentifier Name="crush"/>
+<SimpleIdentifier Name="enter"/>
+<SimpleIdentifier Name="exit"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="free">
+<PointGeometry>
+<Point X="160" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-10" Y="-14"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="hero">
+<PointGeometry>
+<Point X="208" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-11" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="rock">
+<PointGeometry>
+<Point X="112" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-12" Y="22"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="hero" Target="free">
+<LabelBlock>
+<SimpleIdentifier Name="exit"/>
+<LabelGeometry Anchor="NW">
+<Point X="1" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="192" Y="129"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="free" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<LabelGeometry Anchor="NW">
+<Point X="-18" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="176" Y="144"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="free" Target="rock">
+<LabelBlock>
+<SimpleIdentifier Name="crush"/>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="rock" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="clear"/>
+<LabelGeometry Anchor="NW">
+<Point X="-15" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="key_norock"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<SimpleIdentifier Name="exit"/>
+<SimpleIdentifier Name="pickup"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="hero">
+<PointGeometry>
+<Point X="160" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="13" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="key">
+<PointGeometry>
+<Point X="160" Y="256"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="12" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="free">
+<PointGeometry>
+<Point X="160" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="15" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="key" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="pickup"/>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="free" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<LabelGeometry Anchor="NW">
+<Point X="-35" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="145" Y="137"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="hero" Target="free">
+<LabelBlock>
+<SimpleIdentifier Name="exit"/>
+<LabelGeometry Anchor="NW">
+<Point X="6" Y="-4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="177" Y="135"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="key_rock"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="clear"/>
+<SimpleIdentifier Name="crush"/>
+<SimpleIdentifier Name="enter"/>
+<SimpleIdentifier Name="exit"/>
+<SimpleIdentifier Name="pickup"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="free">
+<PointGeometry>
+<Point X="160" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-11" Y="-9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="key">
+<PointGeometry>
+<Point X="160" Y="256"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-9" Y="23"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="hero">
+<PointGeometry>
+<Point X="208" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="13" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="rock">
+<PointGeometry>
+<Point X="112" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-40" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="key" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="pickup"/>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="key" Target="rock">
+<LabelBlock>
+<SimpleIdentifier Name="crush"/>
+<LabelGeometry Anchor="NW">
+<Point X="-34" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="hero" Target="free">
+<LabelBlock>
+<SimpleIdentifier Name="exit"/>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="192" Y="129"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="free" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<LabelGeometry Anchor="NW">
+<Point X="-22" Y="-1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="176" Y="144"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="free" Target="rock">
+<LabelBlock>
+<SimpleIdentifier Name="crush"/>
+<LabelGeometry Anchor="NW">
+<Point X="-31" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="rock" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="clear"/>
+<LabelGeometry Anchor="NW">
+<Point X="-15" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="rock"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="clear"/>
+<SimpleIdentifier Name="crush"/>
+<SimpleIdentifier Name="enter"/>
+<SimpleIdentifier Name="exit"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="rock">
+<PointGeometry>
+<Point X="112" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-12" Y="22"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="hero">
+<PointGeometry>
+<Point X="208" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-11" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="free">
+<PointGeometry>
+<Point X="160" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-10" Y="-14"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="hero" Target="free">
+<LabelBlock>
+<SimpleIdentifier Name="exit"/>
+<LabelGeometry Anchor="NW">
+<Point X="1" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="192" Y="129"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="rock" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="clear"/>
+<LabelGeometry Anchor="NW">
+<Point X="-15" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="free" Target="hero">
+<LabelBlock>
+<SimpleIdentifier Name="enter"/>
+<LabelGeometry Anchor="NW">
+<Point X="-18" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="176" Y="144"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="free" Target="rock">
+<LabelBlock>
+<SimpleIdentifier Name="crush"/>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
+

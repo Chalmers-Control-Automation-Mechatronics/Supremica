@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" Name="nodegroup3">
+<EventDeclList>
+<EventDecl Name="e" Kind="CONTROLLABLE"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="nodegroup3"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="e"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="q0"/>
+<SimpleNode Name="q1"/>
+<SimpleNode Name="q2"/>
+<GroupNode Name=":group1">
+<NodeRef Name="q0"/>
+<NodeRef Name="q1"/>
+</GroupNode>
+<GroupNode Name=":group2">
+<NodeRef Name="q0"/>
+<NodeRef Name="q2"/>
+</GroupNode>
+</NodeList>
+<EdgeList>
+<Edge Source=":group1" Target="q1">
+<LabelBlock>
+<SimpleIdentifier Name="e"/>
+</LabelBlock>
+</Edge>
+<Edge Source=":group2" Target="q2">
+<LabelBlock>
+<SimpleIdentifier Name="e"/>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>

@@ -1,0 +1,957 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="smdreset" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Name="counter_less_than_12"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="repeat"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="stop"/>
+<EventDecl Kind="CONTROLLABLE" Name="scan"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="error_turn"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="done_scan"/>
+<EventDecl Kind="CONTROLLABLE" Name="operator_input"/>
+<EventDecl Kind="CONTROLLABLE" Name="reset"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="done_vacuum"/>
+<EventDecl Kind="CONTROLLABLE" Name="counter"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="counter_equals_12"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="error_scan"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="error_vacuum"/>
+<EventDecl Kind="CONTROLLABLE" Name="vacuum"/>
+<EventDecl Kind="CONTROLLABLE" Name="turn"/>
+<EventDecl Kind="CONTROLLABLE" Name="recover"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="done_turn"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="done_recover"/>
+<EventDecl Kind="PROPOSITION" Name=":omega"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="counterobserver"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="counter"/>
+<SimpleIdentifier Name="counter_equals_12"/>
+<SimpleIdentifier Name="counter_less_than_12"/>
+<SimpleIdentifier Name="repeat"/>
+<SimpleIdentifier Name="reset"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="48" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="208" Y="176"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-5" Y="22"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point X="48" Y="32"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="-14"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="counter_equals_12"/>
+<SimpleIdentifier Name="counter_less_than_12"/>
+<LabelGeometry Anchor="NW">
+<Point X="-35" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="131" Y="143"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s2" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="reset"/>
+<LabelGeometry Anchor="NW">
+<Point X="-34" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="48" Y="105"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="counter"/>
+<LabelGeometry Anchor="NW">
+<Point X="-27" Y="8"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s0" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="repeat"/>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="71" Y="102"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="operatorobserver"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="operator_input"/>
+<SimpleIdentifier Name="repeat"/>
+<SimpleIdentifier Name="stop"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="32" Y="80"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="176" Y="80"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="operator_input"/>
+<LabelGeometry Anchor="NW">
+<Point X="-39" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="stop"/>
+<SimpleIdentifier Name="repeat"/>
+<LabelGeometry Anchor="NW">
+<Point X="-19" Y="-30"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="103" Y="38"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="recoverysupervisor"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="counter"/>
+<SimpleIdentifier Name="done_recover"/>
+<SimpleIdentifier Name="done_scan"/>
+<SimpleIdentifier Name="done_turn"/>
+<SimpleIdentifier Name="done_vacuum"/>
+<SimpleIdentifier Name="error_scan"/>
+<SimpleIdentifier Name="error_turn"/>
+<SimpleIdentifier Name="error_vacuum"/>
+<SimpleIdentifier Name="operator_input"/>
+<SimpleIdentifier Name="recover"/>
+<SimpleIdentifier Name="repeat"/>
+<SimpleIdentifier Name="reset"/>
+<SimpleIdentifier Name="scan"/>
+<SimpleIdentifier Name="stop"/>
+<SimpleIdentifier Name="turn"/>
+<SimpleIdentifier Name="vacuum"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="112" Y="80"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="7" Y="18"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="112" Y="192"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="13" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point X="112" Y="304"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-9" Y="22"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s3">
+<PointGeometry>
+<Point X="224" Y="304"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s4">
+<PointGeometry>
+<Point X="336" Y="304"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s5">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="432" Y="304"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="resetting">
+<PointGeometry>
+<Point X="336" Y="80"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="13" Y="23"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s1" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="scan"/>
+<SimpleIdentifier Name="vacuum"/>
+<SimpleIdentifier Name="turn"/>
+<SimpleIdentifier Name="reset"/>
+<SimpleIdentifier Name="counter"/>
+<SimpleIdentifier Name="done_scan"/>
+<SimpleIdentifier Name="error_scan"/>
+<SimpleIdentifier Name="done_vacuum"/>
+<SimpleIdentifier Name="error_vacuum"/>
+<SimpleIdentifier Name="done_turn"/>
+<SimpleIdentifier Name="error_turn"/>
+<LabelGeometry Anchor="NW">
+<Point X="-45" Y="-37"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="64" Y="188"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="recover"/>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s2" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="done_recover"/>
+<LabelGeometry Anchor="NW">
+<Point X="-39" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s3" Target="s4">
+<LabelBlock>
+<SimpleIdentifier Name="operator_input"/>
+<LabelGeometry Anchor="NW">
+<Point X="-41" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s4" Target="s5">
+<LabelBlock>
+<SimpleIdentifier Name="stop"/>
+<LabelGeometry Anchor="NW">
+<Point X="-11" Y="-20"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s4" Target="resetting">
+<LabelBlock>
+<SimpleIdentifier Name="repeat"/>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="resetting" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="reset"/>
+<LabelGeometry Anchor="NW">
+<Point X="-16" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="error_turn"/>
+<SimpleIdentifier Name="error_vacuum"/>
+<SimpleIdentifier Name="error_scan"/>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-28"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s0" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="scan"/>
+<SimpleIdentifier Name="vacuum"/>
+<SimpleIdentifier Name="turn"/>
+<SimpleIdentifier Name="reset"/>
+<SimpleIdentifier Name="counter"/>
+<SimpleIdentifier Name="done_scan"/>
+<SimpleIdentifier Name="done_vacuum"/>
+<SimpleIdentifier Name="done_turn"/>
+<LabelGeometry Anchor="NW">
+<Point X="-52" Y="-57"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="71" Y="71"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="scanobserver"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="done_recover"/>
+<SimpleIdentifier Name="done_scan"/>
+<SimpleIdentifier Name="error_scan"/>
+<SimpleIdentifier Name="recover"/>
+<SimpleIdentifier Name="scan"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="48" Y="144"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="176" Y="144"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point X="48" Y="32"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="-12"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s2" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="done_recover"/>
+<LabelGeometry Anchor="NW">
+<Point X="-6" Y="-30"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="74" Y="89"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="done_scan"/>
+<SimpleIdentifier Name="error_scan"/>
+<LabelGeometry Anchor="NW">
+<Point X="-7" Y="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="111" Y="120"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="recover"/>
+<LabelGeometry Anchor="NW">
+<Point X="-44" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="scan"/>
+<LabelGeometry Anchor="NW">
+<Point X="-16" Y="7"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="scansupervisor"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="counter"/>
+<SimpleIdentifier Name="counter_equals_12"/>
+<SimpleIdentifier Name="counter_less_than_12"/>
+<SimpleIdentifier Name="done_recover"/>
+<SimpleIdentifier Name="done_scan"/>
+<SimpleIdentifier Name="done_turn"/>
+<SimpleIdentifier Name="error_scan"/>
+<SimpleIdentifier Name="error_turn"/>
+<SimpleIdentifier Name="operator_input"/>
+<SimpleIdentifier Name="recover"/>
+<SimpleIdentifier Name="repeat"/>
+<SimpleIdentifier Name="scan"/>
+<SimpleIdentifier Name="stop"/>
+<SimpleIdentifier Name="turn"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<PointGeometry>
+<Point X="176" Y="16"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="12" Y="7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="176" Y="80"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="12" Y="2"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point X="176" Y="144"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="11" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s3">
+<PointGeometry>
+<Point X="176" Y="208"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="12" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s4">
+<PointGeometry>
+<Point X="176" Y="272"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="10" Y="10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s5">
+<PointGeometry>
+<Point X="176" Y="336"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="10" Y="9"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s6">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="176" Y="400"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="13" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s6" Target="s6">
+<LabelBlock>
+<SimpleIdentifier Name="recover"/>
+<SimpleIdentifier Name="operator_input"/>
+<SimpleIdentifier Name="done_recover"/>
+<SimpleIdentifier Name="stop"/>
+<LabelGeometry Anchor="NW">
+<Point X="-59" Y="-32"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="178" Y="446"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s6" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="repeat"/>
+<LabelGeometry Anchor="NW">
+<Point X="15" Y="48"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="32" Y="281"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s5" Target="s6">
+<LabelBlock>
+<SimpleIdentifier Name="counter_equals_12"/>
+<LabelGeometry Anchor="NW">
+<Point X="-44" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s5" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="counter_less_than_12"/>
+<LabelGeometry Anchor="NW">
+<Point X="-37" Y="36"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="78" Y="207"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="turn"/>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="-20"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s4" Target="s5">
+<LabelBlock>
+<SimpleIdentifier Name="counter"/>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s2" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="scan"/>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s3" Target="s4">
+<LabelBlock>
+<SimpleIdentifier Name="done_scan"/>
+<SimpleIdentifier Name="error_scan"/>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s1" Target="s6">
+<LabelBlock>
+<SimpleIdentifier Name="error_turn"/>
+<LabelGeometry Anchor="NW">
+<Point X="-29" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="277" Y="236"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="done_turn"/>
+<LabelGeometry Anchor="NW">
+<Point X="-33" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="turnobserver"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="done_recover"/>
+<SimpleIdentifier Name="done_turn"/>
+<SimpleIdentifier Name="error_turn"/>
+<SimpleIdentifier Name="recover"/>
+<SimpleIdentifier Name="turn"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="64" Y="144"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="176" Y="144"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point X="64" Y="32"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-7" Y="-12"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s2" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="done_recover"/>
+<LabelGeometry Anchor="NW">
+<Point X="-28" Y="-4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="98" Y="88"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="recover"/>
+<LabelGeometry Anchor="NW">
+<Point X="-46" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="turn"/>
+<LabelGeometry Anchor="NW">
+<Point X="-14" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="done_turn"/>
+<SimpleIdentifier Name="error_turn"/>
+<LabelGeometry Anchor="NW">
+<Point X="-27" Y="-16"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="120" Y="178"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="vacuumobserver"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="done_recover"/>
+<SimpleIdentifier Name="done_vacuum"/>
+<SimpleIdentifier Name="error_vacuum"/>
+<SimpleIdentifier Name="recover"/>
+<SimpleIdentifier Name="vacuum"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="80" Y="160"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-14" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="192" Y="160"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-4" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point X="80" Y="64"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-7" Y="-11"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s0" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="recover"/>
+<LabelGeometry Anchor="NW">
+<Point X="-47" Y="-4"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="vacuum"/>
+<LabelGeometry Anchor="NW">
+<Point X="-15" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s2" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="done_recover"/>
+<LabelGeometry Anchor="NW">
+<Point X="-13" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="109" Y="112"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="done_vacuum"/>
+<SimpleIdentifier Name="error_vacuum"/>
+<LabelGeometry Anchor="NW">
+<Point X="-34" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="136" Y="194"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="vacuumsupervisor"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="counter"/>
+<SimpleIdentifier Name="counter_equals_12"/>
+<SimpleIdentifier Name="counter_less_than_12"/>
+<SimpleIdentifier Name="done_recover"/>
+<SimpleIdentifier Name="done_turn"/>
+<SimpleIdentifier Name="done_vacuum"/>
+<SimpleIdentifier Name="error_turn"/>
+<SimpleIdentifier Name="error_vacuum"/>
+<SimpleIdentifier Name="operator_input"/>
+<SimpleIdentifier Name="recover"/>
+<SimpleIdentifier Name="repeat"/>
+<SimpleIdentifier Name="stop"/>
+<SimpleIdentifier Name="turn"/>
+<SimpleIdentifier Name="vacuum"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<PointGeometry>
+<Point X="176" Y="16"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="12" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="176" Y="80"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="12" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s2">
+<PointGeometry>
+<Point X="176" Y="144"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="12" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s3">
+<PointGeometry>
+<Point X="176" Y="208"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="12" Y="8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s4">
+<PointGeometry>
+<Point X="176" Y="272"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="11" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s5">
+<PointGeometry>
+<Point X="176" Y="336"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="11" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s6">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="176" Y="400"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="14" Y="8"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s2" Target="s3">
+<LabelBlock>
+<SimpleIdentifier Name="vacuum"/>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s1" Target="s2">
+<LabelBlock>
+<SimpleIdentifier Name="done_turn"/>
+<LabelGeometry Anchor="NW">
+<Point X="-30" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s1" Target="s6">
+<LabelBlock>
+<SimpleIdentifier Name="error_turn"/>
+<LabelGeometry Anchor="NW">
+<Point X="-33" Y="-43"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="244" Y="235"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s4" Target="s5">
+<LabelBlock>
+<SimpleIdentifier Name="counter"/>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="turn"/>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-11"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s5" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="counter_less_than_12"/>
+<LabelGeometry Anchor="NW">
+<Point X="-44" Y="67"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="87" Y="234"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s5" Target="s6">
+<LabelBlock>
+<SimpleIdentifier Name="counter_equals_12"/>
+<LabelGeometry Anchor="NW">
+<Point X="-42" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s3" Target="s4">
+<LabelBlock>
+<SimpleIdentifier Name="done_vacuum"/>
+<SimpleIdentifier Name="error_vacuum"/>
+<LabelGeometry Anchor="NW">
+<Point X="-32" Y="-16"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="s6" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="repeat"/>
+<LabelGeometry Anchor="NW">
+<Point X="25" Y="73"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="58" Y="294"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s6" Target="s6">
+<LabelBlock>
+<SimpleIdentifier Name="recover"/>
+<SimpleIdentifier Name="operator_input"/>
+<SimpleIdentifier Name="done_recover"/>
+<SimpleIdentifier Name="stop"/>
+<LabelGeometry Anchor="NW">
+<Point X="-49" Y="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="177" Y="442"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
+

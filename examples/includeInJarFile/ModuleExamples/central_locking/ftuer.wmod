@@ -1,0 +1,2602 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="ftuer" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Name="stop_VR">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="MER_an">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="soft_ZS"/>
+<EventDecl Kind="CONTROLLABLE" Name="stop_ZS">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="time_ER">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="tuer_auf">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="start_ER">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="reset">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="MVR_aus">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="done_ER"/>
+<EventDecl Kind="CONTROLLABLE" Name="async">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="sync">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="time_VR">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="MVR_an">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="soft_CS"/>
+<EventDecl Kind="CONTROLLABLE" Name="soft_SER">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="time_ZS">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="start_VR">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="soft_ER"/>
+<EventDecl Kind="CONTROLLABLE" Name="time_W">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="done_VR"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="tuer_zu">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="stop_ER">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="start_ZS">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="done_ZS"/>
+<EventDecl Kind="CONTROLLABLE" Name="MER_aus">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="timeout">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="STZV">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="CS_ok"/>
+<EventDecl Kind="CONTROLLABLE" Name="soft_VR"/>
+<EventDecl Kind="CONTROLLABLE" Name="done_SER">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name=":omega"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="ftuer"/>
+<Graph>
+<LabelBlock>
+<IndexedIdentifier Name="async">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="CS_ok"/>
+<SimpleIdentifier Name="done_ER"/>
+<IndexedIdentifier Name="done_SER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="done_VR"/>
+<SimpleIdentifier Name="done_ZS"/>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="soft_ER"/>
+<IndexedIdentifier Name="soft_SER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="soft_VR"/>
+<SimpleIdentifier Name="soft_ZS"/>
+<IndexedIdentifier Name="start_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="sync">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_W">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="cs3">
+<PointGeometry>
+<Point X="336" Y="528"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="11" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="cs1">
+<PointGeometry>
+<Point X="176" Y="528"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-29" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="cs2">
+<PointGeometry>
+<Point X="256" Y="528"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-12" Y="22"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="vr8">
+<PointGeometry>
+<Point X="160" Y="448"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-26" Y="2"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="VR">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="208" Y="448"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="5" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="vr7">
+<PointGeometry>
+<Point X="208" Y="400"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="10" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="vr6">
+<PointGeometry>
+<Point X="208" Y="352"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="10" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="vr5">
+<PointGeometry>
+<Point X="208" Y="304"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-24" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="vr4">
+<PointGeometry>
+<Point X="208" Y="256"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-27" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="vr3">
+<PointGeometry>
+<Point X="208" Y="208"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-27" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="vr1">
+<PointGeometry>
+<Point X="208" Y="112"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="9" Y="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="vr2">
+<PointGeometry>
+<Point X="208" Y="160"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="3" Y="16"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="zs9">
+<PointGeometry>
+<Point X="422" Y="218"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-30" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="IN">
+<PointGeometry>
+<Point X="336" Y="80"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="12" Y="1"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="er1">
+<PointGeometry>
+<Point X="336" Y="160"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="11" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="er2">
+<PointGeometry>
+<Point X="336" Y="208"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="11" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="er3">
+<PointGeometry>
+<Point X="336" Y="256"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="11" Y="3"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ER">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="336" Y="304"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="7" Y="13"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="zs1">
+<PointGeometry>
+<Point X="464" Y="112"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-27" Y="8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="zs2">
+<PointGeometry>
+<Point X="464" Y="160"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-26" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="zs3">
+<PointGeometry>
+<Point X="464" Y="208"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="13" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="zs4">
+<PointGeometry>
+<Point X="464" Y="256"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="11" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="zs5">
+<PointGeometry>
+<Point X="464" Y="304"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-26" Y="14"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="zs6">
+<PointGeometry>
+<Point X="464" Y="352"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-28" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="zs7">
+<PointGeometry>
+<Point X="464" Y="400"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-26" Y="0"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ZS">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="464" Y="448"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-18" Y="19"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="zs8">
+<PointGeometry>
+<Point X="512" Y="448"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="1" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+<GroupNode Name=":0">
+<NodeRef Name="ER"/>
+<NodeRef Name="IN"/>
+<NodeRef Name="VR"/>
+<NodeRef Name="ZS"/>
+<NodeRef Name="er1"/>
+<NodeRef Name="er2"/>
+<NodeRef Name="er3"/>
+<NodeRef Name="vr1"/>
+<NodeRef Name="vr2"/>
+<NodeRef Name="vr3"/>
+<NodeRef Name="vr4"/>
+<NodeRef Name="vr5"/>
+<NodeRef Name="vr6"/>
+<NodeRef Name="vr7"/>
+<NodeRef Name="vr8"/>
+<NodeRef Name="zs1"/>
+<NodeRef Name="zs2"/>
+<NodeRef Name="zs3"/>
+<NodeRef Name="zs4"/>
+<NodeRef Name="zs5"/>
+<NodeRef Name="zs6"/>
+<NodeRef Name="zs7"/>
+<NodeRef Name="zs8"/>
+<NodeRef Name="zs9"/>
+<BoxGeometry>
+<Box Height="416" Width="512" X="80" Y="64"/>
+</BoxGeometry>
+</GroupNode>
+</NodeList>
+<EdgeList>
+<Edge Source="IN" Target="vr1">
+<LabelBlock>
+<SimpleIdentifier Name="soft_VR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-26" Y="-16"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="IN" Target="er1">
+<LabelBlock>
+<SimpleIdentifier Name="soft_ER"/>
+<IndexedIdentifier Name="soft_SER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="1" Y="-16"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="IN" Target="zs1">
+<LabelBlock>
+<SimpleIdentifier Name="soft_ZS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-10" Y="-16"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source=":0" Target="cs1">
+<LabelBlock>
+<SimpleIdentifier Name="soft_CS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-47" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="147" Y="501"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ZS" Target="vr1">
+<LabelBlock>
+<SimpleIdentifier Name="soft_VR"/>
+<LabelGeometry Anchor="NW">
+<Point X="68" Y="103"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="305" Y="303"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ZS" Target="zs8">
+<LabelBlock>
+<SimpleIdentifier Name="soft_ZS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-19" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="ZS" Target="er1">
+<LabelBlock>
+<SimpleIdentifier Name="soft_ER"/>
+<IndexedIdentifier Name="soft_SER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-26" Y="30"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="384" Y="323"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="cs1" Target="cs1">
+<LabelBlock>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-46" Y="-19"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="176" Y="562"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="cs1" Target="cs2">
+<LabelBlock>
+<IndexedIdentifier Name="start_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-59" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="zs2" Target="zs2">
+<LabelBlock>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-18" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="496" Y="161"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="zs2" Target="zs3">
+<LabelBlock>
+<IndexedIdentifier Name="stop_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-4"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="vr1" Target="vr2">
+<LabelBlock>
+<IndexedIdentifier Name="start_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-88" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="zs7" Target="ZS">
+<LabelBlock>
+<SimpleIdentifier Name="done_ZS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-1" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="ER" Target="vr5">
+<LabelBlock>
+<SimpleIdentifier Name="soft_VR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-43" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="ER" Target="er3">
+<LabelBlock>
+<SimpleIdentifier Name="soft_ER"/>
+<IndexedIdentifier Name="soft_SER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-89" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="320" Y="282"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ER" Target="zs5">
+<LabelBlock>
+<SimpleIdentifier Name="soft_ZS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-19" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="zs8" Target="zs7">
+<LabelBlock>
+<IndexedIdentifier Name="sync">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-22" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="503" Y="412"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="zs8" Target="zs1">
+<LabelBlock>
+<IndexedIdentifier Name="async">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-69" Y="24"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="572" Y="188"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="er1" Target="er2">
+<LabelBlock>
+<IndexedIdentifier Name="start_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-86" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="zs4" Target="zs5">
+<LabelBlock>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="vr5" Target="vr6">
+<LabelBlock>
+<IndexedIdentifier Name="start_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-88" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="zs6" Target="zs7">
+<LabelBlock>
+<IndexedIdentifier Name="stop_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="zs6" Target="zs6">
+<LabelBlock>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-17" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="497" Y="353"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="VR" Target="er1">
+<LabelBlock>
+<SimpleIdentifier Name="soft_ER"/>
+<IndexedIdentifier Name="soft_SER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-65" Y="44"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="287" Y="316"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="VR" Target="vr8">
+<LabelBlock>
+<SimpleIdentifier Name="soft_VR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-22" Y="4"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="VR" Target="zs9">
+<LabelBlock>
+<SimpleIdentifier Name="soft_ZS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-107" Y="71"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="344" Y="351"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="zs3" Target="zs4">
+<LabelBlock>
+<IndexedIdentifier Name="time_W">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="0" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="vr6" Target="vr6">
+<LabelBlock>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-50" Y="-11"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="176" Y="354"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="vr6" Target="vr7">
+<LabelBlock>
+<IndexedIdentifier Name="stop_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-85" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="zs1" Target="zs2">
+<LabelBlock>
+<IndexedIdentifier Name="start_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="er2" Target="er2">
+<LabelBlock>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-63" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="304" Y="209"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="er2" Target="er3">
+<LabelBlock>
+<IndexedIdentifier Name="stop_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-84" Y="-2"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="vr8" Target="vr1">
+<LabelBlock>
+<IndexedIdentifier Name="async">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-10" Y="16"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="100" Y="188"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="vr8" Target="vr7">
+<LabelBlock>
+<IndexedIdentifier Name="sync">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="-11"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="171" Y="410"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="vr4" Target="vr5">
+<LabelBlock>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-89" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="er3" Target="ER">
+<LabelBlock>
+<SimpleIdentifier Name="done_ER"/>
+<IndexedIdentifier Name="done_SER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="vr3" Target="vr4">
+<LabelBlock>
+<IndexedIdentifier Name="time_W">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-84" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="cs2" Target="cs2">
+<LabelBlock>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-38" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="256" Y="560"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="cs2" Target="cs3">
+<LabelBlock>
+<IndexedIdentifier Name="stop_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-45" Y="-19"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="vr2" Target="vr3">
+<LabelBlock>
+<IndexedIdentifier Name="stop_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-88" Y="-3"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="vr2" Target="vr2">
+<LabelBlock>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-55" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="176" Y="160"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="vr7" Target="VR">
+<LabelBlock>
+<SimpleIdentifier Name="done_VR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-53" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="cs3" Target="ER">
+<LabelBlock>
+<SimpleIdentifier Name="CS_ok"/>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="71"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="zs9" Target="zs1">
+<LabelBlock>
+<IndexedIdentifier Name="async">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-50" Y="9"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="zs9" Target="zs5">
+<LabelBlock>
+<IndexedIdentifier Name="sync">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-51" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="zs5" Target="zs6">
+<LabelBlock>
+<IndexedIdentifier Name="start_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="mer"/>
+<Graph>
+<LabelBlock>
+<IndexedIdentifier Name="MER_an">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="MER_aus">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="48" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-39" Y="3"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="RUN">
+<PointGeometry>
+<Point X="144" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="13" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="RUN" Target="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="MER_aus">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-45" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="96" Y="82"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IDLE" Target="RUN">
+<LabelBlock>
+<IndexedIdentifier Name="MER_an">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-44" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="96" Y="109"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="merguard"/>
+<Graph>
+<LabelBlock>
+<IndexedIdentifier Name="MER_an">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="MER_aus">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="128" Y="160"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="13" Y="7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="RUN">
+<PointGeometry>
+<Point X="240" Y="160"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-39" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="IDLE" Target="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="start_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-65" Y="-44"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="96" Y="156"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IDLE" Target="RUN">
+<LabelBlock>
+<IndexedIdentifier Name="MER_an">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-45" Y="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="184" Y="175"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="RUN" Target="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="MER_aus">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-41" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="184" Y="148"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="mvrguard"/>
+<Graph>
+<LabelBlock>
+<IndexedIdentifier Name="MVR_an">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="MVR_aus">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="112" Y="64"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="13" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="RUN">
+<PointGeometry>
+<Point X="208" Y="64"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-40" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="RUN" Target="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="MVR_aus">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-27" Y="-12"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="160" Y="50"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IDLE" Target="RUN">
+<LabelBlock>
+<IndexedIdentifier Name="MVR_an">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-26" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="159" Y="78"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IDLE" Target="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="start_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-58" Y="-43"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="74" Y="63"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="mvrstzv"/>
+<Graph>
+<LabelBlock>
+<IndexedIdentifier Name="MVR_an">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="MVR_aus">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="STZV">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="48" Y="80"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="11" Y="7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="RUN">
+<PointGeometry>
+<Point X="160" Y="80"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-40" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="IDLE" Target="RUN">
+<LabelBlock>
+<IndexedIdentifier Name="MVR_an">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-42" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="100" Y="98"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="RUN" Target="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="MVR_aus">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-44" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="104" Y="63"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="RUN" Target="RUN">
+<LabelBlock>
+<IndexedIdentifier Name="STZV">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-41" Y="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="199" Y="80"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="sync"/>
+<Graph>
+<LabelBlock>
+<IndexedIdentifier Name="async">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="sync">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tuer_zu">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="AUF">
+<PointGeometry>
+<Point X="224" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="5" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="AZU">
+<PointGeometry>
+<Point X="160" Y="160"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-23" Y="19"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ZU">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="224" Y="224"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="5" Y="18"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="ASY">
+<PointGeometry>
+<Point X="96" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-24" Y="-6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="VR">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="96" Y="224"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-22" Y="15"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="AUF" Target="AUF">
+<LabelBlock>
+<IndexedIdentifier Name="sync">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-23" Y="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="251" Y="69"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AUF" Target="ASY">
+<LabelBlock>
+<IndexedIdentifier Name="start_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-38" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="AUF" Target="ZU">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_zu">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="1" Y="-45"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="AZU" Target="AZU">
+<LabelBlock>
+<IndexedIdentifier Name="async">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-14" Y="0"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="187" Y="133"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AZU" Target="ASY">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-58" Y="8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="123" Y="133"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AZU" Target="ZU">
+<LabelBlock>
+<IndexedIdentifier Name="stop_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-58" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="ASY" Target="AUF">
+<LabelBlock>
+<IndexedIdentifier Name="stop_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-29" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="160" Y="77"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ASY" Target="AZU">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_zu">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-17" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="133" Y="123"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ASY" Target="ASY">
+<LabelBlock>
+<IndexedIdentifier Name="start_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="async">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-26" Y="-33"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="68" Y="67"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="VR" Target="ASY">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-48" Y="14"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="VR" Target="VR">
+<LabelBlock>
+<IndexedIdentifier Name="start_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="sync">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-27" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="64" Y="251"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="VR" Target="ZU">
+<LabelBlock>
+<IndexedIdentifier Name="stop_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="160" Y="243"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ZU" Target="AUF">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-4" Y="28"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="243" Y="160"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ZU" Target="VR">
+<LabelBlock>
+<IndexedIdentifier Name="start_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-35" Y="-14"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="ZU" Target="ZU">
+<LabelBlock>
+<IndexedIdentifier Name="sync">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-40" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="256" Y="252"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="tklemme"/>
+<Graph>
+<LabelBlock>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="tuer_zu">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="AUF">
+<PointGeometry>
+<Point X="160" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-1" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ZU">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="64" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-13" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="ZU" Target="AUF">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_auf">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="109" Y="110"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="AUF" Target="ZU">
+<LabelBlock>
+<IndexedIdentifier Name="tuer_zu">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-35" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="112" Y="82"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="tmotor1"/>
+<Graph>
+<LabelBlock>
+<IndexedIdentifier Name="MER_an">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="MER_aus">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="MVR_an">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="MVR_aus">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="soft_CS"/>
+<IndexedIdentifier Name="start_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="STZV">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="er1">
+<PointGeometry>
+<Point X="128" Y="192"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-29" Y="7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="zs1">
+<PointGeometry>
+<Point X="464" Y="192"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-26" Y="14"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="er2">
+<PointGeometry>
+<Point X="128" Y="272"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-27" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="zs2">
+<PointGeometry>
+<Point X="464" Y="272"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-30" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="er3">
+<PointGeometry>
+<Point X="128" Y="352"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-24" Y="17"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="zs3">
+<PointGeometry>
+<Point X="464" Y="352"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-28" Y="12"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="er4">
+<PointGeometry>
+<Point X="128" Y="432"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-26" Y="8"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="zs4">
+<PointGeometry>
+<Point X="464" Y="432"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="10" Y="1"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="IN">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="288" Y="112"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="15" Y="2"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="vr1">
+<PointGeometry>
+<Point X="288" Y="192"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-23" Y="7"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="vr2">
+<PointGeometry>
+<Point X="288" Y="272"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-26" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="vr3">
+<PointGeometry>
+<Point X="288" Y="352"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-25" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="vr4">
+<PointGeometry>
+<Point X="288" Y="432"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-25" Y="6"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="vr5">
+<PointGeometry>
+<Point X="288" Y="512"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-27" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<GroupNode Name=":0">
+<NodeRef Name="IN"/>
+<NodeRef Name="er1"/>
+<NodeRef Name="er2"/>
+<NodeRef Name="er3"/>
+<NodeRef Name="er4"/>
+<NodeRef Name="vr1"/>
+<NodeRef Name="vr2"/>
+<NodeRef Name="vr3"/>
+<NodeRef Name="vr4"/>
+<NodeRef Name="vr5"/>
+<NodeRef Name="zs1"/>
+<NodeRef Name="zs2"/>
+<NodeRef Name="zs3"/>
+<NodeRef Name="zs4"/>
+<BoxGeometry>
+<Box Height="496" Width="512" X="48" Y="64"/>
+</BoxGeometry>
+</GroupNode>
+</NodeList>
+<EdgeList>
+<Edge Source="er3" Target="er4">
+<LabelBlock>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="2" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="er1" Target="er2">
+<LabelBlock>
+<IndexedIdentifier Name="time_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-51" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="zs4" Target="zs4">
+<LabelBlock>
+<IndexedIdentifier Name="MVR_aus">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="STZV">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-43" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="464" Y="480"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="zs4" Target="IN">
+<LabelBlock>
+<IndexedIdentifier Name="stop_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-15" Y="62"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="362" Y="270"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="vr4" Target="vr5">
+<LabelBlock>
+<IndexedIdentifier Name="MVR_aus">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-69" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="vr4" Target="vr4">
+<LabelBlock>
+<IndexedIdentifier Name="STZV">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-7" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="329" Y="431"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="vr2" Target="vr5">
+<LabelBlock>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-61" Y="21"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="252" Y="392"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="vr2" Target="vr3">
+<LabelBlock>
+<IndexedIdentifier Name="MVR_an">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-64" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source=":0" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="soft_CS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-47" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="235" Y="87"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="zs3" Target="zs3">
+<LabelBlock>
+<IndexedIdentifier Name="STZV">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-22" Y="-4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="502" Y="351"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="zs3" Target="zs4">
+<LabelBlock>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="zs1" Target="zs2">
+<LabelBlock>
+<IndexedIdentifier Name="time_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="3" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="zs2" Target="zs3">
+<LabelBlock>
+<IndexedIdentifier Name="MVR_an">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="zs2" Target="zs4">
+<LabelBlock>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-52" Y="-52"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="438" Y="355"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="er4" Target="er4">
+<LabelBlock>
+<IndexedIdentifier Name="MER_aus">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-40" Y="-20"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="128" Y="476"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="er4" Target="IN">
+<LabelBlock>
+<IndexedIdentifier Name="stop_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-61" Y="46"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="225" Y="287"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="er2" Target="er4">
+<LabelBlock>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-44" Y="-27"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="92" Y="352"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="er2" Target="er3">
+<LabelBlock>
+<IndexedIdentifier Name="MER_an">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="2" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="vr1" Target="vr2">
+<LabelBlock>
+<IndexedIdentifier Name="time_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-66" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="vr5" Target="vr5">
+<LabelBlock>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-35" Y="-25"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="289" Y="555"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="vr5" Target="IN">
+<LabelBlock>
+<IndexedIdentifier Name="stop_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-9" Y="63"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="328" Y="312"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="vr3" Target="vr4">
+<LabelBlock>
+<IndexedIdentifier Name="STZV">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-60" Y="-23"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="IN" Target="er1">
+<LabelBlock>
+<IndexedIdentifier Name="start_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-65" Y="-21"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="IN" Target="vr1">
+<LabelBlock>
+<IndexedIdentifier Name="start_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-67" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="IN" Target="IN">
+<LabelBlock>
+<IndexedIdentifier Name="MER_aus">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="MVR_aus">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="STZV">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="19" Y="-54"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="289" Y="72"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="zs1">
+<LabelBlock>
+<IndexedIdentifier Name="start_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-19" Y="-19"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="ttimer"/>
+<Graph>
+<LabelBlock>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_W">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="48" Y="64"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-18" Y="22"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="RUN">
+<PointGeometry>
+<Point X="160" Y="64"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-13" Y="23"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="IDLE" Target="RUN">
+<LabelBlock>
+<IndexedIdentifier Name="time_W">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-37" Y="0"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="101" Y="79"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="RUN" Target="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="104" Y="44"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="ttimguard"/>
+<Graph>
+<LabelBlock>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_W">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="IDLE">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="112" Y="64"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-11" Y="20"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="RUN">
+<PointGeometry>
+<Point X="224" Y="64"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="0" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="RUN" Target="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="timeout">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="reset">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-29" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="166" Y="46"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IDLE" Target="RUN">
+<LabelBlock>
+<IndexedIdentifier Name="time_W">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="time_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-32" Y="-7"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="164" Y="78"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IDLE" Target="IDLE">
+<LabelBlock>
+<IndexedIdentifier Name="start_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ER">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_VR">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="stop_ZS">
+<SimpleIdentifier Name="TUER"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-64" Y="-28"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="76" Y="61"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<ForeachComponent Name="FT">
+<EnumSetExpression>
+<SimpleIdentifier Name="TUER"/>
+</EnumSetExpression>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="tuermodell">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="CS_ok"/>
+<SimpleIdentifier Name="done_ER"/>
+<IndexedIdentifier Name="done_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="done_VR"/>
+<SimpleIdentifier Name="done_ZS"/>
+<SimpleIdentifier Name="soft_CS"/>
+<SimpleIdentifier Name="soft_ER"/>
+<IndexedIdentifier Name="soft_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="soft_VR"/>
+<SimpleIdentifier Name="soft_ZS"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="CS">
+<PointGeometry>
+<Point X="384" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-26" Y="3"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="IN">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="224" Y="160"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-20" Y="-10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="VR">
+<PointGeometry>
+<Point X="128" Y="160"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-26" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ZS">
+<PointGeometry>
+<Point X="320" Y="160"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="11" Y="4"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="SER">
+<PointGeometry>
+<Point X="224" Y="256"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-35" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ER">
+<PointGeometry>
+<Point X="224" Y="64"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-27" Y="5"/>
+</LabelGeometry>
+</SimpleNode>
+<GroupNode Name=":0">
+<NodeRef Name="ER"/>
+<NodeRef Name="IN"/>
+<NodeRef Name="SER"/>
+<NodeRef Name="VR"/>
+<NodeRef Name="ZS"/>
+<BoxGeometry>
+<Box Height="224" Width="256" X="96" Y="48"/>
+</BoxGeometry>
+</GroupNode>
+</NodeList>
+<EdgeList>
+<Edge Source="ZS" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="done_ZS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="272" Y="170"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="SER" Target="IN">
+<LabelBlock>
+<IndexedIdentifier Name="done_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-79" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="214" Y="208"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="VR" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="done_VR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-25" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="176" Y="150"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="ZS">
+<LabelBlock>
+<SimpleIdentifier Name="soft_ZS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-22" Y="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="272" Y="150"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="SER">
+<LabelBlock>
+<IndexedIdentifier Name="soft_SER">
+<SimpleIdentifier Name="FT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="4" Y="-5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="234" Y="208"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="VR">
+<LabelBlock>
+<SimpleIdentifier Name="soft_VR"/>
+<LabelGeometry Anchor="NW">
+<Point X="-22" Y="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="176" Y="170"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="IN" Target="ER">
+<LabelBlock>
+<SimpleIdentifier Name="soft_ER"/>
+<LabelGeometry Anchor="NW">
+<Point X="-51" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="215" Y="112"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="CS" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="CS_ok"/>
+<LabelGeometry Anchor="NW">
+<Point X="23" Y="-23"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="340" Y="85"/>
+</SplineGeometry>
+</Edge>
+<Edge Source=":0" Target="CS">
+<LabelBlock>
+<SimpleIdentifier Name="soft_CS"/>
+<LabelGeometry Anchor="NW">
+<Point X="-10" Y="0"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="369" Y="122"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="ER" Target="IN">
+<LabelBlock>
+<SimpleIdentifier Name="done_ER"/>
+<LabelGeometry Anchor="NW">
+<Point X="7" Y="-8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="233" Y="112"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</Module>
+

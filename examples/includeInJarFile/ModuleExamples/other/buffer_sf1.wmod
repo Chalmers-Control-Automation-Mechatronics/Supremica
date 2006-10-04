@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Module xmlns="http://waters.sourceforge.net/xsd/module" Name="buffer_sf1">
+<ParameterList>
+  <EventParameter Name="start_before" Kind="CONTROLLABLE"/>
+  <EventParameter Name="start_after" Kind="CONTROLLABLE"/>
+  <EventParameter Name="finish_before" Kind="UNCONTROLLABLE"/>
+  <EventParameter Name="@omega" Kind="PROPOSITION" Required="false"/>
+</ParameterList>
+<ComponentList>
+<SimpleComponent Kind="SPEC">
+  <SimpleIdentifier Name="buffer"/>
+  <Graph>
+  <NodeList>
+    <SimpleNode Name="empty" Initial="true">
+      <EventList>
+        <SimpleIdentifier Name="@omega"/>
+      </EventList>
+    </SimpleNode>
+    <SimpleNode Name="full"/>
+  </NodeList>
+  <EdgeList>
+    <Edge Source="empty" Target="empty">
+      <LabelBlock><SimpleIdentifier Name="start_before"/></LabelBlock>
+    </Edge>
+    <Edge Source="empty" Target="full">
+      <LabelBlock><SimpleIdentifier Name="finish_before"/></LabelBlock>
+    </Edge>
+    <Edge Source="full" Target="empty">
+      <LabelBlock><SimpleIdentifier Name="start_after"/></LabelBlock>
+    </Edge>
+  </EdgeList>
+  </Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>

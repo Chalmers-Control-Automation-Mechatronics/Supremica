@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="small_uncont" xmlns="http://waters.sourceforge.net/xsd/module">
+<ConstantAliasList>
+<ConstantAlias>
+<SimpleIdentifier Name="MACHS"/>
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Name="finish">
+<SimpleIdentifier Name="MACHS"/>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="break">
+<SimpleIdentifier Name="MACHS"/>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="start">
+<SimpleIdentifier Name="MACHS"/>
+</EventDecl>
+<EventDecl Kind="CONTROLLABLE" Name="repair">
+<SimpleIdentifier Name="MACHS"/>
+</EventDecl>
+<EventDecl Kind="PROPOSITION" Name=":omega"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="buffer_uncont"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="finish">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="empty">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="176" X="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="31" X="-19"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="full">
+<PointGeometry>
+<Point Y="176" X="304"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="23" X="2"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="full" Source="empty">
+<LabelBlock>
+<IndexedIdentifier Name="finish">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-15" X="-16"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point Y="160" X="238"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="empty" Source="full">
+<LabelBlock>
+<IndexedIdentifier Name="start">
+<IntConstant Value="2"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="2" X="-16"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point Y="192" X="237"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<ForeachComponent Name="MACH">
+<SimpleIdentifier Name="MACHS"/>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<IndexedIdentifier Name="machine">
+<SimpleIdentifier Name="MACH"/>
+</IndexedIdentifier>
+<Graph Deterministic="true">
+<LabelBlock>
+<IndexedIdentifier Name="break">
+<SimpleIdentifier Name="MACH"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="finish">
+<SimpleIdentifier Name="MACH"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="repair">
+<SimpleIdentifier Name="MACH"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="start">
+<SimpleIdentifier Name="MACH"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="working">
+<PointGeometry>
+<Point Y="224" X="192"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="21" X="-29"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="idle">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point Y="128" X="256"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="-11" X="-11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="down">
+<PointGeometry>
+<Point Y="224" X="320"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point Y="20" X="-13"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="idle" Source="down">
+<LabelBlock>
+<IndexedIdentifier Name="repair">
+<SimpleIdentifier Name="MACH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-17" X="1"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="working" Source="idle">
+<LabelBlock>
+<IndexedIdentifier Name="start">
+<SimpleIdentifier Name="MACH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-23" X="-30"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point Y="169" X="210"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="down" Source="working">
+<LabelBlock>
+<IndexedIdentifier Name="break">
+<SimpleIdentifier Name="MACH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="4" X="-32"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="idle" Source="working">
+<LabelBlock>
+<IndexedIdentifier Name="finish">
+<SimpleIdentifier Name="MACH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="-22"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry Kind="INTERPOLATING">
+<Point Y="186" X="231"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+</ComponentList>
+</Module>
+

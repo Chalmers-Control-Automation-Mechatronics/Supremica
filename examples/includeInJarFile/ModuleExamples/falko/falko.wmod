@@ -1,0 +1,903 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="falko" xmlns="http://waters.sourceforge.net/xsd/module">
+<ConstantAliasList>
+<ConstantAlias>
+<SimpleIdentifier Name="modus"/>
+<EnumSetExpression>
+<SimpleIdentifier Name="WH"/>
+<SimpleIdentifier Name="PH"/>
+</EnumSetExpression>
+</ConstantAlias>
+</ConstantAliasList>
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Name="notAktiv">
+<EnumSetExpression>
+<SimpleIdentifier Name="PH"/>
+<SimpleIdentifier Name="WH"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="wendeVollzogen"/>
+<EventDecl Kind="CONTROLLABLE" Name="abfahrBereit"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="minAbgelaufen"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="tuerenGeschlossen"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="frei"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="tuerenGeoeffnet"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="zugAn">
+<EnumSetExpression>
+<SimpleIdentifier Name="PH"/>
+<SimpleIdentifier Name="WH"/>
+</EnumSetExpression>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="fastAbfahrt"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="ausstiegBeendet"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="abfahrt"/>
+<EventDecl Kind="CONTROLLABLE" Name="bereitFahrt"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="einstiegBeendet"/>
+<EventDecl Kind="PROPOSITION" Name=":omega"/>
+</EventDeclList>
+<ComponentList>
+<ForeachComponent Name="i">
+<SimpleIdentifier Name="modus"/>
+<ComponentList>
+<SimpleComponent Kind="SPEC">
+<IndexedIdentifier Name="abfahrBereitAbort">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="bereitFahrt"/>
+<IndexedIdentifier Name="notAktiv">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="zugAn">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="112" Y="112"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="240" Y="112"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s0" Target="s0">
+<LabelBlock>
+<IndexedIdentifier Name="zugAn">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-19" Y="-31"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="67" Y="102"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<IndexedIdentifier Name="notAktiv">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="174" Y="137"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<IndexedIdentifier Name="zugAn">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="bereitFahrt"/>
+<LabelGeometry Anchor="NW">
+<Point X="-26" Y="-30"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="173" Y="86"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s1">
+<LabelBlock>
+<IndexedIdentifier Name="notAktiv">
+<SimpleIdentifier Name="i"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-27" Y="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="278" Y="93"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</ForeachComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="abfahrBereitFrei"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="abfahrBereit"/>
+<SimpleIdentifier Name="frei"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="112" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="224" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s1" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="frei"/>
+<LabelGeometry Anchor="NW">
+<Point X="-26" Y="-27"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="262" Y="79"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="abfahrBereit"/>
+<LabelGeometry Anchor="NW">
+<Point X="-27" Y="-21"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="164" Y="72"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="frei"/>
+<LabelGeometry Anchor="NW">
+<Point X="-12" Y="6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="168" Y="119"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="andConditionAbfahrt"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="abfahrt"/>
+<SimpleIdentifier Name="bereitFahrt"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="127" Y="195"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="307" Y="195"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="abfahrt"/>
+<LabelGeometry Anchor="NW">
+<Point X="-64" Y="-9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="218" Y="243"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="bereitFahrt"/>
+<LabelGeometry Anchor="NW">
+<Point X="-19" Y="-4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="212" Y="152"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="abfahrt"/>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="334" Y="168"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="andConditionFrei"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="bereitFahrt"/>
+<SimpleIdentifier Name="frei"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="85" Y="197"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="300" Y="197"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="frei"/>
+<LabelGeometry Anchor="NW">
+<Point X="-26" Y="-11"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="190" Y="221"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="bereitFahrt"/>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="-6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="189" Y="158"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="frei"/>
+<LabelGeometry Anchor="NW">
+<Point X="-46" Y="-1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="327" Y="170"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="bereitFahrtAbort"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="abfahrBereit"/>
+<IndexedIdentifier Name="notAktiv">
+<SimpleIdentifier Name="WH"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="zugAn">
+<SimpleIdentifier Name="WH"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="112" Y="112"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="240" Y="112"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s1" Target="s1">
+<LabelBlock>
+<IndexedIdentifier Name="notAktiv">
+<SimpleIdentifier Name="WH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-27" Y="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="278" Y="93"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<IndexedIdentifier Name="zugAn">
+<SimpleIdentifier Name="WH"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="abfahrBereit"/>
+<LabelGeometry Anchor="NW">
+<Point X="-26" Y="-30"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="173" Y="86"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<IndexedIdentifier Name="notAktiv">
+<SimpleIdentifier Name="WH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="174" Y="137"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s0">
+<LabelBlock>
+<IndexedIdentifier Name="zugAn">
+<SimpleIdentifier Name="WH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-19" Y="-31"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="67" Y="102"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="einstiegBeendet"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="abfahrBereit"/>
+<SimpleIdentifier Name="einstiegBeendet"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="112" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="224" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s1" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="einstiegBeendet"/>
+<LabelGeometry Anchor="NW">
+<Point X="5" Y="1"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="262" Y="79"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="abfahrBereit"/>
+<LabelGeometry Anchor="NW">
+<Point X="-36" Y="-21"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="164" Y="72"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="einstiegBeendet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-52" Y="10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="168" Y="119"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="fastAbfahrt"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="abfahrBereit"/>
+<SimpleIdentifier Name="fastAbfahrt"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="112" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="224" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="fastAbfahrt"/>
+<LabelGeometry Anchor="NW">
+<Point X="-25" Y="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="168" Y="119"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="abfahrBereit"/>
+<LabelGeometry Anchor="NW">
+<Point X="-33" Y="-19"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="164" Y="72"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="fastAbfahrt"/>
+<LabelGeometry Anchor="NW">
+<Point X="11" Y="4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="262" Y="79"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="minAbgelaufen"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="abfahrBereit"/>
+<SimpleIdentifier Name="minAbgelaufen"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="s0">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="112" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="s1">
+<PointGeometry>
+<Point X="224" Y="96"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-8" Y="24"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="s0" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="minAbgelaufen"/>
+<LabelGeometry Anchor="NW">
+<Point X="-48" Y="9"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="168" Y="119"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s0">
+<LabelBlock>
+<SimpleIdentifier Name="abfahrBereit"/>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="164" Y="72"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="s1" Target="s1">
+<LabelBlock>
+<SimpleIdentifier Name="minAbgelaufen"/>
+<LabelGeometry Anchor="NW">
+<Point X="-43" Y="-26"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="262" Y="79"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="passagierhalt"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="abfahrBereit"/>
+<SimpleIdentifier Name="ausstiegBeendet"/>
+<IndexedIdentifier Name="notAktiv">
+<SimpleIdentifier Name="PH"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="tuerenGeoeffnet"/>
+<SimpleIdentifier Name="tuerenGeschlossen"/>
+<IndexedIdentifier Name="zugAn">
+<SimpleIdentifier Name="PH"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="einstieg">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="352" Y="208"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-17" Y="44"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="schliessen">
+<PointGeometry>
+<Point X="448" Y="208"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-29" Y="42"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="ausstieg">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="256" Y="208"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-18" Y="44"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="oeffnen">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="160" Y="208"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-21" Y="44"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="inaktiv">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="64" Y="208"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-18" Y="46"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="ausstieg" Target="einstieg">
+<LabelBlock>
+<SimpleIdentifier Name="ausstiegBeendet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-41" Y="7"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="oeffnen" Target="ausstieg">
+<LabelBlock>
+<SimpleIdentifier Name="tuerenGeoeffnet"/>
+<LabelGeometry Anchor="NW">
+<Point X="-54" Y="8"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="einstieg" Target="schliessen">
+<LabelBlock>
+<SimpleIdentifier Name="abfahrBereit"/>
+<LabelGeometry Anchor="NW">
+<Point X="-32" Y="7"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="inaktiv" Target="oeffnen">
+<LabelBlock>
+<IndexedIdentifier Name="zugAn">
+<SimpleIdentifier Name="PH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-30" Y="9"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Source="inaktiv" Target="inaktiv">
+<LabelBlock>
+<IndexedIdentifier Name="notAktiv">
+<SimpleIdentifier Name="PH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-22" Y="-24"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="34" Y="178"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="schliessen" Target="inaktiv">
+<LabelBlock>
+<SimpleIdentifier Name="tuerenGeschlossen"/>
+<LabelGeometry Anchor="NW">
+<Point X="-40" Y="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="244" Y="130"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="planhalt"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="bereitFahrt"/>
+<IndexedIdentifier Name="zugAn">
+<SimpleIdentifier Name="PH"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="zugAn">
+<SimpleIdentifier Name="WH"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="notInPlanhalt">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="80" Y="80"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-34" Y="23"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="inPlanhalt">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="192" Y="80"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-2" Y="22"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="notInPlanhalt" Target="inPlanhalt">
+<LabelBlock>
+<IndexedIdentifier Name="zugAn">
+<SimpleIdentifier Name="PH"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="zugAn">
+<SimpleIdentifier Name="WH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-24" Y="8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="134" Y="100"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="inPlanhalt" Target="notInPlanhalt">
+<LabelBlock>
+<SimpleIdentifier Name="bereitFahrt"/>
+<LabelGeometry Anchor="NW">
+<Point X="-22" Y="-13"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="134" Y="60"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="inPlanhalt" Target="inPlanhalt">
+<LabelBlock>
+<IndexedIdentifier Name="zugAn">
+<SimpleIdentifier Name="WH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="10" Y="-10"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="219" Y="53"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="wendehalt"/>
+<Graph>
+<LabelBlock>
+<IndexedIdentifier Name="notAktiv">
+<SimpleIdentifier Name="WH"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="wendeVollzogen"/>
+<IndexedIdentifier Name="zugAn">
+<SimpleIdentifier Name="WH"/>
+</IndexedIdentifier>
+</LabelBlock>
+<NodeList>
+<SimpleNode Name="wendehaltAktiv">
+<PointGeometry>
+<Point X="288" Y="160"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="1" Y="22"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Initial="true" Name="notWendehaltAktiv">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="175" Y="160"/>
+</PointGeometry>
+<LabelGeometry>
+<Point X="-99" Y="25"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Source="notWendehaltAktiv" Target="notWendehaltAktiv">
+<LabelBlock>
+<IndexedIdentifier Name="notAktiv">
+<SimpleIdentifier Name="WH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-43" Y="-19"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="148" Y="133"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="notWendehaltAktiv" Target="wendehaltAktiv">
+<LabelBlock>
+<IndexedIdentifier Name="zugAn">
+<SimpleIdentifier Name="WH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point X="-31" Y="5"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="230" Y="183"/>
+</SplineGeometry>
+</Edge>
+<Edge Source="wendehaltAktiv" Target="notWendehaltAktiv">
+<LabelBlock>
+<SimpleIdentifier Name="wendeVollzogen"/>
+<LabelGeometry Anchor="NW">
+<Point X="-43" Y="-18"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point X="228" Y="138"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
+

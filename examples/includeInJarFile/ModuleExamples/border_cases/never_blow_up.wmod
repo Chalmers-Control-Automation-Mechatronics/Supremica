@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="never_blow_up" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Name="blow_up"/>
+<EventDecl Kind="PROPOSITION" Name=":omega"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="never_blow_up"/>
+<Graph Deterministic="true">
+<LabelBlock>
+<SimpleIdentifier Name="blow_up"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="never">
+<EventList>
+<SimpleIdentifier Name=":omega"/>
+</EventList>
+<PointGeometry>
+<Point X="176" Y="96"/>
+</PointGeometry>
+<LabelGeometry Anchor="SW">
+<Point X="-17" Y="21"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
+
