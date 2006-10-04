@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.43 2006-09-19 15:53:20 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.44 2006-10-04 12:08:39 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1238,11 +1238,37 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
     (Collection<EdgeProxy> edges)
   {
     for (final EdgeProxy edge: edges){
-      if (edge.getGuardActionBlock() != null){
-        return true;
+      if (edge.getGuardActionBlock() != null)
+      {
+        GuardActionBlockProxy guardActionProxy = edge.getGuardActionBlock();
+        List<SimpleExpressionProxy> guards = guardActionProxy.getGuards();
+        for (SimpleExpressionProxy guard : guards)
+        {
+        	String guardText = guard.getPlainText();
+        	if (guardText != null)
+        	{
+        		if (!guardText.trim().equals(""))
+        		{
+        			return false;
+        		}
+        	}
+        }
+        
+        List<BinaryExpressionProxy> actions = guardActionProxy.getActions();
+        for (BinaryExpressionProxy action : actions)
+        {
+        	String actionText = action.getPlainText();
+        	if (actionText != null)
+        	{
+        		if (!actionText.trim().equals(""))
+        		{
+        			return false;
+        		}
+        	}
+        }       
       }
     }
-    return false;
+    return true;
   }
 
 
