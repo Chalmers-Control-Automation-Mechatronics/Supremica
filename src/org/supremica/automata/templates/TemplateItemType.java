@@ -53,17 +53,16 @@ import java.net.URL;
 import org.supremica.automata.IO.*;
 import org.supremica.automata.*;
 
-public class TemplateItem
+public class TemplateItemType
 {
-	private String description;
-	private String path;
-	private TemplateItemType itemType;
+	public static final TemplateItemType MODULE = new TemplateItemType(".wmod");
+	public static final TemplateItemType XML = new TemplateItemType(".xml");
 
-	public TemplateItem(String description, String path, TemplateItemType itemType)
+	private String description;
+
+	private TemplateItemType(String description)
 	{
 		this.description = description;
-		this.path = path;
-		this.itemType = itemType;
 	}
 
 	public String getDescription()
@@ -71,35 +70,4 @@ public class TemplateItem
 		return description;
 	}
 
-	public String getPath()
-	{
-		return path;
-	}
-
-	public TemplateItemType getItemType()
-	{
-		return itemType;
-	}
-
-	public Project createInstance(ProjectFactory theFactory)
-		throws Exception
-	{
-		try
-		{
-			URL url = TemplateItem.class.getResource(path);
-
-			//InputStream stream = url.openStream();
-			ProjectBuildFromXml builder = new ProjectBuildFromXml(theFactory);
-			Project theProject = builder.build(url);
-
-			return theProject;
-		}
-		catch (Exception ex)
-		{
-
-			// logger.error("Exception building project." + ex);
-			// logger.debug(ex.getStackTrace());
-			throw ex;
-		}
-	}
 }
