@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.45 2006-10-04 12:17:05 knut Exp $
+//# $Id: ModuleCompiler.java,v 1.46 2006-10-04 13:14:42 knut Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1234,43 +1234,36 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
     return actionLists;
   }
 
+/*
   private boolean componentHasNonEmptyGuardActionBlock
     (Collection<EdgeProxy> edges)
   {
     for (final EdgeProxy edge: edges){
-      if (edge.getGuardActionBlock() != null)
-      {
-        GuardActionBlockProxy guardActionProxy = edge.getGuardActionBlock();
-        List<SimpleExpressionProxy> guards = guardActionProxy.getGuards();
-        for (SimpleExpressionProxy guard : guards)
-        {
-        	String guardText = guard.getPlainText();
-        	if (guardText != null)
-        	{
-        		if (!guardText.trim().equals(""))
-        		{
-        			return true;
-        		}
-        	}
-        }
-
-        List<BinaryExpressionProxy> actions = guardActionProxy.getActions();
-        for (BinaryExpressionProxy action : actions)
-        {
-        	String actionText = action.getPlainText();
-        	if (actionText != null)
-        	{
-        		if (!actionText.trim().equals(""))
-        		{
-        			return true;
-        		}
-        	}
-        }
+      if (edge.getGuardActionBlock() != null){
+        return true;
       }
     }
     return false;
   }
+*/
+	private boolean componentHasNonEmptyGuardActionBlock(Collection<EdgeProxy> edges)
+	{
+		for (final EdgeProxy edge: edges)
+		{
+			if (edge.getGuardActionBlock() != null)
+			{
+				GuardActionBlockProxy guardActionProxy = edge.getGuardActionBlock();
+				List<SimpleExpressionProxy> guards = guardActionProxy.getGuards();
+				if (guards.size() > 0)
+					return true;
 
+				List<BinaryExpressionProxy> actions = guardActionProxy.getActions();
+				if (actions.size() > 0)
+					return true;
+			}
+		}
+		return false;
+	}
 
   //#########################################################################
   //# Specific Evaluation Methods

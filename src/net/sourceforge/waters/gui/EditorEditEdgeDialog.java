@@ -166,65 +166,89 @@ public class EditorEditEdgeDialog
   }
 
 
-  //#########################################################################
-  //# Interface java.awt.event.ActionListener
-  public void actionPerformed(final ActionEvent event)
-  {
-    if (event.getActionCommand().equals("OK")) {
-      // Get guard ...
-      SimpleExpressionSubject guard;
-      try {
-	final String text = guardField.getText();
-	guard =
-	  (SimpleExpressionSubject) mParser.parse(text, Operator.TYPE_BOOLEAN);
-      } catch (final ParseException exception) {
-	JOptionPane.showMessageDialog(this, exception.getMessage(),
-				      "Syntax error in guard!",
-				      JDialog.DO_NOTHING_ON_CLOSE);
-	return;
-      }
-      // Get actions ...
-      final String[] texts = actionField.getText().split(";");
-      final List<BinaryExpressionSubject> actions =
-	new ArrayList<BinaryExpressionSubject>(texts.length);
-      for (final String text : texts) {
-	if (text.length() > 0) {
-	  try {
-	    final SimpleExpressionSubject action = 
-	      (SimpleExpressionSubject) mParser.parse(text);
-	    if (!(action instanceof BinaryExpressionSubject)) {
-	      throw new TypeMismatchException(action, "ACTION");
-	    }
-	    final BinaryExpressionSubject binaction =
-	      (BinaryExpressionSubject) action;
-	    actions.add(binaction);
-	  } catch (final ParseException exception) {
-	    JOptionPane.showMessageDialog(this, exception.getMessage(),
-					  "Syntax error in action!",
-					  JDialog.DO_NOTHING_ON_CLOSE);
-	    return;
-	  } catch (final TypeMismatchException exception) {
-	    JOptionPane.showMessageDialog(this, exception.getMessage(),
-					  "Syntax error in action!",
-					  JDialog.DO_NOTHING_ON_CLOSE);
-	    return;
-	  }
+	//#########################################################################
+	//# Interface java.awt.event.ActionListener
+	public void actionPerformed(final ActionEvent event)
+	{
+		if (event.getActionCommand().equals("OK"))
+		{
+			// Get guard ...
+			SimpleExpressionSubject guard;
+			try
+			{
+				final String text = guardField.getText();
+				guard = null;
+				if (text != null && !text.trim().equals(""))
+				{
+					guard = (SimpleExpressionSubject) mParser.parse(text, Operator.TYPE_BOOLEAN);
+				}
+			}
+			catch (final ParseException exception)
+			{
+				JOptionPane.showMessageDialog(this, exception.getMessage(),
+				"Syntax error in guard!",
+				JDialog.DO_NOTHING_ON_CLOSE);
+				return;
+			}
+			// Get actions ...
+			List<BinaryExpressionSubject> actions = null;
+			String actionText = actionField.getText();
+			if (actionText != null && !actionText.trim().equals(""))
+			{
+				final String[] texts = actionField.getText().split(";");
+				actions =	new ArrayList<BinaryExpressionSubject>(texts.length);
+				for (final String text : texts)
+				{
+					if (text.length() > 0)
+					{
+						try
+						{
+							final SimpleExpressionSubject action = (SimpleExpressionSubject) mParser.parse(text);
+							if (!(action instanceof BinaryExpressionSubject))
+							{
+								throw new TypeMismatchException(action, "ACTION");
+							}
+							final BinaryExpressionSubject binaction = (BinaryExpressionSubject) action;
+							actions.add(binaction);
+						}
+						catch (final ParseException exception)
+						{
+							JOptionPane.showMessageDialog(this, exception.getMessage(),
+							"Syntax error in action!",
+							JDialog.DO_NOTHING_ON_CLOSE);
+							return;
+						}
+						catch (final TypeMismatchException exception)
+						{
+							JOptionPane.showMessageDialog(this, exception.getMessage(),
+							"Syntax error in action!",
+							JDialog.DO_NOTHING_ON_CLOSE);
+							return;
+						}
+					}
+				}
+			}
+			// Store parsed results ...
+			final GuardActionBlockSubject block = edgeModel.getGuardActionBlock();
+			final List<SimpleExpressionSubject> bguards = block.getGuardsModifiable();
+			bguards.clear();
+			if (guard != null)
+			{
+				bguards.add(guard);
+			}
+			final List<BinaryExpressionSubject> bactions = block.getActionsModifiable();
+			bactions.clear();
+			if (actions != null)
+			{
+				bactions.addAll(actions);
+			}
+			dispose();
+		}
+		else if (event.getActionCommand().equals("Cancel"))
+		{
+			dispose();
+		}
 	}
-      }
-      // Store parsed results ...
-      final GuardActionBlockSubject block = edgeModel.getGuardActionBlock();
-      final List<SimpleExpressionSubject> bguards = block.getGuardsModifiable();
-      bguards.clear();
-      bguards.add(guard);
-      final List<BinaryExpressionSubject> bactions =
-	block.getActionsModifiable();
-      bactions.clear();
-      bactions.addAll(actions);
-      dispose();
-    } else if (event.getActionCommand().equals("Cancel")) {
-      dispose();
-    }
-  }
 
 
   //#########################################################################
