@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.85 2006-10-03 19:33:06 knut Exp $
+//# $Id: ControlledSurface.java,v 1.86 2006-10-04 15:41:37 knut Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -497,10 +497,13 @@ public class ControlledSurface
         }
         else
         {
-            Point2D p = dummy.getInitialArrowGeometry().getPoint();
-            p.setLocation(p.getX() + dx, p.getY() + dy);
-            // Move
-            dummy.getInitialArrowGeometry().setPoint(p);
+			if (dummy.getInitialArrowGeometry() != null)
+			{
+				Point2D p = dummy.getInitialArrowGeometry().getPoint();
+				p.setLocation(p.getX() + dx, p.getY() + dy);
+				// Move
+				dummy.getInitialArrowGeometry().setPoint(p);
+			}
         }
     }
 

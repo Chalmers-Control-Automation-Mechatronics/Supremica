@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.30 2006-09-25 03:55:30 siw4 Exp $
+//# $Id: EditorMenu.java,v 1.31 2006-10-04 15:41:37 knut Exp $
 //###########################################################################
 
 
@@ -156,7 +156,7 @@ public class EditorMenu
 
 		menuItem = new JMenuItem("Select Tool");
 		menuItem.setEnabled(false);
-		menuItem.setToolTipText("Not implemented yet");		
+		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
 
 		menuItem = new JMenuItem("Node Tool");
@@ -181,12 +181,12 @@ public class EditorMenu
 		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
 		menu.add(menuItem);
 		mToolsCreateEvent = menuItem;
-		
+
 		menuItem = new JMenuItem("Run Embedder");
 		menuItem.addActionListener(this);
 		menu.add(menuItem);
 		mEmbedder = menuItem;
-		
+
 		menu.addSeparator();
 
 		menuItem = new JMenuItem("Options...");
@@ -262,11 +262,19 @@ public class EditorMenu
 			}
 			mEditRedo.setEnabled(root.getUndoInterface().canRedo());
 		}
-		
+
 		if (e.getSource() == mEmbedder)
 		{
-      Thread t = new Thread(new SpringEmbedder(surface.getGraph()));
-      t.start();
+			if (SpringEmbedder.isLayoutable(surface.getGraph()))
+			{
+				Thread t = new Thread(new SpringEmbedder(surface.getGraph()));
+				t.start();
+			}
+			else
+			{
+				JOptionPane.showMessageDialog(root.getFrame(), "Graph is not layoutable", "Alert", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 		}
   }
 

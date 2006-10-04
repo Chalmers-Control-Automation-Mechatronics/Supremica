@@ -297,6 +297,13 @@ public class ExampleTemplates
 
         thisGroup.addItem(new TemplateItem("Big Factory", prefix + "big_factory/bfactory.wmod", TemplateItemType.MODULE));
         thisGroup.addItem(new TemplateItem("Car fh", prefix + "car_fh/car_fh.wmod", TemplateItemType.MODULE));
+        thisGroup.addItem(new TemplateItem("Central locking - Dreitueren", prefix + "central_locking/dreitueren.wmod", TemplateItemType.MODULE));
+        thisGroup.addItem(new TemplateItem("Central locking - ftuer", prefix + "central_locking/ftuer.wmod", TemplateItemType.MODULE));
+        thisGroup.addItem(new TemplateItem("Central locking - koordwsp", prefix + "central_locking/koordwsp.wmod", TemplateItemType.MODULE));
+        thisGroup.addItem(new TemplateItem("Central locking - verriegel3", prefix + "central_locking/verriegel3.wmod", TemplateItemType.MODULE));
+        thisGroup.addItem(new TemplateItem("Central locking - verriegel4", prefix + "central_locking/verriegel4.wmod", TemplateItemType.MODULE));
+        thisGroup.addItem(new TemplateItem("Fischertechnik", prefix + "fischertechnik/fischertechnik.wmod", TemplateItemType.MODULE));
+        thisGroup.addItem(new TemplateItem("Stick picking game", prefix + "other/stick_picking_game.wmod", TemplateItemType.MODULE));
 
     }
 

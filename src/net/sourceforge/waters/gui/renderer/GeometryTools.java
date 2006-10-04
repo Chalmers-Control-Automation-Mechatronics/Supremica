@@ -20,18 +20,18 @@ public final class GeometryTools
         }
         return defaultPosition((GroupNodeProxy)node, turningpoint);
     }
-    
+
     public static Point2D defaultPosition(SimpleNodeProxy node)
     {
         return node.getPointGeometry().getPoint();
     }
-    
+
     public static Point2D defaultPosition(GroupNodeProxy node, Point2D point)
     {
         Rectangle2D r = node.getGeometry().getRectangle();
         return GeometryTools.findIntersection(r, point);
     }
-    
+
     public static Point2D getPosition(NodeProxy node)
     {
         if (node instanceof SimpleNodeProxy)
@@ -40,12 +40,12 @@ public final class GeometryTools
         }
         return getPosition((GroupNodeProxy)node);
     }
-    
+
     public static Point2D getPosition(SimpleNodeProxy node)
     {
         return node.getPointGeometry().getPoint();
     }
-    
+
     public static Point2D getRadialPoint(Point2D p, Point2D center, double radius)
     {
         double width = center.getX() - p.getX();
@@ -54,20 +54,20 @@ public final class GeometryTools
         return new Point2D.Double(center.getX() - Math.cos(angle) * radius,
             center.getY() - Math.sin(angle) * radius);
     }
-    
+
     public static Point2D getPosition(GroupNodeProxy node)
     {
         Rectangle2D r = node.getGeometry().getRectangle();
         return new Point2D.Double(r.getCenterX(), r.getCenterY());
     }
-    
+
     public static Point2D getMidPoint(Point2D p1, Point2D p2)
     {
         double w = p2.getX() - p1.getX();
         double h = p2.getY() - p1.getY();
         return new Point2D.Double(p1.getX() + (w / 2), p1.getY() + (h / 2));
     }
-    
+
     public static Line2D[] getLineSegmentsOfRectangle(Rectangle2D r)
     {
         Line2D[] lines = new Line2D[4];
@@ -81,7 +81,7 @@ public final class GeometryTools
             r.getMinX(), r.getMinY());
         return lines;
     }
-    
+
     public static double[] convertLineIntoEquation(Line2D l)
     {
         double[] eq = new double[3];
@@ -90,7 +90,7 @@ public final class GeometryTools
         eq[2] = -(eq[0] * l.getX1() + eq[1] * l.getY1());
         return eq;
     }
-    
+
     public static Point2D findIntersection(Line2D line1, Line2D line2)
     {
         double[] l1 = convertLineIntoEquation(line1);
@@ -110,14 +110,14 @@ public final class GeometryTools
         x = (-c) / b;
         return new Point2D.Double(x, y);
     }
-    
+
     public static Point2D getControlPoint(QuadCurve2D quad)
     {
         return new Point2D.Double(
             (2 * quad.getCtrlX() - (quad.getX1() + quad.getX2()) / 2),
             (2 * quad.getCtrlY() - (quad.getY1() + quad.getY2()) / 2));
     }
-    
+
     public static Point2D findIntersection(final Rectangle2D r, final Point2D p)
     {
         // can be optimized
@@ -129,7 +129,7 @@ public final class GeometryTools
         for (int i = 0; i < lines.length; i++)
         {
             Point2D t = GeometryTools.findIntersection(line, lines[i]);
-            System.err.println("Distance: " + t.distance(p.getX(), p.getY()) + "SegDist:" + lines[i].ptSegDist(t));
+//            System.err.println("Distance: " + t.distance(p.getX(), p.getY()) + "SegDist:" + lines[i].ptSegDist(t));
             if (t.distance(p.getX(), p.getY()) < distance
                 && lines[i].ptSegDist(t) <= 0.01)
             {
@@ -137,7 +137,7 @@ public final class GeometryTools
                 intersection = t;
             }
         }
-        System.err.println(intersection);
+       // System.err.println(intersection);
         return intersection;
     }
 }

@@ -15,6 +15,7 @@ import org.supremica.automata.Project;
 import org.supremica.gui.TestCasesDialog;
 import org.supremica.gui.VisualProjectFactory;
 import org.supremica.automata.templates.TemplateItem;
+import org.supremica.automata.templates.TemplateItemType;
 
 
 /**
@@ -62,43 +63,65 @@ public class ExamplesStaticAction
     public void doAction(TemplateItem item)
     {
 
-        Project project;
+		if (item.getItemType() == TemplateItemType.XML)
+		{
+			Project project;
 
-        try
-        {
-            project = item.createInstance(new VisualProjectFactory());
-            if (!project.isDeterministic())
-            {
-                logger.warn("Nondeterministic automaton loaded. Some algorithms are not guaranteed to work.");
-            }
+			try
+			{
+				project = item.createInstance(new VisualProjectFactory());
+				if (!project.isDeterministic())
+				{
+					logger.warn("Nondeterministic automaton loaded. Some algorithms are not guaranteed to work.");
+				}
 
-            try
-            {
-				// Compile into Waters module
-				ProductDESImporter importer = new ProductDESImporter(ModuleSubjectFactory.getInstance());
-				ModuleSubject module = (ModuleSubject) importer.importModule(project);
+				try
+				{
+					// Compile into Waters module
+					ProductDESImporter importer = new ProductDESImporter(ModuleSubjectFactory.getInstance());
+					ModuleSubject module = (ModuleSubject) importer.importModule(project);
 
-				// Add as a new module (see OpenFileAction)
-				ide.getIDE().installContainer(module);
-                //int nbrOfAddedAutomata = gui.addProject(project);
+					// Add as a new module (see OpenFileAction)
+					ide.getIDE().installContainer(module);
+					//int nbrOfAddedAutomata = gui.addProject(project);
 
-                //gui.info("Successfully added " + nbrOfAddedAutomata + " automata.");
-            }
-            catch (Exception excp)
-            {
-                logger.error("Error adding automata ", excp);
-                logger.debug(excp.getStackTrace());
+					//gui.info("Successfully added " + nbrOfAddedAutomata + " automata.");
+				}
+				catch (Exception excp)
+				{
+					logger.error("Error adding automata ", excp);
+					logger.debug(excp.getStackTrace());
 
-                return;
-            }
+					return;
+				}
 
-            // logger.debug("ActionMan.fileNewFromTemplate");
-        }
-        catch (Exception ex)
-        {
-            JOptionPane.showMessageDialog(ide.getIDE(), "Error while creating the template!", "Alert", JOptionPane.ERROR_MESSAGE);
-            logger.debug(ex.getStackTrace());
-        }
+				// logger.debug("ActionMan.fileNewFromTemplate");
+			}
+			catch (Exception ex)
+			{
+				JOptionPane.showMessageDialog(ide.getIDE(), "Error while creating the template!", "Alert", JOptionPane.ERROR_MESSAGE);
+				logger.debug(ex.getStackTrace());
+			}
+		}
+		else if (item.getItemType() == TemplateItemType.MODULE)
+		{
+			ModuleSubject module;
+			try
+			{
+				// The documentmanager does the loading, by extension
+				module = (ModuleSubject) ide.getIDE().getDocumentManager().load(TemplateItem.class.getResource(item.getPath()));
+			}
+			catch (RuntimeException ex)
+			{
+				throw ex;
+			}
+			catch (Exception ex)
+			{
+				ide.getIDE().error(ex.getMessage());
+				return;
+			}
+			ide.getIDE().installContainer(module);
+		}
     }
 }
 

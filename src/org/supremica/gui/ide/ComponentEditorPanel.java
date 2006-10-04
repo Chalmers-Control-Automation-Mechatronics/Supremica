@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.29 2006-10-03 19:33:06 knut Exp $
+//# $Id: ComponentEditorPanel.java,v 1.30 2006-10-04 15:41:37 knut Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -18,6 +18,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import javax.swing.*;
+import java.awt.print.*;
+import java.util.Locale;
+import javax.print.attribute.*;
+import javax.print.attribute.standard.*;
 
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.ControlledToolbar;
@@ -183,7 +187,35 @@ public class ComponentEditorPanel
 
 	public void exportPostscript() {}
 
-	public void printFigure() {}
+  public void printFigure()
+  {
+    try
+      {
+        PrinterJob printJob = PrinterJob.getPrinterJob();
+        if (printJob.getPrintService() == null)
+          {
+            System.err.println("No default printer set.");
+            return;
+          }
+        printJob.setPrintable(surface);
+
+        // Printing attributes
+        PrintRequestAttribute name = new JobName("Supremica Printing", Locale.ENGLISH);
+        PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
+        attributes.add(name);
+
+        // Show printing dialog
+        if (printJob.printDialog(attributes))
+          {
+            // Print!
+            printJob.print(attributes);
+          }
+      }
+    catch (Exception ex)
+      {
+        System.err.println(ex.getStackTrace());
+      }
+  }
 
 	public void createEvent()
 	{

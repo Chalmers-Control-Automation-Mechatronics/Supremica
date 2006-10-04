@@ -105,8 +105,11 @@ public class SubjectShapeProducer
       }
     }
     if (runEmbedder) {
-      Thread t = new Thread(new SpringEmbedder(graph));
-      t.start();
+		if (SpringEmbedder.isLayoutable(graph))
+		{
+			Thread t = new Thread(new SpringEmbedder(graph));
+			t.start();
+		}
     }
 		graph.addModelObserver(this);
 	}

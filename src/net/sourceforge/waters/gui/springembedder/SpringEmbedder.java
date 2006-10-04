@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.13 2006-10-03 19:33:06 knut Exp $
+//# $Id: SpringEmbedder.java,v 1.14 2006-10-04 15:41:37 knut Exp $
 //###########################################################################
 
 
@@ -67,6 +67,7 @@ public class SpringEmbedder
     mNodeEdgeRepulsion = NODEEDGE_REPULSION / numnodes;
     mEdgeRepulsion = EDGE_REPULSION / numedges;
   }
+
 
 
   //#########################################################################
@@ -248,6 +249,20 @@ public class SpringEmbedder
       return POINT_ZERO;
     }
   }
+
+	public static boolean isLayoutable(GraphSubject graph)
+	{
+		final Collection<NodeSubject> nodes = graph.getNodesModifiable();
+		for (final NodeSubject node : nodes)
+		{
+			if (!(node instanceof SimpleNodeSubject))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 
   private int i = 0;
 
