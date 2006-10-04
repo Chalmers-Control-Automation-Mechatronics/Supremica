@@ -6,12 +6,12 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import org.supremica.gui.ide.IDE;
 
-public class EditorPrintPDFAction
+public class EditorSavePDFAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
     
-    public EditorPrintPDFAction(List<IDEAction> actionList)
+    public EditorSavePDFAction(List<IDEAction> actionList)
     {
         super(actionList);
         
