@@ -66,6 +66,7 @@ public class TemplateTypes
 	public static final TemplateTypes CommunicationSystemExamples = new TemplateTypes("Communication System Examples");
 	public static final TemplateTypes ManufacturingSystemExamples = new TemplateTypes("Manufacturing System Examples");
 	public static final TemplateTypes Games = new TemplateTypes("Games and Puzzles");
+	public static final TemplateTypes ModuleExamples = new TemplateTypes("Module Examples");
 
 	// public static final TemplateTypes StandardComponent = new TemplateTypes("Standard Components");
 	private String description;
