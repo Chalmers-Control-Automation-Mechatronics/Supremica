@@ -1000,7 +1000,7 @@ public class AutomatonMinimizer
                         totalOSO += countOSO;
                         if (countOSO > 0)
                             countOET += removeRedundantTransitions(aut);
-                    } while (countOSO > 0);
+					} while (countOSO > 0);					
                 }
                 totalOET += countOET;
                 

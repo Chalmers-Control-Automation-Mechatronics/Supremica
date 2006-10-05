@@ -55,19 +55,18 @@ import org.supremica.automata.*;
 
 public class TemplateItemType
 {
-	public static final TemplateItemType MODULE = new TemplateItemType(".wmod");
-	public static final TemplateItemType XML = new TemplateItemType(".xml");
-
-	private String description;
-
-	private TemplateItemType(String description)
-	{
-		this.description = description;
-	}
-
-	public String getDescription()
-	{
-		return description;
-	}
-
+    public static final TemplateItemType MODULE = new TemplateItemType(".wmod");
+    public static final TemplateItemType XML = new TemplateItemType(".xml");
+    
+    private String description;
+    
+    private TemplateItemType(String description)
+    {
+        this.description = description;
+    }
+    
+    public String getDescription()
+    {
+        return description;
+    }
 }

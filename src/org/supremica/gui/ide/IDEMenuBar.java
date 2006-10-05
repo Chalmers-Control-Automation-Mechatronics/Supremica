@@ -123,11 +123,9 @@ public class IDEMenuBar
         menu.add(ide.getActions().toolsTestCasesAction.getMenuItem());
         
         // File.NewFromTemplate
-        JMenu menuFileNewFromTemplate = new JMenu();
-        
-        menuFileNewFromTemplate.setText("Static examples");
-        menu.add(menuFileNewFromTemplate);
-        
+        //JMenu menuFileNewFromTemplate = new JMenu();
+        //menuFileNewFromTemplate.setText("Static examples");
+        //menu.add(menuFileNewFromTemplate);        
         ExampleTemplates exTempl = ExampleTemplates.getInstance();
         for (Iterator groupIt = exTempl.iterator(); groupIt.hasNext(); )
         {
@@ -135,7 +133,7 @@ public class IDEMenuBar
             JMenu menuFileNewFromTemplateGroup = new JMenu();
             
             menuFileNewFromTemplateGroup.setText(currGroup.getDescription());
-            menuFileNewFromTemplate.add(menuFileNewFromTemplateGroup);
+            menu.add(menuFileNewFromTemplateGroup);
             
             for (Iterator itemIt = currGroup.iterator(); itemIt.hasNext(); )
             {

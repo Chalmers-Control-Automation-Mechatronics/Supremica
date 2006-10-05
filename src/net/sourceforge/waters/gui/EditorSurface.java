@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.63 2006-10-03 19:33:06 knut Exp $
+//# $Id: EditorSurface.java,v 1.64 2006-10-05 21:34:54 flordal Exp $
 //###########################################################################
 
 
@@ -57,8 +57,7 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
  */
 public class EditorSurface
     extends JComponent
-    implements Printable,
-    Renderable
+    implements Printable, Renderable
 {
     /**
      * Increase bounds for label & guardAction panels.

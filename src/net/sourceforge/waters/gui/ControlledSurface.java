@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.86 2006-10-04 15:41:37 knut Exp $
+//# $Id: ControlledSurface.java,v 1.87 2006-10-05 21:34:54 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -1906,16 +1906,15 @@ public class ControlledSurface
                 // Move every selected object!
                 if (!draggingSource && !draggingTarget)
                 {
-                    for (Iterator<ProxySubject> it = selectedObjects.iterator(); it.hasNext(); )
+                    for (ProxySubject subject : selectedObjects)
                     {
-                        ProxySubject s = it.next();
-                        if (mResize != null && s instanceof GroupNodeSubject)
+                        if (mResize != null && subject instanceof GroupNodeSubject)
                         {
-                            resizeGroupNode((GroupNodeSubject) s, mResize.resize(e.getPoint()));
+                            resizeGroupNode((GroupNodeSubject) subject, mResize.resize(e.getPoint()));
                         }
                         else
                         {
-                            setObjectPosition(s, dx, dy);
+                            setObjectPosition(subject, dx, dy);
                         }
                     }
                 }
@@ -1931,7 +1930,6 @@ public class ControlledSurface
         {
             updateHighlighting(e.getPoint());
         }
-
     }
 
     private class NodeListener
@@ -2682,11 +2680,9 @@ public class ControlledSurface
         }
     }
 
-
   private class KeySpy
     extends KeyAdapter
   {
-
         public void keyPressed(KeyEvent e)
         {
             //System.err.println(e.getKeyCode());

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindowInterface.java,v 1.8 2006-09-21 14:03:12 robi Exp $
+//# $Id: EditorWindowInterface.java,v 1.9 2006-10-05 21:34:54 flordal Exp $
 //###########################################################################
 
 
@@ -20,29 +20,29 @@ import net.sourceforge.waters.subject.module.IdentifierSubject;
 
 public interface EditorWindowInterface
 {
-	public boolean isSaved();
-
-	public void setSaved(boolean s);
-
-	public JFrame getFrame();
-
-	public ControlledSurface getControlledSurface();
-
-	public EditorEvents getEventPane();
-
-	public UndoInterface getUndoInterface();
-
-	public void repaint();
-
-	public void setDisplayed();
-
-	public void copyAsWMFToClipboard();
-
-	public void exportPDF();
-
-	public void exportPostscript();
-
-	public void printFigure();
-
-	public void createEvent();
+    public boolean isSaved();
+    
+    public void setSaved(boolean s);
+    
+    public JFrame getFrame();
+    
+    public ControlledSurface getControlledSurface();
+    
+    public EditorEvents getEventPane();
+    
+    public UndoInterface getUndoInterface();
+    
+    public void repaint();
+    
+    public void setDisplayed();
+    
+    public void copyAsWMFToClipboard();
+    
+    public void exportPDF();
+    
+    public void exportPostscript();
+    
+    public void printFigure();
+    
+    public void createEvent();
 }
