@@ -55,19 +55,26 @@ public class TemplateGroup
 {
     private List items = new LinkedList();
     private TemplateTypes type;
-    private String description;
+    private String name;
+    private String shortDescription;
     
     public TemplateGroup(TemplateTypes type)
     {
 	this.type = type;
-	this.description = type.getDescription();
+	this.name = type.getName();
+	this.shortDescription = type.getShortDescription();
     }
     
-    public String getDescription()
+    public String getName()
     {
-	return description;
+	return name;
     }
-    
+
+    public String getShortDescription()
+    {
+	return shortDescription;
+    }
+
     public void addItem(TemplateItem item)
     {
 	items.add(item);

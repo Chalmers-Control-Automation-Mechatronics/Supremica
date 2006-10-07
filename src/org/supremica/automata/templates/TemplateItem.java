@@ -55,54 +55,66 @@ import org.supremica.automata.*;
 
 public class TemplateItem
 {
-	private String description;
-	private String path;
-	private TemplateItemType itemType;
+    private String name;
+    private String shortDescription;
+    private String path;
+    private TemplateItemType itemType;
+    
+    public TemplateItem(String name, String path, TemplateItemType itemType)
+    {
+        this(name, null, path, itemType);
+    }
 
-	public TemplateItem(String description, String path, TemplateItemType itemType)
-	{
-		this.description = description;
-		this.path = path;
-		this.itemType = itemType;
-	}
+    public TemplateItem(String name, String shortDescription, String path, TemplateItemType itemType)
+    {
+        this.name = name;
+        this.path = path;
+        this.itemType = itemType;
+    }
 
-	public String getDescription()
-	{
-		return description;
-	}
-
-	public String getPath()
-	{
-		return path;
-	}
-
-	public TemplateItemType getItemType()
-	{
-		return itemType;
-	}
-
-	public Project createInstance(ProjectFactory theFactory)
-		throws Exception
-	{
-		try
-		{
-			URL url = TemplateItem.class.getResource(path);
-
-			//InputStream stream = url.openStream();
-			ProjectBuildFromXml builder = new ProjectBuildFromXml(theFactory);
-			Project theProject = builder.build(url);
-
-			return theProject;
-		}
-		catch (Exception ex)
-		{
-
-			// logger.error("Exception building project." + ex);
-			// logger.debug(ex.getStackTrace());
-			throw ex;
-		}
-	}
-
-
-
+    public String getName()
+    {
+        return name;
+    }
+    
+    public String getShortDescription()
+    {
+        return shortDescription;
+    }
+    
+    
+    public String getPath()
+    {
+        return path;
+    }
+    
+    public TemplateItemType getItemType()
+    {
+        return itemType;
+    }
+    
+    public Project createInstance(ProjectFactory theFactory)
+    throws Exception
+    {
+        try
+        {
+            URL url = TemplateItem.class.getResource(path);
+            
+            //InputStream stream = url.openStream();
+            ProjectBuildFromXml builder = new ProjectBuildFromXml(theFactory);
+            Project theProject = builder.build(url);
+            
+            return theProject;
+        }
+        catch (Exception ex)
+        {
+            
+            // logger.error("Exception building project." + ex);
+            // logger.debug(ex.getStackTrace());
+            throw ex;
+        }
+    }
+    
+    
+    
 }

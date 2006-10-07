@@ -177,7 +177,7 @@ public class MainMenuBar
             TemplateGroup currGroup = (TemplateGroup) groupIt.next();
             JMenu menuFileNewFromTemplateGroup = new JMenu();
             
-            menuFileNewFromTemplateGroup.setText(currGroup.getDescription());
+            menuFileNewFromTemplateGroup.setText(currGroup.getName());
             menuFileNewFromTemplate.add(menuFileNewFromTemplateGroup);
             
             for (Iterator itemIt = currGroup.iterator(); itemIt.hasNext(); )
@@ -185,7 +185,7 @@ public class MainMenuBar
                 TemplateItem currItem = (TemplateItem) itemIt.next();
                 JMenuItem menuItem = new JMenuItem();
                 
-                menuItem.setText(currItem.getDescription());
+                menuItem.setText(currItem.getName());
                 menuFileNewFromTemplateGroup.add(menuItem);
                 menuItem.addActionListener(new NewFromTemplateHandler(currItem));
             }

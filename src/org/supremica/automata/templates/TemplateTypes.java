@@ -53,38 +53,50 @@ import java.util.*;
 
 public class TemplateTypes
 {
-	private static List collection = new LinkedList();
-	public static final TemplateTypes Undefined = new TemplateTypes("Undefined");
-	public static final TemplateTypes DESBookExample = new TemplateTypes("DES-Book Examples");
-	public static final TemplateTypes DESBookExercise = new TemplateTypes("DES-Book Exercises");
-	public static final TemplateTypes DESCourseAssignment = new TemplateTypes("DES-Course Assignments");
-	public static final TemplateTypes DESCourseAssignmentSolutions = new TemplateTypes("DES-Course Assignment Solutions");
-	public static final TemplateTypes OtherExample = new TemplateTypes("Other Examples");
-	public static final TemplateTypes AIPExample = new TemplateTypes("AIP Examples");
-	public static final TemplateTypes CentralLockExample = new TemplateTypes("Central Lock Examples");
-	public static final TemplateTypes OperatorSupervisorExample = new TemplateTypes("Hybrid Human-Computer Supervisors");
-	public static final TemplateTypes CommunicationSystemExamples = new TemplateTypes("Communication System Examples");
-	public static final TemplateTypes ManufacturingSystemExamples = new TemplateTypes("Manufacturing System Examples");
-	public static final TemplateTypes Games = new TemplateTypes("Games and Puzzles");
-	public static final TemplateTypes ModuleExamples = new TemplateTypes("Module Examples");
-
-	// public static final TemplateTypes StandardComponent = new TemplateTypes("Standard Components");
-	private String description;
-
-	private TemplateTypes(String description)
-	{
-		this.description = description;
-
-		collection.add(this);
-	}
-
-	public static Iterator iterator()
-	{
-		return collection.iterator();
-	}
-
-	public String getDescription()
-	{
-		return description;
-	}
+    private static List collection = new LinkedList();
+    public static final TemplateTypes Undefined = new TemplateTypes("Undefined");
+    public static final TemplateTypes DESBookExample = new TemplateTypes("DES-Book Examples", "Examples from 'Discrete Event Systems; Lecture Notes' by Martin Fabian");
+    public static final TemplateTypes DESBookExercise = new TemplateTypes("DES-Book Exercises", "Examples from 'Discrete Event Systems; Lecture Notes' by Martin Fabian");
+    public static final TemplateTypes DESCourseAssignment = new TemplateTypes("DES-Course Assignments", "Assignments used in the undergraduate course in discrete event systems at Chalmers University of Technology");
+    public static final TemplateTypes DESCourseAssignmentSolutions = new TemplateTypes("DES-Course Assignment Solutions");
+    public static final TemplateTypes AIPExample = new TemplateTypes("AIP Examples");
+    public static final TemplateTypes CentralLockExample = new TemplateTypes("Central Lock Examples");
+    public static final TemplateTypes OperatorSupervisorExample = new TemplateTypes("Hybrid Human-Computer Supervisors");
+    public static final TemplateTypes CommunicationSystemExamples = new TemplateTypes("Communication System Examples");
+    public static final TemplateTypes ManufacturingSystemExamples = new TemplateTypes("Manufacturing System Examples");
+    public static final TemplateTypes Games = new TemplateTypes("Games and Puzzles");
+    public static final TemplateTypes ModuleExamples = new TemplateTypes("Module Examples");
+    public static final TemplateTypes OtherExample = new TemplateTypes("Other Examples");
+    
+    // public static final TemplateTypes StandardComponent = new TemplateTypes("Standard Components");
+    private String name;
+    private String shortDescription;
+    
+    private TemplateTypes(String name)
+    {
+        this(name, null);
+    }
+    
+    private TemplateTypes(String name, String shortDescription)
+    {
+        this.shortDescription = shortDescription;
+        this.name = name;
+        
+        collection.add(this);
+    }
+    
+    public static Iterator iterator()
+    {
+        return collection.iterator();
+    }
+    
+    public String getName()
+    {
+        return name;
+    }
+    
+    public String getShortDescription()
+    {
+        return shortDescription;
+    }
 }

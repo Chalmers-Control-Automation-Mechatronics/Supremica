@@ -132,15 +132,17 @@ public class IDEMenuBar
             TemplateGroup currGroup = (TemplateGroup) groupIt.next();
             JMenu menuFileNewFromTemplateGroup = new JMenu();
             
-            menuFileNewFromTemplateGroup.setText(currGroup.getDescription());
+            menuFileNewFromTemplateGroup.setText(currGroup.getName());
+            menuFileNewFromTemplateGroup.setToolTipText(currGroup.getShortDescription());
             menu.add(menuFileNewFromTemplateGroup);
             
             for (Iterator itemIt = currGroup.iterator(); itemIt.hasNext(); )
             {
                 TemplateItem currItem = (TemplateItem) itemIt.next();
-                JMenuItem menuItem = new JMenuItem();
+                JMenuItem menuItem = new JMenuItem();                
+                menuItem.setText(currItem.getName());
+                menuItem.setToolTipText(currItem.getShortDescription());                
                 
-                menuItem.setText(currItem.getDescription());
                 menuFileNewFromTemplateGroup.add(menuItem);
                 menuItem.addActionListener(new NewFromTemplateHandler(currItem));
             }
