@@ -1,3 +1,13 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: org.supremica.gui.ide.actions
+//# CLASS:   EditorRunEmbedderAction
+//###########################################################################
+//# $Id: EditorRunEmbedderAction.java,v 1.3 2006-10-07 14:38:44 robi Exp $
+//###########################################################################
+
+
 package org.supremica.gui.ide.actions;
 
 import java.util.List;
@@ -7,6 +17,8 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import org.supremica.gui.ide.IDE;
@@ -46,18 +58,19 @@ public class EditorRunEmbedderAction
      */
     public void doAction()
     {
-        GraphSubject graph = ide.getIDE().getActiveEditorWindowInterface().getControlledSurface().getGraph();
-        if (graph != null)
-        {
-			if (SpringEmbedder.isLayoutable(graph))
-			{
-				Thread t = new Thread(new SpringEmbedder(graph));
-				t.start();
-			}
-			else
-			{
-				JOptionPane.showMessageDialog(ide.getFrame(), "Graph is not layoutable", "Alert", JOptionPane.ERROR_MESSAGE);
-				return;
+        final GraphSubject graph =
+			ide.getIDE().getActiveEditorWindowInterface().
+			getControlledSurface().getGraph();
+        if (graph != null) {
+			try {
+				final SpringEmbedder embedder = new SpringEmbedder(graph);
+				final Thread thread = new Thread(embedder);
+				thread.start();
+			} catch (final GeometryAbsentException exception) {
+				JOptionPane.showMessageDialog(ide.getFrame(),
+											  "Graph is not layoutable!",
+											  "Alert",
+											  JOptionPane.ERROR_MESSAGE);
 			}
         }
     }

@@ -4,20 +4,23 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.31 2006-10-04 15:41:37 knut Exp $
+//# $Id: EditorMenu.java,v 1.32 2006-10-07 14:38:44 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
-import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import net.sourceforge.waters.gui.observer.Observer;
-import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import javax.swing.*;
+
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
+import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
+import net.sourceforge.waters.subject.module.GraphSubject;
+
 
 /**
  * <p>The EditorWindow menu.</p>
@@ -265,18 +268,19 @@ public class EditorMenu
 
 		if (e.getSource() == mEmbedder)
 		{
-			if (SpringEmbedder.isLayoutable(surface.getGraph()))
-			{
-				Thread t = new Thread(new SpringEmbedder(surface.getGraph()));
-				t.start();
+			try {
+				final GraphSubject graph = surface.getGraph();
+				final SpringEmbedder embedder = new SpringEmbedder(graph);
+				final Thread thread = new Thread(embedder);
+				thread.start();
+			} catch (final GeometryAbsentException exception) {
+				JOptionPane.showMessageDialog(root.getFrame(),
+											  "Graph is not layoutable!",
+											  "Alert",
+											  JOptionPane.ERROR_MESSAGE);
 			}
-			else
-			{
-				JOptionPane.showMessageDialog(root.getFrame(), "Graph is not layoutable", "Alert", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-		}
-  }
+        }
+	}
 
     public void update(EditorChangedEvent e)
     {

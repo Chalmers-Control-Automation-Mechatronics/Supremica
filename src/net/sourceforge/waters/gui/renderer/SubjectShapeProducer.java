@@ -59,9 +59,18 @@ public class SubjectShapeProducer
         if (n.getPointGeometry() == null) {
 	  logger.debug("setGeometry");
           runEmbedder = Config.GUI_EDITOR_USE_SPRING_EMBEDDER.isTrue();
+	  final int base;
+	  final int spread;
+	  if (n.isInitial()) {
+	    base = 10;
+	    spread = 50;
+	  } else {
+	    base = 100;
+	    spread = 500;
+	  }
           n.setPointGeometry(new PointGeometrySubject
-			     (new Point(100 + rand.nextInt(500),
-					100 + rand.nextInt(500))));
+			     (new Point(base + rand.nextInt(spread),
+					base + rand.nextInt(spread))));
         }
         if (n.getLabelGeometry() == null) {
           n.setLabelGeometry(new LabelGeometrySubject(new Point(5, 5)));
@@ -105,14 +114,11 @@ public class SubjectShapeProducer
       }
     }
     if (runEmbedder) {
-		if (SpringEmbedder.isLayoutable(graph))
-		{
-			Thread t = new Thread(new SpringEmbedder(graph));
-			t.start();
-		}
+      Thread t = new Thread(new SpringEmbedder(graph));
+      t.start();
     }
-		graph.addModelObserver(this);
-	}
+    graph.addModelObserver(this);
+  }
 
   public SubjectShapeProducer(Subject graph, ModuleProxy module)
   {
