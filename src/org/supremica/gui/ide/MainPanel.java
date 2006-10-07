@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   MainPanel
 //###########################################################################
-//# $Id: MainPanel.java,v 1.18 2006-09-24 18:18:33 knut Exp $
+//# $Id: MainPanel.java,v 1.19 2006-10-07 20:20:12 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -24,8 +24,10 @@ import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.log.*;
 
@@ -85,6 +87,11 @@ abstract class MainPanel
 	public ExpressionParser getExpressionParser()
 	{
 		return moduleContainer.getExpressionParser();
+	}
+
+	public EventKind guessEventKind(final IdentifierProxy ident)
+	{
+		return moduleContainer.guessEventKind(ident);
 	}
 
 	public Frame getRootWindow()

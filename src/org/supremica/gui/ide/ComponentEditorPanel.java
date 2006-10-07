@@ -4,27 +4,24 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.31 2006-10-04 16:01:25 knut Exp $
+//# $Id: ComponentEditorPanel.java,v 1.32 2006-10-07 20:20:12 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
 
-import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
-import javax.swing.*;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
+import com.lowagie.text.*;
+import com.lowagie.text.pdf.*;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import javax.swing.*;
 import java.awt.print.*;
 import java.util.Locale;
 import javax.print.attribute.*;
 import javax.print.attribute.standard.*;
-
-import com.lowagie.text.*;
-import com.lowagie.text.pdf.*;
+import javax.swing.*;
+import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.ControlledToolbar;
@@ -35,7 +32,7 @@ import net.sourceforge.waters.gui.EventEditorDialog;
 import net.sourceforge.waters.gui.EventTableModel;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.UndoInterface;
-import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.subject.base.NamedSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
@@ -93,8 +90,8 @@ public class ComponentEditorPanel
 		surface.setPreferredSize(IDEDimensions.rightEditorPreferredSize);
 		surface.setMinimumSize(IDEDimensions.rightEditorMinimumSize);
 
-		final ExpressionParser parser = mModuleContainer.getExpressionParser();
-		events = new EditorEvents(mModule, element, parser, this);
+		final ModuleWindowInterface root = mModuleContainer.getEditorPanel();
+		events = new EditorEvents(root, element, this);
 		menu = new EditorMenu(surface, this);
 
 		final LayoutManager layout = new BorderLayout();

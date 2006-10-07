@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.26 2006-09-24 20:40:49 knut Exp $
+//# $Id: EditorEvents.java,v 1.27 2006-10-07 20:20:12 robi Exp $
 //###########################################################################
 
 
@@ -74,23 +74,21 @@ public class EditorEvents
 
 	//#######################################################################
 	//# Constructors
-	public EditorEvents(final ModuleSubject module,
+	public EditorEvents(final ModuleWindowInterface root,
 						final SimpleComponentSubject comp,
-						final ExpressionParser parser,
 						final EditorWindowInterface window)
 	{
-		this(module, comp.getGraph(), parser, window);
+		this(root, comp.getGraph(), window);
 	}
 
-	public EditorEvents(final ModuleSubject module,
+	public EditorEvents(final ModuleWindowInterface root,
 						final GraphSubject graph,
-						final ExpressionParser parser,
 						final EditorWindowInterface window)
 	{
-		final TableModel model = new EventTableModel(graph, module, this);
+		final TableModel model = new EventTableModel(graph, root, this);
 		final Dimension ispacing = new Dimension(0, 0);
-
-		root = window;
+		final ExpressionParser parser = root.getExpressionParser();
+		mRoot = window;
 
 		setModel(model);
 		setTableHeader(null);
@@ -425,7 +423,7 @@ public class EditorEvents
 
 	public EditorWindowInterface getEditorInterface()
 	{
-		return root;
+		return mRoot;
 	}
 
 
@@ -435,7 +433,7 @@ public class EditorEvents
 	private DragGestureListener mDGListener;
 	private DragSourceListener mDSListener;
 	private int mDragAction = DnDConstants.ACTION_COPY;
-	private final EditorWindowInterface root;
+	private final EditorWindowInterface mRoot;
 
 
 	//#######################################################################

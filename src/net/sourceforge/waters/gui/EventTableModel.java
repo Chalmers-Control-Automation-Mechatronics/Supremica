@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.23 2006-09-25 08:06:54 knut Exp $
+//# $Id: EventTableModel.java,v 1.24 2006-10-07 20:20:12 robi Exp $
 //###########################################################################
 
 
@@ -49,7 +49,6 @@ import net.sourceforge.waters.subject.module.EventParameterSubject;
 import net.sourceforge.waters.subject.module.ForeachEventSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
-import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ParameterSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -69,13 +68,13 @@ public class EventTableModel
   //#########################################################################
   //# Constructors
   EventTableModel(final GraphSubject graph,
-                  final ModuleSubject module,
+                  final ModuleWindowInterface root,
                   final EditorEvents table)
   {
     addTableModelListener(new TableHandler());
     mTable = table;
     mGraph = graph;
-    mModule = module;
+    mRoot = root;
     mEvents = collectEvents();
     graph.addModelObserver(this);
     fireTableChanged(new TableModelEvent(this));
@@ -128,7 +127,7 @@ public class EventTableModel
     switch (column) {
       case 0:
         final IdentifierSubject ident = entry.getName();
-        final EventKind kind = guessEventKind(ident);
+        final EventKind kind = mRoot.guessEventKind(ident);
         return getIcon(kind);
       case 1:
         return entry.getName();
@@ -229,14 +228,6 @@ public class EventTableModel
     fireTableRowsInserted(row, row);
     return row;
   }
-/*
-	void deleteEvent(int row)
-	{
-//		final EventDeclSubject victim = (EventDeclSubject) mEventListModel.getElementAt(row);
-//		final IndexedListSubject<EventDeclSubject> events = mModule.getEventDeclListModifiable();
-//		events.remove(victim);
-	}
-*/
 
   String getToolTipText(final int row)
   {
@@ -244,7 +235,7 @@ public class EventTableModel
     final String name = event.toString();
     final int len = name.length();
     final StringBuffer buffer = new StringBuffer(len + 22);
-    final EventKind kind = guessEventKind(event);
+    final EventKind kind = mRoot.guessEventKind(event);
     if (kind == null) {
       buffer.append("Event");
     } else if (kind.equals(EventKind.CONTROLLABLE)) {
@@ -320,29 +311,6 @@ public class EventTableModel
     return index >= 0;
   }
 
-  private EventKind guessEventKind(final IdentifierSubject ident)
-  {
-    if (ident == null) {
-      return null;
-    }
-    final String name = ident.getName();
-    final IndexedList<EventDeclSubject> decls =
-      mModule.getEventDeclListModifiable();
-    final EventDeclSubject decl = decls.get(name);
-    if (decl != null) {
-      return decl.getKind();
-    }
-    final IndexedList<ParameterSubject> params =
-      mModule.getParameterListModifiable();
-    final ParameterSubject param = params.get(name);
-    if (param != null && param instanceof EventParameterSubject) {
-      final EventParameterSubject eparam = (EventParameterSubject) param;
-      final EventDeclSubject edecl = eparam.getEventDecl();
-      return edecl.getKind();
-    }
-    return null;
-  }
-
   private ImageIcon getIcon(final EventKind kind)
   {
     if (kind == null) {
@@ -361,7 +329,7 @@ public class EventTableModel
   public IdentifierTransfer createIdentifierTransfer
     (final IdentifierSubject ident)
   {
-    final EventKind kind = guessEventKind(ident);
+    final EventKind kind = mRoot.guessEventKind(ident);
     return new IdentifierTransfer(ident, kind);
   }
 
@@ -631,7 +599,7 @@ public class EventTableModel
   //#######################################################################
   //# Data Members
   private final GraphSubject mGraph;
-  private final ModuleSubject mModule;
+  private final ModuleWindowInterface mRoot;
   private final List<EventEntry> mEvents;
   private final EditorEvents mTable;
 }

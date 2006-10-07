@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.57 2006-09-26 02:39:40 siw4 Exp $
+//# $Id: ModuleWindow.java,v 1.58 2006-10-07 20:20:12 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -981,6 +981,26 @@ public class ModuleWindow
   public ExpressionParser getExpressionParser()
   {
     return mExpressionParser;
+  }
+
+  public EventKind guessEventKind(final IdentifierProxy ident)
+  {
+    final String name = ident.getName();
+    final IndexedList<EventDeclSubject> decls =
+      mModule.getEventDeclListModifiable();
+    final EventDeclSubject decl = decls.get(name);
+    if (decl != null) {
+      return decl.getKind();
+    }
+    final IndexedList<ParameterSubject> params =
+      mModule.getParameterListModifiable();
+    final ParameterSubject param = params.get(name);
+    if (param != null && param instanceof EventParameterSubject) {
+      final EventParameterSubject eparam = (EventParameterSubject) param;
+      final EventDeclSubject edecl = eparam.getEventDecl();
+      return edecl.getKind();
+    }
+    return null;
   }
 
   public Frame getRootWindow()

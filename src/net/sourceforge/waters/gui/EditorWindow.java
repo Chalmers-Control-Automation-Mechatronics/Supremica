@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.32 2006-09-25 03:55:30 siw4 Exp $
+//# $Id: EditorWindow.java,v 1.33 2006-10-07 20:20:12 robi Exp $
 //###########################################################################
 
 
@@ -39,7 +39,6 @@ import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.UndoRedoEvent;
 import net.sourceforge.waters.model.base.IndexedList;
-import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.subject.base.NamedSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -83,8 +82,7 @@ public class EditorWindow
     surface.setPreferredSize(new Dimension(500, 500));
     surface.setMinimumSize(new Dimension(0, 0));
 
-    final ExpressionParser parser = root.getExpressionParser();
-    mEventPane = new EditorEvents(module, subject, parser, this);
+    mEventPane = new EditorEvents(root, subject, this);
     menu = new EditorMenu(surface, this);
 
     mModuleWindow = root;
