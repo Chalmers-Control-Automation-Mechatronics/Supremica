@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="WineMerchant" xmlns="http://waters.sourceforge.net/xsd/module">
-	<ns2:Comment>An elegant (perhaps not so much with automatic graph layout) solution to the classical 'Wine Merchant's Problem'. A wine merchant has three bottles, capable of storing 3, 5 and 8 litres of wine respectively. Initially, he has 8 litres in the third bottle but he wants to split this volume in half, i.e. two bottles of four litres each. How does he do that if he can not use any measuring equipment except for the three bottles which, of course, are not graded. That is, how do you move from the state '008' to the state '044' in as few steps as possible? The event called '1-2', for example, means that the contents of bottle 1 is poured into bottle 2, until bottle 2 is full or bottle 1 is empty (whichever happens first). Try solving the problem using 'Explore states' from the popup menu.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Observable="true" Name="e12"/>
         <EventDecl Kind="CONTROLLABLE" Observable="true" Name="e13"/>
