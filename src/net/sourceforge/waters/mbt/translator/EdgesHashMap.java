@@ -12,7 +12,7 @@ public class EdgesHashMap extends HashMap<String,List<EdgeNode>> {
 
 	}
 
-	public void add(final String event, final String begin, final String end) {
+	public void add(final String event, final String begin, final String end, final String guard, final String action) {
 
 		List<EdgeNode> EdgesList;
 		EdgeNode EdgeN;
@@ -27,7 +27,7 @@ public class EdgesHashMap extends HashMap<String,List<EdgeNode>> {
 
 		}
 
-		EdgeN = new EdgeNode(begin, end);
+		EdgeN = new EdgeNode(begin, end, guard, action);
 		EdgesList.add(EdgeN);
 		this.put(event, EdgesList);
 	}
