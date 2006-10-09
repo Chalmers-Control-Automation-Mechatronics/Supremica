@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   VariableProxy
 //###########################################################################
-//# $Id: VariableProxy.java,v 1.3 2006-03-06 17:08:46 markus Exp $
+//# $Id: VariableProxy.java,v 1.4 2006-10-09 10:07:54 xo3 Exp $
 //###########################################################################
 
 
@@ -36,7 +36,7 @@ public interface VariableProxy extends Proxy{
   
   /**
    * Gets the type of this variable. Possible types:
-   * EnumSetExpressionProxy (enum), BinaryExpression (integer) 
+   * EnumSetExpressionProxy (enum), BinaryExpressionProxy (integer) 
    * or SimpleIdentifierProxy (boolean).
    */
  
