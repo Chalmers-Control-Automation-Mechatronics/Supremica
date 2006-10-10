@@ -4,11 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.87 2006-10-05 21:34:54 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.88 2006-10-10 00:49:32 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
 
+import net.sourceforge.waters.subject.module.IdentifierSubject;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DragSource;
 import net.sourceforge.waters.gui.renderer.EdgeProxyShape;
 import java.awt.geom.Line2D;
 import java.awt.geom.GeneralPath;
@@ -100,6 +103,15 @@ public class ControlledSurface
       setFocusable(true);
       dtListener = new DTListener();
       dropTarget = new DropTarget(this, dtListener);
+      mDragSource = DragSource.getDefaultDragSource();
+      mDGListener = new DGListener();
+      mDSListener = new DSListener();
+  
+      // component, action, listener
+      mDragSource.createDefaultDragGestureRecognizer(this,
+                              mDragAction,
+                              mDGListener);
+      mDragSource.addDragSourceListener(mDSListener);
     }
 
 
@@ -705,7 +717,7 @@ public class ControlledSurface
                     compound.addCommand(c);
                 }
             }
-            if ((s.getParent() != null) &&
+            else if ((s.getParent() != null) &&
                 (s.getParent().getParent() instanceof EventListExpressionSubject))
             {
                 EventListExpressionSubject e =
@@ -1211,7 +1223,6 @@ public class ControlledSurface
         }
     }
 
-
     private class DTListener extends DropTargetAdapter
     {
         //#######################################################################
@@ -1638,6 +1649,7 @@ public class ControlledSurface
 
         public void mousePressed(MouseEvent e)
         {
+            mToBeDragged = DNDLabel(e.getPoint());
             // This is for triggering the popup
             maybeShowPopup(e);
             setDrag(e);
@@ -1744,6 +1756,7 @@ public class ControlledSurface
 
         public void mouseReleased(MouseEvent e)
         {
+            mToBeDragged = null;
             if (hasDragged)
             {
                 Command unselect = new UnSelectCommand(ControlledSurface.this, previouslySelected);
@@ -1807,6 +1820,9 @@ public class ControlledSurface
 
         public void mouseDragged(MouseEvent e)
         {
+          if (mToBeDragged != null) {
+            return;
+          }
             updateHighlighting(e.getPoint());
             //if (e.getButton() == MouseEvent.BUTTON1) // Why not?
             {
@@ -3028,8 +3044,54 @@ public class ControlledSurface
             return rect;
         }
     }
-
-
+    
+    private class DSListener extends DragSourceAdapter
+    {
+      public void dragOver(DragSourceDragEvent e)
+      {
+        if (e.getTargetActions() == DnDConstants.ACTION_COPY) {
+          e.getDragSourceContext().setCursor
+            (DragSource.DefaultCopyDrop);
+        } else {
+          e.getDragSourceContext().setCursor
+            (DragSource.DefaultCopyNoDrop);
+        }
+      }
+    }
+  
+    private class DGListener implements DragGestureListener
+    {
+      public void dragGestureRecognized(final DragGestureEvent event)
+      {
+        if (mToBeDragged == null) {
+          return;
+        }
+        final Transferable trans = new IdentifierTransfer(mToBeDragged,
+                                                          EventKind.CONTROLLABLE);
+        mToBeDragged = null;
+        try {
+          event.startDrag(DragSource.DefaultCopyDrop, trans);
+        } catch (InvalidDnDOperationException exception) {
+          throw new IllegalArgumentException(exception);
+        }
+      }
+    }
+    
+    private IdentifierSubject DNDLabel(Point pos) {
+      for (ProxySubject s : selectedObjects) {
+        try {
+          if (s instanceof IdentifierSubject && getShapeProducer().getShape(s)
+                                                .getShape().getBounds()
+                                                .contains(pos)) {
+            return (IdentifierSubject)s;
+          }
+        } catch (VisitorException v) {
+          v.printStackTrace();
+        }
+      }
+      return null;
+    }
+    
     //#########################################################################
     //# Data Members
     private ControlledToolbar mToolbar;
@@ -3046,6 +3108,7 @@ public class ControlledSurface
     private boolean draggingSource = false;
     private boolean draggingTarget = false;
     private boolean draggingInitial = false;
+    private IdentifierSubject mToBeDragged = null;
 
     /** List of currently selected EditorObject:s. */
     private List<ProxySubject> selectedObjects =
@@ -3087,7 +3150,12 @@ public class ControlledSurface
         EDGE,
         EVENT;
     }
-
+    
+    private DragSource mDragSource;
+    private DragGestureListener mDGListener;
+    private DragSourceListener mDSListener;
+    private int mDragAction = DnDConstants.ACTION_COPY;
+    
     public static boolean mDND = false;
     /** is not being draggedOver*/
     public static final int NOTDRAG = 0;

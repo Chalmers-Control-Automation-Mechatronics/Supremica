@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   IdentifierTransfer
 //###########################################################################
-//# $Id: IdentifierTransfer.java,v 1.1 2006-09-21 16:42:13 robi Exp $
+//# $Id: IdentifierTransfer.java,v 1.2 2006-10-10 00:49:32 siw4 Exp $
 //###########################################################################
 
 
@@ -29,7 +29,7 @@ public class IdentifierTransfer implements Transferable
    * @param kind   The associated event kind.
    */
   public IdentifierTransfer(final IdentifierSubject ident,
-			    final EventKind kind)
+                            final EventKind kind)
   {
     mData = new IdentifierWithKind(ident, kind);
   }
