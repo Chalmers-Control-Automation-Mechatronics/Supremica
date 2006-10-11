@@ -49,7 +49,6 @@
  */
 package org.supremica.automata.algorithms;
 
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -60,13 +59,10 @@ import junit.framework.TestSuite;
 // For the benchmarks
 import java.io.File;
 import org.supremica.util.ActionTimer;
-
-import org.supremica.automata.algorithms.*;
-    
-//import org.supremica.testhelpers.*;
-import org.supremica.automata.*;
 import org.supremica.automata.algorithms.minimization.*;
 import org.supremica.automata.IO.*;
+import org.supremica.automata.Project;
+import java.util.Date;
 
 // Instantiated testcases
 import org.supremica.testcases.Arbiter;
@@ -92,10 +88,10 @@ public class BenchmarkAutomataVerifier
         TestSuite suite = new TestSuite(BenchmarkAutomataVerifier.class);
         return suite;
     }
-       
+    
     public void testBenchmarkVerification()
     throws Exception
-    {        
+    {
         // Init options and verifier
         VerificationOptions vOptions;
         SynchronizationOptions sOptions;
@@ -104,20 +100,20 @@ public class BenchmarkAutomataVerifier
         mOptions = MinimizationOptions.getDefaultNonblockingOptions();
         
         // Controllability / Nonblocking
-		vOptions = VerificationOptions.getDefaultNonblockingOptions();
-		int type = 1;
+        vOptions = VerificationOptions.getDefaultNonblockingOptions();
+        int type = 1;
         if (type == 0)
             // Nonblocking
             vOptions.setVerificationType(VerificationType.NONBLOCKING);
         else if (type == 1)
-			// Controllability
+            // Controllability
             vOptions.setVerificationType(VerificationType.CONTROLLABILITY);
         else if (type == 2)
             // Both
             vOptions.setVerificationType(VerificationType.CONTROLLABILITYNONBLOCKING);
         
         // Compositional / Modular
-		int algo = 0;
+        int algo = 0;
         if (algo == 0)
             // Compositional
             vOptions.setAlgorithmType(VerificationAlgorithm.COMPOSITIONAL);
@@ -140,12 +136,12 @@ public class BenchmarkAutomataVerifier
         // Heuristics
         MinimizationHeuristic[] heuristicArray =
         {
-            MinimizationHeuristic.MostLocal,
+            //MinimizationHeuristic.MostLocal,
             //MinimizationHeuristic.MostCommon,
-            //MinimizationHeuristic.FewestStates,
-            //MinimizationHeuristic.FewestEvents,
-            //MinimizationHeuristic.LeastExtension
-            //MinimizationHeuristic.FewestTransitions,
+            MinimizationHeuristic.FewestStates,
+            MinimizationHeuristic.FewestEvents,
+            MinimizationHeuristic.LeastExtension,
+            MinimizationHeuristic.FewestTransitions
         };
         
         try
@@ -153,7 +149,8 @@ public class BenchmarkAutomataVerifier
             String fileName = "benchmarklog.txt";
             file = new FileWriter(fileName);
             file.write("BENCHMARKS FOR VERIFICATION OF " + vOptions.getVerificationType() + " USING THE " + vOptions.getAlgorithmType() + " ALGORITHM...\n");
-			file.flush();
+			file.write("Date: " + new Date() + "\n");
+            file.flush();
             System.out.println("BENCHMARK LOG WILL BE WRITTEN TO " + fileName);
             System.out.flush();
         }
@@ -161,7 +158,7 @@ public class BenchmarkAutomataVerifier
         {
             System.err.println(ex);
         }
-
+        
         // Try all strategies combined with all heuristics...
         for (int i=0; i<strategyArray.length; i++)
         {
@@ -176,6 +173,9 @@ public class BenchmarkAutomataVerifier
                 System.out.println("Primary 1:st stage heuristic: " + mOptions.getMinimizationStrategy());
                 System.out.println("Primary 2:nd stage heuristic: " + mOptions.getMinimizationHeuristic());
                 System.out.flush();
+                file.write("Primary 1:st stage heuristic: " + mOptions.getMinimizationStrategy() + "\n");
+                file.write("Primary 2:nd stage heuristic: " + mOptions.getMinimizationHeuristic() + "\n");
+                file.flush();
                 
                 ///////////////////////////////////
                 // Instantiated model benchmarks //
@@ -184,7 +184,7 @@ public class BenchmarkAutomataVerifier
                 if (false)
                 {
                     Project theProject;
-                
+                    
                     // Dining philosophers
                     DiningPhilosophers philo = new DiningPhilosophers(256, true, true, false, false,
                         false, false);
@@ -228,18 +228,20 @@ public class BenchmarkAutomataVerifier
                 String[] test =
                 {
 					/*
-                    "agv", "agvb",
-                    "verriegel3", "verriegel3", "verriegel3b",
+					"agv", "agvb",
+                    "verriegel3", "verriegel3b",
                     "verriegel4", "verriegel4b",
                     "bmw_fh", "big_bmw",
-                    "FMS", "SMS", "PMS",
+                    "FMS", "SMS", 
+					"PMS",
                     "IPC",
                     "ftechnik", "ftechnik_nocoll",
+					"tbed_valid", "tbed_ctct",
 					*/
-                    "tbed_valid", "tbed_ctct",
-                    "fzelle",
+                    //"fzelle",
                     "AIP_minus_AS3_TU4",
-                    "profisafe_i4"
+                    //"PLanTS",
+                    //"profisafe_i4"
                 };
                 
                 // Run tests
@@ -247,7 +249,7 @@ public class BenchmarkAutomataVerifier
                 {
                     ProjectBuildFromXml builder = new ProjectBuildFromXml();
                     Project theProject = builder.build(new File(prefix + test[k] + ".xml"));
-					theProject.setName(test[k]);
+                    theProject.setName(test[k]);
                     runBenchmark(test[k], theProject, vOptions, sOptions, mOptions);
                 }
             }
@@ -255,7 +257,7 @@ public class BenchmarkAutomataVerifier
         file.write("BENCHMARKING COMPLETED\n");
         file.flush();
         file.close();
-    }    
+    }
     
     private void runBenchmark(String name, Project theProject,
         VerificationOptions vOptions,
@@ -280,7 +282,7 @@ public class BenchmarkAutomataVerifier
                 message = message.replaceFirst("BLOCK", "" + !nonblocking);
                 message = message.replaceFirst(" milliseconds", "m");
                 message = message.replaceFirst(" seconds", "s");
-                message = message.replaceAll("_", "\\_");
+                message = message.replaceAll("_", "\u005c\_");
                 file.write(message + "\n");
                 file.flush();
             }

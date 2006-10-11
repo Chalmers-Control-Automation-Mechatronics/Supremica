@@ -158,7 +158,7 @@ public class AutomatonMinimizer
         //////////////
         // MINIMIZE //
         //////////////
-        
+            
         // Find out what to do
         EquivalenceRelation equivalenceRelation = options.getMinimizationType();
         if (equivalenceRelation == EquivalenceRelation.BISIMULATIONEQUIVALENCE)
@@ -194,9 +194,9 @@ public class AutomatonMinimizer
                 return null;
             }
             
-            //////////////////////
-            // "Half-synthesis" //
-            //////////////////////
+            /////////////////////////
+            // "Halfway-synthesis" //
+            /////////////////////////
             halfWaySynthesis(theAutomaton);
             
             // Check if the library with the native methods is ok
@@ -937,8 +937,6 @@ public class AutomatonMinimizer
      */
     public int runConflictEquivalenceRules(Automaton aut)
     {
-        //assert(!hasEpsilonSelfloops(aut));
-
         int total = 0;
         
         try
@@ -961,6 +959,9 @@ public class AutomatonMinimizer
                     countSC = silentContinuationRule(aut);
                     totalSC += countSC;
                 }
+                //aut.setComment(aut.getName() + "_SC");
+                //ActionMan.getGui().addAutomaton(new Automaton(aut));
+                //assert(!hasEpsilonLoops(aut));                
                 if (countSC > 0)
                 {
                     countOET += removeRedundantTransitions(aut);
@@ -971,6 +972,9 @@ public class AutomatonMinimizer
                     countAE = activeEventsRule(aut);
                     totalAE += countAE;
                 }
+                //aut.setComment(aut.getName() + "_AE");
+                //ActionMan.getGui().addAutomaton(new Automaton(aut));
+                //assert(!hasEpsilonLoops(aut));
                 if (countAE > 0)
                 {
                     countOET += removeRedundantTransitions(aut);
@@ -981,6 +985,9 @@ public class AutomatonMinimizer
                     countOSI = ruleOnlySilentIn(aut);
                     totalOSI += countOSI;
                 }
+                //aut.setComment(aut.getName() + "_OSI");
+                //ActionMan.getGui().addAutomaton(new Automaton(aut));
+                //assert(!hasEpsilonLoops(aut));
                 if (countOSI > 0)
                 {
                     countOET += removeRedundantTransitions(aut);
@@ -991,13 +998,17 @@ public class AutomatonMinimizer
                     countCC = certainConflictsRule(aut);
                     totalCC += countCC;
                 }
-                // Rule F (the most frequent to call for repeats, has its own loop...)
+                //aut.setComment(aut.getName() + "_CC");
+                //ActionMan.getGui().addAutomaton(new Automaton(aut));
+                //assert(!hasEpsilonLoops(aut));
+                // Rule F (the most frequent to call for repeats) has its own loop...
                 if (options.getUseRuleOSO())
                 {
                     do
                     {
                         countOSO = ruleOnlySilentOut(aut);
                         totalOSO += countOSO;
+                        assert(!hasEpsilonLoops(aut));
                         if (countOSO > 0)
                             countOET += removeRedundantTransitions(aut);
 					} while (countOSO > 0);					
@@ -1259,8 +1270,8 @@ public class AutomatonMinimizer
             {
                 Arc arc = toBeRemoved.remove(0);
                 logger.fatal("Remove arc: " + arc);
-                ActionMan.getGui().addAutomaton(aut);
-                Thread.sleep(500);
+                //ActionMan.getGui().addAutomaton(aut);
+                //Thread.sleep(500);
                 aut.removeArc(arc);
             }
             
@@ -1478,11 +1489,14 @@ public class AutomatonMinimizer
                             {
                                 //previous.setCost(State.MAX_COST); // Dangerous, make sure you reset!
                                 statesToModify.add(previous);
-                                logger.debug("Rule C.3 came to use.");
+                                logger.debug("Rule C.3 came to use. State " + previous + ".");
                             }
                         }
                         else
                         {
+							// Loop over the outgoing arcs of the previous state, remove
+							// arcs labeled by the same event if they lead somewhere other
+							// than to currState
                             Iterator<Arc> outIt = previous.outgoingArcsIterator();
                             boolean fail = false;
                             LinkedList<Arc> toBeRemoved = new LinkedList<Arc>();
@@ -1496,7 +1510,7 @@ public class AutomatonMinimizer
                                     {
                                         // The arc "currArc" can be removed
                                         toBeRemoved.add(currArc);
-                                        logger.debug("Rule C.1 came to use.");
+                                        logger.debug("Rule C.1 came to use. Arc " + currArc + ".");
                                     }
                                     else
                                     {
@@ -1508,14 +1522,17 @@ public class AutomatonMinimizer
                             {
                                 aut.removeArc(toBeRemoved.remove(0));
                             }
-                            if (!fail)
-                            {
-                                // This may appear as a result of rule C.3 above!
-                                if (previous.getCost() != State.MAX_COST)
+
+							// If this is true, then there are NO outgoing at all from
+							// "previous" then it is blocking unless it is marked itself!
+							if (!fail)
+							{
+							    // This may appear as a result of rule C.3 above!
+                                if (!previous.isAccepting() && previous.getCost() != State.MAX_COST)
                                 {
                                     //previous.setCost(State.MAX_COST); // Dangerous, make sure you reset!
                                     statesToModify.add(previous);
-                                    logger.debug("Rule C.2 came to use.");
+                                    logger.debug("Rule C.2 came to use. State " + previous + ".");
                                 }
                             }
                         }

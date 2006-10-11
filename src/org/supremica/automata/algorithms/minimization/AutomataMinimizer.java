@@ -180,7 +180,8 @@ public class AutomataMinimizer
         
         ActionTimer timer = new ActionTimer();
         
-        // As long as there are at least two automata, compose and minimize!
+        // As long as there are at least two automata, 
+		// select some automata to compose and minimize!
         while (theAutomata.size() >= 2)
         {
             timer.start();
@@ -245,6 +246,32 @@ public class AutomataMinimizer
                     theAutomata = new Automata(min);
                     continue;
                 }
+
+				// If all states are marked in all automata, we're done!
+				if (options.getMinimizationType() == EquivalenceRelation.CONFLICTEQUIVALENCE)
+				{
+					boolean ok = true;
+					for (Automaton aut: theAutomata)
+					{
+						if (aut.hasNonacceptingState())
+						{
+							ok = false;
+							break;
+						}
+					}
+					if (ok)
+					{
+						logger.info("Early termination--all states are marked!");
+						Automaton aut = new Automaton("NONBLOCK");
+						State state = new State("q");
+						state.setAccepting(true);
+						state.setInitial(true);
+						aut.addState(state);
+						//aut.setInitialState(state);
+						theAutomata = new Automata(aut);
+						continue;
+					}
+				}
             }
             // Adjust the eventToAutomataMap
             // Remove the hidden events from the map

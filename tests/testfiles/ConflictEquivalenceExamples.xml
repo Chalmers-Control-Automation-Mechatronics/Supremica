@@ -188,9 +188,11 @@
 		<Event id="b"/>
 	</Events>
 	<States>
-		<State id="0" initial="true"/>
+		<State id="0" accepting="true" initial="true"/>
+		<State id="1"/>
 	</States>
 	<Transitions>
+		<Transition source="0" dest="1" event="a"/>
 	</Transitions>
 </Automaton>
 <Automaton name="C2" type="Plant">
