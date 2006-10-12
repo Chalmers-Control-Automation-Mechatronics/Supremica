@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="Module1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="START_TakeImage"/>
+        <EventDecl Kind="CONTROLLABLE" Name="TIMEOUT_PRECOND_TakeImage"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC">
+            <SimpleIdentifier Name="TakeImage"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="Wait for start">
+                        <PointGeometry>
+                            <Point Y="160" X="368"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-13" X="27"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="Wait for pre-conditions">
+                        <PointGeometry>
+                            <Point Y="368" X="368"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-9" X="25"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S2">
+                        <PointGeometry>
+                            <Point Y="256" X="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="9" X="-32"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S3">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="544" X="368"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-7" X="20"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="Wait for pre-conditions" Source="Wait for start">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="START_TakeImage"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-11" X="19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="160" X="368"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="264" X="368"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="368" X="368"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="S2" Source="Wait for pre-conditions">
+                        <StartPointGeometry>
+                            <Point Y="368" X="368"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="338" X="265"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="256" X="224"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="Wait for start" Source="S2">
+                        <StartPointGeometry>
+                            <Point Y="256" X="224"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="184" X="274"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="160" X="368"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="S3" Source="Wait for pre-conditions">
+                        <StartPointGeometry>
+                            <Point Y="368" X="368"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="456" X="368"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="544" X="368"/>
+                        </EndPointGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>
+
