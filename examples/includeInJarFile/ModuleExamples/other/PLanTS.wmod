@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="Passenger Land-Transportation System - From 'Supervising Passenger Land-Transportation Systems' by K.T. Seow et al." xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="Passenger Land-Transportation System" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>Adapted from 'Supervising Passenger Land-Transportation Systems' by K.T. Seow and M. Pasquier. The system is controllable and nonblocking. P-size: 559872 states, Sp-size: 9720000 states, P||Sp-size: 4907968 states.</ns2:Comment>
     <ParameterList>
         <IntParameter Required="true" Name="n">
             <IntConstant Value="3"/>

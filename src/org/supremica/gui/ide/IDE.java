@@ -1,4 +1,3 @@
-
 package org.supremica.gui.ide;
 
 import javax.xml.bind.JAXBException;
@@ -186,8 +185,6 @@ public class IDE
         moduleContainers.remove(moduleContainer);
     }
 
-
-
     public ModuleContainer getActiveModuleContainer()
     {
         return moduleContainers.getActiveModuleContainer();
@@ -231,6 +228,7 @@ public class IDE
         final ModuleContainer moduleContainer = new ModuleContainer(this, module);
         add(moduleContainer);
         setActive(moduleContainer);
+        moduleContainer.getEditorPanel().showComment(module.getComment());
     }
 
     public JFrame getFrame()

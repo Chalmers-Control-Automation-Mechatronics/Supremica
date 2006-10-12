@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="verriegel4" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="verriegel4" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A large model of a car's central locking system, which originally was developed as a case study within the BMBF project KORSYS. This is an extension of the original three door central locking model including four doors. The system is controllable and nonblocking. If the automaton 'noreset[WSP]' is removed, the system is blocking.</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias>
             <SimpleIdentifier Name="HeckTueren"/>

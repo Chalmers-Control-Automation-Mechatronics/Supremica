@@ -741,7 +741,7 @@ public class AutomataMinimizer
             }
         }
         
-        // If supervision equivalence, make the result a kripke automaton!
+        // If supervisione equivalence, make the result a kripke automaton!
         if (options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE)
         {
             aut = new KripkeAutomaton(aut);

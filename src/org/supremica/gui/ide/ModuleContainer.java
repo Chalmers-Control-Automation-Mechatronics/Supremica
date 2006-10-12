@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.42 2006-10-07 20:20:12 robi Exp $
+//# $Id: ModuleContainer.java,v 1.43 2006-10-12 20:47:03 flordal Exp $
 //###########################################################################
 
 
@@ -72,7 +72,6 @@ import javax.swing.JOptionPane;
 
 public class ModuleContainer implements UndoInterface
 {
-
     //#######################################################################
     //# Constructor
     public ModuleContainer(final IDE ide, final ModuleSubject module)
@@ -85,70 +84,72 @@ public class ModuleContainer implements UndoInterface
         mPrinter = new HTMLPrinter();
         setSelectedComponent(getEditorPanel());
     }
-
-
+    
+    
     //#######################################################################
     //# Simple Access
     public IDE getIDE()
     {
         return mIDE;
     }
-
+    
     public String getName()
     {
         return mModule.getName();
     }
-
+    
     public ModuleSubject getModule()
     {
         return mModule;
     }
-
+    
     public ExpressionParser getExpressionParser()
     {
         return mExpressionParser;
     }
-
-	public EventKind guessEventKind(final IdentifierProxy ident)
-	{
-		final String name = ident.getName();
-		final IndexedList<EventDeclSubject> decls =
-			mModule.getEventDeclListModifiable();
-		final EventDeclSubject decl = decls.get(name);
-		if (decl != null) {
-			return decl.getKind();
-		}
-		final IndexedList<ParameterSubject> params =
-			mModule.getParameterListModifiable();
-		final ParameterSubject param = params.get(name);
-		if (param != null && param instanceof EventParameterSubject) {
-			final EventParameterSubject eparam = (EventParameterSubject) param;
-			final EventDeclSubject edecl = eparam.getEventDecl();
-			return edecl.getKind();
-		}
-		return null;
-	}
-
+    
+    public EventKind guessEventKind(final IdentifierProxy ident)
+    {
+        final String name = ident.getName();
+        final IndexedList<EventDeclSubject> decls =
+            mModule.getEventDeclListModifiable();
+        final EventDeclSubject decl = decls.get(name);
+        if (decl != null)
+        {
+            return decl.getKind();
+        }
+        final IndexedList<ParameterSubject> params =
+            mModule.getParameterListModifiable();
+        final ParameterSubject param = params.get(name);
+        if (param != null && param instanceof EventParameterSubject)
+        {
+            final EventParameterSubject eparam = (EventParameterSubject) param;
+            final EventDeclSubject edecl = eparam.getEventDecl();
+            return edecl.getKind();
+        }
+        return null;
+    }
+    
     public ProxyPrinter getPrinter()
     {
         return mPrinter;
     }
-
+    
     public JToolBar getEditorToolBar(JToolBar mainToolBar)
     {
         return getEditorPanel().getToolBar(mainToolBar);
     }
-
+    
     public JToolBar getAnalyzerPanel(JToolBar mainToolBar)
     {
         return getAnalyzerPanel().getToolBar(mainToolBar);
     }
-
+    
     public Actions getActions()
     {
         return mIDE.getActions();
     }
-
+    
     public EditorPanel getEditorPanel()
     {
         if (editorPanel == null)
@@ -157,7 +158,7 @@ public class ModuleContainer implements UndoInterface
         }
         return editorPanel;
     }
-
+    
     public AnalyzerPanel getAnalyzerPanel()
     {
         if (analyzerPanel == null)
@@ -166,7 +167,7 @@ public class ModuleContainer implements UndoInterface
         }
         return analyzerPanel;
     }
-
+    
     public SimulatorPanel getSimulatorPanel()
     {
         if (simulatorPanel == null)
@@ -175,40 +176,44 @@ public class ModuleContainer implements UndoInterface
         }
         return simulatorPanel;
     }
-
+    
     public ComponentEditorPanel getComponentEditorPanel
         (final SimpleComponentSubject scp)
     {
-		ComponentEditorPanel panel = mComponentToPanelMap.get(scp);
-		if (panel == null) {
-			final EditorPanel editorPanel = getEditorPanel();
-			final JComponent right = editorPanel.getRightComponent();
-			final Dimension oldsize = right.getSize();
-      try {
-        panel =	new ComponentEditorPanel(this, scp, oldsize);
-        mComponentToPanelMap.put(scp, panel);
-      } catch (GeometryAbsentException g) {
-        JOptionPane.showMessageDialog(mIDE, g.getMessage());
-      }
-		}
-		return panel;
+        ComponentEditorPanel panel = mComponentToPanelMap.get(scp);
+        if (panel == null)
+        {
+            final EditorPanel editorPanel = getEditorPanel();
+            final JComponent right = editorPanel.getRightComponent();
+            final Dimension oldsize = right.getSize();
+            try
+            {
+                panel =	new ComponentEditorPanel(this, scp, oldsize);
+                mComponentToPanelMap.put(scp, panel);
+            }
+            catch (GeometryAbsentException g)
+            {
+                JOptionPane.showMessageDialog(mIDE, g.getMessage());
+            }
+        }
+        return panel;
     }
-
+    
     public void setSelectedComponent(Component selectedComponent)
     {
         mSelectedComponent = selectedComponent;
     }
-
+    
     public Component getSelectedComponent()
     {
         return mSelectedComponent;
     }
-
+    
     public int numberOfSelectedAutomata()
     {
         return getSelectedAutomata().size();
     }
-
+    
     public Automata getSelectedAutomata()
     {
         return getAnalyzerPanel().getSelectedAutomata();
@@ -218,54 +223,54 @@ public class ModuleContainer implements UndoInterface
     {
         return getAnalyzerPanel().getSelectedProject();
     }
-*/
+ */
 /*
     public Project getProject()
     {
         return getAnalyzerPanel().getSelectedProject();
     }
-*/
- 	public Automata getUnselectedAutomata()
+ */
+    public Automata getUnselectedAutomata()
     {
         return getAnalyzerPanel().getUnselectedAutomata();
     }
-
+    
     public Automata getAllAutomata()
     {
         return getAnalyzerPanel().getAllAutomata();
     }
-
+    
     public JFrame getFrame()
     {
         return mIDE.getFrame();
     }
-
+    
     public VisualProject getVisualProject()
     {
         return mVisualProject;
     }
-
+    
     public boolean addAutomaton(Automaton theAutomaton)
     {
         getVisualProject().addAutomaton(theAutomaton);
         return true;// To Do Fix
     }
-
-
+    
+    
     public int addAutomata(Automata theAutomata)
     {
         getVisualProject().addAutomata(theAutomata);
         return theAutomata.size(); // TO DO Fix
     }
-
-
+    
+    
     //#######################################################################
     //# Undo & Redo
     public EditorWindowInterface getActiveEditorWindowInterface()
     {
         return getEditorPanel().getActiveEditorWindowInterface();
     }
-
+    
     public void addUndoable(UndoableEdit e)
     {
         if (e.isSignificant())
@@ -285,8 +290,8 @@ public class ModuleContainer implements UndoInterface
         mIDE.getActions().editorUndoAction.setEnabled(canUndo());
         fireEditorChangedEvent(new UndoRedoEvent());
     }
-
-
+    
+    
     public void executeCommand(Command c)
     {
         c.execute();
@@ -294,33 +299,33 @@ public class ModuleContainer implements UndoInterface
         addUndoable(new UndoableCommand(c));
         //}
     }
-
+    
     public boolean canRedo()
     {
         return mUndoManager.canRedo();
     }
-
+    
     public boolean canUndo()
     {
         return mUndoManager.canUndo();
     }
-
+    
     public void clearList()
     {
         mUndoManager.discardAllEdits();
         fireEditorChangedEvent(new UndoRedoEvent());
     }
-
+    
     public String getRedoPresentationName()
     {
         return mUndoManager.getRedoPresentationName();
     }
-
+    
     public String getUndoPresentationName()
     {
         return mUndoManager.getUndoPresentationName();
     }
-
+    
     public void redo() throws CannotRedoException
     {
         mInsignificant.end();
@@ -331,7 +336,7 @@ public class ModuleContainer implements UndoInterface
         mIDE.getActions().editorUndoAction.setEnabled(canUndo());
         fireEditorChangedEvent(new UndoRedoEvent());
     }
-
+    
     public void undo() throws CannotUndoException
     {
         mInsignificant.end();
@@ -342,19 +347,19 @@ public class ModuleContainer implements UndoInterface
         mIDE.getActions().editorUndoAction.setEnabled(canUndo());
         fireEditorChangedEvent(new UndoRedoEvent());
     }
-
+    
     //#######################################################################
     //# Observer Support
     public void attach(final Observer o)
     {
         mObservers.add(o);
     }
-
+    
     public void detach(final Observer o)
     {
         mObservers.remove(o);
     }
-
+    
     public void fireEditorChangedEvent(EditorChangedEvent e)
     {
         for (final Observer o : mObservers)
@@ -362,77 +367,77 @@ public class ModuleContainer implements UndoInterface
             o.update(e);
         }
     }
-
+    
     public GraphProxy getFlatGraphProxy(String name)
     {
-		List<Proxy> components = flatModule.getComponentList();
-		for (Proxy proxy : components)
-		{
-			if (proxy instanceof NamedProxy)
-			{
-				NamedProxy namedProxy = (NamedProxy)proxy;
-				if (name.equals(namedProxy.getName()))
-				{
-					if (proxy instanceof SimpleComponentProxy)
-					{
-						return ((SimpleComponentProxy)proxy).getGraph();
-					}
-					else
-					{
-						System.err.println("ModuleContainer.getFlatGraphProxy proxy: " + name + " not a GraphProxy");
-						return null;
-					}
-				}
-			}
-		}
-
-		return null;
-	}
-
-	public ModuleProxy getFlatModuleProxy()
-	{
-		return flatModule;
-	}
-
+        List<Proxy> components = flatModule.getComponentList();
+        for (Proxy proxy : components)
+        {
+            if (proxy instanceof NamedProxy)
+            {
+                NamedProxy namedProxy = (NamedProxy)proxy;
+                if (name.equals(namedProxy.getName()))
+                {
+                    if (proxy instanceof SimpleComponentProxy)
+                    {
+                        return ((SimpleComponentProxy)proxy).getGraph();
+                    }
+                    else
+                    {
+                        System.err.println("ModuleContainer.getFlatGraphProxy proxy: " + name + " not a GraphProxy");
+                        return null;
+                    }
+                }
+            }
+        }
+        
+        return null;
+    }
+    
+    public ModuleProxy getFlatModuleProxy()
+    {
+        return flatModule;
+    }
+    
     /**
      * Updates the automata in the analyzer-tab.
      */
     public boolean updateAutomata()
     {
-		ProjectBuildFromWaters builder = null;
-		Project supremicaProject = null;
+        ProjectBuildFromWaters builder = null;
+        Project supremicaProject = null;
         try
         {
             builder = new ProjectBuildFromWaters();
             supremicaProject = builder.build(mModule);
-		}
-		catch (EvalException eex)
-		{
+        }
+        catch (EvalException eex)
+        {
             JOptionPane.showMessageDialog(mIDE, eex.getMessage(),
-										  "Error in graph",
+                "Error in graph",
                 JOptionPane.ERROR_MESSAGE);
             return false;
-		}
+        }
         catch (Exception ex)
         {
             JOptionPane.showMessageDialog(mIDE, ex.getMessage(),
-										  "Error in graph",
+                "Error in graph",
                 JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
             return false;
         }
-		mVisualProject.clear();
-		mVisualProject.addAutomata(supremicaProject);
-		mVisualProject.updated();
-
+        mVisualProject.clear();
+        mVisualProject.addAutomata(supremicaProject);
+        mVisualProject.updated();
+        
 /*
-		ProductDESImporter importer = new ProductDESImporter(ModuleSubjectFactory.getInstance());
-		flatModule = (ModuleSubject) importer.importModule(mVisualProject);
-*/
-		return true;
+                ProductDESImporter importer = new ProductDESImporter(ModuleSubjectFactory.getInstance());
+                flatModule = (ModuleSubject) importer.importModule(mVisualProject);
+ */
+        return true;
     }
-
-
+    
+    
     //#######################################################################
     //# Data Members
     private final IDE mIDE;
@@ -446,11 +451,11 @@ public class ModuleContainer implements UndoInterface
     private final Map<SimpleComponentSubject,ComponentEditorPanel>
         mComponentToPanelMap =
         new HashMap<SimpleComponentSubject,ComponentEditorPanel>();
-
+    
     private EditorPanel editorPanel = null;
     private AnalyzerPanel analyzerPanel = null;
     private SimulatorPanel simulatorPanel = null;
     private Component mSelectedComponent = null;
     private VisualProject mVisualProject = new VisualProject();
-
+    
 }

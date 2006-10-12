@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="Man, Wolf, Goat, Cabbage" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A man is standing on the left bank of a river with a wolf, a goat and a gigantic cabbage head. He has a boat with which he can cross the river but there is not enough room for more than one of his possessions. If left unattended, the wolf will eat the goat or the goat will eat the cabbage head. How should the man proceed do cross the river?</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="mc"/>
+        <EventDecl Kind="CONTROLLABLE" Name="mg"/>
+        <EventDecl Kind="CONTROLLABLE" Name="mw"/>
+        <EventDecl Kind="CONTROLLABLE" Name="m"/>
+        <EventDecl Kind="CONTROLLABLE" Name="mcb"/>
+        <EventDecl Kind="CONTROLLABLE" Name="mgb"/>
+        <EventDecl Kind="CONTROLLABLE" Name="mwb"/>
+        <EventDecl Kind="CONTROLLABLE" Name="mb"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="wolfEatGoatL"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="wolfEatGoatR"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="goatEatCabbageR"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="goatEatCabbageL"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT">
+            <SimpleIdentifier Name="Man"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="ml">
+                        <PointGeometry>
+                            <Point Y="99" X="99"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-22" X="3"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="mr">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="154" X="154"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="7" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="mr" Source="ml">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="mw"/>
+                            <SimpleIdentifier Name="mg"/>
+                            <SimpleIdentifier Name="mc"/>
+                            <SimpleIdentifier Name="m"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="6" X="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="99" X="99"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="134" X="119"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="154" X="154"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="ml" Source="mr">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="mwb"/>
+                            <SimpleIdentifier Name="mgb"/>
+                            <SimpleIdentifier Name="mcb"/>
+                            <SimpleIdentifier Name="mb"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-48" X="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="154" X="154"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="119" X="134"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="99" X="99"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="ml" Source="ml">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="eatCabbageR"/>
+                            <SimpleIdentifier Name="eatGoatR"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-25" X="41"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="99" X="99"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="59" X="59"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="99" X="99"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="mr" Source="mr">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="eatGoatL"/>
+                            <SimpleIdentifier Name="eatCabbageL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="3" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="154" X="154"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="195" X="194"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="154" X="154"/>
+                        </EndPointGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT">
+            <SimpleIdentifier Name="Wolf"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="wl">
+                        <PointGeometry>
+                            <Point Y="99" X="99"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-21" X="7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="wr">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="154" X="154"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="2" X="7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="wr" Source="wl">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="mw"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="5" X="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="99" X="99"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="134" X="119"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="154" X="154"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="wl" Source="wr">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="mwb"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-11" X="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="154" X="154"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="119" X="134"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="99" X="99"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="wr" Source="wr">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="eatGoatR"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="5" X="-3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="154" X="154"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="194" X="194"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="154" X="154"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="wl" Source="wl">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="eatGoatL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-17" X="33"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="99" X="99"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="59" X="59"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="99" X="99"/>
+                        </EndPointGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT">
+            <SimpleIdentifier Name="Goat"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="gl">
+                        <PointGeometry>
+                            <Point Y="99" X="99"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-22" X="7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="gr">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="154" X="154"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="gr" Source="gl">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="mg"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="3" X="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="99" X="99"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="134" X="119"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="154" X="154"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="gl" Source="gr">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="mgb"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-15" X="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="154" X="154"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="119" X="134"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="99" X="99"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="gr" Source="gr">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="eatCabbageR"/>
+                            <SimpleIdentifier Name="eatGoatR"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-10" X="9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="154" X="154"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="195" X="194"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="154" X="154"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="gl" Source="gl">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="eatCabbageL"/>
+                            <SimpleIdentifier Name="eatGoatL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-23" X="44"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="99" X="99"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="59" X="59"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="99" X="99"/>
+                        </EndPointGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT">
+            <SimpleIdentifier Name="Cabbage"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="cl">
+                        <PointGeometry>
+                            <Point Y="99" X="99"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-20" X="6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="cr">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="154" X="154"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="8" X="4"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="cr" Source="cl">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="mc"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="7" X="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="99" X="99"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="134" X="119"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="154" X="154"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="cl" Source="cr">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="mcb"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-18" X="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="154" X="154"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="119" X="134"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="99" X="99"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="cl" Source="cl">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="eatCabbageL"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-20" X="38"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="99" X="99"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="59" X="59"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="99" X="99"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Target="cr" Source="cr">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="eatCabbageR"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="3" X="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="154" X="154"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="194" X="195"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="154" X="154"/>
+                        </EndPointGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC">
+            <SimpleIdentifier Name="NoEating"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="51" X="51"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="8" X="6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="1">
+                        <PointGeometry>
+                            <Point Y="235" X="233"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-24" X="-22"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="1" Source="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="eatCabbageL"/>
+                            <SimpleIdentifier Name="eatCabbageR"/>
+                            <SimpleIdentifier Name="eatGoatL"/>
+                            <SimpleIdentifier Name="eatGoatR"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="235" X="233"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="269" X="266"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="235" X="233"/>
+                        </EndPointGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>
+

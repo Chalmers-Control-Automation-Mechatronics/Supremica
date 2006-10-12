@@ -124,24 +124,32 @@ public class BenchmarkAutomataVerifier
         // Strategies
         MinimizationStrategy[] strategyArray =
         {
-            //MinimizationStrategy.FewestTransitionsFirst,
+			/*
+            MinimizationStrategy.FewestTransitionsFirst,
+			*/
             MinimizationStrategy.AtLeastOneLocal,
-            //MinimizationStrategy.AtLeastOneLocalMaxThree,
-            //MinimizationStrategy.MostStatesFirst,
-            //MinimizationStrategy.FewestStatesFirst,
-            //MinimizationStrategy.FewestEventsFirst,
-            //MinimizationStrategy.RandomFirst
+			/*
+            MinimizationStrategy.AtLeastOneLocalMaxThree,
+            MinimizationStrategy.MostStatesFirst,
+            MinimizationStrategy.FewestStatesFirst,
+            MinimizationStrategy.FewestEventsFirst,
+            MinimizationStrategy.RandomFirst
+			*/
         };
         
         // Heuristics
         MinimizationHeuristic[] heuristicArray =
         {
-            //MinimizationHeuristic.MostLocal,
-            //MinimizationHeuristic.MostCommon,
-            MinimizationHeuristic.FewestStates,
-            MinimizationHeuristic.FewestEvents,
-            MinimizationHeuristic.LeastExtension,
-            MinimizationHeuristic.FewestTransitions
+			/*
+			*/
+            MinimizationHeuristic.MostLocal,
+			MinimizationHeuristic.MostCommon,
+			MinimizationHeuristic.FewestStates,
+			MinimizationHeuristic.FewestEvents,
+			MinimizationHeuristic.LeastExtension,
+			MinimizationHeuristic.FewestTransitions
+			/*
+			*/
         };
         
         try
@@ -238,10 +246,12 @@ public class BenchmarkAutomataVerifier
                     "ftechnik", "ftechnik_nocoll",
 					"tbed_valid", "tbed_ctct",
 					*/
-                    //"fzelle",
+                    "fzelle",
+					/*
                     "AIP_minus_AS3_TU4",
-                    //"PLanTS",
-                    //"profisafe_i4"
+                    "PLanTS",
+                    "profisafe_i4"
+					*/
                 };
                 
                 // Run tests

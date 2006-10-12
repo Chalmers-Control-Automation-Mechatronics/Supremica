@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorPanel
 //###########################################################################
-//# $Id: EditorPanel.java,v 1.44 2006-09-24 18:18:33 knut Exp $
+//# $Id: EditorPanel.java,v 1.45 2006-10-12 20:47:03 flordal Exp $
 //###########################################################################
 
 
@@ -24,23 +24,23 @@ public class EditorPanel
     extends MainPanel
 {
     private static final long serialVersionUID = 1L;
-
+    
     private JTabbedPane tabPanel;
     private JComponent componentEditorPanel;
-
+    
     private EditorParametersPanel parametersPanel;
     private EditorEventsPanel eventsPanel;
     private EditorAliasesPanel aliasesPanel;
     private EditorComponentsPanel componentsPanel;
     private ButtonGroup editorButtonGroup;
-
+           
     public EditorPanel(ModuleContainer moduleContainer, String name)
     {
         super(moduleContainer, name);
         tabPanel = new JTabbedPane(JTabbedPane.BOTTOM);
         tabPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
         tabPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
-
+        
 /*
                 aliasesPanel = new EditorAliasesPanel(moduleContainer, "Aliases");
                 aliasesPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
@@ -52,12 +52,12 @@ public class EditorPanel
         componentsPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
         componentsPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
         tabPanel.add(componentsPanel);
-
+        
         eventsPanel = new EditorEventsPanel(moduleContainer, "Events");
         eventsPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
         eventsPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
         tabPanel.add(eventsPanel);
-
+        
 /*
                 parametersPanel = new EditorParametersPanel(moduleContainer, "Parameters");
                 parametersPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
@@ -65,20 +65,20 @@ public class EditorPanel
                 tabPanel.add(parametersPanel);
  */
         tabPanel.setSelectedComponent(componentsPanel);
-
+        
         componentEditorPanel = getEmptyRightPanel();
-
+        
         splitPanelHorizontal = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, tabPanel, componentEditorPanel);
         splitPanelHorizontal.setContinuousLayout(false);
         splitPanelHorizontal.setOneTouchExpandable(false);
         splitPanelHorizontal.setDividerLocation(0.2);
         splitPanelHorizontal.setResizeWeight(0.0);
-
+        
         ((GridBagLayout)getLayout()).setConstraints(splitPanelHorizontal, getGridBagConstraints());
         add(splitPanelHorizontal);
     }
-
-
+    
+    
     //######################################################################
     //#
     public void addToolBarEntries(IDEToolBar toolBar)
@@ -92,17 +92,17 @@ public class EditorPanel
         toolBar.add(getActions().editorAddEdgeAction, editorButtonGroup);
 //		toolBar.add(getActions().editorAddEventAction, editorButtonGroup);
     }
-
+    
     public void disablePanel()
     {
         //getActions().enableEditorActions(false);
     }
-
+    
     public void enablePanel()
     {
         //getActions().enableEditorActions(true);
     }
-
+    
     public EditorWindowInterface getActiveEditorWindowInterface()
     {
         if (getRightComponent() instanceof EditorWindowInterface)
@@ -112,17 +112,17 @@ public class EditorPanel
         return null;
         //	    return getEditorWindowInterface();
     }
-
+    
     public EditorPanelInterface getEditorPanelInterface()
     {
         return new EditorPanelInterfaceImpl();
     }
-
-	public void actionPerformed(ActionEvent e)
-	{
-		componentsPanel.actionPerformed(e);
-	}
-
+    
+    public void actionPerformed(ActionEvent e)
+    {
+        componentsPanel.actionPerformed(e);
+    }
+    
     class EditorPanelInterfaceImpl
         implements EditorPanelInterface
     {
@@ -130,33 +130,30 @@ public class EditorPanel
         {
             componentsPanel.addComponent();
         }
-
+        
         public void addComponent(AbstractSubject component)
         {
             componentsPanel.addComponent(component);
         }
-
+        
         public void addModuleEvent()
         {
             eventsPanel.addModuleEvent();
         }
-
+        
         public void addComponentEvent()
         {
             eventsPanel.addComponentEvent();
         }
-
+        
         public ModuleSubject getModuleSubject()
         {
             return getModuleSubject();
         }
-
+        
         public boolean componentNameAvailable(String name)
         {
-			return componentsPanel.componentNameAvailable(name);
-		}
-
-
-    }
-
+            return componentsPanel.componentNameAvailable(name);
+        }                
+    }   
 }
