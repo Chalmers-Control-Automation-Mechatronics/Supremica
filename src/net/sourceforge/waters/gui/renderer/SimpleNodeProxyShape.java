@@ -42,6 +42,8 @@ import net.sourceforge.waters.gui.renderer.Handle.HandleType;
 public class SimpleNodeProxyShape
     extends AbstractProxyShape
 {
+    private boolean isForbidden = false;
+    
     public void draw(Graphics2D g, RenderingInformation status)
     {
         // Draw the filling (depends on marking)
@@ -78,8 +80,8 @@ public class SimpleNodeProxyShape
         super.draw(g, status);
         
         // Cross out if forbidden
-        //if (isForbidden)
-        if (false)
+        if (isForbidden)
+        //if (false)
         {
             g.setColor(EditorColor.ERRORCOLOR);
             g.setStroke(DOUBLESTROKE);
@@ -122,6 +124,11 @@ public class SimpleNodeProxyShape
                 if (geo == null)
                 {
                     mColors.add(EditorColor.DEFAULTMARKINGCOLOR);
+                    continue;
+                }
+                if (decl.getName().equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME))
+                {
+                    isForbidden = true;
                     continue;
                 }
                 mColors.addAll(geo.getColorSet());

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Automata name="" major="0" minor="9" comment="This testcase is based on the Transfer Line example from 'Notes on Control of Discrete-Event Systems' my W.M Wonham. Here with 1 serially connected, identical cells.">
+<Automata name="" major="0" minor="9" comment="Adapted from 'Notes on Control of Discrete-Event Systems' my W.M Wonham.">
 <Automaton name="B1" type="Specification">
 	<Events>
-		<Event id="0" label="M1_1_finished" controllable="false"/>
-		<Event id="1" label="M2_1_started"/>
-		<Event id="2" label="TU_1_reject" controllable="false"/>
+		<Event id="0" label="f1" controllable="false"/>
+		<Event id="1" label="s2"/>
+		<Event id="2" label="r" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="0" initial="true" accepting="true"/>
@@ -22,8 +22,8 @@
 </Automaton>
 <Automaton name="B2" type="Specification">
 	<Events>
-		<Event id="0" label="M2_1_finished" controllable="false"/>
-		<Event id="1" label="TU_1_take"/>
+		<Event id="0" label="f2" controllable="false"/>
+		<Event id="1" label="l"/>
 	</Events>
 	<States>
 		<State id="0" name="E" initial="true" accepting="true"/>
@@ -36,8 +36,8 @@
 </Automaton>
 <Automaton name="M1" type="Plant">
 	<Events>
-		<Event id="0" label="M1_1_finished" controllable="false"/>
-		<Event id="1" label="start"/>
+		<Event id="0" label="f1" controllable="false"/>
+		<Event id="1" label="s1"/>
 	</Events>
 	<States>
 		<State id="0" name="I1" initial="true" accepting="true"/>
@@ -50,8 +50,8 @@
 </Automaton>
 <Automaton name="M2" type="Plant">
 	<Events>
-		<Event id="0" label="M2_1_finished" controllable="false"/>
-		<Event id="1" label="M2_1_started"/>
+		<Event id="0" label="f2" controllable="false"/>
+		<Event id="1" label="s2"/>
 	</Events>
 	<States>
 		<State id="0" name="I2" initial="true" accepting="true"/>
@@ -64,9 +64,9 @@
 </Automaton>
 <Automaton name="TU" type="Plant">
 	<Events>
-		<Event id="0" label="TU_1_reject" controllable="false"/>
-		<Event id="1" label="TU_1_take"/>
-		<Event id="2" label="finish" controllable="false"/>
+		<Event id="0" label="r" controllable="false"/>
+		<Event id="1" label="l"/>
+		<Event id="2" label="a" controllable="false"/>
 	</Events>
 	<States>
 		<State id="0" name="IT" initial="true" accepting="true"/>

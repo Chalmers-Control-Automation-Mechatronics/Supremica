@@ -8,11 +8,69 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
+		<State id="1" name="s1" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="1" event="2"/>
 		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="two_state_move[TableV]" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="C[TableV][Down]"/>
+		<Event id="2" label="C[TableV][Up]"/>
+		<Event id="3" label="U[TableV][S1][0]" controllable="false"/>
+		<Event id="4" label="U[TableV][S1][1]" controllable="false"/>
+		<Event id="5" label="U[TableV][S2][0]" controllable="false"/>
+		<Event id="6" label="U[TableV][S2][1]" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="init" initial="true" accepting="true"/>
+		<State id="1" name="s0" accepting="true"/>
+		<State id="2" name="s1" accepting="true"/>
+		<State id="3" name="s2" accepting="true"/>
+		<State id="4" name="s3" accepting="true"/>
+		<State id="5" name="s4" accepting="true"/>
+		<State id="6" name="s5" accepting="true"/>
+		<State id="7" name="s6" accepting="true"/>
+		<State id="8" name="s7" accepting="true"/>
+		<State id="9" name="s8" accepting="true"/>
+		<State id="10" name="s9" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="3" event="4"/>
+		<Transition source="0" dest="5" event="2"/>
+		<Transition source="0" dest="7" event="6"/>
+		<Transition source="0" dest="6" event="1"/>
+		<Transition source="1" dest="3" event="4"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="2" dest="2" event="1"/>
+		<Transition source="2" dest="1" event="2"/>
+		<Transition source="3" dest="3" event="2"/>
+		<Transition source="3" dest="5" event="3"/>
+		<Transition source="3" dest="4" event="1"/>
+		<Transition source="4" dest="3" event="2"/>
+		<Transition source="4" dest="2" event="3"/>
+		<Transition source="4" dest="4" event="1"/>
+		<Transition source="5" dest="5" event="2"/>
+		<Transition source="5" dest="7" event="6"/>
+		<Transition source="5" dest="6" event="1"/>
+		<Transition source="6" dest="5" event="2"/>
+		<Transition source="6" dest="6" event="1"/>
+		<Transition source="6" dest="4" event="4"/>
+		<Transition source="7" dest="8" event="1"/>
+		<Transition source="7" dest="7" event="2"/>
+		<Transition source="7" dest="9" event="5"/>
+		<Transition source="8" dest="8" event="1"/>
+		<Transition source="8" dest="7" event="2"/>
+		<Transition source="8" dest="6" event="5"/>
+		<Transition source="9" dest="10" event="1"/>
+		<Transition source="9" dest="9" event="2"/>
+		<Transition source="10" dest="10" event="1"/>
+		<Transition source="10" dest="8" event="6"/>
+		<Transition source="10" dest="9" event="2"/>
 	</Transitions>
 </Automaton>
 <Automaton name="two_state_move_spec[Arm2]" type="Specification">
@@ -26,10 +84,10 @@
 	</Events>
 	<States>
 		<State id="0" name="init" initial="true" accepting="true"/>
-		<State id="1" name="s0"/>
-		<State id="2" name="s1"/>
-		<State id="3" name="s2"/>
-		<State id="4" name="s3"/>
+		<State id="1" name="s0" accepting="true"/>
+		<State id="2" name="s1" accepting="true"/>
+		<State id="3" name="s2" accepting="true"/>
+		<State id="4" name="s3" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="2" event="5"/>
@@ -56,14 +114,14 @@
 		<Event id="7" label="U[Arm1][S2][1]" controllable="false"/>
 	</Events>
 	<States>
-		<State id="0" name="s1"/>
-		<State id="1" name="s2"/>
-		<State id="2" name="s3"/>
-		<State id="3" name="s4"/>
+		<State id="0" name="s1" accepting="true"/>
+		<State id="1" name="s2" accepting="true"/>
+		<State id="2" name="s3" accepting="true"/>
+		<State id="3" name="s4" accepting="true"/>
 		<State id="4" name="s5" initial="true" accepting="true"/>
-		<State id="5" name="s6"/>
-		<State id="6" name="s7"/>
-		<State id="7" name="s8"/>
+		<State id="5" name="s6" accepting="true"/>
+		<State id="6" name="s7" accepting="true"/>
+		<State id="7" name="s8" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="0" event="3"/>
@@ -97,7 +155,7 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s2"/>
+		<State id="1" name="s2" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="0" event="2"/>
@@ -117,7 +175,7 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
+		<State id="1" name="s1" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="1" event="2"/>
@@ -132,7 +190,7 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
+		<State id="1" name="s1" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="1" event="2"/>
@@ -147,7 +205,7 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
+		<State id="1" name="s1" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="1" event="2"/>
@@ -166,9 +224,9 @@
 		<Event id="7" label="U[PressV][S2][1]" controllable="false"/>
 	</Events>
 	<States>
-		<State id="0" name="auf"/>
+		<State id="0" name="auf" accepting="true"/>
 		<State id="1" name="init" initial="true" accepting="true"/>
-		<State id="2" name="s0"/>
+		<State id="2" name="s0" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="0" event="7"/>
@@ -192,7 +250,7 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
+		<State id="1" name="s1" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="1" event="2"/>
@@ -207,7 +265,7 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
+		<State id="1" name="s1" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="1" event="2"/>
@@ -226,14 +284,14 @@
 		<Event id="7" label="U[Arm2][S2][1]" controllable="false"/>
 	</Events>
 	<States>
-		<State id="0" name="s1"/>
-		<State id="1" name="s2"/>
-		<State id="2" name="s3"/>
-		<State id="3" name="s4"/>
+		<State id="0" name="s1" accepting="true"/>
+		<State id="1" name="s2" accepting="true"/>
+		<State id="2" name="s3" accepting="true"/>
+		<State id="3" name="s4" accepting="true"/>
 		<State id="4" name="s5" initial="true" accepting="true"/>
-		<State id="5" name="s6"/>
-		<State id="6" name="s7"/>
-		<State id="7" name="s8"/>
+		<State id="5" name="s6" accepting="true"/>
+		<State id="6" name="s7" accepting="true"/>
+		<State id="7" name="s8" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="0" event="3"/>
@@ -271,25 +329,25 @@
 	</Events>
 	<States>
 		<State id="0" name="init" initial="true" accepting="true"/>
-		<State id="1" name="init_down"/>
-		<State id="2" name="s0"/>
-		<State id="3" name="s1"/>
-		<State id="4" name="s10"/>
-		<State id="5" name="s11"/>
-		<State id="6" name="s12"/>
-		<State id="7" name="s13"/>
-		<State id="8" name="s15"/>
-		<State id="9" name="s16"/>
-		<State id="10" name="s17"/>
-		<State id="11" name="s18"/>
-		<State id="12" name="s2"/>
-		<State id="13" name="s3"/>
-		<State id="14" name="s4"/>
-		<State id="15" name="s5"/>
-		<State id="16" name="s6"/>
-		<State id="17" name="s7"/>
-		<State id="18" name="s8"/>
-		<State id="19" name="s9"/>
+		<State id="1" name="init_down" accepting="true"/>
+		<State id="2" name="s0" accepting="true"/>
+		<State id="3" name="s1" accepting="true"/>
+		<State id="4" name="s10" accepting="true"/>
+		<State id="5" name="s11" accepting="true"/>
+		<State id="6" name="s12" accepting="true"/>
+		<State id="7" name="s13" accepting="true"/>
+		<State id="8" name="s15" accepting="true"/>
+		<State id="9" name="s16" accepting="true"/>
+		<State id="10" name="s17" accepting="true"/>
+		<State id="11" name="s18" accepting="true"/>
+		<State id="12" name="s2" accepting="true"/>
+		<State id="13" name="s3" accepting="true"/>
+		<State id="14" name="s4" accepting="true"/>
+		<State id="15" name="s5" accepting="true"/>
+		<State id="16" name="s6" accepting="true"/>
+		<State id="17" name="s7" accepting="true"/>
+		<State id="18" name="s8" accepting="true"/>
+		<State id="19" name="s9" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="8" event="10"/>
@@ -369,14 +427,14 @@
 		<Event id="7" label="U[CraneV][S2][1]" controllable="false"/>
 	</Events>
 	<States>
-		<State id="0" name="s1"/>
-		<State id="1" name="s2"/>
-		<State id="2" name="s3"/>
-		<State id="3" name="s4"/>
+		<State id="0" name="s1" accepting="true"/>
+		<State id="1" name="s2" accepting="true"/>
+		<State id="2" name="s3" accepting="true"/>
+		<State id="3" name="s4" accepting="true"/>
 		<State id="4" name="s5" initial="true" accepting="true"/>
-		<State id="5" name="s6"/>
-		<State id="6" name="s7"/>
-		<State id="7" name="s8"/>
+		<State id="5" name="s6" accepting="true"/>
+		<State id="6" name="s7" accepting="true"/>
+		<State id="7" name="s8" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="0" event="3"/>
@@ -409,9 +467,9 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
-		<State id="2" name="s2"/>
-		<State id="3" name="s3"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="2" event="5"/>
@@ -435,7 +493,7 @@
 		<Event id="5" label="U[CraneH][S2][1]" controllable="false"/>
 	</Events>
 	<States>
-		<State id="0" name="s0"/>
+		<State id="0" name="s0" accepting="true"/>
 		<State id="1" name="s1" initial="true" accepting="true"/>
 	</States>
 	<Transitions>
@@ -444,6 +502,36 @@
 		<Transition source="0" dest="0" event="1"/>
 		<Transition source="1" dest="0" event="3"/>
 		<Transition source="1" dest="0" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="two_state_move_sensor_changes[TableV]" type="Plant">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="C[TableV][Down]"/>
+		<Event id="2" label="C[TableV][Stop]"/>
+		<Event id="3" label="C[TableV][Up]"/>
+		<Event id="4" label="U[TableV][S1][0]" controllable="false"/>
+		<Event id="5" label="U[TableV][S1][1]" controllable="false"/>
+		<Event id="6" label="U[TableV][S2][0]" controllable="false"/>
+		<Event id="7" label="U[TableV][S2][1]" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="auf" accepting="true"/>
+		<State id="1" name="init" initial="true" accepting="true"/>
+		<State id="2" name="s0" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="2" event="2"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="2" event="5"/>
+		<Transition source="1" dest="2" event="7"/>
+		<Transition source="2" dest="0" event="3"/>
+		<Transition source="2" dest="0" event="1"/>
 	</Transitions>
 </Automaton>
 <Automaton name="robot_rotate" type="Specification">
@@ -458,9 +546,9 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
-		<State id="2" name="s2"/>
-		<State id="3" name="s3"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="1" event="4"/>
@@ -485,13 +573,42 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
+		<State id="1" name="s1" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="1" event="4"/>
 		<Transition source="0" dest="0" event="2"/>
 		<Transition source="1" dest="1" event="1"/>
 		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="two_state_move_spec[TableV]" type="Specification">
+	<Events>
+		<Event id="0" label=":omega"/>
+		<Event id="1" label="C[TableV][Down]"/>
+		<Event id="2" label="C[TableV][Stop]"/>
+		<Event id="3" label="C[TableV][Up]"/>
+		<Event id="4" label="U[TableV][S1][1]" controllable="false"/>
+		<Event id="5" label="U[TableV][S2][1]" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="init" initial="true" accepting="true"/>
+		<State id="1" name="s0" accepting="true"/>
+		<State id="2" name="s1" accepting="true"/>
+		<State id="3" name="s2" accepting="true"/>
+		<State id="4" name="s3" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="2" event="5"/>
+		<Transition source="0" dest="3" event="3"/>
+		<Transition source="0" dest="4" event="1"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="1" dest="3" event="3"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="2" dest="4" event="1"/>
+		<Transition source="3" dest="2" event="5"/>
+		<Transition source="4" dest="1" event="4"/>
 	</Transitions>
 </Automaton>
 <Automaton name="robot_arm2" type="Specification">
@@ -505,7 +622,7 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
+		<State id="1" name="s1" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="1" event="3"/>
@@ -530,19 +647,19 @@
 	</Events>
 	<States>
 		<State id="0" name="init" initial="true" accepting="true"/>
-		<State id="1" name="init_down"/>
-		<State id="2" name="s1"/>
-		<State id="3" name="s10"/>
-		<State id="4" name="s11"/>
-		<State id="5" name="s17"/>
-		<State id="6" name="s2"/>
-		<State id="7" name="s3"/>
-		<State id="8" name="s4"/>
-		<State id="9" name="s5"/>
-		<State id="10" name="s6"/>
-		<State id="11" name="s7"/>
-		<State id="12" name="s8"/>
-		<State id="13" name="s9"/>
+		<State id="1" name="init_down" accepting="true"/>
+		<State id="2" name="s1" accepting="true"/>
+		<State id="3" name="s10" accepting="true"/>
+		<State id="4" name="s11" accepting="true"/>
+		<State id="5" name="s17" accepting="true"/>
+		<State id="6" name="s2" accepting="true"/>
+		<State id="7" name="s3" accepting="true"/>
+		<State id="8" name="s4" accepting="true"/>
+		<State id="9" name="s5" accepting="true"/>
+		<State id="10" name="s6" accepting="true"/>
+		<State id="11" name="s7" accepting="true"/>
+		<State id="12" name="s8" accepting="true"/>
+		<State id="13" name="s9" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="3" event="9"/>
@@ -596,14 +713,14 @@
 		<Event id="7" label="U[RobotR][S2][1]" controllable="false"/>
 	</Events>
 	<States>
-		<State id="0" name="s1"/>
-		<State id="1" name="s2"/>
-		<State id="2" name="s3"/>
-		<State id="3" name="s4"/>
+		<State id="0" name="s1" accepting="true"/>
+		<State id="1" name="s2" accepting="true"/>
+		<State id="2" name="s3" accepting="true"/>
+		<State id="3" name="s4" accepting="true"/>
 		<State id="4" name="s5" initial="true" accepting="true"/>
-		<State id="5" name="s6"/>
-		<State id="6" name="s7"/>
-		<State id="7" name="s8"/>
+		<State id="5" name="s6" accepting="true"/>
+		<State id="6" name="s7" accepting="true"/>
+		<State id="7" name="s8" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="0" event="3"/>
@@ -637,16 +754,16 @@
 	</Events>
 	<States>
 		<State id="0" name="init" initial="true" accepting="true"/>
-		<State id="1" name="s0"/>
-		<State id="2" name="s1"/>
-		<State id="3" name="s2"/>
-		<State id="4" name="s3"/>
-		<State id="5" name="s4"/>
-		<State id="6" name="s5"/>
-		<State id="7" name="s6"/>
-		<State id="8" name="s7"/>
-		<State id="9" name="s8"/>
-		<State id="10" name="s9"/>
+		<State id="1" name="s0" accepting="true"/>
+		<State id="2" name="s1" accepting="true"/>
+		<State id="3" name="s2" accepting="true"/>
+		<State id="4" name="s3" accepting="true"/>
+		<State id="5" name="s4" accepting="true"/>
+		<State id="6" name="s5" accepting="true"/>
+		<State id="7" name="s6" accepting="true"/>
+		<State id="8" name="s7" accepting="true"/>
+		<State id="9" name="s8" accepting="true"/>
+		<State id="10" name="s9" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="3" event="4"/>
@@ -694,10 +811,10 @@
 	</Events>
 	<States>
 		<State id="0" name="init" initial="true" accepting="true"/>
-		<State id="1" name="s0"/>
-		<State id="2" name="s1"/>
-		<State id="3" name="s2"/>
-		<State id="4" name="s3"/>
+		<State id="1" name="s0" accepting="true"/>
+		<State id="2" name="s1" accepting="true"/>
+		<State id="3" name="s2" accepting="true"/>
+		<State id="4" name="s3" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="2" event="5"/>
@@ -723,7 +840,7 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
+		<State id="1" name="s1" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="1" event="3"/>
@@ -741,7 +858,7 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
+		<State id="1" name="s1" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="1" event="2"/>
@@ -756,7 +873,7 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
+		<State id="1" name="s1" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="1" event="2"/>
@@ -776,10 +893,10 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
-		<State id="2" name="s2"/>
-		<State id="3" name="s3"/>
-		<State id="4" name="s4"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
+		<State id="4" name="s4" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="0" event="6"/>
@@ -806,9 +923,9 @@
 		<Event id="7" label="U[CraneH][S2][1]" controllable="false"/>
 	</Events>
 	<States>
-		<State id="0" name="auf"/>
+		<State id="0" name="auf" accepting="true"/>
 		<State id="1" name="init" initial="true" accepting="true"/>
-		<State id="2" name="s0"/>
+		<State id="2" name="s0" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="0" event="7"/>
@@ -835,9 +952,9 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
-		<State id="2" name="s2"/>
-		<State id="3" name="s3"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="2" event="5"/>
@@ -864,10 +981,10 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
-		<State id="2" name="s2"/>
-		<State id="3" name="s3"/>
-		<State id="4" name="s4"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
+		<State id="4" name="s4" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="0" event="1"/>
@@ -893,10 +1010,10 @@
 	</Events>
 	<States>
 		<State id="0" name="init" initial="true" accepting="true"/>
-		<State id="1" name="s0"/>
-		<State id="2" name="s1"/>
-		<State id="3" name="s2"/>
-		<State id="4" name="s3"/>
+		<State id="1" name="s0" accepting="true"/>
+		<State id="2" name="s1" accepting="true"/>
+		<State id="3" name="s2" accepting="true"/>
+		<State id="4" name="s3" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="2" event="5"/>
@@ -923,16 +1040,16 @@
 	</Events>
 	<States>
 		<State id="0" name="init" initial="true" accepting="true"/>
-		<State id="1" name="s0"/>
-		<State id="2" name="s1"/>
-		<State id="3" name="s2"/>
-		<State id="4" name="s3"/>
-		<State id="5" name="s4"/>
-		<State id="6" name="s5"/>
-		<State id="7" name="s6"/>
-		<State id="8" name="s7"/>
-		<State id="9" name="s8"/>
-		<State id="10" name="s9"/>
+		<State id="1" name="s0" accepting="true"/>
+		<State id="2" name="s1" accepting="true"/>
+		<State id="3" name="s2" accepting="true"/>
+		<State id="4" name="s3" accepting="true"/>
+		<State id="5" name="s4" accepting="true"/>
+		<State id="6" name="s5" accepting="true"/>
+		<State id="7" name="s6" accepting="true"/>
+		<State id="8" name="s7" accepting="true"/>
+		<State id="9" name="s8" accepting="true"/>
+		<State id="10" name="s9" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="3" event="4"/>
@@ -981,9 +1098,9 @@
 		<Event id="7" label="U[TableR][S2][1]" controllable="false"/>
 	</Events>
 	<States>
-		<State id="0" name="auf"/>
+		<State id="0" name="auf" accepting="true"/>
 		<State id="1" name="init" initial="true" accepting="true"/>
-		<State id="2" name="s0"/>
+		<State id="2" name="s0" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="0" event="7"/>
@@ -1010,10 +1127,10 @@
 	</Events>
 	<States>
 		<State id="0" name="init" initial="true" accepting="true"/>
-		<State id="1" name="s0"/>
-		<State id="2" name="s1"/>
-		<State id="3" name="s2"/>
-		<State id="4" name="s3"/>
+		<State id="1" name="s0" accepting="true"/>
+		<State id="2" name="s1" accepting="true"/>
+		<State id="3" name="s2" accepting="true"/>
+		<State id="4" name="s3" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="2" event="5"/>
@@ -1036,7 +1153,7 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
+		<State id="1" name="s1" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="1" event="1"/>
@@ -1055,9 +1172,9 @@
 		<Event id="7" label="U[RobotR][S2][1]" controllable="false"/>
 	</Events>
 	<States>
-		<State id="0" name="auf"/>
+		<State id="0" name="auf" accepting="true"/>
 		<State id="1" name="init" initial="true" accepting="true"/>
-		<State id="2" name="s0"/>
+		<State id="2" name="s0" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="0" event="7"/>
@@ -1084,9 +1201,9 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
-		<State id="2" name="s2"/>
-		<State id="3" name="s3"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="2" event="3"/>
@@ -1114,9 +1231,9 @@
 		<Event id="7" label="U[Arm1][S2][1]" controllable="false"/>
 	</Events>
 	<States>
-		<State id="0" name="auf"/>
+		<State id="0" name="auf" accepting="true"/>
 		<State id="1" name="init" initial="true" accepting="true"/>
-		<State id="2" name="s0"/>
+		<State id="2" name="s0" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="0" event="7"/>
@@ -1143,9 +1260,9 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
-		<State id="2" name="s2"/>
-		<State id="3" name="s3"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="1" event="5"/>
@@ -1176,23 +1293,23 @@
 	</Events>
 	<States>
 		<State id="0" name="init" initial="true" accepting="true"/>
-		<State id="1" name="init_down"/>
-		<State id="2" name="s1"/>
-		<State id="3" name="s10"/>
-		<State id="4" name="s11"/>
-		<State id="5" name="s12"/>
-		<State id="6" name="s13"/>
-		<State id="7" name="s15"/>
-		<State id="8" name="s16"/>
-		<State id="9" name="s17"/>
-		<State id="10" name="s2"/>
-		<State id="11" name="s3"/>
-		<State id="12" name="s4"/>
-		<State id="13" name="s5"/>
-		<State id="14" name="s6"/>
-		<State id="15" name="s7"/>
-		<State id="16" name="s8"/>
-		<State id="17" name="s9"/>
+		<State id="1" name="init_down" accepting="true"/>
+		<State id="2" name="s1" accepting="true"/>
+		<State id="3" name="s10" accepting="true"/>
+		<State id="4" name="s11" accepting="true"/>
+		<State id="5" name="s12" accepting="true"/>
+		<State id="6" name="s13" accepting="true"/>
+		<State id="7" name="s15" accepting="true"/>
+		<State id="8" name="s16" accepting="true"/>
+		<State id="9" name="s17" accepting="true"/>
+		<State id="10" name="s2" accepting="true"/>
+		<State id="11" name="s3" accepting="true"/>
+		<State id="12" name="s4" accepting="true"/>
+		<State id="13" name="s5" accepting="true"/>
+		<State id="14" name="s6" accepting="true"/>
+		<State id="15" name="s7" accepting="true"/>
+		<State id="16" name="s8" accepting="true"/>
+		<State id="17" name="s9" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="1" event="1"/>
@@ -1260,9 +1377,9 @@
 		<Event id="7" label="U[CraneV][S2][1]" controllable="false"/>
 	</Events>
 	<States>
-		<State id="0" name="auf"/>
+		<State id="0" name="auf" accepting="true"/>
 		<State id="1" name="init" initial="true" accepting="true"/>
-		<State id="2" name="s0"/>
+		<State id="2" name="s0" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="0" event="7"/>
@@ -1287,7 +1404,7 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
+		<State id="1" name="s1" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="0" event="1"/>
@@ -1306,7 +1423,7 @@
 		<Event id="6" label="C[CraneV][Up]"/>
 	</Events>
 	<States>
-		<State id="0" name="moving"/>
+		<State id="0" name="moving" accepting="true"/>
 		<State id="1" name="not_moving" initial="true" accepting="true"/>
 	</States>
 	<Transitions>
@@ -1329,9 +1446,9 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
-		<State id="2" name="s2"/>
-		<State id="3" name="s3"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="2" event="3"/>
@@ -1359,9 +1476,9 @@
 		<Event id="7" label="U[Arm2][S2][1]" controllable="false"/>
 	</Events>
 	<States>
-		<State id="0" name="auf"/>
+		<State id="0" name="auf" accepting="true"/>
 		<State id="1" name="init" initial="true" accepting="true"/>
-		<State id="2" name="s0"/>
+		<State id="2" name="s0" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="0" event="7"/>
@@ -1391,21 +1508,21 @@
 	</Events>
 	<States>
 		<State id="0" name="init" initial="true" accepting="true"/>
-		<State id="1" name="init_down"/>
-		<State id="2" name="s0"/>
-		<State id="3" name="s1"/>
-		<State id="4" name="s10"/>
-		<State id="5" name="s11"/>
-		<State id="6" name="s12"/>
-		<State id="7" name="s13"/>
-		<State id="8" name="s2"/>
-		<State id="9" name="s3"/>
-		<State id="10" name="s4"/>
-		<State id="11" name="s5"/>
-		<State id="12" name="s6"/>
-		<State id="13" name="s7"/>
-		<State id="14" name="s8"/>
-		<State id="15" name="s9"/>
+		<State id="1" name="init_down" accepting="true"/>
+		<State id="2" name="s0" accepting="true"/>
+		<State id="3" name="s1" accepting="true"/>
+		<State id="4" name="s10" accepting="true"/>
+		<State id="5" name="s11" accepting="true"/>
+		<State id="6" name="s12" accepting="true"/>
+		<State id="7" name="s13" accepting="true"/>
+		<State id="8" name="s2" accepting="true"/>
+		<State id="9" name="s3" accepting="true"/>
+		<State id="10" name="s4" accepting="true"/>
+		<State id="11" name="s5" accepting="true"/>
+		<State id="12" name="s6" accepting="true"/>
+		<State id="13" name="s7" accepting="true"/>
+		<State id="14" name="s8" accepting="true"/>
+		<State id="15" name="s9" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="8" event="4"/>
@@ -1470,9 +1587,9 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
-		<State id="2" name="s2"/>
-		<State id="3" name="s3"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="2" event="3"/>
@@ -1500,16 +1617,16 @@
 	</Events>
 	<States>
 		<State id="0" name="init" initial="true" accepting="true"/>
-		<State id="1" name="s0"/>
-		<State id="2" name="s1"/>
-		<State id="3" name="s2"/>
-		<State id="4" name="s3"/>
-		<State id="5" name="s4"/>
-		<State id="6" name="s5"/>
-		<State id="7" name="s6"/>
-		<State id="8" name="s7"/>
-		<State id="9" name="s8"/>
-		<State id="10" name="s9"/>
+		<State id="1" name="s0" accepting="true"/>
+		<State id="2" name="s1" accepting="true"/>
+		<State id="3" name="s2" accepting="true"/>
+		<State id="4" name="s3" accepting="true"/>
+		<State id="5" name="s4" accepting="true"/>
+		<State id="6" name="s5" accepting="true"/>
+		<State id="7" name="s6" accepting="true"/>
+		<State id="8" name="s7" accepting="true"/>
+		<State id="9" name="s8" accepting="true"/>
+		<State id="10" name="s9" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="3" event="4"/>
@@ -1558,16 +1675,16 @@
 	</Events>
 	<States>
 		<State id="0" name="init" initial="true" accepting="true"/>
-		<State id="1" name="s0"/>
-		<State id="2" name="s1"/>
-		<State id="3" name="s2"/>
-		<State id="4" name="s3"/>
-		<State id="5" name="s4"/>
-		<State id="6" name="s5"/>
-		<State id="7" name="s6"/>
-		<State id="8" name="s7"/>
-		<State id="9" name="s8"/>
-		<State id="10" name="s9"/>
+		<State id="1" name="s0" accepting="true"/>
+		<State id="2" name="s1" accepting="true"/>
+		<State id="3" name="s2" accepting="true"/>
+		<State id="4" name="s3" accepting="true"/>
+		<State id="5" name="s4" accepting="true"/>
+		<State id="6" name="s5" accepting="true"/>
+		<State id="7" name="s6" accepting="true"/>
+		<State id="8" name="s7" accepting="true"/>
+		<State id="9" name="s8" accepting="true"/>
+		<State id="10" name="s9" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="3" event="4"/>
@@ -1615,9 +1732,9 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
-		<State id="2" name="s2"/>
-		<State id="3" name="s3"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="2" event="5"/>
@@ -1642,9 +1759,9 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
-		<State id="2" name="s2"/>
-		<State id="3" name="s3"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="1" event="5"/>
@@ -1670,9 +1787,9 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
-		<State id="2" name="s2"/>
-		<State id="3" name="s3"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="0" event="1"/>
@@ -1700,16 +1817,16 @@
 	</Events>
 	<States>
 		<State id="0" name="init" initial="true" accepting="true"/>
-		<State id="1" name="s0"/>
-		<State id="2" name="s1"/>
-		<State id="3" name="s2"/>
-		<State id="4" name="s3"/>
-		<State id="5" name="s4"/>
-		<State id="6" name="s5"/>
-		<State id="7" name="s6"/>
-		<State id="8" name="s7"/>
-		<State id="9" name="s8"/>
-		<State id="10" name="s9"/>
+		<State id="1" name="s0" accepting="true"/>
+		<State id="2" name="s1" accepting="true"/>
+		<State id="3" name="s2" accepting="true"/>
+		<State id="4" name="s3" accepting="true"/>
+		<State id="5" name="s4" accepting="true"/>
+		<State id="6" name="s5" accepting="true"/>
+		<State id="7" name="s6" accepting="true"/>
+		<State id="8" name="s7" accepting="true"/>
+		<State id="9" name="s8" accepting="true"/>
+		<State id="10" name="s9" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="3" event="4"/>
@@ -1758,14 +1875,14 @@
 		<Event id="7" label="U[CraneH][S2][1]" controllable="false"/>
 	</Events>
 	<States>
-		<State id="0" name="s1"/>
-		<State id="1" name="s2"/>
-		<State id="2" name="s3"/>
-		<State id="3" name="s4"/>
+		<State id="0" name="s1" accepting="true"/>
+		<State id="1" name="s2" accepting="true"/>
+		<State id="2" name="s3" accepting="true"/>
+		<State id="3" name="s4" accepting="true"/>
 		<State id="4" name="s5" initial="true" accepting="true"/>
-		<State id="5" name="s6"/>
-		<State id="6" name="s7"/>
-		<State id="7" name="s8"/>
+		<State id="5" name="s6" accepting="true"/>
+		<State id="6" name="s7" accepting="true"/>
+		<State id="7" name="s8" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="0" event="3"/>
@@ -1798,10 +1915,10 @@
 	</Events>
 	<States>
 		<State id="0" name="init" initial="true" accepting="true"/>
-		<State id="1" name="s0"/>
-		<State id="2" name="s1"/>
-		<State id="3" name="s2"/>
-		<State id="4" name="s3"/>
+		<State id="1" name="s0" accepting="true"/>
+		<State id="2" name="s1" accepting="true"/>
+		<State id="3" name="s2" accepting="true"/>
+		<State id="4" name="s3" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="2" event="5"/>
@@ -1827,10 +1944,10 @@
 	</Events>
 	<States>
 		<State id="0" name="init" initial="true" accepting="true"/>
-		<State id="1" name="s0"/>
-		<State id="2" name="s1"/>
-		<State id="3" name="s2"/>
-		<State id="4" name="s3"/>
+		<State id="1" name="s0" accepting="true"/>
+		<State id="2" name="s1" accepting="true"/>
+		<State id="3" name="s2" accepting="true"/>
+		<State id="4" name="s3" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="2" event="5"/>
@@ -1854,7 +1971,7 @@
 		<Event id="4" label="U[CraneV][S2][1]" controllable="false"/>
 	</Events>
 	<States>
-		<State id="0" name="s0"/>
+		<State id="0" name="s0" accepting="true"/>
 		<State id="1" name="s1" initial="true" accepting="true"/>
 	</States>
 	<Transitions>
@@ -1876,14 +1993,14 @@
 		<Event id="7" label="U[TableR][S2][1]" controllable="false"/>
 	</Events>
 	<States>
-		<State id="0" name="s1"/>
-		<State id="1" name="s2"/>
-		<State id="2" name="s3"/>
-		<State id="3" name="s4"/>
+		<State id="0" name="s1" accepting="true"/>
+		<State id="1" name="s2" accepting="true"/>
+		<State id="2" name="s3" accepting="true"/>
+		<State id="3" name="s4" accepting="true"/>
 		<State id="4" name="s5" initial="true" accepting="true"/>
-		<State id="5" name="s6"/>
-		<State id="6" name="s7"/>
-		<State id="7" name="s8"/>
+		<State id="5" name="s6" accepting="true"/>
+		<State id="6" name="s7" accepting="true"/>
+		<State id="7" name="s8" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="0" event="3"/>
@@ -1914,7 +2031,7 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
+		<State id="1" name="s1" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="1" event="3"/>
@@ -1932,7 +2049,7 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
+		<State id="1" name="s1" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="0" event="1"/>
@@ -1949,7 +2066,7 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
+		<State id="1" name="s1" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="1" event="2"/>
@@ -1968,16 +2085,16 @@
 	</Events>
 	<States>
 		<State id="0" name="init" initial="true" accepting="true"/>
-		<State id="1" name="s0"/>
-		<State id="2" name="s1"/>
-		<State id="3" name="s2"/>
-		<State id="4" name="s3"/>
-		<State id="5" name="s4"/>
-		<State id="6" name="s5"/>
-		<State id="7" name="s6"/>
-		<State id="8" name="s7"/>
-		<State id="9" name="s8"/>
-		<State id="10" name="s9"/>
+		<State id="1" name="s0" accepting="true"/>
+		<State id="2" name="s1" accepting="true"/>
+		<State id="3" name="s2" accepting="true"/>
+		<State id="4" name="s3" accepting="true"/>
+		<State id="5" name="s4" accepting="true"/>
+		<State id="6" name="s5" accepting="true"/>
+		<State id="7" name="s6" accepting="true"/>
+		<State id="8" name="s7" accepting="true"/>
+		<State id="9" name="s8" accepting="true"/>
+		<State id="10" name="s9" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="3" event="4"/>
@@ -2025,9 +2142,9 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
-		<State id="2" name="s2"/>
-		<State id="3" name="s3"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s2" accepting="true"/>
+		<State id="3" name="s3" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="0" event="1"/>
@@ -2053,8 +2170,8 @@
 	</Events>
 	<States>
 		<State id="0" name="s0" initial="true" accepting="true"/>
-		<State id="1" name="s1"/>
-		<State id="2" name="s3"/>
+		<State id="1" name="s1" accepting="true"/>
+		<State id="2" name="s3" accepting="true"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="0" event="4"/>
@@ -2065,127 +2182,45 @@
 		<Transition source="2" dest="0" event="4"/>
 	</Transitions>
 </Automaton>
-<Automaton name="two_state_move[TableV]||two_state_move_sensor_changes[TableV]" type="Plant">
+<Automaton name="two_state_move_failure[TableV]" type="Specification">
 	<Events>
 		<Event id="0" label=":omega"/>
 		<Event id="1" label="C[TableV][Down]"/>
-		<Event id="2" label="C[TableV][Stop]"/>
-		<Event id="3" label="C[TableV][Up]"/>
+		<Event id="2" label="C[TableV][Up]"/>
+		<Event id="3" label="Failure[TableV]"/>
 		<Event id="4" label="U[TableV][S1][0]" controllable="false"/>
 		<Event id="5" label="U[TableV][S1][1]" controllable="false"/>
 		<Event id="6" label="U[TableV][S2][0]" controllable="false"/>
 		<Event id="7" label="U[TableV][S2][1]" controllable="false"/>
 	</Events>
 	<States>
-		<State id="0" name="init.init" initial="true" accepting="true"/>
-		<State id="1" name="s0.auf"/>
-		<State id="2" name="s0.s0"/>
-		<State id="3" name="s1.auf"/>
-		<State id="4" name="s1.s0"/>
-		<State id="5" name="s2.auf"/>
-		<State id="6" name="s2.s0"/>
-		<State id="7" name="s3.auf"/>
-		<State id="8" name="s3.s0"/>
-		<State id="9" name="s4.auf"/>
-		<State id="10" name="s4.s0"/>
-		<State id="11" name="s5.auf"/>
-		<State id="12" name="s5.s0"/>
-		<State id="13" name="s6.auf"/>
-		<State id="14" name="s6.s0"/>
-		<State id="15" name="s7.auf"/>
-		<State id="16" name="s7.s0"/>
-		<State id="17" name="s8.auf"/>
-		<State id="18" name="s8.s0"/>
-		<State id="19" name="s9.auf"/>
-		<State id="20" name="s9.s0"/>
+		<State id="0" name="s1" accepting="true"/>
+		<State id="1" name="s2" accepting="true"/>
+		<State id="2" name="s3" accepting="true"/>
+		<State id="3" name="s4" accepting="true"/>
+		<State id="4" name="s5" initial="true" accepting="true"/>
+		<State id="5" name="s6" accepting="true"/>
+		<State id="6" name="s7" accepting="true"/>
+		<State id="7" name="s8" accepting="true"/>
 	</States>
 	<Transitions>
-		<Transition source="0" dest="11" event="1"/>
-		<Transition source="0" dest="9" event="3"/>
-		<Transition source="0" dest="6" event="5"/>
-		<Transition source="0" dest="14" event="7"/>
-		<Transition source="1" dest="2" event="2"/>
-		<Transition source="1" dest="5" event="5"/>
-		<Transition source="2" dest="3" event="1"/>
-		<Transition source="2" dest="1" event="3"/>
-		<Transition source="3" dest="4" event="2"/>
-		<Transition source="4" dest="3" event="1"/>
-		<Transition source="4" dest="1" event="3"/>
-		<Transition source="5" dest="6" event="2"/>
-		<Transition source="5" dest="9" event="4"/>
-		<Transition source="6" dest="7" event="1"/>
-		<Transition source="6" dest="5" event="3"/>
-		<Transition source="7" dest="8" event="2"/>
-		<Transition source="7" dest="3" event="4"/>
-		<Transition source="8" dest="7" event="1"/>
-		<Transition source="8" dest="5" event="3"/>
-		<Transition source="9" dest="10" event="2"/>
-		<Transition source="9" dest="13" event="7"/>
-		<Transition source="10" dest="11" event="1"/>
-		<Transition source="10" dest="9" event="3"/>
-		<Transition source="11" dest="12" event="2"/>
-		<Transition source="11" dest="7" event="5"/>
-		<Transition source="12" dest="11" event="1"/>
-		<Transition source="12" dest="9" event="3"/>
-		<Transition source="13" dest="14" event="2"/>
-		<Transition source="13" dest="17" event="6"/>
-		<Transition source="14" dest="15" event="1"/>
-		<Transition source="14" dest="13" event="3"/>
-		<Transition source="15" dest="16" event="2"/>
-		<Transition source="15" dest="11" event="6"/>
-		<Transition source="16" dest="15" event="1"/>
-		<Transition source="16" dest="13" event="3"/>
-		<Transition source="17" dest="18" event="2"/>
-		<Transition source="18" dest="19" event="1"/>
-		<Transition source="18" dest="17" event="3"/>
-		<Transition source="19" dest="20" event="2"/>
-		<Transition source="19" dest="15" event="7"/>
-		<Transition source="20" dest="19" event="1"/>
-		<Transition source="20" dest="17" event="3"/>
-	</Transitions>
-</Automaton>
-<Automaton name="two_state_move_failure[TableV]||two_state_move_spec[TableV]" type="Specification">
-	<Events>
-		<Event id="0" label=":omega"/>
-		<Event id="1" label="C[TableV][Down]"/>
-		<Event id="2" label="C[TableV][Stop]"/>
-		<Event id="3" label="C[TableV][Up]"/>
-		<Event id="4" label="Failure[TableV]"/>
-		<Event id="5" label="U[TableV][S1][0]" controllable="false"/>
-		<Event id="6" label="U[TableV][S1][1]" controllable="false"/>
-		<Event id="7" label="U[TableV][S2][0]" controllable="false"/>
-		<Event id="8" label="U[TableV][S2][1]" controllable="false"/>
-	</Events>
-	<States>
-		<State id="0" name="s1.s0"/>
-		<State id="1" name="s2.s2"/>
-		<State id="2" name="s3.s0"/>
-		<State id="3" name="s4.s2"/>
-		<State id="4" name="s5.init" initial="true" accepting="true"/>
-		<State id="5" name="s5.s3"/>
-		<State id="6" name="s6.s1"/>
-		<State id="7" name="s7.s3"/>
-		<State id="8" name="s8.s1"/>
-	</States>
-	<Transitions>
-		<Transition source="0" dest="0" event="2"/>
-		<Transition source="0" dest="0" event="4"/>
-		<Transition source="1" dest="3" event="5"/>
-		<Transition source="2" dest="2" event="2"/>
-		<Transition source="2" dest="1" event="3"/>
-		<Transition source="2" dest="0" event="5"/>
-		<Transition source="3" dest="6" event="8"/>
-		<Transition source="4" dest="5" event="1"/>
-		<Transition source="4" dest="3" event="3"/>
-		<Transition source="4" dest="2" event="6"/>
-		<Transition source="4" dest="6" event="8"/>
-		<Transition source="5" dest="2" event="6"/>
-		<Transition source="6" dest="7" event="1"/>
-		<Transition source="6" dest="6" event="2"/>
-		<Transition source="6" dest="8" event="7"/>
-		<Transition source="7" dest="5" event="7"/>
-		<Transition source="8" dest="8" event="2"/>
-		<Transition source="8" dest="8" event="4"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="1" dest="3" event="4"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="2" dest="0" event="4"/>
+		<Transition source="2" dest="1" event="2"/>
+		<Transition source="3" dest="3" event="2"/>
+		<Transition source="3" dest="4" event="1"/>
+		<Transition source="3" dest="5" event="7"/>
+		<Transition source="4" dest="2" event="5"/>
+		<Transition source="4" dest="3" event="2"/>
+		<Transition source="4" dest="4" event="1"/>
+		<Transition source="4" dest="5" event="7"/>
+		<Transition source="5" dest="6" event="1"/>
+		<Transition source="5" dest="7" event="6"/>
+		<Transition source="6" dest="6" event="1"/>
+		<Transition source="6" dest="4" event="6"/>
+		<Transition source="7" dest="7" event="3"/>
 	</Transitions>
 </Automaton>
 </Automata>
