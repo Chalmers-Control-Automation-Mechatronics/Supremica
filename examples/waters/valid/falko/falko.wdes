@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProductDES Name="falko" xmlns="http://waters.sourceforge.net/xsd/des">
     <EventList>
-        <Event Kind="PROPOSITION" Name=":omega"/>
+        <Event Kind="PROPOSITION" Name=":accepting"/>
         <Event Kind="CONTROLLABLE" Name="abfahrBereit"/>
         <Event Kind="UNCONTROLLABLE" Name="abfahrt"/>
         <Event Kind="UNCONTROLLABLE" Name="ausstiegBeendet"/>
@@ -21,7 +21,7 @@
     <AutomataList>
         <Automaton Kind="SPEC" Name="abfahrBereitAbort[PH]">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="bereitFahrt"/>
                 <EventRef Name="notAktiv[PH]"/>
                 <EventRef Name="zugAn[PH]"/>
@@ -29,7 +29,7 @@
             <StateList>
                 <State Initial="true" Name="s0">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="s1"/>
@@ -44,7 +44,7 @@
         </Automaton>
         <Automaton Kind="SPEC" Name="abfahrBereitAbort[WH]">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="bereitFahrt"/>
                 <EventRef Name="notAktiv[WH]"/>
                 <EventRef Name="zugAn[WH]"/>
@@ -52,7 +52,7 @@
             <StateList>
                 <State Initial="true" Name="s0">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="s1"/>
@@ -67,14 +67,14 @@
         </Automaton>
         <Automaton Kind="SPEC" Name="abfahrBereitFrei">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="abfahrBereit"/>
                 <EventRef Name="frei"/>
             </EventRefList>
             <StateList>
                 <State Initial="true" Name="s0">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="s1"/>
@@ -87,14 +87,14 @@
         </Automaton>
         <Automaton Kind="SPEC" Name="andConditionAbfahrt">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="abfahrt"/>
                 <EventRef Name="bereitFahrt"/>
             </EventRefList>
             <StateList>
                 <State Initial="true" Name="s0">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="s1"/>
@@ -107,14 +107,14 @@
         </Automaton>
         <Automaton Kind="SPEC" Name="andConditionFrei">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="bereitFahrt"/>
                 <EventRef Name="frei"/>
             </EventRefList>
             <StateList>
                 <State Initial="true" Name="s0">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="s1"/>
@@ -127,7 +127,7 @@
         </Automaton>
         <Automaton Kind="SPEC" Name="bereitFahrtAbort">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="abfahrBereit"/>
                 <EventRef Name="notAktiv[WH]"/>
                 <EventRef Name="zugAn[WH]"/>
@@ -135,7 +135,7 @@
             <StateList>
                 <State Initial="true" Name="s0">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="s1"/>
@@ -150,14 +150,14 @@
         </Automaton>
         <Automaton Kind="SPEC" Name="einstiegBeendet">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="abfahrBereit"/>
                 <EventRef Name="einstiegBeendet"/>
             </EventRefList>
             <StateList>
                 <State Initial="true" Name="s0">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="s1"/>
@@ -170,14 +170,14 @@
         </Automaton>
         <Automaton Kind="SPEC" Name="fastAbfahrt">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="abfahrBereit"/>
                 <EventRef Name="fastAbfahrt"/>
             </EventRefList>
             <StateList>
                 <State Initial="true" Name="s0">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="s1"/>
@@ -190,14 +190,14 @@
         </Automaton>
         <Automaton Kind="SPEC" Name="minAbgelaufen">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="abfahrBereit"/>
                 <EventRef Name="minAbgelaufen"/>
             </EventRefList>
             <StateList>
                 <State Initial="true" Name="s0">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="s1"/>
@@ -210,7 +210,7 @@
         </Automaton>
         <Automaton Kind="PLANT" Name="passagierhalt">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="abfahrBereit"/>
                 <EventRef Name="ausstiegBeendet"/>
                 <EventRef Name="notAktiv[PH]"/>
@@ -221,22 +221,22 @@
             <StateList>
                 <State Name="ausstieg">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="einstieg">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Initial="true" Name="inaktiv">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="oeffnen">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="schliessen"/>
@@ -252,7 +252,7 @@
         </Automaton>
         <Automaton Kind="PLANT" Name="planhalt">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="bereitFahrt"/>
                 <EventRef Name="zugAn[PH]"/>
                 <EventRef Name="zugAn[WH]"/>
@@ -260,12 +260,12 @@
             <StateList>
                 <State Name="inPlanhalt">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Initial="true" Name="notInPlanhalt">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
             </StateList>
@@ -278,7 +278,7 @@
         </Automaton>
         <Automaton Kind="PLANT" Name="wendehalt">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="notAktiv[WH]"/>
                 <EventRef Name="wendeVollzogen"/>
                 <EventRef Name="zugAn[WH]"/>
@@ -286,7 +286,7 @@
             <StateList>
                 <State Initial="true" Name="notWendehaltAktiv">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="wendehaltAktiv"/>

@@ -46,7 +46,7 @@
 <SimpleIdentifier Name="side"/>
 </EnumSetExpression>
 </EventDecl>
-<EventDecl Kind="PROPOSITION" Name=":omega"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
@@ -71,7 +71,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="FREE">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="96" X="192"/>
@@ -128,7 +128,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="s2">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="144" X="304"/>
@@ -214,7 +214,7 @@
 <NodeList>
 <SimpleNode Name="GO">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="224" X="256"/>
@@ -225,7 +225,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="STOP">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="160" X="256"/>
@@ -352,7 +352,7 @@
 </SimpleNode>
 <SimpleNode Name="green">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="144" X="144"/>
@@ -525,7 +525,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="notgreen">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="224" X="304"/>
@@ -967,7 +967,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="OUT">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="112" X="128"/>
@@ -1067,7 +1067,7 @@
 <NodeList>
 <SimpleNode Name="s8">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="176" X="224"/>
@@ -1220,7 +1220,7 @@
 </SimpleNode>
 <SimpleNode Name="GREEN">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="160" X="128"/>
@@ -1329,7 +1329,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="RED">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="64" X="192"/>
@@ -1457,7 +1457,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="176" X="224"/>
@@ -1567,7 +1567,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="EMPTY">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="96" X="192"/>
@@ -1642,7 +1642,7 @@
 </SimpleNode>
 <SimpleNode Name="s5">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="256" X="192"/>
@@ -1829,7 +1829,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="TIME">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="160" X="224"/>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProductDES Name="dreitueren" xmlns="http://waters.sourceforge.net/xsd/des">
 <EventList>
-<Event Kind="PROPOSITION" Name=":omega"/>
+<Event Kind="PROPOSITION" Name=":accepting"/>
 <Event Kind="CONTROLLABLE" Name="CS_ok"/>
 <Event Kind="CONTROLLABLE" Name="MER_an[BT]"/>
 <Event Kind="CONTROLLABLE" Name="MER_an[FT]"/>
@@ -80,7 +80,7 @@
 <AutomataList>
 <Automaton Kind="SPEC" Name="ftuer[FT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="CS_ok"/>
 <EventRef Name="async[FT]"/>
 <EventRef Name="done_ER"/>
@@ -106,18 +106,18 @@
 <StateList>
 <State Name="ER">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Initial="true" Name="IN"/>
 <State Name="VR">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="ZS">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="cs1"/>
@@ -229,14 +229,14 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="mer[BT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="MER_an[BT]"/>
 <EventRef Name="MER_aus[BT]"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="IDLE">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="RUN"/>
@@ -248,14 +248,14 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="mer[FT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="MER_an[FT]"/>
 <EventRef Name="MER_aus[FT]"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="IDLE">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="RUN"/>
@@ -267,14 +267,14 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="mer[HT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="MER_an[HT]"/>
 <EventRef Name="MER_aus[HT]"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="IDLE">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="RUN"/>
@@ -286,7 +286,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="merguard[BT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="MER_an[BT]"/>
 <EventRef Name="MER_aus[BT]"/>
 <EventRef Name="start_ER[BT]"/>
@@ -299,7 +299,7 @@
 <StateList>
 <State Initial="true" Name="IDLE">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="RUN"/>
@@ -317,7 +317,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="merguard[FT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="MER_an[FT]"/>
 <EventRef Name="MER_aus[FT]"/>
 <EventRef Name="start_ER[FT]"/>
@@ -330,7 +330,7 @@
 <StateList>
 <State Initial="true" Name="IDLE">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="RUN"/>
@@ -348,7 +348,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="merguard[HT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="MER_an[HT]"/>
 <EventRef Name="MER_aus[HT]"/>
 <EventRef Name="start_ER[HT]"/>
@@ -361,7 +361,7 @@
 <StateList>
 <State Initial="true" Name="IDLE">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="RUN"/>
@@ -379,14 +379,14 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="mvr[HT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="MVR_an[HT]"/>
 <EventRef Name="MVR_aus[HT]"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="IDLE">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="RUN"/>
@@ -398,7 +398,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="mvrguard[BT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="MVR_an[BT]"/>
 <EventRef Name="MVR_aus[BT]"/>
 <EventRef Name="start_ER[BT]"/>
@@ -411,7 +411,7 @@
 <StateList>
 <State Initial="true" Name="IDLE">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="RUN"/>
@@ -429,7 +429,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="mvrguard[FT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="MVR_an[FT]"/>
 <EventRef Name="MVR_aus[FT]"/>
 <EventRef Name="start_ER[FT]"/>
@@ -442,7 +442,7 @@
 <StateList>
 <State Initial="true" Name="IDLE">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="RUN"/>
@@ -460,7 +460,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="mvrguard[HT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="MVR_an[HT]"/>
 <EventRef Name="MVR_aus[HT]"/>
 <EventRef Name="start_ER[HT]"/>
@@ -473,7 +473,7 @@
 <StateList>
 <State Initial="true" Name="IDLE">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="RUN"/>
@@ -491,7 +491,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="mvrstzv[BT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="MVR_an[BT]"/>
 <EventRef Name="MVR_aus[BT]"/>
 <EventRef Name="STZV[BT]"/>
@@ -499,7 +499,7 @@
 <StateList>
 <State Initial="true" Name="IDLE">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="RUN"/>
@@ -512,7 +512,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="mvrstzv[FT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="MVR_an[FT]"/>
 <EventRef Name="MVR_aus[FT]"/>
 <EventRef Name="STZV[FT]"/>
@@ -520,7 +520,7 @@
 <StateList>
 <State Initial="true" Name="IDLE">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="RUN"/>
@@ -533,14 +533,14 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="mzs[HT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="MZS_an[HT]"/>
 <EventRef Name="MZS_aus[HT]"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="IDLE">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="RUN"/>
@@ -552,7 +552,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="mzsguard[HT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="MZS_an[HT]"/>
 <EventRef Name="MZS_aus[HT]"/>
 <EventRef Name="start_ER[HT]"/>
@@ -565,7 +565,7 @@
 <StateList>
 <State Initial="true" Name="IDLE">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="RUN"/>
@@ -583,7 +583,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="nftuer[BT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="CS_ok"/>
 <EventRef Name="async[BT]"/>
 <EventRef Name="done_ER"/>
@@ -609,18 +609,18 @@
 <StateList>
 <State Name="ER">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Initial="true" Name="IN"/>
 <State Name="VR">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="ZS">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="cs1"/>
@@ -731,7 +731,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="nftuer[HT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="CS_ok"/>
 <EventRef Name="async[HT]"/>
 <EventRef Name="done_ER"/>
@@ -757,18 +757,18 @@
 <StateList>
 <State Name="ER">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Initial="true" Name="IN"/>
 <State Name="VR">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="ZS">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="cs1"/>
@@ -879,7 +879,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="sync[BT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="async[BT]"/>
 <EventRef Name="start_VR[BT]"/>
 <EventRef Name="start_ZS[BT]"/>
@@ -894,12 +894,12 @@
 <State Name="AZU"/>
 <State Name="VR">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="ZU">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -933,7 +933,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="sync[FT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="async[FT]"/>
 <EventRef Name="start_VR[FT]"/>
 <EventRef Name="start_ZS[FT]"/>
@@ -948,12 +948,12 @@
 <State Name="AZU"/>
 <State Name="VR">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="ZU">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -987,7 +987,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="sync[HT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="async[HT]"/>
 <EventRef Name="start_VR[HT]"/>
 <EventRef Name="start_ZS[HT]"/>
@@ -1002,12 +1002,12 @@
 <State Name="AZU"/>
 <State Name="VR">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="ZU">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -1041,7 +1041,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="tklemme[BT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="tuer_auf[BT]"/>
 <EventRef Name="tuer_zu[BT]"/>
 </EventRefList>
@@ -1049,7 +1049,7 @@
 <State Initial="true" Name="AUF"/>
 <State Name="ZU">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -1060,7 +1060,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="tklemme[FT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="tuer_auf[FT]"/>
 <EventRef Name="tuer_zu[FT]"/>
 </EventRefList>
@@ -1068,7 +1068,7 @@
 <State Initial="true" Name="AUF"/>
 <State Name="ZU">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -1079,7 +1079,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="tklemme[HT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="tuer_auf[HT]"/>
 <EventRef Name="tuer_zu[HT]"/>
 </EventRefList>
@@ -1087,7 +1087,7 @@
 <State Initial="true" Name="AUF"/>
 <State Name="ZU">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -1098,7 +1098,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="tmotor1[BT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="MER_an[BT]"/>
 <EventRef Name="MER_aus[BT]"/>
 <EventRef Name="MVR_an[BT]"/>
@@ -1120,7 +1120,7 @@
 <StateList>
 <State Initial="true" Name="IN">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="er1"/>
@@ -1189,7 +1189,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="tmotor1[FT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="MER_an[FT]"/>
 <EventRef Name="MER_aus[FT]"/>
 <EventRef Name="MVR_an[FT]"/>
@@ -1211,7 +1211,7 @@
 <StateList>
 <State Initial="true" Name="IN">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="er1"/>
@@ -1280,7 +1280,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="tmotor2[HT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="MER_an[HT]"/>
 <EventRef Name="MER_aus[HT]"/>
 <EventRef Name="MVR_an[HT]"/>
@@ -1303,7 +1303,7 @@
 <StateList>
 <State Initial="true" Name="IN">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="er1"/>
@@ -1373,7 +1373,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="ttimer[BT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="reset[BT]"/>
 <EventRef Name="time_ER[BT]"/>
 <EventRef Name="time_VR[BT]"/>
@@ -1384,7 +1384,7 @@
 <StateList>
 <State Initial="true" Name="IDLE">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="RUN"/>
@@ -1400,7 +1400,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="ttimer[FT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="reset[FT]"/>
 <EventRef Name="time_ER[FT]"/>
 <EventRef Name="time_VR[FT]"/>
@@ -1411,7 +1411,7 @@
 <StateList>
 <State Initial="true" Name="IDLE">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="RUN"/>
@@ -1427,7 +1427,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="ttimer[HT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="reset[HT]"/>
 <EventRef Name="time_ER[HT]"/>
 <EventRef Name="time_VR[HT]"/>
@@ -1438,7 +1438,7 @@
 <StateList>
 <State Initial="true" Name="IDLE">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="RUN"/>
@@ -1454,7 +1454,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="ttimguard[BT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="reset[BT]"/>
 <EventRef Name="start_ER[BT]"/>
 <EventRef Name="start_VR[BT]"/>
@@ -1471,7 +1471,7 @@
 <StateList>
 <State Initial="true" Name="IDLE">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="RUN"/>
@@ -1493,7 +1493,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="ttimguard[FT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="reset[FT]"/>
 <EventRef Name="start_ER[FT]"/>
 <EventRef Name="start_VR[FT]"/>
@@ -1510,7 +1510,7 @@
 <StateList>
 <State Initial="true" Name="IDLE">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="RUN"/>
@@ -1532,7 +1532,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="ttimguard[HT]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="reset[HT]"/>
 <EventRef Name="start_ER[HT]"/>
 <EventRef Name="start_VR[HT]"/>
@@ -1549,7 +1549,7 @@
 <StateList>
 <State Initial="true" Name="IDLE">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="RUN"/>
@@ -1571,7 +1571,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="tuermodell">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="CS_ok"/>
 <EventRef Name="done_ER"/>
 <EventRef Name="done_SER[FT]"/>
@@ -1588,7 +1588,7 @@
 <State Name="ER"/>
 <State Initial="true" Name="IN">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="SER"/>

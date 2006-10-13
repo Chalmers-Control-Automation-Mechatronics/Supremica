@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProductDES Name="safetydisplay_uncont" xmlns="http://waters.sourceforge.net/xsd/des">
     <EventList>
-        <Event Kind="PROPOSITION" Name=":omega"/>
+        <Event Kind="PROPOSITION" Name=":accepting"/>
         <Event Kind="CONTROLLABLE" Name="displayoff"/>
         <Event Kind="CONTROLLABLE" Name="displayon[1]"/>
         <Event Kind="CONTROLLABLE" Name="displayon[2]"/>
@@ -16,7 +16,7 @@
     <AutomataList>
         <Automaton Kind="PLANT" Name="display">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="displayoff"/>
                 <EventRef Name="displayon[1]"/>
                 <EventRef Name="displayon[2]"/>
@@ -25,7 +25,7 @@
             <StateList>
                 <State Initial="true" Name="s0">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="s1"/>
@@ -43,7 +43,7 @@
         </Automaton>
         <Automaton Kind="SPEC" Name="displaypriorityuncontrollable">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="displayoff"/>
                 <EventRef Name="displayon[1]"/>
                 <EventRef Name="displayon[2]"/>
@@ -61,7 +61,7 @@
                 <State Name="on12"/>
                 <State Initial="true" Name="on123">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="on13"/>
@@ -123,7 +123,7 @@
         </Automaton>
         <Automaton Kind="PLANT" Name="door[1]">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="switchoff[1]"/>
                 <EventRef Name="switchon[1]"/>
             </EventRefList>
@@ -131,12 +131,12 @@
                 <State Initial="true" Name="init"/>
                 <State Name="off">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="on">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
             </StateList>
@@ -149,7 +149,7 @@
         </Automaton>
         <Automaton Kind="PLANT" Name="door[2]">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="switchoff[2]"/>
                 <EventRef Name="switchon[2]"/>
             </EventRefList>
@@ -157,12 +157,12 @@
                 <State Initial="true" Name="init"/>
                 <State Name="off">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="on">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
             </StateList>
@@ -175,7 +175,7 @@
         </Automaton>
         <Automaton Kind="PLANT" Name="door[3]">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="switchoff[3]"/>
                 <EventRef Name="switchon[3]"/>
             </EventRefList>
@@ -183,12 +183,12 @@
                 <State Initial="true" Name="init"/>
                 <State Name="off">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="on">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
             </StateList>

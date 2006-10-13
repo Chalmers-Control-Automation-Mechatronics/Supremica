@@ -19,7 +19,7 @@
 <EventDecl Kind="CONTROLLABLE" Name="recover"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="done_turn"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="done_recover"/>
-<EventDecl Kind="PROPOSITION" Name=":omega"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
@@ -35,7 +35,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="48" Y="176"/>
@@ -118,7 +118,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="32" Y="80"/>
@@ -184,7 +184,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="112" Y="80"/>
@@ -227,7 +227,7 @@
 </SimpleNode>
 <SimpleNode Name="s5">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="432" Y="304"/>
@@ -359,7 +359,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="48" Y="144"/>
@@ -498,7 +498,7 @@
 </SimpleNode>
 <SimpleNode Name="s6">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="176" Y="400"/>
@@ -621,7 +621,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="64" Y="144"/>
@@ -703,7 +703,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="80" Y="160"/>
@@ -842,7 +842,7 @@
 </SimpleNode>
 <SimpleNode Name="s6">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="176" Y="400"/>

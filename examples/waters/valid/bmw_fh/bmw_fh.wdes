@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProductDES Name="bmw_fh" xmlns="http://waters.sourceforge.net/xsd/des">
 <EventList>
-<Event Kind="PROPOSITION" Name=":omega"/>
+<Event Kind="PROPOSITION" Name=":accepting"/>
 <Event Kind="UNCONTROLLABLE" Name="CLOSEDOOR[DRD]"/>
 <Event Kind="UNCONTROLLABLE" Name="CLOSEDOOR[PSD]"/>
 <Event Kind="CONTROLLABLE" Name="CMFT_BACK[CLOSE]"/>
@@ -42,7 +42,7 @@
 <AutomataList>
 <Automaton Kind="SPEC" Name="comfort[CLOSE]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="CMFT_BACK[CLOSE]"/>
 <EventRef Name="cmft_cond_doors"/>
 <EventRef Name="cmft_cond_key"/>
@@ -60,7 +60,7 @@
 <State Name="front"/>
 <State Initial="true" Name="init">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="request"/>
@@ -131,7 +131,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="comfort[OPEN]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="CMFT_BACK[OPEN]"/>
 <EventRef Name="cmft_cond_doors"/>
 <EventRef Name="cmft_cond_key"/>
@@ -149,7 +149,7 @@
 <State Name="front"/>
 <State Initial="true" Name="init">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="request"/>
@@ -220,7 +220,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="comfort_condition_doors">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="CLOSEDOOR[DRD]"/>
 <EventRef Name="CLOSEDOOR[PSD]"/>
 <EventRef Name="CMFT_BACK[CLOSE]"/>
@@ -239,7 +239,7 @@
 <State Name="door_open"/>
 <State Initial="true" Name="doors_closed">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="doors_open"/>
@@ -267,7 +267,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="comfort_condition_key">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="CMFT_BACK[CLOSE]"/>
 <EventRef Name="CMFT_BACK[OPEN]"/>
 <EventRef Name="cmft_cond_key"/>
@@ -284,7 +284,7 @@
 <State Name="key"/>
 <State Initial="true" Name="no_key">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -304,7 +304,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="comfort_control">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="CMFT_BACK[CLOSE]"/>
 <EventRef Name="CMFT_BACK[OPEN]"/>
 <EventRef Name="cmft_cond_doors"/>
@@ -323,7 +323,7 @@
 <State Name="esc_req"/>
 <State Initial="true" Name="off">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="request"/>
@@ -356,7 +356,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="comfort_function">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="REQ[CLOSE]"/>
 <EventRef Name="REQ[OPEN]"/>
 <EventRef Name="REQ[STOP]"/>
@@ -364,7 +364,7 @@
 <StateList>
 <State Initial="true" Name="no_request">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="request"/>
@@ -377,14 +377,14 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="doors[DRD]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="CLOSEDOOR[DRD]"/>
 <EventRef Name="OPENDOOR[DRD]"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="closed">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="open"/>
@@ -396,14 +396,14 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="doors[PSD]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="CLOSEDOOR[PSD]"/>
 <EventRef Name="OPENDOOR[PSD]"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="closed">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="open"/>
@@ -415,7 +415,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="fh">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="cmft_start"/>
 <EventRef Name="ecefin"/>
 <EventRef Name="fh_cond_door_open"/>
@@ -433,19 +433,19 @@
 <State Initial="true" Name="s"/>
 <State Name="s0">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s1"/>
 <State Name="s2">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s3"/>
 <State Name="s5">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s6"/>
@@ -488,7 +488,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="fh_condition_doors">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="CLOSEDOOR[DRD]"/>
 <EventRef Name="CLOSEDOOR[PSD]"/>
 <EventRef Name="fh_cond_door_open"/>
@@ -500,7 +500,7 @@
 <State Name="door_open"/>
 <State Initial="true" Name="doors_closed">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="doors_open"/>
@@ -521,7 +521,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="fh_condition_ecefin">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="CLOSEDOOR[DRD]"/>
 <EventRef Name="CLOSEDOOR[PSD]"/>
 <EventRef Name="fh_cond_ecefin"/>
@@ -535,7 +535,7 @@
 <State Name="no_radio_door_open"/>
 <State Initial="true" Name="no_radio_doors_closed">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="no_radio_doors_open"/>
@@ -574,7 +574,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="fh_condition_kl_r">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="cmft_start"/>
 <EventRef Name="fh_cond_ecefin"/>
 <EventRef Name="fh_cond_kl_r"/>
@@ -585,7 +585,7 @@
 <StateList>
 <State Initial="true" Name="no_radio">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="radio"/>
@@ -604,7 +604,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="fh_sync_cmft">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="CMFT_BACK[CLOSE]"/>
 <EventRef Name="CMFT_BACK[OPEN]"/>
 <EventRef Name="FH_LOCK"/>
@@ -613,7 +613,7 @@
 <StateList>
 <State Initial="true" Name="locked">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="unlocked"/>
@@ -627,7 +627,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="lock">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="KEY_PLUG"/>
 <EventRef Name="KEY_UNPLUG"/>
 <EventRef Name="KL_50_OFF"/>
@@ -639,7 +639,7 @@
 <State Name="key"/>
 <State Initial="true" Name="no_key">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="radio"/>
@@ -656,7 +656,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="readcountry">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="ecefin"/>
 <EventRef Name="nocountry"/>
 <EventRef Name="read_country"/>
@@ -665,7 +665,7 @@
 <StateList>
 <State Initial="true" Name="s0">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s1"/>
@@ -679,7 +679,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="timer">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="reset"/>
 <EventRef Name="timeout"/>
 <EventRef Name="timer"/>
@@ -687,7 +687,7 @@
 <StateList>
 <State Initial="true" Name="off">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="on"/>

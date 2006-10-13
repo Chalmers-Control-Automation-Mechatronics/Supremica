@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProductDES Name="tictactoe" xmlns="http://waters.sourceforge.net/xsd/des">
   <EventList>
-    <Event Kind="PROPOSITION" Name=":omega"/>
+    <Event Kind="PROPOSITION" Name=":accepting"/>
     <Event Kind="CONTROLLABLE" Name="black[1][1]"/>
     <Event Kind="CONTROLLABLE" Name="black[1][2]"/>
     <Event Kind="CONTROLLABLE" Name="black[1][3]"/>
@@ -41,7 +41,7 @@
   <AutomataList>
     <Automaton Kind="PLANT" Name="game_over">
       <EventRefList>
-	<EventRef Name=":omega"/>
+	<EventRef Name=":accepting"/>
 	<EventRef Name="black_win_d1"/>
 	<EventRef Name="black_win_d2"/>
 	<EventRef Name="black_win_x[1]"/>
@@ -64,7 +64,7 @@
 	<State Initial="true" Name="game"/>
 	<State Initial="false" Name="over">
 	  <EventRefList>
-	    <EventRef Name=":omega"/>
+	    <EventRef Name=":accepting"/>
 	  </EventRefList>
 	</State>
       </StateList>

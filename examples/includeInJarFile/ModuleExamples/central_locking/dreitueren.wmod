@@ -128,7 +128,7 @@
 <EventDecl Kind="CONTROLLABLE" Name="done_SER">
 <SimpleIdentifier Name="Tueren"/>
 </EventDecl>
-<EventDecl Kind="PROPOSITION" Name=":omega"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
 <ForeachComponent Name="TUER">
@@ -223,7 +223,7 @@
 </SimpleNode>
 <SimpleNode Name="VR">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="448" X="208"/>
@@ -330,7 +330,7 @@
 </SimpleNode>
 <SimpleNode Name="ER">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="304" X="336"/>
@@ -397,7 +397,7 @@
 </SimpleNode>
 <SimpleNode Name="ZS">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="448" X="464"/>
@@ -979,7 +979,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="96" X="48"/>
@@ -1066,7 +1066,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="160" X="128"/>
@@ -1163,7 +1163,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="48" X="64"/>
@@ -1250,7 +1250,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="64" X="112"/>
@@ -1350,7 +1350,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="80" X="48"/>
@@ -1432,7 +1432,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="48" X="32"/>
@@ -1519,7 +1519,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="160" X="128"/>
@@ -1737,7 +1737,7 @@
 </SimpleNode>
 <SimpleNode Name="VR">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="432" X="176"/>
@@ -1764,7 +1764,7 @@
 </SimpleNode>
 <SimpleNode Name="ZS">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="432" X="464"/>
@@ -1839,7 +1839,7 @@
 </SimpleNode>
 <SimpleNode Name="ER">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="288" X="320"/>
@@ -2473,7 +2473,7 @@
 </SimpleNode>
 <SimpleNode Name="ZU">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="224" X="224"/>
@@ -2492,7 +2492,7 @@
 </SimpleNode>
 <SimpleNode Name="VR">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="224" X="96"/>
@@ -2745,7 +2745,7 @@
 </SimpleNode>
 <SimpleNode Name="ZU">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="96" X="64"/>
@@ -2913,7 +2913,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="IN">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="112" X="288"/>
@@ -3454,7 +3454,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="IN">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="112" X="272"/>
@@ -3888,7 +3888,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="64" X="48"/>
@@ -3999,7 +3999,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="64" X="112"/>
@@ -4119,7 +4119,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="IN">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="160" X="224"/>

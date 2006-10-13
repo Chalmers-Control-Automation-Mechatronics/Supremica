@@ -87,10 +87,12 @@ public class IDE
     public IDE()
     throws JAXBException, SAXException
     {
-        Utility.setupFrame(this, IDEDimensions.mainWindowPreferredSize);
+  		Utility.setupFrame(this, IDEDimensions.mainWindowPreferredSize);
         setTitle(getName());
         moduleContainers = new ModuleContainers(this);
-        ModuleContainer defaultModule = createNewModuleContainer();
+
+		ModuleContainer defaultModule = createNewModuleContainer();
+		defaultModule.addStandardPropositions();
         moduleContainers.add(defaultModule);
         moduleContainers.setActive(defaultModule);
 
@@ -173,8 +175,10 @@ public class IDE
         {
             if (moduleContainers.size() <= 1)
             {
-                nextModuleContainer = createNewModuleContainer();
-                moduleContainers.add(nextModuleContainer);
+				installContainer(createNewModuleSubject());
+				nextModuleContainer = getActiveModuleContainer(); // Ugly fix
+                //nextModuleContainer = createNewModuleContainer();
+                //moduleContainers.add(nextModuleContainer);
             }
             else
             {
@@ -216,6 +220,11 @@ public class IDE
         return ideName;
     }
 
+    public ModuleSubject createNewModuleSubject()
+    {
+        return moduleContainers.createNewModuleSubject();
+    }
+
     public ModuleContainer createNewModuleContainer()
     {
         return moduleContainers.createNewModuleContainer();
@@ -225,10 +234,20 @@ public class IDE
     //# Auxiliary Methods
     public void installContainer(final ModuleSubject module)
     {
+		installContainer(module, true);
+    }
+
+    public void installContainer(final ModuleSubject module, boolean showComments)
+    {
         final ModuleContainer moduleContainer = new ModuleContainer(this, module);
+		moduleContainer.addStandardPropositions();
+
         add(moduleContainer);
         setActive(moduleContainer);
-        moduleContainer.getEditorPanel().showComment(module.getComment());
+        if (showComments)
+        {
+        	moduleContainer.getEditorPanel().showComment(module.getComment());
+		}
     }
 
     public JFrame getFrame()
@@ -435,12 +454,21 @@ public class IDE
     }
 
     public static void main(String args[])
-    throws Exception
+		throws Exception
     {
-        List<File> filesToOpen = ProcessCommandLineArguments.process(args);
+//		try
+//		{
+			List<File> filesToOpen = ProcessCommandLineArguments.process(args);
 
-        IDE ide = new IDE();
-        ide.setVisible(true);
-        ide.openFiles(filesToOpen);
+			IDE ide = new IDE();
+			ide.setVisible(true);
+			ide.openFiles(filesToOpen);
+//		}
+//		catch (Exception ex)
+//		{
+//			System.err.println("Exception in IDE.main");
+//			ex.printStackTrace();
+
+//		}
     }
 }

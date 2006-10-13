@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProductDES Name="dmt10" xmlns="http://waters.sourceforge.net/xsd/des">
 <EventList>
-<Event Kind="PROPOSITION" Name=":omega"/>
+<Event Kind="PROPOSITION" Name=":accepting"/>
 <Event Kind="UNCONTROLLABLE" Name="arrive[side]"/>
 <Event Kind="UNCONTROLLABLE" Name="enter[main]"/>
 <Event Kind="UNCONTROLLABLE" Name="enter[side]"/>
@@ -18,14 +18,14 @@
 <AutomataList>
 <Automaton Kind="PLANT" Name="arrive">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="arrive[side]"/>
 <EventRef Name="enter[side]"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="FREE">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="WAIT"/>
@@ -37,7 +37,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="arrive_then_green">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="arrive[side]"/>
 <EventRef Name="enter[side]"/>
 <EventRef Name="yellow[main]"/>
@@ -46,7 +46,7 @@
 <State Name="s1"/>
 <State Initial="true" Name="s2">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -58,7 +58,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="enter[main]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="enter[main]"/>
 <EventRef Name="green[main]"/>
 <EventRef Name="red[main]"/>
@@ -67,12 +67,12 @@
 <StateList>
 <State Name="GO">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Initial="true" Name="STOP">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -88,7 +88,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="enter[side]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="enter[side]"/>
 <EventRef Name="green[side]"/>
 <EventRef Name="red[side]"/>
@@ -97,12 +97,12 @@
 <StateList>
 <State Name="GO">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Initial="true" Name="STOP">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -118,7 +118,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="green_timer_main">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="green[main]"/>
 <EventRef Name="red[main]"/>
 <EventRef Name="tick"/>
@@ -127,7 +127,7 @@
 <StateList>
 <State Name="green">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Initial="true" Name="notgreen"/>
@@ -152,7 +152,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="green_timer_side">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="arrive[side]"/>
 <EventRef Name="enter[side]"/>
 <EventRef Name="green[side]"/>
@@ -164,7 +164,7 @@
 <State Name="green"/>
 <State Initial="true" Name="notgreen">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s0"/>
@@ -218,7 +218,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="leave[main]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="enter[main]"/>
 <EventRef Name="leave[main]"/>
 <EventRef Name="tick"/>
@@ -228,7 +228,7 @@
 <State Name="CROSS1"/>
 <State Initial="true" Name="OUT">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -242,7 +242,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="leave[side]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="enter[side]"/>
 <EventRef Name="leave[side]"/>
 <EventRef Name="tick"/>
@@ -252,7 +252,7 @@
 <State Name="CROSS1"/>
 <State Initial="true" Name="OUT">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -266,7 +266,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="light_sequence">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="green[main]"/>
 <EventRef Name="green[side]"/>
 <EventRef Name="red[main]"/>
@@ -281,7 +281,7 @@
 <State Name="s7"/>
 <State Name="s8">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="yellow"/>
@@ -297,7 +297,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="lights_main">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="green[main]"/>
 <EventRef Name="red[main]"/>
 <EventRef Name="yellow[main]"/>
@@ -305,7 +305,7 @@
 <StateList>
 <State Name="GREEN">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Initial="true" Name="RED"/>
@@ -322,7 +322,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="lights_side">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="green[side]"/>
 <EventRef Name="red[side]"/>
 <EventRef Name="yellow[side]"/>
@@ -331,7 +331,7 @@
 <State Name="GREEN"/>
 <State Initial="true" Name="RED">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="YELLOW"/>
@@ -347,7 +347,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="no_crash">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="enter[main]"/>
 <EventRef Name="enter[side]"/>
 <EventRef Name="leave[main]"/>
@@ -356,7 +356,7 @@
 <StateList>
 <State Initial="true" Name="s0">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s1"/>
@@ -371,7 +371,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="prop_nocrash">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="enter[main]"/>
 <EventRef Name="enter[side]"/>
 <EventRef Name="leave[main]"/>
@@ -380,7 +380,7 @@
 <StateList>
 <State Initial="true" Name="EMPTY">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="FULL"/>
@@ -394,7 +394,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="red_timer">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="green[main]"/>
 <EventRef Name="green[side]"/>
 <EventRef Name="red[main]"/>
@@ -409,7 +409,7 @@
 <State Name="s4"/>
 <State Name="s5">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s6"/>
@@ -432,13 +432,13 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="time">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="tick"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="TIME">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   EventDeclProxy
 //###########################################################################
-//# $Id: EventDeclProxy.java,v 1.5 2006-09-22 19:42:11 robi Exp $
+//# $Id: EventDeclProxy.java,v 1.6 2006-10-13 14:14:30 knut Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -91,11 +91,19 @@ public interface EventDeclProxy extends NamedProxy {
   /**
    * The name to be used for the default marking proposition.
    * This constant is provided for use by tools that do not support
-   * multiple propositions/maring conditions. It is recommended that
+   * multiple propositions/marking conditions. It is recommended that
    * they use proposition events with this default name to label their
    * marked states. In this way it is more likely that the same name
    * is used consistently.
    */
   public static final String DEFAULT_MARKING_NAME = ":accepting";
+
+  /**
+   * The name to be used for the default fobidden proposition.
+   * It is recommended that they use proposition events with this default
+   * name to label their forbidden states. In this way it is more likely
+   * that the same name is used consistently.
+   */
+  public static final String DEFAULT_FORBIDDEN_NAME = ":forbidden";
 
 }

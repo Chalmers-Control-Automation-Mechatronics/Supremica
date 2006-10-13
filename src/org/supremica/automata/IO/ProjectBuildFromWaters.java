@@ -55,6 +55,7 @@ import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.des.*;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -129,12 +130,19 @@ public class ProjectBuildFromWaters
 					EventProxy event = (EventProxy) evIt.next();
 					if (event.getKind() == EventKind.PROPOSITION)
 					{
-						if (!multicolored && (term != null) && !event.equals(term))
+						if (event.getName().equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME))
 						{
-							multicolored = true;
+							currSupremicaState.setForbidden(true);
 						}
-						term = event;
-						currSupremicaState.setAccepting(true);
+						else
+						{
+							if (!multicolored && (term != null) && !event.equals(term))
+							{
+								multicolored = true;
+							}
+							term = event;
+							currSupremicaState.setAccepting(true);
+						}
 						break;
 					}
 				}

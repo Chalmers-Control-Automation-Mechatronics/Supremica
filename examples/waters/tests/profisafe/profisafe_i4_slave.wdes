@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProductDES Name="profisafe_i4_slave" xmlns="http://waters.sourceforge.net/xsd/des">
 <EventList>
-<Event Observable="true" Kind="PROPOSITION" Name=":omega"/>
+<Event Observable="true" Kind="PROPOSITION" Name=":accepting"/>
 <Event Observable="true" Kind="UNCONTROLLABLE" Name="SLAVE__rcv[0][nok]"/>
 <Event Observable="true" Kind="UNCONTROLLABLE" Name="SLAVE__rcv[0][ok]"/>
 <Event Observable="true" Kind="UNCONTROLLABLE" Name="SLAVE__rcv[1][nok]"/>
@@ -121,7 +121,7 @@
 <AutomataList>
 <Automaton Kind="SPEC" Name="SLAVE__got_msg">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="SLAVE__rcv[0][nok]"/>
 <EventRef Name="SLAVE__rcv[0][ok]"/>
 <EventRef Name="SLAVE__rcv[1][nok]"/>
@@ -155,7 +155,7 @@
 <State Name="ack"/>
 <State Initial="true" Name="idle">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -205,7 +205,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="SLAVE__got_slave_timeout">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="SLAVE__slave_timeout"/>
 <EventRef Name="SLAVE__t_22_23__1"/>
 <EventRef Name="SLAVE__t_22_23__2"/>
@@ -263,7 +263,7 @@
 <StateList>
 <State Initial="true" Name="ok">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="timeout"/>
@@ -363,7 +363,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="SLAVE__in_CRC">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="SLAVE__rcv[0][nok]"/>
 <EventRef Name="SLAVE__rcv[0][ok]"/>
 <EventRef Name="SLAVE__rcv[1][nok]"/>
@@ -426,7 +426,7 @@
 <State Name="nok"/>
 <State Name="ok">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -557,7 +557,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="SLAVE__in_cons_num__4">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="SLAVE__rcv[0][nok]"/>
 <EventRef Name="SLAVE__rcv[0][ok]"/>
 <EventRef Name="SLAVE__rcv[1][nok]"/>
@@ -640,22 +640,22 @@
 <State Name="s0"/>
 <State Name="s1">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s2">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s3">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s4">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -856,7 +856,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="SLAVE__main">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="SLAVE__t_20_21"/>
 <EventRef Name="SLAVE__t_21_21"/>
 <EventRef Name="SLAVE__t_21_22"/>
@@ -941,7 +941,7 @@
 <State Name="s23_ack_prepare"/>
 <State Name="s24_await_message">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s25_message_check"/>
@@ -1030,7 +1030,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="SLAVE__number_ok_cycles__INPUT">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="SLAVE__t_24_26"/>
 <EventRef Name="SLAVE__t_25_26__1"/>
 <EventRef Name="SLAVE__t_25_26__10"/>
@@ -1072,7 +1072,7 @@
 <State Name="s2"/>
 <State Name="s3">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -1201,7 +1201,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="SLAVE__out_cons_num_plant__4">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="SLAVE__send[pv][0][0][0][0]"/>
 <EventRef Name="SLAVE__send[pv][0][0][0][1]"/>
 <EventRef Name="SLAVE__send[pv][0][0][0][2]"/>
@@ -1273,22 +1273,22 @@
 <State Name="s0"/>
 <State Name="s1">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s2">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s3">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Initial="true" Name="s4">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -1447,7 +1447,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="SLAVE__out_cons_num_spec__4">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="SLAVE__t_22_23__1"/>
 <EventRef Name="SLAVE__t_22_23__2"/>
 <EventRef Name="SLAVE__t_22_23__3"/>
@@ -1519,22 +1519,22 @@
 <State Name="s0"/>
 <State Name="s1">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s2">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s3">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Initial="true" Name="s4">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -1708,7 +1708,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="SLAVE__out_ps_status_bit2_CRCNO">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="SLAVE__send[pv][0][0][0][0]"/>
 <EventRef Name="SLAVE__send[pv][0][0][0][1]"/>
 <EventRef Name="SLAVE__send[pv][0][0][0][2]"/>
@@ -1784,7 +1784,7 @@
 <StateList>
 <State Initial="true" Name="c0b0">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="c1b0"/>
@@ -2092,7 +2092,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="SLAVE__out_ps_status_bit3_TO">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="SLAVE__send[pv][0][0][0][0]"/>
 <EventRef Name="SLAVE__send[pv][0][0][0][1]"/>
 <EventRef Name="SLAVE__send[pv][0][0][0][2]"/>
@@ -2146,7 +2146,7 @@
 <StateList>
 <State Name="c0b0">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Initial="true" Name="c0b1"/>
@@ -2379,7 +2379,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="SLAVE__out_ps_status_bit4_FV__app_process_data__INPUT">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="SLAVE__send[pv][0][0][0][0]"/>
 <EventRef Name="SLAVE__send[pv][0][0][0][1]"/>
 <EventRef Name="SLAVE__send[pv][0][0][0][2]"/>
@@ -2446,7 +2446,7 @@
 <State Name="b0fv"/>
 <State Name="b0pv">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Initial="true" Name="b1fv"/>
@@ -2651,7 +2651,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="SLAVE__polling">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="SLAVE__resume"/>
 <EventRef Name="SLAVE__t_20_21"/>
 <EventRef Name="SLAVE__t_21_21"/>
@@ -2733,7 +2733,7 @@
 <StateList>
 <State Name="idle">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Initial="true" Name="running"/>
@@ -2820,7 +2820,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="SLAVE__slave_timeout">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="SLAVE__slave_timeout"/>
 <EventRef Name="SLAVE__t_22_23__1"/>
 <EventRef Name="SLAVE__t_22_23__2"/>
@@ -2870,7 +2870,7 @@
 <StateList>
 <State Name="ok">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Initial="true" Name="timeout"/>
@@ -2969,7 +2969,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="SLAVE__uncont">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="SLAVE__rcv[0][nok]"/>
 <EventRef Name="SLAVE__rcv[0][ok]"/>
 <EventRef Name="SLAVE__rcv[1][nok]"/>
@@ -3019,7 +3019,7 @@
 <StateList>
 <State Name="idle">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Initial="true" Name="running"/>

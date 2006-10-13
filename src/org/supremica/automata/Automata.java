@@ -901,7 +901,7 @@ public class Automata
 
     public Set<EventProxy> getEvents()
     {
-        return getUnionAlphabet().getWatersEventsWithAcceptingProposition();
+        return getUnionAlphabet().getWatersEventsWithPropositions();
     }
 
     public Automaton getAutomaton(String name)

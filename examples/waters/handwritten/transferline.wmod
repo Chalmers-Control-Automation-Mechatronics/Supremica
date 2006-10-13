@@ -37,7 +37,7 @@
 <EventDecl Kind="CONTROLLABLE" Name="machine_load">
 <SimpleIdentifier Name="GROUPS"/>
 </EventDecl>
-<EventDecl Kind="PROPOSITION" Name=":omega"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
@@ -62,7 +62,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="162" X="214"/>
@@ -144,7 +144,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="162" X="234"/>
@@ -226,7 +226,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="162" X="198"/>
@@ -309,7 +309,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="EMPTY">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="80" X="208"/>
@@ -564,7 +564,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="EMPTY">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="64" X="192"/>
@@ -756,7 +756,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="EMPTY">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="176" X="224"/>

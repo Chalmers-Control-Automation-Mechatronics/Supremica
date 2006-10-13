@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProductDES Name="profisafe_i4_host" xmlns="http://waters.sourceforge.net/xsd/des">
 <EventList>
-<Event Observable="true" Kind="PROPOSITION" Name=":omega"/>
+<Event Observable="true" Kind="PROPOSITION" Name=":accepting"/>
 <Event Observable="true" Kind="UNCONTROLLABLE" Name="HOST__delay_timeout"/>
 <Event Observable="true" Kind="UNCONTROLLABLE" Name="HOST__host_timeout"/>
 <Event Observable="true" Kind="CONTROLLABLE" Name="HOST__init"/>
@@ -209,7 +209,7 @@
 <AutomataList>
 <Automaton Kind="SPEC" Name="HOST__delay_timeout">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__delay_timeout"/>
 <EventRef Name="HOST__t_11_11"/>
 <EventRef Name="HOST__t_11_8"/>
@@ -236,7 +236,7 @@
 <StateList>
 <State Initial="true" Name="ok">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="timeout"/>
@@ -287,7 +287,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="HOST__fs_master_bit2_CRCNO">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__preset__fs_master_bit2_CRCNO"/>
 <EventRef Name="HOST__read__fs_master_bit2_CRCNO[0]"/>
 <EventRef Name="HOST__read__fs_master_bit2_CRCNO[1]"/>
@@ -352,7 +352,7 @@
 <StateList>
 <State Initial="true" Name="s0">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s1"/>
@@ -477,7 +477,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="HOST__fs_master_bit3_TO">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__preset__fs_master_bit3_TO"/>
 <EventRef Name="HOST__read__fs_master_bit3_TO[0]"/>
 <EventRef Name="HOST__read__fs_master_bit3_TO[1]"/>
@@ -495,7 +495,7 @@
 <StateList>
 <State Initial="true" Name="s0">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s1"/>
@@ -526,7 +526,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="HOST__fs_slave_bit2_CRCNO">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__preset__fs_slave_bit2_CRCNO"/>
 <EventRef Name="HOST__read__fs_slave_bit2_CRCNO[0]"/>
 <EventRef Name="HOST__read__fs_slave_bit2_CRCNO[1]"/>
@@ -591,7 +591,7 @@
 <StateList>
 <State Initial="true" Name="s0">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s1"/>
@@ -716,7 +716,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="HOST__fs_slave_bit3_TO">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__preset__fs_slave_bit3_TO"/>
 <EventRef Name="HOST__read__fs_slave_bit3_TO[0]"/>
 <EventRef Name="HOST__read__fs_slave_bit3_TO[1]"/>
@@ -781,7 +781,7 @@
 <StateList>
 <State Initial="true" Name="s0">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s1"/>
@@ -906,7 +906,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="HOST__got_ack">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__rcv[pv][0][0][0][0][nok]"/>
 <EventRef Name="HOST__rcv[pv][0][0][0][0][ok]"/>
 <EventRef Name="HOST__rcv[pv][0][0][0][1][nok]"/>
@@ -1007,7 +1007,7 @@
 <State Name="ack"/>
 <State Initial="true" Name="idle">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -1181,7 +1181,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="HOST__host_timeout">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__host_timeout"/>
 <EventRef Name="HOST__t_3_3__1"/>
 <EventRef Name="HOST__t_3_3__2"/>
@@ -1222,7 +1222,7 @@
 <StateList>
 <State Initial="true" Name="ok">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="timeout"/>
@@ -1275,7 +1275,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="HOST__in_CRC">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__preset__in_CRC"/>
 <EventRef Name="HOST__rcv[pv][0][0][0][0][nok]"/>
 <EventRef Name="HOST__rcv[pv][0][0][0][0][ok]"/>
@@ -1392,7 +1392,7 @@
 <State Name="nok"/>
 <State Initial="true" Name="ok">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -1578,7 +1578,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="HOST__in_cons_num__4">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__preset__in_cons_num[0]"/>
 <EventRef Name="HOST__preset__in_cons_num[1]"/>
 <EventRef Name="HOST__preset__in_cons_num[2]"/>
@@ -1716,22 +1716,22 @@
 <State Initial="true" Name="s0"/>
 <State Name="s1">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s2">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s3">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s4">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -2245,7 +2245,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="HOST__in_ps_status_bit2_CRCNO">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__preset__in_ps_status_bit2_CRCNO"/>
 <EventRef Name="HOST__rcv[pv][0][0][0][0][nok]"/>
 <EventRef Name="HOST__rcv[pv][0][0][0][0][ok]"/>
@@ -2381,7 +2381,7 @@
 <StateList>
 <State Initial="true" Name="s0">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s1"/>
@@ -2588,7 +2588,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="HOST__in_ps_status_bit3_TO">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__preset__in_ps_status_bit3_TO"/>
 <EventRef Name="HOST__rcv[pv][0][0][0][0][nok]"/>
 <EventRef Name="HOST__rcv[pv][0][0][0][0][ok]"/>
@@ -2724,7 +2724,7 @@
 <StateList>
 <State Initial="true" Name="s0">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s1"/>
@@ -2931,7 +2931,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="HOST__in_ps_status_bit4_FV__app">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__preset__in_ps_status_bit4_FV"/>
 <EventRef Name="HOST__rcv[pv][0][0][0][0][nok]"/>
 <EventRef Name="HOST__rcv[pv][0][0][0][0][ok]"/>
@@ -3080,7 +3080,7 @@
 <State Initial="true" Name="s_0_fv"/>
 <State Name="s_0_pv">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s_1_fv"/>
@@ -3653,7 +3653,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="HOST__main">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__init"/>
 <EventRef Name="HOST__t_10_5__1"/>
 <EventRef Name="HOST__t_10_5__2"/>
@@ -3770,7 +3770,7 @@
 <State Name="s5_message_prepare"/>
 <State Name="s6_await_slave_ack">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s7_slave_ack_check"/>
@@ -3886,7 +3886,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="HOST__old_cons_num__4">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__t_10_5__1"/>
 <EventRef Name="HOST__t_10_5__2"/>
 <EventRef Name="HOST__t_10_5__3"/>
@@ -3912,22 +3912,22 @@
 <State Initial="true" Name="s0"/>
 <State Name="s1">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s2">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s3">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s4">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -3996,7 +3996,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="HOST__operator_ack">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__operator_ack"/>
 <EventRef Name="HOST__t_10_5__1"/>
 <EventRef Name="HOST__t_10_5__2"/>
@@ -4023,7 +4023,7 @@
 <State Name="ack"/>
 <State Initial="true" Name="idle">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -4068,7 +4068,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="HOST__out_cons_num__4">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__send[0]"/>
 <EventRef Name="HOST__send[1]"/>
 <EventRef Name="HOST__send[2]"/>
@@ -4161,22 +4161,22 @@
 <State Initial="true" Name="s0"/>
 <State Name="s1">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s2">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s3">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s4">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -4380,7 +4380,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="HOST__polling">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__resume"/>
 <EventRef Name="HOST__t_10_5__1"/>
 <EventRef Name="HOST__t_10_5__2"/>
@@ -4489,7 +4489,7 @@
 <StateList>
 <State Name="idle">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Initial="true" Name="running"/>
@@ -4603,7 +4603,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="HOST__preset_in_CRC">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__init"/>
 <EventRef Name="HOST__preset__in_CRC"/>
 </EventRefList>
@@ -4611,7 +4611,7 @@
 <State Initial="true" Name="init"/>
 <State Name="run">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -4622,7 +4622,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="HOST__preset_in_cons_num">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__init"/>
 <EventRef Name="HOST__preset__in_cons_num[0]"/>
 <EventRef Name="HOST__preset__in_cons_num[1]"/>
@@ -4634,7 +4634,7 @@
 <State Initial="true" Name="init"/>
 <State Name="run">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -4649,7 +4649,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="HOST__preset_in_ps_status_bit2_CRCNO">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__init"/>
 <EventRef Name="HOST__preset__in_ps_status_bit2_CRCNO"/>
 </EventRefList>
@@ -4657,7 +4657,7 @@
 <State Initial="true" Name="init"/>
 <State Name="run">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -4668,7 +4668,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="HOST__preset_in_ps_status_bit3_TO">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__init"/>
 <EventRef Name="HOST__preset__in_ps_status_bit3_TO"/>
 </EventRefList>
@@ -4676,7 +4676,7 @@
 <State Initial="true" Name="init"/>
 <State Name="run">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -4687,7 +4687,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="HOST__preset_in_ps_status_bit4_FV">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__init"/>
 <EventRef Name="HOST__preset__in_ps_status_bit4_FV"/>
 </EventRefList>
@@ -4695,7 +4695,7 @@
 <State Initial="true" Name="init"/>
 <State Name="run">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -4706,7 +4706,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="HOST__preset_master_bit2_CRCNO">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__init"/>
 <EventRef Name="HOST__preset__fs_master_bit2_CRCNO"/>
 </EventRefList>
@@ -4714,7 +4714,7 @@
 <State Initial="true" Name="init"/>
 <State Name="run">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -4725,7 +4725,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="HOST__preset_master_bit3_TO">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__init"/>
 <EventRef Name="HOST__preset__fs_master_bit3_TO"/>
 </EventRefList>
@@ -4733,7 +4733,7 @@
 <State Initial="true" Name="init"/>
 <State Name="run">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -4744,7 +4744,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="HOST__preset_slave_bit2_CRCNO">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__init"/>
 <EventRef Name="HOST__preset__fs_slave_bit2_CRCNO"/>
 </EventRefList>
@@ -4752,7 +4752,7 @@
 <State Initial="true" Name="init"/>
 <State Name="run">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -4763,7 +4763,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="HOST__preset_slave_bit3_TO">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__init"/>
 <EventRef Name="HOST__preset__fs_slave_bit3_TO"/>
 </EventRefList>
@@ -4771,7 +4771,7 @@
 <State Initial="true" Name="init"/>
 <State Name="run">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -4782,7 +4782,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="HOST__timers">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__delay_timeout"/>
 <EventRef Name="HOST__host_timeout"/>
 <EventRef Name="HOST__t_11_8"/>
@@ -4812,7 +4812,7 @@
 <State Name="delay"/>
 <State Name="host">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Initial="true" Name="off"/>
@@ -4889,7 +4889,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="HOST__uncont">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="HOST__delay_timeout"/>
 <EventRef Name="HOST__host_timeout"/>
 <EventRef Name="HOST__operator_ack"/>
@@ -4994,7 +4994,7 @@
 <StateList>
 <State Name="idle">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Initial="true" Name="running"/>

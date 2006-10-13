@@ -20,7 +20,7 @@
 <IntConstant Value="3"/>
 </BinaryExpression>
 </EventDecl>
-<EventDecl Kind="PROPOSITION" Name=":omega"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
@@ -41,7 +41,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="248" Y="126"/>
@@ -178,7 +178,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="on123">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="469" Y="427"/>
@@ -683,7 +683,7 @@
 </SimpleNode>
 <SimpleNode Name="on">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="318" Y="118"/>
@@ -694,7 +694,7 @@
 </SimpleNode>
 <SimpleNode Name="off">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="176" Y="118"/>

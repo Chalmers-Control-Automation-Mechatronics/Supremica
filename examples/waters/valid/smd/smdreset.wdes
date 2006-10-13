@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProductDES Name="smdreset" xmlns="http://waters.sourceforge.net/xsd/des">
     <EventList>
-        <Event Kind="PROPOSITION" Name=":omega"/>
+        <Event Kind="PROPOSITION" Name=":accepting"/>
         <Event Kind="CONTROLLABLE" Name="counter"/>
         <Event Kind="UNCONTROLLABLE" Name="counter_equals_12"/>
         <Event Kind="UNCONTROLLABLE" Name="counter_less_than_12"/>
@@ -24,7 +24,7 @@
     <AutomataList>
         <Automaton Kind="PLANT" Name="counterobserver">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="counter"/>
                 <EventRef Name="counter_equals_12"/>
                 <EventRef Name="counter_less_than_12"/>
@@ -34,7 +34,7 @@
             <StateList>
                 <State Initial="true" Name="s0">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="s1"/>
@@ -50,7 +50,7 @@
         </Automaton>
         <Automaton Kind="PLANT" Name="operatorobserver">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="operator_input"/>
                 <EventRef Name="repeat"/>
                 <EventRef Name="stop"/>
@@ -58,7 +58,7 @@
             <StateList>
                 <State Initial="true" Name="s0">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="s1"/>
@@ -71,7 +71,7 @@
         </Automaton>
         <Automaton Kind="SPEC" Name="recoverysupervisor">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="counter"/>
                 <EventRef Name="done_recover"/>
                 <EventRef Name="done_scan"/>
@@ -93,7 +93,7 @@
                 <State Name="resetting"/>
                 <State Initial="true" Name="s0">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="s1"/>
@@ -102,7 +102,7 @@
                 <State Name="s4"/>
                 <State Name="s5">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
             </StateList>
@@ -139,7 +139,7 @@
         </Automaton>
         <Automaton Kind="PLANT" Name="scanobserver">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="done_recover"/>
                 <EventRef Name="done_scan"/>
                 <EventRef Name="error_scan"/>
@@ -149,7 +149,7 @@
             <StateList>
                 <State Initial="true" Name="s0">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="s1"/>
@@ -165,7 +165,7 @@
         </Automaton>
         <Automaton Kind="SPEC" Name="scansupervisor">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="counter"/>
                 <EventRef Name="counter_equals_12"/>
                 <EventRef Name="counter_less_than_12"/>
@@ -190,7 +190,7 @@
                 <State Name="s5"/>
                 <State Name="s6">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
             </StateList>
@@ -213,7 +213,7 @@
         </Automaton>
         <Automaton Kind="PLANT" Name="turnobserver">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="done_recover"/>
                 <EventRef Name="done_turn"/>
                 <EventRef Name="error_turn"/>
@@ -223,7 +223,7 @@
             <StateList>
                 <State Initial="true" Name="s0">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="s1"/>
@@ -239,7 +239,7 @@
         </Automaton>
         <Automaton Kind="PLANT" Name="vacuumobserver">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="done_recover"/>
                 <EventRef Name="done_vacuum"/>
                 <EventRef Name="error_vacuum"/>
@@ -249,7 +249,7 @@
             <StateList>
                 <State Initial="true" Name="s0">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="s1"/>
@@ -265,7 +265,7 @@
         </Automaton>
         <Automaton Kind="SPEC" Name="vacuumsupervisor">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="counter"/>
                 <EventRef Name="counter_equals_12"/>
                 <EventRef Name="counter_less_than_12"/>
@@ -290,7 +290,7 @@
                 <State Name="s5"/>
                 <State Name="s6">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
             </StateList>

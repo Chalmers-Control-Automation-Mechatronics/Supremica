@@ -2,7 +2,7 @@
 <Module Name="never_blow_up" xmlns="http://waters.sourceforge.net/xsd/module">
 <EventDeclList>
 <EventDecl Kind="UNCONTROLLABLE" Name="blow_up"/>
-<EventDecl Kind="PROPOSITION" Name=":omega"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="SPEC">
@@ -14,7 +14,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="never">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="176" Y="96"/>

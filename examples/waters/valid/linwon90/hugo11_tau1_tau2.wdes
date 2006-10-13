@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProductDES Name="hugo11" xmlns="http://waters.sourceforge.net/xsd/des">
 <EventList>
-<Event Kind="PROPOSITION" Name=":omega"/>
+<Event Kind="PROPOSITION" Name=":accepting"/>
 <Event Kind="CONTROLLABLE" Name="f1"/>
 <Event Kind="CONTROLLABLE" Name="f2"/>
 <Event Kind="CONTROLLABLE" Name="tau1"/>
@@ -10,14 +10,14 @@
 <AutomataList>
 <Automaton Kind="SPEC" Name=":reduced">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="f1"/>
 <EventRef Name="f2"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name=":b0">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name=":b1"/>
@@ -29,7 +29,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="hugo11">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="f1"/>
 <EventRef Name="f2"/>
 <EventRef Name="tau1"/>
@@ -38,34 +38,34 @@
 <StateList>
 <State Initial="true" Name="s0">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s1">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s10"/>
 <State Name="s2">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s3">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s4"/>
 <State Name="s5">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s6">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s7"/>
@@ -98,41 +98,41 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="hugo11:tau1:tau2">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="f1"/>
 <EventRef Name="f2"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="s0">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Initial="true" Name="s1">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s10"/>
 <State Initial="true" Name="s2">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Initial="true" Name="s3">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s4"/>
 <State Initial="true" Name="s5">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Initial="true" Name="s6">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s7"/>

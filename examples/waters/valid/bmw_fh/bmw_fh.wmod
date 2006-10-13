@@ -61,7 +61,7 @@
 <EventDecl Kind="CONTROLLABLE" Name="fh_cond_kl_r"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="timeout"/>
 <EventDecl Kind="CONTROLLABLE" Name="FH_UNLOCK"/>
-<EventDecl Kind="PROPOSITION" Name=":omega"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="SPEC">
@@ -105,7 +105,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="doors_closed">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="208" Y="128"/>
@@ -284,7 +284,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="no_key">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="208" Y="160"/>
@@ -406,7 +406,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="off">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="112" Y="144"/>
@@ -615,7 +615,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="no_request">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="96" Y="48"/>
@@ -780,7 +780,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="init">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="336" Y="288"/>
@@ -1121,7 +1121,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="closed">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="112" Y="80"/>
@@ -1199,7 +1199,7 @@
 </SimpleNode>
 <SimpleNode Name="s0">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="208" Y="112"/>
@@ -1218,7 +1218,7 @@
 </SimpleNode>
 <SimpleNode Name="s2">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="208" Y="256"/>
@@ -1237,7 +1237,7 @@
 </SimpleNode>
 <SimpleNode Name="s5">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="208" Y="432"/>
@@ -1518,7 +1518,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="doors_closed">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="224" Y="48"/>
@@ -1708,7 +1708,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="no_radio_doors_closed">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="144" Y="352"/>
@@ -1981,7 +1981,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="no_radio">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="160" Y="48"/>
@@ -2087,7 +2087,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="locked">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="176" Y="80"/>
@@ -2185,7 +2185,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="no_key">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="176" Y="48"/>
@@ -2277,7 +2277,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="64" Y="64"/>
@@ -2342,7 +2342,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="off">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="48" Y="80"/>

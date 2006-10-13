@@ -25,7 +25,7 @@
 <EventDecl Kind="UNCONTROLLABLE" Name="new_value">
 <SimpleIdentifier Name="BITS"/>
 </EventDecl>
-<EventDecl Kind="PROPOSITION" Name=":omega"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
 <ForeachComponent Name="I">
@@ -64,7 +64,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="INIT">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="256" Y="96"/>
@@ -219,7 +219,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="183" Y="195"/>
@@ -278,7 +278,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="off">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="48" Y="48"/>

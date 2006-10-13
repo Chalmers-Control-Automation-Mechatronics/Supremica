@@ -74,6 +74,7 @@ public class State
     private int index = -1;
 
     static final LabeledEvent acceptingProposition = new LabeledEvent(EventDeclProxy.DEFAULT_MARKING_NAME, true);
+    static final LabeledEvent forbiddenProposition = new LabeledEvent(EventDeclProxy.DEFAULT_FORBIDDEN_NAME, true);
 
     /**
      * id is the internal identifier, i.e. for directing arcs etc.
@@ -1287,6 +1288,10 @@ public class State
         {
             currPropositions.add(acceptingProposition);
         }
+        if (isForbidden())
+        {
+			currPropositions.add(forbiddenProposition);
+		}
         return currPropositions;
 
     }

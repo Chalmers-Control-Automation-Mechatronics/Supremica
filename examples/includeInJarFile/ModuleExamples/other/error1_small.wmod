@@ -40,7 +40,7 @@ its parameter.
 "Yeah, yeah, yeah &amp; yeah!"
 </Comment>
 </EventDecl>
-<EventDecl Kind="PROPOSITION" Name=":omega"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
 <ForeachComponent Name="MACH">
@@ -74,7 +74,7 @@ its parameter.
 </SimpleNode>
 <SimpleNode Name="idle" Initial="true">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="256" Y="128"/>
@@ -169,7 +169,7 @@ its parameter.
 </SimpleNode>
 <SimpleNode Name="empty" Initial="true">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="176" Y="176"/>
@@ -239,7 +239,7 @@ its parameter.
 <NodeList>
 <SimpleNode Name="m1" Initial="true">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="176" Y="176"/>

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.43 2006-10-12 20:47:03 flordal Exp $
+//# $Id: ModuleContainer.java,v 1.44 2006-10-13 14:14:30 knut Exp $
 //###########################################################################
 
 
@@ -44,6 +44,7 @@ import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -84,30 +85,30 @@ public class ModuleContainer implements UndoInterface
         mPrinter = new HTMLPrinter();
         setSelectedComponent(getEditorPanel());
     }
-    
-    
+
+
     //#######################################################################
     //# Simple Access
     public IDE getIDE()
     {
         return mIDE;
     }
-    
+
     public String getName()
     {
         return mModule.getName();
     }
-    
+
     public ModuleSubject getModule()
     {
         return mModule;
     }
-    
+
     public ExpressionParser getExpressionParser()
     {
         return mExpressionParser;
     }
-    
+
     public EventKind guessEventKind(final IdentifierProxy ident)
     {
         final String name = ident.getName();
@@ -129,27 +130,45 @@ public class ModuleContainer implements UndoInterface
         }
         return null;
     }
-    
+
+    public void addStandardPropositions()
+    {
+		EventDeclSubject accepting = new EventDeclSubject(EventDeclProxy.DEFAULT_MARKING_NAME,
+			EventKind.PROPOSITION);
+		if (!getModule().getEventDeclListModifiable()
+		.containsName(EventDeclProxy.DEFAULT_MARKING_NAME))
+		{
+			getModule().getEventDeclListModifiable().add(accepting);
+		}
+		EventDeclSubject forbidden = new EventDeclSubject(EventDeclProxy.DEFAULT_FORBIDDEN_NAME,
+			EventKind.PROPOSITION);
+		if (!getModule().getEventDeclListModifiable()
+		.containsName(EventDeclProxy.DEFAULT_FORBIDDEN_NAME))
+		{
+			getModule().getEventDeclListModifiable().add(forbidden);
+		}
+	}
+
     public ProxyPrinter getPrinter()
     {
         return mPrinter;
     }
-    
+
     public JToolBar getEditorToolBar(JToolBar mainToolBar)
     {
         return getEditorPanel().getToolBar(mainToolBar);
     }
-    
+
     public JToolBar getAnalyzerPanel(JToolBar mainToolBar)
     {
         return getAnalyzerPanel().getToolBar(mainToolBar);
     }
-    
+
     public Actions getActions()
     {
         return mIDE.getActions();
     }
-    
+
     public EditorPanel getEditorPanel()
     {
         if (editorPanel == null)
@@ -158,7 +177,7 @@ public class ModuleContainer implements UndoInterface
         }
         return editorPanel;
     }
-    
+
     public AnalyzerPanel getAnalyzerPanel()
     {
         if (analyzerPanel == null)
@@ -167,7 +186,7 @@ public class ModuleContainer implements UndoInterface
         }
         return analyzerPanel;
     }
-    
+
     public SimulatorPanel getSimulatorPanel()
     {
         if (simulatorPanel == null)
@@ -176,7 +195,7 @@ public class ModuleContainer implements UndoInterface
         }
         return simulatorPanel;
     }
-    
+
     public ComponentEditorPanel getComponentEditorPanel
         (final SimpleComponentSubject scp)
     {
@@ -198,22 +217,22 @@ public class ModuleContainer implements UndoInterface
         }
         return panel;
     }
-    
+
     public void setSelectedComponent(Component selectedComponent)
     {
         mSelectedComponent = selectedComponent;
     }
-    
+
     public Component getSelectedComponent()
     {
         return mSelectedComponent;
     }
-    
+
     public int numberOfSelectedAutomata()
     {
         return getSelectedAutomata().size();
     }
-    
+
     public Automata getSelectedAutomata()
     {
         return getAnalyzerPanel().getSelectedAutomata();
@@ -234,43 +253,43 @@ public class ModuleContainer implements UndoInterface
     {
         return getAnalyzerPanel().getUnselectedAutomata();
     }
-    
+
     public Automata getAllAutomata()
     {
         return getAnalyzerPanel().getAllAutomata();
     }
-    
+
     public JFrame getFrame()
     {
         return mIDE.getFrame();
     }
-    
+
     public VisualProject getVisualProject()
     {
         return mVisualProject;
     }
-    
+
     public boolean addAutomaton(Automaton theAutomaton)
     {
         getVisualProject().addAutomaton(theAutomaton);
         return true;// To Do Fix
     }
-    
-    
+
+
     public int addAutomata(Automata theAutomata)
     {
         getVisualProject().addAutomata(theAutomata);
         return theAutomata.size(); // TO DO Fix
     }
-    
-    
+
+
     //#######################################################################
     //# Undo & Redo
     public EditorWindowInterface getActiveEditorWindowInterface()
     {
         return getEditorPanel().getActiveEditorWindowInterface();
     }
-    
+
     public void addUndoable(UndoableEdit e)
     {
         if (e.isSignificant())
@@ -290,8 +309,8 @@ public class ModuleContainer implements UndoInterface
         mIDE.getActions().editorUndoAction.setEnabled(canUndo());
         fireEditorChangedEvent(new UndoRedoEvent());
     }
-    
-    
+
+
     public void executeCommand(Command c)
     {
         c.execute();
@@ -299,33 +318,33 @@ public class ModuleContainer implements UndoInterface
         addUndoable(new UndoableCommand(c));
         //}
     }
-    
+
     public boolean canRedo()
     {
         return mUndoManager.canRedo();
     }
-    
+
     public boolean canUndo()
     {
         return mUndoManager.canUndo();
     }
-    
+
     public void clearList()
     {
         mUndoManager.discardAllEdits();
         fireEditorChangedEvent(new UndoRedoEvent());
     }
-    
+
     public String getRedoPresentationName()
     {
         return mUndoManager.getRedoPresentationName();
     }
-    
+
     public String getUndoPresentationName()
     {
         return mUndoManager.getUndoPresentationName();
     }
-    
+
     public void redo() throws CannotRedoException
     {
         mInsignificant.end();
@@ -336,7 +355,7 @@ public class ModuleContainer implements UndoInterface
         mIDE.getActions().editorUndoAction.setEnabled(canUndo());
         fireEditorChangedEvent(new UndoRedoEvent());
     }
-    
+
     public void undo() throws CannotUndoException
     {
         mInsignificant.end();
@@ -347,19 +366,19 @@ public class ModuleContainer implements UndoInterface
         mIDE.getActions().editorUndoAction.setEnabled(canUndo());
         fireEditorChangedEvent(new UndoRedoEvent());
     }
-    
+
     //#######################################################################
     //# Observer Support
     public void attach(final Observer o)
     {
         mObservers.add(o);
     }
-    
+
     public void detach(final Observer o)
     {
         mObservers.remove(o);
     }
-    
+
     public void fireEditorChangedEvent(EditorChangedEvent e)
     {
         for (final Observer o : mObservers)
@@ -367,7 +386,7 @@ public class ModuleContainer implements UndoInterface
             o.update(e);
         }
     }
-    
+
     public GraphProxy getFlatGraphProxy(String name)
     {
         List<Proxy> components = flatModule.getComponentList();
@@ -390,15 +409,15 @@ public class ModuleContainer implements UndoInterface
                 }
             }
         }
-        
+
         return null;
     }
-    
+
     public ModuleProxy getFlatModuleProxy()
     {
         return flatModule;
     }
-    
+
     /**
      * Updates the automata in the analyzer-tab.
      */
@@ -429,15 +448,15 @@ public class ModuleContainer implements UndoInterface
         mVisualProject.clear();
         mVisualProject.addAutomata(supremicaProject);
         mVisualProject.updated();
-        
+
 /*
                 ProductDESImporter importer = new ProductDESImporter(ModuleSubjectFactory.getInstance());
                 flatModule = (ModuleSubject) importer.importModule(mVisualProject);
  */
         return true;
     }
-    
-    
+
+
     //#######################################################################
     //# Data Members
     private final IDE mIDE;
@@ -451,11 +470,11 @@ public class ModuleContainer implements UndoInterface
     private final Map<SimpleComponentSubject,ComponentEditorPanel>
         mComponentToPanelMap =
         new HashMap<SimpleComponentSubject,ComponentEditorPanel>();
-    
+
     private EditorPanel editorPanel = null;
     private AnalyzerPanel analyzerPanel = null;
     private SimulatorPanel simulatorPanel = null;
     private Component mSelectedComponent = null;
     private VisualProject mVisualProject = new VisualProject();
-    
+
 }

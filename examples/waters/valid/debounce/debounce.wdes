@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProductDES Name="debounce" xmlns="http://waters.sourceforge.net/xsd/des">
     <EventList>
-        <Event Kind="PROPOSITION" Name=":omega"/>
+        <Event Kind="PROPOSITION" Name=":accepting"/>
         <Event Kind="CONTROLLABLE" Name="chg_value[1]"/>
         <Event Kind="UNCONTROLLABLE" Name="new_value[1]"/>
         <Event Kind="CONTROLLABLE" Name="reset[1]"/>
@@ -11,7 +11,7 @@
     <AutomataList>
         <Automaton Kind="SPEC" Name="debouncing_ok[1]">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="chg_value[1]"/>
                 <EventRef Name="new_value[1]"/>
                 <EventRef Name="reset[1]"/>
@@ -23,7 +23,7 @@
                 <State Name="FLIP"/>
                 <State Initial="true" Name="INIT">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="WAIT"/>
@@ -44,13 +44,13 @@
         </Automaton>
         <Automaton Kind="PLANT" Name="sensor_and_filter[1]">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="new_value[1]"/>
             </EventRefList>
             <StateList>
                 <State Initial="true" Name="s0">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
             </StateList>
@@ -60,7 +60,7 @@
         </Automaton>
         <Automaton Kind="PLANT" Name="timer[1]">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="reset[1]"/>
                 <EventRef Name="timeout[1]"/>
                 <EventRef Name="timer[1]"/>
@@ -68,7 +68,7 @@
             <StateList>
                 <State Initial="true" Name="off">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="on"/>

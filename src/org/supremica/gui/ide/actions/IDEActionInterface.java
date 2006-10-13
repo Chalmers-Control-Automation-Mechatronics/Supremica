@@ -1,6 +1,7 @@
 
 package org.supremica.gui.ide.actions;
 
+import net.sourceforge.waters.subject.module.ModuleSubject;
 import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.IDEReportInterface;
@@ -12,7 +13,7 @@ import org.supremica.automata.Project;
 public interface IDEActionInterface
     extends IDEReportInterface
 {
-    public ModuleContainer createNewModuleContainer();
+	public ModuleSubject createNewModuleSubject();
     public ModuleContainer getActiveModuleContainer();
     public void add(ModuleContainer module);
     public void remove(ModuleContainer module);
@@ -27,5 +28,5 @@ public interface IDEActionInterface
     public Project getActiveProject();
     public Automata getAllAutomata();
     public Automata getUnselectedAutomata();
-    // int addAutomata(Automata theAutomata);    
+    // int addAutomata(Automata theAutomata);
 }

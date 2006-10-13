@@ -33,7 +33,7 @@
 <EventDecl Kind="UNCONTROLLABLE" Name="abfahrt"/>
 <EventDecl Kind="CONTROLLABLE" Name="bereitFahrt"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="einstiegBeendet"/>
-<EventDecl Kind="PROPOSITION" Name=":omega"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
 <ForeachComponent Name="i">
@@ -56,7 +56,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="112" Y="112"/>
@@ -143,7 +143,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="112" Y="96"/>
@@ -208,7 +208,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="127" Y="195"/>
@@ -273,7 +273,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="85" Y="197"/>
@@ -343,7 +343,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="112" Y="112"/>
@@ -428,7 +428,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="112" Y="96"/>
@@ -493,7 +493,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="112" Y="96"/>
@@ -558,7 +558,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="112" Y="96"/>
@@ -631,7 +631,7 @@
 <NodeList>
 <SimpleNode Name="einstieg">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="352" Y="208"/>
@@ -650,7 +650,7 @@
 </SimpleNode>
 <SimpleNode Name="ausstieg">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="256" Y="208"/>
@@ -661,7 +661,7 @@
 </SimpleNode>
 <SimpleNode Name="oeffnen">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="160" Y="208"/>
@@ -672,7 +672,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="inaktiv">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="64" Y="208"/>
@@ -759,7 +759,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="notInPlanhalt">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="80" Y="80"/>
@@ -770,7 +770,7 @@
 </SimpleNode>
 <SimpleNode Name="inPlanhalt">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="192" Y="80"/>
@@ -847,7 +847,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="notWendehaltAktiv">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="175" Y="160"/>

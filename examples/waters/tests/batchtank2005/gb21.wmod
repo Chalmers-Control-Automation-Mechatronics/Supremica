@@ -14,7 +14,7 @@
 <EventDecl Kind="UNCONTROLLABLE" Name="s1_on"/>
 <EventDecl Kind="CONTROLLABLE" Name="stirrer_off"/>
 <EventDecl Kind="CONTROLLABLE" Name="open_out"/>
-<EventDecl Kind="PROPOSITION" Name=":omega"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="SPEC">
@@ -38,7 +38,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="NO_REQ">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="128" X="176"/>
@@ -111,7 +111,7 @@
 <NodeList>
 <SimpleNode Name="FULL">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="176" X="304"/>
@@ -195,7 +195,7 @@
 </SimpleNode>
 <SimpleNode Name="FULL">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="224" X="240"/>
@@ -299,7 +299,7 @@
 </SimpleNode>
 <SimpleNode Name="UNSAFE_STIR">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="240" X="320"/>
@@ -387,7 +387,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="96" X="160"/>
@@ -417,7 +417,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="NOREQ">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="144" X="112"/>
@@ -474,7 +474,7 @@
 </SimpleNode>
 <SimpleNode Name="FULL">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="128" X="176"/>
@@ -573,7 +573,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="OFF">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="112" X="144"/>
@@ -584,7 +584,7 @@
 </SimpleNode>
 <SimpleNode Name="ON">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="112" X="224"/>
@@ -652,7 +652,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="CLOSED">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="112" X="144"/>
@@ -724,7 +724,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="CLOSED">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="112" X="144"/>

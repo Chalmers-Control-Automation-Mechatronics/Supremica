@@ -65,7 +65,7 @@
 <IntConstant Value="2"/>
 </BinaryExpression>
 </EventDecl>
-<EventDecl Kind="PROPOSITION" Name=":omega"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="SPEC">
@@ -144,7 +144,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="IN">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="187" X="161"/>
@@ -424,7 +424,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="IN">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="187" X="161"/>
@@ -659,7 +659,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="out">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="176" X="80"/>
@@ -800,7 +800,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="OFF">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="160" X="144"/>
@@ -901,7 +901,7 @@
 <SimpleNode Name="RQL"/>
 <SimpleNode Initial="true" Name="OUT">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 </SimpleNode>
 <SimpleNode Name="SWR"/>
@@ -1030,7 +1030,7 @@
 <SimpleNode Name="RQL"/>
 <SimpleNode Initial="true" Name="OUT">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 </SimpleNode>
 <SimpleNode Name="SWR"/>
@@ -1142,7 +1142,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 </SimpleNode>
 <SimpleNode Name="SWITCH"/>
@@ -1194,7 +1194,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="146" X="149"/>
@@ -1279,7 +1279,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="144" X="176"/>

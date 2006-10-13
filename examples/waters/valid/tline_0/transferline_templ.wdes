@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProductDES Name="transferline_templ" xmlns="http://waters.sourceforge.net/xsd/des">
     <EventList>
-        <Event Kind="PROPOSITION" Observable="true" Name=":omega"/>
+        <Event Kind="PROPOSITION" Observable="true" Name=":accepting"/>
         <Event Kind="CONTROLLABLE" Observable="true" Name="machine_load[1]"/>
         <Event Kind="UNCONTROLLABLE" Observable="true" Name="machine_unload[1]"/>
         <Event Kind="UNCONTROLLABLE" Observable="true" Name="tu_accept[0]"/>
@@ -13,14 +13,14 @@
     <AutomataList>
         <Automaton Kind="SPEC" Name="b2sp[1]">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="machine_unload[1]"/>
                 <EventRef Name="tu_load[1]"/>
             </EventRefList>
             <StateList>
                 <State Initial="true" Name="EMPTY">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Initial="false" Name="FULL"/>
@@ -32,7 +32,7 @@
         </Automaton>
         <Automaton Kind="SPEC" Name="b2sup_red[1]">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="machine_load[1]"/>
                 <EventRef Name="machine_unload[1]"/>
                 <EventRef Name="tu_load[1]"/>
@@ -40,7 +40,7 @@
             <StateList>
                 <State Initial="true" Name="EMPTY">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Initial="false" Name="FULL"/>
@@ -55,14 +55,14 @@
         </Automaton>
         <Automaton Kind="PLANT" Name="init">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="tu_accept[0]"/>
                 <EventRef Name="tu_load[0]"/>
             </EventRefList>
             <StateList>
                 <State Initial="true" Name="IDLE">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Initial="false" Name="WORKING"/>
@@ -74,14 +74,14 @@
         </Automaton>
         <Automaton Kind="PLANT" Name="machine[1]">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="machine_load[1]"/>
                 <EventRef Name="machine_unload[1]"/>
             </EventRefList>
             <StateList>
                 <State Initial="true" Name="IDLE">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Initial="false" Name="WORKING"/>
@@ -93,7 +93,7 @@
         </Automaton>
         <Automaton Kind="PLANT" Name="testunit[1]">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="tu_accept[1]"/>
                 <EventRef Name="tu_load[1]"/>
                 <EventRef Name="tu_reject[1]"/>
@@ -101,7 +101,7 @@
             <StateList>
                 <State Initial="true" Name="IDLE">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Initial="false" Name="WORKING"/>

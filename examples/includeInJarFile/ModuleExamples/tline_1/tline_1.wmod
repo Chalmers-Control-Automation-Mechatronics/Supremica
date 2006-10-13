@@ -40,7 +40,7 @@
 <IntConstant Value="1"/>
 </BinaryExpression>
 </EventDecl>
-<EventDecl Kind="PROPOSITION" Name=":omega"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
 <ForeachComponent Name="GROUP">
@@ -75,7 +75,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="EMPTY">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="208" Y="80"/>
@@ -269,7 +269,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="EMPTY">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="192" Y="64"/>
@@ -420,7 +420,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="EMPTY">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="224" Y="176"/>
@@ -505,7 +505,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="214" Y="162"/>
@@ -572,7 +572,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="234" Y="162"/>
@@ -644,7 +644,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="198" Y="162"/>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProductDES Name="smr26" xmlns="http://waters.sourceforge.net/xsd/des">
 <EventList>
-<Event Kind="PROPOSITION" Name=":omega"/>
+<Event Kind="PROPOSITION" Name=":accepting"/>
 <Event Kind="CONTROLLABLE" Name="close_in"/>
 <Event Kind="CONTROLLABLE" Name="close_out"/>
 <Event Kind="UNCONTROLLABLE" Name="jelly"/>
@@ -19,7 +19,7 @@
 <AutomataList>
 <Automaton Kind="SPEC" Name="dischargeonlywhenfull">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="open_out"/>
 <EventRef Name="s2_off"/>
 <EventRef Name="s2_on"/>
@@ -28,7 +28,7 @@
 <State Initial="true" Name="s0"/>
 <State Name="s1">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -40,7 +40,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="dischargeonrequest">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="open_out"/>
 <EventRef Name="req_start"/>
 <EventRef Name="req_stop"/>
@@ -48,7 +48,7 @@
 <StateList>
 <State Initial="true" Name="s0">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s1"/>
@@ -62,7 +62,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="dischargestop">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="close_out"/>
 <EventRef Name="open_out"/>
 <EventRef Name="req_stop"/>
@@ -71,7 +71,7 @@
 <StateList>
 <State Initial="true" Name="s0">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s1"/>
@@ -89,7 +89,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="noflow">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="close_in"/>
 <EventRef Name="close_out"/>
 <EventRef Name="open_in"/>
@@ -98,7 +98,7 @@
 <StateList>
 <State Initial="true" Name="s0">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s1"/>
@@ -113,7 +113,7 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="nojelly">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="close_in"/>
 <EventRef Name="close_out"/>
 <EventRef Name="open_in"/>
@@ -126,14 +126,14 @@
 <StateList>
 <State Initial="true" Name="s0">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s1"/>
 <State Name="s2"/>
 <State Name="s3">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="s4"/>
@@ -158,27 +158,27 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="prop_no_jelly">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="jelly"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="s0">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
 </Automaton>
 <Automaton Kind="PLANT" Name="requests">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="req_start"/>
 <EventRef Name="req_stop"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="NOREQ">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="REQ"/>
@@ -190,7 +190,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="sensors">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="jelly"/>
 <EventRef Name="s1_off"/>
 <EventRef Name="s1_on"/>
@@ -201,7 +201,7 @@
 <State Initial="true" Name="EMPTY"/>
 <State Name="FULL">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="PARTIAL"/>
@@ -217,7 +217,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="stirrer">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="jelly"/>
 <EventRef Name="stirrer_off"/>
 <EventRef Name="stirrer_on"/>
@@ -225,12 +225,12 @@
 <StateList>
 <State Initial="true" Name="OFF">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="ON">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -242,7 +242,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="valve_in">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="close_in"/>
 <EventRef Name="jelly"/>
 <EventRef Name="open_in"/>
@@ -252,7 +252,7 @@
 <StateList>
 <State Initial="true" Name="CLOSED">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="OPEN"/>
@@ -267,7 +267,7 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="valve_out">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="close_out"/>
 <EventRef Name="jelly"/>
 <EventRef Name="open_out"/>
@@ -277,7 +277,7 @@
 <StateList>
 <State Initial="true" Name="CLOSED">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="OPEN"/>

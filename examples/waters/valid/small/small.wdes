@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProductDES Name="small" xmlns="http://waters.sourceforge.net/xsd/des">
     <EventList>
-        <Event Kind="PROPOSITION" Name=":omega"/>
+        <Event Kind="PROPOSITION" Name=":accepting"/>
         <Event Kind="UNCONTROLLABLE" Name="break[1]"/>
         <Event Kind="UNCONTROLLABLE" Name="break[2]"/>
         <Event Kind="UNCONTROLLABLE" Name="finish[1]"/>
@@ -14,7 +14,7 @@
     <AutomataList>
         <Automaton Kind="SPEC" Name="buffer">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="finish[1]"/>
                 <EventRef Name="start[1]"/>
                 <EventRef Name="start[2]"/>
@@ -22,7 +22,7 @@
             <StateList>
                 <State Initial="true" Name="empty">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="full"/>
@@ -35,7 +35,7 @@
         </Automaton>
         <Automaton Kind="PLANT" Name="machine[1]">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="break[1]"/>
                 <EventRef Name="finish[1]"/>
                 <EventRef Name="repair[1]"/>
@@ -45,7 +45,7 @@
                 <State Name="down"/>
                 <State Initial="true" Name="idle">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="working"/>
@@ -59,7 +59,7 @@
         </Automaton>
         <Automaton Kind="PLANT" Name="machine[2]">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="break[2]"/>
                 <EventRef Name="finish[2]"/>
                 <EventRef Name="repair[2]"/>
@@ -69,7 +69,7 @@
                 <State Name="down"/>
                 <State Initial="true" Name="idle">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="working"/>
@@ -83,7 +83,7 @@
         </Automaton>
         <Automaton Kind="SPEC" Name="repair">
             <EventRefList>
-                <EventRef Name=":omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="break[2]"/>
                 <EventRef Name="repair[1]"/>
                 <EventRef Name="repair[2]"/>
@@ -91,7 +91,7 @@
             <StateList>
                 <State Initial="true" Name="m1">
                     <EventRefList>
-                        <EventRef Name=":omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Name="m2"/>

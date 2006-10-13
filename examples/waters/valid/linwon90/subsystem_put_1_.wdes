@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProductDES Name="subsystem" xmlns="http://waters.sourceforge.net/xsd/des">
 <EventList>
-<Event Kind="PROPOSITION" Name=":omega"/>
+<Event Kind="PROPOSITION" Name=":accepting"/>
 <Event Kind="CONTROLLABLE" Name="load[1]"/>
 <Event Kind="CONTROLLABLE" Name="unload[1]"/>
 </EventList>
 <AutomataList>
 <Automaton Kind="SPEC" Name=":reduced">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="load[1]"/>
 <EventRef Name="unload[1]"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="i0">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="i1:w0"/>
@@ -30,14 +30,14 @@
 </Automaton>
 <Automaton Kind="SPEC" Name="subsystem:put[1]">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="load[1]"/>
 <EventRef Name="unload[1]"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="i0">
 <EventRefList>
-<EventRef Name=":omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="i1"/>

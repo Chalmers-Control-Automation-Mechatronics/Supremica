@@ -8,7 +8,7 @@
 <EventDecl Kind="CONTROLLABLE" Name="exit"/>
 <EventDecl Kind="CONTROLLABLE" Name="clear"/>
 <EventDecl Kind="CONTROLLABLE" Name="unlock"/>
-<EventDecl Kind="PROPOSITION" Name=":omega"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="PLANT">

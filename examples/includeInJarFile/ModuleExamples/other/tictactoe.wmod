@@ -41,7 +41,7 @@
   </EventDecl>
   <EventDecl Name="black_win_d1" Kind="UNCONTROLLABLE"/>
   <EventDecl Name="black_win_d2" Kind="UNCONTROLLABLE"/>
-  <EventDecl Name=":omega" Kind="PROPOSITION"/>
+  <EventDecl Name=":accepting" Kind="PROPOSITION"/>
 </EventDeclList>
 <EventAliasList>
   <EventAlias>
@@ -223,7 +223,7 @@
         <SimpleNode Name="game" Initial="true"/>
         <SimpleNode Name="over">
           <EventList>
-            <SimpleIdentifier Name=":omega"/>
+            <SimpleIdentifier Name=":accepting"/>
           </EventList>
         </SimpleNode>
       </NodeList>

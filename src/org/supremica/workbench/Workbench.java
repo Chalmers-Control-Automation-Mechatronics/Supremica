@@ -164,6 +164,14 @@ public class Workbench
 	}
 
 	/**
+	 * Add current automaton to the project
+	 */
+	void addAutomaton()
+	{
+		project.addAutomaton(automaton);
+	}
+
+	/**
 	 * Updates the enabled status of the buttons.
 	 */
 	void updateButtons()
@@ -377,7 +385,7 @@ class CompareButton
 		});
 	}
 
-	/** 
+	/**
 	 * Compare the synched result with the plant If the automaton
 	 * exists, calc new states (only) and manually set the
 	 * forbiddenness
@@ -742,11 +750,14 @@ class DoneButton
 		// Add to gui?
 		if (wb.automaton != null && wb.toAddIt())
 		{
+			wb.addAutomaton();
+			/*
 			Gui gui = ActionMan.getGui();
 			if (gui != null)
 			{
 				gui.addAutomaton(wb.automaton);
 			}
+			*/
 		}
 
 		// Exit

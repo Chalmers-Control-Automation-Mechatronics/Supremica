@@ -22,7 +22,7 @@
 <EventDecl Kind="CONTROLLABLE" Name="repair">
 <SimpleIdentifier Name="MACHS"/>
 </EventDecl>
-<EventDecl Kind="PROPOSITION" Name=":omega"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="SPEC">
@@ -39,7 +39,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="empty">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="176" X="176"/>
@@ -120,7 +120,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="idle">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="128" X="256"/>

@@ -267,7 +267,7 @@ public class ScheduleDialog
 			}
 			else if (optiMethodsBox.getSelectedItem().equals(MILP))
 			{
-				sched = new Milp(ActionMan.getGui().getSelectedAutomata(), buildAutomaton.isSelected(), this);
+				sched = new Milp(ActionMan.getGui().getVisualProjectContainer().getActiveProject(), ActionMan.getGui().getSelectedAutomata(), buildAutomaton.isSelected(), this);
 			}
 			else if (optiMethodsBox.getSelectedItem().equals(VIS_GRAPH))
 			{

@@ -13,7 +13,7 @@
 <EventDecl Kind="CONTROLLABLE" Name="start1"/>
 <EventDecl Kind="CONTROLLABLE" Name="start2"/>
 <EventDecl Kind="CONTROLLABLE" Name="start3"/>
-<EventDecl Kind="PROPOSITION" Name=":omega"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="SPEC">
@@ -37,7 +37,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="s0">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="32" X="144"/>
@@ -141,7 +141,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="64" X="144"/>
@@ -237,7 +237,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="64" X="144"/>
@@ -317,7 +317,7 @@
 </SimpleNode>
 <SimpleNode Initial="true" Name="IDLE">
 <EventList>
-<SimpleIdentifier Name=":omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point Y="64" X="144"/>

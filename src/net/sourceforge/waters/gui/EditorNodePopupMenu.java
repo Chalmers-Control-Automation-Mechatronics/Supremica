@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNodePopupMenu
 //###########################################################################
-//# $Id: EditorNodePopupMenu.java,v 1.18 2006-09-26 02:39:40 siw4 Exp $
+//# $Id: EditorNodePopupMenu.java,v 1.19 2006-10-13 14:14:30 knut Exp $
 //###########################################################################
 
 
@@ -47,7 +47,9 @@ class EditorNodePopupMenu
     private JMenuItem initialItem;
     private JMenuItem recallItem;
     private JMenuItem markItem;
+    private JMenuItem forbidItem;
     private JMenuItem clearItem;
+    private JMenuItem clearForbidItem;
     private JMenuItem createSelfLoop;
 
     public EditorNodePopupMenu(ControlledSurface parent, SimpleNodeSubject node)
@@ -112,6 +114,7 @@ class EditorNodePopupMenu
         }
         markItem = item;
 
+
         item = new JMenuItem("Clear marking");
         item.addActionListener(this);
         this.add(item);
@@ -122,6 +125,30 @@ class EditorNodePopupMenu
             item.setToolTipText("State has no marking");
         }
         clearItem = item;
+
+        item = new JMenuItem("Forbid state");
+        item.addActionListener(this);
+        this.add(item);
+        // Disable if there are no propositions
+        if (!node.getPropositions().getEventList().isEmpty())
+        {
+            item.setEnabled(false);
+            item.setToolTipText("State is marked already");
+        }
+        forbidItem = item;
+
+        item = new JMenuItem("Clear forbidden marking");
+        item.addActionListener(this);
+        this.add(item);
+        // Disable if there are no propositions
+        if (node.getPropositions().getEventList().isEmpty())
+        {
+            item.setEnabled(false);
+            item.setToolTipText("State is not forbidden");
+        }
+        clearForbidItem = item;
+
+
         item = new JMenuItem("Create Self Loop");
         item.addActionListener(this);
         this.add(item);
@@ -173,6 +200,34 @@ class EditorNodePopupMenu
         }
 
         if (e.getSource() == clearItem)
+        {
+            // Should not be a loop... one undo should do it all!
+            while (node.getPropositions().getEventList().size() > 0)
+            {
+                AbstractSubject proposition = node.getPropositions().getEventListModifiable().get(0);
+                Command c = new RemoveEventCommand
+                    (node.getPropositions(),
+                    proposition);
+                parent.getEditorInterface().getUndoInterface().executeCommand(c);
+            }
+        }
+        if (e.getSource() == forbidItem)
+        {
+            EventDeclSubject d = new EventDeclSubject(EventDeclProxy.DEFAULT_FORBIDDEN_NAME,
+                EventKind.PROPOSITION);
+            if (!parent.getModule().getEventDeclListModifiable()
+            .containsName(EventDeclProxy.DEFAULT_FORBIDDEN_NAME))
+            {
+                parent.getModule().getEventDeclListModifiable().add(d);
+            }
+            Command c = new AddEventCommand
+                (node.getPropositions(),
+                new SimpleIdentifierSubject(EventDeclProxy.DEFAULT_FORBIDDEN_NAME),
+                0);
+            parent.getEditorInterface().getUndoInterface().executeCommand(c);
+        }
+
+        if (e.getSource() == clearForbidItem)
         {
             // Should not be a loop... one undo should do it all!
             while (node.getPropositions().getEventList().size() > 0)
