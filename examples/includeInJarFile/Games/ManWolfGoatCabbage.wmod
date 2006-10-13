@@ -15,6 +15,7 @@
         <EventDecl Kind="UNCONTROLLABLE" Name="wolfEatGoatR"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="goatEatCabbageR"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="goatEatCabbageL"/>
+        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT">
@@ -438,15 +439,18 @@
                             <Point Y="-5" X="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="8" X="6"/>
+                            <Point Y="4" X="4"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="1">
+                        <EventList>
+                            <SimpleIdentifier Name=":forbidden"/>
+                        </EventList>
                         <PointGeometry>
-                            <Point Y="235" X="233"/>
+                            <Point Y="96" X="96"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-24" X="-22"/>
+                            <Point Y="-18" X="-18"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -462,13 +466,13 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <StartPointGeometry>
-                            <Point Y="235" X="233"/>
+                            <Point Y="96" X="96"/>
                         </StartPointGeometry>
                         <SplineGeometry>
-                            <Point Y="269" X="266"/>
+                            <Point Y="130" X="129"/>
                         </SplineGeometry>
                         <EndPointGeometry>
-                            <Point Y="235" X="233"/>
+                            <Point Y="96" X="96"/>
                         </EndPointGeometry>
                     </Edge>
                 </EdgeList>

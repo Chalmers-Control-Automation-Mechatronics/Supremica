@@ -17,11 +17,13 @@
 		<State id="5" name="q5"/>
 		<State id="6" name="q6"/>
 		<State id="7" name="q7"/>
+		<State id="8" name="q8"/>
 	</States>
 	<Transitions>
 		<Transition source="0" dest="1" event="a"/>
 		<Transition source="0" dest="2" event="b"/>
 		<Transition source="1" dest="3" event="c"/>
+		<Transition source="1" dest="3" event="d"/>
 		<Transition source="2" dest="3" event="c"/>
 		<Transition source="2" dest="5" event="d"/>
 		<Transition source="4" dest="1" event="c"/>

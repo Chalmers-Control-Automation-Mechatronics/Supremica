@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="Stick picking game" xmlns="http://waters.sourceforge.net/xsd/module">
-<!--
 <Module Name="Stick picking game" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
 <ns2:Comment>Two players alternatingly take one, two or three sticks. The player who takes the last stick loses. If you take the first turn, can you guarantee that you will not lose? In this model, not losing is equivalent to reaching a marked state, and only your own moves are controllable. Try to synthesize a controllable and nonblocking supervisor!</ns2:Comment>
--->
 <EventDeclList>
 <EventDecl Kind="CONTROLLABLE" Name="player1_remove_one"/>
 <EventDecl Kind="CONTROLLABLE" Name="player1_remove_two"/>
