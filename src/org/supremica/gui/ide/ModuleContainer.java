@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.44 2006-10-13 14:14:30 knut Exp $
+//# $Id: ModuleContainer.java,v 1.45 2006-10-13 16:04:30 knut Exp $
 //###########################################################################
 
 
@@ -61,6 +61,7 @@ import net.sourceforge.waters.subject.module.ParameterSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.supremica.properties.Config;
 import org.supremica.automata.IO.ProjectBuildFromWaters;
 import org.supremica.automata.Project;
 import org.supremica.automata.Automaton;
@@ -449,10 +450,12 @@ public class ModuleContainer implements UndoInterface
         mVisualProject.addAutomata(supremicaProject);
         mVisualProject.updated();
 
-/*
-                ProductDESImporter importer = new ProductDESImporter(ModuleSubjectFactory.getInstance());
-                flatModule = (ModuleSubject) importer.importModule(mVisualProject);
- */
+		if (Config.GUI_ANALYZER_AUTOMATONVIEWER_USE_CONTROLLED_SURFACE.isTrue())
+		{
+        	ProductDESImporter importer = new ProductDESImporter(ModuleSubjectFactory.getInstance());
+        	flatModule = (ModuleSubject) importer.importModule(mVisualProject);
+		}
+
         return true;
     }
 

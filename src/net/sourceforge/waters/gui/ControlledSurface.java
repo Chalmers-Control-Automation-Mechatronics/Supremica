@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.88 2006-10-10 00:49:32 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.89 2006-10-13 16:04:30 knut Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -86,34 +86,50 @@ public class ControlledSurface
     {
       super(graph, module, new SubjectShapeProducer(graph, module));
       graph.addModelObserver(this);
-      root = r;
-      mToolbar = t;
-      t.attach(this);
-      mController = new SelectListener();
-      addMouseListener(mController);
-      addMouseListener(new MouseAdapter()
+
+      mutable = (r != null && t != null);
+
+      if (mutable)
       {
-          public void mousePressed(MouseEvent e)
-          {
-              ControlledSurface.this.requestFocusInWindow();
-          }
-      });
-      addMouseMotionListener(mController);
-      addKeyListener(new KeySpy());
-      setFocusable(true);
-      dtListener = new DTListener();
-      dropTarget = new DropTarget(this, dtListener);
-      mDragSource = DragSource.getDefaultDragSource();
-      mDGListener = new DGListener();
-      mDSListener = new DSListener();
-  
-      // component, action, listener
-      mDragSource.createDefaultDragGestureRecognizer(this,
-                              mDragAction,
-                              mDGListener);
-      mDragSource.addDragSourceListener(mDSListener);
+		  root = r;
+		  mToolbar = t;
+		  t.attach(this);
+		  mController = new SelectListener();
+		  addMouseListener(mController);
+		  addMouseListener(new MouseAdapter()
+		  {
+			  public void mousePressed(MouseEvent e)
+			  {
+				  ControlledSurface.this.requestFocusInWindow();
+			  }
+		  });
+		  addMouseMotionListener(mController);
+		  addKeyListener(new KeySpy());
+		  setFocusable(true);
+		  dtListener = new DTListener();
+		  dropTarget = new DropTarget(this, dtListener);
+		  mDragSource = DragSource.getDefaultDragSource();
+		  mDGListener = new DGListener();
+		  mDSListener = new DSListener();
+
+		  // component, action, listener
+		  mDragSource.createDefaultDragGestureRecognizer(this,
+								  mDragAction,
+								  mDGListener);
+		  mDragSource.addDragSourceListener(mDSListener);
+      }
     }
 
+
+    //#########################################################################
+    //# Constructor
+    //# Create an immutable Controlled Surface
+    public ControlledSurface(GraphSubject graph,
+        ModuleSubject module)
+      throws GeometryAbsentException
+    {
+		this(graph, module, null, null);
+    }
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.ModelObserver
@@ -3044,7 +3060,7 @@ public class ControlledSurface
             return rect;
         }
     }
-    
+
     private class DSListener extends DragSourceAdapter
     {
       public void dragOver(DragSourceDragEvent e)
@@ -3058,7 +3074,7 @@ public class ControlledSurface
         }
       }
     }
-  
+
     private class DGListener implements DragGestureListener
     {
       public void dragGestureRecognized(final DragGestureEvent event)
@@ -3076,7 +3092,7 @@ public class ControlledSurface
         }
       }
     }
-    
+
     private IdentifierSubject DNDLabel(Point pos) {
       for (ProxySubject s : selectedObjects) {
         try {
@@ -3091,7 +3107,7 @@ public class ControlledSurface
       }
       return null;
     }
-    
+
     //#########################################################################
     //# Data Members
     private ControlledToolbar mToolbar;
@@ -3138,6 +3154,8 @@ public class ControlledSurface
 
     private boolean newGroup = false;
 
+    private boolean mutable = false;
+
 
     //#########################################################################
     //# Class Constants
@@ -3150,12 +3168,12 @@ public class ControlledSurface
         EDGE,
         EVENT;
     }
-    
+
     private DragSource mDragSource;
     private DragGestureListener mDGListener;
     private DragSourceListener mDSListener;
     private int mDragAction = DnDConstants.ACTION_COPY;
-    
+
     public static boolean mDND = false;
     /** is not being draggedOver*/
     public static final int NOTDRAG = 0;
