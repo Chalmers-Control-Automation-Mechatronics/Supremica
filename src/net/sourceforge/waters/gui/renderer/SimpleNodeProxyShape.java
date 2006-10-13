@@ -120,15 +120,15 @@ public class SimpleNodeProxyShape
                     mColors.add(EditorColor.DEFAULTMARKINGCOLOR);
                     continue;
                 }
+                if (decl.getName().equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME))
+                {
+                    isForbidden = true;
+                    continue;
+                }
                 final ColorGeometryProxy geo = decl.getColorGeometry();
                 if (geo == null)
                 {
                     mColors.add(EditorColor.DEFAULTMARKINGCOLOR);
-                    continue;
-                }
-                if (decl.getName().equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME))
-                {
-                    isForbidden = true;
                     continue;
                 }
                 mColors.addAll(geo.getColorSet());
