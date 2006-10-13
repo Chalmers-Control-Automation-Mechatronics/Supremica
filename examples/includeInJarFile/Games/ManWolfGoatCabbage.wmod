@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="Man, Wolf, Goat, Cabbage" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>A man is standing on the left bank of a river with a wolf, a goat and a gigantic cabbage head. He has a boat with which he can cross the river but there is not enough room for more than one of his possessions. If left unattended, the wolf will eat the goat or the goat will eat the cabbage head. How should the man proceed do cross the river?</ns2:Comment>
+    <ns2:Comment>A man is standing on the left bank of a river with a wolf, a goat and a gigantic cabbage head. He has a boat with which he can cross the river but there is not enough room for more than one of his possessions. If left unattended, the wolf would eat the goat and the goat would eat the cabbage. How should the man proceed do cross the river?</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Name="mc"/>
@@ -87,8 +87,8 @@
                     </Edge>
                     <Edge Target="ml" Source="ml">
                         <LabelBlock>
-                            <SimpleIdentifier Name="eatCabbageR"/>
-                            <SimpleIdentifier Name="eatGoatR"/>
+                            <SimpleIdentifier Name="goatEatCabbageR"/>
+                            <SimpleIdentifier Name="wolfEatGoatR"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-25" X="41"/>
                             </LabelGeometry>
@@ -105,8 +105,8 @@
                     </Edge>
                     <Edge Target="mr" Source="mr">
                         <LabelBlock>
-                            <SimpleIdentifier Name="eatGoatL"/>
-                            <SimpleIdentifier Name="eatCabbageL"/>
+                            <SimpleIdentifier Name="wolfEatGoatL"/>
+                            <SimpleIdentifier Name="goatEatCabbageL"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="3" X="0"/>
                             </LabelGeometry>
@@ -188,7 +188,7 @@
                     </Edge>
                     <Edge Target="wr" Source="wr">
                         <LabelBlock>
-                            <SimpleIdentifier Name="eatGoatR"/>
+                            <SimpleIdentifier Name="wolfEatGoatR"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="5" X="-3"/>
                             </LabelGeometry>
@@ -205,7 +205,7 @@
                     </Edge>
                     <Edge Target="wl" Source="wl">
                         <LabelBlock>
-                            <SimpleIdentifier Name="eatGoatL"/>
+                            <SimpleIdentifier Name="wolfEatGoatL"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-17" X="33"/>
                             </LabelGeometry>
@@ -287,8 +287,8 @@
                     </Edge>
                     <Edge Target="gr" Source="gr">
                         <LabelBlock>
-                            <SimpleIdentifier Name="eatCabbageR"/>
-                            <SimpleIdentifier Name="eatGoatR"/>
+                            <SimpleIdentifier Name="goatEatCabbageR"/>
+                            <SimpleIdentifier Name="wolfEatGoatR"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-10" X="9"/>
                             </LabelGeometry>
@@ -305,8 +305,8 @@
                     </Edge>
                     <Edge Target="gl" Source="gl">
                         <LabelBlock>
-                            <SimpleIdentifier Name="eatCabbageL"/>
-                            <SimpleIdentifier Name="eatGoatL"/>
+                            <SimpleIdentifier Name="goatEatCabbageL"/>
+                            <SimpleIdentifier Name="wolfEatGoatL"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-23" X="44"/>
                             </LabelGeometry>
@@ -388,7 +388,7 @@
                     </Edge>
                     <Edge Target="cl" Source="cl">
                         <LabelBlock>
-                            <SimpleIdentifier Name="eatCabbageL"/>
+                            <SimpleIdentifier Name="goatEatCabbageL"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-20" X="38"/>
                             </LabelGeometry>
@@ -405,7 +405,7 @@
                     </Edge>
                     <Edge Target="cr" Source="cr">
                         <LabelBlock>
-                            <SimpleIdentifier Name="eatCabbageR"/>
+                            <SimpleIdentifier Name="goatEatCabbageR"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="3" X="5"/>
                             </LabelGeometry>
@@ -453,10 +453,10 @@
                 <EdgeList>
                     <Edge Target="1" Source="1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="eatCabbageL"/>
-                            <SimpleIdentifier Name="eatCabbageR"/>
-                            <SimpleIdentifier Name="eatGoatL"/>
-                            <SimpleIdentifier Name="eatGoatR"/>
+                            <SimpleIdentifier Name="goatEatCabbageL"/>
+                            <SimpleIdentifier Name="goatEatCabbageR"/>
+                            <SimpleIdentifier Name="wolfEatGoatL"/>
+                            <SimpleIdentifier Name="wolfEatGoatR"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="10" X="0"/>
                             </LabelGeometry>

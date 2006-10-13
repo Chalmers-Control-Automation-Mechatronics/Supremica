@@ -101,7 +101,7 @@ public class BenchmarkAutomataVerifier
         
         // Controllability / Nonblocking
         vOptions = VerificationOptions.getDefaultNonblockingOptions();
-        int type = 1;
+        int type = 0;
         if (type == 0)
             // Nonblocking
             vOptions.setVerificationType(VerificationType.NONBLOCKING);
@@ -141,9 +141,9 @@ public class BenchmarkAutomataVerifier
         MinimizationHeuristic[] heuristicArray =
         {
 			/*
-			*/
             MinimizationHeuristic.MostLocal,
 			MinimizationHeuristic.MostCommon,
+			*/
 			MinimizationHeuristic.FewestStates,
 			MinimizationHeuristic.FewestEvents,
 			MinimizationHeuristic.LeastExtension,

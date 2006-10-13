@@ -241,7 +241,7 @@ public class AutomataMinimizer
                 if (min.nbrOfStates() == 1 && !min.getInitialState().isAccepting())
                 {
                     // Return a one state blocking automaton (min for example)
-                    logger.info("Early termination!");
+                    logger.info("Early termination--a blocking state can be reached silently!");
                     min.hide(new Alphabet(min.getAlphabet()), false);
                     theAutomata = new Automata(min);
                     continue;
