@@ -11,7 +11,7 @@ public class SanchezTestCase
 	public SanchezTestCase(int blocks, int type)
 	{
 		this.blocks = blocks;
-		project = new Project();
+		project = new Project("Benchmark example");
 
 		if (type == 0)
 		{

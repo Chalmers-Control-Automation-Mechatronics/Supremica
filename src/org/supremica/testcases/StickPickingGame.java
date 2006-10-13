@@ -192,7 +192,7 @@ class Players
 
 public class StickPickingGame
 {
-    Project project = new Project();
+    Project project = new Project("Stick picking game");
     
     public StickPickingGame(int players, int sticks)
     throws Exception

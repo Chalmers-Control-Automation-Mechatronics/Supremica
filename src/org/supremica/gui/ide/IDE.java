@@ -237,17 +237,17 @@ public class IDE
 		installContainer(module, true);
     }
 
-    public void installContainer(final ModuleSubject module, boolean showComments)
+    public void installContainer(final ModuleSubject module, boolean showComment)
     {
         final ModuleContainer moduleContainer = new ModuleContainer(this, module);
 		moduleContainer.addStandardPropositions();
 
         add(moduleContainer);
         setActive(moduleContainer);
-        if (showComments)
+        if (showComment)
         {
-        	moduleContainer.getEditorPanel().showComment(module.getComment());
-		}
+            moduleContainer.getEditorPanel().showComment();
+        }
     }
 
     public JFrame getFrame()

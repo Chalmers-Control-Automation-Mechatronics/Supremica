@@ -21,7 +21,7 @@ public class TransferLine
 	public TransferLine(int cells, int cap1, int cap2, boolean sanchez_models)
 	{
 		this.sanchez_models = sanchez_models;
-		project = new Project();
+		project = new Project("Transfer line");
 		if (!sanchez_models)
 		{
 			project.setComment("This testcase is based on the Transfer Line " + 

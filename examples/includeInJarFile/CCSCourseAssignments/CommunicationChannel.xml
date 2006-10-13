@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Automata name="CommunicationChannel"  major="0"  minor="9" >
+<Automata name="Communication channel"  major="0"  minor="9" >
 <Automaton name="sender" type="Plant">
 	<Events>
 		<Event id="cksumerrack" label="cksumerrack" controllable="false"/>

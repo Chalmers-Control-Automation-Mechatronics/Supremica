@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   MainPanel
 //###########################################################################
-//# $Id: MainPanel.java,v 1.20 2006-10-12 20:47:03 flordal Exp $
+//# $Id: MainPanel.java,v 1.21 2006-10-13 22:04:09 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -118,8 +118,11 @@ abstract class MainPanel
         return editorPanel.getActiveEditorWindowInterface();
     }
     
-    public void showComment(String comment)
+    public void showComment()
     {
+        String name = getModuleSubject().getName();
+        String comment = getModuleSubject().getComment();
+        
         //Create the text pane and configure it.
         JTextPane textPane = new JTextPane();
         AbstractDocument doc;
@@ -142,8 +145,11 @@ abstract class MainPanel
         {
             SimpleAttributeSet attributes = new SimpleAttributeSet();
             //StyleConstants.setFontFamily(attributes, "SansSerif");
+            StyleConstants.setFontSize(attributes, 14);
+            StyleConstants.setBold(attributes, true);
+            doc.insertString(doc.getLength(), name + "\n", attributes);
             StyleConstants.setFontSize(attributes, 12);
-            //StyleConstants.setBold(attributes, true);
+            StyleConstants.setBold(attributes, false);
             doc.insertString(doc.getLength(), comment, attributes);
         }
         catch (BadLocationException ex)

@@ -25,7 +25,7 @@ public class PigeonHole
 	{
 		this.pigeons = pigeons;
 		this.holes = holes;
-		project = new Project();
+		project = new Project("Pigeon-hole principle");
 
 		// if(first)
 		project.setComment("The Pigeon-Hole Principle (PHP): having n pigeons in m holes, if m < n, " + "then there is at least one hole that contains more than one pigeon. " + "Note that similar situations often arise in reality, for example in a batch system with large buffers. " + "In this testcase model, the (globally) marked states represent states where all the pigeons are inside the " + "holes, but there is no more than one pigeon in each hole. Clearly, if m < n, this can not be achieved  " + "and the system is blocking. Here, we have choosen a model where each Pigeon and Hole have unique " + "identies, which makes the problem very hard. " + "An anonymous Petri-Net model on the other hand, would be extremly easy to traverse. " + "To see why this problem is so hard, refer to 'The Intractability of Resolution' by A. Haken. ");

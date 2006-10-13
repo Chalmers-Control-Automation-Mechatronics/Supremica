@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Automata name="Untitled"  major="0"  minor="9" >
+<Automata name="Flexible manufacturing system" comment="Machine 1 is connected to machine 2 via a buffer and the same holds for 3 and 4. Machines 2 and 4 output their products into a buffer that serves machine 5." major="0"  minor="9" >
 <Automaton name="M5" type="Plant">
 	<Events>
 		<Event id="f5" label="f5" controllable="false"/>

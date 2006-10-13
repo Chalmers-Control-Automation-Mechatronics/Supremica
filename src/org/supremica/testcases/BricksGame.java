@@ -187,7 +187,7 @@ class BrickBuilder
 
 public class BricksGame
 {
-	private Project project = new Project();
+	private Project project = new Project("Bricks game");
 
 	public BricksGame(int rows, int cols)
 		throws Exception

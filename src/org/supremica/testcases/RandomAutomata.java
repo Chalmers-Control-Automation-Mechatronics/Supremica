@@ -19,7 +19,7 @@ public class RandomAutomata
 
 	public RandomAutomata(int num, int states, int events, double dens)
 	{
-		project = new Project();
+		project = new Project("Random automata");
 
 		if (first)
 		{

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Automata name="Parrows protocol" comment="Parrow's protocol, an ideal protocol for data transmission, however not physically viable since the 'acknowledgement' signals also have to travel in an unreliable medium. The Sender, Receiver and Medium should together show the Desired behaviour. A physically viable protocol is the alternating bit protocol.">
+<Automata name="Parrow's protocol" comment="Parrow's protocol, an ideal protocol for data transmission, however not physically viable since the 'acknowledgement' signals also have to travel in an unreliable medium. The Sender, Receiver and Medium should together show the Desired behaviour. A physically viable protocol is the alternating bit protocol.">
 <Automaton name="Sender" type="Plant">
 	<Events>
 		<Event id="send"/>
