@@ -1284,7 +1284,7 @@ public class State
     public Collection<EventProxy> getPropositions()
     {
         LinkedList<EventProxy> currPropositions = new LinkedList<EventProxy>();
-        if (isAccepting())
+        if (isAccepting() && !isForbidden())
         {
             currPropositions.add(acceptingProposition);
         }

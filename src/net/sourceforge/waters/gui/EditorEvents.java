@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.27 2006-10-07 20:20:12 robi Exp $
+//# $Id: EditorEvents.java,v 1.28 2006-10-13 15:07:23 knut Exp $
 //###########################################################################
 
 
@@ -35,6 +35,7 @@ import javax.swing.ActionMap;
 import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JFormattedTextField;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTable;
@@ -434,6 +435,7 @@ public class EditorEvents
 	private DragSourceListener mDSListener;
 	private int mDragAction = DnDConstants.ACTION_COPY;
 	private final EditorWindowInterface mRoot;
+	private final JPopupMenu popupMenu = new JPopupMenu();
 
 
 	//#######################################################################

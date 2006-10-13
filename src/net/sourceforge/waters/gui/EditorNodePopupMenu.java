@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNodePopupMenu
 //###########################################################################
-//# $Id: EditorNodePopupMenu.java,v 1.19 2006-10-13 14:14:30 knut Exp $
+//# $Id: EditorNodePopupMenu.java,v 1.20 2006-10-13 15:07:23 knut Exp $
 //###########################################################################
 
 
@@ -49,7 +49,6 @@ class EditorNodePopupMenu
     private JMenuItem markItem;
     private JMenuItem forbidItem;
     private JMenuItem clearItem;
-    private JMenuItem clearForbidItem;
     private JMenuItem createSelfLoop;
 
     public EditorNodePopupMenu(ControlledSurface parent, SimpleNodeSubject node)
@@ -114,18 +113,6 @@ class EditorNodePopupMenu
         }
         markItem = item;
 
-
-        item = new JMenuItem("Clear marking");
-        item.addActionListener(this);
-        this.add(item);
-        // Disable if there are no propositions
-        if (node.getPropositions().getEventList().isEmpty())
-        {
-            item.setEnabled(false);
-            item.setToolTipText("State has no marking");
-        }
-        clearItem = item;
-
         item = new JMenuItem("Forbid state");
         item.addActionListener(this);
         this.add(item);
@@ -137,19 +124,18 @@ class EditorNodePopupMenu
         }
         forbidItem = item;
 
-        item = new JMenuItem("Clear forbidden marking");
+        item = new JMenuItem("Clear propositions");
         item.addActionListener(this);
         this.add(item);
         // Disable if there are no propositions
         if (node.getPropositions().getEventList().isEmpty())
         {
             item.setEnabled(false);
-            item.setToolTipText("State is not forbidden");
+            item.setToolTipText("State has no propositions");
         }
-        clearForbidItem = item;
+        clearItem = item;
 
-
-        item = new JMenuItem("Create Self Loop");
+        item = new JMenuItem("Create self loop");
         item.addActionListener(this);
         this.add(item);
         createSelfLoop = item;
@@ -199,9 +185,9 @@ class EditorNodePopupMenu
             parent.getEditorInterface().getUndoInterface().executeCommand(c);
         }
 
-        if (e.getSource() == clearItem)
+        if (e.getSource() == forbidItem)
         {
-            // Should not be a loop... one undo should do it all!
+            // First remove all other propositions
             while (node.getPropositions().getEventList().size() > 0)
             {
                 AbstractSubject proposition = node.getPropositions().getEventListModifiable().get(0);
@@ -210,9 +196,7 @@ class EditorNodePopupMenu
                     proposition);
                 parent.getEditorInterface().getUndoInterface().executeCommand(c);
             }
-        }
-        if (e.getSource() == forbidItem)
-        {
+
             EventDeclSubject d = new EventDeclSubject(EventDeclProxy.DEFAULT_FORBIDDEN_NAME,
                 EventKind.PROPOSITION);
             if (!parent.getModule().getEventDeclListModifiable()
@@ -227,7 +211,7 @@ class EditorNodePopupMenu
             parent.getEditorInterface().getUndoInterface().executeCommand(c);
         }
 
-        if (e.getSource() == clearForbidItem)
+        if (e.getSource() == clearItem)
         {
             // Should not be a loop... one undo should do it all!
             while (node.getPropositions().getEventList().size() > 0)
@@ -239,7 +223,6 @@ class EditorNodePopupMenu
                 parent.getEditorInterface().getUndoInterface().executeCommand(c);
             }
         }
-
         if (e.getSource() == createSelfLoop)
         {
             Point2D p = node.getPointGeometry().getPoint();
