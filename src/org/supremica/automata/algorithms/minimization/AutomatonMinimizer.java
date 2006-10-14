@@ -1766,7 +1766,7 @@ public class AutomatonMinimizer
     }
     public static String getStatisticsLaTeX()
     {
-        return(totalAE + " & " + totalSC + " & " + totalOSI + " & " + totalOSO + " & " + totalCC + " & " + totalOES + " & " + totalOET);
+        return(totalAE + " & " + totalSC + " & " + totalCC + " & " + totalOSI + " & " + totalOSO + " & " + totalOES + " & " + totalOET);
     }
     public static String getWodesStatisticsLaTeX()
     {

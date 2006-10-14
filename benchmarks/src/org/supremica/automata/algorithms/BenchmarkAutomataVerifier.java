@@ -101,7 +101,7 @@ public class BenchmarkAutomataVerifier
         
         // Controllability / Nonblocking
         vOptions = VerificationOptions.getDefaultNonblockingOptions();
-        int type = 0;
+        int type = 1;
         if (type == 0)
             // Nonblocking
             vOptions.setVerificationType(VerificationType.NONBLOCKING);
@@ -113,7 +113,7 @@ public class BenchmarkAutomataVerifier
             vOptions.setVerificationType(VerificationType.CONTROLLABILITYNONBLOCKING);
         
         // Compositional / Modular
-        int algo = 0;
+        int algo = 1;
         if (algo == 0)
             // Compositional
             vOptions.setAlgorithmType(VerificationAlgorithm.COMPOSITIONAL);
@@ -145,10 +145,10 @@ public class BenchmarkAutomataVerifier
 			MinimizationHeuristic.MostCommon,
 			*/
 			MinimizationHeuristic.FewestStates,
-			MinimizationHeuristic.FewestEvents,
-			MinimizationHeuristic.LeastExtension,
-			MinimizationHeuristic.FewestTransitions
 			/*
+			MinimizationHeuristic.LeastExtension,
+			MinimizationHeuristic.FewestEvents,
+			MinimizationHeuristic.FewestTransitions
 			*/
         };
         
@@ -161,6 +161,7 @@ public class BenchmarkAutomataVerifier
             file.flush();
             System.out.println("BENCHMARK LOG WILL BE WRITTEN TO " + fileName);
             System.out.flush();
+			collectGarbage();
         }
         catch (IOException ex)
         {
@@ -236,21 +237,24 @@ public class BenchmarkAutomataVerifier
                 String[] test =
                 {
 					/*
+					*/
 					"agv", "agvb",
                     "verriegel3", "verriegel3b",
                     "verriegel4", "verriegel4b",
-                    "bmw_fh", "big_bmw",
-                    "FMS", "SMS", 
+                    //"bmw_fh", 
+					"big_bmw",
+                    //"FMS", 
+					"SMS", 
 					"PMS",
                     "IPC",
                     "ftechnik", "ftechnik_nocoll",
-					"tbed_valid", "tbed_ctct",
-					*/
+					"tbed_valid", 
+					//"tbed_ctct",
                     "fzelle",
-					/*
                     "AIP_minus_AS3_TU4",
                     "PLanTS",
                     "profisafe_i4"
+					/*
 					*/
                 };
                 
@@ -297,13 +301,18 @@ public class BenchmarkAutomataVerifier
                 file.flush();
             }
             System.out.println("TIME: " + timer + ", RESULT (NONBLOCKING/CONTROLLABLE): " + nonblocking);
+			collectGarbage();
         }
         catch (Throwable ex)
         {
             System.out.println("Failed! " + ex);
         }
         
-        // Garbage collect now!
+    }
+
+	private void collectGarbage()
+	{
+		// Garbage collect now!
         try
         {
             System.runFinalization();
@@ -316,5 +325,5 @@ public class BenchmarkAutomataVerifier
         {
             System.out.println("Garbage collection failed! " + ex);
         }
-    }
+	}
 }
