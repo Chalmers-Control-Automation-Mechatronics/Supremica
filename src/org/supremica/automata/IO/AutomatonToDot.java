@@ -126,11 +126,6 @@ public class AutomatonToDot
             return ", color = green3";
         }
         
-        if (s.isMutuallyAccepting() &&!s.isForbidden())
-        {
-            return ", color = yellow";
-        }
-        
         if (s.isForbidden())
         {
             return ", color = red1";
@@ -230,11 +225,7 @@ public class AutomatonToDot
                 pw.println("\t{node [shape = " + acceptingShape + "] \"" + state.getName() + "\"};");
             }
             
-            if (state.isMutuallyAccepting() &&!state.isForbidden())
-            {
-                pw.println("\t{node [shape = " + mutuallyAcceptingShape + "] \"" + state.getName() + "\"};");
-            }
-            else if (state.isForbidden())
+            if (state.isForbidden())
             {
                 pw.println("\t{node [shape = " + forbiddenShape + "] \"" + state.getName() + "\"};");
             }

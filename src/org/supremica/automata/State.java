@@ -88,7 +88,6 @@ public class State
     private String name;
     private boolean initial = false;
     private boolean accepting = false;
-    private boolean mutuallyAccepting = false;
     private boolean forbidden = false;
     private boolean active = false;
     private boolean first = false;
@@ -169,7 +168,6 @@ public class State
         index = otherState.index;
         initial = otherState.initial;
         accepting = otherState.accepting;
-        mutuallyAccepting = otherState.mutuallyAccepting;
         forbidden = otherState.forbidden;
         first = otherState.first;
         last = otherState.last;
@@ -310,21 +308,6 @@ public class State
         {
             return epsilonClosure(true).hasAcceptingState();
         }
-    }
-
-    public void setMutuallyAccepting(boolean accepting)
-    {
-        this.mutuallyAccepting = accepting;
-    }
-
-    /**
-     * A state that is accepting is automatically also mutually
-     * accepting.
-     */
-    public boolean isMutuallyAccepting()
-    {
-        // return mutuallyAccepting;
-        return mutuallyAccepting || accepting;
     }
 
     public boolean isForbidden()

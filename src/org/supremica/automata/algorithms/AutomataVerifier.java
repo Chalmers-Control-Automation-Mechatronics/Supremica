@@ -425,32 +425,7 @@ public class AutomataVerifier
         synchHelper.considerAllEventsUncontrollable();
          */
     }
-    
-    /**
-     * Performs modular mutually nonblocking verification on theAutomata.
-     *
-     *@return  true if mutually nonblocking, false if not or false (with error message) if don't know.
-     *@exception  Exception Description of the Exception
-     *@see  AutomataVerificationWorker
-     */
-    private boolean modularMutuallyNonblockingVerification()
-    throws Exception
-    {
-        // Ensure individual nonblocking
-        if (!isIndividuallyNonblocking())
-        {
-            return false;
-        }
-        
-        //MutuallyNonblockingVerifier theVerifier = new MutuallyNonblockingVerifier(theAutomata);
-        MutuallyNonblockingVerifier theVerifier = new MutuallyNonblockingVerifier(theAutomata, synchHelper);
-        
-        // Prepare for stopping the verifier
-        threadToStop = theVerifier;
-        
-        return theVerifier.isMutuallyNonblocking();
-    }
-    
+       
     /**
      * Performs modular controllability verification on theAutomata..
      *

@@ -1197,38 +1197,6 @@ public class Automaton
         return nbrOfAcceptingStates;
     }
 
-    public int nbrOfMutuallyAcceptingStates()
-    {
-        int nbrOfAcceptingStates = 0;
-        for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
-        {
-            State currState = stIt.next();
-
-            if (currState.isMutuallyAccepting())
-            {
-                nbrOfAcceptingStates++;
-            }
-        }
-
-        return nbrOfAcceptingStates;
-    }
-
-    public int nbrOfMutuallyAcceptingNotForbiddenStates()
-    {
-        int nbrOfAcceptingStates = 0;
-        for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
-        {
-            State currState = (State) stIt.next();
-
-            if (currState.isMutuallyAccepting() &&!currState.isForbidden())
-            {
-                nbrOfAcceptingStates++;
-            }
-        }
-
-        return nbrOfAcceptingStates;
-    }
-
     public int nbrOfForbiddenStates()
     {
         int nbrOfForbiddenStates = 0;
@@ -1626,56 +1594,6 @@ public class Automaton
     // End path-computing stuff that does not really belong here //MF
 
     /**
-     * Backwards extend accepting and mutually accepting states along transitions with safeEvents.
-     * some kind of "coreachability along a subset of the alphabet".
-     */
-    public void extendMutuallyAccepting(Alphabet safeEvents)
-    {
-        beginTransaction();
-
-        boolean changes = true;
-
-        while (changes)
-        {
-            changes = false;
-
-            for (Iterator stateIt = stateIterator(); stateIt.hasNext(); )
-            {
-                State currState = (State) stateIt.next();
-
-                // This state must be mutually accepting and not forbidden?
-                //if (currState.isMutuallyAccepting() && !currState.isForbidden())
-                // We don't care about forbidden states...
-                if (currState.isMutuallyAccepting())
-                {
-                    for (Iterator<Arc> arcIt = currState.incomingArcsIterator();
-                    arcIt.hasNext(); )
-                    {
-                        Arc currArc = arcIt.next();
-                        LabeledEvent arcEvent = currArc.getEvent();
-
-                        if (safeEvents.contains(arcEvent.getLabel()))
-                        {
-                            State fromState = currArc.getFromState();
-
-                            if (!fromState.isMutuallyAccepting())
-                            {
-                                fromState.setMutuallyAccepting(true);
-
-                                //fromState.setAccepting(true);
-                                changes = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        invalidate();
-        endTransaction();
-    }
-
-    /**
      * Change the marking of all states in the automaon.
      */
     public void setAllStatesAccepting()
@@ -1708,58 +1626,15 @@ public class Automaton
         endTransaction();
     }
 
-    public void setAllMutuallyAcceptingStatesAsAccepting()
-    {
-        setAllMutuallyAcceptingStatesAsAccepting(false);
-    }
-
-    public void setAllMutuallyAcceptingStatesAsAccepting(boolean keepForbidden)
-    {
-        beginTransaction();
-
-        for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
-        {
-            State currState = stateIt.next();
-
-            if (currState.isMutuallyAccepting())
-            {
-                if (keepForbidden)
-                {
-                    if (!currState.isForbidden())
-                    {
-                        currState.setAccepting(true);
-                    }
-                }
-                else
-                {
-                    currState.setAccepting(true);
-                    currState.setForbidden(false);
-                }
-            }
-        }
-
-        invalidate();
-        endTransaction();
-    }
-
     /**
-     * Makes all mutually accepting or accepting states non-accepting
+     * Makes all accepting states non-accepting
      * and all non-accepting states accepting.
-     */ // and this method is useful for whom? //MF
+     */ 
     public void invertMarking()
     {
-        for (Iterator<State> stateIt = stateIterator(); stateIt.hasNext(); )
+        for (State currState : this)
         {
-            State currState = stateIt.next();
-
-            if (currState.isMutuallyAccepting() || currState.isAccepting())
-            {
-                currState.setAccepting(false);
-            }
-            else
-            {
-                currState.setAccepting(true);
-            }
+            currState.setAccepting(!currState.isAccepting());
         }
     }
 

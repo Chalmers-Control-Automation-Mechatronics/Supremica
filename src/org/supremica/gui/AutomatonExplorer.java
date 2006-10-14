@@ -733,7 +733,7 @@ class StateDisplayer
     private Automaton theAutomaton;
     private JCheckBox isInitialBox = new JCheckBox("initial");
     private JCheckBox isAcceptingBox = new JCheckBox("accepting");
-    private JCheckBox isMutuallyAcceptingBox = new JCheckBox("mutually accepting");
+    //private JCheckBox isMutuallyAcceptingBox = new JCheckBox("mutually accepting");
     private JCheckBox isForbiddenBox = new JCheckBox("forbidden");
     private JLabel stateCost = new JLabel();
     private JLabel stateId = new JLabel();
@@ -783,16 +783,6 @@ class StateDisplayer
             }
         });
         statusBox.add(isAcceptingBox);
-        isMutuallyAcceptingBox.setEnabled(true);
-        isMutuallyAcceptingBox.setBackground(Color.white);
-        isMutuallyAcceptingBox.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                changeStateMutuallyAccepting(((JCheckBox) e.getSource()).isSelected());
-            }
-        });
-        statusBox.add(isMutuallyAcceptingBox);
         isForbiddenBox.setEnabled(true);
         isForbiddenBox.setBackground(Color.white);
         isForbiddenBox.addActionListener(new ActionListener()
@@ -825,7 +815,7 @@ class StateDisplayer
     {
         isInitialBox.setSelected(currState.isInitial());
         isAcceptingBox.setSelected(currState.isAccepting());
-        isMutuallyAcceptingBox.setSelected(currState.isMutuallyAccepting());
+        //isMutuallyAcceptingBox.setSelected(currState.isMutuallyAccepting());
         isForbiddenBox.setSelected(currState.isForbidden());
         
         if (currState instanceof CompositeState)
