@@ -145,7 +145,7 @@ public final class Config
     public static final BooleanProperty INCLUDE_SHOE_FACTORY = new BooleanProperty(PropertyType.GUI, "includeShoeFactory", false, "Include Shoe factory simulation");
 
     // GUI_EDITOR
-    public static final BooleanProperty GUI_EDITOR_USE_SPRING_EMBEDDER = new BooleanProperty(PropertyType.GUI_EDITOR, "useSpringEmbedder", true, "Use spring embedder for automatic graph layout");
+    //public static final BooleanProperty GUI_EDITOR_USE_SPRING_EMBEDDER = new BooleanProperty(PropertyType.GUI_EDITOR, "useSpringEmbedder", true, "Use spring embedder for automatic graph layout");
     public static final IntegerProperty GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT = new IntegerProperty(PropertyType.GUI_EDITOR, "springEmbedderTimeout", 10000, "Maximum layout time");
 
     // GUI_ANALYZER

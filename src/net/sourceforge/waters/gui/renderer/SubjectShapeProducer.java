@@ -58,7 +58,7 @@ public class SubjectShapeProducer
 
         if (n.getPointGeometry() == null) {
 	  logger.debug("setGeometry");
-          runEmbedder = Config.GUI_EDITOR_USE_SPRING_EMBEDDER.isTrue();
+          runEmbedder = true;
 	  final int base;
 	  final int spread;
 	  if (n.isInitial()) {

@@ -219,19 +219,20 @@ public class AnalyzerAutomataPanel
 									return;
 								}
 
-								boolean isSubject = currGraphProxy instanceof GraphSubject;
-								logger.info("isGraphSubject: " + isSubject);
-								isSubject = currModuleProxy instanceof ModuleSubject;
-								logger.info("isModuleSubject: " + isSubject);
+								//boolean isSubject = currGraphProxy instanceof GraphSubject;
+								//logger.info("isGraphSubject: " + isSubject);
+								//isSubject = currModuleProxy instanceof ModuleSubject;
+								//logger.info("isModuleSubject: " + isSubject);
 
 								try
 								{
-									EditorSurface surface = new EditorSurface((GraphSubject)currGraphProxy, (ModuleSubject)currModuleProxy);
+									EditorSurface surface = new EditorSurface((GraphSubject)currGraphProxy, (ModuleSubject)currModuleProxy, new SubjectShapeProducer((GraphSubject)currGraphProxy, currModuleProxy));
 									analyzerPanel.setRightComponent(surface);
 								}
 								catch (Exception ex)
 								{
 									logger.error(ex);
+									return;
 								}
 
 							}
