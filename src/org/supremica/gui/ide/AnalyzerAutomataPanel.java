@@ -224,8 +224,15 @@ public class AnalyzerAutomataPanel
 								isSubject = currModuleProxy instanceof ModuleSubject;
 								logger.info("isModuleSubject: " + isSubject);
 
-								EditorSurface surface = new EditorSurface(currGraphProxy, currModuleProxy);
-								analyzerPanel.setRightComponent(surface);
+								try
+								{
+									EditorSurface surface = new EditorSurface((GraphSubject)currGraphProxy, (ModuleSubject)currModuleProxy);
+									analyzerPanel.setRightComponent(surface);
+								}
+								catch (Exception ex)
+								{
+									logger.error(ex);
+								}
 
 							}
 						}
