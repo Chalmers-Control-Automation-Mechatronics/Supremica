@@ -281,40 +281,45 @@ public class ToModelJUnit extends AbstractModuleProxyVisitor {
 			}
 		}
 
-		if (!(mSUTname==null)) {
+		if (!(mSUTname == null)) {
 			javaString.append(" private Class c ;\n\n");
-			javaString.append(" private " + mSUTname + " SUT = new "
-					+ mSUTname + "();\n\n");
+			javaString.append(" private " + mSUTname + " SUT ;\n\n");
 		}
 
 		javaString.append(" public " + mFSMname + "() \n");
 		javaString.append(" {\n");
-		javaString.append("  state = \"" + mIniNode + "\";\n");
+		javaString.append("  state = \"" + mIniNode + "\";\n\n");
 
 		// When mSUTname is defined. Load the class.
-		if (!(mSUTname==null)) {
+		if (!(mSUTname == null)) {
 			javaString.append("  try{\n");
-			javaString.append("   c = Class.forName(\"" + mSUTname
-					+ "\");\n");
-			javaString.append("  }catch(Exception e){}\n");
-
+			javaString.append("   c = Class.forName(\"" + mSUTname + "\");\n");
+			javaString.append("  }catch(Exception e){}\n\n");
+			javaString.append("  SUT = new " + mSUTname + "();\n\n");
 		}
 
+		// javaString.append(" }\n");
 		javaString.append(" }\n\n");
 		javaString.append(" public String getState() \n");
 		javaString.append(" { return state; } \n\n");
 
-		javaString.append(" public void reset(boolean testing) \n");
-		javaString.append(" { state = \"" + mIniNode + "\";\n");
+		javaString.append(" public void reset(boolean testing)\n");
+		javaString.append(" {\n");
+		javaString.append("  state = \"" + mIniNode + "\";\n");
 
 		//
 		if (!vpl.equals(null)) {
 			for (VariableProxy vp : vpl) {
-				javaString.append("   " + vp.getName() + "="
+				javaString.append("  " + vp.getName() + "="
 						+ vp.getInitialValue() + " ;\n");
 
 			}
 		}
+
+		if (!(mSUTname == null)) {
+			javaString.append("  SUT = new " + mSUTname + "();\n");
+		}
+
 		javaString.append(" } \n\n");
 
 		// Body
@@ -354,7 +359,7 @@ public class ToModelJUnit extends AbstractModuleProxyVisitor {
 							+ action + " \");\n");
 					javaString.append("  " + action + " ;\n");
 				}
-				if (!(mSUTname==null)) {
+				if (!(mSUTname == null)) {
 
 					javaString.append("  for (Method m : c.getMethods()){\n");
 					javaString.append("   if(m.getName().equals(\"" + event
@@ -364,7 +369,7 @@ public class ToModelJUnit extends AbstractModuleProxyVisitor {
 					javaString.append("   }\n");
 					javaString.append("  }\n");
 				}
-				
+
 				javaString.append(" }\n\n");
 
 				// Same event use more than one time.
@@ -389,8 +394,8 @@ public class ToModelJUnit extends AbstractModuleProxyVisitor {
 
 						guard = "true";
 					}
-					javaString.append(" || (state.equals(\"" + begin + "\") && "
-							+ guard + ")");
+					javaString.append(" || (state.equals(\"" + begin
+							+ "\") && " + guard + ")");
 
 				}
 				javaString.append("; }\n");
@@ -421,7 +426,6 @@ public class ToModelJUnit extends AbstractModuleProxyVisitor {
 								+ ": \" + state + \" --> " + end + "\");\n");
 						javaString.append("      state = \"" + end + "\";\n");
 
-						
 					} else {// When edge has action
 						if (k == 0) {
 
@@ -439,18 +443,20 @@ public class ToModelJUnit extends AbstractModuleProxyVisitor {
 						javaString.append("      System.out.println(\"Action: "
 								+ action + " \");\n");
 						javaString.append("      " + action + " ;\n");
-					//	
+						//	
 					}
-					if (!(mSUTname==null)) {
+					if (!(mSUTname == null)) {
 
-						javaString.append("      for (Method m : c.getMethods()){\n");
-						javaString.append("          if (m.getName().equals(\"" + event
-								+ "\") && "
+						javaString
+								.append("      for (Method m : c.getMethods()){\n");
+						javaString.append("          if (m.getName().equals(\""
+								+ event + "\") && "
 								+ "m.getParameterTypes().length == 0){\n");
-						javaString.append("             SUT." + event + "();\n");
+						javaString
+								.append("             SUT." + event + "();\n");
 						javaString.append("          }\n");
 						javaString.append("      }\n");
-						
+
 					}
 					javaString.append("    }\n");
 				}
@@ -478,7 +484,7 @@ public class ToModelJUnit extends AbstractModuleProxyVisitor {
 				.append("  	FsmModel fsm = (FsmModel) fsmClass.newInstance();\n");
 		javaString_Main
 				.append("  	ModelTestCase model = new ModelTestCase(fsm);\n");
-		javaString_Main.append("  	model.randomWalk(40);\n");
+		javaString_Main.append("  	model.randomWalk(30);\n");
 		javaString_Main.append("  } catch (ClassNotFoundException e) {\n");
 		javaString_Main
 				.append("  	System.err.println(\"Cannot load class \" + fsmName);\n");
@@ -651,8 +657,8 @@ public class ToModelJUnit extends AbstractModuleProxyVisitor {
 		// System.out.println("url=" + new File(args[0]).toURL());
 		String s = "e:/1.wmod";
 		String s1 = "e:/";
-//		ToModelJUnit translator = new ToModelJUnit(s, 13, s1, "CALC");
-		ToModelJUnit translator = new ToModelJUnit(s, 6, s1, null);
+		ToModelJUnit translator = new ToModelJUnit(s, 13, s1, "CALC");
+		// ToModelJUnit translator = new ToModelJUnit(s, 6, s1, null);
 		translator.writeFile();
 		// translator.compileFile();
 
