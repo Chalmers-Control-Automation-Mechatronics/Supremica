@@ -291,6 +291,8 @@ public class IDE
         ideToolBar.add(getActions().newAction);
         ideToolBar.add(getActions().openAction);
         ideToolBar.add(getActions().saveAction);
+        ideToolBar.addSeparator();
+        ideToolBar.add(getActions().editorStopEmbedderAction);
 
         getActiveModuleContainer().getAnalyzerPanel().addToolBarEntries(ideToolBar);
         getActiveModuleContainer().getEditorPanel().addToolBarEntries(ideToolBar);

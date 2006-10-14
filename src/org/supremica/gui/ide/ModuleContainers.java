@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainers
 //###########################################################################
-//# $Id: ModuleContainers.java,v 1.6 2006-10-13 14:14:30 knut Exp $
+//# $Id: ModuleContainers.java,v 1.7 2006-10-14 08:59:28 knut Exp $
 //###########################################################################
 
 
@@ -146,13 +146,7 @@ public class ModuleContainers
 
 	public ModuleContainer createNewModuleContainer()
 	{
-		final String name = getNewModuleName("Module");
-		final Collection<ParameterProxy> pl = Collections.emptyList();
-		final Collection<AliasProxy> al = Collections.emptyList();
-		final Collection<EventDeclProxy> el = Collections.emptyList();
-		final Collection<Proxy> prl = Collections.emptyList();
-		final ModuleSubject newModule =
-			new ModuleSubject(name, null, null, pl, al, el, prl, prl);
+		final ModuleSubject newModule = createNewModuleSubject();
 		final ModuleContainer newModuleContainer =
 			new ModuleContainer(ide, newModule);
 		return newModuleContainer;

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.15 2006-10-07 14:38:44 robi Exp $
+//# $Id: SpringEmbedder.java,v 1.16 2006-10-14 08:59:28 knut Exp $
 //###########################################################################
 
 
@@ -19,6 +19,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.List;
+import java.util.LinkedList;
+import java.util.Collections;
 import javax.swing.SwingUtilities;
 
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
@@ -85,6 +88,8 @@ public class SpringEmbedder
   //# Interface java.lang.Runnable
   public void run()
   {
+	springEmbedders.add(this);
+
     int count = 0;
     double limit = CONVERGENCE_CONST;
     for (int i = 1; i < NUM_PASSES; i++) {
@@ -103,7 +108,7 @@ public class SpringEmbedder
             });
           Thread.yield();
         }
-      } while (maxdelta > limit);
+      } while (maxdelta > limit && !stop);
       limit *= 0.25;
     }
     SwingUtilities.invokeLater(new Runnable() {
@@ -111,6 +116,7 @@ public class SpringEmbedder
           updateModel();
         }
       });
+    springEmbedders.remove(this);
   }
 
 
@@ -178,16 +184,16 @@ public class SpringEmbedder
   {
     final double dx = p1.getX() - p2.getX();
     final double dy = p1.getY() - p2.getY();
-    final double len = dx * dx + dy * dy;   
+    final double len = dx * dx + dy * dy;
     if (len > EPSILON) {
       final int pass = mPass > 0 ? mPass : 1;
       final double factor = pass * constant / len;
       return new Point2D.Double(factor * dx, factor * dy);
-    } else {                       
+    } else {
       return new Point2D.Double(mRandom.nextDouble(), mRandom.nextDouble());
     }
-  }           
-                
+  }
+
   private Point2D attraction(final Point2D p1,
                              final Point2D p2,
                              final double constant)
@@ -198,6 +204,8 @@ public class SpringEmbedder
     final double factor = pass * constant;
     return new Point2D.Double(-dx * factor, -dy * factor);
   }
+
+
 
   private Point2D edgeAttraction(final Point2D p,
                                  final Point2D start,
@@ -220,8 +228,26 @@ public class SpringEmbedder
     } else {
       return POINT_ZERO;
     }
+
+
+
   }
 
+	public static void stopAll()
+	{
+		synchronized(springEmbedders)
+		{
+			for (SpringEmbedder embedder : springEmbedders)
+			{
+				embedder.stop();
+			}
+		}
+	}
+
+	public void stop()
+	{
+		stop = true;
+	}
 
   //#########################################################################
   //# Inner Class GeometryWrapper
@@ -293,7 +319,7 @@ public class SpringEmbedder
     abstract void calculateDisplacement();
     abstract double getDelta();
     abstract void updateModel();
-    
+
     //#######################################################################
     //# Data Members
     private Point2D mOldPoint;
@@ -633,6 +659,7 @@ public class SpringEmbedder
 
   private double mInitialStateAttraction;
   private int mPass;
+  private volatile boolean stop = false;
 
 
   //###########################################################################
@@ -660,4 +687,6 @@ public class SpringEmbedder
 
   private static final Point2D POINT_ZERO = new Point2D.Double(0.0, 0.0);
   private static final Point2D POINT_CENTER = new Point2D.Double(200.0, 200.0);
+
+  private static final List<SpringEmbedder> springEmbedders = Collections.synchronizedList(new LinkedList<SpringEmbedder>());
 }

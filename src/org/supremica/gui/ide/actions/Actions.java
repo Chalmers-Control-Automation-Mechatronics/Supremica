@@ -38,6 +38,8 @@ public class Actions
     public IDEAction editorAddInstanceAction = new EditorAddInstanceAction(allActions);
     public IDEAction editorAddBindingAction = new EditorAddBindingAction(allActions);
     public IDEAction editorRunEmbedderAction = new EditorRunEmbedderAction(allActions);
+    public IDEAction editorStopEmbedderAction = new EditorStopEmbedderAction(allActions);
+
 
     // Analyzer Options
     public IDEAction analyzerOptionsAction = new AnalyzerOptionsAction(allActions);
