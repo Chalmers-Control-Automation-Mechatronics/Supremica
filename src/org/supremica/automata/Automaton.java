@@ -2075,6 +2075,9 @@ public class Automaton
             State state = state_it.next();
             done_something |= saturate(state, alpha, dump);	// saturate to the dump-state
         }
+        
+        // Remove all outgoing arcs from the dump-state.
+        dump.removeOutgoingArcs();
 
         // Need to remove dump state including its self-loop arcs?
         if (done_something == false)

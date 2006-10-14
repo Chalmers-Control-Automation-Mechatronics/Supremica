@@ -70,6 +70,8 @@ public class Actions
     public IDEAction analyzerRenameAction = new AnalyzerRenameAction(allActions);
     public IDEAction analyzerExportAction = new AnalyzerExportAction(allActions);
 
+    // Analyzer experimental
+    public IDEAction analyzerPlantifyAction = new AnalyzerPlantifyAction(allActions);    
 
     // Examples Actions
     public IDEAction toolsTestCasesAction = new ToolsTestCasesAction(allActions);
