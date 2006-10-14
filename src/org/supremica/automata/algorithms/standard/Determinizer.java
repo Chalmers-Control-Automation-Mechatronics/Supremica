@@ -527,12 +527,12 @@ public class Determinizer
 		LabeledEvent b = new LabeledEvent("b");
 
 		automaton.getAlphabet().addEvent(b);
-		b.setEpsilon(true);
+		b.setUnobservable(true);
 
 		LabeledEvent c = new LabeledEvent("c");
 
 		automaton.getAlphabet().addEvent(c);
-		c.setEpsilon(true);
+		c.setUnobservable(true);
 
 		LabeledEvent d = new LabeledEvent("d");
 

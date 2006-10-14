@@ -59,263 +59,258 @@ import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
 
 public class AutomataToXml
-	implements AutomataSerializer
+    implements AutomataSerializer
 {
-	private static Logger logger = LoggerFactory.createLogger(AutomataToXml.class);
-	private Automata automata;
-	private Automaton automaton;
-	private boolean canonical;
-	private boolean includeCost = true;
-	private boolean debugMode = false;
-	private final static int majorFileVersion = 0;
-	private final static int minorFileVersion = 9;
-
-	// mappings between state/event and id
-	private Map stateIdMap = new HashMap();
-	private Map eventIdMap = new HashMap();
-
-	public AutomataToXml(Automata automata)
-	{
-		this.automata = automata;
-		canonical = false;
-	}
-
-	public AutomataToXml(Automaton automaton)
-	{
-		this.automata = new Automata();
-
-		this.automata.addAutomaton(automaton);
-
-		canonical = false;
-	}
-
-	public void serialize(PrintWriter pw)
-	{
-		pw.println("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>");
-		pw.print("<Automata");
-
-		if (automata.getName() != null)
-		{
-			pw.print(" name=\"" + EncodingHelper.normalize(automata.getName()) + "\"");
-		}
-
-		pw.print(" major=\"" + majorFileVersion + "\"");
-		pw.print(" minor=\"" + minorFileVersion + "\"");
-
-
-		if ((automata.getComment() != null) &&!automata.getComment().equals(""))
-		{
-			pw.print(" comment=\"" + EncodingHelper.normalize(automata.getComment()) + "\"");
-		}
-
-		pw.println(">");
-
-		Iterator automataIt = automata.iterator();
-
-		while (automataIt.hasNext())
-		{
-			Automaton aut = (Automaton) automataIt.next();
-
-			pw.println("<Automaton name=\"" + aut.getName() + "\" type=\"" + aut.getType().toString() + "\">");
-
-			// Print all events
-			pw.println("\t<Events>");
-
-			int eventId = 0;
-			Iterator eventIt = aut.eventIterator();
-
-			while (eventIt.hasNext())
-			{
-				LabeledEvent event = (LabeledEvent) eventIt.next();
-
-				eventIdMap.put(event, new Integer(eventId));
-				pw.print("\t\t<Event id=\"" + eventId + "\" label=\"" + EncodingHelper.normalize(event.getLabel()) + "\"");
-
-				eventId++;
-
-				//--
-				// pw.print("\t\t<Event id=\"" + EncodingHelper.normalize(event.getId()) + "\" label=\"" + EncodingHelper.normalize(event.getLabel()) + "\"");
-				//--
-				if (!event.isControllable())
-				{
-					pw.print(" controllable=\"false\"");
-				}
-
-				if (!event.isPrioritized())
-				{
-					pw.print(" prioritized=\"false\"");
-				}
-
-				if (!event.isObservable())
-				{
-					pw.print(" observable=\"false\"");
-				}
-
-				if (event.isOperatorIncrease())
-				{
-					pw.print(" operatorIncrease=\"true\"");
-				}
-
-				if (event.isOperatorReset())
-				{
-					pw.print(" operatorReset=\"true\"");
-				}
-
-				if (event.isImmediate())
-				{
-					pw.print(" immediate=\"true\"");
-				}
-
-				if (event.isEpsilon())
-				{
-					pw.print(" epsilon=\"true\"");
-				}
-
-				if (debugMode)
-				{
-					pw.print(" synchIndex=" + event.getSynchIndex());
-				}
-
-				pw.println("/>");
-			}
-
-			pw.println("\t</Events>");
-
-			// Print all states
-			pw.println("\t<States>");
-
-			int stateId = 0;    // we need to make up ids
-			Iterator stateIt = aut.stateIterator();
-
-			while (stateIt.hasNext())
-			{
-				State state = (State) stateIt.next();
-
-				stateIdMap.put(state, new Integer(stateId));    // The arc must be able to find it fast
-				pw.print("\t\t<State id=\"" + stateId + "\"");    // no longer need to normalize
-
-				stateId++;
-
-				//--
-				// pw.print("\t\t<State id=\"" + EncodingHelper.normalize(state.getId()) + "\"");
-				//--
-				pw.print(" name=\"" + EncodingHelper.normalize(state.getName()) + "\"");    // always print the name
-
-				//--
-				// if (!state.getId().equals(state.getName()))
-				// {
-				//      pw.print(" name=\"" + EncodingHelper.normalize(state.getName()) + "\"");
-				// }
-				//--
-				if (state.isInitial())
-				{
-					pw.print(" initial=\"true\"");
-				}
-
-				if (state.isAccepting())
-				{
-					pw.print(" accepting=\"true\"");
-				}
-
-				if (state.isForbidden())
-				{
-					pw.print(" forbidden=\"true\"");
-				}
-
-				if (includeCost)
-				{
-					int value = state.getCost();
-
-					if (value != State.UNDEF_COST)
-					{
-						pw.print(" cost=\"" + value + "\"");
-					}
-				}
-
-				if (debugMode)
-				{
-					pw.print(" synchIndex=" + state.getIndex());
-				}
-
-				// printIntArray(pw, ((StateRegular)state).getOutgoingEventsIndicies());
-				pw.println("/>");
-			}
-
-			pw.println("\t</States>");
-
-			// Print all transitions
-			pw.println("\t<Transitions>");
-
-			stateIt = aut.stateIterator();
-
-			while (stateIt.hasNext())
-			{
-				State sourceState = (State) stateIt.next();
-				Object sourceId = stateIdMap.get(sourceState);
-				Iterator outgoingArcsIt = sourceState.outgoingArcsIterator();
-
-				while (outgoingArcsIt.hasNext())
-				{
-					Arc arc = (Arc) outgoingArcsIt.next();
-					State destState = arc.getToState();
-					Object destId = stateIdMap.get(destState);
-					LabeledEvent event = arc.getEvent();
-					Object eventID = eventIdMap.get(event);
-
-					pw.print("\t\t<Transition source=\"" + sourceId);
-					pw.print("\" dest=\"" + destId);
-					pw.println("\" event=\"" + eventID + "\"/>");
-
-					//--
-					// pw.print("\t\t<Transition source=\"" + EncodingHelper.normalize(sourceState.getId()));
-					// pw.print("\" dest=\"" + EncodingHelper.normalize(destState.getId()));
-					// pw.println("\" event=\"" + EncodingHelper.normalize(arc.getEventId()) + "\"/>");
-					//--
-				}
-			}
-
-			pw.println("\t</Transitions>");
-			pw.println("</Automaton>");
-		}
-
-		pw.println("</Automata>");
-		pw.flush();
-		pw.close();
-	}
-
-	public void serialize(String fileName)
-		throws IOException
-	{
-		serialize(new PrintWriter(new FileWriter(fileName)));
-	}
-
-	public void serialize(File theFile)
-		throws IOException
-	{
-		serialize(theFile.getAbsolutePath());
-	}
-
-	void printIntArray(PrintWriter pw, int[] theArray)
-	{
-		for (int i = 0; i < theArray.length; i++)
-		{
-			if (i == 0)
-			{
-				pw.print(theArray[i]);
-			}
-			else
-			{
-				pw.print(" " + theArray[i]);
-			}
-		}
-	}
-
-	public boolean writeCost(boolean b)
-	{
-		boolean old = includeCost;
-
-		includeCost = b;
-
-		return old;
-	}
+    private static Logger logger = LoggerFactory.createLogger(AutomataToXml.class);
+    private Automata automata;
+    private Automaton automaton;
+    private boolean canonical;
+    private boolean includeCost = true;
+    private boolean debugMode = false;
+    private final static int majorFileVersion = 0;
+    private final static int minorFileVersion = 9;
+    
+    // mappings between state/event and id
+    private Map stateIdMap = new HashMap();
+    private Map eventIdMap = new HashMap();
+    
+    public AutomataToXml(Automata automata)
+    {
+        this.automata = automata;
+        canonical = false;
+    }
+    
+    public AutomataToXml(Automaton automaton)
+    {
+        this.automata = new Automata();
+        
+        this.automata.addAutomaton(automaton);
+        
+        canonical = false;
+    }
+    
+    public void serialize(PrintWriter pw)
+    {
+        pw.println("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>");
+        pw.print("<Automata");
+        
+        if (automata.getName() != null)
+        {
+            pw.print(" name=\"" + EncodingHelper.normalize(automata.getName()) + "\"");
+        }
+        
+        pw.print(" major=\"" + majorFileVersion + "\"");
+        pw.print(" minor=\"" + minorFileVersion + "\"");
+        
+        
+        if ((automata.getComment() != null) &&!automata.getComment().equals(""))
+        {
+            pw.print(" comment=\"" + EncodingHelper.normalize(automata.getComment()) + "\"");
+        }
+        
+        pw.println(">");
+        
+        Iterator automataIt = automata.iterator();
+        
+        while (automataIt.hasNext())
+        {
+            Automaton aut = (Automaton) automataIt.next();
+            
+            pw.println("<Automaton name=\"" + aut.getName() + "\" type=\"" + aut.getType().toString() + "\">");
+            
+            // Print all events
+            pw.println("\t<Events>");
+            
+            int eventId = 0;
+            Iterator eventIt = aut.eventIterator();
+            
+            while (eventIt.hasNext())
+            {
+                LabeledEvent event = (LabeledEvent) eventIt.next();
+                
+                eventIdMap.put(event, new Integer(eventId));
+                pw.print("\t\t<Event id=\"" + eventId + "\" label=\"" + EncodingHelper.normalize(event.getLabel()) + "\"");
+                
+                eventId++;
+                
+                //--
+                // pw.print("\t\t<Event id=\"" + EncodingHelper.normalize(event.getId()) + "\" label=\"" + EncodingHelper.normalize(event.getLabel()) + "\"");
+                //--
+                if (!event.isControllable())
+                {
+                    pw.print(" controllable=\"false\"");
+                }
+                
+                if (!event.isPrioritized())
+                {
+                    pw.print(" prioritized=\"false\"");
+                }
+                
+                if (!event.isObservable())
+                {
+                    pw.print(" observable=\"false\"");
+                }
+                
+                if (event.isOperatorIncrease())
+                {
+                    pw.print(" operatorIncrease=\"true\"");
+                }
+                
+                if (event.isOperatorReset())
+                {
+                    pw.print(" operatorReset=\"true\"");
+                }
+                
+                if (event.isImmediate())
+                {
+                    pw.print(" immediate=\"true\"");
+                }
+                
+                if (debugMode)
+                {
+                    pw.print(" synchIndex=" + event.getSynchIndex());
+                }
+                
+                pw.println("/>");
+            }
+            
+            pw.println("\t</Events>");
+            
+            // Print all states
+            pw.println("\t<States>");
+            
+            int stateId = 0;    // we need to make up ids
+            Iterator stateIt = aut.stateIterator();
+            
+            while (stateIt.hasNext())
+            {
+                State state = (State) stateIt.next();
+                
+                stateIdMap.put(state, new Integer(stateId));    // The arc must be able to find it fast
+                pw.print("\t\t<State id=\"" + stateId + "\"");    // no longer need to normalize
+                
+                stateId++;
+                
+                //--
+                // pw.print("\t\t<State id=\"" + EncodingHelper.normalize(state.getId()) + "\"");
+                //--
+                pw.print(" name=\"" + EncodingHelper.normalize(state.getName()) + "\"");    // always print the name
+                
+                //--
+                // if (!state.getId().equals(state.getName()))
+                // {
+                //      pw.print(" name=\"" + EncodingHelper.normalize(state.getName()) + "\"");
+                // }
+                //--
+                if (state.isInitial())
+                {
+                    pw.print(" initial=\"true\"");
+                }
+                
+                if (state.isAccepting())
+                {
+                    pw.print(" accepting=\"true\"");
+                }
+                
+                if (state.isForbidden())
+                {
+                    pw.print(" forbidden=\"true\"");
+                }
+                
+                if (includeCost)
+                {
+                    int value = state.getCost();
+                    
+                    if (value != State.UNDEF_COST)
+                    {
+                        pw.print(" cost=\"" + value + "\"");
+                    }
+                }
+                
+                if (debugMode)
+                {
+                    pw.print(" synchIndex=" + state.getIndex());
+                }
+                
+                // printIntArray(pw, ((StateRegular)state).getOutgoingEventsIndicies());
+                pw.println("/>");
+            }
+            
+            pw.println("\t</States>");
+            
+            // Print all transitions
+            pw.println("\t<Transitions>");
+            
+            stateIt = aut.stateIterator();
+            
+            while (stateIt.hasNext())
+            {
+                State sourceState = (State) stateIt.next();
+                Object sourceId = stateIdMap.get(sourceState);
+                Iterator outgoingArcsIt = sourceState.outgoingArcsIterator();
+                
+                while (outgoingArcsIt.hasNext())
+                {
+                    Arc arc = (Arc) outgoingArcsIt.next();
+                    State destState = arc.getToState();
+                    Object destId = stateIdMap.get(destState);
+                    LabeledEvent event = arc.getEvent();
+                    Object eventID = eventIdMap.get(event);
+                    
+                    pw.print("\t\t<Transition source=\"" + sourceId);
+                    pw.print("\" dest=\"" + destId);
+                    pw.println("\" event=\"" + eventID + "\"/>");
+                    
+                    //--
+                    // pw.print("\t\t<Transition source=\"" + EncodingHelper.normalize(sourceState.getId()));
+                    // pw.print("\" dest=\"" + EncodingHelper.normalize(destState.getId()));
+                    // pw.println("\" event=\"" + EncodingHelper.normalize(arc.getEventId()) + "\"/>");
+                    //--
+                }
+            }
+            
+            pw.println("\t</Transitions>");
+            pw.println("</Automaton>");
+        }
+        
+        pw.println("</Automata>");
+        pw.flush();
+        pw.close();
+    }
+    
+    public void serialize(String fileName)
+    throws IOException
+    {
+        serialize(new PrintWriter(new FileWriter(fileName)));
+    }
+    
+    public void serialize(File theFile)
+    throws IOException
+    {
+        serialize(theFile.getAbsolutePath());
+    }
+    
+    void printIntArray(PrintWriter pw, int[] theArray)
+    {
+        for (int i = 0; i < theArray.length; i++)
+        {
+            if (i == 0)
+            {
+                pw.print(theArray[i]);
+            }
+            else
+            {
+                pw.print(" " + theArray[i]);
+            }
+        }
+    }
+    
+    public boolean writeCost(boolean b)
+    {
+        boolean old = includeCost;
+        
+        includeCost = b;
+        
+        return old;
+    }
 }

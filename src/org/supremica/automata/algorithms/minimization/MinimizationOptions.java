@@ -186,7 +186,7 @@ public final class MinimizationOptions
             }
         }
         
-        if (targetAlphabet != null && targetAlphabet.nbrOfEpsilonEvents() != 0)
+        if (targetAlphabet != null && targetAlphabet.nbrOfUnobservableEvents() != 0)
         {
             String message = "There should not be epsilon events in the target alphabet.";  // (But it's not dangerous or anything...)
             return message;

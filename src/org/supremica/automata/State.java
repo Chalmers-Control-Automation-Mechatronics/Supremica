@@ -713,13 +713,13 @@ public class State
         return incomingArcs.size();
     }
 
-    public int nbrOfIncomingEpsilonArcs()
+    public int nbrOfIncomingUnobservableArcs()
     {
         int count = 0;
 
         for (Iterator<Arc> it = incomingArcsIterator(); it.hasNext(); )
         {
-            if (it.next().getEvent().isEpsilon())
+            if (!it.next().getEvent().isObservable())
             {
                 count++;
             }
@@ -1000,7 +1000,7 @@ public class State
                 State state = currArc.getToState();
 
                 // Is this an epsilon event that we care about?
-                if (currArc.getEvent().isEpsilon() && !currArc.isSelfLoop() && !result.contains(state) &&
+                if (!currArc.getEvent().isObservable() && !currArc.isSelfLoop() && !result.contains(state) &&
                     ((includeControllable && includeUncontrollable) ||
                     (includeControllable && currArc.getEvent().isControllable()) ||
                     (includeUncontrollable && !currArc.getEvent().isControllable())))
@@ -1037,7 +1037,7 @@ public class State
                 Arc currArc = arcIt.next();
                 State state = currArc.getFromState();
 
-                if (currArc.getEvent().isEpsilon() &&!currArc.isSelfLoop() &&!result.contains(state))
+                if (!currArc.getEvent().isObservable() &&!currArc.isSelfLoop() &&!result.contains(state))
                 {
                     statesToExamine.add(state);
                     result.add(state);
@@ -1108,7 +1108,7 @@ public class State
         {
             LabeledEvent event = arcIt.next().getEvent();
 
-            if (!enabled.contains(event) && !event.isEpsilon())
+            if (!enabled.contains(event) && event.isObservable())
             {
                 enabled.addEvent(event);
             }

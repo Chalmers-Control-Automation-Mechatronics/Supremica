@@ -648,7 +648,7 @@ public final class AutomataIndexForm
 
 			controllableEventsTable[i] = currEvent.isControllable();
 			immediateEventsTable[i] = currEvent.isImmediate();
-			epsilonEventsTable[i] = currEvent.isEpsilon();
+			epsilonEventsTable[i] = !currEvent.isObservable();
 		}
 	}
 

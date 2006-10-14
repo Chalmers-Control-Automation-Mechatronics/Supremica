@@ -71,7 +71,6 @@ public class LabeledEvent
     private boolean operatorIncrease = false;
     private boolean operatorReset = false;
     private boolean immediate = false;
-    private boolean epsilon = false;
     private boolean proposition = false;
     private int expansionPriority = -1;
     private int index = -1;
@@ -99,7 +98,6 @@ public class LabeledEvent
         operatorIncrease = e.operatorIncrease;
         operatorReset = e.operatorReset;
         immediate = e.immediate;
-        epsilon = e.epsilon;
         proposition = e.proposition;
         index = e.index;
     }
@@ -121,8 +119,7 @@ public class LabeledEvent
             proposition = true;
         }
         
-        observable = e.isObservable();
-        
+        observable = e.isObservable();        
     }
     
     public LabeledEvent clone()
@@ -205,14 +202,14 @@ public class LabeledEvent
         this.prioritized = prioritized;
     }
     
-    public boolean isEpsilon()
+    public boolean isUnobservable()
     {
-        return epsilon;
+        return !observable;
     }
     
-    public void setEpsilon(boolean epsilon)
+    public void setUnobservable(boolean unobservable)
     {
-        this.epsilon = epsilon;
+        this.observable = !unobservable;
     }
     
     public boolean isProposition()

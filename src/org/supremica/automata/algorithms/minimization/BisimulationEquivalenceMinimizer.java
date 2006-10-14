@@ -201,7 +201,7 @@ public class BisimulationEquivalenceMinimizer
                     {
                         LabeledEvent event = evIt.next();
                         StateSet nextStates;
-                        if (event.isEpsilon())
+                        if (!event.isObservable())
                         {
                             nextStates = from.epsilonClosure(true);
                         }
@@ -229,7 +229,7 @@ public class BisimulationEquivalenceMinimizer
                     {
                         LabeledEvent event = evIt.next();
                         StateSet nextStates;
-                        if (event.isEpsilon())
+                        if (!event.isObservable())
                         {
                             nextStates = from.epsilonClosure(true);
                         }

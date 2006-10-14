@@ -33,9 +33,6 @@ public class EventSubTree
 
 		SupremicaTreeNode currOperatorResetNode = new SupremicaTreeNode("operatorReset: " + event.isOperatorReset());
 		add(currOperatorResetNode);
-
-		SupremicaTreeNode isEpsilonNode = new SupremicaTreeNode("epsilon: " + event.isEpsilon());
-		add(isEpsilonNode);
 	}
 
 	// Change this to reflect the correct number of children/properties/leaves

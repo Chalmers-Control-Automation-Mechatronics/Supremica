@@ -238,7 +238,7 @@ public class UpdateFromJGrafchartAction
 				currEvent.setPrioritized(isPrioritized);
 				currEvent.setObservable(isObservable);
 				currEvent.setImmediate(isImmediate);
-				currEvent.setEpsilon(isEpsilon);
+				currEvent.setUnobservable(isEpsilon);
 				theEvents.addEvent(currEvent);
 			}
 		}

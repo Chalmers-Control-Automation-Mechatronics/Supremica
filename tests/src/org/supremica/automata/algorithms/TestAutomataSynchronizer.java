@@ -123,7 +123,7 @@ public class TestAutomataSynchronizer
 				assertTrue(theAlphabet.nbrOfControllableEvents() == 4);
 				assertTrue(theAlphabet.nbrOfPrioritizedEvents() == 5);
 				assertTrue(theAlphabet.nbrOfImmediateEvents() == 0);
-				assertTrue(theAlphabet.nbrOfEpsilonEvents() == 0);
+				assertTrue(theAlphabet.nbrOfUnobservableEvents() == 0);
 			}
 
 		}
@@ -168,7 +168,7 @@ public class TestAutomataSynchronizer
 				assertTrue(theAlphabet.nbrOfControllableEvents() == 4);
 				assertTrue(theAlphabet.nbrOfPrioritizedEvents() == 5);
 				assertTrue(theAlphabet.nbrOfImmediateEvents() == 0);
-				assertTrue(theAlphabet.nbrOfEpsilonEvents() == 0);
+				assertTrue(theAlphabet.nbrOfUnobservableEvents() == 0);
 			}
 		}
 		catch (Exception ex)
@@ -212,7 +212,7 @@ public class TestAutomataSynchronizer
 				assertTrue(theAlphabet.nbrOfControllableEvents() == 4);
 				assertTrue(theAlphabet.nbrOfPrioritizedEvents() == 5);
 				assertTrue(theAlphabet.nbrOfImmediateEvents() == 0);
-				assertTrue(theAlphabet.nbrOfEpsilonEvents() == 0);
+				assertTrue(theAlphabet.nbrOfUnobservableEvents() == 0);
 			}
 
 		}
@@ -297,7 +297,7 @@ public class TestAutomataSynchronizer
 				assertTrue(theAlphabet.nbrOfControllableEvents() == 4);
 				assertTrue(theAlphabet.nbrOfPrioritizedEvents() == 5);
 				assertTrue(theAlphabet.nbrOfImmediateEvents() == 0);
-				assertTrue(theAlphabet.nbrOfEpsilonEvents() == 0);
+				assertTrue(theAlphabet.nbrOfUnobservableEvents() == 0);
 			}
 
 			// Test Full synchronization
@@ -320,7 +320,7 @@ public class TestAutomataSynchronizer
 				assertTrue(theAlphabet.nbrOfControllableEvents() == 4);
 				assertTrue(theAlphabet.nbrOfPrioritizedEvents() == 5);
 				assertTrue(theAlphabet.nbrOfImmediateEvents() == 0);
-				assertTrue(theAlphabet.nbrOfEpsilonEvents() == 0);
+				assertTrue(theAlphabet.nbrOfUnobservableEvents() == 0);
 			}
 
 			// Test Broadcast synchronization
@@ -343,7 +343,7 @@ public class TestAutomataSynchronizer
 				assertTrue(theAlphabet.nbrOfControllableEvents() == 4);
 				assertTrue(theAlphabet.nbrOfPrioritizedEvents() == 5);
 				assertTrue(theAlphabet.nbrOfImmediateEvents() == 0);
-				assertTrue(theAlphabet.nbrOfEpsilonEvents() == 0);
+				assertTrue(theAlphabet.nbrOfUnobservableEvents() == 0);
 			}
 
 			// Test synchronization of nondeterministic automata

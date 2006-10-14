@@ -17,13 +17,13 @@ import org.supremica.automata.*;
  */
 
 // Here we determine whether the passed event is epsilon or not
-// Depending on the way we want to interpret epsilon, instantiate diferent objects
+// Depending on the way we want to interpret epsilon, instantiate different objects
 public interface EpsilonTester
 {
-	boolean isThisEpsilon(LabeledEvent event);
-
-	// debug only
-	String showWhatYouGot();
-
-	// debug only
+    boolean isThisEpsilon(LabeledEvent event);
+    
+    // debug only
+    String showWhatYouGot();
+    
+    // debug only
 }

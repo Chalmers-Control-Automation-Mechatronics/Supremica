@@ -379,7 +379,7 @@ public class Alphabet
         {
             LabeledEvent currEvent = evIt.next();
 
-            if (!currEvent.isObservable() || currEvent.isEpsilon())
+            if (!currEvent.isObservable())
             {
                 nbrOfFoundEvents++;
             }
@@ -420,26 +420,6 @@ public class Alphabet
             LabeledEvent currEvent = evIt.next();
 
             if (currEvent.isImmediate())
-            {
-                nbrOfFoundEvents++;
-            }
-        }
-
-        return nbrOfFoundEvents;
-    }
-
-    /**
-     * Returns the number of epsilon events.
-     */
-    public int nbrOfEpsilonEvents()
-    {
-        int nbrOfFoundEvents = 0;
-
-        for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )
-        {
-            LabeledEvent currEvent = evIt.next();
-
-            if (currEvent.isEpsilon())
             {
                 nbrOfFoundEvents++;
             }
@@ -860,7 +840,7 @@ public class Alphabet
             return false;
         }
 
-        if (nbrOfEpsilonEvents() != other.nbrOfEpsilonEvents())
+        if (nbrOfUnobservableEvents() != other.nbrOfUnobservableEvents())
         {
             //System.err.println("equalAlphabet::non equal nbr of epsilon events");
             return false;

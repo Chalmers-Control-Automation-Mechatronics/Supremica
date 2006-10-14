@@ -302,7 +302,7 @@ public class AutomataMinimizer
             if (executionDialog != null)
             {
                 executionDialog.setProgress(initialNbrOfAutomata-theAutomata.size());
-                currentAlphabetSize -= hideThese.size()-hideThese.nbrOfEpsilonEvents();
+                currentAlphabetSize -= hideThese.size()-hideThese.nbrOfUnobservableEvents();
                 executionDialog.setSubheader("Events left: " + currentAlphabetSize +
                     " (" + globalAlphabetSize + ")");
             }
@@ -409,7 +409,7 @@ public class AutomataMinimizer
                 loop: for (LabeledEvent event : eventToAutomataMap.keySet())
                 {
                     // Skip the events in targetAlphabet and epsilon events!
-                    if (targetAlphabet.contains(event) || event.isEpsilon())
+                    if (targetAlphabet.contains(event) || event.isUnobservable())
                     {
                         continue;
                     }

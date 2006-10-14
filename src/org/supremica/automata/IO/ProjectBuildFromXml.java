@@ -528,7 +528,7 @@ public class ProjectBuildFromXml
         currEvent.setOperatorIncrease(operatorIncrease);
         currEvent.setOperatorReset(operatorReset);
         currEvent.setImmediate(immediate);
-        currEvent.setEpsilon(epsilon);
+        currEvent.setUnobservable(epsilon);
         
         // Associate the id with the event
         idEventMap.put(id, currEvent);

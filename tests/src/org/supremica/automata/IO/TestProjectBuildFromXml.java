@@ -59,233 +59,230 @@ import org.supremica.testhelpers.*;
 import org.supremica.automata.*;
 
 public class TestProjectBuildFromXml
-	extends TestCase
+    extends TestCase
 {
-	public TestProjectBuildFromXml(String name)
-	{
-		super(name);
-	}
-
-	/**
-	 * Sets up the test fixture.
-	 * Called before every test case method.
-	 */
-	protected void setUp()
-	{
-	}
-
-	/**
-	 * Tears down the test fixture.
-	 * Called after every test case method.
-	 */
-	protected void tearDown()
-	{
-	}
-
-	/**
-	 * Assembles and returns a test suite
-	 * for all the test methods of this test case.
-	 */
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(TestProjectBuildFromXml.class);
-		return suite;
-	}
-
-	public void testEx45b()
-	{
-		try
-		{
-
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
-			Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
-			assertTrue(theProject.nbrOfAutomata() == 3);
-			assertTrue(theProject.getName().equals("Ex4_5"));
-			assertTrue(theProject.isDeterministic());
-			assertTrue(theProject.hasAcceptingState());
-			assertTrue(theProject.isAllEventsPrioritized());
-			assertTrue(theProject.isEventControllabilityConsistent());
-			assertTrue(!theProject.hasSelfLoop());
-
-			Automaton specAutomaton = null;
-			Automaton robotAutomaton = null;
-			Automaton machineAutomaton = null;
-
-			for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
-			{
-				Automaton currAutomaton = (Automaton)autIt.next();
-				Alphabet currAlphabet = currAutomaton.getAlphabet();
-				String autName = currAutomaton.getName();
-				assertTrue(autName != null);
-				assertTrue(currAlphabet != null);
-				if (autName.equals("Spec"))
-				{
-					specAutomaton = currAutomaton;
-					assertTrue(currAutomaton.getType() == AutomatonType.SPECIFICATION);
-					assertTrue(currAutomaton.nbrOfStates() == 3);
-					assertTrue(currAutomaton.nbrOfEvents() == 3);
-					assertTrue(currAutomaton.nbrOfTransitions() == 3);
-					assertTrue(currAutomaton.hasInitialState());
-					assertTrue(!currAutomaton.hasSelfLoop());
-					assertTrue(currAutomaton.hasAcceptingState());
-					assertTrue(currAutomaton.isAllEventsPrioritized());
-					assertTrue(currAutomaton.isDeterministic());
-					assertTrue(currAutomaton.nbrOfAcceptingStates() == 1);
-					assertTrue(currAutomaton.nbrOfForbiddenStates() == 0);
-					assertTrue(currAutomaton.nbrOfAcceptingAndForbiddenStates() == 0);
-					assertTrue(currAutomaton.nbrOfControllableEvents() == 2);
-					assertTrue(currAutomaton.nbrOfPrioritizedEvents() == 3);
-					assertTrue(currAutomaton.nbrOfImmediateEvents() == 0);
-					assertTrue(currAutomaton.nbrOfEpsilonEvents() == 0);
-					assertTrue(currAlphabet.nbrOfEvents() == 3);
-					assertTrue(currAutomaton.equalAutomaton(currAutomaton));
-					for (Iterator<LabeledEvent> alphIt = currAlphabet.iterator(); alphIt.hasNext();)
-					{
-						LabeledEvent currEvent = alphIt.next();
-						String currLabel = currEvent.getLabel();
-						assertTrue(currLabel != null);
-						if (currLabel.equals("b"))
-						{
-							assertTrue(!currEvent.isControllable());
-							assertTrue(currEvent.isPrioritized());
-							assertTrue(!currEvent.isImmediate());
-							assertTrue(!currEvent.isEpsilon());
-						}
-						else if (currLabel.equals("c"))
-						{
-							assertTrue(currEvent.isControllable());
-							assertTrue(currEvent.isPrioritized());
-							assertTrue(!currEvent.isImmediate());
-							assertTrue(!currEvent.isEpsilon());
-						}
-						else if (currLabel.equals("d"))
-						{
-							assertTrue(currEvent.isControllable());
-							assertTrue(currEvent.isPrioritized());
-							assertTrue(!currEvent.isImmediate());
-							assertTrue(!currEvent.isEpsilon());
-						}
-						else
-						{
-							assertTrue(false);
-						}
-					}
-				}
-				else if (autName.equals("Robot"))
-				{
-					robotAutomaton = currAutomaton;
-					assertTrue(currAutomaton.getType() == AutomatonType.PLANT);
-					assertTrue(currAutomaton.nbrOfStates() == 2);
-					assertTrue(currAutomaton.nbrOfEvents() == 2);
-					assertTrue(currAutomaton.nbrOfTransitions() == 2);
-					assertTrue(currAutomaton.hasInitialState());
-					assertTrue(!currAutomaton.hasSelfLoop());
-					assertTrue(currAutomaton.hasAcceptingState());
-					assertTrue(currAutomaton.isAllEventsPrioritized());
-					assertTrue(currAutomaton.isDeterministic());
-					assertTrue(currAutomaton.nbrOfAcceptingStates() == 2);
-					assertTrue(currAutomaton.nbrOfForbiddenStates() == 0);
-					assertTrue(currAutomaton.nbrOfAcceptingAndForbiddenStates() == 0);
-					assertTrue(currAutomaton.nbrOfControllableEvents() == 1);
-					assertTrue(currAutomaton.nbrOfPrioritizedEvents() == 2);
-					assertTrue(currAutomaton.nbrOfImmediateEvents() == 0);
-					assertTrue(currAutomaton.nbrOfEpsilonEvents() == 0);
-					assertTrue(currAlphabet.nbrOfEvents() == 2);
-					assertTrue(currAutomaton.equalAutomaton(currAutomaton));
-					for (Iterator<LabeledEvent> alphIt = currAlphabet.iterator(); alphIt.hasNext();)
-					{
-						LabeledEvent currEvent = alphIt.next();
-						String currLabel = currEvent.getLabel();
-						assertTrue(currLabel != null);
-						if (currLabel.equals("a"))
-						{
-							assertTrue(currEvent.isControllable());
-							assertTrue(currEvent.isPrioritized());
-							assertTrue(!currEvent.isImmediate());
-							assertTrue(!currEvent.isEpsilon());
-						}
-						else if (currLabel.equals("b"))
-						{
-							assertTrue(!currEvent.isControllable());
-							assertTrue(currEvent.isPrioritized());
-							assertTrue(!currEvent.isImmediate());
-							assertTrue(!currEvent.isEpsilon());
-						}
-						else
-						{
-							assertTrue(false);
-						}
-					}
-				}
-				else if (autName.equals("Machine"))
-				{
-					machineAutomaton = currAutomaton;
-					assertTrue(currAutomaton.getType() == AutomatonType.PLANT);
-					assertTrue(currAutomaton.nbrOfStates() == 2);
-					assertTrue(currAutomaton.nbrOfEvents() == 3);
-					assertTrue(currAutomaton.nbrOfTransitions() == 3);
-					assertTrue(currAutomaton.hasInitialState());
-					assertTrue(!currAutomaton.hasSelfLoop());
-					assertTrue(currAutomaton.hasAcceptingState());
-					assertTrue(currAutomaton.isAllEventsPrioritized());
-					assertTrue(currAutomaton.isDeterministic());
-					assertTrue(currAutomaton.nbrOfAcceptingStates() == 2);
-					assertTrue(currAutomaton.nbrOfForbiddenStates() == 0);
-					assertTrue(currAutomaton.nbrOfAcceptingAndForbiddenStates() == 0);
-					assertTrue(currAutomaton.nbrOfControllableEvents() == 3);
-					assertTrue(currAutomaton.nbrOfPrioritizedEvents() == 3);
-					assertTrue(currAutomaton.nbrOfImmediateEvents() == 0);
-					assertTrue(currAutomaton.nbrOfEpsilonEvents() == 0);
-					assertTrue(currAlphabet.nbrOfEvents() == 3);
-					assertTrue(currAutomaton.equalAutomaton(currAutomaton));
-					for (Iterator<LabeledEvent> alphIt = currAlphabet.iterator(); alphIt.hasNext();)
-					{
-						LabeledEvent currEvent = alphIt.next();
-						String currLabel = currEvent.getLabel();
-						assertTrue(currLabel != null);
-						if (currLabel.equals("c"))
-						{
-							assertTrue(currEvent.isControllable());
-							assertTrue(currEvent.isPrioritized());
-							assertTrue(!currEvent.isImmediate());
-							assertTrue(!currEvent.isEpsilon());
-						}
-						else if (currLabel.equals("d"))
-						{
-							assertTrue(currEvent.isControllable());
-							assertTrue(currEvent.isPrioritized());
-							assertTrue(!currEvent.isImmediate());
-							assertTrue(!currEvent.isEpsilon());
-						}
-						else if (currLabel.equals("e"))
-						{
-							assertTrue(currEvent.isControllable());
-							assertTrue(currEvent.isPrioritized());
-							assertTrue(!currEvent.isImmediate());
-							assertTrue(!currEvent.isEpsilon());
-						}
-						else
-						{
-							assertTrue(false);
-						}
-					}
-				}
-				else
-				{
-					assertTrue(false);
-				}
-			}
-			assertTrue(specAutomaton != null);
-			assertTrue(robotAutomaton != null);
-			assertTrue(machineAutomaton != null);
-
-		}
-		catch (Exception ex)
-		{
-			ex.printStackTrace();
-			assertTrue(false);
-		}
-	}
-
+    public TestProjectBuildFromXml(String name)
+    {
+        super(name);
+    }
+    
+    /**
+     * Sets up the test fixture.
+     * Called before every test case method.
+     */
+    protected void setUp()
+    {
+    }
+    
+    /**
+     * Tears down the test fixture.
+     * Called after every test case method.
+     */
+    protected void tearDown()
+    {
+    }
+    
+    /**
+     * Assembles and returns a test suite
+     * for all the test methods of this test case.
+     */
+    public static Test suite()
+    {
+        TestSuite suite = new TestSuite(TestProjectBuildFromXml.class);
+        return suite;
+    }
+    
+    public void testEx45b()
+    {
+        try
+        {
+            
+            ProjectBuildFromXml builder = new ProjectBuildFromXml();
+            Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
+            assertTrue(theProject.nbrOfAutomata() == 3);
+            assertTrue(theProject.getName().equals("Ex4_5"));
+            assertTrue(theProject.isDeterministic());
+            assertTrue(theProject.hasAcceptingState());
+            assertTrue(theProject.isAllEventsPrioritized());
+            assertTrue(theProject.isEventControllabilityConsistent());
+            assertTrue(!theProject.hasSelfLoop());
+            
+            Automaton specAutomaton = null;
+            Automaton robotAutomaton = null;
+            Automaton machineAutomaton = null;
+            
+            for (Iterator autIt = theProject.iterator(); autIt.hasNext();)
+            {
+                Automaton currAutomaton = (Automaton)autIt.next();
+                Alphabet currAlphabet = currAutomaton.getAlphabet();
+                String autName = currAutomaton.getName();
+                assertTrue(autName != null);
+                assertTrue(currAlphabet != null);
+                if (autName.equals("Spec"))
+                {
+                    specAutomaton = currAutomaton;
+                    assertTrue(currAutomaton.getType() == AutomatonType.SPECIFICATION);
+                    assertTrue(currAutomaton.nbrOfStates() == 3);
+                    assertTrue(currAutomaton.nbrOfEvents() == 3);
+                    assertTrue(currAutomaton.nbrOfTransitions() == 3);
+                    assertTrue(currAutomaton.hasInitialState());
+                    assertTrue(!currAutomaton.hasSelfLoop());
+                    assertTrue(currAutomaton.hasAcceptingState());
+                    assertTrue(currAutomaton.isAllEventsPrioritized());
+                    assertTrue(currAutomaton.isDeterministic());
+                    assertTrue(currAutomaton.nbrOfAcceptingStates() == 1);
+                    assertTrue(currAutomaton.nbrOfForbiddenStates() == 0);
+                    assertTrue(currAutomaton.nbrOfAcceptingAndForbiddenStates() == 0);
+                    assertTrue(currAutomaton.nbrOfControllableEvents() == 2);
+                    assertTrue(currAutomaton.nbrOfPrioritizedEvents() == 3);
+                    assertTrue(currAutomaton.nbrOfImmediateEvents() == 0);
+                    assertTrue(currAutomaton.nbrOfEpsilonEvents() == 0);
+                    assertTrue(currAlphabet.nbrOfEvents() == 3);
+                    assertTrue(currAutomaton.equalAutomaton(currAutomaton));
+                    for (Iterator<LabeledEvent> alphIt = currAlphabet.iterator(); alphIt.hasNext();)
+                    {
+                        LabeledEvent currEvent = alphIt.next();
+                        String currLabel = currEvent.getLabel();
+                        assertTrue(currLabel != null);
+                        if (currLabel.equals("b"))
+                        {
+                            assertTrue(!currEvent.isControllable());
+                            assertTrue(currEvent.isPrioritized());
+                            assertTrue(!currEvent.isImmediate());
+                        }
+                        else if (currLabel.equals("c"))
+                        {
+                            assertTrue(currEvent.isControllable());
+                            assertTrue(currEvent.isPrioritized());
+                            assertTrue(!currEvent.isImmediate());
+                        }
+                        else if (currLabel.equals("d"))
+                        {
+                            assertTrue(currEvent.isControllable());
+                            assertTrue(currEvent.isPrioritized());
+                            assertTrue(!currEvent.isImmediate());
+                        }
+                        else
+                        {
+                            assertTrue(false);
+                        }
+                    }
+                }
+                else if (autName.equals("Robot"))
+                {
+                    robotAutomaton = currAutomaton;
+                    assertTrue(currAutomaton.getType() == AutomatonType.PLANT);
+                    assertTrue(currAutomaton.nbrOfStates() == 2);
+                    assertTrue(currAutomaton.nbrOfEvents() == 2);
+                    assertTrue(currAutomaton.nbrOfTransitions() == 2);
+                    assertTrue(currAutomaton.hasInitialState());
+                    assertTrue(!currAutomaton.hasSelfLoop());
+                    assertTrue(currAutomaton.hasAcceptingState());
+                    assertTrue(currAutomaton.isAllEventsPrioritized());
+                    assertTrue(currAutomaton.isDeterministic());
+                    assertTrue(currAutomaton.nbrOfAcceptingStates() == 2);
+                    assertTrue(currAutomaton.nbrOfForbiddenStates() == 0);
+                    assertTrue(currAutomaton.nbrOfAcceptingAndForbiddenStates() == 0);
+                    assertTrue(currAutomaton.nbrOfControllableEvents() == 1);
+                    assertTrue(currAutomaton.nbrOfPrioritizedEvents() == 2);
+                    assertTrue(currAutomaton.nbrOfImmediateEvents() == 0);
+                    assertTrue(currAutomaton.nbrOfEpsilonEvents() == 0);
+                    assertTrue(currAlphabet.nbrOfEvents() == 2);
+                    assertTrue(currAutomaton.equalAutomaton(currAutomaton));
+                    for (Iterator<LabeledEvent> alphIt = currAlphabet.iterator(); alphIt.hasNext();)
+                    {
+                        LabeledEvent currEvent = alphIt.next();
+                        String currLabel = currEvent.getLabel();
+                        assertTrue(currLabel != null);
+                        if (currLabel.equals("a"))
+                        {
+                            assertTrue(currEvent.isControllable());
+                            assertTrue(currEvent.isPrioritized());
+                            assertTrue(!currEvent.isImmediate());
+                            assertTrue(currEvent.isObservable());
+                        }
+                        else if (currLabel.equals("b"))
+                        {
+                            assertTrue(!currEvent.isControllable());
+                            assertTrue(currEvent.isPrioritized());
+                            assertTrue(!currEvent.isImmediate());
+                            assertTrue(currEvent.isObservable());
+                        }
+                        else
+                        {
+                            assertTrue(false);
+                        }
+                    }
+                }
+                else if (autName.equals("Machine"))
+                {
+                    machineAutomaton = currAutomaton;
+                    assertTrue(currAutomaton.getType() == AutomatonType.PLANT);
+                    assertTrue(currAutomaton.nbrOfStates() == 2);
+                    assertTrue(currAutomaton.nbrOfEvents() == 3);
+                    assertTrue(currAutomaton.nbrOfTransitions() == 3);
+                    assertTrue(currAutomaton.hasInitialState());
+                    assertTrue(!currAutomaton.hasSelfLoop());
+                    assertTrue(currAutomaton.hasAcceptingState());
+                    assertTrue(currAutomaton.isAllEventsPrioritized());
+                    assertTrue(currAutomaton.isDeterministic());
+                    assertTrue(currAutomaton.nbrOfAcceptingStates() == 2);
+                    assertTrue(currAutomaton.nbrOfForbiddenStates() == 0);
+                    assertTrue(currAutomaton.nbrOfAcceptingAndForbiddenStates() == 0);
+                    assertTrue(currAutomaton.nbrOfControllableEvents() == 3);
+                    assertTrue(currAutomaton.nbrOfPrioritizedEvents() == 3);
+                    assertTrue(currAutomaton.nbrOfImmediateEvents() == 0);
+                    assertTrue(currAutomaton.nbrOfEpsilonEvents() == 0);
+                    assertTrue(currAlphabet.nbrOfEvents() == 3);
+                    assertTrue(currAutomaton.equalAutomaton(currAutomaton));
+                    for (Iterator<LabeledEvent> alphIt = currAlphabet.iterator(); alphIt.hasNext();)
+                    {
+                        LabeledEvent currEvent = alphIt.next();
+                        String currLabel = currEvent.getLabel();
+                        assertTrue(currLabel != null);
+                        if (currLabel.equals("c"))
+                        {
+                            assertTrue(currEvent.isControllable());
+                            assertTrue(currEvent.isPrioritized());
+                            assertTrue(!currEvent.isImmediate());
+                            assertTrue(currEvent.isObservable());
+                        }
+                        else if (currLabel.equals("d"))
+                        {
+                            assertTrue(currEvent.isControllable());
+                            assertTrue(currEvent.isPrioritized());
+                            assertTrue(!currEvent.isImmediate());
+                            assertTrue(currEvent.isObservable());
+                        }
+                        else if (currLabel.equals("e"))
+                        {
+                            assertTrue(currEvent.isControllable());
+                            assertTrue(currEvent.isPrioritized());
+                            assertTrue(!currEvent.isImmediate());
+                            assertTrue(currEvent.isObservable());
+                        }
+                        else
+                        {
+                            assertTrue(false);
+                        }
+                    }
+                }
+                else
+                {
+                    assertTrue(false);
+                }
+            }
+            assertTrue(specAutomaton != null);
+            assertTrue(robotAutomaton != null);
+            assertTrue(machineAutomaton != null);
+            
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            assertTrue(false);
+        }
+    }
+    
 }
 

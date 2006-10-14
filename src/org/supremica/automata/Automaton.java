@@ -784,7 +784,7 @@ public class Automaton
                 LabeledEvent currEvent = evIt.next().getEvent();
 
                 // Epsilon event?
-                if (currEvent.isEpsilon())
+                if (!currEvent.isObservable())
                 {
                     return false;
                 }
@@ -1132,7 +1132,7 @@ public class Automaton
         {
             Arc currArc = arcIt.next();
 
-            if (currArc.getEvent().isEpsilon())
+            if (!currArc.getEvent().isObservable())
             {
                 amount++;
             }
@@ -1808,12 +1808,12 @@ public class Automaton
             if (tau == null)
             {
                 tau = new LabeledEvent(silentName);
-                tau.setEpsilon(true);
+                tau.setUnobservable(true);
                 getAlphabet().addEvent(tau);
             }
             else
             {
-                if (!tau.isEpsilon())
+                if (tau.isObservable())
                 {
                     logger.error("The event name " + silentName +
                         " is reserved and must be unobservable!");
@@ -1842,13 +1842,13 @@ public class Automaton
             if (tau_c == null)
             {
                 tau_c = new LabeledEvent(silentCName);
-                tau_c.setEpsilon(true);
+                tau_c.setUnobservable(true);
                 tau_c.setControllable(true);
                 getAlphabet().addEvent(tau_c);
             }
             else
             {
-                if (!tau_c.isEpsilon() || !tau_c.isControllable())
+                if (tau_c.isObservable() || !tau_c.isControllable())
                 {
                     logger.error("The event name " + silentCName +
                         " is reserved and must be controllable and unobservable!");
@@ -1861,13 +1861,13 @@ public class Automaton
             if (tau_u == null)
             {
                 tau_u = new LabeledEvent(silentUName);
-                tau_u.setEpsilon(true);
+                tau_u.setUnobservable(true);
                 tau_u.setControllable(false);
                 getAlphabet().addEvent(tau_u);
             }
             else
             {
-                if (!tau_u.isEpsilon() || tau_u.isControllable())
+                if (tau_u.isObservable() || tau_u.isControllable())
                 {
                     logger.error("The event name " + silentUName +
                         " is reserved and must be uncontrollable and unobservable!");
@@ -1996,7 +1996,7 @@ public class Automaton
 
     public int nbrOfEpsilonEvents()
     {
-        return alphabet.nbrOfEpsilonEvents();
+        return alphabet.nbrOfUnobservableEvents();
     }
 
     public int nbrOfUnobservableEvents()

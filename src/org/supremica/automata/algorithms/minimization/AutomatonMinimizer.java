@@ -285,7 +285,7 @@ public class AutomatonMinimizer
                 // If there is just one event and it's epsilon,
                 // it's easy! (If we don't care about state names.)
                 if ((theAutomaton.getAlphabet().size() == 1) &&
-                    (theAutomaton.getAlphabet().nbrOfEpsilonEvents() == 1) &&
+                    (theAutomaton.getAlphabet().nbrOfUnobservableEvents() == 1) &&
                     useShortNames)
                 {
                     // The conflict equivalent automaton is just one state, the initial state.
@@ -766,7 +766,7 @@ public class AutomatonMinimizer
             
             State currState = stateIt.next();
             StateSet nextStates;
-            if (e.isEpsilon())
+            if (e.isUnobservable())
             {
                 // Find the states that can be reached by epsilons,
                 // i.e. the epsilonclosure of currState
@@ -822,7 +822,7 @@ public class AutomatonMinimizer
                 // So this arc may be OK, just check that there are no more arcs in the iterator!
                 Arc arc = arcIt.next();
                 State two = arc.getToState();
-                boolean arcOK = !arcIt.hasNext() && arc.getEvent().isEpsilon() && !arc.isSelfLoop();
+                boolean arcOK = !arcIt.hasNext() && arc.getEvent().isUnobservable() && !arc.isSelfLoop();
                 boolean markingOK = options.getIgnoreMarking() || (one.hasEqualMarking(two));
                 arcIt = null;
                 if (arcOK && markingOK)
@@ -839,7 +839,7 @@ public class AutomatonMinimizer
                     for (Iterator<Arc> it = state.incomingArcsIterator(); it.hasNext(); )
                     {
                         Arc epsilonArc = it.next();
-                        if (epsilonArc.getEvent().isEpsilon())
+                        if (epsilonArc.getEvent().isUnobservable())
                         {
                             statesToExamine.add(epsilonArc.getFromState());
                         }
@@ -1059,7 +1059,7 @@ public class AutomatonMinimizer
             for (Iterator<Arc> arcIt = state.outgoingArcsIterator(); arcIt.hasNext(); )
             {
                 Arc arc = arcIt.next();
-                if (arc.getEvent().isEpsilon())
+                if (arc.getEvent().isUnobservable())
                 {
                     assert(!arc.isSelfLoop());
                     check = true;
@@ -1155,7 +1155,7 @@ public class AutomatonMinimizer
             for (Iterator<Arc> arcIt = state.outgoingArcsIterator(); arcIt.hasNext(); )
             {
                 Arc arc = arcIt.next();
-                if (arc.getEvent().isEpsilon())
+                if (arc.getEvent().isUnobservable())
                 {
                     assert(!arc.isSelfLoop());
                     check = true;
@@ -1253,7 +1253,7 @@ public class AutomatonMinimizer
             for (Iterator<Arc> outIt = one.outgoingArcsIterator(); outIt.hasNext(); )
             {
                 Arc arc = outIt.next();
-                if (arc.getEvent().isEpsilon())
+                if (arc.getEvent().isUnobservable())
                 {
                     if (!arc.isSelfLoop())
                     {
@@ -1276,7 +1276,7 @@ public class AutomatonMinimizer
             }
             
             // Are all incoming epsilon?
-            if (ok && (one.nbrOfIncomingArcs() == one.nbrOfIncomingEpsilonArcs()))
+            if (ok && (one.nbrOfIncomingArcs() == one.nbrOfIncomingUnobservableArcs()))
             {
                 // "Copy" outgoing arcs from one to the previous states.
                 for (Iterator<Arc> inIt = one.incomingArcsIterator(); inIt.hasNext(); )
@@ -1285,7 +1285,7 @@ public class AutomatonMinimizer
                     State fromState = inArc.getFromState();
 
                     // Should be epsilon!
-                    assert(inArc.getEvent().isEpsilon());
+                    assert(inArc.getEvent().isUnobservable());
                     // Should not be a selfloop
                     assert(!inArc.isSelfLoop());
                     
@@ -1483,7 +1483,7 @@ public class AutomatonMinimizer
                         Arc arc = arcIt.next();
                         State previous = arc.getFromState();
                         
-                        if (arc.getEvent().isEpsilon())
+                        if (arc.getEvent().isUnobservable())
                         {
                             if (previous.getCost() != State.MAX_COST)
                             {
@@ -1686,7 +1686,7 @@ public class AutomatonMinimizer
             for (Iterator<Arc> outIt = state.outgoingArcsIterator(); outIt.hasNext(); )
             {
                 Arc arc = outIt.next();
-                if (!arc.getEvent().isEpsilon())
+                if (!arc.getEvent().isUnobservable())
                 {
                     continue loop;
                 }
@@ -1800,12 +1800,12 @@ public class AutomatonMinimizer
         if (tau == null)
         {
             tau = new LabeledEvent(silentName);
-            tau.setEpsilon(true);
+            tau.setUnobservable(true);
             aut.getAlphabet().addEvent(tau);
         }
         else
         {
-            if (!tau.isEpsilon())
+            if (!tau.isUnobservable())
             {
                 throw new SupremicaException("Misuse of reserved event name 'tau'.");
             }
@@ -1849,13 +1849,13 @@ public class AutomatonMinimizer
         if (tau_u == null)
         {
             tau_u = new LabeledEvent(silentUName);
-            tau_u.setEpsilon(true);
+            tau_u.setUnobservable(true);
             tau_u.setControllable(false);
             aut.getAlphabet().addEvent(tau_u);
         }
         else
         {
-            if (!tau_u.isEpsilon() || tau_u.isControllable())
+            if (!tau_u.isUnobservable() || tau_u.isControllable())
             {
                 throw new SupremicaException("Misuse of reserved event name 'tau_u'.");
             }
@@ -1952,7 +1952,7 @@ public class AutomatonMinimizer
                     Arc arc = arcIt.next();
          
                     // We can safely ignore the closure, we'll get there, don't worry
-                    if (arc.getEvent().isEpsilon())
+                    if (arc.getEvent().isUnobservable())
                     {
                         // Don't add self-loops of epsilons (we will do that later in each state)
                         if (!currState.equals(arc.getToState()))
@@ -1982,7 +1982,7 @@ public class AutomatonMinimizer
          
             // Add silent self-loop
             LabeledEvent tau = new LabeledEvent(SupremicaProperties.getSilentEventName());
-            tau.setEpsilon(true);
+            tau.setUnobservable(true);
             if (!aut.getAlphabet().contains(tau))
             {
                 aut.getAlphabet().addEvent(tau);
@@ -2024,7 +2024,7 @@ public class AutomatonMinimizer
         for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
         {
             Arc arc = arcIt.next();
-            if (arc.isSelfLoop() && arc.getEvent().isEpsilon())
+            if (arc.isSelfLoop() && arc.getEvent().isUnobservable())
             {
                 logger.fatal("Epsilon selfloop: " + arc);
                 ActionMan.getGui().addAutomaton(aut);
@@ -2054,7 +2054,7 @@ public class AutomatonMinimizer
         for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
         {
             Arc currArc = arcIt.next();
-            if (currArc.isSelfLoop() && currArc.getEvent().isEpsilon())
+            if (currArc.isSelfLoop() && currArc.getEvent().isUnobservable())
             {
                 toBeRemoved.add(currArc);
             }
@@ -2083,7 +2083,7 @@ public class AutomatonMinimizer
                 Arc firstArc = outIt.next();
                 LabeledEvent firstEvent = firstArc.getEvent();
                 
-                if (firstEvent.isEpsilon() || firstEvent.equals(event))
+                if (firstEvent.isUnobservable() || firstEvent.equals(event))
                 {
                     State s3 = firstArc.getToState();
                     
@@ -2094,8 +2094,8 @@ public class AutomatonMinimizer
                         {
                             LabeledEvent secondEvent = secondArc.getEvent();
                             // The order (wrt ||) in this if-clause is important!!
-                            if ((secondEvent.isEpsilon() &&
-                                (!firstEvent.isEpsilon() || arc.getEvent().isEpsilon())) ||
+                            if ((secondEvent.isUnobservable() &&
+                                (!firstEvent.isUnobservable() || arc.getEvent().isUnobservable())) ||
                                 (secondEvent.equals(arc.getEvent()) &&
                                 !firstEvent.equals(secondEvent)))
                             {
@@ -2135,7 +2135,7 @@ public class AutomatonMinimizer
             assert(!s3set.contains(s1)); // There should be no loops!
             // Now if s2 can be reached from s3set using at least one a, the arc can be removed!
             StateSet set;
-            if (a.isEpsilon())
+            if (a.isUnobservable())
             {
                 set = s3set.epsilonClosure(false);
             }
@@ -2149,7 +2149,7 @@ public class AutomatonMinimizer
                 continue arcLoop;
             }
             // If a is epsilon, we will do the same thing all over again... so skip it!
-            if (a.isEpsilon())
+            if (a.isUnobservable())
             {
                 continue arcLoop;
             }
@@ -2187,7 +2187,7 @@ public class AutomatonMinimizer
             LabeledEvent event = evIt.next();
             
             // Epsilon?
-            if (event.isEpsilon())
+            if (event.isUnobservable())
             {
                 // Is this event in use?
                 for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
@@ -2488,7 +2488,7 @@ class StateInfoIncoming
                 Arc arc = arcIterator.next();
                 
                 // Ignore epsilon events
-                if (!arc.getEvent().isEpsilon())
+                if (!arc.getEvent().isUnobservable())
                 {
                     Arclet arclet = new Arclet(arc);
                     add(arclet);

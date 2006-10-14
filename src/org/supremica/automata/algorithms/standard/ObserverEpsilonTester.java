@@ -16,16 +16,16 @@ import org.supremica.automata.*;
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public class ObserverEpsilonTester
-	implements EpsilonTester
+    implements EpsilonTester
 {
-	public boolean isThisEpsilon(LabeledEvent event)
-	{
-		return event.isEpsilon() ||!event.isObservable();
-	}
-
-	// debug only
-	public String showWhatYouGot()
-	{
-		return "removing epsilons and unobservable events";
-	}
+    public boolean isThisEpsilon(LabeledEvent event)
+    {
+        return !event.isObservable();
+    }
+    
+    // debug only
+    public String showWhatYouGot()
+    {
+        return "removing epsilons and unobservable events";
+    }
 }

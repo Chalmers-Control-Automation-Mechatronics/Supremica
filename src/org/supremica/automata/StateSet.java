@@ -218,7 +218,7 @@ public class StateSet
                 Arc currArc = arcIt.next();
                 State state = currArc.getToState();
                 
-                if (currArc.getEvent().isEpsilon() && !currArc.isSelfLoop() &&
+                if (!currArc.getEvent().isObservable() && !currArc.isSelfLoop() &&
                     !result.contains(state))
                 {
                     statesToExamine.add(state);

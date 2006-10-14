@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Automata name="Observation equivalence exercise" comment="From an exercise by Milner in 'A Calculus of Communicating Systems' (LNCS 92, Springer 1980). Four of the pairs of processes are observation equivalent (aka weak bisimulation equivalent). The question is which...">
+<Automata name="Observation equivalence exercise" comment="From an exercise by Milner in 'A Calculus of Communicating Systems' (LNCS 92, Springer 1980). Four of the pairs of processes are observation equivalent (aka weak bisimulation equivalent). The question is which... you can find out by minimising with respect to observation equivalence--which finds the unique minimal representation--and then inspect the graphs visually.">
 <!-- i, iv, vi, vii -->
 <Automaton name="i.a" type="Plant">
 	<Events>

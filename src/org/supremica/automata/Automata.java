@@ -438,7 +438,7 @@ public class Automata
         {
             if (!automaton.isDeterministic())
             {
-                logger.warn("Automaton " + automaton + " is not deterministic");
+                //logger.warn("Automaton " + automaton + " is not deterministic");
                 deterministic = false;
             }
         }
@@ -715,7 +715,7 @@ public class Automata
 
                 if (currAlpha.contains(currEvent.getLabel()))
                 {
-                    if (currEvent.isEpsilon() != currAlpha.getEvent(currEvent.getLabel()).isEpsilon())
+                    if (currEvent.isObservable() != currAlpha.getEvent(currEvent.getLabel()).isObservable())
                     {
                         logger.error("The event " + currEvent + " is not epsilon consistent.");
 

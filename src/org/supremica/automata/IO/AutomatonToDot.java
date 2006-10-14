@@ -59,318 +59,311 @@ import org.supremica.automata.LabeledEvent;
 import org.supremica.properties.Config;
 
 public class AutomatonToDot
-	implements AutomataSerializer
+    implements AutomataSerializer
 {
-
-	// We hope that this is the size of an A4 page (isn't 8.5" times 11" ??)
-	private static final int DEFAULT_WIDTH = 7;
-	private static final int DEFAULT_HEIGHT = 11;
-	private Automaton aut;
-
-	private boolean leftToRight = Config.DOT_LEFT_TO_RIGHT.isTrue();
-	private boolean withLabel = Config.DOT_WITH_STATE_LABELS.isTrue();
-	private boolean withCircles = Config.DOT_WITH_CIRCLES.isTrue();
-	private boolean useStateColors = Config.DOT_USE_STATE_COLORS.isTrue();
-	private boolean useArcColors = Config.DOT_USE_ARC_COLORS.isTrue();
-	private boolean writeEventLabels = Config.DOT_WITH_EVENT_LABELS.isTrue();
-
-	public AutomatonToDot(Automaton aut)
-	{
-		this.aut = aut;
-	}
-
-	public boolean isLeftToRight()
-	{
-		return leftToRight;
-	}
-
-	public void setLeftToRight(boolean leftToRight)
-	{
-		this.leftToRight = leftToRight;
-	}
-
-	public void setWithLabels(boolean withLabel)
-	{
-		this.withLabel = withLabel;
-	}
-
-	public void setWithEventLabels(boolean withLabel)
-	{
-		this.writeEventLabels = withLabel;
-	}
-
-	public void setWithCircles(boolean withCircles)
-	{
-		this.withCircles = withCircles;
-	}
-
-	public void setUseStateColors(boolean useStateColors)
-	{
-		this.useStateColors = useStateColors;
-	}
-
-	public void setUseArcColors(boolean useArcColors)
-	{
-		this.useArcColors = useArcColors;
-	}
-
-	protected String getStateColor(State s)
-	{
-		if (!useStateColors)
-		{
-			return "";
-		}
-
-		if (s.isAccepting() &&!s.isForbidden())
-		{
-			return ", color = green3";
-		}
-
-		if (s.isMutuallyAccepting() &&!s.isForbidden())
-		{
-			return ", color = yellow";
-		}
-
-		if (s.isForbidden())
-		{
-			return ", color = red1";
-		}
-
-		return "";
-	}
-
-	protected String getArcColor(boolean is_ctrl, boolean is_prio, boolean is_imm, boolean is_eps, boolean is_obs, boolean is_prop)
-	{
-		if (useArcColors)
-		{
-			if (is_ctrl)
-			{
-				return ", color = green3";
-			}
-			else
-			{
-				return ", color = red1";
-			}
-		}
-
-		return "";
-	}
-
-	public void serialize(PrintWriter pw)
-		throws Exception
-	{
-		//aut.normalizeStateIdentities();
-
-		/*
-		EnumerateStates en = new EnumerateStates(aut, "q");
-		en.execute();
-		*/
-
-		Vector initialStates = new Vector();
-		final String initPrefix = "__init_";
-		String standardShape = null;
-		String acceptingShape = null;
-		String mutuallyAcceptingShape = null;
-		String forbiddenShape = null;
-
-		pw.println("digraph state_automaton {");
-		pw.println("\tcenter = true;");
-
-		// fix page size to this:
-		pw.println("\tsize = \"" + DEFAULT_WIDTH + "," + DEFAULT_HEIGHT + "\";");
-
-		if (leftToRight)
-		{
-			pw.println("\trankdir = LR;");
-		}
-
-		if (withCircles)
-		{
-			standardShape = "circle";
-			acceptingShape = "doublecircle";
-			mutuallyAcceptingShape = "doublecircle";
-			forbiddenShape = "box";
-		}
-		else
-		{
-			standardShape = "plaintext";
-			acceptingShape = "ellipse";
-			mutuallyAcceptingShape = "ellipse";
-			forbiddenShape = "box";
-		}
-
-		// The mutually accepting states are not shown if we aren't using colors...
-		if (!useStateColors)
-		{
-			mutuallyAcceptingShape = "plaintext";
-		}
-
-		if (!aut.hasInitialState())
-		{
-			pw.println("\t noState [shape = plaintext, label = \"No initial state\" ]");
-			pw.println("}");
-			pw.flush();
-			pw.close();
-
-			return;
-		}
-
-		for (Iterator states = aut.stateIterator(); states.hasNext(); )
-		{
-			State state = (State) states.next();
-
-			if (state.isInitial())
-			{
-				initialStates.addElement(state);
-				pw.println("\t{node [shape = plaintext, style=invis, label=\"\"] \"" + initPrefix + state.getName() + "\"};");
-			}
-
-			if (state.isAccepting() &&!state.isForbidden())
-			{
-				pw.println("\t{node [shape = " + acceptingShape + "] \"" + state.getName() + "\"};");
-			}
-
-			if (state.isMutuallyAccepting() &&!state.isForbidden())
-			{
-				pw.println("\t{node [shape = " + mutuallyAcceptingShape + "] \"" + state.getName() + "\"};");
-			}
-			else if (state.isForbidden())
-			{
-				pw.println("\t{node [shape = " + forbiddenShape + "] \"" + state.getName() + "\"};");
-			}
-			else
-			{
-				pw.println("\t{node [shape = " + standardShape + "] \"" + state.getName() + "\"};");
-			}
-		}
-
-		for (int i = 0; i < initialStates.size(); i++)
-		{
-			String stateId = ((State) initialStates.elementAt(i)).getName();
-
-			// pw.println("\t\"" + initPrefix + stateId + "\" [label = \"\"]; ");
-			// pw.println("\t\"" + initPrefix + stateId + "\" [height = \"0\"]; ");
-			// pw.println("\t\"" + initPrefix + stateId + "\" [width = \"0\"]; ");
-			pw.println("\t\"" + initPrefix + stateId + "\" -> \"" + stateId + "\";");
-		}
-
-		//Alphabet theAlphabet = aut.getAlphabet();
-		for (Iterator states = aut.stateIterator(); states.hasNext(); )
-		{
-			State sourceState = (State) states.next();
-
-			pw.print("\t\"" + sourceState.getName() + "\" [label = \"");
-
-			if (withLabel)
-			{
-				pw.print(EncodingHelper.normalize(sourceState.getName(), false));
-			}
-
-			pw.println("\"" + getStateColor(sourceState) + "]; ");
-
-
-			for (Iterator arcSets = sourceState.outgoingMultiArcIterator();
-					arcSets.hasNext(); )
-			{
-				boolean is_ctrl = true;
-				boolean is_prio = false;
-				boolean is_imm = false;
-				boolean is_eps = false;
-				boolean is_obs = false;
-				boolean is_prop = false;
-				MultiArc currArcSet = (MultiArc) arcSets.next();
-				State fromState = currArcSet.getFromState();
-				State toState = currArcSet.getToState();
-
-				pw.print("\t\"" + fromState.getName() + "\" -> \"" + toState.getName());
-
-				pw.print("\" [ label = \"");
-
-				if (writeEventLabels)
-				{
-					for (Iterator arcIt = currArcSet.iterator(); arcIt.hasNext(); )
-					{
-						Arc currArc = (Arc) arcIt.next();
-						LabeledEvent thisEvent = currArc.getEvent();
-
-						if (!thisEvent.isControllable())
-						{
-							pw.print("!");
-
-							is_ctrl = false;
-						}
-
-						if (!thisEvent.isPrioritized())
-						{
-							pw.print("?");
-
-							is_prio = true;
-						}
-
-						if (thisEvent.isImmediate())
-						{
-							pw.print("#");
-
-							is_imm = true;
-						}
-
-						if (thisEvent.isEpsilon())
-						{
-							pw.print("%");
-
-							is_eps = true;
-						}
-
-						if (thisEvent.isProposition())
-						{
-							pw.print("@");
-
-							is_prop = true;
-						}
-
-						if (!thisEvent.isObservable())
-						{
-							pw.print("$");
-
-							is_obs = true;
-						}
-
-						pw.print(EncodingHelper.normalize(thisEvent.getLabel(), false));
-
-						if (arcIt.hasNext())
-						{
-							pw.print("\\n");
-						}
-					}
-				}
-				pw.println("\" " + getArcColor(is_ctrl, is_prio, is_imm, is_eps, is_obs, is_prop) + "];");
-
-				// Commented out large event label font. Did not like this but maybel we can include it as an option.
-				//pw.println("\" " + getArcColor(is_ctrl, is_prio, is_imm, is_eps, is_obs, is_prop) + ", fontname=\"Helvetica\" , fontsize=\"26\"];");
-			}
-		}
-
-		// An attemp to always start at the initial state.
-		// The problem is that a rectangle is drawn around the initial state.
-		// Ok, new versions of dot seems to be able to deal with this.
-		for (Iterator stateIt = initialStates.iterator(); stateIt.hasNext(); )
-		{
-			State currState = (State) stateIt.next();
-
-			pw.println("\t{ rank = min ;");
-			pw.println("\t\t\"" + initPrefix + currState.getName() + "\";");
-			pw.println("\t\t\"" + currState.getName() + "\";");
-			pw.println("\t}");
-		}
-
-		pw.println("}");
-		pw.flush();
-		pw.close();
-	}
-
-	public void serialize(String fileName)
-		throws Exception
-	{
-		serialize(new PrintWriter(new FileWriter(fileName)));
-	}
+    
+    // We hope that this is the size of an A4 page (isn't 8.5" times 11" ??)
+    private static final int DEFAULT_WIDTH = 7;
+    private static final int DEFAULT_HEIGHT = 11;
+    private Automaton aut;
+    
+    private boolean leftToRight = Config.DOT_LEFT_TO_RIGHT.isTrue();
+    private boolean withLabel = Config.DOT_WITH_STATE_LABELS.isTrue();
+    private boolean withCircles = Config.DOT_WITH_CIRCLES.isTrue();
+    private boolean useStateColors = Config.DOT_USE_STATE_COLORS.isTrue();
+    private boolean useArcColors = Config.DOT_USE_ARC_COLORS.isTrue();
+    private boolean writeEventLabels = Config.DOT_WITH_EVENT_LABELS.isTrue();
+    
+    public AutomatonToDot(Automaton aut)
+    {
+        this.aut = aut;
+    }
+    
+    public boolean isLeftToRight()
+    {
+        return leftToRight;
+    }
+    
+    public void setLeftToRight(boolean leftToRight)
+    {
+        this.leftToRight = leftToRight;
+    }
+    
+    public void setWithLabels(boolean withLabel)
+    {
+        this.withLabel = withLabel;
+    }
+    
+    public void setWithEventLabels(boolean withLabel)
+    {
+        this.writeEventLabels = withLabel;
+    }
+    
+    public void setWithCircles(boolean withCircles)
+    {
+        this.withCircles = withCircles;
+    }
+    
+    public void setUseStateColors(boolean useStateColors)
+    {
+        this.useStateColors = useStateColors;
+    }
+    
+    public void setUseArcColors(boolean useArcColors)
+    {
+        this.useArcColors = useArcColors;
+    }
+    
+    protected String getStateColor(State s)
+    {
+        if (!useStateColors)
+        {
+            return "";
+        }
+        
+        if (s.isAccepting() &&!s.isForbidden())
+        {
+            return ", color = green3";
+        }
+        
+        if (s.isMutuallyAccepting() &&!s.isForbidden())
+        {
+            return ", color = yellow";
+        }
+        
+        if (s.isForbidden())
+        {
+            return ", color = red1";
+        }
+        
+        return "";
+    }
+    
+    protected String getArcColor(boolean is_ctrl, boolean is_prio, boolean is_imm, boolean is_eps, boolean is_obs, boolean is_prop)
+    {
+        if (useArcColors)
+        {
+            if (is_ctrl)
+            {
+                return ", color = green3";
+            }
+            else
+            {
+                return ", color = red1";
+            }
+        }
+        
+        return "";
+    }
+    
+    public void serialize(PrintWriter pw)
+    throws Exception
+    {
+        //aut.normalizeStateIdentities();
+        
+                /*
+                EnumerateStates en = new EnumerateStates(aut, "q");
+                en.execute();
+                 */
+        
+        Vector initialStates = new Vector();
+        final String initPrefix = "__init_";
+        String standardShape = null;
+        String acceptingShape = null;
+        String mutuallyAcceptingShape = null;
+        String forbiddenShape = null;
+        
+        pw.println("digraph state_automaton {");
+        pw.println("\tcenter = true;");
+        
+        // fix page size to this:
+        pw.println("\tsize = \"" + DEFAULT_WIDTH + "," + DEFAULT_HEIGHT + "\";");
+        
+        if (leftToRight)
+        {
+            pw.println("\trankdir = LR;");
+        }
+        
+        if (withCircles)
+        {
+            standardShape = "circle";
+            acceptingShape = "doublecircle";
+            mutuallyAcceptingShape = "doublecircle";
+            forbiddenShape = "box";
+        }
+        else
+        {
+            standardShape = "plaintext";
+            acceptingShape = "ellipse";
+            mutuallyAcceptingShape = "ellipse";
+            forbiddenShape = "box";
+        }
+        
+        // The mutually accepting states are not shown if we aren't using colors...
+        if (!useStateColors)
+        {
+            mutuallyAcceptingShape = "plaintext";
+        }
+        
+        if (!aut.hasInitialState())
+        {
+            pw.println("\t noState [shape = plaintext, label = \"No initial state\" ]");
+            pw.println("}");
+            pw.flush();
+            pw.close();
+            
+            return;
+        }
+        
+        for (Iterator states = aut.stateIterator(); states.hasNext(); )
+        {
+            State state = (State) states.next();
+            
+            if (state.isInitial())
+            {
+                initialStates.addElement(state);
+                pw.println("\t{node [shape = plaintext, style=invis, label=\"\"] \"" + initPrefix + state.getName() + "\"};");
+            }
+            
+            if (state.isAccepting() &&!state.isForbidden())
+            {
+                pw.println("\t{node [shape = " + acceptingShape + "] \"" + state.getName() + "\"};");
+            }
+            
+            if (state.isMutuallyAccepting() &&!state.isForbidden())
+            {
+                pw.println("\t{node [shape = " + mutuallyAcceptingShape + "] \"" + state.getName() + "\"};");
+            }
+            else if (state.isForbidden())
+            {
+                pw.println("\t{node [shape = " + forbiddenShape + "] \"" + state.getName() + "\"};");
+            }
+            else
+            {
+                pw.println("\t{node [shape = " + standardShape + "] \"" + state.getName() + "\"};");
+            }
+        }
+        
+        for (int i = 0; i < initialStates.size(); i++)
+        {
+            String stateId = ((State) initialStates.elementAt(i)).getName();
+            
+            // pw.println("\t\"" + initPrefix + stateId + "\" [label = \"\"]; ");
+            // pw.println("\t\"" + initPrefix + stateId + "\" [height = \"0\"]; ");
+            // pw.println("\t\"" + initPrefix + stateId + "\" [width = \"0\"]; ");
+            pw.println("\t\"" + initPrefix + stateId + "\" -> \"" + stateId + "\";");
+        }
+        
+        //Alphabet theAlphabet = aut.getAlphabet();
+        for (Iterator states = aut.stateIterator(); states.hasNext(); )
+        {
+            State sourceState = (State) states.next();
+            
+            pw.print("\t\"" + sourceState.getName() + "\" [label = \"");
+            
+            if (withLabel)
+            {
+                pw.print(EncodingHelper.normalize(sourceState.getName(), false));
+            }
+            
+            pw.println("\"" + getStateColor(sourceState) + "]; ");
+            
+            
+            for (Iterator arcSets = sourceState.outgoingMultiArcIterator();
+            arcSets.hasNext(); )
+            {
+                boolean is_ctrl = true;
+                boolean is_prio = false;
+                boolean is_imm = false;
+                boolean is_eps = false;
+                boolean is_obs = false;
+                boolean is_prop = false;
+                MultiArc currArcSet = (MultiArc) arcSets.next();
+                State fromState = currArcSet.getFromState();
+                State toState = currArcSet.getToState();
+                
+                pw.print("\t\"" + fromState.getName() + "\" -> \"" + toState.getName());
+                
+                pw.print("\" [ label = \"");
+                
+                if (writeEventLabels)
+                {
+                    for (Iterator arcIt = currArcSet.iterator(); arcIt.hasNext(); )
+                    {
+                        Arc currArc = (Arc) arcIt.next();
+                        LabeledEvent thisEvent = currArc.getEvent();
+                        
+                        if (!thisEvent.isControllable())
+                        {
+                            pw.print("!");
+                            
+                            is_ctrl = false;
+                        }
+                        
+                        if (!thisEvent.isPrioritized())
+                        {
+                            pw.print("?");
+                            
+                            is_prio = true;
+                        }
+                        
+                        if (thisEvent.isImmediate())
+                        {
+                            pw.print("#");
+                            
+                            is_imm = true;
+                        }
+                        
+                        if (thisEvent.isProposition())
+                        {
+                            pw.print("@");
+                            
+                            is_prop = true;
+                        }
+                        
+                        if (!thisEvent.isObservable())
+                        {
+                            pw.print("$");
+                            
+                            is_obs = true;
+                        }
+                        
+                        pw.print(EncodingHelper.normalize(thisEvent.getLabel(), false));
+                        
+                        if (arcIt.hasNext())
+                        {
+                            pw.print("\\n");
+                        }
+                    }
+                }
+                pw.println("\" " + getArcColor(is_ctrl, is_prio, is_imm, is_eps, is_obs, is_prop) + "];");
+                
+                // Commented out large event label font. Did not like this but maybel we can include it as an option.
+                //pw.println("\" " + getArcColor(is_ctrl, is_prio, is_imm, is_eps, is_obs, is_prop) + ", fontname=\"Helvetica\" , fontsize=\"26\"];");
+            }
+        }
+        
+        // An attemp to always start at the initial state.
+        // The problem is that a rectangle is drawn around the initial state.
+        // Ok, new versions of dot seems to be able to deal with this.
+        for (Iterator stateIt = initialStates.iterator(); stateIt.hasNext(); )
+        {
+            State currState = (State) stateIt.next();
+            
+            pw.println("\t{ rank = min ;");
+            pw.println("\t\t\"" + initPrefix + currState.getName() + "\";");
+            pw.println("\t\t\"" + currState.getName() + "\";");
+            pw.println("\t}");
+        }
+        
+        pw.println("}");
+        pw.flush();
+        pw.close();
+    }
+    
+    public void serialize(String fileName)
+    throws Exception
+    {
+        serialize(new PrintWriter(new FileWriter(fileName)));
+    }
 }
