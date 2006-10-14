@@ -150,7 +150,7 @@ public final class Config
 
     // GUI_ANALYZER
     public static final BooleanProperty INCLUDE_BOUNDED_UNCON_TOOLS = new BooleanProperty(PropertyType.GUI_ANALYZER, "includeBoundedUnconTools", false, "Include unbounded controllability tools");
-    public static final BooleanProperty GUI_ANALYZER_AUTOMATONVIEWER_USE_CONTROLLED_SURFACE = new BooleanProperty(PropertyType.GUI_ANALYZER, "automatonViewerUseControlledSurface", true, "Use new controlled surface panel to display an automaton");
+    public static final BooleanProperty GUI_ANALYZER_AUTOMATONVIEWER_USE_CONTROLLED_SURFACE = new BooleanProperty(PropertyType.GUI_ANALYZER, "automatonViewerUseControlledSurface", false, "Use new controlled surface panel to display an automaton");
 
     // GUI_SIMULATOR
     public static final BooleanProperty INCLUDE_ANIMATOR = new BooleanProperty(PropertyType.GUI_SIMULATOR, "includeAnimator", false, "Include 2D Graphical Animator");

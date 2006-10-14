@@ -206,8 +206,11 @@ public class AnalyzerAutomataPanel
 							else
 							{
 								Automaton selectedAutomaton = selectedAutomata.getFirstAutomaton();
-								GraphProxy currGraphProxy = moduleContainer.getFlatGraphProxy(selectedAutomaton.getName());
-								ModuleProxy currModuleProxy = moduleContainer.getFlatModuleProxy();
+								ModuleContainer flatModuleContainer = moduleContainer.getFlatModuleContainer();
+
+								//GraphProxy currGraphProxy = moduleContainer.getFlatGraphProxy(selectedAutomaton.getName());
+								//ModuleProxy currModuleProxy = moduleContainer.getFlatModuleProxy();
+								/*
 								if (currGraphProxy == null)
 								{
 									logger.error("AnalyzerAutomataPanel.currGraphProxy == null");
@@ -218,6 +221,7 @@ public class AnalyzerAutomataPanel
 									logger.error("AnalyzerAutomataPanel.currModuleProxy == null");
 									return;
 								}
+								*/
 
 								//boolean isSubject = currGraphProxy instanceof GraphSubject;
 								//logger.info("isGraphSubject: " + isSubject);
@@ -227,9 +231,11 @@ public class AnalyzerAutomataPanel
 								try
 								{
 									//EditorSurface surface = new EditorSurface((GraphSubject)currGraphProxy, (ModuleSubject)currModuleProxy, new SubjectShapeProducer((GraphSubject)currGraphProxy, currModuleProxy));
-									ControlledSurface surface = new ControlledSurface((GraphSubject)currGraphProxy, (ModuleSubject)currModuleProxy);
+									//ControlledSurface surface = new ControlledSurface((GraphSubject)currGraphProxy, (ModuleSubject)currModuleProxy);
 
-									analyzerPanel.setRightComponent(surface);
+									ComponentViewPanel componentView = flatModuleContainer.getComponentViewPanel(selectedAutomaton.getName());
+
+									analyzerPanel.setRightComponent(componentView);
 								}
 								catch (Exception ex)
 								{

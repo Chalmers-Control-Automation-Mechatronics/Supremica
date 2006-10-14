@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.91 2006-10-14 11:04:36 knut Exp $
+//# $Id: ControlledSurface.java,v 1.92 2006-10-14 12:21:27 knut Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -89,35 +89,34 @@ public class ControlledSurface
 
       mutable = (r != null && t != null);
 
-      if (mutable)
-      {
-		  root = r;
-		  mToolbar = t;
-		  t.attach(this);
-		  mController = new SelectListener();
-		  addMouseListener(mController);
-		  addMouseListener(new MouseAdapter()
-		  {
-			  public void mousePressed(MouseEvent e)
-			  {
-				  ControlledSurface.this.requestFocusInWindow();
-			  }
-		  });
-		  addMouseMotionListener(mController);
-		  addKeyListener(new KeySpy());
-		  setFocusable(true);
-		  dtListener = new DTListener();
-		  dropTarget = new DropTarget(this, dtListener);
-		  mDragSource = DragSource.getDefaultDragSource();
-		  mDGListener = new DGListener();
-		  mDSListener = new DSListener();
+	  root = r;
+	  mToolbar = t;
 
-		  // component, action, listener
-		  mDragSource.createDefaultDragGestureRecognizer(this,
-								  mDragAction,
-								  mDGListener);
-		  mDragSource.addDragSourceListener(mDSListener);
-      }
+	  if (mutable)
+	  	t.attach(this);
+	  mController = new SelectListener();
+	  addMouseListener(mController);
+	  addMouseListener(new MouseAdapter()
+	  {
+		  public void mousePressed(MouseEvent e)
+		  {
+			  ControlledSurface.this.requestFocusInWindow();
+		  }
+	  });
+	  addMouseMotionListener(mController);
+	  addKeyListener(new KeySpy());
+	  setFocusable(true);
+	  dtListener = new DTListener();
+	  dropTarget = new DropTarget(this, dtListener);
+	  mDragSource = DragSource.getDefaultDragSource();
+	  mDGListener = new DGListener();
+	  mDSListener = new DSListener();
+
+	  // component, action, listener
+	  mDragSource.createDefaultDragGestureRecognizer(this,
+							  mDragAction,
+							  mDGListener);
+	  mDragSource.addDragSourceListener(mDSListener);
     }
 
 
