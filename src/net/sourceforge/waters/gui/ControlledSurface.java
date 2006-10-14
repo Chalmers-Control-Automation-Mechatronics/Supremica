@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.90 2006-10-14 10:37:28 knut Exp $
+//# $Id: ControlledSurface.java,v 1.91 2006-10-14 11:04:36 knut Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -87,7 +87,7 @@ public class ControlledSurface
       super(graph, module, new SubjectShapeProducer(graph, module));
       graph.addModelObserver(this);
 
-      mutable = true;
+      mutable = (r != null && t != null);
 
       if (mutable)
       {

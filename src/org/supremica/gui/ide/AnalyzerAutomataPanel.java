@@ -226,7 +226,9 @@ public class AnalyzerAutomataPanel
 
 								try
 								{
-									EditorSurface surface = new EditorSurface((GraphSubject)currGraphProxy, (ModuleSubject)currModuleProxy, new SubjectShapeProducer((GraphSubject)currGraphProxy, currModuleProxy));
+									//EditorSurface surface = new EditorSurface((GraphSubject)currGraphProxy, (ModuleSubject)currModuleProxy, new SubjectShapeProducer((GraphSubject)currGraphProxy, currModuleProxy));
+									ControlledSurface surface = new ControlledSurface((GraphSubject)currGraphProxy, (ModuleSubject)currModuleProxy);
+
 									analyzerPanel.setRightComponent(surface);
 								}
 								catch (Exception ex)
