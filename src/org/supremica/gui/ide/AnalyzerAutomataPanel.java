@@ -28,6 +28,7 @@ import net.sourceforge.waters.gui.EditorSurface;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 
@@ -217,6 +218,11 @@ public class AnalyzerAutomataPanel
 									logger.error("AnalyzerAutomataPanel.currModuleProxy == null");
 									return;
 								}
+
+								boolean isSubject = currGraphProxy instanceof GraphSubject;
+								logger.info("isGraphSubject: " + isSubject);
+								isSubject = currModuleProxy instanceof ModuleSubject;
+								logger.info("isModuleSubject: " + isSubject);
 
 								EditorSurface surface = new EditorSurface(currGraphProxy, currModuleProxy);
 								analyzerPanel.setRightComponent(surface);

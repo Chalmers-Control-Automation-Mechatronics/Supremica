@@ -56,7 +56,7 @@ import java.io.*;
 
 public class GraphicsToClipboard
 {
-	private static Logger logger = LoggerFactory.createLogger(DotViewer.class);
+	private static Logger logger = LoggerFactory.createLogger(GraphicsToClipboard.class);
 	private static GraphicsToClipboard theInstance = null;
 
 	private ClipboardCopy clipboardCopy = null;

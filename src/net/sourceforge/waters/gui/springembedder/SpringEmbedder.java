@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.16 2006-10-14 08:59:28 knut Exp $
+//# $Id: SpringEmbedder.java,v 1.17 2006-10-14 10:12:02 knut Exp $
 //###########################################################################
 
 
@@ -42,14 +42,22 @@ public class SpringEmbedder
   public SpringEmbedder(GraphSubject graph)
     throws GeometryAbsentException
   {
-    this(graph, 228424);
+    this(graph, -1);
   }
 
-  public SpringEmbedder(GraphSubject graph, final int seed)
+  public SpringEmbedder(GraphSubject graph, final int timeout)
+    throws GeometryAbsentException
+  {
+    this(graph, timeout, 228424);
+  }
+
+  public SpringEmbedder(GraphSubject graph, final int timeout, final int seed)
     throws GeometryAbsentException
   {
     mRandom = new Random(seed);
     mGraph = graph;
+    mTimeout = timeout;
+
     final Collection<NodeSubject> nodes = graph.getNodesModifiable();
     final int numnodes = nodes.size();
     mNodeMap = new HashMap<SimpleNodeSubject,NodeWrapper>(numnodes);
@@ -90,6 +98,12 @@ public class SpringEmbedder
   {
 	springEmbedders.add(this);
 
+	long stoptime = Long.MAX_VALUE;
+	if (mTimeout >= 0)
+	{
+		stoptime = System.currentTimeMillis() + mTimeout;
+	}
+
     int count = 0;
     double limit = CONVERGENCE_CONST;
     for (int i = 1; i < NUM_PASSES; i++) {
@@ -101,6 +115,7 @@ public class SpringEmbedder
         maxdelta = calculateDisplacements();
         if (count++ >= UPDATE_CONST) {
           count = 0;
+          if (System.currentTimeMillis() > stoptime) stop();
           SwingUtilities.invokeLater(new Runnable() {
               public void run() {
                 updateModel();
@@ -108,7 +123,7 @@ public class SpringEmbedder
             });
           Thread.yield();
         }
-      } while (maxdelta > limit && !stop);
+      } while (maxdelta > limit && !mStop);
       limit *= 0.25;
     }
     SwingUtilities.invokeLater(new Runnable() {
@@ -246,7 +261,7 @@ public class SpringEmbedder
 
 	public void stop()
 	{
-		stop = true;
+		mStop = true;
 	}
 
   //#########################################################################
@@ -659,7 +674,8 @@ public class SpringEmbedder
 
   private double mInitialStateAttraction;
   private int mPass;
-  private volatile boolean stop = false;
+  private final int mTimeout;
+  private volatile boolean mStop = false;
 
 
   //###########################################################################

@@ -114,7 +114,7 @@ public class SubjectShapeProducer
       }
     }
     if (runEmbedder) {
-      Thread t = new Thread(new SpringEmbedder(graph));
+      Thread t = new Thread(new SpringEmbedder(graph, Config.GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT.get()));
       t.start();
     }
     graph.addModelObserver(this);

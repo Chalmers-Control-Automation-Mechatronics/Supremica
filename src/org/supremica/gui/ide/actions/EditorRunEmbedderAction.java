@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   EditorRunEmbedderAction
 //###########################################################################
-//# $Id: EditorRunEmbedderAction.java,v 1.3 2006-10-07 14:38:44 robi Exp $
+//# $Id: EditorRunEmbedderAction.java,v 1.4 2006-10-14 10:12:02 knut Exp $
 //###########################################################################
 
 
@@ -22,6 +22,7 @@ import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import org.supremica.gui.ide.IDE;
+import org.supremica.properties.Config;
 
 /**
  * A new action
@@ -63,7 +64,8 @@ public class EditorRunEmbedderAction
 			getControlledSurface().getGraph();
         if (graph != null) {
 			try {
-				final SpringEmbedder embedder = new SpringEmbedder(graph);
+				SpringEmbedder.stopAll();
+				final SpringEmbedder embedder = new SpringEmbedder(graph, Config.GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT.get());
 				final Thread thread = new Thread(embedder);
 				thread.start();
 			} catch (final GeometryAbsentException exception) {
