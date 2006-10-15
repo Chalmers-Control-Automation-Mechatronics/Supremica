@@ -5,7 +5,7 @@
 <EventDecl Kind="CONTROLLABLE" Name="player1_remove_two"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="player2_remove_one"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="player2_remove_two"/>
-<EventDecl Kind="PROPOSITION" Name="@omega"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
@@ -22,7 +22,7 @@
 </SimpleNode>
 <SimpleNode Name="player2">
 <EventList>
-<SimpleIdentifier Name="@omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="224" Y="256"/>

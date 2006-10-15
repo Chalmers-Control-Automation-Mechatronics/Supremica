@@ -2,31 +2,31 @@
 <ProductDES Name="machine:break:repair"
             xmlns="http://waters.sourceforge.net/xsd/des">
 <EventList>
-<Event Kind="PROPOSITION" Name="@omega"/>
+<Event Kind="PROPOSITION" Name=":accepting"/>
 <Event Kind="UNCONTROLLABLE" Name="finish"/>
 <Event Kind="CONTROLLABLE" Name="start"/>
 </EventList>
 <AutomataList>
 <Automaton Kind="PLANT" Name="machine:break:repair">
 <EventRefList>
-<EventRef Name="@omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="finish"/>
 <EventRef Name="start"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="idle">
 <EventRefList>
-<EventRef Name="@omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="down">
 <EventRefList>
-<EventRef Name="@omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="working">
 <EventRefList>
-<EventRef Name="@omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>

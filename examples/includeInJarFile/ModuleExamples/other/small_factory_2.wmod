@@ -11,7 +11,7 @@
 <EventDecl Name="finish2" Kind="UNCONTROLLABLE"/>
 <EventDecl Name="break2" Kind="UNCONTROLLABLE"/>
 <EventDecl Name="repair2" Kind="CONTROLLABLE"/>
-<EventDecl Name="@omega" Kind="PROPOSITION"/>
+<EventDecl Name=":accepting" Kind="PROPOSITION"/>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
@@ -20,7 +20,7 @@
   <NodeList>
     <SimpleNode Name="idle" Initial="true">
       <EventList>
-        <SimpleIdentifier Name="@omega"/>
+        <SimpleIdentifier Name=":accepting"/>
       </EventList>
     </SimpleNode>
     <SimpleNode Name="working"/>
@@ -48,7 +48,7 @@
   <NodeList>
     <SimpleNode Name="idle" Initial="true">
       <EventList>
-        <SimpleIdentifier Name="@omega"/>
+        <SimpleIdentifier Name=":accepting"/>
       </EventList>
     </SimpleNode>
     <SimpleNode Name="working"/>
@@ -76,7 +76,7 @@
   <NodeList>
     <SimpleNode Name="empty" Initial="true">
       <EventList>
-        <SimpleIdentifier Name="@omega"/>
+        <SimpleIdentifier Name=":accepting"/>
       </EventList>
     </SimpleNode>
     <SimpleNode Name="full"/>
@@ -100,7 +100,7 @@
   <NodeList>
     <SimpleNode Name="m2ok" Initial="true">
       <EventList>
-        <SimpleIdentifier Name="@omega"/>
+        <SimpleIdentifier Name=":accepting"/>
       </EventList>
     </SimpleNode>
     <SimpleNode Name="m2down"/>

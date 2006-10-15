@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="Waters" xmlns="http://waters.sourceforge.net/xsd/module">
     <EventDeclList>
-        <EventDecl Kind="PROPOSITION" Observable="true" Name="omega"/>
+        <EventDecl Kind="PROPOSITION" Observable="true" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Observable="true" Name="m"/>
         <EventDecl Kind="CONTROLLABLE" Observable="true" Name="mb"/>
         <EventDecl Kind="CONTROLLABLE" Observable="true" Name="mw"/>
@@ -26,7 +26,7 @@
                     </SimpleNode>
                     <SimpleNode Initial="false" Name="mr">
                         <EventList>
-                            <SimpleIdentifier Name="omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
                             <Point X="192" Y="144"/>
@@ -94,7 +94,7 @@
                     </SimpleNode>
                     <SimpleNode Initial="false" Name="wr">
                         <EventList>
-                            <SimpleIdentifier Name="omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
                             <Point X="192" Y="144"/>
@@ -156,7 +156,7 @@
                     </SimpleNode>
                     <SimpleNode Initial="false" Name="gr">
                         <EventList>
-                            <SimpleIdentifier Name="omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
                             <Point X="192" Y="144"/>
@@ -218,7 +218,7 @@
                     </SimpleNode>
                     <SimpleNode Initial="false" Name="cr">
                         <EventList>
-                            <SimpleIdentifier Name="omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
                             <Point X="192" Y="144"/>

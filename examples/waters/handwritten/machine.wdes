@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProductDES Name="machine" xmlns="http://waters.sourceforge.net/xsd/des">
     <EventList>
-        <Event Kind="PROPOSITION" Name="@omega"/>
+        <Event Kind="PROPOSITION" Name=":accepting"/>
         <Event Kind="UNCONTROLLABLE" Name="break"/>
         <Event Kind="UNCONTROLLABLE" Name="finish"/>
         <Event Kind="CONTROLLABLE" Name="repair"/>
@@ -10,7 +10,7 @@
     <AutomataList>
         <Automaton Kind="PLANT" Name="machine">
             <EventRefList>
-                <EventRef Name="@omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="break"/>
                 <EventRef Name="finish"/>
                 <EventRef Name="repair"/>
@@ -20,7 +20,7 @@
                 <State Initial="false" Name="down"/>
                 <State Initial="true" Name="idle">
                     <EventRefList>
-                        <EventRef Name="@omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Initial="false" Name="working"/>

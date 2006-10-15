@@ -2,7 +2,7 @@
 <Automata name="ftechnik_nocoll" major="0" minor="9">
 <Automaton name="station[S4]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="LED_off[S4]"/>
 		<Event id="2" label="LED_on[S4]"/>
 		<Event id="3" label="LS_off[S4]" controllable="false"/>
@@ -41,7 +41,7 @@
 </Automaton>
 <Automaton name="plant_move_Lz[1]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_down[1]"/>
 		<Event id="2" label="L_up[1]"/>
 		<Event id="3" label="TL_Z1[1]" controllable="false"/>
@@ -79,7 +79,7 @@
 </Automaton>
 <Automaton name="plant_move_Ly[2]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_back[2]"/>
 		<Event id="2" label="L_forward[2]"/>
 		<Event id="3" label="TL_Y1[2]" controllable="false"/>
@@ -133,7 +133,7 @@
 </Automaton>
 <Automaton name="belt_pick" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="LS_off_B1[2]" controllable="false"/>
 		<Event id="2" label="LS_on_B1[2]" controllable="false"/>
 		<Event id="3" label="L_pick_B1[1]"/>
@@ -155,7 +155,7 @@
 </Automaton>
 <Automaton name="init" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_dropS[S][1]"/>
 		<Event id="2" label="L_dropS[S][2]"/>
 		<Event id="3" label="L_drop_B2[2]"/>
@@ -196,7 +196,7 @@
 </Automaton>
 <Automaton name="init_Y[2]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_back[2]"/>
 		<Event id="2" label="L_forward[2]"/>
 		<Event id="3" label="L_mY1[2]"/>
@@ -246,7 +246,7 @@
 </Automaton>
 <Automaton name="spec_move_Lz[1]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_back[1]"/>
 		<Event id="2" label="L_down[1]"/>
 		<Event id="3" label="L_dropS[S][1]"/>
@@ -337,7 +337,7 @@
 </Automaton>
 <Automaton name="spec_move_Ly[1]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_back[1]"/>
 		<Event id="2" label="L_forward[1]"/>
 		<Event id="3" label="L_mY1[1]"/>
@@ -414,7 +414,7 @@
 </Automaton>
 <Automaton name="station[S1]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="LED_off[S1]"/>
 		<Event id="2" label="LED_on[S1]"/>
 		<Event id="3" label="LS_off[S1]" controllable="false"/>
@@ -453,7 +453,7 @@
 </Automaton>
 <Automaton name="plant_move_L2x" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_at_X2[2]" controllable="false"/>
 		<Event id="2" label="L_at_X3[2]" controllable="false"/>
 		<Event id="3" label="L_at_X4[2]" controllable="false"/>
@@ -623,7 +623,7 @@
 </Automaton>
 <Automaton name="observer_L2x" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_at_X2[2]" controllable="false"/>
 		<Event id="2" label="L_at_X3[2]" controllable="false"/>
 		<Event id="3" label="L_at_X4[2]" controllable="false"/>
@@ -812,7 +812,7 @@
 </Automaton>
 <Automaton name="nocoll_X2" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_at_X1[1]" controllable="false"/>
 		<Event id="2" label="L_at_X2[1]" controllable="false"/>
 		<Event id="3" label="L_at_X2[2]" controllable="false"/>
@@ -836,7 +836,7 @@
 </Automaton>
 <Automaton name="nocoll_X7" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_at_X6[1]" controllable="false"/>
 		<Event id="2" label="L_at_X7[1]" controllable="false"/>
 		<Event id="3" label="L_at_X7[2]" controllable="false"/>
@@ -860,7 +860,7 @@
 </Automaton>
 <Automaton name="magnet[1]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_mag_off[1]"/>
 		<Event id="2" label="L_mag_on[1]"/>
 		<Event id="3" label="init_done"/>
@@ -881,7 +881,7 @@
 </Automaton>
 <Automaton name="spec_move_Ly[2]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_back[2]"/>
 		<Event id="2" label="L_forward[2]"/>
 		<Event id="3" label="L_mY1[2]"/>
@@ -958,7 +958,7 @@
 </Automaton>
 <Automaton name="magnet_L1" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_at_X1[1]" controllable="false"/>
 		<Event id="2" label="L_at_X2[1]" controllable="false"/>
 		<Event id="3" label="L_at_X3[1]" controllable="false"/>
@@ -1084,7 +1084,7 @@
 </Automaton>
 <Automaton name="init_L2X8" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_right[2]"/>
 		<Event id="2" label="TL_X8[2]" controllable="false"/>
 		<Event id="3" label="init"/>
@@ -1110,7 +1110,7 @@
 </Automaton>
 <Automaton name="nocoll_X3" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_at_X2[1]" controllable="false"/>
 		<Event id="2" label="L_at_X3[1]" controllable="false"/>
 		<Event id="3" label="L_at_X3[2]" controllable="false"/>
@@ -1134,7 +1134,7 @@
 </Automaton>
 <Automaton name="init_LZ1[2]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_up[2]"/>
 		<Event id="2" label="TL_Z1[2]" controllable="false"/>
 		<Event id="3" label="init"/>
@@ -1160,7 +1160,7 @@
 </Automaton>
 <Automaton name="magnet_L2" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_at_X2[2]" controllable="false"/>
 		<Event id="2" label="L_at_X3[2]" controllable="false"/>
 		<Event id="3" label="L_at_X4[2]" controllable="false"/>
@@ -1284,7 +1284,7 @@
 </Automaton>
 <Automaton name="drop_on_station[S2]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="LS_off[S2]" controllable="false"/>
 		<Event id="2" label="LS_on[S2]" controllable="false"/>
 		<Event id="3" label="L_dropS[S2][1]"/>
@@ -1318,7 +1318,7 @@
 </Automaton>
 <Automaton name="init_Y[1]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_back[1]"/>
 		<Event id="2" label="L_forward[1]"/>
 		<Event id="3" label="L_mY1[1]"/>
@@ -1368,7 +1368,7 @@
 </Automaton>
 <Automaton name="nocoll_X6" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_at_X5[1]" controllable="false"/>
 		<Event id="2" label="L_at_X6[1]" controllable="false"/>
 		<Event id="3" label="L_at_X6[2]" controllable="false"/>
@@ -1392,7 +1392,7 @@
 </Automaton>
 <Automaton name="station[S2]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="LED_off[S2]"/>
 		<Event id="2" label="LED_on[S2]"/>
 		<Event id="3" label="LS_off[S2]" controllable="false"/>
@@ -1431,7 +1431,7 @@
 </Automaton>
 <Automaton name="init_LZ1[1]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_up[1]"/>
 		<Event id="2" label="TL_Z1[1]" controllable="false"/>
 		<Event id="3" label="init"/>
@@ -1457,7 +1457,7 @@
 </Automaton>
 <Automaton name="plant_move_Lz[2]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_down[2]"/>
 		<Event id="2" label="L_up[2]"/>
 		<Event id="3" label="TL_Z1[2]" controllable="false"/>
@@ -1495,7 +1495,7 @@
 </Automaton>
 <Automaton name="magnet[2]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_mag_off[2]"/>
 		<Event id="2" label="L_mag_on[2]"/>
 		<Event id="3" label="init_done"/>
@@ -1516,7 +1516,7 @@
 </Automaton>
 <Automaton name="safety2L2" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_at_X1[1]" controllable="false"/>
 		<Event id="2" label="L_at_X2[1]" controllable="false"/>
 		<Event id="3" label="L_at_X3[1]" controllable="false"/>
@@ -1666,7 +1666,7 @@
 </Automaton>
 <Automaton name="nocoll_X5" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_at_X4[1]" controllable="false"/>
 		<Event id="2" label="L_at_X5[1]" controllable="false"/>
 		<Event id="3" label="L_at_X5[2]" controllable="false"/>
@@ -1690,7 +1690,7 @@
 </Automaton>
 <Automaton name="drop_on_station[S1]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="LS_off[S1]" controllable="false"/>
 		<Event id="2" label="LS_on[S1]" controllable="false"/>
 		<Event id="3" label="L_dropS[S1][1]"/>
@@ -1724,7 +1724,7 @@
 </Automaton>
 <Automaton name="drop_on_station[S4]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="LS_off[S4]" controllable="false"/>
 		<Event id="2" label="LS_on[S4]" controllable="false"/>
 		<Event id="3" label="L_dropS[S4][1]"/>
@@ -1758,7 +1758,7 @@
 </Automaton>
 <Automaton name="drop_on_station[S3]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="LS_off[S3]" controllable="false"/>
 		<Event id="2" label="LS_on[S3]" controllable="false"/>
 		<Event id="3" label="L_dropS[S3][1]"/>
@@ -1792,7 +1792,7 @@
 </Automaton>
 <Automaton name="safety2L1" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_at_X1[1]" controllable="false"/>
 		<Event id="2" label="L_at_X2[1]" controllable="false"/>
 		<Event id="3" label="L_at_X2[2]" controllable="false"/>
@@ -1942,7 +1942,7 @@
 </Automaton>
 <Automaton name="observer_L1x" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_at_X1[1]" controllable="false"/>
 		<Event id="2" label="L_at_X2[1]" controllable="false"/>
 		<Event id="3" label="L_at_X3[1]" controllable="false"/>
@@ -2131,7 +2131,7 @@
 </Automaton>
 <Automaton name="init_L1X1" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_left[1]"/>
 		<Event id="2" label="TL_X1[1]" controllable="false"/>
 		<Event id="3" label="init"/>
@@ -2157,7 +2157,7 @@
 </Automaton>
 <Automaton name="station[S3]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="LED_off[S3]"/>
 		<Event id="2" label="LED_on[S3]"/>
 		<Event id="3" label="LS_off[S3]" controllable="false"/>
@@ -2196,7 +2196,7 @@
 </Automaton>
 <Automaton name="belt_drop" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="LS1_off_B2[1]" controllable="false"/>
 		<Event id="2" label="LS_on_B2[1]" controllable="false"/>
 		<Event id="3" label="L_drop_B2[2]"/>
@@ -2218,7 +2218,7 @@
 </Automaton>
 <Automaton name="plant_move_Ly[1]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_back[1]"/>
 		<Event id="2" label="L_forward[1]"/>
 		<Event id="3" label="TL_Y1[1]" controllable="false"/>
@@ -2272,7 +2272,7 @@
 </Automaton>
 <Automaton name="nocoll_X4" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_at_X3[1]" controllable="false"/>
 		<Event id="2" label="L_at_X4[1]" controllable="false"/>
 		<Event id="3" label="L_at_X4[2]" controllable="false"/>
@@ -2296,7 +2296,7 @@
 </Automaton>
 <Automaton name="spec_move_Lz[2]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_back[2]"/>
 		<Event id="2" label="L_down[2]"/>
 		<Event id="3" label="L_dropS[S][1]"/>
@@ -2387,7 +2387,7 @@
 </Automaton>
 <Automaton name="plant_move_L1x" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="L_at_X1[1]" controllable="false"/>
 		<Event id="2" label="L_at_X2[1]" controllable="false"/>
 		<Event id="3" label="L_at_X3[1]" controllable="false"/>
@@ -2557,7 +2557,7 @@
 </Automaton>
 <Automaton name="belt" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="B1_start"/>
 		<Event id="2" label="B1_stop"/>
 		<Event id="3" label="LS_off_B1[2]" controllable="false"/>

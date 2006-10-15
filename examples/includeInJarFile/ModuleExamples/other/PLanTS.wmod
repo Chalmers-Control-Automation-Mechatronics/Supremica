@@ -116,7 +116,7 @@
                 <SimpleIdentifier Name="n"/>
             </BinaryExpression>
         </EventDecl>
-        <EventDecl Kind="PROPOSITION" Observable="true" Name="omega"/>
+        <EventDecl Kind="PROPOSITION" Observable="true" Name=":accepting"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT">
@@ -125,7 +125,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="a0">
                         <EventList>
-                            <SimpleIdentifier Name="omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
                             <Point X="50" Y="50"/>
@@ -195,7 +195,7 @@
                         <NodeList>
                             <SimpleNode Initial="true" Name="b0">
                                 <EventList>
-                                    <SimpleIdentifier Name="omega"/>
+                                    <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
                                     <Point X="144" Y="144"/>
@@ -309,7 +309,7 @@
                         <NodeList>
                             <SimpleNode Initial="true" Name="c0">
                                 <EventList>
-                                    <SimpleIdentifier Name="omega"/>
+                                    <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
                                     <Point X="112" Y="128"/>
@@ -385,7 +385,7 @@
                         <NodeList>
                             <SimpleNode Initial="true" Name="d0">
                                 <EventList>
-                                    <SimpleIdentifier Name="omega"/>
+                                    <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
                                     <Point X="112" Y="96"/>
@@ -635,7 +635,7 @@
                                 <NodeList>
                                     <SimpleNode Initial="true" Name="e0">
                                         <EventList>
-                                            <SimpleIdentifier Name="omega"/>
+                                            <SimpleIdentifier Name=":accepting"/>
                                         </EventList>
                                         <PointGeometry>
                                             <Point X="176" Y="80"/>
@@ -719,7 +719,7 @@
                         <NodeList>
                             <SimpleNode Initial="true" Name="f0">
                                 <EventList>
-                                    <SimpleIdentifier Name="omega"/>
+                                    <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
                                     <Point X="240" Y="112"/>
@@ -859,7 +859,7 @@
                         <NodeList>
                             <SimpleNode Initial="true" Name="g0">
                                 <EventList>
-                                    <SimpleIdentifier Name="omega"/>
+                                    <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
                                     <Point X="192" Y="176"/>
@@ -955,7 +955,7 @@
                         <NodeList>
                             <SimpleNode Initial="true" Name="h0">
                                 <EventList>
-                                    <SimpleIdentifier Name="omega"/>
+                                    <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
                                     <Point X="144" Y="192"/>
@@ -1160,7 +1160,7 @@
                         <NodeList>
                             <SimpleNode Initial="true" Name="i0">
                                 <EventList>
-                                    <SimpleIdentifier Name="omega"/>
+                                    <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
                                     <Point X="464" Y="192"/>
@@ -1828,7 +1828,7 @@
                         <NodeList>
                             <SimpleNode Initial="true" Name="j0">
                                 <EventList>
-                                    <SimpleIdentifier Name="omega"/>
+                                    <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
                                     <Point X="144" Y="192"/>
@@ -1839,7 +1839,7 @@
                             </SimpleNode>
                             <SimpleNode Initial="false" Name="j1">
                                 <EventList>
-                                    <SimpleIdentifier Name="omega"/>
+                                    <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
                                     <Point X="240" Y="192"/>
@@ -1946,7 +1946,7 @@
                         <NodeList>
                             <SimpleNode Initial="true" Name="k0">
                                 <EventList>
-                                    <SimpleIdentifier Name="omega"/>
+                                    <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
                                     <Point X="176" Y="176"/>
@@ -1957,7 +1957,7 @@
                             </SimpleNode>
                             <SimpleNode Initial="false" Name="k1">
                                 <EventList>
-                                    <SimpleIdentifier Name="omega"/>
+                                    <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
                                     <Point X="272" Y="176"/>
@@ -2072,7 +2072,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="l0">
                         <EventList>
-                            <SimpleIdentifier Name="omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
                             <Point X="176" Y="128"/>

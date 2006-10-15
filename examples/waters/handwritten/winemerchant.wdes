@@ -7,7 +7,7 @@
 <Event Kind="CONTROLLABLE" Name="e23"/>
 <Event Kind="CONTROLLABLE" Name="e31"/>
 <Event Kind="CONTROLLABLE" Name="e32"/>
-<Event Kind="PROPOSITION" Name="omega"/>
+<Event Kind="PROPOSITION" Name=":accepting"/>
 </EventList>
 <AutomataList>
 <Automaton Kind="PLANT" Name="The Wine Merchants Problem - divide 8 units of wine into 4+4 units using (ungraded) bottles of 3, 5 and 8 units respectively">
@@ -18,7 +18,7 @@
 <EventRef Name="e23"/>
 <EventRef Name="e31"/>
 <EventRef Name="e32"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="008"/>
@@ -27,7 +27,7 @@
 <State Name="035"/>
 <State Name="044">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="053"/>

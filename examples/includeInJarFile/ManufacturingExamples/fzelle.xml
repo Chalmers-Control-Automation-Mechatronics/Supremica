@@ -2,7 +2,7 @@
 <Automata name="Production Cell for Mounting Frames" comment="A model of a particular production cell in a metal-processing plant, see 'Formal Development of Reactive Systems - Case Study Production Cell' by Claus Lewerentz and Thomas Lindner. A conveyor feeds metal plates to a robot that modes the plates to a press where the plates are processed and then picked up by the robot and moved to another conveyor belt.">
 <Automaton name="switch[DepositBelt]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[DepositBelt][Off]"/>
 		<Event id="2" label="C[DepositBelt][On]"/>
 	</Events>
@@ -17,7 +17,7 @@
 </Automaton>
 <Automaton name="two_state_move[TableV]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[TableV][Down]"/>
 		<Event id="2" label="C[TableV][Up]"/>
 		<Event id="3" label="U[TableV][S1][0]" controllable="false"/>
@@ -75,7 +75,7 @@
 </Automaton>
 <Automaton name="two_state_move_spec[Arm2]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Arm2][Down]"/>
 		<Event id="2" label="C[Arm2][Stop]"/>
 		<Event id="3" label="C[Arm2][Up]"/>
@@ -104,7 +104,7 @@
 </Automaton>
 <Automaton name="two_state_move_failure[Arm1]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Arm1][Down]"/>
 		<Event id="2" label="C[Arm1][Up]"/>
 		<Event id="3" label="Failure[Arm1]"/>
@@ -145,7 +145,7 @@
 </Automaton>
 <Automaton name="table_full_empty" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Magnet1][On]"/>
 		<Event id="2" label="C[TableR][Down]"/>
 		<Event id="3" label="C[TableR][Up]"/>
@@ -169,7 +169,7 @@
 </Automaton>
 <Automaton name="sensor[FeedBelt][S2]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="U[FeedBelt][S2][0]" controllable="false"/>
 		<Event id="2" label="U[FeedBelt][S2][1]" controllable="false"/>
 	</Events>
@@ -184,7 +184,7 @@
 </Automaton>
 <Automaton name="sensor[FeedBelt][S1]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="U[FeedBelt][S1][0]" controllable="false"/>
 		<Event id="2" label="U[FeedBelt][S1][1]" controllable="false"/>
 	</Events>
@@ -199,7 +199,7 @@
 </Automaton>
 <Automaton name="switch[CraneMagnet]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[CraneMagnet][Off]"/>
 		<Event id="2" label="C[CraneMagnet][On]"/>
 	</Events>
@@ -214,7 +214,7 @@
 </Automaton>
 <Automaton name="two_state_move_sensor_changes[PressV]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[PressV][Down]"/>
 		<Event id="2" label="C[PressV][Stop]"/>
 		<Event id="3" label="C[PressV][Up]"/>
@@ -244,7 +244,7 @@
 </Automaton>
 <Automaton name="sensor[DepositBelt][S1]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="U[DepositBelt][S1][0]" controllable="false"/>
 		<Event id="2" label="U[DepositBelt][S1][1]" controllable="false"/>
 	</Events>
@@ -259,7 +259,7 @@
 </Automaton>
 <Automaton name="switch[Magnet2]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Magnet2][Off]"/>
 		<Event id="2" label="C[Magnet2][On]"/>
 	</Events>
@@ -274,7 +274,7 @@
 </Automaton>
 <Automaton name="two_state_move_failure[Arm2]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Arm2][Down]"/>
 		<Event id="2" label="C[Arm2][Up]"/>
 		<Event id="3" label="Failure[Arm2]"/>
@@ -315,7 +315,7 @@
 </Automaton>
 <Automaton name="four_state_move[RobotR]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[RobotR][Down]"/>
 		<Event id="2" label="C[RobotR][Up]"/>
 		<Event id="3" label="U[RobotR][S1][0]" controllable="false"/>
@@ -417,7 +417,7 @@
 </Automaton>
 <Automaton name="two_state_move_failure[CraneV]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[CraneV][Down]"/>
 		<Event id="2" label="C[CraneV][Up]"/>
 		<Event id="3" label="Failure[CraneV]"/>
@@ -458,7 +458,7 @@
 </Automaton>
 <Automaton name="magnet1_on_table" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Magnet1][On]"/>
 		<Event id="2" label="U[TableR][S2][0]" controllable="false"/>
 		<Event id="3" label="U[TableR][S2][1]" controllable="false"/>
@@ -485,7 +485,7 @@
 </Automaton>
 <Automaton name="crane_vertical" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[CraneV][Down]"/>
 		<Event id="2" label="U[CraneH][S1][0]" controllable="false"/>
 		<Event id="3" label="U[CraneH][S1][1]" controllable="false"/>
@@ -506,7 +506,7 @@
 </Automaton>
 <Automaton name="two_state_move_sensor_changes[TableV]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[TableV][Down]"/>
 		<Event id="2" label="C[TableV][Stop]"/>
 		<Event id="3" label="C[TableV][Up]"/>
@@ -536,7 +536,7 @@
 </Automaton>
 <Automaton name="robot_rotate" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[RobotR][Down]"/>
 		<Event id="2" label="C[RobotR][Up]"/>
 		<Event id="3" label="U[Arm1][S1][0]" controllable="false"/>
@@ -565,7 +565,7 @@
 </Automaton>
 <Automaton name="deposit_belt" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[DepositBelt][Off]"/>
 		<Event id="2" label="C[DepositBelt][On]"/>
 		<Event id="3" label="U[DepositBelt][S2][0]" controllable="false"/>
@@ -584,7 +584,7 @@
 </Automaton>
 <Automaton name="two_state_move_spec[TableV]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[TableV][Down]"/>
 		<Event id="2" label="C[TableV][Stop]"/>
 		<Event id="3" label="C[TableV][Up]"/>
@@ -613,7 +613,7 @@
 </Automaton>
 <Automaton name="robot_arm2" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Arm2][Up]"/>
 		<Event id="2" label="U[RobotR][S2][0]" controllable="false"/>
 		<Event id="3" label="U[RobotR][S2][1]" controllable="false"/>
@@ -634,7 +634,7 @@
 </Automaton>
 <Automaton name="three_state_move_failure[PressV]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[PressV][Down]"/>
 		<Event id="2" label="C[PressV][Up]"/>
 		<Event id="3" label="Failure[PressV]"/>
@@ -703,7 +703,7 @@
 </Automaton>
 <Automaton name="two_state_move_failure[RobotR]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[RobotR][Down]"/>
 		<Event id="2" label="C[RobotR][Up]"/>
 		<Event id="3" label="Failure[RobotR]"/>
@@ -744,7 +744,7 @@
 </Automaton>
 <Automaton name="two_state_move[RobotR]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[RobotR][Down]"/>
 		<Event id="2" label="C[RobotR][Up]"/>
 		<Event id="3" label="U[RobotR][S1][0]" controllable="false"/>
@@ -802,7 +802,7 @@
 </Automaton>
 <Automaton name="two_state_move_spec[CraneV]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[CraneV][Down]"/>
 		<Event id="2" label="C[CraneV][Stop]"/>
 		<Event id="3" label="C[CraneV][Up]"/>
@@ -831,7 +831,7 @@
 </Automaton>
 <Automaton name="robot_arm1" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Arm1][Up]"/>
 		<Event id="2" label="U[RobotR][S1][0]" controllable="false"/>
 		<Event id="3" label="U[RobotR][S1][1]" controllable="false"/>
@@ -852,7 +852,7 @@
 </Automaton>
 <Automaton name="sensor[DepositBelt][S2]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="U[DepositBelt][S2][0]" controllable="false"/>
 		<Event id="2" label="U[DepositBelt][S2][1]" controllable="false"/>
 	</Events>
@@ -867,7 +867,7 @@
 </Automaton>
 <Automaton name="switch[Magnet1]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Magnet1][Off]"/>
 		<Event id="2" label="C[Magnet1][On]"/>
 	</Events>
@@ -882,7 +882,7 @@
 </Automaton>
 <Automaton name="arm2" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Arm2][Down]"/>
 		<Event id="2" label="C[Arm2][Stop]"/>
 		<Event id="3" label="C[Arm2][Up]"/>
@@ -913,7 +913,7 @@
 </Automaton>
 <Automaton name="two_state_move_sensor_changes[CraneH]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[CraneH][Down]"/>
 		<Event id="2" label="C[CraneH][Stop]"/>
 		<Event id="3" label="C[CraneH][Up]"/>
@@ -943,7 +943,7 @@
 </Automaton>
 <Automaton name="crane_magnet_off_crane" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[CraneMagnet][Off]"/>
 		<Event id="2" label="U[CraneH][S2][0]" controllable="false"/>
 		<Event id="3" label="U[CraneH][S2][1]" controllable="false"/>
@@ -970,7 +970,7 @@
 </Automaton>
 <Automaton name="arm1" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Arm1][Down]"/>
 		<Event id="2" label="C[Arm1][Stop]"/>
 		<Event id="3" label="C[Arm1][Up]"/>
@@ -1001,7 +1001,7 @@
 </Automaton>
 <Automaton name="two_state_move_spec[RobotR]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[RobotR][Down]"/>
 		<Event id="2" label="C[RobotR][Stop]"/>
 		<Event id="3" label="C[RobotR][Up]"/>
@@ -1030,7 +1030,7 @@
 </Automaton>
 <Automaton name="two_state_move[Arm2]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Arm2][Down]"/>
 		<Event id="2" label="C[Arm2][Up]"/>
 		<Event id="3" label="U[Arm2][S1][0]" controllable="false"/>
@@ -1088,7 +1088,7 @@
 </Automaton>
 <Automaton name="two_state_move_sensor_changes[TableR]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[TableR][Down]"/>
 		<Event id="2" label="C[TableR][Stop]"/>
 		<Event id="3" label="C[TableR][Up]"/>
@@ -1118,7 +1118,7 @@
 </Automaton>
 <Automaton name="two_state_move_spec[CraneH]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[CraneH][Down]"/>
 		<Event id="2" label="C[CraneH][Stop]"/>
 		<Event id="3" label="C[CraneH][Up]"/>
@@ -1147,7 +1147,7 @@
 </Automaton>
 <Automaton name="deposit_belt_s1" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Magnet2][Off]"/>
 		<Event id="2" label="U[DepositBelt][S1][1]" controllable="false"/>
 	</Events>
@@ -1162,7 +1162,7 @@
 </Automaton>
 <Automaton name="two_state_move_sensor_changes[RobotR]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[RobotR][Down]"/>
 		<Event id="2" label="C[RobotR][Stop]"/>
 		<Event id="3" label="C[RobotR][Up]"/>
@@ -1192,7 +1192,7 @@
 </Automaton>
 <Automaton name="arm1_up_s4_magnet1" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Arm1][Up]"/>
 		<Event id="2" label="C[Magnet1][Off]"/>
 		<Event id="3" label="C[Magnet1][On]"/>
@@ -1221,7 +1221,7 @@
 </Automaton>
 <Automaton name="two_state_move_sensor_changes[Arm1]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Arm1][Down]"/>
 		<Event id="2" label="C[Arm1][Stop]"/>
 		<Event id="3" label="C[Arm1][Up]"/>
@@ -1251,7 +1251,7 @@
 </Automaton>
 <Automaton name="magnet1_on_robot" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Magnet1][On]"/>
 		<Event id="2" label="U[Arm1][S2][0]" controllable="false"/>
 		<Event id="3" label="U[Arm1][S2][1]" controllable="false"/>
@@ -1278,7 +1278,7 @@
 </Automaton>
 <Automaton name="four_state_move_failure[RobotR]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[RobotR][Down]"/>
 		<Event id="2" label="C[RobotR][Up]"/>
 		<Event id="3" label="Failure[RobotR]"/>
@@ -1367,7 +1367,7 @@
 </Automaton>
 <Automaton name="two_state_move_sensor_changes[CraneV]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[CraneV][Down]"/>
 		<Event id="2" label="C[CraneV][Stop]"/>
 		<Event id="3" label="C[CraneV][Up]"/>
@@ -1397,7 +1397,7 @@
 </Automaton>
 <Automaton name="crane_magnet_off_feed_belt" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[CraneMagnet][Off]"/>
 		<Event id="2" label="U[FeedBelt][S1][0]" controllable="false"/>
 		<Event id="3" label="U[FeedBelt][S1][1]" controllable="false"/>
@@ -1414,7 +1414,7 @@
 </Automaton>
 <Automaton name="crane_horizontal_or_vertical" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[CraneH][Down]"/>
 		<Event id="2" label="C[CraneH][Stop]"/>
 		<Event id="3" label="C[CraneH][Up]"/>
@@ -1437,7 +1437,7 @@
 </Automaton>
 <Automaton name="arm2_up_s2_magnet2" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Arm2][Up]"/>
 		<Event id="2" label="C[Magnet2][Off]"/>
 		<Event id="3" label="C[Magnet2][On]"/>
@@ -1466,7 +1466,7 @@
 </Automaton>
 <Automaton name="two_state_move_sensor_changes[Arm2]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Arm2][Down]"/>
 		<Event id="2" label="C[Arm2][Stop]"/>
 		<Event id="3" label="C[Arm2][Up]"/>
@@ -1496,7 +1496,7 @@
 </Automaton>
 <Automaton name="three_state_move[PressV]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[PressV][Down]"/>
 		<Event id="2" label="C[PressV][Up]"/>
 		<Event id="3" label="U[PressV][S1][0]" controllable="false"/>
@@ -1578,7 +1578,7 @@
 </Automaton>
 <Automaton name="arm1_up_press_s1" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Arm1][Up]"/>
 		<Event id="2" label="U[PressV][S1][0]" controllable="false"/>
 		<Event id="3" label="U[PressV][S1][1]" controllable="false"/>
@@ -1607,7 +1607,7 @@
 </Automaton>
 <Automaton name="two_state_move[Arm1]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Arm1][Down]"/>
 		<Event id="2" label="C[Arm1][Up]"/>
 		<Event id="3" label="U[Arm1][S1][0]" controllable="false"/>
@@ -1665,7 +1665,7 @@
 </Automaton>
 <Automaton name="two_state_move[TableR]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[TableR][Down]"/>
 		<Event id="2" label="C[TableR][Up]"/>
 		<Event id="3" label="U[TableR][S1][0]" controllable="false"/>
@@ -1723,7 +1723,7 @@
 </Automaton>
 <Automaton name="crane_magnet_on_crane" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[CraneMagnet][On]"/>
 		<Event id="2" label="U[CraneH][S1][0]" controllable="false"/>
 		<Event id="3" label="U[CraneH][S1][1]" controllable="false"/>
@@ -1750,7 +1750,7 @@
 </Automaton>
 <Automaton name="crane_vertical_magnet" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[CraneMagnet][Off]"/>
 		<Event id="2" label="C[CraneMagnet][On]"/>
 		<Event id="3" label="C[CraneV][Down]"/>
@@ -1778,7 +1778,7 @@
 </Automaton>
 <Automaton name="arm2_up_s3_magnet2" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Arm2][Up]"/>
 		<Event id="2" label="C[Magnet2][Off]"/>
 		<Event id="3" label="C[Magnet2][On]"/>
@@ -1807,7 +1807,7 @@
 </Automaton>
 <Automaton name="two_state_move[CraneV]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[CraneV][Down]"/>
 		<Event id="2" label="C[CraneV][Up]"/>
 		<Event id="3" label="U[CraneV][S1][0]" controllable="false"/>
@@ -1865,7 +1865,7 @@
 </Automaton>
 <Automaton name="two_state_move_failure[CraneH]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[CraneH][Down]"/>
 		<Event id="2" label="C[CraneH][Up]"/>
 		<Event id="3" label="Failure[CraneH]"/>
@@ -1906,7 +1906,7 @@
 </Automaton>
 <Automaton name="two_state_move_spec[Arm1]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Arm1][Down]"/>
 		<Event id="2" label="C[Arm1][Stop]"/>
 		<Event id="3" label="C[Arm1][Up]"/>
@@ -1935,7 +1935,7 @@
 </Automaton>
 <Automaton name="two_state_move_spec[TableR]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[TableR][Down]"/>
 		<Event id="2" label="C[TableR][Stop]"/>
 		<Event id="3" label="C[TableR][Up]"/>
@@ -1964,7 +1964,7 @@
 </Automaton>
 <Automaton name="crane_horizontal" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[CraneH][Down]"/>
 		<Event id="2" label="C[CraneH][Up]"/>
 		<Event id="3" label="U[CraneV][S2][0]" controllable="false"/>
@@ -1983,7 +1983,7 @@
 </Automaton>
 <Automaton name="two_state_move_failure[TableR]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[TableR][Down]"/>
 		<Event id="2" label="C[TableR][Up]"/>
 		<Event id="3" label="Failure[TableR]"/>
@@ -2024,7 +2024,7 @@
 </Automaton>
 <Automaton name="crane_magnet_on_deposit_belt" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[CraneMagnet][On]"/>
 		<Event id="2" label="U[DepositBelt][S2][0]" controllable="false"/>
 		<Event id="3" label="U[DepositBelt][S2][1]" controllable="false"/>
@@ -2041,7 +2041,7 @@
 </Automaton>
 <Automaton name="crane_horizontal_direction" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[CraneH][Down]"/>
 		<Event id="2" label="C[CraneH][Up]"/>
 		<Event id="3" label="C[CraneMagnet][Off]"/>
@@ -2060,7 +2060,7 @@
 </Automaton>
 <Automaton name="switch[FeedBelt]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[FeedBelt][Off]"/>
 		<Event id="2" label="C[FeedBelt][On]"/>
 	</Events>
@@ -2075,7 +2075,7 @@
 </Automaton>
 <Automaton name="two_state_move[CraneH]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[CraneH][Down]"/>
 		<Event id="2" label="C[CraneH][Up]"/>
 		<Event id="3" label="U[CraneH][S1][0]" controllable="false"/>
@@ -2133,7 +2133,7 @@
 </Automaton>
 <Automaton name="arm2_up_press_s2" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[Arm2][Up]"/>
 		<Event id="2" label="U[PressV][S2][0]" controllable="false"/>
 		<Event id="3" label="U[PressV][S2][1]" controllable="false"/>
@@ -2162,7 +2162,7 @@
 </Automaton>
 <Automaton name="crane_magnet_crane_move" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[CraneMagnet][Off]"/>
 		<Event id="2" label="C[CraneMagnet][On]"/>
 		<Event id="3" label="C[CraneV][Down]"/>
@@ -2184,7 +2184,7 @@
 </Automaton>
 <Automaton name="two_state_move_failure[TableV]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="C[TableV][Down]"/>
 		<Event id="2" label="C[TableV][Up]"/>
 		<Event id="3" label="Failure[TableV]"/>

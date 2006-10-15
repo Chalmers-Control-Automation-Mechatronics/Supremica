@@ -5,7 +5,7 @@
   <EventParameter Name="start_before" Kind="CONTROLLABLE"/>
   <EventParameter Name="start_after" Kind="CONTROLLABLE"/>
   <EventParameter Name="finish_before" Kind="UNCONTROLLABLE"/>
-  <EventParameter Name="@omega" Kind="PROPOSITION" Required="false"/>
+  <EventParameter Name=":accepting" Kind="PROPOSITION" Required="false"/>
 </ParameterList>
 <ComponentList>
 <SimpleComponent Kind="SPEC">
@@ -14,7 +14,7 @@
   <NodeList>
     <SimpleNode Name="empty" Initial="true">
       <EventList>
-        <SimpleIdentifier Name="@omega"/>
+        <SimpleIdentifier Name=":accepting"/>
       </EventList>
     </SimpleNode>
     <SimpleNode Name="full"/>

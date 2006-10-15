@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProductDES Name="sensoractuator" xmlns="http://waters.sourceforge.net/xsd/des">
 <EventList>
-<Event Kind="PROPOSITION" Name="@omega"/>
+<Event Kind="PROPOSITION" Name=":accepting"/>
 <Event Kind="CONTROLLABLE" Name="change_direction_11"/>
 <Event Kind="CONTROLLABLE" Name="change_direction_12"/>
 <Event Kind="CONTROLLABLE" Name="change_direction_13"/>
@@ -24,7 +24,7 @@
 <AutomataList>
 <Automaton Kind="PLANT" Name="Sensoractuator">
 <EventRefList>
-<EventRef Name="@omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="change_direction_11"/>
 <EventRef Name="change_direction_12"/>
 <EventRef Name="change_direction_13"/>
@@ -47,7 +47,7 @@
 <StateList>
 <State Initial="true" Name="Sensoractuator(A)">
 <EventRefList>
-<EventRef Name="@omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="Sensoractuator(B)"/>

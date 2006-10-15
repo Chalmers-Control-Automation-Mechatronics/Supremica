@@ -7,7 +7,7 @@
         <EventDecl Kind="CONTROLLABLE" Observable="true" Name="e23"/>
         <EventDecl Kind="CONTROLLABLE" Observable="true" Name="e31"/>
         <EventDecl Kind="CONTROLLABLE" Observable="true" Name="e32"/>
-        <EventDecl Kind="PROPOSITION" Observable="true" Name="omega"/>
+        <EventDecl Kind="PROPOSITION" Observable="true" Name=":accepting"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT">
@@ -48,7 +48,7 @@
                     </SimpleNode>
                     <SimpleNode Initial="false" Name="044">
                         <EventList>
-                            <SimpleIdentifier Name="omega"/>
+                            <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
                             <Point X="128" Y="320"/>

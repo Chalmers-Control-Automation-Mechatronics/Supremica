@@ -2,7 +2,7 @@
 <Automata name="Car Window Control System" comment="A model of the behaviour of some parts of the electronics in a car. The model covers the comfort function and locking system along with some configuration parameters and includes their interaction with the windows and the sunroof, see 'From Supervisory Control to Nonblocking Controllers for Discrete Event Systems' by Petra Malik.">
 <Automaton name="windows_spec[LEFT][FRONT]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="WINDOW_MANUAL_CLOSE[FRONT][LEFT]" controllable="false"/>
 		<Event id="2" label="WINDOW_MANUAL_OPEN[FRONT][LEFT]" controllable="false"/>
 		<Event id="3" label="WINDOW_MANUAL_STOP[FRONT][LEFT]" controllable="false"/>
@@ -27,7 +27,7 @@
 </Automaton>
 <Automaton name="timer" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="reset"/>
 		<Event id="2" label="timeout" controllable="false"/>
 		<Event id="3" label="timer"/>
@@ -44,7 +44,7 @@
 </Automaton>
 <Automaton name="comfort_function" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="REQ[CLOSE]" controllable="false"/>
 		<Event id="2" label="REQ[OPEN]" controllable="false"/>
 		<Event id="3" label="REQ[STOP]" controllable="false"/>
@@ -61,7 +61,7 @@
 </Automaton>
 <Automaton name="comfort_control" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="CMFT_BACK[CLOSE]"/>
 		<Event id="2" label="CMFT_BACK[OPEN]"/>
 		<Event id="3" label="CMFT_STOP"/>
@@ -109,7 +109,7 @@
 </Automaton>
 <Automaton name="windows[LEFT][REAR]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="WINDOW_MANUAL_CLOSE[REAR][LEFT]" controllable="false"/>
 		<Event id="2" label="WINDOW_MANUAL_OPEN[REAR][LEFT]" controllable="false"/>
 		<Event id="3" label="WINDOW_MANUAL_STOP[REAR][LEFT]" controllable="false"/>
@@ -128,7 +128,7 @@
 </Automaton>
 <Automaton name="comfort[CLOSE]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="CMFT_BACK[CLOSE]"/>
 		<Event id="2" label="CMFT_FRONT[CLOSE]"/>
 		<Event id="3" label="CMFT_ROOF[CLOSE]"/>
@@ -213,7 +213,7 @@
 </Automaton>
 <Automaton name="fh_sync_cmft" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="CMFT_BACK[CLOSE]"/>
 		<Event id="2" label="CMFT_BACK[OPEN]"/>
 		<Event id="3" label="FH_LOCK"/>
@@ -252,7 +252,7 @@
 </Automaton>
 <Automaton name="fh" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="FH_LOCK"/>
 		<Event id="2" label="FH_UNLOCK"/>
 		<Event id="3" label="KL_50_ON" controllable="false"/>
@@ -353,7 +353,7 @@
 </Automaton>
 <Automaton name="windows_spec[LEFT][REAR]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="WINDOW_MANUAL_CLOSE[REAR][LEFT]" controllable="false"/>
 		<Event id="2" label="WINDOW_MANUAL_OPEN[REAR][LEFT]" controllable="false"/>
 		<Event id="3" label="WINDOW_MANUAL_STOP[REAR][LEFT]" controllable="false"/>
@@ -378,7 +378,7 @@
 </Automaton>
 <Automaton name="window_move_stop[RIGHT][FRONT]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="CMFT_BACK[CLOSE]"/>
 		<Event id="2" label="CMFT_BACK[OPEN]"/>
 		<Event id="3" label="window_manual_close[FRONT][RIGHT]"/>
@@ -399,7 +399,7 @@
 </Automaton>
 <Automaton name="windows[RIGHT][REAR]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="WINDOW_MANUAL_CLOSE[REAR][RIGHT]" controllable="false"/>
 		<Event id="2" label="WINDOW_MANUAL_OPEN[REAR][RIGHT]" controllable="false"/>
 		<Event id="3" label="WINDOW_MANUAL_STOP[REAR][RIGHT]" controllable="false"/>
@@ -418,7 +418,7 @@
 </Automaton>
 <Automaton name="fh_condition_kl_r" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="KL_50_OFF" controllable="false"/>
 		<Event id="2" label="KL_50_ON" controllable="false"/>
 		<Event id="3" label="KL_R_ON" controllable="false"/>
@@ -444,7 +444,7 @@
 </Automaton>
 <Automaton name="windows[LEFT][FRONT]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="WINDOW_MANUAL_CLOSE[FRONT][LEFT]" controllable="false"/>
 		<Event id="2" label="WINDOW_MANUAL_OPEN[FRONT][LEFT]" controllable="false"/>
 		<Event id="3" label="WINDOW_MANUAL_STOP[FRONT][LEFT]" controllable="false"/>
@@ -463,7 +463,7 @@
 </Automaton>
 <Automaton name="lock" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="KEY_PLUG" controllable="false"/>
 		<Event id="2" label="KEY_UNPLUG" controllable="false"/>
 		<Event id="3" label="KL_50_OFF" controllable="false"/>
@@ -488,7 +488,7 @@
 </Automaton>
 <Automaton name="windows_spec[RIGHT][FRONT]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="WINDOW_MANUAL_CLOSE[FRONT][RIGHT]" controllable="false"/>
 		<Event id="2" label="WINDOW_MANUAL_OPEN[FRONT][RIGHT]" controllable="false"/>
 		<Event id="3" label="WINDOW_MANUAL_STOP[FRONT][RIGHT]" controllable="false"/>
@@ -513,7 +513,7 @@
 </Automaton>
 <Automaton name="window_move_stop[LEFT][REAR]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="CMFT_BACK[CLOSE]"/>
 		<Event id="2" label="CMFT_BACK[OPEN]"/>
 		<Event id="3" label="window_manual_close[REAR][LEFT]"/>
@@ -534,7 +534,7 @@
 </Automaton>
 <Automaton name="comfort_condition_doors" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="CLOSEDOOR[DRD]" controllable="false"/>
 		<Event id="2" label="CLOSEDOOR[PSD]" controllable="false"/>
 		<Event id="3" label="CMFT_BACK[CLOSE]"/>
@@ -577,7 +577,7 @@
 </Automaton>
 <Automaton name="window_move_stop[RIGHT][REAR]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="CMFT_BACK[CLOSE]"/>
 		<Event id="2" label="CMFT_BACK[OPEN]"/>
 		<Event id="3" label="window_manual_close[REAR][RIGHT]"/>
@@ -598,7 +598,7 @@
 </Automaton>
 <Automaton name="windows_spec[RIGHT][REAR]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="WINDOW_MANUAL_CLOSE[REAR][RIGHT]" controllable="false"/>
 		<Event id="2" label="WINDOW_MANUAL_OPEN[REAR][RIGHT]" controllable="false"/>
 		<Event id="3" label="WINDOW_MANUAL_STOP[REAR][RIGHT]" controllable="false"/>
@@ -623,7 +623,7 @@
 </Automaton>
 <Automaton name="fh_condition_ecefin" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="CLOSEDOOR[DRD]" controllable="false"/>
 		<Event id="2" label="CLOSEDOOR[PSD]" controllable="false"/>
 		<Event id="3" label="KL_R_OFF" controllable="false"/>
@@ -672,7 +672,7 @@
 </Automaton>
 <Automaton name="comfort[OPEN]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="CMFT_BACK[OPEN]"/>
 		<Event id="2" label="CMFT_FRONT[OPEN]"/>
 		<Event id="3" label="CMFT_ROOF[OPEN]"/>
@@ -757,7 +757,7 @@
 </Automaton>
 <Automaton name="roof" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="ROOF_MANUAL_CLOSE" controllable="false"/>
 		<Event id="2" label="ROOF_MANUAL_OPEN" controllable="false"/>
 		<Event id="3" label="ROOF_MANUAL_STOP" controllable="false"/>
@@ -776,7 +776,7 @@
 </Automaton>
 <Automaton name="fh_condition_doors" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="CLOSEDOOR[DRD]" controllable="false"/>
 		<Event id="2" label="CLOSEDOOR[PSD]" controllable="false"/>
 		<Event id="3" label="OPENDOOR[DRD]" controllable="false"/>
@@ -805,7 +805,7 @@
 </Automaton>
 <Automaton name="comfort_condition_key" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="CMFT_BACK[CLOSE]"/>
 		<Event id="2" label="CMFT_BACK[OPEN]"/>
 		<Event id="3" label="CMFT_FRONT[CLOSE]"/>
@@ -838,7 +838,7 @@
 </Automaton>
 <Automaton name="window_move_stop[LEFT][FRONT]" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="CMFT_BACK[CLOSE]"/>
 		<Event id="2" label="CMFT_BACK[OPEN]"/>
 		<Event id="3" label="window_manual_close[FRONT][LEFT]"/>
@@ -859,7 +859,7 @@
 </Automaton>
 <Automaton name="readcountry" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="ecefin" controllable="false"/>
 		<Event id="2" label="nocountry" controllable="false"/>
 		<Event id="3" label="read_country"/>
@@ -878,7 +878,7 @@
 </Automaton>
 <Automaton name="roof_spec" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="ROOF_MANUAL_CLOSE" controllable="false"/>
 		<Event id="2" label="ROOF_MANUAL_OPEN" controllable="false"/>
 		<Event id="3" label="ROOF_MANUAL_STOP" controllable="false"/>
@@ -903,7 +903,7 @@
 </Automaton>
 <Automaton name="roof_move_stop" type="Specification">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="CMFT_BACK[CLOSE]"/>
 		<Event id="2" label="CMFT_BACK[OPEN]"/>
 		<Event id="3" label="roof_manual_close"/>
@@ -924,7 +924,7 @@
 </Automaton>
 <Automaton name="doors[PSD]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="CLOSEDOOR[PSD]" controllable="false"/>
 		<Event id="2" label="OPENDOOR[PSD]" controllable="false"/>
 	</Events>
@@ -939,7 +939,7 @@
 </Automaton>
 <Automaton name="doors[DRD]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="CLOSEDOOR[DRD]" controllable="false"/>
 		<Event id="2" label="OPENDOOR[DRD]" controllable="false"/>
 	</Events>
@@ -954,7 +954,7 @@
 </Automaton>
 <Automaton name="windows[RIGHT][FRONT]" type="Plant">
 	<Events>
-		<Event id="0" label=":omega"/>
+		<Event id="0" label=":accepting"/>
 		<Event id="1" label="WINDOW_MANUAL_CLOSE[FRONT][RIGHT]" controllable="false"/>
 		<Event id="2" label="WINDOW_MANUAL_OPEN[FRONT][RIGHT]" controllable="false"/>
 		<Event id="3" label="WINDOW_MANUAL_STOP[FRONT][RIGHT]" controllable="false"/>

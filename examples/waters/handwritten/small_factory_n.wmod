@@ -21,7 +21,7 @@
       <SimpleIdentifier Name="n"/>
     </BinaryExpression>
   </EventDecl>
-  <EventDecl Name="@omega" Kind="PROPOSITION"/>
+  <EventDecl Name=":accepting" Kind="PROPOSITION"/>
 </EventDeclList>
 <ComponentList>
   <ForeachComponent Name="i">
@@ -44,8 +44,8 @@
             <SimpleIdentifier Name="i"/>
           </IndexedIdentifier>
         </ParameterBinding>
-        <ParameterBinding Name="@omega">
-          <SimpleIdentifier Name="@omega"/>
+        <ParameterBinding Name=":accepting">
+          <SimpleIdentifier Name=":accepting"/>
         </ParameterBinding>
       </Instance>
     </ComponentList>
@@ -81,8 +81,8 @@
             </BinaryExpression>
           </IndexedIdentifier>
         </ParameterBinding>
-        <ParameterBinding Name="@omega">
-          <SimpleIdentifier Name="@omega"/>
+        <ParameterBinding Name=":accepting">
+          <SimpleIdentifier Name=":accepting"/>
         </ParameterBinding>
       </Instance>
     </ComponentList>

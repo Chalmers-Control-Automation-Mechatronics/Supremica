@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProductDES Name="buffertest" xmlns="http://waters.sourceforge.net/xsd/des">
     <EventList>
-        <Event Kind="PROPOSITION" Name="buffer.@omega"/>
+        <Event Kind="PROPOSITION" Name=":accepting"/>
         <Event Kind="CONTROLLABLE" Name="finish1"/>
         <Event Kind="CONTROLLABLE" Name="start1"/>
         <Event Kind="CONTROLLABLE" Name="start2"/>
@@ -9,7 +9,7 @@
     <AutomataList>
         <Automaton Kind="SPEC" Name="buffer.buffer">
             <EventRefList>
-                <EventRef Name="buffer.@omega"/>
+                <EventRef Name=":accepting"/>
                 <EventRef Name="finish1"/>
                 <EventRef Name="start1"/>
                 <EventRef Name="start2"/>
@@ -17,7 +17,7 @@
             <StateList>
                 <State Initial="true" Name="empty">
                     <EventRefList>
-                        <EventRef Name="buffer.@omega"/>
+                        <EventRef Name=":accepting"/>
                     </EventRefList>
                 </State>
                 <State Initial="false" Name="full"/>

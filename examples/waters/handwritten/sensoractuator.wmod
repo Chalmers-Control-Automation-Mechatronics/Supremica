@@ -13,7 +13,7 @@
 <EventDecl Kind="UNCONTROLLABLE" Name="move_right"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="move_left"/>
 <EventDecl Kind="CONTROLLABLE" Name="change_direction"/>
-<EventDecl Kind="PROPOSITION" Name="@omega"/>
+<EventDecl Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
@@ -22,7 +22,7 @@
 <NodeList>
 <SimpleNode Initial="true" Name="A">
 <EventList>
-<SimpleIdentifier Name="@omega"/>
+<SimpleIdentifier Name=":accepting"/>
 </EventList>
 <PointGeometry>
 <Point X="144" Y="160"/>

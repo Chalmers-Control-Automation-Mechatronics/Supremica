@@ -6,7 +6,7 @@
   <EventParameter Name="finish" Kind="UNCONTROLLABLE"/>
   <EventParameter Name="break" Kind="UNCONTROLLABLE" Required="false"/>
   <EventParameter Name="repair" Kind="CONTROLLABLE" Required="false"/>
-  <EventParameter Name="@omega" Kind="PROPOSITION"/>
+  <EventParameter Name=":accepting" Kind="PROPOSITION"/>
 </ParameterList>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
@@ -15,7 +15,7 @@
   <NodeList>
     <SimpleNode Name="idle" Initial="true">
       <EventList>
-        <SimpleIdentifier Name="@omega"/>
+        <SimpleIdentifier Name=":accepting"/>
       </EventList>
     </SimpleNode>
     <SimpleNode Name="working"/>

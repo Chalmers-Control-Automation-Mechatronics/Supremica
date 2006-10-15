@@ -62,7 +62,7 @@
 <Event Kind="UNCONTROLLABLE" Name="leave[4][1]"/>
 <Event Kind="UNCONTROLLABLE" Name="leave[4][2]"/>
 <Event Kind="UNCONTROLLABLE" Name="leave[4][3]"/>
-<Event Kind="PROPOSITION" Name="omega"/>
+<Event Kind="PROPOSITION" Name=":accepting"/>
 <Event Kind="UNCONTROLLABLE" Name="outj[1]"/>
 <Event Kind="UNCONTROLLABLE" Name="outj[2]"/>
 <Event Kind="UNCONTROLLABLE" Name="outj[3]"/>
@@ -103,18 +103,18 @@
 <EventRef Name="ecall[2][1]"/>
 <EventRef Name="ecall[3][1]"/>
 <EventRef Name="ecall[4][1]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="st[1]"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="j0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="j1">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -135,18 +135,18 @@
 <EventRef Name="ecall[2][2]"/>
 <EventRef Name="ecall[3][2]"/>
 <EventRef Name="ecall[4][2]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="st[2]"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="j0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="j1">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -167,18 +167,18 @@
 <EventRef Name="ecall[2][3]"/>
 <EventRef Name="ecall[3][3]"/>
 <EventRef Name="ecall[4][3]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="st[3]"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="j0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="j1">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -213,7 +213,7 @@
 <EventRef Name="leave[4][1]"/>
 <EventRef Name="leave[4][2]"/>
 <EventRef Name="leave[4][3]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="xx[1]"/>
 <EventRef Name="xx[2]"/>
 <EventRef Name="xx[3]"/>
@@ -222,7 +222,7 @@
 <StateList>
 <State Initial="true" Name="l0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="l1"/>
@@ -339,7 +339,7 @@
 <EventRef Name="ad[3]"/>
 <EventRef Name="ad[4]"/>
 <EventRef Name="end[1]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="st[1]"/>
 <EventRef Name="tstart"/>
 <EventRef Name="tstop"/>
@@ -347,7 +347,7 @@
 <StateList>
 <State Initial="true" Name="f0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="f1"/>
@@ -372,7 +372,7 @@
 <EventRef Name="ad[3]"/>
 <EventRef Name="ad[4]"/>
 <EventRef Name="end[2]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="st[2]"/>
 <EventRef Name="tstart"/>
 <EventRef Name="tstop"/>
@@ -380,7 +380,7 @@
 <StateList>
 <State Initial="true" Name="f0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="f1"/>
@@ -405,7 +405,7 @@
 <EventRef Name="ad[3]"/>
 <EventRef Name="ad[4]"/>
 <EventRef Name="end[3]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="st[3]"/>
 <EventRef Name="tstart"/>
 <EventRef Name="tstop"/>
@@ -413,7 +413,7 @@
 <StateList>
 <State Initial="true" Name="f0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="f1"/>
@@ -433,14 +433,14 @@
 </Automaton>
 <Automaton Kind="PLANT" Name="SystemInitiator">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="tstart"/>
 <EventRef Name="tstop"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="a0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="a1"/>
@@ -453,7 +453,7 @@
 <Automaton Kind="SPEC" Name="TrafficJam[1]">
 <EventRefList>
 <EventRef Name="inj[1]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="outj[1]"/>
 <EventRef Name="ras[1][1]"/>
 <EventRef Name="ras[2][1]"/>
@@ -463,7 +463,7 @@
 <StateList>
 <State Initial="true" Name="g0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="g1"/>
@@ -480,7 +480,7 @@
 <Automaton Kind="SPEC" Name="TrafficJam[2]">
 <EventRefList>
 <EventRef Name="inj[2]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="outj[2]"/>
 <EventRef Name="ras[1][2]"/>
 <EventRef Name="ras[2][2]"/>
@@ -490,7 +490,7 @@
 <StateList>
 <State Initial="true" Name="g0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="g1"/>
@@ -507,7 +507,7 @@
 <Automaton Kind="SPEC" Name="TrafficJam[3]">
 <EventRefList>
 <EventRef Name="inj[3]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="outj[3]"/>
 <EventRef Name="ras[1][3]"/>
 <EventRef Name="ras[2][3]"/>
@@ -517,7 +517,7 @@
 <StateList>
 <State Initial="true" Name="g0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="g1"/>
@@ -536,12 +536,12 @@
 <EventRef Name="ecall[1][1]"/>
 <EventRef Name="enter[1][1]"/>
 <EventRef Name="leave[1][1]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="e0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="e1"/>
@@ -557,12 +557,12 @@
 <EventRef Name="ecall[1][2]"/>
 <EventRef Name="enter[1][2]"/>
 <EventRef Name="leave[1][2]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="e0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="e1"/>
@@ -578,12 +578,12 @@
 <EventRef Name="ecall[1][3]"/>
 <EventRef Name="enter[1][3]"/>
 <EventRef Name="leave[1][3]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="e0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="e1"/>
@@ -599,12 +599,12 @@
 <EventRef Name="ecall[2][1]"/>
 <EventRef Name="enter[2][1]"/>
 <EventRef Name="leave[2][1]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="e0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="e1"/>
@@ -620,12 +620,12 @@
 <EventRef Name="ecall[2][2]"/>
 <EventRef Name="enter[2][2]"/>
 <EventRef Name="leave[2][2]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="e0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="e1"/>
@@ -641,12 +641,12 @@
 <EventRef Name="ecall[2][3]"/>
 <EventRef Name="enter[2][3]"/>
 <EventRef Name="leave[2][3]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="e0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="e1"/>
@@ -662,12 +662,12 @@
 <EventRef Name="ecall[3][1]"/>
 <EventRef Name="enter[3][1]"/>
 <EventRef Name="leave[3][1]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="e0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="e1"/>
@@ -683,12 +683,12 @@
 <EventRef Name="ecall[3][2]"/>
 <EventRef Name="enter[3][2]"/>
 <EventRef Name="leave[3][2]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="e0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="e1"/>
@@ -704,12 +704,12 @@
 <EventRef Name="ecall[3][3]"/>
 <EventRef Name="enter[3][3]"/>
 <EventRef Name="leave[3][3]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="e0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="e1"/>
@@ -725,12 +725,12 @@
 <EventRef Name="ecall[4][1]"/>
 <EventRef Name="enter[4][1]"/>
 <EventRef Name="leave[4][1]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="e0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="e1"/>
@@ -746,12 +746,12 @@
 <EventRef Name="ecall[4][2]"/>
 <EventRef Name="enter[4][2]"/>
 <EventRef Name="leave[4][2]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="e0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="e1"/>
@@ -767,12 +767,12 @@
 <EventRef Name="ecall[4][3]"/>
 <EventRef Name="enter[4][3]"/>
 <EventRef Name="leave[4][3]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="e0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="e1"/>
@@ -798,7 +798,7 @@
 <EventRef Name="leave[1][1]"/>
 <EventRef Name="leave[1][2]"/>
 <EventRef Name="leave[1][3]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="ras[1][1]"/>
 <EventRef Name="ras[1][2]"/>
 <EventRef Name="ras[1][3]"/>
@@ -808,7 +808,7 @@
 <StateList>
 <State Initial="true" Name="d0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="d1"/>
@@ -851,7 +851,7 @@
 <EventRef Name="leave[2][1]"/>
 <EventRef Name="leave[2][2]"/>
 <EventRef Name="leave[2][3]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="ras[2][1]"/>
 <EventRef Name="ras[2][2]"/>
 <EventRef Name="ras[2][3]"/>
@@ -861,7 +861,7 @@
 <StateList>
 <State Initial="true" Name="d0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="d1"/>
@@ -904,7 +904,7 @@
 <EventRef Name="leave[3][1]"/>
 <EventRef Name="leave[3][2]"/>
 <EventRef Name="leave[3][3]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="ras[3][1]"/>
 <EventRef Name="ras[3][2]"/>
 <EventRef Name="ras[3][3]"/>
@@ -914,7 +914,7 @@
 <StateList>
 <State Initial="true" Name="d0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="d1"/>
@@ -957,7 +957,7 @@
 <EventRef Name="leave[4][1]"/>
 <EventRef Name="leave[4][2]"/>
 <EventRef Name="leave[4][3]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="ras[4][1]"/>
 <EventRef Name="ras[4][2]"/>
 <EventRef Name="ras[4][3]"/>
@@ -967,7 +967,7 @@
 <StateList>
 <State Initial="true" Name="d0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="d1"/>
@@ -1014,7 +1014,7 @@
 <EventRef Name="enter[4][1]"/>
 <EventRef Name="enter[4][2]"/>
 <EventRef Name="enter[4][3]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="ras[1][1]"/>
 <EventRef Name="ras[1][2]"/>
 <EventRef Name="ras[1][3]"/>
@@ -1035,7 +1035,7 @@
 <StateList>
 <State Initial="true" Name="i0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="i1"/>
@@ -1166,7 +1166,7 @@
 <EventRef Name="enter[4][1]"/>
 <EventRef Name="enter[4][2]"/>
 <EventRef Name="enter[4][3]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="ras[1][1]"/>
 <EventRef Name="ras[1][2]"/>
 <EventRef Name="ras[1][3]"/>
@@ -1187,7 +1187,7 @@
 <StateList>
 <State Initial="true" Name="i0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="i1"/>
@@ -1318,7 +1318,7 @@
 <EventRef Name="enter[4][1]"/>
 <EventRef Name="enter[4][2]"/>
 <EventRef Name="enter[4][3]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="ras[1][1]"/>
 <EventRef Name="ras[1][2]"/>
 <EventRef Name="ras[1][3]"/>
@@ -1339,7 +1339,7 @@
 <StateList>
 <State Initial="true" Name="i0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="i1"/>
@@ -1462,7 +1462,7 @@
 <EventRef Name="enter[2][1]"/>
 <EventRef Name="enter[3][1]"/>
 <EventRef Name="enter[4][1]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="ras[1][1]"/>
 <EventRef Name="ras[2][1]"/>
 <EventRef Name="ras[3][1]"/>
@@ -1472,12 +1472,12 @@
 <StateList>
 <State Initial="true" Name="k0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="k1">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -1510,7 +1510,7 @@
 <EventRef Name="enter[2][2]"/>
 <EventRef Name="enter[3][2]"/>
 <EventRef Name="enter[4][2]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="ras[1][2]"/>
 <EventRef Name="ras[2][2]"/>
 <EventRef Name="ras[3][2]"/>
@@ -1520,12 +1520,12 @@
 <StateList>
 <State Initial="true" Name="k0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="k1">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -1558,7 +1558,7 @@
 <EventRef Name="enter[2][3]"/>
 <EventRef Name="enter[3][3]"/>
 <EventRef Name="enter[4][3]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="ras[1][3]"/>
 <EventRef Name="ras[2][3]"/>
 <EventRef Name="ras[3][3]"/>
@@ -1568,12 +1568,12 @@
 <StateList>
 <State Initial="true" Name="k0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="k1">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 </StateList>
@@ -1598,13 +1598,13 @@
 <Automaton Kind="PLANT" Name="VehicleJamming[1]">
 <EventRefList>
 <EventRef Name="inj[1]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="outj[1]"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="c0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="c1"/>
@@ -1617,13 +1617,13 @@
 <Automaton Kind="PLANT" Name="VehicleJamming[2]">
 <EventRefList>
 <EventRef Name="inj[2]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="outj[2]"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="c0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="c1"/>
@@ -1636,13 +1636,13 @@
 <Automaton Kind="PLANT" Name="VehicleJamming[3]">
 <EventRefList>
 <EventRef Name="inj[3]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="outj[3]"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="c0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="c1"/>
@@ -1667,12 +1667,12 @@
 <EventRef Name="leave[2][1]"/>
 <EventRef Name="leave[3][1]"/>
 <EventRef Name="leave[4][1]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="h0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="h1"/>
@@ -1725,12 +1725,12 @@
 <EventRef Name="leave[2][2]"/>
 <EventRef Name="leave[3][2]"/>
 <EventRef Name="leave[4][2]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="h0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="h1"/>
@@ -1783,12 +1783,12 @@
 <EventRef Name="leave[2][3]"/>
 <EventRef Name="leave[3][3]"/>
 <EventRef Name="leave[4][3]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="h0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="h1"/>
@@ -1830,14 +1830,14 @@
 <EventRefList>
 <EventRef Name="dwn[1]"/>
 <EventRef Name="end[1]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="ret[1]"/>
 <EventRef Name="st[1]"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="b0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="b1"/>
@@ -1854,14 +1854,14 @@
 <EventRefList>
 <EventRef Name="dwn[2]"/>
 <EventRef Name="end[2]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="ret[2]"/>
 <EventRef Name="st[2]"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="b0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="b1"/>
@@ -1878,14 +1878,14 @@
 <EventRefList>
 <EventRef Name="dwn[3]"/>
 <EventRef Name="end[3]"/>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 <EventRef Name="ret[3]"/>
 <EventRef Name="st[3]"/>
 </EventRefList>
 <StateList>
 <State Initial="true" Name="b0">
 <EventRefList>
-<EventRef Name="omega"/>
+<EventRef Name=":accepting"/>
 </EventRefList>
 </State>
 <State Name="b1"/>

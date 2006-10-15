@@ -5,8 +5,6 @@ CVS to Subversion (minor)
 License (minor)
 Installer (minor)
 Common logging system (medium)
-Translator from Supremica-automata to Waters-components (import all examples) (medium)
-Internal layout engine (medium)
 Simulation of automata (major)
 Misc editor and analyzer fixes
     - full editor functionality (major)
@@ -21,7 +19,12 @@ Compressed datastructure for reachable states (major)
 Update webpage (medium)
 Update bug report system (medium)
 
-fix gui.ide.EditorComponentsPanel - implement delete variable and delete component
+IDE annoyances
+- Scrollbars in the editor panel does not work properly
+- It is not possible to change event controllability
+- It is not possible to remove events
+- It is possible to change component kind, i.e, plant or specification
+- It is not possible to copy components - within a module as well as between modules
 
 Priority
 --------
