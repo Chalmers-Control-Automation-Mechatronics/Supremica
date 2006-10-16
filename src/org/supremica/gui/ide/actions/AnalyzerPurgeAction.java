@@ -36,7 +36,7 @@ public class AnalyzerPurgeAction
         setAnalyzerActiveRequired(true);
 
         putValue(Action.NAME, "Purge");
-        putValue(Action.SHORT_DESCRIPTION, "Purge");
+        putValue(Action.SHORT_DESCRIPTION, "Remove all forbidden states");
 //        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
 //        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
 //        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Icon.gif")));

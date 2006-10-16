@@ -12,7 +12,7 @@
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT">
-            <SimpleIdentifier Name="The Wine Merchants Problem - divide 8 units of wine into 4+4 units using (ungraded) bottles of 3, 5 and 8 units respectively"/>
+            <SimpleIdentifier Name="Wine Merchant"/>
             <Graph Deterministic="true">
                 <NodeList>
                     <SimpleNode Initial="true" Name="008">

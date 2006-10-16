@@ -114,30 +114,6 @@ public enum MinimizationHeuristic
         }
         else if (this == MostCommon)
         {
-                        /*
-                        int unionAlphabetSize = selection.getUnionAlphabet().size();
-                        Automaton smallest = null;
-                        for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
-                        {
-                                Automaton aut = autIt.next();
-                                if (smallest == null || aut.getAlphabet().size() < smallest.getAlphabet().size())
-                                {
-                                        smallest = aut;
-                                }
-                        }
-                        Alphabet common = new Alphabet(smallest.getAlphabet());
-                        for (Iterator<Automaton> autIt = selection.iterator(); autIt.hasNext(); )
-                        {
-                                Automaton aut = autIt.next();
-                                if (aut == smallest)
-                                {
-                                        continue;
-                                }
-                                common.intersect(aut.getAlphabet());
-                        }
-                        int nbrOfCommonEvents = common.size();
-                        return ((double) nbrOfCommonEvents)/((double) unionAlphabetSize);
-                         */
             Alphabet commonEvents = MinimizationHelper.getCommonEvents(selection, eventToAutomataMap);
             int nbrOfCommonEvents = commonEvents.size();
             int unionAlphabetSize = selection.getUnionAlphabet().size();

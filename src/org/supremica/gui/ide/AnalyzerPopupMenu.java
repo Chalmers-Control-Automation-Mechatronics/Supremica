@@ -46,6 +46,8 @@ class AnalyzerPopupMenu
         add(ide.getActions().analyzerSynthesizerAction.getMenuItem());
         add(ide.getActions().analyzerVerifierAction.getMenuItem());
         add(ide.getActions().analyzerMinimizeAction.getMenuItem());
+        addSeparator();
+        add(ide.getActions().analyzerPlantifyAction.getMenuItem());
         add(ide.getActions().analyzerEventHiderAction.getMenuItem());
         add(ide.getActions().analyzerPurgeAction.getMenuItem());
         addSeparator();
@@ -64,8 +66,7 @@ class AnalyzerPopupMenu
         if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.get())
         {
             addSeparator();
-            add(ide.getActions().analyzerPlantifyAction.getMenuItem());
         }
-    }
+}
 }
 

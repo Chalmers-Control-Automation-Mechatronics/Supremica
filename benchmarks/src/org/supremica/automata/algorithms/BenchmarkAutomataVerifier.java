@@ -113,7 +113,7 @@ public class BenchmarkAutomataVerifier
             vOptions.setVerificationType(VerificationType.CONTROLLABILITYNONBLOCKING);
         
         // Compositional / Modular
-        int algo = 1;
+        int algo = 0;
         if (algo == 0)
             // Compositional
             vOptions.setAlgorithmType(VerificationAlgorithm.COMPOSITIONAL);
@@ -125,10 +125,10 @@ public class BenchmarkAutomataVerifier
         MinimizationStrategy[] strategyArray =
         {
 			/*
-            MinimizationStrategy.FewestTransitionsFirst,
 			*/
-            MinimizationStrategy.AtLeastOneLocal,
+            MinimizationStrategy.FewestTransitionsFirst, 
 			/*
+			MinimizationStrategy.AtLeastOneLocal,
             MinimizationStrategy.AtLeastOneLocalMaxThree,
             MinimizationStrategy.MostStatesFirst,
             MinimizationStrategy.FewestStatesFirst,
@@ -141,11 +141,11 @@ public class BenchmarkAutomataVerifier
         MinimizationHeuristic[] heuristicArray =
         {
 			/*
-            MinimizationHeuristic.MostLocal,
-			MinimizationHeuristic.MostCommon,
 			*/
-			MinimizationHeuristic.FewestStates,
+            MinimizationHeuristic.MostLocal,
 			/*
+			MinimizationHeuristic.MostCommon,
+			MinimizationHeuristic.FewestStates,
 			MinimizationHeuristic.LeastExtension,
 			MinimizationHeuristic.FewestEvents,
 			MinimizationHeuristic.FewestTransitions
@@ -248,13 +248,13 @@ public class BenchmarkAutomataVerifier
 					"PMS",
                     "IPC",
                     "ftechnik", "ftechnik_nocoll",
-					"tbed_valid", 
+					"tbed_valid",
 					//"tbed_ctct",
-                    "fzelle",
+					"fzelle",
                     "AIP_minus_AS3_TU4",
+					/*
                     "PLanTS",
                     "profisafe_i4"
-					/*
 					*/
                 };
                 

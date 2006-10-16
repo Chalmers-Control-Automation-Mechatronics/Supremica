@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorPanel
 //###########################################################################
-//# $Id: EditorPanel.java,v 1.45 2006-10-12 20:47:03 flordal Exp $
+//# $Id: EditorPanel.java,v 1.46 2006-10-16 15:32:20 flordal Exp $
 //###########################################################################
 
 
@@ -148,7 +148,7 @@ public class EditorPanel
         
         public ModuleSubject getModuleSubject()
         {
-            return getModuleSubject();
+            return componentsPanel.getModuleSubject();
         }
         
         public boolean componentNameAvailable(String name)
