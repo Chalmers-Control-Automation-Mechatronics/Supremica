@@ -17,8 +17,8 @@ public class EditorSavePDFAction
         
         setEditorActiveRequired(true);
         
-        putValue(Action.NAME, "Print As PDF...");
-        putValue(Action.SHORT_DESCRIPTION, "Print As PDF");
+        putValue(Action.NAME, "Save As PDF...");
+        putValue(Action.SHORT_DESCRIPTION, "Save As PDF");
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Print16.gif")));
     }
     

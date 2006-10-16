@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.29 2006-09-24 18:18:33 knut Exp $
+//# $Id: EditorComponentsPanel.java,v 1.30 2006-10-16 18:36:17 knut Exp $
 //###########################################################################
 
 
@@ -35,6 +35,7 @@ import net.sourceforge.waters.subject.module.VariableSubject;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.module.ForeachComponentProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 
@@ -293,5 +294,50 @@ class EditorComponentsPanel
 		if("add simple component".equals(e.getActionCommand())) {
 			moduleContainer.getActions().editorAddSimpleComponentAction.doAction();
 		}
-	}
+
+                if("toPlantType".equals(e.getActionCommand())) 
+                {
+			TreePath currentSelection = moduleSelectTree.getSelectionPath();
+			if (currentSelection != null)
+			{
+				// Get the node in the tree
+				DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode)
+				(currentSelection.getLastPathComponent());
+				Subject component = ((ComponentInfo)
+						targetNode.getUserObject()).getComponent();
+
+				if(component instanceof SimpleComponentSubject) 
+                                {
+                                        ((SimpleComponentSubject)component).setKind(ComponentKind.PLANT);
+				} 
+                                else 
+                                {
+					System.err.println("ModuleWindow.actionPerformed(): " +
+					"'toPlantType' performed by illegal node type");
+				}
+			}
+                }
+                  if("toSpecificationType".equals(e.getActionCommand())) 
+                {
+			TreePath currentSelection = moduleSelectTree.getSelectionPath();
+			if (currentSelection != null)
+			{
+				// Get the node in the tree
+				DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode)
+				(currentSelection.getLastPathComponent());
+				Subject component = ((ComponentInfo)
+						targetNode.getUserObject()).getComponent();
+
+				if(component instanceof SimpleComponentSubject) 
+                                {
+                                        ((SimpleComponentSubject)component).setKind(ComponentKind.SPEC);
+				} 
+                                else 
+                                {
+					System.err.println("ModuleWindow.actionPerformed(): " +
+					"'toSpecificationType' performed by illegal node type");
+				}
+			}
+                }
+        }
 }
