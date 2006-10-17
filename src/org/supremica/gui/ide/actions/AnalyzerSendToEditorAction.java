@@ -69,15 +69,25 @@ public class AnalyzerSendToEditorAction
                     
                     // Add all (new) events to the module
                     ModuleSubject module = ide.getActiveModuleContainer().getEditorPanel().getEditorPanelInterface().getModuleSubject();
+                    boolean problem = false;
                     for (LabeledEvent event: aut.getAlphabet())
                     {
-                        if (!module.getEventDeclListModifiable().containsName(event.getName()))
+                        if (!event.getName().contains("[")) 
                         {
-                            EventProxy proxy = (EventProxy) event;
-                            EventDeclSubject eventDecl = new EventDeclSubject(proxy.getName(), proxy.getKind(), proxy.isObservable(), null, null);
-                            module.getEventDeclListModifiable().add(eventDecl);
+                            if (!module.getEventDeclListModifiable().containsName(event.getName()))
+                            {
+                                EventProxy proxy = (EventProxy) event;
+                                EventDeclSubject eventDecl = new EventDeclSubject(proxy.getName(), proxy.getKind(), proxy.isObservable(), null, null);
+                                module.getEventDeclListModifiable().add(eventDecl);
+                            }
+                        }
+                        else
+                        {
+                            problem = true;
                         }
                     }
+                    if (problem)
+                        JOptionPane.showMessageDialog(ide.getFrame(), "There is a problem in the back-translation of parametrised events.", "Alert", JOptionPane.WARNING_MESSAGE);
                 }
                 catch (Exception ex)
                 {
