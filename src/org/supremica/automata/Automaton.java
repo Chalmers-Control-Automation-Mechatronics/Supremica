@@ -182,6 +182,7 @@ public class Automaton
         }
 
         this.type = type;
+        notifyListeners();
     }
 
     /**
@@ -1629,7 +1630,7 @@ public class Automaton
     /**
      * Makes all accepting states non-accepting
      * and all non-accepting states accepting.
-     */ 
+     */
     public void invertMarking()
     {
         for (State currState : this)
@@ -2075,7 +2076,7 @@ public class Automaton
             State state = state_it.next();
             done_something |= saturate(state, alpha, dump);	// saturate to the dump-state
         }
-        
+
         // Remove all outgoing arcs from the dump-state.
         dump.removeOutgoingArcs();
 

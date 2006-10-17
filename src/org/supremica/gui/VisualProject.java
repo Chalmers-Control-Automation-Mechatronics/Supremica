@@ -91,103 +91,103 @@ public class VisualProject
     private FullTableModel fullTableModel = new FullTableModel();
     private AnalyzerTableModel analyzerTableModel = new AnalyzerTableModel();
     private File projectFile = null;
-    
+
     public VisualProject()
     {
         initialize();
     }
-    
+
     public VisualProject(String name)
     {
         super(name);
-        
+
         initialize();
     }
-    
+
     private void initialize()
     {
         addListener(lightTableModel);
         addListener(fullTableModel);
         addListener(analyzerTableModel);
     }
-    
+
     public void clear()
     {
         super.clear();
-        
+
         if (theAnimator != null)
         {
             theAnimator.setVisible(false);
             theAnimator.dispose();
-            
+
             theAnimator = null;
         }
-        
+
         if (theActionAndControlViewer != null)
         {
             theActionAndControlViewer.setVisible(false);
             theActionAndControlViewer.dispose();
-            
+
             theActionAndControlViewer = null;
         }
-        
+
         projectFile = null;
     }
-    
+
     public void automatonRenamed(Automaton aut, String oldName)
     {
         AutomatonViewer theViewer = (AutomatonViewer) theAutomatonViewerContainer.get(oldName);
-        
+
         if (theViewer != null)
         {
             theAutomatonViewerContainer.remove(oldName);
             theAutomatonViewerContainer.put(aut.getName(), theViewer);
         }
-        
+
         AutomatonExplorer theExplorer = (AutomatonExplorer) theAutomatonExplorerContainer.get(oldName);
-        
+
         if (theExplorer != null)
         {
             theAutomatonExplorerContainer.remove(oldName);
             theAutomatonExplorerContainer.put(aut.getName(), theExplorer);
         }
-        
+
         AlphabetViewer theAlphabetViewer = (AlphabetViewer) theAlphabetViewerContainer.get(oldName);
-        
+
         if (theAlphabetViewer != null)
         {
             theAlphabetViewerContainer.remove(oldName);
             theAlphabetViewerContainer.put(aut.getName(), theAlphabetViewer);
         }
-        
+
         super.automatonRenamed(aut, oldName);
     }
-    
+
     public void removeAutomaton(Automaton aut)
     {
         super.removeAutomaton(aut);
-        
+
         AutomatonViewer theViewer = (AutomatonViewer) theAutomatonViewerContainer.get(aut.getName());
-        
+
         if (theViewer != null)
         {
             theViewer.setVisible(false);
             theViewer.dispose();
             theAutomatonViewerContainer.remove(aut.getName());
         }
-        
+
         AutomatonExplorer theExplorer = (AutomatonExplorer) theAutomatonExplorerContainer.get(aut.getName());
-        
+
         if (theExplorer != null)
         {
             theExplorer.setVisible(false);
             theExplorer.dispose();
             theAutomatonExplorerContainer.remove(aut.getName());
         }
-        
-        
+
+
         AlphabetViewer theAlphabetViewer = (AlphabetViewer) theAlphabetViewerContainer.get(aut.getName());
-        
+
         if (theAlphabetViewer != null)
         {
             theAlphabetViewer.setVisible(false);
@@ -195,43 +195,43 @@ public class VisualProject
             theAlphabetViewerContainer.remove(aut.getName());
         }
     }
-    
+
     public void setSelectedAutomata(Automata theAutomata)
     {
         this.selectedAutomata = theAutomata;
     }
-    
+
     public Automata getSelectedAutomata()
     {
         return selectedAutomata;
     }
-    
-    
+
+
     public int numberOfSelectedAutomata()
     {
         return getSelectedAutomata().size();
     }
-    
+
     public void clearSelection()
     {
         selectedAutomata = null;
     }
-    
+
     public void updateFrameTitles()
     {
         String title = "Supremica - " + getName();
     }
-    
+
     public File getProjectFile()
     {
         return projectFile;
     }
-    
+
     public void setProjectFile(File projectFile)
     {
         this.projectFile = projectFile;
     }
-    
+
         /* This code is no good, but slightly better now.
          * The default behavior was (and is) to create a new viewer if none existed
          * Now there is at least a possibility to simply ask for viewers and not have
@@ -251,7 +251,7 @@ public class VisualProject
     {
         return getAutomatonViewer(automatonName, new DefaultAutomatonViewerFactory());
     }
-    
+
     public AutomatonViewer getAutomatonViewer(String automatonName, AutomatonViewerFactory maker)
     throws Exception
     {
@@ -260,17 +260,17 @@ public class VisualProject
         {
             throw new SupremicaException(automatonName + " does not exist in VisualProjectContainer");
         }
-        
+
         if (existsAutomatonViewer(automaton))
         {
             // Check with the user that its ok to display the automaton
             if (showAutomatonViewer(automaton))
             {
                 AutomatonViewer viewer = returnAutomatonViewer(automaton);
-                
+
                 viewer.setVisible(true);
                 viewer.setState(Frame.NORMAL);
-                
+
                 return viewer;
             }
             else
@@ -287,7 +287,7 @@ public class VisualProject
                 {
                     AutomatonViewer viewer = createAutomatonViewer(automaton, maker);
                     viewer.setVisible(true);
-                    
+
                     return viewer;
                 }
                 else return null;	// null here means "viewer not created since user cancelled due to large state-space"
@@ -302,7 +302,7 @@ public class VisualProject
             return null; // null here means "no viewer exists and you didn't want me to construct a new one"
         }
     }
-    
+
     // This is what it should really be like, one task - one function...
     public boolean showAutomatonViewer(Automaton automaton)
     {
@@ -311,7 +311,7 @@ public class VisualProject
         {
             String msg = "The automata " + automaton + " has " + automaton.nbrOfStates() + " states. It is not recommended to display an automaton with more than " + maxNbrOfStates + " states.";
             msg = EncodingHelper.linebreakAdjust(msg);
-            
+
             Object[] options = { "Continue", "Abort" };
             int response = JOptionPane.showOptionDialog(ActionMan.gui.getFrame(), msg, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
             if(response == JOptionPane.NO_OPTION)
@@ -319,23 +319,23 @@ public class VisualProject
                 return false; // user chose to "Abort"
             }
         }
-        
+
         return true;
     }
-    
+
     // When will any of these throw an exception?? When automaton == null, but else...?
     public boolean existsAutomatonViewer(Automaton automaton)
     throws Exception
     {
         return theAutomatonViewerContainer.containsKey(automaton.getName());
     }
-    
+
     public AutomatonViewer returnAutomatonViewer(Automaton automaton)
     throws Exception
     {
         return (AutomatonViewer) theAutomatonViewerContainer.get(automaton.getName());
     }
-    
+
     public AutomatonViewer createAutomatonViewer(Automaton automaton, AutomatonViewerFactory maker)
     throws Exception
     {
@@ -343,32 +343,32 @@ public class VisualProject
         theAutomatonViewerContainer.put(automaton.getName(), viewer);
         return viewer;
     }
-    
+
     public AutomatonExplorer getAutomatonExplorer(String automaton)
     throws Exception
     {
         if (theAutomatonExplorerContainer.containsKey(automaton))
         {
             AutomatonExplorer explorer = (AutomatonExplorer) theAutomatonExplorerContainer.get(automaton);
-            
+
             explorer.setVisible(true);
-            
+
             return explorer;
         }
         else
         {
             Automaton currAutomaton = getAutomaton(automaton);
-            
+
             if (currAutomaton != null)
             {
                 try
                 {
                     AutomatonExplorer explorer = new AutomatonExplorer(this, currAutomaton);
-                    
+
                     theAutomatonExplorerContainer.put(automaton, explorer);
                     explorer.setVisible(true);
                     explorer.initialize();
-                    
+
                     return explorer;
                 }
                 catch (Exception ex)
@@ -382,34 +382,34 @@ public class VisualProject
             }
         }
     }
-    
+
     public AlphabetViewer getAlphabetViewer(String automaton)
     throws Exception
     {
         logger.debug("VisualProject::getAlphabetViewer(" + automaton + ")");
-        
+
         if (theAlphabetViewerContainer.containsKey(automaton))
         {
             AlphabetViewer viewer = (AlphabetViewer) theAlphabetViewerContainer.get(automaton);
-            
+
             viewer.setVisible(true);
-            
+
             return viewer;
         }
         else
         {
             Automaton currAutomaton = getAutomaton(automaton);
-            
+
             if (currAutomaton != null)
             {
                 try
                 {
                     AlphabetViewer viewer = new AlphabetViewer(currAutomaton);
-                    
+
                     theAlphabetViewerContainer.put(automaton, viewer);
                     viewer.setVisible(true);
                     viewer.initialize();
-                    
+
                     return viewer;
                 }
                 catch (Exception ex)
@@ -423,7 +423,7 @@ public class VisualProject
             }
         }
     }
-    
+
     public ActionAndControlViewer getActionAndControlViewer()
     throws Exception
     {
@@ -431,12 +431,12 @@ public class VisualProject
         {
             theActionAndControlViewer = new ActionAndControlViewer(this);
         }
-        
+
         theActionAndControlViewer.setVisible(true);
-        
+
         return theActionAndControlViewer;
     }
-    
+
     public Animator getAnimator()
     throws Exception
     {
@@ -444,18 +444,18 @@ public class VisualProject
         {
             return null;
         }
-        
+
         if (theAnimator == null)
         {
             theAnimator = AnimationItem.createInstance(getAnimationURL());
         }
-        
+
         theAnimator.setVisible(true);
-        
+
         return theAnimator;
     }
-    
-    
+
+
     public Container getUserInterface()
     throws Exception
     {
@@ -463,15 +463,15 @@ public class VisualProject
         {
             return null;
         }
-        
+
         if (theUserInterface == null)
         {
             getSwingEngine();
         }
-        
+
         return theUserInterface;
     }
-    
+
     public SwingEngine getSwingEngine()
     throws Exception
     {
@@ -479,7 +479,7 @@ public class VisualProject
         {
             return null;
         }
-        
+
         if (theSwingEngine == null)
         {
             try
@@ -504,26 +504,26 @@ public class VisualProject
                 logger.error(ex);
             }
         }
-        
+
         return theSwingEngine;
     }
-    
+
     public SimulatorExecuter getSimulator()
     throws Exception
     {
         if (theSimulator == null)
         {
-            
+
             // ARASH: WAS
             // theSimulator = new SimulatorExecuter(this, false);
             theSimulator = new SimulatorExecuter(this, Config.SIMULATION_IS_EXTERNAL.isTrue());
         }
-        
+
         theSimulator.setVisible(true);
-        
+
         return theSimulator;
     }
-    
+
 /*
                 public SimulatorExecuter getExternalExecuter()
                                 throws Exception
@@ -536,30 +536,30 @@ public class VisualProject
                                 return theSimulator;
                 }
  */
-    
+
     public JGrafchartSupremicaEditor getJGrafchartEditor()
     {
         if (theJGrafchartEditor == null)
         {
             String[] args = new String[1];
-            
+
             args[0] = "";
-            
+
             JGrafchartSupremicaEditor theEditor = new JGrafchartSupremicaEditor(args);
-            
+
             grafchart.sfc.Editor.singleton = theEditor;
             theJGrafchartEditor = theEditor;
-            
+
             //theRecipeEditor = org.supremica.gui.recipeEditor.RecipeEditor.createEditor(this);
         }
-        
+
         theJGrafchartEditor.setVisible(true);
-        
+
         return theJGrafchartEditor;
     }
-    
+
     public void clearSimulationData()
-    {        
+    {
                 /*
                 Actions theActions = getActions();
                 if (theActions != null)
@@ -574,416 +574,416 @@ public class VisualProject
         if (theActionAndControlViewer != null)
         {
             theActionAndControlViewer.setVisible(false);
-            
+
             theActionAndControlViewer = null;
         }
-        
+
         if (theAnimator != null)
         {
             theAnimator.setVisible(false);
-            
+
             theAnimator = null;
         }
-        
+
         if (theSimulator != null)
         {
             theSimulator.setVisible(false);
-            
+
             theSimulator = null;
         }
     }
-    
+
     public int getSize()
     {
         return lightTableModel.getRowCount();
     }
-    
+
     public TableModel getLightTableModel()
     {
         return lightTableModel;
     }
-    
+
     public TableModel getFullTableModel()
     {
         return fullTableModel;
     }
-    
+
     public TableModel getAnalyzerTableModel()
     {
         return analyzerTableModel;
     }
-    
+
     public class LightTableModel
         extends AbstractTableModel
         implements AutomataListener
     {
         public LightTableModel()
         {}
-        
+
         public int getColumnCount()
         {
             return 1;
         }
-        
+
         public String getColumnName(int columnIndex)
         {
             if (columnIndex == AnalyzerAutomataPanel.TABLE_NAME_COLUMN)
             {
                 return "Automata";
             }
-            
+
             return "Unknown";
         }
-        
+
         public Class getColumnClass(int column)
         {
             if (column == AnalyzerAutomataPanel.TABLE_NAME_COLUMN)
             {
                 return String.class;
             }
-            
+
             return String.class;
         }
-        
+
         public int getRowCount()
         {
             return nbrOfAutomata();
         }
-        
+
         public int getSize()
         {
             return getRowCount();
         }
-        
+
         public Object getValueAt(int rowIndex, int columnIndex)
         {
             Automaton theAutomaton = getAutomatonAt(rowIndex);
-            
+
             if (columnIndex == AnalyzerAutomataPanel.TABLE_NAME_COLUMN)
             {
                 return theAutomaton.getName();
             }
-            
+
             return "Unknown";
         }
-        
+
         public boolean isCellEditable(int rowIndex, int columnIndex)
         {
             return false;
         }
-        
+
         public void setValueAt(Object aValue, int rowIndex, int columnIndex)
         {}
-        
+
         public void updateListeners()
         {
             fireTableDataChanged();
         }
-        
+
         public void automatonAdded(Automata automata, Automaton automaton)
         {
             updateListeners();
         }
-        
+
         public void automatonRemoved(Automata automata, Automaton automaton)
         {
             updateListeners();
         }
-        
+
         public void automatonRenamed(Automata automata, Automaton automaton)
         {
             updateListeners();
         }
-        
+
         public void actionsOrControlsChanged(Automata automata)
         {    // Do nothing
         }
-        
+
         public void updated(Object theObject)
         {
             updateListeners();
         }
     }
-    
+
     public class FullTableModel
         extends AbstractTableModel
         implements AutomataListener
     {
         public FullTableModel()
         {}
-        
+
         public int getColumnCount()
         {
             return 4;
         }
-        
+
         public String getColumnName(int columnIndex)
         {
             if (columnIndex == AnalyzerAutomataPanel.TABLE_NAME_COLUMN)
             {
                 return "Automata";
             }
-            
+
             if (columnIndex == AnalyzerAutomataPanel.TABLE_TYPE_COLUMN)
             {
                 return "Type";
             }
-            
+
             if (columnIndex == AnalyzerAutomataPanel.TABLE_STATES_COLUMN)
             {
                 return "Number of states";
             }
-            
+
             if (columnIndex == AnalyzerAutomataPanel.TABLE_EVENTS_COLUMN)
             {
                 return "Number of events";
             }
-            
+
             return "Unknown";
         }
-        
+
         public Class getColumnClass(int column)
         {
             if (column == AnalyzerAutomataPanel.TABLE_NAME_COLUMN)
             {
                 return String.class;
             }
-            
+
             if (column == AnalyzerAutomataPanel.TABLE_TYPE_COLUMN)
             {
                 return String.class;
             }
-            
+
             if ((column == AnalyzerAutomataPanel.TABLE_STATES_COLUMN) || (column == AnalyzerAutomataPanel.TABLE_EVENTS_COLUMN))
             {
                 return Integer.class;
             }
-            
+
             return String.class;
         }
-        
+
         public int getRowCount()
         {
             return nbrOfAutomata();
         }
-        
+
         public int getSize()
         {
             return getRowCount();
         }
-        
+
         public Object getValueAt(int rowIndex, int columnIndex)
         {
             Automaton theAutomaton = getAutomatonAt(rowIndex);
-            
+
             if (columnIndex == AnalyzerAutomataPanel.TABLE_NAME_COLUMN)
             {
                 return theAutomaton.getName();
             }
-            
+
             if (columnIndex == AnalyzerAutomataPanel.TABLE_TYPE_COLUMN)
             {
                 AutomatonType currType = theAutomaton.getType();
-                
+
                 return currType.toString();
             }
-            
+
             if (columnIndex == AnalyzerAutomataPanel.TABLE_STATES_COLUMN)
             {
                 return new Integer(theAutomaton.nbrOfStates());
             }
-            
+
             if (columnIndex == AnalyzerAutomataPanel.TABLE_EVENTS_COLUMN)
             {
                 return new Integer(theAutomaton.nbrOfEvents());
             }
-            
+
             return "Unknown";
         }
-        
+
         public boolean isCellEditable(int rowIndex, int columnIndex)
         {
             if (columnIndex == AnalyzerAutomataPanel.TABLE_TYPE_COLUMN)
             {
                 return true;
             }
-            
+
             return false;
         }
-        
+
         public void setValueAt(Object aValue, int rowIndex, int columnIndex)
         {}
-        
+
         public void updateListeners()
         {
             fireTableDataChanged();
         }
-        
+
         public void automatonAdded(Automata automata, Automaton automaton)
         {
             updateListeners();
         }
-        
+
         public void automatonRemoved(Automata automata, Automaton automaton)
         {
             updateListeners();
         }
-        
+
         public void automatonRenamed(Automata automata, Automaton automaton)
         {
             updateListeners();
         }
-        
+
         public void actionsOrControlsChanged(Automata automata)
-        {   
+        {
             // Do nothing
         }
-        
+
         public void updated(Object theObject)
         {
             updateListeners();
         }
     }
-    
-    
+
+
     public class AnalyzerTableModel
         extends AbstractTableModel
         implements AutomataListener
     {
         public AnalyzerTableModel()
         {}
-        
+
         public int getColumnCount()
         {
             return 5;
         }
-        
+
         public String getColumnName(int columnIndex)
         {
             if (columnIndex == AnalyzerAutomataPanel.TABLE_NAME_COLUMN)
             {
                 return "Name";
             }
-            
+
             if (columnIndex == AnalyzerAutomataPanel.TABLE_TYPE_COLUMN)
             {
                 return "Type";
             }
-            
+
             if (columnIndex == AnalyzerAutomataPanel.TABLE_STATES_COLUMN)
             {
                 return "|Q|";
             }
-            
+
             if (columnIndex == AnalyzerAutomataPanel.TABLE_EVENTS_COLUMN)
             {
                 return "|\u03a3|";
             }
-            
+
             if (columnIndex == AnalyzerAutomataPanel.TABLE_TRANSITIONS_COLUMN)
             {
                 return "|\u2192|";
             }
-            
+
             return "Unknown";
         }
-        
+
         public Class getColumnClass(int column)
         {
             if (column == AnalyzerAutomataPanel.TABLE_NAME_COLUMN)
             {
                 return String.class;
             }
-            
+
             if (column == AnalyzerAutomataPanel.TABLE_TYPE_COLUMN)
             {
                 return String.class;
             }
-            
+
             if ((column == AnalyzerAutomataPanel.TABLE_STATES_COLUMN) || (column == AnalyzerAutomataPanel.TABLE_EVENTS_COLUMN) || (column == AnalyzerAutomataPanel.TABLE_TRANSITIONS_COLUMN))
             {
                 return Integer.class;
             }
-            
+
             return String.class;
         }
-        
+
         public int getRowCount()
         {
             return nbrOfAutomata();
         }
-        
+
         public int getSize()
         {
             return getRowCount();
         }
-        
+
         public Object getValueAt(int rowIndex, int columnIndex)
         {
             Automaton theAutomaton = getAutomatonAt(rowIndex);
-            
+
             if (columnIndex == AnalyzerAutomataPanel.TABLE_NAME_COLUMN)
             {
                 return theAutomaton.getName();
             }
-            
+
             if (columnIndex == AnalyzerAutomataPanel.TABLE_TYPE_COLUMN)
             {
                 AutomatonType currType = theAutomaton.getType();
-                
+
                 return currType.toString();
             }
-            
+
             if (columnIndex == AnalyzerAutomataPanel.TABLE_STATES_COLUMN)
             {
                 return new Integer(theAutomaton.nbrOfStates());
             }
-            
+
             if (columnIndex == AnalyzerAutomataPanel.TABLE_EVENTS_COLUMN)
             {
                 return new Integer(theAutomaton.nbrOfEvents());
             }
-            
+
             if (columnIndex == AnalyzerAutomataPanel.TABLE_TRANSITIONS_COLUMN)
             {
                 return new Integer(theAutomaton.nbrOfTransitions());
             }
-            
+
             return "Unknown";
         }
-        
+
         public boolean isCellEditable(int rowIndex, int columnIndex)
         {
             return false;
         }
-        
+
         public void setValueAt(Object aValue, int rowIndex, int columnIndex)
         {}
-        
+
         public void updateListeners()
         {
             fireTableDataChanged();
         }
-        
-        public void automatonAdded(Automata automata, Automaton automaton)
+
+		public void automatonAdded(Automata automata, Automaton automaton)
         {
             updateListeners();
         }
-        
+
         public void automatonRemoved(Automata automata, Automaton automaton)
         {
             updateListeners();
         }
-        
+
         public void automatonRenamed(Automata automata, Automaton automaton)
         {
             updateListeners();
         }
-        
+
         public void actionsOrControlsChanged(Automata automata)
         {    // Do nothing
         }
-        
+
         public void updated(Object theObject)
         {
             updateListeners();
