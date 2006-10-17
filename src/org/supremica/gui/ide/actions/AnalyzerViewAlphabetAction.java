@@ -37,9 +37,9 @@ public class AnalyzerViewAlphabetAction
 
         putValue(Action.NAME, "Alphabet");
         putValue(Action.SHORT_DESCRIPTION, "View Alphabet");
-//        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
+        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_L));
 //        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
-//        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Icon.gif")));
+        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/Alphabet16.gif")));
     }
 
     public void actionPerformed(ActionEvent e)

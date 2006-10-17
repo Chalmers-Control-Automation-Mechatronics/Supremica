@@ -29,7 +29,7 @@ public class EditorStopEmbedderAction
         setAnalyzerActiveRequired(false);
 
         putValue(Action.NAME, "Stop Layout");
-        putValue(Action.SHORT_DESCRIPTION, "Stop Layout");
+        putValue(Action.SHORT_DESCRIPTION, "Stop all running layout engines");
         //putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
         //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Stop16.gif")));

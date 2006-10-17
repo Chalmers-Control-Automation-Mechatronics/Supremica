@@ -23,7 +23,6 @@ IDE annoyances
 - Scrollbars in the editor panel does not work properly
 - It is not possible to change event controllability
 - It is not possible to remove events
-- It is possible to change component kind, i.e, plant or specification
 - It is not possible to copy components - within a module as well as between modules
 
 Priority

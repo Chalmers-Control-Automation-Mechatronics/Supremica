@@ -60,29 +60,29 @@ public class AutomatonType
     public static final AutomatonType SPECIFICATION = new AutomatonType("Specification", true);
     public static final AutomatonType SUPERVISOR = new AutomatonType("Supervisor", true);
     public static final AutomatonType PROPERTY = new AutomatonType("Property", true);
-
+    
     private String identifier;
-
+    
     private AutomatonType(String identifier, boolean add)
     {
         if (add)
         {
             collection.add(this);
         }
-
+        
         this.identifier = identifier;
     }
-
+    
     public static Iterator iterator()
     {
         return collection.iterator();
     }
-
+    
     public String toString()
     {
         return identifier;
     }
-
+    
     public static AutomatonType toType(String type)
     {
         for (Iterator it = collection.iterator(); it.hasNext(); )
@@ -93,55 +93,55 @@ public class AutomatonType
                 return thisOne;
             }
         }
-
+        
         return UNDEFINED;
     }
-
+    
     public static ComponentKind toKind(AutomatonType type)
     {
-		if (type == SPECIFICATION || type == SUPERVISOR)
-		{
-			return ComponentKind.SPEC;
-		}
-		if (type == PROPERTY)
-		{
-			return ComponentKind.PROPERTY;
-		}
-		return ComponentKind.PLANT;
-	}
-
+        if (type == SPECIFICATION)
+            return ComponentKind.SPEC;
+        if (type == PROPERTY)
+            return ComponentKind.PROPERTY;
+        if (type == SUPERVISOR)
+            return ComponentKind.SUPERVISOR;
+        return ComponentKind.PLANT;
+    }
+    
     public static AutomatonType toType(ComponentKind type)
     {
         if (type == ComponentKind.PLANT)
         {
             return PLANT;
         }
-
         if (type == ComponentKind.SPEC)
         {
             return SPECIFICATION;
         }
-
+        if (type == ComponentKind.SUPERVISOR)
+        {
+            return SUPERVISOR;
+        }
         if (type == ComponentKind.PROPERTY)
         {
             return PROPERTY;
         }
-
+        
         return UNDEFINED;
     }
-
+    
     public static Object[] toArray()
     {
         return collection.toArray();
     }
-
+    
     private static boolean equals(AutomatonType type, String ident)
     {
         if ((type == null) || (ident == null))
         {
             return false;
         }
-
+        
         return ident.toLowerCase().equals(type.toString().toLowerCase());
     }
 }

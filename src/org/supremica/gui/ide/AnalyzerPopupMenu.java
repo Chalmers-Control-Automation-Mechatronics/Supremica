@@ -36,6 +36,7 @@ class AnalyzerPopupMenu
     throws Exception
     {
         JMenu viewMenu = new JMenu("View");
+        viewMenu.setIcon(new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Zoom16.gif")));
         add(viewMenu);
         viewMenu.add(ide.getActions().analyzerViewAutomatonAction.getMenuItem());
         viewMenu.add(ide.getActions().analyzerViewAlphabetAction.getMenuItem());

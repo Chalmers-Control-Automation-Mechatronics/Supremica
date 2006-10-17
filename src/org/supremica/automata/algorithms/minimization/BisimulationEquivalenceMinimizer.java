@@ -65,7 +65,7 @@ import org.supremica.log.*;
  *
  * Then write the code and place it in a c-file.
  *
- * See org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer.cpp 
+ * See org_supremica_automata_algorithms_minimization_BisimulationEquivalenceMinimizer.cpp
  * for further compilation instructions.
  *
  * @author flordal
@@ -73,45 +73,45 @@ import org.supremica.log.*;
 public class BisimulationEquivalenceMinimizer
 {
     private static Logger logger = LoggerFactory.createLogger(BisimulationEquivalenceMinimizer.class);
-
-	/**
-	 * True if native library is available, false otherwise.
-	 */
-	private static boolean libraryLoaded;
-
+    
+    /**
+     * True if native library is available, false otherwise.
+     */
+    private static boolean libraryLoaded;
+    
     static
     {
-		// Load library
-		try
-		{
-        	System.loadLibrary("BisimulationEquivalence");
-        	libraryLoaded = true;
-		}
-		catch (UnsatisfiedLinkError ex)
-		{
-			libraryLoaded = false;
-		}
-		catch (Exception ex)
-		{
-			ex.printStackTrace();
-			libraryLoaded = false;
-		}
-
-		// Unsuccessfull?
-		if (!libraryLoaded)
-		{
-			logger.info("Library BisimulationEquivalence not found, using java methods.");
-		}
+        // Load library
+        try
+        {
+            System.loadLibrary("BisimulationEquivalence");
+            libraryLoaded = true;
+        }
+        catch (UnsatisfiedLinkError ex)
+        {
+            libraryLoaded = false;
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            libraryLoaded = false;
+        }
+        
+        // Unsuccessfull?
+        if (!libraryLoaded)
+        {
+            logger.info("Library BisimulationEquivalence not found, using java methods.");
+        }
     }
-
-	
+    
+    
     /**
      * Minimizes automaton with respect to strong bisimulation equivalence.
      */
-	public static void minimize(Automaton aut)
-	{
-		minimize(aut, false, true);
-	}
+    public static void minimize(Automaton aut)
+    {
+        minimize(aut, false, true);
+    }
     /**
      * Minimizes automaton with respect to weak or strong bisimulation
      * equivalence using long or short state names
@@ -123,14 +123,14 @@ public class BisimulationEquivalenceMinimizer
      * if false, minimizes with respect to weak bisimulation equivalence.
      */
     public static void minimize(Automaton aut, boolean useShortNames, boolean strong)
-        throws UnsatisfiedLinkError
+    throws UnsatisfiedLinkError
     {
         // Set the indices in the automaton.
         aut.setIndices();
-
+        
         // States...
         State[] states = new State[aut.nbrOfStates()];
-		
+        
         // Initialize
         {
             // The initial partitioning in an array, separated by -1 elements.
@@ -155,7 +155,7 @@ public class BisimulationEquivalenceMinimizer
                 assert((index >= 0) && (index < aut.nbrOfStates()));
                 assert(states[index] == null);
                 states[index] = state;
-				// Put accepting states at the front of the list and other at the back...
+                // Put accepting states at the front of the list and other at the back...
                 if (!state.isAccepting(!strong))
                 {
                     initialPartitioning[forwIndex++] = index;
@@ -164,7 +164,7 @@ public class BisimulationEquivalenceMinimizer
                 {
                     initialPartitioning[backIndex--] = index;
                 }
-				// When they meet, put a -1
+                // When they meet, put a -1
                 if (forwIndex == backIndex)
                 {
                     initialPartitioning[forwIndex] = -1;
@@ -181,13 +181,13 @@ public class BisimulationEquivalenceMinimizer
                 int index = 0;
                 for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
                 {
-					Arc arc = arcIt.next();
-					//logger.info("From: " + arc.getFromState() + " ev: " + arc.getEvent() + " (" + arc.getEvent().getIndex() + ") to: " + arc.getToState());
+                    Arc arc = arcIt.next();
+                    //logger.info("From: " + arc.getFromState() + " ev: " + arc.getEvent() + " (" + arc.getEvent().getIndex() + ") to: " + arc.getToState());
                     transitions[index++] = arc.getFromState().getIndex();
                     transitions[index++] = arc.getEvent().getIndex();
                     transitions[index++] = arc.getToState().getIndex();
                 }
-
+                
                 transitionCount = aut.nbrOfTransitions();
             }
             else
@@ -209,14 +209,14 @@ public class BisimulationEquivalenceMinimizer
                         {
                             nextStates = from.nextStates(event, true);
                         }
-						/*
+                                                /*
                         for (Iterator<State> toIt = nextStates.iterator(); toIt.hasNext(); )
                         {
                             State to = toIt.next();
                             transitionCount++;
                         }
-						*/
-						transitionCount += nextStates.size();
+                                                 */
+                        transitionCount += nextStates.size();
                     }
                 }
                 // Now, do the same thing again, and put the info in the array
@@ -248,18 +248,18 @@ public class BisimulationEquivalenceMinimizer
                     }
                 }
             }
-
+            
             // Initialize
-			//logger.info("States: " + aut.nbrOfStates() + " events: " + aut.nbrOfEvents() + " transitions: " + transitionCount);
+            //logger.info("States: " + aut.nbrOfStates() + " events: " + aut.nbrOfEvents() + " transitions: " + transitionCount);
             initialize(aut.nbrOfStates(), aut.nbrOfEvents(), transitionCount,
-                       initialPartitioning, transitions);
-			initialPartitioning = null;
-			transitions = null;
+                initialPartitioning, transitions);
+            initialPartitioning = null;
+            transitions = null;
         }
-
+        
         // Do the partitioning
         partition();
-
+        
         // Merge partitions based on the partitioning done in the native environment
         int[] part = getPartitioning();
         State blob = null;
@@ -271,7 +271,7 @@ public class BisimulationEquivalenceMinimizer
                 //logger.info("part[" + i + "] = " + part[i] + ", " + states[part[i]].getName());
                 if (blob == null)
                 {
-                    blob = states[part[i]]; 
+                    blob = states[part[i]];
                 }
                 else
                 {
@@ -285,29 +285,29 @@ public class BisimulationEquivalenceMinimizer
                 blob = null;
             }
         }
-		part = null;
+        part = null;
     }
-
+    
     /**
      * Initializes the native class with the necessary information.
      */
     private static native void initialize(int nbrOfStates, int nbrOfEvents, int nbrOfTransitions, int[] initialPartitioning, int[] transitions);
-
+    
     /**
      * Runs the Generalized Relational Coarsest Partition Algorithm.
      */
     private static native void partition();
-
+    
     /**
      * Returns an int-array representing the coarsest partitioning.
      */
     private static native int[] getPartitioning();
-
-	/**
-	 * Returns true if the necessary native library has been loaded properly.
-	 */
-	public static boolean libraryLoaded()
-	{
-		return libraryLoaded;
-	}
+    
+    /**
+     * Returns true if the necessary native library has been loaded properly.
+     */
+    public static boolean libraryLoaded()
+    {
+        return libraryLoaded;
+    }
 }

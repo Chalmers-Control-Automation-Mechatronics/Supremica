@@ -37,9 +37,9 @@ public class AnalyzerViewAutomatonAction
 
         putValue(Action.NAME, "Automaton");
         putValue(Action.SHORT_DESCRIPTION, "View Automaton");
-//        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
+        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
 //        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
-//        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Icon.gif")));
+        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/automaton16.gif")));
     }
 
     public void actionPerformed(ActionEvent e)

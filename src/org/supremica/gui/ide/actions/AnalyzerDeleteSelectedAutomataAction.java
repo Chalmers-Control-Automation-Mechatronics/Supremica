@@ -30,7 +30,7 @@ public class AnalyzerDeleteSelectedAutomataAction
         putValue(Action.SHORT_DESCRIPTION, "Delete selected automata");
         putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_D));
         putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
-        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Delete16.gif")));
+        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Remove16.gif")));
     }
     
     public void actionPerformed(ActionEvent e)

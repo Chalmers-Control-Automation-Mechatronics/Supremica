@@ -24,12 +24,13 @@ class ModuleTreePopupMenu
     private JMenuItem deleteComponentItem;
     private JMenuItem editVariableItem;
     private JMenuItem addComponentItem;
-    private JMenuItem toPlantTypeItem;    
-    private JMenuItem toSpecificationTypeItem;        
+    private JMenuItem toPlantTypeItem;
+    private JMenuItem toSpecificationTypeItem;
+    private JMenuItem toSupervisorTypeItem;
     private AbstractSubject mInvokingComponent;
     private ModuleTree mTree;
     private ModuleWindowInterface mWindow;
-
+    
     public ModuleTreePopupMenu(ModuleTree tree, ModuleWindowInterface moduleWindow, AbstractSubject c)
     {
         mInvokingComponent = c;
@@ -37,14 +38,15 @@ class ModuleTreePopupMenu
         mWindow = moduleWindow;
         init();
     }
-
+    
     /**
      * Initialize the menu.
      */
     private void init()
     {
         JMenuItem item;
-
+        
+        // These "actions" are typically executed by the "EditorComponentsPanel"
         if(mInvokingComponent instanceof SimpleComponentSubject)
         {
             item = new JMenuItem("Add variable");
@@ -52,29 +54,35 @@ class ModuleTreePopupMenu
             item.addActionListener(mWindow);
             this.add(item);
             addVariableItem = item;
-
-             item = new JMenuItem("Delete component");
-             item.setActionCommand("delete component");
-             item.addActionListener(mWindow);
-             this.add(item);
+            
+            item = new JMenuItem("Delete component");
+            item.setActionCommand("delete component");
+            item.addActionListener(mWindow);
+            this.add(item);
             deleteComponentItem = item;
-        
-             JMenu typeMenu = new JMenu("Set type");
-             this.add(typeMenu);
-             
-             item = new JMenuItem("Plant");
-             item.setActionCommand("toPlantType");
-             item.addActionListener(mWindow);
-             typeMenu.add(item);
-             toPlantTypeItem = item;        
-             
-             item = new JMenuItem("Specification");
-             item.setActionCommand("toSpecificationType");
-             item.addActionListener(mWindow);
-             typeMenu.add(item);
-             toSpecificationTypeItem = item;        
+            
+            JMenu typeMenu = new JMenu("Set type");
+            this.add(typeMenu);
+            
+            item = new JMenuItem("Plant");
+            item.setActionCommand("toPlantType");
+            item.addActionListener(mWindow);
+            typeMenu.add(item);
+            toPlantTypeItem = item;
+            
+            item = new JMenuItem("Specification");
+            item.setActionCommand("toSpecificationType");
+            item.addActionListener(mWindow);
+            typeMenu.add(item);
+            toSpecificationTypeItem = item;
+            
+            item = new JMenuItem("Supervisor");
+            item.setActionCommand("toSupervisorType");
+            item.addActionListener(mWindow);
+            typeMenu.add(item);
+            toSupervisorTypeItem = item;
         }
-
+        
         if(mInvokingComponent instanceof VariableSubject)
         {
             item = new JMenuItem("Delete variable");
@@ -82,14 +90,14 @@ class ModuleTreePopupMenu
             item.addActionListener(mWindow);
             this.add(item);
             deleteVariableItem = item;
-
+            
             item = new JMenuItem("Edit variable");
             item.setActionCommand("edit variable");
             item.addActionListener((ActionListener)mWindow);
             this.add(item);
             editVariableItem = item;
         }
-
+        
         if(mInvokingComponent instanceof ModuleSubject)
         {
             item = new JMenuItem("Add component");

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.30 2006-10-16 18:36:17 knut Exp $
+//# $Id: EditorComponentsPanel.java,v 1.31 2006-10-17 20:13:30 flordal Exp $
 //###########################################################################
 
 
@@ -43,301 +43,304 @@ import org.supremica.gui.WhiteScrollPane;
 
 
 class EditorComponentsPanel
-	extends WhiteScrollPane
-	implements EditorPanelInterface
+    extends WhiteScrollPane
+    implements EditorPanelInterface
 {
-	private static final long serialVersionUID = 1L;
-
-	private String name;
-	private ModuleContainer moduleContainer;
-
-	private ModuleTree moduleSelectTree;
-	private boolean modified = true;
-
-	EditorComponentsPanel(final ModuleContainer moduleContainer,
-						  final ModuleWindowInterface root,
-						  final String name)
-	{
-		this.moduleContainer = moduleContainer;
-		this.name = name;
-		createContentPane(root);
-		setPreferredSize(IDEDimensions.leftEditorPreferredSize);
-		setMinimumSize(IDEDimensions.leftEditorMinimumSize);
-	}
-
-	public String getName()
-	{
-		return name;
-	}
-
-	private void createContentPane(final ModuleWindowInterface root)
-	{
-		moduleSelectTree = new ModuleTree(root);
-		getViewport().add(moduleSelectTree);
-	}
-
-
-	//#######################################################################
-	//# org.supremica.gui.ide.EditorPanelInterface
-	public void addComponent()
-	{
-		new EditorNewComponentDialog(this);
-	}
-
-	// To do remove this - this is a dummy impl used to satisfy EditorPanelInterface
-	public void addComponentEvent()
-	{
-	}
-
-	// To do remove this - this is a dummy impl used to satisfy EditorPanelInterface
-	public void addModuleEvent()
-	{
-	}
-
-
-	public void addComponent(final AbstractSubject o)
-	{
-		final ModuleSubject module = getModuleSubject();
-		if (module != null)
-		{
-			modified = true;
-
-			DefaultMutableTreeNode parentNode = null;
-			TreePath parentPath = moduleSelectTree.getSelectionPath();
-
-			if (parentPath == null)
-			{
-				//There's no selection. Default to the root node.
-				parentNode = ((ModuleTree) moduleSelectTree).getRoot();
-
-				moduleSelectTree.expandPath(new TreePath(parentNode.getPath()));
-			}
-			else
-			{
-				parentNode = (DefaultMutableTreeNode) (parentPath.getLastPathComponent());
-			}
-
-			ComponentInfo ci = (ComponentInfo) (parentNode.getUserObject());
-
-			//logEntry("addComponent: Parent: " + parentNode.toString());
-
-			if (ci.getComponent() instanceof ForeachSubject)
-			{
-				((ForeachSubject) ci.getComponent()).getBodyModifiable().add(o);
-			}
-			else
-			{
-				module.getComponentListModifiable().add(o);
-			}
-
-
-			//Add node to module tree
-			((ModuleTree) moduleSelectTree).addComponent(o);
-		}
-	}
-
-	public ModuleSubject getModuleSubject()
-	{
-		return moduleContainer.getModule();
-	}
-
-	public boolean componentNameAvailable(String name)
-	{
-		if (name == null || name.equals(""))
-		{
-			return false;
-		}
-
-		ModuleSubject subject = getModuleSubject();
-		List<Proxy> componentList = subject.getComponentList();
-		for(Proxy proxy : componentList)
-		{
-			if (!(proxy instanceof ForeachComponentProxy))
-			{
-				NamedProxy namedProxy = (NamedProxy)proxy;
-				String currName = namedProxy.getName();
-				if (name.equals(currName))
-				{
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
-
-	//######################################################################
-	//# Interface java.awt.event.ActionListener
-	public void actionPerformed(ActionEvent e) {
-		if("add variable".equals(e.getActionCommand())) {
-			//add new variable
-			TreePath currentSelection = moduleSelectTree.getSelectionPath();
-			if (currentSelection != null)
-			{
-				// Get the node in the tree
-				DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode)
-				(currentSelection.getLastPathComponent());
-				Subject component = ((ComponentInfo)
-						targetNode.getUserObject()).getComponent();
-
-				if(component instanceof VariableSubject) {
-					component = component.getParent().getParent();
-					EditorEditVariableDialog.showDialog(null,
-							(SimpleComponentSubject) component, moduleSelectTree);
-				} else if(component instanceof SimpleComponentSubject) {
-					EditorEditVariableDialog.showDialog(null,
-							(SimpleComponentSubject) component, moduleSelectTree);
-				} else {
-					System.err.println("ModuleWindow.actionPerformed(): " +
-					"'add variable' performed by illegal node type");
-				}
-			}
-		}
-
-		if("edit variable".equals(e.getActionCommand())) {
-			//edit existing variable
-			TreePath currentSelection = moduleSelectTree.getSelectionPath();
-			if (currentSelection != null)
-			{
-				// Get the node in the tree
-				DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode)
-				(currentSelection.getLastPathComponent());
-				Subject component = ((ComponentInfo)
-						targetNode.getUserObject()).getComponent();
-
-				if(component instanceof VariableSubject) {
-					Subject parent = component.getParent().getParent();
-					EditorEditVariableDialog.showDialog((VariableSubject) component,
-							(SimpleComponentSubject) parent, moduleSelectTree);
-				} else {
-					System.err.println("ModuleWindow.actionPerformed(): " +
-					"'edit variable' performed by illegal node type");
-				}
-			}
-		}
-
-		if("delete variable".equals(e.getActionCommand())) {
-			//edit existing variable
-			TreePath currentSelection = moduleSelectTree.getSelectionPath();
-			if (currentSelection != null)
-			{
-				// Get the node in the tree
-				DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode)
-				(currentSelection.getLastPathComponent());
-				Subject component = ((ComponentInfo)
-						targetNode.getUserObject()).getComponent();
-
-				if(component instanceof VariableSubject) {
-					Subject parent = component.getParent().getParent();
-
-
-				//mVariable = new VariableSubject(name.getText(), type, initial, marked);
-				//mComponent.getVariablesModifiable().add(mVariable);
-		    	//mTree.addVariable(mVariable);
-
-					System.err.println("Delete variable not implemented");
-					//EditorEditVariableDialog.showDialog((VariableSubject) component,(SimpleComponentSubject) parent, moduleSelectTree);
-				} else {
-					System.err.println("ModuleWindow.actionPerformed(): " +
-					"'delete variable' performed by illegal node type");
-				}
-			}
-		}
-
-		if("delete component".equals(e.getActionCommand())) {
-			TreePath currentSelection = moduleSelectTree.getSelectionPath();
-			if (currentSelection != null)
-			  {
-				// Find the depth of the component...
-				int depth = currentSelection.getPathCount()-1;
-				// Get the node in the tree
-				DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) (currentSelection.getLastPathComponent());
-
-				//Special treatment for variables
-				AbstractSubject component = ((ComponentInfo)
-											 targetNode.getUserObject()).getComponent();
-				if(component instanceof VariableSubject) {
-				  //remove from model (take getParent()x2 because a variableSubject is the child of a list.)
-				  ((SimpleComponentSubject) component.getParent().getParent())
-					.getVariablesModifiable().remove(component);
-
-				  //remove from module tree view
-				  moduleSelectTree.removeCurrentNode();
-				  return;
-				}
-
-				// Find the way to the component in the module
-				ListSubject<AbstractSubject> rootList = getModuleSubject().getComponentListModifiable();
-				ListSubject<AbstractSubject> currentList = rootList;
-				for (int i=1; i<depth; i++)
-				  {
-					// We're (depth-i) levels too deep
-					DefaultMutableTreeNode currentNode = targetNode;
-					for (int j=0; j<(depth-i); j++)
-					  {
-						currentNode = (DefaultMutableTreeNode) (currentNode.getParent());
-					  }
-					// Find currentNode (a ForeachSubject) in currentList and unfold a new ListSubject
-					ForeachSubject foreachSubject = (ForeachSubject) currentList.get(currentList.indexOf(((ComponentInfo) currentNode.getUserObject()).getComponent()));
-					currentList = foreachSubject.getBodyModifiable();
-				  }
-				// I just realised there's a nicer way to do this... well, well.
-
-				// Remove component from module
-				currentList.remove(((ComponentInfo) targetNode.getUserObject()).getComponent());
-
-				// Remove the component visually
-				moduleSelectTree.removeCurrentNode();
-			  }
-		}
-
-		if("add simple component".equals(e.getActionCommand())) {
-			moduleContainer.getActions().editorAddSimpleComponentAction.doAction();
-		}
-
-                if("toPlantType".equals(e.getActionCommand())) 
-                {
-			TreePath currentSelection = moduleSelectTree.getSelectionPath();
-			if (currentSelection != null)
-			{
-				// Get the node in the tree
-				DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode)
-				(currentSelection.getLastPathComponent());
-				Subject component = ((ComponentInfo)
-						targetNode.getUserObject()).getComponent();
-
-				if(component instanceof SimpleComponentSubject) 
-                                {
-                                        ((SimpleComponentSubject)component).setKind(ComponentKind.PLANT);
-				} 
-                                else 
-                                {
-					System.err.println("ModuleWindow.actionPerformed(): " +
-					"'toPlantType' performed by illegal node type");
-				}
-			}
-                }
-                  if("toSpecificationType".equals(e.getActionCommand())) 
-                {
-			TreePath currentSelection = moduleSelectTree.getSelectionPath();
-			if (currentSelection != null)
-			{
-				// Get the node in the tree
-				DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode)
-				(currentSelection.getLastPathComponent());
-				Subject component = ((ComponentInfo)
-						targetNode.getUserObject()).getComponent();
-
-				if(component instanceof SimpleComponentSubject) 
-                                {
-                                        ((SimpleComponentSubject)component).setKind(ComponentKind.SPEC);
-				} 
-                                else 
-                                {
-					System.err.println("ModuleWindow.actionPerformed(): " +
-					"'toSpecificationType' performed by illegal node type");
-				}
-			}
-                }
+    private static final long serialVersionUID = 1L;
+    
+    private String name;
+    private ModuleContainer moduleContainer;
+    
+    private ModuleTree moduleSelectTree;
+    private boolean modified = true;
+    
+    EditorComponentsPanel(final ModuleContainer moduleContainer,
+        final ModuleWindowInterface root,
+        final String name)
+    {
+        this.moduleContainer = moduleContainer;
+        this.name = name;
+        createContentPane(root);
+        setPreferredSize(IDEDimensions.leftEditorPreferredSize);
+        setMinimumSize(IDEDimensions.leftEditorMinimumSize);
+    }
+    
+    public String getName()
+    {
+        return name;
+    }
+    
+    private void createContentPane(final ModuleWindowInterface root)
+    {
+        moduleSelectTree = new ModuleTree(root);
+        getViewport().add(moduleSelectTree);
+    }
+    
+    
+    //#######################################################################
+    //# org.supremica.gui.ide.EditorPanelInterface
+    public void addComponent()
+    {
+        new EditorNewComponentDialog(this);
+    }
+    
+    // To do remove this - this is a dummy impl used to satisfy EditorPanelInterface
+    public void addComponentEvent()
+    {
+    }
+    
+    // To do remove this - this is a dummy impl used to satisfy EditorPanelInterface
+    public void addModuleEvent()
+    {
+    }
+    
+    
+    public void addComponent(final AbstractSubject o)
+    {
+        final ModuleSubject module = getModuleSubject();
+        if (module != null)
+        {
+            modified = true;
+            
+            DefaultMutableTreeNode parentNode = null;
+            TreePath parentPath = moduleSelectTree.getSelectionPath();
+            
+            if (parentPath == null)
+            {
+                //There's no selection. Default to the root node.
+                parentNode = ((ModuleTree) moduleSelectTree).getRoot();
+                
+                moduleSelectTree.expandPath(new TreePath(parentNode.getPath()));
+            }
+            else
+            {
+                parentNode = (DefaultMutableTreeNode) (parentPath.getLastPathComponent());
+            }
+            
+            ComponentInfo ci = (ComponentInfo) (parentNode.getUserObject());
+            
+            //logEntry("addComponent: Parent: " + parentNode.toString());
+            
+            if (ci.getComponent() instanceof ForeachSubject)
+            {
+                ((ForeachSubject) ci.getComponent()).getBodyModifiable().add(o);
+            }
+            else
+            {
+                module.getComponentListModifiable().add(o);
+            }
+            
+            
+            //Add node to module tree
+            ((ModuleTree) moduleSelectTree).addComponent(o);
         }
+    }
+    
+    public ModuleSubject getModuleSubject()
+    {
+        return moduleContainer.getModule();
+    }
+    
+    public boolean componentNameAvailable(String name)
+    {
+        if (name == null || name.equals(""))
+        {
+            return false;
+        }
+        
+        ModuleSubject subject = getModuleSubject();
+        List<Proxy> componentList = subject.getComponentList();
+        for(Proxy proxy : componentList)
+        {
+            if (!(proxy instanceof ForeachComponentProxy))
+            {
+                NamedProxy namedProxy = (NamedProxy)proxy;
+                String currName = namedProxy.getName();
+                if (name.equals(currName))
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    
+    //######################################################################
+    //# Interface java.awt.event.ActionListener
+    public void actionPerformed(ActionEvent e)
+    {
+        if("add variable".equals(e.getActionCommand()))
+        {
+            //add new variable
+            TreePath currentSelection = moduleSelectTree.getSelectionPath();
+            if (currentSelection != null)
+            {
+                // Get the node in the tree
+                DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode)
+                (currentSelection.getLastPathComponent());
+                Subject component = ((ComponentInfo)
+                targetNode.getUserObject()).getComponent();
+                
+                if(component instanceof VariableSubject)
+                {
+                    component = component.getParent().getParent();
+                    EditorEditVariableDialog.showDialog(null,
+                        (SimpleComponentSubject) component, moduleSelectTree);
+                }
+                else if(component instanceof SimpleComponentSubject)
+                {
+                    EditorEditVariableDialog.showDialog(null,
+                        (SimpleComponentSubject) component, moduleSelectTree);
+                }
+                else
+                {
+                    System.err.println("ModuleWindow.actionPerformed(): " +
+                        "'add variable' performed by illegal node type");
+                }
+            }
+        }
+        
+        if("edit variable".equals(e.getActionCommand()))
+        {
+            //edit existing variable
+            TreePath currentSelection = moduleSelectTree.getSelectionPath();
+            if (currentSelection != null)
+            {
+                // Get the node in the tree
+                DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode)
+                (currentSelection.getLastPathComponent());
+                Subject component = ((ComponentInfo)
+                targetNode.getUserObject()).getComponent();
+                
+                if(component instanceof VariableSubject)
+                {
+                    Subject parent = component.getParent().getParent();
+                    EditorEditVariableDialog.showDialog((VariableSubject) component,
+                        (SimpleComponentSubject) parent, moduleSelectTree);
+                }
+                else
+                {
+                    System.err.println("ModuleWindow.actionPerformed(): " +
+                        "'edit variable' performed by illegal node type");
+                }
+            }
+        }
+        
+        if("delete variable".equals(e.getActionCommand()))
+        {
+            //edit existing variable
+            TreePath currentSelection = moduleSelectTree.getSelectionPath();
+            if (currentSelection != null)
+            {
+                // Get the node in the tree
+                DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode)
+                (currentSelection.getLastPathComponent());
+                Subject component = ((ComponentInfo)
+                targetNode.getUserObject()).getComponent();
+                
+                if(component instanceof VariableSubject)
+                {
+                    Subject parent = component.getParent().getParent();
+                    
+                    
+                    //mVariable = new VariableSubject(name.getText(), type, initial, marked);
+                    //mComponent.getVariablesModifiable().add(mVariable);
+                    //mTree.addVariable(mVariable);
+                    
+                    System.err.println("Delete variable not implemented");
+                    //EditorEditVariableDialog.showDialog((VariableSubject) component,(SimpleComponentSubject) parent, moduleSelectTree);
+                }
+                else
+                {
+                    System.err.println("ModuleWindow.actionPerformed(): " +
+                        "'delete variable' performed by illegal node type");
+                }
+            }
+        }
+        
+        if("delete component".equals(e.getActionCommand()))
+        {
+            TreePath currentSelection = moduleSelectTree.getSelectionPath();
+            if (currentSelection != null)
+            {
+                // Find the depth of the component...
+                int depth = currentSelection.getPathCount()-1;
+                // Get the node in the tree
+                DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) (currentSelection.getLastPathComponent());
+                
+                //Special treatment for variables
+                AbstractSubject component = ((ComponentInfo)
+                targetNode.getUserObject()).getComponent();
+                if(component instanceof VariableSubject)
+                {
+                    //remove from model (take getParent()x2 because a variableSubject is the child of a list.)
+                    ((SimpleComponentSubject) component.getParent().getParent())
+                    .getVariablesModifiable().remove(component);
+                    
+                    //remove from module tree view
+                    moduleSelectTree.removeCurrentNode();
+                    return;
+                }
+                
+                // Find the way to the component in the module
+                ListSubject<AbstractSubject> rootList = getModuleSubject().getComponentListModifiable();
+                ListSubject<AbstractSubject> currentList = rootList;
+                for (int i=1; i<depth; i++)
+                {
+                    // We're (depth-i) levels too deep
+                    DefaultMutableTreeNode currentNode = targetNode;
+                    for (int j=0; j<(depth-i); j++)
+                    {
+                        currentNode = (DefaultMutableTreeNode) (currentNode.getParent());
+                    }
+                    // Find currentNode (a ForeachSubject) in currentList and unfold a new ListSubject
+                    ForeachSubject foreachSubject = (ForeachSubject) currentList.get(currentList.indexOf(((ComponentInfo) currentNode.getUserObject()).getComponent()));
+                    currentList = foreachSubject.getBodyModifiable();
+                }
+                // I just realised there's a nicer way to do this... well, well.
+                
+                // Remove component from module
+                currentList.remove(((ComponentInfo) targetNode.getUserObject()).getComponent());
+                
+                // Remove the component visually
+                moduleSelectTree.removeCurrentNode();
+            }
+        }
+        
+        if("add simple component".equals(e.getActionCommand()))
+        {
+            moduleContainer.getActions().editorAddSimpleComponentAction.doAction();
+        }
+        
+        if("toPlantType".equals(e.getActionCommand()) ||
+            "toSpecificationType".equals(e.getActionCommand()) ||
+            "toSupervisorType".equals(e.getActionCommand()))
+        {
+            TreePath currentSelection = moduleSelectTree.getSelectionPath();
+            if (currentSelection != null)
+            {
+                // Get the node in the tree
+                DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode)
+                (currentSelection.getLastPathComponent());
+                Subject component = ((ComponentInfo)
+                targetNode.getUserObject()).getComponent();
+                
+                if(component instanceof SimpleComponentSubject)
+                {
+                    if("toPlantType".equals(e.getActionCommand()))
+                        ((SimpleComponentSubject)component).setKind(ComponentKind.PLANT);
+                    if ("toSpecificationType".equals(e.getActionCommand()))
+                        ((SimpleComponentSubject)component).setKind(ComponentKind.SPEC);
+                    if ("toSupervisorType".equals(e.getActionCommand()))
+                        ((SimpleComponentSubject)component).setKind(ComponentKind.SUPERVISOR);
+                }
+                else
+                {
+                    System.err.println("ModuleWindow.actionPerformed(): " +
+                        "'" + e.getActionCommand() + "' performed by illegal node type");
+                }
+            }
+        }
+    }
 }
