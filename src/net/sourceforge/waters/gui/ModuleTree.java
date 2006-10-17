@@ -63,12 +63,13 @@ public class ModuleTree extends JTree {
 		//TODO: Put some proper icons in place!
 		final ImageIcon plantIcon = new ImageIcon(ModuleWindow.class.getResource("/icons/waters/plant.gif"));
 		final ImageIcon specIcon = new ImageIcon(ModuleWindow.class.getResource("/icons/waters/spec.gif"));
+		final ImageIcon supIcon = new ImageIcon(ModuleWindow.class.getResource("/icons/waters/supervisor.gif"));
 		final ImageIcon propertyIcon = new ImageIcon(ModuleWindow.class.getResource("/icons/waters/property.gif"));
 		final ImageIcon foreachIcon = null;
 		final ImageIcon instanceIcon = new ImageIcon(ModuleWindow.class.getResource("/icons/waters/instance.gif"));
 		final ImageIcon bindingIcon = null;
 
-		setCellRenderer(new ModuleTreeRenderer(foreachIcon, plantIcon, propertyIcon, specIcon, instanceIcon, bindingIcon));
+		setCellRenderer(new ModuleTreeRenderer(foreachIcon, plantIcon, propertyIcon, specIcon, supIcon, instanceIcon, bindingIcon));
 		setEditable(false);
 		getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindowInterface
 //###########################################################################
-//# $Id: ModuleWindowInterface.java,v 1.6 2006-10-07 20:20:12 robi Exp $
+//# $Id: ModuleWindowInterface.java,v 1.7 2006-10-17 23:31:07 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -77,4 +77,8 @@ public interface ModuleWindowInterface
   public EditorWindowInterface showEditor(SimpleComponentSubject comp)
     throws GeometryAbsentException;
 
+  /**
+   * Shows the comment editor panel for the current module.
+   */
+  public void showComment();
 }

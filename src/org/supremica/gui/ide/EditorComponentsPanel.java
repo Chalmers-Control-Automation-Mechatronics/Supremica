@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.31 2006-10-17 20:13:30 flordal Exp $
+//# $Id: EditorComponentsPanel.java,v 1.32 2006-10-17 23:31:07 flordal Exp $
 //###########################################################################
 
 
@@ -53,6 +53,8 @@ class EditorComponentsPanel
     
     private ModuleTree moduleSelectTree;
     private boolean modified = true;
+
+    private ModuleWindowInterface root;
     
     EditorComponentsPanel(final ModuleContainer moduleContainer,
         final ModuleWindowInterface root,
@@ -60,6 +62,7 @@ class EditorComponentsPanel
     {
         this.moduleContainer = moduleContainer;
         this.name = name;
+        this.root = root;
         createContentPane(root);
         setPreferredSize(IDEDimensions.leftEditorPreferredSize);
         setMinimumSize(IDEDimensions.leftEditorMinimumSize);
@@ -313,6 +316,11 @@ class EditorComponentsPanel
             moduleContainer.getActions().editorAddSimpleComponentAction.doAction();
         }
         
+        if("show comment".equals(e.getActionCommand()))
+        {
+            root.showComment();
+        }
+
         if("toPlantType".equals(e.getActionCommand()) ||
             "toSpecificationType".equals(e.getActionCommand()) ||
             "toSupervisorType".equals(e.getActionCommand()))

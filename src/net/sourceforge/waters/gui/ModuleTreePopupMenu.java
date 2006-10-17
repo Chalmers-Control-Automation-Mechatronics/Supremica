@@ -27,6 +27,7 @@ class ModuleTreePopupMenu
     private JMenuItem toPlantTypeItem;
     private JMenuItem toSpecificationTypeItem;
     private JMenuItem toSupervisorTypeItem;
+    private JMenuItem showCommentItem;
     private AbstractSubject mInvokingComponent;
     private ModuleTree mTree;
     private ModuleWindowInterface mWindow;
@@ -82,8 +83,7 @@ class ModuleTreePopupMenu
             typeMenu.add(item);
             toSupervisorTypeItem = item;
         }
-        
-        if(mInvokingComponent instanceof VariableSubject)
+        else if(mInvokingComponent instanceof VariableSubject)
         {
             item = new JMenuItem("Delete variable");
             item.setActionCommand("delete variable");
@@ -97,14 +97,19 @@ class ModuleTreePopupMenu
             this.add(item);
             editVariableItem = item;
         }
-        
-        if(mInvokingComponent instanceof ModuleSubject)
+        else if(mInvokingComponent instanceof ModuleSubject)
         {
             item = new JMenuItem("Add component");
             item.setActionCommand("add simple component");
             item.addActionListener(mWindow);
             this.add(item);
             addComponentItem = item;
+
+            item = new JMenuItem("Show comment");
+            item.setActionCommand("show comment");
+            item.addActionListener(mWindow);
+            this.add(item);
+            showCommentItem = item;
         }
     }
 }

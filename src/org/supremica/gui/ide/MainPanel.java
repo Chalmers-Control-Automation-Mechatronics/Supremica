@@ -4,28 +4,30 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   MainPanel
 //###########################################################################
-//# $Id: MainPanel.java,v 1.21 2006-10-13 22:04:09 flordal Exp $
+//# $Id: MainPanel.java,v 1.22 2006-10-17 23:31:07 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
 
+import java.awt.BorderLayout;
+import java.awt.Font;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JToolBar;
-import javax.swing.text.AbstractDocument;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import net.sourceforge.waters.gui.EditorColor;
 
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
@@ -123,45 +125,38 @@ abstract class MainPanel
         String name = getModuleSubject().getName();
         String comment = getModuleSubject().getComment();
         
-        //Create the text pane and configure it.
-        JTextPane textPane = new JTextPane();
-        AbstractDocument doc;
-        textPane.setCaretPosition(0);
-        textPane.setMargin(new Insets(5,5,5,5));
-        StyledDocument styledDoc = textPane.getStyledDocument();
-        if (styledDoc instanceof AbstractDocument)
-        {
-            doc = (AbstractDocument)styledDoc;       
-        }
-        else
-        {
-            logger.error("Text pane's document isn't an AbstractDocument!");
-            return;
-        }
-        JScrollPane scrollPane = new JScrollPane(textPane);
-        scrollPane.setPreferredSize(new Dimension(200, 200));
-        // Add comment to document
         try
         {
-            SimpleAttributeSet attributes = new SimpleAttributeSet();
-            //StyleConstants.setFontFamily(attributes, "SansSerif");
-            StyleConstants.setFontSize(attributes, 14);
-            StyleConstants.setBold(attributes, true);
-            doc.insertString(doc.getLength(), name + "\n", attributes);
-            StyleConstants.setFontSize(attributes, 12);
-            StyleConstants.setBold(attributes, false);
-            doc.insertString(doc.getLength(), comment, attributes);
+            // Add stuff to a panel
+            JPanel commentPanel = new JPanel();
+            commentPanel.setLayout(new BorderLayout());
+            // Create title
+            //JTextPane titlePane = new JTextPane();
+            JTextField titlePane = new JTextField(name);
+            titlePane.setFont(new Font(null, Font.BOLD, 14));
+            //StyledDocument titleDoc = titlePane.getStyledDocument();
+            //titleDoc.insertString(titleDoc.getLength(), name, null);
+            titlePane.setBorder(new EmptyBorder(0,0,0,0));
+            titlePane.setBorder(new LineBorder(commentPanel.getBackground())); // WTF!? Doesn't work?
+            //titlePane.setBorder(new LineBorder(EditorColor.INVISIBLE));
+            titlePane.setBackground(commentPanel.getBackground()); // WTF!? Doesn't work?
+            //titlePane.setBackground(EditorColor.INVISIBLE);
+            commentPanel.add(BorderLayout.NORTH, titlePane);
+            //Create the comment text
+            JTextPane commentPane = new JTextPane();
+            commentPane.setFont(new Font(null, Font.PLAIN, 12));
+            StyledDocument commentDoc = commentPane.getStyledDocument();
+            commentDoc.insertString(commentDoc.getLength(), comment, null);
+            commentPane.setBackground(commentPanel.getBackground());
+            commentPanel.add(BorderLayout.CENTER, commentPane);
+
+            final EditorPanel editorPanel = moduleContainer.getEditorPanel();
+            editorPanel.setRightComponent(commentPanel);
         }
         catch (BadLocationException ex)
         {
-            logger.error(ex);
-            return;
+            //JOptionPane.showMessageDialog(ide.getFrame(), "Bad comment in module.", "Bad comment", JOptionPane.ERROR_MESSAGE);
         }
-        
-        final EditorPanel editorPanel =
-            moduleContainer.getEditorPanel();
-        editorPanel.setRightComponent
-            (textPane);
     }
     
     //######################################################################

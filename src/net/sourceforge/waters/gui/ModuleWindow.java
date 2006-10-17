@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.58 2006-10-07 20:20:12 robi Exp $
+//# $Id: ModuleWindow.java,v 1.59 2006-10-17 23:31:07 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -872,6 +872,11 @@ public class ModuleWindow
       {
         mInsignificant.addEdit(e);
       }
+  }
+  
+  public void showComment()
+  {
+
   }
 
   public void executeCommand(Command c)
