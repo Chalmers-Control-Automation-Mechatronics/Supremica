@@ -4,20 +4,27 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorEventsPanel
 //###########################################################################
-//# $Id: EditorEventsPanel.java,v 1.17 2006-10-16 15:32:20 flordal Exp $
+//# $Id: EditorEventsPanel.java,v 1.18 2006-10-18 07:48:54 knut Exp $
 //###########################################################################
 
 
 package org.supremica.gui.ide;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.ListModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import net.sourceforge.waters.gui.EventEditorDialog;
 import net.sourceforge.waters.gui.EventDeclListView;
+import net.sourceforge.waters.subject.base.IndexedListSubject;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.xsd.base.EventKind;
 import org.supremica.gui.WhiteScrollPane;
 
 
@@ -46,6 +53,20 @@ class EditorEventsPanel
         popupListener = new PopupListener();
         addMouseListener(popupListener);
         mEventList.addMouseListener(popupListener);
+        JMenu setKindMenu = new JMenu("Set controllability");
+        popup.add(setKindMenu);
+        
+        JMenuItem setControllabilityMenu = new JMenuItem("Controllable");
+        setKindMenu.add(setControllabilityMenu);
+        setControllabilityMenu.addActionListener(new SetControllableAction());
+        
+        JMenuItem setUncontrollabilityMenu = new JMenuItem("Uncontrollable");       
+        setKindMenu.add(setUncontrollabilityMenu);
+        setUncontrollabilityMenu.addActionListener(new SetUncontrollableAction());
+
+        JMenuItem setDeleteMenu = new JMenuItem("Delete event");       
+        popup.add(setDeleteMenu);
+        setDeleteMenu.addActionListener(new SetDeleteAction());        
     }
     
     public String getName()
@@ -79,12 +100,79 @@ class EditorEventsPanel
         
         private void maybeShowPopup(MouseEvent e)
         {
-//			System.err.println("maybeShowPopup");
-            if (e.isPopupTrigger())
+            if (e.isPopupTrigger() && 
+                    !mEventList.isSelectionEmpty() && 
+                    (mEventList.locationToIndex(e.getPoint()) == mEventList.getSelectedIndex()))
             {
-                popup.show(e.getComponent(),
-                    e.getX(), e.getY());
+                popup.show(mEventList, e.getX(), e.getY());
             }
         }
     }
+    
+    class SetControllableAction
+        implements ActionListener
+    {
+        public void actionPerformed(ActionEvent e)
+        {
+            int selectedIndex = mEventList.getSelectedIndex();
+            Object selectedObject = mEventList.getModel().getElementAt(selectedIndex);
+            if (selectedObject instanceof EventDeclSubject)
+            {
+                EventDeclSubject selectedEvent = (EventDeclSubject)selectedObject;
+                if (selectedEvent.getKind() == EventKind.UNCONTROLLABLE)
+                {
+                    selectedEvent.setKind(EventKind.CONTROLLABLE);
+                }
+            }
+            else
+            {
+                System.err.println("SetControllableAction: Unknown selectedObject type");
+            }
+        }
+    }
+    
+    class SetUncontrollableAction
+        implements ActionListener
+    {
+        public void actionPerformed(ActionEvent e)
+        {
+            int selectedIndex = mEventList.getSelectedIndex();
+            Object selectedObject = mEventList.getModel().getElementAt(selectedIndex);
+            if (selectedObject instanceof EventDeclSubject)
+            {
+                EventDeclSubject selectedEvent = (EventDeclSubject)selectedObject;
+                if (selectedEvent.getKind() == EventKind.CONTROLLABLE)
+                {
+                    selectedEvent.setKind(EventKind.UNCONTROLLABLE);
+                }
+            }
+            else
+            {
+                System.err.println("SetUncontrollableAction: Unknown selectedObject type");
+            }            
+        }
+    }   
+
+    class SetDeleteAction
+        implements ActionListener
+    {
+        public void actionPerformed(ActionEvent e)
+        {
+            int selectedIndex = mEventList.getSelectedIndex();
+            Object selectedObject = mEventList.getModel().getElementAt(selectedIndex);
+            if (selectedObject instanceof EventDeclSubject)
+            {
+                EventDeclSubject selectedEvent = (EventDeclSubject)selectedObject;
+                if (selectedEvent.getKind() == EventKind.CONTROLLABLE || selectedEvent.getKind() == EventKind.UNCONTROLLABLE)
+                {
+                    IndexedListSubject<EventDeclSubject> events = moduleContainer.getModule().getEventDeclListModifiable();
+                    events.remove(selectedEvent);
+                }
+            }
+            else
+            {
+                System.err.println("SetUncontrollableAction: Unknown selectedObject type");
+            }            
+        }
+    }   
 }
