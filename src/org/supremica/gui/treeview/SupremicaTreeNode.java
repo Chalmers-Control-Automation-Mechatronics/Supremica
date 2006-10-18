@@ -10,47 +10,47 @@ import javax.swing.*;
 import javax.swing.tree.*;
 
 public class SupremicaTreeNode
-	extends DefaultMutableTreeNode
+    extends DefaultMutableTreeNode
 {
-	boolean enabled = true;
-
-	public SupremicaTreeNode()
-	{
-		super();
-	}
-
-	public SupremicaTreeNode(Object obj)
-	{
-		super(obj);
-	}
-
-	public boolean isEnabled()
-	{
-		return enabled;
-	}
-
-	public void setEnabled(boolean b)
-	{
-		enabled = b;
-	}
-
-	public Icon getOpenIcon()
-	{
-		return null;
-	}
-
-	public Icon getLeafIcon()
-	{
-		return null;
-	}
-
-	public Icon getClosedIcon()
-	{
-		return null;
-	}
-
-	public Icon getDisabledIcon()
-	{
-		return null;
-	}
+    boolean enabled = true;
+    
+    public SupremicaTreeNode()
+    {
+        super();
+    }
+    
+    public SupremicaTreeNode(Object obj)
+    {
+        super(obj);
+    }
+    
+    public boolean isEnabled()
+    {
+        return enabled;
+    }
+    
+    public void setEnabled(boolean b)
+    {
+        enabled = b;
+    }
+    
+    public Icon getOpenIcon()
+    {
+        return null;
+    }
+    
+    public Icon getLeafIcon()
+    {
+        return null;
+    }
+    
+    public Icon getClosedIcon()
+    {
+        return null;
+    }
+    
+    public Icon getDisabledIcon()
+    {
+        return null;
+    }
 }

@@ -8,32 +8,33 @@ import net.sourceforge.waters.gui.ControlledSurface;
 import java.util.List;
 
 public class EditorAddNodeAction
-	extends IDEAction
+    extends IDEAction
 {
-	private static final long serialVersionUID = 1L;
-
-	public EditorAddNodeAction(List<IDEAction> actionList)
-	{
-		super(actionList);
-
-		setEditorActiveRequired(true);
-
-		putValue(Action.NAME, "Add Node");
-		putValue(Action.SHORT_DESCRIPTION, "Add node");
-		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/node16.gif")));
-		putValue(Action.ACTION_COMMAND_KEY, ControlledSurface.Tool.NODE.toString());
-	}
-
-	public void actionPerformed(ActionEvent e)
-	{
-	    //System.out.println("Node");
-		doAction();
-	}
-
-	public void doAction()
-	{
-		ide.setEditorMode(this);
-
+    private static final long serialVersionUID = 1L;
+    
+    public EditorAddNodeAction(List<IDEAction> actionList)
+    {
+        super(actionList);
+        
+        setEditorActiveRequired(true);
+        
+        putValue(Action.NAME, "Add Node");
+        putValue(Action.SHORT_DESCRIPTION, "Add node");
+        //putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/node16.gif")));
+        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/State16.gif")));
+        putValue(Action.ACTION_COMMAND_KEY, ControlledSurface.Tool.NODE.toString());
+    }
+    
+    public void actionPerformed(ActionEvent e)
+    {
+        //System.out.println("Node");
+        doAction();
+    }
+    
+    public void doAction()
+    {
+        ide.setEditorMode(this);
+        
 //		System.err.println("Add Node is not implemented yet!");
-	}
+    }
 }

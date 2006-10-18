@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   MainPanel
 //###########################################################################
-//# $Id: MainPanel.java,v 1.23 2006-10-18 14:53:31 flordal Exp $
+//# $Id: MainPanel.java,v 1.24 2006-10-18 22:36:05 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -139,14 +139,14 @@ abstract class MainPanel
             titlePane.setFont(new Font(null, Font.BOLD, 14));
             StyledDocument titleDoc = titlePane.getStyledDocument();
             titleDoc.insertString(titleDoc.getLength(), name, null);
-            titlePane.setBackground(commentPanel.getBackground()); // WTF!? Doesn't work?
+            //titlePane.setBackground(commentPanel.getBackground()); // WTF!? Doesn't work?
             commentPanel.add(BorderLayout.NORTH, titlePane);
             //Create the comment text
             JTextPane commentPane = new JTextPane();
             commentPane.setFont(new Font(null, Font.PLAIN, 12));
             StyledDocument commentDoc = commentPane.getStyledDocument();
             commentDoc.insertString(commentDoc.getLength(), comment, null);
-            commentPane.setBackground(commentPanel.getBackground());
+            //commentPane.setBackground(commentPanel.getBackground());
             commentPanel.add(BorderLayout.CENTER, commentPane);
 
             final EditorPanel editorPanel = moduleContainer.getEditorPanel();

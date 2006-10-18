@@ -10,62 +10,64 @@ import org.supremica.automata.LabeledEvent;
 import org.supremica.gui.Supremica;
 
 public class EventSubTree
-	extends SupremicaTreeNode
+    extends SupremicaTreeNode
 {
-	private static ImageIcon controllableIcon = new ImageIcon(Supremica.class.getResource("/icons/ControllableEvent16.gif"));
-	private static ImageIcon uncontrollableIcon = new ImageIcon(Supremica.class.getResource("/icons/UncontrollableEvent16.gif"));
-
-	public EventSubTree(LabeledEvent event)
-	{
-		super(event);    // Note that this also caches the event for quick access
-
-		SupremicaTreeNode currControllableNode = new SupremicaTreeNode("controllable: " + event.isControllable());
-		add(currControllableNode);
-
-		SupremicaTreeNode currPrioritizedNode = new SupremicaTreeNode("prioritized: " + event.isPrioritized());
-		add(currPrioritizedNode);
-
-		SupremicaTreeNode currObservableNode = new SupremicaTreeNode("observable: " + event.isObservable());
-		add(currObservableNode);
-
-		SupremicaTreeNode currOperatorIncreaseNode = new SupremicaTreeNode("operatorIncrease: " + event.isOperatorIncrease());
-		add(currOperatorIncreaseNode);
-
-		SupremicaTreeNode currOperatorResetNode = new SupremicaTreeNode("operatorReset: " + event.isOperatorReset());
-		add(currOperatorResetNode);
-	}
-
-	// Change this to reflect the correct number of children/properties/leaves
-	// Could this be calculated from sizeof(LabeledEvent)? It should not.
-	// This depends only on the above construction
-	//
-	// UM... this method is never used, right? What is this?   /hguo
-	public int numDirectLeafs()
-	{
-		return 5;
-	}
-
-	public Icon getOpenIcon()
-	{
-		//return null;
-		if (((LabeledEvent) userObject).isControllable())
-		{
-			return controllableIcon;
-		}
-		else
-		{
-			return uncontrollableIcon;
-		}
-	}
-
-	public Icon getClosedIcon()
-	{
-		//return null;
-		return getOpenIcon();
-	}
-
-	public String toString()
-	{
-		return ((LabeledEvent) userObject).getLabel();
-	}
+    //private static ImageIcon controllableIcon = new ImageIcon(Supremica.class.getResource("/icons/ControllableEvent16.gif"));
+    private static ImageIcon controllableIcon = new ImageIcon(Supremica.class.getResource("/icons/waters/controllable.gif"));
+    //private static ImageIcon uncontrollableIcon = new ImageIcon(Supremica.class.getResource("/icons/UncontrollableEvent16.gif"));
+    private static ImageIcon uncontrollableIcon = new ImageIcon(Supremica.class.getResource("/icons/waters/uncontrollable.gif"));
+    
+    public EventSubTree(LabeledEvent event)
+    {
+        super(event);    // Note that this also caches the event for quick access
+        
+        SupremicaTreeNode currControllableNode = new SupremicaTreeNode("controllable: " + event.isControllable());
+        add(currControllableNode);
+        
+        SupremicaTreeNode currPrioritizedNode = new SupremicaTreeNode("prioritized: " + event.isPrioritized());
+        add(currPrioritizedNode);
+        
+        SupremicaTreeNode currObservableNode = new SupremicaTreeNode("observable: " + event.isObservable());
+        add(currObservableNode);
+        
+        SupremicaTreeNode currOperatorIncreaseNode = new SupremicaTreeNode("operatorIncrease: " + event.isOperatorIncrease());
+        add(currOperatorIncreaseNode);
+        
+        SupremicaTreeNode currOperatorResetNode = new SupremicaTreeNode("operatorReset: " + event.isOperatorReset());
+        add(currOperatorResetNode);
+    }
+    
+    // Change this to reflect the correct number of children/properties/leaves
+    // Could this be calculated from sizeof(LabeledEvent)? It should not.
+    // This depends only on the above construction
+    //
+    // UM... this method is never used, right? What is this?   /hguo
+    public int numDirectLeafs()
+    {
+        return 5;
+    }
+    
+    public Icon getOpenIcon()
+    {
+        //return null;
+        if (((LabeledEvent) userObject).isControllable())
+        {
+            return controllableIcon;
+        }
+        else
+        {
+            return uncontrollableIcon;
+        }
+    }
+    
+    public Icon getClosedIcon()
+    {
+        //return null;
+        return getOpenIcon();
+    }
+    
+    public String toString()
+    {
+        return ((LabeledEvent) userObject).getLabel();
+    }
 }
