@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.17 2006-10-14 10:12:02 knut Exp $
+//# $Id: SpringEmbedder.java,v 1.18 2006-10-18 22:30:32 robi Exp $
 //###########################################################################
 
 
@@ -132,6 +132,11 @@ public class SpringEmbedder
         }
       });
     springEmbedders.remove(this);
+  }
+
+  public double getProgress()
+  {
+    return 1.0 - (mPass + 1.0) / (NUM_PASSES + 1.0);
   }
 
 
