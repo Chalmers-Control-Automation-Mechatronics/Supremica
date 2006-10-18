@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   MainPanel
 //###########################################################################
-//# $Id: MainPanel.java,v 1.22 2006-10-17 23:31:07 flordal Exp $
+//# $Id: MainPanel.java,v 1.23 2006-10-18 14:53:31 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -120,27 +120,26 @@ abstract class MainPanel
         return editorPanel.getActiveEditorWindowInterface();
     }
     
+    /**
+     * Displays a comment about the module.
+     */   
     public void showComment()
     {
         String name = getModuleSubject().getName();
         String comment = getModuleSubject().getComment();
         
+        // Create a new class that does all this and make the title and the comment editable
         try
         {
             // Add stuff to a panel
             JPanel commentPanel = new JPanel();
             commentPanel.setLayout(new BorderLayout());
             // Create title
-            //JTextPane titlePane = new JTextPane();
-            JTextField titlePane = new JTextField(name);
+            JTextPane titlePane = new JTextPane();
             titlePane.setFont(new Font(null, Font.BOLD, 14));
-            //StyledDocument titleDoc = titlePane.getStyledDocument();
-            //titleDoc.insertString(titleDoc.getLength(), name, null);
-            titlePane.setBorder(new EmptyBorder(0,0,0,0));
-            titlePane.setBorder(new LineBorder(commentPanel.getBackground())); // WTF!? Doesn't work?
-            //titlePane.setBorder(new LineBorder(EditorColor.INVISIBLE));
+            StyledDocument titleDoc = titlePane.getStyledDocument();
+            titleDoc.insertString(titleDoc.getLength(), name, null);
             titlePane.setBackground(commentPanel.getBackground()); // WTF!? Doesn't work?
-            //titlePane.setBackground(EditorColor.INVISIBLE);
             commentPanel.add(BorderLayout.NORTH, titlePane);
             //Create the comment text
             JTextPane commentPane = new JTextPane();
