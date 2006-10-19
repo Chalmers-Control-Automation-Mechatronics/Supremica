@@ -14,7 +14,6 @@ Misc editor and analyzer fixes
     - full editor functionality (major)
     - Support multiple support points (medium)
     - Adding generic variables in components that could be implemented in a similar way as for events (major)
-    - Guards replaced with expression object (medium)
     - bugs (external list of bugs?) (major)
 Compiler (major)
 Framework for executing algorithms (medium)

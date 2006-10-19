@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.20 2006-10-19 02:47:30 robi Exp $
+//# $Id: SpringEmbedder.java,v 1.21 2006-10-19 21:13:22 robi Exp $
 //###########################################################################
 
 
@@ -99,13 +99,12 @@ public class SpringEmbedder
   //# Interface java.lang.Runnable
   public void run()
   {
-	springEmbedders.add(this);
+    springEmbedders.add(this);
 
-	long stoptime = Long.MAX_VALUE;
-	if (mTimeout >= 0)
-	{
-		stoptime = System.currentTimeMillis() + mTimeout;
-	}
+    long stoptime = Long.MAX_VALUE;
+    if (mTimeout >= 0) {
+      stoptime = System.currentTimeMillis() + mTimeout;
+    }
 
     int count = 0;
     double limit = CONVERGENCE_CONST;
@@ -147,6 +146,7 @@ public class SpringEmbedder
   {
     return 1.0 - (mPass + 1.0) / (NUM_PASSES + 1.0);
   }*/
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -229,7 +229,10 @@ public class SpringEmbedder
     final double dx = p1.getX() - p2.getX();
     final double dy = p1.getY() - p2.getY();
     final int pass = mPass > 0 ? mPass : 1;
-    final double factor = pass * constant;
+    double factor = pass * constant;
+    if (factor > 0.5) {
+      factor = 0.5;
+    }
     return new Point2D.Double(-dx * factor, -dy * factor);
   }
 
@@ -414,8 +417,6 @@ public class SpringEmbedder
         // with a natural flow from upper left towards lower right
         // This also means that the best position for node labels will be
         // above and to the right of the node... not below and to the left!
-        // It would be nice if in the initial random layout, the initial state
-        // was put close to the top left corner!
         final Point2D delta = attraction(old,
                                          POINT_ZERO,
                                          mInitialStateAttraction);
