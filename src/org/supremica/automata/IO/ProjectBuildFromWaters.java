@@ -143,7 +143,9 @@ public class ProjectBuildFromWaters
                             term = event;
                             currSupremicaState.setAccepting(true);
                         }
-                        break;
+                        // A state CAN be both forbidden and accepting, both must be acknowledged 
+                        // (but forbidden is usually more important)
+                        //break;
                     }
                 }
                 

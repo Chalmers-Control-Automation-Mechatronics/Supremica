@@ -30,18 +30,18 @@ public class StateSubTree
             add(initial);
         }
         
-        if (state.isAccepting())
-        {
-            SupremicaTreeNode accepting = new SupremicaTreeNode("accepting");
-            
-            add(accepting);
-        }
-        
         if (state.isForbidden())
         {
             SupremicaTreeNode forbidden = new SupremicaTreeNode("forbidden");
             
             add(forbidden);
+        }
+        
+        if (state.isAccepting())
+        {
+            SupremicaTreeNode accepting = new SupremicaTreeNode("accepting");
+            
+            add(accepting);
         }
     }
     
@@ -72,7 +72,6 @@ public class StateSubTree
     
     public Icon getOpenIcon()
     {
-        
         //return null;
         if (((State) userObject).isInitial())
         {
@@ -105,14 +104,12 @@ public class StateSubTree
     
     public Icon getClosedIcon()
     {
-        
         //return null;
         return getOpenIcon();
     }
     
     public Icon getLeafIcon()
-    {
-        
+    {        
         //return null;
         return getOpenIcon();
     }
