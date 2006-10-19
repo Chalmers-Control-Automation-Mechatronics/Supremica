@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNodePopupMenu
 //###########################################################################
-//# $Id: EditorNodePopupMenu.java,v 1.20 2006-10-13 15:07:23 knut Exp $
+//# $Id: EditorNodePopupMenu.java,v 1.21 2006-10-19 12:18:05 flordal Exp $
 //###########################################################################
 
 
@@ -31,6 +31,7 @@ import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
+import org.supremica.gui.ide.IDE;
 
 
 /**
@@ -50,6 +51,11 @@ class EditorNodePopupMenu
     private JMenuItem forbidItem;
     private JMenuItem clearItem;
     private JMenuItem createSelfLoop;
+
+    private static final ImageIcon markedStateIcon = new ImageIcon(IDE.class.getResource("/icons/MarkedState16.gif"));
+    private static final ImageIcon initialStateIcon = new ImageIcon(IDE.class.getResource("/icons/InitialState16.gif"));
+    private static final ImageIcon forbiddenStateIcon = new ImageIcon(IDE.class.getResource("/icons/ForbiddenState16.gif"));
+    private static final ImageIcon stateIcon = new ImageIcon(IDE.class.getResource("/icons/State16.gif"));
 
     public EditorNodePopupMenu(ControlledSurface parent, SimpleNodeSubject node)
     {
@@ -74,6 +80,7 @@ class EditorNodePopupMenu
         {
             item = new JMenuItem("Make initial");
             item.addActionListener(this);
+            item.setIcon(initialStateIcon);
             this.add(item);
             // Disable "initial" is node already is initial
             if (node.isInitial())
@@ -85,6 +92,7 @@ class EditorNodePopupMenu
         else
         {
             item = new JMenuItem("Toggle initial");
+            item.setIcon(initialStateIcon);
             item.addActionListener(this);
             this.add(item);
         }
@@ -104,6 +112,7 @@ class EditorNodePopupMenu
 
         item = new JMenuItem("Mark state");
         item.addActionListener(this);
+        item.setIcon(markedStateIcon);
         this.add(item);
         // Disable if there are no propositions
         if (!node.getPropositions().getEventList().isEmpty())
@@ -115,6 +124,7 @@ class EditorNodePopupMenu
 
         item = new JMenuItem("Forbid state");
         item.addActionListener(this);
+        item.setIcon(forbiddenStateIcon);
         this.add(item);
         // Disable if there are no propositions
         if (!node.getPropositions().getEventList().isEmpty())
@@ -126,6 +136,7 @@ class EditorNodePopupMenu
 
         item = new JMenuItem("Clear propositions");
         item.addActionListener(this);
+        item.setIcon(stateIcon);
         this.add(item);
         // Disable if there are no propositions
         if (node.getPropositions().getEventList().isEmpty())

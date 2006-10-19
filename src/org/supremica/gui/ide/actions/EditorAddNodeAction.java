@@ -20,8 +20,7 @@ public class EditorAddNodeAction
         
         putValue(Action.NAME, "Add Node");
         putValue(Action.SHORT_DESCRIPTION, "Add node");
-        //putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/node16.gif")));
-        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/State16.gif")));
+        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/node16.gif")));
         putValue(Action.ACTION_COMMAND_KEY, ControlledSurface.Tool.NODE.toString());
     }
     
