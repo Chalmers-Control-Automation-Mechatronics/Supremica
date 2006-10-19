@@ -41,8 +41,13 @@
 <property name="installer.dir" value="C:\Supremica Installer"/>
 <property name="javalibs.dir" value="lib/unjared"/>
 
+<property name="logs" location="logs"/>
+<property name="logs.reports" location="${logs}/reports"/>
+<property name="logs.results" location="${logs}/results"/>
+
 <!-- Waters -->
 <property name="waters.dir" location="waters"/>
+<property name="waters.examples" location="${examples}/waters"/>
 <property name="waters.xml" location="${waters.dir}/xml"/>
 <property name="waters.xsd" location="${waters.xml}/xsd"/>
 <property name="waters.xsl" location="${waters.xml}/xsl"/>
@@ -663,44 +668,47 @@ Class-Path: ${manifest.pathlist}</echo>
 	</java>
 </target>
 
+<target name="run_tests_supremica"
+        depends="jar_supremica,compile_tests_supremica">
+  <mkdir dir="${logs.results}"/>
+  <junit printsummary="on" fork="true" maxmemory="512m">
+    <formatter type="xml"/>
+    <batchtest todir="${logs.results}">
+      <fileset dir="${testssrc}">
+        <include name="**/*Test.java"/>
+        <include name="**/Test*.java"/>
+        <exclude name="**/TestPackage*.java"/>
+        <exclude name="**/Abstract*.java"/>
+        <exclude name="**/Native*.java"/>
+      </fileset>
+    </batchtest>
+    <classpath>
+      <pathelement location="${dist}/Supremica.jar" />
+      <pathelement location="${testsbuild}" />
+      <pathelement path="${lib}/${unjared}" />
+      <pathelement path="${java.class.path}" />
+    </classpath>
+    <sysproperty key="waters.test.inputdir" value="${waters.examples}"/>
+    <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+    <sysproperty key="java.library.path" value="${dist}"/>
+  </junit>
+</target>
+
 <target name="run_tests" depends="run_tests_supremica"/>
+<target name="run_tests_junit" depends="run_tests_supremica"/>
 
-<target name="run_tests_junit" depends="run_tests_supremica_junit">
+<target name="test_report">
+  <mkdir dir="${logs.reports}"/>
+  <junitreport todir="${logs.reports}">
+    <fileset dir="${logs.results}">
+      <include name="TEST-*.xml"/>
+    </fileset>
+    <report format="frames" todir="${logs.reports}"/>
+  </junitreport>
 </target>
 
-<target name="run_tests_supremica" depends="compile_supremica,compile_tests_supremica">
-	<java fork="yes" classname="junit.textui.TestRunner" taskname="junit" failonerror="true">
-		<arg value="org.supremica.TestPackageSupremica"/>
-        	<jvmarg value="-Djava.library.path=${dist}"/>
-		<classpath>	
-			<pathelement location="${build}" />
-			<pathelement location="${testsbuild}" />
-			<pathelement path="${lib}/${unjared}" />
-			<pathelement path="${java.class.path}" />
-		</classpath>
-		<assertions>
-			 <enable/>
-		</assertions>
-	</java>
-</target>
-
-<target name="run_tests_supremica_junit" depends="compile_supremica,compile_tests_supremica">
-	<junit printsummary="withOutAndErr" fork="true">
-		<formatter type="plain" usefile="false"/>
-		<test name="org.supremica.TestPackageSupremica"/>
-		<classpath>
-			<pathelement location="${build}" />
-			<pathelement location="${testsbuild}" />
-			<pathelement path="${lib}/${unjared}" />
-			<pathelement path="${java.class.path}" />
-		</classpath>
-	</junit>
-</target>
-
-<target name="run_tests_waters"
-        depends="compile_supremica,compile_tests_supremica">
-  <ant dir="${waters.dir}" target="test-java" inheritAll="false"/>
-</target>
+<target name="test"
+        depends="compile_tests_supremica,run_tests_supremica,test_report"/>
 
 <target name="bdd_tests" depends="compile_supremica,startfiles_supremica">
 	<!-- 

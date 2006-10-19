@@ -233,6 +233,7 @@
     <mkdir dir="${test.classes}"/>
     <javac srcdir="${supremica.testsrc}" destdir="${test.classes}" 
            includes="net/sourceforge/waters/**/*.java"
+           excludes="net/sourceforge/waters/gui/**/*.java"
            debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}">
       <classpath>
         <path refid="waters.compile.classpath"/>

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.19 2006-10-19 00:40:01 siw4 Exp $
+//# $Id: SpringEmbedder.java,v 1.20 2006-10-19 02:47:30 robi Exp $
 //###########################################################################
 
 
@@ -708,7 +708,7 @@ public class SpringEmbedder
   private static final double NODE_REPULSION = 1600.0;
   private static final double SELFLOOP_REPULSION = 100.0;
   private static final double EDGE_REPULSION = 80.0;
-  private static final double NODEEDGE_REPULSION = 150.0;
+  private static final double NODEEDGE_REPULSION = 200.0;
 
   private static final double GRAPH_MARGINAL_CONST = 48.0;
   private static final double CENTER_MOVE_CONST = 0.01;
