@@ -315,7 +315,6 @@
          debuglevel="lines,source"
          srcdir="${testssrc}"
          destdir="${testsbuild}"
-         excludes="net/sourceforge/waters/**/*.java"
          includeJavaRuntime="yes"
          deprecation="false"
          verbose="false"
