@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.47 2006-10-14 12:21:27 knut Exp $
+//# $Id: ModuleContainer.java,v 1.48 2006-10-19 00:40:01 siw4 Exp $
 //###########################################################################
 
 
@@ -355,7 +355,6 @@ public class ModuleContainer implements UndoInterface
         {
             mInsignificant.addEdit(e);
         }
-        mUndoManager.addEdit(e);
         mIDE.getActions().editorRedoAction.setEnabled(canRedo());
         mIDE.getActions().editorUndoAction.setEnabled(canUndo());
         fireEditorChangedEvent(new UndoRedoEvent());

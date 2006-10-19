@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateEdgeCommand
 //###########################################################################
-//# $Id: CreateEdgeCommand.java,v 1.9 2006-07-20 02:28:37 robi Exp $
+//# $Id: CreateEdgeCommand.java,v 1.10 2006-10-19 00:40:01 siw4 Exp $
 //###########################################################################
 
 
@@ -81,7 +81,7 @@ public class CreateEdgeCommand
 		final PointGeometrySubject end = new PointGeometrySubject(endPoint);
 		
 		mCreated =	new EdgeSubject(source, target, labelBlock, null,
-									spline, start, end);
+                                spline, start, end);
     }
 
     /**

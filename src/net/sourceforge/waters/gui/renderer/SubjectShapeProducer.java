@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Random;
 
+import net.sourceforge.waters.gui.springembedder.SpringAbortDialog;
 import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -114,7 +115,9 @@ public class SubjectShapeProducer
       }
     }
     if (runEmbedder) {
-      Thread t = new Thread(new SpringEmbedder(graph, Config.GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT.get()));
+      SpringEmbedder embedder = new SpringEmbedder(graph, Config.GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT.get());
+      Thread t = new Thread(embedder);
+      new SpringAbortDialog("ioi", embedder);
       t.start();
     }
     graph.addModelObserver(this);

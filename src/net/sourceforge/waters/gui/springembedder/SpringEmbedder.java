@@ -4,12 +4,15 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.18 2006-10-18 22:30:32 robi Exp $
+//# $Id: SpringEmbedder.java,v 1.19 2006-10-19 00:40:01 siw4 Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui.springembedder;
 
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JFrame;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.AbstractSet;
@@ -132,13 +135,18 @@ public class SpringEmbedder
         }
       });
     springEmbedders.remove(this);
+    mFinished = true;
+  }
+  
+  public int getProgress()
+  {
+    return NUM_PASSES - mPass;
   }
 
-  public double getProgress()
+/*  public double getProgress()
   {
     return 1.0 - (mPass + 1.0) / (NUM_PASSES + 1.0);
-  }
-
+  }*/
 
   //#########################################################################
   //# Auxiliary Methods
@@ -248,9 +256,6 @@ public class SpringEmbedder
     } else {
       return POINT_ZERO;
     }
-
-
-
   }
 
 	public static void stopAll()
@@ -268,6 +273,11 @@ public class SpringEmbedder
 	{
 		mStop = true;
 	}
+  
+  public boolean isFinished()
+  {
+    return mFinished;
+  }
 
   //#########################################################################
   //# Inner Class GeometryWrapper
@@ -662,8 +672,7 @@ public class SpringEmbedder
     private Iterator<? extends GeometryWrapper> mIterator;
 
   }
-
-
+  
   //#########################################################################
   //# Data Members
   private final Random mRandom;
@@ -681,11 +690,11 @@ public class SpringEmbedder
   private int mPass;
   private final int mTimeout;
   private volatile boolean mStop = false;
-
+  private volatile boolean mFinished = false;
 
   //###########################################################################
   //# Class Constants
-  private static final int NUM_PASSES = 3;
+  static final int NUM_PASSES = 3;
   private static final double EPSILON = 0.00002;
   private static final double MULTI_EDGE_WEIGHT = 1.333;
   private static final double SELFLOOP_WEIGHT = 1.05;
