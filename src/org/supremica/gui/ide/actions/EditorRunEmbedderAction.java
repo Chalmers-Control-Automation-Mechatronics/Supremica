@@ -4,23 +4,29 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   EditorRunEmbedderAction
 //###########################################################################
-//# $Id: EditorRunEmbedderAction.java,v 1.4 2006-10-14 10:12:02 knut Exp $
+//# $Id: EditorRunEmbedderAction.java,v 1.5 2006-10-20 05:20:55 robi Exp $
 //###########################################################################
 
 
 package org.supremica.gui.ide.actions;
 
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.List;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 
+import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
+import net.sourceforge.waters.gui.springembedder.SpringAbortDialog;
 import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
 import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+
 import org.supremica.gui.ide.IDE;
 import org.supremica.properties.Config;
 
@@ -59,14 +65,25 @@ public class EditorRunEmbedderAction
      */
     public void doAction()
     {
-        final GraphSubject graph =
+		final ControlledSurface surface =
 			ide.getIDE().getActiveEditorWindowInterface().
-			getControlledSurface().getGraph();
+			getControlledSurface();
+        final GraphSubject graph = surface.getGraph();
         if (graph != null) {
+			SpringEmbedder.stopAll();
 			try {
-				SpringEmbedder.stopAll();
-				final SpringEmbedder embedder = new SpringEmbedder(graph, Config.GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT.get());
+				final Frame root = (Frame) surface.getTopLevelAncestor();
+				final SimpleComponentSubject comp =
+					(SimpleComponentSubject) graph.getParent();
+				final String name = comp == null ? "graph" : comp.getName();
+				final long timeout =
+					Config.GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT.get();
+				final SpringEmbedder embedder = new SpringEmbedder(graph);
 				final Thread thread = new Thread(embedder);
+				final JDialog dialog =
+					new SpringAbortDialog(root, name, embedder, timeout);
+				dialog.setLocationRelativeTo(surface);
+				dialog.setVisible(true);
 				thread.start();
 			} catch (final GeometryAbsentException exception) {
 				JOptionPane.showMessageDialog(ide.getFrame(),

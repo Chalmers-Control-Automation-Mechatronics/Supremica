@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.21 2006-10-19 21:13:22 robi Exp $
+//# $Id: SpringEmbedder.java,v 1.22 2006-10-20 05:20:55 robi Exp $
 //###########################################################################
 
 
@@ -45,21 +45,14 @@ public class SpringEmbedder
   public SpringEmbedder(GraphSubject graph)
     throws GeometryAbsentException
   {
-    this(graph, -1);
+    this(graph, 228424);
   }
 
-  public SpringEmbedder(GraphSubject graph, final int timeout)
-    throws GeometryAbsentException
-  {
-    this(graph, timeout, 228424);
-  }
-
-  public SpringEmbedder(GraphSubject graph, final int timeout, final int seed)
+  public SpringEmbedder(GraphSubject graph, final int seed)
     throws GeometryAbsentException
   {
     mRandom = new Random(seed);
     mGraph = graph;
-    mTimeout = timeout;
 
     final Collection<NodeSubject> nodes = graph.getNodesModifiable();
     final int numnodes = nodes.size();
@@ -102,9 +95,6 @@ public class SpringEmbedder
     springEmbedders.add(this);
 
     long stoptime = Long.MAX_VALUE;
-    if (mTimeout >= 0) {
-      stoptime = System.currentTimeMillis() + mTimeout;
-    }
 
     int count = 0;
     double limit = CONVERGENCE_CONST;
@@ -117,7 +107,6 @@ public class SpringEmbedder
         maxdelta = calculateDisplacements();
         if (count++ >= UPDATE_CONST) {
           count = 0;
-          if (System.currentTimeMillis() > stoptime) stop();
           SwingUtilities.invokeLater(new Runnable() {
               public void run() {
                 updateModel();
@@ -261,26 +250,25 @@ public class SpringEmbedder
     }
   }
 
-	public static void stopAll()
-	{
-		synchronized(springEmbedders)
-		{
-			for (SpringEmbedder embedder : springEmbedders)
-			{
-				embedder.stop();
-			}
-		}
-	}
+  public static void stopAll()
+  {
+    synchronized(springEmbedders) {
+      for (SpringEmbedder embedder : springEmbedders) {
+        embedder.stop();
+      }
+    }
+  }
 
-	public void stop()
-	{
-		mStop = true;
-	}
+  public void stop()
+  {
+    mStop = true;
+  }
   
   public boolean isFinished()
   {
     return mFinished;
   }
+
 
   //#########################################################################
   //# Inner Class GeometryWrapper
@@ -673,6 +661,7 @@ public class SpringEmbedder
     private Iterator<? extends GeometryWrapper> mIterator;
 
   }
+
   
   //#########################################################################
   //# Data Members
@@ -689,9 +678,10 @@ public class SpringEmbedder
 
   private double mInitialStateAttraction;
   private int mPass;
-  private final int mTimeout;
+
   private volatile boolean mStop = false;
-  private volatile boolean mFinished = false;
+  private boolean mFinished = false;
+
 
   //###########################################################################
   //# Class Constants

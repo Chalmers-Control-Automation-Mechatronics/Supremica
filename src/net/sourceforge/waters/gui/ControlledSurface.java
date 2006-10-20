@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.92 2006-10-14 12:21:27 knut Exp $
+//# $Id: ControlledSurface.java,v 1.93 2006-10-20 05:20:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -84,7 +84,8 @@ public class ControlledSurface
         ControlledToolbar t)
       throws GeometryAbsentException
     {
-      super(graph, module, new SubjectShapeProducer(graph, module));
+      super(graph, module,
+            new SubjectShapeProducer(graph, module, r.getFrame()));
       graph.addModelObserver(this);
 
       mutable = (r != null && t != null);

@@ -1,10 +1,12 @@
 package net.sourceforge.waters.gui.renderer;
 
-import java.awt.geom.Point2D;
+import java.awt.Frame;
 import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Random;
+import javax.swing.JDialog;
 
 import net.sourceforge.waters.gui.springembedder.SpringAbortDialog;
 import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
@@ -25,6 +27,7 @@ import net.sourceforge.waters.subject.module.GroupNodeSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.subject.module.SplineGeometrySubject;
 import net.sourceforge.waters.xsd.module.SplineKind;
@@ -40,13 +43,14 @@ public class SubjectShapeProducer
   private static final Logger logger =
     LoggerFactory.createLogger(SubjectShapeProducer.class);
 
-  public SubjectShapeProducer(GraphSubject graph, ModuleProxy module)
+  public SubjectShapeProducer(final GraphSubject graph,
+			      final ModuleProxy module,
+			      final Frame root)
     throws GeometryAbsentException
   {
     super(module);
     boolean runEmbedder = false;
     Random rand = new Random();
-    logger.debug("setGeo");
     for (NodeSubject node : graph.getNodesModifiable()) {
       if (node instanceof SimpleNodeSubject) {
         SimpleNodeSubject n = (SimpleNodeSubject) node;
@@ -58,7 +62,6 @@ public class SubjectShapeProducer
         }
 
         if (n.getPointGeometry() == null) {
-	  logger.debug("setGeometry");
           runEmbedder = true;
 	  final int base;
 	  final int spread;
@@ -115,10 +118,17 @@ public class SubjectShapeProducer
       }
     }
     if (runEmbedder) {
-      SpringEmbedder embedder = new SpringEmbedder(graph, Config.GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT.get());
-      Thread t = new Thread(embedder);
-      new SpringAbortDialog("ioi", embedder);
-      t.start();
+      final SimpleComponentSubject comp =
+	(SimpleComponentSubject) graph.getParent();
+      final String name = comp == null ? "graph" : comp.getName();
+      final long timeout = Config.GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT.get();
+      final SpringEmbedder embedder = new SpringEmbedder(graph);
+      final Thread thread = new Thread(embedder);
+      final JDialog dialog =
+	new SpringAbortDialog(root, name, embedder, timeout);
+      dialog.setLocationRelativeTo(root);
+      dialog.setVisible(true);
+      thread.start();
     }
     graph.addModelObserver(this);
   }
@@ -128,6 +138,7 @@ public class SubjectShapeProducer
     super(module);
     graph.addModelObserver(this);
   }
+
 
 	private void removeMapping(NodeProxy node)
 	{
