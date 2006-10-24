@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.24 2006-10-07 20:20:12 robi Exp $
+//# $Id: EventTableModel.java,v 1.25 2006-10-24 14:16:10 flordal Exp $
 //###########################################################################
 
 
@@ -21,21 +21,17 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.List;
-import java.util.TreeSet;
 import javax.swing.ImageIcon;
-import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-
-import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachEventProxy;
-import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
@@ -43,13 +39,10 @@ import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
-import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
-import net.sourceforge.waters.subject.module.EventParameterSubject;
 import net.sourceforge.waters.subject.module.ForeachEventSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
-import net.sourceforge.waters.subject.module.ParameterSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -124,16 +117,20 @@ public class EventTableModel
   public Object getValueAt(final int row, final int column)
   {
     final EventEntry entry = (EventEntry) mEvents.get(row);
-    switch (column) {
-      case 0:
-        final IdentifierSubject ident = entry.getName();
-        final EventKind kind = mRoot.guessEventKind(ident);
-        return getIcon(kind);
-      case 1:
-        return entry.getName();
-      default:
-        throw new ArrayIndexOutOfBoundsException
-          ("Bad column number for event table model!");
+    switch (column)
+    {
+        case 0:
+            final IdentifierSubject ident = entry.getName();
+            final EventKind kind = mRoot.guessEventKind(ident);
+            if (kind.equals(EventKind.PROPOSITION) && ident.getName().equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME))
+                return IconLoader.ICON_FORBIDDEN;
+            else
+                return getIcon(kind);
+        case 1:
+            return entry.getName();
+        default:
+            throw new ArrayIndexOutOfBoundsException
+                ("Bad column number for event table model!");
     }
   }
 
@@ -313,15 +310,24 @@ public class EventTableModel
 
   private ImageIcon getIcon(final EventKind kind)
   {
-    if (kind == null) {
+    if (kind == null) 
+    {
       return IconLoader.ICON_EVENT;
-    } else if (kind.equals(EventKind.CONTROLLABLE)) {
+    } 
+    else if (kind.equals(EventKind.CONTROLLABLE)) 
+    {
       return IconLoader.ICON_CONTROLLABLE;
-    } else if (kind.equals(EventKind.PROPOSITION)) {
+    } 
+    else if (kind.equals(EventKind.PROPOSITION)) 
+    {
       return IconLoader.ICON_PROPOSITION;
-    } else if (kind.equals(EventKind.UNCONTROLLABLE)) {
+    } 
+    else if (kind.equals(EventKind.UNCONTROLLABLE)) 
+    {
       return IconLoader.ICON_UNCONTROLLABLE;
-    } else {
+    }
+    else 
+    {
       return IconLoader.ICON_EVENT;
     }
   }

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   EventProxy
 //###########################################################################
-//# $Id: EventProxy.java,v 1.3 2005-11-03 01:24:15 robi Exp $
+//# $Id: EventProxy.java,v 1.4 2006-10-24 14:16:10 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.des;
@@ -64,5 +64,4 @@ public interface EventProxy
    *         <CODE>false</CODE> otherwise.
    */
   public boolean isObservable();
-
 }
