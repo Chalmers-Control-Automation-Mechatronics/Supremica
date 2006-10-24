@@ -64,7 +64,7 @@ public class ScheduleDialog
 		JLabel heuristicsLabel = new JLabel("Heuristics: \t \t");
 		heuristicsBox = new JComboBox(heuristicsNames);
 
-		nodeExpander = new JCheckBox("use AK's node expander", true);
+		nodeExpander = new JCheckBox("use AK's node expander", false);
 		buildAutomaton = new JCheckBox("build schedule", true);
 		vgDrawer = new JCheckBox("Draw Visibility Graph", true);
 
@@ -267,7 +267,8 @@ public class ScheduleDialog
 			}
 			else if (optiMethodsBox.getSelectedItem().equals(MILP))
 			{
-				sched = new Milp(ActionMan.getGui().getVisualProjectContainer().getActiveProject(), ActionMan.getGui().getSelectedAutomata(), buildAutomaton.isSelected(), this);
+				//				sched = new Milp(ActionMan.getGui().getVisualProjectContainer().getActiveProject(), ActionMan.getGui().getSelectedAutomata(), buildAutomaton.isSelected(), this);
+				sched = new Milp(ActionMan.getGui().getSelectedAutomata(), buildAutomaton.isSelected(), this);
 			}
 			else if (optiMethodsBox.getSelectedItem().equals(VIS_GRAPH))
 			{

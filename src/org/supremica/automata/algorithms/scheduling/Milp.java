@@ -26,7 +26,8 @@ public class Milp
     private Automata theAutomata, robots, zones;
 
     /** The project used for return result */
-    private Project theProject;
+	// NOT USED YET...
+    // private Project theProject;
 
     /** int[zone_nr][robot_nr][state_nr] - stores the states that fire booking/unbooking events */
     private int[][][] bookingTics, unbookingTics;
@@ -75,15 +76,16 @@ public class Milp
     /** The output string */
     private String outputStr = "";
 
+
     /****************************************************************************************/
     /*                                 CONSTUCTORS                                          */
     /****************************************************************************************/
 
-    public Milp(Project theProject, Automata theAutomata, boolean buildSchedule, ScheduleDialog gui)
-    throws Exception
+    public Milp(Automata theAutomata, boolean buildSchedule, ScheduleDialog gui)
+		throws Exception
     {
         this.theAutomata = theAutomata;
-        this.theProject = theProject;
+		//  this.theProject = theProject;
         this.buildSchedule = buildSchedule;
         this.gui = gui;
 
@@ -115,7 +117,7 @@ public class Milp
      * processes and stores the resulting information.
      */
     public void schedule()
-    throws Exception
+		throws Exception
     {
         ActionTimer totalTimer = new ActionTimer();
 
@@ -173,7 +175,7 @@ public class Milp
      * Does not return anything? The automaton representing the optimal schedule, as given by the MILP-solver
      */
     public void buildScheduleAutomaton()
-    throws Exception
+		throws Exception
     {
         timer.restart();
 
@@ -343,29 +345,31 @@ public class Milp
             }
         }
 
+		// A dummy reset-event that returns the schedule automaton from its accepting 
+		// to its initial state. Needed to describe repetitive working cycles...
+		String resetEventName = "reset";
+		while (theAutomata.getPlantAutomata().getUnionAlphabet().contains(resetEventName))
+		{
+			resetEventName += "1";
+		}
+		LabeledEvent resetEvent = new LabeledEvent(resetEventName);
+		
+		// The reset event brings the schedule to its initial state...
+		schedule.getAlphabet().addEvent(resetEvent);
+		schedule.addArc(new Arc(currScheduledState, schedule.getInitialState(), resetEvent));
+
+		// ...But then also the participating plants should have this event in their initial states
+		for (Automaton plantAuto : theAutomata.getPlantAutomata())
+		{
+			plantAuto.addArc(new Arc(plantAuto.getInitialState(), plantAuto.getInitialState(), resetEvent));
+		}
+        
+
         String str = "Time to build the schedule: " + timer.elapsedTime() + "ms ";
         logger.info(str);
         outputStr += "\t" + str;
-
-        synchronized (this)
-        {
-            //org.supremica.gui.Gui theGui = null;
-            try
-            {
-				theProject.addAutomaton(schedule);
-                //theGui = ActionMan.getGui();
-                //theGui.addAutomaton(schedule);
-// 				if (theGui != null)
-// 					theGui.addAutomaton(schedule);
-// 				else
-// 					logger.info("THE GUI is NULL");
-            }
-            catch (Exception ex)
-            {
-                logger.warn("EXceptiON");
-                throw ex;
-            }
-        }
+        
+		addAutomatonToGui(schedule);
     }
 
 
@@ -379,7 +383,7 @@ public class Milp
      * while the information about the location of booking/unbooking events is collected.
      */
     private void initialize()
-    throws Exception
+		throws Exception
     {
         modelFile = File.createTempFile("milp", ".mod");
         modelFile.deleteOnExit();
@@ -403,7 +407,7 @@ public class Milp
      * should include "ROBOT_A". The resulting robot and zone automata are stored globally.
      */
     private void initAutomata()
-    throws Exception
+		throws Exception
     {
         robots = theAutomata.getPlantAutomata();
         zones = theAutomata.getSpecificationAutomata();
@@ -473,12 +477,17 @@ public class Milp
                     Automaton isSynthesized = toBeSynthesizedIterator.next();
 
                     if (isSynthesized.isSpecification())
+					{
                         zones.removeAutomaton(isSynthesized);
+					}
                 }
 
+				restrictedRobot.setName(currRobotName + "_red");
                 restrictedRobot.remapStateIndices();
-
-                restrictedRobots.addAutomaton(restrictedRobot);
+			
+				addDummyAcceptingState(restrictedRobot);              
+				restrictedRobots.addAutomaton(restrictedRobot);
+				addAutomatonToGui(restrictedRobot);
             }
             else
             {
@@ -488,13 +497,15 @@ public class Milp
 
         // Updating the automata variables
         robots = restrictedRobots;
-        theAutomata = new Automata(robots);
+
+		// Filling theAutomata with SHALLOW copies of robots and zones
+        theAutomata = new Automata(robots, true);
         theAutomata.addAutomata(zones);
         indexMap = new AutomataIndexMap(theAutomata);
     }
 
     private void initMutexStates()
-    throws Exception
+		throws Exception
     {
         bookingTics = new int[zones.size()][robots.size()][1];
         unbookingTics = new int[zones.size()][robots.size()][1];
@@ -514,6 +525,7 @@ public class Milp
         for (int i=0; i<zones.size(); i++)
         {
             Automaton currZone = zones.getAutomatonAt(i);
+
 // 			ArrayList[] bookUnbookStatePairIndices = new ArrayList[robots.size()];
 
             for (int j=0; j<robots.size(); j++)
@@ -521,11 +533,13 @@ public class Milp
                 Automaton currRobot = robots.getAutomatonAt(j);
 
 // 				Alphabet commonAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getAlphabet());
+
                 Alphabet bookingAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getInitialState().activeEvents(false));
 
                 if (bookingAlphabet.size() > 0)
                 {
                     Alphabet unbookingAlphabet = AlphabetHelpers.minus(AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getAlphabet()), bookingAlphabet);
+
 // 					bookUnbookStatePairIndices[j] = new ArrayList<int[]>();
 
                     ArrayList<State> bookingStates = new ArrayList<State>();
@@ -538,7 +552,7 @@ public class Milp
                         Alphabet currStatesBookingAlphabet = AlphabetHelpers.intersect(currState.activeEvents(false), bookingAlphabet);
                         for (Iterator<LabeledEvent> currBookingEventsIter = currStatesBookingAlphabet.iterator(); currBookingEventsIter.hasNext(); )
                         {
-// 							bookingStates.add(new int[]{indexMap.getStateIndex(currRobot, currState), indexMap.getEventIndex(currBookingEventsIter.next())});
+							// 							bookingStates.add(new int[]{indexMap.getStateIndex(currRobot, currState), indexMap.getEventIndex(currBookingEventsIter.next())});
                             ArrayList<State> possibleUnbookingStates = new ArrayList<State>();
 
                             possibleUnbookingStates.add(currState.nextState(currBookingEventsIter.next()));
@@ -587,7 +601,7 @@ public class Milp
     }
 
     private void initMutexStates2()
-    throws Exception
+		throws Exception
     {
         bookingTics = new int[zones.size()][robots.size()][1];
         unbookingTics = new int[zones.size()][robots.size()][1];
@@ -732,7 +746,7 @@ public class Milp
      * constructed.
      */
     private void convertAutomataToMilp()
-    throws Exception
+		throws Exception
     {
         timer.restart();
 
@@ -1005,6 +1019,7 @@ public class Milp
         // The cycle time constraints
         w.newLine();
         w.write(cycleTimeConstraints);
+
 // 		w.write("cycle_time{r in Robots}: c >= time[r, maxTic];");
 // 		w.newLine();
 
@@ -1056,18 +1071,18 @@ public class Milp
     }
 
     private void processSolutionFile()
-    throws Exception
+		throws Exception
     {
         // tillf...
-// 		for (int i=0; i<robots.size(); i++)
-// 		{
-// 			logger.warn("Robot = " + robots.getAutomatonAt(i).getName() + "; index = " + indexMap.getAutomatonIndex(robots.getAutomatonAt(i)));
-// 			for (Iterator<State> stir = robots.getAutomatonAt(i).stateIterator(); stir.hasNext(); )
-// 			{
-// 				State s = stir.next();
-// 				logger.info("State = " + s.getName() + "; index = " + indexMap.getStateIndex(robots.getAutomatonAt(i), s));
-// 			}
-// 		}
+		// 		for (int i=0; i<robots.size(); i++)
+		// 		{
+		// 			logger.warn("Robot = " + robots.getAutomatonAt(i).getName() + "; index = " + indexMap.getAutomatonIndex(robots.getAutomatonAt(i)));
+		// 			for (Iterator<State> stir = robots.getAutomatonAt(i).stateIterator(); stir.hasNext(); )
+		// 			{
+		// 				State s = stir.next();
+		// 				logger.info("State = " + s.getName() + "; index = " + indexMap.getStateIndex(robots.getAutomatonAt(i), s));
+		// 			}
+		// 		}
         //...
 
         optimalTimes = new double[robots.size()][];
@@ -1108,7 +1123,7 @@ public class Milp
     }
 
     private void callMilpSolver()
-    throws Exception
+		throws Exception
     {
         logger.info("The MILP-solver started....");
         // Defines the name of the .exe-file as well the arguments (.mod and .sol file names)
@@ -1134,6 +1149,7 @@ public class Milp
 
             if (milpEchoStr.contains("INTEGER OPTIMAL SOLUTION FOUND") || milpEchoStr.contains("Time") || milpEchoStr.contains("Memory"))
             {
+
 // 				logger.info(milpEchoStr);
 
 // 				if (!milpEchoStr.contains("INTEGER OPTIMAL SOLUTION FOUND"))
@@ -1149,6 +1165,7 @@ public class Milp
     }
 
     // private void killGlpk()
+
 // 	{
 // 		if (milpProcess != null)
 // 			milpProcess.destroy();
@@ -1201,4 +1218,51 @@ public class Milp
     {
         return outputStr;
     }
+
+	private void addDummyAcceptingState(Automaton currPlant)
+	{
+		State currInitialState = currPlant.getInitialState();
+
+		if (currInitialState.isAccepting())
+		{
+			currInitialState.setAccepting(false);
+
+			State dummyState = new State("dummy_" + currInitialState.getName());
+			currPlant.addState(dummyState);
+
+			for (Iterator<Arc> incomingArcIt = currInitialState.incomingArcsIterator(); incomingArcIt.hasNext(); )
+			{
+				Arc currArc = incomingArcIt.next();
+
+				currPlant.addArc(new Arc(currArc.getFromState(), dummyState, currArc.getEvent()));
+			}
+
+			currInitialState.removeIncomingArcs();
+
+// 			LabeledEvent dummyEvent = new LabeledEvent(dummyEventName);
+// 			currPlant.getAlphabet().addEvent(dummyEvent);
+// 			currPlant.addArc(new Arc(dummyState, currInitialState, dummyEvent));
+
+			dummyState.setAccepting(true);
+			dummyState.setCost(0);
+
+			currPlant.remapStateIndices();
+		}
+	}
+
+	private synchronized void addAutomatonToGui(Automaton auto)
+		throws Exception
+	{
+		org.supremica.gui.Gui theGui = null;
+		try
+		{
+			theGui = ActionMan.getGui();
+			theGui.addAutomaton(auto);
+		}
+		catch (Exception ex)
+		{
+			logger.warn("EXceptiON, gui = " + theGui);
+			throw ex;
+		}
+	}
 }

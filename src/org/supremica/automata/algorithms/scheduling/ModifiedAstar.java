@@ -32,25 +32,25 @@ public class ModifiedAstar
     private int searchDepthCounter;
     
     public ModifiedAstar(Automata theAutomata, boolean buildSchedule, ScheduleDialog gui)
-    throws Exception
+		throws Exception
     {
         super(theAutomata, "1-product relax", buildSchedule, gui);
     }
     
     public ModifiedAstar(Automata theAutomata, String heuristic, boolean buildSchedule, ScheduleDialog gui)
-    throws Exception
+		throws Exception
     {
         super(theAutomata, heuristic, true, false, buildSchedule, gui);
     }
     
     public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean iterativeSearch, boolean buildSchedule, ScheduleDialog gui)
-    throws Exception
+		throws Exception
     {
         super(theAutomata, heuristic, manualExpansion, iterativeSearch, buildSchedule, gui);
     }
     
     public ModifiedAstar(Automata theAutomata, boolean manualExpansion, boolean buildSchedule, ScheduleDialog gui)
-    throws Exception
+		throws Exception
     {
         super(theAutomata, manualExpansion, buildSchedule, gui);
     }
@@ -60,7 +60,7 @@ public class ModifiedAstar
      * in the subclasses. Is used if no relaxation is chosen (i.e. brute force search).
      */
     double getRelaxation(double[] node)
-    throws Exception
+		throws Exception
     {
         return 0;
     }
@@ -80,33 +80,33 @@ public class ModifiedAstar
             if (currNodeIsAddedToClosed)
             {
                 // tillf (test)
-// 				Iterator childIter = expander.expandNodeManually(currNode, activeAutomataIndex, true).iterator();
+				// 				Iterator childIter = expander.expandNodeManually(currNode, activeAutomataIndex, true).iterator();
                 Iterator childIter = expander.expandNode(currNode, activeAutomataIndex).iterator();
                 
                 
-// 				//tillf (test)
-// 				Collection childColl = expander.expandNode(currNode, activeAutomataIndex);
-// 				if (childColl.size() > 0 && searchDepthCounter++ > 30)
-// 				{
-// 					int cleanUpSize = openTree.size()/searchDepthCounter;
-// 					double[] firstNodeToBeThrownAway = null;
-// 					double estimateToBeThrownAway = -1;
-// 					for (Iterator<double[]> it = openTree.iterator(); it.hasNext(); )
-// 					{
-// 						double[] currOpenNode = it.next();
-// 						double currEstimate = currOpenNode[ESTIMATE_INDEX];
-// 						if (currEstimate != estimateToBeThrownAway && cleanUpSize > 0)
-// 						{
-// 							estimateToBeThrownAway = currEstimate;
-// 							firstNodeToBeThrownAway = currOpenNode;
-// 						}
-// 						cleanUpSize--;
-// 					}
-// 					SortedSet<double[]> tailSetToBeThrownAway = openTree.tailSet(firstNodeToBeThrownAway);
-// 					tailSetToBeThrownAway.clear();
-// 					searchDepthCounter = 0;
-// 				}
-// 				Iterator childIter = childColl.iterator();
+				// 				//tillf (test)
+				// 				Collection childColl = expander.expandNode(currNode, activeAutomataIndex);
+				// 				if (childColl.size() > 0 && searchDepthCounter++ > 30)
+				// 				{
+				// 					int cleanUpSize = openTree.size()/searchDepthCounter;
+				// 					double[] firstNodeToBeThrownAway = null;
+				// 					double estimateToBeThrownAway = -1;
+				// 					for (Iterator<double[]> it = openTree.iterator(); it.hasNext(); )
+				// 					{
+				// 						double[] currOpenNode = it.next();
+				// 						double currEstimate = currOpenNode[ESTIMATE_INDEX];
+				// 						if (currEstimate != estimateToBeThrownAway && cleanUpSize > 0)
+				// 						{
+				// 							estimateToBeThrownAway = currEstimate;
+				// 							firstNodeToBeThrownAway = currOpenNode;
+				// 						}
+				// 						cleanUpSize--;
+				// 					}
+				// 					SortedSet<double[]> tailSetToBeThrownAway = openTree.tailSet(firstNodeToBeThrownAway);
+				// 					tailSetToBeThrownAway.clear();
+				// 					searchDepthCounter = 0;
+				// 				}
+				// 				Iterator childIter = childColl.iterator();
                 while (childIter.hasNext())
                 {
                     double[] nextNode = (double[])childIter.next();
@@ -158,7 +158,7 @@ public class ModifiedAstar
         
         // The NodeExpander combines the information, together with the parent-information,
         // which is null for the initial state.
-// 		return expander.makeNode(initialStates, null, initialCosts);
+		// 		return expander.makeNode(initialStates, null, initialCosts);
         return expander.makeNode(initialStates, -1, initialCosts);
     }
 }

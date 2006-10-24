@@ -71,7 +71,7 @@ public abstract class AbstractAstar
     protected double[][] remainingCosts;
 
     /** Hashtable containing the estimated cost for each combination of two robots **/
-//     protected Hashtable[] twoProdRelax;
+	//     protected Hashtable[] twoProdRelax;
 
     /**
      * Hashtable containing the estimated cost for a given time configuration
@@ -163,9 +163,9 @@ public abstract class AbstractAstar
      */
     protected boolean manualExpansion;
 
-        /*
-         * The thread that performs the search for the optimal solution
-         */
+	/*
+	 * The thread that performs the search for the optimal solution
+	 */
     protected Thread astarThread;
 
     /**
@@ -191,6 +191,12 @@ public abstract class AbstractAstar
      * (and is thus called by another scheduler)
      */
     protected volatile boolean isRelaxationProvider = true;
+
+	/**
+	 * A dummy event that returns the schedule automaton from its accepting 
+	 * to its initial state. Needed to describe repetitive working cycles. 
+	 */
+	String dummyEventName = "reset";
 
     //MKT Tillf
     protected Hashtable<String, Double> visGraphRelax = null;
@@ -225,7 +231,7 @@ public abstract class AbstractAstar
      * @return remainingEstimatedCost : h(n)
      */
     abstract double getRelaxation(double[] node)
-    throws Exception;
+		throws Exception;
 
 
     /****************************************************************************************/
@@ -234,19 +240,19 @@ public abstract class AbstractAstar
 
 
     public AbstractAstar(Automata theAutomata, boolean buildSchedule, ScheduleDialog gui)
-    throws Exception
+		throws Exception
     {
         this(theAutomata, "1-product relax", buildSchedule, gui);
     }
 
     public AbstractAstar(Automata theAutomata, String heuristic, boolean buildSchedule, ScheduleDialog gui)
-    throws Exception
+		throws Exception
     {
         this(theAutomata, heuristic, true, false, buildSchedule, gui);
     }
 
     public AbstractAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean iterativeSearch, boolean buildSchedule, ScheduleDialog gui)
-    throws Exception
+		throws Exception
     {
         this.theAutomata = theAutomata;
         this.iterativeSearch = iterativeSearch;
@@ -275,7 +281,7 @@ public abstract class AbstractAstar
     }
 
     public AbstractAstar(Automata theAutomata, boolean manualExpansion, boolean buildSchedule, ScheduleDialog gui)
-    throws Exception
+		throws Exception
     {
         this.theAutomata = theAutomata;
         this.buildSchedule = buildSchedule;
@@ -364,14 +370,29 @@ public abstract class AbstractAstar
     }
 
     protected void init()
-    throws Exception
+		throws Exception
     {
         if (theAutomata == null)
             return;
 
         timer = new ActionTimer();
-        expander = new NodeExpander(manualExpansion, theAutomata, this);
         plantAutomata = theAutomata.getPlantAutomata();
+
+		while (plantAutomata.getUnionAlphabet().contains(dummyEventName))
+		{
+			dummyEventName += "1";
+		}
+
+		// This for-loop adds a dummy state in all automata that start on an accepting
+		// state. By this, the search can be performed and all the plants that return 
+		// to their initial states are returned simultaneously with help of a dummy 
+		// "reset"-event, whereafter their working cycles can restart synchronized. 
+		for (Iterator<Automaton> autIt = plantAutomata.iterator(); autIt.hasNext(); )
+		{
+			addDummyAcceptingState(autIt.next());
+		}
+
+		expander = new NodeExpander(manualExpansion, theAutomata, this);
 
         //Borde räcka med plantAutomata.size(), fast då kanske man måste ändra lite på andra ställen också
         keyMapping = new int[theAutomata.size()];
@@ -421,7 +442,7 @@ public abstract class AbstractAstar
      * and visibility graph).
      */
     private void initRemainingCosts()
-    throws Exception
+		throws Exception
     {
         for (int i=0; i<plantAutomata.size(); i++)
         {
@@ -521,7 +542,7 @@ public abstract class AbstractAstar
      * starting from the initial node.
      */
     public void schedule()
-    throws Exception
+		throws Exception
     {
  		if (theAutomata == null) {
 			throw new Exception("Choose several automata to schedule...");
@@ -549,40 +570,40 @@ public abstract class AbstractAstar
 		openTree.add(currNode);
 
 		//tillf
-// 		Runtime jvm = Runtime.getRuntime();
-// 		ActionTimer cleanUpTimer = new ActionTimer();
-// 		cleanUpTimer.restart();
+		// 		Runtime jvm = Runtime.getRuntime();
+		// 		ActionTimer cleanUpTimer = new ActionTimer();
+		// 		cleanUpTimer.restart();
 
 		while(! openTree.isEmpty())
 		{
 			if (isRunning)
 			{
 				//tillf (Throws away the tail of the OPEN list)
-// 			    if (jvm.freeMemory() < jvm.maxMemory() / 100)
-// 				{
-// 					logger.warn("Almost run out of memory, the time since clean up = " + cleanUpTimer.elapsedTime() + "ms. FORCED CLEAN UP STARTED..........");
-// 					logger.info("Before clean up -> openTree.size = " + openTree.size() + "; closedTree.size = " + closedTree.size());
-// 					int cleanUpSize = openTree.size()/4;
-// 					double[] firstNodeToBeThrownAway = null;
-// 					double estimateToBeThrownAway = -1;
-// 					for (Iterator<double[]> it = openTree.iterator(); it.hasNext(); )
-// 					{
-// 						double[] currOpenNode = it.next();
-// 						double currEstimate = currOpenNode[ESTIMATE_INDEX];
-// 						if (currEstimate != estimateToBeThrownAway && cleanUpSize > 0)
-// 						{
-// 							estimateToBeThrownAway = currEstimate;
-// 							firstNodeToBeThrownAway = currOpenNode;
-// 						}
-// 						cleanUpSize--;
-// 					}
-// 					SortedSet<double[]> tailSetToBeThrownAway = openTree.tailSet(firstNodeToBeThrownAway);
-// 					tailSetToBeThrownAway.clear();
-// 					jvm.gc();
-// 					logger.info("After clean up -> openTree.size = " + openTree.size() + "; closedTree.size = " + closedTree.size());
+				// 			    if (jvm.freeMemory() < jvm.maxMemory() / 100)
+				// 				{
+				// 					logger.warn("Almost run out of memory, the time since clean up = " + cleanUpTimer.elapsedTime() + "ms. FORCED CLEAN UP STARTED..........");
+				// 					logger.info("Before clean up -> openTree.size = " + openTree.size() + "; closedTree.size = " + closedTree.size());
+				// 					int cleanUpSize = openTree.size()/4;
+				// 					double[] firstNodeToBeThrownAway = null;
+				// 					double estimateToBeThrownAway = -1;
+				// 					for (Iterator<double[]> it = openTree.iterator(); it.hasNext(); )
+				// 					{
+				// 						double[] currOpenNode = it.next();
+				// 						double currEstimate = currOpenNode[ESTIMATE_INDEX];
+				// 						if (currEstimate != estimateToBeThrownAway && cleanUpSize > 0)
+				// 						{
+				// 							estimateToBeThrownAway = currEstimate;
+				// 							firstNodeToBeThrownAway = currOpenNode;
+				// 						}
+				// 						cleanUpSize--;
+				// 					}
+				// 					SortedSet<double[]> tailSetToBeThrownAway = openTree.tailSet(firstNodeToBeThrownAway);
+				// 					tailSetToBeThrownAway.clear();
+				// 					jvm.gc();
+				// 					logger.info("After clean up -> openTree.size = " + openTree.size() + "; closedTree.size = " + closedTree.size());
 
-// 					cleanUpTimer.restart();
-// 				}
+				// 					cleanUpTimer.restart();
+				// 				}
 
 				iterationCounter++;
 
@@ -625,11 +646,11 @@ public abstract class AbstractAstar
 
         if (currNode == null || ! isAcceptingNode(currNode))
         {
-// 			if (currNode != null)
-// 				logger.error("currnode = " + printArray(currNode) + "; activeAutomataIndex = " + printArray(activeAutomataIndex));
+			// 			if (currNode != null)
+			// 				logger.error("currnode = " + printArray(currNode) + "; activeAutomataIndex = " + printArray(activeAutomataIndex));
 
-// 			for (Iterator<int[]> it = closedTree.values().iterator(); it.hasNext(); )
-// 				logger.info("e_cl : " + printArray(it.next()));
+			// 			for (Iterator<int[]> it = closedTree.values().iterator(); it.hasNext(); )
+			// 				logger.info("e_cl : " + printArray(it.next()));
             throw new RuntimeException("An accepting state could not be found, nr of iterations = " + iterationCounter);
         }
 
@@ -643,16 +664,16 @@ public abstract class AbstractAstar
         {
             logger.info(outputStr);
 
-// 			for (Iterator<int[]> closedsIt = closedTree.values().iterator(); closedsIt.hasNext();)
-// 			{
-// 				int[] node = closedsIt.next();
-// 				logger.warn("cl: " + printArray(node));
-// 			}
+			// 			for (Iterator<int[]> closedsIt = closedTree.values().iterator(); closedsIt.hasNext();)
+			// 			{
+			// 				int[] node = closedsIt.next();
+			// 				logger.warn("cl: " + printArray(node));
+			// 			}
         }
-// 		else
-// 		{
-// 			logger.info(printArray(currNode) + " nådd; kostnad = " + currNode[ACCUMULATED_COST_INDEX]);
-// 		}
+		// 		else
+		// 		{
+		// 			logger.info(printArray(currNode) + " nådd; kostnad = " + currNode[ACCUMULATED_COST_INDEX]);
+		// 		}
 
         this.acceptingNode = currNode;
 
@@ -830,26 +851,26 @@ public abstract class AbstractAstar
       String plantNames = "";
       for (int k=0; k<currAutomataIndex.length-1; k++)
       plantNames += theAutomata.getAutomatonAt(currAutomataIndex[k]).getName() + "||";
-          plantNames += theAutomata.getAutomatonAt(currAutomataIndex[currAutomataIndex.length-1]).getName();
+	  plantNames += theAutomata.getAutomatonAt(currAutomataIndex[currAutomataIndex.length-1]).getName();
 
-          logger.warn("Är " + currNode.toStringLight() + " låst så in i helvete för " + plantNames + "???");
-          }
+	  logger.warn("Är " + currNode.toStringLight() + " låst så in i helvete för " + plantNames + "???");
+	  }
 
-          }
-          }
+	  }
+	  }
 
-          String plantNames = "";
-          for (int k=0; k<currAutomataIndex.length-1; k++)
-          plantNames += theAutomata.getAutomatonAt(currAutomataIndex[k]).getName() + "||";
-          plantNames += theAutomata.getAutomatonAt(currAutomataIndex[currAutomataIndex.length-1]).getName();
+	  String plantNames = "";
+	  for (int k=0; k<currAutomataIndex.length-1; k++)
+	  plantNames += theAutomata.getAutomatonAt(currAutomataIndex[k]).getName() + "||";
+	  plantNames += theAutomata.getAutomatonAt(currAutomataIndex[currAutomataIndex.length-1]).getName();
 
-          outputStr += "\t\t" + plantNames + ": " + schedCounter + " nodes relaxed\n";
-          }
-          }
+	  outputStr += "\t\t" + plantNames + ": " + schedCounter + " nodes relaxed\n";
+	  }
+	  }
 
-          return outputStr;
-          }
-     */
+	  return outputStr;
+	  }
+	*/
 
     //     int getTwoProdRelaxation(int[] node) {
     // 	int estimate = 0;
@@ -894,29 +915,29 @@ public abstract class AbstractAstar
      * @return totalEstimatedCost : f(n) = g(n) + h(n)
      */
     public double calcEstimatedCost(double[] node)
-    throws Exception
+		throws Exception
     {
         double[] parent = getParent(node);
 
         double fNode = node[ACCUMULATED_COST_INDEX] + getRelaxation(node);
-//   		double fParent = parent[ESTIMATE_INDEX];
+		//   		double fParent = parent[ESTIMATE_INDEX];
 
-//  		// The following code inside the if-loop is needed to ensure consistency of the heuristic
-//  		if (fParent > fNode)
-// 		{
-// 			//logger.warn("Consistency ensurance");
-//  			return fParent;
-// 		}
+		//  		// The following code inside the if-loop is needed to ensure consistency of the heuristic
+		//  		if (fParent > fNode)
+		// 		{
+		// 			//logger.warn("Consistency ensurance");
+		//  			return fParent;
+		// 		}
 
-// 		logger.info("node = " + printArray(node) + "; estimation = " + fNode);
+		// 		logger.info("node = " + printArray(node) + "; estimation = " + fNode);
 
         return fNode;
     }
 
-        /*
-         * This method returns an updated cost vector, containing updated current costs,
-         * accumulated cost and estimated cost.
-         */
+	/*
+	 * This method returns an updated cost vector, containing updated current costs,
+	 * accumulated cost and estimated cost.
+	 */
     public double[] updateCosts(double[] costs, int changedIndex, double newCost)
     {
         double[] newCosts = new double[costs.length];
@@ -960,7 +981,7 @@ public abstract class AbstractAstar
      * is done until an initial node is found, which completes the construction.
      */
     public void buildScheduleAutomaton()
-    throws Exception
+		throws Exception
     {
         timer.restart();
 
@@ -1007,6 +1028,16 @@ public abstract class AbstractAstar
             }
         }
 
+		// If a dummy event has been added to any of the robots alphabets, 
+		// it is also added to the schedule, thus making it return from its 
+		// accepting to its initial state. 
+		if (plantAutomata.getUnionAlphabet().contains(dummyEventName))
+		{
+			LabeledEvent resetEvent =  new LabeledEvent(dummyEventName);
+			scheduleAuto.getAlphabet().addEvent(resetEvent);
+			scheduleAuto.addArc(new Arc(scheduleAuto.getStateWithName(printNodeSignature(acceptingNode)), scheduleAuto.getInitialState(), resetEvent));
+		}
+
         logger.info("Schedule was built in " + timer.elapsedTime() + "ms");
         ActionMan.getGui().addAutomaton(scheduleAuto);
     }
@@ -1022,7 +1053,7 @@ public abstract class AbstractAstar
      * @return parentNode - the parent of the node 'node'
      */
     protected double[] getParent(double[] node)
-    throws Exception
+		throws Exception
     {
         // one object of the closedTree may contain several nodes (that all correspond
         // to the same logical state but different paths).
@@ -1144,6 +1175,36 @@ public abstract class AbstractAstar
         return null;
     }
 
+	private void addDummyAcceptingState(Automaton currPlant)
+	{
+		State currInitialState = currPlant.getInitialState();
+
+		if (currInitialState.isAccepting())
+		{
+			currInitialState.setAccepting(false);
+
+			State dummyState = new State("dummy_" + currInitialState.getName());
+			currPlant.addState(dummyState);
+
+			for (Iterator<Arc> incomingArcIt = currInitialState.incomingArcsIterator(); incomingArcIt.hasNext(); )
+			{
+				Arc currArc = incomingArcIt.next();
+
+				currPlant.addArc(new Arc(currArc.getFromState(), dummyState, currArc.getEvent()));
+			}
+
+			currInitialState.removeIncomingArcs();
+
+			LabeledEvent dummyEvent = new LabeledEvent(dummyEventName);
+			currPlant.getAlphabet().addEvent(dummyEvent);
+			currPlant.addArc(new Arc(dummyState, currInitialState, dummyEvent));
+
+			dummyState.setAccepting(true);
+			dummyState.setCost(0);
+
+			currPlant.remapStateIndices();
+		}
+	}
 
     /****************************************************************************************/
     /*                                 AUXILIARY METHODS                                    */

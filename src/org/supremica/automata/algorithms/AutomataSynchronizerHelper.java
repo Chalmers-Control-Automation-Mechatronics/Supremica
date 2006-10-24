@@ -187,7 +187,7 @@ public final class AutomataSynchronizerHelper
      * Initializes the helper for a new run. Generates a new initial state and adds it to the queue.
      */
     public void initialize()
-    throws Exception
+		throws Exception
     {
         // The helper (or rather theStates) should be clear before executing this method
         if (theStates.size() > 0)
@@ -197,7 +197,7 @@ public final class AutomataSynchronizerHelper
         
         // Build the initial state  (including 2 status fields)
         int[] initialState = AutomataIndexFormHelper.createState(theAutomata.size());
-        
+      
         Iterator autIt = theAutomata.iterator();
         while (autIt.hasNext())
         {
@@ -372,7 +372,7 @@ public final class AutomataSynchronizerHelper
     
     // Add this state to theStates
     public void addState(int[] state)
-    throws Exception
+		throws Exception
     {
         int[] newState = null;
         
