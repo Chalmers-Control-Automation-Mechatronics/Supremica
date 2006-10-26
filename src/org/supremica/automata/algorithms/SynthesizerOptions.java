@@ -231,7 +231,7 @@ public final class SynthesizerOptions
     }
     
     /**
-     * Returns the default options for synthesis.
+     * Returns the default options for synthesis---modular synthesis of controllability only.
      */
     public static SynthesizerOptions getDefaultSynthesizerOptions()
     {
