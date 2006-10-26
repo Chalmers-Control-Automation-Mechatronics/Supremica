@@ -135,7 +135,9 @@
 	<unjar src="${lib}/swixml.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/trove.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${waters.jaxbjar}" dest="${lib}/${unjared}"/>
+        <!-- contains incompatiable javax.xml.bind.Unmarshaller
 	<unjar src="${lib}/fuber.jar" dest="${lib}/${unjared}"/>
+        -->
         <unjar src="${lib}/automationobjects_jaxb.jar"
                dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/manufacturingTables_jaxb.jar"
@@ -153,11 +155,12 @@
 	<unjar src="${lib}/licensed/JGo.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/licensed/JGoLayout.jar" dest="${lib}/${unjared}"/>
 	-->
-	<!-- JAXB-stuff -->
+	<!-- JAXB-stuff cannot be included because of signature problem
 	<unjar src="${activation.jar}" dest="${lib}/${unjared}"/>	
 	<unjar src="${jaxb-api.jar}" dest="${lib}/${unjared}"/>
 	<unjar src="${jaxb-impl.jar}" dest="${lib}/${unjared}"/>	
-	<unjar src="${jsr173_api.jar}" dest="${lib}/${unjared}"/>	
+	<unjar src="${jsr173_api.jar}" dest="${lib}/${unjared}"/>\
+        -->	
 </target>
 
 
@@ -244,7 +247,6 @@
          debuglevel="lines,source"
          srcdir="${src}"
          destdir="${build}"
-         includeJavaRuntime="yes"
          deprecation="false"
          verbose="false"
          nowarn="true"
@@ -255,6 +257,7 @@
          fork="true"
          memoryMaximumSize="128M">
     <classpath>    
+      <path refid="jaxb.classpath"/>
       <pathelement location="${lib}/${unjared}"/>
     </classpath>
   </javac>
@@ -325,6 +328,7 @@
          verbose="false"
          source="1.5">
     <classpath> 
+      <path refid="jaxb.classpath"/>
       <pathelement location="${build}"/>
       <pathelement path="${lib}/${unjared}"/>
     </classpath>
