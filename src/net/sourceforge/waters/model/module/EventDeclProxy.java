@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   EventDeclProxy
 //###########################################################################
-//# $Id: EventDeclProxy.java,v 1.7 2006-10-26 09:11:27 flordal Exp $
+//# $Id: EventDeclProxy.java,v 1.8 2006-10-26 20:45:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -79,7 +79,7 @@ public interface EventDeclProxy extends NamedProxy {
   /**
    * Gets the color information for this event declaration.
    * Events of kind <I>proposition</I> may have a color associated to them,
-d   * which defines how nodes marked with the proposition are rendered. This
+   * which defines how nodes marked with the proposition are rendered. This
    * information may be missing, in which case a default color is to be
    * used, and it is meaningless for events that are not of kind
    * <I>proposition</I>.
