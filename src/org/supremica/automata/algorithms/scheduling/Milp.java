@@ -68,7 +68,7 @@ public class Milp
     private volatile boolean isRunning = false;
 
     /** The dialog box that launched this scheduler */
-    private ScheduleDialog gui;
+    private ScheduleDialog scheduleDialog;
 
     /** Decides if the schedule should be built */
     private boolean buildSchedule;
@@ -81,13 +81,13 @@ public class Milp
     /*                                 CONSTUCTORS                                          */
     /****************************************************************************************/
 
-    public Milp(Automata theAutomata, boolean buildSchedule, ScheduleDialog gui)
+    public Milp(Automata theAutomata, boolean buildSchedule, ScheduleDialog scheduleDialog)
 		throws Exception
     {
         this.theAutomata = theAutomata;
 		//  this.theProject = theProject;
         this.buildSchedule = buildSchedule;
-        this.gui = gui;
+        this.scheduleDialog = scheduleDialog;
 
         Thread milpThread = new Thread(this);
         isRunning = true;
@@ -163,7 +163,7 @@ public class Milp
         else
         {
             logger.warn("Scheduling interrupted");
-            gui.reset();
+            scheduleDialog.reset();
         }
     }
 
@@ -1176,13 +1176,13 @@ public class Milp
         requestStop(false);
     }
 
-    public void requestStop(boolean disposeGui)
+    public void requestStop(boolean disposeScheduleDialog)
     {
         isRunning = false;
 
-        if (disposeGui)
+        if (disposeScheduleDialog)
         {
-            gui.done();
+            scheduleDialog.done();
         }
     }
 
@@ -1252,17 +1252,26 @@ public class Milp
 
 	private synchronized void addAutomatonToGui(Automaton auto)
 		throws Exception
+ 	{
+		if (scheduleDialog != null)
+		{
+			org.supremica.gui.Gui theGui = null;
+
+			try
+			{
+				theGui = ActionMan.getGui();
+				theGui.addAutomaton(auto);
+			}
+			catch (Exception ex)
+			{
+				logger.warn("EXceptiON, gui = " + theGui);
+				throw ex;
+			}
+		}
+	}
+	
+	public Automaton getSchedule() 
 	{
-		org.supremica.gui.Gui theGui = null;
-		try
-		{
-			theGui = ActionMan.getGui();
-			theGui.addAutomaton(auto);
-		}
-		catch (Exception ex)
-		{
-			logger.warn("EXceptiON, gui = " + theGui);
-			throw ex;
-		}
+		return schedule;
 	}
 }
