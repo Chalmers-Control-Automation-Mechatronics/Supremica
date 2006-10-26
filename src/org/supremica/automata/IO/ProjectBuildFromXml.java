@@ -554,7 +554,7 @@ public class ProjectBuildFromXml
         boolean initial = false;
         boolean accepting = false;
         boolean forbidden = false;
-        int cost = State.UNDEF_COST;
+        double cost = State.UNDEF_COST;
         int length = attributes.getLength();
         String currName;
         

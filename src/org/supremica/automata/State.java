@@ -67,9 +67,9 @@ import net.sourceforge.waters.plain.base.AbstractNamedElement;
 public class State
     implements StateProxy
 {
-    public final static int MIN_COST = 0;
-    public final static int MAX_COST = Integer.MAX_VALUE;
-    public final static int UNDEF_COST = -1;
+    public final static double MIN_COST = 0;
+    public final static double MAX_COST = Double.MAX_VALUE;
+    public final static double UNDEF_COST = -1;
     public final static int UNDEF_POS = Integer.MIN_VALUE;
     private int index = -1;
 
@@ -94,7 +94,7 @@ public class State
     private boolean last = false;
     private boolean visited = false;
     private boolean selected = false;
-    private int cost = UNDEF_COST;
+    private double cost = UNDEF_COST;
     private State assocState = null;
     // private Object equivClass = null;
     private StateSet stateSet = null;    //
@@ -121,7 +121,7 @@ public class State
      * Stores the cost accumulated from the initial state until this one.
      * The value depends normally (if synchronized automaton) on the path to this state.
      */
-    protected int accumulatedCost = UNDEF_COST;
+    protected double accumulatedCost = UNDEF_COST;
 
 
     /**
@@ -726,12 +726,12 @@ public class State
         return outgoingArcs.size() == 0;
     }
 
-    public void setCost(int cost)
+    public void setCost(double cost)
     {
         this.cost = cost;
     }
 
-    public int getCost()
+    public double getCost()
     {
         return cost;
     }
@@ -1130,7 +1130,7 @@ public class State
      * Returns the cost accumulated when this state is reached. Note that the
      * path to the state is of importance.
      */
-    public int getAccumulatedCost()
+    public double getAccumulatedCost()
     {
         return accumulatedCost;
     }
@@ -1152,7 +1152,7 @@ public class State
      * This method updates explicitly the accumulatedCost. Normally, this version
      * of updateCosts() is only used from within Node.class.
      */
-    public void updateCosts(State prevState, int accumulatedCost)
+    public void updateCosts(State prevState, double accumulatedCost)
     {
         this.accumulatedCost = accumulatedCost + prevState.getCost();
     }

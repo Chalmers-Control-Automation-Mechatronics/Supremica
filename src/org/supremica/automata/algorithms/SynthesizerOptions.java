@@ -244,6 +244,7 @@ public final class SynthesizerOptions
     public static SynthesizerOptions getDefaultMonolithicCNBSynthesizerOptions()
     {
         SynthesizerOptions options = getDefaultSynthesizerOptions();
+		options.synthesisType = SynthesisType.NONBLOCKINGCONTROLLABLE;
         options.synthesisAlgorithm = SynthesisAlgorithm.MONOLITHIC;
         options.optimize = false;
         options.reduceSupervisors = false;

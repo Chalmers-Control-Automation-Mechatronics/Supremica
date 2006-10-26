@@ -215,7 +215,7 @@ public class ProjectToSP
 
 				if (includeCost)
 				{
-					int value = state.getCost();
+					double value = state.getCost();
 
 					if (value != State.UNDEF_COST)
 					{

@@ -421,7 +421,7 @@ public class Milp
             String currRobotName = currRobot.getName();
 
             Automata toBeSynthesized = new Automata(currRobot);
-            int[] costs = new int[currRobot.nbrOfStates()];
+            double[] costs = new double[currRobot.nbrOfStates()];
 
             // Store the costs of each of the robots states
             for (Iterator<State> stateIter = currRobot.stateIterator(); stateIter.hasNext(); )
@@ -806,7 +806,7 @@ public class Milp
             int currRobotIndex = indexMap.getAutomatonIndex(currRobot);
 
             // Each index correspond to a Tic. For each Tic, a deltaTime is added
-            int[] deltaTimes = new int[currRobot.nbrOfStates()];
+            double[] deltaTimes = new double[currRobot.nbrOfStates()];
             for (Iterator<State> stateIter = currRobot.stateIterator(); stateIter.hasNext(); )
             {
                 State currState = stateIter.next();

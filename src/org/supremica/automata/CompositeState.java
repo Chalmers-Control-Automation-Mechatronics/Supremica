@@ -62,14 +62,14 @@ public class CompositeState
     //private int[] compositeIndices = null;
     
     /** The costs corresponding to the underlying states */
-    private int[] compositeCosts = null;
+    private double[] compositeCosts = null;
     
     /**
      * The current costs in this state (only important in a composite state).
      * Depend on which automaton is to be fired as well as the path to this state.
      * See for ex. T.Liljenvalls Lic. (currentCosts = T_v).
      */
-    private int[] currentCosts = null;
+    private double[] currentCosts = null;
     private ArrayList composingStates;
     
     public CompositeState(State state)
@@ -131,8 +131,8 @@ public class CompositeState
      */
     public void initCosts()
     {
-        compositeCosts = new int[composingStates.size()];
-        currentCosts = new int[composingStates.size()];
+        compositeCosts = new double[composingStates.size()];
+        currentCosts = new double[composingStates.size()];
         
         for (int i = 0; i < currentCosts.length; i++)
         {
@@ -175,7 +175,7 @@ public class CompositeState
      *      Returns the costs corresponding to the underlying states. Overrides
      *      the @link getCost() method in org.supremica.automata.State.java.
      */
-    public int[] getCompositeCosts()
+    public double[] getCompositeCosts()
     {
         return compositeCosts;
     }
@@ -184,7 +184,7 @@ public class CompositeState
      *      Returns the current costs associated to this state (keeping in mind the
      *      path to this state).
      */
-    public int[] getCurrentCosts()
+    public double[] getCurrentCosts()
     {
         return currentCosts;
     }
@@ -195,9 +195,9 @@ public class CompositeState
      *      If the current state does not have any underlying cost(s) associated, the
      *      accumulatedCost of the previously visited state is kept.
      */
-    public void updateCosts(int[] prevCurrentCosts, boolean[] firingAutomata, int prevAccumulatedCost)
+    public void updateCosts(double[] prevCurrentCosts, boolean[] firingAutomata, double prevAccumulatedCost)
     {
-        int costAddition = 0;
+        double costAddition = 0;
         
         // The value of costAddition is set as the maximal cost for the firing/active automata
         for (int i = 0; i < firingAutomata.length; i++)

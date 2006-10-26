@@ -74,7 +74,7 @@ public interface Supervisor
      * @throws EventDisabledException if the event was not enabled.
      */
     public void executeEvent(LabeledEvent event)
-	throws EventDisabledException;
+		throws EventDisabledException;
 
     /**
      * Returns the alphabet of the supervisor.

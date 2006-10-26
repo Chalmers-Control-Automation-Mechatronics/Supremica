@@ -821,7 +821,7 @@ class StateDisplayer
         if (currState instanceof CompositeState)
         {
             StringBuffer str = new StringBuffer();
-            int[] costs = ((CompositeState) currState).getCurrentCosts();
+            double[] costs = ((CompositeState) currState).getCurrentCosts();
 
             for (int i = 0; i < costs.length - 1; i++)
             {
