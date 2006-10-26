@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.25 2006-10-24 14:16:10 flordal Exp $
+//# $Id: EventTableModel.java,v 1.26 2006-10-26 09:11:27 flordal Exp $
 //###########################################################################
 
 
@@ -122,7 +122,7 @@ public class EventTableModel
         case 0:
             final IdentifierSubject ident = entry.getName();
             final EventKind kind = mRoot.guessEventKind(ident);
-            if (kind.equals(EventKind.PROPOSITION) && ident.getName().equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME))
+            if (kind!=null && kind.equals(EventKind.PROPOSITION) && ident.getName().equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME))
                 return IconLoader.ICON_FORBIDDEN;
             else
                 return getIcon(kind);
