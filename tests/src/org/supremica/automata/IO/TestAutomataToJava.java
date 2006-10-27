@@ -1,3 +1,13 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica
+//# PACKAGE: org.supremica.automata.IO
+//# CLASS:   TestAutomataToJava
+//###########################################################################
+//# $Id: TestAutomataToJava.java,v 1.4 2006-10-27 01:59:32 robi Exp $
+//###########################################################################
+
+
 /*
  * Supremica Software License Agreement
  *
@@ -37,88 +47,91 @@
  *
  * Supremica is owned and represented by KA.
  */
-/*
- * Created on Apr 14, 2004
- *
- */
+
 package org.supremica.automata.IO;
 import java.io.*;
 import org.supremica.automata.Project;
 import org.supremica.testhelpers.TestFiles;
 import junit.framework.*;
+
+
 /**
  * @author torda
- *
  */
 public class TestAutomataToJava extends TestCase {
-	public TestAutomataToJava(String name) {
+
+	public TestAutomataToJava(String name)
+	{
 		super(name);
 	}
-	public void disabled_testSameAsReferenceFileWithoutSignals() {
+
+	public void testSameAsReferenceFileWithoutSignals()
+		throws Exception
+	{
 		testSameAsReferenceFile("CatAndMouse",
-				TestFiles.getFile(TestFiles.CatMouse),
-				TestFiles.getFile(TestFiles.CatMouseJava));
+								TestFiles.getFile(TestFiles.CatMouse),
+								TestFiles.getFile(TestFiles.CatMouseJava));
 	}
-	public void disabled_testSameAsReferenceFileWithSignals() {
+
+	public void disabled_testSameAsReferenceFileWithSignals()
+		throws Exception
+	{
 		testSameAsReferenceFile("BallProcess",
-				TestFiles.getFile(TestFiles.BallProcess),
-				TestFiles.getFile(TestFiles.BallProcessJava));
+								TestFiles.getFile(TestFiles.BallProcess),
+								TestFiles.getFile(TestFiles.BallProcessJava));
 	}
+
 	/**
 	 * Compares the generated java file with the hand-written reference file
 	 */
-	public void testSameAsReferenceFile(String classname, File projFile,
-			File refFile) {
-		try {
-			//Create an empty temporary file that is deleted upon exit
-			File generatedTempJavaFile = File
-					.createTempFile(classname, ".java");
-			//generatedTempJavaFile.deleteOnExit();
-			//Generate java code into the temporary file from the ball process
-			// project
-			Project proj = new ProjectBuildFromXml().build(projFile);
-			AutomataToJava javaExporter = new AutomataToJava(proj,
-					classname);
-			PrintWriter pw = new PrintWriter(new FileWriter(
-					generatedTempJavaFile));
-			javaExporter.serialize(pw);
-			pw.flush(); //needed!!!
-			pw.close();
-			//Open a reader for the reference file and the generated file
-			// respectively
-			LineNumberReader refReader = new LineNumberReader(new FileReader(
-					refFile));
-			LineNumberReader genReader = new LineNumberReader(new FileReader(
-					generatedTempJavaFile));
-			//Compare each line except those where date and version are written
-			String refLine = refReader.readLine();
-			String genLine = genReader.readLine();
-			while (refLine != null && genLine != null) {
-				if (!(genLine.startsWith(" * Supremica version:") && refLine
-						.startsWith(" * Supremica version:"))
-						&& !(genLine
-								.startsWith(" * This file was generated at:") && refLine
-								.startsWith(" * This file was generated at:")))
-					assertEquals("Line " + genReader.getLineNumber(), refLine,
-							genLine);
-				refLine = refReader.readLine();
-				genLine = genReader.readLine();
+	public void testSameAsReferenceFile
+		(String classname, File projFile, File refFile)
+		throws Exception
+	{
+		//Create an empty temporary file that is deleted upon exit
+		File generatedTempJavaFile = File.createTempFile(classname, ".java");
+		//generatedTempJavaFile.deleteOnExit();
+		//Generate java code into the temporary file from the ball process
+		// project
+		Project proj = new ProjectBuildFromXml().build(projFile);
+		AutomataToJava javaExporter = new AutomataToJava(proj, classname);
+		PrintWriter pw =
+			new PrintWriter(new FileWriter(generatedTempJavaFile));
+		javaExporter.serialize(pw);
+		pw.flush(); // needed!!!
+		pw.close();
+		// Open a reader for the reference file and the generated file
+		// respectively
+		LineNumberReader refReader =
+			new LineNumberReader(new FileReader(refFile));
+		LineNumberReader genReader =
+			new LineNumberReader(new FileReader(generatedTempJavaFile));
+		// Compare each line except those where date and version are written
+		String refLine = refReader.readLine();
+		String genLine = genReader.readLine();
+		while (refLine != null && genLine != null) {
+			if (!(genLine.startsWith(" * Supremica version:") &&
+				  refLine.startsWith(" * Supremica version:")) &&
+				!(genLine.startsWith(" * This file was generated at:") &&
+				  refLine.startsWith(" * This file was generated at:"))) {
+				assertEquals("Line " + genReader.getLineNumber(), refLine,
+							 genLine);
 			}
-			assertNull("The reference file is shorter than the generated file",
-					genLine);
-			assertNull(
-					"The generated file is shorter than the reference file ",
-					refLine);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			fail();
+			refLine = refReader.readLine();
+			genLine = genReader.readLine();
 		}
+		assertNull("The reference file is shorter than the generated file",
+				   genLine);
+		assertNull("The generated file is shorter than the reference file ",
+				   refLine);
 	}
+
 	/**
 	 * Assembles and returns a test suite for all the test methods of this test
 	 * case.
 	 */
-	public static Test suite() {
+	public static Test suite()
+	{
 		TestSuite suite = new TestSuite(TestAutomataToJava.class);
 		return suite;
 	}

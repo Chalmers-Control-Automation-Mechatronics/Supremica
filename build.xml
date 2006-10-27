@@ -497,7 +497,7 @@ Class-Path: ${manifest.pathlist}</echo>
   </jar>
 </target>
 
-<target name="jar_supremica_tests">
+<target name="jar_supremica_tests" depends="compile_supremica_tests">
   <jar jarfile="${dist}/SupremicaTest.jar">
     <fileset dir="${testsbuild}"/>
     <zipfileset dir="${waters.examples}"
@@ -680,8 +680,7 @@ Class-Path: ${manifest.pathlist}</echo>
 	</java>
 </target>
 
-<target name="run_supremica_tests"
-        depends="jar_supremica,jar_supremica_tests,jar_supremica_lib">
+<target name="run_supremica_tests" depends="jar_supremica,jar_supremica_tests">
   <mkdir dir="${logs.results}"/>
   <junit printsummary="on" fork="true" maxmemory="512m">
     <formatter type="xml"/>
@@ -689,6 +688,7 @@ Class-Path: ${manifest.pathlist}</echo>
       <fileset dir="${testssrc}">
         <include name="**/*Test.java"/>
         <include name="**/Test*.java"/>
+        <exclude name="org/supremica/testhelpers/**/*.java"/>
         <exclude name="**/TestPackage*.java"/>
         <exclude name="**/Abstract*.java"/>
         <exclude name="**/Native*.java"/>
