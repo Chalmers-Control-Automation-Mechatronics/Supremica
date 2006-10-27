@@ -240,7 +240,7 @@
 *	source files that have changed.
 -->
 
-<target name="compile" depends="compile_supremica,compile_tests_supremica"/>
+<target name="compile" depends="compile_supremica,compile_supremica_tests"/>
 
 <target name="compile_supremica" depends="startfiles_local_supremica">
   <javac debug="on"
@@ -318,7 +318,7 @@
 *	Reuses existing class files, but recompiles those
 *	source files that have changed.
 -->
-<target name="compile_tests_supremica">
+<target name="compile_supremica_tests">
   <javac debug="on"
          debuglevel="lines,source"
          srcdir="${testssrc}"
@@ -418,7 +418,7 @@
 *	A standard compilation followed by packaging
 *	all files into a jar file. 
 -->
-<target name="build_supremica" depends="compile_supremica,compile_tests_supremica,jar_supremica,startfiles_supremica">
+<target name="build_supremica" depends="compile_supremica,compile_supremica_tests,jar_supremica,startfiles_supremica">
 </target>
 
 <!-- Rebuild:
@@ -494,6 +494,14 @@ Class-Path: ${manifest.pathlist}</echo>
     <zipfileset dir="${waters.xsd}"
                 includes="*.xsd"
                 prefix="net/sourceforge/waters/model/marshaller"/>
+  </jar>
+</target>
+
+<target name="jar_supremica_tests">
+  <jar jarfile="${dist}/SupremicaTest.jar">
+    <fileset dir="${testsbuild}"/>
+    <zipfileset dir="${waters.examples}"
+                prefix="net/sourceforge/waters/model/marshaller/examples"/>
   </jar>
 </target>
 
@@ -672,8 +680,8 @@ Class-Path: ${manifest.pathlist}</echo>
 	</java>
 </target>
 
-<target name="run_tests_supremica"
-        depends="jar_supremica,compile_tests_supremica">
+<target name="run_supremica_tests"
+        depends="jar_supremica,jar_supremica_tests,jar_supremica_lib">
   <mkdir dir="${logs.results}"/>
   <junit printsummary="on" fork="true" maxmemory="512m">
     <formatter type="xml"/>
@@ -687,10 +695,11 @@ Class-Path: ${manifest.pathlist}</echo>
       </fileset>
     </batchtest>
     <classpath>
-      <pathelement location="${dist}/Supremica.jar" />
-      <pathelement location="${testsbuild}" />
-      <pathelement path="${lib}/${unjared}" />
-      <pathelement path="${java.class.path}" />
+      <pathelement location="${dist}/Supremica.jar"/>
+      <pathelement location="${dist}/SupremicaLib.jar"/>
+      <pathelement location="${dist}/SupremicaTest.jar"/>
+      <pathelement path="${jaxb.classpath}"/>
+      <pathelement path="${java.class.path}"/>
     </classpath>
     <sysproperty key="waters.test.inputdir" value="${waters.examples}"/>
     <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
@@ -698,8 +707,8 @@ Class-Path: ${manifest.pathlist}</echo>
   </junit>
 </target>
 
-<target name="run_tests" depends="run_tests_supremica"/>
-<target name="run_tests_junit" depends="run_tests_supremica"/>
+<target name="run_tests" depends="run_supremica_tests"/>
+<target name="run_tests_junit" depends="run_supremica_tests"/>
 
 <target name="test_report">
   <mkdir dir="${logs.reports}"/>
@@ -711,8 +720,7 @@ Class-Path: ${manifest.pathlist}</echo>
   </junitreport>
 </target>
 
-<target name="test"
-        depends="compile_tests_supremica,run_tests_supremica,test_report"/>
+<target name="test" depends="run_supremica_tests,test_report"/>
 
 <target name="bdd_tests" depends="compile_supremica,startfiles_supremica">
 	<!-- 

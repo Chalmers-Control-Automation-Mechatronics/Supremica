@@ -64,7 +64,7 @@
 <xsl:template match="local">
   <EventDeclList>
     <xsl:apply-templates select="event"/>
-    <EventDecl Name=":omega" Kind="PROPOSITION"/>
+    <EventDecl Name=":accepting" Kind="PROPOSITION"/>
   </EventDeclList>
 </xsl:template>
 
@@ -216,7 +216,7 @@
     </xsl:if>
     <xsl:if test="@marked = 1">
       <EventList>
-        <SimpleIdentifier Name=":omega"/>
+        <SimpleIdentifier Name=":accepting"/>
       </EventList>
     </xsl:if>
     <xsl:apply-templates select=".//rendering"/>
