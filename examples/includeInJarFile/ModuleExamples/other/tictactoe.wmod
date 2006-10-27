@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<Module xmlns="http://waters.sourceforge.net/xsd/module"
-        Name="tictactoe">
+<Module Name="Tic Tac Toe" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A model of a tic tac toe game. The size of the game board can be parametrised. The model uses event aliases in the 'game_over' model and the 'white_never_wins' model.</ns2:Comment>
 <ConstantAliasList>
   <ConstantAlias>
     <SimpleIdentifier Name="size"/>
@@ -81,9 +80,21 @@
             </IndexedIdentifier>
             <Graph>
               <NodeList>
-                <SimpleNode Name="free" Initial="true"/>
-                <SimpleNode Name="white"/>
-                <SimpleNode Name="black"/>
+                <SimpleNode Name="free" Initial="true">
+		          <EventList>
+        		    <SimpleIdentifier Name=":accepting"/>
+		          </EventList>
+				</SimpleNode>
+                <SimpleNode Name="white">
+		          <EventList>
+        		    <SimpleIdentifier Name=":accepting"/>
+		          </EventList>
+				</SimpleNode>
+                <SimpleNode Name="black">
+		          <EventList>
+        		    <SimpleIdentifier Name=":accepting"/>
+		          </EventList>
+				</SimpleNode>
               </NodeList>
               <EdgeList>
                 <Edge Source="free" Target="white">
@@ -199,8 +210,16 @@
     <SimpleIdentifier Name="turn"/>
     <Graph>
       <NodeList>
-        <SimpleNode Name="white" Initial="true"/>
-        <SimpleNode Name="black"/>
+        <SimpleNode Name="white" Initial="true">
+	         <EventList>
+      		    <SimpleIdentifier Name=":accepting"/>
+	         </EventList>
+		</SimpleNode>
+        <SimpleNode Name="black"> 
+	         <EventList>
+      		    <SimpleIdentifier Name=":accepting"/>
+	         </EventList>
+		</SimpleNode>
       </NodeList>
       <EdgeList>
         <Edge Source="white" Target="black">
@@ -245,7 +264,11 @@
         <SimpleIdentifier Name="white_win"/>
       </LabelBlock>
       <NodeList>
-        <SimpleNode Name="init" Initial="true"/>
+        <SimpleNode Name="init" Initial="true">
+          <EventList>
+            <SimpleIdentifier Name=":accepting"/>
+          </EventList>
+		</SimpleNode>
       </NodeList>
     </Graph>
   </SimpleComponent>

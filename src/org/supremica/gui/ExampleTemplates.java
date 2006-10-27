@@ -324,6 +324,7 @@ public class ExampleTemplates
         //thisGroup.addItem(new TemplateItem("Man, Wolf, Goat, Cabbage", basePrefix + "/CCSBookExercises/" + "Ex2_6.xml", TemplateItemType.XML));
         thisGroup.addItem(new TemplateItem("Man, Wolf, Goat, Cabbage", prefix + "ManWolfGoatCabbage.wmod", TemplateItemType.MODULE));
         thisGroup.addItem(new TemplateItem("Stick Picking Game", basePrefix + "/ModuleExamples/other/stick_picking_game.wmod", TemplateItemType.MODULE));
+        thisGroup.addItem(new TemplateItem("Tic Tac Toe", basePrefix + "/ModuleExamples/other/tictactoe.wmod", TemplateItemType.MODULE));
     }
 
     /*
