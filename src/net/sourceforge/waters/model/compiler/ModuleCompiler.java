@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.46 2006-10-04 13:14:42 knut Exp $
+//# $Id: ModuleCompiler.java,v 1.47 2006-10-27 19:49:09 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -793,7 +793,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
     throws VisitorException
   {
     /*
-     * Mappings used to create variable automata instanciated.
+     * Mappings used to create variable automata instantiated.
      */
     mEFAEventGuardClauseMap = new HashMap<EventProxy,SimpleExpressionProxy>();
     mEFAEventActionListsMap =
@@ -1057,7 +1057,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
         return false;
       }
       final SimpleExpressionProxy rhs = binary.getRight();
-      return evaluatePartialGuard(lhs, searcher);
+      return evaluatePartialGuard(rhs, searcher);
     }
   }
 
@@ -1195,6 +1195,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
   private SimpleExpressionProxy collectGuard
     (final List<TransitionProxy> path)
   {
+    final BinaryOperator andop = mOperatorTable.getAndOperator();
     SimpleExpressionProxy result = null;
     for (final TransitionProxy trans : path) {
       final GuardActionBlockProxy block =
@@ -1204,7 +1205,6 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
           if (result == null) {
             result = guard;
           } else {
-            final BinaryOperator andop = mOperatorTable.getAndOperator();
             result =
               mModuleFactory.createBinaryExpressionProxy(andop, result, guard);
           }
