@@ -19,6 +19,7 @@ import net.sourceforge.waters.gui.renderer.GeometryTools;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.xsd.module.SplineKind;
+import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
@@ -71,6 +72,9 @@ public class MoveObjects
       } else if (entry.getKey() instanceof LabelBlockSubject) {
         c = new MoveLabelBlock((LabelBlockSubject) entry.getKey(),
                                (LabelBlockSubject) entry.getValue());
+      } else if (entry.getKey() instanceof GuardActionBlockSubject) {
+          c = new MoveGuardActionBlock((GuardActionBlockSubject) entry.getKey(),
+                  (GuardActionBlockSubject) entry.getValue());
       } else if (entry.getKey() instanceof LabelGeometrySubject) {
         c = new MoveLabelGeometry((LabelGeometrySubject) entry.getKey(),
                                   (LabelGeometrySubject) entry.getValue());
@@ -310,6 +314,41 @@ public class MoveObjects
       return "Move LabelBlock";
     }
   }
+ 
+  private class MoveGuardActionBlock
+  implements Command
+{
+  private final GuardActionBlockSubject mGA;
+  private final LabelGeometrySubject mOrig;
+  private final LabelGeometrySubject mNew;
+
+  public MoveGuardActionBlock(GuardActionBlockSubject orig, GuardActionBlockSubject dummy)
+  {
+    mGA = orig;
+    mOrig = mGA.getGeometry().clone();
+    mNew = dummy.getGeometry().clone();
+  }
+
+  public void execute()
+  {
+    mGA.setGeometry(mNew);
+  }
+
+  public void undo()
+  {
+    mGA.setGeometry(mOrig);
+  }
+
+  public boolean isSignificant()
+  {
+    return true;
+  }
+
+  public String getName()
+  {
+    return "Move GuardActionBlock";
+  }
+}
 
   private class MoveLabelGeometry
     implements Command

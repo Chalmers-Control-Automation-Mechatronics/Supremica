@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   GuardActionBlockProxy
 //###########################################################################
-//# $Id: GuardActionBlockProxy.java,v 1.5 2006-09-12 14:32:16 robi Exp $
+//# $Id: GuardActionBlockProxy.java,v 1.6 2006-10-31 16:50:44 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -15,7 +15,7 @@ import net.sourceforge.waters.model.base.Proxy;
 
 /**
  * Guard and Actions with associated geometry information. A GuardActionBlock 
- * is found is on the edges of a graph. 
+ * is found on the edges of a graph. 
  *
  * @author Markus Sk&ouml;ldstam
  */

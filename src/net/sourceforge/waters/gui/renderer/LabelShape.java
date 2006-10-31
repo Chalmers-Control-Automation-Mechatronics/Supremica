@@ -10,15 +10,24 @@ import java.awt.font.TextLayout;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
+import java.util.List;
 
+import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 
 public class LabelShape
     extends AbstractProxyShape
 {
+	public LabelShape(final Proxy p, final int x, final int y, final Font font, String auxilary)
+    {
+		this(p, x, y, font);
+		mAuxilary = auxilary;
+    }
     public LabelShape(final Proxy p, final int x, final int y, final Font font)
     {
         super(p);
+        mAuxilary = "";
         mFont = font;
         mPoint = new Point(x + 2, y + font.getSize());
         mName = getProxy().toString();
@@ -29,8 +38,8 @@ public class LabelShape
         mBounds = new RoundRectangle2D.Double(rect.getX(), rect.getY(),
             rect.getWidth(), rect.getHeight(), ARCRADIUS, ARCRADIUS);
     }
-    
-    public RoundRectangle2D getShape()
+
+	public RoundRectangle2D getShape()
     {
         return mBounds;
     }
@@ -41,6 +50,12 @@ public class LabelShape
         g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
         g.setFont(mFont);
         g.setColor(status.getColor());
+        if(mAuxilary.equals("guard")) {
+        		g.setColor(EditorColor.GUARDCOLOR);
+        } else if(mAuxilary.equals("action"))
+        {
+        		g.setColor(EditorColor.ACTIONCOLOR);
+        }
         g.drawString(mName, (int)mPoint.getX(), (int)mPoint.getY());
         if (status.isFocused())
         {
@@ -48,7 +63,7 @@ public class LabelShape
             g.fill(getShape());
         }
     }
-    
+	private String mAuxilary;
     private final Point mPoint;
     private final RoundRectangle2D mBounds;
     private final Font mFont;

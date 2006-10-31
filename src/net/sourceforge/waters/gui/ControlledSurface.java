@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.93 2006-10-20 05:20:55 robi Exp $
+//# $Id: ControlledSurface.java,v 1.94 2006-10-31 16:50:44 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -200,6 +200,14 @@ public class ControlledSurface
                         objects.add((ProxySubject)shape.getProxy());
                     }
                     shape = getShapeProducer().getShape(edge.getLabelBlock());
+                    if (shape != null)
+                    {
+                        if (shape.isClicked(ex, ey))
+                        {
+                            objects.add((ProxySubject)shape.getProxy());
+                        }
+                    }
+                    shape = getShapeProducer().getShape(edge.getGuardActionBlock());
                     if (shape != null)
                     {
                         if (shape.isClicked(ex, ey))
@@ -407,9 +415,20 @@ public class ControlledSurface
 
     private void setOffset(ProxySubject s, MouseEvent e)
     {
-        if (s instanceof LabelBlockSubject)
+    	if (s instanceof LabelBlockSubject)
         {
             LabelBlockSubject l = (LabelBlockSubject) s;
+            EdgeSubject edge = (EdgeSubject)l.getParent();
+            xoff = e.getX() -
+                (int)l.getGeometry().getOffset().getX();
+            yoff = e.getY() -
+                (int)l.getGeometry().getOffset().getY();
+            xoff -= (int)edge.getGeometry().getPoints().get(0).getX();
+            yoff -= (int)edge.getGeometry().getPoints().get(0).getY();
+        }
+    		else if (s instanceof GuardActionBlockSubject)
+        {
+    			GuardActionBlockSubject l = (GuardActionBlockSubject) s;
             EdgeSubject edge = (EdgeSubject)l.getParent();
             xoff = e.getX() -
                 (int)l.getGeometry().getOffset().getX();
@@ -508,6 +527,11 @@ public class ControlledSurface
             {
                 setLabelBlockPosition((LabelBlockSubject)s, dx, dy);
             }
+            // Is it a guardactionblock?
+            else if (s instanceof GuardActionBlockSubject) // Don't move
+            {
+                setGuardActionBlockPosition((GuardActionBlockSubject)s, dx, dy);
+            }
         }
     }
 
@@ -594,6 +618,15 @@ public class ControlledSurface
     {
         assert(mDummy != null);
         LabelBlockSubject dummy = (LabelBlockSubject)mDummy.getCopy(label);
+        Point2D p = dummy.getGeometry().getOffset();
+        p.setLocation(p.getX() + dx, p.getY() + dy);
+        dummy.getGeometry().setOffset(p);
+    }
+
+    private void setGuardActionBlockPosition(GuardActionBlockSubject label, int dx, int dy)
+    {
+        assert(mDummy != null);
+        GuardActionBlockSubject dummy = (GuardActionBlockSubject)mDummy.getCopy(label);
         Point2D p = dummy.getGeometry().getOffset();
         p.setLocation(p.getX() + dx, p.getY() + dy);
         dummy.getGeometry().setOffset(p);
@@ -836,6 +869,10 @@ public class ControlledSurface
                 {
                     selectedObjects.add(s);
                 }
+            }
+            if (s instanceof GuardActionBlockSubject) 
+            {
+            		selectedObjects.add(s);
             }
             if (s instanceof GroupNodeSubject || s instanceof IdentifierSubject)
             {
@@ -1092,6 +1129,11 @@ public class ControlledSurface
                     selection.add((ProxySubject)shape.getProxy());
                 }
                 shape = getShapeProducer().getShape(edge.getLabelBlock());
+                if (bounds.contains(shape.getShape().getBounds()))
+                {
+                    selection.add((ProxySubject)shape.getProxy());
+                }
+                shape = getShapeProducer().getShape(edge.getGuardActionBlock());
                 if (bounds.contains(shape.getShape().getBounds()))
                 {
                     selection.add((ProxySubject)shape.getProxy());
@@ -1547,6 +1589,14 @@ public class ControlledSurface
                 return 3;
             }
             else if (s instanceof LabelBlockSubject)
+            {
+                if (draggingSource || draggingTarget)
+                {
+                    return -1;
+                }
+                return 2;
+            }
+            else if (s instanceof GuardActionBlockSubject)
             {
                 if (draggingSource || draggingTarget)
                 {
@@ -2218,6 +2268,15 @@ public class ControlledSurface
                 return 2;
             }
             else if (s instanceof LabelBlockSubject)
+            {
+                if ((hasDragged && (nodeIsSelected() || nodeGroupIsSelected()))
+                || draggingSource || draggingTarget)
+                {
+                    return -1;
+                }
+                return 1;
+            }
+            else if (s instanceof GuardActionBlockSubject)
             {
                 if ((hasDragged && (nodeIsSelected() || nodeGroupIsSelected()))
                 || draggingSource || draggingTarget)

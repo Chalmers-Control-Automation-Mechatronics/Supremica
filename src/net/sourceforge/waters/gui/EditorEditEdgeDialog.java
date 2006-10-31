@@ -27,6 +27,7 @@ import net.sourceforge.waters.model.compiler.TypeMismatchException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
@@ -230,6 +231,7 @@ public class EditorEditEdgeDialog
 			}
 			// Store parsed results ...
 			final GuardActionBlockSubject block = edgeModel.getGuardActionBlock();
+			block.fireModelChanged(new ModelChangeEvent(block, ModelChangeEvent.STATE_CHANGED));
 			final List<SimpleExpressionSubject> bguards = block.getGuardsModifiable();
 			bguards.clear();
 			if (guard != null)

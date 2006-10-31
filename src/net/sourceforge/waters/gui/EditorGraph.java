@@ -36,6 +36,7 @@ import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;
+import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
@@ -127,6 +128,10 @@ public class EditorGraph
 			{
 				s = getCopy((LabelBlockSubject)o);
 			}
+			if (o instanceof GuardActionBlockSubject)
+			{
+				s = getCopy((GuardActionBlockSubject)o);
+			}
 			if (o instanceof LabelGeometrySubject)
 			{
 				s = getCopy((LabelGeometrySubject)o);
@@ -139,6 +144,12 @@ public class EditorGraph
 	{
 		EdgeSubject s = (EdgeSubject)mOriginalMap.get(o.getParent());
 		return s.getLabelBlock();
+	}
+
+	public Subject getCopy(GuardActionBlockSubject o)
+	{
+		EdgeSubject s = (EdgeSubject)mOriginalMap.get(o.getParent());
+		return s.getGuardActionBlock();
 	}
 
 	public Subject getCopy(LabelGeometrySubject o)
@@ -156,6 +167,10 @@ public class EditorGraph
 			{
 				s = getOriginal((LabelBlockSubject)o);
 			}
+			if (o instanceof GuardActionBlockSubject)
+			{
+				s = getOriginal((GuardActionBlockSubject)o);
+			}
 			if (o instanceof LabelGeometrySubject)
 			{
 				s = getOriginal((LabelGeometrySubject)o);
@@ -168,6 +183,12 @@ public class EditorGraph
 	{
 		EdgeSubject s = (EdgeSubject)mFakeMap.get(o.getParent());
 		return s.getLabelBlock();
+	}
+
+	public Subject getOriginal(GuardActionBlockSubject o)
+	{
+		EdgeSubject s = (EdgeSubject)mFakeMap.get(o.getParent());
+		return s.getGuardActionBlock();
 	}
 
 	public Subject getOriginal(LabelGeometrySubject o)
@@ -387,6 +408,12 @@ public class EditorGraph
 	}
 
 	public static LabelGeometrySubject defaultLabelBlockOffset()
+	{
+		Point2D p = new Point2D.Double(10, 10);
+		return new LabelGeometrySubject(p);
+	}
+
+	public static LabelGeometrySubject defaultGuardActionBlockOffset()
 	{
 		Point2D p = new Point2D.Double(10, 10);
 		return new LabelGeometrySubject(p);

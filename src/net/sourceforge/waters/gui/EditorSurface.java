@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.64 2006-10-05 21:34:54 flordal Exp $
+//# $Id: EditorSurface.java,v 1.65 2006-10-31 16:50:44 martin Exp $
 //###########################################################################
 
 
@@ -29,6 +29,7 @@ import net.sourceforge.waters.gui.renderer.RenderingInformation;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
@@ -114,9 +115,12 @@ public class EditorSurface
         {
             priority = 4;
         }
+        else if (o instanceof GuardActionBlockProxy) {
+        		priority = 5;
+        }
         else if (o instanceof IdentifierProxy)
         {
-            priority = 5;
+            priority = 6;
         }
         return priority;
     }
@@ -307,6 +311,14 @@ public class EditorSurface
                         return shape.getProxy();
                     }
                     shape = getShapeProducer().getShape(edge.getLabelBlock());
+                    if (shape != null)
+                    {
+                        if (shape.isClicked(ex, ey))
+                        {
+                            return shape.getProxy();
+                        }
+                    }
+                    shape = getShapeProducer().getShape(edge.getGuardActionBlock());
                     if (shape != null)
                     {
                         if (shape.isClicked(ex, ey))

@@ -5,6 +5,8 @@ import java.awt.Color;
 import net.sourceforge.waters.gui.renderer.RenderingInformation;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
@@ -31,10 +33,10 @@ public class EditorColor
     public static final Color DEFAULTMARKINGCOLOR = Color.GRAY;
     
     /** The color of guard expressions. */
-    public static final Color GUARDCOLOR = Color.GREEN.darker().darker();
-    
+    public static final Color GUARDCOLOR = Color.CYAN.darker().darker();
+
     /** The color of action expressions. */
-    public static final Color ACTIONCOLOR = Color.BLUE;
+    public static final Color ACTIONCOLOR = Color.RED.darker().darker();
     
     /** The color of the drag-select area. */
     public static final Color DRAGSELECTCOLOR = new Color(0,0,255,32);

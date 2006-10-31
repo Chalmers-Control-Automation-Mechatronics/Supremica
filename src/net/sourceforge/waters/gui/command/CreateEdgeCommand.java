@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateEdgeCommand
 //###########################################################################
-//# $Id: CreateEdgeCommand.java,v 1.10 2006-10-19 00:40:01 siw4 Exp $
+//# $Id: CreateEdgeCommand.java,v 1.11 2006-10-31 16:50:44 martin Exp $
 //###########################################################################
 
 
@@ -24,6 +24,7 @@ import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.renderer.GeometryTools;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SplineGeometrySubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
@@ -75,12 +76,14 @@ public class CreateEdgeCommand
 						LabelBlockProxyShape.DEFAULTOFFSETY));
 		final LabelBlockSubject labelBlock = 
 			new LabelBlockSubject(empty, offset);
+		final GuardActionBlockSubject guardActionBlock = 
+			new GuardActionBlockSubject(null, null, offset);
 		final SplineGeometrySubject spline = 
 			new SplineGeometrySubject(points, SplineKind.INTERPOLATING);
 		final PointGeometrySubject start = new PointGeometrySubject(startPoint);
 		final PointGeometrySubject end = new PointGeometrySubject(endPoint);
 		
-		mCreated =	new EdgeSubject(source, target, labelBlock, null,
+		mCreated =	new EdgeSubject(source, target, labelBlock, guardActionBlock,
                                 spline, start, end);
     }
 

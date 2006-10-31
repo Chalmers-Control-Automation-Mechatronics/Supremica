@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 import javax.swing.JDialog;
 
@@ -13,10 +14,13 @@ import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.Subject;
@@ -28,6 +32,7 @@ import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.subject.module.SplineGeometrySubject;
 import net.sourceforge.waters.xsd.module.SplineKind;
@@ -110,12 +115,19 @@ public class SubjectShapeProducer
         edge.setEndPoint(p);
       }
       if (edge.getLabelBlock().getGeometry() == null) {
-        LabelGeometrySubject offset =
-          new LabelGeometrySubject
-            (new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
-                       LabelBlockProxyShape.DEFAULTOFFSETY));
-        edge.getLabelBlock().setGeometry(offset);
-      }
+          LabelGeometrySubject offset =
+            new LabelGeometrySubject
+              (new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
+                         LabelBlockProxyShape.DEFAULTOFFSETY));
+          edge.getLabelBlock().setGeometry(offset);
+        }
+     /* if (edge.getGuardActionBlock().getGeometry() == null) {
+          LabelGeometrySubject offset =
+            new LabelGeometrySubject
+              (new Point(GuardActionBlockProxyShape.DEFAULTOFFSETX,
+            		  		(int) edge.getLabelBlock().getGeometry().getOffset().getY() + 0));
+          edge.getGuardActionBlock().setGeometry(offset);
+        }*/
     }
     if (runEmbedder) {
       final SimpleComponentSubject comp =
@@ -160,6 +172,7 @@ public class SubjectShapeProducer
 	{
 		getMap().remove(edge);
 		removeMapping(edge.getLabelBlock());
+		removeMapping(edge.getGuardActionBlock());
 	}
 
 	private void removeMapping(LabelBlockProxy label)
@@ -168,6 +181,21 @@ public class SubjectShapeProducer
 		for (Proxy p : label.getEventList())
 		{
 			getMap().remove(p);
+		}
+	}
+	
+	private void removeMapping(GuardActionBlockProxy GA)
+	{
+		getMap().remove(GA);
+		for(BinaryExpressionProxy action : GA.getActions())
+		{
+			getMap().remove(GA.getActions());
+		}
+		List<SimpleExpressionProxy> guards = GA.getGuards();
+		if(!guards.isEmpty())
+		{
+			SimpleExpressionProxy guard = guards.get(0);
+			getMap().remove(guard);
 		}
 	}
 
@@ -188,6 +216,10 @@ public class SubjectShapeProducer
 		if (subject instanceof LabelBlockProxy)
 		{
 			removeMapping((LabelBlockProxy)subject);
+		}
+		if (subject instanceof GuardActionBlockProxy)
+		{
+			removeMapping((GuardActionBlockProxy)subject);	
 		}
 	}
 
