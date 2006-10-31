@@ -1,6 +1,7 @@
 There is currently no real bug-tracking system for Supremica/Waters... we should start a new one! 
 
- * Problem in Waters when using non-UTF-8 characters in state names (едц fцr example). Saved files can not be opened.
+ * In the IDE, if a file is opened, then changed outside the IDE and then opened again in IDE, the change can not be seen! The DocumentManager caches too much?
+ * Problem in the IDE when using non-UTF-8 characters in state names (едц fцr example). Saved files can not be opened.
  * Monolithic Synthesis does not remove non-reachable states which it should (why not?).
 
 Previously, all bugs were reported and stored in the bug database, http://www.supremica.org/bugtracking, but this is no longer the case. 
