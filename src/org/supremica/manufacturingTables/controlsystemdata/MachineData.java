@@ -62,7 +62,7 @@ package org.supremica.manufacturingTables.controlsystemdata;
 import java.util.List;
 import java.util.LinkedList;
 
-public class Machine implements EquipmentContainer
+public class MachineData implements EquipmentContainer
 {
     static final String [] TYPES = {"Conveyor", "Robot", "Memory", "Fixture", "TurnTable", "Other"};
     private String name;
@@ -78,7 +78,7 @@ public class Machine implements EquipmentContainer
     private MachineController machineController;
     private boolean ownControlSystem;
 
-    public Machine(String name, String type, MachineController machineController, Mailbox mailbox, boolean ownControlSystem)
+    public MachineData(String name, String type, MachineController machineController, Mailbox mailbox, boolean ownControlSystem)
     {
 	this.name = name;
 
@@ -157,7 +157,7 @@ public class Machine implements EquipmentContainer
 	return variables;
     }
   
-    public void addVariable(Variable variableToAdd)
+    public void addVariable(VariableData variableToAdd)
     {
 	variables.add(variableToAdd);
     }

@@ -48,8 +48,8 @@
  */
 
 /**
- * The SOPPredecessor contains a machine name and the operationNbr in that machine that has to be performed 
- * before the SOP can continue.
+ * The COPPredecessor contains a machine name and the operationNbr in that machine that has to be performed 
+ * before the COP can continue.
  *
  * Created: Wed Jun  08 13:40:13 2006
  *
@@ -58,12 +58,12 @@
  */
 package org.supremica.manufacturingTables.controlsystemimplementation.Java;
 
-public class SOPPredecessor implements Cloneable
+public class COPPredecessor implements Cloneable
 {
     private int operation;
     private String machine;
 
-    public SOPPredecessor(int operation, String machine)
+    public COPPredecessor(int operation, String machine)
     {
 	this.operation = operation;
 	this.machine = machine;
@@ -86,21 +86,21 @@ public class SOPPredecessor implements Cloneable
 	return (String) (machine + operation);
     }
 
-    public boolean equals(SOPPredecessor predecessorToCompare)
+    public boolean equals(COPPredecessor predecessorToCompare)
     {
 	return (operation == predecessorToCompare.getOperation()) && machine.equals(predecessorToCompare.getMachine());
     }
     
     public Object clone() 
     {
-	SOPPredecessor clone = null;
+	COPPredecessor clone = null;
 	try
 	    {
-		clone =(SOPPredecessor) super.clone(); // Create space and clone the trivial data (all are)
+		clone =(COPPredecessor) super.clone(); // Create space and clone the trivial data (all are)
 	    }
 	catch (CloneNotSupportedException e)
 	    {
-		System.err.println("The SOPPredecessor could not be cloned!");
+		System.err.println("The COPPredecessor could not be cloned!");
 	    } 
 	return clone;
     }

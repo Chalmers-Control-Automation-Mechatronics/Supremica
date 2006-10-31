@@ -49,7 +49,7 @@
 
 /**
  * The Coordinator class sends EOPNumbers to the Machines, via a mailbox,
- * according to the SOP for the current task.
+ * according to the COP for the current task.
  *
  * Created: Mon Apr  24 14:20:32 2006
  *
@@ -82,24 +82,24 @@ public class Coordinator implements Listener
 	machineCoordinatorsStarted = new HashMap<String, Boolean>(); 
     }
 
-    // When a SOP shall be registerad by the Coordinator, a new MachineCoordinator is created if it has not
-    // already been created. Then the SOP is set to that MachineCoordinator. This makes it easy in the future to 
-    // distinguish between different SOPs for different products. The Coordinator hence can communicate with the
+    // When a COP shall be registerad by the Coordinator, a new MachineCoordinator is created if it has not
+    // already been created. Then the COP is set to that MachineCoordinator. This makes it easy in the future to 
+    // distinguish between different COPs for different products. The Coordinator hence can communicate with the
     // machineCoordinators both directly and via the mailbox, which may be a little strange. This is also done
     // to make it easy in the future to make the MachineCoordinator a part of the machine or to make it only a part 
     // of the cell and remove / not use the message handling.
-    public void registerSOP(SOP SOP)
+    public void registerCOP(COP COP)
     {
-	if ( !machineCoordinators.containsKey( SOP.getMachine() ) )
+	if ( !machineCoordinators.containsKey( COP.getMachine() ) )
 	{
-	    MachineCoordinator machineCoordinator = new MachineCoordinator(SOP.getMachine(), mailbox);
-	    machineCoordinator.setSOP(SOP);
+	    MachineCoordinator machineCoordinator = new MachineCoordinator(COP.getMachine(), mailbox);
+	    machineCoordinator.setCOP(COP);
 	    machineCoordinators.put(machineCoordinator.getID(), machineCoordinator);
 	}
 	else
 	{
-	    System.err.println( "The SOP for machine " + SOP.getMachine() + " is changed to " + SOP.getID() );
-	    machineCoordinators.get( SOP.getMachine() ).setSOP( SOP );
+	    System.err.println( "The COP for machine " + COP.getMachine() + " is changed to " + COP.getID() );
+	    machineCoordinators.get( COP.getMachine() ).setCOP( COP );
 	}
     }
 
@@ -109,7 +109,7 @@ public class Coordinator implements Listener
 	    {
 		performsTask = true;
 		//testrad
-		// mailbox.send( new Message( ID, "Coordinator150R3325", "performSOP", "weld floor" ) );
+		// mailbox.send( new Message( ID, "Coordinator150R3325", "performCOP", "weld floor" ) );
 
 		// Register that the machines are started. Has to be handled separate from starting the machines /
 		// machineCoordinators since otherwise the machineCoordinatorsStarted map could be empty (making us believe 		// that we are done) when only a few machines has been started and finished.
@@ -120,7 +120,7 @@ public class Coordinator implements Listener
 		
 		for (MachineCoordinator machineCoordinator : machineCoordinators.values())
 		{
-		    mailbox.send( new Message( ID, machineCoordinator.getID(), "performSOP", "weld floor" ) );
+		    mailbox.send( new Message( ID, machineCoordinator.getID(), "performCOP", "weld floor" ) );
 		    // Otherwise the machinecoordinators start() method could be called
 		}
 	    }
@@ -133,13 +133,13 @@ public class Coordinator implements Listener
     // Do not need to check if the message is for me since it allways is!
     public void receiveMessage(Message msg)
     {
-	if (performsTask && msg.getType().equals("SOPDone"))
+	if (performsTask && msg.getType().equals("COPDone"))
 	{
 	    if (((Boolean) msg.getContent()).booleanValue())
 	    {
 		    if (machineCoordinatorsStarted.containsKey(msg.getSender()))
 		    {
-			System.err.println("The SOP for machine " + machineCoordinators.get(msg.getSender()).getMachine() + " has been performed with outstanding results!");
+			System.err.println("The COP for machine " + machineCoordinators.get(msg.getSender()).getMachine() + " has been performed with outstanding results!");
 			machineCoordinatorsStarted.remove(msg.getSender());
 		    }
 		    else
@@ -149,7 +149,7 @@ public class Coordinator implements Listener
 	    }
 	    else
 	    {
-		System.out.println("The SOP could not be performed!");
+		System.out.println("The COP could not be performed!");
 		Boolean temp = machineCoordinatorsStarted.get(msg.getSender());
 		temp = Boolean.FALSE; // do not know why I have to separate this two lines
 	    }

@@ -73,12 +73,15 @@ import java.util.Iterator;
 public class Main
 {
     // Reads input arguments from the command line.
-    // The first argument is the xml file containing the factory description and the second argument is the file 
+    // The first argument is the xml file containing the factory description and the second argument is the file
     // path/directory.
-    // All eop and sop files in this directory that (".eop" or ".sop" files) are read. 
+    // All eop and cop files in this directory that (".eop" or ".cop" files) are read.
     public static void main(String[] args)
+    	throws Exception
     {
-	System.err.println("main function entered");
+	try
+	{
+	    System.err.println("main function entered");
 	String path = null;
 	if (args.length >= 2)
 	    {
@@ -88,29 +91,29 @@ public class Main
 	    {
 		String fileName = args[0];
 		Loader loader = new Loader();
-		FactoryType factory = (FactoryType) loader.loadFactory(path, fileName);
+		Factory factory = (Factory) loader.loadFactory(path, fileName);
 		//AutomationObjectsPLCProgramBuilder plcProgramBuilder = new AutomationObjectsPLCProgramBuilder();
 		//plcProgramBuilder.buildPLCProgram(factory);
 		ControlSystemDataBuilder plcDataBuilder = new ControlSystemDataBuilder();
 		plcDataBuilder.buildPLCData(factory);
-		
+
 		String[] fileNames = (new File(path)).list();
 		for (int i = 0; i < fileNames.length; i++)
 		{
 		    if (fileNames[i].toLowerCase().startsWith("eop"))
 		    {
 			System.out.println("File: " + fileNames[i]);
-			OperationType eop = (OperationType) loader.loadEOP(path, fileNames[i]);
+			org.supremica.manufacturingTables.xsd.eop.Operation eop = (org.supremica.manufacturingTables.xsd.eop.Operation) loader.loadEOP(path, fileNames[i]);
 			plcDataBuilder.buildEOP(eop);
 		    }
-		    else if (fileNames[i].toLowerCase().startsWith("sop"))
+		    else if (fileNames[i].toLowerCase().startsWith("cop"))
 		    {
 			System.out.println("File: " + fileNames[i]);
-			ROPType sop = (ROPType) loader.loadSOP(path, fileNames[i]);
-			plcDataBuilder.buildSOP(sop);
+			ROP cop = (ROP) loader.loadCOP(path, fileNames[i]);
+			plcDataBuilder.buildCOP(cop);
 		    }
 		}
-		
+
 		// build EOPs
 		for (int i = 2; i < args.length; i++)
 		    {
@@ -119,7 +122,7 @@ public class Main
 		    }
 
 		ManufacturingCell cell = plcDataBuilder.getManufacturingCell();
-		
+
 
 		ControlSystemImplementationBuilder javaPLCProgramBuilder = new JavaControlSystemImplementationBuilder();
 		javaPLCProgramBuilder.createNewPLCProgram(cell);
@@ -127,18 +130,24 @@ public class Main
 		PLCProgram plcProgram = javaPLCProgramBuilder.getPLCProgram();
 		System.err.println("Time to run the PLCProgram!");
 		plcProgram.run();
-    
 
-		
-		
-		
 
-		
+
+
+
+
+
 
 	    }
 	else
 	    {
 		System.err.println("You must enter a fileName and optionally a path!");
 	    }
+	}
+	catch (Exception e)
+	{
+		e.printStackTrace();
+	}
     }
+
 }

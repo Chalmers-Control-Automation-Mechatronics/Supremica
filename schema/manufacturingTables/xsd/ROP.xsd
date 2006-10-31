@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema 
 	xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="1.0"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0"
 	elementFormDefault="qualified"
 	attributeFormDefault="unqualified"
 	version="1.0">  
@@ -10,7 +10,7 @@
  <xs:simpleType name="ROPType">
   <xs:restriction base="xs:string">
    <xs:enumeration value="ROP"/>
-   <xs:enumeration value="SOP"/>
+   <xs:enumeration value="COP"/>
   </xs:restriction>
  </xs:simpleType>
 
@@ -23,7 +23,7 @@
  <!-- Definition of simple elements ________________________________-->
  <xs:element name="Comment" type="xs:string"/>
  <xs:element name="Machine" type="xs:string"/>
- <xs:element name="Operation" type="xs:positiveInteger"/>
+ <xs:element name="Operation" type="xs:string"/>
 
 
  <!-- Definition of attributes _____________________________________-->

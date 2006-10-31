@@ -69,7 +69,7 @@ public class ManufacturingCell
     private String name;
     private String description;
     private Map machines; // HashMap will be used for quick access to the machines when registering EOPs
-    private List SOPs; // The order for the SOPs are not important but I allways iterate through all elements in the list.
+    private List COPs; // The order for the COPs are not important but I allways iterate through all elements in the list.
     private List<ZoneData> zones; // -||-
 
     private Mailbox mailbox;
@@ -83,7 +83,7 @@ public class ManufacturingCell
 	description = null;
 	machines = new HashMap();  //default capacity (16) and load factor (0,75) suits me fine
 	this.mailbox = mailbox;
-	SOPs = new LinkedList();
+	COPs = new LinkedList();
 	zones = new LinkedList<ZoneData>();
     }
 
@@ -127,24 +127,24 @@ public class ManufacturingCell
 	return machines;
     }
     
-    public Machine getMachine(String machineName)
+    public MachineData getMachine(String machineName)
     {
-	return (Machine) machines.get(machineName);
+	return (MachineData) machines.get(machineName);
     }
     
-    public void addMachine(Machine machineToAdd)
+    public void addMachine(MachineData machineToAdd)
     {
 	machines.put(machineToAdd.getName(), machineToAdd);
     }
 
-    public void registerSOP(SOPData SOPData)
+    public void registerCOP(COPData COPData)
     {
-	SOPs.add(SOPData);
+	COPs.add(COPData);
     }
 
-    public List getSOPs()
+    public List getCOPs()
     {
-	return SOPs;
+	return COPs;
     }
 
 }

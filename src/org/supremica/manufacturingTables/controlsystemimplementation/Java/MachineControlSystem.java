@@ -84,7 +84,7 @@ public class MachineControlSystem extends MachineController implements Listener
     
     public boolean performEOP(int EOPNbr)
     {
-	// The line below can be changed to test only the SOPs and not perform the actual EOPs
+	// The line below can be changed to test only the COPs and not perform the actual EOPs
 	if (EOPNbr==0)
 	    return true;
 

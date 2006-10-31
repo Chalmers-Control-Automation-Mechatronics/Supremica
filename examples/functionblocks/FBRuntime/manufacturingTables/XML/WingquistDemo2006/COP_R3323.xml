@@ -1,0 +1,22 @@
+<ROP id="R3323 V70" type="COP">
+    <Machine>R3323</Machine>
+    <Comment></Comment>
+    <Relation type ="Sequence">   
+       <Activity>	
+            <Operation>WeldSeg1rob2</Operation> 	
+        </Activity>
+        
+        <Activity>
+	    <Precondition>
+		<Predecessor>
+		     <Machine>FIX151</Machine>
+		     <Operation>FixtureBackward</Operation>
+		</Predecessor>	    
+	    </Precondition>	
+            <Operation>WeldSeg3rob2</Operation> 	
+        </Activity>
+    </Relation>
+</ROP>
+
+
+

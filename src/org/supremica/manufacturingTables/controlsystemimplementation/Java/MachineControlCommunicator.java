@@ -78,9 +78,11 @@ public class MachineControlCommunicator extends MachineController
     
     public boolean performEOP(int EOPNbr)
     {
-	// The line below can be changed to test only the SOPs and not perform the actual EOPs
+	// The line below can be changed to test only the COPs and not perform the actual EOPs
 	if (EOPNbr==0)
 	    return true;
+
+
 	EOPPerformedOK = false; // this means that if the EOP is empty, a false will be returned
 
 	List<EOP> EOPList = EOPs.get(EOPNbr);

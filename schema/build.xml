@@ -13,10 +13,15 @@
           <pathelement location="${lib}/jaxb-xjc.jar" />
 	  <pathelement location="${lib}/jaxb-api.jar" />
 	  <pathelement location="${lib}/jaxb-impl.jar" />
-	  <pathelement location="${lib}/jaxb-libs.jar" />
+	  <!--pathelement location="${lib}/jaxb-libs.jar" /-->
 	  <pathelement location="${lib}/jaxp.jar" />
-	  <pathelement location="${lib}/relaxngDatatype.jar" />
+	  <!--pathelement location="${lib}/old_relaxngDatatype.jar" /-->
 	  <pathelement location="${lib}/xsdlib.jar" />
+         
+          <!-- New files due to the JAXB upgrade /-->        
+          <pathelement location="${lib}/activation.jar"/>
+          <pathelement location="${lib}/jsr173_api.jar"/>
+
 	</classpath>
   </taskdef>
 

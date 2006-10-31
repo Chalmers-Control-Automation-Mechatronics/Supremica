@@ -97,64 +97,64 @@ public class JavaControlSystemImplementationBuilder extends ControlSystemImpleme
 	// Description
 	((PLCProgramJava) plcProgram).setDescription(cell.getDescription()); // (could be null)
 
-	// SOPs
+	// COPs
 	// A HashMap is used to store all activities for each machine for fast and easy access later when adding 
-	// successors at the appropriate places. For now I assume that we have only one SOP per Machine! 
-	Map< String, Map< String, org.supremica.manufacturingTables.controlsystemimplementation.Java.SOPActivity > > machinesActivities = new HashMap< String, Map< String, org.supremica.manufacturingTables.controlsystemimplementation.Java.SOPActivity > >();
-	for (Iterator SOPIter = cell.getSOPs().iterator(); SOPIter.hasNext();)
+	// successors at the appropriate places. For now I assume that we have only one COP per Machine! 
+	Map< String, Map< String, org.supremica.manufacturingTables.controlsystemimplementation.Java.COPActivity > > machinesActivities = new HashMap< String, Map< String, org.supremica.manufacturingTables.controlsystemimplementation.Java.COPActivity > >();
+	for (Iterator COPIter = cell.getCOPs().iterator(); COPIter.hasNext();)
 	{
-	    // As mentioned above a HashMap is used for each Machine/SOP to store all the activities for fast and 
+	    // As mentioned above a HashMap is used for each Machine/COP to store all the activities for fast and 
 	    // easy access.
-	    Map<String, org.supremica.manufacturingTables.controlsystemimplementation.Java.SOPActivity> activities = new HashMap<String, org.supremica.manufacturingTables.controlsystemimplementation.Java.SOPActivity>();
+	    Map<String, org.supremica.manufacturingTables.controlsystemimplementation.Java.COPActivity> activities = new HashMap<String, org.supremica.manufacturingTables.controlsystemimplementation.Java.COPActivity>();
 	    
-	    SOPData SOPData = (SOPData) SOPIter.next();
-	    SOP SOP = new SOP(SOPData.getId(), SOPData.getMachine());
-	    SOP.setComment(SOPData.getComment());
-	    //SOP Activities
-	    for (Iterator activityIter = SOPData.getSOPActivities().iterator(); activityIter.hasNext();)
+	    COPData COPData = (COPData) COPIter.next();
+	    COP COP = new COP(COPData.getId(), COPData.getMachine());
+	    COP.setComment(COPData.getComment());
+	    //COP Activities
+	    for (Iterator activityIter = COPData.getCOPActivities().iterator(); activityIter.hasNext();)
 	    {
-		org.supremica.manufacturingTables.controlsystemdata.SOPActivity SOPActivityData = (org.supremica.manufacturingTables.controlsystemdata.SOPActivity) activityIter.next();
-		org.supremica.manufacturingTables.controlsystemimplementation.Java.SOPActivity SOPActivity = new org.supremica.manufacturingTables.controlsystemimplementation.Java.SOPActivity(SOPActivityData.getOperation());
+		org.supremica.manufacturingTables.controlsystemdata.COPActivity COPActivityData = (org.supremica.manufacturingTables.controlsystemdata.COPActivity) activityIter.next();
+		org.supremica.manufacturingTables.controlsystemimplementation.Java.COPActivity COPActivity = new org.supremica.manufacturingTables.controlsystemimplementation.Java.COPActivity(COPActivityData.getOperation());
 		// Add activity to hashmap
-		activities.put(String.valueOf(SOPActivity.getOperation()), SOPActivity);
+		activities.put(String.valueOf(COPActivity.getOperation()), COPActivity);
 		// Predecessors
-		for (Iterator predecessorIter = SOPActivityData.getPredecessors().iterator(); predecessorIter.hasNext();)
+		for (Iterator predecessorIter = COPActivityData.getPredecessors().iterator(); predecessorIter.hasNext();)
 		{
 		    Predecessor predecessorData = (Predecessor) predecessorIter.next();
-		    SOPPredecessor predecessor = new SOPPredecessor( predecessorData.getOperation(), predecessorData.getMachine() );
+		    COPPredecessor predecessor = new COPPredecessor( predecessorData.getOperation(), predecessorData.getMachine() );
 		    // Add predecesor
-		    SOPActivity.addPredecessor(predecessor);
+		    COPActivity.addPredecessor(predecessor);
 		    // Create an Hashmap
 		}
 		// Add activity
-		SOP.addSOPActivity(SOPActivity);
+		COP.addCOPActivity(COPActivity);
 	    }
-	    // Register SOP to Coordinator
-	    coordinator.registerSOP(SOP);
+	    // Register COP to Coordinator
+	    coordinator.registerCOP(COP);
 	    // Add activity map to hashmap with all activities for all machines
-	    machinesActivities.put(SOP.getMachine(), activities);
+	    machinesActivities.put(COP.getMachine(), activities);
 	}
-	// Now when all SOPs are added we will iterate through them again and add successors where appropriate
+	// Now when all COPs are added we will iterate through them again and add successors where appropriate
 	for (Iterator machineIter = machinesActivities.entrySet().iterator(); machineIter.hasNext();)
 	{
 	    Entry entry = (Entry) machineIter.next();
-	    Map<String, org.supremica.manufacturingTables.controlsystemimplementation.Java.SOPActivity> activities = (Map<String, org.supremica.manufacturingTables.controlsystemimplementation.Java.SOPActivity>) entry.getValue();
+	    Map<String, org.supremica.manufacturingTables.controlsystemimplementation.Java.COPActivity> activities = (Map<String, org.supremica.manufacturingTables.controlsystemimplementation.Java.COPActivity>) entry.getValue();
 	    String machine = (String) entry.getKey();
-	    for (org.supremica.manufacturingTables.controlsystemimplementation.Java.SOPActivity activity : activities.values())
+	    for (org.supremica.manufacturingTables.controlsystemimplementation.Java.COPActivity activity : activities.values())
 	    {
-		for (SOPPredecessor predecessor : activity.getPredecessors())
+		for (COPPredecessor predecessor : activity.getPredecessors())
 		{
 		    if ( machinesActivities.containsKey( predecessor.getMachine() ) && machinesActivities.get( predecessor.getMachine() ).containsKey( String.valueOf( predecessor.getOperation() ) ) )
 		    {
 			// && means that the second criteria will not be tested if the first one is not fullfilled 
 			// otherwise this would lead to a nullpointerException 
-			org.supremica.manufacturingTables.controlsystemimplementation.Java.SOPActivity predActivity = machinesActivities.get( predecessor.getMachine() ).get( String.valueOf( predecessor.getOperation() ) );
-			predActivity.addSuccessor( new SOPSuccessor( activity.getOperation(), machine ) );
+			org.supremica.manufacturingTables.controlsystemimplementation.Java.COPActivity predActivity = machinesActivities.get( predecessor.getMachine() ).get( String.valueOf( predecessor.getOperation() ) );
+			predActivity.addSuccessor( new COPSuccessor( activity.getOperation(), machine ) );
 			System.out.println("Adding successor " + machine + ", " + activity.getOperation() + " to " + predecessor.getMachine() + ", " + predActivity.getOperation());   
 		    }
 		    else
 		    {
-			System.err.print("No SOP found for machine " + predecessor.getMachine() + " or the predecessing activity for operation " +  predecessor.getOperation() + " was not found!");	 
+			System.err.print("No COP found for machine " + predecessor.getMachine() + " or the predecessing activity for operation " +  predecessor.getOperation() + " was not found!");	 
 			System.err.println(" (The current activity (operation) and machine is: " +  activity.getOperation() + ", " + machine + ")");  
 			
 		    }
@@ -167,9 +167,9 @@ public class JavaControlSystemImplementationBuilder extends ControlSystemImpleme
 	Map machines = cell.getMachines();
 	for (Iterator machineIter = machines.values().iterator(); machineIter.hasNext();)
 	{
-	    org.supremica.manufacturingTables.controlsystemdata.Machine machineData = (org.supremica.manufacturingTables.controlsystemdata.Machine) machineIter.next();
+	    MachineData machineData = (MachineData) machineIter.next();
 	    
-	    org.supremica.manufacturingTables.controlsystemimplementation.Java.Machine machine; 
+	    Machine machine; 
 	    org.supremica.manufacturingTables.controlsystemimplementation.Java.MachineController machineController;
 	    org.supremica.manufacturingTables.controlsystemimplementation.Java.Mailbox machineMailbox = null;
 	    // Check if the machine has own control system
@@ -193,7 +193,7 @@ public class JavaControlSystemImplementationBuilder extends ControlSystemImpleme
 		machineMailbox = new  org.supremica.manufacturingTables.controlsystemimplementation.Java.Mailbox(); //then you shall register() listeners to the mailbox? 
 		machineController = new org.supremica.manufacturingTables.controlsystemimplementation.Java.MachineControlSystem(machineMailbox);
 		
-		machine = new org.supremica.manufacturingTables.controlsystemimplementation.Java.Machine(machineData.getName(), machineData.getDescription(), machineController, plcProgramMailbox);
+		machine = new Machine(machineData.getName(), machineData.getDescription(), machineController, plcProgramMailbox);
 		System.err.println("Creating Java PLCCode for machine: " + machineData.getName());
 	    }
 	    
@@ -378,8 +378,8 @@ public class JavaControlSystemImplementationBuilder extends ControlSystemImpleme
 		List variables = machineData.getVariables();
 		for (Iterator variableIter = variables.iterator(); variableIter.hasNext();)
 		{
-		    org.supremica.manufacturingTables.controlsystemdata.Variable variableData = (org.supremica.manufacturingTables.controlsystemdata.Variable) variableIter.next();
-		    org.supremica.manufacturingTables.controlsystemimplementation.Java.Variable variable = new org.supremica.manufacturingTables.controlsystemimplementation.Java.Variable(variableData.getName(), machineMailbox);
+		    VariableData variableData = (VariableData) variableIter.next();
+		    Variable variable = new Variable(variableData.getName(), machineMailbox);
 		    
 		    // Values
 		    List values = variableData.getValues();

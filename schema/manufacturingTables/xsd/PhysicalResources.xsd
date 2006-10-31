@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema 
 	xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="1.0"
 	elementFormDefault="qualified"
 	attributeFormDefault="unqualified"
 	version="1.0">  
@@ -48,11 +48,8 @@
 
 
  <!-- Definition of simple elements ________________________________-->
- <xs:element name="Value" type="xs:string"/>
- <xs:element name="InitialValue" type="xs:string"/>
  <xs:element name="State" type="xs:string"/>
  <xs:element name="Description" type="xs:string"/>
- <xs:element name="Zone" type="xs:string"/>
 
 
 
@@ -97,22 +94,9 @@
   <xs:complexType>
    <xs:sequence>
    <xs:element ref="Description" minOccurs="0" maxOccurs="1"/>
-   <!-- Variables shall only exist on machine-level where all are considered semiglobale, i.e. readable from other machines-->
-   <!--xs:element ref="Variable" minOccurs="0" maxOccurs="unbounded"/-->
-   <!-- Equipment does not exist on this level, i.e. they are machines-->
-   <!--xs:element ref="Equipment" minOccurs="0" maxOccurs="1"/-->
-   <xs:element ref="Zones" minOccurs="0" maxOccurs="1"/>
    <xs:element ref="Machines" minOccurs="1" maxOccurs="1"/>
    </xs:sequence>  
    <xs:attribute name="name" type="nameType" use="required"/>
-  </xs:complexType>
- </xs:element>
-
- <xs:element name="Zones">
-  <xs:complexType>
-   <xs:sequence>
-   <xs:element ref="Zone" minOccurs="1" maxOccurs="unbounded"/>
-   </xs:sequence>  
   </xs:complexType>
  </xs:element>
 
@@ -128,12 +112,11 @@
   <xs:complexType>
    <xs:sequence>
    <xs:element ref="Description" minOccurs="0" maxOccurs="1"/>
-   <xs:element ref="Variables" minOccurs="0" maxOccurs="1"/>
    <xs:element ref="Equipment" minOccurs="0" maxOccurs="1"/>
    </xs:sequence>  
    <xs:attribute name="type" type="machineType" use="required"/>
    <xs:attribute name="name" type="nameType" use="required"/>
-   <xs:attribute name="ownControlSystem" type="controlSystemType" use="required"/>
+   <xs:attribute name="hasOwnControlSystem" type="controlSystemType" use="required"/>
   </xs:complexType>
  </xs:element>
 
@@ -141,32 +124,6 @@
   <xs:complexType>
    <xs:sequence>
    <xs:element ref="EquipmentEntity" minOccurs="1" maxOccurs="unbounded"/>
-   </xs:sequence>  
-  </xs:complexType>
- </xs:element>
-
- <xs:element name="Variables">
-  <xs:complexType>
-   <xs:sequence>
-   <xs:element ref="Variable" minOccurs="1" maxOccurs="unbounded"/>
-   </xs:sequence>  
-  </xs:complexType>
- </xs:element>
-
- <xs:element name="Variable">
-  <xs:complexType>
-   <xs:sequence>
-   <xs:element ref="Values" minOccurs="1" maxOccurs="1"/>
-   <xs:element ref="InitialValue" minOccurs="1" maxOccurs="1"/>
-   </xs:sequence>  
-   <xs:attribute name="name" type="nameType" use="required"/>
-  </xs:complexType>
- </xs:element>
-
- <xs:element name="Values">
-  <xs:complexType>
-   <xs:sequence>
-   <xs:element ref="Value" minOccurs="1" maxOccurs="unbounded"/>
    </xs:sequence>  
   </xs:complexType>
  </xs:element>

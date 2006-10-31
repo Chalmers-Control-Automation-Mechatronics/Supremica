@@ -48,8 +48,8 @@
  */
 
 /**
- * The Predecessor contains a machine name and the operationNbr in that machine that has to be performed 
- * before the SOP can continue.
+ * The COPActivity contains (optional) preconditions for operations in other machines, and 
+ * then always an operation for the corresponding COPs machine that has to be performed.
  *
  * Created: Wed Jun  08 13:40:13 2006
  *
@@ -58,15 +58,23 @@
  */
 package org.supremica.manufacturingTables.controlsystemimplementation.Java;
 
-public class SOPSuccessor
+import java.util.List;
+import java.util.LinkedList;
+
+public class COPActivity
 {
     private int operation;
-    private String machine;
-
-    public SOPSuccessor(int operation, String machine)
+    private List<COPPredecessor> predecessors; 
+    // List of predecessors. For now I assume that all predecessors has to be performed to begin the operation, 
+    // i.e. I assume a logical "and" relation between the predecessors. There may be other logical expressions 
+    // in the future. For now the order is not important but I still use lists.
+    private List<COPSuccessor> successors;
+    
+    public COPActivity(int operation)
     {
 	this.operation = operation;
-	this.machine = machine;
+	predecessors = new LinkedList<COPPredecessor>();
+	successors = new LinkedList<COPSuccessor>();
     }
 
     public int getOperation()
@@ -74,9 +82,35 @@ public class SOPSuccessor
 	return operation;
     }
 
-    public String getMachine()
+    public List<COPPredecessor> getPredecessors()
     {
-	return machine;
+	return predecessors;
     }
 
+    // Add a new predecessor to the list.
+    public void addPredecessor(COPPredecessor predecessorToAdd)
+    {
+	predecessors.add(predecessorToAdd);
+    }
+
+    public List<COPSuccessor> getSuccessors()
+    {
+	return successors;
+    }
+
+    // Add a new successor to the list.
+    public void addSuccessor(COPSuccessor successorToAdd)
+    {
+	successors.add(successorToAdd);
+    }
+
+    public boolean hasPredecessors()
+    {
+	return !predecessors.isEmpty();
+    }
+
+    public boolean hasSuccessors()
+    {
+	return !successors.isEmpty();
+    }
 }

@@ -48,8 +48,8 @@
  */
 
 /**
- * The SOP class describes a SOP, Sequence of OPeration, that is to be read by the Coordinator for the 
- * whole manufacturing cell. A SOP contains the order to perform different operations for one machine.
+ * The COP class describes a COP, Sequence of OPeration, that is to be read by the Coordinator for the 
+ * whole manufacturing cell. A COP contains the order to perform different operations for one machine.
  * 
  *
  * Created: Fri Jun  09 09:00:13 2006
@@ -69,10 +69,10 @@ public class MachineCoordinator implements Listener
 {
     private String machine;
     private Mailbox mailbox;
-    private SOPActivity currentActivity;
-    private boolean performsSOP;
-    private SOP currentSOP; // In the future it will be possible with different SOPs
-    private Map<String, SOPPredecessor> predecessorsFulfilled; 
+    private COPActivity currentActivity;
+    private boolean performsCOP;
+    private COP currentCOP; // In the future it will be possible with different COPs
+    private Map<String, COPPredecessor> predecessorsFulfilled; 
     // predecessorsFulfilled is a Map (Hashmap) with the interresting operations (predecessors to 
     // operations this machineCoordinator shall perform) performed by other machines.
  
@@ -80,11 +80,11 @@ public class MachineCoordinator implements Listener
     {
 	this.machine = machine;
 	this.mailbox = mailbox;
-	performsSOP = false;
-	currentSOP = null;
+	performsCOP = false;
+	currentCOP = null;
 	currentActivity = null;
 	mailbox.register(this);
-	predecessorsFulfilled = new HashMap<String, SOPPredecessor>(8); 
+	predecessorsFulfilled = new HashMap<String, COPPredecessor>(8); 
 	// (initital capacity 8 and default load factor (0,75) suits me fine)
 	
     }
@@ -94,9 +94,9 @@ public class MachineCoordinator implements Listener
 	return machine;
     }
 
-    public void setSOP(SOP SOP)
+    public void setCOP(COP COP)
     {
-	currentSOP = SOP;
+	currentCOP = COP;
     }
 
     // This Coordinator has to have a unique id for the message handling.
@@ -107,30 +107,30 @@ public class MachineCoordinator implements Listener
  
     protected void start()
     {
-	if (performsSOP)
+	if (performsCOP)
 	{
-	    System.err.println("Already performing a SOP!");
+	    System.err.println("Already performing a COP!");
 	}
 	else
 	{
-	    performsSOP = true;
-	    currentSOP.start();
-	    if (currentSOP.hasMoreActivities())
+	    performsCOP = true;
+	    currentCOP.start();
+	    if (currentCOP.hasMoreActivities())
 	    {
-		currentActivity = currentSOP.getNextActivity();
-		runSOP();
+		currentActivity = currentCOP.getNextActivity();
+		runCOP();
 	    }
 	}
     }
     
-    private void runSOP()
+    private void runCOP()
     {
 	// testrad
 	// mailbox.send( new Message( getID(), "150R3325", "performEOP", 72 ) );
 
 	if (currentActivity.hasPredecessors())
 	{
-	    for (SOPPredecessor predecessor : currentActivity.getPredecessors())
+	    for (COPPredecessor predecessor : currentActivity.getPredecessors())
 	    {
 		if (predecessorsFulfilled.containsKey(predecessor.getID()))
 		{
@@ -158,42 +158,42 @@ public class MachineCoordinator implements Listener
 	    }
 	    // Now all predecessors are fulfilled. We can not just simply clear the map but must remove the 
 	    // specific predecessors for this current operation
-	    for (SOPPredecessor predecessor : currentActivity.getPredecessors())
+	    for (COPPredecessor predecessor : currentActivity.getPredecessors())
 	    {
 		predecessorsFulfilled.remove(predecessor.getID());
 	    }
 	}
 	
 	// Time to run the operation (EOP)
-	mailbox.send( new Message( getID(), currentSOP.getMachine(), "performEOP", currentActivity.getOperation() ) );
+	mailbox.send( new Message( getID(), currentCOP.getMachine(), "performEOP", currentActivity.getOperation() ) );
 	
 	// Now we will wait for the Machine to report back
     }
 
     public void receiveMessage(Message msg)
     {
-	if (!performsSOP && msg.getType().equals("performSOP"))
+	if (!performsCOP && msg.getType().equals("performCOP"))
 	{
 	    start();
 	}
 	else if (msg.getType().equals("operationDone"))  
-	    // This machines SOP does not have to be started (performsEOP not checked)
+	    // This machines COP does not have to be started (performsEOP not checked)
 	{
-	    SOPPredecessor predecessorDone = (SOPPredecessor) ((SOPPredecessor) msg.getContent()).clone();
+	    COPPredecessor predecessorDone = (COPPredecessor) ((COPPredecessor) msg.getContent()).clone();
 	    predecessorsFulfilled.put(predecessorDone.getID(), predecessorDone);
-	    if (performsSOP) // If we have started
+	    if (performsCOP) // If we have started
 	    {
-		runSOP();
+		runCOP();
 	    }
 	}
-	else if (performsSOP && msg.getType().equals("EOPDone"))
+	else if (performsCOP && msg.getType().equals("EOPDone"))
 	{
 	    if (((Boolean) msg.getContent()).booleanValue())
 	    {
 		System.err.println("The EOP has been performed with outstanding results!");
 
 		// Check if there are successors
-		List<SOPSuccessor> successors = null;
+		List<COPSuccessor> successors = null;
 		int performedOperation = -1;
 		if (currentActivity.hasSuccessors())
 		{
@@ -203,36 +203,36 @@ public class MachineCoordinator implements Listener
 
 		// Check if there are more activities. We have to change the currentActivity before the successors 
 		// are performed, otherwise they can make the current action be done again if they are predecessors to 
-		// some later action in this SOP.
-		if (currentSOP.hasMoreActivities())
+		// some later action in this COP.
+		if (currentCOP.hasMoreActivities())
 		{
-		    currentActivity = currentSOP.getNextActivity();
+		    currentActivity = currentCOP.getNextActivity();
 		}
 		else
 		{
-		    // The complete SOP is done!!
-		    performsSOP = false;
-		    System.out.println("The SOP " + currentSOP.getID() + " is done!");
-		    mailbox.send( new Message( getID(), "Coordinator", "SOPDone", true ) );
+		    // The complete COP is done!!
+		    performsCOP = false;
+		    System.out.println("The COP " + currentCOP.getID() + " is done!");
+		    mailbox.send( new Message( getID(), "Coordinator", "COPDone", true ) );
 		}
 
-		// Handle successors, it is OK to do here after the SOP might be done
+		// Handle successors, it is OK to do here after the COP might be done
 		if (successors != null)
 		{
-		    for (SOPSuccessor successor : successors)
+		    for (COPSuccessor successor : successors)
 		    {
 			// System.err.println("Sending message to machine " +  successor.getMachine() 
 			//   + " that predecessing operation " + performedOperation
 			//   + " in machine " + machine + " is done!"); 
 			mailbox.send( new Message( getID(), "Coordinator" + successor.getMachine(), "operationDone", 
-						   new SOPPredecessor(performedOperation, machine) ) );
+						   new COPPredecessor(performedOperation, machine) ) );
 		    }
 		}
 
 		// If the EOP is still running (not finished) we perform the next operation
-		if (performsSOP)
+		if (performsCOP)
 		{
-		    runSOP();
+		    runCOP();
 		}
 
 	    }
@@ -240,8 +240,8 @@ public class MachineCoordinator implements Listener
 	    {
 		System.err.print("The EOP could not be performed!");
 		System.err.println(" (says message sender: " + msg.getSender() + ")");
-		mailbox.send( new Message( getID(), "Coordinator", "SOPDone", false ) );
-		performsSOP = false;
+		mailbox.send( new Message( getID(), "Coordinator", "COPDone", false ) );
+		performsCOP = false;
 	    }
 	}
 	else

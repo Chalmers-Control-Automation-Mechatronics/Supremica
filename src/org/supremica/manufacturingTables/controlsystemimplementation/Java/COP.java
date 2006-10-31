@@ -48,8 +48,8 @@
  */
 
 /**
- * The SOP class describes a SOP, Sequence of OPeration, that is to be read by the Coordinator for the 
- * whole manufacturing cell. A SOP contains the order to perform different operations for one machine.
+ * The COP class describes a COP, Coordinated OPerations, that is to be read by the Coordinator for the 
+ * whole manufacturing cell. A COP contains the order to perform different operations for one machine.
  * 
  *
  * Created: Fri Jun  09 09:00:13 2006
@@ -63,23 +63,23 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.Iterator;
 
-public class SOP
+public class COP
 {
-    private String id; // The id shall be used when there are different SOPs for the same machine
+    private String id; // The id shall be used when there are different COPs for the same machine
     private String comment;
     private String machine;
-    private List<SOPActivity> activities; 
+    private List<COPActivity> activities; 
     private Iterator activityIterator;
     // List of activities. Each activity contains (optional) preconditions for operations in other machines, and 
-    // then always an operation for this SOPs machine that has to be performed. Last it contains (optional) successors 
+    // then always an operation for this COPs machine that has to be performed. Last it contains (optional) successors 
     // that has to be performed in other machines.
  
-    public SOP(String id, String machine)
+    public COP(String id, String machine)
     {
 	this.id = id;
 	this.machine = machine;
 	comment = null;
-	activities = new LinkedList<SOPActivity>();
+	activities = new LinkedList<COPActivity>();
 	activityIterator = activities.iterator();
   }
 
@@ -103,10 +103,10 @@ public class SOP
 	return id;
     }
  
-    // Add a new SOP activity to the end of the activity list.
-    public void addSOPActivity(SOPActivity SOPActivity)
+    // Add a new COP activity to the end of the activity list.
+    public void addCOPActivity(COPActivity COPActivity)
     {
-	activities.add(SOPActivity);
+	activities.add(COPActivity);
     }
     
     public void start()
@@ -114,13 +114,13 @@ public class SOP
 	activityIterator = activities.iterator();
     }
 
-    // Return true if the SOP has more activities to perform.
+    // Return true if the COP has more activities to perform.
     public boolean hasMoreActivities()
     {
 	return activityIterator.hasNext();
     }
     
-    public SOPActivity getNextActivity()
+    public COPActivity getNextActivity()
     {
 	if (!hasMoreActivities())
 	{
@@ -128,7 +128,7 @@ public class SOP
 	}
 	else
 	{
-	    return (SOPActivity) activityIterator.next(); 
+	    return (COPActivity) activityIterator.next(); 
 	}
     }
     

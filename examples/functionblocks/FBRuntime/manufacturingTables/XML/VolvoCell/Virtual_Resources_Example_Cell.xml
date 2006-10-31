@@ -1,0 +1,47 @@
+<VirtualResources cellName="11-41-150">
+    <Zones>
+        <Zone>1</Zone>
+        <Zone>2</Zone>
+        <Zone>3</Zone>
+        <Zone>4</Zone>
+        <Zone>5</Zone>
+        <Zone>6</Zone>
+        <Zone>7</Zone>
+        <Zone>8</Zone>
+        <Zone>9</Zone>
+        <Zone>10</Zone>
+        <Zone>11</Zone>
+        <Zone>12</Zone>
+    </Zones>
+
+    <Variables>
+        <Variable name="TT153New rack in cell" owner="TT153">
+            <Values>
+                <Value>TRUE</Value>
+                <Value>FALSE</Value>
+            </Values>
+            <InitialValue>TRUE</InitialValue>
+        </Variable>
+        <Variable name="TT154New rack in cell" owner="TT154">
+            <Values>
+                <Value>TRUE</Value>
+                <Value>FALSE</Value>
+            </Values>
+            <InitialValue>TRUE</InitialValue>
+        </Variable>
+
+        <!-- The variables below belongs to the robot control system and shall not be included here>   
+        <Variable name="R3325#parts&gt;0" owner="R3325">
+            <Values>
+                <Value>True</Value>
+                <Value>False</Value>
+            </Values>
+        </Variable>
+        <Variable name="R3325#parts" owner="R3325">
+             ...
+        </Variable>
+        <-->
+
+    </Variables>
+</VirtualResources>
+	

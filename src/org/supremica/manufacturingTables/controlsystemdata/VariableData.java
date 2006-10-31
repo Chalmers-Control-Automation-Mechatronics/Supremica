@@ -48,10 +48,10 @@
  */
 
 /**
- * The SOPActivity contains (optional) preconditions for operations in other machines, and 
- * then always an operation for the corresponding SOPs machine that has to be performed.
+ * The Variable describes some state of a part of the machine and can have a finite number of states.
  *
- * Created: Thu Jun  08 13:40:13 2006
+ *
+ * Created: Mon Apr  24 15:00:32 2006
  *
  * @author Oscar
  * @version 1.0
@@ -61,34 +61,46 @@ package org.supremica.manufacturingTables.controlsystemdata;
 import java.util.List;
 import java.util.LinkedList;
 
-public class SOPActivity
+// Should the values really be Strings and not boolean, integers and so on. Strings may take to much time? 
+// Could use hashvalue too.
+
+public class VariableData
 {
-    private int operation;
-    private List predecessors; 
-    // List of predecessors. For now I assume that all predecessors has to be performed to begin the operation, 
-    // i.e. I assume a logical "and" relation between the predecessors. There may be other logical expressions 
-    // in the future. For now the order is not important but I still use lists.
+    private String name;
+    private String initialValue;
+    private List values; 
+    // The order for the values are not important but I allways iterate through all values.
+    // Normally very few elements are used.
 
-    public SOPActivity(int operation)
+    public VariableData(String name)
     {
-	this.operation = operation;
-	predecessors = new LinkedList();
+	this.name = name;
+	values = new LinkedList();
+	initialValue = null;
     }
 
-    public int getOperation()
+    public String getName()
     {
-	return operation;
+	return name;
+    }
+   
+    public List getValues()
+    {
+	return values;
+    }
+  
+    public void addValue(String valueToAdd)
+    {
+	values.add(valueToAdd);
     }
 
-    public List getPredecessors()
+    public void setInitialValue(String initialValue)
     {
-	return predecessors;
+	this.initialValue = initialValue;
     }
 
-    // Add a new predecessor to the list.
-    public void addPredecessor(Predecessor predecessorToAdd)
+    public String getInitialValue()
     {
-	predecessors.add(predecessorToAdd);
+	return initialValue;
     }
-    
 }

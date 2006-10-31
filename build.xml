@@ -541,17 +541,11 @@ Class-Path: ${manifest.pathlist}</echo>
 <target name="jar_manufacturingTables_jaxb" depends="compile_manufacturingTables_jaxb">
 	<jar jarfile="${lib}/manufacturingTables_jaxb.jar"> 
 		<fileset dir="${build}/">
-			<include name="org/w3/**"/>
 			<include name="org/supremica/manufacturingTables/xsd/**"/>
-		</fileset>
-		<fileset dir="${src}/">
-			<include name="**/*.properties"/>
-			<include name="**/*.ser"/>
 		</fileset>
 	</jar>
 	<delete>
 		<fileset dir="${lib}">
-			<include name="org/w3/**"/>
 			<include name="org/supremica/manufacturingTables/xsd/**"/>
 		</fileset>
 	</delete>

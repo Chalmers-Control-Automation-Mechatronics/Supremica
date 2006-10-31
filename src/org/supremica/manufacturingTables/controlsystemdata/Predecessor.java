@@ -49,7 +49,7 @@
 
 /**
  * The Predecessor contains a machine name and the operationNbr in that machine that has to be performed 
- * before the SOP can continue.
+ * before the COP can continue.
  *
  * Created: Thu Jun  08 13:40:13 2006
  *

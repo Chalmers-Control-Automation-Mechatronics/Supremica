@@ -48,59 +48,35 @@
  */
 
 /**
- * The Variable describes some state of a part of the machine and can have a finite number of states.
+ * The Predecessor contains a machine name and the operationNbr in that machine that has to be performed 
+ * before the COP can continue.
  *
- *
- * Created: Mon Apr  24 15:00:32 2006
+ * Created: Wed Jun  08 13:40:13 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemdata;
+package org.supremica.manufacturingTables.controlsystemimplementation.Java;
 
-import java.util.List;
-import java.util.LinkedList;
-
-// Should the values really be Strings and not boolean, integers and so on. Strings may take to much time? 
-// Could use hashvalue too.
-
-public class Variable
+public class COPSuccessor
 {
-    private String name;
-    private String initialValue;
-    private List values; 
-    // The order for the values are not important but I allways iterate through all values.
-    // Normally very few elements are used.
+    private int operation;
+    private String machine;
 
-    public Variable(String name)
+    public COPSuccessor(int operation, String machine)
     {
-	this.name = name;
-	values = new LinkedList();
-	initialValue = null;
+	this.operation = operation;
+	this.machine = machine;
     }
 
-    public String getName()
+    public int getOperation()
     {
-	return name;
-    }
-   
-    public List getValues()
-    {
-	return values;
-    }
-  
-    public void addValue(String valueToAdd)
-    {
-	values.add(valueToAdd);
+	return operation;
     }
 
-    public void setInitialValue(String initialValue)
+    public String getMachine()
     {
-	this.initialValue = initialValue;
+	return machine;
     }
 
-    public String getInitialValue()
-    {
-	return initialValue;
-    }
 }

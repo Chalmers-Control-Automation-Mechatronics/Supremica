@@ -1,6 +1,6 @@
-﻿<ROP id="CM V70" type="SOP">
+﻿<ROP id="CM V70" type="COP">
     <Machine>CM</Machine>
-    <Comment>Add hock SOP for CM</Comment>
+    <Comment>Add hock COP for CM</Comment>
     <Relation type ="Sequence">
        <Activity>
             <Precondition>
@@ -23,19 +23,19 @@
             <Precondition>
                 <Predecessor>
                      <Machine>R3323</Machine>
-                     <Operation>58</Operation>
+                     <Operation>56</Operation>
                 </Predecessor>	    
                 <Predecessor>
                      <Machine>R3324</Machine>
-                     <Operation>68</Operation>
+                     <Operation>66</Operation>
                 </Predecessor>	    
                 <Predecessor>
                      <Machine>R3325</Machine>
-                     <Operation>83</Operation>
+                     <Operation>81</Operation>
                 </Predecessor>	    
                 <Predecessor>
                      <Machine>R3326</Machine>
-                     <Operation>103</Operation>
+                     <Operation>101</Operation>
                 </Predecessor>	    
             </Precondition>	
             <Operation>3</Operation> 	

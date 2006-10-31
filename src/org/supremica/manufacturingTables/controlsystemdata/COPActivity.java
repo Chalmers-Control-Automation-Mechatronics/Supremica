@@ -48,11 +48,10 @@
  */
 
 /**
- * The SOP class describes a SOP, Sequence of OPeration, that is to be read by the Coordinator for the 
- * whole manufacturing cell. A SOP contains the order to perform different operations for one machine.
- * 
+ * The COPActivity contains (optional) preconditions for operations in other machines, and 
+ * then always an operation for the corresponding COPs machine that has to be performed.
  *
- * Created: Thu Jun  08 09:00:13 2006
+ * Created: Thu Jun  08 13:40:13 2006
  *
  * @author Oscar
  * @version 1.0
@@ -62,52 +61,34 @@ package org.supremica.manufacturingTables.controlsystemdata;
 import java.util.List;
 import java.util.LinkedList;
 
-public class SOPData
+public class COPActivity
 {
-    private String id;
-    private String comment;
-    private String machine;
-    private List activities; 
-    // List of activities. Each activity contains (optional) preconditions for operations in other machines, and 
-    // then always an operation for this SOPs machine that has to be performed.
- 
-    public SOPData(String id, String machine)
+    private int operation;
+    private List predecessors; 
+    // List of predecessors. For now I assume that all predecessors has to be performed to begin the operation, 
+    // i.e. I assume a logical "and" relation between the predecessors. There may be other logical expressions 
+    // in the future. For now the order is not important but I still use lists.
+
+    public COPActivity(int operation)
     {
-	this.id = id;
-	this.machine = machine;
-	comment = null;
-	activities = new LinkedList();
+	this.operation = operation;
+	predecessors = new LinkedList();
     }
 
-    public String getMachine()
+    public int getOperation()
     {
-	return machine;
+	return operation;
     }
 
-    public String getComment()
+    public List getPredecessors()
     {
-	return comment;
+	return predecessors;
     }
 
-    public void setComment(String comment)
+    // Add a new predecessor to the list.
+    public void addPredecessor(Predecessor predecessorToAdd)
     {
-	this.comment = comment;
-    }
-   
-    public String getId()
-    {
-	return id;
-    }
- 
-    // Add a new SOP activity to the end of the activity list.
-    public void addSOPActivity(SOPActivity SOPActivity)
-    {
-	activities.add(SOPActivity);
+	predecessors.add(predecessorToAdd);
     }
     
-    public List getSOPActivities()
-    {
-	return activities;
-    }
-
 }

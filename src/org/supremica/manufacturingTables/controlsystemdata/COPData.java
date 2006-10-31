@@ -48,69 +48,66 @@
  */
 
 /**
- * The SOPActivity contains (optional) preconditions for operations in other machines, and 
- * then always an operation for the corresponding SOPs machine that has to be performed.
+ * The COP class describes a COP, Sequence of OPeration, that is to be read by the Coordinator for the 
+ * whole manufacturing cell. A COP contains the order to perform different operations for one machine.
+ * 
  *
- * Created: Wed Jun  08 13:40:13 2006
+ * Created: Thu Jun  08 09:00:13 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemdata;
 
 import java.util.List;
 import java.util.LinkedList;
 
-public class SOPActivity
+public class COPData
 {
-    private int operation;
-    private List<SOPPredecessor> predecessors; 
-    // List of predecessors. For now I assume that all predecessors has to be performed to begin the operation, 
-    // i.e. I assume a logical "and" relation between the predecessors. There may be other logical expressions 
-    // in the future. For now the order is not important but I still use lists.
-    private List<SOPSuccessor> successors;
+    private String id;
+    private String comment;
+    private String machine;
+    private List activities; 
+    // List of activities. Each activity contains (optional) preconditions for operations in other machines, and 
+    // then always an operation for this COPs machine that has to be performed.
+ 
+    public COPData(String id, String machine)
+    {
+	this.id = id;
+	this.machine = machine;
+	comment = null;
+	activities = new LinkedList();
+    }
+
+    public String getMachine()
+    {
+	return machine;
+    }
+
+    public String getComment()
+    {
+	return comment;
+    }
+
+    public void setComment(String comment)
+    {
+	this.comment = comment;
+    }
+   
+    public String getId()
+    {
+	return id;
+    }
+ 
+    // Add a new COP activity to the end of the activity list.
+    public void addCOPActivity(COPActivity COPActivity)
+    {
+	activities.add(COPActivity);
+    }
     
-    public SOPActivity(int operation)
+    public List getCOPActivities()
     {
-	this.operation = operation;
-	predecessors = new LinkedList<SOPPredecessor>();
-	successors = new LinkedList<SOPSuccessor>();
+	return activities;
     }
 
-    public int getOperation()
-    {
-	return operation;
-    }
-
-    public List<SOPPredecessor> getPredecessors()
-    {
-	return predecessors;
-    }
-
-    // Add a new predecessor to the list.
-    public void addPredecessor(SOPPredecessor predecessorToAdd)
-    {
-	predecessors.add(predecessorToAdd);
-    }
-
-    public List<SOPSuccessor> getSuccessors()
-    {
-	return successors;
-    }
-
-    // Add a new successor to the list.
-    public void addSuccessor(SOPSuccessor successorToAdd)
-    {
-	successors.add(successorToAdd);
-    }
-
-    public boolean hasPredecessors()
-    {
-	return !predecessors.isEmpty();
-    }
-
-    public boolean hasSuccessors()
-    {
-	return !successors.isEmpty();
-    }
 }

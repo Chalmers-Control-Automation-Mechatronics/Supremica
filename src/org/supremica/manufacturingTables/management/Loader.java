@@ -63,6 +63,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.io.*;
 import javax.xml.bind.*;
+import javax.xml.validation.*;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.XMLConstants;
+import org.xml.sax.SAXException;
+
 //import net.sourceforge.fuber.xsd.libraryelement.*;
 //import net.sourceforge.fuber.xsd.libraryelement.impl.*;
 
@@ -78,6 +83,7 @@ public class Loader
     }
 
     public Object loadFactory(String path, String fileName)
+    	throws JAXBException, SAXException
     {
 	// Create JAXBContext and unmarshaller for factory
 	try
@@ -86,9 +92,14 @@ public class Loader
 		//System.err.println("jaxbcontext created");
 		u = jaxbContext.createUnmarshaller();
 		//System.err.println("unmarshaller created");
+	
 		// enable validation
-		u.setValidating( true );
-		System.err.println("validation is set to true");
+		String language = XMLConstants.W3C_XML_SCHEMA_NS_URI;
+		SchemaFactory factory = SchemaFactory.newInstance(language); 
+		StreamSource ss = new StreamSource(new File("../schema/manufacturingTables/xsd/Factory.xsd"));
+		Schema schema = factory.newSchema(ss);
+		u.setSchema(schema);
+		System.err.println("validation is on");
 
 		// We will allow the Unmarshaller's default
 		// ValidationEventHandler to receive notification of warnings
@@ -98,15 +109,18 @@ public class Loader
 		// first error or fatal error.
 		return load(path, fileName);
 	    }
+	catch(SAXException se)
+	{
+	    throw se;
+	}
 	catch(JAXBException je)
 	    {
-		je.printStackTrace();
-		return null;
+		throw je;
 	    }
-       
     }
 
     public Object loadEOP(String path, String fileName)
+    	throws JAXBException, SAXException
     {
 	// Create JAXBContext and unmarshaller for EOP
 	try
@@ -114,41 +128,58 @@ public class Loader
 		jaxbContext = JAXBContext.newInstance("org.supremica.manufacturingTables.xsd.eop");
 		u = jaxbContext.createUnmarshaller();
 		// enable validation
-		u.setValidating( true );
-		
+		String language = XMLConstants.W3C_XML_SCHEMA_NS_URI;
+		SchemaFactory factory = SchemaFactory.newInstance(language); 
+		StreamSource ss = new StreamSource(new File("../schema/manufacturingTables/xsd/EOP.xsd"));
+		Schema schema = factory.newSchema(ss);
+		u.setSchema(schema);
+		System.err.println("validation is on");
+
 		// Se comment about validation above.
 		return load(path, fileName);
 	    }
+	catch(SAXException se)
+	{
+	    throw se;
+	}
 	catch(JAXBException je)
 	    {
-		je.printStackTrace();
-		return null;
+		throw je;
 	    }
     }
 
-    public Object loadSOP(String path, String fileName)
+    public Object loadCOP(String path, String fileName)
+    	throws JAXBException, SAXException
     {
-	// Create JAXBContext and unmarshaller for SOP
+	// Create JAXBContext and unmarshaller for COP
 	try
 	    {
 		jaxbContext = JAXBContext.newInstance("org.supremica.manufacturingTables.xsd.rop");
 		u = jaxbContext.createUnmarshaller();
 		// enable validation
-		u.setValidating( true );
-		
+		String language = XMLConstants.W3C_XML_SCHEMA_NS_URI;
+		SchemaFactory factory = SchemaFactory.newInstance(language); 
+		StreamSource ss = new StreamSource(new File("../schema/manufacturingTables/xsd/ROP.xsd"));
+		Schema schema = factory.newSchema(ss);
+		u.setSchema(schema);
+		System.err.println("validation is on");
+
 		// Se comment about validation above.
 		return load(path, fileName);
 	    }
+	catch(SAXException se)
+	{
+	    throw se;
+	}
 	catch(JAXBException je)
 	    {
-		je.printStackTrace();
-		return null;
+		throw je;
 	    }
     }
-    
+
     private Object load(String path, String fileName)
     {
-	
+
 
 	try
 	    {

@@ -118,7 +118,7 @@ public class LowLevelActuator extends Actuator
 		if (!sensorExist) 
 		    // Actually means that the actuator is moving (or equipment is broken 
 		    // but this should be detected by the stateOrder).
-		    // The SOP should be calculated so that this does not happen but it is not
+		    // The COP should be calculated so that this does not happen but it is not
 		    // fully covered by the concept.
 		    {
 			//System.err.println("Broken equipment or actuator moving: " + name + " !");

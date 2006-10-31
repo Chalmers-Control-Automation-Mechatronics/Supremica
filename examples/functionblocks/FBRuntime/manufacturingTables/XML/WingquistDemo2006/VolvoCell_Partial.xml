@@ -1,0 +1,58 @@
+<Factory name="Volvo Torslanda">
+    <Areas>
+        <Area name="Chassi, 11-41">
+            <Cells>
+                <Cell name="11-41-150">
+                    <!--Zones>
+                        <Zone>1</Zone>
+                        <Zone>2</Zone>
+                        <Zone>3</Zone>
+                        <Zone>4</Zone>
+                        <Zone>5</Zone>
+                        <Zone>6</Zone>
+                        <Zone>7</Zone>
+                        <Zone>8</Zone>
+                        <Zone>9</Zone>
+                        <Zone>10</Zone>
+                        <Zone>11</Zone>
+                        <Zone>12</Zone>
+                    </Zones-->
+
+                    <Machines>
+
+                        <Machine type="Robot" name="150R3323" ownControlSystem="Yes">
+                            <Description>Robot, spot welding</Description>
+                        </Machine>
+
+                        <Machine type="Robot" name="150R3325" ownControlSystem="Yes">
+                            <Description>Robot, material handling and spot welding</Description>
+                        </Machine>
+
+                        <Machine type="Fixture" name="150FIX151" ownControlSystem="No">
+                            <Description>Right fixture </Description>
+                        </Machine>
+
+                        <Machine type="TurnTable" name="150TT153" ownControlSystem="No">
+                            <Description>Left Turntable</Description>	
+                            <!--Variables>
+                                <Variable name="TT153New rack in cell">
+                                    <Values>
+                                        <Value>TRUE</Value>
+                                        <Value>FALSE</Value>
+                                    </Values>
+                                    <InitialValue>TRUE</InitialValue>
+                                </Variable>
+                            </Variables-->
+                        </Machine>
+
+                    </Machines>
+                </Cell>
+            </Cells>
+        </Area>
+    </Areas>
+</Factory>
+
+				
+	
+	         			
+	
