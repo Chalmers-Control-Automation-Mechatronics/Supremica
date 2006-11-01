@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   MainPanel
 //###########################################################################
-//# $Id: MainPanel.java,v 1.24 2006-10-18 22:36:05 flordal Exp $
+//# $Id: MainPanel.java,v 1.25 2006-11-01 08:26:03 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -16,6 +16,8 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -119,43 +121,21 @@ abstract class MainPanel
         }
         return editorPanel.getActiveEditorWindowInterface();
     }
+
+    private CommentPanel commentPanel = null;
     
     /**
      * Displays a comment about the module.
      */   
     public void showComment()
     {
-        String name = getModuleSubject().getName();
-        String comment = getModuleSubject().getComment();
+        if (commentPanel == null)
+        {
+            commentPanel = new CommentPanel(getModuleSubject());
+        }
         
-        // Create a new class that does all this and make the title and the comment editable
-        try
-        {
-            // Add stuff to a panel
-            JPanel commentPanel = new JPanel();
-            commentPanel.setLayout(new BorderLayout());
-            // Create title
-            JTextPane titlePane = new JTextPane();
-            titlePane.setFont(new Font(null, Font.BOLD, 14));
-            StyledDocument titleDoc = titlePane.getStyledDocument();
-            titleDoc.insertString(titleDoc.getLength(), name, null);
-            //titlePane.setBackground(commentPanel.getBackground()); // WTF!? Doesn't work?
-            commentPanel.add(BorderLayout.NORTH, titlePane);
-            //Create the comment text
-            JTextPane commentPane = new JTextPane();
-            commentPane.setFont(new Font(null, Font.PLAIN, 12));
-            StyledDocument commentDoc = commentPane.getStyledDocument();
-            commentDoc.insertString(commentDoc.getLength(), comment, null);
-            //commentPane.setBackground(commentPanel.getBackground());
-            commentPanel.add(BorderLayout.CENTER, commentPane);
-
-            final EditorPanel editorPanel = moduleContainer.getEditorPanel();
-            editorPanel.setRightComponent(commentPanel);
-        }
-        catch (BadLocationException ex)
-        {
-            //JOptionPane.showMessageDialog(ide.getFrame(), "Bad comment in module.", "Bad comment", JOptionPane.ERROR_MESSAGE);
-        }
+        final EditorPanel editorPanel = moduleContainer.getEditorPanel();
+        editorPanel.setRightComponent(commentPanel);
     }
     
     //######################################################################
