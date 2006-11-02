@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeControllabilityChecker
 //###########################################################################
-//# $Id: NativeControllabilityChecker.java,v 1.1 2006-08-15 01:43:06 robi Exp $
+//# $Id: NativeControllabilityChecker.java,v 1.2 2006-11-02 22:40:29 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;
@@ -26,10 +26,15 @@ public class NativeControllabilityChecker
 
   //#########################################################################
   //# Constructors
-  public NativeControllabilityChecker(final ProductDESProxy input,
+  public NativeControllabilityChecker(final ProductDESProxyFactory factory)
+  {
+    this(null, factory);
+  }
+
+  public NativeControllabilityChecker(final ProductDESProxy model,
 				      final ProductDESProxyFactory factory)
   {
-    super(input, factory);
+    super(model, factory);
   }
 
 

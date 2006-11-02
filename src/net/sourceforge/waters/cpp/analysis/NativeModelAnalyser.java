@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeModelAnalyser
 //###########################################################################
-//# $Id: NativeModelAnalyser.java,v 1.1 2006-08-15 01:43:06 robi Exp $
+//# $Id: NativeModelAnalyser.java,v 1.2 2006-11-02 22:40:29 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;
@@ -25,11 +25,16 @@ public abstract class NativeModelAnalyser implements ModelAnalyser
 
   //#########################################################################
   //# Constructors
-  public NativeModelAnalyser(final ProductDESProxy input,
+  public NativeModelAnalyser(final ProductDESProxyFactory factory)
+  {
+    this(null, factory);
+  }
+
+  public NativeModelAnalyser(final ProductDESProxy model,
 			     final ProductDESProxyFactory factory)
   {
-    mInput = input;
     mFactory = factory;
+    mModel = model;
   }
 
 
@@ -40,10 +45,16 @@ public abstract class NativeModelAnalyser implements ModelAnalyser
     return mFactory;
   }
 
-  public ProductDESProxy getInput()
+  public ProductDESProxy getModel()
   {
-    return mInput;
+    return mModel;
   }
+
+  public void setModel(final ProductDESProxy model)
+  {
+    mModel = model;
+  }
+
 
   //#########################################################################
   //# Native Methods
@@ -54,7 +65,7 @@ public abstract class NativeModelAnalyser implements ModelAnalyser
 
   //#########################################################################
   //# Data Members
-  private final ProductDESProxy mInput;
   private final ProductDESProxyFactory mFactory;
+  private ProductDESProxy mModel;
 
 }

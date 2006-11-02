@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeModelVerifier
 //###########################################################################
-//# $Id: NativeModelVerifier.java,v 1.1 2006-08-15 01:43:06 robi Exp $
+//# $Id: NativeModelVerifier.java,v 1.2 2006-11-02 22:40:29 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;
@@ -26,10 +26,15 @@ public abstract class NativeModelVerifier
 
   //#########################################################################
   //# Constructors
-  public NativeModelVerifier(final ProductDESProxy input,
+  public NativeModelVerifier(final ProductDESProxyFactory factory)
+  {
+    this(null, factory);
+  }
+
+  public NativeModelVerifier(final ProductDESProxy model,
 			     final ProductDESProxyFactory factory)
   {
-    super(input, factory);
+    super(model, factory);
     mResult = null;
   }
 
@@ -38,9 +43,19 @@ public abstract class NativeModelVerifier
   //# Invocation
   public boolean run()
   {
+    if (getModel() == null) {
+      throw new NullPointerException("No model given!");
+    } else {
+      mResult = null;
+      mResult = runNativeAlgorithm();
+      return mResult.isSatisfied();
+    }
+  }
+
+  public void setModel(final ProductDESProxy model)
+  {
+    super.setModel(model);
     mResult = null;
-    mResult = runNativeAlgorithm();
-    return mResult.isSatisfied();
   }
 
 

@@ -338,7 +338,6 @@
         <include name="net/sourceforge/waters/**"/>
         <exclude name="net/sourceforge/waters/build/**"/>
         <exclude name="net/sourceforge/waters/gui/**"/>
-        <exclude name="net/sourceforge/waters/model/analysis/**"/>
         <exclude name="net/sourceforge/waters/samples/**"/>
       </packageset>
       <doctitle><![CDATA[<h1>Waters API Documentation</h1>]]></doctitle>

@@ -29,7 +29,7 @@ import java.util.NoSuchElementException;
  * Created: Sun Nov  4 08:56:06 2001
  *
  * @author Eric D. Friedman
- * @version $Id: StateObjectHash.java,v 1.3 2006-09-26 05:41:50 yip1 Exp $
+ * @version $Id: StateObjectHash.java,v 1.4 2006-11-02 22:40:29 robi Exp $
  */
 abstract public class StateObjectHash extends StateHash implements Serializable, StateObjectHashingStrategy {
     /** the set of Objects */
@@ -221,7 +221,7 @@ abstract public class StateObjectHash extends StateHash implements Serializable,
      * This is the default implementation of StateObjectHashingStrategy:
      * it delegates hashing to the Object's hashCode method.
      *
-     * @param object for which the hashcode is to be computed
+     * @param o state tuple for which the hash code is to be computed
      * @return the hashCode
      * @see Object#hashCode()
      */

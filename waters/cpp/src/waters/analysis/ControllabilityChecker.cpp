@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   ControllabilityChecker
 //###########################################################################
-//# $Id: ControllabilityChecker.cpp,v 1.10 2006-09-03 17:09:15 robi Exp $
+//# $Id: ControllabilityChecker.cpp,v 1.11 2006-11-02 22:40:30 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -417,7 +417,7 @@ Java_net_sourceforge_waters_cpp_analysis_NativeControllabilityChecker_runNativeA
     jni::ClassCache cache(env);
     try {
       jni::NativeControllabilityCheckerGlue gchecker(jchecker, &cache);
-      jni::ProductDESGlue des = gchecker.getInputGlue(&cache);
+      jni::ProductDESGlue des = gchecker.getModelGlue(&cache);
       waters::ControllabilityChecker checker(des, &cache);
       bool result = checker.run();
       if (result) {

@@ -4,7 +4,7 @@
 //# PACKAGE: jni.glue
 //# PURPOSE: List of classes and methods to be converted to C++/JNI code
 //###########################################################################
-//# $Id: Classes.txt,v 1.12 2006-09-03 17:09:15 robi Exp $
+//# $Id: Classes.txt,v 1.13 2006-11-02 22:40:30 robi Exp $
 //###########################################################################
 
 
@@ -155,7 +155,7 @@ package net.sourceforge.waters.cpp.analysis;
 
 glue class NativeModelAnalyser {
   glue ProductDESProxyFactory getFactory();
-  glue ProductDESProxy getInput();
+  glue ProductDESProxy getModel();
 }
 
 glue class NativeControllabilityChecker extends NativeModelAnalyser {
