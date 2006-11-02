@@ -60,16 +60,16 @@ package org.supremica.manufacturingTables.controlsystemdata;
 
 public class Predecessor
 {
-    private int operation;
+    private String operation;
     private String machine;
 
-    public Predecessor(int operation, String machine)
+    public Predecessor(String operation, String machine)
     {
 	this.operation = operation;
 	this.machine = machine;
     }
 
-    public int getOperation()
+    public String getOperation()
     {
 	return operation;
     }

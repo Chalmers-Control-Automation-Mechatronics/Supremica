@@ -48,35 +48,44 @@
  */
 
 /**
- * The Predecessor contains a machine name and the operationNbr in that machine that has to be performed 
- * before the COP can continue.
+ * The Mailbox class contains information, in a hashmap for fast search, about the listeners (such as Sensors, Actuators
+ * Machine, Coordinator and MachineController. Listeners have to register themselfs.
  *
- * Created: Wed Jun  08 13:40:13 2006
+ *
+ * Created: Tue Okt  30 11:17 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
-public class COPSuccessor
+import java.util.HashMap;
+import java.util.Map;
+
+public class Mailbox
 {
-    private String operation;
-    private String machine;
+    private Map listeners; // HashMap will be used for quick access to listeners of the mailbox
 
-    public COPSuccessor(String operation, String machine)
+    public Mailbox()
     {
-	this.operation = operation;
-	this.machine = machine;
+	listeners = new HashMap(10); //initital capacity 10 and default load factor (0,75) suits me fine
     }
 
-    public String getOperation()
+    public void send(Message msg)
     {
-	return operation;
+	Listener listener = (Listener) listeners.get(msg.getReceiver());
+	if (listener != null)
+	    {
+		listener.receiveMessage(msg);
+	    }
+	else 
+	    {
+		System.err.println("No listener " + msg.getReceiver() + " registered!");
+	    }
     }
-
-    public String getMachine()
+   
+    public void register(Listener newListener)
     {
-	return machine;
+	listeners.put(newListener.getID(), newListener);
     }
-
 }

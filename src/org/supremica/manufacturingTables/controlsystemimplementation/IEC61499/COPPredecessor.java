@@ -48,22 +48,22 @@
  */
 
 /**
- * The Predecessor contains a machine name and the operationNbr in that machine that has to be performed 
+ * The COPPredecessor contains a machine name and the operationNbr in that machine that has to be performed 
  * before the COP can continue.
  *
- * Created: Wed Jun  08 13:40:13 2006
+ * Created: Tue Oct 30 11:46 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
-public class COPSuccessor
+public class COPPredecessor implements Cloneable
 {
     private String operation;
     private String machine;
 
-    public COPSuccessor(String operation, String machine)
+    public COPPredecessor(String operation, String machine)
     {
 	this.operation = operation;
 	this.machine = machine;
@@ -77,6 +77,33 @@ public class COPSuccessor
     public String getMachine()
     {
 	return machine;
+    }
+
+    // Since it is not absolutely certain that all operation numbers for the whole manufacturing cell
+    // are unique this method returns a concatenation of the Machine and the operation that for certain is unique,
+    public String getID()
+    {
+	return (String) (machine + operation);
+    }
+
+    public boolean equals(COPPredecessor predecessorToCompare)
+    {
+	return operation.equals( predecessorToCompare.getOperation() ) 
+	    && machine.equals( predecessorToCompare.getMachine() );
+    }
+    
+    public Object clone() 
+    {
+	COPPredecessor clone = null;
+	try
+	    {
+		clone =(COPPredecessor) super.clone(); // Create space and clone the trivial data (all are)
+	    }
+	catch (CloneNotSupportedException e)
+	    {
+		System.err.println("The COPPredecessor could not be cloned!");
+	    } 
+	return clone;
     }
 
 }

@@ -60,16 +60,16 @@ package org.supremica.manufacturingTables.controlsystemimplementation.Java;
 
 public class COPPredecessor implements Cloneable
 {
-    private int operation;
+    private String operation;
     private String machine;
 
-    public COPPredecessor(int operation, String machine)
+    public COPPredecessor(String operation, String machine)
     {
 	this.operation = operation;
 	this.machine = machine;
     }
 
-    public int getOperation()
+    public String getOperation()
     {
 	return operation;
     }

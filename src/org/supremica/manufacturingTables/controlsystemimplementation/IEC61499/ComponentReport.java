@@ -46,37 +46,37 @@
  *
  * Supremica is owned and represented by KA.
  */
-
+ 
 /**
- * The Predecessor contains a machine name and the operationNbr in that machine that has to be performed 
- * before the COP can continue.
+ * The ComponentReport is the respons to one machine that has asked for a value of
+ * a component in another machine.
  *
- * Created: Wed Jun  08 13:40:13 2006
+ *
+ * Created: Tue Oct 30 12:34 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
-public class COPSuccessor
+public class ComponentReport
 {
-    private String operation;
-    private String machine;
+    private String component;
+    private String value;
 
-    public COPSuccessor(String operation, String machine)
+    public ComponentReport(String component, String value)
     {
-	this.operation = operation;
-	this.machine = machine;
+	this.component = component;
+	this.value = value;
     }
 
-    public String getOperation()
+    public String getComponentName()
     {
-	return operation;
+	return component;
     }
 
-    public String getMachine()
+    public String getValue()
     {
-	return machine;
+	return value;
     }
-
 }

@@ -53,12 +53,12 @@
  * with for example robots. 
  *
  *
- * Created: Tue Jun 13 16:24:20 2006
+ * Created: Tue Oct 30 12:05 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -105,36 +105,36 @@ abstract public class MachineController
     // confirmation from another machine whether the external component holds the desired value/state or not.
     public void confirmExternalComponent(String externalMachine, ComponentConfirmation compConf)
     {
- 	if (performsEOP)
-	{
-	    if (compConf != null && compConf.getConfirmation())
-	    {
-		// ExternalComponent
-		// Create a new EOPExternalComponent which should be equal to the one in the map
-		EOPExternalComponent confirmedComponent = new EOPExternalComponent(compConf.getComponentName(), 
-										   externalMachine);
-		if (currentEOPRow.getExternalComponentToStateMap().containsKey(confirmedComponent))
-		{
-		    System.err.println("The machine " + externalMachine + " confirmed the component " 
-				       + compConf.getComponentName());
-		    currentEOPRow.getExternalComponentToStateMap().remove(confirmedComponent); 
-		    checkEOPRowPerformed();
-		}		
-		else
-		{
-		    System.err.println("Unknown external component " + compConf.getComponentName() + " for machine controller in machine " + machine.getName() + ".");
-		}
-	    }
-	    else 
-	    {
-		System.err.println("The Machine " + machine.getName() + " has to stop due to component errors in another machine!");
-		performsEOP = false;
-	    }
-	}
-	else 
-	{
-	    System.err.println("This MachineController is not performing an EOP and is not interrested in other machine큦 components!");
-	}
+//  	if (performsEOP)
+// 	{
+// 	    if (compConf != null && compConf.getConfirmation())
+// 	    {
+// 		// ExternalComponent
+// 		// Create a new EOPExternalComponent which should be equal to the one in the map
+// 		EOPExternalComponent confirmedComponent = new EOPExternalComponent(compConf.getComponentName(), 
+// 										   externalMachine);
+// 		if (currentEOPRow.getExternalComponentToStateMap().containsKey(confirmedComponent))
+// 		{
+// 		    System.err.println("The machine " + externalMachine + " confirmed the component " 
+// 				       + compConf.getComponentName());
+// 		    currentEOPRow.getExternalComponentToStateMap().remove(confirmedComponent); 
+// 		    checkEOPRowPerformed();
+// 		}		
+// 		else
+// 		{
+// 		    System.err.println("Unknown external component " + compConf.getComponentName() + " for machine controller in machine " + machine.getName() + ".");
+// 		}
+// 	    }
+// 	    else 
+// 	    {
+// 		System.err.println("The Machine " + machine.getName() + " has to stop due to component errors in another machine!");
+// 		performsEOP = false;
+// 	    }
+// 	}
+// 	else 
+// 	{
+// 	    System.err.println("This MachineController is not performing an EOP and is not interrested in other machine큦 components!");
+// 	}
     }
 
     // Request the value/state of the specified component of this machine.
@@ -147,115 +147,115 @@ abstract public class MachineController
     // Response from another machine with the state of the external component.
     public void reportExternalComponent(String externalMachine, ComponentReport compReport)
     {
-	if (performsEOP)
-	{
-	    // Create a new EOPExternalComponent which state/value should be compared to the ones in the
-	    // alternative EOPs
-	    EOPExternalComponent reqComponent = new EOPExternalComponent(compReport.getComponentName(),
-									 externalMachine);
-	    for (Iterator<Entry<EOP, EOPInitialRow>> EOPIter = currAltEOPToInitRowMap.entrySet().iterator(); 
-		 EOPIter.hasNext();)
-	    {
-		EOPRow EOPRow = EOPIter.next().getValue();
-		// External Component
-		if ( EOPRow.getExternalComponentToStateMap().containsKey( reqComponent ) )
-		{
-		    String state = (String) EOPRow.getExternalComponentToStateMap().remove( reqComponent );
+// 	if (performsEOP)
+// 	{
+// 	    // Create a new EOPExternalComponent which state/value should be compared to the ones in the
+// 	    // alternative EOPs
+// 	    EOPExternalComponent reqComponent = new EOPExternalComponent(compReport.getComponentName(),
+// 									 externalMachine);
+// 	    for (Iterator<Entry<EOP, EOPInitialRow>> EOPIter = currAltEOPToInitRowMap.entrySet().iterator(); 
+// 		 EOPIter.hasNext();)
+// 	    {
+// 		EOPRow EOPRow = EOPIter.next().getValue();
+// 		// External Component
+// 		if ( EOPRow.getExternalComponentToStateMap().containsKey( reqComponent ) )
+// 		{
+// 		    String state = (String) EOPRow.getExternalComponentToStateMap().remove( reqComponent );
 
-		    if (! (state.equals(compReport.getValue()) || state.equals(EOP.IGNORE_TOKEN) ) )
-		    {
-			EOPIter.remove();
-		    }
-		}		
-	    }	
-	    if (currAltEOPToInitRowMap.size() == 1)
-	    {
-		Entry<EOP, EOPInitialRow> EOPToInitRowEntry = currAltEOPToInitRowMap.entrySet().iterator().next();
-		currentEOP = EOPToInitRowEntry.getKey();
-		currentEOPRow = EOPToInitRowEntry.getValue();
-		System.out.println("Only one alternative left!");
+// 		    if (! (state.equals(compReport.getValue()) || state.equals(EOP.IGNORE_TOKEN) ) )
+// 		    {
+// 			EOPIter.remove();
+// 		    }
+// 		}		
+// 	    }	
+// 	    if (currAltEOPToInitRowMap.size() == 1)
+// 	    {
+// 		Entry<EOP, EOPInitialRow> EOPToInitRowEntry = currAltEOPToInitRowMap.entrySet().iterator().next();
+// 		currentEOP = EOPToInitRowEntry.getKey();
+// 		currentEOPRow = EOPToInitRowEntry.getValue();
+// 		System.out.println("Only one alternative left!");
 		
-		checkEOPRowPerformed();
-	    }
+// 		checkEOPRowPerformed();
+// 	    }
 	    
-	}
-	else 
-	{
-	    System.err.println("This MachineController is not performing an EOP and is not interrested in other machine큦 components!");
-	}
+// 	}
+// 	else 
+// 	{
+// 	    System.err.println("This MachineController is not performing an EOP and is not interrested in other machine큦 components!");
+// 	}
     }
     
     // Report from the zone about the state of the zone.
     public void reportZone(String zone, String state)
     {
-	if (performsEOP)
-	{
-	    // Compare the zone and state with the ones in the alternative EOPs
-	    for (Iterator<Entry<EOP, EOPInitialRow>> EOPIter = currAltEOPToInitRowMap.entrySet().iterator(); 
-		 EOPIter.hasNext();)
-	    {
-		EOPRow EOPRow = EOPIter.next().getValue();
-		// Zones
-		if ( EOPRow.getZoneToStateMap().containsKey( zone ) )
-		{
-		    String currentState = (String) EOPRow.getZoneToStateMap().remove( zone );
+ 	if (performsEOP)
+ 	{
+ 	    // Compare the zone and state with the ones in the alternative EOPs
+ 	    for (Iterator<Entry<EOP, EOPInitialRow>> EOPIter = currAltEOPToInitRowMap.entrySet().iterator(); 
+ 		 EOPIter.hasNext();)
+ 	    {
+ 		EOPRow EOPRow = EOPIter.next().getValue();
+ 		// Zones
+ 		if ( EOPRow.getZoneToStateMap().containsKey( zone ) )
+ 		{
+ 		    String currentState = (String) EOPRow.getZoneToStateMap().remove( zone );
 
-		    if (! ( currentState.equals(state) || currentState.equals(EOP.IGNORE_TOKEN) ) )
-		    {
-			EOPIter.remove();
-		    }
-		}		
-	    }	
-	    if (currAltEOPToInitRowMap.size() == 1)
-	    {
-		Entry<EOP, EOPInitialRow> EOPToInitRowEntry = currAltEOPToInitRowMap.entrySet().iterator().next();
-		currentEOP = EOPToInitRowEntry.getKey();
-		currentEOPRow = EOPToInitRowEntry.getValue();
-		System.out.println("Only one alternative left!");
+ 		    if (! ( currentState.equals(state) || currentState.equals(EOP.IGNORE_TOKEN) ) )
+ 		    {
+ 			EOPIter.remove();
+ 		    }
+ 		}		
+ 	    }	
+ 	    if (currAltEOPToInitRowMap.size() == 1)
+ 	    {
+ 		Entry<EOP, EOPInitialRow> EOPToInitRowEntry = currAltEOPToInitRowMap.entrySet().iterator().next();
+ 		currentEOP = EOPToInitRowEntry.getKey();
+ 		currentEOPRow = EOPToInitRowEntry.getValue();
+ 		System.out.println("Only one alternative left!");
 		
-		checkEOPRowPerformed();
-	    }
+ 		checkEOPRowPerformed();
+ 	    }
 	    
-	}
-	else 
-	{
-	    System.err.println("This MachineController is not performing an EOP and is not interrested in zones!");
-	}
+ 	}
+ 	else 
+ 	{
+ 	    System.err.println("This MachineController is not performing an EOP and is not interrested in zones!");
+ 	}
     }
 
     // Confirmation from the zone whether the zone was successfully ordered/checked.
     public void confirmZone(String zone, boolean confirmation)
     {
-	if (performsEOP)
-	{
-	    // Check that the confirmation is true. It should always be true in automatic mode because the EOPs are 
-	    // scheduled that way. Still, in the future it may be possible to instead wait for a zone to be unbooked
-	    // if it should be occupied by another machine.
-	    if (confirmation)
-	    {
-		if (currentEOPRow.getZoneToStateMap().containsKey(zone))
-		{
-		    System.err.println("The zone " + zone + " was confirmed OK to be in state " + 
-				       currentEOPRow.getZoneToStateMap().remove(zone) );
-		    checkEOPRowPerformed();
-		}
-		else
-		{
-		    System.err.println("Unknown zone " + zone + " for machine controller in machine " 
-				       + machine.getName() + ".");
-		}
-	    }
-	    else
-	    {
-		System.err.println("The Machine " + machine.getName() + " has to stop since the zone "
-				   + zone + "was occupied by another machine.");
-		performsEOP = false;
-	    }
-	}
-	else 
-	{
+ 	if (performsEOP)
+ 	{
+ 	    // Check that the confirmation is true. It should always be true in automatic mode because the EOPs are 
+ 	    // scheduled that way. Still, in the future it may be possible to instead wait for a zone to be unbooked
+ 	    // if it should be occupied by another machine.
+ 	    if (confirmation)
+ 	    {
+ 		if (currentEOPRow.getZoneToStateMap().containsKey(zone))
+ 		{
+ 		    System.err.println("The zone " + zone + " was confirmed OK to be in state " + 
+ 				       currentEOPRow.getZoneToStateMap().remove(zone) );
+ 		    checkEOPRowPerformed();
+ 		}
+ 		else
+ 		{
+ 		    System.err.println("Unknown zone " + zone + " for machine controller in machine " 
+ 				       + machine.getName() + ".");
+ 		}
+ 	    }
+ 	    else
+ 	    {
+ 		System.err.println("The Machine " + machine.getName() + " has to stop since the zone "
+ 				   + zone + "was occupied by another machine.");
+ 		performsEOP = false;
+ 	    }
+ 	}
+ 	else 
+ 	{
 	    System.err.println("This MachineController is not performing an EOP and is not interrested in zones!");
-	}
+ 	}
     }
     
     final public void setMachine(Machine machine)
@@ -269,24 +269,24 @@ abstract public class MachineController
     }
 
     // Add/register an eop to the machine controller. For alternative EOPs many EOPs can have the same operation
-    // name and those are stored in a list
-    final public void registerEOP(EOP EOP)  
-    {
-	List EOPList = EOPs.get(EOP.getId());
+    // number and those are stored in a list
+     final public void registerEOP(EOP EOP)  
+     {
+ 	List EOPList = EOPs.get(EOP.getId());
 	if (EOPList != null && EOP.getType().equals(EOP.ALTERNATIVE_TYPE))
-	{
-	    EOPList.add(EOP);
-	}
-	else if (EOPList == null)
-	{
-	    EOPList = new LinkedList();
-	    EOPList.add(EOP);
-	    EOPs.put(EOP.getId(), EOPList);
-	}
-	else
-	{
-	    System.err.println("Warning: Can not have multiple basic EOPs!");
-	}
-    }
+ 	{
+ 	    EOPList.add(EOP);
+ 	}
+ 	else if (EOPList == null)
+ 	{
+ 	    EOPList = new LinkedList();
+ 	    EOPList.add(EOP);
+ 	    EOPs.put(EOP.getId(), EOPList);
+ 	}
+ 	else
+ 	{
+ 	    System.err.println("Warning: Can not have multiple basic EOPs!");
+ 	}
+     }
     
 }

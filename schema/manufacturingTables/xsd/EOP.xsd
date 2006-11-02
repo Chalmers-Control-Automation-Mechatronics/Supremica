@@ -36,7 +36,7 @@
 
 
  <!-- Definition of attributes _____________________________________-->
- <xs:attribute name="opID" type="xs:positiveInteger"/>
+ <xs:attribute name="opID" type="xs:string"/>
  <xs:attribute name="actionNbr" type="xs:positiveInteger"/>
 
  <!-- Definition of complex elements _______________________________-->

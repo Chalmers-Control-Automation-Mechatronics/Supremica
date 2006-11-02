@@ -48,69 +48,88 @@
  */
 
 /**
- * The COPActivity contains (optional) preconditions for operations in other machines, and 
- * then always an operation for the corresponding COPs machine that has to be performed.
+ * The abstract class EOPRow describes a row (intial state or action) of an EOP
+ * 
  *
- * Created: Wed Jun  08 13:40:13 2006
+ * Created: Thu Nov 02 12:22 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
-import java.util.List;
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
-public class COPActivity
+abstract public class EOPRow 
 {
-    private String operation;
-    private List<COPPredecessor> predecessors; 
-    // List of predecessors. For now I assume that all predecessors has to be performed to begin the operation, 
-    // i.e. I assume a logical "and" relation between the predecessors. There may be other logical expressions 
-    // in the future. For now the order is not important but I still use lists.
-    private List<COPSuccessor> successors;
+    protected Map sensorToStateMap; // HashMap will be used for quick access to the states
+    protected Map actuatorToStateMap;
+    protected Map variableToValueMap;
+    protected Map zoneToStateMap;
     
-    public COPActivity(String operation)
+    public EOPRow()
     {
-	this.operation = operation;
-	predecessors = new LinkedList<COPPredecessor>();
-	successors = new LinkedList<COPSuccessor>();
+	sensorToStateMap = new HashMap(10); //initital capacity 10 and default load factor (0,75) suits me fine
+	actuatorToStateMap = new HashMap(10);
+	variableToValueMap = new HashMap(5);
+	zoneToStateMap = new HashMap(10);
     }
 
-    public String getOperation()
+    final public void addSensorToState(String sensor, String state)
     {
-	return operation;
+	sensorToStateMap.put(sensor, state);
     }
 
-    public List<COPPredecessor> getPredecessors()
+    final public Map getSensorToStateMap() 
     {
-	return predecessors;
+	return sensorToStateMap;
     }
 
-    // Add a new predecessor to the list.
-    public void addPredecessor(COPPredecessor predecessorToAdd)
+    final public void addActuatorToState(String actuator, String state)
     {
-	predecessors.add(predecessorToAdd);
+	actuatorToStateMap.put(actuator, state);
     }
 
-    public List<COPSuccessor> getSuccessors()
+    final public Map getActuatorToStateMap() 
     {
-	return successors;
+	return actuatorToStateMap;
     }
 
-    // Add a new successor to the list.
-    public void addSuccessor(COPSuccessor successorToAdd)
+    final public void addZoneToState(String zone, String state)
     {
-	successors.add(successorToAdd);
+	if (state.equals(Zone.FREE_ZONE_TOKEN) || state.equals(Zone.BOOKED_ZONE_TOKEN)
+	    || state.equals(EOP.IGNORE_TOKEN) )
+	{
+	    zoneToStateMap.put(zone, state);
+	}
+	else
+	{
+	    System.err.println("Error: Not allowed state for a zone, must be " + Zone.FREE_ZONE_TOKEN 
+			       + " or " + Zone.BOOKED_ZONE_TOKEN 
+			       + " or " + EOP.IGNORE_TOKEN + "!");
+	}
     }
 
-    public boolean hasPredecessors()
+    final public Map getZoneToStateMap() 
     {
-	return !predecessors.isEmpty();
+	return zoneToStateMap;
     }
 
-    public boolean hasSuccessors()
+    final public void addVariableToValue(String variable, String value)
     {
-	return !successors.isEmpty();
+	variableToValueMap.put(variable, value);
     }
+
+    final public Map getVariableToValueMap() 
+    {
+	return variableToValueMap;
+    }
+
+    abstract public Map<EOPExternalComponent, String> getExternalComponentToStateMap(); 
+   
+    
+    
+
 }

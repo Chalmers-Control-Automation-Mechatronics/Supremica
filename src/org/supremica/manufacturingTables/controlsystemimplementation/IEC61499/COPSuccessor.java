@@ -51,12 +51,12 @@
  * The Predecessor contains a machine name and the operationNbr in that machine that has to be performed 
  * before the COP can continue.
  *
- * Created: Wed Jun  08 13:40:13 2006
+ * Created: Tue Oct 30 11:45 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
 public class COPSuccessor
 {

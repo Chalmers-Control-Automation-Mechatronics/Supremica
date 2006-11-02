@@ -48,30 +48,30 @@
  */
 
 /**
- * The Predecessor contains a machine name and the operationNbr in that machine that has to be performed 
- * before the COP can continue.
+ * The EOPExternalComponent class contains the component name and the machine that has the component.
  *
- * Created: Wed Jun  08 13:40:13 2006
+ *
+ * Created: Thu Nov 02 15:53 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
-public class COPSuccessor
+public class EOPExternalComponent
 {
-    private String operation;
+    private String componentName;
     private String machine;
 
-    public COPSuccessor(String operation, String machine)
+    public EOPExternalComponent(String componentName, String machine)
     {
-	this.operation = operation;
+	this.componentName = componentName;
 	this.machine = machine;
     }
 
-    public String getOperation()
+    public String getComponentName()
     {
-	return operation;
+	return componentName;
     }
 
     public String getMachine()
@@ -79,4 +79,21 @@ public class COPSuccessor
 	return machine;
     }
 
+    public boolean equals(Object equalityTest)
+    {
+	if (equalityTest instanceof EOPExternalComponent)
+	{
+	    EOPExternalComponent externalComponent = (EOPExternalComponent) equalityTest;
+	    return componentName.equals(externalComponent.getComponentName()) && 
+		machine.equals(externalComponent.getMachine());
+	}
+	else
+	{
+	    return false;
+	}
+    }
+     public int hashCode()
+     {
+ 	return (componentName + machine).hashCode();
+     }
 }

@@ -63,7 +63,7 @@ import java.util.LinkedList;
 
 public class EOPData
 {
-    private int id;
+    private String id;
     private String type;
     private String comment;
     private List EOPRows; // contains initial row and action rows 
@@ -71,7 +71,7 @@ public class EOPData
     public static final String BASIC_TYPE = "basic";
     public static final String [] TYPES = {BASIC_TYPE, ALTERNATIVE_TYPE};
     public static final String IGNORE_TOKEN = "*";
-    public EOPData(int id, String type)
+    public EOPData(String id, String type)
     {
 	this.id = id;
 
@@ -109,7 +109,7 @@ public class EOPData
 	this.comment = comment;
     }
    
-    public int getId()
+    public String getId()
     {
 	return id;
     }

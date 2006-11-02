@@ -82,21 +82,21 @@ public class Main
 	try
 	{
 	    System.err.println("main function entered");
-	String path = null;
-	if (args.length >= 2)
+	    String path = null;
+	    if (args.length >= 3)
 	    {
-		path = args[1];
+		path = args[2];
 	    }
-	if (args.length >=1)
+	    if (args.length >=2 && ( args[0].equals("-Java") || args[0].equals("-IEC61499") ) )
 	    {
-		String fileName = args[0];
+		String fileName = args[1];
 		Loader loader = new Loader();
 		Factory factory = (Factory) loader.loadFactory(path, fileName);
 		//AutomationObjectsPLCProgramBuilder plcProgramBuilder = new AutomationObjectsPLCProgramBuilder();
 		//plcProgramBuilder.buildPLCProgram(factory);
 		ControlSystemDataBuilder plcDataBuilder = new ControlSystemDataBuilder();
 		plcDataBuilder.buildPLCData(factory);
-
+		
 		String[] fileNames = (new File(path)).list();
 		for (int i = 0; i < fileNames.length; i++)
 		{
@@ -113,41 +113,42 @@ public class Main
 			plcDataBuilder.buildCOP(cop);
 		    }
 		}
-
-		// build EOPs
-		for (int i = 2; i < args.length; i++)
-		    {
-			//			OperationType eop = (OperationType) loader.loadEOP(path, args[i]);
-			//plcDataBuilder.buildEOP(eop);
-		    }
-
+		
+		
 		ManufacturingCell cell = plcDataBuilder.getManufacturingCell();
-
-
-		ControlSystemImplementationBuilder javaPLCProgramBuilder = new JavaControlSystemImplementationBuilder();
-		javaPLCProgramBuilder.createNewPLCProgram(cell);
-		System.err.println("Java PLCProgram created");
-		PLCProgram plcProgram = javaPLCProgramBuilder.getPLCProgram();
-		System.err.println("Time to run the PLCProgram!");
-		plcProgram.run();
-
-
-
-
-
-
-
-
+		
+		ControlSystemImplementationBuilder PLCProgramBuilder = null;
+		if (args[0].equals("-Java"))
+		{
+		    PLCProgramBuilder = new JavaControlSystemImplementationBuilder();
+		}
+		else if (args[0].equals("-IEC61499"))
+		{
+		    PLCProgramBuilder = new IEC61499ControlSystemImplementationBuilder();
+		}
+		
+		if (PLCProgramBuilder != null)
+		{
+		    PLCProgramBuilder.createNewPLCProgram(cell);
+		    System.err.println(args[0].substring(1) + "PLCProgram created");
+		    PLCProgram plcProgram = PLCProgramBuilder.getPLCProgram();
+		    System.err.println("Time to run the PLCProgram!");
+		    plcProgram.run();
+		}
+		else 
+		{
+		    System.err.println("Unknown implementation language!");
+		}
 	    }
-	else
+	    else
 	    {
-		System.err.println("You must enter a fileName and optionally a path!");
+		System.err.println("You must specify implementation language (-Java, -IEC61499 ...), a fileName and optionally a path!");
 	    }
 	}
 	catch (Exception e)
 	{
-		e.printStackTrace();
+	    e.printStackTrace();
 	}
+	
     }
-
 }

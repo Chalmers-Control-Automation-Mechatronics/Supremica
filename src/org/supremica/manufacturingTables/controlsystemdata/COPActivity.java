@@ -63,19 +63,19 @@ import java.util.LinkedList;
 
 public class COPActivity
 {
-    private int operation;
+    private String operation;
     private List predecessors; 
     // List of predecessors. For now I assume that all predecessors has to be performed to begin the operation, 
     // i.e. I assume a logical "and" relation between the predecessors. There may be other logical expressions 
     // in the future. For now the order is not important but I still use lists.
 
-    public COPActivity(int operation)
+    public COPActivity(String operation)
     {
 	this.operation = operation;
 	predecessors = new LinkedList();
     }
 
-    public int getOperation()
+    public String getOperation()
     {
 	return operation;
     }

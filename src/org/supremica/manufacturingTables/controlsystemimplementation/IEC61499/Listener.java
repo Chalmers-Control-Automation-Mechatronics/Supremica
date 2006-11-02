@@ -48,35 +48,19 @@
  */
 
 /**
- * The Predecessor contains a machine name and the operationNbr in that machine that has to be performed 
- * before the COP can continue.
+ * The Listener interface should be implemented by anyone that is to receive messages from a mailbox.
  *
- * Created: Wed Jun  08 13:40:13 2006
+ * Created: Tue Oct 30 11:45 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
-public class COPSuccessor
+public interface Listener
 {
-    private String operation;
-    private String machine;
-
-    public COPSuccessor(String operation, String machine)
-    {
-	this.operation = operation;
-	this.machine = machine;
-    }
-
-    public String getOperation()
-    {
-	return operation;
-    }
-
-    public String getMachine()
-    {
-	return machine;
-    }
+    String getID();
+    
+    void receiveMessage(Message msg);
 
 }

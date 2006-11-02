@@ -51,12 +51,12 @@
  * The EOP class describes an EOP, Execution of OPeration, that is read by a MachineController
  * 
  *
- * Created: Mon May  15 16:08:32 2006
+ * Created: Thu Nov 02 12:22 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
 import java.util.List;
 import java.util.ListIterator;

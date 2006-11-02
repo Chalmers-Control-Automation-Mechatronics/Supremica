@@ -52,12 +52,12 @@
  * class handles the communication between the cell control program and the machines own control system.
  *
  *
- * Created: Tue Jun 13 16:24:20 2006
+ * Created: Tue Oct 30 12:21 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -81,7 +81,6 @@ public class MachineControlCommunicator extends MachineController
 	// The line below can be changed to test only the COPs and not perform the actual EOPs
 	if (EOPName==null)
 	    return false;
-
 
 	EOPPerformedOK = false; // this means that if the EOP is empty, a false will be returned
 
@@ -341,57 +340,57 @@ public class MachineControlCommunicator extends MachineController
 	}
     }
     
-    
+       
     public ComponentConfirmation checkComponent(ComponentCheck componentCheck)
     {
-	System.err.println("Checking the value of the component " + componentCheck.getComponentName() 
-			   + ", in the machine " + machine.getName() 
-			   + ", which should be " + componentCheck.getValueToCheck() + ".");
+// 	System.err.println("Checking the value of the component " + componentCheck.getComponentName() 
+// 			   + ", in the machine " + machine.getName() 
+// 			   + ", which should be " + componentCheck.getValueToCheck() + ".");
 
 	ComponentConfirmation confirmation = null;
-	try
-	{
-	    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+// 	try
+// 	{
+// 	    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 	    
-	    System.out.print("Type the state for component " + componentCheck.getComponentName() + ": ");
-	    System.out.flush();
-	    String newValue =  in.readLine();
+// 	    System.out.print("Type the state for component " + componentCheck.getComponentName() + ": ");
+// 	    System.out.flush();
+// 	    String newValue =  in.readLine();
 	    
-	    if (componentCheck.getValueToCheck().equals(newValue))
-	    {
-		confirmation = new ComponentConfirmation(componentCheck.getComponentName(), true);
-	    }
-	    else 
-	    {
-		confirmation = new ComponentConfirmation(componentCheck.getComponentName(), false);
-	    }
-	}
-	catch(IOException exception)
-	{
-	    System.err.println("IOException, could not read the input from the keybord!");
-	}
+// 	    if (componentCheck.getValueToCheck().equals(newValue))
+// 	    {
+// 		confirmation = new ComponentConfirmation(componentCheck.getComponentName(), true);
+// 	    }
+// 	    else 
+// 	    {
+// 		confirmation = new ComponentConfirmation(componentCheck.getComponentName(), false);
+// 	    }
+// 	}
+// 	catch(IOException exception)
+// 	{
+// 	    System.err.println("IOException, could not read the input from the keybord!");
+// 	}
 	return confirmation;
     }
     
     public ComponentReport requestComponent(String componentName)
     {
-	System.err.println("Requesting the value of the component " + componentName 
-			   + ", in the machine " + machine.getName() + ".");
+// 	System.err.println("Requesting the value of the component " + componentName 
+// 			   + ", in the machine " + machine.getName() + ".");
 	
 	ComponentReport report = null;
-	try
-	{
-	    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+// 	try
+// 	{
+// 	    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 	    
-	    System.out.print("Type the state for component " + componentName + ": ");
-	    System.out.flush();
-	    String newValue =  in.readLine();
-	    report = new ComponentReport(componentName, newValue);
-	}
-	catch(IOException exception)
-	{
-	    System.err.println("IOException, could not read the input from the keybord!");
-	}
+// 	    System.out.print("Type the state for component " + componentName + ": ");
+// 	    System.out.flush();
+// 	    String newValue =  in.readLine();
+// 	    report = new ComponentReport(componentName, newValue);
+// 	}
+// 	catch(IOException exception)
+// 	{
+// 	    System.err.println("IOException, could not read the input from the keybord!");
+// 	}
 	return report;
     }
     

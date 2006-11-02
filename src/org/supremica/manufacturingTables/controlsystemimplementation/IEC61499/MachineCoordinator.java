@@ -46,18 +46,17 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 /**
  * The COP class describes a COP, Sequence of OPeration, that is to be read by the Coordinator for the 
  * whole manufacturing cell. A COP contains the order to perform different operations for one machine.
  * 
  *
- * Created: Fri Jun  09 09:00:13 2006
+ * Created: Tue Okt  30 11:21 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
 import java.util.List;
 import java.util.LinkedList;
@@ -125,7 +124,7 @@ public class MachineCoordinator implements Listener
     
     private void runCOP()
     {
-	// testrad
+	// testrow
 	// mailbox.send( new Message( getID(), "150R3325", "performEOP", 72 ) );
 
 	if (currentActivity.hasPredecessors())

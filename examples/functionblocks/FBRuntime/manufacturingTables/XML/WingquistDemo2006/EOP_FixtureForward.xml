@@ -1,0 +1,43 @@
+﻿<Operation opID="FixtureForward">
+    <Type>basic</Type>
+    <Comment>Zone Booking for machine with own control system, FixtureForward</Comment>
+    <Machine>FIX151</Machine>
+    <EOP>
+    
+        <InternalComponents>
+        </InternalComponents>
+        <Zones>
+            <Zone>1</Zone>
+        </Zones>
+      
+    
+        <InitialState>
+            <ZoneState>
+                <Zone>1</Zone>
+                <State>f</State>
+            </ZoneState>
+            <InitialStateCheck>
+                <AlarmType>1</AlarmType>
+                <AlarmDelay>0</AlarmDelay>
+            </InitialStateCheck>
+        </InitialState>
+
+        <Action actionNbr="1">
+            <ZoneState>
+                <Zone>1</Zone>
+                <State>b</State>
+            </ZoneState>
+        </Action>
+        <Action actionNbr="2">
+            <ZoneState>
+                <Zone>1</Zone>
+                <State>f</State>
+            </ZoneState>
+        </Action>
+
+    </EOP>
+</Operation>
+
+
+
+

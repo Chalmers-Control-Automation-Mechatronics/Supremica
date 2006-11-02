@@ -48,35 +48,89 @@
  */
 
 /**
- * The Predecessor contains a machine name and the operationNbr in that machine that has to be performed 
- * before the COP can continue.
+ * The COP class describes a COP, Coordinated OPerations, that is to be read by the Coordinator for the 
+ * whole manufacturing cell. A COP contains the order to perform different operations for one machine.
+ * 
  *
- * Created: Wed Jun  08 13:40:13 2006
+ * Created: Tue Oct 30 11:48 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
-public class COPSuccessor
+import java.util.List;
+import java.util.LinkedList;
+import java.util.Iterator;
+
+public class COP
 {
-    private String operation;
+    private String id; // The id shall be used when there are different COPs for the same machine
+    private String comment;
     private String machine;
-
-    public COPSuccessor(String operation, String machine)
+    private List<COPActivity> activities; 
+    private Iterator activityIterator;
+    // List of activities. Each activity contains (optional) preconditions for operations in other machines, and 
+    // then always an operation for this COPs machine that has to be performed. Last it contains (optional) successors 
+    // that has to be performed in other machines.
+ 
+    public COP(String id, String machine)
     {
-	this.operation = operation;
+	this.id = id;
 	this.machine = machine;
-    }
-
-    public String getOperation()
-    {
-	return operation;
-    }
+	comment = null;
+	activities = new LinkedList<COPActivity>();
+	activityIterator = activities.iterator();
+  }
 
     public String getMachine()
     {
 	return machine;
     }
 
+    public String getComment()
+    {
+	return comment;
+    }
+
+    public void setComment(String comment)
+    {
+	this.comment = comment;
+    }
+   
+    public String getID()
+    {
+	return id;
+    }
+ 
+    // Add a new COP activity to the end of the activity list.
+    public void addCOPActivity(COPActivity COPActivity)
+    {
+	activities.add(COPActivity);
+    }
+    
+    public void start()
+    {
+	activityIterator = activities.iterator();
+    }
+
+    // Return true if the COP has more activities to perform.
+    public boolean hasMoreActivities()
+    {
+	return activityIterator.hasNext();
+    }
+    
+    public COPActivity getNextActivity()
+    {
+	if (!hasMoreActivities())
+	{
+	    return null;
+	}
+	else
+	{
+	    return (COPActivity) activityIterator.next(); 
+	}
+    }
+    
 }
+

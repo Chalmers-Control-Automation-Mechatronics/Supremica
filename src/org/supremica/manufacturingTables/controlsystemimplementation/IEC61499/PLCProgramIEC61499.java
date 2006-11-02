@@ -48,35 +48,63 @@
  */
 
 /**
- * The Predecessor contains a machine name and the operationNbr in that machine that has to be performed 
- * before the COP can continue.
+ * The PLCProgramIEC61499 contains information about the Coordinator, which 
+ * in turn communicates with the machines via a mailbox.
  *
- * Created: Wed Jun  08 13:40:13 2006
+ *
+ * Created: Tue Okt  30 11:17 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
-public class COPSuccessor
+import org.supremica.manufacturingTables.controlsystemimplementation.PLCProgram;
+
+public class PLCProgramIEC61499 extends PLCProgram
 {
-    private String operation;
-    private String machine;
+    private String name;
+    private String description;
+    private Coordinator coordinator;
 
-    public COPSuccessor(String operation, String machine)
+    public PLCProgramIEC61499(String name, Coordinator coordinator)
     {
-	this.operation = operation;
-	this.machine = machine;
+	super();
+	this.name = name;
+	this.coordinator = coordinator;
+	description = null;
     }
 
-    public String getOperation()
+    public String getName()
     {
-	return operation;
+	return name;
+    }
+    
+    public String getDescription()
+    {
+	return description;
     }
 
-    public String getMachine()
+    public void setDescription(String newDescription)
     {
-	return machine;
+	description = newDescription;
     }
 
+    public void run()
+    {
+	newProductDetected("Volvo");
+    }
+    
+    public void newProductDetected(String product)
+    {
+	if (product.equals("Volvo"))
+	    {
+		coordinator.performTask("weld floor");
+	    }
+	else
+	    {
+		System.err.println("Product unknown!");
+	    }
+    }
+    
 }

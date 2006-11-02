@@ -52,12 +52,12 @@
  * The MachineController communicates with the actuators and sensors via a mailbox.
  *
  *
- * Created: Mon Apr  24 13:39:32 2006
+ * Created: Tue Okt  30 11:25 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
 public class Machine implements Listener
 {

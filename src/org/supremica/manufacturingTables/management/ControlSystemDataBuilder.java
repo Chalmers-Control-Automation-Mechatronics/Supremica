@@ -157,7 +157,7 @@ public class ControlSystemDataBuilder
 		    // Current Activity
 		    Activity activity = (Activity) activityIter.next();
 		    // Create COP Activity and add to COPData
-		    COPActivity COPActivity = new COPActivity(operationNameToNumber(activity.getOperation()));
+		    COPActivity COPActivity = new COPActivity(activity.getOperation());
 		    COPData.addCOPActivity(COPActivity);
  
 		    System.out.println(blanks.substring(0,nbrOfBlanks) + "<Activity>"); 
@@ -176,7 +176,7 @@ public class ControlSystemDataBuilder
 			    // Current Predecessor (are kinds of OperationReferences)
 			    OperationReferenceType predecessor = (OperationReferenceType) predecessorIter.next();
 			    // Create predecessor and add to COP activity
-			    Predecessor predecessorData = new Predecessor( operationNameToNumber(predecessor.getOperation()), cellName + predecessor.getMachine() ); 
+			    Predecessor predecessorData = new Predecessor( predecessor.getOperation(), cellName + predecessor.getMachine() ); 
 			    COPActivity.addPredecessor(predecessorData);
 
 			    System.out.println(blanks.substring(0,nbrOfBlanks) + "<Predecessor>"); 
@@ -212,23 +212,23 @@ public class ControlSystemDataBuilder
 	}
     }
     
-    // Hack, that converts the operation name to an int.
-    // If the operation name really was an int, the value will be unchanged.
-    // This is to allow the user to use any operation names in the COPs, but
-    // the Java implementation only allows int operation names.
-    private int operationNameToNumber(String operation)
-    {
-	int op;
-	try
-	{
-	    op = Integer.parseInt(operation, 10);
-	}
-	catch(NumberFormatException ne)
-	{
-	    op = operation.hashCode();
-	}
-	return op;
-    }
+//     // Hack, that converts the operation name to an int.
+//     // If the operation name really was an int, the value will be unchanged.
+//     // This is to allow the user to use any operation names in the COPs, but
+//     // the Java implementation only allows int operation names.
+//     private int operationNameToNumber(String operation)
+//     {
+// 	int op;
+// 	try
+// 	{
+// 	    op = Integer.parseInt(operation, 10);
+// 	}
+// 	catch(NumberFormatException ne)
+// 	{
+// 	    op = operation.hashCode();
+// 	}
+// 	return op;
+//     }
     
     public void buildEOP(org.supremica.manufacturingTables.xsd.eop.Operation operation)
     {
@@ -241,7 +241,7 @@ public class ControlSystemDataBuilder
 	nbrOfBlanks++;
 
 	// Create EOPData	
-	EOPData EOPData = new EOPData(operation.getOpID().intValue(), operation.getType().value());
+	EOPData EOPData = new EOPData(operation.getOpID(), operation.getType().value());
 
 	//System.out.println(blanks.substring(0,nbrOfBlanks) + "<Type>" + operation.getType() + "</Type>");
 

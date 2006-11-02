@@ -82,18 +82,18 @@ public class MachineControlSystem extends MachineController implements Listener
 	componentRequests = new HashMap<String, ComponentReport>(5);
     }
     
-    public boolean performEOP(int EOPNbr)
+    public boolean performEOP(String EOPName)
     {
 	// The line below can be changed to test only the COPs and not perform the actual EOPs
-	if (EOPNbr==0)
-	    return true;
+	if (EOPName==null)
+	    return false;
 
 	EOPPerformedOK = false; // this means that if the EOP is empty, a false will be returned
 	
-	List<EOP> EOPList = EOPs.get(EOPNbr);
+	List<EOP> EOPList = EOPs.get(EOPName);
 	if ( EOPList!=null && !performsEOP )
 	{
-	    System.out.println("Performing EOP: " + EOPNbr);
+	    System.out.println("Performing EOP: " + EOPName);
 	    performsEOP = true;
 
 	    // Put all alternative EOPs in a map with their initial rows

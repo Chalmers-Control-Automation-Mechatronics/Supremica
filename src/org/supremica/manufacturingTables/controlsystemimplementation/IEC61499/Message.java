@@ -48,35 +48,66 @@
  */
 
 /**
- * The Predecessor contains a machine name and the operationNbr in that machine that has to be performed 
- * before the COP can continue.
+ * The Message can be sent to and from a mailbox. It consists off sender, receiver, type and the message content.
  *
- * Created: Wed Jun  08 13:40:13 2006
+ *
+ * Created: Tue Okt  30 11:19 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
-public class COPSuccessor
+public class Message
 {
-    private String operation;
-    private String machine;
+    static final String [] TYPES = {"performCOP", "COPDone", "operationDone", "performEOP", "EOPDone", "requestState", 
+				    "checkState", "orderState", "monitorState", "reportState", "confirmState", 
+				    "externalCheckOfComponent", "confirmExternalComponent",
+				    "externalRequestOfComponent", "reportExternalComponent", 
+				    "confirmZoneState", "reportZoneState"};
+    private String type;
+    private Object content;
+    private String receiver;
+    private String sender;
 
-    public COPSuccessor(String operation, String machine)
+    public Message(String sender, String receiver, String type, Object content)
     {
-	this.operation = operation;
-	this.machine = machine;
+	this.content = content;
+	boolean typeOK = false;
+	for (int i=0; i<TYPES.length && !typeOK; i++)
+	    {
+		if (TYPES[i].equals(type))
+		    {
+			typeOK = true;
+		    }
+	    }
+	if (!typeOK)
+	    {
+		System.err.println("Wrong message type declared!");
+		return;
+	    }
+	this.type = type;
+	this.receiver = receiver;
+	this.sender = sender;
+    }
+    
+    public String getType()
+    {
+	return type;
     }
 
-    public String getOperation()
+    public Object getContent()
     {
-	return operation;
+	return content;
+    }
+    
+    public String getSender()
+    {
+	return sender;
     }
 
-    public String getMachine()
+    public String getReceiver()
     {
-	return machine;
+	return receiver;
     }
-
 }

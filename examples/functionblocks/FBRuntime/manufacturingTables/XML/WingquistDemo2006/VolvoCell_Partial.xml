@@ -3,9 +3,9 @@
         <Area name="Chassi, 11-41">
             <Cells>
                 <Cell name="11-41-150">
-                    <!--Zones>
+                    <Zones>
                         <Zone>1</Zone>
-                        <Zone>2</Zone>
+                        <!--Zone>2</Zone>
                         <Zone>3</Zone>
                         <Zone>4</Zone>
                         <Zone>5</Zone>
@@ -15,8 +15,8 @@
                         <Zone>9</Zone>
                         <Zone>10</Zone>
                         <Zone>11</Zone>
-                        <Zone>12</Zone>
-                    </Zones-->
+                        <Zone>12</Zone-->
+                    </Zones>
 
                     <Machines>
 
@@ -28,11 +28,11 @@
                             <Description>Robot, material handling and spot welding</Description>
                         </Machine>
 
-                        <Machine type="Fixture" name="150FIX151" ownControlSystem="No">
+                        <Machine type="Fixture" name="150FIX151" ownControlSystem="Yes">
                             <Description>Right fixture </Description>
                         </Machine>
 
-                        <Machine type="TurnTable" name="150TT153" ownControlSystem="No">
+                        <Machine type="TurnTable" name="150TT153" ownControlSystem="Yes">
                             <Description>Left Turntable</Description>	
                             <!--Variables>
                                 <Variable name="TT153New rack in cell">

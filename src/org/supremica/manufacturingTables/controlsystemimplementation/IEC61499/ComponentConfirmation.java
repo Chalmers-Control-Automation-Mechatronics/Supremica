@@ -46,37 +46,37 @@
  *
  * Supremica is owned and represented by KA.
  */
-
+ 
 /**
- * The Predecessor contains a machine name and the operationNbr in that machine that has to be performed 
- * before the COP can continue.
+ * The ComponentConfirmation is the respons to another machine that has asked for a confirmation that the value of
+ * the component is the supposed one.
  *
- * Created: Wed Jun  08 13:40:13 2006
+ *
+ * Created: Tue Oct 30 12:34 2006
  *
  * @author Oscar
  * @version 1.0
  */
-package org.supremica.manufacturingTables.controlsystemimplementation.Java;
+package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
-public class COPSuccessor
+public class ComponentConfirmation
 {
-    private String operation;
-    private String machine;
+    private String component;
+    private boolean confirmation;
 
-    public COPSuccessor(String operation, String machine)
+    public ComponentConfirmation(String component, boolean confirmation)
     {
-	this.operation = operation;
-	this.machine = machine;
+	this.component = component;
+	this.confirmation = confirmation;
     }
 
-    public String getOperation()
+    public String getComponentName()
     {
-	return operation;
+	return component;
     }
 
-    public String getMachine()
+    public boolean getConfirmation()
     {
-	return machine;
+	return confirmation;
     }
-
 }
