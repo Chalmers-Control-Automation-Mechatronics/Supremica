@@ -41,223 +41,244 @@ import org.supremica.properties.Config;
 
 
 public class SubjectShapeProducer
-	extends ProxyShapeProducer
-	implements ModelObserver
+    extends ProxyShapeProducer
+    implements ModelObserver
 {
-  private static final Logger logger =
-    LoggerFactory.createLogger(SubjectShapeProducer.class);
-
-  public SubjectShapeProducer(final GraphSubject graph,
-			      final ModuleProxy module,
-			      final Frame root)
-    throws GeometryAbsentException
-  {
-    super(module);
-    boolean runEmbedder = false;
-    Random rand = new Random();
-    for (NodeSubject node : graph.getNodesModifiable()) {
-      if (node instanceof SimpleNodeSubject) {
-        SimpleNodeSubject n = (SimpleNodeSubject) node;
-        if (n.isInitial()) {
-          if (n.getInitialArrowGeometry() == null) {
-              n.setInitialArrowGeometry
-              (new PointGeometrySubject(new Point(-5, -5)));
-          }
+    private static final Logger logger =
+        LoggerFactory.createLogger(SubjectShapeProducer.class);
+    
+    public SubjectShapeProducer(final GraphSubject graph,
+        final ModuleProxy module,
+        final Frame root)
+        throws GeometryAbsentException
+    {
+        super(module);
+        boolean runEmbedder = false;
+        Random rand = new Random();
+        for (NodeSubject node : graph.getNodesModifiable())
+        {
+            if (node instanceof SimpleNodeSubject)
+            {
+                SimpleNodeSubject n = (SimpleNodeSubject) node;
+                if (n.isInitial())
+                {
+                    if (n.getInitialArrowGeometry() == null)
+                    {
+                        n.setInitialArrowGeometry
+                            (new PointGeometrySubject(new Point(-5, -5)));
+                    }
+                }
+                
+                if (n.getPointGeometry() == null)
+                {
+                    runEmbedder = true;
+                    final int base;
+                    final int spread;
+                    if (n.isInitial())
+                    {
+                        base = 10;
+                        spread = 50;
+                    }
+                    else
+                    {
+                        base = 100;
+                        spread = 500;
+                    }
+                    n.setPointGeometry(new PointGeometrySubject
+                        (new Point(base + rand.nextInt(spread),
+                        base + rand.nextInt(spread))));
+                }
+                if (n.getLabelGeometry() == null)
+                {
+                    n.setLabelGeometry(new LabelGeometrySubject(new Point(5, 5)));
+                }
+            }
+            else if (node instanceof GroupNodeSubject)
+            {
+                if (((GroupNodeSubject)node).getGeometry() == null)
+                {
+                    throw new GeometryAbsentException("There is no geometry information"
+                        + " for a group node in this graph");
+                }
+            }
         }
-
-        if (n.getPointGeometry() == null) {
-          runEmbedder = true;
-	  final int base;
-	  final int spread;
-	  if (n.isInitial()) {
-	    base = 10;
-	    spread = 50;
-	  } else {
-	    base = 100;
-	    spread = 500;
-	  }
-          n.setPointGeometry(new PointGeometrySubject
-			     (new Point(base + rand.nextInt(spread),
-					base + rand.nextInt(spread))));
-        }
-        if (n.getLabelGeometry() == null) {
-          n.setLabelGeometry(new LabelGeometrySubject(new Point(5, 5)));
-        }
-      } else if (node instanceof GroupNodeSubject) {
-        if (((GroupNodeSubject)node).getGeometry() == null) {
-          throw new GeometryAbsentException("There is no geometry information"
-                                            + " for a group node in this graph");
-        }
-      }
-    }
-    for (EdgeSubject edge : graph.getEdgesModifiable()) {
-      if (edge.getGeometry() == null) {
-        final Collection<Point2D> points =
-          Collections.singleton(GeometryTools.getMidPoint
-                                 (GeometryTools.getPosition(edge.getSource()),
-                                  GeometryTools.getPosition(edge.getTarget())
-                                 ));
-        edge.setGeometry(new SplineGeometrySubject(points,
-                                                   SplineKind.INTERPOLATING));
-      }
-      if (edge.getStartPoint() == null) {
-        Point2D p1 = edge.getGeometry().getPoints().get(0);
-        PointGeometrySubject p =
-          new PointGeometrySubject
-            (GeometryTools.defaultPosition(edge.getSource(), p1));
-        edge.setStartPoint(p);
-      }
-      if (edge.getEndPoint() == null) {
-        PointGeometrySubject p = new PointGeometrySubject(
-                              GeometryTools.defaultPosition(edge.getTarget(),
-                                      edge.getGeometry().getPoints().get(0)));
-        edge.setEndPoint(p);
-      }
-      if (edge.getLabelBlock().getGeometry() == null) {
-          LabelGeometrySubject offset =
-            new LabelGeometrySubject
-              (new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
-                         LabelBlockProxyShape.DEFAULTOFFSETY));
-          edge.getLabelBlock().setGeometry(offset);
-        }
+        for (EdgeSubject edge : graph.getEdgesModifiable())
+        {
+            if (edge.getGeometry() == null)
+            {
+                final Collection<Point2D> points =
+                    Collections.singleton(GeometryTools.getMidPoint
+                    (GeometryTools.getPosition(edge.getSource()),
+                    GeometryTools.getPosition(edge.getTarget())
+                    ));
+                edge.setGeometry(new SplineGeometrySubject(points,
+                    SplineKind.INTERPOLATING));
+            }
+            if (edge.getStartPoint() == null)
+            {
+                Point2D p1 = edge.getGeometry().getPoints().get(0);
+                PointGeometrySubject p =
+                    new PointGeometrySubject
+                    (GeometryTools.defaultPosition(edge.getSource(), p1));
+                edge.setStartPoint(p);
+            }
+            if (edge.getEndPoint() == null)
+            {
+                PointGeometrySubject p = new PointGeometrySubject(
+                    GeometryTools.defaultPosition(edge.getTarget(),
+                    edge.getGeometry().getPoints().get(0)));
+                edge.setEndPoint(p);
+            }
+            if (edge.getLabelBlock().getGeometry() == null)
+            {
+                LabelGeometrySubject offset =
+                    new LabelGeometrySubject
+                    (new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
+                    LabelBlockProxyShape.DEFAULTOFFSETY));
+                edge.getLabelBlock().setGeometry(offset);
+            }
      /* if (edge.getGuardActionBlock().getGeometry() == null) {
           LabelGeometrySubject offset =
             new LabelGeometrySubject
               (new Point(GuardActionBlockProxyShape.DEFAULTOFFSETX,
-            		  		(int) edge.getLabelBlock().getGeometry().getOffset().getY() + 0));
+                                        (int) edge.getLabelBlock().getGeometry().getOffset().getY() + 0));
           edge.getGuardActionBlock().setGeometry(offset);
         }*/
+        }
+        if (runEmbedder)
+        {
+            final SimpleComponentSubject comp =
+                (SimpleComponentSubject) graph.getParent();
+            final String name = comp == null ? "graph" : comp.getName();
+            final long timeout = Config.GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT.get();
+            final SpringEmbedder embedder = new SpringEmbedder(graph);
+            final Thread thread = new Thread(embedder);
+            final JDialog dialog =
+                new SpringAbortDialog(root, name, embedder, timeout);
+            dialog.setLocationRelativeTo(root);
+            dialog.setVisible(true);
+            thread.start();
+        }
+        graph.addModelObserver(this);
     }
-    if (runEmbedder) {
-      final SimpleComponentSubject comp =
-	(SimpleComponentSubject) graph.getParent();
-      final String name = comp == null ? "graph" : comp.getName();
-      final long timeout = Config.GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT.get();
-      final SpringEmbedder embedder = new SpringEmbedder(graph);
-      final Thread thread = new Thread(embedder);
-      final JDialog dialog =
-	new SpringAbortDialog(root, name, embedder, timeout);
-      dialog.setLocationRelativeTo(root);
-      dialog.setVisible(true);
-      thread.start();
+    
+    public SubjectShapeProducer(Subject graph, ModuleProxy module)
+    {
+        super(module);
+        graph.addModelObserver(this);
     }
-    graph.addModelObserver(this);
-  }
-
-  public SubjectShapeProducer(Subject graph, ModuleProxy module)
-  {
-    super(module);
-    graph.addModelObserver(this);
-  }
-
-
-	private void removeMapping(NodeProxy node)
-	{
-		getMap().remove(node);
-		removeMapping(node.getName());
-	}
-
-	private void removeMapping(GroupNodeProxy node)
-	{
-		getMap().remove(node);
-	}
-
-	private void removeMapping(String label)
-	{
-		getMap().remove(label);
-	}
-
-	private void removeMapping(EdgeProxy edge)
-	{
-		getMap().remove(edge);
-		removeMapping(edge.getLabelBlock());
-		removeMapping(edge.getGuardActionBlock());
-	}
-
-	private void removeMapping(LabelBlockProxy label)
-	{
-		getMap().remove(label);
-		for (Proxy p : label.getEventList())
-		{
-			getMap().remove(p);
-		}
-	}
-	
-	private void removeMapping(GuardActionBlockProxy GA)
-	{
-		getMap().remove(GA);
-		for(BinaryExpressionProxy action : GA.getActions())
-		{
-			getMap().remove(GA.getActions());
-		}
-		List<SimpleExpressionProxy> guards = GA.getGuards();
-		if(!guards.isEmpty())
-		{
-			SimpleExpressionProxy guard = guards.get(0);
-			getMap().remove(guard);
-		}
-	}
-
-	private void removeMapping(Subject subject)
-	{
-		if (subject instanceof SimpleNodeProxy)
-		{
-			removeMapping((SimpleNodeProxy)subject);
-		}
-		if (subject instanceof GroupNodeProxy)
-		{
-			removeMapping((GroupNodeProxy)subject);
-		}
-		if (subject instanceof EdgeProxy)
-		{
-			removeMapping((EdgeProxy)subject);
-		}
-		if (subject instanceof LabelBlockProxy)
-		{
-			removeMapping((LabelBlockProxy)subject);
-		}
-		if (subject instanceof GuardActionBlockProxy)
-		{
-			removeMapping((GuardActionBlockProxy)subject);	
-		}
-	}
-
-	public void modelChanged(ModelChangeEvent event)
-	{
-		if (event.getKind() == ModelChangeEvent.ITEM_REMOVED ||
-        event.getKind() == ModelChangeEvent.ITEM_ADDED)
-		{
-			if (event.getSource().getParent() instanceof EventListExpressionSubject)
-			{
-				Subject subject = event.getSource().getParent();
-				if (subject.getParent() instanceof SimpleNodeProxy)
-				{
-					removeMapping((SimpleNodeProxy) subject.getParent());
-				}
-				else if (subject instanceof LabelBlockProxy)
-				{
-					removeMapping((LabelBlockProxy)subject);
-				}
-			}
-			else
-			{
-				removeMapping((Subject)event.getValue());
-			}
-		}
-		else if (event.getSource() instanceof SimpleNodeProxy)
-		{
-			if (event.getKind() == ModelChangeEvent.NAME_CHANGED)
-			{
-				removeMapping((String)event.getValue());
-			}
-			else
-			{
-				removeMapping((SimpleNodeProxy)event.getSource());
-			}
-		}
-		else
-		{
-			removeMapping(event.getSource());
-		}
-	}
+    
+    
+    private void removeMapping(NodeProxy node)
+    {
+        getMap().remove(node);
+        removeMapping(node.getName());
+    }
+    
+    private void removeMapping(GroupNodeProxy node)
+    {
+        getMap().remove(node);
+    }
+    
+    private void removeMapping(String label)
+    {
+        getMap().remove(label);
+    }
+    
+    private void removeMapping(EdgeProxy edge)
+    {
+        getMap().remove(edge);
+        removeMapping(edge.getLabelBlock());
+        removeMapping(edge.getGuardActionBlock());
+    }
+    
+    private void removeMapping(LabelBlockProxy label)
+    {
+        getMap().remove(label);
+        for (Proxy p : label.getEventList())
+        {
+            getMap().remove(p);
+        }
+    }
+    
+    private void removeMapping(GuardActionBlockProxy GA)
+    {
+        if (GA != null) // Fix this
+        {
+            getMap().remove(GA);
+            for(BinaryExpressionProxy action : GA.getActions())
+            {
+                getMap().remove(GA.getActions());
+            }
+            List<SimpleExpressionProxy> guards = GA.getGuards();
+            if(!guards.isEmpty())
+            {
+                SimpleExpressionProxy guard = guards.get(0);
+                getMap().remove(guard);
+            }
+        }
+    }
+    
+    private void removeMapping(Subject subject)
+    {
+        if (subject instanceof SimpleNodeProxy)
+        {
+            removeMapping((SimpleNodeProxy)subject);
+        }
+        if (subject instanceof GroupNodeProxy)
+        {
+            removeMapping((GroupNodeProxy)subject);
+        }
+        if (subject instanceof EdgeProxy)
+        {
+            removeMapping((EdgeProxy)subject);
+        }
+        if (subject instanceof LabelBlockProxy)
+        {
+            removeMapping((LabelBlockProxy)subject);
+        }
+        if (subject instanceof GuardActionBlockProxy)
+        {
+            removeMapping((GuardActionBlockProxy)subject);
+        }
+    }
+    
+    public void modelChanged(ModelChangeEvent event)
+    {
+        if (event.getKind() == ModelChangeEvent.ITEM_REMOVED ||
+            event.getKind() == ModelChangeEvent.ITEM_ADDED)
+        {
+            if (event.getSource().getParent() instanceof EventListExpressionSubject)
+            {
+                Subject subject = event.getSource().getParent();
+                if (subject.getParent() instanceof SimpleNodeProxy)
+                {
+                    removeMapping((SimpleNodeProxy) subject.getParent());
+                }
+                else if (subject instanceof LabelBlockProxy)
+                {
+                    removeMapping((LabelBlockProxy)subject);
+                }
+            }
+            else
+            {
+                removeMapping((Subject)event.getValue());
+            }
+        }
+        else if (event.getSource() instanceof SimpleNodeProxy)
+        {
+            if (event.getKind() == ModelChangeEvent.NAME_CHANGED)
+            {
+                removeMapping((String)event.getValue());
+            }
+            else
+            {
+                removeMapping((SimpleNodeProxy)event.getSource());
+            }
+        }
+        else
+        {
+            removeMapping(event.getSource());
+        }
+    }
 }

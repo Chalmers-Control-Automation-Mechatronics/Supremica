@@ -15,92 +15,100 @@ import java.util.PriorityQueue;
 
 public class Renderer
 {
-	public void renderGraph(GraphProxy graph, List<MiscShape> shapes,
-			Renderable render, ProxyShapeProducer producer,
-			Graphics2D graphics)
-	{
-		PriorityQueue<ShapeToRender> queue = new PriorityQueue<ShapeToRender>();
-		try {
-			for (NodeProxy proxy : graph.getNodes())
-			{
-				queue.offer(new ShapeToRender(producer.getShape(proxy),
-						render.getRenderingInformation(proxy)));
-				if (proxy instanceof SimpleNodeProxy)
-				{
-					queue.offer(new ShapeToRender(producer.getShape(proxy.getName()),
-							render.getRenderingInformation(((SimpleNodeProxy) proxy)
-									.getLabelGeometry())));
-				}
-			}
-			
-			for (EdgeProxy edge : graph.getEdges())
-			{
-				queue.offer(new ShapeToRender(producer.getShape(edge),
-						render.getRenderingInformation(edge)));
-				queue.offer(new ShapeToRender(producer.getShape(edge.getLabelBlock()),
-						render.getRenderingInformation(edge.getLabelBlock())));
-				for (Proxy p : edge.getLabelBlock().getEventList())
-				{
-					queue.offer(new ShapeToRender(producer.getShape(p),
-							render.getRenderingInformation(p)));
-				}
-				queue.offer(new ShapeToRender(producer.getShape(edge.getGuardActionBlock()),
-						render.getRenderingInformation(edge.getGuardActionBlock())));
-				for(BinaryExpressionProxy action : edge.getGuardActionBlock().getActions())
-				{
-					queue.offer(new ShapeToRender(producer.getShape(action),
-							render.getRenderingInformation(action)));
-				}
-				List<SimpleExpressionProxy> guards = edge.getGuardActionBlock().getGuards();
-				if(!guards.isEmpty())
-				{
-					SimpleExpressionProxy guard = guards.get(0); //there should be only one guard.
-					queue.offer(new ShapeToRender(producer.getShape(guard),
-							render.getRenderingInformation(guard)));
-				}
-			}
-		} catch (VisitorException vis) {
-			vis.printStackTrace();
-		}
-		while (!queue.isEmpty()) {
-			queue.poll().draw(graphics);
-		}
-		for (MiscShape shape : shapes) {
-			shape.draw(graphics);
-		}
-	}
-	
-	protected void drawShape(ProxyShape p, RenderingInformation status,
-			Graphics2D graphics)
-	{
-		p.draw(graphics, status);
-	}
-	
-	/**
-	 * just a wrapper class to aid with setting up priority Queue
-	 */
-	private class ShapeToRender
-	implements Comparable<ShapeToRender>
-	{
-		private ProxyShape mShape;
-		private RenderingInformation mStatus;
-		
-		public ShapeToRender(ProxyShape shape, RenderingInformation status)
-		{
-			mShape = shape;
-			mStatus = status;
-		}
-		
-		public void draw(Graphics2D g)
-		{
-			if (mStatus.getPriority() >= 0) {
-				drawShape(mShape, mStatus, g);
-			}
-		}
-		
-		public int compareTo(ShapeToRender o) 
-		{
-			return mStatus.getPriority() - o.mStatus.getPriority();
-		}
-	}
+    public void renderGraph(GraphProxy graph, List<MiscShape> shapes,
+        Renderable render, ProxyShapeProducer producer,
+        Graphics2D graphics)
+    {
+        PriorityQueue<ShapeToRender> queue = new PriorityQueue<ShapeToRender>();
+        try
+        {
+            for (NodeProxy proxy : graph.getNodes())
+            {
+                queue.offer(new ShapeToRender(producer.getShape(proxy),
+                    render.getRenderingInformation(proxy)));
+                if (proxy instanceof SimpleNodeProxy)
+                {
+                    queue.offer(new ShapeToRender(producer.getShape(proxy.getName()),
+                        render.getRenderingInformation(((SimpleNodeProxy) proxy)
+                        .getLabelGeometry())));
+                }
+            }
+            
+            for (EdgeProxy edge : graph.getEdges())
+            {
+                queue.offer(new ShapeToRender(producer.getShape(edge),
+                    render.getRenderingInformation(edge)));
+                queue.offer(new ShapeToRender(producer.getShape(edge.getLabelBlock()),
+                    render.getRenderingInformation(edge.getLabelBlock())));
+                for (Proxy p : edge.getLabelBlock().getEventList())
+                {
+                    queue.offer(new ShapeToRender(producer.getShape(p),
+                        render.getRenderingInformation(p)));
+                }
+                if (edge.getGuardActionBlock() != null) // Fix this
+                {
+                    queue.offer(new ShapeToRender(producer.getShape(edge.getGuardActionBlock()),
+                        render.getRenderingInformation(edge.getGuardActionBlock())));
+                    for(BinaryExpressionProxy action : edge.getGuardActionBlock().getActions())
+                    {
+                        queue.offer(new ShapeToRender(producer.getShape(action),
+                            render.getRenderingInformation(action)));
+                    }
+                    List<SimpleExpressionProxy> guards = edge.getGuardActionBlock().getGuards();
+                    if(!guards.isEmpty())
+                    {
+                        SimpleExpressionProxy guard = guards.get(0); //there should be only one guard.
+                        queue.offer(new ShapeToRender(producer.getShape(guard),
+                            render.getRenderingInformation(guard)));
+                    }}
+            }
+        }
+        catch (VisitorException vis)
+        {
+            vis.printStackTrace();
+        }
+        while (!queue.isEmpty())
+        {
+            queue.poll().draw(graphics);
+        }
+        for (MiscShape shape : shapes)
+        {
+            shape.draw(graphics);
+        }
+    }
+    
+    protected void drawShape(ProxyShape p, RenderingInformation status,
+        Graphics2D graphics)
+    {
+        p.draw(graphics, status);
+    }
+    
+    /**
+     * just a wrapper class to aid with setting up priority Queue
+     */
+    private class ShapeToRender
+        implements Comparable<ShapeToRender>
+    {
+        private ProxyShape mShape;
+        private RenderingInformation mStatus;
+        
+        public ShapeToRender(ProxyShape shape, RenderingInformation status)
+        {
+            mShape = shape;
+            mStatus = status;
+        }
+        
+        public void draw(Graphics2D g)
+        {
+            if (mStatus.getPriority() >= 0)
+            {
+                drawShape(mShape, mStatus, g);
+            }
+        }
+        
+        public int compareTo(ShapeToRender o)
+        {
+            return mStatus.getPriority() - o.mStatus.getPriority();
+        }
+    }
 }
