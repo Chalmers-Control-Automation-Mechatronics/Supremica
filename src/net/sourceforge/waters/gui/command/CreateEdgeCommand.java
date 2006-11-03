@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateEdgeCommand
 //###########################################################################
-//# $Id: CreateEdgeCommand.java,v 1.12 2006-11-03 15:01:56 torda Exp $
+//# $Id: CreateEdgeCommand.java,v 1.13 2006-11-03 20:41:38 flordal Exp $
 //###########################################################################
 
 
@@ -67,20 +67,23 @@ public class CreateEdgeCommand
       points = Collections.singleton((Point2D) new Point((int)endPoint.getX() + 20,
                                                          (int)endPoint.getY() + 20));
     }
-		final LabelGeometrySubject offset = new LabelGeometrySubject(
-			new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
-						LabelBlockProxyShape.DEFAULTOFFSETY));
-		final LabelBlockSubject labelBlock = 
-			new LabelBlockSubject(empty, offset);
-		final GuardActionBlockSubject guardActionBlock = 
-			new GuardActionBlockSubject(null, null, offset);
-		final SplineGeometrySubject spline = 
-			new SplineGeometrySubject(points, SplineKind.INTERPOLATING);
-		final PointGeometrySubject start = new PointGeometrySubject(startPoint);
-		final PointGeometrySubject end = new PointGeometrySubject(endPoint);
-		
-		mCreated =	new EdgeSubject(source, target, labelBlock, guardActionBlock,
-                                spline, start, end);
+    final LabelGeometrySubject labelOffset = new LabelGeometrySubject(
+        new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
+        LabelBlockProxyShape.DEFAULTOFFSETY));
+    final LabelBlockSubject labelBlock =
+        new LabelBlockSubject(empty, labelOffset);
+    final LabelGeometrySubject guardOffset = new LabelGeometrySubject(
+        new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
+        LabelBlockProxyShape.DEFAULTOFFSETY));
+    final GuardActionBlockSubject guardActionBlock =
+        new GuardActionBlockSubject(null, null, guardOffset);
+    final SplineGeometrySubject spline =
+        new SplineGeometrySubject(points, SplineKind.INTERPOLATING);
+    final PointGeometrySubject start = new PointGeometrySubject(startPoint);
+    final PointGeometrySubject end = new PointGeometrySubject(endPoint);
+
+    mCreated =	new EdgeSubject(source, target, labelBlock, guardActionBlock,
+        spline, start, end);
     }
 
     /**
