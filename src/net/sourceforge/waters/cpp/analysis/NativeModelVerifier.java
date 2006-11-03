@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeModelVerifier
 //###########################################################################
-//# $Id: NativeModelVerifier.java,v 1.2 2006-11-02 22:40:29 robi Exp $
+//# $Id: NativeModelVerifier.java,v 1.3 2006-11-03 01:00:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;
@@ -52,12 +53,6 @@ public abstract class NativeModelVerifier
     }
   }
 
-  public void setModel(final ProductDESProxy model)
-  {
-    super.setModel(model);
-    mResult = null;
-  }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
@@ -82,6 +77,11 @@ public abstract class NativeModelVerifier
   public VerificationResult getAnalysisResult()
   {
     return mResult;
+  }
+
+  public void clearAnalysisResult()
+  {
+    mResult = null;
   }
 
 

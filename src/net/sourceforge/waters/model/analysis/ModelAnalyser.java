@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   ModelAnalyser
 //###########################################################################
-//# $Id: ModelAnalyser.java,v 1.4 2006-11-02 22:40:29 robi Exp $
+//# $Id: ModelAnalyser.java,v 1.5 2006-11-03 01:00:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -64,5 +65,13 @@ public interface ModelAnalyser
    *         called before {@link #run() run()} has been called.
    */
   public AnalysisResult getAnalysisResult();
+
+  /**
+   * Resets the analysis result computed by this model analyser.
+   * This method is used when the model or other parameters are changed
+   * after a run, to indicate that the previous results are no longer
+   * valid.
+   */
+  public void clearAnalysisResult();
 
 }

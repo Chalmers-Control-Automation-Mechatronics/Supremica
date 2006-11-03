@@ -2,9 +2,9 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.analysis
-//# CLASS:   ControllabilityChecker
+//# CLASS:   SafetyVerifier
 //###########################################################################
-//# $Id: ControllabilityChecker.cpp,v 1.11 2006-11-02 22:40:30 robi Exp $
+//# $Id: SafetyVerifier.cpp,v 1.1 2006-11-03 01:00:07 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -26,7 +26,7 @@
 #include "jni/glue/EventKindGlue.h"
 #include "jni/glue/IteratorGlue.h"
 #include "jni/glue/LinkedListGlue.h"
-#include "jni/glue/NativeControllabilityCheckerGlue.h"
+#include "jni/glue/NativeSafetyVerifierGlue.h"
 #include "jni/glue/NondeterminismExceptionGlue.h"
 #include "jni/glue/ProductDESGlue.h"
 #include "jni/glue/SetGlue.h"
@@ -34,8 +34,8 @@
 #include "jni/glue/TransitionGlue.h"
 #include "jni/glue/VerificationResultGlue.h"
 
-#include "waters/analysis/ControllabilityChecker.h"
 #include "waters/analysis/EventRecord.h"
+#include "waters/analysis/SafetyVerifier.h"
 #include "waters/analysis/StateRecord.h"
 #include "waters/analysis/StateSpace.h"
 #include "waters/analysis/TransitionRecord.h"
@@ -46,17 +46,19 @@
 namespace waters {
 
 //############################################################################
-//# class ControllabilityChecker
+//# class SafetyVerifier
 //############################################################################
 
 //############################################################################
-//# ControllabilityChecker: Constructors & Destructors
+//# SafetyVerifier: Constructors & Destructors
 
-ControllabilityChecker::
-ControllabilityChecker(const jni::ProductDESGlue des,
-                       jni::ClassCache* cache)
+SafetyVerifier::
+SafetyVerifier(const jni::ProductDESGlue des,
+               const jni::KindTranslatorGlue translator,
+               jni::ClassCache* cache)
   : mCache(cache),
     mModel(des),
+    mKindTranslator(translator),
     mEncoding(0),
     mStateSpace(0),
     mDepthMap(0),
@@ -70,8 +72,8 @@ ControllabilityChecker(const jni::ProductDESGlue des,
 }
 
 
-ControllabilityChecker::
-~ControllabilityChecker()
+SafetyVerifier::
+~SafetyVerifier()
 {
   delete mEncoding;
   delete mStateSpace;
@@ -86,9 +88,9 @@ ControllabilityChecker::
 
 
 //############################################################################
-//# ControllabilityChecker: Invocation
+//# SafetyVerifier: Invocation
 
-bool ControllabilityChecker::
+bool SafetyVerifier::
 run()
 {
   try {
@@ -105,7 +107,7 @@ run()
   }
 }
 
-jni::SafetyTraceGlue ControllabilityChecker::
+jni::SafetyTraceGlue SafetyVerifier::
 getCounterExample(const jni::ProductDESProxyFactoryGlue& factory)
   const
 {
@@ -114,13 +116,13 @@ getCounterExample(const jni::ProductDESProxyFactoryGlue& factory)
 
 
 //############################################################################
-//# ControllabilityChecker: Auxiliary Methods
+//# SafetyVerifier: Auxiliary Methods
 
-void ControllabilityChecker::
+void SafetyVerifier::
 setup()
 {
   // Establish automaton encoding ...
-  mEncoding = new AutomatonEncoding(mModel, mCache);
+  mEncoding = new AutomatonEncoding(mModel, mKindTranslator, mCache);
   mStateSpace = new StateSpace(mEncoding);
   mDepthMap = new ArrayList<uint32>(128);
 
@@ -136,7 +138,7 @@ setup()
     jobject javaobject = iter.next();
     jni::EventGlue event(javaobject, mCache);
     bool controllable;
-    switch (event.getKindGlue(mCache)) {
+    switch (mKindTranslator.getEventKindGlue(&event, mCache)) {
     case jni::EventKind_UNCONTROLLABLE:
       controllable = false;
       break;
@@ -241,7 +243,7 @@ setup()
         EventRecord::compare);
 }
 
-bool ControllabilityChecker::
+bool SafetyVerifier::
 checkProperty()
 {
   // Store initial state ...
@@ -315,7 +317,7 @@ checkProperty()
   return true;
 }
 
-void ControllabilityChecker::
+void SafetyVerifier::
 computeCounterExample()
 {
   mTraceList = new jni::LinkedListGlue(mCache);
@@ -382,7 +384,7 @@ computeCounterExample()
   delete [] targettuple;
 }
 
-void ControllabilityChecker::
+void SafetyVerifier::
 teardown()
 {
   delete mEncoding;
@@ -407,18 +409,20 @@ teardown()
 
 
 //############################################################################
-//# ControllabilityChecker: Invocation through JNI
+//# SafetyVerifier: Invocation through JNI
 
 JNIEXPORT jobject JNICALL 
-Java_net_sourceforge_waters_cpp_analysis_NativeControllabilityChecker_runNativeAlgorithm
+Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
   (JNIEnv* env, jobject jchecker)
 {
   try {
     jni::ClassCache cache(env);
     try {
-      jni::NativeControllabilityCheckerGlue gchecker(jchecker, &cache);
+      jni::NativeSafetyVerifierGlue gchecker(jchecker, &cache);
       jni::ProductDESGlue des = gchecker.getModelGlue(&cache);
-      waters::ControllabilityChecker checker(des, &cache);
+      jni::KindTranslatorGlue translator =
+        gchecker.getKindTranslatorGlue(&cache);
+      waters::SafetyVerifier checker(des, translator, &cache);
       bool result = checker.run();
       if (result) {
         jni::VerificationResultGlue vresult(result, 0, &cache);

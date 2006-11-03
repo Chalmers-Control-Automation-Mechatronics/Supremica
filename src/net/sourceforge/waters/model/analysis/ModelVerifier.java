@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   ModelVerifier
 //###########################################################################
-//# $Id: ModelVerifier.java,v 1.2 2006-11-02 22:40:29 robi Exp $
+//# $Id: ModelVerifier.java,v 1.3 2006-11-03 01:00:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;

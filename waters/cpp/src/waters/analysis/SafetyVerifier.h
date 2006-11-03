@@ -2,14 +2,14 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.analysis
-//# CLASS:   ControllabilityChecker
+//# CLASS:   SafetyVerifier
 //###########################################################################
-//# $Id: ControllabilityChecker.h,v 1.5 2006-09-03 17:09:15 robi Exp $
+//# $Id: SafetyVerifier.h,v 1.1 2006-11-03 01:00:07 robi Exp $
 //###########################################################################
 
 
-#ifndef _ControllabilityChecker_h_
-#define _ControllabilityChecker_h_
+#ifndef _SafetyVerifier_h_
+#define _SafetyVerifier_h_
 
 #ifdef __GNUG__
 #pragma interface
@@ -19,6 +19,7 @@
 #pragma once
 #endif
 
+#include "jni/glue/KindTranslatorGlue.h"
 #include "jni/glue/ProductDESProxyFactoryGlue.h"
 #include "jni/glue/SafetyTraceGlue.h"
 #include "waters/base/ArrayList.h"
@@ -40,17 +41,18 @@ class StateSpace;
 
 
 //############################################################################
-//# class ControllabilityChecker
+//# class SafetyVerifier
 //############################################################################
 
-class ControllabilityChecker
+class SafetyVerifier
 {
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit ControllabilityChecker(jni::ProductDESGlue des,
-				  jni::ClassCache* cache);
-  virtual ~ControllabilityChecker();
+  explicit SafetyVerifier(jni::ProductDESGlue des,
+			  jni::KindTranslatorGlue translator,
+			  jni::ClassCache* cache);
+  virtual ~SafetyVerifier();
 
 public:
   //##########################################################################
@@ -71,6 +73,7 @@ private:
   //# Data Members
   jni::ClassCache* mCache;
   jni::ProductDESGlue mModel;
+  jni::KindTranslatorGlue mKindTranslator;
   AutomatonEncoding* mEncoding;
   StateSpace* mStateSpace;
   ArrayList<uint32>* mDepthMap;
@@ -84,4 +87,4 @@ private:
 
 }   /* namespace waters */
 
-#endif  /* !_ControllabilityChecker_h_ */
+#endif  /* !_SafetyVerifier_h_ */

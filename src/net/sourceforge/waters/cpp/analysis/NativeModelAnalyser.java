@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeModelAnalyser
 //###########################################################################
-//# $Id: NativeModelAnalyser.java,v 1.2 2006-11-02 22:40:29 robi Exp $
+//# $Id: NativeModelAnalyser.java,v 1.3 2006-11-03 01:00:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;
@@ -53,6 +53,7 @@ public abstract class NativeModelAnalyser implements ModelAnalyser
   public void setModel(final ProductDESProxy model)
   {
     mModel = model;
+    clearAnalysisResult();
   }
 
 

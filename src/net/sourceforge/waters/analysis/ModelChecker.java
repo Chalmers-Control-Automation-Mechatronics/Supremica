@@ -1,9 +1,10 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ModelChecker
 //###########################################################################
-//# $Id: ModelChecker.java,v 1.3 2006-08-20 22:51:38 yip1 Exp $
+//# $Id: ModelChecker.java,v 1.4 2006-11-03 01:00:06 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   AutomatonEncoding
 //###########################################################################
-//# $Id: AutomatonEncoding.cpp,v 1.6 2006-09-03 17:09:15 robi Exp $
+//# $Id: AutomatonEncoding.cpp,v 1.7 2006-11-03 01:00:07 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -24,6 +24,7 @@
 #include "jni/cache/ClassGlue.h"
 #include "jni/cache/JavaString.h"
 #include "jni/glue/IteratorGlue.h"
+#include "jni/glue/KindTranslatorGlue.h"
 #include "jni/glue/ProductDESGlue.h"
 #include "jni/glue/SetGlue.h"
 #include "jni/glue/StateGlue.h"
@@ -185,6 +186,7 @@ allocate(int wordindex, int shift)
 
 AutomatonEncoding::
 AutomatonEncoding(const jni::ProductDESGlue des,
+                  const jni::KindTranslatorGlue translator,
                   jni::ClassCache* cache)
 {
   int totalbits = 0;
@@ -200,7 +202,7 @@ AutomatonEncoding(const jni::ProductDESGlue des,
     jobject javaobject = iter.next();
     jni::AutomatonGlue aut(javaobject, cache);
     bool plant;
-    switch (aut.getKindGlue(cache)) {
+    switch (translator.getComponentKindGlue(&aut, cache)) {
     case jni::ComponentKind_PLANT:
       plant = true;
       break;

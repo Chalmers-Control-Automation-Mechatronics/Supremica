@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   AutomatonEncoding
 //###########################################################################
-//# $Id: AutomatonEncoding.h,v 1.5 2006-09-03 17:09:15 robi Exp $
+//# $Id: AutomatonEncoding.h,v 1.6 2006-11-03 01:00:07 robi Exp $
 //###########################################################################
 
 
@@ -27,6 +27,7 @@
 namespace jni {
   class ClassCache;
   class JavaString;
+  class KindTranslatorGlue;
   class ProductDESGlue;
   class StateGlue;
 }
@@ -124,7 +125,8 @@ class AutomatonEncoding
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit AutomatonEncoding(const jni::ProductDESGlue des,
+  explicit AutomatonEncoding(jni::ProductDESGlue des,
+			     jni::KindTranslatorGlue translator,
 			     jni::ClassCache* cache);
   ~AutomatonEncoding();
 

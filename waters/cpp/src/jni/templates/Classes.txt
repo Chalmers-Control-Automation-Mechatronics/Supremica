@@ -4,7 +4,7 @@
 //# PACKAGE: jni.glue
 //# PURPOSE: List of classes and methods to be converted to C++/JNI code
 //###########################################################################
-//# $Id: Classes.txt,v 1.13 2006-11-02 22:40:30 robi Exp $
+//# $Id: Classes.txt,v 1.14 2006-11-03 01:00:07 robi Exp $
 //###########################################################################
 
 
@@ -148,6 +148,11 @@ glue class VerificationResult {
   VerificationResult(boolean satisfied, glue TraceProxy trace);
 }
 
+glue class KindTranslator {
+  glue ComponentKind getComponentKind(glue AutomatonProxy aut);
+  glue EventKind getEventKind(glue EventProxy event);
+}
+
 
 //###########################################################################
 package net.sourceforge.waters.cpp.analysis;
@@ -158,5 +163,6 @@ glue class NativeModelAnalyser {
   glue ProductDESProxy getModel();
 }
 
-glue class NativeControllabilityChecker extends NativeModelAnalyser {
+glue class NativeSafetyVerifier extends NativeModelAnalyser {
+  glue KindTranslator getKindTranslator();
 }

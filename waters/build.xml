@@ -179,8 +179,7 @@
           description="Create JNI headers.">
     <mkdir dir="${javah.dir}"/>
     <javah outputFile="${javah.file}" classpath="${waters.classes}">
-      <class name=
-        "net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker"/>
+      <class name="net.sourceforge.waters.cpp.analysis.NativeSafetyVerifier"/>
       <class name="net.sourceforge.waters.cpp.analysis.NativeHashSet"/>
     </javah>
   </target>
@@ -285,7 +284,7 @@
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
           <exclude name="**/Abstract*.java"/>
-          <include name="**/*ProductDESImporterTest.java"/>
+          <include name="**/Native*.java"/>
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>

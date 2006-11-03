@@ -2,9 +2,9 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.analysis
-//# CLASS:   ControllabilityChecker
+//# CLASS:   LanguageInclusionChecker
 //###########################################################################
-//# $Id: ControllabilityChecker.java,v 1.3 2006-11-03 01:00:07 robi Exp $
+//# $Id: LanguageInclusionChecker.java,v 1.1 2006-11-03 01:00:07 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -12,14 +12,14 @@ package net.sourceforge.waters.model.analysis;
 
 /**
  * A model verifier that checks its input for controllability.
- * This model verifier checks whether the spec components in its input
- * model is controllable with respect to the plant components in the input
- * model.
+ * This model verifier checks whether the behaviour of all plant and spec
+ * components in its input model is contained in the behavior of all
+ * properties in the input model.
  * 
  * @author Robi Malik
  */
 
-public interface ControllabilityChecker extends SafetyVerifier
+public interface LanguageInclusionChecker extends SafetyVerifier
 {
 
 }
