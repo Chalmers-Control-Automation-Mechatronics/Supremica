@@ -2,33 +2,29 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.samples.maze
-//# CLASS:   MazeTest
+//# CLASS:   MonolithicMazeTest
 //###########################################################################
-//# $Id: MazeTest.java,v 1.7 2006-09-04 15:42:06 robi Exp $
+//# $Id: MonolithicMazeTest.java,v 1.1 2006-11-03 05:18:29 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
 
-import net.sourceforge.waters.analysis.ControllabilityChecker;
-import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.analysis.monolithic.
+  MonolithicControllabilityChecker;
+import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
 
 
-public class MazeTest extends AbstractMazeTest
+public class MonolithicMazeTest extends AbstractMazeTest
 {
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.samples.maze.AbstractMazeTest
-  protected VerificationResult checkControllability
+  protected ControllabilityChecker getControllabilityChecker
     (final ProductDESProxy des, final ProductDESProxyFactory factory)
   {
-    final ControllabilityChecker checker =
-      new ControllabilityChecker(des, factory);
-    final boolean result = checker.run();
-    final SafetyTraceProxy trace = result ? null : checker.getCounterExample();
-    return new VerificationResult(result, trace);
+    return new MonolithicControllabilityChecker(des, factory);
   }
 
 }

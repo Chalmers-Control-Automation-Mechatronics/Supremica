@@ -1,21 +1,22 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis
-//# CLASS:   ControllabilityCheckerTest
+//# PACKAGE: net.sourceforge.waters.analysis.monolithic
+//# CLASS:   MonolithicControllabilityCheckerTest
 //###########################################################################
-//# $Id: ControllabilityCheckerTest.java,v 1.16 2006-09-14 14:09:04 robi Exp $
+//# $Id: MonolithicControllabilityCheckerTest.java,v 1.1 2006-11-03 05:18:29 robi Exp $
 //###########################################################################
 
-package net.sourceforge.waters.analysis;
+package net.sourceforge.waters.analysis.monolithic;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.LinkedList;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
+import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -30,13 +31,15 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
-public class ControllabilityCheckerTest extends AbstractModelCheckerTest
+public class MonolithicControllabilityCheckerTest
+  extends AbstractModelVerifierTest
 {
 
   //#########################################################################
   //# Entry points in junit.framework.TestCase
   public static Test suite() {
-    TestSuite testSuite = new TestSuite(ControllabilityCheckerTest.class);
+    TestSuite testSuite =
+      new TestSuite(MonolithicControllabilityCheckerTest.class);
     return testSuite;
   }
 
@@ -53,7 +56,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
   {
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     final ProductDESProxy des = factory.createProductDESProxy("empty");
-    runModelChecker(des, true);
+    runModelVerifier(des, true);
   }
 
 
@@ -63,14 +66,14 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
   {
     final String group = "handwritten";
     final String name = "small_factory_2.wdes";
-    runModelChecker(group, name, true);
+    runModelVerifier(group, name, true);
   }
 
   public void testTictactoe() throws Exception
   {
     final String group = "handwritten";
     final String name = "tictactoe.wdes";
-    runModelChecker(group, name, false);
+    runModelVerifier(group, name, false);
   }
 
 
@@ -81,7 +84,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "amk14.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_cjn5() throws Exception
@@ -89,7 +92,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "cjn5.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_cs37() throws Exception
@@ -97,7 +100,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "cs37.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_ez1() throws Exception
@@ -105,7 +108,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "ez1.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_gb20() throws Exception
@@ -113,7 +116,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "gb20.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_gb21() throws Exception
@@ -121,7 +124,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "gb21.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_gjr5() throws Exception
@@ -129,7 +132,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "gjr5.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_grj3() throws Exception
@@ -137,7 +140,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "grj3.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_imr1() throws Exception
@@ -145,7 +148,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "imr1.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_jbr2() throws Exception
@@ -153,7 +156,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "jbr2.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_jmr30() throws Exception
@@ -161,7 +164,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "jmr30.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_jpt10() throws Exception
@@ -169,7 +172,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "jpt10.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_kah18() throws Exception
@@ -177,7 +180,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "kah18.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_lsr1_1() throws Exception
@@ -185,7 +188,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "lsr1_1.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_lsr1_2() throws Exception
@@ -193,7 +196,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "lsr1_2.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_lz136_1() throws Exception
@@ -201,7 +204,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "lz136_1.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_lz136_2() throws Exception
@@ -209,7 +212,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "lz136_2.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_rch11() throws Exception
@@ -217,7 +220,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "rch11.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_ry27() throws Exception
@@ -225,7 +228,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "ry27.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_scs10() throws Exception
@@ -233,7 +236,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "scs10.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_sjw41() throws Exception
@@ -241,7 +244,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "sjw41.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_smr26() throws Exception
@@ -249,7 +252,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "smr26.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_Batchtank2005_tk27() throws Exception
@@ -257,7 +260,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "tk27.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_tp20() throws Exception
@@ -265,7 +268,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "tp20.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_Batchtank2005_vl6() throws Exception
@@ -273,7 +276,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "vl6.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testMx27() throws Exception
@@ -281,7 +284,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir  = "nasty";
     final String name = "mx27.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void testProfisafeI4Host() throws Exception
@@ -289,7 +292,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "profisafe";
     final String name = "profisafe_i4_host.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testProfisafeI4Slave() throws Exception
@@ -297,7 +300,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "profisafe";
     final String name = "profisafe_i4_slave.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testProfisafeO4Host() throws Exception
@@ -305,7 +308,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "profisafe";
     final String name = "profisafe_o4_host.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testProfisafeO4Slave() throws Exception
@@ -313,7 +316,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "profisafe";
     final String name = "profisafe_o4_slave.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_plants() throws Exception
@@ -321,7 +324,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "plants.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_ac61() throws Exception
@@ -329,7 +332,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "ac61.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_al29() throws Exception
@@ -337,7 +340,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "al29.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_asjc1() throws Exception
@@ -345,7 +348,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "asjc1.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_dal9() throws Exception
@@ -353,7 +356,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "dal9.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_dmt10() throws Exception
@@ -361,7 +364,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "dmt10.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_ejtrw1() throws Exception
@@ -369,7 +372,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "ejtrw1.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_ekb2() throws Exception
@@ -377,7 +380,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "ekb2.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_gat7() throws Exception
@@ -385,7 +388,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "gat7.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_jdm18() throws Exception
@@ -393,7 +396,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "jdm18.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_jlm39() throws Exception
@@ -401,7 +404,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "jlm39.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_jpg7() throws Exception
@@ -409,7 +412,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "jpg7.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_jpm22() throws Exception
@@ -417,7 +420,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "jpm22.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_jrv2() throws Exception
@@ -425,7 +428,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "jrv2.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_js173() throws Exception
@@ -433,7 +436,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "js173.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_lz173() throws Exception
@@ -441,7 +444,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "lz173.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_meb16() throws Exception
@@ -449,7 +452,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "meb16.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_mjd29() throws Exception
@@ -457,7 +460,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "mjd29.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_ncj3() throws Exception
@@ -465,7 +468,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "ncj3.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_rjo6() throws Exception
@@ -473,7 +476,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "rjo6.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_rms33() throws Exception
@@ -481,7 +484,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "rms33.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_sdh7() throws Exception
@@ -489,7 +492,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "sdh7.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void test_TrafficLights2006_sgc9_1() throws Exception
@@ -497,7 +500,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "sgc9_1.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_sgc9_2() throws Exception
@@ -505,7 +508,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "sgc9_2.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void test_TrafficLights2006_yip1() throws Exception
@@ -513,7 +516,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "trafficlights2006";
     final String name = "yip1.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
 
@@ -524,7 +527,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir  = "big_factory";
     final String name = "bfactory.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void testBmw_fh() throws Exception
@@ -532,7 +535,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir  = "bmw_fh";
     final String name = "bmw_fh.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testBorder_cases() throws Exception
@@ -540,7 +543,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir  = "border_cases";
     final String name = "never_blow_up.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void testDebounce() throws Exception
@@ -548,15 +551,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir = "debounce";
     final String name = "debounce.wdes";
-    runModelChecker(group, dir, name, true);
-  }
-
-  public void testDreitueren() throws Exception
-  {
-    final String group = "valid";
-    final String dir  = "central_locking";
-    final String name = "dreitueren.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testFalko() throws Exception
@@ -564,7 +559,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir = "falko";
     final String name = "falko.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testFtuer() throws Exception
@@ -572,7 +567,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir  = "central_locking";
     final String name = "ftuer.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testFischertechnik() throws Exception
@@ -580,7 +575,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir = "fischertechnik";
     final String name = "fischertechnik.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void testKoordwsp() throws Exception
@@ -588,7 +583,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir  = "central_locking";
     final String name = "koordwsp.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testMazes() throws Exception
@@ -596,7 +591,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir = "mazes";
     final String name = "mazes.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testSafetydisplay() throws Exception
@@ -604,7 +599,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir = "safetydisplay";
     final String name = "safetydisplay.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testSmallFactory() throws Exception
@@ -612,7 +607,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir = "small";
     final String name = "small.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testSmallFactoryUncont() throws Exception
@@ -620,7 +615,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir = "small";
     final String name = "small_uncont.wdes";
-    runModelChecker(group, dir, name, false);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void testSmd() throws Exception
@@ -628,7 +623,7 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir = "smd";
     final String name = "smdreset.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
 
   public void testWeiche() throws Exception
@@ -636,9 +631,8 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final String group = "valid";
     final String dir = "vt";
     final String name = "weiche.wdes";
-    runModelChecker(group, dir, name, true);
+    runModelVerifier(group, dir, name, true);
   }
-
 
   //#########################################################################
   //# Test Cases -- Parameterised
@@ -675,21 +669,22 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
       new LinkedList<ParameterBindingProxy>();
     final ParameterBindingProxy binding = createBinding("N", n);
     bindings.add(binding);
-    runModelChecker(group, name, bindings, true);
+    runModelVerifier(group, name, bindings, true);
   }
 
 
   //#########################################################################
   //# Overrides for abstract base class
-  //# net.sourceforge.waters.analysis.AbstractModelCheckerTest
-  ModelChecker createModelChecker(final ProductDESProxy des,
-                                  final ProductDESProxyFactory factory)
+  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  protected ModelVerifier
+    createModelVerifier(final ProductDESProxy des,
+                        final ProductDESProxyFactory factory)
   {
-    return new ControllabilityChecker(des, factory);
+    return new MonolithicControllabilityChecker(des, factory);
   }
 
-  void checkCounterExample(final ProductDESProxy des,
-                           final TraceProxy trace)
+  protected void checkCounterExample(final ProductDESProxy des,
+                                     final TraceProxy trace)
   {
     assertNotNull(trace);
     final SafetyTraceProxy counterexample = (SafetyTraceProxy) trace;
@@ -705,12 +700,11 @@ public class ControllabilityCheckerTest extends AbstractModelCheckerTest
     final Collection<AutomatonProxy> automata = des.getAutomata();
     boolean rejected = false;
     for (final AutomatonProxy aut : automata){
-      final ComponentKind akind =aut.getKind();
+      final ComponentKind akind = aut.getKind();
       final int accepted = checkCounterExample(aut, eventlist);
       if (akind.equals(ComponentKind.PLANT)){
 	assertTrue("Counterexample not accepted by plant " +
-		   aut.getName() + "!"+" accepted "+accepted+" len "+len,
-		   accepted == len);
+		   aut.getName() + "!", accepted == len);
       } else if (akind.equals(ComponentKind.SPEC)) {
 	assertFalse("Counterexample rejected too early (step " + accepted +
 		    ") by spec " + aut.getName() + "!",

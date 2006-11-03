@@ -2,15 +2,15 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.samples.maze
-//# CLASS:   MazeTest
+//# CLASS:   NativeMazeTest
 //###########################################################################
-//# $Id: NativeMazeTest.java,v 1.1 2006-09-04 15:42:06 robi Exp $
+//# $Id: NativeMazeTest.java,v 1.2 2006-11-03 05:18:29 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
 
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
-import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -20,13 +20,10 @@ public class NativeMazeTest extends AbstractMazeTest
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.samples.maze.AbstractMazeTest
-  protected VerificationResult checkControllability
+  protected ControllabilityChecker getControllabilityChecker
     (final ProductDESProxy des, final ProductDESProxyFactory factory)
   {
-    final NativeControllabilityChecker checker =
-      new NativeControllabilityChecker(des, factory);
-    checker.run();
-    return checker.getAnalysisResult();
+    return new NativeControllabilityChecker(des, factory);
   }
 
 }

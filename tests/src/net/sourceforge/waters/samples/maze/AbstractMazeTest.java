@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   AbstractMazeTest
 //###########################################################################
-//# $Id: AbstractMazeTest.java,v 1.1 2006-09-04 15:42:06 robi Exp $
+//# $Id: AbstractMazeTest.java,v 1.2 2006-11-03 05:18:29 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.JAXBException;
 
+import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.WatersException;
@@ -435,6 +436,16 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
     }
   }
 
+  private VerificationResult checkControllability
+    (final ProductDESProxy des, final ProductDESProxyFactory factory)
+  {
+    final ControllabilityChecker checker =
+      getControllabilityChecker(des, factory);
+    final boolean result = checker.run();
+    final SafetyTraceProxy trace = result ? null : checker.getCounterExample();
+    return new VerificationResult(result, trace);
+  }
+
   private List<Point> extractMoves(final SafetyTraceProxy counterexample)
   {
     final List<EventProxy> events = counterexample.getEvents();
@@ -465,7 +476,7 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
 
   //#########################################################################
   //# Provided by Subclasses
-  protected abstract VerificationResult checkControllability
+  protected abstract ControllabilityChecker getControllabilityChecker
     (ProductDESProxy des, ProductDESProxyFactory factory);
 
 

@@ -1,15 +1,15 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeModelAnalyser
 //###########################################################################
-//# $Id: NativeModelAnalyser.java,v 1.3 2006-11-03 01:00:07 robi Exp $
+//# $Id: NativeModelAnalyser.java,v 1.4 2006-11-03 05:18:28 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;
 
-import net.sourceforge.waters.model.analysis.AnalysisResult;
-import net.sourceforge.waters.model.analysis.ModelAnalyser;
+import net.sourceforge.waters.model.analysis.AbstractModelAnalyser;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -20,7 +20,8 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * @author Robi Malik
  */
 
-public abstract class NativeModelAnalyser implements ModelAnalyser
+public abstract class NativeModelAnalyser
+  extends AbstractModelAnalyser
 {
 
   //#########################################################################
@@ -33,27 +34,7 @@ public abstract class NativeModelAnalyser implements ModelAnalyser
   public NativeModelAnalyser(final ProductDESProxy model,
 			     final ProductDESProxyFactory factory)
   {
-    mFactory = factory;
-    mModel = model;
-  }
-
-
-  //#########################################################################
-  //# Simple Acess Methods
-  public ProductDESProxyFactory getFactory()
-  {
-    return mFactory;
-  }
-
-  public ProductDESProxy getModel()
-  {
-    return mModel;
-  }
-
-  public void setModel(final ProductDESProxy model)
-  {
-    mModel = model;
-    clearAnalysisResult();
+    super(model, factory);
   }
 
 
@@ -62,11 +43,5 @@ public abstract class NativeModelAnalyser implements ModelAnalyser
   static {
     System.loadLibrary("waters");
   }
-
-
-  //#########################################################################
-  //# Data Members
-  private final ProductDESProxyFactory mFactory;
-  private ProductDESProxy mModel;
 
 }

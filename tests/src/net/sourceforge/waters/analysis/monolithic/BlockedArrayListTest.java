@@ -1,14 +1,14 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.analysis
+//# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   BlockedArrayListTest
 //###########################################################################
-//# $Id: BlockedArrayListTest.java,v 1.2 2006-07-20 02:28:37 robi Exp $
+//# $Id: BlockedArrayListTest.java,v 1.1 2006-11-03 05:18:29 robi Exp $
 //###########################################################################
 
 
-package net.sourceforge.waters.analysis;
+package net.sourceforge.waters.analysis.monolithic;
 
 import java.math.BigInteger;
 import java.util.Random;

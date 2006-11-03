@@ -4,10 +4,10 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   BlockedArrayList
 //###########################################################################
-//# $Id: BlockedArrayList.java,v 1.2 2006-07-20 02:28:36 robi Exp $
+//# $Id: BlockedArrayList.java,v 1.1 2006-11-03 05:18:28 robi Exp $
 //###########################################################################
 
-package net.sourceforge.waters.analysis;
+package net.sourceforge.waters.analysis.monolithic;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -16,8 +16,8 @@ import java.util.List;
 import net.sourceforge.waters.model.unchecked.Casting;
 
 
-public class BlockedArrayList<T> extends AbstractList<T>{
-  
+public class BlockedArrayList<T> extends AbstractList<T> {
+
   //#########################################################################
   //# Constructors
   public BlockedArrayList(final Class<T> clazz)
@@ -30,9 +30,9 @@ public class BlockedArrayList<T> extends AbstractList<T>{
 
   //#########################################################################
   //# Interface java.util.List
-  public boolean add(T item)
+  public boolean add(final T item)
   {
-    int blockno = size_ / BLOCK_SIZE;
+    final int blockno = size_ / BLOCK_SIZE;
     if (blockno < blocks_.size()) {
       block = blocks_.get(blockno);
     } else {
@@ -41,21 +41,24 @@ public class BlockedArrayList<T> extends AbstractList<T>{
     }
     block[size_ % BLOCK_SIZE] = item;
     size_++;
-    return true;        
+    return true;
   }
-  
-  public T get(int index)
+
+  public T get(final int index)
   {
-    int blockno = index / BLOCK_SIZE;
+    final int blockno = index / BLOCK_SIZE;
     if (blockno < blocks_.size()) {
       block = blocks_.get(blockno);
       return block[index % BLOCK_SIZE];
     } else {
-      throw new IndexOutOfBoundsException("The index "+index+" is out of bounds of list size "+blocks_.size()+" !");
+      throw new IndexOutOfBoundsException
+        ("The index " + index + " is out of bounds of list size " +
+         blocks_.size() + "!");
     }
   }
- 
-  public int size(){
+
+  public int size()
+  {
     return size_;
   }
 
@@ -63,11 +66,11 @@ public class BlockedArrayList<T> extends AbstractList<T>{
   //#########################################################################
   //# Data Members
   private final Class<T> clazz_;
-  private int size_;                    //The number of nodes
-  private List<T[]> blocks_;            //Fixed length blocks for nodes
-  
+  private int size_;                    // The number of nodes
+  private List<T[]> blocks_;            // Fixed length blocks for nodes
+
   private T[] block;
-  
-  private final int BLOCK_SIZE = 1024;
-   
+
+  private static final int BLOCK_SIZE = 1024;
+
 }

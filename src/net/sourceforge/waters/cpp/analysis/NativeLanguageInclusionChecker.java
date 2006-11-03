@@ -4,17 +4,15 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeLanguageInclusionChecker
 //###########################################################################
-//# $Id: NativeLanguageInclusionChecker.java,v 1.1 2006-11-03 01:00:07 robi Exp $
+//# $Id: NativeLanguageInclusionChecker.java,v 1.2 2006-11-03 05:18:28 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;
 
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
-import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
 
 
 /**
