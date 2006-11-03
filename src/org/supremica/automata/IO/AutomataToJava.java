@@ -92,9 +92,7 @@ public class AutomataToJava
 		}
 	}
 
-	private static Logger logger = LoggerFactory.createLogger(AutomataToJava.class);
 	private Project theProject;
-	private AutomataSynchronizerHelper syncHelper;
 	private SynchronizationType syncType = SynchronizationType.PRIORITIZED;
 	private Alphabet allEvents;
 	private String classname;
