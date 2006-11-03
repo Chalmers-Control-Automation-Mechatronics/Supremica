@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.17 2006-11-03 15:01:57 torda Exp $
+//# $Id: JAXBModuleImporter.java,v 1.18 2006-11-03 21:12:25 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -625,10 +625,11 @@ public class JAXBModuleImporter
           actionList.add(exprProxy);
         }
       }
-      final LabelGeometryProxy geometry =
-        (LabelGeometryProxy) element.getLabelGeometry(); 
+      final LabelGeometryProxy geometry;
+      geometry = null; // Fix this
+      //geometry = (LabelGeometryProxy) element.getLabelGeometry();
       return mFactory.createGuardActionBlockProxy
-        (guardList, actionList, geometry);
+          (guardList, actionList, geometry);
     }
   }
   // ------------------------
