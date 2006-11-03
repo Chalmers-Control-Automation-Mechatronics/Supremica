@@ -18,11 +18,9 @@ import org.supremica.automata.State;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
-import org.supremica.automata.Alphabet;
 import org.supremica.automata.ForbiddenEvent;
 import org.supremica.automata.algorithms.SearchStates;
 import org.supremica.gui.VisualProject;
-import org.supremica.gui.MonitorableThread;
 
 public class Forbidder
 {

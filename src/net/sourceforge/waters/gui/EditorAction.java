@@ -2,8 +2,6 @@ package net.sourceforge.waters.gui;
 
 import javax.swing.JTextPane;
 
-import net.sourceforge.waters.model.module.BinaryExpressionProxy;
-
 public class EditorAction extends JTextPane {
 	public EditorAction(String action) 
 	{

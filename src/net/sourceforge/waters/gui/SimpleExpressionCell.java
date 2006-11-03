@@ -4,14 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   SimpleExpressionCell
 //###########################################################################
-//# $Id: SimpleExpressionCell.java,v 1.8 2006-08-08 23:59:21 robi Exp $
+//# $Id: SimpleExpressionCell.java,v 1.9 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
-import java.awt.Container;
-import java.awt.event.ActionEvent;
 import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
@@ -20,7 +18,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.DocumentFilter;
-import javax.swing.text.JTextComponent;
 
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;

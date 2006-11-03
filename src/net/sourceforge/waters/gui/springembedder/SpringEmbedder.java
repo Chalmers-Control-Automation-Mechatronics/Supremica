@@ -4,16 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.22 2006-10-20 05:20:55 robi Exp $
+//# $Id: SpringEmbedder.java,v 1.23 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui.springembedder;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JFrame;
-import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.AbstractSet;
 import java.util.Collection;

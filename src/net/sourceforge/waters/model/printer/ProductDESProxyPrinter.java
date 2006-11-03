@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ProductDESProxyPrinter
 //###########################################################################
-//# $Id: ProductDESProxyPrinter.java,v 1.6 2006-09-12 14:57:53 robi Exp $
+//# $Id: ProductDESProxyPrinter.java,v 1.7 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;
@@ -16,9 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;

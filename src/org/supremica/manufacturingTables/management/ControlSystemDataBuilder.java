@@ -62,13 +62,9 @@ package org.supremica.manufacturingTables.management;
 
 import java.util.Iterator;
 import java.util.List;
-import java.io.*;
-import javax.xml.bind.*;
 import org.supremica.manufacturingTables.xsd.factory.*;
 import org.supremica.manufacturingTables.xsd.eop.*;
 import org.supremica.manufacturingTables.xsd.rop.*;
-import org.supremica.manufacturingTables.management.*;
-import org.supremica.automationobjects.xsd.libraryelement.*;
 //import net.sourceforge.fuber.xsd.libraryelement.*;
 import org.supremica.manufacturingTables.controlsystemdata.*;
 

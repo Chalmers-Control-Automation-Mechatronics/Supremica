@@ -1,11 +1,5 @@
 package net.sourceforge.waters.gui.command;
 
-import net.sourceforge.waters.gui.ControlledSurface;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
-
-import javax.swing.undo.AbstractUndoableEdit;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;

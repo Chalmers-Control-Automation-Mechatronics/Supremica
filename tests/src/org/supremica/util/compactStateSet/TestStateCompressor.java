@@ -51,7 +51,6 @@ package org.supremica.util.compactStateSet;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.supremica.testhelpers.*;
 
 public class TestStateCompressor
 	extends TestCase

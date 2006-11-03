@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBProductDESImporter
 //###########################################################################
-//# $Id: JAXBProductDESImporter.java,v 1.5 2006-09-19 15:53:20 robi Exp $
+//# $Id: JAXBProductDESImporter.java,v 1.6 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -12,8 +12,6 @@ package net.sourceforge.waters.model.marshaller;
 import java.net.URI;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
-import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.base.IndexedSet;
 import net.sourceforge.waters.model.base.Proxy;

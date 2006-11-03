@@ -4,13 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNewDialog
 //###########################################################################
-//# $Id: EditorNewDialog.java,v 1.8 2006-09-20 16:24:12 robi Exp $
+//# $Id: EditorNewDialog.java,v 1.9 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
-import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.tree.*;
@@ -19,7 +18,6 @@ import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.subject.module.GraphSubject;
-import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 

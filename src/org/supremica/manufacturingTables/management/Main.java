@@ -60,15 +60,10 @@
 package org.supremica.manufacturingTables.management;
 import org.supremica.manufacturingTables.controlsystemdata.*;
 import org.supremica.manufacturingTables.controlsystemimplementation.*;
-import org.supremica.manufacturingTables.controlsystemimplementation.Java.*;
 import org.supremica.manufacturingTables.xsd.factory.*;
-import org.supremica.manufacturingTables.xsd.eop.*;
 import org.supremica.manufacturingTables.xsd.rop.*;
 
 import java.io.*;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Iterator;
 
 public class Main
 {

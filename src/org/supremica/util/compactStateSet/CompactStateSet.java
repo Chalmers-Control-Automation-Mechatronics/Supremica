@@ -49,7 +49,6 @@
  */
 package org.supremica.util.compactStateSet;
 
-import org.supremica.automata.AutomataIndexFormHelper;
 import org.supremica.automata.StateStorage;
 import java.util.*;
 

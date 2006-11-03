@@ -1,9 +1,5 @@
 package net.sourceforge.waters.gui.renderer;
 
-import java.awt.BasicStroke;
-import java.awt.Graphics2D;
-import java.awt.Shape;
-import java.awt.Stroke;
 
 import net.sourceforge.waters.model.base.Proxy;
 import java.util.List;

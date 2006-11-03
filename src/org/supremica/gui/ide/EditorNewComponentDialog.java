@@ -4,30 +4,22 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorNewDialog
 //###########################################################################
-//# $Id: EditorNewComponentDialog.java,v 1.14 2006-09-27 18:09:05 knut Exp $
+//# $Id: EditorNewComponentDialog.java,v 1.15 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 
 package org.supremica.gui.ide;
 
 import java.awt.event.*;
-import java.util.Collection;
-import java.util.Collections;
 import javax.swing.*;
-import javax.swing.tree.*;
 
 import net.sourceforge.waters.gui.*;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.subject.module.GraphSubject;
-import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 

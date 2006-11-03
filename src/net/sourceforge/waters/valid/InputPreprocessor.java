@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   InputPreprocessor
 //###########################################################################
-//# $Id: InputPreprocessor.java,v 1.4 2006-02-20 22:20:22 robi Exp $
+//# $Id: InputPreprocessor.java,v 1.5 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 
 
@@ -14,7 +14,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintWriter;

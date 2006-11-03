@@ -4,20 +4,14 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ModuleTreeRenderer
 //###########################################################################
-//# $Id: ModuleTreeRenderer.java,v 1.5 2006-10-17 23:31:07 flordal Exp $
+//# $Id: ModuleTreeRenderer.java,v 1.6 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
 import javax.swing.*;
 import javax.swing.tree.*;
-import javax.swing.event.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import javax.xml.bind.JAXBException;
-import net.sourceforge.waters.model.base.*;
 import net.sourceforge.waters.model.module.*;
-import java.util.ArrayList;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import javax.swing.tree.DefaultMutableTreeNode;
 

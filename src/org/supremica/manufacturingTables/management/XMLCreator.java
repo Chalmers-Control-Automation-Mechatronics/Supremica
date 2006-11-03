@@ -63,9 +63,7 @@ package org.supremica.manufacturingTables.management;
 //import java.util.List;
 import java.io.*;
 import javax.xml.bind.*;
-import org.supremica.manufacturingTables.xsd.factory.*;
 //import net.sourceforge.fuber.xsd.libraryelement.*;
-import org.supremica.automationobjects.xsd.libraryelement.*;
 
 
 public class XMLCreator

@@ -4,18 +4,15 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorOptions
 //###########################################################################
-//# $Id: EditorOptions.java,v 1.5 2006-07-20 02:28:37 robi Exp $
+//# $Id: EditorOptions.java,v 1.6 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
 import javax.swing.*;
 import javax.swing.event.*;
-import javax.swing.table.*;
 import javax.swing.text.NumberFormatter;
 import java.awt.*;
-import java.awt.dnd.*;
 import java.awt.event.*;
-import java.util.*;
 import java.beans.*;
 import net.sourceforge.waters.gui.renderer.EdgeProxyShape;
 

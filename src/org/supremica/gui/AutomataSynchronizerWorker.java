@@ -52,7 +52,6 @@ package org.supremica.gui;
 import org.supremica.automata.algorithms.*;
 import javax.swing.*;
 import java.util.*;
-import java.awt.Component;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.util.ActionTimer;

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ParameterListCell
 //###########################################################################
-//# $Id: ParameterListCell.java,v 1.6 2005-11-10 21:54:42 robi Exp $
+//# $Id: ParameterListCell.java,v 1.7 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 
 
@@ -21,7 +21,6 @@ import net.sourceforge.waters.model.module.EventParameterProxy;
 import net.sourceforge.waters.model.module.IntParameterProxy;
 import net.sourceforge.waters.model.module.ParameterProxy;
 import net.sourceforge.waters.model.module.RangeParameterProxy;
-import net.sourceforge.waters.model.module.SimpleParameterProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 

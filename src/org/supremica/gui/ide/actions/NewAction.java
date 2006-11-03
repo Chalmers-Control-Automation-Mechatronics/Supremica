@@ -5,7 +5,6 @@ import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import net.sourceforge.waters.subject.module.ModuleSubject;
-import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.gui.ide.IDE;
 import java.util.List;
 import javax.swing.KeyStroke;

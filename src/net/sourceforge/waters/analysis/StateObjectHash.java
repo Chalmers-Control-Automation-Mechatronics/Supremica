@@ -19,9 +19,6 @@
 package net.sourceforge.waters.analysis;
 
 import java.io.Serializable;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 /**
  * An open addressed hashing implementation for Object types.
@@ -29,7 +26,7 @@ import java.util.NoSuchElementException;
  * Created: Sun Nov  4 08:56:06 2001
  *
  * @author Eric D. Friedman
- * @version $Id: StateObjectHash.java,v 1.4 2006-11-02 22:40:29 robi Exp $
+ * @version $Id: StateObjectHash.java,v 1.5 2006-11-03 15:01:57 torda Exp $
  */
 abstract public class StateObjectHash extends StateHash implements Serializable, StateObjectHashingStrategy {
     /** the set of Objects */

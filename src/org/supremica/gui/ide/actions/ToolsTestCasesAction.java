@@ -5,11 +5,6 @@ import javax.swing.Action;
 import javax.swing.KeyStroke;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import net.sourceforge.waters.model.marshaller.ProductDESImporter;
-import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.subject.module.ModuleSubject;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import org.supremica.automata.Project;
 import org.supremica.gui.TestCasesDialog;
 
 /**

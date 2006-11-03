@@ -49,10 +49,6 @@
  */
 package org.supremica.automata.templates;
 
-import java.net.URL;
-import org.supremica.automata.IO.*;
-import org.supremica.automata.*;
-
 public class TemplateItemType
 {
     public static final TemplateItemType MODULE = new TemplateItemType(".wmod");

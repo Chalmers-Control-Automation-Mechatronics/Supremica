@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   ProductDESElement
 //###########################################################################
-//# $Id: ProductDESElement.java,v 1.9 2006-09-19 15:53:20 robi Exp $
+//# $Id: ProductDESElement.java,v 1.10 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -12,7 +12,6 @@ package net.sourceforge.waters.plain.des;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.DuplicateNameException;

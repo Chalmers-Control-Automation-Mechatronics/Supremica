@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorAddEventAction
 //###########################################################################
-//# $Id: EditorAddModuleEventAction.java,v 1.4 2006-10-17 07:27:21 flordal Exp $
+//# $Id: EditorAddModuleEventAction.java,v 1.5 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 
@@ -13,9 +13,7 @@ package org.supremica.gui.ide.actions;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.util.List;
-import javax.swing.KeyStroke;
 import org.supremica.gui.ide.IDE;
 import net.sourceforge.waters.gui.ControlledSurface;
 import org.supremica.gui.ide.ModuleContainer;

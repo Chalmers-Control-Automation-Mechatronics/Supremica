@@ -4,13 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ModuleProxyPrinter
 //###########################################################################
-//# $Id: ModuleProxyPrinter.java,v 1.6 2006-09-06 11:52:21 robi Exp $
+//# $Id: ModuleProxyPrinter.java,v 1.7 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;
 
 import java.io.Writer;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 

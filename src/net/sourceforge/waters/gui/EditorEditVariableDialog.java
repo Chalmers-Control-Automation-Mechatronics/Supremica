@@ -1,6 +1,5 @@
 package net.sourceforge.waters.gui;
 
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -10,12 +9,9 @@ import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
-import net.sourceforge.waters.model.expr.BinaryOperator;
-import net.sourceforge.waters.model.expr.IntValue;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
-import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.BooleanConstantSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;

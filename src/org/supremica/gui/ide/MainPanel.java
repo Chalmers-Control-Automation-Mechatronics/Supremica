@@ -4,32 +4,21 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   MainPanel
 //###########################################################################
-//# $Id: MainPanel.java,v 1.25 2006-11-01 08:26:03 flordal Exp $
+//# $Id: MainPanel.java,v 1.26 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
 
-import java.awt.BorderLayout;
-import java.awt.Font;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.JToolBar;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.StyledDocument;
-import net.sourceforge.waters.gui.EditorColor;
 
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.ModuleWindowInterface;

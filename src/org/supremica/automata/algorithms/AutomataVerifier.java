@@ -57,7 +57,6 @@ import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.EventToAutomataMap;
 import org.supremica.automata.State;
 import org.supremica.automata.Arc;
 import org.supremica.automata.AutomatonType;

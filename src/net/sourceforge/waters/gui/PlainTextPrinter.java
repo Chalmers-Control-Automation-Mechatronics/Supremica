@@ -4,24 +4,21 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   HTMLPrinter
 //###########################################################################
-//# $Id: PlainTextPrinter.java,v 1.1 2006-07-10 00:57:32 knut Exp $
+//# $Id: PlainTextPrinter.java,v 1.2 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.io.StringWriter;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventParameterProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
-import net.sourceforge.waters.model.module.IdentifiedProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;

@@ -3,16 +3,10 @@ package org.supremica.gui.ide.actions;
 import java.util.List;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
-import javax.swing.KeyStroke;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import org.supremica.automata.Automata;
-import org.supremica.automata.Automaton;
 import org.supremica.gui.VisualProject;
 import org.supremica.gui.FindStates;
-import org.supremica.gui.AutomatonExplorer;
-import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.gui.ide.IDE;
 import org.supremica.log.*;
 

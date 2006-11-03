@@ -1,14 +1,7 @@
 package net.sourceforge.waters.gui.command;
 
 import net.sourceforge.waters.gui.EditorGraph;
-import net.sourceforge.waters.gui.ControlledSurface;
-import net.sourceforge.waters.model.module.BoxGeometryProxy;
-import net.sourceforge.waters.model.module.GroupNodeProxy;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
-import javax.swing.undo.AbstractUndoableEdit;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;
 import java.awt.geom.Rectangle2D;

@@ -3,15 +3,13 @@
 //# PACKAGE: waters.samples.maze
 //# CLASS:   Action
 //###########################################################################
-//# $Id: Action.java,v 1.3 2006-07-20 02:28:37 robi Exp $
+//# $Id: Action.java,v 1.4 2006-11-03 15:01:58 torda Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.samples.maze;
 
 import java.awt.Point;
-
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 class Action

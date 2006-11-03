@@ -2,13 +2,9 @@
 
 package org.supremica.gui.ide;
 
-import java.awt.*;
-import javax.swing.*;
-import org.supremica.gui.MenuHandler;
 import org.supremica.util.VPopupMenu;
 import org.supremica.log.*;
 
-import org.supremica.gui.ide.actions.IDEActionInterface;
 
 class EditorModuleEventPopupMenu
     extends VPopupMenu

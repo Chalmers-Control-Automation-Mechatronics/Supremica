@@ -51,14 +51,9 @@ package org.supremica.automata;
 
 import org.supremica.log.*;
 import java.util.Comparator;
-import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
-import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.plain.base.AbstractNamedElement;
-import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.TransitionProxy;
 

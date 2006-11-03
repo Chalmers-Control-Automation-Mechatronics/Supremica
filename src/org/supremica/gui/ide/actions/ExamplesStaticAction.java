@@ -2,17 +2,13 @@ package org.supremica.gui.ide.actions;
 
 import java.util.List;
 import javax.swing.Action;
-import javax.swing.KeyStroke;
 import javax.swing.JOptionPane;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
-import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import org.supremica.log.*;
 import org.supremica.automata.Project;
-import org.supremica.gui.TestCasesDialog;
 import org.supremica.gui.VisualProjectFactory;
 import org.supremica.automata.templates.TemplateItem;
 import org.supremica.automata.templates.TemplateItemType;

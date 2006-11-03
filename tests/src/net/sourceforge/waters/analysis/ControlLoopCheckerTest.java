@@ -4,12 +4,11 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopCheckerTest
 //###########################################################################
-//# $Id: ControlLoopCheckerTest.java,v 1.12 2006-09-19 15:53:20 robi Exp $
+//# $Id: ControlLoopCheckerTest.java,v 1.13 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.LinkedList;
@@ -25,8 +24,6 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 

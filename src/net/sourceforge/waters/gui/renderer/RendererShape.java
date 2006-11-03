@@ -2,8 +2,6 @@ package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Shape;
 import java.awt.Graphics2D;
-import java.awt.Stroke;
-import java.awt.BasicStroke;
 
 public interface RendererShape
 {

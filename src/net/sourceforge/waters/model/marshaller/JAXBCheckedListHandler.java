@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBCheckedListHandler
 //###########################################################################
-//# $Id: JAXBCheckedListHandler.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: JAXBCheckedListHandler.java,v 1.3 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -13,7 +13,6 @@ import java.util.List;
 
 import net.sourceforge.waters.model.base.IndexedCollection;
 import net.sourceforge.waters.model.base.NamedProxy;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.unchecked.Casting;
 
 import net.sourceforge.waters.xsd.base.ElementType;

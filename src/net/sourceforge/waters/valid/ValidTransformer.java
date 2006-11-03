@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ValidTransformer
 //###########################################################################
-//# $Id: ValidTransformer.java,v 1.2 2006-02-20 22:20:22 robi Exp $
+//# $Id: ValidTransformer.java,v 1.3 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 
 
@@ -14,7 +14,6 @@ import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;

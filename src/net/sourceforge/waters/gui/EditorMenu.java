@@ -4,15 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.32 2006-10-07 14:38:44 robi Exp $
+//# $Id: EditorMenu.java,v 1.33 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
-import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
 import javax.swing.*;
 
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;

@@ -1,7 +1,6 @@
 package net.sourceforge.waters.gui.command;
 
 import net.sourceforge.waters.gui.ControlledSurface;
-import java.util.List;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import java.util.Set;
 import java.util.HashSet;

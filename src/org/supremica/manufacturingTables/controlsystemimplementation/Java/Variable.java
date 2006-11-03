@@ -61,7 +61,6 @@ package org.supremica.manufacturingTables.controlsystemimplementation.Java;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Iterator;
 
 public class Variable implements Listener
 {

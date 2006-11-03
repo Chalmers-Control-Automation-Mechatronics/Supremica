@@ -2,9 +2,6 @@ package org.supremica.gui.ide.actions;
 
 import javax.swing.Action;
 import java.awt.event.ActionEvent;
-import org.supremica.gui.ide.ModuleContainer;
-import net.sourceforge.waters.gui.EditorWindowInterface;
-import net.sourceforge.waters.gui.ControlledSurface;
 
 import java.util.List;
 

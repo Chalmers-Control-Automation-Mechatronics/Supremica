@@ -4,18 +4,15 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindowInterface.java,v 1.9 2006-10-05 21:34:54 flordal Exp $
+//# $Id: EditorWindowInterface.java,v 1.10 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
-import java.io.File;
-import java.util.List;
 import javax.swing.JFrame;
 
 import net.sourceforge.waters.gui.command.UndoInterface;
-import net.sourceforge.waters.subject.module.IdentifierSubject;
 
 
 public interface EditorWindowInterface

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   EqualCollection
 //###########################################################################
-//# $Id: EqualCollection.java,v 1.5 2006-08-18 06:39:29 robi Exp $
+//# $Id: EqualCollection.java,v 1.6 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -12,8 +12,6 @@ package net.sourceforge.waters.model.base;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 /**

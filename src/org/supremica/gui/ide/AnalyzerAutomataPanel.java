@@ -21,17 +21,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Automata;
-import org.supremica.automata.Project;
 import org.supremica.properties.Config;
-import net.sourceforge.waters.gui.ControlledSurface;
-import net.sourceforge.waters.gui.EditorSurface;
-import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.model.module.GraphProxy;
-import net.sourceforge.waters.subject.module.GraphSubject;
-import net.sourceforge.waters.subject.module.ModuleSubject;
-import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
-import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
-
 
 public class AnalyzerAutomataPanel
 	extends WhiteScrollPane

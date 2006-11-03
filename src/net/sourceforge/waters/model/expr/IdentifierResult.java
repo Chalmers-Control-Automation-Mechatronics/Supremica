@@ -4,13 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   IdentifierResult
 //###########################################################################
-//# $Id: IdentifierResult.java,v 1.1 2006-09-06 11:52:21 robi Exp $
+//# $Id: IdentifierResult.java,v 1.2 2006-11-03 15:01:58 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.model.module.IdentifierProxy;

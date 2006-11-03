@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.16 2006-09-19 15:53:20 robi Exp $
+//# $Id: JAXBModuleImporter.java,v 1.17 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -20,8 +20,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.unchecked.Casting;
-import net.sourceforge.waters.model.base.DocumentProxy;
-import net.sourceforge.waters.model.base.GeometryProxy;
 import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.model.base.NameNotFoundException;
 import net.sourceforge.waters.model.base.Proxy;
@@ -46,7 +44,6 @@ import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachComponentProxy;
 import net.sourceforge.waters.model.module.ForeachEventAliasProxy;
 import net.sourceforge.waters.model.module.ForeachEventProxy;
-import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -68,14 +65,12 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.model.module.SimpleParameterProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.ElementType;
 import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.xsd.base.NamedType;
 import net.sourceforge.waters.xsd.module.AnchorPosition;
 import net.sourceforge.waters.xsd.module.BinaryExpression;
 import net.sourceforge.waters.xsd.module.BoxGeometry;
@@ -94,10 +89,8 @@ import net.sourceforge.waters.xsd.module.ExpressionType;
 import net.sourceforge.waters.xsd.module.ForeachComponent;
 import net.sourceforge.waters.xsd.module.ForeachEventAlias;
 import net.sourceforge.waters.xsd.module.ForeachEvent;
-import net.sourceforge.waters.xsd.module.ForeachType;
 import net.sourceforge.waters.xsd.module.Graph;
 import net.sourceforge.waters.xsd.module.GroupNode;
-import net.sourceforge.waters.xsd.module.IdentifiedType;
 import net.sourceforge.waters.xsd.module.IdentifierType;
 import net.sourceforge.waters.xsd.module.IndexedIdentifier;
 import net.sourceforge.waters.xsd.module.Instance;
@@ -106,7 +99,6 @@ import net.sourceforge.waters.xsd.module.IntParameter;
 import net.sourceforge.waters.xsd.module.LabelBlock;
 import net.sourceforge.waters.xsd.module.LabelGeometry;
 import net.sourceforge.waters.xsd.module.Module;
-import net.sourceforge.waters.xsd.module.NodeType;
 import net.sourceforge.waters.xsd.module.NodeRef;
 import net.sourceforge.waters.xsd.module.ParameterBinding;
 import net.sourceforge.waters.xsd.module.PointGeometryType;
@@ -116,7 +108,6 @@ import net.sourceforge.waters.xsd.module.SimpleComponent;
 import net.sourceforge.waters.xsd.module.SimpleExpressionType;
 import net.sourceforge.waters.xsd.module.SimpleIdentifier;
 import net.sourceforge.waters.xsd.module.SimpleNode;
-import net.sourceforge.waters.xsd.module.SimpleParameterType;
 import net.sourceforge.waters.xsd.module.SplineGeometry;
 import net.sourceforge.waters.xsd.module.SplineKind;
 import net.sourceforge.waters.xsd.module.UnaryExpression;

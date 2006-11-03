@@ -1,17 +1,12 @@
 package net.sourceforge.waters.gui;
 
-import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import org.supremica.util.VPopupMenu;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.VariableSubject;
-import net.sourceforge.waters.gui.command.Command;
-import net.sourceforge.waters.gui.command.DeleteEdgeCommand;
-import net.sourceforge.waters.gui.command.FlipEdgeCommand;
 
 /**
  * Popup for editing attributes of a node.

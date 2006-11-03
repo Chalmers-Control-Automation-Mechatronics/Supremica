@@ -4,11 +4,10 @@
 //# PACKAGE: waters.gui
 //# CLASS:   ShadeTable
 //###########################################################################
-//# $Id: ShadeTable.java,v 1.2 2005-02-18 03:09:06 knut Exp $
+//# $Id: ShadeTable.java,v 1.3 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
-import javax.swing.*;
 import javax.swing.table.*;
 import java.util.*;
 import java.awt.*;

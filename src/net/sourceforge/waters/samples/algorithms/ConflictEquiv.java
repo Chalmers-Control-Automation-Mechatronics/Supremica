@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.waters.samples.algorithms
 //# CLASS:   ConflictEquiv
 //###########################################################################
-//# $Id: ConflictEquiv.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ConflictEquiv.java,v 1.3 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 
@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;

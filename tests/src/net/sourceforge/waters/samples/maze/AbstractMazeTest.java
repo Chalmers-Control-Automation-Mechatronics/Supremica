@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   AbstractMazeTest
 //###########################################################################
-//# $Id: AbstractMazeTest.java,v 1.2 2006-11-03 05:18:29 robi Exp $
+//# $Id: AbstractMazeTest.java,v 1.3 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
@@ -19,7 +19,6 @@ import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.VerificationResult;
-import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;

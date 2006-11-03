@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBListHandler
 //###########################################################################
-//# $Id: JAXBListHandler.java,v 1.3 2006-07-20 02:28:37 robi Exp $
+//# $Id: JAXBListHandler.java,v 1.4 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -12,7 +12,6 @@ package net.sourceforge.waters.model.marshaller;
 import java.util.Collection;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;

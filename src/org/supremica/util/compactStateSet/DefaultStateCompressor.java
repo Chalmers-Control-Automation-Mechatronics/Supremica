@@ -49,7 +49,6 @@
  */
 package org.supremica.util.compactStateSet;
 
-import java.util.*;
 
 public class DefaultStateCompressor
 	implements StateCompressor

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ValidToWaters
 //###########################################################################
-//# $Id: ValidToWaters.java,v 1.7 2006-08-08 23:56:45 robi Exp $
+//# $Id: ValidToWaters.java,v 1.8 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.valid;
@@ -12,9 +12,7 @@ package net.sourceforge.waters.valid;
 
 import java.io.File;
 import java.io.IOException;
-import javax.xml.bind.JAXBException;
 
-import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;

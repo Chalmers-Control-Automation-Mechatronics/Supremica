@@ -4,14 +4,13 @@
 //# PACKAGE: waters.model.base
 //# CLASS:   EventKindException
 //###########################################################################
-//# $Id: EventKindException.java,v 1.2 2005-11-03 01:24:15 robi Exp $
+//# $Id: EventKindException.java,v 1.3 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
 
 import java.util.Iterator;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.RangeValue;
 import net.sourceforge.waters.model.module.EventDeclProxy;

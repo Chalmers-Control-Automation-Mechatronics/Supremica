@@ -55,13 +55,11 @@ import java.io.*;
 import javax.swing.*;
 import java.util.*;
 import org.supremica.properties.BooleanProperty;
-import org.supremica.properties.Config;
 import org.supremica.properties.IntegerProperty;
 import org.supremica.properties.PropertyType;
 import org.supremica.properties.Property;
 import org.supremica.properties.StringProperty;
 import org.supremica.properties.SupremicaProperties;
-import org.supremica.util.BDD.Options;
 
 public class PropertiesDialog
     extends JDialog

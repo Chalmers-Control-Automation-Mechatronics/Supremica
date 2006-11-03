@@ -52,10 +52,8 @@ package org.supremica.automata.IO;
 import java.io.*;
 import java.util.*;
 import java.text.DateFormat;
-import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.SynchronizationType;
-import org.supremica.automata.algorithms.AutomataSynchronizerHelper;
 import org.supremica.automata.execution.*;
 import org.supremica.util.SupremicaException;
 

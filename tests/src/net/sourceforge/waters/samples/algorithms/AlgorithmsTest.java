@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.algorithms
 //# CLASS:   AlgorithmsTest
 //###########################################################################
-//# $Id: AlgorithmsTest.java,v 1.5 2006-09-19 15:53:20 robi Exp $
+//# $Id: AlgorithmsTest.java,v 1.6 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.algorithms;
@@ -13,12 +13,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import javax.xml.bind.JAXBException;
 import javax.xml.transform.TransformerConfigurationException;
 
-import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.NameNotFoundException;
 import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;

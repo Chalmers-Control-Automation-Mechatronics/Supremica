@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventParameterEditorDialog
 //###########################################################################
-//# $Id: SimpleParameterEditorDialog.java,v 1.5 2006-08-08 23:59:21 robi Exp $
+//# $Id: SimpleParameterEditorDialog.java,v 1.6 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 
 
@@ -16,7 +16,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import javax.swing.*;
-import javax.swing.event.*;
 
 import net.sourceforge.waters.model.base.DuplicateNameException;
 import net.sourceforge.waters.model.base.IndexedList;

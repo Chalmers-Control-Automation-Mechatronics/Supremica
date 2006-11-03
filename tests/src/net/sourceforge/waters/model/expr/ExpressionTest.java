@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ExpressionTest
 //###########################################################################
-//# $Id: ExpressionTest.java,v 1.7 2006-09-07 14:51:44 robi Exp $
+//# $Id: ExpressionTest.java,v 1.8 2006-11-03 15:01:58 torda Exp $
 //###########################################################################
 
 
@@ -15,14 +15,9 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.module.BinaryExpressionProxy;
-import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
-import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
-import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
-import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 

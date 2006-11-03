@@ -54,7 +54,6 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.plain.base.AbstractNamedElement;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 

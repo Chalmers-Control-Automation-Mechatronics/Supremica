@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   EventValue
 //###########################################################################
-//# $Id: EventValue.java,v 1.2 2005-11-03 01:24:15 robi Exp $
+//# $Id: EventValue.java,v 1.3 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -13,7 +13,6 @@ import java.util.List;
 
 import net.sourceforge.waters.model.expr.RangeValue;
 import net.sourceforge.waters.model.expr.Value;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 interface EventValue extends Value

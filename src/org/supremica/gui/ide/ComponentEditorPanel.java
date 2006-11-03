@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.32 2006-10-07 20:20:12 robi Exp $
+//# $Id: ComponentEditorPanel.java,v 1.33 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -21,7 +21,6 @@ import java.util.Locale;
 import javax.print.attribute.*;
 import javax.print.attribute.standard.*;
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.ControlledToolbar;

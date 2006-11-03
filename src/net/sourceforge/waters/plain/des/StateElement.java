@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   StateElement
 //###########################################################################
-//# $Id: StateElement.java,v 1.7 2006-08-18 06:39:29 robi Exp $
+//# $Id: StateElement.java,v 1.8 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -12,9 +12,7 @@ package net.sourceforge.waters.plain.des;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import net.sourceforge.waters.model.base.EqualCollection;
 import net.sourceforge.waters.model.base.Proxy;

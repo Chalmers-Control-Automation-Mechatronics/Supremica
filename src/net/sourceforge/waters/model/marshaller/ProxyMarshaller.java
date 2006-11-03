@@ -4,14 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ProxyMarshaller
 //###########################################################################
-//# $Id: ProxyMarshaller.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ProxyMarshaller.java,v 1.3 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 

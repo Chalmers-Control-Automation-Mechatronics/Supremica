@@ -1,8 +1,5 @@
 package net.sourceforge.waters.gui.command;
 
-import javax.swing.undo.AbstractUndoableEdit;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
 
 import net.sourceforge.waters.subject.base.NamedSubject;
 

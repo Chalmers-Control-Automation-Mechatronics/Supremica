@@ -51,28 +51,20 @@ package org.supremica.automata;
 
 import java.util.*;
 import org.supremica.log.*;
-import org.supremica.gui.Gui;
 import org.supremica.automata.IO.ProjectBuildFromXml;
 import javax.swing.JOptionPane;
-import java.awt.Toolkit;
 import java.io.File;
-import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.awt.Component;
 
-import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.EqualCollection;
-import net.sourceforge.waters.plain.base.AbstractNamedElement;
 import net.sourceforge.waters.plain.base.DocumentElement;
-import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 /**

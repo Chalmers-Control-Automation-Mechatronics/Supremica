@@ -4,15 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.65 2006-10-31 16:50:44 martin Exp $
+//# $Id: EditorSurface.java,v 1.66 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.geom.Rectangle2D;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.print.PageFormat;
@@ -33,9 +30,7 @@ import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.subject.module.GroupNodeSubject;
 import java.util.List;
-import java.util.ArrayList;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import java.util.LinkedList;
 import java.util.Collections;

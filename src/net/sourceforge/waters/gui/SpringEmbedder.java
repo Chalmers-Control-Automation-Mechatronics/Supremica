@@ -1,23 +1,23 @@
 package net.sourceforge.waters.gui;
 
-import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Double;
-import java.awt.geom.Rectangle2D;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.IdentityHashMap;
-import java.util.Random;
-
-import net.sourceforge.waters.model.base.Proxy;
-
-import net.sourceforge.waters.model.module.GraphProxy;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
-import net.sourceforge.waters.model.module.NodeProxy;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.model.module.GroupNodeProxy;
-import net.sourceforge.waters.model.module.EdgeProxy;
+//import java.awt.geom.Point2D;
+//import java.awt.geom.Point2D.Double;
+//import java.awt.geom.Rectangle2D;
+//
+//import java.util.ArrayList;
+//import java.util.Collection;
+//import java.util.Map;
+//import java.util.IdentityHashMap;
+//import java.util.Random;
+//
+//import net.sourceforge.waters.model.base.Proxy;
+//
+//import net.sourceforge.waters.model.module.GraphProxy;
+//import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+//import net.sourceforge.waters.model.module.NodeProxy;
+//import net.sourceforge.waters.model.module.SimpleNodeProxy;
+//import net.sourceforge.waters.model.module.GroupNodeProxy;
+//import net.sourceforge.waters.model.module.EdgeProxy;
 
 public class SpringEmbedder
 {	

@@ -1,7 +1,6 @@
 package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.Shape;
 
 import java.awt.geom.Arc2D;
@@ -11,15 +10,12 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
-import java.awt.geom.QuadCurve2D.Double;
 import java.awt.geom.Rectangle2D;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.gui.ModuleWindow;
 import java.util.List;
 import java.util.ArrayList;
-import net.sourceforge.waters.gui.renderer.Handle.HandleType;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 public abstract class EdgeProxyShape

@@ -1,7 +1,6 @@
 package org.supremica.automata.algorithms.scheduling;
 
 import java.util.*;
-import java.util.regex.*;
 import java.io.*;
 
 import org.supremica.automata.*;

@@ -59,8 +59,6 @@
  */
 package org.supremica.manufacturingTables.management;
 
-import java.util.Iterator;
-import java.util.List;
 import java.io.*;
 import javax.xml.bind.*;
 import javax.xml.validation.*;

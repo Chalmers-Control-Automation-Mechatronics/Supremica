@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ProxyPrinter
 //###########################################################################
-//# $Id: ProxyPrinter.java,v 1.5 2006-07-20 02:28:37 robi Exp $
+//# $Id: ProxyPrinter.java,v 1.6 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;
@@ -22,7 +22,6 @@ import net.sourceforge.waters.model.base.AbstractProxyVisitor;
 import net.sourceforge.waters.model.base.ComparableProxy;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.base.VisitorException;
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateEdgeCommand
 //###########################################################################
-//# $Id: CreateEdgeCommand.java,v 1.11 2006-10-31 16:50:44 martin Exp $
+//# $Id: CreateEdgeCommand.java,v 1.12 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 
 
@@ -15,13 +15,9 @@ import java.awt.Point;
 
 import java.util.Collection;
 import java.util.Collections;
-import javax.swing.undo.AbstractUndoableEdit;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
 
 import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
 
-import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.renderer.GeometryTools;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;

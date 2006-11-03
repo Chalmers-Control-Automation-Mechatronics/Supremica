@@ -65,7 +65,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import org.supremica.manufacturingTables.controlsystemdata.*;
-import org.supremica.manufacturingTables.controlsystemimplementation.PLCProgram;
 import org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.*;
 
 public class IEC61499ControlSystemImplementationBuilder extends ControlSystemImplementationBuilder

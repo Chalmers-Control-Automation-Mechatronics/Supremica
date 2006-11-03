@@ -1,8 +1,5 @@
 package org.supremica.gui;
 
-import javax.swing.JOptionPane;
-import javax.swing.JDialog;
-import javax.swing.JCheckBox;
 
 // This is good, enum, not integer constants!
 public enum ExportFormat

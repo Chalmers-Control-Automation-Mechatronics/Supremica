@@ -4,24 +4,20 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompiledEventDecl
 //###########################################################################
-//# $Id: CompiledEventDecl.java,v 1.4 2005-11-03 01:24:15 robi Exp $
+//# $Id: CompiledEventDecl.java,v 1.5 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.IndexValue;
 import net.sourceforge.waters.model.expr.RangeValue;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 

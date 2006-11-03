@@ -1,7 +1,5 @@
 package net.sourceforge.waters.gui.command;
 
-import net.sourceforge.waters.subject.module.GraphSubject;
-import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
 public class ToggleNodeInitialCommand

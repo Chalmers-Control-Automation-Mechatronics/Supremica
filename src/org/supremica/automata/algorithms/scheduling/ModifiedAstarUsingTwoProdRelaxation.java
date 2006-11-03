@@ -5,7 +5,6 @@ import java.util.*;
 import org.supremica.automata.*;
 import org.supremica.gui.ScheduleDialog;
 import org.supremica.log.*;
-import org.supremica.util.ActionTimer;
 
 public class ModifiedAstarUsingTwoProdRelaxation
 	extends ModifiedAstar

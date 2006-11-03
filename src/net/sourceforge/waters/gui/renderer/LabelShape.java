@@ -10,11 +10,9 @@ import java.awt.font.TextLayout;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
-import java.util.List;
 
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 
 public class LabelShape
     extends AbstractProxyShape

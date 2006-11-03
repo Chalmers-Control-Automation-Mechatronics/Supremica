@@ -6,7 +6,6 @@ package org.supremica.workbench;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.Iterator;
-import java.util.LinkedList;
 import org.supremica.log.*;
 import org.supremica.gui.*;
 import org.supremica.automata.algorithms.*;

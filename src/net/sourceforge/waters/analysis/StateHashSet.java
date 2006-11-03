@@ -18,13 +18,7 @@
 
 package net.sourceforge.waters.analysis;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  * An implementation of the <tt>Set</tt> interface that uses an
@@ -33,7 +27,7 @@ import java.util.Set;
  * Created: Sat Nov  3 10:38:17 2001
  *
  * @author Eric D. Friedman
- * @version $Id: StateHashSet.java,v 1.2 2006-09-26 05:41:50 yip1 Exp $
+ * @version $Id: StateHashSet.java,v 1.3 2006-11-03 15:01:57 torda Exp $
  */
 
 public class StateHashSet extends StateObjectHash implements Serializable {

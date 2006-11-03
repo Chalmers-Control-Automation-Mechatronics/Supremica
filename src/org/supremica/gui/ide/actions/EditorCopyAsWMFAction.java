@@ -2,12 +2,7 @@ package org.supremica.gui.ide.actions;
 
 import java.util.List;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
-import javax.swing.KeyStroke;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import org.supremica.gui.ide.ModuleContainer;
-import org.supremica.gui.ide.IDE;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 
 /**

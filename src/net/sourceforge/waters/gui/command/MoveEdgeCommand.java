@@ -4,28 +4,22 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   MoveEdgeCommand
 //###########################################################################
-//# $Id: MoveEdgeCommand.java,v 1.6 2006-08-25 02:12:52 robi Exp $
+//# $Id: MoveEdgeCommand.java,v 1.7 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui.command;
 
 import java.awt.geom.Point2D;
-import java.awt.geom.Point2D.Double;
 import java.awt.Point;
 
 import java.util.Collection;
 import java.util.Collections;
-import javax.swing.undo.AbstractUndoableEdit;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
 
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.renderer.GeometryTools;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.subject.module.EdgeSubject;
-import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SplineGeometrySubject;

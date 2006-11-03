@@ -3,18 +3,10 @@ package net.sourceforge.waters.gui.command;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.gui.EditorGraph;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import javax.swing.undo.AbstractUndoableEdit;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-
-import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.renderer.GeometryTools;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
@@ -27,9 +19,6 @@ import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.BoxGeometrySubject;
 import net.sourceforge.waters.subject.module.SplineGeometrySubject;
-import net.sourceforge.waters.subject.module.NodeSubject;
-import java.util.Set;
-import java.util.HashSet;
 
 /**
  * the Command for Creation of nodes

@@ -4,19 +4,16 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopChecker
 //##########################################################################
-//# $Id: ControlLoopMain.java,v 1.2 2006-08-20 22:51:38 yip1 Exp $
+//# $Id: ControlLoopMain.java,v 1.3 2006-11-03 15:01:57 torda Exp $
 //##########################################################################
 
 package net.sourceforge.waters.analysis;
 
 import java.io.File;
-import java.util.Iterator;
-import java.util.List;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
-import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.LoopTraceProxy;

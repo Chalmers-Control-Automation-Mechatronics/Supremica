@@ -49,8 +49,6 @@
  */
 package org.supremica.automata;
 
-import java.lang.String;
-
 import org.supremica.util.SupremicaException;
 import org.supremica.automata.Automata;
 import org.supremica.automata.LabeledEvent;

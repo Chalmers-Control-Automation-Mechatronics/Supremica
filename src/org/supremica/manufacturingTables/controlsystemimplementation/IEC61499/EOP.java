@@ -61,9 +61,6 @@ package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.LinkedList;
-import java.util.Map;
-import java.util.Iterator;
-import java.util.Map.Entry;
 
 public class EOP
 {

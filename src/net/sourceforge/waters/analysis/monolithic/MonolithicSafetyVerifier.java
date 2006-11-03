@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   MonolithicSafetyVerifier
 //###########################################################################
-//# $Id: MonolithicSafetyVerifier.java,v 1.1 2006-11-03 05:18:28 robi Exp $
+//# $Id: MonolithicSafetyVerifier.java,v 1.2 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.monolithic;
@@ -12,7 +12,6 @@ package net.sourceforge.waters.analysis.monolithic;
 import gnu.trove.THashSet;
 
 import java.math.BigInteger;
-import java.util.Collection;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;

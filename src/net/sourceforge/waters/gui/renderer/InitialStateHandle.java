@@ -3,7 +3,6 @@ package net.sourceforge.waters.gui.renderer;
 import java.awt.geom.Point2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
-import java.awt.geom.Line2D.Double;
 import java.awt.Graphics2D;
 
 public class InitialStateHandle

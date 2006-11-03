@@ -48,7 +48,6 @@
  *  Supremica is owned and represented by KA.
  */
 package org.supremica.automata.algorithms;
-import org.supremica.util.SupremicaException;
 import org.supremica.log.*;
 import java.util.*;
 import org.supremica.automata.*;

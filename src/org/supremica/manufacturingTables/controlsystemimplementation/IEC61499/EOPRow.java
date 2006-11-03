@@ -60,7 +60,6 @@ package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 abstract public class EOPRow 
 {

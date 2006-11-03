@@ -58,9 +58,6 @@
  */
 package org.supremica.manufacturingTables.controlsystemdata;
 
-import java.util.Set;
-import java.util.HashSet;
-
 public class EOPActionRowData extends EOPRowData 
 {
     

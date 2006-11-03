@@ -50,7 +50,6 @@
 package org.supremica.apps;
 
 import java.awt.*;
-import org.supremica.log.*;
 import org.supremica.properties.Config;
 import org.supremica.gui.*;
 

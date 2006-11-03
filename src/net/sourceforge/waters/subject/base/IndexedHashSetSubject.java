@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   IndexedHashSetSubject
 //###########################################################################
-//# $Id: IndexedHashSetSubject.java,v 1.4 2006-07-20 02:28:37 robi Exp $
+//# $Id: IndexedHashSetSubject.java,v 1.5 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.DuplicateNameException;
-import net.sourceforge.waters.model.base.IndexedSet;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.NameNotFoundException;
 import net.sourceforge.waters.model.base.NamedProxy;

@@ -6,7 +6,6 @@ import java.util.List;
 
 import net.sourceforge.waters.gui.ControlledSurface;
 
-import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 
 public class SelectCommand

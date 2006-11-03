@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   EditorRunEmbedderAction
 //###########################################################################
-//# $Id: EditorRunEmbedderAction.java,v 1.5 2006-10-20 05:20:55 robi Exp $
+//# $Id: EditorRunEmbedderAction.java,v 1.6 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 
@@ -15,7 +15,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
@@ -27,7 +26,6 @@ import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
-import org.supremica.gui.ide.IDE;
 import org.supremica.properties.Config;
 
 /**

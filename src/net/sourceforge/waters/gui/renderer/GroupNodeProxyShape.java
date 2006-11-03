@@ -2,18 +2,13 @@ package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.Shape;
 
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.Rectangle2D.Double;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.geom.Point2D;
-
-import net.sourceforge.waters.gui.renderer.Handle.HandleType;
 
 public class GroupNodeProxyShape
     extends AbstractProxyShape

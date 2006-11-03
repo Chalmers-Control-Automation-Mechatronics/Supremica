@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.33 2006-10-07 20:20:12 robi Exp $
+//# $Id: EditorWindow.java,v 1.34 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 
 
@@ -15,13 +15,8 @@ import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
 
 import java.awt.*;
-import java.awt.dnd.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.geom.Rectangle2D;
 import java.awt.print.*;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -30,32 +25,15 @@ import java.util.Locale;
 import javax.print.attribute.*;
 import javax.print.attribute.standard.*;
 import javax.swing.*;
-import javax.swing.undo.AbstractUndoableEdit;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-import javax.swing.undo.UndoManager;
 
-import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.UndoRedoEvent;
-import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.subject.base.NamedSubject;
-import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
 import org.supremica.gui.GraphicsToClipboard;
-
-
-// Printing
-import java.awt.print.*;
-import javax.print.attribute.*;
-import javax.print.attribute.standard.*;
-import java.util.Locale;
-import java.net.URI;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 
 
 public class EditorWindow

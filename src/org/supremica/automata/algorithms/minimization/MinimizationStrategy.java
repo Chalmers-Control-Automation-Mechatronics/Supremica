@@ -49,7 +49,6 @@
  */
 package org.supremica.automata.algorithms.minimization;
 
-import java.util.*;
 import org.supremica.automata.*;
 
 public enum MinimizationStrategy

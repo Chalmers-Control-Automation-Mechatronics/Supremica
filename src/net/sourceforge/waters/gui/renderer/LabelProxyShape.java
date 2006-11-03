@@ -1,6 +1,5 @@
 package net.sourceforge.waters.gui.renderer;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Font;
 import java.awt.Point;
@@ -11,9 +10,7 @@ import java.awt.font.TextLayout;
 
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
-import java.awt.geom.RoundRectangle2D.Double;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 

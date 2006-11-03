@@ -1,8 +1,6 @@
 package org.supremica.automata.algorithms.scheduling;
 
 import java.util.*;
-import javax.swing.*;
-import java.awt.*;
 
 import org.supremica.automata.*;
 import org.supremica.gui.ScheduleDialog;

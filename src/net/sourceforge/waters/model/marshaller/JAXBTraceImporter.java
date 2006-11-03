@@ -4,14 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBTraceImporter
 //###########################################################################
-//# $Id: JAXBTraceImporter.java,v 1.3 2006-09-19 15:53:20 robi Exp $
+//# $Id: JAXBTraceImporter.java,v 1.4 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.LinkedList;
@@ -19,7 +18,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.IndexedSet;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;

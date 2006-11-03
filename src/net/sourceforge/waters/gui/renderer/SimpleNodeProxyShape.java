@@ -3,13 +3,8 @@ package net.sourceforge.waters.gui.renderer;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.RenderingHints;
-
-import java.awt.font.FontRenderContext;
-import java.awt.font.TextLayout;
 
 import java.awt.geom.Arc2D;
-import java.awt.geom.Arc2D.Double;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
 
@@ -26,18 +21,6 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.model.base.DuplicateNameException;
-import net.sourceforge.waters.model.base.IndexedList;
-import net.sourceforge.waters.model.base.GeometryProxy;
-import net.sourceforge.waters.subject.base.AbstractSubject;
-import net.sourceforge.waters.subject.base.ModelChangeEvent;
-import net.sourceforge.waters.subject.base.ModelObserver;
-import net.sourceforge.waters.subject.module.EventDeclSubject;
-import net.sourceforge.waters.subject.module.EventListExpressionSubject;
-import net.sourceforge.waters.subject.module.PointGeometrySubject;
-import net.sourceforge.waters.subject.module.SimpleNodeSubject;
-import net.sourceforge.waters.xsd.module.AnchorPosition;
-import net.sourceforge.waters.gui.renderer.Handle.HandleType;
 
 public class SimpleNodeProxyShape
     extends AbstractProxyShape

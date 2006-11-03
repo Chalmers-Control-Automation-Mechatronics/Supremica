@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   IndexedArrayList
 //###########################################################################
-//# $Id: IndexedArrayList.java,v 1.3 2006-07-20 02:28:37 robi Exp $
+//# $Id: IndexedArrayList.java,v 1.4 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -12,8 +12,6 @@ package net.sourceforge.waters.model.base;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 

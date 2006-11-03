@@ -49,8 +49,6 @@
  */
 package org.supremica.automata.algorithms;
 
-import java.util.*;
-import org.supremica.log.*;
 import org.supremica.automata.*;
 
 interface AutomataSelector

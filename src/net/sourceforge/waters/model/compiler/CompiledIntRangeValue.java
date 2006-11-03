@@ -4,15 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompiledIntRangeValue
 //###########################################################################
-//# $Id: CompiledIntRangeValue.java,v 1.2 2005-11-03 01:24:15 robi Exp $
+//# $Id: CompiledIntRangeValue.java,v 1.3 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
 
 import java.util.AbstractList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import net.sourceforge.waters.model.expr.IndexValue;
 import net.sourceforge.waters.model.expr.IntValue;

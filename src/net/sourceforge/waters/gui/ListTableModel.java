@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ListTableModel
 //###########################################################################
-//# $Id: ListTableModel.java,v 1.1 2006-08-08 23:59:21 robi Exp $
+//# $Id: ListTableModel.java,v 1.2 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 
 
@@ -12,12 +12,10 @@ package net.sourceforge.waters.gui;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 
 
 /**

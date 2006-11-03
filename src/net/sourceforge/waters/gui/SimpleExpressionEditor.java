@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.waters.gui
 //# CLASS:   SimpleExpressionEditor
 //###########################################################################
-//# $Id: SimpleExpressionEditor.java,v 1.1 2006-08-08 23:59:21 robi Exp $
+//# $Id: SimpleExpressionEditor.java,v 1.2 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 
 
@@ -16,7 +16,6 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JTable;
 
 import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.expr.Operator;
 
 
 public class SimpleExpressionEditor

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorEventsPanel
 //###########################################################################
-//# $Id: EditorEventsPanel.java,v 1.18 2006-10-18 07:48:54 knut Exp $
+//# $Id: EditorEventsPanel.java,v 1.19 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 
@@ -15,7 +15,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.ListModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 

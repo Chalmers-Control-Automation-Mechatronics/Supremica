@@ -4,32 +4,25 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.32 2006-10-17 23:31:07 flordal Exp $
+//# $Id: EditorComponentsPanel.java,v 1.33 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 
 package org.supremica.gui.ide;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import javax.swing.*;
 import javax.swing.tree.*;
 import java.util.*;
 
 import net.sourceforge.waters.gui.ComponentInfo;
 import net.sourceforge.waters.gui.EditorEditVariableDialog;
-import net.sourceforge.waters.gui.EditorNewDialog;
 import net.sourceforge.waters.gui.ModuleTree;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
-import net.sourceforge.waters.subject.module.InstanceSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
-import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.VariableSubject;
 import net.sourceforge.waters.model.base.Proxy;

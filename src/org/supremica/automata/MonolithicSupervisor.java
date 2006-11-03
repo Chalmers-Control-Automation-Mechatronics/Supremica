@@ -49,12 +49,8 @@
  */
 package org.supremica.automata;
 
-import java.lang.String;
-
 import org.supremica.util.SupremicaException;
 import org.supremica.automata.Automata;
-import org.supremica.automata.LabeledEvent;
-import org.supremica.automata.State;
 
 /**
  * A monolithic supervisor works just like a modular supervisor with

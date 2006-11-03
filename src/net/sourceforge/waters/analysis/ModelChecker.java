@@ -4,12 +4,10 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ModelChecker
 //###########################################################################
-//# $Id: ModelChecker.java,v 1.4 2006-11-03 01:00:06 robi Exp $
+//# $Id: ModelChecker.java,v 1.5 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
-
-import java.util.List;
 
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;

@@ -49,7 +49,6 @@
  */
 package org.supremica.automata;
 
-import java.util.*;
 
 /**
  * A set of arcs with the same start state and end state.

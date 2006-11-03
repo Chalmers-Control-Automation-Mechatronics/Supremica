@@ -3,20 +3,16 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopChecker
 //###########################################################################
-//# $Id: ControlLoopChecker.java,v 1.14 2006-11-02 22:40:29 robi Exp $
+//# $Id: ControlLoopChecker.java,v 1.15 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.Hashtable;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.EventProxy;

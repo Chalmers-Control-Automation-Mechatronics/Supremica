@@ -4,13 +4,11 @@ package org.supremica.gui;
 
 import javax.swing.*;
 import java.awt.GridLayout;
-import java.awt.BorderLayout;
 import java.awt.event.*;
 import java.awt.Frame;
 import java.io.*;
 
 import org.supremica.log.*;
-import org.supremica.automata.*;
 import org.supremica.automata.algorithms.scheduling.*;
 
 public class ScheduleDialog

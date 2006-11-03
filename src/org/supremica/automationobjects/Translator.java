@@ -48,7 +48,6 @@
  */
 package org.supremica.automationobjects;
 
-import  org.supremica.automationobjects.xsd.libraryelement.*;
 //import  net.sourceforge.fuber.xsd.libraryelement.*;
 
 

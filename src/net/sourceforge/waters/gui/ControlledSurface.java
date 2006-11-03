@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.94 2006-10-31 16:50:44 martin Exp $
+//# $Id: ControlledSurface.java,v 1.95 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -34,7 +34,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import javax.swing.*;
@@ -43,7 +42,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import net.sourceforge.waters.gui.command.*;
-import net.sourceforge.waters.gui.EditorSurface.DRAGOVERSTATUS;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.ToolbarChangedEvent;
@@ -51,8 +49,6 @@ import net.sourceforge.waters.gui.renderer.GeneralShape;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.renderer.GeometryTools;
 import net.sourceforge.waters.gui.renderer.Handle;
-import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
-import net.sourceforge.waters.gui.renderer.LabelProxyShape;
 import net.sourceforge.waters.gui.renderer.MiscShape;
 import net.sourceforge.waters.gui.renderer.ProxyShape;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
@@ -61,7 +57,6 @@ import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.*;
-import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
@@ -69,7 +64,6 @@ import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.*;
 import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.xsd.module.SplineKind;
 
 
 public class ControlledSurface

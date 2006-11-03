@@ -1,8 +1,6 @@
 package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.Shape;
 
 import net.sourceforge.waters.model.base.Proxy;
 import java.util.List;

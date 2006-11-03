@@ -1,10 +1,8 @@
 package org.supremica.gui;
 
 import java.awt.*;
-import javax.swing.*;
 import java.util.*;
 import org.supremica.gui.ide.IDEReportInterface;
-import org.supremica.automata.algorithms.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Project;
 import org.supremica.automata.Automaton;

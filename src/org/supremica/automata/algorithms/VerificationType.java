@@ -49,7 +49,6 @@
  */
 package org.supremica.automata.algorithms;
 
-import java.util.*;
 
 /**
  * Different types of verification.

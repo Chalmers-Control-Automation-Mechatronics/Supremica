@@ -4,18 +4,16 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurfacePopupMenu
 //###########################################################################
-//# $Id: EditorSurfacePopupMenu.java,v 1.2 2006-09-21 14:03:12 robi Exp $
+//# $Id: EditorSurfacePopupMenu.java,v 1.3 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
-import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
 import javax.swing.*;
 
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 import org.supremica.util.VPopupMenu;
 

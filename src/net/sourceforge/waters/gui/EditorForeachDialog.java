@@ -4,13 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorForeachDialog
 //###########################################################################
-//# $Id: EditorForeachDialog.java,v 1.4 2005-11-03 01:24:15 robi Exp $
+//# $Id: EditorForeachDialog.java,v 1.5 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
-import java.awt.*;
 import java.awt.event.*;
 import java.util.Collection;
 import java.util.Collections;

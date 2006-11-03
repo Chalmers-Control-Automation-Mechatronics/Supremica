@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentViewPanel
 //###########################################################################
-//# $Id: ComponentViewPanel.java,v 1.1 2006-10-14 12:21:27 knut Exp $
+//# $Id: ComponentViewPanel.java,v 1.2 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -13,30 +13,23 @@ import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.awt.print.*;
 import java.util.Locale;
 import javax.print.attribute.*;
 import javax.print.attribute.standard.*;
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicSplitPaneUI;
 
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.EditorEvents;
 import net.sourceforge.waters.gui.EditorMenu;
 import net.sourceforge.waters.gui.EditorWindowInterface;
-import net.sourceforge.waters.gui.EventEditorDialog;
-import net.sourceforge.waters.gui.EventTableModel;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
-import net.sourceforge.waters.subject.base.NamedSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
 import org.supremica.gui.GraphicsToClipboard;
 

@@ -49,10 +49,7 @@
  */
 package org.supremica.apps;
 
-import org.supremica.properties.SupremicaProperties;
 import org.supremica.properties.Config;
-
-import java.lang.Exception;
 
 public class Supremica
 {

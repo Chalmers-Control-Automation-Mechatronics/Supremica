@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   AbstractJAXBTest
 //###########################################################################
-//# $Id: AbstractJAXBTest.java,v 1.2 2006-07-20 02:28:38 robi Exp $
+//# $Id: AbstractJAXBTest.java,v 1.3 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.junit.AbstractWatersTest;

@@ -4,15 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   AbstractModelCheckerTest
 //###########################################################################
-//# $Id: AbstractModelCheckerTest.java,v 1.2 2006-09-14 14:09:04 robi Exp $
+//# $Id: AbstractModelCheckerTest.java,v 1.3 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
 
 import java.io.File;
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.junit.AbstractWatersTest;

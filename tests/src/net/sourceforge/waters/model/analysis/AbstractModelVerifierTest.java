@@ -4,15 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractModelVerifierTest
 //###########################################################################
-//# $Id: AbstractModelVerifierTest.java,v 1.3 2006-09-14 14:09:04 robi Exp $
+//# $Id: AbstractModelVerifierTest.java,v 1.4 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
 
 import java.io.File;
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.junit.AbstractWatersTest;

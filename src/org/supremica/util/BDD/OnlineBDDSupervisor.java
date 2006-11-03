@@ -5,10 +5,8 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
 import org.supremica.properties.Config;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.List;
-import java.awt.*;
 
 
 public class OnlineBDDSupervisor

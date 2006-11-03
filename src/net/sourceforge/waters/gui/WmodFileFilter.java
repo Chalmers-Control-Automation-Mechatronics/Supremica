@@ -4,12 +4,11 @@
 //# PACKAGE: waters.gui
 //# CLASS:   WmodFileFilter
 //###########################################################################
-//# $Id: WmodFileFilter.java,v 1.4 2006-03-21 21:58:04 flordal Exp $
+//# $Id: WmodFileFilter.java,v 1.5 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
 import java.io.File;
-import javax.swing.*;
 import javax.swing.filechooser.*;
 
 public class WmodFileFilter

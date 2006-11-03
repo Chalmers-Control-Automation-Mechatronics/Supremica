@@ -4,17 +4,15 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompiledClause
 //###########################################################################
-//# $Id: CompiledClause.java,v 1.1 2006-09-12 14:32:16 robi Exp $
+//# $Id: CompiledClause.java,v 1.2 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
 
 import java.util.Collection;
 
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessorHashMapByContents;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
-import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 

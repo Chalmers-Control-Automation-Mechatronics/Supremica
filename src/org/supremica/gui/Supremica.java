@@ -59,7 +59,6 @@ import java.io.*;
 import javax.help.*;
 import org.supremica.log.*;
 import org.supremica.*;
-import org.supremica.automata.algorithms.*;
 import org.supremica.comm.xmlrpc.*;
 import org.supremica.gui.help.*;
 import org.supremica.properties.Config;

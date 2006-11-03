@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.47 2006-10-27 19:49:09 martin Exp $
+//# $Id: ModuleCompiler.java,v 1.48 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -26,7 +26,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Set;
 
-import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -39,10 +38,8 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.expr.AtomValue;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
-import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.IndexValue;
 import net.sourceforge.waters.model.expr.IntValue;
-import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.expr.RangeValue;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.expr.Value;
@@ -52,7 +49,6 @@ import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
-import net.sourceforge.waters.model.module.BooleanConstantProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;

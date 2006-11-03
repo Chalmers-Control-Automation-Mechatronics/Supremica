@@ -6,15 +6,8 @@ import java.util.List;
 import java.util.IdentityHashMap;
 import java.util.ArrayList;
 
-import javax.swing.undo.AbstractUndoableEdit;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
-
-import net.sourceforge.waters.gui.ControlledSurface;
-
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
-import net.sourceforge.waters.subject.module.IdentifierSubject;
 
 public class ReorganizeListCommand
 	implements Command

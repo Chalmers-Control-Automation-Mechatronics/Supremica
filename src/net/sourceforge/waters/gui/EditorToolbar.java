@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorToolbar
 //###########################################################################
-//# $Id: EditorToolbar.java,v 1.13 2006-07-20 02:28:37 robi Exp $
+//# $Id: EditorToolbar.java,v 1.14 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.ToolbarChangedEvent;
-import net.sourceforge.waters.gui.ControlledSurface.Tool;
 
 /** The primary editor toolbar.
  * The toolbar sits to the left of the editor window and allows for tool selections.

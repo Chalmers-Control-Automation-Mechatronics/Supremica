@@ -30,7 +30,6 @@ import net.sourceforge.waters.subject.base.IndexedHashSetSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
-import net.sourceforge.waters.subject.base.SetSubject;
 import net.sourceforge.waters.subject.base.Subject;
 
 import net.sourceforge.waters.subject.module.EdgeSubject;

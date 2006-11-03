@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   IndexedArrayListSubject
 //###########################################################################
-//# $Id: IndexedArrayListSubject.java,v 1.4 2006-07-20 02:28:37 robi Exp $
+//# $Id: IndexedArrayListSubject.java,v 1.5 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -12,18 +12,15 @@ package net.sourceforge.waters.subject.base;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
 import net.sourceforge.waters.model.base.DuplicateNameException;
-import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.NameNotFoundException;
 import net.sourceforge.waters.model.base.NamedProxy;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.unchecked.Casting;
 

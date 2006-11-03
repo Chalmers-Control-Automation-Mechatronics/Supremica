@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des;
 //# CLASS:   ProductDESElementFactory
 //###########################################################################
-//# $Id: ProductDESElementFactory.java,v 1.7 2006-09-19 15:53:20 robi Exp $
+//# $Id: ProductDESElementFactory.java,v 1.8 2006-11-03 15:01:56 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -15,12 +15,9 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;

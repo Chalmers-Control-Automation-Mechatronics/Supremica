@@ -4,14 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   AbstractProductDESImporterTest
 //###########################################################################
-//# $Id: AbstractProductDESImporterTest.java,v 1.2 2006-09-14 13:44:06 robi Exp $
+//# $Id: AbstractProductDESImporterTest.java,v 1.3 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.net.URI;
 import java.io.File;
-import java.io.IOException;
 
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;

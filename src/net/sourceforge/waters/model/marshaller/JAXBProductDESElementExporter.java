@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBProductDESExporter
 //###########################################################################
-//# $Id: JAXBProductDESElementExporter.java,v 1.3 2006-09-15 13:04:14 robi Exp $
+//# $Id: JAXBProductDESElementExporter.java,v 1.4 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -21,9 +21,7 @@ import java.util.TreeSet;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.IndexedSet;
 import net.sourceforge.waters.model.base.NamedProxy;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AbstractProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
@@ -37,9 +35,7 @@ import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 
-import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.ElementType;
-import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.base.NamedType;
 import net.sourceforge.waters.xsd.des.Automaton;
 import net.sourceforge.waters.xsd.des.AutomatonRef;

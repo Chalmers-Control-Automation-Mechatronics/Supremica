@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.GridBagLayout;
 
 import org.supremica.automata.Automata;
-import org.supremica.automata.Project;
 
 public class AnalyzerPanel
 	extends MainPanel

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SubjectModuleTest
 //###########################################################################
-//# $Id: SubjectModuleTest.java,v 1.4 2006-09-20 16:24:13 robi Exp $
+//# $Id: SubjectModuleTest.java,v 1.5 2006-11-03 15:01:57 torda Exp $
 //###########################################################################
 
 
@@ -12,12 +12,7 @@ package net.sourceforge.waters.subject.module;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import java.util.List;
 
-import net.sourceforge.waters.subject.base.AbstractSubject;
-import net.sourceforge.waters.subject.base.ListSubject;
-import net.sourceforge.waters.subject.base.SetSubject;
-import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.model.module.AbstractModuleTest;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;

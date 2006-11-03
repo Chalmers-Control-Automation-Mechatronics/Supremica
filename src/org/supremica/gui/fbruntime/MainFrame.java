@@ -47,10 +47,6 @@ import org.supremica.log.*;
 
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.border.*;
-
-import com.nwoods.jgo.*;
-
 
 public class MainFrame extends JFrame {
 

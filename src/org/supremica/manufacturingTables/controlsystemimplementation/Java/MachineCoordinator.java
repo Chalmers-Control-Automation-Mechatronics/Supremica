@@ -60,8 +60,6 @@
 package org.supremica.manufacturingTables.controlsystemimplementation.Java;
 
 import java.util.List;
-import java.util.LinkedList;
-import java.util.ListIterator;
 import java.util.HashMap;
 import java.util.Map;
 

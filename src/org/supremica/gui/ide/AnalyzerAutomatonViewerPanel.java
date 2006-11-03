@@ -1,7 +1,6 @@
 package org.supremica.gui.ide;
 
 import java.awt.Dimension;
-import java.io.InputStream;
 
 import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.DotBuilder;

@@ -1,13 +1,9 @@
 
 package net.sourceforge.waters.gui;
 
-import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import org.supremica.util.VPopupMenu;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.gui.command.Command;
-import net.sourceforge.waters.gui.command.DeleteEdgeCommand;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
 

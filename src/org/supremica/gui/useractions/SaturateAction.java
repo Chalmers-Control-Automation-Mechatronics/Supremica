@@ -8,7 +8,6 @@ import javax.swing.*;
 import java.util.*;
 import org.supremica.log.*;
 import org.supremica.automata.*;
-import org.supremica.automata.algorithms.*;
 import org.supremica.gui.Gui;
 import org.supremica.gui.ActionMan;
 
