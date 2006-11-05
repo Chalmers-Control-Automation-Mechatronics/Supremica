@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.95 2006-11-03 15:01:56 torda Exp $
+//# $Id: ControlledSurface.java,v 1.96 2006-11-05 15:51:58 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -1127,10 +1127,13 @@ public class ControlledSurface
                 {
                     selection.add((ProxySubject)shape.getProxy());
                 }
-                shape = getShapeProducer().getShape(edge.getGuardActionBlock());
-                if (bounds.contains(shape.getShape().getBounds()))
+                if (edge.getGuardActionBlock() != null) // Fix this
                 {
-                    selection.add((ProxySubject)shape.getProxy());
+                    shape = getShapeProducer().getShape(edge.getGuardActionBlock());
+                    if (bounds.contains(shape.getShape().getBounds()))
+                    {
+                        selection.add((ProxySubject)shape.getProxy());
+                    }
                 }
             }
             catch (VisitorException vis)

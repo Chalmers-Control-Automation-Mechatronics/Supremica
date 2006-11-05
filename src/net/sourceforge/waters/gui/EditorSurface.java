@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.66 2006-11-03 15:01:56 torda Exp $
+//# $Id: EditorSurface.java,v 1.67 2006-11-05 15:51:58 flordal Exp $
 //###########################################################################
 
 
@@ -182,8 +182,10 @@ public class EditorSurface
      */
     protected void printComponent(Graphics g)
     {
-        // Paint using thin stroke
-        AbstractRendererShape.setBasicStroke(AbstractRendererShape.THINSTROKE);
+        // Paint using other stroke
+        //AbstractRendererShape.setBasicStroke(AbstractRendererShape.THINSTROKE); // Too thin for presentations
+        AbstractRendererShape.setBasicStroke(AbstractRendererShape.SINGLESTROKE); // Just right?
+        //AbstractRendererShape.setBasicStroke(AbstractRendererShape.DOUBLESTROKE); // Too thick
         paintComponent(g, true);
         AbstractRendererShape.setBasicStroke(AbstractRendererShape.SINGLESTROKE);
     }
