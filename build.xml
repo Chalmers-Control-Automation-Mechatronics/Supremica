@@ -68,7 +68,6 @@
 </path>
 
 <path id="supremica.classpath">
-  <path refid="jaxb.classpath"/>
   <pathelement location="${dist}/SupremicaLib.jar"/>
 </path>
 
@@ -155,12 +154,10 @@
 	<unjar src="${lib}/licensed/JGo.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/licensed/JGoLayout.jar" dest="${lib}/${unjared}"/>
 	-->
-	<!-- JAXB-stuff cannot be included because of signature problem
 	<unjar src="${activation.jar}" dest="${lib}/${unjared}"/>	
 	<unjar src="${jaxb-api.jar}" dest="${lib}/${unjared}"/>
-	<unjar src="${jaxb-impl.jar}" dest="${lib}/${unjared}"/>	
-	<unjar src="${jsr173_api.jar}" dest="${lib}/${unjared}"/>\
-        -->	
+	<unjar src="${jaxb-impl.jar}" dest="${lib}/${unjared}"/>
+	<unjar src="${jsr173_api.jar}" dest="${lib}/${unjared}"/>
 </target>
 
 
@@ -257,7 +254,6 @@
          fork="true"
          memoryMaximumSize="128M">
     <classpath>    
-      <path refid="jaxb.classpath"/>
       <pathelement location="${lib}/${unjared}"/>
     </classpath>
   </javac>
@@ -328,7 +324,6 @@
          verbose="false"
          source="1.5">
     <classpath> 
-      <path refid="jaxb.classpath"/>
       <pathelement location="${build}"/>
       <pathelement path="${lib}/${unjared}"/>
     </classpath>
@@ -472,13 +467,6 @@
 Created-By: Knut Akesson
 Main-Class: org.supremica.apps.Supremica
 Class-Path: ${manifest.pathlist}</echo>
-  <pathconvert refid="jaxb.classpath"
-      pathsep=" " property="copy.pathlist">
-    <mapper type="flatten"/>
-  </pathconvert>
-  <copy flatten="true" todir="${dist}">
-    <fileset dir="${lib}" includes="${copy.pathlist}"/>
-  </copy>
 </target>
 
 <target name="jar_supremica" depends="downloads_supremica">
@@ -692,7 +680,6 @@ Class-Path: ${manifest.pathlist}</echo>
       <pathelement location="${dist}/Supremica.jar"/>
       <pathelement location="${dist}/SupremicaLib.jar"/>
       <pathelement location="${dist}/SupremicaTest.jar"/>
-      <pathelement path="${jaxb.classpath}"/>
       <pathelement path="${java.class.path}"/>
     </classpath>
     <sysproperty key="waters.test.inputdir" value="${waters.examples}"/>

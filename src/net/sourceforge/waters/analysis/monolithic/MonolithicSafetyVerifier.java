@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   MonolithicSafetyVerifier
 //###########################################################################
-//# $Id: MonolithicSafetyVerifier.java,v 1.2 2006-11-03 15:01:57 torda Exp $
+//# $Id: MonolithicSafetyVerifier.java,v 1.3 2006-11-06 03:23:35 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.monolithic;
@@ -86,18 +86,6 @@ public class MonolithicSafetyVerifier
 
   //#########################################################################
   //# Invocation
-  /**
-   * Runs this controllability checker.
-   * This method starts the model checking process on the model given
-   * as parameter to the constructor of this object. On termination,
-   * the result of checking the property is known and can be queried
-   * using the {@link #getResult()} and {@link #getCounterExample()}
-   * methods.
-   * @return <CODE>true</CODE> if the model is controllable, or
-   *         <CODE>false</CODE> if it is not.
-   *         The same value can be queried using the {@link #getResult()}
-   *         method.
-   */
   public boolean run()
   {
     Set<StateProxy> stateSet;
