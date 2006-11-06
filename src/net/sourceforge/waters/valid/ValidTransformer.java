@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ValidTransformer
 //###########################################################################
-//# $Id: ValidTransformer.java,v 1.3 2006-11-03 15:01:56 torda Exp $
+//# $Id: ValidTransformer.java,v 1.4 2006-11-06 14:19:19 torda Exp $
 //###########################################################################
 
 
@@ -43,7 +43,7 @@ class ValidTransformer
     // Create an XSL transformer
     final ClassLoader loader = currentThread().getContextClassLoader();
     final InputStream stream =
-      loader.getResourceAsStream("net/sourceforge/waters/valid/vw.xsl");
+      loader.getResourceAsStream("/xsl/vw.xsl");
     final Source xslsource = new StreamSource(stream);
     final TransformerFactory factory = TransformerFactory.newInstance();
     factory.setURIResolver(this);

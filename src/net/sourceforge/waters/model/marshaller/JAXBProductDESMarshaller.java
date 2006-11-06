@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBProductDESMarshaller
 //###########################################################################
-//# $Id: JAXBProductDESMarshaller.java,v 1.5 2006-09-15 09:26:13 robi Exp $
+//# $Id: JAXBProductDESMarshaller.java,v 1.6 2006-11-06 14:19:19 torda Exp $
 //###########################################################################
 
 
@@ -31,7 +31,7 @@ public class JAXBProductDESMarshaller
     super(new JAXBProductDESExporter(),
           new JAXBProductDESImporter(factory),
           "net.sourceforge.waters.xsd.des",
-          "waters-des.xsd");
+          "/xsd/waters-des.xsd");
   }
 
 

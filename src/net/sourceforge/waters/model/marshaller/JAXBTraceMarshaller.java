@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBTraceMarshaller
 //###########################################################################
-//# $Id: JAXBTraceMarshaller.java,v 1.3 2006-09-14 21:10:21 flordal Exp $
+//# $Id: JAXBTraceMarshaller.java,v 1.4 2006-11-06 14:19:19 torda Exp $
 //###########################################################################
 
 
@@ -31,7 +31,7 @@ public class JAXBTraceMarshaller
     super(new JAXBTraceExporter(),
           new JAXBTraceImporter(factory),
           "net.sourceforge.waters.xsd.des",
-          "waters-des.xsd");
+          "/xsd/waters-des.xsd");
   }
 
 

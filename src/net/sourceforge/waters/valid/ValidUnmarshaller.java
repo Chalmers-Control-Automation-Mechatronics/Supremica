@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   ValidUnmarshaller
 //###########################################################################
-//# $Id: ValidUnmarshaller.java,v 1.8 2006-09-15 09:26:13 robi Exp $
+//# $Id: ValidUnmarshaller.java,v 1.9 2006-11-06 14:19:19 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.valid;
@@ -55,7 +55,7 @@ public class ValidUnmarshaller
   {
     final SchemaFactory schemafactory =
       SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-    final URL url = JAXBMarshaller.class.getResource("waters-module.xsd");
+    final URL url = JAXBMarshaller.class.getResource("/xsd/waters-module.xsd");
     final Schema schema = schemafactory.newSchema(url);
     final JAXBContext context =
       JAXBContext.newInstance("net.sourceforge.waters.xsd.module");

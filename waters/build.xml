@@ -143,11 +143,7 @@
         <exclude name="net/sourceforge/waters/model/unchecked/**"/>
         <exclude name="net/sourceforge/waters/xsd/**"/>
       </fileset>
-      <zipfileset file="${xsl}/vw.xsl"
-                  fullpath="net/sourceforge/waters/valid/vw.xsl"/>
-      <zipfileset dir="${xsd}"
-                  includes="*.xsd"
-                  prefix="net/sourceforge/waters/model/marshaller"/>
+      <fileset dir="${xml}"/>
     </jar>
   </target>
 
@@ -167,11 +163,7 @@
         <include name="net/sourceforge/waters/xsd/**/*.properties"/>
         <include name="net/sourceforge/waters/xsd/**/*.ser"/>
       </fileset>
-      <zipfileset file="${xsl}/vw.xsl"
-	          fullpath="net/sourceforge/waters/valid/vw.xsl"/>
-      <zipfileset dir="${xsd}"
-                  includes="*.xsd"
-                  prefix="net/sourceforge/waters/model/marshaller"/>
+      <fileset dir="${xml}"/>
     </jar>
   </target>
 

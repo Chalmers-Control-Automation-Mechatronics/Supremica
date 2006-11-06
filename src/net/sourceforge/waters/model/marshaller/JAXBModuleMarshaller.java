@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleMarshaller
 //###########################################################################
-//# $Id: JAXBModuleMarshaller.java,v 1.4 2006-09-14 21:10:21 flordal Exp $
+//# $Id: JAXBModuleMarshaller.java,v 1.5 2006-11-06 14:19:19 torda Exp $
 //###########################################################################
 
 
@@ -33,7 +33,7 @@ public class JAXBModuleMarshaller
     super(new JAXBModuleExporter(),
           new JAXBModuleImporter(factory, optable),
           "net.sourceforge.waters.xsd.module",
-          "waters-module.xsd");
+          "/xsd/waters-module.xsd");
   }
 
 
