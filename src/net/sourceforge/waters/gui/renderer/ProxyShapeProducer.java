@@ -26,7 +26,9 @@ import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -133,7 +135,7 @@ public class ProxyShapeProducer
         
         GuardActionBlockProxy GA = e.getGuardActionBlock();
         GuardActionBlockProxyShape GAShape = (GuardActionBlockProxyShape) mMap.get(GA);
-        if(GA != null && GAShape==null)  // Fix this
+        if(GAShape==null && GA != null) 
         {
             double x, y;
             //get the edge

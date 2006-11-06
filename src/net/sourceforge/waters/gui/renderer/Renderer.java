@@ -2,6 +2,7 @@ package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Graphics2D;
 
+import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
@@ -45,21 +46,21 @@ public class Renderer
                     queue.offer(new ShapeToRender(producer.getShape(p),
                         render.getRenderingInformation(p)));
                 }
-                if (edge.getGuardActionBlock() != null) // Fix this
+                if (edge.getGuardActionBlock() != null)
                 {
                     queue.offer(new ShapeToRender(producer.getShape(edge.getGuardActionBlock()),
                         render.getRenderingInformation(edge.getGuardActionBlock())));
                     for(BinaryExpressionProxy action : edge.getGuardActionBlock().getActions())
                     {
                         queue.offer(new ShapeToRender(producer.getShape(action),
-                            render.getRenderingInformation(action)));
+                            new RenderingInformation(false, false, EditorColor.ACTIONCOLOR, EditorColor.ACTIONCOLOR, 0)));
                     }
                     List<SimpleExpressionProxy> guards = edge.getGuardActionBlock().getGuards();
                     if(!guards.isEmpty())
                     {
                         SimpleExpressionProxy guard = guards.get(0); //there should be only one guard.
                         queue.offer(new ShapeToRender(producer.getShape(guard),
-                            render.getRenderingInformation(guard)));
+                            new RenderingInformation(false, false, EditorColor.GUARDCOLOR, EditorColor.GUARDCOLOR, 0)));
                     }}
             }
         }

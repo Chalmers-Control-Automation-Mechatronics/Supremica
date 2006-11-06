@@ -48,12 +48,6 @@ public class LabelShape
         g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
         g.setFont(mFont);
         g.setColor(status.getColor());
-        if(mAuxilary.equals("guard")) {
-        		g.setColor(EditorColor.GUARDCOLOR);
-        } else if(mAuxilary.equals("action"))
-        {
-        		g.setColor(EditorColor.ACTIONCOLOR);
-        }
         g.drawString(mName, (int)mPoint.getX(), (int)mPoint.getY());
         if (status.isFocused())
         {
