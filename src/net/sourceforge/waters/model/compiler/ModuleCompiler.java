@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.48 2006-11-03 15:01:57 torda Exp $
+//# $Id: ModuleCompiler.java,v 1.49 2006-11-07 16:42:39 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1081,12 +1081,18 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
     }
     final List<List<TransitionProxy>> transitions =
       new LinkedList<List<TransitionProxy>>();
+    /* 
+     * STYRB.
+    final List<Map < ComponentKind,List<TransitionProxy>>> 
+    transitionsWithType =
+        new LinkedList< Map < ComponentKind, List<TransitionProxy>>>();
+    */
     // It is important that events with different GuardActionBlocks are
     // translated to separate transitions. (mEFATransitions)
     for (final AutomatonProxy automaton : mAutomata.values()) {
       final List<TransitionProxy> transInAutomaton =
         new LinkedList<TransitionProxy>();
-      for (final TransitionProxy transition : automaton.getTransitions()) {
+       for (final TransitionProxy transition : automaton.getTransitions()) {
         if (transition.getEvent() == event) {
           transInAutomaton.add(transition);
         } else if (mEFAEventEventMap.get(transition.getEvent()) != null) {
@@ -1098,9 +1104,20 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       if (transInAutomaton.isEmpty() &&
           automaton.getEvents().contains(event)) {
         transitions.clear();
+        /* STYRB.
+         * Här blir det annorlunda om vi ska ta hänsyn till
+         * styrbarhet.
+         */
         break;
       } else if (!transInAutomaton.isEmpty()) {
         transitions.add(transInAutomaton);
+       /*
+        * STYRB.
+        Map < ComponentKind, List<TransitionProxy>> typeTransitionMap=
+      	  new TreeMap<ComponentKind, List<TransitionProxy>>();
+        typeTransitionMap.put(automaton.getKind(),transInAutomaton);
+        transitionsWithType.add(typeTransitionMap);
+        */
       }
     }
     List<List<TransitionProxy>> allPaths = allPossiblePaths(transitions);
