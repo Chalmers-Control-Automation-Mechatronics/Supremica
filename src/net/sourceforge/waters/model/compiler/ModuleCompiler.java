@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.49 2006-11-07 16:42:39 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.50 2006-11-08 21:28:23 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1086,7 +1086,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
     final List<Map < ComponentKind,List<TransitionProxy>>> 
     transitionsWithType =
         new LinkedList< Map < ComponentKind, List<TransitionProxy>>>();
-    */
+     */
     // It is important that events with different GuardActionBlocks are
     // translated to separate transitions. (mEFATransitions)
     for (final AutomatonProxy automaton : mAutomata.values()) {
@@ -1104,20 +1104,21 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       if (transInAutomaton.isEmpty() &&
           automaton.getEvents().contains(event)) {
         transitions.clear();
-        /* STYRB.
-         * Här blir det annorlunda om vi ska ta hänsyn till
-         * styrbarhet.
+        /*
+         * Please write comments in English, thanks---Robi
+         * STYRB.
+         * H?r blir det annorlunda om vi ska ta h?nsyn till styrbarhet.
          */
         break;
       } else if (!transInAutomaton.isEmpty()) {
         transitions.add(transInAutomaton);
-       /*
-        * STYRB.
+        /*
+         * STYRB.
         Map < ComponentKind, List<TransitionProxy>> typeTransitionMap=
       	  new TreeMap<ComponentKind, List<TransitionProxy>>();
         typeTransitionMap.put(automaton.getKind(),transInAutomaton);
         transitionsWithType.add(typeTransitionMap);
-        */
+         */
       }
     }
     List<List<TransitionProxy>> allPaths = allPossiblePaths(transitions);
