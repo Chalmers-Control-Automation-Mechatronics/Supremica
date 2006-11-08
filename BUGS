@@ -5,5 +5,7 @@ There is currently no real bug-tracking system for Supremica/Waters... we should
  * Problem in the IDE when using non-UTF-8 characters in state names (едц fцr example). Saved files can not be opened.
  * Monolithic Synthesis does not remove non-reachable states which it should (why not?).
 
+ * New modules should not contain any events. Default markings :accepting and :forbidden should only be created when explicitly requested.
+
 Previously, all bugs were reported and stored in the bug database, http://www.supremica.org/bugtracking, but this is no longer the case. 
 

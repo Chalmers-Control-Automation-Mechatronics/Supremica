@@ -470,6 +470,11 @@ Class-Path: ${manifest.pathlist}</echo>
 </target>
 
 <target name="jar_supremica" depends="downloads_supremica">
+  <copy file="${waters.xsl}/vw.xsl"
+        todir="${build}/net/sourceforge/waters/valid"/>
+  <copy todir="${build}/net/sourceforge/waters/model/marshaller">
+    <fileset dir="${waters.xsd}" includes="*.xsd"/>
+  </copy>
   <jar jarfile="${dist}/Supremica.jar" manifest="${build}/manifest.txt"> 
     <fileset dir="${build}"/>
     <fileset dir="${images}"/>
@@ -477,7 +482,6 @@ Class-Path: ${manifest.pathlist}</echo>
     <fileset dir="${animations}"/>              
     <fileset dir="${userinterfaces}"/>  
     <fileset dir="${runtimesoftplcbuild}"/>                     
-    <fileset dir="${waters.xml}"/>                     
   </jar>
 </target>
 

@@ -132,38 +132,24 @@
       <compilerarg value="-Xlint:unchecked"/>
       <compilerarg value="-Xlint:deprecation"/>
     </javac>
- </target>
+  </target>
 
   <target name="waters-jar" depends="waters-compile">
+    <copy file="${xsl}/vw.xsl"
+          todir="${waters.classes}/net/sourceforge/waters/valid"/>
+    <copy todir="${waters.classes}/net/sourceforge/waters/model/marshaller">
+      <fileset dir="${xsd}" includes="*.xsd"/>
+    </copy>
     <jar jarfile="${waters.jar}">
       <fileset dir="${waters.classes}">
         <include name="net/sourceforge/waters/**/*.class"/>
+        <include name="net/sourceforge/waters/**/*.xsd"/>
+        <include name="net/sourceforge/waters/**/*.xsl"/>
         <exclude name="net/sourceforge/waters/build/**"/>
         <exclude name="net/sourceforge/waters/gui/**"/>
         <exclude name="net/sourceforge/waters/model/unchecked/**"/>
         <exclude name="net/sourceforge/waters/xsd/**"/>
       </fileset>
-      <fileset dir="${xml}"/>
-    </jar>
-  </target>
-
-  <target name="424" depends="jaxb-compile,waters-compile"
-          description="Build archive for COMP424-05A asssignment.">
-    <jar jarfile="${waters424.jar}">
-      <fileset dir="${waters.classes}">
-        <include name="net/sourceforge/waters/**/*.class"/>
-        <exclude
-           name="net/sourceforge/waters/analysis/Controllability*.class"/>
-        <exclude name="net/sourceforge/waters/build/**"/>
-        <exclude name="net/sourceforge/waters/gui/**"/>
-        <exclude name="net/sourceforge/waters/model/analysis/**"/>
-        <exclude name="net/sourceforge/waters/samples/**"/>
-      </fileset>
-      <fileset dir="${src}">
-        <include name="net/sourceforge/waters/xsd/**/*.properties"/>
-        <include name="net/sourceforge/waters/xsd/**/*.ser"/>
-      </fileset>
-      <fileset dir="${xml}"/>
     </jar>
   </target>
 
