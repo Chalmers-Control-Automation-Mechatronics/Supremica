@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="Coffee machine" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>A coffee machine that accepts coins as input and allows the user to order coffee and tea. The user interface (coin, tea and coffee) can be controlled but all other behaviour of the machine is uncontrollable.
+
+  Problems with the machine
+    * It sometimes goes 'clonk' and serves the wrong drink
+    * It sometimes pours the drink before dispensing a mug      
+  Task 
+    * Design a supervisor for the user interface that solves these issues</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
+        <EventDecl Kind="CONTROLLABLE" Name="coin"/>
+        <EventDecl Kind="CONTROLLABLE" Name="tea"/>
+        <EventDecl Kind="CONTROLLABLE" Name="coffee"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="pour_tea"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="pour_coffee"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="dispense_mug"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="clonk"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT">
+            <SimpleIdentifier Name="drinks"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="waiting">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="105" X="105"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-22" X="2"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="choose">
+                        <PointGeometry>
+                            <Point Y="161" X="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="-45"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="coffee being served">
+                        <PointGeometry>
+                            <Point Y="160" X="256"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-2" X="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="tea being served">
+                        <PointGeometry>
+                            <Point Y="257" X="145"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="11"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="choose" Source="waiting">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="coin"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-15" X="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="105" X="105"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="135" X="127"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="161" X="160"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="coffee being served" Source="choose">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="coffee"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="2" X="-24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="161" X="160"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="173" X="209"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="160" X="256"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="waiting" Source="coffee being served">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pour_coffee"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-16" X="7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="160" X="256"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="111" X="189"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="105" X="105"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="tea being served" Source="choose">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tea"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-12" X="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="161" X="160"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="211" X="169"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="257" X="145"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="waiting" Source="tea being served">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pour_tea"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-4" X="-64"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="257" X="145"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="186" X="105"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="105" X="105"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="tea being served" Source="coffee being served">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="clonk"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-6" X="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="160" X="256"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="226" X="211"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="257" X="145"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="tea being served" Source="tea being served">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="clonk"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-3" X="-40"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="257" X="145"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="281" X="128"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="257" X="145"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock/>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT">
+            <SimpleIdentifier Name="mugs"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="waiting">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="51" X="51"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-22" X="1"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="mug on its way">
+                        <PointGeometry>
+                            <Point Y="104" X="104"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="mug on its way" Source="waiting">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="coin"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-4" X="-30"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="51" X="51"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="87" X="67"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="104" X="104"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="waiting" Source="mug on its way">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="dispense_mug"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-13" X="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="104" X="104"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="67" X="87"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="51" X="51"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock/>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC">
+            <SimpleIdentifier Name="right drink"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="no order">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="105" X="105"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-8" X="-77"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="tea ordered">
+                        <PointGeometry>
+                            <Point Y="175" X="77"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="9" X="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="coffee ordered">
+                        <PointGeometry>
+                            <Point Y="77" X="175"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-4" X="12"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="tea ordered" Source="no order">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tea"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-5" X="-28"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="105" X="105"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="135" X="75"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="175" X="77"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="no order" Source="tea ordered">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pour_tea"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-7" X="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="175" X="77"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="146" X="106"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="105" X="105"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="coffee ordered" Source="no order">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="coffee"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-26" X="-25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="105" X="105"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="73" X="135"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="77" X="175"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="no order" Source="coffee ordered">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pour_coffee"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="3" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="77" X="175"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="103" X="148"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="105" X="105"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock/>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC">
+            <SimpleIdentifier Name="mug before drink"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="no mug">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="48" X="96"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-24" X="2"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="mug in place">
+                        <PointGeometry>
+                            <Point Y="101" X="149"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="mug in place" Source="no mug">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="dispense_mug"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="3" X="-88"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="48" X="96"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="84" X="112"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="101" X="149"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Target="no mug" Source="mug in place">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="pour_tea"/>
+                            <SimpleIdentifier Name="pour_coffee"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-23" X="9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="101" X="149"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="64" X="132"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="48" X="96"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock/>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>
+

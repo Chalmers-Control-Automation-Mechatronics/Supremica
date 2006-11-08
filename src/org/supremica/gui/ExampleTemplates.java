@@ -180,6 +180,7 @@ public class ExampleTemplates
         thisGroup.addItem(new TemplateItem("Ball Process", prefix + "ballProcess.xml", TemplateItemType.XML));
         thisGroup.addItem(new TemplateItem("Ball Process - Gatekeeper", prefix + "ballProcessGatekeeper.xml", TemplateItemType.XML));
         thisGroup.addItem(new TemplateItem("Car Window Control System", prefix + "big_bmw.xml", TemplateItemType.XML));
+        thisGroup.addItem(new TemplateItem("Coffee Machine", prefix + "CoffeeMachine.wmod", TemplateItemType.MODULE));
         thisGroup.addItem(new TemplateItem("Observation Equivalence Execise", prefix + "ObservationEquivalenceExercise.xml", TemplateItemType.XML));
         //thisGroup.addItem(new TemplateItem("Passenger Land-Transportation System", prefix + "PLanTS.xml", TemplateItemType.XML));
         thisGroup.addItem(new TemplateItem("Passenger Land-Transportation System", basePrefix + "/ModuleExamples/other/PLanTS.wmod", TemplateItemType.MODULE));
