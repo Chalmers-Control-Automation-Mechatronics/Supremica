@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.50 2006-11-08 21:28:23 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.51 2006-11-08 22:01:58 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -37,6 +37,7 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.expr.AtomValue;
 import net.sourceforge.waters.model.expr.BinaryOperator;
+import net.sourceforge.waters.model.expr.BooleanValue;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.IndexValue;
 import net.sourceforge.waters.model.expr.IntValue;
@@ -49,6 +50,8 @@ import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.BooleanConstantProxy;
+import net.sourceforge.waters.model.module.RangeParameterProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -58,6 +61,7 @@ import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
@@ -68,20 +72,15 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.ParameterProxy;
-import net.sourceforge.waters.model.module.RangeParameterProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.SimpleParameterProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
-
-//EFA-------------------
 import net.sourceforge.waters.model.module.VariableProxy;
-import net.sourceforge.waters.model.module.GuardActionBlockProxy;
-//
-
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -142,6 +141,14 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
         visitCollection(bindings);
       }
       // begin EFA
+      
+      // declare boolean constants
+      mContext.add("true", new CompiledIntValue(true));
+      mContext.add("false", new CompiledIntValue(false));
+      
+      // reserve "boolean" for the type boolean
+      mContext.add("boolean", new CompiledIntRangeValue(0,1));
+      
       mIsEFA = false;
       for (final Proxy proxy : mModule.getComponentList()) {
         if (proxy instanceof SimpleComponentProxy) {
@@ -484,6 +491,11 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
   public IntValue visitIntConstantProxy(final IntConstantProxy proxy)
   {
     return new CompiledIntValue(proxy.getValue());
+  }
+
+  public BooleanValue visitBooleanConstantProxy(final BooleanConstantProxy proxy)
+  {
+    return new CompiledBooleanValue(proxy.isValue());
   }
 
   public Object visitIntParameterProxy(final IntParameterProxy proxy)
@@ -1086,7 +1098,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
     final List<Map < ComponentKind,List<TransitionProxy>>> 
     transitionsWithType =
         new LinkedList< Map < ComponentKind, List<TransitionProxy>>>();
-     */
+    */
     // It is important that events with different GuardActionBlocks are
     // translated to separate transitions. (mEFATransitions)
     for (final AutomatonProxy automaton : mAutomata.values()) {
@@ -1497,7 +1509,10 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
                                final RangeValue range)
     throws VisitorException
   {
-    final IndexValue value = evalIndex(expr);
+    IndexValue value = evalIndex(expr);
+    if (value instanceof BooleanValue) {
+    		value = new CompiledIntValue(((BooleanValue) value).getValue());
+    }
     if (range.contains(value)) {
       return value;
     } else {
