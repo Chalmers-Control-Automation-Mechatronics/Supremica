@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   AbstractMazeTest
 //###########################################################################
-//# $Id: AbstractMazeTest.java,v 1.3 2006-11-03 15:01:57 torda Exp $
+//# $Id: AbstractMazeTest.java,v 1.4 2006-11-08 21:49:12 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.JAXBException;
 
-import net.sourceforge.waters.model.analysis.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -414,7 +414,7 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
     final File outdesfile = des.getFileLocation();
     mProductDESMarshaller.marshal(des, outdesfile);
 
-    VerificationResult result = checkControllability(des, mProductDESFactory);
+    VerificationResult result = checkLanguageInclusion(des, mProductDESFactory);
     final boolean controllable = result.isSatisfied();
     SafetyTraceProxy counterexample = null;
     if (!controllable) {
@@ -435,11 +435,11 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
     }
   }
 
-  private VerificationResult checkControllability
+  private VerificationResult checkLanguageInclusion
     (final ProductDESProxy des, final ProductDESProxyFactory factory)
   {
-    final ControllabilityChecker checker =
-      getControllabilityChecker(des, factory);
+    final LanguageInclusionChecker checker =
+      getLanguageInclusionChecker(des, factory);
     final boolean result = checker.run();
     final SafetyTraceProxy trace = result ? null : checker.getCounterExample();
     return new VerificationResult(result, trace);
@@ -475,7 +475,7 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
 
   //#########################################################################
   //# Provided by Subclasses
-  protected abstract ControllabilityChecker getControllabilityChecker
+  protected abstract LanguageInclusionChecker getLanguageInclusionChecker
     (ProductDESProxy des, ProductDESProxyFactory factory);
 
 
@@ -495,7 +495,6 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
     mTraceMarshaller = new JAXBTraceMarshaller(mProductDESFactory);
     mMazeCompiler = new MazeCompiler
       (mInputDirectory, mOutputDirectory, moduleFactory, mModuleMarshaller);
-    mMazeCompiler.setUseLanguageInclusion(false);
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerMarshaller(mModuleMarshaller);
     mDocumentManager.registerMarshaller(mProductDESMarshaller);

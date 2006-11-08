@@ -4,13 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   NativeMazeTest
 //###########################################################################
-//# $Id: NativeMazeTest.java,v 1.2 2006-11-03 05:18:29 robi Exp $
+//# $Id: NativeMazeTest.java,v 1.3 2006-11-08 21:49:12 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
 
-import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
-import net.sourceforge.waters.model.analysis.ControllabilityChecker;
+import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -20,10 +20,10 @@ public class NativeMazeTest extends AbstractMazeTest
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.samples.maze.AbstractMazeTest
-  protected ControllabilityChecker getControllabilityChecker
+  protected LanguageInclusionChecker getLanguageInclusionChecker
     (final ProductDESProxy des, final ProductDESProxyFactory factory)
   {
-    return new NativeControllabilityChecker(des, factory);
+    return new NativeLanguageInclusionChecker(des, factory);
   }
 
 }
