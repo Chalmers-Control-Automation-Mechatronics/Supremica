@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractModelVerifierTest
 //###########################################################################
-//# $Id: AbstractModelVerifierTest.java,v 1.4 2006-11-03 15:01:57 torda Exp $
+//# $Id: AbstractModelVerifierTest.java,v 1.5 2006-11-08 22:55:25 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -50,6 +50,7 @@ public abstract class AbstractModelVerifierTest extends AbstractWatersTest
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
     mDocumentManager.registerUnmarshaller(modmarshaller);
+    mModelVerifier = createModelVerifier(mProductDESProxyFactory);
   } 
 
 
@@ -174,12 +175,11 @@ public abstract class AbstractModelVerifierTest extends AbstractWatersTest
                                   final boolean expect)
     throws Exception
   {
-    final ModelVerifier checker =
-      createModelVerifier(des, mProductDESProxyFactory);
-    final boolean result = checker.run();
+    mModelVerifier.setModel(des);
+    final boolean result = mModelVerifier.run();
     TraceProxy counterexample = null;
     if (!result) {
-      counterexample = checker.getCounterExample();
+      counterexample = mModelVerifier.getCounterExample();
       saveCounterExample(counterexample, bindings);
     }
     assertEquals("Wrong result from model checker: got " +
@@ -194,8 +194,7 @@ public abstract class AbstractModelVerifierTest extends AbstractWatersTest
   //#########################################################################
   //# To be Provided by Subclasses
   protected abstract ModelVerifier
-    createModelVerifier(ProductDESProxy des,
-                        ProductDESProxyFactory factory);
+    createModelVerifier(ProductDESProxyFactory factory);
 
   protected abstract void
     checkCounterExample(ProductDESProxy des,
@@ -253,5 +252,6 @@ public abstract class AbstractModelVerifierTest extends AbstractWatersTest
   private JAXBProductDESMarshaller mProductDESMarshaller;
   private JAXBTraceMarshaller mTraceMarshaller;
   private DocumentManager mDocumentManager;	
+  private ModelVerifier mModelVerifier;
 
 }

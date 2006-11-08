@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   MonolithicSafetyVerifier
 //###########################################################################
-//# $Id: MonolithicSafetyVerifier.java,v 1.3 2006-11-06 03:23:35 robi Exp $
+//# $Id: MonolithicSafetyVerifier.java,v 1.4 2006-11-08 22:55:25 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.monolithic;
@@ -72,15 +72,6 @@ public class MonolithicSafetyVerifier
   {
     super(model, factory);
     mKindTranslator = translator;
-    mAutomatonSet = model.getAutomata();
-    mPlantTransitionMap = new ArrayList<int[][]>();
-    mSpecTransitionMap = new ArrayList<int[][]>();
-
-    mIndexList = new ArrayList<Integer>();
-    mStateList = new BlockedArrayList<StateTuple>(StateTuple.class);
-    mEventCodingList = new ArrayList<EventProxy>(model.getEvents());
-    mPlantEventList = new ArrayList<byte[]>();
-    mSpecEventList = new ArrayList<byte[]>();
   }
 
 
@@ -88,35 +79,51 @@ public class MonolithicSafetyVerifier
   //# Invocation
   public boolean run()
   {
+    final ProductDESProxy model = getModel();
+
     Set<StateProxy> stateSet;
-    int i,j,k = 0;
+    int i, j, k = 0;
     int ck = 0;
     int bl = 0;
     int mask = 0;
     int codeLength = 0;
     int cp = 0;
 
-    eventSize = mEventCodingList.size();
-    automatonSize = mAutomatonSet.size();
+    mNumAutomata = 0;
+    mNumEvents = 0;
+    mNumPlants = 0;
+    mStateTupleSize = 0;
+
+    mAutomatonSet = model.getAutomata();
+    mPlantTransitionMap = new ArrayList<int[][]>();
+    mSpecTransitionMap = new ArrayList<int[][]>();
+    mIndexList = new ArrayList<Integer>();
+    mStateList = new BlockedArrayList<StateTuple>(StateTuple.class);
+    mEventCodingList = new ArrayList<EventProxy>(model.getEvents());
+    mPlantEventList = new ArrayList<byte[]>();
+    mSpecEventList = new ArrayList<byte[]>();
+
+    mNumEvents = mEventCodingList.size();
+    mNumAutomata = mAutomatonSet.size();
 
     // Empty case
-    if (automatonSize == 0) {
+    if (mNumAutomata == 0) {
       return setSatisfiedResult();
     }
 
-    mBitLengthList = new int[automatonSize];
-    mMaskList = new int[automatonSize];
-    mCodePosition = new int[automatonSize];
+    mBitLengthList = new int[mNumAutomata];
+    mMaskList = new int[mNumAutomata];
+    mCodePosition = new int[mNumAutomata];
 
     // Count Plant size
     for (AutomatonProxy ap : mAutomatonSet) {
       final ComponentKind kind = mKindTranslator.getComponentKind(ap);
       if (kind == ComponentKind.PLANT) {
-        plantSize++;
+        mNumPlants++;
       }
     }
  
-    systemState = new int[automatonSize];
+    mSystemState = new int[mNumAutomata];
 
     // Separate the automatons by kind
     for (AutomatonProxy ap : mAutomatonSet) {
@@ -125,15 +132,15 @@ public class MonolithicSafetyVerifier
       // Encoding states to binary values
       final List<StateProxy> codes = new ArrayList<StateProxy>(stateSet);
       // Encoding events to binary values
-      final byte[] aneventCodingList = new byte[eventSize];
+      final byte[] aneventCodingList = new byte[mNumEvents];
       for (EventProxy evp : ap.getEvents()) {
         aneventCodingList[mEventCodingList.indexOf(evp)] = 1;
       }
       // Encoding transitions to binary values
       int stateSize = codes.size();
-      int[][] atransition = new int[stateSize][eventSize];
-      for (i=0;i<stateSize;i++) {
-        for (j=0;j<eventSize;j++) {
+      int[][] atransition = new int[stateSize][mNumEvents];
+      for (i = 0; i < stateSize; i++) {
+        for (j = 0; j < mNumEvents; j++) {
           atransition[i][j] = -1;
         }
       }
@@ -159,7 +166,7 @@ public class MonolithicSafetyVerifier
       final ComponentKind kind = mKindTranslator.getComponentKind(ap);
       switch (kind) {
       case PLANT:
-        systemState[ck] = codes.indexOf(initialState);
+        mSystemState[ck] = codes.indexOf(initialState);
         mPlantEventList.add(aneventCodingList);
         mPlantTransitionMap.add(atransition);
         mBitLengthList[ck] = bl;
@@ -167,11 +174,11 @@ public class MonolithicSafetyVerifier
         ck++;
         break;
       case SPEC:
-        systemState[k+plantSize] = codes.indexOf(initialState);
+        mSystemState[k + mNumPlants] = codes.indexOf(initialState);
         mSpecEventList.add(aneventCodingList);
         mSpecTransitionMap.add(atransition);
-        mBitLengthList[k + plantSize] = bl;
-        mMaskList[k + plantSize] = mask;
+        mBitLengthList[k + mNumPlants] = bl;
+        mMaskList[k + mNumPlants] = mask;
         k++;
         break;
       default:
@@ -180,7 +187,7 @@ public class MonolithicSafetyVerifier
     }
 
     // Set the mCodePosition list
-    for (i = 0; i < automatonSize; i++) {
+    for (i = 0; i < mNumAutomata; i++) {
       codeLength += mBitLengthList[i];
       if (codeLength <= 32){
         mCodePosition[i] = cp;
@@ -190,9 +197,9 @@ public class MonolithicSafetyVerifier
         mCodePosition[i] = cp;
       }
     }
-    stSize = cp + 1;
+    mStateTupleSize = cp + 1;
 
-    if (isControllable(systemState)) {
+    if (isControllable(mSystemState)) {
       return setSatisfiedResult();
     } else {
       final SafetyTraceProxy counterexample = computeCounterExample();
@@ -235,40 +242,40 @@ public class MonolithicSafetyVerifier
     boolean enabled = true;
 
     // Add the initial synchronous product in systemSet and mStateList
-    successor = new int[automatonSize];
-    stateTuple = new StateTuple(stSize);
-    encode(sState,stateTuple);
-    systemSet.add(stateTuple);
-    mStateList.add(stateTuple);
+    mSuccessor = new int[mNumAutomata];
+    mStateTuple = new StateTuple(mStateTupleSize);
+    encode(sState, mStateTuple);
+    systemSet.add(mStateTuple);
+    mStateList.add(mStateTuple);
     mIndexList.add(mStateList.size()-1);
 
     int indexSize = 0;
-    int eventSize = mEventCodingList.size();
+    int mNumEvents = mEventCodingList.size();
     int i,j,k,temp;
 
     while(true){
       // For each current state in the current level, check its controllability
       indexSize = mIndexList.size();
-      for (j = (indexSize == 1) ? 0 : (mIndexList.get(indexSize-2)+1);
+      for (j = (indexSize == 1) ? 0 : (mIndexList.get(indexSize - 2) + 1);
            j <= mIndexList.get(indexSize-1);
            j++) {
-        decode(mStateList.get(j),systemState);
-        for (int e=0;e<eventSize;e++) {
+        decode(mStateList.get(j),mSystemState);
+        for (int e = 0; e < mNumEvents; e++) {
           // Retrieve all enabled events
           enabled = true;
-          for (i = 0; i < plantSize; i++) {
+          for (i = 0; i < mNumPlants; i++) {
             if (mPlantEventList.get(i)[e] == 1){
-              temp = mPlantTransitionMap.get(i)[systemState[i]][e];
+              temp = mPlantTransitionMap.get(i)[mSystemState[i]][e];
               if (temp == -1) {
                 enabled = false;
                 break;
               }
               else if (temp > -1){
-                successor[i] = temp;
+                mSuccessor[i] = temp;
                 continue;
               }
             }
-            successor[i] = systemState[i];
+            mSuccessor[i] = mSystemState[i];
           }
           if (!enabled) {
             continue;
@@ -278,34 +285,36 @@ public class MonolithicSafetyVerifier
           final EventProxy event = mEventCodingList.get(e);
           final EventKind kind = mKindTranslator.getEventKind(event);
           if (kind == EventKind.UNCONTROLLABLE) {
-            for (i = 0; i < automatonSize - plantSize; i++) {
+            for (i = 0; i < mNumAutomata - mNumPlants; i++) {
               if (mSpecEventList.get(i)[e] == 1) {
-                temp = mSpecTransitionMap.get(i)[systemState[i+plantSize]][e];
+                temp =
+                  mSpecTransitionMap.get(i)[mSystemState[i + mNumPlants]][e];
                 if (temp == -1) {
-                  errorEvent = e;
+                  mErrorEvent = e;
                   return false;
                 }
                 if (temp > -1) {
-                  successor[i + plantSize] = temp;
+                  mSuccessor[i + mNumPlants] = temp;
                   continue;
                 }
               }
-              successor[i + plantSize] = systemState[i + plantSize];
+              mSuccessor[i + mNumPlants] = mSystemState[i + mNumPlants];
             }
           } else {
-            for (k = 0; k < automatonSize - plantSize; k++){
+            for (k = 0; k < mNumAutomata - mNumPlants; k++){
               if (mSpecEventList.get(k)[e] == 1) {
-                temp = mSpecTransitionMap.get(k)[systemState[k+plantSize]][e];
+                temp =
+                  mSpecTransitionMap.get(k)[mSystemState[k + mNumPlants]][e];
                 if (temp == -1) {
                   enabled = false;
                   break;
                 }
                 if (temp > -1){
-                  successor[k+plantSize] = temp;
+                  mSuccessor[k + mNumPlants] = temp;
                   continue;
                 }
               }
-              successor[k+plantSize] = systemState[k+plantSize];
+              mSuccessor[k + mNumPlants] = mSystemState[k + mNumPlants];
             }
             if (!enabled) {
               continue;
@@ -313,15 +322,15 @@ public class MonolithicSafetyVerifier
           }
 
           // Encode the new system state and put it into mStateList
-          stateTuple = new StateTuple(stSize);
-          encode(successor,stateTuple);
-          if (systemSet.add(stateTuple)) {
-            mStateList.add(stateTuple);
+          mStateTuple = new StateTuple(mStateTupleSize);
+          encode(mSuccessor, mStateTuple);
+          if (systemSet.add(mStateTuple)) {
+            mStateList.add(mStateTuple);
           }
         }
       }
-      // If mStateList has added a new state, update mIndexList at the last loop
-      // of current level
+      // If mStateList has added a new state, update mIndexList at the last
+      // loop of current level
       if (mStateList.size() != mIndexList.get(indexSize - 1) + 1) {
         mIndexList.add(mStateList.size() - 1);
       } else {
@@ -344,7 +353,7 @@ public class MonolithicSafetyVerifier
     int k = 0;
     int result = 0;
     final int[] codes = sTuple.getCodes();
-    for (i = 0; i < automatonSize; i++) {
+    for (i = 0; i < mNumAutomata; i++) {
       if (mCodePosition[i] == k) {
         result <<= mBitLengthList[i];
         result |= sState[i];
@@ -353,7 +362,7 @@ public class MonolithicSafetyVerifier
         result = sState[i];
         k++;
       }
-      if (i == automatonSize - 1) {
+      if (i == mNumAutomata - 1) {
         codes[k] = result;
       }
     }
@@ -371,9 +380,9 @@ public class MonolithicSafetyVerifier
   {
     int i;
     int result;
-    int k = mCodePosition[automatonSize - 1];
+    int k = mCodePosition[mNumAutomata - 1];
     int temp = sTuple.get(k);
-    for (i = automatonSize - 1; i > -1; i--) {
+    for (i = mNumAutomata - 1; i > -1; i--) {
       if (mCodePosition[i] == k) {
         result = temp;
         result &= mMaskList[i];
@@ -421,13 +430,13 @@ public class MonolithicSafetyVerifier
     boolean found = false;
     int i, j, k, temp;
     int indexSize = mIndexList.size();
-    int[] errorState = new int[automatonSize];
+    int[] errorState = new int[mNumAutomata];
 
-    tracelist.add(0, mEventCodingList.get(errorEvent));
+    tracelist.add(0, mEventCodingList.get(mErrorEvent));
 
     while(true){
-      for (i = 0; i < automatonSize; i++) {
-        errorState[i] = systemState[i];
+      for (i = 0; i < mNumAutomata; i++) {
+        errorState[i] = mSystemState[i];
       }
       mIndexList.remove(--indexSize);
       if(mIndexList.size()==0) break;
@@ -436,45 +445,45 @@ public class MonolithicSafetyVerifier
       for (j = indexSize == 1 ? 0 : mIndexList.get(indexSize - 2) + 1;
            j <= mIndexList.get(indexSize - 1);
            j++) {
-        decode(mStateList.get(j), systemState);
-        for (int e = 0; e < eventSize; e++) {
+        decode(mStateList.get(j), mSystemState);
+        for (int e = 0; e < mNumEvents; e++) {
           enabled = true;
-          for (i = 0; i < plantSize; i++) {
+          for (i = 0; i < mNumPlants; i++) {
             if (mPlantEventList.get(i)[e] == 1){
-              temp = mPlantTransitionMap.get(i)[systemState[i]][e];
+              temp = mPlantTransitionMap.get(i)[mSystemState[i]][e];
               if (temp == -1) {
                 enabled = false;
                 break;
               } else if (temp > -1){
-                successor[i] = temp;
+                mSuccessor[i] = temp;
                 continue;
               }
             }
-            successor[i] = systemState[i];
+            mSuccessor[i] = mSystemState[i];
           }
           if (!enabled) {
             continue;
           }
 
-          for (k = 0; k < automatonSize - plantSize; k++) {
+          for (k = 0; k < mNumAutomata - mNumPlants; k++) {
             if (mSpecEventList.get(k)[e] == 1) {
-              temp = mSpecTransitionMap.get(k)[systemState[k+plantSize]][e];
+              temp = mSpecTransitionMap.get(k)[mSystemState[k+mNumPlants]][e];
               if (temp == -1) {
                 enabled = false;
                 break;
               }
               if (temp > -1) {
-                successor[k + plantSize] = temp;
+                mSuccessor[k + mNumPlants] = temp;
                 continue;
               }
             }
-            successor[k + plantSize] = systemState[k + plantSize];
+            mSuccessor[k + mNumPlants] = mSystemState[k + mNumPlants];
           }
           if (!enabled) {
             continue;
           }
 
-          if (Arrays.equals(successor, errorState)) {
+          if (Arrays.equals(mSuccessor, errorState)) {
             found = true;
             tracelist.add(0, mEventCodingList.get(e));
             break;
@@ -513,17 +522,17 @@ public class MonolithicSafetyVerifier
   private int[] mBitLengthList;
   private int[] mMaskList;
   private int[] mCodePosition;
-  private StateTuple stateTuple;
+  private StateTuple mStateTuple;
 
   // Size
-  private int automatonSize;
-  private int eventSize;
-  private int plantSize;
-  private int stSize;
+  private int mNumAutomata;
+  private int mNumEvents;
+  private int mNumPlants;
+  private int mStateTupleSize;
 
   // For computing successor and counterexample
-  private int[] systemState;
-  private int[] successor;
-  private int errorEvent;
+  private int[] mSystemState;
+  private int[] mSuccessor;
+  private int mErrorEvent;
 
 }
