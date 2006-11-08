@@ -2,11 +2,11 @@
 <Module Name="Coffee machine" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <ns2:Comment>A coffee machine that accepts coins as input and allows the user to order coffee and tea. The user interface (coin, tea and coffee) can be controlled but all other behaviour of the machine is uncontrollable.
 
-  Problems with the machine
-    * It sometimes goes 'clonk' and serves the wrong drink
-    * It sometimes pours the drink before dispensing a mug      
-  Task 
-    * Design a supervisor for the user interface that solves these issues</ns2:Comment>
+Problems with the machine
+  * It sometimes goes 'clonk' and serves the wrong drink
+  * It sometimes pours the drink before dispensing a mug      
+Task 
+  * Design a supervisor for the user interface that solves these issues</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="PROPOSITION" Name=":forbidden"/>

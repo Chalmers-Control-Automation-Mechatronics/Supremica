@@ -62,323 +62,188 @@ import org.supremica.automata.Automaton;
  * @author hugo
  */
 public class AutomataToHierarchyToDot
-	implements AutomataSerializer
+    implements AutomataSerializer
 {
-	private Automata theAutomata;
-	private boolean leftToRight = false;
-	private boolean withLabel = true;
-	private boolean withCircles = false;
-	private boolean useColors = false;
-
-	public AutomataToHierarchyToDot(Automata aut)
-	{
-		this.theAutomata = aut;
-	}
-
-	public boolean isLeftToRight()
-	{
-		return leftToRight;
-	}
-
-	public void setLeftToRight(boolean leftToRight)
-	{
-		this.leftToRight = leftToRight;
-	}
-
-	public void setWithLabels(boolean withLabel)
-	{
-		this.withLabel = withLabel;
-	}
-
-	public void setWithCircles(boolean withCircles)
-	{
-		this.withCircles = withCircles;
-	}
-
-	public void setUseColors(boolean useColors)
-	{
-		this.useColors = useColors;
-	}
-
-	private String getColor(Automaton aut)
-	{
-		if (!useColors)
-		{
-			return "";
-		}
-
-		if (aut.isUndefined())
-		{
-			return ", color = pink";
-		}
-
-		if (aut.isPlant())
-		{
-			return ", color = red";
-		}
-
-		if (aut.isSupervisor() || aut.isSpecification())
-		{
-			return ", color = green";
-		}
-
-		// What on G*d's green earth was that?
-		return ", color = white";
-	}
-
-	private String getShape(Automaton aut)
-	{
-		if (withCircles)
-		{
-			return "";
-		}
-
-		if (aut.isPlant())
-		{
-			return ", shape = box";
-		}
-
-		if (aut.isSupervisor() || aut.isSpecification())
-		{
-			return ", shape = ellipse";
-		}
-
-		if (aut.isUndefined())
-		{
-			return ", shape = egg";
-		}
-
-		// What the f**k was that?
-		return "";
-	}
-
-	public void serialize(PrintWriter pw)
-		throws Exception
-	{
-		pw.println("graph structure {");
-
-		// pw.println("\tcenter = true;");
-		// Left to right or top to bottom?
-		if (leftToRight)
-		{
-			pw.println("\trankdir = LR;");
-		}
-
-		// Circles?
-		if (withCircles)
-		{
-			pw.println("\tnode [shape = circle];");
-		}
-		else
-		{
-
-			//pw.println("\tnode [shape = plaintext];");
-			//pw.println("\tnode [shape = ellipse];");
-		}
-
-		// Filled?
-		if (useColors)
-		{
-			pw.println("\tnode [style = filled];");
-		}
-
-		// The automata are nodes in the graph
-		//for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
-		for (int i = 0; i < theAutomata.size(); i++)
-		{
-			Automaton currAutomaton = theAutomata.getAutomatonAt(i);
-
-			pw.print("\t\"" + currAutomaton.getName() + "\" [label = \"");
-
-			if (withLabel)
-			{
-				pw.print(EncodingHelper.normalize(currAutomaton.getName()));
-			}
-
-			pw.println("\"" + getColor(currAutomaton) + getShape(currAutomaton) + "]; ");
-
-			// The arcs in the graph represent common events in the respective alphabets
-			Alphabet currAlphabet = currAutomaton.getAlphabet();
-
-			//for (Iterator otherIt = theAutomata.iterator(); otherIt.hasNext(); )
-			for (int j = i + 1; j < theAutomata.size(); j++)
-			{
-				Automaton otherAutomaton = theAutomata.getAutomatonAt(j);
-				Alphabet otherAlphabet = otherAutomaton.getAlphabet();
-
-				Alphabet intersection = AlphabetHelpers.intersect(currAlphabet, otherAlphabet);
-				int weight = intersection.nbrOfEvents();
-				int uncon = intersection.nbrOfUncontrollableEvents();
-
-				if (weight > 0)
-				{
-
-					//pw.print("\t\"" + currAutomaton.getName() + "\" -- \"" + otherAutomaton.getName() + "\";");
-					pw.print("\t\"" + currAutomaton.getName() + "\" -- \"" + otherAutomaton.getName() + "\" ");
-
-					if (weight == 1)
-					{
-
-						// pw.print("[style = dashed, "); // This was impopular... /hguo
-						pw.print("[style = solid, ");
-					}
-
-					if (weight > 1)
-					{
-						pw.print("[style = solid, ");
-					}
-
-					pw.println("label = \"" + weight + " (" + uncon + ")\"];");
-				}
-			}
-		}
-
-		pw.println("}");
-		pw.flush();
-		pw.close();
-
-		/* // The way it's done in AutomatonViewer
-		Vector initialStates = new Vector();
-		final String initPrefix = "__init_";
-
-		pw.println("digraph state_automaton {");
-		pw.println("\tcenter = true;");
-
-
-		if (!aut.hasInitialState())
-		{
-				pw.println("\t noState [shape = plaintext, label = \"No initial state\" ]");
-				pw.println("}");
-				pw.flush();
-				pw.close();
-
-				return;
-		}
-
-		for (Iterator states = aut.stateIterator(); states.hasNext(); )
-		{
-				State state = (State) states.next();
-
-				if (state.isInitial())
-				{
-						initialStates.addElement(state);
-						pw.println("\tnode [shape = plaintext] \"" + initPrefix + state.getId() + "\";");
-				}
-
-				if (state.isAccepting() &&!state.isForbidden())
-				{
-						if (withCircles)
-						{
-								pw.println("\tnode [shape = doublecircle] \"" + state.getId() + "\";");
-						}
-						else
-						{
-								pw.println("\tnode [shape = ellipse] \"" + state.getId() + "\";");
-						}
-				}
-
-				if (state.isForbidden())
-				{
-						pw.println("\tnode [shape = box] \"" + state.getId() + "\";");
-				}
-		}
-
-		if (withCircles)
-		{
-				pw.println("\tnode [shape = circle];");
-		}
-		else
-		{
-				pw.println("\tnode [shape = plaintext];");
-		}
-
-		for (int i = 0; i < initialStates.size(); i++)
-		{
-				String stateId = ((State) initialStates.elementAt(i)).getId();
-
-				pw.println("\t\"" + initPrefix + stateId + "\" [label = \"\"]; ");
-				pw.println("\t\"" + initPrefix + stateId + "\" [height = \"0\"]; ");
-				pw.println("\t\"" + initPrefix + stateId + "\" [width = \"0\"]; ");
-				pw.println("\t\"" + initPrefix + stateId + "\" -> \"" + stateId + "\";");
-		}
-
-		//Alphabet theAlphabet = aut.getAlphabet();
-
-		for (Iterator states = aut.stateIterator(); states.hasNext(); )
-		{
-				State sourceState = (State) states.next();
-
-				pw.print("\t\"" + sourceState.getId() + "\" [label = \"");
-
-				if (withLabel)
-				{
-						pw.print(EncodingHelper.normalize(sourceState.getName()));
-				}
-
-				pw.println("\"" + getColor(sourceState) + "]; ");
-
-				for (Iterator arcSets = sourceState.outgoingArcSetIterator(); arcSets.hasNext(); )
-				{
-						ArcSet currArcSet = (ArcSet) arcSets.next();
-						State fromState = currArcSet.getFromState();
-						State toState = currArcSet.getToState();
-
-						pw.print("\t\"" + fromState.getId() + "\" -> \"" + toState.getId());
-						pw.print("\" [ label = \"");
-
-						for (Iterator arcIt = currArcSet.iterator(); arcIt.hasNext(); )
-						{
-								Arc currArc = (Arc) arcIt.next();
-								LabeledEvent thisEvent = currArc.getEvent(); // theAlphabet.getEventWithId(currArc.getEventId());
-
-								if (!thisEvent.isControllable())
-								{
-										pw.print("!");
-								}
-
-								if (!thisEvent.isPrioritized())
-								{
-										pw.print("?");
-								}
-
-								if (thisEvent.isImmediate())
-								{
-										pw.print("#");
-								}
-
-								pw.print(EncodingHelper.normalize(thisEvent.getLabel()));
-
-								if (arcIt.hasNext())
-								{
-										pw.print("\\n");
-								}
-						}
-
-						pw.println("\" ];");
-				}
-		}
-
-		// An attemp to always start at the initial state.
-		// The problem is that a rectangle is drawn around the initial state.
-		Iterator stateIt = initialStates.iterator();
-		while(stateIt.hasNext())
-		{
-				State currState = (State)stateIt.next();
-				pw.println("\t{ rank = min ;");
-				pw.println("\t\t" + initPrefix + currState.getId() + ";");
-				pw.println("\t\t" + currState.getId() + ";");
-				pw.println("\t}");
-		}
-
-		pw.println("}");
-		pw.flush();
-		pw.close();
-		*/
-	}
-
-	public void serialize(String fileName)
-		throws Exception
-	{
-		serialize(new PrintWriter(new FileWriter(fileName)));
-	}
+    private Automata theAutomata;
+    private boolean leftToRight = false;
+    private boolean withLabel = true;
+    private boolean withCircles = false;
+    private boolean useColors = false;
+    
+    public AutomataToHierarchyToDot(Automata aut)
+    {
+        this.theAutomata = aut;
+    }
+    
+    public boolean isLeftToRight()
+    {
+        return leftToRight;
+    }
+    
+    public void setLeftToRight(boolean leftToRight)
+    {
+        this.leftToRight = leftToRight;
+    }
+    
+    public void setWithLabels(boolean withLabel)
+    {
+        this.withLabel = withLabel;
+    }
+    
+    public void setWithCircles(boolean withCircles)
+    {
+        this.withCircles = withCircles;
+    }
+    
+    public void setUseColors(boolean useColors)
+    {
+        this.useColors = useColors;
+    }
+    
+    private String getColor(Automaton aut)
+    {
+        if (!useColors)
+        {
+            return "";
+        }
+        
+        if (aut.isUndefined())
+        {
+            return ", color = pink";
+        }
+        
+        if (aut.isPlant())
+        {
+            return ", color = red";
+        }
+        
+        if (aut.isSupervisor())
+        {
+            return ",color = forestgreen";
+        }
+        
+        if (aut.isSpecification())
+        {
+            return ", color = green";
+        }
+        
+        // What on G*d's green earth was that?
+        return ", color = white";
+    }
+    
+    private String getShape(Automaton aut)
+    {
+        if (withCircles)
+        {
+            return "";
+        }
+        
+        if (aut.isPlant())
+        {
+            return ", shape = box";
+        }
+        
+        if (aut.isSupervisor() || aut.isSpecification())
+        {
+            return ", shape = ellipse";
+        }
+        
+        if (aut.isUndefined())
+        {
+            return ", shape = egg";
+        }
+        
+        // What the f**k was that?
+        return "";
+    }
+    
+    public void serialize(PrintWriter pw)
+    throws Exception
+    {
+        pw.println("graph structure {");
+        
+        // pw.println("\tcenter = true;");
+        // Left to right or top to bottom?
+        if (leftToRight)
+        {
+            pw.println("\trankdir = LR;");
+        }
+        
+        // Circles?
+        if (withCircles)
+        {
+            pw.println("\tnode [shape = circle];");
+        }
+        else
+        {
+            
+            //pw.println("\tnode [shape = plaintext];");
+            //pw.println("\tnode [shape = ellipse];");
+        }
+        
+        // Filled?
+        if (useColors)
+        {
+            pw.println("\tnode [style = filled];");
+        }
+        
+        // The automata are nodes in the graph
+        //for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )
+        for (int i = 0; i < theAutomata.size(); i++)
+        {
+            Automaton currAutomaton = theAutomata.getAutomatonAt(i);
+            
+            pw.print("\t\"" + currAutomaton.getName() + "\" [label = \"");
+            
+            if (withLabel)
+            {
+                pw.print(EncodingHelper.normalize(currAutomaton.getName()));
+            }
+            
+            pw.println("\"" + getColor(currAutomaton) + getShape(currAutomaton) + "]; ");
+            
+            // The arcs in the graph represent common events in the respective alphabets
+            Alphabet currAlphabet = currAutomaton.getAlphabet();
+            
+            //for (Iterator otherIt = theAutomata.iterator(); otherIt.hasNext(); )
+            for (int j = i + 1; j < theAutomata.size(); j++)
+            {
+                Automaton otherAutomaton = theAutomata.getAutomatonAt(j);
+                Alphabet otherAlphabet = otherAutomaton.getAlphabet();
+                
+                Alphabet intersection = AlphabetHelpers.intersect(currAlphabet, otherAlphabet);
+                int eventTotal = intersection.nbrOfEvents();
+                int uncon = intersection.nbrOfUncontrollableEvents();
+                
+                if (eventTotal > 0)
+                {                    
+                    //pw.print("\t\"" + currAutomaton.getName() + "\" -- \"" + otherAutomaton.getName() + "\";");
+                    pw.print("\t\"" + currAutomaton.getName() + "\" -- \"" + otherAutomaton.getName() + "\" ");
+                    
+                    if (eventTotal == 1)
+                    {                        
+                        // pw.print("[style = dashed, "); // This was incredibly impopular... (I thought it was neat...) /hguo
+                        pw.print("[style = solid, ");
+                    }
+                    
+                    if (eventTotal > 1)
+                    {
+                        pw.print("[style = solid, ");
+                    }
+                    
+                    pw.println("label = \"" + eventTotal + " (" + uncon + ")\"];");
+                }
+            }
+        }
+        
+        pw.println("}");
+        pw.flush();
+        pw.close();       
+    }
+    
+    public void serialize(String fileName)
+    throws Exception
+    {
+        serialize(new PrintWriter(new FileWriter(fileName)));
+    }
 }
