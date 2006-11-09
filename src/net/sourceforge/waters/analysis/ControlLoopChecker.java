@@ -1,9 +1,10 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopChecker
 //###########################################################################
-//# $Id: ControlLoopChecker.java,v 1.15 2006-11-03 15:01:57 torda Exp $
+//# $Id: ControlLoopChecker.java,v 1.16 2006-11-09 06:30:01 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.HashSet;
+
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -20,6 +22,8 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.LoopTraceProxy;
+
+import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 /**
@@ -121,7 +125,7 @@ public class ControlLoopChecker extends ModelChecker
      * @param  factory Factory used for trace construction.
      */
     public ControlLoopChecker(final ProductDESProxy model,
-			      final ProductDESProxyFactory factory)
+                              final ProductDESProxyFactory factory)
     {
 	super(model, factory);
 	
@@ -134,8 +138,16 @@ public class ControlLoopChecker extends ModelChecker
 	mTransitionList = new ArrayList<ArrayList<TransitionProxy>>();
 	
 	// create Automaton list
-	for(final AutomatonProxy aProxy: des.getAutomata()){
-	    mAutomataList.add(aProxy);
+	for (final AutomatonProxy aProxy : des.getAutomata()) {
+        final ComponentKind kind = aProxy.getKind();
+        switch (kind) {
+        case PLANT:
+        case SPEC:
+            mAutomataList.add(aProxy);
+            break;
+        default:
+            break;
+        }
 	}
 	
 	// create Event list

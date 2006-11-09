@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   AbstractProductDESImporterTest
 //###########################################################################
-//# $Id: AbstractProductDESImporterTest.java,v 1.3 2006-11-03 15:01:57 torda Exp $
+//# $Id: AbstractProductDESImporterTest.java,v 1.4 2006-11-09 06:30:01 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -60,12 +60,6 @@ public abstract class AbstractProductDESImporterTest
     throws Exception
   {
     testImport("handwritten", "transferline-2.wdes");
-  }
-
-  public void testProfisafeI4Host()
-    throws Exception
-  {
-    testImport("tests", "profisafe", "profisafe_i4_host.wdes");
   }
 
   public void testProfisafeI4Slave()

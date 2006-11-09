@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   AbstractModelCheckerTest
 //###########################################################################
-//# $Id: AbstractModelCheckerTest.java,v 1.3 2006-11-03 15:01:57 torda Exp $
+//# $Id: AbstractModelCheckerTest.java,v 1.4 2006-11-09 06:30:01 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.List;
 
 import net.sourceforge.waters.junit.AbstractWatersTest;
+import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -97,18 +98,6 @@ public abstract class AbstractModelCheckerTest extends AbstractWatersTest
     final File filename = new File(dir, name);
     runModelChecker(filename, bindings, expect);
   }
-    
-  void runModelChecker(final File filename,
-                       final List<ParameterBindingProxy> bindings,
-                       final boolean expect)
-    throws Exception
-  {
-    final ModuleProxy module = (ModuleProxy) mDocumentManager.load(filename);
-    final ModuleCompiler compiler =
-      new ModuleCompiler(mDocumentManager, mProductDESProxyFactory, module);
-    final ProductDESProxy des = compiler.compile(bindings);
-    runModelChecker(des, bindings, expect);
-  }
 
 
   //#########################################################################
@@ -152,13 +141,20 @@ public abstract class AbstractModelCheckerTest extends AbstractWatersTest
     final File filename = new File(dir, name);
     runModelChecker(filename, expect);
   }
-    
+
   void runModelChecker(final File filename, final boolean expect)
     throws Exception
   {
-    final ProductDESProxy des =
-      (ProductDESProxy) mDocumentManager.load(filename);
-    runModelChecker(des, expect);
+    runModelChecker(filename, (List<ParameterBindingProxy>) null, expect);
+  }
+
+  void runModelChecker(final File filename,
+                       final List<ParameterBindingProxy> bindings,
+                       final boolean expect)
+    throws Exception
+  {
+    final ProductDESProxy des = getCompiledDES(filename, bindings);
+    runModelChecker(des, bindings, expect);
   }
 
   void runModelChecker(final ProductDESProxy des, final boolean expect)
@@ -172,7 +168,8 @@ public abstract class AbstractModelCheckerTest extends AbstractWatersTest
                        final boolean expect)
     throws Exception
   {
-    final ModelChecker checker = createModelChecker(des, mProductDESProxyFactory);
+    final ModelChecker checker =
+      createModelChecker(des, mProductDESProxyFactory);
     final boolean result = checker.run();
     TraceProxy counterexample = null;
     if (!result) {
@@ -188,6 +185,30 @@ public abstract class AbstractModelCheckerTest extends AbstractWatersTest
   }
 
 
+  //#########################################################################
+  //# Compiling
+  protected ProductDESProxy getCompiledDES
+    (final File filename,
+     final List<ParameterBindingProxy> bindings)
+    throws Exception
+  {
+    final DocumentProxy doc = mDocumentManager.load(filename);
+    if (doc instanceof ProductDESProxy) {
+      assertTrue("Can't apply bindings to ProductDES!",
+                 bindings == null || bindings.isEmpty());
+      return (ProductDESProxy) doc;
+    } else if (doc instanceof ModuleProxy) {
+      final ModuleProxy module = (ModuleProxy) doc;
+      final ModuleCompiler compiler =
+        new ModuleCompiler(mDocumentManager, mProductDESProxyFactory, module);
+      return compiler.compile(bindings);
+    } else {
+      fail("Unknown document type " + doc.getClass().getName() + "!");
+      return null;
+    }
+  }
+
+                                           
   //#########################################################################
   //# To be Provided by Subclasses
   abstract ModelChecker createModelChecker(ProductDESProxy des,

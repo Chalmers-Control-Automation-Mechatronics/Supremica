@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopCheckerTest
 //###########################################################################
-//# $Id: ControlLoopCheckerTest.java,v 1.13 2006-11-03 15:01:57 torda Exp $
+//# $Id: ControlLoopCheckerTest.java,v 1.14 2006-11-09 06:30:01 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -24,6 +24,8 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+
+import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -273,6 +275,14 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     runModelChecker(group, dir, name, false);
   }
 
+  public void test_Nasty_JustProperty() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "just_property.wmod";
+    runModelChecker(group, dir, name, false);
+  }
+
   public void test_Nasty_TheVicousLoop1() throws Exception
   {
     final String group = "tests";
@@ -293,7 +303,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
   {
     final String group = "tests";
     final String dir = "profisafe";
-    final String name = "profisafe_i4_host.wdes";
+    final String name = "profisafe_i4_host.wmod";
     runModelChecker(group, dir, name, true);
   }
 
@@ -301,7 +311,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
   {
     final String group = "tests";
     final String dir = "profisafe";
-    final String name = "profisafe_i4_slave.wdes";
+    final String name = "profisafe_i4_slave.wmod";
     runModelChecker(group, dir, name, true);
   }
 
@@ -309,7 +319,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
   {
     final String group = "tests";
     final String dir = "profisafe";
-    final String name = "profisafe_o4_host.wdes";
+    final String name = "profisafe_o4_host.wmod";
     runModelChecker(group, dir, name, true);
   }
 
@@ -317,7 +327,7 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
   {
     final String group = "tests";
     final String dir = "profisafe";
-    final String name = "profisafe_o4_slave.wdes";
+    final String name = "profisafe_o4_slave.wmod";
     runModelChecker(group, dir, name, true);
   }
 
@@ -538,11 +548,19 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     
     // 3. Check trace is available in each automaton
     // 3.1. Check control loop is actually a loop
-    for(final AutomatonProxy aProxy: automata){
-      final boolean accepted =
-        checkCounterExample(aProxy, eventlist, loopIndex);
-      assertTrue("Counterexample not accepted by " +
-                 aProxy.getName(), accepted);
+    for (final AutomatonProxy aProxy : automata) {
+      final ComponentKind kind = aProxy.getKind();
+      switch (kind) {
+      case PLANT:
+      case SPEC:
+        final boolean accepted =
+          checkCounterExample(aProxy, eventlist, loopIndex);
+        assertTrue("Counterexample not accepted by " +
+                   aProxy.getName(), accepted);
+        break;
+      default:
+        break;
+      }
     }
   }
   

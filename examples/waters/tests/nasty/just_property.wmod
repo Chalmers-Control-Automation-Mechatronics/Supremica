@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="just_property" xmlns="http://waters.sourceforge.net/xsd/module">
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Name="bad"/>
+<EventDecl Kind="CONTROLLABLE" Name="loop"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PROPERTY">
+<SimpleIdentifier Name="the_property"/>
+<Graph>
+<LabelBlock>
+<SimpleIdentifier Name="bad"/>
+<SimpleIdentifier Name="loop"/>
+</LabelBlock>
+<NodeList>
+<SimpleNode Initial="true" Name="S0"/>
+</NodeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
+

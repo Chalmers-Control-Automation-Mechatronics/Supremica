@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractControllabilityCheckerTest
 //###########################################################################
-//# $Id: AbstractControllabilityCheckerTest.java,v 1.1 2006-11-08 22:55:25 robi Exp $
+//# $Id: AbstractControllabilityCheckerTest.java,v 1.2 2006-11-09 06:30:01 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -275,7 +275,15 @@ public abstract class AbstractControllabilityCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
-  public void testMx27() throws Exception
+  public void test_Nasty_JustProperty() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "just_property.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
+  public void test_Nasty_Mx27() throws Exception
   {
     final String group = "tests";
     final String dir  = "nasty";
@@ -287,7 +295,7 @@ public abstract class AbstractControllabilityCheckerTest
   {
     final String group = "tests";
     final String dir = "profisafe";
-    final String name = "profisafe_i4_host.wdes";
+    final String name = "profisafe_i4_host.wmod";
     runModelVerifier(group, dir, name, true);
   }
 
@@ -295,7 +303,7 @@ public abstract class AbstractControllabilityCheckerTest
   {
     final String group = "tests";
     final String dir = "profisafe";
-    final String name = "profisafe_i4_slave.wdes";
+    final String name = "profisafe_i4_slave.wmod";
     runModelVerifier(group, dir, name, true);
   }
 
@@ -303,7 +311,7 @@ public abstract class AbstractControllabilityCheckerTest
   {
     final String group = "tests";
     final String dir = "profisafe";
-    final String name = "profisafe_o4_host.wdes";
+    final String name = "profisafe_o4_host.wmod";
     runModelVerifier(group, dir, name, true);
   }
 
@@ -311,7 +319,7 @@ public abstract class AbstractControllabilityCheckerTest
   {
     final String group = "tests";
     final String dir = "profisafe";
-    final String name = "profisafe_o4_slave.wdes";
+    final String name = "profisafe_o4_slave.wmod";
     runModelVerifier(group, dir, name, true);
   }
 

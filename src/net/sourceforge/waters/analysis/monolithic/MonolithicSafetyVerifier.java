@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   MonolithicSafetyVerifier
 //###########################################################################
-//# $Id: MonolithicSafetyVerifier.java,v 1.4 2006-11-08 22:55:25 robi Exp $
+//# $Id: MonolithicSafetyVerifier.java,v 1.5 2006-11-09 06:30:01 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.monolithic;
@@ -13,6 +13,7 @@ import gnu.trove.THashSet;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -94,7 +95,23 @@ public class MonolithicSafetyVerifier
     mNumPlants = 0;
     mStateTupleSize = 0;
 
-    mAutomatonSet = model.getAutomata();
+    final Collection<AutomatonProxy> automata =
+      new LinkedList<AutomatonProxy>();
+    for (final AutomatonProxy aut : model.getAutomata()) {
+      final ComponentKind kind = mKindTranslator.getComponentKind(aut);
+      switch (kind) {
+      case PLANT:
+        mNumPlants++;
+        automata.add(aut);
+        break;
+      case SPEC:
+        automata.add(aut);
+        break;
+      default:
+        break;
+      }
+    }
+
     mPlantTransitionMap = new ArrayList<int[][]>();
     mSpecTransitionMap = new ArrayList<int[][]>();
     mIndexList = new ArrayList<Integer>();
@@ -104,7 +121,7 @@ public class MonolithicSafetyVerifier
     mSpecEventList = new ArrayList<byte[]>();
 
     mNumEvents = mEventCodingList.size();
-    mNumAutomata = mAutomatonSet.size();
+    mNumAutomata = automata.size();
 
     // Empty case
     if (mNumAutomata == 0) {
@@ -114,19 +131,10 @@ public class MonolithicSafetyVerifier
     mBitLengthList = new int[mNumAutomata];
     mMaskList = new int[mNumAutomata];
     mCodePosition = new int[mNumAutomata];
-
-    // Count Plant size
-    for (AutomatonProxy ap : mAutomatonSet) {
-      final ComponentKind kind = mKindTranslator.getComponentKind(ap);
-      if (kind == ComponentKind.PLANT) {
-        mNumPlants++;
-      }
-    }
- 
     mSystemState = new int[mNumAutomata];
 
     // Separate the automatons by kind
-    for (AutomatonProxy ap : mAutomatonSet) {
+    for (AutomatonProxy ap : automata) {
       // Get all states
       stateSet = ap.getStates();
       // Encoding states to binary values
@@ -504,8 +512,6 @@ public class MonolithicSafetyVerifier
   //#########################################################################
   //# Data Members
   private KindTranslator mKindTranslator;
-
-  private Set<AutomatonProxy> mAutomatonSet;
 
   // Transition map
   private ArrayList<int[][]> mPlantTransitionMap;
