@@ -16,22 +16,23 @@ public class CommandsTest extends TestCase
   {
     GraphSubject graph1 = new GraphSubject();
     PointGeometrySubject point = new PointGeometrySubject(new Point(10, 15));
+    PointGeometrySubject init = new PointGeometrySubject(new Point(-5, -5));
     LabelGeometrySubject label = new LabelGeometrySubject(
       new Point(LabelProxyShape.DEFAULTOFFSETX,
                 LabelProxyShape.DEFAULTOFFSETY));
-    SimpleNodeSubject node1 = new SimpleNodeSubject("s0", new PlainEventListSubject(),
-                                                    true, point, null, label);
+    SimpleNodeSubject node1 = new SimpleNodeSubject("s0", new PlainEventListSubject(null),
+                                                    true, point, init, label);
     point = new PointGeometrySubject(new Point(20, 15));
     label = new LabelGeometrySubject(
       new Point(LabelProxyShape.DEFAULTOFFSETX,
                 LabelProxyShape.DEFAULTOFFSETY));
-    SimpleNodeSubject node2 = new SimpleNodeSubject("s1", new PlainEventListSubject(),
+    SimpleNodeSubject node2 = new SimpleNodeSubject("s1", new PlainEventListSubject(null),
                                                     false, point, null, label);
     point = new PointGeometrySubject(new Point(30, 15));
     label = new LabelGeometrySubject(
       new Point(LabelProxyShape.DEFAULTOFFSETX,
                 LabelProxyShape.DEFAULTOFFSETY));
-    SimpleNodeSubject node3 = new SimpleNodeSubject("s2", new PlainEventListSubject(),
+    SimpleNodeSubject node3 = new SimpleNodeSubject("s2", new PlainEventListSubject(null),
                                                     false, point, null, label);
     Command c1 = new CreateNodeCommand(graph1, 10, 15);
     c1.execute();

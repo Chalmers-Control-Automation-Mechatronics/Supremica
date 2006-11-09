@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateNodeCommand
 //###########################################################################
-//# $Id: CreateNodeCommand.java,v 1.13 2006-09-25 03:55:30 siw4 Exp $
+//# $Id: CreateNodeCommand.java,v 1.14 2006-11-09 23:34:29 siw4 Exp $
 //###########################################################################
 
 
@@ -54,12 +54,16 @@ public class CreateNodeCommand
                 LabelProxyShape.DEFAULTOFFSETY));
     final IndexedSetSubject<NodeSubject> nodes = graph.getNodesModifiable();
     final boolean initial = nodes.isEmpty();
+    final PointGeometrySubject initarrow = initial ? 
+                                           new PointGeometrySubject(new Point(-5, -5))
+                                           :  null;
+                                                                              
     // Find a unique name!
     String name = "S0";
     for (int i = 0; nodes.containsName(name); i++) {
       name = "S" + i;
     }
-    mCreated = new SimpleNodeSubject(name, props, initial, point, null, label);
+    mCreated = new SimpleNodeSubject(name, props, initial, point, initarrow, label);
   }
 
   /**

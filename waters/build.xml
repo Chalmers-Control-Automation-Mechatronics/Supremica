@@ -286,6 +286,36 @@
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
     </junit>
   </target>
+  
+  <target name="run_test3" depends="test-jar,cpp">
+    <mkdir dir="${logs.results}"/>
+    <junit printsummary="on" fork="true" maxmemory="512m">
+      <formatter type="xml"/>
+      <batchtest todir="${logs.results}">
+        <fileset dir="${supremica.testsrc}">
+          <include name="net/sourceforge/waters/analysis/modular/ModularControllabilityCheckerTest.java"/>
+        </fileset>
+      </batchtest>
+      <classpath refid="waters.test.classpath"/>
+      <sysproperty key="waters.test.inputdir" value="${examples}"/>
+      <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+    </junit>
+  </target>
+  
+  <target name="run_test4" depends="test-jar">
+    <mkdir dir="${logs.results}"/>
+    <junit printsummary="on" fork="true" maxmemory="512m">
+      <formatter type="xml"/>
+      <batchtest todir="${logs.results}">
+        <fileset dir="${supremica.testsrc}">
+          <include name="net/sourceforge/waters/analysis/monolithic/MonolithicControllabilityCheckerTest.java"/>
+        </fileset>
+      </batchtest>
+      <classpath refid="waters.test.classpath"/>
+      <sysproperty key="waters.test.inputdir" value="${examples}"/>
+      <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+    </junit>
+  </target>
 
   <target name="test-report">
     <mkdir dir="${logs.reports}"/>
@@ -302,7 +332,13 @@
 
   <target name="test1" depends="runtest1,test-report"
           description="Run some test cases."/>
+          
+  <target name="test3" depends="run_test3,test-report"
+          description="Run some test cases."/>
 
+  <target name="test4" depends="run_test4,test-report"
+          description="Run some test cases."/>
+          
   <target name="doc" depends="jaxb-generate"
           description="Generate Javadoc documentation.">
     <mkdir dir="${javadoc}"/>

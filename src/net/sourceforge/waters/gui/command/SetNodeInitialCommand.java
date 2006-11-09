@@ -46,6 +46,7 @@ public class SetNodeInitialCommand
 	public void undo()
 	{
 		mNewInitial.setInitial(false);
+    mNewInitial.setInitialArrowGeometry(null);
 		for (Wrapper n : mPreviousInitial)
 		{
 			n.mNode.setInitial(true);

@@ -688,6 +688,27 @@ Class-Path: ${manifest.pathlist}</echo>
   </junit>
 </target>
 
+<target name="run_test_controllability" depends="jar_supremica,jar_supremica_tests">
+  <mkdir dir="${logs.results}"/>
+  <junit printsummary="on" fork="true" maxmemory="512m">
+    <formatter type="xml"/>
+    <batchtest todir="${logs.results}">
+      <fileset dir="${testssrc}">
+        <include name="**/Modular*.java"/>
+      </fileset>
+    </batchtest>
+    <classpath>
+      <pathelement location="${dist}/Supremica.jar"/>
+      <pathelement location="${dist}/SupremicaLib.jar"/>
+      <pathelement location="${dist}/SupremicaTest.jar"/>
+      <pathelement path="${java.class.path}"/>
+    </classpath>
+    <sysproperty key="waters.test.inputdir" value="${waters.examples}"/>
+    <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+    <sysproperty key="java.library.path" value="${dist}"/>
+  </junit>
+</target>
+
 <target name="run_tests" depends="run_supremica_tests"/>
 <target name="run_tests_junit" depends="run_supremica_tests"/>
 
@@ -701,6 +722,7 @@ Class-Path: ${manifest.pathlist}</echo>
   </junitreport>
 </target>
 
+<target name="test_controllability" depends="run_test_controllability,test_report"/>
 <target name="test" depends="run_supremica_tests,test_report"/>
 
 <target name="bdd_tests" depends="compile_supremica,startfiles_supremica">
