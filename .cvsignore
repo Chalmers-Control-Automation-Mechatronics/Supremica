@@ -1,9 +1,6 @@
 build
 dist
-JDE_Project.el
 resources
-nbproject
 logs
 .project
 .classpath
-
