@@ -28,7 +28,7 @@ public abstract class AbstractModularHeuristic
                                          Comparator<AutomatonProxy> comp,
                                          TraceProxy counterExample,
                                          KindTranslator translator) {
-    return checkAutomata(specs, automata, comp, counterExample, translator);
+    return checkAutomata(null, specs, automata, comp, counterExample, translator);
   }
   
   protected AutomatonProxy checkAutomata(AutomatonProxy bestautomaton,
@@ -42,7 +42,7 @@ public abstract class AbstractModularHeuristic
       if (i != counterExample.getEvents().size()) {
         if (!specs || translator.getEventKind(counterExample.getEvents().get(i)) 
             == EventKind.CONTROLLABLE) {
-          if (comp.compare(bestautomaton, automaton) < 0) {
+          if (bestautomaton == null || comp.compare(bestautomaton, automaton) < 0) {
             bestautomaton = automaton;
           }
         }

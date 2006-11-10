@@ -35,7 +35,7 @@ public class MaxCommonEventsHeuristic
                                 new MaxEventComparator(composition),
                                 counterExample, translator);
     }
-    return Collections.singleton(automaton);
+    return automaton == null ? null : Collections.singleton(automaton);
   }
   
   private static class MaxEventComparator
