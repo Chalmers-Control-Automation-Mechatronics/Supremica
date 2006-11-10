@@ -316,6 +316,21 @@
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
     </junit>
   </target>
+  
+  <target name="run_test5" depends="test-jar,cpp">
+    <mkdir dir="${logs.results}"/>
+    <junit printsummary="on" fork="true" maxmemory="512m">
+      <formatter type="xml"/>
+      <batchtest todir="${logs.results}">
+        <fileset dir="${supremica.testsrc}">
+          <include name="net/sourceforge/waters/analysis/modular/*Test.java"/>
+        </fileset>
+      </batchtest>
+      <classpath refid="waters.test.classpath"/>
+      <sysproperty key="waters.test.inputdir" value="${examples}"/>
+      <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+    </junit>
+  </target>
 
   <target name="test-report">
     <mkdir dir="${logs.reports}"/>
@@ -337,6 +352,9 @@
           description="Run some test cases."/>
 
   <target name="test4" depends="run_test4,test-report"
+          description="Run some test cases."/>
+          
+  <target name="test5" depends="run_test5,test-report"
           description="Run some test cases."/>
           
   <target name="doc" depends="jaxb-generate"
