@@ -4,37 +4,25 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   MonolithicControllabilityCheckerTest
 //###########################################################################
-//# $Id: MaxCommonEventsHeuristicTest.java,v 1.1 2006-11-10 23:58:25 siw4 Exp $
+//# $Id: MaxCommonEventsHeuristicTest.java,v 1.2 2006-11-13 03:58:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
-import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
-import java.util.Collection;
-import java.util.List;
-import java.util.LinkedList;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.model.analysis.AbstractControllabilityCheckerTest;
-import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
-import net.sourceforge.waters.model.analysis.ModelVerifier;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.analysis.monolithic.
+  MonolithicControllabilityChecker;
+import net.sourceforge.waters.cpp.analysis.
+  NativeControllabilityChecker;
+import net.sourceforge.waters.model.analysis.
+  AbstractLargeControllabilityCheckerTest;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
-import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class MaxCommonEventsHeuristicTest
-  extends AbstractControllabilityCheckerTest
+  extends AbstractLargeControllabilityCheckerTest
 {
 
   //#########################################################################
@@ -53,10 +41,13 @@ public class MaxCommonEventsHeuristicTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
-  protected ModularControllabilityChecker createModelVerifier(final ProductDESProxyFactory factory)
+  protected ModularControllabilityChecker createModelVerifier
+    (final ProductDESProxyFactory factory)
   {
-    return new ModularControllabilityChecker(null, factory,
-                                             new MonolithicControllabilityChecker(null, factory),
-                                             new MaxCommonEventsHeuristic(false));
+    return
+      new ModularControllabilityChecker
+            (null, factory,
+             new NativeControllabilityChecker(factory),
+             new MaxCommonEventsHeuristic(false));
   }
 }

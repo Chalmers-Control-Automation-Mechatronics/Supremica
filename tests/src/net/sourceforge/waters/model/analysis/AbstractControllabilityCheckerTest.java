@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractControllabilityCheckerTest
 //###########################################################################
-//# $Id: AbstractControllabilityCheckerTest.java,v 1.2 2006-11-09 06:30:01 robi Exp $
+//# $Id: AbstractControllabilityCheckerTest.java,v 1.3 2006-11-13 03:58:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -304,22 +304,6 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "tests";
     final String dir = "profisafe";
     final String name = "profisafe_i4_slave.wmod";
-    runModelVerifier(group, dir, name, true);
-  }
-
-  public void testProfisafeO4Host() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "profisafe";
-    final String name = "profisafe_o4_host.wmod";
-    runModelVerifier(group, dir, name, true);
-  }
-
-  public void testProfisafeO4Slave() throws Exception
-  {
-    final String group = "tests";
-    final String dir = "profisafe";
-    final String name = "profisafe_o4_slave.wmod";
     runModelVerifier(group, dir, name, true);
   }
 

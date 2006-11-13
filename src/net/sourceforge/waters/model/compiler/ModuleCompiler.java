@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.51 2006-11-08 22:01:58 martin Exp $
+//# $Id: ModuleCompiler.java,v 1.52 2006-11-13 03:58:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -142,13 +142,14 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       }
       // begin EFA
       
+      /*
       // declare boolean constants
       mContext.add("true", new CompiledIntValue(true));
       mContext.add("false", new CompiledIntValue(false));
-      
       // reserve "boolean" for the type boolean
       mContext.add("boolean", new CompiledIntRangeValue(0,1));
-      
+      */
+
       mIsEFA = false;
       for (final Proxy proxy : mModule.getComponentList()) {
         if (proxy instanceof SimpleComponentProxy) {
