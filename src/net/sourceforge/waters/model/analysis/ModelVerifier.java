@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   ModelVerifier
 //###########################################################################
-//# $Id: ModelVerifier.java,v 1.3 2006-11-03 01:00:07 robi Exp $
+//# $Id: ModelVerifier.java,v 1.4 2006-11-13 03:03:24 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -82,5 +82,7 @@ public interface ModelVerifier extends ModelAnalyser
   public TraceProxy getCounterExample();
 
   public VerificationResult getAnalysisResult();
+  
+  public int getStates();
 
 }

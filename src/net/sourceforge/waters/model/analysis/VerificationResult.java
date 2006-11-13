@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   VerificationResult
 //###########################################################################
-//# $Id: VerificationResult.java,v 1.1 2006-08-15 01:43:06 robi Exp $
+//# $Id: VerificationResult.java,v 1.2 2006-11-13 03:03:24 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -25,12 +25,30 @@ public class VerificationResult extends AnalysisResult
   {
     this(false, counterexample);
   }
+  
+  public VerificationResult(int states)
+  {
+    this(true, null, states);
+  }
+
+  public VerificationResult(final TraceProxy counterexample, int states)
+  {
+    this(false, counterexample, states);
+  }
 
   public VerificationResult(final boolean satisfied,
 			    final TraceProxy counterexample)
   {
+    this(satisfied, counterexample, -1);
+  }
+  
+  public VerificationResult(final boolean satisfied,
+                            final TraceProxy counterexample,
+                            final int states)
+  {
     super(satisfied);
     mCounterExample = counterexample;
+    mStates = states;
   }
 
 
@@ -40,10 +58,15 @@ public class VerificationResult extends AnalysisResult
   {
     return mCounterExample;
   }
+  
+  public int getStates()
+  {
+    return mStates;
+  }
 
 
   //#########################################################################
   //# Data Members
   private final TraceProxy mCounterExample;
-
+  private final int mStates;
 }

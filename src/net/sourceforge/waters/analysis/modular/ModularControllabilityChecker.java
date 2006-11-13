@@ -1,5 +1,9 @@
 package net.sourceforge.waters.analysis.modular;
 
+import java.util.Comparator;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
 import java.io.File;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -35,6 +39,7 @@ public class ModularControllabilityChecker
   private final ControllabilityChecker mChecker;
   private ModularHeuristic mHeuristic;
   private KindTranslator mTranslator;
+  private int mStates;
   
   public ModularControllabilityChecker(ProductDESProxy model,
                                        ProductDESProxyFactory factory,
@@ -45,6 +50,7 @@ public class ModularControllabilityChecker
     mChecker = checker;
     mHeuristic = heuristic;
     mTranslator = IdenticalKindTranslator.getInstance();
+    mStates = 0;
   }
   
   public SafetyTraceProxy getCounterExample()
@@ -64,43 +70,71 @@ public class ModularControllabilityChecker
   
   public boolean run()
   {
-    int states = 0;
-    Set<AutomatonProxy> plants = new HashSet<AutomatonProxy>();
-    Set<AutomatonProxy> specs = new HashSet<AutomatonProxy>();
+    mStates = 0;
+    final Set<AutomatonProxy> plants = new HashSet<AutomatonProxy>();
+    final SortedSet<AutomatonProxy> specs = 
+      new TreeSet<AutomatonProxy>(new Comparator<AutomatonProxy>() {
+      public int compare(AutomatonProxy a1, AutomatonProxy a2)
+      {
+        if (a1.getStates().size() < a2.getStates().size()) {
+          return -1;
+        } else if (a1.getStates().size() > a2.getStates().size()) {
+          return 1;
+        }
+        if (a1.getTransitions().size() < a2.getTransitions().size()) {
+          return -1;
+        } else if (a1.getTransitions().size() > a2.getTransitions().size()) {
+          return 1;
+        }
+        if (a1.getEvents().size() < a2.getEvents().size()) {
+          return -1;
+        } else if (a1.getEvents().size() > a2.getEvents().size()) {
+          return 1;
+        }
+        return a1.getName().compareTo(a2.getName());
+      }
+    });
     for (AutomatonProxy automaton : getModel().getAutomata()) {
       switch (getKindTranslator().getComponentKind(automaton)) {
         case PLANT :  plants.add(automaton);
                       break;
         case SPEC  :  specs.add(automaton);
                       break;
-        case PROPERTY : specs.add(automaton);
-                        break;
         default : break;
       }
     }
     System.out.println(specs.size());
-    int j = 0;
     while (!specs.isEmpty()) {
-      System.out.println(j++);
       Collection<AutomatonProxy> composition = new ArrayList<AutomatonProxy>();
       Set<EventProxy> events = new HashSet<EventProxy>();
       Set<AutomatonProxy> uncomposedplants = new HashSet<AutomatonProxy>(plants);
       Set<AutomatonProxy> uncomposedspecs = new HashSet<AutomatonProxy>(specs);
-      AutomatonProxy spec = specs.iterator().next();
+      AutomatonProxy spec = specs.first();
       composition.add(spec);
       events.addAll(spec.getEvents());
       uncomposedspecs.remove(spec);
       ProductDESProxy comp = getFactory().createProductDESProxy("comp", events, composition);
       mChecker.setModel(comp);
-      mChecker.setKindTranslator(getKindTranslator());
-      int i = 0;
+      mChecker.setKindTranslator(new KindTranslator()
+      {
+        public EventKind getEventKind(EventProxy e)
+        {
+          return getKindTranslator().getEventKind(e);
+        }
+        
+        public ComponentKind getComponentKind(AutomatonProxy a)
+        {
+          return specs.contains(a) ? ComponentKind.SPEC
+                                   : ComponentKind.PLANT;
+        }
+      });
       while (!mChecker.run()) {
-        System.out.println(i++);
-        Collection<AutomatonProxy> newComp = mHeuristic.heur(comp,
-                                                             uncomposedplants,
-                                                             uncomposedspecs,
-                                                             mChecker.getCounterExample(),
-                                                             getKindTranslator());
+        Collection<AutomatonProxy> newComp =
+          mHeuristic.heur(comp,
+                          uncomposedplants,
+                          uncomposedspecs,
+                          mChecker.getCounterExample(),
+                          getKindTranslator());
         if (newComp == null) {
           setFailedResult(mChecker.getCounterExample());
           return false;
@@ -116,6 +150,7 @@ public class ModularControllabilityChecker
       }
       specs.removeAll(composition);
       plants.addAll(composition);
+      assert(specs.size() + plants.size() == getModel().getAutomata().size());
     }
     setSatisfiedResult();
     return true;

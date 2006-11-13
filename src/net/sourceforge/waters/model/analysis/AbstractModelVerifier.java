@@ -5,7 +5,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractModelVerifier
 //###########################################################################
-//# $Id: AbstractModelVerifier.java,v 1.1 2006-11-03 05:18:28 robi Exp $
+//# $Id: AbstractModelVerifier.java,v 1.2 2006-11-13 03:03:24 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -85,7 +85,7 @@ public abstract class AbstractModelVerifier
    */
   protected boolean setSatisfiedResult()
   {
-    mResult = new VerificationResult();
+    mResult = new VerificationResult(getStates());
     return true;
   }
 
@@ -97,11 +97,14 @@ public abstract class AbstractModelVerifier
    */
   protected boolean setFailedResult(final TraceProxy counterexample)
   {
-    mResult = new VerificationResult(counterexample);
+    mResult = new VerificationResult(counterexample, getStates());
     return false;
   }
 
-
+  public int getStates()
+  {
+    return -1;
+  }
   //#########################################################################
   //# Data Members
   private VerificationResult mResult;
