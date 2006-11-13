@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopChecker
 //###########################################################################
-//# $Id: ControlLoopChecker.java,v 1.17 2006-11-12 22:54:44 yip1 Exp $
+//# $Id: ControlLoopChecker.java,v 1.18 2006-11-13 02:59:43 yip1 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -86,11 +86,8 @@ public class ControlLoopChecker extends ModelChecker
     /** global event map: true is controllable, false is uncontrollable */
     private boolean mGlobalEventMap[];
     
-    /** a map for event availabilities */
-    private static ArrayList<boolean[]> mEventListMap;
-    
-    /** a map for available transitions */
-    private static ArrayList<int[][]> mTransitionListMap;
+    /** */
+    private static int[][][] mMap;
 
     /** a global integer array to store current decoded integer state tuple */
     private int mCurrTuple[];
@@ -136,7 +133,6 @@ public class ControlLoopChecker extends ModelChecker
         mControlLoopFree = true;
         mAutomataList = new ArrayList<AutomatonProxy>();
         mEventList = new ArrayList<EventProxy>();
-        
         mTransitionList = new ArrayList<ArrayList<TransitionProxy>>();
         
         // create Automaton list
@@ -227,21 +223,26 @@ public class ControlLoopChecker extends ModelChecker
         }
         
         // create maps
-        mEventListMap = new ArrayList<boolean[]>();
-        mTransitionListMap = new ArrayList<int[][]>();
-        
-        // initialize maps
-        boolean[] currEvents;
-        int[][] currTrans;
+	mMap = new int[mNumEvent][mNumAutomata][];
+	for(int i = 0; i < mNumEvent; i++){
+	    for(int j = 0; j < mNumAutomata; j++){
+		mMap[i][j] = null;
+	    }
+	}
         
         Set<StateProxy> stateSet;
         ArrayList<StateProxy> stateList;
         
-        // event map: mEventListMap[event][automaton]
-        for(final EventProxy eProxy: mEventList){
-            currEvents = new boolean[mNumAutomata];
-            
-            for(final AutomatonProxy aProxy: mAutomataList){
+	// create map
+	int countAutomata = 0;
+	int countEvent = 0;
+	for(final AutomatonProxy aProxy: mAutomataList){
+	    int numState = aProxy.getStates().size();
+	    
+	    stateSet = aProxy.getStates();
+	    stateList = new ArrayList<StateProxy>(stateSet);
+	    
+	    for(final EventProxy eProxy: mEventList){
                 // find if the event is in current automaton
                 Set<EventProxy> eventSet = aProxy.getEvents();
                 boolean eventAvailable = false;
@@ -253,35 +254,25 @@ public class ControlLoopChecker extends ModelChecker
                 }
                 
                 if(eventAvailable){
-		    currEvents[mAutomataList.indexOf(aProxy)] = true;
+		    mMap[countEvent][countAutomata] = new int[numState];
+
+		    for(int i = 0; i < numState; i++){
+			mMap[countEvent][countAutomata][i] = -1;
+		    }
                 }
-            }
-            
-            mEventListMap.add(currEvents);
-        }
-        
-        // transition map: mTransitionMap[automaton][source][event]
-        counter = 0;
-        for(final AutomatonProxy aProxy: mAutomataList){
-            stateSet = aProxy.getStates();
-            stateList = new ArrayList<StateProxy>(stateSet);
-            
-            int stateSize = stateList.size(); // number of states in current automaton
-            currTrans = new int[stateSize][mNumEvent];
-            for(int i = 0; i < stateSize; i++){
-                for(int j = 0; j < mNumEvent; j++){
-                    currTrans[i][j] = -1;
-                }
-            }
-            for(TransitionProxy tProxy: mTransitionList.get(counter)){
-                currTrans[stateList.indexOf(tProxy.getSource())][mEventList.indexOf(tProxy.getEvent())] 
+		
+		countEvent++;
+	    }
+	    
+            for(TransitionProxy tProxy: mTransitionList.get(countAutomata)){
+                mMap[mEventList.indexOf(tProxy.getEvent())][countAutomata][stateList.indexOf(tProxy.getSource())]
                     = stateList.indexOf(tProxy.getTarget());
             }
-            mTransitionListMap.add(currTrans);
-            
-            counter++;
-        }
-        
+	    
+	    countEvent = 0;
+	    countAutomata++;
+	}
+	
         // create initial state tuple
         mInitialStateTuple = new int[mNumAutomata];
         int i = 0;
@@ -439,6 +430,36 @@ public class ControlLoopChecker extends ModelChecker
         encodedCurrTuple.setInComponent(true);
     }
     
+    /**
+     * It checks event is available from current state tuple.
+     * @param currTuple current state tuple
+     * @param event current event index
+     * @param onlyControllable true if system needs to find only controllable events
+     * @return return null if event is not available from current event, or return next state tuple
+     */
+    public boolean eventAvailable(int currTuple[], int event)
+    {
+	int temp;
+
+	for(int i = 0; i < mNumAutomata; i++){
+	    int map[] = mMap[event][i];
+	    if(map != null){
+		temp = map[currTuple[i]];
+		if(temp > -1){ // next state exists
+		    mNextTuple[i] = temp;
+		}
+		else{ // event is not available
+		    return false;
+		}
+	    }
+	    else{ // event is not in the automaton
+		mNextTuple[i] = currTuple[i];
+	    }
+	}
+	
+	return true;
+    }
+
     /**
      * Gets a counterexample if the model was found to be not control loop free.
      * representing a control loop error trace. A control loop error
@@ -652,36 +673,6 @@ public class ControlLoopChecker extends ModelChecker
         
         final LoopTraceProxy trace = factory.createLoopTraceProxy(tracename, des, tracelist, loopIndex);
         return trace;
-    }
-    
-    /**
-     * It checks event is available from current state tuple.
-     * @param currTuple current state tuple
-     * @param event current event index
-     * @param onlyControllable true if system needs to find only controllable events
-     * @return return null if event is not available from current event, or return next state tuple
-     */
-    public boolean eventAvailable(int currTuple[], int event)
-    {
-        int temp;
-        boolean map[] = mEventListMap.get(event);
-        
-        for(int i = 0; i < mNumAutomata; i++){
-            if(map[i]){
-                temp = mTransitionListMap.get(i)[currTuple[i]][event];
-                if(temp > -1){ // next state exists
-                    mNextTuple[i] = temp;
-                } 
-                else{ // event is not available
-                    return false;
-                }
-            }
-            else{ // event is not in the automaton
-                mNextTuple[i] = currTuple[i];
-            }
-        }
-        
-        return true;
     }
     
     /**
