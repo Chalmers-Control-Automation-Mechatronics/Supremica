@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   VerificationResult
 //###########################################################################
-//# $Id: VerificationResult.java,v 1.2 2006-11-13 03:03:24 siw4 Exp $
+//# $Id: VerificationResult.java,v 1.3 2006-11-14 03:32:30 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -26,29 +26,12 @@ public class VerificationResult extends AnalysisResult
     this(false, counterexample);
   }
   
-  public VerificationResult(int states)
-  {
-    this(true, null, states);
-  }
-
-  public VerificationResult(final TraceProxy counterexample, int states)
-  {
-    this(false, counterexample, states);
-  }
-
   public VerificationResult(final boolean satisfied,
-			    final TraceProxy counterexample)
-  {
-    this(satisfied, counterexample, -1);
-  }
-  
-  public VerificationResult(final boolean satisfied,
-                            final TraceProxy counterexample,
-                            final int states)
+                            final TraceProxy counterexample)
   {
     super(satisfied);
     mCounterExample = counterexample;
-    mStates = states;
+    mTotalNumberOfStates = -1;
   }
 
 
@@ -59,14 +42,30 @@ public class VerificationResult extends AnalysisResult
     return mCounterExample;
   }
   
-  public int getStates()
+  public int getTotalNumberOfStates()
   {
-    return mStates;
+    return mTotalNumberOfStates;
+  }
+
+
+  //#########################################################################
+  //# Providing Statistics
+  public void setNumberOfStates(final int numstates)
+  {
+    if (mTotalNumberOfStates < 0) {
+      mTotalNumberOfStates = numstates;
+    } else {
+      throw new IllegalStateException
+	("Trying to overwrite previously set total number of states " +
+	 "in verification result!");
+    }
   }
 
 
   //#########################################################################
   //# Data Members
   private final TraceProxy mCounterExample;
-  private final int mStates;
+
+  private int mTotalNumberOfStates;
+
 }

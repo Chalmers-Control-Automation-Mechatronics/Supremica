@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   MonolithicSafetyVerifier
 //###########################################################################
-//# $Id: MonolithicSafetyVerifier.java,v 1.5 2006-11-09 06:30:01 robi Exp $
+//# $Id: MonolithicSafetyVerifier.java,v 1.6 2006-11-14 03:32:30 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.monolithic;
@@ -22,6 +22,7 @@ import java.util.Arrays;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
+import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -115,7 +116,7 @@ public class MonolithicSafetyVerifier
     mPlantTransitionMap = new ArrayList<int[][]>();
     mSpecTransitionMap = new ArrayList<int[][]>();
     mIndexList = new ArrayList<Integer>();
-    mStateList = new BlockedArrayList<StateTuple>(StateTuple.class);
+    mStateSpace = new BlockedArrayList<StateTuple>(StateTuple.class);
     mEventCodingList = new ArrayList<EventProxy>(model.getEvents());
     mPlantEventList = new ArrayList<byte[]>();
     mSpecEventList = new ArrayList<byte[]>();
@@ -236,6 +237,15 @@ public class MonolithicSafetyVerifier
 
 
   //#########################################################################
+  //# Setting the Result
+  protected void addStatistics(final VerificationResult result)
+  {
+    final int numstates = mStateSpace.size();
+    result.setNumberOfStates(numstates);
+  }
+
+
+  //#########################################################################
   //# Auxiliary Methods
   /**
    * Check the controllability of the model with a parameter of
@@ -249,13 +259,13 @@ public class MonolithicSafetyVerifier
     THashSet systemSet = new THashSet();
     boolean enabled = true;
 
-    // Add the initial synchronous product in systemSet and mStateList
+    // Add the initial synchronous product in systemSet and mStateSpace
     mSuccessor = new int[mNumAutomata];
     mStateTuple = new StateTuple(mStateTupleSize);
     encode(sState, mStateTuple);
     systemSet.add(mStateTuple);
-    mStateList.add(mStateTuple);
-    mIndexList.add(mStateList.size()-1);
+    mStateSpace.add(mStateTuple);
+    mIndexList.add(mStateSpace.size()-1);
 
     int indexSize = 0;
     int mNumEvents = mEventCodingList.size();
@@ -267,7 +277,7 @@ public class MonolithicSafetyVerifier
       for (j = (indexSize == 1) ? 0 : (mIndexList.get(indexSize - 2) + 1);
            j <= mIndexList.get(indexSize-1);
            j++) {
-        decode(mStateList.get(j),mSystemState);
+        decode(mStateSpace.get(j),mSystemState);
         for (int e = 0; e < mNumEvents; e++) {
           // Retrieve all enabled events
           enabled = true;
@@ -329,18 +339,18 @@ public class MonolithicSafetyVerifier
             }
           }
 
-          // Encode the new system state and put it into mStateList
+          // Encode the new system state and put it into mStateSpace
           mStateTuple = new StateTuple(mStateTupleSize);
           encode(mSuccessor, mStateTuple);
           if (systemSet.add(mStateTuple)) {
-            mStateList.add(mStateTuple);
+            mStateSpace.add(mStateTuple);
           }
         }
       }
-      // If mStateList has added a new state, update mIndexList at the last
+      // If mStateSpace has added a new state, update mIndexList at the last
       // loop of current level
-      if (mStateList.size() != mIndexList.get(indexSize - 1) + 1) {
-        mIndexList.add(mStateList.size() - 1);
+      if (mStateSpace.size() != mIndexList.get(indexSize - 1) + 1) {
+        mIndexList.add(mStateSpace.size() - 1);
       } else {
         break;
       }
@@ -453,7 +463,7 @@ public class MonolithicSafetyVerifier
       for (j = indexSize == 1 ? 0 : mIndexList.get(indexSize - 2) + 1;
            j <= mIndexList.get(indexSize - 1);
            j++) {
-        decode(mStateList.get(j), mSystemState);
+        decode(mStateSpace.get(j), mSystemState);
         for (int e = 0; e < mNumEvents; e++) {
           enabled = true;
           for (i = 0; i < mNumPlants; i++) {
@@ -514,17 +524,17 @@ public class MonolithicSafetyVerifier
   private KindTranslator mKindTranslator;
 
   // Transition map
-  private ArrayList<int[][]> mPlantTransitionMap;
-  private ArrayList<int[][]> mSpecTransitionMap;
+  private List<int[][]> mPlantTransitionMap;
+  private List<int[][]> mSpecTransitionMap;
 
   // Level states storage
-  private ArrayList<Integer> mIndexList;
-  private BlockedArrayList<StateTuple> mStateList;
+  private List<Integer> mIndexList;
+  private List<StateTuple> mStateSpace;
 
   // For encoding/decoding
-  private ArrayList<EventProxy> mEventCodingList;
-  private ArrayList<byte[]> mPlantEventList;
-  private ArrayList<byte[]> mSpecEventList;
+  private List<EventProxy> mEventCodingList;
+  private List<byte[]> mPlantEventList;
+  private List<byte[]> mSpecEventList;
   private int[] mBitLengthList;
   private int[] mMaskList;
   private int[] mCodePosition;

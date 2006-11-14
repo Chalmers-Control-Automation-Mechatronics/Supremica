@@ -4,7 +4,7 @@
 //# PACKAGE: jni.glue
 //# PURPOSE: List of classes and methods to be converted to C++/JNI code
 //###########################################################################
-//# $Id: Classes.txt,v 1.14 2006-11-03 01:00:07 robi Exp $
+//# $Id: Classes.txt,v 1.15 2006-11-14 03:32:30 robi Exp $
 //###########################################################################
 
 
@@ -146,6 +146,7 @@ glue class ProductDESResult {
 
 glue class VerificationResult {
   VerificationResult(boolean satisfied, glue TraceProxy trace);
+  void setNumberOfStates(int numstates);
 }
 
 glue class KindTranslator {

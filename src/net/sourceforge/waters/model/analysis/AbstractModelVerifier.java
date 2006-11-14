@@ -5,7 +5,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractModelVerifier
 //###########################################################################
-//# $Id: AbstractModelVerifier.java,v 1.2 2006-11-13 03:03:24 siw4 Exp $
+//# $Id: AbstractModelVerifier.java,v 1.3 2006-11-14 03:32:30 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -85,7 +85,8 @@ public abstract class AbstractModelVerifier
    */
   protected boolean setSatisfiedResult()
   {
-    mResult = new VerificationResult(getStates());
+    mResult = new VerificationResult();
+    addStatistics(mResult);
     return true;
   }
 
@@ -97,14 +98,21 @@ public abstract class AbstractModelVerifier
    */
   protected boolean setFailedResult(final TraceProxy counterexample)
   {
-    mResult = new VerificationResult(counterexample, getStates());
+    mResult = new VerificationResult(counterexample);
+    addStatistics(mResult);
     return false;
   }
 
-  public int getStates()
+  /**
+   * Gets the total number of states constructed by this verifier.
+   * @return The number of states constructed, or <CODE>-1</CODE> to
+   *         indicate that this figure is not available.
+   */
+  protected void addStatistics(VerificationResult result)
   {
-    return -1;
   }
+
+
   //#########################################################################
   //# Data Members
   private VerificationResult mResult;

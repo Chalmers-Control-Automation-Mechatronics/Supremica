@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeSafetyVerifier
 //###########################################################################
-//# $Id: NativeSafetyVerifier.java,v 1.2 2006-11-13 03:58:13 robi Exp $
+//# $Id: NativeSafetyVerifier.java,v 1.3 2006-11-14 03:32:30 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;
@@ -59,11 +59,6 @@ public class NativeSafetyVerifier
   public SafetyTraceProxy getCounterExample()
   {
     return (SafetyTraceProxy) super.getCounterExample();
-  }
-
-  public int getStates()
-  {
-    return -1;
   }
 
 

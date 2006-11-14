@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   SafetyVerifier
 //###########################################################################
-//# $Id: SafetyVerifier.h,v 1.1 2006-11-03 01:00:07 robi Exp $
+//# $Id: SafetyVerifier.h,v 1.2 2006-11-14 03:32:30 robi Exp $
 //###########################################################################
 
 
@@ -31,6 +31,7 @@ namespace jni {
   class ClassCache;
   class ListGlue;
   class ProductDESGlue;
+  class VerificationResult;
 }
 
 
@@ -60,6 +61,7 @@ public:
   bool run();
   jni::SafetyTraceGlue getCounterExample
     (const jni::ProductDESProxyFactoryGlue& factory) const;
+  void addStatistics(const jni::VerificationResultGlue& vresult) const;
 
 private:
   //##########################################################################
@@ -83,6 +85,7 @@ private:
   uint32 mBadState;
   const EventRecord* mBadEvent;
   jni::ListGlue* mTraceList;
+  uint32 mNumStates;
 };
 
 }   /* namespace waters */

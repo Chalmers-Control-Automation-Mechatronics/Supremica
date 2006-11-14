@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   SafetyVerifier
 //###########################################################################
-//# $Id: SafetyVerifier.cpp,v 1.1 2006-11-03 01:00:07 robi Exp $
+//# $Id: SafetyVerifier.cpp,v 1.2 2006-11-14 03:32:30 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -67,7 +67,8 @@ SafetyVerifier(const jni::ProductDESGlue des,
     mCurrentTuple(0),
     mBadState(UNDEF_UINT32),
     mBadEvent(0),
-    mTraceList(0)
+    mTraceList(0),
+    mNumStates(0)
 {
 }
 
@@ -99,6 +100,7 @@ run()
     if (!result) {
       computeCounterExample();
     }
+    mNumStates = mStateSpace->size();
     teardown();
     return result;
   } catch (...) {
@@ -112,6 +114,14 @@ getCounterExample(const jni::ProductDESProxyFactoryGlue& factory)
   const
 {
   return factory.createSafetyTraceProxyGlue(&mModel, mTraceList, mCache);
+}
+
+
+void SafetyVerifier::
+addStatistics(const jni::VerificationResultGlue& vresult)
+  const
+{
+  vresult.setNumberOfStates(mNumStates);
 }
 
 
@@ -426,12 +436,14 @@ Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
       bool result = checker.run();
       if (result) {
         jni::VerificationResultGlue vresult(result, 0, &cache);
+        checker.addStatistics(vresult);
         return vresult.returnJavaObject();
       } else {
         jni::ProductDESProxyFactoryGlue factory =
           gchecker.getFactoryGlue(&cache);
         jni::SafetyTraceGlue trace = checker.getCounterExample(factory);
         jni::VerificationResultGlue vresult(result, &trace, &cache);
+        checker.addStatistics(vresult);
         return vresult.returnJavaObject();
       }
     } catch (const jni::PreJavaException& pre) {
