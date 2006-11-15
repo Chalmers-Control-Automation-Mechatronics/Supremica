@@ -48,46 +48,31 @@
  */
 
 /**
- * The Mailbox class contains information, in a hashmap for fast search, about the listeners (such as Sensors, Actuators
- * Machine, Coordinator and MachineController. Listeners have to register themselfs.
- * This Mailbox is not used in the Fuber implementation since it was easier to make a separate mailbox FB.
+ * Dummy class to make the system compile while fixing the Wingquist Demo
  *
- *
- * Created: Tue Okt  30 11:17 2006
+ * Created: Wed 15 17:43 2006
  *
  * @author Oscar
  * @version 1.0
  */
 package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Collections;
-
-public class Mailbox
+public class MachineCoordinatorThread
 {
-    private Map listeners; // HashMap will be used for quick access to listeners of the mailbox
-
-    public Mailbox()
+    public MachineCoordinatorThread()
     {
-	listeners = Collections.synchronizedMap(new HashMap(10)); //initital capacity 10 and default load factor (0,75) suits me fine
     }
 
-    public void send(Message msg)
+    public void send(Object o)
     {
-	Listener listener = (Listener) listeners.get(msg.getReceiver());
-	if (listener != null)
-	    {
-		listener.receiveMessage(msg);
-	    }
-	else 
-	    {
-		System.err.println("No listener " + msg.getReceiver() + " registered!");
-	    }
     }
-   
-    public void register(Listener newListener)
+
+    public void register(Object o)
     {
-	listeners.put(newListener.getID(), newListener);
     }
+
+    public void COPDone(String string, boolean bool)
+    {
+    }
+
 }

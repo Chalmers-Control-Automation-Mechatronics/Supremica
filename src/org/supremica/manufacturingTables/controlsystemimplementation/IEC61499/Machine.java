@@ -66,8 +66,8 @@ public class Machine implements Listener
     private String type;
     private String description;
     private MachineController machineController;
-    private Mailbox cellMailbox;
-
+    private Mailbox cellMailbox; // No longer used in the Fuber implementation
+    private MachineThread machineThread; // All communication with the mailbox is now done via the machineThread
     public Machine(String name, String type, MachineController machineController, Mailbox cellMailbox)
     {
 	this.name = name;
@@ -75,9 +75,15 @@ public class Machine implements Listener
 	this.machineController = machineController;
 	description = null;
 	this.cellMailbox = cellMailbox;
-	cellMailbox.register(this);
+	this.machineThread = null;
+	machineThread.register(this);
     }
     
+    public void setThread(MachineThread machineThread)
+    {
+	this.machineThread = machineThread;
+    }
+
     public String getID() // to implement the Listener interface
     {
 	return getName();
@@ -89,12 +95,12 @@ public class Machine implements Listener
 	{
 	    System.err.println("Machine " +name+ " performing EOP " + msg.getContent() + " .");
 	    boolean EOPperformedOK = machineController.performEOP( (String) msg.getContent() );
-	    cellMailbox.send( new Message( name,  msg.getSender(), "EOPDone", EOPperformedOK ) );
+	    machineThread.send( new Message( name,  msg.getSender(), "EOPDone", EOPperformedOK ) );
 	    
 	}
 	else if (msg.getType().equals("externalCheckOfComponent"))
 	{
-	    cellMailbox.send( new Message( name, msg.getSender(), "confirmExternalComponent", machineController.checkComponent( (ComponentCheck) msg.getContent() ) ) );
+	    machineThread.send( new Message( name, msg.getSender(), "confirmExternalComponent", machineController.checkComponent( (ComponentCheck) msg.getContent() ) ) );
 	}
 	else if (msg.getType().equals("confirmExternalComponent"))
 	{
@@ -102,7 +108,7 @@ public class Machine implements Listener
 	}
 	else if (msg.getType().equals("externalRequestOfComponent"))
 	{
-	    cellMailbox.send( new Message( name, msg.getSender(), "reportExternalComponent", machineController.requestComponent( (String) msg.getContent() ) ) );
+	    machineThread.send( new Message( name, msg.getSender(), "reportExternalComponent", machineController.requestComponent( (String) msg.getContent() ) ) );
 	}
 	else if (msg.getType().equals("reportExternalComponent"))
 	{
@@ -124,27 +130,27 @@ public class Machine implements Listener
 
     public void checkExternalComponent(String machine, String componentName, String value)
     {
-	cellMailbox.send( new Message( name, machine, "externalCheckOfComponent", new ComponentCheck(componentName, value) ) ); 
+	machineThread.send( new Message( name, machine, "externalCheckOfComponent", new ComponentCheck(componentName, value) ) ); 
     }
 
     public void requestExternalComponent(String machine, String componentName)
     {
-	cellMailbox.send( new Message( name, machine, "externalRequestOfComponent", componentName ) ); 
+	machineThread.send( new Message( name, machine, "externalRequestOfComponent", componentName ) ); 
     }
     
     public void orderZone(String zone, String state)
     {
-	cellMailbox.send( new Message( name, zone, "orderState", state ) );
+	machineThread.send( new Message( name, zone, "orderState", state ) );
     }
 
     public void checkZone(String zone, String state)
     {
-	cellMailbox.send( new Message( name, zone, "checkState", state ) );
+	machineThread.send( new Message( name, zone, "checkState", state ) );
     }
 
     public void requestZone(String zone)
     {
-	cellMailbox.send( new Message( name, zone, "requestState", null ) );
+	machineThread.send( new Message( name, zone, "requestState", null ) );
     }
 
     public String getName()

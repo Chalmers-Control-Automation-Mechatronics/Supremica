@@ -88,7 +88,7 @@ public class COPPredecessor implements Cloneable
 
     public boolean equals(COPPredecessor predecessorToCompare)
     {
-	return (operation == predecessorToCompare.getOperation()) && machine.equals(predecessorToCompare.getMachine());
+	return operation.equals( predecessorToCompare.getOperation() ) && machine.equals( predecessorToCompare.getMachine() );
     }
     
     public Object clone() 

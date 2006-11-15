@@ -48,7 +48,7 @@
  */
 
 /**
- * The Coordinator class sends EOPNumbers to the Machines, via a mailbox,
+ * The Coordinator class (via the MachineCoordinators) send EOPNumbers to the Machines,
  * according to the COP for the current task.
  *
  * Created: Tue Oct 30 11:49 2006
@@ -60,46 +60,63 @@ package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Collections;
 
-public class Coordinator implements Listener
+public class Coordinator
 {
     private Mailbox mailbox;
+    // All communication with the MachineCoordinators is now done via the CoordinatorThread
+    private CoordinatorThread coordinatorThread; 
     private boolean performsTask; // In this version of the concept, only one product at a time is allowed
     private String ID;
-    private Map<String, MachineCoordinator> machineCoordinators; 
-    // The Coordinator creates all the MachineCoordinators and can reach them both by references and by 
-    // message handling.
+    private Map<String, MachineCoordinator> machineCoordinators; // The String corresponds to the machine name
+    // The Coordinator creates all the MachineCoordinators and can reach them by references.
     private Map<String, Boolean> machineCoordinatorsStarted; // used to keep track of which machines/machineControllers that are started.
  
     public Coordinator(Mailbox mailbox)
     {
 	this.mailbox = mailbox;
+	coordinatorThread = null;
 	performsTask = false;
 	ID = "Coordinator";
-	mailbox.register(this);
 	machineCoordinators = new HashMap<String, MachineCoordinator>(); 
 	// default initital capacity (16) and load factor (0,75) suits me fine
-	machineCoordinatorsStarted = new HashMap<String, Boolean>(); 
+	machineCoordinatorsStarted = Collections.synchronizedMap(new HashMap<String, Boolean>()); 
     }
+
+    // The machineCoordinators must be reached to be used in the Fuber application:
+    public Map<String, MachineCoordinator> getMachineCoordinators()
+    {
+	return machineCoordinators;
+    }
+
+    public void setThread(CoordinatorThread coordinatorThread)
+    {
+	this.coordinatorThread = coordinatorThread;
+    }
+ 
 
     // When a COP shall be registerad by the Coordinator, a new MachineCoordinator is created if it has not
     // already been created. Then the COP is set to that MachineCoordinator. This makes it easy in the future to 
     // distinguish between different COPs for different products. The Coordinator hence can communicate with the
-    // machineCoordinators both directly and via the mailbox, which may be a little strange. This is also done
-    // to make it easy in the future to make the MachineCoordinator a part of the machine or to make it only a part 
-    // of the cell and remove / not use the message handling.
+    // machineCoordinators directly. The machinecoordinators in turn communicate with the machines and with each 
+    // other via the cell mailbox. This is improved from the Java implementation.
     public void registerCOP(COP COP)
     {
 	if ( !machineCoordinators.containsKey( COP.getMachine() ) )
 	{
-	    MachineCoordinator machineCoordinator = new MachineCoordinator(COP.getMachine(), mailbox);
-	    machineCoordinator.setCOP(COP);
-	    machineCoordinators.put(machineCoordinator.getID(), machineCoordinator);
+	    MachineCoordinator machineCoordinator = new MachineCoordinator(COP.getMachine(), mailbox, this);
+	    //	    MachineCoordinatorThread machineCoordinatorThread = new MachineCoordinatorThread();
+	    //	    MachineCoordinator machineCoordinator = new MachineCoordinator(COP.getMachine(), machineCoordinatorThread);
+	    machineCoordinator.setCOP(COP);  
+	    //	    coordinatorThread.setCOP(COP);
+	    machineCoordinators.put( COP.getMachine(), machineCoordinator );  
 	}
 	else
 	{
 	    System.err.println( "The COP for machine " + COP.getMachine() + " is changed to " + COP.getID() );
-	    machineCoordinators.get( COP.getMachine() ).setCOP( COP );
+	    machineCoordinators.get( COP.getMachine() ).setCOP( COP ); 
+	    //	    coordinatorThread.setCOP(COP);
 	}
     }
 
@@ -112,18 +129,17 @@ public class Coordinator implements Listener
 		// mailbox.send( new Message( ID, "Coordinator150R3325", "performCOP", "weld floor" ) );
 
 		// Register that the machines are started. Has to be handled separate from starting the machines /
-		// machineCoordinators since otherwise the machineCoordinatorsStarted map could be empty (making us believe 		// that we are done) when only a few machines has been started and finished.
-		for (MachineCoordinator machineCoordinator : machineCoordinators.values())
+		// machineCoordinators since otherwise the machineCoordinatorsStarted map could be empty (making us believe 		
+		// that we are done) when only a few machines has been started and finished.
+		for (String machineName : machineCoordinators.keySet())
 		{
-		    machineCoordinatorsStarted.put(machineCoordinator.getID(), true);
+		    machineCoordinatorsStarted.put(machineName, true);
 		}
 		
 		for (MachineCoordinator machineCoordinator : machineCoordinators.values())
 		{
-		    // For IEC61499 I chose to call the machineCoordinators directly from the coordinator and not
-		    // use the mailbox for this communication. I think this is more consistent.
-		    machineCoordinator.start();
-		    // mailbox.send( new Message( ID, machineCoordinator.getID(), "performCOP", "weld floor" ) );
+		    //		    machineCoordinator.start();
+		    coordinatorThread.start( machineCoordinator.getMachine() );
 		}
 	    }
 	else 
@@ -132,44 +148,30 @@ public class Coordinator implements Listener
 	    }
     }
     
-    // Do not need to check if the message is for me since it allways is!
-    public void receiveMessage(Message msg)
+    public void COPDone(String machineName, boolean performedOK)
     {
-	if (performsTask && msg.getType().equals("COPDone"))
+	if (performedOK)
 	{
-	    if (((Boolean) msg.getContent()).booleanValue())
+	    if (machineCoordinatorsStarted.containsKey(machineName))
 	    {
-		    if (machineCoordinatorsStarted.containsKey(msg.getSender()))
-		    {
-			System.err.println("The COP for machine " + machineCoordinators.get(msg.getSender()).getMachine() + " has been performed with outstanding results!");
-			machineCoordinatorsStarted.remove(msg.getSender());
-		    }
-		    else
-		    {
-			System.err.println("The machine " + machineCoordinators.get(msg.getSender()).getMachine() + "has never been started!");
-		    }
+		System.err.println("The COP for machine " + machineName + " has been performed with outstanding results!");
+		machineCoordinatorsStarted.remove(machineName);
 	    }
 	    else
 	    {
-		System.out.println("The COP could not be performed!");
-		Boolean temp = machineCoordinatorsStarted.get(msg.getSender());
-		temp = Boolean.FALSE; // do not know why I have to separate this two lines
-	    }
-	    if (machineCoordinatorsStarted.isEmpty())
-	    {
-		System.out.println("The whole cell manufacturing cycle is done!");
-		performsTask = false;
+		System.err.println("The machine " + machineName + "has never been started!");
 	    }
 	}
 	else
 	{
-	    System.err.println("Wrong message or message type sent to Coordinator!");
+	    System.out.println("The COP could not be performed!");
+	    Boolean temp = machineCoordinatorsStarted.get(machineName);
+	    temp = Boolean.FALSE; // do not know why I have to separate this two lines
+	}
+	if (machineCoordinatorsStarted.isEmpty())
+	{
+	    System.out.println("The whole cell manufacturing cycle is done!");
+	    performsTask = false;
 	}
     }
-    
-    public String getID()
-    {
-	return ID;
-    }
-    
 }

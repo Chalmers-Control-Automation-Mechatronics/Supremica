@@ -94,12 +94,14 @@ public class Coordinator implements Listener
 	{
 	    MachineCoordinator machineCoordinator = new MachineCoordinator(COP.getMachine(), mailbox);
 	    machineCoordinator.setCOP(COP);
-	    machineCoordinators.put(machineCoordinator.getID(), machineCoordinator);
+	    machineCoordinators.put( machineCoordinator.getID(), machineCoordinator );
 	}
 	else
 	{
 	    System.err.println( "The COP for machine " + COP.getMachine() + " is changed to " + COP.getID() );
 	    machineCoordinators.get( COP.getMachine() ).setCOP( COP );
+	    // The row above is incorrect since the machineCoordinators are refered to the ID and not the machine.
+	    // Has to be changed!
 	}
     }
 

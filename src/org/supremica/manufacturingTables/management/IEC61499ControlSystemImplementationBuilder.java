@@ -63,12 +63,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.Map.Entry;
 import org.supremica.manufacturingTables.controlsystemdata.*;
 import org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.*;
 
 public class IEC61499ControlSystemImplementationBuilder extends ControlSystemImplementationBuilder
 {
+    // Objects needed in the Fuber application:
+    private Set<org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.Machine> cellMachines;
+    private Set<org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.MachineCoordinator> machineCoordinators;
+    private Set<org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.Zone> zones;
+    private org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.Coordinator coordinator;
 
     public IEC61499ControlSystemImplementationBuilder()
     {
@@ -83,12 +90,16 @@ public class IEC61499ControlSystemImplementationBuilder extends ControlSystemImp
 	// no information so they are actully not needed to create the IEC61499implementation.
 	org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.Mailbox plcProgramMailbox = new  org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.Mailbox();  
 	
-	org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.Coordinator coordinator = new  org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.Coordinator(plcProgramMailbox);
+	//org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.Coordinator coordinator = new  org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.Coordinator(plcProgramMailbox);
+	// Changed, for the Fuber application, to the class-locally private coordinator:
+	coordinator = new  org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.Coordinator(plcProgramMailbox);
 	
 	// Creating zones which are registered to the PLC program mailbox
 	for ( ZoneData zoneData : cell.getZones() )
 	{
-	    new Zone(zoneData.getZoneName(), plcProgramMailbox);
+	    //new Zone(zoneData.getZoneName(), plcProgramMailbox);
+	    // For the Fuber application:
+	    zones.add( new Zone( zoneData.getZoneName(), plcProgramMailbox ) );
 	}
 
 	plcProgram = new PLCProgramIEC61499(cell.getName(), coordinator);
@@ -293,7 +304,7 @@ public class IEC61499ControlSystemImplementationBuilder extends ControlSystemImp
 		    
  		}
  	    }
-	    
+ 
 // 	    if (!machineData.hasOwnControlSystem())
 // 	    {
 // 		// TopLevelSensors
@@ -397,7 +408,15 @@ public class IEC61499ControlSystemImplementationBuilder extends ControlSystemImp
 	    // Set machine to machine controller
 	    machineController.setMachine(machine);
 	    
+	    // For the Fuber application:
+	    cellMachines.add(machine);
 	}
+	// For the Fuber application:
+	for (MachineCoordinator machineCoordinator : coordinator.getMachineCoordinators().values())
+	{
+	    machineCoordinators.add(machineCoordinator);
+	}
+	//Fuber application = new Fuber(coordinator, machineCoordinators, zones, cellMachines);
     }
     
 //     // Low Level Sensor

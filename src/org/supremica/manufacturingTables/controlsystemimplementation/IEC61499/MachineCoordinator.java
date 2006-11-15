@@ -65,7 +65,10 @@ import java.util.Map;
 public class MachineCoordinator implements Listener
 {
     private String machine;
-    private Mailbox mailbox;
+    private Mailbox mailbox; // No longer used in the Fuber implementation
+    private Coordinator coordinator; // No longer used in the Fuber implementation
+    // All communication with the mailbox and the coordinator is now done via the machineCoordinatorThread
+    private MachineCoordinatorThread machineCoordinatorThread; 
     private COPActivity currentActivity;
     private boolean performsCOP;
     private COP currentCOP; // In the future it will be possible with different COPs
@@ -73,17 +76,24 @@ public class MachineCoordinator implements Listener
     // predecessorsFulfilled is a Map (Hashmap) with the interresting operations (predecessors to 
     // operations this machineCoordinator shall perform) performed by other machines.
  
-    public MachineCoordinator(String machine, Mailbox mailbox)
+    public MachineCoordinator(String machine, Mailbox mailbox, Coordinator coordinator)
     {
 	this.machine = machine;
 	this.mailbox = mailbox;
+	this.coordinator = coordinator;
+	this.machineCoordinatorThread = null;
 	performsCOP = false;
 	currentCOP = null;
 	currentActivity = null;
-	mailbox.register(this);
+	machineCoordinatorThread.register(this);
 	predecessorsFulfilled = new HashMap<String, COPPredecessor>(8); 
 	// (initital capacity 8 and default load factor (0,75) suits me fine)
 	
+    }
+
+    public void setThread(MachineCoordinatorThread machineCoordinatorThread)
+    {
+	this.machineCoordinatorThread = machineCoordinatorThread;
     }
 
     public String getMachine()
@@ -123,7 +133,7 @@ public class MachineCoordinator implements Listener
     private void runCOP()
     {
 	// testrow
-	// mailbox.send( new Message( getID(), "150R3325", "performEOP", 72 ) );
+	// machineCoordinatorThread.send( new Message( getID(), "150R3325", "performEOP", 72 ) );
 
 	if (currentActivity.hasPredecessors())
 	{
@@ -162,7 +172,7 @@ public class MachineCoordinator implements Listener
 	}
 	
 	// Time to run the operation (EOP)
-	mailbox.send( new Message( getID(), currentCOP.getMachine(), "performEOP", currentActivity.getOperation() ) );
+	machineCoordinatorThread.send( new Message( getID(), currentCOP.getMachine(), "performEOP", currentActivity.getOperation() ) );
 	
 	// Now we will wait for the Machine to report back
     }
@@ -210,7 +220,8 @@ public class MachineCoordinator implements Listener
 		    // The complete COP is done!!
 		    performsCOP = false;
 		    System.out.println("The COP " + currentCOP.getID() + " is done!");
-		    mailbox.send( new Message( getID(), "Coordinator", "COPDone", true ) );
+		    //machineCoordinatorThread.send( new Message( getID(), "Coordinator", "COPDone", true ) );
+		    machineCoordinatorThread.COPDone(machine, true);
 		}
 
 		// Handle successors, it is OK to do here after the COP might be done
@@ -221,7 +232,7 @@ public class MachineCoordinator implements Listener
 			// System.err.println("Sending message to machine " +  successor.getMachine() 
 			//   + " that predecessing operation " + performedOperation
 			//   + " in machine " + machine + " is done!"); 
-			mailbox.send( new Message( getID(), "Coordinator" + successor.getMachine(), "operationDone", 
+			machineCoordinatorThread.send( new Message( getID(), "Coordinator" + successor.getMachine(), "operationDone", 
 						   new COPPredecessor(performedOperation, machine) ) );
 		    }
 		}
@@ -237,7 +248,8 @@ public class MachineCoordinator implements Listener
 	    {
 		System.err.print("The EOP could not be performed!");
 		System.err.println(" (says message sender: " + msg.getSender() + ")");
-		mailbox.send( new Message( getID(), "Coordinator", "COPDone", false ) );
+		//machineCoordinatorThread.send( new Message( getID(), "Coordinator", "COPDone", false ) );
+		machineCoordinatorThread.COPDone(machine, false);
 		performsCOP = false;
 	    }
 	}
