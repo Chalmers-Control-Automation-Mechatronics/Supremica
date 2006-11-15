@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractModelVerifierTest
 //###########################################################################
-//# $Id: AbstractModelVerifierTest.java,v 1.7 2006-11-15 01:26:40 robi Exp $
+//# $Id: AbstractModelVerifierTest.java,v 1.8 2006-11-15 05:20:02 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -52,6 +52,7 @@ public abstract class AbstractModelVerifierTest extends AbstractWatersTest
     mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
     mDocumentManager.registerUnmarshaller(modmarshaller);
     mModelVerifier = createModelVerifier(mProductDESProxyFactory);
+    setStateLimit();
   }
 
 
@@ -250,6 +251,15 @@ public abstract class AbstractModelVerifierTest extends AbstractWatersTest
 
   //#########################################################################
   //# Auxiliary Methods
+  private void setStateLimit()
+  {
+    final String prop = System.getProperty("waters.analysis.statelimit");
+    if (prop != null) {
+      final int limit = Integer.parseInt(prop);
+      mModelVerifier.setStateLimit(limit);
+    }
+  }
+
   private void saveCounterExample(final TraceProxy counterexample,
                                   final List<ParameterBindingProxy> bindings)
     throws Exception
@@ -284,5 +294,6 @@ public abstract class AbstractModelVerifierTest extends AbstractWatersTest
   private JAXBTraceMarshaller mTraceMarshaller;
   private DocumentManager mDocumentManager;	
   private ModelVerifier mModelVerifier;
+  private PrintWriter mLog;
 
 }

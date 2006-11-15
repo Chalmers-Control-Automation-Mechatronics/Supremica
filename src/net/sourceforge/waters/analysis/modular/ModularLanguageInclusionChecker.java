@@ -1,3 +1,13 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.analysis.modular
+//# CLASS:   ModularLanguageInclusionChecker
+//###########################################################################
+//# $Id: ModularLanguageInclusionChecker.java,v 1.2 2006-11-15 05:20:02 robi Exp $
+//###########################################################################
+
+
 package net.sourceforge.waters.analysis.modular;
 
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
