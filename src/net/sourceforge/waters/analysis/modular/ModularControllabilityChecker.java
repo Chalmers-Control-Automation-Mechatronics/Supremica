@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularControllabilityChecker
 //###########################################################################
-//# $Id: ModularControllabilityChecker.java,v 1.3 2006-11-15 01:26:40 robi Exp $
+//# $Id: ModularControllabilityChecker.java,v 1.4 2006-11-15 01:41:48 robi Exp $
 //###########################################################################
 
 
@@ -85,6 +85,8 @@ public class ModularControllabilityChecker
   public boolean run()
     throws AnalysisException
   {
+    mChecker.setStateLimit(getStateLimit());
+
     mStates = 0;
     final Set<AutomatonProxy> plants = new HashSet<AutomatonProxy>();
     final SortedSet<AutomatonProxy> specs = 
