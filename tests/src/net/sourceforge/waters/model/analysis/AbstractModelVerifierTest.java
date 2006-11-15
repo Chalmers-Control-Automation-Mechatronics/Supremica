@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractModelVerifierTest
 //###########################################################################
-//# $Id: AbstractModelVerifierTest.java,v 1.8 2006-11-15 05:20:02 robi Exp $
+//# $Id: AbstractModelVerifierTest.java,v 1.9 2006-11-15 23:31:59 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -294,6 +294,5 @@ public abstract class AbstractModelVerifierTest extends AbstractWatersTest
   private JAXBTraceMarshaller mTraceMarshaller;
   private DocumentManager mDocumentManager;	
   private ModelVerifier mModelVerifier;
-  private PrintWriter mLog;
 
 }
