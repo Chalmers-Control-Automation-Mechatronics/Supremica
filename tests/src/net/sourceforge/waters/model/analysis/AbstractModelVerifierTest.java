@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractModelVerifierTest
 //###########################################################################
-//# $Id: AbstractModelVerifierTest.java,v 1.6 2006-11-09 06:30:01 robi Exp $
+//# $Id: AbstractModelVerifierTest.java,v 1.7 2006-11-15 01:26:40 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -184,6 +184,11 @@ public abstract class AbstractModelVerifierTest extends AbstractWatersTest
     if (!expect) {
       checkCounterExample(des, counterexample);
     }
+  }
+
+  protected ModelVerifier getModelVerifier()
+  {
+    return mModelVerifier;
   }
 
 

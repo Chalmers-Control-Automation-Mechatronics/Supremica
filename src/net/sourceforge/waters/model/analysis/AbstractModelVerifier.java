@@ -5,7 +5,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractModelVerifier
 //###########################################################################
-//# $Id: AbstractModelVerifier.java,v 1.3 2006-11-14 03:32:30 robi Exp $
+//# $Id: AbstractModelVerifier.java,v 1.4 2006-11-15 01:26:40 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -41,6 +41,7 @@ public abstract class AbstractModelVerifier
                                final ProductDESProxyFactory factory)
   {
     super(model, factory);
+    mStateLimit = Integer.MAX_VALUE;
     mResult = null;
   }
 
@@ -115,6 +116,7 @@ public abstract class AbstractModelVerifier
 
   //#########################################################################
   //# Data Members
+  private int mStateLimit;
   private VerificationResult mResult;
 
 }

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   <basic data types>
 //###########################################################################
-//# $Id: IntTypes.h,v 1.2 2006-08-20 11:02:43 robi Exp $
+//# $Id: IntTypes.h,v 1.3 2006-11-15 01:26:40 robi Exp $
 //###########################################################################
 
 
@@ -29,7 +29,7 @@ namespace waters {
 typedef unsigned int uint32;
 
 #define UNDEF_UINT32 ((waters::uint32) -1)
-
+#define UNDEF_INT32 0x7fffffff
 
 //############################################################################
 //# Elementary Arithmetic

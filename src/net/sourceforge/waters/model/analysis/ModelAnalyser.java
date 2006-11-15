@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   ModelAnalyser
 //###########################################################################
-//# $Id: ModelAnalyser.java,v 1.5 2006-11-03 01:00:07 robi Exp $
+//# $Id: ModelAnalyser.java,v 1.6 2006-11-15 01:26:40 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -32,12 +32,16 @@ public interface ModelAnalyser
   //# Invocation
   /**
    * Runs the analysis operation associated with this model analyser.
-   * @return <CODE>true</CODE> if analysis was successful,
-   *         <CODE>false</CODE> otherwise.
+   * @return <CODE>true</CODE> if analysis was completed with successful
+   *         result, <CODE>false</CODE> if alaysis was completed with
+   *         unsuccessful result,
    * @throws NullPointerException to indicate that no model has been
    *         specified.
+   * @throws AnalysisException to indicate that analysis could not be
+   *         completed due to errors in the model or due to resource
+   *         limitations.
    */
-  public boolean run();
+  public boolean run() throws AnalysisException;
 
 
   //#########################################################################
@@ -58,6 +62,30 @@ public interface ModelAnalyser
    */
   public void setModel(ProductDESProxy model);
 
+
+  //#########################################################################
+  //# Parameters
+  /**
+   * Sets the state limit for this model verifier.
+   * If set, the state limit is the maximum number of states the verifier
+   * is allowed to keep in memory at any one time. If this number is
+   * exceeded, an {@link OverflowException} is thrown.
+   * @param  limit  The new state limit, or {@link Integer#MAX_VALUE} to
+   *                indicate that no state limit is to be used.
+   */
+  public void setStateLimit(final int limit);
+
+  /**
+   * Gets the state limit for this model verifier.
+   * @return The current state limit, or {@link Integer#MAX_VALUE} to indicate
+   *         that no state limit is used.
+   * @see    #setStateLimit(int)
+   */
+  public int getStateLimit();
+
+
+  //#########################################################################
+  //# Accessing the Result
   /**
    * Gets the result of the last analysis run.
    * @return An object containing all information associated with the

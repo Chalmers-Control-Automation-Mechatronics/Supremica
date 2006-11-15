@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   SafetyVerifier
 //###########################################################################
-//# $Id: SafetyVerifier.cpp,v 1.2 2006-11-14 03:32:30 robi Exp $
+//# $Id: SafetyVerifier.cpp,v 1.3 2006-11-15 01:26:40 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -27,7 +27,7 @@
 #include "jni/glue/IteratorGlue.h"
 #include "jni/glue/LinkedListGlue.h"
 #include "jni/glue/NativeSafetyVerifierGlue.h"
-#include "jni/glue/NondeterminismExceptionGlue.h"
+#include "jni/glue/NondeterministicDESExceptionGlue.h"
 #include "jni/glue/ProductDESGlue.h"
 #include "jni/glue/SetGlue.h"
 #include "jni/glue/StateGlue.h"
@@ -59,6 +59,7 @@ SafetyVerifier(const jni::ProductDESGlue des,
   : mCache(cache),
     mModel(des),
     mKindTranslator(translator),
+    mStateLimit(UNDEF_UINT32),
     mEncoding(0),
     mStateSpace(0),
     mDepthMap(0),
@@ -100,7 +101,6 @@ run()
     if (!result) {
       computeCounterExample();
     }
-    mNumStates = mStateSpace->size();
     teardown();
     return result;
   } catch (...) {
@@ -133,7 +133,7 @@ setup()
 {
   // Establish automaton encoding ...
   mEncoding = new AutomatonEncoding(mModel, mKindTranslator, mCache);
-  mStateSpace = new StateSpace(mEncoding);
+  mStateSpace = new StateSpace(mEncoding, mStateLimit);
   mDepthMap = new ArrayList<uint32>(128);
 
   // Establish initial event map ...
@@ -188,8 +188,8 @@ setup()
         if (mCurrentTuple[a] == UNDEF_UINT32) {
           mCurrentTuple[a] = code;
         } else {
-          jstring compname = aut.getName();
-          jni::NondeterminismExceptionGlue exception(compname, &state, mCache);
+          jni::NondeterministicDESExceptionGlue
+            exception(&aut, &state, mCache);
           throw mCache->throwJavaException(exception);
         }
       }
@@ -209,9 +209,8 @@ setup()
       bool det =
         eventrecord->addTransition(autrecord, sourcerecord, targetrecord);
       if (!det) {
-        jstring compname = aut.getName();
-        jni::NondeterminismExceptionGlue
-          exception(compname, &source, &event, mCache);
+        jni::NondeterministicDESExceptionGlue
+          exception(&aut, &source, &event, mCache);
         throw mCache->throwJavaException(exception);
       }
     }
@@ -266,15 +265,15 @@ checkProperty()
   uint32* packed = mStateSpace->prepare();
   mEncoding->encode(mCurrentTuple, packed);
   mStateSpace->add();
+  mNumStates = mStateSpace->size();
 
-  uint32 numstates = mStateSpace->size();
-  uint32 nextlevel = numstates;
+  uint32 nextlevel = mNumStates;
   mDepthMap->add(0);
   mDepthMap->add(nextlevel);
 
   // Main loop ...
   uint32 current = 0;
-  while (current < numstates) {
+  while (current < mNumStates) {
     packed = mStateSpace->get(current);
     mEncoding->decode(packed, mCurrentTuple);
     for (int e = 0; e < mNumEventRecords; e++) {
@@ -315,11 +314,11 @@ checkProperty()
           }
         }
         mStateSpace->add();
-        numstates = mStateSpace->size();
+        mNumStates = mStateSpace->size();
       }
     }
     if (++current == nextlevel) {
-      nextlevel = numstates;
+      nextlevel = mNumStates;
       mDepthMap->add(nextlevel);
     }
   }
@@ -433,6 +432,10 @@ Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
       jni::KindTranslatorGlue translator =
         gchecker.getKindTranslatorGlue(&cache);
       waters::SafetyVerifier checker(des, translator, &cache);
+      const int limit = gchecker.getStateLimit();
+      if (limit != UNDEF_INT32) {
+        checker.setStateLimit(limit);
+      }
       bool result = checker.run();
       if (result) {
         jni::VerificationResultGlue vresult(result, 0, &cache);

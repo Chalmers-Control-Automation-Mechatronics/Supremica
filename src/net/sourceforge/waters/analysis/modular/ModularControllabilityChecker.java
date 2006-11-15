@@ -1,36 +1,50 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.analysis.modular
+//# CLASS:   ModularControllabilityChecker
+//###########################################################################
+//# $Id: ModularControllabilityChecker.java,v 1.3 2006-11-15 01:26:40 robi Exp $
+//###########################################################################
+
+
 package net.sourceforge.waters.analysis.modular;
 
-import java.util.Comparator;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
 import java.io.File;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
-import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.expr.OperatorTable;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
-import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
-import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
-import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.plain.des.SafetyTraceElement;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
-import net.sourceforge.waters.plain.des.ProductDESElement;
-import net.sourceforge.waters.model.des.EventProxy;
 import java.util.ArrayList;
 import java.util.Collection;
-import net.sourceforge.waters.xsd.base.ComponentKind;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.analysis.ControllabilityChecker;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import net.sourceforge.waters.analysis.monolithic.
+       MonolithicControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
+import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
+import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.plain.des.ProductDESElement;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
+import net.sourceforge.waters.plain.des.SafetyTraceElement;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
+
 
 public class ModularControllabilityChecker
   extends AbstractModelVerifier
@@ -69,6 +83,7 @@ public class ModularControllabilityChecker
   }
   
   public boolean run()
+    throws AnalysisException
   {
     mStates = 0;
     final Set<AutomatonProxy> plants = new HashSet<AutomatonProxy>();

@@ -2,9 +2,9 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.compiler
-//# CLASS:   NondeterminismException
+//# CLASS:   NondeterministicModuleException
 //###########################################################################
-//# $Id: NondeterminismException.java,v 1.3 2006-09-03 06:38:43 robi Exp $
+//# $Id: NondeterministicModuleException.java,v 1.1 2006-11-15 01:26:40 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -15,21 +15,29 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.expr.EvalException;
 
 
-public class NondeterminismException extends EvalException {
+/**
+ * An exception thrown by the {@link ModuleCompiler} to indicate that
+ * a graph compiles to a nondeterministic automaton although it is
+ * declared to be deterministic.
+ *
+ * @author Robi Malik
+ */
+
+public class NondeterministicModuleException extends EvalException {
 
   //#########################################################################
   //# Constructors
   /**
    * Constructs a new exception with <CODE>null</CODE> as its detail message.
    */
-  public NondeterminismException()
+  public NondeterministicModuleException()
   {
   }
 
   /**
    * Constructs a new exception with the specified detail message.
    */
-  public NondeterminismException(final String message)
+  public NondeterministicModuleException(final String message)
   {
     super(message);
   }
@@ -38,7 +46,8 @@ public class NondeterminismException extends EvalException {
    * Constructs a new exception with the specified detail message
    * and originating expression.
    */
-  public NondeterminismException(final String message, final Proxy location)
+  public NondeterministicModuleException(final String message,
+                                         final Proxy location)
   {
     super(message, location);
   }
@@ -49,8 +58,8 @@ public class NondeterminismException extends EvalException {
    * @param compname The name of the automaton that causes the problem.
    * @param state    One of the initial states.
    */
-  public NondeterminismException(final String compname,
-                                 final StateProxy state)
+  public NondeterministicModuleException(final String compname,
+                                         final StateProxy state)
   {
     super("Automaton '" + compname + "' has more than one initial state!",
           state);
@@ -63,9 +72,9 @@ public class NondeterminismException extends EvalException {
    * @param state    The state with nondeterministic outgoing transitions.
    * @param event    The event that causes the trouble.
    */
-  public NondeterminismException(final String compname,
-                                 final StateProxy state,
-                                 final EventProxy event)
+  public NondeterministicModuleException(final String compname,
+                                         final StateProxy state,
+                                         final EventProxy event)
   {
     super("Multiple transitions labelled '" + event.getName() +
           "' originating from state '" + state.getName() +

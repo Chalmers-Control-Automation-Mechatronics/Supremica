@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   StateSpace
 //###########################################################################
-//# $Id: StateSpace.h,v 1.1 2006-09-03 06:38:42 robi Exp $
+//# $Id: StateSpace.h,v 1.2 2006-11-15 01:26:40 robi Exp $
 //###########################################################################
 
 
@@ -38,7 +38,7 @@ class StateSpace : public IntHashAccessor
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit StateSpace(const AutomatonEncoding* encoding);
+  explicit StateSpace(const AutomatonEncoding* encoding, uint32 limit);
   virtual ~StateSpace();
 
   //##########################################################################
@@ -62,6 +62,7 @@ private:
   //# Data Members
   int mEncodingSize;
   uint32 mNumStates;
+  uint32 mStateLimit;
   ArrayList<uint32*> mBlocks;
   HashTable<uint32,uint32> mLookupTable;
 

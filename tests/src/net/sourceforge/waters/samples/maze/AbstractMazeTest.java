@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   AbstractMazeTest
 //###########################################################################
-//# $Id: AbstractMazeTest.java,v 1.4 2006-11-08 21:49:12 robi Exp $
+//# $Id: AbstractMazeTest.java,v 1.5 2006-11-15 01:26:40 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.JAXBException;
 
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.base.WatersException;
@@ -437,6 +438,7 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
 
   private VerificationResult checkLanguageInclusion
     (final ProductDESProxy des, final ProductDESProxyFactory factory)
+    throws AnalysisException
   {
     final LanguageInclusionChecker checker =
       getLanguageInclusionChecker(des, factory);

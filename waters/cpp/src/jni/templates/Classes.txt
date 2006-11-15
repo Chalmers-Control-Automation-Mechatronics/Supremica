@@ -4,7 +4,7 @@
 //# PACKAGE: jni.glue
 //# PURPOSE: List of classes and methods to be converted to C++/JNI code
 //###########################################################################
-//# $Id: Classes.txt,v 1.15 2006-11-14 03:32:30 robi Exp $
+//# $Id: Classes.txt,v 1.16 2006-11-15 01:26:40 robi Exp $
 //###########################################################################
 
 
@@ -123,18 +123,6 @@ glue class ProductDESProxyFactory {
 
 
 //###########################################################################
-package net.sourceforge.waters.model.compiler;
-//###########################################################################
-
-glue class NondeterminismException extends Exception {
-  NondeterminismException(String compname, glue StateProxy state);
-  NondeterminismException(String compname,
-			  glue StateProxy state,
-			  glue EventProxy event);
-}
-
-
-//###########################################################################
 package net.sourceforge.waters.model.analysis;
 //###########################################################################
 
@@ -154,6 +142,18 @@ glue class KindTranslator {
   glue EventKind getEventKind(glue EventProxy event);
 }
 
+glue class NondeterministicDESException extends Exception {
+  NondeterministicDESException(glue AutomatonProxy aut, glue StateProxy state);
+  NondeterministicDESException(glue AutomatonProxy aut,
+			       glue StateProxy state,
+			       glue EventProxy event);
+}
+
+glue class OverflowException extends Exception {
+  OverflowException();
+  OverflowException(int limit);
+}
+
 
 //###########################################################################
 package net.sourceforge.waters.cpp.analysis;
@@ -162,6 +162,7 @@ package net.sourceforge.waters.cpp.analysis;
 glue class NativeModelAnalyser {
   glue ProductDESProxyFactory getFactory();
   glue ProductDESProxy getModel();
+  int getStateLimit();
 }
 
 glue class NativeSafetyVerifier extends NativeModelAnalyser {

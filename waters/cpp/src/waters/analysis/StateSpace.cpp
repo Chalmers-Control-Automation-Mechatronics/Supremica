@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   StateSpace
 //###########################################################################
-//# $Id: StateSpace.cpp,v 1.1 2006-09-03 06:38:42 robi Exp $
+//# $Id: StateSpace.cpp,v 1.2 2006-11-15 01:26:40 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -15,6 +15,9 @@
 #include <new>
 
 #include <jni.h>
+
+#include "jni/cache/PreJavaException.h"
+#include "jni/glue/Glue.h"
 
 #include "waters/analysis/AutomatonEncoding.h"
 #include "waters/analysis/StateSpace.h"
@@ -30,9 +33,10 @@ namespace waters {
 //# StateSpace: Constructors & Destructors
 
 StateSpace::
-StateSpace(const AutomatonEncoding* encoding)
+StateSpace(const AutomatonEncoding* encoding, uint32 limit)
   : mEncodingSize(encoding->getNumWords()),
     mNumStates(0),
+    mStateLimit(limit),
     mBlocks(INITBLOCKS),
     mLookupTable(this, BLOCKSIZE)
 {
@@ -89,7 +93,9 @@ add()
 {
   uint32 added = mLookupTable.add(mNumStates);
   if (added == mNumStates) {
-    mNumStates++;
+    if (++mNumStates > mStateLimit) {
+      throw jni::PreJavaException(jni::CLASS_OverflowException);
+    }
   }
   return added;
 }

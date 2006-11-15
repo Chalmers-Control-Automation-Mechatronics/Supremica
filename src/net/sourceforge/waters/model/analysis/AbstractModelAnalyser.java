@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractModelAnalyser
 //###########################################################################
-//# $Id: AbstractModelAnalyser.java,v 1.1 2006-11-03 05:18:28 robi Exp $
+//# $Id: AbstractModelAnalyser.java,v 1.2 2006-11-15 01:26:40 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -36,6 +36,7 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
   {
     mFactory = factory;
     mModel = model;
+    mStateLimit = Integer.MAX_VALUE;
   }
 
 
@@ -57,10 +58,22 @@ public abstract class AbstractModelAnalyser implements ModelAnalyser
     clearAnalysisResult();
   }
 
+  public void setStateLimit(final int limit)
+  {
+    mStateLimit = limit;
+  }
+
+  public int getStateLimit()
+  {
+    return mStateLimit;
+  }
+
+
 
   //#########################################################################
   //# Data Members
   private final ProductDESProxyFactory mFactory;
   private ProductDESProxy mModel;
+  private int mStateLimit;
 
 }

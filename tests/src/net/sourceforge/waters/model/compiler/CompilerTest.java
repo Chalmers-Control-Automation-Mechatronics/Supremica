@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   JAXBTestCase
 //###########################################################################
-//# $Id: CompilerTest.java,v 1.10 2006-09-19 15:53:20 robi Exp $
+//# $Id: CompilerTest.java,v 1.11 2006-11-15 01:26:40 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -25,7 +25,7 @@ import net.sourceforge.waters.model.compiler.DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.EmptyLabelBlockException;
 import net.sourceforge.waters.model.compiler.InstantiationException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
-import net.sourceforge.waters.model.compiler.NondeterminismException;
+import net.sourceforge.waters.model.compiler.NondeterministicModuleException;
 import net.sourceforge.waters.model.compiler.UndefinedIdentifierException;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -300,21 +300,21 @@ public class CompilerTest
     throws IOException, WatersException
   {
     compileError("markus1", null,
-                 NondeterminismException.class, "'s0'", "'a'");
+                 NondeterministicModuleException.class, "'s0'", "'a'");
   }
 
   public void testCompile_nodegroup3()
     throws IOException, WatersException
   {
     compileError("nodegroup3", null,
-                 NondeterminismException.class, "'q0'", "'e'");
+                 NondeterministicModuleException.class, "'q0'", "'e'");
   }
 
   public void testCompile_twoinit()
     throws IOException, WatersException
   {
     compileError("twoinit", null,
-                 NondeterminismException.class, "'comp'");
+                 NondeterministicModuleException.class, "'comp'");
   }
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractControllabilityCheckerTest
 //###########################################################################
-//# $Id: AbstractControllabilityCheckerTest.java,v 1.3 2006-11-13 03:58:13 robi Exp $
+//# $Id: AbstractControllabilityCheckerTest.java,v 1.4 2006-11-15 01:26:40 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -17,6 +17,7 @@ import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -53,6 +54,19 @@ public abstract class AbstractControllabilityCheckerTest
     testEmpty();
     testTransferline__1();
     testSmallFactory2();
+  }
+
+  public void testOverflowException()
+    throws Exception
+  {
+    try {
+      final ModelVerifier verifier = getModelVerifier();
+      verifier.setStateLimit(3);
+      testBigFactory();
+      fail("Expected overflow not caught!");
+    } catch (final OverflowException exception) {
+      // O.K.
+    }
   }
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   MonolithicSafetyVerifier
 //###########################################################################
-//# $Id: MonolithicSafetyVerifier.java,v 1.6 2006-11-14 03:32:30 robi Exp $
+//# $Id: MonolithicSafetyVerifier.java,v 1.7 2006-11-15 01:26:40 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.monolithic;
@@ -21,6 +21,7 @@ import java.util.Arrays;
 
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -80,6 +81,7 @@ public class MonolithicSafetyVerifier
   //#########################################################################
   //# Invocation
   public boolean run()
+    throws OverflowException
   {
     final ProductDESProxy model = getModel();
 
@@ -255,6 +257,7 @@ public class MonolithicSafetyVerifier
    *         <CODE>false</CODE> if it is not.
    */
   private boolean isControllable(int[] sState)
+    throws OverflowException
   {
     THashSet systemSet = new THashSet();
     boolean enabled = true;
@@ -344,6 +347,9 @@ public class MonolithicSafetyVerifier
           encode(mSuccessor, mStateTuple);
           if (systemSet.add(mStateTuple)) {
             mStateSpace.add(mStateTuple);
+            if (mStateSpace.size() > getStateLimit()) {
+              throw new OverflowException(getStateLimit());
+            }
           }
         }
       }

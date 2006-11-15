@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   SafetyVerifier
 //###########################################################################
-//# $Id: SafetyVerifier.h,v 1.2 2006-11-14 03:32:30 robi Exp $
+//# $Id: SafetyVerifier.h,v 1.3 2006-11-15 01:26:40 robi Exp $
 //###########################################################################
 
 
@@ -63,6 +63,10 @@ public:
     (const jni::ProductDESProxyFactoryGlue& factory) const;
   void addStatistics(const jni::VerificationResultGlue& vresult) const;
 
+  //##########################################################################
+  //# Parameters
+  void setStateLimit(uint32 limit) {mStateLimit = limit;}
+
 private:
   //##########################################################################
   //# Auxiliary Methods
@@ -76,6 +80,7 @@ private:
   jni::ClassCache* mCache;
   jni::ProductDESGlue mModel;
   jni::KindTranslatorGlue mKindTranslator;
+  uint32 mStateLimit;
   AutomatonEncoding* mEncoding;
   StateSpace* mStateSpace;
   ArrayList<uint32>* mDepthMap;

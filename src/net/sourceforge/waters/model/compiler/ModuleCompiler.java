@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.52 2006-11-13 03:58:13 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.53 2006-11-15 01:26:40 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -746,8 +746,8 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
         mMaxInitialStates = 0;
         break;
       case 0:
-        final NondeterminismException exception =
-          new NondeterminismException(mCurrentComponentName, state);
+        final NondeterministicModuleException exception =
+          new NondeterministicModuleException(mCurrentComponentName, state);
         throw wrap(exception);
       default:
         break;
@@ -1425,7 +1425,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
             create = false;
             break;
           } else if (deterministic) {
-            throw new NondeterminismException
+            throw new NondeterministicModuleException
               (mCurrentComponentName, sourceState, event);
           }
         }
@@ -1482,7 +1482,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
           }
         }
       }
-    } catch (final NondeterminismException exception) {
+    } catch (final NondeterministicModuleException exception) {
       throw wrap(exception);
     }
   }

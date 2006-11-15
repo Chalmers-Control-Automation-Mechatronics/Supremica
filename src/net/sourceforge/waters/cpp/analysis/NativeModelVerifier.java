@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeModelVerifier
 //###########################################################################
-//# $Id: NativeModelVerifier.java,v 1.3 2006-11-03 01:00:07 robi Exp $
+//# $Id: NativeModelVerifier.java,v 1.4 2006-11-15 01:26:40 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;
 
+import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -36,6 +37,7 @@ public abstract class NativeModelVerifier
 			     final ProductDESProxyFactory factory)
   {
     super(model, factory);
+    mStateLimit = Integer.MAX_VALUE;
     mResult = null;
   }
 
@@ -43,6 +45,7 @@ public abstract class NativeModelVerifier
   //#########################################################################
   //# Invocation
   public boolean run()
+    throws AnalysisException
   {
     if (getModel() == null) {
       throw new NullPointerException("No model given!");
@@ -87,11 +90,11 @@ public abstract class NativeModelVerifier
 
   //#########################################################################
   //# Native Methods
-  abstract VerificationResult runNativeAlgorithm();
-
+  abstract VerificationResult runNativeAlgorithm() throws AnalysisException;
 
   //#########################################################################
   //# Data Members
+  private int mStateLimit;
   private VerificationResult mResult;
 
 }
