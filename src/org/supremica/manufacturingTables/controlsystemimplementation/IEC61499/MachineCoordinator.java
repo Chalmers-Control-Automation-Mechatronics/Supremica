@@ -85,7 +85,7 @@ public class MachineCoordinator implements Listener
 	performsCOP = false;
 	currentCOP = null;
 	currentActivity = null;
-	machineCoordinatorThread.register(this);
+	//	machineCoordinatorThread.register(this);
 	predecessorsFulfilled = new HashMap<String, COPPredecessor>(8); 
 	// (initital capacity 8 and default load factor (0,75) suits me fine)
 	
@@ -94,6 +94,7 @@ public class MachineCoordinator implements Listener
     public void setThread(MachineCoordinatorThread machineCoordinatorThread)
     {
 	this.machineCoordinatorThread = machineCoordinatorThread;
+	this.machineCoordinatorThread.register(this);
     }
 
     public String getMachine()

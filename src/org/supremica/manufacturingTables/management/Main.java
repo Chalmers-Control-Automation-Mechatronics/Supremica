@@ -125,14 +125,17 @@ public class Main
 		if (PLCProgramBuilder != null)
 		{
 		    PLCProgramBuilder.createNewPLCProgram(cell);
-		    System.err.println(args[0].substring(1) + "PLCProgram created");
-		    PLCProgram plcProgram = PLCProgramBuilder.getPLCProgram();
-		    System.err.println("Time to run the PLCProgram!");
-		    plcProgram.run();
+		    System.err.println(args[0].substring(1) + " PLCProgram created");
 		}
 		else 
 		{
 		    System.err.println("Unknown implementation language!");
+		}
+		if (args[0].equals("-Java"))
+		{
+		    PLCProgram plcProgram = PLCProgramBuilder.getPLCProgram();
+		    System.err.println("Time to run the PLCProgram!");
+		    plcProgram.run(); // (The IEC61499 application is started from the Fuber runtime)
 		}
 	    }
 	    else

@@ -79,7 +79,7 @@ public class Zone implements Listener
 	this.mailbox = mailbox;
 	zoneThread = null;
 	this.zoneName = zoneName;
-	zoneThread.register(this);
+	//	zoneThread.register(this);
 	booked = false;
 	bookingMachine = null;
     }
@@ -87,6 +87,7 @@ public class Zone implements Listener
     public void setThread(ZoneThread zoneThread)
     {
 	this.zoneThread = zoneThread;
+	this.zoneThread.register(this);
     }
  
     public synchronized void receiveMessage(Message msg)

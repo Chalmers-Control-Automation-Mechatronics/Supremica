@@ -84,6 +84,11 @@ public class IEC61499ControlSystemImplementationBuilder extends ControlSystemImp
 
     public void createNewPLCProgram(ManufacturingCell cell)
     {
+	// For the Fuber application:
+	cellMachines = new HashSet<org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.Machine>();
+	machineCoordinators = new HashSet<org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.MachineCoordinator>();
+	zones = new HashSet<org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.Zone>();
+	
 	// PLCProgram with mailbox and coordinator are created.
 	// We have to start by creating a mailbox, to be able to create a coordinator, 
 	// to be able to create a PLCProgramIEC61499. The controlsystemdata mailbox and coordinator contains 

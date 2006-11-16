@@ -76,12 +76,13 @@ public class Machine implements Listener
 	description = null;
 	this.cellMailbox = cellMailbox;
 	this.machineThread = null;
-	machineThread.register(this);
+	//	machineThread.register(this);
     }
     
     public void setThread(MachineThread machineThread)
     {
 	this.machineThread = machineThread;
+	this.machineThread.register(this);
     }
 
     public String getID() // to implement the Listener interface
