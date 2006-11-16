@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractLargeControllabilityCheckerTest
 //###########################################################################
-//# $Id: AbstractLargeControllabilityCheckerTest.java,v 1.1 2006-11-13 03:58:13 robi Exp $
+//# $Id: AbstractLargeControllabilityCheckerTest.java,v 1.2 2006-11-16 01:08:50 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -98,14 +98,14 @@ public abstract class AbstractLargeControllabilityCheckerTest
   {
     final String group = "tests";
     final String dir = "incremental_suite";
-    final String name = "tbed_valid.wmod";
+    final String name = "tbed_noderail.wmod";
     runModelVerifier(group, dir, name, true);
   }
 
   public void testVerriegel4() throws Exception
   {
-    final String group = "valid";
-    final String dir = "central_locking";
+    final String group = "tests";
+    final String dir = "incremental_suite";
     final String name = "verriegel4.wmod";
     runModelVerifier(group, dir, name, true);
   }

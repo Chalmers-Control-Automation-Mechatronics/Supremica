@@ -239,6 +239,7 @@
         <fileset dir="${supremica.testsrc}">
           <include name="net/sourceforge/waters/**/*Test.java"/>
           <exclude name="net/sourceforge/waters/gui/**/*.java"/>
+          <exclude name="**/*Heuristic*.java"/>
           <exclude name="**/Abstract*.java"/>
           <exclude name="**/Native*.java"/>
         </fileset>

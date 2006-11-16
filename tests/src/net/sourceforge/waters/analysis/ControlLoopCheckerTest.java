@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopCheckerTest
 //###########################################################################
-//# $Id: ControlLoopCheckerTest.java,v 1.14 2006-11-09 06:30:01 robi Exp $
+//# $Id: ControlLoopCheckerTest.java,v 1.15 2006-11-16 01:08:50 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -398,16 +398,6 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     runModelChecker(group, dir, name, false);
   } 
 
-  /*
-  public void testFischertechnik() throws Exception
-  {
-    final String group = "valid";
-    final String dir = "fischertechnik";
-    final String name = "fischertechnik.wdes";
-    runModelChecker(group, dir, name, false);
-  }
-  */  
-  
   public void testKoordwsp() throws Exception
   {
     final String group = "valid";

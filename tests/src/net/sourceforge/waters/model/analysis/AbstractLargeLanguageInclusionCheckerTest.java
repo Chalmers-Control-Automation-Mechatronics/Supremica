@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractLargeLanguageInclusionCheckerTest
 //###########################################################################
-//# $Id: AbstractLargeLanguageInclusionCheckerTest.java,v 1.1 2006-11-15 05:20:02 robi Exp $
+//# $Id: AbstractLargeLanguageInclusionCheckerTest.java,v 1.2 2006-11-16 01:08:50 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -55,6 +55,83 @@ public abstract class AbstractLargeLanguageInclusionCheckerTest
 
   //#########################################################################
   //# Test Cases --- incremental suite
+  public void testBigBmw_cmft_kl50() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "incremental_suite";
+    final String name = "big_bmw.wmod";
+    final String propname = "prop_cmft_kl50";
+    runModelVerifier(group, dir, name, true, propname);
+  }
+
+  public void testBigBmw_cmft_req() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "incremental_suite";
+    final String name = "big_bmw.wmod";
+    final String propname = "prop_cmft_req";
+    runModelVerifier(group, dir, name, false, propname);
+  }
+
+  public void testBigBmw_fh_cmftreq0() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "incremental_suite";
+    final String name = "big_bmw.wmod";
+    final String propname = "prop_fh_cmftreq0";
+    runModelVerifier(group, dir, name, false, propname);
+  }
+
+  public void testBigBmw_fh_cmftreq1() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "incremental_suite";
+    final String name = "big_bmw.wmod";
+    final String propname = "prop_fh_cmftreq1";
+    runModelVerifier(group, dir, name, true, propname);
+  }
+
+  public void testFischertechnik() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "incremental_suite";
+    final String name = "ftechnik.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
+  public void testTbedNoCollision() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "incremental_suite";
+    final String name = "tbed_nocoll.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
+  public void testTbedNoDerailment() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "incremental_suite";
+    final String name = "tbed_noderail.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
+  public void testVerriegel4_ER() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "incremental_suite";
+    final String name = "verriegel4.wmod";
+    final String propname = "sicherheit_er";
+    runModelVerifier(group, dir, name, false, propname);
+  }
+
+  public void testVerriegel4_VR() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "incremental_suite";
+    final String name = "verriegel4.wmod";
+    final String propname = "sicherheit_vr4";
+    runModelVerifier(group, dir, name, true, propname);
+  }
 
 
   //#########################################################################

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractControllabilityCheckerTest
 //###########################################################################
-//# $Id: AbstractControllabilityCheckerTest.java,v 1.4 2006-11-15 01:26:40 robi Exp $
+//# $Id: AbstractControllabilityCheckerTest.java,v 1.5 2006-11-16 01:08:50 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -574,9 +574,9 @@ public abstract class AbstractControllabilityCheckerTest
 
   public void testFischertechnik() throws Exception
   {
-    final String group = "valid";
-    final String dir = "fischertechnik";
-    final String name = "fischertechnik.wdes";
+    final String group = "tests";
+    final String dir = "incremental_suite";
+    final String name = "ftechnik.wmod";
     runModelVerifier(group, dir, name, false);
   }
 
