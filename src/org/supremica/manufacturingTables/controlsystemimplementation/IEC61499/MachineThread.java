@@ -71,4 +71,8 @@ public class MachineThread
     {
     }
 
+    public void startMachineOperation(String string)
+    {
+    }
+
 }

@@ -319,15 +319,15 @@ public class MachineControlCommunicator extends MachineController
 		// The EOP is mostly done. Now we have to communicate with the real machine and
 		// after that perform the last row (unbook any zones) if there is such a row.
 
-		// ...Sending the message to the real machine to tell it to perform the operation and wait for
-		// it to be performed....
 		System.out.println("Telling machine with own control system to perform operation " 
 				   + currentEOP.getId());
+		// Telling the real or simulated machine to perform the operation:
+		machine.startMachineOperation(currentEOP.getId());
 	    }
-	    if (!currentEOP.hasMoreActions())
+	    else if (!currentEOP.hasMoreActions())
 	    {
 		    performsEOP = false;
-		    System.err.println("The EOP is done!");
+		    System.out.println("The EOP is done!");
 		    EOPPerformedOK = true;
 	    }
 	    else 
@@ -338,6 +338,28 @@ public class MachineControlCommunicator extends MachineController
 	}
     }
     
+    protected void finishedMachineOperation(String operationName)
+    {
+	if ( operationName.equals( currentEOP.getId() ) )
+	{
+	    if (!currentEOP.hasMoreActions())
+	    {
+		    performsEOP = false;
+		    System.out.println("The EOP is done!");
+		    EOPPerformedOK = true;
+	    }
+	    else 
+	    {
+		currentEOPRow = currentEOP.getNextActions();
+		performActions();
+	    }
+
+	}
+	else
+	{
+	    System.err.println("Wrong operation performed by Machine " + machine.getName() + "!!!");
+	}
+    }
        
     public ComponentConfirmation checkComponent(ComponentCheck componentCheck)
     {

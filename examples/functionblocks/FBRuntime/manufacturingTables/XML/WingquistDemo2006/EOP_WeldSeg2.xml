@@ -7,13 +7,13 @@
         <InternalComponents>
         </InternalComponents>
         <Zones>
-            <Zone>1</Zone>
+            <Zone>Zone1</Zone>
         </Zones>
       
     
         <InitialState>
             <ZoneState>
-                <Zone>1</Zone>
+                <Zone>Zone1</Zone>
                 <State>b</State>
             </ZoneState>
             <InitialStateCheck>
@@ -24,13 +24,13 @@
 
         <Action actionNbr="1">
             <ZoneState>
-                <Zone>1</Zone>
+                <Zone>Zone1</Zone>
                 <State>b</State>
             </ZoneState>
         </Action>
         <Action actionNbr="2">
             <ZoneState>
-                <Zone>1</Zone>
+                <Zone>Zone1</Zone>
                 <State>f</State>
             </ZoneState>
         </Action>

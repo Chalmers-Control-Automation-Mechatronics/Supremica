@@ -85,6 +85,19 @@ public class Machine implements Listener
 	this.machineThread.register(this);
     }
 
+    // To communicate with the simulated or real machine, via Fuber
+    public void startMachineOperation(String operationName)
+    {
+	machineThread.startMachineOperation(operationName);
+    }
+
+    // The simulated or real machine has finished the operation
+    public void finishedMachineOperation(String operationName)
+    {
+	// This only happens for machines with own control system
+	( (MachineControlCommunicator) machineController ).finishedMachineOperation(operationName);
+    }
+
     public String getID() // to implement the Listener interface
     {
 	return getName();

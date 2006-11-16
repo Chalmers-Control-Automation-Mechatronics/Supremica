@@ -4,18 +4,18 @@
             <Cells>
                 <Cell name="11-41-150">
                     <Zones>
-                        <Zone>1</Zone>
-                        <!--Zone>2</Zone>
-                        <Zone>3</Zone>
-                        <Zone>4</Zone>
-                        <Zone>5</Zone>
-                        <Zone>6</Zone>
-                        <Zone>7</Zone>
-                        <Zone>8</Zone>
-                        <Zone>9</Zone>
-                        <Zone>10</Zone>
-                        <Zone>11</Zone>
-                        <Zone>12</Zone-->
+                        <Zone>Zone1</Zone>
+                        <!--Zone>Zone2</Zone>
+                        <Zone>Zone3</Zone>
+                        <Zone>Zone4</Zone>
+                        <Zone>Zone5</Zone>
+                        <Zone>Zone6</Zone>
+                        <Zone>Zone7</Zone>
+                        <Zone>Zone8</Zone>
+                        <Zone>Zone9</Zone>
+                        <Zone>Zone10</Zone>
+                        <Zone>Zone11</Zone>
+                        <Zone>Zone12</Zone-->
                     </Zones>
 
                     <Machines>
