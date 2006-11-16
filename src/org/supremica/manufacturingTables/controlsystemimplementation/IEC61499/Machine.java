@@ -78,7 +78,6 @@ public class Machine implements Listener
 	this.machineThread = null;
 	//	machineThread.register(this);
     }
-    
     public void setThread(MachineThread machineThread)
     {
 	this.machineThread = machineThread;

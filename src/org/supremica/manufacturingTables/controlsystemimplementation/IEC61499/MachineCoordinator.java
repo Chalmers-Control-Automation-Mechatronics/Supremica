@@ -113,7 +113,7 @@ public class MachineCoordinator implements Listener
 	return "Coordinator" + machine;
     }
  
-    protected void start()
+    public void start()
     {
 	if (performsCOP)
 	{
