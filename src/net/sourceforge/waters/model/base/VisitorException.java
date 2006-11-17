@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   VisitorException
 //###########################################################################
-//# $Id: VisitorException.java,v 1.2 2005-11-03 01:24:15 robi Exp $
+//# $Id: VisitorException.java,v 1.3 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -31,5 +31,10 @@ public class VisitorException extends WatersException {
   {
     super(msg);
   }
+
+  
+  //#########################################################################
+  //# Static Class Variables
+  public static final long serialVersionUID = 1;
 
 }

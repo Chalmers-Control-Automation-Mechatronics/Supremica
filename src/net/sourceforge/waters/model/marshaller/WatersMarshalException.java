@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   WatersMarshalException
 //###########################################################################
-//# $Id: WatersMarshalException.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: WatersMarshalException.java,v 1.3 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -77,5 +77,10 @@ public class WatersMarshalException extends WatersException {
     super("Failed to write file '" + filename + "'" +
           (cause == null ? "!" : cause));
   }
+  
+  
+  //#########################################################################
+  //# Static Class Variables
+  public static final long serialVersionUID = 1;
 
 }

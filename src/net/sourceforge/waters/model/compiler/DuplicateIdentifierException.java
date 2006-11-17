@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   DuplicateIdentifierException
 //###########################################################################
-//# $Id: DuplicateIdentifierException.java,v 1.2 2005-11-03 01:24:15 robi Exp $
+//# $Id: DuplicateIdentifierException.java,v 1.3 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -62,5 +62,10 @@ public class DuplicateIdentifierException extends EvalException {
   {
     super(typename + " '" + name + "' is already in use!", location);
   }
+
+  
+  //#########################################################################
+  //# Static Class Variables
+  public static final long serialVersionUID = 1;
 
 }

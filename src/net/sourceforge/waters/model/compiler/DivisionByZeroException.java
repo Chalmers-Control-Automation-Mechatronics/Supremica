@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   DivisionByZeroException
 //###########################################################################
-//# $Id: DivisionByZeroException.java,v 1.1 2006-09-08 07:19:58 robi Exp $
+//# $Id: DivisionByZeroException.java,v 1.2 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -33,5 +33,10 @@ public class DivisionByZeroException extends EvalException {
   {
     super("Division by zero in expression!", expr);
   }
+
+  
+  //#########################################################################
+  //# Static Class Variables
+  public static final long serialVersionUID = 1;
 
 }

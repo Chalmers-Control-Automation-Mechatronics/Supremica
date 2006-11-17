@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopChecker
 //###########################################################################
-//# $Id: ControlLoopChecker.java,v 1.18 2006-11-13 02:59:43 yip1 Exp $
+//# $Id: ControlLoopChecker.java,v 1.19 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -77,9 +77,6 @@ public class ControlLoopChecker extends ModelChecker
     /** it holds the initial encoded state tuple of the model. */
     private EncodedStateTuple mEncodedInitialStateTuple;
     
-    /** for tracing counterexample: it holds the root state of the control loop. */
-    private int mRootStateTuple[];
-    
     /** for tracing counterexample: it holds the root encoded state of the control loop. */
     private EncodedStateTuple mEncodedRootStateTuple;
     
@@ -98,10 +95,7 @@ public class ControlLoopChecker extends ModelChecker
     /** a global state tuple for storing next state tuple */
     private int mNextTuple[];
     
-    /** a global encodedstate tuple for storing next state tuple */
-    private EncodedStateTuple mEncodedNextTuple;
-    
-    //#########################################################################
+     //#########################################################################
     //# Variables used for encoding/decoding
     /** a list contains number of bits needed for each automaton */
     private int mNumBits[];
@@ -757,7 +751,7 @@ public class ControlLoopChecker extends ModelChecker
      */
     public void decoding(final int[] encodedStateCodes, final int[] currTuple)
     {
-        int index = 0, tmp, mask, value, i, j;
+        int tmp, mask, value, i, j;
         
         for(i = 0; i < mNumInts; i++){
             tmp = encodedStateCodes[i];

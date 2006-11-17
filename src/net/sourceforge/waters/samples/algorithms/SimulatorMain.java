@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.algorithms
 //# CLASS:   SimulatorMain
 //###########################################################################
-//# $Id: SimulatorMain.java,v 1.3 2006-07-20 02:28:37 robi Exp $
+//# $Id: SimulatorMain.java,v 1.4 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.algorithms;
@@ -117,7 +117,8 @@ public class SimulatorMain
       }
 
       // Initialise simulator
-      final Simulator simulator = new Simulator(des);
+      new Simulator(des);
+      // final Simulator simulator = new Simulator(des);
       System.out.print("Simulator initialised.");
 
       // ====================================================================

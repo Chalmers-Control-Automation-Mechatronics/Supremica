@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   ModelChangeEvent
 //###########################################################################
-//# $Id: ModelChangeEvent.java,v 1.4 2006-09-06 11:52:21 robi Exp $
+//# $Id: ModelChangeEvent.java,v 1.5 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -237,5 +237,10 @@ public class ModelChangeEvent extends EventObject
   //# Data Members
   private final int mKind;
   private final Object mValue;
+  
+  
+  //#########################################################################
+  //# Static Class Variables
+  public static final long serialVersionUID = 1;
 
 }

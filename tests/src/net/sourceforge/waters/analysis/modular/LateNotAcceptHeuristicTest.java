@@ -4,33 +4,18 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   MonolithicControllabilityCheckerTest
 //###########################################################################
-//# $Id: LateNotAcceptHeuristicTest.java,v 1.1 2006-11-10 23:58:25 siw4 Exp $
+//# $Id: LateNotAcceptHeuristicTest.java,v 1.2 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
-import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
-import java.util.Collection;
-import java.util.List;
-import java.util.LinkedList;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
+//import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AbstractControllabilityCheckerTest;
-import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
-import net.sourceforge.waters.model.analysis.ModelVerifier;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
-import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class LateNotAcceptHeuristicTest

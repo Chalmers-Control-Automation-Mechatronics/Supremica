@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   UndefinedIdentifierException
 //###########################################################################
-//# $Id: UndefinedIdentifierException.java,v 1.2 2005-11-03 01:24:15 robi Exp $
+//# $Id: UndefinedIdentifierException.java,v 1.3 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -51,5 +51,10 @@ public class UndefinedIdentifierException extends EvalException {
   {
     super("Undeclared " + typename + " '" + name + "'!", location);
   }
+  
+  
+  //#########################################################################
+  //# Static Class Variables
+  public static final long serialVersionUID = 1;
 
 }

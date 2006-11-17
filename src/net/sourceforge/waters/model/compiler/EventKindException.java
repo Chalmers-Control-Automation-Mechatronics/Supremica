@@ -4,7 +4,7 @@
 //# PACKAGE: waters.model.base
 //# CLASS:   EventKindException
 //###########################################################################
-//# $Id: EventKindException.java,v 1.3 2006-11-03 15:01:57 torda Exp $
+//# $Id: EventKindException.java,v 1.4 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -159,5 +159,10 @@ public class EventKindException extends EvalException {
   private final EventValue mEvent;
   private final int mIndex;
   private final RangeValue mDeclRange;
+  
+  
+  //#########################################################################
+  //# Static Class Variables
+  public static final long serialVersionUID = 1;
 
 }

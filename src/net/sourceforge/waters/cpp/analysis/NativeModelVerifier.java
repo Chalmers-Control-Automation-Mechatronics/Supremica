@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeModelVerifier
 //###########################################################################
-//# $Id: NativeModelVerifier.java,v 1.4 2006-11-15 01:26:40 robi Exp $
+//# $Id: NativeModelVerifier.java,v 1.5 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;
@@ -37,7 +37,6 @@ public abstract class NativeModelVerifier
 			     final ProductDESProxyFactory factory)
   {
     super(model, factory);
-    mStateLimit = Integer.MAX_VALUE;
     mResult = null;
   }
 
@@ -94,7 +93,6 @@ public abstract class NativeModelVerifier
 
   //#########################################################################
   //# Data Members
-  private int mStateLimit;
   private VerificationResult mResult;
 
 }

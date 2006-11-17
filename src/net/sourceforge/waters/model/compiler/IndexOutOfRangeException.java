@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   IndexOutOfRangeException
 //###########################################################################
-//# $Id: IndexOutOfRangeException.java,v 1.2 2005-11-03 01:24:15 robi Exp $
+//# $Id: IndexOutOfRangeException.java,v 1.3 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -104,5 +104,10 @@ public class IndexOutOfRangeException extends EvalException {
   //# Data Members
   private final Value mValue;
   private final RangeValue mRange;
+  
+  
+  //#########################################################################
+  //# Static Class Variables
+  public static final long serialVersionUID = 1;
  
 }

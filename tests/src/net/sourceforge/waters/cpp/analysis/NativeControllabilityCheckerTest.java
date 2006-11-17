@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeControllabilityCheckerTest
 //###########################################################################
-//# $Id: NativeControllabilityCheckerTest.java,v 1.7 2006-11-08 22:55:25 robi Exp $
+//# $Id: NativeControllabilityCheckerTest.java,v 1.8 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;
@@ -15,7 +15,6 @@ import junit.framework.TestSuite;
 import net.sourceforge.waters.model.analysis.
   AbstractControllabilityCheckerTest;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
-import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 

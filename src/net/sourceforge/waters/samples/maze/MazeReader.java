@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   MazeReader
 //###########################################################################
-//# $Id: MazeReader.java,v 1.3 2006-02-20 22:20:22 robi Exp $
+//# $Id: MazeReader.java,v 1.4 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 
@@ -93,16 +93,16 @@ class MazeReader
       mLineNo = 1;
       mSquares = new HashMap<Point,Square>();
       while (hasMoreSquares()) {
-	final String description = nextSquare();
-	final Square square = parseSquare(description);
+        final String description = nextSquare();
+        parseSquare(description);
       }
       final Collection<Square> squares = mSquares.values();
       if (mMinX < 0 || mMinY < 0) {
-	for (final Square square : squares) {
-	  final Point pos = square.getPosition();
-	  pos.x -= mMinX;
-	  pos.y -= mMinY;
-	}
+        for (final Square square : squares) {
+          final Point pos = square.getPosition();
+          pos.x -= mMinX;
+          pos.y -= mMinY;
+        }
       }
       return new Maze(name, squares);
     } finally {

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   JAXBTestCase
 //###########################################################################
-//# $Id: CompilerTest.java,v 1.11 2006-11-15 01:26:40 robi Exp $
+//# $Id: CompilerTest.java,v 1.12 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -95,7 +95,7 @@ public class CompilerTest
         (modname, null, null,
          paramList, aliasList, eventList, proxyList,
          Collections.singletonList(instance));
-      final ProductDESProxy des = compile(module);
+      compile(module);
       fail("Expected InstantiationException not caught!");
     } catch (final InstantiationException exception) {
       final String culprit = "'" + instname + "'";

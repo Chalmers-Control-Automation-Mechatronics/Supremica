@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   WatersUnmarshalException
 //###########################################################################
-//# $Id: WatersUnmarshalException.java,v 1.3 2006-02-20 22:20:21 robi Exp $
+//# $Id: WatersUnmarshalException.java,v 1.4 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -98,5 +98,10 @@ public class WatersUnmarshalException extends WatersException {
     super("Failed to load file '" + filename + "'" +
           (cause == null ? "!" : ": " + cause));
   }
+  
+  
+  //#########################################################################
+  //# Static Class Variables
+  public static final long serialVersionUID = 1;
 
 }

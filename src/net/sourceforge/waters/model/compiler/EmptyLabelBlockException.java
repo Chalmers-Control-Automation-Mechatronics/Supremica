@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   EmptyLabelBlockException
 //###########################################################################
-//# $Id: EmptyLabelBlockException.java,v 1.3 2006-03-23 16:06:03 flordal Exp $
+//# $Id: EmptyLabelBlockException.java,v 1.4 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -23,16 +23,17 @@ public class EmptyLabelBlockException extends EvalException {
    */
   public EmptyLabelBlockException()
   {
+    mComponentName = null;
   }
 
   /**
    * Constructs a new exception indicating the the specified edge has no
    * labels.
    */
-  public EmptyLabelBlockException(final EdgeProxy edge, String componentName)
+  public EmptyLabelBlockException(final EdgeProxy edge, final String compname)
   {
     super(edge);
-    this.componentName = componentName;
+    mComponentName = compname;
   }
 
 
@@ -48,9 +49,18 @@ public class EmptyLabelBlockException extends EvalException {
       final NodeProxy target = edge.getTarget();
       return
         "No labels on transition from " + source.getName() + " to " +
-        target.getName() + " in " + componentName + ".";
+        target.getName() + " in " + mComponentName + ".";
     }
   }
 
-  private String componentName = null;
+
+  //#########################################################################
+  //# Static Class Variables
+  private final String mComponentName;
+  
+  
+  //#########################################################################
+  //# Static Class Variables
+  public static final long serialVersionUID = 1;
+
 }

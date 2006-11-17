@@ -3,7 +3,7 @@
 //# PACKAGE: waters.model.base
 //# CLASS:   MazeSyntaxException
 //###########################################################################
-//# $Id: MazeSyntaxException.java,v 1.1 2005-02-17 01:43:35 knut Exp $
+//# $Id: MazeSyntaxException.java,v 1.2 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
@@ -50,5 +50,10 @@ public class MazeSyntaxException extends IOException {
     super(cause == null ? null : cause.toString());
     initCause(cause);
   }
+
+  
+  //#########################################################################
+  //# Static Class Variables
+  public static final long serialVersionUID = 1;
 
 }

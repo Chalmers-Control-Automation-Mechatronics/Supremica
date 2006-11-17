@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   MonolithicLanguageInclusionCheckerTest
 //###########################################################################
-//# $Id: MonolithicLanguageInclusionCheckerTest.java,v 1.1 2006-11-09 06:30:01 robi Exp $
+//# $Id: MonolithicLanguageInclusionCheckerTest.java,v 1.2 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.monolithic;
@@ -15,7 +15,6 @@ import junit.framework.TestSuite;
 import net.sourceforge.waters.model.analysis.
   AbstractLanguageInclusionCheckerTest;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
-import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 

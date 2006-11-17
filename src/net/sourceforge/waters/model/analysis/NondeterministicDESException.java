@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   NondeterministicDESException
 //###########################################################################
-//# $Id: NondeterministicDESException.java,v 1.1 2006-11-15 01:26:40 robi Exp $
+//# $Id: NondeterministicDESException.java,v 1.2 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -60,5 +60,10 @@ public class NondeterministicDESException extends AnalysisException {
           "' originating from state '" + state.getName() +
           "' in automaton '" + aut.getName() + "'!");
   }
+  
+  
+  //#########################################################################
+  //# Static Class Variables
+  public static final long serialVersionUID = 1;
 
 }

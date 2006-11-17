@@ -4,32 +4,40 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-public class EdgesHashMap extends HashMap<String,List<EdgeNode>> {
+public class EdgesHashMap extends HashMap<String, List<EdgeNode>>
+{
 
-	// constructor
+  // constructor
 
-	public EdgesHashMap() {
+  public EdgesHashMap() {
 
-	}
+  }
 
-	public void add(final String event, final String begin, final String end, final String guard, final String action) {
+  public void add(final String event, final String begin, final String end,
+      final String guard, final String action)
+  {
 
-		List<EdgeNode> EdgesList;
-		EdgeNode EdgeN;
+    List<EdgeNode> EdgesList;
+    EdgeNode EdgeN;
 
-		if (this.containsKey(event)) {
+    if (this.containsKey(event)) {
 
-			EdgesList = get(event);
+      EdgesList = get(event);
 
-		} else {
+    } else {
 
-			EdgesList = new LinkedList<EdgeNode>();
+      EdgesList = new LinkedList<EdgeNode>();
 
-		}
+    }
 
-		EdgeN = new EdgeNode(begin, end, guard, action);
-		EdgesList.add(EdgeN);
-		this.put(event, EdgesList);
-	}
+    EdgeN = new EdgeNode(begin, end, guard, action);
+    EdgesList.add(EdgeN);
+    this.put(event, EdgesList);
+  }
+  
+  
+  //#########################################################################
+  //# Static Class Variables
+  public static final long serialVersionUID = 1;
 
 }

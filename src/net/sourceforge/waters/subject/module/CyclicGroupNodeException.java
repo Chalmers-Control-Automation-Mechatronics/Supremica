@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   CyclicGroupNodeException
 //###########################################################################
-//# $Id: CyclicGroupNodeException.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: CyclicGroupNodeException.java,v 1.3 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -71,5 +71,10 @@ public class CyclicGroupNodeException extends ModelException {
   //#########################################################################
   //# Data Members
   private String mOperation;
+
+  
+  //#########################################################################
+  //# Static Class Variables
+  public static final long serialVersionUID = 1;
 
 }

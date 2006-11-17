@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularControllabilityChecker
 //###########################################################################
-//# $Id: ModularControllabilityChecker.java,v 1.4 2006-11-15 01:41:48 robi Exp $
+//# $Id: ModularControllabilityChecker.java,v 1.5 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 
@@ -36,11 +36,8 @@ import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
-import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.plain.des.ProductDESElement;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-import net.sourceforge.waters.plain.des.SafetyTraceElement;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -53,7 +50,6 @@ public class ModularControllabilityChecker
   private final ControllabilityChecker mChecker;
   private ModularHeuristic mHeuristic;
   private KindTranslator mTranslator;
-  private int mStates;
   
   public ModularControllabilityChecker(ProductDESProxy model,
                                        ProductDESProxyFactory factory,
@@ -64,7 +60,6 @@ public class ModularControllabilityChecker
     mChecker = checker;
     mHeuristic = heuristic;
     mTranslator = IdenticalKindTranslator.getInstance();
-    mStates = 0;
   }
   
   public SafetyTraceProxy getCounterExample()
@@ -87,7 +82,6 @@ public class ModularControllabilityChecker
   {
     mChecker.setStateLimit(getStateLimit());
 
-    mStates = 0;
     final Set<AutomatonProxy> plants = new HashSet<AutomatonProxy>();
     final SortedSet<AutomatonProxy> specs = 
       new TreeSet<AutomatonProxy>(new Comparator<AutomatonProxy>() {
@@ -176,7 +170,6 @@ public class ModularControllabilityChecker
   public static void main(String[] args) throws Exception
   {
     ProductDESProxyFactory mProductDESProxyFactory = ProductDESElementFactory.getInstance();
-    JAXBTraceMarshaller mTraceMarshaller = new JAXBTraceMarshaller(mProductDESProxyFactory);
     JAXBProductDESMarshaller mProductDESMarshaller =
       new JAXBProductDESMarshaller(mProductDESProxyFactory);
     ModuleProxyFactory mModuleProxyFactory = ModuleElementFactory.getInstance();

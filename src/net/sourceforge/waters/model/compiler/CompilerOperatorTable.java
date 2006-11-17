@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompilerOperatorTable
 //###########################################################################
-//# $Id: CompilerOperatorTable.java,v 1.6 2006-09-12 14:32:16 robi Exp $
+//# $Id: CompilerOperatorTable.java,v 1.7 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -25,7 +25,7 @@ import net.sourceforge.waters.model.expr.Value;
 /**
  * The operator table used by the EFA compilers.
  * In addition to providing access to operators by names as defined by
- * the {@link net.sourceforge.waters.model.expr.OperatorTable OperatorTable}
+ * the {@link OperatorTable}
  * interface, this class facilitates semantic access to logical and
  * assignment operators.
  * 
@@ -1131,7 +1131,6 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   private static final int PRIORITY_AND = 40;
   private static final int PRIORITY_OR = 30;
   private static final int PRIORITY_ASSIGNMENT = 20;
-  private static final int PRIORITY_OUTER = OperatorTable.PRIORITY_OUTER;
 
   private static final int OPCHAR_MIN = 32;
   private static final int OPCHAR_MAX = 128;

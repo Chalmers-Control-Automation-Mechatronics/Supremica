@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ExpressionParser
 //###########################################################################
-//# $Id: ExpressionParser.java,v 1.8 2006-09-06 11:52:21 robi Exp $
+//# $Id: ExpressionParser.java,v 1.9 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -609,7 +609,6 @@ public class ExpressionParser {
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final ExpressionScanner mScanner;
-  private boolean mHasExplicitParentheses;
 
   private static final String TYPENAME_INT = "INTEGER";
   private static final String TYPENAME_BOOLEAN = "BOOLEAN";

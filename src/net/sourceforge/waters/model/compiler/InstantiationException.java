@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   InstantiationException
 //###########################################################################
-//# $Id: InstantiationException.java,v 1.3 2005-11-03 01:24:15 robi Exp $
+//# $Id: InstantiationException.java,v 1.4 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -46,5 +46,10 @@ public class InstantiationException extends EvalException {
     }
     return buffer.toString();
   }
+
+  
+  //#########################################################################
+  //# Static Class Variables
+  public static final long serialVersionUID = 1;
 
 }

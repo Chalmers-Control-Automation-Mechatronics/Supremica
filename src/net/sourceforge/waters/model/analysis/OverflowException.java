@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   OverflowException
 //###########################################################################
-//# $Id: OverflowException.java,v 1.1 2006-11-15 01:26:40 robi Exp $
+//# $Id: OverflowException.java,v 1.2 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -66,5 +66,10 @@ public class OverflowException extends AnalysisException {
   //#########################################################################
   //# Data Members
   private final int mLimit;
+  
+  
+  //#########################################################################
+  //# Static Class Variables
+  public static final long serialVersionUID = 1;
 
 }

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller;
 //# CLASS:   BadFileTypeException
 //###########################################################################
-//# $Id: BadFileTypeException.java,v 1.3 2006-02-20 22:20:21 robi Exp $
+//# $Id: BadFileTypeException.java,v 1.4 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -67,5 +67,10 @@ public class BadFileTypeException extends WatersUnmarshalException {
   {
     this("Can't determine contents type for file '" + filename + "'!");
   }
+
+  
+  //#########################################################################
+  //# Static Class Variables
+  public static final long serialVersionUID = 1;
 
 }

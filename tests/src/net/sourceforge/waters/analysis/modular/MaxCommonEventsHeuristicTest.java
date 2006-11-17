@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   MonolithicControllabilityCheckerTest
 //###########################################################################
-//# $Id: MaxCommonEventsHeuristicTest.java,v 1.2 2006-11-13 03:58:13 robi Exp $
+//# $Id: MaxCommonEventsHeuristicTest.java,v 1.3 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;
@@ -12,8 +12,8 @@ package net.sourceforge.waters.analysis.modular;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.monolithic.
-  MonolithicControllabilityChecker;
+//import net.sourceforge.waters.analysis.monolithic.
+//  MonolithicControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.
   NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.

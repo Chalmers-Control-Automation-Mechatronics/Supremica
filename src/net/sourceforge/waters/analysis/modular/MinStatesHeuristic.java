@@ -1,15 +1,15 @@
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.model.des.EventProxy;
-import java.util.Comparator;
-import net.sourceforge.waters.model.des.TraceProxy;
-import java.util.Set;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.model.analysis.KindTranslator;
-import java.util.Collections;
-import net.sourceforge.waters.model.des.AutomatonProxy;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Set;
+
+import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
+
 
 public class MinStatesHeuristic
   extends AbstractModularHeuristic

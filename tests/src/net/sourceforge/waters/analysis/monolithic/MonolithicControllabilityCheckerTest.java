@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   MonolithicControllabilityCheckerTest
 //###########################################################################
-//# $Id: MonolithicControllabilityCheckerTest.java,v 1.3 2006-11-08 22:55:25 robi Exp $
+//# $Id: MonolithicControllabilityCheckerTest.java,v 1.4 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.monolithic;
@@ -15,7 +15,6 @@ import junit.framework.TestSuite;
 import net.sourceforge.waters.model.analysis.
   AbstractControllabilityCheckerTest;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
-import net.sourceforge.waters.model.analysis.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 

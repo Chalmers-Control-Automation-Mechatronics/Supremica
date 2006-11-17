@@ -47,8 +47,6 @@ public class ToModelJUnit extends AbstractModuleProxyVisitor {
 
 	private String filePath;
 
-	private String packagePath;
-
 	private String mFSMname;
 
 	private String mFullJavafilename;

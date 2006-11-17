@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   NodeSetSubjectTest
 //###########################################################################
-//# $Id: NodeSetSubjectTest.java,v 1.1 2006-09-20 16:24:13 robi Exp $
+//# $Id: NodeSetSubjectTest.java,v 1.2 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 
@@ -138,7 +138,7 @@ public class NodeSetSubjectTest extends AbstractWatersTest
     try {
       final NodeSubject[] array = {mNode1, mNode2, mGroup1};
       final List<NodeSubject> testlist = createTestList(array);
-      final GraphSubject graph = createGraph(testlist);
+      createGraph(testlist);
       final Set<NodeSubject> children1 =
         mGroup1.getImmediateChildNodesModifiable();
       children1.add(mNode3);

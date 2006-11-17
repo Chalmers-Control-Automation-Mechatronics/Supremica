@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractControllabilityCheckerTest
 //###########################################################################
-//# $Id: AbstractControllabilityCheckerTest.java,v 1.5 2006-11-16 01:08:50 robi Exp $
+//# $Id: AbstractControllabilityCheckerTest.java,v 1.6 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -12,8 +12,6 @@ package net.sourceforge.waters.model.analysis;
 import java.util.Collection;
 import java.util.List;
 import java.util.LinkedList;
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
 import net.sourceforge.waters.model.analysis.ModelVerifier;

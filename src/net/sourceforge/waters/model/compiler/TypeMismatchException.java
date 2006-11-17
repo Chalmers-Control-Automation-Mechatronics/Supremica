@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   TypeMismatchException
 //###########################################################################
-//# $Id: TypeMismatchException.java,v 1.2 2005-11-03 01:24:15 robi Exp $
+//# $Id: TypeMismatchException.java,v 1.3 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -62,5 +62,10 @@ public class TypeMismatchException extends EvalException {
           "' (evaluated to " + subvalue + ") is not of type " +
           typename + "!", expr);
   }
+  
+  
+  //#########################################################################
+  //# Static Class Variables
+  public static final long serialVersionUID = 1;
 
 }

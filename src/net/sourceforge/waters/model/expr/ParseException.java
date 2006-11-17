@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   ParseException
 //###########################################################################
-//# $Id: ParseException.java,v 1.4 2005-11-03 01:24:16 robi Exp $
+//# $Id: ParseException.java,v 1.5 2006-11-17 03:38:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -107,5 +107,10 @@ public class ParseException extends WatersException
   //#########################################################################
   //# Data Members
   private final int mPosition;
+  
+  
+  //#########################################################################
+  //# Static Class Variables
+  public static final long serialVersionUID = 1;
 
 }
