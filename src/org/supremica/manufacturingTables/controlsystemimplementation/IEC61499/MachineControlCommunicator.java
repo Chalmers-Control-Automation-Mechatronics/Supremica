@@ -323,6 +323,8 @@ public class MachineControlCommunicator extends MachineController
 				   + currentEOP.getId());
 		// Telling the real or simulated machine to perform the operation:
 		machine.startMachineOperation(currentEOP.getId());
+		System.out.println("No more events for machine " + machine.getName());
+
 	    }
 	    else if (!currentEOP.hasMoreActions())
 	    {

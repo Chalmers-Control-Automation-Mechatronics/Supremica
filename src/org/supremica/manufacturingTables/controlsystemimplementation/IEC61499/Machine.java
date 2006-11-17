@@ -59,6 +59,8 @@
  */
 package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
+import net.sourceforge.fuber.demo.MachineThread;
+
 public class Machine implements Listener
 {
     protected final String [] types = {"Conveyor", "Robot", "Memory", "Fixture", "TurnTable", "Other"};
@@ -81,7 +83,7 @@ public class Machine implements Listener
     public void setThread(MachineThread machineThread)
     {
 	this.machineThread = machineThread;
-	this.machineThread.register(this);
+	//this.machineThread.register(this);
     }
 
     // To communicate with the simulated or real machine, via Fuber

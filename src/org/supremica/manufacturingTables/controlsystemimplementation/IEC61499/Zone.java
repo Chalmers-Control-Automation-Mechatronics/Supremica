@@ -58,6 +58,8 @@
  */
 package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
+import net.sourceforge.fuber.demo.ZoneThread;
+
 public class Zone implements Listener
 {
     public static final String FREE_ZONE_TOKEN = 
@@ -87,7 +89,7 @@ public class Zone implements Listener
     public void setThread(ZoneThread zoneThread)
     {
 	this.zoneThread = zoneThread;
-	this.zoneThread.register(this);
+	//this.zoneThread.register(this);
     }
  
     public synchronized void receiveMessage(Message msg)

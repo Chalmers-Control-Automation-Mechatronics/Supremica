@@ -58,6 +58,7 @@
  */
 package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
+import net.sourceforge.fuber.demo.CoordinatorThread;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Collections;
@@ -139,7 +140,7 @@ public class Coordinator
 		for (MachineCoordinator machineCoordinator : machineCoordinators.values())
 		{
 		    //		    machineCoordinator.start();
-		    coordinatorThread.start( machineCoordinator.getMachine() );
+		    coordinatorThread.startMC( machineCoordinator.getMachine() );
 		}
 	    }
 	else 

@@ -58,6 +58,7 @@
  */
 package org.supremica.manufacturingTables.controlsystemimplementation.IEC61499;
 
+import net.sourceforge.fuber.demo.MachineCoordinatorThread;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
@@ -94,7 +95,7 @@ public class MachineCoordinator implements Listener
     public void setThread(MachineCoordinatorThread machineCoordinatorThread)
     {
 	this.machineCoordinatorThread = machineCoordinatorThread;
-	this.machineCoordinatorThread.register(this);
+	//this.machineCoordinatorThread.register(this);
     }
 
     public String getMachine()
@@ -161,6 +162,7 @@ public class MachineCoordinator implements Listener
 		    //System.out.println("All Predecessors not yet fulfulled in machine " + machine + " for operation "
 		    //	       + currentActivity.getOperation() + ", at least not " + predecessor.getID());
 		    // We (still) have to wait for operations from other machines
+		    System.out.println("Predecessors, so no more events for machine " + currentCOP.getMachine());
 		    return;
 		}
 	    }
@@ -174,7 +176,6 @@ public class MachineCoordinator implements Listener
 	
 	// Time to run the operation (EOP)
 	machineCoordinatorThread.send( new Message( getID(), currentCOP.getMachine(), "performEOP", currentActivity.getOperation() ) );
-	
 	// Now we will wait for the Machine to report back
     }
 
