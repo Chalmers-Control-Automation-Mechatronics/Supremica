@@ -139,7 +139,9 @@ public class Coordinator
 		
 		for (MachineCoordinator machineCoordinator : machineCoordinators.values())
 		{
-		    //		    machineCoordinator.start();
+		    //machineCoordinator.start();
+		    // The row below is not perfect... since we contact the machineCoordinator both by
+		    // reference and via the Functionblocks.
 		    coordinatorThread.startMC( machineCoordinator.getMachine() );
 		}
 	    }

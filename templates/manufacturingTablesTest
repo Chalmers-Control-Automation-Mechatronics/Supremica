@@ -1,3 +1,3 @@
 #/bin/sh
 
-java -enableassertions org.supremica.manufacturingTables.management.Main  $*
+java Supremica.jar:SupremicaLib.jar:..\..\Fuber\build -enableassertions org.supremica.manufacturingTables.management.Main  $*

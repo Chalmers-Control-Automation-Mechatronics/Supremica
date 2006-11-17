@@ -359,7 +359,8 @@ public class MachineControlCommunicator extends MachineController
 	}
 	else
 	{
-	    System.err.println("Wrong operation performed by Machine " + machine.getName() + "!!!");
+	    //System.err.println("Wrong operation performed by Machine " + machine.getName() + "!!!");
+	    // Ignore, since Fuber sends, broadcasts, this operation to all machines.
 	}
     }
        

@@ -82,6 +82,7 @@ public class Zone implements Listener
 	zoneThread = null;
 	this.zoneName = zoneName;
 	//	zoneThread.register(this);
+	//mailbox.register(this);
 	booked = false;
 	bookingMachine = null;
     }
@@ -102,19 +103,25 @@ public class Zone implements Listener
 	    if (booked && bookingMachine.equals(msg.getSender()))
 	    {
 		System.err.println("Zone " + zoneName + " is booked by the requesting machine.");
+		
 		zoneThread.send( new Message( zoneName, msg.getSender(), "reportZoneState", BOOKED_ZONE_TOKEN ) );
+		//mailbox.send( new Message( zoneName, msg.getSender(), "reportZoneState", BOOKED_ZONE_TOKEN ) );
 	    }
 	    // Is the zone free?
 	    else if (!booked)
 	    {
 		System.err.println("Zone " + zoneName + " reports that the zone is free.");
+		
 		zoneThread.send( new Message( zoneName, msg.getSender(), "reportZoneState", FREE_ZONE_TOKEN ) );
+		//mailbox.send( new Message( zoneName, msg.getSender(), "reportZoneState", FREE_ZONE_TOKEN ) );
 	    }
 	    // Here the zone is occupied by another machine
 	    else
 	    {
 		System.err.println("Zone " + zoneName + " is occupied by another machine: " + bookingMachine);
+		
 		zoneThread.send( new Message( zoneName, msg.getSender(), "reportZoneState", OCCUPIED_ZONE_TOKEN ) );
+		//mailbox.send( new Message( zoneName, msg.getSender(), "reportZoneState", OCCUPIED_ZONE_TOKEN ) );
 	    }
 	}
 	// Check ZoneState
@@ -123,18 +130,24 @@ public class Zone implements Listener
 	    // Checking if the zone is free, and it is 
 	    if ( ( (String) msg.getContent() ).equals( FREE_ZONE_TOKEN ) && !booked )
 	    {
+		
 		zoneThread.send( new Message( zoneName, msg.getSender(), "confirmZoneState", true ) );
+		//mailbox.send( new Message( zoneName, msg.getSender(), "confirmZoneState", true ) );
 	    }
 	    // Checking if the zone is booked by this machine, and it is
 	    else if ( ( (String) msg.getContent() ).equals( BOOKED_ZONE_TOKEN ) && booked
 		      && bookingMachine.equals(msg.getSender()) )
 	    {
+		
 		zoneThread.send( new Message( zoneName, msg.getSender(), "confirmZoneState", true ) );
+		//mailbox.send( new Message( zoneName, msg.getSender(), "confirmZoneState", true ) );
 	    }
 	    // Otherwise the zone is not in the expected state
 	    else
 	    {
+	
 		zoneThread.send( new Message( zoneName, msg.getSender(), "confirmZoneState", false ) );
+		//mailbox.send( new Message( zoneName, msg.getSender(), "confirmZoneState", false ) );
 	    }
 	}
 	//Order ZoneState
@@ -172,11 +185,15 @@ public class Zone implements Listener
 		else 
 		{
 		    System.err.println("The zone " + zoneName + " is booked by another machine: " + bookingMachine);
+		    
 		    zoneThread.send( new Message( zoneName, msg.getSender(), "confirmZoneState", false ) );
+		    //mailbox.send( new Message( zoneName, msg.getSender(), "confirmZoneState", false ) );
 		    return;
 		}
 	    }
+	    
 	    zoneThread.send( new Message( zoneName, msg.getSender(), "confirmZoneState", true ) );
+	    //mailbox.send( new Message( zoneName, msg.getSender(), "confirmZoneState", true ) );
 	}
 	
 	else

@@ -81,6 +81,7 @@ public class MachineCoordinator implements Listener
     {
 	this.machine = machine;
 	this.mailbox = mailbox;
+	//mailbox.register(this);
 	this.coordinator = coordinator;
 	this.machineCoordinatorThread = null;
 	performsCOP = false;
@@ -175,7 +176,10 @@ public class MachineCoordinator implements Listener
 	}
 	
 	// Time to run the operation (EOP)
+	
 	machineCoordinatorThread.send( new Message( getID(), currentCOP.getMachine(), "performEOP", currentActivity.getOperation() ) );
+	//mailbox.send( new Message( getID(), currentCOP.getMachine(), "performEOP", currentActivity.getOperation() ) );
+	
 	// Now we will wait for the Machine to report back
     }
 
@@ -223,7 +227,9 @@ public class MachineCoordinator implements Listener
 		    performsCOP = false;
 		    System.out.println("The COP " + currentCOP.getID() + " is done!");
 		    //machineCoordinatorThread.send( new Message( getID(), "Coordinator", "COPDone", true ) );
+		    
 		    machineCoordinatorThread.COPDone(machine, true);
+		    //coordinator.COPDone(machine, true);
 		}
 
 		// Handle successors, it is OK to do here after the COP might be done
@@ -234,8 +240,11 @@ public class MachineCoordinator implements Listener
 			// System.err.println("Sending message to machine " +  successor.getMachine() 
 			//   + " that predecessing operation " + performedOperation
 			//   + " in machine " + machine + " is done!"); 
+		
 			machineCoordinatorThread.send( new Message( getID(), "Coordinator" + successor.getMachine(), "operationDone", 
-						   new COPPredecessor(performedOperation, machine) ) );
+								    new COPPredecessor(performedOperation, machine) ) );
+			//mailbox.send( new Message( getID(), "Coordinator" + successor.getMachine(), "operationDone", 
+			//		   new COPPredecessor(performedOperation, machine) ) );
 		    }
 		}
 
@@ -251,7 +260,9 @@ public class MachineCoordinator implements Listener
 		System.err.print("The EOP could not be performed!");
 		System.err.println(" (says message sender: " + msg.getSender() + ")");
 		//machineCoordinatorThread.send( new Message( getID(), "Coordinator", "COPDone", false ) );
+	
 		machineCoordinatorThread.COPDone(machine, false);
+		//coordinator.COPDone(machine, false);
 		performsCOP = false;
 	    }
 	}

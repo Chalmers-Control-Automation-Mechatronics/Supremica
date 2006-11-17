@@ -79,6 +79,7 @@ public class Machine implements Listener
 	this.cellMailbox = cellMailbox;
 	this.machineThread = null;
 	//	machineThread.register(this);
+	//cellMailbox.register(this);
     }
     public void setThread(MachineThread machineThread)
     {
@@ -90,6 +91,8 @@ public class Machine implements Listener
     public void startMachineOperation(String operationName)
     {
 	machineThread.startMachineOperation(operationName);
+	// testRow:
+	//finishedMachineOperation(operationName);	
     }
 
     // The simulated or real machine has finished the operation
@@ -110,12 +113,15 @@ public class Machine implements Listener
 	{
 	    System.err.println("Machine " +name+ " performing EOP " + msg.getContent() + " .");
 	    boolean EOPperformedOK = machineController.performEOP( (String) msg.getContent() );
+	    
 	    machineThread.send( new Message( name,  msg.getSender(), "EOPDone", EOPperformedOK ) );
+	    //cellMailbox.send( new Message( name,  msg.getSender(), "EOPDone", EOPperformedOK ) );
 	    
 	}
 	else if (msg.getType().equals("externalCheckOfComponent"))
 	{
 	    machineThread.send( new Message( name, msg.getSender(), "confirmExternalComponent", machineController.checkComponent( (ComponentCheck) msg.getContent() ) ) );
+	    //cellMailbox.send( new Message( name, msg.getSender(), "confirmExternalComponent", machineController.checkComponent( (ComponentCheck) msg.getContent() ) ) );
 	}
 	else if (msg.getType().equals("confirmExternalComponent"))
 	{
@@ -124,6 +130,7 @@ public class Machine implements Listener
 	else if (msg.getType().equals("externalRequestOfComponent"))
 	{
 	    machineThread.send( new Message( name, msg.getSender(), "reportExternalComponent", machineController.requestComponent( (String) msg.getContent() ) ) );
+	    //cellMailbox.send( new Message( name, msg.getSender(), "reportExternalComponent", machineController.requestComponent( (String) msg.getContent() ) ) );
 	}
 	else if (msg.getType().equals("reportExternalComponent"))
 	{
@@ -146,26 +153,31 @@ public class Machine implements Listener
     public void checkExternalComponent(String machine, String componentName, String value)
     {
 	machineThread.send( new Message( name, machine, "externalCheckOfComponent", new ComponentCheck(componentName, value) ) ); 
+	//cellMailbox.send( new Message( name, machine, "externalCheckOfComponent", new ComponentCheck(componentName, value) ) ); 
     }
-
+    
     public void requestExternalComponent(String machine, String componentName)
     {
 	machineThread.send( new Message( name, machine, "externalRequestOfComponent", componentName ) ); 
+	//cellMailbox.send( new Message( name, machine, "externalRequestOfComponent", componentName ) ); 
     }
     
     public void orderZone(String zone, String state)
     {
 	machineThread.send( new Message( name, zone, "orderState", state ) );
+	//cellMailbox.send( new Message( name, zone, "orderState", state ) );
     }
 
     public void checkZone(String zone, String state)
     {
 	machineThread.send( new Message( name, zone, "checkState", state ) );
+	//cellMailbox.send( new Message( name, zone, "checkState", state ) );
     }
 
     public void requestZone(String zone)
     {
 	machineThread.send( new Message( name, zone, "requestState", null ) );
+	//cellMailbox.send( new Message( name, zone, "requestState", null ) );
     }
 
     public String getName()
