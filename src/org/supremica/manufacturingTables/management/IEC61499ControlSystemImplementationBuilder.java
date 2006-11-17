@@ -69,6 +69,8 @@ import java.util.Map.Entry;
 import org.supremica.manufacturingTables.controlsystemdata.*;
 import org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.*;
 
+import net.sourceforge.fuber.model.Device;
+
 public class IEC61499ControlSystemImplementationBuilder extends ControlSystemImplementationBuilder
 {
     // Objects needed in the Fuber application:
@@ -421,7 +423,7 @@ public class IEC61499ControlSystemImplementationBuilder extends ControlSystemImp
 	{
 	    machineCoordinators.add(machineCoordinator);
 	}
-	//Fuber application = new Fuber(coordinator, machineCoordinators, zones, cellMachines);
+	Device fuberDevice = new Device("DemoDevice", "App.sys", "../../Fuber/fblib", "demo:event", 1, coordinator, machineCoordinators, zones, cellMachines);
     }
     
 //     // Low Level Sensor
