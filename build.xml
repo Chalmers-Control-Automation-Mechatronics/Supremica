@@ -45,6 +45,8 @@
 <property name="logs.reports" location="${logs}/reports"/>
 <property name="logs.results" location="${logs}/results"/>
 
+<property name="fuber" location="../Fuber/build"/>
+
 <!-- Waters -->
 <property name="waters.dir" location="waters"/>
 <property name="waters.examples" location="${examples}/waters"/>
@@ -69,6 +71,7 @@
 
 <path id="supremica.classpath">
   <pathelement location="${dist}/SupremicaLib.jar"/>
+  <pathelement location="${fuber}"/>
 </path>
 
 <!-- Enables emacs warning and error mesages. This is equal to calling jikes +E -->
@@ -255,6 +258,7 @@
          memoryMaximumSize="128M">
     <classpath>    
       <pathelement location="${lib}/${unjared}"/>
+      <pathelement location="${fuber}"/>
     </classpath>
   </javac>
 </target>
