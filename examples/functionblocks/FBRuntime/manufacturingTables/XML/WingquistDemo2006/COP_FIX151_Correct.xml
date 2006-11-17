@@ -30,7 +30,7 @@
                 </Predecessor>	    
 		<Predecessor>
 		     <Machine>R3323</Machine>
-		     <Operation>WeldSeg1rob2</Operation>
+		     <Operation>RobotToWorkPos-23</Operation>
 		 </Predecessor>	    
             </Precondition>
             <Operation>FixtureBackward</Operation> 	

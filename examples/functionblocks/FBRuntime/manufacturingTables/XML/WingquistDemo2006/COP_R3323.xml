@@ -3,9 +3,21 @@
     <Comment></Comment>
     <Relation type ="Sequence">   
        <Activity>	
-            <Operation>WeldSeg1rob2</Operation> 	
+            <Operation>WeldSeg1-23</Operation> 	
         </Activity>
         
+        <Activity>
+	    <Precondition>
+		<Predecessor>
+		     <Machine>FIX151</Machine>
+		     <Operation>FixtureForward</Operation>
+		</Predecessor>	    
+	    </Precondition>	
+            <Operation>RobotToWorkPos-23</Operation> 	
+        </Activity>
+        <Activity>
+            <Operation>WeldSeg2-23</Operation> 	
+        </Activity>
         <Activity>
 	    <Precondition>
 		<Predecessor>
@@ -13,7 +25,7 @@
 		     <Operation>FixtureBackward</Operation>
 		</Predecessor>	    
 	    </Precondition>	
-            <Operation>WeldSeg3rob2</Operation> 	
+            <Operation>WeldSeg3-23</Operation> 	
         </Activity>
     </Relation>
 </ROP>
