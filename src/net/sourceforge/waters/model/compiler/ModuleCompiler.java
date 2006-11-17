@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.54 2006-11-17 03:38:22 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.55 2006-11-17 16:38:23 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1085,6 +1085,73 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
     return null;
   }
 
+  /*
+   * This method will be used to separate plant guards and actions guards.
+   * Both the plant guard and the spec will be converted into dnf. All 
+   * combinations of and-clauses from the plant and spec 
+   * will be used to relabel events. Using this "extended" relabelling 
+   * it will be possible to handle controllability for EFA.
+   */
+  private List<List<List<TransitionProxy>>> plantSpecTransitions
+  (final EventProxy event)
+{
+	  final List<List<List<TransitionProxy>>> PlantSpecTrans =
+	        new LinkedList<List<List<TransitionProxy>>>();
+	  boolean eventButNoTrans= false;
+  final List<List<TransitionProxy>> plantTransitions =
+    new LinkedList<List<TransitionProxy>>();
+  final List<List<TransitionProxy>> specTransitions =
+	    new LinkedList<List<TransitionProxy>>();
+  
+  for (final AutomatonProxy automaton : mAutomata.values()) {
+    final List<TransitionProxy> transInAutomaton =
+      new LinkedList<TransitionProxy>();
+     for (final TransitionProxy transition : automaton.getTransitions()) {
+      if (transition.getEvent() == event) {
+        transInAutomaton.add(transition);
+      } else if (mEFAEventEventMap.get(transition.getEvent()) != null) {
+        if (mEFAEventEventMap.get(transition.getEvent()) == event) {
+          transInAutomaton.add(transition);
+        }
+      }
+    }
+    if (transInAutomaton.isEmpty() &&
+        automaton.getEvents().contains(event)&& 
+		automaton.getKind()== ComponentKind.PLANT) {
+      plantTransitions.clear();
+      specTransitions.clear();
+      break;
+    } 
+    if (transInAutomaton.isEmpty() &&
+            automaton.getEvents().contains(event)&& 
+    		automaton.getKind()== ComponentKind.SPEC) {
+    	eventButNoTrans = true;
+        } 
+    else if (!transInAutomaton.isEmpty()&& 
+    		automaton.getKind()== ComponentKind.PLANT) {
+      plantTransitions.add(transInAutomaton);
+     }
+    else if (!transInAutomaton.isEmpty()&& 
+    		automaton.getKind()== ComponentKind.SPEC) {
+        specTransitions.add(transInAutomaton);
+       }  
+  
+  }
+  
+  List<List<TransitionProxy>> allSpecPaths = allPossiblePaths(specTransitions);
+  List<List<TransitionProxy>> allPlantPaths = allPossiblePaths(specTransitions);
+  
+   PlantSpecTrans.add(0,allPlantPaths);
+   if(eventButNoTrans){
+	   PlantSpecTrans.add(1,null);   
+   }
+   else{
+	   PlantSpecTrans.add(1,allSpecPaths);
+   }
+  
+   return PlantSpecTrans;
+}
+
   private List<List<TransitionProxy>> allPossibleTransitions
     (final EventProxy event)
   {
@@ -1093,13 +1160,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
     }
     final List<List<TransitionProxy>> transitions =
       new LinkedList<List<TransitionProxy>>();
-    /* 
-     * STYRB.
-    final List<Map < ComponentKind,List<TransitionProxy>>> 
-    transitionsWithType =
-        new LinkedList< Map < ComponentKind, List<TransitionProxy>>>();
-    */
-    // It is important that events with different GuardActionBlocks are
+     // It is important that events with different GuardActionBlocks are
     // translated to separate transitions. (mEFATransitions)
     for (final AutomatonProxy automaton : mAutomata.values()) {
       final List<TransitionProxy> transInAutomaton =
@@ -1116,21 +1177,9 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       if (transInAutomaton.isEmpty() &&
           automaton.getEvents().contains(event)) {
         transitions.clear();
-        /*
-         * Please write comments in English, thanks---Robi
-         * STYRB.
-         * H?r blir det annorlunda om vi ska ta h?nsyn till styrbarhet.
-         */
         break;
       } else if (!transInAutomaton.isEmpty()) {
         transitions.add(transInAutomaton);
-        /*
-         * STYRB.
-        Map < ComponentKind, List<TransitionProxy>> typeTransitionMap=
-      	  new TreeMap<ComponentKind, List<TransitionProxy>>();
-        typeTransitionMap.put(automaton.getKind(),transInAutomaton);
-        transitionsWithType.add(typeTransitionMap);
-         */
       }
     }
     List<List<TransitionProxy>> allPaths = allPossiblePaths(transitions);
