@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.96 2006-11-05 15:51:58 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.97 2006-11-17 00:20:09 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -1074,6 +1074,15 @@ public class ControlledSurface
                         EditorLabelBlockPopupMenu(this, label);
                     popup.show(this, e.getX(), e.getY());
                 }
+                if (s instanceof GuardActionBlockSubject)
+                {
+                	GuardActionBlockSubject ga =
+                        (GuardActionBlockSubject) s;
+
+                    EditorGuardActionBlockPopupMenu popup = new
+                        EditorGuardActionBlockPopupMenu(this, ga);
+                    popup.show(this, e.getX(), e.getY());
+                }
             } else {
               final EditorWindowInterface iface = getEditorInterface();
               final EditorSurfacePopupMenu popup =
@@ -1705,6 +1714,17 @@ public class ControlledSurface
                             text.setVisible(true);
                             text.requestFocus();
                         }
+                        if (s instanceof EdgeSubject)
+                        {
+                        	  EditorEditEdgeDialog.showDialog((EdgeSubject) s);
+                        }
+                        if (s instanceof GuardActionBlockSubject)
+                        {
+                        	  GuardActionBlockSubject ga = (GuardActionBlockSubject) s;
+                        	  EdgeSubject edge = (EdgeSubject) s.getParent();
+                        	  EditorEditEdgeDialog.showDialog(edge);
+                        }
+                        
                     }
                 }
             }

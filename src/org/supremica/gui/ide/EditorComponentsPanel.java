@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.33 2006-11-03 15:01:57 torda Exp $
+//# $Id: EditorComponentsPanel.java,v 1.34 2006-11-17 00:20:09 martin Exp $
 //###########################################################################
 
 
@@ -12,6 +12,7 @@ package org.supremica.gui.ide;
 
 import java.awt.event.ActionEvent;
 import javax.swing.tree.*;
+
 import java.util.*;
 
 import net.sourceforge.waters.gui.ComponentInfo;
@@ -225,35 +226,32 @@ class EditorComponentsPanel
         
         if("delete variable".equals(e.getActionCommand()))
         {
-            //edit existing variable
-            TreePath currentSelection = moduleSelectTree.getSelectionPath();
-            if (currentSelection != null)
-            {
-                // Get the node in the tree
-                DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode)
-                (currentSelection.getLastPathComponent());
-                Subject component = ((ComponentInfo)
-                targetNode.getUserObject()).getComponent();
-                
-                if(component instanceof VariableSubject)
-                {
-                    Subject parent = component.getParent().getParent();
-                    
-                    
-                    //mVariable = new VariableSubject(name.getText(), type, initial, marked);
-                    //mComponent.getVariablesModifiable().add(mVariable);
-                    //mTree.addVariable(mVariable);
-                    
-                    System.err.println("Delete variable not implemented");
-                    //EditorEditVariableDialog.showDialog((VariableSubject) component,(SimpleComponentSubject) parent, moduleSelectTree);
-                }
-                else
-                {
-                    System.err.println("ModuleWindow.actionPerformed(): " +
-                        "'delete variable' performed by illegal node type");
-                }
-            }
+        	  TreePath currentSelection = moduleSelectTree.getSelectionPath();
+        	  if (currentSelection != null) 
+        	  {
+        		// Get the node in the tree
+        		DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) (currentSelection.getLastPathComponent());
+        		
+        		//Special treatment for variables
+        		VariableSubject variable = (VariableSubject) ((ComponentInfo) 
+        				targetNode.getUserObject()).getComponent();
+        		
+        		//remove from model (take getParent()x2 because a variableSubject is the child of a list.)
+        		((SimpleComponentSubject) variable.getParent().getParent())
+        		.getVariablesModifiable().remove(variable);
+        		
+        		//remove from module tree view
+        		moduleSelectTree.removeCurrentNode();
+        		return;
+        	  }
+        	
+          	else
+        	  {
+        		System.err.println("ModuleWindow.actionPerformed(): " +
+        		"'delete variable' performed by illegal node type");
+        	  }
         }
+    
         
         if("delete component".equals(e.getActionCommand()))
         {

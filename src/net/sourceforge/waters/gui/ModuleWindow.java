@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.60 2006-11-03 15:01:56 torda Exp $
+//# $Id: ModuleWindow.java,v 1.61 2006-11-17 00:20:09 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -557,6 +557,29 @@ public class ModuleWindow
           }
         }
     }
+    
+    if ("delete variable".equals(e.getActionCommand()))
+    {
+    	  TreePath currentSelection = moduleSelectTree.getSelectionPath();
+    	  if (currentSelection != null) 
+    	  {
+    		// Get the node in the tree
+    		DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) (currentSelection.getLastPathComponent());
+    		
+    		//Special treatment for variables
+    		VariableSubject variable = (VariableSubject) ((ComponentInfo) 
+    				targetNode.getUserObject()).getComponent();
+    		
+    		//remove from model (take getParent()x2 because a variableSubject is the child of a list.)
+    		((SimpleComponentSubject) variable.getParent().getParent())
+    		.getVariablesModifiable().remove(variable);
+    		
+    		//remove from module tree view
+    		moduleSelectTree.removeCurrentNode();
+    		return;
+    	  }
+    }
+    
 
     if ("newforeach".equals(e.getActionCommand()))
       {

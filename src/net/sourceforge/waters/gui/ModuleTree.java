@@ -82,7 +82,32 @@ public class ModuleTree extends JTree {
 		MouseListener ml = new MouseAdapter()
 		{
 			EditorWindowInterface ed = null;
-
+			public void mouseClicked(MouseEvent e)
+			{
+				if (e.getClickCount() == 2)
+				{
+					TreePath selPath = getPathForLocation(e.getX(), e.getY());
+					if(selPath == null) return;
+					
+					mSelfRef.setSelectionPath(selPath);
+					
+					DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+					selPath.getLastPathComponent();
+					if (node == null)
+					{
+						return;
+					}
+					Object nodeInfo = node.getUserObject();
+					
+					AbstractSubject component = (((ComponentInfo) nodeInfo).getComponent());
+					if (component instanceof VariableSubject)
+					{
+						EditorEditVariableDialog.showDialog((VariableSubject) component,
+								(SimpleComponentSubject) component.getParent().getParent(),
+								mSelfRef);
+					}
+				}
+			}
 			public void mousePressed(MouseEvent e)
 			{
 				int selRow = getRowForLocation(e.getX(), e.getY());
