@@ -60,12 +60,14 @@
 <property name="activation.jar" location="${lib}/activation.jar"/>
 <property name="jaxb-api.jar" location="${lib}/jaxb-api.jar"/>
 <property name="jaxb-impl.jar" location="${lib}/jaxb-impl.jar"/>
+<property name="jaxb1-impl.jar" location="${lib}/jaxb1-impl.jar"/>
 <property name="jsr173_api.jar" location="${lib}/jsr173_1.0_api.jar"/>
 
 <path id="jaxb.classpath">
   <pathelement location="${activation.jar}"/>
   <pathelement location="${jaxb-api.jar}"/>
   <pathelement location="${jaxb-impl.jar}"/>
+  <pathelement location="${jaxb1-impl.jar}"/>
   <pathelement location="${jsr173_api.jar}"/>
 </path>
 
@@ -74,13 +76,13 @@
   <pathelement location="${fuber}"/>
 </path>
 
-<!-- Enables emacs warning and error mesages. This is equal to calling jikes +E -->
 <!-- Put this in TextPad to get clickable error messages
 	Expression = ^[ \t]+\[javac\] \([A-Z]:[^:]+\):\([0-9]+\):\([0-9]+\):\([0-9]+\):
 	File Register = 1
 	Line Register = 2
 	Column Register = 3
 -->
+<!-- Enables emacs warning and error mesages. This is equal to calling jikes +E -->
 <property name="build.compiler.emacs" value="true"/>
 <!--
 <property name="build.compiler.pedantic" value="false"/>
@@ -137,16 +139,10 @@
 	<unjar src="${lib}/swixml.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/trove.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${waters.jaxbjar}" dest="${lib}/${unjared}"/>
-        <!-- contains incompatiable javax.xml.bind.Unmarshaller
-	<unjar src="${lib}/fuber.jar" dest="${lib}/${unjared}"/>
-        -->
-        <unjar src="${lib}/automationobjects_jaxb.jar"
-               dest="${lib}/${unjared}"/>
-	<unjar src="${lib}/manufacturingTables_jaxb.jar"
-               dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/manufacturingTables_jaxb.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/itext.jar" dest="${lib}/${unjared}"/>
-	<unjar src="${lib}/java_cup.jar" dest="${lib}/${unjared}"/>	
-	<unjar src="${lib}/bsh.jar" dest="${lib}/${unjared}"/>	
+	<!-- unjar src="${lib}/java_cup.jar" dest="${lib}/${unjared}"/-->	
+	<!-- unjar src="${lib}/bsh.jar" dest="${lib}/${unjared}"/-->	
 	<unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>
 	<unjar src="${lib}/swing-worker.jar" dest="${resources}"/>	
 	<!-- Ant 1.6.0 is not able to unjar empty jar files -->
@@ -160,6 +156,7 @@
 	<unjar src="${activation.jar}" dest="${lib}/${unjared}"/>	
 	<unjar src="${jaxb-api.jar}" dest="${lib}/${unjared}"/>
 	<unjar src="${jaxb-impl.jar}" dest="${lib}/${unjared}"/>
+	<unjar src="${jaxb1-impl.jar}" dest="${lib}/${unjared}"/>
 	<unjar src="${jsr173_api.jar}" dest="${lib}/${unjared}"/>
 </target>
 
@@ -547,14 +544,11 @@ Class-Path: ${manifest.pathlist}</echo>
 <target name="startfiles_local_supremica">
 	<copy file="${templates}/SupremicaJGrafchartLocal" todir="${dist}"/>
 	<chmod file="${dist}/SupremicaJGrafchartLocal" perm="644"/>
-	<copy file="${templates}/SupremicaJGrafchartLocal.cmd"
-	      todir="${dist}"/>
+	<copy file="${templates}/SupremicaJGrafchartLocal.cmd" todir="${dist}"/>
 	<chmod file="${dist}/SupremicaJGrafchartLocal.cmd" perm="644"/>
-	<copy file="${templates}/manufacturingTablesTestLocal"
-	      todir="${dist}"/>
+	<copy file="${templates}/manufacturingTablesTestLocal" todir="${dist}"/>
 	<chmod file="${dist}/manufacturingTablesTestLocal" perm="644"/>
-	<copy file="${templates}/manufacturingTablesTestLocal.cmd"
-	      todir="${dist}"/>
+	<copy file="${templates}/manufacturingTablesTestLocal.cmd" todir="${dist}"/>
 	<chmod file="${dist}/manufacturingTablesTestLocal.cmd" perm="644"/>
 	<copy file="${templates}/IDELocal.cmd" todir="${dist}"/>
 	<chmod file="${dist}/IDELocal.cmd" perm="644"/>
@@ -589,10 +583,8 @@ Class-Path: ${manifest.pathlist}</echo>
 	<chmod file="${dist}/Supremica" perm="755"/>	
 	<copy file="${templates}/Supremica.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/Supremica.cmd" perm="644"/>
-	<copy file="${templates}/Fuber" todir="${dist}"/>	
-	<chmod file="${dist}/Fuber" perm="755"/>
-	<copy file="${templates}/Fuber.cmd" todir="${dist}"/>	
-	<chmod file="${dist}/Fuber.cmd" perm="644"/>
+	<copy file="${templates}/demo" todir="${dist}"/>
+	<chmod file="${dist}/demo" perm="755"/>
 	<copy file="${templates}/manufacturingTablesTest" todir="${dist}"/>
 	<chmod file="${dist}/manufacturingTablesTest" perm="755"/>
 	<copy file="${templates}/manufacturingTablesTest.cmd" todir="${dist}"/>

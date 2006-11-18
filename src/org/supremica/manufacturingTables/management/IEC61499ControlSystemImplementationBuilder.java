@@ -424,6 +424,7 @@ public class IEC61499ControlSystemImplementationBuilder extends ControlSystemImp
 	    machineCoordinators.add(machineCoordinator);
 	}
 	Device fuberDevice = new Device("DemoDevice", "App.sys", "../../Fuber/fblib", "demo:event", 1, coordinator, machineCoordinators, zones, cellMachines);
+	fuberDevice.run();
     }
     
 //     // Low Level Sensor
