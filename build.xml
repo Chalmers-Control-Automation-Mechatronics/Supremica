@@ -53,8 +53,7 @@
 <property name="waters.xml" location="${waters.dir}/xml"/>
 <property name="waters.xsd" location="${waters.xml}/xsd"/>
 <property name="waters.xsl" location="${waters.xml}/xsl"/>
-<property name="waters.jaxbjar"
-  location="${waters.dir}/java/jar/waters_jaxb.jar"/>
+<property name="waters.jaxbjar" location="${waters.dir}/java/jar/waters_jaxb.jar"/>
 
 <!-- JAXB -->
 <property name="activation.jar" location="${lib}/activation.jar"/>
@@ -72,8 +71,8 @@
 </path>
 
 <path id="supremica.classpath">
+  <pathelement location="${fuber}"/>
   <pathelement location="${dist}/SupremicaLib.jar"/>
-  <!--pathelement location="${fuber}"/-->
 </path>
 
 <!-- Put this in TextPad to get clickable error messages
@@ -255,8 +254,8 @@
          fork="true"
          memoryMaximumSize="128M">
     <classpath>    
+	  <pathelement location="${fuber}"/>
       <pathelement location="${lib}/${unjared}"/>
-      <!--pathelement location="${fuber}"/-->
     </classpath>
   </javac>
 </target>
