@@ -73,7 +73,7 @@
 
 <path id="supremica.classpath">
   <pathelement location="${dist}/SupremicaLib.jar"/>
-  <pathelement location="${fuber}"/>
+  <!--pathelement location="${fuber}"/-->
 </path>
 
 <!-- Put this in TextPad to get clickable error messages
@@ -136,6 +136,7 @@
 <!--	<unjar src="${lib}/interfaceRobotStudio3_1.jar" dest="${lib}/${unjared}"/>--> <!-- RobotStudio API. -->
 	<unjar src="${lib}/WMFWriter2D.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/sysutils.jar" dest="${lib}/${unjared}"/>	
+	<unjar src="${lib}/fuber.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/swixml.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/trove.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${waters.jaxbjar}" dest="${lib}/${unjared}"/>
@@ -255,7 +256,7 @@
          memoryMaximumSize="128M">
     <classpath>    
       <pathelement location="${lib}/${unjared}"/>
-      <pathelement location="${fuber}"/>
+      <!--pathelement location="${fuber}"/-->
     </classpath>
   </javac>
 </target>
