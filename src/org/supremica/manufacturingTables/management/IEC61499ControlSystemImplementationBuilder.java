@@ -59,6 +59,8 @@
  */
 package org.supremica.manufacturingTables.management;
 
+import java.io.File;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -423,7 +425,7 @@ public class IEC61499ControlSystemImplementationBuilder extends ControlSystemImp
 	{
 	    machineCoordinators.add(machineCoordinator);
 	}
-	Device fuberDevice = new Device("DemoDevice", "App.sys", "../../Fuber/fblib", "demo:event", 1, coordinator, machineCoordinators, zones, cellMachines);
+	Device fuberDevice = new Device("DemoDevice", "App.sys", ".." + File.separatorChar + ".." + File.separatorChar + "Fuber" + File.separatorChar + "fblib", "demo:event", 1, coordinator, machineCoordinators, zones, cellMachines);
 	fuberDevice.run();
     }
     
