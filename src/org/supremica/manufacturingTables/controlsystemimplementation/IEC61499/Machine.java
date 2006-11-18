@@ -146,7 +146,7 @@ public class Machine implements Listener
 	}
 	else
 	{
-	    System.err.println("Wrong message type sent to Coordinator!");
+	    System.err.println("Wrong message type sent to Machine!");
 	}
     }
 
