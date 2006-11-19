@@ -585,6 +585,8 @@ Class-Path: ${manifest.pathlist}</echo>
 	<chmod file="${dist}/Supremica.cmd" perm="644"/>
 	<copy file="${templates}/demo" todir="${dist}"/>
 	<chmod file="${dist}/demo" perm="755"/>
+	<copy file="${templates}/demo.cmd" todir="${dist}"/>
+	<chmod file="${dist}/demo.cmd" perm="644"/>
 	<copy file="${templates}/manufacturingTablesTest" todir="${dist}"/>
 	<chmod file="${dist}/manufacturingTablesTest" perm="755"/>
 	<copy file="${templates}/manufacturingTablesTest.cmd" todir="${dist}"/>

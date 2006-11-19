@@ -425,7 +425,7 @@ public class IEC61499ControlSystemImplementationBuilder extends ControlSystemImp
 	{
 	    machineCoordinators.add(machineCoordinator);
 	}
-	Device fuberDevice = new Device("DemoDevice", "App.sys", ".." + File.separatorChar + ".." + File.separatorChar + "Fuber" + File.separatorChar + "fblib", "demo:event", 1, coordinator, machineCoordinators, zones, cellMachines);
+	Device fuberDevice = new Device("DemoDevice", "App.sys", ".." + File.separatorChar + ".." + File.separatorChar + "Fuber" + File.separatorChar + "fblib", "demo" + File.pathSeparatorChar + "event", 1, coordinator, machineCoordinators, zones, cellMachines);
 	fuberDevice.run();
     }
     
