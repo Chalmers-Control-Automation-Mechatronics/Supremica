@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.55 2006-11-17 16:38:23 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.56 2006-11-19 21:12:23 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1655,6 +1655,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       return found;
     }
 
+    @SuppressWarnings("unused")
     private boolean search(final CompiledClause clause)
       throws VisitorException
     {

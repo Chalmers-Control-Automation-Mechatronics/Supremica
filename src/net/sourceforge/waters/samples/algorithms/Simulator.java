@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.waters.samples.algorithms
 //# CLASS:   Simulator
 //###########################################################################
-//# $Id: Simulator.java,v 1.3 2006-07-20 02:28:37 robi Exp $
+//# $Id: Simulator.java,v 1.4 2006-11-19 21:12:23 robi Exp $
 //###########################################################################
 
 
@@ -213,6 +213,7 @@ public class Simulator
 
     //#######################################################################
     //# Simple Access
+    @SuppressWarnings("unused")
     private AutomatonProxy getAutomaton()
     {
       return mAutomaton;
@@ -273,6 +274,7 @@ public class Simulator
       }
     }
 
+    @SuppressWarnings("unused")
     private void executeEvent(final EventProxy event)
     {
       mState = findSuccessorState(event);

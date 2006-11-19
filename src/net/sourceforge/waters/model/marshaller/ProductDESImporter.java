@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ProductDESImporter
 //###########################################################################
-//# $Id: ProductDESImporter.java,v 1.6 2006-11-03 15:01:57 torda Exp $
+//# $Id: ProductDESImporter.java,v 1.7 2006-11-19 21:12:23 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -389,11 +389,13 @@ public class ProductDESImporter
 
     //#######################################################################
     //# Simple Access
+    @SuppressWarnings("unused")
     private StateProxy getState()
     {
       return mState;
     }
 
+    @SuppressWarnings("unused")
     private EventProxy getEvent()
     {
       return mEvent;

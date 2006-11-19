@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   NodeSetSubject
 //###########################################################################
-//# $Id: NodeSetSubject.java,v 1.4 2006-07-20 02:28:37 robi Exp $
+//# $Id: NodeSetSubject.java,v 1.5 2006-11-19 21:12:23 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -526,6 +526,7 @@ class NodeSetSubject
     return new ClassCastException(buffer.toString());
   }
 
+  @SuppressWarnings("unused")
   private ClassCastException createBadType(final Object item)
   {
     final StringBuffer buffer = new StringBuffer("Can't add object of class ");

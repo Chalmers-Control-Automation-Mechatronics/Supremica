@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.algorithms
 //# CLASS:   AlgorithmsTest
 //###########################################################################
-//# $Id: AlgorithmsTest.java,v 1.6 2006-11-03 15:01:57 torda Exp $
+//# $Id: AlgorithmsTest.java,v 1.7 2006-11-19 21:12:23 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.algorithms;
@@ -214,6 +214,7 @@ public class AlgorithmsTest extends AbstractWatersTest
     return Bisimulation.reduce(aut, name, mProductDESFactory);
   }
 
+  @SuppressWarnings("unused")
   private AutomatonProxy iterativeReduce(final AutomatonProxy aut)
     throws WatersException
   {
@@ -238,6 +239,7 @@ public class AlgorithmsTest extends AbstractWatersTest
   }
 
 
+  @SuppressWarnings("unused")
   private void save(final ProductDESProxy des)
     throws IOException, JAXBException, WatersException
   {
@@ -261,6 +263,7 @@ public class AlgorithmsTest extends AbstractWatersTest
     mProductDESMarshaller.marshal(des, outfilename);
   }                     
 
+  @SuppressWarnings("unused")
   private Collection<EventProxy> getEvents(final ProductDESProxy des,
 					   final String[] names)
     throws WatersException
