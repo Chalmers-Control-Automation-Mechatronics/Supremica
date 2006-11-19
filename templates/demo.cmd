@@ -1,0 +1,1 @@
+manufacturingTablesTest.cmd -IEC61499 VolvoCell_Partial.xml ..\examples\functionblocks\FBRuntime\manufacturingTables\XML\WingquistDemo2006
