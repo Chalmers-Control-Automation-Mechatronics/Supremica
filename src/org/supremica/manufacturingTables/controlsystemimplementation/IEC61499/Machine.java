@@ -66,6 +66,7 @@ public class Machine implements Listener
     protected final String [] types = {"Conveyor", "Robot", "Memory", "Fixture", "TurnTable", "Other"};
     private String name;
     private String type;
+    private String coordinator; // to know who to send the EOPDone messages to
     private String description;
     private MachineController machineController;
     private Mailbox cellMailbox; // No longer used in the Fuber implementation
@@ -78,6 +79,7 @@ public class Machine implements Listener
 	description = null;
 	this.cellMailbox = cellMailbox;
 	this.machineThread = null;
+	coordinator = null;
 	//	machineThread.register(this);
 	//cellMailbox.register(this);
     }
@@ -107,16 +109,22 @@ public class Machine implements Listener
 	return getName();
     }
 
+    // In the multithreaded Fuber version we have to handle the respons from the machineCoordinator by a separate message
+    public void EOPDone(boolean result)
+    {
+	    machineThread.send( new Message( name,  coordinator, "EOPDone", result ) );
+    }
+
     public void receiveMessage(Message msg)
     {
 	if (msg.getType().equals("performEOP"))
 	{
 	    System.err.println("Machine " +name+ " performing EOP " + msg.getContent() + " .");
-	    boolean EOPperformedOK = machineController.performEOP( (String) msg.getContent() );
+	    //boolean EOPperformedOK = machineController.performEOP( (String) msg.getContent() );
+	    coordinator = msg.getSender();
+	    machineController.performEOP( (String) msg.getContent() );
 	    
-	    machineThread.send( new Message( name,  msg.getSender(), "EOPDone", EOPperformedOK ) );
 	    //cellMailbox.send( new Message( name,  msg.getSender(), "EOPDone", EOPperformedOK ) );
-	    
 	}
 	else if (msg.getType().equals("externalCheckOfComponent"))
 	{

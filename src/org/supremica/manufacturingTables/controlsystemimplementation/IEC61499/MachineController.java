@@ -91,7 +91,8 @@ abstract public class MachineController
 	currAltEOPToInitRowMap = new HashMap<EOP, EOPInitialRow>(6); // initial capacity (6) 
     }
 
-    abstract public boolean performEOP(String EOPName);
+    // abstract public boolean performEOP(String EOPName);
+    abstract public void performEOP(String EOPName);
         
     final public String getID()
     {
