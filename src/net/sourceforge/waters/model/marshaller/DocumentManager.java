@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   DocumentManager
 //###########################################################################
-//# $Id: DocumentManager.java,v 1.8 2006-09-15 09:26:13 robi Exp $
+//# $Id: DocumentManager.java,v 1.9 2006-11-20 15:36:40 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -411,6 +411,13 @@ public class DocumentManager {
     return Collections.unmodifiableList(mFileFilters);
   }
 
+  public void unloadFromCache(DocumentProxy objectToUnload) {
+	for (Map.Entry<URI, DocumentProxy> entry : mDocumentCache.entrySet()) {
+	  if (entry.getValue() == objectToUnload) {
+	    mDocumentCache.remove(entry.getKey());
+	  }
+	}
+  }
 
   //#########################################################################
   //# Auxiliary Methods
@@ -459,7 +466,6 @@ public class DocumentManager {
       }
     }
   }
-
 
   //#########################################################################
   //# Data Members

@@ -30,5 +30,6 @@ public class CloseAction
 	{
 		ModuleContainer moduleContainer = ide.getActiveModuleContainer();
 		ide.remove(moduleContainer);
+		ide.getIDE().getDocumentManager().unloadFromCache(moduleContainer.getModule());
 	}
 }
