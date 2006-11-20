@@ -1,0 +1,22 @@
+﻿<Operation opID="ToolChangeToWeld">
+    <Type>basic</Type>
+    <Comment>Dummy EOP for machine with own control system</Comment>
+    <Machine>R3325</Machine>
+    <EOP>
+    
+        <InternalComponents>
+        </InternalComponents>
+      
+        <InitialState>
+            <InitialStateCheck>
+                <AlarmType>1</AlarmType>
+                <AlarmDelay>0</AlarmDelay>
+            </InitialStateCheck>
+        </InitialState>
+
+    </EOP>
+</Operation>
+
+
+
+

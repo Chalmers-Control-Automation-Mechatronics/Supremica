@@ -1,0 +1,58 @@
+<ROP id="R3325 V70" type="COP">
+    <Machine>R3325</Machine>
+    <Comment></Comment>
+    <Relation type ="Sequence">
+       <Activity>
+          <Operation>FetchFromRack</Operation> 	
+       </Activity>
+       
+       <Activity>	
+            <Operation>LoadFixture</Operation> 	
+        </Activity>
+        
+       <Activity>
+            <Precondition>
+                <Predecessor>
+                     <Machine>FIX151</Machine>
+                     <Operation>FixtureClamp</Operation>
+                </Predecessor>	    
+            </Precondition>
+            <Operation>FixtureToToolChange</Operation> 	
+        </Activity>
+        
+       <Activity>
+            <Operation>ToolChangeToWeld</Operation> 	
+        </Activity>
+        
+       <Activity>	
+            <Operation>WeldSeg1</Operation> 	
+        </Activity>
+        
+        <Activity>	
+            <Operation>RobotToWorkPos</Operation> 	
+        </Activity>
+        
+        <Activity>
+            <Precondition>
+                <Predecessor>
+                     <Machine>FIX151</Machine>
+                     <Operation>FixtureForward</Operation>
+                </Predecessor>	    
+            </Precondition>	
+            <Operation>WeldSeg2</Operation> 	
+        </Activity>
+        
+        <Activity>
+	    <Precondition>
+		<Predecessor>
+		     <Machine>FIX151</Machine>
+		     <Operation>FixtureBackward</Operation>
+		</Predecessor>	    
+	    </Precondition>	
+            <Operation>WeldSeg3</Operation> 	
+        </Activity>
+    </Relation>
+</ROP>
+
+
+
