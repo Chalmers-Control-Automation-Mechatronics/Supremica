@@ -164,6 +164,7 @@ public class MachineCoordinator implements Listener
 		    //	       + currentActivity.getOperation() + ", at least not " + predecessor.getID());
 		    // We (still) have to wait for operations from other machines
 		    System.out.println("Predecessors, so no more events for machine " + currentCOP.getMachine());
+		    machineCoordinatorThread.noMoreEvents();
 		    return;
 		}
 	    }

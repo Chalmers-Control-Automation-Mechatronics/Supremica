@@ -89,10 +89,18 @@ public class Machine implements Listener
 	//this.machineThread.register(this);
     }
 
+//     // Tell the IPS simulation software that we have no more events right now
+//     protected void noMoreEvents()
+//     {
+// 	machineThread.noMoreEvents();
+//     }
+
     // To communicate with the simulated or real machine, via Fuber
     public void startMachineOperation(String operationName)
     {
 	machineThread.startMachineOperation(operationName);
+	System.out.println("No more events for machine " + name);
+	machineThread.noMoreEvents();
 	// testRow:
 	//finishedMachineOperation(operationName);	
     }
