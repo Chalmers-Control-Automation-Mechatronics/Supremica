@@ -353,7 +353,7 @@ public class MachineControlCommunicator extends MachineController
 	    {
 		    performsEOP = false;
 		    System.out.println("MachineControlCommunicator: " + machine.getName() + "The EOP is done!");
-		    machine.EOPDone(false);
+		    machine.EOPDone(true);
 		    EOPPerformedOK = true;
 	    }
 	    else 
