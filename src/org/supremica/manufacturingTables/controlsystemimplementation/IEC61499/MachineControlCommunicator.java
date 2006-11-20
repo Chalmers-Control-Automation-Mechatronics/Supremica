@@ -332,7 +332,7 @@ public class MachineControlCommunicator extends MachineController
 	    else if (!currentEOP.hasMoreActions())
 	    {
 		    performsEOP = false;
-		    System.out.println("The EOP is done!");
+		    System.out.println("MachineControlCommunicator: " + machine.getName() + "The EOP is done!");
 		    machine.EOPDone(true);
 		    EOPPerformedOK = true;
 	    }
@@ -346,13 +346,13 @@ public class MachineControlCommunicator extends MachineController
     
     protected void finishedMachineOperation(String operationName)
     {
-	System.out.println("MachineControlCom.: " + ID + ", finishedMachineOperation");
+	System.out.println("MachineControlCommunicator: " + machine.getName() + ", finishedMachineOperation");
 	if ( operationName.equals( currentEOP.getId() ) )
 	{
 	    if (!currentEOP.hasMoreActions())
 	    {
 		    performsEOP = false;
-		    System.out.println("The EOP is done!");
+		    System.out.println("MachineControlCommunicator: " + machine.getName() + "The EOP is done!");
 		    machine.EOPDone(false);
 		    EOPPerformedOK = true;
 	    }

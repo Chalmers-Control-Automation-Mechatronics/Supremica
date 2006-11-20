@@ -258,7 +258,7 @@ public class MachineCoordinator implements Listener
 	    }
 	    else
 	    {
-		System.err.print("The EOP could not be performed!");
+		System.err.print("MachineCoordinator: " + getID() + "The EOP could not be performed!");
 		System.err.println(" (says message sender: " + msg.getSender() + ")");
 		//machineCoordinatorThread.send( new Message( getID(), "Coordinator", "COPDone", false ) );
 	
