@@ -163,11 +163,12 @@ public class MachineCoordinator implements Listener
 		    //System.out.println("All Predecessors not yet fulfulled in machine " + machine + " for operation "
 		    //	       + currentActivity.getOperation() + ", at least not " + predecessor.getID());
 		    // We (still) have to wait for operations from other machines
-		    System.out.println("Predecessors, so no more events for machine " + currentCOP.getMachine());
+		    System.out.println("NoMoreEvents: Predecessors, so no more events for machine " + currentCOP.getMachine());
 		    machineCoordinatorThread.noMoreEvents();
 		    return;
 		}
 	    }
+	    System.out.println("MoreEvents: Predecessors fulfilled so more events for machine " + currentCOP.getMachine());
 	    // Now all predecessors are fulfilled. We can not just simply clear the map but must remove the 
 	    // specific predecessors for this current operation
 	    for (COPPredecessor predecessor : currentActivity.getPredecessors())
