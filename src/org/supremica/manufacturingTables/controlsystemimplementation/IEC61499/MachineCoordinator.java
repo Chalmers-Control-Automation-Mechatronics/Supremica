@@ -230,6 +230,9 @@ public class MachineCoordinator implements Listener
 		    System.out.println("The COP " + currentCOP.getID() + " is done!");
 		    //machineCoordinatorThread.send( new Message( getID(), "Coordinator", "COPDone", true ) );
 		    
+		    System.out.println("NoMoreEvents: COP for " + currentCOP.getMachine() + " is done!");
+		    machineCoordinatorThread.noMoreEvents();
+
 		    machineCoordinatorThread.COPDone(machine, true);
 		    //coordinator.COPDone(machine, true);
 		}
