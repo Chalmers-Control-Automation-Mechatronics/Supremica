@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   EventRecord
 //###########################################################################
-//# $Id: EventRecord.cpp,v 1.7 2006-09-04 12:44:31 robi Exp $
+//# $Id: EventRecord.cpp,v 1.8 2006-11-22 21:27:57 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -22,6 +22,7 @@
 #include "waters/analysis/AutomatonEncoding.h"
 #include "waters/analysis/EventRecord.h"
 #include "waters/analysis/TransitionRecord.h"
+#include "waters/analysis/TransitionUpdateRecord.h"
 
 
 namespace waters {
@@ -75,20 +76,29 @@ const EventRecordHashAccessor EventRecord::theHashAccessor;
 //# EventRecord: Constructors & Destructors
 
 EventRecord::
-EventRecord(jni::EventGlue event,
-            bool controllable,
-            jni::ClassCache* /* cache */)
+EventRecord(jni::EventGlue event, bool controllable, int numwords)
   : mJavaEvent(event),
     mIsControllable(controllable),
     mIsGloballyDisabled(false),
-    mTransitionRecords(0)
+    mNumberOfWords(numwords),
+    mSearchRecords(0),
+    mTraceSearchRecords(0)
 {
+  mUpdateRecords = new TransitionUpdateRecord*[numwords];
+  for (int w = 0; w < numwords; w++) {
+    mUpdateRecords[w] = 0;
+  }
 }
 
 EventRecord::
 ~EventRecord()
 {
-  delete mTransitionRecords;
+  for (int w = 0; w < mNumberOfWords; w++) {
+    delete mUpdateRecords[w];
+  }
+  delete [] mUpdateRecords;
+  delete mSearchRecords;
+  delete mTraceSearchRecords;
 }
 
 
@@ -99,7 +109,7 @@ bool EventRecord::
 isSkippable()
   const
 {
-  return mIsGloballyDisabled || mTransitionRecords == 0;
+  return mIsGloballyDisabled || mSearchRecords == 0;
 }
 
 jni::JavaString EventRecord::
@@ -149,43 +159,74 @@ addTransition(const AutomatonRecord* aut,
   if (mIsGloballyDisabled) {
     return true;
   } else {
-    if (mTransitionRecords == 0 ||
-        mTransitionRecords->getAutomaton() != aut) {
-      mTransitionRecords = new TransitionRecord(aut, mTransitionRecords);
+    if (mSearchRecords == 0 ||
+        mSearchRecords->getAutomaton() != aut) {
+      mSearchRecords = new TransitionRecord(aut, mSearchRecords);
     }
-    return mTransitionRecords->addTransition(source, target);
+    return mSearchRecords->addTransition(source, target);
   }
 }
 
 void EventRecord::
 normalize(const AutomatonRecord* aut)
 {
-  if (mTransitionRecords != 0 &&
-      mTransitionRecords->getAutomaton() == aut) {
-    mTransitionRecords->normalize();
-    if (mTransitionRecords->isAllSelfloops()) {
-      TransitionRecord* victim = mTransitionRecords;
-      mTransitionRecords = mTransitionRecords->getNext();
-      victim->setNext(0);
-      delete victim;
+  TransitionRecord* trans = mSearchRecords;
+  if (trans != 0 && trans->getAutomaton() == aut) {
+    trans->normalize();
+    const bool unlinked = trans->isAlwaysEnabled();
+    if (unlinked) {
+      mSearchRecords = trans->getNextInSearch();
+    }
+    if (trans->isOnlySelfloops()) {
+      if (unlinked) {
+        trans->setNextInSearch(0);
+        delete trans;
+      }
+    } else {
+      const AutomatonRecord* aut = trans->getAutomaton();
+      const int wordindex = aut->getWordIndex();
+      TransitionUpdateRecord* update = createUpdateRecord(wordindex);
+      update->addTransition(trans);
+      if (unlinked) {
+        trans->setNextInSearch(mTraceSearchRecords);
+        mTraceSearchRecords = trans;
+      }
     }
   } else if (!mIsGloballyDisabled) {
     if (mIsControllable || aut->isPlant()) {
-      delete mTransitionRecords;
-      mTransitionRecords = 0;
+      delete mSearchRecords;
+      mSearchRecords = 0;
       mIsGloballyDisabled = true;
     } else {
-      mTransitionRecords = new TransitionRecord(aut, mTransitionRecords);
+      mSearchRecords = new TransitionRecord(aut, mSearchRecords);
     }
   }
 }
 
-void EventRecord::
-sortTransitionRecords()
+TransitionUpdateRecord* EventRecord::
+createUpdateRecord(int wordindex)
 {
-  TransitionRecordList list(mTransitionRecords);
-  list.qsort();
-  mTransitionRecords = list.getHead();
+  TransitionUpdateRecord* update = mUpdateRecords[wordindex];
+  if (update == 0) {
+    update = mUpdateRecords[wordindex] = new TransitionUpdateRecord();
+  }
+  return update;
+}
+
+void EventRecord::
+sortTransitionRecordsForSearch()
+{
+  TransitionRecordList list(mSearchRecords);
+  list.qsort(TransitionRecord::compareForSearch);
+  mSearchRecords = list.getHead();
+}
+
+void EventRecord::
+sortTransitionRecordsForTrace()
+{
+  TransitionRecordList list(mSearchRecords);
+  list.append(mTraceSearchRecords);
+  mTraceSearchRecords = 0;
 }
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   SafetyVerifier
 //###########################################################################
-//# $Id: SafetyVerifier.cpp,v 1.3 2006-11-15 01:26:40 robi Exp $
+//# $Id: SafetyVerifier.cpp,v 1.4 2006-11-22 21:27:57 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -39,6 +39,7 @@
 #include "waters/analysis/StateRecord.h"
 #include "waters/analysis/StateSpace.h"
 #include "waters/analysis/TransitionRecord.h"
+#include "waters/analysis/TransitionUpdateRecord.h"
 #include "waters/base/HashTable.h"
 #include "waters/javah/Invocations.h"
 
@@ -137,6 +138,7 @@ setup()
   mDepthMap = new ArrayList<uint32>(128);
 
   // Establish initial event map ...
+  const int numwords = mEncoding->getNumberOfWords();
   const jni::SetGlue events = mModel.getEventsGlue(mCache);
   const int numevents = events.size();
   const jni::IteratorGlue iter = events.iteratorGlue(mCache);
@@ -158,12 +160,12 @@ setup()
     default:
       continue;
     }
-    EventRecord* record = new EventRecord(event, controllable, mCache);
+    EventRecord* record = new EventRecord(event, controllable, numwords);
     eventmap.add(record);
   }
 
   // Prepare initial state ...
-  const int numaut = mEncoding->getNumRecords();
+  const int numaut = mEncoding->getNumberOfRecords();
   mCurrentTuple = new uint32[numaut];
   int a;
   for (a = 0; a < numaut; a++) {
@@ -244,7 +246,7 @@ setup()
   while (eventmap.hasNext(hiter2)) {
     EventRecord* eventrecord = eventmap.next(hiter2);
     if (!eventrecord->isSkippable()) {
-      eventrecord->sortTransitionRecords();
+      eventrecord->sortTransitionRecordsForSearch();
       mEventRecords[i++] = eventrecord;
     }
   }
@@ -252,11 +254,13 @@ setup()
         EventRecord::compare);
 }
 
+
 bool SafetyVerifier::
 checkProperty()
 {
   // Store initial state ...
-  const int numaut = mEncoding->getNumRecords();
+  const int numwords = mEncoding->getNumberOfWords();
+  const int numaut = mEncoding->getNumberOfRecords();
   for (int a = 0; a < numaut; a++) {
     if (mCurrentTuple[a] == UNDEF_UINT32) {
       return true;
@@ -281,14 +285,11 @@ checkProperty()
       bool enabled = true;
       for (TransitionRecord* trans = event->getTransitionRecord();
            trans != 0;
-           trans = trans->getNext()) {
-        if (trans->isAlwaysEnabled()) {
-          break;
-        }
+           trans = trans->getNextInSearch()) {
         const AutomatonRecord* aut = trans->getAutomaton();
         const int a = aut->getAutomatonIndex();
         const uint32 source = mCurrentTuple[a];
-        const uint32 target = trans->getSuccessor(source);
+        const uint32 target = trans->getShiftedSuccessor(source);
         if (target == UNDEF_UINT32) {
           if (aut->isPlant() || event->isControllable()) {
             enabled = false;
@@ -302,15 +303,20 @@ checkProperty()
       }
       if (enabled) {
         packed = mStateSpace->prepare(current);
-        for (TransitionRecord* trans = event->getTransitionRecord();
-             trans != 0;
-             trans = trans->getNext()) {
-          const AutomatonRecord* aut = trans->getAutomaton();
-          const int a = aut->getAutomatonIndex();
-          const uint32 source = mCurrentTuple[a];
-          const uint32 target = trans->getSuccessor(source);
-          if (source != target) {
-            mEncoding->set(packed, a, target);
+        for (int w = 0; w < numwords; w++) {
+          TransitionUpdateRecord* update = event->getTransitionUpdateRecord(w);
+          if (update != 0) {
+            uint32 word =
+              packed[w] & update->getKeptMask() | update->getCommonTargets();
+            for (TransitionRecord* trans = update->getTransitionRecords();
+                 trans != 0;
+                 trans = trans->getNextInUpdate()) {
+              const AutomatonRecord* aut = trans->getAutomaton();
+              const int a = aut->getAutomatonIndex();
+              const uint32 source = mCurrentTuple[a];
+              word |= trans->getShiftedSuccessor(source);
+            }
+            packed[w] = word;
           }
         }
         mStateSpace->add();
@@ -326,6 +332,7 @@ checkProperty()
   return true;
 }
 
+
 void SafetyVerifier::
 computeCounterExample()
 {
@@ -333,65 +340,75 @@ computeCounterExample()
   jni::EventGlue eventglue = mBadEvent->getJavaEvent();
   mTraceList->add(0, &eventglue);
 
-  const int numaut = mEncoding->getNumRecords();
-  const int numwords = mEncoding->getNumWords();
-  uint32* mask = new uint32[numwords];
-  uint32 target = mBadState;
-  uint32* packedtarget = mStateSpace->get(target);
-  uint32* targettuple = new uint32[numaut];
-  mEncoding->decode(packedtarget, targettuple);
-
   uint32 level = mDepthMap->size() - 2;
-  while (level-- != 0) {
-    bool found = false;
-    uint32 current = mDepthMap->get(level);
+  if (level > 0) {
+    for (int e = 0; e < mNumEventRecords; e++) {
+      EventRecord* event = mEventRecords[e];
+      event->sortTransitionRecordsForTrace();
+    }
+    const int numaut = mEncoding->getNumberOfRecords();
+    const int numwords = mEncoding->getNumberOfWords();
+    uint32* packedtarget = mStateSpace->get(mBadState);
+    uint32* targettuple = new uint32[numaut];
+    mEncoding->decode(packedtarget, targettuple);
+    
     do {
-      uint32* packedcurrent = mStateSpace->get(current);
-      mEncoding->decode(packedcurrent, mCurrentTuple);
-      for (int e = 0; e < mNumEventRecords; e++) {
-        EventRecord* event = mEventRecords[e];
-        found = true;
-        for (TransitionRecord* trans = event->getTransitionRecord();
-             trans != 0;
-             trans = trans->getNext()) {
-          const AutomatonRecord* aut = trans->getAutomaton();
-          const int a = aut->getAutomatonIndex();
-          const uint32 state = mCurrentTuple[a];
-          const uint32 succ = trans->getSuccessor(state);
-          if (succ != targettuple[a]) {
-            found = false;
-            break;
+      uint32 current = mDepthMap->get(--level);
+      uint32* packedcurrent;
+      const EventRecord* event;
+      mEncoding->shift(targettuple);
+      do {
+        packedcurrent = mStateSpace->get(current++);
+        bool decoded = false;
+        for (int e = 0; e < mNumEventRecords; e++) {
+          event = mEventRecords[e];
+          for (int w = 0; w < numwords; w++) {
+            TransitionUpdateRecord* update =
+              event->getTransitionUpdateRecord(w);
+            if (update == 0) {
+              if (packedcurrent[w] != packedtarget[w]) {
+                goto notfound;
+              }
+            } else {
+              const uint32 mask = update->getKeptMask();
+              if ((packedcurrent[w] & mask) != (packedtarget[w] & mask)) {
+                goto notfound;
+              }
+            }
           }
-        }
-        if (found) {
-          mEncoding->initMask(mask);
+          if (!decoded) {
+            mEncoding->decode(packedcurrent, mCurrentTuple);
+            decoded = true;
+          }
           for (TransitionRecord* trans = event->getTransitionRecord();
                trans != 0;
-               trans = trans->getNext()) {
+               trans = trans->getNextInSearch()) {
             const AutomatonRecord* aut = trans->getAutomaton();
             const int a = aut->getAutomatonIndex();
-            mEncoding->addToMask(mask, a);
+            const uint32 state = mCurrentTuple[a];
+            const uint32 succ = trans->getShiftedSuccessor(state);
+            if (succ != targettuple[a]) {
+              goto notfound;
+            }
           }
-          found = mEncoding->equals(packedcurrent, packedtarget, mask);
-          if (found) {
-            jni::EventGlue eventglue = event->getJavaEvent();
-            mTraceList->add(0, &eventglue);
-            target = current;
-            packedtarget = packedcurrent;
-            uint32* temp = mCurrentTuple;
-            mCurrentTuple = targettuple;
-            targettuple = temp;
-            break;
-          }
+          goto found;
+        notfound:
+          ;
         }
-      }
-      current++;
-    } while (!found);
-  }
+      } while (true);
+    found:
+      jni::EventGlue eventglue = event->getJavaEvent();
+      mTraceList->add(0, &eventglue);
+      packedtarget = packedcurrent;
+      uint32* temp = mCurrentTuple;
+      mCurrentTuple = targettuple;
+      targettuple = temp;
+    } while (level > 0);
 
-  delete [] mask;
-  delete [] targettuple;
+    delete [] targettuple;
+  }
 }
+
 
 void SafetyVerifier::
 teardown()

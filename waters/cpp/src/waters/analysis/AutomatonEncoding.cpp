@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   AutomatonEncoding
 //###########################################################################
-//# $Id: AutomatonEncoding.cpp,v 1.7 2006-11-03 01:00:07 robi Exp $
+//# $Id: AutomatonEncoding.cpp,v 1.8 2006-11-22 21:27:57 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -339,6 +339,17 @@ set(uint32* encoded, int index, uint32 code)
   const int shift = record->getShift();
   const uint32 mask = record->getBitMask();
   encoded[w] = (encoded[w] & ~mask) | (code << shift);
+}
+
+void AutomatonEncoding::
+shift(uint32* decoded)
+  const
+{
+  for (int a = 0; a < mNumRecords; a++) {
+    const AutomatonRecord* record = mAutomatonRecords[a];
+    const int shift = record->getShift();
+    decoded[a] <<= shift;
+  }
 }
 
 

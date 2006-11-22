@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   TransitionRecord
 //###########################################################################
-//# $Id: TransitionRecord.h,v 1.2 2006-09-04 11:04:41 robi Exp $
+//# $Id: TransitionRecord.h,v 1.3 2006-11-22 21:27:57 robi Exp $
 //###########################################################################
 
 
@@ -44,22 +44,30 @@ public:
   //##########################################################################
   //# Simple Access
   const AutomatonRecord* getAutomaton() const {return mAutomaton;}
-  uint32 getSuccessor(uint32 source) const {return mSuccessorStates[source];}
+  uint32 getShiftedSuccessor(uint32 source) const
+    {return mShiftedSuccessors[source];}
   bool isAlwaysDisabled() const {return mWeight == 0;}
   bool isAlwaysEnabled() const {return mWeight == PROBABILITY_1;}
-  bool isAllSelfloops() const {return mIsOnlySelfloops && isAlwaysEnabled();}
-  TransitionRecord* getNext() const {return mNext;}
-  void setNext(TransitionRecord* next) {mNext = next;}
+  bool isOnlySelfloops() const {return mIsOnlySelfloops;}
+  TransitionRecord* getNextInSearch() const {return mNextInSearch;}
+  void setNextInSearch(TransitionRecord* next) {mNextInSearch = next;}
+  TransitionRecord* getNextInUpdate() const {return mNextInUpdate;}
+  void setNextInUpdate(TransitionRecord* next) {mNextInUpdate = next;}
 
   //##########################################################################
   //# Comparing and Hashing
-  int compareTo(const TransitionRecord* partner) const;
-  static int compare(const void* elem1, const void* elem2);
+  int compareToForSearch(const TransitionRecord* partner) const;
+  int compareToForTrace(const TransitionRecord* partner) const;
+  static int compareForSearch(const TransitionRecord* trans1,
+			      const TransitionRecord* trans2);
+  static int compareForTrace(const TransitionRecord* trans1,
+			     const TransitionRecord* trans2);
 
   //##########################################################################
   //# Set up
   bool addTransition(const StateRecord* source, const StateRecord* target);
   void normalize();
+  uint32 getCommonTarget() const;
 
 private:
   //##########################################################################
@@ -67,13 +75,17 @@ private:
   const AutomatonRecord* mAutomaton;
   int mWeight;
   bool mIsOnlySelfloops;
-  uint32* mSuccessorStates;
-  TransitionRecord* mNext;
+  uint32* mShiftedSuccessors;
+  TransitionRecord* mNextInSearch;
+  TransitionRecord* mNextInUpdate;
 
   //##########################################################################
   //# Class Constants
   static const int PROBABILITY_1 = 0x10000000;
 };
+
+typedef int (*TransitionRecordComparator)
+  (const TransitionRecord*, const TransitionRecord*);
 
 
 //############################################################################
@@ -98,7 +110,7 @@ public:
 
   //##########################################################################
   //# Sorting
-  void qsort();
+  void qsort(TransitionRecordComparator comparator);
 
 private:
   //##########################################################################

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   StateSpace
 //###########################################################################
-//# $Id: StateSpace.cpp,v 1.2 2006-11-15 01:26:40 robi Exp $
+//# $Id: StateSpace.cpp,v 1.3 2006-11-22 21:27:57 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -34,7 +34,7 @@ namespace waters {
 
 StateSpace::
 StateSpace(const AutomatonEncoding* encoding, uint32 limit)
-  : mEncodingSize(encoding->getNumWords()),
+  : mEncodingSize(encoding->getNumberOfWords()),
     mNumStates(0),
     mStateLimit(limit),
     mBlocks(INITBLOCKS),

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   EventRecord
 //###########################################################################
-//# $Id: EventRecord.h,v 1.5 2006-09-03 06:38:42 robi Exp $
+//# $Id: EventRecord.h,v 1.6 2006-11-22 21:27:57 robi Exp $
 //###########################################################################
 
 
@@ -34,6 +34,7 @@ class AutomatonRecord;
 class HashAccessor;
 class StateRecord;
 class TransitionRecord;
+class TransitionUpdateRecord;
 
 
 //###########################################################################
@@ -67,9 +68,7 @@ class EventRecord
 public:
   //##########################################################################
   //# Constructors & Destructors
-  explicit EventRecord(jni::EventGlue event,
-		       bool controllable,
-		       jni::ClassCache* cache);
+  explicit EventRecord(jni::EventGlue event, bool controllable, int numwords);
   ~EventRecord();
 
   //##########################################################################
@@ -79,7 +78,9 @@ public:
   bool isSkippable() const;
   const jni::EventGlue& getJavaEvent() const {return mJavaEvent;}
   jni::JavaString getName() const;
-  TransitionRecord* getTransitionRecord() const {return mTransitionRecords;}
+  TransitionRecord* getTransitionRecord() const {return mSearchRecords;}
+  TransitionUpdateRecord* getTransitionUpdateRecord(int w) const
+    {return mUpdateRecords[w];}
 
   //##########################################################################
   //# Comparing and Hashing
@@ -93,7 +94,9 @@ public:
 		     const StateRecord* source,
 		     const StateRecord* target);
   void normalize(const AutomatonRecord* aut);
-  void sortTransitionRecords();
+  TransitionUpdateRecord* createUpdateRecord(int wordindex);
+  void sortTransitionRecordsForSearch();
+  void sortTransitionRecordsForTrace();
 
 private:
   //##########################################################################
@@ -101,7 +104,10 @@ private:
   jni::EventGlue mJavaEvent;
   bool mIsControllable;
   bool mIsGloballyDisabled;
-  TransitionRecord* mTransitionRecords;
+  int mNumberOfWords;
+  TransitionRecord* mSearchRecords;
+  TransitionRecord* mTraceSearchRecords;
+  TransitionUpdateRecord** mUpdateRecords;
 
   //##########################################################################
   //# Class Variables

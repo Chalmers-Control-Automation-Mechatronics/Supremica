@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   AutomatonEncoding
 //###########################################################################
-//# $Id: AutomatonEncoding.h,v 1.6 2006-11-03 01:00:07 robi Exp $
+//# $Id: AutomatonEncoding.h,v 1.7 2006-11-22 21:27:57 robi Exp $
 //###########################################################################
 
 
@@ -132,8 +132,8 @@ public:
 
   //##########################################################################
   //# Simple Access
-  int getNumWords() const {return mNumWords;}
-  int getNumRecords() const {return mNumRecords;}
+  int getNumberOfWords() const {return mNumWords;}
+  int getNumberOfRecords() const {return mNumRecords;}
   const AutomatonRecord* getRecord(int index) const
     {return mAutomatonRecords[index];}
 
@@ -143,6 +143,7 @@ public:
   void decode(const uint32* encoded, uint32* decoded) const;
   uint32 get(const uint32* encoded, int index) const;
   void set(uint32* encoded, int index, uint32 code) const;
+  void shift(uint32* decoded) const;
 
   //##########################################################################
   //# Masking

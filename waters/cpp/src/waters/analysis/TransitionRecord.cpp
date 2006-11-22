@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   TransitionRecord
 //###########################################################################
-//# $Id: TransitionRecord.cpp,v 1.2 2006-09-04 11:04:41 robi Exp $
+//# $Id: TransitionRecord.cpp,v 1.3 2006-11-22 21:27:57 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -32,19 +32,20 @@ TransitionRecord(const AutomatonRecord* aut, TransitionRecord* next)
   : mAutomaton(aut),
     mWeight(0),
     mIsOnlySelfloops(true),
-    mNext(next)
+    mNextInSearch(next),
+    mNextInUpdate(0)
 {
   const uint32 numstates = (uint32) aut->getNumberOfStates();
-  mSuccessorStates = new uint32[numstates];
+  mShiftedSuccessors = new uint32[numstates];
   for (uint32 code = 0; code < numstates; code++) {
-    mSuccessorStates[code] = UNDEF_UINT32;
+    mShiftedSuccessors[code] = UNDEF_UINT32;
   }
 }
 
 TransitionRecord::
 ~TransitionRecord()
 {
-  delete mNext;
+  delete mNextInSearch;
 }
 
 
@@ -52,22 +53,21 @@ TransitionRecord::
 //# TransitionRecord: Comparing
 
 int TransitionRecord::
-compareTo(const TransitionRecord* partner)
+compareToForSearch(const TransitionRecord* partner)
   const
 {
+  const AutomatonRecord* aut1 = mAutomaton;
+  const bool isplant1 = aut1->isPlant();
+  const AutomatonRecord* aut2 = partner->mAutomaton;
+  const bool isplant2 = aut2->isPlant();
+  if (isplant1 && !isplant2) {
+    return -1;
+  } else if (!isplant1 && isplant2) {
+    return 1;
+  }
   const int weight1 = mWeight;
   const int weight2 = partner->mWeight;
-  const AutomatonRecord* aut1 = mAutomaton;
-  const AutomatonRecord* aut2 = partner->mAutomaton;
-  if (weight1 == PROBABILITY_1) {
-    return weight2 == PROBABILITY_1 ? aut1->compareTo(aut2) : 1;
-  } else if (weight2 == PROBABILITY_1) {
-    return -1;
-  } else if (aut1->isPlant() && !aut2->isPlant()) {
-    return -1;
-  } else if (!aut1->isPlant() && aut2->isPlant()) {
-    return 1;
-  } else if (weight1 != weight2) {
+  if (weight1 != weight2) {
     return weight1 - weight2;
   } else {
     return aut1->compareTo(aut2);
@@ -75,11 +75,32 @@ compareTo(const TransitionRecord* partner)
 }
 
 int TransitionRecord::
-compare(const void* elem1, const void* elem2)
+compareToForTrace(const TransitionRecord* partner)
+  const
 {
-  const TransitionRecord* val1 = *((const TransitionRecord**) elem1);
-  const TransitionRecord* val2 = *((const TransitionRecord**) elem2);
-  return val1->compareTo(val2);
+  const AutomatonRecord* aut1 = mAutomaton;
+  const AutomatonRecord* aut2 = partner->mAutomaton;
+  const int weight1 = mWeight / aut1->getNumberOfStates();
+  const int weight2 = partner->mWeight / aut2->getNumberOfStates();
+  if (weight1 != weight2) {
+    return weight1 - weight2;
+  } else {
+    return aut1->compareTo(aut2);
+  }
+}
+
+int TransitionRecord::
+compareForSearch(const TransitionRecord* trans1,
+                 const TransitionRecord* trans2)
+{
+  return trans1->compareToForSearch(trans2);
+}
+
+int TransitionRecord::
+compareForTrace(const TransitionRecord* trans1,
+                const TransitionRecord* trans2)
+{
+  return trans1->compareToForTrace(trans2);
 }
 
 
@@ -91,8 +112,9 @@ addTransition(const StateRecord* source, const StateRecord* target)
 {
   const uint32 sourcecode = source->getStateCode();
   const uint32 targetcode = target->getStateCode();
-  if (mSuccessorStates[sourcecode] == UNDEF_UINT32) {
-    mSuccessorStates[sourcecode] = targetcode;
+  if (mShiftedSuccessors[sourcecode] == UNDEF_UINT32) {
+    const int shift = mAutomaton->getShift();
+    mShiftedSuccessors[sourcecode] = targetcode << shift;
     mWeight++;
     if (sourcecode != targetcode) {
       mIsOnlySelfloops = false;
@@ -114,6 +136,24 @@ normalize()
   }
 }
 
+uint32 TransitionRecord::
+getCommonTarget()
+  const
+{
+  const uint32 numstates = (uint32) mAutomaton->getNumberOfStates();
+  uint32 result = UNDEF_UINT32;
+  for (uint32 code = 0; code < numstates; code++) {
+    const uint32 succ = mShiftedSuccessors[code];
+    if (succ != UNDEF_UINT32) {
+      if (result == UNDEF_UINT32) {
+        result = succ;
+      } else {
+        return UNDEF_UINT32;
+      }
+    }      
+  }
+  return result;
+}
 
 
 //############################################################################
@@ -148,7 +188,7 @@ append(TransitionRecord* record)
   if (mHead == 0) {
     mHead = mTail = record;
   } else {
-    mTail->setNext(record);
+    mTail->setNextInSearch(record);
     mTail = record;
   }
   seek();
@@ -161,7 +201,7 @@ append(const TransitionRecordList& list)
   if (mHead == 0) {
     mHead = head;
   } else {
-    mTail->setNext(head);
+    mTail->setNextInSearch(head);
   }
   if (TransitionRecord* tail = list.mTail) {
     mTail = tail;
@@ -173,27 +213,27 @@ append(const TransitionRecordList& list)
 //# TransitionRecordList: Sorting
 
 void TransitionRecordList::
-qsort()
+qsort(TransitionRecordComparator comparator)
 {
   TransitionRecord* pivot = mHead;
-  if (pivot != 0 && pivot->getNext() != 0) {
+  if (pivot != 0 && pivot->getNextInSearch() != 0) {
     mHead = mTail = 0;
     TransitionRecordList after;
-    TransitionRecord* next = pivot->getNext();
-    pivot->setNext(0);
+    TransitionRecord* next = pivot->getNextInSearch();
+    pivot->setNextInSearch(0);
     do {
       TransitionRecord* current = next;
-      next = current->getNext();
-      current->setNext(0);
-      if (pivot->compareTo(current) > 0) {
+      next = current->getNextInSearch();
+      current->setNextInSearch(0);
+      if (comparator(pivot, current) > 0) {
         append(current);
       } else {
         after.append(current);
       }
     } while (next);
-    qsort();
+    qsort(comparator);
     append(pivot);
-    after.qsort();
+    after.qsort(comparator);
     append(after);
   }
 }
@@ -205,8 +245,10 @@ qsort()
 void TransitionRecordList::
 seek()
 {
-  while (TransitionRecord* next = mTail->getNext()) {
-    mTail = next;
+  if (mTail != 0) {
+    while (TransitionRecord* next = mTail->getNextInSearch()) {
+      mTail = next;
+    }
   }
 }
 
