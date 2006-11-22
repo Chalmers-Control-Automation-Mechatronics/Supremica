@@ -676,6 +676,7 @@ Class-Path: ${manifest.pathlist}</echo>
         <exclude name="**/TestPackage*.java"/>
         <exclude name="**/Abstract*.java"/>
         <exclude name="**/Native*.java"/>
+        <exclude name="**/*Heuristic*.java"/>
       </fileset>
     </batchtest>
     <classpath>
