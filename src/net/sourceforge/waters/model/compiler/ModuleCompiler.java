@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.57 2006-11-22 16:33:22 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.58 2006-11-23 10:10:26 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1161,13 +1161,13 @@ private void updateTransitionsInAutomtata()
         // ... and the corresponding guard
         final SimpleExpressionProxy guardClause =
           mEFAEventGuardClauseMap.get(relabeledEvent);
-        if (relabeledEvent.getKind()== EventKind.CONTROLLABLE && 
+        if (!mEFAEventControllabilityEventsMap.containsKey(relabeledEvent) && 
         		action == null && !searcher.search(guardClause)) {
           // The action does not update this variable and it does
           // not occur in the guard expression => we can remove
           // the corresponding event from the local alphabet.
           variableAlphabet.remove(relabeledEvent);
-          }
+           }
         else {
           // Translate the action to a transition in the variable automaton and
           // add this transition in the variable states where the guard is
