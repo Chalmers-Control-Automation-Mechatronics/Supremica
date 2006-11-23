@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   EventRecord
 //###########################################################################
-//# $Id: EventRecord.cpp,v 1.8 2006-11-22 21:27:57 robi Exp $
+//# $Id: EventRecord.cpp,v 1.9 2006-11-23 07:51:27 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -80,6 +80,8 @@ EventRecord(jni::EventGlue event, bool controllable, int numwords)
   : mJavaEvent(event),
     mIsControllable(controllable),
     mIsGloballyDisabled(false),
+    mIsOnlySelfloops(true),
+    mOccursInSpec(false),
     mNumberOfWords(numwords),
     mSearchRecords(0),
     mTraceSearchRecords(0)
@@ -109,7 +111,15 @@ bool EventRecord::
 isSkippable()
   const
 {
-  return mIsGloballyDisabled || mSearchRecords == 0;
+  if (mIsGloballyDisabled) {
+    return true;
+  } else if (mSearchRecords == 0 && mTraceSearchRecords == 0) {
+    return true;
+  } else if (mIsOnlySelfloops) {
+    return mIsControllable ? true : !mOccursInSpec;
+  } else {
+    return false;
+  }
 }
 
 jni::JavaString EventRecord::
@@ -181,6 +191,8 @@ normalize(const AutomatonRecord* aut)
       if (unlinked) {
         trans->setNextInSearch(0);
         delete trans;
+      } if (!aut->isPlant()) {
+        mOccursInSpec = true;
       }
     } else {
       const AutomatonRecord* aut = trans->getAutomaton();
@@ -191,14 +203,18 @@ normalize(const AutomatonRecord* aut)
         trans->setNextInSearch(mTraceSearchRecords);
         mTraceSearchRecords = trans;
       }
+      mIsOnlySelfloops = false;
+      mOccursInSpec |= !aut->isPlant();
     }
   } else if (!mIsGloballyDisabled) {
     if (mIsControllable || aut->isPlant()) {
       delete mSearchRecords;
-      mSearchRecords = 0;
+      delete mTraceSearchRecords;
+      mSearchRecords = mTraceSearchRecords = 0;
       mIsGloballyDisabled = true;
     } else {
       mSearchRecords = new TransitionRecord(aut, mSearchRecords);
+      mOccursInSpec = true;
     }
   }
 }

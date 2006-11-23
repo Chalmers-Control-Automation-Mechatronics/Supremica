@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   EventRecord
 //###########################################################################
-//# $Id: EventRecord.h,v 1.6 2006-11-22 21:27:57 robi Exp $
+//# $Id: EventRecord.h,v 1.7 2006-11-23 07:51:27 robi Exp $
 //###########################################################################
 
 
@@ -104,6 +104,8 @@ private:
   jni::EventGlue mJavaEvent;
   bool mIsControllable;
   bool mIsGloballyDisabled;
+  bool mIsOnlySelfloops;
+  bool mOccursInSpec;
   int mNumberOfWords;
   TransitionRecord* mSearchRecords;
   TransitionRecord* mTraceSearchRecords;
