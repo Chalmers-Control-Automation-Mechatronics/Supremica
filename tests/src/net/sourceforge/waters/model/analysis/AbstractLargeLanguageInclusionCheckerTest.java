@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractLargeLanguageInclusionCheckerTest
 //###########################################################################
-//# $Id: AbstractLargeLanguageInclusionCheckerTest.java,v 1.2 2006-11-16 01:08:50 robi Exp $
+//# $Id: AbstractLargeLanguageInclusionCheckerTest.java,v 1.3 2006-11-24 02:33:17 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -49,6 +49,78 @@ public abstract class AbstractLargeLanguageInclusionCheckerTest
     final String dir = "profisafe";
     final String name = "profisafe_o4_host.wmod";
     final String propname = "HOST__fv_timeout__property";
+    runModelVerifier(group, dir, name, true, propname);
+  }
+
+  public void testProfisafeI4__fv_crc() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_i4.wmod";
+    final String propname = "HOST__fv_crc__property";
+    runModelVerifier(group, dir, name, false, propname);
+  }
+
+  public void testProfisafeI4__fv_crc_noinit() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_i4.wmod";
+    final String propname = "HOST__fv_crc_noinit__property";
+    runModelVerifier(group, dir, name, true, propname);
+  }
+
+  public void testProfisafeI4__fv_timeout() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_i4.wmod";
+    final String propname = "HOST__fv_timeout__property";
+    runModelVerifier(group, dir, name, true, propname);
+  }
+
+  public void testProfisafeI4__slave() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_i4.wmod";
+    final String propname = "SLAVE__fv__property";
+    runModelVerifier(group, dir, name, true, propname);
+  }
+
+  public void testProfisafeO4__fv_crc() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_o4.wmod";
+    final String propname = "HOST__fv_crc__property";
+    runModelVerifier(group, dir, name, false, propname);
+  }
+
+  public void testProfisafeO4__fv_crc_noinit() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_o4.wmod";
+    final String propname = "HOST__fv_crc_noinit__property";
+    runModelVerifier(group, dir, name, true, propname);
+  }
+
+  public void testProfisafeO4__fv_timeout() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_o4.wmod";
+    final String propname = "HOST__fv_timeout__property";
+    runModelVerifier(group, dir, name, true, propname);
+  }
+
+  public void testProfisafeO4__slave() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_o4.wmod";
+    final String propname = "SLAVE__fv__property";
     runModelVerifier(group, dir, name, true, propname);
   }
 

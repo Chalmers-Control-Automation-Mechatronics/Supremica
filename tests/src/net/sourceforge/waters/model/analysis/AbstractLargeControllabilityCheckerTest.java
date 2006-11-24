@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractLargeControllabilityCheckerTest
 //###########################################################################
-//# $Id: AbstractLargeControllabilityCheckerTest.java,v 1.2 2006-11-16 01:08:50 robi Exp $
+//# $Id: AbstractLargeControllabilityCheckerTest.java,v 1.3 2006-11-24 02:33:17 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -51,12 +51,10 @@ public abstract class AbstractLargeControllabilityCheckerTest
     runModelVerifier(group, dir, name, true);
   }
 
-  /*
-   * Nondeterminism in original test suite !!!
   public void testProfisafeI4() throws Exception
   {
     final String group = "tests";
-    final String dir = "incremental_suite";
+    final String dir = "profisafe";
     final String name = "profisafe_i4.wmod";
     runModelVerifier(group, dir, name, true);
   }
@@ -64,11 +62,10 @@ public abstract class AbstractLargeControllabilityCheckerTest
   public void testProfisafeO4() throws Exception
   {
     final String group = "tests";
-    final String dir = "incremental_suite";
+    final String dir = "profisafe";
     final String name = "profisafe_o4.wmod";
     runModelVerifier(group, dir, name, true);
   }
-   */
 
   public void testRhoneAlps() throws Exception
   {
