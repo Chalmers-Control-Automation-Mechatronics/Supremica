@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   SafetyVerifier
 //###########################################################################
-//# $Id: SafetyVerifier.cpp,v 1.5 2006-11-24 02:34:20 robi Exp $
+//# $Id: SafetyVerifier.cpp,v 1.6 2006-11-24 23:25:59 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -249,7 +249,7 @@ setup()
     if (!eventrecord->isSkippable()) {
       eventrecord->sortTransitionRecordsForSearch();
       mEventRecords[i++] = eventrecord;
-      if (!eventrecord->isControllable() && eventrecord->isInSpec()) {
+      if (!eventrecord->isControllable() && eventrecord->isDisabledInSpec()) {
         mIsTrivial = false;
       }
     }

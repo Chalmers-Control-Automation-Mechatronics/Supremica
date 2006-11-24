@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   EventRecord
 //###########################################################################
-//# $Id: EventRecord.h,v 1.8 2006-11-24 02:34:20 robi Exp $
+//# $Id: EventRecord.h,v 1.9 2006-11-24 23:25:59 robi Exp $
 //###########################################################################
 
 
@@ -75,7 +75,7 @@ public:
   //# Simple Access
   bool isControllable() const {return mIsControllable;}
   bool isGloballyDisabled() const {return mIsGloballyDisabled;}
-  bool isInSpec() const {return mIsInSpec;}
+  bool isDisabledInSpec() const {return mIsDisabledInSpec;}
   bool isSkippable() const;
   const jni::EventGlue& getJavaEvent() const {return mJavaEvent;}
   jni::JavaString getName() const;
@@ -106,7 +106,7 @@ private:
   bool mIsControllable;
   bool mIsGloballyDisabled;
   bool mIsOnlySelfloops;
-  bool mIsInSpec;
+  bool mIsDisabledInSpec;
   int mNumberOfWords;
   TransitionRecord* mSearchRecords;
   TransitionRecord* mTraceSearchRecords;

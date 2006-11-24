@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   EventRecord
 //###########################################################################
-//# $Id: EventRecord.cpp,v 1.10 2006-11-24 02:34:20 robi Exp $
+//# $Id: EventRecord.cpp,v 1.11 2006-11-24 23:25:59 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -81,7 +81,7 @@ EventRecord(jni::EventGlue event, bool controllable, int numwords)
     mIsControllable(controllable),
     mIsGloballyDisabled(false),
     mIsOnlySelfloops(true),
-    mIsInSpec(false),
+    mIsDisabledInSpec(false),
     mNumberOfWords(numwords),
     mSearchRecords(0),
     mTraceSearchRecords(0)
@@ -116,7 +116,7 @@ isSkippable()
   } else if (mSearchRecords == 0 && mTraceSearchRecords == 0) {
     return true;
   } else if (mIsOnlySelfloops) {
-    return mIsControllable ? true : !mIsInSpec;
+    return mIsControllable ? true : !mIsDisabledInSpec;
   } else {
     return false;
   }
@@ -186,13 +186,13 @@ normalize(const AutomatonRecord* aut)
     const bool unlinked = trans->isAlwaysEnabled();
     if (unlinked) {
       mSearchRecords = trans->getNextInSearch();
+    } else {
+      mIsDisabledInSpec |= !aut->isPlant();
     }
     if (trans->isOnlySelfloops()) {
       if (unlinked) {
         trans->setNextInSearch(0);
         delete trans;
-      } if (!aut->isPlant()) {
-        mIsInSpec = true;
       }
     } else {
       const AutomatonRecord* aut = trans->getAutomaton();
@@ -204,7 +204,6 @@ normalize(const AutomatonRecord* aut)
         mTraceSearchRecords = trans;
       }
       mIsOnlySelfloops = false;
-      mIsInSpec |= !aut->isPlant();
     }
   } else if (!mIsGloballyDisabled) {
     if (mIsControllable || aut->isPlant()) {
@@ -214,7 +213,7 @@ normalize(const AutomatonRecord* aut)
       mIsGloballyDisabled = true;
     } else {
       mSearchRecords = new TransitionRecord(aut, mSearchRecords);
-      mIsInSpec = true;
+      mIsDisabledInSpec = true;
     }
   }
 }
