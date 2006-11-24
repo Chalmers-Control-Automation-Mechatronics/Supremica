@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   EventRecord
 //###########################################################################
-//# $Id: EventRecord.cpp,v 1.9 2006-11-23 07:51:27 robi Exp $
+//# $Id: EventRecord.cpp,v 1.10 2006-11-24 02:34:20 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -81,7 +81,7 @@ EventRecord(jni::EventGlue event, bool controllable, int numwords)
     mIsControllable(controllable),
     mIsGloballyDisabled(false),
     mIsOnlySelfloops(true),
-    mOccursInSpec(false),
+    mIsInSpec(false),
     mNumberOfWords(numwords),
     mSearchRecords(0),
     mTraceSearchRecords(0)
@@ -116,7 +116,7 @@ isSkippable()
   } else if (mSearchRecords == 0 && mTraceSearchRecords == 0) {
     return true;
   } else if (mIsOnlySelfloops) {
-    return mIsControllable ? true : !mOccursInSpec;
+    return mIsControllable ? true : !mIsInSpec;
   } else {
     return false;
   }
@@ -192,7 +192,7 @@ normalize(const AutomatonRecord* aut)
         trans->setNextInSearch(0);
         delete trans;
       } if (!aut->isPlant()) {
-        mOccursInSpec = true;
+        mIsInSpec = true;
       }
     } else {
       const AutomatonRecord* aut = trans->getAutomaton();
@@ -204,7 +204,7 @@ normalize(const AutomatonRecord* aut)
         mTraceSearchRecords = trans;
       }
       mIsOnlySelfloops = false;
-      mOccursInSpec |= !aut->isPlant();
+      mIsInSpec |= !aut->isPlant();
     }
   } else if (!mIsGloballyDisabled) {
     if (mIsControllable || aut->isPlant()) {
@@ -214,7 +214,7 @@ normalize(const AutomatonRecord* aut)
       mIsGloballyDisabled = true;
     } else {
       mSearchRecords = new TransitionRecord(aut, mSearchRecords);
-      mOccursInSpec = true;
+      mIsInSpec = true;
     }
   }
 }

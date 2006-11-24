@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   SafetyVerifier
 //###########################################################################
-//# $Id: SafetyVerifier.cpp,v 1.4 2006-11-22 21:27:57 robi Exp $
+//# $Id: SafetyVerifier.cpp,v 1.5 2006-11-24 02:34:20 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -240,6 +240,7 @@ setup()
       mNumEventRecords--;
     }
   }
+  mIsTrivial = true;
   mEventRecords = new EventRecord*[mNumEventRecords];
   HashTableIterator hiter2 = eventmap.iterator();
   int i = 0;
@@ -248,6 +249,9 @@ setup()
     if (!eventrecord->isSkippable()) {
       eventrecord->sortTransitionRecordsForSearch();
       mEventRecords[i++] = eventrecord;
+      if (!eventrecord->isControllable() && eventrecord->isInSpec()) {
+        mIsTrivial = false;
+      }
     }
   }
   qsort(mEventRecords, mNumEventRecords, sizeof(EventRecord*),
@@ -258,6 +262,11 @@ setup()
 bool SafetyVerifier::
 checkProperty()
 {
+  // No interesting specs?
+  if (mIsTrivial) {
+    return true;
+  }
+
   // Store initial state ...
   const int numwords = mEncoding->getNumberOfWords();
   const int numaut = mEncoding->getNumberOfRecords();

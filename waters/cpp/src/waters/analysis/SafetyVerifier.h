@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   SafetyVerifier
 //###########################################################################
-//# $Id: SafetyVerifier.h,v 1.3 2006-11-15 01:26:40 robi Exp $
+//# $Id: SafetyVerifier.h,v 1.4 2006-11-24 02:34:20 robi Exp $
 //###########################################################################
 
 
@@ -85,6 +85,7 @@ private:
   StateSpace* mStateSpace;
   ArrayList<uint32>* mDepthMap;
   int mNumEventRecords;
+  bool mIsTrivial;
   EventRecord** mEventRecords;
   uint32* mCurrentTuple;
   uint32 mBadState;
