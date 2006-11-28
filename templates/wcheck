@@ -1,0 +1,33 @@
+#!/bin/sh
+
+THIS=`readlink -f $0`
+DIR=`dirname $THIS`
+
+export LD_LIBRARY_PATH=$DIR
+
+WPACK="net.sourceforge.waters"
+FACTORY="$WPACK.cpp.analysis.NativeModelVerifierFactory"
+ARGS=
+
+for F in $@; do
+    case $F in
+	-native)
+	    FACTORY="$WPACK.cpp.analysis.NativeModelVerifierFactory"
+	    ;;
+	-mono)
+	    FACTORY="$WPACK.analysis.monolithic.MonolithicModelVerifierFactory"
+	    ;;
+	-cont)
+	    CHECK="Controllability"
+	    ;;
+	-lang)
+	    CHECK="LanguageInclusion"
+	    ;;
+	*)
+	    ARGS="$ARGS \"$F\""
+	    ;;
+    esac
+done
+
+eval java -cp "$DIR/Supremica.jar" -enableassertions \
+    $WPACK.model.analysis.CommandLineTool $FACTORY $CHECK $ARGS

@@ -93,7 +93,7 @@
 *	You should also run it every time one of the jar files below
 *	has been updated.
 -->
-<target name="initialize" depends="clean,initialize_jars,version,build,jar_supremica_lib"/>
+<target name="initialize" depends="clean,initialize_jars,version,build,jar_supremica_lib,cpp_waters"/>
 
 <!--
 <target name="eclipse_initialize">
@@ -172,16 +172,12 @@
 	<mkdir dir="${testsbuild}"/>
 	<delete dir="${benchmarksbuild}"/>
 	<mkdir dir="${benchmarksbuild}"/>
-	<ant dir="${waters.dir}" target="clean" inheritAll="false"/>
 </target>
 
 
 <target name="clean" depends="clean_build">
 	<delete dir="${dist}"/>
 	<mkdir dir="${dist}"/>	
-
-	<delete dir="${src}/net/sourceforge/waters/xsd"/>
-	<mkdir dir="${src}/net/sourceforge/waters/xsd"/>
 
 	<delete dir="${src}/org/w3"/>
 	<mkdir dir="${src}/org/w3"/>
@@ -197,6 +193,8 @@
 
 	<delete dir="${lib}/${unjared}/META-INF"/>
 	<mkdir dir="${lib}/${unjared}/META-INF"/>
+
+	<ant dir="${waters.dir}" target="clean" inheritAll="false"/>
 </target>
 
 <target name="build_jni">
@@ -527,6 +525,12 @@ Class-Path: ${manifest.pathlist}</echo>
 	<unjar src="${lib}/automationobjects_jaxb.jar" dest="${lib}/${unjared}"/>		
 </target>
 
+<target name="cpp_waters">
+  <ant dir="${waters.dir}" target="cpp" inheritAll="false"/>
+  <copy file="${waters.dir}/cpp/lib/libwaters.so" todir="${dist}"
+        failonerror="false"/>
+</target>
+
 <target name="jar_manufacturingTables_jaxb" depends="compile_manufacturingTables_jaxb">
 	<jar jarfile="${lib}/manufacturingTables_jaxb.jar"> 
 		<fileset dir="${build}/">
@@ -573,6 +577,8 @@ Class-Path: ${manifest.pathlist}</echo>
 	<chmod file="${dist}/IDE" perm="755"/>
 	<copy file="${templates}/vw" todir="${dist}"/>	
 	<chmod file="${dist}/vw" perm="755"/>	
+	<copy file="${templates}/wcheck" todir="${dist}"/>	
+	<chmod file="${dist}/wcheck" perm="755"/>	
 	<copy file="${templates}/MBTTranslate" todir="${dist}"/>	
 	<chmod file="${dist}/MBTTranslate" perm="755"/>	
 	<copy file="${templates}/Waters.cmd" todir="${dist}"/>	

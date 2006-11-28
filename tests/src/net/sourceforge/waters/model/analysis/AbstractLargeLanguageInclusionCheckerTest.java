@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractLargeLanguageInclusionCheckerTest
 //###########################################################################
-//# $Id: AbstractLargeLanguageInclusionCheckerTest.java,v 1.3 2006-11-24 02:33:17 robi Exp $
+//# $Id: AbstractLargeLanguageInclusionCheckerTest.java,v 1.4 2006-11-28 04:28:33 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -206,6 +206,119 @@ public abstract class AbstractLargeLanguageInclusionCheckerTest
   }
 
 
+  //#########################################################################
+  //# When you're looking for a REAL challenge ...
+  /*
+  public void testProfisafeInclusionI4_HostCRC3() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_inclusion_i4host.wmod";
+    final String propname = "fv__host_crc__3__property";
+    runModelVerifier(group, dir, name, false, propname);
+  }
+
+  public void testProfisafeInclusionI4_HostTO3() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_inclusion_i4host.wmod";
+    final String propname = "fv__host_to__3__property";
+    runModelVerifier(group, dir, name, false, propname);
+  }
+
+  public void testProfisafeInclusionI4_HostCRC3r() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_inclusion_i4host.wmod";
+    final String propname = "fv__host_crc__3r__property";
+    runModelVerifier(group, dir, name, false, propname);
+  }
+
+  public void testProfisafeInclusionI4_HostTO3r() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_inclusion_i4host.wmod";
+    final String propname = "fv__host_to__3r__property";
+    runModelVerifier(group, dir, name, true, propname);
+  }
+
+  public void testProfisafeInclusionO4_HostCRC3() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_inclusion_o4host.wmod";
+    final String propname = "fv__host_crc__3__property";
+    runModelVerifier(group, dir, name, false, propname);
+  }
+
+  public void testProfisafeInclusionO4_HostTO3() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_inclusion_o4host.wmod";
+    final String propname = "fv__host_to__3__property";
+    runModelVerifier(group, dir, name, false, propname);
+  }
+
+  public void testProfisafeInclusionO4_HostCRC3r() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_inclusion_o4host.wmod";
+    final String propname = "fv__host_crc__3r__property";
+    runModelVerifier(group, dir, name, false, propname);
+  }
+
+  public void testProfisafeInclusionO4_HostTO3r() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_inclusion_o4host.wmod";
+    final String propname = "fv__host_to__3r__property";
+    runModelVerifier(group, dir, name, true, propname);
+  }
+
+  public void testProfisafeInclusionO4_SlaveCRC3() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_inclusion_o4slave.wmod";
+    final String propname = "fv__slave_crc__3__property";
+    runModelVerifier(group, dir, name, false, propname);
+  }
+
+  public void testProfisafeInclusionO4_SlaveTO3() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_inclusion_o4slave.wmod";
+    final String propname = "fv__slave_to__3__property";
+    runModelVerifier(group, dir, name, false, propname);
+  }
+
+  public void testProfisafeInclusionO4_SlaveCRC3r() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_inclusion_o4slave.wmod";
+    final String propname = "fv__slave_crc__3r__property";
+    runModelVerifier(group, dir, name, true, propname);
+  }
+
+  public void testProfisafeInclusionO4_SlaveTO3r() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_inclusion_o4slave.wmod";
+    final String propname = "fv__slave_to__3r__property";
+    runModelVerifier(group, dir, name, true, propname);
+  }
+  */
+
+  
   //#########################################################################
   //# Test Cases -- Parameterised
 
