@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractLargeControllabilityCheckerTest
 //###########################################################################
-//# $Id: AbstractLargeControllabilityCheckerTest.java,v 1.3 2006-11-24 02:33:17 robi Exp $
+//# $Id: AbstractLargeControllabilityCheckerTest.java,v 1.4 2006-11-29 22:22:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -29,6 +29,38 @@ public abstract class AbstractLargeControllabilityCheckerTest
     final String group = "tests";
     final String dir = "profisafe";
     final String name = "profisafe_o4_slave.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
+  public void testProfisafeI5Host() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_i5_host.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
+  public void testProfisafeO5Host() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_o5_host.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
+  public void testProfisafeI6Host() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_i6_host.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
+  public void testProfisafeO6Host() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "profisafe";
+    final String name = "profisafe_o6_host.wmod";
     runModelVerifier(group, dir, name, true);
   }
 
@@ -74,6 +106,18 @@ public abstract class AbstractLargeControllabilityCheckerTest
     final String name = "rhone_alps.wmod";
     runModelVerifier(group, dir, name, true);
   }
+
+  /*
+   * This one has never been solved by VALID. I do not know whether it is
+   * controllable or not ...
+  public void testRhoneTough() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "incremental_suite";
+    final String name = "rhone_alps.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+   */
 
   public void testTbedCTCT() throws Exception
   {
