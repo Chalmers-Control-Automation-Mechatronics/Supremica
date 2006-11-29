@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   SafetyVerifier
 //###########################################################################
-//# $Id: SafetyVerifier.cpp,v 1.6 2006-11-24 23:25:59 robi Exp $
+//# $Id: SafetyVerifier.cpp,v 1.7 2006-11-29 22:20:16 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -65,6 +65,7 @@ SafetyVerifier(const jni::ProductDESGlue des,
     mStateSpace(0),
     mDepthMap(0),
     mNumEventRecords(0),
+    mIsTrivial(false),
     mEventRecords(0),
     mCurrentTuple(0),
     mBadState(UNDEF_UINT32),
@@ -134,6 +135,10 @@ setup()
 {
   // Establish automaton encoding ...
   mEncoding = new AutomatonEncoding(mModel, mKindTranslator, mCache);
+  mIsTrivial = true;
+  if (!mEncoding->hasSpecs()) {
+    return;
+  }
   mStateSpace = new StateSpace(mEncoding, mStateLimit);
   mDepthMap = new ArrayList<uint32>(128);
 
@@ -240,7 +245,6 @@ setup()
       mNumEventRecords--;
     }
   }
-  mIsTrivial = true;
   mEventRecords = new EventRecord*[mNumEventRecords];
   HashTableIterator hiter2 = eventmap.iterator();
   int i = 0;
@@ -275,8 +279,8 @@ checkProperty()
       return true;
     }
   }
-  uint32* packed = mStateSpace->prepare();
-  mEncoding->encode(mCurrentTuple, packed);
+  uint32* packedcurrent = mStateSpace->prepare();
+  mEncoding->encode(mCurrentTuple, packedcurrent);
   mStateSpace->add();
   mNumStates = mStateSpace->size();
 
@@ -286,12 +290,12 @@ checkProperty()
 
   // Main loop ...
   uint32 current = 0;
+  uint32* packednext;
   while (current < mNumStates) {
-    packed = mStateSpace->get(current);
-    mEncoding->decode(packed, mCurrentTuple);
+    packedcurrent = mStateSpace->get(current);
+    mEncoding->decode(packedcurrent, mCurrentTuple);
     for (int e = 0; e < mNumEventRecords; e++) {
       EventRecord* event = mEventRecords[e];
-      bool enabled = true;
       for (TransitionRecord* trans = event->getTransitionRecord();
            trans != 0;
            trans = trans->getNextInSearch()) {
@@ -301,8 +305,7 @@ checkProperty()
         const uint32 target = trans->getShiftedSuccessor(source);
         if (target == UNDEF_UINT32) {
           if (aut->isPlant() || event->isControllable()) {
-            enabled = false;
-            break;
+            goto nextevent;
           } else {
             mBadState = current;
             mBadEvent = event;
@@ -310,27 +313,30 @@ checkProperty()
           }
         }
       }
-      if (enabled) {
-        packed = mStateSpace->prepare(current);
-        for (int w = 0; w < numwords; w++) {
-          TransitionUpdateRecord* update = event->getTransitionUpdateRecord(w);
-          if (update != 0) {
-            uint32 word =
-              packed[w] & update->getKeptMask() | update->getCommonTargets();
-            for (TransitionRecord* trans = update->getTransitionRecords();
-                 trans != 0;
-                 trans = trans->getNextInUpdate()) {
-              const AutomatonRecord* aut = trans->getAutomaton();
-              const int a = aut->getAutomatonIndex();
-              const uint32 source = mCurrentTuple[a];
-              word |= trans->getShiftedSuccessor(source);
-            }
-            packed[w] = word;
+      packednext = mStateSpace->prepare();
+      for (int w = 0; w < numwords; w++) {
+        TransitionUpdateRecord* update = event->getTransitionUpdateRecord(w);
+        if (update == 0) {
+          packednext[w] = packedcurrent[w];
+        } else {
+          uint32 word = packedcurrent[w] &
+            update->getKeptMask() | update->getCommonTargets();
+          for (TransitionRecord* trans = update->getTransitionRecords();
+               trans != 0;
+               trans = trans->getNextInUpdate()) {
+            const AutomatonRecord* aut = trans->getAutomaton();
+            const int a = aut->getAutomatonIndex();
+            const uint32 source = mCurrentTuple[a];
+            word |= trans->getShiftedSuccessor(source);
           }
+          packednext[w] = word;
         }
-        mStateSpace->add();
-        mNumStates = mStateSpace->size();
       }
+      if (mStateSpace->add() == mNumStates) {
+        mNumStates++;
+      }
+    nextevent:
+      ;
     }
     if (++current == nextlevel) {
       nextlevel = mNumStates;

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   AutomatonEncoding
 //###########################################################################
-//# $Id: AutomatonEncoding.cpp,v 1.8 2006-11-22 21:27:57 robi Exp $
+//# $Id: AutomatonEncoding.cpp,v 1.9 2006-11-29 22:20:16 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -277,6 +277,23 @@ AutomatonEncoding::
   }
   delete [] mAutomatonRecords;
   delete [] mWordStop;
+}
+
+
+//############################################################################
+//# AutomatonEncoding: Simple Access
+
+bool AutomatonEncoding::
+hasSpecs()
+  const
+{
+  for (int a = 0; a < mNumRecords; a++) {
+    const AutomatonRecord* record = mAutomatonRecords[a];
+    if (!record->isPlant()) {
+      return true;
+    }
+  }
+  return false;
 }
 
 

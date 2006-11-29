@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   AutomatonEncoding
 //###########################################################################
-//# $Id: AutomatonEncoding.h,v 1.7 2006-11-22 21:27:57 robi Exp $
+//# $Id: AutomatonEncoding.h,v 1.8 2006-11-29 22:20:16 robi Exp $
 //###########################################################################
 
 
@@ -136,6 +136,7 @@ public:
   int getNumberOfRecords() const {return mNumRecords;}
   const AutomatonRecord* getRecord(int index) const
     {return mAutomatonRecords[index];}
+  bool hasSpecs() const;
 
   //##########################################################################
   //# Encoding and Decoding
