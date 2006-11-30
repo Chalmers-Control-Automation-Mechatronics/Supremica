@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   IconLoader
 //###########################################################################
-//# $Id: IconLoader.java,v 1.5 2006-10-26 09:11:27 flordal Exp $
+//# $Id: IconLoader.java,v 1.6 2006-11-30 01:58:05 robi Exp $
 //###########################################################################
 
 
@@ -32,10 +32,9 @@ class IconLoader
     //# Class Constants
     private static final String NAME_CONTROLLABLE = "waters/controllable";
     private static final String NAME_EVENT = "waters/event";
-    private static final String NAME_INTPARAM = "waters/intparam";
     private static final String NAME_PROPOSITION = "waters/proposition";
     private static final String NAME_FORBIDDEN = "ForbiddenState16";
-    private static final String NAME_RANGEPARAM = "waters/rangeparam";
+    private static final String NAME_SIMPLEPARAM = "waters/rangeparam";
     private static final String NAME_UNCONTROLLABLE = "waters/uncontrollable";
     
     
@@ -43,10 +42,9 @@ class IconLoader
     //# Class Constants
     static final ImageIcon ICON_CONTROLLABLE = getIcon(NAME_CONTROLLABLE);
     static final ImageIcon ICON_EVENT = getIcon(NAME_EVENT);
-    static final ImageIcon ICON_INTPARAM = getIcon(NAME_INTPARAM);
     static final ImageIcon ICON_PROPOSITION = getIcon(NAME_PROPOSITION);
     static final ImageIcon ICON_FORBIDDEN = getIcon(NAME_FORBIDDEN);
-    static final ImageIcon ICON_RANGEPARAM = getIcon(NAME_RANGEPARAM);
+    static final ImageIcon ICON_SIMPLEPARAM = getIcon(NAME_SIMPLEPARAM);
     static final ImageIcon ICON_UNCONTROLLABLE = getIcon(NAME_UNCONTROLLABLE);
     
 }

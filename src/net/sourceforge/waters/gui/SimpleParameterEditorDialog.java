@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventParameterEditorDialog
 //###########################################################################
-//# $Id: SimpleParameterEditorDialog.java,v 1.6 2006-11-03 15:01:56 torda Exp $
+//# $Id: SimpleParameterEditorDialog.java,v 1.7 2006-11-30 01:58:05 robi Exp $
 //###########################################################################
 
 
@@ -20,13 +20,11 @@ import javax.swing.*;
 import net.sourceforge.waters.model.base.DuplicateNameException;
 import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.subject.module.IntParameterSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ParameterSubject;
-import net.sourceforge.waters.subject.module.RangeParameterSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
+import net.sourceforge.waters.subject.module.SimpleParameterSubject;
 
 
 public class SimpleParameterEditorDialog
@@ -72,21 +70,6 @@ public class SimpleParameterEditorDialog
 		r3.add(new JLabel("Default Value: "));
 		r3.add(mDefaultInput);
 
-		JRadioButton integerButton, rangeButton;
-
-		mTypeGroup.add(integerButton = new JRadioButton("Integer Expression"));
-		mTypeGroup.add(rangeButton = new JRadioButton("Range"));
-		integerButton.setSelected(true);
-		integerButton.setActionCommand("integer");
-		rangeButton.setActionCommand("range");
-
-		JPanel buttons = new JPanel();
-
-		buttons.setLayout(new GridLayout(1, 2));
-		buttons.add(integerButton);
-		buttons.add(rangeButton);
-		b.add(buttons);
-
 		JButton cancelButton = new JButton("Cancel");
 		JPanel r4 = new JPanel();
 
@@ -119,42 +102,18 @@ public class SimpleParameterEditorDialog
 				return;
 			}
 			SimpleExpressionSubject defaultExpr = null;
-			int mask = 0;
 			final String defaultText = mDefaultInput.getText();
-			final String key = mTypeGroup.getSelection().getActionCommand();
-			if (key.equals("integer"))	{
-				mask = Operator.TYPE_INT;
-			} else if (key.equals("range")) {
-				mask = Operator.TYPE_RANGE;
-			} else {
-				throw new IllegalStateException
-					("Parameter type not selected!");
-			}
 			try {
 				defaultExpr =
-					(SimpleExpressionSubject) parser.parse(defaultText, mask);
+					(SimpleExpressionSubject) parser.parse(defaultText);
 			} catch (final ParseException exception) {
 				ErrorWindow.askRevert(exception, defaultText);
 				mRoot.logEntry("ParseException in default value: " +
 							   exception.getMessage());
 				return;
 			}
-
-			ParameterSubject param;
-			switch (mask) {
-			case Operator.TYPE_INT:
-				param = new IntParameterSubject
-					(nameText, mIsRequired, defaultExpr);
-				break;
-			case Operator.TYPE_RANGE:
-				param = new RangeParameterSubject
-					(nameText, mIsRequired, defaultExpr);
-				break;
-			default:
-				throw new IllegalStateException
-					("Unexpected type mask " + mask + "!");
-			}
-
+			final ParameterSubject param =
+				new SimpleParameterSubject(nameText, mIsRequired, defaultExpr);
 			try	{
 				final ModuleSubject module = mRoot.getModuleSubject();
 				final IndexedList<ParameterSubject> params =
@@ -192,7 +151,6 @@ public class SimpleParameterEditorDialog
 	private final JTextField mNameInput = new JTextField(16);
 	private final JTextField mDefaultInput = new JTextField(16);
 	private final JButton okButton = new JButton("OK");
-	private final ButtonGroup mTypeGroup = new ButtonGroup();
 	private final ModuleWindow mRoot;
 
 	private DefaultListModel data = null;

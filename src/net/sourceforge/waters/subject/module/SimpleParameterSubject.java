@@ -4,12 +4,15 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SimpleParameterSubject
 //###########################################################################
-//# $Id: SimpleParameterSubject.java,v 1.7 2006-09-06 11:52:21 robi Exp $
+//# $Id: SimpleParameterSubject.java,v 1.8 2006-11-30 01:58:05 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleParameterProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
@@ -21,7 +24,7 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
  * @author Robi Malik
  */
 
-public abstract class SimpleParameterSubject
+public final class SimpleParameterSubject
   extends ParameterSubject
   implements SimpleParameterProxy
 {
@@ -34,9 +37,9 @@ public abstract class SimpleParameterSubject
    * @param required The required status of the new simple parameter.
    * @param defaultValue The default value of the new simple parameter.
    */
-  protected SimpleParameterSubject(final String name,
-                                   final boolean required,
-                                   final SimpleExpressionProxy defaultValue)
+  public SimpleParameterSubject(final String name,
+                                final boolean required,
+                                final SimpleExpressionProxy defaultValue)
   {
     super(name, required);
     mDefaultValue = (SimpleExpressionSubject) defaultValue;
@@ -50,8 +53,8 @@ public abstract class SimpleParameterSubject
    * @param name The name of the new simple parameter.
    * @param defaultValue The default value of the new simple parameter.
    */
-  protected SimpleParameterSubject(final String name,
-                                   final SimpleExpressionProxy defaultValue)
+  public SimpleParameterSubject(final String name,
+                                final SimpleExpressionProxy defaultValue)
   {
     this(name,
          true,
@@ -108,6 +111,16 @@ public abstract class SimpleParameterSubject
     result *= 5;
     result += mDefaultValue.hashCodeWithGeometry();
     return result;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.base.Proxy
+  public Object acceptVisitor(final ProxyVisitor visitor)
+    throws VisitorException
+  {
+    final ModuleProxyVisitor downcast = (ModuleProxyVisitor) visitor;
+    return downcast.visitSimpleParameterProxy(this);
   }
 
 

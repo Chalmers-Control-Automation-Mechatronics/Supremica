@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ModuleProxyPrinter
 //###########################################################################
-//# $Id: ModuleProxyPrinter.java,v 1.7 2006-11-03 15:01:57 torda Exp $
+//# $Id: ModuleProxyPrinter.java,v 1.8 2006-11-30 01:58:05 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;
@@ -40,7 +40,6 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
-import net.sourceforge.waters.model.module.IntParameterProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -50,7 +49,6 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.ParameterProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
-import net.sourceforge.waters.model.module.RangeParameterProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
@@ -427,14 +425,6 @@ public class ModuleProxyPrinter
     return null;
   }
 
-  public Object visitIntParameterProxy
-      (final IntParameterProxy proxy)
-    throws VisitorException
-  {
-    printSimpleParameterProxy(proxy, "int");
-    return null;
-  }
-
   public Object visitLabelBlockProxy
       (final LabelBlockProxy proxy)
     throws VisitorException
@@ -515,14 +505,6 @@ public class ModuleProxyPrinter
     return visitGeometryProxy(proxy);
   }
 
-  public Object visitRangeParameterProxy
-      (final RangeParameterProxy proxy)
-    throws VisitorException
-  {
-    printSimpleParameterProxy(proxy, "range");
-    return null;
-  }
-
   public Object visitSimpleComponentProxy
       (final SimpleComponentProxy proxy)
     throws VisitorException
@@ -578,7 +560,12 @@ public class ModuleProxyPrinter
     (final SimpleParameterProxy proxy)
     throws VisitorException
   {
-    return visitProxy(proxy);
+    visitParameterProxy(proxy);
+    print(proxy.getName());
+    print(" = ");
+    final SimpleExpressionProxy defaultValue = proxy.getDefaultValue();
+    defaultValue.acceptVisitor(this);
+    return null;
   }
 
   public Object visitSplineGeometryProxy
@@ -618,22 +605,6 @@ public class ModuleProxyPrinter
       }
     }
     return null;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private void printSimpleParameterProxy
-    (final SimpleParameterProxy proxy, final String typename)
-    throws VisitorException
-  {
-    visitParameterProxy(proxy);
-    print(typename);
-    print(' ');
-    print(proxy.getName());
-    print(" = ");
-    final SimpleExpressionProxy defaultValue = proxy.getDefaultValue();
-    defaultValue.acceptVisitor(this);
   }
 
 

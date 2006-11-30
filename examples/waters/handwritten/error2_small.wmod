@@ -3,9 +3,9 @@
 <Module xmlns="http://waters.sourceforge.net/xsd/module"
         Name="small_factory_n">
 <ParameterList>
-  <IntParameter Name="n">
+  <SimpleParameter Name="n">
     <IntConstant Value="2"/>
-  </IntParameter>
+  </SimpleParameter>
 </ParameterList>
 <EventDeclList>
   <EventDecl Name="start" Kind="CONTROLLABLE">

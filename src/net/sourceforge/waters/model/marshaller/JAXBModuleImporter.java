@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.18 2006-11-03 21:12:25 flordal Exp $
+//# $Id: JAXBModuleImporter.java,v 1.19 2006-11-30 01:58:05 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -50,7 +50,6 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
-import net.sourceforge.waters.model.module.IntParameterProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -60,11 +59,11 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.ParameterProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
-import net.sourceforge.waters.model.module.RangeParameterProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.model.module.SimpleParameterProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
@@ -95,7 +94,6 @@ import net.sourceforge.waters.xsd.module.IdentifierType;
 import net.sourceforge.waters.xsd.module.IndexedIdentifier;
 import net.sourceforge.waters.xsd.module.Instance;
 import net.sourceforge.waters.xsd.module.IntConstant;
-import net.sourceforge.waters.xsd.module.IntParameter;
 import net.sourceforge.waters.xsd.module.LabelBlock;
 import net.sourceforge.waters.xsd.module.LabelGeometry;
 import net.sourceforge.waters.xsd.module.Module;
@@ -103,11 +101,11 @@ import net.sourceforge.waters.xsd.module.NodeRef;
 import net.sourceforge.waters.xsd.module.ParameterBinding;
 import net.sourceforge.waters.xsd.module.PointGeometryType;
 import net.sourceforge.waters.xsd.module.Point;
-import net.sourceforge.waters.xsd.module.RangeParameter;
 import net.sourceforge.waters.xsd.module.SimpleComponent;
 import net.sourceforge.waters.xsd.module.SimpleExpressionType;
 import net.sourceforge.waters.xsd.module.SimpleIdentifier;
 import net.sourceforge.waters.xsd.module.SimpleNode;
+import net.sourceforge.waters.xsd.module.SimpleParameter;
 import net.sourceforge.waters.xsd.module.SplineGeometry;
 import net.sourceforge.waters.xsd.module.SplineKind;
 import net.sourceforge.waters.xsd.module.UnaryExpression;
@@ -349,16 +347,6 @@ public class JAXBModuleImporter
     mHandlerMap.put
       (net.sourceforge.waters.xsd.module.IntConstant.class, handler);
     handler = new ImportHandler() {
-      public IntParameterProxy importElement(final ElementType element)
-      {
-        final IntParameter downcast = (IntParameter) element;
-        return importIntParameter(downcast);
-      }
-    };
-    mHandlerMap.put
-      (net.sourceforge.waters.xsd.module.IntParameter.class, handler);
-    
-    handler = new ImportHandler() {
       public LabelBlockProxy importElement(final ElementType element)
       {
         final LabelBlock downcast = (LabelBlock) element;
@@ -377,8 +365,6 @@ public class JAXBModuleImporter
     };
     mHandlerMap.put
       (net.sourceforge.waters.xsd.module.LabelGeometry.class, handler);
-    
-    
     handler = new ImportHandler() {
       public ModuleProxy importElement(final ElementType element)
       {
@@ -425,15 +411,6 @@ public class JAXBModuleImporter
     mHandlerMap.put
       (net.sourceforge.waters.xsd.module.SimpleComponent.class, handler);
     handler = new ImportHandler() {
-      public RangeParameterProxy importElement(final ElementType element)
-      {
-        final RangeParameter downcast = (RangeParameter) element;
-        return importRangeParameter(downcast);
-      }
-    };
-    mHandlerMap.put
-      (net.sourceforge.waters.xsd.module.RangeParameter.class, handler);
-    handler = new ImportHandler() {
       public SimpleIdentifierProxy importElement(final ElementType element)
       {
         final SimpleIdentifier downcast = (SimpleIdentifier) element;
@@ -451,6 +428,15 @@ public class JAXBModuleImporter
     };
     mHandlerMap.put
       (net.sourceforge.waters.xsd.module.SimpleNode.class, handler);
+    handler = new ImportHandler() {
+      public SimpleParameterProxy importElement(final ElementType element)
+      {
+        final SimpleParameter downcast = (SimpleParameter) element;
+        return importSimpleParameter(downcast);
+      }
+    };
+    mHandlerMap.put
+      (net.sourceforge.waters.xsd.module.SimpleParameter.class, handler);
     handler = new ImportHandler() {
       public SplineGeometryProxy importElement(final ElementType element)
       {
@@ -868,16 +854,6 @@ public class JAXBModuleImporter
     return mFactory.createIntConstantProxy(text, value);
   }
 
-  private IntParameterProxy importIntParameter(final IntParameter element)
-  {
-    final String name = element.getName();
-    final boolean required = element.isRequired();
-    final SimpleExpressionType defaultValueElement = element.getDefault();
-    final SimpleExpressionProxy defaultValue =
-      (SimpleExpressionProxy) importElement(defaultValueElement);
-    return mFactory.createIntParameterProxy(name, required, defaultValue);
-  }
-
   private LabelBlockProxy importLabelBlock(final LabelBlock element)
   {
     if (element != null) {
@@ -985,17 +961,6 @@ public class JAXBModuleImporter
     }
   }
 
-  private RangeParameterProxy importRangeParameter
-    (final RangeParameter element)
-  {
-    final String name = element.getName();
-    final boolean required = element.isRequired();
-    final SimpleExpressionType defaultValueElement = element.getDefault();
-    final SimpleExpressionProxy defaultValue =
-      (SimpleExpressionProxy) importElement(defaultValueElement);
-    return mFactory.createRangeParameterProxy(name, required, defaultValue);
-  }
-
   private Rectangle importRectangle(final Box element)
   {
     final int x = element.getX();
@@ -1054,6 +1019,17 @@ public class JAXBModuleImporter
                                           pointGeometry,
                                           arrowGeometry,
                                           labelGeometry);
+  }
+
+  private SimpleParameterProxy importSimpleParameter
+    (final SimpleParameter element)
+  {
+    final String name = element.getName();
+    final boolean required = element.isRequired();
+    final SimpleExpressionType defaultValueElement = element.getDefault();
+    final SimpleExpressionProxy defaultValue =
+      (SimpleExpressionProxy) importElement(defaultValueElement);
+    return mFactory.createSimpleParameterProxy(name, required, defaultValue);
   }
 
   private SplineGeometryProxy importSplineGeometry

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   AbstractModuleProxyVisitor
 //###########################################################################
-//# $Id: AbstractModuleProxyVisitor.java,v 1.5 2006-05-24 09:13:02 markus Exp $
+//# $Id: AbstractModuleProxyVisitor.java,v 1.6 2006-11-30 01:58:05 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -162,12 +162,6 @@ public class AbstractModuleProxyVisitor
     return visitSimpleExpressionProxy(proxy);
   }
 
-  public Object visitIntParameterProxy(final IntParameterProxy proxy)
-    throws VisitorException
-  {
-    return visitSimpleParameterProxy(proxy);
-  }
-
   public Object visitLabelBlockProxy(final LabelBlockProxy proxy)
     throws VisitorException
   {
@@ -214,12 +208,6 @@ public class AbstractModuleProxyVisitor
     throws VisitorException
   {
     return visitGeometryProxy(proxy);
-  }
-
-  public Object visitRangeParameterProxy(final RangeParameterProxy proxy)
-    throws VisitorException
-  {
-    return visitSimpleParameterProxy(proxy);
   }
 
   public Object visitSimpleComponentProxy(final SimpleComponentProxy proxy)

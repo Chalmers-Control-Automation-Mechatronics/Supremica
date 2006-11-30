@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleExporter
 //###########################################################################
-//# $Id: JAXBModuleExporter.java,v 1.16 2006-11-03 15:01:57 torda Exp $
+//# $Id: JAXBModuleExporter.java,v 1.17 2006-11-30 01:58:05 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -49,7 +49,6 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
-import net.sourceforge.waters.model.module.IntParameterProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -59,7 +58,6 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.ParameterProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
-import net.sourceforge.waters.model.module.RangeParameterProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
@@ -98,7 +96,6 @@ import net.sourceforge.waters.xsd.module.IdentifierType;
 import net.sourceforge.waters.xsd.module.IndexedIdentifier;
 import net.sourceforge.waters.xsd.module.Instance;
 import net.sourceforge.waters.xsd.module.IntConstant;
-import net.sourceforge.waters.xsd.module.IntParameter;
 import net.sourceforge.waters.xsd.module.LabelBlock;
 import net.sourceforge.waters.xsd.module.LabelGeometry;
 import net.sourceforge.waters.xsd.module.Module;
@@ -108,12 +105,11 @@ import net.sourceforge.waters.xsd.module.ObjectFactory;
 import net.sourceforge.waters.xsd.module.ParameterBinding;
 import net.sourceforge.waters.xsd.module.PointGeometryType;
 import net.sourceforge.waters.xsd.module.Point;
-import net.sourceforge.waters.xsd.module.RangeParameter;
 import net.sourceforge.waters.xsd.module.SimpleComponent;
 import net.sourceforge.waters.xsd.module.SimpleExpressionType;
 import net.sourceforge.waters.xsd.module.SimpleIdentifier;
 import net.sourceforge.waters.xsd.module.SimpleNode;
-import net.sourceforge.waters.xsd.module.SimpleParameterType;
+import net.sourceforge.waters.xsd.module.SimpleParameter;
 import net.sourceforge.waters.xsd.module.SplineGeometry;
 import net.sourceforge.waters.xsd.module.SplineKind;
 import net.sourceforge.waters.xsd.module.UnaryExpression;
@@ -384,15 +380,6 @@ public class JAXBModuleExporter
     return element;
   }
 
-  public IntParameter visitIntParameterProxy
-      (final IntParameterProxy proxy)
-    throws VisitorException
-  {
-    final IntParameter element = mFactory.createIntParameter();
-    copyIntParameterProxy(proxy, element);
-    return element;
-  }
-
   public LabelBlock visitLabelBlockProxy
       (final LabelBlockProxy proxy)
     throws VisitorException
@@ -461,15 +448,6 @@ public class JAXBModuleExporter
     return element;
   }
 
-  public RangeParameter visitRangeParameterProxy
-      (final RangeParameterProxy proxy)
-    throws VisitorException
-  {
-    final RangeParameter element = mFactory.createRangeParameter();
-    copyRangeParameterProxy(proxy, element);
-    return element;
-  }
-
   public SimpleComponent visitSimpleComponentProxy
       (final SimpleComponentProxy proxy)
     throws VisitorException
@@ -504,11 +482,13 @@ public class JAXBModuleExporter
     return element;
   }
 
-  public Object visitSimpleParameterProxy
+  public SimpleParameter visitSimpleParameterProxy
       (final SimpleParameterProxy proxy)
     throws VisitorException
   {
-    return visitParameterProxy(proxy);
+    final SimpleParameter element = mFactory.createSimpleParameter();
+    copySimpleParameterProxy(proxy, element);
+    return element;
   }
 
   public SplineGeometry visitSplineGeometryProxy
@@ -951,18 +931,6 @@ public class JAXBModuleExporter
     element.setValue(proxy.getValue());
   }
 
-  private void copyIntParameterProxy
-      (final IntParameterProxy proxy,
-       final IntParameter element)
-    throws VisitorException
-  {
-    copySimpleParameterProxy(proxy, element);
-    final SimpleExpressionProxy defaultValueProxy = proxy.getDefaultValue();
-    final SimpleExpressionType defaultValueElement =
-      (SimpleExpressionType) defaultValueProxy.acceptVisitor(this);
-    element.setDefault(defaultValueElement);
-  }
-
   private void copyLabelBlockProxy
       (final LabelBlockProxy proxy,
        final LabelBlock element)
@@ -1070,18 +1038,6 @@ public class JAXBModuleExporter
     element.setPoint(pointElement);
   }
 
-  private void copyRangeParameterProxy
-      (final RangeParameterProxy proxy,
-       final RangeParameter element)
-    throws VisitorException
-  {
-    copySimpleParameterProxy(proxy, element);
-    final SimpleExpressionProxy defaultValueProxy = proxy.getDefaultValue();
-    final SimpleExpressionType defaultValueElement =
-      (SimpleExpressionType) defaultValueProxy.acceptVisitor(this);
-    element.setDefault(defaultValueElement);
-  }
-
   private void copySimpleComponentProxy
     (final SimpleComponentProxy proxy,
      final SimpleComponent element)
@@ -1146,11 +1102,15 @@ public class JAXBModuleExporter
 
   private void copySimpleParameterProxy
       (final SimpleParameterProxy proxy,
-       final SimpleParameterType element)
+       final SimpleParameter element)
     throws VisitorException
   {
     copyParameterProxy(proxy, element);
     element.setRequired(proxy.isRequired());
+    final SimpleExpressionProxy defaultValueProxy = proxy.getDefaultValue();
+    final SimpleExpressionType defaultValueElement =
+      (SimpleExpressionType) defaultValueProxy.acceptVisitor(this);
+    element.setDefault(defaultValueElement);
   }
 
   private void copySplineGeometryProxy

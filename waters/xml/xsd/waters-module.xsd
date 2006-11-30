@@ -57,43 +57,21 @@
 
 <xs:group name="ParameterListEntry">
   <xs:choice>
-    <xs:element ref="M:IntParameter"/>
-    <xs:element ref="M:RangeParameter"/>
+    <xs:element ref="M:SimpleParameter"/>
     <xs:element ref="M:EventParameter"/>
   </xs:choice>
 </xs:group>
 
-<xs:complexType name="SimpleParameterType">
-  <xs:complexContent>
-    <xs:extension base="B:NamedType">
-      <xs:attribute name="Required" type="xs:boolean" default="true"/>
-    </xs:extension>
-  </xs:complexContent>
-</xs:complexType>
-
-<xs:element name="IntParameter">
+<xs:element name="SimpleParameter">
   <xs:complexType>
     <xs:complexContent>
-      <xs:extension base="M:SimpleParameterType">
+      <xs:extension base="B:NamedType">
         <xs:group ref="M:ArithmeticExpression">
           <xs:annotation><xs:appinfo>
             <jaxb:property name="Default"/>
           </xs:appinfo></xs:annotation>
         </xs:group>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-</xs:element>
-
-<xs:element name="RangeParameter">
-  <xs:complexType>
-    <xs:complexContent>
-      <xs:extension base="M:SimpleParameterType">
-        <xs:group ref="M:RangeExpression">
-          <xs:annotation><xs:appinfo>
-            <jaxb:property name="Default"/>
-          </xs:appinfo></xs:annotation>
-        </xs:group>
+        <xs:attribute name="Required" type="xs:boolean" default="true"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

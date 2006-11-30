@@ -2,14 +2,14 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.expr
-//# CLASS:   IntValue
+//# CLASS:   SimpleValue
 //###########################################################################
-//# $Id: IndexValue.java,v 1.3 2006-11-30 01:58:05 robi Exp $
+//# $Id: SimpleValue.java,v 1.1 2006-11-30 01:58:05 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
 
 
-public interface IndexValue extends SimpleValue
+public interface SimpleValue extends Value
 {
 }

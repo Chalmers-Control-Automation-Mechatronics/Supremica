@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="transferline" xmlns="http://waters.sourceforge.net/xsd/module">
 <ParameterList>
-<IntParameter Required="false" Name="N">
+<SimpleParameter Required="false" Name="N">
 <IntConstant Value="1"/>
-</IntParameter>
+</SimpleParameter>
 </ParameterList>
 <ConstantAliasList>
 <ConstantAlias>

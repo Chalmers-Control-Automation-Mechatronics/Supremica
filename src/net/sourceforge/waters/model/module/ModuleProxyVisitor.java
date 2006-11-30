@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleProxyVisitor
 //###########################################################################
-//# $Id: ModuleProxyVisitor.java,v 1.5 2006-05-24 09:13:02 markus Exp $
+//# $Id: ModuleProxyVisitor.java,v 1.6 2006-11-30 01:58:05 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -89,9 +89,6 @@ public interface ModuleProxyVisitor
   public Object visitIntConstantProxy(IntConstantProxy proxy)
     throws VisitorException;
 
-  public Object visitIntParameterProxy(IntParameterProxy proxy)
-    throws VisitorException;
-
   public Object visitLabelBlockProxy(LabelBlockProxy proxy)
     throws VisitorException;
 
@@ -114,9 +111,6 @@ public interface ModuleProxyVisitor
     throws VisitorException;
 
   public Object visitPointGeometryProxy(PointGeometryProxy proxy)
-    throws VisitorException;
-
-  public Object visitRangeParameterProxy(RangeParameterProxy proxy)
     throws VisitorException;
 
   public Object visitSimpleComponentProxy(SimpleComponentProxy proxy)

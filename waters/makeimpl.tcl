@@ -183,6 +183,10 @@ proc Java_ExtractFileInfo {srcname importMapName} {
 	    lappend attribs $attrib
             set dftvalue ""
             set comment ""
+          } elseif {[regexp \
+                    {^public +static +final +[A-Za-z0-9_]+ +[A-Za-z0-9_]+ *=} \
+                    $header all]} {
+            # ignore ...
 	  } else {
 	    puts stderr "WARNING: Failed to parse method header:"
 	    puts stderr $header

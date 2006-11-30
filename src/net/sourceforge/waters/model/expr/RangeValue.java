@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.expr
 //# CLASS:   RangeValue
 //###########################################################################
-//# $Id: RangeValue.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: RangeValue.java,v 1.3 2006-11-30 01:58:05 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.expr;
@@ -12,7 +12,7 @@ package net.sourceforge.waters.model.expr;
 import java.util.List;
 
 
-public interface RangeValue extends Value {
+public interface RangeValue extends SimpleValue {
 
   public int size();
 

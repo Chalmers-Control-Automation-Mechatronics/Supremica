@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleProxyFactory
 //###########################################################################
-//# $Id: ModuleProxyFactory.java,v 1.14 2006-09-20 16:24:12 robi Exp $
+//# $Id: ModuleProxyFactory.java,v 1.15 2006-11-30 01:58:05 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -408,28 +408,6 @@ public interface ModuleProxyFactory
       (int value);
 
   /**
-   * Creates a new integer parameter.
-   * @param name The name of the new integer parameter.
-   * @param required The required status of the new integer parameter.
-   * @param defaultValue The default value of the new integer parameter.
-   */
-  public IntParameterProxy createIntParameterProxy
-      (String name,
-       boolean required,
-       SimpleExpressionProxy defaultValue);
-
-  /**
-   * Creates a new integer parameter using default values.
-   * This method creates an integer parameter with
-   * the required status set to <CODE>true</CODE>.
-   * @param name The name of the new integer parameter.
-   * @param defaultValue The default value of the new integer parameter.
-   */
-  public IntParameterProxy createIntParameterProxy
-      (String name,
-       SimpleExpressionProxy defaultValue);
-
-  /**
    * Creates a new label block.
    * @param eventList The list of events of the new label block, or <CODE>null</CODE> if empty.
    * @param geometry The geometry of the new label block, or <CODE>null</CODE>.
@@ -532,28 +510,6 @@ public interface ModuleProxyFactory
       (Point2D point);
 
   /**
-   * Creates a new range parameter.
-   * @param name The name of the new range parameter.
-   * @param required The required status of the new range parameter.
-   * @param defaultValue The default value of the new range parameter.
-   */
-  public RangeParameterProxy createRangeParameterProxy
-      (String name,
-       boolean required,
-       SimpleExpressionProxy defaultValue);
-
-  /**
-   * Creates a new range parameter using default values.
-   * This method creates a range parameter with
-   * the required status set to <CODE>true</CODE>.
-   * @param name The name of the new range parameter.
-   * @param defaultValue The default value of the new range parameter.
-   */
-  public RangeParameterProxy createRangeParameterProxy
-      (String name,
-       SimpleExpressionProxy defaultValue);
-
-  /**
    * Creates a new simple component.
    * @param identifier The identifier defining the name of the new simple component.
    * @param kind The kind of the new simple component.
@@ -626,6 +582,28 @@ public interface ModuleProxyFactory
    */
   public SimpleNodeProxy createSimpleNodeProxy
       (String name);
+
+  /**
+   * Creates a new simple parameter.
+   * @param name The name of the new simple parameter.
+   * @param required The required status of the new simple parameter.
+   * @param defaultValue The default value of the new simple parameter.
+   */
+  public SimpleParameterProxy createSimpleParameterProxy
+      (String name,
+       boolean required,
+       SimpleExpressionProxy defaultValue);
+
+  /**
+   * Creates a new simple parameter using default values.
+   * This method creates a simple parameter with
+   * the required status set to <CODE>true</CODE>.
+   * @param name The name of the new simple parameter.
+   * @param defaultValue The default value of the new simple parameter.
+   */
+  public SimpleParameterProxy createSimpleParameterProxy
+      (String name,
+       SimpleExpressionProxy defaultValue);
 
   /**
    * Creates a new spline geometry.

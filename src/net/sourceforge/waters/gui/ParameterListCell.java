@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ParameterListCell
 //###########################################################################
-//# $Id: ParameterListCell.java,v 1.7 2006-11-03 15:01:56 torda Exp $
+//# $Id: ParameterListCell.java,v 1.8 2006-11-30 01:58:05 robi Exp $
 //###########################################################################
 
 
@@ -18,9 +18,8 @@ import javax.swing.ListCellRenderer;
 
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventParameterProxy;
-import net.sourceforge.waters.model.module.IntParameterProxy;
 import net.sourceforge.waters.model.module.ParameterProxy;
-import net.sourceforge.waters.model.module.RangeParameterProxy;
+import net.sourceforge.waters.model.module.SimpleParameterProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -53,10 +52,8 @@ public class ParameterListCell
 			} else if (kind.equals(EventKind.PROPOSITION)) {
 				icon = IconLoader.ICON_PROPOSITION;
 			}
-		} else if (value instanceof IntParameterProxy) {
-			icon = IconLoader.ICON_INTPARAM;
-		} else if (value instanceof RangeParameterProxy) {
-			icon = IconLoader.ICON_RANGEPARAM;
+		} else if (value instanceof SimpleParameterProxy) {
+			icon = IconLoader.ICON_SIMPLEPARAM;
 		} else {
 			throw new ClassCastException("Can't render parameter of class " +
 										 value.getClass().getName() + "!");

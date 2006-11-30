@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   ModuleElementFactory
 //###########################################################################
-//# $Id: ModuleElementFactory.java,v 1.14 2006-09-20 16:24:13 robi Exp $
+//# $Id: ModuleElementFactory.java,v 1.15 2006-11-30 01:58:05 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -594,37 +594,6 @@ public class ModuleElementFactory
   }
 
   /**
-   * Creates a new integer parameter.
-   * @param name The name of the new integer parameter.
-   * @param required The required status of the new integer parameter.
-   * @param defaultValue The default value of the new integer parameter.
-   */
-  public IntParameterElement createIntParameterProxy
-      (final String name,
-       final boolean required,
-       final SimpleExpressionProxy defaultValue)
-  {
-    return new IntParameterElement(name,
-                                   required,
-                                   defaultValue);
-  }
-
-  /**
-   * Creates a new integer parameter using default values.
-   * This method creates an integer parameter with
-   * the required status set to <CODE>true</CODE>.
-   * @param name The name of the new integer parameter.
-   * @param defaultValue The default value of the new integer parameter.
-   */
-  public IntParameterElement createIntParameterProxy
-      (final String name,
-       final SimpleExpressionProxy defaultValue)
-  {
-    return new IntParameterElement(name,
-                                   defaultValue);
-  }
-
-  /**
    * Creates a new label block.
    * @param eventList The list of events of the new label block, or <CODE>null</CODE> if empty.
    * @param geometry The geometry of the new label block, or <CODE>null</CODE>.
@@ -768,37 +737,6 @@ public class ModuleElementFactory
   }
 
   /**
-   * Creates a new range parameter.
-   * @param name The name of the new range parameter.
-   * @param required The required status of the new range parameter.
-   * @param defaultValue The default value of the new range parameter.
-   */
-  public RangeParameterElement createRangeParameterProxy
-      (final String name,
-       final boolean required,
-       final SimpleExpressionProxy defaultValue)
-  {
-    return new RangeParameterElement(name,
-                                     required,
-                                     defaultValue);
-  }
-
-  /**
-   * Creates a new range parameter using default values.
-   * This method creates a range parameter with
-   * the required status set to <CODE>true</CODE>.
-   * @param name The name of the new range parameter.
-   * @param defaultValue The default value of the new range parameter.
-   */
-  public RangeParameterElement createRangeParameterProxy
-      (final String name,
-       final SimpleExpressionProxy defaultValue)
-  {
-    return new RangeParameterElement(name,
-                                     defaultValue);
-  }
-
-  /**
    * Creates a new simple component.
    * @param identifier The identifier defining the name of the new simple component.
    * @param kind The kind of the new simple component.
@@ -899,6 +837,37 @@ public class ModuleElementFactory
       (final String name)
   {
     return new SimpleNodeElement(name);
+  }
+
+  /**
+   * Creates a new simple parameter.
+   * @param name The name of the new simple parameter.
+   * @param required The required status of the new simple parameter.
+   * @param defaultValue The default value of the new simple parameter.
+   */
+  public SimpleParameterElement createSimpleParameterProxy
+      (final String name,
+       final boolean required,
+       final SimpleExpressionProxy defaultValue)
+  {
+    return new SimpleParameterElement(name,
+                                      required,
+                                      defaultValue);
+  }
+
+  /**
+   * Creates a new simple parameter using default values.
+   * This method creates a simple parameter with
+   * the required status set to <CODE>true</CODE>.
+   * @param name The name of the new simple parameter.
+   * @param defaultValue The default value of the new simple parameter.
+   */
+  public SimpleParameterElement createSimpleParameterProxy
+      (final String name,
+       final SimpleExpressionProxy defaultValue)
+  {
+    return new SimpleParameterElement(name,
+                                      defaultValue);
   }
 
   /**

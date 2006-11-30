@@ -4,12 +4,15 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   SimpleParameterElement
 //###########################################################################
-//# $Id: SimpleParameterElement.java,v 1.6 2006-09-06 11:52:21 robi Exp $
+//# $Id: SimpleParameterElement.java,v 1.7 2006-11-30 01:58:05 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleParameterProxy;
 
@@ -20,7 +23,7 @@ import net.sourceforge.waters.model.module.SimpleParameterProxy;
  * @author Robi Malik
  */
 
-public abstract class SimpleParameterElement
+public final class SimpleParameterElement
   extends ParameterElement
   implements SimpleParameterProxy
 {
@@ -33,9 +36,9 @@ public abstract class SimpleParameterElement
    * @param required The required status of the new simple parameter.
    * @param defaultValue The default value of the new simple parameter.
    */
-  protected SimpleParameterElement(final String name,
-                                   final boolean required,
-                                   final SimpleExpressionProxy defaultValue)
+  public SimpleParameterElement(final String name,
+                                final boolean required,
+                                final SimpleExpressionProxy defaultValue)
   {
     super(name, required);
     mDefaultValue = defaultValue;
@@ -48,8 +51,8 @@ public abstract class SimpleParameterElement
    * @param name The name of the new simple parameter.
    * @param defaultValue The default value of the new simple parameter.
    */
-  protected SimpleParameterElement(final String name,
-                                   final SimpleExpressionProxy defaultValue)
+  public SimpleParameterElement(final String name,
+                                final SimpleExpressionProxy defaultValue)
   {
     this(name,
          true,
@@ -103,6 +106,16 @@ public abstract class SimpleParameterElement
     result *= 5;
     result += mDefaultValue.hashCodeWithGeometry();
     return result;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.base.Proxy
+  public Object acceptVisitor(final ProxyVisitor visitor)
+    throws VisitorException
+  {
+    final ModuleProxyVisitor downcast = (ModuleProxyVisitor) visitor;
+    return downcast.visitSimpleParameterProxy(this);
   }
 
 

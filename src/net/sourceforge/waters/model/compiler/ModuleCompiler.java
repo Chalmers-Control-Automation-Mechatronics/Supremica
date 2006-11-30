@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.58 2006-11-23 10:10:26 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.59 2006-11-30 01:58:05 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -42,6 +42,7 @@ import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.IndexValue;
 import net.sourceforge.waters.model.expr.IntValue;
 import net.sourceforge.waters.model.expr.RangeValue;
+import net.sourceforge.waters.model.expr.SimpleValue;
 import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.expr.Value;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -51,7 +52,6 @@ import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.BooleanConstantProxy;
-import net.sourceforge.waters.model.module.RangeParameterProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -66,7 +66,6 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
-import net.sourceforge.waters.model.module.IntParameterProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.NodeProxy;
@@ -248,6 +247,12 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       exception.provideLocation(proxy);
       throw wrap(exception);
     }
+  }
+
+  public BooleanValue visitBooleanConstantProxy
+    (final BooleanConstantProxy proxy)
+  {
+    return new CompiledBooleanValue(proxy.isValue());
   }
 
   public Object visitEdgeProxy(final EdgeProxy proxy)
@@ -493,17 +498,6 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
     return new CompiledIntValue(proxy.getValue());
   }
 
-  public BooleanValue visitBooleanConstantProxy(final BooleanConstantProxy proxy)
-  {
-    return new CompiledBooleanValue(proxy.isValue());
-  }
-
-  public Object visitIntParameterProxy(final IntParameterProxy proxy)
-    throws VisitorException
-  {
-    return visitSimpleParameterProxy(proxy, IntValue.class, "INTEGER");
-  }
-
   public ProductDESProxy visitModuleProxy(final ModuleProxy proxy)
     throws VisitorException
   {
@@ -552,12 +546,6 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       new CompiledParameterBinding(proxy, value);
     mParameterMap.put(name, binding);
     return binding;
-  }
-
-  public Object visitRangeParameterProxy(final RangeParameterProxy proxy)
-    throws VisitorException
-  {
-    return visitSimpleParameterProxy(proxy, RangeValue.class, "RANGE");
   }
 
   /*
@@ -758,19 +746,15 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
     return compiled;
   }
 
-  public Object visitSimpleParameterProxy
-    (final SimpleParameterProxy proxy,
-     final Class<? extends Value> type,
-     final String typename)
+  public SimpleValue visitSimpleParameterProxy(final SimpleParameterProxy proxy)
     throws VisitorException
   {
     try {
       final String name = proxy.getName();
       final SimpleExpressionProxy defaultExpr = proxy.getDefaultValue();
-      final Value defaultValue =
-        evalTyped(defaultExpr, type, typename);
-      final Value value =
-        getParameterValue(proxy, defaultValue, type, typename);
+      final SimpleValue defaultValue = evalTyped(defaultExpr, SimpleValue.class, "LITERAL");
+      final SimpleValue value =
+        getParameterValue(proxy, defaultValue, SimpleValue.class, "LITERAL");
       mContext.add(name, value);
       return value;
     } catch (final EvalException exception) {

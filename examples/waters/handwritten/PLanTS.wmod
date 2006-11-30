@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="Passenger Land-Transportation System - From 'Supervising Passenger Land-Transportation Systems' by K.T. Seow et al." xmlns="http://waters.sourceforge.net/xsd/module">
     <ParameterList>
-        <IntParameter Required="true" Name="n">
+        <SimpleParameter Required="true" Name="n">
             <IntConstant Value="3"/>
-        </IntParameter>
-        <IntParameter Required="true" Name="m">
+        </SimpleParameter>
+        <SimpleParameter Required="true" Name="m">
             <IntConstant Value="4"/>
-        </IntParameter>
+        </SimpleParameter>
     </ParameterList>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Observable="true" Name="tstart"/>
