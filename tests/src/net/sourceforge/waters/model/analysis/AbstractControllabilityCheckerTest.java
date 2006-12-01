@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractControllabilityCheckerTest
 //###########################################################################
-//# $Id: AbstractControllabilityCheckerTest.java,v 1.7 2006-12-01 02:06:30 robi Exp $
+//# $Id: AbstractControllabilityCheckerTest.java,v 1.8 2006-12-01 03:26:36 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -87,6 +87,14 @@ public abstract class AbstractControllabilityCheckerTest
 
   //#########################################################################
   //# Test Cases --- nasty
+  public void testJpt10Counter() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "jpt10counter.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
   public void testVerriegel4Counter2() throws Exception
   {
     final String group = "tests";

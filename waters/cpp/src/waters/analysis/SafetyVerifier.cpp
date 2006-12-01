@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   SafetyVerifier
 //###########################################################################
-//# $Id: SafetyVerifier.cpp,v 1.8 2006-12-01 02:06:30 robi Exp $
+//# $Id: SafetyVerifier.cpp,v 1.9 2006-12-01 03:26:36 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -135,6 +135,7 @@ setup()
 {
   // Establish automaton encoding ...
   mEncoding = new AutomatonEncoding(mModel, mKindTranslator, mCache);
+  // mEncoding->dump();
   mIsTrivial = true;
   if (!mEncoding->hasSpecs()) {
     return;
@@ -366,6 +367,7 @@ computeCounterExample()
     uint32* packedtarget = mStateSpace->get(mBadState);
     uint32* targettuple = new uint32[numaut];
     mEncoding->decode(packedtarget, targettuple);
+    // mEncoding->dumpEncodedState(packedtarget);
     
     do {
       uint32 current = mDepthMap->get(--level);
@@ -415,6 +417,7 @@ computeCounterExample()
         }
       } while (true);
     found:
+      // mEncoding->dumpEncodedState(packedcurrent);
       jni::EventGlue eventglue = event->getJavaEvent();
       mTraceList->add(0, &eventglue);
       packedtarget = packedcurrent;

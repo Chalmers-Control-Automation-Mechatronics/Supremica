@@ -4,13 +4,14 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   EventRecord
 //###########################################################################
-//# $Id: EventRecord.cpp,v 1.11 2006-11-24 23:25:59 robi Exp $
+//# $Id: EventRecord.cpp,v 1.12 2006-12-01 03:26:36 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
 #pragma implementation
 #endif
 
+#include <iostream>
 #include <new>
 
 #include <jni.h>
@@ -239,8 +240,12 @@ sortTransitionRecordsForSearch()
 void EventRecord::
 sortTransitionRecordsForTrace()
 {
-  TransitionRecordList list(mSearchRecords);
-  list.append(mTraceSearchRecords);
+  if (mSearchRecords == 0) {
+    mSearchRecords = mTraceSearchRecords;
+  } else {
+    TransitionRecordList list(mSearchRecords);
+    list.append(mTraceSearchRecords);
+  }
   mTraceSearchRecords = 0;
 }
 
