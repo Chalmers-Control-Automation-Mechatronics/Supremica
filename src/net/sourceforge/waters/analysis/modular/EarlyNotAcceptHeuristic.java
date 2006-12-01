@@ -12,15 +12,17 @@ import java.util.Collection;
 public class EarlyNotAcceptHeuristic
   extends AbstractModularHeuristic
 {
-  private final boolean mPreffersystem;
+  private final HeuristicType mType;
+	private final boolean foo = false;
   
-  public EarlyNotAcceptHeuristic(boolean preffersystem)
+  public EarlyNotAcceptHeuristic(HeuristicType type)
   {
-    mPreffersystem = preffersystem;
+    mType = type;
   }
   
   public Collection<AutomatonProxy> heur(ProductDESProxy composition,
                                          Set<AutomatonProxy> nonComposedPlants,
+                                         Set<AutomatonProxy> nonComposedSpecPlants,
                                          Set<AutomatonProxy> nonComposedSpecs,
                                          TraceProxy counterExample,
                                          KindTranslator translator)
@@ -30,13 +32,25 @@ public class EarlyNotAcceptHeuristic
     for (AutomatonProxy automaton : nonComposedPlants) {
       int i = accepts(automaton, counterExample);
       if (i != counterExample.getEvents().size()) {
-        if (i < least) {
+        if (i <= least) {
           bestautomaton = automaton;
           least = i;
         }
       }
     }
-    if (bestautomaton == null || mPreffersystem) {
+    boolean runspecs = mType == HeuristicType.PREFERREALPLANT && bestautomaton == null;
+    if (bestautomaton == null || mType != HeuristicType.PREFERREALPLANT) {
+      for (AutomatonProxy automaton : nonComposedSpecPlants) {
+        int i = accepts(automaton, counterExample);
+        if (i != counterExample.getEvents().size()) {
+          if (i <= least) {
+            bestautomaton = automaton;
+            least = i;
+          }
+        }
+      }
+    }
+    if (bestautomaton == null || mType == HeuristicType.NOPREF || (runspecs && foo)) {
       for (AutomatonProxy automaton : nonComposedSpecs) {
         int i = accepts(automaton, counterExample);
         if (i != counterExample.getEvents().size()

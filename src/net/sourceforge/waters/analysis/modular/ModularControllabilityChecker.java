@@ -4,12 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularControllabilityChecker
 //###########################################################################
-//# $Id: ModularControllabilityChecker.java,v 1.5 2006-11-17 03:38:22 robi Exp $
+//# $Id: ModularControllabilityChecker.java,v 1.6 2006-12-01 02:16:42 siw4 Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.analysis.modular;
 
+import net.sourceforge.waters.model.analysis.VerificationResult;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,16 +51,22 @@ public class ModularControllabilityChecker
   private final ControllabilityChecker mChecker;
   private ModularHeuristic mHeuristic;
   private KindTranslator mTranslator;
-  
+  private int mStates;
+  private final boolean mLeast;
+ 
   public ModularControllabilityChecker(ProductDESProxy model,
                                        ProductDESProxyFactory factory,
                                        ControllabilityChecker checker,
-                                       ModularHeuristic heuristic)
+                                       ModularHeuristic heuristic,
+                                       boolean least)
   {
     super(model, factory);
     mChecker = checker;
     mHeuristic = heuristic;
     mTranslator = IdenticalKindTranslator.getInstance();
+    mStates = 0;
+    mLeast = least;
+    setStateLimit(2000000);
   }
   
   public SafetyTraceProxy getCounterExample()
@@ -80,9 +87,11 @@ public class ModularControllabilityChecker
   public boolean run()
     throws AnalysisException
   {
+    mStates = 0;
     mChecker.setStateLimit(getStateLimit());
-
+    System.out.println("automata: " + getModel().getAutomata().size());
     final Set<AutomatonProxy> plants = new HashSet<AutomatonProxy>();
+    final Set<AutomatonProxy> specplants = new HashSet<AutomatonProxy>();
     final SortedSet<AutomatonProxy> specs = 
       new TreeSet<AutomatonProxy>(new Comparator<AutomatonProxy>() {
       public int compare(AutomatonProxy a1, AutomatonProxy a2)
@@ -114,13 +123,17 @@ public class ModularControllabilityChecker
         default : break;
       }
     }
-    System.out.println(specs.size());
     while (!specs.isEmpty()) {
+      System.out.println("specs: " + specs.size());
       Collection<AutomatonProxy> composition = new ArrayList<AutomatonProxy>();
       Set<EventProxy> events = new HashSet<EventProxy>();
-      Set<AutomatonProxy> uncomposedplants = new HashSet<AutomatonProxy>(plants);
-      Set<AutomatonProxy> uncomposedspecs = new HashSet<AutomatonProxy>(specs);
-      AutomatonProxy spec = specs.first();
+      SortedSet<AutomatonProxy> uncomposedplants = new TreeSet<AutomatonProxy>(new AutomatonComparator());
+      SortedSet<AutomatonProxy> uncomposedspecplants = new TreeSet<AutomatonProxy>(new AutomatonComparator());
+      SortedSet<AutomatonProxy> uncomposedspecs = new TreeSet<AutomatonProxy>(new AutomatonComparator());
+      uncomposedplants.addAll(plants);
+      uncomposedspecplants.addAll(specplants);
+      uncomposedspecs.addAll(specs);
+      AutomatonProxy spec = mLeast ? specs.first() : specs.last();
       composition.add(spec);
       events.addAll(spec.getEvents());
       uncomposedspecs.remove(spec);
@@ -139,10 +152,14 @@ public class ModularControllabilityChecker
                                    : ComponentKind.PLANT;
         }
       });
+      mChecker.setStateLimit(getStateLimit() - mStates);
       while (!mChecker.run()) {
+        mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
+        mChecker.setStateLimit(getStateLimit() - mStates);
         Collection<AutomatonProxy> newComp =
           mHeuristic.heur(comp,
                           uncomposedplants,
+                          uncomposedspecplants,
                           uncomposedspecs,
                           mChecker.getCounterExample(),
                           getKindTranslator());
@@ -153,36 +170,45 @@ public class ModularControllabilityChecker
         for (AutomatonProxy automaton : newComp) {
           composition.add(automaton);
           uncomposedplants.remove(automaton);
+          uncomposedspecplants.remove(automaton);
           uncomposedspecs.remove(automaton);
           events.addAll(automaton.getEvents());
         }
         comp = getFactory().createProductDESProxy("comp", events, composition);
         mChecker.setModel(comp);
       }
-      specs.removeAll(composition);
-      plants.addAll(composition);
-      assert(specs.size() + plants.size() == getModel().getAutomata().size());
+      mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
+      /*specs.removeAll(composition);
+      plants.addAll(composition);*/
+      StringBuffer thing = new StringBuffer();
+      for (AutomatonProxy automaton : composition) {
+        if (specs.contains(automaton)) {
+          //System.out.println(mChecker.getAnalysisResult().getTotalNumberOfStates() + " " + automaton.getName() + " size " + automaton.getStates().size());
+          specs.remove(automaton);
+          specplants.add(automaton);
+        }
+        /*if (specplants.contains(automaton) || specs.contains(automaton)) {
+          thing.append(automaton.getName());
+          thing.append(',');
+        }*/
+      }
+      //System.out.println(thing);
     }
     setSatisfiedResult();
     return true;
   }
   
-  public static void main(String[] args) throws Exception
+  protected void addStatistics(VerificationResult result)
   {
-    ProductDESProxyFactory mProductDESProxyFactory = ProductDESElementFactory.getInstance();
-    JAXBProductDESMarshaller mProductDESMarshaller =
-      new JAXBProductDESMarshaller(mProductDESProxyFactory);
-    ModuleProxyFactory mModuleProxyFactory = ModuleElementFactory.getInstance();
-    final OperatorTable optable = CompilerOperatorTable.getInstance();
-    final JAXBModuleMarshaller modmarshaller =
-      new JAXBModuleMarshaller(mModuleProxyFactory, optable);
-    DocumentManager mDocumentManager = new DocumentManager();
-    mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
-    mDocumentManager.registerUnmarshaller(modmarshaller);
-    ProductDESProxy mod = (ProductDESProxy)mDocumentManager.load(new File(args[0]));
-    ControllabilityChecker check = new ModularControllabilityChecker(mod, mProductDESProxyFactory, 
-                                                                     new MonolithicControllabilityChecker(mProductDESProxyFactory.createProductDESProxy("empty"), mProductDESProxyFactory),
-                                                                     new MaxCommonEventsHeuristic(false));
-    check.run();
+    result.setNumberOfStates(mStates);
+  }
+  
+  private final static class AutomatonComparator
+    implements Comparator<AutomatonProxy>
+  {
+    public int compare(AutomatonProxy a1, AutomatonProxy a2)
+    {
+      return a1.getName().compareTo(a2.getName());
+    }
   }
 }

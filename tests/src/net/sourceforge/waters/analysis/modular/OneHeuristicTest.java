@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   OneHeuristicTest
 //###########################################################################
-//# $Id: OneHeuristicTest.java,v 1.2 2006-11-17 03:38:22 robi Exp $
+//# $Id: OneHeuristicTest.java,v 1.3 2006-12-01 02:16:43 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;
@@ -46,6 +46,6 @@ public class OneHeuristicTest
     return new ModularControllabilityChecker
       (null, factory,
        new NativeControllabilityChecker(null, factory),
-       new OneHeuristic());
+       new OneHeuristic(), false);
   }
 }

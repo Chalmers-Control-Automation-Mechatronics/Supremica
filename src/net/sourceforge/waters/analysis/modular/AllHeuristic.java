@@ -14,15 +14,17 @@ import net.sourceforge.waters.xsd.base.EventKind;
 public class AllHeuristic
   extends AbstractModularHeuristic
 {
-  private final boolean mPrefferSystem;
+  private final HeuristicType mType;
+	private final boolean foo = false;
   
-  public AllHeuristic(boolean prefferSystem)
+  public AllHeuristic(HeuristicType type)
   {
-    mPrefferSystem = prefferSystem;
+    mType = type;
   }
   
   public Collection<AutomatonProxy> heur(ProductDESProxy composition,
                                          Set<AutomatonProxy> nonComposedPlants,
+                                         Set<AutomatonProxy> nonComposedSpecPlants,
                                          Set<AutomatonProxy> nonComposedSpecs,
                                          TraceProxy counterExample,
                                          KindTranslator translator)
@@ -33,7 +35,15 @@ public class AllHeuristic
         automata.add(automaton);
       }
     }
-    if (!mPrefferSystem || automata.size() == 0) {
+    boolean runspecs = mType == HeuristicType.PREFERREALPLANT && automata.isEmpty();
+    if (automata.size() == 0 || mType != HeuristicType.PREFERREALPLANT) {
+      for (AutomatonProxy automaton : nonComposedSpecPlants) {
+        if (accepts(automaton, counterExample) != counterExample.getEvents().size()) {
+          automata.add(automaton);
+        }
+      }
+    }
+    if (automata.size() == 0 || mType == HeuristicType.NOPREF || (runspecs && foo)) {
       for (AutomatonProxy automaton : nonComposedSpecs) {
         int i = accepts(automaton, counterExample);
         if (i != counterExample.getEvents().size()

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularLanguageInclusionCheckerTest
 //###########################################################################
-//# $Id: ModularLanguageInclusionCheckerTest.java,v 1.3 2006-12-01 02:16:43 siw4 Exp $
+//# $Id: OneUncontrollableCheckerTest.java,v 1.1 2006-12-01 02:16:43 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;
@@ -18,19 +18,19 @@ import junit.framework.TestSuite;
 //       MonolithicLanguageInclusionChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.
-       AbstractLargeLanguageInclusionCheckerTest;
+       AbstractLargeControllabilityCheckerTest;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class ModularLanguageInclusionCheckerTest
-  extends AbstractLargeLanguageInclusionCheckerTest
+public class OneUncontrollableCheckerTest
+  extends AbstractLargeControllabilityCheckerTest
 {
 
   //#########################################################################
   //# Entry points in junit.framework.TestCase
   public static Test suite() {
     TestSuite testSuite =
-      new TestSuite(ModularLanguageInclusionCheckerTest.class);
+      new TestSuite(OneUncontrollableCheckerTest.class);
     return testSuite;
   }
 
@@ -42,13 +42,15 @@ public class ModularLanguageInclusionCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
-  protected ModularLanguageInclusionChecker createModelVerifier
+  protected OneUncontrollableChecker createModelVerifier
     (final ProductDESProxyFactory factory)
   {
-    return new ModularLanguageInclusionChecker
+    return new OneUncontrollableChecker
       (null, factory,
-       new NativeControllabilityChecker(null, factory),
-       new MaxCommonEventsHeuristic(HeuristicType.NOPREF));
+       new ModularControllabilityChecker(null, factory,
+                                         new NativeControllabilityChecker(null, factory),
+                                         new MaxCommonEventsHeuristic(HeuristicType.NOPREF),
+                                         false));
   }
 
 }

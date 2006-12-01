@@ -14,11 +14,17 @@ public class OneHeuristic
 {
   public Collection<AutomatonProxy> heur(ProductDESProxy composition,
                                          Set<AutomatonProxy> nonComposedPlants,
+                                         Set<AutomatonProxy> nonComposedSpecPlants,
                                          Set<AutomatonProxy> nonComposedSpecs,
                                          TraceProxy counterExample,
                                          KindTranslator translator)
   {
     for (AutomatonProxy automaton : nonComposedPlants) {
+      if (accepts(automaton, counterExample) != counterExample.getEvents().size()) {
+        return Collections.singleton(automaton);
+      }
+    }
+    for (AutomatonProxy automaton : nonComposedSpecPlants) {
       if (accepts(automaton, counterExample) != counterExample.getEvents().size()) {
         return Collections.singleton(automaton);
       }

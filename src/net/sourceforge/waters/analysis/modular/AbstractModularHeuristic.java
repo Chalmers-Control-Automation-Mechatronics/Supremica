@@ -1,5 +1,8 @@
 package net.sourceforge.waters.analysis.modular;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Collection;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import java.util.Comparator;
 import java.util.Set;
@@ -16,13 +19,6 @@ import net.sourceforge.waters.xsd.base.EventKind;
 public abstract class AbstractModularHeuristic
   implements ModularHeuristic
 {
-  Map<AutomatonProxy, Map<Key, StateProxy>> mAutomata;
-  
-  public AbstractModularHeuristic()
-  {
-    mAutomata = new HashMap<AutomatonProxy, Map<Key, StateProxy>>();
-  }
-  
   protected AutomatonProxy checkAutomata(boolean specs,
                                          Set<AutomatonProxy> automata,
                                          Comparator<AutomatonProxy> comp,
@@ -51,13 +47,15 @@ public abstract class AbstractModularHeuristic
     return bestautomaton;
   }
   
-  protected int accepts(AutomatonProxy automaton, TraceProxy counterExample)
+  public static boolean acc(AutomatonProxy automaton, TraceProxy counterExample)
   {
-    Map<Key, StateProxy> mapAutomaton = mAutomata.get(automaton);
-    if (mapAutomaton == null) {
-      mapAutomaton = createMap(automaton);
-      mAutomata.put(automaton, mapAutomaton);
-    }
+    return counterExample.getEvents().size() 
+            == accepts(automaton, counterExample);
+  }
+  
+  protected static int accepts(AutomatonProxy automaton, TraceProxy counterExample)
+  {
+    Map<Key, StateProxy> mapAutomaton = createMap(automaton);
     int i = 0;
     StateProxy state = null;
     for (StateProxy s : automaton.getStates()) {

@@ -294,12 +294,13 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <include name="net/sourceforge/waters/analysis/modular/ModularControllabilityCheckerTest.java"/>
+          <include name="net/sourceforge/waters/analysis/modular/MaxCommonEventsHeuristicTest.java"/>
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>
       <sysproperty key="waters.test.inputdir" value="${examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+      <sysproperty key="java.library.path" value="${waters.library.path}"/>
     </junit>
   </target>
   
@@ -325,11 +326,38 @@
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
           <include name="net/sourceforge/waters/analysis/modular/*Test.java"/>
+          <exclude name="net/sourceforge/waters/analysis/modular/LateNotAcceptHeuristicTest.java"/>
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>
       <sysproperty key="waters.test.inputdir" value="${examples}"/>
       <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+      <sysproperty key="java.library.path" value="${waters.library.path}"/>
+    </junit>
+  </target>
+  
+  <target name="run_test6" depends="test-jar,cpp">
+    <java classname="net.sourceforge.waters.analysis.modular.SpeedComparison" fork="true" maxmemory="512m">
+      <classpath refid="waters.test.classpath"/>
+      <sysproperty key="waters.test.inputdir" value="${examples}"/>
+      <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+      <sysproperty key="java.library.path" value="${waters.library.path}"/>
+    </java>
+  </target>
+  
+  <target name="run_test7" depends="test-jar,cpp">
+    <mkdir dir="${logs.results}"/>
+    <junit printsummary="on" fork="true" maxmemory="512m">
+      <formatter type="xml"/>
+      <batchtest todir="${logs.results}">
+        <fileset dir="${supremica.testsrc}">
+          <include name="net/sourceforge/waters/analysis/modular/OneUncontrollableCheckerTest.java"/>
+        </fileset>
+      </batchtest>
+      <classpath refid="waters.test.classpath"/>
+      <sysproperty key="waters.test.inputdir" value="${examples}"/>
+      <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+      <sysproperty key="java.library.path" value="${waters.library.path}"/>
     </junit>
   </target>
 
@@ -356,6 +384,9 @@
           description="Run some test cases."/>
           
   <target name="test5" depends="run_test5,test-report"
+          description="Run some test cases."/>
+         
+  <target name="test7" depends="run_test7,test-report"
           description="Run some test cases."/>
           
   <target name="doc" depends="jaxb-generate"

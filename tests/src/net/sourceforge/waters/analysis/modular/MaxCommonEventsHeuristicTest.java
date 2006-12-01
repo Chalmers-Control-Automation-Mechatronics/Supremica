@@ -2,13 +2,19 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
-//# CLASS:   MonolithicControllabilityCheckerTest
+//# CLASS:   NativeControllabilityCheckerTest
 //###########################################################################
-//# $Id: MaxCommonEventsHeuristicTest.java,v 1.3 2006-11-17 03:38:22 robi Exp $
+//# $Id: MaxCommonEventsHeuristicTest.java,v 1.4 2006-12-01 02:16:43 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;
 
+import net.sourceforge.waters.model.analysis.ControllabilityChecker;
+import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.LinkedList;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -41,13 +47,13 @@ public class MaxCommonEventsHeuristicTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
-  protected ModularControllabilityChecker createModelVerifier
+  protected ControllabilityChecker createModelVerifier
     (final ProductDESProxyFactory factory)
   {
     return
       new ModularControllabilityChecker
             (null, factory,
              new NativeControllabilityChecker(factory),
-             new MaxCommonEventsHeuristic(false));
+             new MaxCommonEventsHeuristic(HeuristicType.PREFERREALPLANT), false);
   }
 }

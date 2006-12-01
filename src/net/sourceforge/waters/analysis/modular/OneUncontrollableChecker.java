@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularLanguageInclusionChecker
 //###########################################################################
-//# $Id: ModularLanguageInclusionChecker.java,v 1.4 2006-12-01 02:16:42 siw4 Exp $
+//# $Id: OneUncontrollableChecker.java,v 1.1 2006-12-01 02:16:42 siw4 Exp $
 //###########################################################################
 
 
@@ -33,26 +33,24 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
-public class ModularLanguageInclusionChecker
+public class OneUncontrollableChecker
   extends AbstractModelVerifier
-  implements LanguageInclusionChecker
+  implements ControllabilityChecker
 {
   private final ControllabilityChecker mChecker;
   private ModularHeuristic mHeuristic;
   private KindTranslator mTranslator;
   private int mStates;
   
-  public ModularLanguageInclusionChecker(ProductDESProxy model,
-                                         ProductDESProxyFactory factory,
-                                         ControllabilityChecker checker,
-                                         ModularHeuristic heuristic)
+  public OneUncontrollableChecker(ProductDESProxy model,
+                                  ProductDESProxyFactory factory,
+                                  ControllabilityChecker checker)
   {
     super(model, factory);
     mChecker = checker;
-    mHeuristic = heuristic;
     mTranslator = IdenticalKindTranslator.getInstance();
     mStates = 0;
-    setStateLimit(10000000);
+    setStateLimit(2000000);
   }
   
   public SafetyTraceProxy getCounterExample()
@@ -74,50 +72,36 @@ public class ModularLanguageInclusionChecker
     throws AnalysisException
   {
     mStates = 0;
-    List<AutomatonProxy> properties = new ArrayList<AutomatonProxy>();
-    Set<AutomatonProxy> automata = 
-      new HashSet<AutomatonProxy>(getModel().getAutomata().size());
-    for (AutomatonProxy automaton : getModel().getAutomata()) {
-      if (getKindTranslator().getComponentKind(automaton)
-          == ComponentKind.PROPERTY) {
-        properties.add(automaton);
-      } else if (getKindTranslator().getComponentKind(automaton)
-                 != ComponentKind.SUPERVISOR) {
-        automata.add(automaton);
+    List<EventProxy> uncontrollables = new ArrayList<EventProxy>();
+    for (EventProxy event : getModel().getEvents()) {
+      if (getKindTranslator().getEventKind(event)
+          == EventKind.UNCONTROLLABLE) {
+        uncontrollables.add(event);
       }
     }
-    Collections.sort(properties, new AutomatonComparator());
-    ModularControllabilityChecker checker =
-      new ModularControllabilityChecker(null, getFactory(), mChecker,
-                                        mHeuristic, false);
-    System.out.println("props: " + properties.size());
-    System.out.println("plants: " + automata.size());
-    for (final AutomatonProxy automaton : properties) {
-      automata.add(automaton);
-      ProductDESProxy model = 
-        getFactory().createProductDESProxy("prop", getModel().getEvents(),
-                                           automata);
-      checker.setModel(model);
-      checker.setKindTranslator(new KindTranslator()
+    Collections.sort(uncontrollables, new EventComparator());
+    for (final EventProxy event : uncontrollables) {
+      mChecker.setModel(getModel());
+      mChecker.setKindTranslator(new KindTranslator()
       {
         public EventKind getEventKind(EventProxy e)
         {
-          return EventKind.UNCONTROLLABLE;
+          return e.equals(event) ? EventKind.UNCONTROLLABLE
+                                 : EventKind.CONTROLLABLE;
         }
         
         public ComponentKind getComponentKind(AutomatonProxy a)
         {
-          return a.equals(automaton) ? ComponentKind.SPEC : ComponentKind.PLANT;
+          return getKindTranslator().getComponentKind(a);
         }
       });
-      automata.remove(automaton);
-      checker.setStateLimit(getStateLimit() - mStates);
-      if (!checker.run()) {
-        mStates += checker.getAnalysisResult().getTotalNumberOfStates();
+      mChecker.setStateLimit(getStateLimit() - mStates);
+      if (!mChecker.run()) {
+        mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
         setFailedResult(mChecker.getCounterExample());
         return false;
       }
-      mStates += checker.getAnalysisResult().getTotalNumberOfStates();
+      mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
     }
     setSatisfiedResult();
     return true;
@@ -126,11 +110,12 @@ public class ModularLanguageInclusionChecker
   protected void addStatistics(VerificationResult result)
   {
     result.setNumberOfStates(mStates);
-  }  
-  private final static class AutomatonComparator
-    implements Comparator<AutomatonProxy>
+  }
+  
+  private final static class EventComparator
+    implements Comparator<EventProxy>
   {
-    public int compare(AutomatonProxy a1, AutomatonProxy a2)
+    public int compare(EventProxy a1, EventProxy a2)
     {
       return a1.getName().compareTo(a2.getName());
     }
