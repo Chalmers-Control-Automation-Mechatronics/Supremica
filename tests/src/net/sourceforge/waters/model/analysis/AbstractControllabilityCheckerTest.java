@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractControllabilityCheckerTest
 //###########################################################################
-//# $Id: AbstractControllabilityCheckerTest.java,v 1.6 2006-11-17 03:38:22 robi Exp $
+//# $Id: AbstractControllabilityCheckerTest.java,v 1.7 2006-12-01 02:06:30 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -82,6 +82,17 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "handwritten";
     final String name = "tictactoe.wdes";
     runModelVerifier(group, name, false);
+  }
+
+
+  //#########################################################################
+  //# Test Cases --- nasty
+  public void testVerriegel4Counter2() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "verriegel4counter2.wmod";
+    runModelVerifier(group, dir, name, false);
   }
 
 

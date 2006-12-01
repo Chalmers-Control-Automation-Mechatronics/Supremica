@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   TransitionUpdateRecord
 //###########################################################################
-//# $Id: TransitionUpdateRecord.h,v 1.1 2006-11-22 21:27:57 robi Exp $
+//# $Id: TransitionUpdateRecord.h,v 1.2 2006-12-01 02:06:30 robi Exp $
 //###########################################################################
 
 
@@ -43,6 +43,7 @@ public:
   //# Simple Access
   uint32 getWordIndex() const {return mWordIndex;}
   uint32 getKeptMask() const {return mKeptMask;}
+  uint32 getCommonMask() const {return mCommonMask;}
   uint32 getCommonTargets() const {return mCommonTargets;}
   TransitionRecord* getTransitionRecords() const {return mTransitionRecords;}
 
@@ -55,6 +56,7 @@ private:
   //# Data Members
   uint32 mWordIndex;
   uint32 mKeptMask;
+  uint32 mCommonMask;
   uint32 mCommonTargets;
   TransitionRecord* mTransitionRecords;
 };

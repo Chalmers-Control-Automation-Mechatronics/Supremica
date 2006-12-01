@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="verriegel4" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="verriegel4counter1"
+        xmlns:ns2="http://waters.sourceforge.net/xsd/base"
+        xmlns="http://waters.sourceforge.net/xsd/module">
     <ConstantAliasList>
         <ConstantAlias>
             <SimpleIdentifier Name="HeckTueren"/>

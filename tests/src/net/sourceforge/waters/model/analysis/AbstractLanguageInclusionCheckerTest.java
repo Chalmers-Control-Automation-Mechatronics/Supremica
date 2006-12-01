@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractLanguageInclusionCheckerTest
 //###########################################################################
-//# $Id: AbstractLanguageInclusionCheckerTest.java,v 1.3 2006-11-17 03:38:22 robi Exp $
+//# $Id: AbstractLanguageInclusionCheckerTest.java,v 1.4 2006-12-01 02:06:30 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -64,6 +64,17 @@ public abstract class AbstractLanguageInclusionCheckerTest
     final String group = "handwritten";
     final String name = "tictactoe.wdes";
     runModelVerifier(group, name, true);
+  }
+
+
+  //#########################################################################
+  //# Test Cases --- nasty
+  public void testVerriegel4Counter1() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "verriegel4counter1.wmod";
+    runModelVerifier(group, dir, name, false);
   }
 
 

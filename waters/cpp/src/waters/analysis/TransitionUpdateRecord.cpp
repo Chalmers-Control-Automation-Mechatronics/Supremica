@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   TransitionUpdateRecord
 //###########################################################################
-//# $Id: TransitionUpdateRecord.cpp,v 1.1 2006-11-22 21:27:57 robi Exp $
+//# $Id: TransitionUpdateRecord.cpp,v 1.2 2006-12-01 02:06:30 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -30,6 +30,7 @@ namespace waters {
 TransitionUpdateRecord::
 TransitionUpdateRecord()
   : mKeptMask(UNDEF_UINT32),
+    mCommonMask(0),
     mCommonTargets(0),
     mTransitionRecords(0)
 {
@@ -56,6 +57,7 @@ addTransition(TransitionRecord* trans)
     mTransitionRecords = trans;
     return true;
   } else {
+    mCommonMask |= mask;
     mCommonTargets |= target;
     return false;
   }

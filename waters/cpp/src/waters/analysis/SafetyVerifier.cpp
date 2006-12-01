@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   SafetyVerifier
 //###########################################################################
-//# $Id: SafetyVerifier.cpp,v 1.7 2006-11-29 22:20:16 robi Exp $
+//# $Id: SafetyVerifier.cpp,v 1.8 2006-12-01 02:06:30 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -385,8 +385,11 @@ computeCounterExample()
                 goto notfound;
               }
             } else {
-              const uint32 mask = update->getKeptMask();
-              if ((packedcurrent[w] & mask) != (packedtarget[w] & mask)) {
+              const uint32 kept = update->getKeptMask();
+              if ((packedcurrent[w] & kept) != (packedtarget[w] & kept)) {
+                goto notfound;
+              } else if ((packedtarget[w] & update->getCommonMask()) !=
+                         update->getCommonTargets()) {
                 goto notfound;
               }
             }

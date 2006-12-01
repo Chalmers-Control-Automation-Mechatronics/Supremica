@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   TransitionRecord
 //###########################################################################
-//# $Id: TransitionRecord.cpp,v 1.3 2006-11-22 21:27:57 robi Exp $
+//# $Id: TransitionRecord.cpp,v 1.4 2006-12-01 02:06:30 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -147,7 +147,7 @@ getCommonTarget()
     if (succ != UNDEF_UINT32) {
       if (result == UNDEF_UINT32) {
         result = succ;
-      } else {
+      } else if (result != succ) {
         return UNDEF_UINT32;
       }
     }      
