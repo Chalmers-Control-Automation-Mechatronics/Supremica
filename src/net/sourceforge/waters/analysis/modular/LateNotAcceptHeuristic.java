@@ -13,7 +13,7 @@ public class LateNotAcceptHeuristic
   extends AbstractModularHeuristic
 {
   private final HeuristicType mType;
-	private final boolean foo = false;
+	private final boolean foo = true;
   
   public LateNotAcceptHeuristic(HeuristicType type)
   {

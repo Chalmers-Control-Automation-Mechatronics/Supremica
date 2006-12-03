@@ -1,5 +1,6 @@
 package net.sourceforge.waters.gui.command;
 
+import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import java.util.Set;
@@ -49,7 +50,8 @@ public class UpdateErrorCommand
       for (NodeSubject n1 : mSurface.getGraph().getNodesModifiable()) {
         Shape s1 = mSurface.getShapeProducer().getShape(n1).getShape();
         for (NodeSubject n2 : mSurface.getGraph().getNodesModifiable()) {
-          if (n1 != n2) {
+          if (n1 != n2 && 
+              !(n1 instanceof GroupNodeProxy && n2 instanceof GroupNodeProxy)) {
             Shape s2 = mSurface.getShapeProducer().getShape(n2).getShape();
             if (overlap(s1, s2)) {
               error.add(n1);

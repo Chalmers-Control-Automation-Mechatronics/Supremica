@@ -16,7 +16,7 @@ public class MinNewEventsHeuristic
   extends AbstractModularHeuristic
 {
   private final HeuristicType mType;
-	private final boolean foo = false;
+	private final boolean foo = true;
   
   public MinNewEventsHeuristic(HeuristicType type)
   {

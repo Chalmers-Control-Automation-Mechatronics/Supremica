@@ -464,11 +464,18 @@ public class EditorGraph
         Point2D p = ((SimpleNodeSubject) n).getPointGeometry().getPoint();
         r1 = new Rectangle((int) p.getX(), (int) p.getY(), 1, 1);
       }
+      Collection<GroupNodeSubject> parents = new ArrayList<GroupNodeSubject>();
+      mainloop:
       for (GroupNodeSubject group : groups) {
         if (n != group) {
           if (group.getGeometry().getRectangle().contains(r1)) {
+            for (GroupNodeSubject parent : parents) {
+              if (group.getGeometry().getRectangle().contains(parent.getGeometry().getRectangle())) {
+                continue mainloop;
+              }
+            }
             group.getImmediateChildNodesModifiable().add(n);
-            break;
+            parents.add(group);
           }
         }
       }

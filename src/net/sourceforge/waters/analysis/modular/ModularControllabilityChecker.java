@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularControllabilityChecker
 //###########################################################################
-//# $Id: ModularControllabilityChecker.java,v 1.6 2006-12-01 02:16:42 siw4 Exp $
+//# $Id: ModularControllabilityChecker.java,v 1.7 2006-12-03 20:55:01 siw4 Exp $
 //###########################################################################
 
 
@@ -89,7 +89,6 @@ public class ModularControllabilityChecker
   {
     mStates = 0;
     mChecker.setStateLimit(getStateLimit());
-    System.out.println("automata: " + getModel().getAutomata().size());
     final Set<AutomatonProxy> plants = new HashSet<AutomatonProxy>();
     final Set<AutomatonProxy> specplants = new HashSet<AutomatonProxy>();
     final SortedSet<AutomatonProxy> specs = 
@@ -124,7 +123,6 @@ public class ModularControllabilityChecker
       }
     }
     while (!specs.isEmpty()) {
-      System.out.println("specs: " + specs.size());
       Collection<AutomatonProxy> composition = new ArrayList<AutomatonProxy>();
       Set<EventProxy> events = new HashSet<EventProxy>();
       SortedSet<AutomatonProxy> uncomposedplants = new TreeSet<AutomatonProxy>(new AutomatonComparator());

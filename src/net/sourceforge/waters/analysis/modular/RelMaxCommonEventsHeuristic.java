@@ -16,7 +16,7 @@ public class RelMaxCommonEventsHeuristic
   extends AbstractModularHeuristic
 {
   private final HeuristicType mType;
-	private final boolean foo = false;
+	private final boolean foo = true;
   
   public RelMaxCommonEventsHeuristic(HeuristicType type)
   {

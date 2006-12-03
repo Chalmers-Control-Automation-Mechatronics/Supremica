@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularLanguageInclusionChecker
 //###########################################################################
-//# $Id: ModularLanguageInclusionChecker.java,v 1.4 2006-12-01 02:16:42 siw4 Exp $
+//# $Id: ModularLanguageInclusionChecker.java,v 1.5 2006-12-03 20:55:01 siw4 Exp $
 //###########################################################################
 
 
@@ -90,8 +90,6 @@ public class ModularLanguageInclusionChecker
     ModularControllabilityChecker checker =
       new ModularControllabilityChecker(null, getFactory(), mChecker,
                                         mHeuristic, false);
-    System.out.println("props: " + properties.size());
-    System.out.println("plants: " + automata.size());
     for (final AutomatonProxy automaton : properties) {
       automata.add(automaton);
       ProductDESProxy model = 

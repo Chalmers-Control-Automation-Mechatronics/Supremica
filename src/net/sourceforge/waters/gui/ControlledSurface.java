@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.97 2006-11-17 00:20:09 martin Exp $
+//# $Id: ControlledSurface.java,v 1.98 2006-12-03 20:55:01 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -138,6 +138,7 @@ public class ControlledSurface
               ((int)drawnAreaBounds.getHeight() + 10 * gridSize));*/
     setPreferredSize(new Dimension((int)drawnAreaBounds.getWidth() + gridSize * 10,
                      (int)drawnAreaBounds.getHeight() + gridSize * 10));
+    root.getUndoInterface().executeCommand(new UpdateErrorCommand(this));
     repaint();
     //root.repaint();
   }
@@ -226,7 +227,7 @@ public class ControlledSurface
         boolean isFocused = isFocused(p);
         boolean selected = isRenderedSelected(p);
         boolean showHandles = selected;
-        boolean error = false;
+        boolean error = mError.contains(o);
         EditorSurface.DRAGOVERSTATUS dragOver = EditorSurface.DRAGOVERSTATUS.NOTDRAG;
         int priority = getPriority(o);
         if (selected)
@@ -1449,7 +1450,7 @@ public class ControlledSurface
                     }
                     else if (s instanceof EdgeSubject)
                     {
-                        addToEdge((EdgeSubject) s, ip, e);
+                        addToEdge((EdgeSubject) s, ip);
                         e.dropComplete(true);
                         return;
                     }
@@ -1495,14 +1496,14 @@ public class ControlledSurface
             addToNode((SimpleNodeSubject)l.getParent(), i);
         }
 
-        private void addToEdge(EdgeSubject edge, IdentifierSubject ip, final DropTargetDropEvent e)
+        private void addToEdge(EdgeSubject edge, IdentifierSubject ip)
         {
-            addToLabelGroup(edge.getLabelBlock(), ip, e);
+            addToLabelGroup(edge.getLabelBlock(), ip,
+                            edge.getLabelBlock().getEventList().size());
         }
 
         private void addToLabelGroup(LabelBlockSubject l, IdentifierSubject i, final DropTargetDropEvent e)
         {
-            final IdentifierSubject cloned = i.clone();
             int pos = 0;
             Point2D p = e.getLocation();
             for (Proxy proxy : l.getEventList())
@@ -1526,10 +1527,15 @@ public class ControlledSurface
             {
                 pos = 0;
             }
-            Command addEvent = new AddEventCommand(l,
-                cloned, pos);
-            root.getUndoInterface().executeCommand(addEvent);
-            repaint();
+            addToLabelGroup(l, i, pos);
+        }
+        
+        private void addToLabelGroup(LabelBlockSubject l, IdentifierSubject i, int pos)
+        {
+          final IdentifierSubject cloned = i.clone();
+          Command addEvent = new AddEventCommand(l, cloned, pos);
+          root.getUndoInterface().executeCommand(addEvent);
+          repaint();
         }
     }
 
