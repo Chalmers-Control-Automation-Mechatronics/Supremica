@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   MonolithicSafetyVerifier
 //###########################################################################
-//# $Id: MonolithicSafetyVerifier.java,v 1.8 2006-12-05 21:38:17 flordal Exp $
+//# $Id: MonolithicSafetyVerifier.java,v 1.9 2006-12-05 21:52:19 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.monolithic;
@@ -397,8 +397,8 @@ public class MonolithicSafetyVerifier
   //# Decoding
   /**
    * Decode the StateTuple
-   * @parameter sTuple The StateTuple to be decoded
-   * @parameter state  The decoded state
+   * @param sTuple The StateTuple to be decoded
+   * @param state  The decoded state
    */
   private void decode(StateTuple sTuple, int[] state)
   {

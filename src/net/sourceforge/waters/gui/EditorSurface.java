@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.68 2006-12-05 21:38:17 flordal Exp $
+//# $Id: EditorSurface.java,v 1.69 2006-12-05 21:52:19 flordal Exp $
 //###########################################################################
 
 
@@ -44,7 +44,7 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
  * <p>A component which allows for the display of module data.</p>
  *
  * <p>The EditorSurface is a viewer-only component. It can load components
- * from {@link ModuleSubject} objects and translate them into its internal
+ * from {@link net.sourceforge.waters.subject.module.ModuleSubject} objects and translate them into its internal
  * storage format, which allows for it to be displayed. To provide
  * interactive editing of an EditorSurface, use a {@link
  * ControlledSurface}.</p>

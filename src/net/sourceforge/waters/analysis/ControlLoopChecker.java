@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopChecker
 //###########################################################################
-//# $Id: ControlLoopChecker.java,v 1.19 2006-11-17 03:38:22 robi Exp $
+//# $Id: ControlLoopChecker.java,v 1.20 2006-12-05 21:52:19 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -428,7 +428,6 @@ public class ControlLoopChecker extends ModelChecker
      * It checks event is available from current state tuple.
      * @param currTuple current state tuple
      * @param event current event index
-     * @param onlyControllable true if system needs to find only controllable events
      * @return return null if event is not available from current event, or return next state tuple
      */
     public boolean eventAvailable(int currTuple[], int event)

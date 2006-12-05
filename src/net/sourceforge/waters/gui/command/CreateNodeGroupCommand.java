@@ -31,7 +31,7 @@ public class CreateNodeGroupCommand
    * Constructs a new CreateNodeCommand with the specified surface and
    * creates the node in the x,y position specified
    *
-   * @param surface the surface edited by this command
+   * @param graph the surface edited by this command
    */
   public CreateNodeGroupCommand(GraphSubject graph, Rectangle2D geom)
   {

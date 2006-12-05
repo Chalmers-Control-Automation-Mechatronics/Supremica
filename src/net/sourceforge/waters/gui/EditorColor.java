@@ -9,7 +9,6 @@ import net.sourceforge.waters.model.module.LabelGeometryProxy;
 
 /**
  * Class defining the colors that are used in the editor.
- * @see EditorObject#getColor
  */
 public class EditorColor
 {

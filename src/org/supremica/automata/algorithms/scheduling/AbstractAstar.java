@@ -60,7 +60,7 @@ public abstract class AbstractAstar
      * none of them is guaranteed to be better than the other, all the nodes are stored
      * as one int[]-variable. The closed nodes are unrolled and compared when necessary,
      * for example when a new node is to be added to the closedTree. This is done by
-     * @see AbstractAstar#updateClosedTree(int[] node) .
+     * @see AbstractAstar#updateClosedTree(double[] node) .
      */
     protected TreeMap<Integer, double[]> closedTree;
 
@@ -394,7 +394,7 @@ public abstract class AbstractAstar
 
 		expander = new NodeExpander(manualExpansion, theAutomata, this);
 
-        //Borde räcka med plantAutomata.size(), fast då kanske man måste ändra lite på andra ställen också
+        //Borde rï¿½cka med plantAutomata.size(), fast dï¿½ kanske man mï¿½ste ï¿½ndra lite pï¿½ andra stï¿½llen ocksï¿½
         keyMapping = new int[theAutomata.size()];
         keyMapping[0] = 1;
         for (int i=1; i<keyMapping.length; i++)
@@ -427,7 +427,7 @@ public abstract class AbstractAstar
 
         PARENT_INDEX = theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
 
-        // Detta borde ändras till STATIC_VARIBEL = 1 (och inte 2) => 2 ändringar
+        // Detta borde ï¿½ndras till STATIC_VARIBEL = 1 (och inte 2) => 2 ï¿½ndringar
         CURRENT_COSTS_INDEX = PARENT_INDEX + 2; //ClosedNodes.CLOSED_NODE_INFO_SIZE;
         //ACCUMULATED_COST_INDEX = CURRENT_COSTS_INDEX + activeAutomataIndex.length;
         ACCUMULATED_COST_INDEX = CURRENT_COSTS_INDEX + plantAutomata.size();
@@ -672,7 +672,7 @@ public abstract class AbstractAstar
         }
 		// 		else
 		// 		{
-		// 			logger.info(printArray(currNode) + " nådd; kostnad = " + currNode[ACCUMULATED_COST_INDEX]);
+		// 			logger.info(printArray(currNode) + " nï¿½dd; kostnad = " + currNode[ACCUMULATED_COST_INDEX]);
 		// 		}
 
         this.acceptingNode = currNode;
@@ -853,7 +853,7 @@ public abstract class AbstractAstar
       plantNames += theAutomata.getAutomatonAt(currAutomataIndex[k]).getName() + "||";
 	  plantNames += theAutomata.getAutomatonAt(currAutomataIndex[currAutomataIndex.length-1]).getName();
 
-	  logger.warn("Är " + currNode.toStringLight() + " låst så in i helvete för " + plantNames + "???");
+	  logger.warn("ï¿½r " + currNode.toStringLight() + " lï¿½st sï¿½ in i helvete fï¿½r " + plantNames + "???");
 	  }
 
 	  }

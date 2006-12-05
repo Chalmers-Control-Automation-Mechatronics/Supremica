@@ -20,7 +20,7 @@ public class FlipEdgeCommand
     /**
      * Flips an edge on the specified surface.
      *
-     * @param graph the surface edited by this command
+     * @param edge the edge to flip.
      */
     public FlipEdgeCommand(EdgeSubject edge)
     {

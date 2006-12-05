@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateNodeCommand
 //###########################################################################
-//# $Id: CreateNodeCommand.java,v 1.14 2006-11-09 23:34:29 siw4 Exp $
+//# $Id: CreateNodeCommand.java,v 1.15 2006-12-05 21:52:19 flordal Exp $
 //###########################################################################
 
 
@@ -38,7 +38,7 @@ public class CreateNodeCommand
   /**
    * Constructs a new CreateNodeCommand with the specified surface and
    * creates the node in the x,y position specified
-   * @param surface the surface edited by this command
+   * @param graph the surface edited by this command
    * @param x the position upon which the node is created
    * @param y the position upon which the node is created
    */
