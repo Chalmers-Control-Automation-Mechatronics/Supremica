@@ -26,7 +26,7 @@ public class DeleteNodeGroupCommand
      * Constructs a new CreateNodeCommand with the specified surface and
      * creates the node in the x,y position specified
      *
-     * @param surface the surface edited by this command
+     * @param graph the surface edited by this command
      */
     public DeleteNodeGroupCommand(GraphSubject graph, GroupNodeSubject nodeGroup)
     {

@@ -20,11 +20,11 @@ public class FlipEdgeCommand
     /**
      * Flips an edge on the specified surface.
      *
-     * @param surface the surface edited by this command
+     * @param graph the surface edited by this command
      */
     public FlipEdgeCommand(EdgeSubject edge)
     {
-		mEdge = edge;
+        mEdge = edge;
     }
 
     /**

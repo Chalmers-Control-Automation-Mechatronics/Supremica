@@ -26,7 +26,7 @@ public class DeleteNodeCommand
    * Constructs a new DeleteNodeCommand with the specified surface and
    * deletes the node specified
    *
-   * @param surface the surface edited by this command
+   * @param graph the surface edited by this command
    * @param node the node which is to be removed
    */
   public DeleteNodeCommand(GraphSubject graph, SimpleNodeSubject node)

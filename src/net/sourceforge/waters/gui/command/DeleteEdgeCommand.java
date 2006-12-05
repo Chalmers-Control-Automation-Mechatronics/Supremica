@@ -23,7 +23,7 @@ public class DeleteEdgeCommand
   /**
    * Deletes an edge on the specified surface.
    *
-   * @param surface the surface edited by this command
+   * @param graph the surface edited by this command
    */
   public DeleteEdgeCommand(GraphSubject graph, EdgeSubject edge)
   {

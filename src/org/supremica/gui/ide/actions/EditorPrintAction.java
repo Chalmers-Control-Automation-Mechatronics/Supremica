@@ -41,7 +41,23 @@ public class EditorPrintAction
         {
             // This action should only be enabled when there's an editor panel open!
             ide.getIDE().info("Must have an editor panel open.");
-        }
-        
+        }        
     }
+
+    /**
+     * Is enabled if it is possible to get a hold of an active EditorWindowInterface.
+     */
+    /* Should use setEnabled when the property becomes true...?
+    public boolean isEnabled()
+    {
+        try
+        {
+            return (null != ide.getActiveModuleContainer().getEditorPanel().getActiveEditorWindowInterface());
+        }
+        catch (NullPointerException ex)
+        {
+            return false;
+        }
+    }
+     */
 }

@@ -5,7 +5,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractModelVerifier
 //###########################################################################
-//# $Id: AbstractModelVerifier.java,v 1.5 2006-11-17 03:38:22 robi Exp $
+//# $Id: AbstractModelVerifier.java,v 1.6 2006-12-05 21:38:17 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -105,8 +105,6 @@ public abstract class AbstractModelVerifier
 
   /**
    * Gets the total number of states constructed by this verifier.
-   * @return The number of states constructed, or <CODE>-1</CODE> to
-   *         indicate that this figure is not available.
    */
   protected void addStatistics(VerificationResult result)
   {

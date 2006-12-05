@@ -7,9 +7,9 @@ import java.util.List;
 public interface ProxyShape
   extends RendererShape
 {
-	public Proxy getProxy();
+    public Proxy getProxy();
   
-  public List<Handle> getHandles();
-  
-  public Handle getClickedHandle(int x, int y);
+    public List<Handle> getHandles();
+
+    public Handle getClickedHandle(int x, int y);
 }

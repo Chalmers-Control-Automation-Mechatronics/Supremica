@@ -39,8 +39,7 @@ public class MoveObjects
    * Constructs a new CreateNodeCommand with the specified surface and
    * creates the node in the x,y position specified
    *
-   * @param surface the surface edited by this command
-   * @param displacement the position upon which the node is created
+   * @param graph the surface edited by this command
    */
   public MoveObjects(Map<ProxySubject, ProxySubject> objects,
                      GraphSubject graph)

@@ -21,7 +21,8 @@ public class Actions
 
     // Editor Actions
     public IDEAction editorPrintAction = new EditorPrintAction(allActions);
-    public IDEAction editorPrintPDFAction = new EditorSavePDFAction(allActions);
+    public IDEAction editorSavePDFAction = new EditorSavePDFAction(allActions);
+    public IDEAction editorSavePostscriptAction = new EditorSavePostscriptAction(allActions);
     public IDEAction exitAction = new ExitAction(allActions);
     public IDEAction editorCopyAction = new EditorCopyAction(allActions);
     public IDEAction editorCopyAsWMFAction = new EditorCopyAsWMFAction(allActions);

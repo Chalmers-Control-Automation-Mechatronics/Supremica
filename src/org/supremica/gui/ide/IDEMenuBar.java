@@ -58,7 +58,8 @@ public class IDEMenuBar
         menu.addSeparator();
         //		menu.add(ide.getActions().importAction));
         menu.add(ide.getActions().editorPrintAction.getMenuItem());
-        menu.add(ide.getActions().editorPrintPDFAction.getMenuItem());
+        menu.add(ide.getActions().editorSavePostscriptAction.getMenuItem());
+        menu.add(ide.getActions().editorSavePDFAction.getMenuItem());
         menu.addSeparator();
         menu.add(ide.getActions().exitAction.getMenuItem());
 

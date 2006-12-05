@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   MonolithicSafetyVerifier
 //###########################################################################
-//# $Id: MonolithicSafetyVerifier.java,v 1.7 2006-11-15 01:26:40 robi Exp $
+//# $Id: MonolithicSafetyVerifier.java,v 1.8 2006-12-05 21:38:17 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.monolithic;
@@ -252,7 +252,7 @@ public class MonolithicSafetyVerifier
   /**
    * Check the controllability of the model with a parameter of
    * initial synchronous product.
-   * @parameter sState The initial synchronous product of the model
+   * @param sState The initial synchronous product of the model
    * @return <CODE>true</CODE> if the model is controllable, or
    *         <CODE>false</CODE> if it is not.
    */
