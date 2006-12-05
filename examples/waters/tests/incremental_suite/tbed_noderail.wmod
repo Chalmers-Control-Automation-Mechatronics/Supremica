@@ -90,23 +90,23 @@
 <EventDecl Kind="CONTROLLABLE" Name="turn_right">
 <SimpleIdentifier Name="SECTIONS"/>
 </EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Name="at">
+<SimpleIdentifier Name="TRAINS"/>
+<SimpleIdentifier Name="SECTIONS"/>
+</EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="req_sw">
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
 <EnumSetExpression>
+<SimpleIdentifier Name="t3"/>
 <SimpleIdentifier Name="t4"/>
 <SimpleIdentifier Name="t5"/>
 <SimpleIdentifier Name="t6"/>
 <SimpleIdentifier Name="t7"/>
 <SimpleIdentifier Name="t8"/>
-<SimpleIdentifier Name="t3"/>
 </EnumSetExpression>
-</EventDecl>
-<EventDecl Kind="UNCONTROLLABLE" Name="at">
-<SimpleIdentifier Name="TRAINS"/>
-<SimpleIdentifier Name="SECTIONS"/>
 </EventDecl>
 <EventDecl Kind="CONTROLLABLE" Name="straight">
 <EnumSetExpression>
@@ -233,7 +233,12 @@
 <SimpleIdentifier Name="t8"/>
 </EnumSetExpression>
 <ComponentList>
-<ForeachComponent Name="SWITCH">
+<ForeachComponent Name="CURVE">
+<EnumSetExpression>
+<SimpleIdentifier Name="t7"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="FRONT">
 <EnumSetExpression>
 <SimpleIdentifier Name="t5"/>
 </EnumSetExpression>
@@ -241,23 +246,18 @@
 <ForeachComponent Name="TRAIN">
 <SimpleIdentifier Name="TRAINS"/>
 <ComponentList>
-<ForeachComponent Name="FRONT">
+<ForeachComponent Name="SWITCH">
 <EnumSetExpression>
 <SimpleIdentifier Name="t5"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="CURVE">
-<EnumSetExpression>
-<SimpleIdentifier Name="t7"/>
 </EnumSetExpression>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
 <IndexedIdentifier Name="sensor_switch5">
 <SimpleIdentifier Name="STRAIGHT"/>
-<SimpleIdentifier Name="SWITCH"/>
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="FRONT"/>
 <SimpleIdentifier Name="CURVE"/>
+<SimpleIdentifier Name="FRONT"/>
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="SWITCH"/>
 </IndexedIdentifier>
 <Graph>
 <LabelBlock>
@@ -752,31 +752,31 @@
 <SimpleIdentifier Name="t27"/>
 </EnumSetExpression>
 <ComponentList>
-<ForeachComponent Name="SWITCH">
+<ForeachComponent Name="CURVE">
 <EnumSetExpression>
-<SimpleIdentifier Name="t6"/>
+<SimpleIdentifier Name="t9"/>
 </EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="TRAIN">
-<SimpleIdentifier Name="TRAINS"/>
 <ComponentList>
 <ForeachComponent Name="FRONT">
 <EnumSetExpression>
 <SimpleIdentifier Name="t11"/>
 </EnumSetExpression>
 <ComponentList>
-<ForeachComponent Name="CURVE">
+<ForeachComponent Name="TRAIN">
+<SimpleIdentifier Name="TRAINS"/>
+<ComponentList>
+<ForeachComponent Name="SWITCH">
 <EnumSetExpression>
-<SimpleIdentifier Name="t9"/>
+<SimpleIdentifier Name="t6"/>
 </EnumSetExpression>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
 <IndexedIdentifier Name="sensor_switch6">
 <SimpleIdentifier Name="STRAIGHT"/>
-<SimpleIdentifier Name="SWITCH"/>
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="FRONT"/>
 <SimpleIdentifier Name="CURVE"/>
+<SimpleIdentifier Name="FRONT"/>
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="SWITCH"/>
 </IndexedIdentifier>
 <Graph>
 <LabelBlock>
@@ -1266,36 +1266,36 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="LEFT">
+<ForeachComponent Name="RIGHT">
 <EnumSetExpression>
 <SimpleIdentifier Name="t25"/>
 </EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t8"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="RIGHT">
-<EnumSetExpression>
-<SimpleIdentifier Name="t16"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="TRAIN">
-<SimpleIdentifier Name="TRAINS"/>
 <ComponentList>
 <ForeachComponent Name="FRONT">
 <EnumSetExpression>
 <SimpleIdentifier Name="t14"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="TRAIN">
+<SimpleIdentifier Name="TRAINS"/>
+<ComponentList>
+<ForeachComponent Name="SWITCH">
+<EnumSetExpression>
+<SimpleIdentifier Name="t8"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="LEFT">
+<EnumSetExpression>
+<SimpleIdentifier Name="t16"/>
+</EnumSetExpression>
+<ComponentList>
 <SimpleComponent Kind="PLANT">
 <IndexedIdentifier Name="sensor_switch8">
-<SimpleIdentifier Name="LEFT"/>
-<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="RIGHT"/>
-<SimpleIdentifier Name="TRAIN"/>
 <SimpleIdentifier Name="FRONT"/>
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="SWITCH"/>
+<SimpleIdentifier Name="LEFT"/>
 </IndexedIdentifier>
 <Graph>
 <LabelBlock>
@@ -1326,70 +1326,6 @@
 </IndexedIdentifier>
 </LabelBlock>
 <NodeList>
-<SimpleNode Name="rgt_rgt">
-<PointGeometry>
-<Point Y="176" X="352"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="5" X="13"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="lft_cross">
-<PointGeometry>
-<Point Y="560" X="224"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="3" X="-57"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="rgt_cross">
-<PointGeometry>
-<Point Y="48" X="352"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="-3" X="-65"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="away_rgt">
-<PointGeometry>
-<Point Y="304" X="352"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="0" X="11"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="derail">
-<PointGeometry>
-<Point Y="304" X="480"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="2" X="-41"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="lft_lft">
-<PointGeometry>
-<Point Y="432" X="224"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="4" X="-35"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="rgt_lft">
-<PointGeometry>
-<Point Y="176" X="224"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="5" X="-40"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Name="lft_rgt">
-<PointGeometry>
-<Point Y="432" X="352"/>
-</PointGeometry>
-<LabelGeometry>
-<Point Y="5" X="11"/>
-</LabelGeometry>
-</SimpleNode>
 <SimpleNode Initial="true" Name="away_lft">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
@@ -1401,8 +1337,108 @@
 <Point Y="7" X="-56"/>
 </LabelGeometry>
 </SimpleNode>
+<SimpleNode Name="lft_rgt">
+<PointGeometry>
+<Point Y="432" X="352"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="5" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="rgt_lft">
+<PointGeometry>
+<Point Y="176" X="224"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="5" X="-40"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="lft_lft">
+<PointGeometry>
+<Point Y="432" X="224"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="4" X="-35"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="derail">
+<PointGeometry>
+<Point Y="304" X="480"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="2" X="-41"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="away_rgt">
+<PointGeometry>
+<Point Y="304" X="352"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="0" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="rgt_cross">
+<PointGeometry>
+<Point Y="48" X="352"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="-3" X="-65"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="lft_cross">
+<PointGeometry>
+<Point Y="560" X="224"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="3" X="-57"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="rgt_rgt">
+<PointGeometry>
+<Point Y="176" X="352"/>
+</PointGeometry>
+<LabelGeometry>
+<Point Y="5" X="13"/>
+</LabelGeometry>
+</SimpleNode>
 </NodeList>
 <EdgeList>
+<Edge Target="lft_cross" Source="lft_lft">
+<LabelBlock>
+<IndexedIdentifier Name="enable">
+<SimpleIdentifier Name="TRAIN"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-14" X="-35"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="lft_rgt" Source="lft_lft">
+<LabelBlock>
+<IndexedIdentifier Name="cpl_right">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="1" X="-45"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="448" X="288"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="lft_lft" Source="lft_lft">
+<LabelBlock>
+<IndexedIdentifier Name="cpl_left">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="12" X="-70"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="433" X="192"/>
+</SplineGeometry>
+</Edge>
 <Edge Target="away_lft" Source="away_rgt">
 <LabelBlock>
 <IndexedIdentifier Name="cpl_left">
@@ -1430,23 +1466,6 @@
 <Point Y="369" X="352"/>
 </SplineGeometry>
 </Edge>
-<Edge Target="away_rgt" Source="away_rgt">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="FRONT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="cpl_right">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="7" X="-18"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="304" X="384"/>
-</SplineGeometry>
-</Edge>
 <Edge Target="rgt_rgt" Source="away_rgt">
 <LabelBlock>
 <IndexedIdentifier Name="at">
@@ -1459,6 +1478,65 @@
 </LabelBlock>
 <SplineGeometry>
 <Point Y="240" X="352"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="away_rgt" Source="away_rgt">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="FRONT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="cpl_right">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="enable">
+<SimpleIdentifier Name="TRAIN"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="7" X="-18"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="304" X="384"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="derail" Source="lft_rgt">
+<LabelBlock>
+<IndexedIdentifier Name="enable">
+<SimpleIdentifier Name="TRAIN"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="-78"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="404" X="456"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="lft_rgt" Source="lft_rgt">
+<LabelBlock>
+<IndexedIdentifier Name="cpl_right">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="2" X="-48"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="460" X="380"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="lft_lft" Source="lft_rgt">
+<LabelBlock>
+<IndexedIdentifier Name="cpl_left">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-15" X="-48"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="414" X="289"/>
 </SplineGeometry>
 </Edge>
 <Edge Target="rgt_lft" Source="rgt_lft">
@@ -1500,136 +1578,6 @@
 <Point Y="192" X="288"/>
 </SplineGeometry>
 </Edge>
-<Edge Target="lft_rgt" Source="lft_rgt">
-<LabelBlock>
-<IndexedIdentifier Name="cpl_right">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="2" X="-48"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="460" X="380"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="derail" Source="lft_rgt">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-9" X="-78"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="404" X="456"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="lft_lft" Source="lft_rgt">
-<LabelBlock>
-<IndexedIdentifier Name="cpl_left">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-15" X="-48"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="414" X="289"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="rgt_lft" Source="rgt_rgt">
-<LabelBlock>
-<IndexedIdentifier Name="cpl_left">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-15" X="-45"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="160" X="288"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="rgt_rgt" Source="rgt_rgt">
-<LabelBlock>
-<IndexedIdentifier Name="cpl_right">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-24" X="-17"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="176" X="384"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="rgt_cross" Source="rgt_rgt">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="11" X="-41"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Target="away_lft" Source="away_lft">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="FRONT"/>
-</IndexedIdentifier>
-<IndexedIdentifier Name="cpl_left">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-33" X="-70"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="304" X="189"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="rgt_lft" Source="away_lft">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="RIGHT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-13" X="-94"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Target="lft_lft" Source="away_lft">
-<LabelBlock>
-<IndexedIdentifier Name="at">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="LEFT"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-8" X="3"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="369" X="224"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="away_rgt" Source="away_lft">
-<LabelBlock>
-<IndexedIdentifier Name="cpl_right">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="2" X="-46"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="320" X="288"/>
-</SplineGeometry>
-</Edge>
 <Edge Target="away_lft" Source="lft_cross">
 <LabelBlock>
 <IndexedIdentifier Name="at">
@@ -1642,6 +1590,19 @@
 </LabelBlock>
 <SplineGeometry>
 <Point Y="432" X="158"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="lft_cross" Source="lft_cross">
+<LabelBlock>
+<IndexedIdentifier Name="enable">
+<SimpleIdentifier Name="TRAIN"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="3" X="-15"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="533" X="251"/>
 </SplineGeometry>
 </Edge>
 <Edge Target="derail" Source="lft_cross">
@@ -1660,67 +1621,17 @@
 <Point Y="502" X="430"/>
 </SplineGeometry>
 </Edge>
-<Edge Target="lft_cross" Source="lft_cross">
+<Edge Target="rgt_cross" Source="rgt_cross">
 <LabelBlock>
 <IndexedIdentifier Name="enable">
 <SimpleIdentifier Name="TRAIN"/>
 </IndexedIdentifier>
 <LabelGeometry Anchor="NW">
-<Point Y="3" X="-15"/>
+<Point Y="-19" X="-61"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point Y="533" X="251"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="lft_rgt" Source="lft_lft">
-<LabelBlock>
-<IndexedIdentifier Name="cpl_right">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="1" X="-45"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="448" X="288"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="lft_lft" Source="lft_lft">
-<LabelBlock>
-<IndexedIdentifier Name="cpl_left">
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="12" X="-70"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="433" X="192"/>
-</SplineGeometry>
-</Edge>
-<Edge Target="lft_cross" Source="lft_lft">
-<LabelBlock>
-<IndexedIdentifier Name="enable">
-<SimpleIdentifier Name="TRAIN"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-14" X="-35"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Target="derail" Source="derail">
-<LabelBlock>
-<IndexedIdentifier Name="derail">
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="SWITCH"/>
-</IndexedIdentifier>
-<LabelGeometry Anchor="NW">
-<Point Y="-6" X="-19"/>
-</LabelGeometry>
-</LabelBlock>
-<SplineGeometry>
-<Point Y="304" X="512"/>
+<Point Y="77" X="324"/>
 </SplineGeometry>
 </Edge>
 <Edge Target="derail" Source="rgt_cross">
@@ -1753,17 +1664,112 @@
 <Point Y="177" X="416"/>
 </SplineGeometry>
 </Edge>
-<Edge Target="rgt_cross" Source="rgt_cross">
+<Edge Target="derail" Source="derail">
+<LabelBlock>
+<IndexedIdentifier Name="derail">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="-19"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="304" X="512"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="away_lft" Source="away_lft">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="FRONT"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="cpl_left">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<IndexedIdentifier Name="enable">
+<SimpleIdentifier Name="TRAIN"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-33" X="-70"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="304" X="189"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="rgt_lft" Source="away_lft">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="RIGHT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-13" X="-94"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="away_rgt" Source="away_lft">
+<LabelBlock>
+<IndexedIdentifier Name="cpl_right">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="2" X="-46"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="320" X="288"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="lft_lft" Source="away_lft">
+<LabelBlock>
+<IndexedIdentifier Name="at">
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="LEFT"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-8" X="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="369" X="224"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="rgt_cross" Source="rgt_rgt">
 <LabelBlock>
 <IndexedIdentifier Name="enable">
 <SimpleIdentifier Name="TRAIN"/>
 </IndexedIdentifier>
 <LabelGeometry Anchor="NW">
-<Point Y="-19" X="-61"/>
+<Point Y="11" X="-41"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="rgt_lft" Source="rgt_rgt">
+<LabelBlock>
+<IndexedIdentifier Name="cpl_left">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-15" X="-45"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point Y="77" X="324"/>
+<Point Y="160" X="288"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="rgt_rgt" Source="rgt_rgt">
+<LabelBlock>
+<IndexedIdentifier Name="cpl_right">
+<SimpleIdentifier Name="SWITCH"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-24" X="-17"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="176" X="384"/>
 </SplineGeometry>
 </Edge>
 </EdgeList>
@@ -1779,16 +1785,16 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="SWITCH">
-<SimpleIdentifier Name="MERGESWITCHES"/>
-<ComponentList>
 <ForeachComponent Name="TRAIN">
 <SimpleIdentifier Name="TRAINS"/>
 <ComponentList>
+<ForeachComponent Name="SWITCH">
+<SimpleIdentifier Name="MERGESWITCHES"/>
+<ComponentList>
 <SimpleComponent Kind="PROPERTY">
 <IndexedIdentifier Name="noderail_mergeswitch">
-<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="SWITCH"/>
 </IndexedIdentifier>
 <Graph>
 <LabelBlock>
@@ -1816,36 +1822,36 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="STRAIGHT">
-<EnumSetExpression>
-<SimpleIdentifier Name="t27"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t4"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="BEFORE">
 <EnumSetExpression>
 <SimpleIdentifier Name="t4"/>
 </EnumSetExpression>
 <ComponentList>
-<ForeachComponent Name="TRAIN">
-<SimpleIdentifier Name="TRAINS"/>
+<ForeachComponent Name="STRAIGHT">
+<EnumSetExpression>
+<SimpleIdentifier Name="t27"/>
+</EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="CURVE">
 <EnumSetExpression>
 <SimpleIdentifier Name="t6"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="TRAIN">
+<SimpleIdentifier Name="TRAINS"/>
+<ComponentList>
+<ForeachComponent Name="SWITCH">
+<EnumSetExpression>
+<SimpleIdentifier Name="t4"/>
+</EnumSetExpression>
+<ComponentList>
 <SimpleComponent Kind="PROPERTY">
 <IndexedIdentifier Name="noderail_4">
-<SimpleIdentifier Name="STRAIGHT"/>
-<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="BEFORE"/>
-<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="STRAIGHT"/>
 <SimpleIdentifier Name="CURVE"/>
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="SWITCH"/>
 </IndexedIdentifier>
 <Graph>
 <LabelBlock>
@@ -2001,36 +2007,36 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="STRAIGHT">
-<EnumSetExpression>
-<SimpleIdentifier Name="t8"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t7"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="BEFORE">
 <EnumSetExpression>
 <SimpleIdentifier Name="t12"/>
 </EnumSetExpression>
 <ComponentList>
-<ForeachComponent Name="TRAIN">
-<SimpleIdentifier Name="TRAINS"/>
+<ForeachComponent Name="STRAIGHT">
+<EnumSetExpression>
+<SimpleIdentifier Name="t8"/>
+</EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="CURVE">
 <EnumSetExpression>
 <SimpleIdentifier Name="t10"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="TRAIN">
+<SimpleIdentifier Name="TRAINS"/>
+<ComponentList>
+<ForeachComponent Name="SWITCH">
+<EnumSetExpression>
+<SimpleIdentifier Name="t7"/>
+</EnumSetExpression>
+<ComponentList>
 <SimpleComponent Kind="PROPERTY">
 <IndexedIdentifier Name="noderail_7">
-<SimpleIdentifier Name="STRAIGHT"/>
-<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="BEFORE"/>
-<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="STRAIGHT"/>
 <SimpleIdentifier Name="CURVE"/>
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="SWITCH"/>
 </IndexedIdentifier>
 <Graph>
 <LabelBlock>
@@ -2186,16 +2192,6 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="LEFT">
-<EnumSetExpression>
-<SimpleIdentifier Name="t1"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t3"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="BEFORE">
 <EnumSetExpression>
 <SimpleIdentifier Name="t3"/>
@@ -2209,13 +2205,23 @@
 <ForeachComponent Name="TRAIN">
 <SimpleIdentifier Name="TRAINS"/>
 <ComponentList>
+<ForeachComponent Name="SWITCH">
+<EnumSetExpression>
+<SimpleIdentifier Name="t3"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="LEFT">
+<EnumSetExpression>
+<SimpleIdentifier Name="t1"/>
+</EnumSetExpression>
+<ComponentList>
 <SimpleComponent Kind="PROPERTY">
 <IndexedIdentifier Name="noderail_3">
-<SimpleIdentifier Name="LEFT"/>
-<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="BEFORE"/>
 <SimpleIdentifier Name="RIGHT"/>
 <SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="SWITCH"/>
+<SimpleIdentifier Name="LEFT"/>
 </IndexedIdentifier>
 <Graph>
 <LabelBlock>
@@ -3814,7 +3820,12 @@
 <SimpleIdentifier Name="t27"/>
 </EnumSetExpression>
 <ComponentList>
-<ForeachComponent Name="SWITCH">
+<ForeachComponent Name="CURVE">
+<EnumSetExpression>
+<SimpleIdentifier Name="t6"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="FRONT">
 <EnumSetExpression>
 <SimpleIdentifier Name="t4"/>
 </EnumSetExpression>
@@ -3822,23 +3833,18 @@
 <ForeachComponent Name="TRAIN">
 <SimpleIdentifier Name="TRAINS"/>
 <ComponentList>
-<ForeachComponent Name="FRONT">
+<ForeachComponent Name="SWITCH">
 <EnumSetExpression>
 <SimpleIdentifier Name="t4"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="CURVE">
-<EnumSetExpression>
-<SimpleIdentifier Name="t6"/>
 </EnumSetExpression>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
 <IndexedIdentifier Name="sensor_switch4">
 <SimpleIdentifier Name="STRAIGHT"/>
-<SimpleIdentifier Name="SWITCH"/>
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="FRONT"/>
 <SimpleIdentifier Name="CURVE"/>
+<SimpleIdentifier Name="FRONT"/>
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="SWITCH"/>
 </IndexedIdentifier>
 <Graph>
 <LabelBlock>
@@ -4096,31 +4102,31 @@
 <SimpleIdentifier Name="t8"/>
 </EnumSetExpression>
 <ComponentList>
-<ForeachComponent Name="SWITCH">
+<ForeachComponent Name="CURVE">
 <EnumSetExpression>
-<SimpleIdentifier Name="t7"/>
+<SimpleIdentifier Name="t10"/>
 </EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="TRAIN">
-<SimpleIdentifier Name="TRAINS"/>
 <ComponentList>
 <ForeachComponent Name="FRONT">
 <EnumSetExpression>
 <SimpleIdentifier Name="t12"/>
 </EnumSetExpression>
 <ComponentList>
-<ForeachComponent Name="CURVE">
+<ForeachComponent Name="TRAIN">
+<SimpleIdentifier Name="TRAINS"/>
+<ComponentList>
+<ForeachComponent Name="SWITCH">
 <EnumSetExpression>
-<SimpleIdentifier Name="t10"/>
+<SimpleIdentifier Name="t7"/>
 </EnumSetExpression>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
 <IndexedIdentifier Name="sensor_switch7">
 <SimpleIdentifier Name="STRAIGHT"/>
-<SimpleIdentifier Name="SWITCH"/>
-<SimpleIdentifier Name="TRAIN"/>
-<SimpleIdentifier Name="FRONT"/>
 <SimpleIdentifier Name="CURVE"/>
+<SimpleIdentifier Name="FRONT"/>
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="SWITCH"/>
 </IndexedIdentifier>
 <Graph>
 <LabelBlock>
@@ -4373,36 +4379,36 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="LEFT">
-<EnumSetExpression>
-<SimpleIdentifier Name="t1"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t3"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="RIGHT">
 <EnumSetExpression>
 <SimpleIdentifier Name="t19"/>
 </EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="TRAIN">
-<SimpleIdentifier Name="TRAINS"/>
 <ComponentList>
 <ForeachComponent Name="FRONT">
 <EnumSetExpression>
 <SimpleIdentifier Name="t3"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="TRAIN">
+<SimpleIdentifier Name="TRAINS"/>
+<ComponentList>
+<ForeachComponent Name="SWITCH">
+<EnumSetExpression>
+<SimpleIdentifier Name="t3"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="LEFT">
+<EnumSetExpression>
+<SimpleIdentifier Name="t1"/>
+</EnumSetExpression>
+<ComponentList>
 <SimpleComponent Kind="PLANT">
 <IndexedIdentifier Name="sensor_switch3">
-<SimpleIdentifier Name="LEFT"/>
-<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="RIGHT"/>
-<SimpleIdentifier Name="TRAIN"/>
 <SimpleIdentifier Name="FRONT"/>
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="SWITCH"/>
+<SimpleIdentifier Name="LEFT"/>
 </IndexedIdentifier>
 <Graph>
 <LabelBlock>
@@ -6190,11 +6196,6 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="AFTER1">
-<EnumSetExpression>
-<SimpleIdentifier Name="t6"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="BEFORE">
 <EnumSetExpression>
 <SimpleIdentifier Name="t0"/>
@@ -6205,6 +6206,11 @@
 <SimpleIdentifier Name="t27"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="AFTER1">
+<EnumSetExpression>
+<SimpleIdentifier Name="t6"/>
+</EnumSetExpression>
+<ComponentList>
 <ForeachComponent Name="SECT">
 <EnumSetExpression>
 <SimpleIdentifier Name="t2"/>
@@ -6212,9 +6218,9 @@
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_cprot_i_2">
-<SimpleIdentifier Name="AFTER1"/>
 <SimpleIdentifier Name="BEFORE"/>
 <SimpleIdentifier Name="AFTER2"/>
+<SimpleIdentifier Name="AFTER1"/>
 <SimpleIdentifier Name="SECT"/>
 </IndexedIdentifier>
 <Graph>
@@ -6852,9 +6858,9 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="SWITCH">
+<ForeachComponent Name="BEFORE1">
 <EnumSetExpression>
-<SimpleIdentifier Name="t6"/>
+<SimpleIdentifier Name="t27"/>
 </EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="AFTER">
@@ -6862,9 +6868,9 @@
 <SimpleIdentifier Name="t15"/>
 </EnumSetExpression>
 <ComponentList>
-<ForeachComponent Name="BEFORE1">
+<ForeachComponent Name="SWITCH">
 <EnumSetExpression>
-<SimpleIdentifier Name="t27"/>
+<SimpleIdentifier Name="t6"/>
 </EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="BEFORE2">
@@ -6874,9 +6880,9 @@
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_cprot_ii_11">
-<SimpleIdentifier Name="SWITCH"/>
-<SimpleIdentifier Name="AFTER"/>
 <SimpleIdentifier Name="BEFORE1"/>
+<SimpleIdentifier Name="AFTER"/>
+<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="BEFORE2"/>
 </IndexedIdentifier>
 <Graph>
@@ -7207,16 +7213,6 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="AFTER1">
-<EnumSetExpression>
-<SimpleIdentifier Name="t8"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t8"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="BEFORE1">
 <EnumSetExpression>
 <SimpleIdentifier Name="t16"/>
@@ -7227,6 +7223,16 @@
 <SimpleIdentifier Name="t10"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="AFTER1">
+<EnumSetExpression>
+<SimpleIdentifier Name="t8"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="SWITCH">
+<EnumSetExpression>
+<SimpleIdentifier Name="t8"/>
+</EnumSetExpression>
+<ComponentList>
 <ForeachComponent Name="BEFORE2">
 <EnumSetExpression>
 <SimpleIdentifier Name="t25"/>
@@ -7234,10 +7240,10 @@
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_cprot_ii_12">
-<SimpleIdentifier Name="AFTER1"/>
-<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="BEFORE1"/>
 <SimpleIdentifier Name="AFTER2"/>
+<SimpleIdentifier Name="AFTER1"/>
+<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="BEFORE2"/>
 </IndexedIdentifier>
 <Graph>
@@ -7604,16 +7610,6 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="AFTER1">
-<EnumSetExpression>
-<SimpleIdentifier Name="t1"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t5"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="BEFORE1">
 <EnumSetExpression>
 <SimpleIdentifier Name="t7"/>
@@ -7624,6 +7620,16 @@
 <SimpleIdentifier Name="t19"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="AFTER1">
+<EnumSetExpression>
+<SimpleIdentifier Name="t1"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="SWITCH">
+<EnumSetExpression>
+<SimpleIdentifier Name="t5"/>
+</EnumSetExpression>
+<ComponentList>
 <ForeachComponent Name="BEFORE2">
 <EnumSetExpression>
 <SimpleIdentifier Name="t8"/>
@@ -7631,10 +7637,10 @@
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_cprot_ii_5">
-<SimpleIdentifier Name="AFTER1"/>
-<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="BEFORE1"/>
 <SimpleIdentifier Name="AFTER2"/>
+<SimpleIdentifier Name="AFTER1"/>
+<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="BEFORE2"/>
 </IndexedIdentifier>
 <Graph>
@@ -8001,14 +8007,9 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="AFTER1">
+<ForeachComponent Name="SECT1">
 <EnumSetExpression>
-<SimpleIdentifier Name="t8"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="SECT2">
-<EnumSetExpression>
-<SimpleIdentifier Name="t9"/>
+<SimpleIdentifier Name="t10"/>
 </EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="BEFORE">
@@ -8021,18 +8022,23 @@
 <SimpleIdentifier Name="t11"/>
 </EnumSetExpression>
 <ComponentList>
-<ForeachComponent Name="SECT1">
+<ForeachComponent Name="SECT2">
 <EnumSetExpression>
-<SimpleIdentifier Name="t10"/>
+<SimpleIdentifier Name="t9"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="AFTER1">
+<EnumSetExpression>
+<SimpleIdentifier Name="t8"/>
 </EnumSetExpression>
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_cprot_iii_10">
-<SimpleIdentifier Name="AFTER1"/>
-<SimpleIdentifier Name="SECT2"/>
+<SimpleIdentifier Name="SECT1"/>
 <SimpleIdentifier Name="BEFORE"/>
 <SimpleIdentifier Name="AFTER2"/>
-<SimpleIdentifier Name="SECT1"/>
+<SimpleIdentifier Name="SECT2"/>
+<SimpleIdentifier Name="AFTER1"/>
 </IndexedIdentifier>
 <Graph>
 <LabelBlock>
@@ -8656,14 +8662,9 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="AFTER1">
+<ForeachComponent Name="SECT1">
 <EnumSetExpression>
-<SimpleIdentifier Name="t1"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="SECT2">
-<EnumSetExpression>
-<SimpleIdentifier Name="t20"/>
+<SimpleIdentifier Name="t19"/>
 </EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="BEFORE">
@@ -8676,18 +8677,23 @@
 <SimpleIdentifier Name="t21"/>
 </EnumSetExpression>
 <ComponentList>
-<ForeachComponent Name="SECT1">
+<ForeachComponent Name="SECT2">
 <EnumSetExpression>
-<SimpleIdentifier Name="t19"/>
+<SimpleIdentifier Name="t20"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="AFTER1">
+<EnumSetExpression>
+<SimpleIdentifier Name="t1"/>
 </EnumSetExpression>
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_cprot_iii_19">
-<SimpleIdentifier Name="AFTER1"/>
-<SimpleIdentifier Name="SECT2"/>
+<SimpleIdentifier Name="SECT1"/>
 <SimpleIdentifier Name="BEFORE"/>
 <SimpleIdentifier Name="AFTER2"/>
-<SimpleIdentifier Name="SECT1"/>
+<SimpleIdentifier Name="SECT2"/>
+<SimpleIdentifier Name="AFTER1"/>
 </IndexedIdentifier>
 <Graph>
 <LabelBlock>
@@ -9311,14 +9317,9 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="AFTER1">
+<ForeachComponent Name="SECT1">
 <EnumSetExpression>
-<SimpleIdentifier Name="t27"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="SECT2">
-<EnumSetExpression>
-<SimpleIdentifier Name="t7"/>
+<SimpleIdentifier Name="t6"/>
 </EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="BEFORE">
@@ -9331,18 +9332,23 @@
 <SimpleIdentifier Name="t5"/>
 </EnumSetExpression>
 <ComponentList>
-<ForeachComponent Name="SECT1">
+<ForeachComponent Name="SECT2">
 <EnumSetExpression>
-<SimpleIdentifier Name="t6"/>
+<SimpleIdentifier Name="t7"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="AFTER1">
+<EnumSetExpression>
+<SimpleIdentifier Name="t27"/>
 </EnumSetExpression>
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_cprot_iii_6">
-<SimpleIdentifier Name="AFTER1"/>
-<SimpleIdentifier Name="SECT2"/>
+<SimpleIdentifier Name="SECT1"/>
 <SimpleIdentifier Name="BEFORE"/>
 <SimpleIdentifier Name="AFTER2"/>
-<SimpleIdentifier Name="SECT1"/>
+<SimpleIdentifier Name="SECT2"/>
+<SimpleIdentifier Name="AFTER1"/>
 </IndexedIdentifier>
 <Graph>
 <LabelBlock>
@@ -9966,14 +9972,9 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="AFTER1">
+<ForeachComponent Name="SECT1">
 <EnumSetExpression>
-<SimpleIdentifier Name="t19"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="SECT2">
-<EnumSetExpression>
-<SimpleIdentifier Name="t0"/>
+<SimpleIdentifier Name="t1"/>
 </EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="BEFORE">
@@ -9986,18 +9987,23 @@
 <SimpleIdentifier Name="t2"/>
 </EnumSetExpression>
 <ComponentList>
-<ForeachComponent Name="SECT1">
+<ForeachComponent Name="SECT2">
 <EnumSetExpression>
-<SimpleIdentifier Name="t1"/>
+<SimpleIdentifier Name="t0"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="AFTER1">
+<EnumSetExpression>
+<SimpleIdentifier Name="t19"/>
 </EnumSetExpression>
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_cprot_iii_1">
-<SimpleIdentifier Name="AFTER1"/>
-<SimpleIdentifier Name="SECT2"/>
+<SimpleIdentifier Name="SECT1"/>
 <SimpleIdentifier Name="BEFORE"/>
 <SimpleIdentifier Name="AFTER2"/>
-<SimpleIdentifier Name="SECT1"/>
+<SimpleIdentifier Name="SECT2"/>
+<SimpleIdentifier Name="AFTER1"/>
 </IndexedIdentifier>
 <Graph>
 <LabelBlock>
@@ -10621,21 +10627,21 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="CRANE">
-<BinaryExpression Operator="..">
-<IntConstant Value="1"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-<ComponentList>
 <ForeachComponent Name="SECT">
 <EnumSetExpression>
 <SimpleIdentifier Name="t13"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="CRANE">
+<BinaryExpression Operator="..">
+<IntConstant Value="1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_crane1">
-<SimpleIdentifier Name="CRANE"/>
 <SimpleIdentifier Name="SECT"/>
+<SimpleIdentifier Name="CRANE"/>
 </IndexedIdentifier>
 <Graph>
 <LabelBlock>
@@ -10799,21 +10805,21 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="CRANE">
-<BinaryExpression Operator="..">
-<IntConstant Value="2"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-<ComponentList>
 <ForeachComponent Name="SECT">
 <EnumSetExpression>
 <SimpleIdentifier Name="t2"/>
 </EnumSetExpression>
 <ComponentList>
+<ForeachComponent Name="CRANE">
+<BinaryExpression Operator="..">
+<IntConstant Value="2"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_crane2">
-<SimpleIdentifier Name="CRANE"/>
 <SimpleIdentifier Name="SECT"/>
+<SimpleIdentifier Name="CRANE"/>
 </IndexedIdentifier>
 <Graph>
 <LabelBlock>
@@ -10977,21 +10983,21 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
+<ForeachComponent Name="SECT">
+<EnumSetExpression>
+<SimpleIdentifier Name="t21"/>
+</EnumSetExpression>
+<ComponentList>
 <ForeachComponent Name="CRANE">
 <BinaryExpression Operator="..">
 <IntConstant Value="3"/>
 <IntConstant Value="3"/>
 </BinaryExpression>
 <ComponentList>
-<ForeachComponent Name="SECT">
-<EnumSetExpression>
-<SimpleIdentifier Name="t21"/>
-</EnumSetExpression>
-<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_crane3">
-<SimpleIdentifier Name="CRANE"/>
 <SimpleIdentifier Name="SECT"/>
+<SimpleIdentifier Name="CRANE"/>
 </IndexedIdentifier>
 <Graph>
 <LabelBlock>
@@ -11155,16 +11161,16 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t3"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="TRAIN">
 <BinaryExpression Operator="..">
 <IntConstant Value="2"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+<ComponentList>
+<ForeachComponent Name="SWITCH">
+<EnumSetExpression>
+<SimpleIdentifier Name="t3"/>
+</EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="SECT">
 <EnumSetExpression>
@@ -11173,8 +11179,8 @@
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_route_left_right_32">
-<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="SECT"/>
 </IndexedIdentifier>
 <Graph>
@@ -11455,9 +11461,9 @@
 <SimpleIdentifier Name="t8"/>
 </EnumSetExpression>
 <ComponentList>
-<ForeachComponent Name="SWITCH">
+<ForeachComponent Name="CURVE">
 <EnumSetExpression>
-<SimpleIdentifier Name="t5"/>
+<SimpleIdentifier Name="t7"/>
 </EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="TRAIN">
@@ -11466,17 +11472,17 @@
 <IntConstant Value="2"/>
 </BinaryExpression>
 <ComponentList>
-<ForeachComponent Name="CURVE">
+<ForeachComponent Name="SWITCH">
 <EnumSetExpression>
-<SimpleIdentifier Name="t7"/>
+<SimpleIdentifier Name="t5"/>
 </EnumSetExpression>
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_route_merge_a_52">
 <SimpleIdentifier Name="STRAIGHT"/>
-<SimpleIdentifier Name="SWITCH"/>
-<SimpleIdentifier Name="TRAIN"/>
 <SimpleIdentifier Name="CURVE"/>
+<SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="SWITCH"/>
 </IndexedIdentifier>
 <Graph>
 <LabelBlock>
@@ -11680,16 +11686,6 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="LEFT">
-<EnumSetExpression>
-<SimpleIdentifier Name="t16"/>
-</EnumSetExpression>
-<ComponentList>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t8"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="RIGHT">
 <EnumSetExpression>
 <SimpleIdentifier Name="t25"/>
@@ -11698,12 +11694,22 @@
 <ForeachComponent Name="TRAIN">
 <SimpleIdentifier Name="TRAINS"/>
 <ComponentList>
+<ForeachComponent Name="SWITCH">
+<EnumSetExpression>
+<SimpleIdentifier Name="t8"/>
+</EnumSetExpression>
+<ComponentList>
+<ForeachComponent Name="LEFT">
+<EnumSetExpression>
+<SimpleIdentifier Name="t16"/>
+</EnumSetExpression>
+<ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_route_merge_b_8">
-<SimpleIdentifier Name="LEFT"/>
-<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="RIGHT"/>
 <SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="SWITCH"/>
+<SimpleIdentifier Name="LEFT"/>
 </IndexedIdentifier>
 <Graph>
 <LabelBlock>
@@ -11957,16 +11963,16 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t3"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="TRAIN">
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+<ComponentList>
+<ForeachComponent Name="SWITCH">
+<EnumSetExpression>
+<SimpleIdentifier Name="t3"/>
+</EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="SECT">
 <EnumSetExpression>
@@ -11975,8 +11981,8 @@
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_route_right_left_31">
-<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="SECT"/>
 </IndexedIdentifier>
 <Graph>
@@ -12252,16 +12258,16 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t4"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="TRAIN">
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+<ComponentList>
+<ForeachComponent Name="SWITCH">
+<EnumSetExpression>
+<SimpleIdentifier Name="t4"/>
+</EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="SECT">
 <EnumSetExpression>
@@ -12270,8 +12276,8 @@
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_route_straight_41">
-<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="SECT"/>
 </IndexedIdentifier>
 <Graph>
@@ -12403,16 +12409,16 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t5"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="TRAIN">
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+<ComponentList>
+<ForeachComponent Name="SWITCH">
+<EnumSetExpression>
+<SimpleIdentifier Name="t5"/>
+</EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="SECT">
 <EnumSetExpression>
@@ -12421,8 +12427,8 @@
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_route_straight_51">
-<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="SECT"/>
 </IndexedIdentifier>
 <Graph>
@@ -12554,16 +12560,16 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t6"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="TRAIN">
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+<ComponentList>
+<ForeachComponent Name="SWITCH">
+<EnumSetExpression>
+<SimpleIdentifier Name="t6"/>
+</EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="SECT">
 <EnumSetExpression>
@@ -12572,8 +12578,8 @@
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_route_straight_61">
-<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="SECT"/>
 </IndexedIdentifier>
 <Graph>
@@ -12705,16 +12711,16 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t7"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="TRAIN">
 <BinaryExpression Operator="..">
 <IntConstant Value="1"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
+<ComponentList>
+<ForeachComponent Name="SWITCH">
+<EnumSetExpression>
+<SimpleIdentifier Name="t7"/>
+</EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="SECT">
 <EnumSetExpression>
@@ -12723,8 +12729,8 @@
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_route_straight_71">
-<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="SECT"/>
 </IndexedIdentifier>
 <Graph>
@@ -12856,16 +12862,16 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t4"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="TRAIN">
 <BinaryExpression Operator="..">
 <IntConstant Value="2"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+<ComponentList>
+<ForeachComponent Name="SWITCH">
+<EnumSetExpression>
+<SimpleIdentifier Name="t4"/>
+</EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="SECT">
 <EnumSetExpression>
@@ -12874,8 +12880,8 @@
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_route_turn_42">
-<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="SECT"/>
 </IndexedIdentifier>
 <Graph>
@@ -13007,16 +13013,16 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t6"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="TRAIN">
 <BinaryExpression Operator="..">
 <IntConstant Value="2"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+<ComponentList>
+<ForeachComponent Name="SWITCH">
+<EnumSetExpression>
+<SimpleIdentifier Name="t6"/>
+</EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="SECT">
 <EnumSetExpression>
@@ -13025,8 +13031,8 @@
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_route_turn_62">
-<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="SECT"/>
 </IndexedIdentifier>
 <Graph>
@@ -13158,16 +13164,16 @@
 </ForeachComponent>
 </ComponentList>
 </ForeachComponent>
-<ForeachComponent Name="SWITCH">
-<EnumSetExpression>
-<SimpleIdentifier Name="t7"/>
-</EnumSetExpression>
-<ComponentList>
 <ForeachComponent Name="TRAIN">
 <BinaryExpression Operator="..">
 <IntConstant Value="2"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
+<ComponentList>
+<ForeachComponent Name="SWITCH">
+<EnumSetExpression>
+<SimpleIdentifier Name="t7"/>
+</EnumSetExpression>
 <ComponentList>
 <ForeachComponent Name="SECT">
 <EnumSetExpression>
@@ -13176,8 +13182,8 @@
 <ComponentList>
 <SimpleComponent Kind="SPEC">
 <IndexedIdentifier Name="sup_route_left_right_72">
-<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="TRAIN"/>
+<SimpleIdentifier Name="SWITCH"/>
 <SimpleIdentifier Name="SECT"/>
 </IndexedIdentifier>
 <Graph>
