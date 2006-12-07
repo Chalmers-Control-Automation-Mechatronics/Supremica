@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.59 2006-11-30 01:58:05 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.60 2006-12-07 15:11:35 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1052,7 +1052,7 @@ private void updateTransitionsInAutomtata()
       // automaton is a subset of mEFAEvent.
       for (VariableProxy variable : variables) {
         final AutomatonProxy variableAutomaton =
-          createVariableAutomaton(comp.getKind(), variable);
+          createVariableAutomaton(ComponentKind.PLANT, variable);
         // Add variable automaton to mAutomata.
         mAutomata.put(variable.getName(), variableAutomaton);
       }
@@ -1166,34 +1166,58 @@ private void updateTransitionsInAutomtata()
             try {
               if (evaluatePartialGuard(guardClause, searcher)) {
             	  StateProxy target;
-                if (action == null) {
+            	  boolean outOfRange= outOfRange(action,range);
+            	  /*
+              	 * The plant action can be out of range but then 
+              	 * a specification guard 
+              	 * could make sure that this does not happen. 
+              	 */
+            	  if (action == null) {
                   target = source;
                 } else {
+                	
+                  if(controllabilityEvents!= null){
+                	  if(outOfRange){
+                		  target=source;
+                	  }
+                	  else{
+                		  final IndexValue result = evalIndex(action, range);
+                          target = variableStates.get(result); 
+                	  }
+                	  for(EventProxy controllabilityEvent: controllabilityEvents){
+                        	SimpleExpressionProxy clause= 
+                        		mControllabilityEventsClauseMap.get(controllabilityEvent);
+                        	
+                        	if (evaluatePartialGuard(clause, searcher)) {
+                        		final TransitionProxy uncontrollableTransition =
+                                    mDESFactory.createTransitionProxy(source,
+                                    		controllabilityEvent,
+                                                                      target);
+                                variableAlphabet.add(controllabilityEvent);  
+                        		variableTransitions.add(uncontrollableTransition);
+                                  mForbiddenRelabelledEvents.add(controllabilityEvent);
+                                   
+                        	}
+                        	
+                        	
+                        }
+                			/* TODO: It could happen that the index is outOfRange and
+                			 *  not blocked by a specification
+                			 * guard. Then we will not detect the modelling error.
+                			 */
+         
+                	}
+                  else{
                   final IndexValue result = evalIndex(action, range);
                   target = variableStates.get(result);
+                  }
+                	
                 }
                 final TransitionProxy actionTransition =
                   mDESFactory.createTransitionProxy(source,
                                                     relabeledEvent,
                                                     target);
                 variableTransitions.add(actionTransition);
-                
-                if(controllabilityEvents!= null){
-                for(EventProxy controllabilityEvent: controllabilityEvents){
-                	SimpleExpressionProxy clause= 
-                		mControllabilityEventsClauseMap.get(controllabilityEvent);
-                	
-                	if (evaluatePartialGuard(clause, searcher)) {
-                		final TransitionProxy uncontrollableTransition =
-                            mDESFactory.createTransitionProxy(source,
-                            		controllabilityEvent,
-                                                              target);
-                        variableAlphabet.add(controllabilityEvent);  
-                		variableTransitions.add(uncontrollableTransition);
-                          mForbiddenRelabelledEvents.add(controllabilityEvent);
-                }
-                }
-              }
             }
               }
                finally {
@@ -1749,7 +1773,7 @@ private void updateTransitionsInAutomtata()
                                final RangeValue range)
     throws VisitorException
   {
-    IndexValue value = evalIndex(expr);
+ 	  IndexValue value = evalIndex(expr);
     if (value instanceof BooleanValue) {
     		value = new CompiledIntValue(((BooleanValue) value).getValue());
     }
@@ -1761,6 +1785,21 @@ private void updateTransitionsInAutomtata()
       throw wrap(exception);
     }
   }
+  private boolean outOfRange(final SimpleExpressionProxy expr,
+          final RangeValue range)
+  throws VisitorException
+  { 
+
+IndexValue value = evalIndex(expr);
+if (value instanceof BooleanValue) {
+value = new CompiledIntValue(((BooleanValue) value).getValue());
+}
+if (range.contains(value)) {
+return false;
+} else {
+	return true;
+}
+}
 
   private RangeValue evalRange(final SimpleExpressionProxy expr)
     throws VisitorException
