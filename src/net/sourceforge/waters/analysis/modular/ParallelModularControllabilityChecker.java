@@ -197,6 +197,7 @@ public class ParallelModularControllabilityChecker
             }
             events.addAll(automaton.getEvents());
             newStates *= automaton.getStates().size();
+            System.out.println(automaton.getName());
           }
           double numevents = events.size();
           double newEvents = events.size() - eventsBefore;
@@ -214,7 +215,7 @@ public class ParallelModularControllabilityChecker
           StringBuffer thing = new StringBuffer();
           for (AutomatonProxy automaton : run.mModel.getAutomata()) {
             if (specs.contains(automaton)) {
-              //System.out.println(mChecker.getAnalysisResult().getTotalNumberOfStates() + " " + automaton.getName() + " size " + automaton.getStates().size());
+              System.out.println(mChecker.getAnalysisResult().getTotalNumberOfStates() + " " + automaton.getName() + " size " + automaton.getStates().size());
               specs.remove(automaton);
               specplants.add(automaton);
               changed.add(automaton);

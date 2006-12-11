@@ -4,12 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventDeclListView
 //###########################################################################
-//# $Id: EventDeclListView.java,v 1.1 2006-09-21 16:42:13 robi Exp $
+//# $Id: EventDeclListView.java,v 1.2 2006-12-11 02:40:44 siw4 Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
+import java.util.Collection;
+import java.util.ArrayList;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragSource;
@@ -66,12 +68,58 @@ public class EventDeclListView
       if (row < 0) {
         return;
       }
-      final ListModel model = getModel();
-      final EventDeclSubject decl = (EventDeclSubject) model.getElementAt(row);
-      final String name = decl.getName();
-      final EventKind kind = decl.getKind();
-      final IdentifierSubject ident = new SimpleIdentifierSubject(name);
-      final Transferable trans = new IdentifierTransfer(ident, kind); 
+      final Object[] values = getSelectedValues();
+      if (values.length == 0) {
+        return;
+      }
+      final Collection<IdentifierSubject> idents = new ArrayList<IdentifierSubject>(values.length);
+      EventType e = EventType.UNKNOWN;
+      for(int i = 0; i < values.length; i++)
+      {
+        final EventDeclSubject decl = (EventDeclSubject) values[i];
+        switch (e) {
+          case UNKNOWN:
+            switch (decl.getKind()) {
+              case PROPOSITION:
+                e = EventType.NODE_EVENTS;
+                break;
+              case CONTROLLABLE:
+                e = EventType.EDGE_EVENTS;
+                break;
+              case UNCONTROLLABLE:
+                e = EventType.EDGE_EVENTS;
+                break;
+              default:
+                break;
+            }
+            break;
+          case EDGE_EVENTS:
+            switch (decl.getKind()) {
+              case PROPOSITION:
+                e = EventType.BOTH;
+                break;
+              default:
+                break;
+            }
+            break;
+          case NODE_EVENTS:
+            switch (decl.getKind()) {
+              case CONTROLLABLE:
+                e = EventType.BOTH;
+                break;
+              case UNCONTROLLABLE:
+                e = EventType.BOTH;
+                break;
+              default:
+                break;
+            }
+            break;
+          default:
+            break;
+        }
+        idents.add(new SimpleIdentifierSubject(decl.getName()));
+      }
+      final Transferable trans = new IdentifierTransfer(idents, e); 
       try {
         event.startDrag(DragSource.DefaultCopyDrop, trans);
       } catch (InvalidDnDOperationException exception) {

@@ -4,11 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.98 2006-12-03 20:55:01 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.99 2006-12-11 02:40:44 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
 
+import java.util.TreeSet;
+import net.sourceforge.waters.subject.base.NamedSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DragSource;
@@ -1305,78 +1307,71 @@ public class ControlledSurface
             {
                 final IdentifierWithKind i = (IdentifierWithKind)
                 e.getTransferable().getTransferData(FLAVOUR);
-                final EventKind ek = i.getKind();
-                final IdentifierSubject ip = i.getIdentifier();
+                final EventType ek = i.getKind();
                 s = mFocusedObject;
-                if (ek == null)
-                {
-                    if (s instanceof SimpleNodeSubject)
-                    {
+                switch (ek) {
+                  case UNKNOWN:
+                    if (s instanceof SimpleNodeSubject) {
                       el = ((SimpleNodeSubject)s).getPropositions();
+                    } else if (s instanceof EdgeSubject) {
+                      el = ((EdgeSubject)s).getLabelBlock();
+                    } else if (s instanceof LabelBlockSubject) {
+                      el = (LabelBlockSubject)s;
+                    } else if (s instanceof LabelGeometrySubject) {
+                      el = ((SimpleNodeSubject)s.getParent()).getPropositions();
                     }
-                    else if (s instanceof EdgeSubject)
-                    {
+                    break;
+                  case NODE_EVENTS:
+                    if (s instanceof SimpleNodeSubject) {
+                      el = ((SimpleNodeSubject)s).getPropositions();
+                    } else if (s instanceof LabelGeometrySubject) {
+                      el = ((SimpleNodeSubject)s.getParent()).getPropositions();
+                    }
+                    break;
+                  case EDGE_EVENTS:
+                   if (s instanceof EdgeSubject)
+                   {
                       el = ((EdgeSubject)s).getLabelBlock();
                     }
                     else if (s instanceof LabelBlockSubject)
                     {
                       el = (LabelBlockSubject)s;
-                    }
-                    else if (s instanceof LabelGeometrySubject)
-                    {
-                      el = ((SimpleNodeSubject)s.getParent()).getPropositions();
-                    }
-                }
-                else if (ek.equals(EventKind.PROPOSITION))
-                {
-                    if (s instanceof SimpleNodeSubject)
-                    {
-                      el = ((SimpleNodeSubject)s).getPropositions();
-                    }
-                    else if (s instanceof LabelGeometrySubject)
-                    {
-                      el = ((SimpleNodeSubject)s.getParent()).getPropositions();
-                    }
-                }
-                else if (ek.equals(EventKind.CONTROLLABLE) ||
-                    ek.equals(EventKind.UNCONTROLLABLE))
-                {
-                  if (s instanceof EdgeSubject)
-                  {
-                      el = ((EdgeSubject)s).getLabelBlock();
-                  }
-                  else if (s instanceof LabelBlockSubject)
-                  {
-                    el = (LabelBlockSubject)s;
-                    LabelBlockSubject l = (LabelBlockSubject) s;
-                    Point2D p = e.getLocation();
-                    try {
-                      double x1 = getShapeProducer().getShape(l).getShape()
-                                                    .getBounds().getMinX();
-                      double x2 = getShapeProducer().getShape(l).getShape()
-                                                    .getBounds().getMaxX();
-                      for (Proxy proxy : l.getEventList()) {
-                        ProxyShape shape = getShapeProducer().getShape(proxy);
-                        Rectangle2D r = shape.getShape().getBounds();
-                        if (p.getY() < r.getCenterY()) {
-                          line = new Line2D.Double(x1, r.getMinY(),
-                                                   x2, r.getMinY());
-                          break;
-                        } else {
-                          line = new Line2D.Double(x1, r.getMaxY(),
-                                                   x2, r.getMaxY());
+                      LabelBlockSubject l = (LabelBlockSubject) s;
+                      Point2D p = e.getLocation();
+                      try {
+                        double x1 = getShapeProducer().getShape(l).getShape()
+                                                      .getBounds().getMinX();
+                        double x2 = getShapeProducer().getShape(l).getShape()
+                                                      .getBounds().getMaxX();
+                        for (Proxy proxy : l.getEventList()) {
+                          ProxyShape shape = getShapeProducer().getShape(proxy);
+                          Rectangle2D r = shape.getShape().getBounds();
+                          if (p.getY() < r.getCenterY()) {
+                            line = new Line2D.Double(x1, r.getMinY(),
+                                                     x2, r.getMinY());
+                            break;
+                          } else {
+                            line = new Line2D.Double(x1, r.getMaxY(),
+                                                     x2, r.getMaxY());
+                          }
                         }
+                      } catch (VisitorException v) {
+                        v.printStackTrace();
                       }
-                    } catch (VisitorException v) {
-                      v.printStackTrace();
                     }
-                  }
+                    break;
+                  default:
+                    break;
                 }
                 if (el != null) {
-                  boolean present = false;
-                  for (Object o : el.getEventList()) {
-                    if (o.toString().equals(ip.toString())) {
-                      present = true;
+                  boolean present = true;
+                  Set<IdentifierSubject> contents = new TreeSet<IdentifierSubject>(NamedComparator.getInstance());
+                  for (AbstractSubject a : el.getEventListModifiable()) {
+                    contents.add((IdentifierSubject)a);
+                  }
+                  for (IdentifierSubject ident : i.getIdentifiers()) {
+                    if (!contents.contains(ident)) {
+                      present = false;
                       break;
                     }
                   }
@@ -1424,85 +1419,78 @@ public class ControlledSurface
 
         public void drop(final DropTargetDropEvent e)
         {
-            mDND = false;
-            mLine = null;
-            try
+          mDND = false;
+          mLine = null;
+          try
+          {
+            if (e.getDropTargetContext().getDropTarget().
+                getDefaultActions() == DnDConstants.ACTION_COPY)
             {
-                // Drag is finished!
-          /*if (mDrag != null)
-            {
-            setDragOver(mDrag, NOTDRAG);
-            }*/
-
-                if (e.getDropTargetContext().getDropTarget().
-                    getDefaultActions() == DnDConstants.ACTION_COPY)
-                {
-                    final IdentifierWithKind i = (IdentifierWithKind)
-                    e.getTransferable().getTransferData(FLAVOUR);
-                    final IdentifierSubject ip = i.getIdentifier();
-                    final ProxySubject s = mFocusedObject;
-                    mDragOver = EditorSurface.DRAGOVERSTATUS.NOTDRAG;
-                    if (s instanceof SimpleNodeSubject)
-                    {
-                        addToNode((SimpleNodeSubject) s, ip);
-                        e.dropComplete(true);
-                        return;
-                    }
-                    else if (s instanceof EdgeSubject)
-                    {
-                        addToEdge((EdgeSubject) s, ip);
-                        e.dropComplete(true);
-                        return;
-                    }
-                    else if (s instanceof LabelBlockSubject)
-                    {
-                        addToLabelGroup((LabelBlockSubject) s, ip, e);
-                        e.dropComplete(true);
-                        return;
-                    }
-                    else if (s instanceof LabelGeometrySubject)
-                    {
-                        addToLabel((LabelGeometrySubject) s, ip);
-                        e.dropComplete(true);
-                        return;
-                    }
-                }
+              final IdentifierWithKind i = (IdentifierWithKind)
+              e.getTransferable().getTransferData(FLAVOUR);
+              final Collection<IdentifierSubject> ips = i.getIdentifiers();
+              final ProxySubject s = mFocusedObject;
+              mDragOver = EditorSurface.DRAGOVERSTATUS.NOTDRAG;
+              if (s instanceof SimpleNodeSubject)
+              {
+                  addToNode((SimpleNodeSubject) s, ips);
+                  e.dropComplete(true);
+                  return;
+              }
+              else if (s instanceof EdgeSubject)
+              {
+                  addToEdge((EdgeSubject) s, ips);
+                  e.dropComplete(true);
+                  return;
+              }
+              else if (s instanceof LabelBlockSubject)
+              {
+                  addToLabelGroup((LabelBlockSubject) s, ips, e);
+                  e.dropComplete(true);
+                  return;
+              }
+              else if (s instanceof LabelGeometrySubject)
+              {
+                  addToLabel((LabelGeometrySubject) s, ips);
+                  e.dropComplete(true);
+                  return;
+              }
             }
-            catch (final UnsupportedFlavorException exception)
-            {
-                throw new IllegalArgumentException(exception);
-            }
-            catch (final IOException exception)
-            {
-                throw new IllegalArgumentException(exception);
-            }
-            e.dropComplete(false);
+          }
+          catch (final UnsupportedFlavorException exception)
+          {
+              throw new IllegalArgumentException(exception);
+          }
+          catch (final IOException exception)
+          {
+              throw new IllegalArgumentException(exception);
+          }
+          e.dropComplete(false);
         }
 
 
         //###################################################################
         //# Auxiliary Methods
-        private void addToNode(SimpleNodeSubject n, IdentifierSubject i)
+        private void addToNode(SimpleNodeSubject n, Collection<IdentifierSubject> i)
         {
-            final IdentifierSubject cloned = i.clone();
             Command addEvent = new AddEventCommand(n.getPropositions(),
-                cloned, 0);
+                i, 0);
             root.getUndoInterface().executeCommand(addEvent);
             repaint();
         }
 
-        private void addToLabel(LabelGeometrySubject l, IdentifierSubject i)
+        private void addToLabel(LabelGeometrySubject l, Collection<IdentifierSubject> i)
         {
             addToNode((SimpleNodeSubject)l.getParent(), i);
         }
 
-        private void addToEdge(EdgeSubject edge, IdentifierSubject ip)
+        private void addToEdge(EdgeSubject edge, Collection<IdentifierSubject> ip)
         {
             addToLabelGroup(edge.getLabelBlock(), ip,
                             edge.getLabelBlock().getEventList().size());
         }
 
-        private void addToLabelGroup(LabelBlockSubject l, IdentifierSubject i, final DropTargetDropEvent e)
+        private void addToLabelGroup(LabelBlockSubject l, Collection<IdentifierSubject> i, final DropTargetDropEvent e)
         {
             int pos = 0;
             Point2D p = e.getLocation();
@@ -1530,10 +1518,9 @@ public class ControlledSurface
             addToLabelGroup(l, i, pos);
         }
         
-        private void addToLabelGroup(LabelBlockSubject l, IdentifierSubject i, int pos)
+        private void addToLabelGroup(LabelBlockSubject l, Collection<IdentifierSubject> i, int pos)
         {
-          final IdentifierSubject cloned = i.clone();
-          Command addEvent = new AddEventCommand(l, cloned, pos);
+          Command addEvent = new AddEventCommand(l, i, pos);
           root.getUndoInterface().executeCommand(addEvent);
           repaint();
         }
@@ -3161,11 +3148,12 @@ public class ControlledSurface
     {
       public void dragGestureRecognized(final DragGestureEvent event)
       {
+        System.out.println(mToBeDragged);
         if (mToBeDragged == null) {
           return;
         }
         final Transferable trans = new IdentifierTransfer(mToBeDragged,
-                                                          EventKind.CONTROLLABLE);
+                                                          EventType.EDGE_EVENTS);
         mToBeDragged = null;
         try {
           event.startDrag(DragSource.DefaultCopyDrop, trans);
@@ -3175,19 +3163,32 @@ public class ControlledSurface
       }
     }
 
-    private IdentifierSubject DNDLabel(Point pos) {
+    private Collection<IdentifierSubject> DNDLabel(Point pos) {
+      Subject parent = null;
+      Collection<IdentifierSubject> labels = null;
       for (ProxySubject s : selectedObjects) {
         try {
           if (s instanceof IdentifierSubject && getShapeProducer().getShape(s)
                                                 .getShape().getBounds()
                                                 .contains(pos)) {
-            return (IdentifierSubject)s;
+            parent = s.getParent();
+            System.out.println("drag events");
+            labels = new ArrayList<IdentifierSubject>();
+            break;
           }
         } catch (VisitorException v) {
           v.printStackTrace();
         }
       }
-      return null;
+      if (labels != null) {
+        for (ProxySubject s : selectedObjects) {
+          if (s.getParent() == parent) {
+            labels.add((IdentifierSubject)s);
+          }
+        }
+      }
+      System.out.println(labels);
+      return labels;
     }
 
     //#########################################################################
@@ -3206,7 +3207,7 @@ public class ControlledSurface
     private boolean draggingSource = false;
     private boolean draggingTarget = false;
     private boolean draggingInitial = false;
-    private IdentifierSubject mToBeDragged = null;
+    private Collection<IdentifierSubject> mToBeDragged = null;
 
     /** List of currently selected EditorObject:s. */
     private List<ProxySubject> selectedObjects =

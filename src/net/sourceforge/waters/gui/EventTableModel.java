@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.26 2006-10-26 09:11:27 flordal Exp $
+//# $Id: EventTableModel.java,v 1.27 2006-12-11 02:40:44 siw4 Exp $
 //###########################################################################
 
 
@@ -332,12 +332,12 @@ public class EventTableModel
     }
   }
 
-  public IdentifierTransfer createIdentifierTransfer
+  /*public IdentifierTransfer createIdentifierTransfer
     (final IdentifierSubject ident)
   {
     final EventKind kind = mRoot.guessEventKind(ident);
     return new IdentifierTransfer(ident, kind);
-  }
+  }*/
 
 
   //#########################################################################

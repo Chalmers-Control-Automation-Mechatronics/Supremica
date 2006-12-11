@@ -4,12 +4,15 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.29 2006-11-03 15:01:56 torda Exp $
+//# $Id: EditorEvents.java,v 1.30 2006-12-11 02:40:44 siw4 Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import net.sourceforge.waters.xsd.base.EventKind;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -82,7 +85,8 @@ public class EditorEvents
 		final TableModel model = new EventTableModel(graph, root, this);
 		final Dimension ispacing = new Dimension(0, 0);
 		final ExpressionParser parser = root.getExpressionParser();
-		mRoot = window;
+		mRoot = root;
+    mWindow = window;
 
 		setModel(model);
 		setTableHeader(null);
@@ -400,13 +404,65 @@ public class EditorEvents
 	{
 		public void dragGestureRecognized(final DragGestureEvent event)
 		{
-			final int row = rowAtPoint(event.getDragOrigin());
-			if (row < 0) {
-				return;
-			}
 			final EventTableModel model = (EventTableModel) getModel();
-			final IdentifierSubject ident = model.getEvent(row);
-			final Transferable trans = model.createIdentifierTransfer(ident);
+      final int[] rows = getSelectedRows();
+      if (rows.length == 0) {
+        return;
+      }
+      final Collection<IdentifierSubject> idents = new ArrayList<IdentifierSubject>(rows.length);
+      EventType e = EventType.UNKNOWN;
+      for(int i = 0; i < rows.length; i++)
+      {
+        final IdentifierSubject ident = model.getEvent(rows[i]);
+        final EventKind guess = mRoot.guessEventKind(ident);
+        System.out.println("EventType: " + e);
+        System.out.println("EventKind: " + guess);
+        if (guess != null) {
+          switch (e) {
+            case UNKNOWN:
+              switch (guess) {
+                case PROPOSITION:
+                  e = EventType.NODE_EVENTS;
+                  break;
+                case CONTROLLABLE:
+                  e = EventType.EDGE_EVENTS;
+                  break;
+                case UNCONTROLLABLE:
+                  e = EventType.EDGE_EVENTS;
+                  break;
+                default:
+                  break;
+              }
+              break;
+            case EDGE_EVENTS:
+              switch (guess) {
+                case PROPOSITION:
+                  e = EventType.BOTH;
+                  break;
+                default:
+                  break;
+              }
+              break;
+            case NODE_EVENTS:
+              switch (guess) {
+                case CONTROLLABLE:
+                  e = EventType.BOTH;
+                  break;
+                case UNCONTROLLABLE:
+                  e = EventType.BOTH;
+                  break;
+                default:
+                  break;
+              }
+              break;
+            default:
+              break;
+          }
+        }
+        idents.add(ident);
+      }
+      System.out.println("EventType: " + e);
+      final Transferable trans = new IdentifierTransfer(idents, e);
 			try {
 				event.startDrag(DragSource.DefaultCopyDrop, trans);
 			} catch (InvalidDnDOperationException exception) {
@@ -417,7 +473,7 @@ public class EditorEvents
 
 	public EditorWindowInterface getEditorInterface()
 	{
-		return mRoot;
+		return mWindow;
 	}
 
 
@@ -427,7 +483,8 @@ public class EditorEvents
 	private DragGestureListener mDGListener;
 	private DragSourceListener mDSListener;
 	private int mDragAction = DnDConstants.ACTION_COPY;
-	private final EditorWindowInterface mRoot;
+	private final ModuleWindowInterface mRoot;
+  private final EditorWindowInterface mWindow;
 	private final JPopupMenu popupMenu = new JPopupMenu();
 
 
