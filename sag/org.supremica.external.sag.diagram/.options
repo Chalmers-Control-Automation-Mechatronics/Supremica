@@ -1,0 +1,7 @@
+# Debugging options for the org.supremica.external.sag.diagram plug-in
+
+# Turn on general debugging for the org.supremica.external.sag.diagram plug-in
+org.supremica.external.sag.diagram/debug=false
+
+# Turn on debugging of visualID processing
+org.supremica.external.sag.diagram/debug/visualID=true
