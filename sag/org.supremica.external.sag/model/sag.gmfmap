@@ -11,7 +11,8 @@
     <ownedChild>
       <domainMetaElement
           href="sag.ecore#//Graph"/>
-      <labelMappings>
+      <labelMappings
+          xsi:type="gmfmap:FeatureLabelMapping">
         <diagramLabel
             href="sag.gmfgraph#GraphName"/>
         <features
@@ -29,7 +30,8 @@
         <ownedChild>
           <domainMetaElement
               href="sag.ecore#//Node"/>
-          <labelMappings>
+          <labelMappings
+              xsi:type="gmfmap:FeatureLabelMapping">
             <diagramLabel
                 href="sag.gmfgraph#SensorName"/>
             <features
@@ -76,7 +78,8 @@
             href="sag.ecore#//Zone/isOneway"/>
       </initializers>
     </domainInitializer>
-    <labelMappings>
+    <labelMappings
+        xsi:type="gmfmap:FeatureLabelMapping">
       <diagramLabel
           href="sag.gmfgraph#Capacity"/>
       <features
@@ -99,7 +102,8 @@
   <links>
     <domainMetaElement
         href="sag.ecore#//BoundedZone"/>
-    <labelMappings>
+    <labelMappings
+        xsi:type="gmfmap:FeatureLabelMapping">
       <diagramLabel
           href="sag.gmfgraph#Capacity"/>
       <features
