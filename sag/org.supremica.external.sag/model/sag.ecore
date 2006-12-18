@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="sag"
+    nsURI="http://supremica.org/external/sag" nsPrefix="org.supremica.external">
+  <eClassifiers xsi:type="ecore:EClass" name="Graph" eSuperTypes="#//Named">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="zone" upperBound="-1" eType="#//Zone"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="multipleObjects" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="node" upperBound="-1" eType="#//Node"
+        containment="true" eOpposite="#//Node/graph"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Zone" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="front" eType="#//Node"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="back" eType="#//Node"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isOneway" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BoundedZone" eSuperTypes="#//Zone">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="capacity" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Named" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="UnboundedZone" eSuperTypes="#//Zone">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isOutside" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Node">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="sensor" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="graph" eType="#//Graph"
+        eOpposite="#//Graph/node"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Project" eSuperTypes="#//Named">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="graph" upperBound="-1"
+        eType="#//Graph" containment="true"/>
+  </eClassifiers>
+</ecore:EPackage>

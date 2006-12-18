@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+ <copyright>
+ </copyright>
+
+ $Id: plugin.xml,v 1.1 2006-12-18 15:25:46 torda Exp $
+-->
+
+<plugin>
+
+
+  <extension
+    point = "org.eclipse.ui.newWizards">
+    <category
+      id = "org.eclipse.emf.ecore.Wizard.category.ID"
+      name="%_UI_Wizard_category">
+    </category>
+    <wizard
+      id = "org.supremica.external.sag.presentation.SagModelWizardID"
+      name = "%_UI_SagModelWizard_label"
+      class = "org.supremica.external.sag.presentation.SagModelWizard"
+      category = "org.eclipse.emf.ecore.Wizard.category.ID"
+      icon = "icons/full/obj16/SagModelFile.gif">
+      <description>%_UI_SagModelWizard_description</description>
+      <selection class = "org.eclipse.core.resources.IResource" />
+    </wizard>
+  </extension>
+
+  <extension point = "org.eclipse.ui.editors">
+    <editor
+        id = "org.supremica.external.sag.presentation.SagEditorID"
+        name = "%_UI_SagEditor_label"
+        icon = "icons/full/obj16/SagModelFile.gif"
+        extensions = "sag"
+        class = "org.supremica.external.sag.presentation.SagEditor" 
+        contributorClass="org.supremica.external.sag.presentation.SagActionBarContributor" >
+    </editor>
+  </extension>    
+</plugin>

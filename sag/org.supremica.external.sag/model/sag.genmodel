@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/org.supremica.external.sag/src"
+    editDirectory="/org.supremica.external.sag/src" editorDirectory="/org.supremica.external.sag.editor/src"
+    modelPluginID="org.supremica.external.sag" modelName="Sag" importerID="org.eclipse.emf.importer.ecore"
+    complianceLevel="6.0">
+  <foreignModel>sag.ecore</foreignModel>
+  <genPackages prefix="Sag" basePackage="org.supremica.external" disposableProviderFactory="true"
+      ecorePackage="sag.ecore#/">
+    <genClasses ecoreClass="sag.ecore#//Graph">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference sag.ecore#//Graph/zone"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sag.ecore#//Graph/multipleObjects"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference sag.ecore#//Graph/node"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="sag.ecore#//Zone">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sag.ecore#//Zone/front"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sag.ecore#//Zone/back"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sag.ecore#//Zone/isOneway"/>
+    </genClasses>
+    <genClasses ecoreClass="sag.ecore#//BoundedZone">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sag.ecore#//BoundedZone/capacity"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="sag.ecore#//Named">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sag.ecore#//Named/name"/>
+    </genClasses>
+    <genClasses ecoreClass="sag.ecore#//UnboundedZone">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sag.ecore#//UnboundedZone/isOutside"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="sag.ecore#//Node">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EAttribute sag.ecore#//Node/sensor"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference sag.ecore#//Node/graph"/>
+    </genClasses>
+    <genClasses ecoreClass="sag.ecore#//Project">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference sag.ecore#//Project/graph"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

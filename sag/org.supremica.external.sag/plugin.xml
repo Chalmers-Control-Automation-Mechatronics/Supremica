@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+ <copyright>
+ </copyright>
+
+ $Id: plugin.xml,v 1.1 2006-12-18 15:21:50 torda Exp $
+-->
+
+<plugin>
+
+  <extension point="org.eclipse.emf.ecore.generated_package">
+    <package 
+       uri = "http://supremica.org/external/sag" 
+       class = "org.supremica.external.sag.SagPackage"
+       genModel = "model/sag.genmodel" /> 
+  </extension>
+
+</plugin>
+
