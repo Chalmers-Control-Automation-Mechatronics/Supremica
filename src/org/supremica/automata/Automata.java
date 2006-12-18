@@ -911,6 +911,9 @@ public class Automata
         return getAutomatonAt(0);
     }
 
+    /**
+     * Returns index of automaton.
+     */
     public int getAutomatonIndex(Automaton theAutomaton)
     {
         for (int i = 0; i < theAutomata.size(); i++)

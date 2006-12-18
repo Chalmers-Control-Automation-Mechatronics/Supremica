@@ -102,10 +102,10 @@ public class IDE
         
         documentManager = new DocumentManager();
         mModuleFactory = ModuleSubjectFactory.getInstance();
-        final OperatorTable optable = CompilerOperatorTable.getInstance();
-        mModuleMarshaller = new JAXBModuleMarshaller(mModuleFactory, optable);
+        final OperatorTable opTable = CompilerOperatorTable.getInstance();
+        mModuleMarshaller = new JAXBModuleMarshaller(mModuleFactory, opTable);
         supremicaUnmarshaller = new SupremicaUnmarshaller(mModuleFactory);
-        validUnmarshaller = new ValidUnmarshaller(mModuleFactory, optable);
+        validUnmarshaller = new ValidUnmarshaller(mModuleFactory, opTable);
         hiscUnmarshaller = new HISCUnmarshaller(mModuleFactory);
         umdesUnmarshaller = new UMDESUnmarshaller(mModuleFactory);
         adsUnmarshaller = new ADSUnmarshaller(mModuleFactory);
@@ -155,7 +155,7 @@ public class IDE
     {
         return theActions;
     }
-    
+
     public Iterator moduleContainerIterator()
     {
         return moduleContainers.iterator();
