@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.99 2006-12-11 02:40:44 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.100 2006-12-19 15:58:14 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -3148,7 +3148,7 @@ public class ControlledSurface
     {
       public void dragGestureRecognized(final DragGestureEvent event)
       {
-        System.out.println(mToBeDragged);
+        //System.out.println(mToBeDragged);
         if (mToBeDragged == null) {
           return;
         }
@@ -3187,7 +3187,7 @@ public class ControlledSurface
           }
         }
       }
-      System.out.println(labels);
+      //System.out.println(labels);
       return labels;
     }
 
