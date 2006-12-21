@@ -16,6 +16,7 @@ import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
@@ -177,7 +178,9 @@ implements ModelObserver
 	private void removeMapping(NodeProxy node)
 	{
 		getMap().remove(node);
-		removeMapping(node.getName());
+    if (node instanceof SimpleNodeProxy) {
+      removeMapping(((SimpleNodeProxy)node).getLabelGeometry());
+    }
 	}
 	
 	private void removeMapping(GroupNodeProxy node)
@@ -185,7 +188,7 @@ implements ModelObserver
 		getMap().remove(node);
 	}
 	
-	private void removeMapping(String label)
+	private void removeMapping(LabelGeometryProxy label)
 	{
 		getMap().remove(label);
 	}
@@ -244,6 +247,10 @@ implements ModelObserver
 		{
 			removeMapping((GuardActionBlockProxy)subject);
 		}
+    if (subject instanceof LabelGeometryProxy)
+		{
+			removeMapping((LabelGeometryProxy)subject);
+		}
 	}
 	
 	public void modelChanged(ModelChangeEvent event)
@@ -272,7 +279,7 @@ implements ModelObserver
 		{
 			if (event.getKind() == ModelChangeEvent.NAME_CHANGED)
 			{
-				removeMapping((String)event.getValue());
+				removeMapping(((SimpleNodeProxy)event.getSource()).getLabelGeometry());
 			}
 			else
 			{

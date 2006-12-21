@@ -38,22 +38,24 @@ public class ProxyShapeProducer
     public ProxyShapeProducer(ModuleProxy m)
     {
         mModule = m;
-        mMap = Collections.synchronizedMap(new IdentityHashMap<Object, ProxyShape>());
+        mMap = Collections.synchronizedMap(new IdentityHashMap<Proxy, ProxyShape>());
     }
     
     public SimpleNodeProxyShape visitSimpleNodeProxy(SimpleNodeProxy n)
     {
-        LabelProxyShape label = (LabelProxyShape)mMap.get(n.getName());
+        LabelProxyShape label = (LabelProxyShape)mMap.get(n.getLabelGeometry());
         if (label == null)
         {
-            label = new LabelProxyShape(n, DEFAULT);
-            mMap.put(n.getName(), label);
+          System.out.println("node 1:" + n.getPointGeometry().getPoint());
+          label = new LabelProxyShape(n, DEFAULT);
+          mMap.put(n.getLabelGeometry(), label);
         }
         SimpleNodeProxyShape s = (SimpleNodeProxyShape)mMap.get(n);
         if (s == null)
         {
-            s = new SimpleNodeProxyShape(n, mModule);
-            mMap.put(n, s);
+          System.out.println("node 2:" + n.getPointGeometry().getPoint());
+          s = new SimpleNodeProxyShape(n, mModule);
+          mMap.put(n, s);
         }
         return s;
     }
@@ -210,13 +212,13 @@ public class ProxyShapeProducer
         return s;
     }
     
-    public ProxyShape getShape(Object o) throws VisitorException
+    public ProxyShape getShape(Proxy p) throws VisitorException
     {
-        if (o instanceof Proxy)
-        {
-            return (ProxyShape)((Proxy)o).acceptVisitor(this);
-        }
-        return mMap.get(o);
+      if (p != null) {
+        return (ProxyShape)p.acceptVisitor(this);
+      } else {
+        return null;
+      }
     }
     
     public ProxyShape visitProxy(Proxy p) throws VisitorException
@@ -243,13 +245,13 @@ public class ProxyShapeProducer
         return rect;
     }
     
-    protected Map<Object, ProxyShape> getMap()
+    protected Map<Proxy, ProxyShape> getMap()
     {
         return mMap;
     }
     
     private final ModuleProxy mModule;
-    private final Map<Object, ProxyShape> mMap;
+    private final Map<Proxy, ProxyShape> mMap;
     
     public static final Font DEFAULT = new Font("Dialog", Font.PLAIN, 12);
     public static final Font UNCONTROLLABLE = DEFAULT.deriveFont(Font.ITALIC);

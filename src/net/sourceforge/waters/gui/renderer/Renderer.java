@@ -29,7 +29,7 @@ public class Renderer
                     render.getRenderingInformation(proxy)));
                 if (proxy instanceof SimpleNodeProxy)
                 {
-                    queue.offer(new ShapeToRender(producer.getShape(proxy.getName()),
+                    queue.offer(new ShapeToRender(producer.getShape(((SimpleNodeProxy)proxy).getLabelGeometry()),
                         render.getRenderingInformation(((SimpleNodeProxy) proxy)
                         .getLabelGeometry())));
                 }

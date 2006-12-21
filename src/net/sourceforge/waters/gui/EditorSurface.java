@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.69 2006-12-05 21:52:19 flordal Exp $
+//# $Id: EditorSurface.java,v 1.70 2006-12-21 22:56:33 siw4 Exp $
 //###########################################################################
 
 
@@ -284,13 +284,15 @@ public class EditorSurface
                     {
                         return shape.getProxy();
                     }
-                    shape = getShapeProducer().getShape(node.getName());
-                    if (shape != null)
-                    {
-                        if ((shape != null) && (shape.isClicked(ex, ey)))
-                        {
-                            return shape.getProxy();
-                        }
+                    if (node instanceof SimpleNodeProxy) {
+                      shape = getShapeProducer().getShape(((SimpleNodeProxy)node).getLabelGeometry());
+                      if (shape != null)
+                      {
+                          if ((shape != null) && (shape.isClicked(ex, ey)))
+                          {
+                              return shape.getProxy();
+                          }
+                      }
                     }
                 }
             }

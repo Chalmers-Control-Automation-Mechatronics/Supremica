@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.100 2006-12-19 15:58:14 flordal Exp $
+//# $Id: ControlledSurface.java,v 1.101 2006-12-21 22:56:33 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -170,13 +170,15 @@ public class ControlledSurface
                     {
                         objects.add((ProxySubject)shape.getProxy());
                     }
-                    shape = getShapeProducer().getShape(node.getName());
-                    if (shape != null)
-                    {
-                        if ((shape != null) && (shape.isClicked(ex, ey)))
-                        {
-                            objects.add((ProxySubject)shape.getProxy());
-                        }
+                    if (node instanceof SimpleNodeProxy) {
+                      shape = getShapeProducer().getShape(((SimpleNodeProxy)node).getLabelGeometry());
+                      if (shape != null)
+                      {
+                          if ((shape != null) && (shape.isClicked(ex, ey)))
+                          {
+                              objects.add((ProxySubject)shape.getProxy());
+                          }
+                      }
                     }
                 }
             }
@@ -1113,11 +1115,13 @@ public class ControlledSurface
                 {
                     selection.add((ProxySubject)shape.getProxy());
                 }
-                shape = getShapeProducer().getShape(node.getName());
-                if ((shape != null) &&
-                    (bounds.contains(shape.getShape().getBounds())))
-                {
-                    selection.add((ProxySubject)shape.getProxy());
+                if (node instanceof SimpleNodeProxy) {
+                  shape = getShapeProducer().getShape(((SimpleNodeProxy)node).getLabelGeometry());
+                  if ((shape != null) &&
+                      (bounds.contains(shape.getShape().getBounds())))
+                  {
+                      selection.add((ProxySubject)shape.getProxy());
+                  }
                 }
             }
             catch (VisitorException vis)

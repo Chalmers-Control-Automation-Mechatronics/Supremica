@@ -60,7 +60,7 @@ public class EditorGraph
 	public EditorGraph(GraphSubject graph)
 	{
 		mGraph = graph;
-    mChanged = new HashSet<Subject>();
+		mChanged = new HashSet<Subject>();
 		mObservers = Collections.synchronizedCollection(new ArrayList());
 		mObserverMap = new IdentityHashMap<NodeSubject, EditorNode>(graph.getNodes().size());
 		mFakeMap = new IdentityHashMap<Subject, Subject>(graph.getNodes().size() + graph.getEdges().size()+1);
