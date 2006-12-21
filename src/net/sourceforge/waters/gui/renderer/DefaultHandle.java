@@ -44,7 +44,7 @@ public class DefaultHandle
     Rectangle2D rect = new Rectangle2D.Double(getShape().getMinX() - 1,
                                               getShape().getMinY() - 1, 
                                               getShape().getWidth() + 2, 
-                                              getShape().getWidth() + 2); 
+                                              getShape().getHeight() + 2); 
 		return rect.contains(x,y);
 	}
   

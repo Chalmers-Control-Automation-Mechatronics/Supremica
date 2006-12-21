@@ -25,7 +25,6 @@ public class LabelProxyShape
             getProxy().getOffset().getX());
         int y = (int)(node.getPointGeometry().getPoint().getY() +
             getProxy().getOffset().getY());
-        System.out.println(node.getPointGeometry().getPoint());
         mPoint = new Point(x + 2, y + font.getSize());
         mName = node.getName();
         TextLayout text = new TextLayout(mName, mFont,

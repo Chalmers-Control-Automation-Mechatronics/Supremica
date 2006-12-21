@@ -125,7 +125,6 @@ public class SimpleNodeProxyShape
         mHandles = new ArrayList<Handle>(1);
         mModule = module;
         Point2D p = getProxy().getPointGeometry().getPoint();
-        System.out.println("Node Point: " + p);
         Rectangle2D rect = new Rectangle2D.Double(p.getX() - RADIUS, p.getY() - RADIUS,
             WIDTH, WIDTH);
         mShape = new Arc2D.Double(rect, 0, 360, Arc2D.OPEN);

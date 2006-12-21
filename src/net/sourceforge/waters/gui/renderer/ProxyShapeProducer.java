@@ -46,14 +46,12 @@ public class ProxyShapeProducer
         LabelProxyShape label = (LabelProxyShape)mMap.get(n.getLabelGeometry());
         if (label == null)
         {
-          System.out.println("node 1:" + n.getPointGeometry().getPoint());
           label = new LabelProxyShape(n, DEFAULT);
           mMap.put(n.getLabelGeometry(), label);
         }
         SimpleNodeProxyShape s = (SimpleNodeProxyShape)mMap.get(n);
         if (s == null)
         {
-          System.out.println("node 2:" + n.getPointGeometry().getPoint());
           s = new SimpleNodeProxyShape(n, mModule);
           mMap.put(n, s);
         }

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.101 2006-12-21 22:56:33 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.102 2006-12-21 23:44:48 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -370,6 +370,7 @@ public class ControlledSurface
             } else {
               p1 = new Point(dragNowX, dragNowY);
             }
+            System.out.println(p1 + ", " + p2);
             shapes.add(new GeneralShape(edgeshape(p1, p2)
                                         , EditorColor.SELECTCOLOR
                                         , null));
@@ -466,14 +467,19 @@ public class ControlledSurface
           (NodeSubject)getNodeOrNodeGroupAtPosition(e.getX(), e.getY());
       Point2D p = e.getPoint();
       if (node != null) {
-        if ((draggingSource && node != edge.getSource())
+        if (node instanceof GroupNodeSubject) {
+          p = GeometryTools.findIntersection(
+               ((GroupNodeSubject)node).getGeometry().getRectangle(), p);
+          Command move = new MoveEdgeCommand(this, edge,
+                                             node, draggingSource,
+                                             (int)p.getX(), (int)p.getY());
+          root.getUndoInterface().executeCommand(move);
+        }
+        else if ((draggingSource && node != edge.getSource())
             || (draggingTarget && node != edge.getTarget())) {
           if (node instanceof SimpleNodeProxy) {
             p = ((SimpleNodeProxy)node).getPointGeometry().getPoint();
-          } else {
-            p = GeometryTools.findIntersection(
-                 ((GroupNodeSubject)node).getGeometry().getRectangle(), p);
-          }
+          } 
           Command move = new MoveEdgeCommand(this, edge,
                                              node, draggingSource,
                                              (int)p.getX(), (int)p.getY());
@@ -662,15 +668,12 @@ public class ControlledSurface
                 if (h != null)
                 {
                     mDontDraw.add(s);
-                    System.err.println("before switch " + h + " " + h.getType());
                     switch (h.getType())
                     {
                         case SOURCE:
-                            System.err.println(h + " " + h.getType());
                             draggingSource = true;
                             return;
                         case TARGET:
-                            System.err.println(h + " " + h.getType());
                             draggingTarget = true;
                             return;
                         default:
@@ -1227,29 +1230,7 @@ public class ControlledSurface
     {
         options = new EditorOptions(root);
     }
-
-        /*
-        public EditorLabelGroup getSelectedLabelGroup()
-        {
-                if (selectedEdge != null)
-                {
-                        for (int i = 0; i < events.size(); i++)
-                        {
-                                if (((EditorLabelGroup) events.get(i)).getParent() == selectedEdge)
-                                {
-                                        return ((EditorLabelGroup) events.get(i));
-                                }
-                        }
-                }
-
-                return selectedLabelGroup;
-        }
-
-        public EditorNode getSelectedNode()
-        {
-                return selectedNode;
-        }
-         */
+    
     private Point2D getMod()
     {
         assert(mDummy != null);
@@ -1896,6 +1877,7 @@ public class ControlledSurface
 
             dragSelect = false;
             hasDragged = false;
+            mResize = null;
         }
 
         public void mouseDragged(MouseEvent e)
@@ -2638,6 +2620,7 @@ public class ControlledSurface
 
             dragSelect = false;
             hasDragged = false;
+            mResize = null;
         }
 
         public void mouseDragged(MouseEvent e)
