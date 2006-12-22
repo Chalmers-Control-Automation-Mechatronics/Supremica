@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.102 2006-12-21 23:44:48 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.103 2006-12-22 01:20:30 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -909,13 +909,6 @@ public class ControlledSurface
                 s instanceof LabelBlockSubject)
             {
                 return isSelected((ProxySubject) s.getParent());
-            }
-            if (s instanceof IdentifierSubject)
-            {
-                return
-                    isSelected((ProxySubject) s.getParent().getParent())
-                    && !hasSelected
-                    ((EventListExpressionSubject) s.getParent().getParent());
             }
         }
         return selected;

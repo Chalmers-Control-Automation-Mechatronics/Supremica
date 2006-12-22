@@ -28,13 +28,18 @@ public class LabelBlockProxyShape
     
     public void draw(Graphics2D g, RenderingInformation status)
     {
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        if (status.isFocused())
-        {
-            g.setColor(status.getShadowColor());
-            g.setStroke(SHADOWSTROKE);
-            g.fill(getShape());
-        }
+      g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      if (status.isFocused())
+      {
+        g.setColor(status.getShadowColor());
+        g.setStroke(SHADOWSTROKE);
+        g.fill(getShape());
+      }
+      if (status.showHandles()) {
+        g.setColor(status.getColor());
+        g.setStroke(BASICSTROKE);
+        g.draw(getShape());
+      }
     }
     
     private RoundRectangle2D mBounds;

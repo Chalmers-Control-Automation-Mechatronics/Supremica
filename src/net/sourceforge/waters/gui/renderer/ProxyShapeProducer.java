@@ -78,7 +78,7 @@ public class ProxyShapeProducer
         if (s == null)
         {
             EdgeProxyShape edge = (EdgeProxyShape)mMap.get(e);
-            int height = 2;
+            int height = 1;
             int width = 0;
             int x;
             int y;

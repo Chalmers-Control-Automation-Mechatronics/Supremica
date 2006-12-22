@@ -27,7 +27,7 @@ public class LabelShape
         super(p);
         mAuxilary = "";
         mFont = font;
-        mPoint = new Point(x + 2, y + font.getSize());
+        mPoint = new Point(x + 2, y + (font.getSize()));
         mName = getProxy().toString();
         TextLayout text = new TextLayout(mName, mFont,
             new FontRenderContext(null, true, true));
