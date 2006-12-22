@@ -4,18 +4,15 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.Collections;
 import java.awt.Font;
-
 import java.awt.geom.RoundRectangle2D;
-
 import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-
 import net.sourceforge.waters.model.base.Proxy;
-
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
@@ -31,6 +28,8 @@ import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
+import java.awt.font.TextLayout;
+import java.awt.font.FontRenderContext;
 
 public class ProxyShapeProducer
     extends AbstractModuleProxyVisitor
@@ -197,6 +196,75 @@ public class ProxyShapeProducer
             mMap.put(GA, GAShape);
         }
         return shape;
+    }
+    
+    public LabeledLabelBlockProxyShape visitGraphProxy(GraphProxy g)
+    {
+      if (g.getBlockedEvents() == null) {
+        return null;
+      }
+      LabelBlockProxy l = g.getBlockedEvents();
+      LabeledLabelBlockProxyShape s = (LabeledLabelBlockProxyShape)mMap.get(l);
+      if (s == null)
+      {
+          int height = 1;
+          int width = 0;
+          int x = 0;
+          int y = 0;
+          if (l.getGeometry() != null)
+          {
+              x = (int)l.getGeometry().getOffset().getX();
+              y = (int)l.getGeometry().getOffset().getY();
+          }
+          else
+          {
+              x = LabelBlockProxyShape.DEFAULTOFFSETX;
+              y = LabelBlockProxyShape.DEFAULTOFFSETY;
+          }
+          Font font = DEFAULT;
+          String blocked = "BLOCKED";
+          TextLayout text = new TextLayout(blocked, font,
+                                           new FontRenderContext(null, true, true));
+          width = (int)text.getBounds().getWidth();
+          for (Proxy p : l.getEventList())
+          {
+              // Use different font for different event kinds.
+              font = DEFAULT;
+              if (p instanceof SimpleIdentifierSubject)
+              {
+                  SimpleIdentifierSubject identifier = (SimpleIdentifierSubject) p;
+                  for (EventDeclProxy event: mModule.getEventDeclList())
+                  {
+                      if (event.getName().equals(identifier.getName()))
+                      {
+                          if (event.getKind() == EventKind.UNCONTROLLABLE)
+                          {
+                              font = UNCONTROLLABLE;
+                          }
+                          break;
+                      }
+                  }
+              }
+              
+              LabelShape ls = new LabelShape(p, x, y + height, font);
+              mMap.put(p, ls);
+              height += ls.getShape().getHeight();
+              
+              if (width < ls.getShape().getWidth())
+              {
+                  width = (int)ls.getShape().getWidth();
+              }
+          }
+          height += 2;
+          
+          RoundRectangle2D mBounds = new RoundRectangle2D.Double(
+              x, y, width, height,
+              LabelBlockProxyShape.DEFAULTARCW,
+              LabelBlockProxyShape.DEFAULTARCH);
+          s = new LabeledLabelBlockProxyShape(l, mBounds, blocked, DEFAULT);
+          mMap.put(l, s);
+      }
+      return s;
     }
     
     public GroupNodeProxyShape visitGroupNodeProxy(GroupNodeProxy g)

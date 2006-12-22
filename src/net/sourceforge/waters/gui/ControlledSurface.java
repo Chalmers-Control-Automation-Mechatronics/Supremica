@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.103 2006-12-22 01:20:30 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.104 2006-12-22 03:45:26 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -159,6 +159,21 @@ public class ControlledSurface
   public List<ProxySubject> getObjectsAtPosition(int ex, int ey)
     {
         List<ProxySubject> objects = new ArrayList<ProxySubject>();
+        try
+        {
+          ProxyShape shape = getShapeProducer().getShape(getGraph());
+          if (shape != null)
+          {
+            if (shape.isClicked(ex, ey))
+            {
+              objects.add((ProxySubject)shape.getProxy());
+            }
+          }
+        }
+        catch (VisitorException vis)
+        {
+            vis.printStackTrace();
+        }
         for (NodeProxy node : getGraph().getNodes())
         {
             try
@@ -418,13 +433,15 @@ public class ControlledSurface
     	if (s instanceof LabelBlockSubject)
         {
             LabelBlockSubject l = (LabelBlockSubject) s;
-            EdgeSubject edge = (EdgeSubject)l.getParent();
             xoff = e.getX() -
                 (int)l.getGeometry().getOffset().getX();
             yoff = e.getY() -
                 (int)l.getGeometry().getOffset().getY();
-            xoff -= (int)edge.getGeometry().getPoints().get(0).getX();
-            yoff -= (int)edge.getGeometry().getPoints().get(0).getY();
+            if (l.getParent() instanceof EdgeSubject) {
+              EdgeSubject edge = (EdgeSubject)l.getParent();
+              xoff -= (int)edge.getGeometry().getPoints().get(0).getX();
+              yoff -= (int)edge.getGeometry().getPoints().get(0).getY();
+            }
         }
     		else if (s instanceof GuardActionBlockSubject)
         {

@@ -73,6 +73,7 @@ public class EditorGraph
 			mBlockedEvents = graph.getBlockedEvents().clone();
 			mFakeMap.put(mBlockedEvents, graph.getBlockedEvents());
 			mOriginalMap.put(graph.getBlockedEvents(), mBlockedEvents);
+      mBlockedEvents.setParent(this);
 		}	else {
 			mBlockedEvents = null;
 		}
@@ -141,8 +142,12 @@ public class EditorGraph
 
 	public Subject getCopy(LabelBlockSubject o)
 	{
-		EdgeSubject s = (EdgeSubject)mOriginalMap.get(o.getParent());
-		return s.getLabelBlock();
+    if (o.getParent() instanceof EdgeSubject) {
+      EdgeSubject s = (EdgeSubject)mOriginalMap.get(o.getParent());
+      return s.getLabelBlock();
+    } else {
+      return mOriginalMap.get(o);
+    }
 	}
 
 	public Subject getCopy(GuardActionBlockSubject o)
@@ -180,8 +185,12 @@ public class EditorGraph
 
 	public Subject getOriginal(LabelBlockSubject o)
 	{
-		EdgeSubject s = (EdgeSubject)mFakeMap.get(o.getParent());
-		return s.getLabelBlock();
+    if (o.getParent() instanceof EdgeSubject) {
+      EdgeSubject s = (EdgeSubject)mFakeMap.get(o.getParent());
+      return s.getLabelBlock();
+    } else {
+      return mFakeMap.get(o);
+    }
 	}
 
 	public Subject getOriginal(GuardActionBlockSubject o)
@@ -256,7 +265,7 @@ public class EditorGraph
 	private Point2D getPosition(NodeSubject node)
 	{
 		if (node instanceof SimpleNodeSubject)
-		{
+		{  
 			return getPosition((SimpleNodeSubject)node);
 		}
 		return getPosition((GroupNodeSubject)node);
@@ -379,8 +388,11 @@ public class EditorGraph
   {
     IdentityHashMap<ProxySubject, ProxySubject> changed = 
       new IdentityHashMap<ProxySubject, ProxySubject>(mChanged.size());
+    System.out.println(mChanged.size());
     for (Subject s : mChanged) {
+      System.out.println(s);
       ProxySubject orig = (ProxySubject)getOriginal(s);
+      System.out.println(orig);
       if (orig != null) {
         changed.put(orig, (ProxySubject)s);
       }

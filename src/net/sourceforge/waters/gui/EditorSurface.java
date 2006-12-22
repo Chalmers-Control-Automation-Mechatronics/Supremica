@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.70 2006-12-21 22:56:33 siw4 Exp $
+//# $Id: EditorSurface.java,v 1.71 2006-12-22 03:45:26 siw4 Exp $
 //###########################################################################
 
 
@@ -334,6 +334,21 @@ public class EditorSurface
             {
                 vis.printStackTrace();
             }
+        }
+        try
+        {
+          ProxyShape shape = getShapeProducer().getShape(mGraph);
+          if (shape != null)
+          {
+            if (shape.isClicked(ex, ey))
+            {
+              return mGraph.getBlockedEvents();
+            }
+          }
+        }
+        catch (VisitorException vis)
+        {
+            vis.printStackTrace();
         }
         return null;
     }

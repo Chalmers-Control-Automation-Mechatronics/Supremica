@@ -23,6 +23,15 @@ public class Renderer
         PriorityQueue<ShapeToRender> queue = new PriorityQueue<ShapeToRender>();
         try
         {
+            if (graph.getBlockedEvents() != null) {
+              queue.offer(new ShapeToRender(producer.getShape(graph),
+                                            render.getRenderingInformation(graph.getBlockedEvents())));
+              for (Proxy p : graph.getBlockedEvents().getEventList())
+              {
+                  queue.offer(new ShapeToRender(producer.getShape(p),
+                      render.getRenderingInformation(p)));
+              }
+            }
             for (NodeProxy proxy : graph.getNodes())
             {
                 queue.offer(new ShapeToRender(producer.getShape(proxy),

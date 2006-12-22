@@ -58,6 +58,11 @@ implements ModelObserver
 		super(module);
 		boolean runEmbedder = false;
 		Random rand = new Random();
+    if (graph.getBlockedEvents() != null) {
+      if (graph.getBlockedEvents().getGeometry() == null) {
+        graph.getBlockedEvents().setGeometry(new LabelGeometrySubject(new Point(5, 5)));
+      }
+    }
 		for (NodeSubject node : graph.getNodesModifiable())
 		{
 			if (node instanceof SimpleNodeSubject)

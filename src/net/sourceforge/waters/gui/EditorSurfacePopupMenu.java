@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurfacePopupMenu
 //###########################################################################
-//# $Id: EditorSurfacePopupMenu.java,v 1.3 2006-11-03 15:01:56 torda Exp $
+//# $Id: EditorSurfacePopupMenu.java,v 1.4 2006-12-22 03:45:26 siw4 Exp $
 //###########################################################################
 
 
@@ -14,9 +14,9 @@ import java.awt.event.*;
 import java.util.List;
 import javax.swing.*;
 
-
 import org.supremica.util.VPopupMenu;
 
+import net.sourceforge.waters.subject.module.LabelBlockSubject;
 
 /**
  * Popup menu for editing general stuff regarding the selected objects.
@@ -43,6 +43,9 @@ class EditorSurfacePopupMenu
     mCreateEventItem = new JMenuItem("Create new event ...");
     mCreateEventItem.addActionListener(this);
     add(mCreateEventItem);
+    mCreateBlockedEventList = new JMenuItem("Create Blocked Event List");
+    mCreateBlockedEventList.addActionListener(this);
+    add(mCreateEventItem);
   }
 
 
@@ -58,6 +61,9 @@ class EditorSurfacePopupMenu
     } else if (source == mCreateEventItem) {
       mMaster.createEvent();
       hide();
+    } else if (source == mCreateBlockedEventList) {
+      mMaster.getControlledSurface().getGraph().setBlockedEvents(new LabelBlockSubject());
+      hide();
     }
     mMaster.repaint();
   }
@@ -69,5 +75,6 @@ class EditorSurfacePopupMenu
   private final EditorWindowInterface mMaster;
   private final JMenuItem mDeleteItem;
   private final JMenuItem mCreateEventItem;
+  private final JMenuItem mCreateBlockedEventList;
 
 }
