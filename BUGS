@@ -11,11 +11,8 @@ distThere is currently no real bug-tracking system for Supremica/Waters... we sh
 
  * Change menu keyboard shortcuts to ALT
  * Grid does not show properly
- * Can't drag label blocks with transition tool
  * Right click breaks label dragging
  * Group node error feedback should be given while dragging
- * Group node can be resized by clicking border without hitting handle
- * Exception when dragging edge handle to different location on group node
 
 Previously, all bugs were reported and stored in the bug database, http://www.supremica.org/bugtracking, but this is no longer the case. 
 

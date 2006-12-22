@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.104 2006-12-22 03:45:26 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.105 2006-12-22 04:20:45 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -2494,17 +2494,15 @@ public class ControlledSurface
                 {
                     for (final ProxySubject object : selectedObjects)
                     {
-                        if (object instanceof EdgeSubject)
+                      if (!(object instanceof NodeSubject)) {
+                        if (mDummy == null)
                         {
-                            EdgeSubject edge = (EdgeSubject) object;
-                            if (mDummy == null)
-                            {
-                                mDummy = new EditorGraph(getGraph());
-                                mDummyShape = new SubjectShapeProducer(mDummy, getModule());
-                                mDummy.addModelObserver(ControlledSurface.this);
-                            }
-                            setEdgePosition(edge, dx, dy);
+                            mDummy = new EditorGraph(getGraph());
+                            mDummyShape = new SubjectShapeProducer(mDummy, getModule());
+                            mDummy.addModelObserver(ControlledSurface.this);
                         }
+                        setObjectPosition(object, dx, dy);
+                      }
                     }
                 }
             }

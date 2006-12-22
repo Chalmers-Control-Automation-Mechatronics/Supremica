@@ -388,11 +388,8 @@ public class EditorGraph
   {
     IdentityHashMap<ProxySubject, ProxySubject> changed = 
       new IdentityHashMap<ProxySubject, ProxySubject>(mChanged.size());
-    System.out.println(mChanged.size());
     for (Subject s : mChanged) {
-      System.out.println(s);
       ProxySubject orig = (ProxySubject)getOriginal(s);
-      System.out.println(orig);
       if (orig != null) {
         changed.put(orig, (ProxySubject)s);
       }
