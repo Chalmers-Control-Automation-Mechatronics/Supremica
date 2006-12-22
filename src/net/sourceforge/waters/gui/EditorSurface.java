@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.71 2006-12-22 03:45:26 siw4 Exp $
+//# $Id: EditorSurface.java,v 1.72 2006-12-22 04:28:55 siw4 Exp $
 //###########################################################################
 
 
@@ -168,7 +168,7 @@ public class EditorSurface
             int x = -(int)getLocation().getX();
             int y = -(int)getLocation().getY();
             
-            for (int i = 0; i < getHeight(); i += gridSize)
+            for (int i = 0; i < getWidth(); i += gridSize)
             {
                 g.drawLine(i, y, i, getHeight());
             }
