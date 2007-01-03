@@ -1,10 +1,10 @@
-distThere is currently no real bug-tracking system for Supremica/Waters... we should start a new one! 
+There is currently no real bug-tracking system for Supremica/Waters... we should start a new one! 
 
  * In the IDE, if a file is opened, then changed outside the IDE and then opened again in IDE, the change can not be seen! The DocumentManager caches too much?
-   DocumentManager can be upgraded to check file modification times. But how should the IDE react if the contents of a module being edited are changed by an external program? -- Robi.
- * The IDE prints using the wrong bounding box, large automata become cropped. It works as it should in Waters!
- * Problem in the IDE when using non-UTF-8 characters in state names (ï¿½ï¿½ï¿½ fï¿½r example). Saved files can not be opened.
-   Special characters should not be permitted to enter -- Robi.
+   * DocumentManager can be upgraded to check file modification times. But how should the IDE react if the contents of a module being edited are changed by an external program? -- Robi.
+     * Ideally it should inform the user about "external modification" - like buffers in emacs. /Hugo
+ * Problem in the IDE when using special characters in state names (åäö för example). Saved files can not be opened.
+   * Special characters should not be permitted to enter -- Robi.
  * ProjectBuildFromWaters must use DocumentManager from IDE, otherwise module instantiation does not work -- Robi.
  * Supremica Synthesis fails on tictactoe example (no initial state reported) -- Robi.
  * New modules should not contain any events. Default markings :accepting and :forbidden should only be created when explicitly requested -- Robi.
