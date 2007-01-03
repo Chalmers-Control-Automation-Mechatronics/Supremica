@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ModuleProxyPrinter
 //###########################################################################
-//# $Id: ModuleProxyPrinter.java,v 1.8 2006-11-30 01:58:05 robi Exp $
+//# $Id: ModuleProxyPrinter.java,v 1.9 2007-01-03 00:49:08 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;
@@ -317,7 +317,7 @@ public class ModuleProxyPrinter
     throws VisitorException
   {
     final LabelBlockProxy blocked = proxy.getBlockedEvents();
-    if (!blocked.getEventList().isEmpty()) {
+    if (blocked != null && !blocked.getEventList().isEmpty()) {
       print("BLOCKED ");
       visitLabelBlockProxy(blocked);
       println();

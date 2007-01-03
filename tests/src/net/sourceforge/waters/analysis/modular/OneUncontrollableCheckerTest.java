@@ -4,19 +4,15 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularLanguageInclusionCheckerTest
 //###########################################################################
-//# $Id: OneUncontrollableCheckerTest.java,v 1.1 2006-12-01 02:16:43 siw4 Exp $
+//# $Id: OneUncontrollableCheckerTest.java,v 1.2 2007-01-03 00:49:08 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
-import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-//import net.sourceforge.waters.analysis.monolithic.
-//       MonolithicLanguageInclusionChecker;
-import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
+import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.
        AbstractLargeControllabilityCheckerTest;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;

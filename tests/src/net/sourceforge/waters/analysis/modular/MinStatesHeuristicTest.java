@@ -4,22 +4,16 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   NativeControllabilityCheckerTest
 //###########################################################################
-//# $Id: MinStatesHeuristicTest.java,v 1.3 2006-12-01 02:16:43 siw4 Exp $
+//# $Id: MinStatesHeuristicTest.java,v 1.4 2007-01-03 00:49:08 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;
 
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.LinkedList;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
-//import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AbstractControllabilityCheckerTest;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 

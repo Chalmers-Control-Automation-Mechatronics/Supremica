@@ -4,14 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularControllabilityChecker
 //###########################################################################
-//# $Id: ModularControllabilityChecker.java,v 1.7 2006-12-03 20:55:01 siw4 Exp $
+//# $Id: ModularControllabilityChecker.java,v 1.8 2007-01-03 00:49:08 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.analysis.modular;
 
 import net.sourceforge.waters.model.analysis.VerificationResult;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -20,26 +19,16 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import net.sourceforge.waters.analysis.monolithic.
-       MonolithicControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
-import net.sourceforge.waters.model.expr.OperatorTable;
-import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -178,7 +167,6 @@ public class ModularControllabilityChecker
       mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
       /*specs.removeAll(composition);
       plants.addAll(composition);*/
-      StringBuffer thing = new StringBuffer();
       for (AutomatonProxy automaton : composition) {
         if (specs.contains(automaton)) {
           //System.out.println(mChecker.getAnalysisResult().getTotalNumberOfStates() + " " + automaton.getName() + " size " + automaton.getStates().size());

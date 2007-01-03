@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularLanguageInclusionChecker
 //###########################################################################
-//# $Id: OneUncontrollableChecker.java,v 1.2 2006-12-11 02:40:44 siw4 Exp $
+//# $Id: OneUncontrollableChecker.java,v 1.3 2007-01-03 00:49:08 robi Exp $
 //###########################################################################
 
 
@@ -13,20 +13,16 @@ package net.sourceforge.waters.analysis.modular;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import java.util.Comparator;
-import java.util.Set;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 import java.util.Collections;
 import net.sourceforge.waters.xsd.base.ComponentKind;
-import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import java.util.Collection;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
-import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -38,7 +34,6 @@ public class OneUncontrollableChecker
   implements ControllabilityChecker
 {
   private final ControllabilityChecker mChecker;
-  private ModularHeuristic mHeuristic;
   private KindTranslator mTranslator;
   private int mStates;
   

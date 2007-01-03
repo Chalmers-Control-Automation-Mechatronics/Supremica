@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleExporter
 //###########################################################################
-//# $Id: JAXBModuleExporter.java,v 1.17 2006-11-30 01:58:05 robi Exp $
+//# $Id: JAXBModuleExporter.java,v 1.18 2007-01-03 00:49:08 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -833,7 +833,7 @@ public class JAXBModuleExporter
         element.setDeterministic(false);
       }
       final LabelBlockProxy blockedEventsProxy = proxy.getBlockedEvents();
-      if (!blockedEventsProxy.getEventList().isEmpty()) {
+      if (blockedEventsProxy != null) {
         final LabelBlock blockedEventsElement =
           visitLabelBlockProxy(blockedEventsProxy);
         element.setBlockedEvents(blockedEventsElement);

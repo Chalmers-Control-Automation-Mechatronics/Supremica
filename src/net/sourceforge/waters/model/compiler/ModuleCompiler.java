@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.60 2006-12-07 15:11:35 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.61 2007-01-03 00:49:08 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -566,11 +566,13 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       final ComponentKind kind = proxy.getKind();
       final GraphProxy graph = proxy.getGraph();
       final boolean deterministic = graph.isDeterministic();
-      final EventListExpressionProxy blockedExpr = graph.getBlockedEvents();
-      final CompiledEventListValue blocked =
-        visitEventListExpressionProxy(blockedExpr);
       mLocalAlphabet = new TreeSet<EventProxy>();
-      createAutomatonEvents(blocked);
+      final EventListExpressionProxy blockedExpr = graph.getBlockedEvents();
+      if (blockedExpr != null) {
+        final CompiledEventListValue blocked =
+          visitEventListExpressionProxy(blockedExpr);
+        createAutomatonEvents(blocked);
+      }
       final Collection<NodeProxy> nodes = graph.getNodes();
       mStates = new TreeSet<StateProxy>();
       mMaxInitialStates = deterministic ? 1 : -1;
@@ -1145,14 +1147,14 @@ private void updateTransitionsInAutomtata()
         // ... and the corresponding guard
         final SimpleExpressionProxy guardClause =
           mEFAEventGuardClauseMap.get(relabeledEvent);
-        if (!mEFAEventControllabilityEventsMap.containsKey(relabeledEvent) && 
-        		action == null && !searcher.search(guardClause)) {
+        if (action == null &&
+            !mEFAEventControllabilityEventsMap.containsKey(relabeledEvent) && 
+        		!searcher.search(guardClause)) {
           // The action does not update this variable and it does
           // not occur in the guard expression => we can remove
           // the corresponding event from the local alphabet.
           variableAlphabet.remove(relabeledEvent);
-           }
-        else {
+        } else {
           // Translate the action to a transition in the variable automaton and
           // add this transition in the variable states where the guard is
           // true.
@@ -1166,17 +1168,16 @@ private void updateTransitionsInAutomtata()
             try {
               if (evaluatePartialGuard(guardClause, searcher)) {
             	  StateProxy target;
-            	  boolean outOfRange= outOfRange(action,range);
-            	  /*
-              	 * The plant action can be out of range but then 
-              	 * a specification guard 
-              	 * could make sure that this does not happen. 
-              	 */
             	  if (action == null) {
                   target = source;
                 } else {
-                	
-                  if(controllabilityEvents!= null){
+                  final boolean outOfRange= outOfRange(action,range);
+                  /*
+                   * The plant action can be out of range but then 
+                   * a specification guard 
+                   * could make sure that this does not happen. 
+                   */
+                  if (controllabilityEvents!= null){
                 	  if(outOfRange){
                 		  target=source;
                 	  }
@@ -1609,7 +1610,6 @@ private void updateTransitionsInAutomtata()
         proxy = mDESFactory.createEventProxy(name, kind, observable);
         event.setEventProxy(proxy);
         mGlobalAlphabet.add(proxy);
-        mOriginalAlphabet.add(proxy);
       }
       mLocalAlphabet.add(proxy);
       mOriginalAlphabet.add(proxy);

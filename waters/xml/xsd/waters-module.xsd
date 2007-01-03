@@ -251,7 +251,7 @@
   <xs:complexContent>
     <xs:extension base="B:ElementType">
       <xs:sequence>
-        <xs:group ref="M:EventListEntry" maxOccurs="unbounded">
+        <xs:group ref="M:EventListEntry" minOccurs="0" maxOccurs="unbounded">
           <xs:annotation><xs:appinfo>
             <jaxb:property name="List"/>
           </xs:appinfo></xs:annotation>

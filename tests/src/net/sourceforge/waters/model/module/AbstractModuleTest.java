@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   AbstractModuleTest
 //###########################################################################
-//# $Id: AbstractModuleTest.java,v 1.8 2006-11-03 15:01:57 torda Exp $
+//# $Id: AbstractModuleTest.java,v 1.9 2007-01-03 00:49:08 robi Exp $
 //###########################################################################
 
 
@@ -237,11 +237,10 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     final LabelBlockProxy labelblock = factory.createLabelBlockProxy();
     final EdgeProxy edge =
       factory.createEdgeProxy(node, node, labelblock, null, null, null, null);
-    final LabelBlockProxy blocked = factory.createLabelBlockProxy();
     final List<SimpleNodeProxy> nodes = Collections.singletonList(node);
     final List<EdgeProxy> edges = Collections.singletonList(edge);
     final GraphProxy graph =
-      factory.createGraphProxy(true, blocked, nodes, edges);
+      factory.createGraphProxy(true, null, nodes, edges);
     final IdentifierProxy compident =
       factory.createSimpleIdentifierProxy(compname);
     final SimpleComponentProxy comp =
@@ -275,10 +274,9 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     final SimpleNodeProxy node =
       factory.createSimpleNodeProxy("s0", props, true, 
                                     pointgeo, arrowgeo, null);
-    final LabelBlockProxy blocked = factory.createLabelBlockProxy();
     final List<SimpleNodeProxy> nodes = Collections.singletonList(node);
     final GraphProxy graph =
-      factory.createGraphProxy(true, blocked, nodes, null);
+      factory.createGraphProxy(true, null, nodes, null);
     final IdentifierProxy compident =
       factory.createSimpleIdentifierProxy(compname);
     final SimpleComponentProxy comp =
@@ -332,13 +330,12 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     final PointGeometryProxy endgeo = factory.createPointGeometryProxy(end);
     final EdgeProxy edge = factory.createEdgeProxy
       (group, group, labelblock, null, null, startgeo, endgeo);
-    final LabelBlockProxy blocked = factory.createLabelBlockProxy();
     final List<NodeProxy> nodes = new LinkedList<NodeProxy>();
     nodes.add(node);
     nodes.add(group);
     final List<EdgeProxy> edges = Collections.singletonList(edge);
     final GraphProxy graph =
-      factory.createGraphProxy(true, blocked, nodes, edges);
+      factory.createGraphProxy(true, null, nodes, edges);
     final IdentifierProxy compident =
       factory.createSimpleIdentifierProxy(compname);
     final SimpleComponentProxy comp =

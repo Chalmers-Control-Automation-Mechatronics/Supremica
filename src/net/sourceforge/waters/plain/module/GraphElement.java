@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   GraphElement
 //###########################################################################
-//# $Id: GraphElement.java,v 1.10 2006-09-20 16:24:13 robi Exp $
+//# $Id: GraphElement.java,v 1.11 2007-01-03 00:49:08 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -42,7 +42,7 @@ public final class GraphElement
   /**
    * Creates a new graph.
    * @param deterministic The determinism status of the new graph.
-   * @param blockedEvents The list of blocked events of the new graph, or <CODE>null</CODE> if empty.
+   * @param blockedEvents The list of blocked events of the new graph, or <CODE>null</CODE>.
    * @param nodes The set of nodes of the new graph, or <CODE>null</CODE> if empty.
    * @param edges The collection of edges of the new graph, or <CODE>null</CODE> if empty.
    */
@@ -52,11 +52,7 @@ public final class GraphElement
                       final Collection<? extends EdgeProxy> edges)
   {
     mIsDeterministic = deterministic;
-    if (blockedEvents == null) {
-      mBlockedEvents = new LabelBlockElement();
-    } else {
-      mBlockedEvents = blockedEvents;
-    }
+    mBlockedEvents = blockedEvents;
     if (nodes == null) {
       mNodes = Collections.emptySet();
     } else {
@@ -79,7 +75,7 @@ public final class GraphElement
    * Creates a new graph using default values.
    * This constructor creates a graph with
    * the determinism status set to <CODE>true</CODE>,
-   * an empty list of blocked events,
+   * the list of blocked events set to <CODE>null</CODE>,
    * an empty set of nodes, and
    * an empty collection of edges.
    */
@@ -108,7 +104,8 @@ public final class GraphElement
       final GraphElement downcast = (GraphElement) partner;
       return
         (mIsDeterministic == downcast.mIsDeterministic) &&
-        mBlockedEvents.equalsByContents(downcast.mBlockedEvents) &&
+        (mBlockedEvents == null ? downcast.mBlockedEvents == null :
+         mBlockedEvents.equalsByContents(downcast.mBlockedEvents)) &&
         EqualCollection.isEqualSetByContents
           (mNodes, downcast.mNodes) &&
         EqualCollection.isEqualCollectionByContents
@@ -124,7 +121,8 @@ public final class GraphElement
       final GraphElement downcast = (GraphElement) partner;
       return
         (mIsDeterministic == downcast.mIsDeterministic) &&
-        mBlockedEvents.equalsWithGeometry(downcast.mBlockedEvents) &&
+        (mBlockedEvents == null ? downcast.mBlockedEvents == null :
+         mBlockedEvents.equalsWithGeometry(downcast.mBlockedEvents)) &&
         EqualCollection.isEqualSetWithGeometry
           (mNodes, downcast.mNodes) &&
         EqualCollection.isEqualCollectionWithGeometry
@@ -142,7 +140,9 @@ public final class GraphElement
       result++;
     }
     result *= 5;
-    result += mBlockedEvents.hashCodeByContents();
+    if (mBlockedEvents != null) {
+      result += mBlockedEvents.hashCodeByContents();
+    }
     result *= 5;
     result += EqualCollection.getSetHashCodeByContents(mNodes);
     result *= 5;
@@ -158,7 +158,9 @@ public final class GraphElement
       result++;
     }
     result *= 5;
-    result += mBlockedEvents.hashCodeWithGeometry();
+    if (mBlockedEvents != null) {
+      result += mBlockedEvents.hashCodeWithGeometry();
+    }
     result *= 5;
     result += EqualCollection.getSetHashCodeWithGeometry(mNodes);
     result *= 5;

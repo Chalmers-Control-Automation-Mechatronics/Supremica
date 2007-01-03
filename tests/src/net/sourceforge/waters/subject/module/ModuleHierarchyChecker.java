@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ModuleHierarchyChecker
 //###########################################################################
-//# $Id: ModuleHierarchyChecker.java,v 1.4 2006-11-03 15:01:57 torda Exp $
+//# $Id: ModuleHierarchyChecker.java,v 1.5 2007-01-03 00:49:08 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -201,7 +201,9 @@ class ModuleHierarchyChecker
     final GraphSubject subject = (GraphSubject) proxy;
     visitProxy(proxy);
     final LabelBlockProxy blocked = proxy.getBlockedEvents();
-    visitProxyChild(blocked, proxy);
+    if (blocked != null) {
+      visitProxyChild(blocked, proxy);
+    }
     mNodeSet = subject.getNodesModifiable();
     visitProxyCollectionChild(mNodeSet, proxy);
     final Collection<EdgeSubject> edges = subject.getEdgesModifiable();

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.27 2006-12-11 02:40:44 siw4 Exp $
+//# $Id: EventTableModel.java,v 1.28 2007-01-03 00:49:08 robi Exp $
 //###########################################################################
 
 
@@ -283,7 +283,9 @@ public class EventTableModel
   private void collectEvents(final ProxyAccessorMap<IdentifierSubject> dest,
                              final EventListExpressionProxy source)
   {
-    collectEvents(dest, source.getEventList());
+    if (source != null) {
+      collectEvents(dest, source.getEventList());
+    }
   }
 
   private void collectEvents(final ProxyAccessorMap<IdentifierSubject> dest,

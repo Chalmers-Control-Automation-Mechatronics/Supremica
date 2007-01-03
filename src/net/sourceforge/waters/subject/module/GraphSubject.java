@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   GraphSubject
 //###########################################################################
-//# $Id: GraphSubject.java,v 1.11 2006-09-20 16:24:13 robi Exp $
+//# $Id: GraphSubject.java,v 1.12 2007-01-03 00:49:08 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -46,7 +46,7 @@ public final class GraphSubject
   /**
    * Creates a new graph.
    * @param deterministic The determinism status of the new graph.
-   * @param blockedEvents The list of blocked events of the new graph, or <CODE>null</CODE> if empty.
+   * @param blockedEvents The list of blocked events of the new graph, or <CODE>null</CODE>.
    * @param nodes The set of nodes of the new graph, or <CODE>null</CODE> if empty.
    * @param edges The collection of edges of the new graph, or <CODE>null</CODE> if empty.
    */
@@ -56,12 +56,10 @@ public final class GraphSubject
                       final Collection<? extends EdgeProxy> edges)
   {
     mIsDeterministic = deterministic;
-    if (blockedEvents == null) {
-      mBlockedEvents = new LabelBlockSubject();
-    } else {
-      mBlockedEvents = (LabelBlockSubject) blockedEvents;
+    mBlockedEvents = (LabelBlockSubject) blockedEvents;
+    if (mBlockedEvents != null) {
+      mBlockedEvents.setParent(this);
     }
-    mBlockedEvents.setParent(this);
     if (nodes == null) {
       mNodes = new NodeSetSubject();
     } else {
@@ -81,7 +79,7 @@ public final class GraphSubject
    * Creates a new graph using default values.
    * This constructor creates a graph with
    * the determinism status set to <CODE>true</CODE>,
-   * an empty list of blocked events,
+   * the list of blocked events set to <CODE>null</CODE>,
    * an empty set of nodes, and
    * an empty collection of edges.
    */
@@ -99,8 +97,10 @@ public final class GraphSubject
   public GraphSubject clone()
   {
     final GraphSubject cloned = (GraphSubject) super.clone();
-    cloned.mBlockedEvents = mBlockedEvents.clone();
-    cloned.mBlockedEvents.setParent(cloned);
+    if (mBlockedEvents != null) {
+      cloned.mBlockedEvents = mBlockedEvents.clone();
+      cloned.mBlockedEvents.setParent(cloned);
+    }
     cloned.mNodes = mNodes.clone();
     cloned.mNodes.setParent(cloned);
     cloned.mEdges =
@@ -122,7 +122,8 @@ public final class GraphSubject
       final GraphSubject downcast = (GraphSubject) partner;
       return
         (mIsDeterministic == downcast.mIsDeterministic) &&
-        mBlockedEvents.equalsByContents(downcast.mBlockedEvents) &&
+        (mBlockedEvents == null ? downcast.mBlockedEvents == null :
+         mBlockedEvents.equalsByContents(downcast.mBlockedEvents)) &&
         EqualCollection.isEqualSetByContents
           (mNodes, downcast.mNodes) &&
         EqualCollection.isEqualCollectionByContents
@@ -138,7 +139,8 @@ public final class GraphSubject
       final GraphSubject downcast = (GraphSubject) partner;
       return
         (mIsDeterministic == downcast.mIsDeterministic) &&
-        mBlockedEvents.equalsWithGeometry(downcast.mBlockedEvents) &&
+        (mBlockedEvents == null ? downcast.mBlockedEvents == null :
+         mBlockedEvents.equalsWithGeometry(downcast.mBlockedEvents)) &&
         EqualCollection.isEqualSetWithGeometry
           (mNodes, downcast.mNodes) &&
         EqualCollection.isEqualCollectionWithGeometry
@@ -156,7 +158,9 @@ public final class GraphSubject
       result++;
     }
     result *= 5;
-    result += mBlockedEvents.hashCodeByContents();
+    if (mBlockedEvents != null) {
+      result += mBlockedEvents.hashCodeByContents();
+    }
     result *= 5;
     result += EqualCollection.getSetHashCodeByContents(mNodes);
     result *= 5;
@@ -172,7 +176,9 @@ public final class GraphSubject
       result++;
     }
     result *= 5;
-    result += mBlockedEvents.hashCodeWithGeometry();
+    if (mBlockedEvents != null) {
+      result += mBlockedEvents.hashCodeWithGeometry();
+    }
     result *= 5;
     result += EqualCollection.getSetHashCodeWithGeometry(mNodes);
     result *= 5;
@@ -240,8 +246,12 @@ public final class GraphSubject
     if (mBlockedEvents == blockedEvents) {
       return;
     }
-    blockedEvents.setParent(this);
-    mBlockedEvents.setParent(null);
+    if (blockedEvents != null) {
+      blockedEvents.setParent(this);
+    }
+    if (mBlockedEvents != null) {
+      mBlockedEvents.setParent(null);
+    }
     mBlockedEvents = blockedEvents;
     final ModelChangeEvent event =
       ModelChangeEvent.createStateChanged(this);

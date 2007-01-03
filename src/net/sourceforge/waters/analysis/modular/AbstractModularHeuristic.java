@@ -1,8 +1,5 @@
 package net.sourceforge.waters.analysis.modular;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Collection;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import java.util.Comparator;
 import java.util.Set;

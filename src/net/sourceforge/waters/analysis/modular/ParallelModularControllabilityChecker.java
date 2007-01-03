@@ -10,22 +10,9 @@ import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
-import java.io.File;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
-import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.expr.OperatorTable;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
-import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.plain.des.SafetyTraceElement;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
-import net.sourceforge.waters.plain.des.ProductDESElement;
 import net.sourceforge.waters.model.des.EventProxy;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -212,7 +199,6 @@ public class ParallelModularControllabilityChecker
           }
         } else {
           Collection<AutomatonProxy> changed = new ArrayList<AutomatonProxy>();
-          StringBuffer thing = new StringBuffer();
           for (AutomatonProxy automaton : run.mModel.getAutomata()) {
             if (specs.contains(automaton)) {
               System.out.println(mChecker.getAnalysisResult().getTotalNumberOfStates() + " " + automaton.getName() + " size " + automaton.getStates().size());

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularLanguageInclusionChecker
 //###########################################################################
-//# $Id: ModularLanguageInclusionChecker.java,v 1.5 2006-12-03 20:55:01 siw4 Exp $
+//# $Id: ModularLanguageInclusionChecker.java,v 1.6 2007-01-03 00:49:08 robi Exp $
 //###########################################################################
 
 
@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import java.util.Collection;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
