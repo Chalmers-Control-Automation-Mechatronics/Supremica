@@ -20,6 +20,8 @@ public class EditorSavePDFAction
         putValue(Action.NAME, "Save As PDF...");
         putValue(Action.SHORT_DESCRIPTION, "Save As PDF");
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Print16.gif")));
+        
+        setEnabled(false);
     }
     
     public void actionPerformed(ActionEvent e)
@@ -39,22 +41,5 @@ public class EditorSavePDFAction
             ide.getIDE().info("Must have an editor panel open.");
         }
     }
-
-    /**
-     * Is enabled if it is possible to get a hold of an active EditorWindowInterface.
-     */
-    /*
-    public boolean isEnabled()
-    {
-        try
-        {
-            return (null != ide.getActiveModuleContainer().getEditorPanel().getActiveEditorWindowInterface());
-        }
-        catch (NullPointerException ex)
-        {
-            return false;
-        }
-    }
-    */
 }
 

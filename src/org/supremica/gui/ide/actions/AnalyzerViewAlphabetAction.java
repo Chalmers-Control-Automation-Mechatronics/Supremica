@@ -11,7 +11,7 @@ import org.supremica.gui.ide.IDE;
 import org.supremica.log.*;
 
 /**
- * A new action
+ * View alphabet action.
  */
 public class AnalyzerViewAlphabetAction
     extends IDEAction
@@ -43,7 +43,7 @@ public class AnalyzerViewAlphabetAction
     }
 
     /**
-     * The code that is run when the action is invoked.
+     * Opens an alphabet viewer window.
      */
     public void doAction()
     {
@@ -54,7 +54,7 @@ public class AnalyzerViewAlphabetAction
         {
             return;
         }
-
+        
         // Why not simpy instantiate an AlphabetViewer with the given
         // automata object?? Use AutomataViewer instead!
         try

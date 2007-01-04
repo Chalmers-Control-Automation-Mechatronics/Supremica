@@ -54,7 +54,7 @@ public class IDE
         Config.LOG_TO_GUI.set(true);
     }
     private static Logger logger = LoggerFactory.createLogger(IDE.class);
-    private final static InterfaceManager interfaceManager = InterfaceManager.getInstance();
+    private static InterfaceManager interfaceManager;
     
     // Document importing
     private final ModuleProxyFactory mModuleFactory;
@@ -155,7 +155,7 @@ public class IDE
     {
         return theActions;
     }
-
+    
     public Iterator moduleContainerIterator()
     {
         return moduleContainers.iterator();
@@ -458,19 +458,13 @@ public class IDE
     public static void main(String args[])
     throws Exception
     {
-//		try
-//		{
-        List<File> filesToOpen = ProcessCommandLineArguments.process(args);
-        
+        List<File> filesToOpen = ProcessCommandLineArguments.process(args); 
+
+        interfaceManager = InterfaceManager.getInstance();
+        interfaceManager.initLookAndFeel();
+
         IDE ide = new IDE();
         ide.setVisible(true);
         ide.openFiles(filesToOpen);
-//		}
-//		catch (Exception ex)
-//		{
-//			System.err.println("Exception in IDE.main");
-//			ex.printStackTrace();
-        
-//		}
     }
 }

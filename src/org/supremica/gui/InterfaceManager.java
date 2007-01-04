@@ -50,6 +50,7 @@
 package org.supremica.gui;
 
 import javax.swing.*;
+import javax.swing.UIManager.LookAndFeelInfo;
 import org.supremica.properties.*;
 
 public class InterfaceManager
@@ -59,37 +60,52 @@ public class InterfaceManager
     
     private InterfaceManager()
     {
+    }
+    
+    public void initLookAndFeel()
+    {
         try
         {
-            Config.getInstance();
-            
             String lookAndFeel = Config.GENERAL_LOOKANDFEEL.get();
             
-            //System.err.println(lookAndFeel + " ");
-            
             if ((lookAndFeel == null) || "System".equalsIgnoreCase(lookAndFeel))
-            {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            }
             else if ("Metal".equalsIgnoreCase(lookAndFeel))
-            {
                 UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-            }
             else if ("Motif".equalsIgnoreCase(lookAndFeel))
-            {
                 UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
-            }
+            else if ("Windows".equalsIgnoreCase(lookAndFeel))
+                UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+            else if ("Mac".equalsIgnoreCase(lookAndFeel))
+                UIManager.setLookAndFeel("javax.swing.plaf.mac.MacLookAndFeel");
+            else if ("GTK+".equalsIgnoreCase(lookAndFeel))
+                UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
             else
-            {
                 UIManager.setLookAndFeel(lookAndFeel);
+            
+            /*
+            // Debugging
+            System.err.println("Chosen look and feel: " + lookAndFeel);
+            System.err.println("Supported look and feels:");
+            for (LookAndFeelInfo info: UIManager.getInstalledLookAndFeels())
+            {
+                System.out.println("  " + info.getName() + " " + info.getClassName());
             }
+            */
         }
         catch (Exception ex)
         {
-//			logger.fatal("Error while setting LookAndFeel");
-//			logger.debug(ex.getStackTrace());
-            System.err.println(ex);
-            System.exit(0);
+            System.err.println("Error while setting look and feel: " + ex);
+            System.err.println("Reverting to System look and feel.");
+            try
+            {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            }
+            catch (Exception nope)
+            {
+                System.err.println(nope);
+                System.exit(0);
+            }
         }
     }
     

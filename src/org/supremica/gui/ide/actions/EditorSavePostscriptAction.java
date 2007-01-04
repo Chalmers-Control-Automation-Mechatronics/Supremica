@@ -31,6 +31,8 @@ public class EditorSavePostscriptAction
         //putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
         //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Print16.gif")));
+                
+        setEnabled(false);
     }
   
     public void actionPerformed(ActionEvent e)
@@ -59,13 +61,22 @@ public class EditorSavePostscriptAction
      */
     public boolean isEnabled()
     {
-        String psMimeType = "application/postscript";
-
-        StreamPrintServiceFactory[] factories =
-            PrinterJob.lookupStreamPrintServices(psMimeType);
-        boolean value = (factories.length > 0);
-        if (!value)
-            putValue(Action.SHORT_DESCRIPTION, "No Postscript print service was found on the system");
-        return value;
+        // No other objections?
+        if (super.isEnabled())
+        {
+            // Look for print service
+            String psMimeType = "application/postscript";
+            StreamPrintServiceFactory[] factories =
+                PrinterJob.lookupStreamPrintServices(psMimeType);
+            // Found one?
+            boolean serviceFound = (factories.length > 0);
+            if (!serviceFound)
+            {
+                putValue(Action.SHORT_DESCRIPTION, "No Postscript print service was found on the system");
+                setEnabled(false);
+            }
+            return serviceFound;
+        }
+        return false;
     }    
 }

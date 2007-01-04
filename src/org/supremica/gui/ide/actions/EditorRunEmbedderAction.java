@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   EditorRunEmbedderAction
 //###########################################################################
-//# $Id: EditorRunEmbedderAction.java,v 1.6 2006-11-03 15:01:57 torda Exp $
+//# $Id: EditorRunEmbedderAction.java,v 1.7 2007-01-04 13:50:10 flordal Exp $
 //###########################################################################
 
 
@@ -51,6 +51,8 @@ public class EditorRunEmbedderAction
         putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_L));
         putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.CTRL_MASK));
         //putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Icon.gif")));
+
+        setEnabled(false);
     }
 
     public void actionPerformed(ActionEvent e)

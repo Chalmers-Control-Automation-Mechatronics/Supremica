@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   MainPanel
 //###########################################################################
-//# $Id: MainPanel.java,v 1.26 2006-11-03 15:01:57 torda Exp $
+//# $Id: MainPanel.java,v 1.27 2007-01-04 13:50:09 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -28,6 +28,7 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
+import org.supremica.gui.ide.actions.IDEAction;
 
 import org.supremica.log.*;
 
@@ -69,8 +70,7 @@ abstract class MainPanel
         constraints.anchor = GridBagConstraints.NORTH;
         constraints.weightx = 1.0;
         constraints.fill = GridBagConstraints.BOTH;
-    }
-    
+    }   
     
     //######################################################################
     //# Interface net.sourceforge.waters.gui.ModuleWindowInterface

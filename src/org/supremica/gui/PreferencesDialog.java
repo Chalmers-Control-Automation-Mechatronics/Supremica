@@ -79,6 +79,9 @@ public class PreferencesDialog
     private GeneralPanel theGeneralPanel = null;
     private Frame owner;
     
+    /**
+     * @deprecated Use PropertiesDialog instead.
+     */
     public PreferencesDialog(Frame owner)
     {
         super(owner, "Preferences", true);

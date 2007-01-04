@@ -56,32 +56,32 @@ package org.supremica.properties;
  */
 public enum PropertyType
 {
-	GENERAL,
-	GENERAL_LOG,
-	GENERAL_FILE,
-	GENERAL_COMM,
-	GENERAL_COMM_XMLRPC,
-	GENERAL_SOFTPLC,
-	GUI,
-	GUI_EDITOR,
-	GUI_ANALYZER,
-	GUI_SIMULATOR,
-	GUI_DOT,
-	ALGORITHMS,
-	ALGORITHMS_SYNC,
-	ALGORITHMS_VERIFICATION,
-	ALGORITHMS_SYNTHESIS,
-	ALGORITHMS_MINIMIZATION,
-	ALGORITHMS_BDD,
-	ALGORITHMS_HMI,
-	MISC;
-
-	/**
-	 * Override of toString-method, transforms identifier into lowercase and uses
-	 * "." instead of "_", so, for example, "GUI_DOT" becomes "gui.dot".
-	 */
-	public String toString()
-	{
-		return super.toString().toLowerCase().replace('_','.');
-	}
+    GENERAL,
+    GENERAL_LOG,
+    GENERAL_FILE,
+    GENERAL_COMM,
+    GENERAL_COMM_XMLRPC,
+    GENERAL_SOFTPLC,
+    GUI,
+    GUI_EDITOR,
+    GUI_ANALYZER,
+    GUI_SIMULATOR,
+    GUI_DOT,
+    ALGORITHMS,
+    ALGORITHMS_SYNCHRONIZATION,
+    ALGORITHMS_VERIFICATION,
+    ALGORITHMS_SYNTHESIS,
+    ALGORITHMS_MINIMIZATION,
+    ALGORITHMS_BDD,
+    ALGORITHMS_HMI,
+    MISC;
+    
+    /**
+     * Override of toString-method, transforms identifier into lowercase and uses
+     * "." instead of "_", so, for example, "GUI_DOT" becomes "gui.dot".
+     */
+    public String toString()
+    {
+        return super.toString().toLowerCase().replace('_','.');
+    }
 }

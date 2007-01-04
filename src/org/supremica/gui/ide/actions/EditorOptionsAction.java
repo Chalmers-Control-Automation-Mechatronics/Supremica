@@ -4,6 +4,7 @@ import javax.swing.Action;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import javax.swing.ImageIcon;
+import net.sourceforge.waters.gui.EditorOptions;
 import org.supremica.gui.ide.IDE;
 
 public class EditorOptionsAction

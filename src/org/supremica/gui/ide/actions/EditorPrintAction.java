@@ -24,8 +24,10 @@ public class EditorPrintAction
         putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_P));
         putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Print16.gif")));
+
+        setEnabled(false);
     }
-    
+
     public void actionPerformed(ActionEvent e)
     {
         doAction();

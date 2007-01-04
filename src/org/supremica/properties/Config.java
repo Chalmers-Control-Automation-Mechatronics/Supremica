@@ -59,6 +59,8 @@ import org.supremica.util.BDD.Options;
 
 /**
  * Configurable options. All of these are automatically added to a GUI for editing.
+ * The current configuration is saved in the file SupremicaProperties.cfg which per default
+ * is loaded on startup.
  */
 public final class Config
 {
@@ -111,13 +113,14 @@ public final class Config
      * com.sun.java.swing.plaf.windows.WindowsLookAndFeel : Windows only
      * javax.swing.plaf.mac.MacLookAndFeel : Mac only
      */
-    private static final String[] LOOKANDFEEL_LEGALVALUES= {"System", "Metal", "Motif",
-    "com.sun.java.swing.plaf.windows.WindowsLookAndFeel", "javax.swing.plaf.mac.MacLookAndFeel"};
-    public static final StringProperty GENERAL_LOOKANDFEEL  = new StringProperty(PropertyType.GENERAL, "generalLookAndFeel", "System", "Look and feel (needs restart)", LOOKANDFEEL_LEGALVALUES);
+    private static final String[] LOOKANDFEEL_LEGALVALUES= {"System", "Metal", "Motif", 
+    "Windows", "Mac", "GTK+"};
+    public static final StringProperty GENERAL_LOOKANDFEEL  = new StringProperty(PropertyType.GENERAL, "generalLookAndFeel", "System", "Look and feel (requires restart)", LOOKANDFEEL_LEGALVALUES);
     public static final StringProperty GENERAL_STATE_SEPARATOR  = new StringProperty(PropertyType.GENERAL, "generalStateSeparator", ".", "State separator character");
     public static final StringProperty GENERAL_STATELABEL_SEPARATOR  = new StringProperty(PropertyType.GENERAL, "generalStateLabelSeparator", ",", "State label separator character");
     public static final BooleanProperty GENERAL_USE_SECURITY = new BooleanProperty(PropertyType.GENERAL, "generalUseSecurity", false, "Use file security");
-    public static final BooleanProperty GENERAL_STUDENT_VERSION = new BooleanProperty(PropertyType.GENERAL, "generalStudentVersion", false, "Student version (needs restart)");
+    public static final BooleanProperty GENERAL_STUDENT_VERSION = new BooleanProperty(PropertyType.GENERAL, "generalStudentVersion", false, "Student version (requires restart)");
+    public static final BooleanProperty INCLUDE_EXPERIMENTAL_ALGORITHMS = new BooleanProperty(PropertyType.GENERAL, "includeExperimentalAlgorithms", false, "Include experimental algorithms");
 
     // GENERAL_LOG
     public static final BooleanProperty LOG_TO_CONSOLE = new BooleanProperty(PropertyType.GENERAL_LOG, "logToConsole", false, "Log to Console");
@@ -157,16 +160,13 @@ public final class Config
     public static final BooleanProperty SIMULATION_IS_EXTERNAL = new BooleanProperty(PropertyType.GUI_SIMULATOR, "simulationIsExternal", false, "External simulation process");
     public static final IntegerProperty SIMULATION_CYCLE_TIME = new IntegerProperty(PropertyType.GUI_SIMULATOR, "simulationCycleTime", 100, "Simulator Cycle time (ms)", false, 0);
 
-    // ALGORITHMS
-    public static final BooleanProperty INCLUDE_EXPERIMENTAL_ALGORITHMS = new BooleanProperty(PropertyType.ALGORITHMS, "includeExperimentalAlgorithms", false, "Include experimental algorithms");
-
-    // ALGORITHMS_SYNC
-    public static final BooleanProperty SYNC_FORBID_UNCON_STATES = new BooleanProperty(PropertyType.ALGORITHMS_SYNC, "syncForbidUncontrollableStates", true, "Forbid uncontrollable states when synchronizing");
-    public static final BooleanProperty SYNC_EXPAND_FORBIDDEN_STATES = new BooleanProperty(PropertyType.ALGORITHMS_SYNC, "syncExpandUncontrollableStates", true, "Expand forbidden states when synchronizing");
-    public static final IntegerProperty SYNC_INITIAL_HASHTABLE_SIZE = new IntegerProperty(PropertyType.ALGORITHMS_SYNC, "syncInitialHashtableSize", (1 << 14) - 1, "Initial hashtable size", false, 1);
-    public static final BooleanProperty SYNC_EXPAND_HASHTABLE = new BooleanProperty(PropertyType.ALGORITHMS_SYNC, "syncExpandHashtable", true, "Expand hashtable");
-    public static final IntegerProperty SYNC_NBR_OF_EXECUTERS = new IntegerProperty(PropertyType.ALGORITHMS_SYNC, "synchNbrOfExecuters", 1, "Number of synchronization threads", false, 1);
-    public static final StringProperty SYNC_AUTOMATON_NAME_SEPARATOR = new StringProperty(PropertyType.ALGORITHMS_SYNC, "synchAutomatonNameSeparator", "||", "Automata name separator");
+    // ALGORITHMS_SYNCHRONIZATION
+    public static final BooleanProperty SYNC_FORBID_UNCON_STATES = new BooleanProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "syncForbidUncontrollableStates", true, "Forbid uncontrollable states when synchronizing");
+    public static final BooleanProperty SYNC_EXPAND_FORBIDDEN_STATES = new BooleanProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "syncExpandUncontrollableStates", true, "Expand forbidden states when synchronizing");
+    public static final IntegerProperty SYNC_INITIAL_HASHTABLE_SIZE = new IntegerProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "syncInitialHashtableSize", (1 << 14) - 1, "Initial hashtable size", false, 1);
+    public static final BooleanProperty SYNC_EXPAND_HASHTABLE = new BooleanProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "syncExpandHashtable", true, "Expand hashtable");
+    public static final IntegerProperty SYNC_NBR_OF_EXECUTERS = new IntegerProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "synchNbrOfExecuters", 1, "Number of synchronization threads", false, 1);
+    public static final StringProperty SYNC_AUTOMATON_NAME_SEPARATOR = new StringProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "synchAutomatonNameSeparator", "||", "Automata name separator");
 
     // ALGORITHMS_VERIFICATION
     public static final StringProperty VERIFY_VERIFICATION_TYPE = new StringProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyVerificationType", VerificationType.CONTROLLABILITY, "Default verificaton type", VerificationType.values());

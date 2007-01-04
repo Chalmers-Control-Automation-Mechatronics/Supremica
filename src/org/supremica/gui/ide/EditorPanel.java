@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorPanel
 //###########################################################################
-//# $Id: EditorPanel.java,v 1.46 2006-10-16 15:32:20 flordal Exp $
+//# $Id: EditorPanel.java,v 1.47 2007-01-04 13:50:09 flordal Exp $
 //###########################################################################
 
 
@@ -41,12 +41,13 @@ public class EditorPanel
         tabPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
         tabPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
         
-/*
+        /*
                 aliasesPanel = new EditorAliasesPanel(moduleContainer, "Aliases");
                 aliasesPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
                 aliasesPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
                 tabPanel.add(aliasesPanel);
- */
+         */
+        
         componentsPanel =
             new EditorComponentsPanel(moduleContainer, this, "Components");
         componentsPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
@@ -111,6 +112,27 @@ public class EditorPanel
         }
         return null;
         //	    return getEditorWindowInterface();
+    }
+    
+    public void setRightComponent(JComponent newComponent)
+    {
+        super.setRightComponent(newComponent);
+        
+        // Update enablement of actions dependent on the right component (component editor panel)
+        if (newComponent instanceof ComponentEditorPanel)
+        {
+            getActions().editorSavePostscriptAction.setEnabled(true);
+            getActions().editorSavePDFAction.setEnabled(true);
+            getActions().editorPrintAction.setEnabled(true);
+            getActions().editorRunEmbedderAction.setEnabled(true);
+        }
+        else
+        {
+            getActions().editorSavePostscriptAction.setEnabled(false);
+            getActions().editorSavePDFAction.setEnabled(false);
+            getActions().editorPrintAction.setEnabled(false);
+            getActions().editorRunEmbedderAction.setEnabled(false);
+        }
     }
     
     public EditorPanelInterface getEditorPanelInterface()
