@@ -58,6 +58,10 @@ import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.util.BDD.Options;    // Arash
 
+/**
+ * @deprecated Use PropertiesDialog instead. But don't delete this file until the 
+ * BDD dialog has been ported properly (see Config.java).
+ */
 public class PreferencesDialog
     extends JDialog
 {
@@ -79,9 +83,6 @@ public class PreferencesDialog
     private GeneralPanel theGeneralPanel = null;
     private Frame owner;
     
-    /**
-     * @deprecated Use PropertiesDialog instead.
-     */
     public PreferencesDialog(Frame owner)
     {
         super(owner, "Preferences", true);

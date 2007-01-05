@@ -198,7 +198,7 @@ public class PropertiesDialog
             }
             catch (IOException exx)
             {
-                System.err.println("Failed to save changed to config-file: " + exx.getMessage());
+                System.err.println("Failed to save changes to config-file: " + exx.getMessage());
             }
             
             doCancel();    // ok, not really cancel. what we do is to close the dialog
@@ -437,7 +437,7 @@ class PropertiesControllerPanel
 
         public void actionPerformed(ActionEvent e)
         {
-            theDialog.doApply();
+            dialog.doApply();
         }
     }
 }

@@ -114,7 +114,7 @@ public final class Config
      * javax.swing.plaf.mac.MacLookAndFeel : Mac only
      */
     private static final String[] LOOKANDFEEL_LEGALVALUES= {"System", "Metal", "Motif", 
-    "Windows", "Mac", "GTK+"};
+    "Windows", "Mac", "GTK"};
     public static final StringProperty GENERAL_LOOKANDFEEL  = new StringProperty(PropertyType.GENERAL, "generalLookAndFeel", "System", "Look and feel (requires restart)", LOOKANDFEEL_LEGALVALUES);
     public static final StringProperty GENERAL_STATE_SEPARATOR  = new StringProperty(PropertyType.GENERAL, "generalStateSeparator", ".", "State separator character");
     public static final StringProperty GENERAL_STATELABEL_SEPARATOR  = new StringProperty(PropertyType.GENERAL, "generalStateLabelSeparator", ",", "State label separator character");
@@ -200,6 +200,7 @@ public final class Config
 
     // ALGORITHMS_BDD
     // Most of the IntegerProperty:s here should be StringProperty:s with appropriate legal values...
+    // Right now they are integers with an interpretation (see PreferencesDialog.java)
     public static final IntegerProperty BDD_ALGORITHM = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddAlgorithm", Options.algo_family, "Algorithm");
     public static final IntegerProperty BDD_SHOW_GROW = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddShowGrowth", Options.show_grow, "Show growth");
     public static final BooleanProperty BDD_SIZE_WATCH = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddSizeWatch", Options.size_watch, "Size watch");

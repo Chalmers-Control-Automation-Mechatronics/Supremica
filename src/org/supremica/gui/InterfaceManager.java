@@ -78,7 +78,7 @@ public class InterfaceManager
                 UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
             else if ("Mac".equalsIgnoreCase(lookAndFeel))
                 UIManager.setLookAndFeel("javax.swing.plaf.mac.MacLookAndFeel");
-            else if ("GTK+".equalsIgnoreCase(lookAndFeel))
+            else if ("GTK".equalsIgnoreCase(lookAndFeel))
                 UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
             else
                 UIManager.setLookAndFeel(lookAndFeel);
