@@ -20,6 +20,8 @@ import net.sourceforge.waters.model.marshaller.WatersMarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.model.expr.ExpressionParser
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import javax.swing.*
 
@@ -31,7 +33,9 @@ class SagToWaters {
     	Project sagProject = loadSagProjectFromFile('C:/runtime-New_configuration/test/BallSystem.sag');
 		println sagProject.name
 		ModuleProxy watersModule = generateWatersModule(sagProject);
-		saveWatersModuleToFile(watersModule, new File("C:/runtime-New_configuration/test/" + watersModule.getName() + WmodFileFilter.WMOD));
+		File watersFile = new File("C:/runtime-New_configuration/test/" + watersModule.getName() +'.'+ WmodFileFilter.WMOD);
+		saveWatersModuleToFile(watersModule, watersFile);
+		watersFile.eachLine{println it}
 	}
 	
 	static {
@@ -48,7 +52,37 @@ class SagToWaters {
 	}
 
 	static ModuleProxy generateWatersModule(Project sagProject) {
-		ModuleSubject watesModule = new ModuleSubject(sagProject.name, null);
+		ModuleSubject watersModule = new ModuleSubject(sagProject.name, null)
+		
+		//Create one component for every sensor
+		def sagSensorNodeToWatersComponentMap = sagProject.graph.collect{it.node}.flatten(). //collect all nodes
+			                                    findAll{it.sensor!=null}.                    //that are sensor nodes
+			                                    inject([:]){sensorToComponent, sensorNode -> //and create a waters component for each
+			GraphSubject watersGraph = new GraphSubject()
+			["false","true"].each{watersGraph.nodesModifiable.add(new SimpleNodeSubject(it))}
+			watersGraph.nodesModifiable.find{it.name=="false"}.initial = true
+			sensorToComponent[sensorNode] = new SimpleComponentSubject(new ExpressionParser(ModuleSubjectFactory.getInstance(), CompilerOperatorTable.getInstance()).parseIdentifier(sensorNode.sensor),
+					                                                   ComponentKind.PLANT, watersGraph)
+			watersModule.componentListModifiable.add(sensorToComponent[sensorNode])
+			sensorToComponent
+		}
+		//Create one component for every bounded zone
+		int i = 0
+		def boundedZoneToWatersComponentMap = sagProject.graph.collect{it.zone}.flatten(). //collect all zones
+			                                  findAll{it instanceof BoundedZone}.        //that are bounded
+			                                  inject([:]){boundedZoneToComponent, zone -> //and create a waters component for each
+			GraphSubject watersGraph = new GraphSubject()
+			(0..zone.capacity).each{watersGraph.nodesModifiable.add(new SimpleNodeSubject(it.toString()))}
+			watersGraph.nodesModifiable.find{it.name=="0"}.initial = true
+			boundedZoneToComponent[zone] = new SimpleComponentSubject(new ExpressionParser(ModuleSubjectFactory.getInstance(), CompilerOperatorTable.getInstance()).parseIdentifier("zone"+i.toString()),
+					                                                   ComponentKind.PLANT, watersGraph)
+			++i
+			watersModule.componentListModifiable.add(boundedZoneToComponent[zone])
+			boundedZoneToComponent
+		}
+		//Create one event for every sensor entry
+		
+		watersModule
 	}
 	
 	static void saveWatersModuleToFile(ModuleProxy watersModule, File fileToSaveIn) {
