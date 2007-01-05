@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: NodeItemProvider.java,v 1.1 2006-12-18 15:23:00 torda Exp $
+ * $Id: NodeItemProvider.java,v 1.2 2007-01-05 13:29:13 torda Exp $
  */
 package org.supremica.external.sag.provider;
 
@@ -62,6 +62,8 @@ public class NodeItemProvider
 			super.getPropertyDescriptors(object);
 
 			addSensorPropertyDescriptor(object);
+			addIncomingPropertyDescriptor(object);
+			addOutgoingPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -84,6 +86,50 @@ public class NodeItemProvider
 				 false,
 				 true,
 				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Incoming feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addIncomingPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Node_incoming_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Node_incoming_feature", "_UI_Node_type"),
+				 SagPackage.Literals.NODE__INCOMING,
+				 true,
+				 false,
+				 true,
+				 null,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Outgoing feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addOutgoingPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Node_outgoing_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Node_outgoing_feature", "_UI_Node_type"),
+				 SagPackage.Literals.NODE__OUTGOING,
+				 true,
+				 false,
+				 true,
+				 null,
 				 null,
 				 null));
 	}

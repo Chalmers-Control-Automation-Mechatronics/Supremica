@@ -30,6 +30,8 @@
     <genClasses image="false" ecoreClass="sag.ecore#//Node">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EAttribute sag.ecore#//Node/sensor"/>
       <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference sag.ecore#//Node/graph"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sag.ecore#//Node/incoming"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sag.ecore#//Node/outgoing"/>
     </genClasses>
     <genClasses ecoreClass="sag.ecore#//Project">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference sag.ecore#//Project/graph"/>

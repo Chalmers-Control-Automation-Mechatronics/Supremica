@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagAdapterFactory.java,v 1.1 2006-12-18 15:23:00 torda Exp $
+ * $Id: SagAdapterFactory.java,v 1.2 2007-01-05 13:29:13 torda Exp $
  */
 package org.supremica.external.sag.util;
 

@@ -11,8 +11,9 @@
         containment="true" eOpposite="#//Node/graph"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Zone" abstract="true">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="front" eType="#//Node"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="back" eType="#//Node"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="front" eType="#//Node"
+        eOpposite="#//Node/incoming"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="back" eType="#//Node" eOpposite="#//Node/outgoing"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="isOneway" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="BoundedZone" eSuperTypes="#//Zone">
@@ -28,6 +29,10 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="sensor" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="graph" eType="#//Graph"
         eOpposite="#//Graph/node"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="incoming" lowerBound="-1"
+        eType="#//Zone" transient="true" eOpposite="#//Zone/front"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outgoing" lowerBound="-1"
+        eType="#//Zone" transient="true" eOpposite="#//Zone/back"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Project" eSuperTypes="#//Named">
     <eStructuralFeatures xsi:type="ecore:EReference" name="graph" upperBound="-1"

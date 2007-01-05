@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagPackage.java,v 1.1 2006-12-18 15:23:00 torda Exp $
+ * $Id: SagPackage.java,v 1.2 2007-01-05 13:29:13 torda Exp $
  */
 package org.supremica.external.sag;
 
@@ -327,13 +327,31 @@ public interface SagPackage extends EPackage {
 	int NODE__GRAPH = 1;
 
 	/**
+	 * The feature id for the '<em><b>Incoming</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE__INCOMING = 2;
+
+	/**
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE__OUTGOING = 3;
+
+	/**
 	 * The number of structural features of the '<em>Node</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FEATURE_COUNT = 2;
+	int NODE_FEATURE_COUNT = 4;
 
 	/**
 	 * The meta object id for the '{@link org.supremica.external.sag.impl.ProjectImpl <em>Project</em>}' class.
@@ -555,6 +573,28 @@ public interface SagPackage extends EPackage {
 	EReference getNode_Graph();
 
 	/**
+	 * Returns the meta object for the reference '{@link org.supremica.external.sag.Node#getIncoming <em>Incoming</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Incoming</em>'.
+	 * @see org.supremica.external.sag.Node#getIncoming()
+	 * @see #getNode()
+	 * @generated
+	 */
+	EReference getNode_Incoming();
+
+	/**
+	 * Returns the meta object for the reference '{@link org.supremica.external.sag.Node#getOutgoing <em>Outgoing</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference '<em>Outgoing</em>'.
+	 * @see org.supremica.external.sag.Node#getOutgoing()
+	 * @see #getNode()
+	 * @generated
+	 */
+	EReference getNode_Outgoing();
+
+	/**
 	 * Returns the meta object for class '{@link org.supremica.external.sag.Project <em>Project</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -744,6 +784,22 @@ public interface SagPackage extends EPackage {
 		 * @generated
 		 */
 		EReference NODE__GRAPH = eINSTANCE.getNode_Graph();
+
+		/**
+		 * The meta object literal for the '<em><b>Incoming</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference NODE__INCOMING = eINSTANCE.getNode_Incoming();
+
+		/**
+		 * The meta object literal for the '<em><b>Outgoing</b></em>' reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference NODE__OUTGOING = eINSTANCE.getNode_Outgoing();
 
 		/**
 		 * The meta object literal for the '{@link org.supremica.external.sag.impl.ProjectImpl <em>Project</em>}' class.

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="org/supremica/external/robotCoordination/**" kind="src" path="src"/>
+	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="lib" path="/Supremica/lib/unjared"/>
 	<classpathentry exported="true" kind="lib" path="C:/Program Files/eclipse/plugins/org.codehaus.groovy.eclipse_1.0.0.20061211/lib/commons-io-1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="C:/Program Files/eclipse/plugins/org.codehaus.groovy.eclipse_1.0.0.20061211/lib/commons-lang-2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="C:/Program Files/eclipse/plugins/org.codehaus.groovy.eclipse_1.0.0.20061211/lib/groovy-all-1.0-RC-01.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Supremica"/>
+	<classpathentry kind="lib" path="/Supremica/build"/>
+	<classpathentry kind="lib" path="/Supremica/lib/unjared"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

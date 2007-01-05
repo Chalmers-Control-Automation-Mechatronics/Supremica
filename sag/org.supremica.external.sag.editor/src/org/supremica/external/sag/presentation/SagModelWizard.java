@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagModelWizard.java,v 1.1 2006-12-18 15:25:46 torda Exp $
+ * $Id: SagModelWizard.java,v 1.2 2007-01-05 13:29:27 torda Exp $
  */
 package org.supremica.external.sag.presentation;
 
@@ -383,8 +383,7 @@ public class SagModelWizard extends Wizard implements INewWizard {
 		 * @generated
 		 */
 		public void createControl(Composite parent) {
-			Composite composite = new Composite(parent, SWT.NONE);
-			{
+			Composite composite = new Composite(parent, SWT.NONE); {
 				GridLayout layout = new GridLayout();
 				layout.numColumns = 1;
 				layout.verticalSpacing = 12;

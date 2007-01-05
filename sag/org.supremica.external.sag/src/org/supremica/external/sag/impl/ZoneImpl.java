@@ -2,12 +2,13 @@
  * <copyright>
  * </copyright>
  *
- * $Id: ZoneImpl.java,v 1.1 2006-12-18 15:23:00 torda Exp $
+ * $Id: ZoneImpl.java,v 1.2 2007-01-05 13:29:13 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
 import org.eclipse.emf.common.notify.Notification;
 
+import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 
@@ -124,11 +125,33 @@ public abstract class ZoneImpl extends EObjectImpl implements Zone {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setFront(Node newFront) {
+	public NotificationChain basicSetFront(Node newFront, NotificationChain msgs) {
 		Node oldFront = front;
 		front = newFront;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__FRONT, oldFront, front));
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__FRONT, oldFront, newFront);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setFront(Node newFront) {
+		if (newFront != front) {
+			NotificationChain msgs = null;
+			if (front != null)
+				msgs = ((InternalEObject)front).eInverseRemove(this, SagPackage.NODE__INCOMING, Node.class, msgs);
+			if (newFront != null)
+				msgs = ((InternalEObject)newFront).eInverseAdd(this, SagPackage.NODE__INCOMING, Node.class, msgs);
+			msgs = basicSetFront(newFront, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__FRONT, newFront, newFront));
 	}
 
 	/**
@@ -162,11 +185,33 @@ public abstract class ZoneImpl extends EObjectImpl implements Zone {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setBack(Node newBack) {
+	public NotificationChain basicSetBack(Node newBack, NotificationChain msgs) {
 		Node oldBack = back;
 		back = newBack;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__BACK, oldBack, back));
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__BACK, oldBack, newBack);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setBack(Node newBack) {
+		if (newBack != back) {
+			NotificationChain msgs = null;
+			if (back != null)
+				msgs = ((InternalEObject)back).eInverseRemove(this, SagPackage.NODE__OUTGOING, Node.class, msgs);
+			if (newBack != null)
+				msgs = ((InternalEObject)newBack).eInverseAdd(this, SagPackage.NODE__OUTGOING, Node.class, msgs);
+			msgs = basicSetBack(newBack, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__BACK, newBack, newBack));
 	}
 
 	/**
@@ -188,6 +233,42 @@ public abstract class ZoneImpl extends EObjectImpl implements Zone {
 		isOneway = newIsOneway;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__IS_ONEWAY, oldIsOneway, isOneway));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case SagPackage.ZONE__FRONT:
+				if (front != null)
+					msgs = ((InternalEObject)front).eInverseRemove(this, SagPackage.NODE__INCOMING, Node.class, msgs);
+				return basicSetFront((Node)otherEnd, msgs);
+			case SagPackage.ZONE__BACK:
+				if (back != null)
+					msgs = ((InternalEObject)back).eInverseRemove(this, SagPackage.NODE__OUTGOING, Node.class, msgs);
+				return basicSetBack((Node)otherEnd, msgs);
+		}
+		return super.eInverseAdd(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case SagPackage.ZONE__FRONT:
+				return basicSetFront(null, msgs);
+			case SagPackage.ZONE__BACK:
+				return basicSetBack(null, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
 
 	/**

@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: Zone.java,v 1.1 2006-12-18 15:23:00 torda Exp $
+ * $Id: Zone.java,v 1.2 2007-01-05 13:29:13 torda Exp $
  */
 package org.supremica.external.sag;
 
@@ -29,6 +29,7 @@ import org.eclipse.emf.ecore.EObject;
 public interface Zone extends EObject {
 	/**
 	 * Returns the value of the '<em><b>Front</b></em>' reference.
+	 * It is bidirectional and its opposite is '{@link org.supremica.external.sag.Node#getIncoming <em>Incoming</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Front</em>' reference isn't clear,
@@ -38,7 +39,8 @@ public interface Zone extends EObject {
 	 * @return the value of the '<em>Front</em>' reference.
 	 * @see #setFront(Node)
 	 * @see org.supremica.external.sag.SagPackage#getZone_Front()
-	 * @model
+	 * @see org.supremica.external.sag.Node#getIncoming
+	 * @model opposite="incoming"
 	 * @generated
 	 */
 	Node getFront();
@@ -55,6 +57,7 @@ public interface Zone extends EObject {
 
 	/**
 	 * Returns the value of the '<em><b>Back</b></em>' reference.
+	 * It is bidirectional and its opposite is '{@link org.supremica.external.sag.Node#getOutgoing <em>Outgoing</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Back</em>' reference isn't clear,
@@ -64,7 +67,8 @@ public interface Zone extends EObject {
 	 * @return the value of the '<em>Back</em>' reference.
 	 * @see #setBack(Node)
 	 * @see org.supremica.external.sag.SagPackage#getZone_Back()
-	 * @model
+	 * @see org.supremica.external.sag.Node#getOutgoing
+	 * @model opposite="outgoing"
 	 * @generated
 	 */
 	Node getBack();
