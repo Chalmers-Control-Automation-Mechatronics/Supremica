@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: GraphImpl.java,v 1.1 2006-12-18 15:23:00 torda Exp $
+ * $Id: GraphImpl.java,v 1.2 2007-01-09 15:31:07 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
@@ -20,10 +20,12 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.EObjectContainmentWithInverseEList;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.supremica.external.sag.Graph;
 import org.supremica.external.sag.Node;
+import org.supremica.external.sag.Project;
 import org.supremica.external.sag.SagPackage;
 import org.supremica.external.sag.Zone;
 
@@ -37,6 +39,7 @@ import org.supremica.external.sag.Zone;
  *   <li>{@link org.supremica.external.sag.impl.GraphImpl#getZone <em>Zone</em>}</li>
  *   <li>{@link org.supremica.external.sag.impl.GraphImpl#isMultipleObjects <em>Multiple Objects</em>}</li>
  *   <li>{@link org.supremica.external.sag.impl.GraphImpl#getNode <em>Node</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.GraphImpl#getProject <em>Project</em>}</li>
  * </ul>
  * </p>
  *
@@ -152,12 +155,57 @@ public class GraphImpl extends NamedImpl implements Graph {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public Project getProject() {
+		if (eContainerFeatureID != SagPackage.GRAPH__PROJECT) return null;
+		return (Project)eContainer();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetProject(Project newProject, NotificationChain msgs) {
+		msgs = eBasicSetContainer((InternalEObject)newProject, SagPackage.GRAPH__PROJECT, msgs);
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setProject(Project newProject) {
+		if (newProject != eInternalContainer() || (eContainerFeatureID != SagPackage.GRAPH__PROJECT && newProject != null)) {
+			if (EcoreUtil.isAncestor(this, newProject))
+				throw new IllegalArgumentException("Recursive containment not allowed for " + toString());
+			NotificationChain msgs = null;
+			if (eInternalContainer() != null)
+				msgs = eBasicRemoveFromContainer(msgs);
+			if (newProject != null)
+				msgs = ((InternalEObject)newProject).eInverseAdd(this, SagPackage.PROJECT__GRAPH, Project.class, msgs);
+			msgs = basicSetProject(newProject, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.GRAPH__PROJECT, newProject, newProject));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case SagPackage.GRAPH__NODE:
 				return ((InternalEList<InternalEObject>)(InternalEList<?>)getNode()).basicAdd(otherEnd, msgs);
+			case SagPackage.GRAPH__PROJECT:
+				if (eInternalContainer() != null)
+					msgs = eBasicRemoveFromContainer(msgs);
+				return basicSetProject((Project)otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -174,8 +222,24 @@ public class GraphImpl extends NamedImpl implements Graph {
 				return ((InternalEList<?>)getZone()).basicRemove(otherEnd, msgs);
 			case SagPackage.GRAPH__NODE:
 				return ((InternalEList<?>)getNode()).basicRemove(otherEnd, msgs);
+			case SagPackage.GRAPH__PROJECT:
+				return basicSetProject(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eBasicRemoveFromContainerFeature(NotificationChain msgs) {
+		switch (eContainerFeatureID) {
+			case SagPackage.GRAPH__PROJECT:
+				return eInternalContainer().eInverseRemove(this, SagPackage.PROJECT__GRAPH, Project.class, msgs);
+		}
+		return super.eBasicRemoveFromContainerFeature(msgs);
 	}
 
 	/**
@@ -192,6 +256,8 @@ public class GraphImpl extends NamedImpl implements Graph {
 				return isMultipleObjects() ? Boolean.TRUE : Boolean.FALSE;
 			case SagPackage.GRAPH__NODE:
 				return getNode();
+			case SagPackage.GRAPH__PROJECT:
+				return getProject();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -216,6 +282,9 @@ public class GraphImpl extends NamedImpl implements Graph {
 				getNode().clear();
 				getNode().addAll((Collection<? extends Node>)newValue);
 				return;
+			case SagPackage.GRAPH__PROJECT:
+				setProject((Project)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -237,6 +306,9 @@ public class GraphImpl extends NamedImpl implements Graph {
 			case SagPackage.GRAPH__NODE:
 				getNode().clear();
 				return;
+			case SagPackage.GRAPH__PROJECT:
+				setProject((Project)null);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -255,6 +327,8 @@ public class GraphImpl extends NamedImpl implements Graph {
 				return multipleObjects != MULTIPLE_OBJECTS_EDEFAULT;
 			case SagPackage.GRAPH__NODE:
 				return node != null && !node.isEmpty();
+			case SagPackage.GRAPH__PROJECT:
+				return getProject() != null;
 		}
 		return super.eIsSet(featureID);
 	}

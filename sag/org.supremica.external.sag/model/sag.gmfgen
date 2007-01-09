@@ -52,9 +52,9 @@
       </modelFacet>
       <labels
           visualID="4001"
-          editPartClassName="NodeSensorEditPart"
-          itemSemanticEditPolicyClassName="NodeSensorItemSemanticEditPolicy"
-          notationViewFactoryClassName="NodeSensorViewFactory"
+          editPartClassName="NodeSensorNameEditPart"
+          itemSemanticEditPolicyClassName="NodeSensorNameItemSemanticEditPolicy"
+          notationViewFactoryClassName="NodeSensorNameViewFactory"
           elementIcon="true">
         <diagramRunTimeClass
             href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
@@ -65,7 +65,7 @@
         <modelFacet
             xsi:type="gmfgen:FeatureLabelModelFacet">
           <metaFeatures
-              href="sag.genmodel#//sag/Node/sensor"/>
+              href="sag.genmodel#//sag/Node/sensorName"/>
         </modelFacet>
       </labels>
     </childNodes>

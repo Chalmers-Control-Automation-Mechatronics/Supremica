@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagFactory.java,v 1.1 2006-12-18 15:23:00 torda Exp $
+ * $Id: SagFactory.java,v 1.2 2007-01-09 15:31:07 torda Exp $
  */
 package org.supremica.external.sag;
 
@@ -69,6 +69,15 @@ public interface SagFactory extends EFactory {
 	 * @generated
 	 */
 	Project createProject();
+
+	/**
+	 * Returns a new object of class '<em>Sensor</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Sensor</em>'.
+	 * @generated
+	 */
+	Sensor createSensor();
 
 	/**
 	 * Returns the package supported by this factory.

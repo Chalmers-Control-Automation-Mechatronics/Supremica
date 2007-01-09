@@ -2,10 +2,11 @@
  * <copyright>
  * </copyright>
  *
- * $Id: Node.java,v 1.2 2007-01-05 13:29:13 torda Exp $
+ * $Id: Node.java,v 1.3 2007-01-09 15:31:07 torda Exp $
  */
 package org.supremica.external.sag;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -16,10 +17,11 @@ import org.eclipse.emf.ecore.EObject;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link org.supremica.external.sag.Node#getSensor <em>Sensor</em>}</li>
  *   <li>{@link org.supremica.external.sag.Node#getGraph <em>Graph</em>}</li>
  *   <li>{@link org.supremica.external.sag.Node#getIncoming <em>Incoming</em>}</li>
  *   <li>{@link org.supremica.external.sag.Node#getOutgoing <em>Outgoing</em>}</li>
+ *   <li>{@link org.supremica.external.sag.Node#getSensor <em>Sensor</em>}</li>
+ *   <li>{@link org.supremica.external.sag.Node#getSensorName <em>Sensor Name</em>}</li>
  * </ul>
  * </p>
  *
@@ -29,30 +31,58 @@ import org.eclipse.emf.ecore.EObject;
  */
 public interface Node extends EObject {
 	/**
-	 * Returns the value of the '<em><b>Sensor</b></em>' attribute.
+	 * Returns the value of the '<em><b>Sensor</b></em>' reference.
+	 * It is bidirectional and its opposite is '{@link org.supremica.external.sag.Sensor#getNode <em>Node</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Sensor</em>' attribute isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Sensor</em>' attribute.
-	 * @see #setSensor(String)
+	 * @return the value of the '<em>Sensor</em>' reference.
+	 * @see #setSensor(Sensor)
 	 * @see org.supremica.external.sag.SagPackage#getNode_Sensor()
-	 * @model
+	 * @see org.supremica.external.sag.Sensor#getNode
+	 * @model opposite="node"
 	 * @generated
 	 */
-	String getSensor();
+	Sensor getSensor();
 
 	/**
-	 * Sets the value of the '{@link org.supremica.external.sag.Node#getSensor <em>Sensor</em>}' attribute.
+	 * Sets the value of the '{@link org.supremica.external.sag.Node#getSensor <em>Sensor</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Sensor</em>' attribute.
+	 * @param value the new value of the '<em>Sensor</em>' reference.
 	 * @see #getSensor()
 	 * @generated
 	 */
-	void setSensor(String value);
+	void setSensor(Sensor value);
+
+	/**
+	 * Returns the value of the '<em><b>Sensor Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Sensor Name</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Sensor Name</em>' attribute.
+	 * @see #setSensorName(String)
+	 * @see org.supremica.external.sag.SagPackage#getNode_SensorName()
+	 * @model transient="true" volatile="true" derived="true"
+	 * @generated
+	 */
+	String getSensorName();
+
+	/**
+	 * Sets the value of the '{@link org.supremica.external.sag.Node#getSensorName <em>Sensor Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Sensor Name</em>' attribute.
+	 * @see #getSensorName()
+	 * @generated
+	 */
+	void setSensorName(String value);
 
 	/**
 	 * Returns the value of the '<em><b>Graph</b></em>' container reference.
@@ -83,7 +113,8 @@ public interface Node extends EObject {
 	void setGraph(Graph value);
 
 	/**
-	 * Returns the value of the '<em><b>Incoming</b></em>' reference.
+	 * Returns the value of the '<em><b>Incoming</b></em>' reference list.
+	 * The list contents are of type {@link org.supremica.external.sag.Zone}.
 	 * It is bidirectional and its opposite is '{@link org.supremica.external.sag.Zone#getFront <em>Front</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <p>
@@ -91,27 +122,17 @@ public interface Node extends EObject {
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Incoming</em>' reference.
-	 * @see #setIncoming(Zone)
+	 * @return the value of the '<em>Incoming</em>' reference list.
 	 * @see org.supremica.external.sag.SagPackage#getNode_Incoming()
 	 * @see org.supremica.external.sag.Zone#getFront
-	 * @model opposite="front" transient="true"
+	 * @model type="org.supremica.external.sag.Zone" opposite="front" transient="true"
 	 * @generated
 	 */
-	Zone getIncoming();
+	EList<Zone> getIncoming();
 
 	/**
-	 * Sets the value of the '{@link org.supremica.external.sag.Node#getIncoming <em>Incoming</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Incoming</em>' reference.
-	 * @see #getIncoming()
-	 * @generated
-	 */
-	void setIncoming(Zone value);
-
-	/**
-	 * Returns the value of the '<em><b>Outgoing</b></em>' reference.
+	 * Returns the value of the '<em><b>Outgoing</b></em>' reference list.
+	 * The list contents are of type {@link org.supremica.external.sag.Zone}.
 	 * It is bidirectional and its opposite is '{@link org.supremica.external.sag.Zone#getBack <em>Back</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <p>
@@ -119,23 +140,12 @@ public interface Node extends EObject {
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Outgoing</em>' reference.
-	 * @see #setOutgoing(Zone)
+	 * @return the value of the '<em>Outgoing</em>' reference list.
 	 * @see org.supremica.external.sag.SagPackage#getNode_Outgoing()
 	 * @see org.supremica.external.sag.Zone#getBack
-	 * @model opposite="back" transient="true"
+	 * @model type="org.supremica.external.sag.Zone" opposite="back" transient="true"
 	 * @generated
 	 */
-	Zone getOutgoing();
-
-	/**
-	 * Sets the value of the '{@link org.supremica.external.sag.Node#getOutgoing <em>Outgoing</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Outgoing</em>' reference.
-	 * @see #getOutgoing()
-	 * @generated
-	 */
-	void setOutgoing(Zone value);
+	EList<Zone> getOutgoing();
 
 } // Node

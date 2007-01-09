@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: NodeItemProvider.java,v 1.2 2007-01-05 13:29:13 torda Exp $
+ * $Id: NodeItemProvider.java,v 1.3 2007-01-09 15:31:07 torda Exp $
  */
 package org.supremica.external.sag.provider;
 
@@ -24,6 +24,7 @@ import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 
+import org.eclipse.emf.edit.provider.ViewerNotification;
 import org.supremica.external.sag.Node;
 import org.supremica.external.sag.SagPackage;
 
@@ -61,9 +62,10 @@ public class NodeItemProvider
 		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
-			addSensorPropertyDescriptor(object);
 			addIncomingPropertyDescriptor(object);
 			addOutgoingPropertyDescriptor(object);
+			addSensorPropertyDescriptor(object);
+			addSensorNamePropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -85,6 +87,28 @@ public class NodeItemProvider
 				 true,
 				 false,
 				 true,
+				 null,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Sensor Name feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addSensorNamePropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Node_sensorName_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Node_sensorName_feature", "_UI_Node_type"),
+				 SagPackage.Literals.NODE__SENSOR_NAME,
+				 true,
+				 false,
+				 false,
 				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
 				 null,
 				 null));
@@ -141,7 +165,7 @@ public class NodeItemProvider
 	 * @generated
 	 */
 	public String getText(Object object) {
-		String label = ((Node)object).getSensor();
+		String label = ((Node)object).getSensorName();
 		return label == null || label.length() == 0 ?
 			getString("_UI_Node_type") :
 			getString("_UI_Node_type") + " " + label;
@@ -156,6 +180,12 @@ public class NodeItemProvider
 	 */
 	public void notifyChanged(Notification notification) {
 		updateChildren(notification);
+
+		switch (notification.getFeatureID(Node.class)) {
+			case SagPackage.NODE__SENSOR_NAME:
+				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
+				return;
+		}
 		super.notifyChanged(notification);
 	}
 

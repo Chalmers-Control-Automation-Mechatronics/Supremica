@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagPackageImpl.java,v 1.2 2007-01-05 13:29:13 torda Exp $
+ * $Id: SagPackageImpl.java,v 1.3 2007-01-09 15:31:07 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
@@ -20,6 +20,7 @@ import org.supremica.external.sag.Node;
 import org.supremica.external.sag.Project;
 import org.supremica.external.sag.SagFactory;
 import org.supremica.external.sag.SagPackage;
+import org.supremica.external.sag.Sensor;
 import org.supremica.external.sag.UnboundedZone;
 import org.supremica.external.sag.Zone;
 
@@ -78,6 +79,13 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 	 * @generated
 	 */
 	private EClass projectEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass sensorEClass = null;
 
 	/**
 	 * Creates an instance of the model <b>Package</b>, registered with
@@ -188,6 +196,15 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getGraph_Project() {
+		return (EReference)graphEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getZone() {
 		return zoneEClass;
 	}
@@ -287,8 +304,17 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getNode_Sensor() {
-		return (EAttribute)nodeEClass.getEStructuralFeatures().get(0);
+	public EReference getNode_Sensor() {
+		return (EReference)nodeEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getNode_SensorName() {
+		return (EAttribute)nodeEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -297,7 +323,7 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 	 * @generated
 	 */
 	public EReference getNode_Graph() {
-		return (EReference)nodeEClass.getEStructuralFeatures().get(1);
+		return (EReference)nodeEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -306,7 +332,7 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 	 * @generated
 	 */
 	public EReference getNode_Incoming() {
-		return (EReference)nodeEClass.getEStructuralFeatures().get(2);
+		return (EReference)nodeEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -315,7 +341,7 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 	 * @generated
 	 */
 	public EReference getNode_Outgoing() {
-		return (EReference)nodeEClass.getEStructuralFeatures().get(3);
+		return (EReference)nodeEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -334,6 +360,33 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 	 */
 	public EReference getProject_Graph() {
 		return (EReference)projectEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getProject_Sensor() {
+		return (EReference)projectEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EClass getSensor() {
+		return sensorEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getSensor_Node() {
+		return (EReference)sensorEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -368,6 +421,7 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 		createEReference(graphEClass, GRAPH__ZONE);
 		createEAttribute(graphEClass, GRAPH__MULTIPLE_OBJECTS);
 		createEReference(graphEClass, GRAPH__NODE);
+		createEReference(graphEClass, GRAPH__PROJECT);
 
 		zoneEClass = createEClass(ZONE);
 		createEReference(zoneEClass, ZONE__FRONT);
@@ -384,13 +438,18 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 		createEAttribute(unboundedZoneEClass, UNBOUNDED_ZONE__IS_OUTSIDE);
 
 		nodeEClass = createEClass(NODE);
-		createEAttribute(nodeEClass, NODE__SENSOR);
 		createEReference(nodeEClass, NODE__GRAPH);
 		createEReference(nodeEClass, NODE__INCOMING);
 		createEReference(nodeEClass, NODE__OUTGOING);
+		createEReference(nodeEClass, NODE__SENSOR);
+		createEAttribute(nodeEClass, NODE__SENSOR_NAME);
 
 		projectEClass = createEClass(PROJECT);
 		createEReference(projectEClass, PROJECT__GRAPH);
+		createEReference(projectEClass, PROJECT__SENSOR);
+
+		sensorEClass = createEClass(SENSOR);
+		createEReference(sensorEClass, SENSOR__NODE);
 	}
 
 	/**
@@ -425,12 +484,14 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 		boundedZoneEClass.getESuperTypes().add(this.getZone());
 		unboundedZoneEClass.getESuperTypes().add(this.getZone());
 		projectEClass.getESuperTypes().add(this.getNamed());
+		sensorEClass.getESuperTypes().add(this.getNamed());
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(graphEClass, Graph.class, "Graph", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getGraph_Zone(), this.getZone(), null, "zone", null, 0, -1, Graph.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getGraph_MultipleObjects(), ecorePackage.getEBoolean(), "multipleObjects", null, 0, 1, Graph.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getGraph_Node(), this.getNode(), this.getNode_Graph(), "node", null, 0, -1, Graph.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getGraph_Project(), this.getProject(), this.getProject_Graph(), "project", null, 0, 1, Graph.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(zoneEClass, Zone.class, "Zone", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getZone_Front(), this.getNode(), this.getNode_Incoming(), "front", null, 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -447,13 +508,18 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 		initEAttribute(getUnboundedZone_IsOutside(), ecorePackage.getEBoolean(), "isOutside", null, 0, 1, UnboundedZone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(nodeEClass, Node.class, "Node", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getNode_Sensor(), ecorePackage.getEString(), "sensor", null, 0, 1, Node.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getNode_Graph(), this.getGraph(), this.getGraph_Node(), "graph", null, 0, 1, Node.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getNode_Incoming(), this.getZone(), this.getZone_Front(), "incoming", null, -1, 1, Node.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getNode_Outgoing(), this.getZone(), this.getZone_Back(), "outgoing", null, -1, 1, Node.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getNode_Graph(), this.getGraph(), this.getGraph_Node(), "graph", null, 0, 1, Node.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getNode_Incoming(), this.getZone(), this.getZone_Front(), "incoming", null, 0, -1, Node.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getNode_Outgoing(), this.getZone(), this.getZone_Back(), "outgoing", null, 0, -1, Node.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getNode_Sensor(), this.getSensor(), this.getSensor_Node(), "sensor", null, 0, 1, Node.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getNode_SensorName(), ecorePackage.getEString(), "sensorName", null, 0, 1, Node.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(projectEClass, Project.class, "Project", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getProject_Graph(), this.getGraph(), null, "graph", null, 0, -1, Project.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getProject_Graph(), this.getGraph(), this.getGraph_Project(), "graph", null, 0, -1, Project.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getProject_Sensor(), this.getSensor(), null, "sensor", null, 0, -1, Project.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(sensorEClass, Sensor.class, "Sensor", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEReference(getSensor_Node(), this.getNode(), this.getNode_Sensor(), "node", null, 0, -1, Sensor.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Create resource
 		createResource(eNS_URI);

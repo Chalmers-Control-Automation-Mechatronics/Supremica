@@ -35,7 +35,7 @@
             <diagramLabel
                 href="sag.gmfgraph#SensorName"/>
             <features
-                href="sag.ecore#//Node/sensor"/>
+                href="sag.ecore#//Node/sensorName"/>
           </labelMappings>
           <tool
               xsi:type="gmftool:CreationTool"

@@ -33,7 +33,6 @@ class SagToWaters {
 
 	static void main(args) {
     	Project sagProject = loadSagProjectFromFile('C:/runtime-New_configuration/test/BallSystem.sag')
-		println sagProject.name
 		ModuleProxy watersModule = generateWatersModule(sagProject)
 		File watersFile = new File("C:/runtime-New_configuration/test/" + watersModule.getName() +'.'+ WmodFileFilter.WMOD)
 		saveWatersModuleToFile(watersModule, watersFile)
@@ -66,6 +65,7 @@ class SagToWaters {
 			watersModule.componentListModifiable << components[sensor]
 			components
 		}
+		
 		//Create one component for every bounded zone
 		int i = 0
 		Map boundedZoneComponents = sagProject.graph.collect{it.zone}.flatten(). //collect all zones
@@ -80,51 +80,54 @@ class SagToWaters {
 			watersModule.componentListModifiable << components[zone]
 			components
 		}
-		//Create one event for every sensor entry
-		Map sensorsBeingEntered = sagProject.graph.collect{it.zone}.flatten().inject([:]){sensors, zone ->
-			if (zone.front != null && zone.front.sensor != null) {
-				sensors[zone] = zone.front.sensor
-			}
-			if (zone.back != null && zone.back.sensor != null && !zone.isOneway) {
-				sensors[zone] = zone.back.sensor
-			}
-			sensors
+		
+		//Create one event for every sensor entry and exit
+		//Get a map with sensor as key and a list of zones from which objects can enter the sensor as value
+		Map sensorEntrances = sagProject.sensor.inject([:]) {entrances, sensor ->
+			entrances[sensor] = sensor.node.collect{node -> node.incoming + node.outgoing.findAll{zone -> !zone.isOneway}}.flatten()
+			entrances
 		}
-		Map sensorEnteringEventCounter = sensorsBeingEntered.values().inject([:]){counters, sensor->
-			counters[sensor] = 0
-			counters
+		//Get a map with sensor as key and a list of zones to which objects can exit the sensor as value
+		Map sensorExits = sagProject.sensor.inject([:]) {exits, sensor ->
+			exits[sensor] = sensor.node.collect{node -> node.outgoing + node.incoming.findAll{zone -> !zone.isOneway}}.flatten()
+			exits
 		}
-		sensorsBeingEntered.each {zoneAndSensorKeyValuePair -> //zone as key and sensor as value
-			Sensor sensor = zoneAndSensorKeyValuePair.value
-			
-			//Create an event
-			String eventLabel = "to_" + sensor.name
-			if (sensorsBeingEntered.values().findAll{it.is(sensor)}.size() > 1) {
-				eventLabel = eventLabel + "_" + sensorEnteringEventCounter[sensor].toString()
-				sensorEnteringEventCounter[sensor] = sensorEnteringEventCounter[sensor] + 1
-			}
-			EventDeclSubject event = new EventDeclSubject(eventLabel, EventKind.UNCONTROLLABLE)
-			watersModule.eventDeclListModifiable << event
-			
-			//Create an edge in the sensor component and add the event label to the edge
-			ComponentProxy component = sensorComponents[sensor]
-            SagToWaters.addEventToComponent(component, "false", "true", event)
+		Closure createEventsAndEdges = {Map sensorChanges, boolean isEntrance ->
+			for (sensorAndZonesKeyValuePair in sensorChanges) { //sensor as key and list of zones as value
+				Sensor sensor = sensorAndZonesKeyValuePair.key
+				List zones = sensorAndZonesKeyValuePair.value
+				//Create an event
+				for (zoneIndex in 0..zones.size()-1) {
+					String eventLabel = (isEntrance ? "to_" : "from_") + sensor.name
+					if (zones.size() > 1) {
+						eventLabel = eventLabel + "_" + zoneIndex.toString()
+					}	
+					EventDeclSubject event = new EventDeclSubject(eventLabel, EventKind.UNCONTROLLABLE)
+					watersModule.eventDeclListModifiable << event
 
-			//Create an edge in the zone component (if bounded) and add the event
-			Zone zone = zoneAndSensorKeyValuePair.key
-			component = boundedZoneComponents[zone]
-			if (component != null) {
-				(zone.capacity..1).each {
-					SagToWaters.addEventToComponent(component, it.toString(), (it-1).toString(), event)
+					//Create an edge in the sensor component and add the event label to the edge
+					ComponentProxy component = sensorComponents[sensor]
+	    	        SagToWaters.addEventToComponent(component, !isEntrance, isEntrance, event)
+					//Create an edge in the zone component (if bounded) and add the event
+					Zone zone = zones[zoneIndex]
+					component = boundedZoneComponents[zone]
+					if (component != null) {
+						(0..zone.capacity-1).each {nodeIndex ->
+							SagToWaters.addEventToComponent(component, (nodeIndex+(isEntrance ? 1 : 0)), (nodeIndex+(isEntrance ? 0 : 1)), event)	
+						}
+					}
 				}
 			}
 		}
+		createEventsAndEdges(sensorEntrances, true)
+		createEventsAndEdges(sensorExits, false)
+		
 		watersModule
 	}
 	
-	static void addEventToComponent(ComponentProxy component, String sourceNodeName, String targetNodeName, EventDeclSubject event) {
-		NodeProxy sourceNode = component.graph.nodes.find{it.name==sourceNodeName}
-		NodeProxy targetNode = component.graph.nodes.find{it.name==targetNodeName}
+	static void addEventToComponent(ComponentProxy component, sourceNodeName, targetNodeName, EventDeclSubject event) {
+		NodeProxy sourceNode = component.graph.nodes.find{it.name==sourceNodeName.toString()}
+		NodeProxy targetNode = component.graph.nodes.find{it.name==targetNodeName.toString()}
 		EdgeSubject edge = component.graph.edges.find{it.source == sourceNode && it.target == targetNode}
 		if (edge == null) {
 			edge = new EdgeSubject(sourceNode, targetNode)

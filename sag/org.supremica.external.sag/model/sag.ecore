@@ -9,6 +9,8 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="multipleObjects" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="node" upperBound="-1" eType="#//Node"
         containment="true" eOpposite="#//Node/graph"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="project" eType="#//Project"
+        transient="true" eOpposite="#//Project/graph"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Zone" abstract="true">
     <eStructuralFeatures xsi:type="ecore:EReference" name="front" eType="#//Node"
@@ -26,16 +28,25 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="isOutside" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Node">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="sensor" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="graph" eType="#//Graph"
-        eOpposite="#//Graph/node"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="incoming" lowerBound="-1"
+        transient="true" eOpposite="#//Graph/node"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="incoming" upperBound="-1"
         eType="#//Zone" transient="true" eOpposite="#//Zone/front"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="outgoing" lowerBound="-1"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outgoing" upperBound="-1"
         eType="#//Zone" transient="true" eOpposite="#//Zone/back"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sensor" eType="#//Sensor"
+        eOpposite="#//Sensor/node"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="sensorName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
+        volatile="true" transient="true" derived="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Project" eSuperTypes="#//Named">
     <eStructuralFeatures xsi:type="ecore:EReference" name="graph" upperBound="-1"
-        eType="#//Graph" containment="true"/>
+        eType="#//Graph" containment="true" eOpposite="#//Graph/project"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sensor" upperBound="-1"
+        eType="#//Sensor" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Sensor" eSuperTypes="#//Named">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="node" upperBound="-1" eType="#//Node"
+        transient="true" eOpposite="#//Node/sensor"/>
   </eClassifiers>
 </ecore:EPackage>

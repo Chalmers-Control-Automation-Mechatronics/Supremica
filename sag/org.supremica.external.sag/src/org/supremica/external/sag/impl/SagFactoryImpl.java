@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagFactoryImpl.java,v 1.1 2006-12-18 15:23:00 torda Exp $
+ * $Id: SagFactoryImpl.java,v 1.2 2007-01-09 15:31:07 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
@@ -65,6 +65,7 @@ public class SagFactoryImpl extends EFactoryImpl implements SagFactory {
 			case SagPackage.UNBOUNDED_ZONE: return createUnboundedZone();
 			case SagPackage.NODE: return createNode();
 			case SagPackage.PROJECT: return createProject();
+			case SagPackage.SENSOR: return createSensor();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -118,6 +119,16 @@ public class SagFactoryImpl extends EFactoryImpl implements SagFactory {
 	public Project createProject() {
 		ProjectImpl project = new ProjectImpl();
 		return project;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Sensor createSensor() {
+		SensorImpl sensor = new SensorImpl();
+		return sensor;
 	}
 
 	/**

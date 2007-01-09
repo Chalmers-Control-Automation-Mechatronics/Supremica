@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: ProjectItemProvider.java,v 1.2 2007-01-09 15:31:07 torda Exp $
+ * $Id: SensorItemProvider.java,v 1.1 2007-01-09 15:31:07 torda Exp $
  */
 package org.supremica.external.sag.provider;
 
@@ -15,25 +15,23 @@ import org.eclipse.emf.common.notify.Notification;
 
 import org.eclipse.emf.common.util.ResourceLocator;
 
-import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.edit.provider.ComposeableAdapterFactory;
 import org.eclipse.emf.edit.provider.IEditingDomainItemProvider;
 import org.eclipse.emf.edit.provider.IItemLabelProvider;
 import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
-import org.eclipse.emf.edit.provider.ViewerNotification;
 
-import org.supremica.external.sag.Project;
-import org.supremica.external.sag.SagFactory;
 import org.supremica.external.sag.SagPackage;
+import org.supremica.external.sag.Sensor;
 
 /**
- * This is the item provider adapter for a {@link org.supremica.external.sag.Project} object.
+ * This is the item provider adapter for a {@link org.supremica.external.sag.Sensor} object.
  * <!-- begin-user-doc -->
  * <!-- end-user-doc -->
  * @generated
  */
-public class ProjectItemProvider
+public class SensorItemProvider
 	extends NamedItemProvider
 	implements	
 		IEditingDomainItemProvider,	
@@ -47,7 +45,7 @@ public class ProjectItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public ProjectItemProvider(AdapterFactory adapterFactory) {
+	public SensorItemProvider(AdapterFactory adapterFactory) {
 		super(adapterFactory);
 	}
 
@@ -61,47 +59,41 @@ public class ProjectItemProvider
 		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
+			addNodePropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
 
 	/**
-	 * This specifies how to implement {@link #getChildren} and is used to deduce an appropriate feature for an
-	 * {@link org.eclipse.emf.edit.command.AddCommand}, {@link org.eclipse.emf.edit.command.RemoveCommand} or
-	 * {@link org.eclipse.emf.edit.command.MoveCommand} in {@link #createCommand}.
+	 * This adds a property descriptor for the Node feature.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Collection getChildrenFeatures(Object object) {
-		if (childrenFeatures == null) {
-			super.getChildrenFeatures(object);
-			childrenFeatures.add(SagPackage.Literals.PROJECT__GRAPH);
-			childrenFeatures.add(SagPackage.Literals.PROJECT__SENSOR);
-		}
-		return childrenFeatures;
+	protected void addNodePropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Sensor_node_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Sensor_node_feature", "_UI_Sensor_type"),
+				 SagPackage.Literals.SENSOR__NODE,
+				 true,
+				 false,
+				 true,
+				 null,
+				 null,
+				 null));
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected EStructuralFeature getChildFeature(Object object, Object child) {
-		// Check the type of the specified child object and return the proper feature to use for
-		// adding (see {@link AddCommand}) it as a child.
-
-		return super.getChildFeature(object, child);
-	}
-
-	/**
-	 * This returns Project.gif.
+	 * This returns Sensor.gif.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Object getImage(Object object) {
-		return overlayImage(object, getResourceLocator().getImage("full/obj16/Project"));
+		return overlayImage(object, getResourceLocator().getImage("full/obj16/Sensor"));
 	}
 
 	/**
@@ -111,10 +103,10 @@ public class ProjectItemProvider
 	 * @generated
 	 */
 	public String getText(Object object) {
-		String label = ((Project)object).getName();
+		String label = ((Sensor)object).getName();
 		return label == null || label.length() == 0 ?
-			getString("_UI_Project_type") :
-			getString("_UI_Project_type") + " " + label;
+			getString("_UI_Sensor_type") :
+			getString("_UI_Sensor_type") + " " + label;
 	}
 
 	/**
@@ -126,13 +118,6 @@ public class ProjectItemProvider
 	 */
 	public void notifyChanged(Notification notification) {
 		updateChildren(notification);
-
-		switch (notification.getFeatureID(Project.class)) {
-			case SagPackage.PROJECT__GRAPH:
-			case SagPackage.PROJECT__SENSOR:
-				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
-				return;
-		}
 		super.notifyChanged(notification);
 	}
 
@@ -145,16 +130,6 @@ public class ProjectItemProvider
 	 */
 	protected void collectNewChildDescriptors(Collection newChildDescriptors, Object object) {
 		super.collectNewChildDescriptors(newChildDescriptors, object);
-
-		newChildDescriptors.add
-			(createChildParameter
-				(SagPackage.Literals.PROJECT__GRAPH,
-				 SagFactory.eINSTANCE.createGraph()));
-
-		newChildDescriptors.add
-			(createChildParameter
-				(SagPackage.Literals.PROJECT__SENSOR,
-				 SagFactory.eINSTANCE.createSensor()));
 	}
 
 	/**

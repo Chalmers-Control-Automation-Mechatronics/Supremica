@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagPackage.java,v 1.2 2007-01-05 13:29:13 torda Exp $
+ * $Id: SagPackage.java,v 1.3 2007-01-09 15:31:07 torda Exp $
  */
 package org.supremica.external.sag;
 
@@ -134,13 +134,22 @@ public interface SagPackage extends EPackage {
 	int GRAPH__NODE = NAMED_FEATURE_COUNT + 2;
 
 	/**
+	 * The feature id for the '<em><b>Project</b></em>' container reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int GRAPH__PROJECT = NAMED_FEATURE_COUNT + 3;
+
+	/**
 	 * The number of structural features of the '<em>Graph</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int GRAPH_FEATURE_COUNT = NAMED_FEATURE_COUNT + 3;
+	int GRAPH_FEATURE_COUNT = NAMED_FEATURE_COUNT + 4;
 
 	/**
 	 * The meta object id for the '{@link org.supremica.external.sag.impl.ZoneImpl <em>Zone</em>}' class.
@@ -309,40 +318,49 @@ public interface SagPackage extends EPackage {
 	int NODE = 5;
 
 	/**
-	 * The feature id for the '<em><b>Sensor</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int NODE__SENSOR = 0;
-
-	/**
 	 * The feature id for the '<em><b>Graph</b></em>' container reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NODE__GRAPH = 1;
+	int NODE__GRAPH = 0;
 
 	/**
-	 * The feature id for the '<em><b>Incoming</b></em>' reference.
+	 * The feature id for the '<em><b>Incoming</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NODE__INCOMING = 2;
+	int NODE__INCOMING = 1;
 
 	/**
-	 * The feature id for the '<em><b>Outgoing</b></em>' reference.
+	 * The feature id for the '<em><b>Outgoing</b></em>' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int NODE__OUTGOING = 3;
+	int NODE__OUTGOING = 2;
+
+	/**
+	 * The feature id for the '<em><b>Sensor</b></em>' reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE__SENSOR = 3;
+
+	/**
+	 * The feature id for the '<em><b>Sensor Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int NODE__SENSOR_NAME = 4;
 
 	/**
 	 * The number of structural features of the '<em>Node</em>' class.
@@ -351,7 +369,7 @@ public interface SagPackage extends EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int NODE_FEATURE_COUNT = 4;
+	int NODE_FEATURE_COUNT = 5;
 
 	/**
 	 * The meta object id for the '{@link org.supremica.external.sag.impl.ProjectImpl <em>Project</em>}' class.
@@ -382,13 +400,60 @@ public interface SagPackage extends EPackage {
 	int PROJECT__GRAPH = NAMED_FEATURE_COUNT + 0;
 
 	/**
+	 * The feature id for the '<em><b>Sensor</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int PROJECT__SENSOR = NAMED_FEATURE_COUNT + 1;
+
+	/**
 	 * The number of structural features of the '<em>Project</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int PROJECT_FEATURE_COUNT = NAMED_FEATURE_COUNT + 1;
+	int PROJECT_FEATURE_COUNT = NAMED_FEATURE_COUNT + 2;
+
+
+	/**
+	 * The meta object id for the '{@link org.supremica.external.sag.impl.SensorImpl <em>Sensor</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.supremica.external.sag.impl.SensorImpl
+	 * @see org.supremica.external.sag.impl.SagPackageImpl#getSensor()
+	 * @generated
+	 */
+	int SENSOR = 7;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENSOR__NAME = NAMED__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Node</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENSOR__NODE = NAMED_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Sensor</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SENSOR_FEATURE_COUNT = NAMED_FEATURE_COUNT + 1;
 
 
 	/**
@@ -433,6 +498,17 @@ public interface SagPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getGraph_Node();
+
+	/**
+	 * Returns the meta object for the container reference '{@link org.supremica.external.sag.Graph#getProject <em>Project</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the container reference '<em>Project</em>'.
+	 * @see org.supremica.external.sag.Graph#getProject()
+	 * @see #getGraph()
+	 * @generated
+	 */
+	EReference getGraph_Project();
 
 	/**
 	 * Returns the meta object for class '{@link org.supremica.external.sag.Zone <em>Zone</em>}'.
@@ -551,15 +627,26 @@ public interface SagPackage extends EPackage {
 	EClass getNode();
 
 	/**
-	 * Returns the meta object for the attribute '{@link org.supremica.external.sag.Node#getSensor <em>Sensor</em>}'.
+	 * Returns the meta object for the reference '{@link org.supremica.external.sag.Node#getSensor <em>Sensor</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Sensor</em>'.
+	 * @return the meta object for the reference '<em>Sensor</em>'.
 	 * @see org.supremica.external.sag.Node#getSensor()
 	 * @see #getNode()
 	 * @generated
 	 */
-	EAttribute getNode_Sensor();
+	EReference getNode_Sensor();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.supremica.external.sag.Node#getSensorName <em>Sensor Name</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Sensor Name</em>'.
+	 * @see org.supremica.external.sag.Node#getSensorName()
+	 * @see #getNode()
+	 * @generated
+	 */
+	EAttribute getNode_SensorName();
 
 	/**
 	 * Returns the meta object for the container reference '{@link org.supremica.external.sag.Node#getGraph <em>Graph</em>}'.
@@ -573,10 +660,10 @@ public interface SagPackage extends EPackage {
 	EReference getNode_Graph();
 
 	/**
-	 * Returns the meta object for the reference '{@link org.supremica.external.sag.Node#getIncoming <em>Incoming</em>}'.
+	 * Returns the meta object for the reference list '{@link org.supremica.external.sag.Node#getIncoming <em>Incoming</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Incoming</em>'.
+	 * @return the meta object for the reference list '<em>Incoming</em>'.
 	 * @see org.supremica.external.sag.Node#getIncoming()
 	 * @see #getNode()
 	 * @generated
@@ -584,10 +671,10 @@ public interface SagPackage extends EPackage {
 	EReference getNode_Incoming();
 
 	/**
-	 * Returns the meta object for the reference '{@link org.supremica.external.sag.Node#getOutgoing <em>Outgoing</em>}'.
+	 * Returns the meta object for the reference list '{@link org.supremica.external.sag.Node#getOutgoing <em>Outgoing</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the reference '<em>Outgoing</em>'.
+	 * @return the meta object for the reference list '<em>Outgoing</em>'.
 	 * @see org.supremica.external.sag.Node#getOutgoing()
 	 * @see #getNode()
 	 * @generated
@@ -614,6 +701,38 @@ public interface SagPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getProject_Graph();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link org.supremica.external.sag.Project#getSensor <em>Sensor</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Sensor</em>'.
+	 * @see org.supremica.external.sag.Project#getSensor()
+	 * @see #getProject()
+	 * @generated
+	 */
+	EReference getProject_Sensor();
+
+	/**
+	 * Returns the meta object for class '{@link org.supremica.external.sag.Sensor <em>Sensor</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Sensor</em>'.
+	 * @see org.supremica.external.sag.Sensor
+	 * @generated
+	 */
+	EClass getSensor();
+
+	/**
+	 * Returns the meta object for the reference list '{@link org.supremica.external.sag.Sensor#getNode <em>Node</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Node</em>'.
+	 * @see org.supremica.external.sag.Sensor#getNode()
+	 * @see #getSensor()
+	 * @generated
+	 */
+	EReference getSensor_Node();
 
 	/**
 	 * Returns the factory that creates the instances of the model.
@@ -670,6 +789,14 @@ public interface SagPackage extends EPackage {
 		 * @generated
 		 */
 		EReference GRAPH__NODE = eINSTANCE.getGraph_Node();
+
+		/**
+		 * The meta object literal for the '<em><b>Project</b></em>' container reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference GRAPH__PROJECT = eINSTANCE.getGraph_Project();
 
 		/**
 		 * The meta object literal for the '{@link org.supremica.external.sag.impl.ZoneImpl <em>Zone</em>}' class.
@@ -770,12 +897,20 @@ public interface SagPackage extends EPackage {
 		EClass NODE = eINSTANCE.getNode();
 
 		/**
-		 * The meta object literal for the '<em><b>Sensor</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Sensor</b></em>' reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute NODE__SENSOR = eINSTANCE.getNode_Sensor();
+		EReference NODE__SENSOR = eINSTANCE.getNode_Sensor();
+
+		/**
+		 * The meta object literal for the '<em><b>Sensor Name</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute NODE__SENSOR_NAME = eINSTANCE.getNode_SensorName();
 
 		/**
 		 * The meta object literal for the '<em><b>Graph</b></em>' container reference feature.
@@ -786,7 +921,7 @@ public interface SagPackage extends EPackage {
 		EReference NODE__GRAPH = eINSTANCE.getNode_Graph();
 
 		/**
-		 * The meta object literal for the '<em><b>Incoming</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Incoming</b></em>' reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
@@ -794,7 +929,7 @@ public interface SagPackage extends EPackage {
 		EReference NODE__INCOMING = eINSTANCE.getNode_Incoming();
 
 		/**
-		 * The meta object literal for the '<em><b>Outgoing</b></em>' reference feature.
+		 * The meta object literal for the '<em><b>Outgoing</b></em>' reference list feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
@@ -818,6 +953,32 @@ public interface SagPackage extends EPackage {
 		 * @generated
 		 */
 		EReference PROJECT__GRAPH = eINSTANCE.getProject_Graph();
+
+		/**
+		 * The meta object literal for the '<em><b>Sensor</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference PROJECT__SENSOR = eINSTANCE.getProject_Sensor();
+
+		/**
+		 * The meta object literal for the '{@link org.supremica.external.sag.impl.SensorImpl <em>Sensor</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.supremica.external.sag.impl.SensorImpl
+		 * @see org.supremica.external.sag.impl.SagPackageImpl#getSensor()
+		 * @generated
+		 */
+		EClass SENSOR = eINSTANCE.getSensor();
+
+		/**
+		 * The meta object literal for the '<em><b>Node</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference SENSOR__NODE = eINSTANCE.getSensor_Node();
 
 	}
 

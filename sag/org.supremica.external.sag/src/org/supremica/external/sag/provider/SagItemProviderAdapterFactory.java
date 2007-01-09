@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagItemProviderAdapterFactory.java,v 1.1 2006-12-18 15:23:00 torda Exp $
+ * $Id: SagItemProviderAdapterFactory.java,v 1.2 2007-01-09 15:31:07 torda Exp $
  */
 package org.supremica.external.sag.provider;
 
@@ -186,6 +186,28 @@ public class SagItemProviderAdapterFactory extends SagAdapterFactory implements 
 	}
 
 	/**
+	 * This keeps track of the one adapter used for all {@link org.supremica.external.sag.Sensor} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected SensorItemProvider sensorItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.supremica.external.sag.Sensor}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createSensorAdapter() {
+		if (sensorItemProvider == null) {
+			sensorItemProvider = new SensorItemProvider(this);
+		}
+
+		return sensorItemProvider;
+	}
+
+	/**
 	 * This returns the root adapter factory that contains this factory.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -286,6 +308,7 @@ public class SagItemProviderAdapterFactory extends SagAdapterFactory implements 
 		if (unboundedZoneItemProvider != null) unboundedZoneItemProvider.dispose();
 		if (nodeItemProvider != null) nodeItemProvider.dispose();
 		if (projectItemProvider != null) projectItemProvider.dispose();
+		if (sensorItemProvider != null) sensorItemProvider.dispose();
 	}
 
 }

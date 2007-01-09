@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: Graph.java,v 1.1 2006-12-18 15:23:00 torda Exp $
+ * $Id: Graph.java,v 1.2 2007-01-09 15:31:07 torda Exp $
  */
 package org.supremica.external.sag;
 
@@ -19,6 +19,7 @@ import org.eclipse.emf.common.util.EList;
  *   <li>{@link org.supremica.external.sag.Graph#getZone <em>Zone</em>}</li>
  *   <li>{@link org.supremica.external.sag.Graph#isMultipleObjects <em>Multiple Objects</em>}</li>
  *   <li>{@link org.supremica.external.sag.Graph#getNode <em>Node</em>}</li>
+ *   <li>{@link org.supremica.external.sag.Graph#getProject <em>Project</em>}</li>
  * </ul>
  * </p>
  *
@@ -86,5 +87,33 @@ public interface Graph extends Named {
 	 * @generated
 	 */
 	EList<Node> getNode();
+
+	/**
+	 * Returns the value of the '<em><b>Project</b></em>' container reference.
+	 * It is bidirectional and its opposite is '{@link org.supremica.external.sag.Project#getGraph <em>Graph</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Project</em>' container reference isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Project</em>' container reference.
+	 * @see #setProject(Project)
+	 * @see org.supremica.external.sag.SagPackage#getGraph_Project()
+	 * @see org.supremica.external.sag.Project#getGraph
+	 * @model opposite="graph"
+	 * @generated
+	 */
+	Project getProject();
+
+	/**
+	 * Sets the value of the '{@link org.supremica.external.sag.Graph#getProject <em>Project</em>}' container reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Project</em>' container reference.
+	 * @see #getProject()
+	 * @generated
+	 */
+	void setProject(Project value);
 
 } // Graph

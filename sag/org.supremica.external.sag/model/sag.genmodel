@@ -12,6 +12,7 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference sag.ecore#//Graph/zone"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sag.ecore#//Graph/multipleObjects"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference sag.ecore#//Graph/node"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference sag.ecore#//Graph/project"/>
     </genClasses>
     <genClasses image="false" ecoreClass="sag.ecore#//Zone">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sag.ecore#//Zone/front"/>
@@ -28,13 +29,18 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sag.ecore#//UnboundedZone/isOutside"/>
     </genClasses>
     <genClasses image="false" ecoreClass="sag.ecore#//Node">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EAttribute sag.ecore#//Node/sensor"/>
       <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference sag.ecore#//Node/graph"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sag.ecore#//Node/incoming"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sag.ecore#//Node/outgoing"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sag.ecore#//Node/sensor"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sag.ecore#//Node/sensorName"/>
     </genClasses>
     <genClasses ecoreClass="sag.ecore#//Project">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference sag.ecore#//Project/graph"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference sag.ecore#//Project/sensor"/>
+    </genClasses>
+    <genClasses ecoreClass="sag.ecore#//Sensor">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sag.ecore#//Sensor/node"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

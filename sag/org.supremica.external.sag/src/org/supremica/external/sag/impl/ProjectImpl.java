@@ -2,12 +2,13 @@
  * <copyright>
  * </copyright>
  *
- * $Id: ProjectImpl.java,v 1.1 2006-12-18 15:23:00 torda Exp $
+ * $Id: ProjectImpl.java,v 1.2 2007-01-09 15:31:07 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
 import java.util.Collection;
 
+import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 
 import org.eclipse.emf.common.util.EList;
@@ -15,12 +16,15 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 
+import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.ecore.util.EObjectContainmentWithInverseEList;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.supremica.external.sag.Graph;
 import org.supremica.external.sag.Project;
 import org.supremica.external.sag.SagPackage;
+import org.supremica.external.sag.Sensor;
 
 /**
  * <!-- begin-user-doc -->
@@ -30,6 +34,7 @@ import org.supremica.external.sag.SagPackage;
  * The following features are implemented:
  * <ul>
  *   <li>{@link org.supremica.external.sag.impl.ProjectImpl#getGraph <em>Graph</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.ProjectImpl#getSensor <em>Sensor</em>}</li>
  * </ul>
  * </p>
  *
@@ -45,6 +50,16 @@ public class ProjectImpl extends NamedImpl implements Project {
 	 * @ordered
 	 */
 	protected EList<Graph> graph = null;
+
+	/**
+	 * The cached value of the '{@link #getSensor() <em>Sensor</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getSensor()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Sensor> sensor = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -72,9 +87,36 @@ public class ProjectImpl extends NamedImpl implements Project {
 	 */
 	public EList<Graph> getGraph() {
 		if (graph == null) {
-			graph = new EObjectContainmentEList<Graph>(Graph.class, this, SagPackage.PROJECT__GRAPH);
+			graph = new EObjectContainmentWithInverseEList<Graph>(Graph.class, this, SagPackage.PROJECT__GRAPH, SagPackage.GRAPH__PROJECT);
 		}
 		return graph;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<Sensor> getSensor() {
+		if (sensor == null) {
+			sensor = new EObjectContainmentEList<Sensor>(Sensor.class, this, SagPackage.PROJECT__SENSOR);
+		}
+		return sensor;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
+		switch (featureID) {
+			case SagPackage.PROJECT__GRAPH:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getGraph()).basicAdd(otherEnd, msgs);
+		}
+		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
 
 	/**
@@ -87,6 +129,8 @@ public class ProjectImpl extends NamedImpl implements Project {
 		switch (featureID) {
 			case SagPackage.PROJECT__GRAPH:
 				return ((InternalEList<?>)getGraph()).basicRemove(otherEnd, msgs);
+			case SagPackage.PROJECT__SENSOR:
+				return ((InternalEList<?>)getSensor()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -101,6 +145,8 @@ public class ProjectImpl extends NamedImpl implements Project {
 		switch (featureID) {
 			case SagPackage.PROJECT__GRAPH:
 				return getGraph();
+			case SagPackage.PROJECT__SENSOR:
+				return getSensor();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -118,6 +164,10 @@ public class ProjectImpl extends NamedImpl implements Project {
 				getGraph().clear();
 				getGraph().addAll((Collection<? extends Graph>)newValue);
 				return;
+			case SagPackage.PROJECT__SENSOR:
+				getSensor().clear();
+				getSensor().addAll((Collection<? extends Sensor>)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -133,6 +183,9 @@ public class ProjectImpl extends NamedImpl implements Project {
 			case SagPackage.PROJECT__GRAPH:
 				getGraph().clear();
 				return;
+			case SagPackage.PROJECT__SENSOR:
+				getSensor().clear();
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -147,6 +200,8 @@ public class ProjectImpl extends NamedImpl implements Project {
 		switch (featureID) {
 			case SagPackage.PROJECT__GRAPH:
 				return graph != null && !graph.isEmpty();
+			case SagPackage.PROJECT__SENSOR:
+				return sensor != null && !sensor.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

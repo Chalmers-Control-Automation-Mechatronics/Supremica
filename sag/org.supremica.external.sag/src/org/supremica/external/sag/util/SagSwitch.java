@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagSwitch.java,v 1.1 2006-12-18 15:23:00 torda Exp $
+ * $Id: SagSwitch.java,v 1.2 2007-01-09 15:31:07 torda Exp $
  */
 package org.supremica.external.sag.util;
 
@@ -133,6 +133,13 @@ public class SagSwitch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
+			case SagPackage.SENSOR: {
+				Sensor sensor = (Sensor)theEObject;
+				T result = caseSensor(sensor);
+				if (result == null) result = caseNamed(sensor);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
 			default: return defaultCase(theEObject);
 		}
 	}
@@ -239,6 +246,21 @@ public class SagSwitch<T> {
 	 * @generated
 	 */
 	public T caseProject(Project object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpretting the object as an instance of '<em>Sensor</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpretting the object as an instance of '<em>Sensor</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseSensor(Sensor object) {
 		return null;
 	}
 
