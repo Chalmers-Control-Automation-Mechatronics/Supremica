@@ -509,12 +509,15 @@ Main-Class: org.supremica.apps.Supremica
 Class-Path: ${manifest.pathlist}</echo>
 </target>
 
-<target name="jar_supremica" depends="downloads_supremica">
+<target name="copy_watersxmlfiles_into_build">
   <copy file="${waters.xsl}/vw.xsl"
         todir="${build}/net/sourceforge/waters/valid"/>
   <copy todir="${build}/net/sourceforge/waters/model/marshaller">
     <fileset dir="${waters.xsd}" includes="*.xsd"/>
   </copy>
+</target>
+
+<target name="jar_supremica" depends="downloads_supremica,copy_watersxmlfiles_into_build">
   <jar jarfile="${dist}/Supremica.jar" manifest="${build}/manifest.txt"> 
     <fileset dir="${build}"/>
     <fileset dir="${images}"/>
