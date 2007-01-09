@@ -73,6 +73,7 @@ public class Actions
 
     // Analyzer experimental
     public IDEAction analyzerPlantifyAction = new AnalyzerPlantifyAction(allActions);    
+    public IDEAction analyzerExperimentAction = new AnalyzerExperimentAction(allActions);    
 
     // Examples Actions
     public IDEAction toolsTestCasesAction = new ToolsTestCasesAction(allActions);

@@ -67,6 +67,7 @@ class AnalyzerPopupMenu
         if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.get())
         {
             addSeparator();
+            add(ide.getActions().analyzerExperimentAction.getMenuItem());
         }
 }
 }
