@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorAddEventAction
 //###########################################################################
-//# $Id: EditorAddComponentEventAction.java,v 1.2 2006-09-23 18:24:51 robi Exp $
+//# $Id: EditorAddComponentEventAction.java,v 1.3 2007-01-11 16:11:52 flordal Exp $
 //###########################################################################
 
 
@@ -24,36 +24,37 @@ import org.supremica.gui.ide.IDE;
 
 
 public class EditorAddComponentEventAction
-	extends IDEAction
+    extends IDEAction
 {
-	private static final long serialVersionUID = 1L;
-
-	public EditorAddComponentEventAction(List<IDEAction> actionList)
-	{
-		super(actionList);
-
-		setEditorActiveRequired(true);
-
-		putValue(Action.NAME, "New Component Event...");
-		putValue(Action.SHORT_DESCRIPTION, "Add a new event to the component");
-		putValue(Action.SMALL_ICON,
-				 new ImageIcon(IDE.class.getResource("/icons/waters/event16.gif")));
-		putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
-		putValue(Action.ACTION_COMMAND_KEY,
-				 ControlledSurface.Tool.EVENT.toString());
-	}
-
-	public void actionPerformed(ActionEvent e)
-	{
-		doAction();
-	}
-
-	public void doAction()
-	{
-		final EditorWindowInterface handler =
-			ide.getActiveEditorWindowInterface();
-		if (handler != null) {
-			handler.createEvent();
-		}
-	}
+    private static final long serialVersionUID = 1L;
+    
+    public EditorAddComponentEventAction(List<IDEAction> actionList)
+    {
+        super(actionList);
+        
+        setEditorActiveRequired(true);
+        
+        putValue(Action.NAME, "New Component Event...");
+        putValue(Action.SHORT_DESCRIPTION, "Add a new event to the component");
+        putValue(Action.SMALL_ICON,
+            new ImageIcon(IDE.class.getResource("/icons/waters/event16.gif")));
+        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
+        putValue(Action.ACTION_COMMAND_KEY,
+            ControlledSurface.Tool.EVENT.toString());
+    }
+    
+    public void actionPerformed(ActionEvent e)
+    {
+        doAction();
+    }
+    
+    public void doAction()
+    {
+        final EditorWindowInterface handler =
+            ide.getActiveEditorWindowInterface();
+        if (handler != null)
+        {
+            handler.createEvent();
+        }
+    }
 }

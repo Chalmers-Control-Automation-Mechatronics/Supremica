@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   MainPanel
 //###########################################################################
-//# $Id: MainPanel.java,v 1.27 2007-01-04 13:50:09 flordal Exp $
+//# $Id: MainPanel.java,v 1.28 2007-01-11 16:11:52 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -34,7 +34,6 @@ import org.supremica.log.*;
 
 import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.ide.actions.Actions;
-
 
 abstract class MainPanel
     extends JPanel
@@ -70,7 +69,7 @@ abstract class MainPanel
         constraints.anchor = GridBagConstraints.NORTH;
         constraints.weightx = 1.0;
         constraints.fill = GridBagConstraints.BOTH;
-    }   
+    }
     
     //######################################################################
     //# Interface net.sourceforge.waters.gui.ModuleWindowInterface

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.49 2006-11-03 15:01:57 torda Exp $
+//# $Id: ModuleContainer.java,v 1.50 2007-01-11 16:11:52 flordal Exp $
 //###########################################################################
 
 
@@ -21,6 +21,7 @@ import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JToolBar;
+import javax.swing.JOptionPane;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.CompoundEdit;
@@ -63,8 +64,6 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.Automata;
 import org.supremica.gui.VisualProject;
 import org.supremica.gui.ide.actions.Actions;
-
-import javax.swing.JOptionPane;
 
 
 public class ModuleContainer implements UndoInterface
