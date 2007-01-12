@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: ZoneTest.java,v 1.1 2006-12-18 15:26:16 torda Exp $
+ * $Id: ZoneTest.java,v 1.2 2007-01-12 14:33:46 torda Exp $
  */
 package org.supremica.external.sag.tests;
 
@@ -16,15 +16,7 @@ import org.supremica.external.sag.Zone;
  * <!-- end-user-doc -->
  * @generated
  */
-public abstract class ZoneTest extends TestCase {
-	/**
-	 * The fixture for this Zone test case.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected Zone fixture = null;
-
+public abstract class ZoneTest extends NamedTest {
 	/**
 	 * Constructs a new Zone test case with the given name.
 	 * <!-- begin-user-doc -->
@@ -36,23 +28,13 @@ public abstract class ZoneTest extends TestCase {
 	}
 
 	/**
-	 * Sets the fixture for this Zone test case.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected void setFixture(Zone fixture) {
-		this.fixture = fixture;
-	}
-
-	/**
 	 * Returns the fixture for this Zone test case.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	private Zone getFixture() {
-		return fixture;
+		return (Zone)fixture;
 	}
 
 } //ZoneTest

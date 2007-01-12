@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagAllTests.java,v 1.1 2006-12-18 15:26:16 torda Exp $
+ * $Id: SagAllTests.java,v 1.2 2007-01-12 14:33:46 torda Exp $
  */
 package org.supremica.external.sag.tests;
 
@@ -34,6 +34,7 @@ public class SagAllTests extends TestSuite {
 	 */
 	public static Test suite() {
 		TestSuite suite = new SagAllTests("Sag Tests");
+		suite.addTest(SagTests.suite());
 		return suite;
 	}
 
