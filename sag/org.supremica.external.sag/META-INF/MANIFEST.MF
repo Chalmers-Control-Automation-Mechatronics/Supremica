@@ -8,7 +8,6 @@ Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Export-Package: org.supremica.external.sag,
  org.supremica.external.sag.impl,
- org.supremica.external.sag.provider,
  org.supremica.external.sag.util
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf.ecore;visibility:=reexport,
