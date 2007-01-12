@@ -32,7 +32,12 @@ public class SagCreationWizard extends Wizard implements INewWizard {
 	/**
 	 * @generated
 	 */
-	protected SagCreationWizardPage page;
+	protected SagCreationWizardPage diagramModelFilePage;
+
+	/**
+	 * @generated
+	 */
+	protected SagCreationWizardPage domainModelFilePage;
 
 	/**
 	 * @generated
@@ -96,10 +101,19 @@ public class SagCreationWizard extends Wizard implements INewWizard {
 	 * @generated
 	 */
 	public void addPages() {
-		page = new SagCreationWizardPage("CreationWizardPage", getSelection()); //$NON-NLS-1$
-		page.setTitle("Create Sag Diagram");
-		page.setDescription("Create a new Sag diagram.");
-		addPage(page);
+		diagramModelFilePage = new SagCreationWizardPage(
+				"DiagramModelFile", getSelection(), "sag_diagram"); //$NON-NLS-1$ //$NON-NLS-2$
+		diagramModelFilePage.setTitle("Create Sag Diagram");
+		diagramModelFilePage
+				.setDescription("Select file that will contain diagram model.");
+		addPage(diagramModelFilePage);
+
+		domainModelFilePage = new SagCreationWizardPage(
+				"DomainModelFile", getSelection(), "sag"); //$NON-NLS-1$ //$NON-NLS-2$
+		domainModelFilePage.setTitle("Create Sag Diagram");
+		domainModelFilePage
+				.setDescription("Select file that will contain domain model.");
+		addPage(domainModelFilePage);
 	}
 
 	/**
@@ -110,8 +124,9 @@ public class SagCreationWizard extends Wizard implements INewWizard {
 
 			protected void execute(IProgressMonitor monitor)
 					throws CoreException, InterruptedException {
-				diagram = SagDiagramEditorUtil.createDiagram(page
-						.getContainerFullPath(), page.getFileName(), monitor);
+				diagram = SagDiagramEditorUtil.createDiagram(
+						diagramModelFilePage.getURI(), domainModelFilePage
+								.getURI(), monitor);
 				if (isOpenNewlyCreatedDiagramEditor() && diagram != null) {
 					try {
 						SagDiagramEditorUtil.openDiagram(diagram);

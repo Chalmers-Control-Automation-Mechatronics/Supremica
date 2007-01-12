@@ -3,13 +3,12 @@ package org.supremica.external.sag.diagram.edit.parts;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
 import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.draw2d.IFigure;
-
 import org.eclipse.emf.common.notify.Notification;
 
 import org.eclipse.gef.EditPolicy;
 
-import org.eclipse.gmf.runtime.diagram.ui.editparts.ShapeCompartmentEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.ListCompartmentEditPart;
+import org.eclipse.gmf.runtime.diagram.ui.editparts.ShapeCompartmentEditPart;
 
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.CreationEditPolicy;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.DragDropEditPolicy;
@@ -30,7 +29,7 @@ public class GraphGraphCompartmentEditPart extends ShapeCompartmentEditPart {
 	/**
 	 * @generated
 	 */
-	public static final int VISUAL_ID = 5001;
+	public static final int VISUAL_ID = 7002;
 
 	/**
 	 * @generated
@@ -71,7 +70,6 @@ public class GraphGraphCompartmentEditPart extends ShapeCompartmentEditPart {
 				new DragDropEditPolicy());
 		installEditPolicy(EditPolicyRoles.CANONICAL_ROLE,
 				new GraphGraphCompartmentCanonicalEditPolicy());
-
 	}
 
 	/**

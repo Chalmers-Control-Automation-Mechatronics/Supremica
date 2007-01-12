@@ -10,26 +10,22 @@ import org.eclipse.gmf.runtime.notation.Diagram;
 import org.eclipse.gmf.runtime.notation.View;
 
 import org.supremica.external.sag.BoundedZone;
+import org.supremica.external.sag.EndNode;
 import org.supremica.external.sag.Graph;
-import org.supremica.external.sag.Node;
 import org.supremica.external.sag.Project;
 import org.supremica.external.sag.SagPackage;
+import org.supremica.external.sag.SensorNode;
 import org.supremica.external.sag.UnboundedZone;
 
-import org.supremica.external.sag.diagram.edit.parts.BoundedZone2EditPart;
-import org.supremica.external.sag.diagram.edit.parts.BoundedZoneCapacity2EditPart;
 import org.supremica.external.sag.diagram.edit.parts.BoundedZoneCapacityEditPart;
 import org.supremica.external.sag.diagram.edit.parts.BoundedZoneEditPart;
+import org.supremica.external.sag.diagram.edit.parts.EndNodeEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphGraphCompartmentEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphNameEditPart;
-import org.supremica.external.sag.diagram.edit.parts.Node2EditPart;
-import org.supremica.external.sag.diagram.edit.parts.NodeEditPart;
-import org.supremica.external.sag.diagram.edit.parts.NodeSensorEditPart;
 import org.supremica.external.sag.diagram.edit.parts.ProjectEditPart;
-import org.supremica.external.sag.diagram.edit.parts.UnboundedZone2EditPart;
-import org.supremica.external.sag.diagram.edit.parts.UnboundedZone3EditPart;
-import org.supremica.external.sag.diagram.edit.parts.UnboundedZone4EditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorNodeEditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorNodeSensorNameEditPart;
 import org.supremica.external.sag.diagram.edit.parts.UnboundedZoneEditPart;
 
 /**
@@ -119,7 +115,7 @@ public class SagVisualIDRegistry {
 			EClass domainElementMetaclass) {
 		if (SagPackage.eINSTANCE.getProject().isSuperTypeOf(
 				domainElementMetaclass)
-				&& isDiagramProject_79((Project) domainElement)) {
+				&& isDiagramProject_1000((Project) domainElement)) {
 			return ProjectEditPart.VISUAL_ID;
 		}
 		return getUnrecognizedDiagramID(domainElement);
@@ -167,51 +163,46 @@ public class SagVisualIDRegistry {
 			if (GraphGraphCompartmentEditPart.VISUAL_ID == nodeVisualID) {
 				return GraphGraphCompartmentEditPart.VISUAL_ID;
 			}
-			return getUnrecognizedGraph_1001ChildNodeID(domainElement,
+			return getUnrecognizedGraph_2010ChildNodeID(domainElement,
 					semanticHint);
-		case NodeEditPart.VISUAL_ID:
-			if (NodeSensorEditPart.VISUAL_ID == nodeVisualID) {
-				return NodeSensorEditPart.VISUAL_ID;
+		case SensorNodeEditPart.VISUAL_ID:
+			if (SensorNodeSensorNameEditPart.VISUAL_ID == nodeVisualID) {
+				return SensorNodeSensorNameEditPart.VISUAL_ID;
 			}
-			return getUnrecognizedNode_2001ChildNodeID(domainElement,
+			return getUnrecognizedSensorNode_3006ChildNodeID(domainElement,
 					semanticHint);
-		case Node2EditPart.VISUAL_ID:
-			return getUnrecognizedNode_2002ChildNodeID(domainElement,
+		case EndNodeEditPart.VISUAL_ID:
+			return getUnrecognizedEndNode_3007ChildNodeID(domainElement,
 					semanticHint);
 		case GraphGraphCompartmentEditPart.VISUAL_ID:
-			if ((semanticHint == null || NodeEditPart.VISUAL_ID == nodeVisualID)
-					&& SagPackage.eINSTANCE.getNode().isSuperTypeOf(
+			if ((semanticHint == null || SensorNodeEditPart.VISUAL_ID == nodeVisualID)
+					&& SagPackage.eINSTANCE.getSensorNode().isSuperTypeOf(
 							domainElementMetaclass)
-					&& (domainElement == null || isNodeNode_2001((Node) domainElement))) {
-				return NodeEditPart.VISUAL_ID;
+					&& (domainElement == null || isNodeSensorNode_3006((SensorNode) domainElement))) {
+				return SensorNodeEditPart.VISUAL_ID;
 			}
-			if ((semanticHint == null || Node2EditPart.VISUAL_ID == nodeVisualID)
-					&& SagPackage.eINSTANCE.getNode().isSuperTypeOf(
+			if ((semanticHint == null || EndNodeEditPart.VISUAL_ID == nodeVisualID)
+					&& SagPackage.eINSTANCE.getEndNode().isSuperTypeOf(
 							domainElementMetaclass)
-					&& (domainElement == null || isNodeNode_2002((Node) domainElement))) {
-				return Node2EditPart.VISUAL_ID;
+					&& (domainElement == null || isNodeEndNode_3007((EndNode) domainElement))) {
+				return EndNodeEditPart.VISUAL_ID;
 			}
-			return getUnrecognizedGraphGraphCompartment_5001ChildNodeID(
+			return getUnrecognizedGraphGraphCompartment_7002ChildNodeID(
 					domainElement, semanticHint);
 		case ProjectEditPart.VISUAL_ID:
 			if ((semanticHint == null || GraphEditPart.VISUAL_ID == nodeVisualID)
 					&& SagPackage.eINSTANCE.getGraph().isSuperTypeOf(
 							domainElementMetaclass)
-					&& (domainElement == null || isNodeGraph_1001((Graph) domainElement))) {
+					&& (domainElement == null || isNodeGraph_2010((Graph) domainElement))) {
 				return GraphEditPart.VISUAL_ID;
 			}
-			return getUnrecognizedProject_79ChildNodeID(domainElement,
+			return getUnrecognizedProject_1000ChildNodeID(domainElement,
 					semanticHint);
 		case BoundedZoneEditPart.VISUAL_ID:
 			if (BoundedZoneCapacityEditPart.VISUAL_ID == nodeVisualID) {
 				return BoundedZoneCapacityEditPart.VISUAL_ID;
 			}
-			return getUnrecognizedBoundedZone_3001LinkLabelID(semanticHint);
-		case BoundedZone2EditPart.VISUAL_ID:
-			if (BoundedZoneCapacity2EditPart.VISUAL_ID == nodeVisualID) {
-				return BoundedZoneCapacity2EditPart.VISUAL_ID;
-			}
-			return getUnrecognizedBoundedZone_3002LinkLabelID(semanticHint);
+			return getUnrecognizedBoundedZone_4007LinkLabelID(semanticHint);
 		}
 		return -1;
 	}
@@ -234,28 +225,12 @@ public class SagVisualIDRegistry {
 			EClass domainElementMetaclass) {
 		if (SagPackage.eINSTANCE.getBoundedZone().isSuperTypeOf(
 				domainElementMetaclass)
-				&& (domainElement == null || isLinkWithClassBoundedZone_3001((BoundedZone) domainElement))) {
+				&& (domainElement == null || isLinkWithClassBoundedZone_4007((BoundedZone) domainElement))) {
 			return BoundedZoneEditPart.VISUAL_ID;
-		} else if (SagPackage.eINSTANCE.getBoundedZone().isSuperTypeOf(
-				domainElementMetaclass)
-				&& (domainElement == null || isLinkWithClassBoundedZone_3002((BoundedZone) domainElement))) {
-			return BoundedZone2EditPart.VISUAL_ID;
 		} else if (SagPackage.eINSTANCE.getUnboundedZone().isSuperTypeOf(
 				domainElementMetaclass)
-				&& (domainElement == null || isLinkWithClassUnboundedZone_3003((UnboundedZone) domainElement))) {
+				&& (domainElement == null || isLinkWithClassUnboundedZone_4009((UnboundedZone) domainElement))) {
 			return UnboundedZoneEditPart.VISUAL_ID;
-		} else if (SagPackage.eINSTANCE.getUnboundedZone().isSuperTypeOf(
-				domainElementMetaclass)
-				&& (domainElement == null || isLinkWithClassUnboundedZone_3004((UnboundedZone) domainElement))) {
-			return UnboundedZone2EditPart.VISUAL_ID;
-		} else if (SagPackage.eINSTANCE.getUnboundedZone().isSuperTypeOf(
-				domainElementMetaclass)
-				&& (domainElement == null || isLinkWithClassUnboundedZone_3005((UnboundedZone) domainElement))) {
-			return UnboundedZone3EditPart.VISUAL_ID;
-		} else if (SagPackage.eINSTANCE.getUnboundedZone().isSuperTypeOf(
-				domainElementMetaclass)
-				&& (domainElement == null || isLinkWithClassUnboundedZone_3006((UnboundedZone) domainElement))) {
-			return UnboundedZone4EditPart.VISUAL_ID;
 		} else {
 			return getUnrecognizedLinkWithClassID(domainElement);
 		}
@@ -267,7 +242,7 @@ public class SagVisualIDRegistry {
 	 *
 	 * @generated
 	 */
-	private static boolean isDiagramProject_79(Project element) {
+	private static boolean isDiagramProject_1000(Project element) {
 		return true;
 	}
 
@@ -287,7 +262,7 @@ public class SagVisualIDRegistry {
 	 *
 	 * @generated
 	 */
-	private static boolean isNodeGraph_1001(Graph element) {
+	private static boolean isNodeGraph_2010(Graph element) {
 		return true;
 	}
 
@@ -297,7 +272,7 @@ public class SagVisualIDRegistry {
 	 *
 	 * @generated
 	 */
-	private static boolean isNodeNode_2001(Node element) {
+	private static boolean isNodeSensorNode_3006(SensorNode element) {
 		return true;
 	}
 
@@ -307,7 +282,7 @@ public class SagVisualIDRegistry {
 	 *
 	 * @generated
 	 */
-	private static boolean isNodeNode_2002(Node element) {
+	private static boolean isNodeEndNode_3007(EndNode element) {
 		return true;
 	}
 
@@ -317,7 +292,7 @@ public class SagVisualIDRegistry {
 	 *
 	 * @generated
 	 */
-	private static int getUnrecognizedGraph_1001ChildNodeID(
+	private static int getUnrecognizedGraph_2010ChildNodeID(
 			EObject domainElement, String semanticHint) {
 		return -1;
 	}
@@ -328,7 +303,7 @@ public class SagVisualIDRegistry {
 	 *
 	 * @generated
 	 */
-	private static int getUnrecognizedNode_2001ChildNodeID(
+	private static int getUnrecognizedSensorNode_3006ChildNodeID(
 			EObject domainElement, String semanticHint) {
 		return -1;
 	}
@@ -339,7 +314,7 @@ public class SagVisualIDRegistry {
 	 *
 	 * @generated
 	 */
-	private static int getUnrecognizedNode_2002ChildNodeID(
+	private static int getUnrecognizedEndNode_3007ChildNodeID(
 			EObject domainElement, String semanticHint) {
 		return -1;
 	}
@@ -350,7 +325,7 @@ public class SagVisualIDRegistry {
 	 *
 	 * @generated
 	 */
-	private static int getUnrecognizedGraphGraphCompartment_5001ChildNodeID(
+	private static int getUnrecognizedGraphGraphCompartment_7002ChildNodeID(
 			EObject domainElement, String semanticHint) {
 		return -1;
 	}
@@ -361,7 +336,7 @@ public class SagVisualIDRegistry {
 	 *
 	 * @generated
 	 */
-	private static int getUnrecognizedProject_79ChildNodeID(
+	private static int getUnrecognizedProject_1000ChildNodeID(
 			EObject domainElement, String semanticHint) {
 		return -1;
 	}
@@ -372,18 +347,7 @@ public class SagVisualIDRegistry {
 	 *
 	 * @generated
 	 */
-	private static int getUnrecognizedBoundedZone_3001LinkLabelID(
-			String semanticHint) {
-		return -1;
-	}
-
-	/**
-	 * User can change implementation of this method to handle some specific
-	 * situations not covered by default logic.
-	 *
-	 * @generated
-	 */
-	private static int getUnrecognizedBoundedZone_3002LinkLabelID(
+	private static int getUnrecognizedBoundedZone_4007LinkLabelID(
 			String semanticHint) {
 		return -1;
 	}
@@ -404,7 +368,7 @@ public class SagVisualIDRegistry {
 	 *
 	 * @generated
 	 */
-	private static boolean isLinkWithClassBoundedZone_3001(BoundedZone element) {
+	private static boolean isLinkWithClassBoundedZone_4007(BoundedZone element) {
 		return true;
 	}
 
@@ -414,50 +378,7 @@ public class SagVisualIDRegistry {
 	 *
 	 * @generated
 	 */
-	private static boolean isLinkWithClassBoundedZone_3002(BoundedZone element) {
-		return true;
-	}
-
-	/**
-	 * User can change implementation of this method to check some additional 
-	 * conditions here.
-	 *
-	 * @generated
-	 */
-	private static boolean isLinkWithClassUnboundedZone_3003(
-			UnboundedZone element) {
-		return true;
-	}
-
-	/**
-	 * User can change implementation of this method to check some additional 
-	 * conditions here.
-	 *
-	 * @generated
-	 */
-	private static boolean isLinkWithClassUnboundedZone_3004(
-			UnboundedZone element) {
-		return true;
-	}
-
-	/**
-	 * User can change implementation of this method to check some additional 
-	 * conditions here.
-	 *
-	 * @generated
-	 */
-	private static boolean isLinkWithClassUnboundedZone_3005(
-			UnboundedZone element) {
-		return true;
-	}
-
-	/**
-	 * User can change implementation of this method to check some additional 
-	 * conditions here.
-	 *
-	 * @generated
-	 */
-	private static boolean isLinkWithClassUnboundedZone_3006(
+	private static boolean isLinkWithClassUnboundedZone_4009(
 			UnboundedZone element) {
 		return true;
 	}

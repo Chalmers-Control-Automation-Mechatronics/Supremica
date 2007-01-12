@@ -3,6 +3,7 @@ package org.supremica.external.sag.diagram.edit.policies;
 import java.util.List;
 import java.util.Collection;
 import org.eclipse.gmf.runtime.notation.Edge;
+import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EObject;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,15 +43,11 @@ import org.supremica.external.sag.Project;
 import org.supremica.external.sag.SagPackage;
 import org.supremica.external.sag.Zone;
 
-import org.supremica.external.sag.diagram.edit.parts.BoundedZone2EditPart;
 import org.supremica.external.sag.diagram.edit.parts.BoundedZoneEditPart;
+import org.supremica.external.sag.diagram.edit.parts.EndNodeEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphEditPart;
-import org.supremica.external.sag.diagram.edit.parts.Node2EditPart;
-import org.supremica.external.sag.diagram.edit.parts.NodeEditPart;
 import org.supremica.external.sag.diagram.edit.parts.ProjectEditPart;
-import org.supremica.external.sag.diagram.edit.parts.UnboundedZone2EditPart;
-import org.supremica.external.sag.diagram.edit.parts.UnboundedZone3EditPart;
-import org.supremica.external.sag.diagram.edit.parts.UnboundedZone4EditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorNodeEditPart;
 import org.supremica.external.sag.diagram.edit.parts.UnboundedZoneEditPart;
 
 import org.supremica.external.sag.diagram.part.SagVisualIDRegistry;
@@ -205,8 +202,8 @@ public class ProjectCanonicalEditPolicy extends CanonicalConnectionEditPolicy {
 		int diagramElementVisualID = SagVisualIDRegistry.getVisualID(view);
 		switch (diagramElementVisualID) {
 		case GraphEditPart.VISUAL_ID:
-		case NodeEditPart.VISUAL_ID:
-		case Node2EditPart.VISUAL_ID:
+		case SensorNodeEditPart.VISUAL_ID:
+		case EndNodeEditPart.VISUAL_ID:
 		case ProjectEditPart.VISUAL_ID: {
 			myEObject2ViewMap.put(modelElement, view);
 			storeLinks(modelElement, getDiagram());
@@ -289,22 +286,15 @@ public class ProjectCanonicalEditPolicy extends CanonicalConnectionEditPolicy {
 	 */
 	private void storeTypeModelFacetLinks(EObject container,
 			EClass containerMetaclass) {
-		storeTypeModelFacetLinks_BoundedZone_3001(container, containerMetaclass);
-		storeTypeModelFacetLinks_BoundedZone_3002(container, containerMetaclass);
-		storeTypeModelFacetLinks_UnboundedZone_3003(container,
-				containerMetaclass);
-		storeTypeModelFacetLinks_UnboundedZone_3004(container,
-				containerMetaclass);
-		storeTypeModelFacetLinks_UnboundedZone_3005(container,
-				containerMetaclass);
-		storeTypeModelFacetLinks_UnboundedZone_3006(container,
+		storeTypeModelFacetLinks_BoundedZone_4007(container, containerMetaclass);
+		storeTypeModelFacetLinks_UnboundedZone_4009(container,
 				containerMetaclass);
 	}
 
 	/**
 	 * @generated
 	 */
-	private void storeTypeModelFacetLinks_BoundedZone_3001(EObject container,
+	private void storeTypeModelFacetLinks_BoundedZone_4007(EObject container,
 			EClass containerMetaclass) {
 		if (SagPackage.eINSTANCE.getGraph().isSuperTypeOf(containerMetaclass)) {
 			for (Iterator values = ((Graph) container).getZone().iterator(); values
@@ -332,35 +322,7 @@ public class ProjectCanonicalEditPolicy extends CanonicalConnectionEditPolicy {
 	/**
 	 * @generated
 	 */
-	private void storeTypeModelFacetLinks_BoundedZone_3002(EObject container,
-			EClass containerMetaclass) {
-		if (SagPackage.eINSTANCE.getGraph().isSuperTypeOf(containerMetaclass)) {
-			for (Iterator values = ((Graph) container).getZone().iterator(); values
-					.hasNext();) {
-				EObject nextValue = ((EObject) values.next());
-				int linkVID = SagVisualIDRegistry
-						.getLinkWithClassVisualID(nextValue);
-				if (BoundedZone2EditPart.VISUAL_ID == linkVID) {
-					Object structuralFeatureResult = ((Zone) nextValue)
-							.getFront();
-					if (structuralFeatureResult instanceof EObject) {
-						EObject dst = (EObject) structuralFeatureResult;
-						structuralFeatureResult = ((Zone) nextValue).getBack();
-						if (structuralFeatureResult instanceof EObject) {
-							EObject src = (EObject) structuralFeatureResult;
-							myLinkDescriptors.add(new LinkDescriptor(src, dst,
-									nextValue, linkVID));
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * @generated
-	 */
-	private void storeTypeModelFacetLinks_UnboundedZone_3003(EObject container,
+	private void storeTypeModelFacetLinks_UnboundedZone_4009(EObject container,
 			EClass containerMetaclass) {
 		if (SagPackage.eINSTANCE.getGraph().isSuperTypeOf(containerMetaclass)) {
 			for (Iterator values = ((Graph) container).getZone().iterator(); values
@@ -369,90 +331,6 @@ public class ProjectCanonicalEditPolicy extends CanonicalConnectionEditPolicy {
 				int linkVID = SagVisualIDRegistry
 						.getLinkWithClassVisualID(nextValue);
 				if (UnboundedZoneEditPart.VISUAL_ID == linkVID) {
-					Object structuralFeatureResult = ((Zone) nextValue)
-							.getFront();
-					if (structuralFeatureResult instanceof EObject) {
-						EObject dst = (EObject) structuralFeatureResult;
-						structuralFeatureResult = ((Zone) nextValue).getBack();
-						if (structuralFeatureResult instanceof EObject) {
-							EObject src = (EObject) structuralFeatureResult;
-							myLinkDescriptors.add(new LinkDescriptor(src, dst,
-									nextValue, linkVID));
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * @generated
-	 */
-	private void storeTypeModelFacetLinks_UnboundedZone_3004(EObject container,
-			EClass containerMetaclass) {
-		if (SagPackage.eINSTANCE.getGraph().isSuperTypeOf(containerMetaclass)) {
-			for (Iterator values = ((Graph) container).getZone().iterator(); values
-					.hasNext();) {
-				EObject nextValue = ((EObject) values.next());
-				int linkVID = SagVisualIDRegistry
-						.getLinkWithClassVisualID(nextValue);
-				if (UnboundedZone2EditPart.VISUAL_ID == linkVID) {
-					Object structuralFeatureResult = ((Zone) nextValue)
-							.getFront();
-					if (structuralFeatureResult instanceof EObject) {
-						EObject dst = (EObject) structuralFeatureResult;
-						structuralFeatureResult = ((Zone) nextValue).getBack();
-						if (structuralFeatureResult instanceof EObject) {
-							EObject src = (EObject) structuralFeatureResult;
-							myLinkDescriptors.add(new LinkDescriptor(src, dst,
-									nextValue, linkVID));
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * @generated
-	 */
-	private void storeTypeModelFacetLinks_UnboundedZone_3005(EObject container,
-			EClass containerMetaclass) {
-		if (SagPackage.eINSTANCE.getGraph().isSuperTypeOf(containerMetaclass)) {
-			for (Iterator values = ((Graph) container).getZone().iterator(); values
-					.hasNext();) {
-				EObject nextValue = ((EObject) values.next());
-				int linkVID = SagVisualIDRegistry
-						.getLinkWithClassVisualID(nextValue);
-				if (UnboundedZone3EditPart.VISUAL_ID == linkVID) {
-					Object structuralFeatureResult = ((Zone) nextValue)
-							.getFront();
-					if (structuralFeatureResult instanceof EObject) {
-						EObject dst = (EObject) structuralFeatureResult;
-						structuralFeatureResult = ((Zone) nextValue).getBack();
-						if (structuralFeatureResult instanceof EObject) {
-							EObject src = (EObject) structuralFeatureResult;
-							myLinkDescriptors.add(new LinkDescriptor(src, dst,
-									nextValue, linkVID));
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * @generated
-	 */
-	private void storeTypeModelFacetLinks_UnboundedZone_3006(EObject container,
-			EClass containerMetaclass) {
-		if (SagPackage.eINSTANCE.getGraph().isSuperTypeOf(containerMetaclass)) {
-			for (Iterator values = ((Graph) container).getZone().iterator(); values
-					.hasNext();) {
-				EObject nextValue = ((EObject) values.next());
-				int linkVID = SagVisualIDRegistry
-						.getLinkWithClassVisualID(nextValue);
-				if (UnboundedZone4EditPart.VISUAL_ID == linkVID) {
 					Object structuralFeatureResult = ((Zone) nextValue)
 							.getFront();
 					if (structuralFeatureResult instanceof EObject) {
@@ -586,5 +464,11 @@ public class ProjectCanonicalEditPolicy extends CanonicalConnectionEditPolicy {
 			return mySemanticAdapter;
 		}
 	}
+
+	//bugfix, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=148021
+	//Does not work, await 2.0M5
+	//protected boolean shouldHandleNotificationEvent(Notification event) {
+	//	return false;
+	//}
 
 }

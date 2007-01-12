@@ -7,22 +7,8 @@
       name="Default">
     <figures
         xsi:type="gmfgraph:PolylineConnection"
-        referencingElements="TwowayZone TwowayOutsideZone"
-        name="TwowayZoneFigure"/>
-    <figures
-        xsi:type="gmfgraph:PolylineConnection"
-        referencingElements="OnewayZone"
-        name="OnewayZoneFigure"
-        targetDecoration="DiodeFigure"/>
-    <figures
-        xsi:type="gmfgraph:PolylineConnection"
-        name="TwowayOutsideZoneFigure"
-        lineKind="LINE_DASH"/>
-    <figures
-        xsi:type="gmfgraph:PolylineConnection"
-        referencingElements="OnewayOutsideZone"
-        name="OnewayOutsideZoneFigure"
-        lineKind="LINE_DASH"
+        referencingElements="Zone"
+        name="ZoneFigure"
         targetDecoration="DiodeFigure"/>
     <figures
         xsi:type="gmfgraph:Rectangle"
@@ -34,8 +20,8 @@
           name="GraphNameFigure"
           text="&lt;...>"/>
       <preferredSize
-          dx="200"
-          dy="140"/>
+          dx="300"
+          dy="170"/>
     </figures>
     <figures
         xsi:type="gmfgraph:Ellipse"
@@ -50,8 +36,8 @@
     </figures>
     <figures
         xsi:type="gmfgraph:Ellipse"
-        referencingElements="Sensor SensorCompartment"
-        name="SensorNode">
+        referencingElements="SensorNode"
+        name="SensorNodeFigure">
       <layout
           xsi:type="gmfgraph:BorderLayout"/>
       <children
@@ -94,8 +80,8 @@
         text="&lt;...>"/>
   </figures>
   <nodes
-      name="Sensor"
-      figure="SensorNode"/>
+      name="SensorNode"
+      figure="SensorNodeFigure"/>
   <nodes
       name="EndNode"
       figure="EndNodeFigure"
@@ -104,24 +90,12 @@
       name="Graph"
       figure="GraphFigure"/>
   <connections
-      name="TwowayZone"
-      figure="TwowayZoneFigure"/>
-  <connections
-      name="OnewayZone"
-      figure="OnewayZoneFigure"/>
-  <connections
-      name="TwowayOutsideZone"
-      figure="TwowayZoneFigure"/>
-  <connections
-      name="OnewayOutsideZone"
-      figure="OnewayOutsideZoneFigure"/>
+      name="Zone"
+      figure="ZoneFigure"/>
   <compartments
       name="GraphCompartment"
       figure="GraphFigure"
       collapsible="true"/>
-  <compartments
-      name="SensorCompartment"
-      figure="SensorNode"/>
   <labels
       name="SensorName"
       figure="SensorNameFigure"/>

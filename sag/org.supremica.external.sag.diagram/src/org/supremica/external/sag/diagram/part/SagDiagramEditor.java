@@ -131,29 +131,6 @@ public class SagDiagramEditor extends DiagramDocumentEditor implements
 	/**
 	 * @generated
 	 */
-	protected void configureGraphicalViewer() {
-		super.configureGraphicalViewer();
-		DiagramRootEditPart root = (DiagramRootEditPart) getDiagramGraphicalViewer()
-				.getRootEditPart();
-		LayeredPane printableLayers = (LayeredPane) root
-				.getLayer(LayerConstants.PRINTABLE_LAYERS);
-		FreeformLayer extLabelsLayer = new FreeformLayer();
-		extLabelsLayer.setLayoutManager(new DelegatingLayout());
-		printableLayers.addLayerAfter(extLabelsLayer,
-				SagEditPartFactory.EXTERNAL_NODE_LABELS_LAYER,
-				LayerConstants.PRIMARY_LAYER);
-		LayeredPane scalableLayers = (LayeredPane) root
-				.getLayer(LayerConstants.SCALABLE_LAYERS);
-		FreeformLayer scaledFeedbackLayer = new FreeformLayer();
-		scaledFeedbackLayer.setEnabled(false);
-		scalableLayers.addLayerAfter(scaledFeedbackLayer,
-				LayerConstants.SCALED_FEEDBACK_LAYER,
-				DiagramRootEditPart.DECORATION_UNPRINTABLE_LAYER);
-	}
-
-	/**
-	 * @generated
-	 */
 	protected PaletteRoot createPaletteRoot(PaletteRoot existingPaletteRoot) {
 		PaletteRoot root = super.createPaletteRoot(existingPaletteRoot);
 		new SagPaletteFactory().fillPalette(root);

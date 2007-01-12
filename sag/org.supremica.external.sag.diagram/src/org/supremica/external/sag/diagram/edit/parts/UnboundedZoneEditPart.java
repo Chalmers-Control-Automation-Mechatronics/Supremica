@@ -1,11 +1,22 @@
 package org.supremica.external.sag.diagram.edit.parts;
 
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
+import org.eclipse.gmf.runtime.notation.NotationPackage;
 import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.draw2d.Connection;
+import org.eclipse.draw2d.Graphics;
+import org.eclipse.draw2d.PolylineDecoration;
+import org.eclipse.draw2d.RotatableDecoration;
+import org.eclipse.draw2d.geometry.PointList;
+import org.eclipse.emf.common.notify.Notification;
 
 import org.eclipse.gmf.runtime.diagram.ui.editparts.ConnectionNodeEditPart;
+import org.eclipse.gmf.runtime.draw2d.ui.figures.PolylineConnectionEx;
 
+import org.supremica.external.sag.SagPackage;
+import org.supremica.external.sag.UnboundedZone;
+import org.supremica.external.sag.Zone;
+import org.supremica.external.sag.diagram.edit.parts.BoundedZoneEditPart.ZoneFigure;
 import org.supremica.external.sag.diagram.edit.policies.UnboundedZoneItemSemanticEditPolicy;
 
 /**
@@ -16,7 +27,7 @@ public class UnboundedZoneEditPart extends ConnectionNodeEditPart {
 	/**
 	 * @generated
 	 */
-	public static final int VISUAL_ID = 3003;
+	public static final int VISUAL_ID = 4009;
 
 	/**
 	 * @generated
@@ -32,7 +43,6 @@ public class UnboundedZoneEditPart extends ConnectionNodeEditPart {
 		super.createDefaultEditPolicies();
 		installEditPolicy(EditPolicyRoles.SEMANTIC_ROLE,
 				new UnboundedZoneItemSemanticEditPolicy());
-
 	}
 
 	/**
@@ -44,41 +54,71 @@ public class UnboundedZoneEditPart extends ConnectionNodeEditPart {
 	 * @generated
 	 */
 	protected Connection createConnectionFigure() {
-		return new OnewayZoneFigure();
+
+		return new ZoneFigure();
+	}
+
+	protected void handleNotificationEvent(Notification notification) {
+		Object feature = notification.getFeature();
+		if (SagPackage.eINSTANCE.getZone_IsOneway().equals(feature)) {
+			((ZoneFigure) getFigure()).updateOnewaySymbol();
+			refresh();
+		} else if (SagPackage.eINSTANCE.getUnboundedZone_IsOutside().equals(
+				feature)) {
+			((ZoneFigure) getFigure()).updateOutsideStyle();
+			refresh();
+		}
+		super.handleNotificationEvent(notification);
 	}
 
 	/**
 	 * @generated
 	 */
-	public class OnewayZoneFigure extends
-			org.eclipse.gmf.runtime.draw2d.ui.figures.PolylineConnectionEx {
+	public class ZoneFigure extends PolylineConnectionEx {
 
 		/**
-		 * @generated
+		 * @generated NOT
 		 */
-		public OnewayZoneFigure() {
+		public ZoneFigure() {
 			this.setFill(true);
 			this.setFillXOR(false);
 			this.setOutline(true);
 			this.setOutlineXOR(false);
 			this.setLineWidth(1);
-			this.setLineStyle(org.eclipse.draw2d.Graphics.LINE_SOLID);
+			this.setLineStyle(Graphics.LINE_SOLID);
 
-			setTargetDecoration(createTargetDecoration());
+			updateOnewaySymbol();
+			updateOutsideStyle();
+		}
+
+		public void updateOnewaySymbol() {
+			if (!((Zone) getEdge().getElement()).isIsOneway()) {
+				setTargetDecoration(null);
+			} else {
+				setTargetDecoration(createTargetDecoration());
+			}
+		}
+
+		public void updateOutsideStyle() {
+			if (!((UnboundedZone) getEdge().getElement()).isIsOutside()) {
+				this.setLineStyle(Graphics.LINE_SOLID);
+			} else {
+				this.setLineStyle(Graphics.LINE_DASH);
+			}
 		}
 
 		/**
 		 * @generated
 		 */
-		private org.eclipse.draw2d.RotatableDecoration createTargetDecoration() {
-			org.eclipse.draw2d.PolylineDecoration df = new org.eclipse.draw2d.PolylineDecoration();
+		private RotatableDecoration createTargetDecoration() {
+			PolylineDecoration df = new PolylineDecoration();
 			df.setFill(true);
 			df.setFillXOR(false);
 			df.setOutline(true);
 			df.setOutlineXOR(false);
 			df.setLineWidth(1);
-			df.setLineStyle(org.eclipse.draw2d.Graphics.LINE_SOLID);
-			org.eclipse.draw2d.geometry.PointList pl = new org.eclipse.draw2d.geometry.PointList();
+			df.setLineStyle(Graphics.LINE_SOLID);
+			PointList pl = new PointList();
 			pl.addPoint(getMapMode().DPtoLP(-2), getMapMode().DPtoLP(-3));
 			pl.addPoint(getMapMode().DPtoLP(-2), getMapMode().DPtoLP(3));
 			pl.addPoint(getMapMode().DPtoLP(-2), getMapMode().DPtoLP(0));

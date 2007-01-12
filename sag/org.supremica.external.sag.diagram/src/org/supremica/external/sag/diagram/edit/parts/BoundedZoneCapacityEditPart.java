@@ -79,7 +79,7 @@ public class BoundedZoneCapacityEditPart extends LabelEditPart implements
 	/**
 	 * @generated
 	 */
-	public static final int VISUAL_ID = 4003;
+	public static final int VISUAL_ID = 6003;
 
 	/**
 	 * @generated
@@ -107,7 +107,7 @@ public class BoundedZoneCapacityEditPart extends LabelEditPart implements
 	static {
 		registerSnapBackPosition(SagVisualIDRegistry
 				.getType(BoundedZoneCapacityEditPart.VISUAL_ID), new Point(0,
-				40));
+				10));
 	}
 
 	/**
@@ -124,7 +124,6 @@ public class BoundedZoneCapacityEditPart extends LabelEditPart implements
 		super.createDefaultEditPolicies();
 		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE,
 				new LabelDirectEditPolicy());
-
 	}
 
 	/**
@@ -265,7 +264,7 @@ public class BoundedZoneCapacityEditPart extends LabelEditPart implements
 	 * @generated
 	 */
 	protected boolean isEditable() {
-		return getEditText() != null;
+		return getParser() != null;
 	}
 
 	/**
@@ -330,7 +329,7 @@ public class BoundedZoneCapacityEditPart extends LabelEditPart implements
 
 				public Object getAdapter(Class adapter) {
 					if (IElementType.class.equals(adapter)) {
-						return SagElementTypes.BoundedZone_3001;
+						return SagElementTypes.BoundedZone_4007;
 					}
 					return super.getAdapter(adapter);
 				}
@@ -476,8 +475,11 @@ public class BoundedZoneCapacityEditPart extends LabelEditPart implements
 				NotationPackage.eINSTANCE.getFontStyle());
 		if (style != null) {
 			FontData fontData = new FontData(style.getFontName(), style
-					.getFontHeight(), (style.isBold() ? SWT.BOLD : SWT.NORMAL)
-					| (style.isItalic() ? SWT.ITALIC : SWT.NORMAL));
+					.getFontHeight(),
+					(style.isBold() ? org.eclipse.swt.SWT.BOLD
+							: org.eclipse.swt.SWT.NORMAL)
+							| (style.isItalic() ? org.eclipse.swt.SWT.ITALIC
+									: org.eclipse.swt.SWT.NORMAL));
 			setFont(fontData);
 		}
 	}
@@ -603,8 +605,7 @@ public class BoundedZoneCapacityEditPart extends LabelEditPart implements
 	/**
 	 * @generated
 	 */
-	public class CapacityFigure extends
-			org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel {
+	public class CapacityFigure extends WrapLabel {
 		/**
 		 * @generated
 		 */

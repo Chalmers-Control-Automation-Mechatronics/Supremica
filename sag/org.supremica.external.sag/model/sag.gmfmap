@@ -29,19 +29,19 @@
             href="sag.ecore#//Graph/node"/>
         <ownedChild>
           <domainMetaElement
-              href="sag.ecore#//Node"/>
+              href="sag.ecore#//SensorNode"/>
           <labelMappings
               xsi:type="gmfmap:FeatureLabelMapping">
             <diagramLabel
                 href="sag.gmfgraph#SensorName"/>
             <features
-                href="sag.ecore#//Node/sensorName"/>
+                href="sag.ecore#//SensorNode/sensorName"/>
           </labelMappings>
           <tool
               xsi:type="gmftool:CreationTool"
               href="sag.gmftool#//@palette/@tools.1/@tools.0"/>
           <diagramNode
-              href="sag.gmfgraph#Sensor"/>
+              href="sag.gmfgraph#SensorNode"/>
         </ownedChild>
       </children>
       <children
@@ -50,7 +50,7 @@
             href="sag.ecore#//Graph/node"/>
         <ownedChild>
           <domainMetaElement
-              href="sag.ecore#//Node"/>
+              href="sag.ecore#//EndNode"/>
           <tool
               xsi:type="gmftool:CreationTool"
               href="sag.gmftool#//@palette/@tools.1/@tools.1"/>
@@ -68,16 +68,6 @@
   <links>
     <domainMetaElement
         href="sag.ecore#//BoundedZone"/>
-    <domainInitializer
-        xsi:type="gmfmap:FeatureSeqInitializer">
-      <initializers
-          xsi:type="gmfmap:FeatureValueSpec"
-          body="true">
-        <feature
-            xsi:type="ecore:EAttribute"
-            href="sag.ecore#//Zone/isOneway"/>
-      </initializers>
-    </domainInitializer>
     <labelMappings
         xsi:type="gmfmap:FeatureLabelMapping">
       <diagramLabel
@@ -91,58 +81,7 @@
         xsi:type="gmftool:CreationTool"
         href="sag.gmftool#//@palette/@tools.2/@tools.0"/>
     <diagramLink
-        href="sag.gmfgraph#OnewayZone"/>
-    <sourceMetaFeature
-        xsi:type="ecore:EReference"
-        href="sag.ecore#//Zone/back"/>
-    <linkMetaFeature
-        xsi:type="ecore:EReference"
-        href="sag.ecore#//Zone/front"/>
-  </links>
-  <links>
-    <domainMetaElement
-        href="sag.ecore#//BoundedZone"/>
-    <labelMappings
-        xsi:type="gmfmap:FeatureLabelMapping">
-      <diagramLabel
-          href="sag.gmfgraph#Capacity"/>
-      <features
-          href="sag.ecore#//BoundedZone/capacity"/>
-    </labelMappings>
-    <containmentFeature
-        href="sag.ecore#//Graph/zone"/>
-    <tool
-        xsi:type="gmftool:CreationTool"
-        href="sag.gmftool#//@palette/@tools.2/@tools.0"/>
-    <diagramLink
-        href="sag.gmfgraph#TwowayZone"/>
-    <sourceMetaFeature
-        xsi:type="ecore:EReference"
-        href="sag.ecore#//Zone/back"/>
-    <linkMetaFeature
-        xsi:type="ecore:EReference"
-        href="sag.ecore#//Zone/front"/>
-  </links>
-  <links>
-    <domainMetaElement
-        href="sag.ecore#//UnboundedZone"/>
-    <domainInitializer
-        xsi:type="gmfmap:FeatureSeqInitializer">
-      <initializers
-          xsi:type="gmfmap:FeatureValueSpec"
-          body="true">
-        <feature
-            xsi:type="ecore:EAttribute"
-            href="sag.ecore#//Zone/isOneway"/>
-      </initializers>
-    </domainInitializer>
-    <containmentFeature
-        href="sag.ecore#//Graph/zone"/>
-    <tool
-        xsi:type="gmftool:CreationTool"
-        href="sag.gmftool#//@palette/@tools.2/@tools.0"/>
-    <diagramLink
-        href="sag.gmfgraph#OnewayZone"/>
+        href="sag.gmfgraph#Zone"/>
     <sourceMetaFeature
         xsi:type="ecore:EReference"
         href="sag.ecore#//Zone/back"/>
@@ -159,68 +98,7 @@
         xsi:type="gmftool:CreationTool"
         href="sag.gmftool#//@palette/@tools.2/@tools.0"/>
     <diagramLink
-        href="sag.gmfgraph#TwowayZone"/>
-    <sourceMetaFeature
-        xsi:type="ecore:EReference"
-        href="sag.ecore#//Zone/back"/>
-    <linkMetaFeature
-        xsi:type="ecore:EReference"
-        href="sag.ecore#//Zone/front"/>
-  </links>
-  <links>
-    <domainMetaElement
-        href="sag.ecore#//UnboundedZone"/>
-    <domainInitializer
-        xsi:type="gmfmap:FeatureSeqInitializer">
-      <initializers
-          xsi:type="gmfmap:FeatureValueSpec"
-          body="true">
-        <feature
-            xsi:type="ecore:EAttribute"
-            href="sag.ecore#//Zone/isOneway"/>
-      </initializers>
-      <initializers
-          xsi:type="gmfmap:FeatureValueSpec"
-          body="true">
-        <feature
-            xsi:type="ecore:EAttribute"
-            href="sag.ecore#//UnboundedZone/isOutside"/>
-      </initializers>
-    </domainInitializer>
-    <containmentFeature
-        href="sag.ecore#//Graph/zone"/>
-    <tool
-        xsi:type="gmftool:CreationTool"
-        href="sag.gmftool#//@palette/@tools.2/@tools.0"/>
-    <diagramLink
-        href="sag.gmfgraph#OnewayOutsideZone"/>
-    <sourceMetaFeature
-        xsi:type="ecore:EReference"
-        href="sag.ecore#//Zone/back"/>
-    <linkMetaFeature
-        xsi:type="ecore:EReference"
-        href="sag.ecore#//Zone/front"/>
-  </links>
-  <links>
-    <domainMetaElement
-        href="sag.ecore#//UnboundedZone"/>
-    <domainInitializer
-        xsi:type="gmfmap:FeatureSeqInitializer">
-      <initializers
-          xsi:type="gmfmap:FeatureValueSpec"
-          body="true">
-        <feature
-            xsi:type="ecore:EAttribute"
-            href="sag.ecore#//UnboundedZone/isOutside"/>
-      </initializers>
-    </domainInitializer>
-    <containmentFeature
-        href="sag.ecore#//Graph/zone"/>
-    <tool
-        xsi:type="gmftool:CreationTool"
-        href="sag.gmftool#//@palette/@tools.2/@tools.0"/>
-    <diagramLink
-        href="sag.gmfgraph#TwowayOutsideZone"/>
+        href="sag.gmfgraph#Zone"/>
     <sourceMetaFeature
         xsi:type="ecore:EReference"
         href="sag.ecore#//Zone/back"/>

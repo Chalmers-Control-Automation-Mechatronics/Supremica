@@ -30,7 +30,7 @@ public class BoundedZoneCapacityViewFactory extends AbstractLabelViewFactory {
 		IMapMode mapMode = MeasurementUnitHelper.getMapMode(containerView
 				.getDiagram().getMeasurementUnit());
 		location.setX(mapMode.DPtoLP(0));
-		location.setY(mapMode.DPtoLP(40));
+		location.setY(mapMode.DPtoLP(10));
 		return view;
 	}
 

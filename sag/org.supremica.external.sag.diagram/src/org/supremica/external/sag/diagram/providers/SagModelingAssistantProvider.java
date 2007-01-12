@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.gmf.runtime.diagram.ui.editparts.GraphicalEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart;
 import org.eclipse.gmf.runtime.emf.type.core.ElementTypeRegistry;
 import org.eclipse.gmf.runtime.emf.type.core.IElementType;
@@ -20,11 +21,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
-import org.supremica.external.sag.diagram.edit.parts.GraphGraphCompartmentEditPart;
+import org.supremica.external.sag.diagram.edit.parts.EndNodeEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphEditPart;
-import org.supremica.external.sag.diagram.edit.parts.Node2EditPart;
-import org.supremica.external.sag.diagram.edit.parts.NodeEditPart;
+import org.supremica.external.sag.diagram.edit.parts.GraphGraphCompartmentEditPart;
 import org.supremica.external.sag.diagram.edit.parts.ProjectEditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorNodeEditPart;
 
 import org.supremica.external.sag.diagram.part.SagDiagramEditorPlugin;
 
@@ -41,78 +42,54 @@ public class SagModelingAssistantProvider extends ModelingAssistantProvider {
 				.getAdapter(IGraphicalEditPart.class);
 		if (editPart instanceof GraphGraphCompartmentEditPart) {
 			List types = new ArrayList();
-			types.add(SagElementTypes.Node_2001);
-			types.add(SagElementTypes.Node_2002);
+			types.add(SagElementTypes.SensorNode_3006);
+			types.add(SagElementTypes.EndNode_3007);
 			return types;
 		}
 		if (editPart instanceof ProjectEditPart) {
 			List types = new ArrayList();
-			types.add(SagElementTypes.Graph_1001);
+			types.add(SagElementTypes.Graph_2010);
 			return types;
 		}
 		return Collections.EMPTY_LIST;
 	}
 
 	/**
-	 * @generated
+	 * @generated NOT
 	 */
 	public List getRelTypesOnSource(IAdaptable source) {
 		IGraphicalEditPart sourceEditPart = (IGraphicalEditPart) source
 				.getAdapter(IGraphicalEditPart.class);
-		if (sourceEditPart instanceof NodeEditPart) {
-			List types = new ArrayList();
-			types.add(SagElementTypes.BoundedZone_3001);
-			types.add(SagElementTypes.BoundedZone_3002);
-			types.add(SagElementTypes.UnboundedZone_3003);
-			types.add(SagElementTypes.UnboundedZone_3004);
-			types.add(SagElementTypes.UnboundedZone_3005);
-			types.add(SagElementTypes.UnboundedZone_3006);
+		if (sourceEditPart instanceof SensorNodeEditPart
+				|| sourceEditPart instanceof EndNodeEditPart) {
+			List<IElementType> types = new ArrayList<IElementType>();
+			types.add(SagElementTypes.BoundedZone_4007);
+			types.add(SagElementTypes.UnboundedZone_4009);
 			return types;
 		}
-		if (sourceEditPart instanceof Node2EditPart) {
-			List types = new ArrayList();
-			types.add(SagElementTypes.BoundedZone_3001);
-			types.add(SagElementTypes.BoundedZone_3002);
-			types.add(SagElementTypes.UnboundedZone_3003);
-			types.add(SagElementTypes.UnboundedZone_3004);
-			types.add(SagElementTypes.UnboundedZone_3005);
-			types.add(SagElementTypes.UnboundedZone_3006);
-			return types;
-		}
+
 		return Collections.EMPTY_LIST;
 	}
 
 	/**
-	 * @generated
+	 * @generated NOT
 	 */
 	public List getRelTypesOnTarget(IAdaptable target) {
 		IGraphicalEditPart targetEditPart = (IGraphicalEditPart) target
 				.getAdapter(IGraphicalEditPart.class);
-		if (targetEditPart instanceof NodeEditPart) {
-			List types = new ArrayList();
-			types.add(SagElementTypes.BoundedZone_3001);
-			types.add(SagElementTypes.BoundedZone_3002);
-			types.add(SagElementTypes.UnboundedZone_3003);
-			types.add(SagElementTypes.UnboundedZone_3004);
-			types.add(SagElementTypes.UnboundedZone_3005);
-			types.add(SagElementTypes.UnboundedZone_3006);
+		if (targetEditPart instanceof SensorNodeEditPart
+				|| targetEditPart instanceof EndNodeEditPart) {
+			List<IElementType> types = new ArrayList<IElementType>();
+			types.add(SagElementTypes.BoundedZone_4007);
+			types.add(SagElementTypes.UnboundedZone_4009);
 			return types;
 		}
-		if (targetEditPart instanceof Node2EditPart) {
-			List types = new ArrayList();
-			types.add(SagElementTypes.BoundedZone_3001);
-			types.add(SagElementTypes.BoundedZone_3002);
-			types.add(SagElementTypes.UnboundedZone_3003);
-			types.add(SagElementTypes.UnboundedZone_3004);
-			types.add(SagElementTypes.UnboundedZone_3005);
-			types.add(SagElementTypes.UnboundedZone_3006);
-			return types;
-		}
+
 		return Collections.EMPTY_LIST;
 	}
 
 	/**
-	 * @generated
+	 * @generated NOT
 	 */
 	public List getRelTypesOnSourceAndTarget(IAdaptable source,
 			IAdaptable target) {
@@ -120,267 +97,56 @@ public class SagModelingAssistantProvider extends ModelingAssistantProvider {
 				.getAdapter(IGraphicalEditPart.class);
 		IGraphicalEditPart targetEditPart = (IGraphicalEditPart) target
 				.getAdapter(IGraphicalEditPart.class);
-		if (sourceEditPart instanceof NodeEditPart) {
-			List types = new ArrayList();
-			if (targetEditPart instanceof NodeEditPart) {
-				types.add(SagElementTypes.BoundedZone_3001);
-			}
-			if (targetEditPart instanceof Node2EditPart) {
-				types.add(SagElementTypes.BoundedZone_3001);
-			}
-			if (targetEditPart instanceof NodeEditPart) {
-				types.add(SagElementTypes.BoundedZone_3002);
-			}
-			if (targetEditPart instanceof Node2EditPart) {
-				types.add(SagElementTypes.BoundedZone_3002);
-			}
-			if (targetEditPart instanceof NodeEditPart) {
-				types.add(SagElementTypes.UnboundedZone_3003);
-			}
-			if (targetEditPart instanceof Node2EditPart) {
-				types.add(SagElementTypes.UnboundedZone_3003);
-			}
-			if (targetEditPart instanceof NodeEditPart) {
-				types.add(SagElementTypes.UnboundedZone_3004);
-			}
-			if (targetEditPart instanceof Node2EditPart) {
-				types.add(SagElementTypes.UnboundedZone_3004);
-			}
-			if (targetEditPart instanceof NodeEditPart) {
-				types.add(SagElementTypes.UnboundedZone_3005);
-			}
-			if (targetEditPart instanceof Node2EditPart) {
-				types.add(SagElementTypes.UnboundedZone_3005);
-			}
-			if (targetEditPart instanceof NodeEditPart) {
-				types.add(SagElementTypes.UnboundedZone_3006);
-			}
-			if (targetEditPart instanceof Node2EditPart) {
-				types.add(SagElementTypes.UnboundedZone_3006);
-			}
-			return types;
-		}
-		if (sourceEditPart instanceof Node2EditPart) {
-			List types = new ArrayList();
-			if (targetEditPart instanceof NodeEditPart) {
-				types.add(SagElementTypes.BoundedZone_3001);
-			}
-			if (targetEditPart instanceof Node2EditPart) {
-				types.add(SagElementTypes.BoundedZone_3001);
-			}
-			if (targetEditPart instanceof NodeEditPart) {
-				types.add(SagElementTypes.BoundedZone_3002);
-			}
-			if (targetEditPart instanceof Node2EditPart) {
-				types.add(SagElementTypes.BoundedZone_3002);
-			}
-			if (targetEditPart instanceof NodeEditPart) {
-				types.add(SagElementTypes.UnboundedZone_3003);
-			}
-			if (targetEditPart instanceof Node2EditPart) {
-				types.add(SagElementTypes.UnboundedZone_3003);
-			}
-			if (targetEditPart instanceof NodeEditPart) {
-				types.add(SagElementTypes.UnboundedZone_3004);
-			}
-			if (targetEditPart instanceof Node2EditPart) {
-				types.add(SagElementTypes.UnboundedZone_3004);
-			}
-			if (targetEditPart instanceof NodeEditPart) {
-				types.add(SagElementTypes.UnboundedZone_3005);
-			}
-			if (targetEditPart instanceof Node2EditPart) {
-				types.add(SagElementTypes.UnboundedZone_3005);
-			}
-			if (targetEditPart instanceof NodeEditPart) {
-				types.add(SagElementTypes.UnboundedZone_3006);
-			}
-			if (targetEditPart instanceof Node2EditPart) {
-				types.add(SagElementTypes.UnboundedZone_3006);
-			}
+		if ((sourceEditPart instanceof SensorNodeEditPart && (targetEditPart instanceof SensorNodeEditPart || targetEditPart instanceof EndNodeEditPart))
+				|| (sourceEditPart instanceof EndNodeEditPart && targetEditPart instanceof SensorNodeEditPart)) {
+			List<IElementType> types = new ArrayList<IElementType>();
+			types.add(SagElementTypes.BoundedZone_4007);
+			types.add(SagElementTypes.UnboundedZone_4009);
 			return types;
 		}
 		return Collections.EMPTY_LIST;
 	}
 
 	/**
-	 * @generated
+	 * @generated NOT
 	 */
 	public List getTypesForSource(IAdaptable target,
 			IElementType relationshipType) {
 		IGraphicalEditPart targetEditPart = (IGraphicalEditPart) target
 				.getAdapter(IGraphicalEditPart.class);
-		if (targetEditPart instanceof NodeEditPart) {
-			List types = new ArrayList();
-			if (relationshipType == SagElementTypes.BoundedZone_3001) {
-				types.add(SagElementTypes.Node_2001);
+		List<IElementType> types = new ArrayList<IElementType>();
+		if (relationshipType == SagElementTypes.BoundedZone_4007
+				|| relationshipType == SagElementTypes.UnboundedZone_4009) {
+			if (targetEditPart instanceof SensorNodeEditPart) {
+				types.add(SagElementTypes.SensorNode_3006);
+				types.add(SagElementTypes.EndNode_3007);
 			}
-			if (relationshipType == SagElementTypes.BoundedZone_3001) {
-				types.add(SagElementTypes.Node_2002);
+			if (targetEditPart instanceof EndNodeEditPart) {
+				types.add(SagElementTypes.SensorNode_3006);
 			}
-			if (relationshipType == SagElementTypes.BoundedZone_3002) {
-				types.add(SagElementTypes.Node_2001);
-			}
-			if (relationshipType == SagElementTypes.BoundedZone_3002) {
-				types.add(SagElementTypes.Node_2002);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3003) {
-				types.add(SagElementTypes.Node_2001);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3003) {
-				types.add(SagElementTypes.Node_2002);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3004) {
-				types.add(SagElementTypes.Node_2001);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3004) {
-				types.add(SagElementTypes.Node_2002);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3005) {
-				types.add(SagElementTypes.Node_2001);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3005) {
-				types.add(SagElementTypes.Node_2002);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3006) {
-				types.add(SagElementTypes.Node_2001);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3006) {
-				types.add(SagElementTypes.Node_2002);
-			}
-			return types;
 		}
-		if (targetEditPart instanceof Node2EditPart) {
-			List types = new ArrayList();
-			if (relationshipType == SagElementTypes.BoundedZone_3001) {
-				types.add(SagElementTypes.Node_2001);
-			}
-			if (relationshipType == SagElementTypes.BoundedZone_3001) {
-				types.add(SagElementTypes.Node_2002);
-			}
-			if (relationshipType == SagElementTypes.BoundedZone_3002) {
-				types.add(SagElementTypes.Node_2001);
-			}
-			if (relationshipType == SagElementTypes.BoundedZone_3002) {
-				types.add(SagElementTypes.Node_2002);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3003) {
-				types.add(SagElementTypes.Node_2001);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3003) {
-				types.add(SagElementTypes.Node_2002);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3004) {
-				types.add(SagElementTypes.Node_2001);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3004) {
-				types.add(SagElementTypes.Node_2002);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3005) {
-				types.add(SagElementTypes.Node_2001);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3005) {
-				types.add(SagElementTypes.Node_2002);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3006) {
-				types.add(SagElementTypes.Node_2001);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3006) {
-				types.add(SagElementTypes.Node_2002);
-			}
-			return types;
-		}
-		return Collections.EMPTY_LIST;
+		return types;
 	}
 
 	/**
-	 * @generated
+	 * @generated NOT
 	 */
 	public List getTypesForTarget(IAdaptable source,
 			IElementType relationshipType) {
 		IGraphicalEditPart sourceEditPart = (IGraphicalEditPart) source
 				.getAdapter(IGraphicalEditPart.class);
-		if (sourceEditPart instanceof NodeEditPart) {
-			List types = new ArrayList();
-			if (relationshipType == SagElementTypes.BoundedZone_3001) {
-				types.add(SagElementTypes.Node_2001);
+		List<IElementType> types = new ArrayList<IElementType>();
+		if (relationshipType == SagElementTypes.BoundedZone_4007
+				|| relationshipType == SagElementTypes.UnboundedZone_4009) {
+			if (sourceEditPart instanceof SensorNodeEditPart) {
+				types.add(SagElementTypes.SensorNode_3006);
+				types.add(SagElementTypes.EndNode_3007);
 			}
-			if (relationshipType == SagElementTypes.BoundedZone_3001) {
-				types.add(SagElementTypes.Node_2002);
+			if (sourceEditPart instanceof EndNodeEditPart) {
+				types.add(SagElementTypes.SensorNode_3006);
 			}
-			if (relationshipType == SagElementTypes.BoundedZone_3002) {
-				types.add(SagElementTypes.Node_2001);
-			}
-			if (relationshipType == SagElementTypes.BoundedZone_3002) {
-				types.add(SagElementTypes.Node_2002);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3003) {
-				types.add(SagElementTypes.Node_2001);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3003) {
-				types.add(SagElementTypes.Node_2002);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3004) {
-				types.add(SagElementTypes.Node_2001);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3004) {
-				types.add(SagElementTypes.Node_2002);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3005) {
-				types.add(SagElementTypes.Node_2001);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3005) {
-				types.add(SagElementTypes.Node_2002);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3006) {
-				types.add(SagElementTypes.Node_2001);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3006) {
-				types.add(SagElementTypes.Node_2002);
-			}
-			return types;
 		}
-		if (sourceEditPart instanceof Node2EditPart) {
-			List types = new ArrayList();
-			if (relationshipType == SagElementTypes.BoundedZone_3001) {
-				types.add(SagElementTypes.Node_2001);
-			}
-			if (relationshipType == SagElementTypes.BoundedZone_3001) {
-				types.add(SagElementTypes.Node_2002);
-			}
-			if (relationshipType == SagElementTypes.BoundedZone_3002) {
-				types.add(SagElementTypes.Node_2001);
-			}
-			if (relationshipType == SagElementTypes.BoundedZone_3002) {
-				types.add(SagElementTypes.Node_2002);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3003) {
-				types.add(SagElementTypes.Node_2001);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3003) {
-				types.add(SagElementTypes.Node_2002);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3004) {
-				types.add(SagElementTypes.Node_2001);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3004) {
-				types.add(SagElementTypes.Node_2002);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3005) {
-				types.add(SagElementTypes.Node_2001);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3005) {
-				types.add(SagElementTypes.Node_2002);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3006) {
-				types.add(SagElementTypes.Node_2001);
-			}
-			if (relationshipType == SagElementTypes.UnboundedZone_3006) {
-				types.add(SagElementTypes.Node_2002);
-			}
-			return types;
-		}
-		return Collections.EMPTY_LIST;
+		return types;
 	}
 
 	/**

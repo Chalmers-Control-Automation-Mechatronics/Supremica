@@ -30,22 +30,15 @@ import org.eclipse.ui.navigator.ICommonContentExtensionSite;
 import org.eclipse.ui.navigator.ICommonLabelProvider;
 
 import org.supremica.external.sag.Named;
-import org.supremica.external.sag.Node;
-import org.supremica.external.sag.Zone;
 
-import org.supremica.external.sag.diagram.edit.parts.BoundedZone2EditPart;
-import org.supremica.external.sag.diagram.edit.parts.BoundedZoneCapacity2EditPart;
 import org.supremica.external.sag.diagram.edit.parts.BoundedZoneCapacityEditPart;
 import org.supremica.external.sag.diagram.edit.parts.BoundedZoneEditPart;
+import org.supremica.external.sag.diagram.edit.parts.EndNodeEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphNameEditPart;
-import org.supremica.external.sag.diagram.edit.parts.Node2EditPart;
-import org.supremica.external.sag.diagram.edit.parts.NodeEditPart;
-import org.supremica.external.sag.diagram.edit.parts.NodeSensorEditPart;
 import org.supremica.external.sag.diagram.edit.parts.ProjectEditPart;
-import org.supremica.external.sag.diagram.edit.parts.UnboundedZone2EditPart;
-import org.supremica.external.sag.diagram.edit.parts.UnboundedZone3EditPart;
-import org.supremica.external.sag.diagram.edit.parts.UnboundedZone4EditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorNodeEditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorNodeSensorNameEditPart;
 import org.supremica.external.sag.diagram.edit.parts.UnboundedZoneEditPart;
 
 import org.supremica.external.sag.diagram.part.SagDiagramEditorPlugin;
@@ -116,43 +109,27 @@ public class SagNavigatorLabelProvider extends LabelProvider implements
 		case GraphEditPart.VISUAL_ID:
 			return getImage(
 					"Navigator?TopLevelNode?http://supremica.org/external/sag?Graph",
-					SagElementTypes.Graph_1001);
-		case NodeEditPart.VISUAL_ID:
+					SagElementTypes.Graph_2010);
+		case SensorNodeEditPart.VISUAL_ID:
 			return getImage(
-					"Navigator?Node?http://supremica.org/external/sag?Node",
-					SagElementTypes.Node_2001);
-		case Node2EditPart.VISUAL_ID:
+					"Navigator?Node?http://supremica.org/external/sag?SensorNode",
+					SagElementTypes.SensorNode_3006);
+		case EndNodeEditPart.VISUAL_ID:
 			return getImage(
-					"Navigator?Node?http://supremica.org/external/sag?Node",
-					SagElementTypes.Node_2002);
+					"Navigator?Node?http://supremica.org/external/sag?EndNode",
+					SagElementTypes.EndNode_3007);
 		case ProjectEditPart.VISUAL_ID:
 			return getImage(
 					"Navigator?Diagram?http://supremica.org/external/sag?Project",
-					SagElementTypes.Project_79);
+					SagElementTypes.Project_1000);
 		case BoundedZoneEditPart.VISUAL_ID:
 			return getImage(
 					"Navigator?Link?http://supremica.org/external/sag?BoundedZone",
-					SagElementTypes.BoundedZone_3001);
-		case BoundedZone2EditPart.VISUAL_ID:
-			return getImage(
-					"Navigator?Link?http://supremica.org/external/sag?BoundedZone",
-					SagElementTypes.BoundedZone_3002);
+					SagElementTypes.BoundedZone_4007);
 		case UnboundedZoneEditPart.VISUAL_ID:
 			return getImage(
 					"Navigator?Link?http://supremica.org/external/sag?UnboundedZone",
-					SagElementTypes.UnboundedZone_3003);
-		case UnboundedZone2EditPart.VISUAL_ID:
-			return getImage(
-					"Navigator?Link?http://supremica.org/external/sag?UnboundedZone",
-					SagElementTypes.UnboundedZone_3004);
-		case UnboundedZone3EditPart.VISUAL_ID:
-			return getImage(
-					"Navigator?Link?http://supremica.org/external/sag?UnboundedZone",
-					SagElementTypes.UnboundedZone_3005);
-		case UnboundedZone4EditPart.VISUAL_ID:
-			return getImage(
-					"Navigator?Link?http://supremica.org/external/sag?UnboundedZone",
-					SagElementTypes.UnboundedZone_3006);
+					SagElementTypes.UnboundedZone_4009);
 		default:
 			return getImage("Navigator?UnknownElement", null);
 		}
@@ -204,25 +181,17 @@ public class SagNavigatorLabelProvider extends LabelProvider implements
 	public String getText(View view) {
 		switch (SagVisualIDRegistry.getVisualID(view)) {
 		case GraphEditPart.VISUAL_ID:
-			return getGraph_1001Text(view);
-		case NodeEditPart.VISUAL_ID:
-			return getNode_2001Text(view);
-		case Node2EditPart.VISUAL_ID:
-			return getNode_2002Text(view);
+			return getGraph_2010Text(view);
+		case SensorNodeEditPart.VISUAL_ID:
+			return getSensorNode_3006Text(view);
+		case EndNodeEditPart.VISUAL_ID:
+			return getEndNode_3007Text(view);
 		case ProjectEditPart.VISUAL_ID:
-			return getProject_79Text(view);
+			return getProject_1000Text(view);
 		case BoundedZoneEditPart.VISUAL_ID:
-			return getBoundedZone_3001Text(view);
-		case BoundedZone2EditPart.VISUAL_ID:
-			return getBoundedZone_3002Text(view);
+			return getBoundedZone_4007Text(view);
 		case UnboundedZoneEditPart.VISUAL_ID:
-			return getUnboundedZone_3003Text(view);
-		case UnboundedZone2EditPart.VISUAL_ID:
-			return getUnboundedZone_3004Text(view);
-		case UnboundedZone3EditPart.VISUAL_ID:
-			return getUnboundedZone_3005Text(view);
-		case UnboundedZone4EditPart.VISUAL_ID:
-			return getUnboundedZone_3006Text(view);
+			return getUnboundedZone_4009Text(view);
 		default:
 			return getUnknownElementText(view);
 		}
@@ -231,7 +200,7 @@ public class SagNavigatorLabelProvider extends LabelProvider implements
 	/**
 	 * @generated
 	 */
-	private String getGraph_1001Text(View view) {
+	private String getGraph_2010Text(View view) {
 		IParser parser = ParserService.getInstance().getParser(
 				new IAdaptable() {
 					public Object getAdapter(Class adapter) {
@@ -240,7 +209,7 @@ public class SagNavigatorLabelProvider extends LabelProvider implements
 									.getType(GraphNameEditPart.VISUAL_ID);
 						}
 						if (IElementType.class.equals(adapter)) {
-							return SagElementTypes.Graph_1001;
+							return SagElementTypes.Graph_2010;
 						}
 						return null;
 					}
@@ -251,7 +220,7 @@ public class SagNavigatorLabelProvider extends LabelProvider implements
 					ParserOptions.NONE.intValue());
 		} else {
 			SagDiagramEditorPlugin.getInstance().logError(
-					"Parser was not found for label " + 4002);
+					"Parser was not found for label " + 5004);
 			return "";
 		}
 	}
@@ -259,16 +228,16 @@ public class SagNavigatorLabelProvider extends LabelProvider implements
 	/**
 	 * @generated
 	 */
-	private String getNode_2001Text(View view) {
+	private String getSensorNode_3006Text(View view) {
 		IParser parser = ParserService.getInstance().getParser(
 				new IAdaptable() {
 					public Object getAdapter(Class adapter) {
 						if (String.class.equals(adapter)) {
 							return SagVisualIDRegistry
-									.getType(NodeSensorEditPart.VISUAL_ID);
+									.getType(SensorNodeSensorNameEditPart.VISUAL_ID);
 						}
 						if (IElementType.class.equals(adapter)) {
-							return SagElementTypes.Node_2001;
+							return SagElementTypes.SensorNode_3006;
 						}
 						return null;
 					}
@@ -279,7 +248,7 @@ public class SagNavigatorLabelProvider extends LabelProvider implements
 					ParserOptions.NONE.intValue());
 		} else {
 			SagDiagramEditorPlugin.getInstance().logError(
-					"Parser was not found for label " + 4001);
+					"Parser was not found for label " + 5003);
 			return "";
 		}
 	}
@@ -287,27 +256,13 @@ public class SagNavigatorLabelProvider extends LabelProvider implements
 	/**
 	 * @generated
 	 */
-	private String getNode_2002Text(View view) {
-		EObject domainModelElement = view.getElement();
-		if (domainModelElement != null) {
-			return ((Node) domainModelElement).getSensor();
-		} else {
-			SagDiagramEditorPlugin.getInstance().logError(
-					"No domain element for view with visualID = " + 2002);
-			return "";
-		}
-	}
-
-	/**
-	 * @generated
-	 */
-	private String getProject_79Text(View view) {
+	private String getEndNode_3007Text(View view) {
 		EObject domainModelElement = view.getElement();
 		if (domainModelElement != null) {
 			return ((Named) domainModelElement).getName();
 		} else {
 			SagDiagramEditorPlugin.getInstance().logError(
-					"No domain element for view with visualID = " + 79);
+					"No domain element for view with visualID = " + 3007);
 			return "";
 		}
 	}
@@ -315,7 +270,21 @@ public class SagNavigatorLabelProvider extends LabelProvider implements
 	/**
 	 * @generated
 	 */
-	private String getBoundedZone_3001Text(View view) {
+	private String getProject_1000Text(View view) {
+		EObject domainModelElement = view.getElement();
+		if (domainModelElement != null) {
+			return ((Named) domainModelElement).getName();
+		} else {
+			SagDiagramEditorPlugin.getInstance().logError(
+					"No domain element for view with visualID = " + 1000);
+			return "";
+		}
+	}
+
+	/**
+	 * @generated
+	 */
+	private String getBoundedZone_4007Text(View view) {
 		IParser parser = ParserService.getInstance().getParser(
 				new IAdaptable() {
 					public Object getAdapter(Class adapter) {
@@ -324,7 +293,7 @@ public class SagNavigatorLabelProvider extends LabelProvider implements
 									.getType(BoundedZoneCapacityEditPart.VISUAL_ID);
 						}
 						if (IElementType.class.equals(adapter)) {
-							return SagElementTypes.BoundedZone_3001;
+							return SagElementTypes.BoundedZone_4007;
 						}
 						return null;
 					}
@@ -335,7 +304,7 @@ public class SagNavigatorLabelProvider extends LabelProvider implements
 					ParserOptions.NONE.intValue());
 		} else {
 			SagDiagramEditorPlugin.getInstance().logError(
-					"Parser was not found for label " + 4003);
+					"Parser was not found for label " + 6003);
 			return "";
 		}
 	}
@@ -343,83 +312,13 @@ public class SagNavigatorLabelProvider extends LabelProvider implements
 	/**
 	 * @generated
 	 */
-	private String getBoundedZone_3002Text(View view) {
-		IParser parser = ParserService.getInstance().getParser(
-				new IAdaptable() {
-					public Object getAdapter(Class adapter) {
-						if (String.class.equals(adapter)) {
-							return SagVisualIDRegistry
-									.getType(BoundedZoneCapacity2EditPart.VISUAL_ID);
-						}
-						if (IElementType.class.equals(adapter)) {
-							return SagElementTypes.BoundedZone_3002;
-						}
-						return null;
-					}
-				});
-		if (parser != null) {
-			return parser.getPrintString(new EObjectAdapter(
-					view.getElement() != null ? view.getElement() : view),
-					ParserOptions.NONE.intValue());
-		} else {
-			SagDiagramEditorPlugin.getInstance().logError(
-					"Parser was not found for label " + 4004);
-			return "";
-		}
-	}
-
-	/**
-	 * @generated
-	 */
-	private String getUnboundedZone_3003Text(View view) {
+	private String getUnboundedZone_4009Text(View view) {
 		EObject domainModelElement = view.getElement();
 		if (domainModelElement != null) {
-			return String.valueOf(((Zone) domainModelElement).isIsOneway());
+			return ((Named) domainModelElement).getName();
 		} else {
 			SagDiagramEditorPlugin.getInstance().logError(
-					"No domain element for view with visualID = " + 3003);
-			return "";
-		}
-	}
-
-	/**
-	 * @generated
-	 */
-	private String getUnboundedZone_3004Text(View view) {
-		EObject domainModelElement = view.getElement();
-		if (domainModelElement != null) {
-			return String.valueOf(((Zone) domainModelElement).isIsOneway());
-		} else {
-			SagDiagramEditorPlugin.getInstance().logError(
-					"No domain element for view with visualID = " + 3004);
-			return "";
-		}
-	}
-
-	/**
-	 * @generated
-	 */
-	private String getUnboundedZone_3005Text(View view) {
-		EObject domainModelElement = view.getElement();
-		if (domainModelElement != null) {
-			return String.valueOf(((Zone) domainModelElement).isIsOneway());
-		} else {
-			SagDiagramEditorPlugin.getInstance().logError(
-					"No domain element for view with visualID = " + 3005);
-			return "";
-		}
-	}
-
-	/**
-	 * @generated
-	 */
-	private String getUnboundedZone_3006Text(View view) {
-		EObject domainModelElement = view.getElement();
-		if (domainModelElement != null) {
-			return String.valueOf(((Zone) domainModelElement).isIsOneway());
-		} else {
-			SagDiagramEditorPlugin.getInstance().logError(
-					"No domain element for view with visualID = " + 3006);
+					"No domain element for view with visualID = " + 4009);
 			return "";
 		}
 	}

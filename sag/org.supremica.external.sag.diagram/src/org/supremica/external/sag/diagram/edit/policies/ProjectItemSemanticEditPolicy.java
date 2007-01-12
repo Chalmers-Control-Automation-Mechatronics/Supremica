@@ -16,6 +16,7 @@ import org.eclipse.gmf.runtime.notation.View;
 
 import org.supremica.external.sag.SagPackage;
 
+import org.supremica.external.sag.diagram.edit.commands.GraphCreateCommand;
 import org.supremica.external.sag.diagram.providers.SagElementTypes;
 
 /**
@@ -28,46 +29,14 @@ public class ProjectItemSemanticEditPolicy extends
 	 * @generated
 	 */
 	protected Command getCreateCommand(CreateElementRequest req) {
-		if (SagElementTypes.Graph_1001 == req.getElementType()) {
+		if (SagElementTypes.Graph_2010 == req.getElementType()) {
 			if (req.getContainmentFeature() == null) {
 				req.setContainmentFeature(SagPackage.eINSTANCE
 						.getProject_Graph());
 			}
-			return getMSLWrapper(new CreateGraph_1001Command(req));
+			return getMSLWrapper(new GraphCreateCommand(req));
 		}
 		return super.getCreateCommand(req);
-	}
-
-	/**
-	 * @generated
-	 */
-	private static class CreateGraph_1001Command extends CreateElementCommand {
-
-		/**
-		 * @generated
-		 */
-		public CreateGraph_1001Command(CreateElementRequest req) {
-			super(req);
-		}
-
-		/**
-		 * @generated
-		 */
-		protected EClass getEClassToEdit() {
-			return SagPackage.eINSTANCE.getProject();
-		};
-
-		/**
-		 * @generated
-		 */
-		protected EObject getElementToEdit() {
-			EObject container = ((CreateElementRequest) getRequest())
-					.getContainer();
-			if (container instanceof View) {
-				container = ((View) container).getElement();
-			}
-			return container;
-		}
 	}
 
 	/**

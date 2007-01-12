@@ -5,7 +5,7 @@
 
    <extension point="org.eclipse.core.runtime.preferences">
       <?gmfgen generated="true"?>
-      <initializer class="org.supremica.external.sag.diagram.part.SagDiagramPreferenceInitializer"/>
+      <initializer class="org.supremica.external.sag.diagram.preferences.DiagramPreferenceInitializer"/>
    </extension>
 
    <extension point="org.eclipse.team.core.fileTypes">
@@ -85,15 +85,15 @@
             checkPluginLoaded="false">
          <Priority name="Low"/>
          <popupContribution class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramContextMenuProvider">
-            <popupStructuredContributionCriteria objectClass="org.supremica.external.sag.diagram.edit.parts.NodeEditPart"/>
+            <popupStructuredContributionCriteria objectClass="org.supremica.external.sag.diagram.edit.parts.SensorNodeEditPart"/>
             <popupPredefinedItem id="deleteFromDiagramAction" remove="true"/>
          </popupContribution>
          <popupContribution class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramContextMenuProvider">
-            <popupStructuredContributionCriteria objectClass="org.supremica.external.sag.diagram.edit.parts.NodeSensorEditPart"/>
+            <popupStructuredContributionCriteria objectClass="org.supremica.external.sag.diagram.edit.parts.SensorNodeSensorNameEditPart"/>
             <popupPredefinedItem id="deleteFromDiagramAction" remove="true"/>
          </popupContribution>
          <popupContribution class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramContextMenuProvider">
-            <popupStructuredContributionCriteria objectClass="org.supremica.external.sag.diagram.edit.parts.Node2EditPart"/>
+            <popupStructuredContributionCriteria objectClass="org.supremica.external.sag.diagram.edit.parts.EndNodeEditPart"/>
             <popupPredefinedItem id="deleteFromDiagramAction" remove="true"/>
          </popupContribution>
          <popupContribution class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramContextMenuProvider">
@@ -114,28 +114,7 @@
             <popupPredefinedItem id="deleteFromModelAction" remove="true"/>
          </popupContribution>
          <popupContribution class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramContextMenuProvider">
-            <popupStructuredContributionCriteria objectClass="org.supremica.external.sag.diagram.edit.parts.BoundedZone2EditPart"/>
-            <popupPredefinedItem id="deleteFromDiagramAction" remove="true"/>
-         </popupContribution>
-         <popupContribution class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramContextMenuProvider">
-            <popupStructuredContributionCriteria objectClass="org.supremica.external.sag.diagram.edit.parts.BoundedZoneCapacity2EditPart"/>
-            <popupPredefinedItem id="deleteFromDiagramAction" remove="true"/>
-            <popupPredefinedItem id="deleteFromModelAction" remove="true"/>
-         </popupContribution>
-         <popupContribution class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramContextMenuProvider">
             <popupStructuredContributionCriteria objectClass="org.supremica.external.sag.diagram.edit.parts.UnboundedZoneEditPart"/>
-            <popupPredefinedItem id="deleteFromDiagramAction" remove="true"/>
-         </popupContribution>
-         <popupContribution class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramContextMenuProvider">
-            <popupStructuredContributionCriteria objectClass="org.supremica.external.sag.diagram.edit.parts.UnboundedZone2EditPart"/>
-            <popupPredefinedItem id="deleteFromDiagramAction" remove="true"/>
-         </popupContribution>
-         <popupContribution class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramContextMenuProvider">
-            <popupStructuredContributionCriteria objectClass="org.supremica.external.sag.diagram.edit.parts.UnboundedZone3EditPart"/>
-            <popupPredefinedItem id="deleteFromDiagramAction" remove="true"/>
-         </popupContribution>
-         <popupContribution class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramContextMenuProvider">
-            <popupStructuredContributionCriteria objectClass="org.supremica.external.sag.diagram.edit.parts.UnboundedZone4EditPart"/>
             <popupPredefinedItem id="deleteFromDiagramAction" remove="true"/>
          </popupContribution>
       </contributionItemProvider>
@@ -223,112 +202,68 @@
 
       <metamodel nsURI="http://supremica.org/external/sag">
          <metamodelType
-               id="org.supremica.external.sag.diagram.Project_79"
+               id="org.supremica.external.sag.diagram.Project_1000"
                name="Undefined"
                kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
                eclass="Project"
                edithelper="org.supremica.external.sag.diagram.edit.helpers.ProjectEditHelper">
-            <param name="semanticHint" value="79"/>
+            <param name="semanticHint" value="1000"/>
          </metamodelType>
       </metamodel>
 
       <metamodel nsURI="http://supremica.org/external/sag">
          <metamodelType
-               id="org.supremica.external.sag.diagram.Node_2001"
-               name="Node"
+               id="org.supremica.external.sag.diagram.SensorNode_3006"
+               name="SensorNode"
                kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
-               eclass="Node"
-               edithelper="org.supremica.external.sag.diagram.edit.helpers.NodeEditHelper">
-            <param name="semanticHint" value="2001"/>
+               eclass="SensorNode"
+               edithelper="org.supremica.external.sag.diagram.edit.helpers.SensorNodeEditHelper">
+            <param name="semanticHint" value="3006"/>
          </metamodelType>
       </metamodel>
 
       <metamodel nsURI="http://supremica.org/external/sag">
-         <specializationType
-               id="org.supremica.external.sag.diagram.Node_2002"
-               name="Node"
+         <metamodelType
+               id="org.supremica.external.sag.diagram.EndNode_3007"
+               name="EndNode"
                kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
-               edithelperadvice="org.supremica.external.sag.diagram.edit.helpers.NodeEditHelperAdvice">
-            <specializes id="org.supremica.external.sag.diagram.Node_2001"/>
-            <param name="semanticHint" value="2002"/>
-         </specializationType>
+               eclass="EndNode"
+               edithelper="org.supremica.external.sag.diagram.edit.helpers.EndNodeEditHelper">
+            <param name="semanticHint" value="3007"/>
+         </metamodelType>
       </metamodel>
 
       <metamodel nsURI="http://supremica.org/external/sag">
          <metamodelType
-               id="org.supremica.external.sag.diagram.Graph_1001"
+               id="org.supremica.external.sag.diagram.Graph_2010"
                name="Graph"
                kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
                eclass="Graph"
                edithelper="org.supremica.external.sag.diagram.edit.helpers.GraphEditHelper">
-            <param name="semanticHint" value="1001"/>
+            <param name="semanticHint" value="2010"/>
          </metamodelType>
       </metamodel>
 
       <metamodel nsURI="http://supremica.org/external/sag">
          <metamodelType
-               id="org.supremica.external.sag.diagram.BoundedZone_3001"
+               id="org.supremica.external.sag.diagram.BoundedZone_4007"
                name="BoundedZone"
                kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
                eclass="BoundedZone"
                edithelper="org.supremica.external.sag.diagram.edit.helpers.BoundedZoneEditHelper">
-            <param name="semanticHint" value="3001"/>
+            <param name="semanticHint" value="4007"/>
          </metamodelType>
-      </metamodel>
-
-      <metamodel nsURI="http://supremica.org/external/sag">
-         <specializationType
-               id="org.supremica.external.sag.diagram.BoundedZone_3002"
-               name="BoundedZone"
-               kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
-               edithelperadvice="org.supremica.external.sag.diagram.edit.helpers.BoundedZoneEditHelperAdvice">
-            <specializes id="org.supremica.external.sag.diagram.BoundedZone_3001"/>
-            <param name="semanticHint" value="3002"/>
-         </specializationType>
       </metamodel>
 
       <metamodel nsURI="http://supremica.org/external/sag">
          <metamodelType
-               id="org.supremica.external.sag.diagram.UnboundedZone_3003"
+               id="org.supremica.external.sag.diagram.UnboundedZone_4009"
                name="UnboundedZone"
                kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
                eclass="UnboundedZone"
                edithelper="org.supremica.external.sag.diagram.edit.helpers.UnboundedZoneEditHelper">
-            <param name="semanticHint" value="3003"/>
+            <param name="semanticHint" value="4009"/>
          </metamodelType>
-      </metamodel>
-
-      <metamodel nsURI="http://supremica.org/external/sag">
-         <specializationType
-               id="org.supremica.external.sag.diagram.UnboundedZone_3004"
-               name="UnboundedZone"
-               kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
-               edithelperadvice="org.supremica.external.sag.diagram.edit.helpers.UnboundedZoneEditHelperAdvice">
-            <specializes id="org.supremica.external.sag.diagram.UnboundedZone_3003"/>
-            <param name="semanticHint" value="3004"/>
-         </specializationType>
-      </metamodel>
-
-      <metamodel nsURI="http://supremica.org/external/sag">
-         <specializationType
-               id="org.supremica.external.sag.diagram.UnboundedZone_3005"
-               name="UnboundedZone"
-               kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
-               edithelperadvice="org.supremica.external.sag.diagram.edit.helpers.UnboundedZone2EditHelperAdvice">
-            <specializes id="org.supremica.external.sag.diagram.UnboundedZone_3003"/>
-            <param name="semanticHint" value="3005"/>
-         </specializationType>
-      </metamodel>
-
-      <metamodel nsURI="http://supremica.org/external/sag">
-         <specializationType
-               id="org.supremica.external.sag.diagram.UnboundedZone_3006"
-               name="UnboundedZone"
-               kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
-               edithelperadvice="org.supremica.external.sag.diagram.edit.helpers.UnboundedZone3EditHelperAdvice">
-            <specializes id="org.supremica.external.sag.diagram.UnboundedZone_3003"/>
-            <param name="semanticHint" value="3006"/>
-         </specializationType>
       </metamodel>
    </extension>
 
@@ -342,16 +277,12 @@
          </enablement>
       </clientContext> 
       <binding context="SagClientContext">
-         <elementType ref="org.supremica.external.sag.diagram.Project_79"/>
-         <elementType ref="org.supremica.external.sag.diagram.Node_2001"/>
-         <elementType ref="org.supremica.external.sag.diagram.Node_2002"/>
-         <elementType ref="org.supremica.external.sag.diagram.Graph_1001"/>
-         <elementType ref="org.supremica.external.sag.diagram.BoundedZone_3001"/>
-         <elementType ref="org.supremica.external.sag.diagram.BoundedZone_3002"/>
-         <elementType ref="org.supremica.external.sag.diagram.UnboundedZone_3003"/>
-         <elementType ref="org.supremica.external.sag.diagram.UnboundedZone_3004"/>
-         <elementType ref="org.supremica.external.sag.diagram.UnboundedZone_3005"/>
-         <elementType ref="org.supremica.external.sag.diagram.UnboundedZone_3006"/>
+         <elementType ref="org.supremica.external.sag.diagram.Project_1000"/>
+         <elementType ref="org.supremica.external.sag.diagram.SensorNode_3006"/>
+         <elementType ref="org.supremica.external.sag.diagram.EndNode_3007"/>
+         <elementType ref="org.supremica.external.sag.diagram.Graph_2010"/>
+         <elementType ref="org.supremica.external.sag.diagram.BoundedZone_4007"/>
+         <elementType ref="org.supremica.external.sag.diagram.UnboundedZone_4009"/>
          <advice ref="org.eclipse.gmf.runtime.diagram.core.advice.notationDepdendents"/>
       </binding>
    </extension>
@@ -494,5 +425,43 @@
             <input type="org.supremica.external.sag.diagram.navigator.SagAbstractNavigatorItem"/>
          </propertySection>
       </propertySections>
+   </extension><extension point="org.eclipse.ui.preferencePages">
+      <?gmfgen generated="true"?>
+      <page
+            name="%preferences.general"
+            class="org.supremica.external.sag.diagram.preferences.DiagramGeneralPreferencePage"
+            id="org.supremica.external.sag.diagram.general">
+      </page>
+      <page
+            name="%preferences.appearance"
+            category="org.supremica.external.sag.diagram.general"
+            class="org.supremica.external.sag.diagram.preferences.DiagramAppearancePreferencePage"
+            id="org.supremica.external.sag.diagram.appearance">
+      </page>     
+      <page
+            name="%preferences.connections"
+            category="org.supremica.external.sag.diagram.general"
+            class="org.supremica.external.sag.diagram.preferences.DiagramConnectionsPreferencePage"
+            id="org.supremica.external.sag.diagram.connections">
+      </page>    
+      <page
+            name="%preferences.printing"
+            category="org.supremica.external.sag.diagram.general"
+            class="org.supremica.external.sag.diagram.preferences.DiagramPrintingPreferencePage"
+            id="org.supremica.external.sag.diagram.printing">
+      </page>
+      <page
+            name="%preferences.rulersAndGrid"
+            category="org.supremica.external.sag.diagram.general"
+            class="org.supremica.external.sag.diagram.preferences.DiagramRulersAndGridPreferencePage"
+            id="org.supremica.external.sag.diagram.rulersAndGrid">
+      </page>
+      <page
+            name="%preferences.pathmaps"
+            category="org.supremica.external.sag.diagram.general"
+            class="org.eclipse.gmf.runtime.emf.ui.preferences.PathmapsPreferencePage"
+            id="org.supremica.external.sag.diagram.pathmaps">
+      </page>
    </extension>
+
 </plugin>

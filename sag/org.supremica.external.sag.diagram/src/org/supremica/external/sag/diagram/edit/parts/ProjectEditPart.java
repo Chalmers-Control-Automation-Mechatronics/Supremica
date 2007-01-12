@@ -20,7 +20,7 @@ public class ProjectEditPart extends DiagramEditPart {
 	/**
 	 * @generated
 	 */
-	public static final int VISUAL_ID = 79;
+	public static final int VISUAL_ID = 1000;
 
 	/**
 	 * @generated
@@ -38,6 +38,5 @@ public class ProjectEditPart extends DiagramEditPart {
 				new ProjectItemSemanticEditPolicy());
 		installEditPolicy(EditPolicyRoles.CANONICAL_ROLE,
 				new ProjectCanonicalEditPolicy());
-
 	}
 }

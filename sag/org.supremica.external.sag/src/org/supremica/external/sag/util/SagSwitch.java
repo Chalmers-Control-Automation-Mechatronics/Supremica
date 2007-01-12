@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagSwitch.java,v 1.2 2007-01-09 15:31:07 torda Exp $
+ * $Id: SagSwitch.java,v 1.3 2007-01-12 14:23:21 torda Exp $
  */
 package org.supremica.external.sag.util;
 
@@ -97,6 +97,7 @@ public class SagSwitch<T> {
 			case SagPackage.ZONE: {
 				Zone zone = (Zone)theEObject;
 				T result = caseZone(zone);
+				if (result == null) result = caseNamed(zone);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -104,6 +105,7 @@ public class SagSwitch<T> {
 				BoundedZone boundedZone = (BoundedZone)theEObject;
 				T result = caseBoundedZone(boundedZone);
 				if (result == null) result = caseZone(boundedZone);
+				if (result == null) result = caseNamed(boundedZone);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -117,6 +119,7 @@ public class SagSwitch<T> {
 				UnboundedZone unboundedZone = (UnboundedZone)theEObject;
 				T result = caseUnboundedZone(unboundedZone);
 				if (result == null) result = caseZone(unboundedZone);
+				if (result == null) result = caseNamed(unboundedZone);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -137,6 +140,21 @@ public class SagSwitch<T> {
 				Sensor sensor = (Sensor)theEObject;
 				T result = caseSensor(sensor);
 				if (result == null) result = caseNamed(sensor);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case SagPackage.END_NODE: {
+				EndNode endNode = (EndNode)theEObject;
+				T result = caseEndNode(endNode);
+				if (result == null) result = caseNode(endNode);
+				if (result == null) result = caseNamed(endNode);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case SagPackage.SENSOR_NODE: {
+				SensorNode sensorNode = (SensorNode)theEObject;
+				T result = caseSensorNode(sensorNode);
+				if (result == null) result = caseNode(sensorNode);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -261,6 +279,36 @@ public class SagSwitch<T> {
 	 * @generated
 	 */
 	public T caseSensor(Sensor object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpretting the object as an instance of '<em>End Node</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpretting the object as an instance of '<em>End Node</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseEndNode(EndNode object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpretting the object as an instance of '<em>Sensor Node</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpretting the object as an instance of '<em>Sensor Node</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseSensorNode(SensorNode object) {
 		return null;
 	}
 

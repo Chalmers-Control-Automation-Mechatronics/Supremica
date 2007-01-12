@@ -82,7 +82,7 @@ public class GraphNameEditPart extends CompartmentEditPart implements
 	/**
 	 * @generated
 	 */
-	public static final int VISUAL_ID = 4002;
+	public static final int VISUAL_ID = 5004;
 
 	/**
 	 * @generated
@@ -136,7 +136,6 @@ public class GraphNameEditPart extends CompartmentEditPart implements
 						return false;
 					}
 				});
-
 	}
 
 	/**
@@ -270,7 +269,7 @@ public class GraphNameEditPart extends CompartmentEditPart implements
 	 * @generated
 	 */
 	protected boolean isEditable() {
-		return getEditText() != null;
+		return getParser() != null;
 	}
 
 	/**
@@ -335,7 +334,7 @@ public class GraphNameEditPart extends CompartmentEditPart implements
 
 				public Object getAdapter(Class adapter) {
 					if (IElementType.class.equals(adapter)) {
-						return SagElementTypes.Graph_1001;
+						return SagElementTypes.Graph_2010;
 					}
 					return super.getAdapter(adapter);
 				}
@@ -481,8 +480,11 @@ public class GraphNameEditPart extends CompartmentEditPart implements
 				NotationPackage.eINSTANCE.getFontStyle());
 		if (style != null) {
 			FontData fontData = new FontData(style.getFontName(), style
-					.getFontHeight(), (style.isBold() ? SWT.BOLD : SWT.NORMAL)
-					| (style.isItalic() ? SWT.ITALIC : SWT.NORMAL));
+					.getFontHeight(),
+					(style.isBold() ? org.eclipse.swt.SWT.BOLD
+							: org.eclipse.swt.SWT.NORMAL)
+							| (style.isItalic() ? org.eclipse.swt.SWT.ITALIC
+									: org.eclipse.swt.SWT.NORMAL));
 			setFont(fontData);
 		}
 	}
@@ -609,7 +611,7 @@ public class GraphNameEditPart extends CompartmentEditPart implements
 	 * @generated
 	 */
 	protected IFigure createFigure() {
-		// Parent should assign one using setLabel method
+		// Parent should assign one using setLabel() method
 		return null;
 	}
 }

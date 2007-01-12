@@ -29,12 +29,16 @@ import javax.swing.*
 
 import javax.xml.bind.JAXBException
 import org.xml.sax.SAXException
+
+// NOTE THAT all generics used here are only for documentation.
+// Groovy does not enforce anything based on generics, neither dynamically or statically
+
 class SagToWaters {
 
 	static void main(args) {
     	Project sagProject = loadSagProjectFromFile('C:/runtime-New_configuration/test/BallSystem.sag')
 		ModuleProxy watersModule = generateWatersModule(sagProject)
-		File watersFile = new File("C:/runtime-New_configuration/test/" + watersModule.getName() +'.'+ WmodFileFilter.WMOD)
+		File watersFile = new File("C:/runtime-New_configuration/test/${watersModule.getName()}.${WmodFileFilter.WMOD}")
 		saveWatersModuleToFile(watersModule, watersFile)
 		watersFile.eachLine{println it}
 	}
@@ -46,61 +50,59 @@ class SagToWaters {
 	}
 
 	static Project loadSagProjectFromFile(String filename) {
-		// Get the serialized sag model model
-		final Resource resource = new ResourceSetImpl().getResource(URI
-				.createFileURI(filename), true)
+		// Get the serialized sag model
+		final Resource resource = new ResourceSetImpl().getResource(URI.createFileURI(filename), true)
 		return resource.getContents().get(0)
 	}
 
 	static ModuleProxy generateWatersModule(Project sagProject) {
 		ModuleSubject watersModule = new ModuleSubject(sagProject.name, null)
 		
+		Closure newComponent = {componentName, graph ->
+			def component = new SimpleComponentSubject(new ExpressionParser(ModuleSubjectFactory.getInstance(), CompilerOperatorTable.getInstance()).parseIdentifier(componentName),
+                ComponentKind.PLANT, graph)
+			watersModule.componentListModifiable << component
+			component
+		}
 		//Create one component for every sensor
-		Map sensorComponents = sagProject.sensor.inject([:]){components, sensor -> //and create a waters component for each
+		final Map<Sensor, SimpleComponentSubject> sensorComponents = sagProject.sensor.inject([:]){components, sensor -> //and create a waters component for each
 			GraphSubject watersGraph = new GraphSubject()
 			["false","true"].each{watersGraph.nodesModifiable << new SimpleNodeSubject(it)}
 			watersGraph.nodesModifiable.find{it.name=="false"}.initial = true
-			components[sensor] = new SimpleComponentSubject(new ExpressionParser(ModuleSubjectFactory.getInstance(), CompilerOperatorTable.getInstance()).parseIdentifier(sensor.name),
-					                                                   ComponentKind.PLANT, watersGraph)
-			watersModule.componentListModifiable << components[sensor]
+			components[sensor] = newComponent(sensor.name, watersGraph)
 			components
 		}
 		
 		//Create one component for every bounded zone
 		int i = 0
-		Map boundedZoneComponents = sagProject.graph.collect{it.zone}.flatten(). //collect all zones
-			                                  findAll{it instanceof BoundedZone}.        //that are bounded
-			                                  inject([:]){components, zone -> //and create a waters component for each
+		final Map<BoundedZone, SimpleComponentSubject> boundedZoneComponents = sagProject.graph.collect{graph -> i = 0; graph.zone.findAll{zone -> zone instanceof BoundedZone}}.flatten().
+			                                         inject([:]){components, zone ->
 			GraphSubject watersGraph = new GraphSubject()
 			(0..zone.capacity).each{watersGraph.nodesModifiable << new SimpleNodeSubject(it.toString())}
 			watersGraph.nodesModifiable.find{it.name=="0"}.initial = true
-			components[zone] = new SimpleComponentSubject(new ExpressionParser(ModuleSubjectFactory.getInstance(), CompilerOperatorTable.getInstance()).parseIdentifier("zone"+i.toString()),
-					                                                   ComponentKind.PLANT, watersGraph)
+			components[zone] = newComponent("${zone.graph.name}_zone${i}", watersGraph)
 			++i
-			watersModule.componentListModifiable << components[zone]
 			components
 		}
 		
 		//Create one event for every sensor entry and exit
 		//Get a map with sensor as key and a list of zones from which objects can enter the sensor as value
-		Map sensorEntrances = sagProject.sensor.inject([:]) {entrances, sensor ->
-			entrances[sensor] = sensor.node.collect{node -> node.incoming + node.outgoing.findAll{zone -> !zone.isOneway}}.flatten()
+		final Map<Sensor, List<Zone>> sensorEntrances = sagProject.sensor.inject([:]) {entrances, sensor ->
+			entrances[sensor] = sensor.node.incoming + sensor.node.outgoing.findAll{zone -> !zone.isOneway}
 			entrances
 		}
 		//Get a map with sensor as key and a list of zones to which objects can exit the sensor as value
-		Map sensorExits = sagProject.sensor.inject([:]) {exits, sensor ->
-			exits[sensor] = sensor.node.collect{node -> node.outgoing + node.incoming.findAll{zone -> !zone.isOneway}}.flatten()
+		final Map<Sensor, List<Zone>> sensorExits = sagProject.sensor.inject([:]) {exits, sensor ->
+			exits[sensor] = sensor.node.outgoing + sensor.node.incoming.findAll{zone -> !zone.isOneway}
 			exits
 		}
 		Closure createEventsAndEdges = {Map sensorChanges, boolean isEntrance ->
-			for (sensorAndZonesKeyValuePair in sensorChanges) { //sensor as key and list of zones as value
-				Sensor sensor = sensorAndZonesKeyValuePair.key
-				List zones = sensorAndZonesKeyValuePair.value
-				//Create an event
-				for (zoneIndex in 0..zones.size()-1) {
+			sensorChanges.each {sensor, zones ->
+				zones.eachWithIndex {zone, zoneIndex  ->
+					//Create an event
 					String eventLabel = (isEntrance ? "to_" : "from_") + sensor.name
 					if (zones.size() > 1) {
-						eventLabel = eventLabel + "_" + zoneIndex.toString()
+						eventLabel = "${eventLabel}_${zoneIndex.toString()}"
 					}	
 					EventDeclSubject event = new EventDeclSubject(eventLabel, EventKind.UNCONTROLLABLE)
 					watersModule.eventDeclListModifiable << event
@@ -108,8 +110,8 @@ class SagToWaters {
 					//Create an edge in the sensor component and add the event label to the edge
 					ComponentProxy component = sensorComponents[sensor]
 	    	        SagToWaters.addEventToComponent(component, !isEntrance, isEntrance, event)
-					//Create an edge in the zone component (if bounded) and add the event
-					Zone zone = zones[zoneIndex]
+				
+	    	        //Create an edge in the zone component (if bounded) and add the event
 					component = boundedZoneComponents[zone]
 					if (component != null) {
 						(0..zone.capacity-1).each {nodeIndex ->
@@ -138,10 +140,8 @@ class SagToWaters {
 	
 	static void saveWatersModuleToFile(ModuleProxy watersModule, File fileToSaveIn) {
 		try	{
-			final ModuleProxyFactory factory =
-				ModuleSubjectFactory.getInstance()
-			final OperatorTable optable = CompilerOperatorTable.getInstance()
-			final ProxyMarshaller<ModuleProxy> marshaller = new JAXBModuleMarshaller(factory, optable)
+			final ProxyMarshaller<ModuleProxy> marshaller = new JAXBModuleMarshaller(ModuleSubjectFactory.getInstance(),
+			                                                                   CompilerOperatorTable.getInstance())
 			marshaller.marshal(watersModule, fileToSaveIn)
 		} catch (final JAXBException exception) {
 			JOptionPane.showMessageDialog(null, "Error saving module file:" + exception.getMessage())

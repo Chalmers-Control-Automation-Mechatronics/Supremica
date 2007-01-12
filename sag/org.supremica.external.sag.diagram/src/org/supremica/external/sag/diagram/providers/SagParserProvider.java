@@ -9,10 +9,9 @@ import org.eclipse.gmf.runtime.common.ui.services.parser.IParserProvider;
 import org.eclipse.gmf.runtime.notation.View;
 import org.supremica.external.sag.SagPackage;
 
-import org.supremica.external.sag.diagram.edit.parts.BoundedZoneCapacity2EditPart;
 import org.supremica.external.sag.diagram.edit.parts.BoundedZoneCapacityEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphNameEditPart;
-import org.supremica.external.sag.diagram.edit.parts.NodeSensorEditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorNodeSensorNameEditPart;
 
 import org.supremica.external.sag.diagram.part.SagVisualIDRegistry;
 
@@ -25,46 +24,46 @@ public class SagParserProvider extends AbstractProvider implements
 	/**
 	 * @generated
 	 */
-	private IParser nodeNodeSensor_4001Parser;
+	private IParser sensorNodeSensorNodeSensorName_5003Parser;
 
 	/**
 	 * @generated
 	 */
-	private IParser getNodeNodeSensor_4001Parser() {
-		if (nodeNodeSensor_4001Parser == null) {
-			nodeNodeSensor_4001Parser = createNodeNodeSensor_4001Parser();
+	private IParser getSensorNodeSensorNodeSensorName_5003Parser() {
+		if (sensorNodeSensorNodeSensorName_5003Parser == null) {
+			sensorNodeSensorNodeSensorName_5003Parser = createSensorNodeSensorNodeSensorName_5003Parser();
 		}
-		return nodeNodeSensor_4001Parser;
+		return sensorNodeSensorNodeSensorName_5003Parser;
 	}
 
 	/**
 	 * @generated
 	 */
-	protected IParser createNodeNodeSensor_4001Parser() {
+	protected IParser createSensorNodeSensorNodeSensorName_5003Parser() {
 		SagStructuralFeatureParser parser = new SagStructuralFeatureParser(
-				SagPackage.eINSTANCE.getNode_Sensor());
+				SagPackage.eINSTANCE.getSensorNode_SensorName());
 		return parser;
 	}
 
 	/**
 	 * @generated
 	 */
-	private IParser graphGraphName_4002Parser;
+	private IParser graphGraphName_5004Parser;
 
 	/**
 	 * @generated
 	 */
-	private IParser getGraphGraphName_4002Parser() {
-		if (graphGraphName_4002Parser == null) {
-			graphGraphName_4002Parser = createGraphGraphName_4002Parser();
+	private IParser getGraphGraphName_5004Parser() {
+		if (graphGraphName_5004Parser == null) {
+			graphGraphName_5004Parser = createGraphGraphName_5004Parser();
 		}
-		return graphGraphName_4002Parser;
+		return graphGraphName_5004Parser;
 	}
 
 	/**
 	 * @generated
 	 */
-	protected IParser createGraphGraphName_4002Parser() {
+	protected IParser createGraphGraphName_5004Parser() {
 		SagStructuralFeatureParser parser = new SagStructuralFeatureParser(
 				SagPackage.eINSTANCE.getNamed_Name());
 		return parser;
@@ -73,46 +72,22 @@ public class SagParserProvider extends AbstractProvider implements
 	/**
 	 * @generated
 	 */
-	private IParser boundedZoneBoundedZoneCapacity_4003Parser;
+	private IParser boundedZoneBoundedZoneCapacity_6003Parser;
 
 	/**
 	 * @generated
 	 */
-	private IParser getBoundedZoneBoundedZoneCapacity_4003Parser() {
-		if (boundedZoneBoundedZoneCapacity_4003Parser == null) {
-			boundedZoneBoundedZoneCapacity_4003Parser = createBoundedZoneBoundedZoneCapacity_4003Parser();
+	private IParser getBoundedZoneBoundedZoneCapacity_6003Parser() {
+		if (boundedZoneBoundedZoneCapacity_6003Parser == null) {
+			boundedZoneBoundedZoneCapacity_6003Parser = createBoundedZoneBoundedZoneCapacity_6003Parser();
 		}
-		return boundedZoneBoundedZoneCapacity_4003Parser;
+		return boundedZoneBoundedZoneCapacity_6003Parser;
 	}
 
 	/**
 	 * @generated
 	 */
-	protected IParser createBoundedZoneBoundedZoneCapacity_4003Parser() {
-		SagStructuralFeatureParser parser = new SagStructuralFeatureParser(
-				SagPackage.eINSTANCE.getBoundedZone_Capacity());
-		return parser;
-	}
-
-	/**
-	 * @generated
-	 */
-	private IParser boundedZoneBoundedZoneCapacity_4004Parser;
-
-	/**
-	 * @generated
-	 */
-	private IParser getBoundedZoneBoundedZoneCapacity_4004Parser() {
-		if (boundedZoneBoundedZoneCapacity_4004Parser == null) {
-			boundedZoneBoundedZoneCapacity_4004Parser = createBoundedZoneBoundedZoneCapacity_4004Parser();
-		}
-		return boundedZoneBoundedZoneCapacity_4004Parser;
-	}
-
-	/**
-	 * @generated
-	 */
-	protected IParser createBoundedZoneBoundedZoneCapacity_4004Parser() {
+	protected IParser createBoundedZoneBoundedZoneCapacity_6003Parser() {
 		SagStructuralFeatureParser parser = new SagStructuralFeatureParser(
 				SagPackage.eINSTANCE.getBoundedZone_Capacity());
 		return parser;
@@ -123,14 +98,12 @@ public class SagParserProvider extends AbstractProvider implements
 	 */
 	protected IParser getParser(int visualID) {
 		switch (visualID) {
-		case NodeSensorEditPart.VISUAL_ID:
-			return getNodeNodeSensor_4001Parser();
+		case SensorNodeSensorNameEditPart.VISUAL_ID:
+			return getSensorNodeSensorNodeSensorName_5003Parser();
 		case GraphNameEditPart.VISUAL_ID:
-			return getGraphGraphName_4002Parser();
+			return getGraphGraphName_5004Parser();
 		case BoundedZoneCapacityEditPart.VISUAL_ID:
-			return getBoundedZoneBoundedZoneCapacity_4003Parser();
-		case BoundedZoneCapacity2EditPart.VISUAL_ID:
-			return getBoundedZoneBoundedZoneCapacity_4004Parser();
+			return getBoundedZoneBoundedZoneCapacity_6003Parser();
 		}
 		return null;
 	}

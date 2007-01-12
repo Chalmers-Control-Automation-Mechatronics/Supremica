@@ -30,6 +30,8 @@ import org.eclipse.gmf.runtime.emf.type.core.requests.ReorientReferenceRelations
 import org.eclipse.gmf.runtime.emf.type.core.requests.ReorientRelationshipRequest;
 import org.eclipse.gmf.runtime.emf.type.core.requests.SetRequest;
 import org.eclipse.gmf.runtime.notation.View;
+import org.supremica.external.sag.Graph;
+import org.supremica.external.sag.Node;
 import org.supremica.external.sag.diagram.edit.helpers.SagBaseEditHelper;
 
 /**
@@ -238,6 +240,28 @@ public class SagBaseItemSemanticEditPolicy extends SemanticEditPolicy {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * @generated 
+	 */
+	protected static class LinkConstraints {
+
+		/**
+		 * @generated 
+		 */
+		public static boolean canCreateBoundedZone_4007(Graph container,
+				Node source, Node target) {
+			return true;
+		}
+
+		/**
+		 * @generated 
+		 */
+		public static boolean canCreateUnboundedZone_4009(Graph container,
+				Node source, Node target) {
+			return true;
+		}
 	}
 
 }

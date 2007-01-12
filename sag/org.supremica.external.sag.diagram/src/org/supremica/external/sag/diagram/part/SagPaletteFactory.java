@@ -67,85 +67,57 @@ public class SagPaletteFactory {
 	 * @generated
 	 */
 	private ToolEntry createGraph1CreationTool() {
-		ImageDescriptor smallImage;
-		ImageDescriptor largeImage;
-
-		smallImage = SagElementTypes
-				.getImageDescriptor(SagElementTypes.Graph_1001);
-
-		largeImage = smallImage;
-
-		final List elementTypes = new ArrayList();
-		elementTypes.add(SagElementTypes.Graph_1001);
-		ToolEntry result = new NodeToolEntry(
-				SagDiagramEditorPlugin.getString("Graph1CreationTool.title"), SagDiagramEditorPlugin.getString("Graph1CreationTool.desc"), smallImage, largeImage, elementTypes); //$NON-NLS-1$ $NON-NLS-2$
-
-		return result;
+		List/*<IElementType>*/types = new ArrayList/*<IElementType>*/(1);
+		types.add(SagElementTypes.Graph_2010);
+		NodeToolEntry entry = new NodeToolEntry(
+				SagDiagramEditorPlugin.getString("Graph1CreationTool.title"), SagDiagramEditorPlugin.getString("Graph1CreationTool.desc"), types); //$NON-NLS-1$ $NON-NLS-2$
+		entry.setSmallIcon(SagElementTypes
+				.getImageDescriptor(SagElementTypes.Graph_2010));
+		entry.setLargeIcon(entry.getSmallIcon());
+		return entry;
 	}
 
 	/**
 	 * @generated
 	 */
 	private ToolEntry createSensor1CreationTool() {
-		ImageDescriptor smallImage;
-		ImageDescriptor largeImage;
-
-		smallImage = SagElementTypes
-				.getImageDescriptor(SagElementTypes.Node_2001);
-
-		largeImage = smallImage;
-
-		final List elementTypes = new ArrayList();
-		elementTypes.add(SagElementTypes.Node_2001);
-		ToolEntry result = new NodeToolEntry(
-				SagDiagramEditorPlugin.getString("Sensor1CreationTool.title"), SagDiagramEditorPlugin.getString("Sensor1CreationTool.desc"), smallImage, largeImage, elementTypes); //$NON-NLS-1$ $NON-NLS-2$
-
-		return result;
+		List/*<IElementType>*/types = new ArrayList/*<IElementType>*/(1);
+		types.add(SagElementTypes.SensorNode_3006);
+		NodeToolEntry entry = new NodeToolEntry(
+				SagDiagramEditorPlugin.getString("Sensor1CreationTool.title"), SagDiagramEditorPlugin.getString("Sensor1CreationTool.desc"), types); //$NON-NLS-1$ $NON-NLS-2$
+		entry.setSmallIcon(SagElementTypes
+				.getImageDescriptor(SagElementTypes.SensorNode_3006));
+		entry.setLargeIcon(entry.getSmallIcon());
+		return entry;
 	}
 
 	/**
 	 * @generated
 	 */
 	private ToolEntry createEndNode2CreationTool() {
-		ImageDescriptor smallImage;
-		ImageDescriptor largeImage;
-
-		smallImage = SagElementTypes
-				.getImageDescriptor(SagElementTypes.Node_2002);
-
-		largeImage = smallImage;
-
-		final List elementTypes = new ArrayList();
-		elementTypes.add(SagElementTypes.Node_2002);
-		ToolEntry result = new NodeToolEntry(
-				SagDiagramEditorPlugin.getString("EndNode2CreationTool.title"), SagDiagramEditorPlugin.getString("EndNode2CreationTool.desc"), smallImage, largeImage, elementTypes); //$NON-NLS-1$ $NON-NLS-2$
-
-		return result;
+		List/*<IElementType>*/types = new ArrayList/*<IElementType>*/(1);
+		types.add(SagElementTypes.EndNode_3007);
+		NodeToolEntry entry = new NodeToolEntry(
+				SagDiagramEditorPlugin.getString("EndNode2CreationTool.title"), SagDiagramEditorPlugin.getString("EndNode2CreationTool.desc"), types); //$NON-NLS-1$ $NON-NLS-2$
+		entry.setSmallIcon(SagElementTypes
+				.getImageDescriptor(SagElementTypes.EndNode_3007));
+		entry.setLargeIcon(entry.getSmallIcon());
+		return entry;
 	}
 
 	/**
 	 * @generated
 	 */
 	private ToolEntry createZone1CreationTool() {
-		ImageDescriptor smallImage;
-		ImageDescriptor largeImage;
-
-		smallImage = SagElementTypes
-				.getImageDescriptor(SagElementTypes.BoundedZone_3001);
-
-		largeImage = smallImage;
-
-		final List relationshipTypes = new ArrayList();
-		relationshipTypes.add(SagElementTypes.BoundedZone_3001);
-		relationshipTypes.add(SagElementTypes.BoundedZone_3002);
-		relationshipTypes.add(SagElementTypes.UnboundedZone_3003);
-		relationshipTypes.add(SagElementTypes.UnboundedZone_3004);
-		relationshipTypes.add(SagElementTypes.UnboundedZone_3005);
-		relationshipTypes.add(SagElementTypes.UnboundedZone_3006);
-		ToolEntry result = new LinkToolEntry(
-				SagDiagramEditorPlugin.getString("Zone1CreationTool.title"), SagDiagramEditorPlugin.getString("Zone1CreationTool.desc"), smallImage, largeImage, relationshipTypes); //$NON-NLS-1$ $NON-NLS-2$
-
-		return result;
+		List/*<IElementType>*/types = new ArrayList/*<IElementType>*/(2);
+		types.add(SagElementTypes.BoundedZone_4007);
+		types.add(SagElementTypes.UnboundedZone_4009);
+		LinkToolEntry entry = new LinkToolEntry(
+				SagDiagramEditorPlugin.getString("Zone1CreationTool.title"), SagDiagramEditorPlugin.getString("Zone1CreationTool.desc"), types); //$NON-NLS-1$ $NON-NLS-2$
+		entry.setSmallIcon(SagElementTypes
+				.getImageDescriptor(SagElementTypes.BoundedZone_4007));
+		entry.setLargeIcon(entry.getSmallIcon());
+		return entry;
 	}
 
 	/**
@@ -162,9 +134,8 @@ public class SagPaletteFactory {
 		 * @generated
 		 */
 		private NodeToolEntry(String title, String description,
-				ImageDescriptor smallIcon, ImageDescriptor largeIcon,
 				List elementTypes) {
-			super(title, description, smallIcon, largeIcon);
+			super(title, description, null, null);
 			this.elementTypes = elementTypes;
 		}
 
@@ -192,9 +163,8 @@ public class SagPaletteFactory {
 		 * @generated
 		 */
 		private LinkToolEntry(String title, String description,
-				ImageDescriptor smallIcon, ImageDescriptor largeIcon,
 				List relationshipTypes) {
-			super(title, description, smallIcon, largeIcon);
+			super(title, description, null, null);
 			this.relationshipTypes = relationshipTypes;
 		}
 

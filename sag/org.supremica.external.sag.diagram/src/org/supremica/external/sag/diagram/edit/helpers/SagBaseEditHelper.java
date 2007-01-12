@@ -1,13 +1,20 @@
 package org.supremica.external.sag.diagram.edit.helpers;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.gmf.runtime.common.core.command.CompositeCommand;
 import org.eclipse.gmf.runtime.common.core.command.ICommand;
 import org.eclipse.gmf.runtime.emf.type.core.edithelper.AbstractEditHelper;
 import org.eclipse.gmf.runtime.emf.type.core.requests.CreateElementRequest;
 import org.eclipse.gmf.runtime.emf.type.core.requests.CreateRelationshipRequest;
+import org.eclipse.gmf.runtime.emf.type.core.requests.DestroyDependentsRequest;
 import org.eclipse.gmf.runtime.emf.type.core.requests.DestroyElementRequest;
 import org.eclipse.gmf.runtime.emf.type.core.requests.DestroyReferenceRequest;
 import org.eclipse.gmf.runtime.emf.type.core.requests.IEditCommandRequest;
+import org.supremica.external.sag.EndNode;
+import org.supremica.external.sag.Node;
+import org.supremica.external.sag.Zone;
 
 /**
  * @generated
@@ -54,9 +61,25 @@ public class SagBaseEditHelper extends AbstractEditHelper {
 	}
 
 	/**
-	 * @generated
+	 * @generated NOT
 	 */
 	protected ICommand getDestroyElementCommand(DestroyElementRequest req) {
+		return null;
+	}
+
+	//For some reason this is not called since these helpers are never created/Tord
+	protected ICommand getDestroyDependentsCommand(DestroyDependentsRequest req) {
+		if (req.getElementToDestroy() instanceof Zone) {
+			Zone zone = (Zone) req.getElementToDestroy();
+			Set<Node> endNodesToDestroy = new HashSet<Node>();
+			if (zone.getBack() instanceof EndNode) {
+				endNodesToDestroy.add(zone.getBack());
+			}
+			if (zone.getFront() instanceof EndNode) {
+				endNodesToDestroy.add(zone.getFront());
+			}
+			return req.getDestroyDependentsCommand(endNodesToDestroy);
+		}
 		return null;
 	}
 

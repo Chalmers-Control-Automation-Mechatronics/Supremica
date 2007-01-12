@@ -6,12 +6,13 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EObject;
 
 import org.supremica.external.sag.Graph;
 
-import org.supremica.external.sag.diagram.edit.parts.Node2EditPart;
-import org.supremica.external.sag.diagram.edit.parts.NodeEditPart;
+import org.supremica.external.sag.diagram.edit.parts.EndNodeEditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorNodeEditPart;
 
 import org.supremica.external.sag.diagram.part.SagVisualIDRegistry;
 
@@ -36,11 +37,11 @@ public class GraphGraphCompartmentCanonicalEditPolicy extends
 			nodeVID = SagVisualIDRegistry
 					.getNodeVisualID(viewObject, nextValue);
 			switch (nodeVID) {
-			case NodeEditPart.VISUAL_ID: {
+			case SensorNodeEditPart.VISUAL_ID: {
 				result.add(nextValue);
 				break;
 			}
-			case Node2EditPart.VISUAL_ID: {
+			case EndNodeEditPart.VISUAL_ID: {
 				result.add(nextValue);
 				break;
 			}
@@ -63,5 +64,4 @@ public class GraphGraphCompartmentCanonicalEditPolicy extends
 	protected String getDefaultFactoryHint() {
 		return null;
 	}
-
 }

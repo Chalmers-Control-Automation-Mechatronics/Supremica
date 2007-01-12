@@ -6,7 +6,7 @@
 	<classpathentry exported="true" kind="lib" path="C:/Program Files/eclipse/plugins/org.codehaus.groovy.eclipse_1.0.0.20061211/lib/commons-io-1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="C:/Program Files/eclipse/plugins/org.codehaus.groovy.eclipse_1.0.0.20061211/lib/commons-lang-2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="C:/Program Files/eclipse/plugins/org.codehaus.groovy.eclipse_1.0.0.20061211/lib/groovy-all-1.0-RC-01.jar"/>
-	<classpathentry kind="lib" path="/Supremica/build"/>
+	<classpathentry kind="lib" path="/Supremica/build" sourcepath="/Supremica/src"/>
 	<classpathentry kind="lib" path="/Supremica/lib/unjared"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
