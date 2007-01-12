@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: GraphImpl.java,v 1.2 2007-01-09 15:31:07 torda Exp $
+ * $Id: GraphImpl.java,v 1.3 2007-01-12 14:23:10 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
@@ -112,7 +112,7 @@ public class GraphImpl extends NamedImpl implements Graph {
 	 */
 	public EList<Zone> getZone() {
 		if (zone == null) {
-			zone = new EObjectContainmentEList<Zone>(Zone.class, this, SagPackage.GRAPH__ZONE);
+			zone = new EObjectContainmentWithInverseEList<Zone>(Zone.class, this, SagPackage.GRAPH__ZONE, SagPackage.ZONE__GRAPH);
 		}
 		return zone;
 	}
@@ -200,6 +200,8 @@ public class GraphImpl extends NamedImpl implements Graph {
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
+			case SagPackage.GRAPH__ZONE:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getZone()).basicAdd(otherEnd, msgs);
 			case SagPackage.GRAPH__NODE:
 				return ((InternalEList<InternalEObject>)(InternalEList<?>)getNode()).basicAdd(otherEnd, msgs);
 			case SagPackage.GRAPH__PROJECT:

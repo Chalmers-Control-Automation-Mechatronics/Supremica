@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagFactoryImpl.java,v 1.2 2007-01-09 15:31:07 torda Exp $
+ * $Id: SagFactoryImpl.java,v 1.3 2007-01-12 14:23:10 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
@@ -63,9 +63,10 @@ public class SagFactoryImpl extends EFactoryImpl implements SagFactory {
 			case SagPackage.GRAPH: return createGraph();
 			case SagPackage.BOUNDED_ZONE: return createBoundedZone();
 			case SagPackage.UNBOUNDED_ZONE: return createUnboundedZone();
-			case SagPackage.NODE: return createNode();
 			case SagPackage.PROJECT: return createProject();
 			case SagPackage.SENSOR: return createSensor();
+			case SagPackage.END_NODE: return createEndNode();
+			case SagPackage.SENSOR_NODE: return createSensorNode();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -106,16 +107,6 @@ public class SagFactoryImpl extends EFactoryImpl implements SagFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Node createNode() {
-		NodeImpl node = new NodeImpl();
-		return node;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public Project createProject() {
 		ProjectImpl project = new ProjectImpl();
 		return project;
@@ -129,6 +120,26 @@ public class SagFactoryImpl extends EFactoryImpl implements SagFactory {
 	public Sensor createSensor() {
 		SensorImpl sensor = new SensorImpl();
 		return sensor;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EndNode createEndNode() {
+		EndNodeImpl endNode = new EndNodeImpl();
+		return endNode;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public SensorNode createSensorNode() {
+		SensorNodeImpl sensorNode = new SensorNodeImpl();
+		return sensorNode;
 	}
 
 	/**

@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: UnboundedZoneImpl.java,v 1.2 2007-01-12 14:23:10 torda Exp $
+ * $Id: EndNodeImpl.java,v 1.1 2007-01-12 14:23:10 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
@@ -12,49 +12,50 @@ import org.eclipse.emf.ecore.EClass;
 
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
+import org.supremica.external.sag.EndNode;
+import org.supremica.external.sag.Named;
 import org.supremica.external.sag.SagPackage;
-import org.supremica.external.sag.UnboundedZone;
 
 /**
  * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Unbounded Zone</b></em>'.
+ * An implementation of the model object '<em><b>End Node</b></em>'.
  * <!-- end-user-doc -->
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link org.supremica.external.sag.impl.UnboundedZoneImpl#isIsOutside <em>Is Outside</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.EndNodeImpl#getName <em>Name</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class UnboundedZoneImpl extends ZoneImpl implements UnboundedZone {
+public class EndNodeImpl extends NodeImpl implements EndNode {
 	/**
-	 * The default value of the '{@link #isIsOutside() <em>Is Outside</em>}' attribute.
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #isIsOutside()
+	 * @see #getName()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final boolean IS_OUTSIDE_EDEFAULT = true;
+	protected static final String NAME_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #isIsOutside() <em>Is Outside</em>}' attribute.
+	 * The cached value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #isIsOutside()
+	 * @see #getName()
 	 * @generated
 	 * @ordered
 	 */
-	protected boolean isOutside = IS_OUTSIDE_EDEFAULT;
+	protected String name = NAME_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected UnboundedZoneImpl() {
+	protected EndNodeImpl() {
 		super();
 	}
 
@@ -65,7 +66,7 @@ public class UnboundedZoneImpl extends ZoneImpl implements UnboundedZone {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return SagPackage.Literals.UNBOUNDED_ZONE;
+		return SagPackage.Literals.END_NODE;
 	}
 
 	/**
@@ -73,8 +74,8 @@ public class UnboundedZoneImpl extends ZoneImpl implements UnboundedZone {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public boolean isIsOutside() {
-		return isOutside;
+	public String getName() {
+		return name;
 	}
 
 	/**
@@ -82,11 +83,11 @@ public class UnboundedZoneImpl extends ZoneImpl implements UnboundedZone {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setIsOutside(boolean newIsOutside) {
-		boolean oldIsOutside = isOutside;
-		isOutside = newIsOutside;
+	public void setName(String newName) {
+		String oldName = name;
+		name = newName;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.UNBOUNDED_ZONE__IS_OUTSIDE, oldIsOutside, isOutside));
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.END_NODE__NAME, oldName, name));
 	}
 
 	/**
@@ -97,8 +98,8 @@ public class UnboundedZoneImpl extends ZoneImpl implements UnboundedZone {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case SagPackage.UNBOUNDED_ZONE__IS_OUTSIDE:
-				return isIsOutside() ? Boolean.TRUE : Boolean.FALSE;
+			case SagPackage.END_NODE__NAME:
+				return getName();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -111,8 +112,8 @@ public class UnboundedZoneImpl extends ZoneImpl implements UnboundedZone {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case SagPackage.UNBOUNDED_ZONE__IS_OUTSIDE:
-				setIsOutside(((Boolean)newValue).booleanValue());
+			case SagPackage.END_NODE__NAME:
+				setName((String)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -126,8 +127,8 @@ public class UnboundedZoneImpl extends ZoneImpl implements UnboundedZone {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case SagPackage.UNBOUNDED_ZONE__IS_OUTSIDE:
-				setIsOutside(IS_OUTSIDE_EDEFAULT);
+			case SagPackage.END_NODE__NAME:
+				setName(NAME_EDEFAULT);
 				return;
 		}
 		super.eUnset(featureID);
@@ -141,10 +142,42 @@ public class UnboundedZoneImpl extends ZoneImpl implements UnboundedZone {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case SagPackage.UNBOUNDED_ZONE__IS_OUTSIDE:
-				return isOutside != IS_OUTSIDE_EDEFAULT;
+			case SagPackage.END_NODE__NAME:
+				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 		}
 		return super.eIsSet(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public int eBaseStructuralFeatureID(int derivedFeatureID, Class<?> baseClass) {
+		if (baseClass == Named.class) {
+			switch (derivedFeatureID) {
+				case SagPackage.END_NODE__NAME: return SagPackage.NAMED__NAME;
+				default: return -1;
+			}
+		}
+		return super.eBaseStructuralFeatureID(derivedFeatureID, baseClass);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public int eDerivedStructuralFeatureID(int baseFeatureID, Class<?> baseClass) {
+		if (baseClass == Named.class) {
+			switch (baseFeatureID) {
+				case SagPackage.NAMED__NAME: return SagPackage.END_NODE__NAME;
+				default: return -1;
+			}
+		}
+		return super.eDerivedStructuralFeatureID(baseFeatureID, baseClass);
 	}
 
 	/**
@@ -157,10 +190,10 @@ public class UnboundedZoneImpl extends ZoneImpl implements UnboundedZone {
 		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (isOutside: ");
-		result.append(isOutside);
+		result.append(" (name: ");
+		result.append(name);
 		result.append(')');
 		return result.toString();
 	}
 
-} //UnboundedZoneImpl
+} //EndNodeImpl

@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SensorImpl.java,v 1.1 2007-01-09 15:31:07 torda Exp $
+ * $Id: SensorImpl.java,v 1.2 2007-01-12 14:23:10 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
@@ -21,6 +21,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.supremica.external.sag.Node;
 import org.supremica.external.sag.SagPackage;
 import org.supremica.external.sag.Sensor;
+import org.supremica.external.sag.SensorNode;
 
 /**
  * <!-- begin-user-doc -->
@@ -44,7 +45,7 @@ public class SensorImpl extends NamedImpl implements Sensor {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Node> node = null;
+	protected EList<SensorNode> node = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -70,9 +71,9 @@ public class SensorImpl extends NamedImpl implements Sensor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Node> getNode() {
+	public EList<SensorNode> getNode() {
 		if (node == null) {
-			node = new EObjectWithInverseResolvingEList<Node>(Node.class, this, SagPackage.SENSOR__NODE, SagPackage.NODE__SENSOR);
+			node = new EObjectWithInverseResolvingEList<SensorNode>(SensorNode.class, this, SagPackage.SENSOR__NODE, SagPackage.SENSOR_NODE__SENSOR);
 		}
 		return node;
 	}
@@ -131,7 +132,7 @@ public class SensorImpl extends NamedImpl implements Sensor {
 		switch (featureID) {
 			case SagPackage.SENSOR__NODE:
 				getNode().clear();
-				getNode().addAll((Collection<? extends Node>)newValue);
+				getNode().addAll((Collection<? extends SensorNode>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);

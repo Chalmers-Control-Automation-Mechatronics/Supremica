@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: ZoneImpl.java,v 1.2 2007-01-05 13:29:13 torda Exp $
+ * $Id: ZoneImpl.java,v 1.3 2007-01-12 14:23:10 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
@@ -15,6 +15,8 @@ import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 
+import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.supremica.external.sag.Graph;
 import org.supremica.external.sag.Node;
 import org.supremica.external.sag.SagPackage;
 import org.supremica.external.sag.Zone;
@@ -29,12 +31,13 @@ import org.supremica.external.sag.Zone;
  *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#getFront <em>Front</em>}</li>
  *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#getBack <em>Back</em>}</li>
  *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#isIsOneway <em>Is Oneway</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#getGraph <em>Graph</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public abstract class ZoneImpl extends EObjectImpl implements Zone {
+public abstract class ZoneImpl extends NamedImpl implements Zone {
 	/**
 	 * The cached value of the '{@link #getFront() <em>Front</em>}' reference.
 	 * <!-- begin-user-doc -->
@@ -63,7 +66,7 @@ public abstract class ZoneImpl extends EObjectImpl implements Zone {
 	 * @generated
 	 * @ordered
 	 */
-	protected static final boolean IS_ONEWAY_EDEFAULT = false;
+	protected static final boolean IS_ONEWAY_EDEFAULT = true;
 
 	/**
 	 * The cached value of the '{@link #isIsOneway() <em>Is Oneway</em>}' attribute.
@@ -240,6 +243,47 @@ public abstract class ZoneImpl extends EObjectImpl implements Zone {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public Graph getGraph() {
+		if (eContainerFeatureID != SagPackage.ZONE__GRAPH) return null;
+		return (Graph)eContainer();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetGraph(Graph newGraph, NotificationChain msgs) {
+		msgs = eBasicSetContainer((InternalEObject)newGraph, SagPackage.ZONE__GRAPH, msgs);
+		return msgs;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setGraph(Graph newGraph) {
+		if (newGraph != eInternalContainer() || (eContainerFeatureID != SagPackage.ZONE__GRAPH && newGraph != null)) {
+			if (EcoreUtil.isAncestor(this, newGraph))
+				throw new IllegalArgumentException("Recursive containment not allowed for " + toString());
+			NotificationChain msgs = null;
+			if (eInternalContainer() != null)
+				msgs = eBasicRemoveFromContainer(msgs);
+			if (newGraph != null)
+				msgs = ((InternalEObject)newGraph).eInverseAdd(this, SagPackage.GRAPH__ZONE, Graph.class, msgs);
+			msgs = basicSetGraph(newGraph, msgs);
+			if (msgs != null) msgs.dispatch();
+		}
+		else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__GRAPH, newGraph, newGraph));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
@@ -251,6 +295,10 @@ public abstract class ZoneImpl extends EObjectImpl implements Zone {
 				if (back != null)
 					msgs = ((InternalEObject)back).eInverseRemove(this, SagPackage.NODE__OUTGOING, Node.class, msgs);
 				return basicSetBack((Node)otherEnd, msgs);
+			case SagPackage.ZONE__GRAPH:
+				if (eInternalContainer() != null)
+					msgs = eBasicRemoveFromContainer(msgs);
+				return basicSetGraph((Graph)otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -267,8 +315,24 @@ public abstract class ZoneImpl extends EObjectImpl implements Zone {
 				return basicSetFront(null, msgs);
 			case SagPackage.ZONE__BACK:
 				return basicSetBack(null, msgs);
+			case SagPackage.ZONE__GRAPH:
+				return basicSetGraph(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public NotificationChain eBasicRemoveFromContainerFeature(NotificationChain msgs) {
+		switch (eContainerFeatureID) {
+			case SagPackage.ZONE__GRAPH:
+				return eInternalContainer().eInverseRemove(this, SagPackage.GRAPH__ZONE, Graph.class, msgs);
+		}
+		return super.eBasicRemoveFromContainerFeature(msgs);
 	}
 
 	/**
@@ -287,6 +351,8 @@ public abstract class ZoneImpl extends EObjectImpl implements Zone {
 				return basicGetBack();
 			case SagPackage.ZONE__IS_ONEWAY:
 				return isIsOneway() ? Boolean.TRUE : Boolean.FALSE;
+			case SagPackage.ZONE__GRAPH:
+				return getGraph();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -307,6 +373,9 @@ public abstract class ZoneImpl extends EObjectImpl implements Zone {
 				return;
 			case SagPackage.ZONE__IS_ONEWAY:
 				setIsOneway(((Boolean)newValue).booleanValue());
+				return;
+			case SagPackage.ZONE__GRAPH:
+				setGraph((Graph)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -329,6 +398,9 @@ public abstract class ZoneImpl extends EObjectImpl implements Zone {
 			case SagPackage.ZONE__IS_ONEWAY:
 				setIsOneway(IS_ONEWAY_EDEFAULT);
 				return;
+			case SagPackage.ZONE__GRAPH:
+				setGraph((Graph)null);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -347,6 +419,8 @@ public abstract class ZoneImpl extends EObjectImpl implements Zone {
 				return back != null;
 			case SagPackage.ZONE__IS_ONEWAY:
 				return isOneway != IS_ONEWAY_EDEFAULT;
+			case SagPackage.ZONE__GRAPH:
+				return getGraph() != null;
 		}
 		return super.eIsSet(featureID);
 	}

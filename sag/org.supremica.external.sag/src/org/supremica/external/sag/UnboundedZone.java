@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: UnboundedZone.java,v 1.1 2006-12-18 15:23:00 torda Exp $
+ * $Id: UnboundedZone.java,v 1.2 2007-01-12 14:23:46 torda Exp $
  */
 package org.supremica.external.sag;
 
@@ -26,6 +26,7 @@ package org.supremica.external.sag;
 public interface UnboundedZone extends Zone {
 	/**
 	 * Returns the value of the '<em><b>Is Outside</b></em>' attribute.
+	 * The default value is <code>"true"</code>.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Is Outside</em>' attribute isn't clear,
@@ -35,7 +36,7 @@ public interface UnboundedZone extends Zone {
 	 * @return the value of the '<em>Is Outside</em>' attribute.
 	 * @see #setIsOutside(boolean)
 	 * @see org.supremica.external.sag.SagPackage#getUnboundedZone_IsOutside()
-	 * @model
+	 * @model default="true"
 	 * @generated
 	 */
 	boolean isIsOutside();

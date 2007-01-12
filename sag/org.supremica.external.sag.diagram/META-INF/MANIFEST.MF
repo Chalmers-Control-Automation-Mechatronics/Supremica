@@ -32,8 +32,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.gmf.runtime.diagram.ui.resources.editor.ide,
  org.eclipse.gmf.runtime.notation.providers,
  org.supremica.external.sag;visibility:=reexport,
- org.eclipse.emf.ocl;visibility:=reexport,
- org.eclipse.emf.query.ocl;visibility:=reexport,
+ org.supremica.external.sag.edit;visibility:=reexport,
  org.eclipse.gmf.runtime.draw2d.ui;visibility:=reexport,
  org.eclipse.draw2d;visibility:=reexport
 Eclipse-LazyStart: true

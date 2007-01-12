@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: Sensor.java,v 1.1 2007-01-09 15:31:07 torda Exp $
+ * $Id: Sensor.java,v 1.2 2007-01-12 14:23:46 torda Exp $
  */
 package org.supremica.external.sag;
 
@@ -28,8 +28,8 @@ import org.eclipse.emf.common.util.EList;
 public interface Sensor extends Named {
 	/**
 	 * Returns the value of the '<em><b>Node</b></em>' reference list.
-	 * The list contents are of type {@link org.supremica.external.sag.Node}.
-	 * It is bidirectional and its opposite is '{@link org.supremica.external.sag.Node#getSensor <em>Sensor</em>}'.
+	 * The list contents are of type {@link org.supremica.external.sag.SensorNode}.
+	 * It is bidirectional and its opposite is '{@link org.supremica.external.sag.SensorNode#getSensor <em>Sensor</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Node</em>' reference isn't clear,
@@ -38,10 +38,10 @@ public interface Sensor extends Named {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Node</em>' reference list.
 	 * @see org.supremica.external.sag.SagPackage#getSensor_Node()
-	 * @see org.supremica.external.sag.Node#getSensor
-	 * @model type="org.supremica.external.sag.Node" opposite="sensor" transient="true"
+	 * @see org.supremica.external.sag.SensorNode#getSensor
+	 * @model type="org.supremica.external.sag.SensorNode" opposite="sensor" transient="true"
 	 * @generated
 	 */
-	EList<Node> getNode();
+	EList<SensorNode> getNode();
 
 } // Sensor

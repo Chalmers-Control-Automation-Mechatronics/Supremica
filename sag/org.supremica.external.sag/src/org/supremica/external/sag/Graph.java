@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: Graph.java,v 1.2 2007-01-09 15:31:07 torda Exp $
+ * $Id: Graph.java,v 1.3 2007-01-12 14:23:46 torda Exp $
  */
 package org.supremica.external.sag;
 
@@ -31,6 +31,7 @@ public interface Graph extends Named {
 	/**
 	 * Returns the value of the '<em><b>Zone</b></em>' containment reference list.
 	 * The list contents are of type {@link org.supremica.external.sag.Zone}.
+	 * It is bidirectional and its opposite is '{@link org.supremica.external.sag.Zone#getGraph <em>Graph</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Zone</em>' containment reference list isn't clear,
@@ -39,7 +40,8 @@ public interface Graph extends Named {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Zone</em>' containment reference list.
 	 * @see org.supremica.external.sag.SagPackage#getGraph_Zone()
-	 * @model type="org.supremica.external.sag.Zone" containment="true"
+	 * @see org.supremica.external.sag.Zone#getGraph
+	 * @model type="org.supremica.external.sag.Zone" opposite="graph" containment="true"
 	 * @generated
 	 */
 	EList<Zone> getZone();
