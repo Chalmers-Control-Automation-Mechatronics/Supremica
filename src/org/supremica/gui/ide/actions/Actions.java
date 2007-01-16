@@ -17,13 +17,14 @@ public class Actions
     public IDEAction openAction = new OpenAction(allActions);
     public IDEAction closeAction = new CloseAction(allActions);
     public IDEAction saveAction = new SaveAction(allActions);
-    //public IDEAction printAction = new PrintAction(allActions);
-
-    // Editor Actions
+    public IDEAction exitAction = new ExitAction(allActions);
+    
+    // Printing Actions
     public IDEAction editorPrintAction = new EditorPrintAction(allActions);
     public IDEAction editorSavePDFAction = new EditorSavePDFAction(allActions);
     public IDEAction editorSavePostscriptAction = new EditorSavePostscriptAction(allActions);
-    public IDEAction exitAction = new ExitAction(allActions);
+
+    // Editor Actions
     public IDEAction editorCopyAction = new EditorCopyAction(allActions);
     public IDEAction editorCopyAsWMFAction = new EditorCopyAsWMFAction(allActions);
     public IDEAction editorUndoAction = new EditorUndoAction(allActions);
@@ -41,7 +42,6 @@ public class Actions
     public IDEAction editorAddBindingAction = new EditorAddBindingAction(allActions);
     public IDEAction editorRunEmbedderAction = new EditorRunEmbedderAction(allActions);
     public IDEAction editorStopEmbedderAction = new EditorStopEmbedderAction(allActions);
-
 
     // Analyzer Options
     public IDEAction analyzerOptionsAction = new AnalyzerOptionsAction(allActions);
@@ -79,7 +79,6 @@ public class Actions
     public IDEAction toolsTestCasesAction = new ToolsTestCasesAction(allActions);
     public IDEAction examplesStaticAction = new ExamplesStaticAction(allActions);
 
-
     // Help Actions
     public IDEAction helpWebAction = new HelpWebAction(allActions);
     public IDEAction helpAboutAction = new HelpAboutAction(allActions);
@@ -96,6 +95,34 @@ public class Actions
         for (IDEAction action : allActions)
         {
             action.setIDEActionInterface(ide);
+        }
+    }
+    
+    /**
+     * Enable/disable all actions that have been flagged as "editor actions".
+     */
+    public void enableEditorActions(boolean enable)
+    {
+        for (IDEAction action : allActions)
+        {
+            if (action.getEditorActiveRequired())
+            {
+                action.setEnabled(enable);
+            }
+        }
+    }
+
+    /**
+     * Enable/disable all actions that have been flagged as "analyzer actions".
+     */
+    public void enableAnalyzerActions(boolean enable)
+    {
+        for (IDEAction action : allActions)
+        {
+            if (action.getAnalyzerActiveRequired())
+            {
+                action.setEnabled(enable);
+            }
         }
     }
 }

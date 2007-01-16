@@ -316,24 +316,31 @@ public class IDE
         }
     }
     
+    // ChangeListener interface
     public void stateChanged(ChangeEvent e)
     {
         if (editorActive())
         {
-            getActiveModuleContainer().getEditorPanel().disablePanel();
-            getActiveModuleContainer().getAnalyzerPanel().enablePanel();
+            getActiveModuleContainer().getEditorPanel().enablePanel();
+            getActiveModuleContainer().getAnalyzerPanel().disablePanel();
+            
+            menuBar.getEditorMenu().setVisible(true);//.enable();
+            menuBar.getAnalyzerMenu().setVisible(false);//.disable();
         }
         if (analyzerActive())
         {
             if (getActiveModuleContainer().updateAutomata())
             {
-                getActiveModuleContainer().getEditorPanel().enablePanel();
-                getActiveModuleContainer().getAnalyzerPanel().disablePanel();
+                getActiveModuleContainer().getEditorPanel().disablePanel();
+                getActiveModuleContainer().getAnalyzerPanel().enablePanel();
             }
             else
             {
                 tabPanel.setSelectedComponent(getActiveModuleContainer().getEditorPanel());
             }
+
+            menuBar.getEditorMenu().setVisible(false);//.disable();
+            menuBar.getAnalyzerMenu().setVisible(true);//.enable();
         }
         repaint();
     }

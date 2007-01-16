@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.34 2006-12-05 21:38:17 flordal Exp $
+//# $Id: ComponentEditorPanel.java,v 1.35 2007-01-16 22:03:32 flordal Exp $
 //###########################################################################
 
 
@@ -106,7 +106,7 @@ public class ComponentEditorPanel
         final int divide = Math.min(prefeventswidth, halfwidth);
         split.setDividerLocation(divide);
         add(split, BorderLayout.CENTER);
-        
+
         surface.createOptions(this);
     }
     

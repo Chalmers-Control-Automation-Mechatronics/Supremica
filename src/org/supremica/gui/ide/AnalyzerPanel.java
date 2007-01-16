@@ -49,18 +49,16 @@ public class AnalyzerPanel
         
         add(splitPanelHorizontal);
 
-        /*
-        this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK), "SelectAll");
+        // Add CTRL-A as a "Select All" action
+        this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK), "SelectAll");
         this.getActionMap().put("SelectAll",
             new AbstractAction()
         {
             public void actionPerformed(ActionEvent e)
             {
-                System.err.println("Select all!");
                 automataPanel.selectAllAutomata();
             }
         });
-         */
     }
     
     /**
@@ -95,9 +93,11 @@ public class AnalyzerPanel
     
     public void disablePanel()
     {
+        getActions().enableAnalyzerActions(false);
     }
     
     public void enablePanel()
     {
+        getActions().enableAnalyzerActions(true);
     }
 }

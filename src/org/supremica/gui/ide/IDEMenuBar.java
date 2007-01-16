@@ -21,6 +21,9 @@ public class IDEMenuBar
     private IDE ide;
     private int startPoint = 0;
 
+    private JMenu editorMenu;
+    private JMenu analyzerMenu;
+    
     class NewFromTemplateHandler
         implements ActionListener
     {
@@ -49,7 +52,6 @@ public class IDEMenuBar
         // File
         JMenu menu = new JMenu("File");
         menu.setMnemonic(KeyEvent.VK_F);
-        add(menu);
         menu.add(ide.getActions().newAction.getMenuItem());
         menu.add(ide.getActions().openAction.getMenuItem());
         menu.add(ide.getActions().closeAction.getMenuItem());
@@ -62,22 +64,22 @@ public class IDEMenuBar
         menu.add(ide.getActions().editorSavePDFAction.getMenuItem());
         menu.addSeparator();
         menu.add(ide.getActions().exitAction.getMenuItem());
+        add(menu);
 
         // Edit
         menu = new JMenu("Edit");
         menu.setMnemonic(KeyEvent.VK_E);
-        add(menu);
         //menu.add(ide.getActions().editorCopyAsWMFAction.getMenuItem());
         //menu.addSeparator();
         menu.add(ide.getActions().editorUndoAction.getMenuItem());
         ide.getActions().editorUndoAction.setEnabled(false);
         menu.add(ide.getActions().editorRedoAction.getMenuItem());
         ide.getActions().editorRedoAction.setEnabled(false);
+        add(menu);
 
         // Editor
         menu = new JMenu("Editor");
         menu.setMnemonic(KeyEvent.VK_M);
-        add(menu);
         menu.add(ide.getActions().editorAddSimpleComponentAction.getMenuItem());
         menu.add(ide.getActions().editorAddComponentEventAction.getMenuItem());
         menu.add(ide.getActions().editorAddModuleEventAction.getMenuItem());
@@ -85,18 +87,18 @@ public class IDEMenuBar
         //menu.add(ide.getActions().editorAddForeachComponentAction.getMenuItem());
         //menu.add(ide.getActions().editorAddInstanceAction.getMenuItem());
         //menu.add(ide.getActions().editorAddBindingAction.getMenuItem());
+        add(menu);
+        editorMenu = menu;
 
         // Analyze
         menu = new JMenu("Analyzer");
         menu.setMnemonic(KeyEvent.VK_A);
-//        add(menu);
-
         JMenu viewMenu = new JMenu("View");
-        menu.add(viewMenu);
         viewMenu.add(ide.getActions().analyzerViewAutomatonAction.getMenuItem());
         viewMenu.add(ide.getActions().analyzerViewAlphabetAction.getMenuItem());
         viewMenu.add(ide.getActions().analyzerViewStatesAction.getMenuItem());
         viewMenu.add(ide.getActions().analyzerViewModularStructureAction.getMenuItem());
+        menu.add(viewMenu);
         menu.addSeparator();
         menu.add(ide.getActions().analyzerSynchronizerAction.getMenuItem());
         menu.add(ide.getActions().analyzerSynthesizerAction.getMenuItem());
@@ -116,13 +118,14 @@ public class IDEMenuBar
         menu.add(ide.getActions().analyzerDeleteAllAction.getMenuItem());
         menu.add(ide.getActions().analyzerRenameAction.getMenuItem());
         menu.add(ide.getActions().analyzerSendToEditorAction.getMenuItem());
-
+        analyzerMenu = menu;
+        add(menu);
 
         // Tools
         menu = new JMenu("Examples");
         menu.setMnemonic(KeyEvent.VK_T);
-        add(menu);
         menu.add(ide.getActions().toolsTestCasesAction.getMenuItem());
+        add(menu);
 
         // File.NewFromTemplate
         //JMenu menuFileNewFromTemplate = new JMenu();
@@ -154,7 +157,7 @@ public class IDEMenuBar
         menu = new JMenu("Configure");
         menu.setMnemonic(KeyEvent.VK_C);
         add(menu);
-        menu.add(ide.getActions().editorOptionsAction.getMenuItem());
+        //menu.add(ide.getActions().editorOptionsAction.getMenuItem());
         menu.add(ide.getActions().analyzerOptionsAction.getMenuItem());
 
 
@@ -189,6 +192,16 @@ public class IDEMenuBar
         menu.add(ide.getActions().helpWebAction.getMenuItem());
         menu.addSeparator();
         menu.add(ide.getActions().helpAboutAction.getMenuItem());
+    }
+
+    public JMenu getEditorMenu()
+    {
+        return editorMenu;
+    }
+
+    public JMenu getAnalyzerMenu()
+    {
+        return analyzerMenu;
     }
 
     public void createModuleList(MenuEvent ev)

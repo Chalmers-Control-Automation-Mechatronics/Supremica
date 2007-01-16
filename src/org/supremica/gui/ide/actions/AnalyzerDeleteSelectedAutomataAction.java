@@ -24,7 +24,7 @@ public class AnalyzerDeleteSelectedAutomataAction
         super(actionList);
         
         setEditorActiveRequired(false);
-        setAnalyzerActiveRequired(false);
+        setAnalyzerActiveRequired(true);
         
         putValue(Action.NAME, "Delete selected");
         putValue(Action.SHORT_DESCRIPTION, "Delete selected automata");

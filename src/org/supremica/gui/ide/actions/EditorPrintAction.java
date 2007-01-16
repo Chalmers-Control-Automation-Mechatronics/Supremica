@@ -17,7 +17,7 @@ public class EditorPrintAction
     {
         super(actionList);
         
-        setEditorActiveRequired(true);
+        //setEditorActiveRequired(true);
         
         putValue(Action.NAME, "Print...");
         putValue(Action.SHORT_DESCRIPTION, "Print");

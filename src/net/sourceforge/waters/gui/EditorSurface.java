@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.72 2006-12-22 04:28:55 siw4 Exp $
+//# $Id: EditorSurface.java,v 1.73 2007-01-16 22:03:32 flordal Exp $
 //###########################################################################
 
 
@@ -38,6 +38,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import org.supremica.properties.Config;
 
 
 /**
@@ -138,9 +139,10 @@ public class EditorSurface
     
     public int getGridSize()
     {
-        return gridSize;
+       // return gridSize;
+        return Config.GUI_EDITOR_GRID_SIZE.get();
     }
-    
+
     public void setGridSize(int g)
     {
         gridSize = g;
@@ -148,7 +150,8 @@ public class EditorSurface
     
     public boolean getShowGrid()
     {
-        return showGrid;
+        //return showGrid;
+        return Config.GUI_EDITOR_SHOW_GRID.get();
     }
     
     public void setShowGrid(boolean s)
@@ -163,17 +166,17 @@ public class EditorSurface
         g.setColor(EditorColor.GRIDCOLOR);
         
         // Draw grid iff showGrid is true
-        if (showGrid)
+        if (getShowGrid())
         {
             int x = -(int)getLocation().getX();
             int y = -(int)getLocation().getY();
             
-            for (int i = 0; i < getWidth(); i += gridSize)
+            for (int i = 0; i < getWidth(); i += getGridSize())
             {
                 g.drawLine(i, y, i, getHeight());
             }
             
-            for (int i = 0; i < getHeight(); i += gridSize)
+            for (int i = 0; i < getHeight(); i += getGridSize())
             {
                 g.drawLine(x, i, getWidth(), i);
             }
@@ -425,7 +428,7 @@ public class EditorSurface
                 }
                  */
         
-        //setPreferredSize(new Dimension(width + gridSize * 10, height + gridSize * 10));
+        //setPreferredSize(new Dimension(width + getGridSize() * 10, height + getGridSize() * 10));
     }
     
     /**

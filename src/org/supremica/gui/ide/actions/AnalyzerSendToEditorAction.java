@@ -34,7 +34,7 @@ public class AnalyzerSendToEditorAction
         super(actionList);
         
         setEditorActiveRequired(false);
-        setAnalyzerActiveRequired(false);
+        setAnalyzerActiveRequired(true);
         
         putValue(Action.NAME, "To editor");
         putValue(Action.SHORT_DESCRIPTION, "Send selected automata to editor");

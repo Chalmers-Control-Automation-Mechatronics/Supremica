@@ -50,10 +50,20 @@ public abstract class IDEAction
     {
         editorActiveRequired = required;
     }
+    
+    public boolean getEditorActiveRequired()
+    {
+        return editorActiveRequired;
+    }
 
     public void setAnalyzerActiveRequired(boolean required)
     {
         analyzerActiveRequired = required;
+    }
+    
+    public boolean getAnalyzerActiveRequired()
+    {
+        return analyzerActiveRequired;
     }
 
     public void setMinimumNumberOfSelectedComponents(int numberOfComponents)
@@ -63,28 +73,6 @@ public abstract class IDEAction
 
     public boolean isEnabled()
     {
-        // TO Do
-                /*
-                if (editorActiveRequired)
-                {
-                        if (!ide.editorActive())
-                        {
-                                return false;
-                        }
-                }
-                if (analyzerActiveRequired)
-                {
-                        if (!ide.analyzerActive())
-                        {
-                                return false;
-                        }
-                }
-
-                if (minimumNumberOfSelectedComponents > ide.numberOfSelectedComponents())
-                {
-                        return false;
-                }
-                 */
         return super.isEnabled();
     }
 }

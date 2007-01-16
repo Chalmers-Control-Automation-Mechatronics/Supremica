@@ -25,7 +25,7 @@ public class AnalyzerStatisticsAction
         super(actionList);
 
         setEditorActiveRequired(false);
-        setAnalyzerActiveRequired(false);
+        setAnalyzerActiveRequired(true);
 
         putValue(Action.NAME, "Statistics");
         putValue(Action.SHORT_DESCRIPTION, "Statistics");

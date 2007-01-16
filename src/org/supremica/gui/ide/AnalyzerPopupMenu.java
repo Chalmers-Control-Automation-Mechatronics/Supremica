@@ -59,8 +59,8 @@ class AnalyzerPopupMenu
         add(ide.getActions().analyzerStatisticsAction.getMenuItem());
         add(ide.getActions().analyzerExportAction.getMenuItem());
         addSeparator();
-        add(ide.getActions().analyzerDeleteSelectedAction.getMenuItem());
-        add(ide.getActions().analyzerDeleteAllAction.getMenuItem());
+        //add(ide.getActions().analyzerDeleteSelectedAction.getMenuItem());
+        //add(ide.getActions().analyzerDeleteAllAction.getMenuItem());
         add(ide.getActions().analyzerRenameAction.getMenuItem());
         add(ide.getActions().analyzerSendToEditorAction.getMenuItem());
 
@@ -69,6 +69,6 @@ class AnalyzerPopupMenu
             addSeparator();
             add(ide.getActions().analyzerExperimentAction.getMenuItem());
         }
-}
+    }
 }
 

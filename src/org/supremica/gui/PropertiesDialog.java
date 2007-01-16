@@ -96,6 +96,7 @@ public class PropertiesDialog
         // For all types of properties
         for (PropertyType type: PropertyType.values())
         {
+            // Create a new panel to put in a tabbed pane
             JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
             
             /*
@@ -155,12 +156,10 @@ public class PropertiesDialog
         // Center the window
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         Dimension frameSize = getSize();
-        
         if (frameSize.height > screenSize.height)
         {
             frameSize.height = screenSize.height;
         }
-        
         if (frameSize.width > screenSize.width)
         {
             frameSize.width = screenSize.width;
@@ -203,6 +202,8 @@ public class PropertiesDialog
             
             doCancel();    // ok, not really cancel. what we do is to close the dialog
         }
+        
+        owner.repaint();
     }
     
     public void setVisible(boolean toVisible)
@@ -304,6 +305,7 @@ public class PropertiesDialog
         public void setInConfig()
         {
             if (!property.isImmutable())
+            {
                 try
                 {
                     property.set(Integer.parseInt(text.getText()));
@@ -312,6 +314,11 @@ public class PropertiesDialog
                 {
                     // Error in number format, ignore this result without error message!
                 }
+                catch (IllegalArgumentException ex)
+                {
+                    System.err.println("Error setting value of property " + property + ", value out of range.");
+                }
+            }
         }
         
         public void getFromConfig()

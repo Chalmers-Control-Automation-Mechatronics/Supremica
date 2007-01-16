@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorPanel
 //###########################################################################
-//# $Id: EditorPanel.java,v 1.47 2007-01-04 13:50:09 flordal Exp $
+//# $Id: EditorPanel.java,v 1.48 2007-01-16 22:03:32 flordal Exp $
 //###########################################################################
 
 
@@ -96,12 +96,12 @@ public class EditorPanel
     
     public void disablePanel()
     {
-        //getActions().enableEditorActions(false);
+        getActions().enableEditorActions(false);
     }
     
     public void enablePanel()
     {
-        //getActions().enableEditorActions(true);
+        getActions().enableEditorActions(true);
     }
     
     public EditorWindowInterface getActiveEditorWindowInterface()

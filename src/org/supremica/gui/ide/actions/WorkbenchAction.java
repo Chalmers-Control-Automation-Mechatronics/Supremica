@@ -28,6 +28,9 @@ public class WorkbenchAction
     {
         super(actionList);
 
+        setEditorActiveRequired(false);
+        setAnalyzerActiveRequired(true);
+        
         putValue(Action.NAME, "Workbench...");
         putValue(Action.SHORT_DESCRIPTION, "Launch workbench");
         putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_W));

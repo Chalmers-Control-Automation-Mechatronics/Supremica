@@ -24,7 +24,7 @@ public class AnalyzerDeleteAllAutomataAction
         super(actionList);
         
         setEditorActiveRequired(false);
-        setAnalyzerActiveRequired(false);
+        setAnalyzerActiveRequired(true);
         
         putValue(Action.NAME, "Delete all");
         putValue(Action.SHORT_DESCRIPTION, "Delete all automata");

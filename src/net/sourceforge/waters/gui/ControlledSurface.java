@@ -4,13 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.105 2006-12-22 04:20:45 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.106 2007-01-16 22:03:32 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
 
 import java.util.TreeSet;
-import net.sourceforge.waters.subject.base.NamedSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DragSource;
@@ -42,6 +41,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import net.sourceforge.waters.gui.EditorSurface.DRAGOVERSTATUS;
 
 import net.sourceforge.waters.gui.command.*;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -65,7 +65,7 @@ import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.*;
-import net.sourceforge.waters.xsd.base.EventKind;
+import org.supremica.properties.Config;
 
 
 public class ControlledSurface
@@ -134,12 +134,12 @@ public class ControlledSurface
     //minimizeSize();
     drawnAreaBounds = null;
     Rectangle area = getDrawnAreaBounds();
-    /*setBounds(0, 0,//-((int)drawnAreaBounds.getMinX() - 5 * gridSize),
-              //-((int)drawnAreaBounds.getMinY() - 5 * gridSize),
-              ((int)drawnAreaBounds.getWidth() + 10 * gridSize),
-              ((int)drawnAreaBounds.getHeight() + 10 * gridSize));*/
-    setPreferredSize(new Dimension((int)drawnAreaBounds.getWidth() + gridSize * 10,
-                     (int)drawnAreaBounds.getHeight() + gridSize * 10));
+    /*setBounds(0, 0,//-((int)drawnAreaBounds.getMinX() - 5 * getGridSize()),
+              //-((int)drawnAreaBounds.getMinY() - 5 * getGridSize()),
+              ((int)drawnAreaBounds.getWidth() + 10 * getGridSize()),
+              ((int)drawnAreaBounds.getHeight() + 10 * getGridSize()));*/
+    setPreferredSize(new Dimension((int)drawnAreaBounds.getWidth() + getGridSize() * 10,
+                     (int)drawnAreaBounds.getHeight() + getGridSize() * 10));
     root.getUndoInterface().executeCommand(new UpdateErrorCommand(this));
     repaint();
     //root.repaint();
@@ -147,8 +147,8 @@ public class ControlledSurface
 
 
   //#########################################################################
-  public void examineCollisions() {
-
+  public void examineCollisions() 
+  {
   }
 
   public ModuleSubject getModule()
@@ -405,7 +405,8 @@ public class ControlledSurface
 
     public boolean getNodesSnap()
     {
-        return nodesSnap;
+        // return nodesSnap;
+        return Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get();
     }
 
     public void setNodesSnap(boolean n)
@@ -420,7 +421,8 @@ public class ControlledSurface
 
     public boolean getControlPointsMove()
     {
-        return controlPointsMove;
+        // return controlPointsMove;
+        return Config.GUI_EDITOR_CONTROL_POINTS_MOVE_WITH_NODE.get();
     }
 
     public void setControlPointsMove(boolean c)
@@ -530,7 +532,7 @@ public class ControlledSurface
             setGroupNodePosition((GroupNodeSubject)s, dx, dy);
         }
         // Is it an edge?
-        else if ((s instanceof EdgeSubject) && (!controlPointsMove || !(nodeIsSelected() || nodeGroupIsSelected())))
+        else if ((s instanceof EdgeSubject) && (!getControlPointsMove() || !(nodeIsSelected() || nodeGroupIsSelected())))
         {
             setEdgePosition((EdgeSubject)s, dx, dy);
         }
@@ -590,7 +592,7 @@ public class ControlledSurface
         Rectangle2D rect = dummy.getGeometry().getRectangle();
         rect.setFrame(rect.getMinX() + dx, rect.getMinY() + dy,
             rect.getWidth(), rect.getHeight());
-        if (nodesSnap)
+        if (getNodesSnap())
         {
             rect = findGridRect(rect);
         }
@@ -1032,7 +1034,7 @@ public class ControlledSurface
      */
     private int findGrid(int x)
     {
-        return (x+gridSize/2)/gridSize*gridSize;
+        return (x+getGridSize()/2)/getGridSize()*getGridSize();
     }
 
     private Point2D findGridPoint(Point2D p)
@@ -1276,7 +1278,7 @@ public class ControlledSurface
         }
         dragNowX = e.getX();
         dragNowY = e.getY();
-        if (newGroup && nodesSnap)
+        if (newGroup && getNodesSnap())
         {
             dragStartX = findGrid(dragStartX);
             dragStartY = findGrid(dragStartY);
@@ -1941,7 +1943,7 @@ public class ControlledSurface
                 int dx = 0;
                 int dy = 0;
                 // Are we using snap?
-                if ((nodeIsSelected() || nodeGroupIsSelected()) && nodesSnap
+                if ((nodeIsSelected() || nodeGroupIsSelected()) && getNodesSnap()
                     && !draggingInitial)
                 {
                     lastX = findGrid(lastX);
@@ -2105,7 +2107,7 @@ public class ControlledSurface
                         int posX;
                         int posY;
 
-                        if (nodesSnap)
+                        if (getNodesSnap())
                         {
                             posX = findGrid(e.getX());
                             posY = findGrid(e.getY());
@@ -2211,7 +2213,7 @@ public class ControlledSurface
                 int dx = 0;
                 int dy = 0;
                 // Are we using snap?
-                if ((nodeIsSelected() || nodeGroupIsSelected()) && nodesSnap
+                if ((nodeIsSelected() || nodeGroupIsSelected()) && getNodesSnap()
                     && !draggingInitial)
                 {
                     lastX = findGrid(lastX);
@@ -2651,7 +2653,7 @@ public class ControlledSurface
                 int dx = 0;
                 int dy = 0;
                 // Are we using snap?
-                if ((nodeIsSelected() || nodeGroupIsSelected()) && nodesSnap)
+                if ((nodeIsSelected() || nodeGroupIsSelected()) && getNodesSnap())
                 {
                     lastX = findGrid(lastX);
                     lastY = findGrid(lastY);
@@ -3107,7 +3109,7 @@ public class ControlledSurface
 
         public Rectangle2D resize(Point2D p)
         {
-            if (nodesSnap)
+            if (getNodesSnap())
             {
                 p = findGridPoint(p);
             }

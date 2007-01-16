@@ -12,6 +12,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
 import java.awt.geom.Rectangle2D;
 
+import org.supremica.properties.Config;
+    
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.gui.ModuleWindow;
 import java.util.List;
@@ -83,7 +85,8 @@ public abstract class EdgeProxyShape
         super.draw(g, status);
         g.setStroke(BASICSTROKE);
         g.setColor(status.getColor());
-        if (ARROWATEND)
+        //if (ARROWATEND)
+        if (Config.GUI_EDITOR_EDGEARROW_AT_END.get())
         {
             // The direction of the arrow calculated from two
             // coordinate pairs. Per default startpoint to endpoint,

@@ -15,7 +15,7 @@ public class EditorSavePDFAction
     {
         super(actionList);
         
-        setEditorActiveRequired(true);
+        //setEditorActiveRequired(true);
         
         putValue(Action.NAME, "Save As PDF...");
         putValue(Action.SHORT_DESCRIPTION, "Save As PDF");

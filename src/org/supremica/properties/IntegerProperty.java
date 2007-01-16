@@ -49,93 +49,87 @@
 package org.supremica.properties;
 
 public class IntegerProperty
-	extends Property
+    extends Property
 {
-	private int defaultValue;
-	private int value;
-	private final int min;
-	private final int max;
-
-	public IntegerProperty(PropertyType type, String key, int value, String comment)
-	{
-		this(type, key, value, comment, false);
-	}
-
-	public IntegerProperty(PropertyType type, String key, int value, String comment, boolean immutable)
-	{
-		this(type, key, value, comment, immutable, Integer.MIN_VALUE, Integer.MAX_VALUE);
-	}
-
-	public IntegerProperty(PropertyType type, String key, int value, String comment, boolean immutable, int min)
-	{
-		this(type, key, value, comment, immutable, min, Integer.MAX_VALUE);
-	}
-
-	public IntegerProperty(PropertyType type, String key, int value, String comment, boolean immutable, int min, int max)
-	{
-		super(type, key, comment, immutable);
-		this.defaultValue = value;
-		this.value = value;
-		this.min = min;
-		this.max = max;
-		if (!isValid(value))
-		{
-			throw new IllegalArgumentException("Illegal value");
-		}
-	}
-
-	public int get()
-	{
-		return value;
-	}
-
-	public void set(String value)
-	{
-		if (isImmutable())
-		{
-			throw new IllegalStateException("This object is immutable, calling the set method is illegal");
-		}
-		int newValue = Integer.parseInt(value);
-		if (isValid(newValue))
-		{
-			this.value = newValue;
-		}
-		else
-		{
-			throw new IllegalArgumentException("Illegal value");
-		}
-	}
-
-	public void set(int value)
-	{
-		if (isImmutable())
-		{
-			throw new IllegalStateException("This object is immutable, calling the set method is illegal");
-		}
-
-		this.value = value;
-	}
-
-	public boolean isValid(int value)
-	{
-		if (value < min)
-		{
-			return false;
-		}
-		if (value > max)
-		{
-			return false;
-		}
-		return true;
-	}
-
-	public String valueToString()
-	{
-		return Integer.toString(value);
-	}
-
-	public boolean currentValueDifferentFromDefaultValue()
-	{
-		return defaultValue != value;
-	}
+    private int defaultValue;
+    private int value;
+    private final int min;
+    private final int max;
+    
+    public IntegerProperty(PropertyType type, String key, int value, String comment)
+    {
+        this(type, key, value, comment, false);
+    }
+    
+    public IntegerProperty(PropertyType type, String key, int value, String comment, boolean immutable)
+    {
+        this(type, key, value, comment, immutable, Integer.MIN_VALUE, Integer.MAX_VALUE);
+    }
+    
+    public IntegerProperty(PropertyType type, String key, int value, String comment, boolean immutable, int min)
+    {
+        this(type, key, value, comment, immutable, min, Integer.MAX_VALUE);
+    }
+    
+    public IntegerProperty(PropertyType type, String key, int value, String comment, boolean immutable, int min, int max)
+    {
+        super(type, key, comment, immutable);
+        this.defaultValue = value;
+        this.value = value;
+        this.min = min;
+        this.max = max;
+        if (!isValid(value))
+        {
+            throw new IllegalArgumentException("Illegal value");
+        }
+    }
+    
+    public int get()
+    {
+        return value;
+    }
+    
+    public void set(String newValue)
+    {
+        set(Integer.parseInt(newValue));
+    }
+    
+    public void set(int newValue)
+    {
+        if (isImmutable())
+        {
+            throw new IllegalStateException("This object is immutable, calling the set method is illegal");
+        }
+        if (isValid(newValue))
+        {
+            this.value = newValue;
+        }
+        else
+        {
+            throw new IllegalArgumentException("Illegal value");
+        }
+    }
+    
+    public boolean isValid(int value)
+    {
+        if (value < min)
+        {
+            return false;
+        }
+        if (value > max)
+        {
+            return false;
+        }
+        return true;
+    }
+    
+    public String valueToString()
+    {
+        return Integer.toString(value);
+    }
+    
+    public boolean currentValueDifferentFromDefaultValue()
+    {
+        return defaultValue != value;
+    }
 }

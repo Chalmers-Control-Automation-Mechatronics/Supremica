@@ -64,7 +64,7 @@ import org.supremica.util.BDD.Options;
  */
 public final class Config
 {
-    // Valid PropertyTypes:
+    // Valid PropertyTypes (see PropertyType.java):
     //   GENERAL
     //   GENERAL_LOG
     //   GENERAL_FILE
@@ -150,7 +150,12 @@ public final class Config
     // GUI_EDITOR
     //public static final BooleanProperty GUI_EDITOR_USE_SPRING_EMBEDDER = new BooleanProperty(PropertyType.GUI_EDITOR, "useSpringEmbedder", true, "Use spring embedder for automatic graph layout");
     public static final IntegerProperty GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT = new IntegerProperty(PropertyType.GUI_EDITOR, "springEmbedderTimeout", 10000, "Maximum layout time");
-
+    public static final BooleanProperty GUI_EDITOR_SHOW_GRID = new BooleanProperty(PropertyType.GUI_EDITOR, "showGrid", true, "Show grid");
+    public static final IntegerProperty GUI_EDITOR_GRID_SIZE = new IntegerProperty(PropertyType.GUI_EDITOR, "gridSize", 16, "Grid size", false, 4, 100);
+    public static final BooleanProperty GUI_EDITOR_NODES_SNAP_TO_GRID = new BooleanProperty(PropertyType.GUI_EDITOR, "nodesSnapToGrid", true, "Nodes snap to grid");
+    public static final BooleanProperty GUI_EDITOR_CONTROL_POINTS_MOVE_WITH_NODE = new BooleanProperty(PropertyType.GUI_EDITOR, "controlPointsMoveWithNode", true, "Control points move with node");
+    public static final BooleanProperty GUI_EDITOR_EDGEARROW_AT_END = new BooleanProperty(PropertyType.GUI_EDITOR, "edgeArrowAtEnd", true, "Draw edge arrows at the end");
+    
     // GUI_ANALYZER
     public static final BooleanProperty INCLUDE_BOUNDED_UNCON_TOOLS = new BooleanProperty(PropertyType.GUI_ANALYZER, "includeBoundedUnconTools", false, "Include unbounded controllability tools");
     public static final BooleanProperty GUI_ANALYZER_AUTOMATONVIEWER_USE_CONTROLLED_SURFACE = new BooleanProperty(PropertyType.GUI_ANALYZER, "automatonViewerUseControlledSurface", false, "Use new controlled surface panel to display an automaton");

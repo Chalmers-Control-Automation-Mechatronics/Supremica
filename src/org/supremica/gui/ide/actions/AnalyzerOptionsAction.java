@@ -12,14 +12,15 @@ public class AnalyzerOptionsAction
 {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Displays dialog with all kinds of options (not only analyzer options...).
+     */
     public AnalyzerOptionsAction(List<IDEAction> actionList)
     {
         super(actionList);
 
-        setEditorActiveRequired(true);
-
-        putValue(Action.NAME, "Analyzer Options...");
-        putValue(Action.SHORT_DESCRIPTION, "Analyzer Options");
+        putValue(Action.NAME, "Options...");
+        putValue(Action.SHORT_DESCRIPTION, "Options");
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Preferences16.gif")));
     }
 
