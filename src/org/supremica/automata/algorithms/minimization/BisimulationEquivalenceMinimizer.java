@@ -117,8 +117,8 @@ public class BisimulationEquivalenceMinimizer
      * equivalence using long or short state names
      *
      * @param useShortNames If true, merged states will get a new,
-     * short name, otherwise merged states are built from their
-     * components, separated by the chosen state name separator.
+     * short name, otherwise merged state names are built from their
+     * components' names, separated by the chosen state name separator.
      * @param strong If true, minimizes with respect to strong bisimulation equivalence,
      * if false, minimizes with respect to weak bisimulation equivalence.
      */
@@ -155,7 +155,7 @@ public class BisimulationEquivalenceMinimizer
                 assert((index >= 0) && (index < aut.nbrOfStates()));
                 assert(states[index] == null);
                 states[index] = state;
-                // Put accepting states at the front of the list and other at the back...
+                // Put accepting states at the front of the list and all other at the back...
                 if (!state.isAccepting(!strong))
                 {
                     initialPartitioning[forwIndex++] = index;

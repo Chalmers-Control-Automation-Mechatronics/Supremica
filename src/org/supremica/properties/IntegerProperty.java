@@ -55,6 +55,7 @@ public class IntegerProperty
     private int value;
     private final int min;
     private final int max;
+    private final int tick;
     
     public IntegerProperty(PropertyType type, String key, int value, String comment)
     {
@@ -73,22 +74,43 @@ public class IntegerProperty
     
     public IntegerProperty(PropertyType type, String key, int value, String comment, boolean immutable, int min, int max)
     {
+        this(type, key, value, comment, immutable, Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
+    }
+
+    public IntegerProperty(PropertyType type, String key, int value, String comment, boolean immutable, int min, int max, int tick)
+    {
         super(type, key, comment, immutable);
         this.defaultValue = value;
         this.value = value;
         this.min = min;
         this.max = max;
+        this.tick = tick;
         if (!isValid(value))
         {
             throw new IllegalArgumentException("Illegal value");
         }
     }
-    
+
     public int get()
     {
         return value;
     }
     
+    public int getMinValue()
+    {
+        return min;
+    }    
+
+    public int getMaxValue()
+    {
+        return max;
+    }    
+
+    public int getTick()
+    {
+        return tick;
+    }    
+
     public void set(String newValue)
     {
         set(Integer.parseInt(newValue));
@@ -132,4 +154,22 @@ public class IntegerProperty
     {
         return defaultValue != value;
     }
+    
+    /*
+    ////////////////////// OVERRIDES ////
+    public String getComment()
+    {
+        String minComment = "";
+        if (min > Integer.MIN_VALUE)
+            minComment = "(" + min;
+        else
+            minComment = "(-\u221E";
+        String maxComment = "";
+        if (max < Integer.MAX_VALUE)
+            maxComment = max + ")";
+        else
+            maxComment = "\u221E)";
+        return super.getComment() + " " + minComment + ", " + maxComment;
+    }
+    */
 }

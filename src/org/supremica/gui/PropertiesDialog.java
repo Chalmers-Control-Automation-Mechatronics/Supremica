@@ -60,6 +60,7 @@ import org.supremica.properties.PropertyType;
 import org.supremica.properties.Property;
 import org.supremica.properties.StringProperty;
 import org.supremica.properties.SupremicaProperties;
+import javax.swing.text.NumberFormatter;
 
 public class PropertiesDialog
     extends JDialog
@@ -289,16 +290,48 @@ public class PropertiesDialog
         private final IntegerProperty property;
         
         JTextField text;
+        JSlider slider;
         
         IntegerChooser(IntegerProperty property)
         {
             super();
+            
             JLabel label = new JLabel(property.getComment());
             this.add(label);
-            text = new JTextField();
-            text.setColumns(Math.max((property.get()+"").length()+1,5));
-            this.add(text);
 
+            // If there are limits, create a slider, otherwise an editable textbox!
+            if (property.getMinValue() == Integer.MIN_VALUE || property.getMaxValue() == Integer.MAX_VALUE)
+            {
+                // JTextField!
+                text = new JTextField();
+                text.setColumns(Math.max((property.get()+"").length()+1,5));
+                this.add(text);
+                
+                slider = null;
+            }
+            else
+            {
+                // JSlider!
+                slider = new JSlider(property.getMinValue(), property.getMaxValue(), property.get());
+                //slider.setMajorTickSpacing(4);
+                slider.setMinorTickSpacing(property.getTick());
+                slider.setSnapToTicks(true);
+                slider.setPaintTrack(true);
+                this.add(slider);
+                /*
+                java.text.NumberFormat numberFormat = java.text.NumberFormat.getIntegerInstance();
+                NumberFormatter formatter = new NumberFormatter(numberFormat);
+                formatter.setMinimum(new Integer(property.getMinValue()));
+                formatter.setMaximum(new Integer(property.getMaxValue()));
+                JFormattedTextField textField = new JFormattedTextField(formatter);
+                textField.setValue(new Integer(property.get()));
+                textField.setColumns(Math.max((property.get()+"").length()+1,5));
+                this.add(textField);
+                */
+                
+                text = null;
+            }
+            
             this.property = property;
         }
         
@@ -308,7 +341,10 @@ public class PropertiesDialog
             {
                 try
                 {
-                    property.set(Integer.parseInt(text.getText()));
+                    if (text != null)
+                        property.set(Integer.parseInt(text.getText()));
+                    else if (slider != null)
+                        property.set(slider.getValue());
                 }
                 catch (NumberFormatException ex)
                 {
@@ -323,7 +359,10 @@ public class PropertiesDialog
         
         public void getFromConfig()
         {
-            text.setText(""+property.get());
+            if (text != null)
+                text.setText(""+property.get());
+            else if (slider != null)
+                slider.setValue(property.get());
         }
     }
 

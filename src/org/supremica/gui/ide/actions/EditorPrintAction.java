@@ -20,7 +20,7 @@ public class EditorPrintAction
         //setEditorActiveRequired(true);
         
         putValue(Action.NAME, "Print...");
-        putValue(Action.SHORT_DESCRIPTION, "Print");
+        putValue(Action.SHORT_DESCRIPTION, "Print current editor figure");
         putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_P));
         putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Print16.gif")));

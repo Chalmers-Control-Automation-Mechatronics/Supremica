@@ -1660,7 +1660,7 @@ public class Automaton
     }
 
     /**
-     * Hides (makes epsilon) the supplied events.
+     * Hides (makes unobservable) the supplied events. Optionally preserving controllability.
      */
     public void hide(Alphabet alpha, boolean preserveControllability)
     {
@@ -1713,7 +1713,7 @@ public class Automaton
             // tau_c
             String silentCName = Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.get();
             LabeledEvent tau_c = getAlphabet().getEvent(silentCName);
-            if (tau_c == null)
+            if (tau_c == null && (alpha.getControllableAlphabet().size() > 0))
             {
                 tau_c = new LabeledEvent(silentCName);
                 tau_c.setUnobservable(true);
@@ -1732,7 +1732,7 @@ public class Automaton
             // tau_u
             String silentUName = Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.get();
             LabeledEvent tau_u = getAlphabet().getEvent(silentUName);
-            if (tau_u == null)
+            if (tau_u == null && (alpha.getUncontrollableAlphabet().size() > 0))
             {
                 tau_u = new LabeledEvent(silentUName);
                 tau_u.setUnobservable(true);

@@ -113,14 +113,13 @@ public final class Config
      * com.sun.java.swing.plaf.windows.WindowsLookAndFeel : Windows only
      * javax.swing.plaf.mac.MacLookAndFeel : Mac only
      */
-    private static final String[] LOOKANDFEEL_LEGALVALUES= {"System", "Metal", "Motif", 
-    "Windows", "Mac", "GTK"};
+    private static final String[] LOOKANDFEEL_LEGALVALUES= {"System", "Metal", "Motif", "Windows", "Mac", "GTK"};
     public static final StringProperty GENERAL_LOOKANDFEEL  = new StringProperty(PropertyType.GENERAL, "generalLookAndFeel", "System", "Look and feel (requires restart)", LOOKANDFEEL_LEGALVALUES);
     public static final StringProperty GENERAL_STATE_SEPARATOR  = new StringProperty(PropertyType.GENERAL, "generalStateSeparator", ".", "State separator character");
     public static final StringProperty GENERAL_STATELABEL_SEPARATOR  = new StringProperty(PropertyType.GENERAL, "generalStateLabelSeparator", ",", "State label separator character");
     public static final BooleanProperty GENERAL_USE_SECURITY = new BooleanProperty(PropertyType.GENERAL, "generalUseSecurity", false, "Use file security");
     public static final BooleanProperty GENERAL_STUDENT_VERSION = new BooleanProperty(PropertyType.GENERAL, "generalStudentVersion", false, "Student version (requires restart)");
-    public static final BooleanProperty INCLUDE_EXPERIMENTAL_ALGORITHMS = new BooleanProperty(PropertyType.GENERAL, "includeExperimentalAlgorithms", false, "Include experimental algorithms");
+    public static final BooleanProperty INCLUDE_EXPERIMENTAL_ALGORITHMS = new BooleanProperty(PropertyType.GENERAL, "includeExperimentalAlgorithms", false, "Include experimental algorithms (requires restart)");
 
     // GENERAL_LOG
     public static final BooleanProperty LOG_TO_CONSOLE = new BooleanProperty(PropertyType.GENERAL_LOG, "logToConsole", false, "Log to Console");
@@ -149,9 +148,9 @@ public final class Config
 
     // GUI_EDITOR
     //public static final BooleanProperty GUI_EDITOR_USE_SPRING_EMBEDDER = new BooleanProperty(PropertyType.GUI_EDITOR, "useSpringEmbedder", true, "Use spring embedder for automatic graph layout");
-    public static final IntegerProperty GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT = new IntegerProperty(PropertyType.GUI_EDITOR, "springEmbedderTimeout", 10000, "Maximum layout time");
+    public static final IntegerProperty GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT = new IntegerProperty(PropertyType.GUI_EDITOR, "springEmbedderTimeout", 10000, "Maximum layout time", false, 0);
     public static final BooleanProperty GUI_EDITOR_SHOW_GRID = new BooleanProperty(PropertyType.GUI_EDITOR, "showGrid", true, "Show grid");
-    public static final IntegerProperty GUI_EDITOR_GRID_SIZE = new IntegerProperty(PropertyType.GUI_EDITOR, "gridSize", 16, "Grid size", false, 4, 100);
+    public static final IntegerProperty GUI_EDITOR_GRID_SIZE = new IntegerProperty(PropertyType.GUI_EDITOR, "gridSize", 16, "Grid size", false, 4, 64, 4);
     public static final BooleanProperty GUI_EDITOR_NODES_SNAP_TO_GRID = new BooleanProperty(PropertyType.GUI_EDITOR, "nodesSnapToGrid", true, "Nodes snap to grid");
     public static final BooleanProperty GUI_EDITOR_CONTROL_POINTS_MOVE_WITH_NODE = new BooleanProperty(PropertyType.GUI_EDITOR, "controlPointsMoveWithNode", true, "Control points move with node");
     public static final BooleanProperty GUI_EDITOR_EDGEARROW_AT_END = new BooleanProperty(PropertyType.GUI_EDITOR, "edgeArrowAtEnd", true, "Draw edge arrows at the end");

@@ -160,7 +160,6 @@ public class IDEMenuBar
         //menu.add(ide.getActions().editorOptionsAction.getMenuItem());
         menu.add(ide.getActions().analyzerOptionsAction.getMenuItem());
 
-
         // Modules
         menu = new JMenu("Modules");
         menu.setMnemonic(KeyEvent.VK_M);
@@ -211,8 +210,7 @@ public class IDEMenuBar
             return;
         }
 
-        JMenu menu = (JMenu)ev.getSource();
-
+        JMenu menu = (JMenu) ev.getSource();
 
         // Remove any windows now in the list
         while (startPoint < menu.getItemCount())
