@@ -224,7 +224,7 @@ public final class Config
     public static final IntegerProperty BDD_H1 = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddH1", Options.es_heuristics, "ES Heuristics");
     public static final IntegerProperty BDD_H2 = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddH2", Options.ndas_heuristics, "NDAS Heuristics");
     public static final IntegerProperty BDD_DSSI_HEURISTIC = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddDelayedStarSelection", Options.dssi_heuristics, "DSSI heuristics");
-    // This really is an IntegerProperty, the others aren't
+    // This really is an IntegerProperty, the others aren't!!
     public static final IntegerProperty BDD_PARTITION_MAX = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddMaxPartitionSize", Options.max_partition_size, "Max Partition Size");
     public static final IntegerProperty BDD_ENCODING_ALGO = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddStateEncodingAlgorithm", Options.encoding_algorithm, "Encoding algorithm");
     public static final StringProperty BDD_LIB_PATH  = new StringProperty(PropertyType.ALGORITHMS_BDD, "bddLibPath", Options.extraLibPath, "Extra Library path");
