@@ -12,6 +12,7 @@
 // when it or one of its children is selected (or only allow level 1 nodes to be selected
 package org.supremica.gui;
 
+import java.awt.MenuBar;
 import java.util.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -24,19 +25,23 @@ import org.supremica.automata.AlphabetHelpers;
 import org.supremica.gui.ide.IDEReportInterface;
 
 /**
- * Gaaaah! LanguageRestrictorDialog has lots of stuff in it that should be somewhere else.
- * There should be a "EventSelectorDialog" or something that should be used for the selection.
- * Other calsses may want to do this, you know. I didn't have the energy to do all that so this
- * is an ugly fix using the LanguageRestrictorDialog.
+ * Lets the user choose events to be hidden.
  */
 class EventHiderDialog
     extends LanguageRestrictorDialog
 {
+    // Gaaaah! LanguageRestrictorDialog has lots of stuff in it that should be somewhere else.
+    // There should be a "EventSelectorDialog" or something that should be used for the selection.
+    // Other classes may want to do this, you know. I didn't have the energy to do all that so this
+    // is an ugly fix using the LanguageRestrictorDialog.
+
     private static final long serialVersionUID = 1L;
     
     private static Logger logger = LoggerFactory.createLogger(EventHiderDialog.class);
     
     private IDEReportInterface ide;
+    
+    private boolean preserveControllability = false;
     
     public EventHiderDialog(IDEReportInterface ide, Automata automata, Alphabet globalAlphabet)
     {
@@ -44,6 +49,39 @@ class EventHiderDialog
         super.setTitle("Event hider");
         
         super.okButton = new OkButton();
+        
+        // Add menu for choosing whether to preserve controllabilty or not.
+        JMenuBar menuBar = super.getJMenuBar();
+                
+        // Restrict
+        JMenu controllabilityMenu = new JMenu("Controllability");        
+        controllabilityMenu.setMnemonic(KeyEvent.VK_C);        
+        // Ignore controllability
+        JRadioButtonMenuItem preserveMenuIgnore = new JRadioButtonMenuItem("Ignore controllability", !preserveControllability);        
+        preserveMenuIgnore.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                preserveControllability = false;
+            }
+        });
+        controllabilityMenu.add(preserveMenuIgnore);
+        // Preserve controllability
+        JRadioButtonMenuItem preserveMenuPreserve = new JRadioButtonMenuItem("Preserve controllability", preserveControllability);        
+        preserveMenuPreserve.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                preserveControllability = true;
+            }
+        });
+        controllabilityMenu.add(preserveMenuPreserve);
+        // Group the radio buttons
+        ButtonGroup preserveGroup = new ButtonGroup();
+        preserveGroup.add(preserveMenuIgnore);
+        preserveGroup.add(preserveMenuPreserve);
+        // Add to menu
+        menuBar.add(controllabilityMenu);
         
         super.pack();
         this.ide = ide;
@@ -63,7 +101,7 @@ class EventHiderDialog
             {
                 public void actionPerformed(ActionEvent e)
                 {
-                    System.err.println("Tryck inte så hårt!");
+                    System.err.println("Tryck inte sï¿½ hï¿½rt!");
                     doRestrict();
                 }
             });
@@ -93,7 +131,7 @@ class EventHiderDialog
             }
             
             // Do the hiding (preserve controllability!)
-            newAutomaton.hide(alpha, true);
+            newAutomaton.hide(alpha, preserveControllability);
             
             // Set appropriate comment
             newAutomaton.setComment(automaton.getName() + "//" +

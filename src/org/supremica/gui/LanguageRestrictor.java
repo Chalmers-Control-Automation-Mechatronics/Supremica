@@ -687,25 +687,21 @@ class LanguageRestrictorDialog
         // For the moment, until we get the rendering etc fixed
         // viewMenuUnion.setEnabled(false);
         // viewMenuIntersection.setEnabled(false);
+        
         // Restrict
-        JMenu restrictMenu = new JMenu("Restrict");
-        
-        restrictMenu.setMnemonic(KeyEvent.VK_R);
-        
+        JMenu restrictMenu = new JMenu("Restrict");        
+        restrictMenu.setMnemonic(KeyEvent.VK_R);        
         // Restrict.Erase These Events (default, therefore initially checked)
-        JRadioButtonMenuItem restrictMenuErase = new JRadioButtonMenuItem("Erase These Events", true);
-        
+        JRadioButtonMenuItem restrictMenuErase = new JRadioButtonMenuItem("Erase These Events", true);        
         restrictMenuErase.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
             {
                 restrictEvents.eraseThese();
             }
-        });
-        
+        });        
         // Restrict.Keep These Events
-        JRadioButtonMenuItem restrictMenuKeep = new JRadioButtonMenuItem("Keep These Events");
-        
+        JRadioButtonMenuItem restrictMenuKeep = new JRadioButtonMenuItem("Keep These Events");        
         restrictMenuKeep.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
@@ -714,17 +710,15 @@ class LanguageRestrictorDialog
             }
         });
         
-        ButtonGroup restrgroup = new ButtonGroup();
-        
-        restrgroup.add(restrictMenuErase);
-        restrgroup.add(restrictMenuKeep);
+        ButtonGroup restrictGroup = new ButtonGroup();        
+        restrictGroup.add(restrictMenuErase);
+        restrictGroup.add(restrictMenuKeep);
         restrictMenu.add(restrictMenuErase);
         restrictMenu.add(restrictMenuKeep);
         restrictMenuErase.setEnabled(true);
         restrictMenuKeep.setEnabled(true);
         
-        JMenuBar menuBar = new JMenuBar();
-        
+        JMenuBar menuBar = new JMenuBar();        
         menuBar.add(menuFile);
         menuBar.add(viewMenu);
         menuBar.add(restrictMenu);
