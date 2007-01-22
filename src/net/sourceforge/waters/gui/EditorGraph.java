@@ -374,6 +374,15 @@ public class EditorGraph
 
 	public void modelChanged(ModelChangeEvent event)
 	{
+    if (event.getKind() == ModelChangeEvent.GEOMETRY_CHANGED
+        && event.getSource() instanceof EdgeSubject
+        && mOriginalMap.containsKey(event.getSource())) {
+      EdgeSubject orig = (EdgeSubject) event.getSource();
+      EdgeSubject copy = (EdgeSubject) getCopy(orig);
+      copy.getStartPoint().setPoint(orig.getStartPoint().getPoint());
+      copy.getEndPoint().setPoint(orig.getEndPoint().getPoint());
+      return;
+    }
     if (event.getKind() == ModelChangeEvent.ITEM_ADDED
         && (event.getSource().getParent() != this
             && event.getSource().getParent().getParent().getParent().getParent() != this

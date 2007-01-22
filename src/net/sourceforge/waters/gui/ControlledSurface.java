@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.107 2007-01-22 01:50:25 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.108 2007-01-22 03:11:41 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -524,15 +524,20 @@ public class ControlledSurface
       Point2D p = e.getPoint();
       if (node != null) {
         if (node instanceof GroupNodeSubject) {
-          p = GeometryTools.findIntersection(
-               ((GroupNodeSubject)node).getGeometry().getRectangle(), p);
-          Command move = new MoveEdgeCommand(this, edge,
-                                             node, draggingSource,
-                                             (int)p.getX(), (int)p.getY());
-          root.getUndoInterface().executeCommand(move);
+          System.out.println("3");
+          if (draggingSource || !getGraph().isDeterministic()) {
+            System.out.println("1");
+            p = GeometryTools.findIntersection(
+                 ((GroupNodeSubject)node).getGeometry().getRectangle(), p);
+            Command move = new MoveEdgeCommand(this, edge,
+                                               node, draggingSource,
+                                               (int)p.getX(), (int)p.getY());
+            root.getUndoInterface().executeCommand(move);
+          }
         }
         else if ((draggingSource && node != edge.getSource())
             || (draggingTarget && node != edge.getTarget())) {
+          System.out.println("2");
           if (node instanceof SimpleNodeProxy) {
             p = ((SimpleNodeProxy)node).getPointGeometry().getPoint();
           } 
@@ -2423,6 +2428,28 @@ public class ControlledSurface
                         {
                             SimpleNodeSubject n2 = (SimpleNodeSubject) s2;
                             Point2D p2 = n2.getPointGeometry().getPoint();
+                            Point2D p1 = null;
+                            // Add edge
+                            if (s1 instanceof SimpleNodeSubject)
+                            {
+                                SimpleNodeSubject n = (SimpleNodeSubject) s1;
+                                p1 = n.getPointGeometry().getPoint();
+                            }
+                            else if (s1 instanceof GroupNodeSubject)
+                            {
+                                GroupNodeSubject n = (GroupNodeSubject) s1;
+                                Rectangle2D rect = n.getGeometry().getRectangle();
+                                p1 = new Point((int)rect.getX() + xoff,
+                                    (int)rect.getY() + yoff);
+                            }
+                            Command createEdge = new CreateEdgeCommand(getGraph(),
+                                (NodeSubject)s1,
+                                n2, p1, p2);
+                            root.getUndoInterface().executeCommand(createEdge);
+                        }
+                        if (s2 instanceof GroupNodeSubject && !getGraph().isDeterministic()) {
+                            GroupNodeSubject n2 = (GroupNodeSubject) s2;
+                            Point2D p2 = GeometryTools.findIntersection(n2.getGeometry().getRectangle(), e.getPoint());
                             Point2D p1 = null;
                             // Add edge
                             if (s1 instanceof SimpleNodeSubject)
