@@ -101,8 +101,6 @@ public class Automaton
 
     private AutomatonListeners listeners = null;
 
-    private AutomatonProxy correspondingAutomatonProxy = null;
-
     /**
      * Creates an empty automaton.
      */
@@ -159,11 +157,6 @@ public class Automaton
         }
 
         endTransaction();
-    }
-
-    public AutomatonProxy clone()
-    {
-        return new Automaton(this);
     }
 
     /**
@@ -884,12 +877,6 @@ public class Automaton
         return theStates;
     }
 
-    public Set<StateProxy> getStates()
-    {
-        return getStateSet().getWatersStates();
-    }
-
-
     public IterableStates iterableStates()
     {
         return new IterableStates(theStates);
@@ -908,19 +895,6 @@ public class Automaton
     public Iterator<Arc> arcIterator()
     {
         return theStates.outgoingArcsIterator();
-    }
-
-    public Collection<TransitionProxy> getTransitions()
-    {
-        LinkedList<TransitionProxy> transitions = new LinkedList<TransitionProxy>();
-
-        for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
-        {
-            Arc currArc = arcIt.next();
-            transitions.add(currArc);
-        }
-
-        return transitions;
     }
 
 /*
@@ -1332,14 +1306,12 @@ public class Automaton
         return alphabet.values();
     }
 
+    /**
+     * Returns the alphabet of the automaton.
+     */
     public Alphabet getAlphabet()
     {
         return alphabet;
-    }
-
-    public Set<EventProxy> getEvents()
-    {
-        return getAlphabet().getWatersEventsWithPropositions();
     }
 
     /**
@@ -2252,7 +2224,6 @@ public class Automaton
         return getName().compareTo(((Automaton) partner).getName());
     }
 
-
     public static void main(String[] args)
     {
         Automaton theAutomaton = new Automaton();
@@ -2271,7 +2242,7 @@ public class Automaton
             System.err.println("st != null");
         }
     }
-
+    
     class InternalEventIterator
         implements Iterator<LabeledEvent>
     {
@@ -2450,9 +2421,42 @@ public class Automaton
         return sbuf.toString();
     }
 
+    //////////////////////////////////////////
+    ///// AutomatonProxy interface stuff /////
+    //////////////////////////////////////////
+    
+    private AutomatonProxy correspondingAutomatonProxy = null;
+
     public ComponentKind getKind()
     {
         return AutomatonType.toKind(type);
     }
 
+    public AutomatonProxy clone()
+    {
+        return new Automaton(this);
+    }
+
+    public Set<StateProxy> getStates()
+    {
+        return getStateSet().getWatersStates();
+    }
+
+    public Collection<TransitionProxy> getTransitions()
+    {
+        LinkedList<TransitionProxy> transitions = new LinkedList<TransitionProxy>();
+
+        for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
+        {
+            Arc currArc = arcIt.next();
+            transitions.add(currArc);
+        }
+
+        return transitions;
+    }
+
+    public Set<EventProxy> getEvents()
+    {
+        return getAlphabet().getWatersEventsWithPropositions();
+    }
 }
