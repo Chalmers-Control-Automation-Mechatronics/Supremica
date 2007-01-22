@@ -10,8 +10,6 @@ There is currently no real bug-tracking system for Supremica/Waters... we should
  * New modules should not contain any events. Default markings :accepting and :forbidden should only be created when explicitly requested -- Robi.
 
  * Change menu keyboard shortcuts to ALT
- * Grid does not show properly
- * Right click breaks label dragging
  * Group node error feedback should be given while dragging
 
 Previously, all bugs were reported and stored in the bug database, http://www.supremica.org/bugtracking, but this is no longer the case. 

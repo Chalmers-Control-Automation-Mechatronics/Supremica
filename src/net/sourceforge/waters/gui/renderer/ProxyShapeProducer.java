@@ -113,7 +113,7 @@ public class ProxyShapeProducer
                     }
                 }
                 
-                LabelShape ls = new LabelShape(p, x, y + height, font);
+                LabelShape ls = new LabelShape(p, x + 1, y + height, font);
                 mMap.put(p, ls);
                 height += ls.getShape().getHeight();
                 
@@ -122,8 +122,8 @@ public class ProxyShapeProducer
                     width = (int)ls.getShape().getWidth();
                 }
             }
-            height += 2;
-            
+            height += 3;
+            width += 3;
             RoundRectangle2D mBounds = new RoundRectangle2D.Double(
                 x, y, width, height,
                 LabelBlockProxyShape.DEFAULTARCW,
@@ -221,8 +221,8 @@ public class ProxyShapeProducer
               x = LabelBlockProxyShape.DEFAULTOFFSETX;
               y = LabelBlockProxyShape.DEFAULTOFFSETY;
           }
-          Font font = DEFAULT;
-          String blocked = "BLOCKED";
+          Font font = BOLD;
+          String blocked = "BLOCKED:";
           TextLayout text = new TextLayout(blocked, font,
                                            new FontRenderContext(null, true, true));
           width = (int)text.getBounds().getWidth();
@@ -246,7 +246,7 @@ public class ProxyShapeProducer
                   }
               }
               
-              LabelShape ls = new LabelShape(p, x, y + height, font);
+              LabelShape ls = new LabelShape(p, x + 1, y + height, font);
               mMap.put(p, ls);
               height += ls.getShape().getHeight();
               
@@ -255,8 +255,8 @@ public class ProxyShapeProducer
                   width = (int)ls.getShape().getWidth();
               }
           }
-          height += 2;
-          
+          height += 4;
+          width += 3;
           RoundRectangle2D mBounds = new RoundRectangle2D.Double(
               x, y, width, height,
               LabelBlockProxyShape.DEFAULTARCW,
@@ -320,5 +320,6 @@ public class ProxyShapeProducer
     private final Map<Proxy, ProxyShape> mMap;
     
     public static final Font DEFAULT = new Font("Dialog", Font.PLAIN, 12);
+    public static final Font BOLD = DEFAULT.deriveFont(Font.BOLD);
     public static final Font UNCONTROLLABLE = DEFAULT.deriveFont(Font.ITALIC);
 }

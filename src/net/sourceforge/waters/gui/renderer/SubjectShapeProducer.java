@@ -41,6 +41,7 @@ import net.sourceforge.waters.xsd.module.SplineKind;
 
 import org.supremica.log.*;
 import org.supremica.properties.Config;
+import net.sourceforge.waters.gui.EditorGraph;
 
 
 public class SubjectShapeProducer
@@ -51,8 +52,8 @@ implements ModelObserver
 		LoggerFactory.createLogger(SubjectShapeProducer.class);
 	
 	public SubjectShapeProducer(final GraphSubject graph,
-			final ModuleProxy module,
-			final Frame root)
+                              final ModuleProxy module,
+                              final Frame root)
 	throws GeometryAbsentException
 	{
 		super(module);

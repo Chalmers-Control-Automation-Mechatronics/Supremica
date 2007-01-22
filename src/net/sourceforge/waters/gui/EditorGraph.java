@@ -51,6 +51,7 @@ import java.util.HashSet;
 import java.util.Comparator;
 import java.awt.Rectangle;
 import net.sourceforge.waters.subject.base.IndexedSetSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
 
 public class EditorGraph
 	extends AbstractSubject
@@ -111,6 +112,7 @@ public class EditorGraph
 		}
 
 		this.addModelObserver(this);
+    graph.addModelObserver(this);
 	}
 
 	public Object acceptVisitor(ProxyVisitor p)
@@ -325,6 +327,23 @@ public class EditorGraph
 			mOriginalMap.remove(e);
 		}
 	}
+  
+  private void removeEdge(EdgeSubject e)
+  {
+    EdgeSubject remove = (EdgeSubject)mOriginalMap.get(e);
+    mEdges.remove(remove);
+    mFakeMap.remove(remove);
+    mOriginalMap.remove(e);
+  }
+  
+  private void removeNode(NodeSubject n)
+  {
+    System.out.println("remove node");
+    NodeSubject remove = (NodeSubject)mOriginalMap.get(n);
+    mNodes.remove(remove);
+    mFakeMap.remove(remove);
+    mOriginalMap.remove(n);
+  }
 
 	private void addGroupNode(GroupNodeSubject gn)
 	{
@@ -346,15 +365,63 @@ public class EditorGraph
 	private void addNode(SimpleNodeSubject n)
 	{
 		SimpleNodeSubject node = n.clone();
+    NodeSubject other = mNodes.get(n.getName());
 		mNodes.add(node);
 		mObserverMap.put(node, new EditorSimpleNode(node));
 		mFakeMap.put(node, n);
-		mOriginalMap.put(n, node);
+    mOriginalMap.put(n, node);
 	}
 
 	public void modelChanged(ModelChangeEvent event)
 	{
-		if (event.getSource() instanceof EdgeSubject)
+    if (event.getKind() == ModelChangeEvent.ITEM_ADDED
+        && (event.getSource().getParent() != this
+            && event.getSource().getParent().getParent().getParent().getParent() != this
+            && !(event.getSource().getParent() instanceof GroupNodeSubject))) {
+      if (event.getValue() instanceof EdgeSubject) {
+        addEdge((EdgeSubject) event.getValue());
+      }
+      if (event.getValue() instanceof SimpleNodeSubject) {
+        addNode((SimpleNodeSubject) event.getValue());
+      }
+      if (event.getValue() instanceof GroupNodeSubject) {
+        addGroupNode((GroupNodeSubject) event.getValue());
+      }
+      if (event.getSource().getParent() instanceof LabelBlockSubject) {
+        LabelBlockSubject block = (LabelBlockSubject) event.getSource().getParent();
+        block = (LabelBlockSubject) getCopy(block);
+        block.getEventListModifiable().add(((IdentifierSubject) event.getValue()).clone());
+      }
+      return;
+    }
+    if (event.getKind() == ModelChangeEvent.ITEM_REMOVED
+        && (event.getSource().getParent() != this 
+            && event.getSource().getParent().getParent().getParent().getParent() != this
+            && !(event.getSource().getParent() instanceof GroupNodeSubject))) {
+      if (event.getValue() instanceof EdgeSubject) {
+        removeEdge((EdgeSubject) event.getValue());
+      }
+      if (event.getValue() instanceof SimpleNodeSubject) {
+        removeNode((NodeSubject) event.getValue());
+      }
+      if (event.getValue() instanceof GroupNodeSubject) {
+        removeNode((GroupNodeSubject) event.getValue());
+      }
+      if (event.getSource().getParent() instanceof LabelBlockSubject) {
+        LabelBlockSubject block = (LabelBlockSubject) event.getSource().getParent();
+        block = (LabelBlockSubject) getCopy(block);
+        AbstractSubject remove = null;
+        for (AbstractSubject a : block.getEventListModifiable()) {
+          if (a.toString().equals(event.getValue().toString())) {
+            remove = a;
+          }
+        }
+        block.getEventListModifiable().remove((IdentifierSubject) remove);
+      }
+      return;
+    }
+		if (event.getSource() instanceof EdgeSubject
+        && event.getSource().getParent().getParent() == this)
 		{
 			EdgeSubject e = (EdgeSubject)event.getSource();
 			if (event.getKind() == ModelChangeEvent.STATE_CHANGED)
@@ -363,7 +430,8 @@ public class EditorGraph
 				mObserverMap.get(e.getTarget()).addEdge(e);
 			}
 		}
-		if (event.getSource() instanceof NodeSubject)
+		if (event.getSource() instanceof NodeSubject
+        && event.getSource().getParent().getParent() == this)
 		{
 			NodeSubject n = (NodeSubject)event.getSource();
 			if (event.getKind() == ModelChangeEvent.GEOMETRY_CHANGED)
@@ -372,7 +440,9 @@ public class EditorGraph
         mNodeMoved = true;
 			}
 		}
-    if (event.getKind() == ModelChangeEvent.GEOMETRY_CHANGED) {
+    if (event.getKind() == ModelChangeEvent.GEOMETRY_CHANGED
+        && (event.getSource().getParent().getParent() == this
+            || event.getSource().getParent().getParent().getParent() == this)) {
       mChanged.add(event.getSource());
     }
     if (event.getKind() == ModelChangeEvent.ITEM_ADDED
