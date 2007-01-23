@@ -2,13 +2,16 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagActionBarContributor.java,v 1.1 2006-12-18 15:25:46 torda Exp $
+ * $Id: SagActionBarContributor.java,v 1.2 2007-01-23 16:07:36 torda Exp $
  */
 package org.supremica.external.sag.presentation;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+
+import javax.swing.JOptionPane;
 
 import org.eclipse.emf.common.ui.viewer.IViewerProvider;
 
@@ -27,6 +30,7 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IContributionManager;
+import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -34,6 +38,8 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.SubContributionItem;
 
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -41,9 +47,19 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.HelpListener;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PartInitException;
+import org.supremica.external.sag.Project;
+import org.supremica.external.sag.waters.SagToWaters;
 
+import net.sourceforge.waters.gui.WmodFileFilter;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import org.eclipse.emf.common.util.Diagnostic;
 /**
  * This is the action bar contributor for the Sag model editor.
  * <!-- begin-user-doc -->
@@ -173,7 +189,7 @@ public class SagActionBarContributor
 	 * as well as the sub-menus for object creation items.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
 	public void contributeToMenu(IMenuManager menuManager) {
 		super.contributeToMenu(menuManager);
@@ -195,6 +211,41 @@ public class SagActionBarContributor
 		createSiblingMenuManager = new MenuManager(SagEditorPlugin.INSTANCE.getString("_UI_CreateSibling_menu_item"));
 		submenuManager.insertBefore("additions", createSiblingMenuManager);
 
+		// Add "generate waters/supremica"
+		//
+		IAction generateWatersDraft  = new Action("Generate Automata", Action.AS_PUSH_BUTTON) {
+
+			@Override
+			public void runWithEvent(Event event) {
+		        EditingDomain domain = ((IEditingDomainProvider)activeEditorPart).getEditingDomain();
+	        	Project sagProject = (Project) domain.getResourceSet().getResources().get(0).getContents().get(0);
+				//Validator validator = new Validator();
+				Diagnostic diagnostic = Validator.INSTANCE.validate(sagProject, domain);
+				if (diagnostic.getSeverity() == Diagnostic.ERROR || 
+						diagnostic.getSeverity() == Diagnostic.WARNING) {
+					MessageBox mb = new MessageBox(getActiveEditor().getSite().getShell(), SWT.ICON_ERROR | SWT.OK);
+		            mb.setText("Automata generation failure");
+		            mb.setMessage("The automata generation was aborted since the SAG model is invalid.");
+		            mb.open();
+		            return;
+				}
+				//Diagnostic diagnostic = validateAction.run();
+			    //diagnostic.getSeverity() == Diagnostic.OK;
+			    FileDialog dialog = new FileDialog(getActiveEditor().getSite().getShell(), SWT.SAVE);
+				dialog.setText("Save");
+		        String[] filterExt = {"*."+WmodFileFilter.WMOD};
+		        dialog.setFilterExtensions(filterExt);
+	        	dialog.setFileName(sagProject.getName());
+		        String filename = dialog.open();
+		        if (filename != null) {
+					ModuleProxy watersModule = SagToWaters.generateWatersModule(sagProject);
+		    		File watersFile = new File(filename);
+		    		SagToWaters.saveWatersModuleToFile(watersModule, watersFile);
+		        }
+			}
+		};
+		submenuManager.insertAfter("additions", generateWatersDraft);
+		
 		// Force an update because Eclipse hides empty menus now.
 		//
 		submenuManager.addMenuListener

@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SensorTest.java,v 1.1 2007-01-12 14:33:46 torda Exp $
+ * $Id: SensorTest.java,v 1.2 2007-01-23 16:08:52 torda Exp $
  */
 package org.supremica.external.sag.tests;
 
@@ -15,6 +15,13 @@ import org.supremica.external.sag.Sensor;
  * <!-- begin-user-doc -->
  * A test case for the model object '<em><b>Sensor</b></em>'.
  * <!-- end-user-doc -->
+ * <p>
+ * The following operations are tested:
+ * <ul>
+ *   <li>{@link org.supremica.external.sag.Sensor#validateName(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map) <em>Validate Name</em>}</li>
+ *   <li>{@link org.supremica.external.sag.Sensor#validateUniquenessOfName(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map) <em>Validate Uniqueness Of Name</em>}</li>
+ * </ul>
+ * </p>
  * @generated
  */
 public class SensorTest extends NamedTest {
@@ -65,6 +72,32 @@ public class SensorTest extends NamedTest {
 	 */
 	protected void tearDown() throws Exception {
 		setFixture(null);
+	}
+
+	/**
+	 * Tests the '{@link org.supremica.external.sag.Sensor#validateName(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map) <em>Validate Name</em>}' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.supremica.external.sag.Sensor#validateName(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map)
+	 * @generated
+	 */
+	public void testValidateName__DiagnosticChain_Map() {
+		// TODO: implement this operation test method
+		// Ensure that you remove @generated or mark it @generated NOT
+		fail();
+	}
+
+	/**
+	 * Tests the '{@link org.supremica.external.sag.Sensor#validateUniquenessOfName(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map) <em>Validate Uniqueness Of Name</em>}' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.supremica.external.sag.Sensor#validateUniquenessOfName(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map)
+	 * @generated
+	 */
+	public void testValidateUniquenessOfName__DiagnosticChain_Map() {
+		// TODO: implement this operation test method
+		// Ensure that you remove @generated or mark it @generated NOT
+		fail();
 	}
 
 } //SensorTest

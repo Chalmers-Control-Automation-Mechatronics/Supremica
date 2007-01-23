@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: GraphTest.java,v 1.1 2006-12-18 15:26:16 torda Exp $
+ * $Id: GraphTest.java,v 1.2 2007-01-23 16:08:52 torda Exp $
  */
 package org.supremica.external.sag.tests;
 
@@ -15,6 +15,13 @@ import org.supremica.external.sag.SagFactory;
  * <!-- begin-user-doc -->
  * A test case for the model object '<em><b>Graph</b></em>'.
  * <!-- end-user-doc -->
+ * <p>
+ * The following operations are tested:
+ * <ul>
+ *   <li>{@link org.supremica.external.sag.Graph#validateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map) <em>Validate All Unbounded Zones Are Outside If Objects Are Identityless</em>}</li>
+ *   <li>{@link org.supremica.external.sag.Graph#validateName(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map) <em>Validate Name</em>}</li>
+ * </ul>
+ * </p>
  * @generated
  */
 public class GraphTest extends NamedTest {
@@ -65,6 +72,32 @@ public class GraphTest extends NamedTest {
 	 */
 	protected void tearDown() throws Exception {
 		setFixture(null);
+	}
+
+	/**
+	 * Tests the '{@link org.supremica.external.sag.Graph#validateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map) <em>Validate All Unbounded Zones Are Outside If Objects Are Identityless</em>}' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.supremica.external.sag.Graph#validateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map)
+	 * @generated
+	 */
+	public void testValidateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless__DiagnosticChain_Map() {
+		// TODO: implement this operation test method
+		// Ensure that you remove @generated or mark it @generated NOT
+		fail();
+	}
+
+	/**
+	 * Tests the '{@link org.supremica.external.sag.Graph#validateName(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map) <em>Validate Name</em>}' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.supremica.external.sag.Graph#validateName(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map)
+	 * @generated
+	 */
+	public void testValidateName__DiagnosticChain_Map() {
+		// TODO: implement this operation test method
+		// Ensure that you remove @generated or mark it @generated NOT
+		fail();
 	}
 
 } //GraphTest

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="org.supremica.external.sag" default="build" basedir=".">
+	<property name="domain" location="."/>
+
+	<path id="groovy.classpath" location="${domain}/lib/groovy-all-1.0.jar" />
+	
+	<taskdef name="groovy" classname="org.codehaus.groovy.ant.Groovy" classpathref="groovy.classpath" />
+	<taskdef name="groovyc" classname="org.codehaus.groovy.ant.Groovyc" classpathref="groovy.classpath" />
+
+	<groovy>
+		properties.eclipse_home = 'c:/program files/eclipse'
+
+		properties.supremica = '../..'
+		
+		properties.edit = '../org.supremica.external.sag.edit'
+		properties.editor = '../org.supremica.external.sag.editor'
+		properties.diagram = '../org.supremica.external.sag.diagram'
+		properties.tests = '../org.supremica.external.sag.tests'
+
+		class SagCompiler extends org.apache.tools.ant.Task {
+			String proj
+			public void execute() {
+				def ant = new AntBuilder(project)
+				def path = project.properties[(proj)];
+				ant.javac(srcdir:path+'/src', destdir:path+'/bin',classpathref:proj+'.classpath')
+				if (new File(path+'/bin-groovy').exists()) {
+					ant.groovyc(srcdir:path+'/src', destdir:path+'/bin-groovy',classpathref:proj+'.groovy.classpath')
+				}
+			}
+		}
+		project.addTaskDefinition('compile_proj', SagCompiler)
+		
+	</groovy>
+
+	<path id='domain.classpath'>
+		<fileset dir="${domain}">
+			<include name="lib/**/*.jar"/>
+		</fileset>
+	</path>
+	<path id='domain.groovy.classpath'>
+		<pathelement location="${domain}/bin"/>
+		<path refid="domain.classpath"/>
+	</path>
+	<path id='edit.classpath'>
+		<pathelement location="${domain}/bin"/>
+		<pathelement location="${domain}/bin-groovy"/>
+		<path refid="domain.classpath"/>
+		<fileset dir="${eclipse_home}">
+			<include name="plugins/*.jar"/>
+		</fileset>		
+	</path>
+	<path id='editor.classpath'>
+		<pathelement location="${edit}/bin"/>
+		<path refid="edit.classpath"/>
+	</path>
+	<path id='diagram.classpath'>
+		<pathelement location="${edit}/bin"/>
+		<path refid="edit.classpath"/>
+	</path>
+	<path id='tests.classpath'>
+		<pathelement location="${diagram}/bin"/>
+		<pathelement location="${edit}/bin"/>
+		<path refid="diagram.classpath"/>
+		<path refid="editor.classpath"/>
+	</path>
+
+	<!-- ================================= 
+          target: compile              
+         ================================= -->
+    <target name="compile" depends="" description="--> description">
+    	<groovy>
+    		ant.compile_proj(proj:'domain')
+    		ant.compile_proj(proj:'edit')
+	   		ant.compile_proj(proj:'editor')
+			ant.compile_proj(proj:'diagram')
+			ant.compile_proj(proj:'tests')
+    	</groovy>
+    </target>
+
+	<!-- ================================= 
+           target: build              
+         ================================= -->
+	<target name="build" depends="clean,compile" description="--> description">
+		
+	</target>
+
+	<!-- ================================= 
+          target: clean              
+         ================================= -->
+    <target name="clean" depends="" description="--> description">
+    	<groovy>
+    		def cleandir = {path ->
+    			ant.delete(dir: path)
+    			ant.mkdir(dir: path)
+    		}
+    		cleandir(properties.domain+'/bin')
+    		cleandir(properties.domain+'/bin-groovy')
+    		cleandir(properties.edit+'/bin')
+    		cleandir(properties.editor+'/bin')
+    		cleandir(properties.diagram+'/bin')
+    		cleandir(properties.tests+'/bin')
+    	</groovy>
+    </target>
+
+	<!-- ================================= 
+          target: initialize              
+         ================================= -->
+    <target name="initialize" depends="" description="--> description">
+        <copy file="${supremica}/dist/Supremica.jar" todir="${domain}/lib" overwrite="true"/>
+        <copy file="${supremica}/dist/SupremicaLib.jar" todir="${domain}/lib" overwrite="true"/>
+    	<antcall target="build"/>
+    </target>
+
+</project>
