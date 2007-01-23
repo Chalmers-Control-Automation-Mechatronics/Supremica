@@ -158,49 +158,6 @@
 	<unjar src="${jaxb-impl.jar}" dest="${lib}/${unjared}"/>
 	<unjar src="${jaxb1-impl.jar}" dest="${lib}/${unjared}"/>
 	<unjar src="${jsr173_api.jar}" dest="${lib}/${unjared}"/>
-	<antcall target="initialize_emf_jars"/>
-</target>
-
-<!-- ================================= 
-          target: initialize_emf_jars              
-         ================================= -->
-<property name="emf_version" value="2.3.0.v200612141025"/>
-<property name="emf_jar_prefix" value="org.eclipse."/>
-
-<target name="initialize_emf_jars" description="Unpacks emf jars needed for sensor activation graphs">
-	<!-- EMF stuff -->
-	<unjar src="${lib}/${emf_jar_prefix}emf.ecore_${emf_version}.jar" dest="${lib}/${unjared}">
-		<patternset refid="all_nested_classfiles.patternset"/>
-	</unjar>
-	<unjar src="${lib}/${emf_jar_prefix}emf.common_${emf_version}.jar" dest="${lib}/${unjared}">
-		<patternset refid="all_nested_classfiles.patternset"/>
-	</unjar>
-	<unjar src="${lib}/${emf_jar_prefix}emf.common.ui_${emf_version}.jar" dest="${lib}/${unjared}">
-		<patternset refid="all_nested_classfiles.patternset"/>
-	</unjar>
-	<unjar src="${lib}/${emf_jar_prefix}emf.ecore.xmi_${emf_version}.jar" dest="${lib}/${unjared}">
-		<patternset refid="all_nested_classfiles.patternset"/>
-	</unjar>
-	<unjar src="${lib}/${emf_jar_prefix}emf.edit_${emf_version}.jar" dest="${lib}/${unjared}">
-		<patternset refid="all_nested_classfiles.patternset"/>
-	</unjar>
-	<!-- eclipse stuff that emf edit plugin code depends on --> 
-	<unjar src="${lib}/org.eclipse.ui.workbench_3.3.0.I20061214-1400.jar" dest="${lib}/${unjared}">
-		<patternset refid="all_nested_classfiles.patternset"/>
-	</unjar>
-	<unjar src="${lib}/org.eclipse.core.runtime_3.3.100.v20061204.jar" dest="${lib}/${unjared}">
-		<patternset refid="all_nested_classfiles.patternset"/>
-	</unjar>
-	<unjar src="${lib}/org.eclipse.osgi_3.3.0.v20061213.jar" dest="${lib}/${unjared}">
-		<patternset refid="all_nested_classfiles.patternset"/>
-	</unjar>
-	<!-- EMF ocl stuff -->
-	<unjar src="${lib}/org.eclipse.emf.ocl_1.0.1.v200609250830.jar" dest="${lib}/${unjared}">
-		<patternset refid="all_nested_classfiles.patternset"/>
-	</unjar>
-	<unjar src="${lib}/lpgjavaruntime.jar" dest="${lib}/${unjared}">
-		<patternset refid="all_nested_classfiles.patternset"/>
-	</unjar>
 </target>
 
 <target name="init">
@@ -215,7 +172,6 @@
 	<delete dir="${benchmarksbuild}"/>
 	<mkdir dir="${benchmarksbuild}"/>
 </target>
-
 
 <target name="clean" depends="clean_build">
 	<delete dir="${dist}"/>
