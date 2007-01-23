@@ -2,9 +2,11 @@
  * <copyright>
  * </copyright>
  *
- * $Id: NamedImpl.java,v 1.1 2006-12-18 15:23:00 torda Exp $
+ * $Id: NamedImpl.java,v 1.2 2007-01-23 09:55:48 torda Exp $
  */
 package org.supremica.external.sag.impl;
+
+import net.sourceforge.waters.subject.module.ModuleSubject;
 
 import org.eclipse.emf.common.notify.Notification;
 

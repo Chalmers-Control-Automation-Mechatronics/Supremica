@@ -2,29 +2,45 @@
  * <copyright>
  * </copyright>
  *
- * $Id: ProjectImpl.java,v 1.2 2007-01-09 15:31:07 torda Exp $
+ * $Id: ProjectImpl.java,v 1.3 2007-01-23 09:55:48 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
 import java.util.Collection;
 
+import java.util.Map;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 
+import org.eclipse.emf.common.util.BasicDiagnostic;
+import org.eclipse.emf.common.util.Diagnostic;
+import org.eclipse.emf.common.util.DiagnosticChain;
 import org.eclipse.emf.common.util.EList;
 
+import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.InternalEObject;
 
+import org.eclipse.emf.ecore.plugin.EcorePlugin;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentWithInverseEList;
+import org.eclipse.emf.ecore.util.EObjectValidator;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
+import org.eclipse.emf.ocl.expressions.OCLExpression;
+import org.eclipse.emf.ocl.expressions.util.EvalEnvironment;
+import org.eclipse.emf.ocl.expressions.util.ExpressionsUtil;
+import org.eclipse.emf.ocl.parser.Environment;
+import org.eclipse.emf.ocl.parser.ParserException;
+import org.eclipse.emf.ocl.query.Query;
+import org.eclipse.emf.ocl.query.QueryFactory;
 import org.supremica.external.sag.Graph;
 import org.supremica.external.sag.Project;
 import org.supremica.external.sag.SagPackage;
 import org.supremica.external.sag.Sensor;
+import org.supremica.external.sag.util.SagValidator;
 
 /**
  * <!-- begin-user-doc -->
@@ -60,6 +76,17 @@ public class ProjectImpl extends NamedImpl implements Project {
 	 * @ordered
 	 */
 	protected EList<Sensor> sensor = null;
+
+	/**
+	 * The parsed OCL expression for the definition of the '{@link #validateName <em>Validate Name</em>}' invariant constraint.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #validateName
+	 * @generated
+	 */
+	private static OCLExpression validateNameInvOCL;
+
+	private static final String OCL_ANNOTATION_SOURCE = "http://www.eclipse.org/OCL/examples/ocl";
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -99,9 +126,48 @@ public class ProjectImpl extends NamedImpl implements Project {
 	 */
 	public EList<Sensor> getSensor() {
 		if (sensor == null) {
-			sensor = new EObjectContainmentEList<Sensor>(Sensor.class, this, SagPackage.PROJECT__SENSOR);
+			sensor = new EObjectContainmentWithInverseEList<Sensor>(Sensor.class, this, SagPackage.PROJECT__SENSOR, SagPackage.SENSOR__PROJECT);
 		}
 		return sensor;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public boolean validateName(DiagnosticChain diagnostics, Map<?, ?> context) {
+		if (validateNameInvOCL == null) {
+			EOperation eOperation = (EOperation) eClass().getEOperations().get(0);
+			Environment env = ExpressionsUtil.createClassifierContext(eClass());
+			EAnnotation ocl = eOperation.getEAnnotation(OCL_ANNOTATION_SOURCE);
+			String body = (String) ocl.getDetails().get("invariant");
+			
+			try {
+				validateNameInvOCL = ExpressionsUtil.createInvariant(env, body, true);
+			} catch (ParserException e) {
+				throw new UnsupportedOperationException(e.getLocalizedMessage());
+			}
+		}
+		
+		Query query = QueryFactory.eINSTANCE.createQuery(validateNameInvOCL);
+		EvalEnvironment evalEnv = new EvalEnvironment();
+		query.setEvaluationEnvironment(evalEnv);
+		
+		if (!query.check(this)) {
+			if (diagnostics != null) {
+				diagnostics.add
+					(new BasicDiagnostic
+						(Diagnostic.ERROR,
+						 SagValidator.DIAGNOSTIC_SOURCE,
+						 SagValidator.PROJECT__VALIDATE_NAME,
+						 EcorePlugin.INSTANCE.getString("_UI_GenericInvariant_diagnostic", new Object[] { "validateName", EObjectValidator.getObjectLabel(this, (Map<Object,Object>) context) }),
+						 new Object [] { this }));
+			}
+			return false;
+		}
+		return true;
+		
 	}
 
 	/**
@@ -115,6 +181,8 @@ public class ProjectImpl extends NamedImpl implements Project {
 		switch (featureID) {
 			case SagPackage.PROJECT__GRAPH:
 				return ((InternalEList<InternalEObject>)(InternalEList<?>)getGraph()).basicAdd(otherEnd, msgs);
+			case SagPackage.PROJECT__SENSOR:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getSensor()).basicAdd(otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}

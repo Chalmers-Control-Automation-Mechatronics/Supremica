@@ -2,15 +2,18 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagPackageImpl.java,v 1.4 2007-01-12 14:23:10 torda Exp $
+ * $Id: SagPackageImpl.java,v 1.5 2007-01-23 09:55:48 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EGenericType;
+import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 
+import org.eclipse.emf.ecore.EValidator;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 
 import org.supremica.external.sag.BoundedZone;
@@ -25,6 +28,7 @@ import org.supremica.external.sag.Sensor;
 import org.supremica.external.sag.SensorNode;
 import org.supremica.external.sag.UnboundedZone;
 import org.supremica.external.sag.Zone;
+import org.supremica.external.sag.util.SagValidator;
 
 /**
  * <!-- begin-user-doc -->
@@ -164,6 +168,15 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 
 		// Initialize created meta-data
 		theSagPackage.initializePackageContents();
+
+		// Register package validator
+		EValidator.Registry.INSTANCE.put
+			(theSagPackage, 
+			 new EValidator.Descriptor() {
+				 public EValidator getEValidator() {
+					 return SagValidator.INSTANCE;
+				 }
+			 });
 
 		// Mark meta-data to indicate it can't be changed
 		theSagPackage.freeze();
@@ -401,6 +414,15 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EReference getSensor_Project() {
+		return (EReference)sensorEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getEndNode() {
 		return endNodeEClass;
 	}
@@ -492,6 +514,7 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 
 		sensorEClass = createEClass(SENSOR);
 		createEReference(sensorEClass, SENSOR__NODE);
+		createEReference(sensorEClass, SENSOR__PROJECT);
 
 		endNodeEClass = createEClass(END_NODE);
 
@@ -545,6 +568,24 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 		initEReference(getGraph_Node(), this.getNode(), this.getNode_Graph(), "node", null, 0, -1, Graph.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getGraph_Project(), this.getProject(), this.getProject_Graph(), "project", null, 0, 1, Graph.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
+		EOperation op = addEOperation(graphEClass, ecorePackage.getEBoolean(), "validateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless", 0, 1);
+		addEParameter(op, ecorePackage.getEDiagnosticChain(), "diagnostics", 0, 1);
+		EGenericType g1 = createEGenericType(ecorePackage.getEMap());
+		EGenericType g2 = createEGenericType();
+		g1.getETypeArguments().add(g2);
+		g2 = createEGenericType();
+		g1.getETypeArguments().add(g2);
+		addEParameter(op, g1, "context", 0, 1);
+
+		op = addEOperation(graphEClass, ecorePackage.getEBoolean(), "validateName", 0, 1);
+		addEParameter(op, ecorePackage.getEDiagnosticChain(), "diagnostics", 0, 1);
+		g1 = createEGenericType(ecorePackage.getEMap());
+		g2 = createEGenericType();
+		g1.getETypeArguments().add(g2);
+		g2 = createEGenericType();
+		g1.getETypeArguments().add(g2);
+		addEParameter(op, g1, "context", 0, 1);
+
 		initEClass(zoneEClass, Zone.class, "Zone", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getZone_Front(), this.getNode(), this.getNode_Incoming(), "front", null, 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getZone_Back(), this.getNode(), this.getNode_Outgoing(), "back", null, 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -552,7 +593,16 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 		initEReference(getZone_Graph(), this.getGraph(), this.getGraph_Zone(), "graph", null, 1, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(boundedZoneEClass, BoundedZone.class, "BoundedZone", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getBoundedZone_Capacity(), ecorePackage.getEInt(), "capacity", null, 0, 1, BoundedZone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getBoundedZone_Capacity(), ecorePackage.getEInt(), "capacity", "1", 0, 1, BoundedZone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		op = addEOperation(boundedZoneEClass, ecorePackage.getEBoolean(), "validateCapacityIsPositiveNumber", 0, 1);
+		addEParameter(op, ecorePackage.getEDiagnosticChain(), "diagnostics", 0, 1);
+		g1 = createEGenericType(ecorePackage.getEMap());
+		g2 = createEGenericType();
+		g1.getETypeArguments().add(g2);
+		g2 = createEGenericType();
+		g1.getETypeArguments().add(g2);
+		addEParameter(op, g1, "context", 0, 1);
 
 		initEClass(namedEClass, Named.class, "Named", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getNamed_Name(), ecorePackage.getEString(), "name", null, 0, 1, Named.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -567,10 +617,38 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 
 		initEClass(projectEClass, Project.class, "Project", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getProject_Graph(), this.getGraph(), this.getGraph_Project(), "graph", null, 0, -1, Project.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEReference(getProject_Sensor(), this.getSensor(), null, "sensor", null, 0, -1, Project.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getProject_Sensor(), this.getSensor(), this.getSensor_Project(), "sensor", null, 0, -1, Project.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		op = addEOperation(projectEClass, ecorePackage.getEBoolean(), "validateName", 0, 1);
+		addEParameter(op, ecorePackage.getEDiagnosticChain(), "diagnostics", 0, 1);
+		g1 = createEGenericType(ecorePackage.getEMap());
+		g2 = createEGenericType();
+		g1.getETypeArguments().add(g2);
+		g2 = createEGenericType();
+		g1.getETypeArguments().add(g2);
+		addEParameter(op, g1, "context", 0, 1);
 
 		initEClass(sensorEClass, Sensor.class, "Sensor", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getSensor_Node(), this.getSensorNode(), this.getSensorNode_Sensor(), "node", null, 0, -1, Sensor.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getSensor_Project(), this.getProject(), this.getProject_Sensor(), "project", null, 1, 1, Sensor.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		op = addEOperation(sensorEClass, ecorePackage.getEBoolean(), "validateName", 0, 1);
+		addEParameter(op, ecorePackage.getEDiagnosticChain(), "diagnostics", 0, 1);
+		g1 = createEGenericType(ecorePackage.getEMap());
+		g2 = createEGenericType();
+		g1.getETypeArguments().add(g2);
+		g2 = createEGenericType();
+		g1.getETypeArguments().add(g2);
+		addEParameter(op, g1, "context", 0, 1);
+
+		op = addEOperation(sensorEClass, ecorePackage.getEBoolean(), "validateUniquenessOfName", 0, 1);
+		addEParameter(op, ecorePackage.getEDiagnosticChain(), "diagnostics", 0, 1);
+		g1 = createEGenericType(ecorePackage.getEMap());
+		g2 = createEGenericType();
+		g1.getETypeArguments().add(g2);
+		g2 = createEGenericType();
+		g1.getETypeArguments().add(g2);
+		addEParameter(op, g1, "context", 0, 1);
 
 		initEClass(endNodeEClass, EndNode.class, "EndNode", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
@@ -580,6 +658,56 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 
 		// Create resource
 		createResource(eNS_URI);
+
+		// Create annotations
+		// http://www.eclipse.org/OCL/examples/ocl
+		createOclAnnotations();
+	}
+
+	/**
+	 * Initializes the annotations for <b>http://www.eclipse.org/OCL/examples/ocl</b>.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void createOclAnnotations() {
+		String source = "http://www.eclipse.org/OCL/examples/ocl";		
+		addAnnotation
+		  ((EOperation)graphEClass.getEOperations().get(0), 
+		   source, 
+		   new String[] {
+			 "invariant", "self.zone->forAll(oclIsKindOf(UnboundedZone) implies oclAsType(UnboundedZone).isOutside)"
+		   });		
+		addAnnotation
+		  ((EOperation)graphEClass.getEOperations().get(1), 
+		   source, 
+		   new String[] {
+			 "invariant", "name <> \'\' and name <> null"
+		   });		
+		addAnnotation
+		  ((EOperation)boundedZoneEClass.getEOperations().get(0), 
+		   source, 
+		   new String[] {
+			 "invariant", "capacity > 0"
+		   });		
+		addAnnotation
+		  ((EOperation)projectEClass.getEOperations().get(0), 
+		   source, 
+		   new String[] {
+			 "invariant", "name <> \'\' and name <> null"
+		   });		
+		addAnnotation
+		  ((EOperation)sensorEClass.getEOperations().get(0), 
+		   source, 
+		   new String[] {
+			 "invariant", "name <> \'\' and name <> null"
+		   });		
+		addAnnotation
+		  ((EOperation)sensorEClass.getEOperations().get(1), 
+		   source, 
+		   new String[] {
+			 "invariant", "project.sensor->forAll(s | s = self or s.name <> self.name)"
+		   });
 	}
 
 } //SagPackageImpl

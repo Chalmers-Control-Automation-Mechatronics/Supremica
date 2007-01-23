@@ -2,10 +2,12 @@
  * <copyright>
  * </copyright>
  *
- * $Id: Graph.java,v 1.3 2007-01-12 14:23:46 torda Exp $
+ * $Id: Graph.java,v 1.4 2007-01-23 09:55:48 torda Exp $
  */
 package org.supremica.external.sag;
 
+import java.util.Map;
+import org.eclipse.emf.common.util.DiagnosticChain;
 import org.eclipse.emf.common.util.EList;
 
 /**
@@ -117,5 +119,21 @@ public interface Graph extends Named {
 	 * @generated
 	 */
 	void setProject(Project value);
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @model annotation="http://www.eclipse.org/OCL/examples/ocl invariant='self.zone->forAll(oclIsKindOf(UnboundedZone) implies oclAsType(UnboundedZone).isOutside)'"
+	 * @generated
+	 */
+	boolean validateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless(DiagnosticChain diagnostics, Map<?, ?> context);
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @model annotation="http://www.eclipse.org/OCL/examples/ocl invariant='name <> \'\' and name <> null'"
+	 * @generated
+	 */
+	boolean validateName(DiagnosticChain diagnostics, Map<?, ?> context);
 
 } // Graph

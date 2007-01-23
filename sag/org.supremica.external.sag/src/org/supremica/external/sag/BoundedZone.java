@@ -2,9 +2,12 @@
  * <copyright>
  * </copyright>
  *
- * $Id: BoundedZone.java,v 1.1 2006-12-18 15:23:00 torda Exp $
+ * $Id: BoundedZone.java,v 1.2 2007-01-23 09:55:48 torda Exp $
  */
 package org.supremica.external.sag;
+
+import java.util.Map;
+import org.eclipse.emf.common.util.DiagnosticChain;
 
 
 /**
@@ -26,6 +29,7 @@ package org.supremica.external.sag;
 public interface BoundedZone extends Zone {
 	/**
 	 * Returns the value of the '<em><b>Capacity</b></em>' attribute.
+	 * The default value is <code>"1"</code>.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Capacity</em>' attribute isn't clear,
@@ -35,7 +39,7 @@ public interface BoundedZone extends Zone {
 	 * @return the value of the '<em>Capacity</em>' attribute.
 	 * @see #setCapacity(int)
 	 * @see org.supremica.external.sag.SagPackage#getBoundedZone_Capacity()
-	 * @model
+	 * @model default="1"
 	 * @generated
 	 */
 	int getCapacity();
@@ -49,5 +53,13 @@ public interface BoundedZone extends Zone {
 	 * @generated
 	 */
 	void setCapacity(int value);
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @model annotation="http://www.eclipse.org/OCL/examples/ocl invariant='capacity > 0'"
+	 * @generated
+	 */
+	boolean validateCapacityIsPositiveNumber(DiagnosticChain diagnostics, Map<?, ?> context);
 
 } // BoundedZone

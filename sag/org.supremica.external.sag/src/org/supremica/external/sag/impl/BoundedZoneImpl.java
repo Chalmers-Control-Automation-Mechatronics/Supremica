@@ -2,18 +2,34 @@
  * <copyright>
  * </copyright>
  *
- * $Id: BoundedZoneImpl.java,v 1.1 2006-12-18 15:23:00 torda Exp $
+ * $Id: BoundedZoneImpl.java,v 1.2 2007-01-23 09:55:48 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
+import java.util.Map;
 import org.eclipse.emf.common.notify.Notification;
 
+import org.eclipse.emf.common.util.BasicDiagnostic;
+import org.eclipse.emf.common.util.Diagnostic;
+import org.eclipse.emf.common.util.DiagnosticChain;
+import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EClass;
 
+import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
+import org.eclipse.emf.ecore.plugin.EcorePlugin;
+import org.eclipse.emf.ecore.util.EObjectValidator;
+import org.eclipse.emf.ocl.expressions.OCLExpression;
+import org.eclipse.emf.ocl.expressions.util.EvalEnvironment;
+import org.eclipse.emf.ocl.expressions.util.ExpressionsUtil;
+import org.eclipse.emf.ocl.parser.Environment;
+import org.eclipse.emf.ocl.parser.ParserException;
+import org.eclipse.emf.ocl.query.Query;
+import org.eclipse.emf.ocl.query.QueryFactory;
 import org.supremica.external.sag.BoundedZone;
 import org.supremica.external.sag.SagPackage;
+import org.supremica.external.sag.util.SagValidator;
 
 /**
  * <!-- begin-user-doc -->
@@ -37,7 +53,7 @@ public class BoundedZoneImpl extends ZoneImpl implements BoundedZone {
 	 * @generated
 	 * @ordered
 	 */
-	protected static final int CAPACITY_EDEFAULT = 0;
+	protected static final int CAPACITY_EDEFAULT = 1;
 
 	/**
 	 * The cached value of the '{@link #getCapacity() <em>Capacity</em>}' attribute.
@@ -48,6 +64,17 @@ public class BoundedZoneImpl extends ZoneImpl implements BoundedZone {
 	 * @ordered
 	 */
 	protected int capacity = CAPACITY_EDEFAULT;
+
+	/**
+	 * The parsed OCL expression for the definition of the '{@link #validateCapacityIsPositiveNumber <em>Validate Capacity Is Positive Number</em>}' invariant constraint.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #validateCapacityIsPositiveNumber
+	 * @generated
+	 */
+	private static OCLExpression validateCapacityIsPositiveNumberInvOCL;
+
+	private static final String OCL_ANNOTATION_SOURCE = "http://www.eclipse.org/OCL/examples/ocl";
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -87,6 +114,45 @@ public class BoundedZoneImpl extends ZoneImpl implements BoundedZone {
 		capacity = newCapacity;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.BOUNDED_ZONE__CAPACITY, oldCapacity, capacity));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public boolean validateCapacityIsPositiveNumber(DiagnosticChain diagnostics, Map<?, ?> context) {
+		if (validateCapacityIsPositiveNumberInvOCL == null) {
+			EOperation eOperation = (EOperation) eClass().getEOperations().get(0);
+			Environment env = ExpressionsUtil.createClassifierContext(eClass());
+			EAnnotation ocl = eOperation.getEAnnotation(OCL_ANNOTATION_SOURCE);
+			String body = (String) ocl.getDetails().get("invariant");
+			
+			try {
+				validateCapacityIsPositiveNumberInvOCL = ExpressionsUtil.createInvariant(env, body, true);
+			} catch (ParserException e) {
+				throw new UnsupportedOperationException(e.getLocalizedMessage());
+			}
+		}
+		
+		Query query = QueryFactory.eINSTANCE.createQuery(validateCapacityIsPositiveNumberInvOCL);
+		EvalEnvironment evalEnv = new EvalEnvironment();
+		query.setEvaluationEnvironment(evalEnv);
+		
+		if (!query.check(this)) {
+			if (diagnostics != null) {
+				diagnostics.add
+					(new BasicDiagnostic
+						(Diagnostic.ERROR,
+						 SagValidator.DIAGNOSTIC_SOURCE,
+						 SagValidator.BOUNDED_ZONE__VALIDATE_CAPACITY_IS_POSITIVE_NUMBER,
+						 EcorePlugin.INSTANCE.getString("_UI_GenericInvariant_diagnostic", new Object[] { "validateCapacityIsPositiveNumber", EObjectValidator.getObjectLabel(this, (Map<Object,Object>) context) }),
+						 new Object [] { this }));
+			}
+			return false;
+		}
+		return true;
+		
 	}
 
 	/**

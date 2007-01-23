@@ -1,0 +1,104 @@
+<%if (isInterface) {%>
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+  <%if (genOperation.hasDocumentation()) {%>
+	 * <!-- begin-model-doc -->
+	 * <%=genOperation.getDocumentation(genModel.getIndentation(stringBuffer))%>
+	 * <!-- end-model-doc -->
+  <%}%>
+  <%if (!genModel.isSuppressEMFModelTags()) { boolean first = true; for (StringTokenizer stringTokenizer = new StringTokenizer(genOperation.getModelInfo(), "\n\r"); stringTokenizer.hasMoreTokens(); ) { String modelInfo = stringTokenizer.nextToken(); if (first) { first = false;%>
+	 * @model <%=modelInfo%>
+  <%} else {%>
+	 *        <%=modelInfo%>
+  <%}} if (first) {%>
+	 * @model
+  <%}}%>
+	 * @generated
+	 */
+<%} else {%>
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+<%}%>
+<%if (!isImplementation) {%>
+	<%=genOperation.getImportedType()%> <%=genOperation.getName()%>(<%=genOperation.getParameters()%>)<%=genOperation.getThrows()%>;
+
+<%} else {%>
+	public <%=genOperation.getImportedType()%> <%=genOperation.getName()%>(<%=genOperation.getParameters()%>)<%=genOperation.getThrows()%>
+	{
+  <%if (genOperation.hasBody()) {%>
+		<%=genOperation.getBody(genModel.getIndentation(stringBuffer))%>
+  <%} else if (genOperation.isInvariant()) {GenClass opClass = genOperation.getGenClass(); String diagnostics = ((GenParameter)genOperation.getGenParameters().get(0)).getName(); String context = ((GenParameter)genOperation.getGenParameters().get(1)).getName();
+		String invariant = null;
+		EOperation eOperation = genOperation.getEcoreOperation();
+		EAnnotation ocl = eOperation.getEAnnotation(oclNsURI);
+		if (ocl != null) invariant = (String) ocl.getDetails().get("invariant");
+		if (invariant == null) { %>
+		// TODO: implement this method
+		// -> specify the condition that violates the invariant
+		// -> verify the details of the diagnostic, including severity and message
+		// Ensure that you remove @generated or mark it @generated NOT
+		if (false)
+		{
+			if (<%=diagnostics%> != null)
+			{
+				<%=diagnostics%>.add
+					(new <%=genModel.getImportedName("org.eclipse.emf.common.util.BasicDiagnostic")%>
+						(<%=genModel.getImportedName("org.eclipse.emf.common.util.Diagnostic")%>.ERROR,
+						 <%=opClass.getGenPackage().getImportedValidatorClassName()%>.DIAGNOSTIC_SOURCE,
+						 <%=opClass.getGenPackage().getImportedValidatorClassName()%>.<%=opClass.getOperationID(genOperation)%>,
+						 <%=genModel.getImportedName("org.eclipse.emf.ecore.plugin.EcorePlugin")%>.INSTANCE.getString("_UI_GenericInvariant_diagnostic", new Object[] { "<%=genOperation.getName()%>", <%=genModel.getImportedName("org.eclipse.emf.ecore.util.EObjectValidator")%>.getObjectLabel(this, <%=context%>) }),<%=genModel.getNonNLS()%><%=genModel.getNonNLS(2)%>
+						 new Object [] { this }));
+			}
+			return false;
+		}
+		return true;
+		<% } else { final String expr = genOperation.getName() + "InvOCL"; %>
+		if (<%=expr%> == null) {
+			<%=genModel.getImportedName("org.eclipse.emf.ecore.EOperation")%> eOperation = (<%=genModel.getImportedName("org.eclipse.emf.ecore.EOperation")%>) eClass().getEOperations().get(<%=eOperation.getEContainingClass().getEOperations().indexOf(eOperation)%>);
+			<%=genModel.getImportedName("org.eclipse.emf.ocl.parser.Environment")%> env = <%=genModel.getImportedName("org.eclipse.emf.ocl.expressions.util.ExpressionsUtil")%>.createClassifierContext(eClass());
+			<%=genModel.getImportedName("org.eclipse.emf.ecore.EAnnotation")%> ocl = eOperation.getEAnnotation(OCL_ANNOTATION_SOURCE);
+			String body = (String) ocl.getDetails().get("invariant");<%=genModel.getNonNLS()%>
+			
+			try {
+				<%=expr%> = <%=genModel.getImportedName("org.eclipse.emf.ocl.expressions.util.ExpressionsUtil")%>.createInvariant(env, body, true);
+			} catch (<%=genModel.getImportedName("org.eclipse.emf.ocl.parser.ParserException")%> e) {
+				throw new UnsupportedOperationException(e.getLocalizedMessage());
+			}
+		}
+		
+		<%=genModel.getImportedName("org.eclipse.emf.ocl.query.Query")%> query = <%=genModel.getImportedName("org.eclipse.emf.ocl.query.QueryFactory")%>.eINSTANCE.createQuery(<%=expr%>);
+		<%=genModel.getImportedName("org.eclipse.emf.ocl.expressions.util.EvalEnvironment")%> evalEnv = new <%=genModel.getImportedName("org.eclipse.emf.ocl.expressions.util.EvalEnvironment")%>();
+		query.setEvaluationEnvironment(evalEnv);
+		
+		if (!query.check(this))
+		{
+			if (<%=diagnostics%> != null)
+			{
+				<%=diagnostics%>.add
+					(new <%=genModel.getImportedName("org.eclipse.emf.common.util.BasicDiagnostic")%>
+						(<%=genModel.getImportedName("org.eclipse.emf.common.util.Diagnostic")%>.ERROR,
+						 <%=opClass.getGenPackage().getImportedValidatorClassName()%>.DIAGNOSTIC_SOURCE,
+						 <%=opClass.getGenPackage().getImportedValidatorClassName()%>.<%=opClass.getOperationID(genOperation)%>,
+						 <%=genModel.getImportedName("org.eclipse.emf.ecore.plugin.EcorePlugin")%>.INSTANCE.getString("_UI_GenericInvariant_diagnostic", new Object[] { "<%=genOperation.getName()%>", <%=genModel.getImportedName("org.eclipse.emf.ecore.util.EObjectValidator")%>.getObjectLabel(this, (Map<Object,Object>) <%=context%>) }),<%=genModel.getNonNLS()%><%=genModel.getNonNLS(2)%>
+						 new Object [] { this }));
+			}
+			return false;
+		}
+		return true;
+		<% } %>
+  <%} else {%>
+<%@ include file="implementedGenOperation.TODO.override.javajetinc" fail="alternative" %>
+<%@ start %>
+		// TODO: implement this method
+		// Ensure that you remove @generated or mark it @generated NOT
+		throw new UnsupportedOperationException();
+<%@ end %><%//implementedGenOperation.TODO.override.javajetinc%>
+  <%}%>
+	}
+
+<%}%>
+<%@ include file="genOperation.insert.javajetinc" fail="silent" %>

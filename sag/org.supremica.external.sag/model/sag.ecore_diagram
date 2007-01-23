@@ -8,7 +8,7 @@
       <styles xmi:type="notation:FilteringStyle" xmi:id="_-DwsCmj5Edu_i88VEes0wA"/>
     </children>
     <children xmi:type="notation:Node" xmi:id="_-DwsC2j5Edu_i88VEes0wA" type="7002">
-      <styles xmi:type="notation:DrawerStyle" xmi:id="_-DwsDGj5Edu_i88VEes0wA"/>
+      <styles xmi:type="notation:DrawerStyle" xmi:id="_-DwsDGj5Edu_i88VEes0wA" collapsed="true"/>
       <styles xmi:type="notation:SortingStyle" xmi:id="_-DwsDWj5Edu_i88VEes0wA"/>
       <styles xmi:type="notation:FilteringStyle" xmi:id="_-DwsDmj5Edu_i88VEes0wA"/>
     </children>
@@ -294,7 +294,7 @@
     <styles xmi:type="notation:LineStyle" xmi:id="_-EqD72j5Edu_i88VEes0wA"/>
     <element xmi:type="ecore:EReference" href="sag.ecore#//Zone/back"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_-EqD8Gj5Edu_i88VEes0wA" points="[0, 30, -81, -86]$[81, 90, 0, -26]"/>
-    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_rD0-MJpEEduMspV0nWGx2w" id="(0.21875,0.050847456)"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_rD0-MJpEEduMspV0nWGx2w" id="(0.104166664,0.09615385)"/>
   </edges>
   <edges xmi:type="notation:Edge" xmi:id="_-Ez04Gj5Edu_i88VEes0wA" type="4004" source="_-D6dAGj5Edu_i88VEes0wA" target="_-DwsJmj5Edu_i88VEes0wA">
     <styles xmi:type="notation:RoutingStyle" xmi:id="_-Ez04Wj5Edu_i88VEes0wA"/>
@@ -462,5 +462,17 @@
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_yH5z5KClEduzMYwAPAKXdA" points="[9, -11, 0, 76]$[9, -78, 0, 9]"/>
     <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_yH5z56ClEduzMYwAPAKXdA" id="(0.67368424,0.15254237)"/>
     <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_yH5z6KClEduzMYwAPAKXdA" id="(0.66071427,0.86538464)"/>
+  </edges>
+  <edges xmi:type="notation:Edge" xmi:id="_5rd8kKSCEduDJdd3diCmmg" type="4002" source="_DzH5wJzHEdus3oZeaECLlA" target="_-EEOE2j5Edu_i88VEes0wA">
+    <children xmi:type="notation:Node" xmi:id="_5rd8laSCEduDJdd3diCmmg" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_5rd8lqSCEduDJdd3diCmmg" x="9" y="4"/>
+    </children>
+    <styles xmi:type="notation:RoutingStyle" xmi:id="_5rd8kaSCEduDJdd3diCmmg"/>
+    <styles xmi:type="notation:FontStyle" xmi:id="_5rd8kqSCEduDJdd3diCmmg"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_5rd8k6SCEduDJdd3diCmmg"/>
+    <element xmi:type="ecore:EReference" href="sag.ecore#//Sensor/project"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_5rd8lKSCEduDJdd3diCmmg" points="[-2, -7, 22, 99]$[-46, -105, -22, 1]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_5rd8l6SCEduDJdd3diCmmg" id="(0.5625,0.08)"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_5rntkKSCEduDJdd3diCmmg" id="(0.17821783,0.6440678)"/>
   </edges>
 </notation:Diagram>

@@ -2,32 +2,48 @@
  * <copyright>
  * </copyright>
  *
- * $Id: GraphImpl.java,v 1.3 2007-01-12 14:23:10 torda Exp $
+ * $Id: GraphImpl.java,v 1.4 2007-01-23 09:55:48 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
 import java.util.Collection;
 
+import java.util.Map;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 
+import org.eclipse.emf.common.util.BasicDiagnostic;
+import org.eclipse.emf.common.util.Diagnostic;
+import org.eclipse.emf.common.util.DiagnosticChain;
 import org.eclipse.emf.common.util.EList;
 
+import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.InternalEObject;
 
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
+import org.eclipse.emf.ecore.plugin.EcorePlugin;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.EObjectContainmentWithInverseEList;
+import org.eclipse.emf.ecore.util.EObjectValidator;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.InternalEList;
 
+import org.eclipse.emf.ocl.expressions.OCLExpression;
+import org.eclipse.emf.ocl.expressions.util.EvalEnvironment;
+import org.eclipse.emf.ocl.expressions.util.ExpressionsUtil;
+import org.eclipse.emf.ocl.parser.Environment;
+import org.eclipse.emf.ocl.parser.ParserException;
+import org.eclipse.emf.ocl.query.Query;
+import org.eclipse.emf.ocl.query.QueryFactory;
 import org.supremica.external.sag.Graph;
 import org.supremica.external.sag.Node;
 import org.supremica.external.sag.Project;
 import org.supremica.external.sag.SagPackage;
 import org.supremica.external.sag.Zone;
+import org.supremica.external.sag.util.SagValidator;
 
 /**
  * <!-- begin-user-doc -->
@@ -85,6 +101,26 @@ public class GraphImpl extends NamedImpl implements Graph {
 	 * @ordered
 	 */
 	protected EList<Node> node = null;
+
+	/**
+	 * The parsed OCL expression for the definition of the '{@link #validateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless <em>Validate All Unbounded Zones Are Outside If Objects Are Identityless</em>}' invariant constraint.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #validateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless
+	 * @generated
+	 */
+	private static OCLExpression validateAllUnboundedZonesAreOutsideIfObjectsAreIdentitylessInvOCL;
+
+	/**
+	 * The parsed OCL expression for the definition of the '{@link #validateName <em>Validate Name</em>}' invariant constraint.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #validateName
+	 * @generated
+	 */
+	private static OCLExpression validateNameInvOCL;
+
+	private static final String OCL_ANNOTATION_SOURCE = "http://www.eclipse.org/OCL/examples/ocl";
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -189,6 +225,84 @@ public class GraphImpl extends NamedImpl implements Graph {
 		}
 		else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.GRAPH__PROJECT, newProject, newProject));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public boolean validateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless(DiagnosticChain diagnostics, Map<?, ?> context) {
+		if (validateAllUnboundedZonesAreOutsideIfObjectsAreIdentitylessInvOCL == null) {
+			EOperation eOperation = (EOperation) eClass().getEOperations().get(0);
+			Environment env = ExpressionsUtil.createClassifierContext(eClass());
+			EAnnotation ocl = eOperation.getEAnnotation(OCL_ANNOTATION_SOURCE);
+			String body = (String) ocl.getDetails().get("invariant");
+			
+			try {
+				validateAllUnboundedZonesAreOutsideIfObjectsAreIdentitylessInvOCL = ExpressionsUtil.createInvariant(env, body, true);
+			} catch (ParserException e) {
+				throw new UnsupportedOperationException(e.getLocalizedMessage());
+			}
+		}
+		
+		Query query = QueryFactory.eINSTANCE.createQuery(validateAllUnboundedZonesAreOutsideIfObjectsAreIdentitylessInvOCL);
+		EvalEnvironment evalEnv = new EvalEnvironment();
+		query.setEvaluationEnvironment(evalEnv);
+		
+		if (!query.check(this)) {
+			if (diagnostics != null) {
+				diagnostics.add
+					(new BasicDiagnostic
+						(Diagnostic.ERROR,
+						 SagValidator.DIAGNOSTIC_SOURCE,
+						 SagValidator.GRAPH__VALIDATE_ALL_UNBOUNDED_ZONES_ARE_OUTSIDE_IF_OBJECTS_ARE_IDENTITYLESS,
+						 EcorePlugin.INSTANCE.getString("_UI_GenericInvariant_diagnostic", new Object[] { "validateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless", EObjectValidator.getObjectLabel(this, (Map<Object,Object>) context) }),
+						 new Object [] { this }));
+			}
+			return false;
+		}
+		return true;
+		
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public boolean validateName(DiagnosticChain diagnostics, Map<?, ?> context) {
+		if (validateNameInvOCL == null) {
+			EOperation eOperation = (EOperation) eClass().getEOperations().get(1);
+			Environment env = ExpressionsUtil.createClassifierContext(eClass());
+			EAnnotation ocl = eOperation.getEAnnotation(OCL_ANNOTATION_SOURCE);
+			String body = (String) ocl.getDetails().get("invariant");
+			
+			try {
+				validateNameInvOCL = ExpressionsUtil.createInvariant(env, body, true);
+			} catch (ParserException e) {
+				throw new UnsupportedOperationException(e.getLocalizedMessage());
+			}
+		}
+		
+		Query query = QueryFactory.eINSTANCE.createQuery(validateNameInvOCL);
+		EvalEnvironment evalEnv = new EvalEnvironment();
+		query.setEvaluationEnvironment(evalEnv);
+		
+		if (!query.check(this)) {
+			if (diagnostics != null) {
+				diagnostics.add
+					(new BasicDiagnostic
+						(Diagnostic.ERROR,
+						 SagValidator.DIAGNOSTIC_SOURCE,
+						 SagValidator.GRAPH__VALIDATE_NAME,
+						 EcorePlugin.INSTANCE.getString("_UI_GenericInvariant_diagnostic", new Object[] { "validateName", EObjectValidator.getObjectLabel(this, (Map<Object,Object>) context) }),
+						 new Object [] { this }));
+			}
+			return false;
+		}
+		return true;
+		
 	}
 
 	/**

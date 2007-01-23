@@ -35,10 +35,13 @@ import org.xml.sax.SAXException
 
 class SagToWaters {
 
+	public static final apa = "asdh";
+	
 	static void main(args) {
-    	Project sagProject = loadSagProjectFromFile('C:/runtime-New_configuration/test/BallSystem.sag')
+		def path = '../org.supremica.external.sag.tests/testcases'
+    	Project sagProject = loadSagProjectFromFile(path+'/testcase1.sag')
 		ModuleProxy watersModule = generateWatersModule(sagProject)
-		File watersFile = new File("C:/runtime-New_configuration/test/${watersModule.getName()}.${WmodFileFilter.WMOD}")
+		File watersFile = new File("${path}/${watersModule.getName()}.${WmodFileFilter.WMOD}")
 		saveWatersModuleToFile(watersModule, watersFile)
 		watersFile.eachLine{println it}
 	}
@@ -115,7 +118,7 @@ class SagToWaters {
 					component = boundedZoneComponents[zone]
 					if (component != null) {
 						(0..zone.capacity-1).each {nodeIndex ->
-							SagToWaters.addEventToComponent(component, (nodeIndex+(isEntrance ? 1 : 0)), (nodeIndex+(isEntrance ? 0 : 1)), event)	
+							SagToWaters.addEventToComponent(component, (nodeIndex+(isEntrance ? 1 : 0)), (nodeIndex+(isEntrance ? 0 : 1)), event)
 						}
 					}
 				}
@@ -123,7 +126,6 @@ class SagToWaters {
 		}
 		createEventsAndEdges(sensorEntrances, true)
 		createEventsAndEdges(sensorExits, false)
-		
 		watersModule
 	}
 	
