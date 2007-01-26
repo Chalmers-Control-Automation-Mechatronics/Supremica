@@ -61,7 +61,7 @@ public class EditorSavePostscriptAction
      */
     public boolean isEnabled()
     {
-        // No other objections?
+        // If there are no other objections, just make sure there is a postscript service!
         if (super.isEnabled())
         {
             // Look for print service
@@ -72,8 +72,7 @@ public class EditorSavePostscriptAction
             boolean serviceFound = (factories.length > 0);
             if (!serviceFound)
             {
-                putValue(Action.SHORT_DESCRIPTION, "No Postscript print service was found on the system");
-                setEnabled(false);
+                putValue(Action.SHORT_DESCRIPTION, "No Postscript print service was found on the system.");
             }
             return serviceFound;
         }
