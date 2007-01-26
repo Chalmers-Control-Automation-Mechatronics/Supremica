@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.35 2007-01-16 22:03:32 flordal Exp $
+//# $Id: ComponentEditorPanel.java,v 1.36 2007-01-26 15:09:52 avenir Exp $
 //###########################################################################
 
 
@@ -286,6 +286,135 @@ public class ComponentEditorPanel
             mModuleContainer.getIDE().info("No Postscript printer service installed.");
         }
     }
+
+ public void exportEncapsulatedPostscript()
+    {
+		String psMimeType = "application/postscript";
+        
+        StreamPrintServiceFactory[] factories =
+            PrinterJob.lookupStreamPrintServices(psMimeType);
+        if (factories.length > 0)
+        {
+            try
+            {
+                // Get file to export to
+                JFileChooser chooser = new JFileChooser();
+                chooser.setSelectedFile(new File(element.getName() + ".eps"));
+                int returnVal = chooser.showSaveDialog(surface);
+                File epsFile = chooser.getSelectedFile();
+                // Not OK?
+                if (returnVal != JFileChooser.APPROVE_OPTION)
+                {
+                    return;
+                }
+
+				// Create output
+				File dir = epsFile.getParentFile();
+				File psFile = File.createTempFile("temp", ".ps", dir);
+
+                // Get printerservice and set up PrintJob
+                FileOutputStream outstream = new FileOutputStream(psFile);
+                StreamPrintService psPrinter = factories[0].getPrintService(outstream);
+                // psPrinter is our Postscript print service
+                PrinterJob printJob = PrinterJob.getPrinterJob();
+                printJob.setPrintService(psPrinter);
+                printJob.setPrintable(surface);
+                // Printing attributes
+                PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
+                PrintRequestAttribute jobName = new JobName("Supremica Printing", Locale.ENGLISH);
+                attributes.add(jobName);
+
+                // Print!
+                printJob.print(attributes);
+
+
+				// Convert ps to eps using "ps2epsi"
+				try 
+				{
+					String[] cmds = new String[]{"ps2epsi", psFile.getName(), epsFile.getName()};
+					
+					Process ps2epsiProcess = Runtime.getRuntime().exec(cmds, null, dir);
+					ps2epsiProcess.waitFor();
+					
+					if (ps2epsiProcess.exitValue() != 0)
+					{
+						throw new Exception("Conversion from ps to eps exited unsuccessfully.");
+					}
+				}
+				catch (Exception ex)
+				{
+					mModuleContainer.getIDE().error("The conversion from ps to eps failed. Make sure that \"ps2epsi.bat\" is globally accessible.");
+					throw ex;
+				}
+
+				// Loop through the eps-file and correct it if necessary
+				File newEpsFile = File.createTempFile(epsFile.getName(), ".tmp", dir);
+				
+				BufferedReader r = new BufferedReader(new FileReader(epsFile));
+				BufferedWriter w = new BufferedWriter(new FileWriter(newEpsFile));
+
+				boolean alert = false;
+				String str = r.readLine();
+				while (str != null)
+				{
+					if (str.contains("save countdictstack"))
+					{
+						alert = false;
+					}
+					
+					if (alert == true)
+					{
+						w.write("save countdictstack mark newpath /showpage {} def /setpagedevice {pop} def");
+						w.newLine();
+						
+						alert = false;
+					}
+					
+					w.write(str);
+					w.newLine();
+					
+					if (str.contains("%%EndPreview"))
+					{
+						alert = true;
+					}
+					
+					str = r.readLine();
+				}
+				
+				w.flush();
+				w.close();
+				r.close();
+				outstream.close();
+
+				// Clean up
+				psFile.delete();
+				epsFile.delete();
+
+				boolean renameSucceeded = newEpsFile.renameTo(epsFile);
+
+				if (!renameSucceeded)
+				{
+					throw new Exception("Unable to rename the newly created file to " + epsFile.getName());
+				}
+			}
+			catch (FileNotFoundException ex)
+            {
+                mModuleContainer.getIDE().error("File not found. " + ex);
+            }
+            catch (PrinterException ex)
+            {
+                mModuleContainer.getIDE().error("Error printing. " + ex);
+            }
+			catch (Exception ex)
+			{
+				mModuleContainer.getIDE().error("Error converting from ps to eps. " + ex);
+			}
+        }
+        else
+        {
+            mModuleContainer.getIDE().info("No Postscript printer service installed.");
+        }
+	}
     
     /**
      * Open a print dialog and let the user choose how to print.

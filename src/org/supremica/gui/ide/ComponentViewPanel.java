@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentViewPanel
 //###########################################################################
-//# $Id: ComponentViewPanel.java,v 1.2 2006-11-03 15:01:57 torda Exp $
+//# $Id: ComponentViewPanel.java,v 1.3 2007-01-26 15:09:52 avenir Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -224,6 +224,8 @@ public class ComponentViewPanel
   }
 
 	public void exportPostscript() {}
+
+	public void exportEncapsulatedPostscript() {}
 
   public void printFigure()
   {

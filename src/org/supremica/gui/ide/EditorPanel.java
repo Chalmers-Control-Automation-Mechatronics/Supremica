@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorPanel
 //###########################################################################
-//# $Id: EditorPanel.java,v 1.48 2007-01-16 22:03:32 flordal Exp $
+//# $Id: EditorPanel.java,v 1.49 2007-01-26 15:09:52 avenir Exp $
 //###########################################################################
 
 
@@ -122,6 +122,7 @@ public class EditorPanel
         if (newComponent instanceof ComponentEditorPanel)
         {
             getActions().editorSavePostscriptAction.setEnabled(true);
+			getActions().editorSaveEncapsulatedPostscriptAction.setEnabled(true);
             getActions().editorSavePDFAction.setEnabled(true);
             getActions().editorPrintAction.setEnabled(true);
             getActions().editorRunEmbedderAction.setEnabled(true);
@@ -129,6 +130,7 @@ public class EditorPanel
         else
         {
             getActions().editorSavePostscriptAction.setEnabled(false);
+			getActions().editorSaveEncapsulatedPostscriptAction.setEnabled(false);
             getActions().editorSavePDFAction.setEnabled(false);
             getActions().editorPrintAction.setEnabled(false);
             getActions().editorRunEmbedderAction.setEnabled(false);

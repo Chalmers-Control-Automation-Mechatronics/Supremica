@@ -23,6 +23,7 @@ public class Actions
     public IDEAction editorPrintAction = new EditorPrintAction(allActions);
     public IDEAction editorSavePDFAction = new EditorSavePDFAction(allActions);
     public IDEAction editorSavePostscriptAction = new EditorSavePostscriptAction(allActions);
+	public IDEAction editorSaveEncapsulatedPostscriptAction = new EditorSaveEncapsulatedPostscriptAction(allActions);
 
     // Editor Actions
     public IDEAction editorCopyAction = new EditorCopyAction(allActions);

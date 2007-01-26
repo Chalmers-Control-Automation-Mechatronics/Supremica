@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.35 2006-12-05 21:38:17 flordal Exp $
+//# $Id: EditorWindow.java,v 1.36 2007-01-26 15:09:47 avenir Exp $
 //###########################################################################
 
 
@@ -18,9 +18,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.print.*;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Locale;
 import javax.print.attribute.*;
 import javax.print.attribute.standard.*;
@@ -252,6 +250,109 @@ public class EditorWindow
             
             // Print!
             printJob.print(attributes);
+        }
+        catch (Exception ex)
+        {
+            System.err.println(ex.getStackTrace());
+        }
+    }
+
+  public void exportEncapsulatedPostscript()
+    {
+        // Get file to export to
+        JFileChooser chooser = new JFileChooser();
+        chooser.setSelectedFile(new File(mSubject.getName() + ".eps"));
+        int returnVal = chooser.showSaveDialog(surface);
+        File epsFile = chooser.getSelectedFile();
+        // Not OK?
+        if (returnVal != JFileChooser.APPROVE_OPTION)
+        {
+            return;
+        }
+        
+        // Create output
+        try
+        {
+            PrinterJob printJob = PrinterJob.getPrinterJob();
+            printJob.setPrintable((EditorSurface) getControlledSurface());
+            
+            File dir = epsFile.getParentFile();
+            File psFile = File.createTempFile(epsFile.getName(), ".ps", dir);
+
+            PrintRequestAttribute postscript = new Destination(psFile.toURI());
+            PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
+            attributes.add(postscript);
+            
+            // Print!
+            printJob.print(attributes);
+
+            // Convert ps to eps using "ps2epsi"
+            try 
+            {
+              String[] cmds = new String[]{"ps2epsi", psFile.getName(), epsFile.getName()};
+              
+              Process ps2epsiProcess = Runtime.getRuntime().exec(cmds, null, dir);
+              ps2epsiProcess.waitFor();
+              
+              if (ps2epsiProcess.exitValue() != 0)
+              {
+				throw new Exception("Conversion from ps to eps exited unsuccessfully.");
+              }
+            }
+            catch (Exception ex)
+            {
+              System.err.println("The conversion from ps to eps failed. Make sure that \"ps2epsi.bat\" is globally accessible.");
+              throw ex;
+            }
+
+            // Loop through the eps-file and correct it if necessary
+            File newEpsFile = File.createTempFile(epsFile.getName(), ".tmp", dir);
+
+            BufferedReader r = new BufferedReader(new FileReader(epsFile));
+            BufferedWriter w = new BufferedWriter(new FileWriter(newEpsFile));
+
+            boolean alert = false;
+            String str = r.readLine();
+            while (str != null)
+            {
+              if (str.contains("save countdictstack"))
+              {
+				alert = false;
+              }
+              
+              if (alert == true)
+              {
+				w.write("save countdictstack mark newpath /showpage {} def /setpagedevice {pop} def");
+				w.newLine();
+                
+				alert = false;
+              }
+              
+              w.write(str);
+              w.newLine();
+              
+              if (str.contains("%%EndPreview"))
+              {
+				alert = true;
+              }
+              
+              str = r.readLine();
+            }
+            
+            w.flush();
+            w.close();
+            r.close();
+           
+            // Clean up
+            psFile.delete();
+            epsFile.delete();
+            
+            boolean renameSucceeded = newEpsFile.renameTo(epsFile);
+            
+            if (!renameSucceeded)
+            {
+              throw new Exception("Unable to rename the newly created file to " + epsFile.getName());
+            }
         }
         catch (Exception ex)
         {

@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindowInterface.java,v 1.10 2006-11-03 15:01:56 torda Exp $
+//# $Id: EditorWindowInterface.java,v 1.11 2007-01-26 15:09:47 avenir Exp $
 //###########################################################################
 
 
@@ -38,6 +38,8 @@ public interface EditorWindowInterface
     public void exportPDF();
     
     public void exportPostscript();
+
+	public void exportEncapsulatedPostscript();
     
     public void printFigure();
     
