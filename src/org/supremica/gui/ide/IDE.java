@@ -325,8 +325,8 @@ public class IDE
             getActiveModuleContainer().getEditorPanel().enablePanel();
             getActiveModuleContainer().getAnalyzerPanel().disablePanel();
             
-            menuBar.getEditorMenu().setVisible(true);//.enable();
-            menuBar.getAnalyzerMenu().setVisible(false);//.disable();
+            menuBar.getEditorMenu().setEnabled(true);//.enable();
+            menuBar.getAnalyzerMenu().setEnabled(false);//.disable();
         }
         if (analyzerActive())
         {
@@ -340,8 +340,8 @@ public class IDE
                 tabPanel.setSelectedComponent(getActiveModuleContainer().getEditorPanel());
             }
 
-            menuBar.getEditorMenu().setVisible(false);//.disable();
-            menuBar.getAnalyzerMenu().setVisible(true);//.enable();
+            menuBar.getEditorMenu().setEnabled(false);//.disable();
+            menuBar.getAnalyzerMenu().setEnabled(true);//.enable();
         }
         repaint();
     }
