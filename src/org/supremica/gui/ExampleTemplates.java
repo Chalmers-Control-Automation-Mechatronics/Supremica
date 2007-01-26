@@ -277,6 +277,7 @@ public class ExampleTemplates
         thisGroup.addItem(new TemplateItem("Circular Table", prefix + "circularTable.xml", TemplateItemType.XML));
         thisGroup.addItem(new TemplateItem("Circular Table (variant)", prefix + "rotationTable.xml", TemplateItemType.XML));
         thisGroup.addItem(new TemplateItem("Dosing Unit", prefix + "dosingUnit.xml", TemplateItemType.XML));
+        thisGroup.addItem(new TemplateItem("Dosing Tank - EFA", prefix + "dosingtankEFA.wmod", TemplateItemType.MODULE));
         thisGroup.addItem(new TemplateItem("Flexible Manufacturing System", prefix + "FlexibleManufacturingSystem.xml", TemplateItemType.XML));
         thisGroup.addItem(new TemplateItem("Flexible Manufacturing System (variant, incomplete)", prefix + "FlexibleManufacturingSystemVariant.xml", TemplateItemType.XML));
         thisGroup.addItem(new TemplateItem("Flexible Production Cell", prefix + "ftechnik.xml", TemplateItemType.XML));
