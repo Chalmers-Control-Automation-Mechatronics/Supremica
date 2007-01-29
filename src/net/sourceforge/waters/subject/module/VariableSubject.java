@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   VariableSubject
 //###########################################################################
-//# $Id: VariableSubject.java,v 1.6 2006-09-06 11:52:21 robi Exp $
+//# $Id: VariableSubject.java,v 1.7 2007-01-29 14:28:48 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -12,11 +12,16 @@ package net.sourceforge.waters.subject.module;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.BooleanConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.VariableProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.MutableSubject;
+import net.sourceforge.waters.model.module.IntConstantProxy;
 
 
 /**
@@ -196,7 +201,7 @@ public final class VariableSubject
    */
   public void setName(final String name)
   {
-    if (mName.equals(name)) {
+    if (mName != null && mName.equals(name)) {
       return;
     }
     mName = name;
@@ -214,7 +219,9 @@ public final class VariableSubject
       return;
     }
     type.setParent(this);
-    mType.setParent(null);
+    if (mType != null) {
+    	mType.setParent(null);
+    }
     mType = type;
     final ModelChangeEvent event =
       ModelChangeEvent.createStateChanged(this);
@@ -230,7 +237,9 @@ public final class VariableSubject
       return;
     }
     initialValue.setParent(this);
-    mInitialValue.setParent(null);
+    if (mInitialValue != null) {
+    	mInitialValue.setParent(null);
+    }
     mInitialValue = initialValue;
     final ModelChangeEvent event =
       ModelChangeEvent.createStateChanged(this);
@@ -257,7 +266,114 @@ public final class VariableSubject
     fireModelChanged(event);
   }
 
+  //Methods for convenient handling of integer variables 
+  public VariableSubject(final String name,
+          final int lowerBound,
+          final int upperBound,
+          final int initialValue,
+          final Integer markedValue) {
+	  setName(name);
+	  setAsInteger(lowerBound, upperBound, initialValue, markedValue);
+  }
 
+  public boolean isInteger() {
+	  return getType() instanceof BinaryExpressionProxy &&
+	         ((BinaryExpressionProxy) getType()).getLeft() instanceof IntConstantProxy &&
+	         ((BinaryExpressionProxy) getType()).getRight() instanceof IntConstantProxy;
+  }
+
+   public void setAsInteger(final int lowerBound, final int upperBound,
+			final int initialValue, final Integer markedValue) {
+	   if (initialValue > upperBound || initialValue < lowerBound) {
+			throw new IllegalArgumentException(
+					"Initial value is not within the specified range");
+	   }
+	   if (markedValue != null && (markedValue > getUpperBound() || markedValue < getLowerBound())) {
+			  throw new IllegalArgumentException("Marked value is not within the specified range");
+	   }
+		
+	   ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
+	   setType(factory.createBinaryExpressionProxy(CompilerOperatorTable
+				.getInstance().getBinaryOperator(".."), factory
+				.createIntConstantProxy(lowerBound), factory
+				.createIntConstantProxy(upperBound)));
+
+	   setInitialValue(factory.createIntConstantProxy(initialValue));
+
+	   setMarkedValue(markedValue == null ? null : factory.createIntConstantProxy(markedValue));
+	}
+
+  public Integer getUpperBound() {
+	  if (!isInteger()) {
+		  return null;
+	  }
+	  return ((IntConstantProxy)((BinaryExpressionProxy) getType()).getRight()).getValue();
+  }
+  
+  public Integer getLowerBound() {
+	  if (!isInteger()) {
+		  return null;
+	  }
+	  return ((IntConstantProxy)((BinaryExpressionProxy) getType()).getLeft()).getValue();
+  }
+
+  public Integer getInitialIntegerValue() {
+	  if (!isInteger()) {
+		  return null;
+	  }
+	  return ((IntConstantProxy) getInitialValue()).getValue();
+  }
+
+  public Integer getMarkedIntegerValue() {
+	  if (!isInteger()) {
+		  return null;
+	  }
+	  if (getMarkedValue() == null) {
+		  return null;
+	  }
+	  return ((IntConstantProxy) getMarkedValue()).getValue();
+  }
+
+  //Methods for convenient handling of boolean variables 
+  public VariableSubject(final String name,
+                         final boolean initialValue,
+                         final Boolean markedValue)
+    {
+      setAsBoolean(initialValue, markedValue);
+    }
+  
+  public void setAsBoolean(final boolean initialValue, final Boolean markedValue) {
+	   	
+	   ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
+	   setType(factory.createSimpleIdentifierProxy(NAME_OF_BOOLEAN_TYPE));
+
+	   setInitialValue(factory.createBooleanConstantProxy(initialValue));
+
+	   setMarkedValue(markedValue == null ? null : factory.createBooleanConstantProxy(markedValue));
+	}
+
+  public boolean isBoolean() {
+	  return getType() instanceof SimpleIdentifierProxy;
+  }
+  
+  public Boolean getInitialBooleanValue() {
+	  if (!isBoolean()) {
+		  return null;
+	  }
+	  return ((BooleanConstantProxy) getInitialValue()).isValue();
+  }
+
+  public Boolean getMarkedBooleanValue() {
+	  if (!isBoolean()) {
+		  return null;
+	  }
+	  if (getMarkedValue() == null) {
+		  return null;
+	  }
+	  return ((BooleanConstantProxy) getMarkedValue()).isValue();
+  }
+
+  
   //#########################################################################
   //# Data Members
   private String mName;
@@ -265,4 +381,5 @@ public final class VariableSubject
   private SimpleExpressionSubject mInitialValue;
   private SimpleExpressionSubject mMarkedValue;
 
+  public final static String NAME_OF_BOOLEAN_TYPE = "boolean";
 }
