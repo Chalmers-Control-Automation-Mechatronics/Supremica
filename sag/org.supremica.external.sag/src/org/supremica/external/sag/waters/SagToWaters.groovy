@@ -24,6 +24,10 @@ import net.sourceforge.waters.model.expr.ExpressionParser
 import net.sourceforge.waters.xsd.base.ComponentKind
 import net.sourceforge.waters.xsd.base.EventKind
 import net.sourceforge.waters.subject.module.EdgeSubject
+import net.sourceforge.waters.model.expr.Operator
+
+import org.supremica.gui.ide.IDE
+import org.supremica.gui.InterfaceManager
 
 import javax.swing.*
 
@@ -35,44 +39,169 @@ import org.xml.sax.SAXException
 
 class SagToWaters {
 
-	public static final apa = "asdh";
-	
 	static void main(args) {
 		def path = '../org.supremica.external.sag.tests/testcases'
     	Project sagProject = loadSagProjectFromFile(path+'/testcase1.sag')
-		ModuleProxy watersModule = generateWatersModule(sagProject)
-		File watersFile = new File("${path}/${watersModule.getName()}.${WmodFileFilter.WMOD}")
-		saveWatersModuleToFile(watersModule, watersFile)
-		watersFile.eachLine{println it}
+		
+    	ModuleProxy watersModule = generateAutomata(sagProject)
+		File automataFile = new File("${path}/${watersModule.name}.${WmodFileFilter.WMOD}")
+		saveWatersModuleToFile(watersModule, automataFile)
+//		automataFile.eachLine{println it}
+		watersModule = generateExtendedAutomata(sagProject)
+		File extendedAutomataFile = new File("${path}/${watersModule.name}_efa.${WmodFileFilter.WMOD}")
+		saveWatersModuleToFile(watersModule, extendedAutomataFile)
+//		extendedAutomataFile.eachLine{println it}
+        
+		def launchIDE = {
+			InterfaceManager.instance.initLookAndFeel();
+			IDE ide = new IDE()
+			ide.visible = true
+			ide.openFiles([automataFile, extendedAutomataFile])
+    	}
+		launchIDE()
 	}
 	
 	static {
 		SagPackageImpl.init()
-		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put(
-				"sag", new XMIResourceFactoryImpl())
+		Resource.Factory.Registry.INSTANCE.extensionToFactoryMap.sag = new XMIResourceFactoryImpl()
 	}
 
 	static Project loadSagProjectFromFile(String filename) {
 		// Get the serialized sag model
 		final Resource resource = new ResourceSetImpl().getResource(URI.createFileURI(filename), true)
-		return resource.getContents().get(0)
+		return resource.contents[0]
 	}
 
-	static ModuleProxy generateWatersModule(Project sagProject) {
+	private static final parser = new ExpressionParser(ModuleSubjectFactory.instance, CompilerOperatorTable.instance)
+	
+	private static newComponent(module, componentName, componentGraph) {
+		def component = new SimpleComponentSubject(parser.parseIdentifier(componentName),
+                ComponentKind.PLANT, componentGraph)
+		module.componentListModifiable << component
+		component
+	}
+	
+	private static newBooleanComponent(module, componentName) {
+		GraphSubject watersGraph = new GraphSubject()
+		["false","true"].each{watersGraph.nodesModifiable << new SimpleNodeSubject(it)}
+		watersGraph.nodesModifiable.find{it.name=="false"}.initial = true
+		newComponent(module, componentName, watersGraph)
+	}
+	
+	private static String createZoneName(graph, index) {
+		"${graph.name}_zone${index}"
+	}
+	
+	static ModuleProxy generateExtendedAutomata(sagProject) {
+		def watersModule = new ModuleSubject(sagProject.name, null)
+		//Create one component containing one variable for every sensor
+		
+		def componentForSensorVariables = newComponent(watersModule, "sensors", new GraphSubject())
+		def sensorComponents = sagProject.sensor.inject([:]){components, sensor -> //and create a waters component for each
+			components[sensor] = SagToWaters.newBooleanComponent(watersModule, sensor.name+"_automata")
+			componentForSensorVariables.variablesModifiable << VariableSubject.createIntegerVariable(sensor.name, 0, 1, 0, null);
+			components
+		}
+		def componentForZoneVariables = newComponent(watersModule, "zones", new GraphSubject())
+		int i = 0
+		def boundedZoneVariables = sagProject.graph.collect{graph -> i = 0; graph.zone.findAll{zone -> zone instanceof BoundedZone}}.flatten().
+			                                         inject([:]){variables, zone ->
+			variables[zone] = VariableSubject.createIntegerVariable(SagToWaters.createZoneName(zone.graph, i), 0, zone.capacity, 0, null)
+			componentForZoneVariables.variablesModifiable << variables[zone]
+			++i
+			variables
+		}
+		def changes = createEvents(watersModule, sagProject)
+		changes.each {change ->
+			//Add to sensor component
+			SagToWaters.addEventToComponent(sensorComponents[change.sensor], !change.isSensorActivation, change.isSensorActivation, change.automatonEvent, true)
+			
+			// Add guards and actions
+			// Start with action to update sensor variable
+			SagToWaters.addActionToComponent(sensorComponents[change.sensor], change.automatonEvent, "${change.sensor.name} = ${change.isSensorActivation ? 1 : 0}")
+			
+			def zoneVariable = boundedZoneVariables[change.zone]
+			if (zoneVariable) {
+				if (change.isSensorActivation) {
+					SagToWaters.addGuardToComponent(sensorComponents[change.sensor], change.automatonEvent, "${zoneVariable.name} > 0 ")
+					SagToWaters.addActionToComponent(sensorComponents[change.sensor], change.automatonEvent, "${zoneVariable.name} -= 1 ")
+				} else {
+					SagToWaters.addGuardToComponent(sensorComponents[change.sensor], change.automatonEvent, "${zoneVariable.name} < ${change.zone.capacity}")
+					SagToWaters.addActionToComponent(sensorComponents[change.sensor], change.automatonEvent, "${zoneVariable.name} += 1 ")
+				}
+			}
+		}
+
+		watersModule
+	}
+
+	private static void addActionToComponent(component, event, String action) {
+		def edge = component.graph.edges.find{it.labelBlock.eventList.any{it.name==event.name}}
+		if (!edge.guardActionBlock) {
+			edge.guardActionBlock = ModuleSubjectFactory.instance.createGuardActionBlockProxy()
+		}
+		edge.guardActionBlock.actionsModifiable << parser.parse(action)
+	}
+	
+	private static void addGuardToComponent(component, event, String guard) {
+		def edge = component.graph.edges.find{it.labelBlock.eventList.any{it.name==event.name}}
+		if (!edge.guardActionBlock) {
+			edge.guardActionBlock = ModuleSubjectFactory.instance.createGuardActionBlockProxy()
+		}
+		edge.guardActionBlock.guardsModifiable << parser.parse(guard, Operator.TYPE_BOOLEAN)
+	}
+	
+	//Returns a list of maps like this [[sensor:<a sensor>, zone:<a zone>, isSensorActivation:<true or false>, automatonEvent:<a waters event>], [...], ...]
+	private static createEvents(watersModule, sagProject) {
+		def changes = sagProject.sensor.inject([]){changes, sensor ->
+			(sensor.node.outgoing + sensor.node.incoming.findAll{zone -> !zone.isOneway}).eachWithIndex {zone, i ->
+				changes << [sensor: sensor,
+				            zone: zone,
+				            isSensorActivation: false,
+				            index: i]
+			}
+			(sensor.node.incoming + sensor.node.outgoing.findAll{zone -> !zone.isOneway}).eachWithIndex {zone, i ->
+				changes << [sensor: sensor,
+			                zone: zone,
+			                isSensorActivation: true,
+			                index: i]
+			}
+			changes
+		}
+		changes.each {change ->
+			//Create an event
+			String eventLabel = (change.isSensorActivation ? "to_" : "from_") + change.sensor.name
+			if (changes.findAll{it.sensor==change.sensor && it.isSensorActivation == change.isSensorActivation}.size() > 1) {
+				eventLabel = "${eventLabel}_${change.index.toString()}"
+			}
+			EventDeclSubject event = new EventDeclSubject(eventLabel, EventKind.UNCONTROLLABLE)
+			watersModule.eventDeclListModifiable << event
+			change.automatonEvent = event
+		}
+		changes
+	}
+	
+/*	private static createEvents(watersModule, sagProject) {
+		def changes = getChanges(sagProject)
+		changes.inject([]) {events, change ->
+			//Create an event
+			String eventLabel = (change.isSensorActivation ? "to_" : "from_") + change.sensor.name
+			if (changes.findAll{it.sensor==change.sensor && it.isSensorActivation == change.isSensorActivation}.size() > 1) {
+				eventLabel = "${eventLabel}_${change.index.toString()}"
+			}
+			EventDeclSubject event = new EventDeclSubject(eventLabel, EventKind.UNCONTROLLABLE)
+			watersModule.eventDeclListModifiable << event
+			events << [automatonEvent:event, *:change]
+		}				
+	}
+*/
+	
+	static ModuleProxy generateAutomata(Project sagProject) {
 		ModuleSubject watersModule = new ModuleSubject(sagProject.name, null)
 		
-		Closure newComponent = {componentName, graph ->
-			def component = new SimpleComponentSubject(new ExpressionParser(ModuleSubjectFactory.getInstance(), CompilerOperatorTable.getInstance()).parseIdentifier(componentName),
-                ComponentKind.PLANT, graph)
-			watersModule.componentListModifiable << component
-			component
-		}
 		//Create one component for every sensor
 		final Map<Sensor, SimpleComponentSubject> sensorComponents = sagProject.sensor.inject([:]){components, sensor -> //and create a waters component for each
-			GraphSubject watersGraph = new GraphSubject()
-			["false","true"].each{watersGraph.nodesModifiable << new SimpleNodeSubject(it)}
-			watersGraph.nodesModifiable.find{it.name=="false"}.initial = true
-			components[sensor] = newComponent(sensor.name, watersGraph)
+			components[sensor] =SagToWaters.newBooleanComponent(watersModule, sensor.name)
 			components
 		}
 		
@@ -83,89 +212,63 @@ class SagToWaters {
 			GraphSubject watersGraph = new GraphSubject()
 			(0..zone.capacity).each{watersGraph.nodesModifiable << new SimpleNodeSubject(it.toString())}
 			watersGraph.nodesModifiable.find{it.name=="0"}.initial = true
-			components[zone] = newComponent("${zone.graph.name}_zone${i}", watersGraph)
+			components[zone] = SagToWaters.newComponent(watersModule, SagToWaters.createZoneName(zone.graph, i), watersGraph)
 			++i
 			components
 		}
 		
-		//Create one event for every sensor entry and exit
-		//Get a map with sensor as key and a list of zones from which objects can enter the sensor as value
-		final Map<Sensor, List<Zone>> sensorEntrances = sagProject.sensor.inject([:]) {entrances, sensor ->
-			entrances[sensor] = sensor.node.incoming + sensor.node.outgoing.findAll{zone -> !zone.isOneway}
-			entrances
-		}
-		//Get a map with sensor as key and a list of zones to which objects can exit the sensor as value
-		final Map<Sensor, List<Zone>> sensorExits = sagProject.sensor.inject([:]) {exits, sensor ->
-			exits[sensor] = sensor.node.outgoing + sensor.node.incoming.findAll{zone -> !zone.isOneway}
-			exits
-		}
-		Closure createEventsAndEdges = {Map sensorChanges, boolean isEntrance ->
-			sensorChanges.each {sensor, zones ->
-				zones.eachWithIndex {zone, zoneIndex  ->
-					//Create an event
-					String eventLabel = (isEntrance ? "to_" : "from_") + sensor.name
-					if (zones.size() > 1) {
-						eventLabel = "${eventLabel}_${zoneIndex.toString()}"
-					}	
-					EventDeclSubject event = new EventDeclSubject(eventLabel, EventKind.UNCONTROLLABLE)
-					watersModule.eventDeclListModifiable << event
-
-					//Create an edge in the sensor component and add the event label to the edge
-					ComponentProxy component = sensorComponents[sensor]
-	    	        SagToWaters.addEventToComponent(component, !isEntrance, isEntrance, event)
-				
-	    	        //Create an edge in the zone component (if bounded) and add the event
-					component = boundedZoneComponents[zone]
-					if (component != null) {
-						(0..zone.capacity-1).each {nodeIndex ->
-							SagToWaters.addEventToComponent(component, (nodeIndex+(isEntrance ? 1 : 0)), (nodeIndex+(isEntrance ? 0 : 1)), event)
-						}
-					}
+		def changes = createEvents(watersModule, sagProject)
+		changes.each {change ->
+			//Add to sensor component
+			SagToWaters.addEventToComponent(sensorComponents[change.sensor], !change.isSensorActivation, change.isSensorActivation, change.automatonEvent, false)
+			
+			//Add to zone component
+			def component = boundedZoneComponents[change.zone]
+			if (component) {
+				(0..change.zone.capacity-1).each {nodeIndex ->
+					SagToWaters.addEventToComponent(component, (nodeIndex+(change.isSensorActivation ? 1 : 0)), (nodeIndex+(change.isSensorActivation ? 0 : 1)), change.automatonEvent, false)
 				}
 			}
 		}
-		createEventsAndEdges(sensorEntrances, true)
-		createEventsAndEdges(sensorExits, false)
 		watersModule
 	}
 	
-	static void addEventToComponent(ComponentProxy component, sourceNodeName, targetNodeName, EventDeclSubject event) {
+	private static void addEventToComponent(component, sourceNodeName, targetNodeName, event, alwaysCreateNewEdge=false) {
 		NodeProxy sourceNode = component.graph.nodes.find{it.name==sourceNodeName.toString()}
 		NodeProxy targetNode = component.graph.nodes.find{it.name==targetNodeName.toString()}
-		EdgeSubject edge = component.graph.edges.find{it.source == sourceNode && it.target == targetNode}
-		if (edge == null) {
+		EdgeSubject edge = alwaysCreateNewEdge ? null : component.graph.edges.find{it.source == sourceNode && it.target == targetNode}
+		if (!edge) {
 			edge = new EdgeSubject(sourceNode, targetNode)
 			component.graph.edgesModifiable << edge
 		}
 		edge.labelBlock.eventListModifiable << ModuleSubjectFactory.instance.createSimpleIdentifierProxy(event.name)
 	}
+
 	
 	static void saveWatersModuleToFile(ModuleProxy watersModule, File fileToSaveIn) {
 		try	{
-			final ProxyMarshaller<ModuleProxy> marshaller = new JAXBModuleMarshaller(ModuleSubjectFactory.getInstance(),
-			                                                                   CompilerOperatorTable.getInstance())
+			final ProxyMarshaller<ModuleProxy> marshaller = new JAXBModuleMarshaller(ModuleSubjectFactory.instance,
+			                                                                   CompilerOperatorTable.instance)
 			marshaller.marshal(watersModule, fileToSaveIn)
 		} catch (final JAXBException exception) {
-			JOptionPane.showMessageDialog(null, "Error saving module file:" + exception.getMessage())
+			JOptionPane.showMessageDialog(null, "Error saving module file:" + exception.message)
 			//logEntry("JAXBException - Failed to save  '" + wmodf + "'!")
 		} catch (final SAXException exception) {
 			JOptionPane.showMessageDialog(null,
 									  "Error saving module file:" +
-									  exception.getMessage())
+									  exception.essage)
 			//logEntry("SAXException - Failed to save  '" + wmodf + "'!")
 		} catch (final WatersMarshalException exception) {
 			JOptionPane.showMessageDialog(null,
 									  "Error saving module file:" +
-									  exception.getMessage())
+									  exception.message)
 		//logEntry("WatersMarshalException - Failed to save  '" +
 		//         wmodf + "'!")
 		} catch (final IOException exception) {
 			JOptionPane.showMessageDialog(null,
 									  "Error saving module file:" +
-									  exception.getMessage())
+									  exception.message)
 			//logEntry("IOException - Failed to save  '" + wmodf + "'!")
 		}
 	}
 }
-
-

@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagActionBarContributor.java,v 1.2 2007-01-23 16:07:36 torda Exp $
+ * $Id: SagActionBarContributor.java,v 1.3 2007-01-29 14:25:03 torda Exp $
  */
 package org.supremica.external.sag.presentation;
 
@@ -238,7 +238,7 @@ public class SagActionBarContributor
 	        	dialog.setFileName(sagProject.getName());
 		        String filename = dialog.open();
 		        if (filename != null) {
-					ModuleProxy watersModule = SagToWaters.generateWatersModule(sagProject);
+					ModuleProxy watersModule = SagToWaters.generateAutomata(sagProject);
 		    		File watersFile = new File(filename);
 		    		SagToWaters.saveWatersModuleToFile(watersModule, watersFile);
 		        }
