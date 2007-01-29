@@ -32,7 +32,7 @@ public class LabelProxyShape
         Rectangle2D rect = text.getBounds();
         rect.setRect(x, y, rect.getWidth() + 4, rect.getHeight() + 6);
         // Unfortunately there are some ac hoc constants here to get 
-        // these conform with corresponding label blocks
+        // these to conform with the corresponding label blocks
         mBounds = new RoundRectangle2D.Double(rect.getX(), rect.getY()-2,
             rect.getWidth()+1, rect.getHeight()+4, CORNERRADIUS, CORNERRADIUS);
     }

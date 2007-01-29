@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorOptions
 //###########################################################################
-//# $Id: EditorOptions.java,v 1.7 2007-01-04 13:50:09 flordal Exp $
+//# $Id: EditorOptions.java,v 1.8 2007-01-29 16:04:25 flordal Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -15,6 +15,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
 import net.sourceforge.waters.gui.renderer.EdgeProxyShape;
+import org.supremica.properties.Config;
+import uk.ac.ic.doc.scenebeans.Circle;
 
 public class EditorOptions
     extends JDialog
@@ -45,7 +47,7 @@ public class EditorOptions
         // GRID ON OR OFF
         JPanel subPanel = new JPanel();
         JLabel label = new JLabel("Grid");
-        boolean selected = root.getControlledSurface().getShowGrid();
+        boolean selected = Config.GUI_EDITOR_SHOW_GRID.get();
         JRadioButton button = new JRadioButton(On, selected);
         button.setActionCommand(On);
         button.addChangeListener(new ChangeListener()
@@ -54,7 +56,9 @@ public class EditorOptions
             {
                 JRadioButton b = (JRadioButton) e.getSource();
                 
-                r.getControlledSurface().setShowGrid(b.isSelected());
+                Config.GUI_EDITOR_SHOW_GRID.set(b.isSelected());
+                //r.getControlledSurface().setShowGrid(b.isSelected());
+                
                 r.repaint();
             }
         });
@@ -70,7 +74,7 @@ public class EditorOptions
         // GRID SIZE
         subPanel = new JPanel();
         label = new JLabel("Grid Size");
-        gridSize = new JSlider(GS_MIN, GS_MAX, root.getControlledSurface().getGridSize());
+        gridSize = new JSlider(GS_MIN, GS_MAX, Config.GUI_EDITOR_GRID_SIZE.get());
         gridSize.setMajorTickSpacing(4);
         gridSize.setMinorTickSpacing(4);
         java.text.NumberFormat numberFormat = java.text.NumberFormat.getIntegerInstance();
@@ -121,7 +125,10 @@ public class EditorOptions
             public void stateChanged(ChangeEvent e)
             {
                 gridSize.setValue((int) (Math.round((double) (gridSize.getValue()) / 4) * 4));
-                r.getControlledSurface().setGridSize(gridSize.getValue());
+
+                Config.GUI_EDITOR_GRID_SIZE.set(gridSize.getValue());
+                //r.getControlledSurface().setGridSize(gridSize.getValue());
+                
                 r.repaint();
                 
                 if (!gridSize.getValueIsAdjusting())
@@ -142,7 +149,7 @@ public class EditorOptions
         // CONTROL POINTS
         subPanel = new JPanel();
         label = new JLabel("Control Points move with nodes");
-        selected = root.getControlledSurface().getControlPointsMove();
+        selected = Config.GUI_EDITOR_CONTROL_POINTS_MOVE_WITH_NODE.get();
         button = new JRadioButton(On, selected);
         button.setActionCommand(On);
         button.addChangeListener(new ChangeListener()
@@ -151,7 +158,8 @@ public class EditorOptions
             {
                 JRadioButton b = (JRadioButton) e.getSource();
                 
-                r.getControlledSurface().setControlPointsMove(b.isSelected());
+                Config.GUI_EDITOR_CONTROL_POINTS_MOVE_WITH_NODE.set(b.isSelected());
+                //r.getControlledSurface().setControlPointsMove(b.isSelected());
             }
         });
         subPanel.add(label);
@@ -166,7 +174,8 @@ public class EditorOptions
         // NODES SNAP
         subPanel = new JPanel();
         label = new JLabel("Nodes snap to grid");
-        selected = root.getControlledSurface().getNodesSnap();
+        Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get();
+        //selected = root.getControlledSurface().getNodesSnap();
         button = new JRadioButton(On, selected);
         button.setActionCommand(On);
         button.addChangeListener(new ChangeListener()
@@ -175,7 +184,8 @@ public class EditorOptions
             {
                 JRadioButton b = (JRadioButton) e.getSource();
                 
-                r.getControlledSurface().setNodesSnap(b.isSelected());
+                Config.GUI_EDITOR_NODES_SNAP_TO_GRID.set(b.isSelected());
+                //r.getControlledSurface().setNodesSnap(b.isSelected());
             }
         });
         subPanel.add(label);
@@ -191,8 +201,9 @@ public class EditorOptions
         JPanel edgeArrowPanel = new JPanel();
         JLabel edgeArrowLabel = new JLabel("Edge arrow position");
         ButtonGroup edgeArrowButtons = new ButtonGroup();
-        JRadioButton inTheMiddle = new JRadioButton("In the middle", !EdgeProxyShape.getArrowAtEnd());
-        JRadioButton atTheEnd = new JRadioButton("At the end", EdgeProxyShape.getArrowAtEnd());
+        boolean arrowAtTheEnd = Config.GUI_EDITOR_EDGEARROW_AT_END.get();
+        JRadioButton inTheMiddle = new JRadioButton("In the middle", !arrowAtTheEnd);
+        JRadioButton atTheEnd = new JRadioButton("At the end", arrowAtTheEnd);
         edgeArrowButtons.add(inTheMiddle);
         edgeArrowButtons.add(atTheEnd);
         edgeArrowPanel.add(edgeArrowLabel);
@@ -205,7 +216,8 @@ public class EditorOptions
             {
                 JRadioButton b = (JRadioButton) e.getSource();
                 
-                EdgeProxyShape.setArrowAtEnd(!b.isSelected());
+                Config.GUI_EDITOR_EDGEARROW_AT_END.set(!b.isSelected());
+                //EdgeProxyShape.setArrowAtEnd(!b.isSelected());
                 r.repaint();
             }
         });
@@ -219,12 +231,15 @@ public class EditorOptions
             {
                 String command = gridShow.getSelection().getActionCommand();
                 
-                r.getControlledSurface().setShowGrid(command == On);
+                Config.GUI_EDITOR_SHOW_GRID.set(command == On);
+                //r.getControlledSurface().setShowGrid(command == On);
                 
                 command = controlPointsMove.getSelection().getActionCommand();
                 
-                r.getControlledSurface().setControlPointsMove(command == On);
-                r.getControlledSurface().setGridSize(gridSize.getValue());
+                Config.GUI_EDITOR_CONTROL_POINTS_MOVE_WITH_NODE.set(command == On);
+                //r.getControlledSurface().setControlPointsMove(command == On);
+                Config.GUI_EDITOR_GRID_SIZE.set(gridSize.getValue());
+                //r.getControlledSurface().setGridSize(gridSize.getValue());
                 setVisible(false);
             }
         });

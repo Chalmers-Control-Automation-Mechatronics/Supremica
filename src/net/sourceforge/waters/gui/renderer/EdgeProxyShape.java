@@ -85,7 +85,6 @@ public abstract class EdgeProxyShape
         super.draw(g, status);
         g.setStroke(BASICSTROKE);
         g.setColor(status.getColor());
-        //if (ARROWATEND)
         if (Config.GUI_EDITOR_EDGEARROW_AT_END.get())
         {
             // The direction of the arrow calculated from two
@@ -363,22 +362,11 @@ public abstract class EdgeProxyShape
         private final GeneralPath mCurve;
     }
     
-    /** Arrows at end of edge or in the middle? */
-    private static boolean ARROWATEND = ModuleWindow.DES_COURSE_VERSION;
     /** The length of the side of the arrow. */
     public static final int ARROWSIDE = 8;
     /** The width of the point of the arrow, in radians. */
     public static final double ARROWANGLEWIDTH = Math.PI / 3.5;
     
-    public static boolean getArrowAtEnd()
-    {
-        return ARROWATEND;
-    }
-    public static void setArrowAtEnd(boolean set)
-    {
-        ARROWATEND = set;
-    }
-        
     protected final List<Handle> mHandles;
     private final Point2D mTurn;
     private final Point2D mStart;

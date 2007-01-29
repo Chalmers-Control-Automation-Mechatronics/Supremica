@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.108 2007-01-22 03:11:41 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.109 2007-01-29 16:04:25 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -78,132 +78,140 @@ public class ControlledSurface
         ModuleSubject module,
         EditorWindowInterface r,
         ControlledToolbar t)
-      throws GeometryAbsentException
+        throws GeometryAbsentException
     {
-      super(graph, module,
+        super(graph, module,
             new SubjectShapeProducer(graph, module, r.getFrame()));
-      mDummy = new EditorGraph(graph);
-      mDummy.addModelObserver((SubjectShapeProducer)getShapeProducer());
-      graph.addModelObserver(this);
-      mDummy.addModelObserver(this);
-
-      mutable = (r != null && t != null);
-
-	  root = r;
-	  mToolbar = t;
-
-	  if (mutable)
-	  	t.attach(this);
-	  mController = new SelectListener();
-	  addMouseListener(mController);
-	  addMouseListener(new MouseAdapter()
-	  {
-		  public void mousePressed(MouseEvent e)
-		  {
-			  ControlledSurface.this.requestFocusInWindow();
-		  }
-	  });
-	  addMouseMotionListener(mController);
-	  addKeyListener(new KeySpy());
-	  setFocusable(true);
-	  dtListener = new DTListener();
-	  dropTarget = new DropTarget(this, dtListener);
-	  mDragSource = DragSource.getDefaultDragSource();
-	  mDGListener = new DGListener();
-	  mDSListener = new DSListener();
-
-	  // component, action, listener
-	  mDragSource.createDefaultDragGestureRecognizer(this,
-							  mDragAction,
-							  mDGListener);
-	  mDragSource.addDragSourceListener(mDSListener);
+        mDummy = new EditorGraph(graph);
+        mDummy.addModelObserver((SubjectShapeProducer)getShapeProducer());
+        graph.addModelObserver(this);
+        mDummy.addModelObserver(this);
+        
+        mutable = (r != null && t != null);
+        
+        root = r;
+        mToolbar = t;
+        
+        if (mutable)
+            t.attach(this);
+        mController = new SelectListener();
+        addMouseListener(mController);
+        addMouseListener(new MouseAdapter()
+        {
+            public void mousePressed(MouseEvent e)
+            {
+                ControlledSurface.this.requestFocusInWindow();
+            }
+        });
+        addMouseMotionListener(mController);
+        addKeyListener(new KeySpy());
+        setFocusable(true);
+        dtListener = new DTListener();
+        dropTarget = new DropTarget(this, dtListener);
+        mDragSource = DragSource.getDefaultDragSource();
+        mDGListener = new DGListener();
+        mDSListener = new DSListener();
+        
+        // component, action, listener
+        mDragSource.createDefaultDragGestureRecognizer(this,
+            mDragAction,
+            mDGListener);
+        mDragSource.addDragSourceListener(mDSListener);
     }
-
-
+    
+    
     //#########################################################################
     //# Constructor
     //# Create an immutable Controlled Surface
     public ControlledSurface(GraphSubject graph,
         ModuleSubject module)
-      throws GeometryAbsentException
+        throws GeometryAbsentException
     {
-		this(graph, module, null, null);
+        this(graph, module, null, null);
     }
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.subject.base.ModelObserver
-  public void modelChanged(ModelChangeEvent e)
-  {
-    //minimizeSize();
-    drawnAreaBounds = null;
-    Rectangle area = getDrawnAreaBounds();
-    /*setBounds(0, 0,//-((int)drawnAreaBounds.getMinX() - 5 * gridSize),
+    
+    //#########################################################################
+    //# Interface net.sourceforge.waters.subject.base.ModelObserver
+    public void modelChanged(ModelChangeEvent e)
+    {
+        //minimizeSize();
+        drawnAreaBounds = null;
+        Rectangle area = getDrawnAreaBounds();
+        /*setBounds(0, 0,//-((int)drawnAreaBounds.getMinX() - 5 * gridSize),
               //-((int)drawnAreaBounds.getMinY() - 5 * gridSize),
               ((int)drawnAreaBounds.getWidth() + 10 * gridSize),
               ((int)drawnAreaBounds.getHeight() + 10 * gridSize));*/
-    setPreferredSize(new Dimension((int)drawnAreaBounds.getWidth() + gridSize * 10,
-                     (int)drawnAreaBounds.getHeight() + gridSize * 10));
-    setErrorList(findError());
-    repaint();
-    //root.repaint();
-  }
-
-  private Set<ProxySubject> findError()
-  {
-    Set<ProxySubject> error = new HashSet<ProxySubject>();
-    try {
-      for (NodeProxy n1 : getDrawnGraph().getNodes()) {
-        Shape s1 = getShapeProducer().getShape(n1).getShape();
-        for (NodeProxy n2 : getDrawnGraph().getNodes()) {
-          if (n1 != n2 && 
-              !(n1 instanceof GroupNodeProxy && n2 instanceof GroupNodeProxy)) {
-            Shape s2 = getShapeProducer().getShape(n2).getShape();
-            if (overlap(s1, s2)) {
-              error.add((ProxySubject)n1);
-              error.add((ProxySubject)n2);
+        setPreferredSize(new Dimension((int)drawnAreaBounds.getWidth() + Config.GUI_EDITOR_GRID_SIZE.get() * 10,
+            (int)drawnAreaBounds.getHeight() + Config.GUI_EDITOR_GRID_SIZE.get() * 10));
+        setErrorList(findError());
+        repaint();
+        //root.repaint();
+    }
+    
+    private Set<ProxySubject> findError()
+    {
+        Set<ProxySubject> error = new HashSet<ProxySubject>();
+        try
+        {
+            for (NodeProxy n1 : getDrawnGraph().getNodes())
+            {
+                Shape s1 = getShapeProducer().getShape(n1).getShape();
+                for (NodeProxy n2 : getDrawnGraph().getNodes())
+                {
+                    if (n1 != n2 &&
+                        !(n1 instanceof GroupNodeProxy && n2 instanceof GroupNodeProxy))
+                    {
+                        Shape s2 = getShapeProducer().getShape(n2).getShape();
+                        if (overlap(s1, s2))
+                        {
+                            error.add((ProxySubject)n1);
+                            error.add((ProxySubject)n2);
+                        }
+                    }
+                }
             }
-          }
         }
-      }
-    } catch (Throwable t) {
-      t.printStackTrace();
+        catch (Throwable t)
+        {
+            t.printStackTrace();
+        }
+        return error;
     }
-    return error;
-  }
-  
-  private boolean overlap(Shape s1, Shape s2)
-  {
-    if (s1.equals(s2)) {
-      return true;
+    
+    private boolean overlap(Shape s1, Shape s2)
+    {
+        if (s1.equals(s2))
+        {
+            return true;
+        }
+        Rectangle2D r1 = s1.getBounds2D();
+        Rectangle2D r2 = s2.getBounds2D();
+        return r1.intersects(r2) && !(r1.contains(r2) || r2.contains(r1));
     }
-    Rectangle2D r1 = s1.getBounds2D();
-    Rectangle2D r2 = s2.getBounds2D();
-    return r1.intersects(r2) && !(r1.contains(r2) || r2.contains(r1));
-  }
-  
-  //#########################################################################
-  public void examineCollisions() 
-  {
-  }
-
-  public ModuleSubject getModule()
-  {
-    return (ModuleSubject) super.getModule();
-  }
-
-  public List<ProxySubject> getObjectsAtPosition(int ex, int ey)
+    
+    //#########################################################################
+    public void examineCollisions()
+    {
+    }
+    
+    public ModuleSubject getModule()
+    {
+        return (ModuleSubject) super.getModule();
+    }
+    
+    public List<ProxySubject> getObjectsAtPosition(int ex, int ey)
     {
         List<ProxySubject> objects = new ArrayList<ProxySubject>();
         try
         {
-          ProxyShape shape = getShapeProducer().getShape(getGraph());
-          if (shape != null)
-          {
-            if (shape.isClicked(ex, ey))
+            ProxyShape shape = getShapeProducer().getShape(getGraph());
+            if (shape != null)
             {
-              objects.add((ProxySubject)shape.getProxy());
+                if (shape.isClicked(ex, ey))
+                {
+                    objects.add((ProxySubject)shape.getProxy());
+                }
             }
-          }
         }
         catch (VisitorException vis)
         {
@@ -220,15 +228,16 @@ public class ControlledSurface
                     {
                         objects.add((ProxySubject)shape.getProxy());
                     }
-                    if (node instanceof SimpleNodeProxy) {
-                      shape = getShapeProducer().getShape(((SimpleNodeProxy)node).getLabelGeometry());
-                      if (shape != null)
-                      {
-                          if ((shape != null) && (shape.isClicked(ex, ey)))
-                          {
-                              objects.add((ProxySubject)shape.getProxy());
-                          }
-                      }
+                    if (node instanceof SimpleNodeProxy)
+                    {
+                        shape = getShapeProducer().getShape(((SimpleNodeProxy)node).getLabelGeometry());
+                        if (shape != null)
+                        {
+                            if ((shape != null) && (shape.isClicked(ex, ey)))
+                            {
+                                objects.add((ProxySubject)shape.getProxy());
+                            }
+                        }
                     }
                 }
             }
@@ -273,7 +282,7 @@ public class ControlledSurface
         }
         return objects;
     }
-
+    
     public RenderingInformation getRenderingInformation(Proxy o)
     {
         assert(o instanceof ProxySubject);
@@ -301,66 +310,69 @@ public class ControlledSurface
             EditorColor.getShadowColor(o, dragOver, selected, error),
             priority);
     }
-
+    
     public Tool getCommand()
     {
         return mToolbar.getCommand();
     }
-
+    
     public void setToolbar(ControlledToolbar t)
     {
         mToolbar = t;
     }
-
+    
     public void setErrorList(Collection<? extends ProxySubject> error)
     {
         mError.clear();
         mError.addAll(error);
     }
-
+    
     public Set<ProxySubject> getErrorList()
     {
         return new HashSet<ProxySubject>(mError);
     }
-
+    
     public boolean isError(ProxySubject subject)
     {
         return mError.contains(subject);
     }
-
+    
     private Shape edgeshape(Point2D p1, Point2D p2)
     {
-      if (p1.equals(p2)) {
-        double ARCEXTENT = EdgeProxyShape.Tear.ARCEXTENT;
-        double TEARRATIO = EdgeProxyShape.Tear.TEARRATIO;
-        Point2D p = p1;
-        Point2D c = new Point((int)p1.getX() - 15, (int)p2.getY() - 15);
-        double dist = (double) Math.sqrt(Math.pow(c.getX() - p.getX(), 2) +
-                                         Math.pow(c.getY() - p.getY(), 2));
-        double r = (dist * (1 -TEARRATIO)) / 2;
-        double theta = Math.atan2(c.getY() - p.getY(), c.getX() - p.getX());
-        Rectangle2D rect = new Rectangle2D.Double(Math.cos(theta) * (dist - r) + p.getX() - r,
-                                                  Math.sin(theta) * (dist - r) + p.getY() - r,
-                                                  r * 2, r * 2);
-        Arc2D arc = new Arc2D.Double(rect, -(Math.toDegrees(theta) + ARCEXTENT/2),
-            ARCEXTENT, Arc2D.OPEN);
-        // different r for setting up where the handle is positioned
-        r = SimpleNodeProxyShape.RADIUS;
-        p1 = GeometryTools.getRadialPoint(arc.getStartPoint(), p, r);
-        p2 = GeometryTools.getRadialPoint(arc.getEndPoint(), p, r);
-        Line2D line1 = new Line2D.Double(p1, arc.getStartPoint());
-        Line2D line2 = new Line2D.Double(arc.getEndPoint(), p2);
-        GeneralPath curve = new GeneralPath(GeneralPath.WIND_NON_ZERO, 3);
-        curve.append(line1, false);
-        curve.append(arc , true);
-        curve.append(line2, true);
-        curve.closePath();
-        return curve;
-      } else {
-        return new Line2D.Double(p1, p2);
-      }
+        if (p1.equals(p2))
+        {
+            double ARCEXTENT = EdgeProxyShape.Tear.ARCEXTENT;
+            double TEARRATIO = EdgeProxyShape.Tear.TEARRATIO;
+            Point2D p = p1;
+            Point2D c = new Point((int)p1.getX() - 15, (int)p2.getY() - 15);
+            double dist = (double) Math.sqrt(Math.pow(c.getX() - p.getX(), 2) +
+                Math.pow(c.getY() - p.getY(), 2));
+            double r = (dist * (1 -TEARRATIO)) / 2;
+            double theta = Math.atan2(c.getY() - p.getY(), c.getX() - p.getX());
+            Rectangle2D rect = new Rectangle2D.Double(Math.cos(theta) * (dist - r) + p.getX() - r,
+                Math.sin(theta) * (dist - r) + p.getY() - r,
+                r * 2, r * 2);
+            Arc2D arc = new Arc2D.Double(rect, -(Math.toDegrees(theta) + ARCEXTENT/2),
+                ARCEXTENT, Arc2D.OPEN);
+            // different r for setting up where the handle is positioned
+            r = SimpleNodeProxyShape.RADIUS;
+            p1 = GeometryTools.getRadialPoint(arc.getStartPoint(), p, r);
+            p2 = GeometryTools.getRadialPoint(arc.getEndPoint(), p, r);
+            Line2D line1 = new Line2D.Double(p1, arc.getStartPoint());
+            Line2D line2 = new Line2D.Double(arc.getEndPoint(), p2);
+            GeneralPath curve = new GeneralPath(GeneralPath.WIND_NON_ZERO, 3);
+            curve.append(line1, false);
+            curve.append(arc , true);
+            curve.append(line2, true);
+            curve.closePath();
+            return curve;
+        }
+        else
+        {
+            return new Line2D.Double(p1, p2);
+        }
     }
-
+    
     public List<MiscShape> getDrawnObjects()
     {
         List<MiscShape> shapes = new ArrayList<MiscShape>();
@@ -377,20 +389,23 @@ public class ControlledSurface
         if (hasDragged && (nodeIsSelected() || nodeGroupIsSelected())
         && getCommand() == Tool.EDGE)
         {
-          NodeSubject n1 = (NodeSubject) selectedObjects.get(0);
-          ProxySubject s = getObjectAtPosition(dragNowX, dragNowY);
-          Point2D p1 = GeometryTools.defaultPosition(n1, new Point(dragStartX,
-                                                                   dragStartY));
-          Point2D p2;
-          if (s instanceof NodeSubject) {
-            p2 = GeometryTools.defaultPosition((NodeProxy)s,
-                                               new Point(dragNowX, dragNowY));
-          } else {
-            p2 = new Point(dragNowX, dragNowY);
-          }
-          shapes.add(new GeneralShape(edgeshape(p1, p2)
-                                      , EditorColor.SELECTCOLOR
-                                      , null));
+            NodeSubject n1 = (NodeSubject) selectedObjects.get(0);
+            ProxySubject s = getObjectAtPosition(dragNowX, dragNowY);
+            Point2D p1 = GeometryTools.defaultPosition(n1, new Point(dragStartX,
+                dragStartY));
+            Point2D p2;
+            if (s instanceof NodeSubject)
+            {
+                p2 = GeometryTools.defaultPosition((NodeProxy)s,
+                    new Point(dragNowX, dragNowY));
+            }
+            else
+            {
+                p2 = new Point(dragNowX, dragNowY);
+            }
+            shapes.add(new GeneralShape(edgeshape(p1, p2)
+            , EditorColor.SELECTCOLOR
+                , null));
         }
         if (draggingTarget)
         {
@@ -398,15 +413,18 @@ public class ControlledSurface
             Point2D p1 = edge.getStartPoint().getPoint();
             ProxySubject s = getObjectAtPosition(dragNowX, dragNowY);
             Point2D p2;
-            if (s instanceof NodeSubject) {
-              p2 = GeometryTools.defaultPosition((NodeProxy)s,
-                                                 new Point(dragNowX, dragNowY));
-            } else {
-              p2 = new Point(dragNowX, dragNowY);
+            if (s instanceof NodeSubject)
+            {
+                p2 = GeometryTools.defaultPosition((NodeProxy)s,
+                    new Point(dragNowX, dragNowY));
+            }
+            else
+            {
+                p2 = new Point(dragNowX, dragNowY);
             }
             shapes.add(new GeneralShape(edgeshape(p1, p2)
-                                        , EditorColor.SELECTCOLOR
-                                        , null));
+            , EditorColor.SELECTCOLOR
+                , null));
         }
         if (draggingSource)
         {
@@ -414,16 +432,19 @@ public class ControlledSurface
             Point2D p2 = edge.getEndPoint().getPoint();
             ProxySubject s = getObjectAtPosition(dragNowX, dragNowY);
             Point2D p1;
-            if (s instanceof NodeSubject) {
-              p1 = GeometryTools.defaultPosition((NodeProxy)s,
-                                                 new Point(dragNowX, dragNowY));
-            } else {
-              p1 = new Point(dragNowX, dragNowY);
+            if (s instanceof NodeSubject)
+            {
+                p1 = GeometryTools.defaultPosition((NodeProxy)s,
+                    new Point(dragNowX, dragNowY));
+            }
+            else
+            {
+                p1 = new Point(dragNowX, dragNowY);
             }
             System.out.println(p1 + ", " + p2);
             shapes.add(new GeneralShape(edgeshape(p1, p2)
-                                        , EditorColor.SELECTCOLOR
-                                        , null));
+            , EditorColor.SELECTCOLOR
+                , null));
         }
         if (mLine != null)
         {
@@ -432,57 +453,36 @@ public class ControlledSurface
         }
         return shapes;
     }
-
+    
     public void setOptionsVisible(boolean v)
     {
         options.setVisible(v);
     }
-
-    public boolean getNodesSnap()
-    {
-        // return nodesSnap;
-        return Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get();
-    }
-
-    public void setNodesSnap(boolean n)
-    {
-        nodesSnap = n;
-    }
-
+    
     public GraphSubject getGraph()
     {
         return (GraphSubject)super.getGraph();
     }
-
-    public boolean getControlPointsMove()
-    {
-        // return controlPointsMove;
-        return Config.GUI_EDITOR_CONTROL_POINTS_MOVE_WITH_NODE.get();
-    }
-
-    public void setControlPointsMove(boolean c)
-    {
-        controlPointsMove = c;
-    }
-
+    
     private void setOffset(ProxySubject s, MouseEvent e)
     {
-    	if (s instanceof LabelBlockSubject)
+        if (s instanceof LabelBlockSubject)
         {
             LabelBlockSubject l = (LabelBlockSubject) s;
             xoff = e.getX() -
                 (int)l.getGeometry().getOffset().getX();
             yoff = e.getY() -
                 (int)l.getGeometry().getOffset().getY();
-            if (l.getParent() instanceof EdgeSubject) {
-              EdgeSubject edge = (EdgeSubject)l.getParent();
-              xoff -= (int)edge.getGeometry().getPoints().get(0).getX();
-              yoff -= (int)edge.getGeometry().getPoints().get(0).getY();
+            if (l.getParent() instanceof EdgeSubject)
+            {
+                EdgeSubject edge = (EdgeSubject)l.getParent();
+                xoff -= (int)edge.getGeometry().getPoints().get(0).getX();
+                yoff -= (int)edge.getGeometry().getPoints().get(0).getY();
             }
         }
-    		else if (s instanceof GuardActionBlockSubject)
+        else if (s instanceof GuardActionBlockSubject)
         {
-    			GuardActionBlockSubject l = (GuardActionBlockSubject) s;
+            GuardActionBlockSubject l = (GuardActionBlockSubject) s;
             EdgeSubject edge = (EdgeSubject)l.getParent();
             xoff = e.getX() -
                 (int)l.getGeometry().getOffset().getX();
@@ -508,52 +508,61 @@ public class ControlledSurface
             yoff = e.getY() - (int)g.getGeometry().getRectangle().getY();
         }
     }
-
-  private void updateModel(MouseEvent e)
-  {
-    if (mShowDummy) {
-      mShowDummy = false;
-    }
-    if (!draggingSource && !draggingTarget) {
-      Command move = new MoveObjects(mDummy.getChanged(), getGraph());
-      root.getUndoInterface().executeCommand(move);
-    } else {
-      EdgeSubject edge = (EdgeSubject) selectedObjects.get(0);
-      NodeSubject node =
-          (NodeSubject)getNodeOrNodeGroupAtPosition(e.getX(), e.getY());
-      Point2D p = e.getPoint();
-      if (node != null) {
-        if (node instanceof GroupNodeSubject) {
-          System.out.println("3");
-          if (draggingSource || !getGraph().isDeterministic()) {
-            System.out.println("1");
-            p = GeometryTools.findIntersection(
-                 ((GroupNodeSubject)node).getGeometry().getRectangle(), p);
-            Command move = new MoveEdgeCommand(this, edge,
-                                               node, draggingSource,
-                                               (int)p.getX(), (int)p.getY());
+    
+    private void updateModel(MouseEvent e)
+    {
+        if (mShowDummy)
+        {
+            mShowDummy = false;
+        }
+        if (!draggingSource && !draggingTarget)
+        {
+            Command move = new MoveObjects(mDummy.getChanged(), getGraph());
             root.getUndoInterface().executeCommand(move);
-          }
         }
-        else if ((draggingSource && node != edge.getSource())
-            || (draggingTarget && node != edge.getTarget())) {
-          System.out.println("2");
-          if (node instanceof SimpleNodeProxy) {
-            p = ((SimpleNodeProxy)node).getPointGeometry().getPoint();
-          } 
-          Command move = new MoveEdgeCommand(this, edge,
-                                             node, draggingSource,
-                                             (int)p.getX(), (int)p.getY());
-          root.getUndoInterface().executeCommand(move);
+        else
+        {
+            EdgeSubject edge = (EdgeSubject) selectedObjects.get(0);
+            NodeSubject node =
+                (NodeSubject)getNodeOrNodeGroupAtPosition(e.getX(), e.getY());
+            Point2D p = e.getPoint();
+            if (node != null)
+            {
+                if (node instanceof GroupNodeSubject)
+                {
+                    System.out.println("3");
+                    if (draggingSource || !getGraph().isDeterministic())
+                    {
+                        System.out.println("1");
+                        p = GeometryTools.findIntersection(
+                            ((GroupNodeSubject)node).getGeometry().getRectangle(), p);
+                        Command move = new MoveEdgeCommand(this, edge,
+                            node, draggingSource,
+                            (int)p.getX(), (int)p.getY());
+                        root.getUndoInterface().executeCommand(move);
+                    }
+                }
+                else if ((draggingSource && node != edge.getSource())
+                || (draggingTarget && node != edge.getTarget()))
+                {
+                    System.out.println("2");
+                    if (node instanceof SimpleNodeProxy)
+                    {
+                        p = ((SimpleNodeProxy)node).getPointGeometry().getPoint();
+                    }
+                    Command move = new MoveEdgeCommand(this, edge,
+                        node, draggingSource,
+                        (int)p.getX(), (int)p.getY());
+                    root.getUndoInterface().executeCommand(move);
+                }
+            }
+            mDontDraw.remove(edge);
         }
-      }
-      mDontDraw.remove(edge);
+        draggingSource = false;
+        draggingTarget = false;
+        draggingInitial = false;
     }
-    draggingSource = false;
-    draggingTarget = false;
-    draggingInitial = false;
-  }
-
+    
     private void setObjectPosition(Subject s, int dx, int dy)
     {
         assert(mShowDummy);
@@ -568,11 +577,11 @@ public class ControlledSurface
             setGroupNodePosition((GroupNodeSubject)s, dx, dy);
         }
         // Is it an edge?
-        else if ((s instanceof EdgeSubject) && (!getControlPointsMove() || !(nodeIsSelected() || nodeGroupIsSelected())))
+        else if ((s instanceof EdgeSubject) && (!Config.GUI_EDITOR_CONTROL_POINTS_MOVE_WITH_NODE.get() || !(nodeIsSelected() || nodeGroupIsSelected())))
         {
             setEdgePosition((EdgeSubject)s, dx, dy);
         }
-
+        
         // DONT MOVE LABELS IN MULTI MODE, (IT'S NO FUN TO TRY TO GET THE OFFSETS RIGHT...)
         if (!edgeIsSelected() && !nodeGroupIsSelected()
         && !nodeIsSelected())
@@ -594,7 +603,7 @@ public class ControlledSurface
             }
         }
     }
-
+    
     private void setNodePosition(SimpleNodeSubject node, int dx, int dy)
     {
         assert(mShowDummy);
@@ -609,16 +618,16 @@ public class ControlledSurface
         }
         else
         {
-			if (dummy.getInitialArrowGeometry() != null)
-			{
-				Point2D p = dummy.getInitialArrowGeometry().getPoint();
-				p.setLocation(p.getX() + dx, p.getY() + dy);
-				// Move
-				dummy.getInitialArrowGeometry().setPoint(p);
-			}
+            if (dummy.getInitialArrowGeometry() != null)
+            {
+                Point2D p = dummy.getInitialArrowGeometry().getPoint();
+                p.setLocation(p.getX() + dx, p.getY() + dy);
+                // Move
+                dummy.getInitialArrowGeometry().setPoint(p);
+            }
         }
     }
-
+    
     private void setGroupNodePosition(GroupNodeSubject nodeGroup, int dx, int dy)
     {
         assert(mShowDummy);
@@ -628,13 +637,13 @@ public class ControlledSurface
         Rectangle2D rect = dummy.getGeometry().getRectangle();
         rect.setFrame(rect.getMinX() + dx, rect.getMinY() + dy,
             rect.getWidth(), rect.getHeight());
-        if (getNodesSnap())
+        if (Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get())
         {
             rect = findGridRect(rect);
         }
         dummy.getGeometry().setRectangle(rect);
     }
-
+    
     private void setEdgePosition(EdgeSubject edge, int dx, int dy)
     {
         assert(mShowDummy);
@@ -664,7 +673,7 @@ public class ControlledSurface
             dummy.getGeometry().getPointsModifiable().set(0, p);
         }
     }
-
+    
     private void setLabelPosition(LabelGeometrySubject label, int dx, int dy)
     {
         assert(mShowDummy);
@@ -673,7 +682,7 @@ public class ControlledSurface
         p.setLocation(p.getX() + dx, p.getY() + dy);
         dummy.setOffset(p);
     }
-
+    
     private void setLabelBlockPosition(LabelBlockSubject label, int dx, int dy)
     {
         assert(mShowDummy);
@@ -682,7 +691,7 @@ public class ControlledSurface
         p.setLocation(p.getX() + dx, p.getY() + dy);
         dummy.getGeometry().setOffset(p);
     }
-
+    
     private void setGuardActionBlockPosition(GuardActionBlockSubject label, int dx, int dy)
     {
         assert(mShowDummy);
@@ -691,7 +700,7 @@ public class ControlledSurface
         p.setLocation(p.getX() + dx, p.getY() + dy);
         dummy.getGeometry().setOffset(p);
     }
-
+    
     private void draggingInitial(ProxySubject s, MouseEvent e)
     {
         if (s instanceof SimpleNodeSubject)
@@ -711,7 +720,7 @@ public class ControlledSurface
             }
         }
     }
-
+    
     private void draggingEdge(ProxySubject s, MouseEvent e)
     {
         if (s instanceof EdgeSubject)
@@ -742,7 +751,7 @@ public class ControlledSurface
             }
         }
     }
-
+    
     private void resizingGroupNode(ProxySubject s, MouseEvent e)
     {
         if (s instanceof GroupNodeSubject)
@@ -763,13 +772,13 @@ public class ControlledSurface
             }
         }
     }
-
+    
     private void resizeGroupNode(GroupNodeSubject s, Rectangle2D rect)
     {
         assert(mShowDummy);
         ((GroupNodeSubject)mDummy.getCopy(s)).getGeometry().setRectangle(rect);
     }
-
+    
     /**
      * Deletes all selected objects.
      */
@@ -836,7 +845,7 @@ public class ControlledSurface
         root.getUndoInterface().addUndoable(new UndoableCommand(compound));
         root.getUndoInterface().executeCommand(deselection);
     }
-
+    
     public boolean hasSelected(EventListExpressionSubject e)
     {
         for (Subject s : selectedObjects)
@@ -848,7 +857,7 @@ public class ControlledSurface
         }
         return false;
     }
-
+    
     public boolean hasSelectedLabel()
     {
         for (Subject s : selectedObjects)
@@ -862,7 +871,7 @@ public class ControlledSurface
         }
         return false;
     }
-
+    
     public GraphProxy getDrawnGraph()
     {
         if (mShowDummy)
@@ -874,12 +883,12 @@ public class ControlledSurface
             return getGraph();
         }
     }
-
+    
     public ProxyShapeProducer getShapeProducer()
     {
         return super.getShapeProducer();
     }
-
+    
     public void select(ProxySubject s)
     {
         if (!selectedObjects.contains(s))
@@ -922,9 +931,9 @@ public class ControlledSurface
                     selectedObjects.add(s);
                 }
             }
-            if (s instanceof GuardActionBlockSubject) 
+            if (s instanceof GuardActionBlockSubject)
             {
-            		selectedObjects.add(s);
+                selectedObjects.add(s);
             }
             if (s instanceof GroupNodeSubject || s instanceof IdentifierSubject)
             {
@@ -932,12 +941,12 @@ public class ControlledSurface
             }
         }
     }
-
+    
     public void unselect(ProxySubject s)
     {
         selectedObjects.remove(s);
     }
-
+    
     public void unselectAll()
     {
         while (selectedObjects.size() > 0)
@@ -945,7 +954,7 @@ public class ControlledSurface
             unselect(selectedObjects.get(0));
         }
     }
-
+    
     public boolean isRenderedSelected(ProxySubject s)
     {
         if (mShowDummy)
@@ -963,18 +972,18 @@ public class ControlledSurface
         }
         return selected;
     }
-
+    
     public boolean isSelected(ProxySubject s)
     {
         return selectedObjects.contains(s);
     }
-
+    
     public boolean isFocused(ProxySubject s)
     {
         // Special case
         if (mFocusedObject == null)
             return false;
-
+        
         // Check if object is focused or the child or parent of something focused
         ProxySubject object = s;
         // Find children
@@ -987,10 +996,10 @@ public class ControlledSurface
             parentOfFocused = (Proxy) parentSubject;
         else
             parentOfFocused = mFocusedObject;
-
+        
         return object.equals(mFocusedObject) || childrenOfFocused.contains(object) || object.equals(parentOfFocused);
     }
-
+    
     public DRAGOVERSTATUS getDragOver(ProxySubject s)
     {
         if (!isFocused(s))
@@ -999,7 +1008,7 @@ public class ControlledSurface
         }
         return mDragOver;
     }
-
+    
     /*
     private void selectChange(EditorObject o)
     {
@@ -1008,7 +1017,7 @@ public class ControlledSurface
         {
             unselectAll();
         }
-
+     
         // If object is selected unselect
         if (selectedObjects.contains(o))
         {
@@ -1020,7 +1029,7 @@ public class ControlledSurface
         }
     }
      */
-
+    
     private boolean nodeIsSelected()
     {
         for (ProxySubject s: selectedObjects)
@@ -1030,10 +1039,10 @@ public class ControlledSurface
                 return true;
             }
         }
-
+        
         return false;
     }
-
+    
     private boolean nodeGroupIsSelected()
     {
         for (ProxySubject s: selectedObjects)
@@ -1043,10 +1052,10 @@ public class ControlledSurface
                 return true;
             }
         }
-
+        
         return false;
     }
-
+    
     private boolean edgeIsSelected()
     {
         for (ProxySubject s: selectedObjects)
@@ -1056,38 +1065,42 @@ public class ControlledSurface
                 return true;
             }
         }
-
+        
         return false;
     }
-
+    
     /**
      * Returns the closest coordinate (works for both x and y) lying on the grid.
      */
     private int findGrid(int x)
     {
-        return (x+getGridSize()/2)/getGridSize()*getGridSize();
+        int gridSize = Config.GUI_EDITOR_GRID_SIZE.get();
+        return (x+gridSize/2)/gridSize*gridSize;
     }
-
+    /**
+     * Finds the closest point to p lying on the grid.
+     */
     private Point2D findGridPoint(Point2D p)
     {
         return new Point(findGrid((int)p.getX()), findGrid((int)p.getY()));
     }
-
+    
     private Rectangle2D findGridRect(Rectangle2D r)
     {
         Rectangle2D rect = new Rectangle();
-        rect.setFrameFromDiagonal(findGrid((int)r.getMinX()),
+        rect.setFrameFromDiagonal(
+            findGrid((int)r.getMinX()),
             findGrid((int)r.getMinY()),
             findGrid((int)r.getMaxX()),
             findGrid((int)r.getMaxY()));
         return rect;
     }
-
+    
     public ProxySubject getObjectAtPosition(int ex, int ey)
     {
         return (ProxySubject)super.getObjectAtPosition(ex, ey);
     }
-
+    
     private void maybeShowPopup(MouseEvent e)
     {
         if (e.isPopupTrigger())
@@ -1098,21 +1111,21 @@ public class ControlledSurface
                 if (s instanceof SimpleNodeSubject)
                 {
                     SimpleNodeSubject node = (SimpleNodeSubject) s;
-
+                    
                     EditorNodePopupMenu popup = new EditorNodePopupMenu(this, node);
                     popup.show(this, e.getX(), e.getY());
                 }
                 if (s instanceof GroupNodeSubject)
                 {
                     GroupNodeSubject node = (GroupNodeSubject) s;
-
+                    
                     EditorNodeGroupPopupMenu popup = new EditorNodeGroupPopupMenu(this, node);
                     popup.show(this, e.getX(), e.getY());
                 }
                 if (s instanceof EdgeSubject)
                 {
                     EdgeSubject edge = (EdgeSubject) s;
-
+                    
                     EditorEdgePopupMenu popup = new EditorEdgePopupMenu(this, edge);
                     popup.show(this, e.getX(), e.getY());
                 }
@@ -1120,36 +1133,38 @@ public class ControlledSurface
                 {
                     LabelBlockSubject label =
                         (LabelBlockSubject) s;
-
+                    
                     EditorLabelBlockPopupMenu popup = new
                         EditorLabelBlockPopupMenu(this, label);
                     popup.show(this, e.getX(), e.getY());
                 }
                 if (s instanceof GuardActionBlockSubject)
                 {
-                	GuardActionBlockSubject ga =
+                    GuardActionBlockSubject ga =
                         (GuardActionBlockSubject) s;
-
+                    
                     EditorGuardActionBlockPopupMenu popup = new
                         EditorGuardActionBlockPopupMenu(this, ga);
                     popup.show(this, e.getX(), e.getY());
                 }
-            } else {
-              final EditorWindowInterface iface = getEditorInterface();
-              final EditorSurfacePopupMenu popup =
-                new EditorSurfacePopupMenu(iface, selectedObjects);
-              popup.show(this, e.getX(), e.getY());
+            }
+            else
+            {
+                final EditorWindowInterface iface = getEditorInterface();
+                final EditorSurfacePopupMenu popup =
+                    new EditorSurfacePopupMenu(iface, selectedObjects);
+                popup.show(this, e.getX(), e.getY());
             }
         }
     }
-
+    
     /**
      * Returns a list of all objects within a rectangle (to be selected).
      */
     public LinkedList<ProxySubject> getDragSelection()
     {
         LinkedList<ProxySubject> selection = new LinkedList<ProxySubject>();
-
+        
         // The bounds of the drag
         Rectangle bounds = getDragRectangle().getBounds();
         for (NodeProxy node : getGraph().getNodes())
@@ -1161,13 +1176,14 @@ public class ControlledSurface
                 {
                     selection.add((ProxySubject)shape.getProxy());
                 }
-                if (node instanceof SimpleNodeProxy) {
-                  shape = getShapeProducer().getShape(((SimpleNodeProxy)node).getLabelGeometry());
-                  if ((shape != null) &&
-                      (bounds.contains(shape.getShape().getBounds())))
-                  {
-                      selection.add((ProxySubject)shape.getProxy());
-                  }
+                if (node instanceof SimpleNodeProxy)
+                {
+                    shape = getShapeProducer().getShape(((SimpleNodeProxy)node).getLabelGeometry());
+                    if ((shape != null) &&
+                        (bounds.contains(shape.getShape().getBounds())))
+                    {
+                        selection.add((ProxySubject)shape.getProxy());
+                    }
                 }
             }
             catch (VisitorException vis)
@@ -1203,10 +1219,10 @@ public class ControlledSurface
                 vis.printStackTrace();
             }
         }
-
+        
         return selection;
     }
-
+    
     /**
      * Updates highlighting based on the current location of the mouse pointer.
      */
@@ -1237,23 +1253,23 @@ public class ControlledSurface
                 }
             });
         }
-
+        
         // Highlight things that are moved over...
         ProxySubject s = null;
         if (mController.getHighlightPriority(object) >= 0 || mDND)
         {
             s = object;
         }
-
+        
         // Unhighlight highligted stuff not in focus
         if ((mFocusedObject != null) && !mFocusedObject.equals(s))
         {
             // Unhighlight object
             mFocusedObject = null;
-
+            
             needRepaint = true;
         }
-
+        
         // Highlight stuff in focus!
         if (s != null && !s.equals(mFocusedObject))
         {
@@ -1261,14 +1277,14 @@ public class ControlledSurface
             mFocusedObject = s;
             needRepaint = true;
         }
-
+        
         // Need repaint?
         if (needRepaint)
         {
             repaint(false);
         }
     }
-
+    
     public void createOptions(EditorWindowInterface root)
     {
         options = new EditorOptions(root);
@@ -1299,7 +1315,7 @@ public class ControlledSurface
         }
         return mod;
     }
-
+    
     private void setDrag(MouseEvent e)
     {
         if (!hasDragged)
@@ -1309,7 +1325,7 @@ public class ControlledSurface
         }
         dragNowX = e.getX();
         dragNowY = e.getY();
-        if (newGroup && getNodesSnap())
+        if (newGroup && Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get())
         {
             dragStartX = findGrid(dragStartX);
             dragStartY = findGrid(dragStartY);
@@ -1317,7 +1333,7 @@ public class ControlledSurface
             dragNowY = findGrid(dragNowY);
         }
     }
-
+    
     private class DTListener extends DropTargetAdapter
     {
         //#######################################################################
@@ -1337,77 +1353,102 @@ public class ControlledSurface
                 e.getTransferable().getTransferData(FLAVOUR);
                 final EventType ek = i.getKind();
                 s = mFocusedObject;
-                switch (ek) {
-                  case UNKNOWN:
-                    if (s instanceof SimpleNodeSubject) {
-                      el = ((SimpleNodeSubject)s).getPropositions();
-                    } else if (s instanceof EdgeSubject) {
-                      el = ((EdgeSubject)s).getLabelBlock();
-                    } else if (s instanceof LabelBlockSubject) {
-                      el = (LabelBlockSubject)s;
-                    } else if (s instanceof LabelGeometrySubject) {
-                      el = ((SimpleNodeSubject)s.getParent()).getPropositions();
-                    }
-                    break;
-                  case NODE_EVENTS:
-                    if (s instanceof SimpleNodeSubject) {
-                      el = ((SimpleNodeSubject)s).getPropositions();
-                    } else if (s instanceof LabelGeometrySubject) {
-                      el = ((SimpleNodeSubject)s.getParent()).getPropositions();
-                    }
-                    break;
-                  case EDGE_EVENTS:
-                   if (s instanceof EdgeSubject)
-                   {
-                      el = ((EdgeSubject)s).getLabelBlock();
-                    }
-                    else if (s instanceof LabelBlockSubject)
-                    {
-                      el = (LabelBlockSubject)s;
-                      LabelBlockSubject l = (LabelBlockSubject) s;
-                      Point2D p = e.getLocation();
-                      try {
-                        double x1 = getShapeProducer().getShape(l).getShape()
-                                                      .getBounds().getMinX();
-                        double x2 = getShapeProducer().getShape(l).getShape()
-                                                      .getBounds().getMaxX();
-                        for (Proxy proxy : l.getEventList()) {
-                          ProxyShape shape = getShapeProducer().getShape(proxy);
-                          Rectangle2D r = shape.getShape().getBounds();
-                          if (p.getY() < r.getCenterY()) {
-                            line = new Line2D.Double(x1, r.getMinY(),
-                                                     x2, r.getMinY());
-                            break;
-                          } else {
-                            line = new Line2D.Double(x1, r.getMaxY(),
-                                                     x2, r.getMaxY());
-                          }
+                switch (ek)
+                {
+                    case UNKNOWN:
+                        if (s instanceof SimpleNodeSubject)
+                        {
+                            el = ((SimpleNodeSubject)s).getPropositions();
                         }
-                      } catch (VisitorException v) {
-                        v.printStackTrace();
-                      }
-                    }
-                    break;
-                  default:
-                    break;
+                        else if (s instanceof EdgeSubject)
+                        {
+                            el = ((EdgeSubject)s).getLabelBlock();
+                        }
+                        else if (s instanceof LabelBlockSubject)
+                        {
+                            el = (LabelBlockSubject)s;
+                        }
+                        else if (s instanceof LabelGeometrySubject)
+                        {
+                            el = ((SimpleNodeSubject)s.getParent()).getPropositions();
+                        }
+                        break;
+                    case NODE_EVENTS:
+                        if (s instanceof SimpleNodeSubject)
+                        {
+                            el = ((SimpleNodeSubject)s).getPropositions();
+                        }
+                        else if (s instanceof LabelGeometrySubject)
+                        {
+                            el = ((SimpleNodeSubject)s.getParent()).getPropositions();
+                        }
+                        break;
+                    case EDGE_EVENTS:
+                        if (s instanceof EdgeSubject)
+                        {
+                            el = ((EdgeSubject)s).getLabelBlock();
+                        }
+                        else if (s instanceof LabelBlockSubject)
+                        {
+                            el = (LabelBlockSubject)s;
+                            LabelBlockSubject l = (LabelBlockSubject) s;
+                            Point2D p = e.getLocation();
+                            try
+                            {
+                                double x1 = getShapeProducer().getShape(l).getShape()
+                                .getBounds().getMinX();
+                                double x2 = getShapeProducer().getShape(l).getShape()
+                                .getBounds().getMaxX();
+                                for (Proxy proxy : l.getEventList())
+                                {
+                                    ProxyShape shape = getShapeProducer().getShape(proxy);
+                                    Rectangle2D r = shape.getShape().getBounds();
+                                    if (p.getY() < r.getCenterY())
+                                    {
+                                        line = new Line2D.Double(x1, r.getMinY(),
+                                            x2, r.getMinY());
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        line = new Line2D.Double(x1, r.getMaxY(),
+                                            x2, r.getMaxY());
+                                    }
+                                }
+                            }
+                            catch (VisitorException v)
+                            {
+                                v.printStackTrace();
+                            }
+                        }
+                        break;
+                    default:
+                        break;
                 }
-                if (el != null) {
-                  boolean present = true;
-                  Set<IdentifierSubject> contents = new TreeSet<IdentifierSubject>(NamedComparator.getInstance());
-                  for (AbstractSubject a : el.getEventListModifiable()) {
-                    contents.add((IdentifierSubject)a);
-                  }
-                  for (IdentifierSubject ident : i.getIdentifiers()) {
-                    if (!contents.contains(ident)) {
-                      present = false;
-                      break;
+                if (el != null)
+                {
+                    boolean present = true;
+                    Set<IdentifierSubject> contents = new TreeSet<IdentifierSubject>(NamedComparator.getInstance());
+                    for (AbstractSubject a : el.getEventListModifiable())
+                    {
+                        contents.add((IdentifierSubject)a);
                     }
-                  }
-                  if (present) {
-                    line = null;
-                  } else {
-                    operation = DnDConstants.ACTION_COPY;
-                  }
+                    for (IdentifierSubject ident : i.getIdentifiers())
+                    {
+                        if (!contents.contains(ident))
+                        {
+                            present = false;
+                            break;
+                        }
+                    }
+                    if (present)
+                    {
+                        line = null;
+                    }
+                    else
+                    {
+                        operation = DnDConstants.ACTION_COPY;
+                    }
                 }
             }
             catch (final UnsupportedFlavorException exception)
@@ -1438,65 +1479,65 @@ public class ControlledSurface
             e.getDropTargetContext().getDropTarget().setDefaultActions(operation);
             e.acceptDrag(operation);
         }
-
+        
         public void dragExit(DropTargetEvent e)
         {
-          mDND = false;
-          mDragOver = EditorSurface.DRAGOVERSTATUS.NOTDRAG;
+            mDND = false;
+            mDragOver = EditorSurface.DRAGOVERSTATUS.NOTDRAG;
         }
-
+        
         public void drop(final DropTargetDropEvent e)
         {
-          mDND = false;
-          mLine = null;
-          try
-          {
-            if (e.getDropTargetContext().getDropTarget().
-                getDefaultActions() == DnDConstants.ACTION_COPY)
+            mDND = false;
+            mLine = null;
+            try
             {
-              final IdentifierWithKind i = (IdentifierWithKind)
-              e.getTransferable().getTransferData(FLAVOUR);
-              final Collection<IdentifierSubject> ips = i.getIdentifiers();
-              final ProxySubject s = mFocusedObject;
-              mDragOver = EditorSurface.DRAGOVERSTATUS.NOTDRAG;
-              if (s instanceof SimpleNodeSubject)
-              {
-                  addToNode((SimpleNodeSubject) s, ips);
-                  e.dropComplete(true);
-                  return;
-              }
-              else if (s instanceof EdgeSubject)
-              {
-                  addToEdge((EdgeSubject) s, ips);
-                  e.dropComplete(true);
-                  return;
-              }
-              else if (s instanceof LabelBlockSubject)
-              {
-                  addToLabelGroup((LabelBlockSubject) s, ips, e);
-                  e.dropComplete(true);
-                  return;
-              }
-              else if (s instanceof LabelGeometrySubject)
-              {
-                  addToLabel((LabelGeometrySubject) s, ips);
-                  e.dropComplete(true);
-                  return;
-              }
+                if (e.getDropTargetContext().getDropTarget().
+                    getDefaultActions() == DnDConstants.ACTION_COPY)
+                {
+                    final IdentifierWithKind i = (IdentifierWithKind)
+                    e.getTransferable().getTransferData(FLAVOUR);
+                    final Collection<IdentifierSubject> ips = i.getIdentifiers();
+                    final ProxySubject s = mFocusedObject;
+                    mDragOver = EditorSurface.DRAGOVERSTATUS.NOTDRAG;
+                    if (s instanceof SimpleNodeSubject)
+                    {
+                        addToNode((SimpleNodeSubject) s, ips);
+                        e.dropComplete(true);
+                        return;
+                    }
+                    else if (s instanceof EdgeSubject)
+                    {
+                        addToEdge((EdgeSubject) s, ips);
+                        e.dropComplete(true);
+                        return;
+                    }
+                    else if (s instanceof LabelBlockSubject)
+                    {
+                        addToLabelGroup((LabelBlockSubject) s, ips, e);
+                        e.dropComplete(true);
+                        return;
+                    }
+                    else if (s instanceof LabelGeometrySubject)
+                    {
+                        addToLabel((LabelGeometrySubject) s, ips);
+                        e.dropComplete(true);
+                        return;
+                    }
+                }
             }
-          }
-          catch (final UnsupportedFlavorException exception)
-          {
-              throw new IllegalArgumentException(exception);
-          }
-          catch (final IOException exception)
-          {
-              throw new IllegalArgumentException(exception);
-          }
-          e.dropComplete(false);
+            catch (final UnsupportedFlavorException exception)
+            {
+                throw new IllegalArgumentException(exception);
+            }
+            catch (final IOException exception)
+            {
+                throw new IllegalArgumentException(exception);
+            }
+            e.dropComplete(false);
         }
-
-
+        
+        
         //###################################################################
         //# Auxiliary Methods
         private void addToNode(SimpleNodeSubject n, Collection<IdentifierSubject> i)
@@ -1506,18 +1547,18 @@ public class ControlledSurface
             root.getUndoInterface().executeCommand(addEvent);
             repaint();
         }
-
+        
         private void addToLabel(LabelGeometrySubject l, Collection<IdentifierSubject> i)
         {
             addToNode((SimpleNodeSubject)l.getParent(), i);
         }
-
+        
         private void addToEdge(EdgeSubject edge, Collection<IdentifierSubject> ip)
         {
             addToLabelGroup(edge.getLabelBlock(), ip,
-                            edge.getLabelBlock().getEventList().size());
+                edge.getLabelBlock().getEventList().size());
         }
-
+        
         private void addToLabelGroup(LabelBlockSubject l, Collection<IdentifierSubject> i, final DropTargetDropEvent e)
         {
             int pos = 0;
@@ -1548,12 +1589,12 @@ public class ControlledSurface
         
         private void addToLabelGroup(LabelBlockSubject l, Collection<IdentifierSubject> i, int pos)
         {
-          Command addEvent = new AddEventCommand(l, i, pos);
-          root.getUndoInterface().executeCommand(addEvent);
-          repaint();
+            Command addEvent = new AddEventCommand(l, i, pos);
+            root.getUndoInterface().executeCommand(addEvent);
+            repaint();
         }
     }
-
+    
     public void update(EditorChangedEvent e)
     {
         if (e instanceof ToolbarChangedEvent)
@@ -1589,11 +1630,11 @@ public class ControlledSurface
             addMouseListener(mController);
             addMouseMotionListener(mController);
             mDragSource.createDefaultDragGestureRecognizer(this,
-                                                           mDragAction,
-                                                           mDGListener);
+                mDragAction,
+                mDGListener);
         }
     }
-
+    
     private class SelectListener
         extends ToolController
     {
@@ -1640,11 +1681,11 @@ public class ControlledSurface
             }
             return -1;
         }
-
+        
         public void mouseClicked(MouseEvent e)
         {
             requestFocusInWindow();
-
+            
             if (e.getButton() == MouseEvent.BUTTON1)
             {
                 // Singleclick?
@@ -1719,13 +1760,13 @@ public class ControlledSurface
              if (selectedNode.getPropGroup().wasClicked(e.getX(), e.getY()) && selectedNode.getPropGroup().getVisible())
              {
              EditorPropGroup p = selectedNode.getPropGroup();
-
+           
              p.setSelectedLabel(e.getX(), e.getY());
              repaint();
              }
              }
            */
-
+                    
                     // What was clicked?
                     ProxySubject s = getObjectAtPosition(e.getX(), e.getY());
                     if (s != null)
@@ -1740,20 +1781,20 @@ public class ControlledSurface
                         }
                         if (s instanceof EdgeSubject)
                         {
-                        	  EditorEditEdgeDialog.showDialog((EdgeSubject) s);
+                            EditorEditEdgeDialog.showDialog((EdgeSubject) s);
                         }
                         if (s instanceof GuardActionBlockSubject)
                         {
-                        	  GuardActionBlockSubject ga = (GuardActionBlockSubject) s;
-                        	  EdgeSubject edge = (EdgeSubject) s.getParent();
-                        	  EditorEditEdgeDialog.showDialog(edge);
+                            GuardActionBlockSubject ga = (GuardActionBlockSubject) s;
+                            EdgeSubject edge = (EdgeSubject) s.getParent();
+                            EditorEditEdgeDialog.showDialog(edge);
                         }
                         
                     }
                 }
             }
         }
-
+        
         public void mousePressed(MouseEvent e)
         {
             mToBeDragged = DNDLabel(e.getPoint());
@@ -1762,17 +1803,17 @@ public class ControlledSurface
             setDrag(e);
             previouslySelected.clear();
             previouslySelected.addAll(selectedObjects);
-
+            
             if (e.getButton() == MouseEvent.BUTTON1)
             {
                 lastX = e.getX();
                 lastY = e.getY();
-
+                
                 ProxySubject s = mFocusedObject;
                 if (s == null)
                 {
                     // Clicking on whitespace!
-
+                    
                     // If control is down, we may select multiple things...
                     if (!e.isControlDown())
                     {
@@ -1782,7 +1823,7 @@ public class ControlledSurface
                             selectedObjects);
                         root.getUndoInterface().executeCommand(unselect);
                     }
-
+                    
                     // If SELECT is active, this means that we're starting a drag-select...
                     // Start of drag-select?
                     dragSelect = true;
@@ -1790,7 +1831,7 @@ public class ControlledSurface
                 else
                 {
                     // Clicking on something!
-
+                    
                     // Should we unselect the currently selected objects?
                     if (!isSelected(s))
                     {
@@ -1801,7 +1842,7 @@ public class ControlledSurface
                                 new UnSelectCommand(ControlledSurface.this,
                                 selectedObjects);;
                                 root.getUndoInterface().executeCommand(unselect);
-
+                                
                         }
                         SelectCommand select =
                             new SelectCommand(ControlledSurface.this, s);
@@ -1818,10 +1859,10 @@ public class ControlledSurface
                             }
                         }
                     }
-
+                    
                     // Select stuff!
                     //selectChange(o);
-
+                    
               /*
                 if (o.getType() == EditorObject.EDGE)
                 {
@@ -1833,9 +1874,9 @@ public class ControlledSurface
                 }
                */
                     draggingInitial(s, e);
-
+                    
                     draggingEdge(s, e);
-
+                    
                     resizingGroupNode(s, e);
                     // Find offset values if a label or group was clicked
                     setOffset(s, e);
@@ -1849,18 +1890,18 @@ public class ControlledSurface
                     if (s instanceof SimpleNodeSubject)
                     {
                         SimpleNodeSubject n = (SimpleNodeSubject) s;
-
+                        
                     }
                 }
             }
             else if (e.getButton() == MouseEvent.BUTTON3)
             {
-
+                
             }
-
+            
             repaint(false);
         }
-
+        
         public void mouseReleased(MouseEvent e)
         {
             mToBeDragged = null;
@@ -1875,10 +1916,10 @@ public class ControlledSurface
             {
                 updateModel(e);
             }
-
+            
             // This is for triggering the popup
             maybeShowPopup(e);
-
+            
             if (e.getButton() == MouseEvent.BUTTON1)
             {
                 // Stop resizing nodegroup
@@ -1886,7 +1927,7 @@ public class ControlledSurface
                 {
                     GroupNodeSubject ng = (GroupNodeSubject) selectedObjects.get(0);
                     mResize = null;
-
+                    
                     if (ng.getGeometry().getRectangle().isEmpty())
                     {
                         Command c = new DeleteNodeGroupCommand(getGraph(), ng);
@@ -1900,7 +1941,7 @@ public class ControlledSurface
                     newGroup = false;
                     root.getUndoInterface().executeCommand(c);
                 }
-
+                
                 // Redefine edge if it has been changed
                 if (edgeIsSelected() && (selectedObjects.size() == 1))
                 {
@@ -1916,32 +1957,33 @@ public class ControlledSurface
                     }
                     //edge.setTPoint(edge.getTPointX(), edge.getTPointY());
                 }
-
+                
             }
-
+            
             repaint(hasDragged);
-
+            
             dragSelect = false;
             hasDragged = false;
             mResize = null;
         }
-
+        
         public void mouseDragged(MouseEvent e)
         {
-          if (mToBeDragged != null) {
-            return;
-          }
+            if (mToBeDragged != null)
+            {
+                return;
+            }
             updateHighlighting(e.getPoint());
             //if (e.getButton() == MouseEvent.BUTTON1) // Why not?
             {
                 setDrag(e);
                 hasDragged = true;
-
+                
                 // DragSelect!
                 if (dragSelect)
                 {
                     toBeSelected = getDragSelection();
-
+                    
                     // Select all that should be selected...
                     //System.out.println(previouslySelected.size());
                     UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, selectedObjects);
@@ -1953,16 +1995,16 @@ public class ControlledSurface
                     // These are in the current drag selection
                     select = new SelectCommand(ControlledSurface.this, toBeSelected);
                     select.execute();
-
+                    
                     repaint(false);
-
+                    
                     return;
                 }
-
+                
                 // Multiple selection?
-
+                
                 // Drag all selected objects
-
+                
                 // is this the start of the move or a continuation of it
                 if (!selectedObjects.isEmpty() && !draggingSource && !draggingTarget)
                 {
@@ -1975,20 +2017,20 @@ public class ControlledSurface
                 int dx = 0;
                 int dy = 0;
                 // Are we using snap?
-                if ((nodeIsSelected() || nodeGroupIsSelected()) && getNodesSnap()
-                    && !draggingInitial)
+                if ((nodeIsSelected() || nodeGroupIsSelected()) && Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get()
+                && !draggingInitial)
                 {
                     lastX = findGrid(lastX);
                     lastY = findGrid(lastY);
-
+                    
                     int currX = findGrid(e.getX());
                     int currY = findGrid(e.getY());
-
+                    
                     // If the first selected node or nodegroup is not correctly
                     // aligned already, we need a modifier to get it on the
                     // grid again...
                     Point2D mod = getMod();
-
+                    
                     dx = currX - lastX + (int) mod.getX();
                     dy = currY - lastY + (int) mod.getY();
                 }
@@ -1997,11 +2039,11 @@ public class ControlledSurface
                     dx = e.getX() - lastX;
                     dy = e.getY() - lastY;
                 }
-
+                
                 // Update position
                 lastX += dx;
                 lastY += dy;
-
+                
                 // No move?
                 if ((dx == 0) && (dy == 0))
                 {
@@ -2015,7 +2057,7 @@ public class ControlledSurface
            return;
            }
            }
-
+         
            for (int i = 0; i < nodeGroups.size(); i++)
            {
            if (((EditorNodeGroup) nodeGroups.get(i)).getBounds().intersects(new Rectangle(dx - EditorNode.WIDTH / 2, dy - EditorNode.WIDTH / 2, EditorNode.WIDTH, EditorNode.WIDTH)) &&!((EditorNodeGroup) nodeGroups.get(i)).getBounds().contains(new Rectangle(dx - EditorNode.WIDTH / 2, dy - EditorNode.WIDTH / 2, EditorNode.WIDTH, EditorNode.WIDTH)))
@@ -2024,7 +2066,7 @@ public class ControlledSurface
            }
            }
          */
-
+                
                 // Move every selected object!
                 if (!draggingSource && !draggingTarget)
                 {
@@ -2040,20 +2082,20 @@ public class ControlledSurface
                         }
                     }
                 }
-
+                
                 examineCollisions();
-
+                
             }
-
+            
             repaint(false);
         }
-
+        
         public void mouseMoved(MouseEvent e)
         {
             updateHighlighting(e.getPoint());
         }
     }
-
+    
     private class NodeListener
         extends ToolController
     {
@@ -2069,11 +2111,11 @@ public class ControlledSurface
             }
             return -1;
         }
-
+        
         public void mouseClicked(MouseEvent e)
         {
             requestFocusInWindow();
-
+            
             if (e.getButton() == MouseEvent.BUTTON1)
             {
                 // Singleclick?
@@ -2081,18 +2123,18 @@ public class ControlledSurface
                 {
                     // What was clicked?
                     //EditorObject o = getObjectAtPosition(e.getX(), e.getY());
-
+                    
                     // Should we add a new node?
-
+                    
                     /** Nonsense?
-                  else if (T.getPlace() == EditorToolbar.EDGE)
-                  {
-                  if (o == null)
-                  {
-                  UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, selectedObjects);;
-
-                  return;
-                  }
+                     * else if (T.getPlace() == EditorToolbar.EDGE)
+                     * {
+                     * if (o == null)
+                     * {
+                     * UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, selectedObjects);;
+                     *
+                     * return;
+                     * }
                      */
                 }
                 // Doubleclick?
@@ -2110,12 +2152,12 @@ public class ControlledSurface
                     }
                 }
             }
-
+            
             // Repaint is done when you release the mouse button?
             // (But that's before the click?)
             repaint();
         }
-
+        
         public void mousePressed(MouseEvent e)
         {
             // This is for triggering the popup
@@ -2125,12 +2167,12 @@ public class ControlledSurface
             {
                 lastX = e.getX();
                 lastY = e.getY();
-
+                
                 ProxySubject s = mFocusedObject;
                 if (s == null)
                 {
                     // Clicking on whitespace!
-
+                    
                     // If control is down, we may select multiple things...
                     if (!e.isControlDown())
                     {
@@ -2138,8 +2180,8 @@ public class ControlledSurface
                         root.getUndoInterface().executeCommand(unselect);
                         int posX;
                         int posY;
-
-                        if (getNodesSnap())
+                        
+                        if (Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get())
                         {
                             posX = findGrid(e.getX());
                             posY = findGrid(e.getY());
@@ -2149,11 +2191,11 @@ public class ControlledSurface
                             posX = e.getX();
                             posY = e.getY();
                         }
-
+                        
                         Command createNode = new CreateNodeCommand(getGraph(), posX, posY);
                         root.getUndoInterface().executeCommand(createNode);
                         //addLabel(getLastNode(), "", 0, break20);
-
+                        
                         //SimpleNodeProxy np = new SimpleNodeProxy("s" + nodes.size());
                         //PointGeometryProxy gp = new PointGeometryProxy(posX,posY);
                         //np.setPointGeometry(gp);
@@ -2163,7 +2205,7 @@ public class ControlledSurface
                 else
                 {
                     // Clicking on something!
-
+                    
                     // Should we unselect the currently selected objects?
                     if (!isSelected(s))
                     {
@@ -2184,7 +2226,7 @@ public class ControlledSurface
                             root.getUndoInterface().executeCommand(unselect);
                         }
                     }
-
+                    
                     // Select stuff!
                     //selectChange(o);
                     draggingInitial(s, e);
@@ -2199,30 +2241,30 @@ public class ControlledSurface
             else if (e.getButton() == MouseEvent.BUTTON3)
             {
             }
-
+            
             repaint(false);
         }
-
+        
         public void mouseReleased(MouseEvent e)
         {
             if (mShowDummy)
             {
                 updateModel(e);
             }
-
+            
             // This is for triggering the popup
             maybeShowPopup(e);
-
+            
             if (e.getButton() == MouseEvent.BUTTON1)
             {
             }
-
+            
             repaint(hasDragged);
-
+            
             dragSelect = false;
             hasDragged = false;
         }
-
+        
         public void mouseDragged(MouseEvent e)
         {
             updateHighlighting(e.getPoint());
@@ -2230,7 +2272,7 @@ public class ControlledSurface
             {
                 setDrag(e);
                 hasDragged = true;
-
+                
                 if (!selectedObjects.isEmpty())
                 {
                     if (!mShowDummy)
@@ -2238,25 +2280,25 @@ public class ControlledSurface
                         mShowDummy = true;
                     }
                 }
-
+                
                 // Find the distances that the mouse has dragged (for moving and stuff)
                 int dx = 0;
                 int dy = 0;
                 // Are we using snap?
-                if ((nodeIsSelected() || nodeGroupIsSelected()) && getNodesSnap()
-                    && !draggingInitial)
+                if ((nodeIsSelected() || nodeGroupIsSelected()) && Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get()
+                && !draggingInitial)
                 {
                     lastX = findGrid(lastX);
                     lastY = findGrid(lastY);
-
+                    
                     int currX = findGrid(e.getX());
                     int currY = findGrid(e.getY());
-
+                    
                     // If the first selected node or nodegroup is not correctly
                     // aligned already, we need a modifier to get it on the
                     // grid again...
                     Point2D mod = getMod();
-
+                    
                     dx = currX - lastX + (int) mod.getX();
                     dy = currY - lastY + (int) mod.getY();
                 }
@@ -2265,28 +2307,28 @@ public class ControlledSurface
                     dx = e.getX() - lastX;
                     dy = e.getY() - lastY;
                 }
-
+                
                 // Update position
                 lastX += dx;
                 lastY += dy;
-
+                
                 for (Iterator<ProxySubject> it = selectedObjects.iterator(); it.hasNext(); )
                 {
                     ProxySubject s = it.next();
-
+                    
                     setObjectPosition(s, dx, dy);
                 }
             }
-
+            
             repaint(false);
         }
-
+        
         public void mouseMoved(MouseEvent e)
         {
             updateHighlighting(e.getPoint());
         }
     }
-
+    
     private class EdgeListener
         extends ToolController
     {
@@ -2329,7 +2371,7 @@ public class ControlledSurface
             }
             return -1;
         }
-
+        
         public void mousePressed(MouseEvent e)
         {
             // This is for triggering the popup
@@ -2339,7 +2381,7 @@ public class ControlledSurface
             {
                 lastX = e.getX();
                 lastY = e.getY();
-
+                
                 ProxySubject s = mFocusedObject;
                 if (s == null)
                 {
@@ -2352,7 +2394,7 @@ public class ControlledSurface
                 else
                 {
                     // Clicking on something!
-
+                    
                     // Should we unselect the currently selected objects?
                     if (!isSelected(s))
                     {
@@ -2373,7 +2415,7 @@ public class ControlledSurface
                             root.getUndoInterface().executeCommand(unselect);
                         }
                     }
-
+                    
               /*
                 if (o.getType() == EditorObject.EDGE)
                 {
@@ -2396,20 +2438,20 @@ public class ControlledSurface
             else if (e.getButton() == MouseEvent.BUTTON3)
             {
             }
-
+            
             repaint(false);
         }
-
+        
         public void mouseReleased(MouseEvent e)
         {
             if (mShowDummy || draggingSource || draggingTarget)
             {
                 updateModel(e);
             }
-
+            
             // This is for triggering the popup
             maybeShowPopup(e);
-
+            
             if (e.getButton() == MouseEvent.BUTTON1)
             {
                 // Draw an edge if EditorToolbar.EDGE is selected
@@ -2421,7 +2463,7 @@ public class ControlledSurface
                         ProxySubject s1 = selectedObjects.get(0);
                         UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, s1);
                         root.getUndoInterface().executeCommand(unselect);
-
+                        
                         // This is the targetpoint
                         ProxySubject s2 = getObjectAtPosition(e.getX(), e.getY());
                         if (s2 instanceof SimpleNodeSubject)
@@ -2447,7 +2489,8 @@ public class ControlledSurface
                                 n2, p1, p2);
                             root.getUndoInterface().executeCommand(createEdge);
                         }
-                        if (s2 instanceof GroupNodeSubject && !getGraph().isDeterministic()) {
+                        if (s2 instanceof GroupNodeSubject && !getGraph().isDeterministic())
+                        {
                             GroupNodeSubject n2 = (GroupNodeSubject) s2;
                             Point2D p2 = GeometryTools.findIntersection(n2.getGeometry().getRectangle(), e.getPoint());
                             Point2D p1 = null;
@@ -2470,12 +2513,12 @@ public class ControlledSurface
                             root.getUndoInterface().executeCommand(createEdge);
                         }
                     }
-
+                    
                     UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, selectedObjects);;
                     root.getUndoInterface().executeCommand(unselect);
                 }
-
-
+                
+                
                 if (edgeIsSelected() && (selectedObjects.size() == 1))
                 {
                     ProxySubject obj = selectedObjects.get(0);
@@ -2488,9 +2531,9 @@ public class ControlledSurface
                     {
                         edge = (EdgeSubject) selectedObjects.get(1);
                     }
-
+                    
                     NodeSubject n = (NodeSubject) getNodeOrNodeGroupAtPosition(e.getX(), e.getY());
-
+                    
                     if (n != null)
                     {
                         if (draggingSource || (draggingTarget && n instanceof SimpleNodeSubject))
@@ -2502,20 +2545,20 @@ public class ControlledSurface
                             root.getUndoInterface().executeCommand(moveEdge);
                         }
                     }
-
+                    
                     draggingSource = false;
                     draggingTarget = false;
                     //edge.setTPoint(edge.getTPointX(), edge.getTPointY());
                 }
-
+                
             }
-
+            
             repaint(hasDragged);
-
+            
             dragSelect = false;
             hasDragged = false;
         }
-
+        
         public void mouseDragged(MouseEvent e)
         {
             updateHighlighting(e.getPoint());
@@ -2523,20 +2566,20 @@ public class ControlledSurface
             {
                 setDrag(e);
                 hasDragged = true;
-
+                
                 // Find the distances that the mouse has dragged (for moving and stuff)
                 int dx = 0;
                 int dy = 0;
                 // Are we using snap?
                 dx = e.getX() - lastX;
                 dy = e.getY() - lastY;
-
+                
                 // Update position
                 lastX += dx;
                 lastY += dy;
-
+                
                 // Single selection! (Multiple selection is only allowed in SELECT-mode.)
-
+                
                 // Edge drawing...
                 // No move?
                 if ((dx == 0) && (dy == 0))
@@ -2548,26 +2591,27 @@ public class ControlledSurface
                 {
                     for (final ProxySubject object : selectedObjects)
                     {
-                      if (!(object instanceof NodeSubject)) {
-                        if (!mShowDummy)
+                        if (!(object instanceof NodeSubject))
                         {
-                            mShowDummy = true;
+                            if (!mShowDummy)
+                            {
+                                mShowDummy = true;
+                            }
+                            setObjectPosition(object, dx, dy);
                         }
-                        setObjectPosition(object, dx, dy);
-                      }
                     }
                 }
             }
-
+            
             repaint(false);
         }
-
+        
         public void mouseMoved(MouseEvent e)
         {
             updateHighlighting(e.getPoint());
         }
     }
-
+    
     private class GroupNodeListener
         extends ToolController
     {
@@ -2579,7 +2623,7 @@ public class ControlledSurface
             }
             return -1;
         }
-
+        
         public void mousePressed(MouseEvent e)
         {
             // This is for triggering the popup
@@ -2589,18 +2633,18 @@ public class ControlledSurface
             {
                 lastX = e.getX();
                 lastY = e.getY();
-
+                
                 ProxySubject o = mFocusedObject;
                 if (o == null)
                 {
-
+                    
                     // If control is down, we may select multiple things...
                     if (!e.isControlDown())
                     {
                         UnSelectCommand unselect = new UnSelectCommand(ControlledSurface.this, selectedObjects);;
                         root.getUndoInterface().executeCommand(unselect);
                     }
-
+                    
                     // If NODEGROUP is active, we're adding a new group
                     // GroupNodeSubject nodeGroup;
                     newGroup = true;
@@ -2608,7 +2652,7 @@ public class ControlledSurface
                 else
                 {
                     // Clicking on something!
-
+                    
                     // Should we unselect the currently selected objects?
                     if (!isSelected(o))
                     {
@@ -2630,7 +2674,7 @@ public class ControlledSurface
                         }
                     }
                     resizingGroupNode(o, e);
-
+                    
                     setOffset(o, e);
                 }
             }
@@ -2641,20 +2685,20 @@ public class ControlledSurface
             else if (e.getButton() == MouseEvent.BUTTON3)
             {
             }
-
+            
             repaint(false);
         }
-
+        
         public void mouseReleased(MouseEvent e)
         {
             if (mShowDummy)
             {
                 updateModel(e);
             }
-
+            
             // This is for triggering the popup
             maybeShowPopup(e);
-
+            
             if (e.getButton() == MouseEvent.BUTTON1)
             {
                 // Stop resizing nodegroup
@@ -2675,14 +2719,14 @@ public class ControlledSurface
                 }
                 newGroup = false;
             }
-
+            
             repaint(hasDragged);
-
+            
             dragSelect = false;
             hasDragged = false;
             mResize = null;
         }
-
+        
         public void mouseDragged(MouseEvent e)
         {
             updateHighlighting(e.getPoint());
@@ -2701,19 +2745,19 @@ public class ControlledSurface
                 int dx = 0;
                 int dy = 0;
                 // Are we using snap?
-                if ((nodeIsSelected() || nodeGroupIsSelected()) && getNodesSnap())
+                if ((nodeIsSelected() || nodeGroupIsSelected()) && Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get())
                 {
                     lastX = findGrid(lastX);
                     lastY = findGrid(lastY);
-
+                    
                     int currX = findGrid(e.getX());
                     int currY = findGrid(e.getY());
-
+                    
                     // If the first selected node or nodegroup is not correctly
                     // aligned already, we need a modifier to get it on the
                     // grid again...
                     Point2D mod = getMod();
-
+                    
                     dx = currX - lastX + (int) mod.getX();
                     dy = currY - lastY + (int) mod.getY();
                 }
@@ -2722,20 +2766,20 @@ public class ControlledSurface
                     dx = e.getX() - lastX;
                     dy = e.getY() - lastY;
                 }
-
+                
                 // Update position
                 lastX += dx;
                 lastY += dy;
-
+                
                 // DragSelect!
-
+                
                 // Single selection! (Multiple selection is only allowed in SELECT-mode.)
-
+                
                 // Are we resizing a nodegroup?
                 if (nodeGroupIsSelected())
                 {
                     GroupNodeSubject nodeGroup = (GroupNodeSubject) selectedObjects.get(0);
-
+                    
                     //Rectangle2D.Double b = new Rectangle2D.Double();
                     //b.setRect(nodeGroup.getBounds());
                     if (mResize != null)
@@ -2746,28 +2790,28 @@ public class ControlledSurface
                     {
                         setObjectPosition(nodeGroup, dx, dy);
                     }
-
-
+                    
+                    
             /* // Prevent nodegroups from moving onto nodes?
                if (intersectsRectangle(nodeGroup.getBounds()))
                {
                nodeGroup.setBounds(b);
                }
              */
-
+                    
                     examineCollisions();
                 }
             }
-
+            
             repaint(false);
         }
-
+        
         public void mouseMoved(MouseEvent e)
         {
             updateHighlighting(e.getPoint());
         }
     }
-
+    
     private class InitialListener
         extends ToolController
     {
@@ -2779,7 +2823,7 @@ public class ControlledSurface
             }
             return -1;
         }
-
+        
         public void mousePressed(MouseEvent e)
         {
             maybeShowPopup(e);
@@ -2789,46 +2833,46 @@ public class ControlledSurface
                 ProxySubject o = mFocusedObject;
                 if (o instanceof SimpleNodeSubject)
                 {
-                  SimpleNodeSubject n = (SimpleNodeSubject) o;
-                  Command initial = new SetNodeInitialCommand(getGraph(), n);
-                  root.getUndoInterface().executeCommand(initial);
-                  repaint();
+                    SimpleNodeSubject n = (SimpleNodeSubject) o;
+                    Command initial = new SetNodeInitialCommand(getGraph(), n);
+                    root.getUndoInterface().executeCommand(initial);
+                    repaint();
                 }
             }
         }
-
+        
         public void mouseReleased(MouseEvent e)
         {
             maybeShowPopup(e);
         }
-
+        
         public void mouseDragged(MouseEvent e)
         {
             updateHighlighting(e.getPoint());
         }
-
+        
         public void mouseMoved(MouseEvent e)
         {
             updateHighlighting(e.getPoint());
         }
     }
-
+    
     private abstract class ToolController
         extends MouseAdapter
         implements MouseMotionListener
     {
         public abstract int getHighlightPriority(ProxySubject s);
-
+        
         public void mouseMoved(MouseEvent e)
         {
-
-          updateHighlighting(e.getPoint());
+            
+            updateHighlighting(e.getPoint());
         }
     }
-
-  private class KeySpy
-    extends KeyAdapter
-  {
+    
+    private class KeySpy
+        extends KeyAdapter
+    {
         public void keyPressed(KeyEvent e)
         {
             //System.err.println(e.getKeyCode());
@@ -2909,7 +2953,7 @@ public class ControlledSurface
                             {
                                 index = index + 2 - labels.size();
                             }
-
+                            
                             hasMoved = true;
                             Command c =
                                 new ReorganizeListCommand(l, labels, index);
@@ -2926,7 +2970,7 @@ public class ControlledSurface
             }
         }
     }
-
+    
     //	public Command upCommand()
     //	{
     //		int index = getSubject().getEventList().size();
@@ -2962,13 +3006,13 @@ public class ControlledSurface
     //		}
     //		return new ReorganizeListCommand(getSubject(), mSelectedLabels, index);
     //	}
-
+    
     private class NameEditField
         extends JTextField
     {
         private final LabelGeometrySubject mLabel;
         private final SimpleNodeSubject mNode;
-
+        
         public NameEditField(LabelGeometrySubject label)
         {
             mLabel = label;
@@ -3018,7 +3062,7 @@ public class ControlledSurface
             });
             mDontDraw.add(mLabel);
         }
-
+        
         private void reName()
         {
             if (!getText().equals(mNode.getName()))
@@ -3049,7 +3093,7 @@ public class ControlledSurface
                 mDontDraw.remove(mLabel);
             }
         }
-
+        
         private class NameEditSpy
             extends FocusAdapter
             implements ActionListener
@@ -3084,14 +3128,14 @@ public class ControlledSurface
                 }
                 }*/
             }
-
+            
             public void focusLost(FocusEvent e)
             {
                 reName();
             }
         }
     }
-
+    
     /**
      *  Just keeps all the logic for resizing a new node group here so
      *  the rest of controlled surface doesn't get more cluttered than it already
@@ -3102,7 +3146,7 @@ public class ControlledSurface
         private final Point corner;
         private final int XCoord;
         private final int YCoord;
-
+        
         public GroupResizer(Rectangle2D rect, Handle.HandleType type)
         {
             switch (type)
@@ -3154,10 +3198,10 @@ public class ControlledSurface
                     YCoord = Integer.MIN_VALUE;
             }
         }
-
+        
         public Rectangle2D resize(Point2D p)
         {
-            if (getNodesSnap())
+            if (Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get())
             {
                 p = findGridPoint(p);
             }
@@ -3174,68 +3218,84 @@ public class ControlledSurface
             return rect;
         }
     }
-
+    
     private class DSListener extends DragSourceAdapter
     {
-      public void dragOver(DragSourceDragEvent e)
-      {
-        if (e.getTargetActions() == DnDConstants.ACTION_COPY) {
-          e.getDragSourceContext().setCursor
-            (DragSource.DefaultCopyDrop);
-        } else {
-          e.getDragSourceContext().setCursor
-            (DragSource.DefaultCopyNoDrop);
+        public void dragOver(DragSourceDragEvent e)
+        {
+            if (e.getTargetActions() == DnDConstants.ACTION_COPY)
+            {
+                e.getDragSourceContext().setCursor
+                    (DragSource.DefaultCopyDrop);
+            }
+            else
+            {
+                e.getDragSourceContext().setCursor
+                    (DragSource.DefaultCopyNoDrop);
+            }
         }
-      }
     }
-
+    
     private class DGListener implements DragGestureListener
     {
-      public void dragGestureRecognized(final DragGestureEvent event)
-      {
-        //System.out.println(mToBeDragged);
-        if (mToBeDragged == null) {
-          return;
+        public void dragGestureRecognized(final DragGestureEvent event)
+        {
+            //System.out.println(mToBeDragged);
+            if (mToBeDragged == null)
+            {
+                return;
+            }
+            final Transferable trans = new IdentifierTransfer(mToBeDragged,
+                EventType.EDGE_EVENTS);
+            mToBeDragged = null;
+            try
+            {
+                event.startDrag(DragSource.DefaultCopyDrop, trans);
+            }
+            catch (InvalidDnDOperationException exception)
+            {
+                throw new IllegalArgumentException(exception);
+            }
         }
-        final Transferable trans = new IdentifierTransfer(mToBeDragged,
-                                                          EventType.EDGE_EVENTS);
-        mToBeDragged = null;
-        try {
-          event.startDrag(DragSource.DefaultCopyDrop, trans);
-        } catch (InvalidDnDOperationException exception) {
-          throw new IllegalArgumentException(exception);
-        }
-      }
     }
-
-    private Collection<IdentifierSubject> DNDLabel(Point pos) {
-      Subject parent = null;
-      Collection<IdentifierSubject> labels = null;
-      for (ProxySubject s : selectedObjects) {
-        try {
-          if (s instanceof IdentifierSubject && getShapeProducer().getShape(s)
-                                                .getShape().getBounds()
-                                                .contains(pos)) {
-            parent = s.getParent();
-            System.out.println("drag events");
-            labels = new ArrayList<IdentifierSubject>();
-            break;
-          }
-        } catch (VisitorException v) {
-          v.printStackTrace();
+    
+    private Collection<IdentifierSubject> DNDLabel(Point pos)
+    {
+        Subject parent = null;
+        Collection<IdentifierSubject> labels = null;
+        for (ProxySubject s : selectedObjects)
+        {
+            try
+            {
+                if (s instanceof IdentifierSubject && getShapeProducer().getShape(s)
+                .getShape().getBounds()
+                .contains(pos))
+                {
+                    parent = s.getParent();
+                    System.out.println("drag events");
+                    labels = new ArrayList<IdentifierSubject>();
+                    break;
+                }
+            }
+            catch (VisitorException v)
+            {
+                v.printStackTrace();
+            }
         }
-      }
-      if (labels != null) {
-        for (ProxySubject s : selectedObjects) {
-          if (s.getParent() == parent) {
-            labels.add((IdentifierSubject)s);
-          }
+        if (labels != null)
+        {
+            for (ProxySubject s : selectedObjects)
+            {
+                if (s.getParent() == parent)
+                {
+                    labels.add((IdentifierSubject)s);
+                }
+            }
         }
-      }
-      //System.out.println(labels);
-      return labels;
+        //System.out.println(labels);
+        return labels;
     }
-
+    
     //#########################################################################
     //# Data Members
     private ControlledToolbar mToolbar;
@@ -3246,14 +3306,12 @@ public class ControlledSurface
     private int xoff = 0;
     private int yoff = 0;
     private GroupResizer mResize = null;
-    private boolean controlPointsMove = true;
-    private boolean nodesSnap = true;
     private boolean hasDragged = false;
     private boolean draggingSource = false;
     private boolean draggingTarget = false;
     private boolean draggingInitial = false;
     private Collection<IdentifierSubject> mToBeDragged = null;
-
+    
     /** List of currently selected EditorObject:s. */
     private List<ProxySubject> selectedObjects =
         new LinkedList<ProxySubject>();
@@ -3263,27 +3321,27 @@ public class ControlledSurface
         new ArrayList<ProxySubject>();
     private Set<ProxySubject> mDontDraw = new HashSet<ProxySubject>();
     private final Set<ProxySubject> mError = new HashSet<ProxySubject>();
-
+    
     private Line2D mLine = null;
-
+    
     /** The currently highlighted EditorObject (under the mouse pointer). */
     private ProxySubject mFocusedObject = null;
-
+    
     private final EditorGraph mDummy;
     private boolean mShowDummy = false;
-
+    
     private ToolController mController;
-
+    
     private DRAGOVERSTATUS mDragOver = DRAGOVERSTATUS.NOTDRAG;
-
+    
     private DropTarget dropTarget;
     private DropTargetListener dtListener;
-
+    
     private boolean newGroup = false;
-
+    
     private boolean mutable = false;
-
-
+    
+    
     //#########################################################################
     //# Class Constants
     public enum Tool
@@ -3295,12 +3353,12 @@ public class ControlledSurface
         EDGE,
         EVENT;
     }
-
+    
     private DragSource mDragSource;
     private DragGestureListener mDGListener;
     private DragSourceListener mDSListener;
     private int mDragAction = DnDConstants.ACTION_COPY;
-
+    
     public static boolean mDND = false;
     /** is not being draggedOver*/
     public static final int NOTDRAG = 0;
@@ -3308,7 +3366,7 @@ public class ControlledSurface
     public static final int CANDROP = 1;
     /** is being draggedOver but can't drop data*/
     public static final int CANTDROP = 2;
-
+    
     private static final DataFlavor FLAVOUR =
         new DataFlavor(IdentifierWithKind.class, "IdentifierWithKind");
 }

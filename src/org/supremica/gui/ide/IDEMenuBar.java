@@ -10,10 +10,12 @@ import java.awt.event.ActionEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.event.MenuEvent;
 import java.util.*;
-
+import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
+import net.sourceforge.waters.subject.module.ModuleSubject;
 import org.supremica.automata.templates.TemplateItem;
 import org.supremica.automata.templates.TemplateGroup;
 import org.supremica.gui.ExampleTemplates;
+import java.io.IOException;
 
 public class IDEMenuBar
     extends JMenuBar
@@ -36,7 +38,23 @@ public class IDEMenuBar
 
         public void actionPerformed(ActionEvent e)
         {
-            ((org.supremica.gui.ide.actions.ExamplesStaticAction)ide.getActions().examplesStaticAction).doAction(item);
+            ModuleSubject module;
+            try
+            {
+                // The documentmanager does the loading, by extension
+                module = (ModuleSubject) ide.getIDE().getDocumentManager().load(TemplateItem.class.getResource(item.getPath()));
+            }
+            catch (IOException ex)
+            {
+                ide.error("Exception loading " + item.getPath() + ".", ex);
+                return;
+            }
+            catch (WatersUnmarshalException ex)
+            {
+                ide.error("Exception loading " + item.getPath() + ".", ex);
+                return;
+            }
+            ide.getIDE().installContainer(module);
         }
     }
 

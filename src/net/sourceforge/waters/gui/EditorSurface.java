@@ -4,9 +4,8 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.73 2007-01-16 22:03:32 flordal Exp $
+//# $Id: EditorSurface.java,v 1.74 2007-01-29 16:04:25 flordal Exp $
 //###########################################################################
-
 
 package net.sourceforge.waters.gui;
 
@@ -60,9 +59,7 @@ public class EditorSurface
      * Increase bounds for label & guardAction panels.
      */
     public static final int TEXTSHADOWMARGIN = 2;
-    protected boolean showGrid = true;
     protected EditorWindowInterface root;
-    protected int gridSize = 16;
     protected int dragStartX;
     protected int dragStartY;
     protected int dragNowX;
@@ -78,9 +75,9 @@ public class EditorSurface
     {
         /** Is not being draggedOver. */
         NOTDRAG,
-        /** Is being draggedOver and can drop data. */
+        /** Is being draggedOver and can drop held object. */
         CANDROP,
-        /** Is being draggedOver but can't drop data. */
+        /** Is being draggedOver but can't drop held object. */
         CANTDROP;
     }
     
@@ -136,29 +133,7 @@ public class EditorSurface
     {
         return getGraph();
     }
-    
-    public int getGridSize()
-    {
-       // return gridSize;
-        return Config.GUI_EDITOR_GRID_SIZE.get();
-    }
-
-    public void setGridSize(int g)
-    {
-        gridSize = g;
-    }
-    
-    public boolean getShowGrid()
-    {
-        //return showGrid;
-        return Config.GUI_EDITOR_SHOW_GRID.get();
-    }
-    
-    public void setShowGrid(boolean s)
-    {
-        showGrid = s;
-    }
-    
+        
     protected void paintGrid(Graphics g)
     {
         g.setColor(EditorColor.BACKGROUNDCOLOR);
@@ -166,17 +141,17 @@ public class EditorSurface
         g.setColor(EditorColor.GRIDCOLOR);
         
         // Draw grid iff showGrid is true
-        if (getShowGrid())
+        if (Config.GUI_EDITOR_SHOW_GRID.get())
         {
             int x = -(int)getLocation().getX();
             int y = -(int)getLocation().getY();
             
-            for (int i = 0; i < getWidth(); i += getGridSize())
+            for (int i = 0; i < getWidth(); i += Config.GUI_EDITOR_GRID_SIZE.get())
             {
                 g.drawLine(i, y, i, getHeight());
             }
             
-            for (int i = 0; i < getHeight(); i += getGridSize())
+            for (int i = 0; i < getHeight(); i += Config.GUI_EDITOR_GRID_SIZE.get())
             {
                 g.drawLine(x, i, getWidth(), i);
             }
@@ -428,7 +403,7 @@ public class EditorSurface
                 }
                  */
         
-        //setPreferredSize(new Dimension(width + getGridSize() * 10, height + getGridSize() * 10));
+        //setPreferredSize(new Dimension(width + Config.GUI_EDITOR_GRID_SIZE.get() * 10, height + Config.GUI_EDITOR_GRID_SIZE.get() * 10));
     }
     
     /**

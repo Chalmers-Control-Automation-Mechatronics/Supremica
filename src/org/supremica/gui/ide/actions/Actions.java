@@ -23,7 +23,7 @@ public class Actions
     public IDEAction editorPrintAction = new EditorPrintAction(allActions);
     public IDEAction editorSavePDFAction = new EditorSavePDFAction(allActions);
     public IDEAction editorSavePostscriptAction = new EditorSavePostscriptAction(allActions);
-	public IDEAction editorSaveEncapsulatedPostscriptAction = new EditorSaveEncapsulatedPostscriptAction(allActions);
+    public IDEAction editorSaveEncapsulatedPostscriptAction = new EditorSaveEncapsulatedPostscriptAction(allActions);
 
     // Editor Actions
     public IDEAction editorCopyAction = new EditorCopyAction(allActions);
@@ -78,7 +78,6 @@ public class Actions
 
     // Examples Actions
     public IDEAction toolsTestCasesAction = new ToolsTestCasesAction(allActions);
-    public IDEAction examplesStaticAction = new ExamplesStaticAction(allActions);
 
     // Help Actions
     public IDEAction helpWebAction = new HelpWebAction(allActions);

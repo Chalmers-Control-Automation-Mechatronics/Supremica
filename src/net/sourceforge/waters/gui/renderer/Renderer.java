@@ -23,15 +23,18 @@ public class Renderer
         PriorityQueue<ShapeToRender> queue = new PriorityQueue<ShapeToRender>();
         try
         {
-            if (graph.getBlockedEvents() != null) {
-              queue.offer(new ShapeToRender(producer.getShape(graph),
-                                            render.getRenderingInformation(graph.getBlockedEvents())));
-              for (Proxy p : graph.getBlockedEvents().getEventList())
-              {
-                  queue.offer(new ShapeToRender(producer.getShape(p),
-                      render.getRenderingInformation(p)));
-              }
+            // Blocked events
+            if (graph.getBlockedEvents() != null)
+            {
+                queue.offer(new ShapeToRender(producer.getShape(graph),
+                    render.getRenderingInformation(graph.getBlockedEvents())));
+                for (Proxy p : graph.getBlockedEvents().getEventList())
+                {
+                    queue.offer(new ShapeToRender(producer.getShape(p),
+                        render.getRenderingInformation(p)));
+                }
             }
+            // Nodes
             for (NodeProxy proxy : graph.getNodes())
             {
                 queue.offer(new ShapeToRender(producer.getShape(proxy),
@@ -43,7 +46,7 @@ public class Renderer
                         .getLabelGeometry())));
                 }
             }
-            
+            // Edges
             for (EdgeProxy edge : graph.getEdges())
             {
                 queue.offer(new ShapeToRender(producer.getShape(edge),
@@ -94,7 +97,7 @@ public class Renderer
     }
     
     /**
-     * just a wrapper class to aid with setting up priority Queue
+     * Just a wrapper class to aid with setting up priority Queue
      */
     private class ShapeToRender
         implements Comparable<ShapeToRender>

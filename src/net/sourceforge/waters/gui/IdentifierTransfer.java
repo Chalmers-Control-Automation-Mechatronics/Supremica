@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   IdentifierTransfer
 //###########################################################################
-//# $Id: IdentifierTransfer.java,v 1.3 2006-12-11 02:40:44 siw4 Exp $
+//# $Id: IdentifierTransfer.java,v 1.4 2007-01-29 16:04:25 flordal Exp $
 //###########################################################################
 
 
@@ -26,7 +26,7 @@ public class IdentifierTransfer implements Transferable
   //# Constructors
   /**
    * Creates a new transferable object containing the specified identifier.
-   * @param ident  The identifier being transferred.
+   * @param idents  The identifier being transferred.
    * @param kind   The associated event kind.
    */
   public IdentifierTransfer(final Collection<IdentifierSubject> idents,

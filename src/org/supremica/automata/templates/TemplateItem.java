@@ -58,18 +58,16 @@ public class TemplateItem
     private String name;
     private String shortDescription;
     private String path;
-    private TemplateItemType itemType;
     
-    public TemplateItem(String name, String path, TemplateItemType itemType)
+    public TemplateItem(String name, String path)
     {
-        this(name, null, path, itemType);
+        this(name, null, path);
     }
 
-    public TemplateItem(String name, String shortDescription, String path, TemplateItemType itemType)
+    public TemplateItem(String name, String shortDescription, String path)
     {
         this.name = name;
         this.path = path;
-        this.itemType = itemType;
     }
 
     public String getName()
@@ -86,11 +84,6 @@ public class TemplateItem
     public String getPath()
     {
         return path;
-    }
-    
-    public TemplateItemType getItemType()
-    {
-        return itemType;
     }
     
     public Project createInstance(ProjectFactory theFactory)
@@ -114,7 +107,4 @@ public class TemplateItem
             throw ex;
         }
     }
-    
-    
-    
 }

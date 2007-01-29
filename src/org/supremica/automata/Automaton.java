@@ -2457,6 +2457,11 @@ public class Automaton
 
     public Set<EventProxy> getEvents()
     {
-        return getAlphabet().getWatersEventsWithPropositions();
+        Set <EventProxy> currSet = getAlphabet().getWatersEventsWithPropositions();
+        if (true || hasAcceptingState()) // Always add? If "accepting" is not in the alphabet, all states should be marked!
+            currSet.add(State.acceptingProposition);
+        if (nbrOfForbiddenStates() > 0)
+            currSet.add(State.forbiddenProposition);
+        return currSet;
     }
 }
