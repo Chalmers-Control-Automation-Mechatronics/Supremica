@@ -1,0 +1,1259 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="" major="0" minor="9">
+<Automaton name="Safety spec O33 O54nst2" type="Specification">
+	<Events>
+		<Event id="0" label="finO33"/>
+		<Event id="1" label="stO54"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Safety spec O33 O79nst2" type="Specification">
+	<Events>
+		<Event id="0" label="finO33"/>
+		<Event id="1" label="stO79"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Safety spec O35 O54ong3" type="Specification">
+	<Events>
+		<Event id="0" label="finO35"/>
+		<Event id="1" label="finO54"/>
+		<Event id="2" label="stO54"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Safety spec O35 O79ong3" type="Specification">
+	<Events>
+		<Event id="0" label="finO35"/>
+		<Event id="1" label="finO79"/>
+		<Event id="2" label="stO79"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Safety spec O54 ext1" type="Specification">
+	<Events>
+		<Event id="0" label="finO33"/>
+		<Event id="1" label="finO54"/>
+		<Event id="2" label="stO31"/>
+		<Event id="3" label="stO32"/>
+		<Event id="4" label="stO33"/>
+		<Event id="5" label="stO35"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="0" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Safety spec O54 ext1 waitSafe" type="Specification">
+	<Events>
+		<Event id="0" label="finO33"/>
+		<Event id="1" label="finO54"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Safety spec O56 ext1" type="Specification">
+	<Events>
+		<Event id="0" label="finO35"/>
+		<Event id="1" label="finO56"/>
+		<Event id="2" label="stO33"/>
+		<Event id="3" label="stO35"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Safety spec O56 ext1 waitSafe" type="Specification">
+	<Events>
+		<Event id="0" label="finO31"/>
+		<Event id="1" label="finO32"/>
+		<Event id="2" label="finO35"/>
+		<Event id="3" label="finO56"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="0"/>
+		<Transition source="1" dest="1" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Safety spec O73 ext1" type="Specification">
+	<Events>
+		<Event id="0" label="finO35"/>
+		<Event id="1" label="finO73"/>
+		<Event id="2" label="stO32"/>
+		<Event id="3" label="stO33"/>
+		<Event id="4" label="stO35"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Safety spec O73 ext1 waitSafe" type="Specification">
+	<Events>
+		<Event id="0" label="finO31"/>
+		<Event id="1" label="finO35"/>
+		<Event id="2" label="finO73"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Safety spec O79 ext1" type="Specification">
+	<Events>
+		<Event id="0" label="finO33"/>
+		<Event id="1" label="finO79"/>
+		<Event id="2" label="stO31"/>
+		<Event id="3" label="stO32"/>
+		<Event id="4" label="stO33"/>
+		<Event id="5" label="stO35"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="0" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Safety spec O79 ext1 waitSafe" type="Specification">
+	<Events>
+		<Event id="0" label="finO33"/>
+		<Event id="1" label="finO79"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Safety spec O81 ext1" type="Specification">
+	<Events>
+		<Event id="0" label="finO35"/>
+		<Event id="1" label="finO81"/>
+		<Event id="2" label="stO33"/>
+		<Event id="3" label="stO35"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Safety spec O81 ext1 waitSafe" type="Specification">
+	<Events>
+		<Event id="0" label="finO31"/>
+		<Event id="1" label="finO32"/>
+		<Event id="2" label="finO35"/>
+		<Event id="3" label="finO81"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="1" event="0"/>
+		<Transition source="1" dest="1" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O21" type="Plant">
+	<Events>
+		<Event id="0" label="finO21"/>
+		<Event id="1" label="stO21"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O23" type="Plant">
+	<Events>
+		<Event id="0" label="finO23"/>
+		<Event id="1" label="stO23"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O31" type="Plant">
+	<Events>
+		<Event id="0" label="finO31"/>
+		<Event id="1" label="stO31"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O32" type="Plant">
+	<Events>
+		<Event id="0" label="finO32"/>
+		<Event id="1" label="stO32"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O33" type="Plant">
+	<Events>
+		<Event id="0" label="finO33"/>
+		<Event id="1" label="stO33"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O35" type="Plant">
+	<Events>
+		<Event id="0" label="finO35"/>
+		<Event id="1" label="stO35"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O52" type="Plant">
+	<Events>
+		<Event id="0" label="finO52"/>
+		<Event id="1" label="stO52"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O54" type="Plant">
+	<Events>
+		<Event id="0" label="finO54"/>
+		<Event id="1" label="stO54"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O56" type="Plant">
+	<Events>
+		<Event id="0" label="finO56"/>
+		<Event id="1" label="stO56"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O58" type="Plant">
+	<Events>
+		<Event id="0" label="finO58"/>
+		<Event id="1" label="stO58"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O71" type="Plant">
+	<Events>
+		<Event id="0" label="finO71"/>
+		<Event id="1" label="stO71"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O72" type="Plant">
+	<Events>
+		<Event id="0" label="finO72"/>
+		<Event id="1" label="stO72"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O73" type="Plant">
+	<Events>
+		<Event id="0" label="finO73"/>
+		<Event id="1" label="stO73"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O74" type="Plant">
+	<Events>
+		<Event id="0" label="finO74"/>
+		<Event id="1" label="stO74"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O75" type="Plant">
+	<Events>
+		<Event id="0" label="finO75"/>
+		<Event id="1" label="stO75"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O77" type="Plant">
+	<Events>
+		<Event id="0" label="finO77"/>
+		<Event id="1" label="stO77"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O79" type="Plant">
+	<Events>
+		<Event id="0" label="finO79"/>
+		<Event id="1" label="stO79"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O81" type="Plant">
+	<Events>
+		<Event id="0" label="finO81"/>
+		<Event id="1" label="stO81"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O83" type="Plant">
+	<Events>
+		<Event id="0" label="finO83"/>
+		<Event id="1" label="stO83"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O85" type="Plant">
+	<Events>
+		<Event id="0" label="finO85"/>
+		<Event id="1" label="stO85"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O87" type="Plant">
+	<Events>
+		<Event id="0" label="finO87"/>
+		<Event id="1" label="stO87"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O111" type="Plant">
+	<Events>
+		<Event id="0" label="finO111"/>
+		<Event id="1" label="stO111"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O112" type="Plant">
+	<Events>
+		<Event id="0" label="finO112"/>
+		<Event id="1" label="stO112"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="O113" type="Plant">
+	<Events>
+		<Event id="0" label="finO113"/>
+		<Event id="1" label="stO113"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="CNV415" type="Specification">
+	<Events>
+		<Event id="0" label="finO21"/>
+		<Event id="1" label="finO23"/>
+		<Event id="2" label="stO21"/>
+		<Event id="3" label="stO23"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="FIX151" type="Specification">
+	<Events>
+		<Event id="0" label="finO31"/>
+		<Event id="1" label="finO32"/>
+		<Event id="2" label="finO33"/>
+		<Event id="3" label="finO35"/>
+		<Event id="4" label="stO31"/>
+		<Event id="5" label="stO32"/>
+		<Event id="6" label="stO33"/>
+		<Event id="7" label="stO35"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="6"/>
+		<Transition source="0" dest="1" event="7"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="0" dest="1" event="5"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="R3323" type="Specification">
+	<Events>
+		<Event id="0" label="finO52"/>
+		<Event id="1" label="finO54"/>
+		<Event id="2" label="finO56"/>
+		<Event id="3" label="finO58"/>
+		<Event id="4" label="stO52"/>
+		<Event id="5" label="stO54"/>
+		<Event id="6" label="stO56"/>
+		<Event id="7" label="stO58"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="6"/>
+		<Transition source="0" dest="1" event="5"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="0" dest="1" event="7"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="R3325" type="Specification">
+	<Events>
+		<Event id="0" label="finO71"/>
+		<Event id="1" label="finO72"/>
+		<Event id="2" label="finO73"/>
+		<Event id="3" label="finO74"/>
+		<Event id="4" label="finO75"/>
+		<Event id="5" label="finO77"/>
+		<Event id="6" label="finO79"/>
+		<Event id="7" label="finO81"/>
+		<Event id="8" label="finO83"/>
+		<Event id="9" label="finO85"/>
+		<Event id="10" label="finO87"/>
+		<Event id="11" label="stO71"/>
+		<Event id="12" label="stO72"/>
+		<Event id="13" label="stO73"/>
+		<Event id="14" label="stO74"/>
+		<Event id="15" label="stO75"/>
+		<Event id="16" label="stO77"/>
+		<Event id="17" label="stO79"/>
+		<Event id="18" label="stO81"/>
+		<Event id="19" label="stO83"/>
+		<Event id="20" label="stO85"/>
+		<Event id="21" label="stO87"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="13"/>
+		<Transition source="0" dest="1" event="15"/>
+		<Transition source="0" dest="1" event="12"/>
+		<Transition source="0" dest="1" event="16"/>
+		<Transition source="0" dest="1" event="17"/>
+		<Transition source="0" dest="1" event="18"/>
+		<Transition source="0" dest="1" event="21"/>
+		<Transition source="0" dest="1" event="14"/>
+		<Transition source="0" dest="1" event="11"/>
+		<Transition source="0" dest="1" event="19"/>
+		<Transition source="0" dest="1" event="20"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="1" dest="0" event="5"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="10"/>
+		<Transition source="1" dest="0" event="7"/>
+		<Transition source="1" dest="0" event="6"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="0" event="8"/>
+		<Transition source="1" dest="0" event="9"/>
+	</Transitions>
+</Automaton>
+<Automaton name="TT153" type="Specification">
+	<Events>
+		<Event id="0" label="finO111"/>
+		<Event id="1" label="finO112"/>
+		<Event id="2" label="finO113"/>
+		<Event id="3" label="stO111"/>
+		<Event id="4" label="stO112"/>
+		<Event id="5" label="stO113"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="5"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="PredO35O23" type="Specification">
+	<Events>
+		<Event id="0" label="finO35"/>
+		<Event id="1" label="stO23"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="PredO56O23" type="Specification">
+	<Events>
+		<Event id="0" label="finO56"/>
+		<Event id="1" label="stO23"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="PredO81O23" type="Specification">
+	<Events>
+		<Event id="0" label="finO81"/>
+		<Event id="1" label="stO23"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="PredO73O32" type="Specification">
+	<Events>
+		<Event id="0" label="finO73"/>
+		<Event id="1" label="stO32"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="PredO21O33" type="Specification">
+	<Events>
+		<Event id="0" label="finO21"/>
+		<Event id="1" label="stO33"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="PredO54O35" type="Specification">
+	<Events>
+		<Event id="0" label="finO54"/>
+		<Event id="1" label="stO35"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="PredO79O35" type="Specification">
+	<Events>
+		<Event id="0" label="finO79"/>
+		<Event id="1" label="stO35"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="PredO21O52" type="Specification">
+	<Events>
+		<Event id="0" label="finO21"/>
+		<Event id="1" label="stO52"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="PredO33O54" type="Specification">
+	<Events>
+		<Event id="0" label="finO33"/>
+		<Event id="1" label="stO54"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="PredO35O56" type="Specification">
+	<Events>
+		<Event id="0" label="finO35"/>
+		<Event id="1" label="stO56"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="PredO111O72" type="Specification">
+	<Events>
+		<Event id="0" label="finO111"/>
+		<Event id="1" label="stO72"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="PredO31O73" type="Specification">
+	<Events>
+		<Event id="0" label="finO31"/>
+		<Event id="1" label="stO73"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="PredO32O74" type="Specification">
+	<Events>
+		<Event id="0" label="finO32"/>
+		<Event id="1" label="stO74"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="PredO21O77" type="Specification">
+	<Events>
+		<Event id="0" label="finO21"/>
+		<Event id="1" label="stO77"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="PredO33O79" type="Specification">
+	<Events>
+		<Event id="0" label="finO33"/>
+		<Event id="1" label="stO79"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="PredO35O81" type="Specification">
+	<Events>
+		<Event id="0" label="finO35"/>
+		<Event id="1" label="stO81"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="PredO72O112" type="Specification">
+	<Events>
+		<Event id="0" label="finO72"/>
+		<Event id="1" label="stO112"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="SeqR3323" type="Specification">
+	<Events>
+		<Event id="0" label="finO52"/>
+		<Event id="1" label="finO54"/>
+		<Event id="2" label="finO56"/>
+		<Event id="3" label="finO58"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3"/>
+		<State id="4" name="q4" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="2" dest="3" event="2"/>
+		<Transition source="3" dest="4" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="SeqR3325" type="Specification">
+	<Events>
+		<Event id="0" label="finO71"/>
+		<Event id="1" label="finO72"/>
+		<Event id="2" label="finO73"/>
+		<Event id="3" label="finO74"/>
+		<Event id="4" label="finO75"/>
+		<Event id="5" label="finO77"/>
+		<Event id="6" label="finO79"/>
+		<Event id="7" label="finO81"/>
+		<Event id="8" label="finO83"/>
+		<Event id="9" label="finO85"/>
+		<Event id="10" label="finO87"/>
+	</Events>
+	<States>
+		<State id="0" name="q0"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q10" initial="true"/>
+		<State id="3" name="q11"/>
+		<State id="4" name="q12"/>
+		<State id="5" name="q13"/>
+		<State id="6" name="q2"/>
+		<State id="7" name="q3"/>
+		<State id="8" name="q4"/>
+		<State id="9" name="q5"/>
+		<State id="10" name="q6"/>
+		<State id="11" name="q7" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="3" event="2"/>
+		<Transition source="2" dest="0" event="0"/>
+		<Transition source="3" dest="6" event="3"/>
+		<Transition source="4" dest="5" event="8"/>
+		<Transition source="5" dest="10" event="9"/>
+		<Transition source="6" dest="7" event="4"/>
+		<Transition source="7" dest="8" event="5"/>
+		<Transition source="8" dest="9" event="6"/>
+		<Transition source="9" dest="4" event="7"/>
+		<Transition source="10" dest="11" event="10"/>
+	</Transitions>
+</Automaton>
+<Automaton name="SeqCNV415" type="Specification">
+	<Events>
+		<Event id="0" label="finO21"/>
+		<Event id="1" label="stO23"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q4" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="SeqFIX151" type="Specification">
+	<Events>
+		<Event id="0" label="finO31"/>
+		<Event id="1" label="finO32"/>
+		<Event id="2" label="finO33"/>
+		<Event id="3" label="finO35"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3"/>
+		<State id="4" name="q4" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="2" dest="3" event="2"/>
+		<Transition source="3" dest="4" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="SeqTT153" type="Specification">
+	<Events>
+		<Event id="0" label="finO111"/>
+		<Event id="1" label="finO112"/>
+		<Event id="2" label="finO113"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+		<State id="3" name="q3" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="2" dest="3" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Z1" type="Specification">
+	<Events>
+		<Event id="0" label="finO35"/>
+		<Event id="1" label="finO56"/>
+		<Event id="2" label="stO33"/>
+		<Event id="3" label="stO35"/>
+		<Event id="4" label="stO56"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="2" event="4"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="2" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Z11" type="Specification">
+	<Events>
+		<Event id="0" label="finO113"/>
+		<Event id="1" label="finO72"/>
+		<Event id="2" label="stO113"/>
+		<Event id="3" label="stO72"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="2" event="2"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="2" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Z3" type="Specification">
+	<Events>
+		<Event id="0" label="finO35"/>
+		<Event id="1" label="finO81"/>
+		<Event id="2" label="stO33"/>
+		<Event id="3" label="stO35"/>
+		<Event id="4" label="stO81"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="2" event="4"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="2" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Z5" type="Specification">
+	<Events>
+		<Event id="0" label="finO33"/>
+		<Event id="1" label="finO54"/>
+		<Event id="2" label="finO56"/>
+		<Event id="3" label="stO33"/>
+		<Event id="4" label="stO54"/>
+		<Event id="5" label="stO56"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="2" event="5"/>
+		<Transition source="0" dest="2" event="4"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="2" dest="0" event="2"/>
+		<Transition source="2" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Z7" type="Specification">
+	<Events>
+		<Event id="0" label="finO33"/>
+		<Event id="1" label="finO79"/>
+		<Event id="2" label="finO81"/>
+		<Event id="3" label="stO33"/>
+		<Event id="4" label="stO79"/>
+		<Event id="5" label="stO81"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="0" dest="2" event="3"/>
+		<Transition source="0" dest="1" event="5"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="2" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+</Automata>

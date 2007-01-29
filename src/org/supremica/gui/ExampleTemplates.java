@@ -294,7 +294,7 @@ public class ExampleTemplates
         thisGroup.addItem(new TemplateItem("Train Testbed", prefix + "tbed_ctct.xml", TemplateItemType.XML));
         thisGroup.addItem(new TemplateItem("Train Testbed (variant)", prefix + "tbed_valid.xml", TemplateItemType.XML));
         thisGroup.addItem(new TemplateItem("Welding Robots", prefix + "weldingRobots.xml", TemplateItemType.XML));
-        thisGroup.addItem(new TemplateItem("Volvo cell", prefix + "volvo.xml", TemplateItemType.XML));
+        thisGroup.addItem(new TemplateItem("Volvo cell", prefix + "volvo_no_sup.xml", TemplateItemType.XML));
     }
 
     private void initializeModuleExamples()
