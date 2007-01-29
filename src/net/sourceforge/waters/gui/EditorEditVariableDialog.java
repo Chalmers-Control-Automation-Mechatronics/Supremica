@@ -10,8 +10,10 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.module.VariableProxy;
 import net.sourceforge.waters.subject.module.BooleanConstantSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
@@ -119,10 +121,10 @@ implements ActionListener{
 		} else {
 			setTitle("Edit variable");
 			//modify dialog according to variable type
-			if(variable.getType() instanceof BinaryExpressionProxy) {
+			if(variable.isInteger()) {
 				//integer variable
 				typeSelector.setSelectedItem("integer");
-			} else if(variable.getType() instanceof SimpleIdentifierProxy) {
+			} else if(variable.isBoolean()) {
 				//boolean variable
 				typeSelector.setSelectedItem("boolean");
 			} else {
@@ -219,20 +221,12 @@ implements ActionListener{
 		layout.setConstraints(booleanMarked, con);
 		booleanPanel.add(booleanMarked);
 
-		if(mVariable != null && mVariable.getType() instanceof SimpleIdentifierProxy) {
+		if(mVariable != null && mVariable.isBoolean()) {
 			//set initial value
-			if(((BooleanConstantSubject) mVariable.getInitialValue()).isValue()) {
-				booleanInitial.setSelectedItem("true");
-			} else {
-				booleanInitial.setSelectedItem("false");
-			}
+			booleanInitial.setSelectedItem(mVariable.getInitialBooleanValue().toString());
 			//set marked value
 			if(mVariable.getMarkedValue() != null) {
-				if(((BooleanConstantSubject) mVariable.getMarkedValue()).isValue()) {
-					booleanMarked.setSelectedItem("true");
-				} else {
-					booleanMarked.setSelectedItem("false");
-				}
+				booleanMarked.setSelectedItem(mVariable.getMarkedBooleanValue().toString());
 			} else {
 				booleanMarked.setSelectedItem("none");
 			}
@@ -305,23 +299,18 @@ implements ActionListener{
 		layout.setConstraints(integerMarked, con);
 		integerPanel.add(integerMarked);
 
-		if(mVariable != null && mVariable.getType() instanceof BinaryExpressionProxy) {
+		if(mVariable != null && mVariable.isInteger()) {
 			//set range values
 			BinaryExpressionProxy range = (BinaryExpressionProxy) mVariable.getType();
-			rangeLower.setText(Integer.toString(
-					((IntConstantProxy) range.getLeft()).getValue()));
-			rangeUpper.setText(Integer.toString(
-					((IntConstantProxy) range.getRight()).getValue()));
+			rangeLower.setText(Integer.toString(mVariable.getLowerBound()));
+			rangeUpper.setText(Integer.toString(mVariable.getUpperBound()));
 
 			//set initial value
-			integerInitial.setText(Integer.toString(
-					((IntConstantProxy) mVariable.getInitialValue()).getValue()));
+			integerInitial.setText(Integer.toString(mVariable.getInitialIntegerValue()));
 
 			//set marked value
 			if(mVariable.getMarkedValue() != null) {
-				integerMarked.setText(Integer.toString(
-						((IntConstantProxy) mVariable.getMarkedValue()).getValue()));
-
+				integerMarked.setText(mVariable.getMarkedIntegerValue().toString());
 			}
 		} else {
 			//enter default values
@@ -352,7 +341,21 @@ implements ActionListener{
 				return;
 			}
 
-			int intLower=0, intUpper=0, intInitial=0, intMarked=0;
+			// Check that a variable with the given name does not already exists
+	    	if (mVariable == null || !mVariable.getName().equals(name.getText())) {
+	    		for (VariableProxy currVariable : mComponent.getVariables()) {
+					if (currVariable.getName().equalsIgnoreCase(name.getText())) {
+						JOptionPane.showMessageDialog(this,
+								"Variable " + name.getText() + " already exists",
+								"Input error",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+				}
+		    }
+	    	
+			int intLower=0, intUpper=0, intInitial=0;
+			Integer intMarked = null;
 			if(typeSelector.getSelectedItem().equals("integer")) {
 				try {
 					intLower = new Integer(rangeLower.getText());
@@ -401,60 +404,27 @@ implements ActionListener{
 							JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-			}
-			SimpleExpressionSubject type = typeSelector.getSelectedItem().equals("integer")
-			? mFactory.createBinaryExpressionProxy(
-					CompilerOperatorTable.getInstance().getBinaryOperator(".."),
-					mFactory.createIntConstantProxy(intLower),
-					mFactory.createIntConstantProxy(intUpper))
-					: mFactory.createSimpleIdentifierProxy("boolean");
-
-		    SimpleExpressionSubject initial, marked;
-		    if(type instanceof BinaryExpressionProxy) {
-		    	initial = mFactory.createIntConstantProxy(intInitial);
-		    	if(!integerMarked.getText().trim().equals("")) {
-		    		marked = mFactory.createIntConstantProxy(intMarked);
-		    	} else {
-		    		marked = null;
-		    	}
-		    } else if(type instanceof SimpleIdentifierSubject) {
-		    	initial = mFactory.createBooleanConstantProxy(booleanInitial.getSelectedItem().equals("true"));
-		    	if(!booleanMarked.getSelectedItem().equals("none")) {
-		    		marked = mFactory.createBooleanConstantProxy(booleanMarked.getSelectedItem().equals("true"));
-		    	} else {
-		    		marked = null;
-		    	}
-		    } else {
-		    	System.err.println("EditorEditVariableDialog: Unsupported variable type");
-		    	return;
-		    }
-
-		    if(mVariable == null) {
-		    	//create new variable
-		    	// Check that a variable with the given name does not already exists
-		    	for (VariableSubject currVariable : mComponent.getVariablesModifiable())
-		    	{
-					if (currVariable.getName().equalsIgnoreCase(name.getText()))
-					{
-						JOptionPane.showMessageDialog(this,
-								"Variable " + name.getText() + " already exists",
-								"Input error",
-								JOptionPane.ERROR_MESSAGE);
-						return;
-					}
+				if (mVariable == null) {
+					mVariable = new VariableSubject(name.getText(), intLower, intUpper, intInitial, intMarked);
+				} else {
+					mVariable.setAsInteger(intLower, intUpper, intInitial, intMarked);
 				}
-
-		    	mVariable = new VariableSubject(name.getText(), type, initial, marked);
+			} else { //if boolean
+				String markedValueString = booleanMarked.getSelectedItem().toString();
+				if (mVariable == null) {
+					mVariable = new VariableSubject(name.getText(), booleanInitial.getSelectedItem().equals("true"), markedValueString.equals("none") ? null : markedValueString.equals("true"));
+				} else {
+					mVariable.setAsBoolean(booleanInitial.getSelectedItem().equals("true"), markedValueString.equals("none") ? null : markedValueString.equals("true"));
+				}
+			}
+			mVariable.setName(name.getText());
+			if (!mComponent.getVariables().contains(mVariable)) {
 		    	mComponent.getVariablesModifiable().add(mVariable);
 		    	mTree.addVariable(mVariable);
 		    } else {
-		    	//edit existing variable
-		    	mVariable.setName(name.getText());
-		    	mVariable.setType(type);
-		    	mVariable.setInitialValue(initial);
-		    	mVariable.setMarkedValue(marked);
 		    	mTree.updateSelectedNode();
 		    }
+		    
 		    dispose();
 		}
 		if(e.getActionCommand().equals("Cancel")) {
