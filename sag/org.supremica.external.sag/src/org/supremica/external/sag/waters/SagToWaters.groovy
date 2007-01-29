@@ -94,19 +94,20 @@ class SagToWaters {
 	
 	static ModuleProxy generateExtendedAutomata(sagProject) {
 		def watersModule = new ModuleSubject(sagProject.name, null)
-		//Create one component containing one variable for every sensor
 		
 		def componentForSensorVariables = newComponent(watersModule, "sensors", new GraphSubject())
+		componentForSensorVariables.graph.nodesModifiable << new SimpleNodeSubject('dummy', null, true, null, null, null)
 		def sensorComponents = sagProject.sensor.inject([:]){components, sensor -> //and create a waters component for each
 			components[sensor] = SagToWaters.newBooleanComponent(watersModule, sensor.name+"_automata")
-			componentForSensorVariables.variablesModifiable << VariableSubject.createIntegerVariable(sensor.name, 0, 1, 0, null);
+			componentForSensorVariables.variablesModifiable << new VariableSubject(sensor.name, 0, 1, 0, null);
 			components
 		}
 		def componentForZoneVariables = newComponent(watersModule, "zones", new GraphSubject())
+		componentForZoneVariables.graph.nodesModifiable << new SimpleNodeSubject('dummy', null, true, null, null, null)
 		int i = 0
 		def boundedZoneVariables = sagProject.graph.collect{graph -> i = 0; graph.zone.findAll{zone -> zone instanceof BoundedZone}}.flatten().
 			                                         inject([:]){variables, zone ->
-			variables[zone] = VariableSubject.createIntegerVariable(SagToWaters.createZoneName(zone.graph, i), 0, zone.capacity, 0, null)
+			variables[zone] = new VariableSubject(SagToWaters.createZoneName(zone.graph, i), 0, zone.capacity, 0, null)
 			componentForZoneVariables.variablesModifiable << variables[zone]
 			++i
 			variables
