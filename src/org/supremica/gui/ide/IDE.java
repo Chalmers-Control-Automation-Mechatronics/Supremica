@@ -82,7 +82,7 @@ public class IDE
     private JTabbedPane tabPanel;
     private JSplitPane splitPanelVertical;
     
-    private final String ideName = "Supremica";
+    private static final String IDENAME = "Supremica";
     
     public IDE()
     throws JAXBException, SAXException
@@ -217,7 +217,7 @@ public class IDE
     
     public String getName()
     {
-        return ideName;
+        return IDENAME;
     }
     
     public ModuleSubject createNewModuleSubject()
@@ -470,7 +470,7 @@ public class IDE
     throws Exception
     {
         List<File> filesToOpen = ProcessCommandLineArguments.process(args); 
-
+        
         interfaceManager = InterfaceManager.getInstance();
         interfaceManager.initLookAndFeel();
 

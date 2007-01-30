@@ -55,161 +55,161 @@ import java.io.StringWriter;
 import java.io.PrintWriter;
 
 public final class SupremicaCategory
-	implements Logger
+    implements Logger
 {
-	private final Category category;
-
-	public SupremicaCategory(Category theCategory)
-	{
-		category = theCategory;
-	}
-
-	public void debug(Object message)
-	{
-		category.debug(message);
-	}
-
-	public void debug(Object message, Throwable t)
-	{
-		category.debug(message, t);
-	}
-
-	/**
-	 * Print the stack trace to the registered listeners.
-	 */
-	public void debug(StackTraceElement[] trace)
-	{
-		for (int i = 0; i < trace.length; ++i)
-		{
-			category.debug(trace[i].toString());
-		}
-	}
-
-	public void error(Object message)
-	{
-		category.error(message);
-	}
-
-	public void error(Object message, Throwable t)
-	{
-		category.error(message + "\n" + t.toString());
-		category.debug(getStackTraceAsString(t));
-	}
-
-	public void error(Throwable t)
-	{
-		category.error(t.toString());
-		category.debug(t.getStackTrace());
-	}
-
-	/**
-	 * Print the stack trace to the registered listeners.
-	 */
-	public void error(StackTraceElement[] trace)
-	{
-		for (int i = 0; i < trace.length; ++i)
-		{
-			category.error(trace[i].toString());
-		}
-	}
-
-	public void fatal(Object message)
-	{
-		category.fatal(message);
-	}
-
-	public void fatal(Object message, Throwable t)
-	{
-		category.fatal(message, t);
-	}
-
-	/**
-	 * Print the stack trace to the registered listeners.
-	 */
-	public void fatal(StackTraceElement[] trace)
-	{
-		for (int i = 0; i < trace.length; ++i)
-		{
-			category.fatal(trace[i].toString());
-		}
-	}
-
-	public void warn(Object message)
-	{
-		category.warn(message);
-	}
-
-	public void warn(Object message, Throwable t)
-	{
-		category.warn(message, t);
-	}
-
-	/**
-	 * Print the stack trace to the registered listeners.
-	 */
-	public void warn(StackTraceElement[] trace)
-	{
-		for (int i = 0; i < trace.length; ++i)
-		{
-			category.warn(trace[i].toString());
-		}
-	}
-
-	public void info(Object message)
-	{
-		category.info(message);
-	}
-
-	public void info(Object message, Throwable t)
-	{
-		category.info(message, t);
-	}
-
-	/**
-	 * Logs the message as an "info"-message only if Supremica is currently in "verbose mode".
-	 */
-	public void verbose(Object message)
-	{
-		if (Config.VERBOSE_MODE.isTrue())
-		{
-			info(message);
-		}
-	}
-
-	/**
-	 * Print the stack trace to the registered listeners.
-	 */
-	public void info(StackTraceElement[] trace)
-	{
-		for (int i = 0; i < trace.length; ++i)
-		{
-			category.info(trace[i].toString());
-		}
-	}
-
-	public boolean isDebugEnabled()
-	{
-		return category.isDebugEnabled();
-	}
-
-	public void setLogToConsole(boolean log)
-	{
-		if (log)
-		{
-			if (!LoggerFactory.hasConsoleAppender())
-			{
-				category.addAppender(LoggerFactory.getConsoleAppender());
-			}
-		}
-	}
-
-	private String getStackTraceAsString(Throwable t)
-	{
-		StringWriter stringWriter = new StringWriter();
-		PrintWriter printWriter = new PrintWriter(stringWriter);
-		t.printStackTrace(printWriter);
-		StringBuffer error = stringWriter.getBuffer();
-		return error.toString();
-	}
-
+    private final Category category;
+    
+    public SupremicaCategory(Category theCategory)
+    {
+        category = theCategory;
+    }
+    
+    public void debug(Object message)
+    {
+        category.debug(message);
+    }
+    
+    public void debug(Object message, Throwable t)
+    {
+        category.debug(message, t);
+    }
+    
+    /**
+     * Print the stack trace to the registered listeners.
+     */
+    public void debug(StackTraceElement[] trace)
+    {
+        for (int i = 0; i < trace.length; ++i)
+        {
+            category.debug(trace[i].toString());
+        }
+    }
+    
+    public void error(Object message)
+    {
+        category.error(message);
+    }
+    
+    public void error(Object message, Throwable t)
+    {
+        category.error(message + "\n" + t.toString());
+        category.debug(getStackTraceAsString(t));
+    }
+    
+    public void error(Throwable t)
+    {
+        category.error(t.toString());
+        category.debug(t.getStackTrace());
+    }
+    
+    /**
+     * Print the stack trace to the registered listeners.
+     */
+    public void error(StackTraceElement[] trace)
+    {
+        for (int i = 0; i < trace.length; ++i)
+        {
+            category.error(trace[i].toString());
+        }
+    }
+    
+    public void fatal(Object message)
+    {
+        category.fatal(message);
+    }
+    
+    public void fatal(Object message, Throwable t)
+    {
+        category.fatal(message, t);
+    }
+    
+    /**
+     * Print the stack trace to the registered listeners.
+     */
+    public void fatal(StackTraceElement[] trace)
+    {
+        for (int i = 0; i < trace.length; ++i)
+        {
+            category.fatal(trace[i].toString());
+        }
+    }
+    
+    public void warn(Object message)
+    {
+        category.warn(message);
+    }
+    
+    public void warn(Object message, Throwable t)
+    {
+        category.warn(message, t);
+    }
+    
+    /**
+     * Print the stack trace to the registered listeners.
+     */
+    public void warn(StackTraceElement[] trace)
+    {
+        for (int i = 0; i < trace.length; ++i)
+        {
+            category.warn(trace[i].toString());
+        }
+    }
+    
+    public void info(Object message)
+    {
+        category.info(message);
+    }
+    
+    public void info(Object message, Throwable t)
+    {
+        category.info(message, t);
+    }
+    
+    /**
+     * Logs the message as an "info"-message only if Supremica is currently in "verbose mode".
+     */
+    public void verbose(Object message)
+    {
+        if (Config.VERBOSE_MODE.isTrue())
+        {
+            info(message);
+        }
+    }
+    
+    /**
+     * Print the stack trace to the registered listeners.
+     */
+    public void info(StackTraceElement[] trace)
+    {
+        for (int i = 0; i < trace.length; ++i)
+        {
+            category.info(trace[i].toString());
+        }
+    }
+    
+    public boolean isDebugEnabled()
+    {
+        return category.isDebugEnabled();
+    }
+    
+    public void setLogToConsole(boolean log)
+    {
+        if (log)
+        {
+            if (!LoggerFactory.hasConsoleAppender())
+            {
+                category.addAppender(LoggerFactory.getConsoleAppender());
+            }
+        }
+    }
+    
+    private String getStackTraceAsString(Throwable t)
+    {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        t.printStackTrace(printWriter);
+        StringBuffer error = stringWriter.getBuffer();
+        return error.toString();
+    }
+    
 }

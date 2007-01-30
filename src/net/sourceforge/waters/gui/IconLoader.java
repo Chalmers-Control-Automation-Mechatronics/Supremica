@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   IconLoader
 //###########################################################################
-//# $Id: IconLoader.java,v 1.6 2006-11-30 01:58:05 robi Exp $
+//# $Id: IconLoader.java,v 1.7 2007-01-30 22:41:12 flordal Exp $
 //###########################################################################
 
 
@@ -14,8 +14,7 @@ import java.net.URL;
 import javax.swing.ImageIcon;
 
 class IconLoader
-{
-    
+{    
     //#########################################################################
     //# Static Class Methods
     private static final ImageIcon getIcon(final String name)
@@ -26,7 +25,6 @@ class IconLoader
         
         return new ImageIcon(resource);
     }
-    
     
     //#########################################################################
     //# Class Constants

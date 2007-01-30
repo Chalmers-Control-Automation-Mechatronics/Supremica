@@ -53,15 +53,16 @@ import org.supremica.properties.Config;
 
 public class Supremica
 {
-	static
-	{
-		Config.XML_RPC_ACTIVE.set(false);
-		Config.DOT_USE.set(true);
-	}
-
-	public static void main(String[] args)
-	{
-		org.supremica.util.ProcessCommandLineArguments.process(args);
-		SupremicaWithGui.startSupremica();
-	}
+    static
+    {
+        // WHAT IS THIS? PLEASE EXPLAIN.
+        Config.XML_RPC_ACTIVE.set(false);
+        Config.DOT_USE.set(true);
+    }
+    
+    public static void main(String[] args)
+    {
+        org.supremica.util.ProcessCommandLineArguments.process(args);
+        SupremicaWithGui.startSupremica();
+    }
 }

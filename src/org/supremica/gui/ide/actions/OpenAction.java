@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   OpenAction
 //###########################################################################
-//# $Id: OpenAction.java,v 1.19 2006-10-03 09:15:11 knut Exp $
+//# $Id: OpenAction.java,v 1.20 2007-01-30 22:41:12 flordal Exp $
 //###########################################################################
 
 
@@ -78,13 +78,11 @@ public class OpenAction
         final FileImporter importer = new WatersFileImporter(theFiles);
     }
 
-
     //#######################################################################
     //# Local Class WatersFileImporter
     private
         class WatersFileImporter extends FileImporter
     {
-
         //###################################################################
         //# Constructors
         private WatersFileImporter(JFileChooser chooser)

@@ -51,19 +51,24 @@ package org.supremica.util;
 
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.Version;
-
-import java.lang.Exception;
 import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
+import org.supremica.gui.ide.actions.IDEActionInterface;
 
+/**
+ * Class responsible for interpreting command line arguments given to Supremica.
+ */
 public class ProcessCommandLineArguments
 {
+    /**
+     * Processes an array of arguments. Returns a list of files to be opened on startup.
+     */
     public static List<File> process(String[] args)
     {
         boolean quit = false;
         List<File> filesToOpen = new LinkedList<File>();
-
+        
         for (int i = 0; i < args.length; i++)
         {
             if (args[i].equals("-h") || args[i].equals("-?") || args[i].equals("--help") || args[i].equals("--usage"))
@@ -78,16 +83,15 @@ public class ProcessCommandLineArguments
                     String fileName = args[i + 1];
                     i++;
                     File propFile = new File(fileName);
-
+                    
                     try
                     {
                         if (!propFile.exists())
                         {
-                            //System.err.println("Properties file not found: " + propFile.getAbsolutePath());
                             System.out.println("Creating property file: " + propFile.getAbsolutePath());
                             propFile.createNewFile();
                         }
-
+                        
                         SupremicaProperties.loadProperties(propFile);
                     }
                     catch (Exception e)
@@ -99,37 +103,45 @@ public class ProcessCommandLineArguments
             else if (args[i].equals("-l") || args[i].equals("--list"))
             {
                 System.out.println(SupremicaProperties.getProperties());
+                //quit = true;
             }
             else if (args[i].equals("-v") || args[i].equals("--version"))
             {
                 System.out.println("Supremica version: " + Version.version());
-                quit = true;
+                //quit = true;
             }
             else
             {
-				String filename = args[i];
-				File  currFile = new File(filename);
-				if (!currFile.exists())
-				{
-                	System.out.println("Invalid usage.\n");
-                	ProcessCommandLineArguments.printUsage();
-                	quit = true;
-				}
-				else
-				{
-					filesToOpen.add(currFile);
-				}
+                String filename = args[i];
+                File  currFile = new File(filename);
+                if (!currFile.exists())
+                {
+                    System.out.println("Invalid usage: '" + args[i] + "'.\n");
+                    ProcessCommandLineArguments.printUsage();
+                    quit = true;
+                }
+                else
+                {
+                    filesToOpen.add(currFile);
+                }
             }
         }
 
+        /*
+        // I'd like to flush the output to the console, but it's intercepted by the logger...
+        // So nothing gets output if we quit here!
+        System.out.println();
+        System.err.println();
+        */
+        
         if (quit)
         {
             System.exit(0);
         }
-
+        
         return filesToOpen;
     }
-
+    
     private static void printUsage()
     {
         System.out.println("Supremica: " + org.supremica.Version.version());

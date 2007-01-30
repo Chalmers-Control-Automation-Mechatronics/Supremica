@@ -54,65 +54,58 @@ import org.supremica.properties.*;
 
 public class LoggerFactory
 {
-	private static LoggerFilter filter = new LoggerFilter();
-	private static boolean logToGui = Config.LOG_TO_GUI.get();
-	private static boolean logToConsole = Config.LOG_TO_CONSOLE.get();
-	private static final PatternLayout layout = new PatternLayout("%-5p %m%n");
-	private static ConsoleAppender consoleAppender = null;
-
-	private LoggerFactory() {}
-
-	public static LoggerFilter getLoggerFilter()
-	{
-		return filter;
-	}
-
-	public synchronized static Logger createLogger(Class theClass)
-	{
-		return createLogger(theClass.getName());
-
+    private static LoggerFilter filter = new LoggerFilter();
+    private static final PatternLayout layout = new PatternLayout("%-5p %m%n");
+    private static ConsoleAppender consoleAppender = null;
+    
+    private LoggerFactory()
+    {}
+    
+    public static LoggerFilter getLoggerFilter()
+    {
+        return filter;
+    }
+    
+    public synchronized static Logger createLogger(Class theClass)
+    {
+        return createLogger(theClass.getName());
+        
 //		return createLogger(theClass.getPackage().getName());
-	}
-
-	public synchronized static Logger createLogger(String name)
-	{
-		Category thisCategory = Category.getInstance(name);    // Deprecated
-
-		if (logToConsole)
-		{
-			thisCategory.addAppender(getConsoleAppender());
-		}
-
-		if (logToGui)
-		{
-			thisCategory.addAppender(LogDisplay.getInstance());
-		}
-
-		SupremicaCategory supremicaCategory = new SupremicaCategory(thisCategory);
-
-		return supremicaCategory;
-	}
-
-	synchronized static ConsoleAppender getConsoleAppender()
-	{
-		if (consoleAppender == null)
-		{
-			consoleAppender = new ConsoleAppender(layout);
-
-			consoleAppender.addFilter(filter);
-		}
-
-		return consoleAppender;
-	}
-
-	synchronized static boolean hasConsoleAppender()
-	{
-		return consoleAppender != null;
-	}
-
-	public synchronized static void updateLoggers()
-	{
-		logToGui = Config.LOG_TO_GUI.get();
-		logToConsole = Config.LOG_TO_CONSOLE.get();
-	}
+    }
+    
+    public synchronized static Logger createLogger(String name)
+    {
+        Category thisCategory = Category.getInstance(name);    // Deprecated
+        
+        if (Config.LOG_TO_CONSOLE.get())
+        {
+            thisCategory.addAppender(getConsoleAppender());
+        }
+        
+        if (Config.LOG_TO_GUI.get())
+        {
+            thisCategory.addAppender(LogDisplay.getInstance());
+        }
+        
+        SupremicaCategory supremicaCategory = new SupremicaCategory(thisCategory);
+        
+        return supremicaCategory;
+    }
+    
+    synchronized static ConsoleAppender getConsoleAppender()
+    {
+        if (consoleAppender == null)
+        {
+            consoleAppender = new ConsoleAppender(layout);
+            
+            consoleAppender.addFilter(filter);
+        }
+        
+        return consoleAppender;
+    }
+    
+    synchronized static boolean hasConsoleAppender()
+    {
+        return consoleAppender != null;
+    }
 }
