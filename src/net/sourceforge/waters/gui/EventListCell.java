@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventListCell
 //###########################################################################
-//# $Id: EventListCell.java,v 1.6 2005-11-10 21:54:42 robi Exp $
+//# $Id: EventListCell.java,v 1.7 2007-01-30 08:51:28 flordal Exp $
 //###########################################################################
 
 
@@ -27,22 +27,25 @@ public class EventListCell
 	//#######################################################################
 	//# Interface javax.swing.ListCellRenderer
 	public Component getListCellRendererComponent(JList list,
-												  Object value,
-												  int index,
-												  boolean isSelected,
-												  boolean cellHasFocus)
-	{
+            Object value,
+            int index,
+            boolean isSelected,
+            boolean cellHasFocus)
+        {
 		final EventDeclProxy decl = (EventDeclProxy) value;
 		final String text = HTMLPrinter.getHTMLString(decl);
 		final EventKind kind = decl.getKind();
 		ImageIcon icon = null;
 		if (kind.equals(EventKind.CONTROLLABLE)) {
-			icon = controllableIcon;
+			icon = IconLoader.ICON_CONTROLLABLE;
 		} else if (kind.equals(EventKind.UNCONTROLLABLE)) {
-			icon = uncontIcon;
+			icon = IconLoader.ICON_UNCONTROLLABLE;
 		} else if (kind.equals(EventKind.PROPOSITION)) {
-			icon = propIcon;
-		}
+                    if (decl.getName().equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME))
+                        icon = IconLoader.ICON_FORBIDDEN;
+                    else
+                        icon = IconLoader.ICON_PROPOSITION;
+                }
 		setText(text);
 		setIcon(icon);
 		if (isSelected) {
@@ -57,17 +60,4 @@ public class EventListCell
 		setOpaque(true);
 		return this;
 	}
-
-
-	//#######################################################################
-	//# Class Constants
-	static final ImageIcon controllableIcon =
-	  new ImageIcon(EventListCell.class.getResource
-			("/icons/waters/controllable.gif"));
-	static final ImageIcon uncontIcon =
-	  new ImageIcon(EventListCell.class.getResource
-			("/icons/waters/uncontrollable.gif"));
-	static final ImageIcon propIcon =
-	  new ImageIcon(EventListCell.class.getResource
-			("/icons/waters/proposition.gif"));
 }

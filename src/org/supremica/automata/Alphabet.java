@@ -131,6 +131,8 @@ public class Alphabet
     Set<EventProxy> getWatersEventsWithPropositions()
     {
         Set<EventProxy> currSet = getWatersEvents();
+        currSet.add(State.acceptingProposition);
+        currSet.add(State.acceptingProposition);
         return currSet;
     }
 

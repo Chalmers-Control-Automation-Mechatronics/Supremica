@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.50 2007-01-11 16:11:52 flordal Exp $
+//# $Id: ModuleContainer.java,v 1.51 2007-01-30 08:51:28 flordal Exp $
 //###########################################################################
 
 
@@ -130,15 +130,13 @@ public class ModuleContainer implements UndoInterface
     {
         EventDeclSubject accepting = new EventDeclSubject(EventDeclProxy.DEFAULT_MARKING_NAME,
             EventKind.PROPOSITION);
-        if (!getModule().getEventDeclListModifiable()
-        .containsName(EventDeclProxy.DEFAULT_MARKING_NAME))
+        if (!getModule().getEventDeclListModifiable().containsName(EventDeclProxy.DEFAULT_MARKING_NAME))
         {
             getModule().getEventDeclListModifiable().add(accepting);
         }
         EventDeclSubject forbidden = new EventDeclSubject(EventDeclProxy.DEFAULT_FORBIDDEN_NAME,
             EventKind.PROPOSITION);
-        if (!getModule().getEventDeclListModifiable()
-        .containsName(EventDeclProxy.DEFAULT_FORBIDDEN_NAME))
+        if (!getModule().getEventDeclListModifiable().containsName(EventDeclProxy.DEFAULT_FORBIDDEN_NAME))
         {
             getModule().getEventDeclListModifiable().add(forbidden);
         }

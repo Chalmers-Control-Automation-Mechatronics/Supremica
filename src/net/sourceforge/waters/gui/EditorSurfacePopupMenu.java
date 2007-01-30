@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurfacePopupMenu
 //###########################################################################
-//# $Id: EditorSurfacePopupMenu.java,v 1.4 2006-12-22 03:45:26 siw4 Exp $
+//# $Id: EditorSurfacePopupMenu.java,v 1.5 2007-01-30 08:51:28 flordal Exp $
 //###########################################################################
 
 
@@ -43,7 +43,7 @@ class EditorSurfacePopupMenu
     mCreateEventItem = new JMenuItem("Create new event ...");
     mCreateEventItem.addActionListener(this);
     add(mCreateEventItem);
-    mCreateBlockedEventList = new JMenuItem("Create Blocked Event List");
+    mCreateBlockedEventList = new JMenuItem("Create blocked event list");
     mCreateBlockedEventList.addActionListener(this);
     add(mCreateEventItem);
   }

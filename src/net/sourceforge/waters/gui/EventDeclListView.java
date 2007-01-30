@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventDeclListView
 //###########################################################################
-//# $Id: EventDeclListView.java,v 1.2 2006-12-11 02:40:44 siw4 Exp $
+//# $Id: EventDeclListView.java,v 1.3 2007-01-30 08:51:28 flordal Exp $
 //###########################################################################
 
 
@@ -35,7 +35,6 @@ import net.sourceforge.waters.xsd.base.EventKind;
 public class EventDeclListView
   extends JList
 {
-
   //#########################################################################
   //# Constructors
   public EventDeclListView(final ModuleSubject module)

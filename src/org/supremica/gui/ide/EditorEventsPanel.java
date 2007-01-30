@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorEventsPanel
 //###########################################################################
-//# $Id: EditorEventsPanel.java,v 1.19 2006-11-03 15:01:57 torda Exp $
+//# $Id: EditorEventsPanel.java,v 1.20 2007-01-30 08:51:28 flordal Exp $
 //###########################################################################
 
 
@@ -39,7 +39,6 @@ class EditorEventsPanel
     
     EditorModuleEventPopupMenu popup = new EditorModuleEventPopupMenu();
     PopupListener popupListener;
-    
     
     EditorEventsPanel(ModuleContainer moduleContainer, String name)
     {

@@ -305,7 +305,9 @@ public class IDE
         return ideToolBar;
     }
     
-    // Overridden so we can exit when window is closed
+    /**
+     * Overridden so we can exit when window is closed
+     */
     protected void processWindowEvent(WindowEvent e)
     {
         super.processWindowEvent(e);
@@ -313,11 +315,12 @@ public class IDE
         if (e.getID() == WindowEvent.WINDOW_CLOSING)
         {
             getActions().exitAction.doAction();
-            System.exit(0);
         }
     }
     
-    // ChangeListener interface
+    /**
+     * ChangeListener interface
+     */
     public void stateChanged(ChangeEvent e)
     {
         if (editorActive())

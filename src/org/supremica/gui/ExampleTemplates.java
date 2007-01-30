@@ -132,7 +132,7 @@ public class ExampleTemplates
         thisGroup.addItem(new TemplateItem("2.1 - PIN Code Reader", prefix + "Ex2_1.xml"));
         thisGroup.addItem(new TemplateItem("2.2 - Kanban", prefix + "Ex2_2.xml"));
         thisGroup.addItem(new TemplateItem("2.6 - Man, Wolf, Goat, Cabbage", prefix + "Ex2_6.xml"));
-        // OBS! THE EXERCISES BELOW HAVE CHANGED NUMBER... AND THE BOOK HAS CHANGES NAME!
+        // OBS! THE EXERCISES BELOW HAVE CHANGED NUMBER... AND THE BOOK HAS CHANGED NAME!
         // WE NEED TO SWITCH TO SVN!
         thisGroup.addItem(new TemplateItem("4.2 - Man, Wolf, Goat, Cabbage Revisited", prefix + "Ex4_1.xml"));
         thisGroup.addItem(new TemplateItem("4.3 - AGV System", prefix + "Ex4_2.xml"));
