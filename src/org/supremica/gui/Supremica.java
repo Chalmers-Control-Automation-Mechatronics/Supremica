@@ -78,7 +78,6 @@ public class Supremica
     private MainPopupMenu mainPopupMenu = new MainPopupMenu(this);
     private VisualProjectContainer theVisualProjectContainer;
     private TypeCellEditor typeEditor;
-    private PreferencesDialog thePreferencesDialog = null;
     private BorderLayout layout;
     private JTable theAutomatonTable;
     private TableSorter theTableSorter;

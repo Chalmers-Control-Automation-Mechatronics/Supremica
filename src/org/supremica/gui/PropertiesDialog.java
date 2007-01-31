@@ -243,6 +243,9 @@ public class PropertiesDialog
         return true;
     }
     
+    /**
+     * Interface for setting and getting a property from Config.
+     */
     private interface Chooser
     {
         /**

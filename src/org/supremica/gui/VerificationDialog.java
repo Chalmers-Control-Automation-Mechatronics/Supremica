@@ -59,6 +59,7 @@ import org.supremica.automata.algorithms.EquivalenceRelation;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.lang.Integer;
 
 interface VerificationPanel
 {
@@ -514,11 +515,14 @@ public class VerificationDialog
         
         public void regain(VerificationOptions verificationOptions)
         {
-            verificationOptions.setExclusionStateLimit(PreferencesDialog.getInt("Exclusion state limit", exclusionStateLimit.getText(), 10));
-            verificationOptions.setReachabilityStateLimit(PreferencesDialog.getInt("Reachability state limit", reachabilityStateLimit.getText(), 10));
+            //verificationOptions.setExclusionStateLimit(PreferencesDialog.getInt("Exclusion state limit", exclusionStateLimit.getText(), 10));
+            verificationOptions.setExclusionStateLimit(Integer.parseInt(exclusionStateLimit.getText())); // Should have min and max values?
+            //verificationOptions.setReachabilityStateLimit(PreferencesDialog.getInt("Reachability state limit", reachabilityStateLimit.getText(), 10));
+            verificationOptions.setReachabilityStateLimit(Integer.parseInt(reachabilityStateLimit.getText())); // Should have min and max values?
             verificationOptions.setOneEventAtATime(oneEventAtATimeBox.isSelected());
             verificationOptions.setSkipUncontrollabilityCheck(skipUncontrollabilityBox.isSelected());
-            verificationOptions.setNbrOfAttempts(PreferencesDialog.getInt("Nbr of attempts limit", nbrOfAttempts.getText(), 1));
+            //verificationOptions.setNbrOfAttempts(PreferencesDialog.getInt("Nbr of attempts limit", nbrOfAttempts.getText(), 1));
+            verificationOptions.setNbrOfAttempts(Integer.parseInt(nbrOfAttempts.getText()));
         }
     }
 }
