@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.34 2006-11-17 00:20:09 martin Exp $
+//# $Id: EditorComponentsPanel.java,v 1.35 2007-01-31 17:52:14 flordal Exp $
 //###########################################################################
 
 
@@ -19,10 +19,13 @@ import net.sourceforge.waters.gui.ComponentInfo;
 import net.sourceforge.waters.gui.EditorEditVariableDialog;
 import net.sourceforge.waters.gui.ModuleTree;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.VariableSubject;
@@ -30,12 +33,16 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.module.ForeachComponentProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.module.SimpleComponent;
 
 
 
 import org.supremica.gui.WhiteScrollPane;
 
-
+/**
+ * This is the panel to the left in the IDE in "Editor mode". Contains
+ * a ModuleTree representation of the currently active ModuleSubject.
+ */
 class EditorComponentsPanel
     extends WhiteScrollPane
     implements EditorPanelInterface
@@ -47,7 +54,7 @@ class EditorComponentsPanel
     
     private ModuleTree moduleSelectTree;
     private boolean modified = true;
-
+    
     private ModuleWindowInterface root;
     
     EditorComponentsPanel(final ModuleContainer moduleContainer,
@@ -91,7 +98,9 @@ class EditorComponentsPanel
     {
     }
     
-    
+    /**
+     * Adds a subject to the active ModuleSubject and also graphically to the ModuleTree.
+     */
     public void addComponent(final AbstractSubject o)
     {
         final ModuleSubject module = getModuleSubject();
@@ -192,7 +201,7 @@ class EditorComponentsPanel
                 }
                 else
                 {
-                    System.err.println("ModuleWindow.actionPerformed(): " +
+                    moduleContainer.getIDE().error("ModuleWindow.actionPerformed(): " +
                         "'add variable' performed by illegal node type");
                 }
             }
@@ -218,7 +227,7 @@ class EditorComponentsPanel
                 }
                 else
                 {
-                    System.err.println("ModuleWindow.actionPerformed(): " +
+                    moduleContainer.getIDE().error("ModuleWindow.actionPerformed(): " +
                         "'edit variable' performed by illegal node type");
                 }
             }
@@ -226,32 +235,31 @@ class EditorComponentsPanel
         
         if("delete variable".equals(e.getActionCommand()))
         {
-        	  TreePath currentSelection = moduleSelectTree.getSelectionPath();
-        	  if (currentSelection != null) 
-        	  {
-        		// Get the node in the tree
-        		DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) (currentSelection.getLastPathComponent());
-        		
-        		//Special treatment for variables
-        		VariableSubject variable = (VariableSubject) ((ComponentInfo) 
-        				targetNode.getUserObject()).getComponent();
-        		
-        		//remove from model (take getParent()x2 because a variableSubject is the child of a list.)
-        		((SimpleComponentSubject) variable.getParent().getParent())
-        		.getVariablesModifiable().remove(variable);
-        		
-        		//remove from module tree view
-        		moduleSelectTree.removeCurrentNode();
-        		return;
-        	  }
-        	
-          	else
-        	  {
-        		System.err.println("ModuleWindow.actionPerformed(): " +
-        		"'delete variable' performed by illegal node type");
-        	  }
+            TreePath currentSelection = moduleSelectTree.getSelectionPath();
+            if (currentSelection != null)
+            {
+                // Get the node in the tree
+                DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) (currentSelection.getLastPathComponent());
+                
+                //Special treatment for variables
+                VariableSubject variable = (VariableSubject) ((ComponentInfo)
+                targetNode.getUserObject()).getComponent();
+                
+                //remove from model (take getParent()x2 because a variableSubject is the child of a list.)
+                ((SimpleComponentSubject) variable.getParent().getParent())
+                .getVariablesModifiable().remove(variable);
+                
+                //remove from module tree view
+                moduleSelectTree.removeCurrentNode();
+                return;
+            }
+            
+            else
+            {
+                moduleContainer.getIDE().error("ModuleWindow.actionPerformed(): " +
+                    "'delete variable' performed by illegal node type");
+            }
         }
-    
         
         if("delete component".equals(e.getActionCommand()))
         {
@@ -262,15 +270,13 @@ class EditorComponentsPanel
                 int depth = currentSelection.getPathCount()-1;
                 // Get the node in the tree
                 DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) (currentSelection.getLastPathComponent());
+                AbstractSubject component = ((ComponentInfo) targetNode.getUserObject()).getComponent();
                 
                 //Special treatment for variables
-                AbstractSubject component = ((ComponentInfo)
-                targetNode.getUserObject()).getComponent();
                 if(component instanceof VariableSubject)
                 {
                     //remove from model (take getParent()x2 because a variableSubject is the child of a list.)
-                    ((SimpleComponentSubject) component.getParent().getParent())
-                    .getVariablesModifiable().remove(component);
+                    ((SimpleComponentSubject) component.getParent().getParent()).getVariablesModifiable().remove(component);
                     
                     //remove from module tree view
                     moduleSelectTree.removeCurrentNode();
@@ -295,13 +301,41 @@ class EditorComponentsPanel
                 // I just realised there's a nicer way to do this... well, well.
                 
                 // Remove component from module
-                currentList.remove(((ComponentInfo) targetNode.getUserObject()).getComponent());
+                currentList.remove(component);
                 
                 // Remove the component visually
                 moduleSelectTree.removeCurrentNode();
             }
         }
         
+        if ("copy component".equals(e.getActionCommand()))
+        {
+            TreePath currentSelection = moduleSelectTree.getSelectionPath();
+            if (currentSelection != null)
+            {
+                // Get the node in the tree
+                DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) (currentSelection.getLastPathComponent());
+                // Get the component
+                Subject component = ((ComponentInfo) targetNode.getUserObject()).getComponent();
+                if(component instanceof SimpleComponentSubject)
+                {
+                    SimpleComponentSubject original = (SimpleComponentSubject) component;
+                    SimpleComponentSubject copy = original.clone();
+                    IdentifierSubject newIdentifier = original.getIdentifier().clone();
+                    newIdentifier.setName("Copy of " + original.getName());
+                    if (componentNameAvailable(newIdentifier.getName()))
+                    {
+                        copy.setIdentifier(newIdentifier);
+                        addComponent(copy);
+                    }
+                    else
+                    {
+                        moduleContainer.getIDE().error("Name " + newIdentifier.getName() + " already exists in module.");
+                    }
+                }
+            }
+        }
+
         if("add simple component".equals(e.getActionCommand()))
         {
             moduleContainer.getActions().editorAddSimpleComponentAction.doAction();
@@ -311,7 +345,7 @@ class EditorComponentsPanel
         {
             root.showComment();
         }
-
+        
         if("toPlantType".equals(e.getActionCommand()) ||
             "toSpecificationType".equals(e.getActionCommand()) ||
             "toSupervisorType".equals(e.getActionCommand()))
@@ -322,8 +356,7 @@ class EditorComponentsPanel
                 // Get the node in the tree
                 DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode)
                 (currentSelection.getLastPathComponent());
-                Subject component = ((ComponentInfo)
-                targetNode.getUserObject()).getComponent();
+                Subject component = ((ComponentInfo) targetNode.getUserObject()).getComponent();
                 
                 if(component instanceof SimpleComponentSubject)
                 {
@@ -336,7 +369,7 @@ class EditorComponentsPanel
                 }
                 else
                 {
-                    System.err.println("ModuleWindow.actionPerformed(): " +
+                    moduleContainer.getIDE().error("ModuleWindow.actionPerformed(): " +
                         "'" + e.getActionCommand() + "' performed by illegal node type");
                 }
             }

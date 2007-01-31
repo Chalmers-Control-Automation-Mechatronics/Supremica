@@ -8,6 +8,7 @@ There is currently no real bug-tracking system for Supremica/Waters... we should
  * ProjectBuildFromWaters must use DocumentManager from IDE, otherwise module instantiation does not work -- Robi.
  * Supremica Synthesis fails on tictactoe example (no initial state reported) -- Robi.
  * New modules should not contain any events. Default markings :accepting and :forbidden should only be created when explicitly requested -- Robi.
+ * Currently some examples exist in double "copies", in examples/waters/handwritten and in  examples/includeInJarFile/ModuleExamples... 
 
  * Change menu keyboard shortcuts to ALT
  * Group node error feedback should be given while dragging

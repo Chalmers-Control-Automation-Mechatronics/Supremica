@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorPanel
 //###########################################################################
-//# $Id: EditorPanel.java,v 1.49 2007-01-26 15:09:52 avenir Exp $
+//# $Id: EditorPanel.java,v 1.50 2007-01-31 17:52:14 flordal Exp $
 //###########################################################################
 
 
@@ -33,7 +33,7 @@ public class EditorPanel
     private EditorAliasesPanel aliasesPanel;
     private EditorComponentsPanel componentsPanel;
     private ButtonGroup editorButtonGroup;
-           
+    
     public EditorPanel(ModuleContainer moduleContainer, String name)
     {
         super(moduleContainer, name);
@@ -48,8 +48,7 @@ public class EditorPanel
                 tabPanel.add(aliasesPanel);
          */
         
-        componentsPanel =
-            new EditorComponentsPanel(moduleContainer, this, "Components");
+        componentsPanel = new EditorComponentsPanel(moduleContainer, this, "Components");
         componentsPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
         componentsPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
         tabPanel.add(componentsPanel);
@@ -122,7 +121,7 @@ public class EditorPanel
         if (newComponent instanceof ComponentEditorPanel)
         {
             getActions().editorSavePostscriptAction.setEnabled(true);
-			getActions().editorSaveEncapsulatedPostscriptAction.setEnabled(true);
+            getActions().editorSaveEncapsulatedPostscriptAction.setEnabled(true);
             getActions().editorSavePDFAction.setEnabled(true);
             getActions().editorPrintAction.setEnabled(true);
             getActions().editorRunEmbedderAction.setEnabled(true);
@@ -130,7 +129,7 @@ public class EditorPanel
         else
         {
             getActions().editorSavePostscriptAction.setEnabled(false);
-			getActions().editorSaveEncapsulatedPostscriptAction.setEnabled(false);
+            getActions().editorSaveEncapsulatedPostscriptAction.setEnabled(false);
             getActions().editorSavePDFAction.setEnabled(false);
             getActions().editorPrintAction.setEnabled(false);
             getActions().editorRunEmbedderAction.setEnabled(false);
@@ -178,6 +177,6 @@ public class EditorPanel
         public boolean componentNameAvailable(String name)
         {
             return componentsPanel.componentNameAvailable(name);
-        }                
-    }   
+        }
+    }
 }

@@ -2161,69 +2161,6 @@ public class Automaton
         return inadequate;
     }
 
-    public Object acceptVisitor(final ProxyVisitor visitor)
-    throws VisitorException
-    {
-        final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
-        return desvisitor.visitAutomatonProxy(this);
-    }
-
-    public boolean equalsByContents(final Proxy partner)
-    {
-        Automaton partnerAutomaton = (Automaton)partner;
-        if (getName().equals(partnerAutomaton.getName()))
-        {
-            return
-                getKind().equals(partnerAutomaton.getKind()) &&
-                EqualCollection.isEqualSetByContents(getEvents(), partnerAutomaton.getEvents()) &&
-                EqualCollection.isEqualSetByContents(getStates(), partnerAutomaton.getStates()) &&
-                EqualCollection.isEqualSetByContents(getTransitions(), partnerAutomaton.getTransitions());
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    public boolean equalsWithGeometry(final Proxy partner)
-    {
-        return equalsByContents(partner);
-    }
-
-    public int hashCodeByContents()
-    {
-        int result = refHashCode();
-        result *= 5;
-        result += getKind().hashCode();
-        result *= 5;
-        result += EqualCollection.getSetHashCodeByContents(getEvents());
-        result *= 5;
-        result += EqualCollection.getSetHashCodeByContents(getStates());
-        result *= 5;
-        result += EqualCollection.getSetHashCodeByContents(getTransitions());
-        return result;
-    }
-
-    public int hashCodeWithGeometry()
-    {
-        return hashCodeByContents();
-    }
-
-    public boolean refequals(final NamedProxy partner)
-    {
-        return getName().equals(partner.getName());
-    }
-
-    public int refHashCode()
-    {
-        return getName().hashCode();
-    }
-
-    public int compareTo(NamedProxy partner)
-    {
-        return getName().compareTo(((Automaton) partner).getName());
-    }
-
     public static void main(String[] args)
     {
         Automaton theAutomaton = new Automaton();
@@ -2421,9 +2358,9 @@ public class Automaton
         return sbuf.toString();
     }
 
-    //////////////////////////////////////////
-    ///// AutomatonProxy interface stuff /////
-    //////////////////////////////////////////
+    ////////////////////////////////////
+    ///// AutomatonProxy interface /////
+    ////////////////////////////////////
     
     private AutomatonProxy correspondingAutomatonProxy = null;
 
@@ -2463,5 +2400,68 @@ public class Automaton
         if (nbrOfForbiddenStates() > 0)
             currSet.add(State.forbiddenProposition);
         return currSet;
+    }
+
+    public Object acceptVisitor(final ProxyVisitor visitor)
+    throws VisitorException
+    {
+        final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
+        return desvisitor.visitAutomatonProxy(this);
+    }
+
+    public boolean equalsByContents(final Proxy partner)
+    {
+        Automaton partnerAutomaton = (Automaton)partner;
+        if (getName().equals(partnerAutomaton.getName()))
+        {
+            return
+                getKind().equals(partnerAutomaton.getKind()) &&
+                EqualCollection.isEqualSetByContents(getEvents(), partnerAutomaton.getEvents()) &&
+                EqualCollection.isEqualSetByContents(getStates(), partnerAutomaton.getStates()) &&
+                EqualCollection.isEqualSetByContents(getTransitions(), partnerAutomaton.getTransitions());
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public boolean equalsWithGeometry(final Proxy partner)
+    {
+        return equalsByContents(partner);
+    }
+
+    public int hashCodeByContents()
+    {
+        int result = refHashCode();
+        result *= 5;
+        result += getKind().hashCode();
+        result *= 5;
+        result += EqualCollection.getSetHashCodeByContents(getEvents());
+        result *= 5;
+        result += EqualCollection.getSetHashCodeByContents(getStates());
+        result *= 5;
+        result += EqualCollection.getSetHashCodeByContents(getTransitions());
+        return result;
+    }
+
+    public int hashCodeWithGeometry()
+    {
+        return hashCodeByContents();
+    }
+
+    public boolean refequals(final NamedProxy partner)
+    {
+        return getName().equals(partner.getName());
+    }
+
+    public int refHashCode()
+    {
+        return getName().hashCode();
+    }
+
+    public int compareTo(NamedProxy partner)
+    {
+        return getName().compareTo(((Automaton) partner).getName());
     }
 }

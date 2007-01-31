@@ -58,38 +58,40 @@ package org.supremica.gui;
 import java.awt.*;
 import javax.swing.*;
 
-// ** This one sets its own background to white
+/** 
+ * Simply a JScrollPane that has a white background.
+ */
 public class WhiteScrollPane
-	extends JScrollPane
+    extends JScrollPane
 {
-	private void setWhite()
-	{
-		Utility.setupPane(this);
-	}
-
-	public WhiteScrollPane()
-	{
-		setWhite();
-	}
-
-	public WhiteScrollPane(Component view)
-	{
-		super(view);
-
-		setWhite();
-	}
-
-	public WhiteScrollPane(Component view, int vsbPolicy, int hsbPolicy)
-	{
-		super(view, vsbPolicy, hsbPolicy);
-
-		setWhite();
-	}
-
-	public WhiteScrollPane(int vsbPolicy, int hsbPolicy)
-	{
-		super(vsbPolicy, hsbPolicy);
-
-		setWhite();
-	}
+    private void setWhite()
+    {
+        Utility.setupPane(this);
+    }
+    
+    public WhiteScrollPane()
+    {
+        setWhite();
+    }
+    
+    public WhiteScrollPane(Component view)
+    {
+        super(view);
+        
+        setWhite();
+    }
+    
+    public WhiteScrollPane(Component view, int vsbPolicy, int hsbPolicy)
+    {
+        super(view, vsbPolicy, hsbPolicy);
+        
+        setWhite();
+    }
+    
+    public WhiteScrollPane(int vsbPolicy, int hsbPolicy)
+    {
+        super(vsbPolicy, hsbPolicy);
+        
+        setWhite();
+    }
 }

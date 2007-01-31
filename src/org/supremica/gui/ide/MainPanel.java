@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   MainPanel
 //###########################################################################
-//# $Id: MainPanel.java,v 1.28 2007-01-11 16:11:52 flordal Exp $
+//# $Id: MainPanel.java,v 1.29 2007-01-31 17:52:14 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -100,12 +100,10 @@ abstract class MainPanel
     
     public EditorWindowInterface showEditor(SimpleComponentSubject component)
     {
-        final EditorPanel editorPanel =
-            moduleContainer.getEditorPanel();
+        final EditorPanel editorPanel = moduleContainer.getEditorPanel();
         if (component != null)
         {
-            editorPanel.setRightComponent
-                (moduleContainer.getComponentEditorPanel(component));
+            editorPanel.setRightComponent(moduleContainer.getComponentEditorPanel(component));
         }
         return editorPanel.getActiveEditorWindowInterface();
     }

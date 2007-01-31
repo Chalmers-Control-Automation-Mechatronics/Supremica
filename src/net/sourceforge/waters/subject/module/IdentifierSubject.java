@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   IdentifierSubject
 //###########################################################################
-//# $Id: IdentifierSubject.java,v 1.8 2006-09-06 11:52:21 robi Exp $
+//# $Id: IdentifierSubject.java,v 1.9 2007-01-31 17:52:14 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -47,8 +47,7 @@ public abstract class IdentifierSubject
    */
   protected IdentifierSubject(final String name)
   {
-    this(null,
-         name);
+    this(null, name);
   }
 
 

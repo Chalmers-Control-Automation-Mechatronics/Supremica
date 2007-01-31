@@ -323,12 +323,12 @@ public class ExampleTemplates
 
         String prefix = basePrefix + "/Games/";
 
-        //thisGroup.addItem(new TemplateItem("Wine Merchant's Problem", prefix + "WineMerchant.xml"));
-        thisGroup.addItem(new TemplateItem("Wine Merchant's Problem", basePrefix + "/ModuleExamples/other/winemerchant.wmod"));
         //thisGroup.addItem(new TemplateItem("Man, Wolf, Goat, Cabbage", basePrefix + "/CCSBookExercises/" + "Ex2_6.xml"));
         thisGroup.addItem(new TemplateItem("Man, Wolf, Goat, Cabbage", prefix + "ManWolfGoatCabbage.wmod"));
         thisGroup.addItem(new TemplateItem("Stick Picking Game", basePrefix + "/ModuleExamples/other/stick_picking_game.wmod"));
         thisGroup.addItem(new TemplateItem("Tic Tac Toe", basePrefix + "/ModuleExamples/other/tictactoe.wmod"));
+        //thisGroup.addItem(new TemplateItem("Wine Merchant's Problem", prefix + "WineMerchant.xml"));
+        thisGroup.addItem(new TemplateItem("Wine Merchant's Problem", basePrefix + "/ModuleExamples/other/winemerchant.wmod"));
     }
 
     /*

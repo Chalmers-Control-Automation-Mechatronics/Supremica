@@ -17,6 +17,7 @@ class ModuleTreePopupMenu
     private JMenuItem addVariableItem;
     private JMenuItem deleteVariableItem;
     private JMenuItem deleteComponentItem;
+    private JMenuItem copyComponentItem;
     private JMenuItem editVariableItem;
     private JMenuItem addComponentItem;
     private JMenuItem toPlantTypeItem;
@@ -56,7 +57,13 @@ class ModuleTreePopupMenu
             item.addActionListener(mWindow);
             this.add(item);
             deleteComponentItem = item;
-            
+
+            item = new JMenuItem("Copy component");
+            item.setActionCommand("copy component");
+            item.addActionListener(mWindow);
+            this.add(item);
+            copyComponentItem = item;
+
             JMenu typeMenu = new JMenu("Set type");
             this.add(typeMenu);
             

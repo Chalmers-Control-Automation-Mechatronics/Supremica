@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleProxy
 //###########################################################################
-//# $Id: ModuleProxy.java,v 1.3 2005-11-03 01:24:16 robi Exp $
+//# $Id: ModuleProxy.java,v 1.4 2007-01-31 17:52:14 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -87,7 +87,6 @@ import net.sourceforge.waters.model.base.Proxy;
 public interface ModuleProxy
   extends DocumentProxy
 {
-
   //#########################################################################
   //# Getters and Setters
   /**
@@ -123,5 +122,4 @@ public interface ModuleProxy
    *         or {@link ForeachComponentProxy}.
    */
   public List<Proxy> getComponentList();
-
 }
