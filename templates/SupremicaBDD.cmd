@@ -1,0 +1,1 @@
+@java -cp ..\build;..\lib\unjared\;..\images;..\examples -enableassertions org.supremica.automata.BDD.BDDAutomaton ..\examples\includeInJarFile\CCSBookExercises\Ex4_5_all_con.xml 

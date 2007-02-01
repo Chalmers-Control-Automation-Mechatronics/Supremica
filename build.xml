@@ -138,6 +138,7 @@
 	<unjar src="${lib}/fuber.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${lib}/swixml.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/trove.jar" dest="${lib}/${unjared}"/>
+	<unjar src="${lib}/javabdd.jar" dest="${lib}/${unjared}"/>	
 	<unjar src="${waters.jaxbjar}" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/manufacturingTables_jaxb.jar" dest="${lib}/${unjared}"/>
 	<unjar src="${lib}/itext.jar" dest="${lib}/${unjared}"/>
@@ -566,6 +567,8 @@ Class-Path: ${manifest.pathlist}</echo>
 	<chmod file="${dist}/SupremicaLocal" perm="755"/>
 	<copy file="${templates}/SFCtoSMV.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/SFCtoSMV.cmd" perm="644"/>
+	<copy file="${templates}/SupremicaBDD.cmd" todir="${dist}"/>	
+	<chmod file="${dist}/SupremicaBDD.cmd" perm="644"/>
 </target>
 
 <target name="startfiles_supremica" depends="startfiles_local_supremica">
