@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   GeometryTools
 //###########################################################################
-//# $Id: GeometryTools.java,v 1.6 2007-02-02 02:55:13 robi Exp $
+//# $Id: GeometryTools.java,v 1.7 2007-02-02 04:12:49 robi Exp $
 //###########################################################################
 
 
@@ -14,6 +14,8 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
 import java.awt.geom.Rectangle2D;
+import java.util.Collections;
+import java.util.List;
 
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
@@ -21,6 +23,10 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
+import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.SplineGeometrySubject;
+
+import net.sourceforge.waters.xsd.module.SplineKind;
 
 
 public final class GeometryTools
@@ -122,6 +128,88 @@ public final class GeometryTools
     }
   }
 
+  /**
+   * Gets the centre point of an edge.
+   * This method checks the edge's geometry and returns the specified
+   * centre point if one is set, or <CODE>null</CODE> in case of a
+   * straight line.
+   * @throws IllegalArgumentException if the spline geometry has
+   *         more than one control point.
+   */
+  public static Point2D getSpecifiedMidPoint(final EdgeProxy edge)
+  {
+    final SplineGeometryProxy geo = edge.getGeometry();
+    if (geo == null) {
+      return null;
+    }
+    final List<Point2D> points = geo.getPoints();
+    final int size = points.size();
+    switch (size) {
+    case 0:
+      return null;
+    case 1:
+      return points.iterator().next();
+    default:
+      throw new IllegalArgumentException
+        ("More than one control point in spline!");
+    }
+  }
+
+  /**
+   * Gets the centre point of an edge.
+   * This method computes the centre between the start and end points
+   * of the given edge. It does <I>not</I> consider the edge's spline
+   * geometry.
+   */
+  public static Point2D getDefaultMidPoint(final EdgeProxy edge)
+  {
+    final Point2D p1 = getStartPoint(edge);
+    final Point2D p2 = getEndPoint(edge);
+    return getMidPoint(p1, p2);
+  }
+
+  /**
+   * Calculates the middle between two given points.
+   */
+  public static Point2D getMidPoint(final Point2D p1, final Point2D p2)
+  {
+    final double x = 0.5 * (p1.getX() + p2.getX());
+    final double y = 0.5 * (p1.getY() + p2.getY());
+    return new Point2D.Double(x, y);
+  }
+
+  /**
+   * Changes the middle point of an edge.
+   * This method changes the edge's spline geometry to reflect the
+   * given new centre point. It produces either a quadratic spline
+   * with a single control point, or a straight line if the given
+   * point is close enough to the straight line between the edge's
+   * source and target.
+   */
+  public static void setSpecifiedMidPoint(final EdgeSubject edge,
+                                          final Point2D newpoint)
+  {
+    final SplineGeometrySubject oldgeo = edge.getGeometry();
+    final Point2D p1 = getStartPoint(edge);
+    final Point2D p2 = getEndPoint(edge);
+    final Line2D line = new Line2D.Double(p1, p2);
+    final double distance = line.ptLineDist(newpoint);
+    if (distance < EPSILON) {
+      edge.setGeometry(null);
+    } else if (oldgeo == null || oldgeo.getPoints().size() != 1) {
+      final List<Point2D> points = Collections.singletonList(newpoint);
+      final SplineGeometrySubject newgeo =
+        new SplineGeometrySubject(points, SplineKind.INTERPOLATING);
+      edge.setGeometry(newgeo);
+    } else {
+      final List<Point2D> points = oldgeo.getPointsModifiable();
+      final Point2D oldpoint = points.iterator().next();
+      if (oldpoint.distanceSq(newpoint) >= EPSILON2) {
+        points.set(0, newpoint);
+      }
+    }
+  }      
+
   public static Point2D getRadialPoint(Point2D p, 
                                        Point2D center,
                                        double radius)
@@ -131,13 +219,6 @@ public final class GeometryTools
     double angle = Math.atan2(height, width);
     return new Point2D.Double(center.getX() - Math.cos(angle) * radius,
                               center.getY() - Math.sin(angle) * radius);
-  }
-
-  public static Point2D getMidPoint(Point2D p1, Point2D p2)
-  {
-    double w = p2.getX() - p1.getX();
-    double h = p2.getY() - p1.getY();
-    return new Point2D.Double(p1.getX() + (w / 2), p1.getY() + (h / 2));
   }
 
   public static Line2D[] getLineSegmentsOfRectangle(Rectangle2D r)
@@ -212,4 +293,18 @@ public final class GeometryTools
     // System.err.println(intersection);
     return intersection;
   }
+
+
+  //#########################################################################
+  //# Class Constants
+  /**
+   * Accuracy constant. Used to determine when points are so close that
+   * they are considered equal.
+   */
+  public static final double EPSILON = 0.001;
+  /**
+   * The square of {@link #EPSILON}.
+   */
+  public static final double EPSILON2 = EPSILON * EPSILON;
+
 }

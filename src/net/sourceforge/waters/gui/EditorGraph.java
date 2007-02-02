@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorGraph
 //###########################################################################
-//# $Id: EditorGraph.java,v 1.12 2007-02-02 02:55:13 robi Exp $
+//# $Id: EditorGraph.java,v 1.13 2007-02-02 04:12:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -664,17 +664,18 @@ public class EditorGraph
 	final double oy1 = oy - ey;
 	final double nx1 = nx - ex;
 	final double ny1 = ny - ey;
-	double divide = ox1 * ox1 + oy1 * oy1;
-	// Correction for very short edge, when ox1 and oy1 are 0 ...
-	if (Math.abs(divide) < Double.MIN_VALUE) {
-	  if (divide >= 0.0) {
-	    divide = 2.0 * Double.MIN_VALUE;
-	  } else {
-	    divide = -2.0 * Double.MIN_VALUE;
-	  }
-	}
-	final double a1 = (nx1 * ox1 + ny1 * oy1) / divide;
-	final double a2 = (nx1 * oy1 - ny1 * ox1) / divide;
+	final double divide = ox1 * ox1 + oy1 * oy1;
+	// Correction needed for very short edge, when ox1 and oy1 are 0 ...
+        final double factor;
+	if (Math.abs(divide) > GeometryTools.EPSILON) {
+          factor = 1.0 / divide;
+        } else if (divide >= 0.0) {
+          factor = 1.0 / GeometryTools.EPSILON;
+        } else {
+          factor = -1.0 / GeometryTools.EPSILON;
+        }
+	final double a1 = factor * (nx1 * ox1 + ny1 * oy1);
+	final double a2 = factor * (nx1 * oy1 - ny1 * ox1);
 	final double a3 = -a2;
 	final double a4 = a1;
 	newCenter = new Point2D.Double(a1 * cx1 + a2 * cy1 + ex,
