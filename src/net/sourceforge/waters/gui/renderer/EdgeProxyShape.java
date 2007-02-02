@@ -1,8 +1,17 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.gui.renderer
+//# CLASS:   EdgeProxyShape
+//###########################################################################
+//# $Id: EdgeProxyShape.java,v 1.11 2007-02-02 02:55:13 robi Exp $
+//###########################################################################
+
+
 package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Graphics2D;
 import java.awt.Shape;
-
 import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.FlatteningPathIterator;
@@ -11,14 +20,15 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
 import java.awt.geom.Rectangle2D;
-
-import org.supremica.properties.Config;
-    
-import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.gui.ModuleWindow;
 import java.util.List;
 import java.util.ArrayList;
+    
+import net.sourceforge.waters.gui.ModuleWindow;
+import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+
+import org.supremica.properties.Config;
+
 
 public abstract class EdgeProxyShape
     extends AbstractProxyShape
@@ -36,23 +46,9 @@ public abstract class EdgeProxyShape
                 GeometryTools.getPosition(edge.getSource()),
                 GeometryTools.getPosition(edge.getTarget()));
         }
-        if (edge.getStartPoint() != null)
-        {
-            mStart = edge.getStartPoint().getPoint();
-        }
-        else
-        {
-            mStart = GeometryTools.defaultPosition(edge.getSource(), mTurn);
-        }
-        if (edge.getEndPoint() != null)
-        {
-            mEnd = edge.getEndPoint().getPoint();
-        }
-        else
-        {
-            mEnd = GeometryTools.defaultPosition(edge.getTarget(), mTurn);
-        }
-        mHandles = new ArrayList<Handle>(2);
+	mStart = GeometryTools.getStartPoint(edge);
+	mEnd = GeometryTools.getEndPoint(edge);
+      mHandles = new ArrayList<Handle>(2);
     }
     
     public List<Handle> getHandles()

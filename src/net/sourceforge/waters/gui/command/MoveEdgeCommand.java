@@ -1,10 +1,10 @@
-//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   MoveEdgeCommand
 //###########################################################################
-//# $Id: MoveEdgeCommand.java,v 1.7 2006-11-03 15:01:56 torda Exp $
+//# $Id: MoveEdgeCommand.java,v 1.8 2007-02-02 02:55:13 robi Exp $
 //###########################################################################
 
 
@@ -20,6 +20,7 @@ import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.renderer.GeometryTools;
 
 import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.GroupNodeSubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SplineGeometrySubject;
@@ -27,7 +28,7 @@ import net.sourceforge.waters.xsd.module.SplineKind;
 
 
 /**
- * the Command for Creation of nodes
+ * The command for changing the source or target of an edge.
  *
  * @author Simon Ware
  */
@@ -36,111 +37,104 @@ public class MoveEdgeCommand
     implements Command
 {
 
-	//#######################################################################
-	//# Constructor
-    /**
-     * Constructs a new CreateNodeCommand with the specified surface and
-     * creates the node in the x,y position specified.
-     * @param surface the surface edited by this command
-     * @param x the position upon which the node is created
-     * @param y the position upon which the node is created
-     */
-    public MoveEdgeCommand(final ControlledSurface surface,
-						   final EdgeSubject edge,
-						   final NodeSubject neo,
-						   boolean source,
-						   int x,
-						   int y)
-    {
-      mSurface = surface;
-      mEdge = edge;
-      mNew = neo;
-      mSource = source;
+  //#########################################################################
+  //# Constructor
+  /**
+   * Creates a new edge move command.
+   * @param  surface  The panel affected.
+   * @param  edge     The edge to be modified.
+   * @param  neo      The new source or target node.
+   * @param  isSource True if the source node is changed,
+   *                  false if the target node is changed.
+   * @param  x        The x coordinate of the changed position.
+   * @param  y        The y coordinate of the changed position.
+   */
+  public MoveEdgeCommand(final ControlledSurface surface,
+                         final EdgeSubject edge,
+                         final NodeSubject neo,
+                         final boolean isSource,
+                         final int x,
+                         final int y)
+  {
+    mSurface = surface;
+    mEdge = edge;
+    mNew = neo;
+    if (neo instanceof GroupNodeSubject) {
       mNPos = new PointGeometrySubject(new Point(x, y));
-      if (source)
-      {
-        mOPos = new PointGeometrySubject(edge.getStartPoint().getPoint());
-        mOld = edge.getSource();
-        mDescription = "Change Edge Source";
-      }
-      else
-      {
-        mOPos = new PointGeometrySubject(edge.getEndPoint().getPoint());
-        mOld = edge.getTarget();
-        mDescription = "Change Edge Target";
-      }
-		  mOTPoint = edge.getGeometry().clone();
-    }
-
-    /**
-     * Executes the Creation of the Node
-     */
-    public void execute()
-    {
-		if (mSource)
-		{
-			mEdge.setSource(mNew);
-			mEdge.setStartPoint(mNPos);
-		}
-		else
-		{
-			mEdge.setTarget(mNew);
-			mEdge.setEndPoint(mNPos);
-		}
-		final Collection<Point2D> points;
-    if (mEdge.getTarget() != mEdge.getSource()) {
-      points = Collections.singleton(
-                    GeometryTools.getMidPoint(mEdge.getStartPoint().getPoint(),
-										mEdge.getEndPoint().getPoint()));
     } else {
-      Point2D p = mEdge.getStartPoint().getPoint();
-      p.setLocation(p.getX() + 20, p.getY() + 20);
-      points = Collections.singleton(p);
+      mNPos = null;
     }
-		mEdge.setGeometry(
-			new SplineGeometrySubject(points, SplineKind.INTERPOLATING));
-		mSurface.getEditorInterface().setDisplayed();
+    mIsSource = isSource;
+    if (isSource) {
+      mOld = edge.getSource();
+      mOPos = edge.getStartPoint();
+      mDescription = "Change Edge Source";
+    } else {
+      mOld = edge.getTarget();
+      mOPos = edge.getEndPoint();
+      mDescription = "Change Edge Target";
     }
+    mOTPoint = edge.getGeometry().clone();
+  }
 
-    /** 
-     * Undoes the Command
-     */    
-    public void undo()
-    {
-      if (mSource)
-      {
-        mEdge.setSource(mOld);
-        mEdge.setStartPoint(mOPos);
-      }
-      else
-      {
-        mEdge.setTarget(mOld);
-        mEdge.setEndPoint(mOPos);
-      }
-      mEdge.setGeometry(mOTPoint);
-      mSurface.getEditorInterface().setDisplayed();
+  public void execute()
+  {
+    if (mIsSource) {
+      mEdge.setSource(mNew);
+      mEdge.setStartPoint(mNPos);
+    } else {
+      mEdge.setTarget(mNew);
+      mEdge.setEndPoint(mNPos);
     }
+    final Point2D p;
+    if (mEdge.getTarget() != mEdge.getSource()) {
+      final Point2D start = GeometryTools.getStartPoint(mEdge);
+      final Point2D end = GeometryTools.getEndPoint(mEdge);
+      p = GeometryTools.getMidPoint(start, end);
+    } else {
+      p = GeometryTools.getStartPoint(mEdge);
+      p.setLocation(p.getX() + 20, p.getY() + 20);
+    }
+    final Collection<Point2D> points = Collections.singleton(p);
+    mEdge.setGeometry(new SplineGeometrySubject(points, 
+                                                SplineKind.INTERPOLATING));
+    mSurface.getEditorInterface().setDisplayed();
+  }
+
+  public void undo()
+  {
+    if (mIsSource) {
+      mEdge.setSource(mOld);
+      mEdge.setStartPoint(mOPos);
+    } else {
+      mEdge.setTarget(mOld);
+      mEdge.setEndPoint(mOPos);
+    }
+    mEdge.setGeometry(mOTPoint);
+    mSurface.getEditorInterface().setDisplayed();
+  }
 	
-	public boolean isSignificant()
-	{
-		return true;
-	}
+  public boolean isSignificant()
+  {
+    return true;
+  }
 
   public String getName()
   {
-		return mDescription;
+    return mDescription;
   }
 
 
-	//#######################################################################
-	//# Data Members
-	private final ControlledSurface mSurface;
-	private final EdgeSubject mEdge;
-	private final NodeSubject mOld;
-	private final NodeSubject mNew;
-	private final boolean mSource;
-	private final PointGeometrySubject mNPos;
-	private final PointGeometrySubject mOPos;
-	private final SplineGeometrySubject mOTPoint;
-	private final String mDescription;	
+  //#########################################################################
+  //# Data Members
+  private final ControlledSurface mSurface;
+  private final EdgeSubject mEdge;
+  private final NodeSubject mOld;
+  private final NodeSubject mNew;
+  private final boolean mIsSource;
+  private final PointGeometrySubject mNPos;
+  private final PointGeometrySubject mOPos;
+  private final SplineGeometrySubject mOTPoint;
+  private final String mDescription;	
+
 }

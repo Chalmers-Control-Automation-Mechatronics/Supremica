@@ -216,28 +216,16 @@ public class MoveObjects
                                   ));
         mOrig = new SplineGeometrySubject(points, SplineKind.INTERPOLATING);
       }
-      if (mEdge.getStartPoint() == null) {
-        mOStart = new PointGeometrySubject(
-                     GeometryTools.defaultPosition(mEdge.getSource(),
-                                                   mOrig.getPoints().get(0)));
-      } else {
-        mOStart = mEdge.getStartPoint().clone();
-      }
-      if (mEdge.getEndPoint() == null) {
-        mOEnd = new PointGeometrySubject(
-                     GeometryTools.defaultPosition(mEdge.getTarget(),
-                                                   mOrig.getPoints().get(0)));
-      } else {
-        mOEnd = mEdge.getEndPoint().clone();
-      }
       mNew = dummy.getGeometry().clone();
-      mNStart = dummy.getStartPoint().clone();
-      mNEnd = dummy.getEndPoint().clone();
-      /*mOSour = orig.getSource();
-      mNSour = dummy.getSource();
-      mOTarg = orig.getTarget();
-      mNTarg = dummy.getTarget();*/
-    }
+      final PointGeometrySubject oStart = mEdge.getStartPoint();
+      mOStart = oStart != null ? oStart.clone() : null;
+      final PointGeometrySubject oEnd = mEdge.getEndPoint();
+      mOEnd = oEnd != null ? oEnd.clone() : null;
+      final PointGeometrySubject nStart = dummy.getStartPoint();
+      mNStart = nStart != null ? nStart.clone() : null;
+      final PointGeometrySubject nEnd = dummy.getEndPoint();
+      mNEnd = nEnd != null ? nEnd.clone() : null;
+   }
 
     public void execute()
     {

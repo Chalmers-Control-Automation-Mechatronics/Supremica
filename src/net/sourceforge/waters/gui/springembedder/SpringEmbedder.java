@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.23 2006-11-03 15:01:57 torda Exp $
+//# $Id: SpringEmbedder.java,v 1.24 2007-02-02 02:55:13 robi Exp $
 //###########################################################################
 
 
@@ -488,8 +488,6 @@ public class SpringEmbedder
     {
       super(edge.getGeometry().getPoints().get(0));
       mGeometry = edge.getGeometry();
-      mStartPoint = edge.getStartPoint();
-      mEndPoint = edge.getEndPoint();
       final NodeSubject source = edge.getSource();
       mSource = mNodeMap.get(source);
       final NodeSubject target = edge.getTarget();
@@ -573,16 +571,12 @@ public class SpringEmbedder
     {
       final Point2D point = getNewPoint();
       mGeometry.getPointsModifiable().set(0, point);
-      mStartPoint.setPoint(mSource.getNewPoint());
-      mEndPoint.setPoint(mTarget.getNewPoint());
     }
 
 
     //#######################################################################
     //# Data Members
     private final SplineGeometrySubject mGeometry;
-    private final PointGeometrySubject mStartPoint;
-    private final PointGeometrySubject mEndPoint;
     private final NodeWrapper mSource;
     private final NodeWrapper mTarget;
   }

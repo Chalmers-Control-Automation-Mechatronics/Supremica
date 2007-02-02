@@ -32,14 +32,16 @@ public class FlipEdgeCommand
      */
     public void execute()
     {
-      NodeSubject node1 = mEdge.getSource();
-      NodeSubject node2 = mEdge.getTarget();
-      Point2D p1 = mEdge.getStartPoint().getPoint();
-      Point2D p2 = mEdge.getEndPoint().getPoint();
-      mEdge.setSource(node2);
-      mEdge.setTarget(node1);
-      mEdge.setStartPoint(new PointGeometrySubject(p2));
-      mEdge.setEndPoint(new PointGeometrySubject(p1));
+      final NodeSubject node1 = mEdge.getSource();
+      final NodeSubject node2 = mEdge.getTarget();
+      final PointGeometrySubject p1 = mEdge.getStartPoint();
+      final PointGeometrySubject p2 = mEdge.getEndPoint();
+      if (p1 != null || p2 != null) {
+	mEdge.setStartPoint(null);
+	mEdge.setEndPoint(null);
+	mEdge.setStartPoint(p2);
+	mEdge.setEndPoint(p1);
+      }
     }
 
     /** 
@@ -50,11 +52,10 @@ public class FlipEdgeCommand
 		execute();
     }
 
-   	public boolean isSignificant()
-	{
-		// I have no idea what to return here... I return false, true?!
-		return true;
-	}
+  public boolean isSignificant()
+  {
+    return true;
+  }
 
   public String getName()
   {

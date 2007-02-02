@@ -1,17 +1,34 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.gui.renderer
+//# CLASS:   ProxyShapeProducer
+//###########################################################################
+//# $Id: ProxyShapeProducer.java,v 1.15 2007-02-02 02:55:13 robi Exp $
+//###########################################################################
+
+
 package net.sourceforge.waters.gui.renderer;
 
+import java.awt.Font;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.util.Collections;
-import java.awt.Font;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
+import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
@@ -19,17 +36,14 @@ import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
-import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
+
 import net.sourceforge.waters.xsd.base.EventKind;
-import java.awt.font.TextLayout;
-import java.awt.font.FontRenderContext;
+
 
 public class ProxyShapeProducer
     extends AbstractModuleProxyVisitor
@@ -57,21 +71,20 @@ public class ProxyShapeProducer
         return s;
     }
     
-    public EdgeProxyShape visitEdgeProxy(EdgeProxy e)
-    {
-        EdgeProxyShape shape = (EdgeProxyShape)mMap.get(e);
-        if (shape == null)
-        {
-            if (e.getStartPoint().getPoint().equals(e.getEndPoint().getPoint()))
-            {
-                shape = new EdgeProxyShape.Tear(e);
-            }
-            else
-            {
-                shape = new EdgeProxyShape.QuadCurve(e);
-            }
-            mMap.put(e, shape);
-        }
+  public EdgeProxyShape visitEdgeProxy(final EdgeProxy e)
+  {
+    EdgeProxyShape shape = (EdgeProxyShape) mMap.get(e);
+    if (shape == null) {
+      final Point2D start = GeometryTools.getStartPoint(e);
+      final Point2D end = GeometryTools.getEndPoint(e);
+      if (start.equals(end)) {
+	shape = new EdgeProxyShape.Tear(e);
+      } else {
+	shape = new EdgeProxyShape.QuadCurve(e);
+      }
+      mMap.put(e, shape);
+    }
+
         LabelBlockProxy l = e.getLabelBlock();
         LabelBlockProxyShape s = (LabelBlockProxyShape)mMap.get(l);
         if (s == null)

@@ -1,68 +1,73 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.gui
+//# CLASS:   EditorGraph
+//###########################################################################
+//# $Id: EditorGraph.java,v 1.12 2007-02-02 02:55:13 robi Exp $
+//###########################################################################
+
 package net.sourceforge.waters.gui;
 
+import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-
-import net.sourceforge.waters.model.base.VisitorException;
 
 import net.sourceforge.waters.gui.renderer.GeometryTools;
 
 import net.sourceforge.waters.model.base.ProxyVisitor;
-
+import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.unchecked.Casting;
 
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.IndexedHashSetSubject;
+import net.sourceforge.waters.subject.base.IndexedSetSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
+import net.sourceforge.waters.subject.base.MutableSubject;
+import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
-
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
+import net.sourceforge.waters.subject.module.SplineGeometrySubject;
+
 import net.sourceforge.waters.xsd.module.SplineKind;
 
-import net.sourceforge.waters.model.unchecked.Casting;
-import net.sourceforge.waters.subject.module.SplineGeometrySubject;
-import net.sourceforge.waters.subject.base.ProxySubject;
-import java.util.Map;
-import java.util.HashSet;
-import java.util.Comparator;
-import java.awt.Rectangle;
-import net.sourceforge.waters.subject.base.IndexedSetSubject;
-import net.sourceforge.waters.subject.module.IdentifierSubject;
 
 public class EditorGraph
-	extends AbstractSubject
-	implements GraphProxy,
-			   ModelObserver
+  extends MutableSubject
+  implements GraphProxy
 {
-	public EditorGraph(GraphSubject graph)
-	{
+  public EditorGraph(final GraphSubject graph)
+  {
 		mGraph = graph;
 		mChanged = new HashSet<Subject>();
-		mObservers = Collections.synchronizedCollection(new ArrayList());
 		mObserverMap = new IdentityHashMap<NodeSubject, EditorNode>(graph.getNodes().size());
 		mFakeMap = new IdentityHashMap<Subject, Subject>(graph.getNodes().size() + graph.getEdges().size()+1);
 		mOriginalMap = new IdentityHashMap<Subject, Subject>(graph.getNodes().size() + graph.getEdges().size()+1);
@@ -111,9 +116,11 @@ public class EditorGraph
 			}
 		}
 
-		this.addModelObserver(this);
-    graph.addModelObserver(this);
-	}
+    final OriginalModelListener listener1 = new OriginalModelListener();
+    graph.addModelObserver(listener1);
+    final CopiedModelListener listener2 = new CopiedModelListener();
+    addModelObserver(listener2);
+  }
 
 	public Object acceptVisitor(ProxyVisitor p)
     throws VisitorException
@@ -284,49 +291,26 @@ public class EditorGraph
 		return new Point2D.Double(r.getCenterX(), r.getCenterY());
 	}
 
-	private void addEdge(EdgeSubject e)
-	{
-		EdgeSubject edge = e.clone();
-		try
-		{
-			edge.setSource((NodeSubject)mOriginalMap.get(e.getSource()));
-			edge.setTarget((NodeSubject)mOriginalMap.get(e.getTarget()));
-			mEdges.add(edge);
-      mObserverMap.get(edge.getSource()).addEdge(edge);
-			mObserverMap.get(edge.getTarget()).addEdge(edge);
-			mFakeMap.put(edge, e);
-			mOriginalMap.put(e, edge);
-      if (edge.getGeometry() == null) {
-        final Collection<Point2D> points = Collections.singleton(
-					GeometryTools.getMidPoint(GeometryTools.getPosition(edge.getSource()),
-                                    GeometryTools.getPosition(edge.getTarget())
-                                    ));
-        edge.setGeometry(new SplineGeometrySubject(points,
-                                                   SplineKind.INTERPOLATING));
-      }
-      if (edge.getStartPoint() == null) {
-        PointGeometrySubject p = new PointGeometrySubject(
-                              GeometryTools.defaultPosition(edge.getSource(),
-                             edge.getGeometry().getPoints().get(0)));
-        edge.setStartPoint(p);
-      }
-      if (edge.getEndPoint() == null) {
-        PointGeometrySubject p = new PointGeometrySubject(
-                              GeometryTools.defaultPosition(edge.getTarget(),
-                                      edge.getGeometry().getPoints().get(0)));
-        edge.setEndPoint(p);
-      }
-		}
-		catch (Throwable t)
-		{
-      System.err.println("either source or target node not in graph");
-      assert(false);
-			t.printStackTrace();
-			mEdges.remove(edge);
-			mFakeMap.remove(edge);
-			mOriginalMap.remove(e);
-		}
-	}
+  private void addEdge(EdgeSubject e)
+  {
+    final EdgeSubject edge = e.clone();
+    edge.setSource((NodeSubject) mOriginalMap.get(e.getSource()));
+    edge.setTarget((NodeSubject) mOriginalMap.get(e.getTarget()));
+    mEdges.add(edge);
+    mObserverMap.get(edge.getSource()).addEdge(edge);
+    mObserverMap.get(edge.getTarget()).addEdge(edge);
+    mFakeMap.put(edge, e);
+    mOriginalMap.put(e, edge);
+    if (edge.getGeometry() == null) {
+      final Collection<Point2D> points =
+	Collections.singleton
+	(GeometryTools.getMidPoint(GeometryTools.getPosition(edge.getSource()),
+				   GeometryTools.getPosition(edge.getTarget())
+				   ));
+      edge.setGeometry(new SplineGeometrySubject(points,
+						 SplineKind.INTERPOLATING));
+    }
+  }
   
   private void removeEdge(EdgeSubject e)
   {
@@ -338,7 +322,6 @@ public class EditorGraph
   
   private void removeNode(NodeSubject n)
   {
-    System.out.println("remove node");
     NodeSubject remove = (NodeSubject)mOriginalMap.get(n);
     mNodes.remove(remove);
     mFakeMap.remove(remove);
@@ -362,106 +345,14 @@ public class EditorGraph
 		}
 	}
 
-	private void addNode(SimpleNodeSubject n)
-	{
-		SimpleNodeSubject node = n.clone();
-    NodeSubject other = mNodes.get(n.getName());
-		mNodes.add(node);
-		mObserverMap.put(node, new EditorSimpleNode(node));
-		mFakeMap.put(node, n);
+  private void addNode(SimpleNodeSubject n)
+  {
+    final SimpleNodeSubject node = n.clone();
+    mNodes.add(node);
+    mObserverMap.put(node, new EditorSimpleNode(node));
+    mFakeMap.put(node, n);
     mOriginalMap.put(n, node);
-	}
-
-	public void modelChanged(ModelChangeEvent event)
-	{
-    if (event.getKind() == ModelChangeEvent.GEOMETRY_CHANGED
-        && event.getSource() instanceof EdgeSubject
-        && mOriginalMap.containsKey(event.getSource())) {
-      EdgeSubject orig = (EdgeSubject) event.getSource();
-      EdgeSubject copy = (EdgeSubject) getCopy(orig);
-      copy.getStartPoint().setPoint(orig.getStartPoint().getPoint());
-      copy.getEndPoint().setPoint(orig.getEndPoint().getPoint());
-      return;
-    }
-    if (event.getKind() == ModelChangeEvent.ITEM_ADDED
-        && (event.getSource().getParent() != this
-            && event.getSource().getParent().getParent().getParent().getParent() != this
-            && !(event.getSource().getParent() instanceof GroupNodeSubject))) {
-      if (event.getValue() instanceof EdgeSubject) {
-        addEdge((EdgeSubject) event.getValue());
-      }
-      if (event.getValue() instanceof SimpleNodeSubject) {
-        addNode((SimpleNodeSubject) event.getValue());
-      }
-      if (event.getValue() instanceof GroupNodeSubject) {
-        addGroupNode((GroupNodeSubject) event.getValue());
-      }
-      if (event.getSource().getParent() instanceof LabelBlockSubject) {
-        LabelBlockSubject block = (LabelBlockSubject) event.getSource().getParent();
-        block = (LabelBlockSubject) getCopy(block);
-        block.getEventListModifiable().add(((IdentifierSubject) event.getValue()).clone());
-      }
-      return;
-    }
-    if (event.getKind() == ModelChangeEvent.ITEM_REMOVED
-        && (event.getSource().getParent() != this 
-            && event.getSource().getParent().getParent().getParent().getParent() != this
-            && !(event.getSource().getParent() instanceof GroupNodeSubject))) {
-      if (event.getValue() instanceof EdgeSubject) {
-        removeEdge((EdgeSubject) event.getValue());
-      }
-      if (event.getValue() instanceof SimpleNodeSubject) {
-        removeNode((NodeSubject) event.getValue());
-      }
-      if (event.getValue() instanceof GroupNodeSubject) {
-        removeNode((GroupNodeSubject) event.getValue());
-      }
-      if (event.getSource().getParent() instanceof LabelBlockSubject) {
-        LabelBlockSubject block = (LabelBlockSubject) event.getSource().getParent();
-        block = (LabelBlockSubject) getCopy(block);
-        AbstractSubject remove = null;
-        for (AbstractSubject a : block.getEventListModifiable()) {
-          if (a.toString().equals(event.getValue().toString())) {
-            remove = a;
-          }
-        }
-        block.getEventListModifiable().remove((IdentifierSubject) remove);
-      }
-      return;
-    }
-		if (event.getSource() instanceof EdgeSubject
-        && event.getSource().getParent().getParent() == this)
-		{
-			EdgeSubject e = (EdgeSubject)event.getSource();
-			if (event.getKind() == ModelChangeEvent.STATE_CHANGED)
-			{
-				mObserverMap.get(e.getSource()).addEdge(e);
-				mObserverMap.get(e.getTarget()).addEdge(e);
-			}
-		}
-		if (event.getSource() instanceof NodeSubject
-        && event.getSource().getParent().getParent() == this)
-		{
-			NodeSubject n = (NodeSubject)event.getSource();
-			if (event.getKind() == ModelChangeEvent.GEOMETRY_CHANGED)
-			{
-				mObserverMap.get(n).update();
-        mNodeMoved = true;
-			}
-		}
-    if (event.getKind() == ModelChangeEvent.GEOMETRY_CHANGED
-        && (event.getSource().getParent().getParent() == this
-            || event.getSource().getParent().getParent().getParent() == this)) {
-      mChanged.add(event.getSource());
-    }
-    if (event.getKind() == ModelChangeEvent.ITEM_ADDED
-        || event.getKind() == ModelChangeEvent.ITEM_REMOVED) {
-      if (event.getSource().getParent() != null
-          && event.getSource().getParent() instanceof GroupNodeSubject) {
-        mChanged.add(event.getSource().getParent());
-      }
-    }
-	}
+  }
   
   public Map<ProxySubject, ProxySubject> getChanged()
   {
@@ -475,24 +366,6 @@ public class EditorGraph
     }
     return changed;
   }
-
-	public void addModelObserver(ModelObserver o)
-	{
-		mObservers.add(o);
-	}
-
-	public void removeModelObserver(ModelObserver o)
-	{
-		mObservers.remove(o);
-	}
-
-	public void fireModelChanged(ModelChangeEvent event)
-	{
-    for (ModelObserver o : mObservers) {
-      o.modelChanged(event);
-    }
-		super.fireModelChanged(event);
-	}
 
 	public static LabelGeometrySubject defaultLabelBlockOffset()
 	{
@@ -570,9 +443,151 @@ public class EditorGraph
     }
   }
 
-	private abstract class EditorNode
-		implements ModelObserver
+
+  //#########################################################################
+  //# Inner Class OriginalModelListener
+  /**
+   * This listener receives all change event associated with the original
+   * editor graph, of which the EditorGraph is a copy.
+   */
+  private class OriginalModelListener
+    implements ModelObserver
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.subject.base.ModelObserver
+    public void modelChanged(final ModelChangeEvent event)
+    {
+      final Subject esource = event.getSource();
+      switch (event.getKind()) {
+      case ModelChangeEvent.ITEM_ADDED:
+	if (!(esource.getParent() instanceof GroupNodeSubject)) {
+	  final ProxySubject added = (ProxySubject) event.getValue();
+	  if (added instanceof EdgeSubject) {
+	    addEdge((EdgeSubject) added);
+	  } else if (added instanceof SimpleNodeSubject) {
+	    addNode((SimpleNodeSubject) added);
+	  } else if (added instanceof GroupNodeSubject) {
+	    addGroupNode((GroupNodeSubject) added);
+	  } else if (esource.getParent() instanceof LabelBlockSubject) {
+	    LabelBlockSubject block = (LabelBlockSubject) esource.getParent();
+	    block = (LabelBlockSubject) getCopy(block);
+	    block.getEventListModifiable().
+	      add(((IdentifierSubject) added).clone());
+	  }
+	}
+	break;
+      case ModelChangeEvent.ITEM_REMOVED:
+	if (!(esource.getParent() instanceof GroupNodeSubject)) {
+	  final ProxySubject victim = (ProxySubject) event.getValue();
+	  if (victim instanceof EdgeSubject) {
+	    removeEdge((EdgeSubject) victim);
+	  } else if (victim instanceof SimpleNodeSubject) {
+	    removeNode((NodeSubject) victim);
+	  } else if (victim instanceof GroupNodeSubject) {
+	    removeNode((GroupNodeSubject) victim);
+	  } else if (esource.getParent() instanceof LabelBlockSubject) {
+	    LabelBlockSubject block = (LabelBlockSubject) esource.getParent();
+	    block = (LabelBlockSubject) getCopy(block);
+	    AbstractSubject remove = null;
+	    for (AbstractSubject a : block.getEventListModifiable()) {
+	      if (a.equalsByContents(victim)) {
+		remove = a;
+	      }
+	    }
+	    block.getEventListModifiable().remove((IdentifierSubject) remove);
+	  }
+	}
+	break;
+      case ModelChangeEvent.GEOMETRY_CHANGED:
+	if (esource instanceof EdgeSubject &&
+	    mOriginalMap.containsKey(esource)) {
+	  final EdgeSubject orig = (EdgeSubject) esource;
+	  final EdgeSubject copy = (EdgeSubject) getCopy(orig);
+	  final PointGeometrySubject origStart = orig.getStartPoint();
+	  final PointGeometrySubject copyStart = copy.getStartPoint();
+	  if (origStart == null) {
+	    copy.setStartPoint(null);
+	  } else if (copyStart == null) {
+	    final PointGeometrySubject cloned = origStart.clone();
+	    copy.setStartPoint(cloned);
+	  } else {
+	    final Point2D point = origStart.getPoint();
+	    copyStart.setPoint(point);
+	  }
+	  final PointGeometrySubject origEnd = orig.getEndPoint();
+	  final PointGeometrySubject copyEnd = copy.getEndPoint();
+	  if (origEnd == null) {
+	    copy.setEndPoint(null);
+	  } else if (copyEnd == null) {
+	    final PointGeometrySubject cloned = origEnd.clone();
+	    copy.setEndPoint(cloned);
+	  } else {
+	    final Point2D point = origEnd.getPoint();
+	    copyEnd.setPoint(point);
+	  }
+	}
+	break;
+      }
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class CopiedModelListener
+  /**
+   * This listener receives all change event associated with this
+   * editor graph.
+   */
+  private class CopiedModelListener
+    implements ModelObserver
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.subject.base.ModelObserver
+    public void modelChanged(final ModelChangeEvent event)
+    {
+      final Subject esource = event.getSource();
+      switch (event.getKind()) {
+      case ModelChangeEvent.ITEM_ADDED:
+      case ModelChangeEvent.ITEM_REMOVED:
 	{
+	  final Subject parent = esource.getParent();
+	  if (parent != null && parent instanceof GroupNodeSubject) {
+	    mChanged.add(parent);
+	  }
+	}
+	break;
+      case ModelChangeEvent.STATE_CHANGED:
+	if (esource instanceof EdgeSubject) {
+	  final EdgeSubject edge = (EdgeSubject) esource;
+	  final NodeSubject source = edge.getSource();
+	  final NodeSubject target = edge.getTarget();
+	  mObserverMap.get(source).addEdge(edge);
+	  mObserverMap.get(target).addEdge(edge);
+	  // TODO: Remove unlinked edges?
+	}
+	break;
+      case ModelChangeEvent.GEOMETRY_CHANGED:
+	if (esource instanceof NodeSubject) {
+	  final NodeSubject node = (NodeSubject) esource;
+	  mObserverMap.get(node).update();
+	  mNodeMoved = true;
+	}
+	mChanged.add(esource);
+	break;
+      }
+    }
+
+  }
+  
+
+  //#########################################################################
+  //# Inner Class EditorNode
+  private abstract class EditorNode
+    implements ModelObserver
+  {
 		protected EditorNode(NodeSubject node)
 		{
 			mNode = node;
@@ -614,75 +629,67 @@ public class EditorGraph
 
 		public abstract void update();
 
-		protected final void transformEdge(final EdgeSubject edge, final Point2D neo)
-		{
-			if (edge.getSource() == edge.getTarget())
-			{
-				Point2D p = edge.getGeometry().getPointsModifiable().get(0);
-				Point2D s = edge.getStartPoint().getPoint();
-				edge.getGeometry().getPointsModifiable().set(0 ,
-						new Point2D.Double(p.getX() + (neo.getX() - (int) s.getX()),
-                               p.getY() + (neo.getY() - s.getY())));
-			}
-			else
-			{
-				final Point2D c = edge.getGeometry().getPointsModifiable().get(0);
-				final Point2D n = new Point2D.Double(neo.getX(), neo.getY());
-				final Point2D o;
-				final Point2D e;
-
-				if (edge.getSource() == getNodeSubject())
-				{
-					o = edge.getStartPoint().getPoint();
-					e = edge.getEndPoint().getPoint();
-					//  Cx = (.25 * (double)(ox + 2*getCPointX() + (double)endNode.getX())) - (double)endNode.getX();
-					//  Cy = (.25 * (double)(oy + 2*getCPointY() + (double)endNode.getY())) - (double)endNode.getY();
-				}
-				else
-				{
-					e = edge.getStartPoint().getPoint();
-					o = edge.getEndPoint().getPoint();
-				}
-				c.setLocation(c.getX() - e.getX(), c.getY() - e.getY());
-				o.setLocation(o.getX() - e.getX(), o.getY() - e.getY());
-				n.setLocation(n.getX() - e.getX(), n.getY() - e.getY());
-
-				// If ox and oy are 0, this becomes 0...
-				double divide = Math.pow(o.getX(), 2) + Math.pow(o.getY(), 2);
-				if (Math.abs(divide) < Double.MIN_VALUE)
-				{
-					if (divide >= 0)
-					{
-						divide = 2*Double.MIN_VALUE;
-					}
-					else
-					{
-						divide = -2*Double.MIN_VALUE;
-					}
-				}
-
-				// ... which is not good here!
-				double a1 = (n.getX() * o.getX() + o.getY() * n.getY())
-							/ divide;
-				double a2 = ((o.getY() * n.getX()) - (o.getX() * n.getY()))
-							/ divide;
-				double a3 = -a2;
-				double a4 = a1;				
-				c.setLocation(a1 * c.getX() + a2 * c.getY() + e.getX(),
-							  a3 * c.getX() + a4 * c.getY() + e.getY());
-				// This is where it sometimes goes wrong...
-				// Cx and Cy sometimes becomes NaN...
-				edge.getGeometry().getPointsModifiable().set(0 , c);
-			}
-			if (edge.getSource() == getNodeSubject())
-			{
-				edge.getStartPoint().setPoint(neo);
-			}
-			if (edge.getTarget() == getNodeSubject())
-			{
-				edge.getEndPoint().setPoint(neo);
-			}
-		}
+    /**
+     * Updates edge geometry when dragging node.
+     * @param  edge   The edge to be modified.
+     * @param  old    The old position of the start or end point.
+     * @param  neo    The new position of the start or end point.
+     */ 
+    protected final void transformEdge(final EdgeSubject edge,
+				       final Point2D old,
+				       final Point2D neo)
+    {
+      final double ox = old.getX();
+      final double oy = old.getY();
+      final double nx = neo.getX();
+      final double ny = neo.getY();
+      final Point2D c = edge.getGeometry().getPointsModifiable().get(0);
+      final double cx = c.getX();
+      final double cy = c.getY();
+      final Point2D newCenter;
+      if (edge.getSource() == edge.getTarget())	{
+	newCenter = new Point2D.Double(cx + nx - ox, cy + ny - oy);
+      }	else {
+	final Point2D e;
+	if (edge.getSource() == getNodeSubject()) {
+	  e = GeometryTools.getEndPoint(edge);
+	} else {
+	  e = GeometryTools.getStartPoint(edge);
+	}
+	final double ex = e.getX();
+	final double ey = e.getY();
+	final double cx1 = cx - ex;
+	final double cy1 = cy - ey;
+	final double ox1 = ox - ex;
+	final double oy1 = oy - ey;
+	final double nx1 = nx - ex;
+	final double ny1 = ny - ey;
+	double divide = ox1 * ox1 + oy1 * oy1;
+	// Correction for very short edge, when ox1 and oy1 are 0 ...
+	if (Math.abs(divide) < Double.MIN_VALUE) {
+	  if (divide >= 0.0) {
+	    divide = 2.0 * Double.MIN_VALUE;
+	  } else {
+	    divide = -2.0 * Double.MIN_VALUE;
+	  }
+	}
+	final double a1 = (nx1 * ox1 + ny1 * oy1) / divide;
+	final double a2 = (nx1 * oy1 - ny1 * ox1) / divide;
+	final double a3 = -a2;
+	final double a4 = a1;
+	newCenter = new Point2D.Double(a1 * cx1 + a2 * cy1 + ex,
+				       a3 * cx1 + a4 * cy1 + ey);
+      }
+      edge.getGeometry().getPointsModifiable().set(0, newCenter);
+      if (edge.getSource() == getNodeSubject() &&
+	  edge.getStartPoint() != null) {
+	edge.getStartPoint().setPoint(neo);
+      }
+      if (edge.getTarget() == getNodeSubject() &&
+	  edge.getEndPoint() != null) {
+	edge.getEndPoint().setPoint(neo);
+      }
+    }
 
 		public NodeSubject getNodeSubject()
 		{
@@ -693,128 +700,108 @@ public class EditorGraph
 		private final IdentityHashMap<EdgeSubject, Boolean> mEdges;
 	}
 
-	private class EditorSimpleNode
-		extends EditorNode
-	{
-		public EditorSimpleNode(SimpleNodeSubject node)
-		{
-			super(node);
-			mPoint = node.getPointGeometry().getPoint();
-		}
 
-		public SimpleNodeSubject getNodeSubject()
-		{
-			return (SimpleNodeSubject)super.getNodeSubject();
-		}
+  //#########################################################################
+  //# Inner Class EditorSimpleNode
+  private class EditorSimpleNode
+    extends EditorNode
+  {
 
-		public void update()
-		{
+    //#######################################################################
+    //# Constructors
+    public EditorSimpleNode(final SimpleNodeSubject node)
+    {
+      super(node);
+      mPoint = node.getPointGeometry().getPoint();
+    }
+
+    //#######################################################################
+    //# Simple Access
+    public SimpleNodeSubject getNodeSubject()
+    {
+      return (SimpleNodeSubject) super.getNodeSubject();
+    }
+
+    //#######################################################################
+    //# Editing
+    public void update()
+    {
       mUpdate = true;
-			if (!mPoint.equals(getNodeSubject().getPointGeometry().getPoint()))
-			{
-				for (EdgeSubject e : getEdges())
-				{
-					transformEdge(e, getNodeSubject().getPointGeometry().getPoint());
-				}
-				mPoint.setLocation(getNodeSubject().getPointGeometry().getPoint());
-			}
+      final Point2D newpos = getNodeSubject().getPointGeometry().getPoint();
+      if (!mPoint.equals(newpos)) {
+	for (final EdgeSubject edge : getEdges()) {
+	  transformEdge(edge, mPoint, newpos);
+	}
+	mPoint = newpos;
+      }
       mUpdate = false;
-		}		
+    }		
+    
+    //#######################################################################
+    //# Data Members
+    private Point2D mPoint;
+  }
 
-		private final Point2D mPoint;
+
+  //#########################################################################
+  //# Inner Class EditorGroupNode
+  private class EditorGroupNode
+    extends EditorNode
+  {
+    //#######################################################################
+    //# Constructors
+    public EditorGroupNode(GroupNodeSubject node)
+    {
+      super(node);
+      mRect = node.getGeometry().getRectangle();
+    }
+
+    //#######################################################################
+    //# Simple Access
+    public GroupNodeSubject getNodeSubject()
+    {
+      return (GroupNodeSubject) super.getNodeSubject();
+    }
+
+    //#######################################################################
+    //# Editing
+    public void update()
+    {
+      final GroupNodeSubject node = getNodeSubject();
+      final Rectangle2D newR = node.getGeometry().getRectangle();
+      if (!mRect.equals(newR)) {
+	for (final EdgeSubject edge : getEdges()) {
+	  final Point2D old;
+	  if (edge.getSource() == node) {
+	    old = edge.getStartPoint().getPoint();
+	  } else if (edge.getTarget() == node)	{
+	    old = edge.getEndPoint().getPoint();
+	  } else {
+	    continue;
+	  }
+	  final Point2D neo = new Point2D.Double
+	    (((old.getX() - mRect.getMinX()) / mRect.getWidth()) *
+	     newR.getWidth() + newR.getMinX(),
+	     ((old.getY() - mRect.getMinY()) / mRect.getHeight()) *
+	     newR.getHeight() + newR.getMinY());
+	  transformEdge(edge, old, neo);
 	}
+	mRect = newR;
+      }
+    }
 
-	private class EditorGroupNode
-		extends EditorNode
-	{
-		public EditorGroupNode(GroupNodeSubject node)
-		{
-			super(node);
-			mRect = node.getGeometry().getRectangle();
-		}
+    //#######################################################################
+    //# Data Members
+    private Rectangle2D mRect;
+  }
 
-		public GroupNodeSubject getNodeSubject()
-		{
-			return (GroupNodeSubject)super.getNodeSubject();
-		}
 
-		public void addEdge(EdgeSubject e)
-		{
-			super.addEdge(e);
-			/*
-			final Rectangle2D r = getSubject().getGeometry().getRectangle();
-			final Point 2D p;
-			if (e.getSource() == getSubject())
-			{
-				p = e.getStartPoint().getPoint();
-			}
-			else
-			{
-				p = e.getEndPoint().getPoint();
-			}
-			if (Maths.abs(p.getX() - r.getMinX()) <
-				Maths.abs(p.getX() - r.getMaxX()))
-			{
-				p.setLocation(r.getMinX(), p.getY());
-			}
-			else
-			{
-				p.setLocation(r.getMaxX(), p.getY());
-			}
-			if (Maths.abs(p.getY() - r.getMinY()) <
-				Maths.abs(p.getY() - r.getMaxY()))
-			{
-				p.setLocation(p.getX(), r.getMinY());
-			}
-			else
-			{
-				p.setLocation(p.getX(), r.getMaxY());
-			}
-			if (e.getSource() == getSubject())
-			{
-				e.getStartPoint().setPoint(p);
-			}
-			else
-			{
-				e.getEndPoint().setPoint(p);
-			}
-			*/
-		}
-
-		public void update()
-		{
-			if (!mRect.equals(getNodeSubject().getGeometry().getRectangle()))
-			{
-				for (EdgeSubject e : getEdges())
-				{
-					Rectangle2D newR = getNodeSubject().getGeometry().getRectangle();
-					Point2D o;
-					Point2D n = new Point2D.Double();
-					if (e.getSource() == getNodeSubject()) {
-						o = e.getStartPoint().getPoint();
-					}	else if (e.getTarget() == getNodeSubject())	{
-						o = e.getEndPoint().getPoint();
-					} else {
-            continue;
-          }
-					n.setLocation(((o.getX() - mRect.getMinX()) / mRect.getWidth())
-                        * newR.getWidth() + newR.getMinX(),
-                        ((o.getY() - mRect.getMinY()) / mRect.getHeight())
-                        * newR.getHeight() + newR.getMinY());
-					transformEdge(e, n);
-				}
-				mRect.setRect(getNodeSubject().getGeometry().getRectangle());
-			}
-		}
-
-		private final Rectangle2D mRect;
-	}
-
+  //#########################################################################
+  //# Data Members
   private boolean mUpdate = false;
 	private final GraphSubject mGraph;
 	private final ListSubject<EdgeSubject> mEdges;
 	private final IndexedSetSubject<NodeSubject> mNodes;
-	private final Collection<ModelObserver> mObservers;
 	private final IdentityHashMap<NodeSubject, EditorNode> mObserverMap;
 	private final IdentityHashMap<Subject, Subject> mFakeMap;
 	private final IdentityHashMap<Subject, Subject> mOriginalMap;

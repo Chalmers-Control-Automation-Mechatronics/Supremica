@@ -1,3 +1,13 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.gui.renderer
+//# CLASS:   SubjectShapeProducer
+//###########################################################################
+//# $Id: SubjectShapeProducer.java,v 1.22 2007-02-02 02:55:13 robi Exp $
+//###########################################################################
+
+
 package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Frame;
@@ -9,10 +19,12 @@ import java.util.List;
 import java.util.Random;
 import javax.swing.JDialog;
 
+import net.sourceforge.waters.gui.EditorGraph;
 import net.sourceforge.waters.gui.springembedder.SpringAbortDialog;
 import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
@@ -39,28 +51,28 @@ import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.subject.module.SplineGeometrySubject;
 import net.sourceforge.waters.xsd.module.SplineKind;
 
-import org.supremica.log.*;
 import org.supremica.properties.Config;
-import net.sourceforge.waters.gui.EditorGraph;
 
 
 public class SubjectShapeProducer
-extends ProxyShapeProducer
-implements ModelObserver
+  extends ProxyShapeProducer
+  implements ModelObserver
 {
-	private static final Logger logger =
-		LoggerFactory.createLogger(SubjectShapeProducer.class);
 	
-	public SubjectShapeProducer(final GraphSubject graph,
+  //########################################################################
+  //# Constructors
+  public SubjectShapeProducer(final GraphSubject graph,
                               final ModuleProxy module,
                               final Frame root)
-	throws GeometryAbsentException
-	{
-		super(module);
-		boolean runEmbedder = false;
-		Random rand = new Random();
+    throws GeometryAbsentException
+  {
+    super(module);
+    mGraph = graph;
+    boolean runEmbedder = false;
+    Random rand = new Random();
     if (graph.getBlockedEvents() != null) {
       if (graph.getBlockedEvents().getGeometry() == null) {
+        // TODO: Calculate better position
         graph.getBlockedEvents().setGeometry(new LabelGeometrySubject(new Point(5, 5)));
       }
     }
@@ -123,21 +135,6 @@ implements ModelObserver
 				edge.setGeometry(new SplineGeometrySubject(points,
 						SplineKind.INTERPOLATING));
 			}
-			if (edge.getStartPoint() == null)
-			{
-				Point2D p1 = edge.getGeometry().getPoints().get(0);
-				PointGeometrySubject p =
-					new PointGeometrySubject
-					(GeometryTools.defaultPosition(edge.getSource(), p1));
-				edge.setStartPoint(p);
-			}
-			if (edge.getEndPoint() == null)
-			{
-				PointGeometrySubject p = new PointGeometrySubject(
-						GeometryTools.defaultPosition(edge.getTarget(),
-								edge.getGeometry().getPoints().get(0)));
-				edge.setEndPoint(p);
-			}
 			if (edge.getLabelBlock().getGeometry() == null)
 			{
 				LabelGeometrySubject offset =
@@ -174,11 +171,13 @@ implements ModelObserver
 		graph.addModelObserver(this);
 	}
 	
-	public SubjectShapeProducer(Subject graph, ModuleProxy module)
-	{
-		super(module);
-		graph.addModelObserver(this);
-	}
+  public SubjectShapeProducer(final Subject graph,
+                              final ModuleProxy module)
+  {
+    super(module);
+    mGraph = (GraphProxy) graph;
+    graph.addModelObserver(this);
+  }
 	
 	
 	private void removeMapping(NodeProxy node)
@@ -258,43 +257,64 @@ implements ModelObserver
 			removeMapping((LabelGeometryProxy)subject);
 		}
 	}
+
 	
-	public void modelChanged(ModelChangeEvent event)
-	{
-		if (event.getKind() == ModelChangeEvent.ITEM_REMOVED ||
-				event.getKind() == ModelChangeEvent.ITEM_ADDED)
-		{
-			if (event.getSource().getParent() instanceof EventListExpressionSubject)
-			{
-				Subject subject = event.getSource().getParent();
-				if (subject.getParent() instanceof SimpleNodeProxy)
-				{
-					removeMapping((SimpleNodeProxy) subject.getParent());
-				}
-				else if (subject instanceof LabelBlockProxy)
-				{
-					removeMapping((LabelBlockProxy)subject);
-				}
-			}
-			else
-			{
-				removeMapping((Subject)event.getValue());
-			}
-		}
-		else if (event.getSource() instanceof SimpleNodeProxy)
-		{
-			if (event.getKind() == ModelChangeEvent.NAME_CHANGED)
-			{
-				removeMapping(((SimpleNodeProxy)event.getSource()).getLabelGeometry());
-			}
-			else
-			{
-				removeMapping((SimpleNodeProxy)event.getSource());
-			}
-		}
-		else
-		{
-			removeMapping(event.getSource());
-		}
-	}
+  //########################################################################
+  //# Interface net.sourceforge.waters.subject.base.ModelObserver
+  public void modelChanged(final ModelChangeEvent event)
+  {
+    final Subject esource = event.getSource();
+    switch (event.getKind()) {
+    case ModelChangeEvent.ITEM_REMOVED:
+    case ModelChangeEvent.ITEM_ADDED:
+      if (esource.getParent() instanceof EventListExpressionSubject) {
+        final Subject parent = esource.getParent();
+        final Subject grandparent = parent.getParent();
+        if (grandparent instanceof SimpleNodeProxy) {
+          removeMapping((SimpleNodeProxy) grandparent);
+        } else if (parent instanceof LabelBlockProxy) {
+          removeMapping((LabelBlockProxy) parent);
+        }
+      } else {
+        removeMapping((Subject) event.getValue());
+      }
+      break;
+    case ModelChangeEvent.NAME_CHANGED:
+      if (esource instanceof SimpleNodeProxy) {
+        final SimpleNodeProxy node = (SimpleNodeProxy) esource;
+        removeMapping(node.getLabelGeometry());
+      } else {
+        removeMapping(esource);
+      }
+      break;
+    case ModelChangeEvent.GEOMETRY_CHANGED:
+      {
+        final NodeProxy node;
+        if (esource instanceof NodeProxy) {
+          node = (NodeProxy) esource;
+        } else if (esource.getParent() instanceof NodeProxy) {
+          node = (NodeProxy) esource.getParent();
+        } else {
+          node = null;
+        }
+        if (node != null) {
+          for (final EdgeProxy edge : mGraph.getEdges()) {
+            if (edge.getSource() == node || edge.getTarget() == node) {
+              removeMapping(edge);
+            }
+          }
+        }
+        removeMapping(esource);
+      }
+      break;
+    default:
+      removeMapping(esource);
+    }
+  }
+
+
+  //########################################################################
+  //# Data Members
+  private final GraphProxy mGraph;
+
 }

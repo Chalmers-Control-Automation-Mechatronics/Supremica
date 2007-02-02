@@ -2,9 +2,9 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.subject.base
-//# CLASS:   ImmutableSubject
+//# CLASS:   AbstractSubject
 //###########################################################################
-//# $Id: AbstractSubject.java,v 1.5 2006-07-20 02:28:37 robi Exp $
+//# $Id: AbstractSubject.java,v 1.6 2007-02-02 02:55:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
