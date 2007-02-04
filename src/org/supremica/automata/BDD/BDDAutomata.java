@@ -57,42 +57,52 @@ import org.supremica.automata.*;
 import org.supremica.automata.IO.*;
 import org.supremica.util.BDD.PCGNode;
 import org.supremica.util.BDD.PCG;
+import org.supremica.util.BDD.Options;
+
 import org.supremica.util.BDD.solvers.OrderingSolver;
 
 
 public class BDDAutomata
 {
 	BDDManager manager;
-	Automata theAutomata;
+	Automata theAutomata = new Automata();
 
-	public BDDAutomata(Automata theAutomata)
+	public BDDAutomata(Automata orgAutomata)
 	{
-		this.theAutomata = new Automata(theAutomata);
-		sortAutomata(theAutomata);
+		sortAutomata(orgAutomata);
 		manager = new BDDManager(theAutomata);
 		manager.initialize();
 	}
 
-	void sortAutomata(Automata theAutomata)
+	void sortAutomata(Automata orgAutomata)
 	{
+		Options.ordering_algorithm = Options.AO_HEURISTIC_BFS;
 		ArrayList<PCGNode> pcgNodeList = new ArrayList<PCGNode>();
-		for (Automaton currAutomaton : theAutomata)
+		for (Automaton currAutomaton : orgAutomata)
 		{
 			pcgNodeList.add(new DefaultPCGNode(currAutomaton.getName(), currAutomaton.nbrOfStates()));
 		}
-		PCG pcg = new PCG(pcgNodeList.toArray());
+		PCG pcg = new PCG(new Vector<PCGNode>(pcgNodeList));
 
-		int[][] weightMatrix = getCommunicationMatrix();
-		OrderingSolver orderingSolver = new OrderingSolver(theAutomata.size());
+		int[][] weightMatrix = getCommunicationMatrix(orgAutomata);
+		OrderingSolver orderingSolver = new OrderingSolver(orgAutomata.size());
 
 		int i = 0;
-		for (Automaton currAutomaton : theAutomata)
+		for (Automaton currAutomaton : orgAutomata)
 		{
 			orderingSolver.addNode(pcgNodeList.get(i), weightMatrix[i], i - 1);
 			i++;
 		}
 
 		int[] order = orderingSolver.getGoodOrder();
+
+		//System.out.print("suggestedOrder:");
+		for (i = 0; i < order.length; i++)
+		{
+			theAutomata.addAutomaton(new Automaton(orgAutomata.getAutomatonAt(order[i])));
+			//System.out.print(" " + order[i]);
+		}
+		//System.out.println();
 	}
 
 	public double numberOfReachableStates()
@@ -115,7 +125,7 @@ public class BDDAutomata
 		return false;
 	}
 
-	int[][] getCommunicationMatrix()
+	int[][] getCommunicationMatrix(Automata theAutomata)
 	{
 		int nbrOfAutomata = theAutomata.size();
 		int[][] communicationMatrix = new int[nbrOfAutomata][nbrOfAutomata];
@@ -155,8 +165,12 @@ public class BDDAutomata
 
 		BDDAutomata bddAutomata = new BDDAutomata(theProject);
 
+		long startTime = System.currentTimeMillis();
 		double nbrOfReachableStates = bddAutomata.numberOfReachableStates();
+		long stopTime = System.currentTimeMillis();
+		long compTime = stopTime - startTime;
 
+		System.err.println("Computation time (ms): " + compTime);
 		System.err.println("Reachable states: " + nbrOfReachableStates);
 	}
 

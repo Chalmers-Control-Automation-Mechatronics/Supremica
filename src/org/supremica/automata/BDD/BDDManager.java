@@ -89,7 +89,7 @@ public class BDDManager
 
 	public BDDManager(Automata theAutomata, String bddpackage)
 	{
-		this(theAutomata, bddpackage, 1000, 1000);
+		this(theAutomata, bddpackage, 10000, 10000);
 	}
 
 	public BDDManager(Automata theAutomata, String bddpackage, int nodenum, int cachesize)

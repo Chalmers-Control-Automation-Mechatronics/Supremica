@@ -1,1 +1,1 @@
-@java -cp ..\build;..\lib\unjared\;..\images;..\examples -enableassertions org.supremica.automata.BDD.BDDAutomata ..\examples\includeInJarFile\CCSBookExercises\Ex4_4.xml 
+@java -Xms500M -Xmx500M -cp ..\build;..\lib\unjared\;..\images;..\examples -enableassertions org.supremica.automata.BDD.BDDAutomata ..\examples\includeInJarFile\ManufacturingExamples\agvNoZoneX.xml

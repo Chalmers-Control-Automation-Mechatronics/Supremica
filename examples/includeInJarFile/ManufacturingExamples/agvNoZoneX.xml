@@ -1,0 +1,813 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SupremicaProject name="AGV" comment="Example from J.O. Moody and P.J. Antsaklis, 'Supervisory Control of Discrete Event Systems Using Petri Nets', p.120. The last specification 'ZoneX' was not included in the original model and it introduces a new zone at the input station (the leftmost one in the animation figure). Without 'ZoneX' the system is nonblocking, with 'ZoneX' the system is blocking. The system is not controllable. Modular controllability synthesis works fine here and just so happens to return a modular supervisor that is also nonblocking (in both cases).">
+<!-- Input stations -->
+<Automaton name="Input1" type="Plant">
+	<Events>
+		<Event id="e10" label="e10" controllable="false"/>
+		<Event id="e11" label="e11" controllable="false"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="e10"/>
+		<Transition source="q1" dest="q0" event="e11"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Input3" type="Plant">
+	<Events>
+		<Event id="e30" label="e30" controllable="false"/>
+		<Event id="e31" label="e31" controllable="false"/>
+	</Events>
+	<States>
+		<State id="q0" accepting="true"/>
+		<State id="q1" initial="true" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="e30"/>
+		<Transition source="q1" dest="q0" event="e31"/>
+	</Transitions>
+</Automaton>
+<!-- Output station -->
+<Automaton name="Output" type="Plant">
+	<Events>
+		<Event id="e20" label="e20" controllable="false"/>
+		<Event id="e21" label="e21" controllable="false"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="e21"/>
+		<Transition source="q1" dest="q0" event="e20"/>
+	</Transitions>
+</Automaton>
+<!-- Sequences -->
+<Automaton name="Seq1" type="Plant">
+	<Events>
+		<Event id="c1" label="c1"/>
+		<Event id="c2" label="c2"/>
+		<Event id="e10" label="e10" controllable="false"/>
+		<Event id="u10" label="u10" controllable="false"/>
+		<Event id="u11" label="u11" controllable="false"/>
+		<Event id="w23" label="w23" controllable="false"/>
+	</Events>
+	<States>
+		<State id="p2" initial="true" accepting="true"/>
+		<State id="q1" accepting="true"/>
+		<State id="q2" accepting="true"/>
+		<State id="q3" accepting="true"/>
+		<State id="q4" accepting="true"/>
+		<State id="q5" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="p2" dest="q1" event="e10"/>
+		<Transition source="q1" dest="q2" event="c1"/>
+		<Transition source="q2" dest="q3" event="u10"/>
+		<Transition source="q3" dest="q4" event="w23"/>
+		<Transition source="q4" dest="q5" event="c2"/>
+		<Transition source="q5" dest="p2" event="u11"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Seq2" type="Plant">
+	<Events>
+		<Event id="c3" label="c3"/>
+		<Event id="c4" label="c4"/>
+		<Event id="e30" label="e30" controllable="false"/>
+		<Event id="u20" label="u20" controllable="false"/>
+		<Event id="u21" label="u21" controllable="false"/>
+		<Event id="u22" label="u22" controllable="false"/>
+		<Event id="u23" label="u23" controllable="false"/>
+		<Event id="u24" label="u24" controllable="false"/>
+		<Event id="u25" label="u25" controllable="false"/>
+		<Event id="u26" label="u26" controllable="false"/>
+		<Event id="u27" label="u27" controllable="false"/>
+		<Event id="u28" label="u28" controllable="false"/>
+		<Event id="u29" label="u29" controllable="false"/>
+		<Event id="w32" label="w32" controllable="false"/>
+	</Events>
+	<States>
+		<State id="p4" accepting="true"/>
+		<State id="q1" accepting="true"/>
+		<State id="q2" accepting="true"/>
+		<State id="q3" accepting="true"/>
+		<State id="q4" accepting="true"/>
+		<State id="q5" accepting="true"/>
+		<State id="q6" accepting="true"/>
+		<State id="q7" accepting="true"/>
+		<State id="q8" initial="true" accepting="true"/>
+		<State id="q9" accepting="true"/>
+		<State id="q10" accepting="true"/>
+		<State id="q11" accepting="true"/>
+		<State id="q12" accepting="true"/>
+		<State id="q13" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="p4" dest="q1" event="e30"/>
+		<Transition source="q1" dest="q2" event="c3"/>
+		<Transition source="q2" dest="q3" event="u25"/>
+		<Transition source="q3" dest="q4" event="u26"/>
+		<Transition source="q4" dest="q5" event="u27"/>
+		<Transition source="q5" dest="q6" event="u28"/>
+		<Transition source="q6" dest="q7" event="u29"/>
+		<Transition source="q7" dest="q8" event="w32"/>
+		<Transition source="q8" dest="q9" event="c4"/>
+		<Transition source="q9" dest="q10" event="u20"/>
+		<Transition source="q10" dest="q11" event="u21"/>
+		<Transition source="q11" dest="q12" event="u22"/>
+		<Transition source="q12" dest="q13" event="u23"/>
+		<Transition source="q13" dest="p4" event="u24"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Seq3" type="Plant">
+	<Events>
+		<Event id="c5" label="c5"/>
+		<Event id="c6" label="c6"/>
+		<Event id="u30" label="u30" controllable="false"/>
+		<Event id="u31" label="u31" controllable="false"/>
+		<Event id="w14" label="w14" controllable="false"/>
+		<Event id="w22" label="w22" controllable="false"/>
+	</Events>
+	<States>
+		<State id="q0" accepting="true"/>
+		<State id="q1" accepting="true"/>
+		<State id="q2" initial="true" accepting="true"/>
+		<State id="q3" accepting="true"/>
+		<State id="q4" accepting="true"/>
+		<State id="q5" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="w14"/>
+		<Transition source="q1" dest="q2" event="c5"/>
+		<Transition source="q2" dest="q3" event="u30"/>
+		<Transition source="q3" dest="q4" event="w22"/>
+		<Transition source="q4" dest="q5" event="c6"/>
+		<Transition source="q5" dest="q0" event="u31"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Seq4" type="Plant">
+	<Events>
+		<Event id="c7" label="c7"/>
+		<Event id="c8" label="c8"/>
+		<Event id="u40" label="u40" controllable="false"/>
+		<Event id="u41" label="u41" controllable="false"/>
+		<Event id="u42" label="u42" controllable="false"/>
+		<Event id="u43" label="u43" controllable="false"/>
+		<Event id="u44" label="u44" controllable="false"/>
+		<Event id="u45" label="u45" controllable="false"/>
+		<Event id="w15" label="w15" controllable="false"/>
+		<Event id="w31" label="w31" controllable="false"/>
+	</Events>
+	<States>
+		<State id="p4" accepting="true"/>
+		<State id="q1" initial="true" accepting="true"/>
+		<State id="q2" accepting="true"/>
+		<State id="q3" accepting="true"/>
+		<State id="q4" accepting="true"/>
+		<State id="q7" accepting="true"/>
+		<State id="q8" accepting="true"/>
+		<State id="q9" accepting="true"/>
+		<State id="q11" accepting="true"/>
+		<State id="q12" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="p4" dest="q1" event="w15"/>
+		<Transition source="q1" dest="q2" event="c7"/>
+		<Transition source="q2" dest="q3" event="u40"/>
+		<Transition source="q3" dest="q4" event="u41"/>
+		<Transition source="q4" dest="q7" event="u42"/>
+		<Transition source="q7" dest="q8" event="w31"/>
+		<Transition source="q8" dest="q9" event="c8"/>
+		<Transition source="q9" dest="q11" event="u43"/>
+		<Transition source="q11" dest="q12" event="u44"/>
+		<Transition source="q12" dest="p4" event="u45"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Seq5" type="Plant">
+	<Events>
+		<Event id="c10" label="c10"/>
+		<Event id="c9" label="c9"/>
+		<Event id="e20" label="e20" controllable="false"/>
+		<Event id="u50" label="u50" controllable="false"/>
+		<Event id="u51" label="u51" controllable="false"/>
+		<Event id="u52" label="u52" controllable="false"/>
+		<Event id="u53" label="u53" controllable="false"/>
+		<Event id="w13" label="w13" controllable="false"/>
+	</Events>
+	<States>
+		<State id="p4" accepting="true"/>
+		<State id="q1" accepting="true"/>
+		<State id="q2" accepting="true"/>
+		<State id="q4" accepting="true"/>
+		<State id="q7" accepting="true"/>
+		<State id="q8" initial="true" accepting="true"/>
+		<State id="q9" accepting="true"/>
+		<State id="q11" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="p4" dest="q1" event="w13"/>
+		<Transition source="q1" dest="q2" event="c9"/>
+		<Transition source="q2" dest="q4" event="u52"/>
+		<Transition source="q4" dest="q7" event="u53"/>
+		<Transition source="q7" dest="q8" event="e20"/>
+		<Transition source="q8" dest="q9" event="c10"/>
+		<Transition source="q9" dest="q11" event="u50"/>
+		<Transition source="q11" dest="p4" event="u51"/>
+	</Transitions>
+</Automaton>
+<!-- Workstations -->
+<Automaton name="WS1a" type="Plant">
+	<Events>
+		<Event id="w11" label="w11" controllable="false"/>
+		<Event id="w12" label="w12" controllable="false"/>
+		<Event id="w13" label="w13" controllable="false"/>
+		<Event id="w14" label="w14" controllable="false"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1" accepting="true"/>
+		<State id="q2" accepting="true"/>
+		<State id="q3" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="w11"/>
+		<Transition source="q1" dest="q2" event="w12"/>
+		<Transition source="q2" dest="q3" event="w13"/>
+		<Transition source="q3" dest="q0" event="w14"/>
+	</Transitions>
+</Automaton>
+<Automaton name="WS1b" type="Plant">
+	<Events>
+		<Event id="w11" label="w11" controllable="false"/>
+		<Event id="w12" label="w12" controllable="false"/>
+		<Event id="w13" label="w13" controllable="false"/>
+		<Event id="w15" label="w15" controllable="false"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1" accepting="true"/>
+		<State id="q2" accepting="true"/>
+		<State id="q3" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="w11"/>
+		<Transition source="q1" dest="q2" event="w12"/>
+		<Transition source="q2" dest="q3" event="w13"/>
+		<Transition source="q3" dest="q0" event="w15"/>
+	</Transitions>
+</Automaton>
+<Automaton name="WS2" type="Plant">
+	<Events>
+		<Event id="w21" label="w21" controllable="false"/>
+		<Event id="w22" label="w22" controllable="false"/>
+		<Event id="w23" label="w23" controllable="false"/>
+		<Event id="w24" label="w24" controllable="false"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1" accepting="true"/>
+		<State id="q2" accepting="true"/>
+		<State id="q3" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="w21"/>
+		<Transition source="q1" dest="q2" event="w22"/>
+		<Transition source="q2" dest="q3" event="w23"/>
+		<Transition source="q3" dest="q0" event="w24"/>
+	</Transitions>
+</Automaton>
+<Automaton name="WS3" type="Plant">
+  <Events>
+   <Event id="w31" label="w31" controllable="false" prioritized="true" />
+   <Event id="w32" label="w32" controllable="false" prioritized="true" />
+   <Event id="w33" label="w33" controllable="false" prioritized="true" />
+   <Event id="w34" label="w34" controllable="false" prioritized="true" />
+  </Events>
+  <States>
+   <State id="q0" initial="true" accepting="true" />
+   <State id="q1" accepting="true" />
+   <State id="q2" accepting="true" />
+   <State id="q3" accepting="true" />
+  </States>
+  <Transitions>
+   <Transition event="w31" source="q0" dest="q1" />
+   <Transition event="w32" source="q1" dest="q2" />
+   <Transition event="w33" source="q2" dest="q3" />
+   <Transition event="w34" source="q3" dest="q0" />
+  </Transitions>
+ </Automaton>
+ <!-- Zone specs -->
+ <Automaton name="Zone1" type="Specification">
+	<Events>
+		<Event id="c1" label="c1"/>
+		<Event id="c2" label="c2"/>
+		<Event id="c3" label="c3"/>
+		<Event id="u10" label="u10" controllable="false"/>
+		<Event id="u11" label="u11" controllable="false"/>
+		<Event id="u23" label="u23" controllable="false"/>
+		<Event id="u24" label="u24" controllable="false"/>
+		<Event id="u25" label="u25" controllable="false"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="c2"/>
+		<Transition source="q0" dest="q2" event="u23"/>
+		<Transition source="q0" dest="q3" event="c3"/>
+		<Transition source="q0" dest="q4" event="c1"/>
+		<Transition source="q1" dest="q0" event="u11"/>
+		<Transition source="q2" dest="q0" event="u24"/>
+		<Transition source="q3" dest="q0" event="u25"/>
+		<Transition source="q4" dest="q0" event="u10"/>
+	</Transitions>
+</Automaton>
+ <Automaton name="Zone2" type="Specification">
+  <Events>
+   <Event id="c6" label="c6" controllable="true" prioritized="true" />
+   <Event id="u21" label="u21" controllable="false" prioritized="true" />
+   <Event id="u26" label="u26" controllable="false" prioritized="true" />
+   <Event id="c5" label="c5" controllable="true" prioritized="true" />
+   <Event id="u30" label="u30" controllable="false" prioritized="true" />
+   <Event id="u31" label="u31" controllable="false" prioritized="true" />
+   <Event id="u22" label="u22" controllable="false" prioritized="true" />
+   <Event id="u27" label="u27" controllable="false" prioritized="true" />
+  </Events>
+  <States>
+   <State id="q0" />
+   <State id="q1" />
+   <State id="q2" />
+   <State id="q3" />
+   <State id="q4" initial="true" accepting="true"/>
+  </States>
+  <Transitions>
+   <Transition event="c6" source="q0" dest="q1" />
+   <Transition event="u21" source="q0" dest="q2" />
+   <Transition event="u26" source="q0" dest="q3" />
+   <Transition event="c5" source="q0" dest="q4" />
+   <Transition event="u30" source="q4" dest="q0" />
+   <Transition event="u31" source="q1" dest="q0" />
+   <Transition event="u22" source="q2" dest="q0" />
+   <Transition event="u27" source="q3" dest="q0" />
+  </Transitions>
+ </Automaton>
+<Automaton name="Zone3" type="Specification">
+	<Events>
+		<Event id="c4" label="c4"/>
+		<Event id="c7" label="c7"/>
+		<Event id="u20" label="u20" controllable="false"/>
+		<Event id="u28" label="u28" controllable="false"/>
+		<Event id="u29" label="u29" controllable="false"/>
+		<Event id="u40" label="u40" controllable="false"/>
+		<Event id="u44" label="u44" controllable="false"/>
+		<Event id="u45" label="u45" controllable="false"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="c4"/>
+		<Transition source="q0" dest="q2" event="u28"/>
+		<Transition source="q0" dest="q3" event="u44"/>
+		<Transition source="q0" dest="q4" event="c7"/>
+		<Transition source="q1" dest="q0" event="u20"/>
+		<Transition source="q2" dest="q0" event="u29"/>
+		<Transition source="q3" dest="q0" event="u45"/>
+		<Transition source="q4" dest="q0" event="u40"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Zone4" type="Specification">
+	<Events>
+		<Event id="c8" label="c8"/>
+		<Event id="c9" label="c9"/>
+		<Event id="u41" label="u41" controllable="false"/>
+		<Event id="u42" label="u42" controllable="false"/>
+		<Event id="u43" label="u43" controllable="false"/>
+		<Event id="u50" label="u50" controllable="false"/>
+		<Event id="u51" label="u51" controllable="false"/>
+		<Event id="u52" label="u52" controllable="false"/>
+	</Events>
+	<States>
+		<State id="q0" initial="true" accepting="true"/>
+		<State id="q1"/>
+		<State id="q2"/>
+		<State id="q3"/>
+		<State id="q4"/>
+	</States>
+	<Transitions>
+		<Transition source="q0" dest="q1" event="c8"/>
+		<Transition source="q0" dest="q2" event="u41"/>
+		<Transition source="q0" dest="q3" event="u50"/>
+		<Transition source="q0" dest="q4" event="c9"/>
+		<Transition source="q1" dest="q0" event="u43"/>
+		<Transition source="q2" dest="q0" event="u42"/>
+		<Transition source="q3" dest="q0" event="u51"/>
+		<Transition source="q4" dest="q0" event="u52"/>
+	</Transitions>
+</Automaton>
+<Execution>
+	<Actions>
+
+		<!-- Input 1 -->
+		<Action label="e11">
+			<Command command="input1.addpart"/>
+		</Action>
+
+		<!-- Input 3 -->
+		<Action label="e31">
+			<Command command="input3.addpart"/>
+		</Action>
+
+		<!-- Output -->
+		<Action label="e21">
+			<Command command="output.removepart"/>
+		</Action>
+		
+		<!-- AGV 1 -->
+		<Action label="u11">
+			<Command command="agv1.go"/>
+		</Action>
+		<Action label="e10">
+			<Command command="agv1.reset"/>
+			<Command command="input1.removepart"/>			
+		</Action>
+		<Action label="c1">
+			<Command command="agv1.go"/>
+		</Action>
+		<Action label="u10">
+			<Command command="agv1.go"/>
+		</Action>
+		<Action label="w23">
+			<Command command="agv1.removepart"/>
+			<Command command="ws2.addpart"/>			
+		</Action>	
+		<Action label="c2">
+			<Command command="agv1.go"/>
+		</Action>
+		
+		<!-- AGV 2 -->
+		<Action label="u30">
+			<Command command="agv2.reset"/>
+		</Action>
+		<Action label="w22">
+			<Command command="agv2.addpart"/>
+			<Command command="ws2.removepart"/>
+		</Action>
+		<Action label="c6">
+			<Command command="agv2.go"/>
+		</Action>
+		<Action label="u31">
+			<Command command="agv2.go"/>
+		</Action>
+		<Action label="w14">
+			<Command command="agv2.removepart"/>
+			<Command command="ws1.addpart1"/>
+		</Action>	
+		<Action label="c5">
+			<Command command="agv2.go"/>
+		</Action>
+
+		<!-- AGV 3 -->
+		<Action label="c4">
+			<Command command="agv3.reset"/>
+		</Action>
+		<Action label="u20">
+			<Command command="agv3.go"/>
+		</Action>
+		<Action label="u21">
+			<Command command="agv3.go"/>
+		</Action>
+		<Action label="u22">
+			<Command command="agv3.go"/>
+		</Action>
+		<Action label="u23">
+			<Command command="agv3.go"/>
+		</Action>	
+		<Action label="u24">
+			<Command command="agv3.go"/>
+		</Action>
+		<Action label="e30">
+			<Command command="agv3.addpart"/>
+			<Command command="input3.removepart"/>						
+		</Action>
+		<Action label="c3">
+			<Command command="agv3.go"/>
+		</Action>
+		<Action label="u25">
+			<Command command="agv3.go"/>
+		</Action>
+		<Action label="u26">
+			<Command command="agv3.go"/>
+		</Action>	
+		<Action label="u27">
+			<Command command="agv3.go"/>
+		</Action>	
+		<Action label="u28">
+			<Command command="agv3.go"/>
+		</Action>
+		<Action label="u29">
+			<Command command="agv3.go"/>
+		</Action>
+		<Action label="w32">
+			<Command command="agv3.removepart"/>
+			<Command command="ws3.addpart"/>
+		</Action>
+		
+		<!-- AGV 4 -->
+		<Action label="c7">
+			<Command command="agv4.reset"/>
+		</Action>
+		<Action label="u40">
+			<Command command="agv4.go"/>
+		</Action>
+		<Action label="u41">
+			<Command command="agv4.go"/>
+		</Action>
+		<Action label="u42">
+			<Command command="agv4.go"/>
+		</Action>
+		<Action label="w31">
+			<Command command="agv4.addpart"/>
+			<Command command="ws3.removepart"/>
+		</Action>	
+		<Action label="c8">
+			<Command command="agv4.go"/>
+		</Action>
+		<Action label="u43">
+			<Command command="agv4.go"/>
+		</Action>
+		<Action label="u44">
+			<Command command="agv4.go"/>
+		</Action>
+		<Action label="u45">
+			<Command command="agv4.go"/>
+		</Action>
+		<Action label="w15">
+			<Command command="agv4.removepart"/>
+			<Command command="ws1.addpart2"/>			
+		</Action>	
+		
+		<!-- AGV 5 -->
+		<Action label="c10">
+			<Command command="agv5.reset"/>
+		</Action>
+		<Action label="u50">
+			<Command command="agv5.go"/>
+		</Action>
+		<Action label="u51">
+			<Command command="agv5.go"/>
+		</Action>
+		<Action label="w13">
+			<Command command="agv5.addpart"/>
+			<Command command="ws1.removepart1"/>			
+			<Command command="ws1.removepart2"/>	
+		</Action>
+		<Action label="c9">
+			<Command command="agv5.go"/>
+		</Action>	
+		<Action label="u52">
+			<Command command="agv5.go"/>
+		</Action>
+		<Action label="u53">
+			<Command command="agv5.go"/>
+		</Action>
+		<Action label="e20">
+			<Command command="agv5.removepart"/>
+			<Command command="output.addpart"/>
+		</Action>
+
+		<!-- WS1 -->
+		<Action label="w11">
+			<Command command="ws1_part1.reset"/>
+			<Command command="ws1_part2.reset"/>
+		</Action>
+		<Action label="w12">
+			<Command command="ws1_part1.go"/>
+			<Command command="ws1_part2.go"/>
+		</Action>
+
+		<!-- WS2 -->
+		<Action label="w24">
+			<Command command="ws2.go"/>
+		</Action>
+		<Action label="w21">
+			<Command command="ws2.reset"/>
+		</Action>
+
+		<!-- WS3 -->
+		<Action label="w33">
+			<Command command="ws3.go"/>
+		</Action>
+		<Action label="w34">
+			<Command command="ws3.go"/>
+		</Action>
+	</Actions>
+	<Controls>
+
+		<!-- Input 1 -->
+		<Control label="e11">
+			<Condition condition="input1.end"/>			
+		</Control>
+
+		<!-- Input 3 -->
+		<Control label="e31">
+			<Condition condition="input3.end"/>			
+		</Control>
+
+		<!-- Output -->
+		<Control label="e21">
+			<Condition condition="output.end"/>			
+		</Control>
+		
+		<!-- AGV 1 -->
+		<Control label="u11">
+			<Condition condition="agv1.end"/>
+		</Control>
+		<Control label="e10">
+			<Condition condition="agv1.end"/>
+			<Condition condition="input1.end"/>			
+		</Control>
+		<Control label="c1">
+			<Condition condition="agv1.end"/>
+		</Control>
+		<Control label="u10">
+			<Condition condition="agv1.end"/>
+		</Control>
+		<Control label="w23">
+			<Condition condition="agv1.end"/>
+			<Condition condition="ws2.end"/>			
+		</Control>	
+		<Control label="c2">
+			<Condition condition="agv1.end"/>
+		</Control>
+		
+		<!-- AGV 2 -->
+		<Control label="u30">
+			<Condition condition="agv2.end"/>
+		</Control>
+		<Control label="w22">
+			<Condition condition="agv2.end"/>
+			<Condition condition="ws2.end"/>
+		</Control>
+		<Control label="c6">
+			<Condition condition="agv2.end"/>
+		</Control>
+		<Control label="u31">
+			<Condition condition="agv2.end"/>
+		</Control>
+		<Control label="w14">
+			<Condition condition="agv2.end"/>
+			<Condition condition="ws1_part1.end"/>			
+		</Control>	
+		<Control label="c5">
+			<Condition condition="agv2.end"/>
+		</Control>
+
+		<!-- AGV 3 -->
+		<Control label="c4">
+			<Condition condition="agv3.end"/>
+		</Control>
+		<Control label="u20">
+			<Condition condition="agv3.end"/>
+		</Control>
+		<Control label="u21">
+			<Condition condition="agv3.end"/>
+		</Control>
+		<Control label="u22">
+			<Condition condition="agv3.end"/>
+		</Control>
+		<Control label="u23">
+			<Condition condition="agv3.end"/>
+		</Control>	
+		<Control label="u24">
+			<Condition condition="agv3.end"/>
+		</Control>
+		<Control label="e30">
+			<Condition condition="agv3.end"/>
+			<Condition condition="input3.end"/>
+		</Control>
+		<Control label="c3">
+			<Condition condition="agv3.end"/>
+		</Control>
+		<Control label="u25">
+			<Condition condition="agv3.end"/>
+		</Control>
+		<Control label="u26">
+			<Condition condition="agv3.end"/>
+		</Control>	
+		<Control label="u27">
+			<Condition condition="agv3.end"/>
+		</Control>	
+		<Control label="u28">
+			<Condition condition="agv3.end"/>
+		</Control>
+		<Control label="u29">
+			<Condition condition="agv3.end"/>
+		</Control>
+		<Control label="w32">
+			<Condition condition="agv3.end"/>
+			<Condition condition="ws3.end"/>			
+		</Control>
+		
+		<!-- AGV 4 -->
+		<Control label="c7">
+			<Condition condition="agv4.end"/>
+		</Control>
+		<Control label="u40">
+			<Condition condition="agv4.end"/>
+		</Control>
+		<Control label="u41">
+			<Condition condition="agv4.end"/>
+		</Control>
+		<Control label="u42">
+			<Condition condition="agv4.end"/>
+		</Control>
+		<Control label="w31">
+			<Condition condition="agv4.end"/>
+			<Condition condition="ws3.end"/>
+		</Control>	
+		<Control label="c8">
+			<Condition condition="agv4.end"/>
+		</Control>
+		<Control label="u43">
+			<Condition condition="agv4.end"/>
+		</Control>
+		<Control label="u44">
+			<Condition condition="agv4.end"/>
+		</Control>
+		<Control label="u45">
+			<Condition condition="agv4.end"/>
+		</Control>
+		<Control label="w15">
+			<Condition condition="agv4.end"/>
+			<Condition condition="ws1_part2.end"/>
+		</Control>	
+		
+		<!-- AGV 5 -->
+		<Control label="c10">
+			<Condition condition="agv5.end"/>
+		</Control>
+		<Control label="u50">
+			<Condition condition="agv5.end"/>
+		</Control>
+		<Control label="u51">
+			<Condition condition="agv5.end"/>
+		</Control>
+		<Control label="w13">
+			<Condition condition="agv5.end"/>
+			<Condition condition="ws1_part1.end"/>
+			<Condition condition="ws1_part2.end"/>
+		</Control>
+		<Control label="c9">
+			<Condition condition="agv5.end"/>
+		</Control>	
+		<Control label="u52">
+			<Condition condition="agv5.end"/>
+		</Control>
+		<Control label="u53">
+			<Condition condition="agv5.end"/>
+		</Control>
+		<Control label="e20">
+			<Condition condition="agv5.end"/>
+			<Condition condition="output.end"/>
+		</Control>
+
+		<!-- WS1 -->
+		<Control label="w11">
+			<Condition condition="ws1_part1.end"/>
+			<Condition condition="ws1_part2.end"/>
+		</Control>
+		<Control label="w12">
+			<Condition condition="ws1_part1.end"/>
+			<Condition condition="ws1_part2.end"/>
+		</Control>
+
+		<!-- WS2 -->
+		<Control label="w24">
+			<Condition condition="ws2.end"/>
+		</Control>
+		<Control label="w21">
+			<Condition condition="ws2.end"/>
+		</Control>
+
+		<!-- WS3 -->
+		<Control label="w33">
+			<Condition condition="ws3.end"/>
+		</Control>
+		<Control label="w34">
+			<Condition condition="ws3.end"/>
+		</Control>
+	</Controls>
+	<Animation path="/scenebeans/agv/agv.xml"/>
+</Execution>
+</SupremicaProject>

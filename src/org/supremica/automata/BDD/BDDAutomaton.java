@@ -84,8 +84,6 @@ public class BDDAutomaton
 	public void initialize()
 	{
 		BDD initialStates = manager.zero();
-		//System.err.println("TrueBDD: " + manager.one().toStringWithDomains());
-        //System.err.println("InitialState: " + initialStates.toStringWithDomains());
 
 		BDD markedStates = manager.zero();
 		BDD forbiddenStates = manager.zero();
@@ -126,10 +124,6 @@ public class BDDAutomaton
 		manager.addInitialStates(initialStates);
 		manager.addMarkedStates(markedStates);
 		manager.addForbiddenStates(forbiddenStates);
-
-        //System.err.println("BDDAutomaton: " + theAutomaton.getName());
-        //System.err.println("InitialState: " + initialStates.toStringWithDomains());
-        //System.err.println("TransitionForwardConjunctiveBDD: " + getTransitionForwardConjunctiveBDD().toStringWithDomains());
 	}
 
 	void addTransition(Arc theArc)
@@ -200,41 +194,5 @@ public class BDDAutomaton
 	{
 		return null;
 	}
-
-/*
-	public BDDAutomaton()
-	{
-		initializeFactory();
-
-		BDDDomain aut1SourceDomain = factory.extDomain(2);
-		BDDDomain aut1DestDomain = factory.extDomain(2);
-		BDDDomain aut2SourceDomain = factory.extDomain(2);
-		BDDDomain aut2DestDomain = factory.extDomain(2);
-		BDDDomain eventDomain = factory.extDomain(2);
-
-
-		// Create transition in automaton 1
-		BDD transition1BDD = factory.zero();
-		// Build <q,q+,e>
-		addTransition(0, aut1SourceDomain, 0, aut1DestDomain, 1, eventDomain, transition1BDD);
-		addTransition(0, aut1SourceDomain, 1, aut1DestDomain, 0, eventDomain, transition1BDD);
-		addTransition(1, aut1SourceDomain, 0, aut1DestDomain, 1, eventDomain, transition1BDD);
-		System.out.println("transition 1 BDD: " + transition1BDD.toStringWithDomains());
-
-		// Create transition in automaton 2
-		BDD transition2BDD = factory.zero();
-		// Build <q,q+,e>
-		addTransition(0, aut2SourceDomain, 1, aut2DestDomain, 0, eventDomain, transition2BDD);
-		addTransition(1, aut2SourceDomain, 0, aut2DestDomain, 1, eventDomain, transition2BDD);
-		addTransition(1, aut2SourceDomain, 1, aut2DestDomain, 1, eventDomain, transition2BDD);
-		System.out.println("transition 2 BDD: " + transition2BDD.toStringWithDomains());
-
-		BDD composedBDD = transition1BDD.and(transition2BDD);
-		System.out.println("composed BDD: " + composedBDD.toStringWithDomains());
-
-		BDD composedEventRemovedBDD = composedBDD.exist(eventDomain.set());
-		System.out.println("composed (event Removed) BDD: " + composedEventRemovedBDD.toStringWithDomains());
-	}
-*/
 
 }
