@@ -55,6 +55,10 @@ import java.util.*;
 import java.io.*;
 import org.supremica.automata.*;
 import org.supremica.automata.IO.*;
+import org.supremica.util.BDD.PCGNode;
+import org.supremica.util.BDD.PCG;
+import org.supremica.util.BDD.solvers.OrderingSolver;
+
 
 public class BDDAutomata
 {
@@ -64,13 +68,31 @@ public class BDDAutomata
 	public BDDAutomata(Automata theAutomata)
 	{
 		this.theAutomata = new Automata(theAutomata);
-		//sortAutomata();
+		sortAutomata(theAutomata);
 		manager = new BDDManager(theAutomata);
 		manager.initialize();
 	}
 
 	void sortAutomata(Automata theAutomata)
-	{ // Implement some efficient algorithm.
+	{
+		ArrayList<PCGNode> pcgNodeList = new ArrayList<PCGNode>();
+		for (Automaton currAutomaton : theAutomata)
+		{
+			pcgNodeList.add(new DefaultPCGNode(currAutomaton.getName(), currAutomaton.nbrOfStates()));
+		}
+		PCG pcg = new PCG(pcgNodeList.toArray());
+
+		int[][] weightMatrix = getCommunicationMatrix();
+		OrderingSolver orderingSolver = new OrderingSolver(theAutomata.size());
+
+		int i = 0;
+		for (Automaton currAutomaton : theAutomata)
+		{
+			orderingSolver.addNode(pcgNodeList.get(i), weightMatrix[i], i - 1);
+			i++;
+		}
+
+		int[] order = orderingSolver.getGoodOrder();
 	}
 
 	public double numberOfReachableStates()
@@ -91,6 +113,36 @@ public class BDDAutomata
 	public boolean isNonblockingAndControllable()
 	{
 		return false;
+	}
+
+	int[][] getCommunicationMatrix()
+	{
+		int nbrOfAutomata = theAutomata.size();
+		int[][] communicationMatrix = new int[nbrOfAutomata][nbrOfAutomata];
+
+		for (int i = 0; i < nbrOfAutomata; i++)
+		{
+			Automaton firstAutomaton = theAutomata.getAutomatonAt(i);
+
+			communicationMatrix[i][i] = getCommunicationComplexity(firstAutomaton, firstAutomaton);
+
+			for (int j = 0; j < i; j++)
+			{
+				Automaton secondAutomaton = theAutomata.getAutomatonAt(j);
+				int complexity = getCommunicationComplexity(firstAutomaton, secondAutomaton);
+				communicationMatrix[i][j] = communicationMatrix[j][i] = complexity;
+			}
+		}
+
+		return communicationMatrix;
+	}
+
+	static int getCommunicationComplexity(Automaton firstAutomaton, Automaton secondAutomaton)
+	{
+		Alphabet firstAlphabet = new Alphabet(firstAutomaton.getAlphabet());
+		Alphabet secondAlphabet = secondAutomaton.getAlphabet();
+		firstAlphabet.intersect(secondAlphabet);
+		return firstAlphabet.size();
 	}
 
 	public static void main(String[] args)
