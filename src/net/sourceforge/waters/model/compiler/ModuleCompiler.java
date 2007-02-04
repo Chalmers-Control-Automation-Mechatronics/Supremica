@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.61 2007-01-03 00:49:08 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.62 2007-02-04 09:09:30 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -582,11 +582,6 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       final Collection<EdgeProxy> edges = graph.getEdges();
       visitCollection(edges);
       mTransitions = new TreeSet<TransitionProxy>();
-
-      //EFA with shared variables---------
-      mSimpleComponents.add(proxy);
-      //---------------------
-
       for (final NodeProxy source : nodes) {
         final CompiledNode sourceEntry = mPrecompiledNodes.get(source);
         for (final EdgeProxy edge : sourceEntry.getEdges()) {
@@ -596,6 +591,9 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
             visitEventListExpressionProxy(labelBlock,
                                           EventKindMask.TYPEMASK_EVENT);
           createAutomatonEvents(events);
+          /*
+           * In method createTransitions, mEFATransitionGuardActionBlockMap is filled.
+           */
           createTransitions(source, events, target, sourceEntry,
                             deterministic, edge);
         }
@@ -610,13 +608,15 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
        */
 
       /*
-       * The automaton is created. If it is an EFA-automaton
-       * the events will be relabeled, transitions divided and
-       * variableAutmata will be created in the method compileEFA().
-       *
+       * The automaton is created. If there exists an EFA-automaton
+       * in the Module, all components are collected in a list.
+       * Events will be relabeled, transitions divided and
+       * variableAutmata will be created, in the method compileEFA().
+       * 
        */
       if (mIsEFA) {
-        Map <StateProxy, StateProxy> stateStateMap =
+    	  mSimpleComponents.add(proxy);
+    	  Map <StateProxy, StateProxy> stateStateMap =
           new HashMap<StateProxy, StateProxy>();
         /*
          * Rename all states.
