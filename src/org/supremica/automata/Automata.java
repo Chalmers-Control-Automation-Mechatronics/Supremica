@@ -880,6 +880,16 @@ public class Automata
         return unionAlphabet;
     }
 
+    /**
+     * Returns the alphabet of events that are in the automata
+     * alphabet but not in the automaton alphabet.
+     */
+    public Alphabet getInverseAlphabet(Automaton automaton)
+    {
+		Alphabet automataAlphabet = getUnionAlphabet();
+		return automataAlphabet.minus(automaton.getAlphabet());
+    }
+
     public Set<AutomatonProxy> getAutomata()
     {
         Iterator<Automaton> iterator = iterator();

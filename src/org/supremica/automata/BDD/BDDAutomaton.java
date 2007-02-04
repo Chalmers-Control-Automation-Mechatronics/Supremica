@@ -50,132 +50,191 @@
 package org.supremica.automata.BDD;
 
 import net.sf.javabdd.*;
-import org.supremica.util.SupremicaException;
 import java.util.*;
-import java.io.*;
 import org.supremica.automata.*;
-import org.supremica.automata.IO.*;
 
 public class BDDAutomaton
 {
-    static BDDFactory factory;
+    Automaton theAutomaton;
+    BDDManager manager;
+	BDDDomain sourceStateDomain;
+	BDDDomain destStateDomain;
+	BDDPairing sourceToDestPairing;
+	BDDPairing destToSourcePairing;
+	BDD transitionForwardBDD;
+	BDD transitionBackwardBDD;
 
-    Map<State, Integer> stateToIntegerMap = new HashMap<State, Integer>();
-    Map<Integer, State> integerToStateMap = new HashMap<Integer, State>();
+
+	public BDDAutomaton(BDDManager manager, Automaton theAutomaton, BDDDomain sourceStateDomain, BDDDomain destStateDomain)
+	{
+		this.manager = manager;
+
+		this.theAutomaton = theAutomaton;
+
+		this.sourceStateDomain = sourceStateDomain;
+		this.destStateDomain = destStateDomain;
+
+		sourceToDestPairing = manager.makePair(sourceStateDomain, destStateDomain);
+		destToSourcePairing = manager.makePair(destStateDomain, sourceStateDomain);
+
+		transitionForwardBDD = manager.zero();
+		transitionBackwardBDD = manager.zero();
+	}
+
+	public void initialize()
+	{
+		BDD initialStates = manager.zero();
+		//System.err.println("TrueBDD: " + manager.one().toStringWithDomains());
+        //System.err.println("InitialState: " + initialStates.toStringWithDomains());
+
+		BDD markedStates = manager.zero();
+		BDD forbiddenStates = manager.zero();
+
+		Alphabet inverseAlphabet = manager.getInverseAlphabet(theAutomaton);
+
+		for (State currState : theAutomaton)
+		{
+			// First create all transitions in this automaton
+			for (Iterator<Arc> arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
+			{
+				Arc currArc = arcIt.next();
+				addTransition(currArc);
+			}
+
+			// Self loop events not in this alphabet
+			for (LabeledEvent event : inverseAlphabet)
+			{
+				addTransition(currState, currState, event);
+			}
+
+			// Then add state properties
+			int stateIndex = manager.getStateIndex(theAutomaton, currState);
+			if (currState.isInitial())
+			{
+				manager.addState(initialStates, stateIndex, sourceStateDomain);
+			}
+			if (currState.isAccepting())
+			{
+				manager.addState(markedStates, stateIndex, sourceStateDomain);
+			}
+			if (currState.isForbidden())
+			{
+				manager.addState(forbiddenStates, stateIndex, sourceStateDomain);
+			}
+		}
+
+		manager.addInitialStates(initialStates);
+		manager.addMarkedStates(markedStates);
+		manager.addForbiddenStates(forbiddenStates);
+
+        //System.err.println("BDDAutomaton: " + theAutomaton.getName());
+        //System.err.println("InitialState: " + initialStates.toStringWithDomains());
+        //System.err.println("TransitionForwardConjunctiveBDD: " + getTransitionForwardConjunctiveBDD().toStringWithDomains());
+	}
+
+	void addTransition(Arc theArc)
+	{
+		State sourceState = theArc.getSource();
+		State destState = theArc.getTarget();
+		LabeledEvent theEvent = theArc.getEvent();
+
+		addTransition(sourceState, destState, theEvent);
+	}
+
+	void addTransition(State sourceState, State destState, LabeledEvent theEvent)
+	{
+		int sourceStateIndex = manager.getStateIndex(theAutomaton, sourceState);
+		int destStateIndex = manager.getStateIndex(theAutomaton, destState);
+		int eventIndex = manager.getEventIndex(theEvent);
+		manager.addTransition(transitionForwardBDD, sourceStateIndex, sourceStateDomain, destStateIndex, destStateDomain, eventIndex, manager.getEventDomain());
+		manager.addTransition(transitionBackwardBDD, destStateIndex, sourceStateDomain, sourceStateIndex, destStateDomain, eventIndex, manager.getEventDomain());
+	}
 
 
-	public BDDAutomaton(Automaton automaton)
+	public int hashCode()
+	{
+		return theAutomaton.hashCode();
+	}
+
+	public boolean equals(Object other)
+	{
+		return theAutomaton.equals(other);
+	}
+
+	public BDDPairing getSourceToDestPairing()
+	{
+		return sourceToDestPairing;
+	}
+
+	public BDDPairing getDestToSourcePairing()
+	{
+		return destToSourcePairing;
+	}
+
+	public BDD getTransitionForwardBDD()
+	{
+		return transitionForwardBDD;
+	}
+
+	public BDD getTransitionBackwardBDD()
+	{
+		return transitionBackwardBDD;
+	}
+
+	public BDD getTransitionForwardConjunctiveBDD()
+	{
+		return getTransitionForwardBDD();
+	}
+
+	public BDD getTransitionBackwardConjunctiveBDD()
+	{
+		return getTransitionBackwardBDD();
+	}
+
+	public BDD getTransitionForwardDisjunctiveBDD()
+	{
+		return null;
+	}
+
+	public BDD getTransitionBackwardDisjunctiveBDD()
+	{
+		return null;
+	}
+
+/*
+	public BDDAutomaton()
 	{
 		initializeFactory();
 
-		// Build maps
-		int nbrOfStates = automaton.nbrOfStates();
-		int i = 0;
-		int initialState = -1;
-		for (State state : automaton)
-		{
-			if (state.isInitial())
-			{
-				initialState = i;
-			}
-			stateToIntegerMap.put(state, i);
-			integerToStateMap.put(i, state);
-			System.out.println(state.getName() + ":" + i);
-			i++;
-		}
+		BDDDomain aut1SourceDomain = factory.extDomain(2);
+		BDDDomain aut1DestDomain = factory.extDomain(2);
+		BDDDomain aut2SourceDomain = factory.extDomain(2);
+		BDDDomain aut2DestDomain = factory.extDomain(2);
+		BDDDomain eventDomain = factory.extDomain(2);
 
-		BDDDomain sourceStateDomain = factory.extDomain(nbrOfStates);
-		BDDDomain destStateDomain = factory.extDomain(nbrOfStates);
-		BDDPairing sourceToDestPairing = factory.makePair(sourceStateDomain, destStateDomain);
-		BDDPairing destToSourcePairing = factory.makePair(destStateDomain, sourceStateDomain);
 
-		BDD transitionBDD = factory.zero();
+		// Create transition in automaton 1
+		BDD transition1BDD = factory.zero();
+		// Build <q,q+,e>
+		addTransition(0, aut1SourceDomain, 0, aut1DestDomain, 1, eventDomain, transition1BDD);
+		addTransition(0, aut1SourceDomain, 1, aut1DestDomain, 0, eventDomain, transition1BDD);
+		addTransition(1, aut1SourceDomain, 0, aut1DestDomain, 1, eventDomain, transition1BDD);
+		System.out.println("transition 1 BDD: " + transition1BDD.toStringWithDomains());
 
-		//
-		// Note that toStringWithDomains is the least significant bit to the left.
-		//
+		// Create transition in automaton 2
+		BDD transition2BDD = factory.zero();
+		// Build <q,q+,e>
+		addTransition(0, aut2SourceDomain, 1, aut2DestDomain, 0, eventDomain, transition2BDD);
+		addTransition(1, aut2SourceDomain, 0, aut2DestDomain, 1, eventDomain, transition2BDD);
+		addTransition(1, aut2SourceDomain, 1, aut2DestDomain, 1, eventDomain, transition2BDD);
+		System.out.println("transition 2 BDD: " + transition2BDD.toStringWithDomains());
 
-		// Build <q,q+>
-		for (Iterator<Arc> ait = automaton.arcIterator(); ait.hasNext(); )
-		{
-			Arc arc = ait.next();
+		BDD composedBDD = transition1BDD.and(transition2BDD);
+		System.out.println("composed BDD: " + composedBDD.toStringWithDomains());
 
-			State sourceState = arc.getFromState();
-			State destState = arc.getToState();
-			int sourceStateIndex = stateToIntegerMap.get(sourceState);
-			int destStateIndex = stateToIntegerMap.get(destState);
-			System.out.println("Transition BDD. Adding transition: " + sourceStateIndex + " " + destStateIndex);
-			BDD sourceStateBDD = factory.buildCube(sourceStateIndex, sourceStateDomain.vars());
-			System.out.println("sourceStateBDD: " + sourceStateBDD.toStringWithDomains());
-
-			BDD destStateBDD = factory.buildCube(destStateIndex, destStateDomain.vars());
-			System.out.println("destStateBDD: " + destStateBDD.toStringWithDomains());
-
-			sourceStateBDD.andWith(destStateBDD);
-			transitionBDD.orWith(sourceStateBDD);
-			System.out.println("transitionBDD: " + transitionBDD.toStringWithDomains());
-		}
-
-		BDD newStatesBDD = factory.buildCube(initialState, sourceStateDomain.vars());
-		System.out.println("initialState BDD: " + newStatesBDD.toStringWithDomains());
-
-/*
-		BDD andBDD = newStatesBDD.and(transitionBDD);
-		System.out.println("and: " + andBDD.toStringWithDomains());
-
-		BDD quantBDD = andBDD.exist(sourceStateDomain.set());
-		System.out.println("quant: " + quantBDD.toStringWithDomains());
-
-		BDD replaceBDD = quantBDD.replace(destToSourcePairing);
-		System.out.println("replace: " + replaceBDD.toStringWithDomains());
-
-		BDD orBDD = replaceBDD.or(newStatesBDD);
-		System.out.println("or: " + orBDD.toStringWithDomains());
+		BDD composedEventRemovedBDD = composedBDD.exist(eventDomain.set());
+		System.out.println("composed (event Removed) BDD: " + composedEventRemovedBDD.toStringWithDomains());
+	}
 */
 
-		BDD reachableStatesBDD = null;
-
-		do
-		{
-			reachableStatesBDD = newStatesBDD.id();
-			newStatesBDD = reachableStatesBDD.relprod(transitionBDD, sourceStateDomain.set());
-			newStatesBDD = newStatesBDD.replace(destToSourcePairing);
-			newStatesBDD = reachableStatesBDD.or(newStatesBDD);
-			System.out.println("reachableStates BDD: " + newStatesBDD.toStringWithDomains());
-		}
-		while (!reachableStatesBDD.equals(newStatesBDD));
-
-		System.out.println("all reachableStates BDD: " + reachableStatesBDD.toStringWithDomains());
-		System.out.println("nbr of reachable states: " + reachableStatesBDD.satCount(sourceStateDomain.set()));
-
-	}
-
-	public void initializeFactory()
-	{
-		if (factory == null)
-		{
-			factory = BDDFactory.init("java", 1000, 1000);
-		}
-	}
-	public int reachableStates()
-	{
-		return -1;
-	}
-
-	public static void main(String[] args)
-		throws Exception
-	{
-			System.err.println("Loading: " + args[0]);
-
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
-			Project theProject = builder.build(new File(args[0]));
-			Automaton spec = theProject.getAutomaton("knut");
-
-			BDDAutomaton bddSpec = new BDDAutomaton(spec);
-
-//			assertTrue(specCopy.nbrOfStates() == 3);
-//			assertTrue(specCopy.nbrOfTransitions() == 3);
-//			assertTrue(specCopy.nbrOfEvents() == 3);
-
-	}
 }

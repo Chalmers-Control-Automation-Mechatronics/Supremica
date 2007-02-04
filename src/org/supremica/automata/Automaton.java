@@ -1562,6 +1562,7 @@ public class Automaton
         reverseAssociatedState(currState.getAssociatedState(), currState);
         currState.setAssociatedState(nextState);
     }
+
     // End path-computing stuff that does not really belong here //MF
 
     /**
@@ -2179,7 +2180,7 @@ public class Automaton
             System.err.println("st != null");
         }
     }
-    
+
     class InternalEventIterator
         implements Iterator<LabeledEvent>
     {
@@ -2361,7 +2362,7 @@ public class Automaton
     ////////////////////////////////////
     ///// AutomatonProxy interface /////
     ////////////////////////////////////
-    
+
     private AutomatonProxy correspondingAutomatonProxy = null;
 
     public ComponentKind getKind()
