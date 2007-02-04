@@ -110,9 +110,19 @@ public class BDDAutomata
 		return manager.numberOfReachableStates();
 	}
 
+	public double numberOfCoreachableStates()
+	{
+		return manager.numberOfCoreachableStates();
+	}
+
+	public double numberOfReachableAndCoreachableStates()
+	{
+		return manager.numberOfReachableAndCoreachableStates();
+	}
+
 	public boolean isNonblocking()
 	{
-		return false;
+		return manager.isNonblocking();
 	}
 
 	public boolean isControllable()
@@ -172,6 +182,24 @@ public class BDDAutomata
 
 		System.err.println("Computation time (ms): " + compTime);
 		System.err.println("Reachable states: " + nbrOfReachableStates);
+
+		startTime = System.currentTimeMillis();
+		double nbrOfCoreachableStates = bddAutomata.numberOfCoreachableStates();
+		stopTime = System.currentTimeMillis();
+		compTime = stopTime - startTime;
+
+		System.err.println("Computation time (ms): " + compTime);
+		System.err.println("Coreachable states: " + nbrOfCoreachableStates);
+
+		startTime = System.currentTimeMillis();
+		double nbrOfReachableAndCoreachableStates = bddAutomata.numberOfReachableAndCoreachableStates();
+		stopTime = System.currentTimeMillis();
+		compTime = stopTime - startTime;
+
+		System.err.println("Computation time (ms): " + compTime);
+		System.err.println("ReachableAndCoreachable states: " + nbrOfReachableAndCoreachableStates);
+
+		System.err.println("isNonblocking: " + bddAutomata.isNonblocking());
 	}
 
 }

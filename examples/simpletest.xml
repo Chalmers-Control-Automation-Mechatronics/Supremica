@@ -6,7 +6,7 @@
 		<Event id="1" label="b"/>
 	</Events>
 	<States>
-		<State id="0" name="S0" initial="true"/>
+		<State id="0" name="S0" initial="true" accepting="true"/>
 		<State id="1" name="S1"/>
 	</States>
 	<Transitions>
@@ -21,7 +21,7 @@
 		<Event id="1" label="b"/>
 	</Events>
 	<States>
-		<State id="0" name="S0" initial="true"/>
+		<State id="0" name="S0" initial="true" accepting="true"/>
 		<State id="1" name="S1"/>
 	</States>
 	<Transitions>

@@ -89,7 +89,7 @@ public class BDDManager
 
 	public BDDManager(Automata theAutomata, String bddpackage)
 	{
-		this(theAutomata, bddpackage, 10000, 10000);
+		this(theAutomata, bddpackage, 150000, 150000);
 	}
 
 	public BDDManager(Automata theAutomata, String bddpackage, int nodenum, int cachesize)
@@ -110,7 +110,7 @@ public class BDDManager
 		}
 
 		initialStatesBDD = one();
-		markedStatesBDD = zero();
+		markedStatesBDD = one();
 		forbiddenStatesBDD = zero();
 		uncontrollableStatesBDD = zero();
 	}
@@ -205,7 +205,7 @@ public class BDDManager
 
 	public void addMarkedStates(BDD markedStates)
 	{
-		markedStatesBDD = markedStatesBDD.andWith(markedStates);
+		markedStatesBDD = markedStatesBDD.and(markedStates);
 	}
 
 	public void addForbiddenStates(BDD forbiddenStates)
@@ -251,7 +251,19 @@ public class BDDManager
 		Collection<BDDAutomaton> bddAutomata = automatonToBDDAutomatonMap.values();
 		for (BDDAutomaton currAutomaton : bddAutomata)
 		{
-			transitionBDD.andWith(currAutomaton.getTransitionForwardConjunctiveBDD());
+			transitionBDD = transitionBDD.and(currAutomaton.getTransitionForwardConjunctiveBDD());
+		}
+		transitionBDD = transitionBDD.exist(eventDomain.set());
+		return transitionBDD;
+	}
+
+	BDD getTransitionBackwardConjunctiveBDD()
+	{
+		BDD transitionBDD = one();
+		Collection<BDDAutomaton> bddAutomata = automatonToBDDAutomatonMap.values();
+		for (BDDAutomaton currAutomaton : bddAutomata)
+		{
+			transitionBDD = transitionBDD.and(currAutomaton.getTransitionBackwardConjunctiveBDD());
 		}
 		transitionBDD = transitionBDD.exist(eventDomain.set());
 		return transitionBDD;
@@ -259,9 +271,34 @@ public class BDDManager
 
 	public double numberOfReachableStates()
 	{
-        //System.err.println("ComposedInitialState: " + initialStatesBDD.toStringWithDomains());
 		BDD reachableStatesBDD = reachableStates(initialStatesBDD, getTransitionForwardConjunctiveBDD());
 		return reachableStatesBDD.satCount(sourceStateVariables);
+	}
+
+	public double numberOfCoreachableStates()
+	{
+		System.out.println("initialStates BDD: " + initialStatesBDD.toStringWithDomains());
+		System.out.println("markedStates BDD: " + markedStatesBDD.toStringWithDomains());
+
+		BDD coreachableStatesBDD = coreachableStates(markedStatesBDD, getTransitionBackwardConjunctiveBDD());
+		return coreachableStatesBDD.satCount(sourceStateVariables);
+	}
+
+	public double numberOfReachableAndCoreachableStates()
+	{
+		BDD reachableStatesBDD = reachableStates(initialStatesBDD, getTransitionForwardConjunctiveBDD());
+		BDD coreachableStatesBDD = coreachableStates(markedStatesBDD, getTransitionBackwardConjunctiveBDD());
+
+		BDD reachableAndCoreachableStatesBDD = reachableStatesBDD.and(coreachableStatesBDD);
+		return reachableAndCoreachableStatesBDD.satCount(sourceStateVariables);
+	}
+
+	public boolean isNonblocking()
+	{
+		BDD reachableStatesBDD = reachableStates(initialStatesBDD, getTransitionForwardConjunctiveBDD());
+		BDD coreachableStatesBDD = coreachableStates(markedStatesBDD, getTransitionBackwardConjunctiveBDD());
+		BDD impBDD = reachableStatesBDD.imp(coreachableStatesBDD);
+		return impBDD.equals(one());
 	}
 
 	public BDD reachableStates(BDD initialStates, BDD transitions)
@@ -273,7 +310,7 @@ public class BDDManager
 		{
 			// Keep a copy of the previously discovered states
 			// This will be used in the terminatiion condition for
-			// the operation. This could probably be optimized away.
+			// the operation.
 			previousReachableStatesBDD = reachableStatesBDD.id();
 
 			// Compute AND function of rechable states and the transitions.
@@ -301,5 +338,22 @@ public class BDDManager
 		while (!reachableStatesBDD.equals(previousReachableStatesBDD)); // Until no new states are found
 
 		return reachableStatesBDD;
+	}
+
+	public BDD coreachableStates(BDD markedStates, BDD transitions)
+	{
+		BDD coreachableStatesBDD = markedStates.id();
+		BDD previousCoreachableStatesBDD = null;
+
+		do
+		{
+			previousCoreachableStatesBDD = coreachableStatesBDD.id();
+			BDD previousStatesAndTransitionsBDD = coreachableStatesBDD.relprod(transitions, sourceStateVariables);
+			BDD previousStatesBDD = previousStatesAndTransitionsBDD.replace(destToSourceStatePairing);
+			coreachableStatesBDD.orWith(previousStatesBDD);
+		}
+		while (!coreachableStatesBDD.equals(previousCoreachableStatesBDD)); // Until no new states are found
+
+		return coreachableStatesBDD;
 	}
 }
