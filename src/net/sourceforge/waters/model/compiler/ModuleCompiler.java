@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.64 2007-02-05 16:31:57 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.65 2007-02-05 17:35:14 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1370,6 +1370,33 @@ private void updateTransitionsInAutomtata()
       final VariableSearcher searcher = new VariableSearcher(variable);
       final Set<TransitionProxy> variableTransitions =
         new TreeSet<TransitionProxy>();
+      //New algorithm -------------------
+      if(false){for(EventProxy forbiddenEvent: mEventForbiddenStatesMap.keySet()){
+    	  final SimpleExpressionProxy clause =
+    		  mEventForbiddenStatesMap.get(forbiddenEvent).getExpression();  
+    	  if(searcher.search(clause)){
+    		  final String name = variable.getName();
+    		  for (final IndexValue item : range.getValues()) {
+    	            final StateProxy source = variableStates.get(item);
+    	            mContext.add(name, item);
+    	            try {
+    	              if (evaluatePartialGuard(clause, searcher)) {
+    	            	  /*
+    	            	   * Since we have an uncontrollable state,
+    	            	   * we do not consider any actions.
+    	            	   */ 
+    	            	  final TransitionProxy forbiddenTransition =
+    	                      mDESFactory.createTransitionProxy(source,
+    	                                                       forbiddenEvent,
+    	                                                        source);
+    	                    variableTransitions.add(forbiddenTransition);
+    	                    variableAlphabet.add(forbiddenEvent); 
+    	                   }
+    	            }
+    	               finally {
+    	              mContext.unset(name);
+    	            }}}}}
+      //------------------------------
       for (EventProxy relabeledEvent : mEFAEventGuardClauseMap.keySet()) {
         // Get the right action.
         final List<List<BinaryExpressionProxy>> actionLists =
