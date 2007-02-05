@@ -280,9 +280,7 @@ public class ExampleTemplates
         thisGroup.addItem(new TemplateItem("Dosing Tank - EFA", prefix + "dosingtankEFA.wmod"));
         thisGroup.addItem(new TemplateItem("Flexible Manufacturing System", prefix + "FlexibleManufacturingSystem.xml"));
         thisGroup.addItem(new TemplateItem("Flexible Manufacturing System (variant, incomplete)", prefix + "FlexibleManufacturingSystemVariant.xml"));
-        //thisGroup.addItem(new TemplateItem("Flexible Production Cell", prefix + "ftechnik.xml"));
         thisGroup.addItem(new TemplateItem("Flexible Production Cell", prefix + "ftechnik.wmod"));
-        //thisGroup.addItem(new TemplateItem("Flexible Production Cell - No Collisions", prefix + "ftechnik_nocoll.xml"));
         thisGroup.addItem(new TemplateItem("Flexible Production Cell (variant)", prefix + "FlexibleProductionCell.xml"));
         thisGroup.addItem(new TemplateItem("Intertwined Product Cycles", prefix + "IntertwinedProductCycles.xml"));
         thisGroup.addItem(new TemplateItem("Machine Buffer Machine", prefix + "machineBufferMachine.xml"));
@@ -313,7 +311,7 @@ public class ExampleTemplates
         thisGroup.addItem(new TemplateItem("Central Locking - koordwsp", prefix + "central_locking/koordwsp.wmod"));
         //thisGroup.addItem(new TemplateItem("Central Locking - verriegel3", prefix + "central_locking/verriegel3.wmod");
         //thisGroup.addItem(new TemplateItem("Central Locking - verriegel4", prefix + "central_locking/verriegel4.wmod");
-        thisGroup.addItem(new TemplateItem("Fischertechnik", prefix + "fischertechnik/fischertechnik.wmod"));
+        //thisGroup.addItem(new TemplateItem("Fischertechnik", prefix + "fischertechnik/fischertechnik.wmod"));
         //thisGroup.addItem(new TemplateItem("Stick Picking Game", prefix + "other/stick_picking_game.wmod");
     }
 
