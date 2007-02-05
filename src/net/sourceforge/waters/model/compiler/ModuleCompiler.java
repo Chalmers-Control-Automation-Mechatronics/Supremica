@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.63 2007-02-04 14:23:47 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.64 2007-02-05 16:31:57 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -995,13 +995,27 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 		 * controllability it is important that the variable automata are built
 		 * before old transitions are removed.
 		 */
+     
+      /* 
+       * Forbidden self loops are first added to the variableAutomata.
+       */
       buildVariableAutomata();
-      //These methods will soon be implemented.
-      plantifyUncontrollableSpec();
-      createForbiddenSelfLoops();
-      addSingleStateSpec();
-      //
+      /*
+       * Transitions in automata without GuardActionBlocks are updated.
+       */
       updateTransitionsInAutomtata();
+      /* 
+       * Specifications that forbids events are added.
+       */
+      addSingleStateSpec();
+      /* Specifications with troublesome guards 
+       * are copied and transformed into plants.
+       */
+      plantifyUncontrollableSpec();
+      /* Forbidden self loops are added to the rest of the plants
+      *  (i.e. not to the variableAutomata. ).
+      */
+      createForbiddenSelfLoopsInAutomata();
       mGlobalAlphabet.clear();
       mGlobalAlphabet.addAll(newEvents);
       mGlobalAlphabet.addAll(mForbiddenRelabelledEvents);
@@ -1013,20 +1027,99 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 
 
 private void addSingleStateSpec() {
-	// TODO Auto-generated method stub
-	
+	for(EventProxy event: mEventForbiddenStatesMap.keySet()){
+		String name= event.getName(); 
+		
+		final Collection<EventProxy> alphabet = new HashSet<EventProxy>();
+        alphabet.add(event);
+    
+        EventProxy marked = mDESFactory.createEventProxy("marked", EventKind.PROPOSITION);
+        Collection<EventProxy> props = Collections.singletonList(marked);
+        final StateProxy state = mDESFactory.createStateProxy(name, true, props);
+        Collection<StateProxy> states = new HashSet<StateProxy>();
+        states.add(state);
+    
+        Collection<TransitionProxy> transitions = new HashSet<TransitionProxy>();
+    
+        final AutomatonProxy automaton =
+        mDESFactory.createAutomatonProxy(name,
+                                       ComponentKind.SPEC,
+                                       alphabet,
+                                       states,
+                                       transitions);
+        mAutomata.put(name, automaton);
+         }
 }
 
-
-private void createForbiddenSelfLoops() {
-	// TODO Auto-generated method stub
-	
-}
-
+private void createForbiddenSelfLoopsInAutomata() {
+	for (EventProxy event: mEventForbiddenStatesMap.keySet()){
+		Set<String> locations = mEventForbiddenStatesMap.get(event).getLocations();
+		for(String loc: locations){
+		for(AutomatonProxy aut: mAutomata.values()){
+		if(aut.getKind()== ComponentKind.PLANT){
+			for (StateProxy state: aut.getStates()){
+				if (state.getName().equals(loc)){
+					
+					final TransitionProxy selfloop =
+                        mDESFactory.createTransitionProxy(state,
+                        		event,
+                                                          state);
+                    Collection<EventProxy> alphabet= aut.getEvents();
+                    alphabet.add(event);
+            		Collection <TransitionProxy> transitions =aut.getTransitions();
+            		transitions.add(selfloop);
+            		String name= aut.getName();
+            		final AutomatonProxy updatedAutomaton =
+            	        mDESFactory.createAutomatonProxy(name,
+            	                                       ComponentKind.PLANT,
+            	                                       alphabet,
+            	                                       aut.getStates(),
+            	         transitions);
+            		mAutomata.remove(name);
+            	        mAutomata.put(name,updatedAutomaton);
+            		
+                }}}}}}}
 
 private void plantifyUncontrollableSpec() {
-	// TODO Auto-generated method stub
+	for(AutomatonProxy aut: mUncontrollableEFASpecifications){
+		
+	    Collection<TransitionProxy> transitions= aut.getTransitions();
+		for(EventProxy event: aut.getEvents()){
+			if(event.getKind()==EventKind.UNCONTROLLABLE){
+				for(StateProxy state: aut.getStates()){
+					if(eventDisabledAtState(aut, state, event)){
+						final TransitionProxy selfloop =
+	                        mDESFactory.createTransitionProxy(state,
+	                        		event,
+	                                                          state);
+						transitions.add(selfloop);
+					}
+									}
+			}
+		}
+	    
+	    
+	    String name="G("+aut.getName()+")";
+	    final AutomatonProxy plantifiedAut =
+	      mDESFactory.createAutomatonProxy(name,
+	                                       ComponentKind.PLANT,
+	                                       aut.getEvents(),
+	                                       aut.getStates(),
+	                                       transitions);
+		mAutomata.put(name,plantifiedAut);
+	}
 	
+}
+
+
+private boolean eventDisabledAtState(AutomatonProxy aut, StateProxy state, EventProxy event) {
+	for(TransitionProxy trans: aut.getTransitions()){
+		if(trans.getSource()== state && trans.getEvent()== event){
+			return false;
+		}
+		
+	}
+	return true;
 }
 
 
