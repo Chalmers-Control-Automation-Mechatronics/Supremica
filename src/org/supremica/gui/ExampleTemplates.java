@@ -280,7 +280,8 @@ public class ExampleTemplates
         thisGroup.addItem(new TemplateItem("Dosing Tank - EFA", prefix + "dosingtankEFA.wmod"));
         thisGroup.addItem(new TemplateItem("Flexible Manufacturing System", prefix + "FlexibleManufacturingSystem.xml"));
         thisGroup.addItem(new TemplateItem("Flexible Manufacturing System (variant, incomplete)", prefix + "FlexibleManufacturingSystemVariant.xml"));
-        thisGroup.addItem(new TemplateItem("Flexible Production Cell", prefix + "ftechnik.xml"));
+        //thisGroup.addItem(new TemplateItem("Flexible Production Cell", prefix + "ftechnik.xml"));
+        thisGroup.addItem(new TemplateItem("Flexible Production Cell", prefix + "ftechnik.wmod"));
         //thisGroup.addItem(new TemplateItem("Flexible Production Cell - No Collisions", prefix + "ftechnik_nocoll.xml"));
         thisGroup.addItem(new TemplateItem("Flexible Production Cell (variant)", prefix + "FlexibleProductionCell.xml"));
         thisGroup.addItem(new TemplateItem("Intertwined Product Cycles", prefix + "IntertwinedProductCycles.xml"));

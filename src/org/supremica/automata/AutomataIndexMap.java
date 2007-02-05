@@ -52,118 +52,118 @@ import org.supremica.log.*;
 
 import java.util.*;
 
-public class AutomataIndexMap 
+public class AutomataIndexMap
 {
-	private Hashtable<String, Integer> automatonMap;
-	private Hashtable<String, Integer> stateMap;
-	private Hashtable<String, Integer> eventMap;
-	
-	private static Logger logger = LoggerFactory.createLogger(AutomataIndexMap.class);
-	
-	public AutomataIndexMap(Automata theAutomata)
-	{
-		// This useful variable stores the union of the automata events
-		Alphabet unionAlphabet = theAutomata.getUnionAlphabet();
-
-		// The initial capacity should be bigger than the number of objects divided by the load factor (which is default 0.75)
-		int initialAutomatonMapCapacity = theAutomata.nbrOfAutomata()*4/3 + 1;
-
-		int initialStateMapCapacity = 0;
-		for (Iterator<Automaton> autoIter = theAutomata.iterator(); autoIter.hasNext(); )
-		{
-			initialStateMapCapacity += autoIter.next().nbrOfStates();
-		}
-		initialStateMapCapacity = initialStateMapCapacity*4/3 + 1;
-			
-		int initialEventMapCapacity = unionAlphabet.nbrOfEvents()*4/3 + 1;
-			
-		// The hashtables are initialized with appropriate capacities. 
-		automatonMap = new Hashtable<String, Integer>(initialAutomatonMapCapacity);
-		stateMap = new Hashtable<String, Integer>(initialStateMapCapacity);
-		eventMap = new Hashtable<String, Integer>(initialEventMapCapacity);
-
-		// The automatonIndex and the stateIndex hashtables are filled
-		int automatonIndex = 0;
-		for (Iterator<Automaton> autoIter = theAutomata.iterator(); autoIter.hasNext(); )
-		{
-			Automaton currAuto = autoIter.next();
-			String currAutoName = currAuto.getName();
-
-			// The automatonIndex hashtable is updated
-			automatonMap.put(currAutoName, new Integer(automatonIndex++));
-
-			int stateIndex = 0;
-			for (Iterator<State> stateIter = currAuto.stateIterator(); stateIter.hasNext(); )
-			{
-				// The stateIndex hashtable is updated
-				stateMap.put(currAutoName + "_" + stateIter.next().getName(), new Integer(stateIndex++));
-			}
-		}
-
-		// The eventIndex hashtable is filled
-		int eventIndex = 0;
-		for (Iterator<LabeledEvent> eventIter = unionAlphabet.iterator(); eventIter.hasNext(); )
-		{
-			eventMap.put(eventIter.next().getLabel(), new Integer(eventIndex++));
-		}
-	}
-
-	/**
-	 * Returns the index corresponding to the current automaton, as stored in the 
-	 * automaton index hashtable.
-	 *
-	 * @param automaton the automaton, whose index is requested
-	 * @return the index of this automaton.
-	 */
-	public int getAutomatonIndex(Automaton automaton)
-	{
-		return automatonMap.get(automaton.getName()).intValue();
-	}
-
-	/**
-	 * Returns the index corresponding to the current event, as stored in the 
-	 * event index hashtable.
-	 *
-	 * @param event the event, whose index is requested
-	 * @return the index of this event.
-	 */
-	public int getEventIndex(LabeledEvent event)
-	{
-		return eventMap.get(event.getLabel()).intValue();
-	}
-
-	/**
-	 * Returns the index corresponding to the current state, as stored in the 
-	 * state index hashtable.
-	 *
-	 * @param automaton the automaton, containing the state 
-	 * @param state the state, whose index is requested
-	 * @return the index of this state.
-	 */
-	public int getStateIndex(Automaton automaton, State state)
-	{
-		return stateMap.get(automaton.getName() + "_" + state.getName()).intValue();
-	}
-
-	/**
-	 * Calculates and returns the (unique) index corresponding to the synchronization of the 
-	 * current states, using the indices stored in the state index hashtable.
-	 *
-	 * @param automata the automata containing the states, that need a common index
-	 * @param states the states, whose index is requested
-	 * @return the index of this event.
-	 */
+    private Hashtable<String, Integer> automatonMap;
+    private Hashtable<String, Integer> stateMap;
+    private Hashtable<String, Integer> eventMap;
+    
+    private static Logger logger = LoggerFactory.createLogger(AutomataIndexMap.class);
+    
+    public AutomataIndexMap(Automata theAutomata)
+    {
+        // This useful variable stores the union of the automata events
+        Alphabet unionAlphabet = theAutomata.getUnionAlphabet();
+        
+        // The initial capacity should be bigger than the number of objects divided by the load factor (which is default 0.75)
+        int initialAutomatonMapCapacity = theAutomata.nbrOfAutomata()*4/3 + 1;
+        
+        int initialStateMapCapacity = 0;
+        for (Iterator<Automaton> autoIter = theAutomata.iterator(); autoIter.hasNext(); )
+        {
+            initialStateMapCapacity += autoIter.next().nbrOfStates();
+        }
+        initialStateMapCapacity = initialStateMapCapacity*4/3 + 1;
+        
+        int initialEventMapCapacity = unionAlphabet.nbrOfEvents()*4/3 + 1;
+        
+        // The hashtables are initialized with appropriate capacities.
+        automatonMap = new Hashtable<String, Integer>(initialAutomatonMapCapacity);
+        stateMap = new Hashtable<String, Integer>(initialStateMapCapacity);
+        eventMap = new Hashtable<String, Integer>(initialEventMapCapacity);
+        
+        // The automatonIndex and the stateIndex hashtables are filled
+        int automatonIndex = 0;
+        for (Iterator<Automaton> autoIter = theAutomata.iterator(); autoIter.hasNext(); )
+        {
+            Automaton currAuto = autoIter.next();
+            String currAutoName = currAuto.getName();
+            
+            // The automatonIndex hashtable is updated
+            automatonMap.put(currAutoName, new Integer(automatonIndex++));
+            
+            int stateIndex = 0;
+            for (Iterator<State> stateIter = currAuto.stateIterator(); stateIter.hasNext(); )
+            {
+                // The stateIndex hashtable is updated
+                stateMap.put(currAutoName + "_" + stateIter.next().getName(), new Integer(stateIndex++));
+            }
+        }
+        
+        // The eventIndex hashtable is filled
+        int eventIndex = 0;
+        for (Iterator<LabeledEvent> eventIter = unionAlphabet.iterator(); eventIter.hasNext(); )
+        {
+            eventMap.put(eventIter.next().getLabel(), new Integer(eventIndex++));
+        }
+    }
+    
+    /**
+     * Returns the index corresponding to the current automaton, as stored in the
+     * automaton index hashtable.
+     *
+     * @param automaton the automaton, whose index is requested
+     * @return the index of this automaton.
+     */
+    public int getAutomatonIndex(Automaton automaton)
+    {
+        return automatonMap.get(automaton.getName()).intValue();
+    }
+    
+    /**
+     * Returns the index corresponding to the current event, as stored in the
+     * event index hashtable.
+     *
+     * @param event the event, whose index is requested
+     * @return the index of this event.
+     */
+    public int getEventIndex(LabeledEvent event)
+    {
+        return eventMap.get(event.getLabel()).intValue();
+    }
+    
+    /**
+     * Returns the index corresponding to the current state, as stored in the
+     * state index hashtable.
+     *
+     * @param automaton the automaton, containing the state
+     * @param state the state, whose index is requested
+     * @return the index of this state.
+     */
+    public int getStateIndex(Automaton automaton, State state)
+    {
+        return stateMap.get(automaton.getName() + "_" + state.getName()).intValue();
+    }
+    
+    /**
+     * Calculates and returns the (unique) index corresponding to the synchronization of the
+     * current states, using the indices stored in the state index hashtable.
+     *
+     * @param automata the automata containing the states, that need a common index
+     * @param states the states, whose index is requested
+     * @return the index of this event.
+     */
 // 	public int getStateIndex(Automata automata, State[] states)
 // 	{
 // 		int index = 0;
 // 		int multiplier = 1;
-		
+    
 // 		for (int i=0; i<automata.length; i++)
 // 		{
 // 			index += stateMap.get(automata.getAutomatonAt(i).getName() + "_" + state.getName()).intValue() * multiplier;
 // 			multiplier *= automata.getAutomatonAt(i).nbrOfStates();
 // 		}
-	
+    
 // 		return index;
 // 	}
 }
