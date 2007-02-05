@@ -286,7 +286,7 @@ public class ExampleTemplates
         thisGroup.addItem(new TemplateItem("Intertwined Product Cycles", prefix + "IntertwinedProductCycles.xml"));
         thisGroup.addItem(new TemplateItem("Machine Buffer Machine", prefix + "machineBufferMachine.xml"));
         thisGroup.addItem(new TemplateItem("Parallel Manufacturing Example", prefix + "parallelManufacturingExample.xml"));
-        thisGroup.addItem(new TemplateItem("Production Cell for Mounting Frames", prefix + "fzelle.xml"));
+        thisGroup.addItem(new TemplateItem("Production Cell for Mounting Frames", prefix + "fzelle.wmod"));
         thisGroup.addItem(new TemplateItem("Robot Assembly Cell", prefix + "robotAssemblyCell.xml"));
         thisGroup.addItem(new TemplateItem("Simple Manufacturing Example", prefix + "simpleManufacturingExample.xml"));
         thisGroup.addItem(new TemplateItem("Tank Process", prefix + "tankProcess.xml"));

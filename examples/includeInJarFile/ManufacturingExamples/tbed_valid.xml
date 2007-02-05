@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Automata name="Train Testbed" comment="A remake by Robi Malik of the 'Train Testbed' example. This model has significantly fewer states than the original.">
+<Automata name="Train Testbed" comment="A remake by Robi Malik of the 'Train Testbed' example from 'PLC implementation of a DES supervisor for a manufacturing testbed: An implementation perspective' by Ryan James Leduc. This model has significantly fewer states than the original.">
 <Automaton name="sensor[t3]" type="Plant">
 	<Events>
 		<Event id="0" label=":accepting"/>
