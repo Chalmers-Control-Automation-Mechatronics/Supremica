@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorGraph
 //###########################################################################
-//# $Id: EditorGraph.java,v 1.13 2007-02-02 04:12:49 robi Exp $
+//# $Id: EditorGraph.java,v 1.14 2007-02-06 04:31:47 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -508,24 +508,24 @@ public class EditorGraph
 	  final PointGeometrySubject copyStart = copy.getStartPoint();
 	  if (origStart == null) {
 	    copy.setStartPoint(null);
-	  } else if (copyStart == null) {
+	  } else {//if (copyStart == null) {
 	    final PointGeometrySubject cloned = origStart.clone();
 	    copy.setStartPoint(cloned);
-	  } else {
+	  } /*else {
 	    final Point2D point = origStart.getPoint();
 	    copyStart.setPoint(point);
-	  }
+	  }*/
 	  final PointGeometrySubject origEnd = orig.getEndPoint();
 	  final PointGeometrySubject copyEnd = copy.getEndPoint();
 	  if (origEnd == null) {
 	    copy.setEndPoint(null);
-	  } else if (copyEnd == null) {
+	  } else { //if (copyEnd == null) {
 	    final PointGeometrySubject cloned = origEnd.clone();
 	    copy.setEndPoint(cloned);
-	  } else {
+	  }/* else {
 	    final Point2D point = origEnd.getPoint();
 	    copyEnd.setPoint(point);
-	  }
+	  }*/
 	}
 	break;
       }

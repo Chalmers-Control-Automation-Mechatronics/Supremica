@@ -185,7 +185,7 @@ public class BDDManager
     
     public int getAutomatonIndex(Automaton theAutomaton)
     {
-        return theIndexMap.getAutnextStatesBDDomatonIndex(theAutomaton);
+        return theIndexMap.getAutomatonIndex(theAutomaton);
     }
     
     public int getStateIndex(Automaton theAutomaton, State theState)
