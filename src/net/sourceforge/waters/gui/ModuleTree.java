@@ -162,6 +162,7 @@ public class ModuleTree extends JTree
                     }
                 }
             }
+            
             public void mouseReleased(MouseEvent e)
             {
                 TreePath selPath = getPathForLocation(e.getX(), e.getY());
@@ -170,13 +171,13 @@ public class ModuleTree extends JTree
                 mSelfRef.setSelectionPath(selPath);
                 maybeShowPopup(e, selPath);
             }
+            
             private void maybeShowPopup(MouseEvent e, TreePath selPath)
             {
                 //possibly show popup menu
-                if (e.isPopupTrigger())
+                if (e.isPopupTrigger() && selPath != null)
                 {
-                    DefaultMutableTreeNode node = (DefaultMutableTreeNode)
-                    selPath.getLastPathComponent();
+                    DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
                     if (node == null)
                     {
                         return;
@@ -187,11 +188,9 @@ public class ModuleTree extends JTree
                     
                     ModuleTreePopupMenu popup = new ModuleTreePopupMenu(
                         mSelfRef, mModuleWindow, component);
-                    popup.show(mSelfRef, e.getX(), e.getY());
-                    
+                    popup.show(mSelfRef, e.getX(), e.getY());                    
                 }
-            }
-            
+            }            
         };
         addMouseListener(ml);
     }

@@ -88,19 +88,16 @@ public class IDE
     throws JAXBException, SAXException
     {
         Utility.setupFrame(this, IDEDimensions.mainWindowPreferredSize);
-        setTitle(getName());
-        moduleContainers = new ModuleContainers(this);
+        //setTitle(getName());
         
-        ModuleContainer defaultModule = createNewModuleContainer();
-        defaultModule.addStandardPropositions();
-        moduleContainers.add(defaultModule);
-        moduleContainers.setActive(defaultModule);
-        
-        contentPanel = (JPanel)getContentPane();
-        contentLayout = new BorderLayout();
-        contentPanel.setLayout(contentLayout);
-        
-        documentManager = new DocumentManager();
+        // Create a default module
+        moduleContainers = new ModuleContainers(this);        
+        ModuleContainer defaultModuleContainer = createNewModuleContainer();
+        defaultModuleContainer.addStandardPropositions();
+        add(defaultModuleContainer);
+        moduleContainers.setActive(defaultModuleContainer);
+
+        // Set up a factory for Module:s
         mModuleFactory = ModuleSubjectFactory.getInstance();
         final OperatorTable opTable = CompilerOperatorTable.getInstance();
         mModuleMarshaller = new JAXBModuleMarshaller(mModuleFactory, opTable);
@@ -109,8 +106,12 @@ public class IDE
         hiscUnmarshaller = new HISCUnmarshaller(mModuleFactory);
         umdesUnmarshaller = new UMDESUnmarshaller(mModuleFactory);
         adsUnmarshaller = new ADSUnmarshaller(mModuleFactory);
+
+        // Document management
+        documentManager = new DocumentManager();
+        // Add marshallers in order of importance (shows up in the file.save dialog)
         documentManager.registerMarshaller(mModuleMarshaller);
-        // Add unmarshallers in the order of importance
+        // Add unmarshallers in order of importance (shows up in the file.open dialog)
         documentManager.registerUnmarshaller(mModuleMarshaller);
         documentManager.registerUnmarshaller(supremicaUnmarshaller);
         documentManager.registerUnmarshaller(validUnmarshaller);
@@ -118,35 +119,34 @@ public class IDE
         documentManager.registerUnmarshaller(umdesUnmarshaller);
         documentManager.registerUnmarshaller(adsUnmarshaller);
         
+        // Instantiate all actions 
         theActions = new Actions(this);
         
+        // Create GUI
+        contentPanel = (JPanel)getContentPane();
+        contentLayout = new BorderLayout();
+        contentPanel.setLayout(contentLayout);        
         menuBar = new IDEMenuBar(this);
-        setJMenuBar(menuBar);
-        
-        setToolBar(createToolBar());
-        
+        setJMenuBar(menuBar);        
+        setToolBar(createToolBar());        
         tabPanel = new JTabbedPane();
         tabPanel.addChangeListener(this);
-        
-        ModuleContainer currModuleContainer = moduleContainers.getActiveModuleContainer();
-        tabPanel.add(currModuleContainer.getEditorPanel());
-        tabPanel.add(currModuleContainer.getAnalyzerPanel());
-        //tabPanel.add(currModuleContainer.getSimulatorPanel());
-        
+        tabPanel.add(defaultModuleContainer.getEditorPanel());
+        tabPanel.add(defaultModuleContainer.getAnalyzerPanel());
+        //tabPanel.add(defaultModuleContainer.getSimulatorPanel());        
         tabPanel.validate();
-        
         logPanel = new LogPanel(this, "Logger");
-        
         splitPanelVertical = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tabPanel, logPanel);
         splitPanelVertical.setContinuousLayout(false);
         splitPanelVertical.setOneTouchExpandable(false);
         splitPanelVertical.setDividerLocation(0.8);
-        splitPanelVertical.setResizeWeight(1.0);
-        
-        contentPanel.add(splitPanelVertical, BorderLayout.CENTER);
-        
+        splitPanelVertical.setResizeWeight(1.0);        
+        contentPanel.add(splitPanelVertical, BorderLayout.CENTER);        
         //pack();
         //validate();
+
+        // Show comment
+        defaultModuleContainer.getEditorPanel().showComment();
         
         logger.info("Supremica version: " + (new Version()).toString());
     }
@@ -201,11 +201,14 @@ public class IDE
         {
             moduleContainers.setActive(moduleContainer);
             
-            oldModuleContainer.setSelectedComponent(tabPanel.getSelectedComponent());
-            
-            tabPanel.remove(oldModuleContainer.getEditorPanel());
-            tabPanel.remove(oldModuleContainer.getAnalyzerPanel());
-            //tabPanel.remove(oldModuleContainer.getSimulatorPanel());
+            if (oldModuleContainer != null)
+            {
+                oldModuleContainer.setSelectedComponent(tabPanel.getSelectedComponent());
+
+                tabPanel.remove(oldModuleContainer.getEditorPanel());
+                tabPanel.remove(oldModuleContainer.getAnalyzerPanel());
+                //tabPanel.remove(oldModuleContainer.getSimulatorPanel());
+            }
             
             tabPanel.add(moduleContainer.getEditorPanel());
             tabPanel.add(moduleContainer.getAnalyzerPanel());

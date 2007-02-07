@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorPanel
 //###########################################################################
-//# $Id: EditorPanel.java,v 1.50 2007-01-31 17:52:14 flordal Exp $
+//# $Id: EditorPanel.java,v 1.51 2007-02-07 18:03:58 flordal Exp $
 //###########################################################################
 
 
@@ -77,8 +77,7 @@ public class EditorPanel
         ((GridBagLayout)getLayout()).setConstraints(splitPanelHorizontal, getGridBagConstraints());
         add(splitPanelHorizontal);
     }
-    
-    
+        
     //######################################################################
     //#
     public void addToolBarEntries(IDEToolBar toolBar)

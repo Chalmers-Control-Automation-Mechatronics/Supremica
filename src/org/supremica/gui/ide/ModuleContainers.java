@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainers
 //###########################################################################
-//# $Id: ModuleContainers.java,v 1.7 2006-10-14 08:59:28 knut Exp $
+//# $Id: ModuleContainers.java,v 1.8 2007-02-07 18:03:58 flordal Exp $
 //###########################################################################
 
 
@@ -25,131 +25,130 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 
 public class ModuleContainers
 {
-	private IDE ide;
-	private List<ModuleContainer> moduleContainers =
-		new LinkedList<ModuleContainer>();
-	private ModuleContainer activeModuleContainer = null;
-
-	private int newModuleCounter = 1;
-
-	public ModuleContainers(IDE ide)
-	{
-		this.ide = ide;
-	}
-
-	public ModuleContainer getModuleContainer(final String name)
-	{
-		for (final ModuleContainer currModuleContainer : moduleContainers) {
-			if (name.equals(currModuleContainer.getName()))	{
-				return currModuleContainer;
-			}
-		}
-		return null;
-	}
-
-	public void add(ModuleContainer moduleContainer)
-	{
-		moduleContainers.add(moduleContainer);
-	}
-
-	public void remove(ModuleContainer moduleContainer)
-	{
-		moduleContainers.remove(moduleContainer);
-		if (moduleContainer == activeModuleContainer)
-		{
-			activeModuleContainer = null;
-		}
-	}
-
-
-	void setActive(ModuleContainer moduleContainer)
-	{
-
-		if (getActiveModuleContainer() != moduleContainer)
-		{
-			activeModuleContainer = moduleContainer;
-		}
-		ide.setTitle(ide.getName() + " [" + moduleContainer.getName() + "]");
-	}
-
-
-	public ModuleContainer getActiveModuleContainer()
-	{
-		return activeModuleContainer;
-	}
-
-
-	public ModuleContainer getFirst()
-	{
-		return (ModuleContainer) moduleContainers.get(0);
-	}
-
-
-	public ModuleContainer getLast()
-	{
-		final int index = moduleContainers.size() - 1;
-		return (ModuleContainer) moduleContainers.get(index);
-	}
-
-
-	public ModuleContainer getNext(ModuleContainer moduleContainer)
-	{
-		int moduleIndex = moduleContainers.indexOf(moduleContainer);
-		int nextModuleIndex = moduleIndex + 1;
-		if (nextModuleIndex == size())
-		{
-			nextModuleIndex = 0;
-		}
-		if (size() >= 1)
-		{
-			return (ModuleContainer)moduleContainers.get(nextModuleIndex);
-		}
-		return null;
-	}
-
-
-	public int size()
-	{
-		return moduleContainers.size();
-	}
-
-
-	public Iterator<ModuleContainer> iterator()
-	{
-		return moduleContainers.iterator();
-	}
-
-
-	public String getNewModuleName(String prefix)
-	{
-		String nameSuggestion = prefix + newModuleCounter++;
-		while (getModuleContainer(nameSuggestion) != null)
-		{
-			nameSuggestion = prefix + newModuleCounter++;
-		}
-		return nameSuggestion;
-
-	}
-
-	public ModuleSubject createNewModuleSubject()
-	{
-		final String name = getNewModuleName("Module");
-		final Collection<ParameterProxy> pl = Collections.emptyList();
-		final Collection<AliasProxy> al = Collections.emptyList();
-		final Collection<EventDeclProxy> el = Collections.emptyList();
-		final Collection<Proxy> prl = Collections.emptyList();
-		final ModuleSubject newModule =
-			new ModuleSubject(name, null, null, pl, al, el, prl, prl);
-		return newModule;
-	}
-
-
-	public ModuleContainer createNewModuleContainer()
-	{
-		final ModuleSubject newModule = createNewModuleSubject();
-		final ModuleContainer newModuleContainer =
-			new ModuleContainer(ide, newModule);
-		return newModuleContainer;
-	}
-
+    private IDE ide;
+    private List<ModuleContainer> moduleContainers =
+        new LinkedList<ModuleContainer>();
+    private ModuleContainer activeModuleContainer = null;
+    
+    private int newModuleCounter = 1;
+    
+    public ModuleContainers(IDE ide)
+    {
+        this.ide = ide;
+    }
+    
+    public ModuleContainer getModuleContainer(final String name)
+    {
+        for (final ModuleContainer currModuleContainer : moduleContainers)
+        {
+            if (name.equals(currModuleContainer.getName()))
+            {
+                return currModuleContainer;
+            }
+        }
+        return null;
+    }
+    
+    public void add(ModuleContainer moduleContainer)
+    {
+        moduleContainers.add(moduleContainer);
+    }
+    
+    public void remove(ModuleContainer moduleContainer)
+    {
+        moduleContainers.remove(moduleContainer);
+        if (moduleContainer == activeModuleContainer)
+        {
+            activeModuleContainer = null;
+        }
+    }    
+    
+    void setActive(ModuleContainer moduleContainer)
+    {        
+        if (getActiveModuleContainer() != moduleContainer)
+        {
+            activeModuleContainer = moduleContainer;
+        }
+        ide.setTitle(ide.getName() + " [" + moduleContainer.getName() + "]");
+    }
+    
+    
+    public ModuleContainer getActiveModuleContainer()
+    {
+        return activeModuleContainer;
+    }
+    
+    
+    public ModuleContainer getFirst()
+    {
+        return (ModuleContainer) moduleContainers.get(0);
+    }
+    
+    
+    public ModuleContainer getLast()
+    {
+        final int index = moduleContainers.size() - 1;
+        return (ModuleContainer) moduleContainers.get(index);
+    }
+    
+    
+    public ModuleContainer getNext(ModuleContainer moduleContainer)
+    {
+        int moduleIndex = moduleContainers.indexOf(moduleContainer);
+        int nextModuleIndex = moduleIndex + 1;
+        if (nextModuleIndex == size())
+        {
+            nextModuleIndex = 0;
+        }
+        if (size() >= 1)
+        {
+            return (ModuleContainer)moduleContainers.get(nextModuleIndex);
+        }
+        return null;
+    }
+    
+    
+    public int size()
+    {
+        return moduleContainers.size();
+    }
+    
+    
+    public Iterator<ModuleContainer> iterator()
+    {
+        return moduleContainers.iterator();
+    }
+        
+    public String getNewModuleName(String prefix)
+    {
+        String nameSuggestion = prefix + newModuleCounter++;
+        while (getModuleContainer(nameSuggestion) != null)
+        {
+            nameSuggestion = prefix + newModuleCounter++;
+        }
+        return nameSuggestion;
+        
+    }
+    
+    public ModuleSubject createNewModuleSubject()
+    {
+        final String name = getNewModuleName("Module");
+        final Collection<ParameterProxy> pl = Collections.emptyList();
+        final Collection<AliasProxy> al = Collections.emptyList();
+        final Collection<EventDeclProxy> el = Collections.emptyList();
+        final Collection<Proxy> prl = Collections.emptyList();
+        final ModuleSubject newModule =
+            new ModuleSubject(name, null, null, pl, al, el, prl, prl);
+        return newModule;
+    }
+    
+    
+    public ModuleContainer createNewModuleContainer()
+    {
+        final ModuleSubject newModule = createNewModuleSubject();
+        final ModuleContainer newModuleContainer =
+            new ModuleContainer(ide, newModule);
+        return newModuleContainer;
+    }
+    
 }

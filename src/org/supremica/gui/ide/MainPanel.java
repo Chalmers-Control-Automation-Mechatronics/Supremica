@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   MainPanel
 //###########################################################################
-//# $Id: MainPanel.java,v 1.29 2007-01-31 17:52:14 flordal Exp $
+//# $Id: MainPanel.java,v 1.30 2007-02-07 18:03:58 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -39,8 +39,6 @@ abstract class MainPanel
     extends JPanel
     implements ModuleWindowInterface
 {
-    private static Logger logger = LoggerFactory.createLogger(MainPanel.class);
-    
     private IDEToolBar thisToolBar = null;
     private IDEToolBar currParentToolBar = null;
     
@@ -208,7 +206,7 @@ abstract class MainPanel
         }
         return null;
     }
-    
+
     public void actionPerformed(ActionEvent e)
     {
     }

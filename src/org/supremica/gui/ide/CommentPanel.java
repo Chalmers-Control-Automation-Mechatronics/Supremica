@@ -2,29 +2,27 @@ package org.supremica.gui.ide;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 import net.sourceforge.waters.subject.base.DocumentSubject;
 
-import org.supremica.log.*;
-
+/**
+ * A panel with editable information about a document. The information is divided into a header
+ * (the name of the document) and a body (the comment of the document).
+ */
 class CommentPanel
     extends JPanel
 {
-    private static Logger logger = LoggerFactory.createLogger(CommentPanel.class);
-    
-    /**
-     * Displays a comment about the module.
-     */
     public CommentPanel(final DocumentSubject document)
     {
         super();
         this.setLayout(new BorderLayout());
-                
+
         try
         {
             // Add stuff to a panel
@@ -39,12 +37,12 @@ class CommentPanel
             commentPane.setFont(new Font(null, Font.PLAIN, 12));
             StyledDocument commentDoc = commentPane.getStyledDocument();
             commentDoc.insertString(commentDoc.getLength(), document.getComment(), null);
-            FocusListener listener = new FocusListener() 
-            {
-                public void focusGained(FocusEvent e) 
-                {
-                }
-                public void focusLost(FocusEvent e) 
+            this.add(BorderLayout.CENTER, commentPane);
+            
+            // The information is stored in the document each time the mouse leaves the panel
+            MouseListener listener = new MouseAdapter() 
+            {               
+                public void mouseExited(MouseEvent e) 
                 {
                     try
                     {
@@ -60,14 +58,13 @@ class CommentPanel
                     }
                 }
             };
-            titlePane.addFocusListener(listener);
-            commentPane.addFocusListener(listener);
-            this.add(BorderLayout.CENTER, commentPane);
+            titlePane.addMouseListener(listener);
+            commentPane.addMouseListener(listener);
+            //getRootPane().addMouseListener(listener); //Won't work?
         }
         catch (BadLocationException ex)
         {
-            // This can't happen...
-            //JOptionPane.showMessageDialog(ide.getFrame(), "Bad comment in module.", "Bad comment", JOptionPane.ERROR_MESSAGE);
+            System.err.println("Bad comment in module. " + ex);
         }
     }
 }
