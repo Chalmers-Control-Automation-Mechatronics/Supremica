@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="Production Cell for Mounting Frames" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
-    <ns2:Comment>A model of a particular production cell in a metal-processing plant, see 'Formal Development of Reactive Systems - Case Study Production Cell' by Claus Lewerentz and Thomas Lindner. A conveyor feeds metal plates to a robot that modes the plates to a press where the plates are processed and then picked up by the robot and moved to another conveyor belt. This is the 'fzelle' example.</ns2:Comment>
+    <ns2:Comment>A model of a particular production cell in a metal-processing plant, see 'Formal Development of Reactive Systems - Case Study Production Cell' by Claus Lewerentz and Thomas Lindner. A conveyor feeds metal plates to a robot that modes the plates to a press where the plates are processed and then picked up by the robot and moved to another conveyor belt. This is the 'fzelle' example. The system has three disjoint parts(!?).</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="C">
             <EnumSetExpression>

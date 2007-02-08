@@ -196,18 +196,18 @@ public class ExampleTemplates
 
         String prefix = basePrefix + "/OtherExamples/aip/";
 
-        thisGroup.addItem(new TemplateItem("Assembly Station 1", prefix + "System1_system1.xml"));
+        thisGroup.addItem(new TemplateItem("Assembly station 1", prefix + "System1_system1.xml"));
         //thisGroup.addItem(new TemplateItem("AIP System 1 - Top AS 1", prefix + "System1_Top_AS1.xml"));
-        thisGroup.addItem(new TemplateItem("Assembly Station 2", prefix + "System2_system2.xml"));
+        thisGroup.addItem(new TemplateItem("Assembly station 2", prefix + "System2_system2.xml"));
         //thisGroup.addItem(new TemplateItem("AIP System 2 - Top AS 2", prefix + "System2_Top_AS2.xml"));
-        thisGroup.addItem(new TemplateItem("Assembly Station 3", prefix + "System3_system3.xml"));
+        thisGroup.addItem(new TemplateItem("Assembly station 3", prefix + "System3_system3.xml"));
         //thisGroup.addItem(new TemplateItem("AIP System 3 - Top AS 3", prefix + "System3_Top_AS3.xml"));
-        thisGroup.addItem(new TemplateItem("Transport Unit 1", prefix + "System4_system4.xml"));
+        thisGroup.addItem(new TemplateItem("Transport unit 1", prefix + "System4_system4.xml"));
         //thisGroup.addItem(new TemplateItem("AIP System 4 - Top TU 1", prefix + "System4_Top_TU1.xml"));
-        thisGroup.addItem(new TemplateItem("Transport Unit 2", prefix + "System5_system5.xml"));
+        thisGroup.addItem(new TemplateItem("Transport unit 2", prefix + "System5_system5.xml"));
         //thisGroup.addItem(new TemplateItem("AIP System 5 - Top TU 2", prefix + "System5_Top_TU2.xml"));
-        thisGroup.addItem(new TemplateItem("Transport Unit 3", prefix + "System6_system6.xml"));
-        thisGroup.addItem(new TemplateItem("Transport Unit 4", prefix + "System7_system7.xml"));
+        thisGroup.addItem(new TemplateItem("Transport unit 3", prefix + "System6_system6.xml"));
+        thisGroup.addItem(new TemplateItem("Transport unit 4", prefix + "System7_system7.xml"));
         //thisGroup.addItem(new TemplateItem("AIP System 7 - Top TU 4", prefix + "System7_Top_TU4.xml"));
         thisGroup.addItem(new TemplateItem("\"Complete\" system (all the above)", prefix + "All.xml"));
         thisGroup.addItem(new TemplateItem("Largest coherent part", prefix + "LargestCoherentPart.xml"));

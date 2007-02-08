@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Automata name="Single Visual Project"  major="0"  minor="9" >
+<Automata name="Assembly station 3"  major="0"  minor="9" >
 <Automaton name="l_HndlPalletLvAS3" type="Specification">
 	<Events>
 		<Event id="PStopClosesEL_2.AS3" label="PStopClosesEL_2.AS3"/>
