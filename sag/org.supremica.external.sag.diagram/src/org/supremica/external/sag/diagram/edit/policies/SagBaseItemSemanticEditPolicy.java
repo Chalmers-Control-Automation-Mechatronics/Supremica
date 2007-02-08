@@ -250,16 +250,8 @@ public class SagBaseItemSemanticEditPolicy extends SemanticEditPolicy {
 		/**
 		 * @generated 
 		 */
-		public static boolean canCreateBoundedZone_4007(Graph container,
-				Node source, Node target) {
-			return true;
-		}
-
-		/**
-		 * @generated 
-		 */
-		public static boolean canCreateUnboundedZone_4009(Graph container,
-				Node source, Node target) {
+		public static boolean canCreateZone_4010(Graph container, Node source,
+				Node target) {
 			return true;
 		}
 	}

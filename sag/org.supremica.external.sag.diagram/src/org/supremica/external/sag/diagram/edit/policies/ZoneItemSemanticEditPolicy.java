@@ -9,8 +9,7 @@ import org.eclipse.gmf.runtime.emf.type.core.requests.DestroyElementRequest;
 /**
  * @generated
  */
-public class UnboundedZone3ItemSemanticEditPolicy extends
-		SagBaseItemSemanticEditPolicy {
+public class ZoneItemSemanticEditPolicy extends SagBaseItemSemanticEditPolicy {
 
 	/**
 	 * @generated

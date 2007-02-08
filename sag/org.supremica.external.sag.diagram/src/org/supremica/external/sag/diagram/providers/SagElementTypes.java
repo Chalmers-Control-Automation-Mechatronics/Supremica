@@ -149,11 +149,7 @@ public class SagElementTypes extends ElementInitializers {
 
 			elements.put(EndNode_3007, SagPackage.eINSTANCE.getEndNode());
 
-			elements.put(BoundedZone_4007, SagPackage.eINSTANCE
-					.getBoundedZone());
-
-			elements.put(UnboundedZone_4009, SagPackage.eINSTANCE
-					.getUnboundedZone());
+			elements.put(Zone_4010, SagPackage.eINSTANCE.getZone());
 		}
 		return (ENamedElement) elements.get(type);
 	}
@@ -177,11 +173,7 @@ public class SagElementTypes extends ElementInitializers {
 	/**
 	 * @generated
 	 */
-	public static final IElementType BoundedZone_4007 = getElementType("org.supremica.external.sag.diagram.BoundedZone_4007"); //$NON-NLS-1$
-	/**
-	 * @generated
-	 */
-	public static final IElementType UnboundedZone_4009 = getElementType("org.supremica.external.sag.diagram.UnboundedZone_4009"); //$NON-NLS-1$
+	public static final IElementType Zone_4010 = getElementType("org.supremica.external.sag.diagram.Zone_4010"); //$NON-NLS-1$
 
 	/**
 	 * @generated
@@ -205,8 +197,7 @@ public class SagElementTypes extends ElementInitializers {
 			KNOWN_ELEMENT_TYPES.add(Graph_2010);
 			KNOWN_ELEMENT_TYPES.add(SensorNode_3006);
 			KNOWN_ELEMENT_TYPES.add(EndNode_3007);
-			KNOWN_ELEMENT_TYPES.add(BoundedZone_4007);
-			KNOWN_ELEMENT_TYPES.add(UnboundedZone_4009);
+			KNOWN_ELEMENT_TYPES.add(Zone_4010);
 		}
 		return KNOWN_ELEMENT_TYPES.contains(elementType);
 	}

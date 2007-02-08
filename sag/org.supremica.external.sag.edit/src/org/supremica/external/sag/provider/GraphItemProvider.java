@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: GraphItemProvider.java,v 1.1 2007-01-12 14:32:38 torda Exp $
+ * $Id: GraphItemProvider.java,v 1.2 2007-02-08 16:36:59 torda Exp $
  */
 package org.supremica.external.sag.provider;
 
@@ -64,25 +64,48 @@ public class GraphItemProvider
 		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
-			addMultipleObjectsPropertyDescriptor(object);
+			addMaxNrOfObjectsPropertyDescriptor(object);
+			addNrOfObjectsIsUnboundedPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
 
 	/**
-	 * This adds a property descriptor for the Multiple Objects feature.
+	 * This adds a property descriptor for the Max Nr Of Objects feature.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected void addMultipleObjectsPropertyDescriptor(Object object) {
+	protected void addMaxNrOfObjectsPropertyDescriptor(Object object) {
 		itemPropertyDescriptors.add
 			(createItemPropertyDescriptor
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
-				 getString("_UI_Graph_multipleObjects_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_Graph_multipleObjects_feature", "_UI_Graph_type"),
-				 SagPackage.Literals.GRAPH__MULTIPLE_OBJECTS,
+				 getString("_UI_Graph_maxNrOfObjects_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Graph_maxNrOfObjects_feature", "_UI_Graph_type"),
+				 SagPackage.Literals.GRAPH__MAX_NR_OF_OBJECTS,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.INTEGRAL_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Nr Of Objects Is Unbounded feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addNrOfObjectsIsUnboundedPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Graph_nrOfObjectsIsUnbounded_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Graph_nrOfObjectsIsUnbounded_feature", "_UI_Graph_type"),
+				 SagPackage.Literals.GRAPH__NR_OF_OBJECTS_IS_UNBOUNDED,
 				 true,
 				 false,
 				 false,
@@ -104,6 +127,7 @@ public class GraphItemProvider
 			super.getChildrenFeatures(object);
 			childrenFeatures.add(SagPackage.Literals.GRAPH__ZONE);
 			childrenFeatures.add(SagPackage.Literals.GRAPH__NODE);
+			childrenFeatures.add(SagPackage.Literals.GRAPH__SENSOR);
 		}
 		return childrenFeatures;
 	}
@@ -154,11 +178,13 @@ public class GraphItemProvider
 		updateChildren(notification);
 
 		switch (notification.getFeatureID(Graph.class)) {
-			case SagPackage.GRAPH__MULTIPLE_OBJECTS:
+			case SagPackage.GRAPH__MAX_NR_OF_OBJECTS:
+			case SagPackage.GRAPH__NR_OF_OBJECTS_IS_UNBOUNDED:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 			case SagPackage.GRAPH__ZONE:
 			case SagPackage.GRAPH__NODE:
+			case SagPackage.GRAPH__SENSOR:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), true, false));
 				return;
 		}
@@ -178,12 +204,7 @@ public class GraphItemProvider
 		newChildDescriptors.add
 			(createChildParameter
 				(SagPackage.Literals.GRAPH__ZONE,
-				 SagFactory.eINSTANCE.createBoundedZone()));
-
-		newChildDescriptors.add
-			(createChildParameter
-				(SagPackage.Literals.GRAPH__ZONE,
-				 SagFactory.eINSTANCE.createUnboundedZone()));
+				 SagFactory.eINSTANCE.createZone()));
 
 		newChildDescriptors.add
 			(createChildParameter

@@ -1,42 +1,33 @@
 package org.supremica.external.sag.diagram.edit.parts;
 
-import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
-import org.eclipse.gmf.runtime.notation.Edge;
-import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.draw2d.Connection;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.PolylineDecoration;
 import org.eclipse.draw2d.RotatableDecoration;
 import org.eclipse.draw2d.geometry.PointList;
 import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.ecore.EAttribute;
-import org.eclipse.emf.ecore.ENamedElement;
-import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.edit.provider.ViewerNotification;
-
 import org.eclipse.gmf.runtime.diagram.ui.editparts.ConnectionNodeEditPart;
+import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.PolylineConnectionEx;
-
-import org.supremica.external.sag.Named;
+import org.eclipse.gmf.runtime.notation.View;
 import org.supremica.external.sag.SagPackage;
 import org.supremica.external.sag.Zone;
-import org.supremica.external.sag.diagram.edit.parts.UnboundedZoneEditPart.ZoneFigure;
-import org.supremica.external.sag.diagram.edit.policies.BoundedZoneItemSemanticEditPolicy;
+import org.supremica.external.sag.diagram.edit.policies.ZoneItemSemanticEditPolicy;
 
 /**
  * @generated
  */
-public class BoundedZoneEditPart extends ConnectionNodeEditPart {
+public class ZoneEditPart extends ConnectionNodeEditPart {
 
 	/**
 	 * @generated
 	 */
-	public static final int VISUAL_ID = 4007;
+	public static final int VISUAL_ID = 4010;
 
 	/**
 	 * @generated
 	 */
-	public BoundedZoneEditPart(View view) {
+	public ZoneEditPart(View view) {
 		super(view);
 	}
 
@@ -46,14 +37,14 @@ public class BoundedZoneEditPart extends ConnectionNodeEditPart {
 	protected void createDefaultEditPolicies() {
 		super.createDefaultEditPolicies();
 		installEditPolicy(EditPolicyRoles.SEMANTIC_ROLE,
-				new BoundedZoneItemSemanticEditPolicy());
+				new ZoneItemSemanticEditPolicy());
 	}
 
 	/**
 	 * Creates figure for this edit part.
 	 * 
-	 * Body of this method does not depend on settings in generation model so
-	 * you may safely remove <i>generated</i> tag and modify it.
+	 * Body of this method does not depend on settings in generation model
+	 * so you may safely remove <i>generated</i> tag and modify it.
 	 * 
 	 * @generated
 	 */
@@ -62,17 +53,8 @@ public class BoundedZoneEditPart extends ConnectionNodeEditPart {
 		return new ZoneFigure();
 	}
 
-	protected void handleNotificationEvent(Notification notification) {
-		Object feature = notification.getFeature();
-		if (SagPackage.eINSTANCE.getZone_IsOneway().equals(feature)) {
-			((ZoneFigure) getFigure()).updateOnewaySymbol();
-			refresh();
-		}
-		super.handleNotificationEvent(notification);
-	}
-
 	/**
-	 * @generated NOT
+	 * @generated
 	 */
 	public class ZoneFigure extends PolylineConnectionEx {
 
@@ -86,14 +68,24 @@ public class BoundedZoneEditPart extends ConnectionNodeEditPart {
 			this.setOutlineXOR(false);
 			this.setLineWidth(1);
 			this.setLineStyle(Graphics.LINE_SOLID);
+
 			updateOnewaySymbol();
+			updateOutsideStyle();
 		}
 
 		public void updateOnewaySymbol() {
-			if (!((Zone) getEdge().getElement()).isIsOneway()) {
+			if (!((Zone) getEdge().getElement()).isOneway()) {
 				setTargetDecoration(null);
 			} else {
 				setTargetDecoration(createTargetDecoration());
+			}
+		}
+
+		public void updateOutsideStyle() {
+			if (!((Zone) getEdge().getElement()).isOutsideSystemBoundry()) {
+				this.setLineStyle(Graphics.LINE_SOLID);
+			} else {
+				this.setLineStyle(Graphics.LINE_DASH);
 			}
 		}
 
@@ -122,4 +114,16 @@ public class BoundedZoneEditPart extends ConnectionNodeEditPart {
 
 	}
 
+	protected void handleNotificationEvent(Notification notification) {
+		Object feature = notification.getFeature();
+		if (SagPackage.eINSTANCE.getZone_Oneway().equals(feature)) {
+			((ZoneFigure) getFigure()).updateOnewaySymbol();
+			refresh();
+		} else if (SagPackage.eINSTANCE.getZone_OutsideSystemBoundry().equals(
+				feature)) {
+			((ZoneFigure) getFigure()).updateOutsideStyle();
+			refresh();
+		}
+		super.handleNotificationEvent(notification);
+	}
 }

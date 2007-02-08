@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SensorNode.java,v 1.1 2007-01-12 14:23:46 torda Exp $
+ * $Id: SensorNode.java,v 1.2 2007-02-08 16:36:08 torda Exp $
  */
 package org.supremica.external.sag;
 
@@ -15,7 +15,7 @@ package org.supremica.external.sag;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link org.supremica.external.sag.SensorNode#getSensorName <em>Sensor Name</em>}</li>
+ *   <li>{@link org.supremica.external.sag.SensorNode#getName <em>Name</em>}</li>
  *   <li>{@link org.supremica.external.sag.SensorNode#getSensor <em>Sensor</em>}</li>
  * </ul>
  * </p>
@@ -26,30 +26,30 @@ package org.supremica.external.sag;
  */
 public interface SensorNode extends Node {
 	/**
-	 * Returns the value of the '<em><b>Sensor Name</b></em>' attribute.
+	 * Returns the value of the '<em><b>Name</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Sensor Name</em>' attribute isn't clear,
+	 * If the meaning of the '<em>Name</em>' attribute isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Sensor Name</em>' attribute.
-	 * @see #setSensorName(String)
-	 * @see org.supremica.external.sag.SagPackage#getSensorNode_SensorName()
+	 * @return the value of the '<em>Name</em>' attribute.
+	 * @see #setName(String)
+	 * @see org.supremica.external.sag.SagPackage#getSensorNode_Name()
 	 * @model transient="true" volatile="true" derived="true"
 	 * @generated
 	 */
-	String getSensorName();
+	String getName();
 
 	/**
-	 * Sets the value of the '{@link org.supremica.external.sag.SensorNode#getSensorName <em>Sensor Name</em>}' attribute.
+	 * Sets the value of the '{@link org.supremica.external.sag.SensorNode#getName <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Sensor Name</em>' attribute.
-	 * @see #getSensorName()
+	 * @param value the new value of the '<em>Name</em>' attribute.
+	 * @see #getName()
 	 * @generated
 	 */
-	void setSensorName(String value);
+	void setName(String value);
 
 	/**
 	 * Returns the value of the '<em><b>Sensor</b></em>' reference.

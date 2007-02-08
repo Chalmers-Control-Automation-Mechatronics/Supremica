@@ -9,24 +9,21 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.gmf.runtime.notation.Diagram;
 import org.eclipse.gmf.runtime.notation.View;
 
-import org.supremica.external.sag.BoundedZone;
 import org.supremica.external.sag.EndNode;
 import org.supremica.external.sag.Graph;
 import org.supremica.external.sag.Project;
 import org.supremica.external.sag.SagPackage;
 import org.supremica.external.sag.SensorNode;
-import org.supremica.external.sag.UnboundedZone;
+import org.supremica.external.sag.Zone;
 
-import org.supremica.external.sag.diagram.edit.parts.BoundedZoneCapacityEditPart;
-import org.supremica.external.sag.diagram.edit.parts.BoundedZoneEditPart;
 import org.supremica.external.sag.diagram.edit.parts.EndNodeEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphGraphCompartmentEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphNameEditPart;
 import org.supremica.external.sag.diagram.edit.parts.ProjectEditPart;
 import org.supremica.external.sag.diagram.edit.parts.SensorNodeEditPart;
-import org.supremica.external.sag.diagram.edit.parts.SensorNodeSensorNameEditPart;
-import org.supremica.external.sag.diagram.edit.parts.UnboundedZoneEditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorNodeNameEditPart;
+import org.supremica.external.sag.diagram.edit.parts.ZoneEditPart;
 
 /**
  * This registry is used to determine which type of visual object should be
@@ -166,8 +163,8 @@ public class SagVisualIDRegistry {
 			return getUnrecognizedGraph_2010ChildNodeID(domainElement,
 					semanticHint);
 		case SensorNodeEditPart.VISUAL_ID:
-			if (SensorNodeSensorNameEditPart.VISUAL_ID == nodeVisualID) {
-				return SensorNodeSensorNameEditPart.VISUAL_ID;
+			if (SensorNodeNameEditPart.VISUAL_ID == nodeVisualID) {
+				return SensorNodeNameEditPart.VISUAL_ID;
 			}
 			return getUnrecognizedSensorNode_3006ChildNodeID(domainElement,
 					semanticHint);
@@ -198,11 +195,6 @@ public class SagVisualIDRegistry {
 			}
 			return getUnrecognizedProject_1000ChildNodeID(domainElement,
 					semanticHint);
-		case BoundedZoneEditPart.VISUAL_ID:
-			if (BoundedZoneCapacityEditPart.VISUAL_ID == nodeVisualID) {
-				return BoundedZoneCapacityEditPart.VISUAL_ID;
-			}
-			return getUnrecognizedBoundedZone_4007LinkLabelID(semanticHint);
 		}
 		return -1;
 	}
@@ -223,14 +215,10 @@ public class SagVisualIDRegistry {
 	 */
 	public static int getLinkWithClassVisualID(EObject domainElement,
 			EClass domainElementMetaclass) {
-		if (SagPackage.eINSTANCE.getBoundedZone().isSuperTypeOf(
-				domainElementMetaclass)
-				&& (domainElement == null || isLinkWithClassBoundedZone_4007((BoundedZone) domainElement))) {
-			return BoundedZoneEditPart.VISUAL_ID;
-		} else if (SagPackage.eINSTANCE.getUnboundedZone().isSuperTypeOf(
-				domainElementMetaclass)
-				&& (domainElement == null || isLinkWithClassUnboundedZone_4009((UnboundedZone) domainElement))) {
-			return UnboundedZoneEditPart.VISUAL_ID;
+		if (SagPackage.eINSTANCE.getZone()
+				.isSuperTypeOf(domainElementMetaclass)
+				&& (domainElement == null || isLinkWithClassZone_4010((Zone) domainElement))) {
+			return ZoneEditPart.VISUAL_ID;
 		} else {
 			return getUnrecognizedLinkWithClassID(domainElement);
 		}
@@ -347,17 +335,6 @@ public class SagVisualIDRegistry {
 	 *
 	 * @generated
 	 */
-	private static int getUnrecognizedBoundedZone_4007LinkLabelID(
-			String semanticHint) {
-		return -1;
-	}
-
-	/**
-	 * User can change implementation of this method to handle some specific
-	 * situations not covered by default logic.
-	 *
-	 * @generated
-	 */
 	private static int getUnrecognizedLinkWithClassID(EObject domainElement) {
 		return -1;
 	}
@@ -368,18 +345,7 @@ public class SagVisualIDRegistry {
 	 *
 	 * @generated
 	 */
-	private static boolean isLinkWithClassBoundedZone_4007(BoundedZone element) {
-		return true;
-	}
-
-	/**
-	 * User can change implementation of this method to check some additional 
-	 * conditions here.
-	 *
-	 * @generated
-	 */
-	private static boolean isLinkWithClassUnboundedZone_4009(
-			UnboundedZone element) {
+	private static boolean isLinkWithClassZone_4010(Zone element) {
 		return true;
 	}
 }

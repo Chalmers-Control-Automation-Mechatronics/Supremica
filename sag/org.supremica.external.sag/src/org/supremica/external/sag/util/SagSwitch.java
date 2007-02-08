@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagSwitch.java,v 1.3 2007-01-12 14:23:21 torda Exp $
+ * $Id: SagSwitch.java,v 1.4 2007-02-08 16:36:08 torda Exp $
  */
 package org.supremica.external.sag.util;
 
@@ -101,25 +101,9 @@ public class SagSwitch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case SagPackage.BOUNDED_ZONE: {
-				BoundedZone boundedZone = (BoundedZone)theEObject;
-				T result = caseBoundedZone(boundedZone);
-				if (result == null) result = caseZone(boundedZone);
-				if (result == null) result = caseNamed(boundedZone);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
 			case SagPackage.NAMED: {
 				Named named = (Named)theEObject;
 				T result = caseNamed(named);
-				if (result == null) result = defaultCase(theEObject);
-				return result;
-			}
-			case SagPackage.UNBOUNDED_ZONE: {
-				UnboundedZone unboundedZone = (UnboundedZone)theEObject;
-				T result = caseUnboundedZone(unboundedZone);
-				if (result == null) result = caseZone(unboundedZone);
-				if (result == null) result = caseNamed(unboundedZone);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -193,21 +177,6 @@ public class SagSwitch<T> {
 	}
 
 	/**
-	 * Returns the result of interpretting the object as an instance of '<em>Bounded Zone</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpretting the object as an instance of '<em>Bounded Zone</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseBoundedZone(BoundedZone object) {
-		return null;
-	}
-
-	/**
 	 * Returns the result of interpretting the object as an instance of '<em>Named</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -219,21 +188,6 @@ public class SagSwitch<T> {
 	 * @generated
 	 */
 	public T caseNamed(Named object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpretting the object as an instance of '<em>Unbounded Zone</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpretting the object as an instance of '<em>Unbounded Zone</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseUnboundedZone(UnboundedZone object) {
 		return null;
 	}
 

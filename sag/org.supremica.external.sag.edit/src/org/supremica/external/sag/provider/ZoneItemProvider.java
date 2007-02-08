@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: ZoneItemProvider.java,v 1.1 2007-01-12 14:32:38 torda Exp $
+ * $Id: ZoneItemProvider.java,v 1.2 2007-02-08 16:36:59 torda Exp $
  */
 package org.supremica.external.sag.provider;
 
@@ -63,7 +63,10 @@ public class ZoneItemProvider
 
 			addFrontPropertyDescriptor(object);
 			addBackPropertyDescriptor(object);
-			addIsOnewayPropertyDescriptor(object);
+			addOnewayPropertyDescriptor(object);
+			addCapacityPropertyDescriptor(object);
+			addOutsideSystemBoundryPropertyDescriptor(object);
+			addBoundedPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -113,19 +116,85 @@ public class ZoneItemProvider
 	}
 
 	/**
-	 * This adds a property descriptor for the Is Oneway feature.
+	 * This adds a property descriptor for the Oneway feature.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected void addIsOnewayPropertyDescriptor(Object object) {
+	protected void addOnewayPropertyDescriptor(Object object) {
 		itemPropertyDescriptors.add
 			(createItemPropertyDescriptor
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
-				 getString("_UI_Zone_isOneway_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_Zone_isOneway_feature", "_UI_Zone_type"),
-				 SagPackage.Literals.ZONE__IS_ONEWAY,
+				 getString("_UI_Zone_oneway_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Zone_oneway_feature", "_UI_Zone_type"),
+				 SagPackage.Literals.ZONE__ONEWAY,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.BOOLEAN_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Capacity feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addCapacityPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Zone_capacity_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Zone_capacity_feature", "_UI_Zone_type"),
+				 SagPackage.Literals.ZONE__CAPACITY,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.INTEGRAL_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Outside System Boundry feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addOutsideSystemBoundryPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Zone_outsideSystemBoundry_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Zone_outsideSystemBoundry_feature", "_UI_Zone_type"),
+				 SagPackage.Literals.ZONE__OUTSIDE_SYSTEM_BOUNDRY,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.BOOLEAN_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Bounded feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addBoundedPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Zone_bounded_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Zone_bounded_feature", "_UI_Zone_type"),
+				 SagPackage.Literals.ZONE__BOUNDED,
 				 true,
 				 false,
 				 false,
@@ -158,7 +227,10 @@ public class ZoneItemProvider
 		updateChildren(notification);
 
 		switch (notification.getFeatureID(Zone.class)) {
-			case SagPackage.ZONE__IS_ONEWAY:
+			case SagPackage.ZONE__ONEWAY:
+			case SagPackage.ZONE__CAPACITY:
+			case SagPackage.ZONE__OUTSIDE_SYSTEM_BOUNDRY:
+			case SagPackage.ZONE__BOUNDED:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 		}

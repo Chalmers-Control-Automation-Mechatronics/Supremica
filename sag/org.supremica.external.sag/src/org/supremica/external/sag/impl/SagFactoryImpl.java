@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagFactoryImpl.java,v 1.3 2007-01-12 14:23:10 torda Exp $
+ * $Id: SagFactoryImpl.java,v 1.4 2007-02-08 16:36:08 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
@@ -61,8 +61,7 @@ public class SagFactoryImpl extends EFactoryImpl implements SagFactory {
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
 			case SagPackage.GRAPH: return createGraph();
-			case SagPackage.BOUNDED_ZONE: return createBoundedZone();
-			case SagPackage.UNBOUNDED_ZONE: return createUnboundedZone();
+			case SagPackage.ZONE: return createZone();
 			case SagPackage.PROJECT: return createProject();
 			case SagPackage.SENSOR: return createSensor();
 			case SagPackage.END_NODE: return createEndNode();
@@ -87,19 +86,9 @@ public class SagFactoryImpl extends EFactoryImpl implements SagFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public BoundedZone createBoundedZone() {
-		BoundedZoneImpl boundedZone = new BoundedZoneImpl();
-		return boundedZone;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public UnboundedZone createUnboundedZone() {
-		UnboundedZoneImpl unboundedZone = new UnboundedZoneImpl();
-		return unboundedZone;
+	public Zone createZone() {
+		ZoneImpl zone = new ZoneImpl();
+		return zone;
 	}
 
 	/**

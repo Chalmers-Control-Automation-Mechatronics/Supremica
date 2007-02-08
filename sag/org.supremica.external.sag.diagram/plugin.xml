@@ -89,7 +89,7 @@
             <popupPredefinedItem id="deleteFromDiagramAction" remove="true"/>
          </popupContribution>
          <popupContribution class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramContextMenuProvider">
-            <popupStructuredContributionCriteria objectClass="org.supremica.external.sag.diagram.edit.parts.SensorNodeSensorNameEditPart"/>
+            <popupStructuredContributionCriteria objectClass="org.supremica.external.sag.diagram.edit.parts.SensorNodeNameEditPart"/>
             <popupPredefinedItem id="deleteFromDiagramAction" remove="true"/>
          </popupContribution>
          <popupContribution class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramContextMenuProvider">
@@ -105,16 +105,7 @@
             <popupPredefinedItem id="deleteFromDiagramAction" remove="true"/>
          </popupContribution>
          <popupContribution class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramContextMenuProvider">
-            <popupStructuredContributionCriteria objectClass="org.supremica.external.sag.diagram.edit.parts.BoundedZoneEditPart"/>
-            <popupPredefinedItem id="deleteFromDiagramAction" remove="true"/>
-         </popupContribution>
-         <popupContribution class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramContextMenuProvider">
-            <popupStructuredContributionCriteria objectClass="org.supremica.external.sag.diagram.edit.parts.BoundedZoneCapacityEditPart"/>
-            <popupPredefinedItem id="deleteFromDiagramAction" remove="true"/>
-            <popupPredefinedItem id="deleteFromModelAction" remove="true"/>
-         </popupContribution>
-         <popupContribution class="org.eclipse.gmf.runtime.diagram.ui.providers.DiagramContextMenuProvider">
-            <popupStructuredContributionCriteria objectClass="org.supremica.external.sag.diagram.edit.parts.UnboundedZoneEditPart"/>
+            <popupStructuredContributionCriteria objectClass="org.supremica.external.sag.diagram.edit.parts.ZoneEditPart"/>
             <popupPredefinedItem id="deleteFromDiagramAction" remove="true"/>
          </popupContribution>
       </contributionItemProvider>
@@ -246,23 +237,12 @@
 
       <metamodel nsURI="http://supremica.org/external/sag">
          <metamodelType
-               id="org.supremica.external.sag.diagram.BoundedZone_4007"
-               name="BoundedZone"
+               id="org.supremica.external.sag.diagram.Zone_4010"
+               name="Zone"
                kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
-               eclass="BoundedZone"
-               edithelper="org.supremica.external.sag.diagram.edit.helpers.BoundedZoneEditHelper">
-            <param name="semanticHint" value="4007"/>
-         </metamodelType>
-      </metamodel>
-
-      <metamodel nsURI="http://supremica.org/external/sag">
-         <metamodelType
-               id="org.supremica.external.sag.diagram.UnboundedZone_4009"
-               name="UnboundedZone"
-               kind="org.eclipse.gmf.runtime.emf.type.core.IHintedType"
-               eclass="UnboundedZone"
-               edithelper="org.supremica.external.sag.diagram.edit.helpers.UnboundedZoneEditHelper">
-            <param name="semanticHint" value="4009"/>
+               eclass="Zone"
+               edithelper="org.supremica.external.sag.diagram.edit.helpers.ZoneEditHelper">
+            <param name="semanticHint" value="4010"/>
          </metamodelType>
       </metamodel>
    </extension>
@@ -281,8 +261,7 @@
          <elementType ref="org.supremica.external.sag.diagram.SensorNode_3006"/>
          <elementType ref="org.supremica.external.sag.diagram.EndNode_3007"/>
          <elementType ref="org.supremica.external.sag.diagram.Graph_2010"/>
-         <elementType ref="org.supremica.external.sag.diagram.BoundedZone_4007"/>
-         <elementType ref="org.supremica.external.sag.diagram.UnboundedZone_4009"/>
+         <elementType ref="org.supremica.external.sag.diagram.Zone_4010"/>
          <advice ref="org.eclipse.gmf.runtime.diagram.core.advice.notationDepdendents"/>
       </binding>
    </extension>

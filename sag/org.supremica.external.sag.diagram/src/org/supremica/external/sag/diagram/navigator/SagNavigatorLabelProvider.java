@@ -31,15 +31,13 @@ import org.eclipse.ui.navigator.ICommonLabelProvider;
 
 import org.supremica.external.sag.Named;
 
-import org.supremica.external.sag.diagram.edit.parts.BoundedZoneCapacityEditPart;
-import org.supremica.external.sag.diagram.edit.parts.BoundedZoneEditPart;
 import org.supremica.external.sag.diagram.edit.parts.EndNodeEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphNameEditPart;
 import org.supremica.external.sag.diagram.edit.parts.ProjectEditPart;
 import org.supremica.external.sag.diagram.edit.parts.SensorNodeEditPart;
-import org.supremica.external.sag.diagram.edit.parts.SensorNodeSensorNameEditPart;
-import org.supremica.external.sag.diagram.edit.parts.UnboundedZoneEditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorNodeNameEditPart;
+import org.supremica.external.sag.diagram.edit.parts.ZoneEditPart;
 
 import org.supremica.external.sag.diagram.part.SagDiagramEditorPlugin;
 import org.supremica.external.sag.diagram.part.SagVisualIDRegistry;
@@ -122,14 +120,10 @@ public class SagNavigatorLabelProvider extends LabelProvider implements
 			return getImage(
 					"Navigator?Diagram?http://supremica.org/external/sag?Project",
 					SagElementTypes.Project_1000);
-		case BoundedZoneEditPart.VISUAL_ID:
+		case ZoneEditPart.VISUAL_ID:
 			return getImage(
-					"Navigator?Link?http://supremica.org/external/sag?BoundedZone",
-					SagElementTypes.BoundedZone_4007);
-		case UnboundedZoneEditPart.VISUAL_ID:
-			return getImage(
-					"Navigator?Link?http://supremica.org/external/sag?UnboundedZone",
-					SagElementTypes.UnboundedZone_4009);
+					"Navigator?Link?http://supremica.org/external/sag?Zone",
+					SagElementTypes.Zone_4010);
 		default:
 			return getImage("Navigator?UnknownElement", null);
 		}
@@ -188,10 +182,8 @@ public class SagNavigatorLabelProvider extends LabelProvider implements
 			return getEndNode_3007Text(view);
 		case ProjectEditPart.VISUAL_ID:
 			return getProject_1000Text(view);
-		case BoundedZoneEditPart.VISUAL_ID:
-			return getBoundedZone_4007Text(view);
-		case UnboundedZoneEditPart.VISUAL_ID:
-			return getUnboundedZone_4009Text(view);
+		case ZoneEditPart.VISUAL_ID:
+			return getZone_4010Text(view);
 		default:
 			return getUnknownElementText(view);
 		}
@@ -234,7 +226,7 @@ public class SagNavigatorLabelProvider extends LabelProvider implements
 					public Object getAdapter(Class adapter) {
 						if (String.class.equals(adapter)) {
 							return SagVisualIDRegistry
-									.getType(SensorNodeSensorNameEditPart.VISUAL_ID);
+									.getType(SensorNodeNameEditPart.VISUAL_ID);
 						}
 						if (IElementType.class.equals(adapter)) {
 							return SagElementTypes.SensorNode_3006;
@@ -284,41 +276,13 @@ public class SagNavigatorLabelProvider extends LabelProvider implements
 	/**
 	 * @generated
 	 */
-	private String getBoundedZone_4007Text(View view) {
-		IParser parser = ParserService.getInstance().getParser(
-				new IAdaptable() {
-					public Object getAdapter(Class adapter) {
-						if (String.class.equals(adapter)) {
-							return SagVisualIDRegistry
-									.getType(BoundedZoneCapacityEditPart.VISUAL_ID);
-						}
-						if (IElementType.class.equals(adapter)) {
-							return SagElementTypes.BoundedZone_4007;
-						}
-						return null;
-					}
-				});
-		if (parser != null) {
-			return parser.getPrintString(new EObjectAdapter(
-					view.getElement() != null ? view.getElement() : view),
-					ParserOptions.NONE.intValue());
-		} else {
-			SagDiagramEditorPlugin.getInstance().logError(
-					"Parser was not found for label " + 6003);
-			return "";
-		}
-	}
-
-	/**
-	 * @generated
-	 */
-	private String getUnboundedZone_4009Text(View view) {
+	private String getZone_4010Text(View view) {
 		EObject domainModelElement = view.getElement();
 		if (domainModelElement != null) {
 			return ((Named) domainModelElement).getName();
 		} else {
 			SagDiagramEditorPlugin.getInstance().logError(
-					"No domain element for view with visualID = " + 4009);
+					"No domain element for view with visualID = " + 4010);
 			return "";
 		}
 	}

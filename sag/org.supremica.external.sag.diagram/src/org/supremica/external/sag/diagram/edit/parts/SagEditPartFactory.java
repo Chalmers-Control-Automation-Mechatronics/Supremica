@@ -41,8 +41,8 @@ public class SagEditPartFactory implements EditPartFactory {
 			case SensorNodeEditPart.VISUAL_ID:
 				return new SensorNodeEditPart(view);
 
-			case SensorNodeSensorNameEditPart.VISUAL_ID:
-				return new SensorNodeSensorNameEditPart(view);
+			case SensorNodeNameEditPart.VISUAL_ID:
+				return new SensorNodeNameEditPart(view);
 
 			case EndNodeEditPart.VISUAL_ID:
 				return new EndNodeEditPart(view);
@@ -50,14 +50,8 @@ public class SagEditPartFactory implements EditPartFactory {
 			case GraphGraphCompartmentEditPart.VISUAL_ID:
 				return new GraphGraphCompartmentEditPart(view);
 
-			case BoundedZoneEditPart.VISUAL_ID:
-				return new BoundedZoneEditPart(view);
-
-			case BoundedZoneCapacityEditPart.VISUAL_ID:
-				return new BoundedZoneCapacityEditPart(view);
-
-			case UnboundedZoneEditPart.VISUAL_ID:
-				return new UnboundedZoneEditPart(view);
+			case ZoneEditPart.VISUAL_ID:
+				return new ZoneEditPart(view);
 			}
 		}
 		return createUnrecognizedEditPart(context, model);

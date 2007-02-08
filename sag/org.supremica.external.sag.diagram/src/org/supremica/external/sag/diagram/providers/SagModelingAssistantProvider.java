@@ -63,8 +63,7 @@ public class SagModelingAssistantProvider extends ModelingAssistantProvider {
 		if (sourceEditPart instanceof SensorNodeEditPart
 				|| sourceEditPart instanceof EndNodeEditPart) {
 			List<IElementType> types = new ArrayList<IElementType>();
-			types.add(SagElementTypes.BoundedZone_4007);
-			types.add(SagElementTypes.UnboundedZone_4009);
+			types.add(SagElementTypes.Zone_4010);
 			return types;
 		}
 
@@ -80,8 +79,7 @@ public class SagModelingAssistantProvider extends ModelingAssistantProvider {
 		if (targetEditPart instanceof SensorNodeEditPart
 				|| targetEditPart instanceof EndNodeEditPart) {
 			List<IElementType> types = new ArrayList<IElementType>();
-			types.add(SagElementTypes.BoundedZone_4007);
-			types.add(SagElementTypes.UnboundedZone_4009);
+			types.add(SagElementTypes.Zone_4010);
 			return types;
 		}
 
@@ -100,8 +98,7 @@ public class SagModelingAssistantProvider extends ModelingAssistantProvider {
 		if ((sourceEditPart instanceof SensorNodeEditPart && (targetEditPart instanceof SensorNodeEditPart || targetEditPart instanceof EndNodeEditPart))
 				|| (sourceEditPart instanceof EndNodeEditPart && targetEditPart instanceof SensorNodeEditPart)) {
 			List<IElementType> types = new ArrayList<IElementType>();
-			types.add(SagElementTypes.BoundedZone_4007);
-			types.add(SagElementTypes.UnboundedZone_4009);
+			types.add(SagElementTypes.Zone_4010);
 			return types;
 		}
 		return Collections.EMPTY_LIST;
@@ -115,8 +112,7 @@ public class SagModelingAssistantProvider extends ModelingAssistantProvider {
 		IGraphicalEditPart targetEditPart = (IGraphicalEditPart) target
 				.getAdapter(IGraphicalEditPart.class);
 		List<IElementType> types = new ArrayList<IElementType>();
-		if (relationshipType == SagElementTypes.BoundedZone_4007
-				|| relationshipType == SagElementTypes.UnboundedZone_4009) {
+		if (relationshipType == SagElementTypes.Zone_4010) {
 			if (targetEditPart instanceof SensorNodeEditPart) {
 				types.add(SagElementTypes.SensorNode_3006);
 				types.add(SagElementTypes.EndNode_3007);
@@ -136,8 +132,7 @@ public class SagModelingAssistantProvider extends ModelingAssistantProvider {
 		IGraphicalEditPart sourceEditPart = (IGraphicalEditPart) source
 				.getAdapter(IGraphicalEditPart.class);
 		List<IElementType> types = new ArrayList<IElementType>();
-		if (relationshipType == SagElementTypes.BoundedZone_4007
-				|| relationshipType == SagElementTypes.UnboundedZone_4009) {
+		if (relationshipType == SagElementTypes.Zone_4010) {
 			if (sourceEditPart instanceof SensorNodeEditPart) {
 				types.add(SagElementTypes.SensorNode_3006);
 				types.add(SagElementTypes.EndNode_3007);

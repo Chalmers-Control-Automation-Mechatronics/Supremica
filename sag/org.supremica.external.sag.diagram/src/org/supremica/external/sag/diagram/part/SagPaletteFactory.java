@@ -109,13 +109,12 @@ public class SagPaletteFactory {
 	 * @generated
 	 */
 	private ToolEntry createZone1CreationTool() {
-		List/*<IElementType>*/types = new ArrayList/*<IElementType>*/(2);
-		types.add(SagElementTypes.BoundedZone_4007);
-		types.add(SagElementTypes.UnboundedZone_4009);
+		List/*<IElementType>*/types = new ArrayList/*<IElementType>*/(1);
+		types.add(SagElementTypes.Zone_4010);
 		LinkToolEntry entry = new LinkToolEntry(
 				SagDiagramEditorPlugin.getString("Zone1CreationTool.title"), SagDiagramEditorPlugin.getString("Zone1CreationTool.desc"), types); //$NON-NLS-1$ $NON-NLS-2$
 		entry.setSmallIcon(SagElementTypes
-				.getImageDescriptor(SagElementTypes.BoundedZone_4007));
+				.getImageDescriptor(SagElementTypes.Zone_4010));
 		entry.setLargeIcon(entry.getSmallIcon());
 		return entry;
 	}

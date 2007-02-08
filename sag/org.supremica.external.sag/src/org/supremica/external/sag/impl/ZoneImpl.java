@@ -2,25 +2,44 @@
  * <copyright>
  * </copyright>
  *
- * $Id: ZoneImpl.java,v 1.3 2007-01-12 14:23:10 torda Exp $
+ * $Id: ZoneImpl.java,v 1.4 2007-02-08 16:36:08 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
+
+import java.util.Map;
 import org.eclipse.emf.common.notify.Notification;
 
 import org.eclipse.emf.common.notify.NotificationChain;
+import org.eclipse.emf.common.util.BasicDiagnostic;
+import org.eclipse.emf.common.util.Diagnostic;
+import org.eclipse.emf.common.util.DiagnosticChain;
+import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.InternalEObject;
 
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.ecore.plugin.EcorePlugin;
+import org.eclipse.emf.ecore.util.EObjectValidator;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.ocl.expressions.OCLExpression;
+import org.eclipse.emf.ocl.expressions.util.EvalEnvironment;
+import org.eclipse.emf.ocl.expressions.util.ExpressionsUtil;
+import org.eclipse.emf.ocl.parser.Environment;
+import org.eclipse.emf.ocl.parser.ParserException;
+import org.eclipse.emf.ocl.query.Query;
+import org.eclipse.emf.ocl.query.QueryFactory;
 import org.supremica.external.sag.Graph;
 import org.supremica.external.sag.Node;
 import org.supremica.external.sag.SagPackage;
 import org.supremica.external.sag.Zone;
-
+import org.supremica.external.sag.util.SagValidator;
+import static org.supremica.external.sag.util.OclHelper.*;
 /**
  * <!-- begin-user-doc -->
  * An implementation of the model object '<em><b>Zone</b></em>'.
@@ -30,14 +49,17 @@ import org.supremica.external.sag.Zone;
  * <ul>
  *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#getFront <em>Front</em>}</li>
  *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#getBack <em>Back</em>}</li>
- *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#isIsOneway <em>Is Oneway</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#isOneway <em>Oneway</em>}</li>
  *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#getGraph <em>Graph</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#getCapacity <em>Capacity</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#isOutsideSystemBoundry <em>Outside System Boundry</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#isBounded <em>Bounded</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public abstract class ZoneImpl extends NamedImpl implements Zone {
+public class ZoneImpl extends NamedImpl implements Zone {
 	/**
 	 * The cached value of the '{@link #getFront() <em>Front</em>}' reference.
 	 * <!-- begin-user-doc -->
@@ -47,6 +69,8 @@ public abstract class ZoneImpl extends NamedImpl implements Zone {
 	 * @ordered
 	 */
 	protected Node front = null;
+
+	protected static final String ZONE_NAME_PREFIX = "zone";
 
 	/**
 	 * The cached value of the '{@link #getBack() <em>Back</em>}' reference.
@@ -59,24 +83,95 @@ public abstract class ZoneImpl extends NamedImpl implements Zone {
 	protected Node back = null;
 
 	/**
-	 * The default value of the '{@link #isIsOneway() <em>Is Oneway</em>}' attribute.
+	 * The default value of the '{@link #isOneway() <em>Oneway</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #isIsOneway()
+	 * @see #isOneway()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final boolean IS_ONEWAY_EDEFAULT = true;
+	protected static final boolean ONEWAY_EDEFAULT = true;
 
 	/**
-	 * The cached value of the '{@link #isIsOneway() <em>Is Oneway</em>}' attribute.
+	 * The cached value of the '{@link #isOneway() <em>Oneway</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #isIsOneway()
+	 * @see #isOneway()
 	 * @generated
 	 * @ordered
 	 */
-	protected boolean isOneway = IS_ONEWAY_EDEFAULT;
+	protected boolean oneway = ONEWAY_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #getCapacity() <em>Capacity</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getCapacity()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final int CAPACITY_EDEFAULT = -1; // TODO The default value literal "null" is not valid.
+
+	protected static final int CAPACITY_UNSET_VALUE = -1;
+	/**
+	 * The cached value of the '{@link #getCapacity() <em>Capacity</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getCapacity()
+	 * @generated
+	 * @ordered
+	 */
+	protected int capacity = CAPACITY_EDEFAULT;
+
+	/**
+	 * This is true if the Capacity attribute has been set.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean capacityESet = false;
+
+	/**
+	 * The default value of the '{@link #isOutsideSystemBoundry() <em>Outside System Boundry</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isOutsideSystemBoundry()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean OUTSIDE_SYSTEM_BOUNDRY_EDEFAULT = false;
+
+	/**
+	 * The cached value of the '{@link #isOutsideSystemBoundry() <em>Outside System Boundry</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isOutsideSystemBoundry()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean outsideSystemBoundry = OUTSIDE_SYSTEM_BOUNDRY_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #isBounded() <em>Bounded</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isBounded()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean BOUNDED_EDEFAULT = false;
+
+	/**
+	 * The parsed OCL expression for the definition of the '{@link #validateCapacityIsPositiveNumber <em>Validate Capacity Is Positive Number</em>}' invariant constraint.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #validateCapacityIsPositiveNumber
+	 * @generated
+	 */
+	private static OCLExpression validateCapacityIsPositiveNumberInvOCL;
+
+	private static final String OCL_ANNOTATION_SOURCE = "http://www.eclipse.org/OCL/examples/ocl";
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -222,8 +317,8 @@ public abstract class ZoneImpl extends NamedImpl implements Zone {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public boolean isIsOneway() {
-		return isOneway;
+	public boolean isOneway() {
+		return oneway;
 	}
 
 	/**
@@ -231,11 +326,11 @@ public abstract class ZoneImpl extends NamedImpl implements Zone {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setIsOneway(boolean newIsOneway) {
-		boolean oldIsOneway = isOneway;
-		isOneway = newIsOneway;
+	public void setOneway(boolean newOneway) {
+		boolean oldOneway = oneway;
+		oneway = newOneway;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__IS_ONEWAY, oldIsOneway, isOneway));
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__ONEWAY, oldOneway, oneway));
 	}
 
 	/**
@@ -251,10 +346,17 @@ public abstract class ZoneImpl extends NamedImpl implements Zone {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
 	public NotificationChain basicSetGraph(Graph newGraph, NotificationChain msgs) {
 		msgs = eBasicSetContainer((InternalEObject)newGraph, SagPackage.ZONE__GRAPH, msgs);
+		if (getName() == null || getName().trim().length() == 0) {
+			int zoneIndex = 0;
+			while (check(this, "graph.zone->exists(name = '" + ZONE_NAME_PREFIX + Integer.toString(zoneIndex) + "')")) {
+				++zoneIndex;
+			}
+			setName(ZONE_NAME_PREFIX + Integer.toString(zoneIndex));
+		}
 		return msgs;
 	}
 
@@ -277,6 +379,138 @@ public abstract class ZoneImpl extends NamedImpl implements Zone {
 		}
 		else if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__GRAPH, newGraph, newGraph));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public int getCapacity() {
+		return capacity;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	public void setCapacity(int newCapacity) {
+		if (newCapacity < 1) {
+			unsetCapacity();
+			return;
+		}
+		int oldCapacity = capacity;
+		capacity = newCapacity;
+		boolean oldCapacityESet = capacityESet;
+		capacityESet = true;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__CAPACITY, oldCapacity, capacity, !oldCapacityESet));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	public void unsetCapacity() {
+		int oldCapacity = capacity;
+		boolean oldCapacityESet = capacityESet;
+		capacity = CAPACITY_UNSET_VALUE;
+		capacityESet = false;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.UNSET, SagPackage.ZONE__CAPACITY, oldCapacity, CAPACITY_EDEFAULT, oldCapacityESet));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public boolean isSetCapacity() {
+		return capacityESet;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public boolean isOutsideSystemBoundry() {
+		return outsideSystemBoundry;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setOutsideSystemBoundry(boolean newOutsideSystemBoundry) {
+		boolean oldOutsideSystemBoundry = outsideSystemBoundry;
+		outsideSystemBoundry = newOutsideSystemBoundry;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__OUTSIDE_SYSTEM_BOUNDRY, oldOutsideSystemBoundry, outsideSystemBoundry));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	public boolean isBounded() {
+		return isSetCapacity() || getCapacity() > 0;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	public void setBounded(boolean newBounded) {
+		if (newBounded) {
+			setCapacity(CAPACITY_EDEFAULT);
+		} else {
+			unsetCapacity();
+		}
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public boolean validateCapacityIsPositiveNumber(DiagnosticChain diagnostics, Map<?, ?> context) {
+		if (validateCapacityIsPositiveNumberInvOCL == null) {
+			EOperation eOperation = (EOperation) eClass().getEOperations().get(0);
+			Environment env = ExpressionsUtil.createClassifierContext(eClass());
+			EAnnotation ocl = eOperation.getEAnnotation(OCL_ANNOTATION_SOURCE);
+			String body = (String) ocl.getDetails().get("invariant");
+			
+			try {
+				validateCapacityIsPositiveNumberInvOCL = ExpressionsUtil.createInvariant(env, body, true);
+			} catch (ParserException e) {
+				throw new UnsupportedOperationException(e.getLocalizedMessage());
+			}
+		}
+		
+		Query query = QueryFactory.eINSTANCE.createQuery(validateCapacityIsPositiveNumberInvOCL);
+		EvalEnvironment evalEnv = new EvalEnvironment();
+		query.setEvaluationEnvironment(evalEnv);
+		
+		if (!query.check(this)) {
+			if (diagnostics != null) {
+				diagnostics.add
+					(new BasicDiagnostic
+						(Diagnostic.ERROR,
+						 SagValidator.DIAGNOSTIC_SOURCE,
+						 SagValidator.ZONE__VALIDATE_CAPACITY_IS_POSITIVE_NUMBER,
+						 EcorePlugin.INSTANCE.getString("_UI_GenericInvariant_diagnostic", new Object[] { "validateCapacityIsPositiveNumber", EObjectValidator.getObjectLabel(this, (Map<Object,Object>) context) }),
+						 new Object [] { this }));
+			}
+			return false;
+		}
+		return true;
+		
 	}
 
 	/**
@@ -349,10 +583,16 @@ public abstract class ZoneImpl extends NamedImpl implements Zone {
 			case SagPackage.ZONE__BACK:
 				if (resolve) return getBack();
 				return basicGetBack();
-			case SagPackage.ZONE__IS_ONEWAY:
-				return isIsOneway() ? Boolean.TRUE : Boolean.FALSE;
+			case SagPackage.ZONE__ONEWAY:
+				return isOneway() ? Boolean.TRUE : Boolean.FALSE;
 			case SagPackage.ZONE__GRAPH:
 				return getGraph();
+			case SagPackage.ZONE__CAPACITY:
+				return new Integer(getCapacity());
+			case SagPackage.ZONE__OUTSIDE_SYSTEM_BOUNDRY:
+				return isOutsideSystemBoundry() ? Boolean.TRUE : Boolean.FALSE;
+			case SagPackage.ZONE__BOUNDED:
+				return isBounded() ? Boolean.TRUE : Boolean.FALSE;
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -371,11 +611,20 @@ public abstract class ZoneImpl extends NamedImpl implements Zone {
 			case SagPackage.ZONE__BACK:
 				setBack((Node)newValue);
 				return;
-			case SagPackage.ZONE__IS_ONEWAY:
-				setIsOneway(((Boolean)newValue).booleanValue());
+			case SagPackage.ZONE__ONEWAY:
+				setOneway(((Boolean)newValue).booleanValue());
 				return;
 			case SagPackage.ZONE__GRAPH:
 				setGraph((Graph)newValue);
+				return;
+			case SagPackage.ZONE__CAPACITY:
+				setCapacity(((Integer)newValue).intValue());
+				return;
+			case SagPackage.ZONE__OUTSIDE_SYSTEM_BOUNDRY:
+				setOutsideSystemBoundry(((Boolean)newValue).booleanValue());
+				return;
+			case SagPackage.ZONE__BOUNDED:
+				setBounded(((Boolean)newValue).booleanValue());
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -395,11 +644,20 @@ public abstract class ZoneImpl extends NamedImpl implements Zone {
 			case SagPackage.ZONE__BACK:
 				setBack((Node)null);
 				return;
-			case SagPackage.ZONE__IS_ONEWAY:
-				setIsOneway(IS_ONEWAY_EDEFAULT);
+			case SagPackage.ZONE__ONEWAY:
+				setOneway(ONEWAY_EDEFAULT);
 				return;
 			case SagPackage.ZONE__GRAPH:
 				setGraph((Graph)null);
+				return;
+			case SagPackage.ZONE__CAPACITY:
+				unsetCapacity();
+				return;
+			case SagPackage.ZONE__OUTSIDE_SYSTEM_BOUNDRY:
+				setOutsideSystemBoundry(OUTSIDE_SYSTEM_BOUNDRY_EDEFAULT);
+				return;
+			case SagPackage.ZONE__BOUNDED:
+				setBounded(BOUNDED_EDEFAULT);
 				return;
 		}
 		super.eUnset(featureID);
@@ -417,10 +675,16 @@ public abstract class ZoneImpl extends NamedImpl implements Zone {
 				return front != null;
 			case SagPackage.ZONE__BACK:
 				return back != null;
-			case SagPackage.ZONE__IS_ONEWAY:
-				return isOneway != IS_ONEWAY_EDEFAULT;
+			case SagPackage.ZONE__ONEWAY:
+				return oneway != ONEWAY_EDEFAULT;
 			case SagPackage.ZONE__GRAPH:
 				return getGraph() != null;
+			case SagPackage.ZONE__CAPACITY:
+				return isSetCapacity();
+			case SagPackage.ZONE__OUTSIDE_SYSTEM_BOUNDRY:
+				return outsideSystemBoundry != OUTSIDE_SYSTEM_BOUNDRY_EDEFAULT;
+			case SagPackage.ZONE__BOUNDED:
+				return isBounded() != BOUNDED_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -435,8 +699,12 @@ public abstract class ZoneImpl extends NamedImpl implements Zone {
 		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (isOneway: ");
-		result.append(isOneway);
+		result.append(" (oneway: ");
+		result.append(oneway);
+		result.append(", capacity: ");
+		if (capacityESet) result.append(capacity); else result.append("<unset>");
+		result.append(", outsideSystemBoundry: ");
+		result.append(outsideSystemBoundry);
 		result.append(')');
 		return result.toString();
 	}

@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: GraphImpl.java,v 1.4 2007-01-23 09:55:48 torda Exp $
+ * $Id: GraphImpl.java,v 1.5 2007-02-08 16:36:08 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
@@ -20,6 +20,7 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EOperation;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.InternalEObject;
 
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
@@ -28,6 +29,7 @@ import org.eclipse.emf.ecore.plugin.EcorePlugin;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
 import org.eclipse.emf.ecore.util.EObjectContainmentWithInverseEList;
 import org.eclipse.emf.ecore.util.EObjectValidator;
+import org.eclipse.emf.ecore.util.EcoreEList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.InternalEList;
 
@@ -42,6 +44,7 @@ import org.supremica.external.sag.Graph;
 import org.supremica.external.sag.Node;
 import org.supremica.external.sag.Project;
 import org.supremica.external.sag.SagPackage;
+import org.supremica.external.sag.SensorNode;
 import org.supremica.external.sag.Zone;
 import org.supremica.external.sag.util.SagValidator;
 
@@ -53,9 +56,11 @@ import org.supremica.external.sag.util.SagValidator;
  * The following features are implemented:
  * <ul>
  *   <li>{@link org.supremica.external.sag.impl.GraphImpl#getZone <em>Zone</em>}</li>
- *   <li>{@link org.supremica.external.sag.impl.GraphImpl#isMultipleObjects <em>Multiple Objects</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.GraphImpl#getMaxNrOfObjects <em>Max Nr Of Objects</em>}</li>
  *   <li>{@link org.supremica.external.sag.impl.GraphImpl#getNode <em>Node</em>}</li>
  *   <li>{@link org.supremica.external.sag.impl.GraphImpl#getProject <em>Project</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.GraphImpl#isNrOfObjectsIsUnbounded <em>Nr Of Objects Is Unbounded</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.GraphImpl#getSensor <em>Sensor</em>}</li>
  * </ul>
  * </p>
  *
@@ -73,24 +78,24 @@ public class GraphImpl extends NamedImpl implements Graph {
 	protected EList<Zone> zone = null;
 
 	/**
-	 * The default value of the '{@link #isMultipleObjects() <em>Multiple Objects</em>}' attribute.
+	 * The default value of the '{@link #getMaxNrOfObjects() <em>Max Nr Of Objects</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #isMultipleObjects()
+	 * @see #getMaxNrOfObjects()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final boolean MULTIPLE_OBJECTS_EDEFAULT = false;
+	protected static final int MAX_NR_OF_OBJECTS_EDEFAULT = -1;
 
 	/**
-	 * The cached value of the '{@link #isMultipleObjects() <em>Multiple Objects</em>}' attribute.
+	 * The cached value of the '{@link #getMaxNrOfObjects() <em>Max Nr Of Objects</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #isMultipleObjects()
+	 * @see #getMaxNrOfObjects()
 	 * @generated
 	 * @ordered
 	 */
-	protected boolean multipleObjects = MULTIPLE_OBJECTS_EDEFAULT;
+	protected int maxNrOfObjects = MAX_NR_OF_OBJECTS_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #getNode() <em>Node</em>}' containment reference list.
@@ -103,13 +108,23 @@ public class GraphImpl extends NamedImpl implements Graph {
 	protected EList<Node> node = null;
 
 	/**
-	 * The parsed OCL expression for the definition of the '{@link #validateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless <em>Validate All Unbounded Zones Are Outside If Objects Are Identityless</em>}' invariant constraint.
+	 * The default value of the '{@link #isNrOfObjectsIsUnbounded() <em>Nr Of Objects Is Unbounded</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #validateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless
+	 * @see #isNrOfObjectsIsUnbounded()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean NR_OF_OBJECTS_IS_UNBOUNDED_EDEFAULT = false;
+
+	/**
+	 * The parsed OCL expression for the definition of the '{@link #validateAllUnboundedZonesAreOutsideIfNrOfObjectsAreUnbounded <em>Validate All Unbounded Zones Are Outside If Nr Of Objects Are Unbounded</em>}' invariant constraint.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #validateAllUnboundedZonesAreOutsideIfNrOfObjectsAreUnbounded
 	 * @generated
 	 */
-	private static OCLExpression validateAllUnboundedZonesAreOutsideIfObjectsAreIdentitylessInvOCL;
+	private static OCLExpression validateAllUnboundedZonesAreOutsideIfNrOfObjectsAreUnboundedInvOCL;
 
 	/**
 	 * The parsed OCL expression for the definition of the '{@link #validateName <em>Validate Name</em>}' invariant constraint.
@@ -119,6 +134,15 @@ public class GraphImpl extends NamedImpl implements Graph {
 	 * @generated
 	 */
 	private static OCLExpression validateNameInvOCL;
+
+	/**
+	 * The parsed OCL expression for the derivation of '{@link #getSensor <em>Sensor</em>}' property.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getSensor
+	 * @generated
+	 */
+	private static OCLExpression sensorDeriveOCL;
 
 	private static final String OCL_ANNOTATION_SOURCE = "http://www.eclipse.org/OCL/examples/ocl";
 
@@ -158,8 +182,8 @@ public class GraphImpl extends NamedImpl implements Graph {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public boolean isMultipleObjects() {
-		return multipleObjects;
+	public int getMaxNrOfObjects() {
+		return maxNrOfObjects;
 	}
 
 	/**
@@ -167,11 +191,11 @@ public class GraphImpl extends NamedImpl implements Graph {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setMultipleObjects(boolean newMultipleObjects) {
-		boolean oldMultipleObjects = multipleObjects;
-		multipleObjects = newMultipleObjects;
+	public void setMaxNrOfObjects(int newMaxNrOfObjects) {
+		int oldMaxNrOfObjects = maxNrOfObjects;
+		maxNrOfObjects = newMaxNrOfObjects;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.GRAPH__MULTIPLE_OBJECTS, oldMultipleObjects, multipleObjects));
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.GRAPH__MAX_NR_OF_OBJECTS, oldMaxNrOfObjects, maxNrOfObjects));
 	}
 
 	/**
@@ -230,23 +254,73 @@ public class GraphImpl extends NamedImpl implements Graph {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	public boolean isNrOfObjectsIsUnbounded() {
+		return getMaxNrOfObjects() < 0;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	public void setNrOfObjectsIsUnbounded(boolean newNrOfObjectsIsUnbounded) {
+		if (newNrOfObjectsIsUnbounded != isNrOfObjectsIsUnbounded()) {
+			setMaxNrOfObjects(newNrOfObjectsIsUnbounded ? -1 : 1);
+		}
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public boolean validateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless(DiagnosticChain diagnostics, Map<?, ?> context) {
-		if (validateAllUnboundedZonesAreOutsideIfObjectsAreIdentitylessInvOCL == null) {
+	public EList<SensorNode> getSensor() {
+
+		EStructuralFeature eFeature = (EStructuralFeature) eClass().getEStructuralFeatures().get(5);
+	
+		if (sensorDeriveOCL == null) { 
+			Environment env = ExpressionsUtil.createPropertyContext(eClass(), eFeature);
+			EAnnotation ocl = eFeature.getEAnnotation(OCL_ANNOTATION_SOURCE);
+			String derive = (String) ocl.getDetails().get("derive");
+			
+			try {
+				sensorDeriveOCL = ExpressionsUtil.createQuery(env, derive, true);
+			} catch (ParserException e) {
+				throw new UnsupportedOperationException(e.getLocalizedMessage());
+			}
+		}
+		
+		Query query = QueryFactory.eINSTANCE.createQuery(sensorDeriveOCL);
+		EvalEnvironment evalEnv = new EvalEnvironment();
+		query.setEvaluationEnvironment(evalEnv);
+	
+		Collection result = (Collection) query.evaluate(this);
+		return new EcoreEList.UnmodifiableEList(this, eFeature, result.size(), result.toArray());
+	
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public boolean validateAllUnboundedZonesAreOutsideIfNrOfObjectsAreUnbounded(DiagnosticChain diagnostics, Map<?, ?> context) {
+		if (validateAllUnboundedZonesAreOutsideIfNrOfObjectsAreUnboundedInvOCL == null) {
 			EOperation eOperation = (EOperation) eClass().getEOperations().get(0);
 			Environment env = ExpressionsUtil.createClassifierContext(eClass());
 			EAnnotation ocl = eOperation.getEAnnotation(OCL_ANNOTATION_SOURCE);
 			String body = (String) ocl.getDetails().get("invariant");
 			
 			try {
-				validateAllUnboundedZonesAreOutsideIfObjectsAreIdentitylessInvOCL = ExpressionsUtil.createInvariant(env, body, true);
+				validateAllUnboundedZonesAreOutsideIfNrOfObjectsAreUnboundedInvOCL = ExpressionsUtil.createInvariant(env, body, true);
 			} catch (ParserException e) {
 				throw new UnsupportedOperationException(e.getLocalizedMessage());
 			}
 		}
 		
-		Query query = QueryFactory.eINSTANCE.createQuery(validateAllUnboundedZonesAreOutsideIfObjectsAreIdentitylessInvOCL);
+		Query query = QueryFactory.eINSTANCE.createQuery(validateAllUnboundedZonesAreOutsideIfNrOfObjectsAreUnboundedInvOCL);
 		EvalEnvironment evalEnv = new EvalEnvironment();
 		query.setEvaluationEnvironment(evalEnv);
 		
@@ -256,8 +330,8 @@ public class GraphImpl extends NamedImpl implements Graph {
 					(new BasicDiagnostic
 						(Diagnostic.ERROR,
 						 SagValidator.DIAGNOSTIC_SOURCE,
-						 SagValidator.GRAPH__VALIDATE_ALL_UNBOUNDED_ZONES_ARE_OUTSIDE_IF_OBJECTS_ARE_IDENTITYLESS,
-						 EcorePlugin.INSTANCE.getString("_UI_GenericInvariant_diagnostic", new Object[] { "validateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless", EObjectValidator.getObjectLabel(this, (Map<Object,Object>) context) }),
+						 SagValidator.GRAPH__VALIDATE_ALL_UNBOUNDED_ZONES_ARE_OUTSIDE_IF_NR_OF_OBJECTS_ARE_UNBOUNDED,
+						 EcorePlugin.INSTANCE.getString("_UI_GenericInvariant_diagnostic", new Object[] { "validateAllUnboundedZonesAreOutsideIfNrOfObjectsAreUnbounded", EObjectValidator.getObjectLabel(this, (Map<Object,Object>) context) }),
 						 new Object [] { this }));
 			}
 			return false;
@@ -340,6 +414,8 @@ public class GraphImpl extends NamedImpl implements Graph {
 				return ((InternalEList<?>)getNode()).basicRemove(otherEnd, msgs);
 			case SagPackage.GRAPH__PROJECT:
 				return basicSetProject(null, msgs);
+			case SagPackage.GRAPH__SENSOR:
+				return ((InternalEList<?>)getSensor()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -368,12 +444,16 @@ public class GraphImpl extends NamedImpl implements Graph {
 		switch (featureID) {
 			case SagPackage.GRAPH__ZONE:
 				return getZone();
-			case SagPackage.GRAPH__MULTIPLE_OBJECTS:
-				return isMultipleObjects() ? Boolean.TRUE : Boolean.FALSE;
+			case SagPackage.GRAPH__MAX_NR_OF_OBJECTS:
+				return new Integer(getMaxNrOfObjects());
 			case SagPackage.GRAPH__NODE:
 				return getNode();
 			case SagPackage.GRAPH__PROJECT:
 				return getProject();
+			case SagPackage.GRAPH__NR_OF_OBJECTS_IS_UNBOUNDED:
+				return isNrOfObjectsIsUnbounded() ? Boolean.TRUE : Boolean.FALSE;
+			case SagPackage.GRAPH__SENSOR:
+				return getSensor();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -391,8 +471,8 @@ public class GraphImpl extends NamedImpl implements Graph {
 				getZone().clear();
 				getZone().addAll((Collection<? extends Zone>)newValue);
 				return;
-			case SagPackage.GRAPH__MULTIPLE_OBJECTS:
-				setMultipleObjects(((Boolean)newValue).booleanValue());
+			case SagPackage.GRAPH__MAX_NR_OF_OBJECTS:
+				setMaxNrOfObjects(((Integer)newValue).intValue());
 				return;
 			case SagPackage.GRAPH__NODE:
 				getNode().clear();
@@ -400,6 +480,9 @@ public class GraphImpl extends NamedImpl implements Graph {
 				return;
 			case SagPackage.GRAPH__PROJECT:
 				setProject((Project)newValue);
+				return;
+			case SagPackage.GRAPH__NR_OF_OBJECTS_IS_UNBOUNDED:
+				setNrOfObjectsIsUnbounded(((Boolean)newValue).booleanValue());
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -416,14 +499,17 @@ public class GraphImpl extends NamedImpl implements Graph {
 			case SagPackage.GRAPH__ZONE:
 				getZone().clear();
 				return;
-			case SagPackage.GRAPH__MULTIPLE_OBJECTS:
-				setMultipleObjects(MULTIPLE_OBJECTS_EDEFAULT);
+			case SagPackage.GRAPH__MAX_NR_OF_OBJECTS:
+				setMaxNrOfObjects(MAX_NR_OF_OBJECTS_EDEFAULT);
 				return;
 			case SagPackage.GRAPH__NODE:
 				getNode().clear();
 				return;
 			case SagPackage.GRAPH__PROJECT:
 				setProject((Project)null);
+				return;
+			case SagPackage.GRAPH__NR_OF_OBJECTS_IS_UNBOUNDED:
+				setNrOfObjectsIsUnbounded(NR_OF_OBJECTS_IS_UNBOUNDED_EDEFAULT);
 				return;
 		}
 		super.eUnset(featureID);
@@ -439,12 +525,16 @@ public class GraphImpl extends NamedImpl implements Graph {
 		switch (featureID) {
 			case SagPackage.GRAPH__ZONE:
 				return zone != null && !zone.isEmpty();
-			case SagPackage.GRAPH__MULTIPLE_OBJECTS:
-				return multipleObjects != MULTIPLE_OBJECTS_EDEFAULT;
+			case SagPackage.GRAPH__MAX_NR_OF_OBJECTS:
+				return maxNrOfObjects != MAX_NR_OF_OBJECTS_EDEFAULT;
 			case SagPackage.GRAPH__NODE:
 				return node != null && !node.isEmpty();
 			case SagPackage.GRAPH__PROJECT:
 				return getProject() != null;
+			case SagPackage.GRAPH__NR_OF_OBJECTS_IS_UNBOUNDED:
+				return isNrOfObjectsIsUnbounded() != NR_OF_OBJECTS_IS_UNBOUNDED_EDEFAULT;
+			case SagPackage.GRAPH__SENSOR:
+				return !getSensor().isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -459,8 +549,8 @@ public class GraphImpl extends NamedImpl implements Graph {
 		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (multipleObjects: ");
-		result.append(multipleObjects);
+		result.append(" (maxNrOfObjects: ");
+		result.append(maxNrOfObjects);
 		result.append(')');
 		return result.toString();
 	}

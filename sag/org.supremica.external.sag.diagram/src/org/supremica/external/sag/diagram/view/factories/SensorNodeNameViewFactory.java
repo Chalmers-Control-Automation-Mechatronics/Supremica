@@ -10,7 +10,7 @@ import org.eclipse.gmf.runtime.diagram.ui.view.factories.BasicNodeViewFactory;
 /**
  * @generated
  */
-public class SensorNodeSensorNameViewFactory extends BasicNodeViewFactory {
+public class SensorNodeNameViewFactory extends BasicNodeViewFactory {
 
 	/**
 	 * @generated

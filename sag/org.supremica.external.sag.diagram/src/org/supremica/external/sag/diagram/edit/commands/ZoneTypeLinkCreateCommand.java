@@ -10,13 +10,12 @@ import org.eclipse.gmf.runtime.emf.type.core.requests.CreateRelationshipRequest;
 import org.supremica.external.sag.Graph;
 import org.supremica.external.sag.Node;
 import org.supremica.external.sag.SagPackage;
-import org.supremica.external.sag.UnboundedZone;
+import org.supremica.external.sag.Zone;
 
 /**
  * @generated
  */
-public class UnboundedZone2TypeLinkCreateCommand extends
-		CreateRelationshipCommand {
+public class ZoneTypeLinkCreateCommand extends CreateRelationshipCommand {
 
 	/**
 	 * @generated
@@ -36,7 +35,7 @@ public class UnboundedZone2TypeLinkCreateCommand extends
 	/**
 	 * @generated
 	 */
-	public UnboundedZone2TypeLinkCreateCommand(CreateRelationshipRequest req,
+	public ZoneTypeLinkCreateCommand(CreateRelationshipRequest req,
 			Graph container, Node source, Node target) {
 		super(req);
 		super.setElementToEdit(container);
@@ -84,8 +83,7 @@ public class UnboundedZone2TypeLinkCreateCommand extends
 	 * @generated
 	 */
 	protected EObject doDefaultElementCreation() {
-		UnboundedZone newElement = (UnboundedZone) super
-				.doDefaultElementCreation();
+		Zone newElement = (Zone) super.doDefaultElementCreation();
 		if (newElement != null) {
 			newElement.setFront(myTarget);
 			newElement.setBack(mySource);

@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SensorNodeItemProvider.java,v 1.1 2007-01-12 14:32:38 torda Exp $
+ * $Id: SensorNodeItemProvider.java,v 1.2 2007-02-08 16:36:59 torda Exp $
  */
 package org.supremica.external.sag.provider;
 
@@ -61,26 +61,26 @@ public class SensorNodeItemProvider
 		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
-			addSensorNamePropertyDescriptor(object);
+			addNamePropertyDescriptor(object);
 			addSensorPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
 
 	/**
-	 * This adds a property descriptor for the Sensor Name feature.
+	 * This adds a property descriptor for the Name feature.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected void addSensorNamePropertyDescriptor(Object object) {
+	protected void addNamePropertyDescriptor(Object object) {
 		itemPropertyDescriptors.add
 			(createItemPropertyDescriptor
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
-				 getString("_UI_SensorNode_sensorName_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_SensorNode_sensorName_feature", "_UI_SensorNode_type"),
-				 SagPackage.Literals.SENSOR_NODE__SENSOR_NAME,
+				 getString("_UI_SensorNode_name_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_SensorNode_name_feature", "_UI_SensorNode_type"),
+				 SagPackage.Literals.SENSOR_NODE__NAME,
 				 true,
 				 false,
 				 false,
@@ -128,7 +128,7 @@ public class SensorNodeItemProvider
 	 * @generated
 	 */
 	public String getText(Object object) {
-		String label = ((SensorNode)object).getSensorName();
+		String label = ((SensorNode)object).getName();
 		return label == null || label.length() == 0 ?
 			getString("_UI_SensorNode_type") :
 			getString("_UI_SensorNode_type") + " " + label;
@@ -145,7 +145,7 @@ public class SensorNodeItemProvider
 		updateChildren(notification);
 
 		switch (notification.getFeatureID(SensorNode.class)) {
-			case SagPackage.SENSOR_NODE__SENSOR_NAME:
+			case SagPackage.SENSOR_NODE__NAME:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 		}

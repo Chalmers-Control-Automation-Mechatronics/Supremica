@@ -6,29 +6,25 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.gmf.runtime.diagram.core.providers.AbstractViewProvider;
 import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.gmf.runtime.emf.type.core.IElementType;
-import org.supremica.external.sag.diagram.edit.parts.BoundedZoneCapacityEditPart;
-import org.supremica.external.sag.diagram.edit.parts.BoundedZoneEditPart;
 import org.supremica.external.sag.diagram.edit.parts.EndNodeEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphGraphCompartmentEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphNameEditPart;
 import org.supremica.external.sag.diagram.edit.parts.ProjectEditPart;
 import org.supremica.external.sag.diagram.edit.parts.SensorNodeEditPart;
-import org.supremica.external.sag.diagram.edit.parts.SensorNodeSensorNameEditPart;
-import org.supremica.external.sag.diagram.edit.parts.UnboundedZoneEditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorNodeNameEditPart;
+import org.supremica.external.sag.diagram.edit.parts.ZoneEditPart;
 
 import org.supremica.external.sag.diagram.part.SagVisualIDRegistry;
 
-import org.supremica.external.sag.diagram.view.factories.BoundedZoneCapacityViewFactory;
-import org.supremica.external.sag.diagram.view.factories.BoundedZoneViewFactory;
 import org.supremica.external.sag.diagram.view.factories.EndNodeViewFactory;
 import org.supremica.external.sag.diagram.view.factories.GraphGraphCompartmentViewFactory;
 import org.supremica.external.sag.diagram.view.factories.GraphNameViewFactory;
 import org.supremica.external.sag.diagram.view.factories.GraphViewFactory;
 import org.supremica.external.sag.diagram.view.factories.ProjectViewFactory;
-import org.supremica.external.sag.diagram.view.factories.SensorNodeSensorNameViewFactory;
+import org.supremica.external.sag.diagram.view.factories.SensorNodeNameViewFactory;
 import org.supremica.external.sag.diagram.view.factories.SensorNodeViewFactory;
-import org.supremica.external.sag.diagram.view.factories.UnboundedZoneViewFactory;
+import org.supremica.external.sag.diagram.view.factories.ZoneViewFactory;
 
 /**
  * @generated
@@ -72,14 +68,12 @@ public class SagViewProvider extends AbstractViewProvider {
 			return GraphNameViewFactory.class;
 		case SensorNodeEditPart.VISUAL_ID:
 			return SensorNodeViewFactory.class;
-		case SensorNodeSensorNameEditPart.VISUAL_ID:
-			return SensorNodeSensorNameViewFactory.class;
+		case SensorNodeNameEditPart.VISUAL_ID:
+			return SensorNodeNameViewFactory.class;
 		case EndNodeEditPart.VISUAL_ID:
 			return EndNodeViewFactory.class;
 		case GraphGraphCompartmentEditPart.VISUAL_ID:
 			return GraphGraphCompartmentViewFactory.class;
-		case BoundedZoneCapacityEditPart.VISUAL_ID:
-			return BoundedZoneCapacityViewFactory.class;
 		}
 		return null;
 	}
@@ -102,10 +96,8 @@ public class SagViewProvider extends AbstractViewProvider {
 		int linkVID = SagVisualIDRegistry.getLinkWithClassVisualID(
 				semanticElement, semanticType);
 		switch (linkVID) {
-		case BoundedZoneEditPart.VISUAL_ID:
-			return BoundedZoneViewFactory.class;
-		case UnboundedZoneEditPart.VISUAL_ID:
-			return UnboundedZoneViewFactory.class;
+		case ZoneEditPart.VISUAL_ID:
+			return ZoneViewFactory.class;
 		}
 		return getUnrecognizedConnectorViewClass(semanticAdapter,
 				containerView, semanticHint);

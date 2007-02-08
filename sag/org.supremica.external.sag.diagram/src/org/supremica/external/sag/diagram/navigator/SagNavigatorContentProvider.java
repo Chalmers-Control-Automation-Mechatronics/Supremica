@@ -28,13 +28,12 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.navigator.ICommonContentExtensionSite;
 import org.eclipse.ui.navigator.ICommonContentProvider;
 
-import org.supremica.external.sag.diagram.edit.parts.BoundedZoneEditPart;
 import org.supremica.external.sag.diagram.edit.parts.EndNodeEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphGraphCompartmentEditPart;
 import org.supremica.external.sag.diagram.edit.parts.ProjectEditPart;
 import org.supremica.external.sag.diagram.edit.parts.SensorNodeEditPart;
-import org.supremica.external.sag.diagram.edit.parts.UnboundedZoneEditPart;
+import org.supremica.external.sag.diagram.edit.parts.ZoneEditPart;
 
 import org.supremica.external.sag.diagram.part.SagVisualIDRegistry;
 
@@ -145,13 +144,7 @@ public class SagNavigatorContentProvider implements ICommonContentProvider {
 			result.addAll(createNavigatorItems(connectedViews, parentElement,
 					false));
 			connectedViews = getDiagramLinksByType(Collections.singleton(view),
-					SagVisualIDRegistry.getType(BoundedZoneEditPart.VISUAL_ID));
-			links
-					.addChildren(createNavigatorItems(connectedViews, links,
-							false));
-			connectedViews = getDiagramLinksByType(Collections.singleton(view),
-					SagVisualIDRegistry
-							.getType(UnboundedZoneEditPart.VISUAL_ID));
+					SagVisualIDRegistry.getType(ZoneEditPart.VISUAL_ID));
 			links
 					.addChildren(createNavigatorItems(connectedViews, links,
 							false));
@@ -190,22 +183,12 @@ public class SagNavigatorContentProvider implements ICommonContentProvider {
 					parentElement);
 			Collection connectedViews = getIncomingLinksByType(Collections
 					.singleton(view), SagVisualIDRegistry
-					.getType(BoundedZoneEditPart.VISUAL_ID));
+					.getType(ZoneEditPart.VISUAL_ID));
 			incominglinks.addChildren(createNavigatorItems(connectedViews,
 					incominglinks, true));
 			connectedViews = getOutgoingLinksByType(
 					Collections.singleton(view), SagVisualIDRegistry
-							.getType(BoundedZoneEditPart.VISUAL_ID));
-			outgoinglinks.addChildren(createNavigatorItems(connectedViews,
-					outgoinglinks, true));
-			connectedViews = getIncomingLinksByType(
-					Collections.singleton(view), SagVisualIDRegistry
-							.getType(UnboundedZoneEditPart.VISUAL_ID));
-			incominglinks.addChildren(createNavigatorItems(connectedViews,
-					incominglinks, true));
-			connectedViews = getOutgoingLinksByType(
-					Collections.singleton(view), SagVisualIDRegistry
-							.getType(UnboundedZoneEditPart.VISUAL_ID));
+							.getType(ZoneEditPart.VISUAL_ID));
 			outgoinglinks.addChildren(createNavigatorItems(connectedViews,
 					outgoinglinks, true));
 			if (!outgoinglinks.isEmpty()) {
@@ -227,22 +210,12 @@ public class SagNavigatorContentProvider implements ICommonContentProvider {
 					parentElement);
 			Collection connectedViews = getIncomingLinksByType(Collections
 					.singleton(view), SagVisualIDRegistry
-					.getType(BoundedZoneEditPart.VISUAL_ID));
+					.getType(ZoneEditPart.VISUAL_ID));
 			incominglinks.addChildren(createNavigatorItems(connectedViews,
 					incominglinks, true));
 			connectedViews = getOutgoingLinksByType(
 					Collections.singleton(view), SagVisualIDRegistry
-							.getType(BoundedZoneEditPart.VISUAL_ID));
-			outgoinglinks.addChildren(createNavigatorItems(connectedViews,
-					outgoinglinks, true));
-			connectedViews = getIncomingLinksByType(
-					Collections.singleton(view), SagVisualIDRegistry
-							.getType(UnboundedZoneEditPart.VISUAL_ID));
-			incominglinks.addChildren(createNavigatorItems(connectedViews,
-					incominglinks, true));
-			connectedViews = getOutgoingLinksByType(
-					Collections.singleton(view), SagVisualIDRegistry
-							.getType(UnboundedZoneEditPart.VISUAL_ID));
+							.getType(ZoneEditPart.VISUAL_ID));
 			outgoinglinks.addChildren(createNavigatorItems(connectedViews,
 					outgoinglinks, true));
 			if (!outgoinglinks.isEmpty()) {
@@ -254,39 +227,7 @@ public class SagNavigatorContentProvider implements ICommonContentProvider {
 			return result.toArray();
 		}
 
-		case BoundedZoneEditPart.VISUAL_ID: {
-			Collection result = new ArrayList();
-			SagNavigatorGroup source = new SagNavigatorGroup("source",
-					"icons/linkSourceNavigatorGroup.gif", parentElement);
-			SagNavigatorGroup target = new SagNavigatorGroup("target",
-					"icons/linkTargetNavigatorGroup.gif", parentElement);
-			Collection connectedViews = getLinksTargetByType(Collections
-					.singleton(view), SagVisualIDRegistry
-					.getType(SensorNodeEditPart.VISUAL_ID));
-			target.addChildren(createNavigatorItems(connectedViews, target,
-					true));
-			connectedViews = getLinksTargetByType(Collections.singleton(view),
-					SagVisualIDRegistry.getType(EndNodeEditPart.VISUAL_ID));
-			target.addChildren(createNavigatorItems(connectedViews, target,
-					true));
-			connectedViews = getLinksSourceByType(Collections.singleton(view),
-					SagVisualIDRegistry.getType(SensorNodeEditPart.VISUAL_ID));
-			source.addChildren(createNavigatorItems(connectedViews, source,
-					true));
-			connectedViews = getLinksSourceByType(Collections.singleton(view),
-					SagVisualIDRegistry.getType(EndNodeEditPart.VISUAL_ID));
-			source.addChildren(createNavigatorItems(connectedViews, source,
-					true));
-			if (!source.isEmpty()) {
-				result.add(source);
-			}
-			if (!target.isEmpty()) {
-				result.add(target);
-			}
-			return result.toArray();
-		}
-
-		case UnboundedZoneEditPart.VISUAL_ID: {
+		case ZoneEditPart.VISUAL_ID: {
 			Collection result = new ArrayList();
 			SagNavigatorGroup source = new SagNavigatorGroup("source",
 					"icons/linkSourceNavigatorGroup.gif", parentElement);

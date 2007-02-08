@@ -2,11 +2,9 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SensorNodeImpl.java,v 1.1 2007-01-12 14:23:10 torda Exp $
+ * $Id: SensorNodeImpl.java,v 1.2 2007-02-08 16:36:08 torda Exp $
  */
 package org.supremica.external.sag.impl;
-
-import static org.supremica.external.sag.util.OclHelper.evaluate;
 
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -21,6 +19,8 @@ import org.supremica.external.sag.SagPackage;
 import org.supremica.external.sag.Sensor;
 import org.supremica.external.sag.SensorNode;
 
+import static org.supremica.external.sag.util.OclHelper.evaluate;
+
 /**
  * <!-- begin-user-doc -->
  * An implementation of the model object '<em><b>Sensor Node</b></em>'.
@@ -28,7 +28,7 @@ import org.supremica.external.sag.SensorNode;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link org.supremica.external.sag.impl.SensorNodeImpl#getSensorName <em>Sensor Name</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.SensorNodeImpl#getName <em>Name</em>}</li>
  *   <li>{@link org.supremica.external.sag.impl.SensorNodeImpl#getSensor <em>Sensor</em>}</li>
  * </ul>
  * </p>
@@ -37,14 +37,14 @@ import org.supremica.external.sag.SensorNode;
  */
 public class SensorNodeImpl extends NodeImpl implements SensorNode {
 	/**
-	 * The default value of the '{@link #getSensorName() <em>Sensor Name</em>}' attribute.
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getSensorName()
+	 * @see #getName()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final String SENSOR_NAME_EDEFAULT = null;
+	protected static final String NAME_EDEFAULT = null;
 
 	/**
 	 * The cached value of the '{@link #getSensor() <em>Sensor</em>}' reference.
@@ -76,38 +76,38 @@ public class SensorNodeImpl extends NodeImpl implements SensorNode {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-	public String getSensorName() {
+	public String getName() {
 		return getSensor() != null ? getSensor().getName() : null;
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
 	 * @generated NOT
 	 */
-	public void setSensorName(String newSensorName) {
-		if (newSensorName == null || newSensorName.equals("")) {
+	public void setName(String newName) {
+		if (newName == null || newName.equals("")) {
 			return;
 		}
-		String oldSensorName = getSensorName();
+		String oldName = getName();
 		Sensor existingSensorWithThisName = (Sensor) evaluate(this,
-				"graph.project.sensor->any(name='"+newSensorName+"')");
+				"graph.project.sensor->any(name='"+newName+"')");
 		if (existingSensorWithThisName != null) {
 			setSensor(existingSensorWithThisName);
 		} else if (getSensor() != null) {
-			getSensor().setName(newSensorName);
+			getSensor().setName(newName);
 		} else {
 			Sensor newSensor = SagFactory.eINSTANCE.createSensor();
-			newSensor.setName(newSensorName);
+			newSensor.setName(newName);
 			getGraph().getProject().getSensor().add(newSensor);
 			setSensor(newSensor);
 		}
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.SENSOR_NODE__SENSOR_NAME, oldSensorName, newSensorName));
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.SENSOR_NODE__NAME, oldName, newName));
 
 	}
 
@@ -209,8 +209,8 @@ public class SensorNodeImpl extends NodeImpl implements SensorNode {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case SagPackage.SENSOR_NODE__SENSOR_NAME:
-				return getSensorName();
+			case SagPackage.SENSOR_NODE__NAME:
+				return getName();
 			case SagPackage.SENSOR_NODE__SENSOR:
 				if (resolve) return getSensor();
 				return basicGetSensor();
@@ -226,8 +226,8 @@ public class SensorNodeImpl extends NodeImpl implements SensorNode {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case SagPackage.SENSOR_NODE__SENSOR_NAME:
-				setSensorName((String)newValue);
+			case SagPackage.SENSOR_NODE__NAME:
+				setName((String)newValue);
 				return;
 			case SagPackage.SENSOR_NODE__SENSOR:
 				setSensor((Sensor)newValue);
@@ -244,8 +244,8 @@ public class SensorNodeImpl extends NodeImpl implements SensorNode {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case SagPackage.SENSOR_NODE__SENSOR_NAME:
-				setSensorName(SENSOR_NAME_EDEFAULT);
+			case SagPackage.SENSOR_NODE__NAME:
+				setName(NAME_EDEFAULT);
 				return;
 			case SagPackage.SENSOR_NODE__SENSOR:
 				setSensor((Sensor)null);
@@ -262,8 +262,8 @@ public class SensorNodeImpl extends NodeImpl implements SensorNode {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case SagPackage.SENSOR_NODE__SENSOR_NAME:
-				return SENSOR_NAME_EDEFAULT == null ? getSensorName() != null : !SENSOR_NAME_EDEFAULT.equals(getSensorName());
+			case SagPackage.SENSOR_NODE__NAME:
+				return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT.equals(getName());
 			case SagPackage.SENSOR_NODE__SENSOR:
 				return sensor != null;
 		}

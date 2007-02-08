@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagPackageImpl.java,v 1.5 2007-01-23 09:55:48 torda Exp $
+ * $Id: SagPackageImpl.java,v 1.6 2007-02-08 16:36:08 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
@@ -16,7 +16,6 @@ import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EValidator;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 
-import org.supremica.external.sag.BoundedZone;
 import org.supremica.external.sag.EndNode;
 import org.supremica.external.sag.Graph;
 import org.supremica.external.sag.Named;
@@ -26,7 +25,6 @@ import org.supremica.external.sag.SagFactory;
 import org.supremica.external.sag.SagPackage;
 import org.supremica.external.sag.Sensor;
 import org.supremica.external.sag.SensorNode;
-import org.supremica.external.sag.UnboundedZone;
 import org.supremica.external.sag.Zone;
 import org.supremica.external.sag.util.SagValidator;
 
@@ -56,21 +54,7 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private EClass boundedZoneEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	private EClass namedEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass unboundedZoneEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -207,7 +191,7 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getGraph_MultipleObjects() {
+	public EAttribute getGraph_MaxNrOfObjects() {
 		return (EAttribute)graphEClass.getEStructuralFeatures().get(1);
 	}
 
@@ -227,6 +211,24 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 	 */
 	public EReference getGraph_Project() {
 		return (EReference)graphEClass.getEStructuralFeatures().get(3);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getGraph_NrOfObjectsIsUnbounded() {
+		return (EAttribute)graphEClass.getEStructuralFeatures().get(4);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EReference getGraph_Sensor() {
+		return (EReference)graphEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
@@ -261,7 +263,7 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getZone_IsOneway() {
+	public EAttribute getZone_Oneway() {
 		return (EAttribute)zoneEClass.getEStructuralFeatures().get(2);
 	}
 
@@ -279,8 +281,8 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getBoundedZone() {
-		return boundedZoneEClass;
+	public EAttribute getZone_Capacity() {
+		return (EAttribute)zoneEClass.getEStructuralFeatures().get(4);
 	}
 
 	/**
@@ -288,8 +290,17 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getBoundedZone_Capacity() {
-		return (EAttribute)boundedZoneEClass.getEStructuralFeatures().get(0);
+	public EAttribute getZone_OutsideSystemBoundry() {
+		return (EAttribute)zoneEClass.getEStructuralFeatures().get(5);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getZone_Bounded() {
+		return (EAttribute)zoneEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
@@ -308,24 +319,6 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 	 */
 	public EAttribute getNamed_Name() {
 		return (EAttribute)namedEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getUnboundedZone() {
-		return unboundedZoneEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getUnboundedZone_IsOutside() {
-		return (EAttribute)unboundedZoneEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -441,7 +434,7 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getSensorNode_SensorName() {
+	public EAttribute getSensorNode_Name() {
 		return (EAttribute)sensorNodeEClass.getEStructuralFeatures().get(0);
 	}
 
@@ -484,24 +477,23 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 		// Create classes and their features
 		graphEClass = createEClass(GRAPH);
 		createEReference(graphEClass, GRAPH__ZONE);
-		createEAttribute(graphEClass, GRAPH__MULTIPLE_OBJECTS);
+		createEAttribute(graphEClass, GRAPH__MAX_NR_OF_OBJECTS);
 		createEReference(graphEClass, GRAPH__NODE);
 		createEReference(graphEClass, GRAPH__PROJECT);
+		createEAttribute(graphEClass, GRAPH__NR_OF_OBJECTS_IS_UNBOUNDED);
+		createEReference(graphEClass, GRAPH__SENSOR);
 
 		zoneEClass = createEClass(ZONE);
 		createEReference(zoneEClass, ZONE__FRONT);
 		createEReference(zoneEClass, ZONE__BACK);
-		createEAttribute(zoneEClass, ZONE__IS_ONEWAY);
+		createEAttribute(zoneEClass, ZONE__ONEWAY);
 		createEReference(zoneEClass, ZONE__GRAPH);
-
-		boundedZoneEClass = createEClass(BOUNDED_ZONE);
-		createEAttribute(boundedZoneEClass, BOUNDED_ZONE__CAPACITY);
+		createEAttribute(zoneEClass, ZONE__CAPACITY);
+		createEAttribute(zoneEClass, ZONE__OUTSIDE_SYSTEM_BOUNDRY);
+		createEAttribute(zoneEClass, ZONE__BOUNDED);
 
 		namedEClass = createEClass(NAMED);
 		createEAttribute(namedEClass, NAMED__NAME);
-
-		unboundedZoneEClass = createEClass(UNBOUNDED_ZONE);
-		createEAttribute(unboundedZoneEClass, UNBOUNDED_ZONE__IS_OUTSIDE);
 
 		nodeEClass = createEClass(NODE);
 		createEReference(nodeEClass, NODE__GRAPH);
@@ -519,7 +511,7 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 		endNodeEClass = createEClass(END_NODE);
 
 		sensorNodeEClass = createEClass(SENSOR_NODE);
-		createEAttribute(sensorNodeEClass, SENSOR_NODE__SENSOR_NAME);
+		createEAttribute(sensorNodeEClass, SENSOR_NODE__NAME);
 		createEReference(sensorNodeEClass, SENSOR_NODE__SENSOR);
 	}
 
@@ -553,8 +545,6 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 		// Add supertypes to classes
 		graphEClass.getESuperTypes().add(this.getNamed());
 		zoneEClass.getESuperTypes().add(this.getNamed());
-		boundedZoneEClass.getESuperTypes().add(this.getZone());
-		unboundedZoneEClass.getESuperTypes().add(this.getZone());
 		projectEClass.getESuperTypes().add(this.getNamed());
 		sensorEClass.getESuperTypes().add(this.getNamed());
 		endNodeEClass.getESuperTypes().add(this.getNode());
@@ -564,11 +554,13 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 		// Initialize classes and features; add operations and parameters
 		initEClass(graphEClass, Graph.class, "Graph", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getGraph_Zone(), this.getZone(), this.getZone_Graph(), "zone", null, 0, -1, Graph.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getGraph_MultipleObjects(), ecorePackage.getEBoolean(), "multipleObjects", null, 0, 1, Graph.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getGraph_MaxNrOfObjects(), ecorePackage.getEInt(), "maxNrOfObjects", "-1", 0, 1, Graph.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getGraph_Node(), this.getNode(), this.getNode_Graph(), "node", null, 0, -1, Graph.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getGraph_Project(), this.getProject(), this.getProject_Graph(), "project", null, 0, 1, Graph.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getGraph_NrOfObjectsIsUnbounded(), ecorePackage.getEBoolean(), "nrOfObjectsIsUnbounded", null, 0, 1, Graph.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
+		initEReference(getGraph_Sensor(), this.getSensorNode(), null, "sensor", null, 0, -1, Graph.class, IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
-		EOperation op = addEOperation(graphEClass, ecorePackage.getEBoolean(), "validateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless", 0, 1);
+		EOperation op = addEOperation(graphEClass, ecorePackage.getEBoolean(), "validateAllUnboundedZonesAreOutsideIfNrOfObjectsAreUnbounded", 0, 1);
 		addEParameter(op, ecorePackage.getEDiagnosticChain(), "diagnostics", 0, 1);
 		EGenericType g1 = createEGenericType(ecorePackage.getEMap());
 		EGenericType g2 = createEGenericType();
@@ -586,16 +578,16 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 		g1.getETypeArguments().add(g2);
 		addEParameter(op, g1, "context", 0, 1);
 
-		initEClass(zoneEClass, Zone.class, "Zone", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEClass(zoneEClass, Zone.class, "Zone", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getZone_Front(), this.getNode(), this.getNode_Incoming(), "front", null, 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getZone_Back(), this.getNode(), this.getNode_Outgoing(), "back", null, 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getZone_IsOneway(), ecorePackage.getEBoolean(), "isOneway", "true", 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getZone_Oneway(), ecorePackage.getEBoolean(), "oneway", "true", 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getZone_Graph(), this.getGraph(), this.getGraph_Zone(), "graph", null, 1, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getZone_Capacity(), ecorePackage.getEInt(), "capacity", "-1", 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getZone_OutsideSystemBoundry(), ecorePackage.getEBoolean(), "outsideSystemBoundry", "false", 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getZone_Bounded(), ecorePackage.getEBoolean(), "bounded", "false", 0, 1, Zone.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
-		initEClass(boundedZoneEClass, BoundedZone.class, "BoundedZone", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getBoundedZone_Capacity(), ecorePackage.getEInt(), "capacity", "1", 0, 1, BoundedZone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		op = addEOperation(boundedZoneEClass, ecorePackage.getEBoolean(), "validateCapacityIsPositiveNumber", 0, 1);
+		op = addEOperation(zoneEClass, ecorePackage.getEBoolean(), "validateCapacityIsPositiveNumber", 0, 1);
 		addEParameter(op, ecorePackage.getEDiagnosticChain(), "diagnostics", 0, 1);
 		g1 = createEGenericType(ecorePackage.getEMap());
 		g2 = createEGenericType();
@@ -606,9 +598,6 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 
 		initEClass(namedEClass, Named.class, "Named", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getNamed_Name(), ecorePackage.getEString(), "name", null, 0, 1, Named.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		initEClass(unboundedZoneEClass, UnboundedZone.class, "UnboundedZone", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getUnboundedZone_IsOutside(), ecorePackage.getEBoolean(), "isOutside", "true", 0, 1, UnboundedZone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(nodeEClass, Node.class, "Node", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getNode_Graph(), this.getGraph(), this.getGraph_Node(), "graph", null, 0, 1, Node.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -653,7 +642,7 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 		initEClass(endNodeEClass, EndNode.class, "EndNode", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(sensorNodeEClass, SensorNode.class, "SensorNode", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getSensorNode_SensorName(), ecorePackage.getEString(), "sensorName", null, 0, 1, SensorNode.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
+		initEAttribute(getSensorNode_Name(), ecorePackage.getEString(), "name", null, 0, 1, SensorNode.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getSensorNode_Sensor(), this.getSensor(), this.getSensor_Node(), "sensor", null, 1, 1, SensorNode.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Create resource
@@ -676,7 +665,7 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 		  ((EOperation)graphEClass.getEOperations().get(0), 
 		   source, 
 		   new String[] {
-			 "invariant", "self.zone->forAll(oclIsKindOf(UnboundedZone) implies oclAsType(UnboundedZone).isOutside)"
+			 "invariant", "nrOfObjectsIsUnbounded implies zone->forAll(oclIsKindOf(UnboundedZone) implies oclAsType(UnboundedZone).isOutside)"
 		   });		
 		addAnnotation
 		  ((EOperation)graphEClass.getEOperations().get(1), 
@@ -685,10 +674,16 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 			 "invariant", "name <> \'\' and name <> null"
 		   });		
 		addAnnotation
-		  ((EOperation)boundedZoneEClass.getEOperations().get(0), 
+		  (getGraph_Sensor(), 
 		   source, 
 		   new String[] {
-			 "invariant", "capacity > 0"
+			 "derive", "node->select(oclIsKindOf(SensorNode))"
+		   });		
+		addAnnotation
+		  ((EOperation)zoneEClass.getEOperations().get(0), 
+		   source, 
+		   new String[] {
+			 "invariant", "bounded implies capacity > 0"
 		   });		
 		addAnnotation
 		  ((EOperation)projectEClass.getEOperations().get(0), 

@@ -53,9 +53,9 @@
       </modelFacet>
       <labels
           visualID="5003"
-          editPartClassName="SensorNodeSensorNameEditPart"
-          itemSemanticEditPolicyClassName="SensorNodeSensorNameItemSemanticEditPolicy"
-          notationViewFactoryClassName="SensorNodeSensorNameViewFactory"
+          editPartClassName="SensorNodeNameEditPart"
+          itemSemanticEditPolicyClassName="SensorNodeNameItemSemanticEditPolicy"
+          notationViewFactoryClassName="SensorNodeNameViewFactory"
           elementIcon="true">
         <diagramRunTimeClass
             href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
@@ -66,7 +66,7 @@
         <modelFacet
             xsi:type="gmfgen:FeatureLabelModelFacet">
           <metaFeatures
-              href="sag.genmodel#//sag/SensorNode/sensorName"/>
+              href="sag.genmodel#//sag/SensorNode/name"/>
         </modelFacet>
       </labels>
     </childNodes>
@@ -162,73 +162,15 @@
       </labels>
     </topLevelNodes>
     <links
-        visualID="4007"
-        editPartClassName="BoundedZoneEditPart"
-        itemSemanticEditPolicyClassName="BoundedZoneItemSemanticEditPolicy"
-        notationViewFactoryClassName="BoundedZoneViewFactory"
-        incomingCreationAllowed="true">
+        visualID="4010"
+        editPartClassName="ZoneEditPart"
+        itemSemanticEditPolicyClassName="ZoneItemSemanticEditPolicy"
+        notationViewFactoryClassName="ZoneViewFactory">
       <diagramRunTimeClass
           href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Edge"/>
       <elementType
           xsi:type="gmfgen:MetamodelType"
-          editHelperClassName="BoundedZoneEditHelper"/>
-      <viewmap
-          xsi:type="gmfgen:InnerClassViewmap"
-          className="ZoneFigure"
-          classBody="&#xD;&#xA;/**&#xD;&#xA; * @generated&#xD;&#xA; */&#xD;&#xA;public class ZoneFigure extends org.eclipse.gmf.runtime.draw2d.ui.figures.PolylineConnectionEx {&#xD;&#xA;&#xD;&#xA;&#x9;/**&#xD;&#xA;&#x9; * @generated&#xD;&#xA;&#x9; */&#xD;&#xA;&#x9;public ZoneFigure() {&#xD;&#xA;&#x9;&#x9;this.setFill(true);&#xD;&#xA;this.setFillXOR(false);&#xD;&#xA;this.setOutline(true);&#xD;&#xA;this.setOutlineXOR(false);&#xD;&#xA;this.setLineWidth(1);&#xD;&#xA;this.setLineStyle(org.eclipse.draw2d.Graphics.LINE_SOLID);&#xD;&#xA;&#xD;&#xA;&#x9;&#x9;setTargetDecoration(createTargetDecoration());&#xD;&#xA;&#x9;}&#xD;&#xA;&#xD;&#xA;&#x9;/**&#xD;&#xA;&#x9; * @generated&#xD;&#xA;&#x9; */&#xD;&#xA;&#x9;private org.eclipse.draw2d.RotatableDecoration createTargetDecoration() {&#xD;&#xA;&#x9;&#x9;org.eclipse.draw2d.PolylineDecoration df = new org.eclipse.draw2d.PolylineDecoration();&#xD;&#xA;df.setFill(true);&#xD;&#xA;df.setFillXOR(false);&#xD;&#xA;df.setOutline(true);&#xD;&#xA;df.setOutlineXOR(false);&#xD;&#xA;df.setLineWidth(1);&#xD;&#xA;df.setLineStyle(org.eclipse.draw2d.Graphics.LINE_SOLID);&#xD;&#xA;org.eclipse.draw2d.geometry.PointList pl = new org.eclipse.draw2d.geometry.PointList();&#xD;&#xA;pl.addPoint(getMapMode().DPtoLP(-2)&#xD;&#xA;, getMapMode().DPtoLP(-3)&#xD;&#xA;);&#xD;&#xA;pl.addPoint(getMapMode().DPtoLP(-2)&#xD;&#xA;, getMapMode().DPtoLP(3)&#xD;&#xA;);&#xD;&#xA;pl.addPoint(getMapMode().DPtoLP(-2)&#xD;&#xA;, getMapMode().DPtoLP(0)&#xD;&#xA;);&#xD;&#xA;pl.addPoint(getMapMode().DPtoLP(-5)&#xD;&#xA;, getMapMode().DPtoLP(-3)&#xD;&#xA;);&#xD;&#xA;pl.addPoint(getMapMode().DPtoLP(-5)&#xD;&#xA;, getMapMode().DPtoLP(3)&#xD;&#xA;);&#xD;&#xA;pl.addPoint(getMapMode().DPtoLP(-2)&#xD;&#xA;, getMapMode().DPtoLP(0)&#xD;&#xA;);&#xD;&#xA;df.setTemplate(pl);&#xD;&#xA;df.setScale(getMapMode().DPtoLP(7)&#xD;&#xA;, getMapMode().DPtoLP(3)&#xD;&#xA;);&#xD;&#xA;&#x9;&#x9;return df;&#xD;&#xA;&#x9;}&#xD;&#xA;&#xD;&#xA;}&#xD;&#xA;&#xD;&#xA;">
-        <requiredPluginIDs>org.eclipse.draw2d</requiredPluginIDs>
-        <requiredPluginIDs>org.eclipse.gmf.runtime.draw2d.ui</requiredPluginIDs>
-      </viewmap>
-      <modelFacet
-          xsi:type="gmfgen:TypeLinkModelFacet"
-          createCommandClassName="BoundedZoneTypeLinkCreateCommand">
-        <metaClass
-            href="sag.genmodel#//sag/BoundedZone"/>
-        <containmentMetaFeature
-            href="sag.genmodel#//sag/Graph/zone"/>
-        <childMetaFeature
-            href="sag.genmodel#//sag/Graph/zone"/>
-        <sourceMetaFeature
-            href="sag.genmodel#//sag/Zone/back"/>
-        <targetMetaFeature
-            href="sag.genmodel#//sag/Zone/front"/>
-      </modelFacet>
-      <labels
-          visualID="6003"
-          editPartClassName="BoundedZoneCapacityEditPart"
-          itemSemanticEditPolicyClassName="BoundedZoneCapacityItemSemanticEditPolicy"
-          notationViewFactoryClassName="BoundedZoneCapacityViewFactory"
-          elementIcon="true">
-        <diagramRunTimeClass
-            href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
-        <viewmap
-            xsi:type="gmfgen:InnerClassViewmap"
-            className="CapacityFigure"
-            classBody="&#xA;/**&#xA; * @generated&#xA; */&#xA;public class CapacityFigure extends org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel {&#xA;&#x9;/**&#xA;&#x9; * @generated&#xA;&#x9; */&#xA;&#x9;public CapacityFigure() {&#xA;&#x9;&#x9;&#x9;&#x9;this.setText(&quot;&lt;...>&quot;);&#xA;&#x9;}&#xA;&#xA;&#xA;&#xA;}&#xA;&#xA;">
-          <attributes
-              xsi:type="gmfgen:LabelOffsetAttributes"
-              y="10"/>
-          <requiredPluginIDs>org.eclipse.draw2d</requiredPluginIDs>
-          <requiredPluginIDs>org.eclipse.gmf.runtime.draw2d.ui</requiredPluginIDs>
-        </viewmap>
-        <modelFacet
-            xsi:type="gmfgen:FeatureLabelModelFacet">
-          <metaFeatures
-              href="sag.genmodel#//sag/BoundedZone/capacity"/>
-        </modelFacet>
-      </labels>
-    </links>
-    <links
-        visualID="4009"
-        editPartClassName="UnboundedZoneEditPart"
-        itemSemanticEditPolicyClassName="UnboundedZoneItemSemanticEditPolicy"
-        notationViewFactoryClassName="UnboundedZoneViewFactory"
-        incomingCreationAllowed="true">
-      <diagramRunTimeClass
-          href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Edge"/>
-      <elementType
-          xsi:type="gmfgen:MetamodelType"
-          editHelperClassName="UnboundedZoneEditHelper"/>
+          editHelperClassName="ZoneEditHelper"/>
       <viewmap
           xsi:type="gmfgen:InnerClassViewmap"
           className="ZoneFigure"
@@ -238,9 +180,9 @@
       </viewmap>
       <modelFacet
           xsi:type="gmfgen:TypeLinkModelFacet"
-          createCommandClassName="UnboundedZoneTypeLinkCreateCommand">
+          createCommandClassName="ZoneTypeLinkCreateCommand">
         <metaClass
-            href="sag.genmodel#//sag/UnboundedZone"/>
+            href="sag.genmodel#//sag/Zone"/>
         <containmentMetaFeature
             href="sag.genmodel#//sag/Graph/zone"/>
         <childMetaFeature
@@ -300,7 +242,7 @@
             xsi:type="gmfgen:ToolEntry"
             title="Zone"
             description="Create new Zone"
-            genLinks="//@diagram/@links.0 //@diagram/@links.1"/>
+            genLinks="//@diagram/@links.0"/>
       </groups>
     </palette>
   </diagram>
@@ -368,59 +310,6 @@
     <childReferences
         parent="//@diagram/@childNodes.1"
         child="//@diagram/@links.0"
-        referenceType="out_taget"
-        groupName="outgoing links"
-        groupIcon="icons/outgoingLinksNavigatorGroup.gif"/>
-    <childReferences
-        parent="//@diagram"
-        child="//@diagram/@links.1"
-        groupName="links"
-        groupIcon="icons/linksNavigatorGroup.gif"/>
-    <childReferences
-        parent="//@diagram/@links.1"
-        child="//@diagram/@childNodes.0"
-        referenceType="out_taget"
-        groupName="target"
-        groupIcon="icons/linkTargetNavigatorGroup.gif"/>
-    <childReferences
-        parent="//@diagram/@childNodes.0"
-        child="//@diagram/@links.1"
-        referenceType="in_source"
-        groupName="incoming links"
-        groupIcon="icons/incomingLinksNavigatorGroup.gif"/>
-    <childReferences
-        parent="//@diagram/@links.1"
-        child="//@diagram/@childNodes.1"
-        referenceType="out_taget"
-        groupName="target"
-        groupIcon="icons/linkTargetNavigatorGroup.gif"/>
-    <childReferences
-        parent="//@diagram/@childNodes.1"
-        child="//@diagram/@links.1"
-        referenceType="in_source"
-        groupName="incoming links"
-        groupIcon="icons/incomingLinksNavigatorGroup.gif"/>
-    <childReferences
-        parent="//@diagram/@links.1"
-        child="//@diagram/@childNodes.0"
-        referenceType="in_source"
-        groupName="source"
-        groupIcon="icons/linkSourceNavigatorGroup.gif"/>
-    <childReferences
-        parent="//@diagram/@childNodes.0"
-        child="//@diagram/@links.1"
-        referenceType="out_taget"
-        groupName="outgoing links"
-        groupIcon="icons/outgoingLinksNavigatorGroup.gif"/>
-    <childReferences
-        parent="//@diagram/@links.1"
-        child="//@diagram/@childNodes.1"
-        referenceType="in_source"
-        groupName="source"
-        groupIcon="icons/linkSourceNavigatorGroup.gif"/>
-    <childReferences
-        parent="//@diagram/@childNodes.1"
-        child="//@diagram/@links.1"
         referenceType="out_taget"
         groupName="outgoing links"
         groupIcon="icons/outgoingLinksNavigatorGroup.gif"/>

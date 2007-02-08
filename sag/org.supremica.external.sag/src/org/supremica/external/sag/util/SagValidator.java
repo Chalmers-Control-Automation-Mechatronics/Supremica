@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagValidator.java,v 1.1 2007-01-23 09:55:48 torda Exp $
+ * $Id: SagValidator.java,v 1.2 2007-02-08 16:36:08 torda Exp $
  */
 package org.supremica.external.sag.util;
 
@@ -43,12 +43,12 @@ public class SagValidator extends EObjectValidator {
 	public static final String DIAGNOSTIC_SOURCE = "org.supremica.external.sag";
 
 	/**
-	 * The {@link org.eclipse.emf.common.util.Diagnostic#getCode() code} for constraint 'Validate All Unbounded Zones Are Outside If Objects Are Identityless' of 'Graph'.
+	 * The {@link org.eclipse.emf.common.util.Diagnostic#getCode() code} for constraint 'Validate All Unbounded Zones Are Outside If Nr Of Objects Are Unbounded' of 'Graph'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final int GRAPH__VALIDATE_ALL_UNBOUNDED_ZONES_ARE_OUTSIDE_IF_OBJECTS_ARE_IDENTITYLESS = 1;
+	public static final int GRAPH__VALIDATE_ALL_UNBOUNDED_ZONES_ARE_OUTSIDE_IF_NR_OF_OBJECTS_ARE_UNBOUNDED = 1;
 
 	/**
 	 * The {@link org.eclipse.emf.common.util.Diagnostic#getCode() code} for constraint 'Validate Name' of 'Graph'.
@@ -59,12 +59,12 @@ public class SagValidator extends EObjectValidator {
 	public static final int GRAPH__VALIDATE_NAME = 2;
 
 	/**
-	 * The {@link org.eclipse.emf.common.util.Diagnostic#getCode() code} for constraint 'Validate Capacity Is Positive Number' of 'Bounded Zone'.
+	 * The {@link org.eclipse.emf.common.util.Diagnostic#getCode() code} for constraint 'Validate Capacity Is Positive Number' of 'Zone'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final int BOUNDED_ZONE__VALIDATE_CAPACITY_IS_POSITIVE_NUMBER = 3;
+	public static final int ZONE__VALIDATE_CAPACITY_IS_POSITIVE_NUMBER = 3;
 
 	/**
 	 * The {@link org.eclipse.emf.common.util.Diagnostic#getCode() code} for constraint 'Validate Name' of 'Project'.
@@ -140,12 +140,8 @@ public class SagValidator extends EObjectValidator {
 				return validateGraph((Graph)value, diagnostics, context);
 			case SagPackage.ZONE:
 				return validateZone((Zone)value, diagnostics, context);
-			case SagPackage.BOUNDED_ZONE:
-				return validateBoundedZone((BoundedZone)value, diagnostics, context);
 			case SagPackage.NAMED:
 				return validateNamed((Named)value, diagnostics, context);
-			case SagPackage.UNBOUNDED_ZONE:
-				return validateUnboundedZone((UnboundedZone)value, diagnostics, context);
 			case SagPackage.NODE:
 				return validateNode((Node)value, diagnostics, context);
 			case SagPackage.PROJECT:
@@ -173,19 +169,19 @@ public class SagValidator extends EObjectValidator {
 		if (result || diagnostics != null) result &= validate_EveryProxyResolves(graph, diagnostics, context);
 		if (result || diagnostics != null) result &= validate_UniqueID(graph, diagnostics, context);
 		if (result || diagnostics != null) result &= validate_EveryKeyUnique(graph, diagnostics, context);
-		if (result || diagnostics != null) result &= validateGraph_validateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless(graph, diagnostics, context);
+		if (result || diagnostics != null) result &= validateGraph_validateAllUnboundedZonesAreOutsideIfNrOfObjectsAreUnbounded(graph, diagnostics, context);
 		if (result || diagnostics != null) result &= validateGraph_validateName(graph, diagnostics, context);
 		return result;
 	}
 
 	/**
-	 * Validates the validateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless constraint of '<em>Graph</em>'.
+	 * Validates the validateAllUnboundedZonesAreOutsideIfNrOfObjectsAreUnbounded constraint of '<em>Graph</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public boolean validateGraph_validateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless(Graph graph, DiagnosticChain diagnostics, Map<Object, Object> context) {
-		return graph.validateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless(diagnostics, context);
+	public boolean validateGraph_validateAllUnboundedZonesAreOutsideIfNrOfObjectsAreUnbounded(Graph graph, DiagnosticChain diagnostics, Map<Object, Object> context) {
+		return graph.validateAllUnboundedZonesAreOutsideIfNrOfObjectsAreUnbounded(diagnostics, context);
 	}
 
 	/**
@@ -204,33 +200,24 @@ public class SagValidator extends EObjectValidator {
 	 * @generated
 	 */
 	public boolean validateZone(Zone zone, DiagnosticChain diagnostics, Map<Object, Object> context) {
-		return validate_EveryDefaultConstraint(zone, diagnostics, context);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public boolean validateBoundedZone(BoundedZone boundedZone, DiagnosticChain diagnostics, Map<Object, Object> context) {
-		boolean result = validate_EveryMultiplicityConforms(boundedZone, diagnostics, context);
-		if (result || diagnostics != null) result &= validate_EveryDataValueConforms(boundedZone, diagnostics, context);
-		if (result || diagnostics != null) result &= validate_EveryReferenceIsContained(boundedZone, diagnostics, context);
-		if (result || diagnostics != null) result &= validate_EveryProxyResolves(boundedZone, diagnostics, context);
-		if (result || diagnostics != null) result &= validate_UniqueID(boundedZone, diagnostics, context);
-		if (result || diagnostics != null) result &= validate_EveryKeyUnique(boundedZone, diagnostics, context);
-		if (result || diagnostics != null) result &= validateBoundedZone_validateCapacityIsPositiveNumber(boundedZone, diagnostics, context);
+		boolean result = validate_EveryMultiplicityConforms(zone, diagnostics, context);
+		if (result || diagnostics != null) result &= validate_EveryDataValueConforms(zone, diagnostics, context);
+		if (result || diagnostics != null) result &= validate_EveryReferenceIsContained(zone, diagnostics, context);
+		if (result || diagnostics != null) result &= validate_EveryProxyResolves(zone, diagnostics, context);
+		if (result || diagnostics != null) result &= validate_UniqueID(zone, diagnostics, context);
+		if (result || diagnostics != null) result &= validate_EveryKeyUnique(zone, diagnostics, context);
+		if (result || diagnostics != null) result &= validateZone_validateCapacityIsPositiveNumber(zone, diagnostics, context);
 		return result;
 	}
 
 	/**
-	 * Validates the validateCapacityIsPositiveNumber constraint of '<em>Bounded Zone</em>'.
+	 * Validates the validateCapacityIsPositiveNumber constraint of '<em>Zone</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public boolean validateBoundedZone_validateCapacityIsPositiveNumber(BoundedZone boundedZone, DiagnosticChain diagnostics, Map<Object, Object> context) {
-		return boundedZone.validateCapacityIsPositiveNumber(diagnostics, context);
+	public boolean validateZone_validateCapacityIsPositiveNumber(Zone zone, DiagnosticChain diagnostics, Map<Object, Object> context) {
+		return zone.validateCapacityIsPositiveNumber(diagnostics, context);
 	}
 
 	/**
@@ -240,15 +227,6 @@ public class SagValidator extends EObjectValidator {
 	 */
 	public boolean validateNamed(Named named, DiagnosticChain diagnostics, Map<Object, Object> context) {
 		return validate_EveryDefaultConstraint(named, diagnostics, context);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public boolean validateUnboundedZone(UnboundedZone unboundedZone, DiagnosticChain diagnostics, Map<Object, Object> context) {
-		return validate_EveryDefaultConstraint(unboundedZone, diagnostics, context);
 	}
 
 	/**

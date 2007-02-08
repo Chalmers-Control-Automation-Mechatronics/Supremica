@@ -92,6 +92,8 @@ class SagToWaters {
 		"${graph.name}_zone${index}"
 	}
 	
+	private static final OUTSIDE_STATE_NAME = "outside"
+	
 	static ModuleProxy generateExtendedAutomata(sagProject) {
 		def watersModule = new ModuleSubject(sagProject.name, null)
 		
@@ -102,16 +104,44 @@ class SagToWaters {
 			componentForSensorVariables.variablesModifiable << new VariableSubject(sensor.name, 0, 1, 0, null);
 			components
 		}
+		
 		def componentForZoneVariables = newComponent(watersModule, "zones", new GraphSubject())
 		componentForZoneVariables.graph.nodesModifiable << new SimpleNodeSubject('dummy', null, true, null, null, null)
 		int i = 0
-		def boundedZoneVariables = sagProject.graph.collect{graph -> i = 0; graph.zone.findAll{zone -> zone instanceof BoundedZone}}.flatten().
+		def boundedZoneVariables = sagProject.graph.collect{graph -> i = 0; graph.findAll{it.maxNrOfObjects != 1}.zone.findAll{zone -> zone.bounded}}.flatten().
 			                                         inject([:]){variables, zone ->
 			variables[zone] = new VariableSubject(SagToWaters.createZoneName(zone.graph, i), 0, zone.capacity, 0, null)
 			componentForZoneVariables.variablesModifiable << variables[zone]
 			++i
 			variables
 		}
+		
+		
+		//Create a simle component with states for every sag node
+		def singleObjectComponents = sagProject.graph.findAll{it.graph.maxNrOfObjects == 1}.inject([:]) {components, sagGraph ->
+			components[sagGraph] = newComponent(watersModule, sagGraph.name, new GraphSubject());
+			components
+		}
+		def sensorNodes = sagProject.sensor.node.findAll{it.graph.maxNrOfObjects == 1}.collect {sensorNode ->
+			def watersNode
+			singleObjectComponents[sagNode.graph].nodesModifiable << watersNode
+			[sagNode:sagNode,watersNode:watersNode]
+		}
+		def zoneNodes = sagProject.graph.findAll{it.maxNrOfObjects == 1}.zone.collect {zone ->
+			def watersNode
+			if (!zone.isIsOutside()) {
+				indexOfZone = zone.graph.zone.findAll{!it.isIsOutside()}.findIndexOf{it == zone}
+				watersNode = new SimpleNodeSubject("zone${indexOfZone}")
+			} else if (!component.graph.nodes.any{it.name == OUTSIDE_STATE_NAME}) {
+				watersNode = new SimpleNodeSubject(OUTSIDE_STATE_NAME)
+			} else {
+				watersNode = component.graph.nodes.find{it.name == OUTSIDE_STATE_NAME}
+			}
+			
+			[zone:zone,watersNode:watersNode]
+		}
+		
+		
 		def changes = createEvents(watersModule, sagProject)
 		changes.each {change ->
 			//Add to sensor component
@@ -208,7 +238,7 @@ class SagToWaters {
 		
 		//Create one component for every bounded zone
 		int i = 0
-		final Map<BoundedZone, SimpleComponentSubject> boundedZoneComponents = sagProject.graph.collect{graph -> i = 0; graph.zone.findAll{zone -> zone instanceof BoundedZone}}.flatten().
+		final Map<BoundedZone, SimpleComponentSubject> boundedZoneComponents = sagProject.graph.collect{graph -> i = 0; graph.zone.findAll{zone -> zone.bounded}}.flatten().
 			                                         inject([:]){components, zone ->
 			GraphSubject watersGraph = new GraphSubject()
 			(0..zone.capacity).each{watersGraph.nodesModifiable << new SimpleNodeSubject(it.toString())}

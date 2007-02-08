@@ -43,12 +43,11 @@ import org.supremica.external.sag.Project;
 import org.supremica.external.sag.SagPackage;
 import org.supremica.external.sag.Zone;
 
-import org.supremica.external.sag.diagram.edit.parts.BoundedZoneEditPart;
 import org.supremica.external.sag.diagram.edit.parts.EndNodeEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphEditPart;
 import org.supremica.external.sag.diagram.edit.parts.ProjectEditPart;
 import org.supremica.external.sag.diagram.edit.parts.SensorNodeEditPart;
-import org.supremica.external.sag.diagram.edit.parts.UnboundedZoneEditPart;
+import org.supremica.external.sag.diagram.edit.parts.ZoneEditPart;
 
 import org.supremica.external.sag.diagram.part.SagVisualIDRegistry;
 
@@ -286,15 +285,13 @@ public class ProjectCanonicalEditPolicy extends CanonicalConnectionEditPolicy {
 	 */
 	private void storeTypeModelFacetLinks(EObject container,
 			EClass containerMetaclass) {
-		storeTypeModelFacetLinks_BoundedZone_4007(container, containerMetaclass);
-		storeTypeModelFacetLinks_UnboundedZone_4009(container,
-				containerMetaclass);
+		storeTypeModelFacetLinks_Zone_4010(container, containerMetaclass);
 	}
 
 	/**
 	 * @generated
 	 */
-	private void storeTypeModelFacetLinks_BoundedZone_4007(EObject container,
+	private void storeTypeModelFacetLinks_Zone_4010(EObject container,
 			EClass containerMetaclass) {
 		if (SagPackage.eINSTANCE.getGraph().isSuperTypeOf(containerMetaclass)) {
 			for (Iterator values = ((Graph) container).getZone().iterator(); values
@@ -302,35 +299,7 @@ public class ProjectCanonicalEditPolicy extends CanonicalConnectionEditPolicy {
 				EObject nextValue = ((EObject) values.next());
 				int linkVID = SagVisualIDRegistry
 						.getLinkWithClassVisualID(nextValue);
-				if (BoundedZoneEditPart.VISUAL_ID == linkVID) {
-					Object structuralFeatureResult = ((Zone) nextValue)
-							.getFront();
-					if (structuralFeatureResult instanceof EObject) {
-						EObject dst = (EObject) structuralFeatureResult;
-						structuralFeatureResult = ((Zone) nextValue).getBack();
-						if (structuralFeatureResult instanceof EObject) {
-							EObject src = (EObject) structuralFeatureResult;
-							myLinkDescriptors.add(new LinkDescriptor(src, dst,
-									nextValue, linkVID));
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * @generated
-	 */
-	private void storeTypeModelFacetLinks_UnboundedZone_4009(EObject container,
-			EClass containerMetaclass) {
-		if (SagPackage.eINSTANCE.getGraph().isSuperTypeOf(containerMetaclass)) {
-			for (Iterator values = ((Graph) container).getZone().iterator(); values
-					.hasNext();) {
-				EObject nextValue = ((EObject) values.next());
-				int linkVID = SagVisualIDRegistry
-						.getLinkWithClassVisualID(nextValue);
-				if (UnboundedZoneEditPart.VISUAL_ID == linkVID) {
+				if (ZoneEditPart.VISUAL_ID == linkVID) {
 					Object structuralFeatureResult = ((Zone) nextValue)
 							.getFront();
 					if (structuralFeatureResult instanceof EObject) {

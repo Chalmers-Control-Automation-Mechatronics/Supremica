@@ -14,13 +14,14 @@ import org.eclipse.gmf.runtime.notation.NotationFactory;
 import org.eclipse.gmf.runtime.notation.View;
 
 import org.supremica.external.sag.diagram.edit.parts.ProjectEditPart;
+import org.supremica.external.sag.diagram.edit.parts.ZoneEditPart;
 
 import org.supremica.external.sag.diagram.part.SagVisualIDRegistry;
 
 /**
  * @generated
  */
-public class UnboundedZoneViewFactory extends ConnectionViewFactory {
+public class ZoneViewFactory extends ConnectionViewFactory {
 
 	/**
 	 * @generated 
@@ -40,8 +41,7 @@ public class UnboundedZoneViewFactory extends ConnectionViewFactory {
 			IAdaptable semanticAdapter, String semanticHint, int index,
 			boolean persisted) {
 		if (semanticHint == null) {
-			semanticHint = SagVisualIDRegistry
-					.getType(org.supremica.external.sag.diagram.edit.parts.UnboundedZoneEditPart.VISUAL_ID);
+			semanticHint = SagVisualIDRegistry.getType(ZoneEditPart.VISUAL_ID);
 			view.setType(semanticHint);
 		}
 		super.decorateView(containerView, view, semanticAdapter, semanticHint,

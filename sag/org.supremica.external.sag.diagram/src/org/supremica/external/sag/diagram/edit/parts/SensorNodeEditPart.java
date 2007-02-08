@@ -118,9 +118,9 @@ public class SensorNodeEditPart extends ShapeNodeEditPart {
 	 * @generated
 	 */
 	protected boolean addFixedChild(EditPart childEditPart) {
-		if (childEditPart instanceof SensorNodeSensorNameEditPart) {
-			((SensorNodeSensorNameEditPart) childEditPart)
-					.setLabel(getPrimaryShape().getFigureSensorNameFigure());
+		if (childEditPart instanceof SensorNodeNameEditPart) {
+			((SensorNodeNameEditPart) childEditPart).setLabel(getPrimaryShape()
+					.getFigureSensorNameFigure());
 			return true;
 		}
 		return false;
@@ -219,7 +219,7 @@ public class SensorNodeEditPart extends ShapeNodeEditPart {
 	 */
 	public EditPart getPrimaryChildEditPart() {
 		return getChildBySemanticHint(SagVisualIDRegistry
-				.getType(SensorNodeSensorNameEditPart.VISUAL_ID));
+				.getType(SensorNodeNameEditPart.VISUAL_ID));
 	}
 
 	/**

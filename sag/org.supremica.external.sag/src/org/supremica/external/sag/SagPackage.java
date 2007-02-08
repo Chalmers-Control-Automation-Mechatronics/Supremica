@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagPackage.java,v 1.5 2007-01-23 09:55:48 torda Exp $
+ * $Id: SagPackage.java,v 1.6 2007-02-08 16:36:08 torda Exp $
  */
 package org.supremica.external.sag;
 
@@ -67,7 +67,7 @@ public interface SagPackage extends EPackage {
 	 * @see org.supremica.external.sag.impl.SagPackageImpl#getNamed()
 	 * @generated
 	 */
-	int NAMED = 3;
+	int NAMED = 2;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -116,13 +116,13 @@ public interface SagPackage extends EPackage {
 	int GRAPH__ZONE = NAMED_FEATURE_COUNT + 0;
 
 	/**
-	 * The feature id for the '<em><b>Multiple Objects</b></em>' attribute.
+	 * The feature id for the '<em><b>Max Nr Of Objects</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int GRAPH__MULTIPLE_OBJECTS = NAMED_FEATURE_COUNT + 1;
+	int GRAPH__MAX_NR_OF_OBJECTS = NAMED_FEATURE_COUNT + 1;
 
 	/**
 	 * The feature id for the '<em><b>Node</b></em>' containment reference list.
@@ -143,13 +143,31 @@ public interface SagPackage extends EPackage {
 	int GRAPH__PROJECT = NAMED_FEATURE_COUNT + 3;
 
 	/**
+	 * The feature id for the '<em><b>Nr Of Objects Is Unbounded</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int GRAPH__NR_OF_OBJECTS_IS_UNBOUNDED = NAMED_FEATURE_COUNT + 4;
+
+	/**
+	 * The feature id for the '<em><b>Sensor</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int GRAPH__SENSOR = NAMED_FEATURE_COUNT + 5;
+
+	/**
 	 * The number of structural features of the '<em>Graph</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int GRAPH_FEATURE_COUNT = NAMED_FEATURE_COUNT + 4;
+	int GRAPH_FEATURE_COUNT = NAMED_FEATURE_COUNT + 6;
 
 	/**
 	 * The meta object id for the '{@link org.supremica.external.sag.impl.ZoneImpl <em>Zone</em>}' class.
@@ -189,13 +207,13 @@ public interface SagPackage extends EPackage {
 	int ZONE__BACK = NAMED_FEATURE_COUNT + 1;
 
 	/**
-	 * The feature id for the '<em><b>Is Oneway</b></em>' attribute.
+	 * The feature id for the '<em><b>Oneway</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ZONE__IS_ONEWAY = NAMED_FEATURE_COUNT + 2;
+	int ZONE__ONEWAY = NAMED_FEATURE_COUNT + 2;
 
 	/**
 	 * The feature id for the '<em><b>Graph</b></em>' container reference.
@@ -207,159 +225,40 @@ public interface SagPackage extends EPackage {
 	int ZONE__GRAPH = NAMED_FEATURE_COUNT + 3;
 
 	/**
-	 * The number of structural features of the '<em>Zone</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int ZONE_FEATURE_COUNT = NAMED_FEATURE_COUNT + 4;
-
-	/**
-	 * The meta object id for the '{@link org.supremica.external.sag.impl.BoundedZoneImpl <em>Bounded Zone</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see org.supremica.external.sag.impl.BoundedZoneImpl
-	 * @see org.supremica.external.sag.impl.SagPackageImpl#getBoundedZone()
-	 * @generated
-	 */
-	int BOUNDED_ZONE = 2;
-
-	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int BOUNDED_ZONE__NAME = ZONE__NAME;
-
-	/**
-	 * The feature id for the '<em><b>Front</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int BOUNDED_ZONE__FRONT = ZONE__FRONT;
-
-	/**
-	 * The feature id for the '<em><b>Back</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int BOUNDED_ZONE__BACK = ZONE__BACK;
-
-	/**
-	 * The feature id for the '<em><b>Is Oneway</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int BOUNDED_ZONE__IS_ONEWAY = ZONE__IS_ONEWAY;
-
-	/**
-	 * The feature id for the '<em><b>Graph</b></em>' container reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int BOUNDED_ZONE__GRAPH = ZONE__GRAPH;
-
-	/**
 	 * The feature id for the '<em><b>Capacity</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int BOUNDED_ZONE__CAPACITY = ZONE_FEATURE_COUNT + 0;
+	int ZONE__CAPACITY = NAMED_FEATURE_COUNT + 4;
 
 	/**
-	 * The number of structural features of the '<em>Bounded Zone</em>' class.
+	 * The feature id for the '<em><b>Outside System Boundry</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int BOUNDED_ZONE_FEATURE_COUNT = ZONE_FEATURE_COUNT + 1;
+	int ZONE__OUTSIDE_SYSTEM_BOUNDRY = NAMED_FEATURE_COUNT + 5;
 
 	/**
-	 * The meta object id for the '{@link org.supremica.external.sag.impl.UnboundedZoneImpl <em>Unbounded Zone</em>}' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see org.supremica.external.sag.impl.UnboundedZoneImpl
-	 * @see org.supremica.external.sag.impl.SagPackageImpl#getUnboundedZone()
-	 * @generated
-	 */
-	int UNBOUNDED_ZONE = 4;
-
-	/**
-	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * The feature id for the '<em><b>Bounded</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int UNBOUNDED_ZONE__NAME = ZONE__NAME;
+	int ZONE__BOUNDED = NAMED_FEATURE_COUNT + 6;
 
 	/**
-	 * The feature id for the '<em><b>Front</b></em>' reference.
+	 * The number of structural features of the '<em>Zone</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int UNBOUNDED_ZONE__FRONT = ZONE__FRONT;
-
-	/**
-	 * The feature id for the '<em><b>Back</b></em>' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int UNBOUNDED_ZONE__BACK = ZONE__BACK;
-
-	/**
-	 * The feature id for the '<em><b>Is Oneway</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int UNBOUNDED_ZONE__IS_ONEWAY = ZONE__IS_ONEWAY;
-
-	/**
-	 * The feature id for the '<em><b>Graph</b></em>' container reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int UNBOUNDED_ZONE__GRAPH = ZONE__GRAPH;
-
-	/**
-	 * The feature id for the '<em><b>Is Outside</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int UNBOUNDED_ZONE__IS_OUTSIDE = ZONE_FEATURE_COUNT + 0;
-
-	/**
-	 * The number of structural features of the '<em>Unbounded Zone</em>' class.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	int UNBOUNDED_ZONE_FEATURE_COUNT = ZONE_FEATURE_COUNT + 1;
+	int ZONE_FEATURE_COUNT = NAMED_FEATURE_COUNT + 7;
 
 	/**
 	 * The meta object id for the '{@link org.supremica.external.sag.impl.NodeImpl <em>Node</em>}' class.
@@ -369,7 +268,7 @@ public interface SagPackage extends EPackage {
 	 * @see org.supremica.external.sag.impl.SagPackageImpl#getNode()
 	 * @generated
 	 */
-	int NODE = 5;
+	int NODE = 3;
 
 	/**
 	 * The feature id for the '<em><b>Graph</b></em>' container reference.
@@ -415,7 +314,7 @@ public interface SagPackage extends EPackage {
 	 * @see org.supremica.external.sag.impl.SagPackageImpl#getProject()
 	 * @generated
 	 */
-	int PROJECT = 6;
+	int PROJECT = 4;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -462,7 +361,7 @@ public interface SagPackage extends EPackage {
 	 * @see org.supremica.external.sag.impl.SagPackageImpl#getSensor()
 	 * @generated
 	 */
-	int SENSOR = 7;
+	int SENSOR = 5;
 
 	/**
 	 * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -509,7 +408,7 @@ public interface SagPackage extends EPackage {
 	 * @see org.supremica.external.sag.impl.SagPackageImpl#getEndNode()
 	 * @generated
 	 */
-	int END_NODE = 8;
+	int END_NODE = 6;
 
 	/**
 	 * The feature id for the '<em><b>Graph</b></em>' container reference.
@@ -564,7 +463,7 @@ public interface SagPackage extends EPackage {
 	 * @see org.supremica.external.sag.impl.SagPackageImpl#getSensorNode()
 	 * @generated
 	 */
-	int SENSOR_NODE = 9;
+	int SENSOR_NODE = 7;
 
 	/**
 	 * The feature id for the '<em><b>Graph</b></em>' container reference.
@@ -594,13 +493,13 @@ public interface SagPackage extends EPackage {
 	int SENSOR_NODE__OUTGOING = NODE__OUTGOING;
 
 	/**
-	 * The feature id for the '<em><b>Sensor Name</b></em>' attribute.
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int SENSOR_NODE__SENSOR_NAME = NODE_FEATURE_COUNT + 0;
+	int SENSOR_NODE__NAME = NODE_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Sensor</b></em>' reference.
@@ -643,15 +542,15 @@ public interface SagPackage extends EPackage {
 	EReference getGraph_Zone();
 
 	/**
-	 * Returns the meta object for the attribute '{@link org.supremica.external.sag.Graph#isMultipleObjects <em>Multiple Objects</em>}'.
+	 * Returns the meta object for the attribute '{@link org.supremica.external.sag.Graph#getMaxNrOfObjects <em>Max Nr Of Objects</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Multiple Objects</em>'.
-	 * @see org.supremica.external.sag.Graph#isMultipleObjects()
+	 * @return the meta object for the attribute '<em>Max Nr Of Objects</em>'.
+	 * @see org.supremica.external.sag.Graph#getMaxNrOfObjects()
 	 * @see #getGraph()
 	 * @generated
 	 */
-	EAttribute getGraph_MultipleObjects();
+	EAttribute getGraph_MaxNrOfObjects();
 
 	/**
 	 * Returns the meta object for the containment reference list '{@link org.supremica.external.sag.Graph#getNode <em>Node</em>}'.
@@ -674,6 +573,28 @@ public interface SagPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getGraph_Project();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.supremica.external.sag.Graph#isNrOfObjectsIsUnbounded <em>Nr Of Objects Is Unbounded</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Nr Of Objects Is Unbounded</em>'.
+	 * @see org.supremica.external.sag.Graph#isNrOfObjectsIsUnbounded()
+	 * @see #getGraph()
+	 * @generated
+	 */
+	EAttribute getGraph_NrOfObjectsIsUnbounded();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link org.supremica.external.sag.Graph#getSensor <em>Sensor</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Sensor</em>'.
+	 * @see org.supremica.external.sag.Graph#getSensor()
+	 * @see #getGraph()
+	 * @generated
+	 */
+	EReference getGraph_Sensor();
 
 	/**
 	 * Returns the meta object for class '{@link org.supremica.external.sag.Zone <em>Zone</em>}'.
@@ -708,15 +629,15 @@ public interface SagPackage extends EPackage {
 	EReference getZone_Back();
 
 	/**
-	 * Returns the meta object for the attribute '{@link org.supremica.external.sag.Zone#isIsOneway <em>Is Oneway</em>}'.
+	 * Returns the meta object for the attribute '{@link org.supremica.external.sag.Zone#isOneway <em>Oneway</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Is Oneway</em>'.
-	 * @see org.supremica.external.sag.Zone#isIsOneway()
+	 * @return the meta object for the attribute '<em>Oneway</em>'.
+	 * @see org.supremica.external.sag.Zone#isOneway()
 	 * @see #getZone()
 	 * @generated
 	 */
-	EAttribute getZone_IsOneway();
+	EAttribute getZone_Oneway();
 
 	/**
 	 * Returns the meta object for the container reference '{@link org.supremica.external.sag.Zone#getGraph <em>Graph</em>}'.
@@ -730,25 +651,37 @@ public interface SagPackage extends EPackage {
 	EReference getZone_Graph();
 
 	/**
-	 * Returns the meta object for class '{@link org.supremica.external.sag.BoundedZone <em>Bounded Zone</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Bounded Zone</em>'.
-	 * @see org.supremica.external.sag.BoundedZone
-	 * @generated
-	 */
-	EClass getBoundedZone();
-
-	/**
-	 * Returns the meta object for the attribute '{@link org.supremica.external.sag.BoundedZone#getCapacity <em>Capacity</em>}'.
+	 * Returns the meta object for the attribute '{@link org.supremica.external.sag.Zone#getCapacity <em>Capacity</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Capacity</em>'.
-	 * @see org.supremica.external.sag.BoundedZone#getCapacity()
-	 * @see #getBoundedZone()
+	 * @see org.supremica.external.sag.Zone#getCapacity()
+	 * @see #getZone()
 	 * @generated
 	 */
-	EAttribute getBoundedZone_Capacity();
+	EAttribute getZone_Capacity();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.supremica.external.sag.Zone#isOutsideSystemBoundry <em>Outside System Boundry</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Outside System Boundry</em>'.
+	 * @see org.supremica.external.sag.Zone#isOutsideSystemBoundry()
+	 * @see #getZone()
+	 * @generated
+	 */
+	EAttribute getZone_OutsideSystemBoundry();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.supremica.external.sag.Zone#isBounded <em>Bounded</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Bounded</em>'.
+	 * @see org.supremica.external.sag.Zone#isBounded()
+	 * @see #getZone()
+	 * @generated
+	 */
+	EAttribute getZone_Bounded();
 
 	/**
 	 * Returns the meta object for class '{@link org.supremica.external.sag.Named <em>Named</em>}'.
@@ -770,27 +703,6 @@ public interface SagPackage extends EPackage {
 	 * @generated
 	 */
 	EAttribute getNamed_Name();
-
-	/**
-	 * Returns the meta object for class '{@link org.supremica.external.sag.UnboundedZone <em>Unbounded Zone</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for class '<em>Unbounded Zone</em>'.
-	 * @see org.supremica.external.sag.UnboundedZone
-	 * @generated
-	 */
-	EClass getUnboundedZone();
-
-	/**
-	 * Returns the meta object for the attribute '{@link org.supremica.external.sag.UnboundedZone#isIsOutside <em>Is Outside</em>}'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Is Outside</em>'.
-	 * @see org.supremica.external.sag.UnboundedZone#isIsOutside()
-	 * @see #getUnboundedZone()
-	 * @generated
-	 */
-	EAttribute getUnboundedZone_IsOutside();
 
 	/**
 	 * Returns the meta object for class '{@link org.supremica.external.sag.Node <em>Node</em>}'.
@@ -920,15 +832,15 @@ public interface SagPackage extends EPackage {
 	EClass getSensorNode();
 
 	/**
-	 * Returns the meta object for the attribute '{@link org.supremica.external.sag.SensorNode#getSensorName <em>Sensor Name</em>}'.
+	 * Returns the meta object for the attribute '{@link org.supremica.external.sag.SensorNode#getName <em>Name</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Sensor Name</em>'.
-	 * @see org.supremica.external.sag.SensorNode#getSensorName()
+	 * @return the meta object for the attribute '<em>Name</em>'.
+	 * @see org.supremica.external.sag.SensorNode#getName()
 	 * @see #getSensorNode()
 	 * @generated
 	 */
-	EAttribute getSensorNode_SensorName();
+	EAttribute getSensorNode_Name();
 
 	/**
 	 * Returns the meta object for the reference '{@link org.supremica.external.sag.SensorNode#getSensor <em>Sensor</em>}'.
@@ -982,12 +894,12 @@ public interface SagPackage extends EPackage {
 		EReference GRAPH__ZONE = eINSTANCE.getGraph_Zone();
 
 		/**
-		 * The meta object literal for the '<em><b>Multiple Objects</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Max Nr Of Objects</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute GRAPH__MULTIPLE_OBJECTS = eINSTANCE.getGraph_MultipleObjects();
+		EAttribute GRAPH__MAX_NR_OF_OBJECTS = eINSTANCE.getGraph_MaxNrOfObjects();
 
 		/**
 		 * The meta object literal for the '<em><b>Node</b></em>' containment reference list feature.
@@ -1004,6 +916,22 @@ public interface SagPackage extends EPackage {
 		 * @generated
 		 */
 		EReference GRAPH__PROJECT = eINSTANCE.getGraph_Project();
+
+		/**
+		 * The meta object literal for the '<em><b>Nr Of Objects Is Unbounded</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute GRAPH__NR_OF_OBJECTS_IS_UNBOUNDED = eINSTANCE.getGraph_NrOfObjectsIsUnbounded();
+
+		/**
+		 * The meta object literal for the '<em><b>Sensor</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference GRAPH__SENSOR = eINSTANCE.getGraph_Sensor();
 
 		/**
 		 * The meta object literal for the '{@link org.supremica.external.sag.impl.ZoneImpl <em>Zone</em>}' class.
@@ -1032,12 +960,12 @@ public interface SagPackage extends EPackage {
 		EReference ZONE__BACK = eINSTANCE.getZone_Back();
 
 		/**
-		 * The meta object literal for the '<em><b>Is Oneway</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Oneway</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute ZONE__IS_ONEWAY = eINSTANCE.getZone_IsOneway();
+		EAttribute ZONE__ONEWAY = eINSTANCE.getZone_Oneway();
 
 		/**
 		 * The meta object literal for the '<em><b>Graph</b></em>' container reference feature.
@@ -1048,22 +976,28 @@ public interface SagPackage extends EPackage {
 		EReference ZONE__GRAPH = eINSTANCE.getZone_Graph();
 
 		/**
-		 * The meta object literal for the '{@link org.supremica.external.sag.impl.BoundedZoneImpl <em>Bounded Zone</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see org.supremica.external.sag.impl.BoundedZoneImpl
-		 * @see org.supremica.external.sag.impl.SagPackageImpl#getBoundedZone()
-		 * @generated
-		 */
-		EClass BOUNDED_ZONE = eINSTANCE.getBoundedZone();
-
-		/**
 		 * The meta object literal for the '<em><b>Capacity</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute BOUNDED_ZONE__CAPACITY = eINSTANCE.getBoundedZone_Capacity();
+		EAttribute ZONE__CAPACITY = eINSTANCE.getZone_Capacity();
+
+		/**
+		 * The meta object literal for the '<em><b>Outside System Boundry</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute ZONE__OUTSIDE_SYSTEM_BOUNDRY = eINSTANCE.getZone_OutsideSystemBoundry();
+
+		/**
+		 * The meta object literal for the '<em><b>Bounded</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute ZONE__BOUNDED = eINSTANCE.getZone_Bounded();
 
 		/**
 		 * The meta object literal for the '{@link org.supremica.external.sag.impl.NamedImpl <em>Named</em>}' class.
@@ -1082,24 +1016,6 @@ public interface SagPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute NAMED__NAME = eINSTANCE.getNamed_Name();
-
-		/**
-		 * The meta object literal for the '{@link org.supremica.external.sag.impl.UnboundedZoneImpl <em>Unbounded Zone</em>}' class.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @see org.supremica.external.sag.impl.UnboundedZoneImpl
-		 * @see org.supremica.external.sag.impl.SagPackageImpl#getUnboundedZone()
-		 * @generated
-		 */
-		EClass UNBOUNDED_ZONE = eINSTANCE.getUnboundedZone();
-
-		/**
-		 * The meta object literal for the '<em><b>Is Outside</b></em>' attribute feature.
-		 * <!-- begin-user-doc -->
-		 * <!-- end-user-doc -->
-		 * @generated
-		 */
-		EAttribute UNBOUNDED_ZONE__IS_OUTSIDE = eINSTANCE.getUnboundedZone_IsOutside();
 
 		/**
 		 * The meta object literal for the '{@link org.supremica.external.sag.impl.NodeImpl <em>Node</em>}' class.
@@ -1208,12 +1124,12 @@ public interface SagPackage extends EPackage {
 		EClass SENSOR_NODE = eINSTANCE.getSensorNode();
 
 		/**
-		 * The meta object literal for the '<em><b>Sensor Name</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute SENSOR_NODE__SENSOR_NAME = eINSTANCE.getSensorNode_SensorName();
+		EAttribute SENSOR_NODE__NAME = eINSTANCE.getSensorNode_Name();
 
 		/**
 		 * The meta object literal for the '<em><b>Sensor</b></em>' reference feature.

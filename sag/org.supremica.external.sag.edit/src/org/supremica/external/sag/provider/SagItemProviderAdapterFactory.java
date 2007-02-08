@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagItemProviderAdapterFactory.java,v 1.1 2007-01-12 14:32:38 torda Exp $
+ * $Id: SagItemProviderAdapterFactory.java,v 1.2 2007-02-08 16:36:59 torda Exp $
  */
 package org.supremica.external.sag.provider;
 
@@ -98,47 +98,25 @@ public class SagItemProviderAdapterFactory extends SagAdapterFactory implements 
 	}
 
 	/**
-	 * This keeps track of the one adapter used for all {@link org.supremica.external.sag.BoundedZone} instances.
+	 * This keeps track of the one adapter used for all {@link org.supremica.external.sag.Zone} instances.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected BoundedZoneItemProvider boundedZoneItemProvider;
+	protected ZoneItemProvider zoneItemProvider;
 
 	/**
-	 * This creates an adapter for a {@link org.supremica.external.sag.BoundedZone}.
+	 * This creates an adapter for a {@link org.supremica.external.sag.Zone}.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Adapter createBoundedZoneAdapter() {
-		if (boundedZoneItemProvider == null) {
-			boundedZoneItemProvider = new BoundedZoneItemProvider(this);
+	public Adapter createZoneAdapter() {
+		if (zoneItemProvider == null) {
+			zoneItemProvider = new ZoneItemProvider(this);
 		}
 
-		return boundedZoneItemProvider;
-	}
-
-	/**
-	 * This keeps track of the one adapter used for all {@link org.supremica.external.sag.UnboundedZone} instances.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected UnboundedZoneItemProvider unboundedZoneItemProvider;
-
-	/**
-	 * This creates an adapter for a {@link org.supremica.external.sag.UnboundedZone}.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Adapter createUnboundedZoneAdapter() {
-		if (unboundedZoneItemProvider == null) {
-			unboundedZoneItemProvider = new UnboundedZoneItemProvider(this);
-		}
-
-		return unboundedZoneItemProvider;
+		return zoneItemProvider;
 	}
 
 	/**
@@ -326,8 +304,7 @@ public class SagItemProviderAdapterFactory extends SagAdapterFactory implements 
 	 */
 	public void dispose() {
 		if (graphItemProvider != null) graphItemProvider.dispose();
-		if (boundedZoneItemProvider != null) boundedZoneItemProvider.dispose();
-		if (unboundedZoneItemProvider != null) unboundedZoneItemProvider.dispose();
+		if (zoneItemProvider != null) zoneItemProvider.dispose();
 		if (projectItemProvider != null) projectItemProvider.dispose();
 		if (sensorItemProvider != null) sensorItemProvider.dispose();
 		if (endNodeItemProvider != null) endNodeItemProvider.dispose();

@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagAdapterFactory.java,v 1.4 2007-01-12 14:23:21 torda Exp $
+ * $Id: SagAdapterFactory.java,v 1.5 2007-02-08 16:36:08 torda Exp $
  */
 package org.supremica.external.sag.util;
 
@@ -80,16 +80,8 @@ public class SagAdapterFactory extends AdapterFactoryImpl {
 				return createZoneAdapter();
 			}
 			@Override
-			public Adapter caseBoundedZone(BoundedZone object) {
-				return createBoundedZoneAdapter();
-			}
-			@Override
 			public Adapter caseNamed(Named object) {
 				return createNamedAdapter();
-			}
-			@Override
-			public Adapter caseUnboundedZone(UnboundedZone object) {
-				return createUnboundedZoneAdapter();
 			}
 			@Override
 			public Adapter caseNode(Node object) {
@@ -160,20 +152,6 @@ public class SagAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link org.supremica.external.sag.BoundedZone <em>Bounded Zone</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see org.supremica.external.sag.BoundedZone
-	 * @generated
-	 */
-	public Adapter createBoundedZoneAdapter() {
-		return null;
-	}
-
-	/**
 	 * Creates a new adapter for an object of class '{@link org.supremica.external.sag.Named <em>Named</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
@@ -184,20 +162,6 @@ public class SagAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createNamedAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link org.supremica.external.sag.UnboundedZone <em>Unbounded Zone</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see org.supremica.external.sag.UnboundedZone
-	 * @generated
-	 */
-	public Adapter createUnboundedZoneAdapter() {
 		return null;
 	}
 

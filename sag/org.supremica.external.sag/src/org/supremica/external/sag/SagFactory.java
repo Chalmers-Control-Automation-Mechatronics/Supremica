@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagFactory.java,v 1.3 2007-01-12 14:23:46 torda Exp $
+ * $Id: SagFactory.java,v 1.4 2007-02-08 16:36:08 torda Exp $
  */
 package org.supremica.external.sag;
 
@@ -35,22 +35,13 @@ public interface SagFactory extends EFactory {
 	Graph createGraph();
 
 	/**
-	 * Returns a new object of class '<em>Bounded Zone</em>'.
+	 * Returns a new object of class '<em>Zone</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Bounded Zone</em>'.
+	 * @return a new object of class '<em>Zone</em>'.
 	 * @generated
 	 */
-	BoundedZone createBoundedZone();
-
-	/**
-	 * Returns a new object of class '<em>Unbounded Zone</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Unbounded Zone</em>'.
-	 * @generated
-	 */
-	UnboundedZone createUnboundedZone();
+	Zone createZone();
 
 	/**
 	 * Returns a new object of class '<em>Project</em>'.
