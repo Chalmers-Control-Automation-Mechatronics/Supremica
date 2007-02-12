@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.112 2007-02-12 22:07:19 robi Exp $
+//# $Id: ControlledSurface.java,v 1.113 2007-02-12 22:29:03 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -310,8 +310,8 @@ public class ControlledSurface
     mRoot.getUndoInterface().executeCommand(compound);
   }
 
-  void doAddToLabelGroup
-    (final LabelBlockSubject block,
+  void doAddToEventList
+    (final EventListExpressionSubject elist,
      final Collection<IdentifierSubject> identifiers,
      final int pos)
   {
@@ -320,14 +320,14 @@ public class ControlledSurface
       final Command unselect = new UnSelectCommand(this, mSelectedObjects);
       compound.addCommand(unselect);
     }
-    final AddEventCommand add = new AddEventCommand(block, identifiers, pos);
-    final Subject parent = block.getParent();
+    final AddEventCommand add = new AddEventCommand(elist, identifiers, pos);
+    final Subject parent = elist.getParent();
     final Collection<ProxySubject> added = new LinkedList<ProxySubject>();
     if (parent instanceof NodeSubject) {
       final NodeSubject node = (NodeSubject) parent;
       added.add(node);
     } else {
-      added.add(block);
+      added.add(elist);
       added.addAll(add.getAddedIdentifiers());
     }
     final Command select = new SelectCommand(this, added);
@@ -2137,36 +2137,28 @@ public class ControlledSurface
     {
       final Point point = event.getLocation();
       commitDrag(point);
-      requestFocusInWindow();
       try {
-        if (event.getDropTargetContext().getDropTarget().
-              getDefaultActions() == DnDConstants.ACTION_COPY) {
+        if (mExternalDragStatus == EditorSurface.DRAGOVERSTATUS.CANDROP) {
           final IdentifierWithKind ikind = (IdentifierWithKind)
             event.getTransferable().getTransferData(FLAVOUR);
           final Collection<IdentifierSubject> identifiers =
             ikind.getIdentifiers();
-          mExternalDragStatus = EditorSurface.DRAGOVERSTATUS.NOTDRAG;
-          if (mFocusedObject == null) {
-            event.dropComplete(false);
-          } else if (mFocusedObject instanceof SimpleNodeSubject) {
+          if (mFocusedObject instanceof SimpleNodeSubject) {
             addToNode((SimpleNodeSubject) mFocusedObject, identifiers);
-            event.dropComplete(true);
           } else if (mFocusedObject instanceof EdgeSubject) {
             addToEdge((EdgeSubject) mFocusedObject, identifiers);
-            event.dropComplete(true);
           } else if (mFocusedObject instanceof LabelBlockSubject) {
             addToLabelGroup((LabelBlockSubject) mFocusedObject,
                             identifiers, event);
-            event.dropComplete(true);
           } else if (mFocusedObject instanceof LabelGeometrySubject) {
             addToLabel((LabelGeometrySubject) mFocusedObject, identifiers);
-            event.dropComplete(true);
-          } else {
-            event.dropComplete(false);
           }
+          event.dropComplete(true);
+          requestFocusInWindow();
         } else {
           event.dropComplete(false);
         }
+        mExternalDragStatus = EditorSurface.DRAGOVERSTATUS.NOTDRAG;
       } catch (final UnsupportedFlavorException exception) {
         throw new IllegalArgumentException(exception);
       } catch (final IOException exception) {
@@ -2231,9 +2223,8 @@ public class ControlledSurface
     private void addToNode(final SimpleNodeSubject node,
                            final Collection<IdentifierSubject> identifiers)
     {
-      final Command addEvent =
-        new AddEventCommand(node.getPropositions(), identifiers, 0);
-      mRoot.getUndoInterface().executeCommand(addEvent);
+      final EventListExpressionSubject elist = node.getPropositions();
+      doAddToEventList(elist, identifiers, elist.getEventList().size());
     }
 
     private void addToLabel(final LabelGeometrySubject label,
@@ -2247,7 +2238,7 @@ public class ControlledSurface
                            final Collection<IdentifierSubject> identifiers)
     {
       final LabelBlockSubject block = edge.getLabelBlock();
-      doAddToLabelGroup(block, identifiers, block.getEventList().size());
+      doAddToEventList(block, identifiers, block.getEventList().size());
     }
 
     private void addToLabelGroup
@@ -2268,7 +2259,7 @@ public class ControlledSurface
       if (pos == -1) {
         pos = 0;
       }
-      doAddToLabelGroup(block, identifiers, pos);
+      doAddToEventList(block, identifiers, pos);
     }
 
     //#######################################################################
