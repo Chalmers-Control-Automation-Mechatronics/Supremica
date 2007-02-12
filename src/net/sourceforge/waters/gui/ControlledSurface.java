@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.113 2007-02-12 22:29:03 robi Exp $
+//# $Id: ControlledSurface.java,v 1.114 2007-02-12 23:24:14 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -310,31 +310,39 @@ public class ControlledSurface
     mRoot.getUndoInterface().executeCommand(compound);
   }
 
+  /**
+   * Adds a set of event labels to a label block and selects them.
+   * This method creates and executes a compound command consisting of
+   * an event addition and a selection command. Labels to be added as
+   * propositions to nodes are handled differently and correctly.
+   * @param  elist        the label block to be modified.
+   * @param  identifiers  the event labels to be added. They are cloned
+   *                      before insertion.
+   * @param  pos          the position in the list where the new labels
+   *                      are to be added. Insertion occurs before this
+   *                      position.
+   */
   void doAddToEventList
     (final EventListExpressionSubject elist,
      final Collection<IdentifierSubject> identifiers,
      final int pos)
   {
-    final CompoundCommand compound = new CompoundCommand("Event Addition");
-    if (!mSelectedObjects.isEmpty()) {
-      final Command unselect = new UnSelectCommand(this, mSelectedObjects);
-      compound.addCommand(unselect);
-    }
     final AddEventCommand add = new AddEventCommand(elist, identifiers, pos);
     final Subject parent = elist.getParent();
-    final Collection<ProxySubject> added = new LinkedList<ProxySubject>();
     if (parent instanceof NodeSubject) {
       final NodeSubject node = (NodeSubject) parent;
-      added.add(node);
+      doReplaceSelection(node);
+      mRoot.getUndoInterface().executeCommand(add);
     } else {
-      added.add(elist);
-      added.addAll(add.getAddedIdentifiers());
+      doReplaceSelection(elist);
+      final CompoundCommand compound = new CompoundCommand("Event Addition");
+      final Collection<IdentifierSubject> added = add.getAddedIdentifiers();
+      final Command select = new SelectCommand(this, added);
+      compound.addCommand(add);
+      compound.addCommand(select);
+      compound.end();
+      mRoot.getUndoInterface().executeCommand(compound);
     }
-    final Command select = new SelectCommand(this, added);
-    compound.addCommand(add);
-    compound.addCommand(select);
-    compound.end();
-    mRoot.getUndoInterface().executeCommand(compound);
   }
 
   /**

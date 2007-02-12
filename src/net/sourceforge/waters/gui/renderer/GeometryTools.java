@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   GeometryTools
 //###########################################################################
-//# $Id: GeometryTools.java,v 1.9 2007-02-12 21:38:49 robi Exp $
+//# $Id: GeometryTools.java,v 1.10 2007-02-12 23:24:14 robi Exp $
 //###########################################################################
 
 
@@ -93,12 +93,16 @@ public final class GeometryTools
       return getPosition(source);
     } else if (pointGeo == null) {
       final SplineGeometryProxy edgeGeo = edge.getGeometry();
+      final NodeProxy target = edge.getTarget();
       final Point2D aux;
-      if (edgeGeo == null || edgeGeo.getPoints().isEmpty()) {
-        final NodeProxy target = edge.getTarget();
-        aux = getPosition(target);
-      } else {
+      if (edgeGeo != null && !edgeGeo.getPoints().isEmpty()) {
         aux = edgeGeo.getPoints().get(0);
+      } else if (target == null ||
+                 target instanceof GroupNodeProxy &&
+                 edge.getEndPoint() != null) {
+        aux = edge.getEndPoint().getPoint();
+      } else {
+        aux = getPosition(target);
       }
       return defaultPosition(source, aux);
     } else {
@@ -122,12 +126,16 @@ public final class GeometryTools
       return getPosition(target);
     } else if (pointGeo == null) {
       final SplineGeometryProxy edgeGeo = edge.getGeometry();
+      final NodeProxy source = edge.getSource();
       final Point2D aux;
-      if (edgeGeo == null || edgeGeo.getPoints().isEmpty()) {
-        final NodeProxy source = edge.getSource();
-        aux = getPosition(source);
-      } else {
+      if (edgeGeo != null && !edgeGeo.getPoints().isEmpty()) {
         aux = edgeGeo.getPoints().get(0);
+      } else if (source == null ||
+                 source instanceof GroupNodeProxy &&
+                 edge.getStartPoint() != null) {
+        aux = edge.getStartPoint().getPoint();
+      } else {
+        aux = getPosition(source);
       }
       return defaultPosition(target, aux);
     } else {
