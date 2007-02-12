@@ -18,9 +18,7 @@ public class VariableHelper {
 	}
 
 	public static boolean isInteger(VariableProxy variable) {
-		return variable.getType() instanceof BinaryExpressionProxy
-				&& ((BinaryExpressionProxy) variable.getType()).getLeft() instanceof IntConstantProxy
-				&& ((BinaryExpressionProxy) variable.getType()).getRight() instanceof IntConstantProxy;
+		return variable.getType() instanceof BinaryExpressionProxy;
 	}
 
 	public static void setAsInteger(VariableSubject variable, final int lowerBound, final int upperBound,
@@ -55,7 +53,7 @@ public class VariableHelper {
 				.getRight()).getValue();
 	}
 
-	public static Integer getLowerBound(VariableSubject variable) {
+	public static Integer getLowerBound(VariableProxy variable) {
 		if (!isInteger(variable)) {
 			return null;
 		}
