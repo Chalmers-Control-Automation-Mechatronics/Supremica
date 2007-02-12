@@ -1,8 +1,8 @@
 package net.sourceforge.waters.gui.command;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 import net.sourceforge.waters.gui.ControlledSurface;
 
@@ -11,14 +11,14 @@ import net.sourceforge.waters.subject.base.ProxySubject;
 public class SelectCommand
 	implements Command
 {
-	private final List<ProxySubject> mSelected;
+	private final Collection<ProxySubject> mSelected;
 	private final ControlledSurface mSurface;
 	
-	public SelectCommand(ControlledSurface surface,
-						 List<? extends ProxySubject> selected)
+	public SelectCommand(final ControlledSurface surface,
+			     final Collection<? extends ProxySubject> selected)
 	{
-		mSelected = new ArrayList(selected);
-		mSurface = surface;
+	  mSelected = new ArrayList<ProxySubject>(selected);
+	  mSurface = surface;
 	}
 	
 	public SelectCommand(ControlledSurface surface,

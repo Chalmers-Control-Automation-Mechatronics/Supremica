@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorAddEventAction
 //###########################################################################
-//# $Id: EditorAddModuleEventAction.java,v 1.5 2006-11-03 15:01:57 torda Exp $
+//# $Id: EditorAddModuleEventAction.java,v 1.6 2007-02-12 21:38:49 robi Exp $
 //###########################################################################
 
 
@@ -15,7 +15,6 @@ import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import org.supremica.gui.ide.IDE;
-import net.sourceforge.waters.gui.ControlledSurface;
 import org.supremica.gui.ide.ModuleContainer;
 
 public class EditorAddModuleEventAction
@@ -34,8 +33,7 @@ public class EditorAddModuleEventAction
         putValue(Action.SMALL_ICON,
             new ImageIcon(IDE.class.getResource("/icons/waters/event16.gif")));
 //		putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
-        putValue(Action.ACTION_COMMAND_KEY,
-            "Module_" + ControlledSurface.Tool.EVENT.toString());
+        putValue(Action.ACTION_COMMAND_KEY, KEY);
     }
     
     public void actionPerformed(ActionEvent e)
@@ -48,4 +46,7 @@ public class EditorAddModuleEventAction
         ModuleContainer activeModule = ide.getActiveModuleContainer();
         activeModule.getEditorPanel().getEditorPanelInterface().addModuleEvent();
     }
+
+	public static final String KEY = "Module_EVENT";
+
 }

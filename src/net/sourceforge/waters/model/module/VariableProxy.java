@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   VariableProxy
 //###########################################################################
-//# $Id: VariableProxy.java,v 1.4 2006-10-09 10:07:54 xo3 Exp $
+//# $Id: VariableProxy.java,v 1.5 2007-02-12 21:38:49 robi Exp $
 //###########################################################################
 
 
@@ -17,21 +17,16 @@ import net.sourceforge.waters.model.base.Proxy;
  * <P>A variable is used to define the guards
  *  and action on transitions.</P>
  *
- * 
- *
- * @author Markus S.
+ * @author Markus Sk&ouml;ldstam
  */
 
 public interface VariableProxy extends Proxy{
 
   //#########################################################################
   //# Getters
-  
   /**
    * Gets the Name of this variable.
    */
-  
- 
   public String getName(); 
   
   /**
@@ -39,13 +34,11 @@ public interface VariableProxy extends Proxy{
    * EnumSetExpressionProxy (enum), BinaryExpressionProxy (integer) 
    * or SimpleIdentifierProxy (boolean).
    */
- 
   public SimpleExpressionProxy getType(); 
   
   /**
    * Gets the initial value of this variable.
    */
- 
   public SimpleExpressionProxy getInitialValue();
   
   /**

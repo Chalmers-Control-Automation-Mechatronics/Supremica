@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorAddEventAction
 //###########################################################################
-//# $Id: EditorAddComponentEventAction.java,v 1.3 2007-01-11 16:11:52 flordal Exp $
+//# $Id: EditorAddComponentEventAction.java,v 1.4 2007-02-12 21:38:49 robi Exp $
 //###########################################################################
 
 
@@ -17,7 +17,6 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 
-import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 
 import org.supremica.gui.ide.IDE;
@@ -39,8 +38,7 @@ public class EditorAddComponentEventAction
         putValue(Action.SMALL_ICON,
             new ImageIcon(IDE.class.getResource("/icons/waters/event16.gif")));
         putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
-        putValue(Action.ACTION_COMMAND_KEY,
-            ControlledSurface.Tool.EVENT.toString());
+        putValue(Action.ACTION_COMMAND_KEY, KEY);
     }
     
     public void actionPerformed(ActionEvent e)
@@ -57,4 +55,7 @@ public class EditorAddComponentEventAction
             handler.createEvent();
         }
     }
+
+	public static final String KEY = "EVENT";
+
 }

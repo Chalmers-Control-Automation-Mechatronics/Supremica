@@ -19,7 +19,7 @@ public class DeleteNodeCommand
   /** The Node Removed by this Command */
   private final SimpleNodeSubject mDeleted;
   /** the Edge Deletion Commands Associated with this Command */
-  private final CompoundCommand mCommands = new CompoundCommand();
+  //private final CompoundCommand mCommands = new CompoundCommand();
   private final String mDescription = "Node Deletion";
 
   /**
@@ -33,6 +33,7 @@ public class DeleteNodeCommand
   {
     mGraph = graph;
     mDeleted = node;
+    /*
     //find all attached edges
     for (EdgeSubject e : mGraph.getEdgesModifiable()) {
       if ((e.getSource() == node) || (e.getTarget() == node)) {
@@ -40,6 +41,7 @@ public class DeleteNodeCommand
       }
     }
     mCommands.end();
+    */
   }
 
   /**
@@ -48,7 +50,7 @@ public class DeleteNodeCommand
 
   public void execute()
   {
-    mCommands.execute();
+    //mCommands.execute();
     mGraph.getNodesModifiable().remove(mDeleted);
   }
 
@@ -59,7 +61,7 @@ public class DeleteNodeCommand
   public void undo()
   {
     mGraph.getNodesModifiable().add(mDeleted);
-    mCommands.undo();
+    //mCommands.undo();
   }
 
 	public boolean isSignificant()

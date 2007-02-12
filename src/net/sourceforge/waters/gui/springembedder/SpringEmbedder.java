@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.26 2007-02-12 03:54:09 siw4 Exp $
+//# $Id: SpringEmbedder.java,v 1.27 2007-02-12 21:38:49 robi Exp $
 //###########################################################################
 
 
@@ -24,6 +24,7 @@ import java.util.Collections;
 import javax.swing.SwingUtilities;
 
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
+import net.sourceforge.waters.gui.renderer.GeometryTools;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
@@ -486,14 +487,12 @@ public class SpringEmbedder
     //# Constructor
     private EdgeWrapper(final EdgeSubject edge)
     {
-      super(edge.getGeometry().getPoints().get(0));
-      mGeometry = edge.getGeometry();
+      super(GeometryTools.getHandlePoint1(edge));
+      mEdge = edge;
       final NodeSubject source = edge.getSource();
       mSource = mNodeMap.get(source);
       final NodeSubject target = edge.getTarget();
       mTarget = mNodeMap.get(target);
-      mStart = edge.getStartPoint();
-      mEnd = edge.getEndPoint();
     }
 
     //#######################################################################
@@ -572,17 +571,15 @@ public class SpringEmbedder
     void updateModel()
     {
       final Point2D point = getNewPoint();
-      mGeometry.getPointsModifiable().set(0, point);
+      GeometryTools.createMidGeometry(mEdge, point);
     }
 
 
     //#######################################################################
     //# Data Members
-    private final SplineGeometrySubject mGeometry;
+    private final EdgeSubject mEdge;
     private final NodeWrapper mSource;
     private final NodeWrapper mTarget;
-    private final PointGeometrySubject mStart;
-    private final PointGeometrySubject mEnd;
   }
 
 

@@ -1,18 +1,17 @@
 package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Graphics2D;
+import java.util.List;
+import java.util.PriorityQueue;
 
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
-import java.util.List;
-import net.sourceforge.waters.model.base.VisitorException;
-import java.util.PriorityQueue;
+import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 public class Renderer
 {
@@ -21,8 +20,6 @@ public class Renderer
         Graphics2D graphics)
     {
         PriorityQueue<ShapeToRender> queue = new PriorityQueue<ShapeToRender>();
-        try
-        {
             // Blocked events
             if (graph.getBlockedEvents() != null)
             {
@@ -75,11 +72,6 @@ public class Renderer
                             new RenderingInformation(false, false, EditorColor.GUARDCOLOR, EditorColor.GUARDCOLOR, 0)));
                     }}
             }
-        }
-        catch (VisitorException vis)
-        {
-            vis.printStackTrace();
-        }
         while (!queue.isEmpty())
         {
             queue.poll().draw(graphics);

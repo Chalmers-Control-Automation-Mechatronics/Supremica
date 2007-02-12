@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   VariableSubject
 //###########################################################################
-//# $Id: VariableSubject.java,v 1.8 2007-02-12 08:34:07 torda Exp $
+//# $Id: VariableSubject.java,v 1.9 2007-02-12 21:38:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -12,16 +12,11 @@ package net.sourceforge.waters.subject.module;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.module.BinaryExpressionProxy;
-import net.sourceforge.waters.model.module.BooleanConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.VariableProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.MutableSubject;
-import net.sourceforge.waters.model.module.IntConstantProxy;
 
 
 /**
@@ -201,7 +196,7 @@ public final class VariableSubject
    */
   public void setName(final String name)
   {
-    if (mName != null && mName.equals(name)) {
+    if (mName.equals(name)) {
       return;
     }
     mName = name;
@@ -219,9 +214,7 @@ public final class VariableSubject
       return;
     }
     type.setParent(this);
-    if (mType != null) {
-    	mType.setParent(null);
-    }
+    mType.setParent(null);
     mType = type;
     final ModelChangeEvent event =
       ModelChangeEvent.createStateChanged(this);
@@ -237,9 +230,7 @@ public final class VariableSubject
       return;
     }
     initialValue.setParent(this);
-    if (mInitialValue != null) {
-    	mInitialValue.setParent(null);
-    }
+    mInitialValue.setParent(null);
     mInitialValue = initialValue;
     final ModelChangeEvent event =
       ModelChangeEvent.createStateChanged(this);
@@ -265,6 +256,7 @@ public final class VariableSubject
       ModelChangeEvent.createStateChanged(this);
     fireModelChanged(event);
   }
+
 
   //#########################################################################
   //# Data Members

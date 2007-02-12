@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   EdgeSubject
 //###########################################################################
-//# $Id: EdgeSubject.java,v 1.10 2007-02-02 02:55:13 robi Exp $
+//# $Id: EdgeSubject.java,v 1.11 2007-02-12 21:38:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -383,8 +383,6 @@ public final class EdgeSubject
       return;
     }
     if (startPoint != null) {
-      startPoint.setParent(this);
-    } else {
       startPoint.setParent(this);
     }
     if (mStartPoint != null) {

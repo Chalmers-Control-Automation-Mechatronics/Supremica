@@ -165,6 +165,7 @@ public class SimpleNodeProxyShape
     private final boolean isInitial;
     private final Point2D mArrow;
     
+    public static int INITIALOFFSET = 15;
     public static int RADIUS = 6;
     public static int WIDTH = RADIUS * 2;
     private static Color FILLCOLOR = Color.WHITE;

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   SubjectShapeProducer
 //###########################################################################
-//# $Id: SubjectShapeProducer.java,v 1.23 2007-02-12 03:54:09 siw4 Exp $
+//# $Id: SubjectShapeProducer.java,v 1.24 2007-02-12 21:38:49 robi Exp $
 //###########################################################################
 
 
@@ -125,16 +125,12 @@ public class SubjectShapeProducer
 		}
 		for (EdgeSubject edge : graph.getEdgesModifiable())
 		{
-			if (edge.getGeometry() == null)
-			{
-				final Collection<Point2D> points =
-					Collections.singleton(GeometryTools.getMidPoint
-							(GeometryTools.getPosition(edge.getSource()),
-									GeometryTools.getPosition(edge.getTarget())
-							));
-				edge.setGeometry(new SplineGeometrySubject(points,
-						SplineKind.INTERPOLATING));
-			}
+                  if (!(edge.getSource() instanceof GroupNodeSubject)) {
+                    edge.setStartPoint(null);
+                  }
+                  if (!(edge.getTarget() instanceof GroupNodeSubject)) {
+                    edge.setEndPoint(null);
+                  }
 			if (edge.getLabelBlock().getGeometry() == null)
 			{
 				LabelGeometrySubject offset =
@@ -142,24 +138,6 @@ public class SubjectShapeProducer
 					(new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
 							LabelBlockProxyShape.DEFAULTOFFSETY));
 				edge.getLabelBlock().setGeometry(offset);
-			}
-      /*if(edge.getStartPoint() != null
-         && edge.getSource() instanceof SimpleNodeProxy) {
-        edge.setStartPoint(null);
-      }
-      if(edge.getEndPoint() != null
-         && edge.getTarget() instanceof SimpleNodeProxy) {
-        edge.setEndPoint(null);
-      }*/
-			if(edge.getGuardActionBlock() == null) {
-				//do nothing
-				/*
-				ModuleSubjectFactory m = ModuleSubjectFactory.getInstance();
-				GuardActionBlockSubject block = m.createGuardActionBlockProxy();
-				((EdgeSubject) edge).setGuardActionBlock(block);
-				*/
-			} else if (edge.getGuardActionBlock().getGeometry() == null) {
-				//do nothing
 			}
 		}
 		if (runEmbedder)

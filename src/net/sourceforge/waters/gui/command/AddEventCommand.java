@@ -1,25 +1,39 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.gui.command
+//# CLASS:   CreateNodeCommand
+//###########################################################################
+//# $Id: AddEventCommand.java,v 1.11 2007-02-12 21:38:49 robi Exp $
+//###########################################################################
+
 package net.sourceforge.waters.gui.command;
 
-import net.sourceforge.waters.subject.module.IdentifierSubject;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
-import java.util.ArrayList;
-import net.sourceforge.waters.gui.NamedComparator;
 import java.util.TreeSet;
-import com.jclark.xsl.util.Comparator;
-import net.sourceforge.waters.subject.base.NamedSubject;
-import java.util.Collection;
+
+import net.sourceforge.waters.gui.NamedComparator;
 import net.sourceforge.waters.subject.base.AbstractSubject;
+import net.sourceforge.waters.subject.base.NamedSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
+
+
+/**
+ * The Command for adding events labels to a label block.
+ *
+ * @author Simon Ware
+ */
 
 public class AddEventCommand
-	implements Command
+  implements Command
 {
-	private final EventListExpressionSubject mList;
-	private final Collection<IdentifierSubject> mIdentifiers;
-	private final int mPosition;
-	private final String mDescription = "Add Event";
-	
+
+  //#########################################################################
+  //# Constructors
   public AddEventCommand(EventListExpressionSubject list,
                          IdentifierSubject identifier,
                          int position)
@@ -27,45 +41,67 @@ public class AddEventCommand
     this(list, Collections.singleton(identifier), position);
   }
   
-	public AddEventCommand(EventListExpressionSubject list,
+  public AddEventCommand(EventListExpressionSubject list,
                          Collection<? extends IdentifierSubject> identifiers,
                          int position)
-	{
-		mList = list;
-		mIdentifiers = new ArrayList<IdentifierSubject>(identifiers.size());
-    Set<IdentifierSubject> contents = new TreeSet<IdentifierSubject>(NamedComparator.getInstance());
+  {
+    mList = list;
+    final Collection<IdentifierSubject> modIdentifiers =
+      new ArrayList<IdentifierSubject>(identifiers.size());
+    Set<IdentifierSubject> contents =
+      new TreeSet<IdentifierSubject>(NamedComparator.getInstance());
     for (AbstractSubject a : mList.getEventListModifiable()) {
       contents.add((IdentifierSubject)a);
     }
     for (IdentifierSubject n: identifiers) {
       if (contents.add(n)) {
-        mIdentifiers.add(n.clone());
+        modIdentifiers.add(n.clone());
       }
     }
-		mPosition = position;
-	}
+    mIdentifiers = Collections.unmodifiableCollection(modIdentifiers);
+    mPosition = position;
+  }
 	
-	public void execute()
-	{
-		mList.getEventListModifiable().addAll(mPosition, mIdentifiers);
-	}
-	
-    /** 
-     * Undoes the Command
-     *
-     */    
-    public void undo()
-    {
-      mList.getEventListModifiable().removeAll(mIdentifiers);
-    }
-	
-	public boolean isSignificant()
-	{
-		return true;
-	}
+
+  //#########################################################################
+  //# Simple Access
+  /**
+   * Gets the list of identifiers to be inserted by this command.
+   */
+  public Collection<IdentifierSubject> getAddedIdentifiers()
+  {
+    return mIdentifiers;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.command
+  public void execute()
+  {
+    mList.getEventListModifiable().addAll(mPosition, mIdentifiers);
+  }
+
+  public void undo()
+  {
+    mList.getEventListModifiable().removeAll(mIdentifiers);
+  }
+
+  public boolean isSignificant()
+  {
+    return true;
+  }
 
   public String getName()
   {
     return mDescription;
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private final EventListExpressionSubject mList;
+  private final Collection<IdentifierSubject> mIdentifiers;
+  private final int mPosition;
+  private final String mDescription = "Add Event";
+
 }

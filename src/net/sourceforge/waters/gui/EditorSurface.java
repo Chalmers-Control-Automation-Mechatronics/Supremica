@@ -4,17 +4,21 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.74 2007-01-29 16:04:25 flordal Exp $
+//# $Id: EditorSurface.java,v 1.75 2007-02-12 21:38:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
 
-import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Graphics;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.Rectangle;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import javax.swing.JComponent;
+
 import net.sourceforge.waters.gui.renderer.AbstractRendererShape;
 import net.sourceforge.waters.gui.renderer.MiscShape;
 import net.sourceforge.waters.gui.renderer.ProxyShape;
@@ -26,17 +30,14 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import java.util.List;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-import java.util.LinkedList;
-import java.util.Collections;
-import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.module.LabelGeometryProxy;
-import net.sourceforge.waters.model.module.LabelBlockProxy;
-import net.sourceforge.waters.model.module.IdentifierProxy;
+
 import org.supremica.properties.Config;
 
 
@@ -55,16 +56,8 @@ public class EditorSurface
     extends JComponent
     implements Printable, Renderable
 {
-    /**
-     * Increase bounds for label & guardAction panels.
-     */
+
     public static final int TEXTSHADOWMARGIN = 2;
-    protected EditorWindowInterface root;
-    protected int dragStartX;
-    protected int dragStartY;
-    protected int dragNowX;
-    protected int dragNowY;
-    protected boolean dragSelect = false;
     private final GraphProxy mGraph;
     private final ModuleProxy mModule;
     private final ProxyShapeProducer mShapeProducer;
@@ -218,119 +211,6 @@ public class EditorSurface
         return (o instanceof SimpleComponentSubject);
     }
     
-    public void showDragSelect(Graphics g)
-    {
-        //Graphics2D g2d = (Graphics2D) this.getGraphics();
-        Graphics2D g2d = (Graphics2D) g;
-        
-        g2d.setColor(EditorColor.DRAGSELECTCOLOR);
-        g2d.fill(getDragRectangle());
-        //g2d.fill(new Rectangle(dragStartX, dragStartY, dragNowX - dragStartX, dragNowY - dragStartY));
-    }
-    
-    // When you're dragging an edge, you only want nodes or nodegroups...
-    public NodeProxy getNodeOrNodeGroupAtPosition(int ex, int ey)
-    {
-        for (NodeProxy node: getGraph().getNodes())
-        {
-            try
-            {
-                ProxyShape shape = getShapeProducer().getShape(node);
-                if (shape.isClicked(ex, ey))
-                {
-                    return (NodeProxy)shape.getProxy();
-                }
-            }
-            catch (VisitorException vis)
-            {
-                vis.printStackTrace();
-            }
-        }
-        return null;
-    }
-    
-    public Proxy getObjectAtPosition(int ex, int ey)
-    {
-        for (NodeProxy node : getGraph().getNodes())
-        {
-            try
-            {
-                ProxyShape shape = getShapeProducer().getShape(node);
-                if (shape != null)
-                {
-                    if (shape.isClicked(ex, ey))
-                    {
-                        return shape.getProxy();
-                    }
-                    if (node instanceof SimpleNodeProxy) {
-                      shape = getShapeProducer().getShape(((SimpleNodeProxy)node).getLabelGeometry());
-                      if (shape != null)
-                      {
-                          if ((shape != null) && (shape.isClicked(ex, ey)))
-                          {
-                              return shape.getProxy();
-                          }
-                      }
-                    }
-                }
-            }
-            catch (VisitorException vis)
-            {
-                vis.printStackTrace();
-            }
-        }
-        for (EdgeProxy edge : getGraph().getEdges())
-        {
-            try
-            {
-                ProxyShape shape = getShapeProducer().getShape(edge);
-                if (shape != null)
-                {
-                    if (shape.isClicked(ex, ey))
-                    {
-                        return shape.getProxy();
-                    }
-                    shape = getShapeProducer().getShape(edge.getLabelBlock());
-                    if (shape != null)
-                    {
-                        if (shape.isClicked(ex, ey))
-                        {
-                            return shape.getProxy();
-                        }
-                    }
-                    shape = getShapeProducer().getShape(edge.getGuardActionBlock());
-                    if (shape != null)
-                    {
-                        if (shape.isClicked(ex, ey))
-                        {
-                            return shape.getProxy();
-                        }
-                    }
-                }
-            }
-            catch (VisitorException vis)
-            {
-                vis.printStackTrace();
-            }
-        }
-        try
-        {
-          ProxyShape shape = getShapeProducer().getShape(mGraph);
-          if (shape != null)
-          {
-            if (shape.isClicked(ex, ey))
-            {
-              return mGraph.getBlockedEvents();
-            }
-          }
-        }
-        catch (VisitorException vis)
-        {
-            vis.printStackTrace();
-        }
-        return null;
-    }
-    
     /**
      * Returns a list of all children of an object.
      */
@@ -347,38 +227,6 @@ public class EditorSurface
         }
         
         return children;
-    }
-    
-    public Rectangle getDragRectangle()
-    {
-        int x;
-        int y;
-        int w;
-        int h;
-        // this can probably be done with set from diagonal
-        if (dragStartX > dragNowX)
-        {
-            x = dragNowX;
-            w = dragStartX - dragNowX;
-        }
-        else
-        {
-            x = dragStartX;
-            w = dragNowX - dragStartX;
-        }
-        
-        if (dragStartY > dragNowY)
-        {
-            y = dragNowY;
-            h = dragStartY - dragNowY;
-        }
-        else
-        {
-            y = dragStartY;
-            h = dragNowY - dragStartY;
-        }
-        
-        return new Rectangle(x,y,w,h);
     }
     
     /**
@@ -579,24 +427,5 @@ public class EditorSurface
             return (NO_SUCH_PAGE);
         }
     }
-    
-    public void repaint(boolean boundsMaybeChanged)
-    {
-        if (boundsMaybeChanged)
-        {
-            //System.out.println("bounds:" + getBounds());
-        }
-        
-        super.repaint();
-    }
-    
-    /*public void repaint()
-    {
-        repaint(true);
-    }*/
-    
-    public EditorWindowInterface getEditorInterface()
-    {
-        return root;
-    }
+
 }

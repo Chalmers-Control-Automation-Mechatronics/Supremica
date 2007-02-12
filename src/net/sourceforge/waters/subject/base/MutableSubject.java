@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   MutableSubject
 //###########################################################################
-//# $Id: MutableSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: MutableSubject.java,v 1.3 2007-02-12 21:38:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -81,7 +82,10 @@ public abstract class MutableSubject
   public void fireModelChanged(final ModelChangeEvent event)
   {
     if (mObservers != null) {
-      for (final ModelObserver observer : mObservers) {
+      // ARGH! People may add or remove observers while we iterate!
+      final Collection<ModelObserver> copy =
+        new ArrayList<ModelObserver>(mObservers);
+      for (final ModelObserver observer : copy) {
         observer.modelChanged(event);
       }
     }

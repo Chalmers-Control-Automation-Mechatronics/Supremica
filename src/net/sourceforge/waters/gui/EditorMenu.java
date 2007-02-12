@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.33 2006-11-03 15:01:56 torda Exp $
+//# $Id: EditorMenu.java,v 1.34 2007-02-12 21:38:49 robi Exp $
 //###########################################################################
 
 
@@ -227,7 +227,7 @@ public class EditorMenu
 
 		if (e.getSource() == editDeleteMenu)
 		{
-			root.getControlledSurface().deleteSelected();
+			root.getControlledSurface().doDeleteSelected();
 		}
 
 		if (e.getSource() == mToolsCreateEvent)

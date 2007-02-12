@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   ProxyShapeProducer
 //###########################################################################
-//# $Id: ProxyShapeProducer.java,v 1.15 2007-02-02 02:55:13 robi Exp $
+//# $Id: ProxyShapeProducer.java,v 1.16 2007-02-12 21:38:49 robi Exp $
 //###########################################################################
 
 
@@ -25,6 +25,7 @@ import java.util.Map;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -291,10 +292,14 @@ public class ProxyShapeProducer
         return s;
     }
     
-    public ProxyShape getShape(Proxy p) throws VisitorException
+    public ProxyShape getShape(final Proxy proxy)
     {
-      if (p != null) {
-        return (ProxyShape)p.acceptVisitor(this);
+      if (proxy != null) {
+        try {
+          return (ProxyShape) proxy.acceptVisitor(this);
+        } catch (final VisitorException exception) {
+          throw new WatersRuntimeException(exception);
+        }
       } else {
         return null;
       }

@@ -21,12 +21,6 @@ public class CreateNodeGroupCommand
     implements Command
 {
 
-  /** The ControlledSurface Edited with this Command */
-  private final GraphSubject mGraph;
-  /** The Node Created by this Command */
-  private final GroupNodeSubject mCreated;
-  private final String mDescription = "Group Node Creation";
-
   /**
    * Constructs a new CreateNodeCommand with the specified surface and
    * creates the node in the x,y position specified
@@ -73,4 +67,22 @@ public class CreateNodeGroupCommand
   {
     return mDescription;
   }
+
+  /**
+   * Gets the group node to be created by this command.
+   */
+  public GroupNodeSubject getCreatedGroupNode()
+  {
+    return mCreated;
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  /** The ControlledSurface Edited with this Command */
+  private final GraphSubject mGraph;
+  /** The Node Created by this Command */
+  private final GroupNodeSubject mCreated;
+  private final String mDescription = "Group Node Creation";
+
 }

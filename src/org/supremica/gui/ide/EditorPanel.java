@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorPanel
 //###########################################################################
-//# $Id: EditorPanel.java,v 1.51 2007-02-07 18:03:58 flordal Exp $
+//# $Id: EditorPanel.java,v 1.52 2007-02-12 21:38:49 robi Exp $
 //###########################################################################
 
 
@@ -14,7 +14,7 @@ import java.awt.GridBagLayout;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
-import net.sourceforge.waters.gui.ControlledSurface;
+import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -85,7 +85,7 @@ public class EditorPanel
         editorButtonGroup = new ButtonGroup();
         toolBar.addSeparator();
         (toolBar.add(getActions().editorSelectAction, editorButtonGroup)).setSelected(true);
-        toolBar.setCommand(ControlledSurface.Tool.SELECT.toString());
+        toolBar.setCommand(ControlledToolbar.Tool.SELECT.toString());
         toolBar.add(getActions().editorAddNodeAction, editorButtonGroup);
         toolBar.add(getActions().editorAddNodeGroupAction, editorButtonGroup);
         toolBar.add(getActions().editorAddEdgeAction, editorButtonGroup);

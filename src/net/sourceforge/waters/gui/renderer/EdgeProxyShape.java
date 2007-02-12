@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   EdgeProxyShape
 //###########################################################################
-//# $Id: EdgeProxyShape.java,v 1.12 2007-02-12 03:54:09 siw4 Exp $
+//# $Id: EdgeProxyShape.java,v 1.13 2007-02-12 21:38:49 robi Exp $
 //###########################################################################
 
 
@@ -35,20 +35,11 @@ public abstract class EdgeProxyShape
 {
     protected EdgeProxyShape(EdgeProxy edge)
     {
-        super(edge);
-        if (edge.getGeometry() != null)
-        {
-            mTurn = edge.getGeometry().getPoints().get(0);
-        }
-        else
-        {
-            mTurn = GeometryTools.getMidPoint(
-                GeometryTools.getPosition(edge.getSource()),
-                GeometryTools.getPosition(edge.getTarget()));
-        }
-        mStart = GeometryTools.getStartPoint(edge);
-        mEnd = GeometryTools.getEndPoint(edge);
-        mHandles = new ArrayList<Handle>(2);
+      super(edge);
+      mTurn = GeometryTools.getHandlePoint1(edge);
+      mStart = GeometryTools.getStartPoint(edge);
+      mEnd = GeometryTools.getEndPoint(edge);
+      mHandles = new ArrayList<Handle>(2);
     }
     
     public List<Handle> getHandles()
@@ -73,7 +64,7 @@ public abstract class EdgeProxyShape
     
     public EdgeProxy getProxy()
     {
-        return (EdgeProxy)super.getProxy();
+        return (EdgeProxy) super.getProxy();
     }
     
     public void draw(Graphics2D g, RenderingInformation status)

@@ -4,17 +4,16 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   MoveEdgeCommand
 //###########################################################################
-//# $Id: MoveEdgeCommand.java,v 1.8 2007-02-02 02:55:13 robi Exp $
+//# $Id: MoveEdgeCommand.java,v 1.9 2007-02-12 21:38:49 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui.command;
 
 import java.awt.geom.Point2D;
-import java.awt.Point;
 
-import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.renderer.GeometryTools;
@@ -24,7 +23,6 @@ import net.sourceforge.waters.subject.module.GroupNodeSubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SplineGeometrySubject;
-import net.sourceforge.waters.xsd.module.SplineKind;
 
 
 /**
@@ -46,21 +44,19 @@ public class MoveEdgeCommand
    * @param  neo      The new source or target node.
    * @param  isSource True if the source node is changed,
    *                  false if the target node is changed.
-   * @param  x        The x coordinate of the changed position.
-   * @param  y        The y coordinate of the changed position.
+   * @param  point    The changed position, or <CODE>null</CODE>.
    */
   public MoveEdgeCommand(final ControlledSurface surface,
                          final EdgeSubject edge,
                          final NodeSubject neo,
                          final boolean isSource,
-                         final int x,
-                         final int y)
+                         final Point2D point)
   {
     mSurface = surface;
     mEdge = edge;
     mNew = neo;
-    if (neo instanceof GroupNodeSubject) {
-      mNPos = new PointGeometrySubject(new Point(x, y));
+    if (neo instanceof GroupNodeSubject && point != null) {
+      mNPos = new PointGeometrySubject(point);
     } else {
       mNPos = null;
     }
@@ -74,7 +70,8 @@ public class MoveEdgeCommand
       mOPos = edge.getEndPoint();
       mDescription = "Change Edge Target";
     }
-    mOTPoint = edge.getGeometry().clone();
+    final SplineGeometrySubject geo = edge.getGeometry();
+    mOldGeo = geo == null ? geo : geo.clone();
   }
 
   public void execute()
@@ -86,18 +83,7 @@ public class MoveEdgeCommand
       mEdge.setTarget(mNew);
       mEdge.setEndPoint(mNPos);
     }
-    final Point2D p;
-    if (mEdge.getTarget() != mEdge.getSource()) {
-      final Point2D start = GeometryTools.getStartPoint(mEdge);
-      final Point2D end = GeometryTools.getEndPoint(mEdge);
-      p = GeometryTools.getMidPoint(start, end);
-    } else {
-      p = GeometryTools.getStartPoint(mEdge);
-      p.setLocation(p.getX() + 20, p.getY() + 20);
-    }
-    final Collection<Point2D> points = Collections.singleton(p);
-    mEdge.setGeometry(new SplineGeometrySubject(points, 
-                                                SplineKind.INTERPOLATING));
+    GeometryTools.createDefaultGeometry(mEdge);
     mSurface.getEditorInterface().setDisplayed();
   }
 
@@ -110,7 +96,7 @@ public class MoveEdgeCommand
       mEdge.setTarget(mOld);
       mEdge.setEndPoint(mOPos);
     }
-    mEdge.setGeometry(mOTPoint);
+    mEdge.setGeometry(mOldGeo);
     mSurface.getEditorInterface().setDisplayed();
   }
 	
@@ -134,7 +120,7 @@ public class MoveEdgeCommand
   private final boolean mIsSource;
   private final PointGeometrySubject mNPos;
   private final PointGeometrySubject mOPos;
-  private final SplineGeometrySubject mOTPoint;
+  private final SplineGeometrySubject mOldGeo;
   private final String mDescription;	
 
 }

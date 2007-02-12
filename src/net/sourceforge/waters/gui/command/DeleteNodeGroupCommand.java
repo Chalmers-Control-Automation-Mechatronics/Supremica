@@ -19,7 +19,7 @@ public class DeleteNodeGroupCommand
     /** The Node Created by this Command */
     private final GroupNodeSubject mDeleted;
     /** the Edge Deletion Commands Associated with this Command */
-    private final CompoundCommand mCommands = new CompoundCommand();
+    //private final CompoundCommand mCommands = new CompoundCommand();
     private final String mDescription = "Group Node Deletion";
 
     /**
@@ -33,12 +33,14 @@ public class DeleteNodeGroupCommand
 		mGraph = graph;
 		// Find a unique name!
 		mDeleted = nodeGroup;
+		/*
 		for (EdgeSubject e : mGraph.getEdgesModifiable()) {
 			if ((e.getSource() == nodeGroup || (e.getTarget() == nodeGroup))) {
 				mCommands.addCommand(new DeleteEdgeCommand(mGraph, e));
 			}
 		}
 		mCommands.end();
+		*/
     }
 
     /**
@@ -47,7 +49,7 @@ public class DeleteNodeGroupCommand
 
     public void execute()
     {
-		mCommands.execute();
+      //mCommands.execute();
 		mGraph.getNodesModifiable().remove(mDeleted);
     }
 
@@ -63,7 +65,7 @@ public class DeleteNodeGroupCommand
     public void undo()
     {
 		mGraph.getNodesModifiable().add(mDeleted);
-		mCommands.undo();
+		//mCommands.undo();
     }
 
     public String getName()

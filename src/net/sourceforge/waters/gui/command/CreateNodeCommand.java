@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateNodeCommand
 //###########################################################################
-//# $Id: CreateNodeCommand.java,v 1.16 2007-01-22 01:50:25 siw4 Exp $
+//# $Id: CreateNodeCommand.java,v 1.17 2007-02-12 21:38:49 robi Exp $
 //###########################################################################
 
 
@@ -92,6 +92,14 @@ public class CreateNodeCommand
   public boolean isSignificant()
   {
     return true;
+  }
+
+  /**
+   * Gets the node to be created by this command.
+   */
+  public SimpleNodeSubject getCreatedNode()
+  {
+    return mCreated;
   }
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorGraph
 //###########################################################################
-//# $Id: EditorGraph.java,v 1.14 2007-02-06 04:31:47 siw4 Exp $
+//# $Id: EditorGraph.java,v 1.15 2007-02-12 21:38:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -45,6 +45,7 @@ import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.MutableSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
+import net.sourceforge.waters.subject.module.BoxGeometrySubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;
@@ -116,10 +117,8 @@ public class EditorGraph
 			}
 		}
 
-    final OriginalModelListener listener1 = new OriginalModelListener();
-    graph.addModelObserver(listener1);
-    final CopiedModelListener listener2 = new CopiedModelListener();
-    addModelObserver(listener2);
+    final CopiedModelListener listener = new CopiedModelListener();
+    addModelObserver(listener);
   }
 
 	public Object acceptVisitor(ProxyVisitor p)
@@ -301,15 +300,6 @@ public class EditorGraph
     mObserverMap.get(edge.getTarget()).addEdge(edge);
     mFakeMap.put(edge, e);
     mOriginalMap.put(e, edge);
-    if (edge.getGeometry() == null) {
-      final Collection<Point2D> points =
-	Collections.singleton
-	(GeometryTools.getMidPoint(GeometryTools.getPosition(edge.getSource()),
-				   GeometryTools.getPosition(edge.getTarget())
-				   ));
-      edge.setGeometry(new SplineGeometrySubject(points,
-						 SplineKind.INTERPOLATING));
-    }
   }
   
   private void removeEdge(EdgeSubject e)
@@ -367,6 +357,287 @@ public class EditorGraph
     return changed;
   }
 
+
+  //#########################################################################
+  //# Transformations
+  /**
+   * Moves a simple node.  This method is called to translate
+   * the position of a simple node by a given fixed amount.
+   * @param  node0   The node in the original graph.
+   * @param  dx      The distance in x direction to be added to the
+   *                 original position to obtain the new position.
+   * @param  dy      The distance in y direction to be added to the
+   *                 original position to obtain the new position.
+   */
+  void moveSimpleNode(final SimpleNodeSubject node0,
+                      final double dx,
+                      final double dy)
+  {
+    final SimpleNodeSubject node1 = (SimpleNodeSubject) getCopy(node0);
+    final PointGeometrySubject geo0 = node0.getPointGeometry();
+    final PointGeometrySubject geo1 = node1.getPointGeometry();
+    movePointGeometry(geo0, geo1, dx, dy);
+  }
+
+  /**
+   * Moves a group node.  This method is called to translate
+   * the position of a group node by a given fixed amount.
+   * @param  node0   The node in the original graph.
+   * @param  dx      The distance in x direction to be added to the
+   *                 original position to obtain the new position.
+   * @param  dy      The distance in y direction to be added to the
+   *                 original position to obtain the new position.
+   */
+  void moveGroupNode(final GroupNodeSubject node0,
+                     final double dx,
+                     final double dy)
+  {
+    final GroupNodeSubject node1 = (GroupNodeSubject) getCopy(node0);
+    final BoxGeometrySubject geo0 = node0.getGeometry();
+    final BoxGeometrySubject geo1 = node1.getGeometry();
+    moveBoxGeometry(geo0, geo1, dx, dy);
+  }
+
+  /**
+   * Moves an edge.  This method is called to translate the start point,
+   * end point, and the handle point of an edge by a given fixed amount.
+   * @param  edge0   The edge in the original graph.
+   * @param  dx      The distance in x direction to be added to the
+   *                 original position to obtain the new position.
+   * @param  dy      The distance in y direction to be added to the
+   *                 original position to obtain the new position.
+   */
+  void moveEdge(final EdgeSubject edge0, final double dx, final double dy)
+  {
+    moveEdgeStart(edge0, dx, dy);
+    moveEdgeEnd(edge0, dx, dy);
+    moveEdgeHandle(edge0, dx, dy);
+  }
+
+  /**
+   * Moves the start point of an edge.  This method is called to translate
+   * the start point of an edge by a given fixed amount.
+   * @param  edge0   The edge in the original graph.
+   * @param  dx      The distance in x direction to be added to the
+   *                 original position to obtain the new position.
+   * @param  dy      The distance in y direction to be added to the
+   *                 original position to obtain the new position.
+   */
+  void moveEdgeStart(final EdgeSubject edge0, final double dx, final double dy)
+  {
+    final PointGeometrySubject geo0 = edge0.getStartPoint();
+    if (geo0 != null) {
+      final EdgeSubject edge1 = (EdgeSubject) getCopy(edge0);
+      final PointGeometrySubject geo1 = edge1.getStartPoint();
+      movePointGeometry(geo0, geo1, dx, dy);
+    }
+  }
+
+  /**
+   * Moves the end point of an edge.  This method is called to translate
+   * the end point of an edge by a given fixed amount.
+   * @param  edge0   The edge in the original graph.
+   * @param  dx      The distance in x direction to be added to the
+   *                 original position to obtain the new position.
+   * @param  dy      The distance in y direction to be added to the
+   *                 original position to obtain the new position.
+   */
+  void moveEdgeEnd(final EdgeSubject edge0, final double dx, final double dy)
+  {
+    final PointGeometrySubject geo0 = edge0.getEndPoint();
+    if (geo0 != null) {
+      final EdgeSubject edge1 = (EdgeSubject) getCopy(edge0);
+      final PointGeometrySubject geo1 = edge1.getEndPoint();
+      movePointGeometry(geo0, geo1, dx, dy);
+    }
+  }
+
+  /**
+   * Moves the handle point of an edge.  This method is called to translate
+   * the handle point of an edge by a given fixed amount. If the start or
+   * end point of the edge have also changed, methods {@link
+   * #moveEdgeStart(EdgeSubject,double,double) moveEdgeStart()} and {@link
+   * #moveEdgeEnd(EdgeSubject,double,double) #moveEdgeEnd()} should be called
+   * first.
+   * @param  edge0   The edge in the original graph.
+   * @param  dx      The distance in x direction to be added to the
+   *                 original position to obtain the new position.
+   * @param  dy      The distance in y direction to be added to the
+   *                 original position to obtain the new position.
+   */
+  void moveEdgeHandle(final EdgeSubject edge0,
+                      final double dx,
+                      final double dy)
+  {
+    final EdgeSubject edge1 = (EdgeSubject) getCopy(edge0);
+    final Point2D point = GeometryTools.getHandlePoint1(edge0);
+    point.setLocation(point.getX() + dx, point.getY() + dy);
+    GeometryTools.createMidGeometry(edge1, point);
+  }
+
+  /**
+   * Updates edge geometry when dragging node.
+   * This method is called when the end point of an edge has changed,
+   * to transform the points of the edge's spline geometry.
+   * The old position of the end point is taken from the original
+   * graph, the new position from the copied graph. Then the
+   * spline control points from the original graph are translated
+   * and stored in the copied graph.
+   * @param  edge0   The edge in the original graph.
+   * @param  isStart <CODE>true</CODE> if the start point has changed;
+   *                 <CODE>false</CODE> if the end point has changed.
+   */
+  void transformEdge(final EdgeSubject edge0, final boolean isStart)
+  {
+    final SplineGeometrySubject geo0 = edge0.getGeometry();
+    if (geo0 != null) {
+      final EdgeSubject edge1 = (EdgeSubject) getCopy(edge0);
+      final Point2D old;
+      final Point2D neo;
+      final Point2D ref;
+      if (isStart) {
+        old = GeometryTools.getStartPoint(edge0);
+        neo = GeometryTools.getStartPoint(edge1);
+        ref = GeometryTools.getEndPoint(edge0);
+      } else {
+        old = GeometryTools.getEndPoint(edge0);
+        neo = GeometryTools.getEndPoint(edge1);
+        ref = GeometryTools.getStartPoint(edge0);
+      }
+      final double oldx = old.getX();
+      final double oldy = old.getY();
+      final double newx = neo.getX();
+      final double newy = neo.getY();
+      final double refx = ref.getX();
+      final double refy = ref.getY();
+      final double ox1 = oldx - refx;
+      final double oy1 = oldy - refy;
+      final double nx1 = newx - refx;
+      final double ny1 = newy - refy;
+      final double divide = ox1 * ox1 + oy1 * oy1;
+      // Correction needed for very short edge, when ox1 and oy1 are 0 ...
+      final double factor;
+      if (Math.abs(divide) > GeometryTools.EPSILON) {
+        factor = 1.0 / divide;
+      } else if (divide >= 0.0) {
+        factor = 1.0 / GeometryTools.EPSILON;
+      } else {
+        factor = -1.0 / GeometryTools.EPSILON;
+      }
+      final double a1 = factor * (nx1 * ox1 + ny1 * oy1);
+      final double a2 = factor * (nx1 * oy1 - ny1 * ox1);
+      final double a3 = -a2;
+      final double a4 = a1;
+      final SplineGeometrySubject geo1 = edge1.getGeometry();
+      assert(geo1 != null);
+      final List<Point2D> points0 = geo0.getPoints();
+      final List<Point2D> points1 = geo1.getPointsModifiable();
+      int i = 0;
+      for (final Point2D point0 : points0) {
+        final double cx1 = point0.getX() - refx;
+        final double cy1 = point0.getY() - refy;
+        final Point2D point1 = new Point2D.Double(a1 * cx1 + a2 * cy1 + refx,
+                                                  a3 * cx1 + a4 * cy1 + refy);
+        points1.set(i++, point1);
+      }
+    }
+  }
+
+  /**
+   * Moves a node label.  This method is called to translate
+   * the position of a node label by a given fixed amount.
+   * @param  label0  The label geometry in the original graph that
+   *                 represents the label to be transformed.
+   * @param  dx      The distance in x direction to be added to the
+   *                 original position to obtain the new position.
+   * @param  dy      The distance in y direction to be added to the
+   *                 original position to obtain the new position.
+   */
+  void moveLabelGeometry(final LabelGeometrySubject label0,
+                         final double dx,
+                         final double dy)
+  {
+    final LabelGeometrySubject label1 = (LabelGeometrySubject) getCopy(label0);
+    moveLabelGeometry(label0, label1, dx, dy);
+  }
+
+  /**
+   * Moves a label block.  This method is called to translate
+   * the position of a label block by a given fixed amount.
+   * @param  block0  The label block in the original graph.
+   * @param  dx      The distance in x direction to be added to the
+   *                 original position to obtain the new position.
+   * @param  dy      The distance in y direction to be added to the
+   *                 original position to obtain the new position.
+   */
+  void moveLabelBlock(final LabelBlockSubject block0,
+                      final double dx,
+                      final double dy)
+  {
+    final LabelBlockSubject block1 = (LabelBlockSubject) getCopy(block0);
+    final LabelGeometrySubject geo0 = block0.getGeometry();
+    final LabelGeometrySubject geo1 = block1.getGeometry();
+    moveLabelGeometry(geo0, geo1, dx, dy);
+  }
+
+  /**
+   * Moves a guard/action block.  This method is called to translate
+   * the position of a guard/action block by a given fixed amount.
+   * @param  block0  The guard/action block in the original graph.
+   * @param  dx      The distance in x direction to be added to the
+   *                 original position to obtain the new position.
+   * @param  dy      The distance in y direction to be added to the
+   *                 original position to obtain the new position.
+   */
+  void moveGuardActionBlock(final GuardActionBlockSubject block0,
+                            final double dx,
+                            final double dy)
+  {
+    final GuardActionBlockSubject block1 =
+      (GuardActionBlockSubject) getCopy(block0);
+    final LabelGeometrySubject geo0 = block0.getGeometry();
+    final LabelGeometrySubject geo1 = block1.getGeometry();
+    moveLabelGeometry(geo0, geo1, dx, dy);
+  }
+
+
+  private void moveBoxGeometry(final BoxGeometrySubject geo0,
+                               final BoxGeometrySubject geo1,
+                               final double dx,
+                               final double dy)
+  {
+    final Rectangle2D rect = geo0.getRectangle();
+    final double x = rect.getX();
+    final double y = rect.getY();
+    final double width = rect.getWidth();
+    final double height = rect.getHeight();
+    rect.setRect(x + dx, y + dy, width, height);
+    geo1.setRectangle(rect);
+  }
+  
+  private void moveLabelGeometry(final LabelGeometrySubject geo0,
+                                 final LabelGeometrySubject geo1,
+                                 final double dx,
+                                 final double dy)
+  {
+    final Point2D point = geo0.getOffset();
+    point.setLocation(point.getX() + dx, point.getY() + dy);
+    geo1.setOffset(point);
+  }
+  
+  private void movePointGeometry(final PointGeometrySubject geo0,
+                                 final PointGeometrySubject geo1,
+                                 final double dx,
+                                 final double dy)
+  {
+    final Point2D point = geo0.getPoint();
+    point.setLocation(point.getX() + dx, point.getY() + dy);
+    geo1.setPoint(point);
+  }
+  
+
+  //#########################################################################
+  //# Static Class Methods
 	public static LabelGeometrySubject defaultLabelBlockOffset()
 	{
 		Point2D p = new Point2D.Double(10, 10);
@@ -398,6 +669,7 @@ public class EditorGraph
 		return new PointGeometrySubject(p);
 	}
   
+
   public static void updateChildNodes(GraphSubject graph) {
     List<GroupNodeSubject> groups = new ArrayList<GroupNodeSubject>();
     for (NodeSubject n : graph.getNodesModifiable()) {
@@ -445,96 +717,6 @@ public class EditorGraph
 
 
   //#########################################################################
-  //# Inner Class OriginalModelListener
-  /**
-   * This listener receives all change event associated with the original
-   * editor graph, of which the EditorGraph is a copy.
-   */
-  private class OriginalModelListener
-    implements ModelObserver
-  {
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.subject.base.ModelObserver
-    public void modelChanged(final ModelChangeEvent event)
-    {
-      final Subject esource = event.getSource();
-      switch (event.getKind()) {
-      case ModelChangeEvent.ITEM_ADDED:
-	if (!(esource.getParent() instanceof GroupNodeSubject)) {
-	  final ProxySubject added = (ProxySubject) event.getValue();
-	  if (added instanceof EdgeSubject) {
-	    addEdge((EdgeSubject) added);
-	  } else if (added instanceof SimpleNodeSubject) {
-	    addNode((SimpleNodeSubject) added);
-	  } else if (added instanceof GroupNodeSubject) {
-	    addGroupNode((GroupNodeSubject) added);
-	  } else if (esource.getParent() instanceof LabelBlockSubject) {
-	    LabelBlockSubject block = (LabelBlockSubject) esource.getParent();
-	    block = (LabelBlockSubject) getCopy(block);
-	    block.getEventListModifiable().
-	      add(((IdentifierSubject) added).clone());
-	  }
-	}
-	break;
-      case ModelChangeEvent.ITEM_REMOVED:
-	if (!(esource.getParent() instanceof GroupNodeSubject)) {
-	  final ProxySubject victim = (ProxySubject) event.getValue();
-	  if (victim instanceof EdgeSubject) {
-	    removeEdge((EdgeSubject) victim);
-	  } else if (victim instanceof SimpleNodeSubject) {
-	    removeNode((NodeSubject) victim);
-	  } else if (victim instanceof GroupNodeSubject) {
-	    removeNode((GroupNodeSubject) victim);
-	  } else if (esource.getParent() instanceof LabelBlockSubject) {
-	    LabelBlockSubject block = (LabelBlockSubject) esource.getParent();
-	    block = (LabelBlockSubject) getCopy(block);
-	    AbstractSubject remove = null;
-	    for (AbstractSubject a : block.getEventListModifiable()) {
-	      if (a.equalsByContents(victim)) {
-		remove = a;
-	      }
-	    }
-	    block.getEventListModifiable().remove((IdentifierSubject) remove);
-	  }
-	}
-	break;
-      case ModelChangeEvent.GEOMETRY_CHANGED:
-	if (esource instanceof EdgeSubject &&
-	    mOriginalMap.containsKey(esource)) {
-	  final EdgeSubject orig = (EdgeSubject) esource;
-	  final EdgeSubject copy = (EdgeSubject) getCopy(orig);
-	  final PointGeometrySubject origStart = orig.getStartPoint();
-	  final PointGeometrySubject copyStart = copy.getStartPoint();
-	  if (origStart == null) {
-	    copy.setStartPoint(null);
-	  } else {//if (copyStart == null) {
-	    final PointGeometrySubject cloned = origStart.clone();
-	    copy.setStartPoint(cloned);
-	  } /*else {
-	    final Point2D point = origStart.getPoint();
-	    copyStart.setPoint(point);
-	  }*/
-	  final PointGeometrySubject origEnd = orig.getEndPoint();
-	  final PointGeometrySubject copyEnd = copy.getEndPoint();
-	  if (origEnd == null) {
-	    copy.setEndPoint(null);
-	  } else { //if (copyEnd == null) {
-	    final PointGeometrySubject cloned = origEnd.clone();
-	    copy.setEndPoint(cloned);
-	  }/* else {
-	    final Point2D point = origEnd.getPoint();
-	    copyEnd.setPoint(point);
-	  }*/
-	}
-	break;
-      }
-    }
-
-  }
-
-
-  //#########################################################################
   //# Inner Class CopiedModelListener
   /**
    * This listener receives all change event associated with this
@@ -563,18 +745,16 @@ public class EditorGraph
 	if (esource instanceof EdgeSubject) {
 	  final EdgeSubject edge = (EdgeSubject) esource;
 	  final NodeSubject source = edge.getSource();
+          if (source != null) {
+            mObserverMap.get(source).addEdge(edge);
+          }
 	  final NodeSubject target = edge.getTarget();
-	  mObserverMap.get(source).addEdge(edge);
-	  mObserverMap.get(target).addEdge(edge);
-	  // TODO: Remove unlinked edges?
+          if (target != null) {
+            mObserverMap.get(target).addEdge(edge);
+          }
 	}
 	break;
       case ModelChangeEvent.GEOMETRY_CHANGED:
-	if (esource instanceof NodeSubject) {
-	  final NodeSubject node = (NodeSubject) esource;
-	  mObserverMap.get(node).update();
-	  mNodeMoved = true;
-	}
 	mChanged.add(esource);
 	break;
       }
@@ -639,49 +819,52 @@ public class EditorGraph
 				       final Point2D old,
 				       final Point2D neo)
     {
-      final double ox = old.getX();
-      final double oy = old.getY();
-      final double nx = neo.getX();
-      final double ny = neo.getY();
-      final Point2D c = edge.getGeometry().getPointsModifiable().get(0);
-      final double cx = c.getX();
-      final double cy = c.getY();
-      final Point2D newCenter;
-      if (edge.getSource() == edge.getTarget())	{
-	newCenter = new Point2D.Double(cx + nx - ox, cy + ny - oy);
-      }	else {
-	final Point2D e;
-	if (edge.getSource() == getNodeSubject()) {
-	  e = GeometryTools.getEndPoint(edge);
-	} else {
-	  e = GeometryTools.getStartPoint(edge);
-	}
-	final double ex = e.getX();
-	final double ey = e.getY();
-	final double cx1 = cx - ex;
-	final double cy1 = cy - ey;
-	final double ox1 = ox - ex;
-	final double oy1 = oy - ey;
-	final double nx1 = nx - ex;
-	final double ny1 = ny - ey;
-	final double divide = ox1 * ox1 + oy1 * oy1;
-	// Correction needed for very short edge, when ox1 and oy1 are 0 ...
-        final double factor;
-	if (Math.abs(divide) > GeometryTools.EPSILON) {
-          factor = 1.0 / divide;
-        } else if (divide >= 0.0) {
-          factor = 1.0 / GeometryTools.EPSILON;
+      final SplineGeometrySubject geo = edge.getGeometry();
+      if (geo != null && geo.getPoints().size() == 1) {
+        final double ox = old.getX();
+        final double oy = old.getY();
+        final double nx = neo.getX();
+        final double ny = neo.getY();
+        final Point2D c = geo.getPointsModifiable().get(0);
+        final double cx = c.getX();
+        final double cy = c.getY();
+        final Point2D newCenter;
+        if (edge.getSource() == edge.getTarget()) {
+          newCenter = new Point2D.Double(cx + nx - ox, cy + ny - oy);
         } else {
-          factor = -1.0 / GeometryTools.EPSILON;
+          final Point2D e;
+          if (edge.getSource() == getNodeSubject()) {
+            e = GeometryTools.getEndPoint(edge);
+          } else {
+            e = GeometryTools.getStartPoint(edge);
+          }
+          final double ex = e.getX();
+          final double ey = e.getY();
+          final double cx1 = cx - ex;
+          final double cy1 = cy - ey;
+          final double ox1 = ox - ex;
+          final double oy1 = oy - ey;
+          final double nx1 = nx - ex;
+          final double ny1 = ny - ey;
+          final double divide = ox1 * ox1 + oy1 * oy1;
+          // Correction needed for very short edge, when ox1 and oy1 are 0 ...
+          final double factor;
+          if (Math.abs(divide) > GeometryTools.EPSILON) {
+            factor = 1.0 / divide;
+          } else if (divide >= 0.0) {
+            factor = 1.0 / GeometryTools.EPSILON;
+          } else {
+            factor = -1.0 / GeometryTools.EPSILON;
+          }
+          final double a1 = factor * (nx1 * ox1 + ny1 * oy1);
+          final double a2 = factor * (nx1 * oy1 - ny1 * ox1);
+          final double a3 = -a2;
+          final double a4 = a1;
+          newCenter = new Point2D.Double(a1 * cx1 + a2 * cy1 + ex,
+                                         a3 * cx1 + a4 * cy1 + ey);
         }
-	final double a1 = factor * (nx1 * ox1 + ny1 * oy1);
-	final double a2 = factor * (nx1 * oy1 - ny1 * ox1);
-	final double a3 = -a2;
-	final double a4 = a1;
-	newCenter = new Point2D.Double(a1 * cx1 + a2 * cy1 + ex,
-				       a3 * cx1 + a4 * cy1 + ey);
+        geo.getPointsModifiable().set(0, newCenter);
       }
-      edge.getGeometry().getPointsModifiable().set(0, newCenter);
       if (edge.getSource() == getNodeSubject() &&
 	  edge.getStartPoint() != null) {
 	edge.getStartPoint().setPoint(neo);
@@ -808,5 +991,5 @@ public class EditorGraph
 	private final IdentityHashMap<Subject, Subject> mOriginalMap;
 	private final LabelBlockSubject mBlockedEvents;
   private final Set<Subject> mChanged;
-  private boolean mNodeMoved = false;
+
 }

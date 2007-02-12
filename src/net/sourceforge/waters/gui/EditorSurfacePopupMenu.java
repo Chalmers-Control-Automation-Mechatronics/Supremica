@@ -4,14 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurfacePopupMenu
 //###########################################################################
-//# $Id: EditorSurfacePopupMenu.java,v 1.5 2007-01-30 08:51:28 flordal Exp $
+//# $Id: EditorSurfacePopupMenu.java,v 1.6 2007-02-12 21:38:49 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
 import java.awt.event.*;
-import java.util.List;
 import javax.swing.*;
 
 import org.supremica.util.VPopupMenu;
@@ -31,12 +30,9 @@ class EditorSurfacePopupMenu
 
   //#########################################################################
   //# Constructor
-  public EditorSurfacePopupMenu(final EditorWindowInterface master,
-				final List selectedObjects)
+  public EditorSurfacePopupMenu(final EditorWindowInterface master)
   {
     mMaster = master;
-    mSelectedObjects = selectedObjects;
-
     mDeleteItem = new JMenuItem("Delete selected objects");
     mDeleteItem.addActionListener(this);
     add(mDeleteItem);
@@ -56,7 +52,7 @@ class EditorSurfacePopupMenu
     final Object source = event.getSource();
     if (source == mDeleteItem) {
       final ControlledSurface surface = mMaster.getControlledSurface();
-      surface.deleteSelected();
+      surface.doDeleteSelected();
       hide();
     } else if (source == mCreateEventItem) {
       mMaster.createEvent();
@@ -71,7 +67,6 @@ class EditorSurfacePopupMenu
 
   //#########################################################################
   //# Data Members
-  private final List mSelectedObjects;
   private final EditorWindowInterface mMaster;
   private final JMenuItem mDeleteItem;
   private final JMenuItem mCreateEventItem;

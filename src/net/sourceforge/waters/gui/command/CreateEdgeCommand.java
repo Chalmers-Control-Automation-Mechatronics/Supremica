@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateEdgeCommand
 //###########################################################################
-//# $Id: CreateEdgeCommand.java,v 1.16 2007-02-02 02:55:13 robi Exp $
+//# $Id: CreateEdgeCommand.java,v 1.17 2007-02-12 21:38:49 robi Exp $
 //###########################################################################
 
 
@@ -12,8 +12,6 @@ package net.sourceforge.waters.gui.command;
 
 import java.awt.Point;
 import java.awt.geom.Point2D;
-import java.util.Collection;
-import java.util.Collections;
 
 import net.sourceforge.waters.gui.renderer.GeometryTools;
 import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
@@ -21,14 +19,11 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
-import net.sourceforge.waters.subject.module.SplineGeometrySubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
-
-import net.sourceforge.waters.xsd.module.SplineKind;
 
 
 /**
@@ -62,44 +57,29 @@ public class CreateEdgeCommand
   public CreateEdgeCommand(final GraphSubject graph,
                            final NodeSubject source,
                            final NodeSubject target,
-                           Point2D startPoint,
-                           Point2D endPoint)
+                           final Point2D startPoint,
+                           final Point2D endPoint)
   {
     mGraph = graph;
     final PointGeometrySubject startGeo;
     if (source instanceof SimpleNodeProxy) {
-      final SimpleNodeProxy simple = (SimpleNodeProxy) source;
-      startPoint = simple.getPointGeometry().getPoint();
       startGeo = null;
     } else {
       startGeo = new PointGeometrySubject(startPoint);
     }
     final PointGeometrySubject endGeo;
     if (target instanceof SimpleNodeProxy) {
-      final SimpleNodeProxy simple = (SimpleNodeProxy) target;
-      endPoint = simple.getPointGeometry().getPoint();
       endGeo = null;
     } else {
       endGeo = new PointGeometrySubject(endPoint);
     }
-    final Point2D point;
-    if (!startPoint.equals(endPoint)) {
-      point = GeometryTools.getMidPoint(startPoint, endPoint);
-    } else {
-      point = new Point((int) endPoint.getX() + 20,
-                        (int) endPoint.getY() + 20);
-    }
-    final Collection<Point2D> points = Collections.singleton(point);
     final LabelGeometrySubject offset =
       new LabelGeometrySubject(new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
                                          LabelBlockProxyShape.DEFAULTOFFSETY));
-    final LabelBlockSubject labelBlock = 
-      new LabelBlockSubject(null, offset);
-    final GuardActionBlockSubject guardActionBlock = null;
-    final SplineGeometrySubject spline = 
-      new SplineGeometrySubject(points, SplineKind.INTERPOLATING);
-    mCreated =	new EdgeSubject(source, target, labelBlock, guardActionBlock,
-                                spline, startGeo, endGeo);
+    final LabelBlockSubject labelBlock = new LabelBlockSubject(null, offset);
+    mCreated = new EdgeSubject(source, target, labelBlock, null,
+                               null, startGeo, endGeo);
+    GeometryTools.createDefaultGeometry(mCreated);
   }
 
   /**
@@ -126,6 +106,14 @@ public class CreateEdgeCommand
   public boolean isSignificant()
   {
     return true;
+  }
+
+  /**
+   * Gets the edge to be created by this command.
+   */
+  public EdgeSubject getCreatedEdge()
+  {
+    return mCreated;
   }
 
 

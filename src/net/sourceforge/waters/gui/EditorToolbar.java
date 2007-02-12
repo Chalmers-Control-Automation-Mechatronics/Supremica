@@ -1,10 +1,10 @@
-//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: waters.gui
 //# CLASS:   EditorToolbar
 //###########################################################################
-//# $Id: EditorToolbar.java,v 1.14 2006-11-03 15:01:56 torda Exp $
+//# $Id: EditorToolbar.java,v 1.15 2007-02-12 21:38:49 robi Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -36,35 +36,32 @@ public class EditorToolbar
 	//private static final Color SELECTIONCOLOR = new Color(255, 200, 240);
 	private static final Color SELECTIONCOLOR = new Color(255, 0, 240);
 	private List<Observer> mObservers = new ArrayList<Observer>();
-	//#########################################################################
-	//# Constructors
-	public EditorToolbar()
-	{
-		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));		
-		mLastSelected = createButton(ControlledSurface.Tool.SELECT.toString()
-                                 , "Select", true);
-		createButton(ControlledSurface.Tool.NODE.toString()
-                 , "Create Nodes", false);
-		createButton(ControlledSurface.Tool.NODEGROUP.toString()
-                 , "Create Group Nodes", false);
-		createButton(ControlledSurface.Tool.INITIAL.toString()
-                 , "Set Initial Node", false);
-		createButton(ControlledSurface.Tool.EDGE.toString()
-                 , "Create Edges", false);
-	}
 
-	//#########################################################################
-	//# Simple Access
 
-	/**
-	 * Find out which tool is currently selected
-	 * @return The ActionCommand for the currently selected tool
-	 *//*
-	public String getPlace()
-	{
-		return mGroup.getSelection().getActionCommand();
-	}
-	   */
+  //##########################################################################
+  //# Constructors
+  public EditorToolbar()
+  {
+    setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));		
+    mLastSelected = createButton(ControlledToolbar.Tool.SELECT.toString(),
+                                 "Select", true);
+    createButton(ControlledToolbar.Tool.NODE.toString(),
+                 "Create Nodes", false);
+    createButton(ControlledToolbar.Tool.GROUPNODE.toString(),
+                 "Create Group Nodes", false);
+    createButton(ControlledToolbar.Tool.EDGE.toString(),
+                 "Create Edges", false);
+  }
+
+
+  //##########################################################################
+  //# Interface net.sourceforge.waters.gui.ControlledToolbar
+  public ControlledToolbar.Tool getTool()
+  {
+    return Enum.valueOf(ControlledToolbar.Tool.class,
+                        mGroup.getSelection().getActionCommand());
+  }
+
 
 	//#########################################################################
 	//# Rendering Buttons
@@ -147,12 +144,6 @@ public class EditorToolbar
 		}
 	}
 
-  public ControlledSurface.Tool getCommand()
-  {
-		return Enum.valueOf(ControlledSurface.Tool.class
-                        , mGroup.getSelection().getActionCommand());
-  }
-	
 	public void attach(Observer o)
 	{
 		mObservers.add(o);

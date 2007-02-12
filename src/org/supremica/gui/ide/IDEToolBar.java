@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEToolBar
 //###########################################################################
-//# $Id: IDEToolBar.java,v 1.12 2006-11-03 15:01:57 torda Exp $
+//# $Id: IDEToolBar.java,v 1.13 2007-02-12 21:38:49 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -19,7 +19,7 @@ import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.ToolbarChangedEvent;
-import net.sourceforge.waters.gui.ControlledSurface;
+import net.sourceforge.waters.gui.ControlledToolbar;
 
 public class IDEToolBar
     extends JToolBar
@@ -122,9 +122,9 @@ public class IDEToolBar
         return collection.size();
     }
     
-    public ControlledSurface.Tool getCommand()
+    public ControlledToolbar.Tool getTool()
     {
-        return Enum.valueOf(ControlledSurface.Tool.class, command);
+        return Enum.valueOf(ControlledToolbar.Tool.class, command);
     }
     
     public void setCommand(String c)

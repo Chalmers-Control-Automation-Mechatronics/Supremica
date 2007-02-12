@@ -192,31 +192,15 @@ public class MoveObjects
   private class MoveEdge
     implements Command
   {
-    private final EdgeSubject mEdge;
-    private final SplineGeometrySubject mOrig;
-    private final SplineGeometrySubject mNew;
-    private final PointGeometrySubject mOStart;
-    private final PointGeometrySubject mNStart;
-    private final PointGeometrySubject mOEnd;
-    private final PointGeometrySubject mNEnd;
-    /*private final NodeSubject mOSour;
-    private final NodeSubject mNSour;
-    private final NodeSubject mOTarg;
-    private final NodeSubject mNTarg;*/
-
+    //#######################################################################
+    //# Constructor
     public MoveEdge(EdgeSubject orig, EdgeSubject dummy)
     {
       mEdge = orig;
-      if (mEdge.getGeometry() != null) {
-        mOrig = mEdge.getGeometry().clone();
-      } else {
-        final Collection<Point2D> points = Collections.singleton(
-        GeometryTools.getMidPoint(GeometryTools.getPosition(mEdge.getSource()),
-                                  GeometryTools.getPosition(mEdge.getTarget())
-                                  ));
-        mOrig = new SplineGeometrySubject(points, SplineKind.INTERPOLATING);
-      }
-      mNew = dummy.getGeometry().clone();
+      final SplineGeometrySubject oGeo = mEdge.getGeometry();
+      mOGeo = oGeo != null ? oGeo.clone() : null;
+      final SplineGeometrySubject nGeo = dummy.getGeometry();
+      mNGeo = nGeo != null ? nGeo.clone() : null;
       final PointGeometrySubject oStart = mEdge.getStartPoint();
       mOStart = oStart != null ? oStart.clone() : null;
       final PointGeometrySubject oEnd = mEdge.getEndPoint();
@@ -225,24 +209,20 @@ public class MoveObjects
       mNStart = nStart != null ? nStart.clone() : null;
       final PointGeometrySubject nEnd = dummy.getEndPoint();
       mNEnd = nEnd != null ? nEnd.clone() : null;
-   }
+    }
 
     public void execute()
     {
-      mEdge.setGeometry(mNew);
+      mEdge.setGeometry(mNGeo);
       mEdge.setStartPoint(mNStart);
       mEdge.setEndPoint(mNEnd);
-      //mEdge.setSource(mNSour);
-      //mEdge.setTarget(mNTarg);
     }
 
     public void undo()
     {
-      mEdge.setGeometry(mOrig);
+      mEdge.setGeometry(mOGeo);
       mEdge.setStartPoint(mOStart);
       mEdge.setEndPoint(mOEnd);
-      //mEdge.setSource(mOSour);
-      //mEdge.setTarget(mOTarg);
     }
 
     public boolean isSignificant()
@@ -254,30 +234,41 @@ public class MoveObjects
     {
       return "Move Edge";
     }
+
+    //#######################################################################
+    //# Data Members
+    private final EdgeSubject mEdge;
+    private final SplineGeometrySubject mOGeo;
+    private final SplineGeometrySubject mNGeo;
+    private final PointGeometrySubject mOStart;
+    private final PointGeometrySubject mNStart;
+    private final PointGeometrySubject mOEnd;
+    private final PointGeometrySubject mNEnd;
+
   }
 
   private class MoveLabelBlock
     implements Command
   {
     private final LabelBlockSubject mLabel;
-    private final LabelGeometrySubject mOrig;
-    private final LabelGeometrySubject mNew;
+    private final LabelGeometrySubject mOGeo;
+    private final LabelGeometrySubject mNGeo;
 
     public MoveLabelBlock(LabelBlockSubject orig, LabelBlockSubject dummy)
     {
       mLabel = orig;
-      mOrig = mLabel.getGeometry().clone();
-      mNew = dummy.getGeometry().clone();
+      mOGeo = mLabel.getGeometry().clone();
+      mNGeo = dummy.getGeometry().clone();
     }
 
     public void execute()
     {
-      mLabel.setGeometry(mNew);
+      mLabel.setGeometry(mNGeo);
     }
 
     public void undo()
     {
-      mLabel.setGeometry(mOrig);
+      mLabel.setGeometry(mOGeo);
     }
 
     public boolean isSignificant()
@@ -295,24 +286,24 @@ public class MoveObjects
   implements Command
 {
   private final GuardActionBlockSubject mGA;
-  private final LabelGeometrySubject mOrig;
-  private final LabelGeometrySubject mNew;
+  private final LabelGeometrySubject mOGeo;
+  private final LabelGeometrySubject mNGeo;
 
   public MoveGuardActionBlock(GuardActionBlockSubject orig, GuardActionBlockSubject dummy)
   {
     mGA = orig;
-    mOrig = mGA.getGeometry().clone();
-    mNew = dummy.getGeometry().clone();
+    mOGeo = mGA.getGeometry().clone();
+    mNGeo = dummy.getGeometry().clone();
   }
 
   public void execute()
   {
-    mGA.setGeometry(mNew);
+    mGA.setGeometry(mNGeo);
   }
 
   public void undo()
   {
-    mGA.setGeometry(mOrig);
+    mGA.setGeometry(mOGeo);
   }
 
   public boolean isSignificant()
