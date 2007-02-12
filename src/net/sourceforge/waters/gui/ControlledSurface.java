@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.111 2007-02-12 21:38:49 robi Exp $
+//# $Id: ControlledSurface.java,v 1.112 2007-02-12 22:07:19 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -321,11 +321,13 @@ public class ControlledSurface
       compound.addCommand(unselect);
     }
     final AddEventCommand add = new AddEventCommand(block, identifiers, pos);
-    final Collection<IdentifierSubject> added;
-    if (isSelected(block)) {
-      added = add.getAddedIdentifiers();
+    final Subject parent = block.getParent();
+    final Collection<ProxySubject> added = new LinkedList<ProxySubject>();
+    if (parent instanceof NodeSubject) {
+      final NodeSubject node = (NodeSubject) parent;
+      added.add(node);
     } else {
-      added = new LinkedList<IdentifierSubject>();
+      added.add(block);
       added.addAll(add.getAddedIdentifiers());
     }
     final Command select = new SelectCommand(this, added);
@@ -954,18 +956,20 @@ public class ControlledSurface
    */
   private void updateHighlighting()
   {
-    boolean needRepaint = false;
-    Collection<ProxySubject> objects = getObjectsAtPosition(mCurrentPoint);
-    ProxySubject object = null;
-    if (!objects.isEmpty()) {
-      object = Collections.max(objects, mComparator);
-      if (getHighlightPriority(object) < 0) {
-        object = null;
+    if (mCurrentPoint != null) {
+      boolean needRepaint = false;
+      Collection<ProxySubject> objects = getObjectsAtPosition(mCurrentPoint);
+      ProxySubject object = null;
+      if (!objects.isEmpty()) {
+        object = Collections.max(objects, mComparator);
+        if (getHighlightPriority(object) < 0) {
+          object = null;
+        }
       }
-    }
-    if (object != mFocusedObject) {
-      mFocusedObject = object;
-      repaint();
+      if (object != mFocusedObject) {
+        mFocusedObject = object;
+        repaint();
+      }
     }
   }
 
@@ -2092,16 +2096,21 @@ public class ControlledSurface
             getShapeProducer().getShape(block).getShape().getBounds();
           final double x1 = bounds.getMinX();
           final double x2 = bounds.getMaxX();
-          double y = bounds.getMinY();
-          for (final ProxySubject item : block.getEventListModifiable()) {
-            final ProxyShape shape = getShapeProducer().getShape(item);
-            final Rectangle2D rect = shape.getShape().getBounds();
-            if (point.getY() < rect.getCenterY()) {
-              y = rect.getMinY();
-              break;
-            } else {
-              y = rect.getMaxY();
+          double y;
+          if (elist == mFocusedObject) {
+            y = bounds.getMinY();
+            for (final ProxySubject item : block.getEventListModifiable()) {
+              final ProxyShape shape = getShapeProducer().getShape(item);
+              final Rectangle2D rect = shape.getShape().getBounds();
+              if (point.getY() < rect.getCenterY()) {
+                y = rect.getMinY();
+                break;
+              } else {
+                y = rect.getMaxY();
+              }
             }
+          } else {
+            y = bounds.getMaxY();
           }
           line = new Line2D.Double(x1, y, x2, y);
         }
@@ -2128,6 +2137,7 @@ public class ControlledSurface
     {
       final Point point = event.getLocation();
       commitDrag(point);
+      requestFocusInWindow();
       try {
         if (event.getDropTargetContext().getDropTarget().
               getDefaultActions() == DnDConstants.ACTION_COPY) {
