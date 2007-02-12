@@ -206,26 +206,61 @@ class AutomatonGenerator {
 		}
 		def result
 		result = collectionsAreEqual(generatedModule.eventDeclList, manualModule.eventDeclList); assert result[0], result[1]
-		result = collectionsAreEqual(generatedModule.componentList.graph.nodes, manualModule.componentList.graph.nodes); assert result[0], result[1]
-		result = collectionsAreEqual(generatedModule.componentList.graph.edges.source, manualModule.componentList.graph.edges.source); assert result[0], result[1]
-		result = collectionsAreEqual(generatedModule.componentList.graph.edges.target, manualModule.componentList.graph.edges.target); assert result[0], result[1]
-		result = collectionsAreEqual(generatedModule.componentList.graph.edges.labelBlock, manualModule.componentList.graph.edges.labelBlock); assert result[0], result[1]
-		result = collectionsAreEqual(generatedModule.componentList.graph.edges.guardActionBlock.guards, manualModule.componentList.graph.edges.guardActionBlock.guards); assert result[0], result[1]
-		result = collectionsAreEqual(generatedModule.componentList.graph.edges.guardActionBlock.actions, manualModule.componentList.graph.edges.guardActionBlock.actions); assert result[0], result[1] 
-		result = collectionsAreEqual(generatedModule.componentList.graph.edges.guardActionBlock.actions, manualModule.componentList.graph.edges.guardActionBlock.actions); assert result[0], result[1]
-		result = collectionsAreEqual(generatedModule.componentList.graph.edges.guardActionBlock, manualModule.componentList.graph.edges.guardActionBlock); assert result[0], result[1]
-		result = collectionsAreEqual(generatedModule.componentList.graph.edges, manualModule.componentList.graph.edges); assert result[0], result[1]
-		result = collectionsAreEqual(generatedModule.componentList.graph, manualModule.componentList.graph); assert result[0], result[1]
-		result = collectionsAreEqual(generatedModule.componentList.variables.type, manualModule.componentList.variables.type); assert result[0], result[1]
-		result = collectionsAreEqual(generatedModule.componentList.variables, manualModule.componentList.variables); assert result[0], result[1]
+		def generatedComponents = generatedModule.componentList.grep(SimpleComponentProxy.class) + generatedModule.componentList.grep(ForeachComponentProxy.class).body 
+		def manualComponents = manualModule.componentList.grep(SimpleComponentProxy.class) + manualModule.componentList.grep(ForeachComponentProxy.class).body 
+		result = collectionsAreEqual(generatedComponents.graph.nodes, manualComponents.graph.nodes); assert result[0], result[1]
+		result = collectionsAreEqual(generatedComponents.graph.edges.source, manualComponents.graph.edges.source); assert result[0], result[1]
+		result = collectionsAreEqual(generatedComponents.graph.edges.target, manualComponents.graph.edges.target); assert result[0], result[1]
+		result = collectionsAreEqual(generatedComponents.graph.edges.labelBlock, manualComponents.graph.edges.labelBlock); assert result[0], result[1]
+		result = collectionsAreEqual(generatedComponents.graph.edges.guardActionBlock.guards, manualComponents.graph.edges.guardActionBlock.guards); assert result[0], result[1]
+		result = collectionsAreEqual(generatedComponents.graph.edges.guardActionBlock.actions, manualComponents.graph.edges.guardActionBlock.actions); assert result[0], result[1] 
+		result = collectionsAreEqual(generatedComponents.graph.edges.guardActionBlock.actions, manualComponents.graph.edges.guardActionBlock.actions); assert result[0], result[1]
+		result = collectionsAreEqual(generatedComponents.graph.edges.guardActionBlock, manualComponents.graph.edges.guardActionBlock); assert result[0], result[1]
+		result = collectionsAreEqual(generatedComponents.graph.edges, manualComponents.graph.edges); assert result[0], result[1]
+		result = collectionsAreEqual(generatedComponents.graph, manualComponents.graph); assert result[0], result[1]
+		result = collectionsAreEqual(generatedComponents.variables.type, manualComponents.variables.type); assert result[0], result[1]
+		result = collectionsAreEqual(generatedComponents.variables, manualComponents.variables); assert result[0], result[1]
 		result = collectionsAreEqual(generatedModule.componentList, manualModule.componentList); assert result[0], result[1]
 		assert generatedModule.equalsByContents(manualModule)
-		assert false: 'fixa initialtillstånd'
+		assert false, 'fixa köer'
+		assert false, 'fixa initialtillstånd'
+		assert false, 'fixa range och konstanter'
+		assert false, 'fixa sensor -> sensor signal'
+		assert false, 'fixa control signal'
+		
 	}
 
 	ModuleProxy generate(Project project) {
 		ModuleBuilder builder = new ModuleBuilder()
 		
+		Closure addStates = { graph ->
+			(graph.sensor + graph.zone.findAll{!it.outsideSystemBoundry}).eachWithIndex { location, i ->
+				builder.state(name:formatStateName(location), initial:i == 0)
+				println formatStateName(location)
+			}
+			if (graph.zone.any{it.outsideSystemBoundry}) {
+				builder.state(name:OUTSIDE_SYSTEM_BOUNDRY_STATE_NAME)
+			}
+		}
+		Closure addTransitions  = { graph ->
+			graph.sensor.each { sensor ->
+				[true, false].each {incoming ->
+					(incoming ? incomingZones(sensor) : outgoingZones(sensor)).each { zone ->
+						def sensorCondition = incoming ? "!${sensor.name}" : null
+						builder.transition(from:formatStateName(incoming ? zone : sensor),
+		                                   to:formatStateName(incoming ? sensor: zone),
+	                                       events:[formatEventName(sensor, zone, incoming) + (graph.maxNrOfObjects > 1 ? "[INDEX_NAME]" : '')],
+	                                       guard:incoming ? "!${sensor.name}" : null) {
+							action("${sensor.name} = ${incoming ? 1 : 0}")
+							if (graph.maxNrOfObjects != 1 && !zone.outsideSystemBoundry) {
+								action("${formatZoneVariableName(zone)} ${incoming ? '-' : '+'}= 1")
+							}
+						}
+					}
+				}
+			}
+		}
+
 		builder.module(name:project.name) {
 			project.sensor.each { sensor -> 
 				builder.booleanVariable(name:sensor.name, initial:false)
@@ -238,11 +273,11 @@ class AutomatonGenerator {
 			project.graph.sensor.each {sensor ->
 				outgoingZones(sensor).each { zone ->
 					builder.event(name:formatEventName(sensor, zone, false),
-					              controllable:false)
+					              controllable:false, ranges:sensor.graph.maxNrOfObjects > 1 ? [0..sensor.graph.maxNrOfObjects-1] : null)
 				}
 				incomingZones(sensor).each { zone ->
 					builder.event(name:formatEventName(sensor, zone, true),
-				                  controllable:false)
+				                  controllable:false, ranges:sensor.graph.maxNrOfObjects > 1 ? [0..sensor.graph.maxNrOfObjects-1] : null)
 				}
 			}
 			project.graph.findAll{it.nrOfObjectsIsUnbounded}.sensor.each { sensor ->
@@ -267,26 +302,17 @@ class AutomatonGenerator {
 					}
 				}
 			}
-			project.graph.findAll{it.maxNrOfObjects == 1}.each {graph ->
+			project.graph.findAll{it.maxNrOfObjects == 1}.each { graph ->
 				builder.plant(name:graph.name) {
-					(graph.sensor + graph.zone.findAll{!it.outsideSystemBoundry}).eachWithIndex { location, i ->
-						builder.state(name:formatStateName(location), initial:i == 0)
-					}
-					if (graph.zone.any{it.outsideSystemBoundry}) {
-						builder.state(name:OUTSIDE_SYSTEM_BOUNDRY_STATE_NAME)
-					}
-					graph.sensor.each { sensor ->
-						[true, false].each {incoming ->
-							(incoming ? incomingZones(sensor) : outgoingZones(sensor)).each { zone ->
-								def sensorCondition = incoming ? "!${sensor.name}" : null
-								builder.transition(from:formatStateName(incoming ? zone : sensor),
-						                           to:formatStateName(incoming ? sensor: zone),
-					                               events:[formatEventName(sensor, zone, incoming)],
-					                               guard:incoming ? "!${sensor.name}" : null) {
-									action("${sensor.name} = ${incoming ? 1 : 0}")
-								}
-							}
-						}
+					addStates(graph)
+					addTransitions(graph)
+				}
+			}
+			project.graph.findAll{it.maxNrOfObjects > 1}.each { graph ->
+				builder.foreach(name:INDEX_NAME, range:0..graph.maxNrOfObjects) {
+					builder.plant(name:"${graph.name}[${INDEX_NAME}]") {
+						addStates(graph)
+						addTransitions(graph)
 					}
 				}
 			}
@@ -295,7 +321,8 @@ class AutomatonGenerator {
 	}
 	
 	final static OUTSIDE_SYSTEM_BOUNDRY_STATE_NAME = 'outside'
-
+	final static INDEX_NAME = 'i'
+	
 	private formatStateName(SensorNode sensor) {
 		sensor.name
 	}
@@ -319,9 +346,6 @@ class AutomatonGenerator {
 	}
 	
 	private String formatZoneVariableName(zone) {
-		//def sensorsOfZone = [zone.back, zone.front].grep(SensorNode.class)
-		//def zonesWithSameSensors = zone.graph.zone.findAll{it.bounded && [it.front, it.back].grep(SensorNode.class) == sensorsOfZone}
-		//def suffix = zonesWithSameSensors.size() > 1 ? "_${zonesWithSameSensors.indexOf(zone)}" : ''
 		"${zone.graph.name}_${formatStateName(zone)}"
 	}
 	

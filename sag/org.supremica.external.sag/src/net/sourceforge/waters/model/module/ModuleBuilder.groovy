@@ -142,7 +142,7 @@ class ModuleBuilder extends BuilderSupport {
 		case 'action':
 			return parser.parse(value)
 		}
-		assert false
+		assert false, "name:$name, value:$value"
 	}
 
 	def createNode(name, Map attributes){
