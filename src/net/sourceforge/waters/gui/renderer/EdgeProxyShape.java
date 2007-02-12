@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   EdgeProxyShape
 //###########################################################################
-//# $Id: EdgeProxyShape.java,v 1.11 2007-02-02 02:55:13 robi Exp $
+//# $Id: EdgeProxyShape.java,v 1.12 2007-02-12 03:54:09 siw4 Exp $
 //###########################################################################
 
 
@@ -46,9 +46,9 @@ public abstract class EdgeProxyShape
                 GeometryTools.getPosition(edge.getSource()),
                 GeometryTools.getPosition(edge.getTarget()));
         }
-	mStart = GeometryTools.getStartPoint(edge);
-	mEnd = GeometryTools.getEndPoint(edge);
-      mHandles = new ArrayList<Handle>(2);
+        mStart = GeometryTools.getStartPoint(edge);
+        mEnd = GeometryTools.getEndPoint(edge);
+        mHandles = new ArrayList<Handle>(2);
     }
     
     public List<Handle> getHandles()

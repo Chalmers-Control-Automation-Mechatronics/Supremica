@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   GeometryTools
 //###########################################################################
-//# $Id: GeometryTools.java,v 1.7 2007-02-02 04:12:49 robi Exp $
+//# $Id: GeometryTools.java,v 1.8 2007-02-12 03:54:09 siw4 Exp $
 //###########################################################################
 
 
@@ -85,20 +85,24 @@ public final class GeometryTools
    */
   public static Point2D getStartPoint(final EdgeProxy edge)
   {
-    final PointGeometryProxy pointGeo = edge.getStartPoint();
-    if (pointGeo == null) {
-      final NodeProxy source = edge.getSource();
-      final SplineGeometryProxy edgeGeo = edge.getGeometry();
-      final Point2D aux;
-      if (edgeGeo == null || edgeGeo.getPoints().isEmpty()) {
-        final NodeProxy target = edge.getTarget();
-        aux = getPosition(target);
+    if (edge.getSource() instanceof GroupNodeProxy) {
+      final PointGeometryProxy pointGeo = edge.getStartPoint();
+      if (pointGeo == null) {
+        final NodeProxy source = edge.getSource();
+        final SplineGeometryProxy edgeGeo = edge.getGeometry();
+        final Point2D aux;
+        if (edgeGeo == null || edgeGeo.getPoints().isEmpty()) {
+          final NodeProxy target = edge.getTarget();
+          aux = getPosition(target);
+        } else {
+          aux = edgeGeo.getPoints().get(0);
+        }
+        return defaultPosition(source, aux);
       } else {
-        aux = edgeGeo.getPoints().get(0);
+        return pointGeo.getPoint();
       }
-      return defaultPosition(source, aux);
     } else {
-      return pointGeo.getPoint();
+      return getPosition(edge.getSource());
     }
   }
 
@@ -110,21 +114,25 @@ public final class GeometryTools
    */
   public static Point2D getEndPoint(final EdgeProxy edge)
   {
-    final PointGeometryProxy pointGeo = edge.getEndPoint();
-    if (pointGeo == null) {
-      final NodeProxy target = edge.getTarget();
-      final SplineGeometryProxy edgeGeo = edge.getGeometry();
-      final Point2D aux;
-      if (edgeGeo == null || edgeGeo.getPoints().isEmpty()) {
-        final NodeProxy source = edge.getSource();
-        aux = getPosition(source);
+    if (edge.getTarget() instanceof GroupNodeProxy) {
+      final PointGeometryProxy pointGeo = edge.getEndPoint();
+      if (pointGeo == null) {
+        final NodeProxy target = edge.getTarget();
+        final SplineGeometryProxy edgeGeo = edge.getGeometry();
+        final Point2D aux;
+        if (edgeGeo == null || edgeGeo.getPoints().isEmpty()) {
+          final NodeProxy source = edge.getSource();
+          aux = getPosition(source);
+        } else {
+          final int index = edgeGeo.getPoints().size() - 1;
+          aux = edgeGeo.getPoints().get(index);
+        }
+        return defaultPosition(target, aux);
       } else {
-        final int index = edgeGeo.getPoints().size() - 1;
-        aux = edgeGeo.getPoints().get(index);
+        return pointGeo.getPoint();
       }
-      return defaultPosition(target, aux);
     } else {
-      return pointGeo.getPoint();
+      return getPosition(edge.getTarget());
     }
   }
 

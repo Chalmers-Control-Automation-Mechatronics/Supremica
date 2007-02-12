@@ -1,5 +1,6 @@
 package net.sourceforge.waters.analysis.modular;
 
+import java.util.HashSet;
 import java.util.Set;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import java.util.HashMap;
@@ -11,19 +12,17 @@ import net.sourceforge.waters.model.des.TraceProxy;
 
 public class CheckSuffix
 {
-  public static void checkSuffix(TraceProxy counter, Set<AutomatonProxy> plants,
-                                 Set<AutomatonProxy> specs)
+  public static Set<AutomatonProxy> checkSuffix(TraceProxy counter, Set<AutomatonProxy> plants,
+                                                       Set<AutomatonProxy> specs)
   {
     boolean none = true;
+    Set<AutomatonProxy> nonsuffixs = new HashSet<AutomatonProxy>();
     for (AutomatonProxy plant : plants) {
       if (accepts(plant, counter) == 0) {
-        none = false;
-        System.out.println(plant.getName());
+        nonsuffixs.add(plant);
       }
     }
-    if (none) {
-      System.out.println("none");
-    }
+    return nonsuffixs;
   }
   
   protected static int accepts(AutomatonProxy automaton, TraceProxy counterExample)

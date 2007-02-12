@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   SubjectShapeProducer
 //###########################################################################
-//# $Id: SubjectShapeProducer.java,v 1.22 2007-02-02 02:55:13 robi Exp $
+//# $Id: SubjectShapeProducer.java,v 1.23 2007-02-12 03:54:09 siw4 Exp $
 //###########################################################################
 
 
@@ -143,6 +143,14 @@ public class SubjectShapeProducer
 							LabelBlockProxyShape.DEFAULTOFFSETY));
 				edge.getLabelBlock().setGeometry(offset);
 			}
+      /*if(edge.getStartPoint() != null
+         && edge.getSource() instanceof SimpleNodeProxy) {
+        edge.setStartPoint(null);
+      }
+      if(edge.getEndPoint() != null
+         && edge.getTarget() instanceof SimpleNodeProxy) {
+        edge.setEndPoint(null);
+      }*/
 			if(edge.getGuardActionBlock() == null) {
 				//do nothing
 				/*

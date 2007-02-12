@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.25 2007-02-06 04:31:47 siw4 Exp $
+//# $Id: SpringEmbedder.java,v 1.26 2007-02-12 03:54:09 siw4 Exp $
 //###########################################################################
 
 
@@ -573,8 +573,6 @@ public class SpringEmbedder
     {
       final Point2D point = getNewPoint();
       mGeometry.getPointsModifiable().set(0, point);
-      mStart.setPoint(mSource.getNewPoint());
-      mEnd.setPoint(mTarget.getNewPoint());
     }
 
 

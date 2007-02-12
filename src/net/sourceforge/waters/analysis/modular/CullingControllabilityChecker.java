@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularControllabilityChecker
 //###########################################################################
-//# $Id: CullingControllabilityChecker.java,v 1.2 2007-01-03 00:49:08 robi Exp $
+//# $Id: CullingControllabilityChecker.java,v 1.3 2007-02-12 03:54:09 siw4 Exp $
 //###########################################################################
 
 
@@ -47,7 +47,7 @@ public class CullingControllabilityChecker
   private KindTranslator mTranslator;
   private int mStates;
   private final boolean mLeast;
-  private static ModularHeuristic ALL = new AllHeuristic(HeuristicType.NOPREF);
+  static ModularHeuristic ALL = new AllHeuristic(HeuristicType.NOPREF);
   private final PrintStream mOut;
  
   public CullingControllabilityChecker(ProductDESProxy model,
