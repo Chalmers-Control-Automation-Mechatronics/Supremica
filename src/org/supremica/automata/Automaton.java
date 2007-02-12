@@ -576,6 +576,11 @@ public class Automaton
         return result;
     }
 
+    public boolean isInAlphabet(LabeledEvent event)
+    {
+		return alphabet.contains(event);
+	}
+
     /**
      * If a state with this id (and/or name?) already exists, return the existing state
      * Else, add this state and return it
@@ -1312,6 +1317,14 @@ public class Automaton
     public Alphabet getAlphabet()
     {
         return alphabet;
+    }
+
+    /**
+     * Returns the observable alphabet of the automaton.
+     */
+    public Alphabet getObservableAlphabet()
+    {
+        return new Alphabet(alphabet, false);
     }
 
     /**

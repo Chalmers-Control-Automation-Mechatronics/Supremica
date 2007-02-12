@@ -77,13 +77,22 @@ public class Alphabet
 
     public Alphabet(Alphabet orgAlphabet)
     {
+        this(orgAlphabet, true);
+    }
+
+    public Alphabet(Alphabet orgAlphabet, boolean keepUnobservable)
+    {
         this();
 
         for (Iterator<LabeledEvent> it = orgAlphabet.iterator(); it.hasNext(); )
         {
-            LabeledEvent newEvent = new LabeledEvent(it.next());
+			LabeledEvent orgEvent = it.next();
 
-            theEvents.put(newEvent.getLabel(), newEvent);
+			if (keepUnobservable || orgEvent.isObservable())
+			{
+            	LabeledEvent newEvent = new LabeledEvent(orgEvent);
+            	theEvents.put(newEvent.getLabel(), newEvent);
+			}
         }
 
         idIndex = orgAlphabet.idIndex;
@@ -652,30 +661,6 @@ public class Alphabet
      */
     public void union(Alphabet other)
     {
-                /*
-                for (Iterator alphIt = other.iterator(); alphIt.hasNext(); )
-                {
-                        LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-
-                        if (!contains(currEvent))
-                        {
-                                LabeledEvent newEvent = new LabeledEvent(currEvent);
-
-                                // newEvent.setId(getUniqueId("e"));
-                                try
-                                {
-                                        addEvent(newEvent);
-                                }
-                                catch (Exception ex)
-                                {
-                    // This should be impossible
-                                        logger.error("Alphabet.union. Trying to add an existing event. " + ex);
-                                        logger.debug(ex.getStackTrace());
-                                }
-                        }
-                }
-                 */
-
         theEvents.putAll(other.theEvents);
     }
 

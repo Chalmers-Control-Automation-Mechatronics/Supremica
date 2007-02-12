@@ -853,29 +853,27 @@ public class Automata
      */
     public Alphabet getUnionAlphabet()
     {
-                /*
-                if (size() == 0)
-                {
-                        return new Alphabet();
-                }
-
-                try
-                {
-                        // If consistency is important, that has to be said explicitly
-                        return AlphabetHelpers.getUnionAlphabet(this, false, false);
-                }
-                catch (Exception ex)
-                {
-                        throw new RuntimeException(ex);
-                }
-                 */
-
         // Add all alphabets to a new one...
         Alphabet unionAlphabet = new Alphabet();
         // Examine each automata
         for (Automaton automaton : this)
         {
             unionAlphabet.union(automaton.getAlphabet());
+        }
+        return unionAlphabet;
+    }
+
+    /**
+     * Returns the union alphabet of all observable events in the represented automata.
+     */
+    public Alphabet getObservableUnionAlphabet()
+    {
+        // Add all alphabets to a new one...
+        Alphabet unionAlphabet = new Alphabet();
+        // Examine each automata
+        for (Automaton automaton : this)
+        {
+            unionAlphabet.union(automaton.getObservableAlphabet());
         }
         return unionAlphabet;
     }

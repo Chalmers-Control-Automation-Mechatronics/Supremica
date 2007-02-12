@@ -1029,6 +1029,7 @@ public class State
         return result;
     }
 
+
     /**
      * Returns true if this state has an outgoing arc for this event .
      */
