@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   VariableSubject
 //###########################################################################
-//# $Id: VariableSubject.java,v 1.7 2007-01-29 14:28:48 torda Exp $
+//# $Id: VariableSubject.java,v 1.8 2007-02-12 08:34:07 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -266,114 +266,6 @@ public final class VariableSubject
     fireModelChanged(event);
   }
 
-  //Methods for convenient handling of integer variables 
-  public VariableSubject(final String name,
-          final int lowerBound,
-          final int upperBound,
-          final int initialValue,
-          final Integer markedValue) {
-	  setName(name);
-	  setAsInteger(lowerBound, upperBound, initialValue, markedValue);
-  }
-
-  public boolean isInteger() {
-	  return getType() instanceof BinaryExpressionProxy &&
-	         ((BinaryExpressionProxy) getType()).getLeft() instanceof IntConstantProxy &&
-	         ((BinaryExpressionProxy) getType()).getRight() instanceof IntConstantProxy;
-  }
-
-   public void setAsInteger(final int lowerBound, final int upperBound,
-			final int initialValue, final Integer markedValue) {
-	   if (initialValue > upperBound || initialValue < lowerBound) {
-			throw new IllegalArgumentException(
-					"Initial value is not within the specified range");
-	   }
-	   if (markedValue != null && (markedValue > getUpperBound() || markedValue < getLowerBound())) {
-			  throw new IllegalArgumentException("Marked value is not within the specified range");
-	   }
-		
-	   ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
-	   setType(factory.createBinaryExpressionProxy(CompilerOperatorTable
-				.getInstance().getBinaryOperator(".."), factory
-				.createIntConstantProxy(lowerBound), factory
-				.createIntConstantProxy(upperBound)));
-
-	   setInitialValue(factory.createIntConstantProxy(initialValue));
-
-	   setMarkedValue(markedValue == null ? null : factory.createIntConstantProxy(markedValue));
-	}
-
-  public Integer getUpperBound() {
-	  if (!isInteger()) {
-		  return null;
-	  }
-	  return ((IntConstantProxy)((BinaryExpressionProxy) getType()).getRight()).getValue();
-  }
-  
-  public Integer getLowerBound() {
-	  if (!isInteger()) {
-		  return null;
-	  }
-	  return ((IntConstantProxy)((BinaryExpressionProxy) getType()).getLeft()).getValue();
-  }
-
-  public Integer getInitialIntegerValue() {
-	  if (!isInteger()) {
-		  return null;
-	  }
-	  return ((IntConstantProxy) getInitialValue()).getValue();
-  }
-
-  public Integer getMarkedIntegerValue() {
-	  if (!isInteger()) {
-		  return null;
-	  }
-	  if (getMarkedValue() == null) {
-		  return null;
-	  }
-	  return ((IntConstantProxy) getMarkedValue()).getValue();
-  }
-
-  //Methods for convenient handling of boolean variables 
-  public VariableSubject(final String name,
-                         final boolean initialValue,
-                         final Boolean markedValue)
-    {
-      setAsBoolean(initialValue, markedValue);
-    }
-  
-  public void setAsBoolean(final boolean initialValue, final Boolean markedValue) {
-	   	
-	   ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
-	   setType(factory.createSimpleIdentifierProxy(NAME_OF_BOOLEAN_TYPE));
-
-	   setInitialValue(factory.createBooleanConstantProxy(initialValue));
-
-	   setMarkedValue(markedValue == null ? null : factory.createBooleanConstantProxy(markedValue));
-	}
-
-  public boolean isBoolean() {
-	  return getType() instanceof SimpleIdentifierProxy;
-  }
-  
-  public Boolean getInitialBooleanValue() {
-	  if (!isBoolean()) {
-		  return null;
-	  }
-	  return ((BooleanConstantProxy) getInitialValue()).isValue();
-  }
-
-  public Boolean getMarkedBooleanValue() {
-	  if (!isBoolean()) {
-		  return null;
-	  }
-	  if (getMarkedValue() == null) {
-		  return null;
-	  }
-	  return ((BooleanConstantProxy) getMarkedValue()).isValue();
-  }
-
-  
   //#########################################################################
   //# Data Members
   private String mName;
@@ -381,5 +273,4 @@ public final class VariableSubject
   private SimpleExpressionSubject mInitialValue;
   private SimpleExpressionSubject mMarkedValue;
 
-  public final static String NAME_OF_BOOLEAN_TYPE = "boolean";
 }

@@ -20,6 +20,7 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.VariableSubject;
+import net.sourceforge.waters.subject.module.VariableHelper;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 
 public class EditorEditVariableDialog extends JDialog
@@ -121,10 +122,10 @@ implements ActionListener{
 		} else {
 			setTitle("Edit variable");
 			//modify dialog according to variable type
-			if(variable.isInteger()) {
+			if(VariableHelper.isInteger(variable)) {
 				//integer variable
 				typeSelector.setSelectedItem("integer");
-			} else if(variable.isBoolean()) {
+			} else if(VariableHelper.isBoolean(variable)) {
 				//boolean variable
 				typeSelector.setSelectedItem("boolean");
 			} else {
@@ -221,12 +222,12 @@ implements ActionListener{
 		layout.setConstraints(booleanMarked, con);
 		booleanPanel.add(booleanMarked);
 
-		if(mVariable != null && mVariable.isBoolean()) {
+		if(mVariable != null && VariableHelper.isBoolean(mVariable)) {
 			//set initial value
-			booleanInitial.setSelectedItem(mVariable.getInitialBooleanValue().toString());
+			booleanInitial.setSelectedItem(VariableHelper.getInitialBooleanValue(mVariable).toString());
 			//set marked value
 			if(mVariable.getMarkedValue() != null) {
-				booleanMarked.setSelectedItem(mVariable.getMarkedBooleanValue().toString());
+				booleanMarked.setSelectedItem(VariableHelper.getMarkedBooleanValue(mVariable).toString());
 			} else {
 				booleanMarked.setSelectedItem("none");
 			}
@@ -299,18 +300,18 @@ implements ActionListener{
 		layout.setConstraints(integerMarked, con);
 		integerPanel.add(integerMarked);
 
-		if(mVariable != null && mVariable.isInteger()) {
+		if(mVariable != null && VariableHelper.isInteger(mVariable)) {
 			//set range values
 			BinaryExpressionProxy range = (BinaryExpressionProxy) mVariable.getType();
-			rangeLower.setText(Integer.toString(mVariable.getLowerBound()));
-			rangeUpper.setText(Integer.toString(mVariable.getUpperBound()));
+			rangeLower.setText(Integer.toString(VariableHelper.getLowerBound(mVariable)));
+			rangeUpper.setText(Integer.toString(VariableHelper.getUpperBound(mVariable)));
 
 			//set initial value
-			integerInitial.setText(Integer.toString(mVariable.getInitialIntegerValue()));
+			integerInitial.setText(Integer.toString(VariableHelper.getInitialIntegerValue(mVariable)));
 
 			//set marked value
 			if(mVariable.getMarkedValue() != null) {
-				integerMarked.setText(mVariable.getMarkedIntegerValue().toString());
+				integerMarked.setText(VariableHelper.getMarkedIntegerValue(mVariable).toString());
 			}
 		} else {
 			//enter default values
@@ -405,16 +406,16 @@ implements ActionListener{
 					return;
 				}
 				if (mVariable == null) {
-					mVariable = new VariableSubject(name.getText(), intLower, intUpper, intInitial, intMarked);
+					mVariable = VariableHelper.createIntegerVariable(name.getText(), intLower, intUpper, intInitial, intMarked);
 				} else {
-					mVariable.setAsInteger(intLower, intUpper, intInitial, intMarked);
+					VariableHelper.setAsInteger(mVariable, intLower, intUpper, intInitial, intMarked);
 				}
 			} else { //if boolean
 				String markedValueString = booleanMarked.getSelectedItem().toString();
 				if (mVariable == null) {
-					mVariable = new VariableSubject(name.getText(), booleanInitial.getSelectedItem().equals("true"), markedValueString.equals("none") ? null : markedValueString.equals("true"));
+					mVariable = VariableHelper.createBooleanVariable(name.getText(), booleanInitial.getSelectedItem().equals("true"), markedValueString.equals("none") ? null : markedValueString.equals("true"));
 				} else {
-					mVariable.setAsBoolean(booleanInitial.getSelectedItem().equals("true"), markedValueString.equals("none") ? null : markedValueString.equals("true"));
+					VariableHelper.setAsBoolean(mVariable, booleanInitial.getSelectedItem().equals("true"), markedValueString.equals("none") ? null : markedValueString.equals("true"));
 				}
 			}
 			mVariable.setName(name.getText());
