@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   EditorRunEmbedderAction
 //###########################################################################
-//# $Id: EditorRunEmbedderAction.java,v 1.7 2007-01-04 13:50:10 flordal Exp $
+//# $Id: EditorRunEmbedderAction.java,v 1.8 2007-02-13 22:38:09 siw4 Exp $
 //###########################################################################
 
 
@@ -68,7 +68,8 @@ public class EditorRunEmbedderAction
 		final ControlledSurface surface =
 			ide.getIDE().getActiveEditorWindowInterface().
 			getControlledSurface();
-        final GraphSubject graph = surface.getGraph();
+      surface.runEmbedder();
+      /*  final GraphSubject graph = surface.getGraph();
         if (graph != null) {
 			SpringEmbedder.stopAll();
 			try {
@@ -85,12 +86,12 @@ public class EditorRunEmbedderAction
 				dialog.setLocationRelativeTo(surface);
 				dialog.setVisible(true);
 				thread.start();
-			} catch (final GeometryAbsentException exception) {
+			} catch (final Exception exception) {
 				JOptionPane.showMessageDialog(ide.getFrame(),
 											  "Graph is not layoutable!",
 											  "Alert",
 											  JOptionPane.ERROR_MESSAGE);
 			}
-        }
+        }*/
     }
 }

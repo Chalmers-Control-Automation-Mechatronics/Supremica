@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.27 2007-02-12 21:38:49 robi Exp $
+//# $Id: SpringEmbedder.java,v 1.28 2007-02-13 22:38:09 siw4 Exp $
 //###########################################################################
 
 
@@ -31,44 +31,80 @@ import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.subject.module.SplineGeometrySubject;
+import java.util.ArrayList;
 
 
 public class SpringEmbedder
-  implements Runnable
+  implements Runnable, EmbedderSubject
 {
 
   //#########################################################################
   //# Constructors
   public SpringEmbedder(GraphSubject graph)
-    throws GeometryAbsentException
   {
     this(graph, 228424);
   }
+  
+  public SpringEmbedder(Collection<NodeSubject> nodes,
+                        Collection<EdgeSubject> edges)
+  {
+    this(nodes, edges, 228424);
+  }
 
   public SpringEmbedder(GraphSubject graph, final int seed)
-    throws GeometryAbsentException
+  {
+    this(graph.getNodesModifiable(), graph.getEdgesModifiable(), seed);
+  }
+  
+  public SpringEmbedder(Collection<NodeSubject> nodes,
+                        Collection<EdgeSubject> edges, int seed)
   {
     mRandom = new Random(seed);
-    mGraph = graph;
+    mNodes = nodes;
+    mEdges = edges;
+    mObservers = new ArrayList<EmbedderObserver>();
+  }
 
-    final Collection<NodeSubject> nodes = graph.getNodesModifiable();
-    final int numnodes = nodes.size();
+  public void addObserver(EmbedderObserver observer)
+  {
+    mObservers.add(observer);
+  }
+  
+  public void removeObserver(EmbedderObserver observer)
+  {
+    mObservers.remove(observer);
+  }
+  
+  private void fireEvent(EmbedderEvent event)
+  {
+    for (EmbedderObserver observer : mObservers) {
+      observer.embedderChanged(event);
+    }
+  }
+  
+  //#########################################################################
+  //# Interface java.lang.Runnable
+  public void run()
+  {
+    springEmbedders.add(this);
+    final int numnodes = mNodes.size();
     mNodeMap = new HashMap<SimpleNodeSubject,NodeWrapper>(numnodes);
-    final Collection<EdgeSubject> edges = graph.getEdgesModifiable();
-    final int numedges = edges.size();
-    mEdgeMap = new HashMap<EdgeSubject,EdgeWrapper>(edges.size());
-    for (final NodeSubject node : nodes) {
+    final int numedges = mEdges.size();
+    mEdgeMap = new HashMap<EdgeSubject,EdgeWrapper>(numedges);
+    for (final NodeSubject node : mNodes) {
       if (node instanceof SimpleNodeSubject) {
         final SimpleNodeSubject simple = (SimpleNodeSubject) node;
         final NodeWrapper wrapper = new NodeWrapper(simple);
         mNodeMap.put(simple, wrapper);
       } else {
-        throw new GeometryAbsentException
+        springEmbedders.remove(this);
+        return;
+        /*throw new GeometryAbsentException
           ("SpringEmbedder does not support nodes of type " +
-           node.getClass().getName() + "!");
+           node.getClass().getName() + "!");*/
       }
     }
-    for (final EdgeSubject edge : edges) {
+    for (final EdgeSubject edge : mEdges) {
       final EdgeWrapper wrapper = new EdgeWrapper(edge);
       mEdgeMap.put(edge, wrapper);
       for (final NodeWrapper node : mNodeMap.values()) {
@@ -82,15 +118,8 @@ public class SpringEmbedder
     mNodeEdgeRepulsion = NODEEDGE_REPULSION / numnodes;
     mEdgeRepulsion = EDGE_REPULSION / numedges;
     mCenter = (Point2D) POINT_CENTER.clone();
-  }
-
-
-  //#########################################################################
-  //# Interface java.lang.Runnable
-  public void run()
-  {
-    springEmbedders.add(this);
-
+    
+    fireEvent(new EmbedderEvent(EmbedderEventType.START));
     long stoptime = Long.MAX_VALUE;
 
     int count = 0;
@@ -121,6 +150,7 @@ public class SpringEmbedder
       });
     springEmbedders.remove(this);
     mFinished = true;
+    fireEvent(new EmbedderEvent(EmbedderEventType.STOP));
   }
   
   public int getProgress()
@@ -657,15 +687,17 @@ public class SpringEmbedder
   //#########################################################################
   //# Data Members
   private final Random mRandom;
-  private final GraphSubject mGraph;
-  private final Map<SimpleNodeSubject,NodeWrapper> mNodeMap;
-  private final Map<EdgeSubject,EdgeWrapper> mEdgeMap;
-  private final Set<GeometryWrapper> mWrapperSet;
-  private final double mBackgroundAttraction;
-  private final double mNodeRepulsion;
-  private final double mNodeEdgeRepulsion;
-  private final double mEdgeRepulsion;
-  private final Point2D mCenter;
+  private final Collection<NodeSubject> mNodes;
+  private final Collection<EdgeSubject> mEdges;
+  private final Collection<EmbedderObserver> mObservers;
+  private Map<SimpleNodeSubject,NodeWrapper> mNodeMap;
+  private Map<EdgeSubject,EdgeWrapper> mEdgeMap;
+  private Set<GeometryWrapper> mWrapperSet;
+  private double mBackgroundAttraction;
+  private double mNodeRepulsion;
+  private double mNodeEdgeRepulsion;
+  private double mEdgeRepulsion;
+  private Point2D mCenter;
 
   private double mInitialStateAttraction;
   private int mPass;

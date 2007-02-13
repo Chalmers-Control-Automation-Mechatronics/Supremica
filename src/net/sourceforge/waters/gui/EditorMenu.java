@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.34 2007-02-12 21:38:49 robi Exp $
+//# $Id: EditorMenu.java,v 1.35 2007-02-13 22:38:09 siw4 Exp $
 //###########################################################################
 
 
@@ -271,7 +271,7 @@ public class EditorMenu
 				final SpringEmbedder embedder = new SpringEmbedder(graph);
 				final Thread thread = new Thread(embedder);
 				thread.start();
-			} catch (final GeometryAbsentException exception) {
+			} catch (final Exception exception) {
 				JOptionPane.showMessageDialog(root.getFrame(),
 											  "Graph is not layoutable!",
 											  "Alert",

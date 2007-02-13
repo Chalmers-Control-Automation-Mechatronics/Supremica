@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.116 2007-02-13 04:22:01 robi Exp $
+//# $Id: ControlledSurface.java,v 1.117 2007-02-13 22:38:09 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -67,13 +67,18 @@ import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.*;
+import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
+import net.sourceforge.waters.gui.springembedder.EmbedderEvent;
+import net.sourceforge.waters.gui.springembedder.EmbedderObserver;
+import net.sourceforge.waters.gui.springembedder.EmbedderEventType;
 
 import org.supremica.properties.Config;
+import net.sourceforge.waters.gui.springembedder.SpringAbortDialog;
 
 
 public class ControlledSurface
   extends EditorSurface
-  implements Observer, ModelObserver
+  implements Observer, ModelObserver, EmbedderObserver
 {
   //#########################################################################
   //# Constructors
@@ -112,6 +117,50 @@ public class ControlledSurface
     this(graph, module, null, null);
   }
 
+  public void embedderChanged(EmbedderEvent event)
+  {
+    if (event.getType() == EmbedderEventType.START) {
+      for (final MouseListener listener : getMouseListeners()) {
+        removeMouseListener(listener);
+      }
+      for (final MouseMotionListener listener : getMouseMotionListeners()) {
+        removeMouseMotionListener(listener);
+      }
+      mController = new EmbedderListener();
+      addMouseListener(mController);
+      addMouseMotionListener(mController);
+      mExternalDragSource.createDefaultDragGestureRecognizer
+        (this, mExternalDragAction, mDGListener);
+      updateHighlighting();
+    } else {
+      final Command move =
+        new MoveObjects(mSecondaryGraph.getChanged(), getGraph());
+      mRoot.getUndoInterface().executeCommand(move);
+      mSecondaryGraph.removeModelObserver(ControlledSurface.this);
+      mSecondaryGraph = null;
+      mSecondaryShapeProducer = null;
+      updateTool();
+      repaint();
+    }
+  }
+  
+  public void runEmbedder()
+  {
+    mSecondaryGraph = new EditorGraph(getGraph());
+    mSecondaryShapeProducer = new SubjectShapeProducer(mSecondaryGraph, getModule());
+    mSecondaryGraph.addModelObserver(ControlledSurface.this);
+    final String name = "graph";
+    final long timeout = Config.GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT.get();
+    final SpringEmbedder embedder = new SpringEmbedder(mSecondaryGraph.getNodeSubjects()
+                                                       , mSecondaryGraph.getEdgeSubjects());
+    embedder.addObserver(this);
+    final Thread thread = new Thread(embedder);
+    final JDialog dialog =
+      new SpringAbortDialog(mRoot.getFrame(), name, embedder, timeout);
+    dialog.setLocationRelativeTo(mRoot.getFrame());
+    dialog.setVisible(true);
+    thread.start();
+  }
 
   //#########################################################################
   //# Simple Access
@@ -169,7 +218,15 @@ public class ControlledSurface
   //# Interface net.sourceforge.waters.subject.base.ModelObserver
   public void modelChanged(final ModelChangeEvent event)
   {
-    updateSize();
+    final Rectangle area = getDrawnAreaBounds();
+    final int extra = Config.GUI_EDITOR_GRID_SIZE.get() * 10;
+    final int x = area.width + extra;
+    final int y = area.height + extra;
+    final Dimension dim = new Dimension(x, y);
+    if (!dim.equals(getPreferredSize())) {
+      setPreferredSize(dim);
+      revalidate();
+    }
     updateError();
     updateHighlighting();
     repaint();
@@ -177,7 +234,7 @@ public class ControlledSurface
 
 
   //#########################################################################
-  //# Refresh Operations
+  //# Toolbar
   private void updateTool()
   {
     final ToolController controller;
@@ -223,26 +280,6 @@ public class ControlledSurface
       mExternalDragSource.createDefaultDragGestureRecognizer
         (this, mExternalDragAction, mDGListener);
       updateHighlighting();
-    }
-  }
-
-  /**
-   * Checks whether the graph size has changed, and if so, adjusts the
-   * panel's scroll bars.
-   */
-  private void updateSize()
-  {
-    if (mSecondaryGraph == null) {
-      // But do not bother while the user is dragging stuff around ...
-      final Rectangle area = getDrawnAreaBounds();
-      final int extra = Config.GUI_EDITOR_GRID_SIZE.get() * 10;
-      final int x = area.width + extra;
-      final int y = area.height + extra;
-      final Dimension dim = new Dimension(x, y);
-      if (!dim.equals(getPreferredSize())) {
-        setPreferredSize(dim);
-        revalidate();
-      }
     }
   }
 
@@ -741,12 +778,6 @@ public class ControlledSurface
 
   //#########################################################################
   //# Error Display
-  /**
-   * Updates the error display.
-   * This method calculates a list of nodegroups that intersect with
-   * nodes and therefore are considered as erronerous. They are
-   * rendered differently to point out errors to the user.
-   */
   private void updateError()
   {
     if (!mIsCommittingSecondaryGraph) {
@@ -771,9 +802,6 @@ public class ControlledSurface
     }
   }
 
-  /**
-   * Checks whether the given item is considered erroneous.
-   */
   private boolean isError(final ProxySubject subject)
   {
     return mError.contains(subject);
@@ -1131,6 +1159,10 @@ public class ControlledSurface
 
   }
 
+  private class EmbedderListener
+    extends ToolController
+  {
+  }
 
   //#########################################################################
   //# Inner Class SelectListener
@@ -1757,7 +1789,6 @@ public class ControlledSurface
       commitSecondaryGraph();
       clearSecondaryGraph();
       mIsCommittingSecondaryGraph = false;
-      updateSize();
       updateError();
     }
 
