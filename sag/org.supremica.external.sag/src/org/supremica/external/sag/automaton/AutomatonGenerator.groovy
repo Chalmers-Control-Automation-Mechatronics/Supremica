@@ -176,13 +176,13 @@ class AutomatonGenerator {
 					state(name:'y2')
 					state(name:'y4')
 					state(name:'between_y1_y2')
-					transition(from:'between_y1_y2', to:'y2', events:['object2_to_y2[i]'], guard:'!y2 & object2_between_y1_y2 > 0') {
-						action('y2 = 1')
-						action('object2_between_y1_y2 -= 1')
-					}
-					transition(from:'y1', to:'between_y1_y2', events:['object2_to_y2[i]'], guard:'object2_between_y1_y2 < 2') {
+					transition(from:'y1', to:'between_y1_y2', events:['object2_from_y1[i]'], guard:'object2_between_y1_y2 < 2') {
 						action('y1 = 0')
 						action('object2_between_y1_y2 += 1')
+					}
+					transition(from:'between_y1_y2', to:'y2', events:['object2_to_y2[i]'], guard:'!y2') {
+						action('y2 = 1')
+						action('object2_between_y1_y2 -= 1')
 					}
 				}
 			}
@@ -249,8 +249,8 @@ class AutomatonGenerator {
 						def sensorCondition = incoming ? "!${sensor.name}" : null
 						builder.transition(from:formatStateName(incoming ? zone : sensor),
 		                                   to:formatStateName(incoming ? sensor: zone),
-	                                       events:[formatEventName(sensor, zone, incoming) + (graph.maxNrOfObjects > 1 ? "[INDEX_NAME]" : '')],
-	                                       guard:incoming ? "!${sensor.name}" : null) {
+	                                       events:[formatEventName(sensor, zone, incoming) + (graph.maxNrOfObjects > 1 ? "[${INDEX_NAME}]" : '')],
+	                                       guard:formatGuard(sensor, zone, incoming)) {
 							action("${sensor.name} = ${incoming ? 1 : 0}")
 							if (graph.maxNrOfObjects != 1 && !zone.outsideSystemBoundry) {
 								action("${formatZoneVariableName(zone)} ${incoming ? '-' : '+'}= 1")
@@ -286,13 +286,10 @@ class AutomatonGenerator {
 					builder.state(name:'true')
 					[true, false].each {incoming ->
 						(incoming ? incomingZones(sensor) : outgoingZones(sensor)).each { zone ->
-							def comparison = incoming ? '> 0' : "< ${zone.capacity}"
-							def zoneCondition = zone.outsideSystemBoundry ? null : "${formatZoneVariableName(zone)} $comparison"
-							def sensorCondition = incoming ? "!${sensor.name}" : null
 							builder.transition(from:"${!incoming}",
 							                   to:"${incoming}",
 						                       events:[formatEventName(sensor, zone, incoming)],
-						                       guard:[sensorCondition, zoneCondition].findAll{it}.join(' & ')) {
+						                       guard:formatGuard(sensor, zone, incoming)) {
 								action("${sensor.name} = ${incoming ? 1 : 0}")
 								if (!zone.outsideSystemBoundry) {
 									action("${formatZoneVariableName(zone)} ${incoming ? '-' : '+'}= 1")
@@ -309,7 +306,7 @@ class AutomatonGenerator {
 				}
 			}
 			project.graph.findAll{it.maxNrOfObjects > 1}.each { graph ->
-				builder.foreach(name:INDEX_NAME, range:0..graph.maxNrOfObjects) {
+				builder.foreach(name:INDEX_NAME, range:0..graph.maxNrOfObjects - 1) {
 					builder.plant(name:"${graph.name}[${INDEX_NAME}]") {
 						addStates(graph)
 						addTransitions(graph)
@@ -354,5 +351,13 @@ class AutomatonGenerator {
 		def zones = (isSensorActivation ? incomingZones(sensor) : outgoingZones(sensor)) 
 		String suffix = zones.size() > 1 ? "_${zones.indexOf(zone)}" : ''
 		"$prefix${sensor.name}$suffix"
+	}
+	
+	private String formatGuard(SensorNode sensor, zone, isSensorActivation) {
+		def comparison = isSensorActivation ? '> 0' : "< ${zone.capacity}"
+		def zoneCondition = zone.bounded && zone.graph.maxNrOfObjects != 1 && (!isSensorActivation || zone.graph.nrOfObjectsIsUnbounded) ?
+		                        "${formatZoneVariableName(zone)} $comparison" : null
+		def sensorCondition = isSensorActivation ? "!${sensor.name}" : null
+        [sensorCondition, zoneCondition].findAll{it}.join(' & ')
 	}
 }

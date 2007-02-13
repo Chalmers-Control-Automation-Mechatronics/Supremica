@@ -153,10 +153,10 @@ class ModuleBuilder extends BuilderSupport {
 			module = node
 			break
 		case 'booleanVariable' :
-			node = new VariableSubject(attributes.name, 0, 1, attributes.initial ? 1 : 0, null);
+			node = VariableHelper.createIntegerVariable(attributes.name, 0, 1, attributes.initial ? 1 : 0, null);
 			break
 		case 'integerVariable' :
-			node = new VariableSubject(attributes.name, attributes.range.from, attributes.range.to, attributes.initial, null)
+			node = VariableHelper.createIntegerVariable(attributes.name, attributes.range.from, attributes.range.to, attributes.initial, null)
 			break
 		case 'event' :
 			node = factory.createEventDeclProxy(attributes.name,
