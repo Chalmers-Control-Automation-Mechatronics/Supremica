@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: Sensor.java,v 1.3 2007-01-23 09:55:48 torda Exp $
+ * $Id: Sensor.java,v 1.4 2007-02-13 16:50:51 torda Exp $
  */
 package org.supremica.external.sag;
 
@@ -19,8 +19,9 @@ import org.eclipse.emf.common.util.EList;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link org.supremica.external.sag.Sensor#getNode <em>Node</em>}</li>
- *   <li>{@link org.supremica.external.sag.Sensor#getProject <em>Project</em>}</li>
+ *   <li>{@link org.supremica.external.sag.Sensor#getName <em>Name</em>}</li>
+ *   <li>{@link org.supremica.external.sag.Sensor#getSignal <em>Signal</em>}</li>
+ *   <li>{@link org.supremica.external.sag.Sensor#isInitiallyActivated <em>Initially Activated</em>}</li>
  * </ul>
  * </p>
  *
@@ -28,67 +29,85 @@ import org.eclipse.emf.common.util.EList;
  * @model
  * @generated
  */
-public interface Sensor extends Named {
+public interface Sensor extends Node {
 	/**
-	 * Returns the value of the '<em><b>Node</b></em>' reference list.
-	 * The list contents are of type {@link org.supremica.external.sag.SensorNode}.
-	 * It is bidirectional and its opposite is '{@link org.supremica.external.sag.SensorNode#getSensor <em>Sensor</em>}'.
+	 * Returns the value of the '<em><b>Name</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Node</em>' reference isn't clear,
+	 * If the meaning of the '<em>Name</em>' attribute isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Node</em>' reference list.
-	 * @see org.supremica.external.sag.SagPackage#getSensor_Node()
-	 * @see org.supremica.external.sag.SensorNode#getSensor
-	 * @model type="org.supremica.external.sag.SensorNode" opposite="sensor" transient="true"
+	 * @return the value of the '<em>Name</em>' attribute.
+	 * @see #setName(String)
+	 * @see org.supremica.external.sag.SagPackage#getSensor_Name()
+	 * @model transient="true" volatile="true" derived="true"
 	 * @generated
 	 */
-	EList<SensorNode> getNode();
+	String getName();
 
 	/**
-	 * Returns the value of the '<em><b>Project</b></em>' container reference.
-	 * It is bidirectional and its opposite is '{@link org.supremica.external.sag.Project#getSensor <em>Sensor</em>}'.
+	 * Sets the value of the '{@link org.supremica.external.sag.Sensor#getName <em>Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Name</em>' attribute.
+	 * @see #getName()
+	 * @generated
+	 */
+	void setName(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Signal</b></em>' reference.
+	 * It is bidirectional and its opposite is '{@link org.supremica.external.sag.SensorSignal#getSensor <em>Sensor</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Project</em>' container reference isn't clear,
+	 * If the meaning of the '<em>Signal</em>' reference isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Project</em>' container reference.
-	 * @see #setProject(Project)
-	 * @see org.supremica.external.sag.SagPackage#getSensor_Project()
-	 * @see org.supremica.external.sag.Project#getSensor
+	 * @return the value of the '<em>Signal</em>' reference.
+	 * @see #setSignal(SensorSignal)
+	 * @see org.supremica.external.sag.SagPackage#getSensor_Signal()
+	 * @see org.supremica.external.sag.SensorSignal#getSensor
 	 * @model opposite="sensor" required="true"
 	 * @generated
 	 */
-	Project getProject();
+	SensorSignal getSignal();
 
 	/**
-	 * Sets the value of the '{@link org.supremica.external.sag.Sensor#getProject <em>Project</em>}' container reference.
+	 * Sets the value of the '{@link org.supremica.external.sag.Sensor#getSignal <em>Signal</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Project</em>' container reference.
-	 * @see #getProject()
+	 * @param value the new value of the '<em>Signal</em>' reference.
+	 * @see #getSignal()
 	 * @generated
 	 */
-	void setProject(Project value);
+	void setSignal(SensorSignal value);
 
 	/**
+	 * Returns the value of the '<em><b>Initially Activated</b></em>' attribute.
 	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Initially Activated</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
 	 * <!-- end-user-doc -->
-	 * @model annotation="http://www.eclipse.org/OCL/examples/ocl invariant='name <> \'\' and name <> null'"
+	 * @return the value of the '<em>Initially Activated</em>' attribute.
+	 * @see #setInitiallyActivated(boolean)
+	 * @see org.supremica.external.sag.SagPackage#getSensor_InitiallyActivated()
+	 * @model
 	 * @generated
 	 */
-	boolean validateName(DiagnosticChain diagnostics, Map<?, ?> context);
+	boolean isInitiallyActivated();
 
 	/**
+	 * Sets the value of the '{@link org.supremica.external.sag.Sensor#isInitiallyActivated <em>Initially Activated</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @model annotation="http://www.eclipse.org/OCL/examples/ocl invariant='project.sensor->forAll(s | s = self or s.name <> self.name)'"
+	 * @param value the new value of the '<em>Initially Activated</em>' attribute.
+	 * @see #isInitiallyActivated()
 	 * @generated
 	 */
-	boolean validateUniquenessOfName(DiagnosticChain diagnostics, Map<?, ?> context);
+	void setInitiallyActivated(boolean value);
 
 } // Sensor

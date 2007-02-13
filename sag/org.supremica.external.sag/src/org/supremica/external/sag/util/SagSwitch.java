@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagSwitch.java,v 1.4 2007-02-08 16:36:08 torda Exp $
+ * $Id: SagSwitch.java,v 1.5 2007-02-13 16:50:51 torda Exp $
  */
 package org.supremica.external.sag.util;
 
@@ -120,10 +120,10 @@ public class SagSwitch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case SagPackage.SENSOR: {
-				Sensor sensor = (Sensor)theEObject;
-				T result = caseSensor(sensor);
-				if (result == null) result = caseNamed(sensor);
+			case SagPackage.SENSOR_SIGNAL: {
+				SensorSignal sensorSignal = (SensorSignal)theEObject;
+				T result = caseSensorSignal(sensorSignal);
+				if (result == null) result = caseNamed(sensorSignal);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -135,10 +135,17 @@ public class SagSwitch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
-			case SagPackage.SENSOR_NODE: {
-				SensorNode sensorNode = (SensorNode)theEObject;
-				T result = caseSensorNode(sensorNode);
-				if (result == null) result = caseNode(sensorNode);
+			case SagPackage.SENSOR: {
+				Sensor sensor = (Sensor)theEObject;
+				T result = caseSensor(sensor);
+				if (result == null) result = caseNode(sensor);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case SagPackage.CONTROL_SIGNAL: {
+				ControlSignal controlSignal = (ControlSignal)theEObject;
+				T result = caseControlSignal(controlSignal);
+				if (result == null) result = caseNamed(controlSignal);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
@@ -222,6 +229,21 @@ public class SagSwitch<T> {
 	}
 
 	/**
+	 * Returns the result of interpretting the object as an instance of '<em>Sensor Signal</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpretting the object as an instance of '<em>Sensor Signal</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseSensorSignal(SensorSignal object) {
+		return null;
+	}
+
+	/**
 	 * Returns the result of interpretting the object as an instance of '<em>Sensor</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -237,6 +259,21 @@ public class SagSwitch<T> {
 	}
 
 	/**
+	 * Returns the result of interpretting the object as an instance of '<em>Control Signal</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpretting the object as an instance of '<em>Control Signal</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseControlSignal(ControlSignal object) {
+		return null;
+	}
+
+	/**
 	 * Returns the result of interpretting the object as an instance of '<em>End Node</em>'.
 	 * <!-- begin-user-doc -->
 	 * This implementation returns null;
@@ -248,21 +285,6 @@ public class SagSwitch<T> {
 	 * @generated
 	 */
 	public T caseEndNode(EndNode object) {
-		return null;
-	}
-
-	/**
-	 * Returns the result of interpretting the object as an instance of '<em>Sensor Node</em>'.
-	 * <!-- begin-user-doc -->
-	 * This implementation returns null;
-	 * returning a non-null result will terminate the switch.
-	 * <!-- end-user-doc -->
-	 * @param object the target of the switch.
-	 * @return the result of interpretting the object as an instance of '<em>Sensor Node</em>'.
-	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
-	 * @generated
-	 */
-	public T caseSensorNode(SensorNode object) {
 		return null;
 	}
 

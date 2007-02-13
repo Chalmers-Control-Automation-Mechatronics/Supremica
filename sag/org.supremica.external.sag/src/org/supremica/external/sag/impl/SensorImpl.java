@@ -2,9 +2,11 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SensorImpl.java,v 1.3 2007-01-23 09:55:48 torda Exp $
+ * $Id: SensorImpl.java,v 1.4 2007-02-13 16:50:51 torda Exp $
  */
 package org.supremica.external.sag.impl;
+
+import static org.supremica.external.sag.util.OclHelper.evaluate;
 
 import java.util.Collection;
 import java.util.Map;
@@ -36,9 +38,10 @@ import org.supremica.external.sag.Project;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
 import org.supremica.external.sag.Node;
+import org.supremica.external.sag.SagFactory;
 import org.supremica.external.sag.SagPackage;
 import org.supremica.external.sag.Sensor;
-import org.supremica.external.sag.SensorNode;
+import org.supremica.external.sag.SensorSignal;
 import org.supremica.external.sag.util.SagValidator;
 
 /**
@@ -48,40 +51,55 @@ import org.supremica.external.sag.util.SagValidator;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link org.supremica.external.sag.impl.SensorImpl#getNode <em>Node</em>}</li>
- *   <li>{@link org.supremica.external.sag.impl.SensorImpl#getProject <em>Project</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.SensorImpl#getName <em>Name</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.SensorImpl#getSignal <em>Signal</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.SensorImpl#isInitiallyActivated <em>Initially Activated</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class SensorImpl extends NamedImpl implements Sensor {
+public class SensorImpl extends NodeImpl implements Sensor {
 	/**
-	 * The cached value of the '{@link #getNode() <em>Node</em>}' reference list.
+	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getNode()
+	 * @see #getName()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<SensorNode> node = null;
+	protected static final String NAME_EDEFAULT = null;
 
 	/**
-	 * The parsed OCL expression for the definition of the '{@link #validateName <em>Validate Name</em>}' invariant constraint.
+	 * The cached value of the '{@link #getSignal() <em>Signal</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #validateName
+	 * @see #getSignal()
 	 * @generated
+	 * @ordered
 	 */
-	private static OCLExpression validateNameInvOCL;
+	protected SensorSignal signal = null;
+
 	/**
-	 * The parsed OCL expression for the definition of the '{@link #validateUniquenessOfName <em>Validate Uniqueness Of Name</em>}' invariant constraint.
+	 * The default value of the '{@link #isInitiallyActivated() <em>Initially Activated</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #validateUniquenessOfName
+	 * @see #isInitiallyActivated()
 	 * @generated
+	 * @ordered
 	 */
-	private static OCLExpression validateUniquenessOfNameInvOCL;
+	protected static final boolean INITIALLY_ACTIVATED_EDEFAULT = false;
+
+	/**
+	 * The cached value of the '{@link #isInitiallyActivated() <em>Initially Activated</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isInitiallyActivated()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean initiallyActivated = INITIALLY_ACTIVATED_EDEFAULT;
+
 	private static final String OCL_ANNOTATION_SOURCE = "http://www.eclipse.org/OCL/examples/ocl";
 
 	/**
@@ -106,13 +124,36 @@ public class SensorImpl extends NamedImpl implements Sensor {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
-	public EList<SensorNode> getNode() {
-		if (node == null) {
-			node = new EObjectWithInverseResolvingEList<SensorNode>(SensorNode.class, this, SagPackage.SENSOR__NODE, SagPackage.SENSOR_NODE__SENSOR);
+	public String getName() {
+		return getSignal() != null ? getSignal().getName() : null;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	public void setName(String newName) {
+		if (newName == null || newName.equals("")) {
+			return;
 		}
-		return node;
+		String oldName = getName();
+		SensorSignal existingSignalWithThisName = (SensorSignal) evaluate(this,
+				"graph.project.sensorSignal->any(name='"+newName+"')");
+		if (existingSignalWithThisName != null) {
+			setSignal(existingSignalWithThisName);
+		} else if (getSignal() != null) {
+			getSignal().setName(newName);
+		} else {
+			SensorSignal newSignal = SagFactory.eINSTANCE.createSensorSignal();
+			newSignal.setName(newName);
+			getGraph().getProject().getSensorSignal().add(newSignal);
+			setSignal(newSignal);
+		}
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.SENSOR__NAME, oldName, newName));
 	}
 
 	/**
@@ -120,9 +161,16 @@ public class SensorImpl extends NamedImpl implements Sensor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Project getProject() {
-		if (eContainerFeatureID != SagPackage.SENSOR__PROJECT) return null;
-		return (Project)eContainer();
+	public SensorSignal getSignal() {
+		if (signal != null && signal.eIsProxy()) {
+			InternalEObject oldSignal = (InternalEObject)signal;
+			signal = (SensorSignal)eResolveProxy(oldSignal);
+			if (signal != oldSignal) {
+				if (eNotificationRequired())
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE, SagPackage.SENSOR__SIGNAL, oldSignal, signal));
+			}
+		}
+		return signal;
 	}
 
 	/**
@@ -130,8 +178,22 @@ public class SensorImpl extends NamedImpl implements Sensor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public NotificationChain basicSetProject(Project newProject, NotificationChain msgs) {
-		msgs = eBasicSetContainer((InternalEObject)newProject, SagPackage.SENSOR__PROJECT, msgs);
+	public SensorSignal basicGetSignal() {
+		return signal;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain basicSetSignal(SensorSignal newSignal, NotificationChain msgs) {
+		SensorSignal oldSignal = signal;
+		signal = newSignal;
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this, Notification.SET, SagPackage.SENSOR__SIGNAL, oldSignal, newSignal);
+			if (msgs == null) msgs = notification; else msgs.add(notification);
+		}
 		return msgs;
 	}
 
@@ -140,20 +202,18 @@ public class SensorImpl extends NamedImpl implements Sensor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setProject(Project newProject) {
-		if (newProject != eInternalContainer() || (eContainerFeatureID != SagPackage.SENSOR__PROJECT && newProject != null)) {
-			if (EcoreUtil.isAncestor(this, newProject))
-				throw new IllegalArgumentException("Recursive containment not allowed for " + toString());
+	public void setSignal(SensorSignal newSignal) {
+		if (newSignal != signal) {
 			NotificationChain msgs = null;
-			if (eInternalContainer() != null)
-				msgs = eBasicRemoveFromContainer(msgs);
-			if (newProject != null)
-				msgs = ((InternalEObject)newProject).eInverseAdd(this, SagPackage.PROJECT__SENSOR, Project.class, msgs);
-			msgs = basicSetProject(newProject, msgs);
+			if (signal != null)
+				msgs = ((InternalEObject)signal).eInverseRemove(this, SagPackage.SENSOR_SIGNAL__SENSOR, SensorSignal.class, msgs);
+			if (newSignal != null)
+				msgs = ((InternalEObject)newSignal).eInverseAdd(this, SagPackage.SENSOR_SIGNAL__SENSOR, SensorSignal.class, msgs);
+			msgs = basicSetSignal(newSignal, msgs);
 			if (msgs != null) msgs.dispatch();
 		}
 		else if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.SENSOR__PROJECT, newProject, newProject));
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.SENSOR__SIGNAL, newSignal, newSignal));
 	}
 
 	/**
@@ -161,38 +221,8 @@ public class SensorImpl extends NamedImpl implements Sensor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public boolean validateName(DiagnosticChain diagnostics, Map<?, ?> context) {
-		if (validateNameInvOCL == null) {
-			EOperation eOperation = (EOperation) eClass().getEOperations().get(0);
-			Environment env = ExpressionsUtil.createClassifierContext(eClass());
-			EAnnotation ocl = eOperation.getEAnnotation(OCL_ANNOTATION_SOURCE);
-			String body = (String) ocl.getDetails().get("invariant");
-			
-			try {
-				validateNameInvOCL = ExpressionsUtil.createInvariant(env, body, true);
-			} catch (ParserException e) {
-				throw new UnsupportedOperationException(e.getLocalizedMessage());
-			}
-		}
-		
-		Query query = QueryFactory.eINSTANCE.createQuery(validateNameInvOCL);
-		EvalEnvironment evalEnv = new EvalEnvironment();
-		query.setEvaluationEnvironment(evalEnv);
-		
-		if (!query.check(this)) {
-			if (diagnostics != null) {
-				diagnostics.add
-					(new BasicDiagnostic
-						(Diagnostic.ERROR,
-						 SagValidator.DIAGNOSTIC_SOURCE,
-						 SagValidator.SENSOR__VALIDATE_NAME,
-						 EcorePlugin.INSTANCE.getString("_UI_GenericInvariant_diagnostic", new Object[] { "validateName", EObjectValidator.getObjectLabel(this, (Map<Object,Object>) context) }),
-						 new Object [] { this }));
-			}
-			return false;
-		}
-		return true;
-		
+	public boolean isInitiallyActivated() {
+		return initiallyActivated;
 	}
 
 	/**
@@ -200,38 +230,11 @@ public class SensorImpl extends NamedImpl implements Sensor {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public boolean validateUniquenessOfName(DiagnosticChain diagnostics, Map<?, ?> context) {
-		if (validateUniquenessOfNameInvOCL == null) {
-			EOperation eOperation = (EOperation) eClass().getEOperations().get(1);
-			Environment env = ExpressionsUtil.createClassifierContext(eClass());
-			EAnnotation ocl = eOperation.getEAnnotation(OCL_ANNOTATION_SOURCE);
-			String body = (String) ocl.getDetails().get("invariant");
-			
-			try {
-				validateUniquenessOfNameInvOCL = ExpressionsUtil.createInvariant(env, body, true);
-			} catch (ParserException e) {
-				throw new UnsupportedOperationException(e.getLocalizedMessage());
-			}
-		}
-		
-		Query query = QueryFactory.eINSTANCE.createQuery(validateUniquenessOfNameInvOCL);
-		EvalEnvironment evalEnv = new EvalEnvironment();
-		query.setEvaluationEnvironment(evalEnv);
-		
-		if (!query.check(this)) {
-			if (diagnostics != null) {
-				diagnostics.add
-					(new BasicDiagnostic
-						(Diagnostic.ERROR,
-						 SagValidator.DIAGNOSTIC_SOURCE,
-						 SagValidator.SENSOR__VALIDATE_UNIQUENESS_OF_NAME,
-						 EcorePlugin.INSTANCE.getString("_UI_GenericInvariant_diagnostic", new Object[] { "validateUniquenessOfName", EObjectValidator.getObjectLabel(this, (Map<Object,Object>) context) }),
-						 new Object [] { this }));
-			}
-			return false;
-		}
-		return true;
-		
+	public void setInitiallyActivated(boolean newInitiallyActivated) {
+		boolean oldInitiallyActivated = initiallyActivated;
+		initiallyActivated = newInitiallyActivated;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.SENSOR__INITIALLY_ACTIVATED, oldInitiallyActivated, initiallyActivated));
 	}
 
 	/**
@@ -243,12 +246,10 @@ public class SensorImpl extends NamedImpl implements Sensor {
 	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case SagPackage.SENSOR__NODE:
-				return ((InternalEList<InternalEObject>)(InternalEList<?>)getNode()).basicAdd(otherEnd, msgs);
-			case SagPackage.SENSOR__PROJECT:
-				if (eInternalContainer() != null)
-					msgs = eBasicRemoveFromContainer(msgs);
-				return basicSetProject((Project)otherEnd, msgs);
+			case SagPackage.SENSOR__SIGNAL:
+				if (signal != null)
+					msgs = ((InternalEObject)signal).eInverseRemove(this, SagPackage.SENSOR_SIGNAL__SENSOR, SensorSignal.class, msgs);
+				return basicSetSignal((SensorSignal)otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -261,10 +262,8 @@ public class SensorImpl extends NamedImpl implements Sensor {
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case SagPackage.SENSOR__NODE:
-				return ((InternalEList<?>)getNode()).basicRemove(otherEnd, msgs);
-			case SagPackage.SENSOR__PROJECT:
-				return basicSetProject(null, msgs);
+			case SagPackage.SENSOR__SIGNAL:
+				return basicSetSignal(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -275,26 +274,15 @@ public class SensorImpl extends NamedImpl implements Sensor {
 	 * @generated
 	 */
 	@Override
-	public NotificationChain eBasicRemoveFromContainerFeature(NotificationChain msgs) {
-		switch (eContainerFeatureID) {
-			case SagPackage.SENSOR__PROJECT:
-				return eInternalContainer().eInverseRemove(this, SagPackage.PROJECT__SENSOR, Project.class, msgs);
-		}
-		return super.eBasicRemoveFromContainerFeature(msgs);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case SagPackage.SENSOR__NODE:
-				return getNode();
-			case SagPackage.SENSOR__PROJECT:
-				return getProject();
+			case SagPackage.SENSOR__NAME:
+				return getName();
+			case SagPackage.SENSOR__SIGNAL:
+				if (resolve) return getSignal();
+				return basicGetSignal();
+			case SagPackage.SENSOR__INITIALLY_ACTIVATED:
+				return isInitiallyActivated() ? Boolean.TRUE : Boolean.FALSE;
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -308,12 +296,14 @@ public class SensorImpl extends NamedImpl implements Sensor {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case SagPackage.SENSOR__NODE:
-				getNode().clear();
-				getNode().addAll((Collection<? extends SensorNode>)newValue);
+			case SagPackage.SENSOR__NAME:
+				setName((String)newValue);
 				return;
-			case SagPackage.SENSOR__PROJECT:
-				setProject((Project)newValue);
+			case SagPackage.SENSOR__SIGNAL:
+				setSignal((SensorSignal)newValue);
+				return;
+			case SagPackage.SENSOR__INITIALLY_ACTIVATED:
+				setInitiallyActivated(((Boolean)newValue).booleanValue());
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -327,11 +317,14 @@ public class SensorImpl extends NamedImpl implements Sensor {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case SagPackage.SENSOR__NODE:
-				getNode().clear();
+			case SagPackage.SENSOR__NAME:
+				setName(NAME_EDEFAULT);
 				return;
-			case SagPackage.SENSOR__PROJECT:
-				setProject((Project)null);
+			case SagPackage.SENSOR__SIGNAL:
+				setSignal((SensorSignal)null);
+				return;
+			case SagPackage.SENSOR__INITIALLY_ACTIVATED:
+				setInitiallyActivated(INITIALLY_ACTIVATED_EDEFAULT);
 				return;
 		}
 		super.eUnset(featureID);
@@ -345,12 +338,30 @@ public class SensorImpl extends NamedImpl implements Sensor {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case SagPackage.SENSOR__NODE:
-				return node != null && !node.isEmpty();
-			case SagPackage.SENSOR__PROJECT:
-				return getProject() != null;
+			case SagPackage.SENSOR__NAME:
+				return NAME_EDEFAULT == null ? getName() != null : !NAME_EDEFAULT.equals(getName());
+			case SagPackage.SENSOR__SIGNAL:
+				return signal != null;
+			case SagPackage.SENSOR__INITIALLY_ACTIVATED:
+				return initiallyActivated != INITIALLY_ACTIVATED_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public String toString() {
+		if (eIsProxy()) return super.toString();
+
+		StringBuffer result = new StringBuffer(super.toString());
+		result.append(" (initiallyActivated: ");
+		result.append(initiallyActivated);
+		result.append(')');
+		return result.toString();
 	}
 
 } //SensorImpl

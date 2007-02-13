@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: Zone.java,v 1.4 2007-02-08 16:36:08 torda Exp $
+ * $Id: Zone.java,v 1.5 2007-02-13 16:50:51 torda Exp $
  */
 package org.supremica.external.sag;
 
@@ -25,6 +25,13 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link org.supremica.external.sag.Zone#getCapacity <em>Capacity</em>}</li>
  *   <li>{@link org.supremica.external.sag.Zone#isOutsideSystemBoundry <em>Outside System Boundry</em>}</li>
  *   <li>{@link org.supremica.external.sag.Zone#isBounded <em>Bounded</em>}</li>
+ *   <li>{@link org.supremica.external.sag.Zone#getForwardCondition <em>Forward Condition</em>}</li>
+ *   <li>{@link org.supremica.external.sag.Zone#getBackwardCondition <em>Backward Condition</em>}</li>
+ *   <li>{@link org.supremica.external.sag.Zone#getFrontEntryCondition <em>Front Entry Condition</em>}</li>
+ *   <li>{@link org.supremica.external.sag.Zone#getFrontExitCondition <em>Front Exit Condition</em>}</li>
+ *   <li>{@link org.supremica.external.sag.Zone#getBackEntryCondition <em>Back Entry Condition</em>}</li>
+ *   <li>{@link org.supremica.external.sag.Zone#getBackExitCondition <em>Back Exit Condition</em>}</li>
+ *   <li>{@link org.supremica.external.sag.Zone#getInitialNrOfObjects <em>Initial Nr Of Objects</em>}</li>
  * </ul>
  * </p>
  *
@@ -251,6 +258,188 @@ public interface Zone extends Named {
 	 * @generated
 	 */
 	void setBounded(boolean value);
+
+	/**
+	 * Returns the value of the '<em><b>Forward Condition</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Forward Condition</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Forward Condition</em>' attribute.
+	 * @see #setForwardCondition(String)
+	 * @see org.supremica.external.sag.SagPackage#getZone_ForwardCondition()
+	 * @model
+	 * @generated
+	 */
+	String getForwardCondition();
+
+	/**
+	 * Sets the value of the '{@link org.supremica.external.sag.Zone#getForwardCondition <em>Forward Condition</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Forward Condition</em>' attribute.
+	 * @see #getForwardCondition()
+	 * @generated
+	 */
+	void setForwardCondition(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Backward Condition</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Backward Condition</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Backward Condition</em>' attribute.
+	 * @see #setBackwardCondition(String)
+	 * @see org.supremica.external.sag.SagPackage#getZone_BackwardCondition()
+	 * @model
+	 * @generated
+	 */
+	String getBackwardCondition();
+
+	/**
+	 * Sets the value of the '{@link org.supremica.external.sag.Zone#getBackwardCondition <em>Backward Condition</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Backward Condition</em>' attribute.
+	 * @see #getBackwardCondition()
+	 * @generated
+	 */
+	void setBackwardCondition(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Front Entry Condition</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Front Entry Condition</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Front Entry Condition</em>' attribute.
+	 * @see #setFrontEntryCondition(String)
+	 * @see org.supremica.external.sag.SagPackage#getZone_FrontEntryCondition()
+	 * @model
+	 * @generated
+	 */
+	String getFrontEntryCondition();
+
+	/**
+	 * Sets the value of the '{@link org.supremica.external.sag.Zone#getFrontEntryCondition <em>Front Entry Condition</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Front Entry Condition</em>' attribute.
+	 * @see #getFrontEntryCondition()
+	 * @generated
+	 */
+	void setFrontEntryCondition(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Front Exit Condition</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Front Exit Condition</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Front Exit Condition</em>' attribute.
+	 * @see #setFrontExitCondition(String)
+	 * @see org.supremica.external.sag.SagPackage#getZone_FrontExitCondition()
+	 * @model
+	 * @generated
+	 */
+	String getFrontExitCondition();
+
+	/**
+	 * Sets the value of the '{@link org.supremica.external.sag.Zone#getFrontExitCondition <em>Front Exit Condition</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Front Exit Condition</em>' attribute.
+	 * @see #getFrontExitCondition()
+	 * @generated
+	 */
+	void setFrontExitCondition(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Back Entry Condition</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Back Entry Condition</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Back Entry Condition</em>' attribute.
+	 * @see #setBackEntryCondition(String)
+	 * @see org.supremica.external.sag.SagPackage#getZone_BackEntryCondition()
+	 * @model
+	 * @generated
+	 */
+	String getBackEntryCondition();
+
+	/**
+	 * Sets the value of the '{@link org.supremica.external.sag.Zone#getBackEntryCondition <em>Back Entry Condition</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Back Entry Condition</em>' attribute.
+	 * @see #getBackEntryCondition()
+	 * @generated
+	 */
+	void setBackEntryCondition(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Back Exit Condition</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Back Exit Condition</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Back Exit Condition</em>' attribute.
+	 * @see #setBackExitCondition(String)
+	 * @see org.supremica.external.sag.SagPackage#getZone_BackExitCondition()
+	 * @model
+	 * @generated
+	 */
+	String getBackExitCondition();
+
+	/**
+	 * Sets the value of the '{@link org.supremica.external.sag.Zone#getBackExitCondition <em>Back Exit Condition</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Back Exit Condition</em>' attribute.
+	 * @see #getBackExitCondition()
+	 * @generated
+	 */
+	void setBackExitCondition(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Initial Nr Of Objects</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Initial Nr Of Objects</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Initial Nr Of Objects</em>' attribute.
+	 * @see #setInitialNrOfObjects(int)
+	 * @see org.supremica.external.sag.SagPackage#getZone_InitialNrOfObjects()
+	 * @model
+	 * @generated
+	 */
+	int getInitialNrOfObjects();
+
+	/**
+	 * Sets the value of the '{@link org.supremica.external.sag.Zone#getInitialNrOfObjects <em>Initial Nr Of Objects</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Initial Nr Of Objects</em>' attribute.
+	 * @see #getInitialNrOfObjects()
+	 * @generated
+	 */
+	void setInitialNrOfObjects(int value);
 
 	/**
 	 * <!-- begin-user-doc -->

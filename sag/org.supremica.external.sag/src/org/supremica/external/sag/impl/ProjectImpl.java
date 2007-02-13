@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: ProjectImpl.java,v 1.3 2007-01-23 09:55:48 torda Exp $
+ * $Id: ProjectImpl.java,v 1.4 2007-02-13 16:50:51 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
@@ -36,9 +36,11 @@ import org.eclipse.emf.ocl.parser.Environment;
 import org.eclipse.emf.ocl.parser.ParserException;
 import org.eclipse.emf.ocl.query.Query;
 import org.eclipse.emf.ocl.query.QueryFactory;
+import org.supremica.external.sag.ControlSignal;
 import org.supremica.external.sag.Graph;
 import org.supremica.external.sag.Project;
 import org.supremica.external.sag.SagPackage;
+import org.supremica.external.sag.SensorSignal;
 import org.supremica.external.sag.Sensor;
 import org.supremica.external.sag.util.SagValidator;
 
@@ -50,7 +52,8 @@ import org.supremica.external.sag.util.SagValidator;
  * The following features are implemented:
  * <ul>
  *   <li>{@link org.supremica.external.sag.impl.ProjectImpl#getGraph <em>Graph</em>}</li>
- *   <li>{@link org.supremica.external.sag.impl.ProjectImpl#getSensor <em>Sensor</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.ProjectImpl#getSensorSignal <em>Sensor Signal</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.ProjectImpl#getControlSignal <em>Control Signal</em>}</li>
  * </ul>
  * </p>
  *
@@ -68,14 +71,24 @@ public class ProjectImpl extends NamedImpl implements Project {
 	protected EList<Graph> graph = null;
 
 	/**
-	 * The cached value of the '{@link #getSensor() <em>Sensor</em>}' containment reference list.
+	 * The cached value of the '{@link #getSensorSignal() <em>Sensor Signal</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getSensor()
+	 * @see #getSensorSignal()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Sensor> sensor = null;
+	protected EList<SensorSignal> sensorSignal = null;
+
+	/**
+	 * The cached value of the '{@link #getControlSignal() <em>Control Signal</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getControlSignal()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<ControlSignal> controlSignal = null;
 
 	/**
 	 * The parsed OCL expression for the definition of the '{@link #validateName <em>Validate Name</em>}' invariant constraint.
@@ -124,11 +137,23 @@ public class ProjectImpl extends NamedImpl implements Project {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Sensor> getSensor() {
-		if (sensor == null) {
-			sensor = new EObjectContainmentWithInverseEList<Sensor>(Sensor.class, this, SagPackage.PROJECT__SENSOR, SagPackage.SENSOR__PROJECT);
+	public EList<SensorSignal> getSensorSignal() {
+		if (sensorSignal == null) {
+			sensorSignal = new EObjectContainmentWithInverseEList<SensorSignal>(SensorSignal.class, this, SagPackage.PROJECT__SENSOR_SIGNAL, SagPackage.SENSOR_SIGNAL__PROJECT);
 		}
-		return sensor;
+		return sensorSignal;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EList<ControlSignal> getControlSignal() {
+		if (controlSignal == null) {
+			controlSignal = new EObjectContainmentEList<ControlSignal>(ControlSignal.class, this, SagPackage.PROJECT__CONTROL_SIGNAL);
+		}
+		return controlSignal;
 	}
 
 	/**
@@ -181,8 +206,8 @@ public class ProjectImpl extends NamedImpl implements Project {
 		switch (featureID) {
 			case SagPackage.PROJECT__GRAPH:
 				return ((InternalEList<InternalEObject>)(InternalEList<?>)getGraph()).basicAdd(otherEnd, msgs);
-			case SagPackage.PROJECT__SENSOR:
-				return ((InternalEList<InternalEObject>)(InternalEList<?>)getSensor()).basicAdd(otherEnd, msgs);
+			case SagPackage.PROJECT__SENSOR_SIGNAL:
+				return ((InternalEList<InternalEObject>)(InternalEList<?>)getSensorSignal()).basicAdd(otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -197,8 +222,10 @@ public class ProjectImpl extends NamedImpl implements Project {
 		switch (featureID) {
 			case SagPackage.PROJECT__GRAPH:
 				return ((InternalEList<?>)getGraph()).basicRemove(otherEnd, msgs);
-			case SagPackage.PROJECT__SENSOR:
-				return ((InternalEList<?>)getSensor()).basicRemove(otherEnd, msgs);
+			case SagPackage.PROJECT__SENSOR_SIGNAL:
+				return ((InternalEList<?>)getSensorSignal()).basicRemove(otherEnd, msgs);
+			case SagPackage.PROJECT__CONTROL_SIGNAL:
+				return ((InternalEList<?>)getControlSignal()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -213,8 +240,10 @@ public class ProjectImpl extends NamedImpl implements Project {
 		switch (featureID) {
 			case SagPackage.PROJECT__GRAPH:
 				return getGraph();
-			case SagPackage.PROJECT__SENSOR:
-				return getSensor();
+			case SagPackage.PROJECT__SENSOR_SIGNAL:
+				return getSensorSignal();
+			case SagPackage.PROJECT__CONTROL_SIGNAL:
+				return getControlSignal();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -232,9 +261,13 @@ public class ProjectImpl extends NamedImpl implements Project {
 				getGraph().clear();
 				getGraph().addAll((Collection<? extends Graph>)newValue);
 				return;
-			case SagPackage.PROJECT__SENSOR:
-				getSensor().clear();
-				getSensor().addAll((Collection<? extends Sensor>)newValue);
+			case SagPackage.PROJECT__SENSOR_SIGNAL:
+				getSensorSignal().clear();
+				getSensorSignal().addAll((Collection<? extends SensorSignal>)newValue);
+				return;
+			case SagPackage.PROJECT__CONTROL_SIGNAL:
+				getControlSignal().clear();
+				getControlSignal().addAll((Collection<? extends ControlSignal>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -251,8 +284,11 @@ public class ProjectImpl extends NamedImpl implements Project {
 			case SagPackage.PROJECT__GRAPH:
 				getGraph().clear();
 				return;
-			case SagPackage.PROJECT__SENSOR:
-				getSensor().clear();
+			case SagPackage.PROJECT__SENSOR_SIGNAL:
+				getSensorSignal().clear();
+				return;
+			case SagPackage.PROJECT__CONTROL_SIGNAL:
+				getControlSignal().clear();
 				return;
 		}
 		super.eUnset(featureID);
@@ -268,8 +304,10 @@ public class ProjectImpl extends NamedImpl implements Project {
 		switch (featureID) {
 			case SagPackage.PROJECT__GRAPH:
 				return graph != null && !graph.isEmpty();
-			case SagPackage.PROJECT__SENSOR:
-				return sensor != null && !sensor.isEmpty();
+			case SagPackage.PROJECT__SENSOR_SIGNAL:
+				return sensorSignal != null && !sensorSignal.isEmpty();
+			case SagPackage.PROJECT__CONTROL_SIGNAL:
+				return controlSignal != null && !controlSignal.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

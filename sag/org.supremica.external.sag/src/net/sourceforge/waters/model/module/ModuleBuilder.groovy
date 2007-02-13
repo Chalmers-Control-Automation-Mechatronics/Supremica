@@ -35,8 +35,8 @@ class ModuleBuilder extends BuilderSupport {
 			proposition(name:'e3')
 			event(name:'e4', ranges:[0..2])
 			event(name:'e5', ranges:[0..2, 0..3], controllable:false)
-			plant(name:'testcomponent') {
-				state(name:'q0', initial:true)
+			plant(name:'testcomponent', initialState:'q0') {
+				state(name:'q0')
 				state(name:'q1')
 				transition(from:'q0',
 						   to:'q1',
@@ -49,8 +49,8 @@ class ModuleBuilder extends BuilderSupport {
 						   to:'q0',
 						   events:['e1', 'e0'])
 			}
-			specification(name:'testcomponent2') {
-				state(name:'s0', initial:true)
+			specification(name:'testcomponent2', initialState:'s0') {
+				state(name:'s0')
 				state(name:'s1')
 				booleanVariable(name:'y1', initial:false)
 				transition(from:'s0',
@@ -64,7 +64,7 @@ class ModuleBuilder extends BuilderSupport {
 				}
 			}
 			foreach(name:'i', range:0..2) {
-				plant(name:'testcomponent3[i]') {
+				plant(name:'testcomponent3[i]', initialState:'q0') {
 					state(name:'q0', initial:true)
 					state(name:'q1')
 					transition(from:'q0',
@@ -131,6 +131,7 @@ class ModuleBuilder extends BuilderSupport {
 	private static final factory = ModuleSubjectFactory.instance
 	private static final parser = new ExpressionParser(factory.instance, CompilerOperatorTable.instance)
 	private transitionAttributes
+	private String initialState
 	final static String VARIABLE_COMPONENT_NAME = 'variables'
 		
 	def createNode(name){
@@ -172,7 +173,8 @@ class ModuleBuilder extends BuilderSupport {
 			node = factory.createSimpleComponentProxy(parser.parseIdentifier(attributes.name),
 	                                                  attributes.get('kind', ComponentKind.PLANT),
 	                                                  factory.createGraphProxy())
-			break
+			initialState = attributes.initialState
+	        break
 		case 'specification' :
 			node = factory.createSimpleComponentProxy(parser.parseIdentifier(attributes.name),
 	                                                  attributes.get('kind', ComponentKind.SPEC),
@@ -180,7 +182,7 @@ class ModuleBuilder extends BuilderSupport {
 			break
 		case 'state' :
 			node = factory.createSimpleNodeProxy(attributes.name)
-			node.initial = attributes.initial
+			node.initial = attributes.name == initialState
 			break
 		case 'transition':
 			node = factory.createEdgeProxy(null,

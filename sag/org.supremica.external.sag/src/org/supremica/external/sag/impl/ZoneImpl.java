@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: ZoneImpl.java,v 1.4 2007-02-08 16:36:08 torda Exp $
+ * $Id: ZoneImpl.java,v 1.5 2007-02-13 16:50:51 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
@@ -54,6 +54,13 @@ import static org.supremica.external.sag.util.OclHelper.*;
  *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#getCapacity <em>Capacity</em>}</li>
  *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#isOutsideSystemBoundry <em>Outside System Boundry</em>}</li>
  *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#isBounded <em>Bounded</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#getForwardCondition <em>Forward Condition</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#getBackwardCondition <em>Backward Condition</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#getFrontEntryCondition <em>Front Entry Condition</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#getFrontExitCondition <em>Front Exit Condition</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#getBackEntryCondition <em>Back Entry Condition</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#getBackExitCondition <em>Back Exit Condition</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#getInitialNrOfObjects <em>Initial Nr Of Objects</em>}</li>
  * </ul>
  * </p>
  *
@@ -161,6 +168,146 @@ public class ZoneImpl extends NamedImpl implements Zone {
 	 * @ordered
 	 */
 	protected static final boolean BOUNDED_EDEFAULT = false;
+
+	/**
+	 * The default value of the '{@link #getForwardCondition() <em>Forward Condition</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getForwardCondition()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String FORWARD_CONDITION_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getForwardCondition() <em>Forward Condition</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getForwardCondition()
+	 * @generated
+	 * @ordered
+	 */
+	protected String forwardCondition = FORWARD_CONDITION_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #getBackwardCondition() <em>Backward Condition</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getBackwardCondition()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String BACKWARD_CONDITION_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getBackwardCondition() <em>Backward Condition</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getBackwardCondition()
+	 * @generated
+	 * @ordered
+	 */
+	protected String backwardCondition = BACKWARD_CONDITION_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #getFrontEntryCondition() <em>Front Entry Condition</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getFrontEntryCondition()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String FRONT_ENTRY_CONDITION_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getFrontEntryCondition() <em>Front Entry Condition</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getFrontEntryCondition()
+	 * @generated
+	 * @ordered
+	 */
+	protected String frontEntryCondition = FRONT_ENTRY_CONDITION_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #getFrontExitCondition() <em>Front Exit Condition</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getFrontExitCondition()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String FRONT_EXIT_CONDITION_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getFrontExitCondition() <em>Front Exit Condition</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getFrontExitCondition()
+	 * @generated
+	 * @ordered
+	 */
+	protected String frontExitCondition = FRONT_EXIT_CONDITION_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #getBackEntryCondition() <em>Back Entry Condition</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getBackEntryCondition()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String BACK_ENTRY_CONDITION_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getBackEntryCondition() <em>Back Entry Condition</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getBackEntryCondition()
+	 * @generated
+	 * @ordered
+	 */
+	protected String backEntryCondition = BACK_ENTRY_CONDITION_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #getBackExitCondition() <em>Back Exit Condition</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getBackExitCondition()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String BACK_EXIT_CONDITION_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getBackExitCondition() <em>Back Exit Condition</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getBackExitCondition()
+	 * @generated
+	 * @ordered
+	 */
+	protected String backExitCondition = BACK_EXIT_CONDITION_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #getInitialNrOfObjects() <em>Initial Nr Of Objects</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getInitialNrOfObjects()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final int INITIAL_NR_OF_OBJECTS_EDEFAULT = 0;
+
+	/**
+	 * The cached value of the '{@link #getInitialNrOfObjects() <em>Initial Nr Of Objects</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getInitialNrOfObjects()
+	 * @generated
+	 * @ordered
+	 */
+	protected int initialNrOfObjects = INITIAL_NR_OF_OBJECTS_EDEFAULT;
 
 	/**
 	 * The parsed OCL expression for the definition of the '{@link #validateCapacityIsPositiveNumber <em>Validate Capacity Is Positive Number</em>}' invariant constraint.
@@ -479,6 +626,153 @@ public class ZoneImpl extends NamedImpl implements Zone {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public String getForwardCondition() {
+		return forwardCondition;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setForwardCondition(String newForwardCondition) {
+		String oldForwardCondition = forwardCondition;
+		forwardCondition = newForwardCondition;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__FORWARD_CONDITION, oldForwardCondition, forwardCondition));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getBackwardCondition() {
+		return backwardCondition;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setBackwardCondition(String newBackwardCondition) {
+		String oldBackwardCondition = backwardCondition;
+		backwardCondition = newBackwardCondition;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__BACKWARD_CONDITION, oldBackwardCondition, backwardCondition));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getFrontEntryCondition() {
+		return frontEntryCondition;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setFrontEntryCondition(String newFrontEntryCondition) {
+		String oldFrontEntryCondition = frontEntryCondition;
+		frontEntryCondition = newFrontEntryCondition;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__FRONT_ENTRY_CONDITION, oldFrontEntryCondition, frontEntryCondition));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getFrontExitCondition() {
+		return frontExitCondition;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setFrontExitCondition(String newFrontExitCondition) {
+		String oldFrontExitCondition = frontExitCondition;
+		frontExitCondition = newFrontExitCondition;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__FRONT_EXIT_CONDITION, oldFrontExitCondition, frontExitCondition));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getBackEntryCondition() {
+		return backEntryCondition;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setBackEntryCondition(String newBackEntryCondition) {
+		String oldBackEntryCondition = backEntryCondition;
+		backEntryCondition = newBackEntryCondition;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__BACK_ENTRY_CONDITION, oldBackEntryCondition, backEntryCondition));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String getBackExitCondition() {
+		return backExitCondition;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setBackExitCondition(String newBackExitCondition) {
+		String oldBackExitCondition = backExitCondition;
+		backExitCondition = newBackExitCondition;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__BACK_EXIT_CONDITION, oldBackExitCondition, backExitCondition));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public int getInitialNrOfObjects() {
+		return initialNrOfObjects;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setInitialNrOfObjects(int newInitialNrOfObjects) {
+		int oldInitialNrOfObjects = initialNrOfObjects;
+		initialNrOfObjects = newInitialNrOfObjects;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__INITIAL_NR_OF_OBJECTS, oldInitialNrOfObjects, initialNrOfObjects));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public boolean validateCapacityIsPositiveNumber(DiagnosticChain diagnostics, Map<?, ?> context) {
 		if (validateCapacityIsPositiveNumberInvOCL == null) {
 			EOperation eOperation = (EOperation) eClass().getEOperations().get(0);
@@ -593,6 +887,20 @@ public class ZoneImpl extends NamedImpl implements Zone {
 				return isOutsideSystemBoundry() ? Boolean.TRUE : Boolean.FALSE;
 			case SagPackage.ZONE__BOUNDED:
 				return isBounded() ? Boolean.TRUE : Boolean.FALSE;
+			case SagPackage.ZONE__FORWARD_CONDITION:
+				return getForwardCondition();
+			case SagPackage.ZONE__BACKWARD_CONDITION:
+				return getBackwardCondition();
+			case SagPackage.ZONE__FRONT_ENTRY_CONDITION:
+				return getFrontEntryCondition();
+			case SagPackage.ZONE__FRONT_EXIT_CONDITION:
+				return getFrontExitCondition();
+			case SagPackage.ZONE__BACK_ENTRY_CONDITION:
+				return getBackEntryCondition();
+			case SagPackage.ZONE__BACK_EXIT_CONDITION:
+				return getBackExitCondition();
+			case SagPackage.ZONE__INITIAL_NR_OF_OBJECTS:
+				return new Integer(getInitialNrOfObjects());
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -625,6 +933,27 @@ public class ZoneImpl extends NamedImpl implements Zone {
 				return;
 			case SagPackage.ZONE__BOUNDED:
 				setBounded(((Boolean)newValue).booleanValue());
+				return;
+			case SagPackage.ZONE__FORWARD_CONDITION:
+				setForwardCondition((String)newValue);
+				return;
+			case SagPackage.ZONE__BACKWARD_CONDITION:
+				setBackwardCondition((String)newValue);
+				return;
+			case SagPackage.ZONE__FRONT_ENTRY_CONDITION:
+				setFrontEntryCondition((String)newValue);
+				return;
+			case SagPackage.ZONE__FRONT_EXIT_CONDITION:
+				setFrontExitCondition((String)newValue);
+				return;
+			case SagPackage.ZONE__BACK_ENTRY_CONDITION:
+				setBackEntryCondition((String)newValue);
+				return;
+			case SagPackage.ZONE__BACK_EXIT_CONDITION:
+				setBackExitCondition((String)newValue);
+				return;
+			case SagPackage.ZONE__INITIAL_NR_OF_OBJECTS:
+				setInitialNrOfObjects(((Integer)newValue).intValue());
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -659,6 +988,27 @@ public class ZoneImpl extends NamedImpl implements Zone {
 			case SagPackage.ZONE__BOUNDED:
 				setBounded(BOUNDED_EDEFAULT);
 				return;
+			case SagPackage.ZONE__FORWARD_CONDITION:
+				setForwardCondition(FORWARD_CONDITION_EDEFAULT);
+				return;
+			case SagPackage.ZONE__BACKWARD_CONDITION:
+				setBackwardCondition(BACKWARD_CONDITION_EDEFAULT);
+				return;
+			case SagPackage.ZONE__FRONT_ENTRY_CONDITION:
+				setFrontEntryCondition(FRONT_ENTRY_CONDITION_EDEFAULT);
+				return;
+			case SagPackage.ZONE__FRONT_EXIT_CONDITION:
+				setFrontExitCondition(FRONT_EXIT_CONDITION_EDEFAULT);
+				return;
+			case SagPackage.ZONE__BACK_ENTRY_CONDITION:
+				setBackEntryCondition(BACK_ENTRY_CONDITION_EDEFAULT);
+				return;
+			case SagPackage.ZONE__BACK_EXIT_CONDITION:
+				setBackExitCondition(BACK_EXIT_CONDITION_EDEFAULT);
+				return;
+			case SagPackage.ZONE__INITIAL_NR_OF_OBJECTS:
+				setInitialNrOfObjects(INITIAL_NR_OF_OBJECTS_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -685,6 +1035,20 @@ public class ZoneImpl extends NamedImpl implements Zone {
 				return outsideSystemBoundry != OUTSIDE_SYSTEM_BOUNDRY_EDEFAULT;
 			case SagPackage.ZONE__BOUNDED:
 				return isBounded() != BOUNDED_EDEFAULT;
+			case SagPackage.ZONE__FORWARD_CONDITION:
+				return FORWARD_CONDITION_EDEFAULT == null ? forwardCondition != null : !FORWARD_CONDITION_EDEFAULT.equals(forwardCondition);
+			case SagPackage.ZONE__BACKWARD_CONDITION:
+				return BACKWARD_CONDITION_EDEFAULT == null ? backwardCondition != null : !BACKWARD_CONDITION_EDEFAULT.equals(backwardCondition);
+			case SagPackage.ZONE__FRONT_ENTRY_CONDITION:
+				return FRONT_ENTRY_CONDITION_EDEFAULT == null ? frontEntryCondition != null : !FRONT_ENTRY_CONDITION_EDEFAULT.equals(frontEntryCondition);
+			case SagPackage.ZONE__FRONT_EXIT_CONDITION:
+				return FRONT_EXIT_CONDITION_EDEFAULT == null ? frontExitCondition != null : !FRONT_EXIT_CONDITION_EDEFAULT.equals(frontExitCondition);
+			case SagPackage.ZONE__BACK_ENTRY_CONDITION:
+				return BACK_ENTRY_CONDITION_EDEFAULT == null ? backEntryCondition != null : !BACK_ENTRY_CONDITION_EDEFAULT.equals(backEntryCondition);
+			case SagPackage.ZONE__BACK_EXIT_CONDITION:
+				return BACK_EXIT_CONDITION_EDEFAULT == null ? backExitCondition != null : !BACK_EXIT_CONDITION_EDEFAULT.equals(backExitCondition);
+			case SagPackage.ZONE__INITIAL_NR_OF_OBJECTS:
+				return initialNrOfObjects != INITIAL_NR_OF_OBJECTS_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -705,6 +1069,20 @@ public class ZoneImpl extends NamedImpl implements Zone {
 		if (capacityESet) result.append(capacity); else result.append("<unset>");
 		result.append(", outsideSystemBoundry: ");
 		result.append(outsideSystemBoundry);
+		result.append(", forwardCondition: ");
+		result.append(forwardCondition);
+		result.append(", backwardCondition: ");
+		result.append(backwardCondition);
+		result.append(", frontEntryCondition: ");
+		result.append(frontEntryCondition);
+		result.append(", frontExitCondition: ");
+		result.append(frontExitCondition);
+		result.append(", backEntryCondition: ");
+		result.append(backEntryCondition);
+		result.append(", backExitCondition: ");
+		result.append(backExitCondition);
+		result.append(", initialNrOfObjects: ");
+		result.append(initialNrOfObjects);
 		result.append(')');
 		return result.toString();
 	}

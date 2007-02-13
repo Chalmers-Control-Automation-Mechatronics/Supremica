@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: Graph.java,v 1.5 2007-02-08 16:36:08 torda Exp $
+ * $Id: Graph.java,v 1.6 2007-02-13 16:50:51 torda Exp $
  */
 package org.supremica.external.sag;
 
@@ -151,7 +151,7 @@ public interface Graph extends Named {
 
 	/**
 	 * Returns the value of the '<em><b>Sensor</b></em>' containment reference list.
-	 * The list contents are of type {@link org.supremica.external.sag.SensorNode}.
+	 * The list contents are of type {@link org.supremica.external.sag.Sensor}.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Sensor</em>' containment reference list isn't clear,
@@ -160,11 +160,11 @@ public interface Graph extends Named {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Sensor</em>' containment reference list.
 	 * @see org.supremica.external.sag.SagPackage#getGraph_Sensor()
-	 * @model type="org.supremica.external.sag.SensorNode" containment="true" transient="true" changeable="false" volatile="true" derived="true"
-	 *        annotation="http://www.eclipse.org/OCL/examples/ocl derive='node->select(oclIsKindOf(SensorNode))'"
+	 * @model type="org.supremica.external.sag.Sensor" containment="true" transient="true" changeable="false" volatile="true" derived="true"
+	 *        annotation="http://www.eclipse.org/OCL/examples/ocl derive='node->select(oclIsKindOf(Sensor))'"
 	 * @generated
 	 */
-	EList<SensorNode> getSensor();
+	EList<Sensor> getSensor();
 
 	/**
 	 * <!-- begin-user-doc -->

@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: Project.java,v 1.3 2007-01-23 09:55:48 torda Exp $
+ * $Id: Project.java,v 1.4 2007-02-13 16:50:51 torda Exp $
  */
 package org.supremica.external.sag;
 
@@ -19,7 +19,8 @@ import org.eclipse.emf.common.util.EList;
  * The following features are supported:
  * <ul>
  *   <li>{@link org.supremica.external.sag.Project#getGraph <em>Graph</em>}</li>
- *   <li>{@link org.supremica.external.sag.Project#getSensor <em>Sensor</em>}</li>
+ *   <li>{@link org.supremica.external.sag.Project#getSensorSignal <em>Sensor Signal</em>}</li>
+ *   <li>{@link org.supremica.external.sag.Project#getControlSignal <em>Control Signal</em>}</li>
  * </ul>
  * </p>
  *
@@ -47,22 +48,38 @@ public interface Project extends Named {
 	EList<Graph> getGraph();
 
 	/**
-	 * Returns the value of the '<em><b>Sensor</b></em>' containment reference list.
-	 * The list contents are of type {@link org.supremica.external.sag.Sensor}.
-	 * It is bidirectional and its opposite is '{@link org.supremica.external.sag.Sensor#getProject <em>Project</em>}'.
+	 * Returns the value of the '<em><b>Sensor Signal</b></em>' containment reference list.
+	 * The list contents are of type {@link org.supremica.external.sag.SensorSignal}.
+	 * It is bidirectional and its opposite is '{@link org.supremica.external.sag.SensorSignal#getProject <em>Project</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Sensor</em>' containment reference isn't clear,
+	 * If the meaning of the '<em>Sensor Signal</em>' containment reference list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Sensor</em>' containment reference list.
-	 * @see org.supremica.external.sag.SagPackage#getProject_Sensor()
-	 * @see org.supremica.external.sag.Sensor#getProject
-	 * @model type="org.supremica.external.sag.Sensor" opposite="project" containment="true"
+	 * @return the value of the '<em>Sensor Signal</em>' containment reference list.
+	 * @see org.supremica.external.sag.SagPackage#getProject_SensorSignal()
+	 * @see org.supremica.external.sag.SensorSignal#getProject
+	 * @model type="org.supremica.external.sag.SensorSignal" opposite="project" containment="true"
 	 * @generated
 	 */
-	EList<Sensor> getSensor();
+	EList<SensorSignal> getSensorSignal();
+
+	/**
+	 * Returns the value of the '<em><b>Control Signal</b></em>' containment reference list.
+	 * The list contents are of type {@link org.supremica.external.sag.ControlSignal}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Control Signal</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Control Signal</em>' containment reference list.
+	 * @see org.supremica.external.sag.SagPackage#getProject_ControlSignal()
+	 * @model type="org.supremica.external.sag.ControlSignal" containment="true"
+	 * @generated
+	 */
+	EList<ControlSignal> getControlSignal();
 
 	/**
 	 * <!-- begin-user-doc -->

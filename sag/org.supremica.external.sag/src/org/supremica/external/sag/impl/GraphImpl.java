@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: GraphImpl.java,v 1.5 2007-02-08 16:36:08 torda Exp $
+ * $Id: GraphImpl.java,v 1.6 2007-02-13 16:50:51 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
@@ -44,7 +44,7 @@ import org.supremica.external.sag.Graph;
 import org.supremica.external.sag.Node;
 import org.supremica.external.sag.Project;
 import org.supremica.external.sag.SagPackage;
-import org.supremica.external.sag.SensorNode;
+import org.supremica.external.sag.Sensor;
 import org.supremica.external.sag.Zone;
 import org.supremica.external.sag.util.SagValidator;
 
@@ -276,7 +276,7 @@ public class GraphImpl extends NamedImpl implements Graph {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<SensorNode> getSensor() {
+	public EList<Sensor> getSensor() {
 
 		EStructuralFeature eFeature = (EStructuralFeature) eClass().getEStructuralFeatures().get(5);
 	

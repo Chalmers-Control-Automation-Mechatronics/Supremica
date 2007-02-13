@@ -6,18 +6,23 @@ class SagBuilder extends BuilderSupport {
 		def y1
 		def sagBuilder = new SagBuilder();
 		sagBuilder.project(name:'testProject') {
+			controlSignal(name:'u1')
+			controlSignal(name:'u2')
+			sensorSignal(name:'y2')
+			sensorSignal(name:'y4')
 			graph(name:'testGraph', maxNrOfObjects:3) {
 				y1 = sensor(name:'y1')
 				sensor(name:'y2')
 				sensor(name:'y3')
-				zone(back:'y1', front:'y2', oneway:true)
-				zone(front:'y1', oneway:false)
+				zone(back:'y1', front:'y2', oneway:true, forwardCondition:'u1')
+				zone(front:'y1', oneway:false, backwardCondition:'!u2')
 				zone(back:'y2', front:'y3')
 			}
 		}
 		def project = sagBuilder.project
 		assert y1.name == 'y1' && y1.graph.project == project
-		assert project.sensor.name == ['y1', 'y2', 'y3']
+		assert project.sensorSignal.name == ['y2', 'y4', 'y1', 'y3']
+		assert project.controlSignal.name == ['u1', 'u2']
 		assert project.graph.name == ['testGraph']
 		assert project.graph.node.name == ['y1', 'y2', 'y3']
 		assert project.graph.zone.collect{[it.back.name,it.front.name]} == [['y1', 'y2'],['end0', 'y1'],['y2','y3']]
@@ -32,19 +37,19 @@ class SagBuilder extends BuilderSupport {
 	private String frontSensorName
 	
 	def createNode(name){
-		switch (name) {
-		case 'project' : SagFactory.eINSTANCE.createProject()
-		}
+		//println "1: $name"
 		null
 	}
 
 	def createNode(name, value){
+		//println "2: $name, $value"
 		null
 	}
 
 	def createNode(name, Map attributes){
+		//println "3: $name, $attributes"
 		def node = null
-		Closure createZone {
+		Closure createZone = {
 			node = SagFactory.eINSTANCE.createZone()
 			frontSensorName = attributes.front
 			attributes.remove('front')
@@ -57,9 +62,15 @@ class SagBuilder extends BuilderSupport {
 			project = node
 			break
 		case 'sensor' :
-			node = SagFactory.eINSTANCE.createSensorNode()
+			node = SagFactory.eINSTANCE.createSensor()
 			currentSensorName = attributes.name
 			attributes.remove('name')
+			break
+		case 'controlSignal' :
+			node = SagFactory.eINSTANCE.createControlSignal()
+			break
+		case 'sensorSignal' :
+			node = SagFactory.eINSTANCE.createSensorSignal()
 			break
 		case 'graph' :
 			node = SagFactory.eINSTANCE.createGraph()
@@ -73,6 +84,8 @@ class SagBuilder extends BuilderSupport {
 		case 'zone' :
 			createZone();
 			break
+		default:
+			assert false
 		}
 		attributes.each {key, value ->
 			node[key] = value
@@ -81,6 +94,7 @@ class SagBuilder extends BuilderSupport {
 	}
 
 	def createNode(name, Map attributes, value){
+		//println "4: $name, $attributes, $value"
 		null
 	}
 	
@@ -88,14 +102,15 @@ class SagBuilder extends BuilderSupport {
 		switch (parent) {
 		case Project:
 			switch (child) {
-			case Graph:
-				parent.graph << child
-				break
+			case Graph: parent.graph << child; break
+			case ControlSignal: parent.controlSignal << child; break
+			case SensorSignal: parent.sensorSignal << child; break
+			default: assert false, "Parent: $parent, Child: $child"
 			}
-			break;
+			break
 		case Graph:
 			switch (child) {
-			case SensorNode:
+			case Sensor:
 				parent.node << child
 				child.name = currentSensorName
 				currentSensorName = null
@@ -112,8 +127,12 @@ class SagBuilder extends BuilderSupport {
 				child.front = frontSensorName ? parent.node.find{it.name == frontSensorName} : createEndNode()
 				frontSensorName = null
 				break
+			default:
+				assert false, "Parent: $parent, Child: $child"
 			}
 			break
+		default:
+			assert false, "Parent: $parent, Child: $child"
 		}
 	}
 

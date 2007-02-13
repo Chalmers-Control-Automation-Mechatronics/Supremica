@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagAdapterFactory.java,v 1.5 2007-02-08 16:36:08 torda Exp $
+ * $Id: SagAdapterFactory.java,v 1.6 2007-02-13 16:50:51 torda Exp $
  */
 package org.supremica.external.sag.util;
 
@@ -92,16 +92,20 @@ public class SagAdapterFactory extends AdapterFactoryImpl {
 				return createProjectAdapter();
 			}
 			@Override
-			public Adapter caseSensor(Sensor object) {
-				return createSensorAdapter();
+			public Adapter caseSensorSignal(SensorSignal object) {
+				return createSensorSignalAdapter();
 			}
 			@Override
 			public Adapter caseEndNode(EndNode object) {
 				return createEndNodeAdapter();
 			}
 			@Override
-			public Adapter caseSensorNode(SensorNode object) {
-				return createSensorNodeAdapter();
+			public Adapter caseSensor(Sensor object) {
+				return createSensorAdapter();
+			}
+			@Override
+			public Adapter caseControlSignal(ControlSignal object) {
+				return createControlSignalAdapter();
 			}
 			@Override
 			public Adapter defaultCase(EObject object) {
@@ -194,6 +198,20 @@ public class SagAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
+	 * Creates a new adapter for an object of class '{@link org.supremica.external.sag.SensorSignal <em>Sensor Signal</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see org.supremica.external.sag.SensorSignal
+	 * @generated
+	 */
+	public Adapter createSensorSignalAdapter() {
+		return null;
+	}
+
+	/**
 	 * Creates a new adapter for an object of class '{@link org.supremica.external.sag.Sensor <em>Sensor</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
@@ -208,6 +226,20 @@ public class SagAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
+	 * Creates a new adapter for an object of class '{@link org.supremica.external.sag.ControlSignal <em>Control Signal</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see org.supremica.external.sag.ControlSignal
+	 * @generated
+	 */
+	public Adapter createControlSignalAdapter() {
+		return null;
+	}
+
+	/**
 	 * Creates a new adapter for an object of class '{@link org.supremica.external.sag.EndNode <em>End Node</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
@@ -218,20 +250,6 @@ public class SagAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createEndNodeAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link org.supremica.external.sag.SensorNode <em>Sensor Node</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see org.supremica.external.sag.SensorNode
-	 * @generated
-	 */
-	public Adapter createSensorNodeAdapter() {
 		return null;
 	}
 

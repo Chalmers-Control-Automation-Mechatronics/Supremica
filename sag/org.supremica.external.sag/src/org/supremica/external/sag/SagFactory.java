@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagFactory.java,v 1.4 2007-02-08 16:36:08 torda Exp $
+ * $Id: SagFactory.java,v 1.5 2007-02-13 16:50:51 torda Exp $
  */
 package org.supremica.external.sag;
 
@@ -53,6 +53,15 @@ public interface SagFactory extends EFactory {
 	Project createProject();
 
 	/**
+	 * Returns a new object of class '<em>Sensor Signal</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Sensor Signal</em>'.
+	 * @generated
+	 */
+	SensorSignal createSensorSignal();
+
+	/**
 	 * Returns a new object of class '<em>Sensor</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -62,6 +71,15 @@ public interface SagFactory extends EFactory {
 	Sensor createSensor();
 
 	/**
+	 * Returns a new object of class '<em>Control Signal</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Control Signal</em>'.
+	 * @generated
+	 */
+	ControlSignal createControlSignal();
+
+	/**
 	 * Returns a new object of class '<em>End Node</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -69,15 +87,6 @@ public interface SagFactory extends EFactory {
 	 * @generated
 	 */
 	EndNode createEndNode();
-
-	/**
-	 * Returns a new object of class '<em>Sensor Node</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Sensor Node</em>'.
-	 * @generated
-	 */
-	SensorNode createSensorNode();
 
 	/**
 	 * Returns the package supported by this factory.

@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagFactoryImpl.java,v 1.4 2007-02-08 16:36:08 torda Exp $
+ * $Id: SagFactoryImpl.java,v 1.5 2007-02-13 16:50:51 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
@@ -63,9 +63,10 @@ public class SagFactoryImpl extends EFactoryImpl implements SagFactory {
 			case SagPackage.GRAPH: return createGraph();
 			case SagPackage.ZONE: return createZone();
 			case SagPackage.PROJECT: return createProject();
-			case SagPackage.SENSOR: return createSensor();
+			case SagPackage.SENSOR_SIGNAL: return createSensorSignal();
 			case SagPackage.END_NODE: return createEndNode();
-			case SagPackage.SENSOR_NODE: return createSensorNode();
+			case SagPackage.SENSOR: return createSensor();
+			case SagPackage.CONTROL_SIGNAL: return createControlSignal();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
 		}
@@ -106,6 +107,16 @@ public class SagFactoryImpl extends EFactoryImpl implements SagFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public SensorSignal createSensorSignal() {
+		SensorSignalImpl sensorSignal = new SensorSignalImpl();
+		return sensorSignal;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public Sensor createSensor() {
 		SensorImpl sensor = new SensorImpl();
 		return sensor;
@@ -116,9 +127,9 @@ public class SagFactoryImpl extends EFactoryImpl implements SagFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EndNode createEndNode() {
-		EndNodeImpl endNode = new EndNodeImpl();
-		return endNode;
+	public ControlSignal createControlSignal() {
+		ControlSignalImpl controlSignal = new ControlSignalImpl();
+		return controlSignal;
 	}
 
 	/**
@@ -126,9 +137,9 @@ public class SagFactoryImpl extends EFactoryImpl implements SagFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public SensorNode createSensorNode() {
-		SensorNodeImpl sensorNode = new SensorNodeImpl();
-		return sensorNode;
+	public EndNode createEndNode() {
+		EndNodeImpl endNode = new EndNodeImpl();
+		return endNode;
 	}
 
 	/**

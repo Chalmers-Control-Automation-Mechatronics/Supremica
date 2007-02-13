@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagValidator.java,v 1.2 2007-02-08 16:36:08 torda Exp $
+ * $Id: SagValidator.java,v 1.3 2007-02-13 16:50:51 torda Exp $
  */
 package org.supremica.external.sag.util;
 
@@ -75,20 +75,20 @@ public class SagValidator extends EObjectValidator {
 	public static final int PROJECT__VALIDATE_NAME = 4;
 
 	/**
-	 * The {@link org.eclipse.emf.common.util.Diagnostic#getCode() code} for constraint 'Validate Name' of 'Sensor'.
+	 * The {@link org.eclipse.emf.common.util.Diagnostic#getCode() code} for constraint 'Validate Name' of 'Sensor Signal'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final int SENSOR__VALIDATE_NAME = 5;
+	public static final int SENSOR_SIGNAL__VALIDATE_NAME = 5;
 
 	/**
-	 * The {@link org.eclipse.emf.common.util.Diagnostic#getCode() code} for constraint 'Validate Uniqueness Of Name' of 'Sensor'.
+	 * The {@link org.eclipse.emf.common.util.Diagnostic#getCode() code} for constraint 'Validate Uniqueness Of Name' of 'Sensor Signal'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final int SENSOR__VALIDATE_UNIQUENESS_OF_NAME = 6;
+	public static final int SENSOR_SIGNAL__VALIDATE_UNIQUENESS_OF_NAME = 6;
 
 	/**
 	 * A constant with a fixed name that can be used as the base value for additional hand written constants.
@@ -146,12 +146,14 @@ public class SagValidator extends EObjectValidator {
 				return validateNode((Node)value, diagnostics, context);
 			case SagPackage.PROJECT:
 				return validateProject((Project)value, diagnostics, context);
-			case SagPackage.SENSOR:
-				return validateSensor((Sensor)value, diagnostics, context);
+			case SagPackage.SENSOR_SIGNAL:
+				return validateSensorSignal((SensorSignal)value, diagnostics, context);
 			case SagPackage.END_NODE:
 				return validateEndNode((EndNode)value, diagnostics, context);
-			case SagPackage.SENSOR_NODE:
-				return validateSensorNode((SensorNode)value, diagnostics, context);
+			case SagPackage.SENSOR:
+				return validateSensor((Sensor)value, diagnostics, context);
+			case SagPackage.CONTROL_SIGNAL:
+				return validateControlSignal((ControlSignal)value, diagnostics, context);
 			default: 
 				return true;
 		}
@@ -269,36 +271,54 @@ public class SagValidator extends EObjectValidator {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public boolean validateSensor(Sensor sensor, DiagnosticChain diagnostics, Map<Object, Object> context) {
-		boolean result = validate_EveryMultiplicityConforms(sensor, diagnostics, context);
-		if (result || diagnostics != null) result &= validate_EveryDataValueConforms(sensor, diagnostics, context);
-		if (result || diagnostics != null) result &= validate_EveryReferenceIsContained(sensor, diagnostics, context);
-		if (result || diagnostics != null) result &= validate_EveryProxyResolves(sensor, diagnostics, context);
-		if (result || diagnostics != null) result &= validate_UniqueID(sensor, diagnostics, context);
-		if (result || diagnostics != null) result &= validate_EveryKeyUnique(sensor, diagnostics, context);
-		if (result || diagnostics != null) result &= validateSensor_validateName(sensor, diagnostics, context);
-		if (result || diagnostics != null) result &= validateSensor_validateUniquenessOfName(sensor, diagnostics, context);
+	public boolean validateSensorSignal(SensorSignal sensorSignal, DiagnosticChain diagnostics, Map<Object, Object> context) {
+		boolean result = validate_EveryMultiplicityConforms(sensorSignal, diagnostics, context);
+		if (result || diagnostics != null) result &= validate_EveryDataValueConforms(sensorSignal, diagnostics, context);
+		if (result || diagnostics != null) result &= validate_EveryReferenceIsContained(sensorSignal, diagnostics, context);
+		if (result || diagnostics != null) result &= validate_EveryProxyResolves(sensorSignal, diagnostics, context);
+		if (result || diagnostics != null) result &= validate_UniqueID(sensorSignal, diagnostics, context);
+		if (result || diagnostics != null) result &= validate_EveryKeyUnique(sensorSignal, diagnostics, context);
+		if (result || diagnostics != null) result &= validateSensorSignal_validateName(sensorSignal, diagnostics, context);
+		if (result || diagnostics != null) result &= validateSensorSignal_validateUniquenessOfName(sensorSignal, diagnostics, context);
 		return result;
 	}
 
 	/**
-	 * Validates the validateName constraint of '<em>Sensor</em>'.
+	 * Validates the validateName constraint of '<em>Sensor Signal</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public boolean validateSensor_validateName(Sensor sensor, DiagnosticChain diagnostics, Map<Object, Object> context) {
-		return sensor.validateName(diagnostics, context);
+	public boolean validateSensorSignal_validateName(SensorSignal sensorSignal, DiagnosticChain diagnostics, Map<Object, Object> context) {
+		return sensorSignal.validateName(diagnostics, context);
 	}
 
 	/**
-	 * Validates the validateUniquenessOfName constraint of '<em>Sensor</em>'.
+	 * Validates the validateUniquenessOfName constraint of '<em>Sensor Signal</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public boolean validateSensor_validateUniquenessOfName(Sensor sensor, DiagnosticChain diagnostics, Map<Object, Object> context) {
-		return sensor.validateUniquenessOfName(diagnostics, context);
+	public boolean validateSensorSignal_validateUniquenessOfName(SensorSignal sensorSignal, DiagnosticChain diagnostics, Map<Object, Object> context) {
+		return sensorSignal.validateUniquenessOfName(diagnostics, context);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public boolean validateSensor(Sensor sensor, DiagnosticChain diagnostics, Map<Object, Object> context) {
+		return validate_EveryDefaultConstraint(sensor, diagnostics, context);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public boolean validateControlSignal(ControlSignal controlSignal, DiagnosticChain diagnostics, Map<Object, Object> context) {
+		return validate_EveryDefaultConstraint(controlSignal, diagnostics, context);
 	}
 
 	/**
@@ -308,15 +328,6 @@ public class SagValidator extends EObjectValidator {
 	 */
 	public boolean validateEndNode(EndNode endNode, DiagnosticChain diagnostics, Map<Object, Object> context) {
 		return validate_EveryDefaultConstraint(endNode, diagnostics, context);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public boolean validateSensorNode(SensorNode sensorNode, DiagnosticChain diagnostics, Map<Object, Object> context) {
-		return validate_EveryDefaultConstraint(sensorNode, diagnostics, context);
 	}
 
 } //SagValidator
