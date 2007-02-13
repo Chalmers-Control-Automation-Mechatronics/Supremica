@@ -9,35 +9,53 @@ import net.sourceforge.waters.model.module.VariableProxy;
 
 public class VariableHelper {
 	// Methods for convenient handling of integer variables
-	public static VariableSubject createIntegerVariable(final String name, final int lowerBound,
-			final int upperBound, final int initialValue,
+	public static VariableSubject createIntegerVariable(final String name,
+			final int lowerBound, final int upperBound, final int initialValue,
 			final Integer markedValue) {
-		VariableSubject variable = ModuleSubjectFactory.getInstance().createVariableProxy(name, null, null);
-		setAsInteger(variable, lowerBound, upperBound, initialValue, markedValue);
-		return variable;
+		if (initialValue > upperBound || initialValue < lowerBound) {
+			throw new IllegalArgumentException(
+					"Initial value is not within the specified range");
+		}
+		if (markedValue != null
+				&& (markedValue > upperBound || markedValue < lowerBound)) {
+			throw new IllegalArgumentException(
+					"Marked value is not within the specified range");
+		}
+
+		ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
+		BinaryExpressionProxy type = factory.createBinaryExpressionProxy(
+				CompilerOperatorTable.getInstance().getBinaryOperator(".."),
+				factory.createIntConstantProxy(lowerBound), factory
+						.createIntConstantProxy(upperBound));
+
+		return factory.createVariableProxy(name, type, factory
+				.createIntConstantProxy(initialValue),
+				markedValue == null ? null : factory
+						.createIntConstantProxy(markedValue));
 	}
 
 	public static boolean isInteger(VariableProxy variable) {
 		return variable.getType() instanceof BinaryExpressionProxy;
 	}
 
-	public static void setAsInteger(VariableSubject variable, final int lowerBound, final int upperBound,
-			final int initialValue, final Integer markedValue) {
+	public static void setAsInteger(VariableSubject variable,
+			final int lowerBound, final int upperBound, final int initialValue,
+			final Integer markedValue) {
 		if (initialValue > upperBound || initialValue < lowerBound) {
 			throw new IllegalArgumentException(
 					"Initial value is not within the specified range");
 		}
 		if (markedValue != null
-				&& (markedValue > getUpperBound(variable) || markedValue < getLowerBound(variable))) {
+				&& (markedValue > upperBound || markedValue < lowerBound)) {
 			throw new IllegalArgumentException(
 					"Marked value is not within the specified range");
 		}
 
 		ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
-		variable.setType(factory.createBinaryExpressionProxy(CompilerOperatorTable
-				.getInstance().getBinaryOperator(".."), factory
-				.createIntConstantProxy(lowerBound), factory
-				.createIntConstantProxy(upperBound)));
+		variable.setType(factory.createBinaryExpressionProxy(
+				CompilerOperatorTable.getInstance().getBinaryOperator(".."),
+				factory.createIntConstantProxy(lowerBound), factory
+						.createIntConstantProxy(upperBound)));
 
 		variable.setInitialValue(factory.createIntConstantProxy(initialValue));
 
@@ -79,20 +97,25 @@ public class VariableHelper {
 	}
 
 	// Methods for convenient handling of boolean variables
-	public static VariableSubject createBooleanVariable(final String name, final boolean initialValue,
-			final Boolean markedValue) {
-		VariableSubject variable = ModuleSubjectFactory.getInstance().createVariableProxy(name, null, null);
-		setAsBoolean(variable, initialValue, markedValue);
-		return variable;
+	public static VariableSubject createBooleanVariable(final String name,
+			final boolean initialValue, final Boolean markedValue) {
+		ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
+		return factory.createVariableProxy(name, factory
+				.createSimpleIdentifierProxy(NAME_OF_BOOLEAN_TYPE), factory
+				.createBooleanConstantProxy(initialValue),
+				markedValue == null ? null : factory
+						.createBooleanConstantProxy(markedValue));
 	}
 
-	public static void setAsBoolean(VariableSubject variable, final boolean initialValue,
-			final Boolean markedValue) {
+	public static void setAsBoolean(VariableSubject variable,
+			final boolean initialValue, final Boolean markedValue) {
 
 		ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
-		variable.setType(factory.createSimpleIdentifierProxy(NAME_OF_BOOLEAN_TYPE));
+		variable.setType(factory
+				.createSimpleIdentifierProxy(NAME_OF_BOOLEAN_TYPE));
 
-		variable.setInitialValue(factory.createBooleanConstantProxy(initialValue));
+		variable.setInitialValue(factory
+				.createBooleanConstantProxy(initialValue));
 
 		variable.setMarkedValue(markedValue == null ? null : factory
 				.createBooleanConstantProxy(markedValue));
@@ -118,6 +141,6 @@ public class VariableHelper {
 		}
 		return ((BooleanConstantProxy) variable.getMarkedValue()).isValue();
 	}
-	
+
 	public final static String NAME_OF_BOOLEAN_TYPE = "boolean";
 }
