@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.114 2007-02-12 23:24:14 robi Exp $
+//# $Id: ControlledSurface.java,v 1.115 2007-02-13 00:14:19 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -167,14 +167,18 @@ public class ControlledSurface
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.ModelObserver
-  public void modelChanged(ModelChangeEvent e)
+  public void modelChanged(final ModelChangeEvent event)
   {
-    //minimizeSize();
-    drawnAreaBounds = null;
-    Rectangle area = getDrawnAreaBounds();
-    setPreferredSize(new Dimension((int)drawnAreaBounds.getWidth() + Config.GUI_EDITOR_GRID_SIZE.get() * 10,
-                                   (int)drawnAreaBounds.getHeight() + Config.GUI_EDITOR_GRID_SIZE.get() * 10));
-    setErrorList(findError());
+    final Rectangle area = getDrawnAreaBounds();
+    final int extra = Config.GUI_EDITOR_GRID_SIZE.get() * 10;
+    final int x = area.width + extra;
+    final int y = area.height + extra;
+    final Dimension dim = new Dimension(x, y);
+    if (!dim.equals(getPreferredSize())) {
+      setPreferredSize(dim);
+      revalidate();
+    }
+    updateError();
     updateHighlighting();
     repaint();
   }
@@ -221,13 +225,12 @@ public class ControlledSurface
       for (final MouseMotionListener listener : getMouseMotionListeners()) {
         removeMouseMotionListener(listener);
       }
-      removeMouseListener(mController);
-      removeMouseMotionListener(mController);
       mController = controller;
       addMouseListener(mController);
       addMouseMotionListener(mController);
       mExternalDragSource.createDefaultDragGestureRecognizer
         (this, mExternalDragAction, mDGListener);
+      updateHighlighting();
     }
   }
 
@@ -695,7 +698,7 @@ public class ControlledSurface
     } else {
       showHandles = mController.canBeSelected(item);
     }
-    final boolean error = mError.contains(item);
+    final boolean error = isError(item);
     EditorSurface.DRAGOVERSTATUS dragOver =
       EditorSurface.DRAGOVERSTATUS.NOTDRAG;
     int priority = getPriority(item);
@@ -726,37 +729,31 @@ public class ControlledSurface
 
   //#########################################################################
   //# Error Display
-  private Set<ProxySubject> findError()
+  private void updateError()
   {
-    Set<ProxySubject> error = new HashSet<ProxySubject>();
-    for (final NodeProxy n1 : getDrawnGraph().getNodes()) {
-      final Shape s1 = getShapeProducer().getShape(n1).getShape();
-      for (final NodeProxy n2 : getDrawnGraph().getNodes()) {
-        if (n1 != n2 &&
-            !(n1 instanceof GroupNodeProxy && n2 instanceof GroupNodeProxy)) {
-          final Shape s2 = getShapeProducer().getShape(n2).getShape();
-          if (overlap(s1, s2)) {
-            error.add((ProxySubject)n1);
-            error.add((ProxySubject)n2);
+    if (!mIsCommittingSecondaryGraph) {
+      mError.clear();
+      final Collection<NodeProxy> nodes = getDrawnGraph().getNodes();
+      for (final NodeProxy n1 : nodes) {
+        final Shape s1 = getShapeProducer().getShape(n1).getShape();
+        for (final NodeProxy n2 : nodes) {
+          if (n1 != n2 &&
+              !(n1 instanceof GroupNodeProxy &&
+                n2 instanceof GroupNodeProxy)) {
+            final Shape s2 = getShapeProducer().getShape(n2).getShape();
+            if (overlap(s1, s2)) {
+              final NodeSubject node1 = (NodeSubject) n1;
+              final NodeSubject node2 = (NodeSubject) n2;
+              mError.add(node1);
+              mError.add(node2);
+            }
           }
         }
       }
     }
-    return error;
   }
 
-  public void setErrorList(Collection<? extends ProxySubject> error)
-  {
-    mError.clear();
-    mError.addAll(error);
-  }
-
-  public Set<ProxySubject> getErrorList()
-  {
-    return new HashSet<ProxySubject>(mError);
-  }
-
-  private boolean isError(ProxySubject subject)
+  private boolean isError(final ProxySubject subject)
   {
     return mError.contains(subject);
   }
@@ -1735,8 +1732,11 @@ public class ControlledSurface
     void commitDrag(final Point point)
     {
       super.commitDrag(point);
+      mIsCommittingSecondaryGraph = true;
       commitSecondaryGraph();
       clearSecondaryGraph();
+      mIsCommittingSecondaryGraph = false;
+      updateError();
     }
 
     void cancelDrag(final Point point)
@@ -3426,6 +3426,9 @@ public class ControlledSurface
    * displayed through alternative means.
    */
   private final Set<ProxySubject> mDontDraw = new HashSet<ProxySubject>();
+  /**
+   * Set of items to be highlighted as erroneous.
+   */
   private final Set<ProxySubject> mError = new HashSet<ProxySubject>();
   /**
    * The currently highlighted EditorObject (under the mouse pointer).
@@ -3450,6 +3453,10 @@ public class ControlledSurface
    * while a move operation is in progress.
    */
   private SubjectShapeProducer mSecondaryShapeProducer = null;
+  /**
+   * A flag, indicating that the secondary graph is being committed.
+   */
+  private boolean mIsCommittingSecondaryGraph = false;
   /**
    * The internal dragging operation currently in progress,
    * or <CODE>null</CODE>.
@@ -3476,13 +3483,6 @@ public class ControlledSurface
 
   //#########################################################################
   //# Class Constants
-  /** is not being draggedOver*/
-  public static final int NOTDRAG = 0;
-  /** is being draggedOver and can drop data*/
-  public static final int CANDROP = 1;
-  /** is being draggedOver but can't drop data*/
-  public static final int CANTDROP = 2;
-
   private static final DataFlavor FLAVOUR =
     new DataFlavor(IdentifierWithKind.class, "IdentifierWithKind");
 
