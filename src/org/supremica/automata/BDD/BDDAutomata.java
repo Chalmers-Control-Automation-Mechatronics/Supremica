@@ -50,6 +50,7 @@
 package org.supremica.automata.BDD;
 
 import net.sf.javabdd.*;
+import org.supremica.log.*;
 import org.supremica.util.SupremicaException;
 import java.util.*;
 import java.io.*;
@@ -61,145 +62,199 @@ import org.supremica.util.BDD.Options;
 
 import org.supremica.util.BDD.solvers.OrderingSolver;
 
-
 public class BDDAutomata
+    implements Iterable<BDDAutomaton>
 {
-	BDDManager manager;
-	Automata theAutomata = new Automata();
+    private static Logger logger = LoggerFactory.createLogger(BDDAutomata.class);
+    
+    BDDManager manager;
+    Automata theAutomata;
+    List<BDDAutomaton> theBDDAutomataList = new LinkedList<BDDAutomaton>();
+    Map<Automaton, BDDAutomaton> automatonToBDDAutomatonMap = new HashMap<Automaton, BDDAutomaton>();
+    AutomataIndexMap theIndexMap;
+    Alphabet observableUnionAlphabet;
+ 
+    BDDTransitions bddTransitions = null; 
+               
+    BDDDomain eventDomain;
+    
+    BDDVarSet sourceStateVariables = null;
+    BDDVarSet destStateVariables = null;
+    
+    BDDPairing sourceToDestStatePairing = null;
+    BDDPairing destToSourceStatePairing = null;
 
-	public BDDAutomata(Automata orgAutomata)
-	{
-		sortAutomata(orgAutomata);
-		manager = new BDDManager(theAutomata);
-		manager.initialize();
-	}
-
-	void sortAutomata(Automata orgAutomata)
-	{
-		Options.ordering_algorithm = Options.AO_HEURISTIC_BFS;
-		ArrayList<PCGNode> pcgNodeList = new ArrayList<PCGNode>();
-		for (Automaton currAutomaton : orgAutomata)
-		{
-			pcgNodeList.add(new DefaultPCGNode(currAutomaton.getName(), currAutomaton.nbrOfStates()));
-		}
-		PCG pcg = new PCG(new Vector<PCGNode>(pcgNodeList));
-
-		int[][] weightMatrix = getCommunicationMatrix(orgAutomata);
-		OrderingSolver orderingSolver = new OrderingSolver(orgAutomata.size());
-
-		int i = 0;
-		for (Automaton currAutomaton : orgAutomata)
-		{
-			orderingSolver.addNode(pcgNodeList.get(i), weightMatrix[i], i - 1);
-			i++;
-		}
-
-		int[] order = orderingSolver.getGoodOrder();
-
-		//System.out.print("suggestedOrder:");
-		for (i = 0; i < order.length; i++)
-		{
-			theAutomata.addAutomaton(new Automaton(orgAutomata.getAutomatonAt(order[i])));
-			//System.out.print(" " + order[i]);
-		}
-		//System.out.println();
-	}
-
-	public double numberOfReachableStates()
-	{
-		return manager.numberOfReachableStates();
-	}
-
-	public double numberOfCoreachableStates()
-	{
-		return manager.numberOfCoreachableStates();
-	}
-
-	public double numberOfReachableAndCoreachableStates()
-	{
-		return manager.numberOfReachableAndCoreachableStates();
-	}
-
-	public boolean isNonblocking()
-	{
-		return manager.isNonblocking();
-	}
-
-	public boolean isControllable()
-	{
-		return false;
-	}
-
-	public boolean isNonblockingAndControllable()
-	{
-		return false;
-	}
-
-	int[][] getCommunicationMatrix(Automata theAutomata)
-	{
-		int nbrOfAutomata = theAutomata.size();
-		int[][] communicationMatrix = new int[nbrOfAutomata][nbrOfAutomata];
-
-		for (int i = 0; i < nbrOfAutomata; i++)
-		{
-			Automaton firstAutomaton = theAutomata.getAutomatonAt(i);
-
-			communicationMatrix[i][i] = getCommunicationComplexity(firstAutomaton, firstAutomaton);
-
-			for (int j = 0; j < i; j++)
-			{
-				Automaton secondAutomaton = theAutomata.getAutomatonAt(j);
-				int complexity = getCommunicationComplexity(firstAutomaton, secondAutomaton);
-				communicationMatrix[i][j] = communicationMatrix[j][i] = complexity;
-			}
-		}
-
-		return communicationMatrix;
-	}
-
-	static int getCommunicationComplexity(Automaton firstAutomaton, Automaton secondAutomaton)
-	{
-		Alphabet firstAlphabet = new Alphabet(firstAutomaton.getAlphabet());
-		Alphabet secondAlphabet = secondAutomaton.getAlphabet();
-		firstAlphabet.intersect(secondAlphabet);
-		return firstAlphabet.size();
-	}
-
-	public static void main(String[] args)
-			throws Exception
-	{
-		System.err.println("Loading: " + args[0]);
-
-		ProjectBuildFromXml builder = new ProjectBuildFromXml();
-		Project theProject = builder.build(new File(args[0]));
-
-		BDDAutomata bddAutomata = new BDDAutomata(theProject);
-
-		long startTime = System.currentTimeMillis();
-		double nbrOfReachableStates = bddAutomata.numberOfReachableStates();
-		long stopTime = System.currentTimeMillis();
-		long compTime = stopTime - startTime;
-
-		System.err.println("Computation time (ms): " + compTime);
-		System.err.println("Reachable states: " + nbrOfReachableStates);
-
-		startTime = System.currentTimeMillis();
-		double nbrOfCoreachableStates = bddAutomata.numberOfCoreachableStates();
-		stopTime = System.currentTimeMillis();
-		compTime = stopTime - startTime;
-
-		System.err.println("Computation time (ms): " + compTime);
-		System.err.println("Coreachable states: " + nbrOfCoreachableStates);
-
-		startTime = System.currentTimeMillis();
-		double nbrOfReachableAndCoreachableStates = bddAutomata.numberOfReachableAndCoreachableStates();
-		stopTime = System.currentTimeMillis();
-		compTime = stopTime - startTime;
-
-		System.err.println("Computation time (ms): " + compTime);
-		System.err.println("ReachableAndCoreachable states: " + nbrOfReachableAndCoreachableStates);
-
-		System.err.println("isNonblocking: " + bddAutomata.isNonblocking());
-	}
-
+    BDD initialStatesBDD = null;
+    BDD markedStatesBDD = null;
+    BDD forbiddenStatesBDD = null;
+    BDD uncontrollableStatesBDD = null;
+    
+    BDDAutomata(Automata orgAutomata)
+    {
+        AutomataSorter automataSorter = new PCGAutomataSorter();
+        theAutomata = automataSorter.sortAutomata(orgAutomata);
+        manager = new BDDManager();
+  
+        try
+        {
+            theIndexMap = new AutomataIndexMap(theAutomata);
+        }
+        catch (Exception e)
+        {
+            logger.error(e);
+        }
+        
+        initialStatesBDD = manager.getOneBDD();
+        markedStatesBDD = manager.getOneBDD();
+        forbiddenStatesBDD = manager.getZeroBDD();
+        uncontrollableStatesBDD = manager.getZeroBDD();
+        
+        initialize();
+    }
+ 
+    BDDManager getBDDManager()
+    {
+        return manager;
+    }
+    
+    void initialize()
+    {
+        observableUnionAlphabet = theAutomata.getObservableUnionAlphabet();
+        eventDomain = manager.createDomain(observableUnionAlphabet.size());
+        
+        sourceStateVariables = manager.createEmptyVarSet();
+        destStateVariables = manager.createEmptyVarSet();
+        
+        BDDDomain[] sourceStateDomains = new BDDDomain[theAutomata.size()];
+        BDDDomain[] destStateDomains = new BDDDomain[theAutomata.size()];
+        
+        int i = 0;
+        for (Automaton automaton : theAutomata)
+        {
+            int nbrOfStates = automaton.nbrOfStates();
+            //System.err.println("nbrOfStates: " + nbrOfStates);
+            BDDDomain sourceStateDomain = manager.createDomain(nbrOfStates);
+            BDDDomain destStateDomain = manager.createDomain(nbrOfStates);
+            BDDAutomaton bddAutomaton = new BDDAutomaton(this, automaton, sourceStateDomain, destStateDomain);
+            bddAutomaton.initialize();
+ 
+            sourceStateVariables.unionWith(sourceStateDomain.set());
+            destStateVariables.unionWith(destStateDomain.set());
+            
+            sourceStateDomains[i] = sourceStateDomain;
+            destStateDomains[i] = destStateDomain;
+            
+            add(bddAutomaton);
+                        
+            i++;
+        }
+      
+        sourceToDestStatePairing = manager.makePairing(sourceStateDomains, destStateDomains);
+        destToSourceStatePairing = manager.makePairing(destStateDomains, sourceStateDomains);       
+  
+        bddTransitions = new BDDMonolithicTransitions(this);
+    }   
+  
+    public Alphabet getInverseAlphabet(Automaton currAutomaton)
+    {
+        return theAutomata.getInverseAlphabet(currAutomaton);
+    }
+        
+    void add(BDDAutomaton bddAutomaton)
+    {
+        theBDDAutomataList.add(bddAutomaton);
+        automatonToBDDAutomatonMap.put(bddAutomaton.getAutomaton(), bddAutomaton);
+    }
+    public Iterator<BDDAutomaton> iterator()
+    {
+        return theBDDAutomataList.iterator();
+    }
+    
+    public BDDVarSet getEventVarSet()
+    {
+        return eventDomain.set();
+    }
+    
+    public BDDDomain getEventDomain()
+    {
+        return eventDomain;
+    }
+     
+    public int getAutomatonIndex(Automaton theAutomaton)
+    {
+        return theIndexMap.getAutomatonIndex(theAutomaton);
+    }
+    
+    public int getStateIndex(Automaton theAutomaton, State theState)
+    {
+        return theIndexMap.getStateIndex(theAutomaton, theState);
+    }
+    
+    public int getEventIndex(LabeledEvent theEvent)
+    {
+        return theIndexMap.getEventIndex(theEvent);
+    }
+ 
+        public void addInitialStates(BDD initialStates)
+    {
+        initialStatesBDD = initialStatesBDD.and(initialStates);
+    }
+    
+    public void addMarkedStates(BDD markedStates)
+    {
+        markedStatesBDD = markedStatesBDD.and(markedStates);
+    }
+    
+    public void addForbiddenStates(BDD forbiddenStates)
+    {
+        forbiddenStatesBDD = forbiddenStatesBDD.or(forbiddenStates);
+    }
+    
+    public void addUncontrollableStates(BDD uncontrollableStates)
+    {
+        uncontrollableStatesBDD = uncontrollableStatesBDD.and(uncontrollableStates);
+    }
+    
+    public double numberOfReachableStates()
+    {
+        BDD reachableStatesBDD = manager.reachableStates(initialStatesBDD, bddTransitions.getMonolithicTransitionForwardBDD(), sourceStateVariables, destToSourceStatePairing);
+        return reachableStatesBDD.satCount(sourceStateVariables);
+    }
+    
+    public double numberOfCoreachableStates()
+    {
+//        System.out.println("initialStates BDD: " + initialStatesBDD.toStringWithDomains());
+//        System.out.println("markedStates BDD: " + markedStatesBDD.toStringWithDomains());
+        
+        BDD coreachableStatesBDD = manager.coreachableStates(markedStatesBDD, bddTransitions.getMonolithicTransitionBackwardBDD(), sourceStateVariables, destToSourceStatePairing);
+        return coreachableStatesBDD.satCount(sourceStateVariables);
+    }
+    
+    public double numberOfReachableAndCoreachableStates()
+    {
+        BDD reachableStatesBDD = manager.reachableStates(initialStatesBDD, bddTransitions.getMonolithicTransitionForwardBDD(), sourceStateVariables, destToSourceStatePairing);
+        BDD coreachableStatesBDD = manager.coreachableStates(markedStatesBDD, bddTransitions.getMonolithicTransitionBackwardBDD(), sourceStateVariables, destToSourceStatePairing);
+        
+        BDD reachableAndCoreachableStatesBDD = reachableStatesBDD.and(coreachableStatesBDD);
+        return reachableAndCoreachableStatesBDD.satCount(sourceStateVariables);
+    }
+    
+    public boolean isNonblocking()
+    {
+        BDD reachableStatesBDD = manager.reachableStates(initialStatesBDD, bddTransitions.getMonolithicTransitionForwardBDD(), sourceStateVariables, destToSourceStatePairing);
+        BDD coreachableStatesBDD = manager.coreachableStates(markedStatesBDD, bddTransitions.getMonolithicTransitionBackwardBDD(), sourceStateVariables, destToSourceStatePairing);
+        BDD impBDD = reachableStatesBDD.imp(coreachableStatesBDD);
+        return impBDD.equals(manager.getOneBDD());
+    }
+    
+    boolean isControllable()
+    {
+        return false;
+    }
+    
+    boolean isNonblockingAndControllable()
+    {
+        return false;
+    }
+    
 }

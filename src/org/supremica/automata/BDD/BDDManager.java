@@ -59,385 +59,140 @@ import org.supremica.automata.IO.*;
 
 public class BDDManager
 {
-	private static Logger logger = LoggerFactory.createLogger(BDDManager.class);
-
-	static BDDFactory factory;
-	Automata theAutomata;
-	Alphabet observableUnionAlphabet;
-	AutomataIndexMap theIndexMap;
-	boolean initialized = false;
-	Map<Automaton, BDDAutomaton> automatonToBDDAutomatonMap = new HashMap<Automaton, BDDAutomaton>();
-	Map<LabeledEvent, BDD> labeledEventToForwardBDDMap = new HashMap<LabeledEvent, BDD>();
-	Map<LabeledEvent, BDD> labeledEventToBackwardBDDMap = new HashMap<LabeledEvent, BDD>();
-
-	BDDDomain eventDomain;
-
-	BDDVarSet sourceStateVariables = null;
-	BDDVarSet destStateVariables = null;
-
-	BDDPairing sourceToDestStatePairing = null;
-	BDDPairing destToSourceStatePairing = null;
-
-	BDD initialStatesBDD = null;
-	BDD markedStatesBDD = null;
-	BDD forbiddenStatesBDD = null;
-	BDD uncontrollableStatesBDD = null;
-	BDD conjunctiveTransitionsBDD = null;
-	BDD disjunctiveTransitionsBDD = null;
-
-	public BDDManager(Automata theAutomata)
-	{
-		this(theAutomata, "java");
-	}
-
-	public BDDManager(Automata theAutomata, String bddpackage)
-	{
-		this(theAutomata, bddpackage, 150000, 150000);
-	}
-
-	public BDDManager(Automata theAutomata, String bddpackage, int nodenum, int cachesize)
-	{
-		if (factory == null)
-		{
-			factory = BDDFactory.init(bddpackage, nodenum, cachesize);
-		}
-		this.theAutomata = theAutomata;
-
-		try
-		{
-			theIndexMap = new AutomataIndexMap(theAutomata);
-		}
-		catch (Exception e)
-		{
-			logger.error(e);
-		}
-
-		initialStatesBDD = one();
-		markedStatesBDD = one();
-		forbiddenStatesBDD = zero();
-		uncontrollableStatesBDD = zero();
-	}
-
-	public void initialize()
-	{
-		observableUnionAlphabet = theAutomata.getObservableUnionAlphabet();
-		eventDomain = factory.extDomain(observableUnionAlphabet.size());
-
-		sourceStateVariables = factory.emptySet();
-		destStateVariables = factory.emptySet();
-
-		BDDDomain[] sourceStateDomains = new BDDDomain[theAutomata.size()];
-		BDDDomain[] destStateDomains = new BDDDomain[theAutomata.size()];
-
-		int i = 0;
-		for (Automaton automaton : theAutomata)
-		{
-			int nbrOfStates = automaton.nbrOfStates();
-			//System.err.println("nbrOfStates: " + nbrOfStates);
-			BDDDomain sourceStateDomain = factory.extDomain(nbrOfStates);
-			BDDDomain destStateDomain = factory.extDomain(nbrOfStates);
-			BDDAutomaton bddAutomaton = new BDDAutomaton(this, automaton, sourceStateDomain, destStateDomain);
-			bddAutomaton.initialize();
-			automatonToBDDAutomatonMap.put(automaton, bddAutomaton);
-
-			sourceStateVariables.unionWith(sourceStateDomain.set());
-			destStateVariables.unionWith(destStateDomain.set());
-
-			sourceStateDomains[i] = sourceStateDomain;
-			destStateDomains[i] = destStateDomain;
-			i++;
-		}
-
-		sourceToDestStatePairing = factory.makePair();
-		sourceToDestStatePairing.set(sourceStateDomains, destStateDomains);
-
-		destToSourceStatePairing = factory.makePair();
-		destToSourceStatePairing.set(destStateDomains, sourceStateDomains);
-
-		createTransitionBDDs();
-
-		initialized = true;
-	}
-
-	// Create a BDD modeling the synchronized behavior of all automata
-	// given this event.
-	void createTransitionBDDs()
-	{
-		for (LabeledEvent currEvent : observableUnionAlphabet)
-		{
-			BDD currForwardTransitionBDD = zero();
-			BDD currBackwardTransitionBDD = zero();
-			int eventIndex = theIndexMap.getEventIndex(currEvent);
-			for (Automaton currAutomaton : theAutomata)
-			{
-				BDDAutomaton currBDDAutomaton = automatonToBDDAutomatonMap.get(currAutomaton);
-				BDDDomain sourceStateDomain = currBDDAutomaton.getSourceStateDomain();
-				BDDDomain destStateDomain = currBDDAutomaton.getDestStateDomain();
-
-				if (currAutomaton.isInAlphabet(currEvent))
-				{  // Add transitions for current event - self-loop all other
-				   // If a new state is reachable using currEvent, we also add all other
-				   // states that could be reched from the dest state using unobservable events.
-					for (State currState : currAutomaton)
-					{
-						int sourceStateIndex = getStateIndex(currAutomaton, currState);
-
-						for (Arc currArc : currState.getOutgoingArcs())
-						{
-							if (currArc.getEvent().equals(currEvent))
-							{
-								StateSet destStateSet = currArc.getToState().epsilonClosure(true);
-								for (State destState : destStateSet)
-								{
-									int destStateIndex = getStateIndex(currAutomaton, destState);
-									addTransition(currForwardTransitionBDD, sourceStateIndex, sourceStateDomain, destStateIndex, destStateDomain, eventIndex, eventDomain);
-									addTransition(currBackwardTransitionBDD, destStateIndex, sourceStateDomain, sourceStateIndex, destStateDomain, eventIndex, eventDomain);
-								}
-							}
-							else
-							{
-								addTransition(currForwardTransitionBDD, sourceStateIndex, sourceStateDomain, sourceStateIndex, destStateDomain, eventIndex, eventDomain);
-								addTransition(currBackwardTransitionBDD, sourceStateIndex, sourceStateDomain, sourceStateIndex, destStateDomain, eventIndex, eventDomain);
-							}
-						}
-					}
-				}
-				else
-				{ // Self-loop all states
-					for (State currState : currAutomaton)
-					{
-						int stateIndex = theIndexMap.getStateIndex(currAutomaton, currState);
-						addTransition(currForwardTransitionBDD, stateIndex, sourceStateDomain, stateIndex, destStateDomain, eventIndex, eventDomain);
-						addTransition(currBackwardTransitionBDD, stateIndex, sourceStateDomain, stateIndex, destStateDomain, eventIndex, eventDomain);
-					}
-				}
-			}
-			addForwardTransitionBDD(currEvent, currForwardTransitionBDD);
-			addBackwardTransitionBDD(currEvent, currBackwardTransitionBDD);
-		}
-	}
-
-	public void addForwardTransitionBDD(LabeledEvent event, BDD bdd)
-	{
-		labeledEventToForwardBDDMap.put(event, bdd);
-	}
-
-	public BDD getForwardTransitionBDD(LabeledEvent event)
-	{
-		return labeledEventToForwardBDDMap.get(event);
-	}
-
-	public void addBackwardTransitionBDD(LabeledEvent event, BDD bdd)
-	{
-		labeledEventToBackwardBDDMap.put(event, bdd);
-	}
-
-	public BDD getBackwardTransitionBDD(LabeledEvent event)
-	{
-		return labeledEventToBackwardBDDMap.get(event);
-	}
-
-	public boolean isInitialized()
-	{
-		return initialized;
-	}
-
-	public BDDDomain getEventDomain()
-	{
-		return eventDomain;
-	}
-
-	public static BDD zero()
-	{
-		return factory.zero();
-	}
-
-	public static BDD one()
-	{
-		return factory.one();
-	}
-
-	public static BDDPairing makePair(BDDDomain source, BDDDomain dest)
-	{
-		return factory.makePair(source, dest);
-	}
-
-	public void addInitialStates(BDD initialStates)
-	{
-		initialStatesBDD = initialStatesBDD.and(initialStates);
-	}
-
-	public int getAutomatonIndex(Automaton theAutomaton)
-	{
-		return theIndexMap.getAutomatonIndex(theAutomaton);
-	}
-
-	public int getStateIndex(Automaton theAutomaton, State theState)
-	{
-		return theIndexMap.getStateIndex(theAutomaton, theState);
-	}
-
-	public int getEventIndex(LabeledEvent theEvent)
-	{
-		return theIndexMap.getEventIndex(theEvent);
-	}
-
-	public Alphabet getInverseAlphabet(Automaton currAutomaton)
-	{
-		return theAutomata.getInverseAlphabet(currAutomaton);
-	}
-
-	public void addMarkedStates(BDD markedStates)
-	{
-		markedStatesBDD = markedStatesBDD.and(markedStates);
-	}
-
-	public void addForbiddenStates(BDD forbiddenStates)
-	{
-		forbiddenStatesBDD = forbiddenStatesBDD.or(forbiddenStates);
-	}
-
-	public void addUncontrollableStates(BDD uncontrollableStates)
-	{
-		uncontrollableStatesBDD = uncontrollableStatesBDD.and(uncontrollableStates);
-	}
-
-	public void addState(BDD bdd, int stateIndex,  BDDDomain domain)
-	{
-		BDD newStateBDD = factory.buildCube(stateIndex, domain.vars());
-		bdd.orWith(newStateBDD);
-	}
-
-	public void addTransition(BDD bdd, int sourceStateIndex, BDDDomain sourceDomain, int destStateIndex, BDDDomain destDomain, int eventIndex, BDDDomain eventDomain)
-	{
-		// Create a BDD representing the source state
-		BDD sourceBDD = factory.buildCube(sourceStateIndex, sourceDomain.vars());
-
-		// Create a BDD representing the dest state
-		BDD destBDD = factory.buildCube(destStateIndex, destDomain.vars());
-
-		// Create a BDD representing the event
-		BDD eventBDD = factory.buildCube(eventIndex, eventDomain.vars());
-
-		// Add source and dest state
-		sourceBDD.andWith(destBDD);
-
-		// Add event to source and dest state
-		sourceBDD.andWith(eventBDD);
-
-		// Add the transition to the set of existing transitions
-		bdd.orWith(sourceBDD);
-	}
-
-	BDD getTransitionForwardConjunctiveBDD()
-	{
-		BDD transitionBDD = one();
-		Collection<BDDAutomaton> bddAutomata = automatonToBDDAutomatonMap.values();
-		for (BDDAutomaton currAutomaton : bddAutomata)
-		{
-			transitionBDD = transitionBDD.and(currAutomaton.getTransitionForwardConjunctiveBDD());
-		}
-		transitionBDD = transitionBDD.exist(eventDomain.set());
-		return transitionBDD;
-	}
-
-	BDD getTransitionBackwardConjunctiveBDD()
-	{
-		BDD transitionBDD = one();
-		Collection<BDDAutomaton> bddAutomata = automatonToBDDAutomatonMap.values();
-		for (BDDAutomaton currAutomaton : bddAutomata)
-		{
-			transitionBDD = transitionBDD.and(currAutomaton.getTransitionBackwardConjunctiveBDD());
-		}
-		transitionBDD = transitionBDD.exist(eventDomain.set());
-		return transitionBDD;
-	}
-
-	public double numberOfReachableStates()
-	{
-		BDD reachableStatesBDD = reachableStates(initialStatesBDD, getTransitionForwardConjunctiveBDD());
-		return reachableStatesBDD.satCount(sourceStateVariables);
-	}
-
-	public double numberOfCoreachableStates()
-	{
-		System.out.println("initialStates BDD: " + initialStatesBDD.toStringWithDomains());
-		System.out.println("markedStates BDD: " + markedStatesBDD.toStringWithDomains());
-
-		BDD coreachableStatesBDD = coreachableStates(markedStatesBDD, getTransitionBackwardConjunctiveBDD());
-		return coreachableStatesBDD.satCount(sourceStateVariables);
-	}
-
-	public double numberOfReachableAndCoreachableStates()
-	{
-		BDD reachableStatesBDD = reachableStates(initialStatesBDD, getTransitionForwardConjunctiveBDD());
-		BDD coreachableStatesBDD = coreachableStates(markedStatesBDD, getTransitionBackwardConjunctiveBDD());
-
-		BDD reachableAndCoreachableStatesBDD = reachableStatesBDD.and(coreachableStatesBDD);
-		return reachableAndCoreachableStatesBDD.satCount(sourceStateVariables);
-	}
-
-	public boolean isNonblocking()
-	{
-		BDD reachableStatesBDD = reachableStates(initialStatesBDD, getTransitionForwardConjunctiveBDD());
-		BDD coreachableStatesBDD = coreachableStates(markedStatesBDD, getTransitionBackwardConjunctiveBDD());
-		BDD impBDD = reachableStatesBDD.imp(coreachableStatesBDD);
-		return impBDD.equals(one());
-	}
-
-	public BDD reachableStates(BDD initialStates, BDD transitions)
-	{
-		BDD reachableStatesBDD = initialStates.id();
-		BDD previousReachableStatesBDD = null;
-
-		do
-		{
-			// Keep a copy of the previously discovered states
-			// This will be used in the terminatiion condition for
-			// the operation.
-			previousReachableStatesBDD = reachableStatesBDD.id();
-
-			// Compute AND function of rechable states and the transitions.
-			// By using this all dest states that can be reached from the current set of
-			// reachable states will be in the DestDomainVariables.
-			// The source states in the BDD are those states that survived the AND function,
-			// which is all states that had an (in the composition) enabled event.
-			// The source states are not of interest to us - thus we quantify out them.
-			// The AND function and removal of some variables are done in one operation by
-			// the relprod command.
-			BDD nextStatesAndTransitionsBDD = reachableStatesBDD.relprod(transitions, sourceStateVariables);
-
-			// Now all states that could be reached from the current set of states
-			// are in the DestDomainVariables. Now we need to move them from DestDomainVariables
-			// to SourceDomainVariables so they are comparaable with our previous reachable states.
-			// This is done with the replace operation.
-			BDD nextStatesBDD = nextStatesAndTransitionsBDD.replace(destToSourceStatePairing);
-
-			// The next operation is to compute the union of the previous reachable
-			// states and the states reachble, in one iteration, from the reachable
-			// states. This is simply done by doing an OR between the
-			// previously reachable states and the newly found states.
-			reachableStatesBDD.orWith(nextStatesBDD);
-		}
-		while (!reachableStatesBDD.equals(previousReachableStatesBDD)); // Until no new states are found
-
-		return reachableStatesBDD;
-	}
-
-	public BDD coreachableStates(BDD markedStates, BDD transitions)
-	{
-		BDD coreachableStatesBDD = markedStates.id();
-		BDD previousCoreachableStatesBDD = null;
-
-		do
-		{
-			previousCoreachableStatesBDD = coreachableStatesBDD.id();
-			BDD previousStatesAndTransitionsBDD = coreachableStatesBDD.relprod(transitions, sourceStateVariables);
-			BDD previousStatesBDD = previousStatesAndTransitionsBDD.replace(destToSourceStatePairing);
-			coreachableStatesBDD.orWith(previousStatesBDD);
-		}
-		while (!coreachableStatesBDD.equals(previousCoreachableStatesBDD)); // Until no new states are found
-
-		return coreachableStatesBDD;
-	}
+    private static Logger logger = LoggerFactory.createLogger(BDDManager.class);
+    
+    static BDDFactory factory;
+    
+    public BDDManager()
+    {
+        this("java");
+    }
+    
+    public BDDManager(String bddpackage)
+    {
+        this(bddpackage, 150000, 150000);
+    }
+    
+    public BDDManager(String bddpackage, int nodenum, int cachesize)
+    {
+        if (factory == null)
+        {
+            factory = BDDFactory.init(bddpackage, nodenum, cachesize);
+        }
+    }
+    
+    public static BDD getZeroBDD()
+    {
+        return factory.zero();
+    }
+    
+    public static BDD getOneBDD()
+    {
+        return factory.one();
+    }
+    
+    public static BDDDomain createDomain(int size)
+    {
+        return factory.extDomain(size);
+    }
+
+    public BDDVarSet createEmptyVarSet()
+    {
+        return factory.emptySet();
+    }
+     
+    public static BDDPairing makePairing(BDDDomain[] source, BDDDomain[] dest)
+    {
+        BDDPairing pairing = factory.makePair();
+        pairing.set(source, dest);
+        return pairing;
+    }
+    
+    public static BDDPairing makePairing(BDDDomain source, BDDDomain dest)
+    {
+        return factory.makePair(source, dest);
+    }
+    
+    public static void addState(BDD bdd, int stateIndex,  BDDDomain domain)
+    {
+        BDD newStateBDD = factory.buildCube(stateIndex, domain.vars());
+        bdd.orWith(newStateBDD);
+    }
+    
+    public static void addTransition(BDD bdd, int sourceStateIndex, BDDDomain sourceDomain, int destStateIndex, BDDDomain destDomain, int eventIndex, BDDDomain eventDomain)
+    {
+        // Create a BDD representing the source state
+        BDD sourceBDD = factory.buildCube(sourceStateIndex, sourceDomain.vars());
+        
+        // Create a BDD representing the dest state
+        BDD destBDD = factory.buildCube(destStateIndex, destDomain.vars());
+        
+        // Create a BDD representing the event
+        BDD eventBDD = factory.buildCube(eventIndex, eventDomain.vars());
+        
+        // Add source and dest state
+        sourceBDD.andWith(destBDD);
+        
+        // Add event to source and dest state
+        sourceBDD.andWith(eventBDD);
+        
+        // Add the transition to the set of existing transitions
+        bdd.orWith(sourceBDD);
+    }
+    
+    public static BDD reachableStates(BDD initialStates, BDD transitions, BDDVarSet sourceStateVariables, BDDPairing destToSourceStatePairing)
+    {
+        BDD reachableStatesBDD = initialStates.id();
+        BDD previousReachableStatesBDD = null;
+        
+        do
+        {
+            // Keep a copy of the previously discovered states
+            // This will be used in the terminatiion condition for
+            // the operation.
+            previousReachableStatesBDD = reachableStatesBDD.id();
+            
+            // Compute AND function of rechable states and the transitions.
+            // By using this all dest states that can be reached from the current set of
+            // reachable states will be in the DestDomainVariables.
+            // The source states in the BDD are those states that survived the AND function,
+            // which is all states that had an (in the composition) enabled event.
+            // The source states are not of interest to us - thus we quantify out them.
+            // The AND function and removal of some variables are done in one operation by
+            // the relprod command.
+            BDD nextStatesAndTransitionsBDD = reachableStatesBDD.relprod(transitions, sourceStateVariables);
+            
+            // Now all states that could be reached from the current set of states
+            // are in the DestDomainVariables. Now we need to move them from DestDomainVariables
+            // to SourceDomainVariables so they are comparaable with our previous reachable states.
+            // This is done with the replace operation.
+            BDD nextStatesBDD = nextStatesAndTransitionsBDD.replace(destToSourceStatePairing);
+            
+            // The next operation is to compute the union of the previous reachable
+            // states and the states reachble, in one iteration, from the reachable
+            // states. This is simply done by doing an OR between the
+            // previously reachable states and the newly found states.
+            reachableStatesBDD.orWith(nextStatesBDD);
+        }
+        while (!reachableStatesBDD.equals(previousReachableStatesBDD)); // Until no new states are found
+        
+        return reachableStatesBDD;
+    }
+    
+    public static BDD coreachableStates(BDD markedStates, BDD transitions, BDDVarSet sourceStateVariables, BDDPairing destToSourceStatePairing)
+    {
+        BDD coreachableStatesBDD = markedStates.id();
+        BDD previousCoreachableStatesBDD = null;
+        
+        do
+        {
+            previousCoreachableStatesBDD = coreachableStatesBDD.id();
+            BDD previousStatesAndTransitionsBDD = coreachableStatesBDD.relprod(transitions, sourceStateVariables);
+            BDD previousStatesBDD = previousStatesAndTransitionsBDD.replace(destToSourceStatePairing);
+            coreachableStatesBDD.orWith(previousStatesBDD);
+        }
+        while (!coreachableStatesBDD.equals(previousCoreachableStatesBDD)); // Until no new states are found
+        
+        return coreachableStatesBDD;
+    }
 }
