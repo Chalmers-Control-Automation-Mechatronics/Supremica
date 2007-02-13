@@ -21,19 +21,19 @@
     <domainDiagramElement
         href="sag.genmodel#//sag/Project"/>
     <childNodes
-        visualID="3006"
-        editPartClassName="SensorNodeEditPart"
-        itemSemanticEditPolicyClassName="SensorNodeItemSemanticEditPolicy"
-        notationViewFactoryClassName="SensorNodeViewFactory"
-        canonicalEditPolicyClassName="SensorNodeCanonicalEditPolicy"
-        graphicalNodeEditPolicyClassName="SensorNodeGraphicalNodeEditPolicy"
-        createCommandClassName="SensorNodeCreateCommand"
+        visualID="3008"
+        editPartClassName="SensorEditPart"
+        itemSemanticEditPolicyClassName="SensorItemSemanticEditPolicy"
+        notationViewFactoryClassName="SensorViewFactory"
+        canonicalEditPolicyClassName="SensorCanonicalEditPolicy"
+        graphicalNodeEditPolicyClassName="SensorGraphicalNodeEditPolicy"
+        createCommandClassName="SensorCreateCommand"
         containers="//@diagram/@compartments.0">
       <diagramRunTimeClass
           href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
       <elementType
           xsi:type="gmfgen:MetamodelType"
-          editHelperClassName="SensorNodeEditHelper"/>
+          editHelperClassName="SensorEditHelper"/>
       <viewmap
           xsi:type="gmfgen:InnerClassViewmap"
           className="SensorNodeFigure"
@@ -45,17 +45,17 @@
       </viewmap>
       <modelFacet>
         <metaClass
-            href="sag.genmodel#//sag/SensorNode"/>
+            href="sag.genmodel#//sag/Sensor"/>
         <containmentMetaFeature
             href="sag.genmodel#//sag/Graph/node"/>
         <childMetaFeature
             href="sag.genmodel#//sag/Graph/node"/>
       </modelFacet>
       <labels
-          visualID="5003"
-          editPartClassName="SensorNodeNameEditPart"
-          itemSemanticEditPolicyClassName="SensorNodeNameItemSemanticEditPolicy"
-          notationViewFactoryClassName="SensorNodeNameViewFactory"
+          visualID="5005"
+          editPartClassName="SensorNameEditPart"
+          itemSemanticEditPolicyClassName="SensorNameItemSemanticEditPolicy"
+          notationViewFactoryClassName="SensorNameViewFactory"
           elementIcon="true">
         <diagramRunTimeClass
             href="../../../plugin/org.eclipse.gmf.runtime.notation/model/notation.genmodel#//notation/Node"/>
@@ -66,7 +66,7 @@
         <modelFacet
             xsi:type="gmfgen:FeatureLabelModelFacet">
           <metaFeatures
-              href="sag.genmodel#//sag/SensorNode/name"/>
+              href="sag.genmodel#//sag/Sensor/name"/>
         </modelFacet>
       </labels>
     </childNodes>

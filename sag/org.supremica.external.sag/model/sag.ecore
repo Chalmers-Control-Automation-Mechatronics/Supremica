@@ -41,10 +41,10 @@
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" volatile="true"
         transient="true" derived="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="sensor" upperBound="-1"
-        eType="#//SensorNode" changeable="false" volatile="true" transient="true"
-        derived="true" containment="true">
+        eType="#//Sensor" changeable="false" volatile="true" transient="true" derived="true"
+        containment="true">
       <eAnnotations source="http://www.eclipse.org/OCL/examples/ocl">
-        <details key="derive" value="node->select(oclIsKindOf(SensorNode))"/>
+        <details key="derive" value="node->select(oclIsKindOf(Sensor))"/>
       </eAnnotations>
     </eStructuralFeatures>
   </eClassifiers>
@@ -74,6 +74,13 @@
         defaultValueLiteral="false"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="bounded" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
         volatile="true" transient="true" defaultValueLiteral="false" derived="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="forwardCondition" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="backwardCondition" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="frontEntryCondition" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="frontExitCondition" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="backEntryCondition" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="backExitCondition" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="initialNrOfObjects" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Named" abstract="true">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -101,10 +108,12 @@
     </eOperations>
     <eStructuralFeatures xsi:type="ecore:EReference" name="graph" upperBound="-1"
         eType="#//Graph" containment="true" eOpposite="#//Graph/project"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="sensor" upperBound="-1"
-        eType="#//Sensor" containment="true" eOpposite="#//Sensor/project"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sensorSignal" upperBound="-1"
+        eType="#//SensorSignal" containment="true" eOpposite="#//SensorSignal/project"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="controlSignal" upperBound="-1"
+        eType="#//ControlSignal" containment="true"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Sensor" eSuperTypes="#//Named">
+  <eClassifiers xsi:type="ecore:EClass" name="SensorSignal" eSuperTypes="#//Named">
     <eOperations name="validateName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean">
       <eAnnotations source="http://www.eclipse.org/OCL/examples/ocl">
         <details key="invariant" value="name &lt;> '' and name &lt;> null"/>
@@ -119,7 +128,7 @@
     </eOperations>
     <eOperations name="validateUniquenessOfName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean">
       <eAnnotations source="http://www.eclipse.org/OCL/examples/ocl">
-        <details key="invariant" value="project.sensor->forAll(s | s = self or s.name &lt;> self.name)"/>
+        <details key="invariant" value="project.sensorSignal->forAll(s | s = self or s.name &lt;> self.name)"/>
       </eAnnotations>
       <eParameters name="diagnostics" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDiagnosticChain"/>
       <eParameters name="context">
@@ -129,16 +138,18 @@
         </eGenericType>
       </eParameters>
     </eOperations>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="node" upperBound="-1" eType="#//SensorNode"
-        transient="true" eOpposite="#//SensorNode/sensor"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sensor" upperBound="-1"
+        eType="#//Sensor" transient="true" eOpposite="#//Sensor/signal"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="project" lowerBound="1"
-        eType="#//Project" transient="true" eOpposite="#//Project/sensor"/>
+        eType="#//Project" transient="true" eOpposite="#//Project/sensorSignal"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="EndNode" eSuperTypes="#//Node #//Named"/>
-  <eClassifiers xsi:type="ecore:EClass" name="SensorNode" eSuperTypes="#//Node">
+  <eClassifiers xsi:type="ecore:EClass" name="Sensor" eSuperTypes="#//Node">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"
         volatile="true" transient="true" derived="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="sensor" lowerBound="1"
-        eType="#//Sensor" eOpposite="#//Sensor/node"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="signal" lowerBound="1"
+        eType="#//SensorSignal" eOpposite="#//SensorSignal/sensor"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="initiallyActivated" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ControlSignal" eSuperTypes="#//Named"/>
 </ecore:EPackage>

@@ -49,28 +49,30 @@
     </genClasses>
     <genClasses ecoreClass="sag.ecore#//Project">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference sag.ecore#//Project/graph"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference sag.ecore#//Project/sensor"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference sag.ecore#//Project/sensorSignal"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference sag.ecore#//Project/controlSignal"/>
       <genOperations ecoreOperation="sag.ecore#//Project/validateName">
         <genParameters ecoreParameter="sag.ecore#//Project/validateName/diagnostics"/>
         <genParameters ecoreParameter="sag.ecore#//Project/validateName/context"/>
       </genOperations>
     </genClasses>
-    <genClasses ecoreClass="sag.ecore#//Sensor">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sag.ecore#//Sensor/node"/>
-      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference sag.ecore#//Sensor/project"/>
-      <genOperations ecoreOperation="sag.ecore#//Sensor/validateName">
-        <genParameters ecoreParameter="sag.ecore#//Sensor/validateName/diagnostics"/>
-        <genParameters ecoreParameter="sag.ecore#//Sensor/validateName/context"/>
+    <genClasses ecoreClass="sag.ecore#//SensorSignal">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sag.ecore#//SensorSignal/sensor"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference sag.ecore#//SensorSignal/project"/>
+      <genOperations ecoreOperation="sag.ecore#//SensorSignal/validateName">
+        <genParameters ecoreParameter="sag.ecore#//SensorSignal/validateName/diagnostics"/>
+        <genParameters ecoreParameter="sag.ecore#//SensorSignal/validateName/context"/>
       </genOperations>
-      <genOperations ecoreOperation="sag.ecore#//Sensor/validateUniquenessOfName">
-        <genParameters ecoreParameter="sag.ecore#//Sensor/validateUniquenessOfName/diagnostics"/>
-        <genParameters ecoreParameter="sag.ecore#//Sensor/validateUniquenessOfName/context"/>
+      <genOperations ecoreOperation="sag.ecore#//SensorSignal/validateUniquenessOfName">
+        <genParameters ecoreParameter="sag.ecore#//SensorSignal/validateUniquenessOfName/diagnostics"/>
+        <genParameters ecoreParameter="sag.ecore#//SensorSignal/validateUniquenessOfName/context"/>
       </genOperations>
     </genClasses>
     <genClasses ecoreClass="sag.ecore#//EndNode"/>
-    <genClasses ecoreClass="sag.ecore#//SensorNode">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sag.ecore#//SensorNode/name"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sag.ecore#//SensorNode/sensor"/>
+    <genClasses ecoreClass="sag.ecore#//Sensor">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sag.ecore#//Sensor/name"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sag.ecore#//Sensor/signal"/>
     </genClasses>
+    <genClasses ecoreClass="sag.ecore#//ControlSignal"/>
   </genPackages>
 </genmodel:GenModel>

@@ -29,13 +29,13 @@
             href="sag.ecore#//Graph/node"/>
         <ownedChild>
           <domainMetaElement
-              href="sag.ecore#//SensorNode"/>
+              href="sag.ecore#//Sensor"/>
           <labelMappings
               xsi:type="gmfmap:FeatureLabelMapping">
             <diagramLabel
                 href="sag.gmfgraph#SensorName"/>
             <features
-                href="sag.ecore#//SensorNode/name"/>
+                href="sag.ecore#//Sensor/name"/>
           </labelMappings>
           <tool
               xsi:type="gmftool:CreationTool"

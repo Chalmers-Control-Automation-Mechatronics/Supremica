@@ -13,15 +13,15 @@
         queryText="true"/>
   </nodeTraces>
   <childNodeTraces
-      visualID="3006"
-      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://supremica.org/external/sag' and _eClass_.name = 'SensorNode') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://supremica.org/external/sag' and _eClass_.name = 'Graph') and _containmentMF_.name = 'node')">
-    <nodeLabelTraces
-        visualID="5003"
-        queryText="true"/>
-  </childNodeTraces>
-  <childNodeTraces
       visualID="3007"
       queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://supremica.org/external/sag' and _eClass_.name = 'EndNode') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://supremica.org/external/sag' and _eClass_.name = 'Graph') and _containmentMF_.name = 'node')"/>
+  <childNodeTraces
+      visualID="3008"
+      queryText="(let _eClass_:ecore::EClass = modelFacet.metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://supremica.org/external/sag' and _eClass_.name = 'Sensor') and (let _containmentMF_:ecore::EStructuralFeature = modelFacet.containmentMetaFeature.ecoreFeature in (let _eClass_:ecore::EClass = _containmentMF_.eContainingClass in _eClass_.ePackage.nsURI = 'http://supremica.org/external/sag' and _eClass_.name = 'Graph') and _containmentMF_.name = 'node')">
+    <nodeLabelTraces
+        visualID="5005"
+        queryText="true"/>
+  </childNodeTraces>
   <linkTraces
       visualID="4010"
       queryText="modelFacet.oclIsKindOf(gmfgen::TypeLinkModelFacet) and (let _eClass_:ecore::EClass = modelFacet.oclAsType(gmfgen::TypeLinkModelFacet).metaClass.ecoreClass in _eClass_.ePackage.nsURI = 'http://supremica.org/external/sag' and _eClass_.name = 'Zone')"/>
