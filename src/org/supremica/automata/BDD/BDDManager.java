@@ -102,6 +102,11 @@ public class BDDManager
         return factory.emptySet();
     }
      
+    
+    public static BDD createBDD(int index, BDDDomain domain)
+    {
+        return factory.buildCube(index, domain.vars());
+    }
     public static BDDPairing makePairing(BDDDomain[] source, BDDDomain[] dest)
     {
         BDDPairing pairing = factory.makePair();

@@ -126,6 +126,16 @@ public class BDDAutomata
         return manager;
     }
     
+    public Automata getAutomata()
+    {
+        return theAutomata;
+    }
+    
+    public BDDAutomaton getBDDAutomaton(Automaton theAutomaton)
+    {
+        return automatonToBDDAutomatonMap.get(theAutomaton);
+    }
+    
     void initialize()
     {
         observableUnionAlphabet = theAutomata.getObservableUnionAlphabet();

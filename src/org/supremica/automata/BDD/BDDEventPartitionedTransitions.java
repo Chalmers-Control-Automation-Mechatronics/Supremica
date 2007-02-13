@@ -51,19 +51,23 @@
 package org.supremica.automata.BDD;
 
 import net.sf.javabdd.*;
+import org.supremica.automata.*;
 import org.supremica.log.*;
 import org.supremica.util.SupremicaException;
 import java.util.*;
 
-public class BDDMonolithicTransitions
+public class BDDEventPartitionedTransitions
     implements BDDTransitions
 {
     BDDAutomata bddAutomata;
+    BDDManager manager;
+    Map<LabeledEvent, BDD> labeledEventToForwardBDDMap = new HashMap<LabeledEvent, BDD>();
+    Map<LabeledEvent, BDD> labeledEventToBackwardBDDMap = new HashMap<LabeledEvent, BDD>();
     BDD transitionForwardBDD = null;    
     BDD transitionBackwardBDD = null;    
     
-    /** Creates a new instance of BDDMonolithicTransitions */
-    public BDDMonolithicTransitions(BDDAutomata bddAutomata)
+    /** Creates a new instance of BDDEventPartitionedTransitions */
+    public BDDEventPartitionedTransitions(BDDAutomata bddAutomata)
     {
         this.bddAutomata = bddAutomata;
          
@@ -75,17 +79,42 @@ public class BDDMonolithicTransitions
             transitionForwardBDD = transitionForwardBDD.and(currAutomaton.getTransitionForwardConjunctiveBDD());
             transitionBackwardBDD = transitionBackwardBDD.and(currAutomaton.getTransitionBackwardConjunctiveBDD());
         }
-        transitionForwardBDD = transitionForwardBDD.exist(bddAutomata.getEventVarSet());        
-        transitionBackwardBDD = transitionBackwardBDD.exist(bddAutomata.getEventVarSet());
+        
+        Alphabet systemAlphabet = bddAutomata.getAutomata().getUnionAlphabet();
+        for (LabeledEvent currEvent : systemAlphabet)
+        {
+            BDD currEventTransitionForwardBDD = transitionForwardBDD.id();
+            BDD currEventTransitionBackwardBDD = transitionBackwardBDD.id();
+            
+            int currEventIndex = bddAutomata.getEventIndex(currEvent);
+            BDD currEventBDD = BDDManager.createBDD(currEventIndex, bddAutomata.getEventDomain());
+            
+            currEventTransitionForwardBDD = currEventTransitionForwardBDD.and(currEventBDD);
+            labeledEventToForwardBDDMap.put(currEvent, currEventTransitionForwardBDD);
+        
+            currEventTransitionBackwardBDD = currEventTransitionBackwardBDD.and(currEventBDD);
+            labeledEventToBackwardBDDMap.put(currEvent, currEventTransitionBackwardBDD);
+        }
     }
     
+    public BDD getEventTransitionForwardBDD(LabeledEvent event)
+    {
+        return labeledEventToForwardBDDMap.get(event);
+    }
+    
+    public BDD getEventTransitionBackwardBDD(LabeledEvent event)
+    {
+        return labeledEventToBackwardBDDMap.get(event);
+    }
+
     public BDD getMonolithicTransitionForwardBDD()
     {
-        return transitionForwardBDD;
+        return null;
     }
     
     public BDD getMonolithicTransitionBackwardBDD()
     {
-        return transitionBackwardBDD;
+        return null;
     }
 }
+
