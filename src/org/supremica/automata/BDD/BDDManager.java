@@ -146,7 +146,7 @@ public class BDDManager
         bdd.orWith(sourceBDD);
     }
     
-    public static BDD reachableStates(BDD initialStates, BDD transitions, BDDVarSet sourceStateVariables, BDDPairing destToSourceStatePairing)
+    public static BDD reachableStates(BDD initialStates, BDDTransitions transitions, BDDVarSet sourceStateVariables, BDDPairing destToSourceStatePairing)
     {
         BDD reachableStatesBDD = initialStates.id();
         BDD previousReachableStatesBDD = null;
@@ -166,8 +166,39 @@ public class BDDManager
             // The source states are not of interest to us - thus we quantify out them.
             // The AND function and removal of some variables are done in one operation by
             // the relprod command.
-            BDD nextStatesAndTransitionsBDD = reachableStatesBDD.relprod(transitions, sourceStateVariables);
-            
+            BDD nextStatesAndTransitionsBDD;
+            if (transitions instanceof BDDMonolithicTransitions)
+            {
+                BDD monolithicTransitions = ((BDDMonolithicTransitions)transitions).getMonolithicTransitionForwardBDD();
+                nextStatesAndTransitionsBDD = reachableStatesBDD.relprod(monolithicTransitions, sourceStateVariables);
+            }
+            else if (transitions instanceof BDDConjunctiveTransitions)
+            {
+                BDDConjunctiveTransitions bddConjunctiveTransitions = (BDDConjunctiveTransitions)transitions;
+                nextStatesAndTransitionsBDD = reachableStatesBDD;
+                for(Iterator<BDD> transitionBDDIt = bddConjunctiveTransitions.forwardIterator(); transitionBDDIt.hasNext(); )
+                {
+                    nextStatesAndTransitionsBDD = nextStatesAndTransitionsBDD.and(transitionBDDIt.next());         
+                }
+                nextStatesAndTransitionsBDD = nextStatesAndTransitionsBDD.exist(sourceStateVariables);
+            }
+            else if (transitions instanceof BDDDisjunctiveTransitions)
+            {
+                BDDConjunctiveTransitions bddDisjunctiveTransitions = (BDDConjunctiveTransitions)transitions;
+                nextStatesAndTransitionsBDD = reachableStatesBDD;
+                for(Iterator<BDD> transitionBDDIt = bddDisjunctiveTransitions.forwardIterator(); transitionBDDIt.hasNext(); )
+                {
+                    nextStatesAndTransitionsBDD = nextStatesAndTransitionsBDD.or(transitionBDDIt.next());         
+                }
+                nextStatesAndTransitionsBDD = nextStatesAndTransitionsBDD.exist(sourceStateVariables);
+            }
+            else
+            {
+                logger.error("Unknown BDDTransition class: " + transitions.getClass());
+                return null;
+            }
+                
+                
             // Now all states that could be reached from the current set of states
             // are in the DestDomainVariables. Now we need to move them from DestDomainVariables
             // to SourceDomainVariables so they are comparaable with our previous reachable states.
@@ -185,7 +216,7 @@ public class BDDManager
         return reachableStatesBDD;
     }
     
-    public static BDD coreachableStates(BDD markedStates, BDD transitions, BDDVarSet sourceStateVariables, BDDPairing destToSourceStatePairing)
+    public static BDD coreachableStates(BDD markedStates, BDDTransitions transitions, BDDVarSet sourceStateVariables, BDDPairing destToSourceStatePairing)
     {
         BDD coreachableStatesBDD = markedStates.id();
         BDD previousCoreachableStatesBDD = null;
@@ -193,7 +224,39 @@ public class BDDManager
         do
         {
             previousCoreachableStatesBDD = coreachableStatesBDD.id();
-            BDD previousStatesAndTransitionsBDD = coreachableStatesBDD.relprod(transitions, sourceStateVariables);
+            
+            BDD previousStatesAndTransitionsBDD;
+            if (transitions instanceof BDDMonolithicTransitions)
+            {
+                BDD monolithicTransitions = ((BDDMonolithicTransitions)transitions).getMonolithicTransitionBackwardBDD();
+                previousStatesAndTransitionsBDD = previousCoreachableStatesBDD.relprod(monolithicTransitions, sourceStateVariables);
+            }
+            else if (transitions instanceof BDDConjunctiveTransitions)
+            {
+                BDDConjunctiveTransitions bddConjunctiveTransitions = (BDDConjunctiveTransitions)transitions;
+                previousStatesAndTransitionsBDD = coreachableStatesBDD;
+                for(Iterator<BDD> transitionBDDIt = bddConjunctiveTransitions.backwardIterator(); transitionBDDIt.hasNext(); )
+                {
+                    previousStatesAndTransitionsBDD.and(transitionBDDIt.next());      
+                }
+                previousStatesAndTransitionsBDD = previousStatesAndTransitionsBDD.exist(sourceStateVariables);
+            }
+            else if (transitions instanceof BDDDisjunctiveTransitions)
+            {
+                BDDDisjunctiveTransitions bddDisjunctiveTransitions = (BDDDisjunctiveTransitions)transitions;
+                previousStatesAndTransitionsBDD = coreachableStatesBDD;
+                for(Iterator<BDD> transitionBDDIt = bddDisjunctiveTransitions.backwardIterator(); transitionBDDIt.hasNext(); )
+                {
+                    previousStatesAndTransitionsBDD.or(transitionBDDIt.next());      
+                }
+                previousStatesAndTransitionsBDD = previousStatesAndTransitionsBDD.exist(sourceStateVariables);
+            }
+            else
+            {
+                logger.error("Unknown BDDTransition class: " + transitions.getClass());
+                return null;
+            }           
+            
             BDD previousStatesBDD = previousStatesAndTransitionsBDD.replace(destToSourceStatePairing);
             coreachableStatesBDD.orWith(previousStatesBDD);
         }

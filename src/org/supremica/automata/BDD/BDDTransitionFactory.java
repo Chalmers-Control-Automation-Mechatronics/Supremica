@@ -52,10 +52,41 @@ package org.supremica.automata.BDD;
 
 import net.sf.javabdd.*;
 import org.supremica.log.*;
+import org.supremica.util.SupremicaException;
+import java.util.*;
+import org.supremica.properties.Config;
 
-public interface  BDDTransitions
-{    
-//    public BDD getMonolithicTransitionForwardBDD();
-//    public BDD getMonolithicTransitionBackwardBDD();
+public class BDDTransitionFactory
+{
+    private static Logger logger = LoggerFactory.createLogger(BDDTransitionFactory.class);
+    
+    BDDAutomata bddAutomata;
+    
+    public BDDTransitionFactory(BDDAutomata bddAutomata)
+    {
+        this.bddAutomata = bddAutomata;
+    }
+    
+    public BDDTransitions createTransitions()
+    {
+        BDDPartitioningType partitioningType = BDDPartitioningType.fromDescription(Config.BDD2_PARTITIONING.get());
+        
+        if (partitioningType == BDDPartitioningType.MONOLITHIC)
+        {
+            return new BDDMonolithicTransitions(bddAutomata);
+        }
+        else if (partitioningType == BDDPartitioningType.CONJUNCTIVE)
+        {
+            return new BDDConjunctiveTransitions(bddAutomata);
+        }
+        else if (partitioningType == BDDPartitioningType.DISJUNCTIVE)
+        {
+            return new BDDDisjunctiveTransitions(bddAutomata);
+        }
+        else
+        {
+            logger.debug("Unknown partitioning: " + partitioningType.toString());
+            return null;
+        }
+    }
 }
-

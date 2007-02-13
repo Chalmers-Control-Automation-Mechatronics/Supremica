@@ -171,7 +171,7 @@ public class BDDAutomata
         sourceToDestStatePairing = manager.makePairing(sourceStateDomains, destStateDomains);
         destToSourceStatePairing = manager.makePairing(destStateDomains, sourceStateDomains);       
   
-        bddTransitions = new BDDMonolithicTransitions(this);
+        bddTransitions = new BDDTransitionFactory(this).createTransitions();
     }   
   
     public Alphabet getInverseAlphabet(Automaton currAutomaton)
@@ -282,7 +282,7 @@ public class BDDAutomata
     {
         if (reachableStatesBDD == null)
         {
-            reachableStatesBDD = manager.reachableStates(initialStatesBDD, bddTransitions.getMonolithicTransitionForwardBDD(), sourceStateVariables, destToSourceStatePairing);
+            reachableStatesBDD = manager.reachableStates(initialStatesBDD, bddTransitions, sourceStateVariables, destToSourceStatePairing);
             nbrOfReachableStates = reachableStatesBDD.satCount(sourceStateVariables);              
         }
         return reachableStatesBDD;
@@ -292,7 +292,7 @@ public class BDDAutomata
     {
         if (coreachableStatesBDD == null)
         {
-            coreachableStatesBDD = manager.coreachableStates(markedStatesBDD, bddTransitions.getMonolithicTransitionBackwardBDD(), sourceStateVariables, destToSourceStatePairing);
+            coreachableStatesBDD = manager.coreachableStates(markedStatesBDD, bddTransitions, sourceStateVariables, destToSourceStatePairing);
             nbrOfCoreachableStates = coreachableStatesBDD.satCount(sourceStateVariables);
         }
         return coreachableStatesBDD;

@@ -52,10 +52,80 @@ package org.supremica.automata.BDD;
 
 import net.sf.javabdd.*;
 import org.supremica.log.*;
+import org.supremica.util.SupremicaException;
+import java.util.*;
 
-public interface  BDDTransitions
-{    
-//    public BDD getMonolithicTransitionForwardBDD();
-//    public BDD getMonolithicTransitionBackwardBDD();
+public class BDDDisjunctiveTransitions
+    implements BDDTransitions
+{
+    BDDAutomata bddAutomata;  
+    Iterator<BDDAutomaton> automataIterator;
+    
+    /** Creates a new instance of BDDMonolithicTransitions */
+    public BDDDisjunctiveTransitions(BDDAutomata bddAutomata)
+    {
+        this.bddAutomata = bddAutomata;
+    }
+    
+    public BDDAutomata getBDDAutomata()
+    {
+        return bddAutomata;
+    }
+    
+    public BDD getTransitionForwardBDD(BDDAutomaton bddAutomaton)
+    {
+        return bddAutomaton.getTransitionForwardConjunctiveBDD();
+    }
+    
+    public BDD getTransitionBackwardBDD(BDDAutomaton bddAutomaton)
+    {
+        return bddAutomaton.getTransitionBackwardConjunctiveBDD();
+    }
+    
+    public Iterator<BDD> forwardIterator()
+    {
+        return new BDDIterator(true);
+    }
+
+    public Iterator<BDD> backwardIterator()
+    {
+        return new BDDIterator(false);
+    }  
+    
+    public class BDDIterator
+        implements Iterator<BDD>
+    {
+        boolean forward;
+        Iterator<BDDAutomaton> bddAutomataIterator;
+        
+        public BDDIterator(boolean forward)
+        {
+            this.forward = forward;
+            bddAutomataIterator = bddAutomata.iterator();
+        }
+
+        public Iterator<BDD> iterator()
+        {
+            return this;
+        }
+        
+        public boolean hasNext()
+        {
+            return bddAutomataIterator.hasNext();
+        }
+        
+        public BDD next()
+        {
+            BDDAutomaton nextBDDAutomaton = bddAutomataIterator.next();
+            if (forward)
+            {
+                return nextBDDAutomaton.getTransitionForwardConjunctiveBDD();
+            }
+            return nextBDDAutomaton.getTransitionBackwardConjunctiveBDD();
+        }
+
+        public void remove()
+        {
+        }
+    }
 }
-

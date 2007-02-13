@@ -55,6 +55,7 @@ import org.supremica.automata.algorithms.VerificationAlgorithm;
 import org.supremica.automata.algorithms.VerificationType;
 import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
 import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
+import org.supremica.automata.BDD.BDDPartitioningType;
 import org.supremica.util.BDD.Options;
 
 /**
@@ -203,11 +204,13 @@ public final class Config
     public static final StringProperty MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME = new StringProperty(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentUnontrollableEventName", "tau_u", "Silent uncontrollable event name");
 
     // ALGORITHMS_BDD2
+    // New BDD implementation using JavaBDD library
     public static final StringProperty BDD2_BDDLIBRARY = new StringProperty(PropertyType.ALGORITHMS_BDD2, "libraryName", "java", "Binary Decision Diagram Library (java/buddy/cudd/jdd)");
     public static final IntegerProperty BDD2_INITIALNODETABLESIZE = new IntegerProperty(PropertyType.ALGORITHMS_BDD2, "initialNodeTableSize", 150000, "Initial node table size");
     public static final IntegerProperty BDD2_CACHESIZE = new IntegerProperty(PropertyType.ALGORITHMS_BDD2, "cacheSize", 150000, "Operation cache size");
- 
-   // ALGORITHMS_BDD
+    public static final StringProperty BDD2_PARTITIONING = new StringProperty(PropertyType.ALGORITHMS_BDD2, "partitioning", BDDPartitioningType.MONOLITHIC.toString(), "BDD transition partitioning", BDDPartitioningType.values());
+
+    // ALGORITHMS_BDD
     // Most of the IntegerProperty:s here should be StringProperty:s with appropriate legal values...
     // Right now they are integers with an interpretation (see PreferencesDialog.java)
     public static final IntegerProperty BDD_ALGORITHM = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddAlgorithm", Options.algo_family, "Algorithm");

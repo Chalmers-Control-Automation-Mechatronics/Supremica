@@ -47,15 +47,42 @@
  *
  * Supremica is owned and represented by KA.
  */
-
 package org.supremica.automata.BDD;
 
-import net.sf.javabdd.*;
-import org.supremica.log.*;
 
-public interface  BDDTransitions
-{    
-//    public BDD getMonolithicTransitionForwardBDD();
-//    public BDD getMonolithicTransitionBackwardBDD();
+/**
+ * Different types of verification.
+ */
+public enum BDDPartitioningType
+{
+    MONOLITHIC("Monolithic"),
+    CONJUNCTIVE("Conjunctive"),
+    DISJUNCTIVE("Disjunctive");
+    
+    /** Textual description. */
+    private final String description;
+    
+    private BDDPartitioningType(String description)
+    {
+        this.description = description;
+    }
+    
+    public String toString()
+    {
+        return description;
+    }
+    
+    public static BDDPartitioningType fromDescription(String description)
+    {
+        for (BDDPartitioningType value: values())
+        {
+            if (value.description.equals(description))
+            {
+                return value;
+            }
+        }
+        return null;
+    }
 }
+
 

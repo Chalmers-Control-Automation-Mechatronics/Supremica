@@ -106,15 +106,5 @@ public class BDDEventPartitionedTransitions
     {
         return labeledEventToBackwardBDDMap.get(event);
     }
-
-    public BDD getMonolithicTransitionForwardBDD()
-    {
-        return null;
-    }
-    
-    public BDD getMonolithicTransitionBackwardBDD()
-    {
-        return null;
-    }
 }
 
