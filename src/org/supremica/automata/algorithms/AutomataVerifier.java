@@ -66,6 +66,7 @@ import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
 import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
 import org.supremica.automata.algorithms.minimization.AutomataMinimizer;
 import org.supremica.automata.algorithms.minimization.MinimizationHelper;
+import org.supremica.automata.BDD.BDDVerifier;
 import org.supremica.util.BDD.*;
 import org.supremica.properties.Config;
 
@@ -295,6 +296,10 @@ public class AutomataVerifier
                     
                     // Work!
                     return monolithicNonblockingVerification();
+                }
+                 else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MONOLITHICBDD)
+                {
+                    return monolithicBDDNonblockingVerification();
                 }
                 else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
                 {
@@ -1340,6 +1345,22 @@ public class AutomataVerifier
         
         return ret;
     }
+ 
+    /**
+     * Answers YES/NO to the NONBLOCKING problem
+     *
+     *@return  true if the system is nonblocking
+     */
+    private boolean monolithicBDDNonblockingVerification()
+    throws Exception
+    {
+        BDDVerifier bddVerifier = new BDDVerifier(theAutomata);
+        boolean isNonblocking = bddVerifier.isNonblocking();
+        logger.info("Number of reachable state: " + bddVerifier.numberOfReachableStates());
+        logger.info("Number of coreachable states: " + bddVerifier.numberOfCoreachableStates());
+        logger.info("Number of blocking states: " + bddVerifier.numberOfBlockingStates());
+        return isNonblocking;
+    }    
     
     /**
      * Answers YES/NO to the NONBLOCKING problem

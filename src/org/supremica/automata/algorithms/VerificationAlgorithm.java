@@ -55,7 +55,8 @@ package org.supremica.automata.algorithms;
  */
 public enum VerificationAlgorithm
 {
-    MONOLITHIC("Monolithic"),
+    MONOLITHIC("Monolithic (Explicit)"),
+    MONOLITHICBDD("Monolithic (Symbolic)"),
     MODULAR("Modular"),
     COMPOSITIONAL("Compositional"),
     BDD("BDD");

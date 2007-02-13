@@ -254,6 +254,7 @@ class SynthesizerDialogStandardPanel
         else if (typeSelector.getType() == SynthesisType.NONBLOCKING)
         {
             algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHIC);
+            algorithmSelector.addItem(SynthesisAlgorithm.MONOLITHICBDD); 
             algorithmSelector.addItem(SynthesisAlgorithm.COMPOSITIONAL);
             algorithmSelector.addItem(SynthesisAlgorithm.BDD);
         }

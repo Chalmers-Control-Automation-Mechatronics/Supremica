@@ -55,6 +55,7 @@ import org.supremica.gui.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.minimization.*;
 import org.supremica.properties.Config;
+import org.supremica.automata.BDD.BDDSynthesizer;
 import org.supremica.util.BDD.OnlineBDDSupervisor;
 
 // This one is used for doMonolithic to return two values
@@ -258,6 +259,12 @@ public class AutomataSynthesizer
                 supervisor.cleanup();
                 bddSynthesizer.cleanup();
             }
+        }
+        else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MONOLITHICBDD)
+        {
+            Automata newAutomata = new Automata(theAutomata);
+            BDDSynthesizer bddSynthesizer = new BDDSynthesizer(theAutomata);            
+            bddSynthesizer.computeNonblockingSupervisorGuards();
         }
         else
         {

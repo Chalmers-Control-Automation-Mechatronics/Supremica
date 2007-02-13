@@ -47,53 +47,30 @@
  *
  * Supremica is owned and represented by KA.
  */
-package org.supremica.automata.algorithms;
+package org.supremica.automata.BDD;
 
-public enum SynthesisAlgorithm
+import org.supremica.log.*;
+import org.supremica.util.SupremicaException;
+import java.util.*;
+import java.io.*;
+import org.supremica.automata.*;
+import org.supremica.automata.IO.*;
+
+public class BDDSynthesizer
 {
-    MONOLITHIC("Monolithic (explicit)", false),
-    MONOLITHICBDD("Monolithic (symbolic)", false), 
-    MODULAR("Modular"),
-    COMPOSITIONAL("Compositional"),
-    //IDD("IDD"),
-    //MonolithicSingleFixpoint("MONOLITHIC (single fixpoint)", false),    // works, but is very slow [due to lame implementation :s ]
-    BDD("BDD");    // works, but we cant handle the results yet
+    private static Logger logger = LoggerFactory.createLogger(BDDSynthesizer.class);
     
-    /** Textual description. */
-    private final String description;
-    /** True if this algo prefers working on modular systems. */
-    private final boolean preferModular;
+    BDDAutomata bddAutomata;
     
-    private SynthesisAlgorithm(String description)
+    public BDDSynthesizer(Automata theAutomata)
     {
-        this(description, true);
+        bddAutomata = new BDDAutomata(theAutomata);
     }
-    
-    private SynthesisAlgorithm(String description, boolean preferModular)
+   
+    public void computeNonblockingSupervisorGuards()
     {
-        this.description = description;
-        this.preferModular = preferModular;
-    }
-    
-    public String toString()
-    {
-        return description;
-    }
-    
-    public boolean prefersModular()
-    {
-        return preferModular;
-    }
-    
-    public static SynthesisAlgorithm fromDescription(String description)
-    {
-        for (SynthesisAlgorithm value: values())
-        {
-            if (value.description.equals(description))
-            {
-                return value;
-            }
-        }
-        return null;
+        logger.info("Computing Nonblocking Supervisor Guards");
     }
 }
+
+

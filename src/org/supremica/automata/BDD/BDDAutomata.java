@@ -89,6 +89,15 @@ public class BDDAutomata
     BDD forbiddenStatesBDD = null;
     BDD uncontrollableStatesBDD = null;
     
+    BDD reachableStatesBDD = null;
+    BDD coreachableStatesBDD = null;
+    BDD reachableAndCoreachableStatesBDD = null;
+    
+    double nbrOfReachableStates = -1;
+    double nbrOfCoreachableStates = -1;
+    double nbrOfReachableAndCoreachableStates = -1;
+    double nbrOfBlockingStates = -1;
+    
     BDDAutomata(Automata orgAutomata)
     {
         AutomataSorter automataSorter = new PCGAutomataSorter();
@@ -217,36 +226,84 @@ public class BDDAutomata
     
     public double numberOfReachableStates()
     {
-        BDD reachableStatesBDD = manager.reachableStates(initialStatesBDD, bddTransitions.getMonolithicTransitionForwardBDD(), sourceStateVariables, destToSourceStatePairing);
-        return reachableStatesBDD.satCount(sourceStateVariables);
+        if (nbrOfReachableStates < 0)
+        {
+            getReachableStates();
+        }
+        return nbrOfReachableStates;
     }
     
     public double numberOfCoreachableStates()
     {
-//        System.out.println("initialStates BDD: " + initialStatesBDD.toStringWithDomains());
-//        System.out.println("markedStates BDD: " + markedStatesBDD.toStringWithDomains());
-        
-        BDD coreachableStatesBDD = manager.coreachableStates(markedStatesBDD, bddTransitions.getMonolithicTransitionBackwardBDD(), sourceStateVariables, destToSourceStatePairing);
-        return coreachableStatesBDD.satCount(sourceStateVariables);
+        if (nbrOfCoreachableStates < 0)
+        {
+            getCoreachableStates();
+        }     
+        return nbrOfCoreachableStates;
+    }
+    
+    public double numberOfBlockingStates()
+    {
+        if (nbrOfBlockingStates < 0)
+        {
+            getReachableAndCoreachableStates();
+        }     
+        return nbrOfBlockingStates;        
     }
     
     public double numberOfReachableAndCoreachableStates()
     {
-        BDD reachableStatesBDD = manager.reachableStates(initialStatesBDD, bddTransitions.getMonolithicTransitionForwardBDD(), sourceStateVariables, destToSourceStatePairing);
-        BDD coreachableStatesBDD = manager.coreachableStates(markedStatesBDD, bddTransitions.getMonolithicTransitionBackwardBDD(), sourceStateVariables, destToSourceStatePairing);
-        
-        BDD reachableAndCoreachableStatesBDD = reachableStatesBDD.and(coreachableStatesBDD);
-        return reachableAndCoreachableStatesBDD.satCount(sourceStateVariables);
+        if (nbrOfReachableAndCoreachableStates < 0)
+        {
+            getReachableAndCoreachableStates();
+        }     
+        return nbrOfReachableAndCoreachableStates;   
     }
     
     public boolean isNonblocking()
     {
-        BDD reachableStatesBDD = manager.reachableStates(initialStatesBDD, bddTransitions.getMonolithicTransitionForwardBDD(), sourceStateVariables, destToSourceStatePairing);
-        BDD coreachableStatesBDD = manager.coreachableStates(markedStatesBDD, bddTransitions.getMonolithicTransitionBackwardBDD(), sourceStateVariables, destToSourceStatePairing);
+        BDD reachableStatesBDD = getReachableStates();
+        BDD coreachableStatesBDD = getCoreachableStates();
         BDD impBDD = reachableStatesBDD.imp(coreachableStatesBDD);
         return impBDD.equals(manager.getOneBDD());
     }
     
+    BDD getReachableStates()
+    {
+        if (reachableStatesBDD == null)
+        {
+            reachableStatesBDD = manager.reachableStates(initialStatesBDD, bddTransitions.getMonolithicTransitionForwardBDD(), sourceStateVariables, destToSourceStatePairing);
+            nbrOfReachableStates = reachableStatesBDD.satCount(sourceStateVariables);              
+        }
+        return reachableStatesBDD;
+    }
+ 
+    BDD getCoreachableStates()
+    {
+        if (coreachableStatesBDD == null)
+        {
+            coreachableStatesBDD = manager.coreachableStates(markedStatesBDD, bddTransitions.getMonolithicTransitionBackwardBDD(), sourceStateVariables, destToSourceStatePairing);
+            nbrOfCoreachableStates = coreachableStatesBDD.satCount(sourceStateVariables);
+        }
+        return coreachableStatesBDD;
+    }  
+    
+    BDD getReachableAndCoreachableStates()
+    {
+        if (reachableAndCoreachableStatesBDD == null)
+        {
+            BDD reachableStatesBDD = getReachableStates();
+            BDD coreachableStatesBDD = getCoreachableStates();
+            
+            reachableAndCoreachableStatesBDD = reachableStatesBDD.and(coreachableStatesBDD);   
+        
+            nbrOfReachableAndCoreachableStates = reachableAndCoreachableStatesBDD.satCount(sourceStateVariables);  
+            nbrOfBlockingStates = nbrOfReachableStates - nbrOfReachableAndCoreachableStates;
+        }
+    
+        return reachableAndCoreachableStatesBDD;
+    } 
+     
     boolean isControllable()
     {
         return false;

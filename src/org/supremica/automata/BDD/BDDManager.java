@@ -56,6 +56,7 @@ import java.util.*;
 import java.io.*;
 import org.supremica.automata.*;
 import org.supremica.automata.IO.*;
+import org.supremica.properties.Config;
 
 public class BDDManager
 {
@@ -65,12 +66,12 @@ public class BDDManager
     
     public BDDManager()
     {
-        this("java");
+        this(Config.BDD2_BDDLIBRARY.get());
     }
     
     public BDDManager(String bddpackage)
     {
-        this(bddpackage, 150000, 150000);
+        this(bddpackage, Config.BDD2_INITIALNODETABLESIZE.get(), Config.BDD2_CACHESIZE.get());
     }
     
     public BDDManager(String bddpackage, int nodenum, int cachesize)

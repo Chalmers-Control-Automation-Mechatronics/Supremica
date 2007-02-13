@@ -122,7 +122,14 @@ public final class SynthesizerOptions
                 return("BDD algorithms currently only support supNB+C synthesis.");
             }
         }
-        
+ 
+        if (synthesisAlgorithm == SynthesisAlgorithm.MONOLITHICBDD)
+        {
+            if (synthesisType != SynthesisType.NONBLOCKING)
+            {
+                return("BDD2 algorithms currently only support supNB synthesis.");
+            }
+        }       
         return null;
     }
     

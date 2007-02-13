@@ -293,7 +293,7 @@ public class VerificationDialog
             else if (verificationTypeBox.getSelectedItem() == VerificationType.NONBLOCKING)
             {
                 algorithmSelector.addItem(VerificationAlgorithm.MONOLITHIC);
-                //algorithmSelector.addItem(VerificationAlgorithm.MODULAR);
+                algorithmSelector.addItem(VerificationAlgorithm.MONOLITHICBDD);
                 algorithmSelector.addItem(VerificationAlgorithm.COMPOSITIONAL);
                 algorithmSelector.addItem(VerificationAlgorithm.BDD);
             }

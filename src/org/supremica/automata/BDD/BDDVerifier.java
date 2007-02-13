@@ -78,7 +78,12 @@ public class BDDVerifier
     {
         return bddAutomata.numberOfReachableAndCoreachableStates();
     }
-    
+ 
+    public double numberOfBlockingStates()
+    {
+        return bddAutomata.numberOfBlockingStates();
+    }
+        
     public boolean isNonblocking()
     {
         return bddAutomata.isNonblocking();

@@ -202,7 +202,12 @@ public final class Config
     public static final StringProperty MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME = new StringProperty(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentControllableEventName", "tau_c", "Silent controllable event name");
     public static final StringProperty MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME = new StringProperty(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentUnontrollableEventName", "tau_u", "Silent uncontrollable event name");
 
-    // ALGORITHMS_BDD
+    // ALGORITHMS_BDD2
+    public static final StringProperty BDD2_BDDLIBRARY = new StringProperty(PropertyType.ALGORITHMS_BDD2, "libraryName", "java", "Binary Decision Diagram Library (java/buddy/cudd/jdd)");
+    public static final IntegerProperty BDD2_INITIALNODETABLESIZE = new IntegerProperty(PropertyType.ALGORITHMS_BDD2, "initialNodeTableSize", 150000, "Initial node table size");
+    public static final IntegerProperty BDD2_CACHESIZE = new IntegerProperty(PropertyType.ALGORITHMS_BDD2, "cacheSize", 150000, "Operation cache size");
+ 
+   // ALGORITHMS_BDD
     // Most of the IntegerProperty:s here should be StringProperty:s with appropriate legal values...
     // Right now they are integers with an interpretation (see PreferencesDialog.java)
     public static final IntegerProperty BDD_ALGORITHM = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddAlgorithm", Options.algo_family, "Algorithm");
