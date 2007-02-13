@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   ProxyShapeProducer
 //###########################################################################
-//# $Id: ProxyShapeProducer.java,v 1.16 2007-02-12 21:38:49 robi Exp $
+//# $Id: ProxyShapeProducer.java,v 1.17 2007-02-13 04:22:01 robi Exp $
 //###########################################################################
 
 
@@ -317,6 +317,9 @@ public class ProxyShapeProducer
     
     public Rectangle getMinimumBoundingRectangle()
     {
+      // *** BUG ***
+      // This is only accurate when the graph has been drawn!
+      // ***
         Collection<ProxyShape> shapes = mMap.values();
         Rectangle rect = new Rectangle(0,0,0,0);
         synchronized(mMap)

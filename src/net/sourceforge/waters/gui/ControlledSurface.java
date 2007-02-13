@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.115 2007-02-13 00:14:19 robi Exp $
+//# $Id: ControlledSurface.java,v 1.116 2007-02-13 04:22:01 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -169,15 +169,7 @@ public class ControlledSurface
   //# Interface net.sourceforge.waters.subject.base.ModelObserver
   public void modelChanged(final ModelChangeEvent event)
   {
-    final Rectangle area = getDrawnAreaBounds();
-    final int extra = Config.GUI_EDITOR_GRID_SIZE.get() * 10;
-    final int x = area.width + extra;
-    final int y = area.height + extra;
-    final Dimension dim = new Dimension(x, y);
-    if (!dim.equals(getPreferredSize())) {
-      setPreferredSize(dim);
-      revalidate();
-    }
+    updateSize();
     updateError();
     updateHighlighting();
     repaint();
@@ -185,7 +177,7 @@ public class ControlledSurface
 
 
   //#########################################################################
-  //# Toolbar
+  //# Refresh Operations
   private void updateTool()
   {
     final ToolController controller;
@@ -231,6 +223,26 @@ public class ControlledSurface
       mExternalDragSource.createDefaultDragGestureRecognizer
         (this, mExternalDragAction, mDGListener);
       updateHighlighting();
+    }
+  }
+
+  /**
+   * Checks whether the graph size has changed, and if so, adjusts the
+   * panel's scroll bars.
+   */
+  private void updateSize()
+  {
+    if (mSecondaryGraph == null) {
+      // But do not bother while the user is dragging stuff around ...
+      final Rectangle area = getDrawnAreaBounds();
+      final int extra = Config.GUI_EDITOR_GRID_SIZE.get() * 10;
+      final int x = area.width + extra;
+      final int y = area.height + extra;
+      final Dimension dim = new Dimension(x, y);
+      if (!dim.equals(getPreferredSize())) {
+        setPreferredSize(dim);
+        revalidate();
+      }
     }
   }
 
@@ -729,6 +741,12 @@ public class ControlledSurface
 
   //#########################################################################
   //# Error Display
+  /**
+   * Updates the error display.
+   * This method calculates a list of nodegroups that intersect with
+   * nodes and therefore are considered as erronerous. They are
+   * rendered differently to point out errors to the user.
+   */
   private void updateError()
   {
     if (!mIsCommittingSecondaryGraph) {
@@ -753,6 +771,9 @@ public class ControlledSurface
     }
   }
 
+  /**
+   * Checks whether the given item is considered erroneous.
+   */
   private boolean isError(final ProxySubject subject)
   {
     return mError.contains(subject);
@@ -1736,6 +1757,7 @@ public class ControlledSurface
       commitSecondaryGraph();
       clearSecondaryGraph();
       mIsCommittingSecondaryGraph = false;
+      updateSize();
       updateError();
     }
 
