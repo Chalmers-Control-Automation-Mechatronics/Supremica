@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.29 2007-02-14 02:01:06 robi Exp $
+//# $Id: SpringEmbedder.java,v 1.30 2007-02-14 22:43:37 siw4 Exp $
 //###########################################################################
 
 
@@ -32,6 +32,10 @@ import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.subject.module.SplineGeometrySubject;
 import java.util.ArrayList;
+import net.sourceforge.waters.subject.module.LabelGeometrySubject;
+import java.awt.Point;
+import net.sourceforge.waters.subject.module.GroupNodeSubject;
+import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
 
 
 public class SpringEmbedder
@@ -64,7 +68,6 @@ public class SpringEmbedder
     mEdges = edges;
     mObservers = new LinkedList<EmbedderObserver>();
   }
-
 
   //#########################################################################
   //# Observer Pattern
@@ -169,7 +172,90 @@ public class SpringEmbedder
   {
     return 1.0 - (mPass + 1.0) / (NUM_PASSES + 1.0);
   }*/
+  
+  public static boolean setUpGeometry(GraphSubject graph)
+    throws GeometryAbsentException
+  {
+    return setUpGeometry(graph, 228424);
+  }
 
+  public static boolean setUpGeometry(GraphSubject graph, int seed)
+    throws GeometryAbsentException
+  {
+    boolean runEmbedder = false;
+    Random rand = new Random(seed);
+    if (graph.getBlockedEvents() != null) {
+      if (graph.getBlockedEvents().getGeometry() == null) {
+        // TODO: Calculate better position
+        graph.getBlockedEvents().setGeometry(new LabelGeometrySubject(new Point(5, 5)));
+      }
+    }
+		for (NodeSubject node : graph.getNodesModifiable())
+		{
+			if (node instanceof SimpleNodeSubject)
+			{
+				SimpleNodeSubject n = (SimpleNodeSubject) node;
+				if (n.isInitial())
+				{
+					if (n.getInitialArrowGeometry() == null)
+					{
+						n.setInitialArrowGeometry
+						(new PointGeometrySubject(new Point(-5, -5)));
+					}
+				}
+				
+				if (n.getPointGeometry() == null)
+				{
+					runEmbedder = true;
+					final int base;
+					final int spread;
+					if (n.isInitial())
+					{
+						base = 10;
+						spread = 50;
+					}
+					else
+					{
+						base = 100;
+						spread = 500;
+					}
+					n.setPointGeometry(new PointGeometrySubject
+                             (new Point(base + rand.nextInt(spread),
+                                        base + rand.nextInt(spread))));
+				}
+				if (n.getLabelGeometry() == null)
+				{
+					n.setLabelGeometry(new LabelGeometrySubject(new Point(5, 5)));
+				}
+			}
+			else if (node instanceof GroupNodeSubject)
+			{
+				if (((GroupNodeSubject)node).getGeometry() == null)
+				{
+					throw new GeometryAbsentException("There is no geometry information"
+							+ " for a group node in this graph");
+				}
+			}
+		}
+		for (EdgeSubject edge : graph.getEdgesModifiable())
+		{
+      if (!(edge.getSource() instanceof GroupNodeSubject)) {
+        edge.setStartPoint(null);
+      }
+      if (!(edge.getTarget() instanceof GroupNodeSubject)) {
+        edge.setEndPoint(null);
+      }
+			if (edge.getLabelBlock().getGeometry() == null)
+			{
+				LabelGeometrySubject offset =
+					new LabelGeometrySubject
+					(new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
+							LabelBlockProxyShape.DEFAULTOFFSETY));
+				edge.getLabelBlock().setGeometry(offset);
+			}
+		}
+		return runEmbedder;
+  }
 
   //#########################################################################
   //# Auxiliary Methods

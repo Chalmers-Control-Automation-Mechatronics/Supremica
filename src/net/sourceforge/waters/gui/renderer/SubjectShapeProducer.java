@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   SubjectShapeProducer
 //###########################################################################
-//# $Id: SubjectShapeProducer.java,v 1.24 2007-02-12 21:38:49 robi Exp $
+//# $Id: SubjectShapeProducer.java,v 1.25 2007-02-14 22:43:37 siw4 Exp $
 //###########################################################################
 
 
@@ -64,96 +64,9 @@ public class SubjectShapeProducer
   public SubjectShapeProducer(final GraphSubject graph,
                               final ModuleProxy module,
                               final Frame root)
-    throws GeometryAbsentException
   {
     super(module);
     mGraph = graph;
-    boolean runEmbedder = false;
-    Random rand = new Random();
-    if (graph.getBlockedEvents() != null) {
-      if (graph.getBlockedEvents().getGeometry() == null) {
-        // TODO: Calculate better position
-        graph.getBlockedEvents().setGeometry(new LabelGeometrySubject(new Point(5, 5)));
-      }
-    }
-		for (NodeSubject node : graph.getNodesModifiable())
-		{
-			if (node instanceof SimpleNodeSubject)
-			{
-				SimpleNodeSubject n = (SimpleNodeSubject) node;
-				if (n.isInitial())
-				{
-					if (n.getInitialArrowGeometry() == null)
-					{
-						n.setInitialArrowGeometry
-						(new PointGeometrySubject(new Point(-5, -5)));
-					}
-				}
-				
-				if (n.getPointGeometry() == null)
-				{
-					runEmbedder = true;
-					final int base;
-					final int spread;
-					if (n.isInitial())
-					{
-						base = 10;
-						spread = 50;
-					}
-					else
-					{
-						base = 100;
-						spread = 500;
-					}
-					n.setPointGeometry(new PointGeometrySubject
-							(new Point(base + rand.nextInt(spread),
-									base + rand.nextInt(spread))));
-				}
-				if (n.getLabelGeometry() == null)
-				{
-					n.setLabelGeometry(new LabelGeometrySubject(new Point(5, 5)));
-				}
-			}
-			else if (node instanceof GroupNodeSubject)
-			{
-				if (((GroupNodeSubject)node).getGeometry() == null)
-				{
-					throw new GeometryAbsentException("There is no geometry information"
-							+ " for a group node in this graph");
-				}
-			}
-		}
-		for (EdgeSubject edge : graph.getEdgesModifiable())
-		{
-                  if (!(edge.getSource() instanceof GroupNodeSubject)) {
-                    edge.setStartPoint(null);
-                  }
-                  if (!(edge.getTarget() instanceof GroupNodeSubject)) {
-                    edge.setEndPoint(null);
-                  }
-			if (edge.getLabelBlock().getGeometry() == null)
-			{
-				LabelGeometrySubject offset =
-					new LabelGeometrySubject
-					(new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
-							LabelBlockProxyShape.DEFAULTOFFSETY));
-				edge.getLabelBlock().setGeometry(offset);
-			}
-		}
-		if (runEmbedder)
-		{
-			final SimpleComponentSubject comp =
-				(SimpleComponentSubject) graph.getParent();
-			final String name = comp == null ? "graph" : comp.getName();
-			final long timeout = Config.GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT.get();
-			final SpringEmbedder embedder = new SpringEmbedder(graph);
-			final Thread thread = new Thread(embedder);
-			final JDialog dialog =
-				new SpringAbortDialog(root, name, embedder, timeout);
-			dialog.setLocationRelativeTo(root);
-			dialog.setVisible(true);
-			thread.start();
-		}
 		graph.addModelObserver(this);
 	}
 	

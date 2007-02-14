@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.118 2007-02-14 02:01:06 robi Exp $
+//# $Id: ControlledSurface.java,v 1.119 2007-02-14 22:43:37 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -90,6 +90,7 @@ public class ControlledSurface
   {
     super(graph, module,
           new SubjectShapeProducer(graph, module, root.getFrame()));
+    boolean runEmbedder = SpringEmbedder.setUpGeometry(graph);
     mRoot = root;
     mToolbar = toolbar;
     if (root != null && toolbar != null) {
@@ -105,6 +106,9 @@ public class ControlledSurface
     addKeyListener(new KeySpy());
     graph.addModelObserver(this);
     updateTool();
+    if (runEmbedder) {
+      runEmbedder();
+    }
   }
 
   /**
@@ -116,7 +120,6 @@ public class ControlledSurface
   {
     this(graph, module, null, null);
   }
-
 
   //#########################################################################
   //# Simple Access
@@ -1215,6 +1218,10 @@ public class ControlledSurface
 
   }
 
+  private class EmbedderListener
+    extends ToolController
+  {
+  }
 
   //#########################################################################
   //# Inner Class EmbedderController

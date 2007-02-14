@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   EditorRunEmbedderAction
 //###########################################################################
-//# $Id: EditorRunEmbedderAction.java,v 1.8 2007-02-13 22:38:09 siw4 Exp $
+//# $Id: EditorRunEmbedderAction.java,v 1.9 2007-02-14 22:43:37 siw4 Exp $
 //###########################################################################
 
 
@@ -68,8 +68,8 @@ public class EditorRunEmbedderAction
 		final ControlledSurface surface =
 			ide.getIDE().getActiveEditorWindowInterface().
 			getControlledSurface();
-      surface.runEmbedder();
-      /*  final GraphSubject graph = surface.getGraph();
+    surface.runEmbedder();
+        /*final GraphSubject graph = surface.getGraph();
         if (graph != null) {
 			SpringEmbedder.stopAll();
 			try {
