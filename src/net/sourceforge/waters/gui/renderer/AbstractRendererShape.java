@@ -45,6 +45,9 @@ public abstract class AbstractRendererShape
     /** Used as the basic stroke when printing--thinner than ordinary lines. */
     //public static final Stroke THINSTROKE = new BasicStroke(0.25f); // Too thin
     public static final Stroke THINSTROKE = new BasicStroke(0.5f);
-    /** The default pen size. Is not {@code final} since it changes when printing. */
+    /**
+     * The default pen size. <STRONG>BUG</STRONG> Is not <CODE>final</CODE>
+     * since it changes when printing --- so needs to be part of renderer.
+     */
     public static Stroke BASICSTROKE = SINGLESTROKE;
-}
+ }

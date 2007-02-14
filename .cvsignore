@@ -4,3 +4,4 @@ resources
 logs
 .project
 .classpath
+SupremicaProperties.cfg

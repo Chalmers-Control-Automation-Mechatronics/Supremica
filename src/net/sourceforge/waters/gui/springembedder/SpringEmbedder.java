@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.30 2007-02-14 22:43:37 siw4 Exp $
+//# $Id: SpringEmbedder.java,v 1.31 2007-02-14 23:22:01 robi Exp $
 //###########################################################################
 
 
@@ -153,14 +153,14 @@ public class SpringEmbedder
       } while (maxdelta > limit && !mStop);
       limit *= 0.25;
     }
+    mFinished = true;
+    springEmbedders.remove(this);
     SwingUtilities.invokeLater(new Runnable() {
         public void run() {
           updateModel();
+          fireEvent(new EmbedderEvent(EmbedderEventType.STOP));
         }
       });
-    springEmbedders.remove(this);
-    mFinished = true;
-    fireEvent(new EmbedderEvent(EmbedderEventType.STOP));
   }
   
   public int getProgress()

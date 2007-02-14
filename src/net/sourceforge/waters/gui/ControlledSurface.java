@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.119 2007-02-14 22:43:37 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.120 2007-02-14 23:22:01 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -965,18 +965,25 @@ public class ControlledSurface
     if (item == null) {
       return null;
     } else if (item instanceof LabelBlockSubject && isSelected(item)) {
-      final Point point = event.getPoint();
       final LabelBlockSubject block = (LabelBlockSubject) item;
-      for (final ProxySubject sub : block.getEventListModifiable()) {
-        final ProxyShape shape = getShapeProducer().getShape(sub);
-        if (shape.getShape().contains(point)) {
-          return sub;
-        }
-      }
-      return item;
+      final Point point = event.getPoint();
+      final ProxySubject label = getLabelToBeSelected(block, point);
+      return label == null ? item : label;
     } else {
       return item;
     }
+  }
+
+  private ProxySubject getLabelToBeSelected(final LabelBlockSubject block,
+                                            final Point point)
+  {
+    for (final ProxySubject sub : block.getEventListModifiable()) {
+      final ProxyShape shape = getShapeProducer().getShape(sub);
+      if (shape.getShape().contains(point)) {
+        return sub;
+      }
+    }
+    return null;
   }
 
 
@@ -1218,10 +1225,6 @@ public class ControlledSurface
 
   }
 
-  private class EmbedderListener
-    extends ToolController
-  {
-  }
 
   //#########################################################################
   //# Inner Class EmbedderController
@@ -1307,7 +1310,10 @@ public class ControlledSurface
       if (event.getButton() == MouseEvent.BUTTON1) {
         final Point point = event.getPoint();
         final ProxySubject item = getItemToBeSelected(event);
-        if (item != mFocusedObject) {
+         if (item == null || event.isControlDown()) {
+          // Clicking on whitespace --- drag select.
+          mInternalDragAction = new InternalDragActionSelect(event);
+        } else if (item != mFocusedObject) {
           if (isSelected(item)) {
             // Selected label in a label block --- EXTERNAL dragging only
             mInternalDragAction = new InternalDragActionDND(event, item);
@@ -1315,9 +1321,6 @@ public class ControlledSurface
             // Unselected label --- move label block or select label
             mInternalDragAction = new InternalDragActionMove(event, item);
           }
-        } else if (item == null || event.isControlDown()) {
-          // Clicking on whitespace --- drag select.
-          mInternalDragAction = new InternalDragActionSelect(event);
         } else {
           final Handle handle = getClickedHandle(item, event);
           if (handle == null) {
@@ -1558,7 +1561,9 @@ public class ControlledSurface
       if (event.getButton() == MouseEvent.BUTTON1) {
         final Point point = event.getPoint();
         final ProxySubject item = getItemToBeSelected(event);
-        if (item != mFocusedObject) {
+        if (item == null || event.isControlDown()) {
+          mInternalDragAction = new InternalDragActionSelect(event);
+        } else if (item != mFocusedObject) {
           if (isSelected(item)) {
             // Selected label in a label block --- EXTERNAL dragging only
             mInternalDragAction = new InternalDragActionDND(event, item);
@@ -1566,8 +1571,6 @@ public class ControlledSurface
             // Unselected label --- move label block or select label
             mInternalDragAction = new InternalDragActionMove(event, item);
           }
-        } else if (item == null || event.isControlDown()) {
-          mInternalDragAction = new InternalDragActionSelect(event);
         } else if (item instanceof NodeSubject) {
           // Clicking on node or nodegroup --- create edge.
           mInternalDragAction = new InternalDragActionCreateEdge(event);
@@ -1709,6 +1712,11 @@ public class ControlledSurface
     boolean shouldSnapToGrid()
     {
       return false;
+    }
+
+    Collection<ProxySubject> getPreviousSelection()
+    {
+      return mPreviousSelection;
     }
 
     //#######################################################################
@@ -1908,6 +1916,12 @@ public class ControlledSurface
     private InternalDragActionSelect(final MouseEvent event)
     {
       super(event);
+      if (mFocusedObject instanceof LabelBlockSubject &&
+          isSelected(mFocusedObject)) {
+        mLabelBlock = (LabelBlockSubject) mFocusedObject;
+      } else {
+        mLabelBlock = null;
+      }
       if (mFocusedObject == null) {
         mCurrentDragSelection = Collections.emptyList();
       } else {
@@ -1928,10 +1942,13 @@ public class ControlledSurface
     {
       if (super.continueDrag(point)) {
         if (wasControlDown()) {
-          mSelectedObjects.addAll(mCurrentDragSelection);
+          mSelectedObjects = new HashSet<ProxySubject>(getPreviousSelection());
           mCurrentDragSelection = getDragSelection();
-          mCurrentDragSelection.retainAll(mSelectedObjects);
-          mSelectedObjects.removeAll(mCurrentDragSelection);
+          if (mSelectedObjects.containsAll(mCurrentDragSelection)) {
+            mSelectedObjects.removeAll(mCurrentDragSelection);
+          } else {
+            mSelectedObjects.addAll(mCurrentDragSelection);
+          }
         } else {
           mSelectedObjects.removeAll(mCurrentDragSelection);
           mCurrentDragSelection = getDragSelection();
@@ -1947,10 +1964,12 @@ public class ControlledSurface
     void commitDrag(final Point point)
     {
       super.commitDrag(point);
-      if (wasControlDown()) {
+      if (!wasControlDown()) {
+        doReplaceSelection(mCurrentDragSelection);
+      } else if (mSelectedObjects.containsAll(mCurrentDragSelection)) {
         doRemoveFromSelection(mCurrentDragSelection);
       } else {
-        doReplaceSelection(mCurrentDragSelection);
+        doAddToSelection(mCurrentDragSelection);
       }
       repaint();
     }
@@ -1958,12 +1977,21 @@ public class ControlledSurface
     void cancelDrag(final Point point)
     {
       super.cancelDrag(point);
-      if (wasControlDown()) {
-        for (final ProxySubject item : mCurrentDragSelection) {
-          doToggleSelection(item);
+      final ProxySubject label = getLabelToBeSelected();
+      if (label == null) {
+        if (wasControlDown()) {
+          for (final ProxySubject item : mCurrentDragSelection) {
+            doToggleSelection(item);
+          }
+        } else {
+          doReplaceSelection(mCurrentDragSelection);
         }
       } else {
-        doReplaceSelection(mCurrentDragSelection);
+        if (wasControlDown()) {
+          doToggleSelection(label);
+        } else {
+          doReplaceLabelSelection(label);
+        }
       }
       repaint();
     }
@@ -1986,7 +2014,7 @@ public class ControlledSurface
      * Returns a list of all objects within a drag rectangle,
      * i.e., the items to be selected.
      */
-    Collection<ProxySubject> getDragSelection()
+    private Collection<ProxySubject> getDragSelection()
     {
       final GraphSubject graph = getGraph();
       final Rectangle dragrect = getDragRectangle();
@@ -2012,9 +2040,9 @@ public class ControlledSurface
       return selection;
     }
 
-    void includeShape(final Collection<ProxySubject> selection,
-                      final Rectangle dragrect,
-                      final ProxySubject item)
+    private void includeShape(final Collection<ProxySubject> selection,
+                              final Rectangle dragrect,
+                              final ProxySubject item)
     {
       if (item != null && mController.canBeSelected(item)) {
         final ProxyShape shape = getShapeProducer().getShape(item);
@@ -2025,8 +2053,19 @@ public class ControlledSurface
       }
     }
 
+    private ProxySubject getLabelToBeSelected()
+    {
+      if (mLabelBlock != null) {
+        final Point point = getDragStart();
+        return ControlledSurface.this.getLabelToBeSelected(mLabelBlock, point);
+      } else {
+        return null;
+      }
+    }
+
     //#######################################################################
     //# Data Members
+    private final LabelBlockSubject mLabelBlock;
     private Collection<ProxySubject> mCurrentDragSelection;
 
   }
