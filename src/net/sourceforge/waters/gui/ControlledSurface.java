@@ -1,10 +1,10 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters GUI
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.117 2007-02-13 22:38:09 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.118 2007-02-14 02:01:06 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -67,10 +67,10 @@ import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.*;
-import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
 import net.sourceforge.waters.gui.springembedder.EmbedderEvent;
-import net.sourceforge.waters.gui.springembedder.EmbedderObserver;
 import net.sourceforge.waters.gui.springembedder.EmbedderEventType;
+import net.sourceforge.waters.gui.springembedder.EmbedderObserver;
+import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
 
 import org.supremica.properties.Config;
 import net.sourceforge.waters.gui.springembedder.SpringAbortDialog;
@@ -96,15 +96,15 @@ public class ControlledSurface
       toolbar.attach(this);
     }
     setFocusable(true);
-    dtListener = new DTListener();
-    dropTarget = new DropTarget(this, dtListener);
+    final DropTargetListener dtListener = new DTListener();
+    final DropTarget dropTarget = new DropTarget(this, dtListener);
     mExternalDragSource = DragSource.getDefaultDragSource();
     mDGListener = new DGListener();
-    mDSListener = new DSListener();
-    updateTool();
+    final DragSourceListener dsListener = new DSListener();
+    mExternalDragSource.addDragSourceListener(dsListener);
     addKeyListener(new KeySpy());
-    mExternalDragSource.addDragSourceListener(mDSListener);
     graph.addModelObserver(this);
+    updateTool();
   }
 
   /**
@@ -117,50 +117,6 @@ public class ControlledSurface
     this(graph, module, null, null);
   }
 
-  public void embedderChanged(EmbedderEvent event)
-  {
-    if (event.getType() == EmbedderEventType.START) {
-      for (final MouseListener listener : getMouseListeners()) {
-        removeMouseListener(listener);
-      }
-      for (final MouseMotionListener listener : getMouseMotionListeners()) {
-        removeMouseMotionListener(listener);
-      }
-      mController = new EmbedderListener();
-      addMouseListener(mController);
-      addMouseMotionListener(mController);
-      mExternalDragSource.createDefaultDragGestureRecognizer
-        (this, mExternalDragAction, mDGListener);
-      updateHighlighting();
-    } else {
-      final Command move =
-        new MoveObjects(mSecondaryGraph.getChanged(), getGraph());
-      mRoot.getUndoInterface().executeCommand(move);
-      mSecondaryGraph.removeModelObserver(ControlledSurface.this);
-      mSecondaryGraph = null;
-      mSecondaryShapeProducer = null;
-      updateTool();
-      repaint();
-    }
-  }
-  
-  public void runEmbedder()
-  {
-    mSecondaryGraph = new EditorGraph(getGraph());
-    mSecondaryShapeProducer = new SubjectShapeProducer(mSecondaryGraph, getModule());
-    mSecondaryGraph.addModelObserver(ControlledSurface.this);
-    final String name = "graph";
-    final long timeout = Config.GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT.get();
-    final SpringEmbedder embedder = new SpringEmbedder(mSecondaryGraph.getNodeSubjects()
-                                                       , mSecondaryGraph.getEdgeSubjects());
-    embedder.addObserver(this);
-    final Thread thread = new Thread(embedder);
-    final JDialog dialog =
-      new SpringAbortDialog(mRoot.getFrame(), name, embedder, timeout);
-    dialog.setLocationRelativeTo(mRoot.getFrame());
-    dialog.setVisible(true);
-    thread.start();
-  }
 
   //#########################################################################
   //# Simple Access
@@ -208,8 +164,36 @@ public class ControlledSurface
   //# Interface net.sourceforge.waters.gui.Observer
   public void update(final EditorChangedEvent event)
   {
-    if (event instanceof ToolbarChangedEvent) {
+    if (event instanceof ToolbarChangedEvent && mEmbedder == null) {
       updateTool();
+    }
+  }
+
+
+  //#########################################################################
+  //# Interfacenet.sourceforge.waters.gui.springembedder.EmbedderObserver
+  public void embedderChanged(final EmbedderEvent event)
+  {
+    switch (event.getType()) {
+    case START:
+      if (mEmbedderController == null) {
+        mEmbedderController = new EmbedderController();
+      }
+      updateController(mEmbedderController);
+      // *** BUG ***
+      // Must disable menus and keyboard also!
+      // ***
+      break;
+    case STOP:
+      mEmbedder.removeObserver(this);
+      mEmbedder = null;
+      commitSecondaryGraph();
+      clearSecondaryGraph();
+      updateTool();
+      break;
+    default:
+      throw new IllegalArgumentException
+        ("Unknown embedder event: " + event.getType() + "!");
     }
   }
 
@@ -228,7 +212,7 @@ public class ControlledSurface
       revalidate();
     }
     updateError();
-    updateHighlighting();
+    mController.updateHighlighting();
     repaint();
   }
 
@@ -237,36 +221,39 @@ public class ControlledSurface
   //# Toolbar
   private void updateTool()
   {
-    final ToolController controller;
     switch (mToolbar.getTool()) {
     case SELECT:
       if (mSelectController == null) {
-        mSelectController = new SelectListener();
+        mSelectController = new SelectController();
       }
-      controller = mSelectController;
+      updateController(mSelectController);
       break;
     case NODE:
       if (mNodeController == null) {
-        mNodeController = new NodeListener();
+        mNodeController = new NodeController();
       }
-      controller = mNodeController;
+      updateController(mNodeController);
       break;
     case GROUPNODE:
       if (mGroupNodeController == null) {
-        mGroupNodeController = new GroupNodeListener();
+        mGroupNodeController = new GroupNodeController();
       }
-      controller = mGroupNodeController;
+      updateController(mGroupNodeController);
       break;
     case EDGE:
       if (mEdgeController == null) {
-        mEdgeController = new EdgeListener();
+        mEdgeController = new EdgeController();
       }
-      controller = mEdgeController;
+      updateController(mEdgeController);
       break;
     default:
       throw new IllegalStateException
         ("Unknown tool: " + mToolbar.getTool() + "!");
     }
+  }
+
+  private void updateController(final ToolController controller)
+  {
     if (mController != controller) {
       for (final MouseListener listener : getMouseListeners()) {
         removeMouseListener(listener);
@@ -279,7 +266,7 @@ public class ControlledSurface
       addMouseMotionListener(mController);
       mExternalDragSource.createDefaultDragGestureRecognizer
         (this, mExternalDragAction, mDGListener);
-      updateHighlighting();
+      mController.installed();
     }
   }
 
@@ -323,14 +310,14 @@ public class ControlledSurface
    * @param  x        the x coordinate of the new node.
    * @param  y        the y coordinate of the new node.
    */
-  void doCreateSimpleNode(final int x, final int y)
+  void doCreateSimpleNode(final Point2D pos)
   {
     final CompoundCommand compound = new CompoundCommand("Node Creation");
     if (!mSelectedObjects.isEmpty()) {
       final Command unselect = new UnSelectCommand(this, mSelectedObjects);
       compound.addCommand(unselect);
     }
-    final CreateNodeCommand create = new CreateNodeCommand(getGraph(), x, y);
+    final CreateNodeCommand create = new CreateNodeCommand(getGraph(), pos);
     final Command select = new SelectCommand(this, create.getCreatedNode());
     compound.addCommand(create);
     compound.addCommand(select);
@@ -486,6 +473,24 @@ public class ControlledSurface
       compound.end();
       mRoot.getUndoInterface().executeCommand(compound);
     }
+  }
+
+  public void runEmbedder()
+  {
+    createSecondaryGraph();
+    final SimpleComponentSubject comp =
+      (SimpleComponentSubject) getGraph().getParent();
+    final String name = comp == null ? "graph" : comp.getName();
+    final long timeout = Config.GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT.get();
+    mEmbedder = new SpringEmbedder(mSecondaryGraph.getNodeSubjects(),
+                                   mSecondaryGraph.getEdgeSubjects());
+    mEmbedder.addObserver(this);
+    final Thread thread = new Thread(mEmbedder);
+    final JDialog dialog =
+      new SpringAbortDialog(mRoot.getFrame(), name, mEmbedder, timeout);
+    dialog.setLocationRelativeTo(mRoot.getFrame());
+    dialog.setVisible(true);
+    thread.start();
   }
 
 
@@ -856,35 +861,42 @@ public class ControlledSurface
     return r1.intersects(r2) && !(r1.contains(r2) || r2.contains(r1));
   }
 
-  private Collection<ProxySubject> getObjectsAtPosition(final Point point)
+  /**
+   * Finds all focusable objects at a given positition.
+   * This method examines the graph and determines which objects are
+   * active, i.e., can be selected by a click at the given position
+   * in the current context.
+   */
+  private Collection<ProxySubject> getFocusableObjectsAtPosition
+    (final Point point)
   {
     final Collection<ProxySubject> collection = new LinkedList<ProxySubject>();
     final GraphSubject graph = getGraph();
     for (final NodeSubject node : graph.getNodesModifiable()) {
-      collectObjectAtPosition(node, point, collection);
+      collectFocusableObjectAtPosition(node, point, collection);
       if (node instanceof SimpleNodeSubject) {
         final SimpleNodeSubject simple = (SimpleNodeSubject) node;
         final LabelGeometrySubject geo = simple.getLabelGeometry();
-        collectObjectAtPosition(geo, point, collection);
+        collectFocusableObjectAtPosition(geo, point, collection);
       }
     }
     for (final EdgeSubject edge : graph.getEdgesModifiable()) {
-      collectObjectAtPosition(edge, point, collection);
+      collectFocusableObjectAtPosition(edge, point, collection);
       final LabelBlockSubject block = edge.getLabelBlock();
-      collectObjectAtPosition(block, point, collection);
+      collectFocusableObjectAtPosition(block, point, collection);
       final GuardActionBlockSubject ga = edge.getGuardActionBlock();
-      collectObjectAtPosition(ga, point, collection);
+      collectFocusableObjectAtPosition(ga, point, collection);
     }
-    collectObjectAtPosition(graph, point, collection);
+    collectFocusableObjectAtPosition(graph, point, collection);
     return collection;
   }
 
-  private void collectObjectAtPosition
+  private void collectFocusableObjectAtPosition
     (final ProxySubject item,
      final Point point,
      final Collection<ProxySubject> collection)
   {
-    if (item == null) {
+    if (item == null || getHighlightPriority(item) < 0) {
       return;
     }
     final ProxyShape shape = getShapeProducer().getShape(item);
@@ -904,6 +916,15 @@ public class ControlledSurface
       collection.add(graph.getBlockedEvents());
     } else {
       collection.add(item);
+    }
+  }
+
+  private int getHighlightPriority(final ProxySubject item)
+  {
+    if (mInternalDragAction == null) {
+      return mController.getHighlightPriority(item);
+    } else {
+      return mInternalDragAction.getHighlightPriority(item);
     }
   }
 
@@ -956,6 +977,40 @@ public class ControlledSurface
   }
 
 
+  //#########################################################################
+  //# Controller Auxiliaries
+  private boolean createSecondaryGraph()
+  {
+    if (mSecondaryGraph == null) {
+      mSecondaryGraph = new EditorGraph(getGraph());
+      mSecondaryShapeProducer =
+        new SubjectShapeProducer(mSecondaryGraph, getModule());
+      mSecondaryGraph.addModelObserver(ControlledSurface.this);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private void clearSecondaryGraph()
+  {
+    if (mSecondaryGraph != null) {
+      mSecondaryGraph.removeModelObserver(ControlledSurface.this);
+      mSecondaryGraph = null;
+      mSecondaryShapeProducer = null;
+      repaint();
+    }
+  }
+
+  private void commitSecondaryGraph()
+  {
+    if (mSecondaryGraph != null) {
+      final Command move =
+        new MoveObjects(mSecondaryGraph.getChanged(), getGraph());
+      mRoot.getUndoInterface().executeCommand(move);
+    }
+  }
+
   private void maybeShowPopup(final MouseEvent event)
   {
     if (event.isPopupTrigger()) {
@@ -994,48 +1049,6 @@ public class ControlledSurface
     }
   }
 
-  /**
-   * Updates highlighting based on the given new location of the mouse
-   * pointer.
-   */
-  private void updateHighlighting(final Point point)
-  {
-    mCurrentPoint = point;
-    updateHighlighting();
-  }
-
-  /**
-   * Updates highlighting based on the last recorded location of the mouse
-   * pointer.
-   */
-  private void updateHighlighting()
-  {
-    if (mCurrentPoint != null) {
-      boolean needRepaint = false;
-      Collection<ProxySubject> objects = getObjectsAtPosition(mCurrentPoint);
-      ProxySubject object = null;
-      if (!objects.isEmpty()) {
-        object = Collections.max(objects, mComparator);
-        if (getHighlightPriority(object) < 0) {
-          object = null;
-        }
-      }
-      if (object != mFocusedObject) {
-        mFocusedObject = object;
-        repaint();
-      }
-    }
-  }
-
-  private int getHighlightPriority(final ProxySubject item)
-  {
-    if (mInternalDragAction == null) {
-      return mController.getHighlightPriority(item);
-    } else {
-      return mInternalDragAction.getHighlightPriority(item);
-    }
-  }
-
   public void createOptions(EditorWindowInterface root)
   {
     mOptions = new EditorOptions(root);
@@ -1062,7 +1075,7 @@ public class ControlledSurface
       final InternalDragActionDND action = getInternalDragAction(point);
       action.commitDrag(event);
       mInternalDragAction = null;
-      updateHighlighting(point);
+      mController.updateHighlighting(point);
     }
 
     //###################################################################
@@ -1099,8 +1112,51 @@ public class ControlledSurface
       return getHighlightPriority(item) > 0;
     }
 
+    /**
+     * Updates highlighting based on the given new location of the mouse
+     * pointer.
+     */
+    void updateHighlighting(final Point point)
+    {
+      mCurrentPoint = point;
+      updateHighlighting();
+    }
+
+    /**
+     * Updates highlighting based on the last recorded location of the mouse
+     * pointer.
+     */
+    void updateHighlighting()
+    {
+      if (mCurrentPoint != null) {
+        final Collection<ProxySubject> objects =
+          getFocusableObjectsAtPosition(mCurrentPoint);
+        final ProxySubject object;
+        if (objects.isEmpty()) {
+          object = null;
+        } else {
+          object = Collections.max(objects, mComparator);
+        }
+        if (object != mFocusedObject) {
+          mFocusedObject = object;
+          repaint();
+        }
+      }
+    }
+
     //#######################################################################
-    //# Interface java.awt.MouseMotionListener
+    //# Additional Callbacks
+    /**
+     * Called after the listener is installed due to tool selection.
+     */
+    void installed()
+    {
+      requestFocusInWindow();
+      updateHighlighting();
+    }
+
+    //#######################################################################
+    //# Interface java.awt.MouseListener
     public void mouseClicked(final MouseEvent event)
     {
     }
@@ -1123,7 +1179,7 @@ public class ControlledSurface
           mInternalDragAction.cancelDrag(point);
         }
         mInternalDragAction = null;
-        updateHighlighting(event.getPoint());
+        updateHighlighting(point);
       }
     }
 
@@ -1159,14 +1215,37 @@ public class ControlledSurface
 
   }
 
-  private class EmbedderListener
-    extends ToolController
-  {
-  }
 
   //#########################################################################
-  //# Inner Class SelectListener
-  private class SelectListener
+  //# Inner Class EmbedderController
+  /**
+   * A dummy controller for spring embedding.
+   * Presently, no interactions are allowed while the spring embedder
+   * is running, but this controller could be extended to support
+   * dragging during the animation.
+   */
+  private class EmbedderController
+    extends ToolController
+  {
+
+    //#######################################################################
+    //# Interface java.awt.MouseListener
+    public void mousePressed(final MouseEvent event)
+    {
+      // No popup!
+    }
+
+    public void mouseReleased(final MouseEvent event)
+    {
+      // No popup!
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class SelectController
+  private class SelectController
     extends ToolController
   {
 
@@ -1270,8 +1349,8 @@ public class ControlledSurface
 
 
   //#########################################################################
-  //# Inner Class NodeListener
-  private class NodeListener
+  //# Inner Class NodeController
+  private class NodeController
     extends ToolController
   {
 
@@ -1285,6 +1364,38 @@ public class ControlledSurface
         return 1;
       } else {
         return -1;
+      }
+    }
+
+    /**
+     * Prevents stacking of nodes.
+     * When the grid is active and there is no item in focus,
+     * this methods checks whether there is a simple node at the nearest
+     * grid point, and if so, changes focus to that node.
+     */
+    void updateHighlighting()
+    {
+      super.updateHighlighting();
+      if (mCurrentPoint != null &&
+          mFocusedObject == null &&
+          mInternalDragAction == null &&
+          Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get()) {
+        final ProxyShapeProducer shaper = getShapeProducer();
+        final Point snapped = findGrid(mCurrentPoint);
+        if (!snapped.equals(mCurrentPoint)) {
+          final int x = snapped.x;
+          final int y = snapped.y;
+          for (final NodeSubject node : getGraph().getNodesModifiable()) {
+            if (node instanceof SimpleNodeSubject) {
+              final ProxyShape shape = shaper.getShape(node);
+              if (shape.isClicked(x, y)) {
+                mCurrentPoint = snapped;
+                super.updateHighlighting();
+                return;
+              }
+            }
+          }
+        }
       }
     }
 
@@ -1303,12 +1414,7 @@ public class ControlledSurface
           } else {
             snapped = point;
           }
-          // *** BUG ***
-          // This does not accurately prevent stacking of nodes!
-          // ***
-          final int x = snapped.x;
-          final int y = snapped.y;
-          doCreateSimpleNode(x, y);
+          doCreateSimpleNode(snapped);
         } else if (event.getClickCount() == 2 &&
                    mFocusedObject != null &&
                    mFocusedObject instanceof LabelGeometrySubject) {
@@ -1347,8 +1453,8 @@ public class ControlledSurface
 
 
   //#########################################################################
-  //# Inner Class GroupNodeListener
-  private class GroupNodeListener
+  //# Inner Class GroupNodeController
+  private class GroupNodeController
     extends ToolController
   {
 
@@ -1393,8 +1499,8 @@ public class ControlledSurface
 
 
   //#########################################################################
-  //# Inner Class EdgeListener
-  private class EdgeListener
+  //# Inner Class EdgeController
+  private class EdgeController
     extends ToolController
   {
 
@@ -1740,34 +1846,17 @@ public class ControlledSurface
     //# Simple Access
     boolean createSecondaryGraph()
     {
-      if (mSecondaryGraph == null) {
-        mSecondaryGraph = new EditorGraph(getGraph());
-        mSecondaryShapeProducer =
-          new SubjectShapeProducer(mSecondaryGraph, getModule());
-        mSecondaryGraph.addModelObserver(ControlledSurface.this);
-        return true;
-      } else {
-        return false;
-      }
+      return ControlledSurface.this.createSecondaryGraph();
     }
 
     void clearSecondaryGraph()
     {
-      if (mSecondaryGraph != null) {
-        mSecondaryGraph.removeModelObserver(ControlledSurface.this);
-        mSecondaryGraph = null;
-        mSecondaryShapeProducer = null;
-        repaint();
-      }
+      ControlledSurface.this.clearSecondaryGraph();
     }
 
     void commitSecondaryGraph()
     {
-      if (mSecondaryGraph != null) {
-        final Command move =
-          new MoveObjects(mSecondaryGraph.getChanged(), getGraph());
-        mRoot.getUndoInterface().executeCommand(move);
-      }
+      ControlledSurface.this.commitSecondaryGraph();
     }
 
     //#######################################################################
@@ -2093,7 +2182,7 @@ public class ControlledSurface
     {
       final Point point = event.getLocation();
       continueDrag(point);
-      updateHighlighting(point);
+      mController.updateHighlighting(point);
 
       IdentifierWithKind ikind;
       EventListExpressionSubject elist = null;
@@ -3164,6 +3253,7 @@ public class ControlledSurface
     MOVE_FOLLOW;
   }
 
+
   //#########################################################################
   //# Inner Class HighlightComparator
   private class HighlightComparator
@@ -3515,21 +3605,22 @@ public class ControlledSurface
    * or <CODE>null</CODE>.
    */
   private InternalDragAction mInternalDragAction;
+  /**
+   * The current spring embedder, if any is running.
+   */
+  private SpringEmbedder mEmbedder;
 
   private ToolController mController;
   private ToolController mSelectController;
   private ToolController mNodeController;
   private ToolController mGroupNodeController;
   private ToolController mEdgeController;
+  private ToolController mEmbedderController;
 
   private DragSource mExternalDragSource;
-  private DragGestureListener mDGListener;
-  private DragSourceListener mDSListener;
+  private final DragGestureListener mDGListener;
   private int mExternalDragAction = DnDConstants.ACTION_COPY;
   private DRAGOVERSTATUS mExternalDragStatus = DRAGOVERSTATUS.NOTDRAG;
-
-  private DropTarget dropTarget;
-  private DropTargetListener dtListener;
 
   private final HighlightComparator mComparator = new HighlightComparator();
 

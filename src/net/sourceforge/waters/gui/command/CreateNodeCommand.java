@@ -1,24 +1,23 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
+//# PROJECT: Waters GUI
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateNodeCommand
 //###########################################################################
-//# $Id: CreateNodeCommand.java,v 1.17 2007-02-12 21:38:49 robi Exp $
+//# $Id: CreateNodeCommand.java,v 1.18 2007-02-14 02:01:06 robi Exp $
 //###########################################################################
-
 
 package net.sourceforge.waters.gui.command;
 
-import net.sourceforge.waters.gui.EditorGraph;
 import java.awt.Point;
+import java.awt.geom.Point2D;
 
+import net.sourceforge.waters.gui.EditorGraph;
 import net.sourceforge.waters.gui.renderer.LabelProxyShape;
 import net.sourceforge.waters.subject.base.IndexedSetSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
-import net.sourceforge.waters.subject.module.PlainEventListSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
@@ -38,50 +37,36 @@ public class CreateNodeCommand
   /**
    * Constructs a new CreateNodeCommand with the specified surface and
    * creates the node in the x,y position specified
-   * @param graph the surface edited by this command
-   * @param x the position upon which the node is created
-   * @param y the position upon which the node is created
+   * @param graph  the graph edited by this command.
+   * @param pos    the position where the node is created.
    */
-  public CreateNodeCommand(GraphSubject graph, int x, int y)
+  public CreateNodeCommand(final GraphSubject graph, final Point2D pos)
   {
     mGraph = graph;
-    final PlainEventListSubject props =
-      new PlainEventListSubject(null);
-    final PointGeometrySubject point = new PointGeometrySubject(
-      new Point(x, y));
-    final LabelGeometrySubject label = new LabelGeometrySubject(
-      new Point(LabelProxyShape.DEFAULTOFFSETX,
-                LabelProxyShape.DEFAULTOFFSETY));
+    final PointGeometrySubject geo = new PointGeometrySubject(pos);
+    final LabelGeometrySubject label =
+      new LabelGeometrySubject(LabelProxyShape.DEFAULTOFFSET);
     final IndexedSetSubject<NodeSubject> nodes = graph.getNodesModifiable();
     final boolean initial = nodes.isEmpty();
-    final PointGeometrySubject initarrow = initial ? 
-                                           new PointGeometrySubject(new Point(-5, -5))
-                                           :  null;
-                                                                              
+    final PointGeometrySubject initgeo =
+      initial ? new PointGeometrySubject(new Point(-5, -5)) : null;
     // Find a unique name!
     String name = "S0";
     for (int i = 0; nodes.containsName(name); i++) {
       name = "S" + i;
     }
-    mCreated = new SimpleNodeSubject(name, props, initial, point, initarrow, label);
+    mCreated =
+      new SimpleNodeSubject(name, null, initial, geo, initgeo, label);
   }
 
-  /**
-   * Executes the Creation of the Node
-   */
   public void execute()
   {
     mGraph.getNodesModifiable().add(mCreated);
-//    EditorGraph.updateChildNodes(mGraph);
   }
 
-  /** 
-   * Undoes the Command
-   */    
   public void undo()
   {
     mGraph.getNodesModifiable().remove(mCreated);
-    //EditorGraph.updateChildNodes(mGraph);
   }
 
   public String getName()

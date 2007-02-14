@@ -67,6 +67,10 @@ public class LabelProxyShape
     private final Point mPoint;
     
     private static double CORNERRADIUS = 8;
+
     public static final int DEFAULTOFFSETX = 0;
     public static final int DEFAULTOFFSETY = 10;
+    public static final Point DEFAULTOFFSET =
+      new Point(DEFAULTOFFSETX, DEFAULTOFFSETY);
+
 }

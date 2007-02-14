@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.28 2007-02-13 22:38:09 siw4 Exp $
+//# $Id: SpringEmbedder.java,v 1.29 2007-02-14 02:01:06 robi Exp $
 //###########################################################################
 
 
@@ -62,9 +62,12 @@ public class SpringEmbedder
     mRandom = new Random(seed);
     mNodes = nodes;
     mEdges = edges;
-    mObservers = new ArrayList<EmbedderObserver>();
+    mObservers = new LinkedList<EmbedderObserver>();
   }
 
+
+  //#########################################################################
+  //# Observer Pattern
   public void addObserver(EmbedderObserver observer)
   {
     mObservers.add(observer);
@@ -77,10 +80,14 @@ public class SpringEmbedder
   
   private void fireEvent(EmbedderEvent event)
   {
-    for (EmbedderObserver observer : mObservers) {
+    // Just in case they try to change the list in response to the call ...
+    final Collection<EmbedderObserver> copy =
+      new ArrayList<EmbedderObserver>(mObservers);
+    for (EmbedderObserver observer : copy) {
       observer.embedderChanged(event);
     }
   }
+
   
   //#########################################################################
   //# Interface java.lang.Runnable
@@ -732,5 +739,7 @@ public class SpringEmbedder
   private static final Point2D POINT_ZERO = new Point2D.Double(0.0, 0.0);
   private static final Point2D POINT_CENTER = new Point2D.Double(200.0, 200.0);
 
-  private static final List<SpringEmbedder> springEmbedders = Collections.synchronizedList(new LinkedList<SpringEmbedder>());
+  private static final List<SpringEmbedder> springEmbedders =
+    Collections.synchronizedList(new LinkedList<SpringEmbedder>());
+
 }
