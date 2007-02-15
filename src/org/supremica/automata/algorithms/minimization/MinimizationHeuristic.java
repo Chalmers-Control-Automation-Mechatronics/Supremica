@@ -51,6 +51,7 @@ package org.supremica.automata.algorithms.minimization;
 
 import java.util.*;
 import org.supremica.automata.*;
+import org.supremica.automata.algorithms.GeneticAlgorithms;
 
 public enum MinimizationHeuristic
 {
@@ -65,6 +66,7 @@ public enum MinimizationHeuristic
     MostStates("Most states", Type.MAXIMIZE),
     MostEvents("Most events", Type.MAXIMIZE),
     MostAutomata("Most automata", Type.MAXIMIZE),
+    GeneticAlgorithm("Genetic algorithm prediction", Type.MINIMIZE),
     Random("Random order", Type.MAXIMIZE);
     
     private enum Type {MAXIMIZE, MINIMIZE, SPECIAL}
@@ -170,6 +172,12 @@ public enum MinimizationHeuristic
         else if (this == MostAutomata || this == FewestAutomata)
         {
             return selection.size();
+        }
+        else if (this == GeneticAlgorithm)
+        {
+            if (selection.size() != 2)
+                throw new IllegalArgumentException("The genetic algoritm can only predict the size of a pair of automata.");
+            return GeneticAlgorithms.predictSynchronizationSize(selection.getAutomatonAt(0), selection.getAutomatonAt(1));
         }
         else if (this == Random)
         {

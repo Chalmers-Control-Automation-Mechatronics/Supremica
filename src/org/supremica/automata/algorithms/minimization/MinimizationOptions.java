@@ -84,6 +84,11 @@ public final class MinimizationOptions
      * only the nonblocking status of the end result.
      */
     private boolean skipLast;
+    /** 
+     * In the compositional minimisation, the procedure will stop when it comes across
+     * components of this size or greater.
+     */
+    private int componentSizeLimit;
     /**
      * If many automata are present, when this option is set, they are composed and minimized
      * rather than being minimized individually.
@@ -94,7 +99,7 @@ public final class MinimizationOptions
      */
     private MinimizationStrategy minimizationStrategy;
     /**
-     * Which heuristic should be used.
+     * Which heuristic should be used to evaluate the automata sets chosen by the minimizationStrategy?
      */
     private MinimizationHeuristic minimizationHeuristic;
     /**

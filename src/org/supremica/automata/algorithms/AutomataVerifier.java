@@ -71,7 +71,7 @@ import org.supremica.util.BDD.*;
 import org.supremica.properties.Config;
 
 /**
- * For performing verification. Uses AutomataSynchronizerExecuter for the actual verification work.
+ * For performing verification. Uses AutomataSynchronizerExecuter for much of the actual verification work.
  *
  * @author  ka
  * @since  November 28, 2001
@@ -163,14 +163,6 @@ public class AutomataVerifier
             verificationOptions.setAlgorithmType(VerificationAlgorithm.MONOLITHIC);
         }
         
-        /*
-        // Check IDD
-        if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.IDD)
-        {
-            return "The IDD Algorithm is not fully implemented yet.";
-        }
-         */
-        
         // Check Controllability
         if (verificationOptions.getVerificationType() == VerificationType.CONTROLLABILITY)
         {
@@ -186,22 +178,6 @@ public class AutomataVerifier
                 return "Some automaton has no marked states. This system is trivially blocking!";
             }
         }
-        
-        /*
-        // Check MutuallyNonblocking
-        if (verificationOptions.getVerificationType() == VerificationType.MUTUALLYNONBLOCKING)
-        {
-            if (!theAutomata.hasAcceptingState())
-            {
-                return "Some automaton has no marked states!";
-            }
-         
-            if (verificationOptions.getAlgorithmType() != VerificationAlgorithm.MODULAR)
-            {
-                return "The mutual nonblocking algorithm is a modular algorithm!";
-            }
-        }
-         */
         
         // Check Language Inclusion
         if (verificationOptions.getVerificationType() == VerificationType.LANGUAGEINCLUSION)
@@ -314,21 +290,6 @@ public class AutomataVerifier
                     throw new UnsupportedOperationException("The selected algorithm is not implemented");
                 }
             }
-            /*
-            else if (verificationOptions.getVerificationType() == VerificationType.MUTUALLYNONBLOCKING)
-            {
-                // Work!
-                if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MODULAR)
-                {
-                    // This algorithm is under implementation!!
-                    return modularMutuallyNonblockingVerification();
-                }
-                else
-                {
-                    throw new UnsupportedOperationException("The selected algorithm is not implemented");
-                }
-            }
-             */
             else
             {
                 throw new UnsupportedOperationException("The selected type of verification " +
@@ -351,6 +312,7 @@ public class AutomataVerifier
         // Invert the properties!
         for (Automaton aut: theAutomata)
         {
+            // Invert automaton type
             if (aut.isPlant())
             {
                 aut.setType(AutomatonType.SPECIFICATION);
@@ -360,6 +322,7 @@ public class AutomataVerifier
                 aut.setType(AutomatonType.PLANT);
             }
             
+            // Invert event controllability
             Alphabet alpha = aut.getAlphabet();
             for (LabeledEvent ev: alpha)
             {
@@ -383,9 +346,9 @@ public class AutomataVerifier
         
         // Make a copy and modify!
         
-        // We shall verify if the language of    L(autA) \subseteq L(autB)
-        Automata autA = new Automata(inclusionAutomata);
-        Automata autB = new Automata(theAutomata);
+        // We shall verify   L(autA) \subseteq L(autB)
+        Automata autA = new Automata(inclusionAutomata); // The automata that are not selected
+        Automata autB = new Automata(theAutomata); // The selected automata
         
         // Make autA plants
         for (Automaton aut: autA)
@@ -775,6 +738,7 @@ public class AutomataVerifier
                 }
             }
             
+            // Now, we've tried ruling them out... did we make it?
             if (potentiallyUncontrollableStates.size(automataIndices) > 0)
             {
                 // There are still some uncontrollable states that we're not sure as of being either
@@ -1136,8 +1100,8 @@ public class AutomataVerifier
     private boolean findUncontrollableStates(int[] automataIndices)
     throws Exception
     {
-        // WOHOOPS! Eventuellt är det listigt att göra ny onlinesynchronizer,
-        // med den nya automataIndices varje gång... tänk på det. FIXA!
+        // WOHOOPS! Eventuellt ï¿½r det listigt att gï¿½ra ny onlinesynchronizer,
+        // med den nya automataIndices varje gï¿½ng... tï¿½nk pï¿½ det. FIXA!
         if (uncontrollabilityCheckHelper == null)
         {
             AutomataSynchronizerExecuter onlineSynchronizer = new AutomataSynchronizerExecuter(synchHelper);
@@ -1525,7 +1489,7 @@ public class AutomataVerifier
             
             if (!allIndividuallyNonblocking)
             {
-                logger.error("The automaton " + currAutomaton + " is individually blocking!");
+                logger.error("The automaton " + currAutomaton + " is blocking!");
                 
                 // logger.error("Aborting verification...");
                 requestStop();
@@ -1538,90 +1502,17 @@ public class AutomataVerifier
         
         return true;
     }
-    
-    /**
-     * Examines nonblocking modularily... not fully implemented yet!
-     *
-     * Does not use the synchHelper!
-     */
-        /*
-        private boolean modularNonblockingVerification()
-                throws Exception
-        {
-                // Is this really a modular system?
-                if (theAutomata.size() == 1)
-                {
-                        logger.info("The selected system has only one automaton - using monolithic verification...");
-         
-                        return monolithicNonblockingVerification();
-                }
-         
-                // Ensure individual nonblocking
-                if (!isIndividuallyNonblocking())
-                {
-                        return false;
-                }
-         
-                // Do some tests...
-                Iterator targetIt = theAutomata.iterator();
-                Automaton newAutomaton;
-                Automata newAutomata = new Automata();
-                Automata restrictedAutomata = null;
-         
-                while (targetIt.hasNext())
-                {
-                        // Iterate over theAutomata
-                        Automaton targetAutomaton = new Automaton((Automaton) targetIt.next());
-                        Alphabet targetAlphabet = targetAutomaton.getAlphabet();
-         
-                        // Restrict the other automata to this automations alphabet and synchronize the result
-                        restrictedAutomata = new Automata();
-         
-                        Iterator restrictIt = theAutomata.iterator();
-         
-                        while (restrictIt.hasNext())
-                        {
-                                Automaton restrictAutomaton = new Automaton((Automaton) restrictIt.next());
-         
-                                if (targetAutomaton.equalAutomaton(restrictAutomaton))
-                                {
-                                        continue;
-                                }
-         
-                                Determinizer determinizer = new Determinizer(restrictAutomaton, targetAlphabet, false);
-         
-                                determinizer.execute();
-         
-                                newAutomaton = determinizer.getNewAutomaton();
-         
-                                newAutomaton.setName(restrictAutomaton.getName() + "_REST");
-                                restrictedAutomata.addAutomaton(newAutomaton);
-                        }
-         
-                        Automaton synchAutomaton = AutomataSynchronizer.synchronizeAutomata(restrictedAutomata);
-         
-                        synchAutomaton.setName(targetAutomaton.getName() + "_BLOB");
-                        newAutomata.addAutomaton(synchAutomaton);
-                }
-         
-                ActionMan.getGui().addAutomata(newAutomata);
-         
-                //ActionMan.getGui().addAutomata(restrictedAutomata);
-                return false;
-        }
-         */
-    
+       
     // BENCHMARKING JUNK
     private static String message = "";
     public String getTheMessage()
     {
         return message;
-    }
-    
+    }    
     
     /**
-     * Verifies controllability by transforming controllbility problems to blocking problems
-     * and using a nonblocking verification algorithm.
+     * Verifies controllability compositionally (by transforming the 
+     * controllability problems into blocking problems).
      *
      * Does not use the synchHelper.
      */
@@ -1634,11 +1525,9 @@ public class AutomataVerifier
             automaton.setAllStatesAccepting();
         }
         
-        // Plantify all automata
-        MinimizationHelper.plantify(theAutomata);
-        
-        // Verify nonblocking (yep, that's right)
-        return compositionalNonblockingVerification();
+        // Now the system is trivially nonblocking so verifying controllability AND nonblocking
+        // equals verifying controllability!
+        return compositionalControllabilityNonblockingVerification();
     }
     
     /**
@@ -1677,7 +1566,7 @@ public class AutomataVerifier
         });
         
         // Minimize the system compositionally
-        Automaton result;
+        Automata result;
         try
         {
             // BENCHMARKING
@@ -1703,7 +1592,7 @@ public class AutomataVerifier
             threadToStop = null;
             
             // JUNK
-            message = minimizer.getStatisticsLine();
+            message = minimizer.getStatisticsLineLaTeX();
         }
         catch (Exception ex)
         {
@@ -1719,7 +1608,8 @@ public class AutomataVerifier
         }
         
         // Examine the result and return the verdict!
-        return moduleIsNonblocking(result, true);
+        theAutomata  = result;
+        return monolithicNonblockingVerification();
     }
     
     private boolean modularLanguageinclusionVerification(Automata inclusionAutomata)

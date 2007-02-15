@@ -52,6 +52,9 @@ package org.supremica.gui;
 import java.util.*;
 import org.supremica.automata.templates.*;
 
+/**
+ * For comvenient menu-access to a large set of examples.
+ */
 public class ExampleTemplates
 {
     private static ExampleTemplates templates = null;

@@ -53,7 +53,7 @@ import java.util.Date;
 
 /**
  * Simulates a "stopwatch" with four buttons - start (resume), stop, reset and
- * restart. 
+ * restart.
  *   * Start resumes a stopped timer.
  *   * Stop interrupts the timer.
  *   * Reset sets the timer to 0 and stops the timer.
@@ -61,121 +61,122 @@ import java.util.Date;
  */
 public class ActionTimer
 {
-	private final static String hours = " hours";
-	private final static String minutes = " minutes";
-	private final static String seconds = " seconds";
-	private final static String milliseconds = " milliseconds";
-	private Date startDate = null;
-	private Date stopDate = null;
-
-	/**
-	 * Creates a new timer set to 0.
-	 */
-	public ActionTimer() {}
-
-	/**
-	 * Resets the timer to 0 and stops the timer.
-	 */
-	public void reset()
-	{
-		startDate = null;
-		stopDate = null;
-	}
-
-	/**
-	 * Interrupts the timer. Start resumes the counting, reset sets the time to 0.
-	 */
-	public void stop()
-	{
-		stopDate = new Date();
-	}
-
-	/**
-	 * Makes the timer resume ticking "from where it last
-	 * stopped". Starts from 0 if it hasn't been started before.
-	 */
-	public void start()
-	{
-		// Not started yet?
-		if (startDate == null)
-		{
-			startDate = new Date();
-			stopDate = null;
-		}
-		else
-		{
-			// Shift "startDate" as long as the timer has been turned off
-			startDate.setTime(startDate.getTime() + ((new Date()).getTime()-stopDate.getTime()));
-			stopDate = null;
-		}
-	}
-
-	/**
-	 * Restarts the timer from 0.
-	 */
-	public void restart()
-	{
-		reset();
-		start();
-	}
-
-	/**
-	 * Returns the elapsed time in milliseconds between last start and last stop call.
-	 * If stop is not called before this method then the time since last call
-	 * to start is returned
-	 */
-	public long elapsedTime()
-		throws IllegalStateException
-	{
-		if (startDate == null)
-		{
-			throw new IllegalStateException("startDate is negative");
-		}
-
-		if (stopDate == null)
-		{
-			return (new Date()).getTime() - startDate.getTime();
-		}
-
-		return stopDate.getTime() - startDate.getTime();
-	}
-
-	/**
-	 * Returns a nice, readable string presenting the currently elapsed time.
-	 */
-	public String toString()
-	{
-		// Calculate time
-		long time = elapsedTime();    // time is in millisecs
-		int hrs = (int) (time / (60 * 60 * 1000.0));
-		time = time - hrs * (60 * 60 * 1000);
-		int mins = (int) (time / (60 * 1000.0));
-		time = time - mins * (60 * 1000);
-		int secs = (int) (time / (1000.0));
-		time = time - secs * 1000;
-		int millis = (int) time;
-
-		// Produce message
-		StringBuffer sbuf = new StringBuffer();
-		if (hrs != 0)
-		{
-			//sbuf.append(hrs + hours + mins + minutes + secs + seconds + millis + milliseconds);
-			sbuf.append(hrs + hours + " " + mins + minutes);
-		}
-		else if (mins != 0)
-		{
-			//sbuf.append(mins + minutes + secs + seconds + millis + milliseconds);
-			sbuf.append(mins + minutes + " " + secs + seconds);
-		}
-		else if (secs != 0)
-		{
-			sbuf.append(secs + seconds + " " + millis + milliseconds);
-		}
-		else
-		{
-			sbuf.append(millis + milliseconds);
-		}
-
-		return sbuf.toString();
-	}
+    private final static String hours = " hours";
+    private final static String minutes = " minutes";
+    private final static String seconds = " seconds";
+    private final static String milliseconds = " milliseconds";
+    private Date startDate = null;
+    private Date stopDate = null;
+    
+    /**
+     * Creates a new timer set to 0.
+     */
+    public ActionTimer()
+    {}
+    
+    /**
+     * Resets the timer to 0 and stops the timer.
+     */
+    public void reset()
+    {
+        startDate = null;
+        stopDate = null;
+    }
+    
+    /**
+     * Interrupts the timer. Start resumes the counting, reset sets the time to 0.
+     */
+    public void stop()
+    {
+        stopDate = new Date();
+    }
+    
+    /**
+     * Makes the timer resume ticking "from where it last
+     * stopped". Starts from 0 if it hasn't been started before.
+     */
+    public void start()
+    {
+        // Not started yet?
+        if (startDate == null)
+        {
+            startDate = new Date();
+            stopDate = null;
+        }
+        else
+        {
+            // Shift "startDate" as long as the timer has been turned off
+            startDate.setTime(startDate.getTime() + ((new Date()).getTime()-stopDate.getTime()));
+            stopDate = null;
+        }
+    }
+    
+    /**
+     * Restarts the timer from 0.
+     */
+    public void restart()
+    {
+        reset();
+        start();
+    }
+    
+    /**
+     * Returns the elapsed time in milliseconds between last start and last stop call.
+     * If stop is not called before this method then the time since last call
+     * to start is returned
+     */
+    public long elapsedTime()
+    throws IllegalStateException
+    {
+        if (startDate == null)
+        {
+            throw new IllegalStateException("startDate is negative");
+        }
+        
+        if (stopDate == null)
+        {
+            return (new Date()).getTime() - startDate.getTime();
+        }
+        
+        return stopDate.getTime() - startDate.getTime();
+    }
+    
+    /**
+     * Returns a nice, readable string presenting the currently elapsed time.
+     */
+    public String toString()
+    {
+        // Calculate time
+        long time = elapsedTime();    // time is in millisecs
+        int hrs = (int) (time / (60 * 60 * 1000.0));
+        time = time - hrs * (60 * 60 * 1000);
+        int mins = (int) (time / (60 * 1000.0));
+        time = time - mins * (60 * 1000);
+        int secs = (int) (time / (1000.0));
+        time = time - secs * 1000;
+        int millis = (int) time;
+        
+        // Produce message
+        StringBuffer sbuf = new StringBuffer();
+        if (hrs != 0)
+        {
+            //sbuf.append(hrs + hours + mins + minutes + secs + seconds + millis + milliseconds);
+            sbuf.append(hrs + hours + " " + mins + minutes);
+        }
+        else if (mins != 0)
+        {
+            //sbuf.append(mins + minutes + secs + seconds + millis + milliseconds);
+            sbuf.append(mins + minutes + " " + secs + seconds);
+        }
+        else if (secs != 0)
+        {
+            sbuf.append(secs + seconds + " " + millis + milliseconds);
+        }
+        else
+        {
+            sbuf.append(millis + milliseconds);
+        }
+        
+        return sbuf.toString();
+    }
 }

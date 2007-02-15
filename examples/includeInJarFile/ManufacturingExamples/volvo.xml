@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Automata name="" major="0" minor="9">
+<Automata name="" comment="Plant||specification size: 8871 states." major="0" minor="9">
 <Automaton name="Safety spec O33 O54nst2" type="Specification">
 	<Events>
 		<Event id="0" label="finO33"/>

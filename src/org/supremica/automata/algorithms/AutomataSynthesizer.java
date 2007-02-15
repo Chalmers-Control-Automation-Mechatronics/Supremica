@@ -217,18 +217,21 @@ public class AutomataSynthesizer
             AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
             minimizer.setExecutionDialog(executionDialog);
             MinimizationOptions options = MinimizationOptions.getDefaultSynthesisOptions();
-            Automaton min = minimizer.getCompositionalMinimization(options);
-            min.setComment("sup(" + min.getName() + ")");
-            min.setName(null);
+            Automata min = minimizer.getCompositionalMinimization(options);
+            for (Automaton sup: min)
+            {
+                sup.setComment("sup(" + min.getName() + ")");
+                sup.setName(null);
+            }
             
             // Present result
-            if (false && Config.VERBOSE_MODE.isTrue() && (min.nbrOfStates() < 100))
+            if (false && Config.VERBOSE_MODE.isTrue() && (min.size() == 1) && (min.getFirstAutomaton().nbrOfStates() < 100))
             {
                 // This may not be true if more advanced simplification rules have been used!
                 logger.info("The states that are reachable in the maximally permissive, "
-							+ "controllable and nonblocking supervisor are: " + min.getStateSet() + ".");
+                    + "controllable and nonblocking supervisor are: " +  min.getFirstAutomaton().getStateSet() + ".");
             }
-            result.addAutomaton(min);
+            result.addAutomata(min);
         }
         else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD)
         {

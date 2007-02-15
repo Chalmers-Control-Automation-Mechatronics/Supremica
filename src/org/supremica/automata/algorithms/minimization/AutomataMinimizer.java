@@ -112,11 +112,11 @@ public class AutomataMinimizer
     /**
      * Returns minimized automaton, minimized with respect to the supplied options.
      */
-    public Automaton getCompositionalMinimization(MinimizationOptions options)
+    public Automata getCompositionalMinimization(MinimizationOptions options)
     throws Exception
     {
         this.options = options;
-             
+        
         // Are the options valid?
         if (!options.isValid())
         {
@@ -180,12 +180,11 @@ public class AutomataMinimizer
         
         ActionTimer timer = new ActionTimer();
         
-        // As long as there are at least two automata, 
-		// select some automata to compose and minimize!
+        // As long as there are at least two automata,
+        // select some automata to compose and minimize!
         while (theAutomata.size() >= 2)
         {
-            timer.start();
-                        /*
+            /*
                           MinimizationTask newTask = getNextMinimizationTask(true);
                           MinimizationTask oldTask = getNextMinimizationTask(false);
                           if (!oldTask.equals(newTask))
@@ -194,8 +193,10 @@ public class AutomataMinimizer
                           logger.info("New: " + newTask);
                           logger.info("Old: " + oldTask);
                           }
-                         */
+             */
+            
             // Get next automata to minimize
+            timer.start();
             MinimizationTask task = getNextMinimizationTask(false);
             Automata selection = task.getAutomata();
             Alphabet hideThese = task.getEventsToHide();
@@ -204,6 +205,7 @@ public class AutomataMinimizer
             {
                 return null;
             }
+            
             // Perform the minimization, unless of course this is the last step
             // and it should be skipped...
             Automaton min;
@@ -232,6 +234,7 @@ public class AutomataMinimizer
             {
                 return null;
             }
+            
             // Early termination
             if ((options.getMinimizationType() == EquivalenceRelation.CONFLICTEQUIVALENCE) ||
                 (options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE))
@@ -246,33 +249,34 @@ public class AutomataMinimizer
                     theAutomata = new Automata(min);
                     continue;
                 }
-
-				// If all states are marked in all automata, we're done!
-				if (options.getMinimizationType() == EquivalenceRelation.CONFLICTEQUIVALENCE)
-				{
-					boolean ok = true;
-					for (Automaton aut: theAutomata)
-					{
-						if (aut.hasNonacceptingState())
-						{
-							ok = false;
-							break;
-						}
-					}
-					if (ok)
-					{
-						logger.info("Early termination--all states are marked!");
-						Automaton aut = new Automaton("NONBLOCK");
-						State state = new State("q");
-						state.setAccepting(true);
-						state.setInitial(true);
-						aut.addState(state);
-						//aut.setInitialState(state);
-						theAutomata = new Automata(aut);
-						continue;
-					}
-				}
+                
+                if (options.getMinimizationType() == EquivalenceRelation.CONFLICTEQUIVALENCE)
+                {
+                    // If all states are marked in all automata, we're done!
+                    boolean ok = true;
+                    for (Automaton aut: theAutomata)
+                    {
+                        if (aut.hasNonacceptingState())
+                        {
+                            ok = false;
+                            break;
+                        }
+                    }
+                    if (ok)
+                    {
+                        logger.info("Early termination--all states are marked!");
+                        Automaton aut = new Automaton("NONBLOCK");
+                        State state = new State("q");
+                        state.setAccepting(true);
+                        state.setInitial(true);
+                        aut.addState(state);
+                        //aut.setInitialState(state);
+                        theAutomata = new Automata(aut);
+                        continue;
+                    }
+                }
             }
+            
             // Adjust the eventToAutomataMap
             // Remove the hidden events from the map
             for (Iterator<LabeledEvent> it = hideThese.iterator(); it.hasNext(); )
@@ -293,11 +297,14 @@ public class AutomataMinimizer
             {
                 eventToAutomataMap.insert(it.next(), min);
             }
+            
             // Adjust the automata
             theAutomata.removeAutomata(selection);
             theAutomata.addAutomaton(min);
+            
             // Dispose of originals
             selection.clear();
+            
             // Update execution dialog
             if (executionDialog != null)
             {
@@ -325,14 +332,13 @@ public class AutomataMinimizer
         //logger.info("Timer time: " + timer);
         //logger.info(theAutomata.getName() + " & " + initialNbrOfAutomata + " & & " + mostStates + " & " + mostTransitions + " & TIME & true/false & " + AutomatonMinimizer.getWodesStatisticsLaTeX() + " & ALGO \\\\");
         // Return the result of the minimization!
-        assert(theAutomata.size() == 1);
-        return theAutomata.getFirstAutomaton();
+        return theAutomata;
     }
     
     /**
      * Returns a string of incomplete LaTeX-code describing the minimisation performed.
      */
-    public String getStatisticsLine()
+    public String getStatisticsLineLaTeX()
     {
         return "\\texttt{NAME} & " + initialNbrOfAutomata + " & SIZE & " + mostStates + " & " + mostTransitions + " & TIME & BLOCK & " + AutomatonMinimizer.getStatisticsLaTeX() + " & ALGO1 & ALGO2 \\\\";
     }

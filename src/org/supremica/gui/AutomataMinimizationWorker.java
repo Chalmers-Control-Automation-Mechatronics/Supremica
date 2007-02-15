@@ -123,7 +123,8 @@ public class AutomataMinimizationWorker
         // The result...
         Automata result = new Automata();
 
-        // Minimize!
+        // Minimize either compositionally (involves composing automata and hiding local events) or 
+        // not (just minimise the components individually).
         if (!options.getCompositionalMinimization())
         {
             if (theAutomata.size() > 1)
@@ -193,13 +194,13 @@ public class AutomataMinimizationWorker
                 AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
                 threadsToStop.add(minimizer);
                 minimizer.setExecutionDialog(executionDialog);
-                Automaton newAutomaton = minimizer.getCompositionalMinimization(options);
+                Automata newAutomata = minimizer.getCompositionalMinimization(options);
                 threadsToStop.remove(minimizer);
 
                 // Minimized!
-                if (!(newAutomaton == null))
+                if (newAutomata != null)
                 {
-                    result.addAutomaton(newAutomaton);
+                    result.addAutomata(newAutomata);
                 }
             }
             catch (Exception ex)
