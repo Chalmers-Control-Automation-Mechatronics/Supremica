@@ -2548,7 +2548,7 @@ public class ActionMan
             return;
         }
 
-        double predictedSize = GeneticAlgorithms.predictSynchronizationSize(selectedAutomata);
+        double predictedSize = GeneticAlgorithms.predictSynchronizationSize(selectedAutomata.getAutomatonAt(0), selectedAutomata.getAutomatonAt(1));
 
         if (predictedSize > 0.0)
         {

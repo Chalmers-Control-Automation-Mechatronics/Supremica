@@ -123,29 +123,13 @@ public final class MinimizationOptions
      */
     public MinimizationOptions()
     {
-        this(EquivalenceRelation.fromDescription(Config.MINIMIZATION_EQUIVALENCE_RELATION.get()),
-            Config.MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS.get(),
-            Config.MINIMIZATION_KEEP_ORIGINAL.get(),
-            Config.MINIMIZATION_IGNORE_MARKING.get(),
-            MinimizationStrategy.toStrategy(Config.MINIMIZATION_STRATEGY.get()),
-            MinimizationHeuristic.toHeuristic(Config.MINIMIZATION_HEURISTIC.get()));
-    }
-    
-    /**
-     * This constructor lets you choose exactly what options you want. This is not recommended and is
-     * therefore private. It is better to first use the "getDefault..."-methods and then
-     * modify the options that you want to change.
-     */
-    private MinimizationOptions(EquivalenceRelation equivalenceRelation, boolean alsoTransitions,
-        boolean keepOriginal, boolean ignoreMarking, MinimizationStrategy strategy,
-        MinimizationHeuristic heuristic)
-    {
-        this.equivalenceRelation = equivalenceRelation;
-        this.alsoTransitions = alsoTransitions;
-        this.keepOriginal = keepOriginal;
-        this.ignoreMarking = ignoreMarking;
-        this.minimizationStrategy = strategy;
-        this.minimizationHeuristic = heuristic;
+        this.equivalenceRelation = EquivalenceRelation.fromDescription(Config.MINIMIZATION_EQUIVALENCE_RELATION.get());
+        alsoTransitions = Config.MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS.get();
+        keepOriginal = Config.MINIMIZATION_KEEP_ORIGINAL.get();
+        ignoreMarking = Config.MINIMIZATION_IGNORE_MARKING.get();
+        minimizationStrategy = MinimizationStrategy.toStrategy(Config.MINIMIZATION_STRATEGY.get());
+        minimizationHeuristic = MinimizationHeuristic.toHeuristic(Config.MINIMIZATION_HEURISTIC.get());
+        componentSizeLimit = Integer.MAX_VALUE;
     }
     
     public boolean isValid()
@@ -287,6 +271,15 @@ public final class MinimizationOptions
     public boolean getSkipLast()
     {
         return skipLast;
+    }
+    
+    public void setComponentSizeLimit(int value)
+    {
+        componentSizeLimit = value;
+    }
+    public int getComponentSizeLimit()
+    {
+        return componentSizeLimit;
     }
     
     public void setTargetAlphabet(Alphabet alpha)

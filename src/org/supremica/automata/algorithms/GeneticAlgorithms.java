@@ -56,6 +56,8 @@ import java.util.Iterator;
 /**
  * This class is a result of a project in the course Evolutionary Computation,
  * FFR105 (2002) at Chalmers University of Technology.
+ * This class provides a method for predicting the size of the composition
+ * of two automata. 
  *
  * @author Hugo Flordal and Arash Vahidi
  */
@@ -207,7 +209,7 @@ public class GeneticAlgorithms
         return data;
     }
     
-    public static int getGADataSize()
+    private static int getGADataSize()
     {
         return GA_DATA_SIZE;
     }

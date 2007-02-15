@@ -281,6 +281,7 @@ public class VerificationDialog
                 algorithmSelector.addItem(VerificationAlgorithm.MONOLITHIC);
                 algorithmSelector.addItem(VerificationAlgorithm.MODULAR);
                 algorithmSelector.addItem(VerificationAlgorithm.COMPOSITIONAL);
+                algorithmSelector.addItem(VerificationAlgorithm.COMBINED);
                 algorithmSelector.addItem(VerificationAlgorithm.BDD);
             }
             /*
@@ -295,6 +296,7 @@ public class VerificationDialog
                 algorithmSelector.addItem(VerificationAlgorithm.MONOLITHIC);
                 algorithmSelector.addItem(VerificationAlgorithm.MONOLITHICBDD);
                 algorithmSelector.addItem(VerificationAlgorithm.COMPOSITIONAL);
+                algorithmSelector.addItem(VerificationAlgorithm.COMBINED);
                 algorithmSelector.addItem(VerificationAlgorithm.BDD);
             }
             else if (verificationTypeBox.getSelectedItem() == VerificationType.CONTROLLABILITYNONBLOCKING)

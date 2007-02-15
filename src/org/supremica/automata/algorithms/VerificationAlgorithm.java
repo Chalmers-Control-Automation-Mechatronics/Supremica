@@ -59,6 +59,7 @@ public enum VerificationAlgorithm
     MONOLITHICBDD("Monolithic (Symbolic)"),
     MODULAR("Modular"),
     COMPOSITIONAL("Compositional"),
+    COMBINED("Compositional + BDD"),
     BDD("BDD");
     //IDD("IDD");
     

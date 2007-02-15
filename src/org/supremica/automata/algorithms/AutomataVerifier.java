@@ -49,6 +49,7 @@
  */
 package org.supremica.automata.algorithms;
 
+import javax.swing.text.html.Option;
 import org.supremica.util.SupremicaException;
 import java.util.*;
 import org.supremica.gui.*;
@@ -236,7 +237,8 @@ public class AutomataVerifier
                 {
                     return modularControllabilityVerification();
                 }
-                else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL)
+                else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL ||
+                    verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMBINED)
                 {
                     return compositionalControllabilityVerification();
                 }
@@ -251,7 +253,8 @@ public class AutomataVerifier
             }
             else if (verificationOptions.getVerificationType() == VerificationType.CONTROLLABILITYNONBLOCKING)
             {
-                if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL)
+                if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL ||
+                    verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMBINED)
                 {
                     return compositionalControllabilityNonblockingVerification();
                 }
@@ -281,7 +284,8 @@ public class AutomataVerifier
                 {
                     return BDDNonblockingVerification();
                 }
-                else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL)
+                else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL ||
+                    verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMBINED)
                 {
                     return compositionalNonblockingVerification();
                 }
@@ -1565,6 +1569,10 @@ public class AutomataVerifier
             }
         });
         
+        // If combined, use BDD:s when the components grow too big!
+        if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMBINED)
+            minimizationOptions.setComponentSizeLimit(250);
+        
         // Minimize the system compositionally
         Automata result;
         try
@@ -1608,8 +1616,18 @@ public class AutomataVerifier
         }
         
         // Examine the result and return the verdict!
-        theAutomata  = result;
-        return monolithicNonblockingVerification();
+        theAutomata  = result;        
+        if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMBINED)
+        {
+            logger.info("Automata after minimisation:");
+            for (Automaton aut : theAutomata)
+            {
+                logger.info(aut + ", " + aut.nbrOfStates() + " states.");
+            }
+            return monolithicBDDNonblockingVerification();
+        }
+        else
+            return monolithicNonblockingVerification();
     }
     
     private boolean modularLanguageinclusionVerification(Automata inclusionAutomata)

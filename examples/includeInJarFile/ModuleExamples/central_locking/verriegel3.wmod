@@ -3766,6 +3766,14 @@
                         <SimpleIdentifier Name="NAME"/>
                     </IndexedIdentifier>
                     <Graph Deterministic="true">
+		                <LabelBlock>
+	                        <IndexedIdentifier Name="reset">
+    	                        <SimpleIdentifier Name="NAME"/>
+                            </IndexedIdentifier>
+            		        <LabelGeometry Anchor="NW">
+                		        <Point Y="5" X="5"/>
+                    		</LabelGeometry>
+		                </LabelBlock>
                         <NodeList>
                             <SimpleNode Initial="true" Name="s0">
                                 <EventList>

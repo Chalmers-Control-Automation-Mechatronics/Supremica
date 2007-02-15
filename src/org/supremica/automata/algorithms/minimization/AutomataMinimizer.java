@@ -197,7 +197,11 @@ public class AutomataMinimizer
             
             // Get next automata to minimize
             timer.start();
-            MinimizationTask task = getNextMinimizationTask(false);
+            MinimizationTask task = getNextMinimizationTask(true);
+            if (task == null)
+            {
+                break;
+            }
             Automata selection = task.getAutomata();
             Alphabet hideThese = task.getEventsToHide();
             timer.stop();
@@ -386,6 +390,7 @@ public class AutomataMinimizer
      * Returns the next Automata that is predicted to be the best one
      * to do minimization on next and the Alphabet of events that can
      * be hidden.
+     *@return an aproptiate MinimizationTask or null if none can be found (e.g. too large automata).
      */
     private MinimizationTask getNextMinimizationTask(boolean newAlgo)
     throws Exception
@@ -440,6 +445,12 @@ public class AutomataMinimizer
                         selection.size() > 3)
                     {
                         continue loop;
+                    }
+                    // Skip selections with too large automata 
+                    for (Automaton aut: selection)
+                    {
+                        if (aut.nbrOfStates() > options.getComponentSizeLimit())
+                            continue loop;
                     }
                     
                     /////////////////
@@ -509,6 +520,10 @@ public class AutomataMinimizer
                     {
                         Automaton aut = autIt.next();
                         
+                        // Skip all the too large automata
+                        if (aut.nbrOfStates() > options.getComponentSizeLimit())
+                            continue;
+                        
                         // Evaluate using current strategy
                         int thisValue = strategy.value(aut);
                         // Maximize or minimize?
@@ -545,8 +560,11 @@ public class AutomataMinimizer
                             }
                         }
                     }
-                    // Got a result?
-                    assert(bestAutomaton != null);
+                    // Got no result?
+                    if (bestAutomaton == null)
+                    {
+                        return null;
+                    }
                 }
                 
                 /////////////////
@@ -560,12 +578,14 @@ public class AutomataMinimizer
                     loop: for (int j=0; j<theAutomata.size(); j++)
                     {
                         Automaton aut = theAutomata.getAutomatonAt(j);
-                        
+
+                        // Skip all the too large automata
+                        if (aut.nbrOfStates() > options.getComponentSizeLimit())
+                            continue loop;
+
                         // Skip self
                         if (bestAutomaton == aut)
-                        {
                             continue loop;
-                        }
                         
                         // Now we have a candidate
                         Automata selection = new Automata(); //selection.clear();
@@ -584,7 +604,6 @@ public class AutomataMinimizer
                             continue loop;
                         }
                         else if (bestValue == thisValue)
-                            //else if (bestValue == 0.0)
                         {
                             // Use lower priority heuristic to make a decision!
                             for (int i = heuristicIndex+1; i<heuristicList.size(); i++)
@@ -601,9 +620,9 @@ public class AutomataMinimizer
                                     taskAutomata = selection;
                                     continue loop;
                                 }
-                                else if (!(nextHeuristicThis == nextHeuristicBest))
+                                else if (nextHeuristicThis != nextHeuristicBest)
                                 {
-                                    // Worse value!
+                                    // Different and worse value!
                                     break;
                                 }
                             }
@@ -629,12 +648,14 @@ public class AutomataMinimizer
                         Automata selection = new Automata();
                         selection.addAutomaton(bestAutomaton);
                         selection.addAutomaton(aut);
-                        
+ 
+                        // Skip all the too large automata
+                        if (aut.nbrOfStates() > options.getComponentSizeLimit())
+                            continue;
+                       
                         // Skip self
                         if (bestAutomaton == aut)
-                        {
                             continue;
-                        }
                         
                         // If there are no common events, try next automaton
                         //int nbrOfCommonEvents = alphaA.nbrOfCommonEvents(alpha);
@@ -701,8 +722,11 @@ public class AutomataMinimizer
                 break;
             }
         }
-        // A choice has been made!
-        assert(taskAutomata != null);
+        // A choice has been made?
+        if (taskAutomata == null)
+        {
+            return null;
+        }
         
         // Which events should be hidden?
         hideThese = MinimizationHelper.getLocalEvents(taskAutomata, eventToAutomataMap);
