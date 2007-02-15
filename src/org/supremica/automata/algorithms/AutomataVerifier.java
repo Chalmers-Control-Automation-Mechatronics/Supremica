@@ -1359,7 +1359,8 @@ public class AutomataVerifier
         logger.info("Number of reachable state: " + bddVerifier.numberOfReachableStates());
         logger.info("Number of coreachable states: " + bddVerifier.numberOfCoreachableStates());
         logger.info("Number of blocking states: " + bddVerifier.numberOfBlockingStates());
-        return isNonblocking;
+        bddVerifier.done();
+        return isNonblocking;       
     }    
     
     /**

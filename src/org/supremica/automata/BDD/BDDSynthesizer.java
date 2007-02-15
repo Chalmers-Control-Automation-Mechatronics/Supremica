@@ -71,6 +71,15 @@ public class BDDSynthesizer
     {
         logger.info("Computing Nonblocking Supervisor Guards");
     }
+
+    public void done()
+    {
+        if (bddAutomata != null)
+        {
+            bddAutomata.done();            
+            bddAutomata = null;            
+        }
+    }
 }
 
 

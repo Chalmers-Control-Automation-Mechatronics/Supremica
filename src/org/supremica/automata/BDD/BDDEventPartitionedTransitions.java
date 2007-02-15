@@ -70,9 +70,10 @@ public class BDDEventPartitionedTransitions
     public BDDEventPartitionedTransitions(BDDAutomata bddAutomata)
     {
         this.bddAutomata = bddAutomata;
-         
-        transitionForwardBDD = BDDManager.getOneBDD();
-        transitionBackwardBDD = BDDManager.getOneBDD();       
+        manager = bddAutomata.getBDDManager();
+        
+        transitionForwardBDD = manager.getOneBDD();
+        transitionBackwardBDD = manager.getOneBDD();       
         
         for (BDDAutomaton currAutomaton : bddAutomata)
         {
@@ -87,7 +88,7 @@ public class BDDEventPartitionedTransitions
             BDD currEventTransitionBackwardBDD = transitionBackwardBDD.id();
             
             int currEventIndex = bddAutomata.getEventIndex(currEvent);
-            BDD currEventBDD = BDDManager.createBDD(currEventIndex, bddAutomata.getEventDomain());
+            BDD currEventBDD = manager.createBDD(currEventIndex, bddAutomata.getEventDomain());
             
             currEventTransitionForwardBDD = currEventTransitionForwardBDD.and(currEventBDD);
             labeledEventToForwardBDDMap.put(currEvent, currEventTransitionForwardBDD);

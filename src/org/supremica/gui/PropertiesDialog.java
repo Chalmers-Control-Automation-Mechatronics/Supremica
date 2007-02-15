@@ -407,12 +407,14 @@ public class PropertiesDialog
         public void setInConfig()
         {
             if (!property.isImmutable())
+            {
                 if (text != null)
                     property.set(text.getText());
                 else
                     property.set(selector.getSelectedItem().toString());
-        }
-        
+            }       
+        }   
+            
         public void getFromConfig()
         {
             if (text != null)

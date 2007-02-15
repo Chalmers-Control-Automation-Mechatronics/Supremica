@@ -82,17 +82,26 @@ public class BDDManager
         }
     }
     
-    public static BDD getZeroBDD()
+    public void done()
+    {
+        if (factory != null)
+        {
+            factory.done();
+            factory = null;
+        }
+    }
+    
+    public BDD getZeroBDD()
     {
         return factory.zero();
     }
     
-    public static BDD getOneBDD()
+    public BDD getOneBDD()
     {
         return factory.one();
     }
     
-    public static BDDDomain createDomain(int size)
+    public BDDDomain createDomain(int size)
     {
         return factory.extDomain(size);
     }
@@ -101,20 +110,19 @@ public class BDDManager
     {
         return factory.emptySet();
     }
-     
-    
-    public static BDD createBDD(int index, BDDDomain domain)
+   
+    public BDD createBDD(int index, BDDDomain domain)
     {
         return factory.buildCube(index, domain.vars());
     }
-    public static BDDPairing makePairing(BDDDomain[] source, BDDDomain[] dest)
+    public BDDPairing makePairing(BDDDomain[] source, BDDDomain[] dest)
     {
         BDDPairing pairing = factory.makePair();
         pairing.set(source, dest);
         return pairing;
     }
     
-    public static BDDPairing makePairing(BDDDomain source, BDDDomain dest)
+    public BDDPairing makePairing(BDDDomain source, BDDDomain dest)
     {
         return factory.makePair(source, dest);
     }
@@ -151,6 +159,7 @@ public class BDDManager
         BDD reachableStatesBDD = initialStates.id();
         BDD previousReachableStatesBDD = null;
         
+        logger.debug("In reachableStates");
         do
         {
             // Keep a copy of the previously discovered states
@@ -169,18 +178,23 @@ public class BDDManager
             BDD nextStatesAndTransitionsBDD;
             if (transitions instanceof BDDMonolithicTransitions)
             {
-                BDD monolithicTransitions = ((BDDMonolithicTransitions)transitions).getMonolithicTransitionForwardBDD();
-                nextStatesAndTransitionsBDD = reachableStatesBDD.relprod(monolithicTransitions, sourceStateVariables);
+                BDD monolithicTransitionsBDD = ((BDDMonolithicTransitions)transitions).getMonolithicTransitionForwardBDD();
+                logger.debug("Number of nodes in monolithicTransitionsBDD: " + monolithicTransitionsBDD.nodeCount());
+                nextStatesAndTransitionsBDD = reachableStatesBDD.relprod(monolithicTransitionsBDD, sourceStateVariables);
+                logger.debug("Number of nodes in nextStatesAndTransitionsBDD: " + nextStatesAndTransitionsBDD.nodeCount());
             }
             else if (transitions instanceof BDDConjunctiveTransitions)
             {
                 BDDConjunctiveTransitions bddConjunctiveTransitions = (BDDConjunctiveTransitions)transitions;
                 nextStatesAndTransitionsBDD = reachableStatesBDD;
+                logger.debug("New round in reachability");                       
                 for(Iterator<BDD> transitionBDDIt = bddConjunctiveTransitions.forwardIterator(); transitionBDDIt.hasNext(); )
                 {
                     nextStatesAndTransitionsBDD = nextStatesAndTransitionsBDD.and(transitionBDDIt.next());         
+                    logger.debug("Number of nodes in nextStatesAndTransitionsBDD: " + nextStatesAndTransitionsBDD.nodeCount());       
                 }
                 nextStatesAndTransitionsBDD = nextStatesAndTransitionsBDD.exist(sourceStateVariables);
+                logger.debug("Number of nodes in nextStatesAndTransitionsBDD: " + nextStatesAndTransitionsBDD.nodeCount());       
             }
             else if (transitions instanceof BDDDisjunctiveTransitions)
             {
@@ -210,6 +224,8 @@ public class BDDManager
             // states. This is simply done by doing an OR between the
             // previously reachable states and the newly found states.
             reachableStatesBDD.orWith(nextStatesBDD);
+            
+            logger.debug("Number of nodes in reachableStatesBDD: " + reachableStatesBDD.nodeCount());
         }
         while (!reachableStatesBDD.equals(previousReachableStatesBDD)); // Until no new states are found
         

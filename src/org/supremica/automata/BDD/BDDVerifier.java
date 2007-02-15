@@ -99,6 +99,15 @@ public class BDDVerifier
         return false;
     }
     
+    public void done()
+    {
+        if (bddAutomata != null)
+        {
+            bddAutomata.done();            
+            bddAutomata = null;            
+        }
+    }
+    
     public static void main(String[] args)
     throws Exception
     {

@@ -59,6 +59,7 @@ public class BDDMonolithicTransitions
     implements BDDTransitions
 {
     BDDAutomata bddAutomata;
+    BDDManager manager;
     BDD transitionForwardBDD = null;    
     BDD transitionBackwardBDD = null;    
     
@@ -66,9 +67,10 @@ public class BDDMonolithicTransitions
     public BDDMonolithicTransitions(BDDAutomata bddAutomata)
     {
         this.bddAutomata = bddAutomata;
-         
-        transitionForwardBDD = BDDManager.getOneBDD();
-        transitionBackwardBDD = BDDManager.getOneBDD();       
+        manager = bddAutomata.getBDDManager();
+        
+        transitionForwardBDD = manager.getOneBDD();
+        transitionBackwardBDD = manager.getOneBDD();       
         
         for (BDDAutomaton currAutomaton : bddAutomata)
         {

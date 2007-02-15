@@ -173,7 +173,20 @@ public class BDDAutomata
   
         bddTransitions = new BDDTransitionFactory(this).createTransitions();
     }   
+    
+    public void done()
+    {
+        if (manager != null)
+        {
+            manager.done();
+        }
+    }
   
+    public void finalize()
+    {
+        done();
+    }
+    
     public Alphabet getInverseAlphabet(Automaton currAutomaton)
     {
         return theAutomata.getInverseAlphabet(currAutomaton);

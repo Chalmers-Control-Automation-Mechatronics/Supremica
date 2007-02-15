@@ -265,6 +265,7 @@ public class AutomataSynthesizer
             Automata newAutomata = new Automata(theAutomata);
             BDDSynthesizer bddSynthesizer = new BDDSynthesizer(theAutomata);            
             bddSynthesizer.computeNonblockingSupervisorGuards();
+            bddSynthesizer.done();
         }
         else
         {

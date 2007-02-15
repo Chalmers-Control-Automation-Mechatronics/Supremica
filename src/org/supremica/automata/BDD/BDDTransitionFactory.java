@@ -73,19 +73,22 @@ public class BDDTransitionFactory
         
         if (partitioningType == BDDPartitioningType.MONOLITHIC)
         {
+            logger.debug("Creating monolithic transitions");
             return new BDDMonolithicTransitions(bddAutomata);
         }
         else if (partitioningType == BDDPartitioningType.CONJUNCTIVE)
         {
+            logger.debug("Creating conjunctive transitions");
             return new BDDConjunctiveTransitions(bddAutomata);
         }
         else if (partitioningType == BDDPartitioningType.DISJUNCTIVE)
         {
+            logger.debug("Creating disjunctive transitions");
             return new BDDDisjunctiveTransitions(bddAutomata);
         }
         else
         {
-            logger.debug("Unknown partitioning: " + partitioningType.toString());
+            logger.error("Unknown partitioning: " + partitioningType.toString());
             return null;
         }
     }
