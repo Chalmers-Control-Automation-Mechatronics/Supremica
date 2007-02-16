@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: Zone.java,v 1.5 2007-02-13 16:50:51 torda Exp $
+ * $Id: Zone.java,v 1.6 2007-02-16 16:32:26 torda Exp $
  */
 package org.supremica.external.sag;
 
@@ -32,6 +32,7 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link org.supremica.external.sag.Zone#getBackEntryCondition <em>Back Entry Condition</em>}</li>
  *   <li>{@link org.supremica.external.sag.Zone#getBackExitCondition <em>Back Exit Condition</em>}</li>
  *   <li>{@link org.supremica.external.sag.Zone#getInitialNrOfObjects <em>Initial Nr Of Objects</em>}</li>
+ *   <li>{@link org.supremica.external.sag.Zone#isOverlapped <em>Overlapped</em>}</li>
  * </ul>
  * </p>
  *
@@ -161,11 +162,9 @@ public interface Zone extends Named {
 	 * </p>
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Capacity</em>' attribute.
-	 * @see #isSetCapacity()
-	 * @see #unsetCapacity()
 	 * @see #setCapacity(int)
 	 * @see org.supremica.external.sag.SagPackage#getZone_Capacity()
-	 * @model default="-1" unsettable="true"
+	 * @model default="-1"
 	 * @generated
 	 */
 	int getCapacity();
@@ -175,35 +174,10 @@ public interface Zone extends Named {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Capacity</em>' attribute.
-	 * @see #isSetCapacity()
-	 * @see #unsetCapacity()
 	 * @see #getCapacity()
 	 * @generated
 	 */
 	void setCapacity(int value);
-
-	/**
-	 * Unsets the value of the '{@link org.supremica.external.sag.Zone#getCapacity <em>Capacity</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #isSetCapacity()
-	 * @see #getCapacity()
-	 * @see #setCapacity(int)
-	 * @generated
-	 */
-	void unsetCapacity();
-
-	/**
-	 * Returns whether the value of the '{@link org.supremica.external.sag.Zone#getCapacity <em>Capacity</em>}' attribute is set.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return whether the value of the '<em>Capacity</em>' attribute is set.
-	 * @see #unsetCapacity()
-	 * @see #getCapacity()
-	 * @see #setCapacity(int)
-	 * @generated
-	 */
-	boolean isSetCapacity();
 
 	/**
 	 * Returns the value of the '<em><b>Outside System Boundry</b></em>' attribute.
@@ -440,6 +414,32 @@ public interface Zone extends Named {
 	 * @generated
 	 */
 	void setInitialNrOfObjects(int value);
+
+	/**
+	 * Returns the value of the '<em><b>Overlapped</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Overlapped</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Overlapped</em>' attribute.
+	 * @see #setOverlapped(boolean)
+	 * @see org.supremica.external.sag.SagPackage#getZone_Overlapped()
+	 * @model
+	 * @generated
+	 */
+	boolean isOverlapped();
+
+	/**
+	 * Sets the value of the '{@link org.supremica.external.sag.Zone#isOverlapped <em>Overlapped</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Overlapped</em>' attribute.
+	 * @see #isOverlapped()
+	 * @generated
+	 */
+	void setOverlapped(boolean value);
 
 	/**
 	 * <!-- begin-user-doc -->

@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagPackageImpl.java,v 1.7 2007-02-13 16:50:51 torda Exp $
+ * $Id: SagPackageImpl.java,v 1.8 2007-02-16 16:32:26 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
@@ -379,6 +379,15 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getZone_Overlapped() {
+		return (EAttribute)zoneEClass.getEStructuralFeatures().get(14);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getNamed() {
 		return namedEClass;
 	}
@@ -596,6 +605,7 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 		createEAttribute(zoneEClass, ZONE__BACK_ENTRY_CONDITION);
 		createEAttribute(zoneEClass, ZONE__BACK_EXIT_CONDITION);
 		createEAttribute(zoneEClass, ZONE__INITIAL_NR_OF_OBJECTS);
+		createEAttribute(zoneEClass, ZONE__OVERLAPPED);
 
 		namedEClass = createEClass(NAMED);
 		createEAttribute(namedEClass, NAMED__NAME);
@@ -693,7 +703,7 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 		initEReference(getZone_Back(), this.getNode(), this.getNode_Outgoing(), "back", null, 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getZone_Oneway(), ecorePackage.getEBoolean(), "oneway", "true", 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getZone_Graph(), this.getGraph(), this.getGraph_Zone(), "graph", null, 1, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getZone_Capacity(), ecorePackage.getEInt(), "capacity", "-1", 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getZone_Capacity(), ecorePackage.getEInt(), "capacity", "-1", 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getZone_OutsideSystemBoundry(), ecorePackage.getEBoolean(), "outsideSystemBoundry", "false", 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getZone_Bounded(), ecorePackage.getEBoolean(), "bounded", "false", 0, 1, Zone.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getZone_ForwardCondition(), ecorePackage.getEString(), "forwardCondition", null, 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -703,6 +713,7 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 		initEAttribute(getZone_BackEntryCondition(), ecorePackage.getEString(), "backEntryCondition", null, 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getZone_BackExitCondition(), ecorePackage.getEString(), "backExitCondition", null, 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getZone_InitialNrOfObjects(), ecorePackage.getEInt(), "initialNrOfObjects", null, 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getZone_Overlapped(), ecorePackage.getEBoolean(), "overlapped", null, 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		op = addEOperation(zoneEClass, ecorePackage.getEBoolean(), "validateCapacityIsPositiveNumber", 0, 1);
 		addEParameter(op, ecorePackage.getEDiagnosticChain(), "diagnostics", 0, 1);

@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: ZoneImpl.java,v 1.5 2007-02-13 16:50:51 torda Exp $
+ * $Id: ZoneImpl.java,v 1.6 2007-02-16 16:32:26 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
@@ -61,6 +61,7 @@ import static org.supremica.external.sag.util.OclHelper.*;
  *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#getBackEntryCondition <em>Back Entry Condition</em>}</li>
  *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#getBackExitCondition <em>Back Exit Condition</em>}</li>
  *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#getInitialNrOfObjects <em>Initial Nr Of Objects</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#isOverlapped <em>Overlapped</em>}</li>
  * </ul>
  * </p>
  *
@@ -78,7 +79,9 @@ public class ZoneImpl extends NamedImpl implements Zone {
 	protected Node front = null;
 
 	protected static final String ZONE_NAME_PREFIX = "zone";
-
+	protected static final int CAPACITY_BOUNDED_DEFAULT = 1;
+	protected static final int CAPACITY_UNBOUNDED = -1;
+	
 	/**
 	 * The cached value of the '{@link #getBack() <em>Back</em>}' reference.
 	 * <!-- begin-user-doc -->
@@ -109,17 +112,8 @@ public class ZoneImpl extends NamedImpl implements Zone {
 	 */
 	protected boolean oneway = ONEWAY_EDEFAULT;
 
-	/**
-	 * The default value of the '{@link #getCapacity() <em>Capacity</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getCapacity()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final int CAPACITY_EDEFAULT = -1; // TODO The default value literal "null" is not valid.
+	protected static final int CAPACITY_EDEFAULT = CAPACITY_UNBOUNDED;
 
-	protected static final int CAPACITY_UNSET_VALUE = -1;
 	/**
 	 * The cached value of the '{@link #getCapacity() <em>Capacity</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -129,15 +123,6 @@ public class ZoneImpl extends NamedImpl implements Zone {
 	 * @ordered
 	 */
 	protected int capacity = CAPACITY_EDEFAULT;
-
-	/**
-	 * This is true if the Capacity attribute has been set.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 * @ordered
-	 */
-	protected boolean capacityESet = false;
 
 	/**
 	 * The default value of the '{@link #isOutsideSystemBoundry() <em>Outside System Boundry</em>}' attribute.
@@ -308,6 +293,26 @@ public class ZoneImpl extends NamedImpl implements Zone {
 	 * @ordered
 	 */
 	protected int initialNrOfObjects = INITIAL_NR_OF_OBJECTS_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #isOverlapped() <em>Overlapped</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isOverlapped()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean OVERLAPPED_EDEFAULT = false;
+
+	/**
+	 * The cached value of the '{@link #isOverlapped() <em>Overlapped</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isOverlapped()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean overlapped = OVERLAPPED_EDEFAULT;
 
 	/**
 	 * The parsed OCL expression for the definition of the '{@link #validateCapacityIsPositiveNumber <em>Validate Capacity Is Positive Number</em>}' invariant constraint.
@@ -543,39 +548,13 @@ public class ZoneImpl extends NamedImpl implements Zone {
 	 * @generated NOT
 	 */
 	public void setCapacity(int newCapacity) {
-		if (newCapacity < 1) {
-			unsetCapacity();
-			return;
-		}
 		int oldCapacity = capacity;
 		capacity = newCapacity;
-		boolean oldCapacityESet = capacityESet;
-		capacityESet = true;
+		if (newCapacity != 1 && isOverlapped()) {
+			setOverlapped(false);
+		}
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__CAPACITY, oldCapacity, capacity, !oldCapacityESet));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated NOT
-	 */
-	public void unsetCapacity() {
-		int oldCapacity = capacity;
-		boolean oldCapacityESet = capacityESet;
-		capacity = CAPACITY_UNSET_VALUE;
-		capacityESet = false;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.UNSET, SagPackage.ZONE__CAPACITY, oldCapacity, CAPACITY_EDEFAULT, oldCapacityESet));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public boolean isSetCapacity() {
-		return capacityESet;
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__CAPACITY, oldCapacity, capacity));
 	}
 
 	/**
@@ -605,7 +584,7 @@ public class ZoneImpl extends NamedImpl implements Zone {
 	 * @generated NOT
 	 */
 	public boolean isBounded() {
-		return isSetCapacity() || getCapacity() > 0;
+		return getCapacity() >= 0;
 	}
 
 	/**
@@ -614,10 +593,8 @@ public class ZoneImpl extends NamedImpl implements Zone {
 	 * @generated NOT
 	 */
 	public void setBounded(boolean newBounded) {
-		if (newBounded) {
-			setCapacity(CAPACITY_EDEFAULT);
-		} else {
-			unsetCapacity();
+		if (newBounded != isBounded()) {
+			setCapacity(newBounded ? CAPACITY_BOUNDED_DEFAULT : CAPACITY_UNBOUNDED);
 		}
 	}
 
@@ -773,6 +750,30 @@ public class ZoneImpl extends NamedImpl implements Zone {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public boolean isOverlapped() {
+		return overlapped;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated NOT
+	 */
+	public void setOverlapped(boolean newOverlapped) {
+		boolean oldOverlapped = overlapped;
+		overlapped = newOverlapped;
+		if (newOverlapped && getCapacity() != 1) {
+			setCapacity(1);
+		}
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__OVERLAPPED, oldOverlapped, overlapped));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public boolean validateCapacityIsPositiveNumber(DiagnosticChain diagnostics, Map<?, ?> context) {
 		if (validateCapacityIsPositiveNumberInvOCL == null) {
 			EOperation eOperation = (EOperation) eClass().getEOperations().get(0);
@@ -901,6 +902,8 @@ public class ZoneImpl extends NamedImpl implements Zone {
 				return getBackExitCondition();
 			case SagPackage.ZONE__INITIAL_NR_OF_OBJECTS:
 				return new Integer(getInitialNrOfObjects());
+			case SagPackage.ZONE__OVERLAPPED:
+				return isOverlapped() ? Boolean.TRUE : Boolean.FALSE;
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -955,6 +958,9 @@ public class ZoneImpl extends NamedImpl implements Zone {
 			case SagPackage.ZONE__INITIAL_NR_OF_OBJECTS:
 				setInitialNrOfObjects(((Integer)newValue).intValue());
 				return;
+			case SagPackage.ZONE__OVERLAPPED:
+				setOverlapped(((Boolean)newValue).booleanValue());
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -980,7 +986,7 @@ public class ZoneImpl extends NamedImpl implements Zone {
 				setGraph((Graph)null);
 				return;
 			case SagPackage.ZONE__CAPACITY:
-				unsetCapacity();
+				setCapacity(CAPACITY_EDEFAULT);
 				return;
 			case SagPackage.ZONE__OUTSIDE_SYSTEM_BOUNDRY:
 				setOutsideSystemBoundry(OUTSIDE_SYSTEM_BOUNDRY_EDEFAULT);
@@ -1009,6 +1015,9 @@ public class ZoneImpl extends NamedImpl implements Zone {
 			case SagPackage.ZONE__INITIAL_NR_OF_OBJECTS:
 				setInitialNrOfObjects(INITIAL_NR_OF_OBJECTS_EDEFAULT);
 				return;
+			case SagPackage.ZONE__OVERLAPPED:
+				setOverlapped(OVERLAPPED_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -1030,7 +1039,7 @@ public class ZoneImpl extends NamedImpl implements Zone {
 			case SagPackage.ZONE__GRAPH:
 				return getGraph() != null;
 			case SagPackage.ZONE__CAPACITY:
-				return isSetCapacity();
+				return capacity != CAPACITY_EDEFAULT;
 			case SagPackage.ZONE__OUTSIDE_SYSTEM_BOUNDRY:
 				return outsideSystemBoundry != OUTSIDE_SYSTEM_BOUNDRY_EDEFAULT;
 			case SagPackage.ZONE__BOUNDED:
@@ -1049,6 +1058,8 @@ public class ZoneImpl extends NamedImpl implements Zone {
 				return BACK_EXIT_CONDITION_EDEFAULT == null ? backExitCondition != null : !BACK_EXIT_CONDITION_EDEFAULT.equals(backExitCondition);
 			case SagPackage.ZONE__INITIAL_NR_OF_OBJECTS:
 				return initialNrOfObjects != INITIAL_NR_OF_OBJECTS_EDEFAULT;
+			case SagPackage.ZONE__OVERLAPPED:
+				return overlapped != OVERLAPPED_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -1066,7 +1077,7 @@ public class ZoneImpl extends NamedImpl implements Zone {
 		result.append(" (oneway: ");
 		result.append(oneway);
 		result.append(", capacity: ");
-		if (capacityESet) result.append(capacity); else result.append("<unset>");
+		result.append(capacity);
 		result.append(", outsideSystemBoundry: ");
 		result.append(outsideSystemBoundry);
 		result.append(", forwardCondition: ");
@@ -1083,6 +1094,8 @@ public class ZoneImpl extends NamedImpl implements Zone {
 		result.append(backExitCondition);
 		result.append(", initialNrOfObjects: ");
 		result.append(initialNrOfObjects);
+		result.append(", overlapped: ");
+		result.append(overlapped);
 		result.append(')');
 		return result.toString();
 	}

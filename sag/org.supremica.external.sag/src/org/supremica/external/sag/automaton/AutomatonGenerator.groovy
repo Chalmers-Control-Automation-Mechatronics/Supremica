@@ -22,6 +22,11 @@ import net.sourceforge.waters.subject.module.EdgeSubject
 import net.sourceforge.waters.model.expr.Operator
 import org.supremica.gui.ide.IDE
 import org.supremica.gui.InterfaceManager
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.des.*;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
+
 
 class AutomatonGenerator {
 
@@ -63,28 +68,49 @@ class AutomatonGenerator {
 				twowayZone(back:'y6', front:'y7', bounded:false, forwardCondition:'u1 & !y1')
 				onewayZone(back:'y7', outsideSystemBoundry:true)
 			}
+			graph(name:'tank', maxNrOfObjects:1) {
+				sensor(name:'low')
+				sensor(name:'high')
+				onewayZone(front:'low', initialNrOfObjects:1)
+				onewayZone(back:'low', front:'high', overlapped:true, backExitCondition:'false')
+			}
+			graph(name:'overlappingObject', nrOfObjectsIsUnbounded:true) {
+				sensor(name:'y8')
+				sensor(name:'y9')
+				onewayZone(front:'y8', outsideSystemBoundry:true)
+				twowayZone(back:'y8', front:'y9', overlapped:true)
+				onewayZone(back:'y9', outsideSystemBoundry:true)
+			}
 		}
 		ModuleProxy generatedModule = instance.generate(sagBuilder.project, false)
 		
 		def moduleBuilder = new ModuleBuilder()
 		
 		moduleBuilder.module(name:'testproject') {
-			booleanVariable(name:'y1')
-			booleanVariable(name:'y2')
-			booleanVariable(name:'y3')
-			booleanVariable(name:'y4')
-			booleanVariable(name:'y5', initial:true)
-			booleanVariable(name:'y6')
-			booleanVariable(name:'y7')
-			booleanVariable(name:'u1')
-			booleanVariable(name:'u2')
-			integerVariable(name:'object1_between_y1_y2', range:0..3, initial:0)
-			integerVariable(name:'object1_beside_y2_0', range:0..1, initial:0)
-			integerVariable(name:'object1_beside_y2_1', range:0..2, initial:0)
-			integerVariable(name:'object1_between_y2_y3', range:0..2, initial:0)
-			integerVariable(name:'object2_between_y1_y2', range:0..2, initial:2)
-			booleanVariable(name:'object3_between_y5_y6')
-			booleanVariable(name:'object3_between_y6_y7')
+			booleanVariable(name:'y1', marked:false)
+			booleanVariable(name:'y2', marked:false)
+			booleanVariable(name:'y3', marked:false)
+			booleanVariable(name:'y4', marked:false)
+			booleanVariable(name:'y5', initial:true, marked:true)
+			booleanVariable(name:'y6', marked:false)
+			booleanVariable(name:'y7', marked:false)
+			booleanVariable(name:'low', marked:false)
+			booleanVariable(name:'high', marked:false)
+			booleanVariable(name:'y8', marked:false)
+			booleanVariable(name:'y9', marked:false)
+			booleanVariable(name:'u1', marked:false)
+			booleanVariable(name:'u2', marked:false)
+			integerVariable(name:'object1_between_y1_y2', range:0..3, initial:0, marked:0)
+			integerVariable(name:'object1_beside_y2_0', range:0..1, initial:0, marked:0)
+			integerVariable(name:'object1_beside_y2_1', range:0..2, initial:0, marked:0)
+			integerVariable(name:'object1_between_y2_y3', range:0..2, initial:0, marked:0)
+			integerVariable(name:'object2_between_y1_y2', range:0..2, initial:2, marked:2)
+			integerVariable(name:'overlappingObject_both_y8_y9', range:0..1, initial:0, marked:0)
+			booleanVariable(name:'object3_between_y5_y6', marked:false)
+			booleanVariable(name:'object3_between_y6_y7', marked:false)
+			booleanVariable(name:'tank_beside_low', initial:true, marked:true)
+			booleanVariable(name:'tank_both_low_high', marked:false)
+			booleanVariable(name:'endOfScanCycle', initial:false, marked:true)
 			event(name:'object1_from_y1', controllable:false)
 			event(name:'object1_to_y1_0', controllable:false)
 			event(name:'object1_to_y1_1', controllable:false)
@@ -112,77 +138,118 @@ class AutomatonGenerator {
 			event(name:'object3_from_y7_0', controllable:false)
 			event(name:'object3_from_y7_1', controllable:false)
 			event(name:'object3_to_y7', controllable:false)
+			event(name:'tank_from_low', controllable:false)
+			event(name:'tank_to_low', controllable:false)
+			event(name:'tank_to_high', controllable:false)
+			event(name:'overlappingObject_from_y8', controllable:false)
+			event(name:'overlappingObject_to_y8_0', controllable:false)
+			event(name:'overlappingObject_to_y8_1', controllable:false)
+			event(name:'overlappingObject_from_y9_0', controllable:false)
+			event(name:'overlappingObject_from_y9_1', controllable:false)
+			event(name:'overlappingObject_to_y9', controllable:false)
+			event(name:'doSignalChange', controllable:true)
+			event(name:'skipSignalChange', controllable:true)
+			eventAlias(name:'sensorEvent', events:['object1_from_y1', 'object1_to_y1_0', 'object1_to_y1_1', 'object1_from_y2_0', 'object1_from_y2_1',
+			                                        'object1_from_y2_2', 'object1_from_y2_3', 'object1_from_y2_4', 'object1_to_y2_0', 'object1_to_y2_1',
+			                                        'object1_to_y2_2', 'object1_to_y2_3', 'object1_from_y3', 'object1_to_y3', 'object2_from_y1',
+			                                        'object2_to_y2', 'object3_from_y5_0', 'object3_from_y5_1', 'object3_to_y5_0', 'object3_to_y5_1',
+			                                        'object3_from_y6_0', 'object3_from_y6_1', 'object3_to_y6_0', 'object3_to_y6_1', 'object3_from_y7_0',
+			                                        'object3_from_y7_1', 'object3_to_y7', 'tank_from_low', 'tank_to_low', 'tank_to_high', 'overlappingObject_from_y8',
+			                                        'overlappingObject_to_y8_0', 'overlappingObject_to_y8_1', 'overlappingObject_from_y9_0',
+			                                        'overlappingObject_from_y9_1', 'overlappingObject_to_y9'])
 			plant(name:'object1_y1', initialState:'false') {
-				state(name:'false')
-				state(name:'true')
-				transition(from:'false', to:'true', events:['object1_to_y1_0'], guard:'!y1') {
-					action('y1 = 1')
-				}
+				state(name:'false', marked:true)
+				state(name:'true', marked:true)
+				transition(from:'false', to:'true', events:['object1_to_y1_0'], guard:'!y1') {action 'y1 = 1'}
 				transition(from:'false', to:'true', events:['object1_to_y1_1'], guard:'!y1 & object1_between_y1_y2 > 0') {
-					action('y1 = 1')
-					action('object1_between_y1_y2 -= 1')
+					action 'y1 = 1'
+					action 'object1_between_y1_y2 -= 1'
 				}
 				transition(from:'true', to:'false', events:['object1_from_y1'], guard:'object1_between_y1_y2 < 3 & (u1 | u2) & y4') {
-					action('y1 = 0')
-					action('object1_between_y1_y2 += 1')
+					action 'y1 = 0'
+					action 'object1_between_y1_y2 += 1'
 				}
 			}
 			plant(name:'object1_y2', initialState:'false') {
-				state(name:'false')
-				state(name:'true')
+				state(name:'false', marked:true)
+				state(name:'true', marked:true)
 				transition(from:'false', to:'true', events:['object1_to_y2_0'], guard:'!y2 & object1_between_y1_y2 > 0 & (u1 | u2)') {
-					action('y2 = 1')
-					action('object1_between_y1_y2 -= 1')
+					action 'y2 = 1'
+					action 'object1_between_y1_y2 -= 1'
 				}
-				transition(from:'false', to:'true', events:['object1_to_y2_1'], guard:'!y2') {
-					action('y2 = 1')
-				}
-				transition(from:'false', to:'true', events:['object1_to_y2_2'], guard:'!y2 & object1_beside_y2_0 > 0') {
-					action('y2 = 1')
-					action('object1_beside_y2_0 -= 1')
+				transition(from:'false', to:'true', events:['object1_to_y2_1'], guard:'!y2') {action 'y2 = 1'}
+				transition(from:'false', to:'true', events:['object1_to_y2_2'], guard:'!y2 & object1_beside_y2_0') {
+					action 'y2 = 1'
+					action 'object1_beside_y2_0 = 0'
 				}
 				transition(from:'false', to:'true', events:['object1_to_y2_3'], guard:'!y2 & object1_beside_y2_1 > 0') {
-					action('y2 = 1')
-					action('object1_beside_y2_1 -= 1')
+					action 'y2 = 1'
+					action 'object1_beside_y2_1 -= 1'
 				}
 				transition(from:'true', to:'false', events:['object1_from_y2_0'], guard:'object1_between_y1_y2 < 3') {
-					action('y2 = 0')
-					action('object1_between_y1_y2 += 1')
+					action 'y2 = 0'
+					action 'object1_between_y1_y2 += 1'
 				}
-				transition(from:'true', to:'false', events:['object1_from_y2_1']) {
-					action('y2 = 0')
-				}
-				transition(from:'true', to:'false', events:['object1_from_y2_2'], guard:'object1_beside_y2_0 < 1') {
-					action('y2 = 0')
-					action('object1_beside_y2_0 += 1')
+				transition(from:'true', to:'false', events:['object1_from_y2_1']) {action 'y2 = 0'}
+				transition(from:'true', to:'false', events:['object1_from_y2_2'], guard:'!object1_beside_y2_0') {
+					action 'y2 = 0'
+					action 'object1_beside_y2_0 = 1'
 				}
 				transition(from:'true', to:'false', events:['object1_from_y2_3'], guard:'object1_beside_y2_1 < 2') {
-					action('y2 = 0')
-					action('object1_beside_y2_1 += 1')
+					action 'y2 = 0'
+					action 'object1_beside_y2_1 += 1'
 				}
 				transition(from:'true', to:'false', events:['object1_from_y2_4'], guard:'object1_between_y2_y3 < 2') {
-					action('y2 = 0')
-					action('object1_between_y2_y3 += 1')
+					action 'y2 = 0'
+					action 'object1_between_y2_y3 += 1'
 				}
 			}
 			plant(name:'object1_y3', initialState:'false') {
-				state(name:'false')
-				state(name:'true')
+				state(name:'false', marked:true)
+				state(name:'true', marked:true)
 				transition(from:'false', to:'true', events:['object1_to_y3'], guard:'!y3 & object1_between_y2_y3 > 0') {
 					action('y3 = 1')
 					action('object1_between_y2_y3 -= 1')
 				}
-				transition(from:'true', to:'false', events:['object1_from_y3']) {
-					action('y3 = 0')
+				transition(from:'true', to:'false', events:['object1_from_y3']) {action 'y3 = 0'}
+			}
+			plant(name:'overlappingObject_y8', initialState:'false') {
+				state(name:'false', marked:true)
+				state(name:'true', marked:true)
+				transition(from:'false', to:'true', events:['overlappingObject_to_y8_0'], guard:'!y8') {
+					action 'y8 = 1'
+				}
+				transition(from:'false', to:'true', events:['overlappingObject_from_y9_0'], guard:'overlappingObject_both_y8_y9') {
+					action 'y9 = 0'
+					action 'overlappingObject_both_y8_y9 = 0'
+				}
+				transition(from:'true', to:'false', events:['overlappingObject_to_y9'], guard:'!y9') {
+					action 'y9 = 1'
+					action 'overlappingObject_both_y8_y9 = 1'
+				}
+			}
+			plant(name:'overlappingObject_y9', initialState:'false') {
+				state(name:'false', marked:true)
+				state(name:'true', marked:true)
+				transition(from:'false', to:'true', events:['overlappingObject_from_y8'], guard:'overlappingObject_both_y8_y9') {
+					action 'y8 = 0'
+					action 'overlappingObject_both_y8_y9 = 0'
+				}
+				transition(from:'true', to:'false', events:['overlappingObject_to_y8_1'], guard:'!y8') {
+					action 'y8 = 1'
+					action 'overlappingObject_both_y8_y9 = 1'
+				}
+				transition(from:'true', to:'false', events:['overlappingObject_from_y9_1']) {
+					action 'y9 = 0'
 				}
 			}
 			plant(name:'object3', initialState:'y5') {
-				state(name:'y5')
-				state(name:'y6')
-				state(name:'y7')
-				state(name:'between_y5_y6')
-				state(name:'between_y6_y7')
-				state(name:'outside')
+				state(name:'y5', marked:true)
+				state(name:'y6', marked:true)
+				state(name:'y7', marked:true)
+				state(name:'between_y5_y6', marked:true)
+				state(name:'between_y6_y7', marked:true)
+				state(name:'outside', marked:true)
 				transition(from:'outside', to:'y5', events:['object3_to_y5_0']) {action('y5 = 1')}
 				transition(from:'between_y5_y6', to:'y5', events:['object3_to_y5_1'], guard:'!u1 & !y2') {
 					action('y5 = 1')
@@ -219,20 +286,55 @@ class AutomatonGenerator {
 				}
 				transition(from:'y7', to:'outside', events:['object3_from_y7_1']) {action('y7 = 0')}
 			}
+			plant(name:'tank', initialState:'beside_low') {
+				state(name:'low', marked:true)
+				state(name:'high', marked:true)
+				state(name:'beside_low', marked:true)
+				state(name:'both_low_high', marked:true)
+				transition(from:'beside_low', to:'low', events:['tank_to_low']){
+					action 'low = 1'
+					action 'tank_beside_low = 0'
+				}
+				transition(from:'low', to:'both_low_high', events:['tank_to_high']){
+					action 'high = 1'
+					action 'tank_both_low_high = 1'
+				}
+				transition(from:'both_low_high', to:'high', events:['tank_from_low'], guard:'false'){
+					action 'low = 0'
+					action 'tank_both_low_high = 0'
+				}
+			}
 			foreach(name:'i', range:0..1) {
 				plant(name:'object2[i]', initialState:'between_y1_y2') {
-					state(name:'y1')
-					state(name:'y2')
-					state(name:'y4')
-					state(name:'between_y1_y2')
+					state(name:'y1', marked:true)
+					state(name:'y2', marked:true)
+					state(name:'y4', marked:true)
+					state(name:'between_y1_y2', marked:true)
 					transition(from:'y1', to:'between_y1_y2', events:['object2_from_y1[i]'], guard:'object2_between_y1_y2 < 2') {
-						action('y1 = 0')
-						action('object2_between_y1_y2 += 1')
+						action 'y1 = 0'
+						action 'object2_between_y1_y2 += 1'
 					}
 					transition(from:'between_y1_y2', to:'y2', events:['object2_to_y2[i]'], guard:'!y2 & u2') {
-						action('y2 = 1')
-						action('object2_between_y1_y2 -= 1')
+						action 'y2 = 1'
+						action 'object2_between_y1_y2 -= 1'
 					}
+				}
+			}
+			plant(name:'ControlUnit', initialState:'u1') {
+				state(name:'u1', marked:false)
+				state(name:'u2', marked:false)
+				state(name:'endOfScanCycle', marked:true)
+				transition(from:'u1', to:'u2', events:['doSignalChange']) { action 'u1 = !u1' }
+				transition(from:'u1', to:'u2', events:['skipSignalChange'])
+				transition(from:'u2', to:'endOfScanCycle', events:['doSignalChange']) {
+					action 'u2 = !u2'
+					action 'endOfScanCycle = 1'
+				}
+				transition(from:'u2', to:'endOfScanCycle', events:['skipSignalChange']) {
+					action 'endOfScanCycle = 1'
+				}
+				transition(from:'endOfScanCycle', to:'u1', events:['sensorEvent']) {
+					action 'endOfScanCycle = 0'
 				}
 			}
 		}
@@ -242,39 +344,50 @@ class AutomatonGenerator {
 			if (c1.size() != c2.size()) {
 				result = [false, "size differs: c1.size()==${c1.size()}, c2.size()==${c2.size()}"]
 			}
-			c1.eachWithIndex { element, i ->
-				if (!element.equalsByContents(c2[i])) {
-					result = [false, "Inequality at index $i: ${c1[i]}, ${c2[i]}"] 
+			for (i in 0..<c1.size()) {
+				if ((c1[i] == null && c2[i] != null) || (c1[i] != null && c2[i] == null)) {
+					result = [false, "Inequality at index $i: one of'em is null"]
+					break
+				}
+				if (c1[i] != null && c2[i] != null && !c1[i].equalsByContents(c2[i])) {
+					result = [false, "Inequality at index $i: ${c1[i]}, ${c2[i]}"]
+					break
 				}
 			}
 			if (!result[0]) {
 				println c1
 				println c2
 			}
-			return result
+			result
 		}
 		def result
 		result = collectionsAreEqual(generatedModule.eventDeclList, manualModule.eventDeclList); assert result[0], result[1]
 		def generatedComponents = generatedModule.componentList.grep(SimpleComponentProxy.class) + generatedModule.componentList.grep(ForeachComponentProxy.class).body 
 		def manualComponents = manualModule.componentList.grep(SimpleComponentProxy.class) + manualModule.componentList.grep(ForeachComponentProxy.class).body 
 		result = collectionsAreEqual(generatedComponents.graph.nodes, manualComponents.graph.nodes); assert result[0], result[1]
+		result = collectionsAreEqual(generatedComponents.graph.edges.labelBlock, manualComponents.graph.edges.labelBlock); assert result[0], result[1]
 		result = collectionsAreEqual(generatedComponents.graph.edges.source, manualComponents.graph.edges.source); assert result[0], result[1]
 		result = collectionsAreEqual(generatedComponents.graph.edges.target, manualComponents.graph.edges.target); assert result[0], result[1]
-		result = collectionsAreEqual(generatedComponents.graph.edges.labelBlock, manualComponents.graph.edges.labelBlock); assert result[0], result[1]
-		result = collectionsAreEqual(generatedComponents.graph.edges.guardActionBlock.guards, manualComponents.graph.edges.guardActionBlock.guards); assert result[0], result[1]
-		result = collectionsAreEqual(generatedComponents.graph.edges.guardActionBlock.actions, manualComponents.graph.edges.guardActionBlock.actions); assert result[0], result[1] 
-		result = collectionsAreEqual(generatedComponents.graph.edges.guardActionBlock.actions, manualComponents.graph.edges.guardActionBlock.actions); assert result[0], result[1]
+		result = collectionsAreEqual(generatedComponents.graph.edges.guardActionBlock.findAll{it}.guards, manualComponents.graph.edges.guardActionBlock.findAll{it}.guards); assert result[0], result[1]
+		result = collectionsAreEqual(generatedComponents.graph.edges.guardActionBlock.findAll{it}.actions, manualComponents.graph.edges.guardActionBlock.findAll{it}.actions); assert result[0], result[1]
 		result = collectionsAreEqual(generatedComponents.graph.edges.guardActionBlock, manualComponents.graph.edges.guardActionBlock); assert result[0], result[1]
 		result = collectionsAreEqual(generatedComponents.graph.edges, manualComponents.graph.edges); assert result[0], result[1]
 		result = collectionsAreEqual(generatedComponents.graph, manualComponents.graph); assert result[0], result[1]
 		result = collectionsAreEqual(generatedComponents.variables.type, manualComponents.variables.type); assert result[0], result[1]
 		result = collectionsAreEqual(generatedComponents.variables, manualComponents.variables); assert result[0], result[1]
 		result = collectionsAreEqual(generatedModule.componentList, manualModule.componentList); assert result[0], result[1]
+		result = collectionsAreEqual(generatedModule.eventAliasList.expression.eventList, manualModule.eventAliasList.expression.eventList); assert result[0], result[1]
+		result = collectionsAreEqual(generatedModule.eventAliasList, manualModule.eventAliasList); assert result[0], result[1]
 		assert generatedModule.equalsByContents(manualModule)
-		assert false, 'fixa overlap'
+        ModuleCompiler compiler = new ModuleCompiler(new DocumentManager(), ProductDESElementFactory.getInstance(), generatedModule);
+        assert compiler.compile()
+ 
+		assert false, 'fixa generering för syntes'
+		assert false, 'fixa markeringar'
 		assert false, 'testa mätlyften med fler än en kula'
 		assert false, 'fixa guards med zoner'
 		assert false, 'fixa köer'
+		assert false, 'testa gui'
 		assert false, 'fixa range och konstanter'
 		assert false, 'fixa exceptions'
 		assert false, 'fixa resursbokning'
@@ -286,90 +399,123 @@ class AutomatonGenerator {
 		
 		Closure addStates = { graph ->
 			(graph.sensor + graph.zone.findAll{!it.outsideSystemBoundry}).eachWithIndex { location, i ->
-				builder.state(name:formatStateName(location))
+				builder.state(name:formatStateName(location), marked:true)
 			}
 			if (graph.zone.any{it.outsideSystemBoundry}) {
-				builder.state(name:OUTSIDE_SYSTEM_BOUNDRY_STATE_NAME)
+				builder.state(name:OUTSIDE_SYSTEM_BOUNDRY_STATE_NAME, marked:true)
 			}
 		}
-		Closure addTransitions  = { graph ->
-			graph.sensor.each { sensor ->
-				[true, false].each {incoming ->
-					(incoming ? incomingZones(sensor) : outgoingZones(sensor)).each { zone ->
-						def sensorCondition = incoming ? "!${sensor.name}" : null
-						builder.transition(from:formatStateName(incoming ? zone : sensor),
-		                                   to:formatStateName(incoming ? sensor: zone),
-	                                       events:[formatEventName(sensor, zone, incoming) + (graph.maxNrOfObjects > 1 ? "[${INDEX_NAME}]" : '')],
-	                                       guard:formatGuard(sensor, zone, incoming)) {
-							action("${sensor.name} = ${incoming ? 1 : 0}")
-							if (!zone.outsideSystemBoundry) {
-								if (zone.capacity > 1) {
-									action("${formatZoneVariableName(zone)} ${incoming ? '-' : '+'}= 1")
-								} else {
-									action("${formatZoneVariableName(zone)} = ${incoming ? 0 : 1}")
-								}
-							}
+		Closure addTransitions  = { sensor ->
+			[true, false].each {movementFromZone ->
+				(movementFromZone ? incomingZones(sensor) : outgoingZones(sensor)).each { zone ->
+					def sensorCondition = movementFromZone ? "!${sensor.name}" : null
+					def otherSensor = (zone.front == sensor) ? zone.back : zone.front
+					def sourceStateName
+					def targetStateName
+					if (sensor.graph.nrOfObjectsIsUnbounded) {
+						sourceStateName = "${!movementFromZone}"
+						targetStateName = "${movementFromZone}"
+					} else {
+						sourceStateName = formatStateName(!movementFromZone ? sensor : zone)
+						targetStateName = formatStateName(movementFromZone ? sensor : zone)
+					}
+					builder.transition(from:sourceStateName,
+		                               to:targetStateName,
+	                                   events:[!zone.overlapped ? formatEventNameRef(sensor, zone, movementFromZone) : formatEventNameRef(otherSensor, zone, !movementFromZone)],
+	                                   guard:!zone.overlapped ? formatGuard(sensor, zone, movementFromZone) : formatGuard(otherSensor, zone, !movementFromZone)) {
+						if (!zone.overlapped) action "${sensor.name} = ${movementFromZone ? 1 : 0}"
+						else action "${otherSensor.name} = ${!movementFromZone ? 1 : 0}"
+						if (!zone.outsideSystemBoundry) {
+							if (zone.capacity > 1) action "${formatZoneVariableName(zone)} ${movementFromZone ? '-' : '+'}= 1"
+							else action "${formatZoneVariableName(zone)} = ${movementFromZone ? 0 : 1}"
 						}
 					}
 				}
 			}
 		}
-
+		Closure addPlant = { graph ->
+			builder.plant(name:formatPlantName(graph), initialState:formatStateName(findInitialState(graph))) {
+				addStates(graph)
+				graph.sensor.each { sensor ->
+					addTransitions(sensor)
+				}
+			}
+		}
+		
 		builder.module(name:project.name) {
 			(project.sensorSignal).each { signal -> 
-				builder.booleanVariable(name:signal.name, initial:signal.sensor.any{it.initiallyActivated})
+				builder.booleanVariable(name:signal.name, initial:signal.sensor.any{it.initiallyActivated}, marked:signal.sensor.any{it.initiallyActivated})
 			}
 			(project.controlSignal).each { signal -> 
-				builder.booleanVariable(name:signal.name, initial:false)
+				builder.booleanVariable(name:signal.name, initial:false, marked:false)
 			}
 			project.graph.zone.findAll{it.bounded && it.graph.maxNrOfObjects != 1}.each { zone ->
 				builder.integerVariable(name:formatZoneVariableName(zone),
 				                        range:0..zone.capacity,
-				                        initial:zone.initialNrOfObjects)
+				                        initial:zone.initialNrOfObjects,
+				                        marked:zone.initialNrOfObjects)
 			}
 			project.graph.zone.findAll{it.graph.maxNrOfObjects == 1 && !it.outsideSystemBoundry}.each { zone ->
-				builder.booleanVariable(name:formatZoneVariableName(zone), initial:zone.initialNrOfObjects)
+				builder.booleanVariable(name:formatZoneVariableName(zone), initial:zone.initialNrOfObjects, marked:zone.initialNrOfObjects)
 			}
+			if (project.controlSignal) {
+				booleanVariable(name:END_OF_SCANCYCLE_VARIABLE_NAME, initial:false, marked:true)
+			}
+			def sensorEvents = []
 			project.graph.sensor.each {sensor ->
-				outgoingZones(sensor).each { zone ->
-					builder.event(name:formatEventName(sensor, zone, false),
-					              controllable:false, ranges:sensor.graph.maxNrOfObjects > 1 ? [0..sensor.graph.maxNrOfObjects-1] : null)
-				}
-				incomingZones(sensor).each { zone ->
-					builder.event(name:formatEventName(sensor, zone, true),
-				                  controllable:false, ranges:sensor.graph.maxNrOfObjects > 1 ? [0..sensor.graph.maxNrOfObjects-1] : null)
-				}
-			}
-			project.graph.findAll{it.nrOfObjectsIsUnbounded}.sensor.each { sensor ->
-				builder.plant(name:"${sensor.graph.name}_${sensor.name}", initialState:"${sensor.initiallyActivated}") {
-					builder.state(name:'false')
-					builder.state(name:'true')
-					[true, false].each {incoming ->
-						(incoming ? incomingZones(sensor) : outgoingZones(sensor)).each { zone ->
-							builder.transition(from:"${!incoming}",
-							                   to:"${incoming}",
-						                       events:[formatEventName(sensor, zone, incoming)],
-						                       guard:formatGuard(sensor, zone, incoming)) {
-								action("${sensor.name} = ${incoming ? 1 : 0}")
-								if (!zone.outsideSystemBoundry) {
-									action("${formatZoneVariableName(zone)} ${incoming ? '-' : '+'}= 1")
-								}
-							}
-						}
+				[false, true].each { incoming ->
+					(incoming ? incomingZones(sensor) : outgoingZones(sensor)).each { zone ->
+						builder.event(name:formatEventName(sensor, zone, incoming),
+					                  controllable:false, ranges:sensor.graph.maxNrOfObjects > 1 ? [0..sensor.graph.maxNrOfObjects-1] : null)
+						sensorEvents << formatEventName(sensor, zone, incoming)
 					}
 				}
 			}
-			project.graph.findAll{it.maxNrOfObjects == 1}.each { graph ->
-				builder.plant(name:graph.name, initialState:formatStateName(findInitialState(graph))) {
-					addStates(graph)
-					addTransitions(graph)
+			if (project.controlSignal) {
+				event(name:DO_CONTROL_SIGNAL_CHANGE_EVENT_NAME, controllable:true)
+				event(name:SKIP_CONTROL_SIGNAL_CHANGE_EVENT_NAME, controllable:true)
+			}
+			eventAlias(name:SENSOR_EVENTS_ALIAS_NAME, events:sensorEvents)
+			project.graph.findAll{it.nrOfObjectsIsUnbounded}.sensor.each { sensor ->
+				builder.plant(name:formatPlantName(sensor), initialState:"${sensor.initiallyActivated}") {
+					builder.state(name:'false', marked:true)
+					builder.state(name:'true', marked:true)
+					addTransitions(sensor)
 				}
+			}
+			project.graph.findAll{it.maxNrOfObjects == 1}.each { graph ->
+				addPlant(graph)
 			}
 			project.graph.findAll{it.maxNrOfObjects > 1}.each { graph ->
 				builder.foreach(name:INDEX_NAME, range:0..graph.maxNrOfObjects - 1) {
-					builder.plant(name:"${graph.name}[${INDEX_NAME}]", initialState:formatStateName(findInitialState(graph))) {
-						addStates(graph)
-						addTransitions(graph)
+					addPlant(graph)
+				}
+			}
+			if (project.controlSignal) {
+				plant(name:'ControlUnit', initialState:project.controlSignal[0].name) {
+					project.controlSignal.each { signal ->
+						builder.state(name:"${signal.name}", marked:false)
+					}
+					state(name:END_OF_SCANCYCLE_STATE_NAME, marked:true)
+					(0..<project.controlSignal.size()-1).each { i -> 
+						builder.transition(from:project.controlSignal[i].name,
+								           to:project.controlSignal[i+1].name, events:[DO_CONTROL_SIGNAL_CHANGE_EVENT_NAME]) {
+							action "${project.controlSignal[i].name} = !${project.controlSignal[i].name}"
+						}
+						builder.transition(from:project.controlSignal[i].name,
+								           to:project.controlSignal[i+1].name, events:[SKIP_CONTROL_SIGNAL_CHANGE_EVENT_NAME])
+					}
+					transition(from:project.controlSignal[-1].name,
+					           to:END_OF_SCANCYCLE_STATE_NAME, events:[DO_CONTROL_SIGNAL_CHANGE_EVENT_NAME]) {
+						action "${project.controlSignal[-1].name} = !${project.controlSignal[-1].name}"
+						action "${END_OF_SCANCYCLE_VARIABLE_NAME} = 1"
+					}
+					transition(from:project.controlSignal[-1].name,
+					           to:END_OF_SCANCYCLE_STATE_NAME, events:[SKIP_CONTROL_SIGNAL_CHANGE_EVENT_NAME]) {
+						action "${END_OF_SCANCYCLE_VARIABLE_NAME} = 1"
+					}
+					transition(from:END_OF_SCANCYCLE_STATE_NAME, to:project.controlSignal[0].name, events:[SENSOR_EVENTS_ALIAS_NAME]) {
+						action "${END_OF_SCANCYCLE_VARIABLE_NAME} = 0"
 					}
 				}
 			}
@@ -379,23 +525,38 @@ class AutomatonGenerator {
 	
 	final static OUTSIDE_SYSTEM_BOUNDRY_STATE_NAME = 'outside'
 	final static INDEX_NAME = 'i'
+	final static END_OF_SCANCYCLE_VARIABLE_NAME = 'endOfScanCycle'
+	final static END_OF_SCANCYCLE_STATE_NAME = 'endOfScanCycle'
+	final static DO_CONTROL_SIGNAL_CHANGE_EVENT_NAME = 'doSignalChange'
+	final static SKIP_CONTROL_SIGNAL_CHANGE_EVENT_NAME = 'skipSignalChange'
+	final static SENSOR_EVENTS_ALIAS_NAME = 'sensorEvent'
+							
+	private findInitialState(graph) {
+		(graph.sensor.findAll{it.initiallyActivated} + graph.zone.findAll{it.initialNrOfObjects} + graph.zone.findAll{it.outsideSystemBoundry})[0]
+	}
+
+	private formatPlantName(Sensor sensor) {
+		"${sensor.graph.name}_${sensor.name}"
+	}
+	private formatPlantName(Graph graph) {
+		graph.name + ((graph.maxNrOfObjects > 1) ? "[${INDEX_NAME}]" : '')
+	}
 	
 	private formatStateName(Sensor sensor) {
 		sensor.name
 	}
-	
-	private findInitialState(graph) {
-		(graph.sensor.findAll{it.initiallyActivated} + graph.zone.findAll{it.initialNrOfObjects} + graph.zone.findAll{it.outsideSystemBoundry})[0]
-	}
-	
 	private formatStateName(Zone zone) {
 		if (zone.outsideSystemBoundry) {
 			return OUTSIDE_SYSTEM_BOUNDRY_STATE_NAME
 		}
 		def sensorsOfZone = [zone.back, zone.front].grep(Sensor.class)
 		def zonesWithSameSensors = zone.graph.zone.findAll{it.bounded && [it.front, it.back].grep(Sensor.class) == sensorsOfZone}
-		def suffix = zonesWithSameSensors.size() > 1 ? "_${zonesWithSameSensors.indexOf(zone)}" : ''
-		"${sensorsOfZone.size() == 1 ? 'beside' : 'between'}_${sensorsOfZone.name.join('_')}$suffix"
+		def prefix = zone.overlapped ? 'both' : 'between'
+		if (sensorsOfZone.size() == 1) {
+			prefix = 'beside'
+		}
+		def suffix = zonesWithSameSensors.size() > 1 ? "${zonesWithSameSensors.indexOf(zone)}" : null
+		([prefix] + sensorsOfZone.name + [suffix]).findAll{it}.join('_')
 	}
 	
 	private outgoingZones(Sensor sensor) {
@@ -410,9 +571,13 @@ class AutomatonGenerator {
 		"${zone.graph.name}_${formatStateName(zone)}"
 	}
 	
-	private String formatEventName(Sensor sensor, zone, isSensorActivation) {
-		String prefix = "${sensor.graph.name}_" + (isSensorActivation ? "to_" : "from_")
-		def zones = (isSensorActivation ? incomingZones(sensor) : outgoingZones(sensor)) 
+	private String formatEventNameRef(Sensor sensor, zone, movementFromZone) {
+		formatEventName(sensor, zone, movementFromZone) + (sensor.graph.maxNrOfObjects > 1 ? "[${INDEX_NAME}]" : '')
+	}
+	
+	private String formatEventName(Sensor sensor, zone, movementFromZone) {
+		String prefix = "${sensor.graph.name}_" + (movementFromZone ? "to_" : "from_")
+		def zones = (movementFromZone ? incomingZones(sensor) : outgoingZones(sensor)) 
 		String suffix = zones.size() > 1 ? "_${zones.indexOf(zone)}" : ''
 		"$prefix${sensor.name}$suffix"
 	}
@@ -424,9 +589,12 @@ class AutomatonGenerator {
 		 //println "$expr, ${parser.parse(expr).dump()}"
 		 	parser.parse(expr) instanceof BinaryExpressionProxy
 		}
-		def comparison = isSensorActivation ? '> 0' : "< ${zone.capacity}"
-		def zoneCondition = zone.bounded && zone.graph.maxNrOfObjects != 1 && (!isSensorActivation || zone.graph.nrOfObjectsIsUnbounded) ?
-		                        "${formatZoneVariableName(zone)} $comparison" : null
+		def comparison = ''
+		if (zone.capacity > 1) comparison = isSensorActivation ? ' > 0' : " < ${zone.capacity}"
+		def negation = ''
+		if (zone.capacity == 1) negation = isSensorActivation^zone.overlapped ? '' : '!'
+		def zoneCondition = zone.bounded && zone.graph.maxNrOfObjects != 1 && (!isSensorActivation || zone.graph.nrOfObjectsIsUnbounded && !zone.overlapped) ?
+		                        "${negation}${formatZoneVariableName(zone)}$comparison" : null
 		def sensorCondition = isSensorActivation && sensor.graph.maxNrOfObjects != 1 ? "!${sensor.name}" : null
 		def directionCondition = (isSensorActivation && zone.front == sensor) || (!isSensorActivation && zone.back == sensor) ? zone.forwardCondition : zone.backwardCondition;
         if (directionCondition && parenthesisNeeded(directionCondition))	directionCondition = '(' + directionCondition + ')'
