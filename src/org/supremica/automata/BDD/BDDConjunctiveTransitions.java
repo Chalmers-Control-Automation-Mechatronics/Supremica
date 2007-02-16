@@ -72,16 +72,6 @@ public class BDDConjunctiveTransitions
         return bddAutomata;
     }
     
-    public BDD getTransitionForwardBDD(BDDAutomaton bddAutomaton)
-    {
-        return bddAutomaton.getTransitionForwardConjunctiveBDD();
-    }
-    
-    public BDD getTransitionBackwardBDD(BDDAutomaton bddAutomaton)
-    {
-        return bddAutomaton.getTransitionBackwardConjunctiveBDD();
-    }
-    
     public Iterator<BDD> forwardIterator()
     {
         return new BDDIterator(true);

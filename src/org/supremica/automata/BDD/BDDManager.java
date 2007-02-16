@@ -154,7 +154,7 @@ public class BDDManager
         bdd.orWith(sourceBDD);
     }
     
-    public static BDD reachableStates(BDD initialStates, BDDTransitions transitions, BDDVarSet sourceStateVariables, BDDPairing destToSourceStatePairing)
+    public static BDD reachableStates(BDD initialStates, BDDTransitions transitions, BDDVarSet sourceStateVariables, BDDVarSet eventVariables, BDDPairing destToSourceStatePairing)
     {
         BDD reachableStatesBDD = initialStates.id();
         BDD previousReachableStatesBDD = null;
@@ -186,7 +186,7 @@ public class BDDManager
             else if (transitions instanceof BDDConjunctiveTransitions)
             {
                 BDDConjunctiveTransitions bddConjunctiveTransitions = (BDDConjunctiveTransitions)transitions;
-                nextStatesAndTransitionsBDD = reachableStatesBDD;
+                nextStatesAndTransitionsBDD = reachableStatesBDD.id();
                 logger.debug("New round in reachability");                       
                 for(Iterator<BDD> transitionBDDIt = bddConjunctiveTransitions.forwardIterator(); transitionBDDIt.hasNext(); )
                 {
@@ -194,6 +194,7 @@ public class BDDManager
                     logger.debug("Number of nodes in nextStatesAndTransitionsBDD: " + nextStatesAndTransitionsBDD.nodeCount());       
                 }
                 nextStatesAndTransitionsBDD = nextStatesAndTransitionsBDD.exist(sourceStateVariables);
+                nextStatesAndTransitionsBDD = nextStatesAndTransitionsBDD.exist(eventVariables);
                 logger.debug("Number of nodes in nextStatesAndTransitionsBDD: " + nextStatesAndTransitionsBDD.nodeCount());       
             }
             else if (transitions instanceof BDDDisjunctiveTransitions)
@@ -232,7 +233,7 @@ public class BDDManager
         return reachableStatesBDD;
     }
     
-    public static BDD coreachableStates(BDD markedStates, BDDTransitions transitions, BDDVarSet sourceStateVariables, BDDPairing destToSourceStatePairing)
+    public static BDD coreachableStates(BDD markedStates, BDDTransitions transitions, BDDVarSet sourceStateVariables, BDDVarSet eventVariables, BDDPairing destToSourceStatePairing)
     {
         BDD coreachableStatesBDD = markedStates.id();
         BDD previousCoreachableStatesBDD = null;
@@ -250,12 +251,13 @@ public class BDDManager
             else if (transitions instanceof BDDConjunctiveTransitions)
             {
                 BDDConjunctiveTransitions bddConjunctiveTransitions = (BDDConjunctiveTransitions)transitions;
-                previousStatesAndTransitionsBDD = coreachableStatesBDD;
+                previousStatesAndTransitionsBDD = coreachableStatesBDD.id();
                 for(Iterator<BDD> transitionBDDIt = bddConjunctiveTransitions.backwardIterator(); transitionBDDIt.hasNext(); )
                 {
-                    previousStatesAndTransitionsBDD.and(transitionBDDIt.next());      
+                    previousStatesAndTransitionsBDD = previousStatesAndTransitionsBDD.and(transitionBDDIt.next());      
                 }
                 previousStatesAndTransitionsBDD = previousStatesAndTransitionsBDD.exist(sourceStateVariables);
+                previousStatesAndTransitionsBDD = previousStatesAndTransitionsBDD.exist(eventVariables);
             }
             else if (transitions instanceof BDDDisjunctiveTransitions)
             {
