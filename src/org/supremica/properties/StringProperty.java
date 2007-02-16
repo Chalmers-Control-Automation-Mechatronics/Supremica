@@ -133,6 +133,16 @@ public class StringProperty
     {
         return legalValues;        
     }
+ 
+    public String[] legalValuesAsStrings()
+    {
+        String[] legalValuesAsStrings = new String[legalValues.length];
+        for (int i = 0; i < legalValues.length; i++)
+        {
+            legalValuesAsStrings[i] = legalValues[i].toString();
+        }
+        return legalValuesAsStrings;        
+    }
     
     public String valueToString()
     {

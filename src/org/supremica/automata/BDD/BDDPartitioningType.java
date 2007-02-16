@@ -81,6 +81,7 @@ public enum BDDPartitioningType
                 return value;
             }
         }
+        System.err.println("Value: " + description);
         return null;
     }
 }

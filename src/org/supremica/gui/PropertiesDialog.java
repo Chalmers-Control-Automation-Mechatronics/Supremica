@@ -74,7 +74,7 @@ public class PropertiesDialog
     /** The place for controlbuttons for this dialog. */
     private PropertiesControllerPanel controlPanel = null;
     
-    private LinkedList chooserList = new LinkedList();
+    private LinkedList<Chooser> chooserList = new LinkedList<Chooser>();
     
     public PropertiesDialog(Frame owner)
     {
@@ -222,8 +222,7 @@ public class PropertiesDialog
      */
     private void getAttributes()
     {
-        Iterator<Chooser> it = chooserList.iterator();
-        for (Chooser chooser = it.next(); it.hasNext(); chooser = it.next())
+        for (Chooser chooser : chooserList)
         {
             chooser.getFromConfig();
         }
@@ -234,8 +233,7 @@ public class PropertiesDialog
      */
     private boolean setAttributes()
     {
-        Iterator<Chooser> it = chooserList.iterator();
-        for (Chooser chooser = it.next(); it.hasNext(); chooser = it.next())
+        for (Chooser chooser : chooserList)
         {
             chooser.setInConfig();
         }
@@ -386,6 +384,7 @@ public class PropertiesDialog
         StringChooser(StringProperty property)
         {
             super();
+            this.property = property;
             JLabel label = new JLabel(property.getComment());
             this.add(label);
             
@@ -397,21 +396,30 @@ public class PropertiesDialog
             }
             else
             {
-                selector = new JComboBox(property.legalValues());
+                selector = new JComboBox(((StringProperty)property).legalValuesAsStrings());
+                if (property.get() != null)
+                {
+                    selector.setSelectedItem(property.get());
+                }
                 this.add(selector);
             }
-
-            this.property = property;
         }
         
         public void setInConfig()
         {
             if (!property.isImmutable())
             {
-                if (text != null)
+                if (selector != null)
+                {
+                    if (selector.getSelectedItem() != null)
+                    {
+                        property.set(selector.getSelectedItem().toString());
+                    }
+                }
+                else if (text != null)
+                {
                     property.set(text.getText());
-                else
-                    property.set(selector.getSelectedItem().toString());
+                }
             }       
         }   
             

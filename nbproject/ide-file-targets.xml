@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir=".." name="Supremica-IDE">
+    <!-- TODO: edit the following target according to your needs -->
+    <!-- (more info: http://www.netbeans.org/kb/55/freeform-config.html#compilesingle) -->
+    <target name="compile-selected-files-in-src">
+        <fail unless="files">Must set property 'files'</fail>
+        <mkdir dir="build"/>
+        <javac destdir="build" includes="${files}" source="1.5" srcdir="src">
+            <classpath path="lib/unjared"/>
+        </javac>
+    </target>
+</project>
