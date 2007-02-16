@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   GeometryTools
 //###########################################################################
-//# $Id: GeometryTools.java,v 1.10 2007-02-12 23:24:14 robi Exp $
+//# $Id: GeometryTools.java,v 1.11 2007-02-16 03:00:42 robi Exp $
 //###########################################################################
 
 
@@ -31,6 +31,9 @@ import net.sourceforge.waters.xsd.module.SplineKind;
 
 public final class GeometryTools
 {
+
+  //#########################################################################
+  //# Nodes
   public static Point2D defaultPosition(NodeProxy node, Point2D turningpoint)
   {
     if (node instanceof SimpleNodeProxy) {
@@ -75,6 +78,29 @@ public final class GeometryTools
   {
     Rectangle2D r = node.getGeometry().getRectangle();
     return new Point2D.Double(r.getCenterX(), r.getCenterY());
+  }
+
+  //#########################################################################
+  //# Edges
+  /**
+   * Checks whether an edge is a selfloop.
+   * An edge is rendered as a selfloop if its source and target nodes
+   * are the same, and in case of a group node, the source and target
+   * geometry must also be the same.
+   */
+  public static boolean isSelfloop(final EdgeProxy edge)
+  {
+    final NodeProxy source = edge.getSource();
+    final NodeProxy target = edge.getTarget();
+    if (source != target) {
+      return false;
+    } else if (source instanceof SimpleNodeProxy) {
+      return true;
+    } else {
+      final Point2D start = getStartPoint(edge);
+      final Point2D end = getEndPoint(edge);
+      return start.distanceSq(end) < EPSILON2;
+    }
   }
 
   /**
@@ -144,47 +170,85 @@ public final class GeometryTools
   }
 
   /**
-   * Gets the position of the handle point of an edge.
-   * The handle position either is the single control point of the
+   * Gets the position of the turning point of an edge.
+   * The turning point is the single control point of the
    * edge's spline geometry, or the centre of the straight line
    * between the edge's start and end point.
    * @throws IllegalArgumentException if the spline geometry has
    *         more than one control point.
    */
-  public static Point2D getHandlePoint1(final EdgeProxy edge)
+  public static Point2D getTurningPoint1(final EdgeProxy edge)
   {
-    final Point2D point = getSpecifiedMidPoint(edge);
-    if (point != null) {
-      return point;
-    } else {
+    final SplineGeometryProxy geo = edge.getGeometry();
+    if (geo == null) {
       return getDefaultMidPoint(edge);
+    } else {
+      final Point2D point = getSinglePoint(geo);
+      switch (geo.getKind()) {
+      case INTERPOLATING:
+        return point;
+      case BEZIER:
+        return convertToTurn(edge, point);
+      default:
+        throw new IllegalArgumentException
+          ("Unknown spline kind: " + geo.getKind());
+      }
     }
   }
 
   /**
-   * Gets the centre point of an edge.
-   * This method checks the edge's geometry and returns the specified
-   * centre point if one is set, or <CODE>null</CODE> in case of a
-   * straight line.
+   * Gets the position of the control point of an edge.
+   * This method tries to find a bezier control point for the
+   * given edge.
    * @throws IllegalArgumentException if the spline geometry has
    *         more than one control point.
    */
-  public static Point2D getSpecifiedMidPoint(final EdgeProxy edge)
+  public static Point2D getControlPoint1(final EdgeProxy edge)
   {
     final SplineGeometryProxy geo = edge.getGeometry();
     if (geo == null) {
-      return null;
+      return getDefaultMidPoint(edge);
+    } else {
+      final Point2D point = getSinglePoint(geo);
+      switch (geo.getKind()) {
+      case INTERPOLATING:
+        return convertToControl(edge, point);
+      case BEZIER:
+        return point;
+      default:
+        throw new IllegalArgumentException
+          ("Unknown spline kind: " + geo.getKind());
+      }
     }
+  }
+
+  /**
+   * Gets the single control point of an edge.
+   * This method checks the edge's spline geometry and returns its only
+   * control point.
+   * @throws IllegalArgumentException if the spline geometry does
+   *         not have exactly one control point.
+   */
+  public static Point2D getSinglePoint(final EdgeProxy edge)
+  {
+    return getSinglePoint(edge.getGeometry());
+  }
+
+  /**
+   * Gets the single control point of a spline.
+   * This method checks the given spline geometry and returns its only
+   * control point.
+   * @throws IllegalArgumentException if the spline geometry does
+   *         not have exactly one control point.
+   */
+  public static Point2D getSinglePoint(final SplineGeometryProxy geo)
+  {
     final List<Point2D> points = geo.getPoints();
-    final int size = points.size();
-    switch (size) {
-    case 0:
-      return null;
-    case 1:
-      return points.iterator().next();
-    default:
+    if (points.size() == 1) {
+      return points.get(0);
+    } else {
       throw new IllegalArgumentException
-        ("More than one control point in spline!");
+        ("Unsupported number of control points in spline!");
     }
   }
 
@@ -196,9 +260,15 @@ public final class GeometryTools
    */
   public static Point2D getDefaultMidPoint(final EdgeProxy edge)
   {
-    final Point2D p1 = getStartPoint(edge);
-    final Point2D p2 = getEndPoint(edge);
-    return getMidPoint(p1, p2);
+    final Point2D start = getStartPoint(edge);
+    if (isSelfloop(edge)) {
+      final double x = start.getX() + TieEdgeProxyShape.DEFAULT_OFFSET_X; 
+      final double y = start.getY() + TieEdgeProxyShape.DEFAULT_OFFSET_Y;
+      return new Point2D.Double(x, y); 
+    } else {
+      final Point2D end = getEndPoint(edge);
+      return getMidPoint(start, end);
+    }
   }
 
   /**
@@ -212,27 +282,31 @@ public final class GeometryTools
   }
 
   /**
-   * Changes the middle point of an edge.
-   * This method changes the edge's spline geometry to reflect the
-   * given new centre point. It produces spline with a single control
-   * point, or replaces the existing one.
+   * Calculates the position of a quadratic spline edge's turning point
+   * from its control point.
    */
-  public static void setSpecifiedMidPoint(final EdgeSubject edge,
-                                          final Point2D newpoint)
+  public static Point2D convertToTurn(final EdgeProxy edge,
+                                      final Point2D control)
   {
-    final SplineGeometrySubject oldgeo = edge.getGeometry();
-    if (oldgeo == null || oldgeo.getPoints().size() != 1) {
-      final List<Point2D> points = Collections.singletonList(newpoint);
-      final SplineGeometrySubject newgeo =
-        new SplineGeometrySubject(points, SplineKind.INTERPOLATING);
-      edge.setGeometry(newgeo);
-    } else {
-      final List<Point2D> points = oldgeo.getPointsModifiable();
-      final Point2D oldpoint = points.iterator().next();
-      if (oldpoint.distanceSq(newpoint) >= EPSILON2) {
-        points.set(0, newpoint);
-      }
-    }
+    final Point2D start = getStartPoint(edge);
+    final Point2D end = getEndPoint(edge);
+    final double x = 0.25 * (start.getX() + 2.0 * control.getX() + end.getX());
+    final double y = 0.25 * (start.getY() + 2.0 * control.getY() + end.getY());
+    return new Point2D.Double(x, y);
+  }
+
+  /**
+   * Calculates the position of a quadratic spline edge's control point
+   * from its turning point.
+   */
+  public static Point2D convertToControl(final EdgeProxy edge,
+                                         final Point2D mid)
+  {
+    final Point2D start = getStartPoint(edge);
+    final Point2D end = getEndPoint(edge);
+    final double x = 2.0 * mid.getX() - 0.5 * (start.getX() + end.getX());
+    final double y = 2.0 * mid.getY() - 0.5 * (start.getY() + end.getY());
+    return new Point2D.Double(x, y);
   }
 
   /**
@@ -245,86 +319,157 @@ public final class GeometryTools
    * always adhered to.
    */
   public static void createMidGeometry(final EdgeSubject edge,
-                                       final Point2D newpoint)
+                                       final Point2D newpoint,
+                                       final SplineKind kind)
   {
-    final Point2D p1 = getStartPoint(edge);
-    final Point2D p2 = getEndPoint(edge);
-    if (p1.distanceSq(p2) < EPSILON2) {
-      setSpecifiedMidPoint(edge, newpoint);
-    } else {
-      final Line2D line = new Line2D.Double(p1, p2);
-      final double distance = line.ptLineDist(newpoint);
-      if (distance >= 1.5) {
-        setSpecifiedMidPoint(edge, newpoint);
-      } else {
-        edge.setGeometry(null);
-      }
+    if (isSelfloop(edge)) {
+      setSpecifiedMidPoint(edge, newpoint, kind);
+      return;
     }
-  }
-
-  /**
-   * Creates default geometry for an edge.
-   * This method either clears the geometry of the given edge (straight
-   * line), or creates a spline geometry with default turning point for
-   * a selfloop.
-   */
-  public static void createDefaultGeometry(final EdgeSubject edge)
-  {
-    final NodeProxy source = edge.getSource();
-    final NodeProxy target = edge.getTarget();
-    if (source == target && source instanceof SimpleNodeProxy) {
-      // *** BUG ***
-      // Should use named constant!
-      // ***
-      final Point2D point = getPosition(source);
-      point.setLocation(point.getX() + 20, point.getY() + 20);
-      setSpecifiedMidPoint(edge, point);
+    final Point2D start = getStartPoint(edge);
+    final Point2D end = getEndPoint(edge);
+    if (start.distanceSq(end) < EPSILON2) {
+      setSpecifiedMidPoint(edge, newpoint, kind);
+      return;
+    }
+    final Line2D line = new Line2D.Double(start, end);
+    if (line.ptLineDist(newpoint) >= 1.5) {
+      setSpecifiedMidPoint(edge, newpoint, kind);
     } else {
       edge.setGeometry(null);
     }
   }
 
-  public static Point2D getRadialPoint(Point2D p, 
-                                       Point2D center,
-                                       double radius)
+  /**
+   * Creates default geometry for an edge.
+   * This method simply clears the geometry of the given edge.
+   */
+  public static void createDefaultGeometry(final EdgeSubject edge)
   {
-    double width = center.getX() - p.getX();
-    double height = center.getY() - p.getY();
-    double angle = Math.atan2(height, width);
-    return new Point2D.Double(center.getX() - Math.cos(angle) * radius,
-                              center.getY() - Math.sin(angle) * radius);
+    edge.setGeometry(null);
   }
 
-  public static Line2D[] getLineSegmentsOfRectangle(Rectangle2D r)
+  /**
+   * Changes the middle point of an edge.
+   * This method changes the edge's spline geometry to reflect the
+   * given new centre point. It produces spline with a single control
+   * point, or replaces the existing one.
+   */
+  public static void setSpecifiedMidPoint(final EdgeSubject edge,
+                                          final Point2D newpoint,
+                                          final SplineKind kind)
   {
-    Line2D[] lines = new Line2D[4];
-    lines[0] = new Line2D.Double(r.getMinX(), r.getMinY(),
-                                 r.getMaxX(), r.getMinY());
-    lines[1] = new Line2D.Double(r.getMaxX(), r.getMinY(),
-                                 r.getMaxX(), r.getMaxY());
-    lines[2] = new Line2D.Double(r.getMaxX(), r.getMaxY(),
-                                 r.getMinX(), r.getMaxY());
-    lines[3] = new Line2D.Double(r.getMinX(), r.getMaxY(),
-                                 r.getMinX(), r.getMinY());
-    return lines;
+    final SplineGeometrySubject oldgeo = edge.getGeometry();
+    if (oldgeo == null || oldgeo.getPoints().size() != 1) {
+      final List<Point2D> points = Collections.singletonList(newpoint);
+      final SplineGeometrySubject newgeo =
+        new SplineGeometrySubject(points, kind);
+      edge.setGeometry(newgeo);
+    } else {
+      final List<Point2D> points = oldgeo.getPointsModifiable();
+      final Point2D oldpoint = points.iterator().next();
+      if (oldpoint.distanceSq(newpoint) >= EPSILON2) {
+        points.set(0, newpoint);
+      }
+      oldgeo.setKind(kind);
+    }
   }
 
-  public static double[] convertLineIntoEquation(Line2D l)
+  public static Point2D getRadialStartPoint(final EdgeProxy edge,
+                                            final Point2D dir)
   {
-    double[] eq = new double[3];
-    eq[0] = l.getY1() - l.getY2();
-    eq[1] = -(l.getX1() - l.getX2());
-    eq[2] = -(eq[0] * l.getX1() + eq[1] * l.getY1());
-    return eq;
+    final NodeProxy source = edge.getSource();
+    final PointGeometryProxy start = edge.getStartPoint();
+    return getRadialPoint(source, start, dir);
   }
 
-  public static Point2D getControlPoint(QuadCurve2D quad)
+  public static Point2D getRadialEndPoint(final EdgeProxy edge,
+                                          final Point2D dir)
   {
-    return new Point2D.Double(
-                              (2 * quad.getCtrlX() - (quad.getX1() + quad.getX2()) / 2),
-                              (2 * quad.getCtrlY() - (quad.getY1() + quad.getY2()) / 2));
+    final NodeProxy target = edge.getTarget();
+    final PointGeometryProxy end = edge.getEndPoint();
+    return getRadialPoint(target, end, dir);
   }
 
+  public static Point2D getRadialPoint(final NodeProxy node,
+                                       final PointGeometryProxy geo,
+                                       final Point2D dir)
+  {
+    if (node == null) {
+      return geo.getPoint();
+    } else if (node instanceof SimpleNodeProxy) {
+      final SimpleNodeProxy simple = (SimpleNodeProxy) node;
+      final Point2D pos = getPosition(simple);
+      final Point2D normdir = getNormalizedDirection(pos, dir);
+      return getRadialPoint(simple, normdir);
+    } else if (node instanceof GroupNodeProxy) {
+      if (geo != null) {
+        return geo.getPoint();
+      } else {
+        final GroupNodeProxy group = (GroupNodeProxy) node;
+        return defaultPosition(group, dir);
+      }
+    } else {
+      throw new ClassCastException
+        ("Unknown node type: " + node.getClass().getName() + "!");
+    }
+  }
+
+  public static Point2D getRadialPoint(final SimpleNodeProxy node,
+                                       final Point2D normdir)
+  {
+    final Point2D center = getPosition(node);
+    final double dx = normdir.getX();
+    final double dy = normdir.getY();
+    final double x = center.getX() + SimpleNodeProxyShape.RADIUS * dx;
+    final double y = center.getY() + SimpleNodeProxyShape.RADIUS * dy;
+    return new Point2D.Double(x, y);
+  }
+
+
+  //#########################################################################
+  //# General Geometric Auxiliaries
+  /**
+   * Calculates a normalized direction vector between to given points.
+   */
+  public static Point2D getNormalizedDirection(final Point2D start,
+                                               final Point2D end)
+  {
+    final double dx = end.getX() - start.getX();
+    final double dy = end.getY() - start.getY();
+    final Point2D dir = new Point2D.Double(dx, dy);
+    normalize(dir);
+    return dir;
+  }
+
+  /**
+   * Normalizes a given vector. This method replaces the x and y coordinates
+   * of the given point so that the length of the result is equal to 1.0,
+   * but the direction is unchanged. If the length of the given vector
+   * is not at least {@link #EPSILON}, an arbitrary direction is assigned.
+   */
+  public static void normalize(final Point2D dir)
+  {
+    final double dx = dir.getX();
+    final double dy = dir.getY();
+    final double len = Math.sqrt(dx * dx + dy * dy);
+    if (len > GeometryTools.EPSILON) {
+      final double norm = 1.0 / len;
+      dir.setLocation(norm * dx, norm * dy);
+    } else {
+      dir.setLocation(1.0, 0.0);
+    }
+  }
+
+  /**
+   * Finds the intersection between a rectangle and a line.
+   * @param  rect   The rectangle to be tested.
+   * @param  point  The end point of the line to be tested.
+   *                This method finds the line from the center of the
+   *                rectangle and this point, and intersects it with the
+   *                boundary of the rectangle. It returns the intersection
+   *                point closest to the given point.
+   */
   public static Point2D findIntersection(final Rectangle2D rect,
                                          final Point2D point)
   {

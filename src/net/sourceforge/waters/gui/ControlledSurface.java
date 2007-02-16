@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.120 2007-02-14 23:22:01 robi Exp $
+//# $Id: ControlledSurface.java,v 1.121 2007-02-16 03:00:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -46,7 +46,6 @@ import net.sourceforge.waters.gui.command.*;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.ToolbarChangedEvent;
-import net.sourceforge.waters.gui.renderer.EdgeProxyShape;
 import net.sourceforge.waters.gui.renderer.GeneralShape;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.renderer.GeometryTools;
@@ -304,6 +303,19 @@ public class ControlledSurface
     compound.addCommand(select);
     compound.end();
     mRoot.getUndoInterface().executeCommand(compound);
+  }
+
+  /**
+   * Changes the start or end of an edge using a move edge command.
+   */
+  void doMoveEdge(final EdgeSubject edge,
+                  final NodeSubject node,
+                  final boolean isSource,
+                  final Point2D anchor)
+  {
+    final Command move =
+      new MoveEdgeCommand(this, edge, node, isSource, anchor);
+    mRoot.getUndoInterface().executeCommand(move);
   }
 
   /**
@@ -1333,7 +1345,7 @@ public class ControlledSurface
             case SOURCE:
             case TARGET:
               mInternalDragAction =
-                new InternalDragActionRedirectEdge(event, handle);
+                new InternalDragActionEdge(event, handle);
               break;
             case NW:
             case N:
@@ -1573,14 +1585,14 @@ public class ControlledSurface
           }
         } else if (item instanceof NodeSubject) {
           // Clicking on node or nodegroup --- create edge.
-          mInternalDragAction = new InternalDragActionCreateEdge(event);
+          mInternalDragAction = new InternalDragActionEdge(event);
         } else if (item instanceof EdgeSubject) {
           final Handle handle = getClickedHandle(mFocusedObject, event);
           if (handle == null) {
             mInternalDragAction = new InternalDragActionMove(event);
           } else {
             mInternalDragAction =
-              new InternalDragActionRedirectEdge(event, handle);
+              new InternalDragActionEdge(event, handle);
           }
         } else {
           mInternalDragAction = new InternalDragActionMove(event);
@@ -2505,14 +2517,12 @@ public class ControlledSurface
         final Point2D pos = node.getPointGeometry().getPoint();
         final double dx = current.getX() - pos.getX();
         final double dy = current.getY() - pos.getY();
-        final double len = Math.sqrt(dx * dx + dy * dy);
-        if (len < 1.0) {
+        final double len2 = dx * dx + dy * dy;
+        if (len2 < GeometryTools.EPSILON2) {
           return false;
         }
-        final double factor = SimpleNodeProxyShape.INITIALOFFSET / len;
-        final Point2D normalized =
-          new Point2D.Double(factor * dx, factor * dy);
-        node.getInitialArrowGeometry().setPoint(normalized);
+        final Point2D dir = new Point2D.Double(dx, dy);
+        node.getInitialArrowGeometry().setPoint(dir);
         return true;
       } else {
         return false;
@@ -2788,151 +2798,43 @@ public class ControlledSurface
 
 
   //#########################################################################
-  //# Inner Class InternalDragActionCreateEdge
-  private class InternalDragActionCreateEdge
-    extends InternalDragAction
-  {
-
-    //#######################################################################
-    //# Constructors
-    private InternalDragActionCreateEdge(final MouseEvent event)
-    {
-      super(event);
-      mSource = (NodeSubject) mFocusedObject;
-      mAnchor = findNodeAnchorPoint(mSource, getDragStart());
-      mFocusedObject = null;
-      mSelectedObjects = Collections.singletonList(mFocusedObject);
-    }
-
-    //#######################################################################
-    //# Dragging
-    boolean continueDrag(final Point point)
-    {
-      if (super.continueDrag(point)) {
-        if (!mCanCreateSelfloop) {
-          final Point current = getDragCurrent();
-          final double dist = mAnchor.distanceSq(current);
-          mCanCreateSelfloop = dist > SELFLOOP_THRESHOLD;
-        }
-        return true;
-      } else {
-        return false;
-      }
-    }
-
-    void commitDrag(final Point point)
-    {
-      super.commitDrag(point);
-      final NodeSubject target = (NodeSubject) mFocusedObject; 
-      if (target != null &&
-          !(target instanceof GroupNodeSubject &&
-            getGraph().isDeterministic())) {
-        final Point2D end = findNodeAnchorPoint(target, getDragCurrent());
-        doCreateEdge(mSource, target, mAnchor, end);
-      }      
-      repaint();
-    }
-
-    //#######################################################################
-    //# Highlighting
-    int getHighlightPriority(final ProxySubject item)
-    {
-      final int prio;
-      if (item instanceof SimpleNodeSubject) {
-        prio = 2;
-      } else if (item instanceof GroupNodeSubject &&
-                 !getGraph().isDeterministic()) {
-        prio = 1;
-      } else {
-        return -1;
-      }
-      if (item == mSource && !mCanCreateSelfloop) {
-        return -1;
-      } else {
-        return prio;
-      }
-    }
-
-    //#######################################################################
-    //# Rendering
-    List<MiscShape> getDrawnObjects()
-    {
-      final Point endPoint = getDragCurrent();
-      final Shape eshape;
-      if (mFocusedObject == null) {
-        eshape = new Line2D.Double(mAnchor, endPoint);
-      } else if (mFocusedObject == mSource &&
-                 mFocusedObject instanceof SimpleNodeSubject &&
-                 mCanCreateSelfloop) {
-        eshape = createSelfloopShape(mAnchor);
-      } else {
-        eshape = new Line2D.Double(mAnchor, endPoint);
-      }        
-      final MiscShape shape =
-        new GeneralShape(eshape, EditorColor.SELECTCOLOR, null);
-      return Collections.singletonList(shape);
-    }
-
-    Shape createSelfloopShape(final Point2D p)
-    {
-      // *** BUG ***
-      // This should really use named constants instead of 20,
-      // and call the methods of the renderer!
-      // ***
-      final double ARCEXTENT = EdgeProxyShape.Tear.ARCEXTENT;
-      final double TEARRATIO = EdgeProxyShape.Tear.TEARRATIO;
-      final Point2D c = new Point((int) p.getX() + 20, (int) p.getY() + 20);
-      final double dist = Math.sqrt(Math.pow(c.getX() - p.getX(), 2) +
-                                    Math.pow(c.getY() - p.getY(), 2));
-      double r = 0.5 * dist * (1.0 - TEARRATIO);
-      final double theta =
-        Math.atan2(c.getY() - p.getY(), c.getX() - p.getX());
-      final Rectangle2D rect =
-        new Rectangle2D.Double(Math.cos(theta) * (dist - r) + p.getX() - r,
-                               Math.sin(theta) * (dist - r) + p.getY() - r,
-                               r * 2, r * 2);
-      final Arc2D arc =
-        new Arc2D.Double(rect, -(Math.toDegrees(theta) + ARCEXTENT/2),
-                         ARCEXTENT, Arc2D.OPEN);
-      // different r for setting up where the handle is positioned
-      r = SimpleNodeProxyShape.RADIUS;
-      final Point2D p1 =
-        GeometryTools.getRadialPoint(arc.getStartPoint(), p, r);
-      final Point2D p2 =
-        GeometryTools.getRadialPoint(arc.getEndPoint(), p, r);
-      final Line2D line1 = new Line2D.Double(p1, arc.getStartPoint());
-      final Line2D line2 = new Line2D.Double(arc.getEndPoint(), p2);
-      final GeneralPath curve =
-        new GeneralPath(GeneralPath.WIND_NON_ZERO, 3);
-      curve.append(line1, false);
-      curve.append(arc , true);
-      curve.append(line2, true);
-      curve.closePath();
-      return curve;
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final NodeSubject mSource;
-    private final Point2D mAnchor;
-    private boolean mCanCreateSelfloop;
-
-  }
-
-
-  //#########################################################################
-  //# Inner Class InternalDragActionRedirectEdge
-  private class InternalDragActionRedirectEdge
+  //# Inner Class InternalDragActionEdge
+  /**
+   * Drag action to create edges or to drag one of their end points.
+   */
+  private class InternalDragActionEdge
     extends BigInternalDragAction
   {
 
     //#######################################################################
     //# Constructors
-    private InternalDragActionRedirectEdge(final MouseEvent event,
-                                           final Handle handle)
+    /**
+     * Creates a drag action to create a new edge.
+     */
+    private InternalDragActionEdge(final MouseEvent event)
     {
       super(event);
+      mSource = (NodeSubject) mFocusedObject;
+      mAnchor = findNodeAnchorPoint(mSource, getDragStart());
+      mIsSource = false;
+      mOrigEdge = null;
+      mCanCreateSelfloop = false;
+      mSelectedObjects = Collections.singletonList(mFocusedObject);
+      mFocusedObject = null;
+    }
+
+    /**
+     * Creates a drag action to redirect the redirect the source or
+     * target of an edge.
+     */
+    private InternalDragActionEdge(final MouseEvent event,
+                                   final Handle handle)
+    {
+      super(event);
+      mSource = null;
+      mAnchor = null;
       mOrigEdge = (EdgeSubject) mFocusedObject;
+      mCanCreateSelfloop = true;
       mSelectedObjects = Collections.singletonList(mFocusedObject);
       switch (handle.getType()) {
       case SOURCE:
@@ -2952,10 +2854,15 @@ public class ControlledSurface
     boolean continueDrag(final Point point)
     {
       if (super.continueDrag(point)) {
-        if (mCopiedEdge == null) {
-          mCopiedEdge = (EdgeSubject) mSecondaryGraph.getCopy(mOrigEdge);
-        }
         Point2D current = getDragCurrent();
+        if (!mCanCreateSelfloop) {
+          final double dist = mAnchor.distanceSq(current);
+          if (dist < SELFLOOP_THRESHOLD) {
+            return false;
+          }
+          mCanCreateSelfloop = true;
+        }
+        createCopiedEdge();
         final NodeSubject focused;
         if (mFocusedObject == null) {
           focused = null;
@@ -2984,7 +2891,6 @@ public class ControlledSurface
           }
           mCopiedEdge.setTarget(focused);
         }
-        GeometryTools.createDefaultGeometry(mCopiedEdge);
         return true;
       } else {
         return false;
@@ -2997,63 +2903,116 @@ public class ControlledSurface
       final Point2D anchor;
       if (node == null) {
         return;
-      } else if (node instanceof SimpleNodeSubject) {
-        if (mIsSource) {
-          if (node == mOrigEdge.getSource()) {
-            return;
-          }
-        } else {
-          if (node == mOrigEdge.getTarget()) {
-            return;
-          }
-        }
-        anchor = null;
-      } else if (node instanceof GroupNodeSubject) {
-        final Point current = getDragCurrent();
-        anchor = findNodeAnchorPoint(node, current);
-        if (mIsSource) {
-          if (node == mOrigEdge.getSource() &&
-              mOrigEdge.getStartPoint() != null &&
-              anchor.equals(mOrigEdge.getStartPoint().getPoint())) {
-            return;
-          }
-        } else {
-          if (getGraph().isDeterministic() ||
-              node == mOrigEdge.getTarget() && 
-              mOrigEdge.getEndPoint() != null &&
-              anchor.equals(mOrigEdge.getEndPoint().getPoint())) {
-            return;
-          }
-        }
+      } else if (mSource != null) {
+        // Creating edge ...
+        final Point2D end = findNodeAnchorPoint(node, getDragCurrent());
+        doCreateEdge(mSource, node, mAnchor, end);
       } else {
-        throw new IllegalStateException
-          ("Unknown node type: " + node.getClass().getName() + "!");
+        // Moving edge, maybe ...
+        if (node instanceof SimpleNodeSubject) {
+          if (mIsSource) {
+            if (node == mOrigEdge.getSource()) {
+              return;
+            }
+          } else {
+            if (node == mOrigEdge.getTarget()) {
+              return;
+            }
+          }
+          anchor = null;
+        } else if (node instanceof GroupNodeSubject) {
+          final Point current = getDragCurrent();
+          anchor = findNodeAnchorPoint(node, current);
+          if (mIsSource) {
+            if (node == mOrigEdge.getSource() &&
+                mOrigEdge.getStartPoint() != null &&
+                anchor.equals(mOrigEdge.getStartPoint().getPoint())) {
+              return;
+            }
+          } else {
+            if (getGraph().isDeterministic() ||
+                node == mOrigEdge.getTarget() && 
+                mOrigEdge.getEndPoint() != null &&
+                anchor.equals(mOrigEdge.getEndPoint().getPoint())) {
+              return;
+            }
+          }
+        } else {
+          throw new IllegalStateException
+            ("Unknown node type: " + node.getClass().getName() + "!");
+        }
+        doMoveEdge(mOrigEdge, node, mIsSource, anchor);
       }
-      final Command move =
-        new MoveEdgeCommand(ControlledSurface.this,
-                            mOrigEdge, node, mIsSource, anchor);
-      mRoot.getUndoInterface().executeCommand(move);
     }
 
     //#######################################################################
     //# Highlighting
     int getHighlightPriority(final ProxySubject item)
     {
+      final int prio;
       if (item instanceof SimpleNodeSubject) {
-        return 2;
+        prio = 2;
       } else if (item instanceof GroupNodeSubject &&
                  (mIsSource || !getGraph().isDeterministic())) {
-        return 1;
+        prio = 1;
       } else {
         return -1;
+      }
+      if (item == mSource && !mCanCreateSelfloop) {
+        return -1;
+      } else {
+        return prio;
       }
     }
 
     //#######################################################################
+    //# Auxiliary Methods
+    void createCopiedEdge()
+    {
+      if (mCopiedEdge == null) {
+        if (mSource != null) {
+          mOrigEdge = new EdgeSubject(mSource, null);
+          mCopiedEdge = mSecondaryGraph.addEdge(mOrigEdge);
+          mSelectedObjects =
+            Collections.singletonList((ProxySubject) mOrigEdge);
+        } else { 
+          mCopiedEdge = (EdgeSubject) mSecondaryGraph.getCopy(mOrigEdge);
+          GeometryTools.createDefaultGeometry(mCopiedEdge);
+        }
+      }
+    }
+
+
+    //#######################################################################
     //# Data Members
+    /**
+     * When creating an edge, its source node; otherwise <CODE>null</CODE>.
+     */
+    private final NodeSubject mSource;
+    /**
+     * When creating an edge, its start point; otherwise <CODE>null</CODE>.
+     */
+    private final Point2D mAnchor;
+    /**
+     * <CODE>true</CODE> when the start point of an edge is being dragged;
+     * <CODE>false</CODE> when dragging the end point.
+     */
     private final boolean mIsSource;
-    private final EdgeSubject mOrigEdge;
+    /**
+     * The edge in the original graph worked upon by this action.
+     */
+    private EdgeSubject mOrigEdge;
+    /**
+     * The copy of the edge worked upon in the secondary graph.
+     */
     private EdgeSubject mCopiedEdge;
+    /**
+     * Whether this action can create a selfloop edge. To create a new
+     * selfloop, the user must drag away from the source node, and then
+     * back onto it. This is to avoid accidental selfloops by erratic
+     * clicking.
+     */
+    private boolean mCanCreateSelfloop;
 
   }
 

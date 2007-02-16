@@ -1,11 +1,12 @@
-
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: waters.gui
+//# PROJECT: Waters GUI
+//# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorOptions
 //###########################################################################
-//# $Id: EditorOptions.java,v 1.8 2007-01-29 16:04:25 flordal Exp $
+//# $Id: EditorOptions.java,v 1.9 2007-02-16 03:00:42 robi Exp $
 //###########################################################################
+
 package net.sourceforge.waters.gui;
 
 import javax.swing.*;
@@ -14,9 +15,9 @@ import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.*;
-import net.sourceforge.waters.gui.renderer.EdgeProxyShape;
+
 import org.supremica.properties.Config;
-import uk.ac.ic.doc.scenebeans.Circle;
+
 
 public class EditorOptions
     extends JDialog
@@ -217,7 +218,6 @@ public class EditorOptions
                 JRadioButton b = (JRadioButton) e.getSource();
                 
                 Config.GUI_EDITOR_EDGEARROW_AT_END.set(!b.isSelected());
-                //EdgeProxyShape.setArrowAtEnd(!b.isSelected());
                 r.repaint();
             }
         });

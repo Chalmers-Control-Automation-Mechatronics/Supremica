@@ -4,359 +4,238 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   EdgeProxyShape
 //###########################################################################
-//# $Id: EdgeProxyShape.java,v 1.13 2007-02-12 21:38:49 robi Exp $
+//# $Id: EdgeProxyShape.java,v 1.14 2007-02-16 03:00:42 robi Exp $
 //###########################################################################
-
 
 package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.Shape;
-import java.awt.geom.Arc2D;
 import java.awt.geom.GeneralPath;
-import java.awt.geom.FlatteningPathIterator;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.QuadCurve2D;
-import java.awt.geom.Rectangle2D;
-import java.util.List;
 import java.util.ArrayList;
-    
-import net.sourceforge.waters.gui.ModuleWindow;
+import java.util.List;
+   
 import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 import org.supremica.properties.Config;
 
 
-public abstract class EdgeProxyShape
-    extends AbstractProxyShape
+abstract class EdgeProxyShape
+  extends AbstractProxyShape
 {
-    protected EdgeProxyShape(EdgeProxy edge)
-    {
-      super(edge);
-      mTurn = GeometryTools.getHandlePoint1(edge);
-      mStart = GeometryTools.getStartPoint(edge);
-      mEnd = GeometryTools.getEndPoint(edge);
-      mHandles = new ArrayList<Handle>(2);
+
+  //#########################################################################
+  //# Constructors
+  EdgeProxyShape(final EdgeProxy edge)
+  {
+    super(edge);
+    mHandles = new ArrayList<Handle>(2);
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  /**
+   * Gets the start point of this edge.
+   * This method returns the actual start point, i.e., the point on the
+   * periphery of the source node where the edge starts. It coincides
+   * with the location of the SOURCE handle.
+   */
+  abstract Point2D getStartPoint();
+
+  /**
+   * Gets the end point of this edge.
+   * This method returns the actual end point, i.e., the point on the
+   * periphery of the target node where the edge ends. It coincides
+   * with the location of the TARGET handle.
+   */
+  abstract Point2D getEndPoint();
+
+  /**
+   * Gets the turning point of this edge.
+   * The morning point is a point about half-way on the edge.
+   */
+  abstract Point2D getTurningPoint();
+
+  /**
+   * Gets the curve shape for this edge.
+   * The full shape is obtained by adding an arrow.
+   */
+  abstract Shape getCurve();
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.renderer.RendererShape
+  public Shape getShape()
+  {
+    if (mShape == null) {
+      final Shape curve = getCurve();
+      final Shape arrow = getArrowHead();
+      mShape = new GeneralPath(GeneralPath.WIND_NON_ZERO, 2);
+      mShape.append(curve, false);
+      mShape.append(arrow, false);
     }
-    
-    public List<Handle> getHandles()
-    {
-        return mHandles;
+    return mShape;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.renderer.ProxyShape
+  public List<Handle> getHandles()
+  {
+    return mHandles;
+  }
+
+
+  //#########################################################################
+  //# Drawing
+  public void draw(final Graphics2D g2d, final RenderingInformation status)
+  {
+    super.draw(g2d, status);
+    final Shape arrow = getArrowHead();
+    g2d.setStroke(BASICSTROKE);
+    g2d.setColor(status.getColor());
+    g2d.fill(arrow);
+  }
+
+  Shape getArrowHead()
+  {
+    if (mArrowHead == null) {
+      if (Config.GUI_EDITOR_EDGEARROW_AT_END.get()) {
+        final Point2D tip = getEndPoint();
+        final Point2D dir = getEndDirection();
+        mArrowHead = createArrowHead(tip, dir);
+      } else {
+        final Point2D tip = getInnerArrowTipPoint();
+        final Point2D dir = getMidDirection();
+        mArrowHead = createArrowHead(tip, dir);
+      }
     }
-    
-    public Point2D getTurningPoint()
-    {
-        return mTurn;
+    return mArrowHead;
+  }
+
+  static GeneralPath createArrowHead(final Point2D tip, final Point2D dir)
+  {
+    final double dx = -ARROW_SIDE * dir.getX();
+    final double dy = -ARROW_SIDE * dir.getY();
+    final double x0 = tip.getX();
+    final double y0 = tip.getY();
+    final double x1 = x0 + dx * ARROW_COS - dy * ARROW_SIN;
+    final double y1 = y0 + dx * ARROW_SIN + dy * ARROW_COS;
+    final double x2 = x0 + dx * ARROW_COS + dy * ARROW_SIN;
+    final double y2 = y0 - dx * ARROW_SIN + dy * ARROW_COS;
+    final GeneralPath path = new GeneralPath(GeneralPath.WIND_NON_ZERO, 3);
+    path.append(new Line2D.Double(x0, y0, x1, y1), false);
+    path.append(new Line2D.Double(x1, y1, x2, y2), true);
+    path.closePath();
+    return path;
+  }
+
+
+  //#########################################################################
+  //# Auxliary Methods
+  /**
+   * Gets the middle of this edge. This simply is the middle between the
+   * start and end points. It may or may not actually be on the edge.
+   */
+  Point2D getMidPoint()
+  {
+    final Point2D start = getStartPoint();
+    final Point2D end = getEndPoint();
+    return GeometryTools.getMidPoint(start, end);
+  }
+
+  /**
+   * Gets the position of the arrow tip if it is rendered on the centre
+   * of the curve as opposed to its end. This is usually the turning
+   * point, but subclasses may override.
+   */
+  Point2D getInnerArrowTipPoint()
+  {
+    return getTurningPoint();
+  }
+
+  /**
+   * Gets the normalized direction vector of the edge at its turning
+   * point. This is used to render the arrow if it is rendered on the
+   * centre of the curve as opposed to its end.
+   */
+  Point2D getMidDirection()
+  {
+    final Point2D start = getStartPoint();
+    final Point2D end = getEndPoint();
+    return GeometryTools.getNormalizedDirection(start, end);
+  }
+
+  /**
+   * Gets the normalized direction vector of the edge at its end
+   * point. This is used to render the arrow if it is rendered at the end
+   * of the curve.
+   */
+  Point2D getEndDirection()
+  {
+    return getMidDirection();
+  }
+
+  void createHandles()
+  {
+    final Point2D start = getStartPoint();
+    createHandle(start, Handle.HandleType.SOURCE);
+    final Point2D end = getEndPoint();
+    createHandle(end, Handle.HandleType.TARGET);
+  }
+
+  void createHandle(final Point2D point, final Handle.HandleType type)
+  {
+    final Handle handle = new DefaultHandle(point, type);
+    mHandles.add(handle);    
+  }
+
+  boolean isInClickBounds(final int x, final int y)
+  {
+    if (mClickBounds == null) {
+      final Shape shape = getShape();
+      mClickBounds = shape.getBounds();
+      mClickBounds.x -= CLICK_TOLERANCE;
+      mClickBounds.y -= CLICK_TOLERANCE;
+      mClickBounds.width += 2 * CLICK_TOLERANCE;
+      mClickBounds.height += 2 * CLICK_TOLERANCE;
     }
-    
-    public Point2D getStartPoint()
-    {
-        return mStart;
-    }
-    
-    public Point2D getEndPoint()
-    {
-        return mEnd;
-    }
-    
-    public EdgeProxy getProxy()
-    {
-        return (EdgeProxy) super.getProxy();
-    }
-    
-    public void draw(Graphics2D g, RenderingInformation status)
-    {
-        super.draw(g, status);
-        g.setStroke(BASICSTROKE);
-        g.setColor(status.getColor());
-        if (Config.GUI_EDITOR_EDGEARROW_AT_END.get())
-        {
-            // The direction of the arrow calculated from two
-            // coordinate pairs. Per default startpoint to endpoint,
-            // but the start, (x1, y1), needs to be changed if the
-            // line is curved...
-            double x1 = mStart.getX(); // Default
-            double y1 = mStart.getY(); // Default
-            double x2 = mEnd.getX();
-            double y2 = mEnd.getY();
-            
-            // Need to find the real direction of the line when it
-            // reaches the endpoint...
-            
-            // Get the shape of the line
-            Shape curve = getShape();
-            
-            // Find the coordinate of the second-to-last segment of the curve
-            FlatteningPathIterator it =
-                new FlatteningPathIterator(curve.getPathIterator(new AffineTransform()), 0.05);
-            while (!it.isDone())
-            {
-                double[] segment = new double[6];
-                int type = it.currentSegment(segment);
-                it.next();
-                
-                // If there is another one (the last one?) take the current one!
-                if (!it.isDone())
-                {
-                    x1 = segment[0];
-                    y1 = segment[1];
-                }
-            }
-            
-            // Draw arrow, pointing in the direction given by (x1,y1),
-            // (x2,y2), at a distance SimpleNodeProxyShape.RADIUS from
-            // the end point!
-            drawArrow(x1, y1, x2, y2, SimpleNodeProxyShape.RADIUS, g);
-        }
-        else
-        {
-            double dx = Math.sin(arrowAngle()) * 4.5;
-            double dy = Math.cos(arrowAngle()) * 4.5;
-            drawArrow((int)(mTurn.getX() - dx), (int)(mTurn.getY() - dy), arrowAngle(), g);
-        }
-    }
-    
-    protected abstract double arrowAngle();
-    
-    /**
-     * Draws an arrow with its point {@code distance} away from (x2, y2) pointing in the direction indicated
-     * by the two points (x1, y1) and (x2, y2).
-     */
-    private static void drawArrow(double x1, double y1, double x2, double y2, int distance, Graphics2D g2d)
-    {
-        //Find angle!
-        double theta;
-        if (y1 == y2)
-        {
-            theta = Math.PI / 2.0;
-            
-            if (x1 < x2)
-            {
-                theta *= -1;
-            }
-        }
-        else
-        {
-            theta = Math.atan((double) (x1 - x2) / (double) (y1 - y2));
-        }
-        // Did arctan give the correct angle or should we add 180 degrees?
-        if (y1 < y2)
-        {
-            theta += Math.PI;
-        }
-        
-        // Find position!
-        int posX = (int) Math.round(x2 + Math.sin(theta)*distance);
-        int posY = (int) Math.round(y2 + Math.cos(theta)*distance);
-        
-        // Draw arrow!
-        drawArrow(posX, posY, theta, g2d);
-    }
-    
-    /**
-     * Draws on g2d an arrow with its point in (x, y), pointing in the angle theta.
-     */
-    public static void drawArrow(int x, int y, double theta, Graphics2D g2d)
-    {
-        // Arrays of coordinates for the corners
-        int[] xcoords = new int[3];
-        int[] ycoords = new int[3];
-        
-        // Draw arrow, the first pair of coordinates is the point
-        xcoords[0] = x;
-        ycoords[0] = y;
-        xcoords[1] = xcoords[0] + (int) Math.round(ARROWSIDE * Math.sin(theta - ARROWANGLEWIDTH/2.0));
-        ycoords[1] = ycoords[0] + (int) Math.round(ARROWSIDE * Math.cos(theta - ARROWANGLEWIDTH/2.0));
-        xcoords[2] = xcoords[0] + (int) Math.round(ARROWSIDE * Math.cos(Math.PI / 2.0 - (theta + ARROWANGLEWIDTH/2.0)));
-        ycoords[2] = ycoords[0] + (int) Math.round(ARROWSIDE * Math.sin(Math.PI / 2.0 - (theta + ARROWANGLEWIDTH/2.0)));
-        
-        // Do the drawing!
-        g2d.drawPolygon(xcoords, ycoords, 3);
-        g2d.fillPolygon(xcoords, ycoords, 3);
-    }
-    
-    public static class QuadCurve
-        extends EdgeProxyShape
-    {
-        public QuadCurve(EdgeProxy e)
-        {
-            super(e);
-            Point2D p1 = getStartPoint();
-            Point2D p2 = getEndPoint();
-            Point2D c = getTurningPoint();
-            double r = SimpleNodeProxyShape.RADIUS;
-            QuadCurve2D curve = new QuadCurve2D.Double(p1.getX(), p1.getY(), c.getX(),
-                c.getY(), p2.getX(), p2.getY());
-            // set quadcurve to be on edge of node
-            if (e.getSource() instanceof SimpleNodeProxy)
-            {
-                if (p1.equals(((SimpleNodeProxy)e.getSource()).getPointGeometry().getPoint()))
-                {
-                    p1 = GeometryTools.getRadialPoint(GeometryTools.getControlPoint(curve)
-                    , p1, r);
-                }
-            }
-            if (e.getTarget() instanceof SimpleNodeProxy)
-            {
-                if (p2.equals(((SimpleNodeProxy)e.getTarget()).getPointGeometry().getPoint()))
-                {
-                    p2 = GeometryTools.getRadialPoint(GeometryTools.getControlPoint(curve)
-                    , p2, r);
-                }
-            }
-            mCurve = new QuadCurve2D.Double(p1.getX(), p1.getY(), c.getX(),
-                c.getY(), p2.getX(), p2.getY());
-            mCurve.setCurve(p1, convertToControl(c, mCurve), p2);
-            // change to control point
-            mHandles.add(new DefaultHandle(p1, Handle.HandleType.SOURCE));
-            mHandles.add(new DefaultHandle(p2, Handle.HandleType.TARGET));
-        }
-        
-        public QuadCurve2D getShape()
-        {
-            return mCurve;
-        }
-        
-        public boolean isClicked(int ex, int ey)
-        {
-            for (Handle h : getHandles())
-            {
-                if (h.isClicked(ex, ey))
-                {
-                    return true;
-                }
-            }
-            Rectangle2D rect = new Rectangle2D.Double(ex - 2, ey - 2, 4, 4);
-            QuadCurve2D q1 = new QuadCurve2D.Double();
-            QuadCurve2D q2 = new QuadCurve2D.Double();
-            QuadCurve2D.subdivide(getShape(), q1, q2);
-            return ((q1.intersects(rect) || q2.intersects(rect)) &&
-                getShape().intersects(rect) && !getShape().contains(rect));
-        }
-        
-        public static Point2D convertToControl(Point2D p, QuadCurve2D q)
-        {
-            return new Point2D.Double(convertToControl(q.getX1(), q.getX2(), p.getX()),
-                convertToControl(q.getY1(), q.getY2(), p.getY()));
-        }
-        
-        public static Point2D convertToTurn(Point2D p, QuadCurve2D q)
-        {
-            return new Point2D.Double(convertToTurn(q.getX1(), q.getX2(), p.getX()),
-                convertToTurn(q.getY1(), q.getY2(), p.getY()));
-        }
-        
-        private static double convertToControl(double start, double end, double center)
-        {
-            return (2 * center - (start + end) / 2);
-        }
-        
-        private static double convertToTurn(double start, double end, double center)
-        {
-            return .25 * (start + 2 * center + end);
-        }
-        
-        protected double arrowAngle()
-        {
-            Point2D p1 = mCurve.getP1();
-            Point2D p2 = mCurve.getP2();
-            return -(Math.atan2(p2.getY() - p1.getY(), p2.getX() - p1.getX())
-            + Math.PI / 2);
-        }
-        
-        private final QuadCurve2D mCurve;
-    }
-    
-    public static class Tear
-        extends EdgeProxyShape
-    {
-        public Tear(EdgeProxy e)
-        {
-            super(e);
-            Point2D p = getStartPoint();
-            Point2D c = getTurningPoint();
-            double dist = (double) Math.sqrt(Math.pow(c.getX() - p.getX(), 2) +
-                Math.pow(c.getY() - p.getY(), 2));
-            double r = (dist * (1 -TEARRATIO)) / 2;
-            double theta = Math.atan2(c.getY() - p.getY(), c.getX() - p.getX());
-            Rectangle2D rect = new Rectangle2D.Double(Math.cos(theta) * (dist - r) + p.getX() - r,
-                Math.sin(theta) * (dist - r) + p.getY() - r,
-                r * 2, r * 2);
-            Arc2D arc = new Arc2D.Double(rect, -(Math.toDegrees(theta) + ARCEXTENT/2),
-                ARCEXTENT, Arc2D.OPEN);
-            // different r for setting up where the handle is positioned
-            r = SimpleNodeProxyShape.RADIUS;
-            Point2D p1;
-            Point2D p2;
-            if (e.getSource() instanceof  SimpleNodeProxy)
-            {
-                p1 = GeometryTools.getRadialPoint(arc.getStartPoint(), p, r);
-            }
-            else
-            {
-                p1 = p;
-            }
-            if (e.getTarget() instanceof  SimpleNodeProxy)
-            {
-                p2 = GeometryTools.getRadialPoint(arc.getEndPoint(), p, r);
-            }
-            else
-            {
-                p2 = p;
-            }
-            Line2D line1 = new Line2D.Double(p1, arc.getStartPoint());
-            Line2D line2 = new Line2D.Double(arc.getEndPoint(), p2);
-            mCurve = new GeneralPath(GeneralPath.WIND_NON_ZERO, 3);
-            mCurve.append(line1, false);
-            mCurve.append(arc , true);
-            mCurve.append(line2, true);
-            mCurve.closePath();
-            mHandles.add(new DefaultHandle(p1, Handle.HandleType.SOURCE));
-            mHandles.add(new DefaultHandle(p2, Handle.HandleType.TARGET));
-        }
-        
-        public GeneralPath getShape()
-        {
-            return mCurve;
-        }
-        
-        public boolean isClicked(int ex, int ey)
-        {
-            for (Handle h : getHandles())
-            {
-                if (h.isClicked(ex, ey))
-                {
-                    return true;
-                }
-            }
-            Rectangle2D rect = new Rectangle2D.Double(ex - 2, ey - 2, 4, 4);
-            return (getShape().intersects(rect) && !getShape().contains(rect));
-        }
-        
-        protected double arrowAngle()
-        {
-            Point2D p1 = getTurningPoint();
-            Point2D p2 = getEndPoint();
-            return -Math.atan2(p2.getY() - p1.getY(), p2.getX() - p1.getX());
-        }
-        
-        public static double TEARRATIO = 0.25;
-        public static double ARCEXTENT = 225;
-        
-        private final GeneralPath mCurve;
-    }
-    
-    /** The length of the side of the arrow. */
-    public static final int ARROWSIDE = 8;
-    /** The width of the point of the arrow, in radians. */
-    public static final double ARROWANGLEWIDTH = Math.PI / 3.5;
-    
-    protected final List<Handle> mHandles;
-    private final Point2D mTurn;
-    private final Point2D mStart;
-    private final Point2D mEnd;
-    
+    return
+      x >= mClickBounds.x && x <= mClickBounds.x + mClickBounds.width &&
+      y >= mClickBounds.y && y <= mClickBounds.y + mClickBounds.height;
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final List<Handle> mHandles;
+  private GeneralPath mShape;
+  private GeneralPath mArrowHead;
+  private Rectangle mClickBounds = null;
+
+
+  //#########################################################################
+  //# Class Constants
+  /**
+   * The width of the point of the arrow, in radians.
+   */
+  static final double ARROW_ANGLE = 0.3 * Math.PI;
+  static final double ARROW_SIN = Math.sin(0.5 * ARROW_ANGLE);
+  static final double ARROW_COS = Math.cos(0.5 * ARROW_ANGLE);
+  /**
+   * The height of the arrow, i.e., the distance it covers on the line.
+   */
+  static final double ARROW_HEIGHT = 8.0;
+  /**
+   * The length of the side of the arrow.
+   */
+  static final double ARROW_SIDE = ARROW_HEIGHT / ARROW_COS;
+
+  static final int CLICK_TOLERANCE = 2;
+  static final int CLICK_TOLERANCE2 = CLICK_TOLERANCE * CLICK_TOLERANCE;
+
 }

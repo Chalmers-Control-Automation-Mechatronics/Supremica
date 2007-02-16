@@ -10,6 +10,7 @@ import java.awt.geom.Point2D;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,10 +54,9 @@ public class SimpleNodeProxyShape
         }
         
         // Draw initial state arrow
-        g.setColor(status.getColor());
-        if (isInitial)
-        {
-            mHandles.get(0).draw(g, status);
+	for (final Handle handle : mHandles) {
+	  g.setColor(status.getColor());
+	  handle.draw(g, status);
         }
         
         // Draw the basic shape (the outline)
@@ -122,25 +122,17 @@ public class SimpleNodeProxyShape
     public SimpleNodeProxyShape(SimpleNodeProxy proxy, ModuleProxy module)
     {
         super(proxy);
-        mHandles = new ArrayList<Handle>(1);
         mModule = module;
         Point2D p = getProxy().getPointGeometry().getPoint();
         Rectangle2D rect = new Rectangle2D.Double(p.getX() - RADIUS, p.getY() - RADIUS,
             WIDTH, WIDTH);
         mShape = new Arc2D.Double(rect, 0, 360, Arc2D.OPEN);
-        isInitial = getProxy().isInitial();
-        if (proxy.getInitialArrowGeometry() != null)
-        {
-            mArrow = getProxy().getInitialArrowGeometry().getPoint();
-        }
-        else
-        {
-            mArrow = new Point(-5, -5); // Why 5?
-        }
-        if (isInitial)
-        {
-            mHandles.add(new InitialStateHandle(Math.atan2(mArrow.getY(), mArrow.getX()), p, RADIUS));
-        }
+        if (proxy.isInitial()) {
+	  final Handle handle = new InitialStateHandle(proxy);
+	  mHandles = Collections.singletonList(handle);
+        } else {
+	  mHandles = Collections.emptyList();
+	}
     }
     
     public Arc2D getShape()
@@ -158,15 +150,13 @@ public class SimpleNodeProxyShape
         return mHandles;
     }
     
-    private List<Handle> mHandles;
+    private final List<Handle> mHandles;
     private Collection<Color> mColors = new ArrayList<Color>();
     private final ModuleProxy mModule;
     private final Arc2D mShape;
-    private final boolean isInitial;
-    private final Point2D mArrow;
     
-    public static int INITIALOFFSET = 15;
     public static int RADIUS = 6;
     public static int WIDTH = RADIUS * 2;
     private static Color FILLCOLOR = Color.WHITE;
+
 }

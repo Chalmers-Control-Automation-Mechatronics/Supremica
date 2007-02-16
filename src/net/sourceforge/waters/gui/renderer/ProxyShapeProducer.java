@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   ProxyShapeProducer
 //###########################################################################
-//# $Id: ProxyShapeProducer.java,v 1.17 2007-02-13 04:22:01 robi Exp $
+//# $Id: ProxyShapeProducer.java,v 1.18 2007-02-16 03:00:42 robi Exp $
 //###########################################################################
 
 
@@ -72,25 +72,24 @@ public class ProxyShapeProducer
         return s;
     }
     
-  public EdgeProxyShape visitEdgeProxy(final EdgeProxy e)
+  public EdgeProxyShape visitEdgeProxy(final EdgeProxy edge)
   {
-    EdgeProxyShape shape = (EdgeProxyShape) mMap.get(e);
+    EdgeProxyShape shape = (EdgeProxyShape) mMap.get(edge);
     if (shape == null) {
-      final Point2D start = GeometryTools.getStartPoint(e);
-      final Point2D end = GeometryTools.getEndPoint(e);
-      if (start.equals(end)) {
-	shape = new EdgeProxyShape.Tear(e);
+      if (GeometryTools.isSelfloop(edge)) {
+        shape = new TieEdgeProxyShape(edge);
+      } else if (edge.getGeometry() == null) {
+        shape = new StraightEdgeProxyShape(edge);
       } else {
-	shape = new EdgeProxyShape.QuadCurve(e);
+        shape = new QuadraticEdgeProxyShape(edge);
       }
-      mMap.put(e, shape);
+      mMap.put(edge, shape);
     }
 
-        LabelBlockProxy l = e.getLabelBlock();
+        LabelBlockProxy l = edge.getLabelBlock();
         LabelBlockProxyShape s = (LabelBlockProxyShape)mMap.get(l);
         if (s == null)
         {
-            EdgeProxyShape edge = (EdgeProxyShape)mMap.get(e);
             int height = 1;
             int width = 0;
             int x;
@@ -105,8 +104,8 @@ public class ProxyShapeProducer
                 x = LabelBlockProxyShape.DEFAULTOFFSETX;
                 y = LabelBlockProxyShape.DEFAULTOFFSETY;
             }
-            x += edge.getTurningPoint().getX();
-            y += edge.getTurningPoint().getY();
+            x += shape.getTurningPoint().getX();
+            y += shape.getTurningPoint().getY();
             for (Proxy p : l.getEventList())
             {
                 // Use different font for different event kinds.
@@ -146,13 +145,11 @@ public class ProxyShapeProducer
             mMap.put(l, s);
         }
         
-        GuardActionBlockProxy GA = e.getGuardActionBlock();
+        GuardActionBlockProxy GA = edge.getGuardActionBlock();
         GuardActionBlockProxyShape GAShape = (GuardActionBlockProxyShape) mMap.get(GA);
         if(GAShape==null && GA != null) 
         {
             double x, y;
-            //get the edge
-            EdgeProxyShape edgeProxyShape = (EdgeProxyShape) mMap.get(e);
             
             //find out offset
             if(GA.getGeometry() == null)
@@ -160,13 +157,13 @@ public class ProxyShapeProducer
                 LabelGeometrySubject offset =
                     new LabelGeometrySubject
                     (new Point(GuardActionBlockProxyShape.DEFAULTOFFSETX,
-                    (int) (l.getGeometry().getOffset().getY() + s.getShape().getHeight())));
-                ((EdgeSubject) e).getGuardActionBlock().setGeometry(offset);
+                    (int) (l.getGeometry().getOffset().getY() + s.getHeight())));
+                ((EdgeSubject) edge).getGuardActionBlock().setGeometry(offset);
             }
             x = GA.getGeometry().getOffset().getX();
             y = GA.getGeometry().getOffset().getY();
-            x += edgeProxyShape.getTurningPoint().getX();
-            y += edgeProxyShape.getTurningPoint().getY();
+            x += shape.getTurningPoint().getX();
+            y += shape.getTurningPoint().getY();
             
             //create content
             int width = 0;

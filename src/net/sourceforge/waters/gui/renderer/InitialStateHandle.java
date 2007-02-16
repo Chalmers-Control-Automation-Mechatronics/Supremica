@@ -1,3 +1,12 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.gui.renderer
+//# CLASS:   InitialStateHandle
+//###########################################################################
+//# $Id: InitialStateHandle.java,v 1.8 2007-02-16 03:00:42 robi Exp $
+//###########################################################################
+
 package net.sourceforge.waters.gui.renderer;
 
 import java.awt.geom.Point2D;
@@ -5,71 +14,80 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.Graphics2D;
 
-public class InitialStateHandle
-    extends AbstractRendererShape
-    implements Handle
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import net.sourceforge.waters.model.module.PointGeometryProxy;
+
+
+class InitialStateHandle
+  extends AbstractRendererShape
+  implements Handle
 {
-    private final GeneralPath mShape;
     
-    public InitialStateHandle(double arrowAngle, Point2D point, int radius)
-    {
-        mShape = new GeneralPath(GeneralPath.WIND_NON_ZERO, 2);
-        double borderX = point.getX() + ((radius+4) * Math.cos(arrowAngle));
-        double borderY = point.getY() + ((radius+4) * Math.sin(arrowAngle));
-        double outerX = borderX + (INITARROWLENGTH * Math.cos(arrowAngle));
-        double outerY = borderY + (INITARROWLENGTH * Math.sin(arrowAngle));
-        mShape.append(new Line2D.Double(outerX, outerY, borderX, borderY), false);
-        double x = point.getX() + Math.cos(arrowAngle)*radius;
-        double y = point.getY() + Math.sin(arrowAngle)*radius;
-        mShape.append(createArrow(x, y, arrowAngle), false);
+  //#########################################################################
+  //# Constructors
+  public InitialStateHandle(final SimpleNodeProxy node)
+  {
+    final PointGeometryProxy geo = node.getInitialArrowGeometry();
+    double dx = -1.0;
+    double dy = -1.0;
+    if (geo != null) {
+      final Point2D dir = geo.getPoint();
+      final double dirx = dir.getX();
+      final double diry = dir.getY();
+      final double len = Math.sqrt(dirx * dirx + diry * diry);
+      if (len > GeometryTools.EPSILON) {
+	dx = dirx / len;
+	dy = diry / len;
+      }
     }
+    final Point2D normdir = new Point2D.Double(dx, dy);
+    final Point2D border = GeometryTools.getRadialPoint(node, normdir);
+    final double x = border.getX() + INITARROW_LENGTH * dx;
+    final double y = border.getY() + INITARROW_LENGTH * dy;
+    final Point2D outer = new Point2D.Double(x, y);
+    final Line2D line = new Line2D.Double(outer, border);
+    normdir.setLocation(-dx, -dy);
+    final GeneralPath arrow = EdgeProxyShape.createArrowHead(border, normdir);
+    mShape = new GeneralPath(GeneralPath.WIND_NON_ZERO, 2);
+    mShape.append(line, false);
+    mShape.append(arrow, false);
+  }
+
     
-    private static GeneralPath createArrow(double x, double y, double theta)
-    {
-        int length = EdgeProxyShape.ARROWSIDE;       // Same as edge arrows
-        double phi = EdgeProxyShape.ARROWANGLEWIDTH; // Same as edge arrows
-        double[] xcoords = new double[3];
-        double[] ycoords = new double[3];
-        
-        // Arrow polygon, the first pair of coordinates is the point
-        xcoords[0] = x;
-        ycoords[0] = y;
-        xcoords[1] = xcoords[0] + length * Math.cos(theta - phi/2.0);
-        ycoords[1] = ycoords[0] + length * Math.sin(theta - phi/2.0);
-        xcoords[2] = xcoords[0] + length * Math.cos(theta + phi/2.0);
-        ycoords[2] = ycoords[0] + length * Math.sin(theta + phi/2.0);
-        GeneralPath arrow = new GeneralPath(GeneralPath.WIND_NON_ZERO, 3);
-        arrow.append(new Line2D.Double(xcoords[0], ycoords[0],
-            xcoords[1], ycoords[1]), false);
-        arrow.append(new Line2D.Double(xcoords[1], ycoords[1],
-            xcoords[2], ycoords[2]), true);
-        arrow.append(new Line2D.Double(xcoords[2], ycoords[2],
-            xcoords[0], ycoords[0]), true);
-        return arrow;
-    }
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.renderer.InitialStateHandle
+  public HandleType getType()
+  {
+    return HandleType.INITIAL;
+  }
+  
+  
+  //#########################################################################
+  //# Drawing
+  public GeneralPath getShape()
+  {
+    return mShape;
+  }
     
-    public GeneralPath getShape()
-    {
-        return mShape;
-    }
+  public void draw(final Graphics2D g2d, final RenderingInformation status)
+  {
+    super.draw(g2d, status);
+    g2d.fill(getShape());
+  }
     
-    public HandleType getType()
-    {
-        return HandleType.INITIAL;
-    }
+  public boolean isClicked(final int x, final int y)
+  {
+    return mShape.intersects(x - 1, y - 1, 2, 2);
+  }
     
-    public void draw(Graphics2D g, RenderingInformation status)
-    {
-        super.draw(g, status);
-        g.fill(getShape());
-    }
-    
-    public boolean isClicked(int x, int y)
-    {
-        //System.err.println("Point: " + x + ", " + y);
-        //System.err.println("Shape: " + mShape);
-        return mShape.intersects(x - 1, y - 1, 2, 2);
-    }
-    
-    private static final double INITARROWLENGTH = 12;
+
+  //#########################################################################
+  //# Data Members
+  private final GeneralPath mShape;
+
+
+  //#########################################################################
+  //# Class Constants
+  static final double INITARROW_LENGTH = 18.0;
+
 }

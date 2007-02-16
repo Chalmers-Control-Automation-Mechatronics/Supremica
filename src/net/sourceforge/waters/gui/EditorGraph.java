@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorGraph
 //###########################################################################
-//# $Id: EditorGraph.java,v 1.15 2007-02-12 21:38:49 robi Exp $
+//# $Id: EditorGraph.java,v 1.16 2007-02-16 03:00:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -290,16 +290,32 @@ public class EditorGraph
 		return new Point2D.Double(r.getCenterX(), r.getCenterY());
 	}
 
-  private void addEdge(EdgeSubject e)
+  /**
+   * Creates a copy of the given edge and adds it to this graph.
+   * @param  edge0   The egde in the original graph a copy of which
+   *                 is to be added.
+   */
+  EdgeSubject addEdge(final EdgeSubject edge0)
   {
-    final EdgeSubject edge = e.clone();
-    edge.setSource((NodeSubject) mOriginalMap.get(e.getSource()));
-    edge.setTarget((NodeSubject) mOriginalMap.get(e.getTarget()));
-    mEdges.add(edge);
-    mObserverMap.get(edge.getSource()).addEdge(edge);
-    mObserverMap.get(edge.getTarget()).addEdge(edge);
-    mFakeMap.put(edge, e);
-    mOriginalMap.put(e, edge);
+    final EdgeSubject edge1 = edge0.clone();
+    final NodeSubject source0 = edge0.getSource();
+    final NodeSubject target0 = edge0.getTarget();
+    if (source0 != null) {
+      final NodeSubject source1 = (NodeSubject) mOriginalMap.get(source0);
+      edge1.setSource(source1);
+      final EditorNode node = mObserverMap.get(source1);
+      node.addEdge(edge1);
+    }
+    if (target0 != null) {
+      final NodeSubject target1 = (NodeSubject) mOriginalMap.get(target0);
+      edge1.setTarget(target1);
+      final EditorNode node = mObserverMap.get(target1);
+      node.addEdge(edge1);
+    }
+    mEdges.add(edge1);
+    mFakeMap.put(edge1, edge0);
+    mOriginalMap.put(edge0, edge1);
+    return edge1;
   }
   
   private void removeEdge(EdgeSubject e)
@@ -470,9 +486,9 @@ public class EditorGraph
                       final double dy)
   {
     final EdgeSubject edge1 = (EdgeSubject) getCopy(edge0);
-    final Point2D point = GeometryTools.getHandlePoint1(edge0);
+    final Point2D point = GeometryTools.getTurningPoint1(edge0);
     point.setLocation(point.getX() + dx, point.getY() + dy);
-    GeometryTools.createMidGeometry(edge1, point);
+    GeometryTools.createMidGeometry(edge1, point, SplineKind.INTERPOLATING);
   }
 
   /**

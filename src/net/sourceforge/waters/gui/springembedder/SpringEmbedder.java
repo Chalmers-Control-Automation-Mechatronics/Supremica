@@ -4,38 +4,40 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.31 2007-02-14 23:22:01 robi Exp $
+//# $Id: SpringEmbedder.java,v 1.32 2007-02-16 03:00:42 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui.springembedder;
 
+import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.util.AbstractSet;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Collections;
 import javax.swing.SwingUtilities;
 
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.renderer.GeometryTools;
+import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.GroupNodeSubject;
+import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.subject.module.SplineGeometrySubject;
-import java.util.ArrayList;
-import net.sourceforge.waters.subject.module.LabelGeometrySubject;
-import java.awt.Point;
-import net.sourceforge.waters.subject.module.GroupNodeSubject;
-import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
+
+import net.sourceforge.waters.xsd.module.SplineKind;
 
 
 public class SpringEmbedder
@@ -610,7 +612,7 @@ public class SpringEmbedder
     //# Constructor
     private EdgeWrapper(final EdgeSubject edge)
     {
-      super(GeometryTools.getHandlePoint1(edge));
+      super(GeometryTools.getTurningPoint1(edge));
       mEdge = edge;
       final NodeSubject source = edge.getSource();
       mSource = mNodeMap.get(source);
@@ -694,7 +696,7 @@ public class SpringEmbedder
     void updateModel()
     {
       final Point2D point = getNewPoint();
-      GeometryTools.createMidGeometry(mEdge, point);
+      GeometryTools.createMidGeometry(mEdge, point, SplineKind.INTERPOLATING);
     }
 
 
