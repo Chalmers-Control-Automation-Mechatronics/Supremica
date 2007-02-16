@@ -2,6 +2,7 @@ package org.supremica.gui;
 
 import java.awt.*;
 import java.util.*;
+import javax.swing.JFrame;
 import org.supremica.gui.ide.IDEReportInterface;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Project;
@@ -48,7 +49,7 @@ public interface Gui
 	//public void addActions(Actions theActions);
 	//public void addControls(Controls theControls);
 	// Do we need this one?
-	Frame getFrame();
+	JFrame getFrame();
 
 	// this should be the main frame
 	VisualProjectContainer getVisualProjectContainer();

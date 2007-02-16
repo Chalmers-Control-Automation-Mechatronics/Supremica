@@ -1,6 +1,6 @@
 package org.supremica.gui.ide;
 
-import java.awt.Frame;
+import javax.swing.JFrame;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Automata;
 
@@ -15,7 +15,7 @@ public interface IDEReportInterface
 
 	void debug(String msg);
 
-	Frame getFrame();
+	JFrame getFrame();
 
 	boolean addAutomaton(Automaton theAutomaton);
 
