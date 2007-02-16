@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.67 2007-02-06 12:18:18 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.68 2007-02-16 00:11:38 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -85,7 +85,8 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 public class ModuleCompiler extends AbstractModuleProxyVisitor {
 
-  //##########################################################################
+ 
+//##########################################################################
   //# Constructors
   public ModuleCompiler(final DocumentManager manager,
                         final ProductDESProxyFactory desfactory,
@@ -97,7 +98,9 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
     mOperatorTable = CompilerOperatorTable.getInstance();
     mComparator = new ExpressionComparator();
     mDNFConverter =
-      new DNFConverter(mModuleFactory, mOperatorTable, mComparator);
+        new DNFConverter(mModuleFactory, mOperatorTable, mComparator);
+    mDNFMinimizer =
+        new DNFMinimizer(mDNFConverter, mOperatorTable);
     mModule = module;
     mContext = null;
     mParameterMap = null;
@@ -831,6 +834,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
           // then for each andClause in the guard expression.
           final SimpleExpressionProxy guard = collectGuard(path);
           final CompiledNormalForm dnf = mDNFConverter.convertToDNF(guard);
+          //final CompiledNormalForm mdnf = mDNFMinimizer.minimize(dnf);
           final Collection<CompiledClause> andClauses = dnf.getClauses();
           if (!andClauses.isEmpty()) {
             final List<SimpleExpressionProxy> sortedAndClauses =
@@ -2038,6 +2042,7 @@ private void updateTransitionsInAutomtata()
   private final CompilerOperatorTable mOperatorTable;
   private final Comparator<SimpleExpressionProxy> mComparator;
   private final DNFConverter mDNFConverter;
+  private final DNFMinimizer mDNFMinimizer;
   /*
    * Mappings needed for EFA with guards on shared variables.
    */

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompilerOperatorTable
 //###########################################################################
-//# $Id: CompilerOperatorTable.java,v 1.7 2006-11-17 03:38:22 robi Exp $
+//# $Id: CompilerOperatorTable.java,v 1.8 2007-02-16 00:11:38 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -51,6 +51,13 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
 
     mAndOperator = new BinaryAndOperator();
     mOrOperator= new BinaryOrOperator();
+    mEqualsOperator = new BinaryEqualsOperator();
+    mNotEqualsOperator = new BinaryNotEqualsOperator();
+    mGreaterThanOperator = new BinaryGreaterThanOperator();
+    mGreaterEqualsOperator = new BinaryGreaterEqualsOperator();
+    mLessThanOperator = new BinaryLessThanOperator();
+    mLessEqualsOperator = new BinaryLessEqualsOperator();
+    
     mNotOperator = new UnaryNotOperator();
     mAssignmentOperator = new BinaryAssignmentOperator();
     mIncrementOperator = new BinaryIncrementOperator();
@@ -65,6 +72,12 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
     store(mAndOperator);
     store(mOrOperator);
     store(mNotOperator);
+    store(mEqualsOperator);
+    store(mNotEqualsOperator);
+    store(mGreaterThanOperator);
+    store(mGreaterEqualsOperator);
+    store(mLessThanOperator);
+    store(mLessEqualsOperator);
     store(mAssignmentOperator);
     store(mIncrementOperator);
     store(mDecrementOperator);
@@ -106,6 +119,30 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   {
     return mNotOperator;
   }
+  
+  BinaryOperator getEqualsOperator() {
+	  return mEqualsOperator;
+  }
+  
+  BinaryOperator getNotEqualsOperator() {
+	  return mNotEqualsOperator;
+  }
+  
+  BinaryOperator getGreaterThanOperator() {
+	  return mGreaterThanOperator;
+  }
+  
+  BinaryOperator getGreaterEqualsOperator() {
+	  return mGreaterEqualsOperator;
+  }
+  
+  BinaryOperator getLessThanOperator() {
+	  return mLessThanOperator;
+  }
+  
+  BinaryOperator getLessEqualsOperator() {
+	  return mLessEqualsOperator;
+  }
 
   BinaryOperator getAssignmentOperator()
   {
@@ -125,6 +162,18 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   BinaryOperator getComplementaryOperator(final BinaryOperator op)
   {
     return mComplementMap.get(op);
+  }
+  
+  public boolean isNotEqualsOperator(BinaryOperator op) {
+		return (op instanceof BinaryNotEqualsOperator);
+  }
+  
+  public boolean isLessThanOperator(BinaryOperator op) {
+		return (op instanceof BinaryLessThanOperator);
+  }
+  
+  public boolean isLessEqualsOperator(BinaryOperator op) {
+		return (op instanceof BinaryLessEqualsOperator);
   }
 
 
@@ -1093,6 +1142,12 @@ public class CompilerOperatorTable extends AbstractOperatorTable {
   private final BinaryOperator mAndOperator;
   private final BinaryOperator mOrOperator;
   private final UnaryOperator mNotOperator;
+  private final BinaryOperator mEqualsOperator;
+  private final BinaryOperator mNotEqualsOperator;
+  private final BinaryOperator mGreaterThanOperator;
+  private final BinaryOperator mGreaterEqualsOperator;
+  private final BinaryOperator mLessThanOperator;
+  private final BinaryOperator mLessEqualsOperator;
   private final BinaryOperator mAssignmentOperator;
   private final BinaryOperator mIncrementOperator;
   private final BinaryOperator mDecrementOperator;
