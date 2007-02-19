@@ -263,8 +263,7 @@
       <formatter type="xml"/>
       <batchtest todir="${logs.results}">
         <fileset dir="${supremica.testsrc}">
-          <exclude name="**/Abstract*.java"/>
-          <include name="**/Native*.java"/>
+         <include name="net/sourceforge/waters/model/compiler/*.java"/>
         </fileset>
       </batchtest>
       <classpath refid="waters.test.classpath"/>

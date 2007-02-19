@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   DNFConverterTest
 //###########################################################################
-//# $Id: DNFConverterTest.java,v 1.1 2006-09-12 14:32:17 robi Exp $
+//# $Id: DNFConverterTest.java,v 1.2 2007-02-19 22:50:59 robi Exp $
 //###########################################################################
 
 
@@ -390,6 +390,25 @@ public class DNFConverterTest extends TestCase
   {
     String[][] expected = {{"a <= b"}};
     testDNF("!(a > b)", expected);
+  }
+
+  public void testReentrant()
+    throws EvalException, ParseException
+  {
+    testCNF_1();
+    testDNF_0();
+    testCNF_a_or_xa();
+    testDNF_a();
+    testCNF_xa();
+    testDNF_a_or_b();
+    testCNF_a_and_b();
+    testDNF_1();
+    testCNF_0();
+    testDNF_a_or_xa();
+    testCNF_a();
+    testDNF_xa();
+    testCNF_a_or_b();
+    testDNF_a_and_b();
   }
 
 
