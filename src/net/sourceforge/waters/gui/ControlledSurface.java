@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.121 2007-02-16 03:00:42 robi Exp $
+//# $Id: ControlledSurface.java,v 1.122 2007-02-20 04:00:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -1311,7 +1311,7 @@ public class ControlledSurface
           EditorEditEdgeDialog.showDialog((EdgeSubject) mFocusedObject);
         } else if (mFocusedObject instanceof GuardActionBlockSubject) {
           final EdgeSubject edge = (EdgeSubject) mFocusedObject.getParent();
-          EditorEditEdgeDialog.showDialog((EdgeSubject) mFocusedObject);
+          EditorEditEdgeDialog.showDialog(edge);
         }
       }
     }

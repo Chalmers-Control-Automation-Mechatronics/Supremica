@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   EmptyLabelBlockException
 //###########################################################################
-//# $Id: EmptyLabelBlockException.java,v 1.4 2006-11-17 03:38:22 robi Exp $
+//# $Id: EmptyLabelBlockException.java,v 1.5 2007-02-20 04:00:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -48,7 +48,7 @@ public class EmptyLabelBlockException extends EvalException {
       final NodeProxy source = edge.getSource();
       final NodeProxy target = edge.getTarget();
       return
-        "No labels on transition from " + source.getName() + " to " +
+        "No event labels on transition from " + source.getName() + " to " +
         target.getName() + " in " + mComponentName + ".";
     }
   }

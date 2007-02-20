@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   SubjectShapeProducer
 //###########################################################################
-//# $Id: SubjectShapeProducer.java,v 1.25 2007-02-14 22:43:37 siw4 Exp $
+//# $Id: SubjectShapeProducer.java,v 1.26 2007-02-20 04:00:42 robi Exp $
 //###########################################################################
 
 
@@ -97,12 +97,15 @@ public class SubjectShapeProducer
 		getMap().remove(label);
 	}
 	
-	private void removeMapping(EdgeProxy edge)
-	{
-		getMap().remove(edge);
-		removeMapping(edge.getLabelBlock());
-		removeMapping(edge.getGuardActionBlock());
-	}
+  private void removeMapping(final EdgeProxy edge)
+  {
+    getMap().remove(edge);
+    removeMapping(edge.getLabelBlock());
+    final GuardActionBlockProxy ga = edge.getGuardActionBlock();
+    if (ga != null) {
+      removeMapping(edge.getGuardActionBlock());
+    }
+  }
 	
 	private void removeMapping(LabelBlockProxy label)
 	{
@@ -116,7 +119,6 @@ public class SubjectShapeProducer
 	private void removeMapping(GuardActionBlockProxy GA)
 	{
 		getMap().remove(GA);
-		if(GA == null) return;
 		for(BinaryExpressionProxy action : GA.getActions())
 		{
 			getMap().remove(GA.getActions());
@@ -166,14 +168,16 @@ public class SubjectShapeProducer
     switch (event.getKind()) {
     case ModelChangeEvent.ITEM_REMOVED:
     case ModelChangeEvent.ITEM_ADDED:
-      if (esource.getParent() instanceof EventListExpressionSubject) {
-        final Subject parent = esource.getParent();
+      final Subject parent = esource.getParent();
+      if (parent instanceof EventListExpressionSubject) {
         final Subject grandparent = parent.getParent();
         if (grandparent instanceof SimpleNodeProxy) {
           removeMapping((SimpleNodeProxy) grandparent);
         } else if (parent instanceof LabelBlockProxy) {
           removeMapping((LabelBlockProxy) parent);
         }
+      } else if (parent instanceof GuardActionBlockProxy) {
+        removeMapping((GuardActionBlockProxy) parent);
       } else {
         removeMapping((Subject) event.getValue());
       }
@@ -187,24 +191,14 @@ public class SubjectShapeProducer
       }
       break;
     case ModelChangeEvent.GEOMETRY_CHANGED:
-      {
-        final NodeProxy node;
-        if (esource instanceof NodeProxy) {
-          node = (NodeProxy) esource;
-        } else if (esource.getParent() instanceof NodeProxy) {
-          node = (NodeProxy) esource.getParent();
-        } else {
-          node = null;
-        }
-        if (node != null) {
-          for (final EdgeProxy edge : mGraph.getEdges()) {
-            if (edge.getSource() == node || edge.getTarget() == node) {
-              removeMapping(edge);
-            }
+      if (esource instanceof NodeProxy) {
+        for (final EdgeProxy edge : mGraph.getEdges()) {
+          if (edge.getSource() == esource || edge.getTarget() == esource) {
+            removeMapping(edge);
           }
         }
-        removeMapping(esource);
       }
+      removeMapping(esource);
       break;
     default:
       removeMapping(esource);

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   ProxyShapeProducer
 //###########################################################################
-//# $Id: ProxyShapeProducer.java,v 1.18 2007-02-16 03:00:42 robi Exp $
+//# $Id: ProxyShapeProducer.java,v 1.19 2007-02-20 04:00:42 robi Exp $
 //###########################################################################
 
 
@@ -137,11 +137,11 @@ public class ProxyShapeProducer
             }
             height += 3;
             width += 3;
-            RoundRectangle2D mBounds = new RoundRectangle2D.Double(
+            final RoundRectangle2D bounds = new RoundRectangle2D.Double(
                 x, y, width, height,
                 LabelBlockProxyShape.DEFAULTARCW,
                 LabelBlockProxyShape.DEFAULTARCH);
-            s = new LabelBlockProxyShape(l, mBounds);
+            s = new LabelBlockProxyShape(l, bounds);
             mMap.put(l, s);
         }
         
