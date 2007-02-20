@@ -1,3 +1,12 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.gui.renderer
+//# CLASS:   SubjectShapeProducer
+//###########################################################################
+//# $Id: GroupNodeProxyShape.java,v 1.6 2007-02-20 22:48:11 robi Exp $
+//###########################################################################
+
 package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Graphics2D;
@@ -10,34 +19,40 @@ import java.util.ArrayList;
 import java.util.List;
 import java.awt.geom.Point2D;
 
+
 public class GroupNodeProxyShape
     extends AbstractProxyShape
 {
-    public GroupNodeProxyShape(GroupNodeProxy proxy)
-    {
-        super(proxy);
-        mRect = new Rectangle2D.Double();
-        mRect.setRect(proxy.getGeometry().getRectangle());
-        mHandles = new ArrayList<Handle>(8);
-        Point2D min = new Point2D.Double(getShape().getMinX(), getShape().getMinY());
-        Point2D c = new Point2D.Double(getShape().getCenterX(), getShape().getCenterY());
-        Point2D max = new Point2D.Double(getShape().getMaxX(), getShape().getMaxY());
-        mHandles.add(new DefaultHandle(min, Handle.HandleType.NW, 6));
-        mHandles.add(new DefaultHandle(new Point2D.Double(c.getX(), min.getY())
-        , Handle.HandleType.N, 6));
-        mHandles.add(new DefaultHandle(new Point2D.Double(max.getX(), min.getY())
-        , Handle.HandleType.NE, 6));
-        mHandles.add(new DefaultHandle(new Point2D.Double(min.getX(), c.getY())
-        , Handle.HandleType.W, 6));
-        mHandles.add(new DefaultHandle(new Point2D.Double(max.getX(), c.getY())
-        , Handle.HandleType.E, 6));
-        mHandles.add(new DefaultHandle(new Point2D.Double(min.getX(), max.getY())
-        , Handle.HandleType.SW, 6));
-        mHandles.add(new DefaultHandle(new Point2D.Double(c.getX(), max.getY())
-        , Handle.HandleType.S, 6));
-        mHandles.add(new DefaultHandle(max, Handle.HandleType.SE, 6));
-    }
+
+  //########################################################################
+  //# Constructors
+  public GroupNodeProxyShape(final GroupNodeProxy group)
+  {
+    super(group);
+    mRect = new Rectangle2D.Double();
+    mRect.setRect(group.getGeometry().getRectangle());
+    mHandles = new ArrayList<Handle>(8);
+    final Point2D min =
+      new Point2D.Double(getShape().getMinX(), getShape().getMinY());
+    final Point2D c =
+      new Point2D.Double(getShape().getCenterX(), getShape().getCenterY());
+    final Point2D max =
+      new Point2D.Double(getShape().getMaxX(), getShape().getMaxY());
+    mHandles.add(new DefaultHandle(min, Handle.HandleType.NW));
+    mHandles.add(new DefaultHandle(c.getX(), min.getY(), Handle.HandleType.N));
+    mHandles.add
+      (new DefaultHandle(max.getX(), min.getY(), Handle.HandleType.NE));
+    mHandles.add(new DefaultHandle(min.getX(), c.getY(), Handle.HandleType.W));
+    mHandles.add(new DefaultHandle(max.getX(), c.getY(), Handle.HandleType.E));
+    mHandles.add
+      (new DefaultHandle(min.getX(), max.getY(), Handle.HandleType.SW));
+    mHandles.add(new DefaultHandle(c.getX(), max.getY(), Handle.HandleType.S));
+    mHandles.add(new DefaultHandle(max, Handle.HandleType.SE));
+  }
     
+
+  //########################################################################
+  //# Simple Access
     public List<Handle> getHandles()
     {
         return mHandles;
