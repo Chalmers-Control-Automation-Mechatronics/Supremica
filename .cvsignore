@@ -2,6 +2,7 @@ build
 dist
 resources
 logs
+nbproject
 .project
 .classpath
 SupremicaProperties.cfg
