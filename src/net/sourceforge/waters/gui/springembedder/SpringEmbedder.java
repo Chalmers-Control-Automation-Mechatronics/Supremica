@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.32 2007-02-16 03:00:42 robi Exp $
+//# $Id: SpringEmbedder.java,v 1.33 2007-02-21 08:37:21 torda Exp $
 //###########################################################################
 
 
@@ -182,85 +182,79 @@ public class SpringEmbedder
   }
 
   public static boolean setUpGeometry(GraphSubject graph, int seed)
-    throws GeometryAbsentException
-  {
-    boolean runEmbedder = false;
-    Random rand = new Random(seed);
-    if (graph.getBlockedEvents() != null) {
-      if (graph.getBlockedEvents().getGeometry() == null) {
-        // TODO: Calculate better position
-        graph.getBlockedEvents().setGeometry(new LabelGeometrySubject(new Point(5, 5)));
-      }
-    }
-		for (NodeSubject node : graph.getNodesModifiable())
-		{
-			if (node instanceof SimpleNodeSubject)
-			{
+			throws GeometryAbsentException {
+		boolean runEmbedder = false;
+		Random rand = new Random(seed);
+		if (graph.getBlockedEvents() != null) {
+			if (graph.getBlockedEvents().getGeometry() == null) {
+				// TODO: Calculate better position
+				graph.getBlockedEvents().setGeometry(
+						new LabelGeometrySubject(new Point(5, 5)));
+			}
+		}
+		for (NodeSubject node : graph.getNodesModifiable()) {
+			if (node instanceof SimpleNodeSubject) {
 				SimpleNodeSubject n = (SimpleNodeSubject) node;
-				if (n.isInitial())
-				{
-					if (n.getInitialArrowGeometry() == null)
-					{
-						n.setInitialArrowGeometry
-						(new PointGeometrySubject(new Point(-5, -5)));
+				if (n.isInitial()) {
+					if (n.getInitialArrowGeometry() == null) {
+						n.setInitialArrowGeometry(new PointGeometrySubject(
+								new Point(-5, -5)));
 					}
 				}
-				
-				if (n.getPointGeometry() == null)
-				{
+
+				if (n.getPointGeometry() == null) {
 					runEmbedder = true;
 					final int base;
 					final int spread;
-					if (n.isInitial())
-					{
+					if (n.isInitial()) {
 						base = 10;
 						spread = 50;
-					}
-					else
-					{
+					} else {
 						base = 100;
 						spread = 500;
 					}
-					n.setPointGeometry(new PointGeometrySubject
-                             (new Point(base + rand.nextInt(spread),
-                                        base + rand.nextInt(spread))));
+					n.setPointGeometry(new PointGeometrySubject(
+							new Point(base + rand.nextInt(spread), base
+									+ rand.nextInt(spread))));
 				}
-				if (n.getLabelGeometry() == null)
-				{
-					n.setLabelGeometry(new LabelGeometrySubject(new Point(5, 5)));
+				if (n.getLabelGeometry() == null) {
+					n
+							.setLabelGeometry(new LabelGeometrySubject(
+									new Point(5, 5)));
 				}
-			}
-			else if (node instanceof GroupNodeSubject)
-			{
-				if (((GroupNodeSubject)node).getGeometry() == null)
-				{
-					throw new GeometryAbsentException("There is no geometry information"
-							+ " for a group node in this graph");
+			} else if (node instanceof GroupNodeSubject) {
+				if (((GroupNodeSubject) node).getGeometry() == null) {
+					throw new GeometryAbsentException(
+							"There is no geometry information"
+									+ " for a group node in this graph");
 				}
 			}
 		}
-		for (EdgeSubject edge : graph.getEdgesModifiable())
-		{
-      if (!(edge.getSource() instanceof GroupNodeSubject)) {
-        edge.setStartPoint(null);
-      }
-      if (!(edge.getTarget() instanceof GroupNodeSubject)) {
-        edge.setEndPoint(null);
-      }
-			if (edge.getLabelBlock().getGeometry() == null)
-			{
-				LabelGeometrySubject offset =
-					new LabelGeometrySubject
-					(new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
-							LabelBlockProxyShape.DEFAULTOFFSETY));
+		for (EdgeSubject edge : graph.getEdgesModifiable()) {
+			if (!(edge.getSource() instanceof GroupNodeSubject)) {
+				edge.setStartPoint(null);
+			}
+			if (!(edge.getTarget() instanceof GroupNodeSubject)) {
+				edge.setEndPoint(null);
+			}
+			if (edge.getLabelBlock().getGeometry() == null) {
+				LabelGeometrySubject offset = new LabelGeometrySubject(
+						new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
+								LabelBlockProxyShape.DEFAULTOFFSETY));
 				edge.getLabelBlock().setGeometry(offset);
+			}
+			if (edge.getGuardActionBlock() != null && edge.getGuardActionBlock().getGeometry() == null) {
+				LabelGeometrySubject offset = new LabelGeometrySubject(
+						new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
+								LabelBlockProxyShape.DEFAULTOFFSETY + 10));
+				edge.getGuardActionBlock().setGeometry(offset);
 			}
 		}
 		return runEmbedder;
-  }
+	}
 
-  //#########################################################################
-  //# Auxiliary Methods
+  // #########################################################################
+  // # Auxiliary Methods
   private synchronized double calculateDisplacements()
   {
     final Collection<? extends GeometryWrapper> wrappers =
