@@ -14,23 +14,23 @@ import org.supremica.gui.InterfaceManager
 SagBuilder builder = new SagBuilder();
 
 builder.project(name:'LiftSystem') {
-    controlSignal(name:'up')
-    controlSignal(name:'out')
-    graph(name:'Ball', maxNrOfObjects:1) {
-        sensor(name:'ballDown')
-        sensor(name:'ballUp')
-        onewayZone(front:'ballDown', frontEntryCondition:'liftDown', outsideSystemBoundry:true)
-        twowayZone(back:'ballDown', front:'ballUp',
-        		   forwardCondition:'up', backwardCondition:'!up',
-        		   backExitCondition:'!liftUp', backEntryCondition:'!liftUp',
-        		   frontExitCondition:'!liftDown', frontEntryCondition:'!liftDown')
-        onewayZone(back:'ballUp', backExitCondition:'out', outsideSystemBoundry:true)
-    }
-    graph(name:'Lift', maxNrOfObjects:1) {
-        sensor(name:'liftDown', initiallyActivated:true)
-        sensor(name:'liftUp')
-        twowayZone(back:'liftDown', front:'liftUp', forwardCondition:'up', backwardCondition:'!up')
-    }
+	controlSignal(name:'up')
+	controlSignal(name:'out')
+	graph(name:'Ball', maxNrOfObjects:3) {
+		sensor(name:'ballDown')
+		sensor(name:'ballUp')
+		onewayZone(front:'ballDown', frontEntryCondition:'liftDown', outsideSystemBoundry:true)
+		twowayZone(back:'ballDown', front:'ballUp', capacity:1,
+		           forwardCondition:'up', backwardCondition:'!up',
+		           backExitCondition:'!liftUp', backEntryCondition:'!liftUp',
+		           frontExitCondition:'!liftDown', frontEntryCondition:'!liftDown')
+		onewayZone(back:'ballUp', backExitCondition:'out', outsideSystemBoundry:true)
+	}
+	graph(name:'Lift', maxNrOfObjects:1) {
+		sensor(name:'liftDown', initiallyActivated:true)
+		sensor(name:'liftUp')
+		twowayZone(back:'liftDown', front:'liftUp', forwardCondition:'up', backwardCondition:'!up')
+	}
 }
 
 def module = AutomatonGenerator.instance.generate(builder.project, false)

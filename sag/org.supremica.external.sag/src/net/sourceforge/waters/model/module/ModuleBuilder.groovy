@@ -66,7 +66,7 @@ class ModuleBuilder extends BuilderSupport {
 			}
 			foreach(name:'i', range:0..2) {
 				plant(name:'testcomponent3[i]', initialState:'q0') {
-					state(name:'q0', initial:true)
+					state(name:'q0')
 					state(name:'q1', forbidden:true)
 					transition(from:'q0',
 					           to:'q1',
@@ -77,8 +77,8 @@ class ModuleBuilder extends BuilderSupport {
 					transition(from:'q1', to:'q0', events:['e1', 'e0'])
 				}
 				foreach(name:'j', range:0..3) {
-					specification(name:'testcomponent4[i][j]') {
-						state(name:'q0', initial:true)
+					specification(name:'testcomponent4[i][j]', initialState:'q0') {
+						state(name:'q0')
 						transition(from:'q0', to:'q0', events:['e5[i][j]'])
 					}
 				}
@@ -131,11 +131,12 @@ class ModuleBuilder extends BuilderSupport {
 	ModuleProxy module 
 	private static final factory = ModuleSubjectFactory.instance
 	private static final parser = new ExpressionParser(factory.instance, CompilerOperatorTable.instance)
-	private transitionAttributes
+	private transitionAttributes = [:]
 	private String initialState
 	final static String VARIABLE_COMPONENT_NAME = 'variables'
 		
 	def createNode(name){
+		assert false
 		null
 	}
 
@@ -158,9 +159,11 @@ class ModuleBuilder extends BuilderSupport {
 			break
 		case 'booleanVariable' :
 			node = VariableHelper.createIntegerVariable(attributes.name, 0, 1, attributes.initial ? 1 : 0, attributes.marked ? 1 : 0);
+			['initial', 'marked'].each{attributes.remove(it)}
 			break
 		case 'integerVariable' :
 			node = VariableHelper.createIntegerVariable(attributes.name, attributes.range.from, attributes.range.to, attributes.initial, attributes.marked)
+			['initial', 'range', 'marked'].each{attributes.remove(it)}
 			break
 		case 'event' :
 			node = factory.createEventDeclProxy(attributes.name,
@@ -168,21 +171,26 @@ class ModuleBuilder extends BuilderSupport {
 					                            true,
 					                            attributes.ranges?.collect{createRangeExpression(it)},
 					                            null)
+			['controllable', 'ranges'].each{attributes.remove(it)}
 			break
 		case 'proposition':
 			node = factory.createEventDeclProxy(attributes.name, EventKind.PROPOSITION)
 			break
 		case 'plant' :
 			node = factory.createSimpleComponentProxy(parser.parseIdentifier(attributes.name),
-	                                                  attributes.get('kind', ComponentKind.PLANT),
+	                                                  ComponentKind.PLANT,
 	                                                  factory.createGraphProxy())
+			assert attributes.initialState
 			initialState = attributes.initialState
+			['initialState'].each{attributes.remove(it)}
 	        break
 		case 'specification' :
 			node = factory.createSimpleComponentProxy(parser.parseIdentifier(attributes.name),
-	                                                  attributes.get('kind', ComponentKind.SPEC),
+	                                                  ComponentKind.SPEC,
 	                                                  factory.createGraphProxy())
+			assert attributes.initialState
 			initialState = attributes.initialState
+			['initialState'].each{attributes.remove(it)}
 			break
 		case 'state' :
 			node = factory.createSimpleNodeProxy(attributes.name)
@@ -190,6 +198,7 @@ class ModuleBuilder extends BuilderSupport {
 			if (attributes.marked) node.propositions.eventListModifiable << parser.parse(EventDeclProxy.DEFAULT_MARKING_NAME)
 			if (attributes.forbidden) node.propositions.eventListModifiable << parser.parse(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)
 			node.propositions.eventListModifiable.addAll(attributes.propositions.collect{parser.parse(it)})
+			['forbidden', 'marked', 'propositions'].each{attributes.remove(it)}
 			break
 		case 'transition':
 			node = factory.createEdgeProxy(null,
@@ -199,21 +208,26 @@ class ModuleBuilder extends BuilderSupport {
 					                       null,
 					                       null,
 					                       null)
-			transitionAttributes = attributes
+			transitionAttributes = attributes.clone()
+			['events', 'from', 'to', 'guard'].each{attributes.remove(it)}
 			break
 		case 'foreach':
 			node = factory.createForeachComponentProxy(attributes.name, createRangeExpression(attributes.range))
+			['range'].each{attributes.remove(it)}
 			break
 		case 'eventAlias':
 			node = factory.createAliasProxy(parser.parseIdentifier(attributes.name), factory.createPlainEventListProxy(attributes.events.collect{parser.parse(it)}))
+			['events'].each{attributes.remove(it)}
 			break
 		default:
 			assert false : "No match for node name \"$name\""
 		}
+		assert !attributes || (attributes.size() == 1 && attributes.name), "The attributes ${attributes} does not match node '$name' with name '${attributes.name}'"
 		return node
 	}
 
 	def createNode(name, Map attributes, value){
+		assert false
 		null
 	}
 	

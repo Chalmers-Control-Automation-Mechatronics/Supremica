@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagPackage.java,v 1.8 2007-02-16 16:32:26 torda Exp $
+ * $Id: SagPackage.java,v 1.9 2007-02-21 08:38:53 torda Exp $
  */
 package org.supremica.external.sag;
 
@@ -324,13 +324,22 @@ public interface SagPackage extends EPackage {
 	int ZONE__OVERLAPPED = NAMED_FEATURE_COUNT + 14;
 
 	/**
+	 * The feature id for the '<em><b>Ordered</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int ZONE__ORDERED = NAMED_FEATURE_COUNT + 15;
+
+	/**
 	 * The number of structural features of the '<em>Zone</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int ZONE_FEATURE_COUNT = NAMED_FEATURE_COUNT + 15;
+	int ZONE_FEATURE_COUNT = NAMED_FEATURE_COUNT + 16;
 
 	/**
 	 * The meta object id for the '{@link org.supremica.external.sag.impl.NodeImpl <em>Node</em>}' class.
@@ -628,13 +637,22 @@ public interface SagPackage extends EPackage {
 	int CONTROL_SIGNAL__NAME = NAMED__NAME;
 
 	/**
+	 * The feature id for the '<em><b>Synthesize</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CONTROL_SIGNAL__SYNTHESIZE = NAMED_FEATURE_COUNT + 0;
+
+	/**
 	 * The number of structural features of the '<em>Control Signal</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int CONTROL_SIGNAL_FEATURE_COUNT = NAMED_FEATURE_COUNT + 0;
+	int CONTROL_SIGNAL_FEATURE_COUNT = NAMED_FEATURE_COUNT + 1;
 
 	/**
 	 * Returns the meta object for class '{@link org.supremica.external.sag.Graph <em>Graph</em>}'.
@@ -888,6 +906,17 @@ public interface SagPackage extends EPackage {
 	EAttribute getZone_Overlapped();
 
 	/**
+	 * Returns the meta object for the attribute '{@link org.supremica.external.sag.Zone#isOrdered <em>Ordered</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Ordered</em>'.
+	 * @see org.supremica.external.sag.Zone#isOrdered()
+	 * @see #getZone()
+	 * @generated
+	 */
+	EAttribute getZone_Ordered();
+
+	/**
 	 * Returns the meta object for class '{@link org.supremica.external.sag.Named <em>Named</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1078,6 +1107,17 @@ public interface SagPackage extends EPackage {
 	 * @generated
 	 */
 	EClass getControlSignal();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.supremica.external.sag.ControlSignal#isSynthesize <em>Synthesize</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Synthesize</em>'.
+	 * @see org.supremica.external.sag.ControlSignal#isSynthesize()
+	 * @see #getControlSignal()
+	 * @generated
+	 */
+	EAttribute getControlSignal_Synthesize();
 
 	/**
 	 * Returns the meta object for class '{@link org.supremica.external.sag.EndNode <em>End Node</em>}'.
@@ -1300,6 +1340,14 @@ public interface SagPackage extends EPackage {
 		EAttribute ZONE__OVERLAPPED = eINSTANCE.getZone_Overlapped();
 
 		/**
+		 * The meta object literal for the '<em><b>Ordered</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute ZONE__ORDERED = eINSTANCE.getZone_Ordered();
+
+		/**
 		 * The meta object literal for the '{@link org.supremica.external.sag.impl.NamedImpl <em>Named</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -1454,6 +1502,14 @@ public interface SagPackage extends EPackage {
 		 * @generated
 		 */
 		EClass CONTROL_SIGNAL = eINSTANCE.getControlSignal();
+
+		/**
+		 * The meta object literal for the '<em><b>Synthesize</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute CONTROL_SIGNAL__SYNTHESIZE = eINSTANCE.getControlSignal_Synthesize();
 
 		/**
 		 * The meta object literal for the '{@link org.supremica.external.sag.impl.EndNodeImpl <em>End Node</em>}' class.

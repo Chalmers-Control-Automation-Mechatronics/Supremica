@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagPackageImpl.java,v 1.8 2007-02-16 16:32:26 torda Exp $
+ * $Id: SagPackageImpl.java,v 1.9 2007-02-21 08:38:53 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
@@ -388,6 +388,15 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getZone_Ordered() {
+		return (EAttribute)zoneEClass.getEStructuralFeatures().get(15);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getNamed() {
 		return namedEClass;
 	}
@@ -550,6 +559,15 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getControlSignal_Synthesize() {
+		return (EAttribute)controlSignalEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getEndNode() {
 		return endNodeEClass;
 	}
@@ -606,6 +624,7 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 		createEAttribute(zoneEClass, ZONE__BACK_EXIT_CONDITION);
 		createEAttribute(zoneEClass, ZONE__INITIAL_NR_OF_OBJECTS);
 		createEAttribute(zoneEClass, ZONE__OVERLAPPED);
+		createEAttribute(zoneEClass, ZONE__ORDERED);
 
 		namedEClass = createEClass(NAMED);
 		createEAttribute(namedEClass, NAMED__NAME);
@@ -632,6 +651,7 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 		createEAttribute(sensorEClass, SENSOR__INITIALLY_ACTIVATED);
 
 		controlSignalEClass = createEClass(CONTROL_SIGNAL);
+		createEAttribute(controlSignalEClass, CONTROL_SIGNAL__SYNTHESIZE);
 	}
 
 	/**
@@ -714,6 +734,7 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 		initEAttribute(getZone_BackExitCondition(), ecorePackage.getEString(), "backExitCondition", null, 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getZone_InitialNrOfObjects(), ecorePackage.getEInt(), "initialNrOfObjects", null, 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getZone_Overlapped(), ecorePackage.getEBoolean(), "overlapped", null, 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getZone_Ordered(), ecorePackage.getEBoolean(), "ordered", "true", 0, 1, Zone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		op = addEOperation(zoneEClass, ecorePackage.getEBoolean(), "validateCapacityIsPositiveNumber", 0, 1);
 		addEParameter(op, ecorePackage.getEDiagnosticChain(), "diagnostics", 0, 1);
@@ -776,6 +797,7 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 		initEAttribute(getSensor_InitiallyActivated(), ecorePackage.getEBoolean(), "initiallyActivated", null, 0, 1, Sensor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(controlSignalEClass, ControlSignal.class, "ControlSignal", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getControlSignal_Synthesize(), ecorePackage.getEBoolean(), "synthesize", "true", 0, 1, ControlSignal.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Create resource
 		createResource(eNS_URI);

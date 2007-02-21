@@ -41,6 +41,7 @@ class AutomatonGenerator {
 		sagBuilder.project(name:"testproject") {
 			controlSignal(name:'u1')
 			controlSignal(name:'u2')
+			controlSignal(name:'u3', synthesize:false)
 			graph(name:"object1", nrOfObjectsIsUnbounded:true) {
 				sensor(name:'y1')
 				sensor(name:'y2')
@@ -57,7 +58,7 @@ class AutomatonGenerator {
 				sensor(name:'y1')
 				sensor(name:'y2')
 				sensor(name:'y4')
-				onewayZone(back:'y1', front:'y2', initialNrOfObjects:2, capacity:2, frontEntryCondition:'u2')
+				onewayZone(back:'y1', front:'y2', initialNrOfObjects:2, capacity:2, ordered:true, frontEntryCondition:'u2')
 			}
 			graph(name:'object3', maxNrOfObjects:1) {
 				sensor(name:'y5', initiallyActivated:true)
@@ -100,6 +101,7 @@ class AutomatonGenerator {
 			booleanVariable(name:'y9', marked:false)
 			booleanVariable(name:'u1', marked:false)
 			booleanVariable(name:'u2', marked:false)
+			booleanVariable(name:'u3', marked:false)
 			integerVariable(name:'object1_between_y1_y2', range:0..3, initial:0, marked:0)
 			integerVariable(name:'object1_beside_y2_0', range:0..1, initial:0, marked:0)
 			integerVariable(name:'object1_beside_y2_1', range:0..2, initial:0, marked:0)
@@ -320,6 +322,21 @@ class AutomatonGenerator {
 					}
 				}
 			}
+			plant(name:'object2_between_y1_y2_queue', initialState:'0_1') {
+				state(name:'empty')
+				state(name:'0')
+				state(name:'1')
+				state(name:'0_1')
+				state(name:'1_0')
+				transition(from:'empty', to:'0', events:['object2_from_y1[0]'])
+				transition(from:'0', to:'empty', events:['object2_to_y2[0]'])
+				transition(from:'1', to:'1_0', events:['object2_from_y1[0]'])
+				transition(from:'0_1', to:'1', events:['object2_to_y2[0]'])
+				transition(from:'empty', to:'1', events:['object2_from_y1[1]'])
+				transition(from:'1', to:'empty', events:['object2_to_y2[1]'])
+				transition(from:'0', to:'0_1', events:['object2_from_y1[1]'])
+				transition(from:'1_0', to:'0', events:['object2_to_y2[1]'])
+			}
 			plant(name:'ControlUnit', initialState:'u1') {
 				state(name:'u1', marked:false)
 				state(name:'u2', marked:false)
@@ -382,16 +399,16 @@ class AutomatonGenerator {
         ModuleCompiler compiler = new ModuleCompiler(new DocumentManager(), ProductDESElementFactory.getInstance(), generatedModule);
         assert compiler.compile()
  
-		assert false, 'fixa generering för syntes'
-		assert false, 'fixa markeringar'
-		assert false, 'testa mätlyften med fler än en kula'
-		assert false, 'fixa guards med zoner'
-		assert false, 'fixa köer'
+        assert false, 'kolla skåpflytt, säkerhet'
+        assert false, 'kolla simantic net'
 		assert false, 'testa gui'
-		assert false, 'fixa range och konstanter'
+		assert false, 'fixa demo'
+		assert false, 'skissa på artikel'
+		assert false, 'fixa guards med zoner'
 		assert false, 'fixa exceptions'
 		assert false, 'fixa resursbokning'
 		assert false, 'fixa delade resurser mellan grafer'
+		assert false, 'fixa range och konstanter'
 	}
 
 	ModuleProxy generate(Project project, boolean forSynthesis) {
@@ -421,7 +438,7 @@ class AutomatonGenerator {
 					}
 					builder.transition(from:sourceStateName,
 		                               to:targetStateName,
-	                                   events:[!zone.overlapped ? formatEventNameRef(sensor, zone, movementFromZone) : formatEventNameRef(otherSensor, zone, !movementFromZone)],
+	                                   events:[!zone.overlapped ? formatEventName(sensor, zone, movementFromZone, INDEX_NAME) : formatEventName(otherSensor, zone, !movementFromZone, INDEX_NAME)],
 	                                   guard:!zone.overlapped ? formatGuard(sensor, zone, movementFromZone) : formatGuard(otherSensor, zone, !movementFromZone)) {
 						if (!zone.overlapped) action "${sensor.name} = ${movementFromZone ? 1 : 0}"
 						else action "${otherSensor.name} = ${!movementFromZone ? 1 : 0}"
@@ -458,7 +475,7 @@ class AutomatonGenerator {
 			project.graph.zone.findAll{it.graph.maxNrOfObjects == 1 && !it.outsideSystemBoundry}.each { zone ->
 				builder.booleanVariable(name:formatZoneVariableName(zone), initial:zone.initialNrOfObjects, marked:zone.initialNrOfObjects)
 			}
-			if (project.controlSignal) {
+			if (project.controlSignal.any{it.synthesize}) {
 				booleanVariable(name:END_OF_SCANCYCLE_VARIABLE_NAME, initial:false, marked:true)
 			}
 			def sensorEvents = []
@@ -471,16 +488,16 @@ class AutomatonGenerator {
 					}
 				}
 			}
-			if (project.controlSignal) {
+			if (project.controlSignal.any{it.synthesize}) {
 				event(name:DO_CONTROL_SIGNAL_CHANGE_EVENT_NAME, controllable:true)
 				event(name:SKIP_CONTROL_SIGNAL_CHANGE_EVENT_NAME, controllable:true)
-			}
-			eventAlias(name:SENSOR_EVENTS_ALIAS_NAME, events:sensorEvents)
-			project.graph.findAll{it.nrOfObjectsIsUnbounded}.sensor.each { sensor ->
-				builder.plant(name:formatPlantName(sensor), initialState:"${sensor.initiallyActivated}") {
-					builder.state(name:'false', marked:true)
-					builder.state(name:'true', marked:true)
-					addTransitions(sensor)
+				eventAlias(name:SENSOR_EVENTS_ALIAS_NAME, events:sensorEvents)
+				project.graph.findAll{it.nrOfObjectsIsUnbounded}.sensor.each { sensor ->
+					builder.plant(name:formatPlantName(sensor), initialState:"${sensor.initiallyActivated}") {
+						builder.state(name:'false', marked:true)
+						builder.state(name:'true', marked:true)
+						addTransitions(sensor)
+					}
 				}
 			}
 			project.graph.findAll{it.maxNrOfObjects == 1}.each { graph ->
@@ -491,30 +508,51 @@ class AutomatonGenerator {
 					addPlant(graph)
 				}
 			}
-			if (project.controlSignal) {
-				plant(name:'ControlUnit', initialState:project.controlSignal[0].name) {
-					project.controlSignal.each { signal ->
+			project.graph.findAll{it.maxNrOfObjects > 1}.zone.findAll{it.ordered && !it.overlapped && (it.capacity > 1 || !it.bounded) && !it.outsideSystemBoundry}.each { zone ->
+				builder.plant(name:"${formatZoneVariableName(zone)}_queue", initialState:formatQueueStateName(0..<zone.initialNrOfObjects)) {
+					def maxNrOfObjects = zone.bounded ? Math.min(zone.graph.maxNrOfObjects, zone.capacity) : zone.graph.maxNrOfObjects 
+					(0..maxNrOfObjects).each { nrOfObjectsInZone ->
+						Permutator.getPermutationsOf(0..<zone.graph.maxNrOfObjects, nrOfObjectsInZone).each { permutation ->
+							builder.state(name:formatQueueStateName(permutation))
+						}
+					}
+					(0..<zone.graph.maxNrOfObjects).each { object ->
+						(0..<maxNrOfObjects).each { nrOfObjectsInZone ->
+							Permutator.getPermutationsOf((0..<zone.graph.maxNrOfObjects) - object, nrOfObjectsInZone).each { objectsInZone ->
+								if (zone in outgoingZones(zone.back)) transition(from:formatQueueStateName(objectsInZone), to:formatQueueStateName([*objectsInZone, object]), events:[formatEventName(zone.back, zone, false, object)])
+								if (zone in outgoingZones(zone.front)) transition(from:formatQueueStateName(objectsInZone), to:formatQueueStateName([object, *objectsInZone]), events:[formatEventName(zone.front, zone, false, object)])
+								if (zone in incomingZones(zone.back)) transition(from:formatQueueStateName([*objectsInZone, object]), to:formatQueueStateName(objectsInZone), events:[formatEventName(zone.back, zone, true, object)])
+								if (zone in incomingZones(zone.front)) transition(from:formatQueueStateName([object, *objectsInZone]), to:formatQueueStateName(objectsInZone), events:[formatEventName(zone.front, zone, true, object)])
+							}
+						}
+					}
+				}
+			}
+			if (project.controlSignal.any{it.synthesize}) {
+				def controlSignalsToBeSynthesized = project.controlSignal.findAll{it.synthesize}
+				plant(name:'ControlUnit', initialState:controlSignalsToBeSynthesized[0].name) {
+					controlSignalsToBeSynthesized.each { signal ->
 						builder.state(name:"${signal.name}", marked:false)
 					}
 					state(name:END_OF_SCANCYCLE_STATE_NAME, marked:true)
-					(0..<project.controlSignal.size()-1).each { i -> 
-						builder.transition(from:project.controlSignal[i].name,
-								           to:project.controlSignal[i+1].name, events:[DO_CONTROL_SIGNAL_CHANGE_EVENT_NAME]) {
-							action "${project.controlSignal[i].name} = !${project.controlSignal[i].name}"
+					(0..<controlSignalsToBeSynthesized.size()-1).each { i -> 
+						builder.transition(from:controlSignalsToBeSynthesized[i].name,
+								           to:controlSignalsToBeSynthesized[i+1].name, events:[DO_CONTROL_SIGNAL_CHANGE_EVENT_NAME]) {
+							action "${controlSignalsToBeSynthesized[i].name} = !${controlSignalsToBeSynthesized[i].name}"
 						}
-						builder.transition(from:project.controlSignal[i].name,
-								           to:project.controlSignal[i+1].name, events:[SKIP_CONTROL_SIGNAL_CHANGE_EVENT_NAME])
+						builder.transition(from:controlSignalsToBeSynthesized[i].name,
+								           to:controlSignalsToBeSynthesized[i+1].name, events:[SKIP_CONTROL_SIGNAL_CHANGE_EVENT_NAME])
 					}
-					transition(from:project.controlSignal[-1].name,
+					transition(from:controlSignalsToBeSynthesized[-1].name,
 					           to:END_OF_SCANCYCLE_STATE_NAME, events:[DO_CONTROL_SIGNAL_CHANGE_EVENT_NAME]) {
-						action "${project.controlSignal[-1].name} = !${project.controlSignal[-1].name}"
+						action "${controlSignalsToBeSynthesized[-1].name} = !${controlSignalsToBeSynthesized[-1].name}"
 						action "${END_OF_SCANCYCLE_VARIABLE_NAME} = 1"
 					}
-					transition(from:project.controlSignal[-1].name,
+					transition(from:controlSignalsToBeSynthesized[-1].name,
 					           to:END_OF_SCANCYCLE_STATE_NAME, events:[SKIP_CONTROL_SIGNAL_CHANGE_EVENT_NAME]) {
 						action "${END_OF_SCANCYCLE_VARIABLE_NAME} = 1"
 					}
-					transition(from:END_OF_SCANCYCLE_STATE_NAME, to:project.controlSignal[0].name, events:[SENSOR_EVENTS_ALIAS_NAME]) {
+					transition(from:END_OF_SCANCYCLE_STATE_NAME, to:controlSignalsToBeSynthesized[0].name, events:[SENSOR_EVENTS_ALIAS_NAME]) {
 						action "${END_OF_SCANCYCLE_VARIABLE_NAME} = 0"
 					}
 				}
@@ -530,7 +568,9 @@ class AutomatonGenerator {
 	final static DO_CONTROL_SIGNAL_CHANGE_EVENT_NAME = 'doSignalChange'
 	final static SKIP_CONTROL_SIGNAL_CHANGE_EVENT_NAME = 'skipSignalChange'
 	final static SENSOR_EVENTS_ALIAS_NAME = 'sensorEvent'
-							
+	final static QUEUE_STATE_NAME_SEPARATOR = '_'						
+	final static EMPTY_QUEUE_STATE_NAME = 'empty'
+	
 	private findInitialState(graph) {
 		(graph.sensor.findAll{it.initiallyActivated} + graph.zone.findAll{it.initialNrOfObjects} + graph.zone.findAll{it.outsideSystemBoundry})[0]
 	}
@@ -538,6 +578,7 @@ class AutomatonGenerator {
 	private formatPlantName(Sensor sensor) {
 		"${sensor.graph.name}_${sensor.name}"
 	}
+	
 	private formatPlantName(Graph graph) {
 		graph.name + ((graph.maxNrOfObjects > 1) ? "[${INDEX_NAME}]" : '')
 	}
@@ -545,6 +586,7 @@ class AutomatonGenerator {
 	private formatStateName(Sensor sensor) {
 		sensor.name
 	}
+	
 	private formatStateName(Zone zone) {
 		if (zone.outsideSystemBoundry) {
 			return OUTSIDE_SYSTEM_BOUNDRY_STATE_NAME
@@ -559,20 +601,24 @@ class AutomatonGenerator {
 		([prefix] + sensorsOfZone.name + [suffix]).findAll{it}.join('_')
 	}
 	
-	private outgoingZones(Sensor sensor) {
-		sensor.graph.zone.grep(sensor.outgoing + sensor.incoming.findAll{zone -> !zone.oneway})
+	private formatQueueStateName(objects) {
+		objects ? objects.join(QUEUE_STATE_NAME_SEPARATOR) : EMPTY_QUEUE_STATE_NAME
 	}
 	
-	private incomingZones(Sensor sensor) {
-		sensor.graph.zone.grep(sensor.outgoing.findAll{zone -> !zone.oneway} + sensor.incoming)
+	private outgoingZones(sensor) {
+		sensor instanceof Sensor ? sensor?.graph.zone.grep(sensor.outgoing + sensor.incoming.findAll{zone -> !zone.oneway}) : null
+	}
+	
+	private incomingZones(sensor) {
+		sensor instanceof Sensor ? sensor?.graph.zone.grep(sensor.outgoing.findAll{zone -> !zone.oneway} + sensor.incoming) : null
 	}
 	
 	private String formatZoneVariableName(zone) {
 		"${zone.graph.name}_${formatStateName(zone)}"
 	}
 	
-	private String formatEventNameRef(Sensor sensor, zone, movementFromZone) {
-		formatEventName(sensor, zone, movementFromZone) + (sensor.graph.maxNrOfObjects > 1 ? "[${INDEX_NAME}]" : '')
+	private String formatEventName(Sensor sensor, zone, movementFromZone, index) {
+		formatEventName(sensor, zone, movementFromZone) + (sensor.graph.maxNrOfObjects > 1 ? "[${index}]" : '')
 	}
 	
 	private String formatEventName(Sensor sensor, zone, movementFromZone) {

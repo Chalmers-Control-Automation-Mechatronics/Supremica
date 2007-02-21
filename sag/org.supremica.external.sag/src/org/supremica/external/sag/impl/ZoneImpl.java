@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: ZoneImpl.java,v 1.6 2007-02-16 16:32:26 torda Exp $
+ * $Id: ZoneImpl.java,v 1.7 2007-02-21 08:38:53 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
@@ -62,6 +62,7 @@ import static org.supremica.external.sag.util.OclHelper.*;
  *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#getBackExitCondition <em>Back Exit Condition</em>}</li>
  *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#getInitialNrOfObjects <em>Initial Nr Of Objects</em>}</li>
  *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#isOverlapped <em>Overlapped</em>}</li>
+ *   <li>{@link org.supremica.external.sag.impl.ZoneImpl#isOrdered <em>Ordered</em>}</li>
  * </ul>
  * </p>
  *
@@ -313,6 +314,26 @@ public class ZoneImpl extends NamedImpl implements Zone {
 	 * @ordered
 	 */
 	protected boolean overlapped = OVERLAPPED_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #isOrdered() <em>Ordered</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isOrdered()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean ORDERED_EDEFAULT = true;
+
+	/**
+	 * The cached value of the '{@link #isOrdered() <em>Ordered</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isOrdered()
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean ordered = ORDERED_EDEFAULT;
 
 	/**
 	 * The parsed OCL expression for the definition of the '{@link #validateCapacityIsPositiveNumber <em>Validate Capacity Is Positive Number</em>}' invariant constraint.
@@ -774,6 +795,27 @@ public class ZoneImpl extends NamedImpl implements Zone {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public boolean isOrdered() {
+		return ordered;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public void setOrdered(boolean newOrdered) {
+		boolean oldOrdered = ordered;
+		ordered = newOrdered;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, SagPackage.ZONE__ORDERED, oldOrdered, ordered));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public boolean validateCapacityIsPositiveNumber(DiagnosticChain diagnostics, Map<?, ?> context) {
 		if (validateCapacityIsPositiveNumberInvOCL == null) {
 			EOperation eOperation = (EOperation) eClass().getEOperations().get(0);
@@ -904,6 +946,8 @@ public class ZoneImpl extends NamedImpl implements Zone {
 				return new Integer(getInitialNrOfObjects());
 			case SagPackage.ZONE__OVERLAPPED:
 				return isOverlapped() ? Boolean.TRUE : Boolean.FALSE;
+			case SagPackage.ZONE__ORDERED:
+				return isOrdered() ? Boolean.TRUE : Boolean.FALSE;
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -960,6 +1004,9 @@ public class ZoneImpl extends NamedImpl implements Zone {
 				return;
 			case SagPackage.ZONE__OVERLAPPED:
 				setOverlapped(((Boolean)newValue).booleanValue());
+				return;
+			case SagPackage.ZONE__ORDERED:
+				setOrdered(((Boolean)newValue).booleanValue());
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -1018,6 +1065,9 @@ public class ZoneImpl extends NamedImpl implements Zone {
 			case SagPackage.ZONE__OVERLAPPED:
 				setOverlapped(OVERLAPPED_EDEFAULT);
 				return;
+			case SagPackage.ZONE__ORDERED:
+				setOrdered(ORDERED_EDEFAULT);
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -1060,6 +1110,8 @@ public class ZoneImpl extends NamedImpl implements Zone {
 				return initialNrOfObjects != INITIAL_NR_OF_OBJECTS_EDEFAULT;
 			case SagPackage.ZONE__OVERLAPPED:
 				return overlapped != OVERLAPPED_EDEFAULT;
+			case SagPackage.ZONE__ORDERED:
+				return ordered != ORDERED_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -1096,6 +1148,8 @@ public class ZoneImpl extends NamedImpl implements Zone {
 		result.append(initialNrOfObjects);
 		result.append(", overlapped: ");
 		result.append(overlapped);
+		result.append(", ordered: ");
+		result.append(ordered);
 		result.append(')');
 		return result.toString();
 	}

@@ -71,6 +71,14 @@
         <element xmi:type="ecore:EAttribute" href="sag.ecore#//Zone/initialNrOfObjects"/>
         <layoutConstraint xmi:type="notation:Location" xmi:id="_XKFgYbtxEdus6JX6jUSP3Q"/>
       </children>
+      <children xmi:type="notation:Node" xmi:id="_PoKcFMDMEduelOY6rnxAnA" type="3001">
+        <element xmi:type="ecore:EAttribute" href="sag.ecore#//Zone/overlapped"/>
+        <layoutConstraint xmi:type="notation:Location" xmi:id="_PoKcFcDMEduelOY6rnxAnA"/>
+      </children>
+      <children xmi:type="notation:Node" xmi:id="_7JlhQMDaEduelOY6rnxAnA" type="3001">
+        <element xmi:type="ecore:EAttribute" href="sag.ecore#//Zone/ordered"/>
+        <layoutConstraint xmi:type="notation:Location" xmi:id="_7JlhQcDaEduelOY6rnxAnA"/>
+      </children>
       <styles xmi:type="notation:DrawerStyle" xmi:id="_-DwsLmj5Edu_i88VEes0wA"/>
       <styles xmi:type="notation:SortingStyle" xmi:id="_-DwsL2j5Edu_i88VEes0wA"/>
       <styles xmi:type="notation:FilteringStyle" xmi:id="_-DwsMGj5Edu_i88VEes0wA"/>
@@ -247,6 +255,10 @@
   <children xmi:type="notation:Node" xmi:id="_M7_wALtWEdus6JX6jUSP3Q" type="2001">
     <children xmi:type="notation:Node" xmi:id="_M7_wBrtWEdus6JX6jUSP3Q" type="5001"/>
     <children xmi:type="notation:Node" xmi:id="_M7_wB7tWEdus6JX6jUSP3Q" type="7001">
+      <children xmi:type="notation:Node" xmi:id="_bG7lcMDMEduelOY6rnxAnA" type="3001">
+        <element xmi:type="ecore:EAttribute" href="sag.ecore#//ControlSignal/synthesize"/>
+        <layoutConstraint xmi:type="notation:Location" xmi:id="_bG7lccDMEduelOY6rnxAnA"/>
+      </children>
       <styles xmi:type="notation:DrawerStyle" xmi:id="_M7_wCLtWEdus6JX6jUSP3Q"/>
       <styles xmi:type="notation:SortingStyle" xmi:id="_M7_wCbtWEdus6JX6jUSP3Q"/>
       <styles xmi:type="notation:FilteringStyle" xmi:id="_M7_wCrtWEdus6JX6jUSP3Q"/>

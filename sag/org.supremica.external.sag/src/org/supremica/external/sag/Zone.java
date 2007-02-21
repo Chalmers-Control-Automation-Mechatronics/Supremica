@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: Zone.java,v 1.6 2007-02-16 16:32:26 torda Exp $
+ * $Id: Zone.java,v 1.7 2007-02-21 08:38:53 torda Exp $
  */
 package org.supremica.external.sag;
 
@@ -33,6 +33,7 @@ import org.eclipse.emf.ecore.EObject;
  *   <li>{@link org.supremica.external.sag.Zone#getBackExitCondition <em>Back Exit Condition</em>}</li>
  *   <li>{@link org.supremica.external.sag.Zone#getInitialNrOfObjects <em>Initial Nr Of Objects</em>}</li>
  *   <li>{@link org.supremica.external.sag.Zone#isOverlapped <em>Overlapped</em>}</li>
+ *   <li>{@link org.supremica.external.sag.Zone#isOrdered <em>Ordered</em>}</li>
  * </ul>
  * </p>
  *
@@ -440,6 +441,33 @@ public interface Zone extends Named {
 	 * @generated
 	 */
 	void setOverlapped(boolean value);
+
+	/**
+	 * Returns the value of the '<em><b>Ordered</b></em>' attribute.
+	 * The default value is <code>"true"</code>.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Ordered</em>' attribute isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Ordered</em>' attribute.
+	 * @see #setOrdered(boolean)
+	 * @see org.supremica.external.sag.SagPackage#getZone_Ordered()
+	 * @model default="true"
+	 * @generated
+	 */
+	boolean isOrdered();
+
+	/**
+	 * Sets the value of the '{@link org.supremica.external.sag.Zone#isOrdered <em>Ordered</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Ordered</em>' attribute.
+	 * @see #isOrdered()
+	 * @generated
+	 */
+	void setOrdered(boolean value);
 
 	/**
 	 * <!-- begin-user-doc -->

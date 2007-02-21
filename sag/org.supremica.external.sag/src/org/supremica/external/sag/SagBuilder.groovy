@@ -8,6 +8,7 @@ class SagBuilder extends BuilderSupport {
 		sagBuilder.project(name:'testProject') {
 			controlSignal(name:'u1')
 			controlSignal(name:'u2')
+			controlSignal(name:'u3', synthesize:false)
 			sensorSignal(name:'y2')
 			sensorSignal(name:'y4')
 			graph(name:'testGraph', maxNrOfObjects:3) {
@@ -22,7 +23,8 @@ class SagBuilder extends BuilderSupport {
 		def project = sagBuilder.project
 		assert y1.name == 'y1' && y1.graph.project == project
 		assert project.sensorSignal.name == ['y2', 'y4', 'y1', 'y3']
-		assert project.controlSignal.name == ['u1', 'u2']
+		assert project.controlSignal.findAll{it.synthesize}.name == ['u1', 'u2']
+		assert project.controlSignal.findAll{!it.synthesize}.name == ['u3']
 		assert project.graph.name == ['testGraph']
 		assert project.graph.node.name == ['y1', 'y2', 'y3']
 		assert project.graph.zone.collect{[it.back.name,it.front.name]} == [['y1', 'y2'],['end0', 'y1'],['y2','y3']]
