@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.68 2007-02-16 00:11:38 martin Exp $
+//# $Id: ModuleCompiler.java,v 1.69 2007-02-22 13:03:10 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -833,9 +833,14 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
           // The event is renamed in two steps: first for each path and
           // then for each andClause in the guard expression.
           final SimpleExpressionProxy guard = collectGuard(path);
+          /*if(guard.getPlainText().endsWith("false")){
+        	  removeTransitionsFromAutomata(path);
+          }
+          else{*/
+        	  
           final CompiledNormalForm dnf = mDNFConverter.convertToDNF(guard);
           //final CompiledNormalForm mdnf = mDNFMinimizer.minimize(dnf);
-          final Collection<CompiledClause> andClauses = dnf.getClauses();
+         final Collection<CompiledClause> andClauses = dnf.getClauses();
           if (!andClauses.isEmpty()) {
             final List<SimpleExpressionProxy> sortedAndClauses =
               mDNFConverter.createSortedClauseList(dnf);
@@ -856,6 +861,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
               // New transitions with the new event names are added to
               // the automata.
               addNewTransitionsToAutomtata(relabeledEvent, path);
+            /*}*/
             }
           }
         }
@@ -893,6 +899,31 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       throw wrap(exception);
     }
   }
+
+
+private void removeTransitionsFromAutomata(List<TransitionProxy> path) {
+	final Map<String,AutomatonProxy> newAutomata =
+	      new TreeMap<String,AutomatonProxy>();
+	    for (final AutomatonProxy aut: mAutomata.values()) {
+	      final Collection<TransitionProxy> transitions =
+	        new TreeSet<TransitionProxy>();
+	      transitions.addAll(aut.getTransitions());
+	      for (final TransitionProxy trans: path) {
+	        if(transitions.contains(trans)){
+	    	  transitions.remove(trans);
+	        }
+	        
+	          }
+	      newAutomata.put(aut.getName(),
+	                      mDESFactory.createAutomatonProxy(aut.getName(),
+	                                                       aut.getKind(),
+	                                                       aut.getEvents(),
+	                                                       aut.getStates(),
+	                                                       transitions));
+	    }
+	    mAutomata.clear();
+	    mAutomata.putAll(newAutomata);	
+}
 
 
 private void addSingleStateSpec() {
@@ -999,30 +1030,46 @@ private boolean eventDisabledAtState(AutomatonProxy aut, StateProxy state, Event
 
 private void findForbiddenStates(final EventProxy event, Set<EventProxy> newEvents) throws EvalException {
 	/*
-	 * Names of specification automata that contains the
-	 * event in the alphabet but not in transitions are
-	 * collected in "specName". This can currently not
-	 * occur in the editor. Hence, "specName" is never used. 
+	 * If a specification automaton contains the
+	 * event in the alphabet but not in transitions forbidden
+	 * is set to true. This can not
+	 * occur in the editor but can be implemented using 
+	 * a transition with the guard "false". 
 	 */
-	final Set<String> specName = new HashSet<String>();
+	boolean forbidden= false;
 	/*
 	 * At position "0" we have allPlantPaths at position
 	 * "1" allSpecPaths.
 	 */
 	final List<List<List<TransitionProxy>>> plantSpecTrans = plantSpecTransitions(
-			event, specName);
+			event, forbidden);
 	/*
 	 * For each possible trans, collect the
 	 * plant guards and spec guards.
 	 */
+	Set<String> forbiddenLoc=new TreeSet<String>();
 	for (List<TransitionProxy> plantTrans : plantSpecTrans
 			.get(0)) {
+		
+		
 		final SimpleExpressionProxy plantGuard = collectGuard(plantTrans);
 		final CompiledNormalForm dnfPlant = mDNFConverter
 				.convertToDNF(plantGuard);
 		final List<SimpleExpressionProxy> sortedPlantClauses = mDNFConverter
 				.createSortedClauseList(dnfPlant);
-		for (final SimpleExpressionProxy plantExpr : sortedPlantClauses) {
+/*		
+		if(forbidden){
+			for (final SimpleExpressionProxy plantExpr : sortedPlantClauses) {
+			for (TransitionProxy plant : plantTrans) {
+				forbiddenLoc.add(plant
+						.getSource()
+						.getName());
+			}
+		mEventForbiddenStatesMap.put
+		(event, new LocationsAndExpression(forbiddenLoc, plantExpr));
+			}}
+	else{
+	*/	for (final SimpleExpressionProxy plantExpr : sortedPlantClauses) {
 			for (List<TransitionProxy> specTrans : plantSpecTrans
 					.get(1)) {
 				if (!specTrans.isEmpty()) {
@@ -1039,7 +1086,7 @@ private void findForbiddenStates(final EventProxy event, Set<EventProxy> newEven
 						final List<SimpleExpressionProxy> sortedUncClauses = mDNFConverter
 								.createSortedClauseList(dnfUncGuard);
 						if (!sortedUncClauses.isEmpty()) {
-							Set<String> forbiddenLoc=new TreeSet<String>();
+							//Set<String> forbiddenLoc=new TreeSet<String>();
 							for (TransitionProxy plant : plantTrans) {
 								forbiddenLoc.add(plant
 										.getSource()
@@ -1066,7 +1113,7 @@ private void findForbiddenStates(final EventProxy event, Set<EventProxy> newEven
 						//Forbidden events are added to the global alphabet.
 						newEvents.add(forbiddenEvent);
 						//mForbiddenStates.add(new LocationAndVariables(forbiddenLoc, uncExpr));
-								
+							/*}*/							
 							}
 						}
 					}
@@ -1380,7 +1427,7 @@ private void updateTransitionsInAutomtata()
    * it will be possible to handle controllability for EFA.
    */
   private List<List<List<TransitionProxy>>> plantSpecTransitions
-  (final EventProxy event, Set<String> specName)
+  (final EventProxy event, boolean forbidden)
 {
 	  final List<List<List<TransitionProxy>>> PlantSpecTrans =
 	        new LinkedList<List<List<TransitionProxy>>>();
@@ -1417,12 +1464,7 @@ private void updateTransitionsInAutomtata()
     if (transInAutomaton.isEmpty() &&
             automaton.getEvents().contains(event)&& 
     		automaton.getKind()== ComponentKind.SPEC) {
-    	/*
-    	 * Names of specification automata that contains the event in the alphabet 
-    	 * but not in transitions are collected in "specName". This can currently
-    	 * not occur in the editor.
-    	 */
-    	specName.add(automaton.getName());
+    		forbidden=true; 
         } 
     else if (!transInAutomaton.isEmpty()&& 
     		automaton.getKind()== ComponentKind.PLANT) {
@@ -1590,10 +1632,13 @@ private void updateTransitionsInAutomtata()
         mEFATransitionGuardActionBlockMap.get(trans);
       if (block != null) {
         for (final SimpleExpressionProxy guard : block.getGuards()) {
-          if (result == null) {
+        	/*if(guard.toString().equals("false")){
+        		return mModuleFactory.createSimpleIdentifierProxy("false");
+        		  }*/
+        	if (result == null) {
             result = guard;
           } else {
-            result =
+        	  result =
               mModuleFactory.createBinaryExpressionProxy(andop, result, guard);
           }
         }
