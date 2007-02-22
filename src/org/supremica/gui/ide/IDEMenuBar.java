@@ -1,21 +1,32 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica IDE
+//# PACKAGE: org.supremica.gui.ide
+//# CLASS:   IDEMenuBar
+//###########################################################################
+//# $Id: IDEMenuBar.java,v 1.36 2007-02-22 22:04:22 robi Exp $
+//###########################################################################
 
 package org.supremica.gui.ide;
 
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import java.awt.event.KeyEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import javax.swing.event.MenuListener;
-import javax.swing.event.MenuEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.util.*;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.subject.module.ModuleSubject;
-import org.supremica.automata.templates.TemplateItem;
+
 import org.supremica.automata.templates.TemplateGroup;
+import org.supremica.automata.templates.TemplateItem;
 import org.supremica.gui.ExampleTemplates;
-import java.io.IOException;
+
 
 public class IDEMenuBar
     extends JMenuBar
@@ -88,24 +99,26 @@ public class IDEMenuBar
         // Edit
         menu = new JMenu("Edit");
         menu.setMnemonic(KeyEvent.VK_E);
-        //menu.add(ide.getActions().editorCopyAsWMFAction.getMenuItem());
-        //menu.addSeparator();
         menu.add(ide.getActions().editorUndoAction.getMenuItem());
         ide.getActions().editorUndoAction.setEnabled(false);
         menu.add(ide.getActions().editorRedoAction.getMenuItem());
         ide.getActions().editorRedoAction.setEnabled(false);
+        menu.addSeparator();
+        menu.add(ide.getActions().editorCutAction.getMenuItem());
+        //menu.add(ide.getActions().editorCopyAsWMFAction.getMenuItem());
+        menu.add(ide.getActions().editorCopyAction.getMenuItem());
+        menu.add(ide.getActions().editorPasteAction.getMenuItem());
+        menu.addSeparator();
+	// Embedder should probably go to 'Tools' menu?
+        menu.add(ide.getActions().editorRunEmbedderAction.getMenuItem());
         add(menu);
 
-        // Editor
-        menu = new JMenu("Editor");
-        menu.setMnemonic(KeyEvent.VK_M);
+        // Insert
+        menu = new JMenu("Insert");
+        menu.setMnemonic(KeyEvent.VK_I);
         menu.add(ide.getActions().editorAddSimpleComponentAction.getMenuItem());
         menu.add(ide.getActions().editorAddComponentEventAction.getMenuItem());
         menu.add(ide.getActions().editorAddModuleEventAction.getMenuItem());
-        menu.add(ide.getActions().editorRunEmbedderAction.getMenuItem());
-        menu.add(ide.getActions().editorCopyAction.getMenuItem());
-        menu.add(ide.getActions().editorCutAction.getMenuItem());
-        menu.add(ide.getActions().editorPasteAction.getMenuItem());
         //menu.add(ide.getActions().editorAddForeachComponentAction.getMenuItem());
         //menu.add(ide.getActions().editorAddInstanceAction.getMenuItem());
         //menu.add(ide.getActions().editorAddBindingAction.getMenuItem());
@@ -113,7 +126,7 @@ public class IDEMenuBar
         editorMenu = menu;
 
         // Analyze
-        menu = new JMenu("Analyzer");
+        menu = new JMenu("Analyze");
         menu.setMnemonic(KeyEvent.VK_A);
         JMenu viewMenu = new JMenu("View");
         viewMenu.add(ide.getActions().analyzerViewAutomatonAction.getMenuItem());
@@ -121,6 +134,7 @@ public class IDEMenuBar
         viewMenu.add(ide.getActions().analyzerViewStatesAction.getMenuItem());
         viewMenu.add(ide.getActions().analyzerViewModularStructureAction.getMenuItem());
         menu.add(viewMenu);
+
         menu.addSeparator();
         menu.add(ide.getActions().analyzerSynchronizerAction.getMenuItem());
         menu.add(ide.getActions().analyzerSynthesizerAction.getMenuItem());
@@ -143,9 +157,9 @@ public class IDEMenuBar
         analyzerMenu = menu;
         add(menu);
 
-        // Tools
+        // Examples
         menu = new JMenu("Examples");
-        menu.setMnemonic(KeyEvent.VK_T);
+        menu.setMnemonic(KeyEvent.VK_X);
         menu.add(ide.getActions().toolsTestCasesAction.getMenuItem());
         add(menu);
 

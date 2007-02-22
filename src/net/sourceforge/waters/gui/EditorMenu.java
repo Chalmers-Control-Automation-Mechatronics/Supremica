@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.37 2007-02-22 03:08:31 robi Exp $
+//# $Id: EditorMenu.java,v 1.38 2007-02-22 22:04:22 robi Exp $
 //###########################################################################
 
 
@@ -29,7 +29,7 @@ import java.util.Collection;
 import java.util.ArrayList;
 import java.awt.Toolkit;
 import net.sourceforge.waters.gui.command.Command;
-//import net.sourceforge.waters.gui.command.CopyGraphCommand;
+import net.sourceforge.waters.gui.command.CopyGraphCommand;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Clipboard;
 
@@ -286,9 +286,7 @@ public class EditorMenu
       }
     }
     
-	/*
-    if (e.getSource() == mPaste)
-    {
+    if (e.getSource() == mPaste) {
       if (CLIPBOARD.isDataFlavorAvailable(COPYGRAPH)) {
         try {
           GraphContainer cont = (GraphContainer) CLIPBOARD.getData(COPYGRAPH);
@@ -300,7 +298,6 @@ public class EditorMenu
         }
       }
     }
-	*/
 
 		if (e.getSource() == mEditUndo)
 		{
