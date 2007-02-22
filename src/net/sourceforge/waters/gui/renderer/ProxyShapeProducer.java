@@ -4,9 +4,8 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   ProxyShapeProducer
 //###########################################################################
-//# $Id: ProxyShapeProducer.java,v 1.19 2007-02-20 04:00:42 robi Exp $
+//# $Id: ProxyShapeProducer.java,v 1.20 2007-02-22 03:08:31 robi Exp $
 //###########################################################################
-
 
 package net.sourceforge.waters.gui.renderer;
 
@@ -19,7 +18,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.IdentityHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,45 +32,47 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.subject.module.EdgeSubject;
-import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
-import net.sourceforge.waters.subject.module.LabelGeometrySubject;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class ProxyShapeProducer
-    extends AbstractModuleProxyVisitor
+  extends AbstractModuleProxyVisitor
 {
-    public ProxyShapeProducer(ModuleProxy m)
-    {
-        mModule = m;
-        mMap = Collections.synchronizedMap(new IdentityHashMap<Proxy, ProxyShape>());
-    }
+
+  //#########################################################################
+  //# Constructors
+  public ProxyShapeProducer(final ModuleProxy module)
+  {
+    mModule = module;
+    mMap = Collections.synchronizedMap(new HashMap<Proxy,ProxyShape>());
+  }
+
     
-    public SimpleNodeProxyShape visitSimpleNodeProxy(SimpleNodeProxy n)
-    {
-        LabelProxyShape label = (LabelProxyShape)mMap.get(n.getLabelGeometry());
-        if (label == null)
-        {
-          label = new LabelProxyShape(n, DEFAULT);
-          mMap.put(n.getLabelGeometry(), label);
-        }
-        SimpleNodeProxyShape s = (SimpleNodeProxyShape)mMap.get(n);
-        if (s == null)
-        {
-          s = new SimpleNodeProxyShape(n, mModule);
-          mMap.put(n, s);
-        }
-        return s;
+  //#########################################################################
+  //# Invocation
+  public ProxyShape getShape(final Proxy proxy)
+  {
+    if (proxy != null) {
+      try {
+        return (ProxyShape) proxy.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    } else {
+      return null;
     }
+  }
     
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
   public EdgeProxyShape visitEdgeProxy(final EdgeProxy edge)
   {
     EdgeProxyShape shape = (EdgeProxyShape) mMap.get(edge);
@@ -84,260 +85,228 @@ public class ProxyShapeProducer
         shape = new QuadraticEdgeProxyShape(edge);
       }
       mMap.put(edge, shape);
+      createLabelBlockShape(edge.getLabelBlock(), shape);
+      final GuardActionBlockProxy ga = edge.getGuardActionBlock();
+      if (ga != null) {
+        createGuardActionBlockShape(ga, shape);
+      }
     }
+    return shape;
+  }
 
-        LabelBlockProxy l = edge.getLabelBlock();
-        LabelBlockProxyShape s = (LabelBlockProxyShape)mMap.get(l);
-        if (s == null)
-        {
-            int height = 1;
-            int width = 0;
-            int x;
-            int y;
-            if (l.getGeometry() != null)
-            {
-                x = (int)l.getGeometry().getOffset().getX();
-                y = (int)l.getGeometry().getOffset().getY();
-            }
-            else
-            {
-                x = LabelBlockProxyShape.DEFAULTOFFSETX;
-                y = LabelBlockProxyShape.DEFAULTOFFSETY;
-            }
-            x += shape.getTurningPoint().getX();
-            y += shape.getTurningPoint().getY();
-            for (Proxy p : l.getEventList())
-            {
-                // Use different font for different event kinds.
-                Font font = DEFAULT;
-                if (p instanceof SimpleIdentifierSubject)
-                {
-                    SimpleIdentifierSubject identifier = (SimpleIdentifierSubject) p;
-                    for (EventDeclProxy event: mModule.getEventDeclList())
-                    {
-                        if (event.getName().equals(identifier.getName()))
-                        {
-                            if (event.getKind() == EventKind.UNCONTROLLABLE)
-                            {
-                                font = UNCONTROLLABLE;
-                            }
-                            break;
-                        }
-                    }
-                }
-                
-                LabelShape ls = new LabelShape(p, x + 1, y + height, font);
-                mMap.put(p, ls);
-                height += ls.getShape().getHeight();
-                
-                if (width < ls.getShape().getWidth())
-                {
-                    width = (int)ls.getShape().getWidth();
-                }
-            }
-            height += 3;
-            width += 3;
-            final RoundRectangle2D bounds = new RoundRectangle2D.Double(
-                x, y, width, height,
-                LabelBlockProxyShape.DEFAULTARCW,
-                LabelBlockProxyShape.DEFAULTARCH);
-            s = new LabelBlockProxyShape(l, bounds);
-            mMap.put(l, s);
-        }
-        
-        GuardActionBlockProxy GA = edge.getGuardActionBlock();
-        GuardActionBlockProxyShape GAShape = (GuardActionBlockProxyShape) mMap.get(GA);
-        if(GAShape==null && GA != null) 
-        {
-            double x, y;
-            
-            //find out offset
-            if(GA.getGeometry() == null)
-            {         
-                LabelGeometrySubject offset =
-                    new LabelGeometrySubject
-                    (new Point(GuardActionBlockProxyShape.DEFAULTOFFSETX,
-                    (int) (l.getGeometry().getOffset().getY() + s.getHeight())));
-                ((EdgeSubject) edge).getGuardActionBlock().setGeometry(offset);
-            }
-            x = GA.getGeometry().getOffset().getX();
-            y = GA.getGeometry().getOffset().getY();
-            x += shape.getTurningPoint().getX();
-            y += shape.getTurningPoint().getY();
-            
-            //create content
-            int width = 0;
-            int height = 2;
-            Font font = DEFAULT;
-            
-            //guard
-            List<SimpleExpressionProxy> guards = GA.getGuards();
-            if(!guards.isEmpty())
-            {
-                SimpleExpressionProxy guard = guards.get(0); //there should only be one guard expression.
-                LabelShape ls = new LabelShape(guard , (int) x, (int) y + height, font, "guard");
-                mMap.put(guard, ls);
-                height += ls.getShape().getHeight();
-                if (width < ls.getShape().getWidth())
-                {
-                    width = (int)ls.getShape().getWidth();
-                }
-                height += 2;
-            }
-            
-            //actions
-            List<BinaryExpressionProxy> actions = GA.getActions();
-            for(BinaryExpressionProxy action : actions)
-            {
-                LabelShape ls = new LabelShape(action , (int) x, (int) y + height, font, "action");
-                mMap.put(action, ls);
-                height += ls.getShape().getHeight();
-                if (width < ls.getShape().getWidth())
-                {
-                    width = (int)ls.getShape().getWidth();
-                }
-            }
-            
-            //create shape
-            RoundRectangle2D mBounds = new RoundRectangle2D.Double(
-                x, y, width, height,
-                GuardActionBlockProxyShape.DEFAULTARCW,
-                GuardActionBlockProxyShape.DEFAULTARCH);
-            GAShape = new GuardActionBlockProxyShape(GA, mBounds);
-            mMap.put(GA, GAShape);
-        }
-        return shape;
+  public LabelBlockProxyShape visitLabelBlockProxy(final LabelBlockProxy block)
+  {
+    final LabelBlockProxyShape shape = (LabelBlockProxyShape) mMap.get(block);
+    if (shape != null) {
+      return shape;
+    } else {
+      return createLabelBlockShape(block, null);
     }
+  }
     
-    public LabeledLabelBlockProxyShape visitGraphProxy(GraphProxy g)
-    {
-      if (g.getBlockedEvents() == null) {
-        return null;
-      }
-      LabelBlockProxy l = g.getBlockedEvents();
-      LabeledLabelBlockProxyShape s = (LabeledLabelBlockProxyShape)mMap.get(l);
-      if (s == null)
+  public GroupNodeProxyShape visitGroupNodeProxy(final GroupNodeProxy group)
+  {
+    GroupNodeProxyShape shape = (GroupNodeProxyShape) mMap.get(group);
+    if (shape == null) {
+      shape = new GroupNodeProxyShape(group);
+      mMap.put(group, shape);
+    }
+    return shape;
+  }
+    
+  public SimpleNodeProxyShape visitSimpleNodeProxy(SimpleNodeProxy simple)
+  {
+    final LabelGeometryProxy geo = simple.getLabelGeometry();
+    LabelProxyShape label = (LabelProxyShape) mMap.get(geo);
+    if (label == null) {
+      label = new LabelProxyShape(simple, DEFAULT);
+      mMap.put(geo, label);
+    }
+    SimpleNodeProxyShape shape = (SimpleNodeProxyShape) mMap.get(simple);
+    if (shape == null) {
+      shape = new SimpleNodeProxyShape(simple, mModule);
+      mMap.put(simple, shape);
+    }
+    return shape;
+  }
+    
+  public ProxyShape visitProxy(Proxy p) throws VisitorException
+  {
+    ProxyShape s = mMap.get(p);
+    if (s == null)
       {
-          int height = 1;
-          int width = 0;
-          int x = 0;
-          int y = 0;
-          if (l.getGeometry() != null)
-          {
-              x = (int)l.getGeometry().getOffset().getX();
-              y = (int)l.getGeometry().getOffset().getY();
-          }
-          else
-          {
-              x = LabelBlockProxyShape.DEFAULTOFFSETX;
-              y = LabelBlockProxyShape.DEFAULTOFFSETY;
-          }
-          Font font = BOLD;
-          String blocked = "BLOCKED:";
-          TextLayout text = new TextLayout(blocked, font,
-                                           new FontRenderContext(null, true, true));
-          width = (int)text.getBounds().getWidth();
-          for (Proxy p : l.getEventList())
-          {
-              // Use different font for different event kinds.
-              font = DEFAULT;
-              if (p instanceof SimpleIdentifierSubject)
-              {
-                  SimpleIdentifierSubject identifier = (SimpleIdentifierSubject) p;
-                  for (EventDeclProxy event: mModule.getEventDeclList())
-                  {
-                      if (event.getName().equals(identifier.getName()))
-                      {
-                          if (event.getKind() == EventKind.UNCONTROLLABLE)
-                          {
-                              font = UNCONTROLLABLE;
-                          }
-                          break;
-                      }
-                  }
-              }
-              
-              LabelShape ls = new LabelShape(p, x + 1, y + height, font);
-              mMap.put(p, ls);
-              height += ls.getShape().getHeight();
-              
-              if (width < ls.getShape().getWidth())
-              {
-                  width = (int)ls.getShape().getWidth();
-              }
-          }
-          height += 4;
-          width += 3;
-          RoundRectangle2D mBounds = new RoundRectangle2D.Double(
-              x, y, width, height,
-              LabelBlockProxyShape.DEFAULTARCW,
-              LabelBlockProxyShape.DEFAULTARCH);
-          s = new LabeledLabelBlockProxyShape(l, mBounds, blocked, DEFAULT);
-          mMap.put(l, s);
+        throw new VisitorException(p + " is not in the map");
       }
-      return s;
-    }
+    return s;
+  }
     
-    public GroupNodeProxyShape visitGroupNodeProxy(GroupNodeProxy g)
-    {
-        GroupNodeProxyShape s = (GroupNodeProxyShape)mMap.get(g);
-        if (s == null)
-        {
-            s = new GroupNodeProxyShape(g);
-            mMap.put(g, s);
-        }
-        return s;
-    }
-    
-    public ProxyShape getShape(final Proxy proxy)
-    {
-      if (proxy != null) {
-        try {
-          return (ProxyShape) proxy.acceptVisitor(this);
-        } catch (final VisitorException exception) {
-          throw new WatersRuntimeException(exception);
-        }
-      } else {
-        return null;
+
+  //#########################################################################
+  //# Auxiliary Access
+  public Rectangle getMinimumBoundingRectangle()
+  {
+    // *** BUG ***
+    // This is only accurate when the graph has been drawn!
+    // ***
+    Collection<ProxyShape> shapes = mMap.values();
+    Rectangle rect = new Rectangle(0,0,0,0);
+    synchronized(mMap)
+      {
+        for (ProxyShape shape : shapes)
+          {
+            rect.add(shape.getShape().getBounds2D());
+          }
       }
-    }
+    return rect;
+  }
     
-    public ProxyShape visitProxy(Proxy p) throws VisitorException
-    {
-        ProxyShape s = mMap.get(p);
-        if (s == null)
-        {
-            throw new VisitorException(p + " is not in the map");
-        }
-        return s;
-    }
+  protected Map<Proxy, ProxyShape> getMap()
+  {
+    return mMap;
+  }
     
-    public Rectangle getMinimumBoundingRectangle()
-    {
-      // *** BUG ***
-      // This is only accurate when the graph has been drawn!
-      // ***
-        Collection<ProxyShape> shapes = mMap.values();
-        Rectangle rect = new Rectangle(0,0,0,0);
-        synchronized(mMap)
-        {
-            for (ProxyShape shape : shapes)
-            {
-                rect.add(shape.getShape().getBounds2D());
+
+  //#########################################################################
+  //# Auxiliary Methods
+  LabelBlockProxyShape createLabelBlockShape
+    (final LabelBlockProxy block,
+     final EdgeProxyShape eshape)
+  {
+    double height = 1.0;
+    double width = 0.0;
+    double x;
+    double y;
+    final LabelGeometryProxy geo = block.getGeometry();
+    if (geo == null) {
+      x = LabelBlockProxyShape.DEFAULTOFFSETX;
+      y = LabelBlockProxyShape.DEFAULTOFFSETY;
+    } else {
+      final Point2D offset = geo.getOffset();
+      x = offset.getX();
+      y = offset.getY();
+    }
+    if (eshape != null) {
+      final Point2D turn = eshape.getTurningPoint();
+      x += turn.getX();
+      y += turn.getY();
+    } else {
+      // Oh no! It's the blocked events list!
+      final TextLayout text =
+        new TextLayout(BLOCKED_HEADER, BOLD,
+                       new FontRenderContext(null, true, true));
+      width = text.getBounds().getWidth();
+    }
+    final int lx = (int) Math.round(x) + 1;
+    for (final Proxy proxy : block.getEventList()) {
+      // Use different font for different event kinds.
+      Font font = DEFAULT;
+      if (proxy instanceof IdentifierProxy) {
+        final IdentifierProxy ident = (IdentifierProxy) proxy;
+        final String name = ident.getName();
+        for (final EventDeclProxy event : mModule.getEventDeclList()) {
+          if (event.getName().equals(name)) {
+            if (event.getKind() == EventKind.UNCONTROLLABLE) {
+              font = UNCONTROLLABLE;
             }
+            break;
+          }
         }
-        return rect;
+      }
+      final int ly = (int) Math.round(y + height);
+      final LabelShape lshape = new LabelShape(proxy, lx, ly, font);
+      mMap.put(proxy, lshape);
+      final RoundRectangle2D lrect = lshape.getShape();
+      height += lrect.getHeight();
+      if (width < lrect.getWidth()) {
+        width = lrect.getWidth();
+      }
     }
-    
-    protected Map<Proxy, ProxyShape> getMap()
-    {
-        return mMap;
+    height += 4;
+    width += 3;
+    final RoundRectangle2D bounds =
+      new RoundRectangle2D.Double(x, y, width, height,
+                                  LabelBlockProxyShape.DEFAULTARCW,
+                                  LabelBlockProxyShape.DEFAULTARCH);
+    final LabelBlockProxyShape shape;
+    if (eshape != null) {
+      shape = new LabelBlockProxyShape(block, bounds);
+    } else {
+      shape = new LabeledLabelBlockProxyShape(block, bounds,
+                                              BLOCKED_HEADER, BOLD);
     }
+    mMap.put(block, shape);
+    return shape;
+  }
     
-    private final ModuleProxy mModule;
-    private final Map<Proxy, ProxyShape> mMap;
+  GuardActionBlockProxyShape createGuardActionBlockShape
+    (final GuardActionBlockProxy ga,
+     final EdgeProxyShape eshape)
+  {
+    final Point2D turn = eshape.getTurningPoint();
+    double x = turn.getX();
+    double y = turn.getY();
+    final LabelGeometryProxy geo = ga.getGeometry();
+    if (geo == null) {
+      x += GuardActionBlockProxyShape.DEFAULTOFFSETX;
+      y += GuardActionBlockProxyShape.DEFAULTOFFSETY;
+    } else {
+      final Point2D offset = geo.getOffset();
+      x += offset.getX();
+      y += offset.getY();
+    }
+    final int lx = (int) Math.round(x);
+    double width = 0.0;
+    double height = 2.0;
+    final List<SimpleExpressionProxy> guards = ga.getGuards();
+    for (final SimpleExpressionProxy guard : guards) {
+      final int ly = (int) Math.round(y + height);
+      final LabelShape lshape =
+        new LabelShape(guard, lx, ly, DEFAULT, "guard");
+      mMap.put(guard, lshape);
+      final RoundRectangle2D lrect = lshape.getShape();
+      height += lrect.getHeight();
+      if (width < lrect.getWidth()) {
+        width = lrect.getWidth();
+      }
+    }
+    if (!guards.isEmpty()) {
+      height += 2;
+    }
+    final List<BinaryExpressionProxy> actions = ga.getActions();
+    for (final BinaryExpressionProxy action : actions) {
+      final int ly = (int) Math.round(y + height);
+      final LabelShape lshape =
+        new LabelShape(action, lx, ly, DEFAULT, "action");
+      mMap.put(action, lshape);
+      final RoundRectangle2D lrect = lshape.getShape();
+      height += lrect.getHeight();
+      if (width < lrect.getWidth()) {
+        width = lrect.getWidth();
+      }
+    }
+    final RoundRectangle2D bounds =
+      new RoundRectangle2D.Double(x, y, width, height,
+                                  GuardActionBlockProxyShape.DEFAULTARCW,
+                                  GuardActionBlockProxyShape.DEFAULTARCH);
+    final GuardActionBlockProxyShape shape =
+      new GuardActionBlockProxyShape(ga, bounds);
+    mMap.put(ga, shape);
+    return shape;
+  }
     
-    public static final Font DEFAULT = new Font("Dialog", Font.PLAIN, 12);
-    public static final Font BOLD = DEFAULT.deriveFont(Font.BOLD);
-    public static final Font UNCONTROLLABLE = DEFAULT.deriveFont(Font.ITALIC);
+
+  //#########################################################################
+  //# Data Members
+  private final ModuleProxy mModule;
+  private final Map<Proxy,ProxyShape> mMap;
+
+    
+  //#########################################################################
+  //# Class Constants
+  public static final Font DEFAULT = new Font("Dialog", Font.PLAIN, 12);
+  public static final Font BOLD = DEFAULT.deriveFont(Font.BOLD);
+  public static final Font UNCONTROLLABLE = DEFAULT.deriveFont(Font.ITALIC);
+
+  private static final String BLOCKED_HEADER = "BLOCKED:";
+
 }

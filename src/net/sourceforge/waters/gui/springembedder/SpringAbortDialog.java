@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringAbortDialog
 //###########################################################################
-//# $Id: SpringAbortDialog.java,v 1.2 2006-10-20 05:20:55 robi Exp $
+//# $Id: SpringAbortDialog.java,v 1.3 2007-02-22 03:08:31 robi Exp $
 //###########################################################################
 
 
@@ -27,6 +27,7 @@ import javax.swing.border.Border;
 
 public class SpringAbortDialog
   extends JDialog
+  implements ActionListener, EmbedderObserver
 {
   
   //#########################################################################
@@ -37,75 +38,79 @@ public class SpringAbortDialog
 			   final long timeout)
   {
     super(owner, "Layouting " + name + " ...");
+    mTimeout = timeout;
+    mTimer = new Timer();
     mEmbedder = embedder;
-
+    mEmbedder.addObserver(this);
     final Border border1 = BorderFactory.createEmptyBorder(4, 4, 4, 4);
-    mProgress = new JProgressBar(0, SpringEmbedder.NUM_PASSES + 1);
+    mProgress = new JProgressBar(0, SpringEmbedder.getMaxProgress());
     mProgress.setAlignmentX(Component.CENTER_ALIGNMENT);
     mProgress.setBorder(border1);
     final Border border2 = BorderFactory.createEmptyBorder(4, 4, 4, 4);
     final JButton abort = new JButton("Abort");
     abort.setAlignmentX(Component.CENTER_ALIGNMENT);
     abort.setBorder(border2);
-    abort.addActionListener(new ActionListener()
-      {
-	public void actionPerformed(final ActionEvent event) {
-	  mEmbedder.stop();
-	}
-      });
+    abort.addActionListener(this);
     final Box box = new Box(BoxLayout.Y_AXIS);
     box.add(mProgress);
     box.add(abort);
     add(box);
-
-    final RefreshTask task = new RefreshTask(timeout);
-    mTimer = new Timer(false);
-    mTimer.schedule(task, TIME_PERIOD, TIME_PERIOD);
-
     pack();
   }
 
 
   //#########################################################################
-  //# Inner Class RefreshTask
-  private class RefreshTask extends TimerTask
+  //# Interface java.awt.event.ActionListener
+  public void actionPerformed(final ActionEvent event)
   {
-    //#########################################################################
-    //# Constructors
-    private RefreshTask(final long timeout)
-    {
-      mStopTime = timeout >= 0 ? System.currentTimeMillis() + timeout : -1;
+    mEmbedder.stop();
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.springembedder.EmbedderObserver
+  public void embedderChanged(final EmbedderEvent event)
+  {
+    switch (event.getType()) {
+    case EMBEDDER_START:
+      final TimerTask task = new AbortTask();
+      mTimer.schedule(task, mTimeout);
+      break;
+    case EMBEDDER_STOP:
+      mTimer.cancel();
+      mEmbedder.removeObserver(this);
+      dispose();
+      break;
+    case EMBEDDER_PROGRESS:
+      mProgress.setValue(mEmbedder.getProgress());
+      break;
+    default:
+      throw new IllegalArgumentException
+        ("Unknown embedder event: " + event.getType() + "!");
     }
+  }
+
+
+  //#########################################################################
+  //# Inner Class AbortTask
+  private class AbortTask extends TimerTask
+  {
 
     //#########################################################################
     //# Overrides for Abstract Base Class TimerTask
     public void run()
     {
-      if (mEmbedder.isFinished()) {
-	mTimer.cancel();
-	dispose();
-      } else if (mStopTime >= 0 && System.currentTimeMillis() >= mStopTime) {
-	mEmbedder.stop();
-      } else {
-	mProgress.setValue(mEmbedder.getProgress());
-      }
+      mEmbedder.stop();
     }
 
-    //#######################################################################
-    //# Data Members
-    private long mStopTime;
   }
 
 
   //#########################################################################
   //# Data Members
-  private final JProgressBar mProgress;
+  private final long mTimeout;
   private final Timer mTimer;
+  private final JProgressBar mProgress;
   private final SpringEmbedder mEmbedder;
-
-
-  //#########################################################################
-  //# Class Constants
-  private static final long TIME_PERIOD = 100;
 
 }

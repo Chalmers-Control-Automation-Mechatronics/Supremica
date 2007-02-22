@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.33 2007-02-21 08:37:21 torda Exp $
+//# $Id: SpringEmbedder.java,v 1.34 2007-02-22 03:08:31 robi Exp $
 //###########################################################################
 
 
@@ -31,6 +31,7 @@ import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;
+import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
@@ -46,44 +47,166 @@ public class SpringEmbedder
 
   //#########################################################################
   //# Constructors
-  public SpringEmbedder(GraphSubject graph)
+  public SpringEmbedder(final GraphSubject graph)
   {
-    this(graph, 228424);
+    this(graph, System.currentTimeMillis());
   }
   
-  public SpringEmbedder(Collection<NodeSubject> nodes,
-                        Collection<EdgeSubject> edges)
+  public SpringEmbedder(final Collection<NodeSubject> nodes,
+                        final Collection<EdgeSubject> edges)
   {
-    this(nodes, edges, 228424);
+    this(nodes, edges, null, System.currentTimeMillis());
   }
 
-  public SpringEmbedder(GraphSubject graph, final int seed)
+  public SpringEmbedder(final Collection<NodeSubject> nodes,
+                        final Collection<EdgeSubject> edges,
+                        final LabelBlockSubject blocked)
   {
-    this(graph.getNodesModifiable(), graph.getEdgesModifiable(), seed);
+    this(nodes, edges, blocked, System.currentTimeMillis());
+  }
+
+  public SpringEmbedder(final GraphSubject graph, final long seed)
+  {
+    this(graph.getNodesModifiable(),
+         graph.getEdgesModifiable(),
+         graph.getBlockedEvents(),
+         seed);
   }
   
-  public SpringEmbedder(Collection<NodeSubject> nodes,
-                        Collection<EdgeSubject> edges, int seed)
+  public SpringEmbedder(final Collection<NodeSubject> nodes,
+                        final Collection<EdgeSubject> edges,
+                        final LabelBlockSubject blocked,
+                        final long seed)
   {
     mRandom = new Random(seed);
     mNodes = nodes;
     mEdges = edges;
+    mBlocked = blocked;
     mObservers = new LinkedList<EmbedderObserver>();
   }
 
+
   //#########################################################################
   //# Observer Pattern
-  public void addObserver(EmbedderObserver observer)
+  public void addObserver(final EmbedderObserver observer)
   {
     mObservers.add(observer);
   }
   
-  public void removeObserver(EmbedderObserver observer)
+  public void removeObserver(final EmbedderObserver observer)
   {
     mObservers.remove(observer);
   }
+
   
-  private void fireEvent(EmbedderEvent event)
+  //#########################################################################
+  //# Interface java.lang.Runnable
+  public void run()
+  {
+    createWrappers();
+    mSpringEmbedders.add(this);
+    fireStarted();
+    runToConvergence();
+    mSpringEmbedders.remove(this);
+    SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+          updateModel();
+          fireStopped();
+        }
+      });
+  }
+  
+
+  //#########################################################################
+  //# Geometry Setup
+  public boolean setUpGeometry()
+    throws GeometryAbsentException
+  {
+    boolean runEmbedder = false;
+    if (mBlocked != null) {
+      if (mBlocked.getGeometry() == null) {
+        // *** BUG ***
+        // Must calculate better position!
+        // ***
+        mBlocked.setGeometry(new LabelGeometrySubject(new Point(5, 5)));
+      }
+    }
+
+    // *** BUG ***
+    // This should used named constants throughout!
+    // ***
+    for (final NodeSubject node : mNodes) {
+      if (node instanceof SimpleNodeSubject) {
+        final SimpleNodeSubject simple = (SimpleNodeSubject) node;
+        if (simple.isInitial()) {
+          if (simple.getInitialArrowGeometry() == null) {
+            simple.setInitialArrowGeometry
+              (new PointGeometrySubject(new Point(-5, -5)));
+          }
+        }
+        if (simple.getPointGeometry() == null) {
+          runEmbedder = true;
+          final int base;
+          final int spread;
+          if (simple.isInitial()) {
+            base = 10;
+            spread = 50;
+          } else {
+            base = 100;
+            spread = 500;
+          }
+          simple.setPointGeometry
+            (new PointGeometrySubject
+                    (new Point(base + mRandom.nextInt(spread),
+                               base + mRandom.nextInt(spread))));
+        }
+        if (simple.getLabelGeometry() == null) {
+          simple.setLabelGeometry
+            (new LabelGeometrySubject(new Point(5, 5)));
+        }
+      } else if (node instanceof GroupNodeSubject) {
+        final GroupNodeSubject group = (GroupNodeSubject) node;
+        if (group.getGeometry() == null) {
+          throw new GeometryAbsentException
+            ("There is no geometry information for group node '" +
+             group.getName() + "' in this graph!");
+        }
+      } else {
+        throw new ClassCastException
+          ("Unknown node type: " + node.getClass().getName() + "!");
+      }
+    }
+
+    for (final EdgeSubject edge : mEdges) {
+      edge.setStartPoint(null);
+      edge.setEndPoint(null);
+      if (edge.getLabelBlock().getGeometry() == null) {
+        final LabelGeometrySubject offset =
+          new LabelGeometrySubject
+               (new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
+                          LabelBlockProxyShape.DEFAULTOFFSETY));
+        edge.getLabelBlock().setGeometry(offset);
+      }
+      if (edge.getGuardActionBlock() != null &&
+          edge.getGuardActionBlock().getGeometry() == null) {
+        // *** BUG ***
+        // Not a very good position!
+        // ***
+        final LabelGeometrySubject offset =
+          new LabelGeometrySubject
+               (new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
+                          LabelBlockProxyShape.DEFAULTOFFSETY + 10));
+        edge.getGuardActionBlock().setGeometry(offset);
+      }
+    }
+
+    return runEmbedder;
+  }
+
+
+  //#########################################################################
+  //# Observer Pattern
+  private void fireEvent(final EmbedderEvent event)
   {
     // Just in case they try to change the list in response to the call ...
     final Collection<EmbedderObserver> copy =
@@ -93,12 +216,43 @@ public class SpringEmbedder
     }
   }
 
-  
-  //#########################################################################
-  //# Interface java.lang.Runnable
-  public void run()
+  private void fireStarted()
   {
-    springEmbedders.add(this);
+    final EmbedderEvent event = EmbedderEvent.createEmbedderStartEvent(this);
+    fireEvent(event);
+  }
+
+  private void fireStopped()
+  {
+    final EmbedderEvent event = EmbedderEvent.createEmbedderStopEvent(this);
+    fireEvent(event);
+  }
+
+  private void fireProgress()
+  {
+    final EmbedderEvent event =
+      EmbedderEvent.createEmbedderProgressEvent(this);
+    fireEvent(event);
+  }
+
+
+  //#########################################################################
+  //# Progress Reporting
+  public int getProgress()
+  {
+    return NUM_PASSES - mPass;
+  }
+
+  public static int getMaxProgress()
+  {
+    return NUM_PASSES + 1;
+  }
+
+
+  //##########################################################################
+  //# Auxiliary Methods
+  private void createWrappers()
+  {
     final int numnodes = mNodes.size();
     mNodeMap = new HashMap<SimpleNodeSubject,NodeWrapper>(numnodes);
     final int numedges = mEdges.size();
@@ -109,11 +263,9 @@ public class SpringEmbedder
         final NodeWrapper wrapper = new NodeWrapper(simple);
         mNodeMap.put(simple, wrapper);
       } else {
-        springEmbedders.remove(this);
-        return;
-        /*throw new GeometryAbsentException
+        throw new IllegalStateException
           ("SpringEmbedder does not support nodes of type " +
-           node.getClass().getName() + "!");*/
+           node.getClass().getName() + "!");
       }
     }
     for (final EdgeSubject edge : mEdges) {
@@ -130,131 +282,36 @@ public class SpringEmbedder
     mNodeEdgeRepulsion = NODEEDGE_REPULSION / numnodes;
     mEdgeRepulsion = EDGE_REPULSION / numedges;
     mCenter = (Point2D) POINT_CENTER.clone();
-    
-    fireEvent(new EmbedderEvent(EmbedderEventType.START));
-    long stoptime = Long.MAX_VALUE;
+  }
 
-    int count = 0;
-    double limit = CONVERGENCE_CONST;
-    for (int i = 1; i < NUM_PASSES; i++) {
-      limit *= 4.0;
+  private void runToConvergence()
+  {
+    if (!mStop) {
+      int count = 0;
+      double limit = CONVERGENCE_CONST;
+      for (int i = 1; i < NUM_PASSES; i++) {
+        limit *= 4.0;
+      }
+      for (mPass = NUM_PASSES; mPass >= 0; mPass--) {
+        fireProgress();
+        double maxdelta;
+        do {
+          maxdelta = calculateDisplacements();
+          if (count++ >= UPDATE_CONST) {
+            count = 0;
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                  updateModel();
+                }
+              });
+            Thread.yield();
+          }
+        } while (maxdelta > limit && !mStop);
+        limit *= 0.25;
+      }
     }
-    for (mPass = NUM_PASSES; mPass >= 0; mPass--) {
-      double maxdelta;
-      do {
-        maxdelta = calculateDisplacements();
-        if (count++ >= UPDATE_CONST) {
-          count = 0;
-          SwingUtilities.invokeLater(new Runnable() {
-              public void run() {
-                updateModel();
-              }
-            });
-          Thread.yield();
-        }
-      } while (maxdelta > limit && !mStop);
-      limit *= 0.25;
-    }
-    mFinished = true;
-    springEmbedders.remove(this);
-    SwingUtilities.invokeLater(new Runnable() {
-        public void run() {
-          updateModel();
-          fireEvent(new EmbedderEvent(EmbedderEventType.STOP));
-        }
-      });
-  }
-  
-  public int getProgress()
-  {
-    return NUM_PASSES - mPass;
   }
 
-/*  public double getProgress()
-  {
-    return 1.0 - (mPass + 1.0) / (NUM_PASSES + 1.0);
-  }*/
-  
-  public static boolean setUpGeometry(GraphSubject graph)
-    throws GeometryAbsentException
-  {
-    return setUpGeometry(graph, 228424);
-  }
-
-  public static boolean setUpGeometry(GraphSubject graph, int seed)
-			throws GeometryAbsentException {
-		boolean runEmbedder = false;
-		Random rand = new Random(seed);
-		if (graph.getBlockedEvents() != null) {
-			if (graph.getBlockedEvents().getGeometry() == null) {
-				// TODO: Calculate better position
-				graph.getBlockedEvents().setGeometry(
-						new LabelGeometrySubject(new Point(5, 5)));
-			}
-		}
-		for (NodeSubject node : graph.getNodesModifiable()) {
-			if (node instanceof SimpleNodeSubject) {
-				SimpleNodeSubject n = (SimpleNodeSubject) node;
-				if (n.isInitial()) {
-					if (n.getInitialArrowGeometry() == null) {
-						n.setInitialArrowGeometry(new PointGeometrySubject(
-								new Point(-5, -5)));
-					}
-				}
-
-				if (n.getPointGeometry() == null) {
-					runEmbedder = true;
-					final int base;
-					final int spread;
-					if (n.isInitial()) {
-						base = 10;
-						spread = 50;
-					} else {
-						base = 100;
-						spread = 500;
-					}
-					n.setPointGeometry(new PointGeometrySubject(
-							new Point(base + rand.nextInt(spread), base
-									+ rand.nextInt(spread))));
-				}
-				if (n.getLabelGeometry() == null) {
-					n
-							.setLabelGeometry(new LabelGeometrySubject(
-									new Point(5, 5)));
-				}
-			} else if (node instanceof GroupNodeSubject) {
-				if (((GroupNodeSubject) node).getGeometry() == null) {
-					throw new GeometryAbsentException(
-							"There is no geometry information"
-									+ " for a group node in this graph");
-				}
-			}
-		}
-		for (EdgeSubject edge : graph.getEdgesModifiable()) {
-			if (!(edge.getSource() instanceof GroupNodeSubject)) {
-				edge.setStartPoint(null);
-			}
-			if (!(edge.getTarget() instanceof GroupNodeSubject)) {
-				edge.setEndPoint(null);
-			}
-			if (edge.getLabelBlock().getGeometry() == null) {
-				LabelGeometrySubject offset = new LabelGeometrySubject(
-						new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
-								LabelBlockProxyShape.DEFAULTOFFSETY));
-				edge.getLabelBlock().setGeometry(offset);
-			}
-			if (edge.getGuardActionBlock() != null && edge.getGuardActionBlock().getGeometry() == null) {
-				LabelGeometrySubject offset = new LabelGeometrySubject(
-						new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
-								LabelBlockProxyShape.DEFAULTOFFSETY + 10));
-				edge.getGuardActionBlock().setGeometry(offset);
-			}
-		}
-		return runEmbedder;
-	}
-
-  // #########################################################################
-  // # Auxiliary Methods
   private synchronized double calculateDisplacements()
   {
     final Collection<? extends GeometryWrapper> wrappers =
@@ -266,6 +323,8 @@ public class SpringEmbedder
       wrapper.calculateDisplacement();
     }
     double maxdelta = 0.0;
+    double movex = 0.0;
+    double movey = 0.0;
     if (mPass > 0) {
       double minx = Double.MAX_VALUE;
       double miny = Double.MAX_VALUE;
@@ -283,13 +342,13 @@ public class SpringEmbedder
       final double dx = GRAPH_MARGINAL_CONST - minx;
       final double dy = GRAPH_MARGINAL_CONST - miny;
       final double factor = mPass * CENTER_MOVE_CONST;
-      final double movex = factor * dx;
-      final double movey = factor * dy;
+      movex = factor * dx;
+      movey = factor * dy;
       final double newx = mCenter.getX() + movex;
       final double newy = mCenter.getY() + movey;
       mCenter.setLocation(newx, newy);
       if (mPass > 1) {
-        maxdelta = Math.sqrt(dx * dx + dy * dy);
+        maxdelta = Math.sqrt(movex * movex + movey * movey);
       }
     }
     for (final GeometryWrapper wrapper : wrappers) {
@@ -299,6 +358,9 @@ public class SpringEmbedder
       }
     }
     for (final GeometryWrapper wrapper : wrappers) {
+      if (mPass > 0) {
+        wrapper.move(movex, movey);
+      }
       wrapper.updatePoint();
     }
     return maxdelta;
@@ -368,8 +430,8 @@ public class SpringEmbedder
 
   public static void stopAll()
   {
-    synchronized(springEmbedders) {
-      for (SpringEmbedder embedder : springEmbedders) {
+    synchronized(mSpringEmbedders) {
+      for (SpringEmbedder embedder : mSpringEmbedders) {
         embedder.stop();
       }
     }
@@ -380,11 +442,6 @@ public class SpringEmbedder
     mStop = true;
   }
   
-  public boolean isFinished()
-  {
-    return mFinished;
-  }
-
 
   //#########################################################################
   //# Inner Class GeometryWrapper
@@ -421,8 +478,8 @@ public class SpringEmbedder
 
     void move(final double dx, final double dy)
     {
-      final double newx = mNewPoint.getX();
-      final double newy = mNewPoint.getY();
+      final double newx = mNewPoint.getX() + dx;
+      final double newy = mNewPoint.getY() + dy;
       setNewPoint(newx, newy);
     }
 
@@ -568,9 +625,9 @@ public class SpringEmbedder
       for (final NodeWrapper other : mNodeMap.values()) {
         if (other != this) {
           delta += getDeltaChange(other);
-         }
+        }
       }
-      for (final  NodeWrapper other : mNeighbours.keySet()) {
+      for (final NodeWrapper other : mNeighbours.keySet()) {
         delta += getDeltaChange(other);
       }
       final int count = mNodeMap.size() + mNeighbours.size();
@@ -778,7 +835,9 @@ public class SpringEmbedder
   private final Random mRandom;
   private final Collection<NodeSubject> mNodes;
   private final Collection<EdgeSubject> mEdges;
+  private final LabelBlockSubject mBlocked;
   private final Collection<EmbedderObserver> mObservers;
+
   private Map<SimpleNodeSubject,NodeWrapper> mNodeMap;
   private Map<EdgeSubject,EdgeWrapper> mEdgeMap;
   private Set<GeometryWrapper> mWrapperSet;
@@ -792,12 +851,14 @@ public class SpringEmbedder
   private int mPass;
 
   private volatile boolean mStop = false;
-  private boolean mFinished = false;
+
+  private static final List<SpringEmbedder> mSpringEmbedders =
+    Collections.synchronizedList(new LinkedList<SpringEmbedder>());
 
 
   //###########################################################################
   //# Class Constants
-  static final int NUM_PASSES = 3;
+  private static final int NUM_PASSES = 3;
   private static final double EPSILON = 0.00002;
   private static final double MULTI_EDGE_WEIGHT = 1.333;
   private static final double SELFLOOP_WEIGHT = 1.05;
@@ -816,12 +877,9 @@ public class SpringEmbedder
   private static final double GRAPH_MARGINAL_CONST = 48.0;
   private static final double CENTER_MOVE_CONST = 0.01;
   private static final double CONVERGENCE_CONST = 0.033;
-  private static final int UPDATE_CONST = 5;
+  private static final int UPDATE_CONST = 10;
 
   private static final Point2D POINT_ZERO = new Point2D.Double(0.0, 0.0);
   private static final Point2D POINT_CENTER = new Point2D.Double(200.0, 200.0);
-
-  private static final List<SpringEmbedder> springEmbedders =
-    Collections.synchronizedList(new LinkedList<SpringEmbedder>());
 
 }

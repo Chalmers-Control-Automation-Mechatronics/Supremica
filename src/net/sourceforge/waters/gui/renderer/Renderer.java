@@ -1,3 +1,12 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.gui.renderer
+//# CLASS:   Renderer
+//###########################################################################
+//# $Id: Renderer.java,v 1.11 2007-02-22 03:08:31 robi Exp $
+//###########################################################################
+
 package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Graphics2D;
@@ -9,28 +18,32 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
+import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+
 
 public class Renderer
 {
     public void renderGraph(GraphProxy graph, List<MiscShape> shapes,
         Renderable render, ProxyShapeProducer producer,
         Graphics2D graphics)
-    {
-        PriorityQueue<ShapeToRender> queue = new PriorityQueue<ShapeToRender>();
-            // Blocked events
-            if (graph.getBlockedEvents() != null)
-            {
-                queue.offer(new ShapeToRender(producer.getShape(graph),
-                    render.getRenderingInformation(graph.getBlockedEvents())));
-                for (Proxy p : graph.getBlockedEvents().getEventList())
-                {
-                    queue.offer(new ShapeToRender(producer.getShape(p),
-                        render.getRenderingInformation(p)));
-                }
-            }
+  {
+    final PriorityQueue<ShapeToRender> queue =
+      new PriorityQueue<ShapeToRender>();
+
+    // Blocked events
+    final LabelBlockProxy blocked = graph.getBlockedEvents();
+    if (blocked != null) {
+      queue.offer(new ShapeToRender(producer.getShape(blocked),
+                                    render.getRenderingInformation(blocked)));
+      for (final Proxy proxy : blocked.getEventList()) {
+        queue.offer(new ShapeToRender(producer.getShape(proxy),
+                                      render.getRenderingInformation(proxy)));
+      }
+    }
+
             // Nodes
             for (NodeProxy proxy : graph.getNodes())
             {

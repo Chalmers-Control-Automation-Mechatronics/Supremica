@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   SubjectShapeProducer
 //###########################################################################
-//# $Id: SubjectShapeProducer.java,v 1.26 2007-02-20 04:00:42 robi Exp $
+//# $Id: SubjectShapeProducer.java,v 1.27 2007-02-22 03:08:31 robi Exp $
 //###########################################################################
 
 
@@ -42,6 +42,7 @@ import net.sourceforge.waters.subject.module.EventListExpressionSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
+import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.NodeSubject;
@@ -78,7 +79,50 @@ public class SubjectShapeProducer
     graph.addModelObserver(this);
   }
 	
-	
+
+  //########################################################################
+  //# Overrides for Base Class ProxyShapeProducer
+  public GuardActionBlockProxyShape visitGuardActionBlockProxy
+    (final GuardActionBlockProxy ga)
+  {
+    final GuardActionBlockProxyShape shape =
+      (GuardActionBlockProxyShape) getMap().get(ga);
+    if (shape != null) {
+      return shape;
+    } else {
+      // Tricky --- a guard/action block may have been uncached independently
+      // from its edge. We must provide the parent shape!
+      final GuardActionBlockSubject subject = (GuardActionBlockSubject) ga;
+      final EdgeProxy edge = (EdgeProxy) subject.getParent();
+      final EdgeProxyShape eshape = visitEdgeProxy(edge);
+      return createGuardActionBlockShape(ga, eshape);
+    }
+  }
+
+  public LabelBlockProxyShape visitLabelBlockProxy(final LabelBlockProxy block)
+  {
+    final LabelBlockProxyShape shape =
+      (LabelBlockProxyShape) getMap().get(block);
+    if (shape != null) {
+      return shape;
+    } else {
+      // Tricky --- a label block may have been uncached independently
+      // from its edge. We must provide the parent shape!
+      final LabelBlockSubject subject = (LabelBlockSubject) block;
+      final Subject parent = subject.getParent();
+      if (parent instanceof EdgeProxy) {
+        final EdgeProxy edge = (EdgeProxy) parent;
+        final EdgeProxyShape eshape = visitEdgeProxy(edge);
+        return createLabelBlockShape(block, eshape);
+      } else {
+        return createLabelBlockShape(block, null);
+      }
+    }
+  }
+
+
+  //########################################################################
+  //# Cleaning the Cache	
 	private void removeMapping(NodeProxy node)
 	{
 		getMap().remove(node);

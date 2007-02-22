@@ -19,7 +19,7 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import javax.swing.KeyStroke;
 import java.awt.event.KeyEvent;
-import net.sourceforge.waters.gui.command.CopyGraphCommand;
+//import net.sourceforge.waters.gui.command.CopyGraphCommand;
 import net.sourceforge.waters.gui.command.Command;
 import java.awt.datatransfer.FlavorListener;
 import java.awt.datatransfer.FlavorEvent;
@@ -58,6 +58,7 @@ public class EditorPasteAction
     
     public void doAction()
     {
+      /*
       if (CLIPBOARD.isDataFlavorAvailable(COPYGRAPH)) {
         try {
           ControlledSurface surface = ide.getActiveEditorWindowInterface()
@@ -73,6 +74,7 @@ public class EditorPasteAction
           ex.printStackTrace();
         }
       }
+      */
     }
     
     public void flavorsChanged(FlavorEvent e)

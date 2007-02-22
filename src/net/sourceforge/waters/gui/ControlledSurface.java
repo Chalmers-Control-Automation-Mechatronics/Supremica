@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.123 2007-02-22 01:41:43 siw4 Exp $
+//# $Id: ControlledSurface.java,v 1.124 2007-02-22 03:08:31 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -56,6 +56,9 @@ import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.gui.renderer.RenderingInformation;
 import net.sourceforge.waters.gui.renderer.SimpleNodeProxyShape;
 import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
+import net.sourceforge.waters.gui.springembedder.EmbedderEvent;
+import net.sourceforge.waters.gui.springembedder.EmbedderObserver;
+import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -66,10 +69,6 @@ import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.module.*;
-import net.sourceforge.waters.gui.springembedder.EmbedderEvent;
-import net.sourceforge.waters.gui.springembedder.EmbedderEventType;
-import net.sourceforge.waters.gui.springembedder.EmbedderObserver;
-import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
 
 import org.supremica.properties.Config;
 import net.sourceforge.waters.gui.springembedder.SpringAbortDialog;
@@ -91,7 +90,6 @@ public class ControlledSurface
   {
     super(graph, module,
           new SubjectShapeProducer(graph, module, root.getFrame()));
-    boolean runEmbedder = SpringEmbedder.setUpGeometry(graph);
     mRoot = root;
     mToolbar = toolbar;
     if (root != null && toolbar != null) {
@@ -105,6 +103,8 @@ public class ControlledSurface
     final DragSourceListener dsListener = new DSListener();
     mExternalDragSource.addDragSourceListener(dsListener);
     addKeyListener(new KeySpy());
+    final SpringEmbedder embedder = new SpringEmbedder(graph);
+    final boolean runEmbedder = embedder.setUpGeometry();
     graph.addModelObserver(this);
     updateTool();
     if (runEmbedder) {
@@ -126,6 +126,7 @@ public class ControlledSurface
   {
     
   }
+
 
   //#########################################################################
   //# Simple Access
@@ -184,7 +185,7 @@ public class ControlledSurface
   public void embedderChanged(final EmbedderEvent event)
   {
     switch (event.getType()) {
-    case START:
+    case EMBEDDER_START:
       if (mEmbedderController == null) {
         mEmbedderController = new EmbedderController();
       }
@@ -193,7 +194,7 @@ public class ControlledSurface
       // Must disable menus and keyboard also!
       // ***
       break;
-    case STOP:
+    case EMBEDDER_STOP:
       mEmbedder.removeObserver(this);
       mEmbedder = null;
       commitSecondaryGraph();
@@ -201,8 +202,7 @@ public class ControlledSurface
       updateTool();
       break;
     default:
-      throw new IllegalArgumentException
-        ("Unknown embedder event: " + event.getType() + "!");
+      break;
     }
   }
 
@@ -909,7 +909,8 @@ public class ControlledSurface
       final GuardActionBlockSubject ga = edge.getGuardActionBlock();
       collectFocusableObjectAtPosition(ga, point, collection);
     }
-    collectFocusableObjectAtPosition(graph, point, collection);
+    collectFocusableObjectAtPosition
+      (graph.getBlockedEvents(), point, collection);
     return collection;
   }
 
@@ -930,15 +931,7 @@ public class ControlledSurface
     if (!shape.isClicked(x, y)) {
       return;
     }
-    if (item instanceof GraphSubject) {
-      // *** BUG ***
-      // This is ugly :-(
-      // ***
-      final GraphSubject graph = (GraphSubject) item;
-      collection.add(graph.getBlockedEvents());
-    } else {
-      collection.add(item);
-    }
+    collection.add(item);
   }
 
   private int getHighlightPriority(final ProxySubject item)
