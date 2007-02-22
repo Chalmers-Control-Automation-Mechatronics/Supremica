@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.124 2007-02-22 03:08:31 robi Exp $
+//# $Id: ControlledSurface.java,v 1.125 2007-02-22 06:37:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -88,8 +88,7 @@ public class ControlledSurface
                            final ControlledToolbar toolbar)
     throws GeometryAbsentException
   {
-    super(graph, module,
-          new SubjectShapeProducer(graph, module, root.getFrame()));
+    super(graph, module, new SubjectShapeProducer(graph, module));
     mRoot = root;
     mToolbar = toolbar;
     if (root != null && toolbar != null) {
@@ -211,14 +210,16 @@ public class ControlledSurface
   //# Interface net.sourceforge.waters.subject.base.ModelObserver
   public void modelChanged(final ModelChangeEvent event)
   {
-    final Rectangle area = getDrawnAreaBounds();
-    final int extra = Config.GUI_EDITOR_GRID_SIZE.get() * 10;
-    final int x = area.width + extra;
-    final int y = area.height + extra;
-    final Dimension dim = new Dimension(x, y);
-    if (!dim.equals(getPreferredSize())) {
-      setPreferredSize(dim);
-      revalidate();
+    if (mInternalDragAction == null) {
+      final Rectangle area = getDrawnAreaBounds();
+      final int extra = Config.GUI_EDITOR_GRID_SIZE.get() * 10;
+      final int x = area.width + extra;
+      final int y = area.height + extra;
+      final Dimension dim = new Dimension(x, y);
+      if (!dim.equals(getPreferredSize())) {
+        setPreferredSize(dim);
+        revalidate();
+      }
     }
     updateError();
     mController.updateHighlighting();
@@ -1005,8 +1006,8 @@ public class ControlledSurface
   {
     if (mSecondaryGraph == null) {
       mSecondaryGraph = new EditorGraph(getGraph());
-      mSecondaryShapeProducer =
-        new SubjectShapeProducer(mSecondaryGraph, getModule());
+      mSecondaryShapeProducer = new SubjectShapeProducer
+        (mSecondaryGraph, mSecondaryGraph, getModule());
       mSecondaryGraph.addModelObserver(ControlledSurface.this);
       return true;
     } else {

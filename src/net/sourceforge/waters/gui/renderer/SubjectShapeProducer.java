@@ -4,24 +4,11 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   SubjectShapeProducer
 //###########################################################################
-//# $Id: SubjectShapeProducer.java,v 1.27 2007-02-22 03:08:31 robi Exp $
+//# $Id: SubjectShapeProducer.java,v 1.28 2007-02-22 06:37:42 robi Exp $
 //###########################################################################
-
 
 package net.sourceforge.waters.gui.renderer;
 
-import java.awt.Frame;
-import java.awt.Point;
-import java.awt.geom.Point2D;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import javax.swing.JDialog;
-
-import net.sourceforge.waters.gui.EditorGraph;
-import net.sourceforge.waters.gui.springembedder.SpringAbortDialog;
-import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
@@ -46,165 +33,100 @@ import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.NodeSubject;
-import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.subject.module.SplineGeometrySubject;
 import net.sourceforge.waters.xsd.module.SplineKind;
-
-import org.supremica.properties.Config;
 
 
 public class SubjectShapeProducer
   extends ProxyShapeProducer
   implements ModelObserver
 {
-	
-  //########################################################################
+
+  //##########################################################################
   //# Constructors
   public SubjectShapeProducer(final GraphSubject graph,
-                              final ModuleProxy module,
-                              final Frame root)
-  {
-    super(module);
-    mGraph = graph;
-		graph.addModelObserver(this);
-	}
-	
-  public SubjectShapeProducer(final Subject graph,
                               final ModuleProxy module)
   {
-    super(module);
-    mGraph = (GraphProxy) graph;
-    graph.addModelObserver(this);
+    this(graph, graph, module);
   }
-	
 
-  //########################################################################
-  //# Overrides for Base Class ProxyShapeProducer
-  public GuardActionBlockProxyShape visitGuardActionBlockProxy
-    (final GuardActionBlockProxy ga)
+  public SubjectShapeProducer(final GraphProxy graph,
+                              final Subject subject,
+                              final ModuleProxy module)
   {
-    final GuardActionBlockProxyShape shape =
-      (GuardActionBlockProxyShape) getMap().get(ga);
-    if (shape != null) {
-      return shape;
-    } else {
-      // Tricky --- a guard/action block may have been uncached independently
-      // from its edge. We must provide the parent shape!
-      final GuardActionBlockSubject subject = (GuardActionBlockSubject) ga;
-      final EdgeProxy edge = (EdgeProxy) subject.getParent();
-      final EdgeProxyShape eshape = visitEdgeProxy(edge);
-      return createGuardActionBlockShape(ga, eshape);
-    }
+    super(graph, module);
+    subject.addModelObserver(this);
   }
 
-  public LabelBlockProxyShape visitLabelBlockProxy(final LabelBlockProxy block)
+
+  //##########################################################################
+  //# Cleaning the Cache
+  private void removeMapping(final SimpleNodeProxy node)
   {
-    final LabelBlockProxyShape shape =
-      (LabelBlockProxyShape) getMap().get(block);
-    if (shape != null) {
-      return shape;
-    } else {
-      // Tricky --- a label block may have been uncached independently
-      // from its edge. We must provide the parent shape!
-      final LabelBlockSubject subject = (LabelBlockSubject) block;
-      final Subject parent = subject.getParent();
-      if (parent instanceof EdgeProxy) {
-        final EdgeProxy edge = (EdgeProxy) parent;
-        final EdgeProxyShape eshape = visitEdgeProxy(edge);
-        return createLabelBlockShape(block, eshape);
-      } else {
-        return createLabelBlockShape(block, null);
-      }
-    }
+    unmap(node);
+    removeMapping(node.getLabelGeometry());
   }
 
+  private void removeMapping(final GroupNodeProxy node)
+  {
+    unmap(node);
+  }
 
-  //########################################################################
-  //# Cleaning the Cache	
-	private void removeMapping(NodeProxy node)
-	{
-		getMap().remove(node);
-    if (node instanceof SimpleNodeProxy) {
-      removeMapping(((SimpleNodeProxy)node).getLabelGeometry());
-    }
-	}
-	
-	private void removeMapping(GroupNodeProxy node)
-	{
-		getMap().remove(node);
-	}
-	
-	private void removeMapping(LabelGeometryProxy label)
-	{
-		getMap().remove(label);
-	}
-	
+  private void removeMapping(final LabelGeometryProxy label)
+  {
+    unmap(label);
+  }
+
   private void removeMapping(final EdgeProxy edge)
   {
-    getMap().remove(edge);
+    unmap(edge);
     removeMapping(edge.getLabelBlock());
-    final GuardActionBlockProxy ga = edge.getGuardActionBlock();
-    if (ga != null) {
-      removeMapping(edge.getGuardActionBlock());
+    final GuardActionBlockProxy block = edge.getGuardActionBlock();
+    if (block != null) {
+      removeMapping(block);
     }
   }
-	
-	private void removeMapping(LabelBlockProxy label)
-	{
-		getMap().remove(label);
-		for (Proxy p : label.getEventList())
-		{
-			getMap().remove(p);
-		}
-	}
-	
-	private void removeMapping(GuardActionBlockProxy GA)
-	{
-		getMap().remove(GA);
-		for(BinaryExpressionProxy action : GA.getActions())
-		{
-			getMap().remove(GA.getActions());
-		}
-		List<SimpleExpressionProxy> guards = GA.getGuards();
-		if(!guards.isEmpty())
-		{
-			SimpleExpressionProxy guard = guards.get(0);
-			getMap().remove(guard);
-		}
-	}
-	
-	private void removeMapping(Subject subject)
-	{
-		if (subject instanceof SimpleNodeProxy)
-		{
-			removeMapping((SimpleNodeProxy)subject);
-		}
-		if (subject instanceof GroupNodeProxy)
-		{
-			removeMapping((GroupNodeProxy)subject);
-		}
-		if (subject instanceof EdgeProxy)
-		{
-			removeMapping((EdgeProxy)subject);
-		}
-		if (subject instanceof LabelBlockProxy)
-		{
-			removeMapping((LabelBlockProxy)subject);
-		}
-		if (subject instanceof GuardActionBlockProxy)
-		{
-			removeMapping((GuardActionBlockProxy)subject);
-		}
-    if (subject instanceof LabelGeometryProxy)
-		{
-			removeMapping((LabelGeometryProxy)subject);
-		}
-	}
 
-	
-  //########################################################################
+  private void removeMapping(final LabelBlockProxy label)
+  {
+    unmap(label);
+    for (final Proxy proxy : label.getEventList()) {
+      unmap(proxy);
+    }
+  }
+
+  private void removeMapping(final GuardActionBlockProxy block)
+  {
+    unmap(block);
+    for (final SimpleExpressionProxy guard : block.getGuards()) {
+      unmap(guard);
+    }
+    for (final BinaryExpressionProxy action : block.getActions()) {
+      unmap(action);
+    }
+  }
+
+  private void removeMapping(final Subject subject)
+  {
+    if (subject instanceof SimpleNodeProxy) {
+      removeMapping((SimpleNodeProxy) subject);
+    } else if (subject instanceof GroupNodeProxy) {
+      removeMapping((GroupNodeProxy) subject);
+    } else if (subject instanceof EdgeProxy) {
+      removeMapping((EdgeProxy) subject);
+    } else if (subject instanceof LabelBlockProxy) {
+      removeMapping((LabelBlockProxy) subject);
+    } else if (subject instanceof GuardActionBlockProxy) {
+      removeMapping((GuardActionBlockProxy)subject);
+    } else if (subject instanceof LabelGeometryProxy) {
+      removeMapping((LabelGeometryProxy)subject);
+    }
+  }
+
+
+  //##########################################################################
   //# Interface net.sourceforge.waters.subject.base.ModelObserver
   public void modelChanged(final ModelChangeEvent event)
   {
@@ -236,7 +158,7 @@ public class SubjectShapeProducer
       break;
     case ModelChangeEvent.GEOMETRY_CHANGED:
       if (esource instanceof NodeProxy) {
-        for (final EdgeProxy edge : mGraph.getEdges()) {
+        for (final EdgeProxy edge : getGraph().getEdges()) {
           if (edge.getSource() == esource || edge.getTarget() == esource) {
             removeMapping(edge);
           }
@@ -248,10 +170,5 @@ public class SubjectShapeProducer
       removeMapping(esource);
     }
   }
-
-
-  //########################################################################
-  //# Data Members
-  private final GraphProxy mGraph;
 
 }

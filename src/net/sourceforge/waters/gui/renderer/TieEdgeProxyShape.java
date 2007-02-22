@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   TieEdgeProxyShape
 //###########################################################################
-//# $Id: TieEdgeProxyShape.java,v 1.1 2007-02-16 03:00:42 robi Exp $
+//# $Id: TieEdgeProxyShape.java,v 1.2 2007-02-22 06:37:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -128,7 +128,7 @@ class TieEdgeProxyShape
 
   Point2D getEndDirection()
   {
-    final Point2D start = mArc.getEndPoint();
+    final Point2D start = mArc.getStartPoint();
     return GeometryTools.getNormalizedDirection(start, mEnd);
   }
 

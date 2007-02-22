@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.76 2007-02-13 00:14:19 robi Exp $
+//# $Id: EditorSurface.java,v 1.77 2007-02-22 06:37:42 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -61,7 +61,7 @@ public class EditorSurface
   //# Constructors
   public EditorSurface(GraphProxy graph, ModuleProxy module)
   {
-    this(graph, module, new ProxyShapeProducer(module));
+    this(graph, module, new ProxyShapeProducer(graph, module));
   }
     
   public EditorSurface(GraphProxy graph, ModuleProxy module,
