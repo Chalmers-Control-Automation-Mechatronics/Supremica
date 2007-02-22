@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   GeometryTools
 //###########################################################################
-//# $Id: GeometryTools.java,v 1.12 2007-02-22 01:41:43 siw4 Exp $
+//# $Id: GeometryTools.java,v 1.13 2007-02-22 01:51:14 siw4 Exp $
 //###########################################################################
 
 
@@ -100,9 +100,11 @@ public final class GeometryTools
   
   public static void translate(EdgeSubject edge, Point2D point)
   {
-    Point2D pos = edge.getGeometry().getPoints().get(0);
-    pos.setLocation(pos.getX() + point.getX(), pos.getY() + point.getY());
-    edge.getGeometry().getPointsModifiable().set(0, pos);
+    if (edge.getGeometry() != null && !edge.getGeometry().getPoints().isEmpty()) {
+      Point2D pos = edge.getGeometry().getPoints().get(0);
+      pos.setLocation(pos.getX() + point.getX(), pos.getY() + point.getY());
+      edge.getGeometry().getPointsModifiable().set(0, pos);
+    }
   }
   
   public static Point2D getPosition(SimpleNodeProxy node)
