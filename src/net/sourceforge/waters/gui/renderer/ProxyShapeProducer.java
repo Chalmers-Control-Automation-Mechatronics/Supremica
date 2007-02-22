@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   ProxyShapeProducer
 //###########################################################################
-//# $Id: ProxyShapeProducer.java,v 1.21 2007-02-22 06:37:42 robi Exp $
+//# $Id: ProxyShapeProducer.java,v 1.22 2007-02-22 08:45:58 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -93,9 +93,14 @@ public class ProxyShapeProducer
     }
   }
 
+  /**
+   * Calculates a minimum bounding rectangle of all shapes displayed.
+   * This method is only accurate if all shapes are cached. If this
+   * cannot be guaranteed, {@link #createAllShapes()} should be called
+   * first to ensure it.
+   */
   public Rectangle getMinimumBoundingRectangle()
   {
-    createAllShapes();
     final Rectangle rect = new Rectangle(0, 0, 0, 0);
     synchronized (mMap) {
       for (final ProxyShape shape : mMap.values()) {
@@ -151,16 +156,16 @@ public class ProxyShapeProducer
     
   public SimpleNodeProxyShape visitSimpleNodeProxy(SimpleNodeProxy simple)
   {
+    SimpleNodeProxyShape shape = (SimpleNodeProxyShape) lookup(simple);
+    if (shape == null) {
+      shape = new SimpleNodeProxyShape(simple, mModule);
+      mMap.put(simple, shape);
+    }
     final LabelGeometryProxy geo = simple.getLabelGeometry();
     LabelProxyShape label = (LabelProxyShape) lookup(geo);
     if (label == null) {
       label = new LabelProxyShape(simple, DEFAULT);
       mMap.put(geo, label);
-    }
-    SimpleNodeProxyShape shape = (SimpleNodeProxyShape) lookup(simple);
-    if (shape == null) {
-      shape = new SimpleNodeProxyShape(simple, mModule);
-      mMap.put(simple, shape);
     }
     return shape;
   }

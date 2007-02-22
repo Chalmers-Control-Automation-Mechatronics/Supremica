@@ -4,15 +4,15 @@ import java.awt.Graphics2D;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.RenderingHints;
-
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
-
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
+
 
 public class LabelProxyShape
     extends AbstractProxyShape
@@ -21,10 +21,11 @@ public class LabelProxyShape
     {
         super(node.getLabelGeometry());
         mFont = font;
-        int x = (int)(node.getPointGeometry().getPoint().getX() +
-            getProxy().getOffset().getX());
-        int y = (int)(node.getPointGeometry().getPoint().getY() +
-            getProxy().getOffset().getY());
+	final Point2D nodepos = node.getPointGeometry().getPoint();
+	final Point2D offset =
+	  getProxy() == null ? DEFAULTOFFSET : getProxy().getOffset();
+        final int x = (int) Math.round(nodepos.getX() + offset.getX());
+        final int y = (int) Math.round(nodepos.getY() + offset.getY());
         mPoint = new Point(x + 2, y + font.getSize());
         mName = node.getName();
         TextLayout text = new TextLayout(mName, mFont,

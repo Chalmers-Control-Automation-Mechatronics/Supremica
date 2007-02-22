@@ -4,11 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.77 2007-02-22 06:37:42 robi Exp $
+//# $Id: EditorSurface.java,v 1.78 2007-02-22 08:45:58 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
 
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Graphics;
 import java.awt.print.PageFormat;
@@ -200,18 +201,14 @@ public class EditorSurface
     return Collections.emptyList();
   }
     
-  public static boolean isSimpleComponentSubject(Object o)
-  {
-    return (o instanceof SimpleComponentSubject);
-  }
-    
   /**
-   * Calculates and returns a rectangle that includes everything drawn on
-   * the surface.
+   * Calculates a dimension indicating the size of all objects currently
+   * displayed by the shape producer.
    */
-  public Rectangle getDrawnAreaBounds()
+  Dimension calculatePreferredSize()
   {
-    return getShapeProducer().getMinimumBoundingRectangle();
+    final Rectangle area = getShapeProducer().getMinimumBoundingRectangle();
+    return new Dimension(area.width, area.height);
   }
     
   public ProxyShapeProducer getShapeProducer()
@@ -257,7 +254,8 @@ public class EditorSurface
         */
             
         // Get the bounds of the actual drawing
-        Rectangle area = getDrawnAreaBounds();
+        getShapeProducer().createAllShapes();
+        Rectangle area = getShapeProducer().getMinimumBoundingRectangle();
             
         // This is the place to do rescaling if the figure won't fit on the page!
         double scaleX = pageFormat.getImageableWidth() / (area.getWidth());

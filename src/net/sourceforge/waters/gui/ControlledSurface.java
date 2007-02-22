@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.126 2007-02-22 06:47:40 robi Exp $
+//# $Id: ControlledSurface.java,v 1.127 2007-02-22 08:45:58 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -109,6 +109,7 @@ public class ControlledSurface
     if (runEmbedder) {
       runEmbedder();
     }
+    mSizeMayHaveChanged = true;
   }
 
   /**
@@ -213,6 +214,7 @@ public class ControlledSurface
     updateError();
     mController.updateHighlighting();
     repaint();
+    mSizeMayHaveChanged = true;
   }
 
 
@@ -222,16 +224,29 @@ public class ControlledSurface
   {
     super.paintComponent(graphics);
     if (mInternalDragAction == null) {
-      final Rectangle area = getDrawnAreaBounds();
-      final int extra = Config.GUI_EDITOR_GRID_SIZE.get() * 10;
-      final int x = area.width + extra;
-      final int y = area.height + extra;
-      final Dimension dim = new Dimension(x, y);
+      adjustSize();
+    }
+  }
+
+  void adjustSize()
+  {
+    if (mSizeMayHaveChanged) {
+      mSizeMayHaveChanged = false;
+      final Dimension dim = calculatePreferredSize();
       if (!dim.equals(getPreferredSize())) {
         setPreferredSize(dim);
         revalidate();
       }
     }
+  }
+
+  Dimension calculatePreferredSize()
+  {
+    final Rectangle area = getShapeProducer().getMinimumBoundingRectangle();
+    final int extra = Config.GUI_EDITOR_GRID_SIZE.get() * 10;
+    final int x = area.width + extra;
+    final int y = area.height + extra;
+    return new Dimension(x, y);
   }
 
 
@@ -3582,6 +3597,8 @@ public class ControlledSurface
   private final EditorWindowInterface mRoot;
   private final ControlledToolbar mToolbar;
   private EditorOptions mOptions;
+
+  private boolean mSizeMayHaveChanged;
 
   /**
    * List of currently selected items.
