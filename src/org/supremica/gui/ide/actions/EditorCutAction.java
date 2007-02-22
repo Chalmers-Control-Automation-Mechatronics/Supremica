@@ -20,22 +20,21 @@ import java.awt.event.KeyEvent;
 import org.supremica.gui.ide.IDE;
 import javax.swing.ImageIcon;
 
-public class EditorCopyAction
+public class EditorCutAction
 	extends IDEAction
 {
 	private static final long serialVersionUID = 1L;
 
-	public EditorCopyAction(List<IDEAction> actionList)
+	public EditorCutAction(List<IDEAction> actionList)
 	{
 		super(actionList);
 
 		setEditorActiveRequired(true);
 
-		putValue(Action.NAME, "Copy");
-		putValue(Action.SHORT_DESCRIPTION, "Copy");
-    putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
-    putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_C));
-		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Copy16.gif")));
+		putValue(Action.NAME, "Cut");
+		putValue(Action.SHORT_DESCRIPTION, "Cut");
+    putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK));
+    putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_U));
 	}
 
 	public void actionPerformed(ActionEvent e)
@@ -64,5 +63,6 @@ public class EditorCopyAction
       Toolkit.getDefaultToolkit().getSystemClipboard().setContents(trans,
                                                                    surface);
     }
+    surface.doDeleteSelected();
   }
 }

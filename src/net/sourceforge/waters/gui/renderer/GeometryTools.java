@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   GeometryTools
 //###########################################################################
-//# $Id: GeometryTools.java,v 1.11 2007-02-16 03:00:42 robi Exp $
+//# $Id: GeometryTools.java,v 1.12 2007-02-22 01:41:43 siw4 Exp $
 //###########################################################################
 
 
@@ -27,6 +27,9 @@ import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.SplineGeometrySubject;
 
 import net.sourceforge.waters.xsd.module.SplineKind;
+import net.sourceforge.waters.subject.module.GroupNodeSubject;
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
+import net.sourceforge.waters.subject.module.NodeSubject;
 
 
 public final class GeometryTools
@@ -68,7 +71,40 @@ public final class GeometryTools
         ("Unknown node type " + node.getClass().getName());
     }
   }
+  
+  public static void translate(NodeSubject node, Point2D point)
+  {
+    if (node instanceof SimpleNodeSubject) {
+      translate((SimpleNodeSubject)node, point);
+    } else if (node instanceof GroupNodeSubject) {
+      translate((GroupNodeSubject)node, point);
+    } else {
+      throw new IllegalArgumentException();
+    }
+  }
+  
+  public static void translate(SimpleNodeSubject node, Point2D point)
+  {
+    Point2D pos = node.getPointGeometry().getPoint();
+    pos.setLocation(pos.getX() + point.getX(), pos.getY() + point.getY());
+    node.getPointGeometry().setPoint(pos);
+  }
 
+  public static void translate(GroupNodeSubject node, Point2D point)
+  {
+    Rectangle2D rect = node.getGeometry().getRectangle();
+    point.setLocation(rect.getX() + point.getX(), rect.getY() + point.getY());
+    rect.setFrame(point.getX(), point.getY(), rect.getWidth(), rect.getHeight());
+    node.getGeometry().setRectangle(rect);
+  }
+  
+  public static void translate(EdgeSubject edge, Point2D point)
+  {
+    Point2D pos = edge.getGeometry().getPoints().get(0);
+    pos.setLocation(pos.getX() + point.getX(), pos.getY() + point.getY());
+    edge.getGeometry().getPointsModifiable().set(0, pos);
+  }
+  
   public static Point2D getPosition(SimpleNodeProxy node)
   {
     return node.getPointGeometry().getPoint();

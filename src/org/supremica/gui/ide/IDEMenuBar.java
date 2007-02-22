@@ -103,6 +103,9 @@ public class IDEMenuBar
         menu.add(ide.getActions().editorAddComponentEventAction.getMenuItem());
         menu.add(ide.getActions().editorAddModuleEventAction.getMenuItem());
         menu.add(ide.getActions().editorRunEmbedderAction.getMenuItem());
+        menu.add(ide.getActions().editorCopyAction.getMenuItem());
+        menu.add(ide.getActions().editorCutAction.getMenuItem());
+        menu.add(ide.getActions().editorPasteAction.getMenuItem());
         //menu.add(ide.getActions().editorAddForeachComponentAction.getMenuItem());
         //menu.add(ide.getActions().editorAddInstanceAction.getMenuItem());
         //menu.add(ide.getActions().editorAddBindingAction.getMenuItem());

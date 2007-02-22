@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.35 2007-02-13 22:38:09 siw4 Exp $
+//# $Id: EditorMenu.java,v 1.36 2007-02-22 01:41:43 siw4 Exp $
 //###########################################################################
 
 
@@ -17,7 +17,21 @@ import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
+import net.sourceforge.waters.gui.transfer.GraphContainer;
+import net.sourceforge.waters.gui.transfer.ObjectTransfer;
 import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.base.IndexedSetSubject;
+import net.sourceforge.waters.subject.module.NodeSubject;
+import net.sourceforge.waters.subject.base.IndexedHashSetSubject;
+import net.sourceforge.waters.subject.module.EdgeSubject;
+import java.util.Collection;
+import java.util.ArrayList;
+import java.awt.Toolkit;
+import net.sourceforge.waters.gui.command.Command;
+import net.sourceforge.waters.gui.command.CopyGraphCommand;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Clipboard;
 
 
 /**
@@ -45,6 +59,8 @@ public class EditorMenu
 	public final JMenuItem editExportPostscriptMenu = null;
 	public final JMenuItem editExportPDFMenu;
 	public final JMenuItem mEmbedder;
+  public final JMenuItem mCopy;
+  public final JMenuItem mPaste;
 	EditorWindowInterface root;
 	ControlledSurface surface;
 	JFileChooser fileChooser;
@@ -127,9 +143,9 @@ public class EditorMenu
 
 		menuItem = new JMenuItem("Copy");
 		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
-		menuItem.setEnabled(false);
-		menuItem.setToolTipText("Not implemented yet");
+		menuItem.setEnabled(true);
 		menu.add(menuItem);
+    mCopy = menuItem;
 
 		menuItem = new JMenuItem("Cut");
 		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK));
@@ -139,9 +155,10 @@ public class EditorMenu
 
 		menuItem = new JMenuItem("Paste");
 		menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK));
-		menuItem.setEnabled(false);
+		menuItem.setEnabled(true);
 		menuItem.setToolTipText("Not implemented yet");
 		menu.add(menuItem);
+    mPaste = menuItem;
 
 		menu.addSeparator();
 
@@ -247,6 +264,41 @@ public class EditorMenu
 		{
 			root.copyAsWMFToClipboard();
 		}
+    
+    if (e.getSource() == mCopy)
+    {
+      Collection<ProxySubject> selected = surface.getSelected();
+      IndexedSetSubject<NodeSubject> nodes =
+        new IndexedHashSetSubject<NodeSubject>();
+      Collection<EdgeSubject> edges = new ArrayList<EdgeSubject>();
+      for (ProxySubject s : selected) {
+        if (s instanceof NodeSubject) {
+          nodes.add((NodeSubject) s);
+        } else if (s instanceof EdgeSubject) {
+          edges.add((EdgeSubject) s);
+        }
+      }
+      if (!nodes.isEmpty()) {
+        GraphContainer cont = new GraphContainer(nodes, edges);
+        ObjectTransfer trans = new ObjectTransfer(cont);
+        Toolkit.getDefaultToolkit().getSystemClipboard().setContents(trans,
+                                                                     surface);
+      }
+    }
+    
+    if (e.getSource() == mPaste)
+    {
+      if (CLIPBOARD.isDataFlavorAvailable(COPYGRAPH)) {
+        try {
+          GraphContainer cont = (GraphContainer) CLIPBOARD.getData(COPYGRAPH);
+          Command command = new CopyGraphCommand(surface.getGraph(), cont,
+                                                 surface.getCurrentPoint());
+          root.getUndoInterface().executeCommand(command);
+        } catch (Exception ex) {
+          System.out.println(ex);
+        }
+      }
+    }
 
 		if (e.getSource() == mEditUndo)
 		{
@@ -277,7 +329,7 @@ public class EditorMenu
 											  "Alert",
 											  JOptionPane.ERROR_MESSAGE);
 			}
-        }
+    }
 	}
 
     public void update(EditorChangedEvent e)
@@ -290,5 +342,9 @@ public class EditorMenu
             mEditUndo.setText(root.getUndoInterface().getUndoPresentationName());
         }
     }
+    
+  private static DataFlavor COPYGRAPH = new DataFlavor(GraphContainer.class,
+                                                       GraphContainer.class.getName());
+  private static Clipboard CLIPBOARD = Toolkit.getDefaultToolkit().getSystemClipboard();
 }
 

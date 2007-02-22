@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.122 2007-02-20 04:00:42 robi Exp $
+//# $Id: ControlledSurface.java,v 1.123 2007-02-22 01:41:43 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -73,11 +73,13 @@ import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
 
 import org.supremica.properties.Config;
 import net.sourceforge.waters.gui.springembedder.SpringAbortDialog;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.Clipboard;
 
 
 public class ControlledSurface
   extends EditorSurface
-  implements Observer, ModelObserver, EmbedderObserver
+  implements Observer, ModelObserver, EmbedderObserver, ClipboardOwner
 {
   //#########################################################################
   //# Constructors
@@ -118,6 +120,11 @@ public class ControlledSurface
     throws GeometryAbsentException
   {
     this(graph, module, null, null);
+  }
+  
+  public void lostOwnership(Clipboard clipboard, Transferable contents)
+  {
+    
   }
 
   //#########################################################################
@@ -403,7 +410,7 @@ public class ControlledSurface
    * Deletes all selected objects using a compound command consisting
    * of an unselect and several delete commands.
    */
-  void doDeleteSelected()
+  public void doDeleteSelected()
   {
     final Collection<ProxySubject> victims = new LinkedList<ProxySubject>();
     final List<Command> commands = new LinkedList<Command>();
@@ -1069,6 +1076,16 @@ public class ControlledSurface
         popup.show(this, event.getX(), event.getY());
       }
     }
+  }
+  
+  public Point getCurrentPoint()
+  {
+    return new Point(mCurrentPoint);
+  }
+  
+  public Collection<ProxySubject> getSelected()
+  {
+    return Collections.unmodifiableCollection(mSelectedObjects);
   }
 
   public void createOptions(EditorWindowInterface root)

@@ -27,6 +27,8 @@ public class Actions
 
     // Editor Actions
     public IDEAction editorCopyAction = new EditorCopyAction(allActions);
+    public IDEAction editorCutAction = new EditorCutAction(allActions);
+    public IDEAction editorPasteAction = new EditorPasteAction(allActions);
     public IDEAction editorCopyAsWMFAction = new EditorCopyAsWMFAction(allActions);
     public IDEAction editorUndoAction = new EditorUndoAction(allActions);
     public IDEAction editorRedoAction = new EditorRedoAction(allActions);
