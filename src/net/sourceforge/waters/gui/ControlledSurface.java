@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.125 2007-02-22 06:37:42 robi Exp $
+//# $Id: ControlledSurface.java,v 1.126 2007-02-22 06:47:40 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -210,6 +210,17 @@ public class ControlledSurface
   //# Interface net.sourceforge.waters.subject.base.ModelObserver
   public void modelChanged(final ModelChangeEvent event)
   {
+    updateError();
+    mController.updateHighlighting();
+    repaint();
+  }
+
+
+  //#########################################################################
+  //# Repainting
+  protected void paintComponent(final Graphics graphics)
+  {
+    super.paintComponent(graphics);
     if (mInternalDragAction == null) {
       final Rectangle area = getDrawnAreaBounds();
       final int extra = Config.GUI_EDITOR_GRID_SIZE.get() * 10;
@@ -221,9 +232,6 @@ public class ControlledSurface
         revalidate();
       }
     }
-    updateError();
-    mController.updateHighlighting();
-    repaint();
   }
 
 
