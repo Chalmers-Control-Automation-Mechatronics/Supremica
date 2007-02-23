@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.127 2007-02-22 08:45:58 robi Exp $
+//# $Id: ControlledSurface.java,v 1.128 2007-02-23 02:42:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -1095,11 +1095,6 @@ public class ControlledSurface
     }
   }
   
-  public Point getCurrentPoint()
-  {
-    return new Point(mCurrentPoint);
-  }
-  
   public Collection<ProxySubject> getSelected()
   {
     return Collections.unmodifiableCollection(mSelectedObjects);
@@ -1110,6 +1105,26 @@ public class ControlledSurface
     mOptions = new EditorOptions(root);
   }
 
+  /**
+   * Returns the position where items can be pasted in this panel.
+   * This is either the current position of the mouse cursor,
+   * or the center of the viewport, if the cursor is not within the
+   * window.
+   */
+  public Point getPastePosition()
+  {
+    final Point point;
+    if (mCurrentPoint == null) {
+      final Rectangle rect = getVisibleRect();
+      final int x = rect.x + (rect.width >> 1);
+      final int y = rect.y + (rect.height >> 1);
+      point = new Point(x, y);
+    } else {
+      point = mCurrentPoint;
+    }
+    return findGrid(point);
+  }
+  
 
   //#########################################################################
   //# Inner Class DTListener
@@ -1184,19 +1199,21 @@ public class ControlledSurface
      */
     void updateHighlighting()
     {
-      if (mCurrentPoint != null) {
+      final ProxySubject object;
+      if (mCurrentPoint == null) {
+        object = null;
+      } else {
         final Collection<ProxySubject> objects =
           getFocusableObjectsAtPosition(mCurrentPoint);
-        final ProxySubject object;
         if (objects.isEmpty()) {
           object = null;
         } else {
           object = Collections.max(objects, mComparator);
         }
-        if (object != mFocusedObject) {
-          mFocusedObject = object;
-          repaint();
-        }
+      }
+      if (object != mFocusedObject) {
+        mFocusedObject = object;
+        repaint();
       }
     }
 
@@ -1235,7 +1252,12 @@ public class ControlledSurface
           mInternalDragAction.cancelDrag(point);
         }
         mInternalDragAction = null;
-        updateHighlighting(point);
+        final Rectangle rect = getVisibleRect();
+        if (rect.contains(point)) {
+          updateHighlighting(point);
+        } else {
+          updateHighlighting(null);
+        }
       }
     }
 
@@ -1256,8 +1278,12 @@ public class ControlledSurface
 
     public void mouseExited(final MouseEvent event)
     {
-      final Point point = event.getPoint();
-      updateHighlighting(point);
+      if (mInternalDragAction != null) {
+        final Point point = event.getPoint();
+        updateHighlighting(point);
+      } else {
+        updateHighlighting(null);
+      }
     }
 
 
@@ -2936,7 +2962,9 @@ public class ControlledSurface
       final NodeSubject node = (NodeSubject) mFocusedObject;
       final Point2D anchor;
       if (node == null) {
-        return;
+        if (mSource != null) {
+          doReplaceSelection(mSource);
+        }
       } else if (mSource != null) {
         // Creating edge ...
         final Point2D end = findNodeAnchorPoint(node, getDragCurrent());
