@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.128 2007-02-23 02:42:55 robi Exp $
+//# $Id: ControlledSurface.java,v 1.129 2007-02-23 03:29:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -59,6 +59,7 @@ import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
 import net.sourceforge.waters.gui.springembedder.EmbedderEvent;
 import net.sourceforge.waters.gui.springembedder.EmbedderObserver;
 import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
+import net.sourceforge.waters.gui.transfer.GraphContainer;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -521,6 +522,28 @@ public class ControlledSurface
     }
   }
 
+  /**
+   * Pastes the nodes and edges in the given graph container into
+   * the graph and selects them, using a copy-graph and a select
+   * command.
+   */
+  public void doPasteNodesAndEdges(final GraphContainer cont)
+  {
+    final CopyGraphCommand paste =
+      new CopyGraphCommand(getGraph(), cont, getPastePosition());
+    final CompoundCommand compound = new CompoundCommand(paste.getName());
+    if (!mSelectedObjects.isEmpty()) {
+      final Command unselect = new UnSelectCommand(this, mSelectedObjects);
+      compound.addCommand(unselect);
+    }
+    compound.addCommand(paste);
+    final Collection<ProxySubject> pasted = paste.getPastedObjects();
+    final Command select = new SelectCommand(this, pasted);
+    compound.addCommand(select);
+    compound.end();
+    mRoot.getUndoInterface().executeCommand(compound);
+  }
+
   public void runEmbedder()
   {
     createSecondaryGraph();
@@ -880,6 +903,26 @@ public class ControlledSurface
     return new Point(x, y);
   }
 
+  /**
+   * Returns the position where items can be pasted in this panel.
+   * This is either the current position of the mouse cursor,
+   * or the center of the viewport, if the cursor is not within the
+   * window.
+   */
+  private Point getPastePosition()
+  {
+    final Point point;
+    if (mCurrentPoint == null) {
+      final Rectangle rect = getVisibleRect();
+      final int x = rect.x + (rect.width >> 1);
+      final int y = rect.y + (rect.height >> 1);
+      point = new Point(x, y);
+    } else {
+      point = mCurrentPoint;
+    }
+    return findGrid(point);
+  }
+
   private Point2D findNodeAnchorPoint(final NodeSubject node,
                                       final Point2D click)
   {
@@ -1105,26 +1148,6 @@ public class ControlledSurface
     mOptions = new EditorOptions(root);
   }
 
-  /**
-   * Returns the position where items can be pasted in this panel.
-   * This is either the current position of the mouse cursor,
-   * or the center of the viewport, if the cursor is not within the
-   * window.
-   */
-  public Point getPastePosition()
-  {
-    final Point point;
-    if (mCurrentPoint == null) {
-      final Rectangle rect = getVisibleRect();
-      final int x = rect.x + (rect.width >> 1);
-      final int y = rect.y + (rect.height >> 1);
-      point = new Point(x, y);
-    } else {
-      point = mCurrentPoint;
-    }
-    return findGrid(point);
-  }
-  
 
   //#########################################################################
   //# Inner Class DTListener

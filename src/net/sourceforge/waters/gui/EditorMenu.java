@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.39 2007-02-23 02:42:55 robi Exp $
+//# $Id: EditorMenu.java,v 1.40 2007-02-23 03:29:55 robi Exp $
 //###########################################################################
 
 
@@ -290,9 +290,7 @@ public class EditorMenu
       if (CLIPBOARD.isDataFlavorAvailable(COPYGRAPH)) {
         try {
           GraphContainer cont = (GraphContainer) CLIPBOARD.getData(COPYGRAPH);
-          Command command = new CopyGraphCommand(surface.getGraph(), cont,
-                                                 surface.getPastePosition());
-          root.getUndoInterface().executeCommand(command);
+		  surface.doPasteNodesAndEdges(cont);
         } catch (Exception ex) {
           System.out.println(ex);
         }

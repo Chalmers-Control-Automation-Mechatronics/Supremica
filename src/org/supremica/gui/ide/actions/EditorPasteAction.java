@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   EditorPasteAction
 //###########################################################################
-//# $Id: EditorPasteAction.java,v 1.4 2007-02-23 02:42:55 robi Exp $
+//# $Id: EditorPasteAction.java,v 1.5 2007-02-23 03:29:55 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -73,11 +73,7 @@ public class EditorPasteAction
 				final ControlledSurface surface = iface.getControlledSurface();
 				final GraphContainer cont =
 					(GraphContainer) CLIPBOARD.getData(COPYGRAPH);
-				final Command command =
-					new CopyGraphCommand(surface.getGraph(),
-										 cont,
-										 surface.getPastePosition());
-				iface.getUndoInterface().executeCommand(command);
+				surface.doPasteNodesAndEdges(cont);
 			} catch (final IOException exception) {
 				throw new WatersRuntimeException(exception);
 			} catch (final UnsupportedFlavorException exception) {
