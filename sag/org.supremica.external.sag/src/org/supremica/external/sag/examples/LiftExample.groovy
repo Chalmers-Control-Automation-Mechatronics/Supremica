@@ -33,7 +33,7 @@ builder.project(name:'LiftSystem') {
 	}
 }
 
-def module = AutomatonGenerator.instance.generate(builder.project, false)
+def module = AutomatonGenerator.instance.generate(builder.project)
 
 def saveToFile = { filename ->
 	def marshaller = new JAXBModuleMarshaller(ModuleSubjectFactory.instance, CompilerOperatorTable.instance)

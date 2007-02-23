@@ -83,7 +83,7 @@ class AutomatonGenerator {
 				onewayZone(back:'y9', outsideSystemBoundry:true)
 			}
 		}
-		ModuleProxy generatedModule = instance.generate(sagBuilder.project, false)
+		ModuleProxy generatedModule = instance.generate(sagBuilder.project)
 		
 		def moduleBuilder = new ModuleBuilder()
 		
@@ -411,7 +411,7 @@ class AutomatonGenerator {
 		assert false, 'fixa range och konstanter'
 	}
 
-	ModuleProxy generate(Project project, boolean forSynthesis) {
+	ModuleProxy generate(Project project) {
 		ModuleBuilder builder = new ModuleBuilder()
 		
 		Closure addStates = { graph ->
