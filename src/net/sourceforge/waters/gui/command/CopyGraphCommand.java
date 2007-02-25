@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CopyGraphCommand
 //###########################################################################
-//# $Id: CopyGraphCommand.java,v 1.2 2007-02-23 03:29:55 robi Exp $
+//# $Id: CopyGraphCommand.java,v 1.3 2007-02-25 09:42:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.command;
@@ -12,11 +12,8 @@ package net.sourceforge.waters.gui.command;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 import net.sourceforge.waters.gui.transfer.GraphContainer;
-import net.sourceforge.waters.subject.base.IndexedSetSubject;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
@@ -45,25 +42,13 @@ public class CopyGraphCommand
                           final GraphContainer cont, 
                           final Point pos)
   {
-    // *** BUG ***
-    // GraphContainer should not use IndexedSetSubject!
-    // ***
-    final IndexedSetSubject<NodeSubject> nodes = cont.getNodes(pos);
+    final GraphContainer copy = new GraphContainer(cont, graph, pos);
     mGraph = graph;
-    mNodes = new ArrayList<NodeSubject>(nodes);
-    mEdges = cont.getEdges(nodes, pos);
-    int testindex = 0;
-    final Set<String> names = new HashSet<String>(mNodes.size());
-    final IndexedSetSubject<NodeSubject> existing = graph.getNodesModifiable();
-    for (final NodeSubject node : mNodes) {
-      String name = node.getName();
-      while (existing.containsName(name) || names.contains(name)) {
-        name = "S" + testindex++;
-      }
-      names.add(name);
-      node.setName(name);
-    }
-    nodes.clear();
+    mNodes = copy.getNodes();
+    mEdges = copy.getEdges();
+    // *** BUG ***
+    // What about the blocked event list?
+    // ***
   }
 
 

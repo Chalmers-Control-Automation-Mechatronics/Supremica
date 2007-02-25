@@ -1,24 +1,33 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica IDE
+//# PACKAGE: org.supremica.gui.ide.actions
+//# CLASS:   EditorCopyAction
+//###########################################################################
+//# $Id: EditorCopyAction.java,v 1.5 2007-02-25 09:42:49 robi Exp $
+//###########################################################################
+
 package org.supremica.gui.ide.actions;
 
-import javax.swing.Action;
 import java.awt.event.ActionEvent;
-import org.supremica.gui.ide.ModuleContainer;
-import java.util.List;
-import net.sourceforge.waters.gui.ControlledSurface;
-import net.sourceforge.waters.subject.base.IndexedSetSubject;
+import java.awt.event.KeyEvent;
+import java.awt.Toolkit;
 import java.util.Collection;
-import net.sourceforge.waters.subject.base.ProxySubject;
-import net.sourceforge.waters.subject.base.IndexedHashSetSubject;
-import net.sourceforge.waters.subject.module.NodeSubject;
-import net.sourceforge.waters.subject.module.EdgeSubject;
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import javax.swing.Action;
+import javax.swing.ImageIcon;
+import javax.swing.KeyStroke;
+
+import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.transfer.GraphContainer;
 import net.sourceforge.waters.gui.transfer.ObjectTransfer;
-import java.awt.Toolkit;
-import javax.swing.KeyStroke;
-import java.awt.event.KeyEvent;
+import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.NodeSubject;
 import org.supremica.gui.ide.IDE;
-import javax.swing.ImageIcon;
+import org.supremica.gui.ide.ModuleContainer;
+
 
 public class EditorCopyAction
 	extends IDEAction
@@ -44,25 +53,24 @@ public class EditorCopyAction
 	}
 
 	public void doAction()
-  {
-    ControlledSurface surface = ide.getActiveEditorWindowInterface()
-                                   .getControlledSurface();
-    Collection<ProxySubject> selected = surface.getSelected();
-    IndexedSetSubject<NodeSubject> nodes =
-      new IndexedHashSetSubject<NodeSubject>();
-    Collection<EdgeSubject> edges = new ArrayList<EdgeSubject>();
-    for (ProxySubject s : selected) {
-      if (s instanceof NodeSubject) {
-        nodes.add((NodeSubject) s.clone());
-      } else if (s instanceof EdgeSubject) {
-        edges.add((EdgeSubject) s);
-      }
-    }
-    if (!nodes.isEmpty()) {
-      GraphContainer cont = new GraphContainer(nodes, edges);
-      ObjectTransfer trans = new ObjectTransfer(cont);
-      Toolkit.getDefaultToolkit().getSystemClipboard().setContents(trans,
-                                                                   surface);
-    }
-  }
+	{
+		final ControlledSurface surface =
+			ide.getActiveEditorWindowInterface().getControlledSurface();
+		final Collection<ProxySubject> selected = surface.getSelected();
+		final Collection<NodeSubject> nodes = new LinkedList<NodeSubject>();
+		final Collection<EdgeSubject> edges = new LinkedList<EdgeSubject>();
+		for (final ProxySubject item : selected) {
+			if (item instanceof NodeSubject) {
+				nodes.add((NodeSubject) item);
+			} else if (item instanceof EdgeSubject) {
+				edges.add((EdgeSubject) item);
+			}
+		}
+		if (!nodes.isEmpty()) {
+			GraphContainer cont = new GraphContainer(nodes, edges);
+			ObjectTransfer trans = new ObjectTransfer(cont);
+			Toolkit.getDefaultToolkit().getSystemClipboard().
+				setContents(trans, surface);
+		}
+	}
 }

@@ -4,9 +4,8 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   GeometryTools
 //###########################################################################
-//# $Id: GeometryTools.java,v 1.13 2007-02-22 01:51:14 siw4 Exp $
+//# $Id: GeometryTools.java,v 1.14 2007-02-25 09:42:49 robi Exp $
 //###########################################################################
-
 
 package net.sourceforge.waters.gui.renderer;
 
@@ -17,106 +16,69 @@ import java.awt.geom.Rectangle2D;
 import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.module.AbstractModuleProxyVisitor;
+import net.sourceforge.waters.model.module.BoxGeometryProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
+import net.sourceforge.waters.subject.base.ProxySubject;
+import net.sourceforge.waters.subject.module.BoxGeometrySubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.GroupNodeSubject;
+import net.sourceforge.waters.subject.module.NodeSubject;
+import net.sourceforge.waters.subject.module.PointGeometrySubject;
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.subject.module.SplineGeometrySubject;
 
 import net.sourceforge.waters.xsd.module.SplineKind;
-import net.sourceforge.waters.subject.module.GroupNodeSubject;
-import net.sourceforge.waters.subject.module.SimpleNodeSubject;
-import net.sourceforge.waters.subject.module.NodeSubject;
 
 
 public final class GeometryTools
 {
 
   //#########################################################################
+  //# Universal Tools (Using Visitors)
+  public static void translate(final ProxySubject item, final Point2D delta)
+  {
+    if (mTranslator == null) {
+      mTranslator = new TranslateVisitor();
+    }
+    mTranslator.translate(item, delta);
+  }
+  
+
+  //#########################################################################
   //# Nodes
-  public static Point2D defaultPosition(NodeProxy node, Point2D turningpoint)
+  public static Point2D getPosition(final NodeProxy node)
   {
-    if (node instanceof SimpleNodeProxy) {
-      return defaultPosition((SimpleNodeProxy) node);
-    } else if (node instanceof GroupNodeProxy) {
-      return defaultPosition((GroupNodeProxy) node, turningpoint);
-    } else {
-      throw new ClassCastException
-        ("Unknown node type " + node.getClass().getName());
+    if (mNodePositionVisitor == null) {
+      mNodePositionVisitor = new NodePositionVisitor();
     }
+    return mNodePositionVisitor.getPosition(node);
   }
 
-  public static Point2D defaultPosition(SimpleNodeProxy node)
+  public static Point2D getTopLeftPosition(final NodeProxy node)
   {
-    return node.getPointGeometry().getPoint();
-  }
-
-  public static Point2D defaultPosition(GroupNodeProxy node, Point2D point)
-  {
-    final Rectangle2D r = node.getGeometry().getRectangle();
-    return GeometryTools.findIntersection(r, point);
-  }
-
-  public static Point2D getPosition(NodeProxy node)
-  {
-    if (node instanceof SimpleNodeProxy) {
-      return getPosition((SimpleNodeProxy) node);
-    } else if (node instanceof GroupNodeProxy) {
-      return getPosition((GroupNodeProxy) node);
-    } else {
-      throw new ClassCastException
-        ("Unknown node type " + node.getClass().getName());
+    if (mTopLeftPositionVisitor == null) {
+      mTopLeftPositionVisitor = new TopLeftPositionVisitor();
     }
-  }
-  
-  public static void translate(NodeSubject node, Point2D point)
-  {
-    if (node instanceof SimpleNodeSubject) {
-      translate((SimpleNodeSubject)node, point);
-    } else if (node instanceof GroupNodeSubject) {
-      translate((GroupNodeSubject)node, point);
-    } else {
-      throw new IllegalArgumentException();
-    }
-  }
-  
-  public static void translate(SimpleNodeSubject node, Point2D point)
-  {
-    Point2D pos = node.getPointGeometry().getPoint();
-    pos.setLocation(pos.getX() + point.getX(), pos.getY() + point.getY());
-    node.getPointGeometry().setPoint(pos);
+    return mTopLeftPositionVisitor.getTopLeftPosition(node);
   }
 
-  public static void translate(GroupNodeSubject node, Point2D point)
+  public static Point2D getDefaultPosition(final NodeProxy node,
+                                           final Point2D turningpoint)
   {
-    Rectangle2D rect = node.getGeometry().getRectangle();
-    point.setLocation(rect.getX() + point.getX(), rect.getY() + point.getY());
-    rect.setFrame(point.getX(), point.getY(), rect.getWidth(), rect.getHeight());
-    node.getGeometry().setRectangle(rect);
-  }
-  
-  public static void translate(EdgeSubject edge, Point2D point)
-  {
-    if (edge.getGeometry() != null && !edge.getGeometry().getPoints().isEmpty()) {
-      Point2D pos = edge.getGeometry().getPoints().get(0);
-      pos.setLocation(pos.getX() + point.getX(), pos.getY() + point.getY());
-      edge.getGeometry().getPointsModifiable().set(0, pos);
+    if (mDefaultPositionVisitor == null) {
+      mDefaultPositionVisitor = new DefaultPositionVisitor();
     }
-  }
-  
-  public static Point2D getPosition(SimpleNodeProxy node)
-  {
-    return node.getPointGeometry().getPoint();
+    return mDefaultPositionVisitor.getDefaultPosition(node, turningpoint);
   }
 
-  public static Point2D getPosition(GroupNodeProxy node)
-  {
-    Rectangle2D r = node.getGeometry().getRectangle();
-    return new Point2D.Double(r.getCenterX(), r.getCenterY());
-  }
 
   //#########################################################################
   //# Edges
@@ -168,7 +130,7 @@ public final class GeometryTools
       } else {
         aux = getPosition(target);
       }
-      return defaultPosition(source, aux);
+      return getDefaultPosition(source, aux);
     } else {
       return pointGeo.getPoint();
     }
@@ -201,7 +163,7 @@ public final class GeometryTools
       } else {
         aux = getPosition(source);
       }
-      return defaultPosition(target, aux);
+      return getDefaultPosition(target, aux);
     } else {
       return pointGeo.getPoint();
     }
@@ -445,7 +407,7 @@ public final class GeometryTools
         return geo.getPoint();
       } else {
         final GroupNodeProxy group = (GroupNodeProxy) node;
-        return defaultPosition(group, dir);
+        return getDefaultPosition(group, dir);
       }
     } else {
       throw new ClassCastException
@@ -574,6 +536,223 @@ public final class GeometryTools
     }
     return found;
   }
+
+
+  //#########################################################################
+  //# Inner Class GeometryVisitor
+  private abstract static class GeometryVisitor
+    extends AbstractModuleProxyVisitor
+  {
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public Object visitSimpleNodeProxy(final SimpleNodeProxy simple)
+      throws VisitorException
+    {
+      return visitPointGeometryProxy(simple.getPointGeometry());
+    }
+
+    public Object visitGroupNodeProxy(final GroupNodeProxy group)
+      throws VisitorException
+    {
+      return visitBoxGeometryProxy(group.getGeometry());
+    }
+
+    public Object visitEdgeProxy(final EdgeProxy edge)
+      throws VisitorException
+    {
+      final SplineGeometryProxy geo = edge.getGeometry();
+      if (geo != null) {
+        return visitSplineGeometryProxy(geo);
+      } else {
+        return null;
+      }
+    }
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class TranslateVisitor
+  private static class TranslateVisitor
+    extends GeometryVisitor
+  {
+
+    //#######################################################################
+    //# Invocation
+    private void translate(final ProxySubject item, final Point2D delta)
+    {
+      try {
+        mDelta = delta;
+        item.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public Object visitBoxGeometryProxy(final BoxGeometryProxy geo)
+    {
+      final BoxGeometrySubject subject = (BoxGeometrySubject) geo;
+      final Rectangle2D rect = geo.getRectangle();
+      final double x = rect.getX() + mDelta.getX();
+      final double y = rect.getY() + mDelta.getY();
+      final double width = rect.getWidth();
+      final double height = rect.getHeight();
+      rect.setFrame(x, y, width, height);
+      subject.setRectangle(rect);
+      return null;
+    }
+
+    public Object visitPointGeometryProxy(final PointGeometryProxy geo)
+    {
+      final PointGeometrySubject subject = (PointGeometrySubject) geo;
+      final Point2D point = geo.getPoint();
+      final double x = point.getX() + mDelta.getX();
+      final double y = point.getY() + mDelta.getY();
+      point.setLocation(x, y);
+      subject.setPoint(point);
+      return null;
+    }
+
+    public Object visitSplineGeometryProxy(final SplineGeometryProxy geo)
+    {
+      final SplineGeometrySubject subject = (SplineGeometrySubject) geo;
+      final List<Point2D> points = subject.getPointsModifiable();
+      final int size = points.size();
+      for (int i = 0; i < size; i++) {
+        final Point2D point = points.get(i);
+        final double x = point.getX() + mDelta.getX();
+        final double y = point.getY() + mDelta.getY();
+        point.setLocation(x, y);
+        points.set(i, point);
+      }
+      return null;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private Point2D mDelta;
+
+  }
+
+
+  //#########################################################################
+  //# Inner Class NodePositionVisitor
+  private static class NodePositionVisitor
+    extends GeometryVisitor
+  {
+
+    //#######################################################################
+    //# Invocation
+    private Point2D getPosition(final NodeProxy node)
+    {
+      try {
+        return (Point2D) node.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public Point2D visitBoxGeometryProxy(final BoxGeometryProxy geo)
+    {
+      final Rectangle2D rect = geo.getRectangle();
+      final double x = rect.getCenterX();
+      final double y = rect.getCenterY();
+      return new Point2D.Double(x, y);
+    }
+
+    public Object visitPointGeometryProxy(final PointGeometryProxy geo)
+    {
+      return geo.getPoint();
+    }
+
+  }
+  
+
+  //#########################################################################
+  //# Inner Class TopLeftPositionVisitor
+  private static class TopLeftPositionVisitor
+    extends GeometryVisitor
+  {
+
+    //#######################################################################
+    //# Invocation
+    private Point2D getTopLeftPosition(final NodeProxy node)
+    {
+      try {
+        return (Point2D) node.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public Point2D visitBoxGeometryProxy(final BoxGeometryProxy geo)
+    {
+      final Rectangle2D rect = geo.getRectangle();
+      final double x = rect.getX();
+      final double y = rect.getY();
+      return new Point2D.Double(x, y);
+    }
+
+    public Object visitPointGeometryProxy(final PointGeometryProxy geo)
+    {
+      return geo.getPoint();
+    }
+
+  }
+  
+
+  //#########################################################################
+  //# Inner Class DefaultPositionVisitor
+  private static class DefaultPositionVisitor
+    extends GeometryVisitor
+  {
+
+    //#######################################################################
+    //# Invocation
+    private Point2D getDefaultPosition(final NodeProxy node,
+                                       final Point2D target)
+    {
+      try {
+        mTarget = target;
+        return (Point2D) node.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    public Point2D visitBoxGeometryProxy(final BoxGeometryProxy geo)
+    {
+      final Rectangle2D rect = geo.getRectangle();
+      return findIntersection(rect, mTarget);
+    }
+
+    public Object visitPointGeometryProxy(final PointGeometryProxy geo)
+    {
+      return geo.getPoint();
+    }
+
+    //#######################################################################
+    //# Data Members
+    private Point2D mTarget;
+
+  }
+  
+
+  //#########################################################################
+  //# Singleton Variables for Visitors
+  private static TranslateVisitor mTranslator = null;
+  private static NodePositionVisitor mNodePositionVisitor = null;
+  private static TopLeftPositionVisitor mTopLeftPositionVisitor = null;
+  private static DefaultPositionVisitor mDefaultPositionVisitor = null;
 
 
   //#########################################################################

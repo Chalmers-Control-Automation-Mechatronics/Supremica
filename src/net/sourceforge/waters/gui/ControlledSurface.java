@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.129 2007-02-23 03:29:55 robi Exp $
+//# $Id: ControlledSurface.java,v 1.130 2007-02-25 09:42:49 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -2951,7 +2951,7 @@ public class ControlledSurface
           focused = null;
         } else {
           focused = (NodeSubject) mSecondaryGraph.getCopy(mFocusedObject);
-          current = GeometryTools.defaultPosition(focused, current);
+          current = GeometryTools.getDefaultPosition(focused, current);
         }
         if (mIsSource) {
           final PointGeometrySubject geo = mCopiedEdge.getStartPoint();
