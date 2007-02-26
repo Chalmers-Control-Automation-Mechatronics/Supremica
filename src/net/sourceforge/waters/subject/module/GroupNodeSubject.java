@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   GroupNodeSubject
 //###########################################################################
-//# $Id: GroupNodeSubject.java,v 1.12 2006-09-20 16:24:13 robi Exp $
+//# $Id: GroupNodeSubject.java,v 1.13 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -13,9 +13,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-import net.sourceforge.waters.model.base.EqualCollection;
 import net.sourceforge.waters.model.base.IndexedSet;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
@@ -124,7 +124,7 @@ public final class GroupNodeSubject
     if (super.equalsByContents(partner)) {
       final GroupNodeSubject downcast = (GroupNodeSubject) partner;
       return
-        EqualCollection.isEqualSetByContents
+        ProxyTools.isEqualSetByContents
           (mImmediateChildNodes, downcast.mImmediateChildNodes);
     } else {
       return false;
@@ -136,7 +136,7 @@ public final class GroupNodeSubject
     if (super.equalsByContents(partner)) {
       final GroupNodeSubject downcast = (GroupNodeSubject) partner;
       return
-        EqualCollection.isEqualSetWithGeometry
+        ProxyTools.isEqualSetWithGeometry
           (mImmediateChildNodes, downcast.mImmediateChildNodes) &&
         (mGeometry == null ? downcast.mGeometry == null :
          mGeometry.equalsWithGeometry(downcast.mGeometry));
@@ -149,7 +149,7 @@ public final class GroupNodeSubject
   {
     int result = super.hashCodeByContents();
     result *= 5;
-    result += EqualCollection.getSetHashCodeByContents(mImmediateChildNodes);
+    result += ProxyTools.getSetHashCodeByContents(mImmediateChildNodes);
     return result;
   }
 
@@ -157,7 +157,7 @@ public final class GroupNodeSubject
   {
     int result = super.hashCodeByContents();
     result *= 5;
-    result += EqualCollection.getSetHashCodeWithGeometry(mImmediateChildNodes);
+    result += ProxyTools.getSetHashCodeWithGeometry(mImmediateChildNodes);
     result *= 5;
     if (mGeometry != null) {
       result += mGeometry.hashCodeWithGeometry();

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   CloningGeometryListSubject
 //###########################################################################
-//# $Id: CloningGeometryListSubject.java,v 1.3 2006-02-20 01:02:03 robi Exp $
+//# $Id: CloningGeometryListSubject.java,v 1.4 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -195,6 +196,68 @@ public class CloningGeometryListSubject<E extends Cloneable>
   }
 
 
+  //#########################################################################
+  //# Interface net.sourceforge.waters.subject.base.ListSubject
+  public void assignFrom(final List<? extends E> list)
+  {
+    final int oldsize = size();
+    final int newsize = list.size();
+    final boolean[] used = new boolean[oldsize];
+    final List<E> newlist = new ArrayList<E>(newsize);
+    int usecount = 0;
+    boolean change = false;
+    int i;
+    for (i = 0; i < newsize; i++) {
+      newlist.add(null);
+    }
+    for (i = 0; i < oldsize; i++) {
+      used[i] = false;
+    }
+    i = 0;
+    final Iterator<? extends E> iter = list.iterator();
+    for (final E newitem : list) {
+      if (iter.hasNext()) {
+        final E olditem = iter.next();
+        if (newitem.equals(olditem)) {
+          newlist.set(i, olditem);
+          used[i] = true;
+          usecount++;
+        }
+        i++;
+      } else {
+        break;
+      }
+    }
+    i = 0;
+    for (final E newitem : list) {
+      if (newlist.get(i) == null) {
+        int j = 0;
+        for (final E olditem : this) {
+          if (!used[j] && newitem.equals(olditem)) {
+            newlist.set(i, olditem);
+            used[j] = true;
+            usecount++;
+            change = true;
+            break;
+          }
+          j++;
+        }
+        if (j == oldsize) {
+          // not found --- must clone and add.
+          final E item = cloneElement(newitem);
+          newlist.set(i, item);
+          change = true;
+        }
+      }
+      i++;
+    }
+    mList = newlist;
+    if (change || usecount < oldsize) {
+      fireGeometryChange();
+    }
+  }
+
+  
   //#########################################################################
   //# Printing
   public String getShortClassName()

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   ProductDESElement
 //###########################################################################
-//# $Id: ProductDESElement.java,v 1.10 2006-11-03 15:01:56 torda Exp $
+//# $Id: ProductDESElement.java,v 1.11 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.DuplicateNameException;
-import net.sourceforge.waters.model.base.EqualCollection;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.IndexedHashSet;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.NameNotFoundException;
@@ -180,8 +180,8 @@ public class ProductDESElement
     if (super.equalsByContents(partner)) {
       final ProductDESElement des = (ProductDESElement) partner;
       return
-        EqualCollection.isEqualSetByContents(mEvents, des.mEvents) &&
-        EqualCollection.isEqualSetByContents(mAutomata, des.mAutomata);
+        ProxyTools.isEqualSetByContents(mEvents, des.mEvents) &&
+        ProxyTools.isEqualSetByContents(mAutomata, des.mAutomata);
     } else {
       return false;
     }    
@@ -191,9 +191,9 @@ public class ProductDESElement
   {
     int result = super.hashCodeByContents();
     result *= 5;
-    result += EqualCollection.getSetHashCodeByContents(mEvents);
+    result += ProxyTools.getSetHashCodeByContents(mEvents);
     result *= 5;
-    result += EqualCollection.getSetHashCodeByContents(mAutomata);
+    result += ProxyTools.getSetHashCodeByContents(mAutomata);
     return result;
   }
 

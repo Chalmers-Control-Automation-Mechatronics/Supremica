@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   IndexedIdentifierSubject
 //###########################################################################
-//# $Id: IndexedIdentifierSubject.java,v 1.7 2006-09-06 11:52:21 robi Exp $
+//# $Id: IndexedIdentifierSubject.java,v 1.8 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -13,8 +13,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.EqualCollection;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
@@ -92,7 +92,7 @@ public final class IndexedIdentifierSubject
     if (super.equalsByContents(partner)) {
       final IndexedIdentifierSubject downcast = (IndexedIdentifierSubject) partner;
       return
-        EqualCollection.isEqualListByContents
+        ProxyTools.isEqualListByContents
           (mIndexes, downcast.mIndexes);
     } else {
       return false;
@@ -104,7 +104,7 @@ public final class IndexedIdentifierSubject
     if (super.equalsWithGeometry(partner)) {
       final IndexedIdentifierSubject downcast = (IndexedIdentifierSubject) partner;
       return
-        EqualCollection.isEqualListWithGeometry
+        ProxyTools.isEqualListWithGeometry
           (mIndexes, downcast.mIndexes);
     } else {
       return false;
@@ -115,7 +115,7 @@ public final class IndexedIdentifierSubject
   {
     int result = super.hashCodeByContents();
     result *= 5;
-    result += EqualCollection.getListHashCodeByContents(mIndexes);
+    result += ProxyTools.getListHashCodeByContents(mIndexes);
     return result;
   }
 
@@ -123,7 +123,7 @@ public final class IndexedIdentifierSubject
   {
     int result = super.hashCodeWithGeometry();
     result *= 5;
-    result += EqualCollection.getListHashCodeWithGeometry(mIndexes);
+    result += ProxyTools.getListHashCodeWithGeometry(mIndexes);
     return result;
   }
 

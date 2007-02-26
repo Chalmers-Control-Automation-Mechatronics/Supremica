@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   GuardActionBlockElement
 //###########################################################################
-//# $Id: GuardActionBlockElement.java,v 1.8 2006-09-20 16:24:13 robi Exp $
+//# $Id: GuardActionBlockElement.java,v 1.9 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -14,8 +14,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.EqualCollection;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
@@ -98,9 +98,9 @@ public final class GuardActionBlockElement
     if (super.equalsByContents(partner)) {
       final GuardActionBlockElement downcast = (GuardActionBlockElement) partner;
       return
-        EqualCollection.isEqualListByContents
+        ProxyTools.isEqualListByContents
           (mGuards, downcast.mGuards) &&
-        EqualCollection.isEqualListByContents
+        ProxyTools.isEqualListByContents
           (mActions, downcast.mActions);
     } else {
       return false;
@@ -112,9 +112,9 @@ public final class GuardActionBlockElement
     if (super.equalsByContents(partner)) {
       final GuardActionBlockElement downcast = (GuardActionBlockElement) partner;
       return
-        EqualCollection.isEqualListWithGeometry
+        ProxyTools.isEqualListWithGeometry
           (mGuards, downcast.mGuards) &&
-        EqualCollection.isEqualListWithGeometry
+        ProxyTools.isEqualListWithGeometry
           (mActions, downcast.mActions) &&
         (mGeometry == null ? downcast.mGeometry == null :
          mGeometry.equalsWithGeometry(downcast.mGeometry));
@@ -127,9 +127,9 @@ public final class GuardActionBlockElement
   {
     int result = super.hashCodeByContents();
     result *= 5;
-    result += EqualCollection.getListHashCodeByContents(mGuards);
+    result += ProxyTools.getListHashCodeByContents(mGuards);
     result *= 5;
-    result += EqualCollection.getListHashCodeByContents(mActions);
+    result += ProxyTools.getListHashCodeByContents(mActions);
     return result;
   }
 
@@ -137,9 +137,9 @@ public final class GuardActionBlockElement
   {
     int result = super.hashCodeByContents();
     result *= 5;
-    result += EqualCollection.getListHashCodeWithGeometry(mGuards);
+    result += ProxyTools.getListHashCodeWithGeometry(mGuards);
     result *= 5;
-    result += EqualCollection.getListHashCodeWithGeometry(mActions);
+    result += ProxyTools.getListHashCodeWithGeometry(mActions);
     result *= 5;
     if (mGeometry != null) {
       result += mGeometry.hashCodeWithGeometry();

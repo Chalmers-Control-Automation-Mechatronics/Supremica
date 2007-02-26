@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   SetSubject
 //###########################################################################
-//# $Id: SetSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: SetSubject.java,v 1.3 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -22,4 +22,24 @@ import java.util.Set;
 public interface SetSubject<P extends ProxySubject>
   extends Set<P>, CollectionSubject<P>
 {
+
+  //#########################################################################
+  //# Cloning
+  public SetSubject<P> clone();
+
+  
+  //#########################################################################
+  //# Assignments
+  /**
+   * Assigns the contents of another set to this set.
+   * This method ensures that the contents of this set are equal to the
+   * contents of the given set according to the {@link
+   * Proxy#equalsWithGeometry(Proxy) equalsWithGeometry()} method.
+   * Items already contained in this set are resued. Items not contained
+   * are cloned from the given set. The method produces as few model change
+   * notifications as possible.
+   * @param  set   The set to be copied from.
+   */
+  public void assignFrom(final Set<? extends P> set);
+
 }

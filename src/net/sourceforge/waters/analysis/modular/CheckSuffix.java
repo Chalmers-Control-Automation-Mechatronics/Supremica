@@ -15,7 +15,6 @@ public class CheckSuffix
   public static Set<AutomatonProxy> checkSuffix(TraceProxy counter, Set<AutomatonProxy> plants,
                                                        Set<AutomatonProxy> specs)
   {
-    boolean none = true;
     Set<AutomatonProxy> nonsuffixs = new HashSet<AutomatonProxy>();
     for (AutomatonProxy plant : plants) {
       if (accepts(plant, counter) == 0) {

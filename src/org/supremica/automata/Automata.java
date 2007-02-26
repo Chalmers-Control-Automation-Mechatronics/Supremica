@@ -61,7 +61,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.base.EqualCollection;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.plain.base.DocumentElement;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -1503,8 +1503,8 @@ public class Automata
     {
         final Automata des = (Automata) partner;
 
-        return	EqualCollection.isEqualSetByContents(getEvents(), des.getEvents()) &&
-            EqualCollection.isEqualSetByContents(getAutomata(), des.getAutomata());
+        return	ProxyTools.isEqualSetByContents(getEvents(), des.getEvents()) &&
+            ProxyTools.isEqualSetByContents(getAutomata(), des.getAutomata());
     }
 
     public boolean equalsWithGeometry(final Proxy partner)
@@ -1514,9 +1514,9 @@ public class Automata
 
     public int hashCodeByContents()
     {
-        int result = EqualCollection.getSetHashCodeByContents(getEvents());
+        int result = ProxyTools.getSetHashCodeByContents(getEvents());
         result *= 5;
-        result += EqualCollection.getSetHashCodeByContents(getAutomata());
+        result += ProxyTools.getSetHashCodeByContents(getAutomata());
         return result;
     }
 

@@ -4,13 +4,15 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   IndexedHashSetSubject
 //###########################################################################
-//# $Id: IndexedHashSetSubject.java,v 1.5 2006-11-03 15:01:57 torda Exp $
+//# $Id: IndexedHashSetSubject.java,v 1.6 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
 
 import java.util.AbstractSet;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -21,6 +23,7 @@ import net.sourceforge.waters.model.base.DuplicateNameException;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.NameNotFoundException;
 import net.sourceforge.waters.model.base.NamedProxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.unchecked.Casting;
 
@@ -305,6 +308,43 @@ public class IndexedHashSetSubject<P extends NamedSubject>
   }
 
 
+  //#########################################################################
+  //# Interface net.sourceforge.waters.subject.base.SetSubject
+  public void assignFrom(final Set<? extends P> set)
+  {
+    final int oldsize = size();
+    final int newsize = set.size();
+    final Collection<P> added = new ArrayList<P>(newsize);
+    final Collection<P> kept = new HashSet<P>(oldsize);
+    final Set<String> names = new HashSet<String>(newsize);
+    for (final P newproxy : set) {
+      final String name = newproxy.getName();
+      if (names.contains(name)) {
+        throw createDuplicateName(name);
+      }
+      names.add(name);
+      final P present = mProxyMap.get(name);
+      if (present == null || !present.equalsWithGeometry(newproxy)) {
+        final P copy = ProxyTools.clone(newproxy);
+        added.add(copy);
+      } else {
+        kept.add(present);
+      }
+    }
+    final Iterator<? extends P> iter = iterator();
+    while (iter.hasNext()) {
+      final P oldproxy = iter.next();
+      if (!kept.contains(oldproxy)) {
+        iter.remove();
+      }
+    }
+    for (final P newproxy : added) {
+      final String name = newproxy.getName();
+      commitAdd(name, newproxy);
+    }
+  }
+
+  
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.Subject
   public Subject getParent()

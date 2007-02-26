@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ModuleSubject
 //###########################################################################
-//# $Id: ModuleSubject.java,v 1.9 2006-09-20 16:24:13 robi Exp $
+//# $Id: ModuleSubject.java,v 1.10 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -14,8 +14,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.EqualCollection;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.AliasProxy;
@@ -155,15 +155,15 @@ public final class ModuleSubject
     if (super.equalsByContents(partner)) {
       final ModuleSubject downcast = (ModuleSubject) partner;
       return
-        EqualCollection.isEqualListByContents
+        ProxyTools.isEqualListByContents
           (mParameterList, downcast.mParameterList) &&
-        EqualCollection.isEqualListByContents
+        ProxyTools.isEqualListByContents
           (mConstantAliasList, downcast.mConstantAliasList) &&
-        EqualCollection.isEqualListByContents
+        ProxyTools.isEqualListByContents
           (mEventDeclList, downcast.mEventDeclList) &&
-        EqualCollection.isEqualListByContents
+        ProxyTools.isEqualListByContents
           (mEventAliasList, downcast.mEventAliasList) &&
-        EqualCollection.isEqualListByContents
+        ProxyTools.isEqualListByContents
           (mComponentList, downcast.mComponentList);
     } else {
       return false;
@@ -175,15 +175,15 @@ public final class ModuleSubject
     if (super.equalsByContents(partner)) {
       final ModuleSubject downcast = (ModuleSubject) partner;
       return
-        EqualCollection.isEqualListWithGeometry
+        ProxyTools.isEqualListWithGeometry
           (mParameterList, downcast.mParameterList) &&
-        EqualCollection.isEqualListWithGeometry
+        ProxyTools.isEqualListWithGeometry
           (mConstantAliasList, downcast.mConstantAliasList) &&
-        EqualCollection.isEqualListWithGeometry
+        ProxyTools.isEqualListWithGeometry
           (mEventDeclList, downcast.mEventDeclList) &&
-        EqualCollection.isEqualListWithGeometry
+        ProxyTools.isEqualListWithGeometry
           (mEventAliasList, downcast.mEventAliasList) &&
-        EqualCollection.isEqualListWithGeometry
+        ProxyTools.isEqualListWithGeometry
           (mComponentList, downcast.mComponentList);
     } else {
       return false;
@@ -194,15 +194,15 @@ public final class ModuleSubject
   {
     int result = super.hashCodeByContents();
     result *= 5;
-    result += EqualCollection.getListHashCodeByContents(mParameterList);
+    result += ProxyTools.getListHashCodeByContents(mParameterList);
     result *= 5;
-    result += EqualCollection.getListHashCodeByContents(mConstantAliasList);
+    result += ProxyTools.getListHashCodeByContents(mConstantAliasList);
     result *= 5;
-    result += EqualCollection.getListHashCodeByContents(mEventDeclList);
+    result += ProxyTools.getListHashCodeByContents(mEventDeclList);
     result *= 5;
-    result += EqualCollection.getListHashCodeByContents(mEventAliasList);
+    result += ProxyTools.getListHashCodeByContents(mEventAliasList);
     result *= 5;
-    result += EqualCollection.getListHashCodeByContents(mComponentList);
+    result += ProxyTools.getListHashCodeByContents(mComponentList);
     return result;
   }
 
@@ -210,15 +210,15 @@ public final class ModuleSubject
   {
     int result = super.hashCodeByContents();
     result *= 5;
-    result += EqualCollection.getListHashCodeWithGeometry(mParameterList);
+    result += ProxyTools.getListHashCodeWithGeometry(mParameterList);
     result *= 5;
-    result += EqualCollection.getListHashCodeWithGeometry(mConstantAliasList);
+    result += ProxyTools.getListHashCodeWithGeometry(mConstantAliasList);
     result *= 5;
-    result += EqualCollection.getListHashCodeWithGeometry(mEventDeclList);
+    result += ProxyTools.getListHashCodeWithGeometry(mEventDeclList);
     result *= 5;
-    result += EqualCollection.getListHashCodeWithGeometry(mEventAliasList);
+    result += ProxyTools.getListHashCodeWithGeometry(mEventAliasList);
     result *= 5;
-    result += EqualCollection.getListHashCodeWithGeometry(mComponentList);
+    result += ProxyTools.getListHashCodeWithGeometry(mComponentList);
     return result;
   }
 

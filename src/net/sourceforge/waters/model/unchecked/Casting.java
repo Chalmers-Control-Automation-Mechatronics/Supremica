@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   Casting
 //###########################################################################
-//# $Id: Casting.java,v 1.3 2006-07-20 02:28:37 robi Exp $
+//# $Id: Casting.java,v 1.4 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.unchecked;
@@ -15,6 +15,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import net.sourceforge.waters.model.base.Proxy;
 
 /**
  * A collection of unchecked casts.  This class provides a set of static

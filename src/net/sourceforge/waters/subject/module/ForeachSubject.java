@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ForeachSubject
 //###########################################################################
-//# $Id: ForeachSubject.java,v 1.9 2006-09-20 16:24:13 robi Exp $
+//# $Id: ForeachSubject.java,v 1.10 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -13,8 +13,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.EqualCollection;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.unchecked.Casting;
@@ -111,7 +111,7 @@ public abstract class ForeachSubject
         mRange.equalsByContents(downcast.mRange) &&
         (mGuard == null ? downcast.mGuard == null :
          mGuard.equalsByContents(downcast.mGuard)) &&
-        EqualCollection.isEqualListByContents
+        ProxyTools.isEqualListByContents
           (mBody, downcast.mBody);
     } else {
       return false;
@@ -126,7 +126,7 @@ public abstract class ForeachSubject
         mRange.equalsWithGeometry(downcast.mRange) &&
         (mGuard == null ? downcast.mGuard == null :
          mGuard.equalsWithGeometry(downcast.mGuard)) &&
-        EqualCollection.isEqualListWithGeometry
+        ProxyTools.isEqualListWithGeometry
           (mBody, downcast.mBody);
     } else {
       return false;
@@ -143,7 +143,7 @@ public abstract class ForeachSubject
       result += mGuard.hashCodeByContents();
     }
     result *= 5;
-    result += EqualCollection.getListHashCodeByContents(mBody);
+    result += ProxyTools.getListHashCodeByContents(mBody);
     return result;
   }
 
@@ -157,7 +157,7 @@ public abstract class ForeachSubject
       result += mGuard.hashCodeWithGeometry();
     }
     result *= 5;
-    result += EqualCollection.getListHashCodeWithGeometry(mBody);
+    result += ProxyTools.getListHashCodeWithGeometry(mBody);
     return result;
   }
 

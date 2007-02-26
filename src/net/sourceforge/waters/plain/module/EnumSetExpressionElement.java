@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   EnumSetExpressionElement
 //###########################################################################
-//# $Id: EnumSetExpressionElement.java,v 1.7 2006-09-06 11:52:21 robi Exp $
+//# $Id: EnumSetExpressionElement.java,v 1.8 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -14,8 +14,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.EqualCollection;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
@@ -83,7 +83,7 @@ public final class EnumSetExpressionElement
     if (super.equalsByContents(partner)) {
       final EnumSetExpressionElement downcast = (EnumSetExpressionElement) partner;
       return
-        EqualCollection.isEqualListByContents
+        ProxyTools.isEqualListByContents
           (mItems, downcast.mItems);
     } else {
       return false;
@@ -95,7 +95,7 @@ public final class EnumSetExpressionElement
     if (super.equalsWithGeometry(partner)) {
       final EnumSetExpressionElement downcast = (EnumSetExpressionElement) partner;
       return
-        EqualCollection.isEqualListWithGeometry
+        ProxyTools.isEqualListWithGeometry
           (mItems, downcast.mItems);
     } else {
       return false;
@@ -106,7 +106,7 @@ public final class EnumSetExpressionElement
   {
     int result = super.hashCodeByContents();
     result *= 5;
-    result += EqualCollection.getListHashCodeByContents(mItems);
+    result += ProxyTools.getListHashCodeByContents(mItems);
     return result;
   }
 
@@ -114,7 +114,7 @@ public final class EnumSetExpressionElement
   {
     int result = super.hashCodeWithGeometry();
     result *= 5;
-    result += EqualCollection.getListHashCodeWithGeometry(mItems);
+    result += ProxyTools.getListHashCodeWithGeometry(mItems);
     return result;
   }
 

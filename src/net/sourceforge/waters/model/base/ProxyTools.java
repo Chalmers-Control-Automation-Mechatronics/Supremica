@@ -2,9 +2,9 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.base
-//# CLASS:   EqualCollection
+//# CLASS:   ProxyTools
 //###########################################################################
-//# $Id: EqualCollection.java,v 1.6 2006-11-03 15:01:57 torda Exp $
+//# $Id: ProxyTools.java,v 1.1 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -12,6 +12,8 @@ package net.sourceforge.waters.model.base;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
+import net.sourceforge.waters.model.unchecked.Casting;
 
 
 /**
@@ -25,7 +27,7 @@ import java.util.List;
  * @author Robi Malik
  */
 
-public class EqualCollection
+public class ProxyTools
 {
 
   //#########################################################################
@@ -278,6 +280,24 @@ public class EqualCollection
       result += proxy.hashCodeWithGeometry();
     }
     return result;
+  }
+
+
+  //#########################################################################
+  //# Cloning
+  /**
+   * Clones a proxy and casts it to the proper type.
+   * @return A clone of the given proxy, or <CODE>null</CODE>
+   *         if the argument is <CODE>null</CODE>.
+   */
+  public static <P extends Proxy> P clone(final P proxy)
+  {
+    if (proxy == null) {
+      return null;
+    } else {
+      final Class<P> clazz = Casting.toClass(proxy.getClass());
+      return clazz.cast(proxy.clone());
+    }
   }
 
 }

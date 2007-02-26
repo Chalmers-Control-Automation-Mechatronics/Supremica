@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   SimpleListSubject
 //###########################################################################
-//# $Id: SimpleListSubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: SimpleListSubject.java,v 1.3 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * <P>A marker interface identifying implementations of the {@link
  * List} interface that are also subjects ({@link Subject}). This is
- * simple kind of list that may accept any types of elements---not
+ * a simple kind of list that may accept any types of elements---not
  * just subjects.</P>
  *
  * @author Robi Malik

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   GraphSubject
 //###########################################################################
-//# $Id: GraphSubject.java,v 1.12 2007-01-03 00:49:08 robi Exp $
+//# $Id: GraphSubject.java,v 1.13 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -13,8 +13,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-import net.sourceforge.waters.model.base.EqualCollection;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -124,9 +124,9 @@ public final class GraphSubject
         (mIsDeterministic == downcast.mIsDeterministic) &&
         (mBlockedEvents == null ? downcast.mBlockedEvents == null :
          mBlockedEvents.equalsByContents(downcast.mBlockedEvents)) &&
-        EqualCollection.isEqualSetByContents
+        ProxyTools.isEqualSetByContents
           (mNodes, downcast.mNodes) &&
-        EqualCollection.isEqualCollectionByContents
+        ProxyTools.isEqualCollectionByContents
           (mEdges, downcast.mEdges);
     } else {
       return false;
@@ -141,9 +141,9 @@ public final class GraphSubject
         (mIsDeterministic == downcast.mIsDeterministic) &&
         (mBlockedEvents == null ? downcast.mBlockedEvents == null :
          mBlockedEvents.equalsWithGeometry(downcast.mBlockedEvents)) &&
-        EqualCollection.isEqualSetWithGeometry
+        ProxyTools.isEqualSetWithGeometry
           (mNodes, downcast.mNodes) &&
-        EqualCollection.isEqualCollectionWithGeometry
+        ProxyTools.isEqualCollectionWithGeometry
           (mEdges, downcast.mEdges);
     } else {
       return false;
@@ -162,9 +162,9 @@ public final class GraphSubject
       result += mBlockedEvents.hashCodeByContents();
     }
     result *= 5;
-    result += EqualCollection.getSetHashCodeByContents(mNodes);
+    result += ProxyTools.getSetHashCodeByContents(mNodes);
     result *= 5;
-    result += EqualCollection.getCollectionHashCodeByContents(mEdges);
+    result += ProxyTools.getCollectionHashCodeByContents(mEdges);
     return result;
   }
 
@@ -180,9 +180,9 @@ public final class GraphSubject
       result += mBlockedEvents.hashCodeWithGeometry();
     }
     result *= 5;
-    result += EqualCollection.getSetHashCodeWithGeometry(mNodes);
+    result += ProxyTools.getSetHashCodeWithGeometry(mNodes);
     result *= 5;
-    result += EqualCollection.getCollectionHashCodeWithGeometry(mEdges);
+    result += ProxyTools.getCollectionHashCodeWithGeometry(mEdges);
     return result;
   }
 

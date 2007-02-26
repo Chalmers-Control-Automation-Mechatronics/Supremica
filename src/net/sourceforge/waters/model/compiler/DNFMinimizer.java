@@ -12,7 +12,7 @@ import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+
 
 public class DNFMinimizer {
 	public DNFMinimizer(DNFConverter converter, CompilerOperatorTable operatorTable) {
@@ -191,7 +191,7 @@ public class DNFMinimizer {
 	
 	class Formula {
 		/* This inner class is a piece of external source code included here by
-		 * Martin Byršd. See below for details*/
+		 * Martin Byr?d. See below for details*/
 		
 		/* Copyright (c) 2007 the authors listed at the following URL, and/or
 		 the authors of referenced articles or incorporated external code:
@@ -231,13 +231,14 @@ public class DNFMinimizer {
 			return result;
 		}
 		
-		public void reduceToPrimeImplicants() {
+		@SuppressWarnings("unchecked")
+    public void reduceToPrimeImplicants() {
 			originalTermList = new ArrayList<Term>(termList);
 			int numVars = termList.get(0).getNumVars();
-			ArrayList[][] table = new ArrayList[numVars + 1][numVars + 1];
+			ArrayList<Term>[][] table = new ArrayList[numVars + 1][numVars + 1];
 			for(int dontKnows=0; dontKnows <= numVars; dontKnows++) {
 				for(int ones=0; ones <= numVars; ones++) {
-					table[dontKnows][ones] = new ArrayList();
+					table[dontKnows][ones] = new ArrayList<Term>();
 				}
 			}
 			for(int i=0; i<termList.size(); i++) {
@@ -374,7 +375,7 @@ public class DNFMinimizer {
 	
 	class Term {
 		/* This inner class is a piece of external source code included here by
-		 * Martin Byršd. See below for details*/
+		 * Martin Byr?d. See below for details*/
 		
 		/* Copyright (c) 2007 the authors listed at the following URL, and/or
 		 the authors of referenced articles or incorporated external code:

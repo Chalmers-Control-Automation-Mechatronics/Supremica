@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   ArrayListSubject
 //###########################################################################
-//# $Id: ArrayListSubject.java,v 1.4 2006-07-20 02:28:37 robi Exp $
+//# $Id: ArrayListSubject.java,v 1.5 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.unchecked.Casting;
 
@@ -214,6 +215,80 @@ public class ArrayListSubject<P extends ProxySubject>
 
            
   //#########################################################################
+  //# Interface net.sourceforge.waters.subject.base.ListSubject
+  public void assignFrom(final List<? extends P> list)
+  {
+    final int oldsize = size();
+    final int newsize = list.size();
+    final boolean[] used = new boolean[oldsize];
+    final Collection<P> added = new ArrayList<P>(newsize);
+    final Collection<P> removed = new ArrayList<P>(oldsize);
+    final Collection<P> moved = new ArrayList<P>(oldsize);
+    final List<P> newlist = new ArrayList<P>(newsize);
+    int i;
+    for (i = 0; i < newsize; i++) {
+      newlist.add(null);
+    }
+    for (i = 0; i < oldsize; i++) {
+      used[i] = false;
+    }
+    i = 0;
+    final Iterator<? extends P> iter = list.iterator();
+    for (final P newproxy : list) {
+      if (iter.hasNext()) {
+        final P oldproxy = iter.next();
+        if (newproxy.equalsWithGeometry(oldproxy)) {
+          newlist.set(i, oldproxy);
+          used[i] = true;
+        }
+        i++;
+      } else {
+        break;
+      }
+    }
+    i = 0;
+    for (final P newproxy : list) {
+      if (newlist.get(i) == null) {
+        int j = 0;
+        for (final P oldproxy : this) {
+          if (!used[j] && newproxy.equalsWithGeometry(oldproxy)) {
+            newlist.set(i, oldproxy);
+            used[j] = true;
+            moved.add(oldproxy);
+            break;
+          }
+          j++;
+        }
+        if (j == oldsize) {
+          // not found --- must clone and add.
+          final P proxy = ProxyTools.clone(newproxy);
+          newlist.set(i, proxy);
+          added.add(proxy);
+          beforeAdd(proxy);          
+        }
+      }
+      i++;
+    }
+    i = 0;
+    for (final P oldproxy : this) {
+      if (!used[i++]) {
+        removed.add(oldproxy);
+      }
+    }
+    mProxyList = newlist;
+    for (final P oldproxy : removed) {
+      afterRemove(oldproxy);
+    }
+    for (final P oldproxy : moved) {
+      afterMove(oldproxy);
+    }
+    for (final P newproxy : added) {
+      afterAdd(newproxy);
+    }
+  }
+
+  
+  //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.Subject
   public Subject getParent()
   {
@@ -307,6 +382,16 @@ public class ArrayListSubject<P extends ProxySubject>
     final ModelChangeEvent event =
       ModelChangeEvent.createItemRemoved(this, proxy);
     fireModelChanged(event);
+  }
+
+  private void afterMove(final P proxy)
+  {
+    final ModelChangeEvent event1 =
+      ModelChangeEvent.createItemRemoved(this, proxy);
+    fireModelChanged(event1);
+    final ModelChangeEvent event2 =
+      ModelChangeEvent.createItemAdded(this, proxy);
+    fireModelChanged(event2);
   }
 
 

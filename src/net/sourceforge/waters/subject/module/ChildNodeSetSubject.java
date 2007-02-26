@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ChildNodeSetSubject
 //###########################################################################
-//# $Id: ChildNodeSetSubject.java,v 1.5 2006-09-20 16:24:13 robi Exp $
+//# $Id: ChildNodeSetSubject.java,v 1.6 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -169,6 +169,15 @@ class ChildNodeSetSubject
 
            
   //#########################################################################
+  //# Interface net.sourceforge.waters.subject.base.SetSubject
+  public void assignFrom(final Set<? extends NodeSubject> set)
+  {
+    throw new UnsupportedOperationException
+      ("Child node set assignment not yet implemented!");
+  }
+
+  
+  //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.Subject
   public Subject getParent()
   {
@@ -244,10 +253,10 @@ class ChildNodeSetSubject
 
   //#########################################################################
   //# Auxiliary Methods
-  private void afterAdd(final NodeSubject proxy)
+  private void afterAdd(final NodeSubject node)
   {
     final ModelChangeEvent event =
-      ModelChangeEvent.createItemAdded(this, proxy);
+      ModelChangeEvent.createItemAdded(this, node);
     fireModelChanged(event);
   }
 

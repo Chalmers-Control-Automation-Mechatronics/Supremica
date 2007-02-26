@@ -58,7 +58,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.base.EqualCollection;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -2430,9 +2430,9 @@ public class Automaton
         {
             return
                 getKind().equals(partnerAutomaton.getKind()) &&
-                EqualCollection.isEqualSetByContents(getEvents(), partnerAutomaton.getEvents()) &&
-                EqualCollection.isEqualSetByContents(getStates(), partnerAutomaton.getStates()) &&
-                EqualCollection.isEqualSetByContents(getTransitions(), partnerAutomaton.getTransitions());
+                ProxyTools.isEqualSetByContents(getEvents(), partnerAutomaton.getEvents()) &&
+                ProxyTools.isEqualSetByContents(getStates(), partnerAutomaton.getStates()) &&
+                ProxyTools.isEqualSetByContents(getTransitions(), partnerAutomaton.getTransitions());
         }
         else
         {
@@ -2451,11 +2451,11 @@ public class Automaton
         result *= 5;
         result += getKind().hashCode();
         result *= 5;
-        result += EqualCollection.getSetHashCodeByContents(getEvents());
+        result += ProxyTools.getSetHashCodeByContents(getEvents());
         result *= 5;
-        result += EqualCollection.getSetHashCodeByContents(getStates());
+        result += ProxyTools.getSetHashCodeByContents(getStates());
         result *= 5;
-        result += EqualCollection.getSetHashCodeByContents(getTransitions());
+        result += ProxyTools.getSetHashCodeByContents(getTransitions());
         return result;
     }
 

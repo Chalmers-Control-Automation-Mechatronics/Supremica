@@ -880,17 +880,17 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 		"        ($membername == downcast.$membername)"
 	  } elseif {[regexp {^Collection<[a-zA-Z]*Proxy>$} $type all]} {
 	    Java_WriteLn $stream $umap \
-		"        EqualCollection.isEqualCollectionByContents"
+		"        ProxyTools.isEqualCollectionByContents"
 	    Java_Write $stream $umap \
                 "          ($membername, downcast.$membername)"
 	  } elseif {[regexp {^Set<[a-zA-Z]*Proxy>} $type all]} {
 	    Java_WriteLn $stream $umap \
-		"        EqualCollection.isEqualSetByContents"
+		"        ProxyTools.isEqualSetByContents"
 	    Java_Write $stream $umap \
                 "          ($membername, downcast.$membername)"
 	  } elseif {[regexp {^List<[a-zA-Z]*Proxy>} $type all]} {
 	    Java_WriteLn  $stream $umap \
-		"        EqualCollection.isEqualListByContents"
+		"        ProxyTools.isEqualListByContents"
 	    Java_Write $stream $umap \
                 "          ($membername, downcast.$membername)"
 	  } elseif {[string compare $eqstatus "required"] == 0} {
@@ -948,17 +948,17 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
                 "        ($membername == downcast.$membername)"
           } elseif {[regexp {^Collection<[a-zA-Z]*Proxy>$} $type all]} {
             Java_WriteLn $stream $umap \
-                "        EqualCollection.isEqualCollectionWithGeometry"
+                "        ProxyTools.isEqualCollectionWithGeometry"
             Java_Write $stream $umap \
                 "          ($membername, downcast.$membername)"
           } elseif {[regexp {^Set<[a-zA-Z]*Proxy>} $type all]} {
             Java_WriteLn $stream $umap \
-                "        EqualCollection.isEqualSetWithGeometry"
+                "        ProxyTools.isEqualSetWithGeometry"
             Java_Write $stream $umap \
                 "          ($membername, downcast.$membername)"
           } elseif {[regexp {^List<[a-zA-Z]*Proxy>} $type all]} {
             Java_WriteLn  $stream $umap \
-                "        EqualCollection.isEqualListWithGeometry"
+                "        ProxyTools.isEqualListWithGeometry"
             Java_Write $stream $umap \
                 "          ($membername, downcast.$membername)"
           } elseif {[string compare $eqstatus "required"] == 0} {
@@ -1006,15 +1006,15 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
           } elseif {[regexp {^Collection<[a-zA-Z]*Proxy>$} $type all]} {
             Java_Write $stream $umap "    result += "
             Java_WriteLn $stream $umap \
-                "EqualCollection.getCollectionHashCodeByContents($membername);"
+                "ProxyTools.getCollectionHashCodeByContents($membername);"
           } elseif {[regexp {^Set<[a-zA-Z]*Proxy>} $type all]} {
             Java_Write $stream $umap "    result += "
             Java_WriteLn $stream $umap \
-                "EqualCollection.getSetHashCodeByContents($membername);"
+                "ProxyTools.getSetHashCodeByContents($membername);"
           } elseif {[regexp {^List<[a-zA-Z]*Proxy>} $type all]} {
             Java_Write $stream $umap "    result += "
             Java_WriteLn $stream $umap \
-                "EqualCollection.getListHashCodeByContents($membername);"
+                "ProxyTools.getListHashCodeByContents($membername);"
           } elseif {![info exists classMap($type)]} {
             Java_WriteLn $stream $umap "    result += $membername.hashCode();"
           } elseif {[string compare $eqstatus "required"] == 0} {
@@ -1063,15 +1063,15 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
           } elseif {[regexp {^Collection<[a-zA-Z]*Proxy>$} $type all]} {
             Java_Write $stream $umap "    result += "
             Java_WriteLn $stream $umap \
-              "EqualCollection.getCollectionHashCodeWithGeometry($membername);"
+              "ProxyTools.getCollectionHashCodeWithGeometry($membername);"
           } elseif {[regexp {^Set<[a-zA-Z]*Proxy>} $type all]} {
             Java_Write $stream $umap "    result += "
             Java_WriteLn $stream $umap \
-                "EqualCollection.getSetHashCodeWithGeometry($membername);"
+                "ProxyTools.getSetHashCodeWithGeometry($membername);"
           } elseif {[regexp {^List<[a-zA-Z]*Proxy>} $type all]} {
             Java_Write $stream $umap "    result += "
             Java_WriteLn $stream $umap \
-                "EqualCollection.getListHashCodeWithGeometry($membername);"
+                "ProxyTools.getListHashCodeWithGeometry($membername);"
           } elseif {![info exists classMap($type)]} {
             Java_WriteLn $stream $umap "    result += $membername.hashCode();"
           } elseif {[string compare $eqstatus "required"] == 0} {

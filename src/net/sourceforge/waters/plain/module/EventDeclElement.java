@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   EventDeclElement
 //###########################################################################
-//# $Id: EventDeclElement.java,v 1.7 2006-09-20 16:24:13 robi Exp $
+//# $Id: EventDeclElement.java,v 1.8 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -14,8 +14,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.EqualCollection;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
@@ -105,7 +105,7 @@ public final class EventDeclElement
       return
         mKind.equals(downcast.mKind) &&
         (mIsObservable == downcast.mIsObservable) &&
-        EqualCollection.isEqualListByContents
+        ProxyTools.isEqualListByContents
           (mRanges, downcast.mRanges);
     } else {
       return false;
@@ -119,7 +119,7 @@ public final class EventDeclElement
       return
         mKind.equals(downcast.mKind) &&
         (mIsObservable == downcast.mIsObservable) &&
-        EqualCollection.isEqualListWithGeometry
+        ProxyTools.isEqualListWithGeometry
           (mRanges, downcast.mRanges) &&
         (mColorGeometry == null ? downcast.mColorGeometry == null :
          mColorGeometry.equalsWithGeometry(downcast.mColorGeometry));
@@ -138,7 +138,7 @@ public final class EventDeclElement
       result++;
     }
     result *= 5;
-    result += EqualCollection.getListHashCodeByContents(mRanges);
+    result += ProxyTools.getListHashCodeByContents(mRanges);
     return result;
   }
 
@@ -152,7 +152,7 @@ public final class EventDeclElement
       result++;
     }
     result *= 5;
-    result += EqualCollection.getListHashCodeWithGeometry(mRanges);
+    result += ProxyTools.getListHashCodeWithGeometry(mRanges);
     result *= 5;
     if (mColorGeometry != null) {
       result += mColorGeometry.hashCodeWithGeometry();

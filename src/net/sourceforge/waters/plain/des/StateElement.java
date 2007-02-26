@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   StateElement
 //###########################################################################
-//# $Id: StateElement.java,v 1.8 2006-11-03 15:01:56 torda Exp $
+//# $Id: StateElement.java,v 1.9 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.EqualCollection;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -117,7 +117,7 @@ public final class StateElement
       final StateElement state = (StateElement) partner;
       return
         (isInitial() == state.isInitial()) &&
-        EqualCollection.isEqualCollectionByContents
+        ProxyTools.isEqualCollectionByContents
           (mPropositions, state.mPropositions);
     } else {
       return false;
@@ -132,7 +132,7 @@ public final class StateElement
       result++;
     }
     result *= 5;
-    result += EqualCollection.getCollectionHashCodeByContents(mPropositions);
+    result += ProxyTools.getCollectionHashCodeByContents(mPropositions);
     return result;
   }
 

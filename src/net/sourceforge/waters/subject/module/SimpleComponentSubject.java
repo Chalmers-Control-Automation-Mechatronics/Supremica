@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SimpleComponentSubject
 //###########################################################################
-//# $Id: SimpleComponentSubject.java,v 1.9 2006-09-20 16:24:13 robi Exp $
+//# $Id: SimpleComponentSubject.java,v 1.10 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -13,8 +13,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.EqualCollection;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.GraphProxy;
@@ -109,7 +109,7 @@ public final class SimpleComponentSubject
       return
         mKind.equals(downcast.mKind) &&
         mGraph.equalsByContents(downcast.mGraph) &&
-        EqualCollection.isEqualListByContents
+        ProxyTools.isEqualListByContents
           (mVariables, downcast.mVariables);
     } else {
       return false;
@@ -123,7 +123,7 @@ public final class SimpleComponentSubject
       return
         mKind.equals(downcast.mKind) &&
         mGraph.equalsWithGeometry(downcast.mGraph) &&
-        EqualCollection.isEqualListWithGeometry
+        ProxyTools.isEqualListWithGeometry
           (mVariables, downcast.mVariables);
     } else {
       return false;
@@ -138,7 +138,7 @@ public final class SimpleComponentSubject
     result *= 5;
     result += mGraph.hashCodeByContents();
     result *= 5;
-    result += EqualCollection.getListHashCodeByContents(mVariables);
+    result += ProxyTools.getListHashCodeByContents(mVariables);
     return result;
   }
 
@@ -150,7 +150,7 @@ public final class SimpleComponentSubject
     result *= 5;
     result += mGraph.hashCodeWithGeometry();
     result *= 5;
-    result += EqualCollection.getListHashCodeWithGeometry(mVariables);
+    result += ProxyTools.getListHashCodeWithGeometry(mVariables);
     return result;
   }
 

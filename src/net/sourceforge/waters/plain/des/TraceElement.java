@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   TraceElement
 //###########################################################################
-//# $Id: TraceElement.java,v 1.4 2006-11-03 15:01:56 torda Exp $
+//# $Id: TraceElement.java,v 1.5 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.des;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.DuplicateNameException;
-import net.sourceforge.waters.model.base.EqualCollection;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.IndexedHashSet;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.NameNotFoundException;
@@ -175,7 +175,7 @@ public abstract class TraceElement
       return
         mProductDES == trace.mProductDES &&
         mAutomata.equals(trace.mAutomata) &&
-        EqualCollection.isEqualListByContents(mTraceSteps, trace.mTraceSteps);
+        ProxyTools.isEqualListByContents(mTraceSteps, trace.mTraceSteps);
     } else {
       return false;
     }    
@@ -187,7 +187,7 @@ public abstract class TraceElement
     result *= 5;
     result += mAutomata.hashCode();
     result *= 5;
-    result += EqualCollection.getListHashCodeByContents(mTraceSteps);
+    result += ProxyTools.getListHashCodeByContents(mTraceSteps);
     return result;
   }
 

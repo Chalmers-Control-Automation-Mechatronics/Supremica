@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   NodeSetSubject
 //###########################################################################
-//# $Id: NodeSetSubject.java,v 1.5 2006-11-19 21:12:23 robi Exp $
+//# $Id: NodeSetSubject.java,v 1.6 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -328,6 +328,15 @@ class NodeSetSubject
   }
 
 
+  //#########################################################################
+  //# Interface net.sourceforge.waters.subject.base.SetSubject
+  public void assignFrom(final Set<? extends NodeSubject> set)
+  {
+    throw new UnsupportedOperationException
+      ("Node set assignment not yet implemented!");
+  }
+
+  
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.Subject
   public Subject getParent()

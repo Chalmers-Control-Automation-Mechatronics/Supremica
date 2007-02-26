@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   IndexedArrayListSubject
 //###########################################################################
-//# $Id: IndexedArrayListSubject.java,v 1.5 2006-11-03 15:01:57 torda Exp $
+//# $Id: IndexedArrayListSubject.java,v 1.6 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -12,12 +12,16 @@ package net.sourceforge.waters.subject.base;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.DuplicateNameException;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.NameNotFoundException;
 import net.sourceforge.waters.model.base.NamedProxy;
@@ -369,6 +373,92 @@ public class IndexedArrayListSubject<P extends NamedSubject>
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.subject.base.ListSubject
+  public void assignFrom(final List<? extends P> list)
+  {
+    final int oldsize = size();
+    final int newsize = list.size();
+    final boolean[] used = new boolean[oldsize];
+    final Collection<P> added = new ArrayList<P>(newsize);
+    final Collection<P> removed = new ArrayList<P>(oldsize);
+    final Collection<P> moved = new ArrayList<P>(oldsize);
+    final Set<String> names = new HashSet<String>(newsize);
+    final List<P> newlist = new ArrayList<P>(newsize);
+    int i;
+    for (i = 0; i < newsize; i++) {
+      newlist.add(null);
+    }
+    for (i = 0; i < oldsize; i++) {
+      used[i] = false;
+    }
+    i = 0;
+    final Iterator<? extends P> iter = iterator();
+    for (final P newproxy : list) {
+      final String name = newproxy.getName();
+      if (names.contains(name)) {
+        throw createDuplicateName(name);
+      }
+      names.add(name);
+      if (iter.hasNext()) {
+        final P oldproxy = iter.next();
+        if (newproxy.equalsWithGeometry(oldproxy)) {
+          newlist.set(i, oldproxy);
+          used[i] = true;
+        }
+        i++;
+      } else {
+        break;
+      }
+    }
+    i = 0;
+    for (final P newproxy : list) {
+      if (newlist.get(i) == null) {
+        final String name = newproxy.getName();
+        if (containsName(name)) {
+          int j = 0;
+          for (final P oldproxy : this) {
+            if (!used[j] && newproxy.equalsWithGeometry(oldproxy)) {
+              newlist.set(i, oldproxy);
+              used[j] = true;
+              moved.add(oldproxy);
+              break;
+            }
+            j++;
+          }
+        }
+        if (newlist.get(i) == null) {
+          // not found --- must clone and add.
+          final P proxy = ProxyTools.clone(newproxy);
+          newlist.set(i, proxy);
+          added.add(proxy);
+          beforeAdd(proxy);          
+          mProxyMap.put(name, proxy);
+        }
+      }
+      i++;
+    }
+    i = 0;
+    for (final P oldproxy : this) {
+      if (!used[i++]) {
+        final String name = oldproxy.getName();
+        removed.add(oldproxy);
+        mProxyMap.remove(name);
+      }
+    }
+    mProxyList = newlist;
+    for (final P oldproxy : removed) {
+      afterRemove(oldproxy);
+    }
+    for (final P oldproxy : moved) {
+      afterMove(oldproxy);
+    }
+    for (final P newproxy : added) {
+      afterAdd(newproxy);
+    }
+  }
+
+  
+  //#########################################################################
   //# Additional Methods
   public P insert(final int index, final P proxy)
     throws DuplicateNameException
@@ -467,6 +557,16 @@ public class IndexedArrayListSubject<P extends NamedSubject>
     final ModelChangeEvent event =
       ModelChangeEvent.createItemRemoved(this, proxy);
     fireModelChanged(event);
+  }
+
+  private void afterMove(final P proxy)
+  {
+    final ModelChangeEvent event1 =
+      ModelChangeEvent.createItemRemoved(this, proxy);
+    fireModelChanged(event1);
+    final ModelChangeEvent event2 =
+      ModelChangeEvent.createItemAdded(this, proxy);
+    fireModelChanged(event2);
   }
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   InstanceSubject
 //###########################################################################
-//# $Id: InstanceSubject.java,v 1.9 2006-09-20 16:24:13 robi Exp $
+//# $Id: InstanceSubject.java,v 1.10 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -13,8 +13,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.EqualCollection;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -96,7 +96,7 @@ public final class InstanceSubject
       final InstanceSubject downcast = (InstanceSubject) partner;
       return
         mModuleName.equals(downcast.mModuleName) &&
-        EqualCollection.isEqualListByContents
+        ProxyTools.isEqualListByContents
           (mBindingList, downcast.mBindingList);
     } else {
       return false;
@@ -109,7 +109,7 @@ public final class InstanceSubject
       final InstanceSubject downcast = (InstanceSubject) partner;
       return
         mModuleName.equals(downcast.mModuleName) &&
-        EqualCollection.isEqualListWithGeometry
+        ProxyTools.isEqualListWithGeometry
           (mBindingList, downcast.mBindingList);
     } else {
       return false;
@@ -122,7 +122,7 @@ public final class InstanceSubject
     result *= 5;
     result += mModuleName.hashCode();
     result *= 5;
-    result += EqualCollection.getListHashCodeByContents(mBindingList);
+    result += ProxyTools.getListHashCodeByContents(mBindingList);
     return result;
   }
 
@@ -132,7 +132,7 @@ public final class InstanceSubject
     result *= 5;
     result += mModuleName.hashCode();
     result *= 5;
-    result += EqualCollection.getListHashCodeWithGeometry(mBindingList);
+    result += ProxyTools.getListHashCodeWithGeometry(mBindingList);
     return result;
   }
 

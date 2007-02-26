@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   EventListExpressionSubject
 //###########################################################################
-//# $Id: EventListExpressionSubject.java,v 1.7 2006-09-20 16:24:13 robi Exp $
+//# $Id: EventListExpressionSubject.java,v 1.8 2007-02-26 21:41:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -13,8 +13,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.EqualCollection;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.subject.base.AbstractSubject;
@@ -79,7 +79,7 @@ public abstract class EventListExpressionSubject
     if (super.equalsByContents(partner)) {
       final EventListExpressionSubject downcast = (EventListExpressionSubject) partner;
       return
-        EqualCollection.isEqualListByContents
+        ProxyTools.isEqualListByContents
           (mEventList, downcast.mEventList);
     } else {
       return false;
@@ -90,7 +90,7 @@ public abstract class EventListExpressionSubject
   {
     int result = super.hashCodeByContents();
     result *= 5;
-    result += EqualCollection.getListHashCodeByContents(mEventList);
+    result += ProxyTools.getListHashCodeByContents(mEventList);
     return result;
   }
 
