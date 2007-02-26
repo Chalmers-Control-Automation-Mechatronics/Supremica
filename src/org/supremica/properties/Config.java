@@ -48,6 +48,7 @@
  */
 package org.supremica.properties;
 
+import javax.swing.UIManager;
 import org.supremica.automata.algorithms.EquivalenceRelation;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
 import org.supremica.automata.algorithms.SynthesisType;
@@ -113,8 +114,10 @@ public final class Config
      * Motif: All platforms   (com.sun.java.swing.plaf.motif.MotifLookAndFeel)
      * com.sun.java.swing.plaf.windows.WindowsLookAndFeel : Windows only
      * javax.swing.plaf.mac.MacLookAndFeel : Mac only
+     * GTK
      */
-    private static final String[] LOOKANDFEEL_LEGALVALUES= {"System", "Metal", "Motif", "Windows", "Mac", "GTK"};
+    private static final String[] LOOKANDFEEL_LEGALVALUES = {"System", "Metal", "Motif", "Windows", "Mac", "GTK"};
+    //private static final Object[] LOOKANDFEEL_LEGALVALUES2 = UIManager.getInstalledLookAndFeels(); // Won't work
     public static final StringProperty GENERAL_LOOKANDFEEL  = new StringProperty(PropertyType.GENERAL, "generalLookAndFeel", "System", "Look and feel (requires restart)", LOOKANDFEEL_LEGALVALUES);
     public static final StringProperty GENERAL_STATE_SEPARATOR  = new StringProperty(PropertyType.GENERAL, "generalStateSeparator", ".", "State separator character");
     public static final StringProperty GENERAL_STATELABEL_SEPARATOR  = new StringProperty(PropertyType.GENERAL, "generalStateLabelSeparator", ",", "State label separator character");

@@ -303,6 +303,7 @@ public class PropertiesDialog
         IntegerChooser(final IntegerProperty property)
         {
             super();
+            this.property = property;
             
             // Label
             JLabel label = new JLabel(property.getComment());
@@ -314,9 +315,9 @@ public class PropertiesDialog
             formatter.setMinimum(new Integer(property.getMinValue()));
             formatter.setMaximum(new Integer(property.getMaxValue()));
             text = new JFormattedTextField(formatter);
-            text.setColumns(Math.max((property.get()+"").length()+1,4));
+            text.setColumns(Math.max((property.get()+"").length()+1,4));                        
 
-            // If there are limits, create a slider, otherwise just an editable textbox!
+            // If there is a closed range, also create a slider
             if (property.getMinValue() == Integer.MIN_VALUE || property.getMaxValue() == Integer.MAX_VALUE)
             {
                 slider = null;
@@ -325,10 +326,12 @@ public class PropertiesDialog
             {
                 // JSlider!
                 slider = new JSlider(property.getMinValue(), property.getMaxValue(), property.get());
+                slider.setMajorTickSpacing(property.getTick()*2);
                 slider.setMinorTickSpacing(property.getTick());
                 slider.setSnapToTicks(true);
-                slider.setPaintLabels(true); // No effect?
-                slider.setPaintTrack(true);  // No effect?
+                //slider.setPaintTicks(true); 
+                //slider.createStandardLabels(property.getTick()); 
+                //slider.setPaintLabels(true); 
                 this.add(slider);
 
                 // Add listeners for updating text and slider to correspond
@@ -366,10 +369,9 @@ public class PropertiesDialog
                     }
                 });
             }
-                        
-            this.add(text);
 
-            this.property = property;
+            // Lastly, add text
+            this.add(text);
         }
         
         public void setInConfig()
@@ -426,7 +428,7 @@ public class PropertiesDialog
             }
             else
             {
-                selector = new JComboBox(((StringProperty)property).legalValuesAsStrings());
+                selector = new JComboBox(property.legalValuesAsStrings());
                 if (property.get() != null)
                 {
                     selector.setSelectedItem(property.get());

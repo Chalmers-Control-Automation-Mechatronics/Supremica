@@ -1616,7 +1616,7 @@ public class AutomataVerifier
         }
         
         // Examine the result and return the verdict!
-        theAutomata  = result;        
+        theAutomata  = result; 
         if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMBINED)
         {
             logger.info("Automata after minimisation:");

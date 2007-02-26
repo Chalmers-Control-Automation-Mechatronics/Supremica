@@ -76,6 +76,10 @@ public enum VerificationAlgorithm
         return description;
     }
 
+    /**
+     * Static method for figuring out which VerificationAlgorithm corresponds to
+     * a given description.
+     */
     public static VerificationAlgorithm fromDescription(String description)
     {
         for (VerificationAlgorithm value: values())
