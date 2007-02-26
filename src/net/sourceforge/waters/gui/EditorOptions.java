@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorOptions
 //###########################################################################
-//# $Id: EditorOptions.java,v 1.9 2007-02-16 03:00:42 robi Exp $
+//# $Id: EditorOptions.java,v 1.10 2007-02-26 13:34:41 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -90,7 +90,8 @@ public class EditorOptions
             public void actionPerformed(ActionEvent e)
             {
                 if (!textField.isEditValid())
-                {    //The text is invalid.
+                {   
+                    //The text is invalid.
                     Toolkit.getDefaultToolkit().beep();
                     textField.selectAll();
                 }

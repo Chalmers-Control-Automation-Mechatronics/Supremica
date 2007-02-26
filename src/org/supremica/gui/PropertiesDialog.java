@@ -51,9 +51,14 @@ package org.supremica.gui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.*;
+import java.text.NumberFormat;
 import javax.swing.*;
 import java.util.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import org.supremica.properties.BooleanProperty;
 import org.supremica.properties.IntegerProperty;
 import org.supremica.properties.PropertyType;
@@ -61,6 +66,7 @@ import org.supremica.properties.Property;
 import org.supremica.properties.StringProperty;
 import org.supremica.properties.SupremicaProperties;
 import javax.swing.text.NumberFormatter;
+import org.supremica.properties.Config;
 
 public class PropertiesDialog
     extends JDialog
@@ -282,7 +288,8 @@ public class PropertiesDialog
     }
 
     /**
-     * Chooser for IntegerProperty:s, en editable JTextField.
+     * Chooser for IntegerProperty:s. The chooser is a JFormattedTextField and if the property has a range 
+     * (a min and a max value) then there's also a JSlider.
      */
     private class IntegerChooser
         extends JPanel
@@ -290,49 +297,78 @@ public class PropertiesDialog
     {
         private final IntegerProperty property;
         
-        JTextField text;
+        JFormattedTextField text;
         JSlider slider;
         
-        IntegerChooser(IntegerProperty property)
+        IntegerChooser(final IntegerProperty property)
         {
             super();
             
+            // Label
             JLabel label = new JLabel(property.getComment());
             this.add(label);
 
-            // If there are limits, create a slider, otherwise an editable textbox!
+            // JFormattedTextField!
+            NumberFormat numberFormat = NumberFormat.getIntegerInstance();
+            NumberFormatter formatter = new NumberFormatter(numberFormat);
+            formatter.setMinimum(new Integer(property.getMinValue()));
+            formatter.setMaximum(new Integer(property.getMaxValue()));
+            text = new JFormattedTextField(formatter);
+            text.setColumns(Math.max((property.get()+"").length()+1,4));
+
+            // If there are limits, create a slider, otherwise just an editable textbox!
             if (property.getMinValue() == Integer.MIN_VALUE || property.getMaxValue() == Integer.MAX_VALUE)
             {
-                // JTextField!
-                text = new JTextField();
-                text.setColumns(Math.max((property.get()+"").length()+1,5));
-                this.add(text);
-                
                 slider = null;
             }
             else
             {
                 // JSlider!
                 slider = new JSlider(property.getMinValue(), property.getMaxValue(), property.get());
-                //slider.setMajorTickSpacing(4);
                 slider.setMinorTickSpacing(property.getTick());
                 slider.setSnapToTicks(true);
-                slider.setPaintTrack(true);
+                slider.setPaintLabels(true); // No effect?
+                slider.setPaintTrack(true);  // No effect?
                 this.add(slider);
-                /*
-                java.text.NumberFormat numberFormat = java.text.NumberFormat.getIntegerInstance();
-                NumberFormatter formatter = new NumberFormatter(numberFormat);
-                formatter.setMinimum(new Integer(property.getMinValue()));
-                formatter.setMaximum(new Integer(property.getMaxValue()));
-                JFormattedTextField textField = new JFormattedTextField(formatter);
-                textField.setValue(new Integer(property.get()));
-                textField.setColumns(Math.max((property.get()+"").length()+1,5));
-                this.add(textField);
-                */
-                
-                text = null;
+
+                // Add listeners for updating text and slider to correspond
+                text.addPropertyChangeListener(new PropertyChangeListener()
+                {
+                    // If the text changes value, update the slider
+                    public void propertyChange(PropertyChangeEvent e)
+                    {
+                        // Is the value being changed?
+                        if ("value".equals(e.getPropertyName()))
+                        {
+                            Number value = (Number) e.getNewValue();
+                            if (value != null)
+                            {
+                                slider.setValue(value.intValue());
+                            }
+                        }
+                    }
+                });
+                slider.addChangeListener(new ChangeListener()
+                {
+                    // If the slider changes state, update the text
+                    public void stateChanged(ChangeEvent e)
+                    {
+                        slider.setValue((int) (Math.round((double) (slider.getValue()) / property.getTick()) * property.getTick()));
+                        if (!slider.getValueIsAdjusting())
+                        {
+                            text.setValue(new Integer(slider.getValue()));
+                        }
+                        else
+                        {    
+                            //value is adjusting; just set the text
+                            text.setText(String.valueOf(slider.getValue()));
+                        }
+                    }
+                });
             }
-            
+                        
+            this.add(text);
+
             this.property = property;
         }
         
@@ -342,10 +378,7 @@ public class PropertiesDialog
             {
                 try
                 {
-                    if (text != null)
-                        property.set(Integer.parseInt(text.getText()));
-                    else if (slider != null)
-                        property.set(slider.getValue());
+                    property.set(Integer.parseInt(text.getText()));
                 }
                 catch (NumberFormatException ex)
                 {
@@ -360,10 +393,7 @@ public class PropertiesDialog
         
         public void getFromConfig()
         {
-            if (text != null)
-                text.setText(""+property.get());
-            else if (slider != null)
-                slider.setValue(property.get());
+            text.setText(""+property.get());
         }
     }
 
@@ -497,6 +527,43 @@ class PropertiesControllerPanel
         public void actionPerformed(ActionEvent e)
         {
             dialog.doApply();
+            
+            /*
+            // Update LookAndFeel
+            String lookAndFeel = Config.GENERAL_LOOKANDFEEL.get();
+            
+            try
+            {
+                if ((lookAndFeel == null) || "System".equalsIgnoreCase(lookAndFeel))
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                else if ("Metal".equalsIgnoreCase(lookAndFeel))
+                    UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+                else if ("Motif".equalsIgnoreCase(lookAndFeel))
+                    UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+                else if ("Windows".equalsIgnoreCase(lookAndFeel))
+                    UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+                else if ("Mac".equalsIgnoreCase(lookAndFeel))
+                    UIManager.setLookAndFeel("javax.swing.plaf.mac.MacLookAndFeel");
+                else if ("GTK".equalsIgnoreCase(lookAndFeel))
+                    UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+                else
+                    UIManager.setLookAndFeel(lookAndFeel);
+            }
+            catch (Exception ex)
+            { 
+                System.err.println("Error while setting look and feel: " + ex);
+                System.err.println("Reverting to System look and feel.");
+                try
+                {
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                }
+                catch (Exception nope)
+                {
+                    System.err.println(nope);
+                    System.exit(0);
+                }
+            }
+             */
         }
     }
 }

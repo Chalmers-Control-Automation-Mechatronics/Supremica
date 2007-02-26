@@ -31,6 +31,7 @@ import org.supremica.gui.ide.actions.OpenAction;
 import org.supremica.properties.Config;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Project;
+
 import org.supremica.automata.Automaton;
 import org.supremica.log.*;
 import org.supremica.Version;
