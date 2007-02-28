@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   InstanceElement
 //###########################################################################
-//# $Id: InstanceElement.java,v 1.9 2007-02-26 21:41:18 robi Exp $
+//# $Id: InstanceElement.java,v 1.10 2007-02-28 00:03:24 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;

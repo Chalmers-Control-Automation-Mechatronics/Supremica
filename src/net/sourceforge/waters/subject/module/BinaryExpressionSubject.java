@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   BinaryExpressionSubject
 //###########################################################################
-//# $Id: BinaryExpressionSubject.java,v 1.7 2006-09-06 11:52:21 robi Exp $
+//# $Id: BinaryExpressionSubject.java,v 1.8 2007-02-28 00:03:24 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;

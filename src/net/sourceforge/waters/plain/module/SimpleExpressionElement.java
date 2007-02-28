@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   SimpleExpressionElement
 //###########################################################################
-//# $Id: SimpleExpressionElement.java,v 1.5 2006-09-06 11:52:21 robi Exp $
+//# $Id: SimpleExpressionElement.java,v 1.6 2007-02-28 00:03:24 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;
@@ -72,7 +72,9 @@ public abstract class SimpleExpressionElement
   {
     int result = super.hashCodeByContents();
     result *= 5;
-    result += mPlainText.hashCode();
+    if (mPlainText != null) {
+      result += mPlainText.hashCode();
+    }
     return result;
   }
 

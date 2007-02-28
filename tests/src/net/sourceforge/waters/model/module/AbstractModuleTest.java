@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   AbstractModuleTest
 //###########################################################################
-//# $Id: AbstractModuleTest.java,v 1.9 2007-01-03 00:49:08 robi Exp $
+//# $Id: AbstractModuleTest.java,v 1.10 2007-02-28 00:03:24 robi Exp $
 //###########################################################################
 
 
@@ -52,6 +52,12 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     throws Exception
   {
     testMarshal("handwritten", "machine");
+  }
+
+  public void testMarshal_marked_value()
+    throws Exception
+  {
+    testMarshal("tests", "nasty", "marked_value");
   }
 
   public void testMarshal_nodegroup1()
@@ -136,6 +142,12 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     throws Exception
   {
     testParse("handwritten", "machine");
+  }
+
+  public void testParse_marked_value()
+    throws Exception
+  {
+    testParse("tests", "nasty", "marked_value");
   }
 
   public void testParse_nodegroup1()

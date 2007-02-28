@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.20 2007-01-03 00:49:08 robi Exp $
+//# $Id: JAXBModuleImporter.java,v 1.21 2007-02-28 00:03:24 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -14,6 +14,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -563,15 +564,17 @@ public class JAXBModuleImporter
 
   private VariableProxy importVariable(final Variable element)
   {
+    final String name = element.getName();
     final SimpleExpressionType typeElement = element.getType();
     final SimpleExpressionProxy type =
       (SimpleExpressionProxy) importElement(typeElement);
-    final SimpleExpressionType initialValueElement = element.getInitialValue();
+    final List<SimpleExpressionType> values = element.getValues();
+    final Iterator<SimpleExpressionType> iter = values.iterator();
+    final SimpleExpressionType initialValueElement = iter.next();
     final SimpleExpressionProxy initialValue =
       (SimpleExpressionProxy) importElement(initialValueElement);
-    final String name = element.getName();
-    if (element.getMarkedValue() != null) {
-      final SimpleExpressionType markedValueElement = element.getMarkedValue();
+    if (iter.hasNext()) {
+      final SimpleExpressionType markedValueElement = iter.next();
       final SimpleExpressionProxy markedValue =
         (SimpleExpressionProxy) importElement(markedValueElement);
       return mFactory.createVariableProxy
@@ -611,9 +614,8 @@ public class JAXBModuleImporter
           actionList.add(exprProxy);
         }
       }
-      final LabelGeometryProxy geometry;
-      geometry = null; // Fix this
-      //geometry = (LabelGeometryProxy) element.getLabelGeometry();
+      final LabelGeometry geometryElement = element.getLabelGeometry();
+      final LabelGeometryProxy geometry = importLabelGeometry(geometryElement);
       return mFactory.createGuardActionBlockProxy
           (guardList, actionList, geometry);
     }

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   VariableSubject
 //###########################################################################
-//# $Id: VariableSubject.java,v 1.9 2007-02-12 21:38:49 robi Exp $
+//# $Id: VariableSubject.java,v 1.10 2007-02-28 00:03:24 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;

@@ -1053,6 +1053,9 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
           if {[info exists classMap($type)]} {
             set typeinfo $classMap($type)
             set typegeo [Java_ClassGetGeometryStatus $typeinfo]
+            set hashmethod "hashCodeWithGeometry"
+          } else {
+            set hashmethod "hashCode"
           }
           if {[regexp {^boolean$} $type all]} {
             Java_WriteLn $stream $umap "    if ($membername) \{"
@@ -1072,15 +1075,13 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
             Java_Write $stream $umap "    result += "
             Java_WriteLn $stream $umap \
                 "ProxyTools.getListHashCodeWithGeometry($membername);"
-          } elseif {![info exists classMap($type)]} {
-            Java_WriteLn $stream $umap "    result += $membername.hashCode();"
           } elseif {[string compare $eqstatus "required"] == 0} {
             Java_WriteLn $stream $umap \
-                "    result += $membername.hashCodeWithGeometry();"
+                "    result += $membername.${hashmethod}();"
           } else {
             Java_WriteLn $stream $umap "    if ($membername != null) \{"
             Java_WriteLn $stream $umap \
-                "      result += $membername.hashCodeWithGeometry();"
+                "      result += $membername.${hashmethod}();"
             Java_WriteLn $stream $umap "    \}"
           }
         }

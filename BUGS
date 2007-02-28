@@ -1,6 +1,5 @@
 There is currently no real bug-tracking system for Supremica/Waters... we should start a new one! 
 
- * The module unmarshaller does not unmarshal the marked value of variables. The unmarshalled marked value is null although the variable has a marked value in the wmod file. 
  * In the IDE, if a file is opened, then changed outside the IDE and then opened again in IDE, the change can not be seen! The DocumentManager caches too much?
    * DocumentManager can be upgraded to check file modification times. But how should the IDE react if the contents of a module being edited are changed by an external program? -- Robi.
      * Ideally it should inform the user about "external modification" - like buffers in emacs. /Hugo
@@ -13,6 +12,8 @@ There is currently no real bug-tracking system for Supremica/Waters... we should
 
  * Change menu keyboard shortcuts to ALT
  * Group node error feedback should be given while dragging
+
+ * DNFMinimizer fails several test cases.
 
 Previously, all bugs were reported and stored in the bug database, http://www.supremica.org/bugtracking, but this is no longer the case. 
 

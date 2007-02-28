@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleExporter
 //###########################################################################
-//# $Id: JAXBModuleExporter.java,v 1.18 2007-01-03 00:49:08 robi Exp $
+//# $Id: JAXBModuleExporter.java,v 1.19 2007-02-28 00:03:24 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -562,15 +562,16 @@ public class JAXBModuleExporter
     final SimpleExpressionType typeElement = 
       (SimpleExpressionType) typeProxy.acceptVisitor(this);
     element.setType(typeElement);
+    final List<SimpleExpressionType> values = element.getValues();
     final SimpleExpressionProxy initialValueProxy = proxy.getInitialValue();
     final SimpleExpressionType initialValueElement = 
       (SimpleExpressionType) initialValueProxy.acceptVisitor(this);
-    element.setInitialValue(initialValueElement);
+    values.add(initialValueElement);
     final SimpleExpressionProxy markedValueProxy = proxy.getMarkedValue();
-    if(markedValueProxy != null) {
+    if (markedValueProxy != null) {
       final SimpleExpressionType markedValueElement = 
         (SimpleExpressionType) markedValueProxy.acceptVisitor(this);
-      element.setMarkedValue(markedValueElement);
+      values.add(markedValueElement);
     }
   }
 

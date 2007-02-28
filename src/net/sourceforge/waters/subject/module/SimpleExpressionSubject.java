@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SimpleExpressionSubject
 //###########################################################################
-//# $Id: SimpleExpressionSubject.java,v 1.6 2006-09-06 11:52:21 robi Exp $
+//# $Id: SimpleExpressionSubject.java,v 1.7 2007-02-28 00:03:24 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -74,7 +74,9 @@ public abstract class SimpleExpressionSubject
   {
     int result = super.hashCodeByContents();
     result *= 5;
-    result += mPlainText.hashCode();
+    if (mPlainText != null) {
+      result += mPlainText.hashCode();
+    }
     return result;
   }
 

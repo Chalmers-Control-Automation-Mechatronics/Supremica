@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   BinaryExpressionElement
 //###########################################################################
-//# $Id: BinaryExpressionElement.java,v 1.7 2006-09-06 11:52:21 robi Exp $
+//# $Id: BinaryExpressionElement.java,v 1.8 2007-02-28 00:03:24 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;

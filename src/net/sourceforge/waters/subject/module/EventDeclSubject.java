@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   EventDeclSubject
 //###########################################################################
-//# $Id: EventDeclSubject.java,v 1.10 2007-02-26 21:41:18 robi Exp $
+//# $Id: EventDeclSubject.java,v 1.11 2007-02-28 00:03:24 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;

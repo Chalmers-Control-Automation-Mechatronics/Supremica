@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.module
 //# CLASS:   VariableElement
 //###########################################################################
-//# $Id: VariableElement.java,v 1.6 2006-09-06 11:52:21 robi Exp $
+//# $Id: VariableElement.java,v 1.7 2007-02-28 00:03:24 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.module;

@@ -595,31 +595,19 @@
     <xs:complexContent>
       <xs:extension base="B:NamedType">
        <xs:sequence>
-        <xs:group ref="M:RangeExpression">
+         <xs:group ref="M:RangeExpression">
            <xs:annotation>
             <xs:appinfo>
                <jaxb:property name="Type"/>
             </xs:appinfo>
            </xs:annotation>
-        </xs:group>
-            
-        <xs:group ref="M:ValueType">
-          <xs:annotation>
-            <xs:appinfo>
-               <jaxb:property name="InitialValue"/>
-            </xs:appinfo>
-           </xs:annotation>
-        </xs:group>
-         
-        <xs:group ref="M:ValueType" minOccurs="0">
-          <xs:annotation>
-            <xs:appinfo>
-               <jaxb:property name="MarkedValue"/>
-            </xs:appinfo>
-           </xs:annotation>
-        </xs:group> 
-        
-        <!--Remember to check that InitialValue has the right type.-->
+         </xs:group>
+         <xs:group ref="M:ValueType" minOccurs="1" maxOccurs="2">
+           <xs:annotation><xs:appinfo>
+             <jaxb:property name="Values"/>
+           </xs:appinfo></xs:annotation>
+         </xs:group>
+         <!--Remember to check that InitialValue has the right type.-->
        </xs:sequence>
       </xs:extension>
     </xs:complexContent>
