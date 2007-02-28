@@ -31,27 +31,26 @@ class ModuleBuilder extends BuilderSupport {
 			integerVariable(name: 'x0', range:1..4, initial:2, marked:2)
 			event(name:'e0')
 			event(name:'e1', controllable:false)
-			event(name:'e2', controllable:false)
+			event('e2', controllable:false)
 			proposition(name:'e3')
 			event(name:'e4', ranges:[0..2])
 			event(name:'e5', ranges:[0..2, 0..3], controllable:false)
 			eventAlias(name:'someEvents', events:['e1', 'e2'])
-			plant(name:'testcomponent', initialState:'q0') {
+			plant(name:'testcomponent', initialState:'q0', defaultEvent:'e0') {
 				state(name:'q0')
-				state(name:'q1', marked:true)
+				state('q1', marked:true)
 				transition(from:'q0',
 						   to:'q1',
-						   events:['e0'],
 						   guard:'y0 & x0 < 4') {
 					action('x0 += 1')
-					action('y0 = 1')
+					set('y0')
 				}
 				transition(from:'q1',
 						   to:'q0',
 						   events:['e1', 'e0'])
 			}
-			specification(name:'testcomponent2', initialState:'s0') {
-				state(name:'s0')
+			specification(name:'testcomponent2') {
+				state('s0')
 				state(name:'s1', propositions:['e3'])
 				booleanVariable(name:'y1', initial:false)
 				transition(from:'s0',
@@ -61,20 +60,22 @@ class ModuleBuilder extends BuilderSupport {
 				transition(from:'s0',
 						   to:'s1',
 						   events:['someEvents']) {
-					action('y1 = 0')
+					reset('y1')
 				}
 			}
-			foreach(name:'i', range:0..2) {
-				plant(name:'testcomponent3[i]', initialState:'q0') {
+			foreach('i', range:0..2) {
+				plant('testcomponent3[i]', initialState:'q0') {
 					state(name:'q0')
-					state(name:'q1', forbidden:true)
-					transition(from:'q0',
-					           to:'q1',
-					           events:['e4[i]'],
+					transition(events:['e4[i]'],
 					           guard:'y0 & x0 < 4') {
 						action('x0 += 1')
 					}
-					transition(from:'q1', to:'q0', events:['e1', 'e0'])
+					transition(events:['e4[i]'],
+					           guard:'!y0 & x0 < 4') {
+						action('x0 += 1')
+					}
+					state(name:'q1', forbidden:true)
+					transition(to:'q0', events:['e1', 'e0'])
 				}
 				foreach(name:'j', range:0..3) {
 					specification(name:'testcomponent4[i][j]', initialState:'q0') {
@@ -133,9 +134,17 @@ class ModuleBuilder extends BuilderSupport {
 	private static final parser = new ExpressionParser(factory.instance, CompilerOperatorTable.instance)
 	private transitionAttributes = [:]
 	private String initialState
+	private List transitionsThatNeedTargetState = []
+	private NodeSubject lastAddedState
+	private String defaultEvent
 	final static String VARIABLE_COMPONENT_NAME = 'variables'
-		
+	
 	def createNode(name){
+		switch(name) {
+		case 'module':
+			assert module
+			return module
+		}
 		assert false
 		null
 	}
@@ -144,8 +153,12 @@ class ModuleBuilder extends BuilderSupport {
 		switch(name) {
 		case 'action':
 			return parser.parse(value)
+		case 'set':
+			return parser.parse("$value = 1")
+		case 'reset':
+			return parser.parse("$value = 0")
 		}
-		assert false, "name:$name, value:$value"
+		createNode(name, [name:value])
 	}
 
 	def createNode(name, Map attributes){
@@ -180,17 +193,17 @@ class ModuleBuilder extends BuilderSupport {
 			node = factory.createSimpleComponentProxy(parser.parseIdentifier(attributes.name),
 	                                                  ComponentKind.PLANT,
 	                                                  factory.createGraphProxy())
-			assert attributes.initialState
 			initialState = attributes.initialState
-			['initialState'].each{attributes.remove(it)}
+			defaultEvent = attributes.defaultEvent
+			['initialState', 'defaultEvent'].each{attributes.remove(it)}
 	        break
 		case 'specification' :
 			node = factory.createSimpleComponentProxy(parser.parseIdentifier(attributes.name),
 	                                                  ComponentKind.SPEC,
 	                                                  factory.createGraphProxy())
-			assert attributes.initialState
 			initialState = attributes.initialState
-			['initialState'].each{attributes.remove(it)}
+			defaultEvent = attributes.defaultEvent
+			['initialState', 'defaultEvent'].each{attributes.remove(it)}
 			break
 		case 'state' :
 			node = factory.createSimpleNodeProxy(attributes.name)
@@ -199,11 +212,14 @@ class ModuleBuilder extends BuilderSupport {
 			if (attributes.forbidden) node.propositions.eventListModifiable << parser.parse(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)
 			node.propositions.eventListModifiable.addAll(attributes.propositions.collect{parser.parse(it)})
 			['forbidden', 'marked', 'propositions'].each{attributes.remove(it)}
+			transitionsThatNeedTargetState.each{it.target = node}
+			transitionsThatNeedTargetState = []
+			lastAddedState = node
 			break
 		case 'transition':
 			node = factory.createEdgeProxy(null,
 					                       null,
-					                       factory.createLabelBlockProxy(attributes.events.collect{parser.parse(it)}, null),
+					                       factory.createLabelBlockProxy(attributes.events ? attributes.events.collect{parser.parse(it)} : [parser.parse(defaultEvent)], null),
 					                       attributes.guard ? factory.createGuardActionBlockProxy([parser.parse(attributes.guard, Operator.TYPE_BOOLEAN)], null, null) : null,
 					                       null,
 					                       null,
@@ -227,8 +243,7 @@ class ModuleBuilder extends BuilderSupport {
 	}
 
 	def createNode(name, Map attributes, value){
-		assert false
-		null
+		return createNode(name, [name:value, *:attributes] )
 	}
 	
 	void setParent(parent, child){
@@ -277,10 +292,13 @@ class ModuleBuilder extends BuilderSupport {
 			switch (child) {
 			case NodeSubject:
 				parent.graph.nodesModifiable << child
+				if (!initialState && parent.graph.nodes.size() == 1) child.initial = true //The first state becomes initial by default
 				break
 			case EdgeSubject:
-				child.source = parent.graph.nodes.find{it.name == transitionAttributes.from}
-				child.target = parent.graph.nodes.find{it.name == transitionAttributes.to}
+				assert parent.graph.nodes
+				child.source = [parent.graph.nodesModifiable.get(transitionAttributes.from), lastAddedState].grep{it}[0] 
+				if (transitionAttributes.to) child.target = parent.graph.nodes.find{it.name == transitionAttributes.to}
+				else transitionsThatNeedTargetState << child
 				parent.graph.edgesModifiable << child
 				transitionAttributes = null
 				break
@@ -316,5 +334,13 @@ class ModuleBuilder extends BuilderSupport {
 	}
 	
 	void nodeCompleted(parent, node) {
+		switch(node) {
+		case(SimpleComponentSubject):
+			assert transitionsThatNeedTargetState.empty
+			lastAddedState = null
+			initialState = null
+			defaultEvent = null
+			break
+		}
 	}
 }
