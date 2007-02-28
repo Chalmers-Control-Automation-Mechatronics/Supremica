@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.70 2007-02-23 12:13:28 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.71 2007-02-28 14:46:44 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1078,14 +1078,14 @@ else{
 						final List<SimpleExpressionProxy> sortedUncClauses = mDNFConverter
 								.createSortedClauseList(dnfUncGuard);
 						if (!sortedUncClauses.isEmpty()) {
-							//Set<String> forbiddenLoc=new TreeSet<String>();
+							Set<String> fLoc=new TreeSet<String>();
 							for (TransitionProxy plant : plantTrans) {
-								forbiddenLoc.add(plant
+								fLoc.add(plant
 										.getSource()
 										.getName());
 								for (TransitionProxy spec : specTrans) {
 									String name=spec.getSource().getName(); 
-									forbiddenLoc.add(name);
+									fLoc.add(name);
 								collectUncontrollableEFASpec(name);
 									
 								}
@@ -1101,7 +1101,7 @@ else{
 										event.getKind(),
 									     event.isObservable());
 						mEventForbiddenStatesMap.put
-						(forbiddenEvent, new LocationsAndExpression(forbiddenLoc, uncExpr));
+						(forbiddenEvent, new LocationsAndExpression(fLoc, uncExpr));
 						//Forbidden events are added to the global alphabet.
 						newEvents.add(forbiddenEvent);
 						//mForbiddenStates.add(new LocationAndVariables(forbiddenLoc, uncExpr));
