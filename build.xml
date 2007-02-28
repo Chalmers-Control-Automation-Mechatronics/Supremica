@@ -61,6 +61,8 @@
 <property name="jaxb1-impl.jar" location="${lib}/jaxb1-impl.jar"/>
 <property name="jsr173_api.jar" location="${lib}/jsr173_1.0_api.jar"/>
 
+<property name="groovy-all.jar" location="${lib}/groovy-all-1.0.jar"/>
+
 <path id="jaxb.classpath">
   <pathelement location="${activation.jar}"/>
   <pathelement location="${jaxb-api.jar}"/>
@@ -72,6 +74,11 @@
 <path id="supremica.classpath">
   <pathelement location="${dist}/SupremicaLib.jar"/>
 </path>
+
+<path id="groovy.classpath" location="${groovy-all.jar}" />
+	
+<taskdef name="groovy" classname="org.codehaus.groovy.ant.Groovy" classpathref="groovy.classpath" />
+<taskdef name="groovyc" classname="org.codehaus.groovy.ant.Groovyc" classpathref="groovy.classpath" />
 
 <patternset id="all_nested_classfiles.patternset">
 	<include name="**/*.class"/>
@@ -159,6 +166,8 @@
 	<unjar src="${jaxb-impl.jar}" dest="${lib}/${unjared}"/>
 	<unjar src="${jaxb1-impl.jar}" dest="${lib}/${unjared}"/>
 	<unjar src="${jsr173_api.jar}" dest="${lib}/${unjared}"/>
+	<!-- support for groovy -->
+	<unjar src="${groovy-all.jar}" dest="${lib}/${unjared}"/>
 </target>
 
 <target name="init">
@@ -234,7 +243,7 @@
 *	source files that have changed.
 -->
 
-<target name="compile" depends="compile_supremica,compile_supremica_tests"/>
+<target name="compile" depends="compile_supremica,compile_supremica_groovy,compile_supremica_tests"/>
 
 <target name="compile_supremica" depends="startfiles_local_supremica">
   <javac debug="on"
@@ -254,6 +263,15 @@
       <pathelement location="${lib}/${unjared}"/>
     </classpath>
   </javac>
+</target>
+
+<target name="compile_supremica_groovy" depends="compile_supremica" description="--> compiles groovy src files that depend on Supremica">
+	<groovyc srcdir="${src}" destdir="${build}">
+		<classpath>    
+			<pathelement location="${build}"/>
+			<pathelement location="${lib}/${unjared}"/>
+		</classpath>
+	</groovyc>
 </target>
 
 <target name="compile_automationobjects_jaxb">
