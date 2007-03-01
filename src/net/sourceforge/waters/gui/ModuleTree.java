@@ -7,7 +7,6 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -62,24 +61,13 @@ public class ModuleTree extends JTree
         
         this.setModel(new DefaultTreeModel(mRootNode));
         
-        //TODO: Put some proper icons in place!
-        final ImageIcon plantIcon = new ImageIcon(ModuleWindow.class.getResource("/icons/waters/plant.gif"));
-        final ImageIcon specIcon = new ImageIcon(ModuleWindow.class.getResource("/icons/waters/spec.gif"));
-        final ImageIcon supIcon = new ImageIcon(ModuleWindow.class.getResource("/icons/waters/supervisor.gif"));
-        final ImageIcon propertyIcon = new ImageIcon(ModuleWindow.class.getResource("/icons/waters/property.gif"));
-        final ImageIcon foreachIcon = null;
-        final ImageIcon instanceIcon = new ImageIcon(ModuleWindow.class.getResource("/icons/waters/instance.gif"));
-        final ImageIcon bindingIcon = null;
         
-        setCellRenderer(new ModuleTreeRenderer(foreachIcon, plantIcon, propertyIcon, specIcon, supIcon, instanceIcon, bindingIcon));
+        setCellRenderer(new ModuleTreeRenderer());
         setEditable(false);
         getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         
         DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
         
-        //renderer.setLeafIcon(simpleIcon);
-        //renderer.setOpenIcon(null);
-        //renderer.setClosedIcon(null);
         //moduleSelectTree.setCellRenderer(renderer);
         MouseListener ml = new MouseAdapter()
         {

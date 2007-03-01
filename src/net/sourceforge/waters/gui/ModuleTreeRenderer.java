@@ -1,105 +1,79 @@
-
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: waters.gui
+//# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleTreeRenderer
 //###########################################################################
-//# $Id: ModuleTreeRenderer.java,v 1.6 2006-11-03 15:01:56 torda Exp $
+//# $Id: ModuleTreeRenderer.java,v 1.7 2007-03-01 02:20:03 robi Exp $
 //###########################################################################
+
 package net.sourceforge.waters.gui;
 
-import javax.swing.*;
-import javax.swing.tree.*;
-import java.awt.*;
-import net.sourceforge.waters.model.module.*;
-import net.sourceforge.waters.xsd.base.ComponentKind;
+import java.awt.Component;
+import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.module.InstanceProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
+
 
 public class ModuleTreeRenderer
     extends DefaultTreeCellRenderer
 {
-    Icon plantIcon;
-    Icon propIcon;
-    Icon specIcon;
-    Icon supIcon;
-    Icon foreachIcon;
-    Icon instIcon;
-    Icon bindingIcon;
-    
-    public ModuleTreeRenderer(Icon foreach, Icon plant, Icon prop, Icon spec, Icon sup, Icon inst, Icon binding)
+
+	//#######################################################################
+	//# Interface javax.swing.tree.TreeCellRenderer
+    public Component getTreeCellRendererComponent
+		(final JTree tree, final Object value, final boolean sel,
+		 final boolean expanded, final boolean leaf,
+		 final int row, final boolean hasFocus)
     {
-        plantIcon = plant;
-        propIcon = prop;
-        specIcon = spec;
-        supIcon = sup;
-        foreachIcon = foreach;
-        instIcon = inst;
-        bindingIcon = binding;
-    }
-    
-    public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus)
-    {
-        super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-        
-        ComponentInfo ci = (ComponentInfo) ((DefaultMutableTreeNode) value).getUserObject();
-        
-        if ((ci.getComponent() instanceof InstanceProxy))
-        {
-            setIcon(instIcon);
+        super.getTreeCellRendererComponent
+			(tree, value, sel, expanded, leaf, row, hasFocus);
+		final DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+        final ComponentInfo ci = (ComponentInfo) node.getUserObject();
+        final Proxy proxy = ci.getComponent();
+		if (proxy instanceof SimpleComponentProxy) {
+			final SimpleComponentProxy comp = (SimpleComponentProxy) proxy;
+			switch (comp.getKind()) {
+			case PLANT:
+                setIcon(IconLoader.ICON_PLANT);
+                setToolTipText("Plant");
+				break;
+			case PROPERTY:
+                setIcon(IconLoader.ICON_PROPERTY);
+                setToolTipText("Property");
+				break;
+			case SPEC:
+                setIcon(IconLoader.ICON_SPEC);
+                setToolTipText("Specification");
+				break;
+			case SUPERVISOR:
+                setIcon(IconLoader.ICON_SUPERVISOR);
+                setToolTipText("Supervisor");
+				break;
+			default:
+				throw new IllegalArgumentException
+					("Unknown component kind: " + comp.getKind() + "!");
+			}
+		} else if (proxy instanceof InstanceProxy) {
+            setIcon(IconLoader.ICON_INSTANCE);
             setToolTipText(null);
-        }
-        
-        if ((ci.getComponent() instanceof ParameterBindingProxy))
-        {
-            setIcon(bindingIcon);
+        } else if (proxy instanceof ParameterBindingProxy) {
+            setIcon(IconLoader.ICON_BINDING);
             setToolTipText(null);
-        }
-        
-        if ((ci.getComponent() instanceof ForeachProxy))
-        {
-            setIcon(foreachIcon);
+        } else if (proxy instanceof ForeachProxy) {
+            setIcon(IconLoader.ICON_FOREACH);
             setToolTipText(null);
             //setEditable(false);
+        } else {
+            setToolTipText(null);
         }
-        else
-        {
-            setToolTipText(null);    //no tool tip
-        }
-        
-        if (/*leaf &&*/ (ci.getComponent() instanceof SimpleComponentProxy))
-        {
-            SimpleComponentProxy scp = (SimpleComponentProxy) ci.getComponent();
-            
-            if (scp.getKind() == ComponentKind.PLANT)
-            {
-                setIcon(plantIcon);
-                setToolTipText("Plant");
-            }
-            else if (scp.getKind() == ComponentKind.PROPERTY)
-            {
-                setIcon(propIcon);
-                setToolTipText("Property");
-            }
-            else if (scp.getKind() == ComponentKind.SPEC)
-            {
-                setIcon(specIcon);
-                setToolTipText("Specification");
-            }
-            else if (scp.getKind() == ComponentKind.SUPERVISOR)
-            {
-                setIcon(supIcon);
-                setToolTipText("Supervisor");
-            }
-            else
-            {
-                setToolTipText(null);
-            }
-        }
-        else
-        {
-            setToolTipText(null);    //no tool tip
-        }
-        
         return this;
     }
+
 }
