@@ -120,6 +120,8 @@ class ModuleBuilder extends BuilderSupport {
 			transitionsThatNeedTargetState = []
 			lastAddedState = node
 			break
+		case 'selfLoop':
+			attributes.selfLoop = true
 		case 'transition':
 			node = factory.createEdgeProxy(null,
 					                       null,
@@ -129,7 +131,7 @@ class ModuleBuilder extends BuilderSupport {
 					                       null,
 					                       null)
 			transitionAttributes = attributes.clone()
-			['events', 'from', 'to', 'guard'].each{attributes.remove(it)}
+			['selfLoop', 'events', 'from', 'to', 'guard'].each{attributes.remove(it)}
 			break
 		case 'foreach':
 			node = factory.createForeachComponentProxy(attributes.name, createRangeExpression(attributes.range))
@@ -201,7 +203,8 @@ class ModuleBuilder extends BuilderSupport {
 			case EdgeSubject:
 				assert parent.graph.nodes
 				child.source = [parent.graph.nodesModifiable.get(transitionAttributes.from), lastAddedState].grep{it}[0] 
-				if (transitionAttributes.to) child.target = parent.graph.nodes.find{it.name == transitionAttributes.to}
+				if (transitionAttributes.selfLoop) child.target = child.source
+				else if (transitionAttributes.to) child.target = parent.graph.nodes.find{it.name == transitionAttributes.to}
 				else transitionsThatNeedTargetState << child
 				parent.graph.edgesModifiable << child
 				transitionAttributes = null
@@ -296,6 +299,7 @@ class ModuleBuilder extends BuilderSupport {
 			specification(name:'testcomponent2') {
 				state('s0')
 				state(name:'s1', propositions:['e3'])
+				selfLoop(events:['e1'])
 				booleanVariable(name:'y1', initial:false)
 				transition(from:'s0',
 						   to:'s1',
@@ -306,6 +310,7 @@ class ModuleBuilder extends BuilderSupport {
 						   events:['someEvents']) {
 					reset('y1')
 				}
+				selfLoop(from:'s0', events:['e1'])
 			}
 			foreach('i', range:0..2) {
 				plant('testcomponent3[i]', initialState:'q0') {
@@ -361,8 +366,10 @@ class ModuleBuilder extends BuilderSupport {
 		     it.labelBlock.eventList.name,
 		     it.guardActionBlock?.guards?.size() == 1 ? it.guardActionBlock.guards[0].toString() : null,
 		     it.guardActionBlock?.actions?.plainText]
-		} == [['s0', 's1', ['e2'], '!y0', []],
-		      ['s0', 's1', ['someEvents'], null, ['y1 = 0']]]
+		} == [['s1', 's1', ['e1'], null, null],
+		      ['s0', 's1', ['e2'], '!y0', []],
+		      ['s0', 's1', ['someEvents'], null, ['y1 = 0']],
+		      ['s0', 's0', ['e1'], null, null]]
 		moduleBuilder
 	}
 }
