@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.73 2007-03-01 12:37:48 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.74 2007-03-01 15:51:03 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -846,11 +846,15 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
           // then for each andClause in the guard expression.
           final SimpleExpressionProxy guard = collectGuard(path);
           final CompiledNormalForm dnf = mDNFConverter.convertToDNF(guard);
-          //final CompiledNormalForm mdnf = mDNFMinimizer.minimize(dnf);
-         final Collection<CompiledClause> andClauses = dnf.getClauses();
-          if (!andClauses.isEmpty()) {
-            final List<SimpleExpressionProxy> sortedAndClauses =
+          //Collection<CompiledClause> andClauses = dnf.getClauses();
+          List<SimpleExpressionProxy> sortedAndClauses =
               mDNFConverter.createSortedClauseList(dnf);
+          if(!dnf.isEmpty()){
+          final CompiledNormalForm mdnf = mDNFMinimizer.minimize(dnf);
+          sortedAndClauses = mDNFConverter.createSortedClauseList(mdnf);
+          }
+          if (!sortedAndClauses.isEmpty()) {
+            //final List<SimpleExpressionProxy> sortedAndClauses = mDNFConverter.createSortedClauseList(andClauses);
             newEvents.remove(event);
             final List<List<BinaryExpressionProxy>> actionLists =
               collectAction(path);
@@ -1035,11 +1039,15 @@ private void findForbiddenStates(final EventProxy event, Set<EventProxy> newEven
 		
 		
 		final SimpleExpressionProxy plantGuard = collectGuard(plantTrans);
-		final CompiledNormalForm dnfPlant = mDNFConverter
+		CompiledNormalForm dnfPlant = mDNFConverter
 				.convertToDNF(plantGuard);
-		final List<SimpleExpressionProxy> sortedPlantClauses = mDNFConverter
-				.createSortedClauseList(dnfPlant);
-		
+		List<SimpleExpressionProxy> sortedPlantClauses = mDNFConverter
+		.createSortedClauseList(dnfPlant);
+		if(!dnfPlant.isEmpty()){
+		CompiledNormalForm mdnfPlant = mDNFMinimizer.minimize(dnfPlant);
+		sortedPlantClauses = mDNFConverter
+				.createSortedClauseList(mdnfPlant);
+		}
 		if(!forbidden.isEmpty()){
 			Set<String> forbiddenLoc=new TreeSet<String>();
 			/*
@@ -1087,8 +1095,14 @@ else{
 							collectUncontrollableGuard(plantExpr, specGuard);
 						final CompiledNormalForm dnfUncGuard = mDNFConverter
 								.convertToDNF(uncGuard);
-						final List<SimpleExpressionProxy> sortedUncClauses = mDNFConverter
-								.createSortedClauseList(dnfUncGuard);
+						 List<SimpleExpressionProxy> sortedUncClauses = mDNFConverter
+						.createSortedClauseList(dnfUncGuard);
+						if(!dnfUncGuard.isEmpty()){
+						final CompiledNormalForm mdnfUncGuard = mDNFMinimizer.minimize(dnfUncGuard);
+						 sortedUncClauses = mDNFConverter
+								.createSortedClauseList(mdnfUncGuard);
+						}
+						
 						if (!sortedUncClauses.isEmpty()) {
 							Set<String> fLoc=new TreeSet<String>();
 							for (TransitionProxy plant : plantTrans) {
