@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.71 2007-02-28 14:46:44 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.72 2007-03-01 07:09:20 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1018,7 +1018,6 @@ private void findForbiddenStates(final EventProxy event, Set<EventProxy> newEven
 	 * For each possible trans, collect the
 	 * plant guards and spec guards.
 	 */
-	Set<String> forbiddenLoc=new TreeSet<String>();
 	for (List<TransitionProxy> plantTrans : plantSpecTrans
 			.get(0)) {
 		
@@ -1030,6 +1029,7 @@ private void findForbiddenStates(final EventProxy event, Set<EventProxy> newEven
 				.createSortedClauseList(dnfPlant);
 		
 		if(!forbidden.isEmpty()){
+			Set<String> forbiddenLoc=new TreeSet<String>();
 			/*
 			 * Collect forbidden locations
 			 */
