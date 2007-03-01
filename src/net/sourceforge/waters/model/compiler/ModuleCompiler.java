@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.72 2007-03-01 07:09:20 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.73 2007-03-01 12:37:48 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -568,7 +568,19 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       }
       final ComponentKind kind = proxy.getKind();
       final GraphProxy graph = proxy.getGraph();
-      final boolean deterministic = graph.isDeterministic();
+      boolean deterministic=true;
+      if (!mIsEFA) {
+      deterministic = graph.isDeterministic();
+      mMaxInitialStates = deterministic ? 1 : -1;
+      }
+      else{
+    	  /*
+    	   * TODO: Check when EFA models are deterministic by 
+    	   * evaluating guard expressions.
+    	   */
+    	  deterministic=false;
+    	  mMaxInitialStates=1;
+      }
       mLocalAlphabet = new TreeSet<EventProxy>();
       final EventListExpressionProxy blockedExpr = graph.getBlockedEvents();
       if (blockedExpr != null) {
@@ -578,7 +590,7 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       }
       final Collection<NodeProxy> nodes = graph.getNodes();
       mStates = new TreeSet<StateProxy>();
-      mMaxInitialStates = deterministic ? 1 : -1;
+      //mMaxInitialStates = deterministic ? 1 : -1;
       mPrecompiledNodes =
         new IdentityHashMap<NodeProxy, CompiledNode>(nodes.size());
       visitCollection(nodes);
