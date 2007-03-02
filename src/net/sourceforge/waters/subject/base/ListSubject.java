@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   ListSubject
 //###########################################################################
-//# $Id: ListSubject.java,v 1.3 2007-02-26 21:41:18 robi Exp $
+//# $Id: ListSubject.java,v 1.4 2007-03-02 05:21:14 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -24,12 +24,9 @@ public interface ListSubject<P extends ProxySubject>
 {
 
   //#########################################################################
-  //# Cloning
+  //# Cloning and Assigning
   public ListSubject<P> clone();
 
-  
-  //#########################################################################
-  //# Assignments
   /**
    * Assigns the contents of another list to this list.
    * This method ensures that the contents of this list are equal to the

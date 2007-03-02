@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   IndexedHashSetSubject
 //###########################################################################
-//# $Id: IndexedHashSetSubject.java,v 1.6 2007-02-26 21:41:18 robi Exp $
+//# $Id: IndexedHashSetSubject.java,v 1.7 2007-03-02 05:21:14 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -315,7 +315,7 @@ public class IndexedHashSetSubject<P extends NamedSubject>
     final int oldsize = size();
     final int newsize = set.size();
     final Collection<P> added = new ArrayList<P>(newsize);
-    final Collection<P> kept = new HashSet<P>(oldsize);
+    final Collection<P> kept = new ArrayList<P>(oldsize);
     final Set<String> names = new HashSet<String>(newsize);
     for (final P newproxy : set) {
       final String name = newproxy.getName();
@@ -331,13 +331,7 @@ public class IndexedHashSetSubject<P extends NamedSubject>
         kept.add(present);
       }
     }
-    final Iterator<? extends P> iter = iterator();
-    while (iter.hasNext()) {
-      final P oldproxy = iter.next();
-      if (!kept.contains(oldproxy)) {
-        iter.remove();
-      }
-    }
+    retainAll(kept);
     for (final P newproxy : added) {
       final String name = newproxy.getName();
       commitAdd(name, newproxy);

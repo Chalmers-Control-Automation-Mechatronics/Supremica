@@ -709,10 +709,17 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
       Java_WriteLn $stream $umap ""
     }
 
+
   ############################################################################
   # Cloning
-    Java_GenerateSeparatorComment $stream $umap "Cloning"
-    if {[string compare $impl "plain"] == 0 || [llength $attribs] == 0} {
+    set needassign [expr [string compare $impl "subject"] == 0 && \
+                        (!$abstract || $numattribs > 0)]
+    if {$needassign} {
+      Java_GenerateSeparatorComment $stream $umap "Cloning and Assigning"
+    } else {
+      Java_GenerateSeparatorComment $stream $umap "Cloning"
+    }
+    if {[string compare $impl "plain"] == 0 || $numattribs == 0} {
       Java_WriteLn $stream $umap "  public $classname clone()"
       Java_WriteLn $stream $umap "  \{"
       Java_WriteLn $stream $umap "    return ($classname) super.clone();"
@@ -838,6 +845,102 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 	Java_WriteLn $stream $umap "  \}"
 	Java_WriteLn $stream $umap ""
       }
+    }
+
+
+  ############################################################################
+  # Assigning
+    if {$needassign} {
+      Java_WriteLn $stream $umap \
+          "  public boolean assignFrom(final ProxySubject partner)"
+      Java_WriteLn $stream $umap "  \{"
+      Java_WriteLn $stream $umap "    if (this != partner) \{"
+      Java_WriteLn $stream $umap \
+          "      final $classname downcast = ($classname) partner;"
+      Java_WriteLn $stream $umap \
+          "      boolean change = super.assignFrom(partner);"
+      foreach attrib $attribs {
+        set decltype [Java_AttribGetDeclaredType $attrib $impl]
+        set type [Java_AttribGetMemberType $attrib $impl classMap]
+        set membername [Java_AttribGetMemberName $attrib $impl]
+        set paramname [Java_AttribGetParameterName $attrib $impl]
+	set gettername [Java_AttribGetGetterName $attrib $impl]
+        set refstatus [Java_AttribGetRefStatus $attrib $impl]
+        set eqstatus [Java_AttribGetEqualityStatus $attrib $impl]
+        if {[Java_IsCollectionType $decltype]} {
+          set gettername "${gettername}Modifiable"
+        }
+        Java_WriteLn $stream $umap \
+            "      final $type $paramname = downcast.${gettername}();"
+        if {[Java_IsCollectionType $decltype]} {
+          Java_WriteLn $stream $umap \
+              "      $membername.assignFrom($paramname);"
+        } elseif {[regexp {2D$} $type all]} {
+          Java_WriteLn $stream $umap \
+              "      if (!$membername.equals($paramname)) \{"
+          Java_WriteLn $stream $umap \
+              "        $membername = ($type) $paramname.clone();"
+          Java_WriteLn $stream $umap "        change = true;"
+          Java_WriteLn $stream $umap "      \}"
+        } elseif {![info exists classMap($decltype)] ||
+                  [string compare $refstatus "ref"] == 0} {
+          Java_WriteLn $stream $umap "      if ($membername != $paramname) \{"
+          Java_WriteLn $stream $umap "        $membername = $paramname;"
+          if {[string compare $eqstatus "geometry"] == 0} {
+            Java_WriteLn $stream $umap \
+                "        fireGeometryChanged($membername);";
+          } else {
+            Java_WriteLn $stream $umap "        change = true;"
+          }
+          Java_WriteLn $stream $umap "      \}"
+        } elseif {[string compare $eqstatus "required"] == 0} {
+          Java_WriteLn $stream $umap \
+              "      $membername.assignFrom($paramname);"
+        } else {
+          Java_WriteLn $stream $umap \
+              "      if ($membername != null && $paramname != null) \{"
+          Java_WriteLn $stream $umap \
+              "        $membername.assignFrom($paramname);"
+          Java_WriteLn $stream $umap \
+              "      \} else if ($membername == null && $paramname != null) \{"
+          Java_WriteLn $stream $umap \
+              "        $membername = $paramname.clone();"
+          Java_WriteLn $stream $umap \
+              "        $membername.setParent(this);"
+          if {[string compare $eqstatus "geometry"] == 0} {
+            Java_WriteLn $stream $umap \
+                "        fireGeometryChanged($membername);";
+          } else {
+            Java_WriteLn $stream $umap "        change = true;"
+          }
+          Java_WriteLn $stream $umap \
+              "      \} else if ($membername != null && $paramname == null) \{"
+          Java_WriteLn $stream $umap \
+              "        $membername.setParent(null);"
+          Java_WriteLn $stream $umap \
+              "        $membername = null;"
+          if {[string compare $eqstatus "geometry"] == 0} {
+            Java_WriteLn $stream $umap "        fireGeometryChanged(null);";
+          } else {
+            Java_WriteLn $stream $umap "        change = true;"
+          }
+          Java_WriteLn $stream $umap "      \}"
+        }
+      }
+      if {$abstract} {
+        Java_WriteLn $stream $umap "      return change;"
+        Java_WriteLn $stream $umap "    \} else \{"
+        Java_WriteLn $stream $umap "      return false;"
+        Java_WriteLn $stream $umap "    \}"
+      } else {
+        Java_WriteLn $stream $umap "      if (change) \{"
+        Java_WriteLn $stream $umap "        fireStateChanged();"
+        Java_WriteLn $stream $umap "      \}"
+        Java_WriteLn $stream $umap "    \}"
+        Java_WriteLn $stream $umap "    return false;"
+      }
+      Java_WriteLn $stream $umap "  \}"
+      Java_WriteLn $stream $umap ""
     }
 
 
@@ -1110,7 +1213,7 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 
   ############################################################################
   # Getters
-    if {[llength $attribs] > 0} {
+    if {$numattribs > 0} {
       set interfacepack $importMap($interfacename)
       Java_GenerateSeparatorComment $stream $umap \
 	  "Interface $interfacepack.$interfacename"
@@ -1162,7 +1265,7 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 
   ############################################################################
   # Setters
-    if {[string compare $impl "subject"] == 0 && [llength $attribs] > 0} {
+    if {[string compare $impl "subject"] == 0 && $numattribs > 0} {
       Java_GenerateSeparatorComment $stream $umap "Setters"
       foreach attrib $attribs {
 	set decltype [Java_AttribGetDeclaredType $attrib $impl]
@@ -1220,21 +1323,12 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
             Java_WriteLn $stream $umap "    $membername = $paramname;"
           }
 	  if {$geo == 3} {
-	    Java_WriteLn $stream $umap \
-		"    final Subject source = getParent();"
-            Java_WriteLn $stream $umap "    final ModelChangeEvent event ="
-	    Java_WriteLn $stream $umap \
-		"      ModelChangeEvent.createGeometryChanged(source, this);"
+	    Java_WriteLn $stream $umap "    fireGeometryChanged();"
 	  } elseif {[string compare $eqstatus "geometry"] == 0} {
-            Java_WriteLn $stream $umap "    final ModelChangeEvent event ="
-	    Java_WriteLn $stream $umap \
-            "      ModelChangeEvent.createGeometryChanged(this, $membername);"
+            Java_WriteLn $stream $umap "    fireGeometryChanged($membername);"
 	  } else {
-            Java_WriteLn $stream $umap "    final ModelChangeEvent event ="
-	    Java_WriteLn $stream $umap \
-		"      ModelChangeEvent.createStateChanged(this);"
+            Java_WriteLn $stream $umap "    fireStateChanged();"
 	  }
-	  Java_WriteLn $stream $umap "    fireModelChanged(event);"
 	}	  
 	Java_WriteLn $stream $umap "  \}"
 	Java_WriteLn $stream $umap ""
@@ -2253,6 +2347,9 @@ proc Java_GenerateHeaderComment {stream packname classname} {
   puts $stream "//# CLASS:   $classname"
   puts $stream "//$gSep75"
   puts $stream "//# \$Id\$"
+  puts $stream "//$gSep75"
+  puts $stream "//# THIS FILE HAS BEEN AUTOMATICALLY GENERATED BY A SCRIPT."
+  puts $stream "//# DO NOT EDIT."
   puts $stream "//$gSep75"
   puts $stream ""
 }

@@ -4,12 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   NotCloningGeometrySetSubject
 //###########################################################################
-//# $Id: NotCloningGeometrySetSubject.java,v 1.3 2006-02-20 01:02:03 robi Exp $
+//# $Id: NotCloningGeometrySetSubject.java,v 1.4 2007-03-02 05:21:14 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
 
 import java.util.AbstractSet;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -21,10 +22,10 @@ import net.sourceforge.waters.model.unchecked.Casting;
 
 
 /**
- * <P>A wrapper of the {@link HashSet} class that also implements the
+ * <E>A wrapper of the {@link HashSet} class that also implements the
  * {@link Subject} interface.</P>
  *
- * <P>This is an implementation of a mutable set with full event
+ * <E>This is an implementation of a mutable set with full event
  * notification support. In contrast to other collection subject
  * implementations, this class is intended for geometry information, and
  * therefore fires geometry change events when a change occurs.  This
@@ -185,6 +186,29 @@ public class NotCloningGeometrySetSubject<E>
   }
 
 
+  //#########################################################################
+  //# Interface net.sourceforge.waters.subject.base.SimpleSetSubject
+  public void assignFrom(final Set<? extends E> set)
+  {
+    final int oldsize = size();
+    final int newsize = set.size();
+    final Collection<E> added = new ArrayList<E>(newsize);
+    final Collection<E> kept = new ArrayList<E>(oldsize);
+    for (final E newitem : set) {
+      if (contains(newitem)) {
+        kept.add(newitem);
+      } else {
+        added.add(newitem);
+      }
+    }
+    final boolean removing = mSet.retainAll(kept);
+    final boolean adding = mSet.addAll(added);
+    if (removing || adding) {
+      fireGeometryChange();
+    }
+  }
+
+  
   //#########################################################################
   //# Printing
   public String getShortClassName()

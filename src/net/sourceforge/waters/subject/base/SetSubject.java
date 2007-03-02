@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   SetSubject
 //###########################################################################
-//# $Id: SetSubject.java,v 1.3 2007-02-26 21:41:18 robi Exp $
+//# $Id: SetSubject.java,v 1.4 2007-03-02 05:21:14 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -24,12 +24,9 @@ public interface SetSubject<P extends ProxySubject>
 {
 
   //#########################################################################
-  //# Cloning
+  //# Cloning and Assigning
   public SetSubject<P> clone();
 
-  
-  //#########################################################################
-  //# Assignments
   /**
    * Assigns the contents of another set to this set.
    * This method ensures that the contents of this set are equal to the

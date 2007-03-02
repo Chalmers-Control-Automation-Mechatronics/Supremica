@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   MutableSubject
 //###########################################################################
-//# $Id: MutableSubject.java,v 1.3 2007-02-12 21:38:49 robi Exp $
+//# $Id: MutableSubject.java,v 1.4 2007-03-02 05:21:14 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -51,12 +51,35 @@ public abstract class MutableSubject
 
 
   //#########################################################################
-  //# Cloning
+  //# Cloning and Assigning
   public MutableSubject clone()
   {
     final MutableSubject cloned = (MutableSubject) super.clone();
     cloned.mObservers = null;
     return cloned;
+  }
+
+  /**
+   * Assigns the contents of another subject to this subject.
+   * This method ensures that the contents of this subject are equal to the
+   * contents of the given subject according to the {@link
+   * Proxy#equalsWithGeometry(Proxy) equalsWithGeometry()} method. Members
+   * that differ are cloned or recursively assigned from the other
+   * subject. The method produces as few state change notifications as
+   * possible.
+   * @param  partner  The subject to be copied from.
+   * @return <CODE>true</CODE> if a state changed notification needs to
+   *         be fired. To reduce the amount of state change notifications
+   *         fired, implementations may suppress them and return
+   *         <CODE>true</CODE>. All <EM>final</EM> subclasses must override
+   *         this method, check the return value of the superclass method
+   *         and call {@link #fireStateChanged()} as appropriate.
+   * @throws ClassCastException to indicate that the argument is not of
+   *         the same type as this subject.
+   */
+  public boolean assignFrom(final ProxySubject partner)
+  {
+    return false;
   }
 
 
@@ -98,6 +121,13 @@ public abstract class MutableSubject
   protected void fireStateChanged()
   {
     final ModelChangeEvent event = ModelChangeEvent.createStateChanged(this);
+    fireModelChanged(event);
+  }
+
+  protected void fireGeometryChanged(final Object geo)
+  {
+    final ModelChangeEvent event =
+      ModelChangeEvent.createGeometryChanged(this, geo);
     fireModelChanged(event);
   }
 

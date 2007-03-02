@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   CloningGeometryListSubject
 //###########################################################################
-//# $Id: CloningGeometryListSubject.java,v 1.4 2007-02-26 21:41:18 robi Exp $
+//# $Id: CloningGeometryListSubject.java,v 1.5 2007-03-02 05:21:14 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -197,7 +197,7 @@ public class CloningGeometryListSubject<E extends Cloneable>
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.subject.base.ListSubject
+  //# Interface net.sourceforge.waters.subject.base.SimpleListSubject
   public void assignFrom(final List<? extends E> list)
   {
     final int oldsize = size();

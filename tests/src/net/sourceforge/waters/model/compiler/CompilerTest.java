@@ -2,9 +2,9 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.compiler
-//# CLASS:   JAXBTestCase
+//# CLASS:   CompilerTest
 //###########################################################################
-//# $Id: CompilerTest.java,v 1.12 2006-11-17 03:38:22 robi Exp $
+//# $Id: CompilerTest.java,v 1.13 2007-03-02 05:21:14 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;

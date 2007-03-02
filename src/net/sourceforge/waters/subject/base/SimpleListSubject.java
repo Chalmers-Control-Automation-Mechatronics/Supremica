@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   SimpleListSubject
 //###########################################################################
-//# $Id: SimpleListSubject.java,v 1.3 2007-02-26 21:41:18 robi Exp $
+//# $Id: SimpleListSubject.java,v 1.4 2007-03-02 05:21:14 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -28,5 +28,18 @@ public interface SimpleListSubject<E>
   //#########################################################################
   //# Cloning
   public SimpleListSubject<E> clone();
+
+  /**
+   * Assigns the contents of another list to this list.
+   * This method ensures that the contents of this list are equal to the
+   * contents of the given list according to the {@link
+   * Proxy#equalsWithGeometry(Proxy) equals()} method, in the given
+   * order. Items already contained in this list are resued, and changed in
+   * position as needed. Items not contained are cloned from the given
+   * list. The method produces as few model change notifications as
+   * possible.
+   * @param  list  The list to be copied from.
+   */
+  public void assignFrom(final List<? extends E> list);
 
 }

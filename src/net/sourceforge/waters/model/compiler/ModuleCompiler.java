@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.74 2007-03-01 15:51:03 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.75 2007-03-02 05:21:14 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -568,18 +568,17 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
       }
       final ComponentKind kind = proxy.getKind();
       final GraphProxy graph = proxy.getGraph();
-      boolean deterministic=true;
+      final boolean deterministic;
       if (!mIsEFA) {
-      deterministic = graph.isDeterministic();
-      mMaxInitialStates = deterministic ? 1 : -1;
-      }
-      else{
-    	  /*
-    	   * TODO: Check when EFA models are deterministic by 
-    	   * evaluating guard expressions.
-    	   */
-    	  deterministic=false;
-    	  mMaxInitialStates=1;
+        deterministic = graph.isDeterministic();
+        mMaxInitialStates = deterministic ? 1 : -1;
+      } else {
+        /*
+         * TODO: Check when EFA models are deterministic by 
+         * evaluating guard expressions.
+         */
+        deterministic = false;
+        mMaxInitialStates = 1;
       }
       mLocalAlphabet = new TreeSet<EventProxy>();
       final EventListExpressionProxy blockedExpr = graph.getBlockedEvents();

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   NamedSubject
 //###########################################################################
-//# $Id: NamedSubject.java,v 1.3 2006-01-22 21:26:33 robi Exp $
+//# $Id: NamedSubject.java,v 1.4 2007-03-02 05:21:14 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -52,10 +52,22 @@ public abstract class NamedSubject
 
 
   //#########################################################################
-  //# Cloning
+  //# Cloning and Assigning
   public NamedSubject clone()
   {
     return (NamedSubject) super.clone();
+  }
+
+  public boolean assignFrom(final ProxySubject partner)
+  {
+    if (this != partner) {
+      final boolean changed = super.assignFrom(partner);
+      final NamedProxy named = (NamedSubject) partner;
+      setName(named.getName());
+      return changed;
+    } else {
+      return false;
+    }
   }
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   ModelChangeEvent
 //###########################################################################
-//# $Id: ModelChangeEvent.java,v 1.5 2006-11-17 03:38:22 robi Exp $
+//# $Id: ModelChangeEvent.java,v 1.6 2007-03-02 05:21:14 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -183,6 +183,8 @@ public class ModelChangeEvent extends EventObject
 
   //#########################################################################
   //# Class Constants
+  public static final long serialVersionUID = 1;
+
   /**
    * The constant identifying an item-addition notification.  This
    * notification is sent after an item has been added to some collection
@@ -192,7 +194,7 @@ public class ModelChangeEvent extends EventObject
    * added. When the message is received, the addition of the item is
    * already completed, so its parent points to the container.
    */
-  public static final int ITEM_ADDED = 1;
+  public static final int ITEM_ADDED = 0x01;
   /**
    * The constant identifying an item-removal notification. This
    * notification is sent after an item has been removed from some
@@ -202,7 +204,7 @@ public class ModelChangeEvent extends EventObject
    * the removed item. When the message is received, the removal of the
    * item is already completed, so its parent is <CODE>null</CODE>.
    */
-  public static final int ITEM_REMOVED = 2;
+  public static final int ITEM_REMOVED = 0x02;
   /**
    * The constant identifying a name change notification.  This
    * notification is sent after the name of a {@link NamedSubject} has been
@@ -210,7 +212,7 @@ public class ModelChangeEvent extends EventObject
    * value is the name the item had before the operation. The message is
    * received by the item that has been renamed.
    */
-  public static final int NAME_CHANGED = 3;
+  public static final int NAME_CHANGED = 0x04;
   /**
    * The constant identifying a state change notification.  This
    * notification is sent after the change of an attribute of some
@@ -220,7 +222,7 @@ public class ModelChangeEvent extends EventObject
    * kinds. The message is received by the item whose attribute has been
    * changed.
    */
-  public static final int STATE_CHANGED = 4;
+  public static final int STATE_CHANGED = 0x08;
   /**
    * The constant identifying a geometry change notification.  This
    * notification is sent after the change of the geometry of some
@@ -230,17 +232,12 @@ public class ModelChangeEvent extends EventObject
    * object that has been changed, or by its parent if the change involved
    * the introduction of a new geometry object.
    */
-  public static final int GEOMETRY_CHANGED = 5;
+  public static final int GEOMETRY_CHANGED = 0x10;
 
 
   //#########################################################################
   //# Data Members
   private final int mKind;
   private final Object mValue;
-  
-  
-  //#########################################################################
-  //# Static Class Variables
-  public static final long serialVersionUID = 1;
 
 }
