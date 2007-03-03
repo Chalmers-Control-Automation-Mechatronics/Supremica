@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.76 2007-03-03 15:28:58 markus Exp $
+//# $Id: ModuleCompiler.java,v 1.77 2007-03-03 16:10:29 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -1109,7 +1109,6 @@ private void findForbiddenStates(final EventProxy event, Set<EventProxy> newEven
 	 * At position "0" we have allPlantPaths at position
 	 * "1" allSpecPaths.
 	 */
-	//forbidden=true;
 	final List<List<List<TransitionProxy>>> plantSpecTrans = plantSpecTransitions(
 			event, forbidden);
 	/*
@@ -1133,7 +1132,8 @@ private void findForbiddenStates(final EventProxy event, Set<EventProxy> newEven
 		if(!forbidden.isEmpty()){
 			Set<String> forbiddenLoc=new TreeSet<String>();
 			/*
-			 * Collect forbidden locations
+			 * Collect forbidden locations. Since the event 
+			 * is forbidden only plant locations are relevant. 
 			 */
 			for (TransitionProxy plant : plantTrans) {
 				forbiddenLoc.add(plant
@@ -1156,7 +1156,8 @@ private void findForbiddenStates(final EventProxy event, Set<EventProxy> newEven
 		newEvents.add(forbiddenEvent);
 		/*
 		 * If the plant guard is always true we still have a controllability problem 
-		 * i.e. either way we must forbid the event.
+		 * i.e. either way we must forbid the event. The case when 
+		 * the plant guard always is false is not yet handleled.
 		 */
 		mForbiddenEvents.add(forbiddenEvent);
 			}}
