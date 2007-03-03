@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleCompiler
 //###########################################################################
-//# $Id: ModuleCompiler.java,v 1.75 2007-03-02 05:21:14 robi Exp $
+//# $Id: ModuleCompiler.java,v 1.76 2007-03-03 15:28:58 markus Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -810,7 +810,13 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
      * translated as plants.
      */
     mEventForbiddenStatesMap= new HashMap<EventProxy,LocationsAndExpression>();
-	mUncontrollableEFASpecifications = new TreeSet<String>(); 
+	//mUncontrollableEFASpecifications = new TreeSet<String>();
+	/*
+	 * Because of a stupid parser that does not simply x>1 & x<1 to false 
+	 * we the extra set mForbiddenEvents. Only after we have built all variable 
+	 * automata we know which forbidden events that needs to be used.
+	 */
+	mForbiddenEvents= new HashSet<EventProxy>();
 	/*
      * Copy the GlobalAlphabet.
      */
@@ -820,7 +826,8 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
     
     try {
       for (final EventProxy event : mOriginalAlphabet) {
-        /*
+        EventProxy orgEvent=findOriginalEvent(event);
+    	  /*
          * Find all possible transitions
          * (synch-combinations between the automata)
          * that the event can trigger(allTrans = allPaths).
@@ -830,10 +837,10 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
         	 * it is important that the forbidden states are collected "first".
         	 * 
         	 */
-        	if (event.getKind() == EventKind.UNCONTROLLABLE) {
-				findForbiddenStates(event, newEvents);
+        	if (orgEvent.getKind() == EventKind.UNCONTROLLABLE) {
+				findForbiddenStates(orgEvent, newEvents);
 			}	
-    	  List<List<TransitionProxy>> allTrans = allPossibleTransitions(event);
+    	  List<List<TransitionProxy>> allTrans = allPossibleTransitions(orgEvent);
         /*
 		 * Collect guard and actions. Split the guards into andClauses. Update
 		 * the automata with the final events and transitions. Fill mappings,
@@ -854,20 +861,20 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
           }
           if (!sortedAndClauses.isEmpty()) {
             //final List<SimpleExpressionProxy> sortedAndClauses = mDNFConverter.createSortedClauseList(andClauses);
-            newEvents.remove(event);
+            newEvents.remove(orgEvent);
             final List<List<BinaryExpressionProxy>> actionLists =
               collectAction(path);
             for (final SimpleExpressionProxy expr : sortedAndClauses) {
               final String eventname =
-                event.getName() + "_" + mCurrentEventID++;
+                orgEvent.getName() + "_" + mCurrentEventID++;
               final EventProxy relabeledEvent =
                 mDESFactory.createEventProxy(eventname,
-                                             event.getKind(),
-                                             event.isObservable());
+                                             orgEvent.getKind(),
+                                             orgEvent.isObservable());
               mEFAEventGuardClauseMap.put(relabeledEvent, expr);
               mEFAEventActionListsMap.put(relabeledEvent, actionLists);
               newEvents.add(relabeledEvent);
-              mEFAEventEventMap.put(relabeledEvent, event);
+              mEFAEventEventMap.put(relabeledEvent, orgEvent);
               // New transitions with the new event names are added to
               // the automata.
               addNewTransitionsToAutomtata(relabeledEvent, path);
@@ -890,14 +897,22 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
        * Transitions in automata without GuardActionBlocks are updated.
        */
       updateTransitionsInAutomtata();
+      
+      /* In order to avoid fictional uncontrollable 
+       * states caussed by the relabelling of events 
+       * specifications are transformed into plants. 
+       * However, if one relabelled uncontrollable 
+       * event is allowed  by the spec i.e. no extra 
+       * selfloops triggered by that relabelled events 
+       * are added at that state. No optimizations are done yet.
+       */
+      plantifySpec();
+      
       /* 
        * Specifications that forbids events are added.
        */
       addSingleStateSpec();
-      /* Specifications with troublesome guards 
-       * are copied and transformed into plants.
-       */
-      plantifyUncontrollableSpec();
+      
       /* Forbidden self loops are added to the rest of the plants
       *  (i.e. not to the variableAutomata. ).
       */
@@ -911,7 +926,8 @@ public class ModuleCompiler extends AbstractModuleProxyVisitor {
 
 
 private void addSingleStateSpec() {
-	for(EventProxy event: mEventForbiddenStatesMap.keySet()){
+	//for(EventProxy event: mEventForbiddenStatesMap.keyset()){
+	for(EventProxy event: mForbiddenEvents){
 		String name= event.getName(); 
 		
 		final Collection<EventProxy> alphabet = new HashSet<EventProxy>();
@@ -936,7 +952,9 @@ private void addSingleStateSpec() {
 }
 
 private void createForbiddenSelfLoopsInAutomata() {
-	for (EventProxy event: mEventForbiddenStatesMap.keySet()){
+	//for (EventProxy event: mEventForbiddenStatesMap.keySet()){
+		
+		for (EventProxy event: mForbiddenEvents){
 		Set<String> namesOfAutomata= new TreeSet<String>();
 		namesOfAutomata.addAll(mAutomata.keySet());
 		for(String loc: mEventForbiddenStatesMap.get(event).getLocations()){
@@ -966,6 +984,7 @@ private void createForbiddenSelfLoopsInAutomata() {
             		
                 }}}}}}}
 
+/*
 private void plantifyUncontrollableSpec() {
 	
 	final Map<String,AutomatonProxy> newPlantAutomata =
@@ -988,7 +1007,7 @@ private void plantifyUncontrollableSpec() {
 					}
 									}
 			}}
-	    String name="G("+aut.getName()+")";
+	    String name="Plant("+aut.getName()+")";
 	    final AutomatonProxy plantifiedAut =
 	      mDESFactory.createAutomatonProxy(name,
 	                                       ComponentKind.PLANT,
@@ -999,8 +1018,72 @@ private void plantifyUncontrollableSpec() {
 	}}}
 	mAutomata.putAll(newPlantAutomata);
 }
+*/
+private void plantifySpec() {
+	
+	final Map<String,AutomatonProxy> newPlantAutomata =
+	      new TreeMap<String,AutomatonProxy>();
+	    
+	for(AutomatonProxy aut: mAutomata.values()){
+		if(aut.getKind()== ComponentKind.SPEC){
+		Collection<TransitionProxy> transitions= new TreeSet<TransitionProxy>();
+	    transitions.addAll(aut.getTransitions());
+		for(EventProxy relabelledEvent: aut.getEvents()){
+			if(relabelledEvent.getKind()== EventKind.UNCONTROLLABLE){
+				for(StateProxy state: aut.getStates()){
+					if(originalEventDisabledAtState(aut, state, relabelledEvent)){
+						final TransitionProxy selfloop =
+	                        mDESFactory.createTransitionProxy(state,
+	                        		relabelledEvent,
+	                                                          state);
+						transitions.add(selfloop);
+					}
+									}
+			}}
+	    String name="Plant("+aut.getName()+")";
+	    final AutomatonProxy plantifiedAut =
+	      mDESFactory.createAutomatonProxy(name,
+	                                       ComponentKind.PLANT,
+	                                       aut.getEvents(),
+	                                       aut.getStates(),
+	                                       transitions);
+	    newPlantAutomata.put(name,plantifiedAut);
+	}}
+	mAutomata.putAll(newPlantAutomata);
+}
+
+private boolean originalEventDisabledAtState(AutomatonProxy aut, StateProxy state, EventProxy relabelledEvent) {	
+	for(TransitionProxy trans: aut.getTransitions()){
+		if(trans.getSource()== state){
+			EventProxy originalEvent = findOriginalEvent(trans.getEvent());
+			final Set<EventProxy> allRelabelled = new HashSet<EventProxy>();
+			for(EventProxy event: mEFAEventEventMap.keySet()){
+				if(mEFAEventEventMap.get(event)== originalEvent){
+					allRelabelled.add(event);
+				}
+			}
+			if(allRelabelled.contains(relabelledEvent)){
+				return false;
+			}
+		}		
+	}
+	return true;
+}
 
 
+private EventProxy findOriginalEvent(EventProxy event) {
+	if(mEFAEventEventMap.isEmpty()){
+		return event;
+	}
+	else if(!mEFAEventEventMap.containsKey(event)){
+		return event;
+	}
+	else{
+		return findOriginalEvent(mEFAEventEventMap.get(event));
+	}
+}
+
+/*
 private boolean eventDisabledAtState(AutomatonProxy aut, StateProxy state, EventProxy event) {
 	for(TransitionProxy trans: aut.getTransitions()){
 		if(trans.getSource()== state && trans.getEvent()== event){
@@ -1010,7 +1093,7 @@ private boolean eventDisabledAtState(AutomatonProxy aut, StateProxy state, Event
 	}
 	return true;
 }
-
+*/
 
 private void findForbiddenStates(final EventProxy event, Set<EventProxy> newEvents) throws EvalException {
 	/*
@@ -1070,11 +1153,20 @@ private void findForbiddenStates(final EventProxy event, Set<EventProxy> newEven
 					     event.isObservable());
 		mEventForbiddenStatesMap.put
 		(forbiddenEvent, new LocationsAndExpression(forbiddenLoc, plantExpr));
-		newEvents.add(forbiddenEvent);			
+		newEvents.add(forbiddenEvent);
+		/*
+		 * If the plant guard is always true we still have a controllability problem 
+		 * i.e. either way we must forbid the event.
+		 */
+		mForbiddenEvents.add(forbiddenEvent);
 			}}
 			else{
+				/*
+				 * I am not sure if this possibility exists.
+				 */
 				mEventForbiddenStatesMap.put
 				(event, new LocationsAndExpression(forbiddenLoc,mModuleFactory.createIntConstantProxy(1)));
+			    mForbiddenEvents.add(event);
 			}
 		}
 			
@@ -1111,7 +1203,7 @@ else{
 								for (TransitionProxy spec : specTrans) {
 									String name=spec.getSource().getName(); 
 									fLoc.add(name);
-								collectUncontrollableEFASpec(name);
+								//collectUncontrollableEFASpec(name);
 									
 								}
 							}
@@ -1129,7 +1221,6 @@ else{
 						(forbiddenEvent, new LocationsAndExpression(fLoc, uncExpr));
 						//Forbidden events are added to the global alphabet.
 						newEvents.add(forbiddenEvent);
-						//mForbiddenStates.add(new LocationAndVariables(forbiddenLoc, uncExpr));
 							}							
 							}
 						}
@@ -1140,7 +1231,7 @@ else{
 	}
 }
 
-
+/*
 private void collectUncontrollableEFASpec(String name) {
 	for(AutomatonProxy aut: mAutomata.values()){
 	if(aut.getKind()== ComponentKind.SPEC){
@@ -1152,7 +1243,7 @@ private void collectUncontrollableEFASpec(String name) {
 	}	
 	}
 }
-
+*/
 
 /*
  * All transitions with old event names are removed. Forbidden events are added to the alphabet 
@@ -1281,9 +1372,7 @@ private void updateTransitionsInAutomtata()
       final VariableSearcher searcher = new VariableSearcher(variable);
       final Set<TransitionProxy> variableTransitions =
         new TreeSet<TransitionProxy>();
-      //New algorithm -------------------
-      //if(false){
-    	  for(EventProxy forbiddenEvent: mEventForbiddenStatesMap.keySet()){
+      	  for(EventProxy forbiddenEvent: mEventForbiddenStatesMap.keySet()){
     	  final SimpleExpressionProxy clause =
     		  mEventForbiddenStatesMap.get(forbiddenEvent).getExpression();  
     	  if(searcher.search(clause)){
@@ -1303,13 +1392,12 @@ private void updateTransitionsInAutomtata()
     	                                                        source);
     	                    variableTransitions.add(forbiddenTransition);
     	                    variableAlphabet.add(forbiddenEvent); 
+    	                    mForbiddenEvents.add(forbiddenEvent);
     	                   }
     	            }
     	               finally {
     	              mContext.unset(name);
     	            }}}}
-    //}
-      //------------------------------
       for (EventProxy relabeledEvent : mEFAEventGuardClauseMap.keySet()) {
         // Get the right action.
         final List<List<BinaryExpressionProxy>> actionLists =
@@ -1426,16 +1514,20 @@ private void updateTransitionsInAutomtata()
     final List<TransitionProxy> transInAutomaton =
       new LinkedList<TransitionProxy>();
      for (final TransitionProxy transition : automaton.getTransitions()) {
-      if (transition.getEvent() == event) {
-        transInAutomaton.add(transition);
-      } else if (mEFAEventEventMap.get(transition.getEvent()) != null) {
+    	 if (event==findOriginalEvent(transition.getEvent())) {
+    	 /*
+      	 * Transition may already been relabelled.
+      	 */
+    	  transInAutomaton.add(transition);
+        
+      } 
+      /*else if (mEFAEventEventMap.get(transition.getEvent()) != null) {
         if (mEFAEventEventMap.get(transition.getEvent()) == event) {
-        	/*
-        	 * Transition may already been relabelled.
-        	 */
+        	
         	transInAutomaton.add(transition);
         }
       }
+      */
     }
     if (transInAutomaton.isEmpty() &&
         automaton.getEvents().contains(event)&& 
@@ -1487,13 +1579,16 @@ private void updateTransitionsInAutomtata()
       final List<TransitionProxy> transInAutomaton =
         new LinkedList<TransitionProxy>();
        for (final TransitionProxy transition : automaton.getTransitions()) {
-        if (transition.getEvent() == event) {
+        if (event==findOriginalEvent(transition.getEvent())) {
           transInAutomaton.add(transition);
-        } else if (mEFAEventEventMap.get(transition.getEvent()) != null) {
+        } 
+        /*
+        else if (mEFAEventEventMap.get(transition.getEvent()) != null) {
           if (mEFAEventEventMap.get(transition.getEvent()) == event) {
             transInAutomaton.add(transition);
           }
         }
+        */
       }
       if (transInAutomaton.isEmpty() &&
           automaton.getEvents().contains(event)) {
@@ -2108,7 +2203,15 @@ private void updateTransitionsInAutomtata()
    * Mappings to handle controllability when the flat EFA model is generated.
    */ 
   private Map<EventProxy, List<List<BinaryExpressionProxy>>> mEFAEventActionListsMap;
-  private Set<String> mUncontrollableEFASpecifications; 
+  /*
+   * The set mUncontrollableEFASpecifications is not used. It may 
+   * be used later for optimization. The specifications that
+   * needs to be transformed into plants are those in mUncontrollableEFASpecifications
+   * and specifications that contains events that have been relabelled into more 
+   * that two one name.    
+   */
+  //private Set<String> mUncontrollableEFASpecifications; 
   private Map<EventProxy,LocationsAndExpression> mEventForbiddenStatesMap;
+  private Set<EventProxy> mForbiddenEvents;
   //
 }
