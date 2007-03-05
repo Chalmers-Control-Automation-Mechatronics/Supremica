@@ -844,11 +844,8 @@ Class-Path: ${manifest.pathlist}</echo>
 			<pathelement location="${dist}/SupremicaLib.jar" />
 			<pathelement path="${java.class.path}" />
 		</classpath>
-<!--
-		<assertions>
-			 <enable/>
-		</assertions>		 
--->
+                <jvmarg value="-Xms128M"/>
+                <jvmarg value="-Xmx512M" />       
 	</java>
 </target>
 
