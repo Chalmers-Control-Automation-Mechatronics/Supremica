@@ -100,7 +100,7 @@ public class AutomataSynthesizer
         this.synchronizationOptions = synchronizationOptions;
         this.synthesizerOptions = synthesizerOptions;
         this.nbrOfExecuters = this.synchronizationOptions.getNbrOfExecuters();
-        this.maximallyPermissive = synthesizerOptions.getMaximallyPermissive();
+        this.maximallyPermissive = synthesizerOptions.getMaximallyPermissive(); 
         
         // Some sanity tests (should already have been tested from ActionMan?)
         if ((synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MODULAR) &&
@@ -267,7 +267,8 @@ public class AutomataSynthesizer
         {
             Automata newAutomata = new Automata(theAutomata);
             BDDSynthesizer bddSynthesizer = new BDDSynthesizer(theAutomata);            
-            bddSynthesizer.computeNonblockingSupervisorGuards();
+            bddSynthesizer.computeSupervisor();
+            bddSynthesizer.getSupervisor();
             bddSynthesizer.done();
         }
         else
@@ -619,7 +620,20 @@ public class AutomataSynthesizer
         {
             synchronizationOptions.setRememberDisabledEvents(true);
         }
-        
+  
+        if (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKING)
+        {
+            automata = new Automata(automata);
+             // Only nonblocking? Then everything should be considered controllable!
+            for (Automaton automaton : automata)
+            {
+                for (LabeledEvent event : automaton.getAlphabet())
+                {
+                    event.setControllable(true);
+                }
+            }
+        }      
+      
         AutomataSynchronizer syncher = new AutomataSynchronizer(automata, synchronizationOptions);
         syncher.getHelper().setExecutionDialog(executionDialog);
         threadToStop = syncher;

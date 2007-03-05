@@ -49,43 +49,50 @@
  */
 package org.supremica.automata.BDD;
 
-import org.supremica.log.*;
-import org.supremica.util.SupremicaException;
-import java.util.*;
-import java.io.*;
-import org.supremica.automata.*;
-import org.supremica.automata.IO.*;
 
-public class BDDSynthesizer
+/**
+ * Different types of verification.
+ */
+public enum BDDLibraryType
 {
-    private static Logger logger = LoggerFactory.createLogger(BDDSynthesizer.class);
+    JAVA("JavaBDD", "java"),
+    BUDDY("Buddy", "buddy"),
+    CUDD("Cudd", "cudd"),
+    JDD("JDD", "jdd");
     
-    BDDAutomata bddAutomata;
+    /** Textual description. */
+    private final String description;
+    private final String libraryname;
     
-    public BDDSynthesizer(Automata theAutomata)
+    private BDDLibraryType(String description, String libraryname)
     {
-        bddAutomata = new BDDAutomata(theAutomata);
-    }
-   
-    public void computeSupervisor()
-    {
-        bddAutomata.getReachableAndCoreachableStates();
-        //logger.info("Computing Nonblocking Supervisor Guards");
+        this.description = description;
+        this.libraryname = libraryname;
     }
     
-    public Automaton getSupervisor()
+    public String toString()
     {
-        return bddAutomata.getSupervisor();
+        return description;
     }
-
-    public void done()
+    
+    public static BDDLibraryType fromDescription(String description)
     {
-        if (bddAutomata != null)
+        for (BDDLibraryType value: values())
         {
-            bddAutomata.done();            
-            bddAutomata = null;            
+            if (value.description.equals(description))
+            {
+                return value;
+            }
         }
+        System.err.println("Value: " + description);
+        return null;
+    }
+    
+    public String getLibraryname()
+    {
+        return libraryname;
     }
 }
+
 
 

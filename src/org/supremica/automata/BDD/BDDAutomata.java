@@ -54,6 +54,8 @@ import org.supremica.log.*;
 import org.supremica.util.SupremicaException;
 import java.util.*;
 import java.io.*;
+import java.math.BigInteger;
+import org.supremica.util.ArrayHelper;
 import org.supremica.automata.*;
 import org.supremica.automata.IO.*;
 import org.supremica.util.BDD.PCGNode;
@@ -72,12 +74,14 @@ public class BDDAutomata
     List<BDDAutomaton> theBDDAutomataList = new LinkedList<BDDAutomaton>();
     Map<Automaton, BDDAutomaton> automatonToBDDAutomatonMap = new HashMap<Automaton, BDDAutomaton>();
     AutomataIndexMap theIndexMap;
-    Alphabet observableUnionAlphabet;
+    Alphabet unionAlphabet;
  
     BDDTransitions bddTransitions = null; 
                
     BDDDomain eventDomain;
-    
+    BDDDomain[] sourceStateDomains = null;
+    BDDDomain[] destStateDomains = null;
+        
     BDDVarSet sourceStateVariables = null;
     BDDVarSet destStateVariables = null;
     
@@ -138,14 +142,15 @@ public class BDDAutomata
     
     void initialize()
     {
-        observableUnionAlphabet = theAutomata.getObservableUnionAlphabet();
-        eventDomain = manager.createDomain(observableUnionAlphabet.size());
+        unionAlphabet = theAutomata.getUnionAlphabet();
+        eventDomain = manager.createDomain(unionAlphabet.size());
+        eventDomain.setName("Events");
         
         sourceStateVariables = manager.createEmptyVarSet();
         destStateVariables = manager.createEmptyVarSet();
         
-        BDDDomain[] sourceStateDomains = new BDDDomain[theAutomata.size()];
-        BDDDomain[] destStateDomains = new BDDDomain[theAutomata.size()];
+        sourceStateDomains = new BDDDomain[theAutomata.size()];
+        destStateDomains = new BDDDomain[theAutomata.size()];
         
         int i = 0;
         for (Automaton automaton : theAutomata)
@@ -161,7 +166,9 @@ public class BDDAutomata
             destStateVariables.unionWith(destStateDomain.set());
             
             sourceStateDomains[i] = sourceStateDomain;
+            sourceStateDomains[i].setName(automaton.getName());
             destStateDomains[i] = destStateDomain;
+            destStateDomains[i].setName(automaton.getName());           
             
             add(bddAutomaton);
                         
@@ -326,6 +333,55 @@ public class BDDAutomata
     
         return reachableAndCoreachableStatesBDD;
     } 
+    
+    public Automaton getSupervisor()
+    {
+        Automaton supervisorAutomaton = new Automaton("Sup");
+        BDD reachableAndCoreachableStatesBDD = getReachableAndCoreachableStates();
+        reachableAndCoreachableStatesBDD.exist(destStateVariables);
+        
+        // Create all events
+        Alphabet newAlphabet = supervisorAutomaton.getAlphabet();
+        //newAlphabet.addAll(unionAlphabet);
+
+        int[] sourceStateDomainIndicies = new int[sourceStateDomains.length];
+        for (int i = 0; i < sourceStateDomains.length; i++)
+        {
+            logger.info("Source state domain " + i + ": " + ArrayHelper.arrayToString(sourceStateDomains[i].vars()));
+            sourceStateDomainIndicies[i] = sourceStateDomains[i].getIndex();
+        } 
+        
+        logger.info("sourceStateDomainIndicies: " + ArrayHelper.arrayToString(sourceStateDomainIndicies));
+        
+        int[] stateArray = new int[sourceStateDomains.length];
+        // Create all states
+        for ( BDD.BDDIterator satIt = new BDD.BDDIterator(reachableAndCoreachableStatesBDD, sourceStateVariables); satIt.hasNext(); ) 
+        {
+            BigInteger[] currSat = satIt.nextTuple();
+            for (int i = 0; i < sourceStateDomainIndicies.length; i++)
+            {
+                stateArray[i] = currSat[sourceStateDomainIndicies[i]].intValue();
+            }
+            logger.info("current state: " + ArrayHelper.arrayToString(stateArray));
+        }
+//        // Create all states
+//        for (BDD.AllSatIterator stateIt = reachableAndCoreachableStatesBDD.allsat(); stateIt.hasNext(); ) 
+//        {
+//            byte[] currState = stateIt.nextSat();
+//            StringBuffer stringBuffer = new StringBuffer("[");
+//            for (int i = 0; i < currState.length; i++)
+//            {
+//                stringBuffer.append(currState[i]);
+//                if (i < currState.length - 1)
+//                {
+//                    stringBuffer.append(" ");
+//                }
+//            }
+//            stringBuffer.append("]");
+//            logger.info("state: " + stringBuffer.toString()); 
+//        }        
+        return supervisorAutomaton;
+    }
      
     boolean isControllable()
     {

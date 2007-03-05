@@ -66,19 +66,22 @@ public class BDDManager
     
     public BDDManager()
     {
-        this(Config.BDD2_BDDLIBRARY.get());
+        this(BDDLibraryType.fromDescription(Config.BDD2_BDDLIBRARY.get()));
     }
     
-    public BDDManager(String bddpackage)
+    public BDDManager(BDDLibraryType bddpackage)
     {
         this(bddpackage, Config.BDD2_INITIALNODETABLESIZE.get(), Config.BDD2_CACHESIZE.get());
     }
     
-    public BDDManager(String bddpackage, int nodenum, int cachesize)
+    public BDDManager(BDDLibraryType bddpackage, int nodenum, int cachesize)
     {
         if (factory == null)
         {
-            factory = BDDFactory.init(bddpackage, nodenum, cachesize);
+            factory = BDDFactory.init(bddpackage.getLibraryname(), nodenum, cachesize);
+            factory.setMaxIncrease(Config.BDD2_MAXINCREASENODES.get());
+            factory.setIncreaseFactor(Config.BDD2_INCREASEFACTOR.get());
+            factory.setCacheRatio(Config.BDD2_CACHERATIO.get());
         }
     }
     
@@ -179,23 +182,23 @@ public class BDDManager
             if (transitions instanceof BDDMonolithicTransitions)
             {
                 BDD monolithicTransitionsBDD = ((BDDMonolithicTransitions)transitions).getMonolithicTransitionForwardBDD();
-                logger.debug("Number of nodes in monolithicTransitionsBDD: " + monolithicTransitionsBDD.nodeCount());
+                //logger.debug("Number of nodes in monolithicTransitionsBDD: " + monolithicTransitionsBDD.nodeCount());
                 nextStatesAndTransitionsBDD = reachableStatesBDD.relprod(monolithicTransitionsBDD, sourceStateVariables);
-                logger.debug("Number of nodes in nextStatesAndTransitionsBDD: " + nextStatesAndTransitionsBDD.nodeCount());
+                //logger.debug("Number of nodes in nextStatesAndTransitionsBDD: " + nextStatesAndTransitionsBDD.nodeCount());
             }
             else if (transitions instanceof BDDConjunctiveTransitions)
             {
                 BDDConjunctiveTransitions bddConjunctiveTransitions = (BDDConjunctiveTransitions)transitions;
                 nextStatesAndTransitionsBDD = reachableStatesBDD.id();
-                logger.debug("New round in reachability");                       
+                //logger.debug("New round in reachability");                       
                 for(Iterator<BDD> transitionBDDIt = bddConjunctiveTransitions.forwardIterator(); transitionBDDIt.hasNext(); )
                 {
                     nextStatesAndTransitionsBDD = nextStatesAndTransitionsBDD.and(transitionBDDIt.next());         
-                    logger.debug("Number of nodes in nextStatesAndTransitionsBDD: " + nextStatesAndTransitionsBDD.nodeCount());       
+                    //logger.debug("Number of nodes in nextStatesAndTransitionsBDD: " + nextStatesAndTransitionsBDD.nodeCount());       
                 }
                 nextStatesAndTransitionsBDD = nextStatesAndTransitionsBDD.exist(sourceStateVariables);
                 nextStatesAndTransitionsBDD = nextStatesAndTransitionsBDD.exist(eventVariables);
-                logger.debug("Number of nodes in nextStatesAndTransitionsBDD: " + nextStatesAndTransitionsBDD.nodeCount());       
+                //logger.debug("Number of nodes in nextStatesAndTransitionsBDD: " + nextStatesAndTransitionsBDD.nodeCount());       
             }
             else if (transitions instanceof BDDDisjunctiveTransitions)
             {

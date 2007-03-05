@@ -116,7 +116,7 @@ public class AutomataSynthesisWorker
         {
             // Get default synchronization options
             SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynthesisOptions();
-            
+                 
             try
             {
                 AutomataSynthesizer synthesizer = new AutomataSynthesizer(theAutomata, syncOptions,

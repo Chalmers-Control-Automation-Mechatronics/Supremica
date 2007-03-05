@@ -61,6 +61,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.supremica.properties.BooleanProperty;
 import org.supremica.properties.IntegerProperty;
+import org.supremica.properties.DoubleProperty;
 import org.supremica.properties.PropertyType;
 import org.supremica.properties.Property;
 import org.supremica.properties.StringProperty;
@@ -134,7 +135,14 @@ public class PropertiesDialog
                         chooserList.add(chooser);
                         panel.add(chooser);
                     }
-                    else if (property instanceof StringProperty)
+                    else if (property instanceof DoubleProperty)
+                    {
+                        DoubleChooser chooser = new DoubleChooser((DoubleProperty) property);
+                        chooser.setEnabled(!property.isImmutable());
+                        chooserList.add(chooser);
+                        panel.add(chooser);
+                    }
+                     else if (property instanceof StringProperty)
                     {
                         StringChooser chooser = new StringChooser((StringProperty) property);
                         chooser.setEnabled(!property.isImmutable());
@@ -399,6 +407,64 @@ public class PropertiesDialog
         }
     }
 
+    /**
+     * Chooser for DoubleProperty:s. The chooser is a JFormattedTextField.
+     */
+    private class DoubleChooser
+        extends JPanel
+        implements Chooser
+    {
+        private final DoubleProperty property;
+        
+        JFormattedTextField text;
+//        JSlider slider;
+        
+        DoubleChooser(final DoubleProperty property)
+        {
+            super();
+            this.property = property;
+            
+            // Label
+            JLabel label = new JLabel(property.getComment());
+            this.add(label);
+
+            // JFormattedTextField!
+            NumberFormat numberFormat = NumberFormat.getNumberInstance();
+            numberFormat.setParseIntegerOnly(false);
+            NumberFormatter formatter = new NumberFormatter(numberFormat);
+            formatter.setMinimum(new Double(property.getMinValue()));
+            formatter.setMaximum(new Double(property.getMaxValue()));
+            text = new JFormattedTextField(formatter);
+            text.setColumns(Math.max((property.get()+"").length()+1,6));                        
+
+            // Lastly, add text
+            this.add(text);
+        }
+        
+        public void setInConfig()
+        {
+            if (!property.isImmutable())
+            {
+                try
+                {
+                    property.set(Double.parseDouble(text.getText()));
+                }
+                catch (NumberFormatException ex)
+                {
+                    // Error in number format, ignore this result without error message!
+                }
+                catch (IllegalArgumentException ex)
+                {
+                    System.err.println("Error setting value of property " + property + ", value out of range.");
+                }
+            }
+        }
+        
+        public void getFromConfig()
+        {
+            text.setText(""+property.get());
+        }
+    }
     /**
      * Chooser for StringProperty:s. If the StringProperty has a set of legal values, 
      * this becomes a JComboBox with those as choices, otherwise this becomes an 

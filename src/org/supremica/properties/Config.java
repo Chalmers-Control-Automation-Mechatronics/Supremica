@@ -57,6 +57,7 @@ import org.supremica.automata.algorithms.VerificationType;
 import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
 import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
 import org.supremica.automata.BDD.BDDPartitioningType;
+import org.supremica.automata.BDD.BDDLibraryType;
 import org.supremica.util.BDD.Options;
 
 /**
@@ -208,9 +209,12 @@ public final class Config
 
     // ALGORITHMS_BDD2
     // New BDD implementation using JavaBDD library
-    public static final StringProperty BDD2_BDDLIBRARY = new StringProperty(PropertyType.ALGORITHMS_BDD2, "libraryName", "java", "Binary Decision Diagram Library (java/buddy/cudd/jdd)");
-    public static final IntegerProperty BDD2_INITIALNODETABLESIZE = new IntegerProperty(PropertyType.ALGORITHMS_BDD2, "initialNodeTableSize", 150000, "Initial node table size");
-    public static final IntegerProperty BDD2_CACHESIZE = new IntegerProperty(PropertyType.ALGORITHMS_BDD2, "cacheSize", 150000, "Operation cache size");
+    public static final StringProperty BDD2_BDDLIBRARY = new StringProperty(PropertyType.ALGORITHMS_BDD2, "libraryName", BDDLibraryType.JAVA.toString(), "Binary Decision Diagram Library", BDDLibraryType.values());
+    public static final IntegerProperty BDD2_INITIALNODETABLESIZE = new IntegerProperty(PropertyType.ALGORITHMS_BDD2, "initialNodeTableSize", 1000000, "Initial node table size");
+    public static final IntegerProperty BDD2_CACHESIZE = new IntegerProperty(PropertyType.ALGORITHMS_BDD2, "cacheSize", 100000, "Operation cache size");
+    public static final IntegerProperty BDD2_MAXINCREASENODES = new IntegerProperty(PropertyType.ALGORITHMS_BDD2, "maxIncreaseNodes", 2500000, "Set maximum number of nodes by which to increase node table after a garbage collection.");
+    public static final DoubleProperty BDD2_INCREASEFACTOR = new DoubleProperty(PropertyType.ALGORITHMS_BDD2, "increaseFactor", 2.0, "Set factor by which to increase node table after a garbage collection.", false, 0.0);
+    public static final DoubleProperty BDD2_CACHERATIO = new DoubleProperty(PropertyType.ALGORITHMS_BDD2, "cacheRatio", 10.0, "Sets the cache ratio for the operator caches (#tablenodes/#cachenodes)", false, 0.0);
     public static final StringProperty BDD2_PARTITIONING = new StringProperty(PropertyType.ALGORITHMS_BDD2, "partitioning", BDDPartitioningType.MONOLITHIC.toString(), "BDD transition partitioning", BDDPartitioningType.values());
 
     // ALGORITHMS_BDD
