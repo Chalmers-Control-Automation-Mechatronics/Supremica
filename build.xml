@@ -845,6 +845,21 @@ Class-Path: ${manifest.pathlist}</echo>
 			<pathelement path="${java.class.path}" />
 		</classpath>
                 <jvmarg value="-Xms128M"/>
+                <jvmarg value="-Xmx512M" />  
+	</java>                
+</target>
+
+<target name="runLocal">
+	<java classname="${supremica_basepackage}.gui.ide.IDE" fork="yes">
+		<classpath>
+			<pathelement location="build" />
+			<pathelement location="lib/unjared" />
+			<pathelement location="images" />
+			<pathelement location="examples" />
+			<pathelement path="${java.class.path}" />
+		</classpath>
+
+                <jvmarg value="-Xms128M"/>
                 <jvmarg value="-Xmx512M" />       
 	</java>
 </target>
