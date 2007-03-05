@@ -242,6 +242,7 @@
 *	Reuses existing class files, but recompiles those
 *	source files that have changed.
 -->
+<target name="compileAndRun" depends="compile,runLocal"/>
 
 <target name="compile" depends="compile_supremica,compile_supremica_groovy,compile_supremica_tests"/>
 
