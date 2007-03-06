@@ -48,37 +48,65 @@
  */
 package org.supremica.automata;
 
+import java.util.*;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.supremica.automata.algorithms.TestPackageAlgorithms;
-import org.supremica.automata.IO.TestPackageIO;
+import org.supremica.testhelpers.*;
+import org.supremica.automata.IO.*;
 
-public class TestPackageAutomata
+public class TestAutomataIndexMap
 	extends TestCase
 {
 
-	public TestPackageAutomata(String name)
+	public TestAutomataIndexMap(String name)
 	{
 		super(name);
 	}
 
 	/**
+	 * Sets up the test fixture.
+	 * Called before every test case method.
+	 */
+	protected void setUp()
+	{
+	}
+
+	/**
+	 * Tears down the test fixture.
+	 * Called after every test case method.
+	 */
+	protected void tearDown()
+	{
+	}
+
+	/**
 	 * Assembles and returns a test suite
-	 * containing all known tests.
+	 * for all the test methods of this test case.
 	 */
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite();
-		suite.addTest(TestAutomaton.suite());
-		suite.addTest(TestAlphabet.suite());
-		suite.addTest(TestState.suite());
-		suite.addTest(TestAutomataIndexMap.suite());
-        suite.addTest(TestAutomata.suite());
-		suite.addTest(TestStateSet.suite());
-		suite.addTest(TestPackageAlgorithms.suite());
-		suite.addTest(TestPackageIO.suite());
+		TestSuite suite = new TestSuite(TestAutomata.class);
 		return suite;
 	}
+
+	public void testEx45b()
+	{
+		try
+		{
+			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
+			assertTrue(theProject.nbrOfAutomata() == 3);
+		}
+		catch (Exception ex)
+		{
+			ex.printStackTrace();
+			assertTrue(false);
+		}
+	}
+
 }
+
+

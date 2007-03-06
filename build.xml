@@ -248,7 +248,7 @@
 
 <target name="compile_supremica" depends="startfiles_local_supremica">
   <javac debug="on"
-         debuglevel="lines,source"
+         debuglevel="lines,source,vars"
          srcdir="${src}"
          destdir="${build}"
          deprecation="false"
@@ -719,6 +719,33 @@ Class-Path: ${manifest.pathlist}</echo>
   </junit>
 </target>
 
+<target name="run_supremica_tests_short" depends="jar_supremica,jar_supremica_tests">
+  <mkdir dir="${logs.results}"/>
+  <junit printsummary="on" fork="true" maxmemory="512m">
+    <formatter type="xml"/>
+    <batchtest todir="${logs.results}">
+      <fileset dir="${testssrc}">
+        <include name="**/*Test.java"/>
+        <include name="**/Test*.java"/>
+        <exclude name="org/supremica/testhelpers/**/*.java"/>
+        <exclude name="**/TestPackage*.java"/>
+        <exclude name="**/Abstract*.java"/>
+        <exclude name="**/Native*.java"/>
+        <exclude name="net/sourceforge/waters/**/*.java"/>
+      </fileset>
+    </batchtest>
+    <classpath>
+      <pathelement location="${dist}/Supremica.jar"/>
+      <pathelement location="${dist}/SupremicaLib.jar"/>
+      <pathelement location="${dist}/SupremicaTest.jar"/>
+      <pathelement path="${java.class.path}"/>
+    </classpath>
+    <sysproperty key="waters.test.inputdir" value="${waters.examples}"/>
+    <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+    <sysproperty key="java.library.path" value="${dist}"/>
+  </junit>
+</target>
+
 <target name="run_test_controllability" depends="jar_supremica,jar_supremica_tests">
   <mkdir dir="${logs.results}"/>
   <junit printsummary="on" fork="true" maxmemory="512m">
@@ -740,7 +767,9 @@ Class-Path: ${manifest.pathlist}</echo>
   </junit>
 </target>
 
+
 <target name="run_tests" depends="run_supremica_tests"/>
+<target name="run_tests_short" depends="run_supremica_tests_short"/>
 <target name="run_tests_junit" depends="run_supremica_tests"/>
 
 <target name="test_report">
@@ -790,7 +819,7 @@ Class-Path: ${manifest.pathlist}</echo>
 		source="1.5"
 		maxmemory="512m"
 		windowtitle="Supremica API"
-		bottom="Copyright &#169; 2001 - 2005 Supremica and Knut Åkesson, Goran Cengic, Martin Fabin, Hugo Flordal, Robi Malik, Arash Vahidi. All Rights Reserved.">
+		bottom="Copyright &#169; 2001 - 2007 Supremica and Knut Åkesson, Martin Fabin, Hugo Flordal, Robi Malik, Arash Vahidi. All Rights Reserved.">
 		<doctitle><![CDATA[<h1>Supremica and Waters API Documentation</h1>]]></doctitle>
 		<packageset dir="${src}">
 			<include name="org/supremica/**/*"/>
