@@ -20,7 +20,6 @@ import net.sourceforge.waters.subject.module.EdgeSubject
 import net.sourceforge.waters.model.expr.Operator
 import org.supremica.gui.ide.IDE
 import org.supremica.gui.InterfaceManager
-import net.sourceforge.waters.model.base.EqualCollection
 
 class Converter {
 	static final SCAN_CYCLE_EVENT_NAME = 'scan'

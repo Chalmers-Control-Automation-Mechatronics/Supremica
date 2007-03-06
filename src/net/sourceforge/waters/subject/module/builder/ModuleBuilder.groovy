@@ -1,7 +1,6 @@
 package net.sourceforge.waters.subject.module.builder;
 
 import groovy.util.BuilderSupport
-import net.sourceforge.waters.model.base.EqualCollection
 import net.sourceforge.waters.subject.module.VariableSubject
 import net.sourceforge.waters.model.module.*
 import net.sourceforge.waters.subject.module.*
