@@ -1,6 +1,7 @@
 package net.sourceforge.waters.subject.module.builder;
 
 import groovy.util.BuilderSupport
+import net.sourceforge.waters.model.base.EqualCollection
 import net.sourceforge.waters.subject.module.VariableSubject
 import net.sourceforge.waters.model.module.*
 import net.sourceforge.waters.subject.module.*
@@ -24,19 +25,18 @@ import org.supremica.gui.InterfaceManager
 class ModuleBuilder extends BuilderSupport {
 
 	static void main(args) {
-		def builder = createTestBuilder()
-		builder.saveModuleToFile()
-		builder.openModuleInSupremica()
+		def module = testBuilder()
+		Util.saveModuleToFile(module)
+		Util.openModuleInSupremica(module)
 	}
 	static {
 		println "module builder test" 
-		createTestBuilder()
+		testBuilder()
 	}
 	
-	ModuleSubject module 
 	private static final factory = ModuleSubjectFactory.instance
 	private static final parser = new ExpressionParser(factory.instance, CompilerOperatorTable.instance)
-	private transitionAttributes = [:]
+	private Map transitionAttributes
 	private String initialState
 	private List transitionsThatNeedTargetState = []
 	private NodeSubject lastAddedState
@@ -44,23 +44,15 @@ class ModuleBuilder extends BuilderSupport {
 	final static String VARIABLE_COMPONENT_NAME = 'variables'
 	
 	def createNode(name){
-		switch(name) {
-		case 'module':
-			assert module
-			return module
-		}
-		assert false
-		null
+		return createNode(name, [:])
 	}
 
 	def createNode(name, value){
 		switch(name) {
-		case 'action':
-			return parser.parse(value)
-		case 'set':
-			return parser.parse("$value = 1")
-		case 'reset':
-			return parser.parse("$value = 0")
+		case 'action': return parser.parse(value)
+		case 'set': return parser.parse("$value = 1")
+		case 'reset': return parser.parse("$value = 0")
+		case 'module': if (value instanceof ModuleSubject) return createNode(name, [module:value]); break
 		}
 		createNode(name, [name:value])
 	}
@@ -69,45 +61,49 @@ class ModuleBuilder extends BuilderSupport {
 		def node = null
 		switch (name) {
 		case 'module':
-			node = factory.createModuleProxy(attributes.name, null)
-			module = node
-			module.eventDeclListModifiable << factory.createEventDeclProxy(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION)
-			module.eventDeclListModifiable << factory.createEventDeclProxy(EventDeclProxy.DEFAULT_FORBIDDEN_NAME, EventKind.PROPOSITION)
+			node = attributes.module ? attributes.module : factory.createModuleProxy(attributes.name, null)
+			if (attributes.name) node.name = attributes.name
+			if (!attributes.module) {
+				node.eventDeclListModifiable << factory.createEventDeclProxy(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION)
+				node.eventDeclListModifiable << factory.createEventDeclProxy(EventDeclProxy.DEFAULT_FORBIDDEN_NAME, EventKind.PROPOSITION)
+			}
+			['module'].each{attributes.remove(it)}
 			break
 		case 'booleanVariable' :
-			node = VariableHelper.createIntegerVariable(attributes.name, 0, 1, attributes.initial ? 1 : 0, attributes.marked ? 1 : 0);
-			['initial', 'marked'].each{attributes.remove(it)}
-			break
+			attributes.range = 0..1
+			attributes.initial = attributes.initial ? 1 : 0
+			attributes.marked = [(false):0,(true):1][attributes.marked]
 		case 'integerVariable' :
-			node = VariableHelper.createIntegerVariable(attributes.name, attributes.range.from, attributes.range.to, attributes.initial, attributes.marked)
+			if (attributes.name instanceof List) node = attributes.name.collect{VariableHelper.createIntegerVariable(it, attributes.range.from, attributes.range.to, attributes.initial, attributes.marked)}
+			else node = VariableHelper.createIntegerVariable(attributes.name, attributes.range.from, attributes.range.to, attributes.initial, attributes.marked)
 			['initial', 'range', 'marked'].each{attributes.remove(it)}
 			break
 		case 'event' :
-			node = factory.createEventDeclProxy(attributes.name,
-					                            attributes.controllable == null || attributes.controllable ? EventKind.CONTROLLABLE : EventKind.UNCONTROLLABLE,
-					                            true,
-					                            attributes.ranges?.collect{createRangeExpression(it)},
-					                            null)
+			Closure createEvent = {label ->
+				factory.createEventDeclProxy(label,
+                            attributes.controllable == null || attributes.controllable ? EventKind.CONTROLLABLE : EventKind.UNCONTROLLABLE,
+                            true,
+                            attributes.ranges?.collect{createRangeExpression(it)},
+                            null)
+            }
+			node = (attributes.name instanceof List) ? attributes.name.collect{createEvent(it)} : createEvent(attributes.name)
 			['controllable', 'ranges'].each{attributes.remove(it)}
 			break
 		case 'proposition':
 			node = factory.createEventDeclProxy(attributes.name, EventKind.PROPOSITION)
 			break
-		case 'plant' :
-			node = factory.createSimpleComponentProxy(parser.parseIdentifier(attributes.name),
-	                                                  ComponentKind.PLANT,
-	                                                  factory.createGraphProxy())
-			initialState = attributes.initialState
-			defaultEvent = attributes.defaultEvent
-			['initialState', 'defaultEvent'].each{attributes.remove(it)}
-	        break
 		case 'specification' :
+			attributes.isSpecification = true
+		case 'plant':
+		case 'automaton' :
 			node = factory.createSimpleComponentProxy(parser.parseIdentifier(attributes.name),
-	                                                  ComponentKind.SPEC,
+	                                                  attributes.isSpecification ? ComponentKind.SPEC : ComponentKind.PLANT,
 	                                                  factory.createGraphProxy())
-			initialState = attributes.initialState
+			
+	        if (attributes.deterministic != null) node.graph.deterministic = attributes.deterministic 
+	        initialState = attributes.initialState
 			defaultEvent = attributes.defaultEvent
-			['initialState', 'defaultEvent'].each{attributes.remove(it)}
+			['deterministic', 'initialState', 'defaultEvent', 'isSpecification'].each{attributes.remove(it)}
 			break
 		case 'state' :
 			node = factory.createSimpleNodeProxy(attributes.name)
@@ -116,13 +112,15 @@ class ModuleBuilder extends BuilderSupport {
 			if (attributes.forbidden) node.propositions.eventListModifiable << parser.parse(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)
 			node.propositions.eventListModifiable.addAll(attributes.propositions.collect{parser.parse(it)})
 			['forbidden', 'marked', 'propositions'].each{attributes.remove(it)}
-			transitionsThatNeedTargetState.each{it.target = node}
-			transitionsThatNeedTargetState = []
+			def transitionsWithThisTarget = transitionsThatNeedTargetState.findAll{!it.targetName || it.targetName == node.name}
+			transitionsWithThisTarget.each{it.transition.target = node}
+			transitionsThatNeedTargetState -= transitionsWithThisTarget
 			lastAddedState = node
 			break
 		case 'selfLoop':
 			attributes.selfLoop = true
 		case 'transition':
+			if (attributes.event && !attributes.events)	attributes.events = [attributes.event]
 			node = factory.createEdgeProxy(null,
 					                       null,
 					                       factory.createLabelBlockProxy(attributes.events ? attributes.events.collect{parser.parse(it)} : [parser.parse(defaultEvent)], null),
@@ -131,7 +129,7 @@ class ModuleBuilder extends BuilderSupport {
 					                       null,
 					                       null)
 			transitionAttributes = attributes.clone()
-			['selfLoop', 'events', 'from', 'to', 'guard'].each{attributes.remove(it)}
+			['selfLoop', 'events', 'event', 'from', 'to', 'guard'].each{attributes.remove(it)}
 			break
 		case 'foreach':
 			node = factory.createForeachComponentProxy(attributes.name, createRangeExpression(attributes.range))
@@ -153,6 +151,10 @@ class ModuleBuilder extends BuilderSupport {
 	}
 	
 	void setParent(parent, child){
+		if (child instanceof Collection) {
+			child.each{setParent(parent, it)}
+			return
+		}
 		switch (parent) {
 		case ModuleSubject:
 			switch (child) {
@@ -176,7 +178,9 @@ class ModuleBuilder extends BuilderSupport {
 				break
 			case AliasSubject:
 				assert child.expression instanceof EventListExpressionProxy
-				parent.eventAliasListModifiable << child
+				def existingEventAlias = parent.eventAliasList.find{it.name == child.name}
+				if (existingEventAlias) existingEventAlias.expression.eventListModifiable.addAll(child.expression.eventList.collect{parser.parse(it.name)})
+				else parent.eventAliasListModifiable << child
 				break
 			default:
 				assert false, "Parent: $parent, Child: ${child.dump()}"
@@ -205,7 +209,7 @@ class ModuleBuilder extends BuilderSupport {
 				child.source = [parent.graph.nodesModifiable.get(transitionAttributes.from), lastAddedState].grep{it}[0] 
 				if (transitionAttributes.selfLoop) child.target = child.source
 				else if (transitionAttributes.to) child.target = parent.graph.nodes.find{it.name == transitionAttributes.to}
-				else transitionsThatNeedTargetState << child
+				if (!child.target) transitionsThatNeedTargetState << [transition:child, targetName:transitionAttributes.to]
 				parent.graph.edgesModifiable << child
 				transitionAttributes = null
 				break
@@ -241,6 +245,10 @@ class ModuleBuilder extends BuilderSupport {
 	}
 	
 	void nodeCompleted(parent, node) {
+		if (node instanceof Collection) {
+			node.each{nodeCompleted(parent, it)}
+			return
+		}
 		switch(node) {
 		case(SimpleComponentSubject):
 			assert transitionsThatNeedTargetState.empty
@@ -248,39 +256,25 @@ class ModuleBuilder extends BuilderSupport {
 			initialState = null
 			defaultEvent = null
 			break
+		case (ModuleSubject):
+			assert !transitionAttributes
+			assert !initialState
+			assert transitionsThatNeedTargetState == []
+			assert !lastAddedState
+			assert !defaultEvent
+			break
 		}
 	}
 	
-	public saveModuleToFile(String filename = "./${module.name}.${WmodFileFilter.WMOD}") {
-    	saveModuleToFile([filename] as File)
-	}
-	
-	public saveModuleToFile(File file) {
-    	saveModuleToFile(module, file)
-	}
-	
-	public static saveModuleToFile(ModuleProxy module, File file) {
-		def marshaller = new JAXBModuleMarshaller(factory, CompilerOperatorTable.instance)
-    	marshaller.marshal(module, file)
-	}
-	
-	public openModuleInSupremica() {
-			InterfaceManager.instance.initLookAndFeel();
-			IDE ide = new IDE()
-			ide.visible = true
-			ide.installContainer(module)
-	}
-		
-	public static ModuleBuilder createTestBuilder() {
+	public static ModuleSubject testBuilder() {
 		def moduleBuilder = new ModuleBuilder();
-		moduleBuilder.module(name:'testmodule') {
+		ModuleSubject module = moduleBuilder.module('testmodule') {
 			booleanVariable('y0', initial:false, marked:true)
-			integerVariable(name:'x0', range:1..4, initial:2, marked:2)
+			integerVariable(name:['x0', 'x1'], range:1..4, initial:2, marked:2)
 			event(name:'e0')
-			event(name:'e1', controllable:false)
-			event('e2', controllable:false)
+			event(name:['e1', 'e2'], controllable:false)
 			proposition(name:'e3')
-			event(name:'e4', ranges:[0..2])
+			event('e4', ranges:[0..2])
 			event(name:'e5', ranges:[0..2, 0..3], controllable:false)
 			eventAlias(name:'someEvents', events:['e1', 'e2'])
 			plant(name:'testcomponent', initialState:'q0', defaultEvent:'e0') {
@@ -296,7 +290,7 @@ class ModuleBuilder extends BuilderSupport {
 						   to:'q0',
 						   events:['e1', 'e0'])
 			}
-			specification(name:'testcomponent2') {
+			specification(name:'testcomponent2', deterministic:false) {
 				state('s0')
 				state(name:'s1', propositions:['e3'])
 				selfLoop(events:['e1'])
@@ -313,9 +307,9 @@ class ModuleBuilder extends BuilderSupport {
 				selfLoop(from:'s0', events:['e1'])
 			}
 			foreach('i', range:0..2) {
-				plant('testcomponent3[i]', initialState:'q0') {
+				automaton('testcomponent3[i]', initialState:'q0') { //becomes plant by default 
 					state(name:'q0')
-					transition(events:['e4[i]'],
+					transition(event:'e4[i]',
 					           guard:'y0 & x0 < 4') {
 						action('x0 += 1')
 					}
@@ -327,14 +321,13 @@ class ModuleBuilder extends BuilderSupport {
 					transition(to:'q0', events:['e1', 'e0'])
 				}
 				foreach(name:'j', range:0..3) {
-					specification(name:'testcomponent4[i][j]', initialState:'q0') {
+					automaton(name:'testcomponent4[i][j]', initialState:'q0', isSpecification:true) {
 						state(name:'q0')
 						transition(from:'q0', to:'q0', events:['e5[i][j]'])
 					}
 				}
 			}
 		}
-		def module = moduleBuilder.module
 		assert module.name == 'testmodule'
 		assert module.componentList.name.contains('testcomponent')
 		assert module.eventDeclList.findAll{it.kind == EventKind.CONTROLLABLE}.name == ['e0', 'e4']
@@ -342,9 +335,10 @@ class ModuleBuilder extends BuilderSupport {
 		assert module.eventDeclList.findAll{it.kind == EventKind.PROPOSITION}.name == [EventDeclProxy.DEFAULT_MARKING_NAME, EventDeclProxy.DEFAULT_FORBIDDEN_NAME, 'e3']
 		assert module.eventAliasList.name == ['someEvents']
 		assert module.eventAliasList.expression.eventList.name == ['e1','e2'] 
-		assert module.componentList.find{it.name == VARIABLE_COMPONENT_NAME}.variables.type*.toString() == ['0..1', '1..4']
-        assert module.componentList.find{it.name == VARIABLE_COMPONENT_NAME}.variables.initialValue.value == [0, 2]
+		assert module.componentList.find{it.name == VARIABLE_COMPONENT_NAME}.variables.type*.toString() == ['0..1', '1..4', '1..4']
+        assert module.componentList.find{it.name == VARIABLE_COMPONENT_NAME}.variables.initialValue.value == [0, 2, 2]
 		assert module.componentList.name == [VARIABLE_COMPONENT_NAME, 'testcomponent', 'testcomponent2', 'i']
+		assert module.componentList.find{it.name == 'testcomponent'}.graph.deterministic
 		assert module.componentList.find{it.name == 'testcomponent'}.graph.nodes.name == ['q0', 'q1']
 		assert module.componentList.find{it.name == 'testcomponent'}.graph.nodes.find{it.name == 'q0'}.initial
 		assert module.componentList.find{it.name == 'testcomponent'}.graph.edges.collect {
@@ -358,6 +352,7 @@ class ModuleBuilder extends BuilderSupport {
 		assert module.componentList.find{it.name == 'testcomponent2'}.variables.collect {
 			[it.name, it.initialValue.value, it.type.toString()]
 		} == [['y1', 0, '0..1']]
+		assert !module.componentList.find{it.name == 'testcomponent2'}.graph.deterministic
 		assert module.componentList.find{it.name == 'testcomponent2'}.graph.nodes.name == ['s0', 's1']
 		assert module.componentList.find{it.name == 'testcomponent2'}.graph.nodes.find{it.name == 's0'}.initial
 		assert module.componentList.find{it.name == 'testcomponent2'}.graph.edges.collect {
@@ -370,6 +365,6 @@ class ModuleBuilder extends BuilderSupport {
 		      ['s0', 's1', ['e2'], '!y0', []],
 		      ['s0', 's1', ['someEvents'], null, ['y1 = 0']],
 		      ['s0', 's0', ['e1'], null, null]]
-		moduleBuilder
+		module
 	}
 }
