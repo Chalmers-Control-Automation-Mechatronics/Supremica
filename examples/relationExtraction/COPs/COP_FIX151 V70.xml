@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ROP id="FIX151 V70" type="COP">
+  <Machine>FIX151</Machine>
+  <Comment />
+  <Relation type="Sequence">
+    <Activity>
+      <Operation>31</Operation>
+    </Activity>
+    <Activity>
+      <Operation>32</Operation>
+      <!--Successors>
+                <Successor>
+                     <Machine>R3325</Machine>
+                     <Operation>74</Operation>
+                </Successor>	    
+                <Successor>
+                     <Machine>R3326</Machine>
+                     <Operation>94</Operation>
+                </Successor>	    
+            </Successors-->
+      <Precondition>
+        <Predecessor>
+          <Machine>R3325</Machine>
+          <Operation>73</Operation>
+        </Predecessor>
+      </Precondition>
+    </Activity>
+    <Activity>
+      <Operation>33</Operation>
+      <Precondition>
+        <Predecessor>
+          <Machine>CNV415</Machine>
+          <Operation>21</Operation>
+        </Predecessor>
+        <Predecessor>
+          <Machine>FIX151</Machine>
+          <Operation>32</Operation>
+        </Predecessor>
+      </Precondition>
+    </Activity>
+    <Activity>
+      <Operation>35</Operation>
+      <Precondition>
+        <Predecessor>
+          <Machine>R3323</Machine>
+          <Operation>54</Operation>
+        </Predecessor>
+        <Predecessor>
+          <Machine>R3325</Machine>
+          <Operation>79</Operation>
+        </Predecessor>
+      </Precondition>
+    </Activity>
+  </Relation>
+</ROP>
+

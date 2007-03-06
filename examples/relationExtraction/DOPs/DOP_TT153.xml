@@ -1,0 +1,25 @@
+<ROP id="TT153 V70" type="COP">
+    <Machine>TT153</Machine>
+    <Comment></Comment>
+    <Relation type ="Sequence">
+        <Activity>
+          <Operation>111</Operation> 	
+        </Activity>
+       <Activity>
+            <Precondition>
+                <Predecessor>
+                     <Machine>R3325</Machine>
+                     <Operation>72</Operation>
+                </Predecessor>	    
+                <Predecessor>
+                     <Machine>R3326</Machine>
+                     <Operation>92</Operation>
+                </Predecessor>	    
+            </Precondition>	
+            <Operation>112</Operation> 	
+        </Activity>
+    </Relation>
+</ROP>
+
+
+

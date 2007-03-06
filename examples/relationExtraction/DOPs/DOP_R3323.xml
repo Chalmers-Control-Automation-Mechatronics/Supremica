@@ -1,0 +1,58 @@
+<ROP id="R3323 V70" type="COP">
+    <Machine>R3323</Machine>
+    <Comment></Comment>
+    <Relation type ="Sequence">
+        <Activity>
+            <Precondition>
+                <Predecessor>
+                     <Machine>CM</Machine>
+                     <Operation>1</Operation>
+                </Predecessor>	    
+            </Precondition>	
+            <Operation>52</Operation> 	
+        </Activity>
+        <Activity>
+            <Precondition>
+                <Predecessor>
+                     <Machine>FIX151</Machine>
+                     <Operation>33</Operation>
+                </Predecessor>	    
+                <Predecessor>
+                     <Machine>FIX152</Machine>
+                     <Operation>43</Operation>
+                </Predecessor>	    
+                <Predecessor>
+                     <Machine>R3324</Machine>
+                     <Operation>62</Operation>
+                </Predecessor>	    
+            </Precondition>	
+            <Operation>54</Operation> 	
+        </Activity>
+        <Activity>
+            <Precondition>
+                <Predecessor>
+                     <Machine>FIX151</Machine>
+                     <Operation>35</Operation>
+                </Predecessor>	    
+                <Predecessor>
+                     <Machine>FIX152</Machine>
+                     <Operation>45</Operation>
+                </Predecessor>	    
+            </Precondition>	
+            <Operation>56</Operation> 	
+        </Activity>
+        <Activity>
+            <Precondition>
+                <Predecessor>
+                     <Machine>R3324</Machine>
+                     <Operation>66</Operation>
+                </Predecessor>	    
+            </Precondition>
+            <Operation>58</Operation> 	
+        </Activity>
+    </Relation>
+</ROP>
+
+
+
+

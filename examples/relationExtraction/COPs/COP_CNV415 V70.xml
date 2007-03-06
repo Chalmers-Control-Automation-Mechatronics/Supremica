@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ROP id="CNV415 V70" type="COP">
+  <Machine>CNV415</Machine>
+  <Comment />
+  <Relation type="Sequence">
+    <Activity>
+      <Operation>21</Operation>
+    </Activity>
+    <Activity>
+      <Operation>23</Operation>
+      <Precondition>
+        <Predecessor>
+          <Machine>R3323</Machine>
+          <Operation>56</Operation>
+        </Predecessor>
+        <Predecessor>
+          <Machine>R3325</Machine>
+          <Operation>81</Operation>
+        </Predecessor>
+      </Precondition>
+    </Activity>
+  </Relation>
+</ROP>
+

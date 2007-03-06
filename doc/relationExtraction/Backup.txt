@@ -1,0 +1,171 @@
+/*****************************************************
+*
+* simplifyOneOperation
+*
+* Simplifies the restrictions for one operation. Returns a simplified
+* Restriction to put in the list of the restrictions for all operations.
+*
+******************************************************/
+public Restriction simplifyOneOperation(Restriction restr)
+{
+
+	/* Replace unnecessary restrictions with a - (instead of init/exec/comp). For example, if there are three restrictions, where O2 is in O2_init in all of them, whereas O1 is in O1_init, O1_exec and O1_comp respectively, then this can be simplified to one restriction where O2 is in O2_init and O1 is in - (don't care). */
+
+	String stateIndicator = "_";
+	String firstState = stateIndicator.concat("init");
+	String secondState = stateIndicator.concat("exec");
+	String thirdState = stateIndicator.concat("comp");
+	String dontCareState = stateIndicator.concat("-");
+
+	System.out.println("\n********** SimplifyOneOperation ***********");
+	String op = (String) restr.opName;
+	System.out.println("Simplify restrictions for operation " + op);
+
+	// Restrictions for starting one operation (call it Op)
+	Restriction simpleRestr = new Restriction(restr.opId, restr.opName, (ArrayList) restr.restrictions);
+
+
+	/*System.out.println("At start, restrictions are ");
+	printList(simpleRestr.restrictions);
+	System.out.println("----------------------");*/
+
+
+	ArrayList restrictions = (ArrayList) simpleRestr.restrictions;
+	int noOfRestr = restrictions.size();
+	int i = 0;
+
+	// Work with one restriction entry at a time, i.e. one operation at a time
+	while(i < noOfRestr)
+	{
+		ArrayList otherStatesList = new ArrayList();
+		ArrayList allStatesList = new ArrayList();
+		String allStates = new String();
+		String opName = new String();
+
+		//Get the restr (operation) we are currently working with.
+		ArrayList states = (ArrayList) restrictions.get(i);
+		int stateNumber = -1;
+
+		/* For all states of the operation, e.g. O1_init, O1_init, O1_comp, O1_init etc. build two lists. allStatesList that in each entry contains a string for each alternative state combination, and otherStatesList that in each entry contains a string representing the states of the other operations (e.g. all but O1). */
+		for(Iterator stateIter = states.iterator(); stateIter.hasNext(); )
+		{
+			String stateName = (String) stateIter.next();
+			if(stateNumber == 2)
+			{
+				opName = stateName.substring(0, stateName.indexOf(stateIndicator)); // e.g. O1
+				System.out.println("*** Simplify entry for opName = " + opName + " ***");
+			}
+			stateNumber++;
+			//System.out.println("SimplifyOneOperation stateNumber " + stateNumber);
+
+			// Into the real states (leaving name and id)
+			if(stateNumber > 1)
+			{
+				//System.out.println("statename= " + stateName);
+
+				String allOtherStates, firstPart, lastPart;
+				String temp = new String();
+
+				// e.g. O1_initO2_compO3_exec in each ArrayList-entry
+				temp = getStates(stateNumber, restrictions);
+				allStatesList.add(temp);
+
+
+				//System.out.println("temp= " + temp);
+				firstPart = temp.substring(0, temp.indexOf(stateName));
+				//System.out.println("firstPart= " + firstPart);
+				lastPart = temp.substring(temp.indexOf(stateName) + stateName.length());
+				//System.out.println("lastPart= " + lastPart);
+				allOtherStates = firstPart.concat(lastPart);
+			    //System.out.println("allOtherStates " + allOtherStates);
+			    otherStatesList.add(allOtherStates);
+
+			}
+		}
+
+		System.out.println("*** Before remove, allStatesList = ***");
+		printStringList(allStatesList);
+		System.out.println("*********************************");
+
+		int noOfRestrEntrys = states.size();
+		String rem = "rem", keep = "keep";
+		ArrayList treated = new ArrayList();
+		ArrayList remove = new ArrayList();
+		for(int ii=0; ii<noOfRestrEntrys; ii++)
+		{
+			remove.add(keep);
+		}
+
+		int indF, indS, indT;
+		for(Iterator otherIter = otherStatesList.iterator(); otherIter.hasNext(); )
+		{
+			System.out.println("Inside other-loop");
+			String other = (String) otherIter.next();
+
+			// Only check each restriction string once.
+			if( !treated.contains(other) )
+			{
+				String first, second, third;
+
+				first = opName.concat(firstState).concat(other);
+				second = opName.concat(secondState).concat(other);
+				third = opName.concat(thirdState).concat(other);
+
+				// Check if there exist e.g. O1_init -> string, O1_exec -> string and O1_comp -> string
+				indF = allStatesList.indexOf(first);
+				indS = allStatesList.indexOf(second);
+				indT = allStatesList.indexOf(third);
+
+				System.out.println("first = " + first + " indF = " + indF);
+				System.out.println("second = " + second + " indS = " + indS);
+				System.out.println("third = " + third + " indT = " + indT);
+
+				// If there exist e.g. O1_init -> string, O1_exec -> string and O1_comp -> string, simplify to O1_- -> string, where - meand don't care.
+				if(indF > -1 && indS > -1 && indT > -1)
+				{
+
+					states.remove(indF+2);
+					String adding = opName.concat(dontCareState).concat(other);
+					System.out.println("Add dont care: " + adding);
+					states.add(indF+2, adding);
+
+					remove.remove(indS+2);
+					remove.add(indS+2, rem);
+					remove.remove(indT+2);
+					remove.add(indT+2, rem);
+
+					/*System.out.println("*** states = ****");
+					printStringList(states);
+					System.out.println("*** restrictions = ****");*/
+
+					restrictions.remove(i);
+					restrictions.add(i, states);
+					printList(restrictions);
+
+				}
+
+				System.out.println("*** After remove, allStatesList = ****");
+				printStringList(allStatesList);
+				System.out.println("*********************************");
+				treated.add(other);
+			}
+		}
+
+		// Perform the removing. Replace the restriction list with a new one, where the unnecessary entrys in each operation restriction list have been removed.
+
+		/*System.out.println("remove:");
+		printStringList(remove);*/
+		for(int k = remove.size()-1; k>1 ; k--)
+		{
+			if( remove.get(k) == rem )
+			{
+				restrictions = removeStates(k, restrictions);
+			}
+		}
+
+		i++;
+		simpleRestr.restrictions = (ArrayList) restrictions.clone();
+	}
+
+	return simpleRestr;
+}
