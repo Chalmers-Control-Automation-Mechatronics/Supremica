@@ -2,16 +2,19 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagActionBarContributor.java,v 1.3 2007-01-29 14:25:03 torda Exp $
+ * $Id: SagActionBarContributor.java,v 1.4 2007-03-07 10:27:19 torda Exp $
  */
 package org.supremica.external.sag.presentation;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JOptionPane;
+import javax.xml.bind.JAXBException;
 
 import org.eclipse.emf.common.ui.viewer.IViewerProvider;
 
@@ -55,10 +58,19 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PartInitException;
 import org.supremica.external.sag.Project;
-import org.supremica.external.sag.waters.SagToWaters;
+import org.supremica.external.sag.automaton.AutomatonGenerator;
+import org.supremica.gui.InterfaceManager;
+import org.supremica.gui.ide.IDE;
+import org.xml.sax.SAXException;
 
 import net.sourceforge.waters.gui.WmodFileFilter;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.WatersMarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+
 import org.eclipse.emf.common.util.Diagnostic;
 /**
  * This is the action bar contributor for the Sag model editor.
@@ -69,6 +81,97 @@ import org.eclipse.emf.common.util.Diagnostic;
 public class SagActionBarContributor
 	extends EditingDomainActionBarContributor
 	implements ISelectionChangedListener {
+	
+	private final class GenerateAutomataAction extends Action {
+		private GenerateAutomataAction(String text, int style) {
+			super(text, style);
+		}
+		IDE ide;
+		@Override
+		public void runWithEvent(Event event) {
+		    EditingDomain domain = ((IEditingDomainProvider)activeEditorPart).getEditingDomain();
+			Project sagProject = (Project) domain.getResourceSet().getResources().get(0).getContents().get(0);
+			//Validator validator = new Validator();
+			Diagnostic diagnostic = Validator.INSTANCE.validate(sagProject, domain);
+			if (diagnostic.getSeverity() == Diagnostic.ERROR || 
+					diagnostic.getSeverity() == Diagnostic.WARNING) {
+				MessageBox mb = new MessageBox(getActiveEditor().getSite().getShell(), SWT.ICON_ERROR | SWT.OK);
+		        mb.setText("Automata generation failure");
+		        mb.setMessage("The automata generation was aborted since the SAG model is invalid.");
+		        mb.open();
+		        return;
+			}
+			//Diagnostic diagnostic = validateAction.run();
+		    //diagnostic.getSeverity() == Diagnostic.OK;
+		    FileDialog dialog = new FileDialog(getActiveEditor().getSite().getShell(), SWT.SAVE);
+			dialog.setText("Save");
+		    String[] filterExt = {"*."+WmodFileFilter.WMOD};
+		    dialog.setFilterExtensions(filterExt);
+			dialog.setFileName(sagProject.getName());
+		    String filename = dialog.open();
+			
+		    if (filename != null) {
+				ModuleProxy module = AutomatonGenerator.getInstance().generateAndSaveToFile(sagProject, filename);
+				MessageBox mb = new MessageBox(getActiveEditor().getSite().getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+			    mb.setText("Automata generation done");
+			    mb.setMessage("Generation was successful. Do you want to open the automata in Supremica?");
+			    if (mb.open() == SWT.YES) {
+			    	InterfaceManager.getInstance().initLookAndFeel();
+					try {
+						if (ide == null) ide = new IDE();
+						ide.setVisible(true);
+						ide.installContainer((ModuleSubject)module);
+						//List<File> fileToOpen = new ArrayList<File>();
+						//fileToOpen.add(new File(filename));
+						//ide.openFiles(fileToOpen);
+					} catch (JAXBException e) {
+						MessageBox errorBox = new MessageBox(getActiveEditor().getSite().getShell(), SWT.ICON_ERROR | SWT.OK);
+						errorBox.setText("Failure");
+						errorBox.setMessage(e.getMessage());
+						errorBox.open();
+						e.printStackTrace();
+					} catch (SAXException e) {
+						MessageBox errorBox = new MessageBox(getActiveEditor().getSite().getShell(), SWT.ICON_ERROR | SWT.OK);
+						errorBox.setText("Failure");
+						errorBox.setMessage(e.getMessage());
+						errorBox.open();
+						e.printStackTrace();					}
+			    }
+		    }
+		}
+
+/*		private void saveModuleToFile(String filename, ModuleProxy module) {
+			try {
+				JAXBModuleMarshaller marshaller = new JAXBModuleMarshaller(ModuleSubjectFactory.getInstance(), CompilerOperatorTable.getInstance());
+				marshaller.marshal(module, new File(filename));
+			} catch (JAXBException e) {
+				MessageBox mb = new MessageBox(getActiveEditor().getSite().getShell(), SWT.ICON_ERROR | SWT.OK);
+			    mb.setText("Failure");
+			    mb.setMessage(e.getMessage());
+			    mb.open();
+			    e.printStackTrace();
+			} catch (SAXException e) {
+				MessageBox mb = new MessageBox(getActiveEditor().getSite().getShell(), SWT.ICON_ERROR | SWT.OK);
+			    mb.setText("Failure");
+			    mb.setMessage(e.getMessage());
+			    mb.open();
+				e.printStackTrace();
+			} catch (WatersMarshalException e) {
+				MessageBox mb = new MessageBox(getActiveEditor().getSite().getShell(), SWT.ICON_ERROR | SWT.OK);
+			    mb.setText("Failure");
+			    mb.setMessage(e.getMessage());
+			    mb.open();
+				e.printStackTrace();
+			} catch (IOException e) {
+				MessageBox mb = new MessageBox(getActiveEditor().getSite().getShell(), SWT.ICON_ERROR | SWT.OK);
+			    mb.setText("Failure");
+			    mb.setMessage(e.getMessage());
+			    mb.open();
+				e.printStackTrace();
+			}
+		}*/
+	}
+
 	/**
 	 * This keeps track of the active editor.
 	 * <!-- begin-user-doc -->
@@ -213,38 +316,8 @@ public class SagActionBarContributor
 
 		// Add "generate waters/supremica"
 		//
-		IAction generateWatersDraft  = new Action("Generate Automata", Action.AS_PUSH_BUTTON) {
-
-			@Override
-			public void runWithEvent(Event event) {
-		        EditingDomain domain = ((IEditingDomainProvider)activeEditorPart).getEditingDomain();
-	        	Project sagProject = (Project) domain.getResourceSet().getResources().get(0).getContents().get(0);
-				//Validator validator = new Validator();
-				Diagnostic diagnostic = Validator.INSTANCE.validate(sagProject, domain);
-				if (diagnostic.getSeverity() == Diagnostic.ERROR || 
-						diagnostic.getSeverity() == Diagnostic.WARNING) {
-					MessageBox mb = new MessageBox(getActiveEditor().getSite().getShell(), SWT.ICON_ERROR | SWT.OK);
-		            mb.setText("Automata generation failure");
-		            mb.setMessage("The automata generation was aborted since the SAG model is invalid.");
-		            mb.open();
-		            return;
-				}
-				//Diagnostic diagnostic = validateAction.run();
-			    //diagnostic.getSeverity() == Diagnostic.OK;
-			    FileDialog dialog = new FileDialog(getActiveEditor().getSite().getShell(), SWT.SAVE);
-				dialog.setText("Save");
-		        String[] filterExt = {"*."+WmodFileFilter.WMOD};
-		        dialog.setFilterExtensions(filterExt);
-	        	dialog.setFileName(sagProject.getName());
-		        String filename = dialog.open();
-		        if (filename != null) {
-					ModuleProxy watersModule = SagToWaters.generateAutomata(sagProject);
-		    		File watersFile = new File(filename);
-		    		SagToWaters.saveWatersModuleToFile(watersModule, watersFile);
-		        }
-			}
-		};
-		submenuManager.insertAfter("additions", generateWatersDraft);
+		IAction generateAutomata  = new GenerateAutomataAction("Generate Automata", Action.AS_PUSH_BUTTON);
+		submenuManager.insertAfter("additions", generateAutomata);
 		
 		// Force an update because Eclipse hides empty menus now.
 		//

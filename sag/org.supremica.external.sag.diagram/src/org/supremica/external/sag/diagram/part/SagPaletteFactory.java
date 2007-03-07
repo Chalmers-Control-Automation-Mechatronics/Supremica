@@ -82,11 +82,11 @@ public class SagPaletteFactory {
 	 */
 	private ToolEntry createSensor1CreationTool() {
 		List/*<IElementType>*/types = new ArrayList/*<IElementType>*/(1);
-		types.add(SagElementTypes.SensorNode_3006);
+		types.add(SagElementTypes.Sensor_3008);
 		NodeToolEntry entry = new NodeToolEntry(
 				SagDiagramEditorPlugin.getString("Sensor1CreationTool.title"), SagDiagramEditorPlugin.getString("Sensor1CreationTool.desc"), types); //$NON-NLS-1$ $NON-NLS-2$
 		entry.setSmallIcon(SagElementTypes
-				.getImageDescriptor(SagElementTypes.SensorNode_3006));
+				.getImageDescriptor(SagElementTypes.Sensor_3008));
 		entry.setLargeIcon(entry.getSmallIcon());
 		return entry;
 	}

@@ -14,6 +14,7 @@ import org.eclipse.gmf.runtime.notation.View;
 import org.supremica.external.sag.SagPackage;
 
 import org.supremica.external.sag.diagram.edit.commands.EndNodeCreateCommand;
+import org.supremica.external.sag.diagram.edit.commands.SensorCreateCommand;
 import org.supremica.external.sag.diagram.edit.commands.SensorNodeCreateCommand;
 import org.supremica.external.sag.diagram.providers.SagElementTypes;
 
@@ -27,11 +28,11 @@ public class GraphGraphCompartmentItemSemanticEditPolicy extends
 	 * @generated
 	 */
 	protected Command getCreateCommand(CreateElementRequest req) {
-		if (SagElementTypes.SensorNode_3006 == req.getElementType()) {
+		if (SagElementTypes.Sensor_3008 == req.getElementType()) {
 			if (req.getContainmentFeature() == null) {
 				req.setContainmentFeature(SagPackage.eINSTANCE.getGraph_Node());
 			}
-			return getMSLWrapper(new SensorNodeCreateCommand(req));
+			return getMSLWrapper(new SensorCreateCommand(req));
 		}
 		if (SagElementTypes.EndNode_3007 == req.getElementType()) {
 			if (req.getContainmentFeature() == null) {

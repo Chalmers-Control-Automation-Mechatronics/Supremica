@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: ZoneImpl.java,v 1.7 2007-02-21 08:38:53 torda Exp $
+ * $Id: ZoneImpl.java,v 1.8 2007-03-07 10:25:53 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
@@ -523,13 +523,13 @@ public class ZoneImpl extends NamedImpl implements Zone {
 	 */
 	public NotificationChain basicSetGraph(Graph newGraph, NotificationChain msgs) {
 		msgs = eBasicSetContainer((InternalEObject)newGraph, SagPackage.ZONE__GRAPH, msgs);
-		if (getName() == null || getName().trim().length() == 0) {
+		/*if (getName() == null || getName().trim().length() == 0) {
 			int zoneIndex = 0;
 			while (check(this, "graph.zone->exists(name = '" + ZONE_NAME_PREFIX + Integer.toString(zoneIndex) + "')")) {
 				++zoneIndex;
 			}
 			setName(ZONE_NAME_PREFIX + Integer.toString(zoneIndex));
-		}
+		}*/
 		return msgs;
 	}
 

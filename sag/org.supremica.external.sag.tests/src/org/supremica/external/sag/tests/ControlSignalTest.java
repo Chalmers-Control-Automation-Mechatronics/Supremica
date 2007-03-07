@@ -2,49 +2,49 @@
  * <copyright>
  * </copyright>
  *
- * $Id: UnboundedZoneTest.java,v 1.1 2006-12-18 15:26:16 torda Exp $
+ * $Id: ControlSignalTest.java,v 1.1 2007-03-07 10:29:34 torda Exp $
  */
 package org.supremica.external.sag.tests;
 
 import junit.textui.TestRunner;
 
+import org.supremica.external.sag.ControlSignal;
 import org.supremica.external.sag.SagFactory;
-import org.supremica.external.sag.UnboundedZone;
 
 /**
  * <!-- begin-user-doc -->
- * A test case for the model object '<em><b>Unbounded Zone</b></em>'.
+ * A test case for the model object '<em><b>Control Signal</b></em>'.
  * <!-- end-user-doc -->
  * @generated
  */
-public class UnboundedZoneTest extends ZoneTest {
+public class ControlSignalTest extends NamedTest {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	public static void main(String[] args) {
-		TestRunner.run(UnboundedZoneTest.class);
+		TestRunner.run(ControlSignalTest.class);
 	}
 
 	/**
-	 * Constructs a new Unbounded Zone test case with the given name.
+	 * Constructs a new Control Signal test case with the given name.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public UnboundedZoneTest(String name) {
+	public ControlSignalTest(String name) {
 		super(name);
 	}
 
 	/**
-	 * Returns the fixture for this Unbounded Zone test case.
+	 * Returns the fixture for this Control Signal test case.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	private UnboundedZone getFixture() {
-		return (UnboundedZone)fixture;
+	private ControlSignal getFixture() {
+		return (ControlSignal)fixture;
 	}
 
 	/**
@@ -54,7 +54,7 @@ public class UnboundedZoneTest extends ZoneTest {
 	 * @generated
 	 */
 	protected void setUp() throws Exception {
-		setFixture(SagFactory.eINSTANCE.createUnboundedZone());
+		setFixture(SagFactory.eINSTANCE.createControlSignal());
 	}
 
 	/**
@@ -67,4 +67,4 @@ public class UnboundedZoneTest extends ZoneTest {
 		setFixture(null);
 	}
 
-} //UnboundedZoneTest
+} //ControlSignalTest

@@ -145,7 +145,7 @@ public class SagElementTypes extends ElementInitializers {
 
 			elements.put(Graph_2010, SagPackage.eINSTANCE.getGraph());
 
-			elements.put(SensorNode_3006, SagPackage.eINSTANCE.getSensorNode());
+			elements.put(Sensor_3008, SagPackage.eINSTANCE.getSensor());
 
 			elements.put(EndNode_3007, SagPackage.eINSTANCE.getEndNode());
 
@@ -165,7 +165,8 @@ public class SagElementTypes extends ElementInitializers {
 	/**
 	 * @generated
 	 */
-	public static final IElementType SensorNode_3006 = getElementType("org.supremica.external.sag.diagram.SensorNode_3006"); //$NON-NLS-1$
+	public static final IElementType Sensor_3008 = getElementType("org.supremica.external.sag.diagram.Sensor_3008"); //$NON-NLS-1$
+
 	/**
 	 * @generated
 	 */
@@ -195,7 +196,7 @@ public class SagElementTypes extends ElementInitializers {
 			KNOWN_ELEMENT_TYPES = new HashSet();
 			KNOWN_ELEMENT_TYPES.add(Project_1000);
 			KNOWN_ELEMENT_TYPES.add(Graph_2010);
-			KNOWN_ELEMENT_TYPES.add(SensorNode_3006);
+			KNOWN_ELEMENT_TYPES.add(Sensor_3008);
 			KNOWN_ELEMENT_TYPES.add(EndNode_3007);
 			KNOWN_ELEMENT_TYPES.add(Zone_4010);
 		}

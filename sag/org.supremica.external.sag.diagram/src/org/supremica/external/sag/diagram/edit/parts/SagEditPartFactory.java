@@ -38,11 +38,11 @@ public class SagEditPartFactory implements EditPartFactory {
 			case GraphNameEditPart.VISUAL_ID:
 				return new GraphNameEditPart(view);
 
-			case SensorNodeEditPart.VISUAL_ID:
-				return new SensorNodeEditPart(view);
+			case SensorEditPart.VISUAL_ID:
+				return new SensorEditPart(view);
 
-			case SensorNodeNameEditPart.VISUAL_ID:
-				return new SensorNodeNameEditPart(view);
+			case SensorNameEditPart.VISUAL_ID:
+				return new SensorNameEditPart(view);
 
 			case EndNodeEditPart.VISUAL_ID:
 				return new EndNodeEditPart(view);

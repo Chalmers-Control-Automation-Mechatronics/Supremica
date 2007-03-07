@@ -6,18 +6,18 @@ class SagBuilder extends BuilderSupport {
 		def y1
 		def sagBuilder = new SagBuilder();
 		sagBuilder.project(name:'testProject') {
-			controlSignal(name:'u1')
+			controlSignal('u1')
 			controlSignal(name:'u2')
-			controlSignal(name:'u3', synthesize:false)
+			controlSignal('u3', synthesize:false)
 			sensorSignal(name:'y2')
-			sensorSignal(name:'y4')
+			sensorSignal('y4')
 			graph(name:'testGraph', maxNrOfObjects:3) {
-				y1 = sensor(name:'y1')
-				sensor(name:'y2')
+				y1 = sensor('y1')
+				sensor('y2')
 				sensor(name:'y3')
-				zone(back:'y1', front:'y2', oneway:true, forwardCondition:'u1')
+				zone(name: 'myLittleZone', back:'y1', front:'y2', oneway:true, forwardCondition:'u1')
 				zone(front:'y1', oneway:false, backwardCondition:'!u2')
-				zone(back:'y2', front:'y3')
+				onewayZone(back:'y2', front:'y3')
 			}
 		}
 		def project = sagBuilder.project
@@ -31,6 +31,7 @@ class SagBuilder extends BuilderSupport {
 		assert !project.graph.zone.find{it.front.name=='y1'}.oneway
 		assert project.graph.zone.find{it.back.name=='y2' && it.front.name=='y3'}.oneway
 		assert project.graph.find{it.name == 'testGraph'}.maxNrOfObjects == 3;
+		assert project.graph.zone.name.grep{it} == ['myLittleZone']
 	}
 
 	Project project
@@ -44,8 +45,7 @@ class SagBuilder extends BuilderSupport {
 	}
 
 	def createNode(name, value){
-		//println "2: $name, $value"
-		null
+		createNode(name, [name:value])
 	}
 
 	def createNode(name, Map attributes){
@@ -96,8 +96,7 @@ class SagBuilder extends BuilderSupport {
 	}
 
 	def createNode(name, Map attributes, value){
-		//println "4: $name, $attributes, $value"
-		null
+		return createNode(name, [name:value, *:attributes] )
 	}
 	
 	void setParent(parent, child){

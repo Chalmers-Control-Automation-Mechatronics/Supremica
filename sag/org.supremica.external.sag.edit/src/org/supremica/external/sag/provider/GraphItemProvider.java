@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: GraphItemProvider.java,v 1.2 2007-02-08 16:36:59 torda Exp $
+ * $Id: GraphItemProvider.java,v 1.3 2007-03-07 10:28:00 torda Exp $
  */
 package org.supremica.external.sag.provider;
 
@@ -120,14 +120,14 @@ public class GraphItemProvider
 	 * {@link org.eclipse.emf.edit.command.MoveCommand} in {@link #createCommand}.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @generated
+	 * @generated NOT
 	 */
 	public Collection getChildrenFeatures(Object object) {
 		if (childrenFeatures == null) {
 			super.getChildrenFeatures(object);
 			childrenFeatures.add(SagPackage.Literals.GRAPH__ZONE);
 			childrenFeatures.add(SagPackage.Literals.GRAPH__NODE);
-			childrenFeatures.add(SagPackage.Literals.GRAPH__SENSOR);
+			//childrenFeatures.add(SagPackage.Literals.GRAPH__SENSOR);
 		}
 		return childrenFeatures;
 	}
@@ -214,7 +214,7 @@ public class GraphItemProvider
 		newChildDescriptors.add
 			(createChildParameter
 				(SagPackage.Literals.GRAPH__NODE,
-				 SagFactory.eINSTANCE.createSensorNode()));
+				 SagFactory.eINSTANCE.createSensor()));
 	}
 
 	/**

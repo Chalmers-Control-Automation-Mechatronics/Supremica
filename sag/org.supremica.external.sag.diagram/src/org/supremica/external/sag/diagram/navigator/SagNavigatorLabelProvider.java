@@ -35,8 +35,8 @@ import org.supremica.external.sag.diagram.edit.parts.EndNodeEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphNameEditPart;
 import org.supremica.external.sag.diagram.edit.parts.ProjectEditPart;
-import org.supremica.external.sag.diagram.edit.parts.SensorNodeEditPart;
-import org.supremica.external.sag.diagram.edit.parts.SensorNodeNameEditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorEditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorNameEditPart;
 import org.supremica.external.sag.diagram.edit.parts.ZoneEditPart;
 
 import org.supremica.external.sag.diagram.part.SagDiagramEditorPlugin;
@@ -108,10 +108,10 @@ public class SagNavigatorLabelProvider extends LabelProvider implements
 			return getImage(
 					"Navigator?TopLevelNode?http://supremica.org/external/sag?Graph",
 					SagElementTypes.Graph_2010);
-		case SensorNodeEditPart.VISUAL_ID:
+		case SensorEditPart.VISUAL_ID:
 			return getImage(
-					"Navigator?Node?http://supremica.org/external/sag?SensorNode",
-					SagElementTypes.SensorNode_3006);
+					"Navigator?Node?http://supremica.org/external/sag?Sensor",
+					SagElementTypes.Sensor_3008);
 		case EndNodeEditPart.VISUAL_ID:
 			return getImage(
 					"Navigator?Node?http://supremica.org/external/sag?EndNode",
@@ -176,8 +176,8 @@ public class SagNavigatorLabelProvider extends LabelProvider implements
 		switch (SagVisualIDRegistry.getVisualID(view)) {
 		case GraphEditPart.VISUAL_ID:
 			return getGraph_2010Text(view);
-		case SensorNodeEditPart.VISUAL_ID:
-			return getSensorNode_3006Text(view);
+		case SensorEditPart.VISUAL_ID:
+			return getSensor_3008Text(view);
 		case EndNodeEditPart.VISUAL_ID:
 			return getEndNode_3007Text(view);
 		case ProjectEditPart.VISUAL_ID:
@@ -220,16 +220,16 @@ public class SagNavigatorLabelProvider extends LabelProvider implements
 	/**
 	 * @generated
 	 */
-	private String getSensorNode_3006Text(View view) {
+	private String getSensor_3008Text(View view) {
 		IParser parser = ParserService.getInstance().getParser(
 				new IAdaptable() {
 					public Object getAdapter(Class adapter) {
 						if (String.class.equals(adapter)) {
 							return SagVisualIDRegistry
-									.getType(SensorNodeNameEditPart.VISUAL_ID);
+									.getType(SensorNameEditPart.VISUAL_ID);
 						}
 						if (IElementType.class.equals(adapter)) {
-							return SagElementTypes.SensorNode_3006;
+							return SagElementTypes.Sensor_3008;
 						}
 						return null;
 					}
@@ -240,7 +240,7 @@ public class SagNavigatorLabelProvider extends LabelProvider implements
 					ParserOptions.NONE.intValue());
 		} else {
 			SagDiagramEditorPlugin.getInstance().logError(
-					"Parser was not found for label " + 5003);
+					"Parser was not found for label " + 5005);
 			return "";
 		}
 	}

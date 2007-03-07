@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: ZoneItemProvider.java,v 1.2 2007-02-08 16:36:59 torda Exp $
+ * $Id: ZoneItemProvider.java,v 1.3 2007-03-07 10:28:13 torda Exp $
  */
 package org.supremica.external.sag.provider;
 
@@ -67,6 +67,15 @@ public class ZoneItemProvider
 			addCapacityPropertyDescriptor(object);
 			addOutsideSystemBoundryPropertyDescriptor(object);
 			addBoundedPropertyDescriptor(object);
+			addForwardConditionPropertyDescriptor(object);
+			addBackwardConditionPropertyDescriptor(object);
+			addFrontEntryConditionPropertyDescriptor(object);
+			addFrontExitConditionPropertyDescriptor(object);
+			addBackEntryConditionPropertyDescriptor(object);
+			addBackExitConditionPropertyDescriptor(object);
+			addInitialNrOfObjectsPropertyDescriptor(object);
+			addOverlappedPropertyDescriptor(object);
+			addOrderedPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -204,6 +213,204 @@ public class ZoneItemProvider
 	}
 
 	/**
+	 * This adds a property descriptor for the Forward Condition feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addForwardConditionPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Zone_forwardCondition_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Zone_forwardCondition_feature", "_UI_Zone_type"),
+				 SagPackage.Literals.ZONE__FORWARD_CONDITION,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Backward Condition feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addBackwardConditionPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Zone_backwardCondition_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Zone_backwardCondition_feature", "_UI_Zone_type"),
+				 SagPackage.Literals.ZONE__BACKWARD_CONDITION,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Front Entry Condition feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addFrontEntryConditionPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Zone_frontEntryCondition_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Zone_frontEntryCondition_feature", "_UI_Zone_type"),
+				 SagPackage.Literals.ZONE__FRONT_ENTRY_CONDITION,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Front Exit Condition feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addFrontExitConditionPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Zone_frontExitCondition_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Zone_frontExitCondition_feature", "_UI_Zone_type"),
+				 SagPackage.Literals.ZONE__FRONT_EXIT_CONDITION,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Back Entry Condition feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addBackEntryConditionPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Zone_backEntryCondition_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Zone_backEntryCondition_feature", "_UI_Zone_type"),
+				 SagPackage.Literals.ZONE__BACK_ENTRY_CONDITION,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Back Exit Condition feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addBackExitConditionPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Zone_backExitCondition_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Zone_backExitCondition_feature", "_UI_Zone_type"),
+				 SagPackage.Literals.ZONE__BACK_EXIT_CONDITION,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Initial Nr Of Objects feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addInitialNrOfObjectsPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Zone_initialNrOfObjects_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Zone_initialNrOfObjects_feature", "_UI_Zone_type"),
+				 SagPackage.Literals.ZONE__INITIAL_NR_OF_OBJECTS,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.INTEGRAL_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Overlapped feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addOverlappedPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Zone_overlapped_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Zone_overlapped_feature", "_UI_Zone_type"),
+				 SagPackage.Literals.ZONE__OVERLAPPED,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.BOOLEAN_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Ordered feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addOrderedPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Zone_ordered_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Zone_ordered_feature", "_UI_Zone_type"),
+				 SagPackage.Literals.ZONE__ORDERED,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.BOOLEAN_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
 	 * This returns the label text for the adapted class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -231,6 +438,15 @@ public class ZoneItemProvider
 			case SagPackage.ZONE__CAPACITY:
 			case SagPackage.ZONE__OUTSIDE_SYSTEM_BOUNDRY:
 			case SagPackage.ZONE__BOUNDED:
+			case SagPackage.ZONE__FORWARD_CONDITION:
+			case SagPackage.ZONE__BACKWARD_CONDITION:
+			case SagPackage.ZONE__FRONT_ENTRY_CONDITION:
+			case SagPackage.ZONE__FRONT_EXIT_CONDITION:
+			case SagPackage.ZONE__BACK_ENTRY_CONDITION:
+			case SagPackage.ZONE__BACK_EXIT_CONDITION:
+			case SagPackage.ZONE__INITIAL_NR_OF_OBJECTS:
+			case SagPackage.ZONE__OVERLAPPED:
+			case SagPackage.ZONE__ORDERED:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 		}

@@ -46,7 +46,7 @@ import org.supremica.external.sag.Zone;
 import org.supremica.external.sag.diagram.edit.parts.EndNodeEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphEditPart;
 import org.supremica.external.sag.diagram.edit.parts.ProjectEditPart;
-import org.supremica.external.sag.diagram.edit.parts.SensorNodeEditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorEditPart;
 import org.supremica.external.sag.diagram.edit.parts.ZoneEditPart;
 
 import org.supremica.external.sag.diagram.part.SagVisualIDRegistry;
@@ -201,7 +201,7 @@ public class ProjectCanonicalEditPolicy extends CanonicalConnectionEditPolicy {
 		int diagramElementVisualID = SagVisualIDRegistry.getVisualID(view);
 		switch (diagramElementVisualID) {
 		case GraphEditPart.VISUAL_ID:
-		case SensorNodeEditPart.VISUAL_ID:
+		case SensorEditPart.VISUAL_ID:
 		case EndNodeEditPart.VISUAL_ID:
 		case ProjectEditPart.VISUAL_ID: {
 			myEObject2ViewMap.put(modelElement, view);

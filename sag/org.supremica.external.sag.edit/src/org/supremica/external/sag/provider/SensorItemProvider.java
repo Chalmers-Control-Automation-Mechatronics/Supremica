@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SensorItemProvider.java,v 1.1 2007-01-12 14:32:38 torda Exp $
+ * $Id: SensorItemProvider.java,v 1.2 2007-03-07 10:28:00 torda Exp $
  */
 package org.supremica.external.sag.provider;
 
@@ -22,6 +22,8 @@ import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 
+import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
+import org.eclipse.emf.edit.provider.ViewerNotification;
 import org.supremica.external.sag.SagPackage;
 import org.supremica.external.sag.Sensor;
 
@@ -32,7 +34,7 @@ import org.supremica.external.sag.Sensor;
  * @generated
  */
 public class SensorItemProvider
-	extends NamedItemProvider
+	extends NodeItemProvider
 	implements	
 		IEditingDomainItemProvider,	
 		IStructuredItemContentProvider,	
@@ -59,29 +61,75 @@ public class SensorItemProvider
 		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
-			addNodePropertyDescriptor(object);
+			addNamePropertyDescriptor(object);
+			addSignalPropertyDescriptor(object);
+			addInitiallyActivatedPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
 
 	/**
-	 * This adds a property descriptor for the Node feature.
+	 * This adds a property descriptor for the Name feature.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected void addNodePropertyDescriptor(Object object) {
+	protected void addNamePropertyDescriptor(Object object) {
 		itemPropertyDescriptors.add
 			(createItemPropertyDescriptor
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
-				 getString("_UI_Sensor_node_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_Sensor_node_feature", "_UI_Sensor_type"),
-				 SagPackage.Literals.SENSOR__NODE,
+				 getString("_UI_Sensor_name_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Sensor_name_feature", "_UI_Sensor_type"),
+				 SagPackage.Literals.SENSOR__NAME,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Signal feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addSignalPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Sensor_signal_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Sensor_signal_feature", "_UI_Sensor_type"),
+				 SagPackage.Literals.SENSOR__SIGNAL,
 				 true,
 				 false,
 				 true,
 				 null,
+				 null,
+				 null));
+	}
+
+	/**
+	 * This adds a property descriptor for the Initially Activated feature.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected void addInitiallyActivatedPropertyDescriptor(Object object) {
+		itemPropertyDescriptors.add
+			(createItemPropertyDescriptor
+				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+				 getResourceLocator(),
+				 getString("_UI_Sensor_initiallyActivated_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_Sensor_initiallyActivated_feature", "_UI_Sensor_type"),
+				 SagPackage.Literals.SENSOR__INITIALLY_ACTIVATED,
+				 true,
+				 false,
+				 false,
+				 ItemPropertyDescriptor.BOOLEAN_VALUE_IMAGE,
 				 null,
 				 null));
 	}
@@ -118,6 +166,13 @@ public class SensorItemProvider
 	 */
 	public void notifyChanged(Notification notification) {
 		updateChildren(notification);
+
+		switch (notification.getFeatureID(Sensor.class)) {
+			case SagPackage.SENSOR__NAME:
+			case SagPackage.SENSOR__INITIALLY_ACTIVATED:
+				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
+				return;
+		}
 		super.notifyChanged(notification);
 	}
 

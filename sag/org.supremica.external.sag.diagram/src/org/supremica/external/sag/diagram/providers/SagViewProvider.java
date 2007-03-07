@@ -11,8 +11,8 @@ import org.supremica.external.sag.diagram.edit.parts.GraphEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphGraphCompartmentEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphNameEditPart;
 import org.supremica.external.sag.diagram.edit.parts.ProjectEditPart;
-import org.supremica.external.sag.diagram.edit.parts.SensorNodeEditPart;
-import org.supremica.external.sag.diagram.edit.parts.SensorNodeNameEditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorEditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorNameEditPart;
 import org.supremica.external.sag.diagram.edit.parts.ZoneEditPart;
 
 import org.supremica.external.sag.diagram.part.SagVisualIDRegistry;
@@ -22,8 +22,9 @@ import org.supremica.external.sag.diagram.view.factories.GraphGraphCompartmentVi
 import org.supremica.external.sag.diagram.view.factories.GraphNameViewFactory;
 import org.supremica.external.sag.diagram.view.factories.GraphViewFactory;
 import org.supremica.external.sag.diagram.view.factories.ProjectViewFactory;
+import org.supremica.external.sag.diagram.view.factories.SensorNameViewFactory;
+import org.supremica.external.sag.diagram.view.factories.SensorViewFactory;
 import org.supremica.external.sag.diagram.view.factories.SensorNodeNameViewFactory;
-import org.supremica.external.sag.diagram.view.factories.SensorNodeViewFactory;
 import org.supremica.external.sag.diagram.view.factories.ZoneViewFactory;
 
 /**
@@ -66,10 +67,10 @@ public class SagViewProvider extends AbstractViewProvider {
 			return GraphViewFactory.class;
 		case GraphNameEditPart.VISUAL_ID:
 			return GraphNameViewFactory.class;
-		case SensorNodeEditPart.VISUAL_ID:
-			return SensorNodeViewFactory.class;
-		case SensorNodeNameEditPart.VISUAL_ID:
-			return SensorNodeNameViewFactory.class;
+		case SensorEditPart.VISUAL_ID:
+			return SensorViewFactory.class;
+		case SensorNameEditPart.VISUAL_ID:
+			return SensorNameViewFactory.class;
 		case EndNodeEditPart.VISUAL_ID:
 			return EndNodeViewFactory.class;
 		case GraphGraphCompartmentEditPart.VISUAL_ID:

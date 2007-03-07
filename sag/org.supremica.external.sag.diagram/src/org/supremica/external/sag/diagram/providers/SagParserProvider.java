@@ -10,7 +10,7 @@ import org.eclipse.gmf.runtime.notation.View;
 import org.supremica.external.sag.SagPackage;
 
 import org.supremica.external.sag.diagram.edit.parts.GraphNameEditPart;
-import org.supremica.external.sag.diagram.edit.parts.SensorNodeNameEditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorNameEditPart;
 
 import org.supremica.external.sag.diagram.part.SagVisualIDRegistry;
 
@@ -23,24 +23,24 @@ public class SagParserProvider extends AbstractProvider implements
 	/**
 	 * @generated
 	 */
-	private IParser sensorNodeSensorNodeName_5003Parser;
+	private IParser sensorSensorName_5005Parser;
 
 	/**
 	 * @generated
 	 */
-	private IParser getSensorNodeSensorNodeName_5003Parser() {
-		if (sensorNodeSensorNodeName_5003Parser == null) {
-			sensorNodeSensorNodeName_5003Parser = createSensorNodeSensorNodeName_5003Parser();
+	private IParser getSensorSensorName_5005Parser() {
+		if (sensorSensorName_5005Parser == null) {
+			sensorSensorName_5005Parser = createSensorSensorName_5005Parser();
 		}
-		return sensorNodeSensorNodeName_5003Parser;
+		return sensorSensorName_5005Parser;
 	}
 
 	/**
 	 * @generated
 	 */
-	protected IParser createSensorNodeSensorNodeName_5003Parser() {
+	protected IParser createSensorSensorName_5005Parser() {
 		SagStructuralFeatureParser parser = new SagStructuralFeatureParser(
-				SagPackage.eINSTANCE.getSensorNode_Name());
+				SagPackage.eINSTANCE.getSensor_Name());
 		return parser;
 	}
 
@@ -73,8 +73,8 @@ public class SagParserProvider extends AbstractProvider implements
 	 */
 	protected IParser getParser(int visualID) {
 		switch (visualID) {
-		case SensorNodeNameEditPart.VISUAL_ID:
-			return getSensorNodeSensorNodeName_5003Parser();
+		case SensorNameEditPart.VISUAL_ID:
+			return getSensorSensorName_5005Parser();
 		case GraphNameEditPart.VISUAL_ID:
 			return getGraphGraphName_5004Parser();
 		}

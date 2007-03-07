@@ -12,7 +12,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.supremica.external.sag.Graph;
 
 import org.supremica.external.sag.diagram.edit.parts.EndNodeEditPart;
-import org.supremica.external.sag.diagram.edit.parts.SensorNodeEditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorEditPart;
 
 import org.supremica.external.sag.diagram.part.SagVisualIDRegistry;
 
@@ -37,7 +37,7 @@ public class GraphGraphCompartmentCanonicalEditPolicy extends
 			nodeVID = SagVisualIDRegistry
 					.getNodeVisualID(viewObject, nextValue);
 			switch (nodeVID) {
-			case SensorNodeEditPart.VISUAL_ID: {
+			case SensorEditPart.VISUAL_ID: {
 				result.add(nextValue);
 				break;
 			}

@@ -13,7 +13,7 @@ import org.supremica.external.sag.EndNode;
 import org.supremica.external.sag.Graph;
 import org.supremica.external.sag.Project;
 import org.supremica.external.sag.SagPackage;
-import org.supremica.external.sag.SensorNode;
+import org.supremica.external.sag.Sensor;
 import org.supremica.external.sag.Zone;
 
 import org.supremica.external.sag.diagram.edit.parts.EndNodeEditPart;
@@ -21,8 +21,8 @@ import org.supremica.external.sag.diagram.edit.parts.GraphEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphGraphCompartmentEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphNameEditPart;
 import org.supremica.external.sag.diagram.edit.parts.ProjectEditPart;
-import org.supremica.external.sag.diagram.edit.parts.SensorNodeEditPart;
-import org.supremica.external.sag.diagram.edit.parts.SensorNodeNameEditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorEditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorNameEditPart;
 import org.supremica.external.sag.diagram.edit.parts.ZoneEditPart;
 
 /**
@@ -162,21 +162,21 @@ public class SagVisualIDRegistry {
 			}
 			return getUnrecognizedGraph_2010ChildNodeID(domainElement,
 					semanticHint);
-		case SensorNodeEditPart.VISUAL_ID:
-			if (SensorNodeNameEditPart.VISUAL_ID == nodeVisualID) {
-				return SensorNodeNameEditPart.VISUAL_ID;
+		case SensorEditPart.VISUAL_ID:
+			if (SensorNameEditPart.VISUAL_ID == nodeVisualID) {
+				return SensorNameEditPart.VISUAL_ID;
 			}
-			return getUnrecognizedSensorNode_3006ChildNodeID(domainElement,
+			return getUnrecognizedSensor_3008ChildNodeID(domainElement,
 					semanticHint);
 		case EndNodeEditPart.VISUAL_ID:
 			return getUnrecognizedEndNode_3007ChildNodeID(domainElement,
 					semanticHint);
 		case GraphGraphCompartmentEditPart.VISUAL_ID:
-			if ((semanticHint == null || SensorNodeEditPart.VISUAL_ID == nodeVisualID)
-					&& SagPackage.eINSTANCE.getSensorNode().isSuperTypeOf(
+			if ((semanticHint == null || SensorEditPart.VISUAL_ID == nodeVisualID)
+					&& SagPackage.eINSTANCE.getSensor().isSuperTypeOf(
 							domainElementMetaclass)
-					&& (domainElement == null || isNodeSensorNode_3006((SensorNode) domainElement))) {
-				return SensorNodeEditPart.VISUAL_ID;
+					&& (domainElement == null || isNodeSensor_3008((Sensor) domainElement))) {
+				return SensorEditPart.VISUAL_ID;
 			}
 			if ((semanticHint == null || EndNodeEditPart.VISUAL_ID == nodeVisualID)
 					&& SagPackage.eINSTANCE.getEndNode().isSuperTypeOf(
@@ -260,7 +260,7 @@ public class SagVisualIDRegistry {
 	 *
 	 * @generated
 	 */
-	private static boolean isNodeSensorNode_3006(SensorNode element) {
+	private static boolean isNodeSensor_3008(Sensor element) {
 		return true;
 	}
 
@@ -291,7 +291,7 @@ public class SagVisualIDRegistry {
 	 *
 	 * @generated
 	 */
-	private static int getUnrecognizedSensorNode_3006ChildNodeID(
+	private static int getUnrecognizedSensor_3008ChildNodeID(
 			EObject domainElement, String semanticHint) {
 		return -1;
 	}

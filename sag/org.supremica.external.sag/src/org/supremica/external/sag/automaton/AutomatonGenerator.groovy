@@ -1,8 +1,7 @@
 package org.supremica.external.sag.automaton;
 
-import net.sourceforge.waters.model.module.*
+import net.sourceforge.waters.subject.module.builder.*
 import org.supremica.external.sag.*
-import net.sourceforge.waters.model.base.EqualCollection
 import net.sourceforge.waters.subject.module.VariableSubject
 import net.sourceforge.waters.model.module.*
 import net.sourceforge.waters.subject.module.*
@@ -26,7 +25,6 @@ import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.*;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-
 
 class AutomatonGenerator {
 
@@ -58,14 +56,14 @@ class AutomatonGenerator {
 				sensor(name:'y1')
 				sensor(name:'y2')
 				sensor(name:'y4')
-				onewayZone(back:'y1', front:'y2', initialNrOfObjects:2, capacity:2, ordered:true, frontEntryCondition:'u2')
+				onewayZone(back:'y1', front:'y2', initialNrOfObjects:2, capacity:2, ordered:true, frontEntryCondition:'u2 & TordsZone')
 			}
 			graph(name:'object3', maxNrOfObjects:1) {
 				sensor(name:'y5', initiallyActivated:true)
 				sensor(name:'y6')
 				sensor(name:'y7')
 				twowayZone(front:'y5', outsideSystemBoundry:true)
-				twowayZone(back:'y5', front:'y6', capacity:1, forwardCondition:'u1', backwardCondition:'!u1', frontExitCondition:'y2', backEntryCondition:'!y2')
+				twowayZone(name:'TordsZone', back:'y5', front:'y6', capacity:1, forwardCondition:'u1', backwardCondition:'!u1', frontExitCondition:'y2', backEntryCondition:'!y2')
 				twowayZone(back:'y6', front:'y7', bounded:false, forwardCondition:'u1 & !y1')
 				onewayZone(back:'y7', outsideSystemBoundry:true)
 			}
@@ -87,11 +85,8 @@ class AutomatonGenerator {
 		
 		def moduleBuilder = new ModuleBuilder()
 		
-		moduleBuilder.module(name:'testproject') {
-			booleanVariable(name:'y1', marked:false)
-			booleanVariable(name:'y2', marked:false)
-			booleanVariable(name:'y3', marked:false)
-			booleanVariable(name:'y4', marked:false)
+		ModuleProxy manualModule = moduleBuilder.module(name:'testproject') {
+			booleanVariable(name:['y1', 'y2', 'y3', 'y4'], marked:false)
 			booleanVariable(name:'y5', initial:true, marked:true)
 			booleanVariable(name:'y6', marked:false)
 			booleanVariable(name:'y7', marked:false)
@@ -108,25 +103,15 @@ class AutomatonGenerator {
 			integerVariable(name:'object1_between_y2_y3', range:0..2, initial:0, marked:0)
 			integerVariable(name:'object2_between_y1_y2', range:0..2, initial:2, marked:2)
 			integerVariable(name:'overlappingObject_both_y8_y9', range:0..1, initial:0, marked:0)
-			booleanVariable(name:'object3_between_y5_y6', marked:false)
+			booleanVariable(name:'TordsZone', marked:false)
 			booleanVariable(name:'object3_between_y6_y7', marked:false)
 			booleanVariable(name:'tank_beside_low', initial:true, marked:true)
 			booleanVariable(name:'tank_both_low_high', marked:false)
 			booleanVariable(name:'endOfScanCycle', initial:false, marked:true)
-			event(name:'object1_from_y1', controllable:false)
-			event(name:'object1_to_y1_0', controllable:false)
-			event(name:'object1_to_y1_1', controllable:false)
-			event(name:'object1_from_y2_0', controllable:false)
-			event(name:'object1_from_y2_1', controllable:false)
-			event(name:'object1_from_y2_2', controllable:false)
-			event(name:'object1_from_y2_3', controllable:false)
-			event(name:'object1_from_y2_4', controllable:false)
-			event(name:'object1_to_y2_0', controllable:false)
-			event(name:'object1_to_y2_1', controllable:false)
-			event(name:'object1_to_y2_2', controllable:false)
-			event(name:'object1_to_y2_3', controllable:false)
-			event(name:'object1_from_y3', controllable:false)
-			event(name:'object1_to_y3', controllable:false)
+			event(['object1_from_y1', 'object1_to_y1_0', 'object1_to_y1_1', 'object1_from_y2_0',
+			       'object1_from_y2_1', 'object1_from_y2_2', 'object1_from_y2_3', 'object1_from_y2_4',
+			       'object1_to_y2_0', 'object1_to_y2_1', 'object1_to_y2_2', 'object1_to_y2_3',
+			       'object1_from_y3', 'object1_to_y3'], controllable:false)
 			event(name:'object2_from_y1', controllable:false, ranges:[0..1])
 			event(name:'object2_to_y2', controllable:false, ranges:[0..1])
 			event(name:'object3_from_y5_0', controllable:false)
@@ -249,30 +234,30 @@ class AutomatonGenerator {
 				state(name:'y5', marked:true)
 				state(name:'y6', marked:true)
 				state(name:'y7', marked:true)
-				state(name:'between_y5_y6', marked:true)
+				state(name:'TordsZone', marked:true)
 				state(name:'between_y6_y7', marked:true)
 				state(name:'outside', marked:true)
 				transition(from:'outside', to:'y5', events:['object3_to_y5_0']) {action('y5 = 1')}
-				transition(from:'between_y5_y6', to:'y5', events:['object3_to_y5_1'], guard:'!u1 & !y2') {
+				transition(from:'TordsZone', to:'y5', events:['object3_to_y5_1'], guard:'!u1 & !y2') {
 					action('y5 = 1')
-					action('object3_between_y5_y6 = 0')
+					action('TordsZone = 0')
 				}
 				transition(from:'y5', to:'outside', events:['object3_from_y5_0']) {action('y5 = 0')}
-				transition(from:'y5', to:'between_y5_y6', events:['object3_from_y5_1'], guard:'u1') {
+				transition(from:'y5', to:'TordsZone', events:['object3_from_y5_1'], guard:'u1') {
 					action('y5 = 0')
-					action('object3_between_y5_y6 = 1')
+					action('TordsZone = 1')
 				}
-				transition(from:'between_y5_y6', to:'y6', events:['object3_to_y6_0'], guard:'u1') {
+				transition(from:'TordsZone', to:'y6', events:['object3_to_y6_0'], guard:'u1') {
 					action('y6 = 1')
-					action('object3_between_y5_y6 = 0')
+					action('TordsZone = 0')
 				}
 				transition(from:'between_y6_y7', to:'y6', events:['object3_to_y6_1']) {
 					action('y6 = 1')
 					action('object3_between_y6_y7 = 0')
 				}
-				transition(from:'y6', to:'between_y5_y6', events:['object3_from_y6_0'], guard:'!u1 & y2') {
+				transition(from:'y6', to:'TordsZone', events:['object3_from_y6_0'], guard:'!u1 & y2') {
 					action('y6 = 0')
-					action('object3_between_y5_y6 = 1')
+					action('TordsZone = 1')
 				}
 				transition(from:'y6', to:'between_y6_y7', events:['object3_from_y6_1'], guard:'u1 & !y1') {
 					action('y6 = 0')
@@ -316,7 +301,7 @@ class AutomatonGenerator {
 						action 'y1 = 0'
 						action 'object2_between_y1_y2 += 1'
 					}
-					transition(from:'between_y1_y2', to:'y2', events:['object2_to_y2[i]'], guard:'!y2 & u2') {
+					transition(from:'between_y1_y2', to:'y2', events:['object2_to_y2[i]'], guard:'!y2 & (u2 & TordsZone)') {
 						action 'y2 = 1'
 						action 'object2_between_y1_y2 -= 1'
 					}
@@ -355,54 +340,12 @@ class AutomatonGenerator {
 				}
 			}
 		}
-		ModuleProxy manualModule = moduleBuilder.module
-		Closure collectionsAreEqual = { c1, c2 ->
-			def result = [true]
-			if (c1.size() != c2.size()) {
-				result = [false, "size differs: c1.size()==${c1.size()}, c2.size()==${c2.size()}"]
-			}
-			for (i in 0..<c1.size()) {
-				if ((c1[i] == null && c2[i] != null) || (c1[i] != null && c2[i] == null)) {
-					result = [false, "Inequality at index $i: one of'em is null"]
-					break
-				}
-				if (c1[i] != null && c2[i] != null && !c1[i].equalsByContents(c2[i])) {
-					result = [false, "Inequality at index $i: ${c1[i]}, ${c2[i]}"]
-					break
-				}
-			}
-			if (!result[0]) {
-				println c1
-				println c2
-			}
-			result
-		}
-		def result
-		result = collectionsAreEqual(generatedModule.eventDeclList, manualModule.eventDeclList); assert result[0], result[1]
-		def generatedComponents = generatedModule.componentList.grep(SimpleComponentProxy.class) + generatedModule.componentList.grep(ForeachComponentProxy.class).body 
-		def manualComponents = manualModule.componentList.grep(SimpleComponentProxy.class) + manualModule.componentList.grep(ForeachComponentProxy.class).body 
-		result = collectionsAreEqual(generatedComponents.graph.nodes, manualComponents.graph.nodes); assert result[0], result[1]
-		result = collectionsAreEqual(generatedComponents.graph.edges.labelBlock, manualComponents.graph.edges.labelBlock); assert result[0], result[1]
-		result = collectionsAreEqual(generatedComponents.graph.edges.source, manualComponents.graph.edges.source); assert result[0], result[1]
-		result = collectionsAreEqual(generatedComponents.graph.edges.target, manualComponents.graph.edges.target); assert result[0], result[1]
-		result = collectionsAreEqual(generatedComponents.graph.edges.guardActionBlock.findAll{it}.guards, manualComponents.graph.edges.guardActionBlock.findAll{it}.guards); assert result[0], result[1]
-		result = collectionsAreEqual(generatedComponents.graph.edges.guardActionBlock.findAll{it}.actions, manualComponents.graph.edges.guardActionBlock.findAll{it}.actions); assert result[0], result[1]
-		result = collectionsAreEqual(generatedComponents.graph.edges.guardActionBlock, manualComponents.graph.edges.guardActionBlock); assert result[0], result[1]
-		result = collectionsAreEqual(generatedComponents.graph.edges, manualComponents.graph.edges); assert result[0], result[1]
-		result = collectionsAreEqual(generatedComponents.graph, manualComponents.graph); assert result[0], result[1]
-		result = collectionsAreEqual(generatedComponents.variables.type, manualComponents.variables.type); assert result[0], result[1]
-		result = collectionsAreEqual(generatedComponents.variables, manualComponents.variables); assert result[0], result[1]
-		result = collectionsAreEqual(generatedModule.componentList, manualModule.componentList); assert result[0], result[1]
-		result = collectionsAreEqual(generatedModule.eventAliasList.expression.eventList, manualModule.eventAliasList.expression.eventList); assert result[0], result[1]
-		result = collectionsAreEqual(generatedModule.eventAliasList, manualModule.eventAliasList); assert result[0], result[1]
-		assert generatedModule.equalsByContents(manualModule)
-        ModuleCompiler compiler = new ModuleCompiler(new DocumentManager(), ProductDESElementFactory.getInstance(), generatedModule);
+				
+		Util.assertGeneratedModuleEqualsManual(generatedModule, manualModule)
+		ModuleCompiler compiler = new ModuleCompiler(new DocumentManager(), ProductDESElementFactory.getInstance(), generatedModule);
         assert compiler.compile()
  
-        assert false, 'kolla skåpflytt, säkerhet'
         assert false, 'kolla simantic net'
-		assert false, 'testa gui'
-		assert false, 'fixa demo'
 		assert false, 'skissa på artikel'
 		assert false, 'fixa guards med zoner'
 		assert false, 'fixa exceptions'
@@ -461,7 +404,7 @@ class AutomatonGenerator {
 		
 		builder.module(name:project.name) {
 			(project.sensorSignal).each { signal -> 
-				builder.booleanVariable(name:signal.name, initial:signal.sensor.any{it.initiallyActivated}, marked:signal.sensor.any{it.initiallyActivated})
+				builder.booleanVariable(name:signal.name, initial:signal.sensor.any{findInitialState(it.graph) == it}, marked:signal.sensor.any{it.initiallyActivated})
 			}
 			(project.controlSignal).each { signal -> 
 				builder.booleanVariable(name:signal.name, initial:false, marked:false)
@@ -469,11 +412,11 @@ class AutomatonGenerator {
 			project.graph.zone.findAll{it.bounded && it.graph.maxNrOfObjects != 1}.each { zone ->
 				builder.integerVariable(name:formatZoneVariableName(zone),
 				                        range:0..zone.capacity,
-				                        initial:zone.initialNrOfObjects,
-				                        marked:zone.initialNrOfObjects)
+				                        initial:findInitialState(zone.graph) == zone ? (zone.initialNrOfObjects ? zone.initialNrOfObjects : zone.graph.maxNrOfObjects) : 0,
+				                        marked:findInitialState(zone.graph) == zone ? (zone.initialNrOfObjects ? zone.initialNrOfObjects : zone.graph.maxNrOfObjects) : 0)
 			}
 			project.graph.zone.findAll{it.graph.maxNrOfObjects == 1 && !it.outsideSystemBoundry}.each { zone ->
-				builder.booleanVariable(name:formatZoneVariableName(zone), initial:zone.initialNrOfObjects, marked:zone.initialNrOfObjects)
+				builder.booleanVariable(name:formatZoneVariableName(zone), initial:findInitialState(zone.graph) == zone, marked:findInitialState(zone.graph) == zone)
 			}
 			if (project.controlSignal.any{it.synthesize}) {
 				booleanVariable(name:END_OF_SCANCYCLE_VARIABLE_NAME, initial:false, marked:true)
@@ -558,7 +501,6 @@ class AutomatonGenerator {
 				}
 			}
 		}
-		builder.module
 	}
 	
 	final static OUTSIDE_SYSTEM_BOUNDRY_STATE_NAME = 'outside'
@@ -572,7 +514,11 @@ class AutomatonGenerator {
 	final static EMPTY_QUEUE_STATE_NAME = 'empty'
 	
 	private findInitialState(graph) {
-		(graph.sensor.findAll{it.initiallyActivated} + graph.zone.findAll{it.initialNrOfObjects} + graph.zone.findAll{it.outsideSystemBoundry})[0]
+		(graph.sensor.findAll{it.initiallyActivated} +
+				graph.zone.findAll{it.initialNrOfObjects} +
+				graph.zone.findAll{it.outsideSystemBoundry} + 
+				graph.sensor.findAll{graph.maxNrOfObjects == 1} +
+				graph.zone.findAll{it.capacity >= graph.maxNrOfObjects || !it.bounded})[0]
 	}
 
 	private formatPlantName(Sensor sensor) {
@@ -588,15 +534,12 @@ class AutomatonGenerator {
 	}
 	
 	private formatStateName(Zone zone) {
-		if (zone.outsideSystemBoundry) {
-			return OUTSIDE_SYSTEM_BOUNDRY_STATE_NAME
-		}
+		if (zone.outsideSystemBoundry) return OUTSIDE_SYSTEM_BOUNDRY_STATE_NAME
+		if (zone.name?.trim()) return zone.name
 		def sensorsOfZone = [zone.back, zone.front].grep(Sensor.class)
 		def zonesWithSameSensors = zone.graph.zone.findAll{it.bounded && [it.front, it.back].grep(Sensor.class) == sensorsOfZone}
 		def prefix = zone.overlapped ? 'both' : 'between'
-		if (sensorsOfZone.size() == 1) {
-			prefix = 'beside'
-		}
+		if (sensorsOfZone.size() == 1) prefix = 'beside'
 		def suffix = zonesWithSameSensors.size() > 1 ? "${zonesWithSameSensors.indexOf(zone)}" : null
 		([prefix] + sensorsOfZone.name + [suffix]).findAll{it}.join('_')
 	}
@@ -614,7 +557,7 @@ class AutomatonGenerator {
 	}
 	
 	private String formatZoneVariableName(zone) {
-		"${zone.graph.name}_${formatStateName(zone)}"
+		zone.name?.trim() ? zone.name : "${zone.graph.name}_${formatStateName(zone)}"
 	}
 	
 	private String formatEventName(Sensor sensor, zone, movementFromZone, index) {
@@ -643,7 +586,7 @@ class AutomatonGenerator {
 		                        "${negation}${formatZoneVariableName(zone)}$comparison" : null
 		def sensorCondition = isSensorActivation && sensor.graph.maxNrOfObjects != 1 ? "!${sensor.name}" : null
 		def directionCondition = (isSensorActivation && zone.front == sensor) || (!isSensorActivation && zone.back == sensor) ? zone.forwardCondition : zone.backwardCondition;
-        if (directionCondition && parenthesisNeeded(directionCondition))	directionCondition = '(' + directionCondition + ')'
+        if (directionCondition && parenthesisNeeded(directionCondition)) directionCondition = '(' + directionCondition + ')'
 		def entryExitCondition
         if (isSensorActivation && zone.front == sensor) entryExitCondition = zone.frontEntryCondition
         else if (isSensorActivation && zone.back == sensor) entryExitCondition = zone.backEntryCondition
@@ -652,4 +595,12 @@ class AutomatonGenerator {
         if (entryExitCondition && parenthesisNeeded(entryExitCondition)) entryExitCondition = '(' + entryExitCondition + ')'
         [sensorCondition, zoneCondition, directionCondition, entryExitCondition].findAll{it}.join(' & ')
 	}
+	
+	ModuleProxy generateAndSaveToFile(Project sagProject, String filename) {
+		ModuleProxy module = generate(sagProject)
+		JAXBModuleMarshaller marshaller = new JAXBModuleMarshaller(ModuleSubjectFactory.getInstance(), CompilerOperatorTable.getInstance());
+		marshaller.marshal(module, new File(filename));
+		module
+	}
+	
 }

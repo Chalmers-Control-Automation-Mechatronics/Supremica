@@ -32,7 +32,7 @@ import org.supremica.external.sag.diagram.edit.parts.EndNodeEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphGraphCompartmentEditPart;
 import org.supremica.external.sag.diagram.edit.parts.ProjectEditPart;
-import org.supremica.external.sag.diagram.edit.parts.SensorNodeEditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorEditPart;
 import org.supremica.external.sag.diagram.edit.parts.ZoneEditPart;
 
 import org.supremica.external.sag.diagram.part.SagVisualIDRegistry;
@@ -160,7 +160,7 @@ public class SagNavigatorContentProvider implements ICommonContentProvider {
 					.singleton(view), SagVisualIDRegistry
 					.getType(GraphGraphCompartmentEditPart.VISUAL_ID));
 			connectedViews = getChildrenByType(connectedViews,
-					SagVisualIDRegistry.getType(SensorNodeEditPart.VISUAL_ID));
+					SagVisualIDRegistry.getType(SensorEditPart.VISUAL_ID));
 			result.addAll(createNavigatorItems(connectedViews, parentElement,
 					false));
 			connectedViews = getChildrenByType(Collections.singleton(view),
@@ -173,7 +173,7 @@ public class SagNavigatorContentProvider implements ICommonContentProvider {
 			return result.toArray();
 		}
 
-		case SensorNodeEditPart.VISUAL_ID: {
+		case SensorEditPart.VISUAL_ID: {
 			Collection result = new ArrayList();
 			SagNavigatorGroup outgoinglinks = new SagNavigatorGroup(
 					"outgoing links", "icons/outgoingLinksNavigatorGroup.gif",
@@ -235,7 +235,7 @@ public class SagNavigatorContentProvider implements ICommonContentProvider {
 					"icons/linkTargetNavigatorGroup.gif", parentElement);
 			Collection connectedViews = getLinksTargetByType(Collections
 					.singleton(view), SagVisualIDRegistry
-					.getType(SensorNodeEditPart.VISUAL_ID));
+					.getType(SensorEditPart.VISUAL_ID));
 			target.addChildren(createNavigatorItems(connectedViews, target,
 					true));
 			connectedViews = getLinksTargetByType(Collections.singleton(view),
@@ -243,7 +243,7 @@ public class SagNavigatorContentProvider implements ICommonContentProvider {
 			target.addChildren(createNavigatorItems(connectedViews, target,
 					true));
 			connectedViews = getLinksSourceByType(Collections.singleton(view),
-					SagVisualIDRegistry.getType(SensorNodeEditPart.VISUAL_ID));
+					SagVisualIDRegistry.getType(SensorEditPart.VISUAL_ID));
 			source.addChildren(createNavigatorItems(connectedViews, source,
 					true));
 			connectedViews = getLinksSourceByType(Collections.singleton(view),

@@ -6,44 +6,33 @@ import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.StackLayout;
 import org.eclipse.draw2d.geometry.Dimension;
-
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.Request;
-
 import org.eclipse.gef.commands.Command;
-
 import org.eclipse.gef.editpolicies.LayoutEditPolicy;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
-
 import org.eclipse.gef.requests.CreateRequest;
-
 import org.eclipse.gmf.runtime.diagram.ui.editparts.IGraphicalEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.ShapeNodeEditPart;
-
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
-
 import org.eclipse.gmf.runtime.draw2d.ui.figures.ConstrainedToolbarLayout;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.WrapLabel;
-
 import org.eclipse.gmf.runtime.gef.ui.figures.DefaultSizeNodeFigure;
 import org.eclipse.gmf.runtime.gef.ui.figures.NodeFigure;
-
 import org.eclipse.gmf.runtime.notation.View;
-
-import org.supremica.external.sag.diagram.edit.policies.SensorNodeItemSemanticEditPolicy;
-
+import org.supremica.external.sag.diagram.edit.policies.SensorItemSemanticEditPolicy;
 import org.supremica.external.sag.diagram.part.SagVisualIDRegistry;
 
 /**
  * @generated
  */
-public class SensorNodeEditPart extends ShapeNodeEditPart {
+public class SensorEditPart extends ShapeNodeEditPart {
 
 	/**
 	 * @generated
 	 */
-	public static final int VISUAL_ID = 3006;
+	public static final int VISUAL_ID = 3008;
 
 	/**
 	 * @generated
@@ -58,7 +47,7 @@ public class SensorNodeEditPart extends ShapeNodeEditPart {
 	/**
 	 * @generated
 	 */
-	public SensorNodeEditPart(View view) {
+	public SensorEditPart(View view) {
 		super(view);
 	}
 
@@ -69,7 +58,7 @@ public class SensorNodeEditPart extends ShapeNodeEditPart {
 		super.createDefaultEditPolicies();
 
 		installEditPolicy(EditPolicyRoles.SEMANTIC_ROLE,
-				new SensorNodeItemSemanticEditPolicy());
+				new SensorItemSemanticEditPolicy());
 		installEditPolicy(EditPolicy.LAYOUT_ROLE, createLayoutEditPolicy());
 	}
 
@@ -118,8 +107,8 @@ public class SensorNodeEditPart extends ShapeNodeEditPart {
 	 * @generated
 	 */
 	protected boolean addFixedChild(EditPart childEditPart) {
-		if (childEditPart instanceof SensorNodeNameEditPart) {
-			((SensorNodeNameEditPart) childEditPart).setLabel(getPrimaryShape()
+		if (childEditPart instanceof SensorNameEditPart) {
+			((SensorNameEditPart) childEditPart).setLabel(getPrimaryShape()
 					.getFigureSensorNameFigure());
 			return true;
 		}
@@ -219,7 +208,7 @@ public class SensorNodeEditPart extends ShapeNodeEditPart {
 	 */
 	public EditPart getPrimaryChildEditPart() {
 		return getChildBySemanticHint(SagVisualIDRegistry
-				.getType(SensorNodeNameEditPart.VISUAL_ID));
+				.getType(SensorNameEditPart.VISUAL_ID));
 	}
 
 	/**

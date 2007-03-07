@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SensorNodeItemProvider.java,v 1.2 2007-02-08 16:36:59 torda Exp $
+ * $Id: ControlSignalItemProvider.java,v 1.1 2007-03-07 10:28:00 torda Exp $
  */
 package org.supremica.external.sag.provider;
 
@@ -21,20 +21,20 @@ import org.eclipse.emf.edit.provider.IItemLabelProvider;
 import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
+
 import org.eclipse.emf.edit.provider.ItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.ViewerNotification;
-
+import org.supremica.external.sag.ControlSignal;
 import org.supremica.external.sag.SagPackage;
-import org.supremica.external.sag.SensorNode;
 
 /**
- * This is the item provider adapter for a {@link org.supremica.external.sag.SensorNode} object.
+ * This is the item provider adapter for a {@link org.supremica.external.sag.ControlSignal} object.
  * <!-- begin-user-doc -->
  * <!-- end-user-doc -->
  * @generated
  */
-public class SensorNodeItemProvider
-	extends NodeItemProvider
+public class ControlSignalItemProvider
+	extends NamedItemProvider
 	implements	
 		IEditingDomainItemProvider,	
 		IStructuredItemContentProvider,	
@@ -47,7 +47,7 @@ public class SensorNodeItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public SensorNodeItemProvider(AdapterFactory adapterFactory) {
+	public ControlSignalItemProvider(AdapterFactory adapterFactory) {
 		super(adapterFactory);
 	}
 
@@ -61,64 +61,41 @@ public class SensorNodeItemProvider
 		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
-			addNamePropertyDescriptor(object);
-			addSensorPropertyDescriptor(object);
+			addSynthesizePropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
 
 	/**
-	 * This adds a property descriptor for the Name feature.
+	 * This adds a property descriptor for the Synthesize feature.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected void addNamePropertyDescriptor(Object object) {
+	protected void addSynthesizePropertyDescriptor(Object object) {
 		itemPropertyDescriptors.add
 			(createItemPropertyDescriptor
 				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
 				 getResourceLocator(),
-				 getString("_UI_SensorNode_name_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_SensorNode_name_feature", "_UI_SensorNode_type"),
-				 SagPackage.Literals.SENSOR_NODE__NAME,
+				 getString("_UI_ControlSignal_synthesize_feature"),
+				 getString("_UI_PropertyDescriptor_description", "_UI_ControlSignal_synthesize_feature", "_UI_ControlSignal_type"),
+				 SagPackage.Literals.CONTROL_SIGNAL__SYNTHESIZE,
 				 true,
 				 false,
 				 false,
-				 ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+				 ItemPropertyDescriptor.BOOLEAN_VALUE_IMAGE,
 				 null,
 				 null));
 	}
 
 	/**
-	 * This adds a property descriptor for the Sensor feature.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected void addSensorPropertyDescriptor(Object object) {
-		itemPropertyDescriptors.add
-			(createItemPropertyDescriptor
-				(((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
-				 getResourceLocator(),
-				 getString("_UI_SensorNode_sensor_feature"),
-				 getString("_UI_PropertyDescriptor_description", "_UI_SensorNode_sensor_feature", "_UI_SensorNode_type"),
-				 SagPackage.Literals.SENSOR_NODE__SENSOR,
-				 true,
-				 false,
-				 true,
-				 null,
-				 null,
-				 null));
-	}
-
-	/**
-	 * This returns SensorNode.gif.
+	 * This returns ControlSignal.gif.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
 	public Object getImage(Object object) {
-		return overlayImage(object, getResourceLocator().getImage("full/obj16/SensorNode"));
+		return overlayImage(object, getResourceLocator().getImage("full/obj16/ControlSignal"));
 	}
 
 	/**
@@ -128,10 +105,10 @@ public class SensorNodeItemProvider
 	 * @generated
 	 */
 	public String getText(Object object) {
-		String label = ((SensorNode)object).getName();
+		String label = ((ControlSignal)object).getName();
 		return label == null || label.length() == 0 ?
-			getString("_UI_SensorNode_type") :
-			getString("_UI_SensorNode_type") + " " + label;
+			getString("_UI_ControlSignal_type") :
+			getString("_UI_ControlSignal_type") + " " + label;
 	}
 
 	/**
@@ -144,8 +121,8 @@ public class SensorNodeItemProvider
 	public void notifyChanged(Notification notification) {
 		updateChildren(notification);
 
-		switch (notification.getFeatureID(SensorNode.class)) {
-			case SagPackage.SENSOR_NODE__NAME:
+		switch (notification.getFeatureID(ControlSignal.class)) {
+			case SagPackage.CONTROL_SIGNAL__SYNTHESIZE:
 				fireNotifyChanged(new ViewerNotification(notification, notification.getNotifier(), false, true));
 				return;
 		}

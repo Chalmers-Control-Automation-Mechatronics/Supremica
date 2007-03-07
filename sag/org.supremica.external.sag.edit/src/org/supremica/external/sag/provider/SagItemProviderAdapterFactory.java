@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagItemProviderAdapterFactory.java,v 1.2 2007-02-08 16:36:59 torda Exp $
+ * $Id: SagItemProviderAdapterFactory.java,v 1.3 2007-03-07 10:28:00 torda Exp $
  */
 package org.supremica.external.sag.provider;
 
@@ -142,6 +142,28 @@ public class SagItemProviderAdapterFactory extends SagAdapterFactory implements 
 	}
 
 	/**
+	 * This keeps track of the one adapter used for all {@link org.supremica.external.sag.SensorSignal} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected SensorSignalItemProvider sensorSignalItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.supremica.external.sag.SensorSignal}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createSensorSignalAdapter() {
+		if (sensorSignalItemProvider == null) {
+			sensorSignalItemProvider = new SensorSignalItemProvider(this);
+		}
+
+		return sensorSignalItemProvider;
+	}
+
+	/**
 	 * This keeps track of the one adapter used for all {@link org.supremica.external.sag.Sensor} instances.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -164,6 +186,28 @@ public class SagItemProviderAdapterFactory extends SagAdapterFactory implements 
 	}
 
 	/**
+	 * This keeps track of the one adapter used for all {@link org.supremica.external.sag.ControlSignal} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ControlSignalItemProvider controlSignalItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.supremica.external.sag.ControlSignal}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createControlSignalAdapter() {
+		if (controlSignalItemProvider == null) {
+			controlSignalItemProvider = new ControlSignalItemProvider(this);
+		}
+
+		return controlSignalItemProvider;
+	}
+
+	/**
 	 * This keeps track of the one adapter used for all {@link org.supremica.external.sag.EndNode} instances.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -183,28 +227,6 @@ public class SagItemProviderAdapterFactory extends SagAdapterFactory implements 
 		}
 
 		return endNodeItemProvider;
-	}
-
-	/**
-	 * This keeps track of the one adapter used for all {@link org.supremica.external.sag.SensorNode} instances.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected SensorNodeItemProvider sensorNodeItemProvider;
-
-	/**
-	 * This creates an adapter for a {@link org.supremica.external.sag.SensorNode}.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Adapter createSensorNodeAdapter() {
-		if (sensorNodeItemProvider == null) {
-			sensorNodeItemProvider = new SensorNodeItemProvider(this);
-		}
-
-		return sensorNodeItemProvider;
 	}
 
 	/**
@@ -306,9 +328,10 @@ public class SagItemProviderAdapterFactory extends SagAdapterFactory implements 
 		if (graphItemProvider != null) graphItemProvider.dispose();
 		if (zoneItemProvider != null) zoneItemProvider.dispose();
 		if (projectItemProvider != null) projectItemProvider.dispose();
-		if (sensorItemProvider != null) sensorItemProvider.dispose();
+		if (sensorSignalItemProvider != null) sensorSignalItemProvider.dispose();
 		if (endNodeItemProvider != null) endNodeItemProvider.dispose();
-		if (sensorNodeItemProvider != null) sensorNodeItemProvider.dispose();
+		if (sensorItemProvider != null) sensorItemProvider.dispose();
+		if (controlSignalItemProvider != null) controlSignalItemProvider.dispose();
 	}
 
 }

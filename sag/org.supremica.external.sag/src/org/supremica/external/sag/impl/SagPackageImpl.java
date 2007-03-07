@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: SagPackageImpl.java,v 1.9 2007-02-21 08:38:53 torda Exp $
+ * $Id: SagPackageImpl.java,v 1.10 2007-03-07 10:25:41 torda Exp $
  */
 package org.supremica.external.sag.impl;
 
@@ -819,7 +819,7 @@ public class SagPackageImpl extends EPackageImpl implements SagPackage {
 		  ((EOperation)graphEClass.getEOperations().get(0), 
 		   source, 
 		   new String[] {
-			 "invariant", "nrOfObjectsIsUnbounded implies zone->forAll(oclIsKindOf(UnboundedZone) implies oclAsType(UnboundedZone).isOutside)"
+			 "invariant", "nrOfObjectsIsUnbounded implies zone->forAll(!bounded implies outsideSystemBoundry)"
 		   });		
 		addAnnotation
 		  ((EOperation)graphEClass.getEOperations().get(1), 

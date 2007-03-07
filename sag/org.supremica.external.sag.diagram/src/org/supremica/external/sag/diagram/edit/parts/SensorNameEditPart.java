@@ -51,13 +51,13 @@ import org.supremica.external.sag.diagram.providers.SagElementTypes;
 /**
  * @generated
  */
-public class SensorNodeNameEditPart extends CompartmentEditPart implements
+public class SensorNameEditPart extends CompartmentEditPart implements
 		ITextAwareEditPart {
 
 	/**
 	 * @generated
 	 */
-	public static final int VISUAL_ID = 5003;
+	public static final int VISUAL_ID = 5005;
 
 	/**
 	 * @generated
@@ -82,7 +82,7 @@ public class SensorNodeNameEditPart extends CompartmentEditPart implements
 	/**
 	 * @generated
 	 */
-	public SensorNodeNameEditPart(View view) {
+	public SensorNameEditPart(View view) {
 		super(view);
 	}
 
@@ -309,7 +309,7 @@ public class SensorNodeNameEditPart extends CompartmentEditPart implements
 
 				public Object getAdapter(Class adapter) {
 					if (IElementType.class.equals(adapter)) {
-						return SagElementTypes.SensorNode_3006;
+						return SagElementTypes.Sensor_3008;
 					}
 					return super.getAdapter(adapter);
 				}

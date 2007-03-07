@@ -7,7 +7,7 @@
     <eOperations name="validateAllUnboundedZonesAreOutsideIfNrOfObjectsAreUnbounded"
         eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean">
       <eAnnotations source="http://www.eclipse.org/OCL/examples/ocl">
-        <details key="invariant" value="nrOfObjectsIsUnbounded implies zone->forAll(oclIsKindOf(UnboundedZone) implies oclAsType(UnboundedZone).isOutside)"/>
+        <details key="invariant" value="nrOfObjectsIsUnbounded implies zone->forAll(!bounded implies outsideSystemBoundry)"/>
       </eAnnotations>
       <eParameters name="diagnostics" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDiagnosticChain"/>
       <eParameters name="context">

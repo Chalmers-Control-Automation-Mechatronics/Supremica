@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: Graph.java,v 1.6 2007-02-13 16:50:51 torda Exp $
+ * $Id: Graph.java,v 1.7 2007-03-07 10:26:15 torda Exp $
  */
 package org.supremica.external.sag;
 
@@ -169,7 +169,7 @@ public interface Graph extends Named {
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @model annotation="http://www.eclipse.org/OCL/examples/ocl invariant='nrOfObjectsIsUnbounded implies zone->forAll(oclIsKindOf(UnboundedZone) implies oclAsType(UnboundedZone).isOutside)'"
+	 * @model annotation="http://www.eclipse.org/OCL/examples/ocl invariant='nrOfObjectsIsUnbounded implies zone->forAll(!bounded implies outsideSystemBoundry)'"
 	 * @generated
 	 */
 	boolean validateAllUnboundedZonesAreOutsideIfNrOfObjectsAreUnbounded(DiagnosticChain diagnostics, Map<?, ?> context);

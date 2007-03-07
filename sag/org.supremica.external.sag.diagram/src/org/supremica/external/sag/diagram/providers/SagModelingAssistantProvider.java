@@ -25,7 +25,7 @@ import org.supremica.external.sag.diagram.edit.parts.EndNodeEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphEditPart;
 import org.supremica.external.sag.diagram.edit.parts.GraphGraphCompartmentEditPart;
 import org.supremica.external.sag.diagram.edit.parts.ProjectEditPart;
-import org.supremica.external.sag.diagram.edit.parts.SensorNodeEditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorEditPart;
 
 import org.supremica.external.sag.diagram.part.SagDiagramEditorPlugin;
 
@@ -42,7 +42,7 @@ public class SagModelingAssistantProvider extends ModelingAssistantProvider {
 				.getAdapter(IGraphicalEditPart.class);
 		if (editPart instanceof GraphGraphCompartmentEditPart) {
 			List types = new ArrayList();
-			types.add(SagElementTypes.SensorNode_3006);
+			types.add(SagElementTypes.Sensor_3008);
 			types.add(SagElementTypes.EndNode_3007);
 			return types;
 		}
@@ -60,7 +60,7 @@ public class SagModelingAssistantProvider extends ModelingAssistantProvider {
 	public List getRelTypesOnSource(IAdaptable source) {
 		IGraphicalEditPart sourceEditPart = (IGraphicalEditPart) source
 				.getAdapter(IGraphicalEditPart.class);
-		if (sourceEditPart instanceof SensorNodeEditPart
+		if (sourceEditPart instanceof SensorEditPart
 				|| sourceEditPart instanceof EndNodeEditPart) {
 			List<IElementType> types = new ArrayList<IElementType>();
 			types.add(SagElementTypes.Zone_4010);
@@ -76,7 +76,7 @@ public class SagModelingAssistantProvider extends ModelingAssistantProvider {
 	public List getRelTypesOnTarget(IAdaptable target) {
 		IGraphicalEditPart targetEditPart = (IGraphicalEditPart) target
 				.getAdapter(IGraphicalEditPart.class);
-		if (targetEditPart instanceof SensorNodeEditPart
+		if (targetEditPart instanceof SensorEditPart
 				|| targetEditPart instanceof EndNodeEditPart) {
 			List<IElementType> types = new ArrayList<IElementType>();
 			types.add(SagElementTypes.Zone_4010);
@@ -95,8 +95,8 @@ public class SagModelingAssistantProvider extends ModelingAssistantProvider {
 				.getAdapter(IGraphicalEditPart.class);
 		IGraphicalEditPart targetEditPart = (IGraphicalEditPart) target
 				.getAdapter(IGraphicalEditPart.class);
-		if ((sourceEditPart instanceof SensorNodeEditPart && (targetEditPart instanceof SensorNodeEditPart || targetEditPart instanceof EndNodeEditPart))
-				|| (sourceEditPart instanceof EndNodeEditPart && targetEditPart instanceof SensorNodeEditPart)) {
+		if ((sourceEditPart instanceof SensorEditPart && (targetEditPart instanceof SensorEditPart || targetEditPart instanceof EndNodeEditPart))
+				|| (sourceEditPart instanceof EndNodeEditPart && targetEditPart instanceof SensorEditPart)) {
 			List<IElementType> types = new ArrayList<IElementType>();
 			types.add(SagElementTypes.Zone_4010);
 			return types;
@@ -113,12 +113,12 @@ public class SagModelingAssistantProvider extends ModelingAssistantProvider {
 				.getAdapter(IGraphicalEditPart.class);
 		List<IElementType> types = new ArrayList<IElementType>();
 		if (relationshipType == SagElementTypes.Zone_4010) {
-			if (targetEditPart instanceof SensorNodeEditPart) {
-				types.add(SagElementTypes.SensorNode_3006);
+			if (targetEditPart instanceof SensorEditPart) {
+				types.add(SagElementTypes.Sensor_3008);
 				types.add(SagElementTypes.EndNode_3007);
 			}
 			if (targetEditPart instanceof EndNodeEditPart) {
-				types.add(SagElementTypes.SensorNode_3006);
+				types.add(SagElementTypes.Sensor_3008);
 			}
 		}
 		return types;
@@ -133,12 +133,12 @@ public class SagModelingAssistantProvider extends ModelingAssistantProvider {
 				.getAdapter(IGraphicalEditPart.class);
 		List<IElementType> types = new ArrayList<IElementType>();
 		if (relationshipType == SagElementTypes.Zone_4010) {
-			if (sourceEditPart instanceof SensorNodeEditPart) {
-				types.add(SagElementTypes.SensorNode_3006);
+			if (sourceEditPart instanceof SensorEditPart) {
+				types.add(SagElementTypes.Sensor_3008);
 				types.add(SagElementTypes.EndNode_3007);
 			}
 			if (sourceEditPart instanceof EndNodeEditPart) {
-				types.add(SagElementTypes.SensorNode_3006);
+				types.add(SagElementTypes.Sensor_3008);
 			}
 		}
 		return types;

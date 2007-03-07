@@ -16,15 +16,15 @@ import org.eclipse.gmf.runtime.notation.NotationFactory;
 import org.eclipse.gmf.runtime.notation.View;
 
 import org.supremica.external.sag.diagram.edit.parts.ProjectEditPart;
-import org.supremica.external.sag.diagram.edit.parts.SensorNodeEditPart;
-import org.supremica.external.sag.diagram.edit.parts.SensorNodeNameEditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorEditPart;
+import org.supremica.external.sag.diagram.edit.parts.SensorNameEditPart;
 
 import org.supremica.external.sag.diagram.part.SagVisualIDRegistry;
 
 /**
  * @generated
  */
-public class SensorNodeViewFactory extends AbstractShapeViewFactory {
+public class SensorViewFactory extends AbstractShapeViewFactory {
 
 	/**
 	 * @generated 
@@ -46,7 +46,7 @@ public class SensorNodeViewFactory extends AbstractShapeViewFactory {
 			boolean persisted) {
 		if (semanticHint == null) {
 			semanticHint = SagVisualIDRegistry
-					.getType(SensorNodeEditPart.VISUAL_ID);
+					.getType(SensorEditPart.VISUAL_ID);
 			view.setType(semanticHint);
 		}
 		super.decorateView(containerView, view, semanticAdapter, semanticHint,
@@ -61,7 +61,7 @@ public class SensorNodeViewFactory extends AbstractShapeViewFactory {
 			view.getEAnnotations().add(shortcutAnnotation);
 		}
 		getViewService().createNode(semanticAdapter, view,
-				SagVisualIDRegistry.getType(SensorNodeNameEditPart.VISUAL_ID),
+				SagVisualIDRegistry.getType(SensorNameEditPart.VISUAL_ID),
 				ViewUtil.APPEND, true, getPreferencesHint());
 	}
 

@@ -2,7 +2,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: GraphTest.java,v 1.2 2007-01-23 16:08:52 torda Exp $
+ * $Id: GraphTest.java,v 1.3 2007-03-07 10:29:34 torda Exp $
  */
 package org.supremica.external.sag.tests;
 
@@ -16,9 +16,16 @@ import org.supremica.external.sag.SagFactory;
  * A test case for the model object '<em><b>Graph</b></em>'.
  * <!-- end-user-doc -->
  * <p>
+ * The following features are tested:
+ * <ul>
+ *   <li>{@link org.supremica.external.sag.Graph#isNrOfObjectsIsUnbounded() <em>Nr Of Objects Is Unbounded</em>}</li>
+ *   <li>{@link org.supremica.external.sag.Graph#getSensor() <em>Sensor</em>}</li>
+ * </ul>
+ * </p>
+ * <p>
  * The following operations are tested:
  * <ul>
- *   <li>{@link org.supremica.external.sag.Graph#validateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map) <em>Validate All Unbounded Zones Are Outside If Objects Are Identityless</em>}</li>
+ *   <li>{@link org.supremica.external.sag.Graph#validateAllUnboundedZonesAreOutsideIfNrOfObjectsAreUnbounded(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map) <em>Validate All Unbounded Zones Are Outside If Nr Of Objects Are Unbounded</em>}</li>
  *   <li>{@link org.supremica.external.sag.Graph#validateName(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map) <em>Validate Name</em>}</li>
  * </ul>
  * </p>
@@ -75,13 +82,52 @@ public class GraphTest extends NamedTest {
 	}
 
 	/**
-	 * Tests the '{@link org.supremica.external.sag.Graph#validateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map) <em>Validate All Unbounded Zones Are Outside If Objects Are Identityless</em>}' operation.
+	 * Tests the '{@link org.supremica.external.sag.Graph#isNrOfObjectsIsUnbounded() <em>Nr Of Objects Is Unbounded</em>}' feature getter.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see org.supremica.external.sag.Graph#validateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map)
+	 * @see org.supremica.external.sag.Graph#isNrOfObjectsIsUnbounded()
 	 * @generated
 	 */
-	public void testValidateAllUnboundedZonesAreOutsideIfObjectsAreIdentityless__DiagnosticChain_Map() {
+	public void testIsNrOfObjectsIsUnbounded() {
+		// TODO: implement this feature getter test method
+		// Ensure that you remove @generated or mark it @generated NOT
+		fail();
+	}
+
+	/**
+	 * Tests the '{@link org.supremica.external.sag.Graph#setNrOfObjectsIsUnbounded(boolean) <em>Nr Of Objects Is Unbounded</em>}' feature setter.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.supremica.external.sag.Graph#setNrOfObjectsIsUnbounded(boolean)
+	 * @generated
+	 */
+	public void testSetNrOfObjectsIsUnbounded() {
+		// TODO: implement this feature setter test method
+		// Ensure that you remove @generated or mark it @generated NOT
+		fail();
+	}
+
+	/**
+	 * Tests the '{@link org.supremica.external.sag.Graph#getSensor() <em>Sensor</em>}' feature getter.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.supremica.external.sag.Graph#getSensor()
+	 * @generated
+	 */
+	public void testGetSensor() {
+		// TODO: implement this feature getter test method
+		// Ensure that you remove @generated or mark it @generated NOT
+		fail();
+	}
+
+	/**
+	 * Tests the '{@link org.supremica.external.sag.Graph#validateAllUnboundedZonesAreOutsideIfNrOfObjectsAreUnbounded(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map) <em>Validate All Unbounded Zones Are Outside If Nr Of Objects Are Unbounded</em>}' operation.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.supremica.external.sag.Graph#validateAllUnboundedZonesAreOutsideIfNrOfObjectsAreUnbounded(org.eclipse.emf.common.util.DiagnosticChain, java.util.Map)
+	 * @generated
+	 */
+	public void testValidateAllUnboundedZonesAreOutsideIfNrOfObjectsAreUnbounded__DiagnosticChain_Map() {
 		// TODO: implement this operation test method
 		// Ensure that you remove @generated or mark it @generated NOT
 		fail();
