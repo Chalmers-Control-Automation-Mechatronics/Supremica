@@ -61,11 +61,10 @@ class Program {
 	boolean deferred = true
 	static final pattern = /(?i)program/
 	static final defaultAttr = 'name'
-	List sequences = []
 	List inputs = []
 	List outputs = []
 	List variables = []
-	List functionBlockInstances  = []
+	MainCycle mainCycle
 	def addToModule(ModuleSubject module, boolean generateDefaultProcessModel = true) {
 		ModuleBuilder mb = new ModuleBuilder()
 		mb.module(module) {
@@ -89,14 +88,30 @@ class Program {
 					reset(Converter.END_OF_SCANCYCLE_VARIABLE_NAME)
 				}
 			}
-			functionBlockInstances.each { it.addToModule(mb) }
-			sequences.each { it.addToModule(mb)	}
+			mainCycle.addToModule(mb)
 		}
 	}
 	def toAutomata(boolean generateDefaultProcessModel = true) {
 		addToModule(new ModuleBuilder().module(name), generateDefaultProcessModel)
 	}
 }
+
+class MainCycle {
+	boolean deferred = true
+	static final pattern = /(?i)mainCycle?/
+	static final defaultAttr = null
+	static final parentAttr = 'mainCycle'
+	List sequences = []
+	List functionBlockInstances  = []
+	def addToModule(ModuleSubject module) {
+		functionBlockInstances.each { it.addToModule(mb) }
+		sequences.each { it.addToModule(mb)	}
+	}
+	def toAutomata(boolean generateDefaultProcessModel = true) {
+		addToModule(new ModuleBuilder().module(name), generateDefaultProcessModel)
+	}
+}
+
 class Sequence {
 	String name
 	static final pattern = /(?i)sequence/
@@ -196,7 +211,9 @@ class Expression {
 	String toSupremicaSyntax() {
 		Converter.toSupremicaSyntax(text)
 	}
-	String toString() {return text}
+	String toString() {
+		return text
+	}
 	def addToModule(ModuleBuilder mb) {
 		
 	}
@@ -223,6 +240,7 @@ class ControlCodeBuilder extends BuilderSupport {
 	static final VARIABLE = 'variables'
 			
 	static final NODE_TYPES = [Program,
+	                           MainCycle,
 	                           Sequence,
 	                           Assignment,
 	                           SetReset,
@@ -237,7 +255,9 @@ class ControlCodeBuilder extends BuilderSupport {
 	                           [name:VARIABLE, pattern:/(?i)variable/, defaultAttr:'name', parentAttr:VARIABLE]]
 	                           
 	def createNode(name){
-		createNode('transition', name)
+		def type = NODE_TYPES.find{name ==~ it.pattern}
+		if (!type) return createNode('transition', name)
+		createNode(name, [:], null)
 	}
 
 	def createNode(name, value){
@@ -249,7 +269,7 @@ class ControlCodeBuilder extends BuilderSupport {
 		if (!type) return null
 		if (type instanceof Class) {
 			def obj = type.newInstance()
-			attributes.each{obj.setProperty(it.key, it.value)}
+			attributes.each{if (it.key) obj.setProperty(it.key, it.value)}
 			return obj
 		}
 		[type:type, *:attributes] as Expando
@@ -265,8 +285,9 @@ class ControlCodeBuilder extends BuilderSupport {
 		println parent.inspect()
 		println child.inspect()
 		def parentAttr = child instanceof Expando ? child.type.parentAttr : child.parentAttr
-		if (!parent[parentAttr]) parent[parentAttr] = []	
-		parent[parentAttr] << child
+		if (parent instanceof Expando && !parent[parentAttr]) parent[parentAttr] = []	
+		if (parent[parentAttr] instanceof List) parent[parentAttr] << child
+		else parent[parentAttr] = child
 	}
 	
 	void nodeCompleted(parent, node) {
@@ -301,29 +322,31 @@ class ControlCodeBuilder extends BuilderSupport {
 			output 'qMeasure'
 			variable 'mBallIsBig'
 			variable 'mBallBetweenGateAndLift'
-			TON(name:'Measuring_T_ge_1000', input:'Measuring.X')
-			SR('qInGate', set:'iStart and not iBallInGate and not qOutGate', reset:'iBallInGate')
-			ASSIGN('qOutGate', input:'iBallInGate and iLiftDown and S0 and not mBallBetweenGateAndLift')
-			sequence(name:'Lift') {
-				STEP('S0'){R('qUp')}
-				'iBallDown'()
-				step('S1'){S('qUp')}
-				'MeasureDone.X'()
-				Step('S2'){N('qOut')}
-				'not iBallUp'()
-			}
-			SEQuence('BallMeasure') {
-				STEP('MeasureInit')
-				TRAN 'iBallUp'
-				STEP('Measuring') {S('qMeasure')}
-				'Measuring_T_ge_1000.Q AND iBigBall'()
-				TRAN('Measuring_T_ge_1000.Q AND iSmallBall', to:'SmallBallFound')
-				STEP('BigBallFound') {S('mBallIsBig')}
-				transition('true', to:'MeasureDone')
-				STEP('SmallBallFound') {R('mBallIsBig')}
-				'true'()
-				STEP('MeasureDone') {Reset('qMeasure')}
-				'!iBallUp'()
+			mainCycle {
+				TON(name:'Measuring_T_ge_1000', input:'Measuring.X')
+				SR('qInGate', set:'iStart and not iBallInGate and not qOutGate', reset:'iBallInGate')
+				ASSIGN('qOutGate', input:'iBallInGate and iLiftDown and S0 and not mBallBetweenGateAndLift')
+				sequence(name:'Lift') {
+					STEP('S0'){R('qUp')}
+					'iBallDown'()
+					step('S1'){S('qUp')}
+					'MeasureDone.X'()
+					Step('S2'){N('qOut')}
+					'not iBallUp'()
+				}
+				SEQuence('BallMeasure') {
+					STEP('MeasureInit')
+					TRAN 'iBallUp'
+					STEP('Measuring') {S('qMeasure')}
+					'Measuring_T_ge_1000.Q AND iBigBall'()
+					TRAN('Measuring_T_ge_1000.Q AND iSmallBall', to:'SmallBallFound')
+					STEP('BigBallFound') {S('mBallIsBig')}
+					transition('true', to:'MeasureDone')
+					STEP('SmallBallFound') {R('mBallIsBig')}
+					'true'()
+					STEP('MeasureDone') {Reset('qMeasure')}
+					'!iBallUp'()
+				}
 			}
 		}
 		def moduleBuilder = new ModuleBuilder()
