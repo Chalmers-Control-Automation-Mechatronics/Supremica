@@ -73,10 +73,11 @@ public class Actions
     public IDEAction analyzerEventHiderAction = new AnalyzerEventHiderAction(allActions);
     public IDEAction analyzerRenameAction = new AnalyzerRenameAction(allActions);
     public IDEAction analyzerExportAction = new AnalyzerExportAction(allActions);
+    public IDEAction analyzerPlantifyAction = new AnalyzerPlantifyAction(allActions);    
 
     // Analyzer experimental
-    public IDEAction analyzerPlantifyAction = new AnalyzerPlantifyAction(allActions);    
     public IDEAction analyzerExperimentAction = new AnalyzerExperimentAction(allActions);    
+    public IDEAction analyzerPredictSizeAction = new AnalyzerPredictSizeAction(allActions);    
 
     // Examples Actions
     public IDEAction toolsTestCasesAction = new ToolsTestCasesAction(allActions);

@@ -214,13 +214,18 @@ public class GeneticAlgorithms
         return GA_DATA_SIZE;
     }
     
+    /**
+     * Calculates the exact synchronisation size. (Without building the full 
+     * automata model of the composed system.)
+     */
     public static int calculateSynchronizationSize(Automata automata)
     {
         return calculateSynchronizationSize(automata, null);
     }
     
     /**
-     * Without building the full automata model of the composed system.
+     * Calculates the exact synchronisation size. (Without building the full 
+     * automata model of the composed system.)
      */
     public static int calculateSynchronizationSize(Automata automata, SynchronizationOptions syncOptions)
     {
@@ -287,6 +292,30 @@ public class GeneticAlgorithms
         }
     }
      */
+    
+    
+    /**
+     * Predicts the size (number of states) of the composition of automata.
+     */
+    public static double predictSynchronizationSize(Automata automata)
+    {
+        // Predict pairwise compositions and multiply the results
+        double prediction = 1;
+        for (Iterator<Automaton> autIt = automata.iterator(); autIt.hasNext(); )
+        {
+            Automaton autA = autIt.next();
+            if (autIt.hasNext())
+            {
+                Automaton autB = autIt.next();
+                prediction *= predictSynchronizationSize(autA, autB);                
+            }
+            else
+            {
+                prediction *= autA.nbrOfStates();
+            }
+        }
+        return prediction;
+    }
     
     /**
      * Predicts the size (number of states) of the composition of autA and autB.
