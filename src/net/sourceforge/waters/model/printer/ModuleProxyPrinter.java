@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ModuleProxyPrinter
 //###########################################################################
-//# $Id: ModuleProxyPrinter.java,v 1.9 2007-01-03 00:49:08 robi Exp $
+//# $Id: ModuleProxyPrinter.java,v 1.10 2007-03-07 10:12:58 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;
@@ -105,6 +105,10 @@ public class ModuleProxyPrinter
  throws VisitorException
   {
 	    print(proxy.getName());
+	    print(" (" + proxy.getType().toString());
+	    print(" initial:" + proxy.getInitialValue().toString());
+	    print(" marked:" + (proxy.getMarkedValue() != null ? proxy.getMarkedValue().toString() : "null"));
+	    print(")");
 	    return null;
   }
   
