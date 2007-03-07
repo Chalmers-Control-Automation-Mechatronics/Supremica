@@ -104,7 +104,7 @@ public class Main
 		    else if (fileNames[i].toLowerCase().startsWith("cop"))
 		    {
 			System.out.println("File: " + fileNames[i]);
-			ROP cop = (ROP) loader.loadCOP(path, fileNames[i]);
+			ROP cop = loader.loadROP(path, fileNames[i]);
 			plcDataBuilder.buildCOP(cop);
 		    }
 		}
