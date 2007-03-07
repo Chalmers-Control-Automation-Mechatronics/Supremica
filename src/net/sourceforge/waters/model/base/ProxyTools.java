@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   ProxyTools
 //###########################################################################
-//# $Id: ProxyTools.java,v 1.1 2007-02-26 21:41:18 robi Exp $
+//# $Id: ProxyTools.java,v 1.2 2007-03-07 10:07:31 torda Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -91,7 +91,10 @@ public class ProxyTools
       while (iter1.hasNext()) {
         final Proxy proxy1 = iter1.next();
         final Proxy proxy2 = iter2.next();
-        if (!proxy1.equalsByContents(proxy2)) {
+        if (proxy1 == null && proxy2 != null) {
+        	return false;
+        }
+        if (proxy1 != null && !proxy1.equalsByContents(proxy2)) {
           return false;
         }
       }
@@ -164,7 +167,10 @@ public class ProxyTools
       while (iter1.hasNext()) {
         final Proxy proxy1 = iter1.next();
         final Proxy proxy2 = iter2.next();
-        if (!proxy1.equalsWithGeometry(proxy2)) {
+        if (proxy1 == null && proxy2 != null) {
+        	return false;
+        }
+        if (proxy1 != null && !proxy1.equalsWithGeometry(proxy2)) {
           return false;
         }
       }
