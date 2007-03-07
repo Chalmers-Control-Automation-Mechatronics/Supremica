@@ -8,7 +8,7 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.algorithms.GeneticAlgorithms;
 
 /**
- * A new action
+ * Action for predicting composition size.
  */
 public class AnalyzerPredictSizeAction
     extends IDEAction
@@ -38,7 +38,7 @@ public class AnalyzerPredictSizeAction
     }
     
     /**
-     * The code that is run when the action is invoked.
+     * Predict the size, calculate the exact size and the worst case size and present the result.
      */
     public void doAction()
     {

@@ -175,9 +175,7 @@ public enum MinimizationHeuristic
         }
         else if (this == GeneticAlgorithm)
         {
-            if (selection.size() != 2)
-                throw new IllegalArgumentException("The genetic algoritm can only predict the size of a pair of automata.");
-            return GeneticAlgorithms.predictSynchronizationSize(selection.getAutomatonAt(0), selection.getAutomatonAt(1));
+            return GeneticAlgorithms.predictSynchronizationSize(selection);
         }
         else if (this == Random)
         {
