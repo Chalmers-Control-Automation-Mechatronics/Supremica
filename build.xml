@@ -588,6 +588,8 @@ Class-Path: ${manifest.pathlist}</echo>
 	<chmod file="${dist}/SFCtoSMV.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaBDD.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaBDD.cmd" perm="644"/>
+	<copy file="${templates}/RelationExtraction.cmd" todir="${dist}"/>	
+	<chmod file="${dist}/RelationExtraction.cmd" perm="644"/>
 </target>
 
 <target name="startfiles_supremica" depends="startfiles_local_supremica">

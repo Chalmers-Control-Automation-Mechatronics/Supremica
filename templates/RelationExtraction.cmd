@@ -1,0 +1,1 @@
+@java -cp ..\build;..\lib\unjared\;..\images;..\examples;..\animations;..\userinterfaces;..\runtime\softplc\build -enableassertions org.supremica.external.relationExtraction.relationExtraction %1 %2 %3 %4 %5 %6 %7 %8 %9
