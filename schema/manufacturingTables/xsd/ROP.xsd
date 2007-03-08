@@ -17,7 +17,6 @@
  <xs:simpleType name="RelationType">
   <xs:restriction base="xs:string">
    <xs:enumeration value="Sequence"/>
-   <xs:enumeration value="Alternative"/>
   </xs:restriction>
  </xs:simpleType>
 
