@@ -147,7 +147,7 @@ public class Loader
         }
     }
     
-    public ROP loadROP(String path, String fileName)
+    public Object loadROP(String path, String fileName)
     throws JAXBException, SAXException
     {
         try
@@ -166,7 +166,7 @@ public class Loader
             // Se comment about validation above.
             
             // Unmarshal!
-            return (ROP) load(path, fileName);
+            return (Object) load(path, fileName);
         }
         catch(SAXException se)
         {
