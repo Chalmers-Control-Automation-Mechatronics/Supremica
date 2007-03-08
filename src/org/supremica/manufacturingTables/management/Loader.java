@@ -150,9 +150,9 @@ public class Loader
     public ROP loadROP(String path, String fileName)
     throws JAXBException, SAXException
     {
-        // Create JAXBContext and unmarshaller for ROP
         try
         {
+            // Create JAXBContext and unmarshaller for ROP
             jaxbContext = JAXBContext.newInstance("org.supremica.manufacturingTables.xsd.rop");
             u = jaxbContext.createUnmarshaller();
             // enable validation
@@ -164,6 +164,8 @@ public class Loader
             System.err.println("validation is on");
             
             // Se comment about validation above.
+            
+            // Unmarshal!
             return (ROP) load(path, fileName);
         }
         catch(SAXException se)

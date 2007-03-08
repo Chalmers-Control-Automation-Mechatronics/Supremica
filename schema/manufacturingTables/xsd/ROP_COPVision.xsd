@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="1.0"
+	
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified"
+	
+	version="1.0">
+
+<!-- Definition of simple types ___________________________________-->
+
+<xs:simpleType name="ROPType">
+	<xs:restriction base="xs:string">
+		<xs:enumeration value="ROP"/>
+		<xs:enumeration value="COP"/>
+	</xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="RelationType">
+	<xs:restriction base="xs:string">
+		<xs:enumeration value="Sequence"/>
+		<xs:enumeration value="Alternative"/>
+		<xs:enumeration value="Parallel"/>
+		<xs:enumeration value="Arbitrary"/>
+	</xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="AttributeType">
+	<xs:restriction base="xs:string">
+	</xs:restriction>
+</xs:simpleType>
+
+<!-- Definition of simple elements ________________________________-->
+
+<xs:element name="Comment" type="xs:string"/>
+<xs:element name="Machine" type="xs:string"/>
+<xs:element name="Operation" type="xs:string"/>
+<xs:element name="AttributeValue" type="xs:string"/>
+<!--xs:element name="UpperIndicator" type="xs:boolean"/>
+<xs:element name="LowerIndicator" type="xs:boolean"/-->
+<xs:element name="IndicatorValue" type="xs:boolean"/>
+<xs:element name="Invisible" type="xs:boolean"/>
+<xs:element name="Unextended" type="xs:boolean"/>
+<xs:element name="Compressed" type="xs:boolean"/>
+<xs:element name='XCoordinate' type="xs:integer"/>
+<xs:element name='YCoordinate' type="xs:integer"/>
+<!-- Definition of attributes _____________________________________-->
+
+<xs:attribute name="id" type="xs:string"/>
+
+<!-- Definition of complex elements and types _______________________________-->
+
+<xs:element name='ROP'>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element ref='Machine' minOccurs='1' maxOccurs='1'/>
+			<xs:element ref='Comment' minOccurs='0' maxOccurs='1'/>
+			<xs:element ref='Relation' minOccurs='1' maxOccurs='1'/>
+		</xs:sequence>
+		<xs:attribute ref='id' use='required'/>
+		<xs:attribute name="type" type="ROPType" use="required"/>
+	</xs:complexType>
+</xs:element>
+
+<xs:element name='Relation'>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:group ref='ActivityRelationGroup' minOccurs='0' maxOccurs='unbounded' />
+			<xs:element ref='Algebraic' minOccurs='0' maxOccurs='1'/>
+			<!--xs:element ref='Position' minOccurs='0' maxOccurs='1'/-->
+		</xs:sequence>
+		<xs:attribute name="type" type="RelationType" use="required"/>		
+	</xs:complexType>
+</xs:element>
+
+<xs:group name='ActivityRelationGroup'>
+	<xs:sequence>
+		<xs:element ref='Activity' minOccurs='0' maxOccurs='unbounded'/>
+		<xs:element ref='Relation' minOccurs='0' maxOccurs='unbounded'/>
+	</xs:sequence>
+</xs:group>
+
+<xs:element name='Activity'>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element ref='Precondition' minOccurs='0' maxOccurs='1'/>
+			<xs:element ref='Operation' minOccurs='1' maxOccurs='1'/>   
+			<!--xs:element ref='Successors' minOccurs='0' maxOccurs='1'/-->
+			<xs:element ref='Properties' minOccurs='0' maxOccurs='1'/>
+			<!--xs:element ref='Position' minOccurs='0' maxOccurs='1'/-->
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<xs:element name='Precondition'> 
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element name='Predecessor' type='OperationReferenceType' minOccurs='1' maxOccurs='unbounded'/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<!--xs:element name='Successors'>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element name='Successor' type='OperationReferenceType' minOccurs='1' maxOccurs='unbounded'/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element-->
+
+<xs:complexType name='OperationReferenceType'> 
+	<xs:sequence>
+		<xs:element ref='Machine' minOccurs='1' maxOccurs='1'/>
+		<xs:element ref='Operation' minOccurs='1' maxOccurs='1'/>
+	</xs:sequence>
+</xs:complexType> 
+
+<xs:element name='Properties'>
+	<xs:complexType>
+		<xs:sequence>	
+			<xs:element ref='Attribute' minOccurs='0' maxOccurs='unbounded'/>
+			<xs:element ref='Unextended' minOccurs='0' maxOccurs='1'/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<xs:element name='Attribute'> 
+	<xs:complexType>
+		<xs:sequence>	
+			<xs:element ref='AttributeValue' minOccurs='1' maxOccurs='1'/>
+			<xs:element ref='UpperIndicator' minOccurs='0' maxOccurs='1'/>
+			<xs:element ref='LowerIndicator' minOccurs='0' maxOccurs='1'/>
+			<xs:element ref='Invisible' minOccurs='0' maxOccurs='1'/>
+		</xs:sequence> 
+		<xs:attribute name="type" type="AttributeType" use="required"/>
+	</xs:complexType> 
+</xs:element>
+
+<xs:element name='UpperIndicator'>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element ref='IndicatorValue' minOccurs='1' maxOccurs='1'/>
+		</xs:sequence>	
+	</xs:complexType>
+</xs:element>
+
+<xs:element name='LowerIndicator'>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element ref='IndicatorValue' minOccurs='1' maxOccurs='1'/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<xs:element name='Algebraic'>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element ref='Compressed' minOccurs='1' maxOccurs='1'/>
+			<xs:element ref='Unextended' minOccurs='0' maxOccurs='1'/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+<!--xs:element name='Position'>
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element ref='XCoordinate' minOccurs='1' maxOccurs='1'/>
+			<xs:element ref='YCoordinate' minOccurs='1' maxOccurs='1'/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:element-->
+</xs:schema>

@@ -292,8 +292,7 @@ public class GeneticAlgorithms
         }
     }
      */
-    
-    
+
     /**
      * Predicts the size (number of states) of the composition of automata.
      */
