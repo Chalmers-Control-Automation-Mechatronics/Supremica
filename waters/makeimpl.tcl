@@ -1000,10 +1000,8 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
 	    Java_Write $stream $umap \
 		"        $membername.${equals}(downcast.$membername)"
 	  } else {
-	    Java_WriteLn $stream $umap \
-		"        ($membername == null ? downcast.$membername == null :"
 	    Java_Write $stream $umap \
-		"         $membername.${equals}(downcast.$membername))"
+              "        ProxyTools.${equals}($membername, downcast.$membername)"
 	  }
 	  if {$i < $numattribs} {
 	    Java_WriteLn $stream $umap " &&"
@@ -1068,10 +1066,8 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
             Java_Write $stream $umap \
                 "        $membername.${equals}(downcast.$membername)"
           } else {
-            Java_WriteLn $stream $umap \
-                "        ($membername == null ? downcast.$membername == null :"
             Java_Write $stream $umap \
-                "         $membername.${equals}(downcast.$membername))"
+              "        ProxyTools.${equals}($membername, downcast.$membername)"
           }
           if {$i < $numattribs} {
             Java_WriteLn $stream $umap " &&"
@@ -1124,10 +1120,8 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
             Java_WriteLn $stream $umap \
                 "    result += $membername.hashCodeByContents();"
           } else {
-            Java_WriteLn $stream $umap "    if ($membername != null) \{"
             Java_WriteLn $stream $umap \
-                "      result += $membername.hashCodeByContents();"
-            Java_WriteLn $stream $umap "    \}"
+                "    result += ProxyTools.hashCodeByContents($membername);"
           }
         }
         Java_WriteLn $stream $umap "    return result;"
@@ -1182,10 +1176,8 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
             Java_WriteLn $stream $umap \
                 "    result += $membername.${hashmethod}();"
           } else {
-            Java_WriteLn $stream $umap "    if ($membername != null) \{"
             Java_WriteLn $stream $umap \
-                "      result += $membername.${hashmethod}();"
-            Java_WriteLn $stream $umap "    \}"
+                "    result += ProxyTools.${hashmethod}($membername);"
           }
         }
         Java_WriteLn $stream $umap "    return result;"

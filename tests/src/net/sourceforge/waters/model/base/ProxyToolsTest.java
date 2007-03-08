@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.des
 //# CLASS:   ProxyToolsTest
 //###########################################################################
-//# $Id: ProxyToolsTest.java,v 1.1 2007-02-26 21:41:18 robi Exp $
+//# $Id: ProxyToolsTest.java,v 1.2 2007-03-08 00:57:12 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -25,11 +25,13 @@ public class ProxyToolsTest extends TestCase
 
   //#########################################################################
   //# Overrides for junit.framework.TestCase
-  public static Test suite() {
+  public static Test suite()
+  {
     return new TestSuite(ProxyToolsTest.class);
   }
 
-  public static void main(String args[]) {
+  public static void main(String args[])
+  {
     junit.textui.TestRunner.run(suite());
   }
 
@@ -123,6 +125,36 @@ public class ProxyToolsTest extends TestCase
     assertTrue(ProxyTools.isEqualCollectionByContents(list2, list2));
   }
 
+  public void testCollectionWithNullEquals()
+  {
+    final StringProxy item = new StringProxy("didel");
+    final Collection<StringProxy> list1 = new LinkedList<StringProxy>();
+    list1.add(item);
+    list1.add(null);
+    final Collection<StringProxy> list2 = new LinkedList<StringProxy>();
+    list2.add(item);
+    list2.add(null);
+    assertTrue(ProxyTools.isEqualCollectionByContents(list1, list1));
+    assertTrue(ProxyTools.isEqualCollectionByContents(list1, list2));
+    assertTrue(ProxyTools.isEqualCollectionByContents(list2, list1));
+    assertTrue(ProxyTools.isEqualCollectionByContents(list2, list2));
+  }
+
+  public void testSetWithNullEquals()
+  {
+    final StringProxy item = new StringProxy("didel");
+    final Set<StringProxy> set1 = new HashSet<StringProxy>();
+    set1.add(item);
+    set1.add(null);
+    final Set<StringProxy> set2 = new HashSet<StringProxy>();
+    set2.add(item);
+    set2.add(null);
+    assertTrue(ProxyTools.isEqualSetByContents(set1, set1));
+    assertTrue(ProxyTools.isEqualSetByContents(set1, set2));
+    assertTrue(ProxyTools.isEqualSetByContents(set2, set1));
+    assertTrue(ProxyTools.isEqualSetByContents(set2, set2));
+  }
+
   public void testCollectionNotEquals()
   {
     final StringProxy item1 = new StringProxy("ei");
@@ -133,7 +165,7 @@ public class ProxyToolsTest extends TestCase
     list1.add(item2);
     final Collection<StringProxy> list2 = new LinkedList<StringProxy>();
     list2.add(item2);
-    list2.add(item3);
+    list2.add(null);
     final Collection<StringProxy> list3 = new LinkedList<StringProxy>();
     list3.add(item1);
     list3.add(item2);
@@ -151,22 +183,48 @@ public class ProxyToolsTest extends TestCase
     final StringProxy item1 = new StringProxy("ei");
     final StringProxy item2 = new StringProxy("didel");
     final StringProxy item3 = new StringProxy("dum");
-    final Set<StringProxy> list1 = new HashSet<StringProxy>();
-    list1.add(item1);
-    list1.add(item2);
-    final Set<StringProxy> list2 = new HashSet<StringProxy>();
-    list2.add(item2);
-    list2.add(item3);
-    final Set<StringProxy> list3 = new HashSet<StringProxy>();
-    list3.add(item1);
-    list3.add(item2);
-    list3.add(item3);
-    assertFalse(ProxyTools.isEqualSetByContents(list1, list2));
-    assertFalse(ProxyTools.isEqualSetByContents(list2, list1));
-    assertFalse(ProxyTools.isEqualSetByContents(list1, list3));
-    assertFalse(ProxyTools.isEqualSetByContents(list3, list1));
-    assertFalse(ProxyTools.isEqualSetByContents(list2, list3));
-    assertFalse(ProxyTools.isEqualSetByContents(list3, list2));
+    final Set<StringProxy> set1 = new HashSet<StringProxy>();
+    set1.add(item1);
+    set1.add(item2);
+    final Set<StringProxy> set2 = new HashSet<StringProxy>();
+    set2.add(item2);
+    set2.add(item3);
+    final Set<StringProxy> set3 = new HashSet<StringProxy>();
+    set3.add(item1);
+    set3.add(item2);
+    set3.add(item3);
+    assertFalse(ProxyTools.isEqualSetByContents(set1, set2));
+    assertFalse(ProxyTools.isEqualSetByContents(set2, set1));
+    assertFalse(ProxyTools.isEqualSetByContents(set1, set3));
+    assertFalse(ProxyTools.isEqualSetByContents(set3, set1));
+    assertFalse(ProxyTools.isEqualSetByContents(set2, set3));
+    assertFalse(ProxyTools.isEqualSetByContents(set3, set2));
+  }
+
+  public void testCollectionWithNullNotEquals()
+  {
+    final StringProxy item = new StringProxy("ohhh");
+    final Collection<StringProxy> empty = Collections.emptyList();
+    final Collection<StringProxy> list1 = Collections.singletonList(item);
+    final Collection<StringProxy> list2 = new LinkedList<StringProxy>();
+    list2.add(null);
+    assertFalse(ProxyTools.isEqualCollectionByContents(empty, list2));
+    assertFalse(ProxyTools.isEqualCollectionByContents(list2, empty));
+    assertFalse(ProxyTools.isEqualCollectionByContents(list1, list2));
+    assertFalse(ProxyTools.isEqualCollectionByContents(list2, list1));
+  }
+
+  public void testSetWithNullNotEquals()
+  {
+    final StringProxy item = new StringProxy("ohhh");
+    final Set<StringProxy> empty = Collections.emptySet();
+    final Set<StringProxy> set1 = Collections.singleton(item);
+    final Set<StringProxy> set2 = new HashSet<StringProxy>();
+    set2.add(null);
+    assertFalse(ProxyTools.isEqualSetByContents(empty, set2));
+    assertFalse(ProxyTools.isEqualSetByContents(set2, empty));
+    assertFalse(ProxyTools.isEqualSetByContents(set1, set2));
+    assertFalse(ProxyTools.isEqualSetByContents(set2, set1));
   }
 
 

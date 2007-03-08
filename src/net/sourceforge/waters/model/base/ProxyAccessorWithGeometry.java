@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   ProxyAccessorWithGeometry
 //###########################################################################
-//# $Id: ProxyAccessorWithGeometry.java,v 1.2 2006-07-20 02:28:37 robi Exp $
+//# $Id: ProxyAccessorWithGeometry.java,v 1.3 2007-03-08 00:57:12 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -33,9 +33,7 @@ public class ProxyAccessorWithGeometry<P extends Proxy>
     if (partner instanceof ProxyAccessorWithGeometry<?>) {
       final ProxyAccessorWithGeometry<?> accessor =
         (ProxyAccessorWithGeometry<?>) partner;
-      return
-        mProxy == null ? accessor.mProxy == null :
-        mProxy.equalsWithGeometry(accessor.mProxy);
+      return ProxyTools.equalsWithGeometry(mProxy, accessor.mProxy);
     } else {
       return false;
     }
@@ -43,11 +41,7 @@ public class ProxyAccessorWithGeometry<P extends Proxy>
 
   public int hashCode()
   {
-    if (mProxy == null) {
-      return 0;
-    } else {
-      return mProxy.hashCodeWithGeometry();
-    }
+    return ProxyTools.hashCodeWithGeometry(mProxy);
   }
 
 

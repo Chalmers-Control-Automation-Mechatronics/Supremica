@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.base
 //# CLASS:   ProxyTools
 //###########################################################################
-//# $Id: ProxyTools.java,v 1.2 2007-03-07 10:07:31 torda Exp $
+//# $Id: ProxyTools.java,v 1.3 2007-03-08 00:57:12 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.base;
@@ -31,7 +31,58 @@ public class ProxyTools
 {
 
   //#########################################################################
+  //# Object Equality respecting NULL
+  /**
+   * Checks whether two objects are equal, handling <CODE>null</CODE>
+   * references properly. The {@link java.lang.Object Object} equality
+   * method {@link Object#equals(Object) equals()} is used for comparison.
+   * @return <CODE>true</CODE> if the two arguments are equal,
+   *         or if both are <CODE>null</CODE>.
+   */
+  public static boolean equals(final Object object1, final Object object2)
+  {
+    if (object1 == null) {
+      return object2 == null;
+    } else {
+      return object1.equals(object2);
+    }
+  }
+
+  /**
+   * Computes the hashcode of an object, handling <CODE>null</CODE>
+   * references properly. The {@link java.lang.Object Object} hash
+   * method {@link Object#hashCode()} is used for hashcode computation.
+   */
+  public static int hashCode(final Object object)
+  {
+    if (object == null) {
+      return HASH_NULL;
+    } else {
+      return object.hashCode();
+    }
+  }
+
+
+  //#########################################################################
   //# Equality by Contents
+  /**
+   * Checks whether two proxy objects are equal, handling <CODE>null</CODE>
+   * references properly. The equality method {@link
+   * Proxy#equalsByContents(Proxy) equalsByContents()} provided by the
+   * {@link Proxy} interface is used for comparison.   
+   * @return <CODE>true</CODE> if the two arguments are equal,
+   *         or if both are <CODE>null</CODE>.
+   */
+  public static boolean equalsByContents(final Proxy proxy1,
+                                         final Proxy proxy2)
+  {
+    if (proxy1 == null) {
+      return proxy2 == null;
+    } else {
+      return proxy1.equalsByContents(proxy2);
+    }
+  }
+
   /**
    * Checks whether two collections have the same contents. This method
    * compares two collections of proxies, and checks whether they have
@@ -91,10 +142,7 @@ public class ProxyTools
       while (iter1.hasNext()) {
         final Proxy proxy1 = iter1.next();
         final Proxy proxy2 = iter2.next();
-        if (proxy1 == null && proxy2 != null) {
-        	return false;
-        }
-        if (proxy1 != null && !proxy1.equalsByContents(proxy2)) {
+        if (!equalsByContents(proxy1, proxy2)) {
           return false;
         }
       }
@@ -107,6 +155,24 @@ public class ProxyTools
 
   //#########################################################################
   //# Equality with Geometry
+  /**
+   * Checks whether two proxy objects are equal, handling <CODE>null</CODE>
+   * references properly. The equality method {@link
+   * Proxy#equalsWithGeometry(Proxy) equalsWithGeometry()} provided by the
+   * {@link Proxy} interface is used for comparison.   
+   * @return <CODE>true</CODE> if the two arguments are equal,
+   *         or if both are <CODE>null</CODE>.
+   */
+  public static boolean equalsWithGeometry(final Proxy proxy1,
+                                           final Proxy proxy2)
+  {
+    if (proxy1 == null) {
+      return proxy2 == null;
+    } else {
+      return proxy1.equalsWithGeometry(proxy2);
+    }
+  }
+
   /**
    * Checks whether two collections have the same contents and
    * geometry. This method compares two collections of proxies, and checks
@@ -167,10 +233,7 @@ public class ProxyTools
       while (iter1.hasNext()) {
         final Proxy proxy1 = iter1.next();
         final Proxy proxy2 = iter2.next();
-        if (proxy1 == null && proxy2 != null) {
-        	return false;
-        }
-        if (proxy1 != null && !proxy1.equalsWithGeometry(proxy2)) {
+        if (!equalsWithGeometry(proxy1, proxy2)) {
           return false;
         }
       }
@@ -184,9 +247,24 @@ public class ProxyTools
   //#########################################################################
   //# Hash Code by Contents
   /**
+   * Computes the hashcode of a proxy, handling <CODE>null</CODE>
+   * references properly. The hash method {@link Proxy#hashCodeByContents()
+   * hashCodeByContents()} provided by the {@link Proxy} is used for
+   * hashcode computation.
+   */
+  public static int hashCodeByContents(final Proxy proxy)
+  {
+    if (proxy == null) {
+      return HASH_NULL;
+    } else {
+      return proxy.hashCodeByContents();
+    }
+  }
+
+  /**
    * Calculates a hash code for a collection of proxies based on the
    * contents of the collection. The hash codes of all elements of the
-   * collection are considered, as obtained through the
+   * collection are considered, as obtained through the {@link
    * Proxy#hashCodeByContents() hashCodeByContents()} provided by the
    * {@link Proxy} interface.
    */
@@ -195,7 +273,7 @@ public class ProxyTools
   {
     int result = 0;
     for (final Proxy proxy : coll) {
-      result += proxy.hashCodeByContents();
+      result += hashCodeByContents(proxy);
     }
     return result;
   }
@@ -228,7 +306,7 @@ public class ProxyTools
     int result = 0;
     for (final Proxy proxy : list) {
       result *= 5;
-      result += proxy.hashCodeByContents();
+      result += hashCodeByContents(proxy);
     }
     return result;
   }
@@ -236,6 +314,21 @@ public class ProxyTools
 
   //#########################################################################
   //# Hash Code with Geometry
+  /**
+   * Computes the hashcode of a proxy, handling <CODE>null</CODE>
+   * references properly. The hash method {@link Proxy#hashCodeByContents()
+   * hashCodeWithGeometry()} provided by the {@link Proxy} is used for
+   * hashcode computation.
+   */
+  public static int hashCodeWithGeometry(final Proxy proxy)
+  {
+    if (proxy == null) {
+      return HASH_NULL;
+    } else {
+      return proxy.hashCodeWithGeometry();
+    }
+  }
+
   /**
    * Calculates a hash code for a collection of proxies based on the
    * contents and geometry information of the collection's elements. The
@@ -248,7 +341,7 @@ public class ProxyTools
   {
     int result = 0;
     for (final Proxy proxy : coll) {
-      result += proxy.hashCodeWithGeometry();
+      result += hashCodeWithGeometry(proxy);
     }
     return result;
   }
@@ -283,7 +376,7 @@ public class ProxyTools
     int result = 0;
     for (final Proxy proxy : list) {
       result *= 5;
-      result += proxy.hashCodeWithGeometry();
+      result += hashCodeWithGeometry(proxy);
     }
     return result;
   }
@@ -305,5 +398,14 @@ public class ProxyTools
       return clazz.cast(proxy.clone());
     }
   }
+
+
+  //#########################################################################
+  //# Class Constants
+  /**
+   * A cryptic constant returned as hash code for <CODE>null</CODE>
+   * references.
+   */
+  private static final int HASH_NULL = 0xabababab;
 
 }
