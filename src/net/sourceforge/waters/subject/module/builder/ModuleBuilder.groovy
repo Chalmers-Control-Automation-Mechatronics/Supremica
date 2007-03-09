@@ -29,7 +29,6 @@ class ModuleBuilder extends BuilderSupport {
 		Util.openModuleInSupremica(module)
 	}
 	static {
-		println "module builder test" 
 		testBuilder()
 	}
 	
@@ -38,8 +37,10 @@ class ModuleBuilder extends BuilderSupport {
 	private Map transitionAttributes
 	private String initialState
 	private List transitionsThatNeedTargetState = []
+	private List transitionsThatNeedSourceState = []
 	private NodeSubject lastAddedState
 	private String defaultEvent
+	private SimpleComponentSubject currentComponent
 	final static String VARIABLE_COMPONENT_NAME = 'variables'
 	
 	def createNode(name){
@@ -78,6 +79,7 @@ class ModuleBuilder extends BuilderSupport {
 			['initial', 'range', 'marked'].each{attributes.remove(it)}
 			break
 		case 'event' :
+			if (attributes.range && !attributes.ranges) return createNode(name, [ranges:[attributes.range], *:attributes])
 			Closure createEvent = {label ->
 				factory.createEventDeclProxy(label,
                             attributes.controllable == null || attributes.controllable ? EventKind.CONTROLLABLE : EventKind.UNCONTROLLABLE,
@@ -86,7 +88,7 @@ class ModuleBuilder extends BuilderSupport {
                             null)
             }
 			node = (attributes.name instanceof List) ? attributes.name.collect{createEvent(it)} : createEvent(attributes.name)
-			['controllable', 'ranges'].each{attributes.remove(it)}
+			['controllable', 'ranges', 'range'].each{attributes.remove(it)}
 			break
 		case 'proposition':
 			node = factory.createEventDeclProxy(attributes.name, EventKind.PROPOSITION)
@@ -102,6 +104,7 @@ class ModuleBuilder extends BuilderSupport {
 	        if (attributes.deterministic != null) node.graph.deterministic = attributes.deterministic 
 	        initialState = attributes.initialState
 			defaultEvent = attributes.defaultEvent
+			currentComponent = node
 			['deterministic', 'initialState', 'defaultEvent', 'isSpecification'].each{attributes.remove(it)}
 			break
 		case 'state' :
@@ -114,10 +117,17 @@ class ModuleBuilder extends BuilderSupport {
 			def transitionsWithThisTarget = transitionsThatNeedTargetState.findAll{!it.targetName || it.targetName == node.name}
 			transitionsWithThisTarget.each{it.transition.target = node}
 			transitionsThatNeedTargetState -= transitionsWithThisTarget
+			def transitionsWithThisSource = transitionsThatNeedSourceState.findAll{it.sourceName == node.name}
+			transitionsWithThisSource.each{it.transition.source = node}
+			transitionsThatNeedSourceState -= transitionsWithThisSource
 			lastAddedState = node
 			break
 		case 'selfLoop':
-			attributes.selfLoop = true
+			return createNode('transition', [selfLoop:true, *:attributes])
+		case 'incoming':
+			return createNode('transition', [incoming:true, *:attributes])
+		case 'outgoing':
+			return createNode('transition', [outgoing:true, *:attributes])
 		case 'transition':
 			if (attributes.event && !attributes.events)	attributes.events = [attributes.event]
 			node = factory.createEdgeProxy(null,
@@ -128,7 +138,7 @@ class ModuleBuilder extends BuilderSupport {
 					                       null,
 					                       null)
 			transitionAttributes = attributes.clone()
-			['selfLoop', 'events', 'event', 'from', 'to', 'guard'].each{attributes.remove(it)}
+			['selfLoop', 'events', 'event', 'from', 'to', 'guard', 'incoming', 'outgoing'].each{attributes.remove(it)}
 			break
 		case 'foreach':
 			node = factory.createForeachComponentProxy(attributes.name, createRangeExpression(attributes.range))
@@ -205,9 +215,14 @@ class ModuleBuilder extends BuilderSupport {
 				break
 			case EdgeSubject:
 				assert parent.graph.nodes
-				child.source = [parent.graph.nodesModifiable.get(transitionAttributes.from), lastAddedState].grep{it}[0] 
-				if (transitionAttributes.selfLoop) child.target = child.source
-				else if (transitionAttributes.to) child.target = parent.graph.nodes.find{it.name == transitionAttributes.to}
+				assert !transitionAttributes.incoming
+				assert !transitionAttributes.outgoing
+				assert !transitionAttributes.selfLoop
+				if (!transitionAttributes.from) child.source = lastAddedState
+				else child.source = parent.graph.nodesModifiable.get(transitionAttributes.from) 
+				if (!child.source) transitionsThatNeedSourceState << [transition:child, sourceName:transitionAttributes.from]
+				//if (transitionAttributes.selfLoop) child.target = child.source
+				if (transitionAttributes.to) child.target = parent.graph.nodes.find{it.name == transitionAttributes.to}
 				if (!child.target) transitionsThatNeedTargetState << [transition:child, targetName:transitionAttributes.to]
 				parent.graph.edgesModifiable << child
 				transitionAttributes = null
@@ -226,6 +241,28 @@ class ModuleBuilder extends BuilderSupport {
 					parent.guardActionBlock = factory.createGuardActionBlockProxy()
 				}
 				parent.guardActionBlock.actionsModifiable << child
+				break
+			default:
+				assert false, "Parent: $parent, Child: $child"
+			}
+			break
+		case SimpleNodeSubject:
+			switch (child) {
+			case EdgeSubject:
+				if (transitionAttributes.selfLoop) {
+					child.source = parent
+					child.target = parent
+				} else if (transitionAttributes.incoming) {
+					child.target = parent
+					child.source = currentComponent.graph.nodes.find{it.name == transitionAttributes.from}
+				} else if (transitionAttributes.outgoing) {
+					child.source = parent
+					child.target = currentComponent.graph.nodes.find{it.name == transitionAttributes.to}
+				} else assert false
+				if (!child.target) transitionsThatNeedTargetState << [transition:child, targetName:transitionAttributes.to]
+				if (!child.source) transitionsThatNeedSourceState << [transition:child, sourceName:transitionAttributes.from]
+				currentComponent.graph.edgesModifiable << child
+				transitionAttributes = null
 				break
 			default:
 				assert false, "Parent: $parent, Child: $child"
@@ -251,16 +288,19 @@ class ModuleBuilder extends BuilderSupport {
 		switch(node) {
 		case(SimpleComponentSubject):
 			assert transitionsThatNeedTargetState.empty
+			assert transitionsThatNeedSourceState.empty
 			lastAddedState = null
 			initialState = null
 			defaultEvent = null
+			currentComponent = null
 			break
 		case (ModuleSubject):
 			assert !transitionAttributes
 			assert !initialState
 			assert transitionsThatNeedTargetState == []
-			assert !lastAddedState
+			assert transitionsThatNeedSourceState == []
 			assert !defaultEvent
+			assert !currentComponent
 			break
 		}
 	}
@@ -271,7 +311,7 @@ class ModuleBuilder extends BuilderSupport {
 			booleanVariable('y0', initial:false, marked:true)
 			integerVariable(name:['x0', 'x1'], range:1..4, initial:2, marked:2)
 			event(name:'e0')
-			event(name:['e1', 'e2'], controllable:false)
+			event(['e1', 'e2'], controllable:false)
 			proposition(name:'e3')
 			event('e4', ranges:[0..2])
 			event(name:'e5', ranges:[0..2, 0..3], controllable:false)
@@ -290,20 +330,17 @@ class ModuleBuilder extends BuilderSupport {
 						   events:['e1', 'e0'])
 			}
 			specification(name:'testcomponent2', deterministic:false) {
-				state('s0')
-				state(name:'s1', propositions:['e3'])
-				selfLoop(events:['e1'])
-				booleanVariable(name:'y1', initial:false)
-				transition(from:'s0',
-						   to:'s1',
-						   events:['e2'],
-						   guard:'!y0')
-				transition(from:'s0',
-						   to:'s1',
-						   events:['someEvents']) {
-					reset('y1')
+				state('s0') {
+					selfLoop(events:['e1'])
 				}
-				selfLoop(from:'s0', events:['e1'])
+				state(name:'s1', propositions:['e3']) {
+					selfLoop(events:['e1'])
+					incoming(from:'s0', events:['someEvents']) {
+						reset('y1')
+					}
+				}
+				booleanVariable(name:'y1', initial:false)
+				transition(from:'s0', to:'s1', event:'e2', guard:'!y0')
 			}
 			foreach('i', range:0..2) {
 				automaton('testcomponent3[i]', initialState:'q0') { //becomes plant by default 
@@ -316,8 +353,9 @@ class ModuleBuilder extends BuilderSupport {
 					           guard:'!y0 & x0 < 4') {
 						action('x0 += 1')
 					}
-					state(name:'q1', forbidden:true)
-					transition(to:'q0', events:['e1', 'e0'])
+					state(name:'q1', forbidden:true) {
+						outgoing(to:'q0', events:['e1', 'e0'])
+					}
 				}
 				foreach(name:'j', range:0..3) {
 					automaton(name:'testcomponent4[i][j]', initialState:'q0', isSpecification:true) {
@@ -360,10 +398,10 @@ class ModuleBuilder extends BuilderSupport {
 		     it.labelBlock.eventList.name,
 		     it.guardActionBlock?.guards?.size() == 1 ? it.guardActionBlock.guards[0].toString() : null,
 		     it.guardActionBlock?.actions?.plainText]
-		} == [['s1', 's1', ['e1'], null, null],
-		      ['s0', 's1', ['e2'], '!y0', []],
+		} == [['s0', 's0', ['e1'], null, null], 
+		      ['s1', 's1', ['e1'], null, null],
 		      ['s0', 's1', ['someEvents'], null, ['y1 = 0']],
-		      ['s0', 's0', ['e1'], null, null]]
+		      ['s0', 's1', ['e2'], '!y0', []]]
 		module
 	}
 }

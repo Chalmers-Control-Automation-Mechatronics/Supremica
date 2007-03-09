@@ -28,22 +28,27 @@ class Util {
 
 	public static assertGeneratedModuleEqualsManual(ModuleProxy generatedModule, ModuleProxy manualModule) {
 		def generated, manual
-		assert ProxyTools.isEqualListByContents(generated = generatedModule.eventDeclList, manual = manualModule.eventDeclList), "\ngenerated:$generated\nmanual   :$manual"
+		assert ProxyTools.isEqualListByContents(generated = generatedModule.eventDeclList, manual = manualModule.eventDeclList), "\ngenerated:$generated\nmanual   :$manual\n"
 		def generatedComponents = generatedModule.componentList.grep(SimpleComponentProxy.class) + generatedModule.componentList.grep(ForeachComponentProxy.class).body 
 		def manualComponents = manualModule.componentList.grep(SimpleComponentProxy.class) + manualModule.componentList.grep(ForeachComponentProxy.class).body 
-		assert ProxyTools.isEqualListByContents(generated = generatedComponents.graph.nodes, manual = manualComponents.graph.nodes), "\ngenerated:$generated\nmanual   :$manual"
-		assert ProxyTools.isEqualListByContents(generated = generatedComponents.graph.edges.labelBlock, manual = manualComponents.graph.edges.labelBlock), "\ngenerated:$generated\nmanual   :$manual"
-		assert ProxyTools.isEqualListByContents(generated = generatedComponents.graph.edges.source, manual = manualComponents.graph.edges.source), "\ngenerated:$generated\nmanual   :$manual"
-		assert ProxyTools.isEqualListByContents(generated = generatedComponents.graph.edges.target, manual = manualComponents.graph.edges.target), "\ngenerated:$generated\nmanual   :$manual"
-		assert ProxyTools.isEqualListByContents(generated = generatedComponents.graph.edges.guardActionBlock.findAll{it}.guards, manual = manualComponents.graph.edges.guardActionBlock.findAll{it}.guards), "\ngenerated:$generated\nmanual   :$manual"
-		assert ProxyTools.isEqualListByContents(generated = generatedComponents.graph.edges.guardActionBlock.findAll{it}.actions, manual = manualComponents.graph.edges.guardActionBlock.findAll{it}.actions), "\ngenerated:$generated\nmanual   :$manual"
-		assert ProxyTools.isEqualListByContents(generated = generatedComponents.graph.edges.guardActionBlock, manual = manualComponents.graph.edges.guardActionBlock), "\ngenerated:$generated\nmanual   :$manual"
-		assert ProxyTools.isEqualListByContents(generated = generatedComponents.graph.edges, manual = manualComponents.graph.edges), "\ngenerated:$generated\nmanual   :$manual"
-		assert ProxyTools.isEqualListByContents(generated = generatedComponents.graph, manual = manualComponents.graph), "\ngenerated:$generated\nmanual   :$manual"
-		assert ProxyTools.isEqualListByContents(generated = generatedComponents.variables, manual = manualComponents.variables), "\ngenerated:$generated\nmanual   :$manual"
-		assert ProxyTools.isEqualListByContents(generated = generatedModule.componentList, manual = manualModule.componentList), "\ngenerated:$generated\nmanual   :$manual"
-		assert ProxyTools.isEqualListByContents(generated = generatedModule.eventAliasList.expression.eventList, manual = manualModule.eventAliasList.expression.eventList), "\ngenerated:$generated\nmanual   :$manual"
-		assert ProxyTools.isEqualListByContents(generated = generatedModule.eventAliasList, manual = manualModule.eventAliasList), "\ngenerated:$generated\nmanual   :$manual"
+		assert (generated = generatedComponents.graph.nodes.name) == (manual = manualComponents.graph.nodes.name), "\ngenerated:$generated\nmanual   :$manual\n"
+		assert ProxyTools.isEqualListByContents(generated = generatedComponents.graph.nodes.propositions, manual = manualComponents.graph.nodes.propositions), "\ngenerated:$generated\nmanual   :$manual\n"
+		assert ProxyTools.isEqualListByContents(generated = generatedComponents.graph.nodes, manual = manualComponents.graph.nodes), "\ngenerated:$generated\nmanual   :$manual\n"
+		assert ProxyTools.isEqualListByContents(generated = generatedComponents.graph.edges.labelBlock, manual = manualComponents.graph.edges.labelBlock), "\ngenerated:$generated\nmanual   :$manual\n"
+		assert ProxyTools.isEqualListByContents(generated = generatedComponents.graph.edges.source, manual = manualComponents.graph.edges.source), "\ngenerated:$generated\nmanual   :$manual\n"
+		assert ProxyTools.isEqualListByContents(generated = generatedComponents.graph.edges.target, manual = manualComponents.graph.edges.target), "\ngenerated:$generated\nmanual   :$manual\n"
+		assert ProxyTools.isEqualListByContents(generated = generatedComponents.graph.edges.guardActionBlock.findAll{it}.guards, manual = manualComponents.graph.edges.guardActionBlock.findAll{it}.guards), "\ngenerated:$generated\nmanual   :$manual\n"
+		assert ProxyTools.isEqualListByContents(generated = generatedComponents.graph.edges.guardActionBlock.findAll{it}.actions, manual = manualComponents.graph.edges.guardActionBlock.findAll{it}.actions), "\ngenerated:$generated\nmanual   :$manual\n"
+		assert ProxyTools.isEqualListByContents(generated = generatedComponents.graph.edges.guardActionBlock, manual = manualComponents.graph.edges.guardActionBlock), "\ngenerated:$generated\nmanual   :$manual\n"
+		assert ProxyTools.isEqualListByContents(generated = generatedComponents.graph.edges, manual = manualComponents.graph.edges), "\ngenerated:$generated\nmanual   :$manual\n"
+		assert (generated = generatedComponents.graph.deterministic) == (manual = manualComponents.graph.deterministic), "\ngenerated:$generated\nmanual   :$manual\n"
+		assert ProxyTools.isEqualListByContents(generated = generatedComponents.graph, manual = manualComponents.graph), "\ngenerated:$generated\nmanual   :$manual\n"
+		assert ProxyTools.isEqualListByContents(generated = generatedComponents.variables, manual = manualComponents.variables), "\ngenerated:$generated\nmanual   :$manual\n"
+		assert (generated = generatedModule.componentList.name) == (manual = manualModule.componentList.name), "\ngenerated:$generated\nmanual   :$manual\n"
+		assert ProxyTools.isEqualListByContents(generated = generatedModule.componentList, manual = manualModule.componentList), "\ngenerated:$generated\nmanual   :$manual\n"
+		assert ProxyTools.isEqualListByContents(generated = generatedModule.eventAliasList.expression.eventList, manual = manualModule.eventAliasList.expression.eventList), "\ngenerated:$generated\nmanual   :$manual\n"
+		assert ProxyTools.isEqualListByContents(generated = generatedModule.eventAliasList, manual = manualModule.eventAliasList), "\ngenerated:$generated\nmanual   :$manual\n"
+		assert generatedModule.name == manualModule.name, "\ngenerated:${generatedModule.name}\nmanual:   ${manualModule.name}\n"
 		assert generatedModule.equalsByContents(manualModule)
 	}
 	
@@ -64,5 +69,4 @@ class Util {
 			ide.visible = true
 			ide.installContainer(module)
 	}
-
 }
