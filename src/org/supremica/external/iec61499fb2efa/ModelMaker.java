@@ -22,13 +22,13 @@
 /*
  * @author Goran Cengic
  */
-package net.sourceforge.fuber.util;
+package org.supremica.external.iec61499fb2efa;
 
 import java.lang.System;
 import java.lang.Math;
 
 
-class EFAModelMaker
+class ModelMaker
 {
     public static void main(String[] args)
     {
