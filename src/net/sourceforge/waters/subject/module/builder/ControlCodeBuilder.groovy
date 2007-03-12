@@ -30,7 +30,7 @@ class Converter {
 	final static DO_CONTROL_SIGNAL_CHANGE_EVENT_NAME = 'doSignalChange'
 	final static SKIP_CONTROL_SIGNAL_CHANGE_EVENT_NAME = 'skipSignalChange'
 	final static TIMEOUT_EVENTS_ALIAS_NAME = 'timeoutEvent'
-	final static SENSOR_EVENTS_ALIAS_NAME = 'sensorEvent'
+	final static PROCESS_EVENTS_ALIAS_NAME = 'processEvent'
 	final static CONTROL_UNIT_PLANT_NAME = 'ControlUnit'
 	static final DEFAULT_PROCESS_PLANT_NAME = 'Process'
 	static final SEPARATOR_PATTERN = /\./
@@ -61,28 +61,35 @@ class Application extends Scope {
 	List variables = []
 	MainProgram mainProgram
 	Process process
-	def addToModule(ModuleSubject module, boolean generateDefaultProcessModel = true) {
+	private addDefaultProcessModel(ModuleBuilder mb) {
+		mb.event(inputs.collect{it.formatEventName()}, controllable:false)
+		mb.eventAlias(Converter.PROCESS_EVENTS_ALIAS_NAME, events:inputs.collect{it.formatEventName()})
+		mb.plant(Converter.DEFAULT_PROCESS_PLANT_NAME) {
+			state('q0', marked:true) {
+				inputs.each{input -> mb.selfLoop(event:input.formatEventName()){mb.action(Converter.toSupremicaSyntax("${input.name} := not ${input.name}"))}}
+			}
+		}
+	}
+
+	def addToModule(ModuleSubject module) {
 		ModuleBuilder mb = new ModuleBuilder()
 		mb.module(module) {
 			[*inputs, *outputs, *variables].grep{it}.each { variable ->
 				mb.booleanVariable(variable.name.toSupremicaSyntax(), initial:variable.value, marked:variable.value ? true : false)
 			}
 			event(Converter.SCAN_CYCLE_EVENT_NAME, controllable:false)
-			event(Converter.PROCESS_SCAN_CYCLE_EVENT_NAME, controllable:false)
-			event(inputs.collect{it.formatEventName()}, controllable:false)
-			eventAlias(Converter.SENSOR_EVENTS_ALIAS_NAME, events:inputs.collect{it.formatEventName()})
-			eventAlias(Converter.TIMEOUT_EVENTS_ALIAS_NAME, events:[])
 			booleanVariable(Converter.END_OF_SCANCYCLE_VARIABLE_NAME, marked:true)
-			plant(Converter.DEFAULT_PROCESS_PLANT_NAME) {
-				state('q0', marked:true) {
-					inputs.each{input -> mb.selfLoop(event:input.formatEventName()){mb.action(Converter.toSupremicaSyntax("${input.name} := not ${input.name}"))}}
-				}
+			if (process) {
+				event(Converter.PROCESS_SCAN_CYCLE_EVENT_NAME, controllable:false)
+				eventAlias(Converter.PROCESS_EVENTS_ALIAS_NAME, events:[Converter.PROCESS_SCAN_CYCLE_EVENT_NAME])
+			} else {
+				addDefaultProcessModel(mb)
 			}
 			plant(Converter.CONTROL_UNIT_PLANT_NAME) {
 				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) 
 				transition(event:Converter.SCAN_CYCLE_EVENT_NAME) { mb.set(Converter.END_OF_SCANCYCLE_VARIABLE_NAME) }
 				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, events:[Converter.SENSOR_EVENTS_ALIAS_NAME, Converter.TIMEOUT_EVENTS_ALIAS_NAME]) {
+					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, events:[Converter.PROCESS_EVENTS_ALIAS_NAME]) {
 						reset(Converter.END_OF_SCANCYCLE_VARIABLE_NAME)
 					}
 				}
@@ -91,8 +98,8 @@ class Application extends Scope {
 			process?.addToModule(mb)
 		}
 	}
-	def toAutomata(boolean generateDefaultProcessModel = true) {
-		addToModule(new ModuleBuilder().module(name.toSupremicaSyntax()), generateDefaultProcessModel)
+	def toAutomata() {
+		addToModule(new ModuleBuilder().module(name.toSupremicaSyntax()))
 	}
 }
 
@@ -120,7 +127,7 @@ class Process extends Scope {
 	List functionBlockInstances  = []
 	def addToModule(ModuleBuilder mb) {
 		functionBlockInstances.each { it.addToModule(mb) }
-		sequences.each { it.addToModule(mb, Converter.PROCESS_SCAN_CYCLE_EVENT_NAME) }
+		sequences.each { it.addToModule(mb, Converter.PROCESS_EVENTS_ALIAS_NAME) }
 	}
 }
 
@@ -141,8 +148,8 @@ class Sequence extends Scope {
 		mb.plant(supremicaName, defaultEvent:scanEvent, deterministic:false) {
 			steps.each { step ->
 				mb.state(step.name.text, marked:true) {
+					selfLoop(guard:new Expression("not ((${transitions.findAll{it.from == step.name}.guard.text.join(') or (')}))").toSupremicaSyntax())
 					transitions.findAll{it.from == step.name}.each { outgoing ->
-						mb.selfLoop(guard:"!(${outgoing.guard.toSupremicaSyntax()})")
 						mb.outgoing(to:outgoing.to.toSupremicaSyntax(), guard:outgoing.guard.toSupremicaSyntax()) {
 							def targetStep = steps.find{it.name==outgoing.to}
 							targetStep.resetQualifiers.each{mb.reset(new IdentifierExpression(it.name).toSupremicaSyntax(this))}
@@ -182,11 +189,8 @@ class TimerOn extends Named {
 	static final defaultAttr = 'name'
 	static final parentAttr = 'functionBlockInstances'
 	static final isScope = false
-	def formatTimeoutEventName() { Converter.toSupremicaSyntax("${name}_true") }
 	def addToModule(ModuleBuilder mb) {
 		mb.booleanVariable(Converter.toSupremicaSyntax("${name}.Q"), initial:false, marked: false)
-		mb.event(Converter.toSupremicaSyntax("${name}_true"), controllable:false)
-		mb.eventAlias(Converter.TIMEOUT_EVENTS_ALIAS_NAME, events:[formatTimeoutEventName()])
 		mb.plant(Converter.toSupremicaSyntax("TON_$name"), defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
 			state('ready', marked:true) {
 				selfLoop(guard:Converter.toSupremicaSyntax("not (${input})"))
@@ -195,7 +199,7 @@ class TimerOn extends Named {
 			state('running', marked:true) {
 				selfLoop(guard:Converter.toSupremicaSyntax(input))
 				outgoing(guard:Converter.toSupremicaSyntax("not (${input})"), to:'ready')
-				outgoing(to:'elapsed', event:formatTimeoutEventName()) { mb.set(Converter.toSupremicaSyntax("${name}.Q")) }
+				outgoing(to:'elapsed') { mb.set(Converter.toSupremicaSyntax("${name}.Q")) }
 			}
 			state('elapsed', marked:true) {
 				selfLoop(guard:Converter.toSupremicaSyntax(input))
@@ -372,13 +376,12 @@ class Scope extends Named {
 class ControlCodeBuilder extends BuilderSupport {
 
 	static void main(args) {
-		def program = testBuilder()
+		testBuilder(true)
 		//builder.saveModuleToFile()
-		Util.openModuleInSupremica(program.toAutomata())
 	}
 	static {
 		println "controlcode builder test" 
-		testBuilder()
+		testBuilder(false)
 	}
 	
 	def currentScope = null
@@ -472,250 +475,265 @@ class ControlCodeBuilder extends BuilderSupport {
 		if (node == currentScope) currentScope = currentScope.parentScope
 	}
 	
-	public static testBuilder() {
-		def controlCodeBuilder = new ControlCodeBuilder();
-		def program = controlCodeBuilder.application(name:'testprogram', deferred:true) {
-			input 'iStart'
-			input 'iBallInGate'
-			input 'iBallDown'
-			input 'iBallUp'
-			input('iLiftDown', value:true)
-			input 'iLiftUp'
-			input 'iSmallBall'
-			input 'iBigBall'
-			output 'qInGate'
-			output 'qOutGate'
-			output 'qUp'
-			output 'qOut'
-			output 'qMeasure'
-			variable 'mBallIsBig'
-			variable 'mBallBetweenGateAndLift'
-			mainProgram {
-				TON(name:'Measuring_T_ge_1000', input:'BallMeasure.Measuring.X')
-				SR('qInGate', set:'iStart and not iBallInGate and not qOutGate', reset:'iBallInGate')
-				ASSIGN('qOutGate', input:'iBallInGate and iLiftDown and S0 and not mBallBetweenGateAndLift')
-				sequence(name:'Lift') {
-					STEP('S0'){
-						R('qUp')
+	public static testBuilder(openInSupremica) {
+		def generateTestProgram = {defaultProcess ->
+			def controlCodeBuilder = new ControlCodeBuilder();
+			controlCodeBuilder.application(name:'testprogram', deferred:true) {
+				input 'iStart'
+				input 'iBallInGate'
+				input 'iBallDown'
+				input 'iBallUp'
+				input('iLiftDown', value:true)
+				input 'iLiftUp'
+				input 'iSmallBall'
+				input 'iBigBall'
+				output 'qInGate'
+				output 'qOutGate'
+				output 'qUp'
+				output 'qOut'
+				output 'qMeasure'
+				variable 'mBallIsBig'
+				variable 'mBallBetweenGateAndLift'
+				mainProgram {
+					TON(name:'Measuring_T_ge_1000', input:'BallMeasure.Measuring.X')
+					SR('qInGate', set:'iStart and not iBallInGate and not qOutGate', reset:'iBallInGate')
+					ASSIGN('qOutGate', input:'iBallInGate and iLiftDown and S0 and not mBallBetweenGateAndLift')
+					sequence(name:'Lift') {
+						STEP('S0'){
+							R('qUp')
+						}
+						'iBallDown'()
+						Step('S1'){S('qUp')}
+						'BallMeasure.Done.X'()
+						Step('S2'){N('qOut')}
+						'not iBallUp'()
 					}
-					'iBallDown'()
-					Step('S1'){S('qUp')}
-					'BallMeasure.Done.X'()
-					Step('S2'){N('qOut')}
-					'not iBallUp'()
-				}
-				SEQuence('BallMeasure') {
-					STEP('Init')
-					TRAN 'iBallUp'
-					STEP('Measuring') {S('qMeasure')}
-					'Measuring_T_ge_1000.Q AND iBigBall'()
-					TRAN('Measuring_T_ge_1000.Q AND iSmallBall', to:'SmallBallFound')
-					STEP('BigBallFound') {S('mBallIsBig')}
-					transition('true', to:'Done')
-					STEP('SmallBallFound') {R('mBallIsBig')}
-					'true'()
-					STEP('Done') {Reset('qMeasure')}
-					'!iBallUp'()
-				}
-			}
-			process {
-				sequence(name:'Lift') {
-					STEP('Down') {N('iLiftDown')}
-					'qUp'()
-					STEP('Middle')
-					'not qUp'(to:'Down')
-					'qUp'()
-					STEP('Up') {N('iLiftUp')}
-					'not qUp'(to:'Middle')
-				}
-			}
-		}
-		def moduleBuilder = new ModuleBuilder()
-		def manualModule = moduleBuilder.module('testprogram') {
-			booleanVariable(['iStart', 'iBallInGate', 'iBallDown', 'iBallUp'], marked:false)
-			booleanVariable('iLiftDown', initial:true, marked:true)
-			booleanVariable('iLiftUp', marked:false)
-			booleanVariable('iSmallBall', marked:false)
-			booleanVariable('iBigBall', marked:false)
-			booleanVariable(['qInGate', 'qOutGate', 'qUp', 'qOut', 'qMeasure'], marked:false)
-			booleanVariable(['mBallIsBig', 'mBallBetweenGateAndLift'], marked:false)
-			booleanVariable(Converter.END_OF_SCANCYCLE_VARIABLE_NAME, marked:true)
-			booleanVariable('Measuring_T_ge_1000_Q', marked:false)
-			booleanVariable('Lift_S0_X', initial:true, marked:true)
-			booleanVariable(['Lift_S1_X', 'Lift_S2_X'], marked:false)
-			booleanVariable('BallMeasure_Init_X', initial:true, marked:true)
-			booleanVariable(['BallMeasure_Measuring_X', 'BallMeasure_BigBallFound_X', 'BallMeasure_SmallBallFound_X', 'BallMeasure_Done_X'], marked:false)
-			booleanVariable('Process_Lift_Down_X', initial:true, marked:true)
-			booleanVariable(['Process_Lift_Middle_X', 'Process_Lift_Up_X'], initial:false, marked:false)
-			event(Converter.SCAN_CYCLE_EVENT_NAME, controllable:false)
-			event(Converter.PROCESS_SCAN_CYCLE_EVENT_NAME, controllable:false)
-			event(['iStart_change', 'iBallInGate_change', 'iBallDown_change', 'iBallUp_change', 'iLiftDown_change', 'iLiftUp_change', 'iSmallBall_change', 'iBigBall_change'], controllable:false)
-			event('Measuring_T_ge_1000_true', controllable:false)
-			eventAlias(name:'sensorEvent', events:['iStart_change', 'iBallInGate_change', 'iBallDown_change', 'iBallUp_change', 'iLiftDown_change', 'iLiftUp_change', 'iSmallBall_change', 'iBigBall_change'])
-			eventAlias(name:'timeoutEvent', events:['Measuring_T_ge_1000_true'])
-			plant(Converter.DEFAULT_PROCESS_PLANT_NAME) {
-				state('q0', marked:true) {
-					selfLoop(event:'iStart_change') {action('iStart = !iStart')}
-					selfLoop(event:'iBallInGate_change') {action('iBallInGate = !iBallInGate')}
-					selfLoop(event:'iBallDown_change') {action('iBallDown = !iBallDown')}
-					selfLoop(event:'iBallUp_change') {action('iBallUp = !iBallUp')}
-					selfLoop(event:'iLiftDown_change') {action('iLiftDown = !iLiftDown')}
-					selfLoop(event:'iLiftUp_change') {action('iLiftUp = !iLiftUp')}
-					selfLoop(event:'iSmallBall_change') {action('iSmallBall = !iSmallBall')}
-					selfLoop(event:'iBigBall_change') {action('iBigBall = !iBigBall')}
-				}
-			}
-			plant(Converter.CONTROL_UNIT_PLANT_NAME) {
-				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME, event:Converter.SCAN_CYCLE_EVENT_NAME) {
-						set(Converter.END_OF_SCANCYCLE_VARIABLE_NAME)
+					SEQuence('BallMeasure') {
+						STEP('Init')
+						TRAN 'iBallUp'
+						STEP('Measuring') {S('qMeasure')}
+						'Measuring_T_ge_1000.Q AND iBigBall'()
+						TRAN('Measuring_T_ge_1000.Q AND iSmallBall', to:'SmallBallFound')
+						STEP('BigBallFound') {S('mBallIsBig')}
+						transition('true', to:'Done')
+						STEP('SmallBallFound') {R('mBallIsBig')}
+						'true'()
+						STEP('Done') {Reset('qMeasure')}
+						'!iBallUp'()
 					}
 				}
-				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, events:[Converter.SENSOR_EVENTS_ALIAS_NAME, Converter.TIMEOUT_EVENTS_ALIAS_NAME]) {
-						reset(Converter.END_OF_SCANCYCLE_VARIABLE_NAME)
-					}
-				}
-			}
-			plant('TON_Measuring_T_ge_1000', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
-				state('ready', marked:true) {
-					selfLoop(guard:'!(BallMeasure_Measuring_X)')
-					outgoing(to:'running', guard:'BallMeasure_Measuring_X')
-				}
-				state('running', marked:true) {
-					selfLoop(guard:'BallMeasure_Measuring_X')
-					outgoing(to:'ready', guard:'!(BallMeasure_Measuring_X)')
-					outgoing(to:'elapsed', event:'Measuring_T_ge_1000_true') { set('Measuring_T_ge_1000_Q') }
-				}
-				state('elapsed', marked:true) {
-					selfLoop(guard:'BallMeasure_Measuring_X')
-					outgoing(to:'ready', guard:'!(BallMeasure_Measuring_X)') { reset('Measuring_T_ge_1000_Q') }
-				}
-			}
-			plant('SR_qInGate', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
-				state('false', marked:true) {
-					outgoing(to:'true', guard:'iStart & !iBallInGate & !qOutGate') { set('qInGate') }
-					selfLoop(guard:'!(iStart & !iBallInGate & !qOutGate)') { reset('qInGate') }
-				}
-				state('true', marked:true) {
-					outgoing(to:'false', guard:'iBallInGate & !(iStart & !iBallInGate & !qOutGate)') { reset('qInGate') }
-					selfLoop(guard:'!(iBallInGate)') { set('qInGate') }
-				}
-			}
-			plant('ASSIGN_qOutGate', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
-				state('q0', marked:true) {
-					selfLoop(guard:'iBallInGate & iLiftDown & S0 & !mBallBetweenGateAndLift') { set('qOutGate') }
-					selfLoop(guard:'!(iBallInGate & iLiftDown & S0 & !mBallBetweenGateAndLift)') { reset('qOutGate') }
-				}
-			}
-			plant('Lift', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
-				state('S0', marked:true) {
-					selfLoop(guard:'!(iBallDown)')
-				}
-				transition(guard:'iBallDown') {
-					set('qUp')
-					reset('Lift_S0_X')
-					set('Lift_S1_X')
-				}
-				state('S1', marked:true) {
-					selfLoop(guard:'!(BallMeasure_Done_X)')
-				}
-				transition(guard:'BallMeasure_Done_X') {
-					set('qOut')
-					reset('Lift_S1_X')
-					set('Lift_S2_X')
-				}
-				state('S2', marked:true) {
-					selfLoop(guard:'!(!iBallUp)')
-					outgoing(to:'S0', guard:'!iBallUp') {
-						reset('qUp')
-						reset('qOut')
-						reset('Lift_S2_X')
-						set('Lift_S0_X')
-					}
-				}
-			}
-			plant(name:'BallMeasure', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
-				state('Init', marked:true) {
-					selfLoop(guard:'!(iBallUp)')
-				}
-				transition(guard:'iBallUp') {
-					set('qMeasure')
-					reset('BallMeasure_Init_X')
-					set('BallMeasure_Measuring_X')
-				}
-				state('Measuring', marked:true) {
-					selfLoop(guard:'!(Measuring_T_ge_1000_Q & iBigBall)')
-					outgoing(to:'BigBallFound', guard:'Measuring_T_ge_1000_Q & iBigBall') {
-						set('mBallIsBig')
-						reset('BallMeasure_Measuring_X')
-						set('BallMeasure_BigBallFound_X')
-					}
-					selfLoop(guard:'!(Measuring_T_ge_1000_Q & iSmallBall)')
-					outgoing(to:'SmallBallFound', guard:'Measuring_T_ge_1000_Q & iSmallBall') {
-						reset('mBallIsBig')
-						reset('BallMeasure_Measuring_X')
-						set('BallMeasure_SmallBallFound_X')
-					}
-				}
-				state('BigBallFound', marked:true) {
-					selfLoop(guard:'!(true)')
-					outgoing(to:'Done', guard:'true'){
-						reset('qMeasure')
-						reset('BallMeasure_BigBallFound_X')
-						set('BallMeasure_Done_X')
-					}
-				}
-				state('SmallBallFound', marked:true) {
-					selfLoop(guard:'!(true)')
-					outgoing(to:'Done', guard:'true') {
-						reset('qMeasure')
-						reset('BallMeasure_SmallBallFound_X')
-						set('BallMeasure_Done_X')
-					}
-				}
-				state('Done', marked:true) {
-					selfLoop(guard:'!(!iBallUp)')
-					outgoing(guard:'!iBallUp', to:'Init') {
-						reset('BallMeasure_Done_X')
-						set('BallMeasure_Init_X')
-					}
-				}
-			}
-			plant('Process_Lift', defaultEvent:Converter.PROCESS_SCAN_CYCLE_EVENT_NAME, deterministic:false) {
-				state('Down', marked:true) {
-					selfLoop(guard:'!(qUp)')
-				}
-				transition(guard:'qUp') {
-					reset('iLiftDown')
-					reset('Process_Lift_Down_X')
-					set('Process_Lift_Middle_X')
-				}
-				state('Middle', marked:true) {
-					selfLoop(guard:'!(!qUp)')
-					outgoing(guard:'!qUp', to:'Down') {
-						set('iLiftDown')
-						reset('Process_Lift_Middle_X')
-						set('Process_Lift_Down_X')
-					}
-					selfLoop(guard:'!(qUp)')
-					outgoing(to:'Up', guard:'qUp') {
-						set('iLiftUp')
-						reset('Process_Lift_Middle_X')
-						set('Process_Lift_Up_X')
-					}
-				}
-				state('Up', marked:true) {
-					selfLoop(guard:'!(!qUp)')
-					outgoing(guard:'!qUp', to:'Middle') {
-						reset('iLiftUp')
-						reset('Process_Lift_Up_X')
-						set('Process_Lift_Middle_X')
+				if (!defaultProcess) {
+					process {
+						sequence(name:'Lift') {
+							STEP('Down') {N('iLiftDown')}
+							'qUp'()
+							STEP('Middle')
+							'not qUp'(to:'Down')
+							'qUp'()
+							STEP('Up') {N('iLiftUp')}
+							'not qUp'(to:'Middle')
+						}
 					}
 				}
 			}
 		}
-		Util.assertGeneratedModuleEqualsManual(program.toAutomata(), manualModule)
-		program
+		def correctProgram = { defaultProcess ->
+			def moduleBuilder = new ModuleBuilder()
+			moduleBuilder.module('testprogram') {
+				booleanVariable(['iStart', 'iBallInGate', 'iBallDown', 'iBallUp'], marked:false)
+				booleanVariable('iLiftDown', initial:true, marked:true)
+				booleanVariable('iLiftUp', marked:false)
+				booleanVariable('iSmallBall', marked:false)
+				booleanVariable('iBigBall', marked:false)
+				booleanVariable(['qInGate', 'qOutGate', 'qUp', 'qOut', 'qMeasure'], marked:false)
+				booleanVariable(['mBallIsBig', 'mBallBetweenGateAndLift'], marked:false)
+				booleanVariable(Converter.END_OF_SCANCYCLE_VARIABLE_NAME, marked:true)
+				booleanVariable('Measuring_T_ge_1000_Q', marked:false)
+				booleanVariable('Lift_S0_X', initial:true, marked:true)
+				booleanVariable(['Lift_S1_X', 'Lift_S2_X'], marked:false)
+				booleanVariable('BallMeasure_Init_X', initial:true, marked:true)
+				booleanVariable(['BallMeasure_Measuring_X', 'BallMeasure_BigBallFound_X', 'BallMeasure_SmallBallFound_X', 'BallMeasure_Done_X'], marked:false)
+				booleanVariable('Process_Lift_Down_X', initial:true, marked:true)
+				booleanVariable(['Process_Lift_Middle_X', 'Process_Lift_Up_X'], initial:false, marked:false)
+				event(Converter.SCAN_CYCLE_EVENT_NAME, controllable:false)
+				event(Converter.PROCESS_SCAN_CYCLE_EVENT_NAME, controllable:false)
+				if (defaultProcess) event(['iStart_change', 'iBallInGate_change', 'iBallDown_change', 'iBallUp_change', 'iLiftDown_change', 'iLiftUp_change', 'iSmallBall_change', 'iBigBall_change'], controllable:false)
+				eventAlias(name:Converter.PROCESS_EVENTS_ALIAS_NAME, events:[Converter.PROCESS_SCAN_CYCLE_EVENT_NAME])//events:['iStart_change', 'iBallInGate_change', 'iBallDown_change', 'iBallUp_change', 'iLiftDown_change', 'iLiftUp_change', 'iSmallBall_change', 'iBigBall_change'])
+				if (defaultProcess) {
+					plant(Converter.DEFAULT_PROCESS_PLANT_NAME) {
+						state('q0', marked:true) {
+							selfLoop(event:'iStart_change') {action('iStart = !iStart')}
+							selfLoop(event:'iBallInGate_change') {action('iBallInGate = !iBallInGate')}
+							selfLoop(event:'iBallDown_change') {action('iBallDown = !iBallDown')}
+							selfLoop(event:'iBallUp_change') {action('iBallUp = !iBallUp')}
+							selfLoop(event:'iLiftDown_change') {action('iLiftDown = !iLiftDown')}
+							selfLoop(event:'iLiftUp_change') {action('iLiftUp = !iLiftUp')}
+							selfLoop(event:'iSmallBall_change') {action('iSmallBall = !iSmallBall')}
+							selfLoop(event:'iBigBall_change') {action('iBigBall = !iBigBall')}
+						}
+					}
+				}
+				plant(Converter.CONTROL_UNIT_PLANT_NAME) {
+					state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
+						outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME, event:Converter.SCAN_CYCLE_EVENT_NAME) {
+							set(Converter.END_OF_SCANCYCLE_VARIABLE_NAME)
+						}
+					}
+					state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
+						outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, events:[Converter.PROCESS_EVENTS_ALIAS_NAME]) {
+							reset(Converter.END_OF_SCANCYCLE_VARIABLE_NAME)
+						}
+					}
+				}
+				plant('TON_Measuring_T_ge_1000', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
+					state('ready', marked:true) {
+						selfLoop(guard:'!(BallMeasure_Measuring_X)')
+						outgoing(to:'running', guard:'BallMeasure_Measuring_X')
+					}
+					state('running', marked:true) {
+						selfLoop(guard:'BallMeasure_Measuring_X')
+						outgoing(to:'ready', guard:'!(BallMeasure_Measuring_X)')
+						outgoing(to:'elapsed') { set('Measuring_T_ge_1000_Q') }
+					}
+					state('elapsed', marked:true) {
+						selfLoop(guard:'BallMeasure_Measuring_X')
+						outgoing(to:'ready', guard:'!(BallMeasure_Measuring_X)') { reset('Measuring_T_ge_1000_Q') }
+					}
+				}
+				plant('SR_qInGate', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
+					state('false', marked:true) {
+						outgoing(to:'true', guard:'iStart & !iBallInGate & !qOutGate') { set('qInGate') }
+						selfLoop(guard:'!(iStart & !iBallInGate & !qOutGate)') { reset('qInGate') }
+					}
+					state('true', marked:true) {
+						outgoing(to:'false', guard:'iBallInGate & !(iStart & !iBallInGate & !qOutGate)') { reset('qInGate') }
+						selfLoop(guard:'!(iBallInGate)') { set('qInGate') }
+					}
+				}
+				plant('ASSIGN_qOutGate', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
+					state('q0', marked:true) {
+						selfLoop(guard:'iBallInGate & iLiftDown & S0 & !mBallBetweenGateAndLift') { set('qOutGate') }
+						selfLoop(guard:'!(iBallInGate & iLiftDown & S0 & !mBallBetweenGateAndLift)') { reset('qOutGate') }
+					}
+				}
+				plant('Lift', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
+					state('S0', marked:true) {
+						selfLoop(guard:'!(iBallDown)')
+					}
+					transition(guard:'iBallDown') {
+						set('qUp')
+						reset('Lift_S0_X')
+						set('Lift_S1_X')
+					}
+					state('S1', marked:true) {
+						selfLoop(guard:'!(BallMeasure_Done_X)')
+					}
+					transition(guard:'BallMeasure_Done_X') {
+						set('qOut')
+						reset('Lift_S1_X')
+						set('Lift_S2_X')
+					}
+					state('S2', marked:true) {
+						selfLoop(guard:'!(!iBallUp)')
+						outgoing(to:'S0', guard:'!iBallUp') {
+							reset('qUp')
+							reset('qOut')
+							reset('Lift_S2_X')
+							set('Lift_S0_X')
+						}
+					}
+				}
+				plant(name:'BallMeasure', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
+					state('Init', marked:true) {
+						selfLoop(guard:'!(iBallUp)')
+					}
+					transition(guard:'iBallUp') {
+						set('qMeasure')
+						reset('BallMeasure_Init_X')
+						set('BallMeasure_Measuring_X')
+					}
+					state('Measuring', marked:true) {
+						selfLoop(guard:'!((Measuring_T_ge_1000_Q & iBigBall) | (Measuring_T_ge_1000_Q & iSmallBall))')
+						outgoing(to:'BigBallFound', guard:'Measuring_T_ge_1000_Q & iBigBall') {
+							set('mBallIsBig')
+							reset('BallMeasure_Measuring_X')
+							set('BallMeasure_BigBallFound_X')
+						}
+						outgoing(to:'SmallBallFound', guard:'Measuring_T_ge_1000_Q & iSmallBall') {
+							reset('mBallIsBig')
+							reset('BallMeasure_Measuring_X')
+							set('BallMeasure_SmallBallFound_X')
+						}
+					}
+					state('BigBallFound', marked:true) {
+						selfLoop(guard:'!(true)')
+						outgoing(to:'Done', guard:'true'){
+							reset('qMeasure')
+							reset('BallMeasure_BigBallFound_X')
+							set('BallMeasure_Done_X')
+						}
+					}
+					state('SmallBallFound', marked:true) {
+						selfLoop(guard:'!(true)')
+						outgoing(to:'Done', guard:'true') {
+							reset('qMeasure')
+							reset('BallMeasure_SmallBallFound_X')
+							set('BallMeasure_Done_X')
+						}
+					}
+					state('Done', marked:true) {
+						selfLoop(guard:'!(!iBallUp)')
+						outgoing(guard:'!iBallUp', to:'Init') {
+							reset('BallMeasure_Done_X')
+							set('BallMeasure_Init_X')
+						}
+					}
+				}
+				if (!defualtProcess) {
+					plant('Process_Lift', defaultEvent:Converter.PROCESS_EVENTS_ALIAS_NAME, deterministic:false) {
+						state('Down', marked:true) {
+							selfLoop(guard:'!(qUp)')
+						}
+						transition(guard:'qUp') {
+							reset('iLiftDown')
+							reset('Process_Lift_Down_X')
+							set('Process_Lift_Middle_X')
+						}
+						state('Middle', marked:true) {
+							selfLoop(guard:'!((!qUp) | (qUp))')
+							outgoing(guard:'!qUp', to:'Down') {
+								set('iLiftDown')
+								reset('Process_Lift_Middle_X')
+								set('Process_Lift_Down_X')
+							}
+							outgoing(to:'Up', guard:'qUp') {
+								set('iLiftUp')
+								reset('Process_Lift_Middle_X')
+								set('Process_Lift_Up_X')
+							}
+						}
+						state('Up', marked:true) {
+							selfLoop(guard:'!(!qUp)')
+							outgoing(guard:'!qUp', to:'Middle') {
+								reset('iLiftUp')
+								reset('Process_Lift_Up_X')
+								set('Process_Lift_Middle_X')
+							}
+						}
+					}
+				}
+			}
+		}
+		def programWithManualProcess = generateTestProgram(false)
+		def programWithDefaultProcess = generateTestProgram(true)
+		def correctProgramWithManualProcess = correctProgram(false)
+		def correctProgramWithDefaultProcess = correctProgram(true)
+		
+		Util.assertGeneratedModuleEqualsManual(programWithManualProcess.toAutomata(), correctProgramWithManualProcess)
+		Util.assertGeneratedModuleEqualsManual(programWithDefaultProcess.toAutomata(), correctProgramWithDefaultProcess)
+		if (openInSupremica) {
+			Util.openModuleInSupremica(programWithManualProcess.toAutomata())
+			Util.openModuleInSupremica(programWithDefaultProcess.toAutomata())
+		}
 	}
 }
