@@ -254,9 +254,11 @@ class ModuleBuilder extends BuilderSupport {
 					child.target = parent
 				} else if (transitionAttributes.incoming) {
 					child.target = parent
+					assert transitionAttributes.from, transitionAttributes
 					child.source = currentComponent.graph.nodes.find{it.name == transitionAttributes.from}
 				} else if (transitionAttributes.outgoing) {
 					child.source = parent
+					assert transitionAttributes.to, transitionAttributes
 					child.target = currentComponent.graph.nodes.find{it.name == transitionAttributes.to}
 				} else assert false
 				if (!child.target) transitionsThatNeedTargetState << [transition:child, targetName:transitionAttributes.to]
@@ -287,8 +289,8 @@ class ModuleBuilder extends BuilderSupport {
 		}
 		switch(node) {
 		case(SimpleComponentSubject):
-			assert transitionsThatNeedTargetState.empty
-			assert transitionsThatNeedSourceState.empty
+			assert transitionsThatNeedTargetState.empty, 'Automaton ' << node.name << ' is lacking states ' << transitionsThatNeedTargetState.targetName << '. Existing states:' << node.graph.nodes.name
+			assert transitionsThatNeedSourceState.empty, 'Automaton ' << node.name << ' is lacking states ' << transitionsThatNeedSourceState.targetName << '. Existing states:' << node.graph.nodes.name
 			lastAddedState = null
 			initialState = null
 			defaultEvent = null
