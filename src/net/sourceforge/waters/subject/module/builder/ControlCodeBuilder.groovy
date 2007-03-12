@@ -36,7 +36,7 @@ class Converter {
 	static final SEPARATOR_PATTERN = /\./
 	static final SEPARATOR = '.'
 		
-	static String toSupremicaSyntax(String expr) {
+	private static String toSupremicaSyntax(String expr) {
 		String newExpr = expr
 		def replaceWordOp = {oldOp, newOp ->
 			newExpr.replaceAll(/(?i)\s*\b${oldOp}\b\s*/){"$newOp"}
@@ -66,7 +66,7 @@ class Application extends Scope {
 		mb.eventAlias(Converter.PROCESS_EVENTS_ALIAS_NAME, events:inputs.collect{it.formatEventName()})
 		mb.plant(Converter.DEFAULT_PROCESS_PLANT_NAME) {
 			state('q0', marked:true) {
-				inputs.each{input -> mb.selfLoop(event:input.formatEventName()){mb.action(Converter.toSupremicaSyntax("${input.name} := not ${input.name}"))}}
+				inputs.each{input -> mb.selfLoop(event:input.formatEventName()){mb.action(new Expression(this, "${input.name} := not ${input.name}").toSupremicaSyntax())}}
 			}
 		}
 	}
@@ -121,7 +121,7 @@ class Process extends Scope {
 	static final defaultAttr = null
 	static final parentAttr = 'process' 
 	Process() {
-		name = new IdentifierExpression('Process')
+		name = new IdentifierExpression(this, 'Process')
 	}
 	List sequences = []
 	List functionBlockInstances  = []
@@ -139,18 +139,19 @@ class Sequence extends Scope {
 	List transitions = []
 	def addToModule(ModuleBuilder mb, String scanEvent) {
 		steps.each { step ->
-			mb.booleanVariable(new IdentifierExpression(step, 'X').toSupremicaSyntax(), initial:step == steps[0], marked:step == steps[0])
+			mb.booleanVariable("${step.name.toSupremicaSyntax()}_X", initial:step == steps[0], marked:step == steps[0])
 		}
 		mb.plant(supremicaName, defaultEvent:scanEvent, deterministic:false) {
 			steps.each { step ->
 				mb.state(step.name.text, marked:true) {
-					selfLoop(guard:new Expression("not ((${transitions.findAll{it.from == step.name}.guard.text.join(') or (')}))").toSupremicaSyntax())
+					selfLoop(guard:new Expression(this, "!(${transitions.findAll{it.from == step.name}.guard.text.join(') and !(')})").toSupremicaSyntax())
 					transitions.findAll{it.from == step.name}.each { outgoing ->
-						mb.outgoing(to:outgoing.to.toSupremicaSyntax(), guard:outgoing.guard.toSupremicaSyntax()) {
+						mb.outgoing(to:outgoing.to.text, guard:outgoing.guard.toSupremicaSyntax()) {
 							def targetStep = steps.find{it.name==outgoing.to}
-							targetStep.resetQualifiers.each{mb.reset(new IdentifierExpression(it.name).toSupremicaSyntax(this))}
-							[*targetStep.setQualifiers, *targetStep.nonstoredQualifiers].grep{it}.each{mb.set(new IdentifierExpression(it.name).toSupremicaSyntax(this))}
-							step.nonstoredQualifiers.each{mb.reset(new IdentifierExpression(it.name).toSupremicaSyntax(this))}
+							targetStep.resetQualifiers.each{mb.reset(new IdentifierExpression(this, it.name).toSupremicaSyntax())}
+							[*targetStep.setQualifiers, *targetStep.nonstoredQualifiers].grep{it}.each{mb.set(new IdentifierExpression(this, it.name).toSupremicaSyntax())}
+							step.nonstoredQualifiers.each{mb.reset(new IdentifierExpression(this, it.name).toSupremicaSyntax())}
+							assert step.scope == step
 							reset(new IdentifierExpression(step, 'X').toSupremicaSyntax())
 							set(new IdentifierExpression(targetStep, 'X').toSupremicaSyntax())
 						}
@@ -161,7 +162,14 @@ class Sequence extends Scope {
 	}
 }
 
-class Step extends Named {
+class Step extends Scope {
+	Step() {
+		super()
+		def x = new Variable()
+		x.name = new IdentifierExpression(this, 'X')
+		x.scope = this
+		namedObjects << x
+	}
 	static final pattern = /(?i)step/
 	static final defaultAttr = 'name'
 	static final parentAttr = 'steps'
@@ -170,7 +178,7 @@ class Step extends Named {
 	List nonstoredQualifiers = []
 }
 
-class Transition extends Named {
+class Transition extends NamedImpl {
 	static final pattern = /(?i)tran(?:sition)?/
 	static final defaultAttr = 'guard'
 	static final parentAttr = 'transitions'
@@ -179,68 +187,74 @@ class Transition extends Named {
 	Expression guard
 }
 
-class TimerOn extends Named {
+class TimerOn extends Scope {
+	TimerOn() {
+		def q = new Output()
+		q.name = new IdentifierExpression(this, 'Q')
+		q.scope = this
+		namedObjects << q
+	}
 	String input
 	static final pattern = /(?i)ton|timerOn/
 	static final defaultAttr = 'name'
 	static final parentAttr = 'functionBlockInstances'
 	static final isScope = false
 	def addToModule(ModuleBuilder mb) {
-		mb.booleanVariable(Converter.toSupremicaSyntax("${name}.Q"), initial:false, marked: false)
-		mb.plant(Converter.toSupremicaSyntax("TON_$name"), defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
+		mb.booleanVariable(new Expression(this, "${name}.Q").toSupremicaSyntax(), initial:false, marked: false)
+		mb.plant("TON_${name.toSupremicaSyntax()}", defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
 			state('ready', marked:true) {
-				selfLoop(guard:Converter.toSupremicaSyntax("not (${input})"))
-				outgoing(to:'running', guard:Converter.toSupremicaSyntax(input))
+				selfLoop(guard:new Expression(this, "not (${input})").toSupremicaSyntax())
+				outgoing(to:'running', guard:new Expression(this, input).toSupremicaSyntax())
 			}
 			state('running', marked:true) {
-				selfLoop(guard:Converter.toSupremicaSyntax(input))
-				outgoing(guard:Converter.toSupremicaSyntax("not (${input})"), to:'ready')
-				outgoing(to:'elapsed') { mb.set(Converter.toSupremicaSyntax("${name}.Q")) }
+				selfLoop(guard:new Expression(this, input).toSupremicaSyntax())
+				outgoing(guard:new Expression(this, "not (${input})").toSupremicaSyntax(), to:'ready')
+				outgoing(to:'elapsed') { mb.set(new Expression(this, "${name}.Q").toSupremicaSyntax()) }
 			}
 			state('elapsed', marked:true) {
-				selfLoop(guard:Converter.toSupremicaSyntax(input))
-				outgoing(guard:Converter.toSupremicaSyntax("not (${input})"), to:'ready') { mb.reset(Converter.toSupremicaSyntax("${name}.Q")) }
+				selfLoop(guard:new Expression(this, input).toSupremicaSyntax())
+				outgoing(guard:new Expression(this, "not (${input})").toSupremicaSyntax(), to:'ready') { mb.reset(Converter.toSupremicaSyntax("${name}.Q")) }
 			}
 		}
 	}
 }
 
-class Assignment extends Named {
+class Assignment extends NamedImpl {
 	String input
 	static final pattern = /(?i)assign(?:ment)?/
 	static final defaultAttr = 'name'
 	static final parentAttr = 'functionBlockInstances'
 	static final isScope = false
 	def addToModule(ModuleBuilder mb) {
-		mb.plant(Converter.toSupremicaSyntax("ASSIGN_$name"), defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
+		mb.plant("ASSIGN_${name.toSupremicaSyntax()}", defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
 			state('q0', marked:true) {
-				selfLoop(guard:Converter.toSupremicaSyntax(input)) { set(name.toSupremicaSyntax()) }
-				selfLoop(guard:Converter.toSupremicaSyntax("not (${input})")) { reset(name.toSupremicaSyntax()) }
+				selfLoop(guard:new Expression(this, input).toSupremicaSyntax()) { set(name.toSupremicaSyntax()) }
+				selfLoop(guard:new Expression(this, "not (${input})").toSupremicaSyntax()) { reset(name.toSupremicaSyntax()) }
 			}
 		}
 	}
 }
 
-class SetReset extends Named {
+class SetReset extends NamedImpl {
 	String set
 	String reset
 	static final pattern = /(?i)SR/
 	static final defaultAttr = 'name'
 	static final parentAttr = 'functionBlockInstances'
 	def addToModule(ModuleBuilder mb) {
-		mb.plant(Converter.toSupremicaSyntax("SR_$name"), defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
+		mb.plant("SR_${name.toSupremicaSyntax()}", defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
 			state('false', marked:true) {
-				outgoing(to:'true', guard:Converter.toSupremicaSyntax(set)){ set(name.toSupremicaSyntax()) }
-				selfLoop(guard:new Expression("not (${set})").toSupremicaSyntax()) { reset(name.toSupremicaSyntax()) }
+				outgoing(to:'true', guard:new Expression(this, set).toSupremicaSyntax()){ set(name.toSupremicaSyntax()) }
+				selfLoop(guard:new Expression(this, "not (${set})").toSupremicaSyntax()) { reset(name.toSupremicaSyntax()) }
 			}
 			state('true', marked:true) {
-				outgoing(guard:Converter.toSupremicaSyntax("$reset and not ($set)"), to:'false'){ reset(name.toSupremicaSyntax()) }
-				selfLoop(guard:Converter.toSupremicaSyntax("not (${reset})")) { set(name.toSupremicaSyntax()) }
+				outgoing(guard:new Expression(this, "$reset and not ($set)").toSupremicaSyntax(), to:'false'){ reset(name.toSupremicaSyntax()) }
+				selfLoop(guard:new Expression(this, "not (${reset})").toSupremicaSyntax()) { set(name.toSupremicaSyntax()) }
 			}
 		}
 	}
 }
-class Input extends Named {
+class Input extends NamedImpl {
 	static final pattern = /(?i)input/
 	static final defaultAttr = 'name'
 	static final parentAttr = 'inputs'
@@ -249,26 +263,54 @@ class Input extends Named {
 	}
 	boolean value
 }
-class Output extends Named {
+class Output extends NamedImpl {
 	static final pattern = /(?i)output/
 	static final defaultAttr = 'name'
 	static final parentAttr = 'outputs'
 	boolean value
 }
-class Variable extends Named {
+class Variable extends NamedImpl {
 	static final pattern = /(?i)variable/
 	static final defaultAttr = 'name'
 	static final parentAttr = 'variables'
 	boolean value
 }
 class Expression {
-	Expression(text) {
+	protected static final KEYWORDS = [/(?i)and/, /(?i)or/, /(?i)not/, /(?i)true/, /(?i)false/]
+	Expression(Named context, String text) {
+		this.context = context
 		this.text = text
 	}
 	String text
-	
+	def context
+	String fullyQualified() {
+		text.replaceAll(/\b\w+\b(?:${Converter.SEPARATOR_PATTERN}\b\w+\b)*/) { word ->
+			if (!KEYWORDS.any{keyword -> word ==~ keyword}) {
+//				println '#######'
+//				println 'Word:' << word << ' context:' << context << ' scope:' << context.scope 
+//				println 'E#######'
+				def obj = context.scope.namedObject(new IdentifierExpression(context, word))
+				assert obj, "Undeclared identifier $word in expr '$text', context ${context.name} and scope ${context.scope.name}" 
+				return context.scope.namedObject(new IdentifierExpression(context, word)).fullName
+			}
+			else return word
+		} 
+	}
 	String toSupremicaSyntax() {
-		Converter.toSupremicaSyntax(text)
+		String newExpr = fullyQualified()
+		def replaceWordOp = {oldOp, newOp ->
+			newExpr.replaceAll(/(?i)\s*\b${oldOp}\b\s*/){"$newOp"}
+		}
+		newExpr = replaceWordOp(/and/, ' & ')
+		newExpr = replaceWordOp(/or/, ' | ')
+		newExpr = newExpr.replace(':=', '£££')
+		newExpr = newExpr.replace('=', '==')
+		newExpr = newExpr.replace('£££', '=')
+		newExpr = replaceWordOp(/not/, ' !')
+		newExpr = newExpr.replace('.', '_')
+		newExpr = newExpr.replaceAll(/\(\s+/){'('}
+		newExpr = newExpr.replaceAll(/\\s+\)/){')'}
+		newExpr.trim()
 	}
 	String toString() {
 		return text
@@ -276,15 +318,7 @@ class Expression {
 	def addToModule(ModuleBuilder mb) {
 		
 	}
-	Expression asGlobal(Map scopeNameMap) {
-		String newExpr = text
-		scopeNameMap.each {scope, names ->
-			names.each{name ->
-				newExpr = newExpr.replaceAll(/\b$name\b/) {"$scope.$name"}
-			}
-		}
-		new Expression(newExpr)
-	}
+	
 	boolean equals(object) {
 		if (!object) return false
 		if (object instanceof Expression) return text.toLowerCase() == object.text.toLowerCase()
@@ -294,62 +328,64 @@ class Expression {
 	int hashCode() {
 		return text.toLowerCase().hashCode()
 	}
-	
-	static {
-		def local = new Expression('(apa and bepa) or cepa')
-		def global = local.asGlobal([repa:['bepa', 'cepa']])
-		assert global.text == '(apa and repa.bepa) or repa.cepa'
-	}
 }
 
 class IdentifierExpression extends Expression {
-	IdentifierExpression(String expr) {
-		super(expr)
+	IdentifierExpression(Named context, String expr) {
+		super(context, expr)
+//		println 'context:' << context << ' expr:' << expr
 	}
-	IdentifierExpression(Named prefix, String suffix) {
-		super("${prefix.fullName}${Converter.SEPARATOR}$suffix")
+	IdentifierExpression(Named context, Named prefix, String suffix) {
+		super(context, "${prefix.fullName}${Converter.SEPARATOR}$suffix")
 	}
-	IdentifierExpression leftMostPart() {
+	String leftMostPart() {
 		def parts = text.split(Converter.SEPARATOR_PATTERN)
-		if (parts.size() > 1) return new IdentifierExpression(parts[0]) 
+		if (parts.size() > 1) return parts[0] 
 		null
 	}
-	IdentifierExpression exceptLeftMostPart() {
+	String exceptLeftMostPart() {
 		def parts = text.split(Converter.SEPARATOR_PATTERN)
-		if (parts.size() > 1) return new IdentifierExpression(parts[1..-1].join(Converter.SEPARATOR)) 
-		this
-	}
-	Named evaluate(Scope scope) {
-		scope.namedObject(this)
-	}
-	IdentifierExpression fullName(Scope scope) {
-		new IdentifierExpression(evaluate(scope).fullName)
-	}
-	String toSupremicaSyntax(Scope scope) {
-		fullName(scope).toSupremicaSyntax()
+		if (parts.size() > 1) return parts[1..-1].join(Converter.SEPARATOR) 
+		text
 	}
 }
 
-class Named {
+abstract class Named {
 	IdentifierExpression name
-	def scope = this
+	abstract Scope getScope()
+	abstract String getFullName()
+	String getSupremicaName() {
+		name.toSupremicaSyntax()
+	}
+}
+class NamedImpl extends Named {
+	Scope scope
 	String getFullName() {
 		scope.parentScope ? "${scope.fullName}${Converter.SEPARATOR}$name" : name
 	}
-	String getSupremicaName() {
-		name.toSupremicaSyntax(scope)
-	}
+	
 }
-
 class Scope extends Named {
 	List namedObjects = []
 	Scope parentScope
+	Scope getScope() {
+		return this 
+	}
 	void setScope(Scope scope){}
+	String getFullName() {
+		parentScope?.parentScope ? "${parentScope.fullName}${Converter.SEPARATOR}$name" : name
+	}
 	def namedObject(IdentifierExpression expr) {
+//		println '---------'
+//		println this
+//		println this.namedObjects.name
+//		println expr
+//		println '========='
 		if (!expr) return null
+		if (expr == this.name) return this
 		def obj
-		def subScope = namedObject(expr.leftMostPart())
-		if (subScope) obj = subScope.namedObject(expr.exceptLeftMostPart())
+		def subScope = expr.leftMostPart() ? namedObject(new IdentifierExpression(this, expr.leftMostPart())) : null
+		if (subScope) obj = subScope.namedObject(new IdentifierExpression(subScope, expr.exceptLeftMostPart()))
 		else {
 			obj = namedObjects.find{it.name == expr}
 			if (!obj) obj = parentScope?.namedObject(expr)
@@ -402,6 +438,7 @@ class ControlCodeBuilder extends BuilderSupport {
 	}
 
 	def createNode(name, Map attributes){
+		//println 'createNode, name:' << name << ' attributes:' << attributes
 		def type = NODE_TYPES.find{name ==~ it.pattern}
 		if (!type) return createNode('transition', attributes, name)
 		if (type instanceof Class) {
@@ -411,14 +448,15 @@ class ControlCodeBuilder extends BuilderSupport {
 					def value
 					Class propertyType = obj.metaClass.properties.find{it.name == attribute.key}.type
 					switch (propertyType) {
-					case IdentifierExpression: value = new IdentifierExpression(attribute.value); break;
-					case Expression: value = new Expression(attribute.value); break;
+					case IdentifierExpression: value = new IdentifierExpression(obj, attribute.value); break;
+					case Expression: value = new Expression(obj, attribute.value); break;
 					default:
 						value = attribute.value
 					}
-					obj.setProperty(attribute.key, value)
+					obj[attribute.key] = value
 				}
 			}
+			assert !(obj instanceof Step) || obj == obj.scope
 			if (obj instanceof Named && currentScope) {
 				obj.scope = currentScope
 				currentScope.namedObjects << obj
@@ -427,6 +465,7 @@ class ControlCodeBuilder extends BuilderSupport {
 				obj.parentScope = currentScope
 				currentScope = obj
 			}
+			assert !(obj instanceof Step) || obj == obj.scope
 			return obj
 		}
 		[type:type, *:attributes] as Expando
@@ -478,7 +517,7 @@ class ControlCodeBuilder extends BuilderSupport {
 				mainProgram {
 					TON(name:'Measuring_T_ge_1000', input:'BallMeasure.Measuring.X')
 					SR('qInGate', set:'iStart and not iBallInGate and not qOutGate', reset:'iBallInGate')
-					ASSIGN('qOutGate', input:'iBallInGate and iLiftDown and S0 and not mBallBetweenGateAndLift')
+					ASSIGN('qOutGate', input:'iBallInGate and iLiftDown and Lift.S0 and not mBallBetweenGateAndLift')
 					sequence(name:'Lift') {
 						STEP('S0'){
 							R('qUp')
@@ -597,8 +636,8 @@ class ControlCodeBuilder extends BuilderSupport {
 				}
 				plant('ASSIGN_qOutGate', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
 					state('q0', marked:true) {
-						selfLoop(guard:'iBallInGate & iLiftDown & S0 & !mBallBetweenGateAndLift') { set('qOutGate') }
-						selfLoop(guard:'!(iBallInGate & iLiftDown & S0 & !mBallBetweenGateAndLift)') { reset('qOutGate') }
+						selfLoop(guard:'iBallInGate & iLiftDown & Lift_S0 & !mBallBetweenGateAndLift') { set('qOutGate') }
+						selfLoop(guard:'!(iBallInGate & iLiftDown & Lift_S0 & !mBallBetweenGateAndLift)') { reset('qOutGate') }
 					}
 				}
 				plant('Lift', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
@@ -638,7 +677,7 @@ class ControlCodeBuilder extends BuilderSupport {
 						set('BallMeasure_Measuring_X')
 					}
 					state('Measuring', marked:true) {
-						selfLoop(guard:'!((Measuring_T_ge_1000_Q & iBigBall) | (Measuring_T_ge_1000_Q & iSmallBall))')
+						selfLoop(guard:'!(Measuring_T_ge_1000_Q & iBigBall) & !(Measuring_T_ge_1000_Q & iSmallBall)')
 						outgoing(to:'BigBallFound', guard:'Measuring_T_ge_1000_Q & iBigBall') {
 							set('mBallIsBig')
 							reset('BallMeasure_Measuring_X')
@@ -685,7 +724,7 @@ class ControlCodeBuilder extends BuilderSupport {
 							set('Process_Lift_Middle_X')
 						}
 						state('Middle', marked:true) {
-							selfLoop(guard:'!((!qUp) | (qUp))')
+							selfLoop(guard:'!(!qUp) & !(qUp)')
 							outgoing(guard:'!qUp', to:'Down') {
 								set('iLiftDown')
 								reset('Process_Lift_Middle_X')
