@@ -127,7 +127,7 @@ class Process extends Scope {
 	List functionBlockInstances  = []
 	def addToModule(ModuleBuilder mb) {
 		functionBlockInstances.each { it.addToModule(mb) }
-		sequences.each { it.addToModule(mb, Converter.PROCESS_EVENTS_ALIAS_NAME) }
+		sequences.each { it.addToModule(mb, Converter.PROCESS_SCAN_CYCLE_EVENT_NAME) }
 	}
 }
 
@@ -141,10 +141,6 @@ class Sequence extends Scope {
 		steps.each { step ->
 			mb.booleanVariable(new IdentifierExpression(step, 'X').toSupremicaSyntax(), initial:step == steps[0], marked:step == steps[0])
 		}
-		println 'AAAAAAAAAAAAAA'
-		println this.dump()
-		println name.toSupremicaSyntax()
-		println 'BBBBBBBBBBBBBB'
 		mb.plant(supremicaName, defaultEvent:scanEvent, deterministic:false) {
 			steps.each { step ->
 				mb.state(step.name.text, marked:true) {
@@ -320,7 +316,6 @@ class IdentifierExpression extends Expression {
 	}
 	IdentifierExpression exceptLeftMostPart() {
 		def parts = text.split(Converter.SEPARATOR_PATTERN)
-		println parts
 		if (parts.size() > 1) return new IdentifierExpression(parts[1..-1].join(Converter.SEPARATOR)) 
 		this
 	}
@@ -339,9 +334,6 @@ class Named {
 	IdentifierExpression name
 	def scope = this
 	String getFullName() {
-		println '<<<< ' << this.dump()
-		print scope
-		println ' >>>>'
 		scope.parentScope ? "${scope.fullName}${Converter.SEPARATOR}$name" : name
 	}
 	String getSupremicaName() {
@@ -356,13 +348,6 @@ class Scope extends Named {
 	def namedObject(IdentifierExpression expr) {
 		if (!expr) return null
 		def obj
-		println '\\\\\\\\\\\\'
-		println expr
-		println expr.leftMostPart()
-		println expr.exceptLeftMostPart()
-		println namedObjects
-		println this.dump()
-		println '////////'
 		def subScope = namedObject(expr.leftMostPart())
 		if (subScope) obj = subScope.namedObject(expr.exceptLeftMostPart())
 		else {
@@ -417,11 +402,9 @@ class ControlCodeBuilder extends BuilderSupport {
 	}
 
 	def createNode(name, Map attributes){
-		println name << attributes
 		def type = NODE_TYPES.find{name ==~ it.pattern}
 		if (!type) return createNode('transition', attributes, name)
 		if (type instanceof Class) {
-			println type
 			def obj = type.newInstance()
 			attributes.each{ attribute ->
 				if (attribute.key) {
@@ -441,8 +424,6 @@ class ControlCodeBuilder extends BuilderSupport {
 				currentScope.namedObjects << obj
 			}
 			if (obj instanceof Scope) {
-				println '---->' << obj << '<----' 
-				println '---->' << (currentScope ? currentScope : 'null') << '<----' 
 				obj.parentScope = currentScope
 				currentScope = obj
 			}
@@ -458,8 +439,8 @@ class ControlCodeBuilder extends BuilderSupport {
 	}
 	
 	void setParent(parent, child) {
-		println 'parent:' << parent.inspect()
-		println 'child:' << child.inspect()
+		//println 'parent:' << parent.inspect()
+		//println 'child:' << child.inspect()
 		def parentAttr = child instanceof Expando ? child.type.parentAttr : child.parentAttr
 		if (parent instanceof Expando && !parent[parentAttr]) parent[parentAttr] = []	
 		if (parent[parentAttr] instanceof List) parent[parentAttr] << child
@@ -478,7 +459,7 @@ class ControlCodeBuilder extends BuilderSupport {
 	public static testBuilder(openInSupremica) {
 		def generateTestProgram = {defaultProcess ->
 			def controlCodeBuilder = new ControlCodeBuilder();
-			controlCodeBuilder.application(name:'testprogram', deferred:true) {
+			controlCodeBuilder.application(name:defaultProcess ? 'testprogramWithDefaultProcess' : 'testprogramWitCustomProcess', deferred:true) {
 				input 'iStart'
 				input 'iBallInGate'
 				input 'iBallDown'
@@ -539,7 +520,7 @@ class ControlCodeBuilder extends BuilderSupport {
 		}
 		def correctProgram = { defaultProcess ->
 			def moduleBuilder = new ModuleBuilder()
-			moduleBuilder.module('testprogram') {
+			moduleBuilder.module(defaultProcess ? 'testprogramWithDefaultProcess' : 'testprogramWitCustomProcess') {
 				booleanVariable(['iStart', 'iBallInGate', 'iBallDown', 'iBallUp'], marked:false)
 				booleanVariable('iLiftDown', initial:true, marked:true)
 				booleanVariable('iLiftUp', marked:false)
@@ -553,12 +534,16 @@ class ControlCodeBuilder extends BuilderSupport {
 				booleanVariable(['Lift_S1_X', 'Lift_S2_X'], marked:false)
 				booleanVariable('BallMeasure_Init_X', initial:true, marked:true)
 				booleanVariable(['BallMeasure_Measuring_X', 'BallMeasure_BigBallFound_X', 'BallMeasure_SmallBallFound_X', 'BallMeasure_Done_X'], marked:false)
-				booleanVariable('Process_Lift_Down_X', initial:true, marked:true)
-				booleanVariable(['Process_Lift_Middle_X', 'Process_Lift_Up_X'], initial:false, marked:false)
 				event(Converter.SCAN_CYCLE_EVENT_NAME, controllable:false)
-				event(Converter.PROCESS_SCAN_CYCLE_EVENT_NAME, controllable:false)
-				if (defaultProcess) event(['iStart_change', 'iBallInGate_change', 'iBallDown_change', 'iBallUp_change', 'iLiftDown_change', 'iLiftUp_change', 'iSmallBall_change', 'iBigBall_change'], controllable:false)
-				eventAlias(name:Converter.PROCESS_EVENTS_ALIAS_NAME, events:[Converter.PROCESS_SCAN_CYCLE_EVENT_NAME])//events:['iStart_change', 'iBallInGate_change', 'iBallDown_change', 'iBallUp_change', 'iLiftDown_change', 'iLiftUp_change', 'iSmallBall_change', 'iBigBall_change'])
+				if (!defaultProcess) {
+					booleanVariable('Process_Lift_Down_X', initial:true, marked:true)
+					booleanVariable(['Process_Lift_Middle_X', 'Process_Lift_Up_X'], initial:false, marked:false)
+					event(Converter.PROCESS_SCAN_CYCLE_EVENT_NAME, controllable:false)
+					eventAlias(name:Converter.PROCESS_EVENTS_ALIAS_NAME, events:[Converter.PROCESS_SCAN_CYCLE_EVENT_NAME])
+				} else {
+					event(['iStart_change', 'iBallInGate_change', 'iBallDown_change', 'iBallUp_change', 'iLiftDown_change', 'iLiftUp_change', 'iSmallBall_change', 'iBigBall_change'], controllable:false)
+					eventAlias(name:Converter.PROCESS_EVENTS_ALIAS_NAME, events:['iStart_change', 'iBallInGate_change', 'iBallDown_change', 'iBallUp_change', 'iLiftDown_change', 'iLiftUp_change', 'iSmallBall_change', 'iBigBall_change'])
+				}
 				if (defaultProcess) {
 					plant(Converter.DEFAULT_PROCESS_PLANT_NAME) {
 						state('q0', marked:true) {
@@ -689,8 +674,8 @@ class ControlCodeBuilder extends BuilderSupport {
 						}
 					}
 				}
-				if (!defualtProcess) {
-					plant('Process_Lift', defaultEvent:Converter.PROCESS_EVENTS_ALIAS_NAME, deterministic:false) {
+				if (!defaultProcess) {
+					plant('Process_Lift', defaultEvent:Converter.PROCESS_SCAN_CYCLE_EVENT_NAME, deterministic:false) {
 						state('Down', marked:true) {
 							selfLoop(guard:'!(qUp)')
 						}
