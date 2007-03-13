@@ -255,8 +255,7 @@
          verbose="false"
          nowarn="true"
          excludes="${jgrafchart_basedir}/**,
-                   ${supremica_basedir}/external/robotCoordination/**,
-                   ${supremica_basedir}/automationobjects/xsd/**"       
+                   ${supremica_basedir}/external/robotCoordination/**"
          source="1.5"
          fork="true"
          memoryMaximumSize="128M">
@@ -273,19 +272,6 @@
 			<pathelement location="${lib}/${unjared}"/>
 		</classpath>
 	</groovyc>
-</target>
-
-<target name="compile_automationobjects_jaxb">
-	<javac
-		srcdir="${src}"
-		destdir="${build}"
-		classpath="${lib}/${unjared}"
-		includeJavaRuntime="yes"
-		deprecation="false"
-		verbose="false"
-		nowarn="true"
-		includes="${supremica_basedir}/automationobjects/xsd/**"
-		source="1.5"/>
 </target>
 
 <!-- Compile:
@@ -525,24 +511,6 @@ Class-Path: ${manifest.pathlist}</echo>
 
 <target name="jar_waters_jaxb">
   <ant dir="${waters.dir}" target="jaxb-jar" inheritAll="false"/>
-</target>
-
-<target name="jar_automationobjects_jaxb" depends="compile_automationobjects_jaxb">
-	<jar jarfile="${lib}/automationobjects_jaxb.jar"> 
-		<fileset dir="${build}/">
-			<include name="org/supremica/automationobjects/xsd/**"/>
-		</fileset>
-		<fileset dir="${src}/">
-			<include name="**/*.properties"/>
-			<include name="**/*.ser"/>
-		</fileset>
-	</jar>
-	<delete>
-		<fileset dir="${lib}">
-			<include name="org/supremica/automationobjects/xsd/**"/>
-		</fileset>
-	</delete>
-	<unjar src="${lib}/automationobjects_jaxb.jar" dest="${lib}/${unjared}"/>
 </target>
 
 <target name="cpp_waters">

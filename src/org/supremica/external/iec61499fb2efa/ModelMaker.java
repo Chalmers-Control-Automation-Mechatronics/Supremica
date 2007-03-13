@@ -1,5 +1,4 @@
 /*
- *   This file is part of Fuber (Function Block Execution Runtime) library.
  *   Copyright (C) 2005 Goran Cengic
  *
  *   This library is free software; you can redistribute it and/or
@@ -27,19 +26,84 @@ package org.supremica.external.iec61499fb2efa;
 import java.lang.System;
 import java.lang.Math;
 
+// load IEC 61499 application
+
+// make instance queue model
+
+// make event execution thread model
+
+// make jobs queue model
+
+// make algorithms execution thread model
 
 class ModelMaker
 {
-    public static void main(String[] args)
+	public static void main(String[] args)
     {
-		// load IEC 61499 application
+		//System.out.println("Number of args: " + args.length);
+		//for(int i = 0; i < args.length; i++)
+		//{
+		//    System.out.println("  arg[" + i + "]: " + args[i] );
+		//}
+                
+		String systemFileName = null;
+		String libraryPathBase = null;
+		String libraryPath = null;
+		int threads = 1;
 
-		// make instance queue model
+		if (args.length == 0)
+		{
+			System.err.println("Usage: FBRuntime [-t num] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
+			return;
+		}
 
-		// make event execution thread model
+		for (int i = 0; i < args.length; i++)
+		{
+			if (args[i].equals("-t"))
+			{
+				if (i + 1 < args.length)
+				{
+					threads =  new Integer(args[i + 1]).intValue();
+				}
+			}
+			if (args[i].equals("-lb"))
+			{
+				if (i + 1 < args.length)
+				{
+					libraryPathBase = args[i + 1];
+				}
+			}
+			if (args[i].equals("-lp"))
+			{
+				if (i + 1 < args.length)
+				{
+					if (libraryPath == null)
+					{
+						libraryPath = args[i + 1];
+					}
+					else
+					{
+						libraryPath = libraryPath + File.pathSeparator + args[i + 1];
+					}
+				}
+			}
+			if (i == args.length-1)
+			{
+				systemFileName = args[i];
+			}
+			
+		}
+				
+		System.out.println("Input arguments: " 
+						   + "system file name: " + systemFileName 
+						   + " , library path base: " + libraryPathBase 
+						   + " , library path: " + libraryPath 
+						   + " , number of threads: " + threads);
 
-		// make jobs queue model
-		
-		// make algorithms execution thread model
-    }
+		Device theDevice = new Device("FBRuntime Device", systemFileName, libraryPathBase, libraryPath, threads);
+
+		theDevice.run();
+		System.out.println("FBRuntime.main(): Exiting");
+		System.exit(0);
+	}
 }
