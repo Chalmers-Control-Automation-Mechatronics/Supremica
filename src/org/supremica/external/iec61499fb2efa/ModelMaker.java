@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2005 Goran Cengic
+ *   Copyright (C) 2006 Goran Cengic
  *
  *   This library is free software; you can redistribute it and/or
  *   modify it under the terms of the GNU Lesser General Public
@@ -23,21 +23,38 @@
  */
 package org.supremica.external.iec61499fb2efa;
 
-import java.lang.System;
-import java.lang.Math;
+import java.io.File;
+import java.lang.Exception;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.LinkedList;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.JAXBException;
 
-// load IEC 61499 application
+import net.sourceforge.fuber.xsd.libraryelement.*;
 
-// make instance queue model
+// TODO: load IEC 61499 application
 
-// make event execution thread model
+// TODO: make instance queue model
 
-// make jobs queue model
+// TODO: make event execution thread model
 
-// make algorithms execution thread model
+// TODO: make jobs queue model
+
+// TODO: make algorithms execution thread model
 
 class ModelMaker
 {
+
+    private List libraryPathList = new LinkedList();
+    private JAXBContext context;
+    private Unmarshaller unmarshaller;
+
+	private JaxbSystem theSystem;
+	
+
 	public static void main(String[] args)
     {
 		//System.out.println("Number of args: " + args.length);
@@ -100,10 +117,6 @@ class ModelMaker
 						   + " , library path: " + libraryPath 
 						   + " , number of threads: " + threads);
 
-		Device theDevice = new Device("FBRuntime Device", systemFileName, libraryPathBase, libraryPath, threads);
-
-		theDevice.run();
-		System.out.println("FBRuntime.main(): Exiting");
 		System.exit(0);
 	}
 }
