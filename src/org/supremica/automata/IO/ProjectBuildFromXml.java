@@ -146,7 +146,7 @@ public class ProjectBuildFromXml
     }
     
     public Project build(URL url)
-		throws Exception
+    throws Exception
     {
         String protocol = url.getProtocol();
         
@@ -177,25 +177,25 @@ public class ProjectBuildFromXml
     }
     
     public Project build(File file)
-		throws Exception
+    throws Exception
     {
         return build(file.toURL());
     }
     
     public Project build(InputStream is)
-		throws Exception
+    throws Exception
     {
         return build(is, false);
     }
     
     private Project build(File file, boolean validate)
-		throws Exception
+    throws Exception
     {
         return build(file.getCanonicalPath(), validate);
     }
     
     private Project build(InputStream is, boolean validate)
-		throws Exception
+    throws Exception
     {
         InputSource source = new InputSource(is);
         
@@ -203,20 +203,20 @@ public class ProjectBuildFromXml
     }
     
     private Project build(String fileName)
-		throws Exception
+    throws Exception
     {
         return build(fileName, false);
     }
     
     // changed to public by Arash, we need to load from streams in XML-RPC interface!
     public Project build(Reader r)
-		throws Exception
+    throws Exception
     {
         return build(r, false);
     }
     
     private Project build(Reader r, boolean validate)
-		throws Exception
+    throws Exception
     {
         InputSource source = new InputSource(r);
         
@@ -224,7 +224,7 @@ public class ProjectBuildFromXml
     }
     
     private Project build(String fileName, boolean validate)
-		throws Exception
+    throws Exception
     {
         SAXParserFactory parserFactory = SAXParserFactory.newInstance();
         
@@ -247,7 +247,7 @@ public class ProjectBuildFromXml
     }
     
     private Project build(InputSource is, boolean validate)
-		throws Exception
+    throws Exception
     {
         SAXParserFactory parserFactory = SAXParserFactory.newInstance();
         
@@ -275,7 +275,7 @@ public class ProjectBuildFromXml
     }
     
     public void startElement(String uri, String localName, String name, Attributes attributes)
-		throws SAXException
+    throws SAXException
     {
         // in order of frequency
         if (transitionStr.equals(name))
@@ -385,13 +385,13 @@ public class ProjectBuildFromXml
     }
     
     public final void doAutomata(Attributes attributes)
-		throws SAXException
+    throws SAXException
     {
         doProject(attributes);
     }
     
     public final void doAutomaton(Attributes attributes)
-		throws SAXException
+    throws SAXException
     {
         currAutomaton = new Automaton();
         currAlphabet = currAutomaton.getAlphabet();
@@ -403,12 +403,12 @@ public class ProjectBuildFromXml
             throwException("name attribute is missing");
         }
         
-		/* Let the gui handle this
-		   if (name.equals(""))
-		   {
-		   throwException("empty automata names are not allowed");
-		   }
-		*/
+                /* Let the gui handle this
+                   if (name.equals(""))
+                   {
+                   throwException("empty automata names are not allowed");
+                   }
+                 */
         
         currAutomaton.setName(name);
         
@@ -442,7 +442,7 @@ public class ProjectBuildFromXml
         {
             // Already there!?!
             logger.error("Name conflict, multiple automata with name " +
-						 currAutomaton + ", discarding last one added.");
+                currAutomaton + ", discarding last one added.");
         }
         else
         {
@@ -451,7 +451,7 @@ public class ProjectBuildFromXml
     }
     
     public final void doEvent(Attributes attributes)
-		throws SAXException
+    throws SAXException
     {
         String id = null;
         String label = null;
@@ -520,8 +520,8 @@ public class ProjectBuildFromXml
         // LabeledEvent currEvent = new LabeledEvent(label, id);
         LabeledEvent currEvent = new LabeledEvent(label);
         
-		//              currEvent.setId(id);
-		//              currEvent.setLabel(label);
+        //              currEvent.setId(id);
+        //              currEvent.setLabel(label);
         currEvent.setControllable(controllable);
         currEvent.setPrioritized(prioritized);
         currEvent.setObservable(observable);
@@ -547,7 +547,7 @@ public class ProjectBuildFromXml
     }
     
     public final void doState(Attributes attributes)
-		throws SAXException
+    throws SAXException
     {
         String id = null;
         String name = null;
@@ -618,9 +618,8 @@ public class ProjectBuildFromXml
     }
     
     public final void doTransition(Attributes attributes)
-		throws SAXException
-    {
-        
+    throws SAXException
+    {        
         // Transition ::source
         String sourceId = attributes.getValue("source");
         
@@ -686,7 +685,7 @@ public class ProjectBuildFromXml
     }
     
     public final void throwException(String msg)
-		throws SAXException
+    throws SAXException
     {
         int line = locator.getLineNumber();
         int column = locator.getColumnNumber();
@@ -696,7 +695,7 @@ public class ProjectBuildFromXml
     }
     
     public final void doProject(Attributes attributes)
-		throws SAXException
+    throws SAXException
     {
         currProject = theProjectFactory.getProject();
         
@@ -741,7 +740,7 @@ public class ProjectBuildFromXml
     }
     
     public final void doLayout(Attributes attributes)
-		throws SAXException
+    throws SAXException
     {
         String width = attributes.getValue("width");
         
@@ -765,7 +764,7 @@ public class ProjectBuildFromXml
     }
     
     public final void doStateLayout(Attributes attributes)
-		throws SAXException
+    throws SAXException
     {
         String id = attributes.getValue("id");
         
@@ -795,27 +794,27 @@ public class ProjectBuildFromXml
     }
     
     public final void doTransitionLayout(Attributes attributes)
-		throws SAXException
+    throws SAXException
     {}
     
     public final void doExecution(Attributes attributes)
-		throws SAXException
+    throws SAXException
     {}
     
     public final void doInputSignals(Attributes attributes)
-		throws SAXException
+    throws SAXException
     {
         currSignals = currProject.getInputSignals();
     }
     
     public final void doOutputSignals(Attributes attributes)
-		throws SAXException
+    throws SAXException
     {
         currSignals = currProject.getOutputSignals();
     }
     
     public final void doSignal(Attributes attributes)
-		throws SAXException
+    throws SAXException
     {
         String label = attributes.getValue("label");
         
@@ -844,7 +843,7 @@ public class ProjectBuildFromXml
     }
     
     public final void doActions(Attributes attributes)
-		throws SAXException
+    throws SAXException
     {
         if (currProject == null)
         {
@@ -855,7 +854,7 @@ public class ProjectBuildFromXml
     }
     
     public final void doAction(Attributes attributes)
-		throws SAXException
+    throws SAXException
     {
         if (currActions == null)
         {
@@ -880,7 +879,7 @@ public class ProjectBuildFromXml
     }
     
     public final void doControls(Attributes attributes)
-		throws SAXException
+    throws SAXException
     {
         if (currProject == null)
         {
@@ -891,7 +890,7 @@ public class ProjectBuildFromXml
     }
     
     public final void doControl(Attributes attributes)
-		throws SAXException
+    throws SAXException
     {
         if (currControls == null)
         {
@@ -927,7 +926,7 @@ public class ProjectBuildFromXml
     }
     
     public final void doTimers(Attributes attributes)
-		throws SAXException
+    throws SAXException
     {
         if (currProject == null)
         {
@@ -938,7 +937,7 @@ public class ProjectBuildFromXml
     }
     
     public final void doTimer(Attributes attributes)
-		throws SAXException
+    throws SAXException
     {
         if (currTimers == null)
         {
@@ -986,7 +985,7 @@ public class ProjectBuildFromXml
     }
     
     public final void doCommand(Attributes attributes)
-		throws SAXException
+    throws SAXException
     {
         if (currAction == null)
         {
@@ -1015,7 +1014,7 @@ public class ProjectBuildFromXml
     }
     
     public final void doCondition(Attributes attributes)
-		throws SAXException
+    throws SAXException
     {
         if (currControl == null)
         {
@@ -1044,7 +1043,7 @@ public class ProjectBuildFromXml
     }
     
     public final void doAnimation(Attributes attributes)
-		throws SAXException
+    throws SAXException
     {
         if (currProject == null)
         {
@@ -1110,7 +1109,7 @@ public class ProjectBuildFromXml
     
     
     public final void doUserInterface(Attributes attributes)
-		throws SAXException
+    throws SAXException
     {
         if (currProject == null)
         {

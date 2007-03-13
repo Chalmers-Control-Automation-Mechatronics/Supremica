@@ -75,14 +75,13 @@ public class Automata
     extends DocumentElement
     implements AutomatonListener, Iterable<Automaton>, ProductDESProxy
 {
-	private static final String defaultName = "Untitled";
+    private static final String defaultName = "Untitled";
     private static Logger logger = LoggerFactory.createLogger(Automata.class);
     private ArrayList<Automaton> theAutomata;
     private HashMap<String,Automaton> nameMap;
     private String name = defaultName;
     private String comment = null;
     private AutomataListeners listeners = null;
-
 
     public Automata()
     {

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   SupremicaUnmarshaller
 //###########################################################################
-//# $Id: SupremicaUnmarshaller.java,v 1.3 2006-09-17 10:23:51 flordal Exp $
+//# $Id: SupremicaUnmarshaller.java,v 1.4 2007-03-13 15:12:33 flordal Exp $
 //###########################################################################
 
 package org.supremica.automata.IO;
@@ -24,6 +24,9 @@ import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.State;
 import org.supremica.gui.StandardExtensionFileFilter;
 
 import org.xml.sax.SAXException;
@@ -32,7 +35,6 @@ import org.xml.sax.SAXException;
 public class SupremicaUnmarshaller
     implements ProxyUnmarshaller<ModuleProxy>
 {
-    
     //#########################################################################
     //# Constructor
     public SupremicaUnmarshaller(final ModuleProxyFactory modfactory)
@@ -40,9 +42,8 @@ public class SupremicaUnmarshaller
     {
         builder = new ProjectBuildFromXml();
         mImporter = new ProductDESImporter(modfactory);
-    }
-
-
+    }    
+    
     //#########################################################################
     //# Interface net.sourceforge.waters.model.marshaller.ProxyUnmarshaller
     public ModuleProxy unmarshal(final URI uri)
@@ -52,14 +53,18 @@ public class SupremicaUnmarshaller
         final ProductDESProxy des;
         try
         {
-           des = builder.build(url);
+            des = builder.build(url);
+            
+            // Examine the result
+            validate((Automata) des);
         }
         catch (Exception ex)
         {
             throw new WatersUnmarshalException(ex);
         }
+                
         return mImporter.importModule(des);
-    }
+    }       
     
     public Class<ModuleProxy> getDocumentClass()
     {
@@ -90,11 +95,30 @@ public class SupremicaUnmarshaller
     public void setDocumentManager(DocumentManager manager)
     {
         mImporter.setDocumentManager(manager);
-    }
-    
+    }    
     
     //#########################################################################
     //# Data Members
     private final ProjectBuildFromXml builder;
-    private final ProductDESImporter mImporter;    
+    private final ProductDESImporter mImporter;
+    
+    /**
+     * Examines if there are conversion problems in an automata. For example,
+     * the State cost feature has no correspondance in the Waters models, the
+     * user should be alerted of this fact...
+     */
+    private void validate (Automata automata)
+    {
+        for (Automaton aut : automata)
+        {
+            for (State state : aut)
+            {
+                if (state.getCost() != state.UNDEF_COST)
+                {
+                    System.err.println("There were state cost information in the imported automata model that was lost in the conversion.");
+                    return;
+                }
+            }
+        }
+    }
 }
