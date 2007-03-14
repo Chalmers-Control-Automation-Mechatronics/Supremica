@@ -49,16 +49,30 @@ import org.supremica.automata.Automata;
 class ModelMaker
 {
 
-    private List libraryPathList = new LinkedList();
     private JAXBContext context;
     private Unmarshaller unmarshaller;
+
+    private List libraryPathList = new LinkedList();
 
 	private JaxbFBNetwork jaxbSystemFBNetwork;
 	private Map jaxbFBTypes = new HashMap();
 
 	private Automata automata = new Automata();
-
-	private ModelMaker() {}
+	
+	private ModelMaker() 
+	{
+		// create unmarshaller
+		try
+		{
+			context = JAXBContext.newInstance("net.sourceforge.fuber.xsd.libraryelement");
+			unmarshaller = context.createUnmarshaller();
+		}
+		catch (Exception e)
+		{
+			System.err.println(e);
+			System.exit(1);
+		}
+	}
 
     // find the fileName in libraries and return the corresponding File
     private File getFile(String fileName)
@@ -103,6 +117,8 @@ class ModelMaker
 
     private void load(String fileName)
     {
+	
+		System.out.println("ModelMaker.load(" + fileName + "): Loading file " + fileName);
 		
 		File file = getFile(fileName);
 		
@@ -120,6 +136,7 @@ class ModelMaker
 						JaxbResource theResource = (JaxbResource) theDevice.getResource().get(0);
 						if (theResource.isSetFBNetwork())
 						{
+							System.out.println("ModelMaker.load(" + fileName + "): The file is IEC 61499 system.");
 							jaxbSystemFBNetwork = ((JaxbFBNetwork) theResource.getFBNetwork());
 						}
 					}
@@ -130,6 +147,7 @@ class ModelMaker
 				JaxbFBType theType = (JaxbFBType) unmarshalledXmlObject;
 				if (theType.isSetName())
 				{
+					System.out.println("ModelMaker.load(" + fileName + "): The file is IEC 61499 FB type.");
 					jaxbFBTypes.put(theType.getName(),theType);
 				}				
 			}
@@ -209,19 +227,6 @@ class ModelMaker
 
 		}
 
-		// create unmarshaller
-		try
-		{
-			context = JAXBContext.newInstance("net.sourceforge.fuber.xsd.libraryelement");
-			unmarshaller = context.createUnmarshaller();
-		}
-		catch (Exception e)
-		{
-			System.err.println(e);
-			System.exit(1);
-		}
-
-
 		load(systemFileName);
 	}
 
@@ -280,15 +285,16 @@ class ModelMaker
 				}
 			}
 			
-		}
-				
-		System.out.println("Input arguments: " 
-						   + "output file name: " + outputFileName 
-						   + "system file name: " + systemFileName 
-						   + " , library path base: " + libraryPathBase 
-						   + " , library path: " + libraryPath);
+		}			
+
+// 		System.out.println("Input arguments: " 
+// 						   + "\n\t output file name: " + outputFileName 
+// 						   + "\n\t system file name: " + systemFileName 
+// 						   + "\n\t library path base: " + libraryPathBase 
+// 						   + "\n\t library path: " + libraryPath);
 
 		(new ModelMaker()).makeModel(outputFileName,systemFileName,libraryPathBase,libraryPath);
 		System.exit(0);
 	}
+
 }
