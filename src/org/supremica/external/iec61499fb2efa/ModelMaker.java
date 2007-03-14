@@ -24,16 +24,17 @@
 package org.supremica.external.iec61499fb2efa;
 
 import java.io.File;
-import java.lang.Exception;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.LinkedList;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.fuber.xsd.libraryelement.*;
+import org.supremica.automata.Automata;
 
 // TODO: load IEC 61499 application
 
@@ -52,48 +53,203 @@ class ModelMaker
     private JAXBContext context;
     private Unmarshaller unmarshaller;
 
-	private JaxbSystem theSystem;
-	
+	private JaxbFBNetwork jaxbSystemFBNetwork;
+	private Map jaxbFBTypes = new HashMap();
 
-	ModelMaker()
-	{
-	}
+	private Automata automata = new Automata();
 
-	void makeModel()
-	{
-		System.out.println("Making model...");
+	private ModelMaker() {}
+
+    // find the fileName in libraries and return the corresponding File
+    private File getFile(String fileName)
+    {
+		File theFile = new File(fileName);
+
+		if (libraryPathList != null)
+		{
+			for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
+			{
+				File curLibraryDir = (File) iter.next();
+				theFile = new File(curLibraryDir, fileName);
+				//System.out.println("ModelMaker.getFile(" + fileName + "): Looking for file in " + theFile.toString());
+				if (theFile.exists())
+				{
+					break;
+				}
+			}
+		}
+
+		if (!theFile.exists())
+		{
+			System.err.println("ModelMaker.getFile(" + fileName + "): The file " + fileName + " does not exist in the specified libraries...");
+			if (libraryPathList != null)
+			{
+				for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
+				{
+					System.err.println("\t" + ((File) iter.next()).getAbsolutePath() + File.separator);
+				}
+			}
+			else
+			{
+				System.err.println("\t. (current directory)");
+			}
+			System.err.println();
+			System.err.println("Usage: ModelMaker [-o outputFile] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
+			System.exit(1);
+		}
+
+		return theFile;
+    }
+
+    private void load(String fileName)
+    {
+		
+		File file = getFile(fileName);
+		
 		try
 		{
-			wait(3000);
+			Object unmarshalledXmlObject = unmarshaller.unmarshal(file);
+			if (unmarshalledXmlObject instanceof JaxbSystem)
+			{ 
+				JaxbSystem theSystem = (JaxbSystem) unmarshalledXmlObject;
+				if (theSystem.isSetDevice())
+				{
+					JaxbDevice theDevice = (JaxbDevice) theSystem.getDevice().get(0);
+					if(theDevice.isSetResource())
+					{
+						JaxbResource theResource = (JaxbResource) theDevice.getResource().get(0);
+						if (theResource.isSetFBNetwork())
+						{
+							jaxbSystemFBNetwork = ((JaxbFBNetwork) theResource.getFBNetwork());
+						}
+					}
+				}
+			}
+			else if (unmarshalledXmlObject instanceof JaxbFBType)
+			{
+				JaxbFBType theType = (JaxbFBType) unmarshalledXmlObject;
+				if (theType.isSetName())
+				{
+					jaxbFBTypes.put(theType.getName(),theType);
+				}				
+			}
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
+			e.printStackTrace(System.err);
+			System.exit(1);
 		}
-		System.out.println("...NOT!");
 	}
 	
 
-	public static void main(String[] args)
+	public void makeModel(String outputFileName, String systemFileName, String libraryPathBase, String libraryPath)
+	{
+		// convert libraryPath string into list of Files
+		if (libraryPath == null) // libraryPath is not specified
+		{
+			if (libraryPathBase == null)
+			{
+				libraryPathList = null;
+			}
+			else
+			{
+				File libraryPathBaseFile = new File(libraryPathBase);
+
+				if (!libraryPathBaseFile.isDirectory())
+				{
+					System.err.println("ModelMaker(): Specified library base is not a directory!: " + libraryPathBaseFile.getName());
+				}
+				else if (!libraryPathBaseFile.exists())
+				{
+					System.err.println("ModelMaker(): Specified library base does not exist!: " + libraryPathBaseFile.getName());
+				}
+				else
+				{
+					libraryPathList.add(libraryPathBaseFile);
+				}
+			}
+		}
+		else // libraryPath is specified by the user
+		{
+		
+			while (true)
+			{
+				
+				File curLibraryDir;
+
+				if (libraryPath.indexOf(File.pathSeparatorChar) == -1)
+				{
+					curLibraryDir = new File(libraryPathBase, libraryPath);
+				}
+				else
+				{
+					curLibraryDir = new File(libraryPathBase, libraryPath.substring(0,libraryPath.indexOf(File.pathSeparatorChar)));
+				}
+
+				if (!curLibraryDir.isDirectory())
+				{
+					System.err.println("ModelMaker(): Specified library path element " + curLibraryDir.getAbsolutePath() + " is not a directory!");
+				}
+				else if (!curLibraryDir.exists())
+				{
+					System.err.println("ModelMaker(): Specified library path element " + curLibraryDir.getAbsolutePath() + " does not exist!");
+				}
+				else
+				{
+					libraryPathList.add(curLibraryDir);
+				}
+
+				if (libraryPath.indexOf(File.pathSeparatorChar) == -1)
+				{
+					break;
+				}
+
+				libraryPath = libraryPath.substring(libraryPath.indexOf(File.pathSeparatorChar)+1);
+			}
+
+		}
+
+		// create unmarshaller
+		try
+		{
+			context = JAXBContext.newInstance("net.sourceforge.fuber.xsd.libraryelement");
+			unmarshaller = context.createUnmarshaller();
+		}
+		catch (Exception e)
+		{
+			System.err.println(e);
+			System.exit(1);
+		}
+
+
+		load(systemFileName);
+	}
+
+
+
+
+	public static void main(String args[])
     {
-		// Echo arguments
-		//System.out.println("Number of args: " + args.length);
-		//for(int i = 0; i < args.length; i++)
-		//{
-		//    System.out.println("  arg[" + i + "]: " + args[i] );
-		//}
-                
+		String outputFileName = null;
 		String systemFileName = null;
 		String libraryPathBase = null;
 		String libraryPath = null;
 
 		if (args.length == 0)
 		{
-			System.err.println("Usage: ModelMaker [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
+			System.err.println("Usage: ModelMaker [-o outputFileName] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
 			return;
 		}
 
 		for (int i = 0; i < args.length; i++)
 		{
+			if (args[i].equals("-o"))
+			{
+				if (i + 1 < args.length)
+				{
+					outputFileName = args[i + 1];
+				}
+			}
 			if (args[i].equals("-lb"))
 			{
 				if (i + 1 < args.length)
@@ -118,16 +274,21 @@ class ModelMaker
 			if (i == args.length-1)
 			{
 				systemFileName = args[i];
+				if (outputFileName == null)
+				{
+					outputFileName = systemFileName + ".wmod";
+				}
 			}
 			
 		}
 				
 		System.out.println("Input arguments: " 
+						   + "output file name: " + outputFileName 
 						   + "system file name: " + systemFileName 
 						   + " , library path base: " + libraryPathBase 
 						   + " , library path: " + libraryPath);
 
-		(new ModelMaker()).makeModel();
+		(new ModelMaker()).makeModel(outputFileName,systemFileName,libraryPathBase,libraryPath);
 		System.exit(0);
 	}
 }
