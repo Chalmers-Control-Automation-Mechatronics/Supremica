@@ -1120,19 +1120,28 @@ public class Milp
     }
     
     private void callMilpSolver()
-    throws Exception
+	throws Exception
     {
         logger.info("The MILP-solver started....");
         // Defines the name of the .exe-file as well the arguments (.mod and .sol file names)
         String[] cmds = new String[5];
-        cmds[0] = "C:\\Program Files\\glpk\\bin\\glpsol.exe";
+        //cmds[0] = "C:\\Program Files\\glpk\\bin\\glpsol.exe";
+	cmds[0] = "glpsol";
         cmds[1] = "-m";
         cmds[2] = modelFile.getAbsolutePath();
         cmds[3] = "-o";
         cmds[4] = solutionFile.getAbsolutePath();
         
-        // Runs the MILP-solver with the arguments defined above
-        milpProcess = Runtime.getRuntime().exec(cmds);
+	try 
+	{
+	    // Runs the MILP-solver with the arguments defined above
+	    milpProcess = Runtime.getRuntime().exec(cmds);
+	}
+	catch (IOException milpNotFoundException)
+	{
+	    logger.error("The GLPK-solver 'glpsol.exe' not found. Make sure that it is registered in your path.");
+	    throw milpNotFoundException;
+	}
         
         // Listens for the output of MILP (that is the input to this application)...
         BufferedReader milpEcho = new BufferedReader(new InputStreamReader(new DataInputStream(milpProcess.getInputStream())));

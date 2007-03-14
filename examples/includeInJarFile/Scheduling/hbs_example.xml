@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="hbs-exempel" comment="A simple example of two robots sharing one mutex zone, used in a DES-course (formerly called HBS) at Chalmers to demonstrate the steps of the A* optimization algorithm. The optimal cycle time (without security delays) is 12 time units." major="0" minor="9">
+<Automaton name="R1" type="Plant">
+	<Events>
+		<Event id="0" label="R1_to"/>
+		<Event id="1" label="R1_b"/>
+		<Event id="2" label="R1_ub"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" cost="4"/>
+		<State id="1" name="q1" cost="5"/>
+		<State id="2" name="q2" cost="2"/>
+		<State id="3" name="FINISH" accepting="true" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="2" dest="3" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="R2" type="Plant">
+	<Events>
+		<Event id="0" label="R2_to"/>
+		<Event id="1" label="R2_b"/>
+		<Event id="2" label="R2_ub"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" cost="3"/>
+		<State id="1" name="q1" cost="2"/>
+		<State id="2" name="q2" cost="5"/>
+		<State id="3" name="FINISH" accepting="true" cost="0"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="2" dest="3" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="Z1" type="Specification">
+	<Events>
+		<Event id="0" label="R1_b"/>
+		<Event id="1" label="R1_ub"/>
+		<Event id="2" label="R2_b"/>
+		<Event id="3" label="R2_ub"/>
+	</Events>
+	<States>
+		<State id="0" name="q0" initial="true" accepting="true"/>
+		<State id="1" name="q1"/>
+		<State id="2" name="q2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="2" event="0"/>
+		<Transition source="1" dest="2" event="2"/>
+	</Transitions>
+</Automaton>
+</Automata>
