@@ -55,8 +55,27 @@ class ModelMaker
 	private JaxbSystem theSystem;
 	
 
+	ModelMaker()
+	{
+	}
+
+	void makeModel()
+	{
+		System.out.println("Making model...");
+		try
+		{
+			wait(3000);
+		}
+		catch(Exception e)
+		{
+		}
+		System.out.println("...NOT!");
+	}
+	
+
 	public static void main(String[] args)
     {
+		// Echo arguments
 		//System.out.println("Number of args: " + args.length);
 		//for(int i = 0; i < args.length; i++)
 		//{
@@ -66,23 +85,15 @@ class ModelMaker
 		String systemFileName = null;
 		String libraryPathBase = null;
 		String libraryPath = null;
-		int threads = 1;
 
 		if (args.length == 0)
 		{
-			System.err.println("Usage: FBRuntime [-t num] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
+			System.err.println("Usage: ModelMaker [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
 			return;
 		}
 
 		for (int i = 0; i < args.length; i++)
 		{
-			if (args[i].equals("-t"))
-			{
-				if (i + 1 < args.length)
-				{
-					threads =  new Integer(args[i + 1]).intValue();
-				}
-			}
 			if (args[i].equals("-lb"))
 			{
 				if (i + 1 < args.length)
@@ -114,9 +125,9 @@ class ModelMaker
 		System.out.println("Input arguments: " 
 						   + "system file name: " + systemFileName 
 						   + " , library path base: " + libraryPathBase 
-						   + " , library path: " + libraryPath 
-						   + " , number of threads: " + threads);
+						   + " , library path: " + libraryPath);
 
+		(new ModelMaker()).makeModel();
 		System.exit(0);
 	}
 }
