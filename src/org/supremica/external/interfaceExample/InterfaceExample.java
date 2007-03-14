@@ -1,3 +1,6 @@
+package org.supremica.external.InterfaceExample;
+
+import java.util.*;
 import org.supremica.automata.*;
 import org.supremica.automata.IO.*;
 import java.io.File;
@@ -6,7 +9,7 @@ import java.io.OutputStreamWriter;
 
 public class InterfaceExample
 {
-    public void createAutomaton()
+    public static void createAutomaton()
     {
 		Automata theAutomata = new Automata();
 		Automaton theAutomaton = new Automaton("theAutomaton");
@@ -34,7 +37,7 @@ public class InterfaceExample
 
 		// Add states to the automaton
 		theAutomaton.addState(q1);
-		theAutomaton.addState(q2);
+		theAutomaton.addState(q2); 
 
 		// Add transitions
 		theAutomaton.addArc(new Arc(q1, q2, e1));
@@ -46,26 +49,41 @@ public class InterfaceExample
 		serializer.serialize(new PrintWriter(new OutputStreamWriter(System.out)));
     }
 
-    void projectBuilder(File file)
+    public static void projectBuilder(File file)
+        throws Exception
     {
         ProjectBuildFromXml builder = new ProjectBuildFromXml();
-        try
+        Project theProject = builder.build(file);
+
+        // Iterate over all automata in the project
+        for (Automaton currAutomaton : theProject)
         {
-            Project theProject = builder.build(file);
-        }
-        catch (Exception ex)
-        {
-            System.err.println(ex);
-            return;
-        }
+            System.out.println("Automaton: " + currAutomaton.getName());
+
+            // Iterate over all events in currAutomaton
+            for (LabeledEvent currEvent : currAutomaton.getAlphabet())
+            {
+                System.out.println("Event: " + currEvent.getName());
+            }
+            // Iterate over all states in currAutomaton
+            for (State currState : currAutomaton)
+            {
+                System.out.println("State: " + currState.getName());
+                for (Iterator<Arc> arcIt = currState.outgoingArcsIterator(); arcIt.hasNext(); )
+                {
+                    Arc currArc = arcIt.next();
+                    System.out.println("\t toState: " + currArc.getTarget().getName() + " Event: " + currArc.getLabel());
+                }
+            }
+        }  
+        
+        
     }
 
 	public static void main(String[] args)
-		throws Exception
-	{
-        InterfaceExample example = new InterfaceExample();
-        example.createAutomaton();
-        example.projectBuilder(new File(args[0]));
-
+        throws Exception
+    {
+        //createAutomaton();
+        projectBuilder(new File("C:\\Documents and Settings\\Knut\\My Documents\\research\\software\\Supremica\\examples\\scanvaccum_org.xml"));
 	}
 }

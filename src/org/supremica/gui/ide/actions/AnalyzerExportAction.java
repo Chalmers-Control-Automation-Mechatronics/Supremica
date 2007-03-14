@@ -294,8 +294,6 @@ public class AnalyzerExportAction
                 return;
             }
 
-            Project selectedProject = ide.getIDE().getActiveProject();
-
             fileExporter.setDialogTitle("Save Project as ...");
 
             if (fileExporter.showSaveDialog(ide.getIDE()) == JFileChooser.APPROVE_OPTION)
@@ -310,12 +308,12 @@ public class AnalyzerExportAction
                         {
                             if (exportMode == ExportFormat.XML)
                             {
-                                AutomataToXml exporter = new AutomataToXml(selectedProject);
+                                AutomataToXml exporter = new AutomataToXml(selectedAutomata);
                                 exporter.serialize(currFile);
                             }
                             else if (exportMode == ExportFormat.SP)
                             {
-                                ProjectToSP exporter = new ProjectToSP(selectedProject);
+                                ProjectToSP exporter = new ProjectToSP(ide.getIDE().getActiveProject());
                                 exporter.serialize(currFile);
                             }
                         }
