@@ -69,6 +69,7 @@ public class ExampleTemplates
     private final TemplateGroup ManufacturingSystemExamples = new TemplateGroup(TemplateTypes.ManufacturingSystemExamples);
     private final TemplateGroup Games = new TemplateGroup(TemplateTypes.Games);
     private final TemplateGroup ModuleExamples  = new TemplateGroup(TemplateTypes.ModuleExamples);
+    private final TemplateGroup SchedulingExamples = new TemplateGroup(TemplateTypes.SchedulingExamples);
     private final TemplateGroup OtherExamples = new TemplateGroup(TemplateTypes.OtherExample);
     
     //private final TemplateGroup StandardComponents = new TemplateGroup(TemplateTypes.StandardComponent);
@@ -93,7 +94,8 @@ public class ExampleTemplates
         initializeCommunicationSystemExamples();
         initializeGames();
         initializeModuleExamples();
-        initializeOtherExamples();
+	initializeSchedulingExamples();
+	initializeOtherExamples();
         //initializeStandardComponents();
     }
     
@@ -331,6 +333,18 @@ public class ExampleTemplates
         thisGroup.addItem(new TemplateItem("Tic Tac Toe", basePrefix + "/ModuleExamples/other/tictactoe.wmod"));
         //thisGroup.addItem(new TemplateItem("Wine Merchant's Problem", prefix + "WineMerchant.xml"));
         thisGroup.addItem(new TemplateItem("Wine Merchant's Problem", basePrefix + "/ModuleExamples/other/winemerchant.wmod"));
+    }
+
+private void initializeSchedulingExamples()
+    {
+        TemplateGroup thisGroup = SchedulingExamples;
+        
+        allGroups.add(thisGroup);
+        
+        String prefix = basePrefix + "/Scheduling/";
+        
+        thisGroup.addItem(new TemplateItem("2 robots, 1 zone (from HBS)", prefix + "hbs_example.xml"));
+        thisGroup.addItem(new TemplateItem("2 robots with alternatives, 1 zone (from PV35)", prefix + "pv35_example.xml"));
     }
     
     /*
