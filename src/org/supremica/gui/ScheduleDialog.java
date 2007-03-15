@@ -14,15 +14,15 @@ import org.supremica.automata.algorithms.scheduling.*;
 public class ScheduleDialog
 	extends JDialog
 {
-	private static final String MODIFIED_A_STAR = "Modified A*";
-	private static final String MODIFIED_VGA_STAR = "Modified VGA*";
-	private static final String MILP = "MILP";
-	private static final String VIS_GRAPH = "Visibility Graph";
+	public static final String MODIFIED_A_STAR = "Modified A*";
+	public static final String MODIFIED_VGA_STAR = "Modified VGA*";
+	public static final String MILP = "MILP";
+	public static final String VIS_GRAPH = "Visibility Graph";
 
-	private static final String ONE_PRODUCT_RELAXATION = "1-product relax";
-	private static final String TWO_PRODUCT_RELAXATION = "2-product relax";
-	private static final String VIS_GRAPH_TIME_RELAXATION = "visibility graph (time)";
-	private static final String VIS_GRAPH_NODE_RELAXATION = "visibility graph (node)";
+	public static final String ONE_PRODUCT_RELAXATION = "1-product relax";
+	public static final String TWO_PRODUCT_RELAXATION = "2-product relax";
+	public static final String VIS_GRAPH_TIME_RELAXATION = "visibility graph (time)";
+	public static final String VIS_GRAPH_NODE_RELAXATION = "visibility graph (node)";
 
     private static final long serialVersionUID = 1L;
     private static final String[] optiMethodNames = new String[]{MODIFIED_A_STAR, MODIFIED_VGA_STAR, MILP, VIS_GRAPH}; //, "Modified IDA*", "Modified SMA*"};
@@ -222,41 +222,39 @@ public class ScheduleDialog
 			if (optiMethodsBox.getSelectedItem().equals(MODIFIED_A_STAR))
 			{
 				String selectedHeuristic = (String) heuristicsBox.getSelectedItem();
-				if (selectedHeuristic.equals(VIS_GRAPH_TIME_RELAXATION))
+				if ((ActionMan.getGui().getSelectedAutomata().getPlantAutomata().size() == 2) && (selectedHeuristic.equals(VIS_GRAPH_TIME_RELAXATION) || selectedHeuristic.equals(VIS_GRAPH_NODE_RELAXATION)))
 				{
-					if (ActionMan.getGui().getSelectedAutomata().getPlantAutomata().size() == 2)
-					{
-						sched = new VisGraphScheduler(ActionMan.getGui().getSelectedAutomata(), vgDrawer.isSelected(), this);
-					}
-					else
-					{
-						sched = new ModifiedAstarUsingVisGraphRelaxation(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), buildAutomaton.isSelected(), this);
-					}
+					sched = new VisGraphScheduler(ActionMan.getGui().getSelectedAutomata(), vgDrawer.isSelected(), this);
 				}
+					// else
+// 					{
+// 						sched = new ModifiedAstarUsingVisGraphRelaxation(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), buildAutomaton.isSelected(), this);
+// 					}
+// 				}
 				// Tillf
 				// This might be temporary (or the alternative just above) to determine which relaxation is best
-				else if (selectedHeuristic.equals(VIS_GRAPH_NODE_RELAXATION))
-				{
-					if (ActionMan.getGui().getSelectedAutomata().getPlantAutomata().size() == 2)
-					{
-						sched = new VisGraphScheduler(ActionMan.getGui().getSelectedAutomata(), vgDrawer.isSelected(), this);
-					}
-					else
-					{
-						sched = new ModifiedAstarUsingVisGraphRelaxation(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), buildAutomaton.isSelected(), true, this);
-					}
-				}
-				else if (selectedHeuristic.equals(ONE_PRODUCT_RELAXATION))
-				{
-					sched = new ModifiedAstarUsingOneProdRelaxation(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), buildAutomaton.isSelected(), this);
-				}
-				else if (selectedHeuristic.equals(TWO_PRODUCT_RELAXATION))
-				{
-					sched = new ModifiedAstarUsingTwoProdRelaxation(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), buildAutomaton.isSelected(), this);
-				}
+// 				else if (selectedHeuristic.equals(VIS_GRAPH_NODE_RELAXATION))
+// 				{
+// 					if (ActionMan.getGui().getSelectedAutomata().getPlantAutomata().size() == 2)
+// 					{
+// 						sched = new VisGraphScheduler(ActionMan.getGui().getSelectedAutomata(), vgDrawer.isSelected(), this);
+// 					}
+// 					else
+// 					{
+// 						sched = new ModifiedAstarUsingVisGraphRelaxation(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), buildAutomaton.isSelected(), true, this);
+// 					}
+// 				}
+// 				else if (selectedHeuristic.equals(ONE_PRODUCT_RELAXATION))
+// 				{
+// 					sched = new ModifiedAstarUsingOneProductRelaxation(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), buildAutomaton.isSelected(), this);
+// 				}
+// 				else if (selectedHeuristic.equals(TWO_PRODUCT_RELAXATION))
+// 				{
+// 					sched = new ModifiedAstarUsingTwoProdRelaxation(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), buildAutomaton.isSelected(), this);
+// 				}
 				else
 				{
-					sched = new ModifiedAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), false, buildAutomaton.isSelected(), this);
+					sched = new ModifiedAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), buildAutomaton.isSelected(), this);
 				}
 			}
 			else if (optiMethodsBox.getSelectedItem().equals(MODIFIED_VGA_STAR))

@@ -94,8 +94,8 @@ public class ExampleTemplates
         initializeCommunicationSystemExamples();
         initializeGames();
         initializeModuleExamples();
-	initializeSchedulingExamples();
-	initializeOtherExamples();
+		initializeSchedulingExamples();
+		initializeOtherExamples();
         //initializeStandardComponents();
     }
     
@@ -345,6 +345,7 @@ private void initializeSchedulingExamples()
         
         thisGroup.addItem(new TemplateItem("2 robots, 1 zone (from HBS)", prefix + "hbs_example.xml"));
         thisGroup.addItem(new TemplateItem("2 robots with alternatives, 1 zone (from PV35)", prefix + "pv35_example.xml"));
+		thisGroup.addItem(new TemplateItem("3 robots, 2 zones", prefix + "3_2.xml"));
     }
     
     /*

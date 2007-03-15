@@ -7,11 +7,11 @@ public interface Scheduler
 {
     /** Returns the representation of a marked state in an optimal schedule automaton. */
     public void schedule()
-    throws Exception;
+		throws Exception;
     
     /** Builds up an optimal schedule automaton from its marked state representation. */
     public void buildScheduleAutomaton()
-    throws Exception;
+		throws Exception;
     
     /** Returns a string containing information about the optimization process. */
     public String getOutputString();

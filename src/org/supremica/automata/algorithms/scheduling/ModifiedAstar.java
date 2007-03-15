@@ -26,6 +26,9 @@ public class ModifiedAstar
     extends AbstractAstar
 {    
     private static Logger logger = LoggerFactory.createLogger(ModifiedAstar.class);
+
+	/** The default heuristic to be used if none is provided by the user */
+	private final static String DEFAULT_HEURISTIC = ScheduleDialog.ONE_PRODUCT_RELAXATION;
     
     //tillf
     private int searchDepthCounter;
@@ -33,36 +36,42 @@ public class ModifiedAstar
     public ModifiedAstar(Automata theAutomata, boolean buildSchedule, ScheduleDialog gui)
 		throws Exception
     {
-        super(theAutomata, "1-product relax", buildSchedule, gui);
+        this(theAutomata, false, buildSchedule, gui);
     }
     
-    public ModifiedAstar(Automata theAutomata, String heuristic, boolean buildSchedule, ScheduleDialog gui)
-		throws Exception
-    {
-        super(theAutomata, heuristic, true, false, buildSchedule, gui);
-    }
-    
-    public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean iterativeSearch, boolean buildSchedule, ScheduleDialog gui)
-		throws Exception
-    {
-        super(theAutomata, heuristic, manualExpansion, iterativeSearch, buildSchedule, gui);
-    }
-    
+//     public ModifiedAstar(Automata theAutomata, String heuristic, boolean buildSchedule, ScheduleDialog gui)
+// 		throws Exception
+//     {
+//         super(theAutomata, heuristic, true, false, buildSchedule, gui);
+//     }
+
     public ModifiedAstar(Automata theAutomata, boolean manualExpansion, boolean buildSchedule, ScheduleDialog gui)
 		throws Exception
     {
-        super(theAutomata, manualExpansion, buildSchedule, gui);
-    }
-    
-    /**
-     * The defalut relaxation, used for estimation of the remaining cost. This method is overriden
-     * in the subclasses. Is used if no relaxation is chosen (i.e. brute force search).
-     */
-    double getRelaxation(double[] node)
+        this(theAutomata, DEFAULT_HEURISTIC, manualExpansion, buildSchedule, gui);
+    }    
+
+    public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, ScheduleDialog gui)
 		throws Exception
     {
-        return 0;
+        this(theAutomata, heuristic, manualExpansion, buildSchedule, false, gui);
     }
+
+	public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider, ScheduleDialog gui) 
+		throws Exception
+	{
+		super(theAutomata, heuristic, manualExpansion, buildSchedule, isRelaxationProvider, gui);
+	}
+    
+//     /**
+//      * The defalut relaxation, used for estimation of the remaining cost. This method is overriden
+//      * in the subclasses. Is used if no relaxation is chosen (i.e. brute force search).
+//      */
+//     double getRelaxation(double[] node)
+// 		throws Exception
+//     {
+//         return 0;
+//     }
     
     /**
      * Updates the closed tree if necessary, i.e. if the currently examined

@@ -1,5 +1,4 @@
-/******************** AbstractAstar.java **************************
- * AKs implementation of Tobbes modified Astar search algo
+/******************** AbstractAstar.java ************************** * AKs implementation of Tobbes modified Astar search algo
  * Basically this is a guided tree-search algorithm, like
  * *      list processed = 0;                             // closed
  *      list waiting = initial_state;   // open
@@ -30,10 +29,10 @@ public abstract class AbstractAstar
     /*                                 VARIABLE SECTION                                     */
     /****************************************************************************************/
     
-    /** The indices of important parameters, that help to find them in the int[]-representions of nodes. */
+    /** The indices of important parameters, that help to find them in the int[]-representions of the nodes. */
     public static int ESTIMATE_INDEX, ACCUMULATED_COST_INDEX, CURRENT_COSTS_INDEX, PARENT_INDEX;
     
-    private static final String VISIBILITY_GRAPH = "visibility graph";
+//     private static final String VISIBILITY_GRAPH = "visibility graph";
     
     /**
      * Contains promising search tree nodes, i.e. nodes that might lie on the optimal path.
@@ -63,25 +62,9 @@ public abstract class AbstractAstar
      * @see AbstractAstar#updateClosedTree(double[] node) .
      */
     protected TreeMap<Integer, double[]> closedTree;
-    
-    /**
-     * The remaining cost for each state of each robot (if run independently of other robots).
-     * int[] = [robot_index, state_index].
-     */
-    protected double[][] remainingCosts;
-    
+        
     /** Hashtable containing the estimated cost for each combination of two robots **/
     //     protected Hashtable[] twoProdRelax;
-    
-    /**
-     * Hashtable containing the estimated cost for a given time configuration
-     * (as returned by the visibility graph)
-     */
-    // Should it be here??? /AK
-    //	protected Hashtable<String, Integer> visGraphRelax = null;
-    
-    /** The Visibility Graphs, used for relaxation. Can handle two robots at a time */
-    protected Hashtable<String, VisGraphScheduler> visibilityGraphs = null;
     
     /** The selected automata */
     protected Automata theAutomata, plantAutomata;
@@ -101,6 +84,9 @@ public abstract class AbstractAstar
     
     /** Handles the expansion of nodes - either manually or using Supremicas methods */
     protected NodeExpander expander;
+
+	/** Is responsible for the correct relaxation/estimation that guides the A* search */
+	protected Relaxer relaxer;
     
     /** Is used to translate the state indices to unique hash values */
     protected int[] keyMapping;
@@ -112,7 +98,7 @@ public abstract class AbstractAstar
      * 2-product relaxation. During this first phase, useOneProdRelax would be true although
      * heuristic = "2-product relax".
      */
-    protected boolean useOneProdRelax;
+//     protected boolean useOneProdRelax;
     
     /** This string contains info about the scheduling, such as time, nr of iterations etc. */
     protected String outputStr =  "";
@@ -132,7 +118,7 @@ public abstract class AbstractAstar
      * the simple modified A*, but requires less memory.
      * THIS FEATURE IS HOWEVER NOT IMPLEMENTED.
      */
-    protected boolean iterativeSearch;
+//     protected boolean iterativeSearch;
     
     /**
      * If this variable is set to true, the consistensy of the heuristic is guaranteed,
@@ -163,9 +149,9 @@ public abstract class AbstractAstar
      */
     protected boolean manualExpansion;
     
-        /*
-         * The thread that performs the search for the optimal solution
-         */
+	/*
+	 * The thread that performs the search for the optimal solution
+	 */
     protected Thread astarThread;
     
     /**
@@ -197,13 +183,10 @@ public abstract class AbstractAstar
      * to its initial state. Needed to describe repetitive working cycles.
      */
     String dummyEventName = "reset";
-    
-    //MKT Tillf
-    protected Hashtable<String, Double> visGraphRelax = null;
-    
-    //MKT MKT Tillf
-    protected int scheduleFromCounter = 0;
-    protected long scheduleFromTime = 0;
+        
+//     //MKT MKT Tillf
+//     protected int scheduleFromCounter = 0;
+//     protected long scheduleFromTime = 0;
     
     
     /****************************************************************************************/
@@ -222,88 +205,64 @@ public abstract class AbstractAstar
      * open tree, according to the estimated remaining cost value.
      */
     protected abstract void branch(double[] currNode);
-    
-    /**
-     * Calculates the relaxation value for the node, i.e. the estimate of the remaining
-     * cost, h(n), according to the employed heuristic
-     *
-     * @param node the node, whose estimated cost we want to know
-     * @return remainingEstimatedCost : h(n)
-     */
-    abstract double getRelaxation(double[] node)
-    throws Exception;
-    
+       
     
     /****************************************************************************************/
     /*                                 CONSTUCTORS                                          */
     /****************************************************************************************/
     
     
-    public AbstractAstar(Automata theAutomata, boolean buildSchedule, ScheduleDialog gui)
-    throws Exception
-    {
-        this(theAutomata, "1-product relax", buildSchedule, gui);
-    }
+//     public AbstractAstar(Automata theAutomata, boolean buildSchedule, ScheduleDialog gui)
+// 		throws Exception
+//     {
+//         this(theAutomata, DEFAULT_HEURISTIC, buildSchedule, gui);
+//     }
     
-    public AbstractAstar(Automata theAutomata, String heuristic, boolean buildSchedule, ScheduleDialog gui)
-    throws Exception
-    {
-        this(theAutomata, heuristic, true, false, buildSchedule, gui);
-    }
+//     public AbstractAstar(Automata theAutomata, String heuristic, boolean buildSchedule, ScheduleDialog gui)
+// 		throws Exception
+//     {
+//         this(theAutomata, heuristic, true, false, buildSchedule, gui);
+//     }
     
-    public AbstractAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean iterativeSearch, boolean buildSchedule, ScheduleDialog gui)
-    throws Exception
+    public AbstractAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider, ScheduleDialog gui)
+		throws Exception
     {
         this.theAutomata = theAutomata;
-        this.iterativeSearch = iterativeSearch;
-        this.heuristic = heuristic;
-        this.buildSchedule = buildSchedule;
+		this.heuristic = heuristic;
+		this.manualExpansion = manualExpansion;
+		this.buildSchedule = buildSchedule;
+        this.isRelaxationProvider = isRelaxationProvider;
         this.gui = gui;
-        this.manualExpansion = manualExpansion;
-        
-        if (heuristic.equals("1-product relax"))
-        {
-            useOneProdRelax = true;
-        }
-        else if(heuristic.equals("2-product relax"))
-        {
-            if (theAutomata.getPlantAutomata().size() < 3)
-            {
-                throw new Exception("2-product relax cannot be used for two or less products");
-            }
-            
-            useOneProdRelax = false;
-        }
-        
+               
         astarThread = new Thread(this);
         isRunning = true;
         astarThread.start();
     }
     
-    public AbstractAstar(Automata theAutomata, boolean manualExpansion, boolean buildSchedule, ScheduleDialog gui)
-    throws Exception
-    {
-        this.theAutomata = theAutomata;
-        this.buildSchedule = buildSchedule;
-        this.gui = gui;
-        this.manualExpansion = manualExpansion;
+//     public AbstractAstar(Automata theAutomata, boolean manualExpansion, boolean buildSchedule, ScheduleDialog gui)
+// 		throws Exception
+//     {
+//         this.theAutomata = theAutomata;
+//         this.buildSchedule = buildSchedule;
+//         this.gui = gui;
+//         this.manualExpansion = manualExpansion;
         
-        if (heuristic.equals("1-product relax"))
-            useOneProdRelax = true;
-        else if(heuristic.equals("2-product relax"))
-        {
-            if (theAutomata.getPlantAutomata().size() < 3)
-            {
-                throw new Exception("2-product relax cannot be used for two or less products");
-            }
+//         if (heuristic.equals("1-product relax"))
+//             useOneProdRelax = true;
+//         else if(heuristic.equals("2-product relax"))
+//         {
+//             if (theAutomata.getPlantAutomata().size() < 3)
+//             {
+//                 throw new Exception("2-product relax cannot be used for two or less products");
+//             }
             
-            useOneProdRelax = false;
-        }
+//             useOneProdRelax = false;
+//         }
         
-        astarThread = new Thread(this);
-        isRunning = true;
-        astarThread.start();
-    }
+//         astarThread = new Thread(this);
+//         isRunning = true;
+//         astarThread.start();
+//     }
     
     
     /****************************************************************************************/
@@ -332,18 +291,18 @@ public abstract class AbstractAstar
                     logger.info(totalTimeStr);
                     outputStr += "\t" + totalTimeStr + "\n";
                     
-                    //Tillf
-                    if (this instanceof ModifiedAstarUsingVisGraphRelaxation)
-                    {
-                        logger.info("Nr of stored VisGraphRelaxations = " + visGraphRelax.size());
-                        logger.info("scheduleFromTime = " + scheduleFromTime + "; scheduleFromCounter = " + scheduleFromCounter + "; " + scheduleFromCounter/(scheduleFromTime+0.0) + " relax_counts/ms");
-                        int visCheckTime = 0;
-                        for (Iterator<VisGraphScheduler> it = visibilityGraphs.values().iterator(); it.hasNext(); )
-                        {
-                            visCheckTime += it.next().totalVisCheckTime;
-                        }
-                        logger.info("total_visibility_check_time = " + visCheckTime);
-                    }
+//                     //Tillf
+//                     if (this instanceof ModifiedAstarUsingVisGraphRelaxation)
+//                     {
+//                         logger.info("Nr of stored VisGraphRelaxations = " + visGraphRelax.size());
+//                         logger.info("scheduleFromTime = " + scheduleFromTime + "; scheduleFromCounter = " + scheduleFromCounter + "; " + scheduleFromCounter/(scheduleFromTime+0.0) + " relax_counts/ms");
+//                         int visCheckTime = 0;
+//                         for (Iterator<VisGraphScheduler> it = visibilityGraphs.values().iterator(); it.hasNext(); )
+//                         {
+//                             visCheckTime += it.next().totalVisCheckTime;
+//                         }
+//                         logger.info("total_visibility_check_time = " + visCheckTime);
+//                     }
                 }
                 
                 if (isRunning && buildSchedule)
@@ -370,11 +329,13 @@ public abstract class AbstractAstar
     }
     
     protected void init()
-    throws Exception
+		throws Exception
     {
         if (theAutomata == null)
+		{
             return;
-        
+        }
+
         timer = new ActionTimer();
         plantAutomata = theAutomata.getPlantAutomata();
         
@@ -393,7 +354,8 @@ public abstract class AbstractAstar
         }
         
         expander = new NodeExpander(manualExpansion, theAutomata, this);
-        
+        initRelaxer(); 
+		        
         //Borde r�cka med plantAutomata.size(), fast d� kanske man m�ste �ndra lite p� andra st�llen ocks�
         keyMapping = new int[theAutomata.size()];
         keyMapping[0] = 1;
@@ -402,13 +364,8 @@ public abstract class AbstractAstar
             keyMapping[i] = keyMapping[i-1] * (theAutomata.getAutomatonAt(i-1).nbrOfStates() + 1);
         }
         
-        remainingCosts = new double[plantAutomata.size()][];
         outputStr = "Processing times:\n";
-        
-        timer.restart();
-        initRemainingCosts();
-        outputStr += "\t1st preprocessing in " + timer.elapsedTime() + " ms\n";
-        
+                
         initAuxIndices();
         
         openTree = new TreeSet<double[]>(new OpenTreeComparator(ESTIMATE_INDEX));
@@ -433,83 +390,36 @@ public abstract class AbstractAstar
         ACCUMULATED_COST_INDEX = CURRENT_COSTS_INDEX + plantAutomata.size();
         ESTIMATE_INDEX = ACCUMULATED_COST_INDEX + 1;
     }
-    
-    /**
-     * Calculates the remaining (independent) cycle times for each robot (i.e. as if there
-     * would only be one robot in the cell) and stores them in remainingCosts.
-     * It is equal to the minimal remaining time from each state to the marked state.
-     * This information is used by different heuristics (e.g. 1-prod-relax, 2-prod-relax
-     * and visibility graph).
-     */
-    private void initRemainingCosts()
-    throws Exception
-    {
-        for (int i=0; i<plantAutomata.size(); i++)
+
+	/**
+	 * Creates an instance of Relaxer corresponding to the chosen heuristic.
+	 */
+	protected void initRelaxer()
+		throws Exception
+	{
+		if (heuristic.equals(ScheduleDialog.ONE_PRODUCT_RELAXATION))
         {
-            Automaton theAuto = plantAutomata.getAutomatonAt(i);
-            
-            // An accepting state is found for the current automaton. In order
-            // for the algorithm to work properly, it is assumed that the model is
-            // such that the accepting state is also the last state in the sequence(s)
-            // of operations, described by the current automaton.
-            State markedState = null;
-            
-            for (Iterator<State> stateIt = theAuto.stateIterator(); stateIt.hasNext(); )
-            {
-                markedState = stateIt.next();
-                
-                if (markedState.isAccepting())
-                    break;
-            }
-            
-            if (! markedState.isAccepting())
-                throw new Exception("No accepting state for " + theAuto.getName() + " was found during preprocessing...");
-            
-            
-            ArrayList estList = new ArrayList();
-            
-            remainingCosts[i] = new double[theAuto.nbrOfStates()];
-            for (int j=0; j<remainingCosts[i].length; j++)
-                remainingCosts[i][j] = -1;
-            
-            if (markedState == null)
-                return;
-            else
-            {
-                remainingCosts[i][markedState.getIndex()] = markedState.getCost();
-                
-                estList.add(markedState);
-                
-                while (!estList.isEmpty())
-                {
-                    Iterator<Arc> incomingArcIterator = ((State)estList.remove(0)).incomingArcsIterator();
-                    
-                    while (incomingArcIterator.hasNext())
-                    {
-                        Arc currArc = incomingArcIterator.next();
-                        State currState = currArc.getFromState();
-                        State nextState = currArc.getToState();
-                        
-                        if (remainingCosts[i][currState.getIndex()] == -1)
-                        {
-                            remainingCosts[i][currState.getIndex()] = remainingCosts[i][nextState.getIndex()] + nextState.getCost();
-                            estList.add(currState);
-                        }
-                        else
-                        {
-                            double newRemainingCost = nextState.getCost() + remainingCosts[i][nextState.getIndex()];
-                            
-                            if (newRemainingCost < remainingCosts[i][currState.getIndex()])
-                            {
-                                remainingCosts[i][currState.getIndex()] = newRemainingCost;
-                                estList.add(currState);
-                            }
-                        }
-                    }
-                }
-            }
+            relaxer = new OneProductRelaxer(expander, this);
         }
-    }
+        else if (heuristic.equals(ScheduleDialog.TWO_PRODUCT_RELAXATION))
+        {
+            // if (theAutomata.getPlantAutomata().size() < 3)
+			//             {
+			//                 throw new Exception("2-product relax cannot be used for two or less products");
+			//             }
+            
+			//             useOneProdRelax = false;
+			throw new Exception("'2-product relax' is currently too buggishly implemented.");
+        }
+		else if (heuristic.equals(ScheduleDialog.VIS_GRAPH_TIME_RELAXATION))
+		{
+			relaxer = new VisibilityGraphRelaxer(expander, this, false);
+		}
+		else if (heuristic.equals(ScheduleDialog.VIS_GRAPH_NODE_RELAXATION))
+		{
+			relaxer = new VisibilityGraphRelaxer(expander, this, true);
+		}
+	}
     
     public void requestStop()
     {
@@ -542,7 +452,7 @@ public abstract class AbstractAstar
      * starting from the initial node.
      */
     public void schedule()
-    throws Exception
+		throws Exception
     {
         if (theAutomata == null)
         {
@@ -555,7 +465,7 @@ public abstract class AbstractAstar
     }
     
     public double scheduleFrom(double[] currNode)
-    throws Exception
+		throws Exception
     {
         schedulingDone = false;
         
@@ -852,26 +762,26 @@ public abstract class AbstractAstar
       String plantNames = "";
       for (int k=0; k<currAutomataIndex.length-1; k++)
       plantNames += theAutomata.getAutomatonAt(currAutomataIndex[k]).getName() + "||";
-          plantNames += theAutomata.getAutomatonAt(currAutomataIndex[currAutomataIndex.length-1]).getName();
+	  plantNames += theAutomata.getAutomatonAt(currAutomataIndex[currAutomataIndex.length-1]).getName();
      
-          logger.warn("�r " + currNode.toStringLight() + " l�st s� in i helvete f�r " + plantNames + "???");
-          }
+	  logger.warn("�r " + currNode.toStringLight() + " l�st s� in i helvete f�r " + plantNames + "???");
+	  }
      
-          }
-          }
+	  }
+	  }
      
-          String plantNames = "";
-          for (int k=0; k<currAutomataIndex.length-1; k++)
-          plantNames += theAutomata.getAutomatonAt(currAutomataIndex[k]).getName() + "||";
-          plantNames += theAutomata.getAutomatonAt(currAutomataIndex[currAutomataIndex.length-1]).getName();
+	  String plantNames = "";
+	  for (int k=0; k<currAutomataIndex.length-1; k++)
+	  plantNames += theAutomata.getAutomatonAt(currAutomataIndex[k]).getName() + "||";
+	  plantNames += theAutomata.getAutomatonAt(currAutomataIndex[currAutomataIndex.length-1]).getName();
      
-          outputStr += "\t\t" + plantNames + ": " + schedCounter + " nodes relaxed\n";
-          }
-          }
+	  outputStr += "\t\t" + plantNames + ": " + schedCounter + " nodes relaxed\n";
+	  }
+	  }
      
-          return outputStr;
-          }
-     */
+	  return outputStr;
+	  }
+	*/
     
     //     int getTwoProdRelaxation(int[] node) {
     // 	int estimate = 0;
@@ -916,7 +826,7 @@ public abstract class AbstractAstar
      * @return totalEstimatedCost : f(n) = g(n) + h(n)
      */
     public double calcEstimatedCost(double[] node)
-    throws Exception
+		throws Exception
     {
         double[] parent = getParent(node);
         
@@ -935,10 +845,10 @@ public abstract class AbstractAstar
         return fNode;
     }
     
-        /*
-         * This method returns an updated cost vector, containing updated current costs,
-         * accumulated cost and estimated cost.
-         */
+	/*
+	 * This method returns an updated cost vector, containing updated current costs,
+	 * accumulated cost and estimated cost.
+	 */
     public double[] updateCosts(double[] costs, int changedIndex, double newCost)
     {
         double[] newCosts = new double[costs.length];
@@ -982,7 +892,7 @@ public abstract class AbstractAstar
      * is done until an initial node is found, which completes the construction.
      */
     public void buildScheduleAutomaton()
-    throws Exception
+		throws Exception
     {
         timer.restart();
         
@@ -1054,7 +964,7 @@ public abstract class AbstractAstar
      * @return parentNode - the parent of the node 'node'
      */
     protected double[] getParent(double[] node)
-    throws Exception
+		throws Exception
     {
         // one object of the closedTree may contain several nodes (that all correspond
         // to the same logical state but different paths).
@@ -1211,6 +1121,18 @@ public abstract class AbstractAstar
     /*                                 AUXILIARY METHODS                                    */
     /****************************************************************************************/
     
+    /**
+     * Calculates the relaxation value for the node, i.e. the estimate of the remaining
+     * cost, h(n), according to the employed heuristic
+     *
+     * @param node the node, whose estimated cost we want to know
+     * @return remainingEstimatedCost : h(n)
+     */
+    protected double getRelaxation(double[] node)
+		throws Exception
+	{
+		return relaxer.getRelaxation(node);
+	}
     
     public String printArray(int[] node)
     {
@@ -1405,4 +1327,35 @@ public abstract class AbstractAstar
     {
         return outputStr;
     }
+
+	public Automata getAllAutomata()
+	{
+		return theAutomata;
+	}
+
+	public Automata getPlantAutomata()
+	{
+		return plantAutomata;
+	}
+
+	public boolean isManualExpansion()
+	{
+		return manualExpansion;
+	}
+
+	public ScheduleDialog getGui()
+	{
+		return gui;
+	}
+
+	public void sleep (long ms)
+		throws InterruptedException
+	{
+		astarThread.sleep(ms);
+	}
+
+	public void addToOutputString(String str)
+	{
+		outputStr += str;
+	}
 }
