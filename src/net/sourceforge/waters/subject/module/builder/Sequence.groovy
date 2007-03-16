@@ -1,9 +1,9 @@
 package net.sourceforge.waters.subject.module.builder;
 
-class Sequence extends Scope {
+class Sequence extends Named {
 	static final pattern = /(?i)sequence/
 	static final defaultAttr = 'name'
-	static final parentAttr = 'sequences'
+	static final parentAttr = 'statements'
 	List steps = []
 	List transitions = []
 	def addToModule(ModuleBuilder mb, String scanEvent) {
@@ -29,16 +29,12 @@ class Sequence extends Scope {
 			}
 		}
 	}
+	Scope getRuntimeScope(Scope parent) {
+		Scope scope = [parent:parent, self:this]
+	}
 }
 
-class Step extends Scope {
-	Step() {
-		super()
-		def x = new Variable()
-		x.name = new IdentifierExpression('X')
-		x.scope = this
-		children << x
-	}
+class Step extends Named {
 	static final pattern = /(?i)step/
 	static final defaultAttr = 'name'
 	static final parentAttr = 'steps'
@@ -47,7 +43,7 @@ class Step extends Scope {
 	List nonstoredQualifiers = []
 }
 
-class Transition extends NamedImpl {
+class Transition extends Named {
 	static final pattern = /(?i)tran(?:sition)?/
 	static final defaultAttr = 'guard'
 	static final parentAttr = 'transitions'

@@ -35,98 +35,95 @@ class Converter {
 	static final DEFAULT_PROCESS_PLANT_NAME = 'Process'
 	static final SEPARATOR_PATTERN = /\./
 	static final SEPARATOR = '.'
-		
-//	private static String toSupremicaSyntax(String expr) {
-//		String newExpr = expr
-//		def replaceWordOp = {oldOp, newOp ->
-//			newExpr.replaceAll(/(?i)\s*\b${oldOp}\b\s*/){"$newOp"}
-//		}
-//		newExpr = replaceWordOp(/and/, ' & ')
-//		newExpr = replaceWordOp(/or/, ' | ')
-//		newExpr = newExpr.replace(':=', '£££')
-//		newExpr = newExpr.replace('=', '==')
-//		newExpr = newExpr.replace('£££', '=')
-//		newExpr = replaceWordOp(/not/, ' !')
-//		newExpr = newExpr.replace('.', '_')
-//		newExpr.trim()
-//	}
 }
 
-class Assignment extends NamedImpl {
-	String input
+class Assignment extends Named {
+	Expression input
+	IdentifierExpression Q
 	static final pattern = /(?i)assign(?:ment)?/
 	static final defaultAttr = 'name'
-	static final parentAttr = 'functionBlockInstances'
-	def addToModule(ModuleBuilder mb, Scope dynamicScope) {
-		println 'aaasda'
-		mb.plant("ASSIGN_${name.toSupremicaSyntax(dynamicScope)}", defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
-			state('q0', marked:true) {
-				selfLoop(guard:new Expression(input).toSupremicaSyntax(dynamicScope)) { set(name.toSupremicaSyntax(dynamicScope)) }
-				selfLoop(guard:new Expression("not (${input})").toSupremicaSyntax(dynamicScope)) { reset(name.toSupremicaSyntax(dynamicScope)) }
+	static final parentAttr = 'statements'
+
+	def addToModule(ModuleBuilder mb, List statements, int indexToThis, eventName) {
+		Scope scope = statements[indexToThis].scope
+		Variable assignedVariable = scope.namedElement(Q)
+		if (assignedVariable.assignmentAutomatonNeeded(statements, indexToThis)) {
+			mb.booleanVariable(Q.toSupremicaSyntax(scope), initial:assignedVariable.value, marked:assignedVariable.value ? true : false)
+			mb.plant("ASSIGN_${Q.toSupremicaSyntax(scope)}", defaultEvent:eventName, deterministic:false) {
+				state('q0', marked:true) {
+					selfLoop(guard:input.toSupremicaSyntax(scope, statements[0..<indexToThis])) { set(Q.toSupremicaSyntax(scope)) }
+					selfLoop(guard:new Expression("not (${input})").toSupremicaSyntax(scope, statements[0..<indexToThis])) { reset(Q.toSupremicaSyntax(scope)) }
+				}
 			}
 		}
 	}
+	List execute(Scope parent) {
+		[[statement:this, scope:parent]]
+	}
+	List getNamedElements() { return [] }
+	List getSubScopes() { return [] } 
 }
 
-class Input extends NamedImpl {
+class Input extends ExternalVariable {
 	static final pattern = /(?i)input/
 	static final defaultAttr = 'name'
 	static final parentAttr = 'inputs'
-	def formatEventName() {
-		name.toSupremicaSyntax(this) + '_change'
+	def formatEventName(Scope scope) {
+		name.toSupremicaSyntax(scope) + '_change'
 	}
-	boolean value
 }
-class Output extends NamedImpl {
+class Output extends ExternalVariable {
 	static final pattern = /(?i)output/
 	static final defaultAttr = 'name'
 	static final parentAttr = 'outputs'
-	boolean value
 }
-class Variable extends NamedImpl {
+abstract class ExternalVariable extends Variable {
+	def assignmentAutomatonNeeded(List statements, int indexToThis) {
+		def statementScope = statements[indexToThis].scope
+		def variableScope = statementScope.scopeOf(statements[indexToThis].statement.Q)
+		def fullNameOfThis = statementScope.fullNameOf(statements[indexToThis].statement.Q)
+		def needed = variableScope.global 
+		int i = 0
+		needed |= statements[0..indexToThis].any{s ->
+			s.scope.identifiersInExpression(s.scope.expand(s.statement.input, statements[0..<i++])).any{it == fullNameOfThis}
+		}
+		needed &= indexToThis == statements.size() - 1 || statements[indexToThis+1..-1].every{it.scope.fullNameOf(it.statement.Q) != fullNameOfThis}
+	}
+}
+class InternalVariable extends Variable {
 	static final pattern = /(?i)variable/
 	static final defaultAttr = 'name'
 	static final parentAttr = 'variables'
+		def assignmentAutomatonNeeded(List statements, int indexToThis) {
+		def statementScope = statements[indexToThis].scope
+		def variableScope = statementScope.scopeOf(statements[indexToThis].statement.Q)
+		def fullNameOfThis = statementScope.fullNameOf(statements[indexToThis].statement.Q)
+		def needed = false 
+		int i = 0
+		needed |= statements[0..indexToThis].any{s ->
+			statementScope.identifiersInExpression(s.scope.expand(s.statement.input, statements[0..<i++])).any{it == fullNameOfThis}
+		}
+		needed &= indexToThis == statements.size() - 1 || statements[indexToThis+1..-1].every{it.scope.fullNameOf(it.statement.Q) != fullNameOfThis}
+	}
+}
+
+abstract class Variable extends Named {
 	boolean value
 }
+
 class Expression {
-	protected static final KEYWORDS = [/(?i)and/, /(?i)or/, /(?i)not/, /(?i)true/, /(?i)false/]
-	protected static final WORD_PATTERN = /\b\w+\b(?:${Converter.SEPARATOR_PATTERN}\b\w+\b)*/
-	                                                                  	
 	Expression(String text) {
-		this.text = text
+		this.text = text?.trim()
 	}
-	String text
+	final String text
 	
-	String fullyQualified(context) {
-		def newExpr = text.replaceAll(WORD_PATTERN) { word ->
-			if (!KEYWORDS.any{keyword -> word ==~ keyword}) {
-	//			println '#######'
-//				println 'Word:' << word << ' context:' << context << ' scope:' << context.scope 
-//				println 'E#######'
-				def expr = context.scope.aliases[word]
-				if (expr) {
-					if (expr ==~ WORD_PATTERN) return "$expr"
-					else return "($expr)"
-				} else return word
-			} else return word
-		}
-		newExpr.replaceAll(WORD_PATTERN) { word ->
-			if (!KEYWORDS.any{keyword -> word ==~ keyword}) {
-//				println '#######'
-//				println 'Word:' << word << ' context:' << context << ' scope:' << context.scope 
-//				println 'E#######'
-				def obj = context.scope.child(new IdentifierExpression(word))
-				assert obj, "Undeclared identifier $word in expr '$text', context ${context.name} and scope ${context.scope.name}" 
-				return context.scope.child(new IdentifierExpression(word)).fullName
-			} else return word
-		} 
-	}
-	String toSupremicaSyntax(context) {
-		String newExpr = fullyQualified(context)
+	String toSupremicaSyntax(Scope scope, List programState) {
+		String newExpr = scope.expand(this, programState).text
 		def replaceWordOp = {oldOp, newOp ->
 			newExpr.replaceAll(/(?i)\s*\b${oldOp}\b\s*/){"$newOp"}
 		}
+		newExpr = replaceWordOp(/true/, ' 1 ')
+		newExpr = replaceWordOp(/false/, ' 0 ')
 		newExpr = replaceWordOp(/and/, ' & ')
 		newExpr = replaceWordOp(/or/, ' | ')
 		newExpr = newExpr.replace(':=', '£££')
@@ -135,82 +132,103 @@ class Expression {
 		newExpr = replaceWordOp(/not/, ' !')
 		newExpr = newExpr.replace('.', '_')
 		newExpr = newExpr.replaceAll(/\(\s+/){'('}
-		newExpr = newExpr.replaceAll(/\\s+\)/){')'}
+		newExpr = newExpr.replaceAll(/\s+\)/){')'}
 		newExpr.trim()
 	}
 	String toString() {
 		return text
 	}
-	def addToModule(ModuleBuilder mb) {
-		
-	}
-	
 	boolean equals(object) {
 		if (!object) return false
-		if (object instanceof Expression) return text.toLowerCase() == object.text.toLowerCase()
+		if (object instanceof Expression) {
+			if (text == object.text || (text && object.text && text.toLowerCase() == object.text.toLowerCase())) return true
+			return 
+		}
 		false
 	}
-	
 	int hashCode() {
 		return text.toLowerCase().hashCode()
 	}
 }
-public class NamedImpl extends Named {
-	Scope scope
-	String getFullName() {
-		scope.parentScope ? "${scope.fullName}${Converter.SEPARATOR}$name" : name
-	}
-}
-abstract class Named {
+class Named {
 	IdentifierExpression name
-	abstract Scope getScope()
-	abstract String getFullName()
-	String getSupremicaName() {
-		name.toSupremicaSyntax(this)
-	}
 }
 
 class IdentifierExpression extends Expression {
 	IdentifierExpression(String expr) {
 		super(expr)
-//		println 'context:' << context << ' expr:' << expr
 	}
-/*	IdentifierExpression(Named prefix, String suffix) {
-		super(context, "${prefix.fullName}${Converter.SEPARATOR}$suffix")
-	}*/
-	String leftMostPart() {
+	IdentifierExpression leftMostPart() {
 		def parts = text.split(Converter.SEPARATOR_PATTERN)
-		if (parts.size() > 1) return parts[0] 
+		if (parts.size() > 1) return new IdentifierExpression(parts[0]) 
 		null
 	}
-	String exceptLeftMostPart() {
+	IdentifierExpression exceptLeftMostPart() {
 		def parts = text.split(Converter.SEPARATOR_PATTERN)
-		if (parts.size() > 1) return parts[1..-1].join(Converter.SEPARATOR) 
-		text
+		if (parts.size() > 1) return new IdentifierExpression(parts[1..-1].join(Converter.SEPARATOR)) 
+		else return new IdentifierExpression(text)
+	}
+	IdentifierExpression rightMostPart() {
+		new IdentifierExpression(text.split(Converter.SEPARATOR_PATTERN)[-1])
+	}
+	String toSupremicaSyntax(Scope scope) {
+		super.toSupremicaSyntax(scope, [])
 	}
 }
 
 class ControlCodeBuilder extends BuilderSupport {
 
+	ControlCodeBuilder() {
+		functionblock('SR') {
+			input 'S'
+			input 'R'
+			output 'Q'
+			mainProgram {
+				'Q := not R and Q or S'()
+			}
+		}
+		functionblock('RS') {
+			input 'S'
+			input 'R'
+			output 'Q'
+			mainProgram {
+				'Q := not R and (Q or S)'()
+			}
+		}
+		functionblock('P') {
+			input 'in'
+			output 'Q'
+			variable 'in_old'
+			mainProgram {
+				'Q := in and not in_old'()
+				'in_old := in'()
+			}
+		}
+		functionblock('N') {
+			input 'in'
+			output 'Q'
+			variable 'in_old'
+			mainProgram {
+				'Q := not in and in_old'()
+				'in_old := in'()
+			}
+		}
+	}
+	List functionBlocks = []
 	static void main(args) {
-		testBuilder(true)
+		testBuilder3(true)
 		//builder.saveModuleToFile()
 	}
 	static {
-		println "controlcode builder test" 
-		testBuilder(false)
+		//println "controlcode builder test" 
+		//testBuilder2(false)
 	}
 	
-	def currentScope = null
-	
-	def functionBlocks = []
-	                      
 	static final SET = 'setQualifiers'
 	static final RESET = 'resetQualifiers'
 	static final NONSTORED = 'nonstoredQualifiers'
 			
-	static final NODE_TYPES = [Application,
-	                           MainProgram,
+	static final NODE_TYPES = [MainProgram,
 	                           FunctionBlock,
 	                           FunctionBlockInstance,
 	                           Sequence,
@@ -220,7 +238,7 @@ class ControlCodeBuilder extends BuilderSupport {
 	                           Transition,
 	                           Input,
 	                           Output,
-	                           Variable,
+	                           InternalVariable,
 	                           [name:SET, pattern:/(?i)S|set/, defaultAttr:'name', parentAttr:SET],
 	                           [name:RESET, pattern:/(?i)R|reset/, defaultAttr:'name', parentAttr:RESET],
 	                           [name:NONSTORED, pattern:/(?i)N|nonstored/, defaultAttr:'name', parentAttr:NONSTORED]]
@@ -230,7 +248,7 @@ class ControlCodeBuilder extends BuilderSupport {
 		if (!type)
 			if (name =~ /\:=/) {
 				def parts = name.split(/\:=/)
-				return createNode('assignment', [name:parts[0], input:parts[1]]) 
+				return createNode('assignment', [name:"ASSIGN_${parts[0]}", Q:parts[0], input:parts[1]]) 
 			} else return createNode('transition', name)
 		createNode(name, [:], null)
 	}
@@ -241,16 +259,16 @@ class ControlCodeBuilder extends BuilderSupport {
 
 	def createNode(name, Map attributes){
 		def type = NODE_TYPES.find{name ==~ it.pattern}
-		//println 'createNode, name:' << name << ' attributes:' << attributes << ' type:' << type << ' currentScope:' << currentScope.dump()
-		if (!type && currentScope.metaClass.properties.any{it.name == 'functionBlocks'}) type = currentScope.functionBlocks.find{name ==~ it.namePattern}
-		else if (!type) return createNode('transition', attributes, name)
+//		println 'createNode, name:' << name << ' attributes:' << attributes << ' type:' << type.inspect()
+		if (!type) type = functionBlocks.find{name ==~ it.namePattern}
+		if (!type) return createNode('transition', attributes, name)
 		//println type
 		if (type instanceof Class) {
 			def obj = type.newInstance()
 			def setProperty  = {attribute ->
 				if (attribute?.key) {
 					def value
-					Class propertyType = obj.metaClass.properties.find{it.name == attribute.key}?.type
+					Class propertyType = obj.metaClass.properties.find{it.name.toLowerCase() == attribute.key.toLowerCase()}?.type
 					switch (propertyType) {
 					case IdentifierExpression: value = new IdentifierExpression(attribute.value); break
 					case Expression: value = new Expression(attribute.value); break
@@ -262,35 +280,30 @@ class ControlCodeBuilder extends BuilderSupport {
 			}
 			setProperty(attributes.find{it.key == 'type'})
 			attributes.each{ setProperty(it) }
-			
-			//println obj
-			if (obj instanceof Named && currentScope) {
-				obj.scope = currentScope
-				currentScope.children << obj
-			}
-			if (obj instanceof Scope) {
-				obj.parentScope = currentScope
-				currentScope = obj
-			}
+			if (obj instanceof FunctionBlock) functionBlocks << obj
 			return obj
 		}
-		if (type instanceof FunctionBlock) return createNode('functionBlockInstance', [type:type, *:attributes])
+		if (type instanceof FunctionBlock) {
+			if (!attributes.name) attributes.name = "${type.name}_${attributes.Q}"
+			return createNode('functionBlockInstance', [type:type, *:attributes])
+		}
 		[type:type, *:attributes] as Expando
 	}
 
 	def createNode(name, Map attributes, value){
 		def type = NODE_TYPES.find{name ==~ it.pattern}
-		if (!type) return null//createNode('transition', name)
+		if (!type) return createNode(name, [(FunctionBlockInstance.defaultAttr):value, *:attributes])
 		createNode(name, [(type.defaultAttr):value, *:attributes])
 	}
 	
 	void setParent(parent, child) {
-		//println 'parent:' << parent.inspect()
-		//println 'child:' << child.inspect()
+		//println "setParent: parent: ${parent.inspect()}, child: ${child.inspect()}"
 		def parentAttr = child instanceof Expando ? child.type.parentAttr : child.parentAttr
-		if (parent instanceof Expando && !parent[parentAttr]) parent[parentAttr] = []	
-		if (parent[parentAttr] instanceof List) parent[parentAttr] << child
-		else parent[parentAttr] = child
+		if (parentAttr) {
+			if (parent instanceof Expando && !parent[parentAttr]) parent[parentAttr] = []	
+			if (parent[parentAttr] instanceof List) parent[parentAttr] << child
+			else parent[parentAttr] = child
+		}
 	}
 	
 	void nodeCompleted(parent, node) {
@@ -300,7 +313,6 @@ class ControlCodeBuilder extends BuilderSupport {
 		case Step: parent.transitions.findAll{!it.to}.each{it.to = node.name}; break
 		case Transition: if (!node.from) node.from = parent.steps[-1].name; break
 		}
-		if (node == currentScope) currentScope = currentScope.parentScope
 	}
 	
 	public static testBuilder(openInSupremica) {
@@ -549,11 +561,142 @@ class ControlCodeBuilder extends BuilderSupport {
 		def correctProgramWithManualProcess = correctProgram(false)
 		def correctProgramWithDefaultProcess = correctProgram(true)
 		
-		Util.assertGeneratedModuleEqualsManual(programWithManualProcess.toAutomata(), correctProgramWithManualProcess)
+		printscope programWithDefaultProcess.runtimeScope, 0
+/*		Util.assertGeneratedModuleEqualsManual(programWithManualProcess.toAutomata(), correctProgramWithManualProcess)
 		Util.assertGeneratedModuleEqualsManual(programWithDefaultProcess.toAutomata(), correctProgramWithDefaultProcess)
 		if (openInSupremica) {
 			Util.openModuleInSupremica(programWithManualProcess.toAutomata())
 			Util.openModuleInSupremica(programWithDefaultProcess.toAutomata())
+		}*/
+	}
+	static void testBuilder3(openInSupremica) {
+		def ccb = new ControlCodeBuilder()
+		def app = ccb.application('testapp2') {
+			input 'y1'
+			input 'y2'
+			input 'y3'
+			output 'u1'
+			output 'u2'
+			output 'u3'
+			output 'u5'
+			output 'u6'
+			output 'u7'
+			output 'u4'
+			variable 'x2'
+			functionblock('FB1') {
+				input 'y1'
+				input 'y2'
+				output 'u1'
+				variable 'x'
+				mainProgram {
+					SR('SR1', Q:'u1', S:'x AND y2', R:'y1')
+					SR('SR2', Q:'x', S:'y1', R:'y2')
+				}
+			}
+			mainProgram {
+				'u2 := not y1'()
+				'u1 := y1 and u2'()
+				SR('SR1', S:'y1', R:'y2 and u2')
+				'u5 := SR1.Q'()
+				RS('RS1', S:'y1', R:'y2 and u2', Q:'u6')
+				P('Py2', in:'y2')
+				'u4 := Py2.Q and y1'()
+				'x2 := True'()
+				'u3 := u1 or u2'()
+				FB1('FB1instance', y1:'y2', y2:'y3', u1:'u7')
+			}
+		}
+		ModuleSubject correctModule = new ModuleBuilder().module('testapp2') {
+			event(Converter.SCAN_CYCLE_EVENT_NAME, controllable:false)
+			booleanVariable(['y1', 'y2', 'y3', 'u2', 'u1', 'SR1_Q', 'u5', 'u6', 'Py2_in_old', 'u4', 'u3', 'FB1instance_x', 'u7'], initial:false, marked:false)
+			event(['y1_change', 'y2_change', 'y3_change'], controllable:false)
+			eventAlias(name:Converter.PROCESS_EVENTS_ALIAS_NAME, events:['y1_change', 'y2_change', 'y3_change'])
+			plant(Converter.DEFAULT_PROCESS_PLANT_NAME) {
+				state('q0', marked:true) {
+					selfLoop(event:'y1_change') {action('y1 = !y1')}
+					selfLoop(event:'y2_change') {action('y2 = !y2')}
+					selfLoop(event:'y3_change') {action('y3 = !y3')}
+				}
+			}
+			plant(Converter.CONTROL_UNIT_PLANT_NAME) {
+				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME, event:Converter.SCAN_CYCLE_EVENT_NAME) {
+					//	set(Converter.END_OF_SCANCYCLE_VARIABLE_NAME)
+					}
+				}
+				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, events:[Converter.PROCESS_EVENTS_ALIAS_NAME]) {
+					//	reset(Converter.END_OF_SCANCYCLE_VARIABLE_NAME)
+					}
+				}
+			}
+			plant('ASSIGN_u2', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
+				state('q0', marked:true) {
+					selfLoop(guard:'!y1') { set('u2') }
+					selfLoop(guard:'!(!y1)') { reset('u2') }
+				}
+			}
+			plant('ASSIGN_u1', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
+				state('q0', marked:true) {
+					selfLoop(guard:'y1 & !y1') { set('u1') }
+					selfLoop(guard:'!(y1 & !y1)') { reset('u1') }
+				}
+			}
+			plant('ASSIGN_SR1_Q', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
+				state('q0', marked:true) {
+					selfLoop(guard:'!(y2 & !y1) & SR1_Q | y1') { set('SR1_Q') }
+					selfLoop(guard:'!(!(y2 & !y1) & SR1_Q | y1)') { reset('SR1_Q') }
+				}
+			}
+			plant('ASSIGN_u5', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
+				state('q0', marked:true) {
+					selfLoop(guard:'!(y2 & !y1) & SR1_Q | y1') { set('u5') }
+					selfLoop(guard:'!(!(y2 & !y1) & SR1_Q | y1)') { reset('u5') }
+				}
+			}
+			plant('ASSIGN_u6', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
+				state('q0', marked:true) {
+					selfLoop(guard:'!(y2 & !y1) & (u6 | y1)') { set('u6') }
+					selfLoop(guard:'!(!(y2 & !y1) & (u6 | y1))') { reset('u6') }
+				}
+			}
+			plant('ASSIGN_Py2_in_old', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
+				state('q0', marked:true) {
+					selfLoop(guard:'y2') { set('Py2_in_old') }
+					selfLoop(guard:'!(y2)') { reset('Py2_in_old') }
+				}
+			}
+			plant('ASSIGN_u4', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
+				state('q0', marked:true) {
+					selfLoop(guard:'(y2 & !Py2_in_old) & y1') { set('u4') }
+					selfLoop(guard:'!((y2 & !Py2_in_old) & y1)') { reset('u4') }
+				}
+			}
+			plant('ASSIGN_u3', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
+				state('q0', marked:true) {
+					selfLoop(guard:'(y1 & !y1) | !y1') { set('u3') }
+					selfLoop(guard:'!((y1 & !y1) | !y1)') { reset('u3') }
+				}
+			}
+			plant('ASSIGN_FB1instance_x', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
+				state('q0', marked:true) {
+					selfLoop(guard:'!y3 & FB1instance_x | y2') { set('FB1instance_x') }
+					selfLoop(guard:'!(!y3 & FB1instance_x | y2)') { reset('FB1instance_x') }
+				}
+			}
+			plant('ASSIGN_u7', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
+				state('q0', marked:true) {
+					selfLoop(guard:'!y2 & u7 | (FB1instance_x & y3)') { set('u7') }
+					selfLoop(guard:'!(!y2 & u7 | (FB1instance_x & y3))') { reset('u7') }
+				}
+			}
+		}
+		
+		ModuleSubject generatedModule = app.toAutomata()
+		Util.assertGeneratedModuleEqualsManual(generatedModule, correctModule)
+		
+		if (openInSupremica) {
+			Util.openModuleInSupremica(generatedModule)
 		}
 	}
 }

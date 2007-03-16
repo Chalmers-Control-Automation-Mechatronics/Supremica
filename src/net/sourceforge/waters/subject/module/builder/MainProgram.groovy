@@ -5,12 +5,13 @@ class MainProgram {
 	static final pattern = /(?i)mainProgram/
 	static final defaultAttr = null
 	static final parentAttr = 'mainProgram'
-	List sequences = []
-	List functionBlockInstances  = []
-	def addToModule(ModuleBuilder mb, Scope scope) {
-		println 'apa'
-		println this.dump()
-		functionBlockInstances.each { it.addToModule(mb, scope) }
-		sequences.each { it.addToModule(mb, Converter.SCAN_CYCLE_EVENT_NAME)	}
+	List statements = []
+	def addToModule(ModuleBuilder mb, Scope parent, List programState) {
+		statements.each { programState = it.addToModule(mb, parent, programState) }
+		programState
+		//sequences.each { it.addToModule(mb, Converter.SCAN_CYCLE_EVENT_NAME)	}
+	}
+	List execute(Scope parent) {
+		statements.inject([]){executedStatements, statement -> executedStatements + statement.execute(parent)}
 	}
 }
