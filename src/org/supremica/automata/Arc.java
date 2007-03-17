@@ -69,10 +69,6 @@ public class Arc
     // Internal use for graphical representation -- should be in GraphicalArc?
     private double outgoingAngle = 0;
     private double incomingAngle = 0;
-    private int dxControlPointBegin = 0;
-    private int dyControlPointBegin = 0;
-    private int dxControlPointEnd = 0;
-    private int dyControlPointEnd = 0;
     private int beginX = -1;
     private int beginY = -1;
     private int endX = -1;
@@ -218,54 +214,6 @@ public class Arc
         // notifyListeners(ArcListeners.MODE_ARC_REMOVED, this);
     }
     
-    // This does not belong here, does it?
-    // Should have a "GraphicalArc" that includes (by inheritance?) Arc
-    public void computeDefaultDisplayParameters()
-    {
-        int x1 = fromState.getX();
-        int y1 = fromState.getY();
-        int x2 = toState.getX();
-        int y2 = toState.getY();
-        
-        outgoingAngle = angle(x1, y1, x2, y2);
-        incomingAngle = angle(x2, y2, x1, y1);
-    }
-    
-    public void computeStartAndEndParameters()
-    {
-        int x1 = fromState.getX();
-        int y1 = fromState.getY();
-        int r1 = fromState.getRadius();
-        int x2 = toState.getX();
-        int y2 = toState.getY();
-        int r2 = toState.getRadius();
-        
-        beginX = x1 + (int) (r1 * Math.cos(outgoingAngle));
-        beginY = y1 + (int) (r1 * Math.sin(outgoingAngle));
-        endX = x2 + (int) (r2 * Math.cos(incomingAngle));
-        endY = y2 + (int) (r2 * Math.sin(incomingAngle));
-    }
-    
-    public int getBeginX()
-    {
-        return beginX;
-    }
-    
-    public int getBeginY()
-    {
-        return beginY;
-    }
-    
-    public int getEndX()
-    {
-        return endX;
-    }
-    
-    public int getEndY()
-    {
-        return endY;
-    }
-    
 /*
         public Listeners getListeners()
         {
@@ -293,41 +241,6 @@ public class Arc
                 }
         }
  */
-    
-    public static double angle(int x0, int y0, int x1, int y1)
-    {
-        double angle = 0;
-        double xDist = x1 - x0;
-        double yDist = y1 - y0;
-        
-        if (xDist == 0)
-        {
-            if (yDist >= 0)
-            {
-                angle = Math.PI / 2;
-            }
-            else
-            {
-                angle = -1 * Math.PI / 2;
-            }
-        }
-        else if (xDist > 0)
-        {
-            angle = Math.atan(yDist / xDist);
-            
-            if (yDist < 0)
-            {
-                angle = 2 * Math.PI + angle;
-            }
-        }
-        else
-        {
-            xDist = -1 * xDist;
-            angle = Math.PI - Math.atan(yDist / xDist);
-        }
-        
-        return angle;
-    }
     
     /**
      *      Returns a boolean vector where true means that the corresponding automata
@@ -368,21 +281,6 @@ public class Arc
         sbuf.append(">");
         
         return sbuf.toString();
-    }
-    
-    /**
-     * Initializes the array of firingAutomata
-     *
-     * @param size
-     */
-    private void initFiringAutomata(int size)
-    {
-        firingAutomata = new boolean[size];
-        
-        for (int i = 0; i < size; i++)
-        {
-            firingAutomata[i] = false;
-        }
     }
     
     /**

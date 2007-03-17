@@ -51,33 +51,10 @@ package org.supremica.automata;
 
 import java.util.*;
 
-/**
- * A collection of arcs with the same start state and end state.
- */
-/*
-public class ArcSet
-	extends TreeSet<Arc>
-{
-	public ArcSet()
-	{
-		super();
-	}
-
-	public ArcSet(Comparator<? super Arc> c)
-	{
-		super(c);
-	}
-}
-*/
 public class ArcSet
 	extends LinkedList<Arc>
 {
 	public ArcSet()
-	{
-		super();
-	}
-
-	public ArcSet(Comparator<? super Arc> c)
 	{
 		super();
 	}
