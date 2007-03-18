@@ -87,12 +87,6 @@ public class AlphabetHelpers
         return getUnionAlphabet(alphas, /* "", */ true, true);
     }
     
-    private static Alphabet getUnionAlphabet(EventsSet alphabets, String idPrefix)
-    throws IllegalArgumentException, Exception
-    {
-        return getUnionAlphabet(alphabets, /* idPrefix, */ true, true);
-    }
-    
     /**
      * Compute a new alphabet as the union of a set of alphabets.
      * Adjust the Event attributes properly.

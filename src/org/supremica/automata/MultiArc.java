@@ -66,7 +66,7 @@ public class MultiArc
 	 */
 	public MultiArc(State from, State to)
 	{
-		super(new Arc.EventComparator());
+//		super(new Arc.EventComparator());
 		fromState = from;
 		toState = to;
 	}
