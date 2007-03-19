@@ -242,6 +242,8 @@ public class MultithreadedAstar
         {
             e.printStackTrace();
         }
+
+		return 0;
     }
 
     /**

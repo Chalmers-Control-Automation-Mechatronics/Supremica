@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   SupremicaUnmarshaller
 //###########################################################################
-//# $Id: SupremicaUnmarshaller.java,v 1.5 2007-03-15 10:25:26 flordal Exp $
+//# $Id: SupremicaUnmarshaller.java,v 1.6 2007-03-19 10:43:40 flordal Exp $
 //###########################################################################
 
 package org.supremica.automata.IO;
@@ -113,7 +113,7 @@ public class SupremicaUnmarshaller
         {
             for (State state : aut)
             {
-                if (state.getCost() != state.UNDEF_COST)
+                if (state.getCost() != State.UNDEF_COST)
                 {
                     System.err.println("State cost information in the imported automata model was lost in the conversion.");
                     return;

@@ -482,7 +482,7 @@ public class ModifiedAstar
         iterationCounter = 0;
         
         // Resets the OPEN and the CLOSED trees
-		resetTrees();
+		initTrees();
         
         // Initiates the OPEN tree by adding the initial node, corresponding to the initial
         // state of the synchronous composition of the selected automata.
