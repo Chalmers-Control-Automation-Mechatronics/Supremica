@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   DNFConverter
 //###########################################################################
-//# $Id: DNFConverter.java,v 1.1 2006-09-12 14:32:16 robi Exp $
+//# $Id: DNFConverter.java,v 1.2 2007-03-19 22:13:38 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -34,11 +34,11 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * @author Robi Malik
  */
 
-class DNFConverter extends AbstractModuleProxyVisitor {
+public class DNFConverter extends AbstractModuleProxyVisitor {
 
   //#########################################################################
   //# Constructors
-  DNFConverter(final ModuleProxyFactory factory,
+  public DNFConverter(final ModuleProxyFactory factory,
                final CompilerOperatorTable optable,
                final Comparator<SimpleExpressionProxy> comparator)
   {
@@ -50,7 +50,7 @@ class DNFConverter extends AbstractModuleProxyVisitor {
 
   //##########################################################################
   //# Invocation
-  CompiledNormalForm convertToDNF(final SimpleExpressionProxy expr)
+  public CompiledNormalForm convertToDNF(final SimpleExpressionProxy expr)
     throws EvalException
   {
     final BinaryOperator andop = mOpTable.getAndOperator();

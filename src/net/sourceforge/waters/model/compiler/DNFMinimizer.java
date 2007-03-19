@@ -191,7 +191,7 @@ public class DNFMinimizer {
 	
 	class Formula {
 		/* This inner class is a piece of external source code included here by
-		 * Martin Byr?d. See below for details*/
+		 * Martin Byr&oumld. See below for details*/
 		
 		/* Copyright (c) 2007 the authors listed at the following URL, and/or
 		 the authors of referenced articles or incorporated external code:
@@ -368,14 +368,13 @@ public class DNFMinimizer {
 			return -1;
 		}
 		
-		
 		private List<Term> termList;
 		private List<Term> originalTermList;
 	}
 	
 	class Term {
 		/* This inner class is a piece of external source code included here by
-		 * Martin Byr?d. See below for details*/
+		 * Martin Byr&oumld. See below for details*/
 		
 		/* Copyright (c) 2007 the authors listed at the following URL, and/or
 		 the authors of referenced articles or incorporated external code:

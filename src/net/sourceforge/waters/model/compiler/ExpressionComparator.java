@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   ExpressionComparator
 //###########################################################################
-//# $Id: ExpressionComparator.java,v 1.2 2006-11-03 15:01:57 torda Exp $
+//# $Id: ExpressionComparator.java,v 1.3 2007-03-19 22:13:38 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -38,14 +38,14 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * @author Robi Malik
  */
 
-class ExpressionComparator
+public class ExpressionComparator
   extends AbstractModuleProxyVisitor
   implements Comparator<SimpleExpressionProxy>
 {
 
   //#########################################################################
   //# Constructors
-  ExpressionComparator()
+  public ExpressionComparator()
   {
     mInterfaceValues = new HashMap<Class,Integer>(32);
     mInterfaceValues.put(IntConstantProxy.class, 0);

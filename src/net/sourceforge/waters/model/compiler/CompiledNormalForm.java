@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompiledNormalForm
 //###########################################################################
-//# $Id: CompiledNormalForm.java,v 1.1 2006-09-12 14:32:16 robi Exp $
+//# $Id: CompiledNormalForm.java,v 1.2 2007-03-19 22:13:38 martin Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -16,7 +16,7 @@ import java.util.Set;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 
 
-class CompiledNormalForm implements Cloneable
+public class CompiledNormalForm implements Cloneable
 {
 
   //#########################################################################
