@@ -82,7 +82,7 @@ public class MultithreadedAstar
 	protected void init()
 		throws Exception
 	{
-		if (isMainThread)
+		if (rootNode == null)
 		{
 			super.init();
 		}
@@ -158,7 +158,8 @@ public class MultithreadedAstar
 					// that represents the same logical state and is better than the current node in all
 					// "aspects" (lower cost in all directions). If the current node is promising (if it ends up on CLOSED),
 					// its successors are found and put on the OPEN tree.
-					branch(currNode);
+// 					branch(currNode);
+					step(currNode);
 				}
 				else
 				{
@@ -227,7 +228,7 @@ public class MultithreadedAstar
 							// Calculate the estimate function of the expanded node and store it at the appropriate position
 							nextNodeBasis[ESTIMATE_INDEX] = calcEstimatedCost(nextNodeBasis);
 							
-							openTree.add(new MultithreadedNode(nextNode, null));
+							openTree.add(new MultithreadedNode(nextNodeBasis, null));
 						}
 					}
 					else
