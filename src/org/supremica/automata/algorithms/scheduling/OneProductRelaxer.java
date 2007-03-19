@@ -8,7 +8,7 @@ public class OneProductRelaxer
 	implements Relaxer
 {
 	private NodeExpander expander; 
-	private AbstractAstar scheduler;
+	private ModifiedAstar scheduler;
 	private Automata plantAutomata;
 
     /**
@@ -17,7 +17,7 @@ public class OneProductRelaxer
      */
     private double[][] remainingCosts;
 	
-	public OneProductRelaxer(NodeExpander expander, AbstractAstar scheduler)
+	public OneProductRelaxer(NodeExpander expander, ModifiedAstar scheduler)
 		throws Exception
 	{
 		this.expander = expander;

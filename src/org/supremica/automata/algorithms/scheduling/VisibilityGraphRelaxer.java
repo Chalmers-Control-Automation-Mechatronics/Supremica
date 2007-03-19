@@ -32,11 +32,11 @@ public class VisibilityGraphRelaxer
 	private volatile boolean relaxFromNodes;
 	private Automata plantAutomata;
 	private NodeExpander expander;
-	private AbstractAstar scheduler;
+	private ModifiedAstar scheduler;
 	private OneProductRelaxer oneProdRelaxer;
 	private ActionTimer timer;
 
-	public VisibilityGraphRelaxer(NodeExpander expander, AbstractAstar scheduler, boolean relaxFromNodes)
+	public VisibilityGraphRelaxer(NodeExpander expander, ModifiedAstar scheduler, boolean relaxFromNodes)
 		throws Exception
 	{
 		this.expander = expander;
@@ -79,7 +79,7 @@ public class VisibilityGraphRelaxer
 			double remainingCycleTime = oneProdRelaxer.getRemainingCosts()[i][(int)node[scheduler.getActiveAutomataIndex()[i]]];
 			if (!relaxFromNodes)
 			{
-				remainingCycleTime += node[AbstractAstar.CURRENT_COSTS_INDEX + i];
+				remainingCycleTime += node[ModifiedAstar.CURRENT_COSTS_INDEX + i];
 			}
 
 			effTimePoint[i] = cycleTimes[i] - remainingCycleTime;
@@ -113,7 +113,7 @@ public class VisibilityGraphRelaxer
 					}
 					catch (InterruptedException ex)
 					{
-						logger.error("INTERRUPTED_EXCEPTION in AbstractAstar.calcEstimatedCost()...");
+						logger.error("INTERRUPTED_EXCEPTION in ModifiedAstar.calcEstimatedCost()...");
 						throw(ex);
 					}				
 
@@ -144,9 +144,9 @@ public class VisibilityGraphRelaxer
 			double minCurrentCost = Double.MAX_VALUE;
 			for (int i=0; i<plantAutomata.size(); i++)
 			{
-				if (node[AbstractAstar.CURRENT_COSTS_INDEX + i] < minCurrentCost)
+				if (node[ModifiedAstar.CURRENT_COSTS_INDEX + i] < minCurrentCost)
 				{
-					minCurrentCost = node[AbstractAstar.CURRENT_COSTS_INDEX + i];
+					minCurrentCost = node[ModifiedAstar.CURRENT_COSTS_INDEX + i];
 				}
 			}
 
@@ -215,7 +215,7 @@ public class VisibilityGraphRelaxer
 				}
 				catch (InterruptedException ex)
 				{
-					logger.error("EXCEPTION in AbstractAstar.preprocessVisibilityGraphs()...");
+					logger.error("EXCEPTION in ModifiedAstar.preprocessVisibilityGraphs()...");
 					throw(ex);
 				}
 

@@ -73,6 +73,11 @@ public class Milp
     
     /** The output string */
     private String outputStr = "";
+
+	/*
+	 * The thread that performs the search for the optimal solution
+	 */
+	private Thread milpThread;
     
     /****************************************************************************************/
     /*                                 CONSTUCTORS                                          */
@@ -85,11 +90,14 @@ public class Milp
         //  this.theProject = theProject;
         this.buildSchedule = buildSchedule;
         this.scheduleDialog = scheduleDialog;
-        
-        Thread milpThread = new Thread(this);
+    }
+
+	public void startSearchThread()
+	{
+		milpThread = new Thread(this);
         isRunning = true;
         milpThread.start();
-    }
+	}
     
     public void run()
     {

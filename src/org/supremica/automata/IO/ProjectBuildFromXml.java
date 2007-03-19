@@ -672,6 +672,20 @@ public class ProjectBuildFromXml
         
         // Create and add the arc
         Arc arc = new Arc(sourceState, destState, event);
+
+	// TEMP-solution (use EFA instead)
+	String probabilityStr = attributes.getValue("probability");
+	if (probabilityStr != null)
+	{
+	    double probability = Double.valueOf(probabilityStr).doubleValue();
+	    
+	    if (probability < 0 || probability > 1)
+	    {
+		throwException("the probability value is out of range");
+	    }
+
+	    arc.setProbability(probability);
+	}
         
         // Arc arc = new Arc(sourceState, destState, eventId);
         try

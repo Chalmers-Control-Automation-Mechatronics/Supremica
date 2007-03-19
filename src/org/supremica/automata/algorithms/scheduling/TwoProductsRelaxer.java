@@ -19,11 +19,11 @@ public class TwoProductsRelaxer
 	private Hashtable<Integer, Double> twoProdRelax = new Hashtable<Integer, Double>();
 
 	private NodeExpander expander;
-	private AbstractAstar scheduler;
+	private ModifiedAstar scheduler;
 	private Automata plantAutomata;
 	private Automata theAutomata;
 
-	public TwoProductsRelaxer(NodeExpander expander, AbstractAstar scheduler)
+	public TwoProductsRelaxer(NodeExpander expander, ModifiedAstar scheduler)
 		throws Exception
 	{
 		this.expander = expander;
@@ -131,7 +131,7 @@ public class TwoProductsRelaxer
 					}
 					catch (InterruptedException ex)
 					{
-						logger.error("INTERRUPTED_EXCEPTION in AbstractAstar.calcEstimatedCost()...");
+						logger.error("INTERRUPTED_EXCEPTION in ModifiedAstar.calcEstimatedCost()...");
 						throw(ex);
 					}
 

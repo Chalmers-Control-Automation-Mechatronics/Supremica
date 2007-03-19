@@ -5,6 +5,9 @@ import org.supremica.automata.algorithms.Stoppable;
 public interface Scheduler
     extends Stoppable, Runnable
 {
+	/** Starts the search thread. */
+	public void startSearchThread();
+
     /** Returns the representation of a marked state in an optimal schedule automaton. */
     public void schedule()
 		throws Exception;

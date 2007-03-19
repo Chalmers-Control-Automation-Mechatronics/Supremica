@@ -89,6 +89,10 @@ public class OpenTreeComparator
 		{
 			return compare((double[]) a, (double[]) b);
 		}
+		else if (a instanceof MultithreadedNode)
+		{
+			return compare(((MultithreadedNode) a).getNodeBasis(), ((MultithreadedNode) b).getNodeBasis());
+		}
 
 		return 0;
 	}

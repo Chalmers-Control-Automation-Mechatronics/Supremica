@@ -79,9 +79,13 @@ public class Arc
      * this Arc. It has only a reasonable value if synchronization is performed.
      */
     private boolean[] firingAutomata = null;
+
+    // TEMP-solution (use EFA instead)
+    public static final double UNDEF_PROBABILITY = -1;
+    private double probability = UNDEF_PROBABILITY;  
     
     private Arc(State from, State to)
-    throws IllegalArgumentException
+	throws IllegalArgumentException
     {
         if (from == null)
         {
@@ -342,5 +346,24 @@ public class Arc
         return hashCodeByContents();
     }
     
-    
+    // TEMP-solution (use EFA instead)
+    public Arc(State from, State to, LabeledEvent event, double probability)
+	throws IllegalArgumentException
+    {
+	this(from, to, event);
+
+	setProbability(probability);
+    }
+
+    // TEMP-solution (use EFA instead)
+    public void setProbability(double probability)
+    {
+	this.probability = probability;
+    }
+
+    // TEMP-solution (use EFA instead)
+    public double getProbability()
+    {
+	return probability;
+    }
 }

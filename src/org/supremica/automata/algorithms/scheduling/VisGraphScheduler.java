@@ -79,6 +79,11 @@ public class VisGraphScheduler
     
     /** The number of zones that each robot occupies during its cycle */
     private double[] additionalTimes;
+
+	/*
+	 * The thread that performs the search for the optimal solution
+	 */
+	private Thread vgThread;
     
     public VisGraphScheduler(Automata theAutomata, boolean toDrawVisibilityGraph, ScheduleDialog gui)
     throws Exception
@@ -101,11 +106,14 @@ public class VisGraphScheduler
         this.zones = zones;
         this.gui = gui;
         this.isRelaxationProvider = isRelaxationProvider;
-        
-        Thread vgThread = new Thread(this);
+    }
+
+	public void startSearchThread()
+	{
+        vgThread = new Thread(this);
         isRunning = true;
         vgThread.start();
-    }
+	}
     
     public void run()
     {

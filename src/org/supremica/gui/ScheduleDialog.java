@@ -15,18 +15,19 @@ public class ScheduleDialog
 	extends JDialog
 {
 	public static final String MODIFIED_A_STAR = "Modified A*";
-	public static final String MODIFIED_VGA_STAR = "Modified VGA*";
 	public static final String MILP = "MILP";
 	public static final String VIS_GRAPH = "Visibility Graph";
+	public static final String MULTITHREADED_A_STAR = "Multithreaded A*";
 
 	public static final String ONE_PRODUCT_RELAXATION = "1-product relax";
 	public static final String TWO_PRODUCT_RELAXATION = "2-product relax";
 	public static final String VIS_GRAPH_TIME_RELAXATION = "visibility graph (time)";
 	public static final String VIS_GRAPH_NODE_RELAXATION = "visibility graph (node)";
+	public static final String BRUTE_FORCE_RELAXATION = "brute force";
 
     private static final long serialVersionUID = 1L;
-    private static final String[] optiMethodNames = new String[]{MODIFIED_A_STAR, MODIFIED_VGA_STAR, MILP, VIS_GRAPH}; //, "Modified IDA*", "Modified SMA*"};
-    private static final String[] heuristicsNames = new String[]{ONE_PRODUCT_RELAXATION, TWO_PRODUCT_RELAXATION, VIS_GRAPH_TIME_RELAXATION, VIS_GRAPH_NODE_RELAXATION, "brute force"};
+    private static final String[] optiMethodNames = new String[]{MODIFIED_A_STAR, MILP, VIS_GRAPH, MULTITHREADED_A_STAR}; //, "Modified IDA*", "Modified SMA*"};
+    private static final String[] heuristicsNames = new String[]{ONE_PRODUCT_RELAXATION, TWO_PRODUCT_RELAXATION, VIS_GRAPH_TIME_RELAXATION, VIS_GRAPH_NODE_RELAXATION, BRUTE_FORCE_RELAXATION};
     private static Logger logger = LoggerFactory.createLogger(ScheduleDialog.class);
     private JComboBox optiMethodsBox, heuristicsBox;
     private JCheckBox nodeExpander, buildAutomaton, vgDrawer;
@@ -34,7 +35,6 @@ public class ScheduleDialog
     private JTextField memoryCapacityField;
 	private JButton okButton, cancelButton;
 	JButton autoTestButton; //Tillf
-	public ScheduleDialog dia = this; //Tillf
 	private java.util.ArrayList filesToSchedule = new java.util.ArrayList();
 
 	Scheduler sched = null;
@@ -226,49 +226,22 @@ public class ScheduleDialog
 				{
 					sched = new VisGraphScheduler(ActionMan.getGui().getSelectedAutomata(), vgDrawer.isSelected(), this);
 				}
-					// else
-// 					{
-// 						sched = new ModifiedAstarUsingVisGraphRelaxation(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), buildAutomaton.isSelected(), this);
-// 					}
-// 				}
-				// Tillf
-				// This might be temporary (or the alternative just above) to determine which relaxation is best
-// 				else if (selectedHeuristic.equals(VIS_GRAPH_NODE_RELAXATION))
-// 				{
-// 					if (ActionMan.getGui().getSelectedAutomata().getPlantAutomata().size() == 2)
-// 					{
-// 						sched = new VisGraphScheduler(ActionMan.getGui().getSelectedAutomata(), vgDrawer.isSelected(), this);
-// 					}
-// 					else
-// 					{
-// 						sched = new ModifiedAstarUsingVisGraphRelaxation(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), buildAutomaton.isSelected(), true, this);
-// 					}
-// 				}
-// 				else if (selectedHeuristic.equals(ONE_PRODUCT_RELAXATION))
-// 				{
-// 					sched = new ModifiedAstarUsingOneProductRelaxation(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), buildAutomaton.isSelected(), this);
-// 				}
-// 				else if (selectedHeuristic.equals(TWO_PRODUCT_RELAXATION))
-// 				{
-// 					sched = new ModifiedAstarUsingTwoProdRelaxation(ActionMan.getGui().getSelectedAutomata(), nodeExpander.isSelected(), buildAutomaton.isSelected(), this);
-// 				}
 				else
 				{
 					sched = new ModifiedAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), buildAutomaton.isSelected(), this);
 				}
 			}
-			else if (optiMethodsBox.getSelectedItem().equals(MODIFIED_VGA_STAR))
-			{
-// 				sched = new ModifiedVGAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), vgDrawer.isSelected(), false, buildAutomaton.isSelected(), this);
-			}
 			else if (optiMethodsBox.getSelectedItem().equals(MILP))
 			{
-				//				sched = new Milp(ActionMan.getGui().getVisualProjectContainer().getActiveProject(), ActionMan.getGui().getSelectedAutomata(), buildAutomaton.isSelected(), this);
 				sched = new Milp(ActionMan.getGui().getSelectedAutomata(), buildAutomaton.isSelected(), this);
 			}
 			else if (optiMethodsBox.getSelectedItem().equals(VIS_GRAPH))
 			{
 				sched = new VisGraphScheduler(ActionMan.getGui().getSelectedAutomata(), vgDrawer.isSelected(), this);
+			}
+			else if (optiMethodsBox.getSelectedItem().equals(MULTITHREADED_A_STAR))
+			{
+				sched = new MultithreadedAstar(ActionMan.getGui().getSelectedAutomata(), (String) heuristicsBox.getSelectedItem(), nodeExpander.isSelected(), buildAutomaton.isSelected(), false, this);
 			}
 // 			else if (optiMethodsBox.getSelectedItem().equals("Modified IDA*"))
 // 				throw new Exception("IMA* not implemented yet...");
@@ -279,6 +252,8 @@ public class ScheduleDialog
 			{
 				throw new Exception("Unknown optimization method");
 			}
+
+			sched.startSearchThread();
 		}
 		catch (Exception excp)
 		{
