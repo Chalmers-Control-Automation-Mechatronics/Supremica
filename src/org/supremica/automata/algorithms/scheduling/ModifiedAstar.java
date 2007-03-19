@@ -39,11 +39,11 @@ public class ModifiedAstar
         this(theAutomata, false, buildSchedule, gui);
     }
     
-//     public ModifiedAstar(Automata theAutomata, String heuristic, boolean buildSchedule, ScheduleDialog gui)
-// 		throws Exception
-//     {
-//         super(theAutomata, heuristic, true, false, buildSchedule, gui);
-//     }
+    public ModifiedAstar(Automata theAutomata, String heuristic, boolean buildSchedule, ScheduleDialog gui)
+      throws Exception
+    {
+         super(theAutomata, heuristic, true, false, buildSchedule, gui);
+    }
 
     public ModifiedAstar(Automata theAutomata, boolean manualExpansion, boolean buildSchedule, ScheduleDialog gui)
 		throws Exception

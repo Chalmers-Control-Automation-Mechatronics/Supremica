@@ -34,7 +34,7 @@ public class ModifiedAstarUsingOneProdRelaxation
 	 * @param node the current node
 	 * @return double the heuristic function, h(n), that guides the search, in this case it is the "1-product relaxation"
 	 */
-    double getRelaxation(double[] node) 
+  double getRelaxation(double[] node) 
 		throws Exception
 	{
 		double estimate = 0;
@@ -42,10 +42,10 @@ public class ModifiedAstarUsingOneProdRelaxation
 	
 		for (int i=0; i<activeAutomataIndex.length; i++) 
 		{
-			double altEstimate = currCosts[i] + remainingCosts[i][(int)node[activeAutomataIndex[i]]]; 
-	    
-			if (altEstimate > estimate)
-				estimate = altEstimate;
+		  // double altEstimate = currCosts[i] + remainingCosts[i][(int)node[activeAutomataIndex[i]]]; 
+		  double altEstimate = currCosts[i];
+		  if (altEstimate > estimate)
+		    estimate = altEstimate;
 		}
 	
 		return estimate;

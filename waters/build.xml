@@ -126,6 +126,7 @@
     <javac srcdir="${supremica.src}" destdir="${waters.classes}" 
            includes="net/sourceforge/waters/**/*.java"
            excludes="net/sourceforge/waters/gui/**/*.java
+                     net/sourceforge/waters/mbt/**/*.java
                      net/sourceforge/waters/model/unchecked/**/*.java"
            debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}">
       <classpath refid="waters.compile.classpath"/>

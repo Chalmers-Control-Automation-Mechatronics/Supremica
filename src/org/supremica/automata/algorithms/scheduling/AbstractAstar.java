@@ -1128,7 +1128,7 @@ public abstract class AbstractAstar
      * @param node the node, whose estimated cost we want to know
      * @return remainingEstimatedCost : h(n)
      */
-    protected double getRelaxation(double[] node)
+    double getRelaxation(double[] node)
 		throws Exception
 	{
 		return relaxer.getRelaxation(node);

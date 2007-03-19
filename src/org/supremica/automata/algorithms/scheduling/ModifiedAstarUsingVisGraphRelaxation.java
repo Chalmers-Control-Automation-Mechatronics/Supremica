@@ -1,3 +1,12 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: 
+//# PACKAGE: org.supremica.automata.algorithms.scheduling
+//# CLASS:   ModifiedAstarUsingVisGraphRelaxation
+//###########################################################################
+//# $Id: ModifiedAstarUsingVisGraphRelaxation.java,v 1.12 2007-03-19 04:44:56 robi Exp $
+//###########################################################################
+
 package org.supremica.automata.algorithms.scheduling;
 
 import java.util.*;
@@ -14,7 +23,11 @@ public class ModifiedAstarUsingVisGraphRelaxation
 	 * Hashtable containing the estimated cost for a given time configuration 
 	 * (as returned by the visibility graph)
 	 */
-	//private Hashtable<String, Integer> visGraphRelax = null;
+	private Map<String,Double> visGraphRelax = null;
+
+	private final double remainingCosts[][] = null;
+
+	private Map<String,VisGraphScheduler> visibilityGraphs = null;
 
 	/**
 	 * The output stream
@@ -113,8 +126,8 @@ public class ModifiedAstarUsingVisGraphRelaxation
 					}				
 
 					//Tillf
-					scheduleFromTime += relaxTimer.elapsedTime();
-					scheduleFromCounter++;
+					//scheduleFromTime += relaxTimer.elapsedTime();
+					//scheduleFromCounter++;
 					
 					if (visibilityRelaxation < currVisibilityRelaxation)
 					{
@@ -183,7 +196,7 @@ public class ModifiedAstarUsingVisGraphRelaxation
 	private void preprocessVisibilityGraphs()
 		throws Exception
 	{
-		visibilityGraphs = new Hashtable<String, VisGraphScheduler>();
+		visibilityGraphs = new Hashtable<String,VisGraphScheduler>();
 
 		for (int i=0; i<plantAutomata.size() - 1; i++)
 		{

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   ConstructorGlue
 //###########################################################################
-//# $Id: ConstructorGlue.java,v 1.3 2005-11-05 09:47:15 robi Exp $
+//# $Id: ConstructorGlue.java,v 1.4 2007-03-19 04:44:56 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -57,7 +57,7 @@ class ConstructorGlue extends MethodGlue {
 
   //#########################################################################
   //# Type Verification
-  void verify(final Class javaclass, final ErrorReporter reporter)
+  void verify(final Class<?> javaclass, final ErrorReporter reporter)
   {
     try {
       final Class[] paramtypes = getParameterClasses();

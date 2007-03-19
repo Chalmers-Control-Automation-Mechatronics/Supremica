@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   MethodGlue
 //###########################################################################
-//# $Id: MethodGlue.java,v 1.3 2005-11-05 09:47:15 robi Exp $
+//# $Id: MethodGlue.java,v 1.4 2007-03-19 04:44:56 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -97,7 +97,7 @@ abstract class MethodGlue implements Comparable<MethodGlue>, WritableGlue {
 
   //#########################################################################
   //# Type Verification
-  abstract void verify(final Class javaclass, final ErrorReporter reporter);
+  abstract void verify(final Class<?> javaclass, final ErrorReporter reporter);
 
   Class[] getParameterClasses()
   {

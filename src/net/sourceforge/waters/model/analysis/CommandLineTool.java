@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopChecker
 //##########################################################################
-//# $Id: CommandLineTool.java,v 1.1 2006-11-28 04:28:33 robi Exp $
+//# $Id: CommandLineTool.java,v 1.2 2007-03-19 04:44:56 robi Exp $
 //##########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -87,7 +87,7 @@ public class CommandLineTool
       }
       
       final ClassLoader loader = CommandLineTool.class.getClassLoader();
-      final Class fclazz = loader.loadClass(factoryname);
+      final Class<?> fclazz = loader.loadClass(factoryname);
       final Method getinst = fclazz.getMethod("getInstance", List.class);
       final ModelVerifierFactory factory =
         (ModelVerifierFactory) getinst.invoke(null, arglist);

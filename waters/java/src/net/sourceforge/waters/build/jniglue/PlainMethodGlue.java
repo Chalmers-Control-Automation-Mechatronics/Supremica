@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.build.jniglue
 //# CLASS:   PlainMethodGlue
 //###########################################################################
-//# $Id: PlainMethodGlue.java,v 1.5 2005-11-05 09:47:15 robi Exp $
+//# $Id: PlainMethodGlue.java,v 1.6 2007-03-19 04:44:56 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.build.jniglue;
@@ -109,7 +109,7 @@ class PlainMethodGlue extends MethodGlue {
 
   //#########################################################################
   //# Type Verification
-  void verify(final Class javaclass, final ErrorReporter reporter)
+  void verify(final Class<?> javaclass, final ErrorReporter reporter)
   {
     try {
       final Class[] paramtypes = getParameterClasses();
