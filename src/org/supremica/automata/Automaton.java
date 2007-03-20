@@ -2212,7 +2212,7 @@ public class Automaton
         }
     }
 
-    class InternalEventIterator
+    static class InternalEventIterator
         implements Iterator<LabeledEvent>
     {
         private final Iterator arcIt;
