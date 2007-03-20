@@ -167,13 +167,13 @@ public class TestAlphabet
         assertTrue(!alph1.equals(alph2));
         alph2.addEvent(e1);
         assertTrue(alph1.equals(alph2));
-        alph1.add(e2);
-        alph2.add(e2_copy);
+        alph1.addEvent(e2);
+        alph2.addEvent(e2_copy);
         assertTrue(alph1.equals(alph2));
         LabeledEvent e3_1 = new LabeledEvent("e3");
         LabeledEvent e3_2 = new LabeledEvent("e3");      
-        alph1.add(e3_1);
-        alph2.add(e3_2);
+        alph1.addEvent(e3_1);
+        alph2.addEvent(e3_2);
         assertTrue(alph1.equals(alph2));
         Alphabet alph3 = new Alphabet();
         Alphabet alph4 = new Alphabet();

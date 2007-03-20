@@ -175,6 +175,16 @@ public class Alphabet
         return new ControllableEventIterator(theEvents.values().iterator(), false);
     }
 
+    public void add(Object other)
+        throws IllegalArgumentException
+    {
+        if (other instanceof LabeledEvent)
+        {
+            throw new IllegalArgumentException("other must be of type LabeledEvent");
+        }
+        addEvent((LabeledEvent)other);
+    }
+    
     /**
      * Add an event. Thorws exception if the event is null, has null label or
      * is already in the alphabet(!).
