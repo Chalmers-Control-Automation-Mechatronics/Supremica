@@ -112,15 +112,15 @@ public class ExportDialog
 
 			return ExportFormat.FSM;    // Should return a FsmExporter object
 		}
-		else if (selectedValue == spString)
-		{
-			if (checkbox.isSelected())
-			{
-				return ExportFormat.SP_DEBUG;
-			}
-
-			return ExportFormat.SP;    // Should return a SpExporter object
-		}
+//		else if (selectedValue == spString)
+//		{
+//			if (checkbox.isSelected())
+//			{
+//				return ExportFormat.SP_DEBUG;
+//			}
+//
+//			return ExportFormat.SP;    // Should return a SpExporter object
+//		}
 		else if (selectedValue == htmlString)
 		{
 			if (checkbox.isSelected())

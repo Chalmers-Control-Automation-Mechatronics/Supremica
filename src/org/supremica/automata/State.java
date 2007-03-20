@@ -96,9 +96,9 @@ public class State
     private State assocState = null;
     // private Object equivClass = null;
     private StateSet stateSet = null;    //
-    private int x = UNDEF_POS;
-    private int y = UNDEF_POS;
-    private int radius = 9;
+//    private int x = UNDEF_POS;
+//    private int y = UNDEF_POS;
+//    private int radius = 9;
 
     private Listeners listeners = null;
 
@@ -173,12 +173,6 @@ public class State
         // equivClass = otherState.equivClass;
         stateSet = otherState.stateSet;
         visited = otherState.visited;
-        x = otherState.x;
-        y = otherState.y;
-        radius = otherState.radius;
-        // Här är skurken.....
-        // Vilken jäv**a skurk? Skriv ordentliga kommentarer, skurkar!!!
-        //              outgoingArcs = otherState.outgoingArcs;
     }
 
     public NamedProxy clone()
@@ -363,6 +357,7 @@ public class State
         return selected;
     }
 
+/*    
     public void setXY(int x, int y)
     {
         this.x = x;
@@ -378,7 +373,9 @@ public class State
     {
         return y;
     }
+*/
 
+/*
     public boolean validLayout()
     {
         if ((x < 0) || (y < 0))
@@ -403,7 +400,7 @@ public class State
     {
         return radius;
     }
-
+*/
     public boolean equals(Object state)
     {
         //return id.equals(((State) state).id);
@@ -1098,7 +1095,7 @@ public class State
 
         return enabled;
     }
-
+/*
     public boolean contains(int x1, int y1)
     {
         int radius2 = radius * radius;
@@ -1106,7 +1103,7 @@ public class State
 
         return (distance2 <= radius2);
     }
-
+*/
     public Listeners getListeners()
     {
         if (listeners == null)

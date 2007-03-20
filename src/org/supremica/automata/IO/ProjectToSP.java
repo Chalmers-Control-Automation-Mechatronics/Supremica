@@ -61,7 +61,7 @@ public class ProjectToSP
 	private boolean canonical = false;
 	private boolean includeCost = false;
 	private boolean debugMode = false;
-	private boolean includeLayout = true;
+//	private boolean includeLayout = true;
 	private boolean includeExecution = true;
 	private final static int majorFileVersion = 0;
 	private final static int minorFileVersion = 10;
@@ -75,10 +75,10 @@ public class ProjectToSP
 		this.project = project;
 	}
 
-	public void setIncludeLayout(boolean includeLayout)
-	{
-		this.includeLayout = includeLayout;
-	}
+//	public void setIncludeLayout(boolean includeLayout)
+//	{
+//		this.includeLayout = includeLayout;
+//	}
 
 	public void setIncludeExecution(boolean includeExecution)
 	{
@@ -263,61 +263,6 @@ public class ProjectToSP
 			}
 
 			pw.println("\t</Transitions>");
-
-			// Print layout
-			if (includeLayout && aut.hasLayout())
-			{
-				pw.println("\t<Layout>");
-
-				// Print State Layout
-				pw.println("\t\t<StatesLayout>");
-
-				for (Iterator stateIt = aut.stateIterator();
-						stateIt.hasNext(); )
-				{
-					State state = (State) stateIt.next();
-
-					// pw.print("\t\t\t<StateLayout id=\"" + EncodingHelper.normalize(state.getId()) + "\"");
-					pw.print("\t\t\t<StateLayout id=\"" + stateIdMap.get(state) + "\"");
-					pw.print(" x=\"" + state.getX() + "\"");
-					pw.print(" y=\"" + state.getY() + "\"");
-					pw.println("/>");
-				}
-
-				pw.println("\t\t</StatesLayout>");
-
-				// Print Transition Layout
-				pw.println("\t\t<TransitionsLayout>");
-
-				for (Iterator stateIt = aut.stateIterator();
-						stateIt.hasNext(); )
-				{
-					State sourceState = (State) stateIt.next();
-
-					/*
-for (Iterator arcSets = sourceState.outgoingArcSetIterator(); arcSets.hasNext(); )
-{
-					ArcSet currArcSet = (ArcSet) arcSets.next();
-					State fromState = currArcSet.getFromState();
-					State toState = currArcSet.getToState();
-					pw.println("\t\t\t<ArcSet from=\"" + fromState.getId() + "\" to=\"" + toState.getId() + "\">");
-
-					for (Iterator arcIt = currArcSet.iterator(); arcIt.hasNext(); )
-					{
-													Arc currArc = (Arc) arcIt.next();
-													LabeledEvent thisEvent = theAlphabet.getEventWithId(currArc.getEventId());
-
-													pw.println("\t\t\t\t" + "<Event>" + thisEvent.getLabel() < "</Event>");
-					}
-
-					pw.println("\t\t\t</ArcSet>");
-}
-					*/
-					pw.println("\t\t</TransitionsLayout>");
-				}
-
-				pw.println("\t</Layout>");
-			}
 
 			pw.println("</Automaton>");
 		}

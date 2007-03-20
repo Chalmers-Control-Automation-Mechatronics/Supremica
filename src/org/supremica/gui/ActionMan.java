@@ -621,7 +621,7 @@ public class ActionMan
 
             return;
         }
-
+/*
         if (exportMode == ExportFormat.SP_DEBUG)
         {
             ProjectToSP exporter = new ProjectToSP(gui.getSelectedProject());
@@ -631,7 +631,7 @@ public class ActionMan
 
             return;
         }
-
+*/
         if (exportMode == ExportFormat.DOT_DEBUG)
         {
             for (Iterator autIt = selectedAutomata.iterator();
@@ -791,48 +791,6 @@ public class ActionMan
 
                 return;
             }
-            else if (exportMode == ExportFormat.SP)
-            {
-                fileExporter = FileDialogs.getSPFileExporter();
-            }
-            else
-            {
-                return;
-            }
-
-            Project selectedProject = gui.getSelectedProject();
-
-            fileExporter.setDialogTitle("Save Project as ...");
-
-            if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
-            {
-                File currFile = fileExporter.getSelectedFile();
-
-                if (currFile != null)
-                {
-                    if (!currFile.isDirectory())
-                    {
-                        try
-                        {
-                            if (exportMode == ExportFormat.XML)
-                            {
-                                AutomataToXml exporter = new AutomataToXml(selectedProject);
-                                exporter.serialize(currFile);
-                            }
-                            else if (exportMode == ExportFormat.SP)
-                            {
-                                ProjectToSP exporter = new ProjectToSP(selectedProject);
-                                exporter.serialize(currFile);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            logger.error("Exception while exporting " + currFile.getAbsolutePath(), ex);
-                            logger.debug(ex.getStackTrace());
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -858,10 +816,10 @@ public class ActionMan
         {
             fileExporter = FileDialogs.getExportFileChooser(FileFormats.FSM);
         }
-        else if (exportMode == ExportFormat.SP)
-        {
-            fileExporter = FileDialogs.getExportFileChooser(FileFormats.SP);
-        }
+//        else if (exportMode == ExportFormat.SP)
+//        {
+//            fileExporter = FileDialogs.getExportFileChooser(FileFormats.SP);
+//        }
         else
         {
             return;
@@ -902,17 +860,17 @@ public class ActionMan
                             AutomatonToFSM exporter = new AutomatonToFSM(currAutomaton);
                             exporter.serialize(currFile.getAbsolutePath());
                         }
-                        else if (exportMode == ExportFormat.SP)
-                        {
-                            Project selectedProject = gui.getSelectedProject();
-                            Project newProject = new Project();
-                            newProject.addAttributes(selectedProject);
-                            //newProject.addActions(selectedProject.getActions());
-                            //newProject.addControls(selectedProject.getControls());
-                            //newProject.setAnimationURL(selectedProject.getAnimationURL());
-                            ProjectToSP exporter = new ProjectToSP(newProject);
-                            exporter.serialize(currFile);
-                        }
+//                        else if (exportMode == ExportFormat.SP)
+//                        {
+//                            Project selectedProject = gui.getSelectedProject();
+//                            Project newProject = new Project();
+//                            newProject.addAttributes(selectedProject);
+//                            //newProject.addActions(selectedProject.getActions());
+//                            //newProject.addControls(selectedProject.getControls());
+//                            //newProject.setAnimationURL(selectedProject.getAnimationURL());
+//                            ProjectToSP exporter = new ProjectToSP(newProject);
+//                            exporter.serialize(currFile);
+//                        }
 
                         /*
                           else if (exportMode == ExportFormat.HTML)

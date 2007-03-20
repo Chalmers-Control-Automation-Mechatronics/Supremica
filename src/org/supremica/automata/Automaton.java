@@ -95,9 +95,9 @@ public class Automaton
     private int uniqueStateIndex = 0;
 
     // Graphical stuff
-    private boolean hasLayout = false;
-    private int width = -1;
-    private int height = -1;
+//    private boolean hasLayout = false;
+//    private int width = -1;
+//    private int height = -1;
 
     private AutomatonListeners listeners = null;
 
@@ -1770,6 +1770,7 @@ public class Automaton
         endTransaction();
     }
 
+    /*
     public State getState(int x, int y)
     {
         Iterator stateIt = stateIterator();
@@ -1838,7 +1839,7 @@ public class Automaton
         return true;
     }
     // End layout stuff that does not belong in this interface
-
+*/
     public int nbrOfControllableEvents()
     {
         return alphabet.nbrOfControllableEvents();

@@ -116,7 +116,7 @@ public class AnalyzerExportAction
 
             return;
         }
-
+/*
         if (exportMode == ExportFormat.SP_DEBUG)
         {
             ProjectToSP exporter = new ProjectToSP(ide.getActiveProject());
@@ -126,6 +126,7 @@ public class AnalyzerExportAction
 
             return;
         }
+*/
         if (exportMode == ExportFormat.DOT_DEBUG)
         {
             for (Iterator autIt = selectedAutomata.iterator();
@@ -285,10 +286,12 @@ public class AnalyzerExportAction
 
                 //return;
             }
+ /*           
             else if (exportMode == ExportFormat.SP)
             {
                 fileExporter = FileDialogs.getSPFileExporter();
             }
+ */
             else
             {
                 return;
@@ -311,11 +314,13 @@ public class AnalyzerExportAction
                                 AutomataToXml exporter = new AutomataToXml(selectedAutomata);
                                 exporter.serialize(currFile);
                             }
+                            /*
                             else if (exportMode == ExportFormat.SP)
                             {
                                 ProjectToSP exporter = new ProjectToSP(ide.getIDE().getActiveProject());
                                 exporter.serialize(currFile);
                             }
+                             */
                         }
                         catch (Exception ex)
                         {
@@ -351,10 +356,12 @@ public class AnalyzerExportAction
         {
             fileExporter = FileDialogs.getExportFileChooser(FileFormats.FSM);
         }
+/*        
         else if (exportMode == ExportFormat.SP)
         {
             fileExporter = FileDialogs.getExportFileChooser(FileFormats.SP);
         }
+  */
         else
         {
             return;
@@ -395,6 +402,7 @@ public class AnalyzerExportAction
                             AutomatonToFSM exporter = new AutomatonToFSM(currAutomaton);
                             exporter.serialize(currFile.getAbsolutePath());
                         }
+/*                        
                         else if (exportMode == ExportFormat.SP)
                         {
                             Project activeProject = ide.getActiveProject();
@@ -406,7 +414,7 @@ public class AnalyzerExportAction
                             ProjectToSP exporter = new ProjectToSP(activeProject);
                             exporter.serialize(currFile);
                         }
-
+*/
                         /*
                           else if (exportMode == ExportFormat.HTML)
                           {

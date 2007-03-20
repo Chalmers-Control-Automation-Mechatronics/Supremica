@@ -144,7 +144,9 @@ public class Automata
 
     public Automata clone()
     {
-      return new Automata(this, false);
+        //Automata clonedObject = (Automata)super.clone();
+        
+        return new Automata(this, false);
     }
 
     private void deepAutomataCopy(Automata oldAutomata)

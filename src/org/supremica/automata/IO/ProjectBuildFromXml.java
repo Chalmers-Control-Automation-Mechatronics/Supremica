@@ -306,6 +306,7 @@ public class ProjectBuildFromXml
         {
             doAutomata(attributes);
         }
+ /*       
         else if (layoutStr.equals(name))
         {
             doLayout(attributes);
@@ -314,6 +315,7 @@ public class ProjectBuildFromXml
         {
             doStateLayout(attributes);
         }
+ */
         else if (executionStr.equals(name))
         {
             doExecution(attributes);
@@ -752,7 +754,8 @@ public class ProjectBuildFromXml
             throw new SAXException("Unsupported file format.");
         }
     }
-    
+ 
+    /*
     public final void doLayout(Attributes attributes)
     throws SAXException
     {
@@ -776,7 +779,9 @@ public class ProjectBuildFromXml
         
         currAutomaton.setHasLayout(true);
     }
-    
+     */
+
+    /*
     public final void doStateLayout(Attributes attributes)
     throws SAXException
     {
@@ -806,10 +811,13 @@ public class ProjectBuildFromXml
             currState.setXY(iX, iY);
         }
     }
+     **/
     
+    /*
     public final void doTransitionLayout(Attributes attributes)
     throws SAXException
     {}
+    */
     
     public final void doExecution(Attributes attributes)
     throws SAXException
