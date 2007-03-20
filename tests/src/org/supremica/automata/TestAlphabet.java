@@ -167,6 +167,7 @@ public class TestAlphabet
 			Automaton spec = AutomataSynchronizer.synchronizeAutomata(theProject.getSpecificationAutomata());
             assertTrue(plant.getAlphabet() instanceof Alphabet);
             assertTrue(spec.getAlphabet() instanceof Alphabet);
+            assertTrue(plant.getAlphabet().size() == spec.getAlphabet().size())
             assertTrue(plant.getAlphabet().equals(spec.getAlphabet()));
 
 			// Test inequality
