@@ -271,6 +271,11 @@ public final class AutomataIndexFormHelper
 
 	public static String dumpState(int[] state)
 	{
+        if (state == null)
+        {
+            return "[null]";
+        }
+        
 		StringBuffer sb = new StringBuffer("[");
 
 		for (int i = 0; i < state.length; i++)
