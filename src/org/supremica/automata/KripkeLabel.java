@@ -59,7 +59,7 @@ import java.lang.String;
 public class KripkeLabel
 	implements Comparable<KripkeLabel>
 {
-	private String label = null;
+	private final String label;
 	
 	public KripkeLabel(String label)
 	{
@@ -79,4 +79,12 @@ public class KripkeLabel
 		return this.label.compareTo(other.label);
 	}
 
+    public boolean equals(Object other)
+    {
+        if (other == null || !(other instanceof KripkeLabel))
+        {
+            return false;
+        }
+        return this.label.equals(((KripkeLabel)other).label);
+    }
 }

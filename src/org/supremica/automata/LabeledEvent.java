@@ -136,6 +136,11 @@ public class LabeledEvent
         return label;
     }
     
+    /**
+     * @deprecated
+     * There is no reason why setlabel should not be immutable
+     */
+    @Deprecated    
     public void setLabel(String label)
     {
         this.label = label;
