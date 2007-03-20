@@ -51,35 +51,57 @@ package org.supremica.automata;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import org.supremica.automata.IO.*;
+import org.supremica.testhelpers.*;
 
-import org.supremica.automata.algorithms.TestPackageAlgorithms;
-import org.supremica.automata.IO.TestPackageIO;
-
-public class TestPackageAutomata
+public class TestLabeledEvent
 	extends TestCase
 {
 
-	public TestPackageAutomata(String name)
+	public TestLabeledEvent(String name)
 	{
 		super(name);
 	}
 
 	/**
+	 * Sets up the test fixture.
+	 * Called before every test case method.
+	 */
+	protected void setUp()
+	{
+	}
+
+	/**
+	 * Tears down the test fixture.
+	 * Called after every test case method.
+	 */
+	protected void tearDown()
+	{
+	}
+
+	/**
 	 * Assembles and returns a test suite
-	 * containing all known tests.
+	 * for all the test methods of this test case.
 	 */
 	public static Test suite()
 	{
-		TestSuite suite = new TestSuite();
-		suite.addTest(TestLabeledEvent.suite());
-		suite.addTest(TestAlphabet.suite());
-		suite.addTest(TestState.suite());
-		suite.addTest(TestAutomaton.suite());
-        suite.addTest(TestAutomataIndexMap.suite());
-        suite.addTest(TestAutomata.suite());
-		suite.addTest(TestStateSet.suite());
-		suite.addTest(TestPackageAlgorithms.suite());
-		suite.addTest(TestPackageIO.suite());
+		TestSuite suite = new TestSuite(TestLabeledEvent.class);
 		return suite;
 	}
+
+
+	public void testSimpleOperations()
+	{
+        LabeledEvent e1 = new LabeledEvent("l1");
+        assertTrue(e1.equals(e1));
+        assertTrue(!e1.equals(null));
+        LabeledEvent e2 = new LabeledEvent("l1");
+        assertTrue(e1.equals(e2));
+        LabeledEvent e3 = new LabeledEvent("l3");
+        assertTrue(!e1.equals(e3));
+        LabeledEvent e4 = new LabeledEvent(e3);
+        assertTrue(e4.equals(e3));
+    }
+
 }
+
