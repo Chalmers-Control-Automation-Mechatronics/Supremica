@@ -359,4 +359,10 @@ public class LabeledEvent
     {
         return getName().hashCode();
     }
+    
+    public static void main(String[] args)
+    {
+        LabeledEvent e1 = new LabeledEvent("e1");
+        System.out.println(e1.equals(e1));
+    }
 }
