@@ -171,7 +171,7 @@ public class TestAlphabet
         alph2.add(e2_copy);
         assertTrue(alph1.equals(alph2));
         LabeledEvent e3_1 = new LabeledEvent("e3");
-        LabeledEvent e2_2 = new LabeledEvent("e3");      
+        LabeledEvent e3_2 = new LabeledEvent("e3");      
         alph1.add(e3_1);
         alph2.add(e3_2);
         assertTrue(alph1.equals(alph2));
