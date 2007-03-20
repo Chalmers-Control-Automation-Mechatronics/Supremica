@@ -383,9 +383,9 @@ public final class IntArrayHashTable
 
 		try
 		{
-			System.out.println("add a1: " + theHashTable.add(a1));
-			System.out.println("add a2: " + theHashTable.add(a2));
-			System.out.println("add a3: " + theHashTable.add(a3));
+			System.out.println("add a1: " + Arrays.toString(theHashTable.add(a1)));
+			System.out.println("add a2: " + Arrays.toString(theHashTable.add(a2)));
+			System.out.println("add a3: " + Arrays.toString(theHashTable.add(a3)));
 		}
 		catch (Exception e)
 		{

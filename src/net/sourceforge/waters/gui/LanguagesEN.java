@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   Languages
 //###########################################################################
-//# $Id: LanguagesEN.java,v 1.3 2006-11-03 15:01:56 torda Exp $
+//# $Id: LanguagesEN.java,v 1.4 2007-03-20 12:11:31 knut Exp $
 //###########################################################################
 package net.sourceforge.waters.gui;
 
@@ -18,7 +18,7 @@ package net.sourceforge.waters.gui;
 public class LanguagesEN
 	extends Languages
 {
-	public void LanguagesEN() {}
+	public LanguagesEN() {}
 
 	public static void createLanguage(Languages l)
 	{

@@ -49,6 +49,7 @@
  */
 package org.supremica.automata;
 
+import java.io.Serializable;
 import org.supremica.log.*;
 import java.util.Comparator;
 import net.sourceforge.waters.model.base.Proxy;
@@ -67,18 +68,19 @@ public class Arc
 	// private ArcListeners listeners = null;
     
     // Internal use for graphical representation -- should be in GraphicalArc?
+/*
     private double outgoingAngle = 0;
     private double incomingAngle = 0;
     private int beginX = -1;
     private int beginY = -1;
     private int endX = -1;
     private int endY = -1;
-    
+*/    
     /**
      * This variable indicates which (initial) automata are "the brains behind"
      * this Arc. It has only a reasonable value if synchronization is performed.
      */
-    private boolean[] firingAutomata = null;
+    //private boolean[] firingAutomata = null;
 
     // TEMP-solution (use EFA instead)
     public static final double UNDEF_PROBABILITY = -1;
@@ -107,7 +109,7 @@ public class Arc
     }
     
     public Arc(State from, State to, LabeledEvent event)
-    throws IllegalArgumentException
+        throws IllegalArgumentException
     {
         this(from, to);
         
@@ -124,7 +126,17 @@ public class Arc
     
     public TransitionProxy clone()
     {
-        return new Arc(this);
+        try
+        {
+            Arc clone = (Arc)super.clone();
+            Arc.cloneAttributes(this, clone);
+            return clone;
+        }
+        catch (CloneNotSupportedException ex)
+        {
+            logger.error(ex);
+            return null;
+        }
     }
     
     public LabeledEvent getEvent()
@@ -252,20 +264,26 @@ public class Arc
      *
      *      @return firingAutomata
      */
+/*    
     public boolean[] getFiringAutomata()
     {
         return firingAutomata;
     }
-    
-    public boolean equals(Arc obj)
+*/
+    public boolean equals(Object object)
     {
-        if (obj == null)
+        if ((object == null) || !(object instanceof Arc))
         {
-            return (this == null); // Hehe
+            return false;
         }
         
-        Arc arc = (Arc) obj;
+        Arc arc = (Arc) object;
         return (toState.equals(arc.getToState()) && fromState.equals(arc.getFromState()) && event.equals(arc.getEvent()));
+    }
+    
+    public int hashCode()
+    {
+        return toState.hashCode() + fromState.hashCode() + event.hashCode();
     }
     
     /**
@@ -310,7 +328,7 @@ public class Arc
      * Comparator for comparing two arcs based on their events alone.
      */
     public static class EventComparator
-        implements Comparator<Arc>
+        implements Comparator<Arc>, Serializable
     {
         public int compare(Arc one, Arc two)
         {
@@ -353,6 +371,13 @@ public class Arc
 	this(from, to, event);
 
 	setProbability(probability);
+    }
+    
+    private static void cloneAttributes(Arc from, Arc to)
+    {
+        to.event = from.event;
+        to.fromState = from.fromState;
+        to.toState = from.toState;       
     }
 
     // TEMP-solution (use EFA instead)

@@ -497,7 +497,7 @@ public class Alphabet
         theEvents = newEvents;
     }
 
-    class ControllableEventIterator
+    static class ControllableEventIterator
         implements Iterator<LabeledEvent>
     {
         private final Iterator theIterator;
@@ -927,6 +927,10 @@ public class Alphabet
 
     public boolean equals(Object other)
     {
+        if (other == null || !(other instanceof Alphabet))
+        {
+            return false;
+        }
         return this.theEvents.equals(((Alphabet) other).theEvents);
     }
 

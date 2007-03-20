@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeHashSet
 //###########################################################################
-//# $Id: NativeHashSet.java,v 1.1 2006-08-20 08:39:41 robi Exp $
+//# $Id: NativeHashSet.java,v 1.2 2007-03-20 12:11:31 knut Exp $
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;
@@ -40,7 +40,7 @@ public class NativeHashSet<E> extends AbstractSet<E>
     addAll(collection);
   }
 
-  public void finalzize()
+  protected void finalize()
   {
     destroyNativeHashSet(mNativeHandler);
   }
@@ -113,7 +113,7 @@ public class NativeHashSet<E> extends AbstractSet<E>
       mNativeIter = createNativeIterator(mNativeHandler);
     }
 
-    public void finalize()
+    protected void finalize()
     {
       destroyNativeIterator(mNativeIter);
     }

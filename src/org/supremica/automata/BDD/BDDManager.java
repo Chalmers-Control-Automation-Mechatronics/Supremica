@@ -202,7 +202,7 @@ public class BDDManager
             }
             else if (transitions instanceof BDDDisjunctiveTransitions)
             {
-                BDDConjunctiveTransitions bddDisjunctiveTransitions = (BDDConjunctiveTransitions)transitions;
+                BDDDisjunctiveTransitions bddDisjunctiveTransitions = (BDDDisjunctiveTransitions)transitions;
                 nextStatesAndTransitionsBDD = reachableStatesBDD;
                 for(Iterator<BDD> transitionBDDIt = bddDisjunctiveTransitions.forwardIterator(); transitionBDDIt.hasNext(); )
                 {

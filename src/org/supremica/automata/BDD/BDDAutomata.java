@@ -189,7 +189,7 @@ public class BDDAutomata
         }
     }
   
-    public void finalize()
+    protected void finalize()
     {
         done();
     }

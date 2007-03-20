@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   IndexedListModel
 //###########################################################################
-//# $Id: IndexedListModel.java,v 1.2 2006-09-21 16:42:13 robi Exp $
+//# $Id: IndexedListModel.java,v 1.3 2007-03-20 12:11:31 knut Exp $
 //###########################################################################
 
 
@@ -49,7 +49,7 @@ public class IndexedListModel<E extends NamedSubject>
     }
   }
 
-  public void finalize()
+  protected void finalize()
   {
     dispose();
   }
