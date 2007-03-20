@@ -128,7 +128,7 @@ class AutomataSelectorFactory
                 // This is an event that has not been taken care of
                 LabeledEvent event = entry.getValue().iterator().next();
                 // After this we're done examining this event!
-                entry.getValue().remove(event);
+                entry.getValue().removeEvent(event);
                 // Build alphabet
                 Alphabet ucAlpha = new Alphabet();
                 ucAlpha.addEvent(event);

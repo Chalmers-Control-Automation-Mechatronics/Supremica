@@ -473,10 +473,7 @@ public class IDE
     
     public static void main(String args[])
     throws Exception
-    {
-        LabeledEvent e1 = new LabeledEvent("l1");
-        boolean result = e1.equals(e1);
-        
+    {   
         List<File> filesToOpen = ProcessCommandLineArguments.process(args); 
         
         interfaceManager = InterfaceManager.getInstance();
