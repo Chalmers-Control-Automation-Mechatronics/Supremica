@@ -167,6 +167,8 @@ public class TestAlphabet
 			Automaton spec = AutomataSynchronizer.synchronizeAutomata(theProject.getSpecificationAutomata());
             assertTrue(plant.getAlphabet() instanceof Alphabet);
             assertTrue(spec.getAlphabet() instanceof Alphabet);
+            System.err.println("spec: " + spec.getAlphabet().toString());
+            System.err.println("plant: " + plant.getAlphabet().toString());
             assertTrue(plant.getAlphabet().size() == spec.getAlphabet().size());
             assertTrue(plant.getAlphabet().equals(spec.getAlphabet()));
 
