@@ -165,7 +165,9 @@ public class TestAlphabet
 			// Test equality
 			Automaton plant = AutomataSynchronizer.synchronizeAutomata(theProject.getPlantAutomata());
 			Automaton spec = AutomataSynchronizer.synchronizeAutomata(theProject.getSpecificationAutomata());
-			assertTrue(plant.getAlphabet().equals(spec.getAlphabet()));
+            assertTrue(plant.getAlphabet() instanceof Alphabet);
+            assertTrue(spec.getAlphabet() instanceof Alphabet);
+            assertTrue(plant.getAlphabet().equals(spec.getAlphabet()));
 
 			// Test inequality
 			spec = theProject.getAutomaton("Functional mode");
