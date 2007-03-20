@@ -1,0 +1,4 @@
+#/usr/bash
+
+findbugs -textui -effort:max -sortByClass -html:fancy-hist.xsl -onlyAnalyze org.supremica.automata.* -auxclasspath ../../dist/SupremicaLib.jar ../../dist/Supremica.jar > output.html
+
