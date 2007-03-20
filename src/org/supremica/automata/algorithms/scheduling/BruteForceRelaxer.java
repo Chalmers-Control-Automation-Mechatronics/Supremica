@@ -15,7 +15,7 @@ public class BruteForceRelaxer
 	 * @return double the heuristic function, h(n), that guides the search, 
 	 * in this case it is the "brute-force relaxation"
 	 */
-    public double getRelaxation(double[] node) 
+    public double getRelaxation(Node node) 
 		throws Exception
 	{
 		return 0;
