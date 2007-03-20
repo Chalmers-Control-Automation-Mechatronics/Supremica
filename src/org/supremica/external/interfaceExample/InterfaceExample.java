@@ -1,4 +1,4 @@
-package org.supremica.external.InterfaceExample;
+package org.supremica.external.interfaceExample;
 
 import java.util.*;
 import org.supremica.automata.*;
