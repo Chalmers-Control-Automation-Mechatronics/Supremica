@@ -186,7 +186,7 @@ public class TestAlphabet
         alph4.addEvent(e2_2);
         alph4.addEvent(e1_2);
         assertTrue(alph3.equals(alph4));
-        alph4.addEvent(e1_1);
+        alph4.addEvent(e3_1);
         assertTrue(!alph3.equals(alph4));        
     }    
     
