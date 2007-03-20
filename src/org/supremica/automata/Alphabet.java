@@ -929,7 +929,7 @@ public class Alphabet
     {
         if (other instanceof Alphabet)
         {
-            this.theEvents.equals(((Alphabet)other).theEvents);            
+            return this.theEvents.equals(((Alphabet)other).theEvents);            
         }
         return false;
     }
