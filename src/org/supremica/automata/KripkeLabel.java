@@ -81,10 +81,10 @@ public class KripkeLabel
 
     public boolean equals(Object other)
     {
-        if (other == null || !(other instanceof KripkeLabel))
+        if (other instanceof KripkeLabel)
         {
-            return false;
+            return this.label.equals(((KripkeLabel)other).label);
         }
-        return this.label.equals(((KripkeLabel)other).label);
+        return false;
     }
 }

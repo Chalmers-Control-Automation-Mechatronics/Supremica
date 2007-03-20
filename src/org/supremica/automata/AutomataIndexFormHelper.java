@@ -299,7 +299,7 @@ public final class AutomataIndexFormHelper
 	public static String dumpVerboseState(int[] state, AutomataIndexForm theForm)
 	{
 		StringBuffer sb = new StringBuffer("[\n");
-		State[][] stateTable = theForm.getStateTable();
+		//State[][] stateTable = theForm.getStateTable();
 
 		for (int i = 0; i < state.length - STATE_EXTRA_DATA; i++)
 		{

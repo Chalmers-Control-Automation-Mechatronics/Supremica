@@ -64,19 +64,19 @@ public class EventHelpers
 {
 	private static Logger logger = LoggerFactory.createLogger(EventHelpers.class);
 
-	/**
-	 * Creates a new event from a set of events
-	 *
-	 * @param  eventSet Description of the Parameter
-	 * @return  Description of the Return Value
-	 * @exception  IllegalArgumentException Description of the Exception
-	 * @exception  Exception Description of the Exception
-	 */
-	private static LabeledEvent createEvent(EventsSet eventSet)
-		throws IllegalArgumentException, Exception
-	{
-		return createEvent(eventSet, true, true);
-	}
+//	/**
+//	 * Creates a new event from a set of events
+//	 *
+//	 * @param  eventSet Description of the Parameter
+//	 * @return  Description of the Return Value
+//	 * @exception  IllegalArgumentException Description of the Exception
+//	 * @exception  Exception Description of the Exception
+//	 */
+//	private static LabeledEvent createEvent(EventsSet eventSet)
+//		throws IllegalArgumentException, Exception
+//	{
+//		return createEvent(eventSet, true, true);
+//	}
 
 	/**
 	 * Creates a new event from a set of events

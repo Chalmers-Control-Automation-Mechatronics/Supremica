@@ -444,7 +444,7 @@ public final class AutomataIndexForm
 					int currEventIndex = theEvent.getSynchIndex();
 
 					// Sort
-					sortedEventIndices.add(new Integer(currEventIndex));
+					sortedEventIndices.add(currEventIndex);
 					sortedArcs[currEventIndex].add(currArc);
 
 					// Now insert the nextState index into the table
@@ -597,7 +597,7 @@ public final class AutomataIndexForm
 					LabeledEvent theEvent = theAlphabet.getEvent(currEvent.getLabel());
 					int currEventIndex = theEvent.getSynchIndex();
 
-					sortedEventIndices.add(new Integer(currEventIndex));
+					sortedEventIndices.add(currEventIndex);
 
 					// Now insert the prevState index into the table
 					State currPrevState = currArc.getFromState();

@@ -65,22 +65,6 @@ public class Arc
     private LabeledEvent event;
     private State fromState;
     private State toState;
-	// private ArcListeners listeners = null;
-    
-    // Internal use for graphical representation -- should be in GraphicalArc?
-/*
-    private double outgoingAngle = 0;
-    private double incomingAngle = 0;
-    private int beginX = -1;
-    private int beginY = -1;
-    private int endX = -1;
-    private int endY = -1;
-*/    
-    /**
-     * This variable indicates which (initial) automata are "the brains behind"
-     * this Arc. It has only a reasonable value if synchronization is performed.
-     */
-    //private boolean[] firingAutomata = null;
 
     // TEMP-solution (use EFA instead)
     public static final double UNDEF_PROBABILITY = -1;
@@ -101,11 +85,6 @@ public class Arc
         
         this.fromState = from;
         this.toState = to;
-        
-                /* I think these should be in Automaton.java... maybe we're not actually going to add this arc, right?
-                from.addOutgoingArc(this);
-                to.addIncomingArc(this);
-                 */
     }
     
     public Arc(State from, State to, LabeledEvent event)
@@ -125,11 +104,13 @@ public class Arc
     
     
     public TransitionProxy clone()
-    {
+    {   
         try
         {
             Arc clone = (Arc)super.clone();
-            Arc.cloneAttributes(this, clone);
+            clone.event = event;
+            clone.fromState = fromState;
+            clone.toState = toState;              
             return clone;
         }
         catch (CloneNotSupportedException ex)
@@ -153,15 +134,15 @@ public class Arc
     {
         return toState;
     }
+ 
+    public void setToState(State toState)
+    {
+        this.toState = toState;
+    }
     
     public State getTarget()
     {
         return getToState();
-    }
-    
-    public void setToState(State toState)
-    {
-        this.toState = toState;
     }
     
     public State getFromState()
@@ -174,23 +155,9 @@ public class Arc
         return getFromState();
     }
     
-    public void setFromState(State fromState)
-    {
-        this.fromState = fromState;
-    }
-    
     public String getLabel()
     {
         return event.getLabel();
-    }
-    
-    public void reverse()
-    {
-        // swap the states
-        State tmpState = getToState();
-        
-        toState = getFromState();
-        fromState = tmpState;
     }
     
     /**
@@ -211,65 +178,9 @@ public class Arc
         if (toState != null)
         {
             toState.removeIncomingArc(this);
-        }
-        
-        // eventId = null;
-        event = null;
-        fromState = null;
-        toState = null;
-        
-        // Removed notification here because it was extremely costly
-        // when running the AutomatonPurge. Should we really have notifiers
-        // attached to the arcs, isn't it enough if we have it to the automaton?
-        
-        // Later: Hmm - This can be removed because then the arcset in the automaton will
-        // not be updated and thus an error might occur.
-        
-        // Hugo: What do you mean? Can you or can't you remove it!?
-        
-        // notifyListeners(ArcListeners.MODE_ARC_REMOVED, this);
+        }    
     }
     
-/*
-        public Listeners getListeners()
-        {
-                if (listeners == null)
-                {
-                        listeners = new ArcListeners(this);
-                }
- 
-                return listeners;
-        }
- 
-        private void notifyListeners()
-        {
-                if (listeners != null)
-                {
-                        listeners.notifyListeners();
-                }
-        }
- 
-        private void notifyListeners(int mode, Object o)
-        {
-                if (listeners != null)
-                {
-                        listeners.notifyListeners(mode, o);
-                }
-        }
- */
-    
-    /**
-     *      Returns a boolean vector where true means that the corresponding automata
-     *      is (one of the) "responsible(s)" for the transition.
-     *
-     *      @return firingAutomata
-     */
-/*    
-    public boolean[] getFiringAutomata()
-    {
-        return firingAutomata;
-    }
-*/
     public boolean equals(Object object)
     {
         if ((object == null) || !(object instanceof Arc))
@@ -366,18 +277,10 @@ public class Arc
     
     // TEMP-solution (use EFA instead)
     public Arc(State from, State to, LabeledEvent event, double probability)
-	throws IllegalArgumentException
+        throws IllegalArgumentException
     {
-	this(from, to, event);
-
-	setProbability(probability);
-    }
-    
-    private static void cloneAttributes(Arc from, Arc to)
-    {
-        to.event = from.event;
-        to.fromState = from.fromState;
-        to.toState = from.toState;       
+        this(from, to, event);
+        setProbability(probability);
     }
 
     // TEMP-solution (use EFA instead)

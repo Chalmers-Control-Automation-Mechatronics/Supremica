@@ -88,7 +88,6 @@ public class State
     private boolean initial = false;
     private boolean accepting = false;
     private boolean forbidden = false;
-    private boolean active = false;
     private boolean first = false;
     private boolean last = false;
     private boolean visited = false;
@@ -319,16 +318,6 @@ public class State
         }
     }
 
-    public void setActive(boolean active)
-    {
-        this.active = active;
-    }
-
-    public boolean isActive()
-    {
-        return active;
-    }
-
     /**
      * This is only valid after setAssociatedState
      * has been called.
@@ -358,65 +347,13 @@ public class State
         return selected;
     }
 
-/*    
-    public void setXY(int x, int y)
-    {
-        this.x = x;
-        this.y = y;
-    }
-
-    public int getX()
-    {
-        return x;
-    }
-
-    public int getY()
-    {
-        return y;
-    }
-*/
-
-/*
-    public boolean validLayout()
-    {
-        if ((x < 0) || (y < 0))
-        {
-            return false;
-        }
-
-        return true;
-    }
-
-    public Point getLocation()
-    {
-        return new Point(x, y);
-    }
-
-    public void setRadius(int radius)
-    {
-        this.radius = radius;
-    }
-
-    public int getRadius()
-    {
-        return radius;
-    }
-*/
     public boolean equals(Object other)
     {
-        if (other == null || !(other instanceof State))
+        if (other instanceof State)
         {
-            return false;
+            return id.equals(((State) other).id);
         }
-        //return id.equals(((State) state).id);
-        boolean result = id.equals(((State) other).id);
-
-        if (result)
-        {
-            assert (this.hashCode() == other.hashCode());
-        }
-
-        return result;
+        return false;
     }
 
     /**
@@ -447,11 +384,6 @@ public class State
         }
 
         if (forbidden != otherState.forbidden)
-        {
-            return false;
-        }
-
-        if (active != otherState.active)
         {
             return false;
         }

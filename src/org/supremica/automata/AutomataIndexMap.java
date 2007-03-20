@@ -54,16 +54,16 @@ import java.util.*;
 
 public class AutomataIndexMap
 {
-    private HashMap<Automaton, Integer> automatonToIndexMap;
-    private Automaton[] indexToAutomatonArray;    
-    private HashMap<AutomatonAndStateEntry, Integer> automatonStateEntryToIndexMap;
-    private HashMap<AutomatonAndIntegerEntry, State> automatonIntegerEntryToStateMap;
-    private HashMap<LabeledEvent, Integer> eventToIndexMap;
-    private LabeledEvent[] indexToEventArray;
+    private final HashMap<Automaton, Integer> automatonToIndexMap;
+    private final Automaton[] indexToAutomatonArray;    
+    private final HashMap<AutomatonAndStateEntry, Integer> automatonStateEntryToIndexMap;
+    private final HashMap<AutomatonAndIntegerEntry, State> automatonIntegerEntryToStateMap;
+    private final HashMap<LabeledEvent, Integer> eventToIndexMap;
+    private final LabeledEvent[] indexToEventArray;
     
     private static Logger logger = LoggerFactory.createLogger(AutomataIndexMap.class);
     
-    public AutomataIndexMap(Automata theAutomata)
+    public AutomataIndexMap(final Automata theAutomata)
     {
         // This useful variable stores the union of the automata events
         Alphabet unionAlphabet = theAutomata.getUnionAlphabet();
@@ -117,7 +117,7 @@ public class AutomataIndexMap
      * @param automaton the automaton, whose index is requested
      * @return the index of this automaton.
      */
-    public int getAutomatonIndex(Automaton automaton)
+    public int getAutomatonIndex(final Automaton automaton)
     {
         if (automaton == null)
         {
@@ -126,7 +126,7 @@ public class AutomataIndexMap
         return automatonToIndexMap.get(automaton);
     }
     
-    public Automaton getAutomatonAt(int index)
+    public Automaton getAutomatonAt(final int index)
     {
         if (index < 0)
         {
@@ -142,7 +142,7 @@ public class AutomataIndexMap
      * @param event the event, whose index is requested
      * @return the index of this event.
      */
-    public int getEventIndex(LabeledEvent event)
+    public int getEventIndex(final LabeledEvent event)
     {
          if (event == null)
         {
@@ -151,7 +151,7 @@ public class AutomataIndexMap
         return eventToIndexMap.get(event);
     }
     
-    public LabeledEvent getEvent(int index)
+    public LabeledEvent getEvent(final int index)
     {
         if (index < 0)
         {
@@ -168,7 +168,7 @@ public class AutomataIndexMap
      * @param state the state, whose index is requested
      * @return the index of this state.
      */
-    public int getStateIndex(Automaton automaton, State state)
+    public int getStateIndex(final Automaton automaton, final State state)
     {
         if (automaton == null)
         {
@@ -181,7 +181,7 @@ public class AutomataIndexMap
         return automatonStateEntryToIndexMap.get(new AutomatonAndStateEntry(automaton, state));
     }
     
-    public State getStateAt(Automaton automaton, int stateIndex)
+    public State getStateAt(final Automaton automaton, final int stateIndex)
     {
         if (automaton == null)
         {
@@ -194,7 +194,7 @@ public class AutomataIndexMap
         return automatonIntegerEntryToStateMap.get(new AutomatonAndIntegerEntry(automaton, stateIndex));
     }
     
-    public State getStateAt(int automatonIndex, int stateIndex)
+    public State getStateAt(final int automatonIndex, final int stateIndex)
     {
         if (automatonIndex < 0)
         {
@@ -208,12 +208,12 @@ public class AutomataIndexMap
         return getStateAt(currAutomaton, stateIndex);
     }
     
-    class AutomatonAndStateEntry
+    static class AutomatonAndStateEntry
     {
         Automaton automaton;
         State state;
         
-        public AutomatonAndStateEntry(Automaton automaton, State state)
+        public AutomatonAndStateEntry(final Automaton automaton, final State state)
         {
             this.automaton = automaton;
             this.state = state;
@@ -234,7 +234,7 @@ public class AutomataIndexMap
         }
     }
 
-    class AutomatonAndIntegerEntry
+    static class AutomatonAndIntegerEntry
     {
         Automaton automaton;
         int stateIndex;

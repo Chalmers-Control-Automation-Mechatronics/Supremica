@@ -238,11 +238,11 @@ public class LabeledEvent
     
     public boolean equals(Object obj)
     {
-        if (obj == null || !(obj instanceof LabeledEvent))
+        if (obj instanceof LabeledEvent)
         {
-            return false;
+            this.label.equals(((LabeledEvent)obj).label);
         }
-        return this.label.equals(((LabeledEvent)obj).label);
+        return false;
     }
     
     public boolean equals(String label)

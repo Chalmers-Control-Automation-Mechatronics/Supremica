@@ -1874,11 +1874,11 @@ public class Automaton
 
     public boolean equals(Object other)
     {
-        if (other == null || !(other instanceof Automaton))
+        if (other instanceof Automaton)
         {
-            return false;
+            return this.equalAutomaton((Automaton)other);
         }
-        return this.equalAutomaton((Automaton)other);
+        return false;
     }
     
     /**
