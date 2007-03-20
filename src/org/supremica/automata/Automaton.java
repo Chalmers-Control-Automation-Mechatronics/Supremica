@@ -310,7 +310,7 @@ public class Automaton
         indexStateMap.clear();
         for (State state : iterableStates())
         {
-            indexStateMap.put(new Integer(state.getIndex()), state);
+            indexStateMap.put(state.getIndex(), state);
         }
     }
 
@@ -323,7 +323,7 @@ public class Automaton
 
         for (State state : iterableStates())
         {
-            sort.add(new Integer(state.getIndex()));
+            sort.add(state.getIndex());
         }
 
         for (Integer i : sort )
@@ -360,7 +360,7 @@ public class Automaton
         }
 
         //idStateMap.put(state.getId(), state);
-        indexStateMap.put(new Integer(state.getIndex()), state);
+        indexStateMap.put(state.getIndex(), state);
 
         if (state.isInitial())
         {
@@ -623,7 +623,7 @@ public class Automaton
         //String id = state.getId();
         //idStateMap.remove(id);
         int index = state.getIndex();
-        indexStateMap.remove(new Integer(index));
+        indexStateMap.remove(index);
         notifyListeners(AutomatonListeners.MODE_STATE_REMOVED, state);
     }
 
@@ -1000,7 +1000,7 @@ public class Automaton
      */
     public boolean containsStateWithIndex(int index)
     {
-        return indexStateMap.containsKey(new Integer(index));
+        return indexStateMap.containsKey(index);
     }
 
     /**
@@ -1011,7 +1011,7 @@ public class Automaton
      */
     public State getStateWithIndex(int index)
     {
-        return (State) indexStateMap.get(new Integer(index));
+        return (State) indexStateMap.get(index);
     }
 
     // end index stuff
