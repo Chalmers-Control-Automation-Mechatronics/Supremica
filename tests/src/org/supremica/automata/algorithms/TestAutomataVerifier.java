@@ -96,7 +96,7 @@ public class TestAutomataVerifier
 	{
 		try
 		{
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			ProjectBuildFromXML builder = new ProjectBuildFromXML();
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3));
 			SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
 			VerificationOptions verificationOptions = new VerificationOptions();
@@ -119,7 +119,7 @@ public class TestAutomataVerifier
 	{
 		try
 		{
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			ProjectBuildFromXML builder = new ProjectBuildFromXML();
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3Uncontrollable));
 			SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
 			VerificationOptions verificationOptions = new VerificationOptions();
@@ -141,7 +141,7 @@ public class TestAutomataVerifier
 	{
 		try
 		{
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			ProjectBuildFromXML builder = new ProjectBuildFromXML();
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.SimpleManufacturingExample));
 
 			assertTrue(AutomataVerifier.verifyMonolithicNonblocking(theProject));
@@ -157,7 +157,7 @@ public class TestAutomataVerifier
 	{
 		try
 		{
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			ProjectBuildFromXML builder = new ProjectBuildFromXML();
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.AutomaticCarParkGate));
 
 			assertTrue(!AutomataVerifier.verifyMonolithicNonblocking(theProject));
@@ -173,7 +173,7 @@ public class TestAutomataVerifier
 	{
 		try
 		{
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			ProjectBuildFromXML builder = new ProjectBuildFromXML();
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.SimpleManufacturingExample));
 
 			VerificationOptions verificationOptions;
@@ -232,7 +232,7 @@ public class TestAutomataVerifier
 	{
 		try
 		{
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			ProjectBuildFromXML builder = new ProjectBuildFromXML();
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.AutomaticCarParkGate));
 
 			assertTrue(!AutomataVerifier.verifyCompositionalNonblocking(theProject));
@@ -248,7 +248,7 @@ public class TestAutomataVerifier
 	{
 	 	try
 		{
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			ProjectBuildFromXML builder = new ProjectBuildFromXML();
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3LanguageInclusion));
 			SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
 			VerificationOptions verificationOptions = new VerificationOptions();
@@ -274,7 +274,7 @@ public class TestAutomataVerifier
 	{
 		try
 		{
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			ProjectBuildFromXML builder = new ProjectBuildFromXML();
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3LanguageExclusion));
 			SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
 			VerificationOptions verificationOptions = new VerificationOptions();

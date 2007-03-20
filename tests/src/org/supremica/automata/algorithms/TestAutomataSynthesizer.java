@@ -95,7 +95,7 @@ public class TestAutomataSynthesizer
     {
         try
         {            
-            ProjectBuildFromXml builder = new ProjectBuildFromXml();
+            ProjectBuildFromXML builder = new ProjectBuildFromXML();
             Project theProject = builder.build(TestFiles.getFile(TestFiles.AGV));
             assertTrue(theProject.nbrOfAutomata() == 17);
             SynthesizerOptions syntOptions = new SynthesizerOptions();

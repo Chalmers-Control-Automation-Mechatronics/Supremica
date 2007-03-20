@@ -107,7 +107,7 @@ public class TestAlgo
 	}
 	// ----------------------------------------------------------------------------------
 	private int fail, pass;
-	private ProjectBuildFromXml builder;
+	private ProjectBuildFromXML builder;
 	private org.supremica.util.BDD.BDDAutomata automata2;
 	private org.supremica.util.BDD.Supervisor supervisor;
 	private org.supremica.automata.Automata automata1;
@@ -116,7 +116,7 @@ public class TestAlgo
 	// ----------------------------------------------------------------------------------
 	public TestAlgo()
 	{
-		builder = new ProjectBuildFromXml();
+		builder = new ProjectBuildFromXML();
 	}
 
 	private void load(String name)
@@ -768,6 +768,9 @@ public class TestAlgo
 
 /*
  $Log: not supported by cvs2svn $
+ Revision 1.32  2004/12/08 10:23:15  vahidi
+ the supervisor subclasses can no give level-1 dep info
+
  Revision 1.31  2004/11/25 16:04:52  vahidi
  fixed hugos "fixes" where the HeperData was not created for BDD operations.
 

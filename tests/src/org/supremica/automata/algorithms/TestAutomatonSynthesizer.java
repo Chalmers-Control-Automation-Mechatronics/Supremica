@@ -97,7 +97,7 @@ public class TestAutomatonSynthesizer
 		try
 		{
 
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			ProjectBuildFromXML builder = new ProjectBuildFromXML();
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
 			assertTrue(theProject.nbrOfAutomata() == 3);
 			SynchronizationOptions syncOptions = new SynchronizationOptions();

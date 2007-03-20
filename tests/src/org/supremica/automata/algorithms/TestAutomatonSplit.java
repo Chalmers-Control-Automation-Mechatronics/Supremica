@@ -94,7 +94,7 @@ public class TestAutomatonSplit
 	{
 		try
 		{
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			ProjectBuildFromXML builder = new ProjectBuildFromXML();
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.Split));
 			Automaton q = theProject.getAutomaton("q");
 			Automata split = AutomatonSplit.split(q);

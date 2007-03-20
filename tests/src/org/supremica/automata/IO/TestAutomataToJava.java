@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.automata.IO
 //# CLASS:   TestAutomataToJava
 //###########################################################################
-//# $Id: TestAutomataToJava.java,v 1.4 2006-10-27 01:59:32 robi Exp $
+//# $Id: TestAutomataToJava.java,v 1.5 2007-03-20 19:30:24 knut Exp $
 //###########################################################################
 
 
@@ -93,7 +93,7 @@ public class TestAutomataToJava extends TestCase {
 		//generatedTempJavaFile.deleteOnExit();
 		//Generate java code into the temporary file from the ball process
 		// project
-		Project proj = new ProjectBuildFromXml().build(projFile);
+		Project proj = new ProjectBuildFromXML().build(projFile);
 		AutomataToJava javaExporter = new AutomataToJava(proj, classname);
 		PrintWriter pw =
 			new PrintWriter(new FileWriter(generatedTempJavaFile));

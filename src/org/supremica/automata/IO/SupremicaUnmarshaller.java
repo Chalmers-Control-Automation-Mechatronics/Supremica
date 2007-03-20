@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   SupremicaUnmarshaller
 //###########################################################################
-//# $Id: SupremicaUnmarshaller.java,v 1.6 2007-03-19 10:43:40 flordal Exp $
+//# $Id: SupremicaUnmarshaller.java,v 1.7 2007-03-20 19:30:24 knut Exp $
 //###########################################################################
 
 package org.supremica.automata.IO;
@@ -40,7 +40,7 @@ public class SupremicaUnmarshaller
     public SupremicaUnmarshaller(final ModuleProxyFactory modfactory)
     throws JAXBException, SAXException
     {
-        builder = new ProjectBuildFromXml();
+        builder = new ProjectBuildFromXML();
         mImporter = new ProductDESImporter(modfactory);
     }    
     
@@ -99,7 +99,7 @@ public class SupremicaUnmarshaller
     
     //#########################################################################
     //# Data Members
-    private final ProjectBuildFromXml builder;
+    private final ProjectBuildFromXML builder;
     private final ProductDESImporter mImporter;
     
     /**

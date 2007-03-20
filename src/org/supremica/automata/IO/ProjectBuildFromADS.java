@@ -128,11 +128,11 @@ public class ProjectBuildFromADS
 {
 	private static Logger logger = LoggerFactory.createLogger(ProjectBuildFromADS.class);
 	private ProjectFactory theProjectFactory = null;
-	private Project currProject = null;
-	private Automaton currAutomaton = null;
+//	private Project currProject = null;
+//	private Automaton currAutomaton = null;
 	private Alphabet currAlphabet = null;
 	protected String automatonName = "Imported ADS file";
-	private InputProtocol inputProtocol = InputProtocol.UnknownProtocol;
+//	private InputProtocol inputProtocol = InputProtocol.UnknownProtocol;
 	private File thisFile = null;
 	private static int READ_AUTOMATON_NAME = 1;
 	private static int STATE_READ_NUMBER_OF_STATES = 2;
@@ -157,7 +157,7 @@ public class ProjectBuildFromADS
 
 		if (protocol.equals("file"))
 		{
-			inputProtocol = InputProtocol.FileProtocol;
+			//inputProtocol = InputProtocol.FileProtocol;
 
 			String fileName = url.getFile();
 
@@ -173,11 +173,11 @@ public class ProjectBuildFromADS
 		}
 		else if (protocol.equals("jar"))
 		{
-			inputProtocol = InputProtocol.JarProtocol;
+			//inputProtocol = InputProtocol.JarProtocol;
 		}
 		else
 		{
-			inputProtocol = InputProtocol.UnknownProtocol;
+			//inputProtocol = InputProtocol.UnknownProtocol;
 
 			System.err.println("Unknown protocol: " + protocol);
 

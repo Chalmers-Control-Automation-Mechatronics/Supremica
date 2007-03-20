@@ -60,7 +60,7 @@ public class AutomataToControlBuilderSFC
 {
     private static Logger logger = LoggerFactory.createLogger(AutomataToControlBuilderSFC.class);
     protected ControlBuilderHelper theHelper = null;
-    private String fileName = null;
+//    private String fileName = null;
     protected Project theProject;
     protected boolean debugMode = false;
     protected int transitionCounter = 0;
@@ -75,7 +75,14 @@ public class AutomataToControlBuilderSFC
     public AutomataToControlBuilderSFC(Project theProject, IEC61131Helper theHelper)
     {
         this.theProject = theProject;
-        this.theHelper = (ControlBuilderHelper) theHelper;
+        if (theHelper instanceof ControlBuilderHelper)
+        {
+            this.theHelper = (ControlBuilderHelper)theHelper;
+        }
+        else
+        {
+            logger.error("Helper must be of type ControlBuilderHelper");
+        }
     }
     
     public void serialize(String fileName)
@@ -94,9 +101,7 @@ public class AutomataToControlBuilderSFC
             PrintWriter thePrintWriter = new PrintWriter(theWriter);
             String theFileName = theFile.getName();
             
-            fileName = theFileName.substring(0, theFileName.length() - 4);
-            
-            serializeApp(thePrintWriter, filename);
+            serializeApp(thePrintWriter, theFileName.substring(0, theFileName.length() - 4));
             thePrintWriter.close();
         }
         catch (Exception ex)
@@ -110,7 +115,7 @@ public class AutomataToControlBuilderSFC
     {
         
         // Start of file header
-        Date theDate = new Date();
+        //Date theDate = new Date();
         
         // Should perhaps get current date and time, but how do I format it?
         //logger.info(theDate.toString());

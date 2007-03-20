@@ -194,7 +194,7 @@ public class TestAlphabet
 	{
 		try
 		{
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			ProjectBuildFromXML builder = new ProjectBuildFromXML();
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.AutomaticCarParkGate));
 
 			// Test equality

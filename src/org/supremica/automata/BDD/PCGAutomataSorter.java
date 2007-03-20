@@ -74,7 +74,7 @@ public class PCGAutomataSorter
         {
             pcgNodeList.add(new DefaultPCGNode(currAutomaton.getName(), currAutomaton.nbrOfStates()));
         }
-        PCG pcg = new PCG(new Vector<PCGNode>(pcgNodeList));
+        //PCG pcg = new PCG(new Vector<PCGNode>(pcgNodeList));
         
         int[][] weightMatrix = getCommunicationMatrix(orgAutomata);
         OrderingSolver orderingSolver = new OrderingSolver(orgAutomata.size());

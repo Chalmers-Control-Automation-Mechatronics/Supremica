@@ -67,7 +67,7 @@ public class ProjectBuildFromWaters
 {
     private static Logger logger = LoggerFactory.createLogger(ProjectBuildFromWaters.class);
     private ProjectFactory theProjectFactory = null;
-    private Project currProject = null;
+//    private Project currProject = null;
     
     public ProjectBuildFromWaters()
     {

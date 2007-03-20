@@ -272,7 +272,7 @@ public class Server
 
 		try
 		{
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			ProjectBuildFromXML builder = new ProjectBuildFromXML();
 
 			project = builder.build(reader);
 		}
@@ -304,7 +304,7 @@ public class Server
 
 		try
 		{
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			ProjectBuildFromXML builder = new ProjectBuildFromXML();
 
 			project = builder.build(reader);
 		}

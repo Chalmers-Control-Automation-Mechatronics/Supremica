@@ -113,7 +113,7 @@ public class BDDVerifier
     {
         System.err.println("Loading: " + args[0]);
         
-        ProjectBuildFromXml builder = new ProjectBuildFromXml();
+        ProjectBuildFromXML builder = new ProjectBuildFromXML();
         Project theProject = builder.build(new File(args[0]));
         
         BDDVerifier bddVerifier = new BDDVerifier(theProject);

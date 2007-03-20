@@ -61,8 +61,8 @@ public class AutomataToSMV
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataToSMV.class);
 	private Automata theAutomata;
-	private AutomataSynchronizerHelper syncHelper;
-	private SynchronizationType syncType = SynchronizationType.PRIORITIZED;
+//	private AutomataSynchronizerHelper syncHelper;
+//	private SynchronizationType syncType = SynchronizationType.PRIORITIZED;
 	private Alphabet allEvents;
 
 	public AutomataToSMV(Automata theAutomata)

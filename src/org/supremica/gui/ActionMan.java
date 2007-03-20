@@ -1964,7 +1964,7 @@ public class ActionMan
 
         try
         {
-            ProjectBuildFromXml builder = new ProjectBuildFromXml(new VisualProjectFactory());
+            ProjectBuildFromXML builder = new ProjectBuildFromXML(new VisualProjectFactory());
 
             currProject = builder.build(file);
         }

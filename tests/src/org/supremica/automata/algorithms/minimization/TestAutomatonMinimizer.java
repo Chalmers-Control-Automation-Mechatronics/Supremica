@@ -98,7 +98,7 @@ public class TestAutomatonMinimizer
     {
         try
         {
-            ProjectBuildFromXml builder = new ProjectBuildFromXml();
+            ProjectBuildFromXML builder = new ProjectBuildFromXML();
             Project theProject = builder.build(TestFiles.getFile(TestFiles.MachineBufferMachine));
             SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
             syncOptions.setForbidUncontrollableStates(true);
@@ -135,7 +135,7 @@ public class TestAutomatonMinimizer
         try
         {
 			// Test
-            ProjectBuildFromXml builder = new ProjectBuildFromXml();
+            ProjectBuildFromXML builder = new ProjectBuildFromXML();
             Project theProject = builder.build(TestFiles.getFile(TestFiles.ObservationEquivalence));
             MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
             options.setMinimizationType(EquivalenceRelation.OBSERVATIONEQUIVALENCE);
@@ -184,7 +184,7 @@ public class TestAutomatonMinimizer
 
         try
         {
-            ProjectBuildFromXml builder = new ProjectBuildFromXml();
+            ProjectBuildFromXML builder = new ProjectBuildFromXML();
             Project theProject = builder.build(TestFiles.getFile(TestFiles.BisimulationEquivalence));
             MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
             options.setMinimizationType(EquivalenceRelation.BISIMULATIONEQUIVALENCE);
@@ -221,7 +221,7 @@ public class TestAutomatonMinimizer
     {
         try
         {
-            ProjectBuildFromXml builder = new ProjectBuildFromXml();
+            ProjectBuildFromXML builder = new ProjectBuildFromXML();
             Project theProject = builder.build(TestFiles.getFile(TestFiles.ConflictEquivalence));
 
             Automata tests = theProject.getPlantAutomata();

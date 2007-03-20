@@ -85,7 +85,7 @@ public class BDDAutomata
     BDDVarSet sourceStateVariables = null;
     BDDVarSet destStateVariables = null;
     
-    BDDPairing sourceToDestStatePairing = null;
+//    BDDPairing sourceToDestStatePairing = null;
     BDDPairing destToSourceStatePairing = null;
 
     BDD initialStatesBDD = null;
@@ -175,7 +175,7 @@ public class BDDAutomata
             i++;
         }
       
-        sourceToDestStatePairing = manager.makePairing(sourceStateDomains, destStateDomains);
+        //sourceToDestStatePairing = manager.makePairing(sourceStateDomains, destStateDomains);
         destToSourceStatePairing = manager.makePairing(destStateDomains, sourceStateDomains);       
   
         bddTransitions = new BDDTransitionFactory(this).createTransitions();
@@ -341,7 +341,7 @@ public class BDDAutomata
         reachableAndCoreachableStatesBDD.exist(destStateVariables);
         
         // Create all events
-        Alphabet newAlphabet = supervisorAutomaton.getAlphabet();
+      //  Alphabet newAlphabet = supervisorAutomaton.getAlphabet();
         //newAlphabet.addAll(unionAlphabet);
 
         int[] sourceStateDomainIndicies = new int[sourceStateDomains.length];

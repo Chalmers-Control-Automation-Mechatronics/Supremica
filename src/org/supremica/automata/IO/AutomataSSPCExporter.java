@@ -65,7 +65,7 @@ public class AutomataSSPCExporter
 
 		if (ret == null)
 		{
-			ret = new Integer(event_count++);
+			ret = event_count++;
 
 			eventMap.put(name, ret);
 		}
@@ -147,7 +147,7 @@ public class AutomataSSPCExporter
 		for (Iterator states = a.stateIterator(); states.hasNext(); )
 		{
 			State state = (State) states.next();
-			Integer num = new Integer(state_count++);
+			Integer num = state_count++;
 			stateMap.put(state, num);
 		}
 

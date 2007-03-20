@@ -73,7 +73,7 @@ public class ControlBuilderHelper
 	{
 
 		// Start of file header
-		Date theDate = new Date();
+		//Date theDate = new Date();
 
 		// Should perhaps get current date and time, but how do I format it?
 		//logger.info(theDate.toString());

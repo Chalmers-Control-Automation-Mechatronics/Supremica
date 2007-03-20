@@ -62,7 +62,7 @@ public class AutomataToNQC
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataToNQC.class);
 	private Automata theAutomata;
-	private AutomataSynchronizerHelper syncHelper;
+//	private AutomataSynchronizerHelper syncHelper;
 	private SynchronizationType syncType = SynchronizationType.PRIORITIZED;
 	private Alphabet allEvents;
 

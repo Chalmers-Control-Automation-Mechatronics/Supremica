@@ -74,11 +74,11 @@ public class ProjectBuildFromHYB
 {
 	private static Logger logger = LoggerFactory.createLogger(ProjectBuildFromHYB.class);
 	private ProjectFactory theProjectFactory = null;
-	private Project currProject = null;
-	private Automaton currAutomaton = null;
+//	private Project currProject = null;
+//	private Automaton currAutomaton = null;
 	private Alphabet currAlphabet = null;
 	protected String automatonName = "Imported from HYB";
-	private InputProtocol inputProtocol = InputProtocol.UnknownProtocol;
+//	private InputProtocol inputProtocol = InputProtocol.UnknownProtocol;
 	private File thisFile = null;
 
 	public ProjectBuildFromHYB()
@@ -98,7 +98,7 @@ public class ProjectBuildFromHYB
 
 		if (protocol.equals("file"))
 		{
-			inputProtocol = InputProtocol.FileProtocol;
+			//inputProtocol = InputProtocol.FileProtocol;
 
 			String fileName = url.getFile();
 
@@ -114,7 +114,7 @@ public class ProjectBuildFromHYB
 		}
 		else
 		{
-			inputProtocol = InputProtocol.UnknownProtocol;
+			//inputProtocol = InputProtocol.UnknownProtocol;
 
 			System.err.println("Unknown protocol: " + protocol);
 

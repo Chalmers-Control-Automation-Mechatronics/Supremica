@@ -97,7 +97,7 @@ public class TestProjectBuildFromXml
         try
         {
             
-            ProjectBuildFromXml builder = new ProjectBuildFromXml();
+            ProjectBuildFromXML builder = new ProjectBuildFromXML();
             Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
             assertTrue(theProject.nbrOfAutomata() == 3);
             assertTrue(theProject.getName().equals("Ex4_5"));

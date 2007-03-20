@@ -51,7 +51,7 @@ package org.supremica.automata;
 
 import java.util.*;
 import org.supremica.log.*;
-import org.supremica.automata.IO.ProjectBuildFromXml;
+import org.supremica.automata.IO.ProjectBuildFromXML;
 import javax.swing.JOptionPane;
 import java.io.File;
 import java.net.URL;
@@ -131,7 +131,7 @@ public class Automata
     throws Exception
     {
         super(defaultName);
-        ProjectBuildFromXml builder = new ProjectBuildFromXml();
+        ProjectBuildFromXML builder = new ProjectBuildFromXML();
         Project theProject = builder.build(url);
         shallowAutomataCopy(theProject);
     }

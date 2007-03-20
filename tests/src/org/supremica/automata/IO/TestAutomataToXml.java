@@ -100,13 +100,13 @@ public class TestAutomataToXml
 		try
 		{
 			File testFileAgv = TestFiles.getFile(TestFiles.AGV);
-			ProjectBuildFromXml originalBuilder = new ProjectBuildFromXml();
+			ProjectBuildFromXML originalBuilder = new ProjectBuildFromXML();
 			Project theOriginalProject = originalBuilder.build(testFileAgv);
 			assertTrue(theOriginalProject.nbrOfAutomata() > 0);
 			File tempFile = File.createTempFile(tempFilePrefix, tempFileSuffix);
 			AutomataToXml exporter = new AutomataToXml(theOriginalProject);
 			exporter.serialize(tempFile);
-			ProjectBuildFromXml secondBuilder = new ProjectBuildFromXml();
+			ProjectBuildFromXML secondBuilder = new ProjectBuildFromXML();
 			Project theSecondProject = secondBuilder.build(tempFile);
 			tempFile.delete();
 			assertTrue(theOriginalProject != null);

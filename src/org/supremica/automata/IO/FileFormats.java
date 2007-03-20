@@ -95,8 +95,8 @@ public class FileFormats
 	private String identifier;
 	private String extension;
 	private String description;
-	private boolean input = false;
-	private boolean output = false;
+//	private boolean input = false;
+//	private boolean output = false;
 
 	private FileFormats(boolean input, boolean output, String identifier, String extension, String description)
 	{
@@ -112,8 +112,8 @@ public class FileFormats
 			outputs.add(this);
 		}
 
-		this.input = input;
-		this.output = output;
+//		this.input = input;
+//		this.output = output;
 		this.identifier = identifier;
 		this.extension = extension;
 		this.description = description;

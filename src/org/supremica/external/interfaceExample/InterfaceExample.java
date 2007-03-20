@@ -52,7 +52,7 @@ public class InterfaceExample
     public static void projectBuilder(File file)
         throws Exception
     {
-        ProjectBuildFromXml builder = new ProjectBuildFromXml();
+        ProjectBuildFromXML builder = new ProjectBuildFromXML();
         Project theProject = builder.build(file);
 
         // Iterate over all automata in the project

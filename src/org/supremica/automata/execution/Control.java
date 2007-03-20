@@ -56,7 +56,7 @@ public class Control
 {
 	private String label = null;
 	private List conditions = null;
-	private Expression expr = null;
+//	private Expression expr = null;
 	private boolean invert = false;
 
 	public Control(String label)
@@ -69,7 +69,7 @@ public class Control
 		this.label = label;
 		this.invert = invert;
 		conditions = new LinkedList();
-		expr = new ConstVariable(false);
+//		expr = new ConstVariable(false);
 	}
 
 	public Control(String label, boolean invert, Condition condition)
@@ -84,7 +84,7 @@ public class Control
 		this(otherControl.label, otherControl.invert);
 
 		conditions = new LinkedList(otherControl.conditions);
-		expr = new ConstVariable(true);
+//		expr = new ConstVariable(true);
 	}
 
 	public String getLabel()

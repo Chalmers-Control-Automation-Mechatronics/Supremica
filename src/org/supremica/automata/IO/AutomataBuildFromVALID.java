@@ -64,7 +64,7 @@ public class AutomataBuildFromVALID
 	private Project currAutomata = null;
 	private SAXBuilder docBuilder;
 	private String filePath;
-	private int autonum = 0;
+//	private int autonum = 0;
 
 	// mappings between id and state/event
 	private Map idStateMap = new HashMap();

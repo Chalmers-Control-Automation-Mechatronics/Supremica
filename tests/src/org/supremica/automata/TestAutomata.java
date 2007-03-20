@@ -96,7 +96,7 @@ public class TestAutomata
 	{
 		try
 		{
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			ProjectBuildFromXML builder = new ProjectBuildFromXML();
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
 			assertTrue(theProject.nbrOfAutomata() == 3);
 

@@ -94,7 +94,7 @@ public class TemplateItem
             URL url = TemplateItem.class.getResource(path);
             
             //InputStream stream = url.openStream();
-            ProjectBuildFromXml builder = new ProjectBuildFromXml(theFactory);
+            ProjectBuildFromXML builder = new ProjectBuildFromXML(theFactory);
             Project theProject = builder.build(url);
             
             return theProject;

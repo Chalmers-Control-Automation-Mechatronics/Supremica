@@ -127,7 +127,7 @@ public class TestStateSet
 		
 		try
 		{
-			ProjectBuildFromXml builder = new ProjectBuildFromXml();
+			ProjectBuildFromXML builder = new ProjectBuildFromXML();
 			Project theProject = builder.build(TestFiles.getFile(TestFiles.CentralLocking3Doors));
 			
 			Automaton aut = theProject.getAutomaton("decoder");

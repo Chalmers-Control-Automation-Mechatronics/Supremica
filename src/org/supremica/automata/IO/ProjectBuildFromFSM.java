@@ -104,11 +104,11 @@ public class ProjectBuildFromFSM
 {
 	private static Logger logger = LoggerFactory.createLogger(ProjectBuildFromFSM.class);
 	private ProjectFactory theProjectFactory = null;
-	private Project currProject = null;
-	private Automaton currAutomaton = null;
+//	private Project currProject = null;
+//	private Automaton currAutomaton = null;
 	private Alphabet currAlphabet = null;
 	protected String automatonName = "Imported from UMDES";
-	private InputProtocol inputProtocol = InputProtocol.UnknownProtocol;
+//	private InputProtocol inputProtocol = InputProtocol.UnknownProtocol;
 	private File thisFile = null;
 	private TransitionMap transitionMap = new TransitionMap();
 	private static int STATE_READ_NUMBER_OF_STATES = 1;
@@ -133,7 +133,7 @@ public class ProjectBuildFromFSM
 
 		if (protocol.equals("file"))
 		{
-			inputProtocol = InputProtocol.FileProtocol;
+			//inputProtocol = InputProtocol.FileProtocol;
 
 			String fileName = url.getFile();
 
@@ -149,11 +149,11 @@ public class ProjectBuildFromFSM
 		}
 		else if (protocol.equals("jar"))
 		{
-			inputProtocol = InputProtocol.JarProtocol;
+			//inputProtocol = InputProtocol.JarProtocol;
 		}
 		else
 		{
-			inputProtocol = InputProtocol.UnknownProtocol;
+			//inputProtocol = InputProtocol.UnknownProtocol;
 
 			System.err.println("Unknown protocol: " + protocol);
 

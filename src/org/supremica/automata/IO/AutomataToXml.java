@@ -63,8 +63,8 @@ public class AutomataToXml
 {
     private static Logger logger = LoggerFactory.createLogger(AutomataToXml.class);
     private Automata automata;
-    private Automaton automaton;
-    private boolean canonical;
+//    private Automaton automaton;
+//    private boolean canonical;
     private boolean includeCost = true;
     private boolean debugMode = false;
     private final static int majorFileVersion = 0;
@@ -77,7 +77,7 @@ public class AutomataToXml
     public AutomataToXml(Automata automata)
     {
         this.automata = automata;
-        canonical = false;
+  //      canonical = false;
     }
     
     public AutomataToXml(Automaton automaton)
@@ -86,7 +86,7 @@ public class AutomataToXml
         
         this.automata.addAutomaton(automaton);
         
-        canonical = false;
+   //     canonical = false;
     }
     
     public void serialize(PrintWriter pw)
@@ -128,7 +128,7 @@ public class AutomataToXml
             {
                 LabeledEvent event = (LabeledEvent) eventIt.next();
                 
-                eventIdMap.put(event, new Integer(eventId));
+                eventIdMap.put(event, eventId);
                 pw.print("\t\t<Event id=\"" + eventId + "\" label=\"" + EncodingHelper.normalize(event.getLabel()) + "\"");
                 
                 eventId++;
@@ -186,7 +186,7 @@ public class AutomataToXml
             {
                 State state = (State) stateIt.next();
                 
-                stateIdMap.put(state, new Integer(stateId));    // The arc must be able to find it fast
+                stateIdMap.put(state, stateId);    // The arc must be able to find it fast
                 pw.print("\t\t<State id=\"" + stateId + "\"");    // no longer need to normalize
                 
                 stateId++;

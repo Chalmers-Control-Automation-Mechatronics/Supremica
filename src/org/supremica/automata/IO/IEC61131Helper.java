@@ -86,7 +86,7 @@ public class IEC61131Helper
 		} */
 
 		// Start of file header
-		Date theDate = new Date();
+		//Date theDate = new Date();
 
 		pw.println("PROGRAM " + fileName);
 	}

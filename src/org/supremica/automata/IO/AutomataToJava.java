@@ -64,7 +64,7 @@ import org.supremica.util.SupremicaException;
  */
 public class AutomataToJava
 {
-	public class GenerationException
+	public static class GenerationException
 		extends SupremicaException
 	{
 		private static final long serialVersionUID = 1L;
