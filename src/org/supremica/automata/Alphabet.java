@@ -64,7 +64,6 @@ import net.sourceforge.waters.model.des.EventProxy;
  *@see  org.supremica.automata.AlphabetHelpers
  */
 public class Alphabet
-    extends AbstractSet<LabeledEvent>
 {
     private static Logger logger = LoggerFactory.createLogger(Alphabet.class);
     private int idIndex = 0;
@@ -120,21 +119,9 @@ public class Alphabet
         return size();
     }
 
-        /*
-        public void setEvents(Map oldEvents)
-        {
-                theEvents = new TreeMap<String,LabeledEvent>(oldEvents);
-        }
-         */
-
-    public Map getEvents()
-    {
-        return theEvents;
-    }
-
     Set<EventProxy> getWatersEvents()
     {
-        return new TreeSet<EventProxy>(this);
+        return new TreeSet<EventProxy>(this.theEvents.values());
     }
 
     Set<EventProxy> getWatersEventsWithPropositions()
