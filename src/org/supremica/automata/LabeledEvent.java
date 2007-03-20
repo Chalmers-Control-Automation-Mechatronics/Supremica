@@ -236,11 +236,11 @@ public class LabeledEvent
         return expansionPriority;
     }
     
-    public boolean equals(Object obj)
+    public boolean equals(Object other)
     {
-        if (obj instanceof LabeledEvent)
+        if (other instanceof LabeledEvent)
         {
-            this.label.equals(((LabeledEvent)obj).label);
+            return equals(((LabeledEvent)other).label);
         }
         return false;
     }
