@@ -1560,15 +1560,16 @@ public class Automaton
 
     private void reverseAssociatedState(State currState, State nextState)
     {
-        if (currState != null)
+        if (currState == null)
         {
-            currState.setVisited(true);
+            return;
         }
+        
+        currState.setVisited(true);
 
         if (currState.getAssociatedState() == null)
         {
             currState.setAssociatedState(nextState);
-
             return;
         }
 

@@ -157,7 +157,7 @@ public class ModularSupervisor
 		return model.getUnionAlphabet();
     }
 
-    public void reset()
+    public synchronized void reset()
     {
 		for (int i = 0; i<currentGlobalState.length; i++)
 			currentGlobalState[i] = initialState[i];
