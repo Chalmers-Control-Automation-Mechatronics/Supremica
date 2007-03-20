@@ -87,4 +87,9 @@ public class KripkeLabel
         }
         return false;
     }
+    
+    public int hashCode()
+    {
+        return label.hashCode();
+    }
 }
