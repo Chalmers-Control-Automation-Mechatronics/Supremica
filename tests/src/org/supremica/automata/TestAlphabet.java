@@ -155,7 +155,42 @@ public class TestAlphabet
 		}
 	}
 
-	public void testAlphabetEquality()
+	public void testAlphabetEquality1()
+	{
+        Alphabet alph1 = new Alphabet();
+        Alphabet alph2 = new Alphabet();
+        assertTrue(alph1.equals(alph2));
+        LabeledEvent e1 = new LabeledEvent("e1");
+        LabeledEvent e2 = new LabeledEvent("e2");
+        LabeledEvent e2_copy = new LabeledEvent(e2);        
+        alph1.addEvent(e1);
+        assertTrue(!alph1.equals(alph2));
+        alph2.addEvent(e1);
+        assertTrue(alph1.equals(alph2));
+        alph1.add(e2);
+        alph2.add(e2_copy);
+        assertTrue(alph1.equals(alph2));
+        LabeledEvent e3_1 = new LabeledEvent("e3");
+        LabeledEvent e2_2 = new LabeledEvent("e3");      
+        alph1.add(e3_1);
+        alph2.add(e3_2);
+        assertTrue(alph1.equals(alph2));
+        Alphabet alph3 = new Alphabet();
+        Alphabet alph4 = new Alphabet();
+        LabeledEvent e1_1 = new LabeledEvent("e1");
+        LabeledEvent e2_1 = new LabeledEvent("e2");
+        alph3.addEvent(e1_1);
+        alph3.addEvent(e2_1);
+        LabeledEvent e1_2 = new LabeledEvent("e1");
+        LabeledEvent e2_2 = new LabeledEvent("e2");  
+        alph4.addEvent(e2_2);
+        alph4.addEvent(e1_2);
+        assertTrue(alph3.equals(alph4));
+        alph4.addEvent(e1_1);
+        assertTrue(!alph3.equals(alph4));        
+    }    
+    
+	public void testAlphabetEquality2()
 	{
 		try
 		{
