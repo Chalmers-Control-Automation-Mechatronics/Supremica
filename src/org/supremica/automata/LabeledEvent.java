@@ -233,18 +233,11 @@ public class LabeledEvent
     
     public boolean equals(Object obj)
     {
-        return equals((LabeledEvent) obj);
-        
-        // throw new RuntimeException("LabeledEvent::equals(Object), not expected to be called!");
-        // System.err.println("equalsObject");
-        // return this.label.equals(((LabeledEvent) obj).label);
-    }
-    
-    // NOTE -- this one's experimental, while migrating to the real problem domain
-    // The Java people have messed it all up with inheriting equals(Object)
-    public boolean equals(LabeledEvent event)
-    {
-        return equals(event.getLabel());
+        if (obj == null || !(obj instanceof LabeledEvent))
+        {
+            return false;
+        }
+        return this.label.equals(((LabeledEvent)obj).label);
     }
     
     public boolean equals(String label)

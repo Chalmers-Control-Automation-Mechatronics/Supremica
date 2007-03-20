@@ -132,8 +132,8 @@ public class Automaton
         alphabet.union(new Alphabet(orgAut.getAlphabet()));
 
         type = orgAut.type;
-        name = new String(orgAut.name == null ? "" : orgAut.name);
-        comment = new String(orgAut.comment == null ? "" : orgAut.comment);
+        name = orgAut.name == null ? "" : orgAut.name;
+        comment = orgAut.comment == null ? "" : orgAut.comment;
 
         // Create all states
         for (State orgState : orgAut.iterableStates())
@@ -1699,42 +1699,49 @@ public class Automaton
             // tau_c
             String silentCName = Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.get();
             LabeledEvent tau_c = getAlphabet().getEvent(silentCName);
-            if (tau_c == null && (alpha.getControllableAlphabet().size() > 0))
+            if(alpha.getControllableAlphabet().size() > 0)
             {
-                tau_c = new LabeledEvent(silentCName);
-                tau_c.setUnobservable(true);
-                tau_c.setControllable(true);
-                getAlphabet().addEvent(tau_c);
-            }
-            else
-            {
-                if (tau_c.isObservable() || !tau_c.isControllable())
+                if (tau_c == null)
                 {
-                    logger.error("The event name " + silentCName +
-                        " is reserved and must be controllable and unobservable!");
-                    return;
+                    tau_c = new LabeledEvent(silentCName);
+                    tau_c.setUnobservable(true);
+                    tau_c.setControllable(true);
+                    getAlphabet().addEvent(tau_c);
                 }
+                else
+                {
+                    if (tau_c.isObservable() || !tau_c.isControllable())
+                    {
+                        logger.error("The event name " + silentCName +
+                            " is reserved and must be controllable and unobservable!");
+                        return;
+                    }
+                }                
             }
+            
+
             // tau_u
             String silentUName = Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.get();
             LabeledEvent tau_u = getAlphabet().getEvent(silentUName);
-            if (tau_u == null && (alpha.getUncontrollableAlphabet().size() > 0))
-            {
-                tau_u = new LabeledEvent(silentUName);
-                tau_u.setUnobservable(true);
-                tau_u.setControllable(false);
-                getAlphabet().addEvent(tau_u);
-            }
-            else
-            {
-                if (tau_u.isObservable() || tau_u.isControllable())
+            if (alpha.getUncontrollableAlphabet().size() > 0)
+            {   
+                if (tau_u == null)
                 {
-                    logger.error("The event name " + silentUName +
-                        " is reserved and must be uncontrollable and unobservable!");
-                    return;
+                    tau_u = new LabeledEvent(silentUName);
+                    tau_u.setUnobservable(true);
+                    tau_u.setControllable(false);
+                    getAlphabet().addEvent(tau_u);
+                }
+                else
+                {
+                    if (tau_u.isObservable() || tau_u.isControllable())
+                    {
+                        logger.error("The event name " + silentUName +
+                            " is reserved and must be uncontrollable and unobservable!");
+                        return;
+                    }
                 }
             }
-
             // Modify arcs
             for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
             {
@@ -1865,6 +1872,15 @@ public class Automaton
         return alphabet.nbrOfUnobservableEvents();
     }
 
+    public boolean equals(Object other)
+    {
+        if (other == null || !(other instanceof Automaton))
+        {
+            return false;
+        }
+        return this.equalAutomaton((Automaton)other);
+    }
+    
     /**
      * Returns true if there are no obvious differences between this
      * automaton and the other. Note, that this method only compares the

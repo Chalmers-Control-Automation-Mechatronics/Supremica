@@ -401,14 +401,18 @@ public class State
         return radius;
     }
 */
-    public boolean equals(Object state)
+    public boolean equals(Object other)
     {
+        if (other == null || !(other instanceof State))
+        {
+            return false;
+        }
         //return id.equals(((State) state).id);
-        boolean result = id.equals(((State) state).id);
+        boolean result = id.equals(((State) other).id);
 
         if (result)
         {
-            assert (this.hashCode() == state.hashCode());
+            assert (this.hashCode() == other.hashCode());
         }
 
         return result;
