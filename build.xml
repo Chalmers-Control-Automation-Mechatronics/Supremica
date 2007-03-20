@@ -262,6 +262,8 @@
     <classpath>    
       <pathelement location="${lib}/${unjared}"/>
     </classpath>
+    <!--
+    <compilerarg value="-Xlint"/> -->
   </javac>
 </target>
 

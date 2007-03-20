@@ -49,6 +49,7 @@
  */
 package org.supremica.automata;
 
+import java.io.Serializable;
 import java.util.*;
 import java.awt.Point;
 
@@ -63,7 +64,7 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 
 
 public class State
-    implements StateProxy
+    implements StateProxy, Serializable
 {
     public final static double MIN_COST = 0;
     public final static double MAX_COST = Double.MAX_VALUE;
