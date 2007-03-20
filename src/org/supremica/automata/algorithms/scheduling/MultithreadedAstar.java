@@ -12,6 +12,7 @@ import java.util.*;
 
 import org.supremica.automata.*;
 import org.supremica.gui.ScheduleDialog;
+import org.supremica.gui.ActionMan;
 import org.supremica.log.*;
 
 public class MultithreadedAstar
@@ -35,7 +36,7 @@ public class MultithreadedAstar
      * (-1 and 0 are due to Supremicas AutomataIndexFormHelper information, namely
      * AutomataIndexFormHelper.STATE_EXTRA_DATA).
      */
-    protected TreeSet<MultithreadedNode> openTree;
+//     protected TreeSet<MultithreadedNode> openTree;
     
     /**
      * Contains already examined (i.e. "closed") search tree nodes (or rather their int[]-representations
@@ -50,13 +51,14 @@ public class MultithreadedAstar
      * closedTree. This is done by
      * @see ModifiedAstar#updateClosedTree(double[] node) .
      */
-    protected TreeMap<Integer, MultithreadedNode> closedTree;
+//     protected TreeMap<Integer, MultithreadedNode> closedTree;
 
     /** Stores the accepting node of the resulting schedule (with a reference to the ancestor node. */
-    protected MultithreadedNode acceptingNode = null;
+//     protected MultithreadedNode acceptingNode = null;
 
 	private MultithreadedNode rootNode = null;
 	private double branchingProbality;
+	private static final double DEFAULT_PROBABILITY = 1;
      
 	public MultithreadedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider, ScheduleDialog gui)
 		throws Exception
@@ -67,7 +69,7 @@ public class MultithreadedAstar
 	public MultithreadedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider, ScheduleDialog gui, MultithreadedNode rootNode)
 		throws Exception
     {
-        this(theAutomata, heuristic, manualExpansion, buildSchedule, isRelaxationProvider, gui, rootNode, 1);
+        this(theAutomata, heuristic, manualExpansion, buildSchedule, isRelaxationProvider, gui, rootNode, DEFAULT_PROBABILITY);
     }
 		
     public MultithreadedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider, ScheduleDialog gui, MultithreadedNode rootNode, double branchingProbality)
@@ -95,22 +97,25 @@ public class MultithreadedAstar
 		}
 	}
 
-	/** 
-	 * Resets or initializes the OPEN and the CLOSED trees.
-	 */
-	protected void initTrees()
-	{
-		if (openTree == null)
-		{
-			openTree = new TreeSet<MultithreadedNode>(new OpenTreeComparator(ESTIMATE_INDEX));
-			closedTree = new TreeMap<Integer, MultithreadedNode>();
-		}
-		else 
-		{
-			openTree.clear();
-			closedTree.clear();
-		}
-	}
+// 	/** 
+// 	 * Resets or initializes the OPEN and the CLOSED trees.
+// 	 */
+// 	protected void initTrees()
+// 	{
+// logger.info("In initTrees");
+// 		if (openTree == null)
+// 		{
+// logger.info("inittar");
+// 			openTree = new TreeSet<MultithreadedNode>(new OpenTreeComparator(ESTIMATE_INDEX));
+// 			closedTree = new TreeMap<Integer, MultithreadedNode>();
+// 		}
+// 		else 
+// 		{
+// logger.info("clearar");
+// 			openTree.clear();
+// 			closedTree.clear();
+// 		}
+// 	}
 
    /**
      * Walks through the tree of possible paths in search for the optimal one,
@@ -127,7 +132,7 @@ public class MultithreadedAstar
         {		
 			// Initiates the OPEN tree by adding the initial node, corresponding to the initial
 			// state of the synchronous composition of the selected automata.
-			MultithreadedNode currNode = new MultithreadedNode((double[]) super.makeInitialNode(), null);
+			MultithreadedNode currNode = makeInitialNode();
 			openTree.add(currNode);
 
 			while(! openTree.isEmpty())
@@ -137,7 +142,7 @@ public class MultithreadedAstar
 					iterationCounter++;
                 
 					// Selects the first node on OPEN. If it is accepting, the search is completed
-					currNode = openTree.first();
+					currNode = (MultithreadedNode) openTree.first();
 					
 					if (isAcceptingNode(currNode))
 					{
@@ -147,11 +152,13 @@ public class MultithreadedAstar
 						break;
 					}
                 
+
+					// TODO: bättre open-hantering
 					// The first open node is removed
 					boolean succesfullyRemoved =  openTree.remove(currNode);
 					if (! succesfullyRemoved)
 					{
-						throw new Exception("The node " + printNodeName(currNode.getNodeBasis()) + " was not found on the openTree");
+						throw new Exception("The node " + printNodeName(currNode) + " was not found on the openTree");
 					}
                 
 					// If the node is not accepting, it goes to the CLOSED tree if there is not a node there already
@@ -176,7 +183,7 @@ public class MultithreadedAstar
 			outputStr += "\tIn time: " + timer.elapsedTime() + " ms\n";
 			outputStr += "\tThe CLOSED tree contains (at the end) " + closedTree.size() + " elements\n";
 			outputStr += "\tMax{OPEN.size} = " + maxOpenSize + "\n";
-			outputStr += "\t\t" + "g = " + currNode.getNodeBasis()[ACCUMULATED_COST_INDEX];
+			outputStr += "\t\t" + "g = " + currNode.getBasis()[ACCUMULATED_COST_INDEX];
 			
 			if (!isRelaxationProvider)
 			{
@@ -185,20 +192,12 @@ public class MultithreadedAstar
 				
 			this.acceptingNode = currNode;
 			
-			schedulingDone = true;
-				
-// 		Iterator childIt = expander.expandNode(nodeBasis, activeAutomataIndex);
-
-// 		if (!expander.isUncontrollableEventFound())
-		} 
-		else
-		{
-			
+			schedulingDone = true;				
 		}
 	}
 
 	// TODO...
-	protected void branch(double[] banan) {} //ta bort
+		//	protected void branch(double[] banan) {} //ta bort
 	/**
      * Updates the closed tree if necessary, i.e. if the currently examined
      * node with better estimate value already is present on that tree.
@@ -214,29 +213,31 @@ public class MultithreadedAstar
 			if (subthreads == null)
 			{
 				boolean currNodeIsAddedToClosed = updateClosedTree(currNode);
-            
+           
 				if (currNodeIsAddedToClosed)
 				{
-					Iterator childIter = expandNode(currNode).iterator();
+					Iterator childIter = expander.expandNode(currNode, activeAutomataIndex).iterator();
                 
 					if (!expander.isUncontrollableEventFound())
 					{
 						while (childIter.hasNext())
 						{
-							double[] nextNodeBasis = (double[])childIter.next();
+							Node nextNode = (Node)childIter.next();
 							
 							// Calculate the estimate function of the expanded node and store it at the appropriate position
-							nextNodeBasis[ESTIMATE_INDEX] = calcEstimatedCost(nextNodeBasis);
+							nextNode.setValueAt(ESTIMATE_INDEX, calcEstimatedCost(nextNode));
 							
-							openTree.add(new MultithreadedNode(nextNodeBasis, null));
+							openTree.add(nextNode);
 						}
 					}
 					else
 					{
-						
+						logger.info("uncontrollable");
 					}
 				}
 			}
+
+			return 0;
         }
         catch (Exception e)
         {
@@ -246,118 +247,185 @@ public class MultithreadedAstar
 		return 0;
     }
 
-    /**
-     * This method puts the node "node" in the right place on the closedTree if the tree does not already
-     * contain any nodes that correspond to the same logical states than this node.
-     * Otherwise, the method compares this node to those already examined. If this node is worse
-     * (more expensive in every future direction) that any already examined node, it is discarded.
-     * Conversely, if it is better than every examined node, this node is the only one to be stored in the
-     * closedTree. If there are ties (in some directions one node is better than the other, but in others
-     * it is worse), this node, as well as all the discovered tie nodes are stored in the closedTree
-     * (note that all examined nodes that are always worse than "node" are discarded).
-     *
-     * @param node the new node that might be added to the CLOSED tree.
-     * @return true, if the new node is added to the CLOSED tree
-     *         false, otherwise.
-     */
-    protected boolean updateClosedTree(MultithreadedNode node)
-    {
-        // The nodes corresponding to the same logical state (but different paths from the initial state)
-        // as the new node. They are stored as one double[]-variable in the closedTree.
-        MultithreadedNode correspondingClosedNode = closedTree.remove(new Integer((int)getKey(node)));
+//     /**
+//      * This method puts the node "node" in the right place on the closedTree if the tree does not already
+//      * contain any nodes that correspond to the same logical states than this node.
+//      * Otherwise, the method compares this node to those already examined. If this node is worse
+//      * (more expensive in every future direction) that any already examined node, it is discarded.
+//      * Conversely, if it is better than every examined node, this node is the only one to be stored in the
+//      * closedTree. If there are ties (in some directions one node is better than the other, but in others
+//      * it is worse), this node, as well as all the discovered tie nodes are stored in the closedTree
+//      * (note that all examined nodes that are always worse than "node" are discarded).
+//      *
+//      * @param node the new node that might be added to the CLOSED tree.
+//      * @return true, if the new node is added to the CLOSED tree
+//      *         false, otherwise.
+//      */
+//     protected boolean updateClosedTree(MultithreadedNode node)
+//     {
+//         // The nodes corresponding to the same logical state (but different paths from the initial state)
+//         // as the new node. They are stored as one double[]-variable in the closedTree.
+//         MultithreadedNode correspondingClosedNode = closedTree.remove(new Integer((int)getKey(node)));
         
-        // If the node (or its logical state collegues) has not yet been put on the closedTree,
-        // then it is simply added to CLOSED.
-        if (correspondingClosedNode == null)
-        {
-            closedTree.put(new Integer((int)getKey(node)), node);
-        }
-        else
-        {
-			double[] nodeBasis = node.getNodeBasis();
-			double[] correspondingClosedNodeBasis = correspondingClosedNode.getNodeBasis();
+//         // If the node (or its logical state collegues) has not yet been put on the closedTree,
+//         // then it is simply added to CLOSED.
+//         if (correspondingClosedNode == null)
+//         {
+//             closedTree.put(new Integer((int)getKey(node)), node);
+//         }
+//         else
+//         {
+// 			double[] nodeBasis = node.getBasis();
+// 			double[] correspondingClosedNodeBasis = correspondingClosedNode.getBasis();
 
-            // The internal indices of the nodes that can be either better or worse (cheaper or more expensive)
-            // than the current node, depending on the future path ("internal index" meaning the node's number in the
-            // correspondingClosedNodes-double[]-array).
-            ArrayList<Integer> tieIndices = new ArrayList<Integer>();
+//             // The internal indices of the nodes that can be either better or worse (cheaper or more expensive)
+//             // than the current node, depending on the future path ("internal index" meaning the node's number in the
+//             // correspondingClosedNodes-double[]-array).
+//             ArrayList<Integer> tieIndices = new ArrayList<Integer>();
             
-            int nodeLength = nodeBasis.length;
-            int nrOfClosedNodes = correspondingClosedNodeBasis.length / nodeLength;
+//             int nodeLength = nodeBasis.length;
+//             int nrOfClosedNodes = correspondingClosedNodeBasis.length / nodeLength;
             
-            // Each "internal" node should be compared to the current node
-            for (int i=0; i<nrOfClosedNodes; i++)
-            {
-                boolean newNodeIsAlwaysWorse = true;
-                boolean newNodeIsAlwaysBetter = true;
+//             // Each "internal" node should be compared to the current node
+//             for (int i=0; i<nrOfClosedNodes; i++)
+//             {
+//                 boolean newNodeIsAlwaysWorse = true;
+//                 boolean newNodeIsAlwaysBetter = true;
                 
-                // The comparison is done for Tv_new[i] + g_new <> Tv_old[i] + g_old (forall i)
-                for (int j=CURRENT_COSTS_INDEX; j<ACCUMULATED_COST_INDEX; j++)
-                {
-                    double currCostDiff = (nodeBasis[j] + nodeBasis[ACCUMULATED_COST_INDEX]) - (correspondingClosedNodeBasis[j + i*nodeLength] + correspondingClosedNodeBasis[ACCUMULATED_COST_INDEX + i*nodeLength]);
+//                 // The comparison is done for Tv_new[i] + g_new <> Tv_old[i] + g_old (forall i)
+//                 for (int j=CURRENT_COSTS_INDEX; j<ACCUMULATED_COST_INDEX; j++)
+//                 {
+//                     double currCostDiff = (nodeBasis[j] + nodeBasis[ACCUMULATED_COST_INDEX]) - (correspondingClosedNodeBasis[j + i*nodeLength] + correspondingClosedNodeBasis[ACCUMULATED_COST_INDEX + i*nodeLength]);
                     
-                    if (currCostDiff < 0)
-                    {
-                        newNodeIsAlwaysWorse = false;
-                    }
-                    else if (currCostDiff > 0)
-                    {
-                        newNodeIsAlwaysBetter = false;
-                    }
-                }
+//                     if (currCostDiff < 0)
+//                     {
+//                         newNodeIsAlwaysWorse = false;
+//                     }
+//                     else if (currCostDiff > 0)
+//                     {
+//                         newNodeIsAlwaysBetter = false;
+//                     }
+//                 }
                 
-                // If the new node is worse than any already examined node in every future direction,
-                // it is thrown away;
-                if (newNodeIsAlwaysWorse)
-                {
-                    closedTree.put(new Integer((int)getKey(node)), correspondingClosedNode);
-                    return false;
-                }
-                // else if the examined node is neither worse nor better, its index is added to the tieIndices
-                else if (!newNodeIsAlwaysWorse && !newNodeIsAlwaysBetter)
-                {
-                    tieIndices.add(new Integer(i));
-                }
-            }
+//                 // If the new node is worse than any already examined node in every future direction,
+//                 // it is thrown away;
+//                 if (newNodeIsAlwaysWorse)
+//                 {
+//                     closedTree.put(new Integer((int)getKey(node)), correspondingClosedNode);
+//                     return false;
+//                 }
+//                 // else if the examined node is neither worse nor better, its index is added to the tieIndices
+//                 else if (!newNodeIsAlwaysWorse && !newNodeIsAlwaysBetter)
+//                 {
+//                     tieIndices.add(new Integer(i));
+//                 }
+//             }
             
-            // Only ties (and the new node) are kept for the update of the closedTree.
-            double[] newClosedNodeBasis = new double[(tieIndices.size() + 1)*nodeLength];
+//             // Only ties (and the new node) are kept for the update of the closedTree.
+//             double[] newClosedNodeBasis = new double[(tieIndices.size() + 1)*nodeLength];
             
-            // The tie-nodes (if there are any) are copied to the new closedNode
-            for (int i=0; i<tieIndices.size(); i++)
-            {
-                int currExaminedNodesIndex = tieIndices.get(i).intValue();
-                for (int j=0; j<nodeLength; j++)
-                {
-                    newClosedNodeBasis[j + i*nodeLength] = correspondingClosedNodeBasis[j + currExaminedNodesIndex*nodeLength];
-                }
-            }
+//             // The tie-nodes (if there are any) are copied to the new closedNode
+//             for (int i=0; i<tieIndices.size(); i++)
+//             {
+//                 int currExaminedNodesIndex = tieIndices.get(i).intValue();
+//                 for (int j=0; j<nodeLength; j++)
+//                 {
+//                     newClosedNodeBasis[j + i*nodeLength] = correspondingClosedNodeBasis[j + currExaminedNodesIndex*nodeLength];
+//                 }
+//             }
             
-            // The latest addition to the node-family (double[] node) is also added to the new closedNode
-            for (int j=0; j<nodeLength; j++)
-            {
-                newClosedNodeBasis[j + tieIndices.size()*nodeLength] = nodeBasis[j];
-            }
+//             // The latest addition to the node-family (double[] node) is also added to the new closedNode
+//             for (int j=0; j<nodeLength; j++)
+//             {
+//                 newClosedNodeBasis[j + tieIndices.size()*nodeLength] = nodeBasis[j];
+//             }
             
-			MultithreadedNode newClosedNode = new MultithreadedNode(newClosedNodeBasis, correspondingClosedNode.getSubthreads());
-            closedTree.put(new Integer((int)getKey(node)), newClosedNode);
-        }
+// 			MultithreadedNode newClosedNode = new MultithreadedNode(newClosedNodeBasis, correspondingClosedNode.getSubthreads());
+//             closedTree.put(new Integer((int)getKey(node)), newClosedNode);
+//         }
         
-        return true;
-    }
+//         return true;
+//     }
 
-	private Collection expandNode(MultithreadedNode node)
+	/**
+	 * Converts the double[]-representation of the initial node to a 
+	 * MultithreadedNode-representation.
+	 *
+	 * @return the multithreaded node containing the double[]-representation of the initial state.
+	 */
+	protected MultithreadedNode makeInitialNode()
 	{
-		return expander.expandNode(node.getNodeBasis(), activeAutomataIndex);
+		return new MultithreadedNode(makeInitialNodeBasis(), null);
 	}
 
-	private boolean isAcceptingNode(MultithreadedNode node)
-	{
-		return super.isAcceptingNode(node.getNodeBasis());
-	}
+ //    /**
+//      * Starting from an accepting state/node, this method walks its way back,
+//      * using keys stored in PARENT_INDEX to find parents. When this is done,
+//      * an event, connecting the two nodes is found and added to the schedule,
+//      * while the parent becomes the next node in search of its parent. This
+//      * is done until an initial node is found, which completes the construction.
+//      */
+//     public void buildScheduleAutomaton()
+// 		throws Exception
+//     {
+//         timer.restart();
+        
+//         Automaton scheduleAuto = new Automaton();
+//         scheduleAuto.setComment("Schedule");
 
-	private int getKey(MultithreadedNode node)
-	{
-		return super.getKey(node.getNodeBasis());
-	}
+// 		double[] currNodeBasis = acceptingNode.getBasis();
+        
+//         State nextState = new State(printNodeSignature(currNode));
+//         nextState.setAccepting(true);
+//         scheduleAuto.addState(nextState);
+        
+//         while (hasParent(currNodeBasis))
+//         {
+//             try
+//             {
+//                 if (isRunning)
+//                 {
+//                     double[] parentBasis = getParent(currNodeBasis);
+//                     State currState = new State(printNodeSignature(parentBasis) + "; firing time = " + currNodeBasis[ACCUMULATED_COST_INDEX]);
+//                     LabeledEvent event = findCurrentEvent(parentBasis, currNodeBasis);
+                    
+//                     if (!hasParent(parentBasis))
+// 					{
+//                         currState.setInitial(true);
+//                     }
+
+//                     scheduleAuto.addState(currState);
+//                     scheduleAuto.getAlphabet().addEvent(event);
+//                     scheduleAuto.addArc(new Arc(currState, nextState, event));
+                    
+//                     currNodeBasis = parentBasis;
+//                     nextState = currState;
+//                 }
+//                 else
+//                 {
+//                     return;
+//                 }
+//             }
+//             catch (Exception ex)
+//             {
+//                 logger.error("ModifiedAstar::buildScheduleAutomaton() --> Could not find the arc between " + printArray(currNodeBasis) + " and its parent" + printNodeName(getParent(currNodeBasis)));
+//                 logger.debug(ex.getStackTrace());
+                
+//                 throw ex;
+//             }
+//         }
+        
+//         // If a dummy event has been added to any of the robots alphabets,
+//         // it is also added to the schedule, thus making it return from its
+//         // accepting to its initial state.
+//         if (plantAutomata.getUnionAlphabet().contains(dummyEventName))
+//         {
+//             LabeledEvent resetEvent =  new LabeledEvent(dummyEventName);
+//             scheduleAuto.getAlphabet().addEvent(resetEvent);
+//             scheduleAuto.addArc(new Arc(scheduleAuto.getStateWithName(printNodeSignature(acceptingNode.getBasis())), scheduleAuto.getInitialState(), resetEvent));
+//         }
+        
+//         logger.info("Schedule was built in " + timer.elapsedTime() + "ms");
+//         ActionMan.getGui().addAutomaton(scheduleAuto);
+//     }
 }

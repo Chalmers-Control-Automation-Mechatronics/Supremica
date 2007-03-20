@@ -45,7 +45,7 @@ public class TwoProductsRelaxer
 	{
 		double relaxationValue = -1;
 
-		Integer key = scheduler.getKey(node);
+		Integer key = scheduler.getKey(new BasicNode(node));
 		Object relaxationObject = twoProdRelax.get(key);
 
 		// If the relaxation has already been done once, then return the result
@@ -122,7 +122,7 @@ public class TwoProductsRelaxer
 						}
 
 						oneProdRelaxer.setActiveAutomataIndex(new int[]{i, j});
-						oneProdRelaxer.scheduleFrom(node);
+						oneProdRelaxer.scheduleFrom(new BasicNode(node));
 
 						while (!oneProdRelaxer.schedulingDone())
 						{
@@ -164,5 +164,11 @@ public class TwoProductsRelaxer
 // 		}
 
 		return estimate;
+	}
+
+	public double getRelaxation(Node node)
+		throws Exception
+	{
+		return getRelaxation(node.getBasis());
 	}
 }

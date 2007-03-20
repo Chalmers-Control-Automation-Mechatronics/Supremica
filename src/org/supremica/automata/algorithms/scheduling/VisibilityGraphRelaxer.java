@@ -185,6 +185,12 @@ public class VisibilityGraphRelaxer
 		return estimatedRemainingCost;
 	}
 
+	public double getRelaxation(Node node)
+		throws Exception
+	{
+		return getRelaxation(node.getBasis());
+	}
+
 	private void preprocessVisibilityGraphs()
 		throws Exception
 	{

@@ -7,6 +7,6 @@ public interface Relaxer
 	 * i.e. the method returns the estimated cost to some marked node 
 	 * from the supplied node. 
 	 */
-    public double getRelaxation(double[] node)
+    public double getRelaxation(Node node)
 		throws Exception;
 }

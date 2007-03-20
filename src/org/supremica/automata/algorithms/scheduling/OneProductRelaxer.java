@@ -121,7 +121,7 @@ public class OneProductRelaxer
 	 * @return double the heuristic function, h(n), that guides the search, 
 	 * in this case it is the "1-product relaxation"
 	 */
-    public double getRelaxation(double[] node) 
+    public double getRelaxation(Node node) 
 		throws Exception
 	{
 		double estimate = 0;
@@ -130,7 +130,7 @@ public class OneProductRelaxer
 	
 		for (int i=0; i<scheduler.getActiveLength(); i++) 
 		{
-			double altEstimate = currCosts[i] + remainingCosts[i][(int)node[scheduler.getActiveAutomataIndex()[i]]]; 
+			double altEstimate = currCosts[i] + remainingCosts[i][(int)node.getValueAt(scheduler.getActiveAutomataIndex()[i])]; 
 	    
 			if (altEstimate > estimate)
 			{

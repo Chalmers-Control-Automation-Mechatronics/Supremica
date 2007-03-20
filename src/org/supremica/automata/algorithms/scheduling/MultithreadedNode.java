@@ -12,29 +12,25 @@ package org.supremica.automata.algorithms.scheduling;
 import java.util.ArrayList;
 
 public class MultithreadedNode
+	extends BasicNode
 {
-	private double[] nodeBasis;
 	private ArrayList subthreads;
 
-	public MultithreadedNode(double[] nodeBasis, ArrayList subthreads)
+	public MultithreadedNode(double[] basis)
 	{
-		this.nodeBasis = new double[nodeBasis.length];
-		for (int i=0; i<nodeBasis.length; i++)
-		{
-			this.nodeBasis[i] = nodeBasis[i];
-		}
+		this(basis, null);
+	}
+
+	public MultithreadedNode(double[] basis, ArrayList subthreads)
+	{
+		super(basis);
 
 		this.subthreads = subthreads;
 	}
 
-	public MultithreadedNode(double[] nodeBasis)
+	public Node emptyClone()
 	{
-		this(nodeBasis, null);
-	}
-
-	public double[] getNodeBasis()
-	{
-		return nodeBasis;
+		return new MultithreadedNode(null, null);
 	}
 
 	public ArrayList getSubthreads()

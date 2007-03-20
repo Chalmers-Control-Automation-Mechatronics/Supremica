@@ -47,7 +47,7 @@ public class ModifiedAstar
      * (-1 and 0 are due to Supremicas AutomataIndexFormHelper information, namely
      * AutomataIndexFormHelper.STATE_EXTRA_DATA).
      */
-    protected TreeSet<double[]> openTree;
+    protected TreeSet<Node> openTree;
     
     /**
      * Contains already examined (i.e. "closed") search tree nodes (or rather their int[]-representations
@@ -58,9 +58,9 @@ public class ModifiedAstar
      * none of them is guaranteed to be better than the other, all the nodes are stored
      * as one double[]-variable. The closed nodes are unrolled and compared when necessary,
      * for example when a new node is to be added to the closedTree. This is done by
-     * @see ModifiedAstar#updateClosedTree(double[] node) .
+     * @see ModifiedAstar#updateClosedTree(Node node) .
      */
-    protected TreeMap<Integer, double[]> closedTree;
+    protected TreeMap<Integer, Node> closedTree;
         
     /** Hashtable containing the estimated cost for each combination of two robots **/
     //     protected Hashtable[] twoProdRelax;
@@ -131,7 +131,7 @@ public class ModifiedAstar
     private static Logger logger = LoggerFactory.createLogger(ModifiedAstar.class);
     
     /** Stores the accepting node of the resulting schedule (with a reference to the ancestor node. */
-    protected double[] acceptingNode = null;
+    protected Node acceptingNode = null;
     
     /** This boolean is true if the scheduler-thread should be (is) running */
     protected volatile boolean isRunning = false;
@@ -225,18 +225,18 @@ public class ModifiedAstar
 
             ActionTimer totalTimer = new ActionTimer();
             
-//             if (isRunning)
-//             {
-//                 totalTimer.restart();
+            if (isRunning)
+            {
+                totalTimer.restart();
 //                 init();
-//             }
+            }
             
             if (!isRelaxationProvider)
             {
                 if (isRunning)
                 {
                     schedule();
-                    
+
                     String totalTimeStr = "Total optimization time = " + totalTimer.elapsedTime() + "ms";
                     logger.info(totalTimeStr);
                     outputStr += "\t" + totalTimeStr + "\n";
@@ -274,6 +274,8 @@ public class ModifiedAstar
         }
 
         timer = new ActionTimer();
+		timer.restart();
+
         plantAutomata = theAutomata.getPlantAutomata();
         
 		// Finds a string that is not contained in any plant alphabet, 
@@ -291,7 +293,7 @@ public class ModifiedAstar
         {
             addDummyAcceptingState(autIt.next());
         }
-        
+ 
 		// Creates an instance of a class that is resposible for the expansion of 
 		// the synchronized states. 
         expander = new NodeExpander(manualExpansion, theAutomata, this);
@@ -299,7 +301,7 @@ public class ModifiedAstar
 		// Creates an instance of the relaxation class (search guidance), as 
 		// specified by the user through the GUI.
         initRelaxer(); 
-		        
+
         //Borde r�cka med plantAutomata.size(), fast d� kanske man m�ste �ndra lite p� andra st�llen ocks�
         keyMapping = new int[theAutomata.size()];
         keyMapping[0] = 1;
@@ -309,13 +311,13 @@ public class ModifiedAstar
         }
         
         outputStr = "Processing times:\n";
-                
+
 		// Initiates the important node indices that are used throughout the search
         initAuxIndices();
 
 		// Initiates the open and the closed trees.
 		initTrees();
-        
+
 		// Is needed for synchronization purposes
         isInitialized = true;
 
@@ -382,8 +384,8 @@ public class ModifiedAstar
 	{
 		if (openTree == null)
 		{
-			openTree = new TreeSet<double[]>(new OpenTreeComparator(ESTIMATE_INDEX));
-			closedTree = new TreeMap<Integer, double[]>();
+			openTree = new TreeSet<Node>(new OpenTreeComparator(ESTIMATE_INDEX));
+			closedTree = new TreeMap<Integer, Node>();
 		}
 		else 
 		{
@@ -420,7 +422,7 @@ public class ModifiedAstar
      * double[] initialNode is thus [initialStates.getIndex() AutomataIndexFormHelper-info
      * null initialStates.getCost() 0 -1].
      */
-    protected double[] makeInitialNode()
+    protected double[] makeInitialNodeBasis()
     {
         int[] initialStates = AutomataIndexFormHelper.createState(theAutomata.size());
         double[] initialCosts = new double[getActiveLength() + 2];
@@ -448,8 +450,20 @@ public class ModifiedAstar
         // The NodeExpander combines the information, together with the parent-information,
         // which is null for the initial state.
 		// 		return expander.makeNode(initialStates, null, initialCosts);
-        return expander.makeNode(initialStates, -1, initialCosts);
+        return expander.makeNodeBasis(initialStates, -1, initialCosts);
     }
+
+	/**
+	 * Converts the double[]-representation of the initial node to a Node-representation.
+	 * In this case, the result is returned in the form of a BasicNode-instance.
+	 * Overriden in subclasses.
+	 *
+	 * @return the basic node containing the double[]-representation of the initial state.
+	 */
+	protected Node makeInitialNode()
+	{
+		return new BasicNode(makeInitialNodeBasis());
+	}
     
     
     /****************************************************************************************/
@@ -473,17 +487,14 @@ public class ModifiedAstar
         }
     }
     
-    public double scheduleFrom(double[] currNode)
+    public double scheduleFrom(Node currNode)
 		throws Exception
     {
         schedulingDone = false;
 
         timer.restart();
         iterationCounter = 0;
-        
-        // Resets the OPEN and the CLOSED trees
-		initTrees();
-        
+               
         // Initiates the OPEN tree by adding the initial node, corresponding to the initial
         // state of the synchronous composition of the selected automata.
         openTree.add(currNode);
@@ -577,7 +588,7 @@ public class ModifiedAstar
         outputStr += "\tIn time: " + timer.elapsedTime() + " ms\n";
         outputStr += "\tThe CLOSED tree contains (at the end) " + closedTree.size() + " elements\n";
         outputStr += "\tMax{OPEN.size} = " + maxOpenSize + "\n";
-        outputStr += "\t\t" + "g = " + currNode[ACCUMULATED_COST_INDEX];
+        outputStr += "\t\t" + "g = " + currNode.getValueAt(ACCUMULATED_COST_INDEX);
         
         if (!isRelaxationProvider)
         {
@@ -598,7 +609,7 @@ public class ModifiedAstar
         
         schedulingDone = true;
         
-        return currNode[ACCUMULATED_COST_INDEX];
+        return currNode.getValueAt(ACCUMULATED_COST_INDEX);
     }
 
     /**
@@ -607,7 +618,7 @@ public class ModifiedAstar
      * If the node is added to the closed tree, its descendants are put on the
      * open tree, according to the estimated remaining cost value.
      */
-    protected void branch(double[] currNode)
+    protected void branch(Node currNode)
     {
         try
         {
@@ -645,10 +656,10 @@ public class ModifiedAstar
 				// 				Iterator childIter = childColl.iterator();
                 while (childIter.hasNext())
                 {
-                    double[] nextNode = (double[])childIter.next();
+                    Node nextNode = (Node)childIter.next();
                     
                     // Calculate the estimate function of the expanded node and store it at the appropriate position
-                    nextNode[ESTIMATE_INDEX] = calcEstimatedCost(nextNode);
+                    nextNode.setValueAt(ESTIMATE_INDEX, calcEstimatedCost(nextNode));
                     
                     openTree.add(nextNode);
                 }
@@ -674,11 +685,11 @@ public class ModifiedAstar
      * @return true, if the new node is added to the CLOSED tree
      *         false, otherwise.
      */
-    protected boolean updateClosedTree(double[] node)
+    protected boolean updateClosedTree(Node node)
     {
         // The nodes corresponding to the same logical state (but different paths from the initial state)
         // as the new node. They are stored as one double[]-variable in the closedTree.
-        double[] correspondingClosedNodes = closedTree.remove(new Integer((int)getKey(node)));
+        Node correspondingClosedNodes = closedTree.remove(new Integer((int)getKey(node)));
         
         // If the node (or its logical state collegues) has not yet been put on the closedTree,
         // then it is simply added to CLOSED.
@@ -692,9 +703,9 @@ public class ModifiedAstar
             // than the current node, depending on the future path ("internal index" meaning the node's number in the
             // correspondingClosedNodes-double[]-array).
             ArrayList<Integer> tieIndices = new ArrayList<Integer>();
-            
-            int nodeLength = node.length;
-            int nrOfClosedNodes = correspondingClosedNodes.length / nodeLength;
+ 
+            int nodeLength = node.getBasis().length;
+            int nrOfClosedNodes = correspondingClosedNodes.getBasis().length / nodeLength;
             
             // Each "internal" node should be compared to the current node
             for (int i=0; i<nrOfClosedNodes; i++)
@@ -705,7 +716,7 @@ public class ModifiedAstar
                 // The comparison is done for Tv_new[i] + g_new <> Tv_old[i] + g_old (forall i)
                 for (int j=CURRENT_COSTS_INDEX; j<ACCUMULATED_COST_INDEX; j++)
                 {
-                    double currCostDiff = (node[j] + node[ACCUMULATED_COST_INDEX]) - (correspondingClosedNodes[j + i*nodeLength] + correspondingClosedNodes[ACCUMULATED_COST_INDEX + i*nodeLength]);
+                    double currCostDiff = (node.getValueAt(j) + node.getValueAt(ACCUMULATED_COST_INDEX)) - (correspondingClosedNodes.getValueAt(j + i*nodeLength) + correspondingClosedNodes.getValueAt(ACCUMULATED_COST_INDEX + i*nodeLength));
                     
                     if (currCostDiff < 0)
                     {
@@ -732,7 +743,7 @@ public class ModifiedAstar
             }
             
             // Only ties (and the new node) are kept for the update of the closedTree.
-            double[] newClosedNode = new double[(tieIndices.size() + 1)*nodeLength];
+            double[] newClosedNodeBasis = new double[(tieIndices.size() + 1)*nodeLength];
             
             // The tie-nodes (if there are any) are copied to the new closedNode
             for (int i=0; i<tieIndices.size(); i++)
@@ -740,17 +751,19 @@ public class ModifiedAstar
                 int currExaminedNodesIndex = tieIndices.get(i).intValue();
                 for (int j=0; j<nodeLength; j++)
                 {
-                    newClosedNode[j + i*nodeLength] = correspondingClosedNodes[j + currExaminedNodesIndex*nodeLength];
+                    newClosedNodeBasis[j + i*nodeLength] = correspondingClosedNodes.getValueAt(j + currExaminedNodesIndex*nodeLength);
                 }
             }
             
             // The latest addition to the node-family (double[] node) is also added to the new closedNode
             for (int j=0; j<nodeLength; j++)
             {
-                newClosedNode[j + tieIndices.size()*nodeLength] = node[j];
+                newClosedNodeBasis[j + tieIndices.size()*nodeLength] = node.getValueAt(j);
             }
+
+			correspondingClosedNodes.setBasis(newClosedNodeBasis);
             
-            closedTree.put(new Integer((int)getKey(node)), newClosedNode);
+            closedTree.put(new Integer((int)getKey(node)), correspondingClosedNodes);
         }
         
         return true;
@@ -892,12 +905,12 @@ public class ModifiedAstar
      * @param node the node, whose estimated cost we want to know
      * @return totalEstimatedCost : f(n) = g(n) + h(n)
      */
-    public double calcEstimatedCost(double[] node)
+    public double calcEstimatedCost(Node node)
 		throws Exception
     {
-        double[] parent = getParent(node);
+//         double[] parent = getParent(node);
         
-        double fNode = node[ACCUMULATED_COST_INDEX] + getRelaxation(node);
+        double fNode = node.getValueAt(ACCUMULATED_COST_INDEX) + getRelaxation(node);
         //   		double fParent = parent[ESTIMATE_INDEX];
         
         //  		// The following code inside the if-loop is needed to ensure consistency of the heuristic
@@ -970,7 +983,7 @@ public class ModifiedAstar
         nextState.setAccepting(true);
         scheduleAuto.addState(nextState);
         
-        double[] currNode = acceptingNode;
+		Node currNode = acceptingNode;
         
         while (hasParent(currNode))
         {
@@ -978,13 +991,15 @@ public class ModifiedAstar
             {
                 if (isRunning)
                 {
-                    double[] parent = getParent(currNode);
-                    State currState = new State(printNodeSignature(parent) + "; firing time = " + currNode[ACCUMULATED_COST_INDEX]);
+                    Node parent = getParent(currNode);
+                    State currState = new State(printNodeSignature(parent) + "; firing time = " + currNode.getValueAt(ACCUMULATED_COST_INDEX));
                     LabeledEvent event = findCurrentEvent(parent, currNode);
                     
                     if (!hasParent(parent))
+					{
                         currState.setInitial(true);
-                    
+                    }
+
                     scheduleAuto.addState(currState);
                     scheduleAuto.getAlphabet().addEvent(event);
                     scheduleAuto.addArc(new Arc(currState, nextState, event));
@@ -999,7 +1014,7 @@ public class ModifiedAstar
             }
             catch (Exception ex)
             {
-                logger.error("ModifiedAstar::buildScheduleAutomaton() --> Could not find the arc between " + printArray(currNode) + " and its parent" + printNodeName(getParent(currNode)));
+                logger.error("ModifiedAstar::buildScheduleAutomaton() --> Could not find the arc between " + printArray(currNode.getBasis()) + " and its parent" + printNodeName(getParent(currNode)));
                 logger.debug(ex.getStackTrace());
                 
                 throw ex;
@@ -1021,22 +1036,24 @@ public class ModifiedAstar
     }
     
     /**
-     * This method finds a parent to the current node by retrieving an element from
-     * the closedTree that corresponds to the key, stored in the current nodes PARENT_INDEX.
-     * Caution should be made, since the closed element might consist of several nodes.
-     * The true parent is found by comparing the costs for all the nodes stored in the
-     * parent element.
+     * This method finds several parent candidates to the current node by retrieving 
+	 * an element from the closedTree that corresponds to the key, stored in the current 
+	 * nodes PARENT_INDEX. Caution should be made, since the closed element might consist 
+	 * of several nodes. The true parent is found by comparing the costs for all the nodes 
+	 * stored in the parent element.
      *
      * @param node - the node whose parent is seeked
      * @return parentNode - the parent of the node 'node'
      */
-    protected double[] getParent(double[] node)
+    protected Node getParent(Node node)
 		throws Exception
     {
         // one object of the closedTree may contain several nodes (that all correspond
         // to the same logical state but different paths).
-        double[] parentCandidates = closedTree.get(new Integer((int)node[PARENT_INDEX]));
-        int nrOfCandidates = parentCandidates.length / node.length;
+		Node parentCandidates = closedTree.get(new Integer((int)node.getValueAt(PARENT_INDEX)));
+		double[] parentCandidatesBasis = parentCandidates.getBasis();
+				
+        int nrOfCandidates = parentCandidatesBasis.length / node.getBasis().length;
         
         if (nrOfCandidates == 1)
         {
@@ -1060,13 +1077,13 @@ public class ModifiedAstar
                 // This might look strange, but it is not. All parent candidates corresponds to
                 // the same logical state. In other words, it is enough to do the state indices check
                 // for some of the parent candidates, why not the first.
-                if (node[currIndex] != parentCandidates[currIndex])
+                if (node.getValueAt(currIndex) != parentCandidates.getValueAt(currIndex))
                 {
                     activePlantIndex = j;
                     
                     // The new cost (after update) is equal to the cost of the state that is changed
                     // during the transition, i.e. the state corresponding to the firing robot.
-                    newStateCost = theAutomata.getAutomatonAt(currIndex).getStateWithIndex((int)node[currIndex]).getCost();
+                    newStateCost = theAutomata.getAutomatonAt(currIndex).getStateWithIndex((int)node.getValueAt(currIndex)).getCost();
                     
                     break;
                 }
@@ -1082,7 +1099,7 @@ public class ModifiedAstar
                 // Retrieving the costs of the current parent candidate
                 for (int j=0; j<parentCosts.length; j++)
                 {
-                    parentCosts[j] = parentCandidates[j + CURRENT_COSTS_INDEX + i*node.length];
+                    parentCosts[j] = parentCandidates.getValueAt(j + CURRENT_COSTS_INDEX + i*node.getBasis().length);
                 }
                 
                 double[] newCosts = updateCosts(parentCosts, activePlantIndex, newStateCost);
@@ -1094,7 +1111,7 @@ public class ModifiedAstar
                 // The estimate cost is not important here
                 for (int j=0; j<newCosts.length - 1; j++)
                 {
-                    if (newCosts[j] != node[j + CURRENT_COSTS_INDEX])
+                    if (newCosts[j] != node.getValueAt(j + CURRENT_COSTS_INDEX))
                     {
                         isParent = false;
                         break;
@@ -1104,11 +1121,15 @@ public class ModifiedAstar
                 // If the parent was found, return it.
                 if (isParent)
                 {
-                    double[] parent = new double[node.length];
+                    double[] parentBasis = new double[node.getBasis().length];
                     
-                    for (int j=0; j<parent.length; j++)
-                        parent[j] = parentCandidates[j + i*node.length];
-                    
+                    for (int j=0; j<parentBasis.length; j++)
+					{
+                        parentBasis[j] = parentCandidates.getValueAt(j + i*node.getBasis().length);
+                    }
+
+					Node parent = node.emptyClone();
+					parent.setBasis(parentBasis);
                     return parent;
                 }
             }
@@ -1122,11 +1143,13 @@ public class ModifiedAstar
      * The reference should be stored in the PARENT_INDEX. If its value
      * is -1, the current node has no recognized parent.
      */
-    protected boolean hasParent(double[] node)
+    protected boolean hasParent(Node node)
     {
-        if (node[PARENT_INDEX] == -1)
+        if (node.getValueAt(PARENT_INDEX) == -1)
+		{
             return false;
-        
+        }
+
         return true;
     }
     
@@ -1139,14 +1162,15 @@ public class ModifiedAstar
      * @param toNode the "to" end of the seeked transition
      * @return connectingEvent - the event between "fromNode" and "toNode"
      */
-    protected LabeledEvent findCurrentEvent(double[] fromNode, double[] toNode) throws Exception
+    protected LabeledEvent findCurrentEvent(Node fromNode, Node toNode) 
+		throws Exception
     {
         for (int i=0; i<theAutomata.size(); i++)
         {
-            if (fromNode[i] != toNode[i])
+            if (fromNode.getValueAt(i) != toNode.getValueAt(i))
             {
                 Automaton auto = theAutomata.getAutomatonAt(i);
-                return auto.getLabeledEvent(auto.getStateWithIndex((int)fromNode[i]), auto.getStateWithIndex((int)toNode[i]));
+                return auto.getLabeledEvent(auto.getStateWithIndex((int)fromNode.getValueAt(i)), auto.getStateWithIndex((int)toNode.getValueAt(i)));
             }
         }
         
@@ -1195,7 +1219,7 @@ public class ModifiedAstar
      * @param node the node, whose estimated cost we want to know
      * @return remainingEstimatedCost : h(n)
      */
-    protected double getRelaxation(double[] node)
+    protected double getRelaxation(Node node)
 		throws Exception
 	{
 		return relaxer.getRelaxation(node);
@@ -1227,30 +1251,33 @@ public class ModifiedAstar
         return s;
     }
     
-    protected String printNodeSignature(double[] node)
+    protected String printNodeSignature(Node node)
     {
+		
         String s = printNodeName(node) + "; Tv = [";
         
-        int addIndex = node.length - (plantAutomata.size() + 1);
+        int addIndex = node.getBasis().length - (plantAutomata.size() + 1);
         for (int i=0; i<getActiveLength()-1; i++)
-            s += node[i + CURRENT_COSTS_INDEX] +  " ";
-        s += node[ACCUMULATED_COST_INDEX-1] + "]; g = ";
+		{
+            s += node.getValueAt(i + CURRENT_COSTS_INDEX) +  " ";
+		}
+        s += node.getValueAt(ACCUMULATED_COST_INDEX-1) + "]; g = ";
         
-        s += node[ACCUMULATED_COST_INDEX];
-        s += "; f = " + node[ESTIMATE_INDEX];
+        s += node.getValueAt(ACCUMULATED_COST_INDEX);
+        s += "; f = " + node.getValueAt(ESTIMATE_INDEX);
         
         return s;
     }
     
-    protected String printNodeName(double[] node)
+    protected String printNodeName(Node node)
     {
         String s = "[";
         
         for (int i=0; i<theAutomata.size()-1; i++)
         {
-            s += theAutomata.getAutomatonAt(i).getStateWithIndex((int)node[i]) + " ";
+            s += theAutomata.getAutomatonAt(i).getStateWithIndex((int)node.getValueAt(i)) + " ";
         }
-        s += theAutomata.getAutomatonAt(theAutomata.size()-1).getStateWithIndex((int)node[theAutomata.size()-1]) + "]";
+        s += theAutomata.getAutomatonAt(theAutomata.size()-1).getStateWithIndex((int)node.getValueAt(theAutomata.size()-1)) + "]";
         
         return s;
     }
@@ -1261,7 +1288,7 @@ public class ModifiedAstar
      * @param node the current node
      * @return true if all the corresponing states are accepting
      */
-    protected boolean isAcceptingNode(double[] node)
+    protected boolean isAcceptingNode(Node node)
     {
         // The active automata, i.e. the automata that are currently being scheduled
         // should be in their marked states. The notion of active automata is important
@@ -1271,7 +1298,7 @@ public class ModifiedAstar
         {
             int index = activeAutomataIndex[i];
             
-            if (!theAutomata.getAutomatonAt(index).getStateWithIndex((int)node[index]).isAccepting())
+            if (!theAutomata.getAutomatonAt(index).getStateWithIndex((int)node.getValueAt(index)).isAccepting())
             {
                 return false;
             }
@@ -1282,7 +1309,7 @@ public class ModifiedAstar
         {
             if (theAutomata.getAutomatonAt(i).isSpecification())
             {
-                if (!theAutomata.getAutomatonAt(i).getStateWithIndex((int)node[i]).isAccepting())
+                if (!theAutomata.getAutomatonAt(i).getStateWithIndex((int)node.getValueAt(i)).isAccepting())
                 {
                     return false;
                 }
@@ -1300,13 +1327,13 @@ public class ModifiedAstar
      * @param node the current node
      * @return the key (int) for the node ordering in the closedTree
      */
-    public int getKey(double[] node)
+    public int getKey(Node node)
     {
         int key = 0;
         
         for (int i=0; i<activeAutomataIndex.length; i++)
         {
-            key += ((int)node[activeAutomataIndex[i]])*keyMapping[activeAutomataIndex[i]];
+            key += ((int)node.getValueAt(activeAutomataIndex[i]))*keyMapping[activeAutomataIndex[i]];
         }
         
         return key;

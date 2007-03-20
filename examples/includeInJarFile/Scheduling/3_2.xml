@@ -2,9 +2,9 @@
 <Automata name="2_2" comment="A simple example of 3 robots sharing 2 mutex zones. Optimal cycle time is 26 time units." major="0" minor="9">
 <Automaton name="R1" type="Plant">
 	<Events>
-		<Event id="0" label="R1_book_ook_1"/>
+		<Event id="0" label="R1_book_1"/>
 		<Event id="1" label="R1_unbook_1"/>
-		<Event id="2" label="R1_book_ook_2"/>
+		<Event id="2" label="R1_book_2"/>
 		<Event id="3" label="R1_unbook_2"/>
 	</Events>
 	<States>
