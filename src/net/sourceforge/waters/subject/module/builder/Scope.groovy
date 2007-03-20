@@ -14,7 +14,9 @@ class Scope {
 		assert id
 		scopeOf(id).self.namedElements.find{it.name == id.rightMostPart()}
 	}
+	private Map scopeOfIdCache = [:]
 	Scope scopeOf(IdentifierExpression id) {
+		if (scopeOfIdCache[id]) return scopeOfIdCache[id]
 		Scope scopeOfId
 		Named subScopeElement
 		if (id.leftMostPart() && (subScopeElement = self.subScopeElements.find{it.name == id.leftMostPart()})) {
@@ -23,7 +25,7 @@ class Scope {
 			scopeOfId = this
 		} else scopeOfId = parent?.scopeOf(id)
 		assert scopeOfId, "Undeclared identifier $id, scope ${fullName}"
-		scopeOfId
+		scopeOfIdCache[id] = scopeOfId
 	}
 	protected static final KEYWORDS = [/(?i)and/, /(?i)or/, /(?i)not/, /(?i)true/, /(?i)false/]
 	
@@ -54,7 +56,10 @@ class Scope {
 		identifiers
 	}
 	
+	private Map expandCache = [:]
 	Expression expand(Expression expr, List earlierStatements) {
+		def cacheKey = "$expr${earlierStatements.size()}"
+		if (expandCache[cacheKey]) return expandCache[cacheKey] 
 		def expandedExpr = expr.text.replaceAll(FULL_ID_PATTERN) { word ->
 			def expandedWord = word
    			if (!KEYWORDS.any{keyword -> word ==~ keyword}) {
@@ -63,28 +68,38 @@ class Scope {
 			assert expandedWord, "Undeclared identifier $word in expr '${expr.text}', scope ${fullName}"
 			expandedWord
 		}
-   		new Expression(expandedExpr)
+		expandCache[cacheKey] = new Expression(expandedExpr)
 	}
 	Expression exchange(IdentifierExpression id, List earlierStatements) {
 		IdentifierExpression fullId = fullNameOf(id)
-		if (earlierStatements.empty) return fullId
-		def earlierAssigmentToId = earlierStatements.reverse().find{it.scope.fullNameOf(it.statement.Q) == fullId}
-		if (earlierAssigmentToId) {
-			def i = earlierStatements.lastIndexOf(earlierAssigmentToId)
-			def newExpr = earlierAssigmentToId.scope.expand(earlierAssigmentToId.statement.input, earlierStatements[0..<i])
-			if (newExpr.text ==~ /(?i)(?:not\s+)?${FULL_ID_PATTERN}/) return newExpr
-			else return new Expression("($newExpr)")
-		} else {
-			return fullId
+		def newExpr
+		if (earlierStatements.empty) newExpr = fullId
+		else {
+			def earlierAssigmentToId = earlierStatements.reverse().find{it.scope.fullNameOf(it.statement.Q) == fullId}
+			if (earlierAssigmentToId) {
+				def i = earlierStatements.lastIndexOf(earlierAssigmentToId)
+				newExpr = earlierAssigmentToId.scope.expand(earlierAssigmentToId.statement.input, earlierStatements[0..<i])
+				if (!(newExpr.text ==~ /(?i)(?:not\s+)?${FULL_ID_PATTERN}/)) newExpr = new Expression("($newExpr)")
+			} else {
+				newExpr = fullId
+			}
 		}
+		newExpr
 	}
 	IdentifierExpression fullNameOf(Named namedObject) {
 		!global ? new IdentifierExpression("${fullName}${Converter.SEPARATOR}$namedObject.name") : namedObject.name
 	}
 	
+	IdentifierExpression fullNameCache = null
 	IdentifierExpression getFullName() {
-		if (global) return null
-		if (parent.global) return self.name
-		new IdentifierExpression("${parent.fullName}${Converter.SEPARATOR}${self.name}")
+		if (fullNameCache) return fullNameCache
+		if (global) fullNameCache = null
+		else if (parent.global) fullNameCache = self.name
+		else fullNameCache = new IdentifierExpression("${parent.fullName}${Converter.SEPARATOR}${self.name}")
+		fullNameCache
+	}
+	Scope getProcessScope() {
+		if (self instanceof Process) return this
+		else return parent?.processScope
 	}
 }

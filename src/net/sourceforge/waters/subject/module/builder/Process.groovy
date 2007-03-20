@@ -2,14 +2,19 @@ package net.sourceforge.waters.subject.module.builder;
 
 class Process extends Named {
 	static final pattern = /(?i)process/
-	static final defaultAttr = null
-	static final parentAttr = 'process' 
-	Process() {
-		name = new IdentifierExpression('Process')
-	}
+	static final defaultAttr = 'name'
+	static final parentAttr = 'processes' 
+	List variables = []
 	List statements  = []
-	def addToModule(ModuleBuilder mb) {
-		statements.each { it.addToModule(mb) }
-		//sequences.each { it.addToModule(mb, Converter.PROCESS_SCAN_CYCLE_EVENT_NAME) }
+
+	List execute(Scope parent) {
+		Scope scope = [parent:parent, self:this]
+		statements.inject([]){executedStatements, statement -> executedStatements + statement.execute(scope)}
+	}
+	List getNamedElements() {
+		return [*variables, *statements]
+	}
+	List getSubScopeElements() {
+		return statements
 	}
 }

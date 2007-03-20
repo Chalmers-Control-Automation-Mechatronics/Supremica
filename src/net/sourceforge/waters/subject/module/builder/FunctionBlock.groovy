@@ -2,7 +2,6 @@ package net.sourceforge.waters.subject.module.builder
 import net.sourceforge.waters.subject.module.*
 
 class FunctionBlock extends Named {
-	boolean deferred = true
 	static final pattern = /(?i)application|functionblock/
 	static final defaultAttr = 'name'
 	static final parentAttr = null
@@ -14,7 +13,7 @@ class FunctionBlock extends Named {
 	List outputs = []
 	List variables = []
 	MainProgram mainProgram
-	List processes
+	List processes = []
 	                     
 	private addDefaultProcessModel(ModuleBuilder mb, Scope scope) {
 		mb.event(inputs.collect{it.formatEventName(scope)}, controllable:false)
@@ -35,13 +34,13 @@ class FunctionBlock extends Named {
 		ModuleBuilder mb = new ModuleBuilder()
 		Scope scope = [self:this]
 		mb.module(module) {
-			inputs.grep{it}.each { variable ->
-				mb.booleanVariable(variable.name.toSupremicaSyntax(scope), initial:variable.value, marked:variable.value ? true : false)
-			}
+			//inputs.grep{it}.each { variable ->
+			//	mb.booleanVariable(variable.name.toSupremicaSyntax(scope), initial:variable.value, marked:variable.value ? true : false)
+			//}
 			event(Converter.SCAN_CYCLE_EVENT_NAME, controllable:false)
 			if (processes) {
-				event(Converter.PROCESS_SCAN_CYCLE_EVENT_NAME, controllable:false)
-				eventAlias(Converter.PROCESS_EVENTS_ALIAS_NAME, events:[Converter.PROCESS_SCAN_CYCLE_EVENT_NAME])
+				//event(Converter.PROCESS_SCAN_CYCLE_EVENT_NAME, controllable:false)
+				//eventAlias(Converter.PROCESS_EVENTS_ALIAS_NAME, events:[Converter.PROCESS_SCAN_CYCLE_EVENT_NAME])
 			} else {
 				addDefaultProcessModel(mb, scope)
 			}
@@ -53,21 +52,22 @@ class FunctionBlock extends Named {
 				}
 			}
 			List statements = execute(scope)
-			statements.eachWithIndex { scopedStatement, i ->
-				scopedStatement.statement.addToModule(mb, statements, i, Converter.SCAN_CYCLE_EVENT_NAME)	
+			(0..<statements.size()).each { i ->
+				statements[i].statement.addToModule(mb, statements, i)
 			}
 		}
 	}
 
-	
 	List execute(Scope parent) {
-		mainProgram.execute(parent)
+		List statements = mainProgram.execute(parent)
+		processes*.execute(parent).each { statements += it }
+		statements
 	}
 	
 	List getNamedElements() {
-		return [this, *inputs, *outputs, *variables, *mainProgram.statements]
+		return [this, *inputs, *outputs, *variables, *mainProgram.statements, *processes]
 	}
 	List getSubScopeElements() {
-		return mainProgram.statements
+		return [*mainProgram.statements, *processes]
 	}
 }
