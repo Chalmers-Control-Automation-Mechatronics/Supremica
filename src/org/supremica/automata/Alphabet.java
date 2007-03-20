@@ -927,11 +927,11 @@ public class Alphabet
 
     public boolean equals(Object other)
     {
-        if (other == null || !(other instanceof Alphabet))
+        if (other instanceof Alphabet)
         {
-            return false;
+            this.theEvents.equals(((Alphabet)other).theEvents);            
         }
-        return this.theEvents.equals(((Alphabet) other).theEvents);
+        return false;
     }
 
     public int hashCode()
