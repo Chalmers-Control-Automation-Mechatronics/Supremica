@@ -62,10 +62,10 @@ import org.supremica.automata.*;
 import org.supremica.automata.execution.*;
 import org.supremica.log.*;
 
-public class ProjectBuildFromXml
+public class ProjectBuildFromXML
     extends DefaultHandler
 {
-    private static Logger logger = LoggerFactory.createLogger(ProjectBuildFromXml.class);
+    private static Logger logger = LoggerFactory.createLogger(ProjectBuildFromXML.class);
     private final static String automataStr = "Automata";
     private final static String automatonStr = "Automaton";
     private final static String eventsStr = "Events";
@@ -135,12 +135,12 @@ public class ProjectBuildFromXml
     private Map idStateMap = new HashMap();
     private Map idEventMap = new HashMap();
     
-    public ProjectBuildFromXml()
+    public ProjectBuildFromXML()
     {
         this.theProjectFactory = new DefaultProjectFactory();
     }
     
-    public ProjectBuildFromXml(ProjectFactory theProjectFactory)
+    public ProjectBuildFromXML(ProjectFactory theProjectFactory)
     {
         this.theProjectFactory = theProjectFactory;
     }
@@ -188,11 +188,11 @@ public class ProjectBuildFromXml
         return build(is, false);
     }
     
-    private Project build(File file, boolean validate)
-    throws Exception
-    {
-        return build(file.getCanonicalPath(), validate);
-    }
+//    private Project build(File file, boolean validate)
+//    throws Exception
+//    {
+//        return build(file.getCanonicalPath(), validate);
+//    }
     
     private Project build(InputStream is, boolean validate)
     throws Exception
@@ -202,11 +202,11 @@ public class ProjectBuildFromXml
         return build(source, validate);
     }
     
-    private Project build(String fileName)
-    throws Exception
-    {
-        return build(fileName, false);
-    }
+//    private Project build(String fileName)
+//    throws Exception
+//    {
+//        return build(fileName, false);
+//    }
     
     // changed to public by Arash, we need to load from streams in XML-RPC interface!
     public Project build(Reader r)
@@ -1116,7 +1116,7 @@ public class ProjectBuildFromXml
             }
             else if ((url == null) && (inputProtocol == InputProtocol.JarProtocol))
             {
-                url = ProjectBuildFromXml.class.getResource(path);
+                url = ProjectBuildFromXML.class.getResource(path);
             }
         }
         catch (MalformedURLException ex)
@@ -1182,7 +1182,7 @@ public class ProjectBuildFromXml
             }
             else if ((url == null) && (inputProtocol == InputProtocol.JarProtocol))
             {
-                url = ProjectBuildFromXml.class.getResource(path);
+                url = ProjectBuildFromXML.class.getResource(path);
             }
         }
         catch (MalformedURLException ex)
