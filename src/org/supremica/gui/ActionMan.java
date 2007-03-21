@@ -1857,17 +1857,6 @@ public class ActionMan
         automataExport(gui);
     }
 
-    public static void fileImportValid(Gui gui)
-    {
-        new FileImporter(FileDialogs.getVALIDFileImporter(), gui)    // anonymous class
-        {
-            void openFile(Gui g, File f)
-            {
-                importValidFile(g, f);
-            }
-        };
-    }
-
     public static void fileImportWaters(Gui gui)
     {
         new FileImporter(FileDialogs.getWatersFileImporter(), gui)    // anonymous class
@@ -2140,27 +2129,6 @@ public class ActionMan
         catch (Exception ex)
         {
             logger.error("Error while importing " + file.getAbsolutePath(), ex);
-            logger.debug(ex.getStackTrace());
-
-            return;
-        }
-    }
-
-    public static void importValidFile(Gui gui, File file)
-    {
-        gui.info("Importing " + file.getAbsolutePath() + " ...");
-
-        try
-        {
-            AutomataBuildFromVALID builder = new AutomataBuildFromVALID(new VisualProjectFactory());
-            Automata currAutomata = builder.build(file);
-            int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
-
-            gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
-        }
-        catch (Exception ex)
-        {
-            logger.error("Error while importing " + file.getAbsolutePath() + ". " + ex);
             logger.debug(ex.getStackTrace());
 
             return;

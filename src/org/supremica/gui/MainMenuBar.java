@@ -249,19 +249,8 @@ public class MainMenuBar
                 }
             });
             
-            // File.Import.Valid
-            JMenuItem menuFileImportValid = new JMenuItem("From VALID...");
-            menuFileImport.add(menuFileImportValid);
-            menuFileImportValid.addActionListener(new ActionListener()
-            {
-                public void actionPerformed(ActionEvent e)
-                {
-                    ActionMan.fileImportValid(ActionMan.getGui());
-                }
-            });
-            
-                        /*
-                        // File.Import.HYB
+            /*
+                        // File.Import.HYB (the file format of Balemi's tool)
                         JMenuItem menuFileImportHYB = new JMenuItem("From HYB...");
                         menuFileImport.add(menuFileImportHYB);
                         menuFileImportHYB.addActionListener(new ActionListener()
@@ -271,7 +260,7 @@ public class MainMenuBar
                         ActionMan.fileImportHYB(ActionMan.getGui());
                         }
                         });
-                         */
+             */
             
             // File.Import.HISC
             JMenuItem menuFileImportHISC = new JMenuItem("From HISC...");
@@ -547,7 +536,7 @@ public class MainMenuBar
                     ActionMan.testCases(ActionMan.getGui());
                 }
                 catch (Exception excp)
-                {                    
+                {
                     // Do nothing?
                 }
             }

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   SupremicaUnmarshaller
 //###########################################################################
-//# $Id: SupremicaUnmarshaller.java,v 1.7 2007-03-20 19:30:24 knut Exp $
+//# $Id: SupremicaUnmarshaller.java,v 1.8 2007-03-21 16:09:32 flordal Exp $
 //###########################################################################
 
 package org.supremica.automata.IO;
@@ -104,7 +104,7 @@ public class SupremicaUnmarshaller
     
     /**
      * Examines if there are conversion problems in an automata. For example,
-     * the State cost feature has no correspondance in the Waters models, the
+     * the State cost feature has no correspondance in the Waters models, the 
      * user should be alerted of this fact...
      */
     private void validate (Automata automata)
