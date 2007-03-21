@@ -216,7 +216,7 @@ public class Server
 
 		theAutomata.addAutomaton(currAutomaton);
 
-		AutomataToXml exporter = new AutomataToXml(theAutomata);
+		AutomataToXML exporter = new AutomataToXML(theAutomata);
 		StringWriter response = new StringWriter();
 		PrintWriter pw = new PrintWriter(response);
 
@@ -252,7 +252,7 @@ public class Server
 			theAutomata.addAutomaton(currAutomaton);
 		}
 
-		AutomataToXml exporter = new AutomataToXml(theAutomata);
+		AutomataToXML exporter = new AutomataToXML(theAutomata);
 		StringWriter response = new StringWriter();
 		PrintWriter pw = new PrintWriter(response);
 

@@ -221,13 +221,6 @@ public class Alphabet
     public void removeEvent(LabeledEvent ev)
     throws IllegalArgumentException
     {
-                /*
-                if (!includes(ev))
-                {
-                        throw new IllegalArgumentException("The event is not included in this alphabet");
-                }
-                 */
-
         removeEvent(ev.getLabel());
     }
 
@@ -241,19 +234,6 @@ public class Alphabet
 
         theEvents.remove(label);
     }
-
-    /**
-     * True, if the event is in the set already, false otherwise.
-     *
-     *@param  theEvent Description of the Parameter
-     *@return  Description of the Return Value
-     */
-        /*
-        public boolean containsEvent(LabeledEvent theEvent)
-        {
-                return theEvents.containsValue(theEvent);
-        }
-         */
 
     /**
      * True, if there exists an event with the same label, false otherwise.
@@ -281,25 +261,6 @@ public class Alphabet
 
         return theEvents.containsKey(label);
     }
-
-    /**
-     * Given an event, returns an "equal" event from this alphabet
-     * The def of "equal" is an internal matter.
-     * Use this method instead of fiddling with event ids in user code
-     * Returns null if the event does not exist
-     */
-        /*
-        public LabeledEvent getEvent(LabeledEvent ev)
-                throws IllegalArgumentException
-        {
-                if (ev == null)
-                {
-                        throw new IllegalArgumentException("getEvent: event must be non-null");
-                }
-
-                return theEvents.getEvent(ev.getLabel());
-        }
-         */
 
     /**
      * Return the event with the given label.
@@ -343,9 +304,8 @@ public class Alphabet
     {
         int nbrOfFoundEvents = 0;
 
-        for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )
+        for (LabeledEvent currEvent : this)
         {
-            LabeledEvent currEvent = evIt.next();
             if (currEvent.isControllable())
             {
                 nbrOfFoundEvents++;
@@ -362,9 +322,8 @@ public class Alphabet
     {
         int nbrOfFoundEvents = 0;
 
-        for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )
+        for (LabeledEvent currEvent : this)
         {
-            LabeledEvent currEvent = evIt.next();
             if (!currEvent.isControllable())
             {
                 nbrOfFoundEvents++;
@@ -382,10 +341,8 @@ public class Alphabet
     {
         int nbrOfFoundEvents = 0;
 
-        for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )
+        for (LabeledEvent currEvent : this)
         {
-            LabeledEvent currEvent = evIt.next();
-
             if (!currEvent.isObservable())
             {
                 nbrOfFoundEvents++;
@@ -402,10 +359,8 @@ public class Alphabet
     {
         int nbrOfFoundEvents = 0;
 
-        for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )
+        for (LabeledEvent currEvent : this)
         {
-            LabeledEvent currEvent = evIt.next();
-
             if (currEvent.isPrioritized())
             {
                 nbrOfFoundEvents++;
@@ -422,10 +377,8 @@ public class Alphabet
     {
         int nbrOfFoundEvents = 0;
 
-        for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )
+        for (LabeledEvent currEvent : this)
         {
-            LabeledEvent currEvent = evIt.next();
-
             if (currEvent.isImmediate())
             {
                 nbrOfFoundEvents++;
@@ -448,16 +401,10 @@ public class Alphabet
 
         if (size() > 0)
         {
-            for (Iterator<LabeledEvent> it = iterator(); it.hasNext(); )
+            for (LabeledEvent event : this)
             {
-                LabeledEvent event = it.next();
-
                 sbuf.append(event);
-
-                if (it.hasNext())
-                {
-                    sbuf.append(", ");
-                }
+                sbuf.append(", ");
             }
         }
 

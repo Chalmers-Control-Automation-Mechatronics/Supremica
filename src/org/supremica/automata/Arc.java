@@ -107,11 +107,7 @@ public class Arc
     {   
         try
         {
-            Arc clone = (Arc)super.clone();
-            clone.event = event;
-            clone.fromState = fromState;
-            clone.toState = toState;              
-            return clone;
+            return (Arc)super.clone();        
         }
         catch (CloneNotSupportedException ex)
         {
@@ -183,13 +179,12 @@ public class Arc
     
     public boolean equals(Object object)
     {
-        if ((object == null) || !(object instanceof Arc))
+        if (object instanceof Arc)
         {
-            return false;
+            Arc arc = (Arc) object;
+            return (toState.equals(arc.getToState()) && fromState.equals(arc.getFromState()) && event.equals(arc.getEvent()));
         }
-        
-        Arc arc = (Arc) object;
-        return (toState.equals(arc.getToState()) && fromState.equals(arc.getFromState()) && event.equals(arc.getEvent()));
+        return false;
     }
     
     public int hashCode()

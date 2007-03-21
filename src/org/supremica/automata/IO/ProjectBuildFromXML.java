@@ -405,13 +405,6 @@ public class ProjectBuildFromXML
             throwException("name attribute is missing");
         }
         
-                /* Let the gui handle this
-                   if (name.equals(""))
-                   {
-                   throwException("empty automata names are not allowed");
-                   }
-                 */
-        
         currAutomaton.setName(name);
         
         String type = attributes.getValue("type");

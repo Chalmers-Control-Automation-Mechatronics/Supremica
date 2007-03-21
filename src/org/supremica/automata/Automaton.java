@@ -82,22 +82,14 @@ public class Automaton
      */
     private String comment;
 
-    // private List theStates = new LinkedList();
     private final StateSet theStates = new StateSet();
     private final Alphabet alphabet;
-    //private Map idStateMap;    // Want fast lookup on both id and index (but not name?)
     private int index = -1;
     private Map<Integer,State> indexStateMap;
-    //private ArcSet theArcs;
     private State initialState;
     private boolean isDisabled = false;
     private AutomatonType type = AutomatonType.SPECIFICATION;
     private int uniqueStateIndex = 0;
-
-    // Graphical stuff
-//    private boolean hasLayout = false;
-//    private int width = -1;
-//    private int height = -1;
 
     private AutomatonListeners listeners = null;
 
@@ -833,37 +825,17 @@ public class Automaton
     }
 
     public void removeArc(Arc arc)
-    throws IllegalArgumentException
+        throws IllegalArgumentException
     {
         if (arc == null)
         {
             throw new IllegalArgumentException("Arc must be non-null");
         }
-
         arc.clear();
-        //theArcs.removeArc(arc);
-        //notifyListeners(AutomatonListeners.MODE_ARC_REMOVED, arc);
     }
-
-        /*
-        public void removeArcs(ArcSet arcSet)
-        {
-                try
-                {
-                        for (Iterator<Arc> arcIt = arcSet.iterator(); arcIt.hasNext(); )
-                        {
-                                removeArc(arcIt.next());
-                        }
-                }
-                catch (Exception ex)
-                {
-                        logger.error("Error in Automaton.java when removing arcs.");
-                }
-        }
-         */
-
+    
     public boolean containsState(State state)
-    throws IllegalArgumentException
+        throws IllegalArgumentException
     {
         if (state == null)
         {

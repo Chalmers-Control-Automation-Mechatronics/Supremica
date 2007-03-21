@@ -109,7 +109,7 @@ public class AnalyzerExportAction
         // Proper design would have solved this problem
         if (exportMode == ExportFormat.XML_DEBUG)
         {
-            AutomataToXml xport = new AutomataToXml(selectedAutomata);
+            AutomataToXML xport = new AutomataToXML(selectedAutomata);
             TextFrame textframe = new TextFrame("XML debug output");
 
             xport.serialize(textframe.getPrintWriter());
@@ -311,7 +311,7 @@ public class AnalyzerExportAction
                         {
                             if (exportMode == ExportFormat.XML)
                             {
-                                AutomataToXml exporter = new AutomataToXml(selectedAutomata);
+                                AutomataToXML exporter = new AutomataToXML(selectedAutomata);
                                 exporter.serialize(currFile);
                             }
                             /*
@@ -384,7 +384,7 @@ public class AnalyzerExportAction
                         {
                             Automata currAutomata = new Automata();
                             currAutomata.addAutomaton(currAutomaton);
-                            AutomataToXml exporter = new AutomataToXml(currAutomata);
+                            AutomataToXML exporter = new AutomataToXML(currAutomata);
                             exporter.serialize(currFile);
                         }
                         else if (exportMode == ExportFormat.DOT)

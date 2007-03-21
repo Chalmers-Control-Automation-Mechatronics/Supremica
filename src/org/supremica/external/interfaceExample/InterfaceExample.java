@@ -44,7 +44,7 @@ public class InterfaceExample
 		theAutomaton.addArc(new Arc(q2, q1, e2));
 
 		// Output the automata as XML
-		AutomataToXml serializer = new AutomataToXml(theAutomata);
+		AutomataToXML serializer = new AutomataToXML(theAutomata);
 
 		serializer.serialize(new PrintWriter(new OutputStreamWriter(System.out)));
     }

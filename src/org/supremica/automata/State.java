@@ -79,7 +79,7 @@ public class State
      * id is the internal identifier, i.e. for directing arcs etc.
      * It is used for generating the hashcode.
      */
-    private final String id;
+    //private final String id = "";
 
     /**
      * Name is the external identifier, i.e. the string appearing in Supremica
@@ -127,18 +127,19 @@ public class State
      */
     public State(String name)
     {
+        this.name = name;
         // Use name as id
-        this(name, name);
+        //this(name, name);
     }
 
-    /**
-     * Creates a new state with a specified name and id.
-     */
-    private State(String name, String id)
-    {
-        this.name = name;
-        this.id = id;
-    }
+//    /**
+//     * Creates a new state with a specified name and id.
+//     */
+//    private State(String name, String id)
+//    {
+//        this.name = name;
+//        this.id = id;
+//    }
 
     /**
      * This copy constructor does only copy the states attributes.
@@ -161,8 +162,9 @@ public class State
      */
     public State(String name, State otherState)
     {
-        this(name, otherState.id);
-
+        this(name);
+        //this(name, otherState.id);
+        
         index = otherState.index;
         initial = otherState.initial;
         accepting = otherState.accepting;
@@ -179,17 +181,6 @@ public class State
     {
         return new State(this);
     }
-
-    private String getId()
-    {
-        if (id == null)
-        {
-            return "";
-        }
-
-        return id;
-    }
-
 
     /**
      * This is an ugly method that only is needed when dealing
@@ -351,7 +342,7 @@ public class State
     {
         if (other instanceof State)
         {
-            return id.equals(((State) other).id);
+            return name.equals(((State) other).name);
         }
         return false;
     }
@@ -413,7 +404,7 @@ public class State
 
     public int hashCode()
     {
-        return id.hashCode();
+        return name.hashCode();
     }
 
     /**
@@ -1100,15 +1091,9 @@ public class State
 
     public int compareTo(NamedProxy partner)
     {
-        return id.compareTo(((State) partner).id);
+        return name.compareTo(((State) partner).name);
     }
 
-/*
-        public int compareTo(State other)
-        {
-                return this.getId().compareTo(other.getId());
-        }
- */
     //////////////////
     // Kripke stuff //
     //////////////////

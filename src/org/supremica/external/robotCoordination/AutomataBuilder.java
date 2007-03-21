@@ -606,7 +606,7 @@ public class AutomataBuilder
 
 		allAutomata.addAutomata(zones);
 
-		AutomataToXml exporter = new AutomataToXml(allAutomata);
+		AutomataToXML exporter = new AutomataToXML(allAutomata);
 
 		exporter.serialize(new PrintWriter(System.out));
 	}
