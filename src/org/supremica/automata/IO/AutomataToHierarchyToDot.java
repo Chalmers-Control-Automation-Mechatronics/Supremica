@@ -142,19 +142,7 @@ public class AutomataToHierarchyToDot
         {
             return ", shape = box";
         }
-        
-        if (aut.isSupervisor() || aut.isSpecification())
-        {
-            return ", shape = ellipse";
-        }
-        
-        if (aut.isUndefined())
-        {
-            return ", shape = egg";
-        }
-        
-        // What the f**k was that?
-        return "";
+        return ", shape = ellipse";
     }
     
     public void serialize(PrintWriter pw)

@@ -52,6 +52,7 @@ package org.supremica.automata;
 import org.supremica.util.SupremicaException;
 import java.util.*;
 import org.supremica.log.*;
+import org.supremica.util.Args;
 import org.supremica.properties.Config;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.model.base.Proxy;
@@ -94,8 +95,9 @@ public class Automaton
     private AutomatonListeners listeners = null;
 
     /**
-     * Creates an empty automaton.
+     * Creates an empty automaton. Always create with a name.
      */
+    @Deprecated
     public Automaton()
     {
         alphabet = new Alphabet();
@@ -157,13 +159,8 @@ public class Automaton
      * @see AutomatonType
      */
     public void setType(AutomatonType type)
-    throws IllegalArgumentException
     {
-        if (type == null)
-        {
-            throw new IllegalArgumentException("Type must be non-null");
-        }
-
+        Args.checkForNull(type);
         this.type = type;
         notifyListeners();
     }
@@ -173,11 +170,6 @@ public class Automaton
      */
     public AutomatonType getType()
     {
-        if (type == null)
-        {
-            return AutomatonType.UNDEFINED;
-        }
-
         return type;
     }
 
@@ -818,10 +810,6 @@ public class Automaton
         // Add the arc to the individual states
         arc.getFromState().addOutgoingArc(arc);
         arc.getToState().addIncomingArc(arc);
-
-//		arc.getListeners().addListener(this);
-//		theArcs.addArc(arc);
-//		notifyListeners(AutomatonListeners.MODE_ARC_ADDED, arc);
     }
 
     public void removeArc(Arc arc)

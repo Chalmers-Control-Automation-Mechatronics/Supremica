@@ -377,8 +377,10 @@ public class Alphabet
     {
         int nbrOfFoundEvents = 0;
 
-        for (LabeledEvent currEvent : this)
+        for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )
         {
+            LabeledEvent currEvent = evIt.next();
+
             if (currEvent.isImmediate())
             {
                 nbrOfFoundEvents++;
@@ -401,10 +403,16 @@ public class Alphabet
 
         if (size() > 0)
         {
-            for (LabeledEvent event : this)
+            for (Iterator<LabeledEvent> it = iterator(); it.hasNext(); )
             {
+                LabeledEvent event = it.next();
+
                 sbuf.append(event);
-                sbuf.append(", ");
+
+                if (it.hasNext())
+                {
+                    sbuf.append(", ");
+                }
             }
         }
 
@@ -430,10 +438,8 @@ public class Alphabet
         Map<String,LabeledEvent> newEvents = new TreeMap<String,LabeledEvent>();
 
         // Deep copy
-        for (Iterator it = iterator(); it.hasNext(); )
+        for (LabeledEvent currEvent : this)
         {
-            LabeledEvent currEvent = (LabeledEvent) it.next();
-
             newEvents.put(currEvent.getLabel(), currEvent);
         }
 
@@ -550,23 +556,17 @@ public class Alphabet
      */
     public void intersect(Alphabet other)
     {
-        ArrayList removeList = new ArrayList();
+        List<LabeledEvent> removeList = new ArrayList<LabeledEvent>();
 
-        for (Iterator alphIt = this.iterator(); alphIt.hasNext(); )
+        for (LabeledEvent currEvent : this)
         {
-            LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-
             if (!other.contains(currEvent))
             {
                 removeList.add(currEvent);
             }
         }
-
-        for (Iterator removeIt = removeList.iterator(); removeIt.hasNext(); )
+        for (LabeledEvent currEvent : removeList)
         {
-            LabeledEvent currEvent = (LabeledEvent) removeIt.next();
-
-            //String currEvent = (String) removeIt.next();
             removeEvent(currEvent);
         }
     }
@@ -578,9 +578,8 @@ public class Alphabet
      */
     public boolean overlap(Alphabet other)
     {
-        for (Iterator alphIt = this.iterator(); alphIt.hasNext(); )
+        for (LabeledEvent currEvent : this)
         {
-            LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 
             if (other.contains(currEvent))
             {

@@ -53,6 +53,8 @@ import java.io.Serializable;
 import java.util.*;
 import java.awt.Point;
 
+import org.supremica.util.Args;
+
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.NamedProxy;
@@ -76,12 +78,6 @@ public class State
     static final LabeledEvent forbiddenProposition = new LabeledEvent(EventDeclProxy.DEFAULT_FORBIDDEN_NAME, true);
 
     /**
-     * id is the internal identifier, i.e. for directing arcs etc.
-     * It is used for generating the hashcode.
-     */
-    //private final String id = "";
-
-    /**
      * Name is the external identifier, i.e. the string appearing in Supremica
      */
     private String name;
@@ -94,11 +90,7 @@ public class State
     private boolean selected = false;
     private double cost = UNDEF_COST;
     private State assocState = null;
-    // private Object equivClass = null;
-    private StateSet stateSet = null;    //
-//    private int x = UNDEF_POS;
-//    private int y = UNDEF_POS;
-//    private int radius = 9;
+    private StateSet stateSet = null;    
 
     private Listeners listeners = null;
 
@@ -127,19 +119,9 @@ public class State
      */
     public State(String name)
     {
+        Args.checkForContent(name);
         this.name = name;
-        // Use name as id
-        //this(name, name);
     }
-
-//    /**
-//     * Creates a new state with a specified name and id.
-//     */
-//    private State(String name, String id)
-//    {
-//        this.name = name;
-//        this.id = id;
-//    }
 
     /**
      * This copy constructor does only copy the states attributes.
@@ -163,7 +145,6 @@ public class State
     public State(String name, State otherState)
     {
         this(name);
-        //this(name, otherState.id);
         
         index = otherState.index;
         initial = otherState.initial;
@@ -172,7 +153,6 @@ public class State
         first = otherState.first;
         last = otherState.last;
         cost = otherState.cost;
-        // equivClass = otherState.equivClass;
         stateSet = otherState.stateSet;
         visited = otherState.visited;
     }
@@ -244,6 +224,7 @@ public class State
 
     public void setName(String name)
     {
+        Args.checkForContent(name);
         this.name = name;
     }
 
@@ -700,22 +681,6 @@ public class State
      */
     public int removeOutgoingArcs()
     {
-                /*
-                int count = 0;
-                LinkedList outArcs = (LinkedList) outgoingArcs.clone();
-                Iterator<Arc> arcIt = outArcs.iterator();
-                while (arcIt.hasNext())
-                {
-                        Arc currArc = arcIt.next();
-                        currArc.clear();
-                        count++;
-                }
-                outgoingArcs.clear();
-                outArcs.clear();
-
-                return count;
-                 */
-
         int count = outgoingArcs.size();
         Object[] arcs = outgoingArcs.toArray();
         outgoingArcs.clear();
@@ -732,22 +697,6 @@ public class State
      */
     public int removeIncomingArcs()
     {
-                /*
-                int count = 0;
-                LinkedList inArcs = (LinkedList) incomingArcs.clone();
-                Iterator<Arc> arcIt = inArcs.iterator();
-                while (arcIt.hasNext())
-                {
-                        Arc currArc = arcIt.next();
-                        currArc.clear();
-                        count++;
-                }
-                incomingArcs.clear();
-                inArcs.clear();
-
-                return count;
-                 */
-
         int count = incomingArcs.size();
         Object[] arcs = incomingArcs.toArray();
         incomingArcs.clear();
@@ -756,11 +705,6 @@ public class State
             ((Arc) arc).clear();
         }
         return count;
-    }
-
-    public boolean isSafe()
-    {
-        return cost < MAX_COST;
     }
 
     /**
@@ -1023,15 +967,7 @@ public class State
 
         return enabled;
     }
-/*
-    public boolean contains(int x1, int y1)
-    {
-        int radius2 = radius * radius;
-        int distance2 = (x - x1) * (x - x1) + (y - y1) * (y - y1);
 
-        return (distance2 <= radius2);
-    }
-*/
     public Listeners getListeners()
     {
         if (listeners == null)

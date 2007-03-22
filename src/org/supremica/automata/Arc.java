@@ -50,6 +50,7 @@
 package org.supremica.automata;
 
 import java.io.Serializable;
+import org.supremica.util.Args;
 import org.supremica.log.*;
 import java.util.Comparator;
 import net.sourceforge.waters.model.base.Proxy;
@@ -70,28 +71,14 @@ public class Arc
     public static final double UNDEF_PROBABILITY = -1;
     private double probability = UNDEF_PROBABILITY;  
     
-    private Arc(State from, State to)
-	throws IllegalArgumentException
+    public Arc(State from, State to, LabeledEvent event)
     {
-        if (from == null)
-        {
-            throw new IllegalArgumentException("State from must be non null");
-        }
-        
-        if (to == null)
-        {
-            throw new IllegalArgumentException("State to must be non null");
-        }
+        Args.checkForNull(from);
+        Args.checkForNull(to);
+        Args.checkForNull(event);
         
         this.fromState = from;
         this.toState = to;
-    }
-    
-    public Arc(State from, State to, LabeledEvent event)
-        throws IllegalArgumentException
-    {
-        this(from, to);
-        
         this.event = event;
     }
     
@@ -101,7 +88,6 @@ public class Arc
         this.fromState = other.fromState;
         this.toState = other.toState;
     }
-    
     
     public TransitionProxy clone()
     {   

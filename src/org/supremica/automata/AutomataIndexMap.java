@@ -54,11 +54,11 @@ import java.util.*;
 
 public class AutomataIndexMap
 {
-    private final HashMap<Automaton, Integer> automatonToIndexMap;
+    private final Map<Automaton, Integer> automatonToIndexMap;
     private final Automaton[] indexToAutomatonArray;    
-    private final HashMap<AutomatonAndStateEntry, Integer> automatonStateEntryToIndexMap;
-    private final HashMap<AutomatonAndIntegerEntry, State> automatonIntegerEntryToStateMap;
-    private final HashMap<LabeledEvent, Integer> eventToIndexMap;
+    private final Map<AutomatonAndStateEntry, Integer> automatonStateEntryToIndexMap;
+    private final Map<AutomatonAndIntegerEntry, State> automatonIntegerEntryToStateMap;
+    private final Map<LabeledEvent, Integer> eventToIndexMap;
     private final LabeledEvent[] indexToEventArray;
     
     private static Logger logger = LoggerFactory.createLogger(AutomataIndexMap.class);
@@ -100,7 +100,7 @@ public class AutomataIndexMap
             }
         }
         
-        // The eventIndex hashmaps is filled
+        // The eventIndex map is filled
         int eventIndex = 0;
         for (LabeledEvent currEvent : unionAlphabet)
         {
