@@ -1,7 +1,7 @@
 /*
  *   Copyright (C) 2006 Goran Cengic
  *
- *   This library is free software; you can redistribute it and/or
+ *   This file is free software; you can redistribute it and/or
  *   modify it under the terms of the GNU Lesser General Public
  *   License as published by the Free Software Foundation; either
  *   version 2.1 of the License, or (at your option) any later version.
@@ -34,134 +34,46 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.fuber.xsd.libraryelement.*;
-import org.supremica.automata.Automata;
-
-// TODO: load IEC 61499 application
-
-// TODO: make instance queue model
-
-// TODO: make event execution thread model
-
-// TODO: make jobs queue model
-
-// TODO: make algorithms execution thread model
+import javax.xml.bind.Marshaller;
 
 class ModelMaker
 {
 
-    private JAXBContext context;
-    private Unmarshaller unmarshaller;
+    private JAXBContext iecContext;
+    private Unmarshaller iecUnmarshaller;
+    private JAXBContext wmodContext;
+    private Marshaller wmodMarshaller;
 
-    private List libraryPathList = new LinkedList();
+	private String systemFileName;
+	private String outputFileName;
+    private List<File> libraryPathList = new LinkedList<File>();
 
 	private JaxbFBNetwork jaxbSystemFBNetwork;
 	private Map jaxbFBTypes = new HashMap();
 
-	private Automata automata = new Automata();
-	
-	private ModelMaker() 
+
+	private ModelMaker(String outputFileName, String systemFileName, String libraryPathBase, String libraryPath) 
 	{
-		// create unmarshaller
+
 		try
 		{
-			context = JAXBContext.newInstance("net.sourceforge.fuber.xsd.libraryelement");
-			unmarshaller = context.createUnmarshaller();
+			iecContext = JAXBContext.newInstance("net.sourceforge.fuber.xsd.libraryelement");
+			iecUnmarshaller = iecContext.createUnmarshaller();
+			
+			wmodContext = JAXBContext.newInstance("net.sourceforge.waters.xsd.module");
+			wmodMarshaller = wmodContext.createMarshaller();
+
 		}
 		catch (Exception e)
 		{
 			System.err.println(e);
 			System.exit(1);
 		}
-	}
 
-    // find the fileName in libraries and return the corresponding File
-    private File getFile(String fileName)
-    {
-		File theFile = new File(fileName);
+		this.outputFileName = outputFileName;
+		this.systemFileName = systemFileName;
 
-		if (libraryPathList != null)
-		{
-			for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
-			{
-				File curLibraryDir = (File) iter.next();
-				theFile = new File(curLibraryDir, fileName);
-				//System.out.println("ModelMaker.getFile(" + fileName + "): Looking for file in " + theFile.toString());
-				if (theFile.exists())
-				{
-					break;
-				}
-			}
-		}
 
-		if (!theFile.exists())
-		{
-			System.err.println("ModelMaker.getFile(" + fileName + "): The file " + fileName + " does not exist in the specified libraries...");
-			if (libraryPathList != null)
-			{
-				for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
-				{
-					System.err.println("\t" + ((File) iter.next()).getAbsolutePath() + File.separator);
-				}
-			}
-			else
-			{
-				System.err.println("\t. (current directory)");
-			}
-			System.err.println();
-			System.err.println("Usage: ModelMaker [-o outputFile] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
-			System.exit(1);
-		}
-
-		return theFile;
-    }
-
-    private void load(String fileName)
-    {
-	
-		System.out.println("ModelMaker.load(" + fileName + "): Loading file " + fileName);
-		
-		File file = getFile(fileName);
-		
-		try
-		{
-			Object unmarshalledXmlObject = unmarshaller.unmarshal(file);
-			if (unmarshalledXmlObject instanceof JaxbSystem)
-			{ 
-				JaxbSystem theSystem = (JaxbSystem) unmarshalledXmlObject;
-				if (theSystem.isSetDevice())
-				{
-					JaxbDevice theDevice = (JaxbDevice) theSystem.getDevice().get(0);
-					if(theDevice.isSetResource())
-					{
-						JaxbResource theResource = (JaxbResource) theDevice.getResource().get(0);
-						if (theResource.isSetFBNetwork())
-						{
-							System.out.println("ModelMaker.load(" + fileName + "): The file is IEC 61499 system.");
-							jaxbSystemFBNetwork = ((JaxbFBNetwork) theResource.getFBNetwork());
-						}
-					}
-				}
-			}
-			else if (unmarshalledXmlObject instanceof JaxbFBType)
-			{
-				JaxbFBType theType = (JaxbFBType) unmarshalledXmlObject;
-				if (theType.isSetName())
-				{
-					System.out.println("ModelMaker.load(" + fileName + "): The file is IEC 61499 FB type.");
-					jaxbFBTypes.put(theType.getName(),theType);
-				}				
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace(System.err);
-			System.exit(1);
-		}
-	}
-	
-
-	public void makeModel(String outputFileName, String systemFileName, String libraryPathBase, String libraryPath)
-	{
 		// convert libraryPath string into list of Files
 		if (libraryPath == null) // libraryPath is not specified
 		{
@@ -224,10 +136,111 @@ class ModelMaker
 
 				libraryPath = libraryPath.substring(libraryPath.indexOf(File.pathSeparatorChar)+1);
 			}
+		}
+	}
 
+
+
+    // find the fileName in libraries and return the corresponding File
+    private File getFile(String fileName)
+    {
+		File theFile = new File(fileName);
+
+		if (libraryPathList != null)
+		{
+			for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
+			{
+				File curLibraryDir = (File) iter.next();
+				theFile = new File(curLibraryDir, fileName);
+				//System.out.println("ModelMaker.getFile(" + fileName + "): Looking for file in " + theFile.toString());
+				if (theFile.exists())
+				{
+					break;
+				}
+			}
 		}
 
-		load(systemFileName);
+		if (!theFile.exists())
+		{
+			System.err.println("ModelMaker.getFile(" + fileName + "): The file " + fileName + " does not exist in the specified libraries...");
+			if (libraryPathList != null)
+			{
+				for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
+				{
+					System.err.println("\t" + ((File) iter.next()).getAbsolutePath() + File.separator);
+				}
+			}
+			else
+			{
+				System.err.println("\t. (current directory)");
+			}
+			System.err.println();
+			System.err.println("Usage: ModelMaker [-o outputFile] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
+			System.exit(1);
+		}
+
+		return theFile;
+    }
+
+    private void loadApplication(String fileName)
+    {
+	
+		System.out.println("ModelMaker.loadFile(" + fileName + "): Loading file " + fileName);
+		
+		File file = getFile(fileName);
+		
+		try
+		{
+			Object unmarshalledXmlObject = iecUnmarshaller.unmarshal(file);
+			if (unmarshalledXmlObject instanceof JaxbSystem)
+			{ 
+				JaxbSystem theSystem = (JaxbSystem) unmarshalledXmlObject;
+				if (theSystem.isSetDevice())
+				{
+					JaxbDevice theDevice = (JaxbDevice) theSystem.getDevice().get(0);
+					if(theDevice.isSetResource())
+					{
+						JaxbResource theResource = (JaxbResource) theDevice.getResource().get(0);
+						if (theResource.isSetFBNetwork())
+						{
+							System.out.println("ModelMaker.loadFile(" + fileName + "): The file is IEC 61499 system.");
+							jaxbSystemFBNetwork = ((JaxbFBNetwork) theResource.getFBNetwork());
+							
+						}
+					}
+				}
+			}
+			else if (unmarshalledXmlObject instanceof JaxbFBType)
+			{
+				JaxbFBType theType = (JaxbFBType) unmarshalledXmlObject;
+				if (theType.isSetName())
+				{
+					System.out.println("ModelMaker.loadFile(" + fileName + "): The file is IEC 61499 FB type.");
+					jaxbFBTypes.put(theType.getName(),theType);
+				}				
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace(System.err);
+			System.exit(1);
+		}
+	}
+	
+	public void makeModel()
+	{
+
+		// load IEC 61499 application
+		loadApplication(systemFileName);
+
+		// TODO: make instance queue model
+		
+		// TODO: make event execution thread model
+		
+		// TODO: make jobs queue model
+		
+		// TODO: make algorithms execution thread model
+	
 	}
 
 
@@ -287,14 +300,9 @@ class ModelMaker
 			
 		}			
 
-// 		System.out.println("Input arguments: " 
-// 						   + "\n\t output file name: " + outputFileName 
-// 						   + "\n\t system file name: " + systemFileName 
-// 						   + "\n\t library path base: " + libraryPathBase 
-// 						   + "\n\t library path: " + libraryPath);
-
-		(new ModelMaker()).makeModel(outputFileName,systemFileName,libraryPathBase,libraryPath);
+		(new ModelMaker(outputFileName,systemFileName,libraryPathBase,libraryPath)).makeModel();
 		System.exit(0);
+
 	}
 
 }
