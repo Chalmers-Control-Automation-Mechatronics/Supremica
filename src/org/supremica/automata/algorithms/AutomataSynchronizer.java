@@ -73,7 +73,6 @@ public class AutomataSynchronizer
         this.theAutomata = automata;
         this.syncOptions = options;
         synchHelper = new AutomataSynchronizerHelper(automata, options);
-        indexMap = synchHelper.getIndexMap();
         
         initialize();
     }
@@ -104,6 +103,8 @@ public class AutomataSynchronizer
             AutomataSynchronizerExecuter currSynchronizationExecuter = new AutomataSynchronizerExecuter(synchHelper);
             synchronizationExecuters.add(currSynchronizationExecuter);
         }
+  
+        indexMap = synchHelper.getIndexMap();    
     }
     
     public void execute()
