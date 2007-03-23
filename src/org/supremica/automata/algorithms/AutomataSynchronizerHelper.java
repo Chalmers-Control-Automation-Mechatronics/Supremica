@@ -57,6 +57,7 @@ import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
 import org.supremica.automata.AutomataIndexForm;
 import org.supremica.automata.AutomataIndexFormHelper;
+import org.supremica.automata.AutomataIndexMap;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
@@ -208,6 +209,11 @@ public final class AutomataSynchronizerHelper
         
         // Add state to stack
         addState(initialState);
+    }
+    
+    public AutomataIndexMap getIndexMap()
+    {
+        return theAutomataIndexForm.getIndexMap();
     }
     
     public SynchronizationOptions getSynchronizationOptions()

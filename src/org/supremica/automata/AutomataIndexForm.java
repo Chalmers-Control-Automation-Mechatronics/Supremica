@@ -217,6 +217,10 @@ public final class AutomataIndexForm
 		return theAutomata.size();
 	}
 
+    public AutomataIndexMap getIndexMap()
+    {
+        return indexMap;
+    }
 	/**
 	 * Give each automaton a unique index Remember that this index
 	 * must be consistent with getAutomatonAt(int) in Automata

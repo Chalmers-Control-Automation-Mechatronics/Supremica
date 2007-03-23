@@ -62,6 +62,7 @@ public class AutomataSynchronizer
     private AutomataSynchronizerHelper synchHelper;
     private SynchronizationOptions syncOptions;
     private ArrayList synchronizationExecuters;
+    private AutomataIndexMap indexMap;
     
     // For stopping execution
     private boolean stopRequested = false;
@@ -72,6 +73,7 @@ public class AutomataSynchronizer
         this.theAutomata = automata;
         this.syncOptions = options;
         synchHelper = new AutomataSynchronizerHelper(automata, options);
+        indexMap = synchHelper.getIndexMap();
         
         initialize();
     }
@@ -120,7 +122,7 @@ public class AutomataSynchronizer
             Automaton currAutomaton = (Automaton) autIt.next();
             
             currInitialState = currAutomaton.getInitialState();
-            initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
+            initialState[indexMap.getAutomatonIndex(currAutomaton)] = indexMap.getStateIndex(currAutomaton, currInitialState);
             
             comment.append(currAutomaton.getName());
             comment.append(syncOptions.getAutomatonNameSeparator());
