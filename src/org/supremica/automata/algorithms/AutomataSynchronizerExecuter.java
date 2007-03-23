@@ -49,6 +49,7 @@
  */
 package org.supremica.automata.algorithms;
 
+import org.supremica.automata.AutomataIndexMap;
 import org.supremica.log.*;
 import org.supremica.util.SupremicaException;
 import org.supremica.gui.*;
@@ -1170,6 +1171,8 @@ public final class AutomataSynchronizerExecuter
 	 */
 	private void addNextArcPermutation(int[] currState, int[] nextState, int currEventIndex, int index)
 	{
+        AutomataIndexMap indexMap = indexForm.getIndexMap();
+        
 		// Is this index an "end index"
 		if (index == Integer.MAX_VALUE)
 		{
@@ -1185,7 +1188,8 @@ public final class AutomataSynchronizerExecuter
 					Automaton theAutomaton = helper.getAutomaton();
 					org.supremica.automata.State fromState = theAutomaton.getStateWithIndex(helper.getStateIndex(currState));
 					org.supremica.automata.State toState = theAutomaton.getStateWithIndex(nextIndex);
-					LabeledEvent theEvent = theAutomaton.getAlphabet().getEventWithIndex(currEventIndex);
+					LabeledEvent theEvent = indexMap.getEvent(currEventIndex);
+                    //theAutomaton.getAlphabet().getEventWithIndex(currEventIndex);
 
 					// Create new arc
 					Arc newArc = new Arc(fromState, toState, theEvent);
