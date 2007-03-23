@@ -419,6 +419,7 @@ public class AutomataVerifier
         boolean allModulesControllable = true;
         boolean[] typeIsSupSpecTable = synchHelper.getAutomataIndexForm().getTypeIsSupSpecTable();
         boolean[] controllableEventsTable = synchHelper.getAutomataIndexForm().getControllableEventsTable();
+        AutomataIndexMap indexMap = synchHelper.getIndexMap();
         
         // Iterate over supervisors/specifications
         loop: for (Automaton supervisor: theAutomata)
@@ -426,7 +427,7 @@ public class AutomataVerifier
             // To enable the overriding the AutomatonType of automata we use typeIsSupSpecTable!
             // if ((supervisor.getType() == AutomatonType.Supervisor) || (supervisor.getType() == AutomatonType.SPECIFICATION))
             // if (!typeIsPlantTable[supervisor.getIndex()])
-            if (typeIsSupSpecTable[supervisor.getIndex()])
+            if (typeIsSupSpecTable[indexMap.getAutomatonAt(supervisor)])
             {
                 // This is a relevant automaton!
                 selectedAutomata.addAutomaton(supervisor);
@@ -437,7 +438,7 @@ public class AutomataVerifier
                 {
                     // To enable overriding the controllability status of events!
                     //if (!event.isControllable())
-                    if (!controllableEventsTable[event.getIndex()])
+                    if (!controllableEventsTable[indexMap.getEventIndex(event)])
                     {
                         // Note that in the language inclusion case, the
                         // uncontrollableEventToPlantsMap has been adjusted...
