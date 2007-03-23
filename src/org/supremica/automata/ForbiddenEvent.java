@@ -16,10 +16,10 @@ import net.sourceforge.waters.model.des.EventProxy;
 public class ForbiddenEvent
 	extends LabeledEvent
 {
-	public ForbiddenEvent()
-	{
-		super();
-	}
+//	public ForbiddenEvent()
+//	{
+//		super();
+//	}
 	
 	public ForbiddenEvent(String label)
 	{

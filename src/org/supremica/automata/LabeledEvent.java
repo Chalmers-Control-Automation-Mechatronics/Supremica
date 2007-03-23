@@ -63,7 +63,7 @@ public class LabeledEvent
 {
     /** The label is what shows in the dot-figures, this is the
      * global identifier of an event, appearing in the alphabet. */
-    private String label = "";
+    private final String label;
     
     private boolean controllable = true;
     private boolean prioritized = true;
@@ -75,8 +75,8 @@ public class LabeledEvent
     private int expansionPriority = -1;
     private int index = -1;
     
-    public LabeledEvent()
-    {}
+//    public LabeledEvent()
+//    {}
     
     public LabeledEvent(String label)
     {
@@ -137,15 +137,15 @@ public class LabeledEvent
         return label;
     }
     
-    /**
-     * @deprecated
-     * There is no reason why setlabel should not be immutable
-     */
-    @Deprecated    
-    public void setLabel(String label)
-    {
-        this.label = label;
-    }
+//    /**
+//     * @deprecated
+//     * There is no reason why setlabel should not be immutable
+//     */
+////    @Deprecated    
+////    public void setLabel(String label)
+////    {
+////        this.label = label;
+////    }
     
     public boolean isControllable()
     {
