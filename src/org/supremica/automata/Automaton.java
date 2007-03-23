@@ -1524,7 +1524,7 @@ public class Automaton
         {
             return;
         }
-        
+
         currState.setVisited(true);
 
         if (currState.getAssociatedState() == null)
@@ -1677,15 +1677,15 @@ public class Automaton
                             " is reserved and must be controllable and unobservable!");
                         return;
                     }
-                }                
+                }
             }
-            
+
 
             // tau_u
             String silentUName = Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.get();
             LabeledEvent tau_u = getAlphabet().getEvent(silentUName);
             if (alpha.getUncontrollableAlphabet().size() > 0)
-            {   
+            {
                 if (tau_u == null)
                 {
                     tau_u = new LabeledEvent(silentUName);
@@ -1841,7 +1841,7 @@ public class Automaton
         }
         return false;
     }
-    
+
     /**
      * Returns true if there are no obvious differences between this
      * automaton and the other. Note, that this method only compares the
@@ -2456,4 +2456,45 @@ public class Automaton
     {
         return getName().compareTo(((Automaton) partner).getName());
     }
+
+    // Events are (supposed to be) immutable, you cannot change the label once constructed
+    // Most of the effects of this can be overcome by this method
+    // We do not test if the old_event actually exists in the alphabet, we merely (try to) remove it
+    // We do not test if new_event already exists, merely (try to) add it
+    public boolean replaceEvent(LabeledEvent old_event, LabeledEvent new_event)
+    {
+		boolean done_anything = false; // not yet...
+
+		// We start with removing teh old event, and adding teh new event, '
+		// to minimize the risk for ending up in an inconsistent state, due to exceptions
+		// remove old_event from the alphabet - *no* testing for existence, may throw!
+		getAlphabet().removeEvent(old_event);
+
+		// add new_event to the alphabet - *no* testing for duplicates, may throw!
+		getAlphabet.addEvent(new_event);
+
+		// note that if addEvent above throws, we have removed the old event, but not added the new one
+		// if the removeEvent throws we have done nothing, but a catcher will never know the difference,
+		// since both removeEvent and addEvent throw IllegalArgumentException. Is this good?
+
+		// iterate over all arcs
+		// if the arc refers to old_event, make it refer to new_event
+		for (Iterator<Arc> ait = arcIterator(); ait.hasNext(); )
+		{
+			Arc arc = ait.next();
+			LabeledEvent event = arc.getEvent();
+			if(event == old_event)	// yes, we test for equality of the references (hard core equality, not for sissies! :-)
+			{
+				arc.setEvent(new_event);
+				done_anything = true;	// now we've done something
+			}
+		}
+
+	}
+
+	// Since events are immutable, renaming is actually replacing teh old with a new
+	public boolean renameEvent(LabeledEvent old_event, final String new_label)
+	{
+		return replaceEvent(old_event, new_event, true);
+	}
 }

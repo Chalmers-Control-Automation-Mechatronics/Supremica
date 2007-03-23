@@ -16,18 +16,21 @@ class Philosopher
 {
 	static State[] states =
 	{
-		new State("s0"), new State("lu"),    // left fork picked up
+		new State("s0"), 	// idle a.k.a. init
+		new State("lu"),    // left fork picked up
 		new State("ru"),    // right fork picked up
 		new State("eat"),    // eating
 		new State("ld"),    // left fork put down
 		new State("rd")    // right fork put down
 	};
+	// iondices into states[]
 	final static int INIT = 0;
 	final static int L_UP = 1;
 	final static int R_UP = 2;
 	final static int EAT = 3;
 	final static int L_DN = 4;
 	final static int R_DN = 5;
+
 	static LabeledEvent[] events =
 	{
 		new LabeledEvent("L_take"),    // pick up left
@@ -35,6 +38,7 @@ class Philosopher
 		new LabeledEvent("L_put"),    // put down left
 		new LabeledEvent("R_put"),    // put down right
 	};
+	// indices into events[]
 	final static int L_TAKE = 0;
 	final static int R_TAKE = 1;
 	final static int L_PUT = 2;
@@ -104,12 +108,21 @@ class Philosopher
 		inited = true;
 	}
 
+	// Fake renaming, must replace the event due to immutability
+	private void renameEvent(Automaton sm, int ev_index, final String new_label)
+	{
+		Alphabet alpha = sm.getAlphabet();
+		LabeledEvent ev_old = alpha.getEvent(events[ev_index].getLabel());
+		LabeledEvent ev_new = new LabeledEvent(new_label);
+		sm.replaceEvent(ev_old, ev_new);
+
+	}
+
 	public Automaton build(int id, int l_fork, int r_fork)
 		throws Exception
 	{
-		Automaton sm = new Automaton(philo);
-
 		// deep copy, I hope
+		Automaton sm = new Automaton(philo);
 		sm.setName("Philo" + NAME_SEP + id);
 
 		// adjust the event names according to l_fork and r_fork
@@ -117,15 +130,14 @@ class Philosopher
 		// R_take becomes take<id>.<r_fork>
 		// L_put becomes put<id>.<l_fork>
 		// R_put becomes put<id>.<r_fork>
-		Alphabet alpha = sm.getAlphabet();
+		renameEvent(sm, L_TAKE, "take" + id + LABEL_SEP + l_fork);
+		renameEvent(sm, R_TAKE, "take" + id + LABEL_SEP + r_fork);
+		renameEvent(sm, L_PUT, "put" + id + LABEL_SEP + l_fork);
+		renameEvent(sm, R_PUT, "put" + id + LABEL_SEP + r_fork);
 
-		alpha.getEvent(events[L_TAKE].getLabel()).setLabel("take" + id + LABEL_SEP + l_fork);
-		alpha.getEvent(events[R_TAKE].getLabel()).setLabel("take" + id + LABEL_SEP + r_fork);
-		alpha.getEvent(events[L_PUT].getLabel()).setLabel("put" + id + LABEL_SEP + l_fork);
-		alpha.getEvent(events[R_PUT].getLabel()).setLabel("put" + id + LABEL_SEP + r_fork);
-
-		// must rehash since we've changed the label (that's the way it works (unfortunately))
-		alpha.rehash();
+		// Used Automaton::replaceEvent, so no need to rehash
+		// // must rehash since we've changed the label (that's the way it works (unfortunately))
+		// alpha.rehash();
 
 		return sm;
 	}
@@ -134,16 +146,18 @@ class Philosopher
 // Builds a Philo automaton
 class EatingPhilosopher
 {
-	static State[] states = { new State("think"), new State("lu"),    // left fork picked up
-							  new State("ru"),    // right fork picked up
-
-	//new State("eat"),
-	new State("ready"),    // ready for eating
-							  new State("ld"),    // left fork put down
-							  new State("rd"),    // right fork put down
-
-	//new State("eat2")
-	new State("eat") };
+	static State[] states =
+	{	new State("think"),
+		new State("lu"),    // left fork picked up
+	  	new State("ru"),    // right fork picked up
+		//new State("eat"),
+		new State("ready"),    // ready for eating
+	  	new State("ld"),    // left fork put down
+	  	new State("rd"),    // right fork put down
+		//new State("eat2")
+		new State("eat")
+	};
+	// indices into states[]
 	final static int INIT = 0;
 	final static int L_UP = 1;
 	final static int R_UP = 2;
@@ -151,11 +165,15 @@ class EatingPhilosopher
 	final static int L_DN = 4;
 	final static int R_DN = 5;
 	final static int EAT2 = 6;
-	static LabeledEvent[] events = { new LabeledEvent("L_take"),    // pick up left
-									 new LabeledEvent("R_take"),    // pick up right
-									 new LabeledEvent("L_put"),    // put down left
-									 new LabeledEvent("R_put"),    // put down right
-									 new LabeledEvent("Start_eating") };
+
+	static LabeledEvent[] events =
+	{	new LabeledEvent("L_take"),    // pick up left
+		new LabeledEvent("R_take"),    // pick up right
+		new LabeledEvent("L_put"),    // put down left
+		new LabeledEvent("R_put"),    // put down right
+		new LabeledEvent("Start_eating")
+	};
+	// indicies into events[]
 	final static int L_TAKE = 0;
 	final static int R_TAKE = 1;
 	final static int L_PUT = 2;
@@ -227,6 +245,16 @@ class EatingPhilosopher
 		inited = true;
 	}
 
+	// Fake renaming, must replace the event due to immutability
+	private void renameEvent(Automaton sm, int ev_index, final String new_label)
+	{
+		Alphabet alpha = sm.getAlphabet();
+		LabeledEvent ev_old = alpha.getEvent(events[ev_index].getLabel());
+		LabeledEvent ev_new = new LabeledEvent(new_label);
+		sm.replaceEvent(ev_old, ev_new);
+
+	}
+
 	public Automaton build(int id, int l_fork, int r_fork)
 		throws Exception
 	{
@@ -240,16 +268,14 @@ class EatingPhilosopher
 		// R_take becomes take<id>.<r_fork>
 		// L_put becomes put<id>.<l_fork>
 		// R_put becomes put<id>.<r_fork>
-		Alphabet alpha = sm.getAlphabet();
+		renameEvent(sm, L_TAKE, "take" + id + LABEL_SEP + l_fork);
+		renameEvent(sm, R_TAKE, "take" + id + LABEL_SEP + r_fork);
+		renameEvent(sm, L_PUT, "put" + id + LABEL_SEP + l_fork);
+		renameEvent(sm, R_PUT, "put" + id + LABEL_SEP + r_fork);
 
-		alpha.getEvent(events[L_TAKE].getLabel()).setLabel("take" + id + LABEL_SEP + l_fork);
-		alpha.getEvent(events[R_TAKE].getLabel()).setLabel("take" + id + LABEL_SEP + r_fork);
-		alpha.getEvent(events[L_PUT].getLabel()).setLabel("put" + id + LABEL_SEP + l_fork);
-		alpha.getEvent(events[R_PUT].getLabel()).setLabel("put" + id + LABEL_SEP + r_fork);
-		alpha.getEvent(events[START_EATING].getLabel()).setLabel("startEating" + id);
-
-		// must rehash since we've changed the label (that's the way it works)
-		alpha.rehash();
+		// Used Automaton::replaceEvent, so no need to rehash
+		// // must rehash since we've changed the label (that's the way it works (unfortunately))
+		// alpha.rehash();
 
 		return sm;
 	}
@@ -318,16 +344,22 @@ interface ChopstickBuilder
 class Chopstick
 	implements ChopstickBuilder
 {
-	static State[] states = { new State("0"),
-							  new State("1") };
-	static LabeledEvent[] events = { new LabeledEvent("L_up"),
-									 new LabeledEvent("R_up"),
-									 new LabeledEvent("L_dn"),
-									 new LabeledEvent("R_dn") };
-	static Arc[] arcs = { new Arc(states[0], states[1], events[0]),
-						  new Arc(states[1], states[0], events[2]),
-						  new Arc(states[0], states[1], events[1]),
-						  new Arc(states[1], states[0], events[3]) };
+	static State[] states =
+	{	new State("0"),
+		new State("1")
+	};
+	static LabeledEvent[] events =
+	{	new LabeledEvent("L_up"),
+		new LabeledEvent("R_up"),
+		new LabeledEvent("L_dn"),
+		new LabeledEvent("R_dn")
+	};
+	static Arc[] arcs =
+	{	new Arc(states[0], states[1], events[0]),
+		new Arc(states[1], states[0], events[2]),
+		new Arc(states[0], states[1], events[1]),
+		new Arc(states[1], states[0], events[3])
+	};
 
 	final static int L_TAKE = 0;
 	final static int R_TAKE = 1;
@@ -387,6 +419,16 @@ class Chopstick
 		inited = true;
 	}
 
+	// Fake renaming, must replace the event due to immutability
+	private void renameEvent(Automaton sm, int ev_index, final String new_label)
+	{
+		Alphabet alpha = sm.getAlphabet();
+		LabeledEvent ev_old = alpha.getEvent(events[ev_index].getLabel());
+		LabeledEvent ev_new = new LabeledEvent(new_label);
+		sm.replaceEvent(ev_old, ev_new);
+
+	}
+
 	public Automaton build(int id, int l_philo, int r_philo)
 		throws Exception
 	{
@@ -395,15 +437,20 @@ class Chopstick
 		// deep copy, I hope
 		sm.setName("Fork" + NAME_SEP + id);
 
-		Alphabet alpha = sm.getAlphabet();
+		// Alphabet alpha = sm.getAlphabet();
 
-		alpha.getEvent(events[L_TAKE].getLabel()).setLabel("take" + l_philo + LABEL_SEP + id);
-		alpha.getEvent(events[R_TAKE].getLabel()).setLabel("take" + r_philo + LABEL_SEP + id);
-		alpha.getEvent(events[L_PUT].getLabel()).setLabel("put" + l_philo + LABEL_SEP + id);
-		alpha.getEvent(events[R_PUT].getLabel()).setLabel("put" + r_philo + LABEL_SEP + id);
+		renameEvent(sm, L_TAKE, "take" + l_philo + LABEL_SEP + id);
+		renameEvent(sm, R_TAKE, "take" + r_philo + LABEL_SEP + id);
+		renameEvent(sm, L_PUT, "put" + l_philo + LABEL_SEP + id);
+		renameEvent(sm, R_PUT, "put" + r_philo + LABEL_SEP + id);
 
-		// must rehash since we've changed the label (that's the way it works)
-		alpha.rehash();
+		// alpha.getEvent(events[L_TAKE].getLabel()).setLabel("take" + l_philo + LABEL_SEP + id);
+		// alpha.getEvent(events[R_TAKE].getLabel()).setLabel("take" + r_philo + LABEL_SEP + id);
+		// alpha.getEvent(events[L_PUT].getLabel()).setLabel("put" + l_philo + LABEL_SEP + id);
+		// alpha.getEvent(events[R_PUT].getLabel()).setLabel("put" + r_philo + LABEL_SEP + id);
+
+		// // must rehash since we've changed the label (that's the way it works)
+		// alpha.rehash();
 
 		return sm;
 	}
@@ -482,6 +529,16 @@ class MemoryChopstick
 		inited = true;
 	}
 
+	// Fake renaming, must replace the event due to immutability
+	private void renameEvent(Automaton sm, int ev_index, final String new_label)
+	{
+		Alphabet alpha = sm.getAlphabet();
+		LabeledEvent ev_old = alpha.getEvent(events[ev_index].getLabel());
+		LabeledEvent ev_new = new LabeledEvent(new_label);
+		sm.replaceEvent(ev_old, ev_new);
+
+	}
+
 	public Automaton build(int id, int l_philo, int r_philo)
 		throws Exception
 	{
@@ -490,15 +547,20 @@ class MemoryChopstick
 		// deep copy, I hope
 		sm.setName("Fork" + NAME_SEP + id);
 
-		Alphabet alpha = sm.getAlphabet();
+		// Alphabet alpha = sm.getAlphabet();
 
-		alpha.getEvent(events[L_TAKE].getLabel()).setLabel("take" + l_philo + LABEL_SEP + id);
-		alpha.getEvent(events[R_TAKE].getLabel()).setLabel("take" + r_philo + LABEL_SEP + id);
-		alpha.getEvent(events[L_PUT].getLabel()).setLabel("put" + l_philo + LABEL_SEP + id);
-		alpha.getEvent(events[R_PUT].getLabel()).setLabel("put" + r_philo + LABEL_SEP + id);
+		renameEvent(sm, L_TAKE, "take" + l_philo + LABEL_SEP + id);
+		renameEvent(sm, R_TAKE, "take" + r_philo + LABEL_SEP + id);
+		renameEvent(sm, L_PUT, "put" + l_philo + LABEL_SEP + id);
+		renameEvent(sm, R_PUT, "put" + r_philo + LABEL_SEP + id);
 
-		// must rehash since we've changed the label (that's the way it works)
-		alpha.rehash();
+		// alpha.getEvent(events[L_TAKE].getLabel()).setLabel("take" + l_philo + LABEL_SEP + id);
+		// alpha.getEvent(events[R_TAKE].getLabel()).setLabel("take" + r_philo + LABEL_SEP + id);
+		// alpha.getEvent(events[L_PUT].getLabel()).setLabel("put" + l_philo + LABEL_SEP + id);
+		// alpha.getEvent(events[R_PUT].getLabel()).setLabel("put" + r_philo + LABEL_SEP + id);
+
+		// // must rehash since we've changed the label (that's the way it works)
+		// alpha.rehash();
 
 		return sm;
 	}
@@ -538,7 +600,7 @@ public class DiningPhilosophers
 		}
 	}
 
-	public DiningPhilosophers(int num, boolean l_take, boolean r_take, 
+	public DiningPhilosophers(int num, boolean l_take, boolean r_take,
 							  boolean l_put, boolean r_put, boolean animation, boolean forkmemory)
 		throws Exception
 	{

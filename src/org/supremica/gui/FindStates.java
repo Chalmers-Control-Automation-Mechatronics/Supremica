@@ -1047,7 +1047,7 @@ class FindStatesFrame
 		public ForbidButton()
 		{
 			super("Forbid");
-			setToolTipText("Forbid found states"); // if none selected, should forbid all?
+			setToolTipText("Forbid found states");
 
 			addActionListener(new ActionListener()
 			{
