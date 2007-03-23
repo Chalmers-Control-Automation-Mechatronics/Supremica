@@ -829,6 +829,7 @@ public final class AutomataSynchronizerHelper
         Automaton problemAutomaton;
         int[] currState = new int[automataIndices.length];
         State[][] stateTable = getIndexFormStateTable();
+        AutomataIndexMap indexMap = theAutomataIndexForm.getIndexMap();
         
         for (Iterator stateHolderIterator = stateMemorizer.iterator(automataIndices);
         stateHolderIterator.hasNext(); )
@@ -838,7 +839,7 @@ public final class AutomataSynchronizerHelper
             currState = stateHolder.getArray();
             problemPlant = stateHolder.getProblemPlant();
             problemEvent = stateHolder.getProblemEvent();
-            problemAutomaton = theAutomata.getAutomatonAt(problemPlant);
+            problemAutomaton = indexMap.getAutomatonAt(problemPlant);
             
             StringBuffer state = new StringBuffer();
             boolean firstEntry = true;
@@ -858,7 +859,7 @@ public final class AutomataSynchronizerHelper
                         state.append(", ");
                     }
                     
-                    state.append(theAutomata.getAutomatonAt(automataIndices[i]).getName());
+                    state.append(indexMap.getAutomatonAt(automataIndices[i]).getName());
                     state.append(": ");
                     state.append(stateTable[automataIndices[i]][currState[i]].getName());
                 }

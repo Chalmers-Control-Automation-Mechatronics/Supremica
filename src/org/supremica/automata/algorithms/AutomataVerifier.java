@@ -928,6 +928,7 @@ public class AutomataVerifier
     private void excludeUncontrollableStates(int[] similarAutomata, Automata selectedAutomata, int[] automataIndices)
     throws Exception
     {
+        AutomataIndexMap indexMap = synchHelper.getIndexMap();
         String addedAutomata = "";
         int start = selectedAutomata.size() - automataIndices.length;
         
@@ -938,7 +939,7 @@ public class AutomataVerifier
             
             for (int i = 0; i < automataIndices.length; i++)
             {
-                stateAmount = stateAmount * theAutomata.getAutomatonAt(automataIndices[i]).nbrOfStates();
+                stateAmount = stateAmount * indexMap.getAutomatonAt(automataIndices[i]).nbrOfStates();
             }
         }
         else
@@ -946,7 +947,7 @@ public class AutomataVerifier
             // Been here before, already added some automata
             for (int i = 0; i < start; i++)
             {
-                addedAutomata = addedAutomata + " " + theAutomata.getAutomatonAt(similarAutomata[i]);
+                addedAutomata = addedAutomata + " " + indexMap.getAutomatonAt(similarAutomata[i]);
             }
             
             // Increase the limit each time
@@ -961,10 +962,10 @@ public class AutomataVerifier
         for (int i = start; i < similarAutomata.length; i++)
         {
             // Add automaton
-            selectedAutomata.addAutomaton(theAutomata.getAutomatonAt(similarAutomata[i]));
+            selectedAutomata.addAutomaton(indexMap.getAutomatonAt(similarAutomata[i]));
             
-            addedAutomata = addedAutomata + " " + theAutomata.getAutomatonAt(similarAutomata[i]);
-            stateAmount = stateAmount * theAutomata.getAutomatonAt(similarAutomata[i]).nbrOfStates();
+            addedAutomata = addedAutomata + " " + indexMap.getAutomatonAt(similarAutomata[i]);
+            stateAmount = stateAmount * indexMap.getAutomatonAt(similarAutomata[i]).nbrOfStates();
             
             if ((stateAmount > stateAmountLimit) || (i == similarAutomata.length - 1))
             {
