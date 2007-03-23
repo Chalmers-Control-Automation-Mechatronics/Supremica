@@ -821,7 +821,7 @@ public class Automaton
         }
         arc.clear();
     }
-    
+
     public boolean containsState(State state)
         throws IllegalArgumentException
     {
@@ -2490,11 +2490,13 @@ public class Automaton
 			}
 		}
 
+		return done_anything;
 	}
 
-	// Since events are immutable, renaming is actually replacing teh old with a new
+	// Since events are immutable, renaming is actually replacing the old with a new
+	// The new one will be created with default properties (controllability etc), is that OK?
 	public boolean renameEvent(LabeledEvent old_event, final String new_label)
 	{
-		return replaceEvent(old_event, new_event, true);
+		return replaceEvent(old_event, new LabeledEvent(new_label));
 	}
 }
