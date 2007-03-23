@@ -107,6 +107,18 @@ public final class Args
             throw new IndexOutOfBoundsException(aNumber + " not in range " + aLow + ".." + Integer.MAX_VALUE);
         }
     }    
+
+        /**
+     * Throw an <code>IndexOutOfBoundsException</code> if not 0 <= aNumber <= Integer.MAX_VALUE
+     * returns <code>false</code>.
+     */
+    public static void checkForIndex(int aNumber)
+    {
+        if (aNumber < 0)
+        {
+            throw new IndexOutOfBoundsException(aNumber + " is not >= 0.");
+        }
+    } 
     
     /**
      * Throw an <code>IllegalArgumentException</code> only if <code>aCollection.isEmpty</code>

@@ -49,7 +49,7 @@
 package org.supremica.automata;
 
 import org.supremica.log.*;
-
+import org.supremica.util.Args;
 import java.util.*;
 
 public final class AutomataIndexMap
@@ -119,19 +119,13 @@ public final class AutomataIndexMap
      */
     public int getAutomatonIndex(final Automaton automaton)
     {
-        if (automaton == null)
-        {
-            throw new IllegalArgumentException("automaton has to be non-null");
-        }
+        Args.checkForNull(automaton);
         return automatonToIndexMap.get(automaton);
     }
     
     public Automaton getAutomatonAt(final int index)
     {
-        if (index < 0)
-        {
-            throw new IndexOutOfBoundsException("index has to >= 0");
-        }
+        Args.checkForIndex(index);
         return indexToAutomatonArray[index];
     }
       
@@ -144,19 +138,13 @@ public final class AutomataIndexMap
      */
     public int getEventIndex(final LabeledEvent event)
     {
-         if (event == null)
-        {
-            throw new IllegalArgumentException("event has to be non-null");
-        }
+        Args.checkForNull(event);
         return eventToIndexMap.get(event);
     }
     
-    public LabeledEvent getEvent(final int index)
+    public LabeledEvent getEventAt(final int index)
     {
-        if (index < 0)
-        {
-            throw new IndexOutOfBoundsException("index has to >= 0");
-        }
+        Args.checkForIndex(index);
         return indexToEventArray[index];
     }
     
@@ -170,27 +158,15 @@ public final class AutomataIndexMap
      */
     public int getStateIndex(final Automaton automaton, final State state)
     {
-        if (automaton == null)
-        {
-            throw new IllegalArgumentException("automaton has to be non-null");
-        }
-        if (state == null)
-        {
-            throw new IllegalArgumentException("state has to be non-null");
-        }        
+        Args.checkForNull(automaton);
+        Args.checkForNull(state);      
         return automatonStateEntryToIndexMap.get(new AutomatonAndStateEntry(automaton, state));
     }
     
     public State getStateAt(final Automaton automaton, final int stateIndex)
     {
-        if (automaton == null)
-        {
-            throw new IllegalArgumentException("automaton has to be non-null");
-        }
-        if (stateIndex < 0)
-        {
-            throw new IndexOutOfBoundsException("index has to >= 0");
-        }
+        Args.checkForNull(automaton);
+        Args.checkForIndex(stateIndex);
         return automatonIntegerEntryToStateMap.get(new AutomatonAndIntegerEntry(automaton, stateIndex));
     }
     

@@ -1188,7 +1188,7 @@ public final class AutomataSynchronizerExecuter
 					Automaton theAutomaton = helper.getAutomaton();
 					org.supremica.automata.State fromState = theAutomaton.getStateWithIndex(helper.getStateIndex(currState));
 					org.supremica.automata.State toState = theAutomaton.getStateWithIndex(nextIndex);
-					LabeledEvent theEvent = indexMap.getEvent(currEventIndex);
+					LabeledEvent theEvent = indexMap.getEventAt(currEventIndex);
                     //theAutomaton.getAlphabet().getEventWithIndex(currEventIndex);
 
 					// Create new arc
