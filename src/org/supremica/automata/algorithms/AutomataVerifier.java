@@ -597,6 +597,7 @@ public class AutomataVerifier
         // Was the result uncontrollable?
         if (!synchHelper.getAutomataIsControllable())
         {
+            AutomataIndexMap indexMap = synchHelper.getIndexMap();
             // Try to add some more automata
             // Make array with indices of selected automata to remember which were originally selected
             int[] automataIndices = new int[selectedAutomata.size()];
@@ -605,7 +606,7 @@ public class AutomataVerifier
             for (Iterator<Automaton> autIt = selectedAutomata.iterator();
             autIt.hasNext(); )
             {
-                automataIndices[i++] = autIt.next().getIndex();
+                automataIndices[i++] = indexMap.getAutomatonIndex(autIt.next());
             }
             
             if (Config.VERBOSE_MODE.isTrue())
@@ -801,6 +802,7 @@ public class AutomataVerifier
         double[] arraySortValue = new double[amountOfUnselected];
         int count = 0;
         
+        AutomataIndexMap indexMap = synchHelper.getIndexMap();
         for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
         {
             currAutomaton = autIt.next();
@@ -817,7 +819,7 @@ public class AutomataVerifier
             // Did we get a value?
             if (arraySortValue[count] > 0)
             {
-                tempArray[count++] = currAutomaton.getIndex();
+                tempArray[count++] = indexMap.getAutomatonIndex(currAutomaton);
                 
                 // Have we found everything possible already?
                 if (count == amountOfUnselected)
