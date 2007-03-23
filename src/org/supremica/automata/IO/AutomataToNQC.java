@@ -62,7 +62,7 @@ public class AutomataToNQC
 {
 	private static Logger logger = LoggerFactory.createLogger(AutomataToNQC.class);
 	private Automata theAutomata;
-//	private AutomataSynchronizerHelper syncHelper;
+    private AutomataIndexMap indexMap;
 	private SynchronizationType syncType = SynchronizationType.PRIORITIZED;
 	private Alphabet allEvents;
 
@@ -74,7 +74,8 @@ public class AutomataToNQC
 
 	private void initialize()
 	{
-		allEvents = theAutomata.setIndices();
+        indexMap = new AutomataIndexMap(theAutomata);
+		allEvents = theAutomata.getUnionAlphabet();
 	}
 
 	void printBeginProgram(PrintWriter pw)
@@ -107,7 +108,7 @@ public class AutomataToNQC
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = currEvent.getSynchIndex();
+			int currEventIndex = indexMap.getEventIndex(currEvent);
 
 			printBooleanVariableDeclaration(pw, "e_" + currEventIndex, currEvent.getLabel() + (currEvent.isControllable()
 																							   ? " controllable"
@@ -130,8 +131,8 @@ public class AutomataToNQC
 				throw new SupremicaException("AutomataToNQC.printStateVariables: all automata must have an initial state");
 			}
 
-			int currAutomatonIndex = currAutomaton.getSynchIndex();
-			int currStateIndex = initialState.getSynchIndex();
+			int currAutomatonIndex = indexMap.getAutomatonIndex(currAutomaton);
+			int currStateIndex = indexMap.getStateIndex(currAutomaton, initialState);
 
 			printBooleanVariableDeclaration(pw, "q_" + currAutomatonIndex, initialState.getName() + " in " + currAutomaton.getName(), Integer.toString(currStateIndex));
 		}
@@ -204,7 +205,7 @@ public class AutomataToNQC
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = currEvent.getSynchIndex();
+			int currEventIndex = indexMap.getEventIndex(currEvent);
 
 			pw.println("\n\t\t// Enable condition for event \"" + currEvent.getLabel() + "\"");
 
@@ -216,7 +217,7 @@ public class AutomataToNQC
 			{
 				Automaton currAutomaton = (Automaton) autIt.next();
 				Alphabet currAlphabet = currAutomaton.getAlphabet();
-				int currAutomatonIndex = currAutomaton.getSynchIndex();
+				int currAutomatonIndex = indexMap.getAutomatonIndex(currAutomaton);
 
 				if (syncType == SynchronizationType.PRIORITIZED)
 				{    // All automata that has this event as prioritized must be able to execute it
@@ -242,7 +243,7 @@ public class AutomataToNQC
 								stateIt.hasNext(); )
 						{
 							State currState = (State) stateIt.next();
-							int currStateIndex = currState.getSynchIndex();
+							int currStateIndex = indexMap.getStateIndex(currAutomaton, currState);
 
 							if (previousState)
 							{
@@ -283,7 +284,7 @@ public class AutomataToNQC
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = currEvent.getSynchIndex();
+			int currEventIndex = indexMap.getEventIndex(currEvent);
 
 			pw.println("\n\t\t// Enable condition for event \"" + currEvent.getLabel() + "\"");
 			pw.println("\t\tenabled_" + currEvent.getLabel() + "(e_" + currEventIndex + ");");
@@ -310,7 +311,7 @@ public class AutomataToNQC
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = currEvent.getSynchIndex();
+			int currEventIndex = indexMap.getEventIndex(currEvent);
 
 			pw.println("\n// External enable condition for event \"" + currEvent.getLabel() + "\"");
 			pw.println("void enabled_" + currEvent.getLabel() + "(int& e)");
@@ -331,7 +332,7 @@ public class AutomataToNQC
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = currEvent.getSynchIndex();
+			int currEventIndex = indexMap.getEventIndex(currEvent);
 
 			pw.println("\n// Action for event \"" + currEvent.getLabel() + "\"");
 			pw.println("void do_" + currEvent.getLabel() + "()");
@@ -353,7 +354,7 @@ public class AutomataToNQC
 				alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = currEvent.getSynchIndex();
+			int currEventIndex = indexMap.getEventIndex(currEvent);
 
 			pw.println("\n\t\t// Enable condition for event \"" + currEvent.getLabel() + "\"");
 			pw.println("\t\te_" + currEventIndex + " = " + "e_" + currEventIndex + " && !enabledEvent;");
@@ -364,7 +365,7 @@ public class AutomataToNQC
 				alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = currEvent.getSynchIndex();
+			int currEventIndex = indexMap.getEventIndex(currEvent);
 
 			pw.println("\n\t\t// Enable condition for event \"" + currEvent.getLabel() + "\"");
 			pw.println("\t\te_" + currEventIndex + " = " + "e_" + currEventIndex + " && !enabledEvent;");
@@ -457,7 +458,7 @@ public class AutomataToNQC
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = currEvent.getSynchIndex();
+			int currEventIndex = indexMap.getEventIndex(currEvent);
 
 			pw.println("\n\t\t// Transition for event \"" + currEvent.getLabel() + "\"");
 
@@ -471,7 +472,7 @@ public class AutomataToNQC
 			{
 				Automaton currAutomaton = (Automaton) autIt.next();
 				Alphabet currAlphabet = currAutomaton.getAlphabet();
-				int currAutomatonIndex = currAutomaton.getSynchIndex();
+				int currAutomatonIndex = indexMap.getAutomatonIndex(currAutomaton);
 
 				if (currAlphabet.contains(currEvent.getLabel()))
 				{
@@ -490,7 +491,7 @@ public class AutomataToNQC
 							stateIt.hasNext(); )
 					{
 						State currState = (State) stateIt.next();
-						int currStateIndex = currState.getSynchIndex();
+						int currStateIndex = indexMap.getStateIndex(currAutomaton, currState);
 						State toState = currState.nextState(currAutomatonEvent);
 
 						if (toState == null)
@@ -498,7 +499,7 @@ public class AutomataToNQC
 							throw new SupremicaException("AutomataToIEC1131.printChangeTransitionsAsST: " + "Could not find the next state from state " + currState.getName() + " with label " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
 						}
 
-						int toStateIndex = toState.getSynchIndex();
+						int toStateIndex = indexMap.getStateIndex(currAutomaton, toState);
 
 						if (currState != toState)
 						{

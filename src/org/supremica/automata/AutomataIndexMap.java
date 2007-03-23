@@ -52,7 +52,7 @@ import org.supremica.log.*;
 
 import java.util.*;
 
-public class AutomataIndexMap
+public final class AutomataIndexMap
 {
     private final Map<Automaton, Integer> automatonToIndexMap;
     private final Automaton[] indexToAutomatonArray;    

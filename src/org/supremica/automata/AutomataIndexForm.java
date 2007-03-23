@@ -129,7 +129,7 @@ public final class AutomataIndexForm
 		indexMap = new AutomataIndexMap(theAutomata);
 
 		// Set the indices of the events in theAutomata (this method returns the union alphabet)
-		Alphabet unionAlphabet = theAutomata.setIndices();
+		Alphabet unionAlphabet = theAutomata.getUnionAlphabet();
 		theAutomaton.getAlphabet().union(unionAlphabet);
 
 		//theAutomaton.setIndices();
@@ -287,7 +287,7 @@ public final class AutomataIndexForm
 		{
 			LabeledEvent currEvent = (LabeledEvent) theAlphabetIt.next();
 			String currLabel = currEvent.getLabel();
-			int currEventSynchIndex = currEvent.getSynchIndex();
+			int currEventSynchIndex = indexMap.getEventIndex(currEvent);
 
 			for (int i = 0; i < nbrOfAutomata; i++)
 			{
@@ -441,7 +441,7 @@ public final class AutomataIndexForm
 					LabeledEvent currEvent = currArc.getEvent();
 					// currAlphabet.getEventWithId(eventId)
 					LabeledEvent theEvent = theAlphabet.getEvent(currEvent.getLabel());
-					int currEventIndex = theEvent.getSynchIndex();
+					int currEventIndex = indexMap.getEventIndex(theEvent);
 
 					// Sort
 					sortedEventIndices.add(currEventIndex);
@@ -595,7 +595,7 @@ public final class AutomataIndexForm
 					// String eventId = currArc.getEventId();
 					LabeledEvent currEvent = currArc.getEvent();    // currAlphabet.getEventWithId(eventId);
 					LabeledEvent theEvent = theAlphabet.getEvent(currEvent.getLabel());
-					int currEventIndex = theEvent.getSynchIndex();
+					int currEventIndex = indexMap.getEventIndex(theEvent);
 
 					sortedEventIndices.add(currEventIndex);
 
@@ -666,7 +666,7 @@ public final class AutomataIndexForm
 		{
 			LabeledEvent currEvent = (LabeledEvent) theAlphabetIt.next();
 			String currLabel = currEvent.getLabel();
-			int currEventSynchIndex = currEvent.getSynchIndex();
+			int currEventSynchIndex = indexMap.getEventIndex(currEvent);
 
 			eventToAutomatonTable[currEventSynchIndex] = new int[nbrOfAutomata + 1];
 
@@ -678,7 +678,7 @@ public final class AutomataIndexForm
 
 				if (currAutAlphabet.contains(currLabel))
 				{
-					eventToAutomatonTable[currEventSynchIndex][currTablePosition] = currAutomaton.getSynchIndex();
+					eventToAutomatonTable[currEventSynchIndex][currTablePosition] = indexMap.getAutomatonIndex(currAutomaton);
 					currTablePosition++;
 				}
 			}

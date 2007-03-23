@@ -2471,7 +2471,7 @@ public class Automaton
 		getAlphabet().removeEvent(old_event);
 
 		// add new_event to the alphabet - *no* testing for duplicates, may throw!
-		getAlphabet.addEvent(new_event);
+		getAlphabet().addEvent(new_event);
 
 		// note that if addEvent above throws, we have removed the old event, but not added the new one
 		// if the removeEvent throws we have done nothing, but a catcher will never know the difference,
