@@ -260,7 +260,6 @@ class EatingPhilosopher
 	{
 		// deep copy, I hope
 		Automaton sm = new Automaton(philo);
-
 		sm.setName("Philo" + NAME_SEP + id);
 
 		// adjust the event names according to l_fork and r_fork
@@ -272,6 +271,7 @@ class EatingPhilosopher
 		renameEvent(sm, R_TAKE, "take" + id + LABEL_SEP + r_fork);
 		renameEvent(sm, L_PUT, "put" + id + LABEL_SEP + l_fork);
 		renameEvent(sm, R_PUT, "put" + id + LABEL_SEP + r_fork);
+		renameEvent(sm, START_EATING, "start_eating" + id);
 
 		// Used Automaton::replaceEvent, so no need to rehash
 		// // must rehash since we've changed the label (that's the way it works (unfortunately))
