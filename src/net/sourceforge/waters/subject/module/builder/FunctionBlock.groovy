@@ -4,7 +4,7 @@ import net.sourceforge.waters.subject.module.*
 class FunctionBlock extends Named {
 	static final pattern = /(?i)application|functionblock/
 	static final defaultAttr = 'name'
-	static final parentAttr = null
+	static final parentAttr = 'types'
 	String namePattern
 	String getNamePattern() {
 		namePattern ? /(?i)$namePattern/ : /(?i)${name.text}/
@@ -12,10 +12,10 @@ class FunctionBlock extends Named {
 	List inputs = []
 	List outputs = []
 	List variables = []
-	MainProgram mainProgram
+	List programs = []
 	List processes = []
-	                     
-	private addDefaultProcessModel(ModuleBuilder mb, Scope scope) {
+	List types = []
+/*	private addDefaultProcessModel(ModuleBuilder mb, Scope scope) {
 		mb.event(inputs.collect{it.formatEventName(scope)}, controllable:false)
 		mb.eventAlias(Converter.PROCESS_EVENTS_ALIAS_NAME, events:inputs.collect{it.formatEventName(scope)})
 		mb.plant(Converter.DEFAULT_PROCESS_PLANT_NAME) {
@@ -23,7 +23,7 @@ class FunctionBlock extends Named {
 				inputs.each{input -> mb.selfLoop(event:input.formatEventName(scope)){mb.action("${input.name} = !${input.name}")}}
 			}
 		}
-	}
+	}*/
 
 	def toAutomata() {
 		addToModule(new ModuleBuilder().module(name.toSupremicaSyntax([self:this] as Scope)))
@@ -34,16 +34,7 @@ class FunctionBlock extends Named {
 		ModuleBuilder mb = new ModuleBuilder()
 		Scope scope = [self:this]
 		mb.module(module) {
-			//inputs.grep{it}.each { variable ->
-			//	mb.booleanVariable(variable.name.toSupremicaSyntax(scope), initial:variable.value, marked:variable.value ? true : false)
-			//}
 			event(Converter.SCAN_CYCLE_EVENT_NAME, controllable:false)
-			if (processes) {
-				//event(Converter.PROCESS_SCAN_CYCLE_EVENT_NAME, controllable:false)
-				//eventAlias(Converter.PROCESS_EVENTS_ALIAS_NAME, events:[Converter.PROCESS_SCAN_CYCLE_EVENT_NAME])
-			} else {
-				addDefaultProcessModel(mb, scope)
-			}
 			plant(Converter.CONTROL_UNIT_PLANT_NAME) {
 				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) 
 				transition(event:Converter.SCAN_CYCLE_EVENT_NAME)
@@ -52,22 +43,40 @@ class FunctionBlock extends Named {
 				}
 			}
 			List statements = execute(scope)
+//			println statements.collect{[it.scope.fullName, it.statement.Q, it.statement.input]}
+			
+			//Add default process models for those inputs that never are assigned values
+			inputs.findAll{input -> statements.statement.every{it.Q != input.name}}.each { input ->
+				ControlCodeBuilder ccb = new ControlCodeBuilder()
+				def inputDefaultProcess = ccb.process("Process_${input.name}") {
+					ccb.logicProgram('program') {
+						ccb."${input.name} := not ${input.name}"()
+					}
+				}
+				processes << inputDefaultProcess
+				statements += inputDefaultProcess.execute(scope)
+			}
+			addProcessEvents(mb, scope)
 			(0..<statements.size()).each { i ->
 				statements[i].statement.addToModule(mb, statements, i)
 			}
 		}
 	}
 
+	def addProcessEvents(ModuleBuilder mb, Scope parent) {
+		subScopeElements*.addProcessEvents(mb, parent)
+	}
 	List execute(Scope parent) {
-		List statements = mainProgram.execute(parent)
-		processes*.execute(parent).each { statements += it }
+		List statements = []
+		programs.each{ statements += it.execute(parent) }
+		processes.each { statements += it.execute(parent) }
 		statements
 	}
 	
 	List getNamedElements() {
-		return [this, *inputs, *outputs, *variables, *mainProgram.statements, *processes]
+		[this, *types, *inputs, *outputs, *variables, *programs, *processes]
 	}
 	List getSubScopeElements() {
-		return [*mainProgram.statements, *processes]
+		[*programs, *processes, *variables]
 	}
 }

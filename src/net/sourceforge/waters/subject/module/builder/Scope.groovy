@@ -7,24 +7,36 @@ class Scope {
 	boolean isGlobal() {!parent}
 	
 	IdentifierExpression fullNameOf(IdentifierExpression id) {
+		//println id
 		assert id
-		scopeOf(id).fullNameOf(namedElement(id))
+		scopeOf(id)?.fullNameOf(namedElement(id))
+	}
+	List getSubScopesOfSelf() {
+		self.subScopeElements.collect{new Scope(self:it, parent:this)}
+	}
+	List getNamedElementsOfSelf() {
+		if (self.properties['type']) return self.namedElements + parent.namedElement(self.type).namedElements
+		else return self.namedElements
 	}
 	Named namedElement(IdentifierExpression id) {
 		assert id
-		scopeOf(id).self.namedElements.find{it.name == id.rightMostPart()}
+		scopeOf(id)?.namedElementsOfSelf.find{it.name == id.rightMostPart()}
 	}
 	private Map scopeOfIdCache = [:]
 	Scope scopeOf(IdentifierExpression id) {
+		scopeOf(id, true)
+	}
+	Scope scopeOf(IdentifierExpression id, boolean delegateToParent) {
 		if (scopeOfIdCache[id]) return scopeOfIdCache[id]
+//		println "id: $id, scope: ${fullName}, delegateToParent: $delegateToParent, leftMostPart: ${id.leftMostPart()}, except: ${id.exceptLeftMostPart()}"
 		Scope scopeOfId
-		Named subScopeElement
-		if (id.leftMostPart() && (subScopeElement = self.subScopeElements.find{it.name == id.leftMostPart()})) {
-			scopeOfId = new Scope(self:subScopeElement, parent:this).scopeOf(id.exceptLeftMostPart())
-		} else if (self.namedElements.any{it.name == id}) {
+		Scope subScope
+		if (id.leftMostPart() && (subScope = subScopesOfSelf.find{it.self.name == id.leftMostPart()})) {
+			scopeOfId = subScope.scopeOf(id.exceptLeftMostPart(), false)
+		} else if (namedElementsOfSelf.any{it.name == id}) {
 			scopeOfId = this
-		} else scopeOfId = parent?.scopeOf(id)
-		assert scopeOfId, "Undeclared identifier $id, scope ${fullName}"
+		} else if (delegateToParent) scopeOfId = parent?.scopeOf(id)
+//		assert scopeOfId, "Undeclared identifier $id, scope ${fullName}, identifiers: ${namedElementsOfSelf.name}"
 		scopeOfIdCache[id] = scopeOfId
 	}
 	protected static final KEYWORDS = [/(?i)and/, /(?i)or/, /(?i)not/, /(?i)true/, /(?i)false/]
@@ -58,6 +70,7 @@ class Scope {
 	
 	private Map expandCache = [:]
 	Expression expand(Expression expr, List earlierStatements) {
+//		println "expand, expr:$expr"
 		def cacheKey = "$expr${earlierStatements.size()}"
 		if (expandCache[cacheKey]) return expandCache[cacheKey] 
 		def expandedExpr = expr.text.replaceAll(FULL_ID_PATTERN) { word ->
@@ -71,6 +84,7 @@ class Scope {
 		expandCache[cacheKey] = new Expression(expandedExpr)
 	}
 	Expression exchange(IdentifierExpression id, List earlierStatements) {
+//		println "exchange, id:$id"
 		IdentifierExpression fullId = fullNameOf(id)
 		def newExpr
 		if (earlierStatements.empty) newExpr = fullId
@@ -87,9 +101,33 @@ class Scope {
 		newExpr
 	}
 	IdentifierExpression fullNameOf(Named namedObject) {
+		assert namedElementsOfSelf.any{it.name == namedObject.name}, "${namedObject.name} does not belong to scope $fullName, identifiers: ${namedElementsOfSelf.name}"
 		!global ? new IdentifierExpression("${fullName}${Converter.SEPARATOR}$namedObject.name") : namedObject.name
 	}
+	IdentifierExpression relativeNameOf(Named namedObject, Scope relativeTo) {
+		assert namedElementsOfSelf.any{it.name == namedObject.name}, "${namedObject.name} does not belong to scope $fullName, identifiers: ${namedElementsOfSelf.name}"
+		
+	}
 	
+	boolean descendantOf(Scope scope) {
+		if (this.fullName == scope.fullName) return false
+		if (scope.global) return true
+		if (this.global) return false
+		return this.fullName.startsWith(scope.fullName)
+	}
+	
+	IdentifierExpression relativeNameOf(IdentifierExpression id, Scope relativeTo) {
+		if (relativeTo.global) return fullNameOf(id) 
+		else return fullNameOf(id)?.relativeTo(relativeTo.fullName)
+/*		Scope idScope = scopeOf(id)
+		assert(idScope), "${id} does not belong to scope $fullName, identifiers: ${namedElementsOfSelf.name}"
+		if (idScope != this) return idScope.relativeNameOf(id.rightMostPart, relativeTo)
+		if (relativeTo == this || relativeTo.descendantOf(this)) return id
+		else if (this.descendantOf(relativeTo)) parent.relativeNameOf(self.name + id, relativeTo)
+		else if (relativeTo.descendantOf(this)) return scopeOf(id)?.relativeNameOf(id.rightMostPart(), relativeTo)
+		else return parent.relativeNameOf(self.name + id, relativeTo)*/
+	}
+
 	IdentifierExpression fullNameCache = null
 	IdentifierExpression getFullName() {
 		if (fullNameCache) return fullNameCache
@@ -101,5 +139,13 @@ class Scope {
 	Scope getProcessScope() {
 		if (self instanceof Process) return this
 		else return parent?.processScope
+	}
+	String getEventName() {
+		processScope ? "${processScope.fullName.toSupremicaSyntax(processScope)}_change" : Converter.SCAN_CYCLE_EVENT_NAME
+	}
+	
+	Scope getGlobalScope() {
+		if (global) return this
+		else return parent.globalScope
 	}
 }

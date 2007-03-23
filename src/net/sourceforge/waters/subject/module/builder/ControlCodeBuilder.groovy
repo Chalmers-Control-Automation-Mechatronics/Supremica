@@ -35,51 +35,16 @@ class Converter {
 	static final DEFAULT_PROCESS_PLANT_NAME = 'Process'
 	static final SEPARATOR_PATTERN = /\./
 	static final SEPARATOR = '.'
-}
-
-class Assignment extends Named {
-	Expression input
-	IdentifierExpression Q
-	static final pattern = /(?i)assign(?:ment)?/
-	static final defaultAttr = 'name'
-	static final parentAttr = 'statements'
-
-	def addToModule(ModuleBuilder mb, List statements, int indexToThis) {
-		Scope scope = statements[indexToThis].scope
-		Scope processScope = scope.processScope
-		def thisOne = statements[indexToThis]
-		statements = statements.findAll{it.scope.processScope == processScope}
-		indexToThis = statements.indexOf(thisOne)
-		Variable assignedVariable = scope.namedElement(Q)
-		if (assignedVariable.assignmentAutomatonNeeded(statements, indexToThis)) {
-			mb.booleanVariable(Q.toSupremicaSyntax(scope), initial:assignedVariable.value, marked:assignedVariable.value ? true : false)
-			def eventName = processScope ? "${processScope.fullName.toSupremicaSyntax(processScope)}_change": Converter.SCAN_CYCLE_EVENT_NAME
-			if (processScope) {
-				mb.event(eventName, controllable:false)
-				mb.eventAlias(Converter.PROCESS_EVENTS_ALIAS_NAME, events:[eventName])
-			}
-			mb.plant("ASSIGN_${Q.toSupremicaSyntax(scope)}", defaultEvent:eventName, deterministic:false) {
-				state('q0', marked:true) {
-					selfLoop(guard:input.toSupremicaSyntax(scope, statements[0..<indexToThis])) { set(Q.toSupremicaSyntax(scope)) }
-					selfLoop(guard:new Expression("not (${input})").toSupremicaSyntax(scope, statements[0..<indexToThis])) { reset(Q.toSupremicaSyntax(scope)) }
-				}
-			}
-		}
-	}
-	List execute(Scope parent) {
-		[[statement:this, scope:parent]]
-	}
-	List getNamedElements() { return [] }
-	List getSubScopes() { return [] } 
+	static final NOT_INIT_VARIABLE_NAME = 'NOT_INIT'
 }
 
 class Input extends ExternalVariable {
 	static final pattern = /(?i)input/
 	static final defaultAttr = 'name'
 	static final parentAttr = 'inputs'
-	def formatEventName(Scope scope) {
+/*	def formatEventName(Scope scope) {
 		name.toSupremicaSyntax(scope) + '_change'
-	}
+	}*/
 }
 class Output extends ExternalVariable {
 	static final pattern = /(?i)output/
@@ -93,17 +58,10 @@ abstract class ExternalVariable extends Variable {
 		def fullNameOfThis = statementScope.fullNameOf(statements[indexToThis].statement.Q)
 		def needed = variableScope.global 
 		int i = 0
-//		println fullNameOfThis
 		needed |= statements[0..indexToThis].any{s ->
-//			println s.scope.identifiersInExpression(s.scope.expand(s.statement.input, statements[0..<i]))	
-			s.scope.identifiersInExpression(s.scope.expand(s.statement.input, statements[0..<i++])).any{it == fullNameOfThis}
+			statementScope.globalScope.identifiersInExpression(s.scope.expand(s.statement.input, statements[0..<i++])).any{it == fullNameOfThis}
 		}
-//		println needed
-//		println indexToThis
-//		println statements.size()
-//		println statements[indexToThis+1..-1].collect{it.scope.fullNameOf(it.statement.Q)}
 		needed &= indexToThis == statements.size() - 1 || statements[indexToThis+1..-1].every{it.scope.fullNameOf(it.statement.Q) != fullNameOfThis}
-//		println needed
 		needed
 	}
 }
@@ -119,11 +77,12 @@ class InternalVariable extends Variable {
 		int i = 0
 		// Don't add if it is not used in any earlier assignment expression, inluding this
 		needed |= statements[0..indexToThis].any{s ->
-			statementScope.identifiersInExpression(s.scope.expand(s.statement.input, statements[0..<i++])).any{it == fullNameOfThis}
+			statementScope.globalScope.identifiersInExpression(s.scope.expand(s.statement.input, statements[0..<i++])).any{it == fullNameOfThis}
 		}
 		// Don't add if it wil be added later
 		needed &= indexToThis == statements.size() - 1 || statements[indexToThis+1..-1].every{it.scope.fullNameOf(it.statement.Q) != fullNameOfThis}
 	}
+	def addProcessEvents(ModuleBuilder mb, Scope parent) {}
 }
 
 abstract class Variable extends Named {
@@ -193,67 +152,87 @@ class IdentifierExpression extends Expression {
 	String toSupremicaSyntax(Scope scope) {
 		super.toSupremicaSyntax(scope, [])
 	}
+	IdentifierExpression plus(other) {
+		new IdentifierExpression("${this}${Converter.SEPARATOR}$other")
+	}
+	boolean startsWith(IdentifierExpression other) {
+		text.toLowerCase().startsWith(other.text.toLowerCase())
+	}
+	IdentifierExpression relativeTo(IdentifierExpression scope) {
+		if (startsWith(scope)) return new IdentifierExpression(text[scope.text.size()+1..-1])
+		else if (scope.startsWith(this)) return rightMostPart()
+		else return this
+	}
 }
 
 class ControlCodeBuilder extends BuilderSupport {
 
 	ControlCodeBuilder() {
-		functionblock('SR') {
+		List standardFBs = []
+		standardFBs << functionblock('SR') {
 			input 'S'
 			input 'R'
 			output 'Q'
-			mainProgram {
+			logicProgram('program') {
 				'Q := not R and Q or S'()
 			}
 		}
-		functionblock('RS') {
+		standardFBs << functionblock('RS') {
 			input 'S'
 			input 'R'
 			output 'Q'
-			mainProgram {
+			logicProgram('program') {
 				'Q := not R and (Q or S)'()
 			}
 		}
-		functionblock('P') {
+		standardFBs << functionblock('P') {
 			input 'in'
 			output 'Q'
 			variable 'in_old'
-			mainProgram {
+			logicProgram('program') {
 				'Q := in and not in_old'()
 				'in_old := in'()
 			}
 		}
-		functionblock('N') {
+		standardFBs << functionblock('N') {
 			input 'in'
 			output 'Q'
 			variable 'in_old'
-			mainProgram {
+			logicProgram('program') {
 				'Q := not in and in_old'()
 				'in_old := in'()
 			}
 		}
-		functionblock('S') {
+		standardFBs << functionblock('S') {
 			input 'in'
 			output 'Q'
-			mainProgram {
+			logicProgram('program') {
 				'Q := Q or in'()
 			}
 		}
-		functionblock('R') {
+		standardFBs << functionblock('R') {
 			input 'in'
 			output 'Q'
-			mainProgram {
+			logicProgram('program') {
 				'Q := Q and not in'()
 			}
 		}
-
+		functionBlocks = standardFBs
 	}
 	List functionBlocks = []
 	static void main(args) {
-		testBuilder3(true)
+		//testSfc(true)
+//		testAutomataGenerator(true)
+//		testAssignment(true)
+//		testFunctionBlocks(true)
 		//builder.saveModuleToFile()
 	}
 	static {
+		testAutomataGenerator(false)
+		testAssignment(false)
+		testFunctionBlocks(false)
+		testSfc(false)
+		
 		//println "controlcode builder test" 
 		//testBuilder2(false)
 	}
@@ -262,9 +241,11 @@ class ControlCodeBuilder extends BuilderSupport {
 	static final RESET = 'resetQualifiers'
 	static final NONSTORED = 'nonstoredQualifiers'
 			
-	static final NODE_TYPES = [MainProgram,
+	static final NODE_TYPES = [LogicProgram,
+	                           SequentialProgram,
 	                           FunctionBlock,
 	                           FunctionBlockInstance,
+	                           FunctionBlockCall,
 	                           Sequence,
 	                           Assignment,
 	                           Process,
@@ -273,29 +254,37 @@ class ControlCodeBuilder extends BuilderSupport {
 	                           Input,
 	                           Output,
 	                           InternalVariable,
-	                           [name:SET, pattern:/(?i)S|set/, defaultAttr:'name', parentAttr:SET],
+	                           /*[name:SET, pattern:/(?i)S|set/, defaultAttr:'name', parentAttr:SET],
 	                           [name:RESET, pattern:/(?i)R|reset/, defaultAttr:'name', parentAttr:RESET],
-	                           [name:NONSTORED, pattern:/(?i)N|nonstored/, defaultAttr:'name', parentAttr:NONSTORED]]
+	                           [name:NONSTORED, pattern:/(?i)N|nonstored/, defaultAttr:'name', parentAttr:NONSTORED]*/]
 
 	def createNode(name){
-		def type = NODE_TYPES.find{name ==~ it.pattern}
-		if (!type)
-			if (name =~ /\:=/) {
-				def parts = name.split(/\:=/)
-				return createNode('assignment', [name:"ASSIGN_${parts[0]}", Q:parts[0], input:parts[1]]) 
-			} else return createNode('transition', name)
 		createNode(name, [:], null)
 	}
 
 	def createNode(name, value){
 		createNode(name, [:], value)
 	}
-
 	def createNode(name, Map attributes){
 		def type = NODE_TYPES.find{name ==~ it.pattern}
-//		println 'createNode, name:' << name << ' attributes:' << attributes << ' type:' << type.inspect()
-		if (!type) type = functionBlocks.find{name ==~ it.namePattern}
-		if (!type) return createNode('transition', attributes, name)
+		if (!type) {
+			if (name =~ /\:=/) { //Assignment
+				def parts = name.split(/\:=/)
+				return createNode('assignment', [name:"ASSIGN_${parts[0]}", Q:parts[0], input:parts[1]]) 
+			} else if (current instanceof Sequence) return createNode('transition', [guard:name, *:attributes])
+			else if (!attributes.keySet().every{it =~ /(?i)name/}) { //FB instance call
+				if (attributes.name) { //call of FB instance with name attributes.name that should be created on the fly/implicitly
+					functionBlockInstance(type:name, name:attributes.name)
+					return createNode('functionBlockCall', attributes)
+				} else { // call of either explicitly declared FB instance or implicitly declared without name 
+					return createNode('functionBlockCall', [name:name, *:attributes])
+				}
+			} else { // FB instance declaration
+				assert attributes.name
+				return createNode('functionBlockInstance', [type:name, name:attributes.name])
+			}
+			assert false
+		}
 		//println type
 		if (type instanceof Class) {
 			def obj = type.newInstance()
@@ -313,29 +302,25 @@ class ControlCodeBuilder extends BuilderSupport {
 				}
 			}
 			if (attributes.name =~ /\:=/) {
-				def parts = name.split(/\:=/)
+				def parts = attributes.name.split(/\:=/)
 				attributes.name = parts[0]
 				attributes.value = parts[1]
 			}
-			setProperty(attributes.find{it.key == 'type'})
-			attributes.each{ setProperty(it) }
-			if (obj instanceof FunctionBlock) functionBlocks << obj
-			return obj
-		}
-		if (type instanceof FunctionBlock) {
-			if (!attributes.name) {
+			if (type == Transition && !attributes.name) {
 				int i = 1
-				current.statements.name.text.each { if (it == "${type.name}$i") ++i }
-				attributes.name = "${type.name}$i"
+				current.namedElements.name.text.each { if (it == "T$i") ++i }
+				attributes.name = "T$i"
 			}
-			return createNode('functionBlockInstance', [type:type, *:attributes])
+			attributes.each{ setProperty(it) }
+			return obj
 		}
 		[type:type, *:attributes] as Expando
 	}
 
 	def createNode(name, Map attributes, value){
+		//println "createNode, name: $name, attributes:$attributes, value:$value"
 		def type = NODE_TYPES.find{name ==~ it.pattern}
-		if (!type) return createNode(name, [(FunctionBlockInstance.defaultAttr):value, *:attributes])
+		if (!type) return createNode(name, [name:value, *:attributes])
 		createNode(name, [(type.defaultAttr):value, *:attributes])
 	}
 	
@@ -347,6 +332,10 @@ class ControlCodeBuilder extends BuilderSupport {
 			if (parent[parentAttr] instanceof List) parent[parentAttr] << child
 			else parent[parentAttr] = child
 		}
+		def childAttr = child.metaClass.properties.find{it.type == parent.class}
+		if (childAttr) {
+			childAttr.setProperty(child, parent)
+		}		
 	}
 	
 	void nodeCompleted(parent, node) {
@@ -355,519 +344,100 @@ class ControlCodeBuilder extends BuilderSupport {
 		case Sequence: node.transitions.findAll{!it.to}.each{it.to = node.steps[0].name}; break
 		case Step: parent.transitions.findAll{!it.to}.each{it.to = node.name}; break
 		case Transition: if (!node.from) node.from = parent.steps[-1].name; break
+		case FunctionBlock:
+			if (!parent) { //Add predefined function blocks to root FB
+				node[FunctionBlock.parentAttr] += functionBlocks
+			}
+			break
 		}
 	}
 	
-	public static testBuilder(openInSupremica) {
-		def generateTestProgram = {defaultProcess ->
-			def controlCodeBuilder = new ControlCodeBuilder();
-			controlCodeBuilder.application(name:defaultProcess ? 'testprogramWithDefaultProcess' : 'testprogramWitCustomProcess', deferred:true) {
-				input 'iStart'
-				input 'iBallInGate'
-				input 'iBallDown'
-				input 'iBallUp'
-				input('iLiftDown', value:true)
-				input 'iLiftUp'
-				input 'iSmallBall'
-				input 'iBigBall'
-				output 'qInGate'
-				output 'qOutGate'
-				output 'qUp'
-				output 'qOut'
-				output 'qMeasure'
-				variable 'mBallIsBig'
-				variable 'mBallBetweenGateAndLift'
-				functionblock('SR') {
-					input 'S'
-					input 'R'
-					output 'Q'
-					mainProgram {
-						'Q := not R and Q or S'()
-					}
-				}
-				mainProgram {
-					'qOutGate := iBallInGate and iLiftDown and Lift.S0 and not mBallBetweenGateAndLift'()
-					SR(Q:'qInGate', S:'iStart and not iBallInGate and not qOutGate', R:'iBallInGate')
-					sequence(name:'Lift') {
-						STEP('S0'){
-							R('qUp')
-						}
-						'iBallDown'()
-						Step('S1'){S('qUp')}
-						'BallMeasure.Done.X'()
-						Step('S2'){N('qOut')}
-						'not iBallUp'()
-					}
-					SEQuence('BallMeasure') {
-						STEP('Init')
-						TRAN 'iBallUp'
-						STEP('Measuring') {S('qMeasure')}
-						'iBigBall'()
-						TRAN('iSmallBall', to:'SmallBallFound')
-						STEP('BigBallFound') {S('mBallIsBig')}
-						transition('true', to:'Done')
-						STEP('SmallBallFound') {R('mBallIsBig')}
-						'true'()
-						STEP('Done') {Reset('qMeasure')}
-						'!iBallUp'()
-					}
-				}
-				if (!defaultProcess) {
-					process {
-						sequence(name:'Lift') {
-							STEP('Down') {N('iLiftDown')}
-							'qUp'()
-							STEP('Middle')
-							'not qUp'(to:'Down')
-							'qUp'()
-							STEP('Up') {N('iLiftUp')}
-							'not qUp'(to:'Middle')
-						}
-					}
-				}
-			}
-		}
-		def correctProgram = { defaultProcess ->
-			def moduleBuilder = new ModuleBuilder()
-			moduleBuilder.module(defaultProcess ? 'testprogramWithDefaultProcess' : 'testprogramWitCustomProcess') {
-				booleanVariable(['iStart', 'iBallInGate', 'iBallDown', 'iBallUp'], marked:false)
-				booleanVariable('iLiftDown', initial:true, marked:true)
-				booleanVariable('iLiftUp', marked:false)
-				booleanVariable('iSmallBall', marked:false)
-				booleanVariable('iBigBall', marked:false)
-				booleanVariable(['qInGate', 'qOutGate', 'qUp', 'qOut', 'qMeasure'], marked:false)
-				booleanVariable(['mBallIsBig', 'mBallBetweenGateAndLift'], marked:false)
-				booleanVariable(Converter.END_OF_SCANCYCLE_VARIABLE_NAME, marked:true)
-				booleanVariable('Lift_S0_X', initial:true, marked:true)
-				booleanVariable(['Lift_S1_X', 'Lift_S2_X'], marked:false)
-				booleanVariable('BallMeasure_Init_X', initial:true, marked:true)
-				booleanVariable(['BallMeasure_Measuring_X', 'BallMeasure_BigBallFound_X', 'BallMeasure_SmallBallFound_X', 'BallMeasure_Done_X'], marked:false)
-				event(Converter.SCAN_CYCLE_EVENT_NAME, controllable:false)
-				if (!defaultProcess) {
-					booleanVariable('Process_Lift_Down_X', initial:true, marked:true)
-					booleanVariable(['Process_Lift_Middle_X', 'Process_Lift_Up_X'], initial:false, marked:false)
-					event(Converter.PROCESS_SCAN_CYCLE_EVENT_NAME, controllable:false)
-					eventAlias(name:Converter.PROCESS_EVENTS_ALIAS_NAME, events:[Converter.PROCESS_SCAN_CYCLE_EVENT_NAME])
-				} else {
-					event(['iStart_change', 'iBallInGate_change', 'iBallDown_change', 'iBallUp_change', 'iLiftDown_change', 'iLiftUp_change', 'iSmallBall_change', 'iBigBall_change'], controllable:false)
-					eventAlias(name:Converter.PROCESS_EVENTS_ALIAS_NAME, events:['iStart_change', 'iBallInGate_change', 'iBallDown_change', 'iBallUp_change', 'iLiftDown_change', 'iLiftUp_change', 'iSmallBall_change', 'iBigBall_change'])
-				}
-				if (defaultProcess) {
-					plant(Converter.DEFAULT_PROCESS_PLANT_NAME) {
-						state('q0', marked:true) {
-							selfLoop(event:'iStart_change') {action('iStart = !iStart')}
-							selfLoop(event:'iBallInGate_change') {action('iBallInGate = !iBallInGate')}
-							selfLoop(event:'iBallDown_change') {action('iBallDown = !iBallDown')}
-							selfLoop(event:'iBallUp_change') {action('iBallUp = !iBallUp')}
-							selfLoop(event:'iLiftDown_change') {action('iLiftDown = !iLiftDown')}
-							selfLoop(event:'iLiftUp_change') {action('iLiftUp = !iLiftUp')}
-							selfLoop(event:'iSmallBall_change') {action('iSmallBall = !iSmallBall')}
-							selfLoop(event:'iBigBall_change') {action('iBigBall = !iBigBall')}
-						}
-					}
-				}
-				plant(Converter.CONTROL_UNIT_PLANT_NAME) {
-					state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
-						outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME, event:Converter.SCAN_CYCLE_EVENT_NAME) {
-							set(Converter.END_OF_SCANCYCLE_VARIABLE_NAME)
-						}
-					}
-					state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
-						outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, events:[Converter.PROCESS_EVENTS_ALIAS_NAME]) {
-							reset(Converter.END_OF_SCANCYCLE_VARIABLE_NAME)
-						}
-					}
-				}
-				plant('ASSIGN_qOutGate', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
-					state('q0', marked:true) {
-						selfLoop(guard:'iBallInGate & iLiftDown & Lift_S0 & !mBallBetweenGateAndLift') { set('qOutGate') }
-						selfLoop(guard:'!(iBallInGate & iLiftDown & Lift_S0 & !mBallBetweenGateAndLift)') { reset('qOutGate') }
-					}
-				}
-				plant('ASSIGN_qInGate', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
-					state('q0', marked:true) {
-						selfLoop(guard:'!(iBallInGate) & qInGate | (iStart & !iBallInGate & !qOutGate)') { set('qInGate') }
-						selfLoop(guard:'!(!(iBallInGate) & qInGate | (iStart & !iBallInGate & !qOutGate))') { reset('qInGate') }
-					}
-				}
-				
-				plant('Lift', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
-					state('S0', marked:true) {
-						selfLoop(guard:'!(iBallDown)')
-					}
-					transition(guard:'iBallDown') {
-						set('qUp')
-						reset('Lift_S0_X')
-						set('Lift_S1_X')
-					}
-					state('S1', marked:true) {
-						selfLoop(guard:'!(BallMeasure_Done_X)')
-					}
-					transition(guard:'BallMeasure_Done_X') {
-						set('qOut')
-						reset('Lift_S1_X')
-						set('Lift_S2_X')
-					}
-					state('S2', marked:true) {
-						selfLoop(guard:'!(!iBallUp)')
-						outgoing(to:'S0', guard:'!iBallUp') {
-							reset('qUp')
-							reset('qOut')
-							reset('Lift_S2_X')
-							set('Lift_S0_X')
-						}
-					}
-				}
-				plant(name:'BallMeasure', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
-					state('Init', marked:true) {
-						selfLoop(guard:'!(iBallUp)')
-					}
-					transition(guard:'iBallUp') {
-						set('qMeasure')
-						reset('BallMeasure_Init_X')
-						set('BallMeasure_Measuring_X')
-					}
-					state('Measuring', marked:true) {
-						selfLoop(guard:'!(iBigBall) & !(iSmallBall)')
-						outgoing(to:'BigBallFound', guard:'iBigBall') {
-							set('mBallIsBig')
-							reset('BallMeasure_Measuring_X')
-							set('BallMeasure_BigBallFound_X')
-						}
-						outgoing(to:'SmallBallFound', guard:'iSmallBall') {
-							reset('mBallIsBig')
-							reset('BallMeasure_Measuring_X')
-							set('BallMeasure_SmallBallFound_X')
-						}
-					}
-					state('BigBallFound', marked:true) {
-						selfLoop(guard:'!(true)')
-						outgoing(to:'Done', guard:'true'){
-							reset('qMeasure')
-							reset('BallMeasure_BigBallFound_X')
-							set('BallMeasure_Done_X')
-						}
-					}
-					state('SmallBallFound', marked:true) {
-						selfLoop(guard:'!(true)')
-						outgoing(to:'Done', guard:'true') {
-							reset('qMeasure')
-							reset('BallMeasure_SmallBallFound_X')
-							set('BallMeasure_Done_X')
-						}
-					}
-					state('Done', marked:true) {
-						selfLoop(guard:'!(!iBallUp)')
-						outgoing(guard:'!iBallUp', to:'Init') {
-							reset('BallMeasure_Done_X')
-							set('BallMeasure_Init_X')
-						}
-					}
-				}
-				if (!defaultProcess) {
-					plant('Process_Lift', defaultEvent:Converter.PROCESS_SCAN_CYCLE_EVENT_NAME, deterministic:false) {
-						state('Down', marked:true) {
-							selfLoop(guard:'!(qUp)')
-						}
-						transition(guard:'qUp') {
-							reset('iLiftDown')
-							reset('Process_Lift_Down_X')
-							set('Process_Lift_Middle_X')
-						}
-						state('Middle', marked:true) {
-							selfLoop(guard:'!(!qUp) & !(qUp)')
-							outgoing(guard:'!qUp', to:'Down') {
-								set('iLiftDown')
-								reset('Process_Lift_Middle_X')
-								set('Process_Lift_Down_X')
-							}
-							outgoing(to:'Up', guard:'qUp') {
-								set('iLiftUp')
-								reset('Process_Lift_Middle_X')
-								set('Process_Lift_Up_X')
-							}
-						}
-						state('Up', marked:true) {
-							selfLoop(guard:'!(!qUp)')
-							outgoing(guard:'!qUp', to:'Middle') {
-								reset('iLiftUp')
-								reset('Process_Lift_Up_X')
-								set('Process_Lift_Middle_X')
-							}
-						}
-					}
-				}
-			}
-		}
-		def programWithManualProcess = generateTestProgram(false)
-		def programWithDefaultProcess = generateTestProgram(true)
-		def correctProgramWithManualProcess = correctProgram(false)
-		def correctProgramWithDefaultProcess = correctProgram(true)
-		
-		printscope programWithDefaultProcess.runtimeScope, 0
-/*		Util.assertGeneratedModuleEqualsManual(programWithManualProcess.toAutomata(), correctProgramWithManualProcess)
-		Util.assertGeneratedModuleEqualsManual(programWithDefaultProcess.toAutomata(), correctProgramWithDefaultProcess)
-		if (openInSupremica) {
-			Util.openModuleInSupremica(programWithManualProcess.toAutomata())
-			Util.openModuleInSupremica(programWithDefaultProcess.toAutomata())
-		}*/
-	}
-	static void testBuilder3(openInSupremica) {
+	static void testSfc(openInSupremica) {
 		def ccb = new ControlCodeBuilder()
-		def app = ccb.application('testapp2') {
-			input 'y1'
-			input 'y2'
-			input 'y3'
-			output 'u1'
-			output 'u2'
-			output 'u3'
-			output 'u5'
-			output 'u6'
-			output 'u7'
-			output 'u4'
-			variable 'x2'
-			functionblock('FB1') {
-				input 'y1'
-				input 'y2'
-				output 'u1'
-				variable 'x'
-				mainProgram {
-					SR('SR1', Q:'u1', S:'x AND y2', R:'y1')
-					SR('SR2', Q:'x', S:'y1', R:'y2')
+		def appSfc = ccb.application('sfcapp') {
+			input 'y1 := true'
+			input 'y2 := true'
+			sequentialProgram('program') {
+				sequence('mySequence') {
+					Step 'S1'
+					'y1'();    'y2'(to:'S3')
+					Step 'S2'
+					'not y1'(to:'S1')
+								Step 'S3'
+								'true'()
 				}
 			}
-			mainProgram {
-				'u2 := not y1'()
-				'u1 := y1 and u2'()
-				SR('SR1', S:'y1', R:'y2 and u2')
-				'u5 := SR1.Q'()
-				RS(S:'y1', R:'y2 and u2', Q:'u6')
-				P('Py2', in:'y2')
-				'u4 := Py2.Q and y1'()
-				'x2 := True'()
-				'u3 := u1 or u2'()
-				FB1('FB1instance', y1:'y2', y2:'y3', u1:'u7')
-			}
-			process('someProcess') {
-				variable 'x'
-				SR('SR1', Q:'y1', S:'y2 and u3', R:'not u3')
+		}
+		def appSfcLess = ccb.application('sfcapp') {
+			input 'y1 := true'
+			input 'y2 := true'
+			logicProgram('program') {
+				variable 'S1_X'
+				variable 'S2_X'
+				variable 'S3_X'
+				variable "${Converter.NOT_INIT_VARIABLE_NAME}"
+				variable 'mySequence_T1_enabled'
+				variable 'mySequence_T2_enabled'
+				variable 'mySequence_T3_enabled'
+				variable 'mySequence_T4_enabled'
+				'mySequence_T1_enabled := S1_X and y1'()
+				'mySequence_T2_enabled := S1_X and y2'()
+				'mySequence_T3_enabled := S2_X and not y1'()
+				'mySequence_T4_enabled := S3_X and true'()
+				RS(Q:'S1_X', S:"not ${Converter.NOT_INIT_VARIABLE_NAME} or mySequence_T3_enabled or mySequence_T4_enabled", R:'mySequence_T1_enabled or mySequence_T2_enabled')
+				RS(Q:'S2_X', S:'mySequence_T1_enabled', R:'mySequence_T3_enabled')
+				RS(Q:'S3_X', S:'mySequence_T2_enabled', R:'mySequence_T4_enabled')
+				"${Converter.NOT_INIT_VARIABLE_NAME} := true"()
 			}
 		}
-		def appAssignmentOnly = ccb.application('testapp2') {
-			input 'y1'
-			input 'y2'
-			input 'y3'
-			output 'u1'
-			output 'u2'
-			output 'u3'
-			output 'u5'
-			output 'u6'
-			output 'u7'
-			output 'u4'
-			variable 'x2'
-			variable 'SR1_S'
-			variable 'SR1_R'
-			variable 'SR1_Q'
-			variable 'RS1_Q'
-			variable 'RS1_S'
-			variable 'RS1_R'
-			variable 'Py2_in'
-			variable 'Py2_Q'
-			variable 'Py2_in_old'
-			variable 'FB1instance_u1'
-			variable 'FB1instance_y1'
-			variable 'FB1instance_y2'
-			variable 'FB1instance_SR1_Q'
-			variable 'FB1instance_SR1_S'
-			variable 'FB1instance_SR1_R'
-			variable 'FB1instance_SR2_Q'
-			variable 'FB1instance_SR2_S'
-			variable 'FB1instance_SR2_R'
-			variable 'FB1instance_x' 
-			mainProgram {
-				'u2 := not y1'()
-				'u1 := y1 and u2'()
-				'SR1_S := y1'()
-				'SR1_R := y2 and u2'()
-				'SR1_Q := not SR1_R and SR1_Q or SR1_S'()
-				'u5 := SR1_Q'()
-				'RS1_Q := u6'()
-				'RS1_S := y1'()
-				'RS1_R := y2 and u2'()
-				'RS1_Q := not RS1_R and (RS1_Q or RS1_S)'()
-				'u6 := RS1_Q'()
-				'Py2_in := y2'()
-				'Py2_Q := Py2_in and not Py2_in_old '()
-				'Py2_in_old := Py2_in'()
-				'u4 := Py2_Q and y1'()
-				'x2 := True'()
-				'u3 := u1 or u2'()
-				'FB1instance_u1 := u7'()
-				'FB1instance_y1 := y2'()
-				'FB1instance_y2 := y3'()
-				'FB1instance_SR1_Q := FB1instance_u1'()
-				'FB1instance_SR1_S := FB1instance_x and FB1instance_y2'()
-				'FB1instance_SR1_R := FB1instance_y1'()
-				'FB1instance_SR1_Q := not FB1instance_SR1_R and FB1instance_SR1_Q or FB1instance_SR1_S'()
-				'FB1instance_u1 := FB1instance_SR1_Q'()
-				'FB1instance_SR2_Q := FB1instance_x'()
-				'FB1instance_SR2_S := FB1instance_y1'()
-				'FB1instance_SR2_R := FB1instance_y2'()
-				'FB1instance_SR2_Q := not FB1instance_SR2_R and FB1instance_SR2_Q or FB1instance_SR2_S'()
-				'FB1instance_x := FB1instance_SR2_Q'()
-				'u7 := FB1instance_u1'()
-			}
-			process('someProcess') {
-				'SR1_Q := y1'()
-				'SR1_S := y2 and u3'()
-				'SR1_R := not u3'()
-				'SR1_Q := not SR1_R and SR1_Q or SR1_S'()
-				'y1 := SR1_Q'()
-			}
+		ModuleSubject sfcModule = appSfc.toAutomata()
+		ModuleSubject sfcLessModule = appSfcLess.toAutomata()
+		Util.assertGeneratedModuleEqualsManual(sfcModule, sfcLessModule)
+		if (openInSupremica) {
+			Util.openModuleInSupremica(sfcModule)
 		}
+
+	}
+	static void testAutomataGenerator(openInSupremica) {
+		def ccb = new ControlCodeBuilder()
 		def appStateless = ccb.application('testapp2') {
 			input 'y1'
 			input 'y2'
 			input 'y3'
-			output 'u1'
-			output 'u2'
 			output 'u3'
-			output 'u5'
-			output 'u6'
 			output 'u7'
-			output 'u4'
-//			variable 'x2'
-//			variable 'SR1_S'
-//			variable 'SR1_R'
-			variable 'SR1_Q'
-//			variable 'RS1_Q'
-//			variable 'RS1_S'
-//			variable 'RS1_R'
-//			variable 'Py2_in'
-//			variable 'Py2_Q'
-			variable 'Py2_in_old'
-//			variable 'FB1instance_u1'
-//			variable 'FB1instance_y1'
-//			variable 'FB1instance_y2'
-//			variable 'FB1instance_SR1_Q'
-//			variable 'FB1instance_SR1_S'
-//			variable 'FB1instance_SR1_R'
-//			variable 'FB1instance_SR2_Q'
-//			variable 'FB1instance_SR2_S'
-//			variable 'FB1instance_SR2_R'
 			variable 'FB1instance_x' 
-			mainProgram {
+			logicProgram('program') {
 				'u7 := not y2 and u7 or (FB1instance_x and y3)'()
 				'FB1instance_x := not y3 and FB1instance_x or y2'()
-				//'FB1instance_SR2_Q := not y3 and FB1instance_x or y2'()
-				//'FB1instance_SR2_R := y3'()
-				//'FB1instance_SR2_S := y2'()
-				//'FB1instance_SR2_Q := FB1instance_x'()
-				//'FB1instance_u1 := not y2 and u7 or (FB1instance_x and y3)'()
-				//'FB1instance_SR1_Q := not y2 and u7 or (FB1instance_x and y3)'()
-				//'FB1instance_SR1_R := y2'()
-				//'FB1instance_SR1_S := FB1instance_x and y3'()
-				//'FB1instance_SR1_Q := u7'()
-				//'FB1instance_y2 := y3'()
-				//'FB1instance_y1 := y2'()
-				//'FB1instance_u1 := u7'()
-				'u3 := (y1 and not y1) or (not y1)'()
-				//'x2 := True'()
-				'u4 := (y2 and not Py2_in_old) and y1'()
-				'Py2_in_old := y2'()
-				//'Py2_Q := y2 and not Py2_in_old'()
-				//'Py2_in := y2'()
-				'u6 := not (y2 and not y1) and (u6 or y1)'()
-				//'RS1_Q := not (y2 and not y1) and (u6 or y1)'()
-				//'RS1_R := y2 and not y1'()
-				//'RS1_S := y1'()
-				//'RS1_Q := u6'()
-				'u5 := not (y2 and not y1) and SR1_Q or y1'()
-				'SR1_Q := not (y2 and not y1) and SR1_Q or y1'()
-				//'SR1_R := y2 and not y1'()
-				//'SR1_S := y1'()
-				'u1 := y1 and not y1'()
-				'u2 := not y1'()
+				'u3 := true'()
 			}
 			process('someProcess') {
-				//'SR1_Q := y1'()
-				//'SR1_S := y2 and u3'()
-				//'SR1_R := not u3'()
-				//'SR1_Q := not (not u3) and y1 or (y2 and u3)'()
-				'y1 := not (not u3) and y1 or (y2 and u3)'()
+				logicProgram('program') {
+					'y1 := not (not u3) and y1 or (y2 and u3)'()
+				}
 			}
 		}
 
 		ModuleSubject correctModule = new ModuleBuilder().module('testapp2') {
 			event(Converter.SCAN_CYCLE_EVENT_NAME, controllable:false)
-			booleanVariable(['y1'/*, 'y2', 'y3'*/, 'u2', 'u1', 'SR1_Q', 'u5', 'u6', 'Py2_in_old', 'u4', 'u3', 'FB1instance_x', 'u7'], initial:false, marked:false)
-			event(['someProcess_change'/*, 'y2_change', 'y3_change'*/], controllable:false)
-			eventAlias(name:Converter.PROCESS_EVENTS_ALIAS_NAME, events:['someProcess_change'])//, 'y2_change', 'y3_change'])
-/*			plant(Converter.DEFAULT_PROCESS_PLANT_NAME) {
-				state('q0', marked:true) {
-					selfLoop(event:'y1_change') {action('y1 = !y1')}
-					selfLoop(event:'y2_change') {action('y2 = !y2')}
-					selfLoop(event:'y3_change') {action('y3 = !y3')}
-				}
-			}*/
+			booleanVariable(['y1', 'y2', 'y3', 'u3', 'FB1instance_x', 'u7'], initial:false, marked:false)
+			event(['someProcess_change', 'Process_y2_change', 'Process_y3_change'], controllable:false)
+			eventAlias(name:Converter.PROCESS_EVENTS_ALIAS_NAME, events:['someProcess_change', 'Process_y2_change', 'Process_y3_change'])
 			plant(Converter.CONTROL_UNIT_PLANT_NAME) {
 				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
 					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME, event:Converter.SCAN_CYCLE_EVENT_NAME) {
-					//	set(Converter.END_OF_SCANCYCLE_VARIABLE_NAME)
 					}
 				}
 				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
 					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, events:[Converter.PROCESS_EVENTS_ALIAS_NAME]) {
-					//	reset(Converter.END_OF_SCANCYCLE_VARIABLE_NAME)
 					}
-				}
-			}
-			plant('ASSIGN_u2', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
-				state('q0', marked:true) {
-					selfLoop(guard:'!y1') { set('u2') }
-					selfLoop(guard:'!(!y1)') { reset('u2') }
-				}
-			}
-			plant('ASSIGN_u1', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
-				state('q0', marked:true) {
-					selfLoop(guard:'y1 & !y1') { set('u1') }
-					selfLoop(guard:'!(y1 & !y1)') { reset('u1') }
-				}
-			}
-			plant('ASSIGN_SR1_Q', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
-				state('q0', marked:true) {
-					selfLoop(guard:'!(y2 & !y1) & SR1_Q | y1') { set('SR1_Q') }
-					selfLoop(guard:'!(!(y2 & !y1) & SR1_Q | y1)') { reset('SR1_Q') }
-				}
-			}
-			plant('ASSIGN_u5', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
-				state('q0', marked:true) {
-					selfLoop(guard:'!(y2 & !y1) & SR1_Q | y1') { set('u5') }
-					selfLoop(guard:'!(!(y2 & !y1) & SR1_Q | y1)') { reset('u5') }
-				}
-			}
-			plant('ASSIGN_u6', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
-				state('q0', marked:true) {
-					selfLoop(guard:'!(y2 & !y1) & (u6 | y1)') { set('u6') }
-					selfLoop(guard:'!(!(y2 & !y1) & (u6 | y1))') { reset('u6') }
-				}
-			}
-			plant('ASSIGN_Py2_in_old', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
-				state('q0', marked:true) {
-					selfLoop(guard:'y2') { set('Py2_in_old') }
-					selfLoop(guard:'!(y2)') { reset('Py2_in_old') }
-				}
-			}
-			plant('ASSIGN_u4', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
-				state('q0', marked:true) {
-					selfLoop(guard:'(y2 & !Py2_in_old) & y1') { set('u4') }
-					selfLoop(guard:'!((y2 & !Py2_in_old) & y1)') { reset('u4') }
 				}
 			}
 			plant('ASSIGN_u3', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
 				state('q0', marked:true) {
-					selfLoop(guard:'(y1 & !y1) | !y1') { set('u3') }
-					selfLoop(guard:'!((y1 & !y1) | !y1)') { reset('u3') }
+					selfLoop(guard:'1') { set('u3') }
+					selfLoop(guard:'!1') { reset('u3') }
 				}
 			}
 			plant('ASSIGN_FB1instance_x', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
@@ -888,19 +458,273 @@ class ControlCodeBuilder extends BuilderSupport {
 					selfLoop(guard:'!(!(!u3) & y1 | (y2 & u3))') { reset('y1') }
 				}
 			}
+			plant('ASSIGN_y2', defaultEvent:'Process_y2_change', deterministic:false) {
+				state('q0', marked:true) {
+					selfLoop(guard:'!y2') { set('y2') }
+					selfLoop(guard:'!(!y2)') { reset('y2') }
+				}
+			}
+			plant('ASSIGN_y3', defaultEvent:'Process_y3_change', deterministic:false) {
+				state('q0', marked:true) {
+					selfLoop(guard:'!y3') { set('y3') }
+					selfLoop(guard:'!(!y3)') { reset('y3') }
+				}
+			}
 		}
 		
-		ModuleSubject generatedModule = app.toAutomata()
-		ModuleSubject generatedModuleFromAssignmentOnly = appAssignmentOnly.toAutomata()
-		
-		Util.assertGeneratedModuleEqualsManual(generatedModule, generatedModuleFromAssignmentOnly)
-
 		ModuleSubject generatedModuleFromStateless = appStateless.toAutomata()
-		Util.assertGeneratedModuleEqualsManual(generatedModuleFromAssignmentOnly, generatedModuleFromStateless)
 		Util.assertGeneratedModuleEqualsManual(generatedModuleFromStateless, correctModule)
 		
 		if (openInSupremica) {
-//			Util.openModuleInSupremica(generatedModule)
+			Util.openModuleInSupremica(generatedModuleFromStateless)
 		}
+	}
+	static testFunctionBlocks(boolean openInSupremica) {
+		def ccb = new ControlCodeBuilder()
+		def app = ccb.application('functionBlockTest') {
+			input 'y1'
+			input 'y2'
+			input 'y3'
+			output 'u1'
+			output 'u2'
+			output 'u3'
+			output 'u5'
+			output 'u6'
+			output 'u7'
+			output 'u4'
+			RS 'RS1'
+			functionblock('FB1') {
+				input 'y1'
+				input 'y2'
+				output 'u1'
+				variable 'x'
+				logicProgram('program') {
+					SR(Q:'u1', S:'x AND y2', R:'y1')
+					SR(Q:'x', S:'y1', R:'y2')
+				}
+			}
+			logicProgram('program') {
+				'u2 := not y1'()
+				SR('SR1', S:'y1', R:'y2 and u2')
+				'u5 := SR1.Q'()
+				RS1(S:'y1', R:'y2 and u2', Q:'u6')
+				P('Py2', in:'y2')
+				'u4 := Py2.Q and y1'()
+				FB1('FB1instance', y1:'y2', y2:'y3', u1:'u7')
+			}
+			process('someProcess') {
+				variable 'x'
+				logicProgram('program') {
+					SR(Q:'y1', S:'y2 and u3 or x', R:'not u3')
+					'x := not u2'()
+				}
+			}
+			process('process3') {
+				functionblock('ProcessFb') {
+					input 'in'
+					output 'q'
+					logicProgram('program') {
+						'q := not in'()
+					}
+				}
+				logicProgram('program') {
+					ProcessFb(q:'y3', in:'u2')
+				}
+			}
+		}
+		def appAssignmentOnly = ccb.application('functionBlockTest') {
+			input 'y1'
+			input 'y2'
+			input 'y3'
+			output 'u1'
+			output 'u2'
+			output 'u3'
+			output 'u5'
+			output 'u6'
+			output 'u7'
+			output 'u4'
+			logicProgram('program') {
+				variable 'FB1instance_u1'
+				variable 'FB1instance_y1'
+				variable 'FB1instance_y2'
+				variable 'FB1instance_program_SR1_Q'
+				variable 'FB1instance_program_SR1_S'
+				variable 'FB1instance_program_SR1_R'
+				variable 'FB1instance_program_SR2_Q'
+				variable 'FB1instance_program_SR2_S'
+				variable 'FB1instance_program_SR2_R'
+				variable 'FB1instance_x'
+				variable 'SR1_S'
+				variable 'SR1_R'
+				variable 'SR1_Q'
+				variable 'RS1_Q'
+				variable 'RS1_S'
+				variable 'RS1_R'
+				variable 'Py2_in'
+				variable 'Py2_Q'
+				variable 'Py2_in_old'
+				'u2 := not y1'()
+				'SR1_S := y1'()
+				'SR1_R := y2 and u2'()
+				'SR1_Q := not SR1_R and SR1_Q or SR1_S'()
+				'u5 := SR1_Q'()
+				'RS1_Q := u6'()
+				'RS1_S := y1'()
+				'RS1_R := y2 and u2'()
+				'RS1_Q := not RS1_R and (RS1_Q or RS1_S)'()
+				'u6 := RS1_Q'()
+				'Py2_in := y2'()
+				'Py2_Q := Py2_in and not Py2_in_old '()
+				'Py2_in_old := Py2_in'()
+				'u4 := Py2_Q and y1'()
+				'FB1instance_u1 := u7'()
+				'FB1instance_y1 := y2'()
+				'FB1instance_y2 := y3'()
+				'FB1instance_program_SR1_Q := FB1instance_u1'()
+				'FB1instance_program_SR1_S := FB1instance_x and FB1instance_y2'()
+				'FB1instance_program_SR1_R := FB1instance_y1'()
+				'FB1instance_program_SR1_Q := not FB1instance_program_SR1_R and FB1instance_program_SR1_Q or FB1instance_program_SR1_S'()
+				'FB1instance_u1 := FB1instance_program_SR1_Q'()
+				'FB1instance_program_SR2_Q := FB1instance_x'()
+				'FB1instance_program_SR2_S := FB1instance_y1'()
+				'FB1instance_program_SR2_R := FB1instance_y2'()
+				'FB1instance_program_SR2_Q := not FB1instance_program_SR2_R and FB1instance_program_SR2_Q or FB1instance_program_SR2_S'()
+				'FB1instance_x := FB1instance_program_SR2_Q'()
+				'u7 := FB1instance_u1'()
+			}
+			process('someProcess') {
+				variable 'x'
+				logicProgram('program') {
+					variable 'SR1_Q'
+					variable 'SR1_S'
+					variable 'SR1_R'
+					'SR1_Q := y1'()
+					'SR1_S := y2 and u3 or x'()
+					'SR1_R := not u3'()
+					'SR1_Q := not SR1_R and SR1_Q or SR1_S'()
+					'y1 := SR1_Q'()
+					'x := not u2'()
+				}
+			}
+			process('process3') {
+				logicProgram('program') {
+					'y3 := not u2'()
+				}
+			}
+		}
+		ModuleSubject generatedModule = app.toAutomata()
+		ModuleSubject generatedModuleFromAssignmentOnly = appAssignmentOnly.toAutomata()
+		Util.assertGeneratedModuleEqualsManual(generatedModule, generatedModuleFromAssignmentOnly)
+		if (openInSupremica) {
+			Util.openModuleInSupremica(generatedModule)
+		}
+	}
+	static testAssignment(boolean openInSupremica) {
+		def ccb = new ControlCodeBuilder()
+		def appAssignmentOnly = ccb.application('assignmentTest') {
+			input 'y1'
+			input 'y2'
+			input 'y3'
+			output 'u1'
+			output 'u2'
+			output 'u3'
+			output 'u5'
+			output 'u6'
+			output 'u7'
+			output 'u4'
+			variable 'x2'
+			variable 'SR1_S'
+			variable 'SR1_R'
+			variable 'SR1_Q'
+			variable 'RS1_Q'
+			variable 'RS1_S'
+			variable 'RS1_R'
+			variable 'Py2_in'
+			variable 'Py2_Q'
+			variable 'Py2_in_old'
+			logicProgram('program') {
+				'u2 := not y1'()
+				'u1 := y1 and u2'()
+				'SR1_S := y1'()
+				'SR1_R := y2 and u2'()
+				'SR1_Q := not SR1_R and SR1_Q or SR1_S'()
+				'u5 := SR1_Q'()
+				'RS1_Q := u6'()
+				'RS1_S := y1'()
+				'RS1_R := y2 and u2'()
+				'RS1_Q := not RS1_R and (RS1_Q or RS1_S)'()
+				'u6 := RS1_Q'()
+				'Py2_in := y2'()
+				'Py2_Q := Py2_in and not Py2_in_old '()
+				'Py2_in_old := Py2_in'()
+				'u4 := Py2_Q and y1'()
+				'x2 := True'()
+			}
+			process('someProcess') {
+				logicProgram('program') {
+					'SR1_Q := y1'()
+					'SR1_S := y2 and u3'()
+					'SR1_R := not u3'()
+					'SR1_Q := not SR1_R and SR1_Q or SR1_S'()
+					'y1 := SR1_Q'()
+				}
+			}
+		}
+		def appStateless = ccb.application('assignmentTest') {
+			input 'y1'
+			input 'y2'
+			input 'y3'
+			output 'u1'
+			output 'u2'
+			output 'u3'
+			output 'u5'
+			output 'u6'
+			output 'u7'
+			output 'u4'
+	//		variable 'x2'
+	//		variable 'SR1_S'
+	//		variable 'SR1_R'
+			variable 'SR1_Q'
+	//		variable 'RS1_Q'
+	//		variable 'RS1_S'
+	//		variable 'RS1_R'
+	//		variable 'Py2_in'
+	//		variable 'Py2_Q'
+			variable 'Py2_in_old'
+			logicProgram('program') {
+				//'x2 := True'()
+				'u4 := (y2 and not Py2_in_old) and y1'()
+				'Py2_in_old := y2'()
+				//'Py2_Q := y2 and not Py2_in_old'()
+				//'Py2_in := y2'()
+				'u6 := not (y2 and not y1) and (u6 or y1)'()
+				//'RS1_Q := not (y2 and not y1) and (u6 or y1)'()
+				//'RS1_R := y2 and not y1'()
+				//'RS1_S := y1'()
+				//'RS1_Q := u6'()
+				'u5 := not (y2 and not y1) and SR1_Q or y1'()
+				'SR1_Q := not (y2 and not y1) and SR1_Q or y1'()
+				//'SR1_R := y2 and not y1'()
+				//'SR1_S := y1'()
+				'u1 := y1 and not y1'()
+				'u2 := not y1'()
+			}
+			process('someProcess') {
+				logicProgram('program') {
+					//'SR1_Q := y1'()
+					//'SR1_S := y2 and u3'()
+					//'SR1_R := not u3'()
+					//'SR1_Q := not (not u3) and y1 or (y2 and u3)'()
+					'y1 := not (not u3) and y1 or (y2 and u3)'()
+				}
+			}
+		}
+		ModuleSubject generatedModuleFromAssignmentOnly = appAssignmentOnly.toAutomata()
+		ModuleSubject generatedModuleFromStateless = appStateless.toAutomata()
+		Util.assertGeneratedModuleEqualsManual(generatedModuleFromAssignmentOnly, generatedModuleFromStateless)
+		if (openInSupremica) {
+			Util.openModuleInSupremica(generatedModuleFromAssignmentOnly)
+		}
+
 	}
 }

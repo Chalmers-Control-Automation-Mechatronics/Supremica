@@ -1,17 +1,49 @@
 package net.sourceforge.waters.subject.module.builder;
 
-class MainProgram {
-	boolean deferred = true
-	static final pattern = /(?i)mainProgram/
-	static final defaultAttr = null
-	static final parentAttr = 'mainProgram'
+class LogicProgram extends Named {
+	static final pattern = /(?i)logicProgram/
+	static final defaultAttr = 'name'
+	static final parentAttr = 'programs'
 	List statements = []
-/*	def addToModule(ModuleBuilder mb, Scope parent, List programState) {
-		statements.each { programState = it.addToModule(mb, parent, programState) }
-		programState
-		//sequences.each { it.addToModule(mb, Converter.SCAN_CYCLE_EVENT_NAME)	}
-	}*/
+	List variables = []
 	List execute(Scope parent) {
-		statements.inject([]){executedStatements, statement -> executedStatements + statement.execute(parent)}
+		Scope scope = [self:this, parent:parent]
+		statements.inject([]){executedStatements, statement -> executedStatements + statement.execute(scope)}
 	}
+	List getNamedElements() {
+		//[*variables, *statements]
+		subScopeElements
+	}
+	List getSubScopeElements() {
+		variables
+		//statements
+	}
+	def addProcessEvents(ModuleBuilder mb, Scope parent) {
+		//statements*.addProcessEvents(mb, [self:this, parent:parent] as Scope)
+		subScopeElements*.addProcessEvents(mb, [self:this, parent:parent] as Scope)
+	}
+}
+class SequentialProgram extends Named {
+	static final pattern = /(?i)sequentialProgram/
+	static final defaultAttr = 'name'
+	static final parentAttr = 'programs'
+	static final NOT_INIT_VARIABLE = new InternalVariable(name:new IdentifierExpression(Converter.NOT_INIT_VARIABLE_NAME))
+	List variables = [NOT_INIT_VARIABLE]
+	List sequences = []
+	
+	List getNamedElements() {
+		subScopeElements//[*variables, *sequences]
+	}
+	List getSubScopeElements() {
+		[*variables, *sequences, *sequences.steps]
+	}
+	List execute(Scope parent) {
+		Scope scope = [self:this, parent:parent]
+		List statements = sequences.inject([]){executedStatements, sequence -> executedStatements + sequence.execute(scope)}
+		statements << [scope:scope, statement:new Assignment(Q:NOT_INIT_VARIABLE.name, input:new Expression('true'))]
+	}
+	def addProcessEvents(ModuleBuilder mb, Scope parent) {
+		subScopeElements*.addProcessEvents(mb, [self:this, parent:parent] as Scope)
+	}
+
 }
