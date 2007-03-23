@@ -302,6 +302,7 @@ public class AutomataVerifier
         }
         catch (Exception e)
         {
+            System.err.println(e.getStackTrace());
             logger.error("Exception in AutomataVerifier: " + e);
             
             throw new RuntimeException(e);    // Try change this later
