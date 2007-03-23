@@ -644,7 +644,7 @@ public final class AutomataIndexForm
 
 		for (int i = 0; i < theAlphabet.size(); i++)
 		{
-			LabeledEvent currEvent = theAlphabet.getEventWithIndex(i);
+			LabeledEvent currEvent = indexMap.getEvent(i);
 
 			controllableEventsTable[i] = currEvent.isControllable();
 			immediateEventsTable[i] = currEvent.isImmediate();
