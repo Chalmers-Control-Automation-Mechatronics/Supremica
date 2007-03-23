@@ -62,6 +62,7 @@ import org.supremica.automata.State;
 import org.supremica.automata.Arc;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.AutomataIndexMap;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
 import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
@@ -427,7 +428,7 @@ public class AutomataVerifier
             // To enable the overriding the AutomatonType of automata we use typeIsSupSpecTable!
             // if ((supervisor.getType() == AutomatonType.Supervisor) || (supervisor.getType() == AutomatonType.SPECIFICATION))
             // if (!typeIsPlantTable[supervisor.getIndex()])
-            if (typeIsSupSpecTable[indexMap.getAutomatonAt(supervisor)])
+            if (typeIsSupSpecTable[indexMap.getAutomatonIndex(supervisor)])
             {
                 // This is a relevant automaton!
                 selectedAutomata.addAutomaton(supervisor);
