@@ -76,7 +76,7 @@ class InternalVariable extends Variable {
 		def needed = false 
 		int i = 0
 		// Don't add if it is not used in any earlier assignment expression, inluding this
-		needed |= statements[0..indexToThis].any{s ->
+	        needed |= statements[0..indexToThis].any{s ->
 			statementScope.globalScope.identifiersInExpression(s.scope.expand(s.statement.input, statements[0..<i++])).any{it == fullNameOfThis}
 		}
 		// Don't add if it wil be added later
@@ -95,8 +95,12 @@ class Expression {
 	}
 	final String text
 	
-	String toSupremicaSyntax(Scope scope, List programState) {
-		String newExpr = scope.expand(this, programState).text
+	Expression expand(scope, programState) {
+		scope.expand(this, programState)
+	}
+	
+	String toSupremicaSyntax() {
+		String newExpr = text
 		def replaceWordOp = {oldOp, newOp ->
 			newExpr.replaceAll(/(?i)\s*\b${oldOp}\b\s*/){"$newOp"}
 		}
@@ -116,6 +120,18 @@ class Expression {
 	String toString() {
 		return text
 	}
+	Expression cleanup() {
+	    String oldExpr = ''
+	    String newExpr = text
+	    while (oldExpr != newExpr) {
+		oldExpr = newExpr
+		newExpr = newExpr.replaceAll(/\(\s*${FULL_ID_PATTERN}\s*\)/){it[1..-2]}
+		newExpr = newExpr.replaceAll(/(?i)\(\s*not\s+${FULL_ID_PATTERN}\s*\)/){it[1..-2]}
+		newExpr = newExpr.replaceAll(/(?i)not\s+not/){''}
+		newExpr = newExpr.replaceAll(/\s\s/){' '}
+	    }
+	    new Expression(newExpr)
+	}
 	boolean equals(object) {
 		if (!object) return false
 		if (object instanceof Expression) {
@@ -127,6 +143,31 @@ class Expression {
 	int hashCode() {
 		return text.toLowerCase().hashCode()
 	}
+	List findIdentifiers() {
+		List ids = []
+		(text =~ FULL_ID_PATTERN).each{match -> if (!KEYWORDS.any{keyword -> match ==~ keyword}) ids << new IdentifierExpression(match)}
+		ids
+	}
+	protected static final KEYWORDS = [/(?i)and/, /(?i)or/, /(?i)not/, /(?i)true/, /(?i)false/]
+	
+	static final SIMPLE_ID_PATTERN = /\b_*[a-zA-Z]\w*\b*/
+	static final FULL_ID_PATTERN = /${SIMPLE_ID_PATTERN}(?:${Converter.SEPARATOR_PATTERN}${SIMPLE_ID_PATTERN})*/
+	static {
+		assert 'apa' ==~ FULL_ID_PATTERN
+		assert '__apa' ==~ FULL_ID_PATTERN
+		assert '_apa1' ==~ FULL_ID_PATTERN
+		assert !('_1apa' ==~ FULL_ID_PATTERN)
+		assert !('1apa' ==~ FULL_ID_PATTERN)
+		assert 'a__p1a' ==~ FULL_ID_PATTERN
+		assert 'a__p1a' ==~ FULL_ID_PATTERN
+		assert 'a__p1a.asd' ==~ FULL_ID_PATTERN
+		assert 'a__p1a.__asd.sd1' ==~ FULL_ID_PATTERN
+		assert !('a__p1a.__1.sd1' ==~ FULL_ID_PATTERN)
+		assert new Expression('apa_bepa.cepa and (lepa_pep_as or epa.opa)').findIdentifiers().text == ['apa_bepa.cepa', 'lepa_pep_as', 'epa.opa']
+		assert new Expression('Py2_in and not Py2_old').findIdentifiers().text == ['Py2_in', 'Py2_old']
+		assert new Expression('apa and ((pepa)) and (not (cepa))').cleanup().text == 'apa and pepa and not cepa'
+	}
+
 }
 class Named {
 	IdentifierExpression name
@@ -150,7 +191,7 @@ class IdentifierExpression extends Expression {
 		new IdentifierExpression(text.split(Converter.SEPARATOR_PATTERN)[-1])
 	}
 	String toSupremicaSyntax(Scope scope) {
-		super.toSupremicaSyntax(scope, [])
+		super.expand(scope, []).toSupremicaSyntax()
 	}
 	IdentifierExpression plus(other) {
 		new IdentifierExpression("${this}${Converter.SEPARATOR}$other")
@@ -188,19 +229,19 @@ class ControlCodeBuilder extends BuilderSupport {
 		standardFBs << functionblock('P') {
 			input 'in'
 			output 'Q'
-			variable 'in_old'
+			variable 'old'
 			logicProgram('program') {
-				'Q := in and not in_old'()
-				'in_old := in'()
+				'Q := in and not old'()
+				'old := in'()
 			}
 		}
 		standardFBs << functionblock('N') {
 			input 'in'
 			output 'Q'
-			variable 'in_old'
+			variable 'old'
 			logicProgram('program') {
-				'Q := not in and in_old'()
-				'in_old := in'()
+				'Q := not in and old'()
+				'old := in'()
 			}
 		}
 		standardFBs << functionblock('S') {
@@ -228,11 +269,11 @@ class ControlCodeBuilder extends BuilderSupport {
 		//builder.saveModuleToFile()
 	}
 	static {
-		testAutomataGenerator(false)
+                testAutomataGenerator(false)
 		testAssignment(false)
 		testFunctionBlocks(false)
 		testSfc(false)
-		
+	
 		//println "controlcode builder test" 
 		//testBuilder2(false)
 	}
@@ -250,6 +291,8 @@ class ControlCodeBuilder extends BuilderSupport {
 	                           Assignment,
 	                           Process,
 	                           Step,
+				   NAction,
+				   P1Action,
 	                           Transition,
 	                           Input,
 	                           Output,
@@ -268,13 +311,11 @@ class ControlCodeBuilder extends BuilderSupport {
 	def createNode(name, Map attributes){
 		def type = NODE_TYPES.find{name ==~ it.pattern}
 		if (!type) {
-			if (name =~ /\:=/) { //Assignment
-				def parts = name.split(/\:=/)
-				return createNode('assignment', [name:"ASSIGN_${parts[0]}", Q:parts[0], input:parts[1]]) 
-			} else if (current instanceof Sequence) return createNode('transition', [guard:name, *:attributes])
+                        if (current instanceof Sequence) return createNode('transition', [guard:name, *:attributes])
 			else if (!attributes.keySet().every{it =~ /(?i)name/}) { //FB instance call
 				if (attributes.name) { //call of FB instance with name attributes.name that should be created on the fly/implicitly
-					functionBlockInstance(type:name, name:attributes.name)
+					//functionBlockInstance(type:name, name:attributes.name)
+					attributes.type = name
 					return createNode('functionBlockCall', attributes)
 				} else { // call of either explicitly declared FB instance or implicitly declared without name 
 					return createNode('functionBlockCall', [name:name, *:attributes])
@@ -285,8 +326,11 @@ class ControlCodeBuilder extends BuilderSupport {
 			}
 			assert false
 		}
-		//println type
-		if (type instanceof Class) {
+		if (type == Assignment && name =~ /\:=/) { //Assignment
+			def parts = name.split(/\:=/)
+			return createNode('assignment', [name:"ASSIGN_${parts[0]}", Q:parts[0], input:parts[1], *:attributes]) 
+		}
+                if (type instanceof Class) {
 			def obj = type.newInstance()
 			def setProperty  = {attribute ->
 				if (attribute?.key) {
@@ -320,8 +364,10 @@ class ControlCodeBuilder extends BuilderSupport {
 	def createNode(name, Map attributes, value){
 		//println "createNode, name: $name, attributes:$attributes, value:$value"
 		def type = NODE_TYPES.find{name ==~ it.pattern}
-		if (!type) return createNode(name, [name:value, *:attributes])
-		createNode(name, [(type.defaultAttr):value, *:attributes])
+		if (value != null) {
+                    if (!type) return createNode(name, [name:value, *:attributes])
+                    return createNode(name, [(type.defaultAttr):value, *:attributes])
+                } else return createNode(name, attributes)
 	}
 	
 	void setParent(parent, child) {
@@ -357,13 +403,21 @@ class ControlCodeBuilder extends BuilderSupport {
 		def appSfc = ccb.application('sfcapp') {
 			input 'y1 := true'
 			input 'y2 := true'
+			output 'u1'
+			output 'u3'
 			sequentialProgram('program') {
 				sequence('mySequence') {
 					Step 'S1'
 					'y1'();    'y2'(to:'S3')
-					Step 'S2'
+					Step('S2'){
+						N_action {
+							'u1 := y1 or y2'()
+						}
+					}
 					'not y1'(to:'S1')
-								Step 'S3'
+								Step('S3'){
+									P1_action{'u3 := y2'()}
+								}
 								'true'()
 				}
 			}
@@ -371,6 +425,8 @@ class ControlCodeBuilder extends BuilderSupport {
 		def appSfcLess = ccb.application('sfcapp') {
 			input 'y1 := true'
 			input 'y2 := true'
+			output 'u1'
+			output 'u3'
 			logicProgram('program') {
 				variable 'S1_X'
 				variable 'S2_X'
@@ -380,13 +436,27 @@ class ControlCodeBuilder extends BuilderSupport {
 				variable 'mySequence_T2_enabled'
 				variable 'mySequence_T3_enabled'
 				variable 'mySequence_T4_enabled'
+				variable 'S1_activation'
+				variable 'S2_activation'
+				variable 'S3_activation'
+				variable 'S1_deactivation'
+				variable 'S2_deactivation'
+				variable 'S3_deactivation'
 				'mySequence_T1_enabled := S1_X and y1'()
-				'mySequence_T2_enabled := S1_X and y2'()
+				'mySequence_T2_enabled := S1_X and y2 and not mySequence_T1_enabled'()
 				'mySequence_T3_enabled := S2_X and not y1'()
 				'mySequence_T4_enabled := S3_X and true'()
 				RS(Q:'S1_X', S:"not ${Converter.NOT_INIT_VARIABLE_NAME} or mySequence_T3_enabled or mySequence_T4_enabled", R:'mySequence_T1_enabled or mySequence_T2_enabled')
+				P('S1_P1', Q:'S1_activation', in:'S1_X')
+				N('S1_N1', Q:'S1_deactivation', in:'S1_X')
 				RS(Q:'S2_X', S:'mySequence_T1_enabled', R:'mySequence_T3_enabled')
+				P('S2_P1', Q:'S2_activation', in:'S2_X')
+				N('S2_N1', Q:'S2_deactivation', in:'S2_X')
+				'u1 := y1 or y2'('S2_X')
 				RS(Q:'S3_X', S:'mySequence_T2_enabled', R:'mySequence_T4_enabled')
+				P('S3_P1', Q:'S3_activation', in:'S3_X')
+				N('S3_N1', Q:'S3_deactivation', in:'S3_X')
+				'u3 := y2'('S3_activation')
 				"${Converter.NOT_INIT_VARIABLE_NAME} := true"()
 			}
 		}
@@ -454,20 +524,20 @@ class ControlCodeBuilder extends BuilderSupport {
 			}
 			plant('ASSIGN_y1', defaultEvent:'someProcess_change', deterministic:false) {
 				state('q0', marked:true) {
-					selfLoop(guard:'!(!u3) & y1 | (y2 & u3)') { set('y1') }
-					selfLoop(guard:'!(!(!u3) & y1 | (y2 & u3))') { reset('y1') }
+					selfLoop(guard:'u3 & y1 | (y2 & u3)') { set('y1') }
+					selfLoop(guard:'!(u3 & y1 | (y2 & u3))') { reset('y1') }
 				}
 			}
 			plant('ASSIGN_y2', defaultEvent:'Process_y2_change', deterministic:false) {
 				state('q0', marked:true) {
 					selfLoop(guard:'!y2') { set('y2') }
-					selfLoop(guard:'!(!y2)') { reset('y2') }
+					selfLoop(guard:'y2') { reset('y2') }
 				}
 			}
 			plant('ASSIGN_y3', defaultEvent:'Process_y3_change', deterministic:false) {
 				state('q0', marked:true) {
 					selfLoop(guard:'!y3') { set('y3') }
-					selfLoop(guard:'!(!y3)') { reset('y3') }
+					selfLoop(guard:'y3') { reset('y3') }
 				}
 			}
 		}
@@ -492,6 +562,7 @@ class ControlCodeBuilder extends BuilderSupport {
 			output 'u6'
 			output 'u7'
 			output 'u4'
+                        output 'u8'
 			RS 'RS1'
 			functionblock('FB1') {
 				input 'y1'
@@ -511,6 +582,7 @@ class ControlCodeBuilder extends BuilderSupport {
 				P('Py2', in:'y2')
 				'u4 := Py2.Q and y1'()
 				FB1('FB1instance', y1:'y2', y2:'y3', u1:'u7')
+                                'u8 := y1 or y2'('y3')
 			}
 			process('someProcess') {
 				variable 'x'
@@ -543,6 +615,7 @@ class ControlCodeBuilder extends BuilderSupport {
 			output 'u6'
 			output 'u7'
 			output 'u4'
+                        output 'u8'
 			logicProgram('program') {
 				variable 'FB1instance_u1'
 				variable 'FB1instance_y1'
@@ -562,7 +635,7 @@ class ControlCodeBuilder extends BuilderSupport {
 				variable 'RS1_R'
 				variable 'Py2_in'
 				variable 'Py2_Q'
-				variable 'Py2_in_old'
+				variable 'Py2_old'
 				'u2 := not y1'()
 				'SR1_S := y1'()
 				'SR1_R := y2 and u2'()
@@ -574,8 +647,8 @@ class ControlCodeBuilder extends BuilderSupport {
 				'RS1_Q := not RS1_R and (RS1_Q or RS1_S)'()
 				'u6 := RS1_Q'()
 				'Py2_in := y2'()
-				'Py2_Q := Py2_in and not Py2_in_old '()
-				'Py2_in_old := Py2_in'()
+				'Py2_Q := Py2_in and not Py2_old '()
+				'Py2_old := Py2_in'()
 				'u4 := Py2_Q and y1'()
 				'FB1instance_u1 := u7'()
 				'FB1instance_y1 := y2'()
@@ -591,6 +664,7 @@ class ControlCodeBuilder extends BuilderSupport {
 				'FB1instance_program_SR2_Q := not FB1instance_program_SR2_R and FB1instance_program_SR2_Q or FB1instance_program_SR2_S'()
 				'FB1instance_x := FB1instance_program_SR2_Q'()
 				'u7 := FB1instance_u1'()
+                                'u8 := (y3) and (y1 or y2) or (not (y3) and u8)'()
 			}
 			process('someProcess') {
 				variable 'x'
@@ -641,7 +715,7 @@ class ControlCodeBuilder extends BuilderSupport {
 			variable 'RS1_R'
 			variable 'Py2_in'
 			variable 'Py2_Q'
-			variable 'Py2_in_old'
+			variable 'Py2_old'
 			logicProgram('program') {
 				'u2 := not y1'()
 				'u1 := y1 and u2'()
@@ -655,8 +729,8 @@ class ControlCodeBuilder extends BuilderSupport {
 				'RS1_Q := not RS1_R and (RS1_Q or RS1_S)'()
 				'u6 := RS1_Q'()
 				'Py2_in := y2'()
-				'Py2_Q := Py2_in and not Py2_in_old '()
-				'Py2_in_old := Py2_in'()
+				'Py2_Q := Py2_in and not Py2_old '()
+				'Py2_old := Py2_in'()
 				'u4 := Py2_Q and y1'()
 				'x2 := True'()
 			}
@@ -690,12 +764,12 @@ class ControlCodeBuilder extends BuilderSupport {
 	//		variable 'RS1_R'
 	//		variable 'Py2_in'
 	//		variable 'Py2_Q'
-			variable 'Py2_in_old'
+			variable 'Py2_old'
 			logicProgram('program') {
 				//'x2 := True'()
-				'u4 := (y2 and not Py2_in_old) and y1'()
-				'Py2_in_old := y2'()
-				//'Py2_Q := y2 and not Py2_in_old'()
+				'u4 := (y2 and not Py2_old) and y1'()
+				'Py2_old := y2'()
+				//'Py2_Q := y2 and not Py2_old'()
 				//'Py2_in := y2'()
 				'u6 := not (y2 and not y1) and (u6 or y1)'()
 				//'RS1_Q := not (y2 and not y1) and (u6 or y1)'()

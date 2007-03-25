@@ -39,48 +39,27 @@ class Scope {
 //		assert scopeOfId, "Undeclared identifier $id, scope ${fullName}, identifiers: ${namedElementsOfSelf.name}"
 		scopeOfIdCache[id] = scopeOfId
 	}
-	protected static final KEYWORDS = [/(?i)and/, /(?i)or/, /(?i)not/, /(?i)true/, /(?i)false/]
-	
-	protected static final SIMPLE_ID_PATTERN = /\b_*[a-zA-Z]\w*\b*/
-	protected static final FULL_ID_PATTERN = /${SIMPLE_ID_PATTERN}(?:${Converter.SEPARATOR_PATTERN}${SIMPLE_ID_PATTERN})*/
-	static {
-		assert 'apa' ==~ FULL_ID_PATTERN
-		assert '__apa' ==~ FULL_ID_PATTERN
-		assert '_apa1' ==~ FULL_ID_PATTERN
-		assert !('_1apa' ==~ FULL_ID_PATTERN)
-		assert !('1apa' ==~ FULL_ID_PATTERN)
-		assert 'a__p1a' ==~ FULL_ID_PATTERN
-		assert 'a__p1a' ==~ FULL_ID_PATTERN
-		assert 'a__p1a.asd' ==~ FULL_ID_PATTERN
-		assert 'a__p1a.__asd.sd1' ==~ FULL_ID_PATTERN
-		assert !('a__p1a.__1.sd1' ==~ FULL_ID_PATTERN)
-	}
 	
 	List identifiersInExpression(Expression expr) {
-		List identifiers = []
-		def expandedExpr = (expr.text =~ FULL_ID_PATTERN).each { word ->
-			if (!KEYWORDS.any{keyword -> word ==~ keyword}) {
-				def fullId = fullNameOf(new IdentifierExpression(word))
-				assert fullId, "Undeclared identifier $word in expr '${expr.text}', scope ${fullName}"
-				identifiers << fullId
-			}
+		//println expr
+		expr.findIdentifiers().collect{
+			def fullId = fullNameOf(it)
+			assert fullId, "Undeclared identifier $it in expr '${expr}', scope ${fullName}"
+			fullId
 		}
-		identifiers
 	}
 	
 	private Map expandCache = [:]
 	Expression expand(Expression expr, List earlierStatements) {
-//		println "expand, expr:$expr"
+		//println "expand, expr:$expr, identifiers: ${expr.findIdentifiers()}"
 		def cacheKey = "$expr${earlierStatements.size()}"
-		if (expandCache[cacheKey]) return expandCache[cacheKey] 
-		def expandedExpr = expr.text.replaceAll(FULL_ID_PATTERN) { word ->
-			def expandedWord = word
-   			if (!KEYWORDS.any{keyword -> word ==~ keyword}) {
-   				expandedWord = exchange(new IdentifierExpression(word), earlierStatements).text
-			}
-			assert expandedWord, "Undeclared identifier $word in expr '${expr.text}', scope ${fullName}"
-			expandedWord
-		}
+		if (expandCache[cacheKey]) return expandCache[cacheKey]
+		def expandedExpr = expr.text
+		expr.findIdentifiers().each { id ->
+		    def newExpr = exchange(id, earlierStatements)
+		    assert newExpr, "Undeclared identifier $id in expr '${expr}', scope ${fullName}"
+		    expandedExpr = expandedExpr.replaceAll(Expression.FULL_ID_PATTERN){(new IdentifierExpression(it) == id) ? newExpr.text : it}
+ 		}
 		expandCache[cacheKey] = new Expression(expandedExpr)
 	}
 	Expression exchange(IdentifierExpression id, List earlierStatements) {
@@ -93,7 +72,8 @@ class Scope {
 			if (earlierAssigmentToId) {
 				def i = earlierStatements.lastIndexOf(earlierAssigmentToId)
 				newExpr = earlierAssigmentToId.scope.expand(earlierAssigmentToId.statement.input, earlierStatements[0..<i])
-				if (!(newExpr.text ==~ /(?i)(?:not\s+)?${FULL_ID_PATTERN}/)) newExpr = new Expression("($newExpr)")
+				//if (!(newExpr.text ==~ /(?i)(?:not\s+)?${FULL_ID_PATTERN}/))
+				newExpr = new Expression("($newExpr)")
 			} else {
 				newExpr = fullId
 			}

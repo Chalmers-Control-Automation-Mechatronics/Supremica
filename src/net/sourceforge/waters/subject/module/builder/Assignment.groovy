@@ -3,8 +3,9 @@ package net.sourceforge.waters.subject.module.builder;
 class Assignment extends Named {
 	Expression input
 	IdentifierExpression Q
-	static final pattern = /(?i)assign(?:ment)?/
-	static final defaultAttr = 'name'
+        Expression condition
+	static final pattern = /(?i)assign(?:ment)|.*\:=.*?/
+	static final defaultAttr = 'condition'
 	static final parentAttr = 'statements'
 
 	def addToModule(ModuleBuilder mb, List statements, int indexToThis) {
@@ -18,14 +19,17 @@ class Assignment extends Named {
 			mb.booleanVariable(Q.toSupremicaSyntax(scope), initial:assignedVariable.value, marked:assignedVariable.value ? true : false)
 			mb.plant("ASSIGN_${Q.toSupremicaSyntax(scope)}", defaultEvent:scope.eventName, deterministic:false) {
 				state('q0', marked:true) {
-					selfLoop(guard:input.toSupremicaSyntax(scope, statements[0..<indexToThis])) { set(Q.toSupremicaSyntax(scope)) }
-					selfLoop(guard:new Expression("not (${input})").toSupremicaSyntax(scope, statements[0..<indexToThis])) { reset(Q.toSupremicaSyntax(scope)) }
+					//println input.expand(scope, statements[0..<indexToThis]).toSupremicaSyntax()
+					//println input.expand(scope, statements[0..<indexToThis]).cleanup().toSupremicaSyntax()
+					selfLoop(guard:input.expand(scope, statements[0..<indexToThis]).cleanup().toSupremicaSyntax()) { set(Q.toSupremicaSyntax(scope)) }
+					selfLoop(guard:new Expression("not (${input})").expand(scope, statements[0..<indexToThis]).cleanup().toSupremicaSyntax()) { reset(Q.toSupremicaSyntax(scope)) }
 				}
 			}
 		}
 	}
 	List execute(Scope parent) {
-		[[statement:this, scope:parent]]
+            if (!condition) return [[statement:this, scope:parent]]
+            else return [[statement:new Assignment(Q:Q, input:new Expression("($condition) and ($input) or (not ($condition) and $Q)")), scope:parent]]
 	}
 	List getNamedElements() { [] }
 	List getSubScopes() { [] } 
