@@ -33,8 +33,8 @@ class Step extends Named {
 	static final parentAttr = 'steps'
 	Sequence sequence
 	List variables = [new InternalVariable(name:new IdentifierExpression('X')),
-	                    new InternalVariable(name:new IdentifierExpression('activation')),
-	                    new InternalVariable(name:new IdentifierExpression('deactivation'))]
+	                  new InternalVariable(name:new IdentifierExpression('activation')),
+	                  new InternalVariable(name:new IdentifierExpression('deactivation'))]
 	List actionBlocks = []		
 	
 	boolean isInitial() {
@@ -42,6 +42,7 @@ class Step extends Named {
 	}
 	                   
 	List execute(Scope parent) {
+		variables.find{it.name == new IdentifierExpression('X')}.markedValue = (sequence.steps[0] == this)
 		Scope scope = [self:this, parent:parent]
 		ControlCodeBuilder ccb = new ControlCodeBuilder()
 		Closure buildExpr = {stepEntrance ->
@@ -125,7 +126,7 @@ class P1Action extends Named {
 	}
 }
 class P0Action extends Named {
-	static final pattern = /(?i)P1_Action/
+	static final pattern = /(?i)P0_Action/
 	static final defaultAttr = null
 	static final parentAttr = 'actionBlocks'
 	Step step

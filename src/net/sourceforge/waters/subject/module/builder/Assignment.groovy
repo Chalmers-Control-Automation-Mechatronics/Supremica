@@ -16,7 +16,8 @@ class Assignment extends Named {
 		indexToThis = statements.indexOf(thisOne)
 		Variable assignedVariable = scope.namedElement(Q)
 		if (assignedVariable.assignmentAutomatonNeeded(statements, indexToThis)) {
-			mb.booleanVariable(Q.toSupremicaSyntax(scope), initial:assignedVariable.value, marked:assignedVariable.value ? true : false)
+			boolean markedValue = (assignedVariable.markedValue != null) ? assignedVariable.markedValue : (assignedVariable.value != null ? assignedVariable.value : false) 
+			mb.booleanVariable(Q.toSupremicaSyntax(scope), initial:assignedVariable.value, marked:markedValue)
 			mb.plant("ASSIGN_${Q.toSupremicaSyntax(scope)}", defaultEvent:scope.eventName, deterministic:false) {
 				state('q0', marked:true) {
 					//println input.expand(scope, statements[0..<indexToThis]).toSupremicaSyntax()

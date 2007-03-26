@@ -76,7 +76,7 @@ class InternalVariable extends Variable {
 		def needed = false 
 		int i = 0
 		// Don't add if it is not used in any earlier assignment expression, inluding this
-	        needed |= statements[0..indexToThis].any{s ->
+		needed |= statements[0..indexToThis].any{s ->
 			statementScope.globalScope.identifiersInExpression(s.scope.expand(s.statement.input, statements[0..<i++])).any{it == fullNameOfThis}
 		}
 		// Don't add if it wil be added later
@@ -87,6 +87,7 @@ class InternalVariable extends Variable {
 
 abstract class Variable extends Named {
 	boolean value
+	boolean markedValue
 }
 
 class Expression {
@@ -121,16 +122,16 @@ class Expression {
 		return text
 	}
 	Expression cleanup() {
-	    String oldExpr = ''
-	    String newExpr = text
-	    while (oldExpr != newExpr) {
-		oldExpr = newExpr
-		newExpr = newExpr.replaceAll(/\(\s*${FULL_ID_PATTERN}\s*\)/){it[1..-2]}
-		newExpr = newExpr.replaceAll(/(?i)\(\s*not\s+${FULL_ID_PATTERN}\s*\)/){it[1..-2]}
-		newExpr = newExpr.replaceAll(/(?i)not\s+not/){''}
-		newExpr = newExpr.replaceAll(/\s\s/){' '}
-	    }
-	    new Expression(newExpr)
+		String oldExpr = ''
+		String newExpr = text
+		while (oldExpr != newExpr) {
+			oldExpr = newExpr
+			newExpr = newExpr.replaceAll(/\(\s*${FULL_ID_PATTERN}\s*\)/){it[1..-2]}
+			newExpr = newExpr.replaceAll(/(?i)\(\s*not\s+${FULL_ID_PATTERN}\s*\)/){it[1..-2]}
+			newExpr = newExpr.replaceAll(/(?i)not\s+not/){''}
+			newExpr = newExpr.replaceAll(/\s\s/){' '}
+		}
+		new Expression(newExpr)
 	}
 	boolean equals(object) {
 		if (!object) return false
@@ -262,18 +263,18 @@ class ControlCodeBuilder extends BuilderSupport {
 	}
 	List functionBlocks = []
 	static void main(args) {
-		//testSfc(true)
-//		testAutomataGenerator(true)
-//		testAssignment(true)
-//		testFunctionBlocks(true)
+		testSfc(true)
+		testAutomataGenerator(true)
+		testAssignment(true)
+		testFunctionBlocks(true)
 		//builder.saveModuleToFile()
 	}
 	static {
-                testAutomataGenerator(false)
+/*		testAutomataGenerator(false)
 		testAssignment(false)
 		testFunctionBlocks(false)
 		testSfc(false)
-	
+	*/
 		//println "controlcode builder test" 
 		//testBuilder2(false)
 	}
@@ -291,15 +292,13 @@ class ControlCodeBuilder extends BuilderSupport {
 	                           Assignment,
 	                           Process,
 	                           Step,
-				   NAction,
-				   P1Action,
+	                           NAction,
+	                           P1Action,
+	                           P0Action,
 	                           Transition,
 	                           Input,
 	                           Output,
-	                           InternalVariable,
-	                           /*[name:SET, pattern:/(?i)S|set/, defaultAttr:'name', parentAttr:SET],
-	                           [name:RESET, pattern:/(?i)R|reset/, defaultAttr:'name', parentAttr:RESET],
-	                           [name:NONSTORED, pattern:/(?i)N|nonstored/, defaultAttr:'name', parentAttr:NONSTORED]*/]
+	                           InternalVariable]
 
 	def createNode(name){
 		createNode(name, [:], null)
@@ -311,7 +310,7 @@ class ControlCodeBuilder extends BuilderSupport {
 	def createNode(name, Map attributes){
 		def type = NODE_TYPES.find{name ==~ it.pattern}
 		if (!type) {
-                        if (current instanceof Sequence) return createNode('transition', [guard:name, *:attributes])
+			if (current instanceof Sequence) return createNode('transition', [guard:name, *:attributes])
 			else if (!attributes.keySet().every{it =~ /(?i)name/}) { //FB instance call
 				if (attributes.name) { //call of FB instance with name attributes.name that should be created on the fly/implicitly
 					//functionBlockInstance(type:name, name:attributes.name)
@@ -330,7 +329,7 @@ class ControlCodeBuilder extends BuilderSupport {
 			def parts = name.split(/\:=/)
 			return createNode('assignment', [name:"ASSIGN_${parts[0]}", Q:parts[0], input:parts[1], *:attributes]) 
 		}
-                if (type instanceof Class) {
+		if (type instanceof Class) {
 			def obj = type.newInstance()
 			def setProperty  = {attribute ->
 				if (attribute?.key) {
@@ -365,9 +364,9 @@ class ControlCodeBuilder extends BuilderSupport {
 		//println "createNode, name: $name, attributes:$attributes, value:$value"
 		def type = NODE_TYPES.find{name ==~ it.pattern}
 		if (value != null) {
-                    if (!type) return createNode(name, [name:value, *:attributes])
-                    return createNode(name, [(type.defaultAttr):value, *:attributes])
-                } else return createNode(name, attributes)
+			if (!type) return createNode(name, [name:value, *:attributes])
+			else return createNode(name, [(type.defaultAttr):value, *:attributes])
+		} else return createNode(name, attributes)
 	}
 	
 	void setParent(parent, child) {
@@ -404,10 +403,15 @@ class ControlCodeBuilder extends BuilderSupport {
 			input 'y1 := true'
 			input 'y2 := true'
 			output 'u1'
+			output 'u2'
 			output 'u3'
 			sequentialProgram('program') {
 				sequence('mySequence') {
-					Step 'S1'
+					Step ('S1'){
+						P0_Action {
+							'u2 := y1'()
+						}
+					}
 					'y1'();    'y2'(to:'S3')
 					Step('S2'){
 						N_action {
@@ -426,9 +430,10 @@ class ControlCodeBuilder extends BuilderSupport {
 			input 'y1 := true'
 			input 'y2 := true'
 			output 'u1'
+			output 'u2'
 			output 'u3'
 			logicProgram('program') {
-				variable 'S1_X'
+				variable('S1_X', markedValue:true)
 				variable 'S2_X'
 				variable 'S3_X'
 				variable "${Converter.NOT_INIT_VARIABLE_NAME}"
@@ -449,6 +454,7 @@ class ControlCodeBuilder extends BuilderSupport {
 				RS(Q:'S1_X', S:"not ${Converter.NOT_INIT_VARIABLE_NAME} or mySequence_T3_enabled or mySequence_T4_enabled", R:'mySequence_T1_enabled or mySequence_T2_enabled')
 				P('S1_P1', Q:'S1_activation', in:'S1_X')
 				N('S1_N1', Q:'S1_deactivation', in:'S1_X')
+				'u2 := y1'('S1_deactivation')
 				RS(Q:'S2_X', S:'mySequence_T1_enabled', R:'mySequence_T3_enabled')
 				P('S2_P1', Q:'S2_activation', in:'S2_X')
 				N('S2_N1', Q:'S2_deactivation', in:'S2_X')
@@ -562,7 +568,7 @@ class ControlCodeBuilder extends BuilderSupport {
 			output 'u6'
 			output 'u7'
 			output 'u4'
-                        output 'u8'
+			output 'u8'
 			RS 'RS1'
 			functionblock('FB1') {
 				input 'y1'
@@ -582,7 +588,7 @@ class ControlCodeBuilder extends BuilderSupport {
 				P('Py2', in:'y2')
 				'u4 := Py2.Q and y1'()
 				FB1('FB1instance', y1:'y2', y2:'y3', u1:'u7')
-                                'u8 := y1 or y2'('y3')
+				'u8 := y1 or y2'('y3')
 			}
 			process('someProcess') {
 				variable 'x'
@@ -615,7 +621,7 @@ class ControlCodeBuilder extends BuilderSupport {
 			output 'u6'
 			output 'u7'
 			output 'u4'
-                        output 'u8'
+			output 'u8'
 			logicProgram('program') {
 				variable 'FB1instance_u1'
 				variable 'FB1instance_y1'
@@ -664,7 +670,7 @@ class ControlCodeBuilder extends BuilderSupport {
 				'FB1instance_program_SR2_Q := not FB1instance_program_SR2_R and FB1instance_program_SR2_Q or FB1instance_program_SR2_S'()
 				'FB1instance_x := FB1instance_program_SR2_Q'()
 				'u7 := FB1instance_u1'()
-                                'u8 := (y3) and (y1 or y2) or (not (y3) and u8)'()
+				'u8 := (y3) and (y1 or y2) or (not (y3) and u8)'()
 			}
 			process('someProcess') {
 				variable 'x'
@@ -799,6 +805,5 @@ class ControlCodeBuilder extends BuilderSupport {
 		if (openInSupremica) {
 			Util.openModuleInSupremica(generatedModuleFromAssignmentOnly)
 		}
-
 	}
 }
