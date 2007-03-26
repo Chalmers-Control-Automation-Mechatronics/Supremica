@@ -8,6 +8,8 @@ class FunctionBlockCall extends Named {
 	IdentifierExpression type
 	void setProperty(String property, Object newValue) {
 		if (metaClass.properties.any{it.name == property}) metaClass.setProperty(this, property, newValue)
+		else if (newValue instanceof Expression) inputOutputMapping[new IdentifierExpression(property)] = newValue
+		else if (newValue instanceof IdentifierExpression) inputOutputMapping[new IdentifierExpression(property)] = new Expression(newValue.text)
 		else inputOutputMapping[new IdentifierExpression(property)] = new Expression(newValue)
 	}
 

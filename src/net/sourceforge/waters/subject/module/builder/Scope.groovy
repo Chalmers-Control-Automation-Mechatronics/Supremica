@@ -56,9 +56,9 @@ class Scope {
 		if (expandCache[cacheKey]) return expandCache[cacheKey]
 		def expandedExpr = expr.text
 		expr.findIdentifiers().each { id ->
-		    def newExpr = exchange(id, earlierStatements)
-		    assert newExpr, "Undeclared identifier $id in expr '${expr}', scope ${fullName}"
-		    expandedExpr = expandedExpr.replaceAll(Expression.FULL_ID_PATTERN){(new IdentifierExpression(it) == id) ? newExpr.text : it}
+			def newExpr = exchange(id, earlierStatements)
+			assert newExpr, "Undeclared identifier $id in expr '${expr}', scope ${fullName}"
+			expandedExpr = expandedExpr.replaceAll(Expression.FULL_ID_PATTERN){(new IdentifierExpression(it) == id) ? newExpr.text : it}
  		}
 		expandCache[cacheKey] = new Expression(expandedExpr)
 	}

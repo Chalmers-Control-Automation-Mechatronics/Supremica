@@ -130,6 +130,7 @@ class Expression {
 			newExpr = newExpr.replaceAll(/(?i)\(\s*not\s+${FULL_ID_PATTERN}\s*\)/){it[1..-2]}
 			newExpr = newExpr.replaceAll(/(?i)not\s+not/){''}
 			newExpr = newExpr.replaceAll(/\s\s/){' '}
+			newExpr = newExpr.replaceAll(/\(\((?:\s|${FULL_ID_PATTERN})*\)\)/){it[1..-2]}
 		}
 		new Expression(newExpr)
 	}
@@ -167,6 +168,7 @@ class Expression {
 		assert new Expression('apa_bepa.cepa and (lepa_pep_as or epa.opa)').findIdentifiers().text == ['apa_bepa.cepa', 'lepa_pep_as', 'epa.opa']
 		assert new Expression('Py2_in and not Py2_old').findIdentifiers().text == ['Py2_in', 'Py2_old']
 		assert new Expression('apa and ((pepa)) and (not (cepa))').cleanup().text == 'apa and pepa and not cepa'
+		assert new Expression('apa or ((sopa and ((pepa.rl or lepa))))').cleanup().text == 'apa or ((sopa and (pepa.rl or lepa)))'
 	}
 
 }
@@ -285,9 +287,6 @@ class ControlCodeBuilder extends BuilderSupport {
 			
 	static final NODE_TYPES = [LogicProgram,
 	                           SequentialProgram,
-	                           FunctionBlock,
-	                           FunctionBlockInstance,
-	                           FunctionBlockCall,
 	                           Sequence,
 	                           Assignment,
 	                           Process,
@@ -295,7 +294,13 @@ class ControlCodeBuilder extends BuilderSupport {
 	                           NAction,
 	                           P1Action,
 	                           P0Action,
+	                           SetQualifier,
+	                           ResetQualifier,
+	                           NonstoredQualifier,
 	                           Transition,
+	                           FunctionBlock,
+	                           FunctionBlockInstance,
+	                           FunctionBlockCall,
 	                           Input,
 	                           Output,
 	                           InternalVariable]
@@ -308,12 +313,12 @@ class ControlCodeBuilder extends BuilderSupport {
 		createNode(name, [:], value)
 	}
 	def createNode(name, Map attributes){
-		def type = NODE_TYPES.find{name ==~ it.pattern}
+		//println "Create node: name:$name, attributes:$attributes"
+		def type = NODE_TYPES.find{name ==~ it.pattern && (!it.declaredFields.any{it.name == 'parentType'} || current?.class == it.parentType)}
 		if (!type) {
 			if (current instanceof Sequence) return createNode('transition', [guard:name, *:attributes])
 			else if (!attributes.keySet().every{it =~ /(?i)name/}) { //FB instance call
 				if (attributes.name) { //call of FB instance with name attributes.name that should be created on the fly/implicitly
-					//functionBlockInstance(type:name, name:attributes.name)
 					attributes.type = name
 					return createNode('functionBlockCall', attributes)
 				} else { // call of either explicitly declared FB instance or implicitly declared without name 
@@ -327,7 +332,7 @@ class ControlCodeBuilder extends BuilderSupport {
 		}
 		if (type == Assignment && name =~ /\:=/) { //Assignment
 			def parts = name.split(/\:=/)
-			return createNode('assignment', [name:"ASSIGN_${parts[0]}", Q:parts[0], input:parts[1], *:attributes]) 
+			return createNode('assignment', [Q:parts[0], input:parts[1], *:attributes]) 
 		}
 		if (type instanceof Class) {
 			def obj = type.newInstance()
@@ -335,10 +340,11 @@ class ControlCodeBuilder extends BuilderSupport {
 				if (attribute?.key) {
 					def value
 					Class propertyType = obj.metaClass.properties.find{it.name.toLowerCase() == attribute.key.toLowerCase()}?.type
-					switch (propertyType) {
-					case IdentifierExpression: value = new IdentifierExpression(attribute.value); break
-					case Expression: value = new Expression(attribute.value); break
-					default:
+					if (propertyType.isCase(Expression) && !(attribute.value instanceof Expression)) {
+						value = new Expression(attribute.value)
+					} else if (propertyType.isCase(IdentifierExpression) && !(attribute.value instanceof IdentifierExpression)) {
+						value = new IdentifierExpression(attribute.value)
+					} else {
 						value = attribute.value
 					}
 					obj[attribute.key] = value
@@ -361,8 +367,8 @@ class ControlCodeBuilder extends BuilderSupport {
 	}
 
 	def createNode(name, Map attributes, value){
-		//println "createNode, name: $name, attributes:$attributes, value:$value"
-		def type = NODE_TYPES.find{name ==~ it.pattern}
+	//	println "createNode, name: $name, attributes:$attributes, value:$value"
+		def type = NODE_TYPES.find{name ==~ it.pattern && (!it.declaredFields.any{it.name == 'parentType'} || current.class == it.parentType) }
 		if (value != null) {
 			if (!type) return createNode(name, [name:value, *:attributes])
 			else return createNode(name, [(type.defaultAttr):value, *:attributes])
@@ -405,15 +411,19 @@ class ControlCodeBuilder extends BuilderSupport {
 			output 'u1'
 			output 'u2'
 			output 'u3'
+			output 'u4'
+			output 'u5'
 			sequentialProgram('program') {
 				sequence('mySequence') {
 					Step ('S1'){
+						N('u5')
 						P0_Action {
 							'u2 := y1'()
 						}
 					}
 					'y1'();    'y2'(to:'S3')
 					Step('S2'){
+						S('u4')
 						N_action {
 							'u1 := y1 or y2'()
 						}
@@ -421,6 +431,7 @@ class ControlCodeBuilder extends BuilderSupport {
 					'not y1'(to:'S1')
 								Step('S3'){
 									P1_action{'u3 := y2'()}
+									R('u4')
 								}
 								'true'()
 				}
@@ -432,6 +443,8 @@ class ControlCodeBuilder extends BuilderSupport {
 			output 'u1'
 			output 'u2'
 			output 'u3'
+			output 'u4'
+			output 'u5'
 			logicProgram('program') {
 				variable('S1_X', markedValue:true)
 				variable 'S2_X'
@@ -454,15 +467,18 @@ class ControlCodeBuilder extends BuilderSupport {
 				RS(Q:'S1_X', S:"not ${Converter.NOT_INIT_VARIABLE_NAME} or mySequence_T3_enabled or mySequence_T4_enabled", R:'mySequence_T1_enabled or mySequence_T2_enabled')
 				P('S1_P1', Q:'S1_activation', in:'S1_X')
 				N('S1_N1', Q:'S1_deactivation', in:'S1_X')
+				SR(Q:'u5', S:'S1_X', R:'S1_deactivation') 
 				'u2 := y1'('S1_deactivation')
 				RS(Q:'S2_X', S:'mySequence_T1_enabled', R:'mySequence_T3_enabled')
 				P('S2_P1', Q:'S2_activation', in:'S2_X')
 				N('S2_N1', Q:'S2_deactivation', in:'S2_X')
+				'u4 := S2_activation or u4'()
 				'u1 := y1 or y2'('S2_X')
 				RS(Q:'S3_X', S:'mySequence_T2_enabled', R:'mySequence_T4_enabled')
 				P('S3_P1', Q:'S3_activation', in:'S3_X')
 				N('S3_N1', Q:'S3_deactivation', in:'S3_X')
 				'u3 := y2'('S3_activation')
+				'u4 := not S3_activation and u4'()
 				"${Converter.NOT_INIT_VARIABLE_NAME} := true"()
 			}
 		}

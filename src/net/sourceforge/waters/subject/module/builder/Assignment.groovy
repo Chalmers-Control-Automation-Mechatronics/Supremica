@@ -3,7 +3,7 @@ package net.sourceforge.waters.subject.module.builder;
 class Assignment extends Named {
 	Expression input
 	IdentifierExpression Q
-        Expression condition
+	Expression condition
 	static final pattern = /(?i)assign(?:ment)|.*\:=.*?/
 	static final defaultAttr = 'condition'
 	static final parentAttr = 'statements'
@@ -15,13 +15,14 @@ class Assignment extends Named {
 		statements = statements.findAll{it.scope.processScope == processScope}
 		indexToThis = statements.indexOf(thisOne)
 		Variable assignedVariable = scope.namedElement(Q)
+		assert assignedVariable, "Undeclared identifier $Q in scope ${scope.fullName}"
 		if (assignedVariable.assignmentAutomatonNeeded(statements, indexToThis)) {
 			boolean markedValue = (assignedVariable.markedValue != null) ? assignedVariable.markedValue : (assignedVariable.value != null ? assignedVariable.value : false) 
 			mb.booleanVariable(Q.toSupremicaSyntax(scope), initial:assignedVariable.value, marked:markedValue)
 			mb.plant("ASSIGN_${Q.toSupremicaSyntax(scope)}", defaultEvent:scope.eventName, deterministic:false) {
 				state('q0', marked:true) {
-					//println input.expand(scope, statements[0..<indexToThis]).toSupremicaSyntax()
-					//println input.expand(scope, statements[0..<indexToThis]).cleanup().toSupremicaSyntax()
+					//println input.expand(scope, statements[0..<indexToThis])
+					//println input.expand(scope, statements[0..<indexToThis]).cleanup()
 					selfLoop(guard:input.expand(scope, statements[0..<indexToThis]).cleanup().toSupremicaSyntax()) { set(Q.toSupremicaSyntax(scope)) }
 					selfLoop(guard:new Expression("not (${input})").expand(scope, statements[0..<indexToThis]).cleanup().toSupremicaSyntax()) { reset(Q.toSupremicaSyntax(scope)) }
 				}
@@ -29,8 +30,8 @@ class Assignment extends Named {
 		}
 	}
 	List execute(Scope parent) {
-            if (!condition) return [[statement:this, scope:parent]]
-            else return [[statement:new Assignment(Q:Q, input:new Expression("($condition) and ($input) or (not ($condition) and $Q)")), scope:parent]]
+		if (!condition) return [[statement:this, scope:parent]]
+		else return [[statement:new Assignment(Q:Q, input:new Expression("($condition) and ($input) or (not ($condition) and $Q)")), scope:parent]]
 	}
 	List getNamedElements() { [] }
 	List getSubScopes() { [] } 
