@@ -30,11 +30,13 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedList;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.fuber.xsd.libraryelement.*;
-import javax.xml.bind.Marshaller;
+import net.sourceforge.waters.xsd.base.*;
+import net.sourceforge.waters.xsd.module.*;
 
 class ModelMaker
 {
@@ -47,9 +49,15 @@ class ModelMaker
 	private String systemFileName;
 	private String outputFileName;
     private List<File> libraryPathList = new LinkedList<File>();
+	
+	private JaxbSystem theSystem;
+	private JaxbFBNetwork systemFBNetwork;
+	private Map<String,JaxbFBType> fbTypes = new HashMap<String,JaxbFBType>();
+	private Map<String,String> functionBlocks = new HashMap<String,String>();
 
-	private JaxbFBNetwork jaxbSystemFBNetwork;
-	private Map jaxbFBTypes = new HashMap();
+	private Module outputModule;
+	private List<EventDecl> eventList;
+	private List<ElementType> componentList;
 
 
 	private ModelMaker(String outputFileName, String systemFileName, String libraryPathBase, String libraryPath) 
@@ -182,19 +190,19 @@ class ModelMaker
 		return theFile;
     }
 
-    private void loadApplication(String fileName)
+    private void loadSystem(String fileName)
     {
 	
-		System.out.println("ModelMaker.loadFile(" + fileName + "): Loading file " + fileName);
+		System.out.println("ModelMaker.loadSystem(" + fileName + "): Loading file " + fileName);
 		
 		File file = getFile(fileName);
 		
 		try
 		{
-			Object unmarshalledXmlObject = iecUnmarshaller.unmarshal(file);
-			if (unmarshalledXmlObject instanceof JaxbSystem)
+			Object unmarshalledObject = iecUnmarshaller.unmarshal(file);
+			if (unmarshalledObject instanceof JaxbSystem)
 			{ 
-				JaxbSystem theSystem = (JaxbSystem) unmarshalledXmlObject;
+				theSystem = (JaxbSystem) unmarshalledObject;
 				if (theSystem.isSetDevice())
 				{
 					JaxbDevice theDevice = (JaxbDevice) theSystem.getDevice().get(0);
@@ -203,21 +211,31 @@ class ModelMaker
 						JaxbResource theResource = (JaxbResource) theDevice.getResource().get(0);
 						if (theResource.isSetFBNetwork())
 						{
-							System.out.println("ModelMaker.loadFile(" + fileName + "): The file is IEC 61499 system.");
-							jaxbSystemFBNetwork = ((JaxbFBNetwork) theResource.getFBNetwork());
-							
+							systemFBNetwork = ((JaxbFBNetwork) theResource.getFBNetwork());
+							if (systemFBNetwork.isSetFB())
+							{
+								for (Iterator fbIter = systemFBNetwork.getFB().iterator(); fbIter.hasNext();)
+								{
+									FB curFB = (FB) fbIter.next();
+									String instanceName = curFB.getName();
+									// get and load the FB type
+									if (curFB.getType().startsWith("E_SPLIT"))
+									{
+										//constructSplitType((new Integer(curFB.getType().substring(7))).intValue());
+									}
+									else if (curFB.getType().startsWith("E_MERGE"))
+									{
+										//constructMergeType((new Integer(curFB.getType().substring(7))).intValue());
+									}
+									else
+									{
+										loadFB(instanceName, curFB.getType() + ".fbt");
+									}
+								}
+							}
 						}
 					}
 				}
-			}
-			else if (unmarshalledXmlObject instanceof JaxbFBType)
-			{
-				JaxbFBType theType = (JaxbFBType) unmarshalledXmlObject;
-				if (theType.isSetName())
-				{
-					System.out.println("ModelMaker.loadFile(" + fileName + "): The file is IEC 61499 FB type.");
-					jaxbFBTypes.put(theType.getName(),theType);
-				}				
 			}
 		}
 		catch (Exception e)
@@ -226,12 +244,114 @@ class ModelMaker
 			System.exit(1);
 		}
 	}
+
+    private void loadFB(String instanceName, String fileName)
+    {
+	
+		System.out.println("ModelMaker.loadFB(" + instanceName + ", " + fileName + "):");
+		
+		File file = getFile(fileName);
+		
+		try
+		{
+			Object unmarshalledObject = iecUnmarshaller.unmarshal(file);
+			if (unmarshalledObject instanceof JaxbFBType)
+			{
+				JaxbFBType theType = (JaxbFBType) unmarshalledObject;
+				String typeName = theType.getName();
+				if (!fbTypes.keySet().contains(typeName))
+				{
+					System.out.println("\t Adding FB type " + typeName);
+					fbTypes.put(typeName, theType);					
+				}
+				System.out.println("\t Adding FB " + instanceName);
+				functionBlocks.put(instanceName,theType.getName());
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace(System.err);
+			System.exit(1);
+		}
+	}
+
+// 	private void constructMergeType(int size)
+// 	{
+// 		resource.addBasicFBType("E_MERGE" + size);
+		
+// 		BasicFBType newBasicFBType = (BasicFBType) resource.getFBType("E_MERGE" + size);	
+
+// 		for(int i=1; i<=size; i++)
+// 		{
+// 			newBasicFBType.addVariable("EI" + i, new BooleanVariable("EventInput",false));
+// 		}
+// 		newBasicFBType.addVariable("EO", new BooleanVariable("EventInput",false));
+
+// 		newBasicFBType.getECC().addInitialState("S0");
+// 		newBasicFBType.getECC().addState("S1");
+// 		newBasicFBType.getECC().getState("S1").addAction(null, "EO");
+// 		String condition = "";
+// 		for(int i=1; i<=size; i++)
+// 		{
+// 			if (i==size)
+// 			{
+// 				condition = condition + "EI" + i;
+// 			}
+// 			else
+// 			{
+// 				condition = condition + "EI" + i + " OR ";
+// 			}
+// 		}
+// 		newBasicFBType.getECC().addTransition("S0","S1",condition);
+// 		newBasicFBType.getECC().addTransition("S1","S0","TRUE");
+// 	}
+
+// 	private void constructSplitType(int size)
+// 	{
+// 		resource.addBasicFBType("E_SPLIT" + size);
+		
+// 		BasicFBType newBasicFBType = (BasicFBType) resource.getFBType("E_SPLIT" + size);
+		
+// 		newBasicFBType.addVariable("EI", new BooleanVariable("EventInput",false));
+
+// 		for(int i=1; i<=size; i++)
+// 		{
+// 			newBasicFBType.addVariable("EO" + i, new BooleanVariable("EventInput",false));
+// 		}
+
+// 		newBasicFBType.getECC().addInitialState("S0");
+// 		newBasicFBType.getECC().addState("S1");
+// 		for(int i=1; i<=size; i++)
+// 		{
+// 			newBasicFBType.getECC().getState("S0").addAction(null, "EO" + i);
+// 		}
+// 		newBasicFBType.getECC().addTransition("S0","S1","EI");
+// 		newBasicFBType.getECC().addTransition("S1","S0","TRUE");
+// 	}
+	
+
+	private void setupOutput()
+	{
+
+		outputModule = new Module();
+		outputModule.setName(theSystem.getName());
+
+		outputModule.setEventDeclList(new EventDeclList());
+		outputModule.setComponentList(new ComponentList());
+		
+		eventList = outputModule.getEventDeclList().getList();
+		componentList = outputModule.getComponentList().getList();
+
+		
+	}
 	
 	public void makeModel()
 	{
 
 		// load IEC 61499 application
-		loadApplication(systemFileName);
+		loadSystem(systemFileName);
+
+		setupOutput();
 
 		// TODO: make instance queue model
 		
@@ -299,7 +419,13 @@ class ModelMaker
 			}
 			
 		}			
-
+		
+		System.out.println("Input arguments: \n" 
+						   + "\t output name: " + outputFileName + "\n"
+						   + "\t system name: " + systemFileName + "\n"
+						   + "\t library path base: " + libraryPathBase + "\n"
+						   + "\t library path: " + libraryPath + "\n");
+		
 		(new ModelMaker(outputFileName,systemFileName,libraryPathBase,libraryPath)).makeModel();
 		System.exit(0);
 
