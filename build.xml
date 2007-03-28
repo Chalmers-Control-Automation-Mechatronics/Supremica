@@ -244,7 +244,7 @@
 -->
 <target name="compileAndRun" depends="compile,runLocal"/>
 
-<target name="compile" depends="compile_supremica,compile_supremica_groovy,compile_supremica_tests"/>
+<target name="compile" depends="compile_supremica,compile_supremica_groovy,compile_supremica_tests, compile_supremica_tests_groovy"/>
 
 <target name="compile_supremica" depends="startfiles_local_supremica">
   <javac debug="on"
@@ -334,6 +334,14 @@
   </javac>
 </target>
 
+<target name="compile_supremica_tests_groovy" description="--> compiles groovy test files">
+	<groovyc srcdir="${testssrc}" destdir="${testsbuild}">
+		<classpath>    
+			<pathelement location="${build}"/>
+			<pathelement location="${lib}/${unjared}"/>
+		</classpath>
+	</groovyc>
+</target>
 <!-- Compile Supremica Benchmarks
 *	Reuses existing class files, but recompiles those
 *	source files that have changed.
@@ -691,7 +699,7 @@ Class-Path: ${manifest.pathlist}</echo>
   </junit>
 </target>
 
-<target name="run_supremica_tests_short" depends="jar_supremica,jar_supremica_tests">
+<target name="run_supremica_tests_short">
   <mkdir dir="${logs.results}"/>
   <junit printsummary="on" fork="true" maxmemory="512m">
     <formatter type="xml"/>
@@ -699,6 +707,8 @@ Class-Path: ${manifest.pathlist}</echo>
       <fileset dir="${testssrc}">
         <include name="**/*Test.java"/>
         <include name="**/Test*.java"/>
+<!--        <include name="**/*Test.groovy"/>
+        <include name="**/Test*.groovy"/>-->
         <exclude name="org/supremica/testhelpers/**/*.java"/>
         <exclude name="**/TestPackage*.java"/>
         <exclude name="**/Abstract*.java"/>
