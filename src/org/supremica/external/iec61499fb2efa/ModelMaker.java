@@ -341,7 +341,8 @@ class ModelMaker
 		
 		eventList = outputModule.getEventDeclList().getList();
 		componentList = outputModule.getComponentList().getList();
-
+		
+		
 		
 	}
 	
