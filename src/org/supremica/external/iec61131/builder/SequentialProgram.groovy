@@ -1,4 +1,6 @@
-package net.sourceforge.waters.subject.module.builder;
+package org.supremica.external.iec61131.builder
+
+import net.sourceforge.waters.subject.module.builder.ModuleBuilder
 
 class SequentialProgram {
 	static final pattern = /(?i)sequentialProgram/

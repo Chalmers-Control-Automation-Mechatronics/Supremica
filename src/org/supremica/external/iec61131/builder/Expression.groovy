@@ -1,4 +1,4 @@
-package net.sourceforge.waters.subject.module.builder;
+package org.supremica.external.iec61131.builder
 
 class Expression {
 	Expression(String text) {
