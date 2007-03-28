@@ -414,7 +414,7 @@
   <target name="doc" depends="jaxb-generate"
           description="Generate Javadoc documentation.">
     <mkdir dir="${javadoc}"/>
-    <javadoc destdir="${javadoc}">
+    <javadoc destdir="${javadoc}" windowtitle="Waters API">
       <packageset dir="${src}">
         <include name="net/sourceforge/waters/xsd/**/*"/>
         <exclude name="net/sourceforge/waters/xsd/*/impl/**"/>

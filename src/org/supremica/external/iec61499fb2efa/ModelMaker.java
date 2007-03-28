@@ -29,22 +29,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.net.URI;
+import java.lang.Exception;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.fuber.xsd.libraryelement.*;
-import net.sourceforge.waters.xsd.base.*;
-import net.sourceforge.waters.xsd.module.*;
+
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.model.module.ModuleProxy;
+//import net.sourceforge.waters.model.expr.OperatorTable;
+//import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+
 
 class ModelMaker
 {
 
     private JAXBContext iecContext;
     private Unmarshaller iecUnmarshaller;
-    private JAXBContext wmodContext;
-    private Marshaller wmodMarshaller;
 
 	private String systemFileName;
 	private String outputFileName;
@@ -55,9 +59,8 @@ class ModelMaker
 	private Map<String,JaxbFBType> fbTypes = new HashMap<String,JaxbFBType>();
 	private Map<String,String> functionBlocks = new HashMap<String,String>();
 
-	private Module outputModule;
-	private List<EventDecl> eventList;
-	private List<ElementType> componentList;
+	private ModuleProxyFactory moduleFactory;
+	private ModuleProxy outputModule;
 
 
 	private ModelMaker(String outputFileName, String systemFileName, String libraryPathBase, String libraryPath) 
@@ -67,10 +70,6 @@ class ModelMaker
 		{
 			iecContext = JAXBContext.newInstance("net.sourceforge.fuber.xsd.libraryelement");
 			iecUnmarshaller = iecContext.createUnmarshaller();
-			
-			wmodContext = JAXBContext.newInstance("net.sourceforge.waters.xsd.module");
-			wmodMarshaller = wmodContext.createMarshaller();
-
 		}
 		catch (Exception e)
 		{
@@ -332,17 +331,18 @@ class ModelMaker
 
 	private void setupOutput()
 	{
+		
+		moduleFactory = ModuleSubjectFactory.getInstance();
 
-		outputModule = new Module();
-		outputModule.setName(theSystem.getName());
+		try
+		{
+			URI location = new URI(outputFileName);
+			outputModule = moduleFactory.createModuleProxy(theSystem.getName(), location);
+		}
+		catch (Exception e)
+		{
+		}
 
-		outputModule.setEventDeclList(new EventDeclList());
-		outputModule.setComponentList(new ComponentList());
-		
-		eventList = outputModule.getEventDeclList().getList();
-		componentList = outputModule.getComponentList().getList();
-		
-		
 		
 	}
 	
@@ -352,12 +352,14 @@ class ModelMaker
 		// load IEC 61499 application
 		loadSystem(systemFileName);
 
+		// setup module factory
 		setupOutput();
 
 		// TODO: make instance queue model
 		
+
 		// TODO: make event execution thread model
-		
+
 		// TODO: make jobs queue model
 		
 		// TODO: make algorithms execution thread model
