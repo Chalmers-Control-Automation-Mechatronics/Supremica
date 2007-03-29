@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   SimpleSetSubject
 //###########################################################################
-//# $Id: SimpleSetSubject.java,v 1.3 2007-03-02 05:21:14 robi Exp $
+//# $Id: SimpleSetSubject.java,v 1.4 2007-03-29 00:58:46 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -33,7 +33,7 @@ public interface SimpleSetSubject<E>
    * Assigns the contents of another set to this set.
    * This method ensures that the contents of this set are equal to the
    * contents of the given set according to the {@link
-   * Proxy#equalsWithGeometry(Proxy) equals()} method.  Items already
+   * Object#equals(Object) equals()} method. Items already
    * contained in this set are resued. Items not contained are cloned from
    * the given set. The method produces as few model change notifications
    * as possible.
