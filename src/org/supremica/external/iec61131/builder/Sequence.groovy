@@ -45,13 +45,14 @@ class Transition {
 	}
 	def addProcessEvents(ModuleBuilder mb, Scope parent) {}
 	List execute(Scope parent) {
+		Scope scope = [self:this, parent:parent]
 		def ccb = new ControlCodeBuilder()
 		int indexOfThis = sequence.transitions.indexOf(this)
 		List higherPrioTrans = sequence.transitions[0..<indexOfThis].findAll{it.from == from}
-		String mainExpr = "${parent.fullNameOf(from+'X')} and (${guard})"
-		List prioExpr = higherPrioTrans.collect{parent.fullNameOf(it.name + ENABLED_NAME).text}
+		String mainExpr = "${from + 'X'} and $guard"
+		List prioExpr = higherPrioTrans.collect{(it.name + ENABLED_NAME).text}
 		Assignment enable = ccb."${ENABLED.name} := ${[mainExpr, *prioExpr].join(' and not ')}"()
-		[[scope:[self:this, parent:parent] as Scope, statement:enable]]
+		enable.execute(scope)
 	}
 }
 class Step {
@@ -105,9 +106,9 @@ class NAction {
 	List getSubScopeElements() {[]}
 	def addProcessEvents(ModuleBuilder mb, Scope parent) {}
 	List execute(Scope parent) {
-		List execStatements = statements.inject([]) {list, elem -> list += elem.execute(parent)}
-		execStatements.each{it.statement.condition = new Expression('X')}
-		execStatements.statement.inject([]){list, elem -> list += elem.execute(parent)}
+		statements*.execute(parent).flatten().collect{
+			new Assignment(Q:it.Q, input:it.input, condition:new Expression('X')).execute(parent)
+		}.flatten()
 	}
 }
 class P1Action {
@@ -120,9 +121,9 @@ class P1Action {
 	List getSubScopeElements() {[]}
 	def addProcessEvents(ModuleBuilder mb, Scope parent) {}
 	List execute(Scope parent) {
-		List execStatements = statements.inject([]) {list, elem -> list += elem.execute(parent)}
-		execStatements.each{it.statement.condition = new Expression('activation')}
-		execStatements.statement.inject([]){list, elem -> list += elem.execute(parent)}
+		statements*.execute(parent).flatten().collect{
+			new Assignment(Q:it.Q, input:it.input, condition:new Expression('activation')).execute(parent)
+		}.flatten()
 	}
 }
 class P0Action {
@@ -135,9 +136,9 @@ class P0Action {
 	List getSubScopeElements() {println 'P0Actionsubscope';[]}
 	def addProcessEvents(ModuleBuilder mb, Scope parent) {println 'P0Actionaddprocevent'}
 	List execute(Scope parent) {
-		List execStatements = statements.inject([]) {list, elem -> list += elem.execute(parent)}
-		execStatements.each{it.statement.condition = new Expression('deactivation')}
-		execStatements.statement.inject([]){list, elem -> list += elem.execute(parent)}
+		statements*.execute(parent).flatten().collect{
+			new Assignment(Q:it.Q, input:it.input, condition:new Expression('deactivation')).execute(parent)
+		}.flatten()
 	}
 }
 class SetQualifier {
@@ -148,7 +149,7 @@ class SetQualifier {
 	IdentifierExpression variable
 	Step step
 	List execute(Scope parent) {
-		[[scope:parent, statement:[Q:variable, input:new Expression("activation or $variable")] as Assignment]]
+		[[scope:parent, Q:variable, input:new Expression("activation or $variable")] as RuntimeAssignment]
 	}
 }
 class ResetQualifier {
@@ -159,7 +160,7 @@ class ResetQualifier {
 	IdentifierExpression variable
 	Step step
 	List execute(Scope parent) {
-		[[scope:parent, statement:[Q:variable, input:new Expression("not activation and $variable")] as Assignment]]
+		[[scope:parent, Q:variable, input:new Expression("not activation and $variable")] as RuntimeAssignment]
 	}
 }
 class NonstoredQualifier {

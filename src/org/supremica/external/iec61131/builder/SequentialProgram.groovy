@@ -31,7 +31,7 @@ class SequentialProgram {
 			}
 		}
 
-		execStatements << [scope:scope, statement:new Assignment(Q:NOT_INIT_VARIABLE.name, input:new Expression('true'))]
+		execStatements << new RuntimeAssignment(scope:scope, Q:NOT_INIT_VARIABLE.name, input:new Expression('true'))
 	}
 	def addProcessEvents(ModuleBuilder mb, Scope parent) {
 		subScopeElements*.addProcessEvents(mb, [self:this, parent:parent] as Scope)

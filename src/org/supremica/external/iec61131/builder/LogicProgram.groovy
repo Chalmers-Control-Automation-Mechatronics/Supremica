@@ -11,7 +11,7 @@ class LogicProgram {
 	List variables = []
 	List execute(Scope parent) {
 		Scope scope = [self:this, parent:parent]
-		statements.inject([]){executedStatements, statement -> executedStatements + statement.execute(scope)}
+		statements*.execute(scope).flatten()//.inject([]){list, elem -> list + elem.execute(scope)}
 	}
 	List getNamedElements() {
 		subScopeElements

@@ -10,12 +10,12 @@ class Process {
 	List variables = []
 	List programs = []
 	List types = []
+	Speed speed = Speed.MEDIUM
+	
 	
 	List execute(Scope parent) {
-		Scope scope = [self:this, parent:parent]
-		List statements = []
-		programs*.execute(scope).each { statements += it }
-		statements
+		Scope scope = [self:this, parent:parent, process:this]
+		programs*.execute(scope).flatten()
 	}
 	List getNamedElements() {
 		[*variables, *programs, *types]
@@ -25,6 +25,7 @@ class Process {
 	}
 	def addEvent(ModuleBuilder mb, Scope parent) {
 		Scope scope = [self:this, parent:parent]
+		println scope.fullName
 		def eventName = scope.eventName
 		mb.event(eventName, controllable:false)
 		mb.eventAlias(Converter.PROCESS_EVENTS_ALIAS_NAME, events:[eventName])

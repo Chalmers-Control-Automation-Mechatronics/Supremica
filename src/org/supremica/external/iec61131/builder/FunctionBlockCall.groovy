@@ -43,9 +43,9 @@ class FunctionBlockCall {
 			assert block, "Undeclared function block ${instance.type}, referenced from ${instanceDeclarationScope}"
 		}
 //		println "FunctionBlockCall.execute, callingScope: ${callingScope.fullName}, instance:${instance.name}, type:${type.name}"
-		List statements = block.outputs.findAll{inputOutputMapping[it.name]}.collect{[scope:callingScope, statement:[input:inputOutputMapping[it.name], Q:instanceScope.relativeNameOf(it.name, callingScope)] as Assignment]}
-		statements += block.inputs.collect{[scope:callingScope, statement:[input:inputOutputMapping[it.name], Q:instanceScope.relativeNameOf(it.name, callingScope)] as Assignment]}
+		List statements = block.outputs.findAll{inputOutputMapping[it.name]}.collect{[scope:callingScope, input:inputOutputMapping[it.name], Q:instanceScope.relativeNameOf(it.name, callingScope)] as RuntimeAssignment}
+		statements += block.inputs.collect{[scope:callingScope, input:inputOutputMapping[it.name], Q:instanceScope.relativeNameOf(it.name, callingScope)] as RuntimeAssignment}
 		statements += block.execute(instanceScope)
-		statements += block.outputs.findAll{inputOutputMapping[it.name]}.collect{[scope:callingScope, statement:[input:instanceScope.relativeNameOf(it.name, callingScope), Q:new IdentifierExpression(inputOutputMapping[it.name].text)] as Assignment]}
+		statements += block.outputs.findAll{inputOutputMapping[it.name]}.collect{[scope:callingScope, input:instanceScope.relativeNameOf(it.name, callingScope), Q:new IdentifierExpression(inputOutputMapping[it.name].text)] as RuntimeAssignment}
 	}
 }
