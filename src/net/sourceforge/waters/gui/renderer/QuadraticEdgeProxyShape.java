@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   QuadraticEdgeProxyShape
 //###########################################################################
-//# $Id: QuadraticEdgeProxyShape.java,v 1.1 2007-02-16 03:00:42 robi Exp $
+//# $Id: QuadraticEdgeProxyShape.java,v 1.2 2007-03-30 11:50:44 avenir Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -41,10 +41,14 @@ class QuadraticEdgeProxyShape
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.renderer.RendererShape
-  public QuadCurve2D getShape()
-  {
-    return mCurve;
-  }
+  // This method reduces the functionality of the superclass, where
+  // getShape() is already defined. Is it on purpose? 
+  // This functionality seems to be needed when 
+  // the shape of the curve together with the attached arrowhead iswanted. 
+//   public QuadCurve2D getShape()
+//   {
+//     return mCurve;
+//   }
 
   public boolean isClicked(final int x, final int y)
   {

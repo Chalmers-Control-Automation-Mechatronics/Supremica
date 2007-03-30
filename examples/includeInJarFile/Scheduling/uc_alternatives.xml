@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Automata name="2_6" major="0" minor="9">
+<Automata name="2_6" comment="A simple example of scheduling under certain uncontrollability. The uncontrollable events have known probabilities of occurrence. If both uncontrollable events are equally probable, the optimal expected cycle time (without security delays) of this example is 18.5 time units." major="0" minor="9">
 <Automaton name="R1" type="Plant">
 	<Events>
 		<Event id="0" label="R1_b"/>

@@ -497,7 +497,7 @@ public class NodeExpander
 				}
 			}
 		}
-	
+
 		return childNodes.values();
     }
 

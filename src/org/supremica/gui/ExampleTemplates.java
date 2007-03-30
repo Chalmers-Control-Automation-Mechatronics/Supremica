@@ -346,7 +346,7 @@ private void initializeSchedulingExamples()
         thisGroup.addItem(new TemplateItem("2 robots (from HBS)", prefix + "hbs_example.xml"));
         thisGroup.addItem(new TemplateItem("2 robots with alternatives (from PV35)", prefix + "pv35_example.xml"));
 		thisGroup.addItem(new TemplateItem("3 robots", prefix + "3_2.xml"));
-		thisGroup.addItem(new TemplateItem("2 robots, uncontrollable alternatives", prefix + "un_alternatives.xml"));
+		thisGroup.addItem(new TemplateItem("2 robots, uncontrollable alternatives", prefix + "uc_alternatives.xml"));
     }
     
     /*

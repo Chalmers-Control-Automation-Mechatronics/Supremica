@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public class MultithreadedNode
 	extends BasicNode
 {
-	private ArrayList subthreads;
+	private ArrayList<MultithreadedAstar> subthreads;
 
 	public MultithreadedNode(double[] basis)
 	{
@@ -33,8 +33,18 @@ public class MultithreadedNode
 		return new MultithreadedNode(null, null);
 	}
 
-	public ArrayList getSubthreads()
+	public ArrayList<MultithreadedAstar> getSubthreads()
 	{
 		return subthreads;
+	}
+
+	public void addSubthread(MultithreadedAstar subthread)
+	{
+		if (subthreads == null)
+		{
+			subthreads = new ArrayList<MultithreadedAstar>();
+		}
+
+		subthreads.add(subthread);
 	}
 }

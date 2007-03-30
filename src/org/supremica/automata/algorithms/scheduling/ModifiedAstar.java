@@ -32,6 +32,8 @@ public class ModifiedAstar
     
     /** The indices of important parameters, that help to find them in the int[]-representions of the nodes. */
     public static int ESTIMATE_INDEX, ACCUMULATED_COST_INDEX, CURRENT_COSTS_INDEX, PARENT_INDEX;
+
+	protected static double ROOT_VALUE = -1;
       
     /**
      * Contains promising search tree nodes, i.e. nodes that might lie on the optimal path.
@@ -75,7 +77,7 @@ public class ModifiedAstar
     protected int[] activeAutomataIndex;
     
     /** Counts the number of iterations */
-    protected int iterationCounter;
+    public static int iterationCounter;
     
     /** Starts ticking when the search/walk through the nodes is
      * started. Shows the duration of the scheduling. */
@@ -188,6 +190,8 @@ public class ModifiedAstar
     /*                                 CONSTUCTORS                                          */
     /****************************************************************************************/
     
+	public ModifiedAstar() {}
+
     public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider, ScheduleDialog gui)
 		throws Exception
     {
@@ -221,14 +225,16 @@ public class ModifiedAstar
     {
         try
         {
-			init();
-
             ActionTimer totalTimer = new ActionTimer();
             
             if (isRunning)
             {
                 totalTimer.restart();
-//                 init();
+
+				init();
+
+				// Is needed for synchronization purposes
+				isInitialized = true;
             }
             
             if (!isRelaxationProvider)
@@ -318,11 +324,8 @@ public class ModifiedAstar
 		// Initiates the open and the closed trees.
 		initTrees();
 
-		// Is needed for synchronization purposes
-        isInitialized = true;
-
 		String initTimeStr = "Initialization time = " + timer.elapsedTime() + "ms";
-		logger.info(initTimeStr);
+// 		logger.info(initTimeStr);
 		outputStr += "\t" + initTimeStr + "\n";
     }
     
@@ -543,25 +546,26 @@ public class ModifiedAstar
                 {
                     maxOpenSize = currOpenSize;
                 }
-                
+
                 // Selects the first node on OPEN. If it is accepting, the search is completed
                 currNode = openTree.first();
-                
+
                 if (isAcceptingNode(currNode))
                 {
                     // This line is needed for correct backward search, performed during the schedule construction
                     // IS IT???
                     updateClosedTree(currNode);
+					this.acceptingNode = currNode;
                     break;
                 }
-                
+
                 // The first open node is removed
                 boolean succesfullyRemoved =  openTree.remove(currNode);
                 if (! succesfullyRemoved)
                 {
                     throw new Exception("The node " + printNodeName(currNode) + " was not found on the openTree");
                 }
-                
+
                 // If the node is not accepting, it goes to the CLOSED tree if there is not a node there already
                 // that represents the same logical state and is better than the current node in all
                 // "aspects" (lower cost in all directions). If the current node is promising (if it ends up on CLOSED),
@@ -583,13 +587,13 @@ public class ModifiedAstar
             // 				logger.info("e_cl : " + printArray(it.next()));
             throw new RuntimeException("An accepting state could not be found, nr of iterations = " + iterationCounter);
         }
-        
+
         outputStr += "\tA*-iterations (nr of search calls through the closed tree): " + iterationCounter + "\n";
         outputStr += "\tIn time: " + timer.elapsedTime() + " ms\n";
         outputStr += "\tThe CLOSED tree contains (at the end) " + closedTree.size() + " elements\n";
         outputStr += "\tMax{OPEN.size} = " + maxOpenSize + "\n";
-        outputStr += "\t\t" + "g = " + currNode.getValueAt(ACCUMULATED_COST_INDEX);
-        
+        outputStr += "\t\t" + "g = " + acceptingNode.getValueAt(ESTIMATE_INDEX);
+
         if (!isRelaxationProvider)
         {
             logger.info(outputStr);
@@ -605,10 +609,8 @@ public class ModifiedAstar
         // 			logger.info(printArray(currNode) + " n�dd; kostnad = " + currNode[ACCUMULATED_COST_INDEX]);
         // 		}
         
-        this.acceptingNode = currNode;
-        
         schedulingDone = true;
-        
+
         return currNode.getValueAt(ACCUMULATED_COST_INDEX);
     }
 
@@ -979,7 +981,7 @@ public class ModifiedAstar
         Automaton scheduleAuto = new Automaton();
         scheduleAuto.setComment("Schedule");
         
-        State nextState = new State(printNodeSignature(acceptingNode));
+        State nextState = makeStateFromNode(acceptingNode, scheduleAuto);
         nextState.setAccepting(true);
         scheduleAuto.addState(nextState);
         
@@ -992,8 +994,8 @@ public class ModifiedAstar
                 if (isRunning)
                 {
                     Node parent = getParent(currNode);
-                    State currState = new State(printNodeSignature(parent) + "; firing time = " + currNode.getValueAt(ACCUMULATED_COST_INDEX));
-                    LabeledEvent event = findCurrentEvent(parent, currNode);
+                    State currState = makeStateFromNode(parent, scheduleAuto);
+                    LabeledEvent event = findConnectingEvent(parent, currNode);
                     
                     if (!hasParent(parent))
 					{
@@ -1034,6 +1036,21 @@ public class ModifiedAstar
         logger.info("Schedule was built in " + timer.elapsedTime() + "ms");
         ActionMan.getGui().addAutomaton(scheduleAuto);
     }
+
+	/**
+	 * Creates a state, maiking sure that a unique name is given to the new state.
+	 */
+	protected State makeStateFromNode(Node node, Automaton auto)
+	{
+		String stateName = printNodeName(node) + "; firing_time = " + node.getValueAt(ACCUMULATED_COST_INDEX);
+		
+		while (auto.containsStateWithName(stateName))
+		{
+			stateName += ".";
+		}
+		
+		return new State(stateName);
+	}
     
     /**
      * This method finds several parent candidates to the current node by retrieving 
@@ -1145,7 +1162,7 @@ public class ModifiedAstar
      */
     protected boolean hasParent(Node node)
     {
-        if (node.getValueAt(PARENT_INDEX) == -1)
+        if (node.getValueAt(PARENT_INDEX) == ROOT_VALUE)
 		{
             return false;
         }
@@ -1162,7 +1179,7 @@ public class ModifiedAstar
      * @param toNode the "to" end of the seeked transition
      * @return connectingEvent - the event between "fromNode" and "toNode"
      */
-    protected LabeledEvent findCurrentEvent(Node fromNode, Node toNode) 
+    protected LabeledEvent findConnectingEvent(Node fromNode, Node toNode) 
 		throws Exception
     {
         for (int i=0; i<theAutomata.size(); i++)
@@ -1171,6 +1188,41 @@ public class ModifiedAstar
             {
                 Automaton auto = theAutomata.getAutomatonAt(i);
                 return auto.getLabeledEvent(auto.getStateWithIndex((int)fromNode.getValueAt(i)), auto.getStateWithIndex((int)toNode.getValueAt(i)));
+            }
+        }
+        
+        return null;
+    }
+
+    /**
+     * Finds an arc between two nodes. In order to do this, the automaton that is
+     * responsible for the transition, i.e. the plant automaton, whose indices differ
+     * between the two nodes, is found.
+     *
+     * @param fromNode the "from" end of the seeked transition
+     * @param toNode the "to" end of the seeked transition
+     * @return connectingEvent - the event between "fromNode" and "toNode"
+     */
+    protected Arc findConnectingArc(Node fromNode, Node toNode) 
+		throws Exception
+    {
+        for (int i=0; i<theAutomata.size(); i++)
+        {
+            if (fromNode.getValueAt(i) != toNode.getValueAt(i))
+            {
+                Automaton auto = theAutomata.getAutomatonAt(i);
+				State fromState = auto.getStateWithIndex((int)fromNode.getValueAt(i));
+				State toState = auto.getStateWithIndex((int)toNode.getValueAt(i));
+                
+				for (Iterator<Arc> arcsIt = fromState.outgoingArcsIterator(); arcsIt.hasNext(); )
+				{
+					Arc currArc = arcsIt.next();
+
+					if (currArc.getToState().equals(toState))
+					{
+						return currArc;
+					}
+				}
             }
         }
         
@@ -1224,6 +1276,11 @@ public class ModifiedAstar
 	{
 		return relaxer.getRelaxation(node);
 	}
+
+	public Relaxer getRelaxer()
+	{
+		return relaxer;
+	}
     
     public String printArray(int[] node)
     {
@@ -1251,7 +1308,7 @@ public class ModifiedAstar
         return s;
     }
     
-    protected String printNodeSignature(Node node)
+    public String printNodeSignature(Node node)
     {
 		
         String s = printNodeName(node) + "; Tv = [";
@@ -1269,7 +1326,7 @@ public class ModifiedAstar
         return s;
     }
     
-    protected String printNodeName(Node node)
+    public String printNodeName(Node node)
     {
         String s = "[";
         
@@ -1358,6 +1415,11 @@ public class ModifiedAstar
         
         return key;
     }
+
+	public int[] getKeyMapping()
+	{
+		return keyMapping;
+	}
     
     protected double[] resetCosts(double[] node)
     {
@@ -1401,7 +1463,7 @@ public class ModifiedAstar
             activeAutomataIndex[i] = newActiveAutomataIndex[i];
         }
     }
-    
+   
     public boolean schedulingDone()
     {
         return schedulingDone;
@@ -1422,6 +1484,11 @@ public class ModifiedAstar
         return outputStr;
     }
 
+// 	public int getMaxOpenSize()
+// 	{
+// 		return maxOpenSize;
+// 	}
+
 	public Automata getAllAutomata()
 	{
 		return theAutomata;
@@ -1435,6 +1502,21 @@ public class ModifiedAstar
 	public boolean isManualExpansion()
 	{
 		return manualExpansion;
+	}
+
+	public boolean getBuildSchedule()
+	{
+		return buildSchedule;
+	}
+
+	public String getHeuristic()
+	{
+		return heuristic;
+	}
+
+	public NodeExpander getNodeExpander()
+	{
+		return expander;
 	}
 
 	public ScheduleDialog getGui()
