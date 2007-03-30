@@ -40,8 +40,9 @@ import net.sourceforge.fuber.xsd.libraryelement.*;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 //import net.sourceforge.waters.model.expr.OperatorTable;
-//import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 
 
 class ModelMaker
@@ -147,7 +148,6 @@ class ModelMaker
 	}
 
 
-
     // find the fileName in libraries and return the corresponding File
     private File getFile(String fileName)
     {
@@ -188,7 +188,8 @@ class ModelMaker
 
 		return theFile;
     }
-
+	
+	//{ loadSystem
     private void loadSystem(String fileName)
     {
 	
@@ -243,36 +244,7 @@ class ModelMaker
 			System.exit(1);
 		}
 	}
-
-    private void loadFB(String instanceName, String fileName)
-    {
-	
-		System.out.println("ModelMaker.loadFB(" + instanceName + ", " + fileName + "):");
-		
-		File file = getFile(fileName);
-		
-		try
-		{
-			Object unmarshalledObject = iecUnmarshaller.unmarshal(file);
-			if (unmarshalledObject instanceof JaxbFBType)
-			{
-				JaxbFBType theType = (JaxbFBType) unmarshalledObject;
-				String typeName = theType.getName();
-				if (!fbTypes.keySet().contains(typeName))
-				{
-					System.out.println("\t Adding FB type " + typeName);
-					fbTypes.put(typeName, theType);					
-				}
-				System.out.println("\t Adding FB " + instanceName);
-				functionBlocks.put(instanceName,theType.getName());
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace(System.err);
-			System.exit(1);
-		}
-	}
+	//}
 
 // 	private void constructMergeType(int size)
 // 	{
@@ -327,6 +299,36 @@ class ModelMaker
 // 		newBasicFBType.getECC().addTransition("S0","S1","EI");
 // 		newBasicFBType.getECC().addTransition("S1","S0","TRUE");
 // 	}
+
+    private void loadFB(String instanceName, String fileName)
+    {
+	
+		System.out.println("ModelMaker.loadFB(" + instanceName + ", " + fileName + "):");
+		
+		File file = getFile(fileName);
+		
+		try
+		{
+			Object unmarshalledObject = iecUnmarshaller.unmarshal(file);
+			if (unmarshalledObject instanceof JaxbFBType)
+			{
+				JaxbFBType theType = (JaxbFBType) unmarshalledObject;
+				String typeName = theType.getName();
+				if (!fbTypes.keySet().contains(typeName))
+				{
+					System.out.println("\t Adding FB type " + typeName);
+					fbTypes.put(typeName, theType);					
+				}
+				System.out.println("\t Adding FB " + instanceName);
+				functionBlocks.put(instanceName,theType.getName());
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace(System.err);
+			System.exit(1);
+		}
+	}
 	
 
 	private void setupOutput()
@@ -336,27 +338,34 @@ class ModelMaker
 
 		try
 		{
-			URI location = new URI(outputFileName);
-			outputModule = moduleFactory.createModuleProxy(theSystem.getName(), location);
+			outputModule = moduleFactory.createModuleProxy(theSystem.getName(),null);
+
+			JAXBModuleMarshaller moduleMarshaller = new JAXBModuleMarshaller(moduleFactory, CompilerOperatorTable.getInstance());	
+			moduleMarshaller.marshal(outputModule,new File(outputFileName));
 		}
 		catch (Exception e)
 		{
 		}
+	}
 
+
+	private void makeInstanceQueue()
+	{
 		
 	}
 	
 	public void makeModel()
 	{
-
+		
 		// load IEC 61499 application
 		loadSystem(systemFileName);
+		
 
 		// setup module factory
 		setupOutput();
-
-		// TODO: make instance queue model
 		
+		// make instance queue model
+		makeInstanceQueue();
 
 		// TODO: make event execution thread model
 
