@@ -61,6 +61,7 @@ class Step {
 	static final parentAttr = 'steps'
 	IdentifierExpression name
 	Sequence sequence
+	boolean marked
 	List variables = [new InternalVariable(name:new IdentifierExpression('X')),
 	                  new InternalVariable(name:new IdentifierExpression('activation')),
 	                  new InternalVariable(name:new IdentifierExpression('deactivation'))]
@@ -70,7 +71,9 @@ class Step {
 		sequence.steps[0] == this
 	}
 	List execute(Scope parent) {
-		variables.find{it.name == new IdentifierExpression('X')}.markedValue = (sequence.steps[0] == this)
+		//Only one step can be marked due to efa restrictions
+		//Mark the first marked step, or if no marked step, mark the initial step
+		variables.find{it.name == new IdentifierExpression('X')}.markedValue = ([*sequence.steps.findAll{it.marked}, sequence.steps[0]][0] == this)
 		Scope scope = [self:this, parent:parent]
 		ControlCodeBuilder ccb = new ControlCodeBuilder()
 		Closure buildExpr = {stepEntrance ->

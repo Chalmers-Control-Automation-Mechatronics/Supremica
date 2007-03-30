@@ -12,6 +12,11 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 		tester.testFunctionBlocks()
 		tester.testSfc()
 		tester.testSfcDeferred()
+		Util.openInSupremica(ASSIGNMENT_APP_MODULE)
+		Util.openInSupremica(SFC_APP_MODULE)
+		Util.openInSupremica(SFC_DEFERRED_APP_MODULE)
+		Util.openInSupremica(STATELESS_CYCLE_APP_MODULE)
+		Util.openInSupremica(FB_APP_MODULE)
 	}
 	static final CCB = new ControlCodeBuilder()
 	static final ASSIGNMENT_APP = CCB.application('assignmentTest') {
@@ -116,7 +121,7 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 		}
 		ModuleSubject generatedModuleFromStateless = appStateless.toAutomata()
 		Util.assertGeneratedModuleEqualsManual(ASSIGNMENT_APP_MODULE, generatedModuleFromStateless)
-//		Util.openModuleInSupremica(generatedModuleFromAssignmentOnly)
+//		Util.openInSupremica(generatedModuleFromAssignmentOnly)
 	}
 	static final SFC_APP = CCB.application('sfcapp') {
 		input 'y1 := true'
@@ -135,7 +140,7 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 					}
 				}
 				'y1'();    'y2'(to:'S3')
-				Step('S2'){
+				Step('S2', marked:true){
 					S('u4')
 					N_action {
 						'u1 := y1 or y2'()
@@ -162,8 +167,8 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 			output 'u4'
 			output 'u5'
 			logicProgram('program') {
-				variable('S1_X', markedValue:true)
-				variable 'S2_X'
+				variable 'S1_X'
+				variable('S2_X', markedValue:true)
 				variable 'S3_X'
 				variable("${Converter.NOT_INIT_VARIABLE_NAME}", markedValue:true)
 				variable 'mySequence_T1_enabled'
@@ -201,7 +206,7 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 		//ModuleSubject sfcModule = sfcApp.toAutomata()
 		ModuleSubject sfcLessModule = appSfcLess.toAutomata()
 		Util.assertGeneratedModuleEqualsManual(SFC_APP_MODULE, sfcLessModule)
-		//Util.openModuleInSupremica(sfcModule)
+		//Util.openInSupremica(sfcModule)
 	}
 	static final SFC_DEFERRED_APP = CCB.application('testSfcDeferred') {
 		sequentialProgram('deferred', deferred:true) {
@@ -262,13 +267,15 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 //		ModuleSubject sfcModule = appSfc.toAutomata()
 		ModuleSubject sfcLessModule = appSfcLess.toAutomata()
 		Util.assertGeneratedModuleEqualsManual(SFC_DEFERRED_APP_MODULE, sfcLessModule)
-//		Util.openModuleInSupremica(sfcModule)
+//		Util.openInSupremica(sfcModule)
 	}
 	static final STATELESS_CYCLE_APP = CCB.application('testapp2') {
 		input 'y1'
 		input 'y2'
 		input 'y3'
-		output 'u3'
+		input 'y4'
+		input 'y5'
+		output('u3', markedValue:true)
 		output 'u7'
 		variable 'FB1instance_x' 
 		logicProgram('program') {
@@ -281,22 +288,112 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 				'y1 := not (not u3) and y1 or (y2 and u3)'()
 			}
 		}
+		process('slowProcess1', speed:Speed.SLOW) {
+			logicProgram('program') {
+				'y4 := u7'()
+			}
+		}
+		process('slowProcess2', speed:Speed.SLOW) {
+			logicProgram('program') {
+				'y5 := u7'()
+			}
+		}
 	}
 	static final STATELESS_CYCLE_APP_MODULE = STATELESS_CYCLE_APP.toAutomata()
 	void testAutomataGenerator() {
 		ModuleSubject correctModule = new ModuleBuilder().module('testapp2') {
 			event(Converter.SCAN_CYCLE_EVENT_NAME, controllable:false)
-			booleanVariable(['y1', 'y2', 'y3', 'u3', 'FB1instance_x', 'u7'], initial:false, marked:false)
-			event([Converter.NO_PROCESS_CHANGE_EVENT_NAME, 'someProcess_change', 'Process_y2_change', 'Process_y3_change'], controllable:false)
-			eventAlias(name:Converter.PROCESS_EVENTS_ALIAS_NAME, events:[Converter.NO_PROCESS_CHANGE_EVENT_NAME, 'someProcess_change', 'Process_y2_change', 'Process_y3_change'])
-			plant(Converter.CONTROL_UNIT_PLANT_NAME) {
+			booleanVariable(['y1', 'y2', 'y3', 'y4', 'y5', 'FB1instance_x', 'u7'], initial:false, marked:false)
+			booleanVariable('u3', initial:false, marked:true)
+			event(['someProcess_change', 'Process_y2_change', 'Process_y3_change', 'slowProcess1_change', 'slowProcess2_change'], controllable:false)
+			plant('ControlUnit_vs_someProcess', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME) {
 				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME, event:Converter.SCAN_CYCLE_EVENT_NAME) {
-					}
+					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
 				}
 				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, events:[Converter.PROCESS_EVENTS_ALIAS_NAME]) {
-					}
+					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:'someProcess_change')
+					selfLoop()
+				}
+			}
+			plant('ControlUnit_vs_Process_y2', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME) {
+				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				}
+				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:'Process_y2_change')
+					selfLoop()
+				}
+			}
+			plant('ControlUnit_vs_Process_y3', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME) {
+				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				}
+				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:'Process_y3_change')
+					selfLoop()
+				}
+			}
+			plant('ControlUnit_vs_SlowProcesses', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME) {
+				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				}
+				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, events:['slowProcess1_change', 'slowProcess2_change'])
+					selfLoop()
+				}
+			}
+			plant('someProcess_vs_slowProcess1', defaultEvent:'someProcess_change') {
+				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				}
+				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:'slowProcess1_change')
+					selfLoop()
+				}
+			}
+			plant('someProcess_vs_slowProcess2', defaultEvent:'someProcess_change') {
+				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				}
+				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:'slowProcess2_change')
+					selfLoop()
+				}
+			}
+			plant('Process_y2_vs_slowProcess1', defaultEvent:'Process_y2_change') {
+				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				}
+				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:'slowProcess1_change')
+					selfLoop()
+				}
+			}
+			plant('Process_y2_vs_slowProcess2', defaultEvent:'Process_y2_change') {
+				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				}
+				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:'slowProcess2_change')
+					selfLoop()
+				}
+			}
+			plant('Process_y3_vs_slowProcess1', defaultEvent:'Process_y3_change') {
+				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				}
+				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:'slowProcess1_change')
+					selfLoop()
+				}
+			}
+			plant('Process_y3_vs_slowProcess2', defaultEvent:'Process_y3_change') {
+				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				}
+				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:'slowProcess2_change')
+					selfLoop()
 				}
 			}
 			plant('ASSIGN_u3', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
@@ -335,10 +432,22 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 					selfLoop(guard:'y3') { reset('y3') }
 				}
 			}
+			plant('ASSIGN_y4', defaultEvent:'slowProcess1_change', deterministic:false) {
+				state('q0', marked:true) {
+					selfLoop(guard:'u7') { set('y4') }
+					selfLoop(guard:'!u7') { reset('y4') }
+				}
+			}
+			plant('ASSIGN_y5', defaultEvent:'slowProcess2_change', deterministic:false) {
+				state('q0', marked:true) {
+					selfLoop(guard:'u7') { set('y5') }
+					selfLoop(guard:'!u7') { reset('y5') }
+				}
+			}
 		}
 		
 		Util.assertGeneratedModuleEqualsManual(STATELESS_CYCLE_APP_MODULE, correctModule)
-//		Util.openModuleInSupremica(generatedModuleFromStateless)
+//		Util.openInSupremica(generatedModuleFromStateless)
 	}
 	static final FB_APP = CCB.application('functionBlockTest') {
 		input 'y1'
@@ -479,6 +588,6 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 		}
 		ModuleSubject generatedModuleFromAssignmentOnly = appAssignmentOnly.toAutomata()
 		Util.assertGeneratedModuleEqualsManual(FB_APP_MODULE, generatedModuleFromAssignmentOnly)
-//		Util.openModuleInSupremica(generatedModule)
+//		Util.openInSupremica(generatedModule)
 	}
 }

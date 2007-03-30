@@ -27,25 +27,7 @@ class RuntimeAssignment {
 	final IdentifierExpression Q
 	final Expression input
 	final Scope scope
-	def addToModule(ModuleBuilder mb, List statements, int indexToThis) {
-		Scope processScope = scope.processScope // Process scope is null if it is the controller that executes the statement
-		statements = statements.findAll{it.scope.processScope == processScope}
-		indexToThis = statements.indexOf(this)
-		Variable assignedVariable = scope.namedElement(Q)
-		assert assignedVariable, "Undeclared identifier $Q in scope ${scope.fullName}"
-		if (assignedVariable.assignmentAutomatonNeeded(statements, indexToThis)) {
-			boolean markedValue = (assignedVariable.markedValue != null) ? assignedVariable.markedValue : (assignedVariable.value != null ? assignedVariable.value : false) 
-			mb.booleanVariable(Q.toSupremicaSyntax(scope), initial:assignedVariable.value, marked:markedValue)
-			mb.plant("ASSIGN_${Q.toSupremicaSyntax(scope)}", defaultEvent:scope.eventName, deterministic:false) {
-				state('q0', marked:true) {
-					//println input.expand(scope, statements[0..<indexToThis])
-					//println input.expand(scope, statements[0..<indexToThis]).cleanup()
-					selfLoop(guard:input.expand(scope, statements[0..<indexToThis]).cleanup().toSupremicaSyntax()) { set(Q.toSupremicaSyntax(scope)) }
-					selfLoop(guard:new Expression("not (${input})").expand(scope, statements[0..<indexToThis]).cleanup().toSupremicaSyntax()) { reset(Q.toSupremicaSyntax(scope)) }
-				}
-			}
-		}
-	}
+	
 	String toString() {
 		"$scope { $Q := $input }"
 	}
@@ -53,13 +35,14 @@ class RuntimeAssignment {
 		Variable assignedVariable = scope.namedElement(Q)
 		assert assignedVariable, "Undeclared identifier $Q in ${this}"
 		boolean markedValue = (assignedVariable.markedValue != null) ? assignedVariable.markedValue : (assignedVariable.value != null ? assignedVariable.value : false) 
-		mb.booleanVariable(Q.toSupremicaSyntax(scope), initial:assignedVariable.value, marked:markedValue)
-		mb.plant("ASSIGN_${Q.toSupremicaSyntax(scope)}", defaultEvent:scope.eventName, deterministic:false) {
+		String supremicaNameOfQ = Q.toSupremicaSyntax() //Q must already be fully qualified
+		mb.booleanVariable(supremicaNameOfQ, initial:assignedVariable.value, marked:markedValue)
+		mb.plant("ASSIGN_${supremicaNameOfQ}", defaultEvent:scope.eventName, deterministic:false) {
 			state('q0', marked:true) {
 				//println input.expand(scope, statements[0..<indexToThis])
 				//println input.expand(scope, statements[0..<indexToThis]).cleanup()
-				selfLoop(guard:input.cleanup().toSupremicaSyntax()) { set(Q.toSupremicaSyntax()) }
-				selfLoop(guard:new Expression("not (${input})").cleanup().toSupremicaSyntax()) { reset(Q.toSupremicaSyntax()) }
+				selfLoop(guard:input.cleanup().toSupremicaSyntax()) { set(supremicaNameOfQ) }
+				selfLoop(guard:new Expression("not (${input})").cleanup().toSupremicaSyntax()) { reset(supremicaNameOfQ) }
 			}
 		}
 	}

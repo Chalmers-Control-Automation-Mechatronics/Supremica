@@ -26,7 +26,7 @@ class ModuleBuilder extends BuilderSupport {
 	static void main(args) {
 		def module = testBuilder()
 		Util.saveModuleToFile(module)
-		Util.openModuleInSupremica(module)
+		Util.openInSupremica(module)
 	}
 	static {
 		testBuilder()

@@ -23,7 +23,7 @@ class FunctionBlock {
 	final String eventName = Converter.SCAN_CYCLE_EVENT_NAME
 	
 	def toAutomata() {
-		addToModule(new ModuleBuilder().module(name.toSupremicaSyntax([self:this] as Scope)))
+		addToModule(new ModuleBuilder().module(name.toSupremicaSyntax()))
 	}
 
 
@@ -31,16 +31,7 @@ class FunctionBlock {
 		ModuleBuilder mb = new ModuleBuilder()
 		Scope scope = [self:this, process:this]
 		mb.module(module) {
-			event(Converter.SCAN_CYCLE_EVENT_NAME, controllable:false)
-			event(Converter.NO_PROCESS_CHANGE_EVENT_NAME, controllable:false)
-			eventAlias(Converter.PROCESS_EVENTS_ALIAS_NAME, events:[Converter.NO_PROCESS_CHANGE_EVENT_NAME])
-			plant(Converter.CONTROL_UNIT_PLANT_NAME) {
-				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) 
-				transition(event:Converter.SCAN_CYCLE_EVENT_NAME)
-				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, events:[Converter.PROCESS_EVENTS_ALIAS_NAME])
-				}
-			}
+
 			List assignments = execute(scope)
 //			println statements.collect{[it.scope.fullName, it.statement.Q, it.statement.input]}
 			
@@ -62,9 +53,30 @@ class FunctionBlock {
 				new TreeMap(withoutUnnecessary).each {Q, input -> 
 					new RuntimeAssignment(scope:processScope, Q:Q, input:input).addToModule(mb)
 				}
-				if (processScope.self != this) {
-					mb.event(processScope.eventName, controllable:false)
-					mb.eventAlias(Converter.PROCESS_EVENTS_ALIAS_NAME, events:[processScope.eventName])
+				mb.event(processScope.eventName, controllable:false)
+				assignmentsForEachProcess.keySet().findAll{processScope.self.speed.value == it.self.speed.value + 1}.each { slowerProc ->
+					mb.plant("${processScope.fullName.toSupremicaSyntax()}_vs_${slowerProc.fullName.toSupremicaSyntax()}", defaultEvent:processScope.eventName) {
+						state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
+							outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+						}
+						state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
+							outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:slowerProc.eventName)
+							selfLoop()
+						}
+					}
+				}
+				assignmentsForEachProcess.keySet().any{processScope.self.speed.value == it.self.speed.value + 2}
+				List slowProcesses = assignmentsForEachProcess.keySet().findAll{processScope.self.speed.value == it.self.speed.value + 2}
+				if (slowProcesses) {
+					plant("${processScope.fullName.toSupremicaSyntax()}_vs_SlowProcesses", defaultEvent:processScope.eventName) {
+						state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
+							outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+						}
+						state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
+							outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, events:slowProcesses.eventName)
+							selfLoop()
+						}
+					}
 				}
 			}
 		}

@@ -17,9 +17,6 @@ class IdentifierExpression extends Expression implements Comparable {
 	IdentifierExpression rightMostPart() {
 		new IdentifierExpression(text.split(Converter.SEPARATOR_PATTERN)[-1])
 	}
-	String toSupremicaSyntax(Scope scope) {
-		super.expand(scope, []).toSupremicaSyntax()
-	}
 	IdentifierExpression plus(other) {
 		new IdentifierExpression("${this}${Converter.SEPARATOR}$other")
 	}
