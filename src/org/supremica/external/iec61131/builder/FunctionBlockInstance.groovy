@@ -16,4 +16,9 @@ class FunctionBlockInstance {
 		FunctionBlock type = getType(parent)
 		type.addProcessEvents(mb, [self:this, parent:parent] as Scope)
 	}
+	List getControllableVariables(Scope parent) {
+		FunctionBlock type = getType(parent)
+		Scope scope = [self:this, parent:parent]
+		[*type.inputs*.getControllableVariables(scope), *type*.getControllableVariables(scope)]
+	}
 }

@@ -31,4 +31,7 @@ class IdentifierExpression extends Expression implements Comparable {
 	int compareTo(other) {
 		text.toLowerCase().compareTo(other.text.toLowerCase())
 	}
+	IdentifierExpression fullyQualified(Scope scope) {
+		scope.fullNameOf(this)
+	}
 }

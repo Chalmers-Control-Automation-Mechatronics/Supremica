@@ -12,12 +12,12 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 		tester.testFunctionBlocks()
 		tester.testSfc()
 		tester.testSfcDeferred()
-		Util.openInSupremica(ASSIGNMENT_APP_MODULE)
+/*		Util.openInSupremica(ASSIGNMENT_APP_MODULE)
 		Util.openInSupremica(SFC_APP_MODULE)
 		Util.openInSupremica(SFC_DEFERRED_APP_MODULE)
 		Util.openInSupremica(STATELESS_CYCLE_APP_MODULE)
 		Util.openInSupremica(FB_APP_MODULE)
-	}
+*/	}
 	static final CCB = new ControlCodeBuilder()
 	static final ASSIGNMENT_APP = CCB.application('assignmentTest') {
 		input 'y1'
@@ -68,7 +68,7 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 			}
 		}
 	}
-	static final ASSIGNMENT_APP_MODULE = ASSIGNMENT_APP.toAutomata()
+	//static final ASSIGNMENT_APP_MODULE = ASSIGNMENT_APP.toAutomata()
 	void testAssignment() {
 		def appStateless = CCB.application('assignmentTest') {
 			input 'y1'
@@ -119,8 +119,8 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 				}
 			}
 		}
-		ModuleSubject generatedModuleFromStateless = appStateless.toAutomata()
-		Util.assertGeneratedModuleEqualsManual(ASSIGNMENT_APP_MODULE, generatedModuleFromStateless)
+		ModuleSubject generatedModuleFromStateless = appStateless.toAutomata(true)
+		Util.assertGeneratedModuleEqualsManual(ASSIGNMENT_APP.toAutomata(true), generatedModuleFromStateless)
 //		Util.openInSupremica(generatedModuleFromAssignmentOnly)
 	}
 	static final SFC_APP = CCB.application('sfcapp') {
@@ -155,7 +155,7 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 			}
 		}
 	}
-	static final SFC_APP_MODULE = SFC_APP.toAutomata()
+	//static final SFC_APP_MODULE = SFC_APP.toAutomata()
 	
 	void testSfc() {
 		def appSfcLess = CCB.application('sfcapp') {
@@ -205,7 +205,7 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 		}
 		//ModuleSubject sfcModule = sfcApp.toAutomata()
 		ModuleSubject sfcLessModule = appSfcLess.toAutomata()
-		Util.assertGeneratedModuleEqualsManual(SFC_APP_MODULE, sfcLessModule)
+		Util.assertGeneratedModuleEqualsManual(SFC_APP.toAutomata(), sfcLessModule)
 		//Util.openInSupremica(sfcModule)
 	}
 	static final SFC_DEFERRED_APP = CCB.application('testSfcDeferred') {
@@ -224,7 +224,7 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 			}
 		}
 	}
-	static final SFC_DEFERRED_APP_MODULE = SFC_DEFERRED_APP.toAutomata()
+	//static final SFC_DEFERRED_APP_MODULE = SFC_DEFERRED_APP.toAutomata()
 	void testSfcDeferred() {
 		def appSfcLess = CCB.application('testSfcDeferred') {
 			logicProgram('deferred') {
@@ -266,7 +266,7 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 		}
 //		ModuleSubject sfcModule = appSfc.toAutomata()
 		ModuleSubject sfcLessModule = appSfcLess.toAutomata()
-		Util.assertGeneratedModuleEqualsManual(SFC_DEFERRED_APP_MODULE, sfcLessModule)
+		Util.assertGeneratedModuleEqualsManual(SFC_DEFERRED_APP.toAutomata(), sfcLessModule)
 //		Util.openInSupremica(sfcModule)
 	}
 	static final STATELESS_CYCLE_APP = CCB.application('testapp2') {
@@ -299,12 +299,12 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 			}
 		}
 	}
-	static final STATELESS_CYCLE_APP_MODULE = STATELESS_CYCLE_APP.toAutomata()
+	//static final STATELESS_CYCLE_APP_MODULE = STATELESS_CYCLE_APP.toAutomata()
 	void testAutomataGenerator() {
 		ModuleSubject correctModule = new ModuleBuilder().module('testapp2') {
 			event(Converter.SCAN_CYCLE_EVENT_NAME, controllable:false)
-			booleanVariable(['y1', 'y2', 'y3', 'y4', 'y5', 'FB1instance_x', 'u7'], initial:false, marked:false)
-			booleanVariable('u3', initial:false, marked:true)
+			booleanVariable(['y1', 'y2', 'y3', 'y4', 'y5', 'FB1instance_x', 'u7'], initialValue:false, markedValue:false)
+			booleanVariable('u3', initialValue:false, markedValue:true)
 			event(['someProcess_change', 'Process_y2_change', 'Process_y3_change', 'slowProcess1_change', 'slowProcess2_change'], controllable:false)
 			plant('ControlUnit_vs_someProcess', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME) {
 				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
@@ -446,7 +446,101 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 			}
 		}
 		
-		Util.assertGeneratedModuleEqualsManual(STATELESS_CYCLE_APP_MODULE, correctModule)
+		Util.assertGeneratedModuleEqualsManual(STATELESS_CYCLE_APP.toAutomata(), correctModule)
+//		Util.openInSupremica(generatedModuleFromStateless)
+	}
+	static final SYNTHESIS_APP = CCB.application('synthesisapp') {
+		input 'y1'
+		input 'y2'
+		output('u3', markedValue:true)
+		output 'u7'
+		logicProgram('program') {
+			'u7 := u3 and y1 and not y2'()
+		}
+		process('someProcess') {
+			logicProgram('program') {
+				'y1 := u3 and y1 or (y2 and u3)'()
+			}
+		}
+		process('slowProcess1', speed:Speed.SLOW) {
+			logicProgram('program') {
+				'y2 := u7'()
+			}
+		}
+	}
+	//static final STATELESS_CYCLE_APP_MODULE = STATELESS_CYCLE_APP.toAutomata()
+	void testSynthesisAutomataGenerator() {
+		ModuleSubject correctModule = new ModuleBuilder().module('synthesisapp') {
+			event(Converter.SCAN_CYCLE_EVENT_NAME, controllable:false)
+			event(Converter.START_SCAN_EVENT_NAME, controllable:true)
+			booleanVariable(['y1', 'y2', 'u7'], initialValue:false, markedValue:false)
+			booleanVariable('u3', initialValue:false, markedValue:true)
+			event(['someProcess_change', 'slowProcess1_change'], controllable:false)
+			plant('ScanCycle') {
+				state('start', marked:true) {
+					outgoing(to:'main', event:Converter.START_SCAN_EVENT_NAME)
+				}
+				state('main', marked:true) {
+					outgoing(to:'start', event:Converter.SCAN_CYCLE_EVENT_NAME)
+				}
+			}
+			plant('ControlUnit_vs_someProcess', defaultEvent:Converter.START_SCAN_EVENT_NAME) {
+				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.SCAN_CYCLE_MAIN_STATE_NAME)
+				}
+				state(Converter.SCAN_CYCLE_MAIN_STATE_NAME, marked:true) {
+					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME, event:Converter.SCAN_CYCLE_EVENT_NAME)
+				}
+				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:'someProcess_change')
+					outgoing(to:Converter.SCAN_CYCLE_MAIN_STATE_NAME)
+				}
+			}
+			plant('ControlUnit_vs_SlowProcesses', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME) {
+				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				}
+				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, events:['slowProcess1_change'])
+					selfLoop()
+				}
+			}
+			plant('someProcess_vs_slowProcess1', defaultEvent:'someProcess_change') {
+				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				}
+				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:'slowProcess1_change')
+					selfLoop()
+				}
+			}
+			plant('ASSIGN_u3', defaultEvent:Converter.START_SCAN_EVENT_NAME, deterministic:false) {
+				state('q0', marked:true) {
+					selfLoop() { set 'u3' }
+					selfLoop() { reset 'u3' }
+				}
+			}
+			plant('ASSIGN_u7', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME, deterministic:false) {
+				state('q0', marked:true) {
+					selfLoop(guard:'u3 & y1 & !y2') { set 'u7' }
+					selfLoop(guard:'!(u3 & y1 & !y2)') { reset 'u7' }
+				}
+			}
+			plant('ASSIGN_y1', defaultEvent:'someProcess_change', deterministic:false) {
+				state('q0', marked:true) {
+					selfLoop(guard:'u3 & y1 | (y2 & u3)') { set 'y1' }
+					selfLoop(guard:'!(u3 & y1 | (y2 & u3))') { reset 'y1' }
+				}
+			}
+			plant('ASSIGN_y2', defaultEvent:'slowProcess1_change', deterministic:false) {
+				state('q0', marked:true) {
+					selfLoop(guard:'u7') { set('y2') }
+					selfLoop(guard:'!u7') { reset('y2') }
+				}
+			}
+		}
+		
+		Util.assertGeneratedModuleEqualsManual(SYNTHESIS_APP.toAutomata(true), correctModule)
 //		Util.openInSupremica(generatedModuleFromStateless)
 	}
 	static final FB_APP = CCB.application('functionBlockTest') {
@@ -502,7 +596,7 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 			}
 		}
 	}
-	static final FB_APP_MODULE = FB_APP.toAutomata()
+	//static final FB_APP_MODULE = FB_APP.toAutomata()
 	void testFunctionBlocks(boolean openInSupremica) {
 		def appAssignmentOnly = CCB.application('functionBlockTest') {
 			input 'y1'
@@ -587,7 +681,7 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 			}
 		}
 		ModuleSubject generatedModuleFromAssignmentOnly = appAssignmentOnly.toAutomata()
-		Util.assertGeneratedModuleEqualsManual(FB_APP_MODULE, generatedModuleFromAssignmentOnly)
+		Util.assertGeneratedModuleEqualsManual(FB_APP.toAutomata(), generatedModuleFromAssignmentOnly)
 //		Util.openInSupremica(generatedModule)
 	}
 }

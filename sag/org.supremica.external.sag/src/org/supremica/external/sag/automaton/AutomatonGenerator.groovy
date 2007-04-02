@@ -86,28 +86,28 @@ class AutomatonGenerator {
 		def moduleBuilder = new ModuleBuilder()
 		
 		ModuleProxy manualModule = moduleBuilder.module(name:'testproject') {
-			booleanVariable(name:['y1', 'y2', 'y3', 'y4'], marked:false)
-			booleanVariable(name:'y5', initial:true, marked:true)
-			booleanVariable(name:'y6', marked:false)
-			booleanVariable(name:'y7', marked:false)
-			booleanVariable(name:'low', marked:false)
-			booleanVariable(name:'high', marked:false)
-			booleanVariable(name:'y8', marked:false)
-			booleanVariable(name:'y9', marked:false)
-			booleanVariable(name:'u1', marked:false)
-			booleanVariable(name:'u2', marked:false)
-			booleanVariable(name:'u3', marked:false)
-			integerVariable(name:'object1_between_y1_y2', range:0..3, initial:0, marked:0)
-			integerVariable(name:'object1_beside_y2_0', range:0..1, initial:0, marked:0)
-			integerVariable(name:'object1_beside_y2_1', range:0..2, initial:0, marked:0)
-			integerVariable(name:'object1_between_y2_y3', range:0..2, initial:0, marked:0)
-			integerVariable(name:'object2_between_y1_y2', range:0..2, initial:2, marked:2)
-			integerVariable(name:'overlappingObject_both_y8_y9', range:0..1, initial:0, marked:0)
-			booleanVariable(name:'TordsZone', marked:false)
-			booleanVariable(name:'object3_between_y6_y7', marked:false)
-			booleanVariable(name:'tank_beside_low', initial:true, marked:true)
-			booleanVariable(name:'tank_both_low_high', marked:false)
-			booleanVariable(name:'endOfScanCycle', initial:false, marked:true)
+			booleanVariable(name:['y1', 'y2', 'y3', 'y4'], markedValue:false)
+			booleanVariable(name:'y5', initialValue:true, markedValue:true)
+			booleanVariable(name:'y6', markedValue:false)
+			booleanVariable(name:'y7', markedValue:false)
+			booleanVariable(name:'low', markedValue:false)
+			booleanVariable(name:'high', markedValue:false)
+			booleanVariable(name:'y8', markedValue:false)
+			booleanVariable(name:'y9', markedValue:false)
+			booleanVariable(name:'u1', markedValue:false)
+			booleanVariable(name:'u2', markedValue:false)
+			booleanVariable(name:'u3', markedValue:false)
+			integerVariable(name:'object1_between_y1_y2', range:0..3, initialValue:0, markedValue:0)
+			integerVariable(name:'object1_beside_y2_0', range:0..1, initialValue:0, markedValue:0)
+			integerVariable(name:'object1_beside_y2_1', range:0..2, initialValue:0, markedValue:0)
+			integerVariable(name:'object1_between_y2_y3', range:0..2, initialValue:0, markedValue:0)
+			integerVariable(name:'object2_between_y1_y2', range:0..2, initialValue:2, markedValue:2)
+			integerVariable(name:'overlappingObject_both_y8_y9', range:0..1, initialValue:0, markedValue:0)
+			booleanVariable(name:'TordsZone', markedValue:false)
+			booleanVariable(name:'object3_between_y6_y7', markedValue:false)
+			booleanVariable(name:'tank_beside_low', initialValue:true, markedValue:true)
+			booleanVariable(name:'tank_both_low_high', markedValue:false)
+			booleanVariable(name:'endOfScanCycle', initialValue:false, markedValue:true)
 			event(['object1_from_y1', 'object1_to_y1_0', 'object1_to_y1_1', 'object1_from_y2_0',
 			       'object1_from_y2_1', 'object1_from_y2_2', 'object1_from_y2_3', 'object1_from_y2_4',
 			       'object1_to_y2_0', 'object1_to_y2_1', 'object1_to_y2_2', 'object1_to_y2_3',
@@ -404,22 +404,22 @@ class AutomatonGenerator {
 		
 		builder.module(name:project.name) {
 			(project.sensorSignal).each { signal -> 
-				builder.booleanVariable(name:signal.name, initial:signal.sensor.any{findInitialState(it.graph) == it}, marked:signal.sensor.any{it.initiallyActivated})
+				builder.booleanVariable(name:signal.name, initialValue:signal.sensor.any{findInitialState(it.graph) == it}, markedValue:signal.sensor.any{it.initiallyActivated})
 			}
 			(project.controlSignal).each { signal -> 
-				builder.booleanVariable(name:signal.name, initial:false, marked:false)
+				builder.booleanVariable(name:signal.name, initialValue:false, markedValue:false)
 			}
 			project.graph.zone.findAll{it.bounded && it.graph.maxNrOfObjects != 1}.each { zone ->
 				builder.integerVariable(name:formatZoneVariableName(zone),
 				                        range:0..zone.capacity,
-				                        initial:findInitialState(zone.graph) == zone ? (zone.initialNrOfObjects ? zone.initialNrOfObjects : zone.graph.maxNrOfObjects) : 0,
-				                        marked:findInitialState(zone.graph) == zone ? (zone.initialNrOfObjects ? zone.initialNrOfObjects : zone.graph.maxNrOfObjects) : 0)
+				                        initialValue:findInitialState(zone.graph) == zone ? (zone.initialNrOfObjects ? zone.initialNrOfObjects : zone.graph.maxNrOfObjects) : 0,
+				                        markedValue:findInitialState(zone.graph) == zone ? (zone.initialNrOfObjects ? zone.initialNrOfObjects : zone.graph.maxNrOfObjects) : 0)
 			}
 			project.graph.zone.findAll{it.graph.maxNrOfObjects == 1 && !it.outsideSystemBoundry}.each { zone ->
-				builder.booleanVariable(name:formatZoneVariableName(zone), initial:findInitialState(zone.graph) == zone, marked:findInitialState(zone.graph) == zone)
+				builder.booleanVariable(name:formatZoneVariableName(zone), initialValue:findInitialState(zone.graph) == zone, markedValue:findInitialState(zone.graph) == zone)
 			}
 			if (project.controlSignal.any{it.synthesize}) {
-				booleanVariable(name:END_OF_SCANCYCLE_VARIABLE_NAME, initial:false, marked:true)
+				booleanVariable(name:END_OF_SCANCYCLE_VARIABLE_NAME, initialValue:false, markedValue:true)
 			}
 			def sensorEvents = []
 			project.graph.sensor.each {sensor ->

@@ -10,7 +10,7 @@ class Assignment {
 	static final defaultAttr = 'condition'
 	static final parentAttr = 'statements'
 
-	List execute(Scope parent) {
+	List getRuntimeAssignments(Scope parent) {
 		if (!condition) return [[scope:parent, Q:Q, input:input] as RuntimeAssignment]
 		else return [[scope:parent, Q:Q, input:new Expression("($condition) and ($input) or (not ($condition) and $Q)")] as RuntimeAssignment]
 	}
@@ -36,7 +36,7 @@ class RuntimeAssignment {
 		assert assignedVariable, "Undeclared identifier $Q in ${this}"
 		boolean markedValue = (assignedVariable.markedValue != null) ? assignedVariable.markedValue : (assignedVariable.value != null ? assignedVariable.value : false) 
 		String supremicaNameOfQ = Q.toSupremicaSyntax() //Q must already be fully qualified
-		mb.booleanVariable(supremicaNameOfQ, initial:assignedVariable.value, marked:markedValue)
+		mb.booleanVariable(supremicaNameOfQ, initialValue:assignedVariable.value, markedValue:markedValue)
 		mb.plant("ASSIGN_${supremicaNameOfQ}", defaultEvent:scope.eventName, deterministic:false) {
 			state('q0', marked:true) {
 				//println input.expand(scope, statements[0..<indexToThis])

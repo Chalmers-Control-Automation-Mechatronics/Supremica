@@ -14,6 +14,7 @@ class Output extends ExternalVariable {
 }
 abstract class ExternalVariable extends Variable {
 	def assignmentAutomatonNeeded(List statements, int indexToThis) {
+		assert false
 		def statementScope = statements[indexToThis].scope
 		def variableScope = statementScope.scopeOf(statements[indexToThis].Q)
 		def fullNameOfThis = statementScope.fullNameOf(statements[indexToThis].Q)
@@ -31,6 +32,7 @@ class InternalVariable extends Variable {
 	static final defaultAttr = 'name'
 	static final parentAttr = 'variables'
 	def assignmentAutomatonNeeded(List statements, int indexToThis) {
+		assert false
 		def statementScope = statements[indexToThis].scope
 		def variableScope = statementScope.scopeOf(statements[indexToThis].Q)
 		def fullNameOfThis = statementScope.fullNameOf(statements[indexToThis].Q)
@@ -50,4 +52,7 @@ abstract class Variable {
 	boolean value
 	boolean markedValue
 	IdentifierExpression name
+	List getControllableVariables(Scope parent) {
+		[name.fullyQualified(parent)]
+	}
 }

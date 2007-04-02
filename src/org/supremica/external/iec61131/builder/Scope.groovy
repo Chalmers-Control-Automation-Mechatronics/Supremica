@@ -12,11 +12,12 @@ class Scope {
 		scopeOf(id)?.fullNameOf(namedElement(id))
 	}
 	List getSubScopesOfSelf() {
-		if (self.properties['type']) return parent.namedElement(self.type).subScopeElements.collect{new Scope(self:it, parent:this)}
+		if (self.metaClass.properties.any{it.name == 'type'}) return parent.namedElement(self.type).subScopeElements.collect{new Scope(self:it, parent:this)}
 		else return self.subScopeElements.collect{new Scope(self:it, parent:this)}
 	}
 	List getNamedElementsOfSelf() {
-		if (self.properties['type']) return parent.namedElement(self.type).namedElements
+		if (self.metaClass.properties.any{it.name == 'type'}) 
+			return parent.namedElement(self.type).namedElements
 		else return self.namedElements
 	}
 	Object namedElement(IdentifierExpression id) {

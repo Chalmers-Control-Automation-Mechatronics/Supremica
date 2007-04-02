@@ -13,9 +13,9 @@ class Process {
 	Speed speed = Speed.MEDIUM
 	
 	
-	List execute(Scope parent) {
+	List getRuntimeAssignments(Scope parent) {
 		Scope scope = [self:this, parent:parent, process:this]
-		programs*.execute(scope).flatten()
+		programs*.getRuntimeAssignments(scope).flatten()
 	}
 	List getNamedElements() {
 		[*variables, *programs, *types]
@@ -34,5 +34,29 @@ class Process {
 	def addProcessEvents(ModuleBuilder mb, Scope parent) {
 		addEvent(mb, parent)
 		subScopeElements*.addProcessEvents(mb, [self:this, parent:parent] as Scope)
-	}	
+	}
+	def addPriorityAutomaton(ModuleBuilder mb, Scope scope, Scope scopeOfSlowerProcess, forSynthesis) {
+		mb.plant("${scope.fullName.toSupremicaSyntax()}_vs_${scopeOfSlowerProcess.fullName.toSupremicaSyntax()}", defaultEvent:scope.eventName) {
+			state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
+				outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+			}
+			state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
+				outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:scopeOfSlowerProcess.eventName)
+				selfLoop()
+			}
+		}
+	}
+	def addPriorityAutomaton(ModuleBuilder mb, Scope scope, List scopesOfMuchSlowerProcesses) {
+		if(scopesOfMuchSlowerProcesses) {
+			mb.plant("${scope.fullName.toSupremicaSyntax()}_vs_SlowProcesses", defaultEvent:scope.eventName) {
+				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				}
+				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
+					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, events:scopesOfMuchSlowerProcesses.eventName)
+					selfLoop()
+				}
+			}
+		}
+	}
 }

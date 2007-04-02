@@ -9,9 +9,13 @@ class LogicProgram {
 	IdentifierExpression name
 	List statements = []
 	List variables = []
-	List execute(Scope parent) {
+	List getRuntimeAssignments(Scope parent) {
 		Scope scope = [self:this, parent:parent]
-		statements*.execute(scope).flatten()//.inject([]){list, elem -> list + elem.execute(scope)}
+		statements*.getRuntimeAssignments(scope).flatten()
+	}
+	List getControllableVariables(Scope parent) {
+		Scope scope = [self:this, parent:parent]
+		subScopeElements*.getControllableVariables(scope).flatten()
 	}
 	List getNamedElements() {
 		subScopeElements

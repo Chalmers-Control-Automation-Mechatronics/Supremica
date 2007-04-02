@@ -17,21 +17,20 @@ class SequentialProgram {
 	List getSubScopeElements() {
 		[*variables, *sequences, *sequences.steps]
 	}
-	List execute(Scope parent) {
+	List getRuntimeAssignments(Scope parent) {
 		Scope scope = [self:this, parent:parent]
-		List execStatements = []               
+		List rtAssignments = []               
 		if (deferred) {
-			execStatements += sequences.inject([]){list, elem -> list + elem.execute(scope)}
-			execStatements += sequences.steps.inject([]){list, elem -> list + elem.execute(scope)}
+			rtAssignments += sequences*.getRuntimeAssignments(scope).flatten()
+			rtAssignments += sequences.steps*.getRuntimeAssignments(scope).flatten()
 		} else {
-			execStatements += sequences.inject([]){list, seq ->
-				list + seq.execute(scope) + seq.steps.inject([]){list2, step ->
-					list2 + step.execute(scope)
-				}
-			}
+			rtAssignments += sequences.collect{it.getRuntimeAssignments(scope) + it.steps*.getRuntimeAssignments(scope)}.flatten()
 		}
-
-		execStatements << new RuntimeAssignment(scope:scope, Q:NOT_INIT_VARIABLE.name, input:new Expression('true'))
+		rtAssignments << new RuntimeAssignment(scope:scope, Q:NOT_INIT_VARIABLE.name, input:new Expression('true'))
+	}
+	List getControllableVariables(Scope parent) {
+		Scope scope = [self:this, parent:parent]
+		subScopeElements*.getControllableVariables(scope).flatten()
 	}
 	def addProcessEvents(ModuleBuilder mb, Scope parent) {
 		subScopeElements*.addProcessEvents(mb, [self:this, parent:parent] as Scope)

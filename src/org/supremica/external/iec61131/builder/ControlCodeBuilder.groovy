@@ -6,11 +6,12 @@ import net.sourceforge.waters.subject.module.builder.Util
 import net.sourceforge.waters.subject.module.builder.ModuleBuilder
 
 class Converter {
-	static final SCAN_CYCLE_EVENT_NAME = 'scanProgram'
+	static final SCAN_CYCLE_EVENT_NAME = 'mainScan'
 	static final NO_PROCESS_CHANGE_EVENT_NAME = 'noProcessChange'
 //	final static END_OF_SCANCYCLE_VARIABLE_NAME = 'endOfScanCycle'
 	final static START_OF_SCANCYCLE_STATE_NAME = 'startOfScanCycle'
 	final static END_OF_SCANCYCLE_STATE_NAME = 'endOfScanCycle'
+	final static SCAN_CYCLE_MAIN_STATE_NAME = 'main'
 	//final static DO_CONTROL_SIGNAL_CHANGE_EVENT_NAME = 'doSignalChange'
 	//final static SKIP_CONTROL_SIGNAL_CHANGE_EVENT_NAME = 'skipSignalChange'
 	//final static TIMEOUT_EVENTS_ALIAS_NAME = 'timeoutEvent'
@@ -20,6 +21,7 @@ class Converter {
 	static final SEPARATOR_PATTERN = /\./
 	static final SEPARATOR = '.'
 	static final NOT_INIT_VARIABLE_NAME = 'NOT_INIT'
+	static final START_SCAN_EVENT_NAME = 'startScan'
 }
 
 class ControlCodeBuilder extends BuilderSupport {

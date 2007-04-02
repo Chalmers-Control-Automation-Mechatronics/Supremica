@@ -9,15 +9,14 @@ class Sequence {
 	IdentifierExpression name
 	List steps = []
 	List transitions = []
-   	List execute(Scope parent) {
+   	List getRuntimeAssignments(Scope parent) {
 		Scope scope = [self:this, parent:parent]
-		List statements = []
-		transitions.each { t ->
-			statements += t.execute(scope)
-		}
-		statements
+		subScopeElements*.getRuntimeAssignments(scope).flatten()
 	}
-
+	List getControllableVariables(Scope parent) {
+		Scope scope = [self:this, parent:parent]
+		subScopeElements*.getControllableVariables(scope).flatten()
+	}
 	List getNamedElements() {
 		subScopeElements
 	}
@@ -44,16 +43,17 @@ class Transition {
 		[]
 	}
 	def addProcessEvents(ModuleBuilder mb, Scope parent) {}
-	List execute(Scope parent) {
+	List getRuntimeAssignments(Scope parent) {
 		Scope scope = [self:this, parent:parent]
 		def ccb = new ControlCodeBuilder()
 		int indexOfThis = sequence.transitions.indexOf(this)
 		List higherPrioTrans = sequence.transitions[0..<indexOfThis].findAll{it.from == from}
 		String mainExpr = "${from + 'X'} and $guard"
 		List prioExpr = higherPrioTrans.collect{(it.name + ENABLED_NAME).text}
-		Assignment enable = ccb."${ENABLED.name} := ${[mainExpr, *prioExpr].join(' and not ')}"()
-		enable.execute(scope)
+		Assignment enableAssignment = ccb."${ENABLED.name} := ${[mainExpr, *prioExpr].join(' and not ')}"()
+		enableAssignment.getRuntimeAssignments(scope)
 	}
+	List getControllableVariables(Scope parent) {[]}
 }
 class Step {
 	static final pattern = /(?i)step/
@@ -70,7 +70,7 @@ class Step {
 	boolean isInitial() {
 		sequence.steps[0] == this
 	}
-	List execute(Scope parent) {
+	List getRuntimeAssignments(Scope parent) {
 		//Only one step can be marked due to efa restrictions
 		//Mark the first marked step, or if no marked step, mark the initial step
 		variables.find{it.name == new IdentifierExpression('X')}.markedValue = ([*sequence.steps.findAll{it.marked}, sequence.steps[0]][0] == this)
@@ -82,11 +82,15 @@ class Step {
 		List execStatements = []
 		String activationExpr = (initial ? "not ${Converter.NOT_INIT_VARIABLE_NAME} or ":'') + buildExpr(true)
 		String deactivationExpr = buildExpr(false)
-		execStatements += ccb."activation := $activationExpr"().execute(scope)
-		execStatements += ccb."deactivation := $deactivationExpr"().execute(scope)
-		execStatements += ccb.SR(Q:'X', S:'activation', R:'deactivation').execute(scope)
-		statements.each{execStatements += it.execute(scope)}
+		execStatements += ccb."activation := $activationExpr"().getRuntimeAssignments(scope)
+		execStatements += ccb."deactivation := $deactivationExpr"().getRuntimeAssignments(scope)
+		execStatements += ccb.SR(Q:'X', S:'activation', R:'deactivation').getRuntimeAssignments(scope)
+		statements.each{execStatements += it.getRuntimeAssignments(scope)}
 		execStatements
+	}
+	List getControllableVariables(Scope parent) {
+		Scope scope = [self:this, parent:parent]
+		subScopeElements*.getControllableVariables(scope).flatten()
 	}
 	List getNamedElements() {
 		subScopeElements
@@ -108,9 +112,9 @@ class NAction {
 	List getNamedElements() {[]}
 	List getSubScopeElements() {[]}
 	def addProcessEvents(ModuleBuilder mb, Scope parent) {}
-	List execute(Scope parent) {
-		statements*.execute(parent).flatten().collect{
-			new Assignment(Q:it.Q, input:it.input, condition:new Expression('X')).execute(parent)
+	List getRuntimeAssignments(Scope parent) {
+		statements*.getRuntimeAssignments(parent).flatten().collect{
+			new Assignment(Q:it.Q, input:it.input, condition:new Expression('X')).getRuntimeAssignments(parent)
 		}.flatten()
 	}
 }
@@ -123,9 +127,9 @@ class P1Action {
 	List getNamedElements() {[]}
 	List getSubScopeElements() {[]}
 	def addProcessEvents(ModuleBuilder mb, Scope parent) {}
-	List execute(Scope parent) {
-		statements*.execute(parent).flatten().collect{
-			new Assignment(Q:it.Q, input:it.input, condition:new Expression('activation')).execute(parent)
+	List getRuntimeAssignments(Scope parent) {
+		statements*.getRuntimeAssignments(parent).flatten().collect{
+			new Assignment(Q:it.Q, input:it.input, condition:new Expression('activation')).getRuntimeAssignments(parent)
 		}.flatten()
 	}
 }
@@ -138,9 +142,9 @@ class P0Action {
 	List getNamedElements() {println 'P0Actiongetnamed';[]}
 	List getSubScopeElements() {println 'P0Actionsubscope';[]}
 	def addProcessEvents(ModuleBuilder mb, Scope parent) {println 'P0Actionaddprocevent'}
-	List execute(Scope parent) {
-		statements*.execute(parent).flatten().collect{
-			new Assignment(Q:it.Q, input:it.input, condition:new Expression('deactivation')).execute(parent)
+	List getRuntimeAssignments(Scope parent) {
+		statements*.getRuntimeAssignments(parent).flatten().collect{
+			new Assignment(Q:it.Q, input:it.input, condition:new Expression('deactivation')).getRuntimeAssignments(parent)
 		}.flatten()
 	}
 }
@@ -151,7 +155,7 @@ class SetQualifier {
 	static final parentAttr = 'statements'
 	IdentifierExpression variable
 	Step step
-	List execute(Scope parent) {
+	List getRuntimeAssignments(Scope parent) {
 		[[scope:parent, Q:variable, input:new Expression("activation or $variable")] as RuntimeAssignment]
 	}
 }
@@ -162,7 +166,7 @@ class ResetQualifier {
 	static final parentAttr = 'statements'
 	IdentifierExpression variable
 	Step step
-	List execute(Scope parent) {
+	List getRuntimeAssignments(Scope parent) {
 		[[scope:parent, Q:variable, input:new Expression("not activation and $variable")] as RuntimeAssignment]
 	}
 }
@@ -173,7 +177,7 @@ class NonstoredQualifier {
 	static final parentAttr = 'statements'
 	IdentifierExpression variable
 	Step step
-	List execute(Scope parent) {
-		new ControlCodeBuilder().SR(Q:variable, S:'X', R:'deactivation').execute(parent)
+	List getRuntimeAssignments(Scope parent) {
+		new ControlCodeBuilder().SR(Q:variable, S:'X', R:'deactivation').getRuntimeAssignments(parent)
 	}
 }

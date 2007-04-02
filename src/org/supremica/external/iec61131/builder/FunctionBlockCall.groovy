@@ -15,7 +15,7 @@ class FunctionBlockCall {
 		else inputOutputMapping[new IdentifierExpression(property)] = new Expression(newValue)
 	}
 
-	List execute(Scope callingScope) {
+	List getRuntimeAssignments(Scope callingScope) {
 		def instance = callingScope.namedElement(name)
 		assert instance || type, "Undeclared function block instance $name, referenced from ${callingScope.fullName}"
 		FunctionBlock block
@@ -42,10 +42,10 @@ class FunctionBlockCall {
 			block = instanceDeclarationScope.namedElement(instance.type)
 			assert block, "Undeclared function block ${instance.type}, referenced from ${instanceDeclarationScope}"
 		}
-//		println "FunctionBlockCall.execute, callingScope: ${callingScope.fullName}, instance:${instance.name}, type:${type.name}"
+//		println "FunctionBlockCall.getRuntimeAssignments, callingScope: ${callingScope.fullName}, instance:${instance.name}, type:${type.name}"
 		List statements = block.outputs.findAll{inputOutputMapping[it.name]}.collect{[scope:callingScope, input:inputOutputMapping[it.name], Q:instanceScope.relativeNameOf(it.name, callingScope)] as RuntimeAssignment}
 		statements += block.inputs.collect{[scope:callingScope, input:inputOutputMapping[it.name], Q:instanceScope.relativeNameOf(it.name, callingScope)] as RuntimeAssignment}
-		statements += block.execute(instanceScope)
+		statements += block.getRuntimeAssignments(instanceScope)
 		statements += block.outputs.findAll{inputOutputMapping[it.name]}.collect{[scope:callingScope, input:instanceScope.relativeNameOf(it.name, callingScope), Q:new IdentifierExpression(inputOutputMapping[it.name].text)] as RuntimeAssignment}
 	}
 }
