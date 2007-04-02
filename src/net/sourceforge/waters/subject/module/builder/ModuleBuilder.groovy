@@ -71,12 +71,12 @@ class ModuleBuilder extends BuilderSupport {
 			break
 		case 'booleanVariable' :
 			attributes.range = 0..1
-			attributes.initial = attributes.initial ? 1 : 0
-			attributes.marked = [(false):0,(true):1][attributes.marked]
+			attributes.initialValue = attributes.initialValue ? 1 : 0
+			attributes.markedValue = [(false):0,(true):1][attributes.markedValue]
 		case 'integerVariable' :
-			if (attributes.name instanceof List) node = attributes.name.collect{VariableHelper.createIntegerVariable(it, attributes.range.from, attributes.range.to, attributes.initial, attributes.marked)}
-			else node = VariableHelper.createIntegerVariable(attributes.name, attributes.range.from, attributes.range.to, attributes.initial, attributes.marked)
-			['initial', 'range', 'marked'].each{attributes.remove(it)}
+			if (attributes.name instanceof List) node = attributes.name.collect{VariableHelper.createIntegerVariable(it, attributes.range.from, attributes.range.to, attributes.initialValue, attributes.markedValue)}
+			else node = VariableHelper.createIntegerVariable(attributes.name, attributes.range.from, attributes.range.to, attributes.initialValue, attributes.markedValue)
+			['initialValue', 'range', 'markedValue'].each{attributes.remove(it)}
 			break
 		case 'event' :
 			if (attributes.range && !attributes.ranges) return createNode(name, [ranges:[attributes.range], *:attributes])
@@ -310,8 +310,8 @@ class ModuleBuilder extends BuilderSupport {
 	public static ModuleSubject testBuilder() {
 		def moduleBuilder = new ModuleBuilder();
 		ModuleSubject module = moduleBuilder.module('testmodule') {
-			booleanVariable('y0', initial:false, marked:true)
-			integerVariable(name:['x0', 'x1'], range:1..4, initial:2, marked:2)
+			booleanVariable('y0', initialValue:false, markedValue:true)
+			integerVariable(name:['x0', 'x1'], range:1..4, initialValue:2, markedValue:2)
 			event(name:'e0')
 			event(['e1', 'e2'], controllable:false)
 			proposition(name:'e3')
@@ -341,7 +341,7 @@ class ModuleBuilder extends BuilderSupport {
 						reset('y1')
 					}
 				}
-				booleanVariable(name:'y1', initial:false)
+				booleanVariable(name:'y1', initialValue:false)
 				transition(from:'s0', to:'s1', event:'e2', guard:'!y0')
 			}
 			foreach('i', range:0..2) {
