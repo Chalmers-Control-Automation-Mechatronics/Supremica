@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.waters.samples.algorithms
 //# CLASS:   Simulator
 //###########################################################################
-//# $Id: Simulator.java,v 1.4 2006-11-19 21:12:23 robi Exp $
+//# $Id: Simulator.java,v 1.5 2007-04-03 03:53:33 robi Exp $
 //###########################################################################
 
 
@@ -242,14 +242,8 @@ public class Simulator
 
     private void checkState(final StateProxy state)
     {
-      boolean found = false;
-      for (final StateProxy autstate : mAutomaton.getStates()) {
-	if (autstate == state) {
-	  found = true;
-	  break;
-	}
-      }
-      if (!found) {
+      final Set<StateProxy> states = mAutomaton.getStates();
+      if (!states.contains(state)) {
 	throw new IllegalArgumentException
 	  ("Automaton '" + mAutomaton.getName() +
 	   "' does not have the state '" + state.getName() + "'!");

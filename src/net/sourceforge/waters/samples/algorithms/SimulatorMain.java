@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.algorithms
 //# CLASS:   SimulatorMain
 //###########################################################################
-//# $Id: SimulatorMain.java,v 1.4 2006-11-17 03:38:22 robi Exp $
+//# $Id: SimulatorMain.java,v 1.5 2007-04-03 03:53:33 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.algorithms;
@@ -32,7 +32,7 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
  * a Waters {@link Simulator}.</P>
  *
  * <P>It implements a simple application that accepts a file name on the
- * command line, loads a model from the file, *and initialises a simulator
+ * command line, loads a model from the file, and initialises a simulator
  * for that model.  More precisely, this class can be run as follows.</P>
  *
  * <P><CODE>java SimulatorMain &lt;<I>file</I>&gt;</CODE></P>
@@ -72,7 +72,7 @@ public class SimulatorMain
   //# Main Method for Testing
   /**
    * Main method.
-   * This is a main method to check a set of files for controllability.
+   * This is a main method to demonstrate the use of a simulator.
    * Please refer to the class documentation ({@link SimulatorMain})
    * for more detailed information.
    * @param  args    Array of file names from the command line.
