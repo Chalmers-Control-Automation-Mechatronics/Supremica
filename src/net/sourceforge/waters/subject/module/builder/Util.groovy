@@ -21,12 +21,15 @@ import net.sourceforge.waters.subject.module.EdgeSubject
 import net.sourceforge.waters.model.expr.Operator
 import org.supremica.gui.ide.IDE
 import org.supremica.gui.InterfaceManager
+import org.supremica.automata.IO.ProjectBuildFromWaters
+import org.supremica.automata.Project
+import org.supremica.automata.algorithms.AutomataVerifier
 
 class Util {
 	private static final factory = ModuleSubjectFactory.instance
 	private static final parser = new ExpressionParser(factory.instance, CompilerOperatorTable.instance)
 
-	public static assertGeneratedModuleEqualsManual(ModuleProxy generatedModule, ModuleProxy manualModule) {
+	public static void assertGeneratedModuleEqualsManual(ModuleProxy generatedModule, ModuleProxy manualModule) {
 		def generated, manual
 		assert ProxyTools.isEqualListByContents(generated = new ArrayList(generatedModule.eventDeclList).sort{it.name}, manual = new ArrayList(manualModule.eventDeclList).sort{it.name}), "\ngenerated:$generated\nmanual   :$manual\n"
 		def generatedComponents = ((generatedModule.componentList.grep(SimpleComponentProxy.class) + generatedModule.componentList.grep(ForeachComponentProxy.class).body)).sort{it.name}
@@ -34,7 +37,7 @@ class Util {
 		assert (generated = generatedModule.componentList.name.sort()) == (manual = manualModule.componentList.name.sort()), "\ngenerated:$generated\nmanual   :$manual\n"
 		assert (generated = generatedComponents.graph.collect{it.nodes.name}) == (manual = manualComponents.graph.collect{it.nodes.name}), "\ngenerated:$generated\nmanual   :$manual\n"
 		assert (generated = generatedComponents.kind) == (manual = manualComponents.kind), "\ngenerated:$generated\nmanual   :$manual\n"
-		assert ProxyTools.isEqualListByContents(generated = generatedComponents.graph.nodes.propositions, manual = manualComponents.graph.nodes.propositions), "\ngenerated:$generated\nmanual   :$manual\n"
+		assert (generated = generatedComponents.graph.nodes.collect{[it.name, it.propositions.eventList.name]}) == (manual = manualComponents.graph.nodes.collect{[it.name, it.propositions.eventList.name]}), "\nstate marking\ngenerated:$generated\nmanual   :$manual\n"
 		assert ProxyTools.isEqualListByContents(generated = generatedComponents.graph.nodes, manual = manualComponents.graph.nodes), "\ngenerated:$generated\nmanual   :$manual\n"
 		assert (generated = generatedComponents.graph.collect{it.edges.collect{it.labelBlock.eventList*.toString().sort()}}) == (manual = manualComponents.graph.collect{it.edges.collect{it.labelBlock.eventList*.toString().sort()}}), "\nlabelBlock\ngenerated:$generated\nmanual   :$manual\n"
 		assert (generated = generatedComponents.graph.collect{it.edges.source.toString()}) == (manual = manualComponents.graph.collect{it.edges.source.toString()}), "\nSource node\ngenerated:$generated\nmanual   :$manual\n"
@@ -53,21 +56,26 @@ class Util {
 //		assert generatedModule.equalsByContents(manualModule)
 	}
 	
-	public static saveModuleToFile(ModuleProxy module, String filename = "./${module.name}.${WmodFileFilter.WMOD}") {
+	public static void saveModuleToFile(ModuleProxy module, String filename = "./${module.name}.${WmodFileFilter.WMOD}") {
     	saveModuleToFile(module, [filename] as File)
 	}
 	
-	public static saveModuleToFile(ModuleProxy module, File file) {
+	public static void saveModuleToFile(ModuleProxy module, File file) {
 		def marshaller = new JAXBModuleMarshaller(factory, CompilerOperatorTable.instance)
     	marshaller.marshal(module, file)
 	}
 	
 	private static IDE ide
 	
-	public static openInSupremica(ModuleProxy module) {
-			InterfaceManager.instance.initLookAndFeel();
-			if (!ide) ide = new IDE()
-			ide.visible = true
-			ide.installContainer(module)
+	public static void openInSupremica(ModuleProxy module) {
+		InterfaceManager.instance.initLookAndFeel();
+		if (!ide) ide = new IDE()
+		ide.visible = true
+		ide.installContainer(module)
+	}
+	public static boolean verifyNonblocking(ModuleProxy module) {
+		def supremicaProjBuilderFromWatersModule = new ProjectBuildFromWaters();
+        Project supremicaProject = supremicaProjBuilderFromWatersModule.build(module);
+       	AutomataVerifier.verifyMonolithicNonblocking(supremicaProject)
 	}
 }
