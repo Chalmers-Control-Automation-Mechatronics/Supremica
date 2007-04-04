@@ -73,31 +73,31 @@ public class Milp
     
     /** The output string */
     private String outputStr = "";
-
-	/*
-	 * The thread that performs the search for the optimal solution
-	 */
-	private Thread milpThread;
+    
+    /*
+     * The thread that performs the search for the optimal solution
+     */
+    private Thread milpThread;
     
     /****************************************************************************************/
     /*                                 CONSTUCTORS                                          */
     /****************************************************************************************/
     
     public Milp(Automata theAutomata, boolean buildSchedule, ScheduleDialog scheduleDialog)
-		throws Exception
+    throws Exception
     {
         this.theAutomata = theAutomata;
         //  this.theProject = theProject;
         this.buildSchedule = buildSchedule;
         this.scheduleDialog = scheduleDialog;
     }
-
-	public void startSearchThread()
-	{
-		milpThread = new Thread(this);
+    
+    public void startSearchThread()
+    {
+        milpThread = new Thread(this);
         isRunning = true;
         milpThread.start();
-	}
+    }
     
     public void run()
     {
@@ -110,7 +110,7 @@ public class Milp
             logger.error("Milp::schedule() -> " + ex);
             logger.debug(ex.getStackTrace());
         }
-    }    
+    }
     
     /****************************************************************************************/
     /*                                 "SCHEDULER"-INTERFACE METHODS                        */
@@ -121,7 +121,7 @@ public class Milp
      * processes and stores the resulting information.
      */
     public void schedule()
-		throws Exception
+    throws Exception
     {
         ActionTimer totalTimer = new ActionTimer();
         
@@ -180,7 +180,7 @@ public class Milp
      * by the MILP-solver can be accessed by the getSchedule-method
      */
     public void buildScheduleAutomaton()
-		throws Exception
+    throws Exception
     {
         timer.restart();
         
@@ -388,7 +388,7 @@ public class Milp
      * while the information about the location of booking/unbooking events is collected.
      */
     private void initialize()
-		throws Exception
+    throws Exception
     {
         modelFile = File.createTempFile("milp", ".mod");
         modelFile.deleteOnExit();
@@ -412,7 +412,7 @@ public class Milp
      * should include "ROBOT_A". The resulting robot and zone automata are stored globally.
      */
     private void initAutomata()
-		throws Exception
+    throws Exception
     {
         robots = theAutomata.getPlantAutomata();
         zones = theAutomata.getSpecificationAutomata();
@@ -510,7 +510,7 @@ public class Milp
     }
     
     private void initMutexStates()
-		throws Exception
+    throws Exception
     {
         bookingTics = new int[zones.size()][robots.size()][1];
         unbookingTics = new int[zones.size()][robots.size()][1];
@@ -531,13 +531,13 @@ public class Milp
         {
             Automaton currZone = zones.getAutomatonAt(i);
             
-			// 			ArrayList[] bookUnbookStatePairIndices = new ArrayList[robots.size()];
+            // 			ArrayList[] bookUnbookStatePairIndices = new ArrayList[robots.size()];
             
             for (int j=0; j<robots.size(); j++)
             {
                 Automaton currRobot = robots.getAutomatonAt(j);
                 
-				// 				Alphabet commonAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getAlphabet());
+                // 				Alphabet commonAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getAlphabet());
                 
                 Alphabet bookingAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getInitialState().activeEvents(false));
                 
@@ -545,7 +545,7 @@ public class Milp
                 {
                     Alphabet unbookingAlphabet = AlphabetHelpers.minus(AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getAlphabet()), bookingAlphabet);
                     
-					// 					bookUnbookStatePairIndices[j] = new ArrayList<int[]>();
+                    // 					bookUnbookStatePairIndices[j] = new ArrayList<int[]>();
                     
                     ArrayList<State> bookingStates = new ArrayList<State>();
                     ArrayList<State> unbookingStates = new ArrayList<State>();
@@ -606,7 +606,7 @@ public class Milp
     }
     
     private void initMutexStates2()
-		throws Exception
+    throws Exception
     {
         bookingTics = new int[zones.size()][robots.size()][1];
         unbookingTics = new int[zones.size()][robots.size()][1];
@@ -751,7 +751,7 @@ public class Milp
      * constructed.
      */
     private void convertAutomataToMilp()
-		throws Exception
+    throws Exception
     {
         timer.restart();
         
@@ -1025,8 +1025,8 @@ public class Milp
         w.newLine();
         w.write(cycleTimeConstraints);
         
-		// 		w.write("cycle_time{r in Robots}: c >= time[r, maxTic];");
-		// 		w.newLine();
+        // 		w.write("cycle_time{r in Robots}: c >= time[r, maxTic];");
+        // 		w.newLine();
         
         // The initial (precedence) constraints
         w.newLine();
@@ -1076,7 +1076,7 @@ public class Milp
     }
     
     private void processSolutionFile()
-		throws Exception
+    throws Exception
     {
         // tillf...
         // 		for (int i=0; i<robots.size(); i++)
@@ -1128,28 +1128,28 @@ public class Milp
     }
     
     private void callMilpSolver()
-		throws Exception
+    throws Exception
     {
         logger.info("The MILP-solver started....");
         // Defines the name of the .exe-file as well the arguments (.mod and .sol file names)
         String[] cmds = new String[5];
         //cmds[0] = "C:\\Program Files\\glpk\\bin\\glpsol.exe";
-		cmds[0] = "glpsol";
+        cmds[0] = "glpsol";
         cmds[1] = "-m";
         cmds[2] = modelFile.getAbsolutePath();
         cmds[3] = "-o";
         cmds[4] = solutionFile.getAbsolutePath();
         
-		try 
-		{
-			// Runs the MILP-solver with the arguments defined above
-			milpProcess = Runtime.getRuntime().exec(cmds);
-		}
-		catch (IOException milpNotFoundException)
-		{
-			logger.error("The GLPK-solver 'glpsol.exe' not found. Make sure that it is registered in your path.");
-			throw milpNotFoundException;
-		}
+        try
+        {
+            // Runs the MILP-solver with the arguments defined above
+            milpProcess = Runtime.getRuntime().exec(cmds);
+        }
+        catch (IOException milpNotFoundException)
+        {
+            logger.error("The GLPK-solver 'glpsol.exe' not found. Make sure that it is registered in your path.");
+            throw milpNotFoundException;
+        }
         
         // Listens for the output of MILP (that is the input to this application)...
         BufferedReader milpEcho = new BufferedReader(new InputStreamReader(new DataInputStream(milpProcess.getInputStream())));
@@ -1164,12 +1164,12 @@ public class Milp
             if (milpEchoStr.contains("INTEGER OPTIMAL SOLUTION FOUND") || milpEchoStr.contains("Time") || milpEchoStr.contains("Memory"))
             {
                 
-				// 				logger.info(milpEchoStr);
+                // 				logger.info(milpEchoStr);
                 
-				// 				if (!milpEchoStr.contains("INTEGER OPTIMAL SOLUTION FOUND"))
-				// 				{
-				// 					outputStr += "\t" + milpEchoStr + "\n";
-				// 				}
+                // 				if (!milpEchoStr.contains("INTEGER OPTIMAL SOLUTION FOUND"))
+                // 				{
+                // 					outputStr += "\t" + milpEchoStr + "\n";
+                // 				}
             }
             else if (milpEchoStr.contains("error"))
             {
@@ -1180,10 +1180,10 @@ public class Milp
     
     // private void killGlpk()
     
-	// 	{
-	// 		if (milpProcess != null)
-	// 			milpProcess.destroy();
-	// 	}
+    // 	{
+    // 		if (milpProcess != null)
+    // 			milpProcess.destroy();
+    // 	}
     
     public void requestStop()
     {
@@ -1253,9 +1253,9 @@ public class Milp
             
             currInitialState.removeIncomingArcs();
             
-			// 			LabeledEvent dummyEvent = new LabeledEvent(dummyEventName);
-			// 			currPlant.getAlphabet().addEvent(dummyEvent);
-			// 			currPlant.addArc(new Arc(dummyState, currInitialState, dummyEvent));
+            // 			LabeledEvent dummyEvent = new LabeledEvent(dummyEventName);
+            // 			currPlant.getAlphabet().addEvent(dummyEvent);
+            // 			currPlant.addArc(new Arc(dummyState, currInitialState, dummyEvent));
             
             dummyState.setAccepting(true);
             dummyState.setCost(0);
@@ -1265,7 +1265,7 @@ public class Milp
     }
     
     private synchronized void addAutomatonToGui(Automaton auto)
-		throws Exception
+    throws Exception
     {
         if (scheduleDialog != null)
         {

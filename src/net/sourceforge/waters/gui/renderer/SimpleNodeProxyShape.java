@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 
 import java.awt.geom.Arc2D;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
 
@@ -32,7 +33,8 @@ public class SimpleNodeProxyShape
     {
         // Draw the filling (depends on marking)
         updateColors();
-        Rectangle2D rect = getShape().getBounds();
+        //Rectangle2D rect = getShape().getBounds();
+        Rectangle2D rect = nodeCircleShape.getBounds();
         Arc2D arc;
         double i = 0;
         double degrees = ((double)360 / (double)mColors.size());
@@ -53,13 +55,16 @@ public class SimpleNodeProxyShape
             }
         }
         
-        // Draw initial state arrow
+        // Draw handles (initial state arrow)
 	for (final Handle handle : mHandles) {
 	  g.setColor(status.getColor());
 	  handle.draw(g, status);
         }
+
+        // The above handle drawing should not be necessary (it's drawn below) but 
+        // the initial arrow refuses to be drawn filled in the editor (not in printed output!?)?
         
-        // Draw the basic shape (the outline)
+        // Draw the basic shape (the outline + handles (initial state arrow))
         super.draw(g, status);
         
         // Cross out if forbidden
@@ -126,16 +131,28 @@ public class SimpleNodeProxyShape
         Point2D p = getProxy().getPointGeometry().getPoint();
         Rectangle2D rect = new Rectangle2D.Double(p.getX() - RADIUS, p.getY() - RADIUS,
             WIDTH, WIDTH);
-        mShape = new Arc2D.Double(rect, 0, 360, Arc2D.OPEN);
+        
+        //mShape = new Arc2D.Double(rect, 0, 360, Arc2D.OPEN);
+        nodeCircleShape = new Arc2D.Double(rect, 0, 360, Arc2D.OPEN);
+        mShape = new GeneralPath(nodeCircleShape);
+
+        // Create handles
         if (proxy.isInitial()) {
 	  final Handle handle = new InitialStateHandle(proxy);
 	  mHandles = Collections.singletonList(handle);
         } else {
 	  mHandles = Collections.emptyList();
 	}
+        
+        // Append handles to shape
+        for (Handle handle: mHandles)
+        { 
+            mShape.append(handle.getShape(), false);
+        }
     }
     
-    public Arc2D getShape()
+    //public Arc2D getShape()
+    public GeneralPath getShape()
     {
         return mShape;
     }
@@ -153,10 +170,12 @@ public class SimpleNodeProxyShape
     private final List<Handle> mHandles;
     private Collection<Color> mColors = new ArrayList<Color>();
     private final ModuleProxy mModule;
-    private final Arc2D mShape;
+
+    //private final Arc2D mShape;
+    private final Arc2D nodeCircleShape;
+    private final GeneralPath mShape; // To incorporate the initial state arrow    
     
     public static int RADIUS = 6;
     public static int WIDTH = RADIUS * 2;
     private static Color FILLCOLOR = Color.WHITE;
-
 }

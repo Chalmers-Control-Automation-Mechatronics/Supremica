@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   InitialStateHandle
 //###########################################################################
-//# $Id: InitialStateHandle.java,v 1.8 2007-02-16 03:00:42 robi Exp $
+//# $Id: InitialStateHandle.java,v 1.9 2007-04-04 07:24:01 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -49,6 +49,7 @@ class InitialStateHandle
     normdir.setLocation(-dx, -dy);
     final GeneralPath arrow = EdgeProxyShape.createArrowHead(border, normdir);
     mShape = new GeneralPath(GeneralPath.WIND_NON_ZERO, 2);
+    //mShape = new GeneralPath(GeneralPath.WIND_EVEN_ODD, 2);
     mShape.append(line, false);
     mShape.append(arrow, false);
   }

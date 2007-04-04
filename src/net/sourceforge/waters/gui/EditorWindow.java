@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindow.java,v 1.36 2007-01-26 15:09:47 avenir Exp $
+//# $Id: EditorWindow.java,v 1.37 2007-04-04 07:24:01 flordal Exp $
 //###########################################################################
 
 
@@ -256,8 +256,8 @@ public class EditorWindow
             System.err.println(ex.getStackTrace());
         }
     }
-
-  public void exportEncapsulatedPostscript()
+    
+    public void exportEncapsulatedPostscript()
     {
         // Get file to export to
         JFileChooser chooser = new JFileChooser();
@@ -278,71 +278,66 @@ public class EditorWindow
             
             File dir = epsFile.getParentFile();
             File psFile = File.createTempFile(epsFile.getName(), ".ps", dir);
-
+            
             PrintRequestAttribute postscript = new Destination(psFile.toURI());
             PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
             attributes.add(postscript);
             
             // Print!
             printJob.print(attributes);
-
+            
             // Convert ps to eps using "ps2epsi"
-            try 
+            try
             {
-              String[] cmds = new String[]{"ps2epsi", psFile.getName(), epsFile.getName()};
-              
-              Process ps2epsiProcess = Runtime.getRuntime().exec(cmds, null, dir);
-              ps2epsiProcess.waitFor();
-              
-              if (ps2epsiProcess.exitValue() != 0)
-              {
-				throw new Exception("Conversion from ps to eps exited unsuccessfully.");
-              }
+                String[] cmds = new String[]{"ps2epsi", psFile.getName(), epsFile.getName()};                
+                Process ps2epsiProcess = Runtime.getRuntime().exec(cmds, null, dir);
+                ps2epsiProcess.waitFor();
+                
+                if (ps2epsiProcess.exitValue() != 0)
+                {
+                    throw new Exception("Conversion from ps to eps exited unsuccessfully.");
+                }
             }
             catch (Exception ex)
             {
-              System.err.println("The conversion from ps to eps failed. Make sure that \"ps2epsi.bat\" is globally accessible.");
-              throw ex;
+                System.err.println("The conversion from ps to eps failed. Make sure that \"ps2epsi\" is globally accessible.");
+                throw ex;
             }
-
+            
             // Loop through the eps-file and correct it if necessary
-            File newEpsFile = File.createTempFile(epsFile.getName(), ".tmp", dir);
-
+            File newEpsFile = File.createTempFile(epsFile.getName(), ".tmp", dir);            
             BufferedReader r = new BufferedReader(new FileReader(epsFile));
-            BufferedWriter w = new BufferedWriter(new FileWriter(newEpsFile));
+            BufferedWriter w = new BufferedWriter(new FileWriter(newEpsFile));            
 
+            // This code takes care of a particular bug (?) that Avenir found in some (?) eps-generators...
             boolean alert = false;
             String str = r.readLine();
             while (str != null)
             {
-              if (str.contains("save countdictstack"))
-              {
-				alert = false;
-              }
-              
-              if (alert == true)
-              {
-				w.write("save countdictstack mark newpath /showpage {} def /setpagedevice {pop} def");
-				w.newLine();
-                
-				alert = false;
-              }
-              
-              w.write(str);
-              w.newLine();
-              
-              if (str.contains("%%EndPreview"))
-              {
-				alert = true;
-              }
-              
-              str = r.readLine();
+                if (str.contains("save countdictstack"))
+                {
+                    alert = false;
+                }                
+                if (alert == true)
+                {
+                    w.write("save countdictstack mark newpath /showpage {} def /setpagedevice {pop} def");
+                    w.newLine();
+                    
+                    alert = false;
+                }                
+                w.write(str);
+                w.newLine();                
+                if (str.contains("%%EndPreview"))
+                {
+                    alert = true;
+                }                
+                str = r.readLine();
             }
             
             w.flush();
             w.close();
             r.close();
-           
+            
             // Clean up
             psFile.delete();
             epsFile.delete();
@@ -351,7 +346,7 @@ public class EditorWindow
             
             if (!renameSucceeded)
             {
-              throw new Exception("Unable to rename the newly created file to " + epsFile.getName());
+                throw new Exception("Unable to rename the newly created file to " + epsFile.getName());
             }
         }
         catch (Exception ex)

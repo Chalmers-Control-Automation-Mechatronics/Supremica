@@ -9,7 +9,7 @@ import javax.swing.ImageIcon;
 import org.supremica.gui.ide.IDE;
 
 /**
- * A new action
+ * Action for exporting a graph to postscipt.
  */
 public class EditorSavePostscriptAction
     extends IDEAction
@@ -57,7 +57,8 @@ public class EditorSavePostscriptAction
     }  
 
     /**
-     * Should be enabled only when a postscript service can be found AND when a component is being edited.
+     * Should be enabled only when a postscript service can be found AND 
+     * when a component is being edited (checked elsewhere).
      */
     public boolean isEnabled()
     {

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   EdgeProxyShape
 //###########################################################################
-//# $Id: EdgeProxyShape.java,v 1.14 2007-02-16 03:00:42 robi Exp $
+//# $Id: EdgeProxyShape.java,v 1.15 2007-04-04 07:24:01 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -128,6 +128,7 @@ abstract class EdgeProxyShape
     final double x2 = x0 + dx * ARROW_COS + dy * ARROW_SIN;
     final double y2 = y0 - dx * ARROW_SIN + dy * ARROW_COS;
     final GeneralPath path = new GeneralPath(GeneralPath.WIND_NON_ZERO, 3);
+    //final GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD, 3);
     path.append(new Line2D.Double(x0, y0, x1, y1), false);
     path.append(new Line2D.Double(x1, y1, x2, y2), true);
     path.closePath();
@@ -229,7 +230,7 @@ abstract class EdgeProxyShape
   /**
    * The height of the arrow, i.e., the distance it covers on the line.
    */
-  static final double ARROW_HEIGHT = 8.0;
+  static final double ARROW_HEIGHT = 7.0; // 7.0 is closer to what was produced earlier than is 8.0.
   /**
    * The length of the side of the arrow.
    */

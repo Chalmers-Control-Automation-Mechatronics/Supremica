@@ -517,15 +517,13 @@ public class Alphabet
      */
     public Alphabet minus(Alphabet other)
     {
-        for (Iterator<LabeledEvent> alphIt = other.iterator(); alphIt.hasNext(); )
+        for (LabeledEvent event : other)
         {
-            LabeledEvent currEvent = alphIt.next();
-
-            if (contains(currEvent))
+            if (this.contains(event))
             {
                 try
                 {
-                    removeEvent(currEvent);
+                    this.removeEvent(event);
 
                     //  Quick check if this alphabet is almost empty
                     if ((this.size() == 1) && !other.contains(this.iterator().next()))

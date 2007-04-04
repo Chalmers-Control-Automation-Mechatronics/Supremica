@@ -205,7 +205,7 @@ public class AutomatonMinimizer
                 // tau_u-saturate!
                 supervisionEquivalenceSaturate(theAutomaton);
                 
-                // Partition using native methods
+                // Partition using native methods, long state names and STRONG bisimulation equivalence
                 BisimulationEquivalenceMinimizer.minimize(theAutomaton, false, true);
             }
             
@@ -530,6 +530,7 @@ public class AutomatonMinimizer
     throws Exception
     {
         Automaton newAutomaton = new Automaton();
+
         // Don't listen to this!
         newAutomaton.beginTransaction();
         
@@ -640,12 +641,13 @@ public class AutomatonMinimizer
                 // Don't try to refine single-state classes!
                 if (currClass.size() > 1)
                 {
-                    // refined = refined || partition(equivClasses, currClass); // WRONG!
+                    // refined = refined || partition(equivClasses, currClass); // WRONG! SHOULD REFINE EITHER WAY!
                     refined = partition(equivClasses, currClass) || refined;
                 }
             }
         }
     }
+    
     /**
      * Partitions equivClass by all events.
      *@return true if a partitioning was made, false otherwise.

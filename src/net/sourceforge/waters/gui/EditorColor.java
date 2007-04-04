@@ -67,7 +67,7 @@ public class EditorColor
     }
     
     /**
-     * Returns the apropriate color for painting this object.
+     * Returns the appropriate color for painting this object.
      */
     public static Color getColor(Proxy o, EditorSurface.DRAGOVERSTATUS dragOver, boolean selected,
         boolean error)

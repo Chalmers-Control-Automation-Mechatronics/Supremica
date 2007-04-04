@@ -4,16 +4,16 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   ProxyShapeProducer
 //###########################################################################
-//# $Id: ProxyShapeProducer.java,v 1.22 2007-02-22 08:45:58 robi Exp $
+//# $Id: ProxyShapeProducer.java,v 1.23 2007-04-04 07:24:01 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Font;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.Collections;
@@ -158,8 +158,8 @@ public class ProxyShapeProducer
   {
     SimpleNodeProxyShape shape = (SimpleNodeProxyShape) lookup(simple);
     if (shape == null) {
-      shape = new SimpleNodeProxyShape(simple, mModule);
-      mMap.put(simple, shape);
+        shape = new SimpleNodeProxyShape(simple, mModule);
+        mMap.put(simple, shape);
     }
     final LabelGeometryProxy geo = simple.getLabelGeometry();
     LabelProxyShape label = (LabelProxyShape) lookup(geo);

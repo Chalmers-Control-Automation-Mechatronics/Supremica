@@ -104,7 +104,6 @@ public class BisimulationEquivalenceMinimizer
         }
     }
     
-    
     /**
      * Minimizes automaton with respect to strong bisimulation equivalence.
      */
@@ -112,6 +111,7 @@ public class BisimulationEquivalenceMinimizer
     {
         minimize(aut, false, true);
     }
+    
     /**
      * Minimizes automaton with respect to weak or strong bisimulation
      * equivalence using long or short state names

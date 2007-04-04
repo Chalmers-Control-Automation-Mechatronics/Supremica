@@ -2142,8 +2142,7 @@ public class ActionMan
         try
         {
             // Build Waters ModuleProxy
-            final ModuleProxyFactory factory =
-                ModuleSubjectFactory.getInstance();
+            final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
             final OperatorTable optable = CompilerOperatorTable.getInstance();
             final ProxyUnmarshaller<ModuleProxy> unMarshaller = new JAXBModuleMarshaller(factory, optable);
             final URI uri = file.toURI();

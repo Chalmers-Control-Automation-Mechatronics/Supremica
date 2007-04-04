@@ -1680,7 +1680,6 @@ public class Automaton
                 }
             }
 
-
             // tau_u
             String silentUName = Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.get();
             LabeledEvent tau_u = getAlphabet().getEvent(silentUName);
@@ -1703,6 +1702,7 @@ public class Automaton
                     }
                 }
             }
+            
             // Modify arcs
             for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
             {

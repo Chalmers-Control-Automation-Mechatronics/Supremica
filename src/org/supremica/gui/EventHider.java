@@ -101,7 +101,7 @@ class EventHiderDialog
             {
                 public void actionPerformed(ActionEvent e)
                 {
-                    System.err.println("Tryck inte s� h�rt!");
+                    System.err.println("Tryck inte så hårt!");
                     doRestrict();
                 }
             });
