@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<project name="Iec61131BuilderExamples" default="compile" basedir=".">
+
+	<property file="build.properties" />
+
+	<property name="supremicadir" value="../../.." />
+	<property name="lib" value="${supremicadir}/lib" />
+	<property name="src" value="." />
+	<property name="bin" value="bin" />
+	<property name="groovy-all.jar" location="${lib}/groovy-all-1.0.jar" />
+
+	<path id="groovy.classpath" location="${groovy-all.jar}" />
+	<path id="supremica.classpath">
+		<pathelement location="${supremicadir}/build" />
+		<pathelement location="${supremicadir}/lib/unjared" />
+		<pathelement location="${supremicadir}/images" />
+		<pathelement location="${supremicadir}/examples" />
+	</path>
+
+	<!--<taskdef name="groovy" classname="org.codehaus.groovy.ant.Groovy" classpathref="groovy.classpath" />-->
+	<taskdef name="groovyc" classname="org.codehaus.groovy.ant.Groovyc" classpathref="groovy.classpath" />
+
+	<target name="compile">
+		<groovyc srcdir="${src}" destdir="${bin}" classpathref="supremica.classpath"/>
+	</target>
+
+	<target name="Lift" depends="compile">
+		<java fork="yes" classname="Lift" failonerror="true" classpathref="supremica.classpath">
+			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Xms64m"/>
+			<classpath>
+				<pathelement location="${bin}" />
+			</classpath>
+		</java>
+	</target>
+
+	<!-- ================================= 
+          target: clean              
+         ================================= -->
+	<target name="clean" depends="" description="">
+		<delete dir="${bin}"/>
+		<mkdir dir="${bin}"/>
+	</target>
+
+	<!-- ================================= 
+          target: initialize              
+         ================================= -->
+	<target name="initialize" depends="clean,compile" description="--> description"/>
+
+</project>
+
