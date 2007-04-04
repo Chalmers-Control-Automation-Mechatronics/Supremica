@@ -37,23 +37,23 @@ class Process {
 	}
 	def addPriorityAutomaton(ModuleBuilder mb, Scope scope, Scope scopeOfSlowerProcess, forSynthesis) {
 		mb.plant("${scope.fullName.toSupremicaSyntax()}_vs_${scopeOfSlowerProcess.fullName.toSupremicaSyntax()}", defaultEvent:scope.eventName) {
-			state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
-				outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+			state(Converter.AFTER_SLOWER_PROCESS_STATE_NAME, marked:true) {
+				outgoing(to:Converter.BEFORE_SLOWER_PROCESS_STATE_NAME)
 			}
-			state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
-				outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:scopeOfSlowerProcess.eventName)
+			state(Converter.BEFORE_SLOWER_PROCESS_STATE_NAME, marked:true) {
+				outgoing(to:Converter.AFTER_SLOWER_PROCESS_STATE_NAME, event:scopeOfSlowerProcess.eventName)
 				selfLoop()
 			}
 		}
 	}
-	def addPriorityAutomaton(ModuleBuilder mb, Scope scope, List scopesOfMuchSlowerProcesses) {
+	def addPriorityAutomaton(ModuleBuilder mb, Scope scope, List scopesOfMuchSlowerProcesses, forSynthesis) {
 		if(scopesOfMuchSlowerProcesses) {
 			mb.plant("${scope.fullName.toSupremicaSyntax()}_vs_SlowProcesses", defaultEvent:scope.eventName) {
-				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				state(Converter.AFTER_SLOWER_PROCESS_STATE_NAME, marked:true) {
+					outgoing(to:Converter.BEFORE_SLOWER_PROCESS_STATE_NAME)
 				}
-				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, events:scopesOfMuchSlowerProcesses.eventName)
+				state(Converter.BEFORE_SLOWER_PROCESS_STATE_NAME, marked:true) {
+					outgoing(to:Converter.AFTER_SLOWER_PROCESS_STATE_NAME, events:scopesOfMuchSlowerProcesses.eventName)
 					selfLoop()
 				}
 			}

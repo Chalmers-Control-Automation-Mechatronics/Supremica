@@ -6,25 +6,19 @@ import net.sourceforge.waters.subject.module.builder.Util
 
 class ControlCodeBuilderTest extends GroovyTestCase {
 	static void main(String[] args) {
-		def tester = new ControlCodeBuilderTest()
-		tester.testAssignment()
-		tester.testAutomataGenerator()
-		tester.testFunctionBlocks()
-		tester.testSfc()
-		tester.testSfcDeferred()
-/*		Util.openInSupremica(ASSIGNMENT_APP_MODULE)
-		Util.openInSupremica(SFC_APP_MODULE)
-		Util.openInSupremica(SFC_DEFERRED_APP_MODULE)
-		Util.openInSupremica(STATELESS_CYCLE_APP_MODULE)
-		Util.openInSupremica(FB_APP_MODULE)
-*/	}
+		Util.openInSupremica(ASSIGNMENT_APP.toAutomata(true))
+//		Util.openInSupremica(SFC_APP_MODULE)
+//		Util.openInSupremica(SFC_DEFERRED_APP_MODULE)
+//		Util.openInSupremica(STATELESS_CYCLE_APP_MODULE)
+//		Util.openInSupremica(FB_APP_MODULE)
+	}
 	static final CCB = new ControlCodeBuilder()
 	static final ASSIGNMENT_APP = CCB.application('assignmentTest') {
 		input 'y1'
 		input 'y2'
 		input 'y3'
-		output 'u1'
-		output 'u2'
+		output 'u1 := true'
+		output 'u2 := false'
 		output 'u3'
 		output 'u5'
 		output 'u6'
@@ -74,8 +68,8 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 			input 'y1'
 			input 'y2'
 			input 'y3'
-			output 'u1'
-			output 'u2'
+			output('u1', value:true, markedValue:true)
+			output('u2', value:false, markedValue:false)
 			output 'u3'
 			output 'u5'
 			output 'u6'
@@ -159,8 +153,8 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 	
 	void testSfc() {
 		def appSfcLess = CCB.application('sfcapp') {
-			input 'y1 := true'
-			input 'y2 := true'
+			input('y1', value:true)
+			input('y2', value:true)
 			output 'u1'
 			output 'u2'
 			output 'u3'
@@ -307,92 +301,92 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 			booleanVariable('u3', initialValue:false, markedValue:true)
 			event(['someProcess_change', 'Process_y2_change', 'Process_y3_change', 'slowProcess1_change', 'slowProcess2_change'], controllable:false)
 			plant('ControlUnit_vs_someProcess', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME) {
-				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				state(Converter.AFTER_SLOWER_PROCESS_STATE_NAME, marked:false) {
+					outgoing(to:Converter.BEFORE_SLOWER_PROCESS_STATE_NAME)
 				}
-				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:'someProcess_change')
+				state(Converter.BEFORE_SLOWER_PROCESS_STATE_NAME, marked:true) {
+					outgoing(to:Converter.AFTER_SLOWER_PROCESS_STATE_NAME, event:'someProcess_change')
 					selfLoop()
 				}
 			}
 			plant('ControlUnit_vs_Process_y2', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME) {
-				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				state(Converter.AFTER_SLOWER_PROCESS_STATE_NAME, marked:false) {
+					outgoing(to:Converter.BEFORE_SLOWER_PROCESS_STATE_NAME)
 				}
-				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:'Process_y2_change')
+				state(Converter.BEFORE_SLOWER_PROCESS_STATE_NAME, marked:true) {
+					outgoing(to:Converter.AFTER_SLOWER_PROCESS_STATE_NAME, event:'Process_y2_change')
 					selfLoop()
 				}
 			}
 			plant('ControlUnit_vs_Process_y3', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME) {
-				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				state(Converter.AFTER_SLOWER_PROCESS_STATE_NAME, marked:false) {
+					outgoing(to:Converter.BEFORE_SLOWER_PROCESS_STATE_NAME)
 				}
-				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:'Process_y3_change')
+				state(Converter.BEFORE_SLOWER_PROCESS_STATE_NAME, marked:true) {
+					outgoing(to:Converter.AFTER_SLOWER_PROCESS_STATE_NAME, event:'Process_y3_change')
 					selfLoop()
 				}
 			}
 			plant('ControlUnit_vs_SlowProcesses', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME) {
-				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				state(Converter.AFTER_SLOWER_PROCESS_STATE_NAME, marked:false) {
+					outgoing(to:Converter.BEFORE_SLOWER_PROCESS_STATE_NAME)
 				}
-				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, events:['slowProcess1_change', 'slowProcess2_change'])
+				state(Converter.BEFORE_SLOWER_PROCESS_STATE_NAME, marked:true) {
+					outgoing(to:Converter.AFTER_SLOWER_PROCESS_STATE_NAME, events:['slowProcess1_change', 'slowProcess2_change'])
 					selfLoop()
 				}
 			}
 			plant('someProcess_vs_slowProcess1', defaultEvent:'someProcess_change') {
-				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				state(Converter.AFTER_SLOWER_PROCESS_STATE_NAME, marked:true) {
+					outgoing(to:Converter.BEFORE_SLOWER_PROCESS_STATE_NAME)
 				}
-				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:'slowProcess1_change')
+				state(Converter.BEFORE_SLOWER_PROCESS_STATE_NAME, marked:true) {
+					outgoing(to:Converter.AFTER_SLOWER_PROCESS_STATE_NAME, event:'slowProcess1_change')
 					selfLoop()
 				}
 			}
 			plant('someProcess_vs_slowProcess2', defaultEvent:'someProcess_change') {
-				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				state(Converter.AFTER_SLOWER_PROCESS_STATE_NAME, marked:true) {
+					outgoing(to:Converter.BEFORE_SLOWER_PROCESS_STATE_NAME)
 				}
-				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:'slowProcess2_change')
+				state(Converter.BEFORE_SLOWER_PROCESS_STATE_NAME, marked:true) {
+					outgoing(to:Converter.AFTER_SLOWER_PROCESS_STATE_NAME, event:'slowProcess2_change')
 					selfLoop()
 				}
 			}
 			plant('Process_y2_vs_slowProcess1', defaultEvent:'Process_y2_change') {
-				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				state(Converter.AFTER_SLOWER_PROCESS_STATE_NAME, marked:true) {
+					outgoing(to:Converter.BEFORE_SLOWER_PROCESS_STATE_NAME)
 				}
-				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:'slowProcess1_change')
+				state(Converter.BEFORE_SLOWER_PROCESS_STATE_NAME, marked:true) {
+					outgoing(to:Converter.AFTER_SLOWER_PROCESS_STATE_NAME, event:'slowProcess1_change')
 					selfLoop()
 				}
 			}
 			plant('Process_y2_vs_slowProcess2', defaultEvent:'Process_y2_change') {
-				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				state(Converter.AFTER_SLOWER_PROCESS_STATE_NAME, marked:true) {
+					outgoing(to:Converter.BEFORE_SLOWER_PROCESS_STATE_NAME)
 				}
-				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:'slowProcess2_change')
+				state(Converter.BEFORE_SLOWER_PROCESS_STATE_NAME, marked:true) {
+					outgoing(to:Converter.AFTER_SLOWER_PROCESS_STATE_NAME, event:'slowProcess2_change')
 					selfLoop()
 				}
 			}
 			plant('Process_y3_vs_slowProcess1', defaultEvent:'Process_y3_change') {
-				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				state(Converter.AFTER_SLOWER_PROCESS_STATE_NAME, marked:true) {
+					outgoing(to:Converter.BEFORE_SLOWER_PROCESS_STATE_NAME)
 				}
-				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:'slowProcess1_change')
+				state(Converter.BEFORE_SLOWER_PROCESS_STATE_NAME, marked:true) {
+					outgoing(to:Converter.AFTER_SLOWER_PROCESS_STATE_NAME, event:'slowProcess1_change')
 					selfLoop()
 				}
 			}
 			plant('Process_y3_vs_slowProcess2', defaultEvent:'Process_y3_change') {
-				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				state(Converter.AFTER_SLOWER_PROCESS_STATE_NAME, marked:true) {
+					outgoing(to:Converter.BEFORE_SLOWER_PROCESS_STATE_NAME)
 				}
-				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:'slowProcess2_change')
+				state(Converter.BEFORE_SLOWER_PROCESS_STATE_NAME, marked:true) {
+					outgoing(to:Converter.AFTER_SLOWER_PROCESS_STATE_NAME, event:'slowProcess2_change')
 					selfLoop()
 				}
 			}
@@ -480,37 +474,40 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 				state('start', marked:true) {
 					outgoing(to:'main', event:Converter.START_SCAN_EVENT_NAME)
 				}
-				state('main', marked:true) {
+				state('main', marked:false) {
 					outgoing(to:'start', event:Converter.SCAN_CYCLE_EVENT_NAME)
 				}
 			}
 			plant('ControlUnit_vs_someProcess', defaultEvent:Converter.START_SCAN_EVENT_NAME) {
-				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
+				state(Converter.AFTER_SLOWER_PROCESS_STATE_NAME, marked:false) {
 					outgoing(to:Converter.SCAN_CYCLE_MAIN_STATE_NAME)
 				}
-				state(Converter.SCAN_CYCLE_MAIN_STATE_NAME, marked:true) {
-					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME, event:Converter.SCAN_CYCLE_EVENT_NAME)
+				state(Converter.SCAN_CYCLE_MAIN_STATE_NAME, marked:false) {
+					outgoing(to:Converter.BEFORE_SLOWER_PROCESS_STATE_NAME, event:Converter.SCAN_CYCLE_EVENT_NAME)
 				}
-				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:'someProcess_change')
+				state(Converter.BEFORE_SLOWER_PROCESS_STATE_NAME, marked:true) {
+					outgoing(to:Converter.AFTER_SLOWER_PROCESS_STATE_NAME, event:'someProcess_change')
 					outgoing(to:Converter.SCAN_CYCLE_MAIN_STATE_NAME)
 				}
 			}
-			plant('ControlUnit_vs_SlowProcesses', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME) {
-				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+			plant('ControlUnit_vs_SlowProcesses', defaultEvent:Converter.START_SCAN_EVENT_NAME) {
+				state(Converter.AFTER_SLOWER_PROCESS_STATE_NAME, marked:false) {
+					outgoing(to:Converter.SCAN_CYCLE_MAIN_STATE_NAME)
 				}
-				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, events:['slowProcess1_change'])
-					selfLoop()
+				state(Converter.SCAN_CYCLE_MAIN_STATE_NAME, marked:false) {
+					outgoing(to:Converter.BEFORE_SLOWER_PROCESS_STATE_NAME, event:Converter.SCAN_CYCLE_EVENT_NAME)
+				}
+				state(Converter.BEFORE_SLOWER_PROCESS_STATE_NAME, marked:true) {
+					outgoing(to:Converter.AFTER_SLOWER_PROCESS_STATE_NAME, events:['slowProcess1_change'])
+					outgoing(to:Converter.SCAN_CYCLE_MAIN_STATE_NAME)
 				}
 			}
 			plant('someProcess_vs_slowProcess1', defaultEvent:'someProcess_change') {
-				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
+				state(Converter.AFTER_SLOWER_PROCESS_STATE_NAME, marked:true) {
+					outgoing(to:Converter.BEFORE_SLOWER_PROCESS_STATE_NAME)
 				}
-				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, event:'slowProcess1_change')
+				state(Converter.BEFORE_SLOWER_PROCESS_STATE_NAME, marked:true) {
+					outgoing(to:Converter.AFTER_SLOWER_PROCESS_STATE_NAME, event:'slowProcess1_change')
 					selfLoop()
 				}
 			}
@@ -539,7 +536,6 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 				}
 			}
 		}
-		
 		Util.assertGeneratedModuleEqualsManual(SYNTHESIS_APP.toAutomata(true), correctModule)
 //		Util.openInSupremica(generatedModuleFromStateless)
 	}
@@ -597,7 +593,7 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 		}
 	}
 	//static final FB_APP_MODULE = FB_APP.toAutomata()
-	void testFunctionBlocks(boolean openInSupremica) {
+	void testFunctionBlocks() {
 		def appAssignmentOnly = CCB.application('functionBlockTest') {
 			input 'y1'
 			input 'y2'
@@ -680,8 +676,8 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 				}
 			}
 		}
-		ModuleSubject generatedModuleFromAssignmentOnly = appAssignmentOnly.toAutomata()
-		Util.assertGeneratedModuleEqualsManual(FB_APP.toAutomata(), generatedModuleFromAssignmentOnly)
+		ModuleSubject generatedModuleFromAssignmentOnly = appAssignmentOnly.toAutomata(true)
+		Util.assertGeneratedModuleEqualsManual(FB_APP.toAutomata(true), generatedModuleFromAssignmentOnly)
 //		Util.openInSupremica(generatedModule)
 	}
 }

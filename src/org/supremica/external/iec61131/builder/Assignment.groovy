@@ -34,7 +34,10 @@ class RuntimeAssignment {
 	def addToModule(ModuleBuilder mb) {
 		Variable assignedVariable = scope.namedElement(Q)
 		assert assignedVariable, "Undeclared identifier $Q in ${this}"
-		boolean markedValue = (assignedVariable.markedValue != null) ? assignedVariable.markedValue : (assignedVariable.value != null ? assignedVariable.value : false) 
+		boolean markedValue
+		if (assignedVariable.markedValue != null) markedValue = assignedVariable.markedValue
+		else if (assignedVariable.value != null)  markedValue = assignedVariable.value
+		else markedValue = false
 		String supremicaNameOfQ = Q.toSupremicaSyntax() //Q must already be fully qualified
 		mb.booleanVariable(supremicaNameOfQ, initialValue:assignedVariable.value, markedValue:markedValue)
 		mb.plant("ASSIGN_${supremicaNameOfQ}", defaultEvent:scope.eventName, deterministic:false) {
@@ -59,6 +62,7 @@ class RuntimeAssignment {
 		assignmentForOneProcess.inject([:]){ Map map, elem ->
 			def expandedInput = elem.input.replaceAllIdentifiers {
 				def fullName = elem.scope.fullNameOf(it)
+				assert fullName, "Undeclared identifier $it in $elem"
 				map[fullName] ? new Expression("(${map[fullName]})") : fullName
 			}
 			map[elem.scope.fullNameOf(elem.Q)] = expandedInput

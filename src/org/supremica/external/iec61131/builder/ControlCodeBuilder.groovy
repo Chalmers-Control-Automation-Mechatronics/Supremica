@@ -8,16 +8,11 @@ import net.sourceforge.waters.subject.module.builder.ModuleBuilder
 class Converter {
 	static final SCAN_CYCLE_EVENT_NAME = 'mainScan'
 	static final NO_PROCESS_CHANGE_EVENT_NAME = 'noProcessChange'
-//	final static END_OF_SCANCYCLE_VARIABLE_NAME = 'endOfScanCycle'
-	final static START_OF_SCANCYCLE_STATE_NAME = 'startOfScanCycle'
-	final static END_OF_SCANCYCLE_STATE_NAME = 'endOfScanCycle'
+	static final BEFORE_SLOWER_PROCESS_STATE_NAME = 'beforeSlowProcess'
+	static final AFTER_SLOWER_PROCESS_STATE_NAME = 'afterSlowProcess'
 	final static SCAN_CYCLE_MAIN_STATE_NAME = 'main'
-	//final static DO_CONTROL_SIGNAL_CHANGE_EVENT_NAME = 'doSignalChange'
-	//final static SKIP_CONTROL_SIGNAL_CHANGE_EVENT_NAME = 'skipSignalChange'
-	//final static TIMEOUT_EVENTS_ALIAS_NAME = 'timeoutEvent'
 	final static PROCESS_EVENTS_ALIAS_NAME = 'processEvent'
 	final static CONTROL_UNIT_PLANT_NAME = 'ControlUnit'
-	//static final DEFAULT_PROCESS_PLANT_NAME = 'Process'
 	static final SEPARATOR_PATTERN = /\./
 	static final SEPARATOR = '.'
 	static final NOT_INIT_VARIABLE_NAME = 'NOT_INIT'
@@ -160,7 +155,7 @@ class ControlCodeBuilder extends BuilderSupport {
 			if (attributes.name =~ /\:=/) {
 				def parts = attributes.name.split(/\:=/)
 				attributes.name = parts[0]
-				attributes.value = parts[1]
+				attributes.value = parts[1].toBoolean()
 			}
 			if (type == Transition && !attributes.name) {
 				int i = 1

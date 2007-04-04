@@ -2,6 +2,7 @@ package org.supremica.external.iec61131.builder
 
 import net.sourceforge.waters.subject.module.ModuleSubject
 import net.sourceforge.waters.subject.module.builder.ModuleBuilder
+import net.sourceforge.waters.subject.module.builder.Util
 
 class FunctionBlock {
 	static final pattern = /(?i)application|functionblock/
@@ -21,6 +22,10 @@ class FunctionBlock {
 	List specifications = []
 	final Speed speed = Speed.FAST
 	final String eventName = Converter.SCAN_CYCLE_EVENT_NAME
+	
+	boolean verify() {
+		Util.verifyNonblocking(toAutomata(false))	
+	}
 	
 	def toAutomata(boolean forSynthesis = false) {
 		addToModule(new ModuleBuilder().module(name.toSupremicaSyntax()), forSynthesis)
@@ -52,17 +57,22 @@ class FunctionBlock {
 					state('start', marked:true) {
 						outgoing(to:'main', event:Converter.START_SCAN_EVENT_NAME)
 					}
-					state('main', marked:true) {
+					state('main', marked:false) {
 						outgoing(to:'start', event:Converter.SCAN_CYCLE_EVENT_NAME)
 					}
 				}
-				freeVariables.each{ variable ->
-					def variableName = variable.toSupremicaSyntax()
-					mb.booleanVariable(variableName, markedValue:true)
-					mb.plant("ASSIGN_${variable.toSupremicaSyntax()}", defaultEvent:Converter.START_SCAN_EVENT_NAME, deterministic:false) {
+				freeVariables.each{ variableName ->
+					def suprVariableName = variableName.toSupremicaSyntax()
+					Variable variable = scope.namedElement(variableName)
+					boolean markedValue
+					if (variable.markedValue != null) markedValue = variable.markedValue
+					else if (variable.value != null)  markedValue = variable.value
+					else markedValue = false
+					mb.booleanVariable(suprVariableName, markedValue:markedValue)
+					mb.plant("ASSIGN_${suprVariableName}", defaultEvent:Converter.START_SCAN_EVENT_NAME, deterministic:false) {
 						state('q0', marked:true) {
-							selfLoop() { set(variable.toSupremicaSyntax()) }
-							selfLoop() { reset(variable.toSupremicaSyntax()) }
+							selfLoop() { set(suprVariableName) }
+							selfLoop() { reset(suprVariableName) }
 						}
 					}
 				}
@@ -79,43 +89,38 @@ class FunctionBlock {
 				}
 				assignmentsForEachProcess.keySet().any{processScope.self.speed.value == it.self.speed.value + 2}
 				List muchSlowerProcesses = assignmentsForEachProcess.keySet().findAll{processScope.self.speed.value == it.self.speed.value + 2}
-				processScope.self.addPriorityAutomaton(mb, processScope, muchSlowerProcesses)
+				processScope.self.addPriorityAutomaton(mb, processScope, muchSlowerProcesses, forSynthesis)
 			}
 		}
 	}
 
 	def addPriorityAutomaton(ModuleBuilder mb, Scope scope, Scope scopeOfSlowerProcess, forSynthesis) {
-		String start = Converter.START_OF_SCANCYCLE_STATE_NAME
-		String main = forSynthesis ? Converter.SCAN_CYCLE_MAIN_STATE_NAME : Converter.END_OF_SCANCYCLE_STATE_NAME
-		String end = Converter.END_OF_SCANCYCLE_STATE_NAME
+		addPriorityAutomaton(mb, scope, [scopeOfSlowerProcess.eventName], scopeOfSlowerProcess.fullName.toSupremicaSyntax(), forSynthesis)
+	}
+	def addPriorityAutomaton(ModuleBuilder mb, Scope scope, List events, nameOfSlow, forSynthesis) {
+		String start = Converter.AFTER_SLOWER_PROCESS_STATE_NAME
+		String main = forSynthesis ? Converter.SCAN_CYCLE_MAIN_STATE_NAME : Converter.BEFORE_SLOWER_PROCESS_STATE_NAME
+		String end = Converter.BEFORE_SLOWER_PROCESS_STATE_NAME
 		String startEvent = forSynthesis ? Converter.START_SCAN_EVENT_NAME : Converter.SCAN_CYCLE_EVENT_NAME 
 		String mainEvent = Converter.SCAN_CYCLE_EVENT_NAME
-		mb.plant("${scope.fullName.toSupremicaSyntax()}_vs_${scopeOfSlowerProcess.fullName.toSupremicaSyntax()}", defaultEvent:startEvent) {
-			state(start, marked:true) {
+		mb.plant("${scope.fullName.toSupremicaSyntax()}_vs_${nameOfSlow}", defaultEvent:startEvent) {
+			state(start, marked:false) {
 				outgoing(to:main)
 			}
 			if (forSynthesis) {
-				state(main, marked:true) {
+				state(main, marked:false) {
 					outgoing(to:end, event:mainEvent)
 				}
 			}
 			state(end, marked:true) {
-				outgoing(to:start, event:scopeOfSlowerProcess.eventName)
+				outgoing(to:start, events:events)
 				outgoing(to:main)
 			}
 		}
 	}
-	def addPriorityAutomaton(ModuleBuilder mb, Scope scope, List scopesOfMuchSlowerProcesses) {
+	def addPriorityAutomaton(ModuleBuilder mb, Scope scope, List scopesOfMuchSlowerProcesses, forSynthesis) {
 		if(scopesOfMuchSlowerProcesses) {
-			mb.plant("${scope.fullName.toSupremicaSyntax()}_vs_SlowProcesses", defaultEvent:scope.eventName) {
-				state(Converter.START_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.END_OF_SCANCYCLE_STATE_NAME)
-				}
-				state(Converter.END_OF_SCANCYCLE_STATE_NAME, marked:true) {
-					outgoing(to:Converter.START_OF_SCANCYCLE_STATE_NAME, events:scopesOfMuchSlowerProcesses.eventName)
-					selfLoop()
-				}
-			}
+			addPriorityAutomaton(mb, scope, scopesOfMuchSlowerProcesses.eventName, 'SlowProcesses', forSynthesis)
 		}
 	}
 	def addProcessEvents(ModuleBuilder mb, Scope parent) {
