@@ -33,8 +33,8 @@ app = ccb.application('CorrectLift') {
 	}
 }
 
-verify(app)
-//Util.openInSupremica(app.toAutomata())
+//verify(app)
+Util.openInSupremica(app.toAutomata())
 
 app = ccb.application('LiftWhereUpAndOutCylindersCrash') {
 	input 'iLiftDown := true'
@@ -58,7 +58,7 @@ app = ccb.application('LiftWhereUpAndOutCylindersCrash') {
 	}
 }
 
-verify(app)
+//verify(app)
 //Util.openInSupremica(app.toAutomata())
 
 app = ccb.application('LiftForSynthesis') {
@@ -93,4 +93,4 @@ app = ccb.application('LiftForSynthesis') {
 	}
 }
 
-Util.openInSupremica(app.toAutomata(true))
+//Util.openInSupremica(app.toAutomata(true))

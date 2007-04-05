@@ -125,6 +125,7 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 		output 'u3'
 		output 'u4'
 		output 'u5'
+		output 'u6'
 		sequentialProgram('program') {
 			sequence('mySequence') {
 				Step ('S1'){
@@ -160,6 +161,7 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 			output 'u3'
 			output 'u4'
 			output 'u5'
+			output 'u6'
 			logicProgram('program') {
 				variable 'S1_X'
 				variable('S2_X', markedValue:true)
@@ -195,6 +197,7 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 				'u3 := y2'('S3_activation')
 				'u4 := not S3_activation and u4'()
 				"${Converter.NOT_INIT_VARIABLE_NAME} := true"()
+				'u6 := u6'()
 			}
 		}
 		//ModuleSubject sfcModule = sfcApp.toAutomata()

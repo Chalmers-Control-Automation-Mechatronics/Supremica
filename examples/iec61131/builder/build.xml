@@ -27,7 +27,7 @@
 
 	<target name="Lift" depends="compile">
 		<java fork="yes" classname="Lift" failonerror="true" classpathref="supremica.classpath">
-			<jvmarg value="-Xmx64m"/>
+			<jvmarg value="-Xmx512m"/>
 			<jvmarg value="-Xms64m"/>
 			<classpath>
 				<pathelement location="${bin}" />
@@ -35,6 +35,33 @@
 		</java>
 	</target>
 
+	<target name="MachineCalibration" depends="compile">
+		<java fork="yes" classname="MachineCalibration" failonerror="true" classpathref="supremica.classpath">
+			<jvmarg value="-Xmx512m"/>
+			<jvmarg value="-Xms64m"/>
+			<classpath>
+				<pathelement location="${bin}" />
+			</classpath>
+		</java>
+	</target>
+	<target name="LongLift" depends="compile">
+		<java fork="yes" classname="LongLift" failonerror="true" classpathref="supremica.classpath">
+			<jvmarg value="-Xmx512m"/>
+			<jvmarg value="-Xms64m"/>
+			<classpath>
+				<pathelement location="${bin}" />
+			</classpath>
+		</java>
+	</target>
+	<target name="TwoMachineCell" depends="compile">
+		<java fork="yes" classname="TwoMachineCell" failonerror="true" classpathref="supremica.classpath">
+			<jvmarg value="-Xmx512m"/>
+			<jvmarg value="-Xms64m"/>
+			<classpath>
+				<pathelement location="${bin}" />
+			</classpath>
+		</java>
+	</target>
 	<!-- ================================= 
           target: clean              
          ================================= -->

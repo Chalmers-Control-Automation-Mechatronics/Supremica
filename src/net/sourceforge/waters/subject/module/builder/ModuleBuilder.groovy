@@ -97,10 +97,13 @@ class ModuleBuilder extends BuilderSupport {
 			attributes.isSpecification = true
 		case 'plant':
 		case 'automaton' :
-			node = factory.createSimpleComponentProxy(parser.parseIdentifier(attributes.name),
+			def identifier = parser.parseIdentifier(attributes.name)
+			node = current instanceof ModuleProxy ? current.componentList.find{it.identifier == identifier} : current.body.find{it.identifier == identifier} 
+			if (!node) {
+				node = factory.createSimpleComponentProxy(identifier,
 	                                                  attributes.isSpecification ? ComponentKind.SPEC : ComponentKind.PLANT,
 	                                                  factory.createGraphProxy())
-			
+			}
 	        if (attributes.deterministic != null) node.graph.deterministic = attributes.deterministic 
 	        initialState = attributes.initialState
 			defaultEvent = attributes.defaultEvent
@@ -108,7 +111,8 @@ class ModuleBuilder extends BuilderSupport {
 			['deterministic', 'initialState', 'defaultEvent', 'isSpecification'].each{attributes.remove(it)}
 			break
 		case 'state' :
-			node = factory.createSimpleNodeProxy(attributes.name)
+			node = current.graph.nodes.find{it.name == attributes.name}
+			if (!node) node = factory.createSimpleNodeProxy(attributes.name)
 			node.initial = (attributes.name == initialState)
 			if (attributes.marked) node.propositions.eventListModifiable << parser.parse(EventDeclProxy.DEFAULT_MARKING_NAME)
 			if (attributes.forbidden) node.propositions.eventListModifiable << parser.parse(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)
@@ -168,7 +172,7 @@ class ModuleBuilder extends BuilderSupport {
 		case ModuleSubject:
 			switch (child) {
 			case ComponentSubject:
-				parent.componentListModifiable << child
+				if (!parent.componentList.contains(child)) parent.componentListModifiable << child
 				break
 			case ForeachComponentSubject:
 				parent.componentListModifiable << child
@@ -210,7 +214,7 @@ class ModuleBuilder extends BuilderSupport {
 		case ComponentSubject:
 			switch (child) {
 			case NodeSubject:
-				parent.graph.nodesModifiable << child
+				if (!parent.graph.nodes.contains(child)) parent.graph.nodesModifiable << child
 				if (!initialState && parent.graph.nodes.size() == 1) child.initial = true //The first state becomes initial by default
 				break
 			case EdgeSubject:

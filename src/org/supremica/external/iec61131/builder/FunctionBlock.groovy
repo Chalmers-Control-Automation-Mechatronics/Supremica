@@ -38,7 +38,7 @@ class FunctionBlock {
 			List assignments = getRuntimeAssignments(scope)
 			List freeVariables = allControllableVariables.findAll{var -> assignments.every{it.Q.fullyQualified(it.scope) != var}}
 			if (forSynthesis) assert freeVariables //Must exist free variables for synthesis
-			else assert !freeVariables //Must not exist any free variables if not synthesis
+			//else assert !freeVariables //Must not exist any free variables if not synthesis
 			//Add default process models for those inputs that never are assigned values
 			inputs.findAll{input -> assignments.every{it.Q != input.name}}.each { input ->
 				ControlCodeBuilder ccb = new ControlCodeBuilder()
@@ -50,7 +50,6 @@ class FunctionBlock {
 				processes << inputDefaultProcess
 				assignments += inputDefaultProcess.getRuntimeAssignments(scope)
 			}
-			Map assignmentsForEachProcess = RuntimeAssignment.separateBasedOnProcess(assignments)
 			if (forSynthesis) {
 				event(Converter.START_SCAN_EVENT_NAME, controllable:true)
 				mb.plant("ScanCycle", defaultEvent:Converter.START_SCAN_EVENT_NAME) {
@@ -76,7 +75,14 @@ class FunctionBlock {
 						}
 					}
 				}
+			} else {
+				def ccb = new ControlCodeBuilder()
+				freeVariables.each { variableName -> 
+					assignments += ccb."$variableName := $variableName"().getRuntimeAssignments(scope)	
+				}
 			}
+			Map assignmentsForEachProcess = RuntimeAssignment.separateBasedOnProcess(assignments)
+				
 			assignmentsForEachProcess.each { processScope, assForProc ->
 				Map stateless = RuntimeAssignment.substituteIntoStateless(assForProc)
 				Map withoutUnnecessary = RuntimeAssignment.removeUnnecessary(this, stateless)
