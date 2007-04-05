@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="br_expose_sight_3" version="1.0" valid="1"
+	hasGeometry="1" width="335" height="367"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-07-22 00:52:22 GMT" modificationDate="2005-08-18 04:31:05 GMT">
+	<events>
+		<event controllable="1" name="br_expose_detail.ALT1"/>
+		<event controllable="1" name="br_expose_detail.ALT2"/>
+		<event controllable="1" name="br_expose_detail.SID"/>
+		<event controllable="1" name="br_expose_rec_list"/>
+		<event controllable="1" name="br_expose_sight_list"/>
+		<event controllable="0" name="br_select.ALT1"/>
+		<event controllable="0" name="br_select.ALT2"/>
+		<event controllable="0" name="br_select_rec_list"/>
+		<event controllable="0" name="br_select_sight_list"/>
+		<event controllable="1" name="cb_new_detail.ALT1"/>
+		<event controllable="1" name="cb_new_detail.ALT2"/>
+		<event controllable="1" name="cb_new_detail.SID"/>
+	</events>
+	<nodes>
+		<node marked="1">
+			<rendering><point x="224" y="384"/></rendering>
+			<label name="exposed">
+				<rendering><point x="11" y="13"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="224" y="160"/></rendering>
+			<label name="hidden">
+				<rendering><point x="6" y="-11"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="224" y="272"/></rendering>
+			<label name="requested">
+				<rendering><point x="9" y="13"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="187" y="384"/></rendering>
+			<source name="exposed"/>
+			<labelGroup>
+				<rendering><point x="-100" y="-44"/></rendering>
+				<label name="br_select.ALT1"/>
+				<label name="br_select.ALT2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="br_select_rec_list">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+				<label name="br_select_sight_list">
+					<rendering><point x="0" y="45"/></rendering>
+				</label>
+				<label name="cb_new_detail.SID">
+					<rendering><point x="0" y="60"/></rendering>
+				</label>
+				<label name="cb_new_detail.ALT1">
+					<rendering><point x="0" y="75"/></rendering>
+				</label>
+				<label name="cb_new_detail.ALT2">
+					<rendering><point x="0" y="90"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="370" y="274"/></rendering>
+			<source name="exposed"/>
+			<target name="hidden"/>
+			<labelGroup>
+				<rendering><point x="-91" y="34"/></rendering>
+				<label name="br_expose_sight_list"/>
+				<label name="br_expose_detail.ALT1">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="br_expose_detail.ALT2">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+				<label name="br_expose_rec_list">
+					<rendering><point x="0" y="45"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="requested"/>
+			<target name="exposed"/>
+			<labelGroup>
+				<rendering><point x="-122" y="-15"/></rendering>
+				<label name="br_expose_detail.SID"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="184" y="272"/></rendering>
+			<source name="requested"/>
+			<labelGroup>
+				<rendering><point x="-82" y="7"/></rendering>
+				<label name="cb_new_detail.SID"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="261" y="217"/></rendering>
+			<source name="requested"/>
+			<target name="hidden"/>
+			<labelGroup>
+				<rendering><point x="-18" y="-36"/></rendering>
+				<label name="br_select.ALT1"/>
+				<label name="br_select.ALT2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="br_select_rec_list">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+				<label name="br_select_sight_list">
+					<rendering><point x="0" y="45"/></rendering>
+				</label>
+				<label name="cb_new_detail.ALT1">
+					<rendering><point x="0" y="60"/></rendering>
+				</label>
+				<label name="cb_new_detail.ALT2">
+					<rendering><point x="0" y="75"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="224" y="215"/></rendering>
+			<source name="hidden"/>
+			<target name="requested"/>
+			<labelGroup>
+				<rendering><point x="-112" y="31"/></rendering>
+				<label name="cb_new_detail.SID"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="184" y="160"/></rendering>
+			<source name="hidden"/>
+			<labelGroup>
+				<rendering><point x="-98" y="-73"/></rendering>
+				<label name="br_select.ALT1"/>
+				<label name="br_select.ALT2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="br_select_rec_list">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+				<label name="br_select_sight_list">
+					<rendering><point x="0" y="45"/></rendering>
+				</label>
+				<label name="br_expose_detail.ALT1">
+					<rendering><point x="0" y="60"/></rendering>
+				</label>
+				<label name="br_expose_detail.ALT2">
+					<rendering><point x="0" y="75"/></rendering>
+				</label>
+				<label name="br_expose_rec_list">
+					<rendering><point x="0" y="90"/></rendering>
+				</label>
+				<label name="br_expose_sight_list">
+					<rendering><point x="0" y="105"/></rendering>
+				</label>
+				<label name="cb_new_detail.ALT1">
+					<rendering><point x="0" y="120"/></rendering>
+				</label>
+				<label name="cb_new_detail.ALT2">
+					<rendering><point x="0" y="135"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

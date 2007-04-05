@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="br_tofront_3" version="1.0" valid="1"
+	hasGeometry="1" width="302" height="238"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-07-18 23:28:49 GMT" modificationDate="2005-08-18 02:41:44 GMT">
+	<events>
+		<event controllable="1" name="br_expose"/>
+		<event controllable="1" name="br_hide"/>
+		<event controllable="1" name="cb_new_detail.1"/>
+		<event controllable="1" name="cb_new_detail.2"/>
+		<event controllable="1" name="cb_new_detail.3"/>
+		<event controllable="1" name="map_expose"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="240" y="144"/></rendering>
+			<label name="requested">
+				<rendering><point x="-69" y="6"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="144" y="80"/></rendering>
+			<label name="hidden">
+				<rendering><point x="-59" y="5"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="144" y="208"/></rendering>
+			<label name="exposed">
+				<rendering><point x="-68" y="6"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="145" y="245"/></rendering>
+			<source name="exposed"/>
+			<labelGroup>
+				<rendering><point x="-41" y="-5"/></rendering>
+				<label name="cb_new_detail.1"/>
+				<label name="cb_new_detail.2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="cb_new_detail.3">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="129" y="143"/></rendering>
+			<source name="exposed"/>
+			<target name="hidden"/>
+			<labelGroup>
+				<rendering><point x="-66" y="10"/></rendering>
+				<label name="map_expose"/>
+				<label name="br_hide">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="requested"/>
+			<target name="exposed"/>
+			<labelGroup>
+				<rendering><point x="-2" y="11"/></rendering>
+				<label name="br_expose"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="279" y="144"/></rendering>
+			<source name="requested"/>
+			<labelGroup>
+				<rendering><point x="-16" y="-10"/></rendering>
+				<label name="cb_new_detail.1"/>
+				<label name="cb_new_detail.2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="cb_new_detail.3">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="160" y="146"/></rendering>
+			<source name="hidden"/>
+			<target name="exposed"/>
+			<labelGroup>
+				<rendering><point x="-24" y="-14"/></rendering>
+				<label name="br_expose"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="hidden"/>
+			<target name="requested"/>
+			<labelGroup>
+				<rendering><point x="-6" y="-37"/></rendering>
+				<label name="cb_new_detail.1"/>
+				<label name="cb_new_detail.2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="cb_new_detail.3">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="144" y="42"/></rendering>
+			<source name="hidden"/>
+			<labelGroup>
+				<rendering><point x="-36" y="14"/></rendering>
+				<label name="map_expose"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

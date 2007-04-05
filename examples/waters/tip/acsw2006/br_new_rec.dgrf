@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="br_new_rec" version="1.0" valid="1"
+	hasGeometry="1" width="146" height="178"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-07-18 04:01:41 GMT" modificationDate="2005-07-18 04:02:07 GMT">
+	<events>
+		<event controllable="1" name="br_remove_rec.SID"/>
+		<event controllable="1" name="br_show_rec.SID"/>
+		<event controllable="1" name="cb_new_rec.SID"/>
+	</events>
+	<nodes>
+		<node marked="1">
+			<rendering><point x="80" y="160"/></rendering>
+			<label name="near">
+				<rendering><point x="14" y="7"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="80" y="64"/></rendering>
+			<label name="far">
+				<rendering><point x="13" y="6"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<source name="far"/>
+			<target name="near"/>
+			<labelGroup>
+				<rendering><point x="4" y="-7"/></rendering>
+				<label name="cb_new_rec.SID"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="80" y="199"/></rendering>
+			<source name="near"/>
+			<labelGroup>
+				<rendering><point x="-44" y="10"/></rendering>
+				<label name="br_show_rec.SID"/>
+				<label name="cb_new_rec.SID">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

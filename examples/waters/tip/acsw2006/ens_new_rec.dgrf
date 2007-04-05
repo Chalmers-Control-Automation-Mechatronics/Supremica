@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="ens_new_rec" version="1.0" valid="1"
+	hasGeometry="1" width="278" height="292"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-07-18 04:26:01 GMT" modificationDate="2005-08-10 23:35:14 GMT">
+	<events>
+		<event controllable="1" name="cb_new_location.UID"/>
+		<event controllable="0" name="ens_new_rec.UID.SID"/>
+		<event controllable="0" name="ens_norec.UID.SID"/>
+		<event controllable="0" name="ens_rec.UID.SID"/>
+	</events>
+	<nodes>
+		<node marked="1">
+			<rendering><point x="240" y="256"/></rendering>
+			<label name="sent">
+				<rendering><point x="13" y="4"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="240" y="16"/></rendering>
+			<label name="idle">
+				<rendering><point x="-31" y="4"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="240" y="176"/></rendering>
+			<label name="arrived">
+				<rendering><point x="14" y="4"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="240" y="96"/></rendering>
+			<label name="moved">
+				<rendering><point x="13" y="4"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<source name="arrived"/>
+			<target name="sent"/>
+			<labelGroup>
+				<rendering><point x="5" y="2"/></rendering>
+				<label name="ens_new_rec.UID.SID"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="225" y="56"/></rendering>
+			<source name="idle"/>
+			<target name="moved"/>
+			<labelGroup>
+				<rendering><point x="-123" y="4"/></rendering>
+				<label name="cb_new_location.UID"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="240" y="296"/></rendering>
+			<source name="sent"/>
+			<labelGroup>
+				<rendering><point x="-118" y="-13"/></rendering>
+				<label name="cb_new_location.UID"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="moved"/>
+			<target name="arrived"/>
+			<labelGroup>
+				<rendering><point x="5" y="6"/></rendering>
+				<label name="ens_rec.UID.SID"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="256" y="55"/></rendering>
+			<source name="moved"/>
+			<target name="idle"/>
+			<labelGroup>
+				<rendering><point x="7" y="3"/></rendering>
+				<label name="ens_norec.UID.SID"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

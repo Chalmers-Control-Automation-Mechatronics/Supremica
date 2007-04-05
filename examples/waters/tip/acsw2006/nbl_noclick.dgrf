@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="nbl_noclick" version="1.0" valid="1"
+	hasGeometry="1" width="195" height="202"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-07-28 23:53:55 GMT" modificationDate="2005-08-18 04:27:59 GMT">
+	<events>
+		<event controllable="0" name="br_select.1"/>
+		<event controllable="0" name="br_select.2"/>
+		<event controllable="0" name="br_select.3"/>
+		<event controllable="0" name="br_select_rec_list"/>
+		<event controllable="0" name="br_select_sight_list"/>
+		<event controllable="0" name="loc_new_location"/>
+		<event controllable="0" name="map_select.1"/>
+		<event controllable="0" name="map_select.2"/>
+		<event controllable="0" name="map_select.3"/>
+		<event controllable="0" name="tau_noclick"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="272" y="192"/></rendering>
+			<label name="ok">
+				<rendering><point x="15" y="5"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="272" y="288"/></rendering>
+			<label name="suspend">
+				<rendering><point x="14" y="5"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="235" y="192"/></rendering>
+			<source name="ok"/>
+			<labelGroup>
+				<rendering><point x="-76" y="-79"/></rendering>
+				<label name="br_select.1"/>
+				<label name="br_select.2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="br_select.3">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+				<label name="br_select_rec_list">
+					<rendering><point x="0" y="45"/></rendering>
+				</label>
+				<label name="br_select_sight_list">
+					<rendering><point x="0" y="60"/></rendering>
+				</label>
+				<label name="map_select.1">
+					<rendering><point x="0" y="75"/></rendering>
+				</label>
+				<label name="map_select.2">
+					<rendering><point x="0" y="90"/></rendering>
+				</label>
+				<label name="map_select.3">
+					<rendering><point x="0" y="105"/></rendering>
+				</label>
+				<label name="loc_new_location">
+					<rendering><point x="0" y="120"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<source name="ok"/>
+			<target name="suspend"/>
+			<labelGroup>
+				<rendering><point x="6" y="2"/></rendering>
+				<label name="tau_noclick"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

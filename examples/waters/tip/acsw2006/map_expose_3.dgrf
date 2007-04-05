@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="map_expose_3" version="1.0" valid="1"
+	hasGeometry="1" width="183" height="222"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-07-18 23:28:58 GMT" modificationDate="2005-08-18 04:25:56 GMT">
+	<events>
+		<event controllable="1" name="br_expose"/>
+		<event controllable="1" name="map_expose"/>
+		<event controllable="1" name="map_hide"/>
+		<event controllable="0" name="map_select.1"/>
+		<event controllable="0" name="map_select.2"/>
+		<event controllable="0" name="map_select.3"/>
+		<event controllable="0" name="map_select_location"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="128" y="112"/></rendering>
+			<label name="hidden">
+				<rendering><point x="14" y="5"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="128" y="208"/></rendering>
+			<label name="exposed">
+				<rendering><point x="13" y="6"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="127" y="74"/></rendering>
+			<source name="hidden"/>
+			<labelGroup>
+				<rendering><point x="-29" y="12"/></rendering>
+				<label name="br_expose"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="143" y="161"/></rendering>
+			<source name="hidden"/>
+			<target name="exposed"/>
+			<labelGroup>
+				<rendering><point x="5" y="2"/></rendering>
+				<label name="map_expose"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="112" y="159"/></rendering>
+			<source name="exposed"/>
+			<target name="hidden"/>
+			<labelGroup>
+				<rendering><point x="-64" y="-3"/></rendering>
+				<label name="br_expose"/>
+				<label name="map_hide">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="129" y="246"/></rendering>
+			<source name="exposed"/>
+			<labelGroup>
+				<rendering><point x="-53" y="-7"/></rendering>
+				<label name="map_select.1"/>
+				<label name="map_select.2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="map_select.3">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+				<label name="map_select_location">
+					<rendering><point x="0" y="45"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="map_click" version="1.0" valid="1"
+	hasGeometry="1" width="198" height="166"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-07-18 02:38:33 GMT" modificationDate="2005-08-18 04:26:01 GMT">
+	<events>
+		<event controllable="1" name="map_remove.SID"/>
+		<event controllable="0" name="map_select.SID"/>
+		<event controllable="1" name="map_show.SID"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="112" y="64"/></rendering>
+			<label name="hidden">
+				<rendering><point x="12" y="6"/></rendering>
+			</label>
+		</node>
+		<node marked="1">
+			<rendering><point x="112" y="160"/></rendering>
+			<label name="visible">
+				<rendering><point x="14" y="6"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="111" y="198"/></rendering>
+			<source name="visible"/>
+			<labelGroup>
+				<rendering><point x="-35" y="14"/></rendering>
+				<label name="map_select.SID"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="96" y="113"/></rendering>
+			<source name="visible"/>
+			<target name="hidden"/>
+			<labelGroup>
+				<rendering><point x="-69" y="9"/></rendering>
+				<label name="map_remove.SID"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="128" y="113"/></rendering>
+			<source name="hidden"/>
+			<target name="visible"/>
+			<labelGroup>
+				<rendering><point x="5" y="-1"/></rendering>
+				<label name="map_show.SID"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

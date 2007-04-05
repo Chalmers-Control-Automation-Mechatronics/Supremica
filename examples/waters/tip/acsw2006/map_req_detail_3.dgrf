@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="map_req_detail_3" version="1.0" valid="1"
+	hasGeometry="1" width="189" height="190"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-07-18 02:32:29 GMT" modificationDate="2005-08-18 04:26:45 GMT">
+	<events>
+		<event controllable="1" name="map_req_detail.SID"/>
+		<event controllable="0" name="map_select.ALT1"/>
+		<event controllable="0" name="map_select.ALT2"/>
+		<event controllable="0" name="map_select.SID"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="96" y="224"/></rendering>
+			<label name="click">
+				<rendering><point x="14" y="6"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="96" y="128"/></rendering>
+			<label name="idle">
+				<rendering><point x="16" y="5"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="94" y="262"/></rendering>
+			<source name="click"/>
+			<labelGroup>
+				<rendering><point x="-40" y="-8"/></rendering>
+				<label name="map_select.SID"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="113" y="176"/></rendering>
+			<source name="click"/>
+			<target name="idle"/>
+			<labelGroup>
+				<rendering><point x="-21" y="-3"/></rendering>
+				<label name="map_req_detail.SID"/>
+				<label name="map_select.ALT1">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="map_select.ALT2">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="80" y="175"/></rendering>
+			<source name="idle"/>
+			<target name="click"/>
+			<labelGroup>
+				<rendering><point x="-56" y="-16"/></rendering>
+				<label name="map_select.SID"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="94" y="90"/></rendering>
+			<source name="idle"/>
+			<labelGroup>
+				<rendering><point x="-45" y="0"/></rendering>
+				<label name="map_select.ALT1"/>
+				<label name="map_select.ALT2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

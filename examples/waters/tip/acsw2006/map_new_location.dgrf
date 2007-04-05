@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="map_new_location" version="1.0" valid="1"
+	hasGeometry="1" width="184" height="149"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-08-16 00:15:59 GMT" modificationDate="2005-08-18 04:26:19 GMT">
+	<events>
+		<event controllable="1" name="map_new_location"/>
+		<event controllable="0" name="map_select_location"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="96" y="128"/></rendering>
+			<label name="idle">
+				<rendering><point x="12" y="3"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="96" y="224"/></rendering>
+			<label name="click">
+				<rendering><point x="13" y="3"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="94" y="262"/></rendering>
+			<source name="click"/>
+			<labelGroup>
+				<rendering><point x="-45" y="-4"/></rendering>
+				<label name="map_select_location"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="112" y="176"/></rendering>
+			<source name="click"/>
+			<target name="idle"/>
+			<labelGroup>
+				<rendering><point x="-23" y="14"/></rendering>
+				<label name="map_new_location"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="81" y="176"/></rendering>
+			<source name="idle"/>
+			<target name="click"/>
+			<labelGroup>
+				<rendering><point x="-62" y="-7"/></rendering>
+				<label name="map_select_location"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

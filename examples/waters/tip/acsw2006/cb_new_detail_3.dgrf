@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="cb_new_detail_3" version="1.0" valid="1"
+	hasGeometry="1" width="437" height="152"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-07-18 04:30:13 GMT" modificationDate="2005-08-10 23:36:49 GMT">
+	<events>
+		<event controllable="1" name="br_req_detail.ALT1"/>
+		<event controllable="1" name="br_req_detail.ALT2"/>
+		<event controllable="1" name="br_req_detail.SID"/>
+		<event controllable="1" name="cb_new_detail.SID"/>
+		<event controllable="1" name="cb_req_detail.UID.SID"/>
+		<event controllable="1" name="cb_uncache.SID"/>
+		<event controllable="1" name="map_req_detail.ALT1"/>
+		<event controllable="1" name="map_req_detail.ALT2"/>
+		<event controllable="1" name="map_req_detail.SID"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="192" y="192"/></rendering>
+			<label name="noreq">
+				<rendering><point x="16" y="4"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="320" y="192"/></rendering>
+			<label name="req">
+				<rendering><point x="-34" y="6"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="359" y="192"/></rendering>
+			<source name="req"/>
+			<labelGroup>
+				<rendering><point x="-10" y="-15"/></rendering>
+				<label name="br_req_detail.SID"/>
+				<label name="map_req_detail.SID">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="cb_req_detail.UID.SID">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="256" y="210"/></rendering>
+			<source name="req"/>
+			<target name="noreq"/>
+			<labelGroup>
+				<rendering><point x="-58" y="10"/></rendering>
+				<label name="br_req_detail.ALT1"/>
+				<label name="br_req_detail.ALT2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="map_req_detail.ALT1">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+				<label name="map_req_detail.ALT2">
+					<rendering><point x="0" y="45"/></rendering>
+				</label>
+				<label name="cb_new_detail.SID">
+					<rendering><point x="0" y="60"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="257" y="173"/></rendering>
+			<source name="noreq"/>
+			<target name="req"/>
+			<labelGroup>
+				<rendering><point x="-52" y="-21"/></rendering>
+				<label name="br_req_detail.SID"/>
+				<label name="map_req_detail.SID">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="151" y="192"/></rendering>
+			<source name="noreq"/>
+			<labelGroup>
+				<rendering><point x="-106" y="-23"/></rendering>
+				<label name="br_req_detail.ALT1"/>
+				<label name="br_req_detail.ALT2">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+				<label name="map_req_detail.ALT1">
+					<rendering><point x="0" y="30"/></rendering>
+				</label>
+				<label name="map_req_detail.ALT2">
+					<rendering><point x="0" y="45"/></rendering>
+				</label>
+				<label name="cb_uncache.SID">
+					<rendering><point x="0" y="60"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

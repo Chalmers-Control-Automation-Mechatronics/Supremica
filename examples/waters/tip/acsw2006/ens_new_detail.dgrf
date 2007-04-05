@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="ens_new_detail" version="1.0" valid="1"
+	hasGeometry="1" width="269" height="117"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-07-18 04:29:17 GMT" modificationDate="2005-08-18 02:52:07 GMT">
+	<events>
+		<event controllable="1" name="cb_req_detail.UID.SID"/>
+		<event controllable="0" name="ens_new_detail.UID.SID"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="160" y="160"/></rendering>
+			<label name="req">
+				<rendering><point x="13" y="5"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="160" y="64"/></rendering>
+			<label name="idle">
+				<rendering><point x="13" y="5"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="176" y="113"/></rendering>
+			<source name="req"/>
+			<target name="idle"/>
+			<labelGroup>
+				<rendering><point x="-22" y="12"/></rendering>
+				<label name="ens_new_detail.UID.SID"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="143" y="114"/></rendering>
+			<source name="idle"/>
+			<target name="req"/>
+			<labelGroup>
+				<rendering><point x="-112" y="-4"/></rendering>
+				<label name="cb_req_detail.UID.SID"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

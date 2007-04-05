@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="cb_new_location" version="1.0" valid="1"
+	hasGeometry="1" width="238" height="155"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-07-18 04:17:47 GMT" modificationDate="2005-08-16 06:47:03 GMT">
+	<events>
+		<event controllable="1" name="cb_new_location.UID"/>
+		<event controllable="0" name="loc_new_location"/>
+		<event controllable="1" name="map_new_location"/>
+	</events>
+	<nodes>
+		<node initial="1" marked="1">
+			<rendering><point x="224" y="144"/></rendering>
+			<label name="idle">
+				<rendering><point x="11" y="5"/></rendering>
+			</label>
+		</node>
+		<node>
+			<rendering><point x="224" y="240"/></rendering>
+			<label name="req">
+				<rendering><point x="12" y="3"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge>
+			<rendering><point x="207" y="194"/></rendering>
+			<source name="idle"/>
+			<target name="req"/>
+			<labelGroup>
+				<rendering><point x="-97" y="-18"/></rendering>
+				<label name="loc_new_location"/>
+				<label name="map_new_location">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="240" y="193"/></rendering>
+			<source name="req"/>
+			<target name="idle"/>
+			<labelGroup>
+				<rendering><point x="-18" y="16"/></rendering>
+				<label name="cb_new_location.UID"/>
+			</labelGroup>
+		</edge>
+		<edge isLoop="1">
+			<rendering><point x="225" y="277"/></rendering>
+			<source name="req"/>
+			<labelGroup>
+				<rendering><point x="-61" y="-11"/></rendering>
+				<label name="loc_new_location"/>
+				<label name="map_new_location">
+					<rendering><point x="0" y="15"/></rendering>
+				</label>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

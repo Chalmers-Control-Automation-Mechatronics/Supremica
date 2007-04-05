@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graph PUBLIC "vgraph" "vgraph.dtd">
+<graph name="cb_new_sight" version="1.0" valid="1"
+	hasGeometry="1" width="258" height="147"
+	generatorName="DGE" generatorVersion="2.9b2"
+	creationDate="2005-07-18 04:19:56 GMT" modificationDate="2005-08-18 02:50:07 GMT">
+	<events>
+		<event controllable="1" name="cb_new_sight.SID"/>
+		<event controllable="0" name="ens_new_sight.UID.SID"/>
+	</events>
+	<nodes>
+		<node>
+			<rendering><point x="240" y="240"/></rendering>
+			<label name="event">
+				<rendering><point x="13" y="6"/></rendering>
+			</label>
+		</node>
+		<node initial="1" marked="1">
+			<rendering><point x="240" y="144"/></rendering>
+			<label name="idle">
+				<rendering><point x="12" y="3"/></rendering>
+			</label>
+		</node>
+	</nodes>
+	<edges>
+		<edge isLoop="1">
+			<rendering><point x="239" y="277"/></rendering>
+			<source name="event"/>
+			<labelGroup>
+				<rendering><point x="-65" y="-10"/></rendering>
+				<label name="ens_new_sight.UID.SID"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="256" y="192"/></rendering>
+			<source name="event"/>
+			<target name="idle"/>
+			<labelGroup>
+				<rendering><point x="1" y="-11"/></rendering>
+				<label name="cb_new_sight.SID"/>
+			</labelGroup>
+		</edge>
+		<edge>
+			<rendering><point x="224" y="193"/></rendering>
+			<source name="idle"/>
+			<target name="event"/>
+			<labelGroup>
+				<rendering><point x="-118" y="16"/></rendering>
+				<label name="ens_new_sight.UID.SID"/>
+			</labelGroup>
+		</edge>
+	</edges>
+</graph>

@@ -1,0 +1,569 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "module" "module.dtd">
+
+<module name="tip3_main"
+        legacy="1"
+        arity="0"
+        generatorName="VALID-II"
+        generatorVersion="2.9b2"
+        version="1.0"
+        creationDate="2005-07-18 14:25:48 GMT+12:00"
+        modificationDate="2005-08-18 16:39:30 GMT+12:00">
+<interface/>
+<definitions>
+<typeDefinition name="SIGHTS" expression="{1..3}"/>
+</definitions>
+<local>
+<event name="map_req_detail"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..3}">
+<alias old="map_req_detail.$_0" new="map_req_detail[$_0]"/>
+</foreach-alias>
+<event name="br_show_rec"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..3}">
+<alias old="br_show_rec.$_0" new="br_show_rec[$_0]"/>
+</foreach-alias>
+<event name="ens_norec"
+       controllable="0"
+       arity="2">
+</event>
+<foreach-alias dummy="_0" range="{UID}">
+<foreach-alias dummy="_1" range="{1..3}">
+<alias old="ens_norec.$_0.$_1" new="ens_norec[$_0][$_1]"/>
+</foreach-alias>
+</foreach-alias>
+<event name="map_hide"
+       controllable="1"
+       arity="0">
+</event>
+<event name="ens_new_location"
+       controllable="1"
+       arity="1">
+</event>
+<event name="cb_new_rec"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..3}">
+<alias old="cb_new_rec.$_0" new="cb_new_rec[$_0]"/>
+</foreach-alias>
+<event name="ens_req_detail"
+       controllable="1"
+       arity="2">
+</event>
+<event name="map_show_location"
+       controllable="1"
+       arity="0">
+</event>
+<event name="ens_new_sight"
+       controllable="0"
+       arity="2">
+</event>
+<foreach-alias dummy="_0" range="{UID}">
+<foreach-alias dummy="_1" range="{1..3}">
+<alias old="ens_new_sight.$_0.$_1" new="ens_new_sight[$_0][$_1]"/>
+</foreach-alias>
+</foreach-alias>
+<event name="cb_new_sight"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..3}">
+<alias old="cb_new_sight.$_0" new="cb_new_sight[$_0]"/>
+</foreach-alias>
+<event name="cb_req_detail"
+       controllable="1"
+       arity="2">
+</event>
+<foreach-alias dummy="_0" range="{UID}">
+<foreach-alias dummy="_1" range="{1..3}">
+<alias old="cb_req_detail.$_0.$_1" new="cb_req_detail[$_0][$_1]"/>
+</foreach-alias>
+</foreach-alias>
+<event name="map_remove"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..3}">
+<alias old="map_remove.$_0" new="map_remove[$_0]"/>
+</foreach-alias>
+<event name="ens_at"
+       controllable="0"
+       arity="2">
+</event>
+<foreach-alias dummy="_0" range="{UID}">
+<foreach-alias dummy="_1" range="{1..3}">
+<alias old="ens_at.$_0.$_1" new="ens_at[$_0][$_1]"/>
+</foreach-alias>
+</foreach-alias>
+<event name="ens_notat"
+       controllable="0"
+       arity="2">
+</event>
+<foreach-alias dummy="_0" range="{UID}">
+<foreach-alias dummy="_1" range="{1..3}">
+<alias old="ens_notat.$_0.$_1" new="ens_notat[$_0][$_1]"/>
+</foreach-alias>
+</foreach-alias>
+<event name="cb_update_location"
+       controllable="1"
+       arity="0">
+</event>
+<event name="map_expose"
+       controllable="1"
+       arity="0">
+</event>
+<event name="br_expose_detail"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..3}">
+<alias old="br_expose_detail.$_0" new="br_expose_detail[$_0]"/>
+</foreach-alias>
+<event name="br_remove_sight"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..3}">
+<alias old="br_remove_sight.$_0" new="br_remove_sight[$_0]"/>
+</foreach-alias>
+<event name="br_hide"
+       controllable="1"
+       arity="0">
+</event>
+<event name="br_select_sight_list"
+       controllable="0"
+       arity="0">
+</event>
+<event name="tau_noclick"
+       controllable="0"
+       arity="0">
+</event>
+<event name="br_remove_rec"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..3}">
+<alias old="br_remove_rec.$_0" new="br_remove_rec[$_0]"/>
+</foreach-alias>
+<event name="loc_new_location"
+       controllable="0"
+       arity="0">
+</event>
+<event name="cb_new_location"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{UID}">
+<alias old="cb_new_location.$_0" new="cb_new_location[$_0]"/>
+</foreach-alias>
+<event name="br_show_sight"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..3}">
+<alias old="br_show_sight.$_0" new="br_show_sight[$_0]"/>
+</foreach-alias>
+<event name="br_expose"
+       controllable="1"
+       arity="0">
+<comment>
+Browser pops into foreground on the mobile device,
+either caused by user click or programmed.
+</comment>
+</event>
+<event name="ens_new_detail"
+       controllable="0"
+       arity="2">
+</event>
+<foreach-alias dummy="_0" range="{UID}">
+<foreach-alias dummy="_1" range="{1..3}">
+<alias old="ens_new_detail.$_0.$_1" new="ens_new_detail[$_0][$_1]"/>
+</foreach-alias>
+</foreach-alias>
+<event name="ens_new_rec"
+       controllable="0"
+       arity="2">
+</event>
+<foreach-alias dummy="_0" range="{UID}">
+<foreach-alias dummy="_1" range="{1..3}">
+<alias old="ens_new_rec.$_0.$_1" new="ens_new_rec[$_0][$_1]"/>
+</foreach-alias>
+</foreach-alias>
+<event name="br_expose_rec_list"
+       controllable="1"
+       arity="0">
+<comment>
+List of recommendations gets displayed in browser.
+</comment>
+</event>
+<event name="cb_new_detail"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..3}">
+<alias old="cb_new_detail.$_0" new="cb_new_detail[$_0]"/>
+</foreach-alias>
+<event name="map_show"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..3}">
+<alias old="map_show.$_0" new="map_show[$_0]"/>
+</foreach-alias>
+<event name="br_req_detail"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..3}">
+<alias old="br_req_detail.$_0" new="br_req_detail[$_0]"/>
+</foreach-alias>
+<event name="map_select"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..3}">
+<alias old="map_select.$_0" new="map_select[$_0]"/>
+</foreach-alias>
+<event name="br_select_rec_list"
+       controllable="0"
+       arity="0">
+</event>
+<event name="map_select_location"
+       controllable="0"
+       arity="0">
+</event>
+<event name="br_select"
+       controllable="0"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..3}">
+<alias old="br_select.$_0" new="br_select[$_0]"/>
+</foreach-alias>
+<event name="map_new_location"
+       controllable="1"
+       arity="0">
+</event>
+<event name="br_expose_sight_list"
+       controllable="1"
+       arity="0">
+</event>
+<event name="cb_uncache"
+       controllable="1"
+       arity="1">
+</event>
+<foreach-alias dummy="_0" range="{1..3}">
+<alias old="cb_uncache.$_0" new="cb_uncache[$_0]"/>
+</foreach-alias>
+<event name="ens_rec"
+       controllable="0"
+       arity="2">
+</event>
+<foreach-alias dummy="_0" range="{UID}">
+<foreach-alias dummy="_1" range="{1..3}">
+<alias old="ens_rec.$_0.$_1" new="ens_rec[$_0][$_1]"/>
+</foreach-alias>
+</foreach-alias>
+</local>
+<parts>
+<component graph="br_expose_3" kind="plant"/>
+<foreach-instance dummy="SID" range="$SIGHTS">
+<instance name="cb_new_rec[$SID]" module="cb_new_rec_spec">
+<nameParam name="cb_new_rec" value="cb_new_rec[$SID]"/>
+<nameParam name="ens_new_rec" value="ens_new_rec[UID][$SID]"/>
+</instance>
+</foreach-instance>
+<component graph="map_show_location" kind="spec"/>
+<foreach-instance dummy="SID" range="$SIGHTS">
+<instance name="ens_new_sight[$SID]" module="ens_new_sight_plant">
+<nameParam name="cb_new_location" value="cb_new_location[UID]"/>
+<nameParam name="ens_at" value="ens_at[UID][$SID]"/>
+<nameParam name="ens_new_sight" value="ens_new_sight[UID][$SID]"/>
+<nameParam name="ens_notat" value="ens_notat[UID][$SID]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="SID" range="$SIGHTS">
+<instance name="cb_new_sight[$SID]" module="cb_new_sight_spec">
+<nameParam name="cb_new_sight" value="cb_new_sight[$SID]"/>
+<nameParam name="ens_new_sight" value="ens_new_sight[UID][$SID]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="ALT2" range="{3}">
+<foreach-instance dummy="ALT1" range="{2}">
+<foreach-instance dummy="SID" range="{1}">
+<instance name="map_req_detail_1[$ALT2][$ALT1][$SID]" module="map_req_detail_3_spec">
+<nameParam name="map_req_detail" value="map_req_detail[$SID]"/>
+<nameParam name="map_select_ALT1" value="map_select[$ALT1]"/>
+<nameParam name="map_select_ALT2" value="map_select[$ALT2]"/>
+<nameParam name="map_select_SID" value="map_select[$SID]"/>
+</instance>
+</foreach-instance>
+</foreach-instance>
+</foreach-instance>
+<foreach-instance dummy="ALT2" range="{3}">
+<foreach-instance dummy="ALT1" range="{1}">
+<foreach-instance dummy="SID" range="{2}">
+<instance name="map_req_detail_2[$ALT2][$ALT1][$SID]" module="map_req_detail_3_spec">
+<nameParam name="map_req_detail" value="map_req_detail[$SID]"/>
+<nameParam name="map_select_ALT1" value="map_select[$ALT1]"/>
+<nameParam name="map_select_ALT2" value="map_select[$ALT2]"/>
+<nameParam name="map_select_SID" value="map_select[$SID]"/>
+</instance>
+</foreach-instance>
+</foreach-instance>
+</foreach-instance>
+<foreach-instance dummy="ALT2" range="{2}">
+<foreach-instance dummy="ALT1" range="{1}">
+<foreach-instance dummy="SID" range="{3}">
+<instance name="map_req_detail_3[$ALT2][$ALT1][$SID]" module="map_req_detail_3_spec">
+<nameParam name="map_req_detail" value="map_req_detail[$SID]"/>
+<nameParam name="map_select_ALT1" value="map_select[$ALT1]"/>
+<nameParam name="map_select_ALT2" value="map_select[$ALT2]"/>
+<nameParam name="map_select_SID" value="map_select[$SID]"/>
+</instance>
+</foreach-instance>
+</foreach-instance>
+</foreach-instance>
+<component graph="nbl_noclick" kind="plant"/>
+<component graph="cb_update_location" kind="spec"/>
+<component graph="map_expose_3" kind="plant"/>
+<foreach-instance dummy="SID" range="$SIGHTS">
+<instance name="cb_cache_detail[$SID]" module="cb_cache_detail_spec">
+<nameParam name="cb_new_detail" value="cb_new_detail[$SID]"/>
+<nameParam name="cb_req_detail" value="cb_req_detail[UID][$SID]"/>
+<nameParam name="cb_uncache" value="cb_uncache[$SID]"/>
+<nameParam name="ens_new_detail" value="ens_new_detail[UID][$SID]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="SID" range="$SIGHTS">
+<instance name="map_click[$SID]" module="map_click_plant">
+<nameParam name="map_remove" value="map_remove[$SID]"/>
+<nameParam name="map_show" value="map_show[$SID]"/>
+<nameParam name="map_select" value="map_select[$SID]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="SID" range="$SIGHTS">
+<instance name="br_click_rec_3[$SID]" module="br_click_rec_3_plant">
+<nameParam name="br_expose_detail_1" value="br_expose_detail[1]"/>
+<nameParam name="br_expose_detail_2" value="br_expose_detail[2]"/>
+<nameParam name="br_expose_detail_3" value="br_expose_detail[3]"/>
+<nameParam name="br_expose_rec_list" value="br_expose_rec_list"/>
+<nameParam name="br_expose_sight_list" value="br_expose_sight_list"/>
+<nameParam name="br_remove_rec" value="br_remove_rec[$SID]"/>
+<nameParam name="br_show_rec" value="br_show_rec[$SID]"/>
+<nameParam name="br_select" value="br_select[$SID]"/>
+</instance>
+</foreach-instance>
+<component graph="cb_new_location" kind="spec"/>
+<foreach-instance dummy="SID" range="$SIGHTS">
+<instance name="ens_new_detail[$SID]" module="ens_new_detail_plant">
+<nameParam name="cb_req_detail" value="cb_req_detail[UID][$SID]"/>
+<nameParam name="ens_new_detail" value="ens_new_detail[UID][$SID]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="SID" range="$SIGHTS">
+<instance name="ens_new_rec[$SID]" module="ens_new_rec_plant">
+<nameParam name="cb_new_location" value="cb_new_location[UID]"/>
+<nameParam name="ens_new_rec" value="ens_new_rec[UID][$SID]"/>
+<nameParam name="ens_norec" value="ens_norec[UID][$SID]"/>
+<nameParam name="ens_rec" value="ens_rec[UID][$SID]"/>
+</instance>
+</foreach-instance>
+<component graph="br_expose_rec_list" kind="spec"/>
+<foreach-instance dummy="ALT2" range="{3}">
+<foreach-instance dummy="ALT1" range="{2}">
+<foreach-instance dummy="SID" range="{1}">
+<instance name="br_req_detail_1[$ALT2][$ALT1][$SID]" module="br_req_detail_spec">
+<nameParam name="br_req_detail" value="br_req_detail[$SID]"/>
+<nameParam name="br_select_ALT1" value="br_select[$ALT1]"/>
+<nameParam name="br_select_ALT2" value="br_select[$ALT2]"/>
+<nameParam name="br_select_SID" value="br_select[$SID]"/>
+<nameParam name="br_select_rec_list" value="br_select_rec_list"/>
+<nameParam name="br_select_sight_list" value="br_select_sight_list"/>
+</instance>
+</foreach-instance>
+</foreach-instance>
+</foreach-instance>
+<foreach-instance dummy="ALT2" range="{3}">
+<foreach-instance dummy="ALT1" range="{1}">
+<foreach-instance dummy="SID" range="{2}">
+<instance name="br_req_detail_2[$ALT2][$ALT1][$SID]" module="br_req_detail_spec">
+<nameParam name="br_req_detail" value="br_req_detail[$SID]"/>
+<nameParam name="br_select_ALT1" value="br_select[$ALT1]"/>
+<nameParam name="br_select_ALT2" value="br_select[$ALT2]"/>
+<nameParam name="br_select_SID" value="br_select[$SID]"/>
+<nameParam name="br_select_rec_list" value="br_select_rec_list"/>
+<nameParam name="br_select_sight_list" value="br_select_sight_list"/>
+</instance>
+</foreach-instance>
+</foreach-instance>
+</foreach-instance>
+<foreach-instance dummy="ALT2" range="{2}">
+<foreach-instance dummy="ALT1" range="{1}">
+<foreach-instance dummy="SID" range="{3}">
+<instance name="br_req_detail_3[$ALT2][$ALT1][$SID]" module="br_req_detail_spec">
+<nameParam name="br_req_detail" value="br_req_detail[$SID]"/>
+<nameParam name="br_select_ALT1" value="br_select[$ALT1]"/>
+<nameParam name="br_select_ALT2" value="br_select[$ALT2]"/>
+<nameParam name="br_select_SID" value="br_select[$SID]"/>
+<nameParam name="br_select_rec_list" value="br_select_rec_list"/>
+<nameParam name="br_select_sight_list" value="br_select_sight_list"/>
+</instance>
+</foreach-instance>
+</foreach-instance>
+</foreach-instance>
+<foreach-instance dummy="ALT2" range="{3}">
+<foreach-instance dummy="ALT1" range="{2}">
+<foreach-instance dummy="SID" range="{1}">
+<instance name="cb_new_detail_1[$ALT2][$ALT1][$SID]" module="cb_new_detail_3_spec">
+<nameParam name="br_req_detail_ALT1" value="br_req_detail[$ALT1]"/>
+<nameParam name="br_req_detail_ALT2" value="br_req_detail[$ALT2]"/>
+<nameParam name="br_req_detail_SID" value="br_req_detail[$SID]"/>
+<nameParam name="cb_new_detail" value="cb_new_detail[$SID]"/>
+<nameParam name="cb_req_detail" value="cb_req_detail[UID][$SID]"/>
+<nameParam name="cb_uncache" value="cb_uncache[$SID]"/>
+<nameParam name="map_req_detail_ALT1" value="map_req_detail[$ALT1]"/>
+<nameParam name="map_req_detail_ALT2" value="map_req_detail[$ALT2]"/>
+<nameParam name="map_req_detail_SID" value="map_req_detail[$SID]"/>
+</instance>
+</foreach-instance>
+</foreach-instance>
+</foreach-instance>
+<foreach-instance dummy="ALT2" range="{3}">
+<foreach-instance dummy="ALT1" range="{1}">
+<foreach-instance dummy="SID" range="{2}">
+<instance name="cb_new_detail_2[$ALT2][$ALT1][$SID]" module="cb_new_detail_3_spec">
+<nameParam name="br_req_detail_ALT1" value="br_req_detail[$ALT1]"/>
+<nameParam name="br_req_detail_ALT2" value="br_req_detail[$ALT2]"/>
+<nameParam name="br_req_detail_SID" value="br_req_detail[$SID]"/>
+<nameParam name="cb_new_detail" value="cb_new_detail[$SID]"/>
+<nameParam name="cb_req_detail" value="cb_req_detail[UID][$SID]"/>
+<nameParam name="cb_uncache" value="cb_uncache[$SID]"/>
+<nameParam name="map_req_detail_ALT1" value="map_req_detail[$ALT1]"/>
+<nameParam name="map_req_detail_ALT2" value="map_req_detail[$ALT2]"/>
+<nameParam name="map_req_detail_SID" value="map_req_detail[$SID]"/>
+</instance>
+</foreach-instance>
+</foreach-instance>
+</foreach-instance>
+<foreach-instance dummy="ALT2" range="{2}">
+<foreach-instance dummy="ALT1" range="{1}">
+<foreach-instance dummy="SID" range="{3}">
+<instance name="cb_new_detail_3[$ALT2][$ALT1][$SID]" module="cb_new_detail_3_spec">
+<nameParam name="br_req_detail_ALT1" value="br_req_detail[$ALT1]"/>
+<nameParam name="br_req_detail_ALT2" value="br_req_detail[$ALT2]"/>
+<nameParam name="br_req_detail_SID" value="br_req_detail[$SID]"/>
+<nameParam name="cb_new_detail" value="cb_new_detail[$SID]"/>
+<nameParam name="cb_req_detail" value="cb_req_detail[UID][$SID]"/>
+<nameParam name="cb_uncache" value="cb_uncache[$SID]"/>
+<nameParam name="map_req_detail_ALT1" value="map_req_detail[$ALT1]"/>
+<nameParam name="map_req_detail_ALT2" value="map_req_detail[$ALT2]"/>
+<nameParam name="map_req_detail_SID" value="map_req_detail[$SID]"/>
+</instance>
+</foreach-instance>
+</foreach-instance>
+</foreach-instance>
+<component graph="br_tofront_3" kind="spec"/>
+<foreach-instance dummy="SID" range="$SIGHTS">
+<instance name="br_new_rec[$SID]" module="br_new_rec_spec">
+<nameParam name="br_remove_rec" value="br_remove_rec[$SID]"/>
+<nameParam name="br_show_rec" value="br_show_rec[$SID]"/>
+<nameParam name="cb_new_rec" value="cb_new_rec[$SID]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="ALT2" range="{3}">
+<foreach-instance dummy="ALT1" range="{1}">
+<foreach-instance dummy="SID" range="{2}">
+<instance name="br_expose_sight_2[$ALT2][$ALT1][$SID]" module="br_expose_sight_3_spec">
+<nameParam name="br_expose_detail_ALT1" value="br_expose_detail[$ALT1]"/>
+<nameParam name="br_expose_detail_ALT2" value="br_expose_detail[$ALT2]"/>
+<nameParam name="br_expose_detail_SID" value="br_expose_detail[$SID]"/>
+<nameParam name="br_expose_rec_list" value="br_expose_rec_list"/>
+<nameParam name="br_expose_sight_list" value="br_expose_sight_list"/>
+<nameParam name="cb_new_detail_ALT1" value="cb_new_detail[$ALT1]"/>
+<nameParam name="cb_new_detail_ALT2" value="cb_new_detail[$ALT2]"/>
+<nameParam name="cb_new_detail_SID" value="cb_new_detail[$SID]"/>
+<nameParam name="br_select_sight_list" value="br_select_sight_list"/>
+<nameParam name="br_select_ALT1" value="br_select[$ALT1]"/>
+<nameParam name="br_select_ALT2" value="br_select[$ALT2]"/>
+<nameParam name="br_select_rec_list" value="br_select_rec_list"/>
+</instance>
+</foreach-instance>
+</foreach-instance>
+</foreach-instance>
+<foreach-instance dummy="ALT2" range="{3}">
+<foreach-instance dummy="ALT1" range="{2}">
+<foreach-instance dummy="SID" range="{1}">
+<instance name="br_expose_sight_1[$ALT2][$ALT1][$SID]" module="br_expose_sight_3_spec">
+<nameParam name="br_expose_detail_ALT1" value="br_expose_detail[$ALT1]"/>
+<nameParam name="br_expose_detail_ALT2" value="br_expose_detail[$ALT2]"/>
+<nameParam name="br_expose_detail_SID" value="br_expose_detail[$SID]"/>
+<nameParam name="br_expose_rec_list" value="br_expose_rec_list"/>
+<nameParam name="br_expose_sight_list" value="br_expose_sight_list"/>
+<nameParam name="cb_new_detail_ALT1" value="cb_new_detail[$ALT1]"/>
+<nameParam name="cb_new_detail_ALT2" value="cb_new_detail[$ALT2]"/>
+<nameParam name="cb_new_detail_SID" value="cb_new_detail[$SID]"/>
+<nameParam name="br_select_sight_list" value="br_select_sight_list"/>
+<nameParam name="br_select_ALT1" value="br_select[$ALT1]"/>
+<nameParam name="br_select_ALT2" value="br_select[$ALT2]"/>
+<nameParam name="br_select_rec_list" value="br_select_rec_list"/>
+</instance>
+</foreach-instance>
+</foreach-instance>
+</foreach-instance>
+<foreach-instance dummy="ALT2" range="{2}">
+<foreach-instance dummy="ALT1" range="{1}">
+<foreach-instance dummy="SID" range="{3}">
+<instance name="br_expose_sight_3[$ALT2][$ALT1][$SID]" module="br_expose_sight_3_spec">
+<nameParam name="br_expose_detail_ALT1" value="br_expose_detail[$ALT1]"/>
+<nameParam name="br_expose_detail_ALT2" value="br_expose_detail[$ALT2]"/>
+<nameParam name="br_expose_detail_SID" value="br_expose_detail[$SID]"/>
+<nameParam name="br_expose_rec_list" value="br_expose_rec_list"/>
+<nameParam name="br_expose_sight_list" value="br_expose_sight_list"/>
+<nameParam name="cb_new_detail_ALT1" value="cb_new_detail[$ALT1]"/>
+<nameParam name="cb_new_detail_ALT2" value="cb_new_detail[$ALT2]"/>
+<nameParam name="cb_new_detail_SID" value="cb_new_detail[$SID]"/>
+<nameParam name="br_select_sight_list" value="br_select_sight_list"/>
+<nameParam name="br_select_ALT1" value="br_select[$ALT1]"/>
+<nameParam name="br_select_ALT2" value="br_select[$ALT2]"/>
+<nameParam name="br_select_rec_list" value="br_select_rec_list"/>
+</instance>
+</foreach-instance>
+</foreach-instance>
+</foreach-instance>
+<foreach-instance dummy="SID" range="$SIGHTS">
+<instance name="br_new_sight[$SID]" module="br_new_sight_spec">
+<nameParam name="br_remove_sight" value="br_remove_sight[$SID]"/>
+<nameParam name="br_show_sight" value="br_show_sight[$SID]"/>
+<nameParam name="cb_new_sight" value="cb_new_sight[$SID]"/>
+</instance>
+</foreach-instance>
+<component graph="map_new_location" kind="spec"/>
+<component graph="br_expose_sight_list" kind="spec"/>
+<foreach-instance dummy="SID" range="$SIGHTS">
+<instance name="map_new[$SID]" module="map_new_spec">
+<nameParam name="cb_new_rec" value="cb_new_rec[$SID]"/>
+<nameParam name="cb_new_sight" value="cb_new_sight[$SID]"/>
+<nameParam name="map_remove" value="map_remove[$SID]"/>
+<nameParam name="map_show" value="map_show[$SID]"/>
+</instance>
+</foreach-instance>
+<foreach-instance dummy="SID" range="$SIGHTS">
+<instance name="br_click_sight_3[$SID]" module="br_click_sight_3_plant">
+<nameParam name="br_expose_detail_1" value="br_expose_detail[1]"/>
+<nameParam name="br_expose_detail_2" value="br_expose_detail[2]"/>
+<nameParam name="br_expose_detail_3" value="br_expose_detail[3]"/>
+<nameParam name="br_expose_rec_list" value="br_expose_rec_list"/>
+<nameParam name="br_expose_sight_list" value="br_expose_sight_list"/>
+<nameParam name="br_remove_sight" value="br_remove_sight[$SID]"/>
+<nameParam name="br_show_sight" value="br_show_sight[$SID]"/>
+<nameParam name="br_select" value="br_select[$SID]"/>
+</instance>
+</foreach-instance>
+</parts>
+</module>
