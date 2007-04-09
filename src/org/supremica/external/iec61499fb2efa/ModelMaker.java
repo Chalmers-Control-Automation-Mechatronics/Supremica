@@ -35,15 +35,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
 
+import net.sourceforge.waters.xsd.base.ComponentKind;
+
 import net.sourceforge.fuber.xsd.libraryelement.*;
-
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-//import net.sourceforge.waters.model.expr.OperatorTable;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-
 
 class ModelMaker
 {
@@ -60,8 +54,7 @@ class ModelMaker
 	private Map<String,JaxbFBType> fbTypes = new HashMap<String,JaxbFBType>();
 	private Map<String,String> functionBlocks = new HashMap<String,String>();
 
-	private ModuleProxyFactory moduleFactory;
-	private ModuleProxy outputModule;
+	private ExtendedAutomata automata;
 
 
 	private ModelMaker(String outputFileName, String systemFileName, String libraryPathBase, String libraryPath) 
@@ -184,12 +177,12 @@ class ModelMaker
 			System.err.println();
 			System.err.println("Usage: ModelMaker [-o outputFile] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
 			System.exit(1);
+
 		}
 
 		return theFile;
     }
 	
-	//{ loadSystem
     private void loadSystem(String fileName)
     {
 	
@@ -244,7 +237,6 @@ class ModelMaker
 			System.exit(1);
 		}
 	}
-	//}
 
 // 	private void constructMergeType(int size)
 // 	{
@@ -331,23 +323,6 @@ class ModelMaker
 	}
 	
 
-	private void setupOutput()
-	{
-		
-		moduleFactory = ModuleSubjectFactory.getInstance();
-
-		try
-		{
-			outputModule = moduleFactory.createModuleProxy(theSystem.getName(),null);
-
-			JAXBModuleMarshaller moduleMarshaller = new JAXBModuleMarshaller(moduleFactory, CompilerOperatorTable.getInstance());	
-			moduleMarshaller.marshal(outputModule,new File(outputFileName));
-		}
-		catch (Exception e)
-		{
-		}
-	}
-
 
 	private void makeInstanceQueue()
 	{
@@ -359,11 +334,17 @@ class ModelMaker
 		
 		// load IEC 61499 application
 		loadSystem(systemFileName);
-		
 
-		// setup module factory
-		setupOutput();
+		automata = new ExtendedAutomata(theSystem.getName());
+
+		ExtendedAutomaton test = new ExtendedAutomaton("test", ComponentKind.PLANT);
 		
+		test.addState("blah");
+
+		automata.add(test);
+
+		automata.writeToFile(new File(outputFileName));
+
 		// make instance queue model
 		makeInstanceQueue();
 
@@ -371,8 +352,12 @@ class ModelMaker
 
 		// TODO: make jobs queue model
 		
-		// TODO: make algorithms execution thread model
-	
+		// TODO: make algorithms execution thread model	
+
+		// TODO: for each FB instance make models
+		
+		// Write out the module file
+		automata.writeToFile(new File(outputFileName));
 	}
 
 
