@@ -102,8 +102,7 @@ public class CompositeState
         
         // -2 since the last two indices correspond to something funny, not the nbrs of the underlying states.
         for (int i = 0; i < indices.length - 2; i++)
-        {            
-			//             theAutomata.getAutomatonAt(i).remapStateIndices();
+        {
             initComposingStates(helper.getIndexMap().getStateAt(helper.getAutomata().getAutomatonAt(i), indices[i]));
         }
         

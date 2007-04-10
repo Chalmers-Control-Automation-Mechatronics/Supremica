@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SupremicaProject name="AGV" comment="Example from J.O. Moody and P.J. Antsaklis, 'Supervisory Control of Discrete Event Systems Using Petri Nets', p.120. The last specification 'ZoneX' was not included in the original model and it introduces a new zone at the input station (the leftmost one in the animation figure). Without 'ZoneX' the system is nonblocking, with 'ZoneX' the system is blocking. The system is not controllable. Modular controllability synthesis works fine here and just so happens to return a modular supervisor that is also nonblocking (in both cases).">
+<SupremicaProject name="AGV" comment="Example from J.O. Moody and P.J. Antsaklis, 'Supervisory Control of Discrete Event Systems Using Petri Nets', p.120. The last specification 'ZoneX' was not included in the original model and it introduces a new zone at the input station (the leftmost one in the animation figure (not included in this release of Supremica(?))). Without 'ZoneX' the system is nonblocking, with 'ZoneX' the system is blocking. The system is not controllable. Modular controllability synthesis works fine here and just so happens to return a modular supervisor that is also nonblocking (in both cases).">
 <!-- Input stations -->
 <Automaton name="Input1" type="Plant">
 	<Events>
