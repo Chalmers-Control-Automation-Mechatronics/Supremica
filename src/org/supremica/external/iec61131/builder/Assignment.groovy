@@ -27,6 +27,7 @@ class RuntimeAssignment {
 	final IdentifierExpression Q
 	final Expression input
 	final Scope scope
+	final boolean stochastic // Means that it will not necessarily execute
 	
 	String toString() {
 		"$scope { $Q := $input }"
@@ -44,8 +45,8 @@ class RuntimeAssignment {
 			state('q0', marked:true) {
 				//println input.expand(scope, statements[0..<indexToThis])
 				//println input.expand(scope, statements[0..<indexToThis]).cleanup()
-				selfLoop(guard:input.cleanup().toSupremicaSyntax()) { set(supremicaNameOfQ) }
-				selfLoop(guard:new Expression("not (${input})").cleanup().toSupremicaSyntax()) { reset(supremicaNameOfQ) }
+				selfLoop(guard:input?.cleanup()?.toSupremicaSyntax()) { set(supremicaNameOfQ) }
+				selfLoop(guard:input ? new Expression("not (${input})").cleanup().toSupremicaSyntax() : null) { reset(supremicaNameOfQ) }
 			}
 		}
 	}
@@ -60,7 +61,7 @@ class RuntimeAssignment {
 	}
 	static Map substituteIntoStateless(List assignmentForOneProcess) {
 		assignmentForOneProcess.inject([:]){ Map map, elem ->
-			def expandedInput = elem.input.replaceAllIdentifiers {
+			def expandedInput = elem.input?.replaceAllIdentifiers {
 				def fullName = elem.scope.fullNameOf(it)
 				assert fullName, "Undeclared identifier $it in $elem"
 				map[fullName] ? new Expression("(${map[fullName]})") : fullName

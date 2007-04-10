@@ -25,43 +25,18 @@
 		<groovyc srcdir="${src}" destdir="${bin}" classpathref="supremica.classpath"/>
 	</target>
 
-	<target name="Lift" depends="compile">
-		<java fork="yes" classname="Lift" failonerror="true" classpathref="supremica.classpath">
+	<!-- usage example: ant -Dclassname=LongLift run -->
+	<target name="run" depends="compile">
+		<java fork="yes" classname="${classname}" failonerror="true" classpathref="supremica.classpath">
 			<jvmarg value="-Xmx512m"/>
 			<jvmarg value="-Xms64m"/>
+			<jvmarg value="-Djava.library.path=${supremicadir}/platform/win.x86/lib"/>
 			<classpath>
 				<pathelement location="${bin}" />
 			</classpath>
 		</java>
 	</target>
 
-	<target name="MachineCalibration" depends="compile">
-		<java fork="yes" classname="MachineCalibration" failonerror="true" classpathref="supremica.classpath">
-			<jvmarg value="-Xmx512m"/>
-			<jvmarg value="-Xms64m"/>
-			<classpath>
-				<pathelement location="${bin}" />
-			</classpath>
-		</java>
-	</target>
-	<target name="LongLift" depends="compile">
-		<java fork="yes" classname="LongLift" failonerror="true" classpathref="supremica.classpath">
-			<jvmarg value="-Xmx512m"/>
-			<jvmarg value="-Xms64m"/>
-			<classpath>
-				<pathelement location="${bin}" />
-			</classpath>
-		</java>
-	</target>
-	<target name="TwoMachineCell" depends="compile">
-		<java fork="yes" classname="TwoMachineCell" failonerror="true" classpathref="supremica.classpath">
-			<jvmarg value="-Xmx512m"/>
-			<jvmarg value="-Xms64m"/>
-			<classpath>
-				<pathelement location="${bin}" />
-			</classpath>
-		</java>
-	</target>
 	<!-- ================================= 
           target: clean              
          ================================= -->

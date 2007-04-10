@@ -142,9 +142,9 @@ class ControlCodeBuilder extends BuilderSupport {
 				if (attribute?.key) {
 					def value
 					Class propertyType = obj.metaClass.properties.find{it.name.toLowerCase() == attribute.key.toLowerCase()}?.type
-					if (propertyType.isCase(Expression) && !(attribute.value instanceof Expression)) {
+					if (propertyType.isCase(Expression) && !(attribute.value instanceof Expression) && attribute.value != null) {
 						value = new Expression(attribute.value)
-					} else if (propertyType.isCase(IdentifierExpression) && !(attribute.value instanceof IdentifierExpression)) {
+					} else if (propertyType.isCase(IdentifierExpression) && !(attribute.value instanceof IdentifierExpression) && attribute.value != null) {
 						value = new IdentifierExpression(attribute.value)
 					} else {
 						value = attribute.value

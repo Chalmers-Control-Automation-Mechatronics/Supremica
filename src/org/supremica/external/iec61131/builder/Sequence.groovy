@@ -48,7 +48,7 @@ class Transition {
 		def ccb = new ControlCodeBuilder()
 		int indexOfThis = sequence.transitions.indexOf(this)
 		List higherPrioTrans = sequence.transitions[0..<indexOfThis].findAll{it.from == from}
-		String mainExpr = "${from + 'X'} and $guard"
+		String mainExpr = "${from + 'X'} and ($guard)"
 		List prioExpr = higherPrioTrans.collect{(it.name + ENABLED_NAME).text}
 		Assignment enableAssignment = ccb."${ENABLED.name} := ${[mainExpr, *prioExpr].join(' and not ')}"()
 		enableAssignment.getRuntimeAssignments(scope)

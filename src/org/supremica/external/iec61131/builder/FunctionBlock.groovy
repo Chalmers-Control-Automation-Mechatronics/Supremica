@@ -40,15 +40,18 @@ class FunctionBlock {
 			if (forSynthesis) assert freeVariables //Must exist free variables for synthesis
 			//else assert !freeVariables //Must not exist any free variables if not synthesis
 			//Add default process models for those inputs that never are assigned values
-			inputs.findAll{input -> assignments.every{it.Q != input.name}}.each { input ->
+			List freeInputs = inputs.findAll{input -> assignments.every{it.Q != input.name}}
+			if (freeInputs) {
 				ControlCodeBuilder ccb = new ControlCodeBuilder()
-				def inputDefaultProcess = ccb.process("Process_${input.name}") {
-					ccb.logicProgram('program') {
-						ccb."${input.name} := not ${input.name}"()
+				def processForFreeInputs = ccb.process("FreeInputs") {
+					ccb.logicProgram('main') {
+						freeInputs.each { input ->
+							ccb.assignment(Q:input.name, input:null)
+						}
 					}
 				}
-				processes << inputDefaultProcess
-				assignments += inputDefaultProcess.getRuntimeAssignments(scope)
+				processes << processForFreeInputs
+				assignments += processForFreeInputs.getRuntimeAssignments(scope)
 			}
 			if (forSynthesis) {
 				event(Converter.START_SCAN_EVENT_NAME, controllable:true)

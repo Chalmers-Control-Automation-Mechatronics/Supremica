@@ -302,7 +302,7 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 			event(Converter.SCAN_CYCLE_EVENT_NAME, controllable:false)
 			booleanVariable(['y1', 'y2', 'y3', 'y4', 'y5', 'FB1instance_x', 'u7'], initialValue:false, markedValue:false)
 			booleanVariable('u3', initialValue:false, markedValue:true)
-			event(['someProcess_change', 'Process_y2_change', 'Process_y3_change', 'slowProcess1_change', 'slowProcess2_change'], controllable:false)
+			event(['someProcess_change', 'FreeInputs_change', 'slowProcess1_change', 'slowProcess2_change'], controllable:false)
 			plant('ControlUnit_vs_someProcess', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME) {
 				state(Converter.AFTER_SLOWER_PROCESS_STATE_NAME, marked:false) {
 					outgoing(to:Converter.BEFORE_SLOWER_PROCESS_STATE_NAME)
@@ -312,21 +312,12 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 					selfLoop()
 				}
 			}
-			plant('ControlUnit_vs_Process_y2', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME) {
+			plant('ControlUnit_vs_FreeInputs', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME) {
 				state(Converter.AFTER_SLOWER_PROCESS_STATE_NAME, marked:false) {
 					outgoing(to:Converter.BEFORE_SLOWER_PROCESS_STATE_NAME)
 				}
 				state(Converter.BEFORE_SLOWER_PROCESS_STATE_NAME, marked:true) {
-					outgoing(to:Converter.AFTER_SLOWER_PROCESS_STATE_NAME, event:'Process_y2_change')
-					selfLoop()
-				}
-			}
-			plant('ControlUnit_vs_Process_y3', defaultEvent:Converter.SCAN_CYCLE_EVENT_NAME) {
-				state(Converter.AFTER_SLOWER_PROCESS_STATE_NAME, marked:false) {
-					outgoing(to:Converter.BEFORE_SLOWER_PROCESS_STATE_NAME)
-				}
-				state(Converter.BEFORE_SLOWER_PROCESS_STATE_NAME, marked:true) {
-					outgoing(to:Converter.AFTER_SLOWER_PROCESS_STATE_NAME, event:'Process_y3_change')
+					outgoing(to:Converter.AFTER_SLOWER_PROCESS_STATE_NAME, event:'FreeInputs_change')
 					selfLoop()
 				}
 			}
@@ -357,7 +348,7 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 					selfLoop()
 				}
 			}
-			plant('Process_y2_vs_slowProcess1', defaultEvent:'Process_y2_change') {
+			plant('FreeInputs_vs_slowProcess1', defaultEvent:'FreeInputs_change') {
 				state(Converter.AFTER_SLOWER_PROCESS_STATE_NAME, marked:true) {
 					outgoing(to:Converter.BEFORE_SLOWER_PROCESS_STATE_NAME)
 				}
@@ -366,25 +357,7 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 					selfLoop()
 				}
 			}
-			plant('Process_y2_vs_slowProcess2', defaultEvent:'Process_y2_change') {
-				state(Converter.AFTER_SLOWER_PROCESS_STATE_NAME, marked:true) {
-					outgoing(to:Converter.BEFORE_SLOWER_PROCESS_STATE_NAME)
-				}
-				state(Converter.BEFORE_SLOWER_PROCESS_STATE_NAME, marked:true) {
-					outgoing(to:Converter.AFTER_SLOWER_PROCESS_STATE_NAME, event:'slowProcess2_change')
-					selfLoop()
-				}
-			}
-			plant('Process_y3_vs_slowProcess1', defaultEvent:'Process_y3_change') {
-				state(Converter.AFTER_SLOWER_PROCESS_STATE_NAME, marked:true) {
-					outgoing(to:Converter.BEFORE_SLOWER_PROCESS_STATE_NAME)
-				}
-				state(Converter.BEFORE_SLOWER_PROCESS_STATE_NAME, marked:true) {
-					outgoing(to:Converter.AFTER_SLOWER_PROCESS_STATE_NAME, event:'slowProcess1_change')
-					selfLoop()
-				}
-			}
-			plant('Process_y3_vs_slowProcess2', defaultEvent:'Process_y3_change') {
+			plant('FreeInputs_vs_slowProcess2', defaultEvent:'FreeInputs_change') {
 				state(Converter.AFTER_SLOWER_PROCESS_STATE_NAME, marked:true) {
 					outgoing(to:Converter.BEFORE_SLOWER_PROCESS_STATE_NAME)
 				}
@@ -417,16 +390,16 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 					selfLoop(guard:'!(u3 & y1 | (y2 & u3))') { reset('y1') }
 				}
 			}
-			plant('ASSIGN_y2', defaultEvent:'Process_y2_change', deterministic:false) {
+			plant('ASSIGN_y2', defaultEvent:'FreeInputs_change', deterministic:false) {
 				state('q0', marked:true) {
-					selfLoop(guard:'!y2') { set('y2') }
-					selfLoop(guard:'y2') { reset('y2') }
+					selfLoop { set('y2') }
+					selfLoop { reset('y2') }
 				}
 			}
-			plant('ASSIGN_y3', defaultEvent:'Process_y3_change', deterministic:false) {
+			plant('ASSIGN_y3', defaultEvent:'FreeInputs_change', deterministic:false) {
 				state('q0', marked:true) {
-					selfLoop(guard:'!y3') { set('y3') }
-					selfLoop(guard:'y3') { reset('y3') }
+					selfLoop { set('y3') }
+					selfLoop { reset('y3') }
 				}
 			}
 			plant('ASSIGN_y4', defaultEvent:'slowProcess1_change', deterministic:false) {

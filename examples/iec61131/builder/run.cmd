@@ -1,0 +1,1 @@
+@ant -Dclassname=%1 run
