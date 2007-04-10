@@ -22,6 +22,9 @@ public class Milp
     
     /** The involved automata, plants, zone specifications */
     private Automata theAutomata, robots, zones;
+
+	// prec_temp
+// 	private Automata specs;
     
     /** The project used for return result */
     // NOT USED YET...
@@ -193,11 +196,11 @@ public class Milp
         // as specification indices and used to step through the final graph following the
         // time schedule (which is needed to build the schedule automaton)
         int[] currComposedStateIndices = stepper.getInitialStateIndices();
-        
+
         // The first set of state indices correspond to the initial state of the composed automaton.
         // They are thus used to construct the initial state of the schedule automaton.
         State currScheduledState = makeScheduleState(currComposedStateIndices, true);
-        
+
         // This alphabet is needed to check which events are common to the robots
         // If several transitions with the same event are enabled simultaneously, naturally
         // the transition having the greatest time value should be fired
@@ -213,7 +216,7 @@ public class Milp
                 commonRobotEventsAlphabet.addEvents(AlphabetHelpers.intersect(firstAlphabet, secondAlphabet));
             }
         }
-        
+
         // Walk from the initial state until an accepting (synchronized) state is found
         // In every step, the cheapest allowed transition is chosen
         // This is done until an accepting state is found for our schedule
@@ -235,15 +238,15 @@ public class Milp
             // Which automaton fires the "cheapest" transition...
             for (int i=0; i<theAutomata.size(); i++)
             {
-                Automaton currRobot = theAutomata.getAutomatonAt(i);
-                
+                Automaton currRobot = indexMap.getAutomatonAt(i);
+
                 // Since the robots are supposed to fire events, the check for the "smallest time event"
                 // is only done for the plants
                 if (currRobot.isPlant())
                 {
                     robotIndex++;
                     
-                    State currState = currRobot.getStateWithIndex(currComposedStateIndices[i]);
+                    State currState = indexMap.getStateAt(currRobot, currComposedStateIndices[i]);
                     double currTime = optimalTimes[robotIndex][currComposedStateIndices[i]];
                     
                     // Choose the smallest time (as long as it is not smaller than the previously scheduled time)...
@@ -253,7 +256,7 @@ public class Milp
                         {
                             Arc currArc = arcs.next();
                             LabeledEvent currEvent = currArc.getEvent();
-                            
+
                             // ... that correspoinds to an enabled transition
                             if (stepper.isEnabled(currEvent))
                             {
@@ -262,7 +265,7 @@ public class Milp
                                 // If the next node has lower time value, then it cannot belong
                                 // to the optimal path, since precedence constraints are not fulfilled
                                 // Otherwise, this could be the path
-                                if (optimalTimes[robotIndex][nextStateIndex] >= currTime + currRobot.getStateWithIndex(nextStateIndex).getCost())
+                                if (optimalTimes[robotIndex][nextStateIndex] >= currTime + indexMap.getStateAt(currRobot, nextStateIndex).getCost())
                                 {
                                     // But! Care should be taken with the events common to any pair of robots.
                                     // When synched, the slowest robot should fire the synchronizing event.
@@ -294,7 +297,7 @@ public class Milp
                     }
                 }
             }
-            
+
             // Here is the check to see if there have been any synchronizing events. If so, and if the
             // time of the slowest synchronizing event is smaller than the current optimal time, obviously
             // an update is needed.
@@ -312,15 +315,15 @@ public class Milp
                     }
                 }
             }
-            
+
             // Add the transition time to the name of the state-to-be-in-the-schedule
             currScheduledState.setName(currScheduledState.getName() + ";  firing_time = " + smallestTime);
             //			currScheduledState.setCost(smallestTime);
-            
+
             // Make a transition (in the synchronizer) to the state that is reachable in one step at cheapest cost
             // This state will be the next parting point in our walk
             currComposedStateIndices = stepper.step(currComposedStateIndices, currOptimalEvent);
-            
+
             // Update the schedule automaton
             State nextScheduledState = makeScheduleState(currComposedStateIndices);
             
@@ -329,17 +332,17 @@ public class Milp
                 schedule.getAlphabet().addEvent(currOptimalEvent);
             }
             schedule.addArc(new Arc(currScheduledState, nextScheduledState, currOptimalEvent));
-            
+
             currScheduledState = nextScheduledState;
             
             // If all the states that build up the current state are accepting, make the composed state accepting too
             boolean isAccepting = true;
             for (int i=0; i<theAutomata.size(); i++)
             {
-                if (! theAutomata.getAutomatonAt(i).getStateWithIndex(currComposedStateIndices[i]).isAccepting())
+                if (! indexMap.getStateAt(indexMap.getAutomatonAt(i), currComposedStateIndices[i]).isAccepting())
                     isAccepting = false;
             }
-            
+
             if (isAccepting)
             {
                 if (smallestTime != makespan)
@@ -349,7 +352,7 @@ public class Milp
                 currScheduledState.setName(currScheduledState.getName() + ";  makespan = " + makespan);
             }
         }
-        
+
         // A dummy reset-event that returns the schedule automaton from its accepting
         // to its initial state. Needed to describe repetitive working cycles...
         String resetEventName = "reset";
@@ -358,22 +361,21 @@ public class Milp
             resetEventName += "1";
         }
         LabeledEvent resetEvent = new LabeledEvent(resetEventName);
-        
+
         // The reset event brings the schedule to its initial state...
         schedule.getAlphabet().addEvent(resetEvent);
         schedule.addArc(new Arc(currScheduledState, schedule.getInitialState(), resetEvent));
-        
+
         // ...But then also the participating plants should have this event in their initial states
         for (Automaton plantAuto : theAutomata.getPlantAutomata())
         {
             plantAuto.addArc(new Arc(plantAuto.getInitialState(), plantAuto.getInitialState(), resetEvent));
         }
         
-        
         String str = "Time to build the schedule: " + timer.elapsedTime() + "ms ";
         logger.info(str);
         outputStr += "\t" + str;
-        
+
         addAutomatonToGui(schedule);
     }
     
@@ -401,6 +403,9 @@ public class Milp
         
         initAutomata();
         initMutexStates();
+
+		// prec_temp
+// 		initOtherSpecs();
     }
     
     
@@ -507,6 +512,18 @@ public class Milp
         theAutomata = new Automata(robots, true);
         theAutomata.addAutomata(zones);
         indexMap = new AutomataIndexMap(theAutomata);
+
+		// prec_temp
+// 		specs = new Automata();
+// 		for (Iterator<Automaton> zit = zones.iterator(); zit.hasNext(); )
+// 		{
+// 			Automaton zone = zit.next();
+// 			if (!zone.getName().contains("Zone"))
+// 			{
+// 				specs.addAutomaton(zone);
+// 				zones.removeAutomaton(zone);
+// 			}
+// 		}
     }
     
     private void initMutexStates()
@@ -530,23 +547,39 @@ public class Milp
         for (int i=0; i<zones.size(); i++)
         {
             Automaton currZone = zones.getAutomatonAt(i);
+// logger.error("Examining " + currZone.getName());
             
             // 			ArrayList[] bookUnbookStatePairIndices = new ArrayList[robots.size()];
             
             for (int j=0; j<robots.size(); j++)
             {
                 Automaton currRobot = robots.getAutomatonAt(j);
-                
+// logger.error("Examining " + currRobot.getName());                
                 // 				Alphabet commonAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getAlphabet());
                 
                 Alphabet bookingAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getInitialState().activeEvents(false));
-                
+
+//temp
+// logger.info("booking events = ");
+// for (Iterator<LabeledEvent> it = bookingAlphabet.iterator(); it.hasNext(); )
+// {
+// 	LabeledEvent cev = it.next();
+// 	logger.info("\t" + cev.getName());
+// }
+
                 if (bookingAlphabet.size() > 0)
                 {
                     Alphabet unbookingAlphabet = AlphabetHelpers.minus(AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getAlphabet()), bookingAlphabet);
+
+//temp
+// logger.info("unbooking events = ");
+// for (Iterator<LabeledEvent> it = unbookingAlphabet.iterator(); it.hasNext(); )
+// {
+// 	LabeledEvent cev = it.next();
+// 	logger.info("\t" + cev.getName());
+// }
                     
-                    // 					bookUnbookStatePairIndices[j] = new ArrayList<int[]>();
-                    
+                                    
                     ArrayList<State> bookingStates = new ArrayList<State>();
                     ArrayList<State> unbookingStates = new ArrayList<State>();
                     
@@ -557,7 +590,6 @@ public class Milp
                         Alphabet currStatesBookingAlphabet = AlphabetHelpers.intersect(currState.activeEvents(false), bookingAlphabet);
                         for (Iterator<LabeledEvent> currBookingEventsIter = currStatesBookingAlphabet.iterator(); currBookingEventsIter.hasNext(); )
                         {
-                            // 							bookingStates.add(new int[]{indexMap.getStateIndex(currRobot, currState), indexMap.getEventIndex(currBookingEventsIter.next())});
                             ArrayList<State> possibleUnbookingStates = new ArrayList<State>();
                             
                             possibleUnbookingStates.add(currState.nextState(currBookingEventsIter.next()));
@@ -593,10 +625,25 @@ public class Milp
                         throw new Exception(exceptionStr);
                     }
                     
+					//temp
+// 					logger.warn(currZone.getName() + " & " + currRobot.getName() + " has " + bookingTics[i][j].length + " tics");
+
                     bookingTics[i][j] = new int[bookingStates.size()];
                     unbookingTics[i][j] = new int[unbookingStates.size()];
                     for (int k=0; k<bookingStates.size(); k++)
                     {
+						//temp
+// 						State bst = bookingStates.get(k);
+// 						if (bst != null)
+// 							logger.info("book_" + k + ": " + bst.getName());
+// 						else
+// 							logger.info("book_" + k + ": NULL");
+// 						State ubst = unbookingStates.get(k);
+// 						if (ubst != null)
+// 							logger.info("unbook_" + k + ": " + ubst.getName());
+// 						else
+// 							logger.info("unbook_" + k + ": NULL");
+
                         bookingTics[i][j][k] = indexMap.getStateIndex(currRobot, bookingStates.get(k));
                         unbookingTics[i][j][k] = indexMap.getStateIndex(currRobot, unbookingStates.get(k));
                     }
@@ -605,140 +652,184 @@ public class Milp
         }
     }
     
-    private void initMutexStates2()
-    throws Exception
-    {
-        bookingTics = new int[zones.size()][robots.size()][1];
-        unbookingTics = new int[zones.size()][robots.size()][1];
+//     private void initMutexStates2()
+//     throws Exception
+//     {
+//         bookingTics = new int[zones.size()][robots.size()][1];
+//         unbookingTics = new int[zones.size()][robots.size()][1];
         
-        // Initializing all book/unbook-state indices to -1.
-        // The ones that remain -1 at the output of this method correspond
-        // to non-conflicting robot-zone-pairs.
-        for (int i=0; i<zones.size(); i++)
-        {
-            for (int j=0; j<robots.size(); j++)
-            {
-                bookingTics[i][j][0] = -1;
-                unbookingTics[i][j][0] = -1;
-            }
-        }
+//         // Initializing all book/unbook-state indices to -1.
+//         // The ones that remain -1 at the output of this method correspond
+//         // to non-conflicting robot-zone-pairs.
+//         for (int i=0; i<zones.size(); i++)
+//         {
+//             for (int j=0; j<robots.size(); j++)
+//             {
+//                 bookingTics[i][j][0] = -1;
+//                 unbookingTics[i][j][0] = -1;
+//             }
+//         }
         
-        for (int i=0; i<zones.size(); i++)
-        {
-            State initial = zones.getAutomatonAt(i).getInitialState();
+//         for (int i=0; i<zones.size(); i++)
+//         {
+//             State initial = zones.getAutomatonAt(i).getInitialState();
             
-            for (Iterator<MultiArc> bookingMultiArcs = initial.outgoingMultiArcIterator(); bookingMultiArcs.hasNext(); )
-            {
-                Alphabet bookingAlphabet = new Alphabet();
-                Alphabet unbookingAlphabet = new Alphabet();
+//             for (Iterator<MultiArc> bookingMultiArcs = initial.outgoingMultiArcIterator(); bookingMultiArcs.hasNext(); )
+//             {
+//                 Alphabet bookingAlphabet = new Alphabet();
+//                 Alphabet unbookingAlphabet = new Alphabet();
                 
-                MultiArc currBookingMultiArc = bookingMultiArcs.next();
+//                 MultiArc currBookingMultiArc = bookingMultiArcs.next();
                 
-                // Adding booking event for each set of arcs i.e. for each book-state of the zone-specification
-                for (Iterator<Arc> bookingArcs = currBookingMultiArc.iterator(); bookingArcs.hasNext(); )
-                {
-                    bookingAlphabet.addEvent(bookingArcs.next().getEvent());
-                }
+//                 // Adding booking event for each set of arcs i.e. for each book-state of the zone-specification
+//                 for (Iterator<Arc> bookingArcs = currBookingMultiArc.iterator(); bookingArcs.hasNext(); )
+//                 {
+//                     bookingAlphabet.addEvent(bookingArcs.next().getEvent());
+//                 }
                 
-                for (Iterator<MultiArc> unbookingMultiArcs = currBookingMultiArc.getToState().outgoingMultiArcIterator(); unbookingMultiArcs.hasNext(); )
-                {
-                    MultiArc currUnbookingMultiArc = unbookingMultiArcs.next();
+//                 for (Iterator<MultiArc> unbookingMultiArcs = currBookingMultiArc.getToState().outgoingMultiArcIterator(); unbookingMultiArcs.hasNext(); )
+//                 {
+//                     MultiArc currUnbookingMultiArc = unbookingMultiArcs.next();
                     
-                    if (currUnbookingMultiArc.getToState().equals(initial))
-                    {
-                        for (Iterator<Arc> unbookingArcs = currUnbookingMultiArc.iterator(); unbookingArcs.hasNext(); )
-                        {
-                            unbookingAlphabet.addEvent(unbookingArcs.next().getEvent());
-                        }
+//                     if (currUnbookingMultiArc.getToState().equals(initial))
+//                     {
+//                         for (Iterator<Arc> unbookingArcs = currUnbookingMultiArc.iterator(); unbookingArcs.hasNext(); )
+//                         {
+//                             unbookingAlphabet.addEvent(unbookingArcs.next().getEvent());
+//                         }
                         
-                        break;
-                    }
-                }
+//                         break;
+//                     }
+//                 }
                 
-                // The robot set is searched for the states from which the above book/unbook events can be fired
-                for (int j=0; j<robots.size(); j++)
-                {
-                    ArrayList<State> bookingStates = new ArrayList<State>();
-                    ArrayList<State> unbookingStates = new ArrayList<State>();
-                    Automaton currRobot = robots.getAutomatonAt(j);
+//                 // The robot set is searched for the states from which the above book/unbook events can be fired
+//                 for (int j=0; j<robots.size(); j++)
+//                 {
+//                     ArrayList<State> bookingStates = new ArrayList<State>();
+//                     ArrayList<State> unbookingStates = new ArrayList<State>();
+//                     Automaton currRobot = robots.getAutomatonAt(j);
                     
                     
-                    // The following is done only for the robot that contains the corresponding unbooking-event
-                    Alphabet currRobotZoneIntersectionAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), unbookingAlphabet);
-                    if (currRobotZoneIntersectionAlphabet.nbrOfEvents() > 0)
-                    {
-                        // States that can lead directly to unbooking-events are found
-                        for (Iterator<Arc> robotArcs = currRobot.arcIterator(); robotArcs.hasNext(); )
-                        {
-                            Arc currArc = robotArcs.next();
+//                     // The following is done only for the robot that contains the corresponding unbooking-event
+//                     Alphabet currRobotZoneIntersectionAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), unbookingAlphabet);
+//                     if (currRobotZoneIntersectionAlphabet.nbrOfEvents() > 0)
+//                     {
+//                         // States that can lead directly to unbooking-events are found
+//                         for (Iterator<Arc> robotArcs = currRobot.arcIterator(); robotArcs.hasNext(); )
+//                         {
+//                             Arc currArc = robotArcs.next();
                             
-                            if (currRobotZoneIntersectionAlphabet.contains(currArc.getLabel()))
-                                unbookingStates.add(currArc.getFromState());
-                        }
+//                             if (currRobotZoneIntersectionAlphabet.contains(currArc.getLabel()))
+//                                 unbookingStates.add(currArc.getFromState());
+//                         }
                         
-                        // For each "unbooking"-state, a search up the robot is done until corresponding
-                        // "booking"-states are found. Note that one "u"-state can correspond to several "b"-states.
-                        for (int k=0; k<unbookingStates.size(); k++)
-                        {
-                            // If there are alternative paths to the current state, several booking states will be found.
-                            // They should be matched by equal number of unbooking states.
-                            int alternativeBookings = 0;
+//                         // For each "unbooking"-state, a search up the robot is done until corresponding
+//                         // "booking"-states are found. Note that one "u"-state can correspond to several "b"-states.
+//                         for (int k=0; k<unbookingStates.size(); k++)
+//                         {
+//                             // If there are alternative paths to the current state, several booking states will be found.
+//                             // They should be matched by equal number of unbooking states.
+//                             int alternativeBookings = 0;
                             
-                            ArrayList<State> upstreamStates = new ArrayList<State>();
-                            upstreamStates.add(unbookingStates.get(k));
+//                             ArrayList<State> upstreamStates = new ArrayList<State>();
+//                             upstreamStates.add(unbookingStates.get(k));
                             
-                            while (!upstreamStates.isEmpty())
-                            {
-                                State currState = upstreamStates.remove(0);
+//                             while (!upstreamStates.isEmpty())
+//                             {
+//                                 State currState = upstreamStates.remove(0);
                                 
-                                // Every roadsplit is an alternative.
-                                alternativeBookings += (currState.nbrOfIncomingArcs() - 1);
+//                                 // Every roadsplit is an alternative.
+//                                 alternativeBookings += (currState.nbrOfIncomingArcs() - 1);
                                 
-                                for (Iterator<Arc> incomingArcs = currState.incomingArcsIterator(); incomingArcs.hasNext(); )
-                                {
-                                    Arc currArc = incomingArcs.next();
+//                                 for (Iterator<Arc> incomingArcs = currState.incomingArcsIterator(); incomingArcs.hasNext(); )
+//                                 {
+//                                     Arc currArc = incomingArcs.next();
                                     
-                                    // If we hit the booking event, then add the state that fires it to the "bookingStates"
-                                    if (bookingAlphabet.contains(currArc.getLabel()))
-                                    {
-                                        bookingStates.add(currArc.getFromState());
-                                    }
-                                    else
-                                        upstreamStates.add(currArc.getFromState());
-                                }
+//                                     // If we hit the booking event, then add the state that fires it to the "bookingStates"
+//                                     if (bookingAlphabet.contains(currArc.getLabel()))
+//                                     {
+//                                         bookingStates.add(currArc.getFromState());
+//                                     }
+//                                     else
+//                                         upstreamStates.add(currArc.getFromState());
+//                                 }
                                 
-                                // A copy of the current unbooking state is added for every alternative path
-                                // between the unbook state and the book states.
-                                for (int l=0; l<alternativeBookings; l++)
-                                    unbookingStates.add(k, unbookingStates.get(k));
-                            }
-                        }
+//                                 // A copy of the current unbooking state is added for every alternative path
+//                                 // between the unbook state and the book states.
+//                                 for (int l=0; l<alternativeBookings; l++)
+//                                     unbookingStates.add(k, unbookingStates.get(k));
+//                             }
+//                         }
                         
-                        bookingTics[i][j] = new int[bookingStates.size()];
-                        unbookingTics[i][j] = new int[unbookingStates.size()];
+//                         bookingTics[i][j] = new int[bookingStates.size()];
+//                         unbookingTics[i][j] = new int[unbookingStates.size()];
                         
-                        if (bookingTics[i][j].length != unbookingTics[i][j].length)
-                        {
-                            String exceptionStr = "The numbers of book/unbook-states do not correspond. Something is wrong....\n";
-                            exceptionStr += "nr_book_states[" + i + "][" + j + "] = " + bookingTics[i][j].length + "\n";
-                            exceptionStr += "nr_unbook_states[" + i + "][" + j + "] = " + unbookingTics[i][j].length + "\n";
+//                         if (bookingTics[i][j].length != unbookingTics[i][j].length)
+//                         {
+//                             String exceptionStr = "The numbers of book/unbook-states do not correspond. Something is wrong....\n";
+//                             exceptionStr += "nr_book_states[" + i + "][" + j + "] = " + bookingTics[i][j].length + "\n";
+//                             exceptionStr += "nr_unbook_states[" + i + "][" + j + "] = " + unbookingTics[i][j].length + "\n";
                             
-                            throw new Exception(exceptionStr);
-                        }
+//                             throw new Exception(exceptionStr);
+//                         }
                         
-                        for (int k=0; k<bookingTics[i][j].length; k++)
-                        {
-                            bookingTics[i][j][k] = indexMap.getStateIndex(currRobot, bookingStates.get(k));
-                            unbookingTics[i][j][k] = indexMap.getStateIndex(currRobot, unbookingStates.get(k));
-                        }
+//                         for (int k=0; k<bookingTics[i][j].length; k++)
+//                         {
+//                             bookingTics[i][j][k] = indexMap.getStateIndex(currRobot, bookingStates.get(k));
+//                             unbookingTics[i][j][k] = indexMap.getStateIndex(currRobot, unbookingStates.get(k));
+//                         }
                         
-                        // This assumes that each zone-event is used by exactly one robot
-                        break;
-                    }
-                }
-            }
-        }
-    }
+//                         // This assumes that each zone-event is used by exactly one robot
+//                         break;
+//                     }
+//                 }
+//             }
+//         }
+//     }
+
+	// prec_temp
+// 	private void initOtherSpecs()
+// 	{
+// 		logger.warn("In the others....");
+// 		for (int i=0; i<specs.size(); i++)
+//         {
+//             Automaton currSpec = specs.getAutomatonAt(i);
+// 			logger.warn("Examining " + currSpec.getName());  
+
+// 			if (!currSpec.getInitialState().isAccepting())
+// 			{
+// 				for (Iterator<State> specStateIt = currSpec.stateIterator(); specStateIt.hasNext(); )
+// 				{
+// 					State currSpecState = specStateIt.next();
+// 					if (!currSpecState.isAccepting())
+// 					{
+// 						for (int j=0; j<robots.size(); j++)
+// 						{
+// 							Automaton currRobot = robots.getAutomatonAt(j);		
+// 							Alphabet commonActiveAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), currSpecState.activeEvents(false));
+// 							logger.warn("Searching for outgoing events in " + currRobot.getName());
+// 							if (commonActiveAlphabet.size() > 0)
+// 							{
+// 								logger.info("HIT...");
+// 								for (Iterator<LabeledEvent> eventIt = commonActiveAlphabet.iterator(); eventIt.hasNext(); )
+// 								{
+// 									LabeledEvent currEvent = eventIt.next();
+// 									for (Iterator <State> robotStateIt = currRobot.stateIterator(); robotStateIt.hasNext(); )
+// 									{
+// 										State currRobotState = robotStateIt.next();
+// 										if (currRobotState.activeEvents(false).contains(currEvent))
+// 										{
+// 											logger.info("Found " + currEvent.getName() + " out from " + currRobotState.getName()); 
+// 										}
+// 									}
+// 								}
+// 							}
+// 						}
+// 					}
+// 				}
+// 			}
+//         }
+// 	}
     
     
     /****************************************************************************************/
@@ -951,14 +1042,14 @@ public class Milp
                                 
                                 mutexConstraints += "mutex_Z" + i + "_R" + j1 + "_R" + j2 + "_var" + repeatedBooking + " : time[" + j1 + ", " + bookingTics[i][j1][k1] + "] >= " + "time[" + j2 + ", " + unbookingTics[i][j2][k2] + "] - bigM*" + currMutexVariable + " + " + epsilon;
                                 
-                                String pathCutEnsurance = pathCutTable.get(robots.getAutomatonAt(j1).getStateWithIndex(k1));
+                                String pathCutEnsurance = pathCutTable.get(indexMap.getStateAt(robots.getAutomatonAt(j1), k1));
                                 if (pathCutEnsurance != null)
                                 {
                                     mutexConstraints += " - bigM*" + pathCutEnsurance;
                                 }
                                 mutexConstraints += ";\n";
                                 mutexConstraints += "dual_mutex_Z" + i + "_R" + j1 + "_R" + j2  + "_var" + repeatedBooking + " : time[" + j2 + ", " + bookingTics[i][j2][k2] + "] >= " + "time[" + j1 + ", " + unbookingTics[i][j1][k1] + "] - bigM*(1 - " + currMutexVariable + ")" + " + " + epsilon;
-                                pathCutEnsurance = pathCutTable.get(robots.getAutomatonAt(j2).getStateWithIndex(k2));
+                                pathCutEnsurance = pathCutTable.get(indexMap.getStateAt(robots.getAutomatonAt(j2), k2));
                                 if (pathCutEnsurance != null)
                                 {
                                     mutexConstraints += " - bigM*" + pathCutEnsurance;
@@ -1211,9 +1302,9 @@ public class Milp
         
         for (int i=0; i<theAutomata.size() - 1; i++)
         {
-            stateName += theAutomata.getAutomatonAt(i).getStateWithIndex(stateIndices[i]).getName() + ".";
+            stateName += indexMap.getStateAt(indexMap.getAutomatonAt(i), stateIndices[i]).getName() + ".";
         }
-        stateName += theAutomata.getAutomatonAt(theAutomata.size()-1).getStateWithIndex(stateIndices[theAutomata.size()-1]).getName() + "]";
+        stateName += indexMap.getStateAt(indexMap.getAutomatonAt(theAutomata.size()-1), stateIndices[theAutomata.size()-1]).getName() + "]";
         
         State scheduledState = new State(stateName);
         
