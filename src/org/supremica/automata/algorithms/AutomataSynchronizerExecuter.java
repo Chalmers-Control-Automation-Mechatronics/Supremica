@@ -969,11 +969,11 @@ public final class AutomataSynchronizerExecuter
 						// Make sure the initial state gets number 0
 						if (AutomataIndexFormHelper.isInitial(currState))
 						{
-							newState = new CompositeState("q0", currState, helper.getAutomata());
+							newState = new CompositeState("q0", currState, helper);
 						}
 						else
 						{
-							newState = new CompositeState("q" + stateNumber++, currState, helper.getAutomata());
+							newState = new CompositeState("q" + stateNumber++, currState, helper);
 						}
 					}
 					else
@@ -993,7 +993,7 @@ public final class AutomataSynchronizerExecuter
 						sb.setLength(sb.length() - options.getStateNameSeparator().length());
 
 						// Create state
-						newState = new CompositeState(sb.toString(), currState, helper.getAutomata());
+						newState = new CompositeState(sb.toString(), currState, helper);
 					}
 
 					// Set some attributes of the state

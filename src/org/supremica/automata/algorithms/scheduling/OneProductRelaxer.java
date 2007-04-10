@@ -54,7 +54,9 @@ public class OneProductRelaxer
                 markedState = stateIt.next();
                 
                 if (markedState.isAccepting())
+				{
                     break;
+				}
             }
             
             if (! markedState.isAccepting())
@@ -76,7 +78,7 @@ public class OneProductRelaxer
 			}
             else
             {
-                remainingCosts[i][markedState.getIndex()] = markedState.getCost();
+                remainingCosts[i][expander.getIndexMap().getStateIndex(theAuto, markedState)] = markedState.getCost();
                 
                 estList.add(markedState);
                 
@@ -89,19 +91,21 @@ public class OneProductRelaxer
                         Arc currArc = incomingArcIterator.next();
                         State currState = currArc.getFromState();
                         State nextState = currArc.getToState();
+						int currStateIndex = expander.getIndexMap().getStateIndex(theAuto, currState);
+						int nextStateIndex = expander.getIndexMap().getStateIndex(theAuto, nextState);
                         
-                        if (remainingCosts[i][currState.getIndex()] == -1)
+                        if (remainingCosts[i][currStateIndex] == -1)
                         {
-                            remainingCosts[i][currState.getIndex()] = remainingCosts[i][nextState.getIndex()] + nextState.getCost();
+                            remainingCosts[i][currStateIndex] = remainingCosts[i][nextStateIndex] + nextState.getCost();
                             estList.add(currState);
                         }
                         else
                         {
-                            double newRemainingCost = nextState.getCost() + remainingCosts[i][nextState.getIndex()];
+                            double newRemainingCost = nextState.getCost() + remainingCosts[i][nextStateIndex];
                             
-                            if (newRemainingCost < remainingCosts[i][currState.getIndex()])
+                            if (newRemainingCost < remainingCosts[i][currStateIndex])
                             {
-                                remainingCosts[i][currState.getIndex()] = newRemainingCost;
+                                remainingCosts[i][currStateIndex] = newRemainingCost;
                                 estList.add(currState);
                             }
                         }

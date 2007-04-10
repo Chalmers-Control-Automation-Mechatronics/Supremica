@@ -89,7 +89,7 @@ public class TwoProductsRelaxer
 					activePlantsAlphabet.addEvents(secondRelaxationPlantAutomaton.getAlphabet());
 					for (int k=0; k<theAutomata.size(); k++)
 					{
-						Automaton specAutomaton = theAutomata.getAutomatonAt(k);
+						Automaton specAutomaton = expander.getIndexMap().getAutomatonAt(k);
 						if (specAutomaton.isSpecification())
 						{
 // 							specAutomaton.getInitialState().setInitial(false);
@@ -99,7 +99,7 @@ public class TwoProductsRelaxer
 							int initialStateIndex = specAutomaton.getInitialState().getIndex();
 							if (node[k] != initialStateIndex)
 							{
-								for (Iterator<Arc> outgoingArcs = specAutomaton.getStateWithIndex((int)node[k]).outgoingArcsIterator(); outgoingArcs.hasNext();)
+								for (Iterator<Arc> outgoingArcs = expander.getIndexMap().getStateAt(specAutomaton, (int)node[k]).outgoingArcsIterator(); outgoingArcs.hasNext();)
 								{
 									LabeledEvent currEvent = outgoingArcs.next().getEvent();
 									if (!activePlantsAlphabet.contains(currEvent))

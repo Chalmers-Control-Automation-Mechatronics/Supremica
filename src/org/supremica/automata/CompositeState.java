@@ -50,6 +50,7 @@
 package org.supremica.automata;
 
 import java.util.*;
+import org.supremica.automata.algorithms.AutomataSynchronizerHelper;
 import org.supremica.log.*;
 
 public class CompositeState
@@ -63,7 +64,7 @@ public class CompositeState
     
     /** The costs corresponding to the underlying states */
     private double[] compositeCosts = null;
-    
+
     /**
      * The current costs in this state (only important in a composite state).
      * Depend on which automaton is to be fired as well as the path to this state.
@@ -82,29 +83,28 @@ public class CompositeState
         super(name);
     }
     
-    public CompositeState(int[] indices, Automata compositeAutomata)
+    public CompositeState(int[] indices, AutomataSynchronizerHelper helper)
     {
-        this("non_def", indices, compositeAutomata);
+        this("non_def", indices, helper);
     }
     
-    public CompositeState(String name, int[] indices, Automata compositeAutomata)
+    public CompositeState(String name, int[] indices, AutomataSynchronizerHelper helper)
     {
         this(name);
         
         //setOwnerAutomaton(ownerAutomaton);
-        initialize(indices, compositeAutomata);
+        initialize(indices, helper);
     }
     
-    public void initialize(int[] indices, Automata theAutomata)
+    public void initialize(int[] indices, AutomataSynchronizerHelper helper)
     {
         composingStates = new ArrayList();
         
         // -2 since the last two indices correspond to something funny, not the nbrs of the underlying states.
         for (int i = 0; i < indices.length - 2; i++)
         {            
-            //Behövs pgs nån bugg
-            theAutomata.getAutomatonAt(i).remapStateIndices();
-            initComposingStates(theAutomata.getAutomatonAt(i).getStateWithIndex(indices[i]));
+			//             theAutomata.getAutomatonAt(i).remapStateIndices();
+            initComposingStates(helper.getIndexMap().getStateAt(helper.getAutomata().getAutomatonAt(i), indices[i]));
         }
         
         initCosts();

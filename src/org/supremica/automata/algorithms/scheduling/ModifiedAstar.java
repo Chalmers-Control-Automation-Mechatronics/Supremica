@@ -86,6 +86,10 @@ public class ModifiedAstar
     /** Handles the expansion of nodes - either manually or using Supremicas methods */
     protected NodeExpander expander;
 
+	/** Responsible for correct indexing of automata, states and events */
+	protected AutomataIndexMap indexMap;
+		
+
 	/** Is responsible for the correct relaxation/estimation that guides the A* search */
 	protected Relaxer relaxer;
     
@@ -304,6 +308,9 @@ public class ModifiedAstar
 		// the synchronized states. 
         expander = new NodeExpander(manualExpansion, theAutomata, this);
 
+	    // Fetches the AutomataIndexMap from the NodeExpander
+		indexMap = expander.getIndexMap();
+
 		// Creates an instance of the relaxation class (search guidance), as 
 		// specified by the user through the GUI.
         initRelaxer(); 
@@ -313,7 +320,7 @@ public class ModifiedAstar
         keyMapping[0] = 1;
         for (int i=1; i<keyMapping.length; i++)
         {
-            keyMapping[i] = keyMapping[i-1] * (theAutomata.getAutomatonAt(i-1).nbrOfStates() + 1);
+            keyMapping[i] = keyMapping[i-1] * (indexMap.getAutomatonAt(i-1).nbrOfStates() + 1);
         }
         
         outputStr = "Processing times:\n";
@@ -334,7 +341,7 @@ public class ModifiedAstar
         activeAutomataIndex = new int[plantAutomata.size()];
         for (int i=0; i<activeAutomataIndex.length; i++)
         {
-            activeAutomataIndex[i] = theAutomata.getAutomatonIndex(plantAutomata.getAutomatonAt(i));
+            activeAutomataIndex[i] = indexMap.getAutomatonIndex(plantAutomata.getAutomatonAt(i));
         }
         
         PARENT_INDEX = theAutomata.size() + AutomataIndexFormHelper.STATE_EXTRA_DATA;
@@ -427,33 +434,34 @@ public class ModifiedAstar
      */
     protected double[] makeInitialNodeBasis()
     {
-        int[] initialStates = AutomataIndexFormHelper.createState(theAutomata.size());
-        double[] initialCosts = new double[getActiveLength() + 2];
+		return expander.makeInitialNodeBasis();
+  //       int[] initialStates = AutomataIndexFormHelper.createState(theAutomata.size());
+//         double[] initialCosts = new double[getActiveLength() + 2];
         
-        int nrOfPlants = plantAutomata.size();
+//         int nrOfPlants = plantAutomata.size();
         
-        // Initial state indices are stored
-        for (int i=0; i<theAutomata.size(); i++)
-        {
-            initialStates[i] = theAutomata.getAutomatonAt(i).getInitialState().getIndex();
-        }
+//         // Initial state indices are stored
+//         for (int i=0; i<theAutomata.size(); i++)
+//         {
+//             initialStates[i] = theAutomata.getAutomatonAt(i).getInitialState().getIndex();
+//         }
         
-        // Initial state costs are stored
-        for (int i=0; i<nrOfPlants; i++)
-        {
-            initialCosts[i] = plantAutomata.getAutomatonAt(i).getInitialState().getCost();
-        }
+//         // Initial state costs are stored
+//         for (int i=0; i<nrOfPlants; i++)
+//         {
+//             initialCosts[i] = plantAutomata.getAutomatonAt(i).getInitialState().getCost();
+//         }
         
-        // The initial accumulated cost is zero
-        initialCosts[nrOfPlants] = 0;
+//         // The initial accumulated cost is zero
+//         initialCosts[nrOfPlants] = 0;
         
-        // The initial estimate is set to -1
-        initialCosts[nrOfPlants + 1] = -1;
+//         // The initial estimate is set to -1
+//         initialCosts[nrOfPlants + 1] = -1;
         
-        // The NodeExpander combines the information, together with the parent-information,
-        // which is null for the initial state.
-		// 		return expander.makeNode(initialStates, null, initialCosts);
-        return expander.makeNodeBasis(initialStates, -1, initialCosts);
+//         // The NodeExpander combines the information, together with the parent-information,
+//         // which is null for the initial state.
+// 		// 		return expander.makeNode(initialStates, null, initialCosts);
+//         return expander.makeNodeBasis(initialStates, -1, initialCosts);
     }
 
 	/**
@@ -580,11 +588,6 @@ public class ModifiedAstar
         
         if (currNode == null || ! isAcceptingNode(currNode))
         {
-            // 			if (currNode != null)
-            // 				logger.error("currnode = " + printArray(currNode) + "; activeAutomataIndex = " + printArray(activeAutomataIndex));
-            
-            // 			for (Iterator<int[]> it = closedTree.values().iterator(); it.hasNext(); )
-            // 				logger.info("e_cl : " + printArray(it.next()));
             throw new RuntimeException("An accepting state could not be found, nr of iterations = " + iterationCounter);
         }
 
@@ -597,17 +600,7 @@ public class ModifiedAstar
         if (!isRelaxationProvider)
         {
             logger.info(outputStr);
-            
-            // 			for (Iterator<int[]> closedsIt = closedTree.values().iterator(); closedsIt.hasNext();)
-            // 			{
-            // 				int[] node = closedsIt.next();
-            // 				logger.warn("cl: " + printArray(node));
-            // 			}
         }
-        // 		else
-        // 		{
-        // 			logger.info(printArray(currNode) + " n�dd; kostnad = " + currNode[ACCUMULATED_COST_INDEX]);
-        // 		}
         
         schedulingDone = true;
 
@@ -625,7 +618,7 @@ public class ModifiedAstar
         try
         {
             boolean currNodeIsAddedToClosed = updateClosedTree(currNode);
-            
+
             if (currNodeIsAddedToClosed)
             {
                 // tillf (test)
@@ -659,7 +652,7 @@ public class ModifiedAstar
                 while (childIter.hasNext())
                 {
                     Node nextNode = (Node)childIter.next();
-                    
+
                     // Calculate the estimate function of the expanded node and store it at the appropriate position
                     nextNode.setValueAt(ESTIMATE_INDEX, calcEstimatedCost(nextNode));
                     
@@ -981,7 +974,7 @@ public class ModifiedAstar
         Automaton scheduleAuto = new Automaton();
         scheduleAuto.setComment("Schedule");
         
-        State nextState = makeStateFromNode(acceptingNode, scheduleAuto);
+        State nextState = makeStateFromNode(acceptingNode, scheduleAuto, -1);
         nextState.setAccepting(true);
         scheduleAuto.addState(nextState);
         
@@ -994,7 +987,7 @@ public class ModifiedAstar
                 if (isRunning)
                 {
                     Node parent = getParent(currNode);
-                    State currState = makeStateFromNode(parent, scheduleAuto);
+                    State currState = makeStateFromNode(parent, scheduleAuto, currNode.getValueAt(ACCUMULATED_COST_INDEX));
                     LabeledEvent event = findConnectingEvent(parent, currNode);
                     
                     if (!hasParent(parent))
@@ -1040,9 +1033,14 @@ public class ModifiedAstar
 	/**
 	 * Creates a state, maiking sure that a unique name is given to the new state.
 	 */
-	protected State makeStateFromNode(Node node, Automaton auto)
+	protected State makeStateFromNode(Node node, Automaton auto, double firingTime)
 	{
-		String stateName = printNodeName(node) + "; firing_time = " + node.getValueAt(ACCUMULATED_COST_INDEX);
+		String timeStr = "; firing_time = " + firingTime;
+		if (firingTime == -1)
+		{
+			timeStr = "; cycle_time = " + node.getValueAt(ACCUMULATED_COST_INDEX);
+		}
+		String stateName = printNodeName(node) + timeStr;
 		
 		while (auto.containsStateWithName(stateName))
 		{
@@ -1100,7 +1098,7 @@ public class ModifiedAstar
                     
                     // The new cost (after update) is equal to the cost of the state that is changed
                     // during the transition, i.e. the state corresponding to the firing robot.
-                    newStateCost = theAutomata.getAutomatonAt(currIndex).getStateWithIndex((int)node.getValueAt(currIndex)).getCost();
+                    newStateCost = indexMap.getStateAt(indexMap.getAutomatonAt(currIndex), (int)node.getValueAt(currIndex)).getCost();
                     
                     break;
                 }
@@ -1186,8 +1184,8 @@ public class ModifiedAstar
         {
             if (fromNode.getValueAt(i) != toNode.getValueAt(i))
             {
-                Automaton auto = theAutomata.getAutomatonAt(i);
-                return auto.getLabeledEvent(auto.getStateWithIndex((int)fromNode.getValueAt(i)), auto.getStateWithIndex((int)toNode.getValueAt(i)));
+                Automaton auto = indexMap.getAutomatonAt(i);
+                return auto.getLabeledEvent(indexMap.getStateAt(auto, (int)fromNode.getValueAt(i)), indexMap.getStateAt(auto, (int)toNode.getValueAt(i)));
             }
         }
         
@@ -1210,9 +1208,9 @@ public class ModifiedAstar
         {
             if (fromNode.getValueAt(i) != toNode.getValueAt(i))
             {
-                Automaton auto = theAutomata.getAutomatonAt(i);
-				State fromState = auto.getStateWithIndex((int)fromNode.getValueAt(i));
-				State toState = auto.getStateWithIndex((int)toNode.getValueAt(i));
+                Automaton auto = indexMap.getAutomatonAt(i);
+				State fromState = indexMap.getStateAt(auto, (int)fromNode.getValueAt(i));
+				State toState = indexMap.getStateAt(auto, (int)toNode.getValueAt(i));
                 
 				for (Iterator<Arc> arcsIt = fromState.outgoingArcsIterator(); arcsIt.hasNext(); )
 				{
@@ -1330,11 +1328,11 @@ public class ModifiedAstar
     {
         String s = "[";
         
-        for (int i=0; i<theAutomata.size()-1; i++)
+        for (int i=0; i<theAutomata.size(); i++)
         {
-            s += theAutomata.getAutomatonAt(i).getStateWithIndex((int)node.getValueAt(i)) + " ";
+			s += indexMap.getStateAt(indexMap.getAutomatonAt(i), (int)node.getValueAt(i)) + " ";
         }
-        s += theAutomata.getAutomatonAt(theAutomata.size()-1).getStateWithIndex((int)node.getValueAt(theAutomata.size()-1)) + "]";
+		s = s.trim() + "]";
         
         return s;
     }
@@ -1354,8 +1352,9 @@ public class ModifiedAstar
         for (int i=0; i<activeAutomataIndex.length; i++)
         {
             int index = activeAutomataIndex[i];
+			State currState = indexMap.getStateAt(indexMap.getAutomatonAt(index), (int)node.getValueAt(index));
             
-            if (!theAutomata.getAutomatonAt(index).getStateWithIndex((int)node.getValueAt(index)).isAccepting())
+            if (!currState.isAccepting())
             {
                 return false;
             }
@@ -1364,9 +1363,9 @@ public class ModifiedAstar
         // All the specifications should be in their marked states.
         for (int i=0; i<theAutomata.size(); i++)
         {
-            if (theAutomata.getAutomatonAt(i).isSpecification())
+            if (indexMap.getAutomatonAt(i).isSpecification())
             {
-                if (!theAutomata.getAutomatonAt(i).getStateWithIndex((int)node.getValueAt(i)).isAccepting())
+                if (!indexMap.getStateAt(indexMap.getAutomatonAt(i), (int)node.getValueAt(i)).isAccepting())
                 {
                     return false;
                 }
@@ -1517,6 +1516,11 @@ public class ModifiedAstar
 	public NodeExpander getNodeExpander()
 	{
 		return expander;
+	}
+
+	public AutomataIndexMap getIndexMap()
+	{
+		return indexMap;
 	}
 
 	public ScheduleDialog getGui()

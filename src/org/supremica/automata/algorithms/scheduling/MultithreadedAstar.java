@@ -106,6 +106,7 @@ public class MultithreadedAstar
 		relaxer = parentThread.getRelaxer(); 
 		keyMapping = parentThread.getKeyMapping(); 
 		activeAutomataIndex = parentThread.getActiveAutomataIndex();
+		indexMap = parentThread.getIndexMap();
 
 		this.rootNode = rootNode;
 		this.branchingProbality = branchingProbality;
@@ -177,7 +178,7 @@ public class MultithreadedAstar
 				logger.info(outputStr);
 			}
 			
-			schedulingDone = true;				
+			schedulingDone = true;	
 		}
 		else // I.e. if this is a subthread...
 		{
@@ -197,6 +198,7 @@ public class MultithreadedAstar
     {
 		if (openTree == null || openTree.size() == 0)
 		{
+			// Should return -INFINITY in subthreads I believe /AK
 			throw new RuntimeException("The OPEN list is empty, while an accepting state was not found, nr of iterations = " + iterationCounter);
 		}
               
@@ -261,12 +263,13 @@ public class MultithreadedAstar
 					double currEstimatedCost = 0;
 					while (childIter.hasNext())
 					{
-						//TODO... Hur hitta sannolikheten...
 						MultithreadedNode subRootNode = (MultithreadedNode)childIter.next();
 						subRootNode.setValueAt(PARENT_INDEX, ROOT_VALUE);
 
 						Arc connectingArc = findConnectingArc(currNode, subRootNode);
+
 						MultithreadedAstar subthread = new MultithreadedAstar(this, subRootNode, connectingArc.getProbability());
+
 						currNode.addSubthread(subthread);
 						
 						// TODO... Synchronization could be improved 
@@ -275,7 +278,7 @@ public class MultithreadedAstar
 						{
 							sleep(1);
 						}
-			
+
 						currEstimatedCost += subthread.getBranchingProbability() * subthread.step();
 					}
 
@@ -361,17 +364,19 @@ public class MultithreadedAstar
 	private void collectScheduleInfo()
 		throws Exception
 	{
-		Node currNode = acceptingNode;
-
-		scheduleInfo = new ArrayList<Node>();
-
-		while (hasParent(currNode))
-        {
+		if (scheduleInfo == null)
+		{
+			scheduleInfo = new ArrayList<Node>();
+			Node currNode = acceptingNode;
+			
+			while (hasParent(currNode))
+			{
+				scheduleInfo.add(0, currNode);
+				currNode = getParent(currNode);
+			}
+			
 			scheduleInfo.add(0, currNode);
- 			currNode = getParent(currNode);
 		}
-
-		scheduleInfo.add(0, currNode);
 	}
 
 	/**
@@ -416,7 +421,22 @@ public class MultithreadedAstar
 	public String buildScheduleFromArray(ArrayList<Node> scheduleInfo)
 		throws Exception
 	{
-		State currState = makeStateFromNode(scheduleInfo.get(0), scheduleAuto);
+		// Only a state that do not have successors should use -1 
+		// as the firing time. Otherwise, the accumulated time of the
+		// successor is the firing time of the current state.
+		// Note that in case of subthreads, the current state is left 
+		// immediately following some uncontrollable choice event. Thus
+		// firing_time = accumulated_time.
+		double firingTime = -1;
+		if (scheduleInfo.size() > 1)
+		{
+			firingTime = scheduleInfo.get(1).getValueAt(ACCUMULATED_COST_INDEX);
+		}
+		else if (((MultithreadedNode) scheduleInfo.get(0)).getSubthreads() != null)
+		{
+			firingTime = scheduleInfo.get(0).getValueAt(ACCUMULATED_COST_INDEX);
+		}
+		State currState = makeStateFromNode(scheduleInfo.get(0), scheduleAuto, firingTime);
 		String rootName = currState.getName();
 
 		if (scheduleAuto.nbrOfStates() == 0)
@@ -428,7 +448,22 @@ public class MultithreadedAstar
 
 		for (int i=1; i<scheduleInfo.size(); i++)
 		{
-			State nextState = makeStateFromNode(scheduleInfo.get(i), scheduleAuto);
+			// Only a state that do not have successors should use -1 
+			// as the firing time. Otherwise, the accumulated time of the
+			// successor is the firing time of the current state.
+			// Note that in case of subthreads, the current state is left 
+			// immediately following some uncontrollable choice event. Thus
+			// firing_time = accumulated_time.
+			firingTime = -1;
+			if (i < scheduleInfo.size() - 1)
+			{
+				firingTime = scheduleInfo.get(i+1).getValueAt(ACCUMULATED_COST_INDEX);
+			}
+			else if (((MultithreadedNode) scheduleInfo.get(i)).getSubthreads() != null)
+			{
+				firingTime = scheduleInfo.get(i).getValueAt(ACCUMULATED_COST_INDEX);
+			}
+			State nextState = makeStateFromNode(scheduleInfo.get(i), scheduleAuto, firingTime);
 			scheduleAuto.addState(nextState);
 
 			LabeledEvent event = findConnectingEvent(scheduleInfo.get(i-1), scheduleInfo.get(i));

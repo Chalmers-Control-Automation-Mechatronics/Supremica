@@ -28,6 +28,9 @@ public class NodeExpander
 
     /** Contains maps between states and corresponding indices, in order to compress the used memory and speed up operations */
 	protected AutomataIndexForm indexForm;
+
+	/** Responsible for correct indexing of automata, states and events. */
+	protected AutomataIndexMap indexMap;
     
     /** The selected automata to be scheduled */
     protected Automata theAutomata, plantAutomata;
@@ -72,10 +75,10 @@ public class NodeExpander
 		}
 		else 
 		{	   
-			for (int i=0; i<theAutomata.size(); i++)
-			{
-				theAutomata.getAutomatonAt(i).remapStateIndices();
-			}
+// 			for (int i=0; i<theAutomata.size(); i++)
+// 			{
+// 				indexMap.getAutomatonAt(i).remapStateIndices();
+// 			}
 
 			initSpecEventTable();
 		}
@@ -109,7 +112,7 @@ public class NodeExpander
 
 		for (int i=0; i<theAutomata.size(); i++) 
 		{
-			Automaton theAuto = theAutomata.getAutomatonAt(i);
+			Automaton theAuto = indexMap.getAutomatonAt(i);
 	    
 			if (theAuto.isSpecification()) 
 			{
@@ -133,7 +136,7 @@ public class NodeExpander
 			int automatonIndex = activeAutomataIndex[i]; 
 			int stateIndex = (int)node.getValueAt(automatonIndex);
 
-			State st = theAutomata.getAutomatonAt(automatonIndex).getStateWithIndex(stateIndex);
+			State st = indexMap.getStateAt(indexMap.getAutomatonAt(automatonIndex), stateIndex);
 			Iterator<Arc> arcIt = st.outgoingArcsIterator();
 
 			while (arcIt.hasNext()) 
@@ -186,7 +189,7 @@ public class NodeExpander
 				else 
 				{
 					int currSpecIndex = ((Integer)currSpecIndexObj).intValue();
-					Iterator<State> enabledStatesIt = theAutomata.getAutomatonAt(currSpecIndex).statesThatEnableEventIterator(currEvent.getLabel());
+					Iterator<State> enabledStatesIt = indexMap.getAutomatonAt(currSpecIndex).statesThatEnableEventIterator(currEvent.getLabel());
 
 					while (enabledStatesIt.hasNext()) 
 					{
@@ -385,12 +388,14 @@ public class NodeExpander
 			onlineSynchronizer.initialize();
 
 			indexForm = helper.getAutomataIndexForm();
+			//new
+			indexMap = helper.getIndexMap();
 			
 			// Remapping necessary due to some kind of bug (in AutomataIndexForm?)
-			for (int i=0; i<theAutomata.size(); i++)
-			{
-				theAutomata.getAutomatonAt(i).remapStateIndices();
-			}
+// 			for (int i=0; i<theAutomata.size(); i++)
+// 			{
+// 				indexMap.getAutomatonAt(i).remapStateIndices();
+// 			}
 		} 
 		catch (Exception e) 
 		{
@@ -406,7 +411,7 @@ public class NodeExpander
 		int[] currStateIndex = AutomataIndexFormHelper.createState(theAutomata.size());
 		for (int i=0; i<currStateIndex.length; i++)
 		{
-			currStateIndex[i] = (int)node.getValueAt(i);
+ 			currStateIndex[i] = (int)node.getValueAt(i);
 		}
 
 		int[] currOutgoingEvents = onlineSynchronizer.getOutgoingEvents(currStateIndex);
@@ -455,7 +460,7 @@ public class NodeExpander
 							
 							if (!childNodes.contains(currKey)) 
 							{
-								double newCost = plantAutomata.getAutomatonAt(changedIndex).getStateWithIndex(nextStateIndex[activeAutomataIndex[changedIndex]]).getCost();
+								double newCost = indexMap.getStateAt(plantAutomata.getAutomatonAt(changedIndex), nextStateIndex[activeAutomataIndex[changedIndex]]).getCost();
 								double[] newCosts = sched.updateCosts(getCosts(node), changedIndex, newCost);
 								
 								Node newNode = node.emptyClone();
@@ -486,7 +491,7 @@ public class NodeExpander
 						
 						if (!childNodes.contains(currKey)) 
 						{
-							double newCost = plantAutomata.getAutomatonAt(changedIndex).getStateWithIndex(nextStateIndex[activeAutomataIndex[changedIndex]]).getCost();
+							double newCost = indexMap.getStateAt(plantAutomata.getAutomatonAt(changedIndex), nextStateIndex[activeAutomataIndex[changedIndex]]).getCost();
 							double[] newCosts = sched.updateCosts(getCosts(node), changedIndex, newCost);
 							
 							Node newNode = node.emptyClone();
@@ -584,6 +589,49 @@ public class NodeExpander
 	public boolean isUncontrollableEventFound()
 	{
 		return uncontrollableEventFound;
+	}
+
+    /**
+     * Converts the representation of the initial state to the double[]-representation of a node.
+     * double[] node consists of [states.getIndex() AutomataIndexFormHelper-info (-1 0 normally)
+     * parentStates.getIndex() states.getCurrentCost() accumulatedCost estimatedCost].
+     * double[] initialNode is thus [initialStates.getIndex() AutomataIndexFormHelper-info
+     * null initialStates.getCost() 0 -1].
+     */
+    public double[] makeInitialNodeBasis()
+    {
+		int nrOfPlants = plantAutomata.size();
+        int[] initialStates = AutomataIndexFormHelper.createState(theAutomata.size());
+        double[] initialCosts = new double[nrOfPlants + 2];
+        
+        // Initial state indices are stored
+        for (int i=0; i<theAutomata.size(); i++)
+        {
+			Automaton currAuto = indexMap.getAutomatonAt(i);
+            initialStates[indexMap.getAutomatonIndex(currAuto)] = indexMap.getStateIndex(currAuto, currAuto.getInitialState());
+        }
+        
+        // Initial state costs are stored
+        for (int i=0; i<nrOfPlants; i++)
+        {
+            initialCosts[i] = plantAutomata.getAutomatonAt(i).getInitialState().getCost();
+        }
+        
+        // The initial accumulated cost is zero
+        initialCosts[nrOfPlants] = 0;
+        
+        // The initial estimate is set to -1
+        initialCosts[nrOfPlants + 1] = -1;
+        
+        // The NodeExpander combines the information, together with the parent-information,
+        // which is null for the initial state.
+		// 		return expander.makeNode(initialStates, null, initialCosts);
+        return makeNodeBasis(initialStates, -1, initialCosts);
+    }
+
+	public AutomataIndexMap getIndexMap()
+	{
+		return indexMap;
 	}
 }
    
