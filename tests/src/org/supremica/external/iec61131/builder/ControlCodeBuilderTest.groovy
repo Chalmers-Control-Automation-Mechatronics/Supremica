@@ -205,6 +205,66 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 		Util.assertGeneratedModuleEqualsManual(SFC_APP.toAutomata(), sfcLessModule)
 		//Util.openInSupremica(sfcModule)
 	}
+	static final SFC_PARALLEL_APP = CCB.application('sfcParallelApp') {
+		input 'y1'
+		input 'y2'
+		sequentialProgram('program') {
+			sequence('mySequence') {
+				Step 'S1'
+				'y1'(to:['L1', 'R1'])
+				Step('L1')
+				'not y1'()
+				Step 'L2'
+				Step 'R1'
+				'y2'(from:['L2', 'R1'])
+			}
+		}
+	}
+	
+	void testSfcParallelism() {
+		def appSfcLess = CCB.application('sfcParallelApp') {
+			input 'y1'
+			input 'y2'
+			logicProgram('program') {
+				variable('S1_X', markedValue:true)
+				variable 'L1_X'
+				variable 'L2_X'
+				variable 'R1_X'
+				variable("${Converter.NOT_INIT_VARIABLE_NAME}", markedValue:true)
+				variable 'mySequence_T1_enabled'
+				variable 'mySequence_T2_enabled'
+				variable 'mySequence_T3_enabled'
+				variable 'S1_activation'
+				variable 'S1_deactivation'
+				variable 'L1_activation'
+				variable 'L1_deactivation'
+				variable 'L2_activation'
+				variable 'L2_deactivation'
+				variable 'R1_activation'
+				variable 'R1_deactivation'
+				'mySequence_T1_enabled := S1_X and y1'()
+				'mySequence_T2_enabled := L1_X and not y1'()
+				'mySequence_T3_enabled := L2_X and R1_X and y2'()
+				"S1_activation := not ${Converter.NOT_INIT_VARIABLE_NAME} or mySequence_T3_enabled"()
+				'S1_deactivation := mySequence_T1_enabled'()
+				SR(Q:'S1_X', S:"S1_activation", R:'S1_deactivation')
+				'L1_activation := mySequence_T1_enabled'()
+				'L1_deactivation := mySequence_T2_enabled'()
+				SR(Q:'L1_X', S:'L1_activation', R:'L1_deactivation')
+				'L2_activation := mySequence_T2_enabled'()
+				'L2_deactivation := mySequence_T3_enabled'()
+				SR(Q:'L2_X', S:'L2_activation', R:'L2_deactivation')
+				'R1_activation := mySequence_T1_enabled'()
+				'R1_deactivation := mySequence_T3_enabled'()
+				SR(Q:'R1_X', S:'R1_activation', R:'R1_deactivation')
+				"${Converter.NOT_INIT_VARIABLE_NAME} := true"()
+			}
+		}
+		//ModuleSubject sfcModule = sfcApp.toAutomata()
+		ModuleSubject sfcLessModule = appSfcLess.toAutomata()
+		Util.assertGeneratedModuleEqualsManual(SFC_PARALLEL_APP.toAutomata(), sfcLessModule)
+		//Util.openInSupremica(sfcModule)
+	}
 	static final SFC_DEFERRED_APP = CCB.application('testSfcDeferred') {
 		sequentialProgram('deferred', deferred:true) {
 			sequence('sfcA') {
