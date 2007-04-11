@@ -6,7 +6,7 @@ class LogicProgram {
 	static final pattern = /(?i)logicProgram/
 	static final defaultAttr = 'name'
 	static final parentAttr = 'programs'
-	IdentifierExpression name
+	Identifier name
 	List statements = []
 	List variables = []
 	List getRuntimeAssignments(Scope parent) {

@@ -6,8 +6,8 @@ class SequentialProgram {
 	static final pattern = /(?i)sequentialProgram/
 	static final defaultAttr = 'name'
 	static final parentAttr = 'programs'
-	static final NOT_INIT_VARIABLE = new InternalVariable(name:new IdentifierExpression(Converter.NOT_INIT_VARIABLE_NAME), markedValue:true)
-	IdentifierExpression name
+	static final NOT_INIT_VARIABLE = new InternalVariable(name:new Identifier(Converter.NOT_INIT_VARIABLE_NAME), markedValue:true)
+	Identifier name
 	List variables = [NOT_INIT_VARIABLE]
 	List sequences = []
 	boolean deferred = false

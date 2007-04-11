@@ -5,14 +5,14 @@ class FunctionBlockCall {
 	static final defaultAttr = 'name'
 	static final parentAttr = 'statements'
 	Map inputOutputMapping = [:]
-	IdentifierExpression type
-	IdentifierExpression name
+	Identifier type
+	Identifier name
 	
 	void setProperty(String property, Object newValue) {
 		if (metaClass.properties.any{it.name == property}) metaClass.setProperty(this, property, newValue)
-		else if (newValue instanceof Expression) inputOutputMapping[new IdentifierExpression(property)] = newValue
-		else if (newValue instanceof IdentifierExpression) inputOutputMapping[new IdentifierExpression(property)] = new Expression(newValue.text)
-		else inputOutputMapping[new IdentifierExpression(property)] = new Expression(newValue)
+		else if (newValue instanceof Expression) inputOutputMapping[new Identifier(property)] = newValue
+		else if (newValue instanceof Identifier) inputOutputMapping[new Identifier(property)] = new Expression(newValue.text)
+		else inputOutputMapping[new Identifier(property)] = new Expression(newValue)
 	}
 
 	List getRuntimeAssignments(Scope callingScope) {
@@ -30,8 +30,8 @@ class FunctionBlockCall {
 			if (type) instanceName = name
 			else {
 			    int i = 1
-			    callingScope.self.namedElements.name.each { if (new IdentifierExpression("${block.name}$i") == it) ++i } 
-			    instanceName = new IdentifierExpression("${block.name}$i")
+			    callingScope.self.namedElements.name.each { if (new Identifier("${block.name}$i") == it) ++i } 
+			    instanceName = new Identifier("${block.name}$i")
 			}
 			instance = [name:instanceName, type:block.name] as FunctionBlockInstance
 			callingScope.self.variables << instance
@@ -46,6 +46,6 @@ class FunctionBlockCall {
 		List statements = block.outputs.findAll{inputOutputMapping[it.name]}.collect{[scope:callingScope, input:inputOutputMapping[it.name], Q:instanceScope.relativeNameOf(it.name, callingScope)] as RuntimeAssignment}
 		statements += block.inputs.collect{[scope:callingScope, input:inputOutputMapping[it.name], Q:instanceScope.relativeNameOf(it.name, callingScope)] as RuntimeAssignment}
 		statements += block.getRuntimeAssignments(instanceScope)
-		statements += block.outputs.findAll{inputOutputMapping[it.name]}.collect{[scope:callingScope, input:instanceScope.relativeNameOf(it.name, callingScope), Q:new IdentifierExpression(inputOutputMapping[it.name].text)] as RuntimeAssignment}
+		statements += block.outputs.findAll{inputOutputMapping[it.name]}.collect{[scope:callingScope, input:instanceScope.relativeNameOf(it.name, callingScope), Q:new Identifier(inputOutputMapping[it.name].text)] as RuntimeAssignment}
 	}
 }

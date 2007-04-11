@@ -1,37 +1,37 @@
 package org.supremica.external.iec61131.builder
 
-class IdentifierExpression extends Expression implements Comparable {
-	IdentifierExpression(String expr) {
+class Identifier extends Expression implements Comparable {
+	Identifier(String expr) {
 		super(expr)
 	}
-	IdentifierExpression leftMostPart() {
+	Identifier leftMostPart() {
 		def parts = text.split(Converter.SEPARATOR_PATTERN)
-		if (parts.size() > 1) return new IdentifierExpression(parts[0]) 
+		if (parts.size() > 1) return new Identifier(parts[0]) 
 		null
 	}
-	IdentifierExpression exceptLeftMostPart() {
+	Identifier exceptLeftMostPart() {
 		def parts = text.split(Converter.SEPARATOR_PATTERN)
-		if (parts.size() > 1) return new IdentifierExpression(parts[1..-1].join(Converter.SEPARATOR)) 
-		else return new IdentifierExpression(text)
+		if (parts.size() > 1) return new Identifier(parts[1..-1].join(Converter.SEPARATOR)) 
+		else return new Identifier(text)
 	}
-	IdentifierExpression rightMostPart() {
-		new IdentifierExpression(text.split(Converter.SEPARATOR_PATTERN)[-1])
+	Identifier rightMostPart() {
+		new Identifier(text.split(Converter.SEPARATOR_PATTERN)[-1])
 	}
-	IdentifierExpression plus(other) {
-		new IdentifierExpression("${this}${Converter.SEPARATOR}$other")
+	Identifier plus(other) {
+		new Identifier("${this}${Converter.SEPARATOR}$other")
 	}
-	boolean startsWith(IdentifierExpression other) {
+	boolean startsWith(Identifier other) {
 		text.toLowerCase().startsWith(other.text.toLowerCase())
 	}
-	IdentifierExpression relativeTo(IdentifierExpression scope) {
-		if (startsWith(scope)) return new IdentifierExpression(text[scope.text.size()+1..-1])
+	Identifier relativeTo(Identifier scope) {
+		if (startsWith(scope)) return new Identifier(text[scope.text.size()+1..-1])
 		else if (scope.startsWith(this)) return rightMostPart()
 		else return this
 	}
 	int compareTo(other) {
 		text.toLowerCase().compareTo(other.text.toLowerCase())
 	}
-	IdentifierExpression fullyQualified(Scope scope) {
+	Identifier fullyQualified(Scope scope) {
 		scope.fullNameOf(this)
 	}
 }

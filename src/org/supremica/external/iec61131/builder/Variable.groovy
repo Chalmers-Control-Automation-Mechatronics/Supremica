@@ -24,7 +24,7 @@ class InternalVariable extends Variable {
 abstract class Variable {
 	boolean value //defaults to false
 	Boolean markedValue // defaults to null
-	IdentifierExpression name
+	Identifier name
 	List getControllableVariables(Scope parent) {
 		[name.fullyQualified(parent)]
 	}

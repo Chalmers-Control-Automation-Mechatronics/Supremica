@@ -4,7 +4,7 @@ import net.sourceforge.waters.subject.module.builder.ModuleBuilder
 
 class Assignment {
 	Expression input
-	IdentifierExpression Q
+	Identifier Q
 	Expression condition
 	static final pattern = /(?i)assign(?:ment)|.*\:=.*?/
 	static final defaultAttr = 'condition'
@@ -24,7 +24,7 @@ class Assignment {
 }
 
 class RuntimeAssignment {
-	final IdentifierExpression Q
+	final Identifier Q
 	final Expression input
 	final Scope scope
 	final boolean stochastic // Means that it will not necessarily execute

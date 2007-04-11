@@ -144,8 +144,12 @@ class ControlCodeBuilder extends BuilderSupport {
 					Class propertyType = obj.metaClass.properties.find{it.name.toLowerCase() == attribute.key.toLowerCase()}?.type
 					if (propertyType.isCase(Expression) && !(attribute.value instanceof Expression) && attribute.value != null) {
 						value = new Expression(attribute.value)
-					} else if (propertyType.isCase(IdentifierExpression) && !(attribute.value instanceof IdentifierExpression) && attribute.value != null) {
-						value = new IdentifierExpression(attribute.value)
+					} else if (propertyType.isCase(Identifier) && !(attribute.value instanceof Identifier) && attribute.value != null) {
+						value = new Identifier(attribute.value)
+					} else if (propertyType.isCase(List) && !(attribute.value instanceof List)) {
+						value = [new Identifier(attribute.value)]
+					} else if (propertyType.isCase(List) && attribute.value instanceof List) {
+						value = attribute.value.collect{new Identifier(it)}
 					} else {
 						value = attribute.value
 					}
@@ -194,9 +198,9 @@ class ControlCodeBuilder extends BuilderSupport {
 	void nodeCompleted(parent, node) {
 //		println "nodeCompleted: parent: $parent, node: $node"
 		switch (node) {
-		case Sequence: node.transitions.findAll{!it.to}.each{it.to = node.steps[0].name}; break
-		case Step: parent.transitions.findAll{!it.to}.each{it.to = node.name}; break
-		case Transition: if (!node.from) node.from = parent.steps[-1].name; break
+		case Sequence: node.transitions.findAll{!it.to}.each{it.to << node.steps[0].name}; break
+		case Step: parent.transitions.findAll{!it.to}.each{it.to << node.name}; break
+		case Transition: if (!node.from) node.from << parent.steps[-1].name; break
 		case FunctionBlock:
 			if (!parent) { //Add predefined function blocks to root FB
 				node[FunctionBlock.parentAttr] += functionBlocks

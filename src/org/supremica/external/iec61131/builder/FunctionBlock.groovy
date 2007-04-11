@@ -8,7 +8,7 @@ class FunctionBlock {
 	static final pattern = /(?i)application|functionblock/
 	static final defaultAttr = 'name'
 	static final parentAttr = 'types'
-	IdentifierExpression name
+	Identifier name
 	String namePattern
 	String getNamePattern() {
 		namePattern ? /(?i)$namePattern/ : /(?i)${name.text}/

@@ -59,7 +59,7 @@ class Expression {
 	Set findIdentifiers() {
 		if (identifiersCache == null) {
 			Map ids = [:]
-			(text =~ FULL_ID_PATTERN).each{match -> if (!KEYWORDS.any{keyword -> match ==~ keyword}) ids[new IdentifierExpression(match)] = true}
+			(text =~ FULL_ID_PATTERN).each{match -> if (!KEYWORDS.any{keyword -> match ==~ keyword}) ids[new Identifier(match)] = true}
 			identifiersCache = ids
 		}
 		identifiersCache.keySet()
@@ -86,9 +86,9 @@ class Expression {
 		assert new Expression('apa or ((sopa and ((pepa.rl or lepa))))').cleanup().text == 'apa or ((sopa and (pepa.rl or lepa)))'
 	}
 	Expression replaceAllIdentifiers(closure) {
-		new Expression(text.replaceAll(FULL_ID_PATTERN) { it ==~ KEYWORD_PATTERN ? it : closure(new IdentifierExpression(it)).text })
+		new Expression(text.replaceAll(FULL_ID_PATTERN) { it ==~ KEYWORD_PATTERN ? it : closure(new Identifier(it)).text })
 	}
-	boolean contains(IdentifierExpression id) {
+	boolean contains(Identifier id) {
 		if (!identifiersCache) findIdentifiers()
 		identifiersCache[id] 
 	}

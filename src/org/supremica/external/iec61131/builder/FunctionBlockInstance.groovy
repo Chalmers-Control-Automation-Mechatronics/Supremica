@@ -6,8 +6,8 @@ class FunctionBlockInstance {
 	static final pattern = /(?i)functionblockinstance/
 	static final defaultAttr = 'name'
 	static final parentAttr = 'variables'
-	IdentifierExpression name
-	IdentifierExpression type
+	Identifier name
+	Identifier type
 	FunctionBlock getType(Scope parent) {
 		parent.namedElement(type)
 	}

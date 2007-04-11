@@ -6,7 +6,7 @@ class Scope {
 	
 	boolean isGlobal() {!parent}
 	
-	IdentifierExpression fullNameOf(IdentifierExpression id) {
+	Identifier fullNameOf(Identifier id) {
 		//println id
 		assert id
 		scopeOf(id)?.fullNameOf(namedElement(id))
@@ -20,15 +20,15 @@ class Scope {
 			return parent.namedElement(self.type).namedElements
 		else return self.namedElements
 	}
-	Object namedElement(IdentifierExpression id) {
+	Object namedElement(Identifier id) {
 		assert id
 		scopeOf(id)?.namedElementsOfSelf.find{it.name == id.rightMostPart()}
 	}
 	private Map scopeOfIdCache = [:]
-	Scope scopeOf(IdentifierExpression id) {
+	Scope scopeOf(Identifier id) {
 		scopeOf(id, true)
 	}
-	Scope scopeOf(IdentifierExpression id, boolean delegateToParent) {
+	Scope scopeOf(Identifier id, boolean delegateToParent) {
 		if (scopeOfIdCache[id]) return scopeOfIdCache[id]
 //		println "id: $id, scope: ${fullName}, delegateToParent: $delegateToParent, leftMostPart: ${id.leftMostPart()}, except: ${id.exceptLeftMostPart()}, namedElements: ${namedElementsOfSelf.name}, subscopes:${subScopesOfSelf.fullName}"
 		Scope scopeOfId
@@ -42,23 +42,23 @@ class Scope {
 		scopeOfIdCache[id] = scopeOfId
 	}
 		
-	IdentifierExpression fullNameOf(namedObject) {
+	Identifier fullNameOf(namedObject) {
 		assert namedObject.name
 		assert namedElementsOfSelf.any{it.name == namedObject.name}, "${namedObject.name} does not belong to scope $fullName, identifiers: ${namedElementsOfSelf.name}"
-		!global ? new IdentifierExpression("${fullName}${Converter.SEPARATOR}$namedObject.name") : namedObject.name
+		!global ? new Identifier("${fullName}${Converter.SEPARATOR}$namedObject.name") : namedObject.name
 	}
 
-	IdentifierExpression relativeNameOf(IdentifierExpression id, Scope relativeTo) {
+	Identifier relativeNameOf(Identifier id, Scope relativeTo) {
 		if (relativeTo.global) return fullNameOf(id) 
 		else return fullNameOf(id)?.relativeTo(relativeTo.fullName)
 	}
 
-	IdentifierExpression fullNameCache = null
-	IdentifierExpression getFullName() {
+	Identifier fullNameCache = null
+	Identifier getFullName() {
 		if (fullNameCache) return fullNameCache
-		if (global) fullNameCache = new IdentifierExpression('ControlUnit')
+		if (global) fullNameCache = new Identifier('ControlUnit')
 		else if (parent.global) fullNameCache = self.name
-		else {fullNameCache = new IdentifierExpression("${parent.fullName}${Converter.SEPARATOR}${self.name}")}
+		else {fullNameCache = new Identifier("${parent.fullName}${Converter.SEPARATOR}${self.name}")}
 		fullNameCache
 	}
 	final def process

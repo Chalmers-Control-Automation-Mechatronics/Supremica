@@ -6,7 +6,7 @@ class Process {
 	static final pattern = /(?i)process/
 	static final defaultAttr = 'name'
 	static final parentAttr = 'processes'
-	IdentifierExpression name
+	Identifier name
 	List variables = []
 	List programs = []
 	List types = []
