@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   MonolithicSafetyVerifier
 //###########################################################################
-//# $Id: MonolithicSafetyVerifier.java,v 1.9 2006-12-05 21:52:19 flordal Exp $
+//# $Id: MonolithicSafetyVerifier.java,v 1.10 2007-04-16 03:56:00 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.monolithic;
@@ -243,6 +243,7 @@ public class MonolithicSafetyVerifier
   protected void addStatistics(final VerificationResult result)
   {
     final int numstates = mStateSpace.size();
+    result.setNumberOfAutomata(mNumAutomata);
     result.setNumberOfStates(numstates);
   }
 

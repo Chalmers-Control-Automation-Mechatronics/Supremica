@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   SafetyVerifier
 //###########################################################################
-//# $Id: SafetyVerifier.cpp,v 1.9 2006-12-01 03:26:36 robi Exp $
+//# $Id: SafetyVerifier.cpp,v 1.10 2007-04-16 03:56:00 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -123,6 +123,8 @@ void SafetyVerifier::
 addStatistics(const jni::VerificationResultGlue& vresult)
   const
 {
+  const int numaut = mEncoding->getNumberOfRecords();
+  vresult.setNumberOfAutomata(numaut);
   vresult.setNumberOfStates(mNumStates);
 }
 
