@@ -341,7 +341,7 @@ class ModelMaker
 		
 		test.addState("blah");
 
-		automata.add(test);
+		automata.addAutomaton(test);
 
 		automata.writeToFile(new File(outputFileName));
 

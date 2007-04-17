@@ -29,19 +29,19 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
 
 
-import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 
+import net.sourceforge.waters.xsd.base.EventKind;
 
 class ExtendedAutomata
 {
 
-	private ModuleProxyFactory factory;
-	private IdentifierProxy identifier;
+	private ModuleSubjectFactory factory;
+	private IdentifierSubject identifier;
 	private ModuleSubject module;
 
 
@@ -60,7 +60,14 @@ class ExtendedAutomata
 		return module;
 	}
 
-	public void add(ExtendedAutomaton automaton)
+	
+	public void addEvent(String name, EventKind kind)
+	{
+		module.getEventDeclListModifiable().add(factory.createEventDeclProxy(name, kind));
+	}
+
+
+	public void addAutomaton(ExtendedAutomaton automaton)
 	{
 		module.getComponentListModifiable().add(automaton.getComponent());
 	}

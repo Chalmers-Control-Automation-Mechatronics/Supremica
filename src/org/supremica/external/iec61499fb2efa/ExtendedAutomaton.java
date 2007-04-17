@@ -24,6 +24,9 @@
 
 package org.supremica.external.iec61499fb2efa;
 
+import java.util.List;
+import java.util.LinkedList;
+
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -45,7 +48,6 @@ class ExtendedAutomaton
 	private ModuleSubject module;
 	private SimpleComponentSubject component;
 	private GraphSubject graph;
-
 
 	public ExtendedAutomaton(String name, ComponentKind kind, ExtendedAutomata automata) 
 	{
@@ -69,13 +71,27 @@ class ExtendedAutomaton
 		graph.getNodesModifiable().add(new SimpleNodeSubject(name));
 	}
 
-
-	public void addTransition(String from, String to, String label, String guardAction)
+	/**
+	 * Adds transition to the extended finite automaton 
+	 *
+	 * @param from  name of the source state
+	 * @param to name of the destination state
+	 * @param label semi-colon separated list of event names for the transition
+	 * @param guard guard expression for the transition
+	 * @param action action for the transition
+	 */
+	public void addTransition(String from, String to, String label, String guard, String action)
 	{
 		SimpleNodeSubject fromNode = (SimpleNodeSubject) graph.getNodesModifiable().get(from);
 		SimpleNodeSubject toNode = (SimpleNodeSubject) graph.getNodesModifiable().get(to);
 		
-		LabelBlockSubject labelBlock = factory.createLabelBlockProxy();
+		// parse lable into event name list 
+		List events = new LinkedList();
+		while(label.contains(";"))
+		{
+			
+		}
+		LabelBlockSubject labelBlock = factory.createLabelBlockProxy(events, null);
 		
 		GuardActionBlockSubject guardActionBlock = factory.createGuardActionBlockProxy();
 
