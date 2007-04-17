@@ -55,6 +55,10 @@ class ExtendedAutomata
 
 	}
 
+	protected ModuleSubject getModule()
+	{
+		return module;
+	}
 
 	public void add(ExtendedAutomaton automaton)
 	{

@@ -24,14 +24,15 @@
 
 package org.supremica.external.iec61499fb2efa;
 
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
+import net.sourceforge.waters.subject.module.EdgeSubject;
+import net.sourceforge.waters.subject.module.LabelBlockSubject;
+import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
@@ -39,37 +40,49 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 class ExtendedAutomaton
 {
 
-	private ModuleProxyFactory factory;
- 	private IdentifierProxy identifier;
+	private ModuleSubjectFactory factory;
+ 	private IdentifierSubject identifier;
+	private ModuleSubject module;
 	private SimpleComponentSubject component;
 	private GraphSubject graph;
 
 
-	public ExtendedAutomaton(String name, ComponentKind kind) 
+	public ExtendedAutomaton(String name, ComponentKind kind, ExtendedAutomata automata) 
 	{
 		factory = ModuleSubjectFactory.getInstance();
 
+		module = automata.getModule();
+
 		identifier = factory.createSimpleIdentifierProxy(name);
-		graph = new GraphSubject();
-		component = new SimpleComponentSubject(identifier, kind, graph);
+		graph = factory.createGraphProxy();
+		component = factory.createSimpleComponentProxy(identifier, kind, graph);
 	}
+
 
 	protected SimpleComponentSubject getComponent()
 	{
 		return component;
 	}
-	
-
-
 
 	public void addState(String name)
 	{
 		graph.getNodesModifiable().add(new SimpleNodeSubject(name));
 	}
 
-	public void addTransition()
-	{
 
+	public void addTransition(String from, String to, String label, String guardAction)
+	{
+		SimpleNodeSubject fromNode = (SimpleNodeSubject) graph.getNodesModifiable().get(from);
+		SimpleNodeSubject toNode = (SimpleNodeSubject) graph.getNodesModifiable().get(to);
+		
+		LabelBlockSubject labelBlock = factory.createLabelBlockProxy();
+		
+		GuardActionBlockSubject guardActionBlock = factory.createGuardActionBlockProxy();
+
+		EdgeSubject newEdge = factory.createEdgeProxy(fromNode, toNode, labelBlock, guardActionBlock, null, null, null);
+
+		graph.getEdgesModifiable().add(newEdge);
+		
 	}
 
 }

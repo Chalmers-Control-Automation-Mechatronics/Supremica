@@ -337,7 +337,7 @@ class ModelMaker
 
 		automata = new ExtendedAutomata(theSystem.getName());
 
-		ExtendedAutomaton test = new ExtendedAutomaton("test", ComponentKind.PLANT);
+		ExtendedAutomaton test = new ExtendedAutomaton("test", ComponentKind.PLANT, automata);
 		
 		test.addState("blah");
 
