@@ -1,0 +1,101 @@
+/*
+ * @author Goran Cengic
+ */
+
+import net.sourceforge.fuber.model.*;
+import net.sourceforge.fuber.demo.MachineThread;
+import org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.*;
+
+
+ServiceFBInstance serviceFB = (ServiceFBInstance) serviceFB;
+Map serviceState = (Map) serviceState;
+Event serviceEvent = (Event) serviceEvent;
+Variables serviceVariables = (Variables) serviceVariables;
+
+Map demoRefs = (Map) demoRefs;
+
+
+if (serviceInitialize)
+{
+
+	System.out.println("Machine.bsh(" + serviceFB.getName() + "): Initialization");
+	serviceState = new HashMap();
+
+	// get the right machine ref from demoRefs
+	Machine machine;
+	if (serviceFB.getName().equals("R3323"))
+	{
+		for (Iterator iter = ((Set) demoRefs.get("machines")).iterator(); iter.hasNext();)
+		{
+			Machine cur = (Machine) iter.next();
+			if (cur.getName().equals("150R3323"))
+			{
+				machine = cur;
+				System.out.println("Machine.bsh(" + serviceFB.getName() + "): Initialization: R3323");
+			}
+		}
+	}
+	else if (serviceFB.getName().equals("R3325"))
+	{
+		for (Iterator iter = ((Set) demoRefs.get("machines")).iterator(); iter.hasNext();)
+		{
+			Machine cur = (Machine) iter.next();
+			if (cur.getName().equals("150R3325"))
+			{
+				machine = cur;
+				System.out.println("Machine.bsh(" + serviceFB.getName() + "): Initialization: R3325");
+			}
+		}
+	}
+	else if (serviceFB.getName().equals("TT153"))
+	{
+		for (Iterator iter = ((Set) demoRefs.get("machines")).iterator(); iter.hasNext();)
+		{
+			Machine cur = (Machine) iter.next();
+			if (cur.getName().equals("150TT153"))
+			{
+				machine = cur;
+				System.out.println("Machine.bsh(" + serviceFB.getName() + "): Initialization: TT153");
+			}
+		}
+	}
+	else if (serviceFB.getName().equals("FIX151"))
+	{
+		for (Iterator iter = ((Set) demoRefs.get("machines")).iterator(); iter.hasNext();)
+		{
+			Machine cur = (Machine) iter.next();
+			if (cur.getName().equals("150FIX151"))
+			{
+				machine = cur;
+				System.out.println("Machine.bsh(" + serviceFB.getName() + "): Initialization: FIX151");
+			}
+		}
+	}
+
+
+	// create service thread
+	MachineThread machineThread = new MachineThread(serviceFB,serviceVariables, machine);
+	serviceState.put("machineThread", machineThread);
+	machineThread.start();
+
+	machine.setThread(machineThread);
+
+}
+else
+{
+
+	String eventName  = ((Event) serviceEvent).getName();
+
+	if (eventName.equals("receive"))
+	{ 
+		System.out.println("Machine.bsh(" + serviceFB.getName() + "): \"receive\" event received");
+		Message in = ((Message) ((ObjectVariable) serviceVariables.getVariable("inMessage")).getValue());
+		serviceState.get("machineThread").receiveMessage(in);	
+	}
+	else if (eventName.equals("finishedOperation"))
+	{ 
+		System.out.println("Machine.bsh(" + serviceFB.getName() + "): \"finishedOperation\" event received");
+		String operation = ((StringVariable) serviceVariables.getVariable("inOperation")).getValue();
+		serviceState.get("machineThread").finishedOperation(operation);	
+	}
+}

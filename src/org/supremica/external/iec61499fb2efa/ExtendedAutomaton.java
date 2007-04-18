@@ -36,6 +36,7 @@ import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
+import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -97,6 +98,11 @@ class ExtendedAutomaton
 		graph.getNodesModifiable().add(factory.createSimpleNodeProxy(name,null, initial,null,null,null));
 	}
 
+	public void addVariable(String name, SimpleExpressionSubject type, SimpleExpressionSubject initialValue)
+	{
+		component.getVariablesModifiable().add(factory.createVariableProxy(name, type, initialValue));
+	}
+
 	/**
 	 * Adds transition to the extended finite automaton 
 	 *
@@ -111,7 +117,7 @@ class ExtendedAutomaton
 		SimpleNodeSubject fromNode = (SimpleNodeSubject) graph.getNodesModifiable().get(from);
 		SimpleNodeSubject toNode = (SimpleNodeSubject) graph.getNodesModifiable().get(to);
 		
-		// parse lable into event name list 
+		// parse label into event name list and make LabelBlockSubject 
 		List events = new LinkedList();
 		String remainingEvents = label;
 		String curEvent;
@@ -136,7 +142,7 @@ class ExtendedAutomaton
 		}
 		LabelBlockSubject labelBlock = factory.createLabelBlockProxy(events, null);
 		
-		
+		// make GuardActionSubject
 		
 		GuardActionBlockSubject guardActionBlock = factory.createGuardActionBlockProxy();
 

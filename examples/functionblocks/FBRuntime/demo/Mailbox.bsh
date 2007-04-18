@@ -1,0 +1,137 @@
+/*
+ * @author Goran Cengic
+ */
+
+import net.sourceforge.fuber.model.*;
+import org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.*;
+
+
+ServiceFBInstance serviceFB = (ServiceFBInstance) serviceFB;
+Map serviceState = (Map) serviceState;
+Event serviceEvent = (Event) serviceEvent;
+Variables serviceVariables = (Variables) serviceVariables;
+
+
+if (serviceInitialize)
+{
+
+}
+else
+{
+
+	String eventName  = ((Event) serviceEvent).getName();
+	Message in;
+
+	if (eventName.equals("sendMC1"))
+	{ 
+		System.out.println("Mailbox.bsh(" + serviceFB.getName() + "): \"sendMC1\" event received");
+		in = (Message) ((ObjectVariable) serviceVariables.getVariable("inMessageMC1")).getValue();
+	}
+	else if (eventName.equals("sendMC2"))
+	{ 
+		System.out.println("Mailbox.bsh(" + serviceFB.getName() + "): \"sendMC2\" event received");
+		in = (Message) ((ObjectVariable) serviceVariables.getVariable("inMessageMC2")).getValue();
+	}
+	else if (eventName.equals("sendMC3"))
+	{ 
+		System.out.println("Mailbox.bsh(" + serviceFB.getName() + "): \"sendMC3\" event received");
+		in = (Message) ((ObjectVariable) serviceVariables.getVariable("inMessageMC3")).getValue();
+	}
+	else if (eventName.equals("sendMC4"))
+	{ 
+		System.out.println("Mailbox.bsh(" + serviceFB.getName() + "): \"sendMC4\" event received");
+		in = (Message) ((ObjectVariable) serviceVariables.getVariable("inMessageMC4")).getValue();
+	}
+
+	else if (eventName.equals("sendM1"))
+	{ 
+		System.out.println("Mailbox.bsh(" + serviceFB.getName() + "): \"sendM1\" event received");
+		in = (Message) ((ObjectVariable) serviceVariables.getVariable("inMessageM1")).getValue();
+	}
+	else if (eventName.equals("sendM2"))
+	{ 
+		System.out.println("Mailbox.bsh(" + serviceFB.getName() + "): \"sendM2\" event received");
+		in = (Message) ((ObjectVariable) serviceVariables.getVariable("inMessageM2")).getValue();
+	}
+	else if (eventName.equals("sendM3"))
+	{ 
+		System.out.println("Mailbox.bsh(" + serviceFB.getName() + "): \"sendM3\" event received");
+		in = (Message) ((ObjectVariable) serviceVariables.getVariable("inMessageM3")).getValue();
+	}
+	else if (eventName.equals("sendM4"))
+	{ 
+		System.out.println("Mailbox.bsh(" + serviceFB.getName() + "): \"sendM4\" event received");
+		in = (Message) ((ObjectVariable) serviceVariables.getVariable("inMessageM4")).getValue();
+	}
+
+	else if (eventName.equals("sendZ1"))
+	{ 
+		System.out.println("Mailbox.bsh(" + serviceFB.getName() + "): \"sendZ1\" event received");
+		in = (Message) ((ObjectVariable) serviceVariables.getVariable("inMessageZ1")).getValue();
+	}
+
+	else
+	{
+		System.out.println("Mailbox.bsh(" + serviceFB.getName() + "): unknown event received: " + eventName);		
+		exit(1);
+	}
+
+	//
+	// check where the message is going and send it immediately	
+
+	// coordinators
+	if (in.getReceiver().equals("Coordinator150R3323"))
+	{
+		((ObjectVariable) serviceVariables.getVariable("outMessageMC1")).setValue(in);
+		serviceFB.sendEvent("toMC1");
+	}
+	else if (in.getReceiver().equals("Coordinator150R3325"))
+	{
+		((ObjectVariable) serviceVariables.getVariable("outMessageMC2")).setValue(in);
+		serviceFB.sendEvent("toMC2");
+	}
+	else if (in.getReceiver().equals("Coordinator150TT153"))
+	{
+		((ObjectVariable) serviceVariables.getVariable("outMessageMC3")).setValue(in);
+		serviceFB.sendEvent("toMC3");
+	}
+	else if (in.getReceiver().equals("Coordinator150FIX151"))
+	{
+		((ObjectVariable) serviceVariables.getVariable("outMessageMC4")).setValue(in);
+		serviceFB.sendEvent("toMC4");
+	}
+	
+	// machines
+	else if (in.getReceiver().equals("150R3323"))
+	{
+		((ObjectVariable) serviceVariables.getVariable("outMessageM1")).setValue(in);
+		serviceFB.sendEvent("toM1");
+	}
+	else if (in.getReceiver().equals("150R3325"))
+	{
+		((ObjectVariable) serviceVariables.getVariable("outMessageM2")).setValue(in);
+		serviceFB.sendEvent("toM2");
+	}
+	else if (in.getReceiver().equals("150TT153"))
+	{
+		((ObjectVariable) serviceVariables.getVariable("outMessageM3")).setValue(in);
+		serviceFB.sendEvent("toM3");
+	}
+	else if (in.getReceiver().equals("150FIX151"))
+	{
+		((ObjectVariable) serviceVariables.getVariable("outMessageM4")).setValue(in);
+		serviceFB.sendEvent("toM4");
+	}
+	
+	// zones
+	else if (in.getReceiver().equals("Zone1"))
+	{
+		((ObjectVariable) serviceVariables.getVariable("outMessageZ1")).setValue(in);
+		serviceFB.sendEvent("toZ1");
+	}
+	else
+	{
+		System.out.println("Mailbox.bsh(" + serviceFB.getName() + "): unknown receiver: " + in.getReceiver());
+		exit(1);
+	}
+}

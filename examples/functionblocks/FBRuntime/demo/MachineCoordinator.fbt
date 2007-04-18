@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType	xmlns="http://www.holobloc.com/xml/LibraryElement" Name="MachineCoordinator" >
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2006-11-13" />
+  <InterfaceList>
+    <EventInputs>
+	  <Event Name="receive" >
+	    <With Var="inMessage" />
+      </Event>
+      <Event Name="start" />
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="send" >
+	       <With Var="outMessage" />
+      </Event>
+      <Event Name="COPDone" >
+	       <With Var="machineName" />
+	       <With Var="performed" />
+      </Event>
+      <Event Name="noMoreEvents" />
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="inMessage" Type="Object" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="outMessage" Type="Object" />
+      <VarDeclaration Name="machineName" Type="STRING" />
+      <VarDeclaration Name="performed" Type="BOOL" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

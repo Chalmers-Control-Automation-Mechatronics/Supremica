@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType	xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Coordinator" >
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2006-11-13" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="run" />
+      <Event Name="COPDone1" >
+	       <With Var="machineName1" />
+	       <With Var="performed1" />
+      </Event>
+      <Event Name="COPDone2" >
+	       <With Var="machineName2" />
+	       <With Var="performed2" />
+      </Event>
+      <Event Name="COPDone3" >
+	       <With Var="machineName3" />
+	       <With Var="performed3" />
+      </Event>
+      <Event Name="COPDone4" >
+	       <With Var="machineName4" />
+	       <With Var="performed4" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="start1" />
+      <Event Name="start2" />
+      <Event Name="start3" />
+      <Event Name="start4" />
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="machineName1" Type="STRING" />
+      <VarDeclaration Name="performed1" Type="BOOL" />
+      <VarDeclaration Name="machineName2" Type="STRING" />
+      <VarDeclaration Name="performed2" Type="BOOL" />
+      <VarDeclaration Name="machineName3" Type="STRING" />
+      <VarDeclaration Name="performed3" Type="BOOL" />
+      <VarDeclaration Name="machineName4" Type="STRING" />
+      <VarDeclaration Name="performed4" Type="BOOL" />
+    </InputVars>
+  </InterfaceList>
+</FBType>

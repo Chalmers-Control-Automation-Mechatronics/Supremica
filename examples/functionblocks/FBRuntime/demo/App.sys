@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Demo" >
+  <VersionInfo  Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2006-11-15" />
+  <Device  Name="Test Device" Type="DeviceType_not_used">
+    <Resource Name="Test Resource" Type="ResourceType_not_used">
+      <FBNetwork>
+        <FB Name="restart" Type="E_RESTART" />
+
+        <FB Name="fcc" Type="FCC" />
+
+        <FB Name="R3323merge" Type="E_MERGE2" />
+        <FB Name="R3325merge" Type="E_MERGE2" />
+        <FB Name="TT153merge" Type="E_MERGE2" />
+        <FB Name="FIX151merge" Type="E_MERGE2" />
+
+        <FB Name="rend1" Type="E_REND" />
+        <FB Name="rend2" Type="E_REND" />
+        <FB Name="rend3" Type="E_REND" />
+
+        <FB Name="coordinator" Type="Coordinator" />
+
+        <FB Name="R3323coordinator" Type="MachineCoordinator" />
+        <FB Name="R3325coordinator" Type="MachineCoordinator" />
+        <FB Name="TT153coordinator" Type="MachineCoordinator" />
+        <FB Name="FIX151coordinator" Type="MachineCoordinator" />
+
+        <FB Name="R3323" Type="Machine" />
+        <FB Name="R3325" Type="Machine" />
+        <FB Name="TT153" Type="Machine" />
+        <FB Name="FIX151" Type="Machine" />
+
+        <FB Name="zone1" Type="Zone" />
+
+        <FB Name="mailbox" Type="Mailbox" />
+
+        <FB Name="delay" Type="E_DELAY" />
+
+        <FB Name="split1" Type="E_SPLIT2" />
+        <FB Name="split2" Type="E_SPLIT2" />
+        <FB Name="split3" Type="E_SPLIT2" />
+        <FB Name="split4" Type="E_SPLIT2" />
+
+        <FB Name="delay_merge" Type="E_MERGE4" />
+        <FB Name="delay_split" Type="E_SPLIT5" />
+
+        <FB Name="printd" Type="Print" />
+        <FB Name="printr" Type="Print" />
+
+        <FB Name="rend_split" Type="E_SPLIT3" />
+
+        <FB Name="nomore_merge" Type="E_MERGE2" />
+
+		
+        <EventConnections>
+          <Connection Source="restart.COLD" Destination="coordinator.run" />
+
+          <Connection Source="R3323coordinator.COPDone" Destination="coordinator.COPDone1" />
+          <Connection Source="R3325coordinator.COPDone" Destination="coordinator.COPDone2" />
+          <Connection Source="TT153coordinator.COPDone" Destination="coordinator.COPDone3" />
+          <Connection Source="FIX151coordinator.COPDone" Destination="coordinator.COPDone4" />
+
+          <Connection Source="coordinator.start1" Destination="R3323coordinator.start" />
+          <Connection Source="coordinator.start2" Destination="R3325coordinator.start" />
+          <Connection Source="coordinator.start3" Destination="TT153coordinator.start" />
+          <Connection Source="coordinator.start4" Destination="FIX151coordinator.start" />
+
+          <Connection Source="R3323coordinator.send" Destination="mailbox.sendMC1" />
+          <Connection Source="R3325coordinator.send" Destination="mailbox.sendMC2" />
+          <Connection Source="TT153coordinator.send" Destination="mailbox.sendMC3" />
+          <Connection Source="FIX151coordinator.send" Destination="mailbox.sendMC4" />
+
+          <Connection Source="R3323.send" Destination="mailbox.sendM1" />
+          <Connection Source="R3325.send" Destination="mailbox.sendM2" />
+          <Connection Source="TT153.send" Destination="mailbox.sendM3" />
+          <Connection Source="FIX151.send" Destination="mailbox.sendM4" />
+
+          <Connection Source="zone1.send" Destination="mailbox.sendZ1" />
+
+          <Connection Source="mailbox.toMC1" Destination="R3323coordinator.receive" />
+          <Connection Source="mailbox.toMC2" Destination="R3325coordinator.receive" />
+          <Connection Source="mailbox.toMC3" Destination="TT153coordinator.receive" />
+          <Connection Source="mailbox.toMC4" Destination="FIX151coordinator.receive" />
+
+          <Connection Source="mailbox.toM1" Destination="R3323.receive" />
+          <Connection Source="mailbox.toM2" Destination="R3325.receive" />
+          <Connection Source="mailbox.toM3" Destination="TT153.receive" />
+          <Connection Source="mailbox.toM4" Destination="FIX151.receive" />
+
+          <Connection Source="mailbox.toZ1" Destination="zone1.receive" />
+
+
+          <Connection Source="R3323.startOperation" Destination="fcc.startOperationM1" />
+          <Connection Source="R3325.startOperation" Destination="fcc.startOperationM2" />
+          <Connection Source="TT153.startOperation" Destination="fcc.startOperationM3" />
+          <Connection Source="FIX151.startOperation" Destination="fcc.startOperationM4" />
+
+          <Connection Source="fcc.finishedOperationM1" Destination="R3323.finishedOperation" />
+          <Connection Source="fcc.finishedOperationM2" Destination="R3325.finishedOperation" />
+          <Connection Source="fcc.finishedOperationM3" Destination="TT153.finishedOperation" />
+          <Connection Source="fcc.finishedOperationM4" Destination="FIX151.finishedOperation" />
+		  
+
+		  <Connection Source="R3323coordinator.noMoreEvents" Destination="R3323merge.EI1" />
+          <Connection Source="R3325coordinator.noMoreEvents" Destination="R3325merge.EI1" />
+          <Connection Source="TT153coordinator.noMoreEvents" Destination="TT153merge.EI1" />
+          <Connection Source="FIX151coordinator.noMoreEvents" Destination="FIX151merge.EI1" />
+
+		  <Connection Source="R3323.noMoreEvents" Destination="R3323merge.EI2" />
+		  <Connection Source="R3325.noMoreEvents" Destination="R3325merge.EI2" />
+		  <Connection Source="TT153.noMoreEvents" Destination="TT153merge.EI2" />
+		  <Connection Source="FIX151.noMoreEvents" Destination="FIX151merge.EI2" />
+
+		  <Connection Source="R3323merge.EO" Destination="split1.EI" />
+		  <Connection Source="R3325merge.EO" Destination="split2.EI" />
+		  <Connection Source="TT153merge.EO" Destination="split3.EI" />
+		  <Connection Source="FIX151merge.EO" Destination="split4.EI" />
+
+		  <Connection Source="split1.EO1" Destination="rend1.EI1" />
+		  <Connection Source="split2.EO1" Destination="rend1.EI2" />
+		  <Connection Source="split3.EO1" Destination="rend2.EI1" />
+		  <Connection Source="split4.EO1" Destination="rend2.EI2" />
+
+		  <Connection Source="rend1.EO" Destination="rend3.EI1" />
+		  <Connection Source="rend2.EO" Destination="rend3.EI2" />
+
+		  <Connection Source="rend3.EO" Destination="rend_split.EI" />
+
+		  <Connection Source="split1.EO2" Destination="delay_merge.EI1" />
+		  <Connection Source="split2.EO2" Destination="delay_merge.EI2" />
+		  <Connection Source="split3.EO2" Destination="delay_merge.EI3" />
+		  <Connection Source="split4.EO2" Destination="delay_merge.EI4" />
+
+		  <Connection Source="delay_merge.EO" Destination="delay.START" />
+		  <Connection Source="rend_split.EO1" Destination="delay.STOP" />
+		  <Connection Source="rend_split.EO2" Destination="nomore_merge.EI1" />
+		  <Connection Source="rend_split.EO3" Destination="printr.PRINT" />
+
+		  <Connection Source="delay.EO" Destination="delay_split.EI" />
+
+		  <Connection Source="delay_split.EO1" Destination="nomore_merge.EI2" />
+		  <Connection Source="delay_split.EO2" Destination="rend1.R" />
+		  <Connection Source="delay_split.EO3" Destination="rend2.R" />
+		  <Connection Source="delay_split.EO4" Destination="rend3.R" />
+		  <Connection Source="delay_split.EO5" Destination="printd.PRINT" />
+
+		  <Connection Source="nomore_merge.EO" Destination="fcc.noMoreEvents" />
+
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="App Delay triggered" Destination="printd.TEXT" />
+          <Connection Source="App Rendesvouz triggered" Destination="printr.TEXT" />
+
+          <Connection Source="1000" Destination="delay.DT" />
+        
+        
+          <Connection Source="R3323coordinator.machineName" Destination="coordinator.machineName1" />
+          <Connection Source="R3323coordinator.performed" Destination="coordinator.performed1" />
+          <Connection Source="R3325coordinator.machineName" Destination="coordinator.machineName2" />
+          <Connection Source="R3325coordinator.performed" Destination="coordinator.performed2" />
+          <Connection Source="TT153coordinator.machineName" Destination="coordinator.machineName3" />
+          <Connection Source="TT153coordinator.performed" Destination="coordinator.performed3" />
+          <Connection Source="FIX151coordinator.machineName" Destination="coordinator.machineName4" />
+          <Connection Source="FIX151coordinator.performed" Destination="coordinator.performed4" />
+
+          <Connection Source="R3323coordinator.outMessage" Destination="mailbox.inMessageMC1" />
+          <Connection Source="mailbox.outMessageMC1" Destination="R3323coordinator.inMessage" />
+          <Connection Source="R3325coordinator.outMessage" Destination="mailbox.inMessageMC2" />
+          <Connection Source="mailbox.outMessageMC2" Destination="R3325coordinator.inMessage" />
+          <Connection Source="TT153coordinator.outMessage" Destination="mailbox.inMessageMC3" />
+          <Connection Source="mailbox.outMessageMC3" Destination="TT153coordinator.inMessage" />
+          <Connection Source="FIX151coordinator.outMessage" Destination="mailbox.inMessageMC4" />
+          <Connection Source="mailbox.outMessageMC4" Destination="FIX151coordinator.inMessage" />
+
+          <Connection Source="R3323.outMessage" Destination="mailbox.inMessageM1" />
+          <Connection Source="mailbox.outMessageM1" Destination="R3323.inMessage" />
+          <Connection Source="R3325.outMessage" Destination="mailbox.inMessageM2" />
+          <Connection Source="mailbox.outMessageM2" Destination="R3325.inMessage" />
+          <Connection Source="TT153.outMessage" Destination="mailbox.inMessageM3" />
+          <Connection Source="mailbox.outMessageM3" Destination="TT153.inMessage" />
+          <Connection Source="FIX151.outMessage" Destination="mailbox.inMessageM4" />
+          <Connection Source="mailbox.outMessageM4" Destination="FIX151.inMessage" />
+
+          <Connection Source="zone1.outMessage" Destination="mailbox.inMessageZ1" />
+          <Connection Source="mailbox.outMessageZ1" Destination="zone1.inMessage" />
+
+          <Connection Source="R3323.outOperation" Destination="fcc.inOperationM1" />
+          <Connection Source="R3325.outOperation" Destination="fcc.inOperationM2" />
+          <Connection Source="TT153.outOperation" Destination="fcc.inOperationM3" />
+          <Connection Source="FIX151.outOperation" Destination="fcc.inOperationM4" />
+
+          <Connection Source="fcc.outOperationM1" Destination="R3323.inOperation" />
+          <Connection Source="fcc.outOperationM2" Destination="R3325.inOperation" />
+          <Connection Source="fcc.outOperationM3" Destination="TT153.inOperation" />
+          <Connection Source="fcc.outOperationM4" Destination="FIX151.inOperation" />
+
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+</System>

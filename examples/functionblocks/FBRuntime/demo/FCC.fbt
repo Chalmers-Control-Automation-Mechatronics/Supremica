@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="FCC">
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2006-08-11" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="startOperationM1">
+        <With Var="inOperationM1"/>
+      </Event>
+      <Event Name="startOperationM2">
+        <With Var="inOperationM2"/>
+      </Event>
+      <Event Name="startOperationM3">
+        <With Var="inOperationM3"/>
+      </Event>
+      <Event Name="startOperationM4">
+        <With Var="inOperationM4"/>
+      </Event>
+      <Event Name="noMoreEvents"/>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="finishedOperationM1">
+        <With Var="outOperationM1" />
+      </Event>
+      <Event Name="finishedOperationM2">
+        <With Var="outOperationM2" />
+      </Event>
+      <Event Name="finishedOperationM3">
+        <With Var="outOperationM3" />
+      </Event>
+      <Event Name="finishedOperationM4">
+        <With Var="outOperationM4" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="inOperationM1" Type="String"/>
+      <VarDeclaration Name="inOperationM2" Type="String"/>
+      <VarDeclaration Name="inOperationM3" Type="String"/>
+      <VarDeclaration Name="inOperationM4" Type="String"/>
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="outOperationM1" Type="String"/> 
+      <VarDeclaration Name="outOperationM2" Type="String"/> 
+      <VarDeclaration Name="outOperationM3" Type="String"/> 
+      <VarDeclaration Name="outOperationM4" Type="String"/> 
+    </OutputVars>
+  </InterfaceList>
+</FBType>

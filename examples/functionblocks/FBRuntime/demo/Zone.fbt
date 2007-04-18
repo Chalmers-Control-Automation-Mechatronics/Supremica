@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType	xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Zone" >
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2006-11-13" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="receive" >
+	       <With Var="inMessage" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="send" >
+	       <With Var="outMessage" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="inMessage" Type="Object" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="outMessage" Type="Object" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

@@ -1,0 +1,80 @@
+/*
+ * @author Goran Cengic
+ */
+
+import net.sourceforge.fuber.model.*;
+import net.sourceforge.fuber.demo.CoordinatorThread;
+import org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.*;
+
+
+ServiceFBInstance serviceFB = (ServiceFBInstance) serviceFB;
+Map serviceState = (Map) serviceState;
+Event serviceEvent = (Event) serviceEvent;
+Variables serviceVariables = (Variables) serviceVariables;
+
+Map demoRefs = (Map) demoRefs;
+
+
+if (serviceInitialize)
+{
+	Coordinator coordinator = (Coordinator) demoRefs.get("coordinator");
+
+	System.out.println("Coordinator.bsh(" + serviceFB.getName() + "): Initialization");
+	serviceState = new HashMap();
+	
+	// create service thread
+	CoordinatorThread coordinatorThread = new CoordinatorThread(serviceFB,serviceVariables,coordinator);
+	serviceState.put("coordinatorThread", coordinatorThread);
+	coordinatorThread.start();
+
+	coordinator.setThread(coordinatorThread);
+
+}
+else
+{
+	
+	String eventName  = ((Event) serviceEvent).getName();
+	String machineName = "";
+	boolean performed = false;
+	
+	if (eventName.equals("run"))
+	{
+		serviceState.get("coordinatorThread").runProgram();	
+	}	
+	else if (eventName.equals("COPDone1"))
+	{ 
+		System.out.println("Coordinator.bsh(" + serviceFB.getName() + "): \"COPDone1\" event received");
+		machineName = ((StringVariable) serviceVariables.getVariable("machineName1")).getValue();
+		performed  = ((Boolean) ((BooleanVariable) serviceVariables.getVariable("performed1")).getValue()).booleanValue();
+		serviceState.get("coordinatorThread").COPDone(machineName,performed);	
+	}
+	else if (eventName.equals("COPDone2"))
+	{ 
+		System.out.println("Coordinator.bsh(" + serviceFB.getName() + "): \"COPDone2\" event received");
+		machineName = ((StringVariable) serviceVariables.getVariable("machineName2")).getValue();
+		performed  = ((Boolean) ((BooleanVariable) serviceVariables.getVariable("performed2")).getValue()).booleanValue();
+		serviceState.get("coordinatorThread").COPDone(machineName,performed);	
+	}
+	else if (eventName.equals("COPDone3"))
+	{ 
+		System.out.println("Coordinator.bsh(" + serviceFB.getName() + "): \"COPDone3\" event received");
+		machineName = ((StringVariable) serviceVariables.getVariable("machineName3")).getValue();
+		performed  = ((Boolean) ((BooleanVariable) serviceVariables.getVariable("performed3")).getValue()).booleanValue();
+		serviceState.get("coordinatorThread").COPDone(machineName,performed);	
+	}
+	else if (eventName.equals("COPDone4"))
+	{ 
+		System.out.println("Coordinator.bsh(" + serviceFB.getName() + "): \"COPDone4\" event received");
+		machineName = ((StringVariable) serviceVariables.getVariable("machineName4")).getValue();
+		performed  = ((Boolean) ((BooleanVariable) serviceVariables.getVariable("performed4")).getValue()).booleanValue();
+		serviceState.get("coordinatorThread").COPDone(machineName,performed);	
+	}
+
+	else
+	{
+		System.out.println("Coordinator.bsh(" + serviceFB.getName() + "): unknown event received: " + eventName);		
+		exit(1);
+	}
+
+
+}

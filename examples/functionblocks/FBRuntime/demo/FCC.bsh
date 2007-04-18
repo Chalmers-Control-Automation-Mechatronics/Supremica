@@ -1,0 +1,83 @@
+/*
+ *   This file is part of Fuber (Function Block Execution Runtime) library.
+ *   Copyright (C) 2005 Goran Cengic
+ *
+ *   This library is free software; you can redistribute it and/or
+ *   modify it under the terms of the GNU Lesser General Public
+ *   License as published by the Free Software Foundation; either
+ *   version 2.1 of the License, or (at your option) any later version.
+ *
+ *   This library is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *   Lesser General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Lesser General Public
+ *   License along with this library; if not, write to the Free Software
+ *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ *   To contact author please refer to contact information in the README file.
+ */
+/*
+ * @author Goran Cengic
+ */
+
+import net.sourceforge.fuber.model.*;
+
+import net.sourceforge.fuber.demo.FCCThread;
+
+ServiceFBInstance serviceFB = (ServiceFBInstance) serviceFB;
+Map serviceState = (Map) serviceState;
+Event serviceEvent = (Event) serviceEvent;
+Variables serviceVariables = (Variables) serviceVariables;
+
+if (serviceInitialize)
+{
+	System.out.println("FCC.bsh(" + serviceFB.getName() + "): Initialization");
+	serviceState = new HashMap();
+
+	// create service thread
+	FCCThread fcc = new FCCThread(serviceFB,serviceVariables);
+	serviceState.put("fcc", fcc);
+	fcc.start();
+}
+else
+{
+
+	String eventName  = ((Event) serviceEvent).getName();
+
+	if (eventName.equals("startOperationM1"))
+	{ 	
+		System.out.println("FCC.bsh(" + serviceFB.getName() + "): \"startOperationM1\" event received");
+		String operation = ((StringVariable) serviceVariables.getVariable("inOperationM1")).getValue();
+		System.out.println("FCC.bsh(" + serviceFB.getName() + "): starting operation: " + operation);
+		serviceState.get("fcc").startOperation(operation);
+	}	
+	else if (eventName.equals("startOperationM2"))
+	{ 	
+		System.out.println("FCC.bsh(" + serviceFB.getName() + "): \"startOperationM2\" event received");
+		String operation = ((StringVariable) serviceVariables.getVariable("inOperationM2")).getValue();
+		System.out.println("FCC.bsh(" + serviceFB.getName() + "): starting operation: " + operation);
+		serviceState.get("fcc").startOperation(operation);
+	}	
+	else if (eventName.equals("startOperationM3"))
+	{ 	
+		System.out.println("FCC.bsh(" + serviceFB.getName() + "): \"startOperationM3\" event received");
+		String operation = ((StringVariable) serviceVariables.getVariable("inOperationM3")).getValue();
+		System.out.println("FCC.bsh(" + serviceFB.getName() + "): starting operation: " + operation);
+		serviceState.get("fcc").startOperation(operation);
+	}	
+	else if (eventName.equals("startOperationM4"))
+	{ 
+		System.out.println("FCC.bsh(" + serviceFB.getName() + "): \"startOperationM4\" event received");
+		String operation = ((StringVariable) serviceVariables.getVariable("inOperationM4")).getValue();
+		System.out.println("FCC.bsh(" + serviceFB.getName() + "): starting operation: " + operation);
+		serviceState.get("fcc").startOperation(operation);
+	}	
+	else if (eventName.equals("noMoreEvents"))
+	{ 
+		System.out.println("FCC.bsh(" + serviceFB.getName() + "): \"noMoreEvents\" event received");
+		serviceState.get("fcc").noMoreEvents();
+	}	
+}
+

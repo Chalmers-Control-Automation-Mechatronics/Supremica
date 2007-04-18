@@ -1,0 +1,58 @@
+/*
+ * @author Goran Cengic
+ */
+
+import net.sourceforge.fuber.model.*;
+import net.sourceforge.fuber.demo.ZoneThread;
+import org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.*;
+
+
+ServiceFBInstance serviceFB = (ServiceFBInstance) serviceFB;
+Map serviceState = (Map) serviceState;
+Event serviceEvent = (Event) serviceEvent;
+Variables serviceVariables = (Variables) serviceVariables;
+
+Map demoRefs = (Map) demoRefs;
+
+
+if (serviceInitialize)
+{
+
+	System.out.println("Zone.bsh(" + serviceFB.getName() + "): Initialization");
+	serviceState = new HashMap();
+
+	// get the right machine ref from demoRefs
+	Zone zone;
+	if (serviceFB.getName().equals("zone1"))
+	{
+		for (Iterator iter = ((Set) demoRefs.get("zones")).iterator(); iter.hasNext();)
+		{
+			Zone cur = (Zone) iter.next();
+			if (cur.getID().equals("Zone1"))
+			{
+				zone = cur;
+				System.out.println("Zone.bsh(" + serviceFB.getName() + "): Initialization: Zone1");
+			}
+		}
+	}
+
+	// create service thread
+	ZoneThread zoneThread = new ZoneThread(serviceFB,serviceVariables,zone);
+	serviceState.put("zoneThread", zoneThread);
+	zoneThread.start();
+	
+	zone.setThread(zoneThread);
+
+}
+else
+{
+
+	String eventName  = ((Event) serviceEvent).getName();
+
+	if (eventName.equals("receive"))
+	{ 
+		System.out.println("Zone.bsh(" + serviceFB.getName() + "): \"receive\" event received");
+		Message in = ((Message) ((ObjectVariable) serviceVariables.getVariable("inMessage")).getValue());
+		serviceState.get("zoneThread").receiveMessage(in);	
+	}
+}

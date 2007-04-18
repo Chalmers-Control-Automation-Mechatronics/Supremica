@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="FCCStimuli">
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2006-08-23" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="START"/>
+      <Event Name="RECEIVED">
+        <With Var="IN" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="STOP"/>
+      <Event Name="SEND">
+        <With Var="OUT"/>
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="IN" Type="String"/>
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="OUT" Type="String"/>
+    </OutputVars>
+  </InterfaceList>
+  <BasicFB>
+    <InternalVars>
+        <VarDeclaration Name="time" Type="DOUBLE" />
+    </InternalVars>
+    <ECC>
+        <ECState Name="INIT" />
+        <ECState Name="SUBS">
+		    <ECAction Algorithm="Subscribe" Output="SEND"/>
+	    </ECState>
+        <ECState Name="FETCH">
+		    <ECAction Algorithm="FetchFromRack" Output="SEND"/>
+	    </ECState>
+        <ECState Name="LOAD_AND_TURN">
+		    <ECAction Algorithm="LoadFixture" Output="SEND"/>
+		    <ECAction Algorithm="TurnForward" Output="SEND"/>
+	    </ECState>
+        <ECState Name="FIXTURE_CLAMP">
+		    <ECAction Algorithm="FixtureClamp" Output="SEND"/>
+	    </ECState>
+        <ECState Name="FIXTURE_TO_TOOLCHANGE">
+		    <ECAction Algorithm="FixtureToToolChange" Output="SEND"/>
+	    </ECState>
+        <ECState Name="TOOLCHANGE_AND_FORWARD">
+		    <ECAction Algorithm="ToolChangeToWeld" Output="SEND"/>
+		    <ECAction Algorithm="FixtureForward" Output="SEND"/>
+	    </ECState>
+        <ECState Name="NOMORE">
+		    <ECAction Algorithm="NoMoreEvents" Output="SEND"/>
+	    </ECState>		
+        <ECState Name="END">
+		    <ECAction Output="STOP"/>
+	    </ECState>
+		<ECTransition Source="INIT" Destination="SUBS" Condition="START" />
+		<ECTransition Source="SUBS" Destination="FETCH" Condition="RECEIVED AND IN=&#34;OK&#34;" />
+		<ECTransition Source="FETCH" Destination="LOAD_AND_TURN" Condition="RECEIVED AND IN=&#34;OK&#34;" />
+		<ECTransition Source="LOAD_AND_TURN" Destination="END" Condition="RECEIVED AND IN=&#34;OK&#34;" />
+		<ECTransition Source="END" Destination="INIT" Condition="1" />
+    </ECC>
+    <Algorithm Name="Subscribe">
+     <Other Language="Java" Text=
+	 "
+	 OUT = &#34;SUBSCRIBE FetchFromRackf, LoadFixturef, FixtureClampf&#34;;
+	 "
+	 />	
+    </Algorithm>
+    <Algorithm Name="Start1">
+     <Other Language="Java" Text=
+	 "
+	 OUT = &#34;START FetchFromRacks 0&#34;;
+	 "
+	 />
+    </Algorithm>
+    <Algorithm Name="NoMoreEvents">
+     <Other Language="Java" Text=
+	 "
+	 OUT = &#34;NOMOREEVENTS&#34;;
+	 "
+	 />
+    </Algorithm>
+	<Algorithm Name="GetTime">
+     <Other Language="Java" Text=
+	 "
+	 
+	 "
+	 />
+    </Algorithm>
+  </BasicFB>
+</FBType>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType	xmlns="http://www.holobloc.com/xml/LibraryElement" Name="Mailbox" >
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2006-11-02" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="sendMC1" >
+	       <With Var="inMessageMC1" />
+      </Event>
+      <Event Name="sendMC2" >
+	       <With Var="inMessageMC2" />
+      </Event>
+      <Event Name="sendMC3" >
+	       <With Var="inMessageMC3" />
+      </Event>
+      <Event Name="sendMC4" >
+	       <With Var="inMessageMC4" />
+      </Event>
+
+      <Event Name="sendM1" >
+	       <With Var="inMessageM1" />
+      </Event>
+      <Event Name="sendM2" >
+	       <With Var="inMessageM2" />
+      </Event>
+      <Event Name="sendM3" >
+	       <With Var="inMessageM3" />
+      </Event>
+      <Event Name="sendM4" >
+	       <With Var="inMessageM4" />
+      </Event>
+
+      <Event Name="sendZ1" >
+	       <With Var="inMessageZ1" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="toMC1" >
+	       <With Var="outMessageMC1" />
+      </Event>
+      <Event Name="toMC2" >
+	       <With Var="outMessageMC2" />
+      </Event>
+      <Event Name="toMC3" >
+	       <With Var="outMessageMC3" />
+      </Event>
+      <Event Name="toMC4" >
+	       <With Var="outMessageMC4" />
+      </Event>
+
+      <Event Name="toM1" >
+	       <With Var="outMessageM1" />
+      </Event>
+      <Event Name="toM2" >
+	       <With Var="outMessageM2" />
+      </Event>
+      <Event Name="toM3" >
+	       <With Var="outMessageM3" />
+      </Event>
+      <Event Name="toM4" >
+	       <With Var="outMessageM4" />
+      </Event>
+
+      <Event Name="toZ1" >
+	       <With Var="outMessageZ1" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="inMessageMC1" Type="Object" />
+      <VarDeclaration Name="inMessageMC2" Type="Object" />
+      <VarDeclaration Name="inMessageMC3" Type="Object" />
+      <VarDeclaration Name="inMessageMC4" Type="Object" />
+
+      <VarDeclaration Name="inMessageM1" Type="Object" />
+      <VarDeclaration Name="inMessageM2" Type="Object" />
+      <VarDeclaration Name="inMessageM3" Type="Object" />
+      <VarDeclaration Name="inMessageM4" Type="Object" />
+
+      <VarDeclaration Name="inMessageZ1" Type="Object" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="outMessageMC1" Type="Object" />
+      <VarDeclaration Name="outMessageMC2" Type="Object" />
+      <VarDeclaration Name="outMessageMC3" Type="Object" />
+      <VarDeclaration Name="outMessageMC4" Type="Object" />
+
+      <VarDeclaration Name="outMessageM1" Type="Object" />
+      <VarDeclaration Name="outMessageM2" Type="Object" />
+      <VarDeclaration Name="outMessageM3" Type="Object" />
+      <VarDeclaration Name="outMessageM4" Type="Object" />
+
+      <VarDeclaration Name="outMessageZ1" Type="Object" />
+    </OutputVars>
+  </InterfaceList>
+</FBType>

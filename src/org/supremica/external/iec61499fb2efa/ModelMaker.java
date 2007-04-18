@@ -339,10 +339,10 @@ class ModelMaker
 
 		ExtendedAutomaton test = new ExtendedAutomaton("test", automata);
 		
-		test.addState("blah1", true);
-		test.addState("blah2");
+		test.addState("s0", true);
+		test.addState("s1");
 		
-		test.addTransition("blah1","blah2","blah_e1;blah_e2;","","");
+		test.addTransition("s0","s1","e1;e2;","","");
 
 		automata.addAutomaton(test);
 

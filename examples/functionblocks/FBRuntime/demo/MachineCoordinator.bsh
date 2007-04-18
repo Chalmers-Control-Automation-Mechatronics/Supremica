@@ -1,0 +1,100 @@
+/*
+ * @author Goran Cengic
+ */
+
+import net.sourceforge.fuber.model.*;
+import net.sourceforge.fuber.demo.MachineCoordinatorThread;
+import org.supremica.manufacturingTables.controlsystemimplementation.IEC61499.*;
+
+
+ServiceFBInstance serviceFB = (ServiceFBInstance) serviceFB;
+Map serviceState = (Map) serviceState;
+Event serviceEvent = (Event) serviceEvent;
+Variables serviceVariables = (Variables) serviceVariables;
+
+Map demoRefs = (Map) demoRefs;
+
+if (serviceInitialize)
+{
+	
+	System.out.println("MachineCoordinator.bsh(" + serviceFB.getName() + "): Initialization");
+	serviceState = new HashMap();
+	
+	// get the right machine coordinator ref from demoRefs
+	MachineCoordinator machineCoordinator;
+	if (serviceFB.getName().equals("R3323coordinator"))
+	{
+		for (Iterator iter = ((Set) demoRefs.get("machineCoordinators")).iterator(); iter.hasNext();)
+		{
+			MachineCoordinator cur = (MachineCoordinator) iter.next();
+			if (cur.getID().equals("Coordinator150R3323"))
+			{
+				machineCoordinator = cur;
+				System.out.println("MachineCoordinator.bsh(" + serviceFB.getName() + "): Initialization: Coordinator R3323");
+			}
+		}
+	}
+	else if (serviceFB.getName().equals("R3325coordinator"))
+	{
+		for (Iterator iter = ((Set) demoRefs.get("machineCoordinators")).iterator(); iter.hasNext();)
+		{
+			MachineCoordinator cur = (MachineCoordinator) iter.next();
+			if (cur.getID().equals("Coordinator150R3325"))
+			{
+				machineCoordinator = cur;
+				System.out.println("MachineCoordinator.bsh(" + serviceFB.getName() + "): Initialization: Coordinator R3325");
+			}
+		}
+	}
+	else if (serviceFB.getName().equals("TT153coordinator"))
+	{
+		for (Iterator iter = ((Set) demoRefs.get("machineCoordinators")).iterator(); iter.hasNext();)
+		{
+			MachineCoordinator cur = (MachineCoordinator) iter.next();
+			if (cur.getID().equals("Coordinator150TT153"))
+			{
+				machineCoordinator = cur;
+				System.out.println("MachineCoordinator.bsh(" + serviceFB.getName() + "): Initialization: Coordinator TT153");
+			}
+		}
+	}
+	else if (serviceFB.getName().equals("FIX151coordinator"))
+	{
+		for (Iterator iter = ((Set) demoRefs.get("machineCoordinators")).iterator(); iter.hasNext();)
+		{
+			MachineCoordinator cur = (MachineCoordinator) iter.next();
+			if (cur.getID().equals("Coordinator150FIX151"))
+			{
+				machineCoordinator = cur;
+				System.out.println("MachineCoordinator.bsh(" + serviceFB.getName() + "): Initialization: Coordinator FIX151");
+			}
+		}
+	}
+	
+	
+	// create service thread
+	MachineCoordinatorThread machineCoordinatorThread = new MachineCoordinatorThread(serviceFB,serviceVariables, machineCoordinator);
+	serviceState.put("machineCoordinatorThread", machineCoordinatorThread);
+	machineCoordinatorThread.start();
+	
+	machineCoordinator.setThread(machineCoordinatorThread);
+	
+}
+else
+{
+	
+	String eventName  = ((Event) serviceEvent).getName();
+	
+	if (eventName.equals("start"))
+	{
+		System.out.println("MachineCoordinator.bsh(" + serviceFB.getName() + "): \"start\" event received");
+		serviceState.get("machineCoordinatorThread").startCoordinator();	
+	}
+	else if (eventName.equals("receive"))
+	{ 
+		System.out.println("MachineCoordinator.bsh(" + serviceFB.getName() + "): \"receive\" event received");
+		Message in = ((Message) ((ObjectVariable) serviceVariables.getVariable("inMessage")).getValue());
+		serviceState.get("machineCoordinatorThread").receiveMessage(in);	
+	}
+	
+}

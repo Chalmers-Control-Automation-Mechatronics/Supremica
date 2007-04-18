@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<System xmlns="http://www.holobloc.com/xml/LibraryElement" Name="FCCWorkbench" >
+  <VersionInfo  Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2006-08-23" />
+  <Device  Name="Test Device" Type="DeviceType_not_used">
+    <Resource Name="Test Resource" Type="ResourceType_not_used">
+      <FBNetwork>
+        <FB Name="restart" Type="E_RESTART" />
+        <FB Name="fcc stimuli" Type="FCCStimuli" />
+        <FB Name="fcc" Type="FCC" />
+        <FB Name="split send" Type="E_SPLIT2" />
+        <FB Name="split received" Type="E_SPLIT2" />
+        <FB Name="print send" Type="Print" />
+        <FB Name="print received" Type="Print" />
+        <FB Name="stop" Type="E_STOP" />
+        <EventConnections>
+          <Connection Source="restart.COLD" Destination="fcc stimuli.START" />
+          <Connection Source="fcc stimuli.SEND" Destination="split send.EI" />
+          <Connection Source="split send.EO1" Destination="fcc.SEND" />
+          <Connection Source="split send.EO2" Destination="print send.PRINT" />
+          <Connection Source="fcc.RECEIVED" Destination="split received.EI" />
+          <Connection Source="split received.EO1" Destination="fcc stimuli.RECEIVED" />
+          <Connection Source="split received.EO2" Destination="print received.PRINT" />
+          <Connection Source="fcc stimuli.STOP" Destination="stop.STOP" />
+        </EventConnections>
+        <DataConnections>
+          <Connection Source="fcc stimuli.OUT" Destination="fcc.OUT" />
+          <Connection Source="fcc.IN" Destination="fcc stimuli.IN" />
+          <Connection Source="fcc stimuli.OUT" Destination="print send.TEXT" />
+          <Connection Source="fcc.IN" Destination="print received.TEXT" />
+        </DataConnections>
+      </FBNetwork>
+    </Resource>
+  </Device>
+</System>
