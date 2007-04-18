@@ -60,6 +60,11 @@ class ExtendedAutomata
 		return module;
 	}
 
+
+	public void addEvent(String name)
+	{
+		module.getEventDeclListModifiable().add(factory.createEventDeclProxy(name, EventKind.UNCONTROLLABLE));
+	}
 	
 	public void addEvent(String name, EventKind kind)
 	{
