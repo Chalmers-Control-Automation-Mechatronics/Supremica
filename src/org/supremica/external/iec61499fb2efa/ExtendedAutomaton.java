@@ -98,8 +98,11 @@ class ExtendedAutomaton
 		graph.getNodesModifiable().add(factory.createSimpleNodeProxy(name,null, initial,null,null,null));
 	}
 
-	public void addVariable(String name, SimpleExpressionSubject type, SimpleExpressionSubject initialValue)
+	public void addVariable(String name, String type, String initialValue)
 	{
+
+		
+
 		component.getVariablesModifiable().add(factory.createVariableProxy(name, type, initialValue));
 	}
 
