@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   SafetyVerifier
 //###########################################################################
-//# $Id: SafetyVerifier.h,v 1.4 2006-11-24 02:34:20 robi Exp $
+//# $Id: SafetyVerifier.h,v 1.5 2007-04-18 03:45:53 robi Exp $
 //###########################################################################
 
 
@@ -31,7 +31,7 @@ namespace jni {
   class ClassCache;
   class ListGlue;
   class ProductDESGlue;
-  class VerificationResult;
+  class VerificationResultGlue;
 }
 
 
@@ -91,6 +91,7 @@ private:
   uint32 mBadState;
   const EventRecord* mBadEvent;
   jni::ListGlue* mTraceList;
+  int mNumAutomata;
   uint32 mNumStates;
 };
 

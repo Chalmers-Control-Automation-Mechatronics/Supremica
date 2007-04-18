@@ -258,22 +258,22 @@
     </junit>
   </target>
 
-	  <target name="runtest1" depends="test-jar,cpp">
-	    <mkdir dir="${logs.results}"/>
-	    <junit printsummary="on" fork="true" maxmemory="512m">
-	      <formatter type="xml"/>
-	      <batchtest todir="${logs.results}">
-	        <fileset dir="${supremica.testsrc}">
-	          <include name="net/sourceforge/waters/**/*Module*Test.java"/>
-	          <exclude name="**/Abstract*.java"/>
-	        </fileset>
-	      </batchtest>
-	      <classpath refid="waters.test.classpath"/>
-	      <sysproperty key="waters.test.inputdir" value="${examples}"/>
-	      <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
-	      <sysproperty key="java.library.path" value="${waters.library.path}"/>
-	    </junit>
-	  </target>
+  <target name="runtest1" depends="test-jar,cpp">
+    <mkdir dir="${logs.results}"/>
+    <junit printsummary="on" fork="true" maxmemory="512m">
+      <formatter type="xml"/>
+      <batchtest todir="${logs.results}">
+        <fileset dir="${supremica.testsrc}">
+          <include name="net/sourceforge/waters/**/Native*Test.java"/>
+          <exclude name="**/Abstract*.java"/>
+        </fileset>
+      </batchtest>
+      <classpath refid="waters.test.classpath"/>
+      <sysproperty key="waters.test.inputdir" value="${examples}"/>
+      <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+      <sysproperty key="java.library.path" value="${waters.library.path}"/>
+    </junit>
+  </target>
 
   <target name="test2" depends="test-jar">
     <mkdir dir="${logs.results}"/>

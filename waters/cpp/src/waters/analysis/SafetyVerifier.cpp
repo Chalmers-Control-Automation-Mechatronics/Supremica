@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   SafetyVerifier
 //###########################################################################
-//# $Id: SafetyVerifier.cpp,v 1.10 2007-04-16 03:56:00 robi Exp $
+//# $Id: SafetyVerifier.cpp,v 1.11 2007-04-18 03:45:53 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -123,8 +123,7 @@ void SafetyVerifier::
 addStatistics(const jni::VerificationResultGlue& vresult)
   const
 {
-  const int numaut = mEncoding->getNumberOfRecords();
-  vresult.setNumberOfAutomata(numaut);
+  vresult.setNumberOfAutomata(mNumAutomata);
   vresult.setNumberOfStates(mNumStates);
 }
 
@@ -142,6 +141,7 @@ setup()
   if (!mEncoding->hasSpecs()) {
     return;
   }
+  mNumAutomata = mEncoding->getNumberOfRecords();
   mStateSpace = new StateSpace(mEncoding, mStateLimit);
   mDepthMap = new ArrayList<uint32>(128);
 
@@ -173,17 +173,16 @@ setup()
   }
 
   // Prepare initial state ...
-  const int numaut = mEncoding->getNumberOfRecords();
-  mCurrentTuple = new uint32[numaut];
+  mCurrentTuple = new uint32[mNumAutomata];
   int a;
-  for (a = 0; a < numaut; a++) {
+  for (a = 0; a < mNumAutomata; a++) {
     mCurrentTuple[a] = UNDEF_UINT32;
   }    
 
   // Collect transitions ...
   const HashAccessor* stateaccessor = StateRecord::getHashAccessor();
   HashTable<jni::StateGlue*,StateRecord*> statemap(stateaccessor, 256);
-  for (a = 0; a < numaut; a++) {
+  for (a = 0; a < mNumAutomata; a++) {
     const AutomatonRecord* autrecord = mEncoding->getRecord(a);
     const jni::AutomatonGlue aut = autrecord->getJavaAutomaton();
     const jni::SetGlue states = aut.getStatesGlue(mCache);
@@ -276,8 +275,7 @@ checkProperty()
 
   // Store initial state ...
   const int numwords = mEncoding->getNumberOfWords();
-  const int numaut = mEncoding->getNumberOfRecords();
-  for (int a = 0; a < numaut; a++) {
+  for (int a = 0; a < mNumAutomata; a++) {
     if (mCurrentTuple[a] == UNDEF_UINT32) {
       return true;
     }
@@ -364,10 +362,9 @@ computeCounterExample()
       EventRecord* event = mEventRecords[e];
       event->sortTransitionRecordsForTrace();
     }
-    const int numaut = mEncoding->getNumberOfRecords();
     const int numwords = mEncoding->getNumberOfWords();
     uint32* packedtarget = mStateSpace->get(mBadState);
-    uint32* targettuple = new uint32[numaut];
+    uint32* targettuple = new uint32[mNumAutomata];
     mEncoding->decode(packedtarget, targettuple);
     // mEncoding->dumpEncodedState(packedtarget);
     
