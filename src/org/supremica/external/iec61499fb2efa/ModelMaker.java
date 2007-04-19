@@ -335,18 +335,20 @@ class ModelMaker
 		// load IEC 61499 application
 		loadSystem(systemFileName);
 
+
+		// test automata classes
 		automata = new ExtendedAutomata(theSystem.getName());
 
 		ExtendedAutomaton test = new ExtendedAutomaton("test", automata);
 		
 		test.addState("s0", true);
 		test.addState("s1");
-		
-		test.addTransition("s0","s1","e1;e2;","","");
+
+		test.addIntegerVariable("var1", 0, 5, 0, null);
+
+		test.addTransition("s0","s1","e1;e2;","var1 == 1","var1  = 4;");
 
 		automata.addAutomaton(test);
-
-		automata.writeToFile(new File(outputFileName));
 
 		// make instance queue model
 		makeInstanceQueue();
