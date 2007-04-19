@@ -338,6 +338,12 @@ public class ScheduleDialog
 
 		sched = null;
 	}
+
+	public void close()
+	{
+		setVisible(false);
+		dispose();
+	}
 }
 
 

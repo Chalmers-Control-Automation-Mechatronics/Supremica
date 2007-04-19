@@ -287,6 +287,11 @@ public class ModifiedAstar
 		timer.restart();
 
         plantAutomata = theAutomata.getPlantAutomata();
+
+		// This Automata instance collects the original copies of such plant automata 
+		// that are changed due to addition of dummy event. This is needed to restore
+		// the original picture at schedule construction. 
+// 		alteredAutomata = new Automata();
         
 		// Finds a string that is not contained in any plant alphabet, 
 		// to be used as the label for the dummy event.
@@ -299,10 +304,11 @@ public class ModifiedAstar
         // state. By this, the search can be performed and all the plants that return
         // to their initial states are returned simultaneously with help of a dummy
         // "reset"-event, whereafter their working cycles can restart synchronized.
-        for (Iterator<Automaton> autIt = plantAutomata.iterator(); autIt.hasNext(); )
-        {
-            addDummyAcceptingState(autIt.next());
-        }
+// This should be done by adding a specification forcing the plants to execute once, I think. /AK
+//         for (Iterator<Automaton> autIt = plantAutomata.iterator(); autIt.hasNext(); )
+//         {
+//             addDummyAcceptingState(autIt.next());
+//         }
  
 		// Creates an instance of a class that is resposible for the expansion of 
 		// the synchronized states. 
@@ -969,15 +975,16 @@ public class ModifiedAstar
     public void buildScheduleAutomaton()
 		throws Exception
     {
-        timer.restart();
-        
+        timer.restart();  
+
+		// Construct the schedule
         Automaton scheduleAuto = new Automaton();
         scheduleAuto.setComment("Schedule");
-        
+      
         State nextState = makeStateFromNode(acceptingNode, scheduleAuto, -1);
         nextState.setAccepting(true);
         scheduleAuto.addState(nextState);
-        
+
 		Node currNode = acceptingNode;
         
         while (hasParent(currNode))
@@ -1016,14 +1023,32 @@ public class ModifiedAstar
             }
         }
         
-        // If a dummy event has been added to any of the robots alphabets,
+        // If a dummy event has been added to all robot alphabets,
         // it is also added to the schedule, thus making it return from its
         // accepting to its initial state.
-        if (plantAutomata.getUnionAlphabet().contains(dummyEventName))
+		boolean resetSchedule = true;
+		for (Iterator<Automaton> plantAutIt = plantAutomata.iterator(); plantAutIt.hasNext(); )
+		{
+			Automaton plant = plantAutIt.next();
+			if (!plant.getAlphabet().contains(dummyEventName))
+			{
+				resetSchedule = false;
+				break;
+			}
+		}
+        if (resetSchedule)
         {
             LabeledEvent resetEvent =  new LabeledEvent(dummyEventName);
             scheduleAuto.getAlphabet().addEvent(resetEvent);
-            scheduleAuto.addArc(new Arc(scheduleAuto.getStateWithName(printNodeSignature(acceptingNode)), scheduleAuto.getInitialState(), resetEvent));
+
+			for (Iterator<State> stateIt = scheduleAuto.stateIterator(); stateIt.hasNext(); )
+			{
+				State state = stateIt.next();
+				if (state.isAccepting())
+				{
+					scheduleAuto.addArc(new Arc(state, scheduleAuto.getInitialState(), resetEvent));					
+				}
+			}
         }
         
         logger.info("Schedule was built in " + timer.elapsedTime() + "ms");
@@ -1227,36 +1252,41 @@ public class ModifiedAstar
         return null;
     }
     
-    private void addDummyAcceptingState(Automaton currPlant)
-    {
-        State currInitialState = currPlant.getInitialState();
+// This should be done by adding a specification forcing the plants to execute once, I think. /AK
+//     private void addDummyAcceptingState(Automaton currPlant)
+//     {
+//         State currInitialState = currPlant.getInitialState();
         
-        if (currInitialState.isAccepting())
-        {
-            currInitialState.setAccepting(false);
+//         if (currInitialState.isAccepting())
+//         {
+// // 			// Record that this plant has been altered
+// // 			alteredAutomata.addAutomaton(new Automaton(currPlant));
+// // 			logger.info("adding " + currPlant.getName() + " to altered");
+
+//             currInitialState.setAccepting(false);
             
-            State dummyState = new State("dummy_" + currInitialState.getName());
-            currPlant.addState(dummyState);
+//             State dummyState = new State("dummy_" + currInitialState.getName());
+//             currPlant.addState(dummyState);
             
-            for (Iterator<Arc> incomingArcIt = currInitialState.incomingArcsIterator(); incomingArcIt.hasNext(); )
-            {
-                Arc currArc = incomingArcIt.next();
+//             for (Iterator<Arc> incomingArcIt = currInitialState.incomingArcsIterator(); incomingArcIt.hasNext(); )
+//             {
+//                 Arc currArc = incomingArcIt.next();
                 
-                currPlant.addArc(new Arc(currArc.getFromState(), dummyState, currArc.getEvent()));
-            }
+//                 currPlant.addArc(new Arc(currArc.getFromState(), dummyState, currArc.getEvent()));
+//             }
             
-            currInitialState.removeIncomingArcs();
+//             currInitialState.removeIncomingArcs();
             
-            LabeledEvent dummyEvent = new LabeledEvent(dummyEventName);
-            currPlant.getAlphabet().addEvent(dummyEvent);
-            currPlant.addArc(new Arc(dummyState, currInitialState, dummyEvent));
+//             LabeledEvent dummyEvent = new LabeledEvent(dummyEventName);
+//             currPlant.getAlphabet().addEvent(dummyEvent);
+//             currPlant.addArc(new Arc(dummyState, currInitialState, dummyEvent));
             
-            dummyState.setAccepting(true);
-            dummyState.setCost(0);
+//             dummyState.setAccepting(true);
+//             dummyState.setCost(0);
             
-            currPlant.remapStateIndices();
-        }
-    }
+//             currPlant.remapStateIndices();
+//         }
+//     }
     
     /****************************************************************************************/
     /*                                 AUXILIARY METHODS                                    */
@@ -1345,7 +1375,7 @@ public class ModifiedAstar
      */
     protected boolean isAcceptingNode(Node node)
     {
-        // The active automata, i.e. the automata that are currently being scheduled
+		// The active automata, i.e. the automata that are currently being scheduled
         // should be in their marked states. The notion of active automata is important
         // when a subset of original plant automata is used, e.g. in relaxations.
         // However, I suspect that there is a nicer way to implement this. /AK

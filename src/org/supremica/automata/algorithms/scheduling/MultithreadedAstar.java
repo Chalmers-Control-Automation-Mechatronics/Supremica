@@ -61,6 +61,7 @@ public class MultithreadedAstar
 	private MultithreadedNode rootNode = null;
 	private double branchingProbality;
 	private static final double DEFAULT_PROBABILITY = 1;
+	private static final double UNSUCCESSFUL_SEARCH_VALUE = Double.NEGATIVE_INFINITY;
 	private ArrayList<Node> scheduleInfo;
 	private Automaton scheduleAuto;
 // 	private int nrOfSubthreads = 0;
@@ -154,7 +155,6 @@ public class MultithreadedAstar
 					// that represents the same logical state and is better than the current node in all
 					// "aspects" (lower cost in all directions). If the current node is promising (if it ends up on CLOSED),
 					// its successors are found and put on the OPEN tree.
-// 					branch(currNode);
 					double currEstimatedCost = step();
 					if (acceptingNode != null)
 					{
@@ -171,7 +171,14 @@ public class MultithreadedAstar
 			outputStr += "\tIn time: " + localTimer.elapsedTime() + " ms\n";
 // 			outputStr += "\tThe CLOSED tree contains (at the end) " + closedTree.size() + " elements\n";
 // 			outputStr += "\tMax{OPEN.size} = " + maxOpenSize + "\n";
-			outputStr += "\t\t" + "g = " + acceptingNode.getBasis()[ESTIMATE_INDEX];
+			if (acceptingNode != null)
+			{
+				outputStr += "\t\t" + "g = " + acceptingNode.getBasis()[ESTIMATE_INDEX];
+			}
+			else
+			{
+				logger.error("An accepting state could not be found");
+			}
 			
 			if (!isRelaxationProvider)
 			{
@@ -198,13 +205,21 @@ public class MultithreadedAstar
     {
 		if (openTree == null || openTree.size() == 0)
 		{
-			// Should return -INFINITY in subthreads I believe /AK
-			throw new RuntimeException("The OPEN list is empty, while an accepting state was not found, nr of iterations = " + iterationCounter);
+			// Should return -INFINITY in subthreads. If this is the main 
+			// thread on the other hand, then the search was unsuccessful.
+			if (isRelaxationProvider)
+			{
+				return Double.NEGATIVE_INFINITY;
+			}
+			else
+			{
+				throw new RuntimeException("The OPEN list is empty, while an accepting state was not found, nr of iterations = " + iterationCounter);
+			}
 		}
               
 		// Selects the first node on OPEN. If it is accepting, the search is completed
 		MultithreadedNode currNode = (MultithreadedNode) openTree.first();
-
+		
 		if (isAcceptingNode(currNode))
 		{
 			// This line is needed for correct backward search, performed during the schedule construction
@@ -279,11 +294,24 @@ public class MultithreadedAstar
 							sleep(1);
 						}
 
-						currEstimatedCost += subthread.getBranchingProbability() * subthread.step();
+						double currStepValue = subthread.step();
+						if (currStepValue == UNSUCCESSFUL_SEARCH_VALUE)
+						{ // If any of the subthreads leads to a deadlock, all (uncontrollable) subthreads are dismissed
+							currEstimatedCost = UNSUCCESSFUL_SEARCH_VALUE;
+							break;
+						}
+						else
+						{
+							currEstimatedCost += subthread.getBranchingProbability() * currStepValue;
+						}
 					}
 
-					currNode.setValueAt(ESTIMATE_INDEX, currEstimatedCost);
-					openTree.add(currNode);
+					// Add the node to the open tree only if it might lead to a marked state
+					if (currEstimatedCost != UNSUCCESSFUL_SEARCH_VALUE)
+					{
+						currNode.setValueAt(ESTIMATE_INDEX, currEstimatedCost);
+						openTree.add(currNode);
+					}
 
 					return currEstimatedCost;
 				}
@@ -298,12 +326,24 @@ public class MultithreadedAstar
 			double currEstimatedCost = 0;
 			for (MultithreadedAstar subthread : currNode.getSubthreads())
 			{
-				currEstimatedCost += subthread.getBranchingProbability() * subthread.step();
+				double currStepValue = subthread.step();
+				if (currStepValue == UNSUCCESSFUL_SEARCH_VALUE)
+				{ // If any of the subthreads leads to a deadlock, all (uncontrollable) subthreads are dismissed
+					currEstimatedCost = UNSUCCESSFUL_SEARCH_VALUE;
+					break;
+				}
+				else
+				{
+					currEstimatedCost += subthread.getBranchingProbability() * currStepValue;
+				}
 			}
 
-			currNode.setValueAt(ESTIMATE_INDEX, currEstimatedCost);
-			
-			openTree.add(currNode);
+			// Add the node to the open tree only if it might lead to a marked state
+			if (currEstimatedCost != UNSUCCESSFUL_SEARCH_VALUE)
+			{
+				currNode.setValueAt(ESTIMATE_INDEX, currEstimatedCost);			
+				openTree.add(currNode);
+			}
 
 			return currEstimatedCost;
 		}
@@ -389,33 +429,36 @@ public class MultithreadedAstar
     public void buildScheduleAutomaton()
 		throws Exception
     {    
-		timer.restart();
+		if (acceptingNode != null)
+		{
+			timer.restart();
         
-		scheduleAuto = new Automaton();
-		scheduleAuto.setComment("Schedule");
+			scheduleAuto = new Automaton();
+			scheduleAuto.setComment("Schedule");
 		
-		buildScheduleFromArray(scheduleInfo);
+			buildScheduleFromArray(scheduleInfo);
 
-        // If a dummy event has been added to any of the robots alphabets,
-        // it is also added to the schedule, thus making it return from its
-        // accepting to its initial state.
-        if (plantAutomata.getUnionAlphabet().contains(dummyEventName))
-        {
-            LabeledEvent resetEvent =  new LabeledEvent(dummyEventName);
-            scheduleAuto.getAlphabet().addEvent(resetEvent);
-			
-			for (Iterator<State> stateIt = scheduleAuto.stateIterator(); stateIt.hasNext(); )
+			// If a dummy event has been added to any of the robots alphabets,
+			// it is also added to the schedule, thus making it return from its
+			// accepting to its initial state.
+			if (plantAutomata.getUnionAlphabet().contains(dummyEventName))
 			{
-				State accState = stateIt.next();
-				if (accState.isAccepting())
+				LabeledEvent resetEvent = new LabeledEvent(dummyEventName);
+				scheduleAuto.getAlphabet().addEvent(resetEvent);
+			
+				for (Iterator<State> stateIt = scheduleAuto.stateIterator(); stateIt.hasNext(); )
 				{
-					scheduleAuto.addArc(new Arc(accState, scheduleAuto.getInitialState(), resetEvent));
+					State accState = stateIt.next();
+					if (accState.isAccepting())
+					{
+						scheduleAuto.addArc(new Arc(accState, scheduleAuto.getInitialState(), resetEvent));
+					}
 				}
 			}
-        }
         
-        logger.info("Schedule was built in " + timer.elapsedTime() + "ms");
-		ActionMan.getGui().addAutomaton(scheduleAuto);
+			logger.info("Schedule was built in " + timer.elapsedTime() + "ms");
+			ActionMan.getGui().addAutomaton(scheduleAuto);
+		}
 	}
 
 	public String buildScheduleFromArray(ArrayList<Node> scheduleInfo)

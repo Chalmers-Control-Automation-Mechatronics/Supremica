@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.37 2007-03-30 11:52:00 avenir Exp $
+//# $Id: ComponentEditorPanel.java,v 1.38 2007-04-19 09:41:26 avenir Exp $
 //###########################################################################
 
 
@@ -313,7 +313,7 @@ public class ComponentEditorPanel
 			// Some transform needed to convert java's pixel representation into postscript coordinate system
 			AffineTransform transform = new AffineTransform(1, 0, 0, -1, 0, (new java.awt.print.Paper()).getHeight());
 			AffineTransform offsetTransform = new AffineTransform(1, 0, 0, -1, 0, 0);
-			AffineTransform labelTransform = new AffineTransform(1, 0, 0, -1, 3, (new java.awt.print.Paper()).getHeight() - 12);
+			AffineTransform labelTransform = new AffineTransform(1, 0, 0, -1, 1, (new java.awt.print.Paper()).getHeight() - 12);
 
 			// The delimiters of the eps-file BoundingBox, stored in the following order: minX, minY, maxX, maxY
 			double[] boundingBoxLimits = new double[]{(new java.awt.print.Paper()).getWidth(), (new java.awt.print.Paper()).getHeight(), 0, 0};
@@ -322,8 +322,16 @@ public class ComponentEditorPanel
 			final int NODE_RADIUS = 6; // The radius of the states
 			final double MARKING_GREY_SCALE = 0.5; // The grayscale level of the marked states
 
-			// Open a file chooser and create the eps-file to be filled with the graphical information
+			// Open a file chooser in the location of the modelfile 
+			// and create the eps-file to be filled with the graphical information
 			JFileChooser chooser = new JFileChooser();
+			try 
+			{
+				chooser.setCurrentDirectory(mModule.getFileLocation());
+			}
+			catch (NullPointerException ex)
+			{}
+				
 			chooser.setSelectedFile(new File(element.getName() + ".eps"));
 			int returnVal = chooser.showSaveDialog(surface);
 			File epsFile = chooser.getSelectedFile();
@@ -575,7 +583,7 @@ public class ComponentEditorPanel
 
 					// Create bounds for the state, at a small distance (PADDING) 
 					// outside the state circle and update the bounding box
-					final int PADDING = 2;
+					final int PADDING = 0;
 					Rectangle2D stateBounds = new Rectangle2D.Double(centerPoint.getX() - NODE_RADIUS - PADDING, centerPoint.getY() - NODE_RADIUS - PADDING, 2*(NODE_RADIUS + PADDING), 2*(NODE_RADIUS + PADDING));
 					boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, stateBounds, null);
 
@@ -603,6 +611,10 @@ public class ComponentEditorPanel
 								w.write("straightArrow");
 								w.newLine();
 
+								Rectangle2D bounds = handle.getShape().getBounds2D();
+								double[] boundsCoords = new double[]{bounds.getMinX(), bounds.getMinY(), bounds.getMaxX(), bounds.getMaxY()};
+								transform.transform(boundsCoords, 0, boundsCoords, 0, 2);
+
 								// Update the bounding box
 								boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, handle.getShape().getBounds2D(), transform);
 
@@ -620,8 +632,8 @@ public class ComponentEditorPanel
 					w.write("(" + simpleNode.getName() + ") " + leftLowerCorner.getX() + " " + leftLowerCorner.getY() + " stateLabel");
 					w.newLine();
 
-					// Update the bounding box
-					boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, stateLabelShape.getBounds2D(), labelTransform);
+					// Update the bounding box			
+					boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, stateLabelShape.getBounds2D(), transform);
 				}
 
 				// Add an empty line after each state-info
@@ -976,11 +988,17 @@ public class ComponentEditorPanel
 	 */
 	private double[] updateBoundingBoxLimits(double[] bbLimits, Rectangle2D bounds, AffineTransform transform)
 	{
-		double[] boundsCoords = new double[]{bounds.getMinX(), bounds.getMinY(), bounds.getMaxX(), bounds.getMaxY()};
+		double[] boundsCoords = new double[]{bounds.getMinX(), bounds.getMaxY(), bounds.getMaxX(), bounds.getMinY()};
 
 		if (transform != null)
 		{
 			transform.transform(boundsCoords, 0, boundsCoords, 0, 2);
+		}
+		else //If no transform was given, then the boundsCoords should have normal ordering, i.e. minX, minY, maxX, maxY
+		{
+			double temp = boundsCoords[1];
+			boundsCoords[1] = boundsCoords[3];
+			boundsCoords[3] = temp;
 		}
 
 		// minX

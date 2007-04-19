@@ -24,7 +24,7 @@ public class Milp
     private Automata theAutomata, robots, zones;
 
 	// prec_temp
-// 	private Automata specs;
+	private Automata specs;
     
     /** The project used for return result */
     // NOT USED YET...
@@ -76,6 +76,9 @@ public class Milp
     
     /** The output string */
     private String outputStr = "";
+
+	/** The constrainst represented by external specifications, in string form */
+	private String externalConstraints = "";
     
     /*
      * The thread that performs the search for the optimal solution
@@ -110,6 +113,15 @@ public class Milp
         }
         catch (Exception ex)
         {
+			milpProcess = null;
+			modelFile.delete();
+			solutionFile.delete();
+
+			if (scheduleDialog != null)
+			{
+				scheduleDialog.close();
+			}
+
             logger.error("Milp::schedule() -> " + ex);
             logger.debug(ex.getStackTrace());
         }
@@ -124,7 +136,7 @@ public class Milp
      * processes and stores the resulting information.
      */
     public void schedule()
-    throws Exception
+		throws Exception
     {
         ActionTimer totalTimer = new ActionTimer();
         
@@ -183,7 +195,7 @@ public class Milp
      * by the MILP-solver can be accessed by the getSchedule-method
      */
     public void buildScheduleAutomaton()
-    throws Exception
+		throws Exception
     {
         timer.restart();
         
@@ -405,7 +417,7 @@ public class Milp
         initMutexStates();
 
 		// prec_temp
-// 		initOtherSpecs();
+		initOtherSpecs();
     }
     
     
@@ -417,7 +429,7 @@ public class Milp
      * should include "ROBOT_A". The resulting robot and zone automata are stored globally.
      */
     private void initAutomata()
-    throws Exception
+		throws Exception
     {
         robots = theAutomata.getPlantAutomata();
         zones = theAutomata.getSpecificationAutomata();
@@ -485,7 +497,7 @@ public class Milp
                 for (Iterator<Automaton> toBeSynthesizedIterator = toBeSynthesized.iterator(); toBeSynthesizedIterator.hasNext(); )
                 {
                     Automaton isSynthesized = toBeSynthesizedIterator.next();
-                    
+
                     if (isSynthesized.isSpecification())
                     {
                         zones.removeAutomaton(isSynthesized);
@@ -494,10 +506,10 @@ public class Milp
                 
                 restrictedRobot.setName(currRobotName + "_red");
                 restrictedRobot.remapStateIndices();
-                
+
                 addDummyAcceptingState(restrictedRobot);
                 restrictedRobots.addAutomaton(restrictedRobot);
-                addAutomatonToGui(restrictedRobot);
+				addAutomatonToGui(restrictedRobot);
             }
             else
             {
@@ -513,21 +525,25 @@ public class Milp
         theAutomata.addAutomata(zones);
         indexMap = new AutomataIndexMap(theAutomata);
 
-		// prec_temp
-// 		specs = new Automata();
-// 		for (Iterator<Automaton> zit = zones.iterator(); zit.hasNext(); )
-// 		{
-// 			Automaton zone = zit.next();
-// 			if (!zone.getName().contains("Zone"))
-// 			{
-// 				specs.addAutomaton(zone);
-// 				zones.removeAutomaton(zone);
-// 			}
-// 		}
+		// prec_temp (TODO... nicer than ugly-hack would be nice)
+		specs = new Automata();
+		for (Iterator<Automaton> zIt = zones.iterator(); zIt.hasNext(); )
+		{
+			Automaton zone = zIt.next();
+			if (zone.getName().contains("extern"))
+			{
+				specs.addAutomaton(zone);
+			}
+		}
+		for (Iterator<Automaton> spIt = specs.iterator(); spIt.hasNext(); )
+		{
+			Automaton spec = spIt.next();
+			zones.removeAutomaton(spec);
+		}
     }
     
     private void initMutexStates()
-    throws Exception
+		throws Exception
     {
         bookingTics = new int[zones.size()][robots.size()][1];
         unbookingTics = new int[zones.size()][robots.size()][1];
@@ -547,38 +563,20 @@ public class Milp
         for (int i=0; i<zones.size(); i++)
         {
             Automaton currZone = zones.getAutomatonAt(i);
-// logger.error("Examining " + currZone.getName());
             
             // 			ArrayList[] bookUnbookStatePairIndices = new ArrayList[robots.size()];
             
             for (int j=0; j<robots.size(); j++)
             {
                 Automaton currRobot = robots.getAutomatonAt(j);
-// logger.error("Examining " + currRobot.getName());                
+
                 // 				Alphabet commonAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getAlphabet());
                 
                 Alphabet bookingAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getInitialState().activeEvents(false));
 
-//temp
-// logger.info("booking events = ");
-// for (Iterator<LabeledEvent> it = bookingAlphabet.iterator(); it.hasNext(); )
-// {
-// 	LabeledEvent cev = it.next();
-// 	logger.info("\t" + cev.getName());
-// }
-
                 if (bookingAlphabet.size() > 0)
                 {
-                    Alphabet unbookingAlphabet = AlphabetHelpers.minus(AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getAlphabet()), bookingAlphabet);
-
-//temp
-// logger.info("unbooking events = ");
-// for (Iterator<LabeledEvent> it = unbookingAlphabet.iterator(); it.hasNext(); )
-// {
-// 	LabeledEvent cev = it.next();
-// 	logger.info("\t" + cev.getName());
-// }
-                    
+                    Alphabet unbookingAlphabet = AlphabetHelpers.minus(AlphabetHelpers.intersect(currRobot.getAlphabet(), currZone.getAlphabet()), bookingAlphabet);                   
                                     
                     ArrayList<State> bookingStates = new ArrayList<State>();
                     ArrayList<State> unbookingStates = new ArrayList<State>();
@@ -625,25 +623,10 @@ public class Milp
                         throw new Exception(exceptionStr);
                     }
                     
-					//temp
-// 					logger.warn(currZone.getName() + " & " + currRobot.getName() + " has " + bookingTics[i][j].length + " tics");
-
                     bookingTics[i][j] = new int[bookingStates.size()];
                     unbookingTics[i][j] = new int[unbookingStates.size()];
                     for (int k=0; k<bookingStates.size(); k++)
                     {
-						//temp
-// 						State bst = bookingStates.get(k);
-// 						if (bst != null)
-// 							logger.info("book_" + k + ": " + bst.getName());
-// 						else
-// 							logger.info("book_" + k + ": NULL");
-// 						State ubst = unbookingStates.get(k);
-// 						if (ubst != null)
-// 							logger.info("unbook_" + k + ": " + ubst.getName());
-// 						else
-// 							logger.info("unbook_" + k + ": NULL");
-
                         bookingTics[i][j][k] = indexMap.getStateIndex(currRobot, bookingStates.get(k));
                         unbookingTics[i][j][k] = indexMap.getStateIndex(currRobot, unbookingStates.get(k));
                     }
@@ -788,48 +771,181 @@ public class Milp
 //     }
 
 	// prec_temp
-// 	private void initOtherSpecs()
-// 	{
-// 		logger.warn("In the others....");
-// 		for (int i=0; i<specs.size(); i++)
-//         {
-//             Automaton currSpec = specs.getAutomatonAt(i);
-// 			logger.warn("Examining " + currSpec.getName());  
+	private void initOtherSpecs()
+		throws Exception
+	{
+		for (int i=0; i<specs.size(); i++)
+        {
+            Automaton currSpec = specs.getAutomatonAt(i);
 
-// 			if (!currSpec.getInitialState().isAccepting())
-// 			{
-// 				for (Iterator<State> specStateIt = currSpec.stateIterator(); specStateIt.hasNext(); )
+			if (!currSpec.getInitialState().isAccepting())
+			{
+				for (Iterator<State> specStateIt = currSpec.stateIterator(); specStateIt.hasNext(); )
+				{
+					State currSpecState = specStateIt.next();
+					if (!currSpecState.isAccepting())
+					{
+						String exclusiveSpecStr = "external_" + currSpec.getName() + " : ";
+						ArrayList<TreeSet> altPathVariablesSet = new ArrayList<TreeSet>();
+						
+						for (int j=0; j<robots.size(); j++)
+						{
+							Automaton currRobot = robots.getAutomatonAt(j);		
+							Alphabet commonActiveAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), currSpecState.activeEvents(false));
+
+							if (commonActiveAlphabet.size() > 0)
+							{
+								TreeSet<int[]> altPathVariables = new TreeSet<int[]>(new PathSplitIndexComparator());
+								for (Iterator<LabeledEvent> eventIt = commonActiveAlphabet.iterator(); eventIt.hasNext(); )
+								{
+									LabeledEvent currEvent = eventIt.next();
+									for (Iterator <State> robotStateIt = currRobot.stateIterator(); robotStateIt.hasNext(); )
+									{
+										State currRobotState = robotStateIt.next();
+										if (currRobotState.activeEvents(false).contains(currEvent))
+										{
+											// Should start the search from the next state to find the nearest path split
+											findNearestPathSplits(currRobot, currRobotState.nextState(currEvent), altPathVariables, currEvent);									
+										}
+									}
+								}
+
+								altPathVariables = removeFalseAltPaths(currRobot, altPathVariables);
+
+								for (Iterator<int[]> it = altPathVariables.iterator(); it.hasNext(); )
+								{				
+									int[] pathSplitState = it.next();
+
+									String twoPathsStrStart = "";
+									String twoPathsStrEnd = "";
+									if (pathSplitState.length > 2 && pathSplitState[2] == 1)
+									{
+										twoPathsStrStart = "(1 - ";
+										twoPathsStrEnd = ")";
+									}
+
+									exclusiveSpecStr += twoPathsStrStart + "R" + indexMap.getAutomatonIndex(currRobot) + "_from_" + pathSplitState[0] + "_to_" + pathSplitState[1] + twoPathsStrEnd + " + ";
+								}
+								
+								altPathVariablesSet.add(altPathVariables);
+							}
+						}
+
+						boolean dominatingRobotFound = false;
+						for (int j=0; j<altPathVariablesSet.size(); j++)
+						{
+							if (altPathVariablesSet.get(j).size() == 0)
+							{
+								if (dominatingRobotFound)
+								{
+									throw new Exception(currSpec.getName() + " prevents the system from reaching its final state, since at least 2 plants want (but must not) execute a mutually exclussive event.");
+								}
+								else
+								{
+									dominatingRobotFound = true;
+								}
+							}
+						}
+						exclusiveSpecStr = exclusiveSpecStr.substring(0, exclusiveSpecStr.lastIndexOf("+"));
+						if (dominatingRobotFound)
+						{
+							exclusiveSpecStr += "= 0;";
+						}
+						else
+						{
+							exclusiveSpecStr += "= 1;";
+						}
+
+						externalConstraints += exclusiveSpecStr + "\n";
+					}
+				}
+			}
+        }
+	}
+
+    private void findNearestPathSplits(Automaton auto, State state, TreeSet<int[]> altPathsVariables)
+    {
+		findNearestPathSplits(auto, state, altPathsVariables, null);
+	}
+
+    private void findNearestPathSplits(Automaton auto, State state, TreeSet<int[]> altPathsVariables, LabeledEvent event)
+    {
+		if (state.nbrOfIncomingArcs() != 0)
+		{
+			for (Iterator<Arc> incomingArcsIt = state.incomingArcsIterator(); incomingArcsIt.hasNext(); )
+			{
+				Arc currArc = incomingArcsIt.next();
+
+				// If this is the first method call, then the state is below the branching event.
+				// In that case, alternative paths leading to this state are of no interest. Thus
+				// special treatment. 
+// 				if (event != null)
 // 				{
-// 					State currSpecState = specStateIt.next();
-// 					if (!currSpecState.isAccepting())
+// 					if (!currArc.getEvent().equals(event))
 // 					{
-// 						for (int j=0; j<robots.size(); j++)
-// 						{
-// 							Automaton currRobot = robots.getAutomatonAt(j);		
-// 							Alphabet commonActiveAlphabet = AlphabetHelpers.intersect(currRobot.getAlphabet(), currSpecState.activeEvents(false));
-// 							logger.warn("Searching for outgoing events in " + currRobot.getName());
-// 							if (commonActiveAlphabet.size() > 0)
-// 							{
-// 								logger.info("HIT...");
-// 								for (Iterator<LabeledEvent> eventIt = commonActiveAlphabet.iterator(); eventIt.hasNext(); )
-// 								{
-// 									LabeledEvent currEvent = eventIt.next();
-// 									for (Iterator <State> robotStateIt = currRobot.stateIterator(); robotStateIt.hasNext(); )
-// 									{
-// 										State currRobotState = robotStateIt.next();
-// 										if (currRobotState.activeEvents(false).contains(currEvent))
-// 										{
-// 											logger.info("Found " + currEvent.getName() + " out from " + currRobotState.getName()); 
-// 										}
-// 									}
-// 								}
-// 							}
-// 						}
+// 						continue;
 // 					}
 // 				}
-// 			}
-//         }
-// 	}
+
+				if (event == null || currArc.getEvent().equals(event))
+				{
+					State upstreamsState = currArc.getFromState();
+					if (upstreamsState.nbrOfOutgoingMultiArcs() == 1)
+					{
+						findNearestPathSplits(auto, upstreamsState, altPathsVariables);
+					}
+					else if (upstreamsState.nbrOfOutgoingMultiArcs() == 2)
+					{
+						State nextLeftState = upstreamsState.nextStateIterator().next();
+						// -1 in the end if current path goes through the left sibling (+1 otherwise)
+						int[] pathSplitIndex = new int[]{indexMap.getStateIndex(auto, upstreamsState), indexMap.getStateIndex(auto, nextLeftState), -1};
+						if (! nextLeftState.equals(state))
+						{
+							pathSplitIndex[pathSplitIndex.length-1] = 1;
+						}
+						
+					altPathsVariables.add(pathSplitIndex);
+					}
+					else 
+					{
+						altPathsVariables.add(new int[]{indexMap.getStateIndex(auto, upstreamsState), indexMap.getStateIndex(auto, state)});
+					}
+				}
+			}
+		}
+	}
+
+	private TreeSet<int[]> removeFalseAltPaths(Automaton auto, TreeSet<int[]> altPathVariables)
+	{
+		boolean falseAltPathFound = false;
+		TreeSet<int[]> newAltPathVariables = new TreeSet<int[]>(new PathSplitIndexComparator());
+		SortedSet<int[]> tail = altPathVariables.tailSet(new int[]{0, 0, -1});
+
+		while (!tail.isEmpty())
+		{
+			int startStateIndex = tail.first()[0];
+			int[] separatingElement = new int[]{startStateIndex + 1, 0, -1};
+			SortedSet<int[]> head = tail.headSet(separatingElement);
+			tail = tail.tailSet(separatingElement);
+			State startState = indexMap.getStateAt(auto, startStateIndex);
+			if (startState.nbrOfOutgoingMultiArcs() != head.size())
+			{
+				newAltPathVariables.addAll(head);
+			}
+			else
+			{
+				falseAltPathFound = true;
+				findNearestPathSplits(auto, startState, newAltPathVariables);
+			}
+		}
+
+		if (falseAltPathFound)
+		{
+			return removeFalseAltPaths(auto, newAltPathVariables);
+		}
+
+		return newAltPathVariables;
+	}
     
     
     /****************************************************************************************/
@@ -842,7 +958,7 @@ public class Milp
      * constructed.
      */
     private void convertAutomataToMilp()
-    throws Exception
+		throws Exception
     {
         timer.restart();
         
@@ -941,17 +1057,17 @@ public class Milp
                         int nextLeftStateIndex = indexMap.getStateIndex(currRobot, nextLeftState);
                         int nextRightStateIndex = indexMap.getStateIndex(currRobot, nextRightState);
                         
-                        String currAltPathsVariable = "R" + currRobotIndex + "_goes_from_" + currStateIndex + "_to_" + nextLeftStateIndex;
+                        String currAltPathsVariable = "R" + currRobotIndex + "_from_" + currStateIndex + "_to_" + nextLeftStateIndex;
                         
                         altPathsVariables += "var " + currAltPathsVariable + ", binary;\n";
                         
                         altPathsConstraints += "alt_paths_" + "R" + currRobotIndex + "_" + currStateIndex + " : ";
-                        altPathsConstraints += "time[" + i + ", " + nextLeftStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + ", "  + nextLeftStateIndex + "] - bigM*" + currAltPathsVariable + ";\n";
+                        altPathsConstraints += "time[" + i + ", " + nextLeftStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + ", "  + nextLeftStateIndex + "] - bigM*(1 - " + currAltPathsVariable + ");\n";
                         
                         pathCutTable.put(nextLeftState, currAltPathsVariable);
                         
                         altPathsConstraints += "dual_alt_paths_" + "R" + currRobotIndex + "_" + currStateIndex + " : ";
-                        altPathsConstraints += "time[" + i + ", " + nextRightStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + ", "  + nextRightStateIndex + "] - bigM*(1 - " + currAltPathsVariable + ");\n";
+                        altPathsConstraints += "time[" + i + ", " + nextRightStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + ", "  + nextRightStateIndex + "] - bigM*" + currAltPathsVariable + ";\n";
                         
                         pathCutTable.put(nextRightState, "(1 - " + currAltPathsVariable + ")");
                     }
@@ -959,12 +1075,15 @@ public class Milp
                     else if (nbrOfOutgoingMultiArcs > 2)
                     {
                         int currAlternative = 0;
+						String sumEqualToOneConstraint = "alt_paths_" + "R" + currRobotIndex + "_" + currStateIndex + "_TOT : ";
                         
                         while (nextStates.hasNext())
                         {
-                            String currAltPathsVariable = "R" + currRobotIndex + "_" + currStateIndex + "_path_" + currAlternative;
-                            State nextState = nextStates.next();
-                            int nextStateIndex = indexMap.getStateIndex(currRobot, nextState);
+							State nextState = nextStates.next();
+							int nextStateIndex = indexMap.getStateIndex(currRobot, nextState);
+
+                            String currAltPathsVariable = "R" + currRobotIndex + "_from_" + currStateIndex + "_to_" + nextStateIndex;
+							sumEqualToOneConstraint += currAltPathsVariable + " + ";
                             
                             altPathsVariables += "var " + currAltPathsVariable + ", binary;\n";
                             
@@ -976,12 +1095,14 @@ public class Milp
                             currAlternative++;
                         }
                         
-                        altPathsConstraints += "alt_paths_" + "R" + currRobotIndex + "_" + currStateIndex + "_TOT : ";
-                        for (int k=0; k<currAlternative - 1; k++)
-                        {
-                            altPathsConstraints += "R" + currRobotIndex + "_" + currStateIndex + "_path_" + k + " + ";
-                        }
-                        altPathsConstraints += "R" + currRobotIndex + "_" + currStateIndex + "_path_" + (currAlternative - 1) + " = 1;\n";
+						altPathsConstraints += sumEqualToOneConstraint.substring(0, sumEqualToOneConstraint.lastIndexOf("+")) + "= 1;\n";
+
+//                         altPathsConstraints += "alt_paths_" + "R" + currRobotIndex + "_" + currStateIndex + "_TOT : ";
+//                         for (int k=0; k<currAlternative - 1; k++)
+//                         {
+//                             altPathsConstraints += "R" + currRobotIndex + "_" + currStateIndex + "_path_" + k + " + ";
+//                         }
+//                         altPathsConstraints += "R" + currRobotIndex + "_" + currStateIndex + "_path_" + (currAlternative - 1) + " = 1;\n";
                     }
                 }
                 else if (currState.isAccepting())
@@ -1134,7 +1255,11 @@ public class Milp
         // The mutex constraints
         w.newLine();
         w.write(mutexConstraints);
-        w.newLine();
+
+		// The constraints due to external specifications
+		w.newLine();
+		w.write(externalConstraints);
+		w.newLine();
         
         // The end of the model-section and the beginning of the data-section
         w.newLine();
@@ -1167,7 +1292,7 @@ public class Milp
     }
     
     private void processSolutionFile()
-    throws Exception
+		throws Exception
     {
         // tillf...
         // 		for (int i=0; i<robots.size(); i++)
@@ -1325,38 +1450,46 @@ public class Milp
     }
     
     private void addDummyAcceptingState(Automaton currPlant)
+		throws Exception 
     {
         State currInitialState = currPlant.getInitialState();
-        
+
+		if (currInitialState == null)
+		{
+			String robotName = currPlant.getName();
+			robotName = robotName.substring(0, robotName.indexOf("_red"));
+			throw new Exception(robotName + " has no initial state when restricted by its specifications. The system has thus no (optimal) path."); 
+		}
+
         if (currInitialState.isAccepting())
         {
             currInitialState.setAccepting(false);
             
             State dummyState = new State("dummy_" + currInitialState.getName());
             currPlant.addState(dummyState);
-            
+
             for (Iterator<Arc> incomingArcIt = currInitialState.incomingArcsIterator(); incomingArcIt.hasNext(); )
             {
                 Arc currArc = incomingArcIt.next();
                 
                 currPlant.addArc(new Arc(currArc.getFromState(), dummyState, currArc.getEvent()));
             }
-            
+
             currInitialState.removeIncomingArcs();
-            
+
             // 			LabeledEvent dummyEvent = new LabeledEvent(dummyEventName);
             // 			currPlant.getAlphabet().addEvent(dummyEvent);
             // 			currPlant.addArc(new Arc(dummyState, currInitialState, dummyEvent));
-            
+
             dummyState.setAccepting(true);
             dummyState.setCost(0);
-            
+
             currPlant.remapStateIndices();
         }
     }
     
     private synchronized void addAutomatonToGui(Automaton auto)
-    throws Exception
+		throws Exception
     {
         if (scheduleDialog != null)
         {
@@ -1382,4 +1515,23 @@ public class Milp
     {
         return schedule;
     }
+}
+
+class PathSplitIndexComparator
+	implements Comparator<int[]>
+{
+	public int compare(int[] o1, int[] o2)
+	{
+		int indexLength = Math.min(o1.length, o2.length);
+
+		for (int i=0; i<indexLength; i++)
+		{
+			if (o1[i] != o2[i])
+			{
+				return o1[i] - o2[i];
+			}
+		}
+
+		return 0;
+	}
 }

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   DocumentSubject
 //###########################################################################
-//# $Id: DocumentSubject.java,v 1.5 2006-09-19 15:53:20 robi Exp $
+//# $Id: DocumentSubject.java,v 1.6 2007-04-19 09:39:54 avenir Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -109,6 +109,10 @@ public abstract class DocumentSubject
 
   public File getFileLocation() throws MalformedURLException
   {
+    if (mLocation == null) {
+      return null;
+    }
+
     final URL url = mLocation.toURL();
     final String proto = url.getProtocol();
     if (proto.equals("file")) {
