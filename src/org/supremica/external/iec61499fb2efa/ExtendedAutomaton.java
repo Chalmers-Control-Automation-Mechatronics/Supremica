@@ -103,7 +103,7 @@ class ExtendedAutomaton
 
 		
 
-		component.getVariablesModifiable().add(factory.createVariableProxy(name, type, initialValue));
+		//component.getVariablesModifiable().add(factory.createVariableProxy(name, type, initialValue));
 	}
 
 	/**
