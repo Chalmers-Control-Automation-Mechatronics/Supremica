@@ -4,14 +4,18 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ModuleProxyPrinter
 //###########################################################################
-//# $Id: ModuleProxyPrinter.java,v 1.10 2007-03-07 10:12:58 torda Exp $
+//# $Id: ModuleProxyPrinter.java,v 1.11 2007-04-23 02:51:11 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;
 
+import java.awt.Color;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.Writer;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -63,6 +67,7 @@ import net.sourceforge.waters.model.module.BooleanConstantProxy;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.xsd.module.AnchorPosition;
 
 
 public class ModuleProxyPrinter
@@ -172,22 +177,36 @@ public class ModuleProxyPrinter
     return null;
   }
 
-  public Object visitBoxGeometryProxy
-      (final BoxGeometryProxy proxy)
+  public Object visitBoxGeometryProxy(final BoxGeometryProxy geo)
     throws VisitorException
   {
-    return visitGeometryProxy(proxy);
+    final Rectangle2D rect = geo.getRectangle();
+    print(rect);
+    return null;
   }
 
-  public Object visitColorGeometryProxy
-      (final ColorGeometryProxy proxy)
+  public Object visitColorGeometryProxy(final ColorGeometryProxy geo)
     throws VisitorException
   {
-    return visitGeometryProxy(proxy);
+    final Set<Color> colors = geo.getColorSet();
+    if (colors.size() == 1) {
+      print(colors.iterator().next());
+    } else {
+      boolean first = true;
+      print('{');
+      for (final Color color : colors) {
+        if (first) {
+          first = false;
+        } else {
+          print(", ");
+        }
+        print(color);
+      }
+    }
+    return visitGeometryProxy(geo);
   }
 
-  public Object visitComponentProxy
-      (final ComponentProxy proxy)
+  public Object visitComponentProxy(final ComponentProxy proxy)
     throws VisitorException
   {
     return visitIdentifiedProxy(proxy);
@@ -437,10 +456,16 @@ public class ModuleProxyPrinter
   }
 
   public Object visitLabelGeometryProxy
-      (final LabelGeometryProxy proxy)
+      (final LabelGeometryProxy geo)
     throws VisitorException
   {
-    return visitGeometryProxy(proxy);
+    final AnchorPosition anchor = geo.getAnchor();
+    final Point2D point = geo.getOffset();
+    print('[');
+    print(anchor.toString());
+    print(']');
+    print(point);
+    return null;
   }
 
   public Object visitModuleProxy
@@ -503,10 +528,12 @@ public class ModuleProxyPrinter
   }
 
   public Object visitPointGeometryProxy
-      (final PointGeometryProxy proxy)
+      (final PointGeometryProxy geo)
     throws VisitorException
   {
-    return visitGeometryProxy(proxy);
+    final Point2D point = geo.getPoint();
+    print(point);
+    return null;
   }
 
   public Object visitSimpleComponentProxy
@@ -573,10 +600,20 @@ public class ModuleProxyPrinter
   }
 
   public Object visitSplineGeometryProxy
-      (final SplineGeometryProxy proxy)
+      (final SplineGeometryProxy geo)
     throws VisitorException
   {
-    return visitGeometryProxy(proxy);
+    final List<Point2D> points = geo.getPoints();
+    boolean first = true;
+    for (final Point2D point : points) {
+      if (first) {
+        first = false;
+      } else {
+        print(", ");
+      }
+      print(point);
+    }
+    return null;
   }
 
   public Object visitUnaryExpressionProxy
@@ -612,6 +649,45 @@ public class ModuleProxyPrinter
   }
 
 
+  //#########################################################################
+  //# Auxiliary Methods
+  private void print(final Point2D point)
+    throws VisitorException
+  {
+    print('(');
+    print(point.getX());
+    print(',');
+    print(point.getY());
+    print(')');
+  }
+
+  private void print(final Rectangle2D rect)
+    throws VisitorException
+  {
+    print('(');
+    print(rect.getX());
+    print(',');
+    print(rect.getY());
+    print(',');
+    print(rect.getWidth());
+    print(',');
+    print(rect.getHeight());
+    print(')');
+  }
+
+  private void print(final Color color)
+    throws VisitorException
+  {
+    print("RGB(");
+    print(color.getRed());
+    print(',');
+    print(color.getGreen());
+    print(',');
+    print(color.getBlue());
+    print(')');
+  }
+
+  
   //#########################################################################
   //# Data Members
   private int mPriority = OperatorTable.PRIORITY_OUTER;

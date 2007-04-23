@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ProxyPrinter
 //###########################################################################
-//# $Id: ProxyPrinter.java,v 1.6 2006-11-03 15:01:57 torda Exp $
+//# $Id: ProxyPrinter.java,v 1.7 2007-04-23 02:51:11 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;
@@ -259,6 +259,12 @@ public class ProxyPrinter
     } catch (final IOException exception) {
       throw wrap(exception);
     }
+  }
+
+  public void print(final double msg)
+    throws VisitorException
+  {
+    print(Double.toString(msg));
   }
 
   public void print(final int msg)

@@ -855,8 +855,10 @@ proc Java_GenerateClass {impl subpack prefix destname classinfo
           "  public boolean assignFrom(final ProxySubject partner)"
       Java_WriteLn $stream $umap "  \{"
       Java_WriteLn $stream $umap "    if (this != partner) \{"
-      Java_WriteLn $stream $umap \
-          "      final $classname downcast = ($classname) partner;"
+      if {[llength $attribs] > 0} {
+        Java_WriteLn $stream $umap \
+            "      final $classname downcast = ($classname) partner;"
+      }
       Java_WriteLn $stream $umap \
           "      boolean change = super.assignFrom(partner);"
       foreach attrib $attribs {
