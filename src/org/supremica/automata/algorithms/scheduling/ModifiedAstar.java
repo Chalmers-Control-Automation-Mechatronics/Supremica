@@ -1417,9 +1417,14 @@ public class ModifiedAstar
     {
         int key = 0;
         
-        for (int i=0; i<activeAutomataIndex.length; i++)
+//         for (int i=0; i<activeAutomataIndex.length; i++)
+//         {
+//             key += ((int)node.getValueAt(activeAutomataIndex[i]))*keyMapping[activeAutomataIndex[i]];
+//         }
+        for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
         {
-            key += ((int)node.getValueAt(activeAutomataIndex[i]))*keyMapping[activeAutomataIndex[i]];
+			int automatonIndex = indexMap.getAutomatonIndex(autIt.next());
+            key += ((int)node.getValueAt(automatonIndex))*keyMapping[automatonIndex];
         }
         
         return key;
