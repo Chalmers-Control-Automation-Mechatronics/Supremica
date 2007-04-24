@@ -10,8 +10,14 @@ There is currently no real bug-tracking system for Supremica/Waters... we should
  * New modules should not contain any events. Default markings :accepting and :forbidden should only be created when explicitly requested -- Robi.
  * Currently some examples exist in double "copies", in examples/waters/handwritten and in  examples/includeInJarFile/ModuleExamples... 
 
- * Change menu keyboard shortcuts to ALT
+ * Check menu keyboard shortcuts. ALT or CONTROL --- presently ALT-E
+   is used twice.
  * Group node error feedback should be given while dragging
+ * Encapsulated Postscript exporter is broken. It is trying to reimplement
+   renderer functionality which, predictably, does not work properly.
+   Printing _must_ be done through Renderer and Graphics2D somehow ...
+ * Selection should not be shown when printing.
+ * Logging is not thread-safe.
 
  * DNFMinimizer fails several test cases.
 
