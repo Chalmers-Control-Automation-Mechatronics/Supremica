@@ -90,6 +90,9 @@ public class Milp
      * The thread that performs the search for the optimal solution
      */
     private Thread milpThread;
+
+	// temp
+	PrintWriter logWriter = null;
     
     /****************************************************************************************/
     /*                                 CONSTUCTORS                                          */
@@ -102,6 +105,11 @@ public class Milp
         //  this.theProject = theProject;
         this.buildSchedule = buildSchedule;
         this.scheduleDialog = scheduleDialog;
+
+		// temp
+		File logFile = new File("C:\\supremica_log.txt");
+		logFile.createNewFile();
+		logWriter = new PrintWriter(logFile);
     }
     
     public void startSearchThread()
@@ -130,7 +138,14 @@ public class Milp
 
             logger.error("Milp::schedule() -> " + ex);
             logger.debug(ex.getStackTrace());
+			
+			ex.printStackTrace(logWriter);
+			logWriter.flush();
+			logWriter.close();
         }
+
+		logWriter.flush();
+		logWriter.close();
     }
     
     /****************************************************************************************/
@@ -172,6 +187,8 @@ public class Milp
             
             String totalTimeStr = "Total optimization time = " + totalTimer.elapsedTime() + "ms";
             logger.info(totalTimeStr);
+			// temp
+			logWriter.println(totalTimeStr);
             outputStr += "\t" + totalTimeStr + "\n";
         }
         
@@ -188,6 +205,8 @@ public class Milp
         else
         {
             logger.warn("Scheduling interrupted");
+			// temp
+			logWriter.println("Scheduling interrupted");
 			if (scheduleDialog != null)
 			{
 				scheduleDialog.reset();
@@ -397,6 +416,8 @@ public class Milp
         
         String str = "Time to build the schedule: " + timer.elapsedTime() + "ms ";
         logger.info(str);
+		// temp
+		logWriter.println(str);
         outputStr += "\t" + str;
 
         addAutomatonToGui(schedule);
@@ -469,6 +490,8 @@ public class Milp
 			if (counter == 0)
 			{
 				logger.warn("Specification " + spec.getName() + " has no common events with any of the plants");
+				// temp
+				logWriter.println("Specification " + spec.getName() + " has no common events with any of the plants");
 			}
 			else if (counter == 1)
 			{
@@ -550,6 +573,8 @@ public class Milp
 				plants.addAutomaton(restrictedPlant);
 
 				logger.info(str.substring(0, str.lastIndexOf("||")) + " synthesized into " + restrictedPlant.getName());
+				// temp
+				logWriter.println(str.substring(0, str.lastIndexOf("||")) + " synthesized into " + restrictedPlant.getName());
 			}
 		}
 
@@ -1447,6 +1472,8 @@ public class Milp
         
         String str = "Time to set up the optimization problem: " + timer.elapsedTime() + "ms";
         logger.info(str);
+		// temp
+		logWriter.println(str);
         outputStr += "\t" + str + "\n";
     }
     
@@ -1548,6 +1575,8 @@ public class Milp
         
         str = "OPTIMAL MAKESPAN: " + makespan + ".............................";
         logger.info(str);
+		// temp
+		logWriter.println(str);
         outputStr += "\t" + str + "\n";
     }
     
@@ -1555,6 +1584,8 @@ public class Milp
 		throws Exception
     {
         logger.info("The MILP-solver started....");
+		// temp
+		logWriter.println("The MILP-solver started....");
         // Defines the name of the .exe-file as well the arguments (.mod and .sol file names)
         String[] cmds = new String[5];
         //cmds[0] = "C:\\Program Files\\glpk\\bin\\glpsol.exe";
@@ -1572,6 +1603,8 @@ public class Milp
         catch (IOException milpNotFoundException)
         {
             logger.error("The GLPK-solver 'glpsol.exe' not found. Make sure that it is registered in your path.");
+			// temp
+			logWriter.println("The GLPK-solver 'glpsol.exe' not found. Make sure that it is registered in your path.");
             throw milpNotFoundException;
         }
         
@@ -1707,6 +1740,8 @@ public class Milp
             catch (Exception ex)
             {
                 logger.warn("EXceptiON, gui = " + theGui);
+				// temp
+				logWriter.println("EXceptiON, gui = " + theGui);
                 throw ex;
             }
         }
@@ -1747,6 +1782,8 @@ public class Milp
             catch (Exception ex)
             {
                 logger.warn("EXceptiON, gui = " + theGui);
+				// temp
+				logWriter.println("EXceptiON, gui = " + theGui);
                 throw ex;
             }
         }
