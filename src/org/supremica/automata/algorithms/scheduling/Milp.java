@@ -96,7 +96,7 @@ public class Milp
     /****************************************************************************************/
     
     public Milp(Automata theAutomata, boolean buildSchedule, ScheduleDialog scheduleDialog)
-    throws Exception
+		throws Exception
     {
         this.theAutomata = theAutomata;
         //  this.theProject = theProject;
@@ -188,7 +188,10 @@ public class Milp
         else
         {
             logger.warn("Scheduling interrupted");
-            scheduleDialog.reset();
+			if (scheduleDialog != null)
+			{
+				scheduleDialog.reset();
+			}
         }
     }
     
@@ -553,7 +556,8 @@ public class Milp
 		for (Iterator<Automaton> specsIt = allSpecs.iterator(); specsIt.hasNext(); )
 		{
 			Automaton spec = specsIt.next();
-			if (spec.nbrOfStates() > 2)
+
+			if (isMutexZone(spec))
 			{
 				zones.addAutomaton(spec);
 			}
@@ -663,6 +667,43 @@ public class Milp
             }
         }
     }
+
+    private boolean isMutexZone(Automaton spec)
+    {
+		if (spec.nbrOfStates() < 3)
+		{
+			return false;
+		}
+
+		State initialState = spec.getInitialState();
+		if (!initialState.isAccepting())
+		{
+			return false;
+		}
+
+		if (spec.nbrOfAcceptingStates() != 1)
+		{
+			return false;
+		}
+			
+		for (Iterator<State> stateIt = spec.stateIterator(); stateIt.hasNext(); )
+		{
+			State state = stateIt.next();
+			if (!state.equals(initialState))
+			{
+				for (Iterator<State> nextStateIt = state.nextStateIterator(); nextStateIt.hasNext(); )
+				{
+					State nextState = nextStateIt.next();
+					if (!nextState.equals(initialState))
+					{
+						return false;
+					}
+				}
+			}
+		}
+
+		return true;
+	}
     
 	// prec_temp
 	private void createExternalConstraints()
@@ -672,22 +713,25 @@ public class Milp
         {
             Automaton currSpec = externalSpecs.getAutomatonAt(i);
 
-			if (!currSpec.getInitialState().isAccepting())
+			if (currSpec.nbrOfStates() == 2)
 			{
-				if (currSpec.getInitialState().nbrOfIncomingArcs() == 0)
+				if (!currSpec.getInitialState().isAccepting())
 				{
-					createXORConstraints(currSpec);
-					continue;
-				}
-			}
-			else
-			{
-				if (currSpec.getInitialState().nbrOfIncomingArcs() > 0)
-				{
-					if (currSpec.nbrOfAcceptingStates() == 1)
+					if (currSpec.getInitialState().nbrOfIncomingArcs() == 0)
 					{
-						createPrecedenceConstraints(currSpec);
+						createXORConstraints(currSpec);
 						continue;
+					}
+				}
+				else
+				{
+					if (currSpec.getInitialState().nbrOfIncomingArcs() > 0)
+					{
+						if (currSpec.nbrOfAcceptingStates() == 1)
+						{
+							createPrecedenceConstraints(currSpec);
+							continue;
+						}
 					}
 				}
 			}
@@ -1571,7 +1615,7 @@ public class Milp
     {
         isRunning = false;
         
-        if (disposeScheduleDialog)
+        if (scheduleDialog != null && disposeScheduleDialog)
         {
             scheduleDialog.done();
         }
