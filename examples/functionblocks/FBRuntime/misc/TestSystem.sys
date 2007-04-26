@@ -7,6 +7,7 @@
         <FB Name="restart" Type="E_RESTART" />
         <!--FB Name="delay" Type="E_DELAY" /-->
         <FB Name="merge" Type="E_MERGE2" />
+        <!--FB Name="split" Type="E_SPLIT7" /-->
         <FB Name="comptest1" Type="TestComposite" />
         <FB Name="comptest2" Type="TestComposite" />
         <EventConnections>

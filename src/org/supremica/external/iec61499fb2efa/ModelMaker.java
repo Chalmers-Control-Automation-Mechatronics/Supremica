@@ -214,14 +214,11 @@ class ModelMaker
 								{
 									FB curFB = (FB) fbIter.next();
 									String instanceName = curFB.getName();
+									String typeName = curFB.getType();
 									// get and load the FB type
-									if (curFB.getType().startsWith("E_SPLIT"))
+									if (typeName.startsWith("E_SPLIT") || typeName.startsWith("E_MERGE"))
 									{
-										//constructSplitType((new Integer(curFB.getType().substring(7))).intValue());
-									}
-									else if (curFB.getType().startsWith("E_MERGE"))
-									{
-										//constructMergeType((new Integer(curFB.getType().substring(7))).intValue());
+										functionBlocks.put(instanceName,curFB.getType());								
 									}
 									else
 									{
@@ -240,60 +237,6 @@ class ModelMaker
 			System.exit(1);
 		}
 	}
-
-// 	private void constructMergeType(int size)
-// 	{
-// 		resource.addBasicFBType("E_MERGE" + size);
-		
-// 		BasicFBType newBasicFBType = (BasicFBType) resource.getFBType("E_MERGE" + size);	
-
-// 		for(int i=1; i<=size; i++)
-// 		{
-// 			newBasicFBType.addVariable("EI" + i, new BooleanVariable("EventInput",false));
-// 		}
-// 		newBasicFBType.addVariable("EO", new BooleanVariable("EventInput",false));
-
-// 		newBasicFBType.getECC().addInitialState("S0");
-// 		newBasicFBType.getECC().addState("S1");
-// 		newBasicFBType.getECC().getState("S1").addAction(null, "EO");
-// 		String condition = "";
-// 		for(int i=1; i<=size; i++)
-// 		{
-// 			if (i==size)
-// 			{
-// 				condition = condition + "EI" + i;
-// 			}
-// 			else
-// 			{
-// 				condition = condition + "EI" + i + " OR ";
-// 			}
-// 		}
-// 		newBasicFBType.getECC().addTransition("S0","S1",condition);
-// 		newBasicFBType.getECC().addTransition("S1","S0","TRUE");
-// 	}
-
-// 	private void constructSplitType(int size)
-// 	{
-// 		resource.addBasicFBType("E_SPLIT" + size);
-		
-// 		BasicFBType newBasicFBType = (BasicFBType) resource.getFBType("E_SPLIT" + size);
-		
-// 		newBasicFBType.addVariable("EI", new BooleanVariable("EventInput",false));
-
-// 		for(int i=1; i<=size; i++)
-// 		{
-// 			newBasicFBType.addVariable("EO" + i, new BooleanVariable("EventInput",false));
-// 		}
-
-// 		newBasicFBType.getECC().addInitialState("S0");
-// 		newBasicFBType.getECC().addState("S1");
-// 		for(int i=1; i<=size; i++)
-// 		{
-// 			newBasicFBType.getECC().getState("S0").addAction(null, "EO" + i);
-// 		}
-// 		newBasicFBType.getECC().addTransition("S0","S1","EI");
-// 		newBasicFBType.getECC().addTransition("S1","S0","TRUE");
-// 	}
 
     private void loadFB(String instanceName, String fileName)
     {
@@ -366,6 +309,18 @@ class ModelMaker
 	{
 				
 	}
+
+	private void makeMerge(int size)
+	{
+		System.out.println("Making Merge of size: " + size);
+	}
+	
+	private void makeSplit(int size)
+	{
+		System.out.println("Making Split of size: " + size);
+	}
+
+
 	
 	public void makeModel()
 	{
@@ -397,36 +352,49 @@ class ModelMaker
 		for (Iterator fbIter = functionBlocks.keySet().iterator(); fbIter.hasNext();)
 		{
 			String fbName = (String) fbIter.next();
-			JaxbFBType fbType = fbTypes.get(functionBlocks.get(fbName));
-			if (fbType.isSetBasicFB())
+			String typeName = (String) functionBlocks.get(fbName);
+			JaxbFBType fbType = fbTypes.get(typeName);
+			if (fbType != null)
 			{
-				makeBasicFB(fbName, fbType);
-			}
-			else if (fbType.isSetFBNetwork())
-			{
-				makeCompositeFB(fbName, fbType);
-			}
-			else if (fbType.getName().equals("E_RESTART"))
-			{
-				
-			}
-			else if (fbType.getName().startsWith("E_SPLIT"))
-			{
-				
-			}
-			else if (fbType.getName().startsWith("E_MERGE"))
-			{
-				
+				if (fbType.isSetBasicFB())
+				{
+					makeBasicFB(fbName, fbType);
+				}
+				else if (fbType.isSetFBNetwork())
+				{
+					makeCompositeFB(fbName, fbType);
+				}
+				else if (typeName.equals("E_RESTART"))
+				{
+					
+				}
+				else
+				{
+					System.err.println("ModelMaker.makeModel(): Unsupported FB type: " + functionBlocks.get(fbName));
+					System.err.println("\t Info: The type in neither Basic nor Composite FB type.");
+					System.exit(1);
+				}
 			}
 			else
 			{
-				System.err.println("ModelMaker.makeModel(): Unsupported FB type: " + functionBlocks.get(fbName));
-				System.err.println("\t Info: The type in neither Basic nor Composite FB type.");
-				System.exit(1);
+				if (typeName.startsWith("E_SPLIT"))
+				{
+					makeSplit((new Integer(functionBlocks.get(fbName).substring(7))).intValue());
+				}
+				else if (typeName.startsWith("E_MERGE"))
+				{
+					makeMerge((new Integer(functionBlocks.get(fbName).substring(7))).intValue());
+				}
+				else
+				{
+					System.err.println("ModelMaker.makeModel(): Unsupported FB type: " + functionBlocks.get(fbName));
+					System.err.println("\t Info: The type in neither Basic nor Composite FB type.");
+					System.exit(1);
+				}
 			}
 		}
-
-
+		
+		
 // 		// test automata classes
 // 		ExtendedAutomaton test = new ExtendedAutomaton("test", automata);
 // 		test.addState("s0", true);
