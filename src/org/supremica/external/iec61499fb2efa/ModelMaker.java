@@ -51,8 +51,11 @@ class ModelMaker
 	
 	private JaxbSystem theSystem;
 	private JaxbFBNetwork systemFBNetwork;
-	private Map<String,JaxbFBType> fbTypes = new HashMap<String,JaxbFBType>();
 	private Map<String,String> functionBlocks = new HashMap<String,String>();
+	private Map<String,JaxbFBType> fbTypes = new HashMap<String,JaxbFBType>();
+
+	private Map<String, Map> eventConnectionMaps = new HashMap<String, Map>();
+	private Map<String, Map> dataConnectionMaps = new HashMap<String, Map>();
 
 	private ExtendedAutomata automata;
 
@@ -328,10 +331,40 @@ class ModelMaker
 	{
 		ExtendedAutomaton instanceQueue = new ExtendedAutomaton("instanceQueue", automata);
 		
-		// get the maximum number of FB instances in queue at the same time
+		// the maximum number of FB instances in queue at the same time
+		final int places = 5;
+				
+	}
+
+	private void makeEventExecution()
+	{
+		ExtendedAutomaton eventExecution = new ExtendedAutomaton("eventExecution", automata);
 		
+	}
+
+	private void makeJobQueue()
+	{
+		ExtendedAutomaton jobQueue = new ExtendedAutomaton("jobQueue", automata);
 		
+		// the maximum number of jobs in queue at the same time
+		final int places = 5;
 		
+	}
+
+	private void makeAlgorithmExecution()
+	{
+		ExtendedAutomaton algorithmExecution = new ExtendedAutomaton("algorithmExecution", automata);
+				
+	}
+
+	private void makeBasicFB(String fbName, JaxbFBType fbType)
+	{
+				
+	}
+
+	private void makeCompositeFB(String fbName, JaxbFBType fbType)
+	{
+				
 	}
 	
 	public void makeModel()
@@ -340,31 +373,75 @@ class ModelMaker
 		// load IEC 61499 application
 		loadSystem(systemFileName);
 
- 		automata = new ExtendedAutomata(theSystem.getName());
-
-// 		// test automata classes
-// 		ExtendedAutomaton test = new ExtendedAutomaton("test", automata);
+		// make event connection map
 		
-// 		test.addState("s0", true);
-// 		test.addState("s1");
 
-// 		test.addIntegerVariable("var1", 0, 5, 0, null);
+		// make data connection map
 
-// 		test.addTransition("s0","s1","e1;e2;","var1 == 1","var1  = 4;");
 
-// 		automata.addAutomaton(test);
+ 		automata = new ExtendedAutomata(theSystem.getName());
 
 		// make instance queue model
 		makeInstanceQueue();
 
-		// TODO: make event execution thread model
-
-		// TODO: make jobs queue model
+		// make event execution thread model
+		makeEventExecution();
 		
-		// TODO: make algorithms execution thread model	
+		// make jobs queue model
+		makeJobQueue();
 
-		// TODO: for each FB instance make models
-		
+		// make algorithms execution thread model	
+		makeAlgorithmExecution();
+
+		//for each FB instance make models
+		for (Iterator fbIter = functionBlocks.keySet().iterator(); fbIter.hasNext();)
+		{
+			String fbName = (String) fbIter.next();
+			JaxbFBType fbType = fbTypes.get(functionBlocks.get(fbName));
+			if (fbType.isSetBasicFB())
+			{
+				makeBasicFB(fbName, fbType);
+			}
+			else if (fbType.isSetFBNetwork())
+			{
+				makeCompositeFB(fbName, fbType);
+			}
+			else if (fbType.getName().equals("E_RESTART"))
+			{
+				
+			}
+			else if (fbType.getName().startsWith("E_SPLIT"))
+			{
+				
+			}
+			else if (fbType.getName().startsWith("E_MERGE"))
+			{
+				
+			}
+			else
+			{
+				System.err.println("ModelMaker.makeModel(): Unsupported FB type: " + functionBlocks.get(fbName));
+				System.err.println("\t Info: The type in neither Basic nor Composite FB type.");
+				System.exit(1);
+			}
+		}
+
+
+// 		// test automata classes
+// 		ExtendedAutomaton test = new ExtendedAutomaton("test", automata);
+// 		test.addState("s0", true);
+// 		test.addState("s1");
+// 		test.addIntegerVariable("var1", 0, 5, 0, null);
+// 		test.addTransition("s0","s1","e1;e2;","var1 == 1","var1  = 4;");
+// 		automata.addAutomaton(test);
+// 		ExtendedAutomaton test2 = new ExtendedAutomaton("test2", automata);
+// 		test2.addState("s0", true);
+// 		test2.addState("s1");
+// 		test2.addIntegerVariable("var1", 0, 5, 0, null);
+// 		test2.addTransition("s0","s1","e1;e2;","var1 == 1","var1  = 4;");
+// 		automata.addAutomaton(test2);
+
+
 		// Write out the module file
 		automata.writeToFile(new File(outputFileName));
 	}
