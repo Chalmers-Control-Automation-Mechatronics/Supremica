@@ -22,6 +22,9 @@ public class Milp
     private static Logger logger = LoggerFactory.createLogger(Milp.class);
 	
 	private static final int NO_PATH_SPLIT_INDEX = -1;
+
+	/** A big enough value used by the MILP-solver (should be greater than any time-variable). */
+	private static final int BIG_M_VALUE = 250000;
     
     /** The involved automata, plants, zone specifications */
     private Automata theAutomata, plants, zones, externalSpecs;
@@ -127,9 +130,10 @@ public class Milp
         }
         catch (Exception ex)
         {
+			milpProcess.destroy();
 			milpProcess = null;
-			modelFile.delete();
-			solutionFile.delete();
+			// modelFile.delete();
+// 			solutionFile.delete();
 
 			if (scheduleDialog != null)
 			{
@@ -226,7 +230,25 @@ public class Milp
 		throws Exception
     {
         timer.restart();
+
+		//temp
+		SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
+		synthesizerOptions.setSynthesisType(SynthesisType.NONBLOCKINGCONTROLLABLE);
+		synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.MONOLITHIC);
+		synthesizerOptions.setPurge(true);
+		synthesizerOptions.setMaximallyPermissive(true);
+		synthesizerOptions.setMaximallyPermissiveIncremental(true);
         
+		AutomataSynthesizer synthesizer = new AutomataSynthesizer(theAutomata, SynchronizationOptions.getDefaultSynthesisOptions(), synthesizerOptions);
+        
+		Automaton synthAll = synthesizer.execute().getFirstAutomaton();
+		synthAll.setName("SYNTH_OVER_ALL");
+		synthAll.setType(AutomatonType.PLANT);		
+        State synthState = synthAll.getInitialState();
+
+
+
+
         schedule = new Automaton();
         schedule.setComment("Schedule");
         
@@ -274,21 +296,23 @@ public class Milp
             
             // Stores the highest firing times for each active synchronizing event
             Hashtable<LabeledEvent, Double> synchArcsInfo = new Hashtable<LabeledEvent, Double>();
-            
+
             // Which automaton fires the "cheapest" transition...
-            for (int i=0; i<theAutomata.size(); i++)
+	        for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
             {
-                Automaton currPlant = indexMap.getAutomatonAt(i);
+//                 Automaton currPlant = indexMap.getAutomatonAt(i);
+				Automaton currPlant = autIt.next();
 
                 // Since the plants are supposed to fire events, the check for the "smallest time event"
                 // is only done for the plants
                 if (currPlant.isPlant())
                 {
-                    plantIndex++;
+//                     plantIndex++;
+					plantIndex = indexMap.getAutomatonIndex(currPlant);
                     
-                    State currState = indexMap.getStateAt(currPlant, currComposedStateIndices[i]);
-                    double currTime = optimalTimes[plantIndex][currComposedStateIndices[i]];
-                    
+                    State currState = indexMap.getStateAt(currPlant, currComposedStateIndices[plantIndex]);
+                    double currTime = optimalTimes[plantIndex][currComposedStateIndices[plantIndex]];
+
                     // Choose the smallest time (as long as it is not smaller than the previously scheduled time)...
                     if (currTime <= smallestTime)
                     {
@@ -298,7 +322,9 @@ public class Milp
                             LabeledEvent currEvent = currArc.getEvent();
 
                             // ... that correspoinds to an enabled transition
-                            if (stepper.isEnabled(currEvent))
+//                             if (stepper.isEnabled(currEvent))
+							// temp (fulhack)
+							if (synthState.nextState(currEvent) != null)
                             {
 								int currStateIndex = indexMap.getStateIndex(currPlant, currState);
                                 int nextStateIndex = indexMap.getStateIndex(currPlant, currArc.getToState());
@@ -375,6 +401,9 @@ public class Milp
             }
             schedule.addArc(new Arc(currScheduledState, nextScheduledState, currOptimalEvent));
 
+			//temp (fulhack)
+			synthState = synthState.nextState(currOptimalEvent);
+
             currScheduledState = nextScheduledState;
             
             // If all the states that build up the current state are accepting, make the composed state accepting too
@@ -382,14 +411,18 @@ public class Milp
             for (int i=0; i<theAutomata.size(); i++)
             {
                 if (! indexMap.getStateAt(indexMap.getAutomatonAt(i), currComposedStateIndices[i]).isAccepting())
+				{
                     isAccepting = false;
+				}
             }
 
             if (isAccepting)
             {
                 if (smallestTime != makespan)
+				{
                     throw new Exception("Makespan value does NOT correspond to the cost of the final state of the schedule (sched_time = " + smallestTime + "; makespan = " + makespan + "). Something went wrong...");
-                
+                }
+
                 currScheduledState.setAccepting(true);
                 currScheduledState.setName(currScheduledState.getName() + ";  makespan = " + makespan);
             }
@@ -430,7 +463,7 @@ public class Milp
     
     /**
      * Creates the (temporary) *.mod- and *.sol- files that are used to communicate
-     * with the MILP-solver (GLPK). The automata are preprocessed (synthes and purge)
+     * with the MILP-solver (GLPK). The automata are preprocessed (syntes and purge)
      * while the information about the location of booking/unbooking events is collected.
      */
     private void initialize()
@@ -564,7 +597,6 @@ public class Milp
 // 				restrictedPlant.setName(plantName + "_red");
 // 				restrictedPlant.remapStateIndices();
 
-				addDummyAcceptingState(restrictedPlant);
 // 				restrictedPlants.addAutomaton(restrictedPlant);
 // 				addAutomatonToGui(restrictedPlant);
 				String plantName = restrictedPlant.getName();
@@ -576,6 +608,11 @@ public class Milp
 				// temp
 				logWriter.println(str.substring(0, str.lastIndexOf("||")) + " synthesized into " + restrictedPlant.getName());
 			}
+		}
+
+		for (Iterator<Automaton> plantIt = plants.iterator(); plantIt.hasNext(); )
+		{
+			addDummyAcceptingState(plantIt.next());
 		}
 
 		for (Iterator<Automaton> specsIt = allSpecs.iterator(); specsIt.hasNext(); )
@@ -1456,7 +1493,7 @@ public class Milp
         w.newLine();
         w.write("param nrOfZones := " + (nrOfZones - 1) + ";");
         w.newLine();
-        w.write("param bigM := " + Short.MAX_VALUE + ";");
+        w.write("param bigM := " + BIG_M_VALUE + ";");
         w.newLine();
         // Behovs maxTic verkligen???
         w.write("param maxTic := " + (nrOfTics - 1) + ";");
@@ -1647,6 +1684,11 @@ public class Milp
     public void requestStop(boolean disposeScheduleDialog)
     {
         isRunning = false;
+		
+		if (milpProcess != null)
+		{
+			milpProcess.destroy();
+		}
         
         if (scheduleDialog != null && disposeScheduleDialog)
         {
