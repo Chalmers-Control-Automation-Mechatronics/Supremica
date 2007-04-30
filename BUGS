@@ -17,7 +17,10 @@ There is currently no real bug-tracking system for Supremica/Waters... we should
    renderer functionality which, predictably, does not work properly.
    Printing _must_ be done through Renderer and Graphics2D somehow ...
  * Selection should not be shown when printing.
- * Logging is not thread-safe.
+ * Changes of logging settings in Options dialog do not take effect
+   immediately.
+ * Option 'Log to Console' does not seem to work?
+ * Log display is very slow when large numbers of messages are logged.
 
  * DNFMinimizer fails several test cases.
 

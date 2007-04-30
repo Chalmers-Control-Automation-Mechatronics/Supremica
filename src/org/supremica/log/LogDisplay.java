@@ -1,3 +1,11 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica
+//# PACKAGE: org.supremica.log
+//# CLASS:   LogDisplay
+//###########################################################################
+//# $Id: LogDisplay.java,v 1.30 2007-04-30 03:14:52 robi Exp $
+//###########################################################################
 
 /*
  * Supremica Software License Agreement
@@ -47,22 +55,30 @@
  *
  * Supremica is owned and represented by KA.
  */
+
 package org.supremica.log;
 
 import java.awt.Color;
 import java.awt.event.*;
 import java.io.*;
 import java.net.URL;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 import javax.swing.*;
 import javax.swing.text.*;
+
 import org.apache.log4j.*;
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.helpers.QuietWriter;
 import org.apache.log4j.helpers.OptionConverter;
+
 import org.supremica.util.VPopupMenu;
 import org.supremica.gui.*;
 import org.supremica.properties.*;
+
 
 public class LogDisplay
     extends AppenderSkeleton
@@ -70,21 +86,36 @@ public class LogDisplay
 {
     private static LogDisplay theLogDisplay = null;
     private JScrollPane theTextPaneScrollPane;
-    private JTextPane textpane;
-    private StyledDocument doc;
+    private JTextPane mTextPane;
+    private StyledDocument mDocument;
     private LoggerPopupMenu popup = new LoggerPopupMenu(LoggerFactory.getLoggerFilter());
     
     private StringWriter sw;
     private QuietWriter qw;
-    private Hashtable attributes;
-    private Hashtable icons;
+	private Layout mLayout;
+    private Map<Level,MutableAttributeSet> mAttributeMap;
+    private Map<Level,ImageIcon> mIconMap;
     private String label;
-    private boolean fancy;
+    private boolean mIsFancy;
     private Thread reader;
     private Thread reader2;
     private boolean quit;
+
     private final PipedInputStream pin = new PipedInputStream();
     private final PipedInputStream pin2 = new PipedInputStream();
+	/**
+	 * Queue of logging events to be displayed as soon as the AWT event
+	 * dispatching thread becomes available.
+	 */
+	private final List<LoggingEvent> mEventQueue =
+		new LinkedList<LoggingEvent>();
+	/**
+	 * This runnable is executed periodically in the AWT event
+	 * dispatching thread to display any logging events in
+	 * {@link #mEventQueue}.
+	 */
+	private final Runnable mEventQueueReader = new EventQueueReader();
+
     static final String LABEL_OPTION = "Label";
     static final String COLOR_OPTION_FATAL = "Color.Emerg";
     static final String COLOR_OPTION_ERROR = "Color.Error";
@@ -95,17 +126,16 @@ public class LogDisplay
     static final String FANCY_OPTION = "Fancy";
     static final String FONT_NAME_OPTION = "Font.Name";
     static final String FONT_SIZE_OPTION = "Font.Size";
+
     
     private LogDisplay()
     {
-        super();
-        
-        layout = new PatternLayout("%-5p %m%n");
+        mLayout = new PatternLayout("%-5p %m%n");
         name = "Debug";
         
         setTextPane(new JTextPane());
         
-        theTextPaneScrollPane = new JScrollPane(textpane);
+        theTextPaneScrollPane = new JScrollPane(mTextPane);
         
         createAttributes();
         createIcons();
@@ -113,11 +143,11 @@ public class LogDisplay
         this.label = "";
         this.sw = new StringWriter();
         this.qw = new QuietWriter(sw, errorHandler);
-        
-        this.fancy = true;
+
+        mIsFancy = true;
         
         // This code used to be in the popup menu -------------
-        textpane.addMouseListener(new MouseAdapter()
+        mTextPane.addMouseListener(new MouseAdapter()
         {
             public void mousePressed(MouseEvent e)
             {
@@ -138,7 +168,7 @@ public class LogDisplay
             {
                 if (e.isPopupTrigger())
                 {
-                    popup.show(textpane, e.getX(), e.getY());
+                    popup.show(mTextPane, e.getX(), e.getY());
                 }
             }
         });
@@ -183,14 +213,14 @@ public class LogDisplay
             {
                 String text = "Couldn't redirect STDERR to this console\n" + io.getMessage();
                 
-                //doc.insertString(doc.getLength(), text);
+                //mDocument.insertString(mDocument.getLength(), text);
                 System.err.println(text);
             }
             catch (SecurityException se)
             {
                 String text = "Couldn't redirect STDERR to this console\n" + se.getMessage();
                 
-                //doc.insertString(doc.getLength(), text);
+                //mDocument.insertString(mDocument.getLength(), text);
                 System.err.println(text);
             }
             
@@ -218,50 +248,35 @@ public class LogDisplay
     
     private void createAttributes()
     {
-        
-        attributes = new Hashtable();
-        
+        mAttributeMap = new HashMap<Level,MutableAttributeSet>(8);
         MutableAttributeSet attError = new SimpleAttributeSet();
-        
-        attributes.put(Level.ERROR, attError);
+        mAttributeMap.put(Level.ERROR, attError);
         StyleConstants.setFontSize(attError, 14);
-        
+        StyleConstants.setForeground(attError, Color.red);
         MutableAttributeSet attWarn = new SimpleAttributeSet();
-        
-        attributes.put(Level.WARN, attWarn);
+        mAttributeMap.put(Level.WARN, attWarn);
         StyleConstants.setFontSize(attWarn, 14);
-        
+        StyleConstants.setForeground(attWarn, new Color(255, 128, 0));
         MutableAttributeSet attInfo = new SimpleAttributeSet();
-        
-        attributes.put(Level.INFO, attInfo);
+        mAttributeMap.put(Level.INFO, attInfo);
         StyleConstants.setFontSize(attInfo, 14);
-        
+        StyleConstants.setForeground(attInfo, new Color(0, 80, 0));
         MutableAttributeSet attDebug = new SimpleAttributeSet();
-        
-        attributes.put(Level.DEBUG, attDebug);
+        mAttributeMap.put(Level.DEBUG, attDebug);
         StyleConstants.setFontSize(attDebug, 14);
-        
+        StyleConstants.setForeground(attDebug, Color.blue);
         MutableAttributeSet attFatal = new SimpleAttributeSet();
-        
-        attributes.put(Level.FATAL, attFatal);
+        mAttributeMap.put(Level.FATAL, attFatal);
         StyleConstants.setFontSize(attFatal, 14);
-        
+        StyleConstants.setForeground(attFatal, Color.black);
         MutableAttributeSet attAll = new SimpleAttributeSet();
-        
-        attributes.put(Level.ALL, attAll);
+        mAttributeMap.put(Level.ALL, attAll);
         StyleConstants.setFontSize(attAll, 14);
-        
+        StyleConstants.setForeground(attAll, Color.blue);
         MutableAttributeSet attOff = new SimpleAttributeSet();
-        
-        attributes.put(Level.OFF, attOff);
+        mAttributeMap.put(Level.OFF, attOff);
         StyleConstants.setFontSize(attOff, 14);
-        StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.ERROR), Color.red);
-        StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.WARN), new Color(255, 128, 0));
-        StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.INFO), new Color(0, 80, 0));
-        StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.DEBUG), Color.blue);
-        StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.FATAL), Color.black);
-        StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.ALL), Color.blue);
-        StyleConstants.setForeground((MutableAttributeSet) attributes.get(Level.OFF), Color.red);
+        StyleConstants.setForeground(attOff, Color.red);
     }
     
     public void close()
@@ -269,66 +284,83 @@ public class LogDisplay
     
     public void clear()
     {
-        textpane.setText("");
+        mTextPane.setText("");
     }
     
     public void cut()
     {
-        textpane.cut();
+        mTextPane.cut();
     }
     
     public void copy()
     {
-        textpane.copy();
+        mTextPane.copy();
     }
     
-    private ImageIcon getIcon(String file)
+    private ImageIcon getIcon(final String name)
     {
-        URL url = Supremica.class.getResource(file);
-        
-        return (url == null)
-        ? new ImageIcon()
-        : new ImageIcon(url);
+        final URL url = Supremica.class.getResource(name);
+		return url == null ? null : new ImageIcon(url);
     }
     
     private void createIcons()
     {
-        icons = new Hashtable();
-        
-        icons.put(Level.FATAL, getIcon("/icons/BlackFlag.gif"));
-        icons.put(Level.ERROR, getIcon("/icons/RedFlag.gif"));
-        icons.put(Level.WARN, getIcon("/icons/OrangeFlag.gif"));
-        icons.put(Level.INFO, getIcon("/icons/GreenFlag.gif"));
-        icons.put(Level.DEBUG, getIcon("/icons/BlueFlag.gif"));
-        icons.put(Level.ALL, getIcon("/icons/BlackFlag.gif"));
-        icons.put(Level.OFF, getIcon("/icons/BlackFlag.gif"));
-        
+        mIconMap = new HashMap<Level,ImageIcon>(8);
+        mIconMap.put(Level.FATAL, getIcon("/icons/BlackFlag.gif"));
+        mIconMap.put(Level.ERROR, getIcon("/icons/RedFlag.gif"));
+        mIconMap.put(Level.WARN, getIcon("/icons/OrangeFlag.gif"));
+        mIconMap.put(Level.INFO, getIcon("/icons/GreenFlag.gif"));
+        mIconMap.put(Level.DEBUG, getIcon("/icons/BlueFlag.gif"));
+        mIconMap.put(Level.ALL, getIcon("/icons/BlackFlag.gif"));
+        mIconMap.put(Level.OFF, getIcon("/icons/BlackFlag.gif"));
     }
     
-    public void append(LoggingEvent event)
+	/**
+	 * Displays the given logging event in the log display, as soon as
+	 * possible. If not called from the AWT event dispatching thread, the
+	 * event may be queued for later logging in a thread-safe fashion.
+	 */
+    public void append(final LoggingEvent event)
+	{
+		if (SwingUtilities.isEventDispatchThread()) {
+			appendImmediately(event);
+		} else {
+			synchronized (mEventQueue) {
+				if (mEventQueue.isEmpty()) {
+					SwingUtilities.invokeLater(mEventQueueReader);
+				}
+				mEventQueue.add(event);
+			}
+		}
+	}
+
+	/**
+	 * Displays the given logging event in the log display.
+	 * This method changes the GUI data structures and therefore
+	 * must be called from the AWT event dispatching thread.
+	 */
+    private void appendImmediately(final LoggingEvent event)
     {
-        String text = this.layout.format(event);
-        String trace = "";
-        
-        textpane.setCaretPosition(doc.getLength());
-        
-        try
-        {
-            if (fancy)
-            {
-                textpane.setEditable(true);
-                textpane.insertIcon((ImageIcon) icons.get(event.getLevel()));
-                textpane.setEditable(false);
-            }
-            
-            doc.insertString(doc.getLength(), text + trace, (MutableAttributeSet) attributes.get(event.getLevel()));
-        }
-        catch (BadLocationException badex)
-        {
-            System.err.println(badex);
-        }
+        final String text = mLayout.format(event);
+		final Level level = event.getLevel();
+        mTextPane.setCaretPosition(mDocument.getLength());
+		if (mIsFancy) {
+			final ImageIcon icon = mIconMap.get(level);
+			if (icon != null) {
+				mTextPane.setEditable(true);
+				mTextPane.insertIcon(icon);
+				mTextPane.setEditable(false);
+			}
+		}
+		try {
+			mDocument.insertString(mDocument.getLength(),
+								   text,
+								   mAttributeMap.get(level));
+		} catch (final BadLocationException exception) {
+			throw new IllegalStateException(exception);
+		}
     }
-    
+
     public JComponent getComponent()
     {
         return theTextPaneScrollPane;
@@ -336,7 +368,7 @@ public class LogDisplay
     
     public JComponent getComponentWithoutScrollPane()
     {
-        return textpane;
+        return mTextPane;
     }
     
     public String getLabel()
@@ -371,7 +403,7 @@ public class LogDisplay
     
     public void setLayout(Layout layout)
     {
-        this.layout = layout;
+        mLayout = layout;
     }
     
     public void setName(String name)
@@ -381,39 +413,28 @@ public class LogDisplay
     
     private void setTextPane(JTextPane textpane)
     {
-        this.textpane = textpane;
-        //this.textpane();
-        
-        textpane.setEditable(false);
-        textpane.setBackground(Color.white);
-        
-        this.doc = textpane.getStyledDocument();
+        mTextPane = textpane;
+        mTextPane.setEditable(false);
+        mTextPane.setBackground(Color.white);
+        mDocument = mTextPane.getStyledDocument();
     }
     
     private void setColor(Level p, String v)
     {
-        StyleConstants.setForeground((MutableAttributeSet) attributes.get(p), parseColor(v));
+        StyleConstants.setForeground(mAttributeMap.get(p), parseColor(v));
     }
     
-    private void setFontSize(int size)
+    private void setFontSize(final int size)
     {
-        Enumeration e = attributes.elements();
-        
-        while (e.hasMoreElements())
-        {
-            StyleConstants.setFontSize((MutableAttributeSet) e.nextElement(), size);
-        }
-        
-        return;
+		for (final MutableAttributeSet attribs : mAttributeMap.values()) {
+			StyleConstants.setFontSize(attribs, size);
+		}
     }
     
-    private void setFontName(String name)
+    private void setFontName(final String name)
     {
-        Enumeration e = attributes.elements();
-        
-        while (e.hasMoreElements())
-        {
-            StyleConstants.setFontFamily((MutableAttributeSet) e.nextElement(), name);
+		for (final MutableAttributeSet attribs : mAttributeMap.values()) {
+			StyleConstants.setFontFamily(attribs, name);
         }
     }
     
@@ -451,12 +472,12 @@ public class LogDisplay
         
         if (option.equalsIgnoreCase(COLOR_OPTION_BACKGROUND))
         {
-            textpane.setBackground(parseColor(value));
+            mTextPane.setBackground(parseColor(value));
         }
         
         if (option.equalsIgnoreCase(FANCY_OPTION))
         {
-            fancy = OptionConverter.toBoolean(value, fancy);
+            mIsFancy = OptionConverter.toBoolean(value, mIsFancy);
         }
         
         if (option.equalsIgnoreCase(FONT_SIZE_OPTION))
@@ -741,4 +762,35 @@ public class LogDisplay
         
         return input;
     }
+
+
+	//#######################################################################
+	//# Inner Class EventQueueReader
+	/**
+	 * This runnable is executed periodically in the AWT event
+	 * dispatching thread to display any logging events in
+	 * {@link #mEventQueue}.
+	 */
+	private class EventQueueReader implements Runnable
+	{
+
+		//###################################################################
+		//# Interface java.lang.Runnable
+		/**
+		 * Displays all logging events in {@link #mEventQueue} to the
+		 * log display in a thread-safe manner. This method must be
+		 * executed from the AWT event dispatching thread.
+		 */
+		public void run()
+		{
+			synchronized (mEventQueue) {
+				for (final LoggingEvent event : mEventQueue) {
+					appendImmediately(event);
+				}
+				mEventQueue.clear();					
+			}
+		}
+
+	}
+		
 }
