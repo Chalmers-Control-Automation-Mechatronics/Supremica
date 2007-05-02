@@ -1,10 +1,10 @@
 //# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Supremica
-//# PACKAGE: org.supremica.properties
-//# CLASS:   BooleanProperty
+//# PACKAGE: org.supremica.log
+//# CLASS:   RedirectProperty
 //###########################################################################
-//# $Id: BooleanProperty.java,v 1.4 2007-05-02 00:25:29 robi Exp $
+//# $Id: RedirectProperty.java,v 1.1 2007-05-02 00:25:29 robi Exp $
 //###########################################################################
 
 /*
@@ -56,66 +56,58 @@
  * Supremica is owned and represented by KA.
  */
 
-package org.supremica.properties;
+package org.supremica.log;
+
+import org.supremica.properties.BooleanProperty;
+import org.supremica.properties.PropertyType;
 
 
-public class BooleanProperty
-    extends Property
+/**
+ * A property representing whether the output to a system stream should be
+ * logged to the log display panel. This is a {@link BooleanProperty} with
+ * the additional ability to update the behaviour of the log display when
+ * it is set.
+ *
+ * Presently, this includes two Supremica properties:
+ * <LI>
+ * <UL>{@link Config#GENERAL_REDIRECT_STDOUT}</UL>
+ * <UL>{@link Config#GENERAL_REDIRECT_STDERR}</UL>
+ * </LI>
+ *
+ * @author Robi Malik
+ */
+
+public class RedirectProperty
+	extends BooleanProperty
 {
-    private boolean defaultValue;
-    private boolean value;
     
-    public BooleanProperty(PropertyType type, String key, boolean value, String comment)
+	//#######################################################################
+	//# Constructors
+    public RedirectProperty(final PropertyType type,
+							final String key,
+							final boolean value,
+							final String comment)
     {
-        this(type, key, value, comment, false);
+        super(type, key, value, comment);
     }
     
-    public BooleanProperty(PropertyType type, String key, boolean value, String comment, boolean immutable)
+    public RedirectProperty(final PropertyType type,
+							final String key,
+							final boolean value,
+							final String comment,
+							final boolean immutable)
     {
-        super(type, key, comment, immutable);
-        this.defaultValue = value;
-        this.value = value;
+        super(type, key, value, comment, immutable);
     }
-    
-    public boolean get()
+
+
+	//#######################################################################
+	//# Overrides for Abstract Base Class org.supremica.properties.Property
+    public void set(final boolean value)
     {
-        return isTrue();
-    }
-    
-    public boolean isTrue()
-    {
-        return value;
-    }
-    
-    public boolean isFalse()
-    {
-        return !isTrue();
-    }
-    
-    public void set(final String value)
-    {
-		final boolean boolval = Boolean.parseBoolean(value);
-		set(boolval);
-    }
-    
-    public void set(boolean value)
-    {
-        if (isImmutable())
-        {
-            throw new IllegalStateException("This object is immutable, calling the set method is illegal");
-        }
-        
-        this.value = value;
-    }
-    
-    public String valueToString()
-    {
-        return Boolean.toString(value);
-    }
-    
-    public boolean currentValueDifferentFromDefaultValue()
-    {
-        return defaultValue != value;
+		super.set(value);
+		final LogDisplay display = LogDisplay.getInstance();
+		display.updateProperty(this);
     }
     
 }

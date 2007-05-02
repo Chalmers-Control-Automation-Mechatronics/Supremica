@@ -1,3 +1,11 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica
+//# PACKAGE: org.supremica.log
+//# CLASS:   LoggerFactory
+//###########################################################################
+//# $Id: LoggerFactory.java,v 1.14 2007-05-02 00:25:29 robi Exp $
+//###########################################################################
 
 /*
  * Supremica Software License Agreement
@@ -47,65 +55,108 @@
  *
  * Supremica is owned and represented by KA.
  */
+
 package org.supremica.log;
 
-import org.apache.log4j.*;
-import org.supremica.properties.*;
+import java.io.PrintWriter;
+
+import org.apache.log4j.Appender;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.WriterAppender;
+
+import org.supremica.properties.Config;
+
 
 public class LoggerFactory
 {
-    private static LoggerFilter filter = new LoggerFilter();
-    private static final PatternLayout layout = new PatternLayout("%-5p %m%n");
-    private static ConsoleAppender consoleAppender = null;
-    
+
+	//#######################################################################
+	//# Constructors
     private LoggerFactory()
-    {}
+    {
+	}
     
+
+	//#######################################################################
+	//# Factory Methods
     public static LoggerFilter getLoggerFilter()
     {
-        return filter;
+        return mFilter;
     }
     
-    public synchronized static Logger createLogger(Class theClass)
+    public static Logger createLogger(final Class clazz)
     {
-        return createLogger(theClass.getName());
-        
-//		return createLogger(theClass.getPackage().getName());
+        return createLogger(clazz.getName());
     }
     
-    public synchronized static Logger createLogger(String name)
+    public static Logger createLogger(final String name)
     {
-        Category thisCategory = Category.getInstance(name);    // Deprecated
-        
-        if (Config.LOG_TO_CONSOLE.get())
-        {
-            thisCategory.addAppender(getConsoleAppender());
-        }
-        
-        if (Config.LOG_TO_GUI.get())
-        {
-            thisCategory.addAppender(LogDisplay.getInstance());
-        }
-        
-        SupremicaCategory supremicaCategory = new SupremicaCategory(thisCategory);
-        
-        return supremicaCategory;
+        final org.apache.log4j.Logger logger =
+			org.apache.log4j.Logger.getLogger(name);
+		return new SupremicaLogger(logger);
     }
     
-    synchronized static ConsoleAppender getConsoleAppender()
+    public static Appender getConsoleAppender()
     {
-        if (consoleAppender == null)
-        {
-            consoleAppender = new ConsoleAppender(layout);
-            
-            consoleAppender.addFilter(filter);
-        }
-        
-        return consoleAppender;
+        return mConsoleAppender;
     }
-    
-    synchronized static boolean hasConsoleAppender()
-    {
-        return consoleAppender != null;
-    }
+
+	/**
+	 * Updates the appenders of the root logger after a change to
+	 * Supremica properties. This method adds or removes appenders
+	 * to the root logger, thus changing the behaviour of all loggers
+	 * that do not implement specific behaviour.
+	 * @param  property  The property that was changed,
+	 *                   either {@link Config#LOG_TO_CONSOLE} or
+	 *                   {@link Config#LOG_TO_GUI}.
+	 */
+	public static void updateProperty(final AppenderProperty property)
+	{
+		final Appender appender;
+		if (property == Config.LOG_TO_CONSOLE) {
+			appender = mConsoleAppender;
+		} else if (property == Config.LOG_TO_GUI) {
+			appender = LogDisplay.getInstance();
+		} else {
+			throw new IllegalArgumentException
+				("Unsupported property: " + property.getKey() + "!");
+		}
+	    final org.apache.log4j.Logger root =
+			org.apache.log4j.Logger.getRootLogger();
+		if (property.isTrue()) {
+			root.addAppender(appender);
+		} else {
+			root.removeAppender(appender);
+		}
+	}
+
+
+	//#######################################################################
+	//# Static Initialisation
+	static {
+		final PatternLayout layout = new PatternLayout("%-5p %m%n");
+		final PrintWriter writer = new PrintWriter(System.out);
+		final Appender cappender = new WriterAppender(layout, writer);
+		mConsoleAppender = cappender;
+		final LoggerFilter filter = new LoggerFilter();
+		cappender.addFilter(filter);
+		mFilter = filter;
+	    final org.apache.log4j.Logger root =
+			org.apache.log4j.Logger.getRootLogger();
+        if (Config.LOG_TO_CONSOLE.isTrue()) {
+			root.addAppender(cappender);
+		}
+        if (Config.LOG_TO_GUI.isTrue()) {
+			final Appender dappender = LogDisplay.getInstance();
+			root.addAppender(dappender);
+		}
+
+	}
+
+
+	//#######################################################################
+	//# Data Members
+    private static final LoggerFilter mFilter;
+    private static final Appender mConsoleAppender;
+
 }

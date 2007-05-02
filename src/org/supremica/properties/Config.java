@@ -49,6 +49,7 @@
 package org.supremica.properties;
 
 import javax.swing.UIManager;
+
 import org.supremica.automata.algorithms.EquivalenceRelation;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
 import org.supremica.automata.algorithms.SynthesisType;
@@ -58,6 +59,8 @@ import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
 import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
 import org.supremica.automata.BDD.BDDPartitioningType;
 import org.supremica.automata.BDD.BDDLibraryType;
+import org.supremica.log.AppenderProperty;
+import org.supremica.log.RedirectProperty;
 import org.supremica.util.BDD.Options;
 
 /**
@@ -127,11 +130,21 @@ public final class Config
     public static final BooleanProperty INCLUDE_EXPERIMENTAL_ALGORITHMS = new BooleanProperty(PropertyType.GENERAL, "includeExperimentalAlgorithms", false, "Include experimental algorithms (requires restart)");
 
     // GENERAL_LOG
-    public static final BooleanProperty LOG_TO_CONSOLE = new BooleanProperty(PropertyType.GENERAL_LOG, "logToConsole", false, "Log to Console");
-    public static final BooleanProperty LOG_TO_GUI = new BooleanProperty(PropertyType.GENERAL_LOG, "logToGUI", false, "Log to Graphical User Interface");
-    public static final BooleanProperty GENERAL_REDIRECT_STDOUT = new BooleanProperty(PropertyType.GENERAL_LOG, "generalRedirectStdout", true, "Redirect stdout");
-    public static final BooleanProperty GENERAL_REDIRECT_STDERR = new BooleanProperty(PropertyType.GENERAL_LOG, "generalRedirectStderr", true, "Redirect stderr");
-    public static final BooleanProperty VERBOSE_MODE = new BooleanProperty(PropertyType.GENERAL_LOG, "verboseMode", false, "Verbose mode");
+    public static final AppenderProperty LOG_TO_CONSOLE =
+      new AppenderProperty(PropertyType.GENERAL_LOG, "logToConsole",
+			   false, "Log to Console");
+    public static final AppenderProperty LOG_TO_GUI =
+      new AppenderProperty(PropertyType.GENERAL_LOG, "logToGUI",
+			   false, "Log to Graphical User Interface");
+    public static final RedirectProperty GENERAL_REDIRECT_STDOUT =
+      new RedirectProperty(PropertyType.GENERAL_LOG, "generalRedirectStdout",
+			   true, "Redirect stdout");
+    public static final RedirectProperty GENERAL_REDIRECT_STDERR =
+      new RedirectProperty(PropertyType.GENERAL_LOG, "generalRedirectStderr",
+			   true, "Redirect stderr");
+    public static final BooleanProperty VERBOSE_MODE =
+      new BooleanProperty(PropertyType.GENERAL_LOG, "verboseMode",
+			  false, "Verbose mode");
 
     // GENERAL_FILE
     public static final StringProperty FILE_OPEN_PATH = new StringProperty(PropertyType.GENERAL_FILE, "fileOpenPath", LocalSystem.getHomeDirectory(), "Default file open path");

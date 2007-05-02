@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.log
 //# CLASS:   LogDisplay
 //###########################################################################
-//# $Id: LogDisplay.java,v 1.30 2007-04-30 03:14:52 robi Exp $
+//# $Id: LogDisplay.java,v 1.31 2007-05-02 00:25:29 robi Exp $
 //###########################################################################
 
 /*
@@ -60,8 +60,14 @@ package org.supremica.log;
 
 import java.awt.Color;
 import java.awt.event.*;
-import java.io.*;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.Pipe;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -72,78 +78,38 @@ import javax.swing.text.*;
 
 import org.apache.log4j.*;
 import org.apache.log4j.spi.LoggingEvent;
-import org.apache.log4j.helpers.QuietWriter;
 import org.apache.log4j.helpers.OptionConverter;
 
 import org.supremica.util.VPopupMenu;
 import org.supremica.gui.*;
-import org.supremica.properties.*;
+import org.supremica.properties.Config;
 
 
 public class LogDisplay
     extends AppenderSkeleton
-    implements Runnable
 {
-    private static LogDisplay theLogDisplay = null;
-    private JScrollPane theTextPaneScrollPane;
-    private JTextPane mTextPane;
-    private StyledDocument mDocument;
-    private LoggerPopupMenu popup = new LoggerPopupMenu(LoggerFactory.getLoggerFilter());
-    
-    private StringWriter sw;
-    private QuietWriter qw;
-	private Layout mLayout;
-    private Map<Level,MutableAttributeSet> mAttributeMap;
-    private Map<Level,ImageIcon> mIconMap;
-    private String label;
-    private boolean mIsFancy;
-    private Thread reader;
-    private Thread reader2;
-    private boolean quit;
 
-    private final PipedInputStream pin = new PipedInputStream();
-    private final PipedInputStream pin2 = new PipedInputStream();
-	/**
-	 * Queue of logging events to be displayed as soon as the AWT event
-	 * dispatching thread becomes available.
-	 */
-	private final List<LoggingEvent> mEventQueue =
-		new LinkedList<LoggingEvent>();
-	/**
-	 * This runnable is executed periodically in the AWT event
-	 * dispatching thread to display any logging events in
-	 * {@link #mEventQueue}.
-	 */
-	private final Runnable mEventQueueReader = new EventQueueReader();
-
-    static final String LABEL_OPTION = "Label";
-    static final String COLOR_OPTION_FATAL = "Color.Emerg";
-    static final String COLOR_OPTION_ERROR = "Color.Error";
-    static final String COLOR_OPTION_WARN = "Color.Warn";
-    static final String COLOR_OPTION_INFO = "Color.Info";
-    static final String COLOR_OPTION_DEBUG = "Color.Debug";
-    static final String COLOR_OPTION_BACKGROUND = "Color.Background";
-    static final String FANCY_OPTION = "Fancy";
-    static final String FONT_NAME_OPTION = "Font.Name";
-    static final String FONT_SIZE_OPTION = "Font.Size";
-
+	//#######################################################################
+	//# Constructors
+    public static LogDisplay getInstance()
+    {
+        InterfaceManager interfaceManager = InterfaceManager.getInstance();
+        if (theLogDisplay == null) {
+            theLogDisplay = new LogDisplay();            
+            theLogDisplay.addFilter(LoggerFactory.getLoggerFilter());
+			theLogDisplay.connectStreams();
+        }
+        return theLogDisplay;
+    }
     
     private LogDisplay()
     {
         mLayout = new PatternLayout("%-5p %m%n");
-        name = "Debug";
-        
         setTextPane(new JTextPane());
-        
         theTextPaneScrollPane = new JScrollPane(mTextPane);
-        
         createAttributes();
         createIcons();
-        
-        this.label = "";
-        this.sw = new StringWriter();
-        this.qw = new QuietWriter(sw, errorHandler);
-
+        mLabel = "";
         mIsFancy = true;
         
         // This code used to be in the popup menu -------------
@@ -172,80 +138,11 @@ public class LogDisplay
                 }
             }
         });
-        
-        // --------------------------------------//
-        if (Config.GENERAL_REDIRECT_STDOUT.isTrue())
-        {
-            try
-            {
-                PipedOutputStream pout = new PipedOutputStream(this.pin);
-                
-                System.setOut(new PrintStream(pout, true));
-            }
-            catch (java.io.IOException io)
-            {
-                String text = "Couldn't redirect STDOUT to this console\n" + io.getMessage();
-                
-                System.err.println(text);
-            }
-            catch (SecurityException se)
-            {
-                String text = "Couldn't redirect STDOUT to this console\n" + se.getMessage();
-                
-                System.err.println(text);
-            }
-            
-            reader = new Thread(this);
-            
-            reader.setDaemon(true);
-            reader.start();
-        }
-        
-        if (Config.GENERAL_REDIRECT_STDERR.isTrue())
-        {
-            try
-            {
-                PipedOutputStream pout2 = new PipedOutputStream(this.pin2);
-                
-                System.setErr(new PrintStream(pout2, true));
-            }
-            catch (java.io.IOException io)
-            {
-                String text = "Couldn't redirect STDERR to this console\n" + io.getMessage();
-                
-                //mDocument.insertString(mDocument.getLength(), text);
-                System.err.println(text);
-            }
-            catch (SecurityException se)
-            {
-                String text = "Couldn't redirect STDERR to this console\n" + se.getMessage();
-                
-                //mDocument.insertString(mDocument.getLength(), text);
-                System.err.println(text);
-            }
-            
-            reader2 = new Thread(this);
-            
-            reader2.setDaemon(true);
-            reader2.start();
-        }
-        
-        quit = false;    // signals the Threads that they should exit
-    }
+	}
+
     
-    public synchronized static LogDisplay getInstance()
-    {
-        InterfaceManager interfaceManager = InterfaceManager.getInstance();
-        if (theLogDisplay == null)
-        {
-            theLogDisplay = new LogDisplay();
-            
-            theLogDisplay.addFilter(LoggerFactory.getLoggerFilter());
-        }
-        
-        return theLogDisplay;
-    }
-    
+	//#######################################################################
+	//# Initialisation
     private void createAttributes()
     {
         mAttributeMap = new HashMap<Level,MutableAttributeSet>(8);
@@ -278,9 +175,35 @@ public class LogDisplay
         StyleConstants.setFontSize(attOff, 14);
         StyleConstants.setForeground(attOff, Color.red);
     }
+
+	private void connectStreams()
+	{
+		if (mStdOutReader == null) {
+			mStdOutReader = new StdOutReader();
+		}
+		mStdOutReader.setup();
+		if (mStdErrReader == null) {
+			mStdErrReader = new StdErrReader();
+		}
+		mStdErrReader.setup();
+	}
+
+    private void createIcons()
+    {
+        mIconMap = new HashMap<Level,ImageIcon>(8);
+        mIconMap.put(Level.FATAL, getIcon("/icons/BlackFlag.gif"));
+        mIconMap.put(Level.ERROR, getIcon("/icons/RedFlag.gif"));
+        mIconMap.put(Level.WARN, getIcon("/icons/OrangeFlag.gif"));
+        mIconMap.put(Level.INFO, getIcon("/icons/GreenFlag.gif"));
+        mIconMap.put(Level.DEBUG, getIcon("/icons/BlueFlag.gif"));
+        mIconMap.put(Level.ALL, getIcon("/icons/BlackFlag.gif"));
+        mIconMap.put(Level.OFF, getIcon("/icons/BlackFlag.gif"));
+    }
+    
     
     public void close()
-    {}
+    {
+	}
     
     public void clear()
     {
@@ -303,18 +226,9 @@ public class LogDisplay
 		return url == null ? null : new ImageIcon(url);
     }
     
-    private void createIcons()
-    {
-        mIconMap = new HashMap<Level,ImageIcon>(8);
-        mIconMap.put(Level.FATAL, getIcon("/icons/BlackFlag.gif"));
-        mIconMap.put(Level.ERROR, getIcon("/icons/RedFlag.gif"));
-        mIconMap.put(Level.WARN, getIcon("/icons/OrangeFlag.gif"));
-        mIconMap.put(Level.INFO, getIcon("/icons/GreenFlag.gif"));
-        mIconMap.put(Level.DEBUG, getIcon("/icons/BlueFlag.gif"));
-        mIconMap.put(Level.ALL, getIcon("/icons/BlackFlag.gif"));
-        mIconMap.put(Level.OFF, getIcon("/icons/BlackFlag.gif"));
-    }
-    
+
+	//#######################################################################
+	//# Interface org.apache.log4j.Appender
 	/**
 	 * Displays the given logging event in the log display, as soon as
 	 * possible. If not called from the AWT event dispatching thread, the
@@ -373,9 +287,12 @@ public class LogDisplay
     
     public String getLabel()
     {
-        return label;
+        return mLabel;
     }
     
+
+	//#######################################################################
+	//# Properties
     public String[] getOptionStrings()
     {
         return new String[]{ LABEL_OPTION, COLOR_OPTION_FATAL,
@@ -385,6 +302,20 @@ public class LogDisplay
         FONT_NAME_OPTION, FONT_SIZE_OPTION };
     }
     
+	/**
+	 * Updates the system stream readers after a change to Supremica
+	 * properties. This method dynamically changes the behaviour whether
+	 * STDOUT or STDERR printing appears in the log display.
+	 * @param  property  The property that was changed,
+	 *                   either {@link Config#GENERAL_REDIRECT_STDOUT} or
+	 *                   {@link Config#GENERAL_REDIRECT_STDERR}.
+	 */
+	public void updateProperty(final RedirectProperty property)
+	{
+		mStdOutReader.updateRedirect(property);
+		mStdErrReader.updateRedirect(property);
+	}
+
     private Color parseColor(String v)
     {
         StringTokenizer st = new StringTokenizer(v, ",");
@@ -442,7 +373,7 @@ public class LogDisplay
     {
         if (option.equalsIgnoreCase(LABEL_OPTION))
         {
-            this.label = value;
+            mLabel = value;
         }
         
         if (option.equalsIgnoreCase(COLOR_OPTION_FATAL))
@@ -681,88 +612,6 @@ public class LogDisplay
         }
     }
     
-    public synchronized void run()
-    {
-        Logger logger = LoggerFactory.createLogger(LogDisplay.class);
-        
-        try
-        {
-            while (Thread.currentThread() == reader)
-            {
-                try
-                {
-                    this.wait(100);
-                }
-                catch (InterruptedException ie)
-                {}
-                
-                if (pin.available() != 0)
-                {
-                    String input = this.readLine(pin);
-                    
-                    logger.info("Stdout: " + input);
-                }
-                
-                if (quit)
-                {
-                    return;
-                }
-            }
-            
-            while (Thread.currentThread() == reader2)
-            {
-                try
-                {
-                    this.wait(100);
-                }
-                catch (InterruptedException ie)
-                {}
-                
-                if (pin2.available() != 0)
-                {
-                    String input = this.readLine(pin2);
-                    
-                    logger.error("Stderr: " + input);
-                }
-                
-                if (quit)
-                {
-                    return;
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            logger.error("\nLogDiplay reports an internal error.");
-            logger.error("The error is: " + e);
-        }
-    }
-    
-    public synchronized String readLine(PipedInputStream in)
-    throws IOException
-    {
-        String input = "";
-        
-        do
-        {
-            int available = in.available();
-            
-            if (available == 0)
-            {
-                break;
-            }
-            
-            byte b[] = new byte[available];
-            
-            in.read(b);
-            
-            input = input + new String(b, 0, b.length);
-        }
-        while (!input.endsWith("\n") &&!input.endsWith("\r\n") &&!quit);
-        
-        return input;
-    }
-
 
 	//#######################################################################
 	//# Inner Class EventQueueReader
@@ -792,5 +641,293 @@ public class LogDisplay
 		}
 
 	}
-		
+
+
+	//#######################################################################
+	//# Inner Class SystemStreamReader
+	/**
+	 * A thread that continuously monitors a system stream ({@link System#err}
+	 * or {@link System#out} and redirects anything printed to it to the
+	 * log display.
+	 */
+	private abstract class SystemStreamReader extends Thread
+	{
+
+		//###################################################################
+		//# Constructor
+		/**
+		 * Creates a new system stream reader thread.
+		 * {@link #setup()} must be called before the new thread
+		 * can do anything useful.
+		 */
+		private SystemStreamReader()
+		{
+			setDaemon(true);
+			mSystemStream = getSystemOut();
+		}
+
+		//###################################################################
+		//# Setup
+		/**
+		 * Initialises the pipe and starts the thread.
+		 */
+		private void setup()
+		{
+			try {
+				final Pipe pipe = Pipe.open();
+				final Pipe.SourceChannel source = pipe.source();
+				final Pipe.SinkChannel sink = pipe.sink();
+				mPipeIn = Channels.newInputStream(source);
+				final OutputStream pout = Channels.newOutputStream(sink);
+				mPrintStream = new PrintStream(pout, true);
+				reconnect();
+				start();
+			} catch (final IOException exception) {
+				System.err.println
+					("Failed to redirect " + getStreamName() + "!");
+				exception.printStackTrace(System.err);
+			}
+		}
+
+		/**
+		 * Updates this reader after a change of Supremica properties.
+		 * This method reconnects the reader to its system stream if the given
+		 * property matches the Supremica property represented by this reader.
+		 * @see #reconnect()
+		 */
+		private void updateRedirect(final RedirectProperty property)
+		{
+			if (property == getProperty()) {
+				try {
+					reconnect();
+				} catch (final IOException exception) {
+					System.err.println
+						("Failed to redirect " + getStreamName() + "!");
+					exception.printStackTrace(System.err);
+				}
+			}
+		}
+
+		/**
+		 * Reconnects this reader to its system stream depending on
+		 * Supremica property settings. This methods connects the
+		 * reader to the system stream, if the correspoding property
+		 * is set to true; otherwise it disconnects so output is
+		 * returned to the console.
+		 */
+		private void reconnect()
+			throws IOException
+		{
+			final RedirectProperty property = getProperty();
+			if (property.isTrue()) {
+				connect();
+			} else {
+				disconnect();
+			}
+		}
+
+		private void connect()
+			throws IOException
+		{
+			setSystemOut(mPrintStream);
+		}
+
+		private void disconnect()
+			throws IOException
+		{
+			setSystemOut(mSystemStream);
+		}
+			
+		//###################################################################
+		//# Interface java.lang.Runnable
+		public void run()
+		{
+			try {
+				while (true) {
+					final String line = readLine();
+					if (line != null) {
+						logLine(line);
+					}
+				}
+			} catch (final IOException exception) {
+				exception.printStackTrace(System.err);
+			}
+		}
+
+		//###################################################################
+		//# Reading
+		private String readLine()
+			throws IOException
+		{
+			final StringBuffer buffer = new StringBuffer();
+			char ch;
+			do {
+				final int code = mPipeIn.read(); // blocks
+				if (code == -1) {
+					throw new EOFException("Broken pipe!");
+				}
+				ch = (char) code;
+				if (ch != '\n' && ch != '\r') {
+					buffer.append(ch);
+				}
+			} while (ch != '\n');
+			return buffer.length() == 0 ? null : buffer.toString();
+		}
+
+		//###################################################################
+		//# Abstract Methods
+		abstract RedirectProperty getProperty();
+		abstract PrintStream getSystemOut();
+		abstract void setSystemOut(PrintStream stream);
+		abstract String getStreamName();
+		abstract void logLine(String line);
+
+		//###################################################################
+		//# Data Members
+		private final PrintStream mSystemStream;
+		private InputStream mPipeIn;
+		private PrintStream mPrintStream;
+
+	}
+
+
+	//#######################################################################
+	//# Inner Class StdOutReader
+	private class StdOutReader extends SystemStreamReader
+	{
+
+		//###################################################################
+		//# Constructor
+		private StdOutReader()
+		{
+			mLogger = LoggerFactory.createLogger(getClass());
+		}
+
+		//###################################################################
+		//# Overrides for Abstract Baseclass SystemStreamReader
+		RedirectProperty getProperty()
+		{
+			return Config.GENERAL_REDIRECT_STDOUT;
+		}
+
+		PrintStream getSystemOut()
+		{
+			return System.out;
+		}
+
+		void setSystemOut(final PrintStream stream)
+		{
+			System.setOut(stream);
+		}
+
+		String getStreamName()
+		{
+			return "STDOUT";
+		}
+
+		void logLine(final String line)
+		{
+			mLogger.info("Stdout: " + line);
+		}
+
+		//###################################################################
+		//# Data Members
+		private final Logger mLogger;
+
+	}
+
+
+	//#######################################################################
+	//# Inner Class StdErrReader
+	private class StdErrReader extends SystemStreamReader
+	{
+
+		//###################################################################
+		//# Constructor
+		private StdErrReader()
+		{
+			mLogger = LoggerFactory.createLogger(getClass());
+		}
+
+		//###################################################################
+		//# Overrides for Abstract Baseclass SystemStreamReader
+		RedirectProperty getProperty()
+		{
+			return Config.GENERAL_REDIRECT_STDERR;
+		}
+
+		PrintStream getSystemOut()
+		{
+			return System.err;
+		}
+
+		void setSystemOut(final PrintStream stream)
+		{
+			System.setErr(stream);
+		}
+
+		String getStreamName()
+		{
+			return "STDERR";
+		}
+
+		void logLine(final String line)
+		{
+			mLogger.error("Stderr: " + line);
+		}
+
+		//###################################################################
+		//# Data Members
+		private final Logger mLogger;
+
+	}
+
+
+	//#######################################################################
+	//# Data Members
+    private JScrollPane theTextPaneScrollPane;
+    private JTextPane mTextPane;
+    private StyledDocument mDocument;
+    private LoggerPopupMenu popup =
+		new LoggerPopupMenu(LoggerFactory.getLoggerFilter());
+	private Layout mLayout;
+    private Map<Level,MutableAttributeSet> mAttributeMap;
+    private Map<Level,ImageIcon> mIconMap;
+    private String mLabel;
+    private boolean mIsFancy;
+
+	/**
+	 * Queue of logging events to be displayed as soon as the AWT event
+	 * dispatching thread becomes available.
+	 */
+	private final List<LoggingEvent> mEventQueue =
+		new LinkedList<LoggingEvent>();
+	/**
+	 * This runnable is executed periodically in the AWT event
+	 * dispatching thread to display any logging events in
+	 * {@link #mEventQueue}.
+	 */
+	private final Runnable mEventQueueReader = new EventQueueReader();
+    private SystemStreamReader mStdOutReader;
+    private SystemStreamReader mStdErrReader;
+
+
+	//#######################################################################
+	//# Class Variables
+    private static LogDisplay theLogDisplay = null;
+
+
+	//#######################################################################
+	//# Configuration Option Names
+    private static final String LABEL_OPTION = "Label";
+    private static final String COLOR_OPTION_FATAL = "Color.Emerg";
+    private static final String COLOR_OPTION_ERROR = "Color.Error";
+    private static final String COLOR_OPTION_WARN = "Color.Warn";
+    private static final String COLOR_OPTION_INFO = "Color.Info";
+    private static final String COLOR_OPTION_DEBUG = "Color.Debug";
+    private static final String COLOR_OPTION_BACKGROUND = "Color.Background";
+    private static final String FANCY_OPTION = "Fancy";
+    private static final String FONT_NAME_OPTION = "Font.Name";
+	private static final String FONT_SIZE_OPTION = "Font.Size";
+
 }
