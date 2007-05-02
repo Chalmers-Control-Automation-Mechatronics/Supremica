@@ -19,6 +19,7 @@ There is currently no real bug-tracking system for Supremica/Waters... we should
  * Selection should not be shown when printing.
  * Log display is very slow when large numbers of messages are logged.
 
+ * TestAutomatonMinimizer does not terminate.
  * DNFMinimizer fails several test cases.
 
 Previously, all bugs were reported and stored in the bug database, http://www.supremica.org/bugtracking, but this is no longer the case. 

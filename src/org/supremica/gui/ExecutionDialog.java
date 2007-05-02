@@ -1,3 +1,11 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica
+//# PACKAGE: org.supremica.gui
+//# CLASS:   ExecutionDialog
+//###########################################################################
+//# $Id: ExecutionDialog.java,v 1.33 2007-05-02 02:39:12 robi Exp $
+//###########################################################################
 
 /*
  * Supremica Software License Agreement
@@ -49,6 +57,7 @@
  */
 package org.supremica.gui;
 
+import org.supremica.log.*;
 import org.supremica.automata.algorithms.Stoppable;
 import java.util.*;
 import java.awt.event.*;
@@ -83,8 +92,8 @@ public final class ExecutionDialog
     private int value = -1;
     
     private ExecutionDialogMode currentMode = null;
+    private ExecutionDialogMode newMode = null;
     private int nbrOfFoundStates = -1;
-    private boolean newMode = true;
     
     private void Init(String title)
     {
@@ -173,10 +182,9 @@ public final class ExecutionDialog
     /**
      * Sets the mode of the dialog.
      */
-    public void setMode(ExecutionDialogMode mode)
+    public void setMode(final ExecutionDialogMode mode)
     {
-        currentMode = mode;
-        
+        newMode = mode;
         updateMode();
     }
     
@@ -228,8 +236,6 @@ public final class ExecutionDialog
     
     private void updateMode()
     {
-        newMode = true;
-        
         // Should we replace the "value panel"
         if (currCenterPanel != null)
         {
@@ -242,19 +248,13 @@ public final class ExecutionDialog
     public void run()
     {
         // Update labels
-        if (newMode)
-        {
-            if (currentMode == ExecutionDialogMode.HIDE)
-            {
-                setVisible(false);
-                
+		if (newMode != currentMode) {
+			currentMode = newMode;
+            if (currentMode == ExecutionDialogMode.HIDE) {
+                dispose();                
                 return;
             }
-            else if (!isVisible())
-            {
-                setVisible(true);
-            }
-            
+			setVisible(true);
             // Should we replace the "value panel"
             if (currCenterPanel != null)
             {
@@ -277,92 +277,6 @@ public final class ExecutionDialog
                 
                 currCenterPanel = progressPanel;
             }
-            
-                        /*
-                        if (currentMode == ExecutionDialogMode.synchronizing)
-                        {
-                                        operationHeader.setText(currentMode.getId());    // "Synchronizing...");
-                                        operationSubheader.setText(currentMode.getText());    // "Number of states:");
-                                        contentPanel.add(infoPanel, BorderLayout.CENTER);
-                         
-                                        currCenterPanel = infoPanel;
-                        }
-                        else if (currentMode == ExecutionDialogMode.verifying)
-                        {
-                                        operationHeader.setText(currentMode.getId());    // "Verifying...");
-                                        operationSubheader.setText(currentMode.getText());    // "Number of states:");
-                                        contentPanel.add(infoPanel, BorderLayout.CENTER);
-                         
-                                        currCenterPanel = infoPanel;
-                        }
-                        else if (currentMode == ExecutionDialogMode.synthesizing)
-                        {
-                                        operationHeader.setText(currentMode.getId());    // "Synthesizing...");
-                                        operationSubheader.setText(currentMode.getText());    // "Number of states:");
-                                        contentPanel.add(infoPanel, BorderLayout.CENTER);
-                         
-                                        currCenterPanel = infoPanel;
-                        }
-                        else if (currentMode == ExecutionDialogMode.buildingStates)
-                        {
-                                        operationHeader.setText(currentMode.getId());    // "Building states...");
-                                        operationSubheader.setText(currentMode.getText());    // "");
-                                        contentPanel.add(progressPanel, BorderLayout.CENTER);
-                         
-                                        currCenterPanel = progressPanel;
-                        }
-                        else if (currentMode == ExecutionDialogMode.buildingTransitions)
-                        {
-                                        operationHeader.setText(currentMode.getId());    // "Building transitions...");
-                                        operationSubheader.setText(currentMode.getText());    // "");
-                                        contentPanel.add(progressPanel, BorderLayout.CENTER);
-                         
-                                        currCenterPanel = progressPanel;
-                        }
-                        else if (currentMode == ExecutionDialogMode.matchingStates)
-                        {
-                                        operationHeader.setText(currentMode.getId());    // "Matching states...");
-                                        operationSubheader.setText(currentMode.getText());    // "");
-                                        contentPanel.add(progressPanel, BorderLayout.CENTER);
-                         
-                                        currCenterPanel = progressPanel;
-                        }
-                        else if (currentMode == ExecutionDialogMode.verifyingNonblocking)
-                        {
-                                        operationHeader.setText(currentMode.getId());    // "Verifying nonblocking...");
-                                        operationSubheader.setText(currentMode.getText());    // "");
-                                        contentPanel.add(progressPanel, BorderLayout.CENTER);
-                         
-                                        currCenterPanel = progressPanel;
-                        }
-                        else if (currentMode == ExecutionDialogMode.verifyingMutualNonblockingFirstRun)
-                        {
-                                        operationHeader.setText(currentMode.getId());    // "Verifying mutual nonblocking...");
-                                        operationSubheader.setText(currentMode.getText());    // "");
-                                        contentPanel.add(progressPanel, BorderLayout.CENTER);
-                         
-                                        currCenterPanel = progressPanel;
-                        }
-                        else if (currentMode == ExecutionDialogMode.verifyingMutualNonblockingSecondRun)
-                        {
-                                        operationHeader.setText(currentMode.getId());    // "Verifying mutual nonblocking...");
-                                        operationSubheader.setText(currentMode.getText());    // "");
-                                        contentPanel.add(progressPanel, BorderLayout.CENTER);
-                         
-                                        currCenterPanel = progressPanel;
-                        }
-                         */
-            
-                        /*
-                         * This is what it should look like - let the mode keep track of itself
-                         *
-                         * operationHeader.setText(currentMode.getId());    // "Matching states...");
-                         * contentPanel.add(progressPanel, BorderLayout.CENTER);
-                         *
-                         * currCenterPanel = infoPanel;
-                         *
-                         */
-            newMode = false;
         }
         
         // Update labels
