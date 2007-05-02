@@ -699,7 +699,8 @@ Class-Path: ${manifest.pathlist}</echo>
   </junit>
 </target>
 
-<target name="run_supremica_tests_short">
+<target name="run_supremica_tests_short"
+        depends="jar_supremica,jar_supremica_tests">
   <mkdir dir="${logs.results}"/>
   <junit printsummary="on" fork="true" maxmemory="512m">
     <formatter type="xml"/>
