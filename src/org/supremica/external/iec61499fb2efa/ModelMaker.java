@@ -277,8 +277,38 @@ class ModelMaker
 		// the maximum number of FB instances in queue at the same time
 		final int places = 5;
 		
-		
-
+	
+		instanceQueue.addState("s0", true);
+		for (int i = 1; i <= places; i++)
+		{
+//         \State{$s_i \gets $ newState("s$i$")}
+//         \State{$\triangleright$ Transiton when queueing instance}
+//         \State{$from \gets s_{i-1}$}
+//         \State{$to \gets s_i$}
+//         \State{$event \gets$ ""}
+//         \ForAll{$b \in B$}
+// 		\State{$bID \gets$ nameOf($b$)}
+// 		\State{$event \gets event +$ {\rm "queue\_fb\_$bID$;"}}
+//         \EndFor
+// 		\State{$guard\gets$ "queueing\_fb$>$0"}
+//         \For{$j \gets 1,i-1$}
+// 		\State{$guard\gets guard$ + " \& queueing\_fb != fb\_place\_$j$"}
+//         \EndFor
+// 		\State{$action \gets$ "fb\_place\_$i$ := queuing\_fb;"}
+//         \State{$action \gets action$ + "queuing\_fb := 0;"}
+//         \State{addTransition($from$, $to$, $event$, $guard$, $action$)}
+//         \State{$\triangleright$ Transiton when dequeueing instance}
+//         \State{$from \gets s_i$}
+//         \State{$to \gets s_{i-1}$}
+//         \State{$event \gets$ "remove\_fb;"}      
+//         \State{$guard \gets$ ""}      
+//         \State{$action\gets$ "current\_fb := fb\_place\_1;"}
+//         \For{$j \gets 1,i-1$}
+// 		\State{$action\gets action$ + "fb\_place\_$j$ := fb\_place\_$(j+1)$;"}
+//         \EndFor
+// 		\State{$action\gets action$ + "fb\_place\_$i$ := 0;"}
+//         \State{addTransition($from$, $to$, $event$, $guard$, $action$)}       
+		}
 		
 	}
 
