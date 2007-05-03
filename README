@@ -1,8 +1,8 @@
 README
 ======
 
-To run Supremica you need a Java2 1.5 compliant JVM.
-All development is done with Sun's JDK2 1.5. You also need
+To run Supremica you need a Java2 1.6 compliant JVM.
+All development is done with Sun's JDK2 1.6. You also need
 Ant - the Java build system. Secure shell (SSH) is needed 
 for secure communication with the computers at the Department
 of Signals and Systems. 
