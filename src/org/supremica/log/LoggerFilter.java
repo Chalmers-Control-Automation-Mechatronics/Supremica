@@ -53,129 +53,130 @@ import org.apache.log4j.*;
 import org.apache.log4j.spi.*;
 
 public class LoggerFilter
-	extends Filter
+    extends Filter
 {
-	private boolean allowInfos = true;
-	private boolean allowWarns = true;
-	private boolean allowDebugs = false;
-	private boolean allowFatals = true;
-	private boolean allowErrors = true;
-
-	public LoggerFilter() {}
-
-	public void setOption(String option, String value)
-	{    // Not implemented
-	}
-
-	public String[] getOptionStrings()
-	{
-		return new String[0];
-	}
-
-	public int decide(LoggingEvent event)
-	{
-		Level prio = event.getLevel();
-
-		if (prio == Level.DEBUG)
-		{
-			if (allowDebugs)
-			{
-				return Filter.ACCEPT;
-			}
-
-			return Filter.DENY;
-		}
-
-		if (prio == Level.INFO)
-		{
-			if (allowInfos)
-			{
-				return Filter.ACCEPT;
-			}
-
-			return Filter.DENY;
-		}
-
-		if (prio == Level.WARN)
-		{
-			if (allowWarns)
-			{
-				return Filter.ACCEPT;
-			}
-
-			return Filter.DENY;
-		}
-
-		if (prio == Level.ERROR)
-		{
-			if (allowErrors)
-			{
-				return Filter.ACCEPT;
-			}
-
-			return Filter.DENY;
-		}
-
-		if (prio == Level.FATAL)
-		{
-			if (allowFatals)
-			{
-				return Filter.ACCEPT;
-			}
-
-			return Filter.DENY;
-		}
-
-		return Filter.NEUTRAL;
-	}
-
-	public boolean allowInfo()
-	{
-		return allowInfos;
-	}
-
-	public void setAllowInfo(boolean allow)
-	{
-		this.allowInfos = allow;
-	}
-
-	public boolean allowDebug()
-	{
-		return allowDebugs;
-	}
-
-	public void setAllowDebug(boolean allow)
-	{
-		this.allowDebugs = allow;
-	}
-
-	public boolean allowWarn()
-	{
-		return allowWarns;
-	}
-
-	public void setAllowWarn(boolean allow)
-	{
-		this.allowWarns = allow;
-	}
-
-	public boolean allowError()
-	{
-		return allowErrors;
-	}
-
-	public void setAllowError(boolean allow)
-	{
-		this.allowErrors = allow;
-	}
-
-	public boolean allowFatal()
-	{
-		return allowFatals;
-	}
-
-	public void setAllowFatal(boolean allow)
-	{
-		this.allowFatals = allow;
-	}
+    private boolean allowInfos = true;
+    private boolean allowWarns = true;
+    private boolean allowDebugs = false;
+    private boolean allowFatals = true;
+    private boolean allowErrors = true;
+    
+    public LoggerFilter()
+    {}
+    
+    public void setOption(String option, String value)
+    {    // Not implemented
+    }
+    
+    public String[] getOptionStrings()
+    {
+        return new String[0];
+    }
+    
+    public int decide(LoggingEvent event)
+    {
+        Level prio = event.getLevel();
+        
+        if (prio == Level.DEBUG)
+        {
+            if (allowDebugs)
+            {
+                return Filter.ACCEPT;
+            }
+            
+            return Filter.DENY;
+        }
+        
+        if (prio == Level.INFO)
+        {
+            if (allowInfos)
+            {
+                return Filter.ACCEPT;
+            }
+            
+            return Filter.DENY;
+        }
+        
+        if (prio == Level.WARN)
+        {
+            if (allowWarns)
+            {
+                return Filter.ACCEPT;
+            }
+            
+            return Filter.DENY;
+        }
+        
+        if (prio == Level.ERROR)
+        {
+            if (allowErrors)
+            {
+                return Filter.ACCEPT;
+            }
+            
+            return Filter.DENY;
+        }
+        
+        if (prio == Level.FATAL)
+        {
+            if (allowFatals)
+            {
+                return Filter.ACCEPT;
+            }
+            
+            return Filter.DENY;
+        }
+        
+        return Filter.NEUTRAL;
+    }
+    
+    public boolean allowInfo()
+    {
+        return allowInfos;
+    }
+    
+    public void setAllowInfo(boolean allow)
+    {
+        this.allowInfos = allow;
+    }
+    
+    public boolean allowDebug()
+    {
+        return allowDebugs;
+    }
+    
+    public void setAllowDebug(boolean allow)
+    {
+        this.allowDebugs = allow;
+    }
+    
+    public boolean allowWarn()
+    {
+        return allowWarns;
+    }
+    
+    public void setAllowWarn(boolean allow)
+    {
+        this.allowWarns = allow;
+    }
+    
+    public boolean allowError()
+    {
+        return allowErrors;
+    }
+    
+    public void setAllowError(boolean allow)
+    {
+        this.allowErrors = allow;
+    }
+    
+    public boolean allowFatal()
+    {
+        return allowFatals;
+    }
+    
+    public void setAllowFatal(boolean allow)
+    {
+        this.allowFatals = allow;
+    }
 }
