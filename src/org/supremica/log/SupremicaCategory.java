@@ -196,7 +196,7 @@ public final class SupremicaCategory
     {
         if (log)
         {
-            if (!LoggerFactory.hasConsoleAppender())
+            //if (!LoggerFactory.hasConsoleAppender())
             {
                 category.addAppender(LoggerFactory.getConsoleAppender());
             }

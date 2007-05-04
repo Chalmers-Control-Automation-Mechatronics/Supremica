@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.log
 //# CLASS:   LoggerFactory
 //###########################################################################
-//# $Id: LoggerFactory.java,v 1.14 2007-05-02 00:25:29 robi Exp $
+//# $Id: LoggerFactory.java,v 1.15 2007-05-04 12:03:23 flordal Exp $
 //###########################################################################
 
 /*
@@ -69,16 +69,16 @@ import org.supremica.properties.Config;
 
 public class LoggerFactory
 {
-
-	//#######################################################################
-	//# Constructors
+    
+    //#######################################################################
+    //# Constructors
     private LoggerFactory()
     {
-	}
+    }
     
-
-	//#######################################################################
-	//# Factory Methods
+    
+    //#######################################################################
+    //# Factory Methods
     public static LoggerFilter getLoggerFilter()
     {
         return mFilter;
@@ -92,71 +92,82 @@ public class LoggerFactory
     public static Logger createLogger(final String name)
     {
         final org.apache.log4j.Logger logger =
-			org.apache.log4j.Logger.getLogger(name);
-		return new SupremicaLogger(logger);
+            org.apache.log4j.Logger.getLogger(name);
+        return new SupremicaLogger(logger);
     }
     
     public static Appender getConsoleAppender()
     {
         return mConsoleAppender;
     }
-
-	/**
-	 * Updates the appenders of the root logger after a change to
-	 * Supremica properties. This method adds or removes appenders
-	 * to the root logger, thus changing the behaviour of all loggers
-	 * that do not implement specific behaviour.
-	 * @param  property  The property that was changed,
-	 *                   either {@link Config#LOG_TO_CONSOLE} or
-	 *                   {@link Config#LOG_TO_GUI}.
-	 */
-	public static void updateProperty(final AppenderProperty property)
-	{
-		final Appender appender;
-		if (property == Config.LOG_TO_CONSOLE) {
-			appender = mConsoleAppender;
-		} else if (property == Config.LOG_TO_GUI) {
-			appender = LogDisplay.getInstance();
-		} else {
-			throw new IllegalArgumentException
-				("Unsupported property: " + property.getKey() + "!");
-		}
-	    final org.apache.log4j.Logger root =
-			org.apache.log4j.Logger.getRootLogger();
-		if (property.isTrue()) {
-			root.addAppender(appender);
-		} else {
-			root.removeAppender(appender);
-		}
-	}
-
-
-	//#######################################################################
-	//# Static Initialisation
-	static {
-		final PatternLayout layout = new PatternLayout("%-5p %m%n");
-		final PrintWriter writer = new PrintWriter(System.out);
-		final Appender cappender = new WriterAppender(layout, writer);
-		mConsoleAppender = cappender;
-		final LoggerFilter filter = new LoggerFilter();
-		cappender.addFilter(filter);
-		mFilter = filter;
-	    final org.apache.log4j.Logger root =
-			org.apache.log4j.Logger.getRootLogger();
-        if (Config.LOG_TO_CONSOLE.isTrue()) {
-			root.addAppender(cappender);
-		}
-        if (Config.LOG_TO_GUI.isTrue()) {
-			final Appender dappender = LogDisplay.getInstance();
-			root.addAppender(dappender);
-		}
-
-	}
-
-
-	//#######################################################################
-	//# Data Members
+    
+    /**
+     * Updates the appenders of the root logger after a change to
+     * Supremica properties. This method adds or removes appenders
+     * to the root logger, thus changing the behaviour of all loggers
+     * that do not implement specific behaviour.
+     * @param  property  The property that was changed,
+     *                   either {@link Config#LOG_TO_CONSOLE} or
+     *                   {@link Config#LOG_TO_GUI}.
+     */
+    public static void updateProperty(final AppenderProperty property)
+    {
+        final Appender appender;
+        if (property == Config.LOG_TO_CONSOLE)
+        {
+            appender = mConsoleAppender;
+        }
+        else if (property == Config.LOG_TO_GUI)
+        {
+            appender = LogDisplay.getInstance();
+        }
+        else
+        {
+            throw new IllegalArgumentException
+                ("Unsupported property: " + property.getKey() + "!");
+        }
+        final org.apache.log4j.Logger root =
+            org.apache.log4j.Logger.getRootLogger();
+        if (property.isTrue())
+        {
+            root.addAppender(appender);
+        }
+        else
+        {
+            root.removeAppender(appender);
+        }
+    }
+    
+    
+    //#######################################################################
+    //# Static Initialisation
+    static
+    {
+        final PatternLayout layout = new PatternLayout("%-5p %m%n");
+        final PrintWriter writer = new PrintWriter(System.out);
+        final Appender cappender = new WriterAppender(layout, writer);
+        mConsoleAppender = cappender;
+        final LoggerFilter filter = new LoggerFilter();
+        cappender.addFilter(filter);
+        mFilter = filter;
+        final org.apache.log4j.Logger root =
+            org.apache.log4j.Logger.getRootLogger();
+        if (Config.LOG_TO_CONSOLE.isTrue())
+        {
+            root.addAppender(cappender);
+        }
+        if (Config.LOG_TO_GUI.isTrue())
+        {
+            final Appender dappender = LogDisplay.getInstance();
+            root.addAppender(dappender);
+        }
+        
+    }
+    
+    
+    //#######################################################################
+    //# Data Members
     private static final LoggerFilter mFilter;
     private static final Appender mConsoleAppender;
-
+    
 }
