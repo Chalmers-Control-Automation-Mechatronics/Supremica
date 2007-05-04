@@ -54,6 +54,7 @@ class ModelMaker
 	private Map<String,String> functionBlocks = new HashMap<String,String>();
 	private Map<String,JaxbFBType> fbTypes = new HashMap<String,JaxbFBType>();
 
+	private Map<String, JaxbFBType> basicFunctionBlocks = new HashMap<String, JaxbFBType>();
 	private Map<String, Map> eventConnectionMaps = new HashMap<String, Map>();
 	private Map<String, Map> dataConnectionMaps = new HashMap<String, Map>();
 
@@ -281,11 +282,11 @@ class ModelMaker
 		instanceQueue.addState("s0", true);
 		for (int i = 1; i <= places; i++)
 		{
-//         \State{$s_i \gets $ newState("s$i$")}
-//         \State{$\triangleright$ Transiton when queueing instance}
-//         \State{$from \gets s_{i-1}$}
-//         \State{$to \gets s_i$}
-//         \State{$event \gets$ ""}
+			instanceQueue.addState("s" + i);
+			//Transiton when queueing instance
+			String from = "s" + (i-1);
+			String to = "s" + i;
+			String event = "";
 //         \ForAll{$b \in B$}
 // 		\State{$bID \gets$ nameOf($b$)}
 // 		\State{$event \gets event +$ {\rm "queue\_fb\_$bID$;"}}
@@ -361,11 +362,20 @@ class ModelMaker
 		// load IEC 61499 application
 		loadSystem(systemFileName);
 
+		// make basic FB map
+		for (Iterator<String> iter = functionBlocks.keySet().iterator(); iter.hasNext();)
+		{
+			
+			String curBlock = iter.next();
+			
+			
+		}
+
+
 		// make event connection map
 		
 
 		// make data connection map
-
 
  		automata = new ExtendedAutomata(theSystem.getName());
 
