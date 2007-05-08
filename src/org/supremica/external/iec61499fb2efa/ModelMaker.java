@@ -64,6 +64,8 @@ class ModelMaker
 	// String fb name, Map data conn map do->di
 	private Map dataConnectionMaps = new HashMap();
 
+	private String restartInstance = null;
+
 	private ExtendedAutomata automata;
 
 
@@ -220,17 +222,7 @@ class ModelMaker
 								for (Iterator fbIter = systemFBNetwork.getFB().iterator(); fbIter.hasNext();)
 								{
 									FB curFB = (FB) fbIter.next();
-									String instanceName = curFB.getName();
-									String typeName = curFB.getType();
-									// get and load the FB type
-									if (typeName.startsWith("E_SPLIT") || typeName.startsWith("E_MERGE"))
-									{
-										functionBlocks.put(instanceName,curFB.getType());								
-									}
-									else
-									{
-										loadFB(instanceName, curFB.getType() + ".fbt");
-									}
+									loadFB(curFB, null);
 								}
 							}
 						}
@@ -245,68 +237,104 @@ class ModelMaker
 		}
 	}
 
-    private void loadFB(String instanceName, String fileName)
+    private void loadFB(FB fb, FB parent)
     {
+		
+		String instanceName = null;
+		if (parent == null)
+		{
+			instanceName = fb.getName();
+		}
+		else
+		{
+			instanceName = parent.getName() + "." + fb.getName();		
+		}
+		String typeName = fb.getType();
+		String fileName = typeName + ".fbt";
 	
 		System.out.println("ModelMaker.loadFB(" + instanceName + ", " + fileName + "):");
-		
-		File file = getFile(fileName);
-		
-		try
+				
+		if (typeName.equals("E_RESTART"))
 		{
-			Object unmarshalledObject = iecUnmarshaller.unmarshal(file);
+			System.out.println("\t Skipping built-in E_RESTART type.");
+			System.out.println("\t Adding FB " + instanceName);
+			restartInstance = instanceName;
+			functionBlocks.put(instanceName,typeName);
+		}
+		else if (typeName.startsWith("E_MERGE"))
+		{
+			System.out.println("\t Skipping built-in E_MERGE type.");			
+			System.out.println("\t Adding FB " + instanceName);
+			functionBlocks.put(instanceName,typeName);
+			System.out.println("\t Adding Basic FB " + instanceName);			
+			basicFunctionBlocks.put(instanceName, typeName);
+					
+		}
+		else if (typeName.startsWith("E_SPLIT"))
+		{
+			System.out.println("\t Skipping built-in E_SPLIT type.");			
+			System.out.println("\t Adding FB " + instanceName);
+			functionBlocks.put(instanceName,typeName);
+			System.out.println("\t Adding Basic FB " + instanceName);			
+			basicFunctionBlocks.put(instanceName, typeName);
+		}
+		else
+		{
+			
+			File file = getFile(fileName);
+			
+			Object unmarshalledObject = null;
+			
+			try
+			{
+				unmarshalledObject = iecUnmarshaller.unmarshal(file);
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace(System.err);
+				System.exit(1);
+			}
+			
 			if (unmarshalledObject instanceof JaxbFBType)
 			{
 				JaxbFBType theType = (JaxbFBType) unmarshalledObject;
-				String typeName = theType.getName();
+
 				if (!fbTypes.keySet().contains(typeName))
 				{
 					System.out.println("\t Adding FB type " + typeName);
 					fbTypes.put(typeName, theType);					
 				}
+
 				System.out.println("\t Adding FB " + instanceName);
 				functionBlocks.put(instanceName,theType.getName());
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace(System.err);
-			System.exit(1);
-		}
-	}
-
-	private void makeBasicFBMap(JaxbFBNetwork fbNetwork, String parentName)
-	{
-		for (Iterator iter = fbNetwork.getFB().iterator(); iter.hasNext();)
-		{
-			
-			String curBlock = ((FB) iter.next()).getName();
-			String curTypeName = (String) functionBlocks.get(curBlock);
-			JaxbFBType curType = (JaxbFBType) fbTypes.get(curTypeName);
-			if (curType.isSetBasicFB() & !curType.isSetFBNetwork())
-			{
-				if (parentName == null)
+				
+				if (theType.isSetBasicFB() & !theType.isSetFBNetwork())
 				{
-					basicFunctionBlocks.put(curBlock, curType);
+					System.out.println("\t Adding Basic FB " + instanceName);			
+					basicFunctionBlocks.put(instanceName, typeName);
+				}
+				else if (!theType.isSetBasicFB() & theType.isSetFBNetwork())
+				{
+					JaxbFBNetwork fbNetwork = theType.getFBNetwork();
+					if (fbNetwork.isSetFB())
+					{
+						for (Iterator fbIter = fbNetwork.getFB().iterator(); fbIter.hasNext();)
+						{
+							FB curFB = (FB) fbIter.next();
+							loadFB(curFB, fb);
+						}
+					}
 				}
 				else
 				{
-					basicFunctionBlocks.put(parentName + "." + curBlock, curType);					
+					System.out.println("ModelMaker.loadFB(" + instanceName + ", " + fileName + "): Unsupported FB type: " + typeName);
+					System.out.println("\t Neither a Basic FB nor Composite FB.");
+					System.exit(1);
 				}
-			}
-			else if (!curType.isSetBasicFB() & curType.isSetFBNetwork())
-			{
-				makeBasicFBMap(curType.getFBNetwork(), curBlock);
-			}
-			else
-			{
-				System.out.println("ModelMake.makeBasicFBMap: Unsupported FB type: " + curTypeName);
-				System.out.println("\t Neither a Basic FB nor Composite FB.");
-				System.exit(1);
 			}
 		}
 	}
-
+	
 	private void makeEventConnectionMap(JaxbFBNetwork fbNetwork, String parentName)
 	{
 		
@@ -314,9 +342,8 @@ class ModelMaker
 
 	private void makeDataConnectionMap(JaxbFBNetwork fbNetwork, String parentName)
 	{
-
+		
 	}
-
 
 	private void makeInstanceQueue()
 	{
@@ -380,7 +407,7 @@ class ModelMaker
 				
 	}
 
-	private void makeBasicFB(String fbName, JaxbFBType fbType)
+	private void makeBasicFB(String fbName)
 	{
 				
 	}
@@ -396,17 +423,64 @@ class ModelMaker
 	}
 
 
+
+	private void printFunctionBlocksMap()
+	{
+		System.out.println("ModelMaker.printFunctionBlocksMap():");
+		for (Iterator iter = functionBlocks.keySet().iterator(); iter.hasNext();)
+		{
+			String curBlock = (String) iter.next();
+			String curType  = (String) functionBlocks.get(curBlock);
+			System.out.println("\t " + curBlock + "\t" + curType);
+		}
+	}
+
+	private void printBasicFunctionBlocksMap()
+	{
+		System.out.println("ModelMaker.printBasicFunctionBlocksMap():");
+		for (Iterator iter = basicFunctionBlocks.keySet().iterator(); iter.hasNext();)
+		{
+			String curBlock = (String) iter.next();
+			String curType  = (String) functionBlocks.get(curBlock);
+			System.out.println("\t " + curBlock + "\t" + curType);
+		}
+	}	
+
+	private void printFBTypesMap()
+	{
+		System.out.println("ModelMaker.printFBTypesMap():");
+		for (Iterator iter = fbTypes.keySet().iterator(); iter.hasNext();)
+		{
+			String curBlock = (String) iter.next();
+			JaxbFBType curType  = (JaxbFBType) fbTypes.get(curBlock);
+			System.out.println("\t " + curBlock + "\t" + curType.getName());
+		}
+	}
+
+	private void printEventConnectionMaps()
+	{
+	}
+
+	private void printDataConnectionMaps()
+	{
+	}
+	
+
 	
 	public void makeModel()
 	{
 		
 		loadSystem(systemFileName);
-
-		makeBasicFBMap(systemFBNetwork, null);
 		
 		makeEventConnectionMap(systemFBNetwork, null);
 
 		makeDataConnectionMap(systemFBNetwork, null);
+
+		printFunctionBlocksMap();
+		printBasicFunctionBlocksMap();
+		printFBTypesMap();
+		printEventConnectionMaps();
+		printDataConnectionMaps();
 
  		automata = new ExtendedAutomata(theSystem.getName());
 
@@ -422,44 +496,21 @@ class ModelMaker
 		for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
 		{
 			String fbName = (String) fbIter.next();
-			JaxbFBType fbType = (JaxbFBType) basicFunctionBlocks.get(fbName);
-			String typeName = fbType.getName();
-			if (fbType != null)
+			String typeName = (String) basicFunctionBlocks.get(fbName);
+			
+			if (typeName.startsWith("E_SPLIT"))
 			{
-				if (fbType.isSetBasicFB())
-				{
-					makeBasicFB(fbName, fbType);
-				}
-				else if (typeName.equals("E_RESTART"))
-				{
-					
-				}
-				else
-				{
-					System.err.println("ModelMaker.makeModel(): Unsupported FB type: " + functionBlocks.get(fbName));
-					System.err.println("\t Info: The type in neither Basic nor Composite FB type.");
-					System.exit(1);
-				}
+				makeSplit((new Integer(((String) functionBlocks.get(fbName)).substring(7))).intValue());
+			}
+			else if (typeName.startsWith("E_MERGE"))
+			{
+				makeMerge((new Integer(((String) functionBlocks.get(fbName)).substring(7))).intValue());
 			}
 			else
 			{
-				if (typeName.startsWith("E_SPLIT"))
-				{
-					makeSplit((new Integer(((String) functionBlocks.get(fbName)).substring(7))).intValue());
-				}
-				else if (typeName.startsWith("E_MERGE"))
-				{
-					makeMerge((new Integer(((String) functionBlocks.get(fbName)).substring(7))).intValue());
-				}
-				else
-				{
-					System.err.println("ModelMaker.makeModel(): Unsupported FB type: " + functionBlocks.get(fbName));
-					System.err.println("\t Info: The type in neither Basic nor Composite FB type.");
-					System.exit(1);
-				}
+				makeBasicFB(fbName);
 			}
 		}
-		
 		
 // 		// test automata classes
 // 		ExtendedAutomaton test = new ExtendedAutomaton("test", automata);
@@ -536,8 +587,8 @@ class ModelMaker
 		}			
 		
 		System.out.println("Input arguments: \n" 
-						   + "\t output name: " + outputFileName + "\n"
-						   + "\t system name: " + systemFileName + "\n"
+						   + "\t output file: " + outputFileName + "\n"
+						   + "\t system file: " + systemFileName + "\n"
 						   + "\t library path base: " + libraryPathBase + "\n"
 						   + "\t library path: " + libraryPath + "\n");
 		
