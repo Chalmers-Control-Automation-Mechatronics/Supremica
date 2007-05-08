@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.38 2007-04-19 09:41:26 avenir Exp $
+//# $Id: ComponentEditorPanel.java,v 1.39 2007-05-08 10:06:39 avenir Exp $
 //###########################################################################
 
 
@@ -329,7 +329,7 @@ public class ComponentEditorPanel
 			{
 				chooser.setCurrentDirectory(mModule.getFileLocation());
 			}
-			catch (NullPointerException ex)
+			catch (Exception ex)
 			{}
 				
 			chooser.setSelectedFile(new File(element.getName() + ".eps"));
