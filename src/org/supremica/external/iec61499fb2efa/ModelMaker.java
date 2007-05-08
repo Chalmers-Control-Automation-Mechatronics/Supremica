@@ -60,9 +60,10 @@ class ModelMaker
 	private Map fbTypes = new HashMap();
 
 	// String fb name, Map event conn map eo->ei
-	private Map eventConnectionMaps = new HashMap();
+	private Map eventConnections = new HashMap();
 	// String fb name, Map data conn map do->di
-	private Map dataConnectionMaps = new HashMap();
+	private Map dataConnections = new HashMap();
+
 
 	private String restartInstance = null;
 
@@ -174,7 +175,8 @@ class ModelMaker
 
 		if (!theFile.exists())
 		{
-			System.err.println("ModelMaker.getFile(" + fileName + "): The file " + fileName + " does not exist in the specified libraries...");
+			System.err.println("ModelMaker.getFile(" + fileName + "): The file " + fileName 
+							   + " does not exist in the specified libraries...");
 			if (libraryPathList != null)
 			{
 				for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
@@ -261,23 +263,23 @@ class ModelMaker
 			restartInstance = instanceName;
 			functionBlocks.put(instanceName,typeName);
 		}
-		else if (typeName.startsWith("E_MERGE"))
-		{
-			System.out.println("\t Skipping built-in E_MERGE type.");			
-			System.out.println("\t Adding FB " + instanceName);
-			functionBlocks.put(instanceName,typeName);
-			System.out.println("\t Adding Basic FB " + instanceName);			
-			basicFunctionBlocks.put(instanceName, typeName);
+// 		else if (typeName.startsWith("E_MERGE"))
+// 		{
+// 			System.out.println("\t Skipping built-in E_MERGE type.");			
+// 			System.out.println("\t Adding FB " + instanceName);
+// 			functionBlocks.put(instanceName,typeName);
+// 			System.out.println("\t Adding Basic FB " + instanceName);			
+// 			basicFunctionBlocks.put(instanceName, typeName);
 					
-		}
-		else if (typeName.startsWith("E_SPLIT"))
-		{
-			System.out.println("\t Skipping built-in E_SPLIT type.");			
-			System.out.println("\t Adding FB " + instanceName);
-			functionBlocks.put(instanceName,typeName);
-			System.out.println("\t Adding Basic FB " + instanceName);			
-			basicFunctionBlocks.put(instanceName, typeName);
-		}
+// 		}
+// 		else if (typeName.startsWith("E_SPLIT"))
+// 		{
+// 			System.out.println("\t Skipping built-in E_SPLIT type.");			
+// 			System.out.println("\t Adding FB " + instanceName);
+// 			functionBlocks.put(instanceName,typeName);
+// 			System.out.println("\t Adding Basic FB " + instanceName);			
+// 			basicFunctionBlocks.put(instanceName, typeName);
+// 		}
 		else
 		{
 			
@@ -327,7 +329,8 @@ class ModelMaker
 				}
 				else
 				{
-					System.out.println("ModelMaker.loadFB(" + instanceName + ", " + fileName + "): Unsupported FB type: " + typeName);
+					System.out.println("ModelMaker.loadFB(" + instanceName + ", " + fileName
+									   + "): Unsupported FB type: " + typeName);
 					System.out.println("\t Neither a Basic FB nor Composite FB.");
 					System.exit(1);
 				}
@@ -335,15 +338,163 @@ class ModelMaker
 		}
 	}
 	
-	private void makeEventConnectionMap(JaxbFBNetwork fbNetwork, String parentName)
+	private void makeEventConnectionMap(JaxbFBNetwork fbNetwork, String parentInstance, int level)
+	{
+		for (int i = 0; i<level; i++)
+		{
+			System.out.print("\t");
+		}
+		System.out.println("ModelMaker.makeEventConnectionMap(" + parentInstance + "):");
+		for (Iterator connIter = fbNetwork.getEventConnections().getConnection().iterator();
+			 connIter.hasNext();)
+		{
+			JaxbConnection connection = (JaxbConnection) connIter.next();
+			String source = connection.getSource();
+			String dest = connection.getDestination();			
+			String sourceInstance = getInstanceName(source);
+			String sourceSignal   = getSignalName(source);
+			JaxbFBType sourceType = (JaxbFBType) fbTypes.get((String) functionBlocks.get(sourceInstance));
+			if (sourceType != null)
+			{
+				if (sourceType.isSetFBNetwork())
+				{
+					if (parentInstance == null)
+					{
+						makeEventConnectionMap(sourceType.getFBNetwork(), sourceInstance, level + 1);
+					}
+					else
+					{
+						makeEventConnectionMap(sourceType.getFBNetwork(), parentInstance + "." + sourceInstance, level + 1);
+					}
+				}
+			}
+
+			if (parentInstance != null)
+			{
+				source = parentInstance + "." + source;
+				dest   = parentInstance + "." + dest;			
+			}
+			
+			// flattening
+			source = getInternalEventOutputConnection(source);
+			dest = getInternalEventInputConnection(dest);
+			sourceInstance = getInstanceName(source);
+			sourceSignal   = getSignalName(source);
+			
+			for (int i = 0; i<level; i++)
+			{
+				System.out.print("\t");
+			}
+			System.out.println("Adding connection: " 
+							   + source
+							   + "-->" 
+							   + dest);
+			
+			Map eventMap;
+			if (!eventConnections.keySet().contains(sourceInstance))
+			{
+				eventMap = new HashMap();
+				eventConnections.put(sourceInstance, eventMap);
+			}
+			else
+			{
+				eventMap = (Map) eventConnections.get(sourceInstance);
+			}
+			eventMap.put(sourceSignal, dest);
+		}	
+	}		
+
+
+	private void makeDataConnectionMap()
 	{
 		
 	}
 
-	private void makeDataConnectionMap(JaxbFBNetwork fbNetwork, String parentName)
+	private String getInternalEventInputConnection(String externalConnection)
 	{
-		
+		String instanceName = getInstanceName(externalConnection);
+		String signalName = getSignalName(externalConnection);
+		JaxbFBType instanceType = (JaxbFBType) fbTypes.get((String) functionBlocks.get(instanceName));
+		if (instanceType != null)
+		{
+			if (instanceType.isSetFBNetwork())
+			{
+				for (Iterator internalConnIter = instanceType.getFBNetwork().getEventConnections().getConnection().iterator(); 
+					 internalConnIter.hasNext();)
+				{
+					JaxbConnection curConn = (JaxbConnection) internalConnIter.next();
+					String source = curConn.getSource();
+					if (source.equals(signalName))
+					{
+						String destination = curConn.getDestination();
+						String destInstance = getInstanceName(destination);
+						if (basicFunctionBlocks.keySet().contains(instanceName + "." + destInstance))
+						{
+							return instanceName + "." + destination;
+						}
+						else
+						{
+							return getInternalEventInputConnection(instanceName + "." + destination);
+						}
+					}
+				}
+			}
+		}
+		return externalConnection;
 	}
+
+	private String getInternalEventOutputConnection(String externalConnection)
+	{
+		String instanceName = getInstanceName(externalConnection);
+		String signalName = getSignalName(externalConnection);
+		JaxbFBType instanceType = (JaxbFBType) fbTypes.get((String) functionBlocks.get(instanceName));
+		if (instanceType != null)
+		{
+			if (instanceType.isSetFBNetwork())
+			{
+				for (Iterator internalConnIter = instanceType.getFBNetwork().getEventConnections().getConnection().iterator(); 
+					 internalConnIter.hasNext();)
+				{
+					JaxbConnection curConn = (JaxbConnection) internalConnIter.next();
+					String dest = curConn.getDestination();
+					if (dest.equals(signalName))
+					{
+						String source = curConn.getSource();
+						String sourceInstance = getInstanceName(source);
+						if (basicFunctionBlocks.keySet().contains(instanceName + "." + sourceInstance))
+						{
+							return instanceName + "." + source;
+						}
+						else
+						{
+							return getInternalEventOutputConnection(instanceName + "." + source);
+						}
+					}
+				}
+			}
+		}
+		return externalConnection;
+	}
+
+	private String getInstanceName(String cntSpec)
+	{
+		if (cntSpec.indexOf(".") < 0)
+		{
+			return "";
+		}
+		return cntSpec.substring(0,cntSpec.lastIndexOf("."));
+	}
+
+	private String getSignalName(String cntSpec)
+	{
+		if (cntSpec.indexOf(".") < 0)
+		{
+			return cntSpec;
+		}
+		return cntSpec.substring(cntSpec.lastIndexOf(".")+1,cntSpec.length());
+	}
+
+
 
 	private void makeInstanceQueue()
 	{
@@ -409,6 +560,7 @@ class ModelMaker
 
 	private void makeBasicFB(String fbName)
 	{
+		System.out.println("ModelMaker.makeBasicFB(" + fbName + "):");
 				
 	}
 
@@ -457,12 +609,38 @@ class ModelMaker
 		}
 	}
 
-	private void printEventConnectionMaps()
+	private void printEventConnectionsMap()
 	{
+		System.out.println("ModelMaker.printEventConnectionsMap():");
+		for (Iterator fbIter = eventConnections.keySet().iterator(); fbIter.hasNext();)
+		{
+			String curBlock = (String) fbIter.next();
+			Map curEvents = (Map) eventConnections.get(curBlock);
+			System.out.println("\t " + curBlock);
+			for (Iterator evIter = curEvents.keySet().iterator(); evIter.hasNext();)
+			{
+				String curEvent = (String) evIter.next();
+				String curConnection  = (String) curEvents.get(curEvent);
+				System.out.println("\t\t " + curEvent + " --> " + curConnection);
+			}
+		}
 	}
 
-	private void printDataConnectionMaps()
+	private void printDataConnectionsMap()
 	{
+		System.out.println("ModelMaker.printDataConnectionsMap():");
+		for (Iterator fbIter = dataConnections.keySet().iterator(); fbIter.hasNext();)
+		{
+			String curBlock = (String) fbIter.next();
+			Map curDatas = (Map) dataConnections.get(curBlock);
+			System.out.println("\t " + curBlock);
+			for (Iterator dataIter = curDatas.keySet().iterator(); dataIter.hasNext();)
+			{
+				String curData = (String) dataIter.next();
+				String curConnection  = (String) curDatas.get(curData);
+				System.out.println("\t\t " + curConnection + " --> " + curData);
+			}
+		}
 	}
 	
 
@@ -472,15 +650,15 @@ class ModelMaker
 		
 		loadSystem(systemFileName);
 		
-		makeEventConnectionMap(systemFBNetwork, null);
+		makeEventConnectionMap(systemFBNetwork, null, 0);
 
-		makeDataConnectionMap(systemFBNetwork, null);
+		makeDataConnectionMap();
 
 		printFunctionBlocksMap();
 		printBasicFunctionBlocksMap();
 		printFBTypesMap();
-		printEventConnectionMaps();
-		printDataConnectionMaps();
+		printEventConnectionsMap();
+		printDataConnectionsMap();
 
  		automata = new ExtendedAutomata(theSystem.getName());
 
@@ -498,18 +676,18 @@ class ModelMaker
 			String fbName = (String) fbIter.next();
 			String typeName = (String) basicFunctionBlocks.get(fbName);
 			
-			if (typeName.startsWith("E_SPLIT"))
-			{
-				makeSplit((new Integer(((String) functionBlocks.get(fbName)).substring(7))).intValue());
-			}
-			else if (typeName.startsWith("E_MERGE"))
-			{
-				makeMerge((new Integer(((String) functionBlocks.get(fbName)).substring(7))).intValue());
-			}
-			else
-			{
+// 			if (typeName.startsWith("E_SPLIT"))
+// 			{
+// 				makeSplit((new Integer(((String) functionBlocks.get(fbName)).substring(7))).intValue());
+// 			}
+// 			else if (typeName.startsWith("E_MERGE"))
+// 			{
+// 				makeMerge((new Integer(((String) functionBlocks.get(fbName)).substring(7))).intValue());
+// 			}
+// 			else
+// 			{
 				makeBasicFB(fbName);
-			}
+//			}
 		}
 		
 // 		// test automata classes
@@ -526,7 +704,7 @@ class ModelMaker
 // 		test2.addTransition("s0","s1","e1;e2;","var1 == 1","var1  = 4;");
 // 		automata.addAutomaton(test2);
 
-		automata.writeToFile(new File(outputFileName));
+		//automata.writeToFile(new File(outputFileName));
 	}
 
 
