@@ -150,55 +150,75 @@ class ModelMaker
 			}
 		}
 	}
-
-
-    // find the fileName in libraries and return the corresponding File
-    private File getFile(String fileName)
-    {
-		File theFile = new File(fileName);
-
-		if (libraryPathList != null)
-		{
-			for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
-			{
-				File curLibraryDir = (File) iter.next();
-				theFile = new File(curLibraryDir, fileName);
-				//System.out.println("ModelMaker.getFile(" + fileName + "): Looking for file in " + theFile.toString());
-				if (theFile.exists())
-				{
-					break;
-				}
-			}
-		}
-
-		if (!theFile.exists())
-		{
-			System.err.println("ModelMaker.getFile(" + fileName + "): The file " + fileName 
-							   + " does not exist in the specified libraries...");
-			if (libraryPathList != null)
-			{
-				for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
-				{
-					System.err.println("\t" + ((File) iter.next()).getAbsolutePath() + File.separator);
-				}
-			}
-			else
-			{
-				System.err.println("\t. (current directory)");
-			}
-			System.err.println();
-			System.err.println("Usage: ModelMaker [-o outputFile] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
-			System.exit(1);
-
-		}
-
-		return theFile;
-    }
 	
+	public void makeModel()
+	{
+		
+		loadSystem(systemFileName);
+		
+		makeEventConnectionMap(systemFBNetwork, null, 0);
+		
+		makeDataConnectionMap(systemFBNetwork, null, 0);
+
+		//printFunctionBlocksMap();
+		//printBasicFunctionBlocksMap();
+		//printFBTypesMap();
+		//printEventConnectionsMap();
+		//printDataConnectionsMap();
+
+ 		automata = new ExtendedAutomata(theSystem.getName());
+
+		makeInstanceQueue();
+
+		makeEventExecution();
+		
+		makeJobQueue();
+
+		makeAlgorithmExecution();
+
+		//for each basic FB instance make models
+		for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
+		{
+			String fbName = (String) fbIter.next();
+			String typeName = (String) basicFunctionBlocks.get(fbName);
+			
+// 			if (typeName.startsWith("E_SPLIT"))
+// 			{
+// 				makeSplit((new Integer(((String) functionBlocks.get(fbName)).substring(7))).intValue());
+// 			}
+// 			else if (typeName.startsWith("E_MERGE"))
+// 			{
+// 				makeMerge((new Integer(((String) functionBlocks.get(fbName)).substring(7))).intValue());
+// 			}
+// 			else
+// 			{
+				makeBasicFB(fbName);
+//			}
+		}
+		
+// 		// test automata classes
+// 		ExtendedAutomaton test = new ExtendedAutomaton("test", automata);
+// 		test.addState("s0", true);
+// 		test.addState("s1");
+// 		test.addIntegerVariable("var1", 0, 5, 0, null);
+// 		automata.addEvent("e1", "controllable");
+// 		test.addTransition("s0","s1","e1;e2;","var1 == 1","var1 = 4;");
+// 		automata.addAutomaton(test);
+// 		ExtendedAutomaton test2 = new ExtendedAutomaton("test2", automata);
+// 		test2.addState("s0", true);
+// 		test2.addState("s1");
+// 		test2.addIntegerVariable("var1", 0, 5, 0, null);
+// 		test2.addTransition("s0","s1","e1;e2;","var1 == 1","var1  = 4;");
+// 		automata.addAutomaton(test2);
+
+		automata.writeToFile(new File(outputFileName));
+	}
+
     private void loadSystem(String fileName)
     {
 	
-		System.out.println("ModelMaker.loadSystem(" + fileName + "): Loading file " + fileName);
+		System.out.println("ModelMaker.loadSystem(" + fileName + "):");
+		System.out.println("\t Loading file " + fileName);
 		
 		File file = getFile(fileName);
 		
@@ -335,6 +355,46 @@ class ModelMaker
 			}
 		}
 	}
+
+    private File getFile(String fileName)
+    {
+		File theFile = new File(fileName);
+
+		if (libraryPathList != null)
+		{
+			for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
+			{
+				File curLibraryDir = (File) iter.next();
+				theFile = new File(curLibraryDir, fileName);
+				//System.out.println("ModelMaker.getFile(" + fileName + "): Looking for file in " + theFile.toString());
+				if (theFile.exists())
+				{
+					break;
+				}
+			}
+		}
+
+		if (!theFile.exists())
+		{
+			System.err.println("ModelMaker.getFile(" + fileName + "): The file " + fileName 
+							   + " does not exist in the specified libraries...");
+			if (libraryPathList != null)
+			{
+				for (Iterator iter = libraryPathList.iterator();iter.hasNext();)
+				{
+					System.err.println("\t" + ((File) iter.next()).getAbsolutePath() + File.separator);
+				}
+			}
+			else
+			{
+				System.err.println("\t. (current directory)");
+			}
+			System.err.println();
+			System.err.println("Usage: ModelMaker [-o outputFile] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
+			System.exit(1);
+		}
+		return theFile;
+    }
 	
 	private void makeEventConnectionMap(JaxbFBNetwork fbNetwork, String parentInstance, int level)
 	{
@@ -342,15 +402,20 @@ class ModelMaker
 		{
 			System.out.print("\t");
 		}
-		System.out.println("ModelMaker.makeEventConnectionMap(" + parentInstance + "):");
-
+		if (parentInstance == null)
+		{
+			System.out.println("ModelMaker.makeEventConnectionMap(System):");
+		}
+		else
+		{
+			System.out.println("ModelMaker.makeEventConnectionMap(" + parentInstance + "):");
+		}
 		for (Iterator connIter = fbNetwork.getEventConnections().getConnection().iterator();
 			 connIter.hasNext();)
 		{
 			JaxbConnection connection = (JaxbConnection) connIter.next();
 			String source = connection.getSource();
 			String dest = connection.getDestination();			
-
 
 			if (parentInstance != null)
 			{
@@ -487,8 +552,14 @@ class ModelMaker
 		{
 			System.out.print("\t");
 		}
-		System.out.println("ModelMaker.makeDataConnectionMap(" + parentInstance + "):");
-
+		if (parentInstance == null)
+		{
+			System.out.println("ModelMaker.makeDataConnectionMap(System):");
+		}
+		else
+		{
+			System.out.println("ModelMaker.makeDataConnectionMap(" + parentInstance + "):");
+		}
 		for (Iterator connIter = fbNetwork.getDataConnections().getConnection().iterator();
 			 connIter.hasNext();)
 		{
@@ -537,14 +608,14 @@ class ModelMaker
 			destInstance = getInstanceName(dest);
 			destSignal   = getSignalName(dest);
 		
-			for (int i = 0; i<level; i++)
-			{
-				System.out.print("\t");
-			}
-			System.out.println("Adding connection: " 
-							   + source
-							   + "-->" 
-							   + dest);
+// 			for (int i = 0; i<level; i++)
+// 			{
+// 				System.out.print("\t");
+// 			}
+// 			System.out.println("Adding connection: " 
+// 							   + source
+// 							   + "-->" 
+// 							   + dest);
 			
 			Map dataMap;
 			if (!dataConnections.keySet().contains(destInstance))
@@ -644,8 +715,6 @@ class ModelMaker
 		return cntSpec.substring(cntSpec.lastIndexOf(".")+1,cntSpec.length());
 	}
 
-
-
 	private void makeInstanceQueue()
 	{
 		ExtendedAutomaton instanceQueue = new ExtendedAutomaton("instanceQueue", automata);
@@ -685,7 +754,6 @@ class ModelMaker
 // 		\State{$action\gets action$ + "fb\_place\_$i$ := 0;"}
 //         \State{addTransition($from$, $to$, $event$, $guard$, $action$)}       
 		}
-		
 	}
 
 	private void makeEventExecution()
@@ -723,8 +791,6 @@ class ModelMaker
 	{
 		System.out.println("Making Split of size: " + size);
 	}
-
-
 
 	private void printFunctionBlocksMap()
 	{
@@ -792,74 +858,6 @@ class ModelMaker
 			}
 		}
 	}
-	
-
-	
-	public void makeModel()
-	{
-		
-		loadSystem(systemFileName);
-		
-		makeEventConnectionMap(systemFBNetwork, null, 0);
-
-		makeDataConnectionMap(systemFBNetwork, null, 0);
-
-		printFunctionBlocksMap();
-		printBasicFunctionBlocksMap();
-		//printFBTypesMap();
-		printEventConnectionsMap();
-		printDataConnectionsMap();
-
- 		automata = new ExtendedAutomata(theSystem.getName());
-
-		makeInstanceQueue();
-
-		makeEventExecution();
-		
-		makeJobQueue();
-
-		makeAlgorithmExecution();
-
-		//for each basic FB instance make models
-		for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
-		{
-			String fbName = (String) fbIter.next();
-			String typeName = (String) basicFunctionBlocks.get(fbName);
-			
-// 			if (typeName.startsWith("E_SPLIT"))
-// 			{
-// 				makeSplit((new Integer(((String) functionBlocks.get(fbName)).substring(7))).intValue());
-// 			}
-// 			else if (typeName.startsWith("E_MERGE"))
-// 			{
-// 				makeMerge((new Integer(((String) functionBlocks.get(fbName)).substring(7))).intValue());
-// 			}
-// 			else
-// 			{
-				makeBasicFB(fbName);
-//			}
-		}
-		
-// 		// test automata classes
-// 		ExtendedAutomaton test = new ExtendedAutomaton("test", automata);
-// 		test.addState("s0", true);
-// 		test.addState("s1");
-// 		test.addIntegerVariable("var1", 0, 5, 0, null);
-// 		automata.addEvent("e1", "controllable");
-// 		test.addTransition("s0","s1","e1;e2;","var1 == 1","var1 = 4;");
-// 		automata.addAutomaton(test);
-// 		ExtendedAutomaton test2 = new ExtendedAutomaton("test2", automata);
-// 		test2.addState("s0", true);
-// 		test2.addState("s1");
-// 		test2.addIntegerVariable("var1", 0, 5, 0, null);
-// 		test2.addTransition("s0","s1","e1;e2;","var1 == 1","var1  = 4;");
-// 		automata.addAutomaton(test2);
-
-//		automata.writeToFile(new File(outputFileName));
-	}
-
-
-
 
 	public static void main(String args[])
     {
