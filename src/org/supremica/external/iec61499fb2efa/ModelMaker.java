@@ -35,8 +35,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
 
-import net.sourceforge.waters.xsd.base.ComponentKind;
-
 import net.sourceforge.fuber.xsd.libraryelement.*;
 
 class ModelMaker
@@ -690,21 +688,22 @@ class ModelMaker
 //			}
 		}
 		
-// 		// test automata classes
-// 		ExtendedAutomaton test = new ExtendedAutomaton("test", automata);
-// 		test.addState("s0", true);
-// 		test.addState("s1");
-// 		test.addIntegerVariable("var1", 0, 5, 0, null);
-// 		test.addTransition("s0","s1","e1;e2;","var1 == 1","var1  = 4;");
-// 		automata.addAutomaton(test);
-// 		ExtendedAutomaton test2 = new ExtendedAutomaton("test2", automata);
-// 		test2.addState("s0", true);
-// 		test2.addState("s1");
-// 		test2.addIntegerVariable("var1", 0, 5, 0, null);
-// 		test2.addTransition("s0","s1","e1;e2;","var1 == 1","var1  = 4;");
-// 		automata.addAutomaton(test2);
+		// test automata classes
+		ExtendedAutomaton test = new ExtendedAutomaton("test", automata);
+		test.addState("s0", true);
+		test.addState("s1");
+		test.addIntegerVariable("var1", 0, 5, 0, null);
+		automata.addEvent("e1", "controllable");
+		test.addTransition("s0","s1","e1;e2;","var1 == 1","var1 = 4;");
+		automata.addAutomaton(test);
+		ExtendedAutomaton test2 = new ExtendedAutomaton("test2", automata);
+		test2.addState("s0", true);
+		test2.addState("s1");
+		test2.addIntegerVariable("var1", 0, 5, 0, null);
+		test2.addTransition("s0","s1","e1;e2;","var1 == 1","var1  = 4;");
+		automata.addAutomaton(test2);
 
-		//automata.writeToFile(new File(outputFileName));
+		automata.writeToFile(new File(outputFileName));
 	}
 
 

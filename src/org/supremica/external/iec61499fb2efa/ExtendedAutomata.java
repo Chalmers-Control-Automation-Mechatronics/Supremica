@@ -66,9 +66,16 @@ class ExtendedAutomata
 		module.getEventDeclListModifiable().add(factory.createEventDeclProxy(name, EventKind.UNCONTROLLABLE));
 	}
 	
-	public void addEvent(String name, EventKind kind)
+	public void addEvent(String name, String kind)
 	{
-		module.getEventDeclListModifiable().add(factory.createEventDeclProxy(name, kind));
+		if (kind.equals("controllable"))
+		{
+			module.getEventDeclListModifiable().add(factory.createEventDeclProxy(name, EventKind.CONTROLLABLE));
+		}
+		else if (kind.equals("uncontrollable"))
+		{
+			module.getEventDeclListModifiable().add(factory.createEventDeclProxy(name, EventKind.UNCONTROLLABLE));
+		}
 	}
 
 
