@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.39 2007-05-08 10:06:39 avenir Exp $
+//# $Id: ComponentEditorPanel.java,v 1.40 2007-05-09 18:05:59 robi Exp $
 //###########################################################################
 
 
@@ -20,10 +20,11 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.io.*;
 import java.awt.print.*;
-import java.util.Locale;
+import java.net.MalformedURLException;
+import java.io.*;
 import java.util.List;
+import java.util.Locale;
 import javax.print.attribute.*;
 import javax.print.attribute.standard.*;
 import javax.swing.*;
@@ -322,16 +323,18 @@ public class ComponentEditorPanel
 			final int NODE_RADIUS = 6; // The radius of the states
 			final double MARKING_GREY_SCALE = 0.5; // The grayscale level of the marked states
 
-			// Open a file chooser in the location of the modelfile 
-			// and create the eps-file to be filled with the graphical information
+			// Open a file chooser in the location of the modelfile,
+			// and create the eps-file to be filled with the graphical
+			// information.
 			JFileChooser chooser = new JFileChooser();
-			try 
-			{
-				chooser.setCurrentDirectory(mModule.getFileLocation());
+			try {
+				final File location = mModule.getFileLocation();
+				if (location != null) {
+					chooser.setCurrentDirectory(location);
+				}
+			} catch (final MalformedURLException exception) {
+				// JAR URL---no file---no preselection of directory.
 			}
-			catch (Exception ex)
-			{}
-				
 			chooser.setSelectedFile(new File(element.getName() + ".eps"));
 			int returnVal = chooser.showSaveDialog(surface);
 			File epsFile = chooser.getSelectedFile();
@@ -545,6 +548,7 @@ public class ComponentEditorPanel
 			w.newLine();
 		
 			// For every node...
+			// *** BUG *** This must be done through renderer.
 			for (NodeProxy node : surface.getDrawnGraph().getNodes())
 			{
 				// ... representing a state
@@ -772,6 +776,7 @@ public class ComponentEditorPanel
 		}
 		catch (Exception ex)
 		{
+			// *** BUG *** should not catch all exceptions ...
 			if (w != null)
 			{
 				try 
