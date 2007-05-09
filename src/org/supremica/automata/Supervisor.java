@@ -74,13 +74,19 @@ public interface Supervisor
      * @throws EventDisabledException if the event was not enabled.
      */
     public void executeEvent(LabeledEvent event)
-		throws EventDisabledException;
+    throws EventDisabledException;
 
     /**
      * Returns the alphabet of the supervisor.
      */
     public Alphabet getAlphabet();
 
+    /**
+     * Returns automata representation of supervisor.
+     */
+    public Automata getAsAutomata()
+    throws UnsupportedOperationException;
+    
     /**
      * Returns the supervisor to its initial state.
      */
@@ -91,6 +97,6 @@ public interface Supervisor
  * Thrown when an event unexpectedly turns out to be disabled.
  */
 class EventDisabledException
-	extends SupremicaException
+    extends SupremicaException
 {
 }

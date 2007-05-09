@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<Automata name="Transfer line" major="0" minor="9" comment="Adapted from 'Notes on Control of Discrete-Event Systems' my W.M Wonham.">
+<Automata name="Transfer line" major="0" minor="9" comment="Adapted from 'Notes on Control of Discrete-Event Systems' by W.M Wonham.">
 <Automaton name="B1" type="Specification">
 	<Events>
 		<Event id="0" label="f1" controllable="false"/>

@@ -47,16 +47,18 @@
  *
  *  Supremica is owned and represented by KA.
  */
+
 package org.supremica.automata.algorithms;
 import org.supremica.log.*;
 import java.util.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.standard.ObserverBuilder;
+
 /**
  * A monolithic synthesizer that can handle non-blocking and controllability problems.
  *
- *@author  ka
- *@since  November 28, 2000
+ *@author ka
+ *@since November 28, 2000
  */
 public class AutomatonSynthesizer
     implements Stoppable
@@ -197,18 +199,16 @@ public class AutomatonSynthesizer
     {
         StateSet stateList = new StateSet();
         logger.debug("AutomatonSynthesizer.synthesizeControllableNonblocking...");
-        for (Iterator stateIt = theAutomaton.stateIterator();
-        stateIt.hasNext(); )
+        for (State state: theAutomaton)
         {
-            State currState = (State) stateIt.next();
-            if (currState.isAccepting() &&!currState.isForbidden())
+            if (state.isAccepting() &&!state.isForbidden())
             {
-                acceptingStates.add(currState);
+                acceptingStates.add(state);
             }
-            if (currState.isForbidden())
+            if (state.isForbidden())
             {
-                stateList.add(currState);
-                currState.setCost(State.MAX_COST);
+                stateList.add(state);
+                state.setCost(State.MAX_COST);
             }
         }
         // Do fixed point iteration
@@ -228,12 +228,11 @@ public class AutomatonSynthesizer
         doReachable();
         // Forbid the states with MAX_COST set
         boolean didSomething = false;
-        for (Iterator<State> stateIt = theAutomaton.stateIterator(); stateIt.hasNext(); )
+        for (State state: theAutomaton)
         {
-            State currState = (State) stateIt.next();
-            if (currState.getCost() == State.MAX_COST)
+            if (state.getCost() == State.MAX_COST)
             {
-                currState.setForbidden(true);
+                state.setForbidden(true);
                 didSomething = true;
             }
         }

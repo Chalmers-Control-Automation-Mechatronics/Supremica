@@ -149,7 +149,7 @@ public class AutomataSynchronizer
     
     public void displayInfo()
     {
-        synchHelper.displayInfo();
+        synchHelper.printStatistics();
     }
     
     // -- MF -- Added to allow users easy access to the number of synch'ed states

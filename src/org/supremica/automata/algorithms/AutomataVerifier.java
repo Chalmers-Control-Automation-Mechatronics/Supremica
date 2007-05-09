@@ -521,7 +521,7 @@ public class AutomataVerifier
         }
         
         //return "\\texttt{NAME} & " + initialNbrOfAutomata + " & SIZE & " + mostStates + " & " + mostTransitions + " & TIME & BLOCK & " + AutomatonMinimizer.getWodesStatisticsLaTeX() + " & ALGO1 & ALGO2 \\\\";
-		message = "\\texttt{NAME} & " + theAutomata.size() + " & SIZE & " + synchHelper.getInfo() + " & TIME & " + !allModulesControllable;
+        message = "\\texttt{NAME} & " + theAutomata.size() + " & SIZE & " + synchHelper.getStatisticsLineLatex() + " & TIME & " + !allModulesControllable;
 
         return allModulesControllable;
     }
@@ -1515,6 +1515,9 @@ public class AutomataVerifier
        
     // BENCHMARKING JUNK
     private static String message = "";
+    /**
+     * Returns LaTeX-code with statistics for a table.
+     */
     public String getTheMessage()
     {
         return message;
@@ -1766,7 +1769,7 @@ public class AutomataVerifier
     {
         if (synchHelper != null)
         {
-            synchHelper.displayInfo();
+            synchHelper.printStatistics();
         }
     }
     

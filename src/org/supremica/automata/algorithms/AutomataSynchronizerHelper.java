@@ -86,7 +86,7 @@ public final class AutomataSynchronizerHelper
     private boolean automataIsControllable = true;
     
     // Keeps information common to helpers.
-    private HelperData helperData;
+    private AutomataSynchronizerHelperStatistics helperStatistics;
     private SynchronizationOptions syncOptions = null;
     
     // Used by AutomataSynchronizerExecuter
@@ -130,7 +130,7 @@ public final class AutomataSynchronizerHelper
         
         this.theAutomata = theAutomata;
         this.syncOptions = syncOptions;
-        helperData = new HelperData();
+        helperStatistics = new AutomataSynchronizerHelperStatistics();
         statesToProcess = new IntArrayList();
         nbrOfStatesToProcess = 0;
         theStates = new IntArrayHashTable(syncOptions.getInitialHashtableSize(),
@@ -164,7 +164,7 @@ public final class AutomataSynchronizerHelper
         theAutomaton = orgHelper.getAutomaton();
         theAutomataIndexForm = orgHelper.getAutomataIndexForm();
         syncOptions = orgHelper.getSynchronizationOptions();
-        helperData = orgHelper.getHelperData();
+        helperStatistics = orgHelper.getHelperData();
         executionDialog = orgHelper.getExecutionDialog();
         statesToProcess = new IntArrayList();
         nbrOfStatesToProcess = 0;
@@ -188,7 +188,7 @@ public final class AutomataSynchronizerHelper
      * Initializes the helper for a new run. Generates a new initial state and adds it to the queue.
      */
     public void initialize()
-		throws Exception
+    throws Exception
     {
         // The helper (or rather theStates) should be clear before executing this method
         if (theStates.size() > 0)
@@ -198,7 +198,7 @@ public final class AutomataSynchronizerHelper
         
         // Build the initial state  (including 2 status fields)
         int[] initialState = AutomataIndexFormHelper.createState(theAutomata.size());
-      
+        
         Iterator autIt = theAutomata.iterator();
         while (autIt.hasNext())
         {
@@ -251,9 +251,9 @@ public final class AutomataSynchronizerHelper
         return theAutomataIndexForm;
     }
     
-    public HelperData getHelperData()
+    public AutomataSynchronizerHelperStatistics getHelperData()
     {
-        return helperData;
+        return helperStatistics;
     }
     
     public int getNbrOfStatesToProcess()
@@ -378,7 +378,7 @@ public final class AutomataSynchronizerHelper
     
     // Add this state to theStates
     public void addState(int[] state)
-		throws Exception
+    throws Exception
     {
         int[] newState = null;
         
@@ -398,17 +398,17 @@ public final class AutomataSynchronizerHelper
             addStatus(newState);
             addStateToProcess(newState);
             
-            helperData.nbrOfAddedStates++;
+            helperStatistics.nbrOfAddedStates++;
         }
         else if (rememberTrace && (fromStateList.size() != 0))
         {
             fromStateList.removeLast();
         }
         
-        helperData.nbrOfCheckedStates++;
-        if ((executionDialog != null) && (helperData.nbrOfCheckedStates % 2000 == 0))
+        helperStatistics.nbrOfCheckedStates++;
+        if ((executionDialog != null) && (helperStatistics.nbrOfCheckedStates % 2000 == 0))
         {
-            executionDialog.setValue((int) helperData.nbrOfAddedStates);
+            executionDialog.setValue((int) helperStatistics.nbrOfAddedStates);
         }
     }
     
@@ -472,7 +472,7 @@ public final class AutomataSynchronizerHelper
         
         state[state.length - AutomataIndexFormHelper.STATE_STATUS_FROM_END] = currStatus;
         
-        helperData.nbrOfForbiddenStates++;
+        helperStatistics.nbrOfForbiddenStates++;
     }
     
     public void setDeadlocked(int[] state, boolean deadlocked)
@@ -492,7 +492,7 @@ public final class AutomataSynchronizerHelper
         {
             currStatus |= (1 << 6);
             
-            helperData.nbrOfDeadlockedStates++;
+            helperStatistics.nbrOfDeadlockedStates++;
         }
         else
         {
@@ -519,7 +519,7 @@ public final class AutomataSynchronizerHelper
     
     public long getNumberOfAddedStates()
     {
-        return helperData.nbrOfAddedStates;
+        return helperStatistics.nbrOfAddedStates;
     }
     
     public State[][] getIndexFormStateTable()
@@ -608,7 +608,7 @@ public final class AutomataSynchronizerHelper
             LabeledEvent currEvent = (LabeledEvent) eventIterator.next();
             
             if (currEvent.getExpansionPriority() < 0)
-            {                
+            {
                 // The events are already ordered after synchIndex!
                 // eventPriority[currEvent.getSynchIndex()] = 10;
                 eventPriority[index++] = 10;
@@ -639,19 +639,19 @@ public final class AutomataSynchronizerHelper
     /**
      * Logs the amount of states examined during the execution and some other stuff.
      */
-    public void displayInfo()
+    public void printStatistics()
     {
         // Did we do anything?
-        if (helperData.getNumberOfCheckedStates() != 0)
+        if (helperStatistics.getNumberOfCheckedStates() != 0)
         {
-            logger.info("Operation statistics:\n\t" + (helperData.getNumberOfCheckedStates() - 1) + " transitions were examined.\n\t" + helperData.getNumberOfReachableStates() + " reachable states were found.\n\t" + helperData.getNumberOfForbiddenStates() + " forbidden states were found.\n\t" + helperData.getNumberOfDeadlockedStates() + " deadlocked states were found.");
+            logger.info(helperStatistics);
         }
     }
-
-	public String getInfo()
-	{
-		return helperData.getNumberOfReachableStates() + " & " + (helperData.getNumberOfCheckedStates() - 1);
-	}
+    
+    public String getStatisticsLineLatex()
+    {
+        return helperStatistics.getStatisticsLineLaTeX();
+    }
     
     /**
      * Displays the event-trace leading to the uncontrollable state.
@@ -945,55 +945,5 @@ public final class AutomataSynchronizerHelper
             controllableEventsTable[i] = !controllableEventsTable[i];
         }
     }
-    
-    public class HelperData
-    {
-        public long nbrOfAddedStates = 0;
-        public long nbrOfCheckedStates = 0;
-        public long nbrOfForbiddenStates = 0;
-        public long nbrOfDeadlockedStates = 0;
-        
-        public HelperData()
-        {}
-        
-        public long getNumberOfReachableStates()
-        {
-            return nbrOfAddedStates;
-        }
-        
-        public long getNumberOfCheckedStates()
-        {
-            return nbrOfCheckedStates;
-        }
-        
-        public long getNumberOfForbiddenStates()
-        {
-            return nbrOfForbiddenStates;
-        }
-        
-        public long getNumberOfDeadlockedStates()
-        {
-            return nbrOfDeadlockedStates;
-        }
-        
-        public void setNumberOfReachableStates(long n)
-        {
-            nbrOfAddedStates = n;
-        }
-        
-        public void setNumberOfCheckedStates(long n)
-        {
-            nbrOfCheckedStates = n;
-        }
-        
-        public void setNumberOfForbiddenStates(long n)
-        {
-            nbrOfForbiddenStates = n;
-        }
-        
-        public void setNumberOfDeadlockedStates(long n)
-        {
-            nbrOfDeadlockedStates = n;
-        }
-    }
+
 }

@@ -57,17 +57,17 @@ import org.supremica.automata.Automata;
  * just one module...
  */
 public class MonolithicSupervisor
-	extends ModularSupervisor
-	implements Supervisor
+    extends ModularSupervisor
+    implements Supervisor
 {
-	/**
-	 * Creates a monolithic supervisor. 
-	 *
-	 * @param supervisor is an Automaton modeling the supervisor.
-	 */
-	public MonolithicSupervisor(Automaton supervisor)
-		throws SupremicaException
-	{
-		super(new Automata(supervisor));
-	}
+    /**
+     * Creates a monolithic supervisor.
+     *
+     * @param supervisor is an Automaton modeling the supervisor.
+     */
+    public MonolithicSupervisor(Automaton supervisor)
+    throws SupremicaException
+    {
+        super(new Automata(supervisor));
+    }
 }

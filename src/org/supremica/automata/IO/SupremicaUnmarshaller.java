@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   SupremicaUnmarshaller
 //###########################################################################
-//# $Id: SupremicaUnmarshaller.java,v 1.8 2007-03-21 16:09:32 flordal Exp $
+//# $Id: SupremicaUnmarshaller.java,v 1.9 2007-05-09 11:54:46 flordal Exp $
 //###########################################################################
 
 package org.supremica.automata.IO;
@@ -28,6 +28,8 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
 import org.supremica.gui.StandardExtensionFileFilter;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 
 import org.xml.sax.SAXException;
 
@@ -35,6 +37,8 @@ import org.xml.sax.SAXException;
 public class SupremicaUnmarshaller
     implements ProxyUnmarshaller<ModuleProxy>
 {
+    protected static Logger logger = LoggerFactory.createLogger(SupremicaUnmarshaller.class);
+
     //#########################################################################
     //# Constructor
     public SupremicaUnmarshaller(final ModuleProxyFactory modfactory)
@@ -107,7 +111,7 @@ public class SupremicaUnmarshaller
      * the State cost feature has no correspondance in the Waters models, the 
      * user should be alerted of this fact...
      */
-    private void validate (Automata automata)
+    private void validate(Automata automata)
     {
         for (Automaton aut : automata)
         {
@@ -115,7 +119,7 @@ public class SupremicaUnmarshaller
             {
                 if (state.getCost() != State.UNDEF_COST)
                 {
-                    System.err.println("State cost information in the imported automata model was lost in the conversion.");
+                    logger.warn("State cost information in the imported automata model was lost in the conversion; optimisation is not possible.");
                     return;
                 }
             }

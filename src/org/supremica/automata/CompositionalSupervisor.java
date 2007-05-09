@@ -66,64 +66,72 @@ import org.supremica.automata.KripkeLabel;
  * reached by "alpha" from the current global state.
  */
 public class CompositionalSupervisor
-	extends ModularSupervisor
-	implements Supervisor
+    extends ModularSupervisor
+    implements Supervisor
 {
-	/**
-	 * Creates a compositional supervisor from a system model, a set
-	 * of maps mapping KripkeLabel:s and a description of the
-	 * composition scheme.
-	 *
-	 * @param model is an Automata containing a model of the
-	 * plant and the specification (may be plantified)
-	 * @param mapArray array of maps, the order in which to use them
-	 * is described by <code>compositionScheme</code>
-	 * @param compositionScheme describes the flow of the mapping,
-	 * from a state (array) to a YES/NO verdict on whether the state
-	 * is allowed by the supervisor. Used by the isEnabled-method.
-	 */
-	public CompositionalSupervisor(Automata model, Map<KripkeLabel,KripkeLabel>[] mapArray, String compositionScheme)
-		throws SupremicaException
-	{
-		super(model);
-	}
-
-   	////////////////////////////////////////
-	// Supervisor interface methods       //
-	// (inherited from ModularSupervisor  //
+    /**
+     * Creates a compositional supervisor from a system model, a set
+     * of maps mapping KripkeLabel:s and a description of the
+     * composition scheme.
+     *
+     * @param model is an Automata containing a model of the
+     * plant and the specification (may be plantified)
+     * @param mapArray array of maps, the order in which to use them
+     * is described by <code>compositionScheme</code>
+     * @param compositionScheme describes the flow of the mapping,
+     * from a state (array) to a YES/NO verdict on whether the state
+     * is allowed by the supervisor. Used by the isEnabled-method.
+     */
+    public CompositionalSupervisor(Automata model, Map<KripkeLabel,KripkeLabel>[] mapArray, String compositionScheme)
+    throws SupremicaException
+    {
+        super(model);
+    }
+    
+    ////////////////////////////////////////
+    // Supervisor interface methods       //
+    // (inherited from ModularSupervisor  //
     // and overridden here)               //
-	////////////////////////////////////////
-	
-	// We need to override this one
-	public boolean isEnabled(LabeledEvent event)
-	{
-		// Find out which state the system would be in if event was execuded.
-		// Save the current global state
-		State[] currentStateSave = (State[]) currentGlobalState.clone();
-		// We would end up (hypotetically) in some other state...
-		State[] hypotheticalState;
-		try 
-		{
-			// Try executing the event
-			executeEvent(event);
-			hypotheticalState = currentGlobalState;
-			// Restore order
-			currentGlobalState = currentStateSave;
-		}
-		catch (EventDisabledException ex)
-		{
-			// Restore order
-			currentGlobalState = currentStateSave;
-			// The event is disabled by the model (it was a stupid
-			// question, it should not matter whether the supervisor
-			// enables or disables the event)
-			return false;
-		}
+    ////////////////////////////////////////
+    
+    // We need to override this one
+    public boolean isEnabled(LabeledEvent event)
+    {
+        // Find out which state the system would be in if event was execuded.
+        // Save the current global state
+        State[] currentStateSave = (State[]) currentGlobalState.clone();
+        // We would end up (hypotetically) in some other state...
+        State[] hypotheticalState;
+        try
+        {
+            // Try executing the event
+            executeEvent(event);
+            hypotheticalState = currentGlobalState;
+            // Restore order
+            currentGlobalState = currentStateSave;
+        }
+        catch (EventDisabledException ex)
+        {
+            // Restore order
+            currentGlobalState = currentStateSave;
+            // The event is disabled by the model (it was a stupid
+            // question, it should not matter whether the supervisor
+            // enables or disables the event)
+            return false;
+        }
+        
+        // ... examine if hypotheticalState maps to "OK" or "BAD".
+        
+        // INSERT CODE HERE
+        
+        return true;
+    }
 
-		// ... examine if hypotheticalState maps to "OK" or "BAD".
-
-		// INSERT CODE HERE
-
-		return true;
-	}
+    /**
+     * Returns a "flat" automata model representing the compositional supervisor.
+     */
+    public Automata getAsAutomata()
+    {
+        throw new UnsupportedOperationException("The algorithm for transforming the compositional supervisor to a 'flat' automata is not implemented.");
+    }
 }
