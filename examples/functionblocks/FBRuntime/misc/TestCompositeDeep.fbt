@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FBType xmlns="http://www.holobloc.com/xml/LibraryElement" Name="TestCompositeDeep" >
+  <VersionInfo Author="Goran Cengic" Organization="Chalmers" Version="1.0" Date="2007-05-09" />
+  <InterfaceList>
+    <EventInputs>
+      <Event Name="EI" >
+        <With Var="DI" />
+      </Event>
+    </EventInputs>
+    <EventOutputs>
+      <Event Name="EO" >
+        <With Var="DO" />
+      </Event>
+    </EventOutputs>
+    <InputVars>
+      <VarDeclaration Name="DI" Type="INT" />
+    </InputVars>
+    <OutputVars>
+      <VarDeclaration Name="DO" Type="INT" />
+    </OutputVars>
+  </InterfaceList>
+	<FBNetwork>
+		<FB Name="deep1" Type="TestComposite" />
+		<FB Name="deep2" Type="TestComposite" />
+	<EventConnections>
+		<Connection Source="EI" Destination="deep1.EI" />
+		<Connection Source="deep1.EO" Destination="deep2.EI" />
+		<Connection Source="deep2.EO" Destination="EO" />
+	</EventConnections>
+	<DataConnections>
+		<Connection Source="DI" Destination="deep1.DI" />
+		<Connection Source="deep1.DO" Destination="deep2.DI" />
+		<Connection Source="deep2.DO" Destination="DO" />
+	</DataConnections>
+  </FBNetwork>
+</FBType>
