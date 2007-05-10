@@ -161,6 +161,8 @@ class ModelMaker
 	
 	public void makeModel()
 	{
+
+		System.out.println("ModelMaker.makeModel(): Loading and Analyzing System -----------------------------");
 		
 		loadSystem(systemFileName);
 		
@@ -175,6 +177,8 @@ class ModelMaker
 // 		printFBTypesMap();
 // 		printEventConnectionsMap();
 // 		printDataConnectionsMap();
+
+		System.out.println("ModelMaker.makeModel(): Generating Model -----------------------------------------");
 
  		automata = new ExtendedAutomata(theSystem.getName());
 
