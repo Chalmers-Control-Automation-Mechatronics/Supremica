@@ -54,8 +54,14 @@ class ModelMaker
 	private Map functionBlocks = new HashMap();
 	// String name, String type name
 	private Map basicFunctionBlocks = new HashMap();
+	// String name, Integer ID
 	private Map basicFunctionBlocksID = new HashMap();
-	private int idCounter = 1;
+	private int fbIDCounter = 1;
+	// String fb name, Map alg name -> alg ID
+	private Map algorithms = new HashMap();
+	private int algIDCounter = 1;
+	// String fb name, Map alg name -> JaxbAlgorithm
+	private Map algorithmTexts = new HashMap();
 	// String name, JaxbFBType type object
 	private Map fbTypes = new HashMap();
 
@@ -162,11 +168,13 @@ class ModelMaker
 		
 		makeDataConnectionMap(systemFBNetwork, null, 0);
 
-// 		printFunctionBlocksMap();
-// 		printBasicFunctionBlocksMap();
-// 		printFBTypesMap();
-// 		printEventConnectionsMap();
-// 		printDataConnectionsMap();
+		printFunctionBlocksMap();
+		printBasicFunctionBlocksMap();
+		printAlgorithmsMap();
+		printAlgorithmTextsMap();
+		printFBTypesMap();
+		printEventConnectionsMap();
+		printDataConnectionsMap();
 
  		automata = new ExtendedAutomata(theSystem.getName());
 
@@ -263,14 +271,16 @@ class ModelMaker
     {
 		
 		String instanceName = null;
+
 		if (parent == null)
 		{
 			instanceName = fb.getName();
 		}
 		else
 		{
-			instanceName = parentName + "." + fb.getName();		
+			instanceName = parentName + "_" + fb.getName();		
 		}
+
 		String typeName = fb.getType();
 		String fileName = typeName + ".fbt";
 	
@@ -334,8 +344,39 @@ class ModelMaker
 				{
 					System.out.println("\t Adding Basic FB " + instanceName);			
 					basicFunctionBlocks.put(instanceName, typeName);
-					basicFunctionBlocksID.put(instanceName, new Integer(idCounter));
-					idCounter++;
+					basicFunctionBlocksID.put(instanceName, new Integer(fbIDCounter));
+					fbIDCounter++;
+					
+					// make algoritms map entry
+					BasicFB basicFB = theType.getBasicFB();
+					if (basicFB.isSetAlgorithm())
+					{
+						List fbAlgs = (List) basicFB.getAlgorithm();
+						Map algMap = new HashMap();
+						Map algTextMap = new HashMap();
+						for (Iterator iter = fbAlgs.iterator(); iter.hasNext();)
+						{
+							JaxbAlgorithm curAlg = (JaxbAlgorithm) iter.next();
+							if (curAlg.isSetName())
+							{
+								String curAlgName = curAlg.getName();
+								algMap.put(curAlgName, new Integer(algIDCounter));
+								algIDCounter++;
+								if (curAlg.isSetOther())
+								{
+									algTextMap.put(curAlgName, curAlg.getOther().getText());
+								}
+							}
+							else
+							{
+								System.out.println("\t Error: The algorithm does not have a name!");
+								System.exit(1);
+							}
+						}
+						algIDCounter = 1;
+						algorithms.put(instanceName, algMap);
+						algorithmTexts.put(instanceName, algTextMap);
+					}
 				}
 				else if (!theType.isSetBasicFB() & theType.isSetFBNetwork())
 				{
@@ -418,21 +459,25 @@ class ModelMaker
 			 connIter.hasNext();)
 		{
 			JaxbConnection connection = (JaxbConnection) connIter.next();
-			String source = connection.getSource();
-			String dest = connection.getDestination();			
-
+			String source = connection.getSource().replace(".", "_");
+			String dest = connection.getDestination().replace(".", "_");			
+			
 			if (parentInstance != null)
 			{
 				// don't process internal event input connections in composite blocks...
 				if (!getInstanceName(source).equals(""))
 				{
-					source = parentInstance + "." + source;
-					dest   = parentInstance + "." + dest;			
+					source = parentInstance + "_" + source;
+					dest   = parentInstance + "_" + dest;			
 				}
 			}
 			String sourceInstance = getInstanceName(source);
 			String sourceSignal   = getSignalName(source);
-			
+				
+// 			for (int i = 0; i<level; i++)
+// 			{
+// 				System.out.print("\t");
+// 			}
 // 			System.out.println("Analyzing connection: " 
 // 							   + source
 // 							   + "-->" 
@@ -451,8 +496,8 @@ class ModelMaker
 			// ...process them here
 			if (sourceInstance.equals(""))
 			{
-				source = parentInstance + "." + source;
-				dest   = parentInstance + "." + dest;			
+				source = parentInstance + "_" + source;
+				dest   = parentInstance + "_" + dest;			
 			}
 			
 			// flattening
@@ -497,18 +542,18 @@ class ModelMaker
 					 internalConnIter.hasNext();)
 				{
 					JaxbConnection curConn = (JaxbConnection) internalConnIter.next();
-					String source = curConn.getSource();
+					String source = curConn.getSource().replace(".","_");
 					if (source.equals(signalName))
 					{
-						String destination = curConn.getDestination();
+						String destination = curConn.getDestination().replace(".","_");
 						String destInstance = getInstanceName(destination);
-						if (basicFunctionBlocks.keySet().contains(instanceName + "." + destInstance))
+						if (basicFunctionBlocks.keySet().contains(instanceName + "_" + destInstance))
 						{
-							return instanceName + "." + destination;
+							return instanceName + "_" + destination;
 						}
 						else
 						{
-							return getInternalEventInputConnection(instanceName + "." + destination);
+							return getInternalEventInputConnection(instanceName + "_" + destination);
 						}
 					}
 				}
@@ -530,18 +575,18 @@ class ModelMaker
 					 internalConnIter.hasNext();)
 				{
 					JaxbConnection curConn = (JaxbConnection) internalConnIter.next();
-					String dest = curConn.getDestination();
+					String dest = curConn.getDestination().replace(".","_");
 					if (dest.equals(signalName))
 					{
-						String source = curConn.getSource();
+						String source = curConn.getSource().replace(".","_");
 						String sourceInstance = getInstanceName(source);
-						if (basicFunctionBlocks.keySet().contains(instanceName + "." + sourceInstance))
+						if (basicFunctionBlocks.keySet().contains(instanceName + "_" + sourceInstance))
 						{
-							return instanceName + "." + source;
+							return instanceName + "_" + source;
 						}
 						else
 						{
-							return getInternalEventOutputConnection(instanceName + "." + source);
+							return getInternalEventOutputConnection(instanceName + "_" + source);
 						}
 					}
 				}
@@ -568,16 +613,16 @@ class ModelMaker
 			 connIter.hasNext();)
 		{
 			JaxbConnection connection = (JaxbConnection) connIter.next();
-			String source = connection.getSource();
-			String dest = connection.getDestination();			
+			String source = connection.getSource().replace(".","_");
+			String dest = connection.getDestination().replace(".","_");			
 
 			if (parentInstance != null)
 			{
 				// don't process internal event input connections in composite blocks...
 				if (!getInstanceName(dest).equals(""))
 				{
-					source = parentInstance + "." + source;
-					dest   = parentInstance + "." + dest;			
+					source = parentInstance + "_" + source;
+					dest   = parentInstance + "_" + dest;			
 				}
 			}
 
@@ -602,8 +647,8 @@ class ModelMaker
 			// ...process them here
 			if (destInstance.equals(""))
 			{
-				source = parentInstance + "." + source;
-				dest   = parentInstance + "." + dest;			
+				source = parentInstance + "_" + source;
+				dest   = parentInstance + "_" + dest;			
 			}
 			
 			// flattening
@@ -648,18 +693,18 @@ class ModelMaker
 					 internalConnIter.hasNext();)
 				{
 					JaxbConnection curConn = (JaxbConnection) internalConnIter.next();
-					String source = curConn.getSource();
+					String source = curConn.getSource().replace(".","_");
 					if (source.equals(signalName))
 					{
-						String destination = curConn.getDestination();
+						String destination = curConn.getDestination().replace(".","_");
 						String destInstance = getInstanceName(destination);
-						if (basicFunctionBlocks.keySet().contains(instanceName + "." + destInstance))
+						if (basicFunctionBlocks.keySet().contains(instanceName + "_" + destInstance))
 						{
-							return instanceName + "." + destination;
+							return instanceName + "_" + destination;
 						}
 						else
 						{
-							return getInternalDataInputConnection(instanceName + "." + destination);
+							return getInternalDataInputConnection(instanceName + "_" + destination);
 						}
 					}
 				}
@@ -681,18 +726,18 @@ class ModelMaker
 					 internalConnIter.hasNext();)
 				{
 					JaxbConnection curConn = (JaxbConnection) internalConnIter.next();
-					String dest = curConn.getDestination();
+					String dest = curConn.getDestination().replace(".","_");
 					if (dest.equals(signalName))
 					{
-						String source = curConn.getSource();
+						String source = curConn.getSource().replace(".","_");
 						String sourceInstance = getInstanceName(source);
-						if (basicFunctionBlocks.keySet().contains(instanceName + "." + sourceInstance))
+						if (basicFunctionBlocks.keySet().contains(instanceName + "_" + sourceInstance))
 						{
-							return instanceName + "." + source;
+							return instanceName + "_" + source;
 						}
 						else
 						{
-							return getInternalDataOutputConnection(instanceName + "." + source);
+							return getInternalDataOutputConnection(instanceName + "_" + source);
 						}
 					}
 				}
@@ -703,20 +748,20 @@ class ModelMaker
 
 	private String getInstanceName(String cntSpec)
 	{
-		if (cntSpec.indexOf(".") < 0)
+		if (cntSpec.indexOf("_") < 0)
 		{
 			return "";
 		}
-		return cntSpec.substring(0,cntSpec.lastIndexOf("."));
+		return cntSpec.substring(0,cntSpec.lastIndexOf("_"));
 	}
 
 	private String getSignalName(String cntSpec)
 	{
-		if (cntSpec.indexOf(".") < 0)
+		if (cntSpec.indexOf("_") < 0)
 		{
 			return cntSpec;
 		}
-		return cntSpec.substring(cntSpec.lastIndexOf(".")+1,cntSpec.length());
+		return cntSpec.substring(cntSpec.lastIndexOf("_")+1,cntSpec.length());
 	}
 
 	private void makeInstanceQueue()
@@ -791,7 +836,45 @@ class ModelMaker
 		ExtendedAutomaton jobQueue = new ExtendedAutomaton("jobQueue", automata);
 		
 		// the maximum number of jobs in queue at the same time
-		final int places = 5;
+		final int places = basicFunctionBlocks.keySet().size();
+		
+		jobQueue.addState("s0", true);
+		for (int i = 1; i <= places; i++)
+		{
+			jobQueue.addState("s" + i);
+			//Transiton when queueing instance
+			String from = "s" + (i-1);
+			String to = "s" + i;
+			String event = "";
+			String guard = "";
+			String action = "";
+			for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
+			{
+				String instanceName = (String) fbIter.next();
+				event = "queue_job_" + instanceName + ";";
+				guard = "queueing_job_" + instanceName + ">0";
+				action = "job_fb_place_" + i + " = " + basicFunctionBlocksID.get(instanceName) + ";";
+				action = action + "job_alg_place_" + i + " = queuing_job_" + instanceName + ";";
+				action = action + "queuing_job_" + instanceName + " = 0;";
+				jobQueue.addTransition(from, to, event, guard, action);
+			}
+			// Transiton when dequeueing instance
+			from = "s" + i;
+			to = "s" + (i-1);
+			event = "remove_job;";      
+			guard = "";      
+			action = "current_job_fb = job_fb_place_1;";
+			action = action + "current_job_alg = job_alg_place_1;";
+			for (int j = 1; j <= i-1; j++)
+			{
+				action = action + "job_fb_place_" + j + " = job_fb_place_" + (j+1) + ";";
+				action = action + "job_alg_place_" + j + " = job_alg_place_" + (j+1) + ";";
+			}
+			action = action + "job_fb_place_" + i + " = 0;";
+			action = action + "job_alg_place_" + i + " = 0;";
+			jobQueue.addTransition(from, to, event, guard, action);      
+		}
+		automata.addAutomaton(jobQueue);	
 	}
 
 	private void makeAlgorithmExecution()
@@ -836,6 +919,40 @@ class ModelMaker
 			String curType  = (String) basicFunctionBlocks.get(curBlock);
 			Integer curID = (Integer) basicFunctionBlocksID.get(curBlock);
 			System.out.println("\t " + curBlock + "\t" + curType + "\t" + curID);
+		}
+	}	
+
+	private void printAlgorithmsMap()
+	{
+		System.out.println("ModelMaker.printAlgorithmsMap():");
+		for (Iterator iter = algorithms.keySet().iterator(); iter.hasNext();)
+		{
+			String curBlock = (String) iter.next();
+			Map curAlgMap  = (Map) algorithms.get(curBlock);
+			System.out.println("\t " + curBlock);
+			for (Iterator algIter = curAlgMap.keySet().iterator(); algIter.hasNext();)
+			{
+				String curAlgName = (String) algIter.next();
+				Integer curAlgID = (Integer) curAlgMap.get(curAlgName);
+				System.out.println("\t\t " + curAlgName + "\t" + curAlgID);
+			}
+		}
+	}	
+
+	private void printAlgorithmTextsMap()
+	{
+		System.out.println("ModelMaker.printAlgorithmTextsMap():");
+		for (Iterator iter = algorithmTexts.keySet().iterator(); iter.hasNext();)
+		{
+			String curBlock = (String) iter.next();
+			Map curAlgTextMap  = (Map) algorithmTexts.get(curBlock);
+			System.out.println("\t " + curBlock);
+			for (Iterator algIter = curAlgTextMap.keySet().iterator(); algIter.hasNext();)
+			{
+				String curAlgName = (String) algIter.next();
+				String curAlgText = (String) curAlgTextMap.get(curAlgName);
+				System.out.println("\t\t " + curAlgName + "\t" + curAlgText);
+			}
 		}
 	}	
 

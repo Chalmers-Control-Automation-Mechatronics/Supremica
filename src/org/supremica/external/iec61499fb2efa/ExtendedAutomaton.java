@@ -60,6 +60,7 @@ import net.sourceforge.waters.model.expr.ParseException;
 class ExtendedAutomaton
 {
 
+	private String name;
 	private ExtendedAutomata automata;
 	private ModuleSubjectFactory factory;
  	private IdentifierSubject identifier;
@@ -71,6 +72,8 @@ class ExtendedAutomaton
 
 	public ExtendedAutomaton(String name, ExtendedAutomata automata) 
 	{
+		this.name = name;
+
 		factory = ModuleSubjectFactory.getInstance();
 		
 		this.automata = automata;
@@ -171,6 +174,12 @@ class ExtendedAutomaton
 		catch (final ParseException exception)
 		{
 			System.out.println("ExtendedAutomaton.addTransition(): Syntax error in guard!");
+			System.out.println("\t automaton: " + name);
+			System.out.println("\t from: " + from);
+			System.out.println("\t to: " + to);
+			System.out.println("\t label: " + label);
+			System.out.println("\t guard: " + guardIn);
+			System.out.println("\t action: " + actionIn);
 			return;
 		}
 		// Get actions ...
