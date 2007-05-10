@@ -168,13 +168,13 @@ class ModelMaker
 		
 		makeDataConnectionMap(systemFBNetwork, null, 0);
 
-		printFunctionBlocksMap();
-		printBasicFunctionBlocksMap();
-		printAlgorithmsMap();
-		printAlgorithmTextsMap();
-		printFBTypesMap();
-		printEventConnectionsMap();
-		printDataConnectionsMap();
+// 		printFunctionBlocksMap();
+// 		printBasicFunctionBlocksMap();
+// 		printAlgorithmsMap();
+// 		printAlgorithmTextsMap();
+// 		printFBTypesMap();
+// 		printEventConnectionsMap();
+// 		printDataConnectionsMap();
 
  		automata = new ExtendedAutomata(theSystem.getName());
 
@@ -766,6 +766,8 @@ class ModelMaker
 
 	private void makeInstanceQueue()
 	{
+		System.out.println("ModelMaker.makeInstanceQueue():");
+
 		ExtendedAutomaton instanceQueue = new ExtendedAutomaton("instanceQueue", automata);
 		
 		// the maximum number of FB instances in queue at the same time
@@ -811,6 +813,8 @@ class ModelMaker
 
 	private void makeEventExecution()
 	{
+		System.out.println("ModelMaker.makeEventExecution():");
+
 		ExtendedAutomaton eventExecution = new ExtendedAutomaton("eventExecution", automata);
 
 		eventExecution.addState("s0", true);
@@ -823,7 +827,7 @@ class ModelMaker
 			String instanceName = (String) iter.next();
 
 			String event = "handle_event_" + instanceName + ";";
-			String guard = "cur_fb == " + (Integer) basicFunctionBlocksID.get(instanceName);
+			String guard = "current_fb == " + (Integer) basicFunctionBlocksID.get(instanceName);
 			eventExecution.addTransition("s1", "s2", event, guard, null);
 			event = "handling_event_done_" + instanceName + ";";
 			eventExecution.addTransition("s2", "s0", event, null, null);
@@ -833,6 +837,8 @@ class ModelMaker
 
 	private void makeJobQueue()
 	{
+		System.out.println("ModelMaker.makeJobQueue():");
+
 		ExtendedAutomaton jobQueue = new ExtendedAutomaton("jobQueue", automata);
 		
 		// the maximum number of jobs in queue at the same time
@@ -879,8 +885,37 @@ class ModelMaker
 
 	private void makeAlgorithmExecution()
 	{
+		System.out.println("ModelMaker.makeAlgorithmExecution():");
+
 		ExtendedAutomaton algorithmExecution = new ExtendedAutomaton("algorithmExecution", automata);
 				
+		algorithmExecution.addState("s0", true);
+		algorithmExecution.addState("s1");
+		algorithmExecution.addState("s2");
+		
+		algorithmExecution.addTransition("s0", "s1", "remove_job;", null, null);	
+
+		for (Iterator iter = basicFunctionBlocks.keySet().iterator(); iter.hasNext();)
+		{
+			String instanceName = (String) iter.next();
+			Integer instanceID = (Integer) basicFunctionBlocksID.get(instanceName);
+			Map algorithmMap = (Map) algorithms.get(instanceName);
+			if (algorithmMap != null)
+			{
+				for (Iterator algIter = algorithmMap.keySet().iterator();algIter.hasNext();)
+				{
+					String algName = (String) algIter.next();
+					Integer algID = (Integer) algorithmMap.get(algName);
+					String event = "execute_" + instanceName + "_" + algName + ";";
+					String guard = "current_job_fb == " + instanceID;
+					guard = guard + " & current_job_alg == " + algID;
+					algorithmExecution.addTransition("s1", "s2", event, guard, null);
+					event = "finished_execution_" + instanceName + "_" + algName + ";";
+					algorithmExecution.addTransition("s2", "s0", event, null, null);
+				}
+			}
+		}
+		automata.addAutomaton(algorithmExecution);
 	}
 
 	private void makeBasicFB(String fbName)
