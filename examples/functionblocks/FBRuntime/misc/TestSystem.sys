@@ -8,8 +8,8 @@
         <!--FB Name="delay" Type="E_DELAY" /-->
         <FB Name="merge" Type="E_MERGE2" />
         <!--FB Name="split" Type="E_SPLIT7" /-->
-        <FB Name="comptest1" Type="TestCompositeDeep" />
-        <FB Name="comptest2" Type="TestCompositeDeep" />
+        <FB Name="comptest1" Type="TestComposite" />
+        <FB Name="comptest2" Type="TestComposite" />
         <EventConnections>
           <Connection Source="restart.COLD" Destination="merge.EI2" />
           <!--Connection Source="merge.EO" Destination="delay.START" /-->

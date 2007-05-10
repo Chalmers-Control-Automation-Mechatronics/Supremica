@@ -82,7 +82,6 @@ class ExtendedAutomaton
 		component = factory.createSimpleComponentProxy(identifier, ComponentKind.PLANT, graph);
 
 		parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
-
 	}
 
 	public ExtendedAutomaton(String name, ComponentKind kind, ExtendedAutomata automata) 

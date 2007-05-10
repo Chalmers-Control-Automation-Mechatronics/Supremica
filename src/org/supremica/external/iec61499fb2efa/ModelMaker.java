@@ -54,6 +54,8 @@ class ModelMaker
 	private Map functionBlocks = new HashMap();
 	// String name, String type name
 	private Map basicFunctionBlocks = new HashMap();
+	private Map basicFunctionBlocksID = new HashMap();
+	private int idCounter = 1;
 	// String name, JaxbFBType type object
 	private Map fbTypes = new HashMap();
 
@@ -160,11 +162,11 @@ class ModelMaker
 		
 		makeDataConnectionMap(systemFBNetwork, null, 0);
 
-		//printFunctionBlocksMap();
-		//printBasicFunctionBlocksMap();
-		//printFBTypesMap();
-		//printEventConnectionsMap();
-		//printDataConnectionsMap();
+// 		printFunctionBlocksMap();
+// 		printBasicFunctionBlocksMap();
+// 		printFBTypesMap();
+// 		printEventConnectionsMap();
+// 		printDataConnectionsMap();
 
  		automata = new ExtendedAutomata(theSystem.getName());
 
@@ -332,6 +334,8 @@ class ModelMaker
 				{
 					System.out.println("\t Adding Basic FB " + instanceName);			
 					basicFunctionBlocks.put(instanceName, typeName);
+					basicFunctionBlocksID.put(instanceName, new Integer(idCounter));
+					idCounter++;
 				}
 				else if (!theType.isSetBasicFB() & theType.isSetFBNetwork())
 				{
@@ -720,9 +724,8 @@ class ModelMaker
 		ExtendedAutomaton instanceQueue = new ExtendedAutomaton("instanceQueue", automata);
 		
 		// the maximum number of FB instances in queue at the same time
-		final int places = 5;
+		final int places = basicFunctionBlocks.keySet().size();
 		
-	
 		instanceQueue.addState("s0", true);
 		for (int i = 1; i <= places; i++)
 		{
@@ -731,35 +734,56 @@ class ModelMaker
 			String from = "s" + (i-1);
 			String to = "s" + i;
 			String event = "";
-//         \ForAll{$b \in B$}
-// 		\State{$bID \gets$ nameOf($b$)}
-// 		\State{$event \gets event +$ {\rm "queue\_fb\_$bID$;"}}
-//         \EndFor
-// 		\State{$guard\gets$ "queueing\_fb$>$0"}
-//         \For{$j \gets 1,i-1$}
-// 		\State{$guard\gets guard$ + " \& queueing\_fb != fb\_place\_$j$"}
-//         \EndFor
-// 		\State{$action \gets$ "fb\_place\_$i$ := queuing\_fb;"}
-//         \State{$action \gets action$ + "queuing\_fb := 0;"}
-//         \State{addTransition($from$, $to$, $event$, $guard$, $action$)}
-//         \State{$\triangleright$ Transiton when dequeueing instance}
-//         \State{$from \gets s_i$}
-//         \State{$to \gets s_{i-1}$}
-//         \State{$event \gets$ "remove\_fb;"}      
-//         \State{$guard \gets$ ""}      
-//         \State{$action\gets$ "current\_fb := fb\_place\_1;"}
-//         \For{$j \gets 1,i-1$}
-// 		\State{$action\gets action$ + "fb\_place\_$j$ := fb\_place\_$(j+1)$;"}
-//         \EndFor
-// 		\State{$action\gets action$ + "fb\_place\_$i$ := 0;"}
-//         \State{addTransition($from$, $to$, $event$, $guard$, $action$)}       
+			for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
+			{
+				String instanceName = (String) fbIter.next();
+				event = event + "queue_fb_" + instanceName + ";";
+			}
+
+			String guard = "queueing_fb>0";
+			for (int j = 1; j <= (i-1); j++)
+			{
+				guard = guard + " & queueing_fb != fb_place_" + j;
+			}
+			String action = "fb_place_" + i + " = queuing_fb;";
+			action = action + "queuing_fb = 0;";
+			instanceQueue.addTransition(from, to, event, guard, action);
+			// Transiton when dequeueing instance
+			from = "s" + i;
+			to = "s" + (i-1);
+			event = "remove_fb;";      
+			guard = "";      
+			action = "current_fb = fb_place_1;";
+			for (int j = 1; j <= i-1; j++)
+			{
+				action = action + "fb_place_" + j + " = fb_place_" + (j+1) + ";";
+			}
+			action = action + "fb_place_" + i + " = 0;";
+			instanceQueue.addTransition(from, to, event, guard, action);      
 		}
+		automata.addAutomaton(instanceQueue);
 	}
 
 	private void makeEventExecution()
 	{
 		ExtendedAutomaton eventExecution = new ExtendedAutomaton("eventExecution", automata);
+
+		eventExecution.addState("s0", true);
+		eventExecution.addState("s1");
+		eventExecution.addState("s2");
 		
+		eventExecution.addTransition("s0", "s1", "remove_fb;", null, null);	
+		for (Iterator iter = basicFunctionBlocks.keySet().iterator(); iter.hasNext();)
+		{
+			String instanceName = (String) iter.next();
+
+			String event = "handle_event_" + instanceName + ";";
+			String guard = "cur_fb == " + (Integer) basicFunctionBlocksID.get(instanceName);
+			eventExecution.addTransition("s1", "s2", event, guard, null);
+			event = "handling_event_done_" + instanceName + ";";
+			eventExecution.addTransition("s2", "s0", event, null, null);
+		}
+		automata.addAutomaton(eventExecution);
 	}
 
 	private void makeJobQueue()
@@ -809,8 +833,9 @@ class ModelMaker
 		for (Iterator iter = basicFunctionBlocks.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
-			String curType  = (String) functionBlocks.get(curBlock);
-			System.out.println("\t " + curBlock + "\t" + curType);
+			String curType  = (String) basicFunctionBlocks.get(curBlock);
+			Integer curID = (Integer) basicFunctionBlocksID.get(curBlock);
+			System.out.println("\t " + curBlock + "\t" + curType + "\t" + curID);
 		}
 	}	
 
