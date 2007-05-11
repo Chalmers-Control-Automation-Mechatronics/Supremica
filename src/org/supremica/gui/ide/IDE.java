@@ -1,3 +1,12 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica/Waters IDE
+//# PACKAGE: org.supremica.gui.IDE
+//# CLASS:   IDE
+//###########################################################################
+//# $Id: IDE.java,v 1.78 2007-05-11 02:07:10 robi Exp $
+//###########################################################################
+
 package org.supremica.gui.ide;
 
 import javax.xml.bind.JAXBException;
@@ -66,7 +75,7 @@ public class IDE
     private final ProxyUnmarshaller<ModuleProxy> hiscUnmarshaller;
     private final ProxyUnmarshaller<ModuleProxy> umdesUnmarshaller;
     private final ProxyUnmarshaller<ModuleProxy> adsUnmarshaller;
-    private final DocumentManager documentManager;
+	private final DocumentManager mDocumentManager;
     
     private Actions theActions;
     
@@ -110,16 +119,16 @@ public class IDE
         adsUnmarshaller = new ADSUnmarshaller(mModuleFactory);
 
         // Document management
-        documentManager = new DocumentManager();
+        mDocumentManager = new DocumentManager();
         // Add marshallers in order of importance (shows up in the file.save dialog)
-        documentManager.registerMarshaller(mModuleMarshaller);
+        mDocumentManager.registerMarshaller(mModuleMarshaller);
         // Add unmarshallers in order of importance (shows up in the file.open dialog)
-        documentManager.registerUnmarshaller(mModuleMarshaller);
-        documentManager.registerUnmarshaller(supremicaUnmarshaller);
-        documentManager.registerUnmarshaller(validUnmarshaller);
-        documentManager.registerUnmarshaller(hiscUnmarshaller);
-        documentManager.registerUnmarshaller(umdesUnmarshaller);
-        documentManager.registerUnmarshaller(adsUnmarshaller);
+        mDocumentManager.registerUnmarshaller(mModuleMarshaller);
+        mDocumentManager.registerUnmarshaller(supremicaUnmarshaller);
+        mDocumentManager.registerUnmarshaller(validUnmarshaller);
+        mDocumentManager.registerUnmarshaller(hiscUnmarshaller);
+        mDocumentManager.registerUnmarshaller(umdesUnmarshaller);
+        mDocumentManager.registerUnmarshaller(adsUnmarshaller);
         
         // Instantiate all actions 
         theActions = new Actions(this);
@@ -267,7 +276,7 @@ public class IDE
     
     public DocumentManager getDocumentManager()
     {
-        return documentManager;
+        return mDocumentManager;
     }
     
     private void setToolBar(JToolBar toolBar)

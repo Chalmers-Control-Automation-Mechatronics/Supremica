@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindow
 //###########################################################################
-//# $Id: ModuleWindow.java,v 1.61 2006-11-17 00:20:09 martin Exp $
+//# $Id: ModuleWindow.java,v 1.62 2007-05-11 02:07:10 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -183,7 +183,6 @@ public class ModuleWindow
   /**
    * Translates the current module into a Supremica project and open
    * the project in Supremica.
-   */
   public void exportToSupremica()
   {
     //The project in Supremica format
@@ -223,11 +222,8 @@ public class ModuleWindow
     System.out.println(supremicaProject.toString());
     int nbrOfAddedAutomata = supremica.addProject(supremicaProject);
     System.err.println(nbrOfAddedAutomata);
-
-    //EFA question: 
-    /*export everything to supremica 
-      and translate to single automata there?*/
   }
+   */
 
   public JPanel createEventsPane()
   {
@@ -776,10 +772,12 @@ public class ModuleWindow
         processWindowEvent(new WindowEvent(this,WindowEvent.WINDOW_CLOSING));
       }
 
+    /*
     if (e.getSource() == analysisExportSupremicaMenu)
       {
         exportToSupremica();
       }
+    */
   }
 
   private void saveAs()

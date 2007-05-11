@@ -76,15 +76,15 @@ import org.supremica.gui.texteditor.TextFrame;
 import org.swixml.SwingEngine;
 
 // Waters importing
-import net.sourceforge.waters.subject.module.*;
 import net.sourceforge.waters.model.module.*;
 import net.sourceforge.waters.model.marshaller.*;
 import net.sourceforge.waters.model.expr.*;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import java.net.URI;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 // -- MF -- Abstract class to save on duplicate code
 // -- From this class is instantiated anonymous classes that implement the openFile properly
+
 abstract class FileImporter
 {
     FileImporter(JFileChooser fileOpener, Gui gui)
@@ -2142,15 +2142,17 @@ public class ActionMan
         try
         {
             // Build Waters ModuleProxy
-            final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
+            final ModuleProxyFactory factory =
+	      ModuleElementFactory.getInstance();
             final OperatorTable optable = CompilerOperatorTable.getInstance();
             final ProxyUnmarshaller<ModuleProxy> unMarshaller = new JAXBModuleMarshaller(factory, optable);
-            final URI uri = file.toURI();
-            ModuleProxy module = (ModuleSubject) unMarshaller.unmarshal(uri);
-
-            ProjectBuildFromWaters builder = new ProjectBuildFromWaters(new VisualProjectFactory());
-            Automata currAutomata = builder.build(module);
-            int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
+	    final DocumentManager manager = new DocumentManager();
+	    manager.registerUnmarshaller(unMarshaller);
+            final ModuleProxy module = (ModuleProxy) manager.load(file);
+            final ProjectBuildFromWaters builder =
+	      new ProjectBuildFromWaters(manager, new VisualProjectFactory());
+            final Automata currAutomata = builder.build(module);
+            final int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
 
             gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
         }

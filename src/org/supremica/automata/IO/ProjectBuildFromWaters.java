@@ -1,3 +1,12 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica
+//# PACKAGE: org.supremica.automata.IO
+//# CLASS:   ProjectBuildFromWaters
+//###########################################################################
+//# $Id: ProjectBuildFromWaters.java,v 1.19 2007-05-11 02:07:10 robi Exp $
+//###########################################################################
+
 /*
  *  Supremica Software License Agreement
  *
@@ -48,8 +57,6 @@
  */
 package org.supremica.automata.IO;
 
-import java.util.*;
-
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.des.*;
@@ -65,42 +72,53 @@ import org.supremica.log.*;
 
 public class ProjectBuildFromWaters
 {
-    private static Logger logger = LoggerFactory.createLogger(ProjectBuildFromWaters.class);
-    private ProjectFactory theProjectFactory = null;
-//    private Project currProject = null;
+
+    //#######################################################################
+    //# Data Members
+    private final ProjectFactory mProjectFactory;
+	private final DocumentManager mDocumentManager;
+
+    private static final Logger logger =
+		LoggerFactory.createLogger(ProjectBuildFromWaters.class);
+
     
-    public ProjectBuildFromWaters()
+    //#######################################################################
+    //# Constructors
+    public ProjectBuildFromWaters(final DocumentManager manager)
     {
-        this.theProjectFactory = new DefaultProjectFactory();
+        this(manager, new DefaultProjectFactory());
     }
     
-    public ProjectBuildFromWaters(ProjectFactory theProjectFactory)
+    public ProjectBuildFromWaters(final DocumentManager manager,
+								  final ProjectFactory factory)
     {
-        this.theProjectFactory = theProjectFactory;
+		mDocumentManager = manager;
+        mProjectFactory = factory;
     }
     
-    public Project build(ModuleProxy module)
-    throws EvalException
+
+    //#######################################################################
+    //# Invocation
+    public Project build(final ModuleProxy module)
+		throws EvalException
     {
-        if (module == null)
-        {
-            throw new NullPointerException("argument must be non null");
+        if (module == null) {
+            throw new NullPointerException("Argument must be non-null!");
         }
-        Project currProject = theProjectFactory.getProject();
-        currProject.setName(module.getName());
-        
-        final ProductDESProxyFactory factory =
+        final ProductDESProxyFactory desfactory =
             ProductDESElementFactory.getInstance();
-        DocumentManager mDocumentManager = new DocumentManager();
-        ModuleCompiler compiler =
-            new ModuleCompiler(mDocumentManager, factory, module);
-        
-        ProductDESProxy des = compiler.compile();
-        
-        Collection theWatersAutomata = des.getAutomata();
-        for (Iterator autIt = theWatersAutomata.iterator(); autIt.hasNext(); )
-        {
-            AutomatonProxy currWatersAutomaton = (AutomatonProxy)autIt.next();
+        final ModuleCompiler compiler =
+            new ModuleCompiler(mDocumentManager, desfactory, module);
+		final ProductDESProxy des = compiler.compile();
+        return build(des);
+	}
+
+	public Project build(final ProductDESProxy des)
+		throws EvalException
+    {
+        final Project currProject = mProjectFactory.getProject();
+        currProject.setName(des.getName());
+        for (final AutomatonProxy currWatersAutomaton : des.getAutomata()) {
             Automaton currSupremicaAutomaton = new Automaton();
             currSupremicaAutomaton.setCorrespondingAutomatonProxy(currWatersAutomaton);
             currSupremicaAutomaton.setName(currWatersAutomaton.getName());
@@ -113,10 +131,8 @@ public class ProjectBuildFromWaters
             boolean multicolored = false;
             
             // Create states
-            Set currWatersStates = currWatersAutomaton.getStates();
-            for (Iterator stateIt = currWatersStates.iterator(); stateIt.hasNext(); )
-            {
-                StateProxy currWatersState = (StateProxy) stateIt.next();
+            for (final StateProxy currWatersState :
+					 currWatersAutomaton.getStates()) {
                 //System.err.println("State: " + currWatersState.getName());
                 
                 State currSupremicaState = new State(currWatersState.getName());
@@ -125,9 +141,8 @@ public class ProjectBuildFromWaters
                 // Initial?
                 currSupremicaState.setInitial(currWatersState.isInitial());
                 // Find marked status (only one type of marking here!!!)
-                for (Iterator evIt = currWatersState.getPropositions().iterator(); evIt.hasNext(); )
-                {
-                    EventProxy event = (EventProxy) evIt.next();
+                for (final EventProxy event :
+						 currWatersState.getPropositions()) {
                     if (event.getKind() == EventKind.PROPOSITION)
                     {
                         if (event.getName().equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME))
@@ -153,7 +168,7 @@ public class ProjectBuildFromWaters
                 if (multicolored)
                 {
                     //Print warning! Color disappears in conversion!
-                    throw new EvalException("Multiple propositions are not allowed!");
+                    throw new EvalException("Multiple propositions are not yet supported!");
                     //System.out.println("Waters model had multicolored marking, Supremica model treats all markings as the same color.");
                 }
                 
@@ -164,10 +179,8 @@ public class ProjectBuildFromWaters
             Alphabet currSupremicaAlphabet = currSupremicaAutomaton.getAlphabet();
             
             // Create the alphabet
-            Set currWatersEvents = currWatersAutomaton.getEvents();
-            for (Iterator evIt = currWatersEvents.iterator(); evIt.hasNext(); )
-            {
-                EventProxy currWatersEvent = (EventProxy)evIt.next();
+            for (final EventProxy currWatersEvent :
+					 currWatersAutomaton.getEvents()) {
                 if (currWatersEvent.getKind() != EventKind.PROPOSITION)
                 {
                     LabeledEvent currSupremicaEvent = new LabeledEvent(currWatersEvent);
@@ -176,10 +189,8 @@ public class ProjectBuildFromWaters
             }
             
             // Create transitions
-            Collection currWatersTransitions = currWatersAutomaton.getTransitions();
-            for (Iterator trIt = currWatersTransitions.iterator(); trIt.hasNext(); )
-            {
-                TransitionProxy currWatersTransition = (TransitionProxy)trIt.next();
+            for (final TransitionProxy currWatersTransition :
+					 currWatersAutomaton.getTransitions()) {
                 StateProxy watersSourceState = currWatersTransition.getSource();
                 StateProxy watersTargetState = currWatersTransition.getTarget();
                 EventProxy watersEvent = currWatersTransition.getEvent();

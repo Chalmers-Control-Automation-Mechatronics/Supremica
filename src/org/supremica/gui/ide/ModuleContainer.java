@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.51 2007-01-30 08:51:28 flordal Exp $
+//# $Id: ModuleContainer.java,v 1.52 2007-05-11 02:07:10 robi Exp $
 //###########################################################################
 
 
@@ -43,6 +43,7 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -473,9 +474,9 @@ public class ModuleContainer implements UndoInterface
     {
         ProjectBuildFromWaters builder = null;
         Project supremicaProject = null;
-        try
-        {
-            builder = new ProjectBuildFromWaters();
+        try {
+			final DocumentManager manager = getIDE().getDocumentManager();
+            builder = new ProjectBuildFromWaters(manager);
             supremicaProject = builder.build(mModule);
         }
         catch (EvalException eex)
