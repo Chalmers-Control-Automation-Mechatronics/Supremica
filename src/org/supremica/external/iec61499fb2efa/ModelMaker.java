@@ -50,18 +50,22 @@ class ModelMaker
 	
 	private JaxbSystem theSystem;
 	private JaxbFBNetwork systemFBNetwork;
+
 	// String name, String type name
 	private Map functionBlocks = new HashMap();
+
 	// String name, String type name
 	private Map basicFunctionBlocks = new HashMap();
 	// String name, Integer ID
 	private Map basicFunctionBlocksID = new HashMap();
 	private int fbIDCounter = 1;
+
 	// String fb name, Map alg name -> alg ID
 	private Map algorithms = new HashMap();
 	private int algIDCounter = 1;
 	// String fb name, Map alg name -> JaxbAlgorithm
 	private Map algorithmTexts = new HashMap();
+
 	// String name, JaxbFBType type object
 	private Map fbTypes = new HashMap();
 
@@ -70,11 +74,74 @@ class ModelMaker
 	// String fb name, Map data conn map do->di
 	private Map dataConnections = new HashMap();
 
-
 	private String restartInstance = null;
 
 	private ExtendedAutomata automata;
 
+	public static void main(String args[])
+    {
+		String outputFileName = null;
+		String systemFileName = null;
+		String libraryPathBase = null;
+		String libraryPath = null;
+
+		if (args.length == 0)
+		{
+			System.err.println("Usage: ModelMaker [-o outputFileName] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
+			return;
+		}
+
+		for (int i = 0; i < args.length; i++)
+		{
+			if (args[i].equals("-o"))
+			{
+				if (i + 1 < args.length)
+				{
+					outputFileName = args[i + 1];
+				}
+			}
+			if (args[i].equals("-lb"))
+			{
+				if (i + 1 < args.length)
+				{
+					libraryPathBase = args[i + 1];
+				}
+			}
+			if (args[i].equals("-lp"))
+			{
+				if (i + 1 < args.length)
+				{
+					if (libraryPath == null)
+					{
+						libraryPath = args[i + 1];
+					}
+					else
+					{
+						libraryPath = libraryPath + File.pathSeparator + args[i + 1];
+					}
+				}
+			}
+			if (i == args.length-1)
+			{
+				systemFileName = args[i];
+				if (outputFileName == null)
+				{
+					outputFileName = systemFileName + ".wmod";
+				}
+			}
+			
+		}			
+		
+		System.out.println("Input arguments: \n" 
+						   + "\t output file: " + outputFileName + "\n"
+						   + "\t system file: " + systemFileName + "\n"
+						   + "\t library path base: " + libraryPathBase + "\n"
+						   + "\t library path: " + libraryPath + "\n");
+		
+		(new ModelMaker(outputFileName,systemFileName,libraryPathBase,libraryPath)).makeModel();
+		System.exit(0);
+
+	}
 
 	private ModelMaker(String outputFileName, String systemFileName, String libraryPathBase, String libraryPath) 
 	{
@@ -770,6 +837,8 @@ class ModelMaker
 
 	private void makeInstanceQueue()
 	{
+		// TODO: Declare variables
+		
 		System.out.println("ModelMaker.makeInstanceQueue():");
 
 		ExtendedAutomaton instanceQueue = new ExtendedAutomaton("instanceQueue", automata);
@@ -817,6 +886,8 @@ class ModelMaker
 
 	private void makeEventExecution()
 	{
+		// TODO: Declare variables
+
 		System.out.println("ModelMaker.makeEventExecution():");
 
 		ExtendedAutomaton eventExecution = new ExtendedAutomaton("eventExecution", automata);
@@ -841,6 +912,8 @@ class ModelMaker
 
 	private void makeJobQueue()
 	{
+		// TODO: Declare variables
+
 		System.out.println("ModelMaker.makeJobQueue():");
 
 		ExtendedAutomaton jobQueue = new ExtendedAutomaton("jobQueue", automata);
@@ -889,6 +962,8 @@ class ModelMaker
 
 	private void makeAlgorithmExecution()
 	{
+		// TODO: Declare variables
+
 		System.out.println("ModelMaker.makeAlgorithmExecution():");
 
 		ExtendedAutomaton algorithmExecution = new ExtendedAutomaton("algorithmExecution", automata);
@@ -1039,70 +1114,4 @@ class ModelMaker
 			}
 		}
 	}
-
-	public static void main(String args[])
-    {
-		String outputFileName = null;
-		String systemFileName = null;
-		String libraryPathBase = null;
-		String libraryPath = null;
-
-		if (args.length == 0)
-		{
-			System.err.println("Usage: ModelMaker [-o outputFileName] [-lb libraryPathBase] [-lp libraryDirectory]... file.sys");
-			return;
-		}
-
-		for (int i = 0; i < args.length; i++)
-		{
-			if (args[i].equals("-o"))
-			{
-				if (i + 1 < args.length)
-				{
-					outputFileName = args[i + 1];
-				}
-			}
-			if (args[i].equals("-lb"))
-			{
-				if (i + 1 < args.length)
-				{
-					libraryPathBase = args[i + 1];
-				}
-			}
-			if (args[i].equals("-lp"))
-			{
-				if (i + 1 < args.length)
-				{
-					if (libraryPath == null)
-					{
-						libraryPath = args[i + 1];
-					}
-					else
-					{
-						libraryPath = libraryPath + File.pathSeparator + args[i + 1];
-					}
-				}
-			}
-			if (i == args.length-1)
-			{
-				systemFileName = args[i];
-				if (outputFileName == null)
-				{
-					outputFileName = systemFileName + ".wmod";
-				}
-			}
-			
-		}			
-		
-		System.out.println("Input arguments: \n" 
-						   + "\t output file: " + outputFileName + "\n"
-						   + "\t system file: " + systemFileName + "\n"
-						   + "\t library path base: " + libraryPathBase + "\n"
-						   + "\t library path: " + libraryPath + "\n");
-		
-		(new ModelMaker(outputFileName,systemFileName,libraryPathBase,libraryPath)).makeModel();
-		System.exit(0);
-
-	}
-
 }
