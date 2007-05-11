@@ -1,3 +1,12 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica
+//# PACKAGE: org.supremica.properties
+//# CLASS:   Config
+//###########################################################################
+//# $Id: Config.java,v 1.32 2007-05-11 02:44:46 robi Exp $
+//###########################################################################
+
 /*
  * Supremica Software License Agreement
  *
@@ -163,6 +172,9 @@ public final class Config
     // GUI
     public static final BooleanProperty INCLUDE_JGRAFCHART = new BooleanProperty(PropertyType.GUI, "includeJGrafchart", false, "Include JGrafchart");
     public static final BooleanProperty INCLUDE_SHOE_FACTORY = new BooleanProperty(PropertyType.GUI, "includeShoeFactory", false, "Include Shoe factory simulation");
+    public static final BooleanProperty INCLUDE_INSTANTION =
+      new BooleanProperty(PropertyType.GUI, "includeInstantiation", true,
+			  "Enable instantiation and other advanced features");
 
     // GUI_EDITOR
     //public static final BooleanProperty GUI_EDITOR_USE_SPRING_EMBEDDER = new BooleanProperty(PropertyType.GUI_EDITOR, "useSpringEmbedder", true, "Use spring embedder for automatic graph layout");

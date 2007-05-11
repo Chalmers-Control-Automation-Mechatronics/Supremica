@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorNewDialog
 //###########################################################################
-//# $Id: EditorNewDialog.java,v 1.9 2006-11-03 15:01:56 torda Exp $
+//# $Id: EditorNewDialog.java,v 1.10 2007-05-11 02:44:46 robi Exp $
 //###########################################################################
 
 
@@ -18,8 +18,11 @@ import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
+
+import org.supremica.properties.Config;
 
 
 /**
@@ -36,7 +39,8 @@ public class EditorNewDialog
 	implements ActionListener
 {
 
-	public EditorNewDialog(ModuleWindow root, DefaultMutableTreeNode node)
+	public EditorNewDialog(final ModuleWindowInterface root,
+						   final DefaultMutableTreeNode node)
 	{
 		setTitle("Component Editor");
 
@@ -82,9 +86,10 @@ public class EditorNewDialog
 		group.add(k1);
 		kBox.add(k1);
 
+        final boolean advanced = Config.INCLUDE_INSTANTION.isTrue();
 		k1 = new JRadioButton("Property");
 		k1.setActionCommand("Property");
-		k1.setEnabled(!ModuleWindow.DES_COURSE_VERSION);
+		k1.setEnabled(advanced);
 		group.add(k1);
 		kBox.add(k1);
 
@@ -125,8 +130,9 @@ public class EditorNewDialog
 			final GraphSubject graph = new GraphSubject();
 			final SimpleComponentSubject comp =
 				new SimpleComponentSubject(ident, kind, graph);
-			//TODO: Make this create the component
-			mRoot.addComponent(comp);
+			final ModuleSubject module = mRoot.getModuleSubject();
+			// *** BUG *** must add to proper subtree !!!
+			module.getComponentListModifiable().add(comp);
 			dispose();
 		}
 
@@ -145,7 +151,7 @@ public class EditorNewDialog
 
 	//########################################################################
 	//# Data Members
-	private final ModuleWindow mRoot;
+	private final ModuleWindowInterface mRoot;
 	private final DefaultMutableTreeNode mParentNode;
 	private final JTextField mNameInput = new JTextField(16);
 	private final JButton okButton;

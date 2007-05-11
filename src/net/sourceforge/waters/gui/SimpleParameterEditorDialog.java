@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventParameterEditorDialog
 //###########################################################################
-//# $Id: SimpleParameterEditorDialog.java,v 1.7 2006-11-30 01:58:05 robi Exp $
+//# $Id: SimpleParameterEditorDialog.java,v 1.8 2007-05-11 02:44:46 robi Exp $
 //###########################################################################
 
 
@@ -34,7 +34,7 @@ public class SimpleParameterEditorDialog
 
 	//#######################################################################
 	//# Constructor
-	public SimpleParameterEditorDialog(final ModuleWindow root)
+	public SimpleParameterEditorDialog(final ModuleWindowInterface root)
 	{
 		setTitle("Simple Parameter Editor");
 		mRoot = root;
@@ -97,8 +97,6 @@ public class SimpleParameterEditorDialog
 				parser.parseSimpleIdentifier(nameText);
 			} catch (final ParseException exception) {
 				ErrorWindow.askRevert(exception, nameText);
-				mRoot.logEntry("ParseException in event name: " +
-							   exception.getMessage());
 				return;
 			}
 			SimpleExpressionSubject defaultExpr = null;
@@ -108,8 +106,6 @@ public class SimpleParameterEditorDialog
 					(SimpleExpressionSubject) parser.parse(defaultText);
 			} catch (final ParseException exception) {
 				ErrorWindow.askRevert(exception, defaultText);
-				mRoot.logEntry("ParseException in default value: " +
-							   exception.getMessage());
 				return;
 			}
 			final ParameterSubject param =
@@ -121,8 +117,6 @@ public class SimpleParameterEditorDialog
 				params.insert(param);
 			} catch (final DuplicateNameException exception) {
 				JOptionPane.showMessageDialog(this, "Duplicate parameter");
-				mRoot.logEntry("DuplicateNameException: " +
-							   exception.getMessage());
 				return;
 			}
 			dispose();
@@ -151,7 +145,7 @@ public class SimpleParameterEditorDialog
 	private final JTextField mNameInput = new JTextField(16);
 	private final JTextField mDefaultInput = new JTextField(16);
 	private final JButton okButton = new JButton("OK");
-	private final ModuleWindow mRoot;
+	private final ModuleWindowInterface mRoot;
 
 	private DefaultListModel data = null;
 	private JList dataList = null;

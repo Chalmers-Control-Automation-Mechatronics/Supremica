@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorForeachDialog
 //###########################################################################
-//# $Id: EditorForeachDialog.java,v 1.5 2006-11-03 15:01:56 torda Exp $
+//# $Id: EditorForeachDialog.java,v 1.6 2007-05-11 02:44:46 robi Exp $
 //###########################################################################
 
 
@@ -20,6 +20,7 @@ import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.subject.module.ForeachComponentSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 
 
@@ -39,7 +40,7 @@ public class EditorForeachDialog
 
 	//#######################################################################
 	//# Constructors
-	public EditorForeachDialog(ModuleWindow root)
+	public EditorForeachDialog(final ModuleWindowInterface root)
 	{
 		mRoot = root;
 		setTitle("Foreach Component Editor");
@@ -77,7 +78,7 @@ public class EditorForeachDialog
 
 		setContentPane(b);
 		pack();
-		setLocationRelativeTo(mRoot);
+		setLocationRelativeTo(mRoot.getRootWindow());
 		setVisible(true);
 		mNameInput.requestFocusInWindow();
 	}
@@ -123,9 +124,10 @@ public class EditorForeachDialog
 			final ForeachComponentSubject foreach =
 				new ForeachComponentSubject
 				      (nameText, rangeExpr, guardExpr, empty);
-
-			//TODO: Make this create the component
-			mRoot.addComponent(foreach);
+			final ModuleSubject module = mRoot.getModuleSubject();
+			// *** BUG *** must add to proper subtree !!!
+			module.getComponentListModifiable().add(foreach);
+			dispose();
 		}
 
 		if ("cancel".equals(e.getActionCommand()))
@@ -141,6 +143,6 @@ public class EditorForeachDialog
 	private final JTextField mNameInput = new JTextField(10);
 	private final JTextField mRangeInput = new JTextField(25);
 	private final JTextField mGuardInput = new JTextField(25);
-	private final ModuleWindow mRoot;
+	private final ModuleWindowInterface mRoot;
 
 }

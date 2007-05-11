@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.14 2006-11-03 15:01:56 torda Exp $
+//# $Id: EventEditorDialog.java,v 1.15 2007-05-11 02:44:46 robi Exp $
 //###########################################################################
 
 
@@ -63,6 +63,8 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ParameterSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
+
+import org.supremica.properties.Config;
 
 
 public class EventEditorDialog
@@ -205,6 +207,7 @@ public class EventEditorDialog
         {
             // Initialising for the first time. Everything needs to be done.
             // Name panel, basic part ...
+          final boolean advanced = Config.INCLUDE_INSTANTION.isTrue();
             mNamePanel = new RaisedDialogPanel();
             mNameLabel = new JLabel("Name:");
             final FormattedInputParser parser = new EventNameInputParser();
@@ -238,7 +241,7 @@ public class EventEditorDialog
             mKindGroup.add(mUncontrollableButton);
             mPropositionButton = new JRadioButton("Proposition");
             mPropositionButton.setRequestFocusEnabled(false);
-            mPropositionButton.setEnabled(!ModuleWindow.DES_COURSE_VERSION);
+            mPropositionButton.setEnabled(advanced);
             mKindGroup.add(mPropositionButton);
             switch (decl.getKind())
             {
@@ -254,7 +257,7 @@ public class EventEditorDialog
             }
             mMoreOptionsButton = new JButton();
             mMoreOptionsButton.setRequestFocusEnabled(false);
-            mMoreOptionsButton.setEnabled(!ModuleWindow.DES_COURSE_VERSION);
+            mMoreOptionsButton.setEnabled(advanced);
             mMoreOptionsButton.addActionListener(new ActionListener()
             {
                 public void actionPerformed(final ActionEvent event)

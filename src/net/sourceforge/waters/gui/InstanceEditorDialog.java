@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   InstanceEditorDialog
 //###########################################################################
-//# $Id: InstanceEditorDialog.java,v 1.4 2005-11-03 01:24:15 robi Exp $
+//# $Id: InstanceEditorDialog.java,v 1.5 2007-05-11 02:44:46 robi Exp $
 //###########################################################################
 
 
@@ -23,6 +23,7 @@ import javax.swing.JTextField;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.InstanceSubject;
 
 
@@ -33,7 +34,7 @@ public class InstanceEditorDialog
 
 	//#######################################################################
 	//# Constructor
-	public InstanceEditorDialog(ModuleWindow root)
+	public InstanceEditorDialog(ModuleWindowInterface root)
 	{
 		setTitle("Instance Component Editor");
 		mRoot = root;
@@ -89,19 +90,19 @@ public class InstanceEditorDialog
 		{
 			final ExpressionParser parser = mRoot.getExpressionParser();
 			final String nameText = mNameInput.getText();
-			IdentifierProxy ident = null;
+			final IdentifierProxy ident;
 			try {
 				ident = parser.parseIdentifier(nameText);
 			} catch (final ParseException exception) {
 				ErrorWindow.askRevert(exception, nameText);
-				mRoot.logEntry("ParseException in instance name: " +
-							   exception.getMessage());
 				return;
 			}
 			final String moduleText = mModuleInput.getText();
 			final InstanceSubject inst =
 				new InstanceSubject(ident, moduleText);
-			mRoot.addComponent(inst);
+			final ModuleSubject module = mRoot.getModuleSubject();
+			// *** BUG *** must add to proper subtree !!!
+			module.getComponentListModifiable().add(inst);
 			dispose();
 		}
 
@@ -117,6 +118,6 @@ public class InstanceEditorDialog
 	private final JTextField mNameInput = new JTextField(16);
 	private final JTextField mModuleInput = new JTextField(16);
 	private final JButton okButton = new JButton("OK");
-	private final ModuleWindow mRoot;
+	private final ModuleWindowInterface mRoot;
 
 }

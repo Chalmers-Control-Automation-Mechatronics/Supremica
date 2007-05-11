@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   BindingEditorDialog
 //###########################################################################
-//# $Id: BindingEditorDialog.java,v 1.5 2006-11-03 15:01:56 torda Exp $
+//# $Id: BindingEditorDialog.java,v 1.6 2007-05-11 02:44:46 robi Exp $
 //###########################################################################
 
 
@@ -26,11 +26,10 @@ public class BindingEditorDialog
 
 	//#######################################################################
 	//# Constructor
-	public BindingEditorDialog(ModuleWindow root)
+	public BindingEditorDialog(final ModuleWindowInterface root)
 	{
 		setTitle("Parameter Binding Editor");
-
-		this.mRoot = root;
+		mRoot = root;
 
 		// Center this element on the screen
 		setModal(true);
@@ -86,21 +85,18 @@ public class BindingEditorDialog
 				parser.parseSimpleIdentifier(nameText);
 			} catch (final ParseException exception) {
 				JOptionPane.showMessageDialog(this, "Invalid identifier");
-				mRoot.logEntry
-					("Binding name was found to be invalid: " + nameText);
 				return;
 			}
 			try {
 				expr = (SimpleExpressionSubject) parser.parse(exprText);
 			} catch (final ParseException exception) {
 				ErrorWindow.askRevert(exception, exprText);
-				mRoot.logEntry("ParseException in binding: " +
-							   exception.getMessage());
 				return;
 			}
 			final ParameterBindingSubject binding =
 				new ParameterBindingSubject(nameText, expr);
-			mRoot.addComponent(binding);
+			// *** TODO *** Add binding to module ...
+			// mRoot.addComponent(binding);
 			dispose();
 		}
 
@@ -116,6 +112,6 @@ public class BindingEditorDialog
 	private final JTextField mNameInput = new JTextField(16);
 	private final JTextField mExprInput = new JTextField(16);
 	private final JButton okButton = new JButton("OK");
-	ModuleWindow mRoot = null;
+	private final ModuleWindowInterface mRoot;
 
 }
