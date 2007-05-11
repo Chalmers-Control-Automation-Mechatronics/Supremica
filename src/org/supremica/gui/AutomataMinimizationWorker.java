@@ -155,16 +155,15 @@ public class AutomataMinimizationWorker
                         minimizer.setExecutionDialog(executionDialog);
                     }
                     threadsToStop.add(minimizer);
-                    Automaton newAutomaton = minimizer.getMinimizedAutomaton(options);
+                    final Automaton newAutomaton =
+		      minimizer.getMinimizedAutomaton(options);
                     threadsToStop.remove(minimizer);
-                    newAutomaton.setComment("min(" + newAutomaton.getName() + ")");
-                    newAutomaton.setName(null);
-
-                    if (stopRequested)
-                    {
+                    if (stopRequested) {
                         break;
                     }
-
+                    newAutomaton.setComment
+		      ("min(" + newAutomaton.getName() + ")");
+                    newAutomaton.setName(null);
                     // Update execution dialog
                     if (executionDialog != null)
                     {
