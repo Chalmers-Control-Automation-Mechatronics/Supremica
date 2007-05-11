@@ -50,6 +50,7 @@ package org.supremica.properties;
 
 import java.util.*;
 import java.io.*;
+import javax.swing.text.html.Option;
 import org.supremica.util.BDD.Options;
 
 /**
@@ -87,6 +88,9 @@ public final class SupremicaProperties
         updateProperties(propertyFile);
     }
     
+    /**
+     * Load properties from file.
+     */
     private static void updateProperties(File propertyFile)
     throws FileNotFoundException, IOException
     {
@@ -103,8 +107,7 @@ public final class SupremicaProperties
             }
             else if (orgProperty.isImmutable())
             {
-                System.err.println("Property \"" + newKey + "\" is immutable");
-                
+                System.err.println("Property \"" + newKey + "\" is immutable");                
             }
             else
             {
@@ -118,8 +121,9 @@ public final class SupremicaProperties
                 }
             }
         }
-        updateBDDOptions(false);
         
+        // Update values in BDD.Options based on the current Config.
+        updateBDDOptions(false);        
     }
     
     public static void saveProperties()
@@ -152,7 +156,10 @@ public final class SupremicaProperties
     private static void saveProperties(File propertyFile, boolean saveAll)
     throws FileNotFoundException, IOException
     {
-        updateBDDOptions(true);    // first sync from BDD options
+        // Update config from the current values in BDD.Options 
+        // (WHY!!? IT SHOULD BE THE OTHER WAY AROUND OR THEY ARE LOST?! /hguo)
+        //updateBDDOptions(true);    // first sync from BDD options
+        updateBDDOptions(false);    // Send the new Config values to BDD.Options
         
         OutputStream os = new FileOutputStream(propertyFile);
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "8859_1"));
@@ -189,19 +196,20 @@ public final class SupremicaProperties
         return newProperties;
     }
     
-        /*
-         * The problem is that we got two copies of BDD Options.
-         * This will make sure they are both updated
-         *
-         * TO DO: Rewrite the Option code in the BDD Package to
-         * support Supremica style option handling.
-         */
+    /*
+     * The problem is that we got two copies of BDD Options.
+     * This will make sure they are both updated
+     *
+     * TO DO: Rewrite the Option code in the BDD Package to
+     * support the new style property handling.
+     */
     public static void updateBDDOptions(boolean from_Options)
     {
         if (from_Options)
         {
-            // Options -> Properties
-            Config.BDD_ALGORITHM.set(Options.algo_family);
+            // Options -> Config
+            //Config.BDD_ALGORITHM.set(Options.algo_family);
+            Config.BDD_ALGORITHM.set(Options.REACH_ALGO_NAMES[Options.algo_family]);
             Config.BDD_SHOW_GROW.set(Options.show_grow);
             Config.BDD_SIZE_WATCH.set(Options.size_watch);
             Config.BDD_ALTER_PCG.set(Options.user_alters_PCG);
@@ -212,7 +220,7 @@ public final class SupremicaProperties
             Config.BDD_LOCAL_SATURATION.set(Options.local_saturation);
             Config.BDD_TRACE_ON.set(Options.trace_on);
             Config.BDD_COUNT_ALGO.set(Options.count_algo);
-            Config.BDD_LI_ALGO.set(Options.inclsuion_algorithm);
+            Config.BDD_LI_ALGO.set(Options.inclusion_algorithm);
             Config.BDD_ORDER_ALGO.set(Options.ordering_algorithm);
             Config.BDD_ORDERING_FORCE_COST.set(Options.ordering_force_cost);
             Config.BDD_AS_HEURISTIC.set(Options.as_heuristics);
@@ -231,8 +239,9 @@ public final class SupremicaProperties
         }
         else
         {
-            // Properties -> Options
-            Options.algo_family = Config.BDD_ALGORITHM.get();
+            // Config -> Options
+            //Options.algo_family = Config.BDD_ALGORITHM.get();
+            Options.algo_family = indexOf(Config.BDD_ALGORITHM.get(), Options.REACH_ALGO_NAMES);
             Options.show_grow = Config.BDD_SHOW_GROW.get();
             Options.size_watch = Config.BDD_SIZE_WATCH.get();
             Options.user_alters_PCG = Config.BDD_ALTER_PCG.get();
@@ -243,7 +252,7 @@ public final class SupremicaProperties
             Options.trace_on = Config.BDD_TRACE_ON.get();
             Options.profile_on = Config.BDD_PROFILE_ON.get();
             Options.count_algo = Config.BDD_COUNT_ALGO.get();
-            Options.inclsuion_algorithm = Config.BDD_LI_ALGO.get();
+            Options.inclusion_algorithm = Config.BDD_LI_ALGO.get();
             Options.ordering_algorithm = Config.BDD_ORDER_ALGO.get();
             Options.ordering_force_cost = Config.BDD_ORDERING_FORCE_COST.get();
             Options.as_heuristics = Config.BDD_AS_HEURISTIC.get();
@@ -262,6 +271,19 @@ public final class SupremicaProperties
         }
     }
     
+    /**
+     * Returns the index of object in objects. For the BDD options.
+     */
+    private static int indexOf(String object, String[] objects)
+    {
+        for (int i=0; i< objects.length; i++)
+        {
+            if (object.equals(objects[i]))
+                return i;
+        }
+        return -1;
+    }
+    
     private static SupremicaProperties supremicaProperties;
     private static Config config = Config.getInstance();
     private static File propertyFile = null;
@@ -269,6 +291,7 @@ public final class SupremicaProperties
     static
     {
         supremicaProperties = new SupremicaProperties();
+        // Update values in BDD.Options based on Config.
         updateBDDOptions(false);
     }
     

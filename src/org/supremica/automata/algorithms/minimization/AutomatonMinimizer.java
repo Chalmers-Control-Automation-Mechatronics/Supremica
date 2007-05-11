@@ -158,7 +158,7 @@ public class AutomatonMinimizer
         //////////////
         // MINIMIZE //
         //////////////
-            
+        
         // Find out what to do
         EquivalenceRelation equivalenceRelation = options.getMinimizationType();
         if (equivalenceRelation == EquivalenceRelation.BISIMULATIONEQUIVALENCE)
@@ -530,7 +530,7 @@ public class AutomatonMinimizer
     throws Exception
     {
         Automaton newAutomaton = new Automaton();
-
+        
         // Don't listen to this!
         newAutomaton.beginTransaction();
         
@@ -920,7 +920,7 @@ public class AutomatonMinimizer
             forwardsClosure.remove(one); // Skip self
             while (forwardsClosure.size() != 0)
             {
-                State two = forwardsClosure.remove();                
+                State two = forwardsClosure.remove();
                 if (backwardsClosure.contains(two))
                 {
                     System.out.println("Loopstates:" + " " + one + ", " + two);
@@ -933,96 +933,102 @@ public class AutomatonMinimizer
     }
     
     /**
+     * The rules.
+     */
+    enum Rule
+    { SC, AE, OSI, OSO, CC };
+    
+    /**
      * Runs some rules for minimization wrt conflict equivalence.
      *
      * @return total number of states removed.
      */
     public int runConflictEquivalenceRules(Automaton aut)
     {
-        int total = 0;
+        // Remove redundant transitions
+        int countOET = removeRedundantTransitions(aut);
+        int countSC = 0;
+        int countOSI = 0;
+        int countAE = 0;
+        int countCC = 0;
+        int countOSO = 0;
         
         try
         {
-            int count;
+            boolean rerunNeeded;
             do
             {
-                // Remove redundant transitions
-                int countOET = removeRedundantTransitions(aut);
-                int countSC = 0;
-                int countOSI = 0;
-                int countAE = 0;
-                int countCC = 0;
-                int countOSO = 0;
-    
-                // Merge conflict equivalent states and stuff...
-                // Rule A
-                if (options.getUseRuleSC())
+                rerunNeeded = false;
+                
+                // Run the rules in the specified order...
+                //final Rule[] order = { Rule.SC, Rule.AE, Rule.OSI, Rule.CC, Rule.OSO}; // Original order
+                final Rule[] order = { Rule.AE, Rule.SC, Rule.OSO, Rule.OSI, Rule.CC};
+                for (Rule rule : order)
                 {
-                    countSC = silentContinuationRule(aut);
-                    totalSC += countSC;
-                }
-                //aut.setComment(aut.getName() + "_SC");
-                //ActionMan.getGui().addAutomaton(new Automaton(aut));
-                //assert(!hasEpsilonLoops(aut));                
-                if (countSC > 0)
-                {
-                    countOET += removeRedundantTransitions(aut);
-                }
-                // Rule B
-                if (options.getUseRuleAE())
-                {
-                    countAE = activeEventsRule(aut);
-                    totalAE += countAE;
-                }
-                //aut.setComment(aut.getName() + "_AE");
-                //ActionMan.getGui().addAutomaton(new Automaton(aut));
-                //assert(!hasEpsilonLoops(aut));
-                if (countAE > 0)
-                {
-                    countOET += removeRedundantTransitions(aut);
-                }
-                // Rule AA
-                if (options.getUseRuleOSI())
-                {
-                    countOSI = ruleOnlySilentIn(aut);
-                    totalOSI += countOSI;
-                }
-                //aut.setComment(aut.getName() + "_OSI");
-                //ActionMan.getGui().addAutomaton(new Automaton(aut));
-                //assert(!hasEpsilonLoops(aut));
-                if (countOSI > 0)
-                {
-                    countOET += removeRedundantTransitions(aut);
-                }
-                // Rule C
-                if (true)
-                {
-                    countCC = certainConflictsRule(aut);
-                    totalCC += countCC;
-                }
-                //aut.setComment(aut.getName() + "_CC");
-                //ActionMan.getGui().addAutomaton(new Automaton(aut));
-                //assert(!hasEpsilonLoops(aut));
-                // Rule F (the most frequent to call for repeats) has its own loop...
-                if (options.getUseRuleOSO())
-                {
+                    int count;
+                    boolean change = false;
                     do
                     {
-                        countOSO = ruleOnlySilentOut(aut);
-                        totalOSO += countOSO;
-                        assert(!hasEpsilonLoops(aut));
-                        if (countOSO > 0)
-                            countOET += removeRedundantTransitions(aut);
-					} while (countOSO > 0);					
+                        count = 0;
+                        switch (rule)
+                        {
+                            case OSO:
+                                // Rule F (only silent outgoing)
+                                if (options.getUseRuleOSO())
+                                {
+                                    count = ruleOnlySilentOut(aut);
+                                    countOSO += count;
+                                }
+                            case OSI:
+                                // Rule AA (only silent incoming)
+                                if (options.getUseRuleOSI())
+                                {
+                                    count = ruleOnlySilentIn(aut);
+                                    countOSI += count;
+                                }
+                            case SC:
+                                // Rule A (silent continuation)
+                                if (options.getUseRuleSC())
+                                {
+                                    count = silentContinuationRule(aut);
+                                    countSC += count;
+                                }
+                            case AE:
+                                // Rule B (active events)
+                                if (options.getUseRuleAE())
+                                {
+                                    count = activeEventsRule(aut);
+                                    countAE += count;
+                                }
+                            case CC:
+                                // Rule C (certain conflicts)
+                                if (true)
+                                {
+                                    count = certainConflictsRule(aut);
+                                    countCC += count;
+                                }
+                        }
+                        
+                        // Did anything happen
+                        if (count > 0)
+                            change = true;
+
+                        //System.out.println("Rule: " + rule + " count: " + count);
+                        
+                        // This must never happen as it is assumed by many of the rules
+                        //assert(!hasEpsilonLoops(aut));
+                    } while(false && (rule == Rule.OSO || rule == Rule.OSI || rule == Rule.AE) && count > 0);
+
+                    // Has anything happened to the number of states?
+                    if (change)
+                    {
+                        // This may have opened up the possibility to apply the rules again!
+                        rerunNeeded = true;
+                        // Also remove redundant transitions
+                        countOET += removeRedundantTransitions(aut);
+                    }
                 }
-                totalOET += countOET;
-                
-                logger.debug("Rule SC: " + countSC + ", rule AE: " + countAE +
-                    ", rule CC: " + countCC + ", rule OSI: " + countOSI + 
-                    ", rule OSO: " + countOSO + ", count OET: " + countOET);
-                count = countSC+countOSI+countAE+countCC+countOSO;
-                total += count;
-            } while (count > 0);
+            } while (rerunNeeded);
         }
         catch (Exception excp)
         {
@@ -1031,7 +1037,21 @@ public class AutomatonMinimizer
             return -1;
         }
         
-        return total;
+        // Log statistics
+        logger.debug("Rule SC: " + countSC + ", rule AE: " + countAE +
+            ", rule CC: " + countCC + ", rule OSI: " + countOSI +
+            ", rule OSO: " + countOSO + ", count OET: " + countOET);
+        
+        // Add to totals
+        totalSC += countSC;
+        totalAE += countAE;
+        totalOSI += countOSI;
+        totalCC += countCC;
+        totalOSO += countOSO;
+        totalOET += countOET;
+        
+        // Return state nbr change
+        return countSC+countOSI+countAE+countCC+countOSO;
     }
     
     /**
@@ -1085,15 +1105,15 @@ public class AutomatonMinimizer
             }
             list.add(info);
         }
-
+        
         // Now all equivalent states should be in the lists, merge!
         count += mergeEquivalent(aut, infoHash.values());
-
+        
         infoHash.clear();
         
         return count;
     }
-
+    
     /**
      *  Look through all lists, merge all states with equivalent StateInfo.
      */
@@ -1126,22 +1146,22 @@ public class AutomatonMinimizer
         }
         return count;
     }
-        
+    
     /*
     public int silentContinuationRule(Automaton aut)
     throws Exception
     {
         //assert(!hasEpsilonSelfloops(aut));
-
+     
         logger.fatal("NY");
-        
+     
         ////////////
         // RULE A //
         ////////////
-        
+     
         // Count the removed states
         int count = 0;
-        
+     
         // If two states has the same incoming arcs (from the same state(s) and with the same
         // event(s)) AND if there is an epsilon transition present in both states, the states
         // can be merged. NOTE! THIS PRESUPPOSES THAT THERE ARE NO EPSILON-LOOPS IN THE AUTOMATON!
@@ -1150,7 +1170,7 @@ public class AutomatonMinimizer
         loop: while (statesToExamine.size() != 0)
         {
             State state = statesToExamine.remove();
-            
+     
             // If this state doesn't have an outgoing epsilon-transition, it's not gonna be equivalent
             // to anything else...
             boolean check = false;
@@ -1168,11 +1188,11 @@ public class AutomatonMinimizer
             {
                 continue loop;
             }
-            
+     
             // Find relevant info about the state
             StateInfoIncoming info = new StateInfoIncoming(state);
             logger.error("Stateinfo " + info);
-            
+     
             // Get list of states with same hashcode
             LinkedList list = (LinkedList) infoHash.get(new Integer(info.hashCode()));
             if (list == null)
@@ -1194,7 +1214,7 @@ public class AutomatonMinimizer
                     logger.info("Merging " + old.getState() + " and " + info.getState() + " info " + merge + ".");
                     count++;
                     // Use the old entry in the list but with the new state!
-                    old.setState(merge);                    
+                    old.setState(merge);
                     // There can be no more of this characterization in the list
                     // Get a new state!
                     continue loop;
@@ -1208,10 +1228,10 @@ public class AutomatonMinimizer
             list.add(info);
         }
         infoHash.clear();
-        
+     
         return count;
     }
-    */
+     */
     
     /**
      * Rule AA, only silent incoming and not stable (observation equivalence "backwards" and then silentContinuation).
@@ -1285,7 +1305,7 @@ public class AutomatonMinimizer
                 {
                     Arc inArc = inIt.next(); // ConcurrentModificationError!?
                     State fromState = inArc.getFromState();
-
+                    
                     // Should be epsilon!
                     assert(inArc.getEvent().isUnobservable());
                     // Should not be a selfloop
@@ -1296,7 +1316,7 @@ public class AutomatonMinimizer
                         Arc outArc = outIt.next();
                         State toState = outArc.getToState();
                         LabeledEvent event = outArc.getEvent();
-
+                        
                         Arc newArc = new Arc(fromState, toState, event);
                         aut.addArc(newArc);
                     }
@@ -1304,7 +1324,7 @@ public class AutomatonMinimizer
                 
                 aut.removeState(one);
                 count++;
-            }            
+            }
         }
         
         return count;
@@ -1355,14 +1375,14 @@ public class AutomatonMinimizer
     throws Exception
     {
         //assert(!hasEpsilonSelfloops(aut));
-        
+     
         ////////////
         // RULE B //
         ////////////
-        
+     
         // Count the removed states
         int count = 0;
-        
+     
         // If two states have the same incoming arcs (from the same state(s) and with the same
         // event(s)) AND if both states have the same events active, then they can be merged!
         Hashtable infoHash = new Hashtable((aut.nbrOfStates()*4)/3+1);
@@ -1370,10 +1390,10 @@ public class AutomatonMinimizer
         loop: while (statesToExamine.size() != 0)
         {
             State state = statesToExamine.remove();
-            
+     
             // Find relevant info about the state
             StateInfoActiveEventsRule info = new StateInfoActiveEventsRule(state);
-            
+     
             // Get list of states with same hashcode
             LinkedList list = (LinkedList) infoHash.get(new Integer(info.hashCode()));
             if (list == null)
@@ -1395,7 +1415,7 @@ public class AutomatonMinimizer
                     State merge = MinimizationHelper.mergeStates(aut, old.getState(), info.getState(), useShortNames);
                     count++;
                     // Use the old entry in the list but with the new state!
-                    old.setState(merge);                    
+                    old.setState(merge);
                     // There can be no more of this characterization in the list
                     // Get a new state!
                     continue loop;
@@ -1405,10 +1425,10 @@ public class AutomatonMinimizer
             list.add(info);
         }
         infoHash.clear();
-        
+     
         return count;
     }
-    */
+     */
     
     /**
      * Certain conflicts rule.
@@ -1496,9 +1516,9 @@ public class AutomatonMinimizer
                         }
                         else
                         {
-							// Loop over the outgoing arcs of the previous state, remove
-							// arcs labeled by the same event if they lead somewhere other
-							// than to currState
+                            // Loop over the outgoing arcs of the previous state, remove
+                            // arcs labeled by the same event if they lead somewhere other
+                            // than to currState
                             Iterator<Arc> outIt = previous.outgoingArcsIterator();
                             boolean fail = false;
                             LinkedList<Arc> toBeRemoved = new LinkedList<Arc>();
@@ -1524,12 +1544,12 @@ public class AutomatonMinimizer
                             {
                                 aut.removeArc(toBeRemoved.remove(0));
                             }
-
-							// If this is true, then there are NO outgoing at all from
-							// "previous" then it is blocking unless it is marked itself!
-							if (!fail)
-							{
-							    // This may appear as a result of rule C.3 above!
+                            
+                            // If this is true, then there are NO outgoing at all from
+                            // "previous" then it is blocking unless it is marked itself!
+                            if (!fail)
+                            {
+                                // This may appear as a result of rule C.3 above!
                                 if (!previous.isAccepting() && previous.getCost() != State.MAX_COST)
                                 {
                                     //previous.setCost(State.MAX_COST); // Dangerous, make sure you reset!
@@ -2017,7 +2037,7 @@ public class AutomatonMinimizer
         return amount;
     }
          */
-
+    
     /**
      * True if there are epsilon selfloops in aut.
      */
@@ -2542,7 +2562,7 @@ class StateInfoActiveEventsRule
     {
         assert(info instanceof StateInfoIncoming);
         StateInfoActiveEventsRule other = (StateInfoActiveEventsRule) info;
-
+        
         boolean result = super.equivalentTo(other);
         result &= activeEvents.equals(other.activeEvents);
         result &= isMarked == other.isMarked;

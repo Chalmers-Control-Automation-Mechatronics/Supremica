@@ -93,7 +93,7 @@ public class StringProperty
     {
         if (isImmutable())
         {
-            throw new IllegalStateException("This object is immutable, calling the set method is illegal");
+            throw new IllegalStateException("This object is immutable, calling the set method is illegal.");
         }
         
         this.value = value;
@@ -103,7 +103,7 @@ public class StringProperty
     {
         if (value == null)
         {
-            throw new IllegalArgumentException("null strings is not allowed");
+            throw new IllegalArgumentException("null strings are not allowed.");
         }
         if (legalValues == null)
         {

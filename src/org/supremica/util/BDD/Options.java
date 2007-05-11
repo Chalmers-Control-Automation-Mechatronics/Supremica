@@ -105,7 +105,7 @@ public class Options
     public static final int INCLUSION_ALGO_MONOLITHIC = 0,
         INCLUSION_ALGO_MODULAR = 1,
         INCLUSION_ALGO_INCREMENTAL = 2;
-    public static int inclsuion_algorithm = INCLUSION_ALGO_INCREMENTAL;
+    public static int inclusion_algorithm = INCLUSION_ALGO_INCREMENTAL;
     
     /** C/LI algorithm */
     

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.log
 //# CLASS:   RedirectProperty
 //###########################################################################
-//# $Id: RedirectProperty.java,v 1.1 2007-05-02 00:25:29 robi Exp $
+//# $Id: RedirectProperty.java,v 1.2 2007-05-11 12:09:23 flordal Exp $
 //###########################################################################
 
 /*
@@ -78,36 +78,36 @@ import org.supremica.properties.PropertyType;
  */
 
 public class RedirectProperty
-	extends BooleanProperty
+    extends BooleanProperty
 {
     
-	//#######################################################################
-	//# Constructors
+    //#######################################################################
+    //# Constructors
     public RedirectProperty(final PropertyType type,
-							final String key,
-							final boolean value,
-							final String comment)
+        final String key,
+        final boolean value,
+        final String comment)
     {
         super(type, key, value, comment);
     }
     
     public RedirectProperty(final PropertyType type,
-							final String key,
-							final boolean value,
-							final String comment,
-							final boolean immutable)
+        final String key,
+        final boolean value,
+        final String comment,
+        final boolean immutable)
     {
         super(type, key, value, comment, immutable);
     }
-
-
-	//#######################################################################
-	//# Overrides for Abstract Base Class org.supremica.properties.Property
+    
+    
+    //#######################################################################
+    //# Overrides for Abstract Base Class org.supremica.properties.Property
     public void set(final boolean value)
     {
-		super.set(value);
-		final LogDisplay display = LogDisplay.getInstance();
-		display.updateProperty(this);
+        super.set(value);
+        final LogDisplay display = LogDisplay.getInstance();
+        display.updateProperty(this);
     }
     
 }

@@ -101,7 +101,7 @@ public class BenchmarkAutomataVerifier
         
         // Controllability / Nonblocking
         vOptions = VerificationOptions.getDefaultNonblockingOptions();
-        int type = 1;
+        int type = 0;
         if (type == 0)
             // Nonblocking
             vOptions.setVerificationType(VerificationType.NONBLOCKING);
@@ -124,32 +124,32 @@ public class BenchmarkAutomataVerifier
         // Strategies
         MinimizationStrategy[] strategyArray =
         {
-			/*
-			*/
-            MinimizationStrategy.FewestTransitionsFirst, 
-			/*
-			MinimizationStrategy.AtLeastOneLocal,
+            /*
+             */
+            MinimizationStrategy.FewestTransitionsFirst,
+            /*
+            MinimizationStrategy.AtLeastOneLocal,
             MinimizationStrategy.AtLeastOneLocalMaxThree,
             MinimizationStrategy.MostStatesFirst,
             MinimizationStrategy.FewestStatesFirst,
             MinimizationStrategy.FewestEventsFirst,
             MinimizationStrategy.RandomFirst
-			*/
+             */
         };
         
         // Heuristics
         MinimizationHeuristic[] heuristicArray =
         {
-			/*
-			*/
+            /*
+             */ 
             MinimizationHeuristic.MostLocal,
-			/*
-			MinimizationHeuristic.MostCommon,
-			MinimizationHeuristic.FewestStates,
-			MinimizationHeuristic.LeastExtension,
-			MinimizationHeuristic.FewestEvents,
-			MinimizationHeuristic.FewestTransitions
-			*/
+            /*
+            MinimizationHeuristic.MostCommon,
+            MinimizationHeuristic.FewestStates,
+            MinimizationHeuristic.LeastExtension,
+            MinimizationHeuristic.FewestEvents,
+            MinimizationHeuristic.FewestTransitions
+             */
         };
         
         try
@@ -157,11 +157,11 @@ public class BenchmarkAutomataVerifier
             String fileName = "benchmarklog.txt";
             file = new FileWriter(fileName);
             file.write("BENCHMARKS FOR VERIFICATION OF " + vOptions.getVerificationType() + " USING THE " + vOptions.getAlgorithmType() + " ALGORITHM...\n");
-			file.write("Date: " + new Date() + "\n");
+            file.write("Date: " + new Date() + "\n");
             file.flush();
             System.out.println("BENCHMARK LOG WILL BE WRITTEN TO " + fileName);
             System.out.flush();
-			collectGarbage();
+            collectGarbage();
         }
         catch (IOException ex)
         {
@@ -236,32 +236,30 @@ public class BenchmarkAutomataVerifier
                 // Benchmarks
                 String[] test =
                 {
-					/*
-					*/
-					"agv", "agvb",
+                    /*
+                     */
+                    "agv", "agvb",
                     "verriegel3", "verriegel3b",
                     "verriegel4", "verriegel4b",
-                    //"bmw_fh", 
-					"big_bmw",
-                    //"FMS", 
-					"SMS", 
-					"PMS",
+                    //"bmw_fh",
+                    "big_bmw",
+                    //"FMS",
+                    "SMS",
+                    "PMS",
                     "IPC",
                     "ftechnik", "ftechnik_nocoll",
-					"tbed_valid",
-					//"tbed_ctct",
-					"fzelle",
+                    "tbed_valid",
+                    //"tbed_ctct",
+                    "fzelle",
                     "AIP_minus_AS3_TU4",
-					/*
                     "PLanTS",
                     "profisafe_i4"
-					*/
                 };
                 
                 // Run tests
                 for (int k=0; k<test.length; k++)
                 {
-                    ProjectBuildFromXml builder = new ProjectBuildFromXml();
+                    ProjectBuildFromXML builder = new ProjectBuildFromXML();
                     Project theProject = builder.build(new File(prefix + test[k] + ".xml"));
                     theProject.setName(test[k]);
                     runBenchmark(test[k], theProject, vOptions, sOptions, mOptions);
@@ -301,7 +299,7 @@ public class BenchmarkAutomataVerifier
                 file.flush();
             }
             System.out.println("TIME: " + timer + ", RESULT (NONBLOCKING/CONTROLLABLE): " + nonblocking);
-			collectGarbage();
+            collectGarbage();
         }
         catch (Throwable ex)
         {
@@ -309,10 +307,10 @@ public class BenchmarkAutomataVerifier
         }
         
     }
-
-	private void collectGarbage()
-	{
-		// Garbage collect now!
+    
+    private void collectGarbage()
+    {
+        // Garbage collect now!
         try
         {
             System.runFinalization();
@@ -325,5 +323,5 @@ public class BenchmarkAutomataVerifier
         {
             System.out.println("Garbage collection failed! " + ex);
         }
-	}
+    }
 }

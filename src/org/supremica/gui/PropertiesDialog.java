@@ -252,6 +252,10 @@ public class PropertiesDialog
             chooser.setInConfig();
         }
         
+        // The old BDD options (Arash's) are treated specially. They method still use integer variables
+        // in BDD.Options instead of the Config-values. The BDD.Options values are updated by the 
+        // SupremicaProperties.saveProperties()-method (which is run after successfully running this method).
+        
         return true;
     }
     

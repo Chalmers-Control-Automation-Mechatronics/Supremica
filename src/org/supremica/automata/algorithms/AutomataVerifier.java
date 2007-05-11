@@ -1219,7 +1219,7 @@ public class AutomataVerifier
         boolean ret = false;
         org.supremica.util.BDD.Timer timer = new org.supremica.util.BDD.Timer("BDDLanguageInclusionVerification");
         
-        switch (Options.inclsuion_algorithm)
+        switch (Options.inclusion_algorithm)
         {
             
             case Options.INCLUSION_ALGO_MONOLITHIC :
@@ -1280,7 +1280,7 @@ public class AutomataVerifier
         
         org.supremica.util.BDD.Timer timer = new org.supremica.util.BDD.Timer("BDDControllabilityVerification");
         
-        switch (Options.inclsuion_algorithm)
+        switch (Options.inclusion_algorithm)
         {
             case Options.INCLUSION_ALGO_MONOLITHIC :
                 AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata);

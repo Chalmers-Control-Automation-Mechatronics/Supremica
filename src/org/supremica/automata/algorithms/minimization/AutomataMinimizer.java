@@ -81,9 +81,13 @@ public class AutomataMinimizer
     
     /** Largest number of states come across. */
     private int mostStates = 0;
+    /** Total number of states come across. */
+    private int totalStates = 0;
     
     /** Largest number of transitions come across. */
     private int mostTransitions = 0;
+    /** Total number of transitions come across. */
+    private int totalTransitions = 0;
     
     /** Number of automata in the beginning. */
     private int initialNbrOfAutomata;
@@ -197,7 +201,7 @@ public class AutomataMinimizer
             
             // Get next automata to minimize
             timer.start();
-            MinimizationTask task = getNextMinimizationTask(true);
+            MinimizationTask task = getNextMinimizationTask(false);
             if (task == null)
             {
                 break;
@@ -219,7 +223,8 @@ public class AutomataMinimizer
                 min = AutomataSynchronizer.synchronizeAutomata(selection);
                 boolean preserveControllability = options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE;
                 min.hide(hideThese, preserveControllability);
-                // Examine for largest sizes
+                
+                // Examine for largest sizes (this is a special case, this is otherwise done in minolithicMinimization())
                 if (min.nbrOfStates() > mostStates)
                 {
                     mostStates = min.nbrOfStates();
@@ -228,6 +233,8 @@ public class AutomataMinimizer
                 {
                     mostTransitions = min.nbrOfTransitions();
                 }
+                totalStates += min.nbrOfStates();
+                totalTransitions += min.nbrOfTransitions();
             }
             else
             {
@@ -327,6 +334,9 @@ public class AutomataMinimizer
             // Print largest automaton size
             logger.info("The automaton with the most states had " + mostStates + " states.");
             logger.info("The automaton with the most transitions had " + mostTransitions + " transitions.");
+            // Print total state number examined
+            logger.info("The automata examined had " + totalStates + " states in total.");
+            logger.info("The automata examined had " + totalTransitions + " transitions in total.");
         }
         else
         {
@@ -344,7 +354,8 @@ public class AutomataMinimizer
      */
     public String getStatisticsLineLaTeX()
     {
-        return "\\texttt{NAME} & " + initialNbrOfAutomata + " & SIZE & " + mostStates + " & " + mostTransitions + " & TIME & BLOCK & " + AutomatonMinimizer.getStatisticsLaTeX() + " & ALGO1 & ALGO2 \\\\";
+        //return "\\texttt{NAME} & " + initialNbrOfAutomata + " & SIZE & " + mostStates + " & " + mostTransitions + " & TIME & BLOCK & " + AutomatonMinimizer.getStatisticsLaTeX() + " & ALGO1 & ALGO2 \\\\";
+        return "\\texttt{NAME} & " + initialNbrOfAutomata + " & SIZE & " + mostStates + " & " + mostTransitions + " & " + totalStates + " & " + totalTransitions + " & TIME & BLOCK & " + AutomatonMinimizer.getStatisticsLaTeX() + " & ALGO1 & ALGO2 \\\\";
     }
     
     /**
@@ -446,7 +457,7 @@ public class AutomataMinimizer
                     {
                         continue loop;
                     }
-                    // Skip selections with too large automata 
+                    // Skip selections with too large automata
                     for (Automaton aut: selection)
                     {
                         if (aut.nbrOfStates() > options.getComponentSizeLimit())
@@ -578,11 +589,11 @@ public class AutomataMinimizer
                     loop: for (int j=0; j<theAutomata.size(); j++)
                     {
                         Automaton aut = theAutomata.getAutomatonAt(j);
-
+                        
                         // Skip all the too large automata
                         if (aut.nbrOfStates() > options.getComponentSizeLimit())
                             continue loop;
-
+                        
                         // Skip self
                         if (bestAutomaton == aut)
                             continue loop;
@@ -648,11 +659,11 @@ public class AutomataMinimizer
                         Automata selection = new Automata();
                         selection.addAutomaton(bestAutomaton);
                         selection.addAutomaton(aut);
- 
+                        
                         // Skip all the too large automata
                         if (aut.nbrOfStates() > options.getComponentSizeLimit())
                             continue;
-                       
+                        
                         // Skip self
                         if (bestAutomaton == aut)
                             continue;
@@ -789,6 +800,8 @@ public class AutomataMinimizer
         {
             mostTransitions = aut.nbrOfTransitions();
         }
+        totalStates += aut.nbrOfStates();
+        totalTransitions += aut.nbrOfTransitions();
         
         //ActionMan.getGui().addAutomaton(new Automaton(aut));
         
