@@ -165,7 +165,7 @@ public class PropertiesDialog
             }
         }
         
-        setSize(700, 500);
+        setSize(700, 525);
         //pack();
         
         // Center the window

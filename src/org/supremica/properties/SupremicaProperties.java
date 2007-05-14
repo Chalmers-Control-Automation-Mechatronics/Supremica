@@ -208,9 +208,15 @@ public final class SupremicaProperties
         if (from_Options)
         {
             // Options -> Config
-            //Config.BDD_ALGORITHM.set(Options.algo_family);
             Config.BDD_ALGORITHM.set(Options.REACH_ALGO_NAMES[Options.algo_family]);
-            Config.BDD_SHOW_GROW.set(Options.show_grow);
+            Config.BDD_COUNT_ALGO.set(Options.COUNT_ALGO_NAMES[Options.count_algo]);
+            Config.BDD_LI_ALGO.set(Options.INCLUSION_ALGORITHM_NAMES[Options.inclusion_algorithm]);
+            Config.BDD_ORDER_ALGO.set(Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm]);
+            Config.BDD_ORDERING_FORCE_COST.set(Options.FORCE_TYPE_NAMES[Options.ordering_force_cost]);
+            Config.BDD_AS_HEURISTIC.set(Options.AS_HEURISTIC_NAMES[Options.as_heuristics]);
+            Config.BDD_DISJ_OPTIMIZER_ALGO.set(Options.DISJ_OPTIMIZER_NAMES[Options.disj_optimizer_algo]);
+            Config.BDD_TRANSITION_OPTIMIZER_ALGO.set(Options.TRANSITION_OPTIMIZER_NAMES[Options.transition_optimizer_algo]);
+            Config.BDD_SHOW_GROW.set(Options.SHOW_GROW_NAMES[Options.show_grow]);
             Config.BDD_SIZE_WATCH.set(Options.size_watch);
             Config.BDD_ALTER_PCG.set(Options.user_alters_PCG);
             Config.BDD_DEBUG_ON.set(Options.debug_on);
@@ -219,30 +225,29 @@ public final class SupremicaProperties
             Config.BDD_NB_OPTIMISTIC.set(Options.nb_optimistic);
             Config.BDD_LOCAL_SATURATION.set(Options.local_saturation);
             Config.BDD_TRACE_ON.set(Options.trace_on);
-            Config.BDD_COUNT_ALGO.set(Options.count_algo);
-            Config.BDD_LI_ALGO.set(Options.inclusion_algorithm);
-            Config.BDD_ORDER_ALGO.set(Options.ordering_algorithm);
-            Config.BDD_ORDERING_FORCE_COST.set(Options.ordering_force_cost);
-            Config.BDD_AS_HEURISTIC.set(Options.as_heuristics);
-            Config.BDD_FRONTIER_TYPE.set(Options.frontier_strategy);
-            Config.BDD_H1.set(Options.es_heuristics);
-            Config.BDD_H2.set(Options.ndas_heuristics);
-            Config.BDD_DSSI_HEURISTIC.set(Options.dssi_heuristics);
+            Config.BDD_FRONTIER_TYPE.set(Options.FRONTIER_STRATEGY_NAMES[Options.frontier_strategy]);
+            Config.BDD_H1.set(Options.ES_HEURISTIC_NAMES[Options.es_heuristics]);
+            Config.BDD_H2.set(Options.NDAS_HEURISTIC_NAMES[Options.ndas_heuristics]);
+            Config.BDD_DSSI_HEURISTIC.set(Options.DSSI_HEURISTIC_NAMES[Options.dssi_heuristics]);
             Config.BDD_PARTITION_MAX.set(Options.max_partition_size);
-            Config.BDD_ENCODING_ALGO.set(Options.encoding_algorithm);
+            Config.BDD_ENCODING_ALGO.set(Options.ENCODING_NAMES[Options.encoding_algorithm]);
             Config.BDD_LIB_PATH.set(Options.extraLibPath);
-            Config.BDD_SUP_REACHABILITY.set(Options.sup_reachability_type);
-            Config.BDD_DISJ_OPTIMIZER_ALGO.set(Options.disj_optimizer_algo);
-            Config.BDD_TRANSITION_OPTIMIZER_ALGO.set(Options.transition_optimizer_algo);
+            Config.BDD_SUP_REACHABILITY.set(Options.SUP_REACHABILITY_NAMES[Options.sup_reachability_type]);
             Config.BDD_INTERLEAVED_VARIABLES.set(Options.interleaved_variables);
             Config.BDD_LEVEL_GRAPHS.set(Options.show_level_graph);
         }
         else
         {
             // Config -> Options
-            //Options.algo_family = Config.BDD_ALGORITHM.get();
             Options.algo_family = indexOf(Config.BDD_ALGORITHM.get(), Options.REACH_ALGO_NAMES);
-            Options.show_grow = Config.BDD_SHOW_GROW.get();
+            Options.count_algo = indexOf(Config.BDD_COUNT_ALGO.get(), Options.COUNT_ALGO_NAMES);
+            Options.inclusion_algorithm = indexOf(Config.BDD_LI_ALGO.get(), Options.INCLUSION_ALGORITHM_NAMES);
+            Options.ordering_algorithm = indexOf(Config.BDD_ORDER_ALGO.get(), Options.ORDERING_ALGORITHM_NAMES);
+            Options.ordering_force_cost = indexOf(Config.BDD_ORDERING_FORCE_COST.get(), Options.FORCE_TYPE_NAMES);
+            Options.as_heuristics = indexOf(Config.BDD_AS_HEURISTIC.get(), Options.AS_HEURISTIC_NAMES);
+            Options.disj_optimizer_algo = indexOf(Config.BDD_DISJ_OPTIMIZER_ALGO.get(), Options.DISJ_OPTIMIZER_NAMES);
+            Options.transition_optimizer_algo = indexOf(Config.BDD_TRANSITION_OPTIMIZER_ALGO.get(), Options.TRANSITION_OPTIMIZER_NAMES);
+            Options.show_grow = indexOf(Config.BDD_SHOW_GROW.get(), Options.SHOW_GROW_NAMES);
             Options.size_watch = Config.BDD_SIZE_WATCH.get();
             Options.user_alters_PCG = Config.BDD_ALTER_PCG.get();
             Options.debug_on = Config.BDD_DEBUG_ON.get();
@@ -251,21 +256,14 @@ public final class SupremicaProperties
             Options.local_saturation = Config.BDD_LOCAL_SATURATION.get();
             Options.trace_on = Config.BDD_TRACE_ON.get();
             Options.profile_on = Config.BDD_PROFILE_ON.get();
-            Options.count_algo = Config.BDD_COUNT_ALGO.get();
-            Options.inclusion_algorithm = Config.BDD_LI_ALGO.get();
-            Options.ordering_algorithm = Config.BDD_ORDER_ALGO.get();
-            Options.ordering_force_cost = Config.BDD_ORDERING_FORCE_COST.get();
-            Options.as_heuristics = Config.BDD_AS_HEURISTIC.get();
-            Options.frontier_strategy = Config.BDD_FRONTIER_TYPE.get();
-            Options.es_heuristics = Config.BDD_H1.get();
-            Options.ndas_heuristics = Config.BDD_H2.get();
-            Options.dssi_heuristics = Config.BDD_DSSI_HEURISTIC.get();
+            Options.frontier_strategy = indexOf(Config.BDD_FRONTIER_TYPE.get(), Options.FRONTIER_STRATEGY_NAMES);
+            Options.es_heuristics = indexOf(Config.BDD_H1.get(), Options.ES_HEURISTIC_NAMES);
+            Options.ndas_heuristics = indexOf(Config.BDD_H2.get(), Options.NDAS_HEURISTIC_NAMES);
+            Options.dssi_heuristics = indexOf(Config.BDD_DSSI_HEURISTIC.get(), Options.DSSI_HEURISTIC_NAMES);
             Options.max_partition_size = Config.BDD_PARTITION_MAX.get();
-            Options.encoding_algorithm = Config.BDD_ENCODING_ALGO.get();
+            Options.encoding_algorithm = indexOf(Config.BDD_ENCODING_ALGO.get(), Options.ENCODING_NAMES);
             Options.extraLibPath = Config.BDD_LIB_PATH.get();
-            Options.sup_reachability_type = Config.BDD_SUP_REACHABILITY.get();
-            Options.disj_optimizer_algo = Config.BDD_DISJ_OPTIMIZER_ALGO.get();
-            Options.transition_optimizer_algo = Config.BDD_TRANSITION_OPTIMIZER_ALGO.get();
+            Options.sup_reachability_type = indexOf(Config.BDD_SUP_REACHABILITY.get(), Options.SUP_REACHABILITY_NAMES);
             Options.interleaved_variables = Config.BDD_INTERLEAVED_VARIABLES.get();
             Options.show_level_graph = Config.BDD_LEVEL_GRAPHS.get();
         }
