@@ -63,6 +63,7 @@ class ModelMaker
 	// String fb name, Map alg name -> alg ID
 	private Map algorithms = new HashMap();
 	private int algIDCounter = 1;
+	private int algIDCounterMax = 1;
 	// String fb name, Map alg name -> JaxbAlgorithm
 	private Map algorithmTexts = new HashMap();
 
@@ -433,6 +434,7 @@ class ModelMaker
 								String curAlgName = curAlg.getName();
 								algMap.put(curAlgName, new Integer(algIDCounter));
 								algIDCounter++;
+								if (algIDCounterMax < algIDCounter) algIDCounterMax = algIDCounter;
 								if (curAlg.isSetOther())
 								{
 									algTextMap.put(curAlgName, curAlg.getOther().getText());
@@ -837,8 +839,6 @@ class ModelMaker
 
 	private void makeInstanceQueue()
 	{
-		// TODO: Declare variables
-		
 		System.out.println("ModelMaker.makeInstanceQueue():");
 
 		ExtendedAutomaton instanceQueue = new ExtendedAutomaton("instanceQueue", automata);
@@ -846,9 +846,14 @@ class ModelMaker
 		// the maximum number of FB instances in queue at the same time
 		final int places = basicFunctionBlocks.keySet().size();
 		
+		instanceQueue.addIntegerVariable("queueing_fb", 0, fbIDCounter - 1, 0, null);
+		instanceQueue.addIntegerVariable("current_fb", 0, fbIDCounter - 1, 0, null);
+		
 		instanceQueue.addState("s0", true);
 		for (int i = 1; i <= places; i++)
 		{
+			instanceQueue.addIntegerVariable("fb_place_" + i, 0, fbIDCounter - 1, 0, null);
+
 			instanceQueue.addState("s" + i);
 			//Transiton when queueing instance
 			String from = "s" + (i-1);
@@ -860,13 +865,13 @@ class ModelMaker
 				event = event + "queue_fb_" + instanceName + ";";
 			}
 
-			String guard = "queueing_fb>0";
+			String guard = "queueing_fb > 0";
 			for (int j = 1; j <= (i-1); j++)
 			{
 				guard = guard + " & queueing_fb != fb_place_" + j;
 			}
-			String action = "fb_place_" + i + " = queuing_fb;";
-			action = action + "queuing_fb = 0;";
+			String action = "fb_place_" + i + " = queueing_fb;";
+			action = action + "queueing_fb = 0;";
 			instanceQueue.addTransition(from, to, event, guard, action);
 			// Transiton when dequeueing instance
 			from = "s" + i;
@@ -886,8 +891,6 @@ class ModelMaker
 
 	private void makeEventExecution()
 	{
-		// TODO: Declare variables
-
 		System.out.println("ModelMaker.makeEventExecution():");
 
 		ExtendedAutomaton eventExecution = new ExtendedAutomaton("eventExecution", automata);
@@ -912,36 +915,41 @@ class ModelMaker
 
 	private void makeJobQueue()
 	{
-		// TODO: Declare variables
-
 		System.out.println("ModelMaker.makeJobQueue():");
 
 		ExtendedAutomaton jobQueue = new ExtendedAutomaton("jobQueue", automata);
 		
 		// the maximum number of jobs in queue at the same time
-		final int places = basicFunctionBlocks.keySet().size();
+		final int places = basicFunctionBlocks.keySet().size();	
 		
+		jobQueue.addIntegerVariable("queueing_job_fb", 0, fbIDCounter - 1, 0, null);
+		jobQueue.addIntegerVariable("queueing_job_alg", 0, algIDCounterMax - 1, 0, null);
+		jobQueue.addIntegerVariable("current_job_fb", 0, fbIDCounter - 1, 0, null);
+		jobQueue.addIntegerVariable("current_job_alg", 0, algIDCounterMax - 1, 0, null);
+
 		jobQueue.addState("s0", true);
 		for (int i = 1; i <= places; i++)
 		{
+			jobQueue.addIntegerVariable("job_fb_place_" + i, 0, fbIDCounter - 1, 0, null);
+			jobQueue.addIntegerVariable("job_alg_place_" + i, 0, algIDCounterMax - 1, 0, null);
+
 			jobQueue.addState("s" + i);
-			//Transiton when queueing instance
+			//Transiton when queueing job
 			String from = "s" + (i-1);
 			String to = "s" + i;
 			String event = "";
-			String guard = "";
-			String action = "";
 			for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
 			{
 				String instanceName = (String) fbIter.next();
-				event = "queue_job_" + instanceName + ";";
-				guard = "queueing_job_" + instanceName + ">0";
-				action = "job_fb_place_" + i + " = " + basicFunctionBlocksID.get(instanceName) + ";";
-				action = action + "job_alg_place_" + i + " = queuing_job_" + instanceName + ";";
-				action = action + "queuing_job_" + instanceName + " = 0;";
-				jobQueue.addTransition(from, to, event, guard, action);
+				event = event + "queue_job_" + instanceName + ";";
 			}
-			// Transiton when dequeueing instance
+			String guard = "queueing_job_fb > 0 & queueing_job_alg > 0";
+			String action = "job_fb_place_" + i + " = queueing_job_fb;";
+			action = action + "job_alg_place_" + i + " = queueing_job_alg;";
+			action = action + "queueing_job_fb = 0;";
+			action = action + "queueing_job_alg = 0;";
+			jobQueue.addTransition(from, to, event, guard, action);
+			// Transiton when dequeueing job
 			from = "s" + i;
 			to = "s" + (i-1);
 			event = "remove_job;";      
