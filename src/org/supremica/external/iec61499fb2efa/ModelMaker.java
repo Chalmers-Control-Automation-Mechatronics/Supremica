@@ -970,8 +970,6 @@ class ModelMaker
 
 	private void makeAlgorithmExecution()
 	{
-		// TODO: Declare variables
-
 		System.out.println("ModelMaker.makeAlgorithmExecution():");
 
 		ExtendedAutomaton algorithmExecution = new ExtendedAutomaton("algorithmExecution", automata);
