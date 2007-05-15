@@ -412,7 +412,7 @@ class ModelMaker
 				System.out.println("\t Adding FB " + instanceName);
 				functionBlocks.put(instanceName,theType.getName());
 				
-				if (theType.isSetBasicFB() & !theType.isSetFBNetwork())
+				if (theType.isSetBasicFB() && !theType.isSetFBNetwork())
 				{
 					System.out.println("\t Adding Basic FB " + instanceName);			
 					basicFunctionBlocks.put(instanceName, typeName);
@@ -451,7 +451,7 @@ class ModelMaker
 						algorithmTexts.put(instanceName, algTextMap);
 					}
 				}
-				else if (!theType.isSetBasicFB() & theType.isSetFBNetwork())
+				else if (!theType.isSetBasicFB() && theType.isSetFBNetwork())
 				{
 					JaxbFBNetwork fbNetwork = theType.getFBNetwork();
 					if (fbNetwork.isSetFB())
@@ -846,7 +846,7 @@ class ModelMaker
 		// the maximum number of FB instances in queue at the same time
 		final int places = basicFunctionBlocks.keySet().size();
 		
-		instanceQueue.addIntegerVariable("queueing_fb", 0, fbIDCounter - 1, 0, null);
+		instanceQueue.addIntegerVariable("queuing_fb", 0, fbIDCounter - 1, 0, null);
 		instanceQueue.addIntegerVariable("current_fb", 0, fbIDCounter - 1, 0, null);
 		
 		instanceQueue.addState("s0", true);
@@ -855,7 +855,7 @@ class ModelMaker
 			instanceQueue.addIntegerVariable("fb_place_" + i, 0, fbIDCounter - 1, 0, null);
 
 			instanceQueue.addState("s" + i);
-			//Transiton when queueing instance
+			//Transiton when queuing instance
 			String from = "s" + (i-1);
 			String to = "s" + i;
 			String event = "";
@@ -865,15 +865,15 @@ class ModelMaker
 				event = event + "queue_fb_" + instanceName + ";";
 			}
 
-			String guard = "queueing_fb > 0";
+			String guard = "queuing_fb > 0";
 			for (int j = 1; j <= (i-1); j++)
 			{
-				guard = guard + " & queueing_fb != fb_place_" + j;
+				guard = guard + " & queuing_fb != fb_place_" + j;
 			}
-			String action = "fb_place_" + i + " = queueing_fb;";
-			action = action + "queueing_fb = 0;";
+			String action = "fb_place_" + i + " = queuing_fb;";
+			action = action + "queuing_fb = 0;";
 			instanceQueue.addTransition(from, to, event, guard, action);
-			// Transiton when dequeueing instance
+			// Transiton when dequeuing instance
 			from = "s" + i;
 			to = "s" + (i-1);
 			event = "remove_fb;";      
@@ -922,8 +922,8 @@ class ModelMaker
 		// the maximum number of jobs in queue at the same time
 		final int places = basicFunctionBlocks.keySet().size();	
 		
-		jobQueue.addIntegerVariable("queueing_job_fb", 0, fbIDCounter - 1, 0, null);
-		jobQueue.addIntegerVariable("queueing_job_alg", 0, algIDCounterMax - 1, 0, null);
+		jobQueue.addIntegerVariable("queuing_job_fb", 0, fbIDCounter - 1, 0, null);
+		jobQueue.addIntegerVariable("queuing_job_alg", 0, algIDCounterMax - 1, 0, null);
 		jobQueue.addIntegerVariable("current_job_fb", 0, fbIDCounter - 1, 0, null);
 		jobQueue.addIntegerVariable("current_job_alg", 0, algIDCounterMax - 1, 0, null);
 
@@ -934,7 +934,7 @@ class ModelMaker
 			jobQueue.addIntegerVariable("job_alg_place_" + i, 0, algIDCounterMax - 1, 0, null);
 
 			jobQueue.addState("s" + i);
-			//Transiton when queueing job
+			//Transiton when queuing job
 			String from = "s" + (i-1);
 			String to = "s" + i;
 			String event = "";
@@ -943,13 +943,13 @@ class ModelMaker
 				String instanceName = (String) fbIter.next();
 				event = event + "queue_job_" + instanceName + ";";
 			}
-			String guard = "queueing_job_fb > 0 & queueing_job_alg > 0";
-			String action = "job_fb_place_" + i + " = queueing_job_fb;";
-			action = action + "job_alg_place_" + i + " = queueing_job_alg;";
-			action = action + "queueing_job_fb = 0;";
-			action = action + "queueing_job_alg = 0;";
+			String guard = "queuing_job_fb > 0 & queuing_job_alg > 0";
+			String action = "job_fb_place_" + i + " = queuing_job_fb;";
+			action = action + "job_alg_place_" + i + " = queuing_job_alg;";
+			action = action + "queuing_job_fb = 0;";
+			action = action + "queuing_job_alg = 0;";
 			jobQueue.addTransition(from, to, event, guard, action);
-			// Transiton when dequeueing job
+			// Transiton when dequeuing job
 			from = "s" + i;
 			to = "s" + (i-1);
 			event = "remove_job;";      
@@ -1006,7 +1006,7 @@ class ModelMaker
 	private void makeBasicFB(String fbName)
 	{
 		System.out.println("ModelMaker.makeBasicFB(" + fbName + "):");
-				
+		
 	}
 
 	private void makeMerge(int size)

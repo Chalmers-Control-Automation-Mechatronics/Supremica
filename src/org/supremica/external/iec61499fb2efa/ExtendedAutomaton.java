@@ -57,7 +57,7 @@ import net.sourceforge.waters.model.expr.ParseException;
 
 
 
-class ExtendedAutomaton
+public class ExtendedAutomaton
 {
 
 	private String name;

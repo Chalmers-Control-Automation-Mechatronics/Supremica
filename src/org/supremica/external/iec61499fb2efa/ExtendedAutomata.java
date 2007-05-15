@@ -37,7 +37,7 @@ import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 
 import net.sourceforge.waters.xsd.base.EventKind;
 
-class ExtendedAutomata
+public class ExtendedAutomata
 {
 
 	private ModuleSubjectFactory factory;
