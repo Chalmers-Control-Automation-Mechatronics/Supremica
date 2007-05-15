@@ -1029,8 +1029,12 @@ class ModelMaker
 		System.out.println("\t Event Receiving");
 
 		Integer fbID = (Integer) basicFunctionBlocksID.get(fbName);
+		Integer maxEventID = (Integer) eventsMaxID.get(fbName); 
 
 		ExtendedAutomaton eventReceiving = new ExtendedAutomaton("Event Receiving " + fbName , automata);
+
+		// Uncomment when eventsMaxID is done!!!
+		//eventReceiving.addIntegerVariable("receiving_event_" + fbName, 0, maxEventID - 1, 0, null);
 				
 		eventReceiving.addState("s0", true);
 		eventReceiving.addState("s1");
