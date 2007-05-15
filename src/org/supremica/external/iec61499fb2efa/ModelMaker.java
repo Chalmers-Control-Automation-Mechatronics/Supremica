@@ -60,6 +60,12 @@ class ModelMaker
 	private Map basicFunctionBlocksID = new HashMap();
 	private int fbIDCounter = 1;
 
+	// String fb name, Map event input name -> event ID
+	private Map events = new HashMap();
+	// String fb name, max event ID
+	private Map eventsMaxID = new HashMap();
+	private int eventIDCounter = 1;
+
 	// String fb name, Map alg name -> alg ID
 	private Map algorithms = new HashMap();
 	private int algIDCounter = 1;
@@ -415,6 +421,7 @@ class ModelMaker
 				if (theType.isSetBasicFB() && !theType.isSetFBNetwork())
 				{
 					System.out.println("\t Adding Basic FB " + instanceName);			
+
 					basicFunctionBlocks.put(instanceName, typeName);
 					basicFunctionBlocksID.put(instanceName, new Integer(fbIDCounter));
 					fbIDCounter++;
@@ -450,6 +457,9 @@ class ModelMaker
 						algorithms.put(instanceName, algMap);
 						algorithmTexts.put(instanceName, algTextMap);
 					}
+
+					// make events map entry
+					
 				}
 				else if (!theType.isSetBasicFB() && theType.isSetFBNetwork())
 				{
@@ -841,7 +851,7 @@ class ModelMaker
 	{
 		System.out.println("ModelMaker.makeInstanceQueue():");
 
-		ExtendedAutomaton instanceQueue = new ExtendedAutomaton("instanceQueue", automata);
+		ExtendedAutomaton instanceQueue = new ExtendedAutomaton("Instance Queue", automata);
 		
 		// the maximum number of FB instances in queue at the same time
 		final int places = basicFunctionBlocks.keySet().size();
@@ -893,7 +903,7 @@ class ModelMaker
 	{
 		System.out.println("ModelMaker.makeEventExecution():");
 
-		ExtendedAutomaton eventExecution = new ExtendedAutomaton("eventExecution", automata);
+		ExtendedAutomaton eventExecution = new ExtendedAutomaton("Event Execution", automata);
 
 		eventExecution.addState("s0", true);
 		eventExecution.addState("s1");
@@ -917,7 +927,7 @@ class ModelMaker
 	{
 		System.out.println("ModelMaker.makeJobQueue():");
 
-		ExtendedAutomaton jobQueue = new ExtendedAutomaton("jobQueue", automata);
+		ExtendedAutomaton jobQueue = new ExtendedAutomaton("Job Queue", automata);
 		
 		// the maximum number of jobs in queue at the same time
 		final int places = basicFunctionBlocks.keySet().size();	
@@ -972,7 +982,7 @@ class ModelMaker
 	{
 		System.out.println("ModelMaker.makeAlgorithmExecution():");
 
-		ExtendedAutomaton algorithmExecution = new ExtendedAutomaton("algorithmExecution", automata);
+		ExtendedAutomaton algorithmExecution = new ExtendedAutomaton("Algorithm Execution", automata);
 				
 		algorithmExecution.addState("s0", true);
 		algorithmExecution.addState("s1");
@@ -1004,10 +1014,53 @@ class ModelMaker
 	}
 
 	private void makeBasicFB(String fbName)
-	{
+	{	
 		System.out.println("ModelMaker.makeBasicFB(" + fbName + "):");
+	
+		makeBasicFBEventReceiving(fbName);
+		makeBasicFBEventHandling(fbName);
+		makeBasicFBEventQueue(fbName);
+		makeBasicFBExecutionControlChart(fbName);
+		makeBasicFBAlgorithms(fbName);
+	}
+
+	private void makeBasicFBEventReceiving(String fbName)
+	{
+		System.out.println("\t Event Receiving");
+
+		ExtendedAutomaton eventReceiving = new ExtendedAutomaton("Event Receiving " + fbName , automata);
+				
+		eventReceiving.addState("s0", true);
+		eventReceiving.addState("s1");
+		eventReceiving.addState("s2");
+		
+		automata.addAutomaton(eventReceiving);
+	}
+	
+	private void makeBasicFBEventHandling(String fbName)
+	{
+		System.out.println("\t Event Handling");
 		
 	}
+
+	private void makeBasicFBEventQueue(String fbName)
+	{
+		System.out.println("\t Event Queue");
+
+	}
+
+	private void makeBasicFBExecutionControlChart(String fbName)
+	{
+		System.out.println("\t Execution Control Chart");
+		
+	}
+
+	private void makeBasicFBAlgorithms(String fbName)
+	{
+		System.out.println("\t Algorithms");
+				
+	}
+
 
 	private void makeMerge(int size)
 	{
@@ -1039,6 +1092,23 @@ class ModelMaker
 			String curType  = (String) basicFunctionBlocks.get(curBlock);
 			Integer curID = (Integer) basicFunctionBlocksID.get(curBlock);
 			System.out.println("\t " + curBlock + "\t" + curType + "\t" + curID);
+		}
+	}	
+
+	private void printEventsMap()
+	{
+		System.out.println("ModelMaker.printEventsMap():");
+		for (Iterator iter = algorithms.keySet().iterator(); iter.hasNext();)
+		{
+			String curBlock = (String) iter.next();
+			Map curAlgMap  = (Map) algorithms.get(curBlock);
+			System.out.println("\t " + curBlock);
+			for (Iterator algIter = curAlgMap.keySet().iterator(); algIter.hasNext();)
+			{
+				String curAlgName = (String) algIter.next();
+				Integer curAlgID = (Integer) curAlgMap.get(curAlgName);
+				System.out.println("\t\t " + curAlgName + "\t" + curAlgID);
+			}
 		}
 	}	
 
