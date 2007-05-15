@@ -1028,12 +1028,49 @@ class ModelMaker
 	{
 		System.out.println("\t Event Receiving");
 
+		Integer fbID = (Integer) basicFunctionBlocksID.get(fbName);
+
 		ExtendedAutomaton eventReceiving = new ExtendedAutomaton("Event Receiving " + fbName , automata);
 				
 		eventReceiving.addState("s0", true);
 		eventReceiving.addState("s1");
 		eventReceiving.addState("s2");
+		eventReceiving.addState("s3");
+		eventReceiving.addState("s4");
+
+		String from = "s0";
+		String to = "s1";
+		String event = "receive_event_" + fbName + ";";
+		String action = "queuing_event_" + fbName + " = receiving_event_" + fbName + ";";
+		eventReceiving.addTransition(from, to, event, null, action);
+
+		from = "s1";
+		to = "s2";
+		event = "queue_event_" + fbName + ";";
+		action = "queuing_fb = " + fbID + ";";
+		eventReceiving.addTransition(from, to, event, null, action);
 		
+		from = "s2";
+		to = "s3";
+		event = "queue_fb_" + fbName + ";";
+		eventReceiving.addTransition(from, to, event, null, null);
+
+		from = "s3";
+		to = "s0";
+		event = "handle_event_" + fbName + ";";
+		eventReceiving.addTransition(from, to, event, null, null);
+
+		from = "s3";
+		to = "s4";
+		event = "receive_event_" + fbName + ";";
+		action = "queuing_event_" + fbName + " = receiving_event_" + fbName + ";";
+		eventReceiving.addTransition(from, to, event, null, action);
+
+		from = "s4";
+		to = "s3";
+		event = "queue_event_" + fbName + ";";
+		eventReceiving.addTransition(from, to, event, null, null);
+
 		automata.addAutomaton(eventReceiving);
 	}
 	
@@ -1097,6 +1134,9 @@ class ModelMaker
 
 	private void printEventsMap()
 	{
+
+		// TODO: Do it!!!!!
+
 		System.out.println("ModelMaker.printEventsMap():");
 		for (Iterator iter = algorithms.keySet().iterator(); iter.hasNext();)
 		{
