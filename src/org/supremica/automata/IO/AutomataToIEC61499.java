@@ -1,50 +1,25 @@
 /*
- * Supremica Software License Agreement
+ *   Copyright (C) 2006 Goran Cengic
  *
- * The Supremica software is not in the public domain
- * However, it is freely available without fee for education,
- * research, and non-profit purposes.  By obtaining copies of
- * this and other files that comprise the Supremica software,
- * you, the Licensee, agree to abide by the following
- * conditions and understandings with respect to the
- * copyrighted software:
+ *   This file is free software; you can redistribute it and/or
+ *   modify it under the terms of the GNU Lesser General Public
+ *   License as published by the Free Software Foundation; either
+ *   version 2.1 of the License, or (at your option) any later version.
  *
- * The software is copyrighted in the name of Supremica,
- * and ownership of the software remains with Supremica.
+ *   This library is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *   Lesser General Public License for more details.
  *
- * Permission to use, copy, and modify this software and its
- * documentation for education, research, and non-profit
- * purposes is hereby granted to Licensee, provided that the
- * copyright notice, the original author's names and unit
- * identification, and this permission notice appear on all
- * such copies, and that no charge be made for such copies.
- * Any entity desiring permission to incorporate this software
- * into commercial products or to use it for commercial
- * purposes should contact:
+ *   You should have received a copy of the GNU Lesser General Public
+ *   License along with this library; if not, write to the Free Software
+ *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * Knut Akesson (KA), knut@supremica.org
- * Supremica,
- * Knarrhogsgatan 10
- * SE-431 60 MOLNDAL
- * SWEDEN
- *
- * to discuss license terms. No cost evaluation licenses are
- * available.
- *
- * Licensee may not use the name, logo, or any other symbol
- * of Supremica nor the names of any of its employees nor
- * any adaptation thereof in advertising or publicity
- * pertaining to the software without specific prior written
- * approval of the Supremica.
- *
- * SUPREMICA AND KA MAKES NO REPRESENTATIONS ABOUT THE
- * SUITABILITY OF THE SOFTWARE FOR ANY PURPOSE.
- * IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
- *
- * Supremica or KA shall not be liable for any damages
- * suffered by Licensee from the use of this software.
- *
- * Supremica is owned and represented by KA.
+ *   To contact author please refer to contact information in the README file.
+ */
+
+/*
+ * @author Goran Cengic
  */
 package org.supremica.automata.IO;
 
