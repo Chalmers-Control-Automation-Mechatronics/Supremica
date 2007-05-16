@@ -59,17 +59,17 @@ class ModelMaker
 	// String name, Integer ID
 	private Map basicFunctionBlocksID = new HashMap();
 	private int fbIDCounter = 1;
+	private int fbMaxID = 1;
 
 	// String fb name, Map event input name -> event ID
 	private Map events = new HashMap();
 	// String fb name, max event ID
 	private Map eventsMaxID = new HashMap();
-	private int eventIDCounter = 1;
 
 	// String fb name, Map alg name -> alg ID
 	private Map algorithms = new HashMap();
 	private int algIDCounter = 1;
-	private int algIDCounterMax = 1;
+	private int algMaxID = 1;
 	// String fb name, Map alg name -> JaxbAlgorithm
 	private Map algorithmTexts = new HashMap();
 
@@ -246,6 +246,7 @@ class ModelMaker
 
 // 		printFunctionBlocksMap();
 // 		printBasicFunctionBlocksMap();
+//		printEventsMap();
 // 		printAlgorithmsMap();
 // 		printAlgorithmTextsMap();
 // 		printFBTypesMap();
@@ -331,6 +332,7 @@ class ModelMaker
 								{
 									FB curFB = (FB) fbIter.next();
 									loadFB(curFB, null, null);
+									fbMaxID = fbIDCounter - 1;
 								}
 							}
 						}
@@ -425,7 +427,25 @@ class ModelMaker
 					basicFunctionBlocks.put(instanceName, typeName);
 					basicFunctionBlocksID.put(instanceName, new Integer(fbIDCounter));
 					fbIDCounter++;
-					
+
+					// make events map entry
+					List eventInputList = (List) ((EventInputs) ((InterfaceList) theType.getInterfaceList()).getEventInputs()).getEvent();
+					int eventIDCounter = 1;
+					Map eventIDMap = new HashMap();
+					for (Iterator eventIter = eventInputList.iterator(); eventIter.hasNext();)
+					{
+						JaxbEvent curEvent = (JaxbEvent) eventIter.next();
+
+						eventIDMap.put(curEvent.getName(), new Integer(eventIDCounter));
+						
+						if (!eventIter.hasNext())
+						{
+							eventsMaxID.put(instanceName, new Integer(eventIDCounter));
+						}
+						eventIDCounter++;
+					}
+					events.put(instanceName, eventIDMap);
+
 					// make algoritms map entry
 					BasicFB basicFB = theType.getBasicFB();
 					if (basicFB.isSetAlgorithm())
@@ -440,12 +460,15 @@ class ModelMaker
 							{
 								String curAlgName = curAlg.getName();
 								algMap.put(curAlgName, new Integer(algIDCounter));
-								algIDCounter++;
-								if (algIDCounterMax < algIDCounter) algIDCounterMax = algIDCounter;
 								if (curAlg.isSetOther())
 								{
 									algTextMap.put(curAlgName, curAlg.getOther().getText());
 								}
+								if (!iter.hasNext())
+								{
+									algMaxID = algIDCounter;
+								}
+								algIDCounter++;
 							}
 							else
 							{
@@ -457,9 +480,6 @@ class ModelMaker
 						algorithms.put(instanceName, algMap);
 						algorithmTexts.put(instanceName, algTextMap);
 					}
-
-					// make events map entry
-					
 				}
 				else if (!theType.isSetBasicFB() && theType.isSetFBNetwork())
 				{
@@ -853,16 +873,16 @@ class ModelMaker
 
 		ExtendedAutomaton instanceQueue = new ExtendedAutomaton("Instance Queue", automata);
 		
-		// the maximum number of FB instances in queue at the same time
+		// the maximum number of FB instances in the queue at the same time
 		final int places = basicFunctionBlocks.keySet().size();
-		
-		instanceQueue.addIntegerVariable("queuing_fb", 0, fbIDCounter - 1, 0, null);
-		instanceQueue.addIntegerVariable("current_fb", 0, fbIDCounter - 1, 0, null);
+
+		instanceQueue.addIntegerVariable("queuing_fb", 0, fbMaxID, 0, null);
+		instanceQueue.addIntegerVariable("current_fb", 0, fbMaxID, 0, null);
 		
 		instanceQueue.addState("s0", true);
 		for (int i = 1; i <= places; i++)
 		{
-			instanceQueue.addIntegerVariable("fb_place_" + i, 0, fbIDCounter - 1, 0, null);
+			instanceQueue.addIntegerVariable("fb_place_" + i, 0, fbMaxID, 0, null);
 
 			instanceQueue.addState("s" + i);
 			//Transiton when queuing instance
@@ -929,19 +949,19 @@ class ModelMaker
 
 		ExtendedAutomaton jobQueue = new ExtendedAutomaton("Job Queue", automata);
 		
-		// the maximum number of jobs in queue at the same time
+		// the maximum number of jobs in the queue at the same time
 		final int places = basicFunctionBlocks.keySet().size();	
 		
-		jobQueue.addIntegerVariable("queuing_job_fb", 0, fbIDCounter - 1, 0, null);
-		jobQueue.addIntegerVariable("queuing_job_alg", 0, algIDCounterMax - 1, 0, null);
-		jobQueue.addIntegerVariable("current_job_fb", 0, fbIDCounter - 1, 0, null);
-		jobQueue.addIntegerVariable("current_job_alg", 0, algIDCounterMax - 1, 0, null);
+		jobQueue.addIntegerVariable("queuing_job_fb", 0, fbMaxID, 0, null);
+		jobQueue.addIntegerVariable("queuing_job_alg", 0, algMaxID, 0, null);
+		jobQueue.addIntegerVariable("current_job_fb", 0, fbMaxID, 0, null);
+		jobQueue.addIntegerVariable("current_job_alg", 0, algMaxID, 0, null);
 
 		jobQueue.addState("s0", true);
 		for (int i = 1; i <= places; i++)
 		{
-			jobQueue.addIntegerVariable("job_fb_place_" + i, 0, fbIDCounter - 1, 0, null);
-			jobQueue.addIntegerVariable("job_alg_place_" + i, 0, algIDCounterMax - 1, 0, null);
+			jobQueue.addIntegerVariable("job_fb_place_" + i, 0, fbMaxID, 0, null);
+			jobQueue.addIntegerVariable("job_alg_place_" + i, 0, algMaxID, 0, null);
 
 			jobQueue.addState("s" + i);
 			//Transiton when queuing job
@@ -1029,12 +1049,11 @@ class ModelMaker
 		System.out.println("\t Event Receiving");
 
 		Integer fbID = (Integer) basicFunctionBlocksID.get(fbName);
-		Integer maxEventID = (Integer) eventsMaxID.get(fbName); 
+		Integer eventMaxID = (Integer) eventsMaxID.get(fbName); 
 
 		ExtendedAutomaton eventReceiving = new ExtendedAutomaton("Event Receiving " + fbName , automata);
 
-		// Uncomment when eventsMaxID is done!!!
-		//eventReceiving.addIntegerVariable("receiving_event_" + fbName, 0, maxEventID - 1, 0, null);
+		eventReceiving.addIntegerVariable("receiving_event_" + fbName, 0, eventMaxID, 0, null);
 				
 		eventReceiving.addState("s0", true);
 		eventReceiving.addState("s1");
@@ -1082,14 +1101,117 @@ class ModelMaker
 	{
 		System.out.println("\t Event Handling");
 		
+		ExtendedAutomaton eventHandling = new ExtendedAutomaton("Event Handling " + fbName , automata);
+
+		eventHandling.addState("s0", true);
+		eventHandling.addState("s1");
+		eventHandling.addState("s2");
+		eventHandling.addState("s3");
+
+		String from = "s0";
+		String to = "s1";
+		String event = "handle_event_" + fbName + ";";
+		eventHandling.addTransition(from, to, event, null, null);
+
+		from = "s1";
+		to = "s2";
+		event = "remove_event_" + fbName + ";";
+		eventHandling.addTransition(from, to, event, null, null);
+
+		from = "s2";
+		to = "s3";
+		event = "update_ECC_" + fbName + ";";
+		eventHandling.addTransition(from, to, event, null, null);
+
+		from = "s3";
+		to = "s2";
+		event = "no_action_" + fbName + ";";
+		eventHandling.addTransition(from, to, event, null, null);
+
+		from = "s3";
+		to = "s1";
+		event = "no_transition_" + fbName + ";";
+		eventHandling.addTransition(from, to, event, null, null);
+
+		from = "s3";
+		to = "s0";
+		event = "handling_event_done_" + fbName + ";";
+		eventHandling.addTransition(from, to, event, null, null);
+
+		automata.addAutomaton(eventHandling);
 	}
 
 	private void makeBasicFBEventQueue(String fbName)
 	{
 		System.out.println("\t Event Queue");
 
-	}
+		String typeName = (String) basicFunctionBlocks.get(fbName);
+		JaxbFBType theType = (JaxbFBType) fbTypes.get(typeName);
+		List eventInputList = (List) ((EventInputs) ((InterfaceList) theType.getInterfaceList()).getEventInputs()).getEvent();
+		
+		ExtendedAutomaton eventQueue = new ExtendedAutomaton("Event Queue " + fbName, automata);
+		
+		// the maximum number of events in the queue at the same time
+		final int places = basicFunctionBlocks.keySet().size();	
+		
+		final int evMaxID = ((Integer) eventsMaxID.get(fbName)).intValue();
+		
+		eventQueue.addIntegerVariable("queuing_event_" + fbName, 0, evMaxID, 0, null);
 
+		eventQueue.addState("s0", true);
+		for (int i = 1; i <= places; i++)
+		{
+		
+			eventQueue.addIntegerVariable("event_" + fbName + "_place_" + i, 0, fbMaxID, 0, null);
+			
+			for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
+			{
+
+				JaxbEvent curEvent = (JaxbEvent) evIter.next();
+				String eventName = curEvent.getName();
+				List withData = curEvent.getWith();
+
+				
+
+
+
+				
+// 				eventQueue.addState("s" + i);
+// 				//Transiton when queuing event
+// 				String from = "s" + (i-1);
+// 				String to = "s" + i;
+// 				String event = "";
+// 				for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
+// 				{
+// 					String instanceName = (String) fbIter.next();
+// 					event = event + "queue_job_" + instanceName + ";";
+// 				}
+// 				String guard = "queuing_job_fb > 0 & queuing_job_alg > 0";
+// 				String action = "job_fb_place_" + i + " = queuing_job_fb;";
+// 				action = action + "job_alg_place_" + i + " = queuing_job_alg;";
+// 				action = action + "queuing_job_fb = 0;";
+// 				action = action + "queuing_job_alg = 0;";
+// 				eventQueue.addTransition(from, to, event, guard, action);
+// 				// Transiton when dequeuing event
+// 				from = "s" + i;
+// 				to = "s" + (i-1);
+// 				event = "remove_job;";      
+// 				guard = "";      
+// 				action = "current_job_fb = job_fb_place_1;";
+// 				action = action + "current_job_alg = job_alg_place_1;";
+// 				for (int j = 1; j <= i-1; j++)
+// 				{
+// 					action = action + "job_fb_place_" + j + " = job_fb_place_" + (j+1) + ";";
+// 					action = action + "job_alg_place_" + j + " = job_alg_place_" + (j+1) + ";";
+// 				}
+// 				action = action + "job_fb_place_" + i + " = 0;";
+// 				action = action + "job_alg_place_" + i + " = 0;";
+// 				eventQueue.addTransition(from, to, event, guard, action);      
+			}
+		}
+		automata.addAutomaton(eventQueue);	
+	}
+	
 	private void makeBasicFBExecutionControlChart(String fbName)
 	{
 		System.out.println("\t Execution Control Chart");
@@ -1134,25 +1256,25 @@ class ModelMaker
 			Integer curID = (Integer) basicFunctionBlocksID.get(curBlock);
 			System.out.println("\t " + curBlock + "\t" + curType + "\t" + curID);
 		}
+		System.out.println("\t Maximal block ID: " + fbMaxID);			
 	}	
 
 	private void printEventsMap()
 	{
-
-		// TODO: Do it!!!!!
-
 		System.out.println("ModelMaker.printEventsMap():");
-		for (Iterator iter = algorithms.keySet().iterator(); iter.hasNext();)
+		for (Iterator iter = events.keySet().iterator(); iter.hasNext();)
 		{
 			String curBlock = (String) iter.next();
-			Map curAlgMap  = (Map) algorithms.get(curBlock);
+			Map curEventIDMap  = (Map) events.get(curBlock);
 			System.out.println("\t " + curBlock);
-			for (Iterator algIter = curAlgMap.keySet().iterator(); algIter.hasNext();)
+			for (Iterator evIter = curEventIDMap.keySet().iterator(); evIter.hasNext();)
 			{
-				String curAlgName = (String) algIter.next();
-				Integer curAlgID = (Integer) curAlgMap.get(curAlgName);
-				System.out.println("\t\t " + curAlgName + "\t" + curAlgID);
+				String curEventName = (String) evIter.next();
+				Integer curEventID = (Integer) curEventIDMap.get(curEventName);
+				System.out.println("\t\t " + curEventName + "\t" + curEventID);
 			}
+			Integer evMaxID = (Integer) eventsMaxID.get(curBlock);
+			System.out.println("\t Maximal event ID: " + evMaxID);
 		}
 	}	
 
@@ -1171,6 +1293,7 @@ class ModelMaker
 				System.out.println("\t\t " + curAlgName + "\t" + curAlgID);
 			}
 		}
+		System.out.println("\t Maximal algorithm ID: " + algMaxID);					
 	}	
 
 	private void printAlgorithmTextsMap()
