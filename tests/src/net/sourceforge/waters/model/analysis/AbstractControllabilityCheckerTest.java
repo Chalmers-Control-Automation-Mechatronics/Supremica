@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractControllabilityCheckerTest
 //###########################################################################
-//# $Id: AbstractControllabilityCheckerTest.java,v 1.8 2006-12-01 03:26:36 robi Exp $
+//# $Id: AbstractControllabilityCheckerTest.java,v 1.9 2007-05-17 17:01:35 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -82,6 +82,33 @@ public abstract class AbstractControllabilityCheckerTest
     final String group = "handwritten";
     final String name = "tictactoe.wdes";
     runModelVerifier(group, name, false);
+  }
+
+
+  //#########################################################################
+  //# Test Cases --- hisc
+  public void testHISCRhoneSubsystem1Patch0() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "hisc";
+    final String name = "rhone_subsystem1_patch0.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
+  public void testHISCRhoneSubsystem1Patch1() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "hisc";
+    final String name = "rhone_subsystem1_patch1.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
+  public void testHISCRhoneSubsystem1Patch2() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "hisc";
+    final String name = "rhone_subsystem1_patch2.wmod";
+    runModelVerifier(group, dir, name, true);
   }
 
 

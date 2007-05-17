@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopCheckerTest
 //###########################################################################
-//# $Id: ControlLoopCheckerTest.java,v 1.15 2006-11-16 01:08:50 robi Exp $
+//# $Id: ControlLoopCheckerTest.java,v 1.16 2007-05-17 17:01:35 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis;
@@ -272,6 +272,14 @@ public class ControlLoopCheckerTest extends AbstractModelCheckerTest
     final String group = "tests";
     final String dir = "batchtank2005";
     final String name = "vl6.wdes";
+    runModelChecker(group, dir, name, false);
+  }
+
+  public void testHISCRhoneSubsystem1Patch2() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "hisc";
+    final String name = "rhone_subsystem1_patch2.wmod";
     runModelChecker(group, dir, name, false);
   }
 
