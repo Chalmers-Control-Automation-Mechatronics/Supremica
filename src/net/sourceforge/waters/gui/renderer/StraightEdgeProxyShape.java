@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   StraightEdgeProxyShape
 //###########################################################################
-//# $Id: StraightEdgeProxyShape.java,v 1.1 2007-02-16 03:00:42 robi Exp $
+//# $Id: StraightEdgeProxyShape.java,v 1.2 2007-05-18 15:42:02 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -31,6 +31,17 @@ class StraightEdgeProxyShape
     mStart = GeometryTools.getRadialStartPoint(edge, end);
     mEnd = GeometryTools.getRadialEndPoint(edge, start);
     mLine = new Line2D.Double(mStart, mEnd);
+    final double distance = mStart.distance(mEnd);
+    if (distance == 0.0) {
+      mArrowTip = start;
+    } else {
+      final double t1 =
+        0.5 * (distance - EdgeProxyShape.ARROW_HEIGHT) / distance;
+      final double t2 = 1.0 - t1;
+      final double x = t1 * mStart.getX() + t2 * mEnd.getX();
+      final double y = t1 * mStart.getY() + t2 * mEnd.getY();
+      mArrowTip = new Point2D.Double(x, y);
+    }
     createHandles();
   }
 
@@ -71,11 +82,17 @@ class StraightEdgeProxyShape
     return getMidPoint();
   }
 
+  Point2D getInnerArrowTipPoint()
+  {
+    return mArrowTip;
+  }
+
 
   //#########################################################################
   //# Data Members
   private final Point2D mStart;
   private final Point2D mEnd;
   private final Line2D mLine;
+  private final Point2D mArrowTip;
 
 }

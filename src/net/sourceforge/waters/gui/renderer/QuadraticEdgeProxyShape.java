@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   QuadraticEdgeProxyShape
 //###########################################################################
-//# $Id: QuadraticEdgeProxyShape.java,v 1.2 2007-03-30 11:50:44 avenir Exp $
+//# $Id: QuadraticEdgeProxyShape.java,v 1.3 2007-05-18 15:42:02 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -35,21 +35,13 @@ class QuadraticEdgeProxyShape
     mCurve = new QuadCurve2D.Double(mStart.getX(), mStart.getY(),
 				    mControl.getX(), mControl.getY(), 
 				    mEnd.getX(), mEnd.getY());
+    mArrowTip = calculateInnerArrowTipPosition();
     createHandles();
   }
 
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.renderer.RendererShape
-  // This method reduces the functionality of the superclass, where
-  // getShape() is already defined. Is it on purpose? 
-  // This functionality seems to be needed when 
-  // the shape of the curve together with the attached arrowhead iswanted. 
-//   public QuadCurve2D getShape()
-//   {
-//     return mCurve;
-//   }
-
   public boolean isClicked(final int x, final int y)
   {
     if (getClickedHandle(x, y) != null) {
@@ -76,7 +68,6 @@ class QuadraticEdgeProxyShape
     return mCurve;
   }
 
-
   Point2D getStartPoint()
   {
     return mStart;
@@ -96,9 +87,33 @@ class QuadraticEdgeProxyShape
     return new Point2D.Double(x, y);
   }
 
+  Point2D getInnerArrowTipPoint()
+  {
+    return mArrowTip;
+  }
+
   Point2D getEndDirection()
   {
     return GeometryTools.getNormalizedDirection(mControl, mEnd);
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private Point2D calculateInnerArrowTipPosition()
+  {
+    final Point2D turn = getTurningPoint();
+    final Point2D dir = getMidDirection();
+    final double dist = 0.5 * EdgeProxyShape.ARROW_HEIGHT;
+    final double x = turn.getX() + dist * dir.getX();
+    final double y = turn.getY() + dist * dir.getY();
+    final Point2D rawtip = new Point2D.Double(x, y);
+    if (mStart.distance(mEnd) < EdgeProxyShape.ARROW_HEIGHT) {
+      return rawtip;
+    } else {
+      return GeometryTools.findClosestPointOnQuadratic
+        (mStart, mControl, mEnd, rawtip);
+    }
   }
 
 
@@ -108,5 +123,6 @@ class QuadraticEdgeProxyShape
   private final Point2D mEnd;
   private final Point2D mControl;
   private final QuadCurve2D mCurve;
+  private final Point2D mArrowTip;
 
 }

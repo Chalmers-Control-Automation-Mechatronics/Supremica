@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   GeometryTools
 //###########################################################################
-//# $Id: GeometryTools.java,v 1.14 2007-02-25 09:42:49 robi Exp $
+//# $Id: GeometryTools.java,v 1.15 2007-05-18 15:42:02 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -268,6 +268,144 @@ public final class GeometryTools
     } else {
       final Point2D end = getEndPoint(edge);
       return getMidPoint(start, end);
+    }
+  }
+
+  /**
+   * Finds the point on an edge that is closest to a given point.
+   */
+  public static Point2D findClosestPointOnEdge(final EdgeProxy edge,
+                                               final Point2D point)
+  {
+    if (isSelfloop(edge)) {
+      throw new UnsupportedOperationException
+        ("Finding closest point not implemented for selfloops!");
+    } else if (edge.getGeometry() == null) {
+      final Point2D start = getStartPoint(edge);
+      final Point2D end = getEndPoint(edge);
+      return findClosestPointOnLine(start, end, point);
+    } else {
+      final Point2D start = getStartPoint(edge);
+      final Point2D end = getEndPoint(edge);
+      final Point2D ctrl = getControlPoint1(edge);
+      return findClosestPointOnQuadratic(start, ctrl, end, point);
+    }
+  }
+
+  /**
+   * Finds the point closest to a point 'p' on the line
+   * between two points 'pt1' and 'pt2'.
+   * @param pt1              one end of the line.
+   * @param pt2              the other end of the line.
+   * @param p                the point to find the closest point to.
+   * @return The point closest to 'p' on the line.
+   */
+  public static Point2D findClosestPointOnLine(final Point2D pt1,
+                                               final Point2D pt2,
+                                               final Point2D p)
+  {
+    // If the two points represent the same point then
+    // they are the closest point.
+    if (pt1.equals(pt2)) {
+      return pt1;
+    }
+    // Compute the relative position of the closest point to the point 'p'
+    // u = ((p - pt1) . (pt2 - pt1)) / ((pt2 - pt1) . (pt2 - pt1))
+    // where '.' is the vector dot product.
+    final double x = p.getX();
+    final double y = p.getY();
+    final double x1 = pt1.getX();
+    final double y1 = pt1.getY();
+    final double x2 = pt2.getX();
+    final double y2 = pt2.getY();
+    final double dx = x2 - x1;
+    final double dy = y2 - y1;
+    final double u = (dx * (x - x1) + dy * (y - y1)) / (dx * dx + dy * dy);
+    // Remove this conditional statement if you allow the closest point to be
+    // exterior to the direct line between pt1 and pt2.
+    if (u >= 1.0) {
+      return pt2;
+    } else if (u <= 0.0) {
+      return pt1;
+    } else {
+      // Create the closest point
+      return new Point2D.Double(x2 * u + x1 * (1.0 - u),
+                                y2 * u + y1 * (1.0 - u));
+    }
+  }
+
+
+  /**
+   * Finds the point closest to a point 'p' on the bezier quadratic
+   * curve between two points 'pt1' and 'pt2', and with control point 'c'.
+   * @param pt1              One end of the curve.
+   * @param c                The Bezier control point of the curve.
+   * @param pt2              The other end of the curve.
+   * @param p                The point to find the closest point to.
+   * @return The point closest to point 'p' on the curve.
+   */
+  public static Point2D findClosestPointOnQuadratic(final Point2D pt1,
+                                                    final Point2D c,
+                                                    final Point2D pt2,
+                                                    final Point2D p)
+  {
+    final Line2D line = new Line2D.Double(pt1, pt2);
+    if (line.ptLineDistSq(c) < EPSILON2) {
+      // If the curve is almost straight, treat it as a line ...
+      return findClosestPointOnLine(pt1, pt2, p);
+    } else if (pt1.equals(pt2)) {
+      // If the start and end points are the same, also treat it as a line ...
+      return findClosestPointOnLine(pt1, c, p);
+    } else if (pt1.distanceSq(pt2) < EPSILON2) {
+      // Also if the start and end points are almost the same ...
+      final Point2D mid = getMidPoint(pt1, pt2);
+      return findClosestPointOnLine(mid, c, p);
+    } else {
+      // f(t) = (1-t)^2*pt1 + 2t*(1-t)*c + t^2*pt2
+      //      = pt1 - 2t*pt1 + t^2*pt1 +2t*c - 2t^2*c + t^2*pt2
+      //      = (pt1+pt2-2c)*t^2 + (2c-2pt1)*t + pt1
+      // d(t) = || f(t) - p ||^2
+      // First calculate coefficients of f(t) - p:
+      // f(t) - p = a2*t^2 + a1*t + a0
+      final double x1 = pt1.getX();
+      final double y1 = pt1.getY();
+      final double x2 = pt2.getX();
+      final double y2 = pt2.getY();
+      final double xc = c.getX();
+      final double yc = c.getY();
+      final double x = p.getX();
+      final double y = p.getY();
+      final double a2x = x1 + x2 - 2.0 * xc;
+      final double a2y = y1 + y2 - 2.0 * yc;
+      final double a1x = 2.0 * (xc - x1);
+      final double a1y = 2.0 * (yc - y1);
+      final double a0x = x1 - x;
+      final double a0y = y1 - y;
+      // Now square them to get the coefficients of d(t):
+      // d(t) = d4*t^4 + d3*t^3 + d2*t^2 + d1*t + d0
+      final double d4 = a2x * a2x + a2y * a2y;
+      final double d3 = 2.0 * (a2x * a1x + a2y * a1y);
+      final double d2 = a1x * a1x + a1y * a1y + 2.0 * (a2x * a0x + a2y * a0y);
+      final double d1 = 2.0 * (a1x * a0x + a1y * a0y);
+      final double d0 = a0x * a0x + a0y * a0y;
+      // Minimise the biquadratic ...
+      final HornerPolynomial biquadratic =
+        new HornerPolynomial(d4, d3, d2, d1, d0);
+      final double tmin = biquadratic.findBiquadraticMinimum(0.0, 1.0);
+      // Return the point ...
+      if (tmin == 0.0) {
+        return pt1;
+      } else if (tmin == 1.0) {
+        return pt2;
+      } else {
+        final double t2 = tmin * tmin;
+        final double tbar = 1.0 - tmin;
+        final double tbar2 = tbar * tbar;
+        final double tt = 2.0 * tmin * tbar;
+        final double xmin = tbar2 * x1 + tt * xc + t2 * x2;
+        final double ymin = tbar2 * y1 + tt * yc + t2 * y2;
+        return new Point2D.Double(xmin, ymin);
+      }
     }
   }
 
