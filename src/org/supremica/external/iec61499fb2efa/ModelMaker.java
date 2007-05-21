@@ -1151,62 +1151,218 @@ class ModelMaker
 		
 		ExtendedAutomaton eventQueue = new ExtendedAutomaton("Event Queue " + fbName, automata);
 		
+		// maximum value of an integer variable
+		final int varMaxValue = 10;
+
 		// the maximum number of events in the queue at the same time
 		final int places = basicFunctionBlocks.keySet().size();	
 		
 		final int evMaxID = ((Integer) eventsMaxID.get(fbName)).intValue();
-		
 		eventQueue.addIntegerVariable("queuing_event_" + fbName, 0, evMaxID, 0, null);
 
+		// data input variables for each queue place
+		if (theType.getInterfaceList().isSetInputVars())
+		{
+			final List dataInputs = theType.getInterfaceList().getInputVars().getVarDeclaration();
+			for (Iterator dataInputsIter = dataInputs.iterator(); dataInputsIter.hasNext();)
+			{
+				VarDeclaration curDeclaration = (VarDeclaration) dataInputsIter.next();
+				String curDataInputName = curDeclaration.getName();
+				String curDataType =  curDeclaration.getType();
+				if (curDataType.toLowerCase().equals("int"))
+				{
+					eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName, 0, varMaxValue, 0, null);
+				}
+				else if (curDataType.toLowerCase().equals("bool"))
+				{
+					System.err.println("\t Error: Unsupported input data variable type: BOOL");
+					System.err.println("\t Variable name: " + fbName + "_" + curDataInputName);
+					System.exit(1);
+				}
+				else if (curDataType.toLowerCase().equals("real"))
+				{
+					System.err.println("\t Error: Unsupported input data variable type: REAL");
+					System.err.println("\t Variable name: " + fbName + "_" + curDataInputName);
+					System.exit(1);
+				}
+				else if (curDataType.toLowerCase().equals("string"))
+				{
+					System.err.println("\t Error: Unsupported input data variable type: STRING");
+					System.err.println("\t Variable name: " + fbName + "_" + curDataInputName);
+					System.exit(1);
+				}
+				else if (curDataType.toLowerCase().equals("object"))
+				{
+					System.err.println("\t Error: Unsupported input data variable type: OBJECT");
+					System.err.println("\t Variable name: " + fbName + "_" + curDataInputName);
+					System.exit(1);
+				}
+			}
+		}
+		
+		// data output variables
+		if (theType.getInterfaceList().isSetOutputVars())
+		{
+			final List dataOutputs = theType.getInterfaceList().getOutputVars().getVarDeclaration();
+			for (Iterator dataOutputsIter = dataOutputs.iterator(); dataOutputsIter.hasNext();)
+			{
+				VarDeclaration curDeclaration = (VarDeclaration) dataOutputsIter.next();
+				String curDataOutputName = curDeclaration.getName();
+				String curDataType =  curDeclaration.getType();
+				if (curDataType.toLowerCase().equals("int"))
+				{
+					eventQueue.addIntegerVariable("data_" + curDataOutputName + "_" + fbName, 0, varMaxValue, 0, null);
+				}
+				else if (curDataType.toLowerCase().equals("bool"))
+				{
+					System.err.println("\t Error: Unsupported input data variable type: BOOL");
+					System.err.println("\t Variable name: " + fbName + "_" + curDataOutputName);
+					System.exit(1);
+				}
+				else if (curDataType.toLowerCase().equals("real"))
+				{
+					System.err.println("\t Error: Unsupported input data variable type: REAL");
+					System.err.println("\t Variable name: " + fbName + "_" + curDataOutputName);
+					System.exit(1);
+				}
+				else if (curDataType.toLowerCase().equals("string"))
+				{
+					System.err.println("\t Error: Unsupported input data variable type: STRING");
+					System.err.println("\t Variable name: " + fbName + "_" + curDataOutputName);
+					System.exit(1);
+				}
+				else if (curDataType.toLowerCase().equals("object"))
+				{
+					System.err.println("\t Error: Unsupported input data variable type: OBJECT");
+					System.err.println("\t Variable name: " + fbName + "_" + curDataOutputName);
+					System.exit(1);
+				}
+			}
+		}
+		
 		eventQueue.addState("s0", true);
+
 		for (int i = 1; i <= places; i++)
 		{
 		
 			eventQueue.addIntegerVariable("event_" + fbName + "_place_" + i, 0, fbMaxID, 0, null);
+			
+			// data input variables for each queue place
+			if (theType.getInterfaceList().isSetInputVars())
+			{
+				final List dataInputs = theType.getInterfaceList().getInputVars().getVarDeclaration();
+				for (Iterator dataInputsIter = dataInputs.iterator(); dataInputsIter.hasNext();)
+				{
+					VarDeclaration curDeclaration = (VarDeclaration) dataInputsIter.next();
+					String curDataInputName = curDeclaration.getName();
+					String curDataType =  curDeclaration.getType();
+					if (curDataType.toLowerCase().equals("int"))
+					{
+						eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName + "_place_" + i, 0, varMaxValue, 0, null);
+					}
+					else if (curDataType.toLowerCase().equals("bool"))
+					{
+						System.err.println("\t Error: Unsupported input data variable type: BOOL");
+						System.err.println("\t Variable name: " + fbName + "_" + curDataInputName);
+						System.exit(1);
+					}
+					else if (curDataType.toLowerCase().equals("real"))
+					{
+						System.err.println("\t Error: Unsupported input data variable type: REAL");
+						System.err.println("\t Variable name: " + fbName + "_" + curDataInputName);
+						System.exit(1);
+					}
+					else if (curDataType.toLowerCase().equals("string"))
+					{
+						System.err.println("\t Error: Unsupported input data variable type: STRING");
+						System.err.println("\t Variable name: " + fbName + "_" + curDataInputName);
+						System.exit(1);
+					}
+					else if (curDataType.toLowerCase().equals("object"))
+					{
+						System.err.println("\t Error: Unsupported input data variable type: OBJECT");
+						System.err.println("\t Variable name: " + fbName + "_" + curDataInputName);
+						System.exit(1);
+					}
+				}
+			}
+			
+			eventQueue.addState("s" + i);
 			
 			for (Iterator evIter = eventInputList.iterator(); evIter.hasNext();)
 			{
 
 				JaxbEvent curEvent = (JaxbEvent) evIter.next();
 				String eventName = curEvent.getName();
-				List withData = curEvent.getWith();
-
+				int eventID = ((Integer) ((Map) events.get(fbName)).get(eventName)).intValue();
 				
+				//Transiton when queuing event
+ 				String from = "s" + (i-1);
+ 				String to = "s" + i;
+ 				String event = "queue_event_" + fbName + ";";
+ 				String guard = "queuing_event_" + fbName + " == " + eventID;
+ 				String action = "event_" + fbName + "_place_" + i + " = queuing_event_" + fbName + ";";
+				if (curEvent.isSetWith())
+				{
+					List withData = curEvent.getWith();
+					for (Iterator withIter = withData.iterator(); withIter.hasNext();)
+					{
+						String curWith = ((With) withIter.next()).getVar();
+						String cntFrom = (String) ((Map) dataConnections.get(fbName)).get(curWith);
+						String fromInstance = getInstanceName(cntFrom);
+						String fromSignal = getSignalName(cntFrom);				
+						action = action + 
+							"data_" + curWith + "_" + fbName + "_place_" + i + 
+							" = data_" + fromSignal + "_" + fromInstance + ";";
+					}
+				}
+ 				action = action + "queueing_event_" + fbName + " = 0;";
+ 				eventQueue.addTransition(from, to, event, guard, action);
 
+				// Transiton when dequeuing event
+ 				from = "s" + i;
+ 				to = "s" + (i-1);
+ 				event = "remove_event_" + fbName + ";";
+ 				guard = "event_" + fbName + "_place_" + i + " == " + eventID;
+ 				action = "event_" + fbName + " = event_" + fbName + "_place_" + i + ";";
+				// move events in the queue
+				for (int j = 1; j <= i-1; j++)
+				{
+					action = action + "event_" + fbName + "_place_" + j + " = event_" + fbName + "_place_" + (j+1) + ";";
+				}
+ 				action = action + "event_" + fbName + "_place_" + i + " = 0;";
 
+				if (curEvent.isSetWith())
+				{
+					List withData = curEvent.getWith();
+					// get first data in the queue
+					for (Iterator withIter = withData.iterator(); withIter.hasNext();)
+					{
+						String curWith = ((With) withIter.next()).getVar();
+						action = action + 
+							"data_" + curWith + "_" + fbName + " = data_" + curWith + "_" + fbName + "_place_" + i + ";";
+					}
+					// move the queue
+					for (Iterator withIter = withData.iterator(); withIter.hasNext();)
+					{
+						String curWith = ((With) withIter.next()).getVar();
+						for (int j = 1; j <= i-1; j++)
+						{
+							action = action + 
+								"data_" + curWith + "_" + fbName + "_place_" + j + " = data_" + curWith + "_" + fbName + "_place_" + (j+1) + ";";
+							
+						}
+					}
+					// reset current queue place
+					for (Iterator withIter = withData.iterator(); withIter.hasNext();)
+					{
+						String curWith = ((With) withIter.next()).getVar();
+							action = action + 
+								"data_" + curWith + "_" + fbName + "_place_" + i + " = 0;";
+					}
+				}
 
-				
-// 				eventQueue.addState("s" + i);
-// 				//Transiton when queuing event
-// 				String from = "s" + (i-1);
-// 				String to = "s" + i;
-// 				String event = "";
-// 				for (Iterator fbIter = basicFunctionBlocks.keySet().iterator(); fbIter.hasNext();)
-// 				{
-// 					String instanceName = (String) fbIter.next();
-// 					event = event + "queue_job_" + instanceName + ";";
-// 				}
-// 				String guard = "queuing_job_fb > 0 & queuing_job_alg > 0";
-// 				String action = "job_fb_place_" + i + " = queuing_job_fb;";
-// 				action = action + "job_alg_place_" + i + " = queuing_job_alg;";
-// 				action = action + "queuing_job_fb = 0;";
-// 				action = action + "queuing_job_alg = 0;";
-// 				eventQueue.addTransition(from, to, event, guard, action);
-// 				// Transiton when dequeuing event
-// 				from = "s" + i;
-// 				to = "s" + (i-1);
-// 				event = "remove_job;";      
-// 				guard = "";      
-// 				action = "current_job_fb = job_fb_place_1;";
-// 				action = action + "current_job_alg = job_alg_place_1;";
-// 				for (int j = 1; j <= i-1; j++)
-// 				{
-// 					action = action + "job_fb_place_" + j + " = job_fb_place_" + (j+1) + ";";
-// 					action = action + "job_alg_place_" + j + " = job_alg_place_" + (j+1) + ";";
-// 				}
-// 				action = action + "job_fb_place_" + i + " = 0;";
-// 				action = action + "job_alg_place_" + i + " = 0;";
-// 				eventQueue.addTransition(from, to, event, guard, action);      
+ 				eventQueue.addTransition(from, to, event, guard, action);
 			}
 		}
 		automata.addAutomaton(eventQueue);	
