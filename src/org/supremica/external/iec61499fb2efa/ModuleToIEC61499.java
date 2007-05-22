@@ -40,7 +40,7 @@ import org.supremica.util.SupremicaException;
  * @author Goran Cengic
  *
  */
-public class AutomataToIEC61499
+public class ModuleToIEC61499
 {
 
 	private static final String xmlnsLibraryElementString = "xmlns=\"http://www.holobloc.com/xml/LibraryElement\" ";
