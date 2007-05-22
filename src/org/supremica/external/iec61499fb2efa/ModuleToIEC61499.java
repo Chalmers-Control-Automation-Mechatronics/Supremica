@@ -44,7 +44,7 @@ public class ModuleToIEC61499
 {
 
 	private static final String xmlnsLibraryElementString = "xmlns=\"http://www.holobloc.com/xml/LibraryElement\" ";
-	private static Logger logger = LoggerFactory.createLogger(AutomataToIEC61499.class);
+	private static Logger logger = LoggerFactory.createLogger(ModuleToIEC61499.class);
 	private Project theProject;
 	private Alphabet allEvents;
 	private boolean comments = false;
@@ -54,13 +54,13 @@ public class ModuleToIEC61499
 
 
 	// Constructor
-	public AutomataToIEC61499(Project theProject)
+	public ModuleToIEC61499(Project theProject)
 	{
 		this.theProject = theProject;
 		allEvents = this.theProject.setIndices();
 	}
 
-	private AutomataToIEC61499(Project theProject,boolean comments, boolean useXmlns)
+	private ModuleToIEC61499(Project theProject,boolean comments, boolean useXmlns)
 	{
 		this.theProject = theProject;
 		allEvents = this.theProject.setIndices();
@@ -101,7 +101,7 @@ public class ModuleToIEC61499
 
 				File tmpFile = new File(file.getParent() + "/" + tempProject.getAutomatonAt(0).getName() + ".fbt");
 
-				AutomataToIEC61499 tempToIEC61499 = new AutomataToIEC61499(tempProject,comments,useXmlns);
+				ModuleToIEC61499 tempToIEC61499 = new ModuleToIEC61499(tempProject,comments,useXmlns);
 
 				tempToIEC61499.setPrintWriter(new PrintWriter(new FileWriter(tmpFile)));
 
@@ -456,7 +456,7 @@ public class ModuleToIEC61499
 
 			if (currAutomaton.getInitialState() == null)
 			{
-				String errMessage = "AutomataToIEC61499.printAlgorithmDeclarations: " + "all automata must have an initial state but automaton " + currAutomaton.getName() + "doesn't";
+				String errMessage = "ModuleToIEC61499.printAlgorithmDeclarations: " + "all automata must have an initial state but automaton " + currAutomaton.getName() + "doesn't";
 
 				logger.error(errMessage);
 
@@ -508,7 +508,7 @@ public class ModuleToIEC61499
 
 					if (currAutomatonEvent == null)
 					{
-						throw new SupremicaException("AutomataToIEC61499.printAlgorithmDeclarations: " + "Could not find " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
+						throw new SupremicaException("ModuleToIEC61499.printAlgorithmDeclarations: " + "Could not find " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
 					}
 
 					boolean previousState = false;
@@ -521,7 +521,7 @@ public class ModuleToIEC61499
 
 						if (toState == null)
 						{
-							throw new SupremicaException("AutomataToIEC61499.printAlgorithmDeclarations: " + "Could not find the next state from state " + currState.getName() + " with label " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
+							throw new SupremicaException("ModuleToIEC61499.printAlgorithmDeclarations: " + "Could not find the next state from state " + currState.getName() + " with label " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
 						}
 
 						int toStateIndex = toState.getSynchIndex();
