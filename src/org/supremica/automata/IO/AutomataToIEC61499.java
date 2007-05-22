@@ -48,7 +48,7 @@
  */
 
 /*
- * @author Goran Cengic
+ * @author Goran Cengic (cengic@chalmers.se)
  */
 
 package org.supremica.automata.IO;
@@ -62,14 +62,9 @@ import org.supremica.log.*;
 import org.supremica.automata.*;
 import org.supremica.util.SupremicaException;
 
-//TODO: Make state variables int
-
 /** This class generates an IEC-61499 function block
- * application implementing the automata in the 
- * current project.
- *
- * @author Goran Cengic
- *
+ *  application implementing the automata in the 
+ *  current project.
  */
 public class AutomataToIEC61499
 {

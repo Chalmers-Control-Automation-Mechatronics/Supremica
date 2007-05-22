@@ -15,11 +15,10 @@
  *   License along with this library; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
- *   To contact author please refer to contact information in the README file.
  */
 
 /*
- * @author Goran Cengic
+ * @author Goran Cengic (cengic@chalmers.se)
  */
 package org.supremica.external.iec61499fb2efa;
 
