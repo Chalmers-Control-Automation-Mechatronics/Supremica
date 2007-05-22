@@ -47,7 +47,7 @@
  *  Supremica is owned and represented by KA.
  */
 
-// This is the guy that ties together the Gui and the menus
+// This is the class that ties together the GUI and the menus
 // This is nothing but the Controller in the ModelViewController pattern
 package org.supremica.gui;
 

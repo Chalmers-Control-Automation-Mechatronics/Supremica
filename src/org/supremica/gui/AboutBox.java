@@ -89,7 +89,7 @@ public class AboutBox
 	String version = Version.version();
 	String copyright = "Copyright © 1999-2005";
 	String authors1 = "Knut \u00c5kesson, Hugo Flordal, Martin Fabian";
-	String authors2 = "Anders Hellgren, Arash Vahidi, Goran Cengic";
+	String authors2 = "Anders Hellgren, Arash Vahidi";
 	String comments1 = "Northwoods Software - http://www.nwoods.com";
 	String comments2 = "AT&T Research - http://www.graphviz.org";
 

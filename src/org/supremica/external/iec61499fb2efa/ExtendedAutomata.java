@@ -28,14 +28,12 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBException;
 
-
+import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-
-import net.sourceforge.waters.xsd.base.EventKind;
 
 public class ExtendedAutomata
 {
