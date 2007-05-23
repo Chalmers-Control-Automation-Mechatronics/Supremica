@@ -122,9 +122,11 @@ public class BisimulationEquivalenceMinimizer
      * @param strong If true, minimizes with respect to strong bisimulation equivalence,
      * if false, minimizes with respect to weak bisimulation equivalence.
      */
-    public static void minimize(Automaton aut, boolean useShortNames, boolean strong)
+    public static int minimize(Automaton aut, boolean useShortNames, boolean strong)
     throws UnsatisfiedLinkError
     {
+        int before = aut.nbrOfStates();
+        
         // Set the indices in the automaton.
         aut.setIndices();
         
@@ -286,6 +288,8 @@ public class BisimulationEquivalenceMinimizer
             }
         }
         part = null;
+        
+        return before - aut.nbrOfStates();
     }
     
     /**

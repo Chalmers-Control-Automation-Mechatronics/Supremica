@@ -78,16 +78,6 @@ public class AutomatonMinimizer
     /** The supplied options. */
     private MinimizationOptions options;
     
-    // Local debug stuff... to be erased when things are stable!
-    private static int totalSC = 0;
-    private static int totalOSI = 0;
-    private static int totalAE = 0;
-    private static int totalCC = 0;
-    private static int totalD = 0;
-    private static int totalOSO = 0;
-    private static int totalOES = 0;
-    private static int totalOET = 0;
-    
     // Use short names (state names are either integers or based on their parent states)
     private boolean useShortNames = false;
     
@@ -194,19 +184,22 @@ public class AutomatonMinimizer
                 return null;
             }
             
+            int countHWS = 0;
+            int countBSE = 0;
+            
             /////////////////////////
             // "Halfway-synthesis" //
             /////////////////////////
-            halfWaySynthesis(theAutomaton);
+            countHWS += halfWaySynthesis(theAutomaton);
             
             // Check if the library with the native methods is ok
-            if (BisimulationEquivalenceMinimizer.libraryLoaded())
+            if (false && BisimulationEquivalenceMinimizer.libraryLoaded())
             {
                 // tau_u-saturate!
                 supervisionEquivalenceSaturate(theAutomaton);
                 
                 // Partition using native methods, long state names and STRONG bisimulation equivalence
-                BisimulationEquivalenceMinimizer.minimize(theAutomaton, false, true);
+                countBSE += BisimulationEquivalenceMinimizer.minimize(theAutomaton, false, true);
             }
             
             // Message
@@ -220,6 +213,11 @@ public class AutomatonMinimizer
             
             // Start listening again
             theAutomaton.endTransaction();
+            
+            logger.fatal("Halfway synthesis: " + countHWS + ", bisimulation equivalence: " + countBSE);
+            
+            totalHWS += countHWS;
+            totalBSE += countBSE;
             
             // Finished!
             return theAutomaton;
@@ -529,7 +527,7 @@ public class AutomatonMinimizer
     private Automaton buildAutomaton(EquivalenceClasses equivClasses)
     throws Exception
     {
-        Automaton newAutomaton = new Automaton();
+        Automaton newAutomaton = new Automaton(theAutomaton.getName());
         
         // Don't listen to this!
         newAutomaton.beginTransaction();
@@ -598,9 +596,6 @@ public class AutomatonMinimizer
                 }
             }
         }
-        
-        // Give the automaton an appropriate comment
-        newAutomaton.setName(theAutomaton.getName());
         
         // Start listening again
         newAutomaton.endTransaction();
@@ -1788,19 +1783,24 @@ public class AutomatonMinimizer
         return count;
     }
     
-    public static String getStatistics()
-    {
-        return ("Reduction statistics: activeEvent: " + totalAE + ", silentCont: " + totalSC + ", certainConf: " + totalCC + ", onlySilentIn: " + totalOSI + ", onlySilentOut: " + totalOSO + ", D: " + totalD + ", OES: " + totalOES + ", OET: " + totalOET + ".");
-    }
-    public static String getStatisticsLaTeX()
-    {
-        return(totalAE + " & " + totalSC + " & " + totalCC + " & " + totalOSI + " & " + totalOSO + " & " + totalOES + " & " + totalOET);
-    }
-    public static String getWodesStatisticsLaTeX()
-    {
-        return(totalAE + " & " + totalSC + " & " + totalCC + " & " + (totalOSI + totalOSO) + " & " + totalOES + " & " + totalOET);
-    }
-    public static void resetTotal()
+    // Statistics for ConflictEquivalence
+    private static int totalSC;
+    private static int totalOSI;
+    private static int totalAE;
+    private static int totalCC;
+    private static int totalD;
+    private static int totalOSO;
+    private static int totalOES;
+    private static int totalOET;
+    
+    // Statistics for SupervisionEquivalence
+    private static int totalHWS;
+    private static int totalBSE;
+
+    /**
+     * Reset statistics info.
+     */
+    public static void resetStatistics()
     {
         totalSC = 0;
         totalOSI = 0;
@@ -1810,8 +1810,32 @@ public class AutomatonMinimizer
         totalOSO = 0;
         totalOES = 0;
         totalOET = 0;
+        
+        totalBSE = 0;
+        totalHWS = 0;
+    }
+
+    /**
+     * Loggs some relevant statistics for the minimisation.
+     */
+    public static void logStatistics(MinimizationOptions options)
+    {
+        if (options.getMinimizationType() == EquivalenceRelation.CONFLICTEQUIVALENCE)
+            logger.info("Reduction statistics: activeEvent: " + totalAE + ", silentCont: " + totalSC + ", certainConf: " + totalCC + ", onlySilentIn: " + totalOSI + ", onlySilentOut: " + totalOSO + ", D: " + totalD + ", OES: " + totalOES + ", OET: " + totalOET + ".");
+        else if (options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE)
+            logger.info("Reduction statistics: halfway Synthesis: " + totalHWS + ", bisimulation equivalence " + totalBSE);
     }
     
+    public static String getStatisticsLaTeX()
+    {
+        return(totalAE + " & " + totalSC + " & " + totalCC + " & " + totalOSI + " & " + totalOSO + " & " + totalOES + " & " + totalOET);
+    }
+    
+    public static String getWodesStatisticsLaTeX()
+    {
+        return(totalAE + " & " + totalSC + " & " + totalCC + " & " + (totalOSI + totalOSO) + " & " + totalOES + " & " + totalOET);
+    }
+            
     /**
      * Add tau-transitions to cover for the epsilon events (aka "saturate"). More formally, each
      * time there is a transition "p =epsilon=> q", after completing the transitive closure (or
@@ -2246,7 +2270,7 @@ public class AutomatonMinimizer
     throws Exception
     {
         //logger.info("Halfway-synthesis on " + aut);
-        int sizeBefore = aut.nbrOfStates();
+        int before = aut.nbrOfStates();
         
         // Loop
         boolean outerChange = true;
@@ -2348,7 +2372,7 @@ public class AutomatonMinimizer
             aut.removeState(toBeRemoved.remove(0));
         }
         
-        return sizeBefore - aut.nbrOfStates();
+        return before - aut.nbrOfStates();
     }
     
     /**

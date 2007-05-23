@@ -167,7 +167,7 @@ public class AutomataMinimizer
         heuristicList.addFirst(options.getMinimizationHeuristic());
         
         // Initialize statistics count
-        AutomatonMinimizer.resetTotal();
+        AutomatonMinimizer.resetStatistics();
         
         // Special pre-minimization stuff
         if (options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE)
@@ -330,13 +330,12 @@ public class AutomataMinimizer
         if (Config.VERBOSE_MODE.isTrue())
         {
             // Print total reduction statistics
-            logger.info(AutomatonMinimizer.getStatistics());
+            AutomatonMinimizer.logStatistics(options);
             // Print largest automaton size
             logger.info("The automaton with the most states had " + mostStates + " states.");
             logger.info("The automaton with the most transitions had " + mostTransitions + " transitions.");
-            // Print total state number examined
-            logger.info("The automata examined had " + totalStates + " states in total.");
-            logger.info("The automata examined had " + totalTransitions + " transitions in total.");
+            // Print total state & transition number examined
+            logger.info("The automata encountered had " + totalStates + " states and " + totalTransitions + " transitions in total.");
         }
         else
         {
