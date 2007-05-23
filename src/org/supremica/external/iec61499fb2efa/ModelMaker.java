@@ -1159,7 +1159,19 @@ class ModelMaker
 		final int evMaxID = ((Integer) eventsMaxID.get(fbName)).intValue();
 		eventQueue.addIntegerVariable("queuing_event_" + fbName, 0, evMaxID, 0, null);
 
-		// data input variables for each queue place
+		// event input variables
+		if (theType.getInterfaceList().isSetInputVars())
+		{
+			final List eventInputs = theType.getInterfaceList().getEventInputs().getEvent();
+			for (Iterator eventInputsIter = eventInputs.iterator(); eventInputsIter.hasNext();)
+			{
+				JaxbEvent curEventInput = (JaxbEvent) eventInputsIter.next();
+				String curEventInputName = curEventInput.getName();
+				eventQueue.addIntegerVariable("event_" + curEventInputName + "_" + fbName, 0, 1, 0, null);
+			}
+		}
+
+		// data input variables
 		if (theType.getInterfaceList().isSetInputVars())
 		{
 			final List dataInputs = theType.getInterfaceList().getInputVars().getVarDeclaration();
@@ -1300,7 +1312,7 @@ class ModelMaker
  				String to = "s" + i;
  				String event = "queue_event_" + fbName + ";";
  				String guard = "queuing_event_" + fbName + " == " + eventID;
- 				String action = "event_" + fbName + "_place_" + i + " = queuing_event_" + fbName + ";";
+ 				String action = "event_" + fbName + "_place_" + i + " = queuing_event_examplesexamples" + fbName + ";";
 				if (curEvent.isSetWith())
 				{
 					List withData = curEvent.getWith();
@@ -1323,7 +1335,7 @@ class ModelMaker
  				to = "s" + (i-1);
  				event = "remove_event_" + fbName + ";";
  				guard = "event_" + fbName + "_place_" + i + " == " + eventID;
- 				action = "event_" + fbName + " = event_" + fbName + "_place_" + i + ";";
+ 				action = "event_" + eventName + "_" + fbName + " = 1;";
 				// move events in the queue
 				for (int j = 1; j <= i-1; j++)
 				{
@@ -1370,18 +1382,15 @@ class ModelMaker
 	private void makeBasicFBExecutionControlChart(String fbName)
 	{
 		System.out.println("\t Execution Control Chart");
-	
+		
+		String typeName = (String) basicFunctionBlocks.get(fbName);
+		JaxbFBType theType = (JaxbFBType) fbTypes.get(typeName);
+		
+		ExtendedAutomaton ecc = new ExtendedAutomaton("Execution Control Chart " + fbName, automata);
 
 		
 
-
-
-
-
-
-
-
-
+		automata.addAutomaton(ecc);	
 	}
 
 	private void makeBasicFBAlgorithms(String fbName)
