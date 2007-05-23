@@ -504,7 +504,7 @@ public class MultithreadedAstar
 			}
 			else if (((MultithreadedNode) scheduleInfo.get(i)).getSubthreads() != null)
 			{
-				firingTime = scheduleInfo.get(i).getValueAt(ACCUMULATED_COST_INDEX);
+				firingTime = scheduleInfo.get(i).getValueAt(ACCUMULATED_COST_INDEX);  
 			}
 			State nextState = makeStateFromNode(scheduleInfo.get(i), scheduleAuto, firingTime);
 			scheduleAuto.addState(nextState);

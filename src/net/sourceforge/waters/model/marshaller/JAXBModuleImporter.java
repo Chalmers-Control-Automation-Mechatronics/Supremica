@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.21 2007-02-28 00:03:24 robi Exp $
+//# $Id: JAXBModuleImporter.java,v 1.22 2007-05-23 07:23:47 avenir Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;

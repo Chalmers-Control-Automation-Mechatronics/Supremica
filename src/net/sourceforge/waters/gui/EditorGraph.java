@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorGraph
 //###########################################################################
-//# $Id: EditorGraph.java,v 1.16 2007-02-16 03:00:42 robi Exp $
+//# $Id: EditorGraph.java,v 1.17 2007-05-23 07:23:00 avenir Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;

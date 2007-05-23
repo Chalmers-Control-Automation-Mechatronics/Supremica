@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   ProxyShapeProducer
 //###########################################################################
-//# $Id: ProxyShapeProducer.java,v 1.23 2007-04-04 07:24:01 flordal Exp $
+//# $Id: ProxyShapeProducer.java,v 1.24 2007-05-23 07:23:00 avenir Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;

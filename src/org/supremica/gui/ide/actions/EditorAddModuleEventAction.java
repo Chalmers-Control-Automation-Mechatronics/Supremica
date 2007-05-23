@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorAddEventAction
 //###########################################################################
-//# $Id: EditorAddModuleEventAction.java,v 1.6 2007-02-12 21:38:49 robi Exp $
+//# $Id: EditorAddModuleEventAction.java,v 1.7 2007-05-23 07:24:11 avenir Exp $
 //###########################################################################
 
 
@@ -13,7 +13,9 @@ package org.supremica.gui.ide.actions;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.List;
+import javax.swing.KeyStroke;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
@@ -32,7 +34,7 @@ public class EditorAddModuleEventAction
         putValue(Action.SHORT_DESCRIPTION, "Add a new event to the module");
         putValue(Action.SMALL_ICON,
             new ImageIcon(IDE.class.getResource("/icons/waters/event16.gif")));
-//		putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
+        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
         putValue(Action.ACTION_COMMAND_KEY, KEY);
     }
     

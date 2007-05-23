@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.35 2007-01-31 17:52:14 flordal Exp $
+//# $Id: EditorComponentsPanel.java,v 1.36 2007-05-23 07:24:11 avenir Exp $
 //###########################################################################
 
 
@@ -86,6 +86,12 @@ class EditorComponentsPanel
     public void addComponent()
     {
         new EditorNewComponentDialog(this);
+    }
+    
+    public void renameComponent(SimpleComponentSubject component)
+    {
+        new EditorRenameComponentDialog(this, component);
+        moduleSelectTree.updateSelectedNode();
     }
     
     // To do remove this - this is a dummy impl used to satisfy EditorPanelInterface
@@ -332,6 +338,23 @@ class EditorComponentsPanel
                     {
                         moduleContainer.getIDE().error("Name " + newIdentifier.getName() + " already exists in module.");
                     }
+                }
+            }
+        }
+         
+        if ("rename component".equals(e.getActionCommand()))
+        {
+            TreePath currentSelection = moduleSelectTree.getSelectionPath();
+            if (currentSelection != null)
+            {
+                // Get the node in the tree
+                DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) (currentSelection.getLastPathComponent());
+                // Get the component 
+                Subject component = ((ComponentInfo) targetNode.getUserObject()).getComponent();
+                if(component instanceof SimpleComponentSubject)
+                {
+                    SimpleComponentSubject simpleComponent = (SimpleComponentSubject) component;
+                    renameComponent(simpleComponent);            
                 }
             }
         }

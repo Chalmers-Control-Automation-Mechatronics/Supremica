@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.40 2007-05-09 18:05:59 robi Exp $
+//# $Id: ComponentEditorPanel.java,v 1.41 2007-05-23 07:24:11 avenir Exp $
 //###########################################################################
 
 
@@ -43,10 +43,13 @@ import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.renderer.Handle;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.base.NamedSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -370,7 +373,21 @@ public class ComponentEditorPanel
 			w.write("%%Page: 1 1");
 			w.newLine();
 			w.newLine();
-
+              
+			w.write("/actionLabel {");
+			w.newLine();
+			w.write("\tgsave");
+			w.newLine();
+			w.write("\t0.6 0.15 0.15 setrgbcolor");
+			w.newLine();
+			w.write("\tControllableFont label");
+			w.newLine();
+			w.write("\tgrestore");
+			w.newLine();
+			w.write("} def");
+			w.newLine();
+			w.newLine();
+                        
 			// Useful functions are defined and added to the eps-file
 			w.write("/arrow {");
 			w.newLine();
@@ -421,6 +438,20 @@ public class ComponentEditorPanel
 			w.write("} def");
 			w.newLine();
 			w.newLine();
+                        
+			w.write("/guardLabel {");
+			w.newLine();
+			w.write("\tgsave");
+			w.newLine();
+			w.write("\t0.0 0.5 0.5 setrgbcolor");
+			w.newLine();
+			w.write("\tControllableFont label");
+			w.newLine();
+			w.write("\tgrestore");
+			w.newLine();
+			w.write("} def");
+			w.newLine();
+			w.newLine();
 
 			w.write("/label {");
 			w.newLine();
@@ -433,6 +464,43 @@ public class ComponentEditorPanel
 			w.write("\tshow");
 			w.newLine();
 			w.write("\tstroke");
+			w.newLine();
+			w.write("} def");
+			w.newLine();
+			w.newLine();
+                        
+			w.write("/loop {");
+			w.newLine();
+			w.write("\tnewpath");
+			w.newLine();
+			w.write("\t28 -2 roll moveto");
+			w.newLine();
+                        w.write("\t26 -2 roll lineto");
+			w.newLine();
+                        w.write("\t24 -2 roll lineto");
+			w.newLine();
+                        w.write("\t22 -6 roll curveto");
+			w.newLine();
+                        w.write("\t16 -6 roll curveto");
+			w.newLine();
+                        w.write("\t10 -6 roll curveto");
+			w.newLine();
+                        w.write("\t4 -2 roll lineto");
+			w.newLine();
+                        w.write("\tlineto");
+			w.newLine();
+			w.write("\tstroke");
+			w.newLine();
+			w.write("} def");
+			w.newLine();
+			w.newLine();
+                        
+                        // Useful functions are defined and added to the eps-file
+			w.write("/loopArrow {");
+			w.newLine();
+			w.write("\tarrowHead");
+			w.newLine();
+			w.write("\tloop");
 			w.newLine();
 			w.write("} def");
 			w.newLine();
@@ -600,6 +668,7 @@ public class ComponentEditorPanel
 							{
 								PathIterator paths = handle.getShape().getPathIterator(transform);
 
+                                                                String psStr = "";
 								while (!paths.isDone())
 								{
 									double[] coords = new double[6];
@@ -607,12 +676,12 @@ public class ComponentEditorPanel
 							
 									if (res != PathIterator.SEG_CLOSE)
 									{
-										w.write(Math.round(coords[0]) + " " + Math.round(coords[1]) + " ");
+										psStr += Math.round(coords[0]) + " " + Math.round(coords[1]) + " \n";
 									}
 							
 									paths.next();
 								}
-								w.write("straightArrow");
+								w.write(psStr.substring(0, psStr.length()-1) + "straightArrow");
 								w.newLine();
 
 								Rectangle2D bounds = handle.getShape().getBounds2D();
@@ -658,30 +727,49 @@ public class ComponentEditorPanel
 				}
 
 				// Write the geometry information about the edge to the eps-file
+                                String psStr = "";
 				while (!paths.isDone())
 				{
 					double[] coords = new double[6];
 					int res = paths.currentSegment(coords);
-
+                                        
+                                        //temp
+                                        String str = res + ": ";
+                                        for (int i=0; i<coords.length; i++)
+                                            str += coords[i] + " ";
+                                        System.out.println(edge.getSource().getName() + " -> " + edge.getTarget().getName() + "... " + str);
+                                            
 					if (res != PathIterator.SEG_CLOSE)
 					{
-						// The ps-commands are either "moveto", using 2 arguments
-						// or "curveto" (in java SEG_QUADTO) using 4 arguments
+						// The ps-commands are either "moveto", using 2 arguments,
+						// "curveto" using 4 arguments (in java SEG_QUADTO) or 
+                                                // "curveto" using 6 arguments (Bézier interpolation) (in java SEG_CUBICTO)
 						int nrOfCoords = 2;
 						if (res == PathIterator.SEG_QUADTO)
 						{
 							nrOfCoords = 4;
 						}
+                                                else if (res == PathIterator.SEG_CUBICTO)
+                                                {
+                                                    nrOfCoords = 6;
+                                                    
+                                                    // SEG_CUBICTO, used to draw self-loops, requires special treatment
+                                                    command = "loopArrow";
+                                                }
 
 						for (int i=0; i<nrOfCoords; i++)
 						{
-							w.write(Math.round(coords[i]) + " ");
+							//w.write(Math.round(coords[i]) + " ");
+                                                    psStr += Math.round(coords[i]) + " ";
 						}
+
+                                                psStr += "\n";
 					}
 					else
 					{
-						w.write(command);
+                                                w.write(psStr.substring(0, psStr.length()-1) + command);
 						w.newLine();
+                                                break;
 					}
 
 					paths.next();
@@ -724,6 +812,41 @@ public class ComponentEditorPanel
 					// Update the bounding box
 					boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, eventShape.getBounds2D(), labelTransform);
 				}
+                                
+                                // Add guards and actions to the eps-file
+                                GuardActionBlockProxy guardActionBlock = edge.getGuardActionBlock();
+                                for (BinaryExpressionProxy action : guardActionBlock.getActions())
+                                {
+                                    System.out.println("action.left = " + action.getLeft());
+                                    System.out.println("action.operator = " + action.getOperator().getName());
+                                    System.out.println("action.right = " + action.getRight());
+                                    System.out.println("action.to_string = " + action);
+                                    
+                                    Shape actionShape = producer.getShape(action).getShape();
+                                    Point2D actionAnchor = labelTransform.transform(new Point2D.Double(actionShape.getBounds2D().getMinX(), actionShape.getBounds2D().getMinY()), null);
+                                    actionAnchor.setLocation(Math.round(actionAnchor.getX()), Math.round(actionAnchor.getY()));
+                                    System.out.println("at (" + actionAnchor.getX() + ", " + actionAnchor.getY() + ")");
+                                    
+                                    w.write("(" + action + ") " + actionAnchor.getX() + " " + actionAnchor.getY() + " actionLabel");
+                                    w.newLine();
+                                    
+                                    // Update the bounding box
+                                    boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, actionShape.getBounds2D(), labelTransform);
+                                }
+                                for (SimpleExpressionProxy guard : guardActionBlock.getGuards())
+                                {
+                                    System.out.println("guard.to_string = " + guard);
+                                    Shape guardShape = producer.getShape(guard).getShape();
+                                    Point2D guardAnchor = labelTransform.transform(new Point2D.Double(guardShape.getBounds2D().getMinX(), guardShape.getBounds2D().getMinY()), null);
+                                    guardAnchor.setLocation(Math.round(guardAnchor.getX()), Math.round(guardAnchor.getY()));
+                                    System.out.println("at (" + guardAnchor.getX() + ", " + guardAnchor.getY() + ")");
+                                    
+                                    w.write("(" + guard + ") " + guardAnchor.getX() + " " + guardAnchor.getY() + " guardLabel");
+                                    w.newLine();
+                                    
+                                    // Update the bounding box
+                                    boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, guardShape.getBounds2D(), labelTransform);
+                                }
 
 				// Add an empty line after each edge-info
 				w.newLine();

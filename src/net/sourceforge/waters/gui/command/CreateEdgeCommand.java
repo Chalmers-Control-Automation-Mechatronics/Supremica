@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.command
 //# CLASS:   CreateEdgeCommand
 //###########################################################################
-//# $Id: CreateEdgeCommand.java,v 1.17 2007-02-12 21:38:49 robi Exp $
+//# $Id: CreateEdgeCommand.java,v 1.18 2007-05-23 07:23:00 avenir Exp $
 //###########################################################################
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorAddEventAction
 //###########################################################################
-//# $Id: EditorAddComponentEventAction.java,v 1.5 2007-02-22 01:41:43 siw4 Exp $
+//# $Id: EditorAddComponentEventAction.java,v 1.6 2007-05-23 07:24:11 avenir Exp $
 //###########################################################################
 
 

@@ -14,16 +14,17 @@ import net.sourceforge.waters.subject.module.VariableSubject;
 class ModuleTreePopupMenu
     extends VPopupMenu
 {
-    private JMenuItem addVariableItem;
-    private JMenuItem deleteVariableItem;
-    private JMenuItem deleteComponentItem;
-    private JMenuItem copyComponentItem;
-    private JMenuItem editVariableItem;
     private JMenuItem addComponentItem;
+    private JMenuItem addVariableItem;
+    private JMenuItem copyComponentItem;
+    private JMenuItem deleteComponentItem;
+    private JMenuItem deleteVariableItem;
+    private JMenuItem editVariableItem;
+    private JMenuItem renameComponentItem;
+    private JMenuItem showCommentItem;
     private JMenuItem toPlantTypeItem;
     private JMenuItem toSpecificationTypeItem;
-    private JMenuItem toSupervisorTypeItem;
-    private JMenuItem showCommentItem;
+    private JMenuItem toSupervisorTypeItem;    
     private AbstractSubject mInvokingComponent;
     private ModuleTree mTree;
     private ModuleWindowInterface mWindow;
@@ -63,6 +64,12 @@ class ModuleTreePopupMenu
             item.addActionListener(mWindow);
             this.add(item);
             copyComponentItem = item;
+            
+            item = new JMenuItem("Rename component");
+            item.setActionCommand("rename component");
+            item.addActionListener(mWindow);
+            this.add(item);
+            renameComponentItem = item;
 
             JMenu typeMenu = new JMenu("Set type");
             this.add(typeMenu);
