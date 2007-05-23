@@ -1312,7 +1312,7 @@ class ModelMaker
  				String to = "s" + i;
  				String event = "queue_event_" + fbName + ";";
  				String guard = "queuing_event_" + fbName + " == " + eventID;
- 				String action = "event_" + fbName + "_place_" + i + " = queuing_event_examplesexamples" + fbName + ";";
+ 				String action = "event_" + fbName + "_place_" + i + " = queuing_event_" + fbName + ";";
 				if (curEvent.isSetWith())
 				{
 					List withData = curEvent.getWith();
