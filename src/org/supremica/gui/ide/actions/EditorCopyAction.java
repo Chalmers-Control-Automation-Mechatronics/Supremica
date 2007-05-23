@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   EditorCopyAction
 //###########################################################################
-//# $Id: EditorCopyAction.java,v 1.5 2007-02-25 09:42:49 robi Exp $
+//# $Id: EditorCopyAction.java,v 1.6 2007-05-23 15:47:29 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -30,47 +30,52 @@ import org.supremica.gui.ide.ModuleContainer;
 
 
 public class EditorCopyAction
-	extends IDEAction
+    extends IDEAction
 {
-	private static final long serialVersionUID = 1L;
-
-	public EditorCopyAction(List<IDEAction> actionList)
-	{
-		super(actionList);
-
-		setEditorActiveRequired(true);
-
-		putValue(Action.NAME, "Copy");
-		putValue(Action.SHORT_DESCRIPTION, "Copy");
-    putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
-    putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_C));
-		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Copy16.gif")));
-	}
-
-	public void actionPerformed(ActionEvent e)
-	{
-		doAction();
-	}
-
-	public void doAction()
-	{
-		final ControlledSurface surface =
-			ide.getActiveEditorWindowInterface().getControlledSurface();
-		final Collection<ProxySubject> selected = surface.getSelected();
-		final Collection<NodeSubject> nodes = new LinkedList<NodeSubject>();
-		final Collection<EdgeSubject> edges = new LinkedList<EdgeSubject>();
-		for (final ProxySubject item : selected) {
-			if (item instanceof NodeSubject) {
-				nodes.add((NodeSubject) item);
-			} else if (item instanceof EdgeSubject) {
-				edges.add((EdgeSubject) item);
-			}
-		}
-		if (!nodes.isEmpty()) {
-			GraphContainer cont = new GraphContainer(nodes, edges);
-			ObjectTransfer trans = new ObjectTransfer(cont);
-			Toolkit.getDefaultToolkit().getSystemClipboard().
-				setContents(trans, surface);
-		}
-	}
+    private static final long serialVersionUID = 1L;
+    
+    public EditorCopyAction(List<IDEAction> actionList)
+    {
+        super(actionList);
+        
+        setEditorActiveRequired(true);
+        
+        putValue(Action.NAME, "Copy");
+        putValue(Action.SHORT_DESCRIPTION, "Copy");
+        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
+        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_C));
+        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Copy16.gif")));
+    }
+    
+    public void actionPerformed(ActionEvent e)
+    {
+        doAction();
+    }
+    
+    public void doAction()
+    {
+        final ControlledSurface surface =
+            ide.getActiveEditorWindowInterface().getControlledSurface();
+        final Collection<ProxySubject> selected = surface.getSelected();
+        final Collection<NodeSubject> nodes = new LinkedList<NodeSubject>();
+        final Collection<EdgeSubject> edges = new LinkedList<EdgeSubject>();
+        for (final ProxySubject item : selected)
+        {
+            if (item instanceof NodeSubject)
+            {
+                nodes.add((NodeSubject) item);
+            }
+            else if (item instanceof EdgeSubject)
+            {
+                edges.add((EdgeSubject) item);
+            }
+        }
+        if (!nodes.isEmpty())
+        {
+            GraphContainer cont = new GraphContainer(nodes, edges);
+            ObjectTransfer trans = new ObjectTransfer(cont);
+            Toolkit.getDefaultToolkit().getSystemClipboard().
+                setContents(trans, surface);
+        }
+    }
 }

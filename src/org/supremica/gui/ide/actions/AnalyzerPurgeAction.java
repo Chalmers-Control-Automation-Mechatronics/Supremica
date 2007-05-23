@@ -3,6 +3,7 @@ package org.supremica.gui.ide.actions;
 import java.util.List;
 import javax.swing.Action;
 import java.awt.event.ActionEvent;
+import javax.swing.ImageIcon;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.algorithms.AutomatonPurge;
@@ -35,6 +36,7 @@ public class AnalyzerPurgeAction
 //        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
 //        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
 //        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Icon.gif")));
+        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/purge16.gif")));
     }
 
     public void actionPerformed(ActionEvent e)

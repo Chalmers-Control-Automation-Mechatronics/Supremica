@@ -33,9 +33,8 @@ public class AnalyzerViewStatesAction
         putValue(Action.SHORT_DESCRIPTION, "View states");
         //        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
         //        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
-
-        //putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/node16.gif")));
-        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/States16.gif")));
+        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/states16.gif")));
+        //putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/States16.gif")));
     }
 
     public void actionPerformed(ActionEvent e)

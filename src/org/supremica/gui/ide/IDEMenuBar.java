@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.36 2007-02-22 22:04:22 robi Exp $
+//# $Id: IDEMenuBar.java,v 1.37 2007-05-23 15:47:29 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -14,6 +14,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.*;
+import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -129,6 +130,7 @@ public class IDEMenuBar
         menu = new JMenu("Analyze");
         menu.setMnemonic(KeyEvent.VK_A);
         JMenu viewMenu = new JMenu("View");
+        viewMenu.setIcon(new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Zoom16.gif")));
         viewMenu.add(ide.getActions().analyzerViewAutomatonAction.getMenuItem());
         viewMenu.add(ide.getActions().analyzerViewAlphabetAction.getMenuItem());
         viewMenu.add(ide.getActions().analyzerViewStatesAction.getMenuItem());

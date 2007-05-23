@@ -29,7 +29,7 @@ public class AnalyzerViewAutomatonAction
         super(actionList);
 
         setEditorActiveRequired(false);
-        setAnalyzerActiveRequired(true);
+        setAnalyzerActiveRequired(true); 
 
         putValue(Action.NAME, "Automaton");
         putValue(Action.SHORT_DESCRIPTION, "View Automaton");

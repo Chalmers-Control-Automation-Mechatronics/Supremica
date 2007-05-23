@@ -4,6 +4,7 @@ import java.util.List;
 import javax.swing.Action;
 import javax.swing.JOptionPane;
 import java.awt.event.ActionEvent;
+import javax.swing.ImageIcon;
 import org.supremica.automata.Automata;
 import org.supremica.automata.IO.EncodingHelper;
 import org.supremica.gui.AutomataHierarchyViewer;
@@ -35,7 +36,7 @@ public class AnalyzerViewModularStructureAction
         putValue(Action.SHORT_DESCRIPTION, "View Modular Structure");
 //        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
 //        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
-//        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Icon.gif")));
+        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/modularstructure16.gif")));
     }
 
     public void actionPerformed(ActionEvent e)
