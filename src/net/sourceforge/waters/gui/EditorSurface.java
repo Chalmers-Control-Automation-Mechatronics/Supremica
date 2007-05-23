@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorSurface
 //###########################################################################
-//# $Id: EditorSurface.java,v 1.79 2007-04-04 07:24:01 flordal Exp $
+//# $Id: EditorSurface.java,v 1.80 2007-05-23 14:15:51 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -160,7 +160,15 @@ public class EditorSurface
         //AbstractRendererShape.setBasicStroke(AbstractRendererShape.THINSTROKE); // Too thin for presentations
         AbstractRendererShape.setBasicStroke(AbstractRendererShape.SINGLESTROKE); // Just right?
         //AbstractRendererShape.setBasicStroke(AbstractRendererShape.DOUBLESTROKE); // Too thick
+
+        // Clear selection?
+        
+        // Paint the component on the supplied Graphics instance
         paintComponent(g, true);
+
+        // Reset selection?
+        
+        // Reset stroke
         AbstractRendererShape.setBasicStroke(AbstractRendererShape.SINGLESTROKE);
     }
     
@@ -182,13 +190,14 @@ public class EditorSurface
         {
             paintGrid(g);
         }
-    /*
-    // Don't do anything if there is nothing to do!
-    if ((nodes == null) || (nodes.size() == 0))
-    {
-    return;
-    }
-     */
+
+        /*
+        // Don't do anything if there is nothing to do!
+        if ((nodes == null) || (nodes.size() == 0))
+        {
+        return;
+        }
+         */
         Renderer renderer = new Renderer();
         renderer.renderGraph(getDrawnGraph(), getDrawnObjects(), this,
             getShapeProducer(), (Graphics2D)g);
