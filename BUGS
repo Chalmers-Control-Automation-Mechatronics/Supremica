@@ -1,4 +1,21 @@
-There is currently no real bug-tracking system for Supremica/Waters... we should start a new one! 
+
+
+
+
+
+*********************************************************
+BUGS are now handled in a bug-tracking system. Find and 
+access it through
+             www.supremica.org/admin
+
+If you want to simply view the bugs, click the "View" tab                    
+and then "Bugs", if you want to edit the bugs, click the                       
+"Pages" tab and then "bugs" in the list.    
+*********************************************************
+
+
+
+
 
  * In the IDE, if a file is opened, then changed outside the IDE and then opened again in IDE, the change can not be seen! The DocumentManager caches too much?
    * DocumentManager can be upgraded to check file modification times. But how should the IDE react if the contents of a module being edited are changed by an external program? -- Robi.
@@ -6,22 +23,16 @@ There is currently no real bug-tracking system for Supremica/Waters... we should
  * Problem in the IDE when using special characters in state names (åäö för example). Saved files can not be opened.
    * Special characters should not be permitted to enter -- Robi.
  * ProjectBuildFromWaters must use DocumentManager from IDE, otherwise module instantiation does not work -- Robi.
- * Supremica Synthesis fails on tictactoe example (no initial state reported) -- Robi.
  * New modules should not contain any events. Default markings :accepting and :forbidden should only be created when explicitly requested -- Robi.
- * Currently some examples exist in double "copies", in examples/waters/handwritten and in  examples/includeInJarFile/ModuleExamples... 
 
  * Check menu keyboard shortcuts. ALT or CONTROL --- presently ALT-E
    is used twice -- Robi.
  * Group node error feedback should be given while dragging -- Robi.
- * Flip edge operation is broken -- Robi.
  * Encapsulated Postscript exporter is broken. It is trying to reimplement
    renderer functionality which, predictably, does not work properly.
    Printing _must_ be done through Renderer and Graphics2D somehow -- Robi.
- * Selection should not be shown when printing -- Robi.
  * Log display is very slow when large numbers of messages are logged -- Robi.
 
- * TestAutomatonMinimizer does not terminate: Conflict equivalence
-   minimization fails on automaton F in ConflictEquivalenceExamples -- Robi.
  * DNFMinimizer fails several test cases -- Robi.
 
 Previously, all bugs were reported and stored in the bug database, http://www.supremica.org/bugtracking, but this is no longer the case. 
