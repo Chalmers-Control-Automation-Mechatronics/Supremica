@@ -961,7 +961,7 @@ public class AutomatonMinimizer
                 rerunNeeded = false;
                 
                 // Run the rules in the specified order...
-                //final Rule[] order = { Rule.SC, Rule.AE, Rule.OSI, Rule.CC, Rule.OSO}; // Original order
+                //final Rule[] order = { Rule.SC, Rule.AE, Rule.OSI, Rule.CC, Rule.OSO}; // "Original" order
                 final Rule[] order = { Rule.AE, Rule.SC, Rule.OSO, Rule.OSI, Rule.CC};
                 for (Rule rule : order)
                 {
@@ -1010,13 +1010,17 @@ public class AutomatonMinimizer
                         }
                         
                         // Did anything happen
+                        if (stopRequested)
+                            return -1;
+                        if (count < 0)
+                            logger.error("Error when running rule: " + rule + " count: " + count);
                         if (count > 0)
                             change = true;
 
                         //System.out.println("Rule: " + rule + " count: " + count);
                         
                         // This must never happen as it is assumed by many of the rules
-                        //assert(!hasEpsilonLoops(aut));
+                        assert(!hasEpsilonLoops(aut));
                     } while(false && (rule == Rule.OSO || rule == Rule.OSI || rule == Rule.AE) && count > 0);
 
                     // Has anything happened to the number of states?
@@ -1741,6 +1745,7 @@ public class AutomatonMinimizer
                     // hashCode of the state is changed... not gooooood...
                     //   On the other hand... maybe we shouldn't give the state a new name at all?
                     // After all, we don't merge states, we just remove a state?
+                    /*
                     if (!useShortNames)
                     {
                         State toState = outArc.getToState();
@@ -1748,6 +1753,7 @@ public class AutomatonMinimizer
                             toState.getName());
                         //logger.warn("AutomatonMinimizer: Name changed on state, problems with bad hashcodes may appear...");
                     }
+                     */
                 }
                 
                 aut.removeState(state);
