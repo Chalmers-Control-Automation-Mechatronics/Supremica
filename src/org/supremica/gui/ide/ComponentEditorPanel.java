@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.41 2007-05-23 07:24:11 avenir Exp $
+//# $Id: ComponentEditorPanel.java,v 1.42 2007-05-23 16:28:16 robi Exp $
 //###########################################################################
 
 
@@ -127,6 +127,13 @@ public class ComponentEditorPanel
         surface.createOptions(this);
     }
     
+	//########################################################################
+    //# Interface net.sourceforge.waters.gui.EditorWindowInterface
+	public ModuleWindowInterface getModuleWindowInterface()
+	{
+		return mModuleContainer.getEditorPanel();
+	}
+
     public boolean isSaved()
     {
         return isSaved;

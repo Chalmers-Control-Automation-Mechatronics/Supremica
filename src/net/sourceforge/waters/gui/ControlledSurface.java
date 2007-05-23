@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.131 2007-05-23 07:23:00 avenir Exp $
+//# $Id: ControlledSurface.java,v 1.132 2007-05-23 16:28:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -81,6 +81,7 @@ public class ControlledSurface
   extends EditorSurface
   implements Observer, ModelObserver, EmbedderObserver, ClipboardOwner
 {
+
   //#########################################################################
   //# Constructors
   public ControlledSurface(final GraphSubject graph,
@@ -125,7 +126,6 @@ public class ControlledSurface
   
   public void lostOwnership(Clipboard clipboard, Transferable contents)
   {
-    
   }
 
 
@@ -1116,17 +1116,17 @@ public class ControlledSurface
           popup.show(this, event.getX(), event.getY());
         } else if (s instanceof EdgeSubject) {
           EdgeSubject edge = (EdgeSubject) s;
-          EditorEdgePopupMenu popup = new EditorEdgePopupMenu(this, edge);
+          EditorEdgePopupMenu popup = new EditorEdgePopupMenu(mRoot, edge);
           popup.show(this, event.getX(), event.getY());
         } else if (s instanceof LabelBlockSubject) {
           LabelBlockSubject label = (LabelBlockSubject) s;
           EditorLabelBlockPopupMenu popup = new
-            EditorLabelBlockPopupMenu(this, label);
+            EditorLabelBlockPopupMenu(mRoot, label);
           popup.show(this, event.getX(), event.getY());
         } else if (s instanceof GuardActionBlockSubject) {
           GuardActionBlockSubject ga = (GuardActionBlockSubject) s;
           EditorGuardActionBlockPopupMenu popup = new
-            EditorGuardActionBlockPopupMenu(this, ga);
+            EditorGuardActionBlockPopupMenu(mRoot, ga);
           popup.show(this, event.getX(), event.getY());
         }
       } else {
@@ -1391,10 +1391,10 @@ public class ControlledSurface
           text.requestFocusInWindow();
           repaint();
         } else if (mFocusedObject instanceof EdgeSubject) {
-          EditorEditEdgeDialog.showDialog((EdgeSubject) mFocusedObject);
+          EditorEditEdgeDialog.showDialog((EdgeSubject) mFocusedObject, mRoot);
         } else if (mFocusedObject instanceof GuardActionBlockSubject) {
           final EdgeSubject edge = (EdgeSubject) mFocusedObject.getParent();
-          EditorEditEdgeDialog.showDialog(edge);
+          EditorEditEdgeDialog.showDialog(edge, mRoot);
         }
       }
     }
@@ -1642,11 +1642,17 @@ public class ControlledSurface
       super.mouseClicked(event);
       if (event.getButton() == MouseEvent.BUTTON1 &&
           event.getClickCount() == 2 &&
-          mFocusedObject != null &&
-          mFocusedObject instanceof SimpleNodeSubject) {
-        // Double click simple node to create selfloop
-        final SimpleNodeSubject node = (SimpleNodeSubject) mFocusedObject;
-        doCreateEdge(node, node, null, null);
+          mFocusedObject != null) {
+        if (mFocusedObject instanceof SimpleNodeSubject) {
+          // Double click simple node to create selfloop
+          final SimpleNodeSubject node = (SimpleNodeSubject) mFocusedObject;
+          doCreateEdge(node, node, null, null);
+        } else if (mFocusedObject instanceof EdgeSubject) {
+          EditorEditEdgeDialog.showDialog((EdgeSubject) mFocusedObject, mRoot);
+        } else if (mFocusedObject instanceof GuardActionBlockSubject) {
+          final EdgeSubject edge = (EdgeSubject) mFocusedObject.getParent();
+          EditorEditEdgeDialog.showDialog(edge, mRoot);
+        }
       }
     }
 

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentViewPanel
 //###########################################################################
-//# $Id: ComponentViewPanel.java,v 1.4 2007-01-31 17:52:14 flordal Exp $
+//# $Id: ComponentViewPanel.java,v 1.5 2007-05-23 16:28:16 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -143,7 +143,14 @@ public class ComponentViewPanel
         AnalyzerPanel analyzerPanel = mModuleContainer.getAnalyzerPanel();
         analyzerPanel.setRightComponent(this);
     }
-    
+
+	//########################################################################
+    //# Interface net.sourceforge.waters.gui.EditorWindowInterface
+	public ModuleWindowInterface getModuleWindowInterface()
+	{
+		return mModuleContainer.getEditorPanel();
+	}
+
     public UndoInterface getUndoInterface()
     {
         return mModuleContainer;

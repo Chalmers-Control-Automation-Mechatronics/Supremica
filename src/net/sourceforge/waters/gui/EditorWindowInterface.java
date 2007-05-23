@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindowInterface.java,v 1.12 2007-01-31 17:52:14 flordal Exp $
+//# $Id: EditorWindowInterface.java,v 1.13 2007-05-23 16:28:16 robi Exp $
 //###########################################################################
 
 
@@ -17,12 +17,9 @@ import net.sourceforge.waters.gui.command.UndoInterface;
 
 public interface EditorWindowInterface
 {
-    public boolean isSaved();
-    
-    public void setSaved(boolean s);
-    
-    public JFrame getFrame();
-    
+
+	public ModuleWindowInterface getModuleWindowInterface();
+
     public ControlledSurface getControlledSurface();
     
     public EditorEvents getEventPane();
@@ -44,4 +41,14 @@ public interface EditorWindowInterface
     public void printFigure();
     
     public void createEvent();
+
+	// *** BUG ***
+	// The following functions should be in ModuleWindowInterface !!!
+    public boolean isSaved();
+    
+    public void setSaved(boolean s);
+
+    public JFrame getFrame();
+    // ***
+
 }

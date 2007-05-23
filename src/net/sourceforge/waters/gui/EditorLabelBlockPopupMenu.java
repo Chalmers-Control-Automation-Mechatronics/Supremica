@@ -1,52 +1,62 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# PROJECT: Waters GUI
+//# PACKAGE: net.sourceforge.waters.gui
+//# CLASS:   EditorLabelBlockPopupMenu
+//###########################################################################
+//# $Id$
+//###########################################################################
 
 package net.sourceforge.waters.gui;
 
-import java.awt.event.*;
-import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JMenuItem;
+
 import org.supremica.util.VPopupMenu;
+
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
 
 /**
  * Popup for editing attributes of a label block.
+ *
+ * @author Martin Byr&ouml;d
  */
+
 class EditorLabelBlockPopupMenu
-	extends VPopupMenu
-	implements ActionListener
+  extends VPopupMenu
+  implements ActionListener
 {
-	private EdgeSubject mEdge;
-	private ControlledSurface parent;
 
-	private JMenuItem editEdgeItem;
-		
-	public EditorLabelBlockPopupMenu(ControlledSurface parent, 
-								LabelBlockSubject block)
-	{
-		this.parent = parent;
-		mEdge = (EdgeSubject)block.getParent();
+  //#########################################################################
+  //# Constructor
+  public EditorLabelBlockPopupMenu(final EditorWindowInterface root,
+                                   final LabelBlockSubject block)
+  {
+    mRoot = root;
+    mEdge = (EdgeSubject) block.getParent();
+    mEditEdgeItem = new JMenuItem("Edit guard/actions");
+    mEditEdgeItem.addActionListener(this);
+    add(mEditEdgeItem);
+  }
 
-		init();
-	}
 
-	/**
-	 * Initialize the menu.
-	 */
-	private void init()
-	{
-		JMenuItem item;
+  //#########################################################################
+  //# Interface java.awt.event.ActionListener
+  public void actionPerformed(final ActionEvent event) 
+  {
+    if (event.getSource() == mEditEdgeItem) {
+      final ModuleWindowInterface root = mRoot.getModuleWindowInterface();
+      EditorEditEdgeDialog.showDialog(mEdge, root);
+    }
+  }
 
-		item = new JMenuItem("Edit edge");
-		item.addActionListener(this);
-		editEdgeItem = item;
-		this.add(item);
-	}
 
-	public void actionPerformed(ActionEvent e) 
-	{
-		if (e.getSource() == editEdgeItem)
-		{
-			EditorEditEdgeDialog.showDialog(mEdge);
-		}
-		parent.repaint();
-	}
+  //#########################################################################
+  //# Data Members
+  private final EdgeSubject mEdge;
+  private final EditorWindowInterface mRoot;
+  private JMenuItem mEditEdgeItem;
+
 }

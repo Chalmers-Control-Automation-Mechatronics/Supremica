@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   SubjectShapeProducer
 //###########################################################################
-//# $Id: SubjectShapeProducer.java,v 1.28 2007-02-22 06:37:42 robi Exp $
+//# $Id: SubjectShapeProducer.java,v 1.29 2007-05-23 16:28:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;

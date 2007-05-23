@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorGraph
 //###########################################################################
-//# $Id: EditorGraph.java,v 1.17 2007-05-23 07:23:00 avenir Exp $
+//# $Id: EditorGraph.java,v 1.18 2007-05-23 16:28:16 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -759,6 +759,7 @@ public class EditorGraph
 	break;
       case ModelChangeEvent.STATE_CHANGED:
 	if (esource instanceof EdgeSubject) {
+          mChanged.add(esource);
 	  final EdgeSubject edge = (EdgeSubject) esource;
 	  final NodeSubject source = edge.getSource();
           if (source != null) {

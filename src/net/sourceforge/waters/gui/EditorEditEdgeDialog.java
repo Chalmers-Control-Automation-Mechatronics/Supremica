@@ -15,13 +15,16 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.*;
 
+import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.TypeMismatchException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
@@ -31,6 +34,7 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
+import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 
@@ -41,16 +45,33 @@ public class EditorEditEdgeDialog
 {
 
   //#########################################################################
-  //# Constructors
-  public EditorEditEdgeDialog(EdgeSubject edge)
+  //# Static Invocation
+  public static void showDialog(final EdgeSubject edge,
+                                final EditorWindowInterface root)
   {
-    edgeModel = edge;
-    mParser = new ExpressionParser(m, CompilerOperatorTable.getInstance());
+    final ModuleWindowInterface rroot = root.getModuleWindowInterface();
+    new EditorEditEdgeDialog(edge, rroot);
+  }
+
+  public static void showDialog(final EdgeSubject edge,
+                                final ModuleWindowInterface root)
+  {
+    new EditorEditEdgeDialog(edge, root);
+  }
+
+
+  //#########################################################################
+  //# Constructors
+  public EditorEditEdgeDialog(final EdgeSubject edge,
+                              final ModuleWindowInterface root)
+  {
+    mEdge = edge;
+    mRoot = root;
 
     GridBagConstraints con = new GridBagConstraints();
 
     setModal(true);
-    setLocationRelativeTo(null);
+    setLocationRelativeTo(mRoot.getRootWindow());
     setTitle("Edit Edge");
 
     //setup layout manager
@@ -97,14 +118,17 @@ public class EditorEditEdgeDialog
     layout.setConstraints(guardLabel, con);
     add(guardLabel);
 
-    GuardActionBlockSubject block = edge.getGuardActionBlock();
+    final GuardActionBlockSubject block = mEdge.getGuardActionBlock();
+    final List<SimpleExpressionSubject> guards;
+    final List<BinaryExpressionSubject> actions;
     if (block == null) {
-      block = m.createGuardActionBlockProxy();
-      edge.setGuardActionBlock(block);
+      guards = Collections.emptyList();
+      actions = Collections.emptyList();
+    } else {
+      guards = block.getGuardsModifiable();
+      actions = block.getActionsModifiable();
     }
-
     guardField = new JTextPane();
-    final List<SimpleExpressionSubject> guards = block.getGuardsModifiable();
     if (!guards.isEmpty()) {
       final SimpleExpressionSubject guard = guards.iterator().next();
       final String guardText = guard.toString();
@@ -131,7 +155,6 @@ public class EditorEditEdgeDialog
     add(actionLabel);
 
     actionField = new JTextPane();
-    final List<BinaryExpressionSubject> actions = block.getActionsModifiable();
     final StringBuffer buffer = new StringBuffer();
     boolean first = true;
     for (final BinaryExpressionSubject action : actions) {
@@ -161,108 +184,109 @@ public class EditorEditEdgeDialog
     setVisible(true);
   }
 
-  public static void showDialog(EdgeSubject edge)
+
+  //#########################################################################
+  //# Interface java.awt.event.ActionListener
+  public void actionPerformed(final ActionEvent event)
   {
-    new EditorEditEdgeDialog(edge);
+    if (event.getActionCommand().equals("OK")) {
+      final ExpressionParser parser = mRoot.getExpressionParser();
+      // Get guard ...
+      SimpleExpressionSubject guard;
+      try {
+        final String text = guardField.getText();
+        guard = null;
+        if (text != null && !text.trim().equals("")) {
+          guard = (SimpleExpressionSubject) parser.parse
+            (text, Operator.TYPE_BOOLEAN);
+        }
+      }	catch (final ParseException exception) {
+        JOptionPane.showMessageDialog(this, exception.getMessage(),
+                                      "Syntax error in guard!",
+                                      JDialog.DO_NOTHING_ON_CLOSE);
+        return;
+      }
+      // Get actions ...
+      List<BinaryExpressionSubject> actions = null;
+      String actionText = actionField.getText();
+      if (actionText != null && !actionText.trim().equals("")) {
+        final String[] texts = actionField.getText().split(";");
+        actions = new ArrayList<BinaryExpressionSubject>(texts.length);
+        for (final String text : texts)	{
+          if (text.length() > 0) {
+            try	{
+              final SimpleExpressionSubject action =
+                (SimpleExpressionSubject) parser.parse(text);
+              if (!(action instanceof BinaryExpressionSubject))	{
+                throw new TypeMismatchException(action, "ACTION");
+              }
+              final BinaryExpressionSubject binaction =
+                (BinaryExpressionSubject) action;
+              actions.add(binaction);
+            } catch (final ParseException exception) {
+              JOptionPane.showMessageDialog(this, exception.getMessage(),
+                                            "Syntax error in action!",
+                                            JDialog.DO_NOTHING_ON_CLOSE);
+              return;
+            } catch (final TypeMismatchException exception) {
+              JOptionPane.showMessageDialog(this, exception.getMessage(),
+                                            "Syntax error in action!",
+                                            JDialog.DO_NOTHING_ON_CLOSE);
+              return;
+            }
+          }
+        }
+      }
+      // Store parsed results ...
+      final GuardActionBlockSubject block = mEdge.getGuardActionBlock();
+      if (block == null) {
+        if (guard != null || actions != null) {
+          final List<SimpleExpressionSubject> guards =
+            guard == null ? null : Collections.singletonList(guard);
+          // *** BUG ***
+          // Not a very good position!
+          // ***
+          final LabelGeometrySubject geo = new LabelGeometrySubject
+            (new Point(LabelBlockProxyShape.DEFAULTOFFSETX,
+                       LabelBlockProxyShape.DEFAULTOFFSETY + 10));
+          final GuardActionBlockSubject newblock =
+            new GuardActionBlockSubject(guards, actions, geo);
+          mEdge.setGuardActionBlock(newblock);
+        }
+      } else {
+        if (guard == null && actions == null) {
+          mEdge.setGuardActionBlock(null);
+        } else {
+          final List<SimpleExpressionSubject> bguards =
+            block.getGuardsModifiable();
+          bguards.clear();
+          if (guard != null) {
+            bguards.add(guard);
+          }
+          final List<BinaryExpressionSubject> bactions =
+            block.getActionsModifiable();
+          bactions.clear();
+          if (actions != null) {
+            bactions.addAll(actions);
+          }
+        }
+      }
+      dispose();
+    } else if (event.getActionCommand().equals("Cancel")) {
+      dispose();
+    }
   }
-
-
-	//#########################################################################
-	//# Interface java.awt.event.ActionListener
-	public void actionPerformed(final ActionEvent event)
-	{
-		if (event.getActionCommand().equals("OK"))
-		{
-			// Get guard ...
-			SimpleExpressionSubject guard;
-			try
-			{
-				final String text = guardField.getText();
-				guard = null;
-				if (text != null && !text.trim().equals(""))
-				{
-					guard = (SimpleExpressionSubject) mParser.parse(text, Operator.TYPE_BOOLEAN);
-				}
-			}
-			catch (final ParseException exception)
-			{
-				JOptionPane.showMessageDialog(this, exception.getMessage(),
-				"Syntax error in guard!",
-				JDialog.DO_NOTHING_ON_CLOSE);
-				return;
-			}
-			// Get actions ...
-			List<BinaryExpressionSubject> actions = null;
-			String actionText = actionField.getText();
-			if (actionText != null && !actionText.trim().equals(""))
-			{
-				final String[] texts = actionField.getText().split(";");
-				actions =	new ArrayList<BinaryExpressionSubject>(texts.length);
-				for (final String text : texts)
-				{
-					if (text.length() > 0)
-					{
-						try
-						{
-							final SimpleExpressionSubject action = (SimpleExpressionSubject) mParser.parse(text);
-							if (!(action instanceof BinaryExpressionSubject))
-							{
-								throw new TypeMismatchException(action, "ACTION");
-							}
-							final BinaryExpressionSubject binaction = (BinaryExpressionSubject) action;
-							actions.add(binaction);
-						}
-						catch (final ParseException exception)
-						{
-							JOptionPane.showMessageDialog(this, exception.getMessage(),
-							"Syntax error in action!",
-							JDialog.DO_NOTHING_ON_CLOSE);
-							return;
-						}
-						catch (final TypeMismatchException exception)
-						{
-							JOptionPane.showMessageDialog(this, exception.getMessage(),
-							"Syntax error in action!",
-							JDialog.DO_NOTHING_ON_CLOSE);
-							return;
-						}
-					}
-				}
-			}
-			// Store parsed results ...
-			final GuardActionBlockSubject block = edgeModel.getGuardActionBlock();
-			block.fireModelChanged(new ModelChangeEvent(block, ModelChangeEvent.STATE_CHANGED));
-			final List<SimpleExpressionSubject> bguards = block.getGuardsModifiable();
-			bguards.clear();
-			if (guard != null)
-			{
-				bguards.add(guard);
-			}
-			final List<BinaryExpressionSubject> bactions = block.getActionsModifiable();
-			bactions.clear();
-			if (actions != null)
-			{
-				bactions.addAll(actions);
-			}
-			dispose();
-		}
-		else if (event.getActionCommand().equals("Cancel"))
-		{
-			dispose();
-		}
-	}
 
 
   //#########################################################################
   //# Data Members
+  private final EdgeSubject mEdge;
+  private final ModuleWindowInterface mRoot;
   private JButton okButton, cancelButton;
   private JTextPane guardField, actionField;
   private final JLabel guardLabel = new JLabel("Guard:");
   private final JLabel actionLabel = new JLabel("Action:");
   private GridBagLayout layout;
-  private final ExpressionParser mParser;
-  private ModuleSubjectFactory m = ModuleSubjectFactory.getInstance();
-  private EdgeSubject edgeModel;
 
 
   //#########################################################################
