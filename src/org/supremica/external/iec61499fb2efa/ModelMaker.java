@@ -1389,6 +1389,7 @@ class ModelMaker
 		ExtendedAutomaton ecc = new ExtendedAutomaton("Execution Control Chart " + fbName, automata);
 
 		
+		
 
 		automata.addAutomaton(ecc);	
 	}
