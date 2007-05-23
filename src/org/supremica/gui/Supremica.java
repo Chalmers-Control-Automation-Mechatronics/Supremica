@@ -748,7 +748,7 @@ public class Supremica
             {
                 return null;
             }
-            else if (newName.equals(""))
+            else if (newName.trim().equals(""))
             {
                 JOptionPane.showMessageDialog(this, "An empty name is not allowed.", "Alert", JOptionPane.ERROR_MESSAGE);
             }

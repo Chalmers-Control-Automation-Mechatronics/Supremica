@@ -12,7 +12,7 @@ import org.supremica.log.*;
 import org.supremica.util.ActionTimer;
 
 public class Milp
-    implements Scheduler
+        implements Scheduler
 {
     /****************************************************************************************/
     /*                                 VARIABLE SECTION                                     */
@@ -94,9 +94,6 @@ public class Milp
      */
     private Thread milpThread;
     
-    // temp
-    PrintWriter logWriter = null;
-    
     /****************************************************************************************/
     /*                                 CONSTUCTORS                                          */
     /****************************************************************************************/
@@ -108,13 +105,8 @@ public class Milp
         //  this.theProject = theProject;
         this.buildSchedule = buildSchedule;
         this.scheduleDialog = scheduleDialog;
-        
-        // temp
-        File logFile = new File("C:\\supremica_log.txt");
-        logFile.createNewFile();
-        logWriter = new PrintWriter(logFile);
     }
-
+    
     public void startSearchThread()
     {
         milpThread = new Thread(this);
@@ -130,11 +122,19 @@ public class Milp
         }
         catch (Exception ex)
         {
-            milpProcess.destroy();
-            milpProcess = null;
-            // modelFile.delete();
-// 			solutionFile.delete();
-            
+            if (milpProcess != null)
+            {
+                milpProcess.destroy();
+                milpProcess = null;
+            }
+            if (modelFile != null)
+            {
+                modelFile.delete();
+            }
+            if (solutionFile != null)
+            {
+                solutionFile.delete();
+            }
             if (scheduleDialog != null)
             {
                 scheduleDialog.close();
@@ -142,14 +142,7 @@ public class Milp
             
             logger.error("Milp::schedule() -> " + ex);
             logger.debug(ex.getStackTrace());
-            
-            ex.printStackTrace(logWriter);
-            logWriter.flush();
-            logWriter.close();
         }
-        
-        logWriter.flush();
-        logWriter.close();
     }
     
     /****************************************************************************************/
@@ -161,14 +154,13 @@ public class Milp
      * processes and stores the resulting information.
      */
     public void schedule()
-    throws Exception
+        throws Exception
     {
         ActionTimer totalTimer = new ActionTimer();
         
         if (isRunning)
         {
             totalTimer.restart();
-            
             initialize();
         }
         
@@ -191,9 +183,6 @@ public class Milp
             
             String totalTimeStr = "Total optimization time = " + totalTimer.elapsedTime() + "ms";
             logger.info(totalTimeStr);
-            // temp
-            logWriter.println(totalTimeStr);
-            outputStr += "\t" + totalTimeStr + "\n";
         }
         
         // Builds the optimal schedule (if solicited)
@@ -209,9 +198,7 @@ public class Milp
         else
         {
             logger.warn("Scheduling interrupted");
-            // temp
-            logWriter.println("Scheduling interrupted");
-            if (scheduleDialog != null)
+            
             {
                 scheduleDialog.reset();
             }
@@ -229,9 +216,7 @@ public class Milp
     public void buildScheduleAutomaton()
     throws Exception
     {
-        timer.restart();
-        
-        //temp
+        //temp (fulhack)
         SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
         synthesizerOptions.setSynthesisType(SynthesisType.NONBLOCKINGCONTROLLABLE);
         synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.MONOLITHIC);
@@ -247,10 +232,20 @@ public class Milp
         State synthState = synthAll.getInitialState();
         
         
+        // Create the automaton with a chosen name
+        String scheduleName = "";
+        while (scheduleName != null && scheduleName.trim() == "")
+        {
+            scheduleName = ActionMan.getGui().getNewAutomatonName("Enter a name for the schedule", "Schedule");
+        }       
+        if (scheduleName == null)
+        {
+            return;
+        }
+        schedule = new Automaton(scheduleName);
         
-        
-        schedule = new Automaton();
-        schedule.setComment("Schedule");
+        // Start the clock
+        timer.restart();
         
         SynchronizationStepper stepper = new SynchronizationStepper(theAutomata);
         
@@ -449,8 +444,6 @@ public class Milp
         
         String str = "Time to build the schedule: " + timer.elapsedTime() + "ms ";
         logger.info(str);
-        // temp
-        logWriter.println(str);
         outputStr += "\t" + str;
         
         addAutomatonToGui(schedule);
@@ -467,7 +460,7 @@ public class Milp
      * while the information about the location of booking/unbooking events is collected.
      */
     private void initialize()
-    throws Exception
+        throws Exception
     {
         modelFile = File.createTempFile("milp", ".mod");
         modelFile.deleteOnExit();
@@ -491,15 +484,12 @@ public class Milp
      * should include "PLANT_A". The resulting plant and zone automata are stored globally.
      */
     private void initAutomata()
-    throws Exception
+        throws Exception
     {
         plants = theAutomata.getPlantAutomata();
         zones = new Automata();
         externalSpecs = new Automata();
         Automata allSpecs = theAutomata.getSpecificationAutomata();
-        
-        // The plants synchronized with all corresponding specifications (except mutex zone specifications)
-//         Automata restrictedPlants = new Automata();
         
         Hashtable<Automaton, Automata> toBeSynthesizedSet = new Hashtable<Automaton, Automata>(plants.size());
         for (Iterator<Automaton> specIt = allSpecs.iterator(); specIt.hasNext(); )
@@ -523,8 +513,6 @@ public class Milp
             if (counter == 0)
             {
                 logger.warn("Specification " + spec.getName() + " has no common events with any of the plants");
-                // temp
-                logWriter.println("Specification " + spec.getName() + " has no common events with any of the plants");
             }
             else if (counter == 1)
             {
@@ -594,25 +582,18 @@ public class Milp
                     }
                 }
                 
-// 				restrictedPlant.setName(plantName + "_red");
-// 				restrictedPlant.remapStateIndices();
-                
-// 				restrictedPlants.addAutomaton(restrictedPlant);
-// 				addAutomatonToGui(restrictedPlant);
                 String plantName = restrictedPlant.getName();
                 plants.removeAutomaton(plantName);
                 restrictedPlant.setName(plantName + "_constrained");
                 plants.addAutomaton(restrictedPlant);
                 
                 logger.info(str.substring(0, str.lastIndexOf("||")) + " synthesized into " + restrictedPlant.getName());
-                // temp
-                logWriter.println(str.substring(0, str.lastIndexOf("||")) + " synthesized into " + restrictedPlant.getName());
             }
         }
-        
+                
         for (Iterator<Automaton> plantIt = plants.iterator(); plantIt.hasNext(); )
         {
-            addDummyAcceptingState(plantIt.next());
+            prepareAutomatonForMilp(plantIt.next());
         }
         
         for (Iterator<Automaton> specsIt = allSpecs.iterator(); specsIt.hasNext(); )
@@ -638,7 +619,7 @@ public class Milp
     }
     
     private void initMutexStates()
-    throws Exception
+        throws Exception
     {
         bookingTics = new int[zones.size()][plants.size()][1];
         unbookingTics = new int[zones.size()][plants.size()][1];
@@ -1509,8 +1490,6 @@ public class Milp
         
         String str = "Time to set up the optimization problem: " + timer.elapsedTime() + "ms";
         logger.info(str);
-        // temp
-        logWriter.println(str);
         outputStr += "\t" + str + "\n";
     }
     
@@ -1612,8 +1591,6 @@ public class Milp
         
         str = "OPTIMAL MAKESPAN: " + makespan + ".............................";
         logger.info(str);
-        // temp
-        logWriter.println(str);
         outputStr += "\t" + str + "\n";
     }
     
@@ -1621,8 +1598,7 @@ public class Milp
     throws Exception
     {
         logger.info("The MILP-solver started....");
-        // temp
-        logWriter.println("The MILP-solver started....");
+        
         // Defines the name of the .exe-file as well the arguments (.mod and .sol file names)
         String[] cmds = new String[5];
         //cmds[0] = "C:\\Program Files\\glpk\\bin\\glpsol.exe";
@@ -1640,8 +1616,7 @@ public class Milp
         catch (IOException milpNotFoundException)
         {
             logger.error("The GLPK-solver 'glpsol.exe' not found. Make sure that it is registered in your path.");
-            // temp
-            logWriter.println("The GLPK-solver 'glpsol.exe' not found. Make sure that it is registered in your path.");
+            
             throw milpNotFoundException;
         }
         
@@ -1729,17 +1704,64 @@ public class Milp
         return outputStr;
     }
     
-    private void addDummyAcceptingState(Automaton currPlant)
-    throws Exception
+    /**
+     *  This method prepares a plant for the MILP optimization algorithm.
+     *  It checks whether the plant has an initial state (
+     *  prior to the call to this method, the plant is composed with
+     *  its specifications, i.e. specifications that only consist of events in
+     *  this plant. If the specifications are too restrictive, an initial
+     *  state may not exist). Next, if the initial state of the plant is also
+     *  accepting, a dummy accepting state is added to the plant in order to
+     *  allow the optimization algorithm to start. If there is a self-loop
+     *  in the initial state (which should only occur after one run of the
+     *  optimization algorithm), it is removed (otherwise MILP cannot function).
+     *
+     *  @param - The plant to be prepared for MILP-optimization.
+     */
+    private void prepareAutomatonForMilp(Automaton currPlant)
+        throws Exception
     {
         State currInitialState = currPlant.getInitialState();
         
+        // If there is no initial state, throw exception
         if (currInitialState == null)
         {
-            String plantName = currPlant.getName().substring(0, currPlant.getName().indexOf("_co"));
-            throw new Exception(plantName + " has no initial state when restricted by its specifications. The system has thus no (optimal) path.");
+            int plantNameRootIndex = currPlant.getName().indexOf("_constr");
+            String plantName;
+            if (plantNameRootIndex < 0)
+            {
+                plantName = currPlant.getName();
+            }
+            else
+            {
+                plantName = currPlant.getName().substring(0, plantNameRootIndex);
+            }
+            throw new Exception(plantName + " has no initial state, possibly due to the restrictions imposed by its specifications. The system has thus no (optimal) path.");
         }
         
+        // Remove the self-loops in the initial state. Such self-loops are sometimes created during
+        // schedule construction to run a schedule repeatedly.
+        ArrayList<Arc> arcsToBeRemoved = new ArrayList<Arc>();
+        boolean selfLoopDetected = false;
+        for (Iterator<Arc> arcIt = currInitialState.outgoingArcsIterator(); arcIt.hasNext();)
+        {
+            Arc arc = arcIt.next();
+            if (arc.isSelfLoop())
+            {
+                arcsToBeRemoved.add(arc);
+                selfLoopDetected = true;
+            }
+        }
+        for (Arc arc : arcsToBeRemoved)
+        {
+            currPlant.removeArc(arc);
+        }
+        if (selfLoopDetected)
+        {
+            currPlant.remapStateIndices();
+        }
+             
+        // Add a dummy accepting state if the initial state is accepting
         if (currInitialState.isAccepting())
         {
             currInitialState.setAccepting(false);
@@ -1755,10 +1777,6 @@ public class Milp
             }
             
             currInitialState.removeIncomingArcs();
-            
-            // 			LabeledEvent dummyEvent = new LabeledEvent(dummyEventName);
-            // 			currPlant.getAlphabet().addEvent(dummyEvent);
-            // 			currPlant.addArc(new Arc(dummyState, currInitialState, dummyEvent));
             
             dummyState.setAccepting(true);
             dummyState.setCost(0);
@@ -1782,8 +1800,7 @@ public class Milp
             catch (Exception ex)
             {
                 logger.warn("EXceptiON, gui = " + theGui);
-                // temp
-                logWriter.println("EXceptiON, gui = " + theGui);
+                
                 throw ex;
             }
         }
@@ -1824,8 +1841,7 @@ public class Milp
             catch (Exception ex)
             {
                 logger.warn("EXceptiON, gui = " + theGui);
-                // temp
-                logWriter.println("EXceptiON, gui = " + theGui);
+                
                 throw ex;
             }
         }

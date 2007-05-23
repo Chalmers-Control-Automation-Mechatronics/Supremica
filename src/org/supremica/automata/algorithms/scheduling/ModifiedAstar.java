@@ -975,11 +975,20 @@ public class ModifiedAstar
     public void buildScheduleAutomaton()
 		throws Exception
     {
+        // Create the automaton with a chosen name
+        String scheduleName = "";
+        while (scheduleName != null && scheduleName.trim() == "")
+        {
+            scheduleName = ActionMan.getGui().getNewAutomatonName("Enter a name for the schedule", "Schedule");
+        }       
+        if (scheduleName == null)
+        {
+            return;
+        }
+        Automaton scheduleAuto = new Automaton(scheduleName);
+        
+        // Start the clock
         timer.restart();  
-
-		// Construct the schedule
-        Automaton scheduleAuto = new Automaton();
-        scheduleAuto.setComment("Schedule");
       
         State nextState = makeStateFromNode(acceptingNode, scheduleAuto, -1);
         nextState.setAccepting(true);

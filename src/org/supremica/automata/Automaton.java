@@ -1260,7 +1260,7 @@ public class Automaton
     {
         return (new StateSet(theStates)).iterator();
     }
-
+    
     public Iterator<LabeledEvent> eventIterator()
     {
         return alphabet.iterator();

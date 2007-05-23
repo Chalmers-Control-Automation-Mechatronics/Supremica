@@ -499,6 +499,7 @@ public class State
      * Use this iterator when you're planning to fiddle with the arcs.
      *
      * No, don't, there's no need, you can always go around it in better ways.
+     * Such as... ?
      *
      * @deprecated
      */
