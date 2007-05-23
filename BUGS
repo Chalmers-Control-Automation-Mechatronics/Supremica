@@ -1,8 +1,3 @@
-
-
-
-
-
 *********************************************************
 BUGS are now handled in a bug-tracking system. Find and 
 access it through
@@ -12,26 +7,3 @@ If you want to simply view the bugs, click the "View" tab
 and then "Bugs", if you want to edit the bugs, click the                       
 "Pages" tab and then "bugs" in the list.    
 *********************************************************
-
-
-
-
-
- * In the IDE, if a file is opened, then changed outside the IDE and then opened again in IDE, the change can not be seen! The DocumentManager caches too much?
-   * DocumentManager can be upgraded to check file modification times. But how should the IDE react if the contents of a module being edited are changed by an external program? -- Robi.
-     * Ideally it should inform the user about "external modification" - like buffers in emacs. /Hugo
- * ProjectBuildFromWaters must use DocumentManager from IDE, otherwise module instantiation does not work -- Robi.
- * New modules should not contain any events. Default markings :accepting and :forbidden should only be created when explicitly requested -- Robi.
-
- * Check menu keyboard shortcuts. ALT or CONTROL --- presently ALT-E
-   is used twice -- Robi.
- * Group node error feedback should be given while dragging -- Robi.
- * Encapsulated Postscript exporter is broken. It is trying to reimplement
-   renderer functionality which, predictably, does not work properly.
-   Printing _must_ be done through Renderer and Graphics2D somehow -- Robi.
- * Log display is very slow when large numbers of messages are logged -- Robi.
-
- * DNFMinimizer fails several test cases -- Robi.
-
-
-
