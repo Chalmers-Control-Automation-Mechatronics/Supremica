@@ -214,7 +214,7 @@ public class AutomatonMinimizer
             // Start listening again
             theAutomaton.endTransaction();
             
-            logger.fatal("Halfway synthesis: " + countHWS + ", bisimulation equivalence: " + countBSE);
+            logger.verbose("Halfway synthesis: " + countHWS + ", bisimulation equivalence: " + countBSE);
             
             totalHWS += countHWS;
             totalBSE += countBSE;
