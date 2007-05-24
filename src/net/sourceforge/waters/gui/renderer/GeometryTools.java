@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   GeometryTools
 //###########################################################################
-//# $Id: GeometryTools.java,v 1.16 2007-05-24 18:58:54 robi Exp $
+//# $Id: GeometryTools.java,v 1.17 2007-05-24 21:04:09 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -372,16 +372,19 @@ public final class GeometryTools
   {
     final Line2D line = new Line2D.Double(pt1, pt2);
     final Point2D turn = convertToTurn(pt1, pt2, c);
-    if (line.ptLineDistSq(turn) < EPSILON_SQ) {
-      // If the curve is almost straight, treat it as a line ...
-      return findClosestPointOnLine(pt1, pt2, p);
-    } else if (pt1.equals(pt2)) {
-      // If the start and end points are the same, also treat it as a line ...
-      return findClosestPointOnLine(pt1, c, p);
-    } else if (pt1.distanceSq(pt2) < EPSILON_SQ) {
-      // Also if the start and end points are almost the same ...
-      final Point2D mid = getMidPoint(pt1, pt2);
-      return findClosestPointOnLine(mid, c, p);
+    if (line.ptLineDistSq(turn) < EPSILON_SQ ||
+        pt1.distanceSq(pt2) < EPSILON_SQ) {
+      // If the curve is almost straight, or if the start and end points
+      // are almost the same, treat it as two lines ...
+      final Point2D candidate1 = findClosestPointOnLine(pt1, turn, p);
+      final Point2D candidate2 = findClosestPointOnLine(pt2, turn, p);
+      if (candidate1.equals(candidate2)) {
+        return candidate1;
+      } else if (candidate1.distanceSq(p) < candidate2.distanceSq(p)) {
+        return candidate1;
+      } else {
+        return candidate2;
+      }
     } else {
       // f(t) = (1-t)^2*pt1 + 2t*(1-t)*c + t^2*pt2
       //      = pt1 - 2t*pt1 + t^2*pt1 +2t*c - 2t^2*c + t^2*pt2
@@ -946,7 +949,7 @@ public final class GeometryTools
    * Accuracy constant. Used to determine when points are so close that
    * they are considered equal.
    */
-  public static final double EPSILON = 0.000001;
+  public static final double EPSILON = 0.00001;
 
   /**
    * The square of {@link #EPSILON}.

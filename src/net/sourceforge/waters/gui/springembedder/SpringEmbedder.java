@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.36 2007-05-24 18:58:54 robi Exp $
+//# $Id: SpringEmbedder.java,v 1.37 2007-05-24 21:04:09 robi Exp $
 //###########################################################################
 
 
@@ -833,28 +833,22 @@ public class SpringEmbedder
         final Point2D end = mTarget.getOldPoint();
         final Point2D turn = getOldPoint();
         final Line2D line = new Line2D.Double(start, end);
-        final Point2D closest;
-        final double weight;
-        if (line.ptLineDistSq(turn) < GeometryTools.EPSILON_SQ) {
-          closest = GeometryTools.findClosestPointOnLine(start, end, point);
-          weight = 1.0;
-        } else {
-          final Point2D control =
-            GeometryTools.convertToControl(start, end, turn);
-          closest = GeometryTools.findClosestPointOnQuadratic
-            (start, control, end, point);
-          final double x1 = start.getX();
-          final double y1 = start.getY();
-          final double x2 = end.getX();
-          final double y2 = end.getY();
-          final double xm = 0.5 * (x1 + x2);
-          final double ym = 0.5 * (y1 + y2);
-          final Point2D mid = new Point2D.Double(xm, ym);
-          final Line2D diag = new Line2D.Double(mid, turn);
-          final double distsq = diag.ptLineDistSq(point);
-          weight = distsq >= MIDQUADRATIC_THRESHOLD_SQ ? 1.0 :
-                   distsq / MIDQUADRATIC_THRESHOLD_SQ;
-        }
+        final Point2D control =
+          GeometryTools.convertToControl(start, end, turn);
+        final Point2D closest = GeometryTools.findClosestPointOnQuadratic
+          (start, control, end, point);
+        final double x1 = start.getX();
+        final double y1 = start.getY();
+        final double x2 = end.getX();
+        final double y2 = end.getY();
+        final double xm = 0.5 * (x1 + x2);
+        final double ym = 0.5 * (y1 + y2);
+        final Point2D mid = new Point2D.Double(xm, ym);
+        final Line2D diag = new Line2D.Double(mid, turn);
+        final double distsq = diag.ptLineDistSq(point);
+        final double weight =
+          distsq >= MIDQUADRATIC_THRESHOLD_SQ ? 1.0 :
+          distsq / MIDQUADRATIC_THRESHOLD_SQ;
         if (weight == 1.0) {
           return repulsion(closest, point, mNodeEdgeRepulsion);
         } else {
