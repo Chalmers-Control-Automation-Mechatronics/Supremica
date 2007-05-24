@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.automata.IO
 //# CLASS:   ProjectBuildFromWaters
 //###########################################################################
-//# $Id: ProjectBuildFromWaters.java,v 1.19 2007-05-11 02:07:10 robi Exp $
+//# $Id: ProjectBuildFromWaters.java,v 1.20 2007-05-24 04:03:56 siw4 Exp $
 //###########################################################################
 
 /*
@@ -96,24 +96,23 @@ public class ProjectBuildFromWaters
         mProjectFactory = factory;
     }
     
-
-    //#######################################################################
-    //# Invocation
-    public Project build(final ModuleProxy module)
-		throws EvalException
+    public Project build(ModuleProxy module)
+      throws EvalException
     {
-        if (module == null) {
-            throw new NullPointerException("Argument must be non-null!");
-        }
-        final ProductDESProxyFactory desfactory =
+      if (module == null)
+      {
+          throw new NullPointerException("argument must be non null");
+      }
+      final ProductDESProxyFactory factory =
             ProductDESElementFactory.getInstance();
-        final ModuleCompiler compiler =
-            new ModuleCompiler(mDocumentManager, desfactory, module);
-		final ProductDESProxy des = compiler.compile();
-        return build(des);
-	}
-
-	public Project build(final ProductDESProxy des)
+      DocumentManager mDocumentManager = new DocumentManager();
+      ModuleCompiler compiler =
+          new ModuleCompiler(mDocumentManager, factory, module);
+      
+      return build(compiler.compile());
+    }
+    
+ 	public Project build(final ProductDESProxy des)
 		throws EvalException
     {
         final Project currProject = mProjectFactory.getProject();

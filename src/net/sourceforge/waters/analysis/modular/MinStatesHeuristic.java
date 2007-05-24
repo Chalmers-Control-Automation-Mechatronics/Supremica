@@ -17,6 +17,11 @@ public class MinStatesHeuristic
   private final HeuristicType mType;
 	private final boolean foo = true;
   
+  public MinStatesHeuristic()
+  {
+    this(HeuristicType.PREFERREALPLANT);
+  }
+  
   public MinStatesHeuristic(HeuristicType type)
   {
     mType = type;

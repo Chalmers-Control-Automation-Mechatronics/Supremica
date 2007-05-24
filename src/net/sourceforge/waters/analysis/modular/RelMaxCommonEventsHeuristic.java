@@ -18,6 +18,11 @@ public class RelMaxCommonEventsHeuristic
   private final HeuristicType mType;
 	private final boolean foo = true;
   
+  public RelMaxCommonEventsHeuristic()
+  {
+    this(HeuristicType.PREFERREALPLANT);
+  }
+  
   public RelMaxCommonEventsHeuristic(HeuristicType type)
   {
     mType = type;

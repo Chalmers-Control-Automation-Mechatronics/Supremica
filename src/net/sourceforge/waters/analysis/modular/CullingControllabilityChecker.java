@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularControllabilityChecker
 //###########################################################################
-//# $Id: CullingControllabilityChecker.java,v 1.3 2007-02-12 03:54:09 siw4 Exp $
+//# $Id: CullingControllabilityChecker.java,v 1.4 2007-05-24 04:03:56 siw4 Exp $
 //###########################################################################
 
 
@@ -178,7 +178,7 @@ public class CullingControllabilityChecker
                                   getKindTranslator()), newComp.iterator().next());
           Set<AutomatonProxy> possible = new HashSet<AutomatonProxy>(op.others);
           possible.add(op.added);
-          CheckSuffix.checkSuffix(counter, possible, null);
+          //CheckSuffix.checkSuffix(counter, possible, null);
           int prevstates = mChecker.getAnalysisResult().getTotalNumberOfStates();
           System.out.println(op.added.getName() + " added " + mStates + " " + composition.size() + " " + prevstates);
           uncomposedplants.remove(op.added);

@@ -17,6 +17,11 @@ public class MaxCommonUncontrollableEventsHeuristic
   private final HeuristicType mType;
 	private final boolean foo = true;
   
+  public MaxCommonUncontrollableEventsHeuristic()
+  {
+    this(HeuristicType.PREFERREALPLANT);
+  }
+  
   public MaxCommonUncontrollableEventsHeuristic(HeuristicType type)
   {
     mType = type;

@@ -166,7 +166,7 @@ public class Alphabet
     public void add(Object other)
         throws IllegalArgumentException
     {
-        if (other instanceof LabeledEvent)
+        if (!(other instanceof LabeledEvent))
         {
             throw new IllegalArgumentException("other must be of type LabeledEvent");
         }

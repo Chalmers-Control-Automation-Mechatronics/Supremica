@@ -17,6 +17,11 @@ public class MinEventsHeuristic
   private final HeuristicType mType;
 	private final boolean foo = true;
   
+  public MinEventsHeuristic()
+  {
+    this(HeuristicType.PREFERREALPLANT);
+  }
+  
   public MinEventsHeuristic(HeuristicType type)
   {
     mType = type;

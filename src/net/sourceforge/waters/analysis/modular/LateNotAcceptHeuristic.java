@@ -15,6 +15,11 @@ public class LateNotAcceptHeuristic
   private final HeuristicType mType;
 	private final boolean foo = true;
   
+  public LateNotAcceptHeuristic()
+  {
+    this(HeuristicType.PREFERREALPLANT);
+  }
+  
   public LateNotAcceptHeuristic(HeuristicType type)
   {
     mType = type;

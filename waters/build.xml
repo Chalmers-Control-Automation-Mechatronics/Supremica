@@ -127,7 +127,10 @@
            includes="net/sourceforge/waters/**/*.java"
            excludes="net/sourceforge/waters/gui/**/*.java
                      net/sourceforge/waters/mbt/**/*.java
-                     net/sourceforge/waters/model/unchecked/**/*.java"
+                     net/sourceforge/waters/analysis/modular/supremica/*.java
+                     net/sourceforge/waters/analysis/modular/SpeedComparison.java
+                     net/sourceforge/waters/model/unchecked/**/*.java
+                     org/supremica/**/*.java"
            debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}">
       <classpath refid="waters.compile.classpath"/>
       <compilerarg value="-Xlint:unchecked"/>
@@ -338,7 +341,7 @@
     </junit>
   </target>
   
-  <target name="run_test6" depends="test-jar,cpp">
+  <target name="run_test6">
     <java classname="net.sourceforge.waters.analysis.modular.SpeedComparison" fork="true" maxmemory="512m">
       <classpath refid="waters.test.classpath"/>
       <sysproperty key="waters.test.inputdir" value="${examples}"/>

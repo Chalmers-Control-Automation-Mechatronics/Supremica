@@ -18,6 +18,11 @@ public class MaxCommonEventsHeuristic
   private final HeuristicType mType;
 	private final boolean foo = true;
   
+  public MaxCommonEventsHeuristic()
+  {
+    this(HeuristicType.PREFERREALPLANT);
+  }
+  
   public MaxCommonEventsHeuristic(HeuristicType type)
   {
     mType = type;

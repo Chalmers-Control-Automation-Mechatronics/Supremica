@@ -17,6 +17,11 @@ public class AllHeuristic
   private final HeuristicType mType;
 	private final boolean foo = true;
   
+  public AllHeuristic()
+  {
+    this(HeuristicType.PREFERREALPLANT);
+  }
+  
   public AllHeuristic(HeuristicType type)
   {
     mType = type;

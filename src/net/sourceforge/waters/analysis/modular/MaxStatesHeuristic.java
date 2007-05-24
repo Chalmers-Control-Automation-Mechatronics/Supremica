@@ -17,6 +17,11 @@ public class MaxStatesHeuristic
   private final HeuristicType mType;
 	private final boolean foo = true;
   
+  public MaxStatesHeuristic()
+  {
+    this(HeuristicType.PREFERREALPLANT);
+  }
+  
   public MaxStatesHeuristic(HeuristicType type)
   {
     mType = type;
