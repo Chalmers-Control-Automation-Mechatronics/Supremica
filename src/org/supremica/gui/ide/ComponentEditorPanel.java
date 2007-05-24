@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.42 2007-05-23 16:28:16 robi Exp $
+//# $Id: ComponentEditorPanel.java,v 1.43 2007-05-24 06:17:33 avenir Exp $
 //###########################################################################
 
 
@@ -822,39 +822,34 @@ public class ComponentEditorPanel
                                 
                                 // Add guards and actions to the eps-file
                                 GuardActionBlockProxy guardActionBlock = edge.getGuardActionBlock();
-                                for (BinaryExpressionProxy action : guardActionBlock.getActions())
+                                if (guardActionBlock != null)
                                 {
-                                    System.out.println("action.left = " + action.getLeft());
-                                    System.out.println("action.operator = " + action.getOperator().getName());
-                                    System.out.println("action.right = " + action.getRight());
-                                    System.out.println("action.to_string = " + action);
-                                    
-                                    Shape actionShape = producer.getShape(action).getShape();
-                                    Point2D actionAnchor = labelTransform.transform(new Point2D.Double(actionShape.getBounds2D().getMinX(), actionShape.getBounds2D().getMinY()), null);
-                                    actionAnchor.setLocation(Math.round(actionAnchor.getX()), Math.round(actionAnchor.getY()));
-                                    System.out.println("at (" + actionAnchor.getX() + ", " + actionAnchor.getY() + ")");
-                                    
-                                    w.write("(" + action + ") " + actionAnchor.getX() + " " + actionAnchor.getY() + " actionLabel");
-                                    w.newLine();
-                                    
-                                    // Update the bounding box
-                                    boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, actionShape.getBounds2D(), labelTransform);
-                                }
-                                for (SimpleExpressionProxy guard : guardActionBlock.getGuards())
-                                {
-                                    System.out.println("guard.to_string = " + guard);
-                                    Shape guardShape = producer.getShape(guard).getShape();
-                                    Point2D guardAnchor = labelTransform.transform(new Point2D.Double(guardShape.getBounds2D().getMinX(), guardShape.getBounds2D().getMinY()), null);
-                                    guardAnchor.setLocation(Math.round(guardAnchor.getX()), Math.round(guardAnchor.getY()));
-                                    System.out.println("at (" + guardAnchor.getX() + ", " + guardAnchor.getY() + ")");
-                                    
-                                    w.write("(" + guard + ") " + guardAnchor.getX() + " " + guardAnchor.getY() + " guardLabel");
-                                    w.newLine();
-                                    
-                                    // Update the bounding box
-                                    boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, guardShape.getBounds2D(), labelTransform);
-                                }
+                                    for (BinaryExpressionProxy action : guardActionBlock.getActions())
+                                    {
+                                        Shape actionShape = producer.getShape(action).getShape();
+                                        Point2D actionAnchor = labelTransform.transform(new Point2D.Double(actionShape.getBounds2D().getMinX(), actionShape.getBounds2D().getMinY()), null);
+                                        actionAnchor.setLocation(Math.round(actionAnchor.getX()), Math.round(actionAnchor.getY()));
 
+                                        w.write("(" + action + ") " + actionAnchor.getX() + " " + actionAnchor.getY() + " actionLabel");
+                                        w.newLine();
+
+                                        // Update the bounding box
+                                        boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, actionShape.getBounds2D(), labelTransform);
+                                    }
+                                    for (SimpleExpressionProxy guard : guardActionBlock.getGuards())
+                                    {
+                                        Shape guardShape = producer.getShape(guard).getShape();
+                                        Point2D guardAnchor = labelTransform.transform(new Point2D.Double(guardShape.getBounds2D().getMinX(), guardShape.getBounds2D().getMinY()), null);
+                                        guardAnchor.setLocation(Math.round(guardAnchor.getX()), Math.round(guardAnchor.getY()));
+
+                                        w.write("(" + guard + ") " + guardAnchor.getX() + " " + guardAnchor.getY() + " guardLabel");
+                                        w.newLine();
+
+                                        // Update the bounding box
+                                        boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, guardShape.getBounds2D(), labelTransform);
+                                    }
+                                }
+                                
 				// Add an empty line after each edge-info
 				w.newLine();
 			}
