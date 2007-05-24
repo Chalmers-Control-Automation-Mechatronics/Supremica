@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.132 2007-05-23 16:28:16 robi Exp $
+//# $Id: ControlledSurface.java,v 1.133 2007-05-24 18:58:54 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -2607,7 +2607,7 @@ public class ControlledSurface
         final double dx = current.getX() - pos.getX();
         final double dy = current.getY() - pos.getY();
         final double len2 = dx * dx + dy * dy;
-        if (len2 < GeometryTools.EPSILON2) {
+        if (len2 < GeometryTools.EPSILON_SQ) {
           return false;
         }
         final Point2D dir = new Point2D.Double(dx, dy);

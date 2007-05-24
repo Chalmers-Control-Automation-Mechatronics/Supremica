@@ -4,13 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.35 2007-05-23 08:36:50 robi Exp $
+//# $Id: SpringEmbedder.java,v 1.36 2007-05-24 18:58:54 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui.springembedder;
 
 import java.awt.Point;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.AbstractSet;
 import java.util.ArrayList;
@@ -301,7 +302,7 @@ public class SpringEmbedder
     mInitialStateAttraction = INITIALSTATE_ATTRACTION;
     mNodeRepulsion = NODE_REPULSION / numnodes;
     mNodeEdgeRepulsion = NODEEDGE_REPULSION / numnodes;
-    mEdgeRepulsion = EDGE_REPULSION / numedges;
+    mEdgeRepulsion = EDGE_REPULSION;
     mCenter = (Point2D) POINT_CENTER.clone();
   }
 
@@ -612,7 +613,6 @@ public class SpringEmbedder
 
     //#######################################################################
     //# Layouting
-    abstract void calculateDisplacement();
     abstract double getDelta();
     abstract void updateModel();
 
@@ -642,6 +642,13 @@ public class SpringEmbedder
     }
 
     //#######################################################################
+    //# Simple Access
+    boolean isInitial()
+    {
+      return mIsInitial;
+    }
+
+    //#######################################################################
     //# Auxiliary Methods
     private void addNeighbours(final EdgeWrapper edge)
     {
@@ -665,56 +672,9 @@ public class SpringEmbedder
       }
     }
 
+
     //#######################################################################
     //# Layouting Methods
-    void calculateDisplacement()
-    {
-      final Point2D old = getOldPoint();
-      final Point2D delta0 = attraction(old,
-                                        mCenter,
-                                        mBackgroundAttraction);
-      double dx = delta0.getX();
-      double dy = delta0.getY();
-      if (mIsInitial && mInitialStateAttraction > EPSILON) {
-        // Pull initial state towards the upper left corner...
-        // Makes it easier to find and gives more consistently drawn graphs
-        // with a natural flow from upper left towards lower right
-        // This also means that the best position for node labels will be
-        // above and to the right of the node... not below and to the left!
-        final Point2D delta = attraction(old,
-                                         POINT_ZERO,
-                                         mInitialStateAttraction);
-        dx += delta.getX();
-        dy += delta.getY();
-      }
-      final double repulsion0 = mNodeRepulsion * mSelfLoopFactor;
-      for (final NodeWrapper other : mNodeMap.values()) {
-        if (other != this) {
-          final double repulsion = repulsion0 * other.mSelfLoopFactor;
-          final Point2D delta = repulsion(old,
-                                          other.getOldPoint(),
-                                          repulsion);
-          dx += delta.getX();
-          dy += delta.getY();
-        }
-      }
-      final double degree = mNeighbours.size();
-      final Set<Map.Entry<NodeWrapper,Double>> entries =
-        mNeighbours.entrySet();
-      for (final Map.Entry<NodeWrapper,Double> entry : entries) {
-        final NodeWrapper other = entry.getKey();
-        final double weight = entry.getValue() / degree;
-        final Point2D delta = attraction(old,
-                                         other.getOldPoint(),
-                                         weight * NODE_ATTRACTION);
-        dx += delta.getX();
-        dy += delta.getY();
-      }
-      final double x = old.getX() + dx;
-      final double y = old.getY() + dy;
-      setNewPoint(x, y);
-    }
-
     void initializeNewPoint()
     {
       super.initializeNewPoint();
@@ -837,41 +797,6 @@ public class SpringEmbedder
 
     //#######################################################################
     //# Layouting Methods
-    void calculateDisplacement()
-    {
-      final Point2D old = getOldPoint();
-      double dx = 0.0;
-      double dy = 0.0;
-      for (final EdgeWrapper other : mEdgeMap.values()) {
-        if (other != this) {
-          final Point2D delta = repulsion(old,
-                                          other.getOldPoint(),
-                                          mEdgeRepulsion);
-          dx += delta.getX();
-          dy += delta.getY();
-        }
-      }
-      for (final NodeWrapper node : mNodeMap.values()) {
-        if (node != mSource && node != mTarget) {
-          final Point2D closest = getClosestPoint(node);
-          final Point2D delta = repulsion(closest,
-                                          node.getOldPoint(),
-                                          mNodeEdgeRepulsion);
-          dx += delta.getX();
-          dy += delta.getY();
-        } else {
-          final Point2D delta = attraction(old,
-                                           node.getOldPoint(),
-                                           EDGE_ATTRACTION);
-          dx += delta.getX();
-          dy += delta.getY();
-        }
-      }
-      final double x = old.getX() + dx;
-      final double y = old.getY() + dy;
-      setNewPoint(x, y);
-    }
-
     void initializeNewPoint()
     {
       super.initializeNewPoint();
@@ -899,9 +824,49 @@ public class SpringEmbedder
     {
       if (node == mSource || node == mTarget) {
         return POINT_ZERO;
+      } else if (mSource == mTarget) {
+        final Point2D old = getOldPoint();
+        return repulsion(old, node.getOldPoint(), mNodeEdgeRepulsion);
       } else {
-        final Point2D closest = getClosestPoint(node);
-        return repulsion(closest, node.getOldPoint(), mNodeEdgeRepulsion);
+        final Point2D point = node.getOldPoint();
+        final Point2D start = mSource.getOldPoint();
+        final Point2D end = mTarget.getOldPoint();
+        final Point2D turn = getOldPoint();
+        final Line2D line = new Line2D.Double(start, end);
+        final Point2D closest;
+        final double weight;
+        if (line.ptLineDistSq(turn) < GeometryTools.EPSILON_SQ) {
+          closest = GeometryTools.findClosestPointOnLine(start, end, point);
+          weight = 1.0;
+        } else {
+          final Point2D control =
+            GeometryTools.convertToControl(start, end, turn);
+          closest = GeometryTools.findClosestPointOnQuadratic
+            (start, control, end, point);
+          final double x1 = start.getX();
+          final double y1 = start.getY();
+          final double x2 = end.getX();
+          final double y2 = end.getY();
+          final double xm = 0.5 * (x1 + x2);
+          final double ym = 0.5 * (y1 + y2);
+          final Point2D mid = new Point2D.Double(xm, ym);
+          final Line2D diag = new Line2D.Double(mid, turn);
+          final double distsq = diag.ptLineDistSq(point);
+          weight = distsq >= MIDQUADRATIC_THRESHOLD_SQ ? 1.0 :
+                   distsq / MIDQUADRATIC_THRESHOLD_SQ;
+        }
+        if (weight == 1.0) {
+          return repulsion(closest, point, mNodeEdgeRepulsion);
+        } else {
+          final Point2D rep1 =
+            repulsion(closest, point, weight * mNodeEdgeRepulsion);
+          final Point2D rep2 =
+            repulsion(turn, point, (1.0 - weight) * mNodeEdgeRepulsion);
+          final double dx = rep1.getX() + rep2.getX();
+          final double dy = rep1.getY() + rep2.getY();
+          rep1.setLocation(dx, dy);
+          return rep1;
+        }
       }
     }
 
@@ -928,25 +893,6 @@ public class SpringEmbedder
       GeometryTools.createMidGeometry(mEdge, point, SplineKind.INTERPOLATING);
     }
 
-
-    //#######################################################################
-    //# Auxiliary Methods
-    final Point2D getClosestPoint(final NodeWrapper node)
-    {
-      if (mSource == mTarget) {
-        return getOldPoint();
-      } else {
-        final Point2D start = mSource.getOldPoint();
-        final Point2D end = mTarget.getOldPoint();
-        final Point2D mid = getOldPoint();
-        final double x = 2.0 * mid.getX() - 0.5 * (start.getX() + end.getX());
-        final double y = 2.0 * mid.getY() - 0.5 * (start.getY() + end.getY());
-        final Point2D control = new Point2D.Double(x, y);
-        final Point2D point = node.getOldPoint();
-        return GeometryTools.findClosestPointOnQuadratic
-          (start, control, end, point);
-      }
-    }
 
     //#######################################################################
     //# Data Members
@@ -1091,8 +1037,10 @@ public class SpringEmbedder
 
   //###########################################################################
   //# Class Constants
-  private static final int NUM_PASSES = 3;
   private static final double EPSILON = 0.00002;
+  private static final double MIDQUADRATIC_THRESHOLD_SQ = 100.0;
+
+  private static final int NUM_PASSES = 3;
   private static final double MULTI_EDGE_WEIGHT = 1.333;
   private static final double SELFLOOP_WEIGHT = 1.05;
 
@@ -1105,7 +1053,7 @@ public class SpringEmbedder
   private static final double NODE_ATTRACTION = 0.1;
   private static final double NODE_REPULSION = 1000.0;
   private static final double SELFLOOP_REPULSION = 100.0;
-  private static final double EDGE_REPULSION = 80.0;
+  private static final double EDGE_REPULSION = 25.0;
   private static final double NODEEDGE_REPULSION = 160.0;
 
   private static final double GRAPH_MARGINAL_CONST = 48.0;

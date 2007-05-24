@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   GeometryTools
 //###########################################################################
-//# $Id: GeometryTools.java,v 1.15 2007-05-18 15:42:02 robi Exp $
+//# $Id: GeometryTools.java,v 1.16 2007-05-24 18:58:54 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -99,7 +99,7 @@ public final class GeometryTools
     } else {
       final Point2D start = getStartPoint(edge);
       final Point2D end = getEndPoint(edge);
-      return start.distanceSq(end) < EPSILON2;
+      return start.distanceSq(end) < EPSILON_SQ;
     }
   }
 
@@ -336,6 +336,27 @@ public final class GeometryTools
 
 
   /**
+   * Calculates the square of the distance from a point 'p' to the bezier
+   * quadratic curve between two points 'pt1' and 'pt2', and with control
+   * point 'c'.
+   * @param pt1              One end of the curve.
+   * @param c                The Bezier control point of the curve.
+   * @param pt2              The other end of the curve.
+   * @param p                The point to find the closest point to.
+   * @return The square of the distance between 'p' and the point closest
+   *         to point 'p' on the curve.
+   */
+  public static double findDistanceToQuadraticSq(final Point2D pt1,
+                                                 final Point2D c,
+                                                 final Point2D pt2,
+                                                 final Point2D p)
+  {
+    final Point2D closest = findClosestPointOnQuadratic(pt1, c, pt2, p);
+    return closest.distanceSq(p);
+  }
+
+
+  /**
    * Finds the point closest to a point 'p' on the bezier quadratic
    * curve between two points 'pt1' and 'pt2', and with control point 'c'.
    * @param pt1              One end of the curve.
@@ -350,13 +371,14 @@ public final class GeometryTools
                                                     final Point2D p)
   {
     final Line2D line = new Line2D.Double(pt1, pt2);
-    if (line.ptLineDistSq(c) < EPSILON2) {
+    final Point2D turn = convertToTurn(pt1, pt2, c);
+    if (line.ptLineDistSq(turn) < EPSILON_SQ) {
       // If the curve is almost straight, treat it as a line ...
       return findClosestPointOnLine(pt1, pt2, p);
     } else if (pt1.equals(pt2)) {
       // If the start and end points are the same, also treat it as a line ...
       return findClosestPointOnLine(pt1, c, p);
-    } else if (pt1.distanceSq(pt2) < EPSILON2) {
+    } else if (pt1.distanceSq(pt2) < EPSILON_SQ) {
       // Also if the start and end points are almost the same ...
       final Point2D mid = getMidPoint(pt1, pt2);
       return findClosestPointOnLine(mid, c, p);
@@ -392,10 +414,13 @@ public final class GeometryTools
       final HornerPolynomial biquadratic =
         new HornerPolynomial(d4, d3, d2, d1, d0);
       final double tmin = biquadratic.findBiquadraticMinimum(0.0, 1.0);
+      if (tmin < 0.0 || tmin > 1.0) {
+        System.err.println(tmin);
+      }
       // Return the point ...
-      if (tmin == 0.0) {
+      if (tmin <= 0.0) {
         return pt1;
-      } else if (tmin == 1.0) {
+      } else if (tmin >= 1.0) {
         return pt2;
       } else {
         final double t2 = tmin * tmin;
@@ -428,6 +453,17 @@ public final class GeometryTools
   {
     final Point2D start = getStartPoint(edge);
     final Point2D end = getEndPoint(edge);
+    return convertToTurn(start, end, control);
+  }
+
+  /**
+   * Calculates the position of a quadratic spline edge's turning point
+   * from its control point.
+   */
+  public static Point2D convertToTurn(final Point2D start,
+                                      final Point2D end,
+                                      final Point2D control)
+  {
     final double x = 0.25 * (start.getX() + 2.0 * control.getX() + end.getX());
     final double y = 0.25 * (start.getY() + 2.0 * control.getY() + end.getY());
     return new Point2D.Double(x, y);
@@ -438,12 +474,23 @@ public final class GeometryTools
    * from its turning point.
    */
   public static Point2D convertToControl(final EdgeProxy edge,
-                                         final Point2D mid)
+                                         final Point2D turn)
   {
     final Point2D start = getStartPoint(edge);
     final Point2D end = getEndPoint(edge);
-    final double x = 2.0 * mid.getX() - 0.5 * (start.getX() + end.getX());
-    final double y = 2.0 * mid.getY() - 0.5 * (start.getY() + end.getY());
+    return convertToControl(start, end, turn);
+  }
+
+  /**
+   * Calculates the position of a quadratic spline edge's control point
+   * from its turning point.
+   */
+  public static Point2D convertToControl(final Point2D start,
+                                         final Point2D end,
+                                         final Point2D turn)
+  {
+    final double x = 2.0 * turn.getX() - 0.5 * (start.getX() + end.getX());
+    final double y = 2.0 * turn.getY() - 0.5 * (start.getY() + end.getY());
     return new Point2D.Double(x, y);
   }
 
@@ -466,7 +513,7 @@ public final class GeometryTools
     }
     final Point2D start = getStartPoint(edge);
     final Point2D end = getEndPoint(edge);
-    if (start.distanceSq(end) < EPSILON2) {
+    if (start.distanceSq(end) < EPSILON_SQ) {
       setSpecifiedMidPoint(edge, newpoint, kind);
       return;
     }
@@ -506,7 +553,7 @@ public final class GeometryTools
     } else {
       final List<Point2D> points = oldgeo.getPointsModifiable();
       final Point2D oldpoint = points.iterator().next();
-      if (oldpoint.distanceSq(newpoint) >= EPSILON2) {
+      if (oldpoint.distanceSq(newpoint) >= EPSILON_SQ) {
         points.set(0, newpoint);
       }
       oldgeo.setKind(kind);
@@ -899,11 +946,11 @@ public final class GeometryTools
    * Accuracy constant. Used to determine when points are so close that
    * they are considered equal.
    */
-  public static final double EPSILON = 0.001;
+  public static final double EPSILON = 0.000001;
 
   /**
    * The square of {@link #EPSILON}.
    */
-  public static final double EPSILON2 = EPSILON * EPSILON;
+  public static final double EPSILON_SQ = EPSILON * EPSILON;
 
 }
