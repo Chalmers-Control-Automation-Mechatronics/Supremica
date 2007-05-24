@@ -464,10 +464,10 @@ public class Milp
     {
         modelFile = File.createTempFile("milp", ".mod");
         modelFile.deleteOnExit();
-        
+logger.info("model: " + modelFile.getPath());
         solutionFile = File.createTempFile("milp", ".sol");
         solutionFile.deleteOnExit();
-        
+logger.info("solution: " + solutionFile.getPath());        
         indexMap = new AutomataIndexMap(theAutomata);
         pathCutTable = new Hashtable<State,String>();
         
@@ -784,7 +784,7 @@ public class Milp
     }
     
     private void createXORConstraints(Automaton currSpec)
-    throws Exception
+        throws Exception
     {
         // Replace some characters that the GLPK-solver would not accept
         String specName = currSpec.getName().trim();
@@ -1027,17 +1027,43 @@ public class Milp
 // 		return firingStates;
 // 	}
     
-//     private void findNearestPathSplits(Automaton auto, State state, TreeSet<int[]> altPathsVariables)
+    /**
+     *  Calls @findNearestPathSplits(auto, state, altPathsVariables, null), thus
+     *  initiating search for the path splits on all transitions leading to state.
+     *
+     *  @param - auto, the automaton in which path splits may appear.
+     *  @parem - state, the state above which path splits are searched for.
+     *  @param - altPathVariables, the  @ArrayList containing the indices of 
+     *           path split state pairs. The search is always ended by adding 
+     *           NO_PATH_SPLIT_INDEX to the list.
+     */
     private void findNearestPathSplits(Automaton auto, State state, ArrayList<int[]> altPathsVariables)
     {
         findNearestPathSplits(auto, state, altPathsVariables, null);
     }
     
-//     private void findNearestPathSplits(Automaton auto, State state, TreeSet<int[]> altPathsVariables, LabeledEvent event)
+    /**
+     *  Finds all pairs of states {startState, endState} following the supplied 
+     *  event upwards from the supplied state, such that there is a 
+     *  path split in the supplied automaton at startState, leading in one 
+     *  transition to endState. If the event is null, all upstreams path-split 
+     *  states are found. Their inidices, as provided by @AutomataIndexMap, are
+     *  stored in the supplied ArrayList.
+     *
+     *  @param - auto, the automaton in which path splits may appear.
+     *  @parem - state, the state above which path splits are searched for.
+     *  @param - altPathVariables, the  @ArrayList containing the indices of 
+     *           path split state pairs. The search is always ended by adding 
+     *           NO_PATH_SPLIT_INDEX to the list.
+     *  @param - event, the event above (and including) which the search for 
+     *           path splits is started. If null, all transition leading to the 
+     *           state are considered. 
+     */
     private void findNearestPathSplits(Automaton auto, State state, ArrayList<int[]> altPathsVariables, LabeledEvent event)
     {
         if (state.nbrOfIncomingArcs() == 0)
-        { // Indicates that there is no path split leading to the current state
+        { 
+            // Indicates that there is no path split leading to the current state
             altPathsVariables.add(new int[]{NO_PATH_SPLIT_INDEX, NO_PATH_SPLIT_INDEX});
         }
         else
@@ -1045,39 +1071,24 @@ public class Milp
             for (Iterator<Arc> incomingArcsIt = state.incomingArcsIterator(); incomingArcsIt.hasNext(); )
             {
                 Arc currArc = incomingArcsIt.next();
-                
-                // If this is the first method call, then the state is below the branching event.
-                // In that case, alternative paths leading to this state are of no interest. Thus
-                // special treatment.
-// 				if (event != null)
-// 				{
-// 					if (!currArc.getEvent().equals(event))
-// 					{
-// 						continue;
-// 					}
-// 				}
-                
+                               
+                // Normally, this method is called to find all split states ABOVE a certain event.
+                // Thus, if the event is non-null, the other transitions leading to event.getTarget() 
+                // should not be considered.
                 if (event == null || currArc.getEvent().equals(event))
                 {
                     State upstreamsState = currArc.getFromState();
                     if (upstreamsState.nbrOfOutgoingMultiArcs() == 1)
-                    {
+                    {   
+                        // If one step has been taken upstreams from the branching event, all path splits 
+                        // above become interesting. Thus, if no path splits are found immediately,
+                        // the method is looped with event equal to null. 
                         findNearestPathSplits(auto, upstreamsState, altPathsVariables);
                     }
-// 					else if (upstreamsState.nbrOfOutgoingMultiArcs() == 2)
-// 					{
-// 						State nextLeftState = upstreamsState.nextStateIterator().next();
-// 						// -1 in the end if current path goes through the left sibling (+1 otherwise)
-// 						int[] pathSplitIndex = new int[]{indexMap.getStateIndex(auto, upstreamsState), indexMap.getStateIndex(auto, nextLeftState), -1};
-// 						if (! nextLeftState.equals(state))
-// 						{
-// 							pathSplitIndex[pathSplitIndex.length-1] = 1;
-// 						}
-                    
-// 					altPathsVariables.add(pathSplitIndex);
-// 					}
                     else
-                    {
+                    { 
+                        // If a path split is found, the indices for the states "touched" by the splitting event,
+                        // i.e. {splitEvent.getSource(), splitEvent.getTarget()} are stored in the supplied list.
                         altPathsVariables.add(new int[]{indexMap.getStateIndex(auto, upstreamsState), indexMap.getStateIndex(auto, state)});
                     }
                 }

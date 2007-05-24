@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.43 2007-05-24 06:17:33 avenir Exp $
+//# $Id: ComponentEditorPanel.java,v 1.44 2007-05-24 09:02:28 avenir Exp $
 //###########################################################################
 
 
@@ -44,8 +44,10 @@ import net.sourceforge.waters.gui.renderer.Handle;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.BoxGeometryProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
@@ -625,7 +627,7 @@ public class ComponentEditorPanel
 			// For every node...
 			// *** BUG *** This must be done through renderer.
 			for (NodeProxy node : surface.getDrawnGraph().getNodes())
-			{
+			{                            
 				// ... representing a state
 				if (node instanceof SimpleNodeProxy)
 				{
@@ -715,6 +717,53 @@ public class ComponentEditorPanel
 					// Update the bounding box			
 					boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, stateLabelShape.getBounds2D(), transform);
 				}
+                                
+                                // Treatment of node groups
+                                if (node instanceof GroupNodeProxy)
+                                {
+                                    w.write("% Node group " + node.getName() + "\n");
+                                    w.write("newpath\n");
+                                    w.write("gsave\n");
+                                    w.write("0.7 setgray\n");
+                                    w.write("1.5 setlinewidth\n");
+                                    
+                                    GroupNodeProxy groupNode = (GroupNodeProxy) node;
+                                    BoxGeometryProxy groupGeometryProxy = groupNode.getGeometry();
+                                    PathIterator paths = groupGeometryProxy.getRectangle().getPathIterator(transform);
+                                    while (!paths.isDone())
+                                    {
+                                            double[] coords = new double[6];
+                                            int res = paths.currentSegment(coords);
+
+                                            if (res == PathIterator.SEG_MOVETO)
+                                            {
+                                                w.write(Math.round(coords[0]) + " " + Math.round(coords[1]) + " moveto\n");
+                                            }
+                                            else if (res == PathIterator.SEG_LINETO)
+                                            {
+                                                w.write(Math.round(coords[0]) + " " + Math.round(coords[1]) + " lineto\n");
+                                            }
+                                            else if (res == PathIterator.SEG_QUADTO)
+                                            {
+                                                System.out.println("Oops, could this happen? Not implemented...");
+                                            }
+                                            else if (res == PathIterator.SEG_CUBICTO)
+                                            {
+                                                String str = "";
+                                                for (int i = 0; i < coords.length; i++)
+                                                {
+                                                    str += Math.round(coords[i]) + " ";
+                                                }
+                                                str += "curveto\n";
+                                            }
+                                            else 
+                                            {
+                                                w.write("stroke\n");
+                                                w.write("grestore\n");
+                                            }
+                                            paths.next();
+                                    }
+                                }
 
 				// Add an empty line after each state-info
 				w.newLine();
@@ -739,13 +788,7 @@ public class ComponentEditorPanel
 				{
 					double[] coords = new double[6];
 					int res = paths.currentSegment(coords);
-                                        
-                                        //temp
-                                        String str = res + ": ";
-                                        for (int i=0; i<coords.length; i++)
-                                            str += coords[i] + " ";
-                                        System.out.println(edge.getSource().getName() + " -> " + edge.getTarget().getName() + "... " + str);
-                                            
+                                       
 					if (res != PathIterator.SEG_CLOSE)
 					{
 						// The ps-commands are either "moveto", using 2 arguments,
@@ -853,7 +896,7 @@ public class ComponentEditorPanel
 				// Add an empty line after each edge-info
 				w.newLine();
 			}
-
+                        
 			// Add closing command to the eps-file
 			w.write("%%EOF");
 			
