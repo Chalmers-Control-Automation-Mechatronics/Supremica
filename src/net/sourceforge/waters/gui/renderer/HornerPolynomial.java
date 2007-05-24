@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   HornerPolynomial
 //###########################################################################
-//# $Id: HornerPolynomial.java,v 1.2 2007-05-24 18:58:54 robi Exp $
+//# $Id: HornerPolynomial.java,v 1.3 2007-05-24 20:20:57 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -332,7 +332,7 @@ public class HornerPolynomial
         if (yy0 > 0.0 && yy1 < 0.0) {
           return derivative1.newtonIteration(x0);
         } else {
-          return yy1 < 0.0 ? x0 : x1;
+          return yy1 < 0.0 ? x1 : x0;
         }
       } else if (x0 >= extremal1) {
         if (yy0 < 0.0 && yy1 > 0.0) {

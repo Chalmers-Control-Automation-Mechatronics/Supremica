@@ -128,7 +128,6 @@
            excludes="net/sourceforge/waters/gui/**/*.java
                      net/sourceforge/waters/mbt/**/*.java
                      net/sourceforge/waters/analysis/modular/supremica/*.java
-                     net/sourceforge/waters/analysis/modular/SpeedComparison.java
                      net/sourceforge/waters/model/unchecked/**/*.java
                      org/supremica/**/*.java"
            debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}">
@@ -214,7 +213,8 @@
     <mkdir dir="${test.classes}"/>
     <javac srcdir="${supremica.testsrc}" destdir="${test.classes}" 
            includes="net/sourceforge/waters/**/*.java"
-           excludes="net/sourceforge/waters/gui/**/*.java"
+           excludes="net/sourceforge/waters/gui/**/*.java
+                     net/sourceforge/waters/analysis/modular/supremica/*.java"
            debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}">
       <classpath>
         <path refid="waters.compile.classpath"/>
@@ -243,7 +243,7 @@
         <fileset dir="${supremica.testsrc}">
           <include name="net/sourceforge/waters/**/*Test.java"/>
           <exclude name="net/sourceforge/waters/gui/**/*.java"/>
-          <exclude name="net/sourceforge/waters/analysis/modular/*.java"/>
+          <exclude name="net/sourceforge/waters/analysis/modular/**/*.java"/>
           <exclude name="**/*Heuristic*.java"/>
           <exclude name="**/Abstract*.java"/>
           <exclude name="**/Native*.java"/>

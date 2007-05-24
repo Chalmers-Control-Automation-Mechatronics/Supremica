@@ -678,7 +678,13 @@ Class-Path: ${manifest.pathlist}</echo>
     <formatter type="xml"/>
     <batchtest todir="${logs.results}">
       <fileset dir="${testssrc}">
-        <include name="**/MaxCommonEventsHeuristicTest.java"/>
+        <include name="**/*Test.java"/>
+        <include name="**/Test*.java"/>
+        <exclude name="org/supremica/testhelpers/**/*.java"/>
+        <exclude name="**/TestPackage*.java"/>
+        <exclude name="**/Abstract*.java"/>
+        <exclude name="**/Native*.java"/>
+        <exclude name="net/sourceforge/waters/analysis/modular/**/*.java"/>
       </fileset>
     </batchtest>
     <classpath>
@@ -693,20 +699,6 @@ Class-Path: ${manifest.pathlist}</echo>
   </junit>
 </target>
 
-<target name="run_test6" depends="build">
-  <java classname="net.sourceforge.waters.analysis.modular.SpeedComparison" fork="true" maxmemory="512m">
-    <classpath>
-      <pathelement location="${dist}/Supremica.jar"/>
-      <pathelement location="${dist}/SupremicaLib.jar"/>
-      <pathelement location="${dist}/SupremicaTest.jar"/>
-      <pathelement path="${java.class.path}"/>
-    </classpath>
-    <sysproperty key="waters.test.inputdir" value="${waters.examples}"/>
-    <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
-    <sysproperty key="java.library.path" value="${dist}"/>
-  </java>
-</target>
-
 <target name="run_supremica_tests_short"
         depends="jar_supremica,jar_supremica_tests">
   <mkdir dir="${logs.results}"/>
@@ -716,8 +708,8 @@ Class-Path: ${manifest.pathlist}</echo>
       <fileset dir="${testssrc}">
         <include name="**/*Test.java"/>
         <include name="**/Test*.java"/>
-        <include name="**/*Test.groovy"/>
-        <include name="**/Test*.groovy"/>
+<!--        <include name="**/*Test.groovy"/>
+        <include name="**/Test*.groovy"/>-->
         <exclude name="org/supremica/testhelpers/**/*.java"/>
         <exclude name="**/TestPackage*.java"/>
         <exclude name="**/Abstract*.java"/>
@@ -743,7 +735,7 @@ Class-Path: ${manifest.pathlist}</echo>
     <formatter type="xml"/>
     <batchtest todir="${logs.results}">
       <fileset dir="${testssrc}">
-        <include name="**/Geometry*.java"/>
+        <include name="**/Modular*.java"/>
       </fileset>
     </batchtest>
     <classpath>

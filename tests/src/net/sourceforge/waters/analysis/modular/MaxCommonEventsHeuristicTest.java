@@ -4,12 +4,11 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   NativeControllabilityCheckerTest
 //###########################################################################
-//# $Id: MaxCommonEventsHeuristicTest.java,v 1.6 2007-05-24 04:03:56 siw4 Exp $
+//# $Id: MaxCommonEventsHeuristicTest.java,v 1.7 2007-05-24 20:20:57 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.analysis.modular.supremica.ProjectingControllabilityChecker;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 
@@ -18,8 +17,6 @@ import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.
   AbstractLargeControllabilityCheckerTest;
-import net.sourceforge.waters.model.analysis.
-  AbstractControllabilityCheckerTest;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -47,7 +44,7 @@ public class MaxCommonEventsHeuristicTest
     (final ProductDESProxyFactory factory)
   {
     return
-      new ProjectingControllabilityChecker
+      new ModularControllabilityChecker
             (null, factory,
              new NativeControllabilityChecker(factory),
              new MaxCommonEventsHeuristic(HeuristicType.PREFERREALPLANT), false);

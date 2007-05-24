@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   DNFMinimizerTest
 //###########################################################################
-//# $Id: DNFMinimizerTest.java,v 1.1 2007-02-19 22:50:59 robi Exp $
+//# $Id: DNFMinimizerTest.java,v 1.2 2007-05-24 20:20:57 robi Exp $
 //###########################################################################
 
 
@@ -266,6 +266,13 @@ public class DNFMinimizerTest extends TestCase
   {
     final String[][] expected = {{"a", "b"}, {"!b", "c"}};
     testMinimizer("a & b | a & c | !b & c", expected);
+  }
+
+  public void testMinimizer_exercise2a()
+    throws EvalException, ParseException
+  {
+    final String[][] expected = {{"a", "b"}, {"!b", "c"}};
+    testMinimizer("a & b | !b & c", expected);
   }
 
   public void testMinimizer_exercise3()
