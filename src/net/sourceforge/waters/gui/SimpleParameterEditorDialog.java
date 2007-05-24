@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventParameterEditorDialog
 //###########################################################################
-//# $Id: SimpleParameterEditorDialog.java,v 1.8 2007-05-11 02:44:46 robi Exp $
+//# $Id: SimpleParameterEditorDialog.java,v 1.9 2007-05-24 06:21:18 robi Exp $
 //###########################################################################
 
 
@@ -96,7 +96,7 @@ public class SimpleParameterEditorDialog
 			try {
 				parser.parseSimpleIdentifier(nameText);
 			} catch (final ParseException exception) {
-				ErrorWindow.askRevert(exception, nameText);
+				ErrorWindow.askRevert(this, exception, nameText);
 				return;
 			}
 			SimpleExpressionSubject defaultExpr = null;
@@ -105,7 +105,7 @@ public class SimpleParameterEditorDialog
 				defaultExpr =
 					(SimpleExpressionSubject) parser.parse(defaultText);
 			} catch (final ParseException exception) {
-				ErrorWindow.askRevert(exception, defaultText);
+				ErrorWindow.askRevert(this, exception, defaultText);
 				return;
 			}
 			final ParameterSubject param =

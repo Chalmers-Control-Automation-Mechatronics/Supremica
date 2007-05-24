@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ErrorWindow
 //###########################################################################
-//# $Id: ErrorWindow.java,v 1.4 2006-08-08 23:59:21 robi Exp $
+//# $Id: ErrorWindow.java,v 1.5 2007-05-24 06:21:18 robi Exp $
 //###########################################################################
 
 
@@ -42,24 +42,6 @@ public class ErrorWindow
 
 	//#######################################################################
 	//# Modal Invocation
-	/**
-	 * Pops up an error dialog window.
-	 * This method shows a dialog describing a parse error message
-	 * and its position, and asks the user whether they want to
-	 * continue their editing, or stop and revert to the last correct
-	 * value of their input.
-	 * @param  exception  The parse exception that caused the error.
-	 * @param  input      The input which caused the error.
-	 * @return <CODE>true</CODE> if the user chooses to cancel their edit,
-	 *         <CODE>false</CODE> otherwise.
-	 */
-	public static boolean askRevert(final ParseException exception,
-									final String input)
-	{
-		return askRevert(null, exception, input);
-	}
-
-
 	/**
 	 * Pops up an error dialog window.
 	 * This method shows a dialog describing a parse error message

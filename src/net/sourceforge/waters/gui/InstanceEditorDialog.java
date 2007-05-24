@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   InstanceEditorDialog
 //###########################################################################
-//# $Id: InstanceEditorDialog.java,v 1.5 2007-05-11 02:44:46 robi Exp $
+//# $Id: InstanceEditorDialog.java,v 1.6 2007-05-24 06:21:18 robi Exp $
 //###########################################################################
 
 
@@ -94,7 +94,7 @@ public class InstanceEditorDialog
 			try {
 				ident = parser.parseIdentifier(nameText);
 			} catch (final ParseException exception) {
-				ErrorWindow.askRevert(exception, nameText);
+				ErrorWindow.askRevert(this, exception, nameText);
 				return;
 			}
 			final String moduleText = mModuleInput.getText();

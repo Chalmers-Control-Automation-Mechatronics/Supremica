@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorForeachDialog
 //###########################################################################
-//# $Id: EditorForeachDialog.java,v 1.6 2007-05-11 02:44:46 robi Exp $
+//# $Id: EditorForeachDialog.java,v 1.7 2007-05-24 06:21:18 robi Exp $
 //###########################################################################
 
 
@@ -94,7 +94,7 @@ public class EditorForeachDialog
 			try	{
 				parser.parseSimpleIdentifier(nameText);
 			} catch (final ParseException exception) {
-				ErrorWindow.askRevert(exception, nameText);
+				ErrorWindow.askRevert(this, exception, nameText);
 				return;
 			}
 
@@ -104,7 +104,7 @@ public class EditorForeachDialog
 				rangeExpr = (SimpleExpressionSubject)
 					parser.parse(rangeText, Operator.TYPE_RANGE);
 			} catch (final ParseException exception) {
-				ErrorWindow.askRevert(exception, rangeText);
+				ErrorWindow.askRevert(this, exception, rangeText);
 				return;
 			}
 
@@ -115,7 +115,7 @@ public class EditorForeachDialog
 					guardExpr = (SimpleExpressionSubject)
 						parser.parse(guardText, Operator.TYPE_INT);
 				} catch (final ParseException exception) {
-					ErrorWindow.askRevert(exception, guardText);
+					ErrorWindow.askRevert(this, exception, guardText);
 					return;
 				}
 			}

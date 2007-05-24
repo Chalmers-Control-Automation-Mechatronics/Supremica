@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorRenameComponentDialog
 //###########################################################################
-//# $Id: EditorRenameComponentDialog.java,v 1.1 2007-05-23 07:24:11 avenir Exp $
+//# $Id: EditorRenameComponentDialog.java,v 1.2 2007-05-24 06:21:18 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -99,7 +99,7 @@ public class EditorRenameComponentDialog
             } 
             catch (final ParseException exception) 
             {
-                ErrorWindow.askRevert(exception, nameText);
+                ErrorWindow.askRevert(this, exception, nameText);
                 return;
             }
             

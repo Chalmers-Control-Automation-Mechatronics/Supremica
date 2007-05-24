@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   BindingEditorDialog
 //###########################################################################
-//# $Id: BindingEditorDialog.java,v 1.6 2007-05-11 02:44:46 robi Exp $
+//# $Id: BindingEditorDialog.java,v 1.7 2007-05-24 06:21:18 robi Exp $
 //###########################################################################
 
 
@@ -90,7 +90,7 @@ public class BindingEditorDialog
 			try {
 				expr = (SimpleExpressionSubject) parser.parse(exprText);
 			} catch (final ParseException exception) {
-				ErrorWindow.askRevert(exception, exprText);
+				ErrorWindow.askRevert(this, exception, exprText);
 				return;
 			}
 			final ParameterBindingSubject binding =

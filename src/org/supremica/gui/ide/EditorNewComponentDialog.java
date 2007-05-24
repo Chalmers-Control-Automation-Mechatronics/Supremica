@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorNewDialog
 //###########################################################################
-//# $Id: EditorNewComponentDialog.java,v 1.15 2006-11-03 15:01:57 torda Exp $
+//# $Id: EditorNewComponentDialog.java,v 1.16 2007-05-24 06:21:18 robi Exp $
 //###########################################################################
 
 
@@ -137,7 +137,7 @@ public class EditorNewComponentDialog
 			try {
 				ident = parser.parseIdentifier(nameText);
 			} catch (final ParseException exception) {
-				ErrorWindow.askRevert(exception, nameText);
+				ErrorWindow.askRevert(this, exception, nameText);
 				return;
 			}
 
