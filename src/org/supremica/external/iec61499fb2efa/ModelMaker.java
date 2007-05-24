@@ -1150,14 +1150,14 @@ class ModelMaker
 		
 		ExtendedAutomaton eventQueue = new ExtendedAutomaton("Event Queue " + fbName, automata);
 		
-		// maximum value of an integer variable
-		final int varMaxValue = 10;
-
 		// the maximum number of events in the queue at the same time
 		final int places = basicFunctionBlocks.keySet().size();	
 		
 		final int evMaxID = ((Integer) eventsMaxID.get(fbName)).intValue();
 		eventQueue.addIntegerVariable("queuing_event_" + fbName, 0, evMaxID, 0, null);
+
+		// maximum value of an integer variable
+		final int varMaxValue = 10;
 
 		// event input variables
 		if (theType.getInterfaceList().isSetInputVars())
@@ -1388,9 +1388,48 @@ class ModelMaker
 		
 		ExtendedAutomaton ecc = new ExtendedAutomaton("Execution Control Chart " + fbName, automata);
 
-		
-		
+		// maximum value of an integer variable
+		final int varMaxValue = 10;
 
+		// local variables
+		if (theType.getBasicFB().isSetInternalVars())
+		{
+			final List internalVars = theType.getBasicFB().getInternalVars().getVarDeclaration();
+			for (Iterator internalVarIter = internalVars.iterator(); internalVarIter.hasNext();)
+			{
+				VarDeclaration curDeclaration = (VarDeclaration) internalVarIter.next();
+				String curName = curDeclaration.getName();
+				String curType =  curDeclaration.getType();
+				if (curType.toLowerCase().equals("int"))
+				{
+					ecc.addIntegerVariable("internal_" + curName + "_" + fbName, 0, varMaxValue, 0, null);
+				}
+				else if (curType.toLowerCase().equals("bool"))
+				{
+					System.err.println("\t Error: Unsupported input data variable type: BOOL");
+					System.err.println("\t Variable name: " + fbName + "_" + curName);
+					System.exit(1);
+				}
+				else if (curType.toLowerCase().equals("real"))
+				{
+					System.err.println("\t Error: Unsupported input data variable type: REAL");
+					System.err.println("\t Variable name: " + fbName + "_" + curName);
+					System.exit(1);
+				}
+				else if (curType.toLowerCase().equals("string"))
+				{
+					System.err.println("\t Error: Unsupported input data variable type: STRING");
+					System.err.println("\t Variable name: " + fbName + "_" + curName);
+					System.exit(1);
+				}
+				else if (curType.toLowerCase().equals("object"))
+				{
+					System.err.println("\t Error: Unsupported input data variable type: OBJECT");
+					System.err.println("\t Variable name: " + fbName + "_" + curName);
+					System.exit(1);
+				}
+			}
+		}
 		automata.addAutomaton(ecc);	
 	}
 
