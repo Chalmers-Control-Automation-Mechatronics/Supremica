@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ProjectingControllabilityChecker
 //###########################################################################
-//# $Id: ProjectingControllabilityChecker.java,v 1.2 2007-05-25 08:17:51 robi Exp $
+//# $Id: ProjectingControllabilityChecker.java,v 1.3 2007-05-25 15:18:24 robi Exp $
 //###########################################################################
 
 
@@ -390,6 +390,8 @@ public class ProjectingControllabilityChecker
       final Automaton synchprod =
         AutomataSynchronizer.synchronizeAutomata(supmodel, synchopt);
       LOGGER.debug("ProjectingControllabilityChecker: minimizing ...");
+      LOGGER.debug("Original alphabet:" + synchprod.getEvents());
+      LOGGER.debug("Target alphabet:" + alph);
       final AutomatonMinimizer minimizer =
         new AutomatonMinimizer(synchprod);
       final MinimizationOptions opt = new MinimizationOptions();
@@ -401,7 +403,7 @@ public class ProjectingControllabilityChecker
       opt.setMinimizationType(EquivalenceRelation.LANGUAGEEQUIVALENCE);
       opt.setTargetAlphabet(alph);
       final Automaton minAutomaton = minimizer.getMinimizedAutomaton(opt);
-      LOGGER.debug("ProjectingControllabilityChecker: done so far.");
+      LOGGER.debug("Result alphabet:" + minAutomaton.getEvents());
       for (AutomatonProxy a : automata) {
         targ.addAll(a.getEvents());
       }
