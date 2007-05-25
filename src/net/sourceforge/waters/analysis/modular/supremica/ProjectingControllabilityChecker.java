@@ -2,70 +2,71 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.analysis.modular
-//# CLASS:   ModularControllabilityChecker
+//# CLASS:   ProjectingControllabilityChecker
 //###########################################################################
-//# $Id: ProjectingControllabilityChecker.java,v 1.1 2007-05-24 04:03:56 siw4 Exp $
+//# $Id: ProjectingControllabilityChecker.java,v 1.2 2007-05-25 08:17:51 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.analysis.modular.supremica;
 
-import net.sourceforge.waters.model.marshaller.DocumentManager;
-import java.util.Queue;
-import java.util.PriorityQueue;
-import java.util.LinkedList;
-import org.supremica.automata.algorithms.SynchronizationOptions;
-import net.sourceforge.waters.analysis.modular.*;
-import java.util.Stack;
-import org.supremica.automata.algorithms.AutomataSynchronizer;
-import org.supremica.automata.Automaton;
-import org.supremica.automata.algorithms.minimization.MinimizationOptions;
-import org.supremica.automata.Alphabet;
-import net.sourceforge.waters.model.des.TraceProxy;
-import java.util.List;
-import org.supremica.automata.algorithms.minimization.AutomatonMinimizer;
-import org.supremica.automata.LabeledEvent;
-import org.supremica.automata.algorithms.EquivalenceRelation;
-import org.supremica.automata.algorithms.minimization.AutomataMinimizer;
-import org.supremica.automata.IO.ProjectBuildFromWaters;
-import java.util.Collections;
-import net.sourceforge.waters.model.des.TransitionProxy;
-import java.util.Map;
-import java.util.HashMap;
-import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.analysis.VerificationResult;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.Stack;
 import java.util.TreeSet;
 
+import net.sourceforge.waters.analysis.modular.*;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.algorithms.AutomataSynchronizer;
+import org.supremica.automata.algorithms.EquivalenceRelation;
+import org.supremica.automata.algorithms.SynchronizationOptions;
+import org.supremica.automata.algorithms.minimization.AutomataMinimizer;
+import org.supremica.automata.algorithms.minimization.AutomatonMinimizer;
+import org.supremica.automata.algorithms.minimization.MinimizationOptions;
+import org.supremica.automata.IO.ProjectBuildFromWaters;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 
 
 public class ProjectingControllabilityChecker
   extends AbstractModelVerifier
   implements ControllabilityChecker
 {
-  private final ControllabilityChecker mChecker;
-  private ModularHeuristic mHeuristic;
-  private KindTranslator mTranslator;
-  private int mStates;
-  private final boolean mLeast;
- 
+
+  //#########################################################################
+  //# Constructors
   public ProjectingControllabilityChecker(ProductDESProxy model,
                                           ProductDESProxyFactory factory,
                                           ControllabilityChecker checker,
@@ -377,11 +378,21 @@ public class ProjectingControllabilityChecker
       for (EventProxy e : targ) {
         alph.addEvent((LabeledEvent)(new LabeledEvent(e)));
       }
-      ProjectBuildFromWaters build = new ProjectBuildFromWaters(new DocumentManager());
-      SynchronizationOptions synch = SynchronizationOptions.getDefaultSynthesisOptions();
-      synch.setUseShortStateNames(true);
-      AutomatonMinimizer min = new AutomatonMinimizer(AutomataSynchronizer.synchronizeAutomata(build.build(comp),synch));
-      MinimizationOptions opt = new MinimizationOptions();
+
+      final ProjectBuildFromWaters builder =
+        new ProjectBuildFromWaters(new DocumentManager());
+      final Automata supmodel = builder.build(comp);
+      final SynchronizationOptions synchopt =
+        SynchronizationOptions.getDefaultSynthesisOptions();
+      synchopt.setUseShortStateNames(true);
+      LOGGER.debug("ProjectingControllabilityChecker: synchronising " +
+                   comp.getAutomata().size() + " automata ...");
+      final Automaton synchprod =
+        AutomataSynchronizer.synchronizeAutomata(supmodel, synchopt);
+      LOGGER.debug("ProjectingControllabilityChecker: minimizing ...");
+      final AutomatonMinimizer minimizer =
+        new AutomatonMinimizer(synchprod);
+      final MinimizationOptions opt = new MinimizationOptions();
       opt.setAlsoTransitions(true);
       opt.setComponentSizeLimit(Integer.MAX_VALUE);
       opt.setCompositionalMinimization(true);
@@ -389,7 +400,8 @@ public class ProjectingControllabilityChecker
       opt.setKeepOriginal(false);
       opt.setMinimizationType(EquivalenceRelation.LANGUAGEEQUIVALENCE);
       opt.setTargetAlphabet(alph);
-      Automaton minAutomaton = min.getMinimizedAutomaton(opt);
+      final Automaton minAutomaton = minimizer.getMinimizedAutomaton(opt);
+      LOGGER.debug("ProjectingControllabilityChecker: done so far.");
       for (AutomatonProxy a : automata) {
         targ.addAll(a.getEvents());
       }
@@ -538,14 +550,31 @@ public class ProjectingControllabilityChecker
         return mHash;
       }
       
-      public boolean equal(Object other)
+      public boolean equals(final Object other)
       {
-        if (other instanceof Key) {
-          Key o = (Key) other;
-          return mState.equals(o.mState) && mEvent.equals(o.mEvent);
+        if (other != null && other.getClass() == getClass()) {
+          final Key key = (Key) other;
+          return mState.equals(key.mState) && mEvent.equals(key.mEvent);
+        } else {
+          return false;
         }
-        return false;
       }
     }
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private final ControllabilityChecker mChecker;
+  private ModularHeuristic mHeuristic;
+  private KindTranslator mTranslator;
+  private int mStates;
+  private final boolean mLeast;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final Logger LOGGER =
+    LoggerFactory.createLogger(ProjectingControllabilityChecker.class);
+
 }
