@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractModelVerifierTest
 //###########################################################################
-//# $Id: AbstractModelVerifierTest.java,v 1.10 2006-11-16 11:27:25 oscar Exp $
+//# $Id: AbstractModelVerifierTest.java,v 1.11 2007-05-25 07:53:02 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -37,7 +37,7 @@ public abstract class AbstractModelVerifierTest extends AbstractWatersTest
 
   //#########################################################################
   //# Overrides for base class junit.framework.TestCase
-  public void setUp() throws Exception
+  protected void setUp() throws Exception
   {
     super.setUp();
     mProductDESProxyFactory = ProductDESElementFactory.getInstance();

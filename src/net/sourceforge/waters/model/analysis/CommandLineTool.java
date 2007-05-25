@@ -4,13 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.analysis
 //# CLASS:   ControlLoopChecker
 //##########################################################################
-//# $Id: CommandLineTool.java,v 1.2 2007-03-19 04:44:56 robi Exp $
+//# $Id: CommandLineTool.java,v 1.3 2007-05-25 07:53:02 robi Exp $
 //##########################################################################
 
 package net.sourceforge.waters.model.analysis;
 
 import java.lang.reflect.Method;
 import java.io.File;
+import java.io.PrintStream;
 import java.util.Formatter;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -87,6 +88,20 @@ public class CommandLineTool
       }
       
       final ClassLoader loader = CommandLineTool.class.getClassLoader();
+      try {
+        final Class<?> lclazz = loader.loadClass(LOGGERFACTORY);
+        if (verbose) {
+          final Method method =
+            lclazz.getMethod("logToStream", PrintStream.class);
+          method.invoke(null, System.err);
+        } else {
+          final Method method = lclazz.getMethod("logToNull");
+          method.invoke(null);
+        }
+      } catch (final ClassNotFoundException exception) {
+        // No loggers---no trouble ...
+      }
+
       final Class<?> fclazz = loader.loadClass(factoryname);
       final Method getinst = fclazz.getMethod("getInstance", List.class);
       final ModelVerifierFactory factory =
@@ -142,7 +157,8 @@ public class CommandLineTool
         final int numstates = result.getTotalNumberOfStates();
         final float difftime = 0.001f * (stop - start);
 
-        formatter.format("%b (%d states, %.3f s)\n", satisfied, numstates, difftime);
+        formatter.format("%b (%d states, %.3f s)\n",
+                         satisfied, numstates, difftime);
         if (verbose && !satisfied) {
           System.out.println("Counterexample:");
           final TraceProxy counterex = result.getCounterExample();
@@ -158,4 +174,11 @@ public class CommandLineTool
       exception.printStackTrace(System.err);
     }
   }
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final String LOGGERFACTORY =
+    "org.supremica.log.LoggerFactory";
+
 }

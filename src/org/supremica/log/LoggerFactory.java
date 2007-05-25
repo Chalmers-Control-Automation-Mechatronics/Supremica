@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.log
 //# CLASS:   LoggerFactory
 //###########################################################################
-//# $Id: LoggerFactory.java,v 1.15 2007-05-04 12:03:23 flordal Exp $
+//# $Id: LoggerFactory.java,v 1.16 2007-05-25 07:53:02 robi Exp $
 //###########################################################################
 
 /*
@@ -58,11 +58,15 @@
 
 package org.supremica.log;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.WriterAppender;
+import org.apache.log4j.varia.NullAppender;
 
 import org.supremica.properties.Config;
 
@@ -138,7 +142,31 @@ public class LoggerFactory
         }
     }
     
-    
+    public static void logToNull()
+	{
+        final Appender appender = new NullAppender();
+        final org.apache.log4j.Logger root =
+            org.apache.log4j.Logger.getRootLogger();
+		root.addAppender(appender);
+	}
+
+    public static void logToFile(final File file)
+		throws FileNotFoundException
+	{
+		final PrintStream stream = new PrintStream(file);
+		logToStream(stream);
+	}
+
+	public static void logToStream(final PrintStream stream)
+	{
+        final PrintWriter writer = new PrintWriter(stream);
+        final Appender appender = new WriterAppender(mLayout, writer);
+        final org.apache.log4j.Logger root =
+            org.apache.log4j.Logger.getRootLogger();
+		root.addAppender(appender);
+	}
+
+
     //#######################################################################
     //# Static Initialisation
     static
@@ -149,7 +177,6 @@ public class LoggerFactory
         mConsoleAppender = cappender;
         final LoggerFilter filter = new LoggerFilter();
         cappender.addFilter(filter);
-        mFilter = filter;
         final org.apache.log4j.Logger root =
             org.apache.log4j.Logger.getRootLogger();
         if (Config.LOG_TO_CONSOLE.isTrue())
@@ -161,12 +188,14 @@ public class LoggerFactory
             final Appender dappender = LogDisplay.getInstance();
             root.addAppender(dappender);
         }
-        
+		mLayout = layout;
+        mFilter = filter;        
     }
     
     
     //#######################################################################
     //# Data Members
+    private static final PatternLayout mLayout;
     private static final LoggerFilter mFilter;
     private static final Appender mConsoleAppender;
     

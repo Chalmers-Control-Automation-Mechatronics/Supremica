@@ -17,6 +17,9 @@ for F in $@; do
 	-mono)
 	    FACTORY="$WPACK.analysis.monolithic.MonolithicModelVerifierFactory"
 	    ;;
+	-proj)
+	    FACTORY="$WPACK.analysis.modular.supremica.ProjectingModelVerifierFactory"
+	    ;;
 	-cont)
 	    CHECK="Controllability"
 	    ;;
@@ -29,5 +32,14 @@ for F in $@; do
     esac
 done
 
-eval java -cp "$DIR/Supremica.jar" -enableassertions \
-    $WPACK.model.analysis.CommandLineTool $FACTORY $CHECK $ARGS
+OK=1
+if [ "" = "$CHECK" ]; then
+    echo "No check specified!"
+    echo "Available options are: -cont -lang"
+    OK=0
+fi
+
+if [ $OK = 1 ]; then
+    eval java -cp "$DIR/Supremica.jar" -enableassertions -Xmx512m \
+        $WPACK.model.analysis.CommandLineTool $FACTORY $CHECK $ARGS
+fi
