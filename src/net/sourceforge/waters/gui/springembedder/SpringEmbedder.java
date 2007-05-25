@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.37 2007-05-24 21:04:09 robi Exp $
+//# $Id: SpringEmbedder.java,v 1.38 2007-05-25 11:45:34 robi Exp $
 //###########################################################################
 
 
@@ -29,6 +29,7 @@ import javax.swing.SwingUtilities;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.renderer.GeometryTools;
 import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
+import net.sourceforge.waters.gui.renderer.SimpleNodeProxyShape;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GroupNodeSubject;
@@ -304,6 +305,7 @@ public class SpringEmbedder
     mNodeEdgeRepulsion = NODEEDGE_REPULSION / numnodes;
     mEdgeRepulsion = EDGE_REPULSION;
     mCenter = (Point2D) POINT_CENTER.clone();
+    mTotalJumpsAvailable = numnodes;
   }
 
   private void runToConvergence()
@@ -639,6 +641,7 @@ public class SpringEmbedder
       mIsInitial = node.isInitial();
       mNeighbours = new HashMap<NodeWrapper,Double>();
       mSelfLoopFactor = 1.0;
+      mJumps = null;
     }
 
     //#######################################################################
@@ -717,6 +720,29 @@ public class SpringEmbedder
       return delta;
     }
 
+    boolean isJumping(final EdgeWrapper edge, final Point2D closest)
+    {
+      if (mPass > 0) {
+        final Point2D old = getOldPoint();
+        final double distsq = old.distanceSq(closest);
+        if (distsq < JUMP_THRESHOLD_SQ) {
+          if (mJumps == null) {
+            final int numedges = mEdgeWrappers.length;
+            mJumps = new HashMap<EdgeWrapper,EdgeJump>(numedges);
+          }
+          final EdgeJump jump = mJumps.get(edge);
+          if (jump == null) {
+            final EdgeJump newjump = new EdgeJump(distsq);
+            mJumps.put(edge, newjump);
+          } else {
+            jump.update(distsq);
+            return jump.isJumping();
+          }
+        }
+      }
+      return false;
+    }
+
     double getDelta()
     {
       double delta = 0.0;
@@ -756,6 +782,7 @@ public class SpringEmbedder
     private final boolean mIsInitial;
     private final Map<NodeWrapper,Double> mNeighbours;
     private double mSelfLoopFactor;
+    private Map<EdgeWrapper,EdgeJump> mJumps;
   }
 
 
@@ -837,6 +864,9 @@ public class SpringEmbedder
           GeometryTools.convertToControl(start, end, turn);
         final Point2D closest = GeometryTools.findClosestPointOnQuadratic
           (start, control, end, point);
+        if (node.isJumping(this, closest)) {
+          return POINT_ZERO;
+        }
         final double x1 = start.getX();
         final double y1 = start.getY();
         final double x2 = end.getX();
@@ -848,7 +878,7 @@ public class SpringEmbedder
         final double distsq = diag.ptLineDistSq(point);
         final double weight =
           distsq >= MIDQUADRATIC_THRESHOLD_SQ ? 1.0 :
-          distsq / MIDQUADRATIC_THRESHOLD_SQ;
+          Math.sqrt(distsq) / MIDQUADRATIC_THRESHOLD;
         if (weight == 1.0) {
           return repulsion(closest, point, mNodeEdgeRepulsion);
         } else {
@@ -886,7 +916,6 @@ public class SpringEmbedder
       final Point2D point = getNewPoint();
       GeometryTools.createMidGeometry(mEdge, point, SplineKind.INTERPOLATING);
     }
-
 
     //#######################################################################
     //# Data Members
@@ -926,6 +955,61 @@ public class SpringEmbedder
     private final EdgeWrapper mEdge1;
     private final EdgeWrapper mEdge2;
 
+  }
+
+
+  //#########################################################################
+  //# Inner Class EdgeJump
+  /**
+   * A simple record to keep track of nodes having to cross edges.
+   * Occasionally, a node ends up on the wrong side of an edge, and cannot
+   * cross it due to excessive repulsion. This class is used to temporarily
+   * switch off the repulsion between the node and edge concerned to allow
+   * the node to cross. This is called a <I>jump</I>.  The total number of
+   * jumps per spring embedder run is limited.
+   */
+  private class EdgeJump
+  {
+
+    //#######################################################################
+    //# Constructor
+    EdgeJump(final double distance)
+    {
+      mLastDistance = distance;
+      mIsJumping = false;
+      mJumpsAvailable = MAX_JUMPS_EACH;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    boolean isJumping()
+    {
+      return mIsJumping;
+    }
+
+    //#######################################################################
+    //# Jump Switching
+    void update(final double distance)
+    {
+      if (mIsJumping) {
+        if (distance > mLastDistance) {
+          mIsJumping = false;
+        }
+      } else if (mJumpsAvailable > 0 && mTotalJumpsAvailable > 0) {
+        if (distance < mLastDistance) {
+          mJumpsAvailable--;
+          mTotalJumpsAvailable--;
+          mIsJumping = true;
+        }
+      }
+      mLastDistance = distance;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private double mLastDistance;
+    private boolean mIsJumping;
+    private int mJumpsAvailable;
   }
 
 
@@ -1022,6 +1106,7 @@ public class SpringEmbedder
   private double mInitialStateAttraction;
   private int mNextWrapperId;
   private int mPass;
+  private int mTotalJumpsAvailable;
 
   private volatile boolean mStop = false;
 
@@ -1032,7 +1117,14 @@ public class SpringEmbedder
   //###########################################################################
   //# Class Constants
   private static final double EPSILON = 0.00002;
-  private static final double MIDQUADRATIC_THRESHOLD_SQ = 100.0;
+  private static final double MIDQUADRATIC_THRESHOLD = 100.0;
+  private static final double MIDQUADRATIC_THRESHOLD_SQ =
+    MIDQUADRATIC_THRESHOLD * MIDQUADRATIC_THRESHOLD;
+  private static final double JUMP_THRESHOLD =
+    2.0 * SimpleNodeProxyShape.RADIUS;
+  private static final double JUMP_THRESHOLD_SQ =
+    JUMP_THRESHOLD * JUMP_THRESHOLD;
+  private static final int MAX_JUMPS_EACH = 3;
 
   private static final int NUM_PASSES = 3;
   private static final double MULTI_EDGE_WEIGHT = 1.333;
