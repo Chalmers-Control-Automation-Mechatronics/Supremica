@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ProjectingControllabilityChecker
 //###########################################################################
-//# $Id: ProjectingControllabilityChecker.java,v 1.3 2007-05-25 15:18:24 robi Exp $
+//# $Id: ProjectingControllabilityChecker.java,v 1.4 2007-05-26 08:51:23 robi Exp $
 //###########################################################################
 
 
@@ -372,11 +372,14 @@ public class ProjectingControllabilityChecker
       for (AutomatonProxy a : automata) {
         mHidden.removeAll(a.getEvents());
       }
-      Set<EventProxy> targ = new HashSet<EventProxy>(events);
+      final Set<EventProxy> targ = new HashSet<EventProxy>(events);
       targ.removeAll(mHidden);
-      Alphabet alph = new Alphabet();
-      for (EventProxy e : targ) {
-        alph.addEvent((LabeledEvent)(new LabeledEvent(e)));
+      LOGGER.debug("Events: " + events);
+      LOGGER.debug("Hidden: " + mHidden);
+      final Alphabet alph = new Alphabet();
+      for (final EventProxy event : targ) {
+        final LabeledEvent label = new LabeledEvent(event);
+        alph.addEvent(label);
       }
 
       final ProjectBuildFromWaters builder =
@@ -391,7 +394,8 @@ public class ProjectingControllabilityChecker
         AutomataSynchronizer.synchronizeAutomata(supmodel, synchopt);
       LOGGER.debug("ProjectingControllabilityChecker: minimizing ...");
       LOGGER.debug("Original alphabet:" + synchprod.getEvents());
-      LOGGER.debug("Target alphabet:" + alph);
+      LOGGER.debug("Target alphabet (alph): " + alph);
+      LOGGER.debug("Target alphabet (targ): " + targ);
       final AutomatonMinimizer minimizer =
         new AutomatonMinimizer(synchprod);
       final MinimizationOptions opt = new MinimizationOptions();
