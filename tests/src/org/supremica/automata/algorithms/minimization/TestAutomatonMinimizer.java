@@ -1,3 +1,12 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica Tests
+//# PACKAGE: org.supremica.automata.algorithms.minimization
+//# CLASS:   TestAutomatonMinimizer
+//###########################################################################
+//# $Id: TestAutomatonMinimizer.java,v 1.10 2007-05-26 11:29:22 robi Exp $
+//###########################################################################
+
 /*
  *  Supremica Software License Agreement
  *
@@ -46,42 +55,39 @@
  *
  *  Supremica is owned and represented by KA.
  */
+
 package org.supremica.automata.algorithms.minimization;
 
+import java.io.File;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+
 import org.supremica.testhelpers.*;
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
-import org.supremica.automata.algorithms.minimization.BisimulationEquivalenceMinimizer;
 import org.supremica.automata.IO.*;
 
-import java.util.*;
 
 public class TestAutomatonMinimizer
-    extends TestCase
+    extends AbstractAnalysisTest
 {
-    public TestAutomatonMinimizer(String name)
+
+	//#######################################################################
+	//# Entry points in junit.framework.TestCase
+    public TestAutomatonMinimizer(final String name)
     {
         super(name);
-    }
-    
-    /**
-     * Sets up the test fixture.
-     * Called before every test case method.
-     */
-    protected void setUp()
-    {
-    }
-    
-    /**
-     * Tears down the test fixture.
-     * Called after every test case method.
-     */
-    protected void tearDown()
-    {
     }
     
     /**
@@ -90,10 +96,25 @@ public class TestAutomatonMinimizer
      */
     public static Test suite()
     {
-        TestSuite suite = new TestSuite(TestAutomatonMinimizer.class);
+        final TestSuite suite = new TestSuite(TestAutomatonMinimizer.class);
         return suite;
     }
     
+	public static void main(final String[] args)
+	{
+		junit.textui.TestRunner.run(suite());
+	}
+
+	protected void setUp() throws Exception
+	{
+		super.setUp();
+		final DocumentManager manager = getDocumentManager();
+		mBuilder = new ProjectBuildFromWaters(manager);
+	}
+
+
+	//#######################################################################
+	//# Supremica Test Cases
     public void testLanguageEquivalenceMinimization()
     {
         try
@@ -266,4 +287,99 @@ public class TestAutomatonMinimizer
             assertTrue(false);
         }
     }
+
+
+	//#######################################################################
+	//# Waters Test Cases
+	public void testAutomatonMinimizerForWaters()
+		throws Exception
+	{
+		final ProductDESProxy des = getBmwDES();
+		final AutomatonProxy aut = getComfortFunctionAutomaton(des);
+		final Alphabet target = getReqCloseHidingAlhabet(des, aut);
+		final MinimizationOptions opt = getMinimizationOptions(aut, target);
+		final Automaton supaut = mBuilder.build(aut);
+		final AutomatonMinimizer minimizer = new AutomatonMinimizer(supaut);
+		final AutomatonProxy minaut = minimizer.getMinimizedAutomaton(opt);
+		final Collection<EventProxy> minevents = minaut.getEvents();
+		assertEquals("Unexpected event set in result!", target, minevents);
+	}
+
+	public void testAutomataMinimizerForWaters()
+		throws Exception
+	{
+		final ProductDESProxy des = getBmwDES();
+		final AutomatonProxy aut = getComfortFunctionAutomaton(des);
+		final Alphabet target = getReqCloseHidingAlhabet(des, aut);
+		final MinimizationOptions opt = getMinimizationOptions(aut, target);
+		final Automaton supaut = mBuilder.build(aut);
+		final Automata supmodel = new Automata(supaut);
+		final AutomataMinimizer minimizer = new AutomataMinimizer(supmodel);
+		final ProductDESProxy minmodel =
+			minimizer.getCompositionalMinimization(opt);
+		assertEquals("Unexpected number of automata in result!",
+					 1, minmodel.getAutomata().size());
+		final AutomatonProxy minaut = minmodel.getAutomata().iterator().next();
+		final Collection<EventProxy> minevents = minaut.getEvents();
+		assertEquals("Unexpected event set in result!", target, minevents);
+	}
+
+
+	//#######################################################################
+	//# Auxiliary Methods for Waters Test
+	private ProductDESProxy getBmwDES()
+		throws Exception
+	{
+		final String groupname = "valid";
+		final String subdirname = "bmw_fh";
+		final String filename = "bmw_fh.wdes";
+		final File rootdir = getInputRoot();
+		final File groupdir = new File(rootdir, groupname);
+		final File subdir = new File(groupdir, subdirname);
+		final File file = new File(subdir, filename);
+		return getCompiledDES(file);
+	}
+
+	private AutomatonProxy getComfortFunctionAutomaton
+		(final ProductDESProxy des)
+	{
+		final String autname = "comfort_function";
+		return findAutomaton(des, autname);
+	}
+
+	private Alphabet getReqCloseHidingAlhabet(final ProductDESProxy des,
+											  final AutomatonProxy aut)
+	{
+		final String eventname = "REQ[CLOSE]";
+		final EventProxy victim = findEvent(des, eventname);
+		final Alphabet target = new Alphabet();
+		for (final EventProxy event : aut.getEvents()) {
+			if (event != victim) {
+				final LabeledEvent label = new LabeledEvent(event);
+				target.addEvent(label);
+			}
+		}
+		return target;
+	}
+
+	private MinimizationOptions getMinimizationOptions
+		(final AutomatonProxy aut, final Alphabet target)
+	{
+		final int numstates = aut.getStates().size();
+		final MinimizationOptions opt = new MinimizationOptions();
+		opt.setAlsoTransitions(true);
+		opt.setComponentSizeLimit(10 * numstates);
+		opt.setCompositionalMinimization(true);
+		opt.setIgnoreMarking(true);
+		opt.setKeepOriginal(false);
+		opt.setMinimizationType(EquivalenceRelation.LANGUAGEEQUIVALENCE);
+		opt.setTargetAlphabet(target);
+		return opt;
+	}
+
+
+	//#######################################################################
+	//# Data Members
+	private ProjectBuildFromWaters mBuilder;
+
 }

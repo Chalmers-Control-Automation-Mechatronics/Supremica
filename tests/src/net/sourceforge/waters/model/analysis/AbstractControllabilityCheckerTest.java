@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractControllabilityCheckerTest
 //###########################################################################
-//# $Id: AbstractControllabilityCheckerTest.java,v 1.9 2007-05-17 17:01:35 robi Exp $
+//# $Id: AbstractControllabilityCheckerTest.java,v 1.10 2007-05-26 11:29:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -32,6 +32,18 @@ import net.sourceforge.waters.xsd.base.EventKind;
 public abstract class AbstractControllabilityCheckerTest
   extends AbstractModelVerifierTest
 {
+
+  //#########################################################################
+  //# Entry points in junit.framework.TestCase
+  public AbstractControllabilityCheckerTest()
+  {
+  }
+
+  public AbstractControllabilityCheckerTest(final String name)
+  {
+    super(name);
+  }
+
 
   //#########################################################################
   //# Test Cases --- handcrafted

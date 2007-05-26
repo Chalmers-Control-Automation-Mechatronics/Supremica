@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractModelVerifierTest
 //###########################################################################
-//# $Id: AbstractModelVerifierTest.java,v 1.11 2007-05-25 07:53:02 robi Exp $
+//# $Id: AbstractModelVerifierTest.java,v 1.12 2007-05-26 11:29:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -12,46 +12,35 @@ package net.sourceforge.waters.model.analysis;
 import java.io.File;
 import java.util.List;
 
-import net.sourceforge.waters.junit.AbstractWatersTest;
-import net.sourceforge.waters.model.base.DocumentProxy;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
-import net.sourceforge.waters.model.expr.OperatorTable;
-import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
-import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 
-public abstract class AbstractModelVerifierTest extends AbstractWatersTest
+public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
 {
 
   //#########################################################################
   //# Overrides for base class junit.framework.TestCase
+  public AbstractModelVerifierTest()
+  {
+  }
+
+  public AbstractModelVerifierTest(final String name)
+  {
+    super(name);
+  }
+
   protected void setUp() throws Exception
   {
     super.setUp();
-    mProductDESProxyFactory = ProductDESElementFactory.getInstance();
-    mTraceMarshaller = new JAXBTraceMarshaller(mProductDESProxyFactory);
-    mProductDESMarshaller =
-      new JAXBProductDESMarshaller(mProductDESProxyFactory);
-    mModuleProxyFactory = ModuleElementFactory.getInstance();
-    final OperatorTable optable = CompilerOperatorTable.getInstance();
-    final JAXBModuleMarshaller modmarshaller =
-      new JAXBModuleMarshaller(mModuleProxyFactory, optable);
-    mDocumentManager = new DocumentManager();
-    mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
-    mDocumentManager.registerUnmarshaller(modmarshaller);
-    mModelVerifier = createModelVerifier(mProductDESProxyFactory);
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    mTraceMarshaller = new JAXBTraceMarshaller(factory);
+    mModelVerifier = createModelVerifier(factory);
     setStateLimit();
   }
 
@@ -194,36 +183,6 @@ public abstract class AbstractModelVerifierTest extends AbstractWatersTest
 
 
   //#########################################################################
-  //# Compiling
-  protected ProductDESProxy getCompiledDES(final File filename)
-    throws Exception
-  {
-    return getCompiledDES(filename, null);
-  }
-
-  protected ProductDESProxy getCompiledDES
-    (final File filename,
-     final List<ParameterBindingProxy> bindings)
-    throws Exception
-  {
-    final DocumentProxy doc = mDocumentManager.load(filename);
-    if (doc instanceof ProductDESProxy) {
-      assertTrue("Can't apply bindings to ProductDES!",
-                 bindings == null || bindings.isEmpty());
-      return (ProductDESProxy) doc;
-    } else if (doc instanceof ModuleProxy) {
-      final ModuleProxy module = (ModuleProxy) doc;
-      final ModuleCompiler compiler =
-        new ModuleCompiler(mDocumentManager, mProductDESProxyFactory, module);
-      return compiler.compile(bindings);
-    } else {
-      fail("Unknown document type " + doc.getClass().getName() + "!");
-      return null;
-    }
-  }
-
-                                           
-  //#########################################################################
   //# To be Provided by Subclasses
   protected abstract ModelVerifier
     createModelVerifier(ProductDESProxyFactory factory);
@@ -231,22 +190,6 @@ public abstract class AbstractModelVerifierTest extends AbstractWatersTest
   protected abstract void
     checkCounterExample(ProductDESProxy des,
                         TraceProxy counterexample);
-
-
-  //#########################################################################
-  //# Accessing the Factories
-  protected ProductDESProxyFactory getProductDESProxyFactory()
-  {
-    return mProductDESProxyFactory;
-  }
-
-  protected ParameterBindingProxy createBinding(final String name,
-                                                final int value)
-  {
-    final IntConstantProxy expr =
-      mModuleProxyFactory.createIntConstantProxy(value);
-    return mModuleProxyFactory.createParameterBindingProxy(name, expr);
-  }
 
 
   //#########################################################################
@@ -288,10 +231,7 @@ public abstract class AbstractModelVerifierTest extends AbstractWatersTest
 
   //#########################################################################
   //# Data Members
-  private ProductDESProxyFactory mProductDESProxyFactory;
-  private ModuleProxyFactory mModuleProxyFactory;
-  private JAXBProductDESMarshaller mProductDESMarshaller;
   private JAXBTraceMarshaller mTraceMarshaller;
-  private DocumentManager mDocumentManager;	
   private ModelVerifier mModelVerifier;
+
 }

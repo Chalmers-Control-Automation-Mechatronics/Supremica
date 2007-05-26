@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractLanguageInclusionCheckerTest
 //###########################################################################
-//# $Id: AbstractLanguageInclusionCheckerTest.java,v 1.4 2006-12-01 02:06:30 robi Exp $
+//# $Id: AbstractLanguageInclusionCheckerTest.java,v 1.5 2007-05-26 11:29:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -29,6 +29,17 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 public abstract class AbstractLanguageInclusionCheckerTest
   extends AbstractModelVerifierTest
 {
+
+  //#########################################################################
+  //# Entry points in junit.framework.TestCase
+  public AbstractLanguageInclusionCheckerTest()
+  {
+  }
+
+  public AbstractLanguageInclusionCheckerTest(final String name)
+  {
+    super(name);
+  }
 
   //#########################################################################
   //# Test Cases --- handcrafted

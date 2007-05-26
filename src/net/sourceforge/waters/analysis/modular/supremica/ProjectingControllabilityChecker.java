@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ProjectingControllabilityChecker
 //###########################################################################
-//# $Id: ProjectingControllabilityChecker.java,v 1.4 2007-05-26 08:51:23 robi Exp $
+//# $Id: ProjectingControllabilityChecker.java,v 1.5 2007-05-26 11:29:22 robi Exp $
 //###########################################################################
 
 
@@ -370,7 +370,9 @@ public class ProjectingControllabilityChecker
         mHidden.retainAll(a.getEvents());
       }
       for (AutomatonProxy a : automata) {
-        mHidden.removeAll(a.getEvents());
+        if (!compAutomata.contains(a)) {
+          mHidden.removeAll(a.getEvents());
+        }
       }
       final Set<EventProxy> targ = new HashSet<EventProxy>(events);
       targ.removeAll(mHidden);

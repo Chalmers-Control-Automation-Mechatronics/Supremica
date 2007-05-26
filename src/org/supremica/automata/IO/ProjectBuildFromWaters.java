@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.automata.IO
 //# CLASS:   ProjectBuildFromWaters
 //###########################################################################
-//# $Id: ProjectBuildFromWaters.java,v 1.20 2007-05-24 04:03:56 siw4 Exp $
+//# $Id: ProjectBuildFromWaters.java,v 1.21 2007-05-26 11:29:22 robi Exp $
 //###########################################################################
 
 /*
@@ -67,148 +67,191 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.automata.*;
-import org.supremica.log.*;
 
 
+/**
+ * A converter that translates the WATERS {@link ProductDESProxy}
+ * interfaces into Supremica's {@link Project} classes.
+ *
+ * @author Knut &Aring;kesson
+ */ 
 public class ProjectBuildFromWaters
 {
 
     //#######################################################################
-    //# Data Members
-    private final ProjectFactory mProjectFactory;
-	private final DocumentManager mDocumentManager;
-
-    private static final Logger logger =
-		LoggerFactory.createLogger(ProjectBuildFromWaters.class);
-
-    
-    //#######################################################################
     //# Constructors
+	/**
+	 * Creates a WATERS-to-Supremica converter using a default project
+	 * factory.
+	 * @param  manager  The document manager used when compiling Waters
+	 *                  modules. This argument must be provided and reference
+	 *                  a document manager that is properly initialised to
+	 *                  load modules. To support proper caching, the
+	 *                  document manager should be shared throughout the
+	 *                  application.
+	 */
     public ProjectBuildFromWaters(final DocumentManager manager)
     {
         this(manager, new DefaultProjectFactory());
     }
-    
+
+	/**
+	 * Creates a WATERS-to-Supremica converter.
+	 * @param  manager  The document manager used when compiling WATERS
+	 *                  modules. This argument must be provided and reference
+	 *                  a document manager that is properly initialised to
+	 *                  load modules. To support proper caching, the
+	 *                  document manager should be shared throughout the
+	 *                  application.
+	 * @param  factory  The project factory used to create the Supremica
+	 *                  automata.
+	 */
     public ProjectBuildFromWaters(final DocumentManager manager,
 								  final ProjectFactory factory)
     {
 		mDocumentManager = manager;
         mProjectFactory = factory;
     }
-    
+
+
+    //#######################################################################
+    //# Invocation
+	/**
+	 * Converts a WATERS module to a Supremica project.
+	 * This method uses a compiler to translate and instantiate the module,
+	 * and then converts the resulting product DES.
+	 * @param  module   The WATERS module to be converted.
+	 * @return The module in Supremica form.
+	 * @throws EvalException to indicate that compilation of the module
+	 *                  has failed.
+	 */
     public Project build(ModuleProxy module)
-      throws EvalException
+		throws EvalException
     {
-      if (module == null)
-      {
-          throw new NullPointerException("argument must be non null");
-      }
-      final ProductDESProxyFactory factory =
+		if (module == null) {
+			throw new NullPointerException("argument must be non null");
+		}
+		final ProductDESProxyFactory factory =
             ProductDESElementFactory.getInstance();
-      DocumentManager mDocumentManager = new DocumentManager();
-      ModuleCompiler compiler =
-          new ModuleCompiler(mDocumentManager, factory, module);
-      
-      return build(compiler.compile());
+		ModuleCompiler compiler =
+			new ModuleCompiler(mDocumentManager, factory, module);
+		return build(compiler.compile());
     }
-    
+
+	/**
+	 * Converts a WATERS product DES to a Supremica project.
+	 * @param  des      The WATERS product DES to be converted.
+	 * @return The product DES in Supremica form.
+	 * @throws EvalException to indicate that the model could not be
+	 *                  converted due to WATERS features not supported
+	 *                  by Supremica.
+	 */
  	public Project build(final ProductDESProxy des)
 		throws EvalException
     {
         final Project currProject = mProjectFactory.getProject();
         currProject.setName(des.getName());
-        for (final AutomatonProxy currWatersAutomaton : des.getAutomata()) {
-            Automaton currSupremicaAutomaton = new Automaton();
-            currSupremicaAutomaton.setCorrespondingAutomatonProxy(currWatersAutomaton);
-            currSupremicaAutomaton.setName(currWatersAutomaton.getName());
-            
-            //System.err.println("Automaton: " + currWatersAutomaton.getName());
-            currSupremicaAutomaton.setType(AutomatonType.toType(currWatersAutomaton.getKind()));
-            
-            // Termination event
-            EventProxy term = null;
-            boolean multicolored = false;
-            
-            // Create states
-            for (final StateProxy currWatersState :
-					 currWatersAutomaton.getStates()) {
-                //System.err.println("State: " + currWatersState.getName());
-                
-                State currSupremicaState = new State(currWatersState.getName());
-                
-                // Set attributes
-                // Initial?
-                currSupremicaState.setInitial(currWatersState.isInitial());
-                // Find marked status (only one type of marking here!!!)
-                for (final EventProxy event :
-						 currWatersState.getPropositions()) {
-                    if (event.getKind() == EventKind.PROPOSITION)
-                    {
-                        if (event.getName().equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME))
-                        {
-                            currSupremicaState.setForbidden(true);
-                        }
-                        else
-                        {
-                            if (!multicolored && (term != null) && !event.equals(term))
-                            {
-                                multicolored = true;
-                            }
-                            term = event;
-                            currSupremicaState.setAccepting(true);
-                        }
-                        // A state CAN be both forbidden and accepting, both must be acknowledged 
-                        // (but forbidden is usually more important)
-                        //break;
-                    }
-                }
-                
-                // Did we find multiple colors?
-                if (multicolored)
-                {
-                    //Print warning! Color disappears in conversion!
-                    throw new EvalException("Multiple propositions are not yet supported!");
-                    //System.out.println("Waters model had multicolored marking, Supremica model treats all markings as the same color.");
-                }
-                
-                // Add to automaton
-                currSupremicaAutomaton.addState(currSupremicaState);
-            }
-            
-            Alphabet currSupremicaAlphabet = currSupremicaAutomaton.getAlphabet();
-            
-            // Create the alphabet
-            for (final EventProxy currWatersEvent :
-					 currWatersAutomaton.getEvents()) {
-                if (currWatersEvent.getKind() != EventKind.PROPOSITION)
-                {
-                    LabeledEvent currSupremicaEvent = new LabeledEvent(currWatersEvent);
-                    currSupremicaAlphabet.addEvent(currSupremicaEvent);
-                }
-            }
-            
-            // Create transitions
-            for (final TransitionProxy currWatersTransition :
-					 currWatersAutomaton.getTransitions()) {
-                StateProxy watersSourceState = currWatersTransition.getSource();
-                StateProxy watersTargetState = currWatersTransition.getTarget();
-                EventProxy watersEvent = currWatersTransition.getEvent();
-                
-                State supremicaSourceState = currSupremicaAutomaton.getStateWithName(watersSourceState.getName());
-                State supremicaTargetState = currSupremicaAutomaton.getStateWithName(watersTargetState.getName());
-                LabeledEvent supremicaEvent = currSupremicaAlphabet.getEvent(watersEvent.getName());
-                Arc currSupremicaArc = new Arc(supremicaSourceState, supremicaTargetState, supremicaEvent);
-                
-                currSupremicaAutomaton.addArc(currSupremicaArc);
-                
-                //LabeledEvent currSupremicaEvent = new LabeledEvent(currWatersEvent);
-                //currSupremicaAlphabet.addEvent(currSupremicaEvent);
-            }
-            
-            currProject.addAutomaton(currSupremicaAutomaton);
-            
+        for (final AutomatonProxy aut : des.getAutomata()) {
+			final Automaton supaut = build(aut);
+            currProject.addAutomaton(supaut);
         }
         return currProject;
+	}
+
+	/**
+	 * Converts a WATERS automaton to a Supremica automaton.
+	 * @param  aut      The WATERS automaton to be converted.
+	 * @return The automaton in Supremica form.
+	 * @throws EvalException to indicate that the model could not be
+	 *                  converted due to WATERS features not supported
+	 *                  by Supremica.
+	 */
+	public Automaton build(final AutomatonProxy aut)
+		throws EvalException
+	{
+		final Automaton supaut = new Automaton();
+		supaut.setCorrespondingAutomatonProxy(aut);
+		supaut.setName(aut.getName());
+
+		//System.err.println("Automaton: " + aut.getName());
+		supaut.setType(AutomatonType.toType(aut.getKind()));
+
+		// Termination event
+		EventProxy term = null;
+		boolean multicolored = false;
+
+		// Create states
+		for (final StateProxy currWatersState : aut.getStates()) {
+			State currSupremicaState = new State(currWatersState.getName());
+			// Set attributes
+			// Initial?
+			currSupremicaState.setInitial(currWatersState.isInitial());
+			// Find marked status (only one type of marking here!!!)
+			for (final EventProxy event : currWatersState.getPropositions()) {
+				if (event.getKind() == EventKind.PROPOSITION) {
+					if (event.getName().equals
+						  (EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
+						currSupremicaState.setForbidden(true);
+					} else {
+						if (!multicolored && (term != null) &&
+							!event.equals(term)) {
+							multicolored = true;
+						}
+						term = event;
+						currSupremicaState.setAccepting(true);
+					}
+					// A state CAN be both forbidden and accepting, both
+					// must be acknowledged (but forbidden is usually more
+					// important)
+					//break;
+				}
+			}
+
+			// Did we find multiple colours?
+			if (multicolored) {
+				throw new EvalException
+					("Multiple propositions are not yet supported!");
+			}
+			// Add to automaton
+			supaut.addState(currSupremicaState);
+		}
+
+		Alphabet currSupremicaAlphabet = supaut.getAlphabet();
+		// Create the alphabet
+		for (final EventProxy currWatersEvent : aut.getEvents()) {
+			if (currWatersEvent.getKind() != EventKind.PROPOSITION) {
+				LabeledEvent currSupremicaEvent =
+					new LabeledEvent(currWatersEvent);
+				currSupremicaAlphabet.addEvent(currSupremicaEvent);
+			}
+		}
+
+		// Create transitions
+		for (final TransitionProxy currWatersTransition :
+				 aut.getTransitions()) {
+			StateProxy watersSourceState = currWatersTransition.getSource();
+			StateProxy watersTargetState = currWatersTransition.getTarget();
+			EventProxy watersEvent = currWatersTransition.getEvent();
+			State supremicaSourceState =
+				supaut.getStateWithName(watersSourceState.getName());
+			State supremicaTargetState =
+				supaut.getStateWithName(watersTargetState.getName());
+			LabeledEvent supremicaEvent =
+				currSupremicaAlphabet.getEvent(watersEvent.getName());
+			Arc currSupremicaArc = new Arc(supremicaSourceState,
+										   supremicaTargetState,
+										   supremicaEvent);
+			supaut.addArc(currSupremicaArc);
+		}
+
+		return supaut;
     }
+
+
+    //#######################################################################
+    //# Data Members
+    private final ProjectFactory mProjectFactory;
+	private final DocumentManager mDocumentManager;
+
 }
 

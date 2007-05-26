@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeControllabilityCheckerTest
 //###########################################################################
-//# $Id: NativeControllabilityCheckerTest.java,v 1.8 2006-11-17 03:38:22 robi Exp $
+//# $Id: NativeControllabilityCheckerTest.java,v 1.9 2007-05-26 11:29:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;
@@ -24,10 +24,11 @@ public class NativeControllabilityCheckerTest
 
   //#########################################################################
   //# Entry points in junit.framework.TestCase
-  public static Test suite() {
-    TestSuite testSuite =
+  public static Test suite()
+  {
+    final TestSuite suite =
       new TestSuite(NativeControllabilityCheckerTest.class);
-    return testSuite;
+    return suite;
   }
 
   public static void main(final String[] args)

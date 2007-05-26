@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   AbstractWatersTest
 //###########################################################################
-//# $Id: AbstractWatersTest.java,v 1.4 2007-05-25 07:53:02 robi Exp $
+//# $Id: AbstractWatersTest.java,v 1.5 2007-05-26 11:29:22 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.junit;
@@ -21,6 +21,12 @@ public abstract class AbstractWatersTest
   //# Constructors
   public AbstractWatersTest()
   {
+    this(null);
+  }
+
+  public AbstractWatersTest(final String name)
+  {
+    super(name);
     final String inputprop = System.getProperty("waters.test.inputdir");
     final String outputprop = System.getProperty("waters.test.outputdir");
     mInputRoot = new File(inputprop);

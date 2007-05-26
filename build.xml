@@ -765,8 +765,10 @@ Class-Path: ${manifest.pathlist}</echo>
   </junitreport>
 </target>
 
-<target name="test_controllability" depends="run_test_controllability,test_report"/>
 <target name="test" depends="run_supremica_tests,test_report"/>
+<target name="test_controllability"
+        depends="run_test_controllability,test_report"/>
+<target name="test_short" depends="run_tests_short,test_report"/>
 
 <target name="bdd_tests" depends="compile_supremica,startfiles_supremica">
 	<!-- 
