@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.automata.algorithms.minimization
 //# CLASS:   TestAutomatonMinimizer
 //###########################################################################
-//# $Id: TestAutomatonMinimizer.java,v 1.10 2007-05-26 11:29:22 robi Exp $
+//# $Id: TestAutomatonMinimizer.java,v 1.11 2007-05-26 13:35:32 robi Exp $
 //###########################################################################
 
 /*
@@ -296,8 +296,10 @@ public class TestAutomatonMinimizer
 	{
 		final ProductDESProxy des = getBmwDES();
 		final AutomatonProxy aut = getComfortFunctionAutomaton(des);
-		final Alphabet target = getReqCloseHidingAlhabet(des, aut);
-		final MinimizationOptions opt = getMinimizationOptions(aut, target);
+		final Collection<EventProxy> target =
+			getReqCloseHidingAlhabet(des, aut);
+		final Alphabet alphabet = mBuilder.buildAlphabet(target);
+		final MinimizationOptions opt = getMinimizationOptions(aut, alphabet);
 		final Automaton supaut = mBuilder.build(aut);
 		final AutomatonMinimizer minimizer = new AutomatonMinimizer(supaut);
 		final AutomatonProxy minaut = minimizer.getMinimizedAutomaton(opt);
@@ -310,8 +312,10 @@ public class TestAutomatonMinimizer
 	{
 		final ProductDESProxy des = getBmwDES();
 		final AutomatonProxy aut = getComfortFunctionAutomaton(des);
-		final Alphabet target = getReqCloseHidingAlhabet(des, aut);
-		final MinimizationOptions opt = getMinimizationOptions(aut, target);
+		final Collection<EventProxy> target =
+			getReqCloseHidingAlhabet(des, aut);
+		final Alphabet alphabet = mBuilder.buildAlphabet(target);
+		final MinimizationOptions opt = getMinimizationOptions(aut, alphabet);
 		final Automaton supaut = mBuilder.build(aut);
 		final Automata supmodel = new Automata(supaut);
 		final AutomataMinimizer minimizer = new AutomataMinimizer(supmodel);
@@ -347,18 +351,15 @@ public class TestAutomatonMinimizer
 		return findAutomaton(des, autname);
 	}
 
-	private Alphabet getReqCloseHidingAlhabet(final ProductDESProxy des,
-											  final AutomatonProxy aut)
+	private Collection<EventProxy>
+		getReqCloseHidingAlhabet(final ProductDESProxy des,
+								 final AutomatonProxy aut)
 	{
 		final String eventname = "REQ[CLOSE]";
 		final EventProxy victim = findEvent(des, eventname);
-		final Alphabet target = new Alphabet();
-		for (final EventProxy event : aut.getEvents()) {
-			if (event != victim) {
-				final LabeledEvent label = new LabeledEvent(event);
-				target.addEvent(label);
-			}
-		}
+		final Collection<EventProxy> target =
+			new HashSet<EventProxy>(aut.getEvents());
+		target.remove(victim);
 		return target;
 	}
 

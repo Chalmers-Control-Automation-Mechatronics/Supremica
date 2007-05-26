@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.automata.IO
 //# CLASS:   ProjectBuildFromWaters
 //###########################################################################
-//# $Id: ProjectBuildFromWaters.java,v 1.21 2007-05-26 11:29:22 robi Exp $
+//# $Id: ProjectBuildFromWaters.java,v 1.22 2007-05-26 13:35:32 robi Exp $
 //###########################################################################
 
 /*
@@ -57,6 +57,8 @@
  */
 package org.supremica.automata.IO;
 
+import java.util.Collection;
+
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.des.*;
@@ -73,7 +75,7 @@ import org.supremica.automata.*;
  * A converter that translates the WATERS {@link ProductDESProxy}
  * interfaces into Supremica's {@link Project} classes.
  *
- * @author Knut &Aring;kesson
+ * @author Knut &Aring;kesson, Robi Malik
  */ 
 public class ProjectBuildFromWaters
 {
@@ -176,9 +178,30 @@ public class ProjectBuildFromWaters
 		//System.err.println("Automaton: " + aut.getName());
 		supaut.setType(AutomatonType.toType(aut.getKind()));
 
-		// Termination event
-		EventProxy term = null;
-		boolean multicolored = false;
+		// Create the alphabet
+		EventProxy marking = null;
+		EventProxy forbidden = null;
+		final Alphabet currSupremicaAlphabet = supaut.getAlphabet();
+		for (final EventProxy currWatersEvent : aut.getEvents()) {
+			switch (currWatersEvent.getKind()) {
+			case PROPOSITION:
+				final String name = currWatersEvent.getName();
+				if (name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
+					forbidden = currWatersEvent;
+				} else if (marking == null) {
+					marking = currWatersEvent;
+				} else {
+					throw new EvalException
+						("Multiple propositions are not yet supported!");
+				}
+				break;
+			default:
+				final LabeledEvent currSupremicaEvent =
+					new LabeledEvent(currWatersEvent);
+				currSupremicaAlphabet.addEvent(currSupremicaEvent);
+				break;
+			}
+		}
 
 		// Create states
 		for (final StateProxy currWatersState : aut.getStates()) {
@@ -188,42 +211,18 @@ public class ProjectBuildFromWaters
 			currSupremicaState.setInitial(currWatersState.isInitial());
 			// Find marked status (only one type of marking here!!!)
 			for (final EventProxy event : currWatersState.getPropositions()) {
-				if (event.getKind() == EventKind.PROPOSITION) {
-					if (event.getName().equals
-						  (EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
-						currSupremicaState.setForbidden(true);
-					} else {
-						if (!multicolored && (term != null) &&
-							!event.equals(term)) {
-							multicolored = true;
-						}
-						term = event;
-						currSupremicaState.setAccepting(true);
-					}
-					// A state CAN be both forbidden and accepting, both
-					// must be acknowledged (but forbidden is usually more
-					// important)
-					//break;
+				if (event == marking) {
+					currSupremicaState.setAccepting(true);
+				} else if (event == forbidden) {
+					currSupremicaState.setForbidden(true);
 				}
 			}
-
-			// Did we find multiple colours?
-			if (multicolored) {
-				throw new EvalException
-					("Multiple propositions are not yet supported!");
+			// If the marking proposition is not in alphabet: mark all states!
+			if (marking == null) {
+				currSupremicaState.setAccepting(true);
 			}
 			// Add to automaton
 			supaut.addState(currSupremicaState);
-		}
-
-		Alphabet currSupremicaAlphabet = supaut.getAlphabet();
-		// Create the alphabet
-		for (final EventProxy currWatersEvent : aut.getEvents()) {
-			if (currWatersEvent.getKind() != EventKind.PROPOSITION) {
-				LabeledEvent currSupremicaEvent =
-					new LabeledEvent(currWatersEvent);
-				currSupremicaAlphabet.addEvent(currSupremicaEvent);
-			}
 		}
 
 		// Create transitions
@@ -246,6 +245,25 @@ public class ProjectBuildFromWaters
 
 		return supaut;
     }
+
+	/**
+	 * Converts a collection of WATERS events to a Supremica alphabet/
+	 * @param  events   The WATERS events to be converted.
+	 * @return An alphabet containing Supremica event labels corresponding
+	 *         to all the given events, except for the propositions.
+	 */
+	public Alphabet buildAlphabet
+		(final Collection<? extends EventProxy> events)
+	{
+		final Alphabet alphabet = new Alphabet();
+		for (final EventProxy event : events) {
+			if (event.getKind() != EventKind.PROPOSITION) {
+				final LabeledEvent label = new LabeledEvent(event);
+				alphabet.addEvent(label);
+			}
+		}
+		return alphabet;
+	}
 
 
     //#######################################################################
