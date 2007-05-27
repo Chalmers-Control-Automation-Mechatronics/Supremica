@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.automata.IO
 //# CLASS:   ProjectBuildFromWaters
 //###########################################################################
-//# $Id: ProjectBuildFromWaters.java,v 1.22 2007-05-26 13:35:32 robi Exp $
+//# $Id: ProjectBuildFromWaters.java,v 1.23 2007-05-27 07:10:03 robi Exp $
 //###########################################################################
 
 /*
@@ -247,7 +247,7 @@ public class ProjectBuildFromWaters
     }
 
 	/**
-	 * Converts a collection of WATERS events to a Supremica alphabet/
+	 * Converts a collection of WATERS events to a Supremica alphabet.
 	 * @param  events   The WATERS events to be converted.
 	 * @return An alphabet containing Supremica event labels corresponding
 	 *         to all the given events, except for the propositions.

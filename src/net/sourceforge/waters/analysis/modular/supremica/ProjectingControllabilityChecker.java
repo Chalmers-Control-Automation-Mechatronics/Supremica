@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ProjectingControllabilityChecker
 //###########################################################################
-//# $Id: ProjectingControllabilityChecker.java,v 1.5 2007-05-26 11:29:22 robi Exp $
+//# $Id: ProjectingControllabilityChecker.java,v 1.6 2007-05-27 07:10:03 robi Exp $
 //###########################################################################
 
 
@@ -363,16 +363,14 @@ public class ProjectingControllabilityChecker
       for (AutomatonProxy a : compAutomata) {
         events.addAll(a.getEvents());
       }
-      ProductDESProxy comp = getFactory().createProductDESProxy("comp", events,
-                                                                compAutomata);
+      ProductDESProxy comp =
+        getFactory().createProductDESProxy("comp", events, compAutomata);
       mHidden = new HashSet<EventProxy>(events);
-      for (AutomatonProxy a : compAutomata) {
+      for (final AutomatonProxy a : compAutomata) {
         mHidden.retainAll(a.getEvents());
       }
-      for (AutomatonProxy a : automata) {
-        if (!compAutomata.contains(a)) {
-          mHidden.removeAll(a.getEvents());
-        }
+      for (final AutomatonProxy a : mAutomata) {
+        mHidden.removeAll(a.getEvents());
       }
       final Set<EventProxy> targ = new HashSet<EventProxy>(events);
       targ.removeAll(mHidden);
