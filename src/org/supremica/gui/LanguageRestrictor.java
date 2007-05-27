@@ -71,7 +71,7 @@ class ViewerPanel
     {}
 }
 
-class EventsViewerPanel    // compare AlphabetsViewerPanel
+class EventsViewerPanel    // compare AlphabetViewerPanel
     extends JPanel
 {
     private static final long serialVersionUID = 1L;
@@ -198,8 +198,7 @@ class EventsViewerPanel    // compare AlphabetsViewerPanel
     
     // Go through the tree and make hide those nodes that are not in all automata
     public void showIntersection()
-    {
-        
+    {        
         // for all the (immediate) children of the root, make them visible
         for (Enumeration e = root.children(); e.hasMoreElements(); )
         {

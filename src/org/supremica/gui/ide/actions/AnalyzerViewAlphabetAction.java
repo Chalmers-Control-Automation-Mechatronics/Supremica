@@ -6,7 +6,7 @@ import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import org.supremica.automata.Automata;
-import org.supremica.gui.AutomataViewer;
+import org.supremica.gui.AlphabetViewer;
 import org.supremica.gui.ide.IDE;
 import org.supremica.log.*;
 
@@ -59,8 +59,8 @@ public class AnalyzerViewAlphabetAction
         // automata object?? Use AutomataViewer instead!
         try
         {
-            // AlphabetViewer alphabetviewer = new AlphabetViewer(selectedAutomata);
-            AutomataViewer alphabetViewer = new AutomataViewer(selectedAutomata, true, false);
+            AlphabetViewer alphabetViewer = new AlphabetViewer(selectedAutomata);
+            //AutomataViewer alphabetViewer = new AutomataViewer(selectedAutomata, true, false);
 
             alphabetViewer.setVisible(true);
         }

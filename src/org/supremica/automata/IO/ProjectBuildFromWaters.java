@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.automata.IO
 //# CLASS:   ProjectBuildFromWaters
 //###########################################################################
-//# $Id: ProjectBuildFromWaters.java,v 1.23 2007-05-27 07:10:03 robi Exp $
+//# $Id: ProjectBuildFromWaters.java,v 1.24 2007-05-27 10:52:13 flordal Exp $
 //###########################################################################
 
 /*
@@ -67,6 +67,7 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.EventKind;
+import org.supremica.log.*;
 
 import org.supremica.automata.*;
 
@@ -79,9 +80,14 @@ import org.supremica.automata.*;
  */ 
 public class ProjectBuildFromWaters
 {
-
-    //#######################################################################
-    //# Constructors
+    //# Data Members
+    private final ProjectFactory mProjectFactory;
+    private final DocumentManager mDocumentManager;
+    
+    private static final Logger logger =
+        LoggerFactory.createLogger(ProjectBuildFromWaters.class);
+    
+        //# Constructors
 	/**
 	 * Creates a WATERS-to-Supremica converter using a default project
 	 * factory.
@@ -109,9 +115,9 @@ public class ProjectBuildFromWaters
 	 *                  automata.
 	 */
     public ProjectBuildFromWaters(final DocumentManager manager,
-								  final ProjectFactory factory)
+        final ProjectFactory factory)
     {
-		mDocumentManager = manager;
+        mDocumentManager = manager;
         mProjectFactory = factory;
     }
 
@@ -130,14 +136,17 @@ public class ProjectBuildFromWaters
     public Project build(ModuleProxy module)
 		throws EvalException
     {
-		if (module == null) {
-			throw new NullPointerException("argument must be non null");
-		}
-		final ProductDESProxyFactory factory =
+        if (module == null)
+        {
+            throw new NullPointerException("argument must be non null");
+        }
+        final ProductDESProxyFactory factory =
             ProductDESElementFactory.getInstance();
-		ModuleCompiler compiler =
-			new ModuleCompiler(mDocumentManager, factory, module);
-		return build(compiler.compile());
+        DocumentManager mDocumentManager = new DocumentManager();
+        ModuleCompiler compiler =
+            new ModuleCompiler(mDocumentManager, factory, module);
+        
+        return build(compiler.compile());
     }
 
 	/**
@@ -153,6 +162,7 @@ public class ProjectBuildFromWaters
     {
         final Project currProject = mProjectFactory.getProject();
         currProject.setName(des.getName());
+
         for (final AutomatonProxy aut : des.getAutomata()) {
 			final Automaton supaut = build(aut);
             currProject.addAutomaton(supaut);
@@ -171,9 +181,8 @@ public class ProjectBuildFromWaters
 	public Automaton build(final AutomatonProxy aut)
 		throws EvalException
 	{
-		final Automaton supaut = new Automaton();
+		final Automaton supaut = new Automaton(aut.getName());
 		supaut.setCorrespondingAutomatonProxy(aut);
-		supaut.setName(aut.getName());
 
 		//System.err.println("Automaton: " + aut.getName());
 		supaut.setType(AutomatonType.toType(aut.getKind()));
@@ -264,12 +273,5 @@ public class ProjectBuildFromWaters
 		}
 		return alphabet;
 	}
-
-
-    //#######################################################################
-    //# Data Members
-    private final ProjectFactory mProjectFactory;
-	private final DocumentManager mDocumentManager;
-
 }
 

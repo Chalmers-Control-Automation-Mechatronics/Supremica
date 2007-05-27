@@ -55,130 +55,136 @@ import javax.swing.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 
-// I changed AlphabetViewer to accept Automata objects and to show the alphabets 
-// of all selected Automaton in the same window. That's probably what you want if 
-// you select more than one and request Alphabet viewing. Previously, one 
+// I changed AlphabetViewer to accept Automata objects and to show the alphabets
+// of all selected Automaton in the same window. That's probably what you want if
+// you select more than one and request Alphabet viewing. Previously, one
 // AlphabetViewer was opened for each automaton.
 public class AlphabetViewer
-	extends JFrame
+    extends JFrame
 {
-	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
-	private JMenuBar menuBar = new JMenuBar();
-	private AlphabetViewerPanel alphabetPanel;
-
-	public AlphabetViewer(Automaton automaton)
-		throws Exception
-	{
-		Automata automata = new Automata();
-
-		automata.addAutomaton(automaton);
-		init(automata);
-	}
-
-	public AlphabetViewer(Automata theAutomata)
-		throws Exception
-	{
-		init(theAutomata);
-	}
-
-	private void init(Automata theAutomata)
-		throws Exception
-	{
-		this.alphabetPanel = new AlphabetViewerPanel(theAutomata);
-		contentPane = (JPanel) getContentPane();
-
-		// contentPane.setLayout(new BorderLayout());
-		// contentPane.add(toolBar, BorderLayout.NORTH);
-		setTitle("Alphabet Viewer");    // : " + theAutomaton.getName());
-
-		// setSize(200, 500);
-		addWindowListener(new WindowAdapter()
-		{
-			public void windowClosing(WindowEvent e)
-			{
-				setVisible(false);
-
-				//dispose();
-			}
-		});
-
-		/* Center the window
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		Dimension frameSize = getSize();
-
-		if (frameSize.height > screenSize.height)
-		{
-				frameSize.height = screenSize.height;
-		}
-
-		if (frameSize.width > screenSize.width)
-		{
-				frameSize.width = screenSize.width;
-		}
-
-		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
-		setIconImage(Supremica.cornerImage);*/
-		Utility.setupFrame(this, 200, 500);
-		initMenubar();
-		contentPane.add(alphabetPanel, BorderLayout.CENTER);
-	}
-
-	private void initMenubar()
-	{
-		setJMenuBar(menuBar);
-
-		// File
-		JMenu menuFile = new JMenu();
-
-		menuFile.setText("File");
-		menuFile.setMnemonic(KeyEvent.VK_F);
-
-		// File.Close
-		JMenuItem menuFileClose = new JMenuItem();
-
-		menuFileClose.setText("Close");
-		menuFileClose.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				setVisible(false);
-
-				//dispose();
-			}
-		});
-		menuFile.add(menuFileClose);
-		menuBar.add(menuFile);
-
-		// View
-		JMenu viewMenu = new JMenu("View");
-
-		viewMenu.setMnemonic(KeyEvent.VK_V);
-
-		// View.Union (default, therefore initially checked)
-		JRadioButtonMenuItem viewMenuUnion = new JRadioButtonMenuItem("Union", true);
-
-		viewMenuUnion.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e) {}
-		});
-
-		// View.Intersection
-		JRadioButtonMenuItem viewMenuIntersection = new JRadioButtonMenuItem("Intersection");
-
-		viewMenuIntersection.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e) {}
-		});
-
-		ButtonGroup buttongroup = new ButtonGroup();
-
-		buttongroup.add(viewMenuUnion);
-		buttongroup.add(viewMenuIntersection);
-		viewMenu.add(viewMenuUnion);
-		viewMenu.add(viewMenuIntersection);
-		menuBar.add(viewMenu);
-	}
-
-	public void initialize() {}
+    private static final long serialVersionUID = 1L;
+    private JPanel contentPane;
+    private JMenuBar menuBar = new JMenuBar();
+    //private AlphabetViewerPanel alphabetPanel;
+    private EventsViewerPanel alphabetPanel;
+    
+    public AlphabetViewer(Automaton automaton)
+    throws Exception
+    {
+        Automata automata = new Automata();
+        
+        automata.addAutomaton(automaton);
+        init(automata);
+    }
+    
+    public AlphabetViewer(Automata theAutomata)
+    throws Exception
+    {
+        init(theAutomata);
+    }
+    
+    private void init(Automata theAutomata)
+    throws Exception
+    {
+        //this.alphabetPanel = new AlphabetViewerPanel(theAutomata);
+        this.alphabetPanel = new EventsViewerPanel(theAutomata);
+        contentPane = (JPanel) getContentPane();
+        
+        // contentPane.setLayout(new BorderLayout());
+        // contentPane.add(toolBar, BorderLayout.NORTH);
+        setTitle("Alphabet Viewer");    // : " + theAutomaton.getName());
+        
+        // setSize(200, 500);
+        addWindowListener(new WindowAdapter()
+        {
+            public void windowClosing(WindowEvent e)
+            {
+                setVisible(false);
+                
+                //dispose();
+            }
+        });
+        
+                /* Center the window
+                Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+                Dimension frameSize = getSize();
+                 
+                if (frameSize.height > screenSize.height)
+                {
+                                frameSize.height = screenSize.height;
+                }
+                 
+                if (frameSize.width > screenSize.width)
+                {
+                                frameSize.width = screenSize.width;
+                }
+                 
+                setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
+                setIconImage(Supremica.cornerImage);*/
+        Utility.setupFrame(this, 200, 500);
+        initMenubar();
+        contentPane.add(alphabetPanel, BorderLayout.CENTER);
+    }
+    
+    private void initMenubar()
+    {
+        setJMenuBar(menuBar);
+        
+        // File
+        JMenu menuFile = new JMenu();
+        
+        menuFile.setText("File");
+        menuFile.setMnemonic(KeyEvent.VK_F);
+        
+        // File.Close
+        JMenuItem menuFileClose = new JMenuItem();
+        
+        menuFileClose.setText("Close");
+        menuFileClose.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                setVisible(false);
+                
+                //dispose();
+            }
+        });
+        menuFile.add(menuFileClose);
+        menuBar.add(menuFile);
+        
+        // View
+        JMenu viewMenu = new JMenu("View");        
+        viewMenu.setMnemonic(KeyEvent.VK_V);
+        
+        // View.Union (default, therefore initially checked)
+        JRadioButtonMenuItem viewMenuUnion = new JRadioButtonMenuItem("Union", true);        
+        viewMenuUnion.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                alphabetPanel.showUnion();
+            }
+        });
+        
+        // View.Intersection
+        JRadioButtonMenuItem viewMenuIntersection = new JRadioButtonMenuItem("Intersection");        
+        viewMenuIntersection.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                alphabetPanel.showIntersection();
+            }
+        });
+        
+        ButtonGroup buttongroup = new ButtonGroup();
+        
+        buttongroup.add(viewMenuUnion);
+        buttongroup.add(viewMenuIntersection);
+        viewMenu.add(viewMenuUnion);
+        viewMenu.add(viewMenuIntersection);
+        menuBar.add(viewMenu);
+    }
+    
+    public void initialize()
+    {}
 }

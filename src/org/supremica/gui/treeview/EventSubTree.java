@@ -17,34 +17,42 @@ public class EventSubTree
     //private static ImageIcon uncontrollableIcon = new ImageIcon(Supremica.class.getResource("/icons/UncontrollableEvent16.gif"));
     private static ImageIcon uncontrollableIcon = new ImageIcon(Supremica.class.getResource("/icons/waters/uncontrollable.gif"));
     
+    private int directLeafs = 0;
+    
     public EventSubTree(LabeledEvent event)
     {
         super(event);    // Note that this also caches the event for quick access
         
         SupremicaTreeNode currControllableNode = new SupremicaTreeNode("controllable: " + event.isControllable());
-        add(currControllableNode);
-        
-        SupremicaTreeNode currPrioritizedNode = new SupremicaTreeNode("prioritized: " + event.isPrioritized());
-        add(currPrioritizedNode);
+        add(currControllableNode); directLeafs++;
         
         SupremicaTreeNode currObservableNode = new SupremicaTreeNode("observable: " + event.isObservable());
-        add(currObservableNode);
+        add(currObservableNode); directLeafs++;
         
+        // Hide junk...
+        /*
+        SupremicaTreeNode currPrioritizedNode = new SupremicaTreeNode("prioritized: " + event.isPrioritized());
+        add(currPrioritizedNode); directLeafs++;
+         
         SupremicaTreeNode currOperatorIncreaseNode = new SupremicaTreeNode("operatorIncrease: " + event.isOperatorIncrease());
-        add(currOperatorIncreaseNode);
-        
+        add(currOperatorIncreaseNode); directLeafs++;
+         
         SupremicaTreeNode currOperatorResetNode = new SupremicaTreeNode("operatorReset: " + event.isOperatorReset());
-        add(currOperatorResetNode);
+        add(currOperatorResetNode); directLeafs++;
+         */
     }
     
-    // Change this to reflect the correct number of children/properties/leaves
-    // Could this be calculated from sizeof(LabeledEvent)? It should not.
-    // This depends only on the above construction
-    //
-    // UM... this method is never used, right? What is this?   /hguo
+    /**
+     * Change this to reflect the correct number of children/properties/leaves
+     * Could this be calculated from sizeof(LabeledEvent)? It should not.
+     * This depends only on the above construction
+     *
+     * This method is used to quickly determine if an event occurs in all 
+     * automata or not, see showIntersection in EventsViewerPanel.
+     */
     public int numDirectLeafs()
     {
-        return 5;
+        return directLeafs;
     }
     
     public Icon getOpenIcon()
