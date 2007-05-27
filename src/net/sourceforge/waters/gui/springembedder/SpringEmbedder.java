@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.38 2007-05-25 11:45:34 robi Exp $
+//# $Id: SpringEmbedder.java,v 1.39 2007-05-27 16:30:06 robi Exp $
 //###########################################################################
 
 
@@ -28,6 +28,7 @@ import javax.swing.SwingUtilities;
 
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.renderer.GeometryTools;
+import net.sourceforge.waters.gui.renderer.HornerPolynomial;
 import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
 import net.sourceforge.waters.gui.renderer.SimpleNodeProxyShape;
 import net.sourceforge.waters.subject.module.EdgeSubject;
@@ -443,10 +444,18 @@ public class SpringEmbedder
     final double dx = p1.getX() - p2.getX();
     final double dy = p1.getY() - p2.getY();
     final double len = dx * dx + dy * dy;
-    if (len > EPSILON) {
+    if (len > 0.0) {
       final int pass = mPass > 0 ? mPass : 1;
-      final double factor = pass * constant / len;
-      return new Point2D.Double(factor * dx, factor * dy);
+      double factor = pass * constant / len;
+      double x = factor * dx;
+      double y = factor * dy;
+      final double sqrep = x * x + y * y;
+      if (sqrep > MAX_REPULSION_SQ) {
+        factor *= Math.sqrt(MAX_REPULSION_SQ / sqrep);
+        x = factor * dx;
+        y = factor * dy;
+      }
+      return new Point2D.Double(x, y);
     } else {
       return new Point2D.Double(mRandom.nextDouble(), mRandom.nextDouble());
     }
@@ -707,10 +716,7 @@ public class SpringEmbedder
         mNodeRepulsion * mSelfLoopFactor * other.mSelfLoopFactor;
       final Point2D delta = repulsion(old, otherold, repulsion0);
       if (mNeighbours.containsKey(other)) {
-        final int degree = mNeighbours.size();
-        final int otherdegree = other.mNeighbours.size();
-        final double weight =
-          mNeighbours.get(other) * (0.5 / degree + 0.5 / otherdegree);
+        final double weight = mNeighbours.get(other);
         final Point2D delta1 =
           attraction(old, otherold, weight * NODE_ATTRACTION);
         final double dx = delta.getX() + delta1.getX();
@@ -859,37 +865,59 @@ public class SpringEmbedder
         final Point2D start = mSource.getOldPoint();
         final Point2D end = mTarget.getOldPoint();
         final Point2D turn = getOldPoint();
-        final Line2D line = new Line2D.Double(start, end);
         final Point2D control =
           GeometryTools.convertToControl(start, end, turn);
-        final Point2D closest = GeometryTools.findClosestPointOnQuadratic
-          (start, control, end, point);
+        final HornerPolynomial biquadratic =
+          GeometryTools.getClosestPointBiquadratic(start, control, end, point);
+        final Point2D closest;
+        final Point2D alternative;
+        if (biquadratic == null) {
+          //System.err.println("biquadratic == null");
+          final Point2D candidate1 =
+            GeometryTools.findClosestPointOnLine(start, turn, point);
+          final Point2D candidate2 =
+            GeometryTools.findClosestPointOnLine(end, turn, point);
+          if (candidate1.equals(candidate2)) {
+            closest = candidate1;
+          } else if (candidate1.distanceSq(point) <
+                     candidate2.distanceSq(point)) {
+            closest = candidate1;
+          } else {
+            closest = candidate2;
+          }
+          alternative = null;
+        } else {
+          final double[] extremals =
+            biquadratic.findBiquadraticPseudoMinimals(0.0, 1.0);
+          if (extremals.length == 1) {
+            closest = GeometryTools.getPointOnQuadratic
+              (start, control, end, extremals[0]);
+            alternative = null;
+          } else if (biquadratic.getValue(extremals[0]) <
+                     biquadratic.getValue(extremals[1])) {
+            closest = GeometryTools.getPointOnQuadratic
+              (start, control, end, extremals[0]);
+            alternative = GeometryTools.getPointOnQuadratic
+              (start, control, end, extremals[1]);
+          } else {
+            closest = GeometryTools.getPointOnQuadratic
+              (start, control, end, extremals[1]);
+            alternative = GeometryTools.getPointOnQuadratic
+              (start, control, end, extremals[0]);
+          }
+        }
         if (node.isJumping(this, closest)) {
           return POINT_ZERO;
-        }
-        final double x1 = start.getX();
-        final double y1 = start.getY();
-        final double x2 = end.getX();
-        final double y2 = end.getY();
-        final double xm = 0.5 * (x1 + x2);
-        final double ym = 0.5 * (y1 + y2);
-        final Point2D mid = new Point2D.Double(xm, ym);
-        final Line2D diag = new Line2D.Double(mid, turn);
-        final double distsq = diag.ptLineDistSq(point);
-        final double weight =
-          distsq >= MIDQUADRATIC_THRESHOLD_SQ ? 1.0 :
-          Math.sqrt(distsq) / MIDQUADRATIC_THRESHOLD;
-        if (weight == 1.0) {
+        } else if (alternative == null) {
           return repulsion(closest, point, mNodeEdgeRepulsion);
         } else {
-          final Point2D rep1 =
-            repulsion(closest, point, weight * mNodeEdgeRepulsion);
-          final Point2D rep2 =
-            repulsion(turn, point, (1.0 - weight) * mNodeEdgeRepulsion);
-          final double dx = rep1.getX() + rep2.getX();
-          final double dy = rep1.getY() + rep2.getY();
-          rep1.setLocation(dx, dy);
-          return rep1;
+          final double constant = 0.5 * mNodeEdgeRepulsion;
+          final Point2D repulsion0 = repulsion(closest, point, constant);
+          final Point2D repulsion1 = repulsion(alternative, point, constant);
+          final double dx = repulsion0.getX() + repulsion1.getX();
+          final double dy = repulsion0.getY() + repulsion1.getY();
+          repulsion0.setLocation(dx, dy);
+          return repulsion0;
         }
       }
     }
@@ -1116,10 +1144,8 @@ public class SpringEmbedder
 
   //###########################################################################
   //# Class Constants
-  private static final double EPSILON = 0.00002;
-  private static final double MIDQUADRATIC_THRESHOLD = 100.0;
-  private static final double MIDQUADRATIC_THRESHOLD_SQ =
-    MIDQUADRATIC_THRESHOLD * MIDQUADRATIC_THRESHOLD;
+  private static final double EPSILON = 0.0000001;
+  private static final double MAX_REPULSION_SQ = 50000.0;
   private static final double JUMP_THRESHOLD =
     2.0 * SimpleNodeProxyShape.RADIUS;
   private static final double JUMP_THRESHOLD_SQ =
@@ -1132,15 +1158,15 @@ public class SpringEmbedder
 
   private static final double BACKGROUND_ATTRACTION = 0.05;
   private static final double INITIALSTATE_ATTRACTION =
-    0.22 * BACKGROUND_ATTRACTION;
+    0.33 * BACKGROUND_ATTRACTION;
   private static final double INITIALSTATE_DECAY =
     0.01 * INITIALSTATE_ATTRACTION;
   private static final double EDGE_ATTRACTION = 0.05;
-  private static final double NODE_ATTRACTION = 0.1;
+  private static final double NODE_ATTRACTION = 0.04;
   private static final double NODE_REPULSION = 1000.0;
   private static final double SELFLOOP_REPULSION = 100.0;
   private static final double EDGE_REPULSION = 25.0;
-  private static final double NODEEDGE_REPULSION = 160.0;
+  private static final double NODEEDGE_REPULSION = 200.0;
 
   private static final double GRAPH_MARGINAL_CONST = 48.0;
   private static final double CENTER_MOVE_CONST = 0.01;

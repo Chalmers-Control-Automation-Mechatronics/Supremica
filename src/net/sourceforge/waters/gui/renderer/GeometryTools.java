@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   GeometryTools
 //###########################################################################
-//# $Id: GeometryTools.java,v 1.17 2007-05-24 21:04:09 robi Exp $
+//# $Id: GeometryTools.java,v 1.18 2007-05-27 16:30:06 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -336,27 +336,6 @@ public final class GeometryTools
 
 
   /**
-   * Calculates the square of the distance from a point 'p' to the bezier
-   * quadratic curve between two points 'pt1' and 'pt2', and with control
-   * point 'c'.
-   * @param pt1              One end of the curve.
-   * @param c                The Bezier control point of the curve.
-   * @param pt2              The other end of the curve.
-   * @param p                The point to find the closest point to.
-   * @return The square of the distance between 'p' and the point closest
-   *         to point 'p' on the curve.
-   */
-  public static double findDistanceToQuadraticSq(final Point2D pt1,
-                                                 final Point2D c,
-                                                 final Point2D pt2,
-                                                 final Point2D p)
-  {
-    final Point2D closest = findClosestPointOnQuadratic(pt1, c, pt2, p);
-    return closest.distanceSq(p);
-  }
-
-
-  /**
    * Finds the point closest to a point 'p' on the bezier quadratic
    * curve between two points 'pt1' and 'pt2', and with control point 'c'.
    * @param pt1              One end of the curve.
@@ -370,12 +349,12 @@ public final class GeometryTools
                                                     final Point2D pt2,
                                                     final Point2D p)
   {
-    final Line2D line = new Line2D.Double(pt1, pt2);
-    final Point2D turn = convertToTurn(pt1, pt2, c);
-    if (line.ptLineDistSq(turn) < EPSILON_SQ ||
-        pt1.distanceSq(pt2) < EPSILON_SQ) {
-      // If the curve is almost straight, or if the start and end points
-      // are almost the same, treat it as two lines ...
+    final HornerPolynomial biquadratic =
+      getClosestPointBiquadratic(pt1, c, pt2, p);
+    if (biquadratic == null) {
+      // If the curve is (almost) straight, or if the start and end points
+      // are (almost) the same, treat it as two lines ...
+      final Point2D turn = convertToTurn(pt1, pt2, c);
       final Point2D candidate1 = findClosestPointOnLine(pt1, turn, p);
       final Point2D candidate2 = findClosestPointOnLine(pt2, turn, p);
       if (candidate1.equals(candidate2)) {
@@ -386,55 +365,55 @@ public final class GeometryTools
         return candidate2;
       }
     } else {
-      // f(t) = (1-t)^2*pt1 + 2t*(1-t)*c + t^2*pt2
-      //      = pt1 - 2t*pt1 + t^2*pt1 +2t*c - 2t^2*c + t^2*pt2
-      //      = (pt1+pt2-2c)*t^2 + (2c-2pt1)*t + pt1
-      // d(t) = || f(t) - p ||^2
-      // First calculate coefficients of f(t) - p:
-      // f(t) - p = a2*t^2 + a1*t + a0
-      final double x1 = pt1.getX();
-      final double y1 = pt1.getY();
-      final double x2 = pt2.getX();
-      final double y2 = pt2.getY();
-      final double xc = c.getX();
-      final double yc = c.getY();
-      final double x = p.getX();
-      final double y = p.getY();
-      final double a2x = x1 + x2 - 2.0 * xc;
-      final double a2y = y1 + y2 - 2.0 * yc;
-      final double a1x = 2.0 * (xc - x1);
-      final double a1y = 2.0 * (yc - y1);
-      final double a0x = x1 - x;
-      final double a0y = y1 - y;
-      // Now square them to get the coefficients of d(t):
-      // d(t) = d4*t^4 + d3*t^3 + d2*t^2 + d1*t + d0
-      final double d4 = a2x * a2x + a2y * a2y;
-      final double d3 = 2.0 * (a2x * a1x + a2y * a1y);
-      final double d2 = a1x * a1x + a1y * a1y + 2.0 * (a2x * a0x + a2y * a0y);
-      final double d1 = 2.0 * (a1x * a0x + a1y * a0y);
-      final double d0 = a0x * a0x + a0y * a0y;
-      // Minimise the biquadratic ...
-      final HornerPolynomial biquadratic =
-        new HornerPolynomial(d4, d3, d2, d1, d0);
+      // Otherwise we can minimise the biquadratic ...
       final double tmin = biquadratic.findBiquadraticMinimum(0.0, 1.0);
-      if (tmin < 0.0 || tmin > 1.0) {
-        System.err.println(tmin);
-      }
       // Return the point ...
       if (tmin <= 0.0) {
         return pt1;
       } else if (tmin >= 1.0) {
         return pt2;
       } else {
-        final double t2 = tmin * tmin;
-        final double tbar = 1.0 - tmin;
-        final double tbar2 = tbar * tbar;
-        final double tt = 2.0 * tmin * tbar;
-        final double xmin = tbar2 * x1 + tt * xc + t2 * x2;
-        final double ymin = tbar2 * y1 + tt * yc + t2 * y2;
-        return new Point2D.Double(xmin, ymin);
+        return getPointOnQuadratic(pt1, c, pt2, tmin);
       }
     }
+  }
+
+  public static HornerPolynomial getClosestPointBiquadratic(final Point2D pt1,
+                                                            final Point2D c,
+                                                            final Point2D pt2,
+                                                            final Point2D p)
+  {
+    // f(t) = (1-t)^2*pt1 + 2t*(1-t)*c + t^2*pt2
+    //      = pt1 - 2t*pt1 + t^2*pt1 +2t*c - 2t^2*c + t^2*pt2
+    //      = (pt1+pt2-2c)*t^2 + (2c-2pt1)*t + pt1
+    // d(t) = || f(t) - p ||^2
+    // First calculate coefficients of f(t) - p:
+    // f(t) - p = a2*t^2 + a1*t + a0
+    final double x1 = pt1.getX();
+    final double y1 = pt1.getY();
+    final double x2 = pt2.getX();
+    final double y2 = pt2.getY();
+    final double xc = c.getX();
+    final double yc = c.getY();
+    final double x = p.getX();
+    final double y = p.getY();
+    final double a2x = x1 + x2 - 2.0 * xc;
+    final double a2y = y1 + y2 - 2.0 * yc;
+    final double a1x = 2.0 * (xc - x1);
+    final double a1y = 2.0 * (yc - y1);
+    final double a0x = x1 - x;
+    final double a0y = y1 - y;
+    // Now square them to get the coefficients of d(t):
+    // d(t) = d4*t^4 + d3*t^3 + d2*t^2 + d1*t + d0
+    final double d4 = a2x * a2x + a2y * a2y;
+    if (d4 == 0.0) {
+      return null;
+    }
+    final double d3 = 2.0 * (a2x * a1x + a2y * a1y);
+    final double d2 = a1x * a1x + a1y * a1y + 2.0 * (a2x * a0x + a2y * a0y);
+    final double d1 = 2.0 * (a1x * a0x + a1y * a0y);
+    final double d0 = a0x * a0x + a0y * a0y;
+    return new HornerPolynomial(d4, d3, d2, d1, d0);
   }
 
   /**
@@ -495,6 +474,32 @@ public final class GeometryTools
     final double x = 2.0 * turn.getX() - 0.5 * (start.getX() + end.getX());
     final double y = 2.0 * turn.getY() - 0.5 * (start.getY() + end.getY());
     return new Point2D.Double(x, y);
+  }
+
+  public static Point2D getPointOnQuadratic(final Point2D start,
+                                            final Point2D control,
+                                            final Point2D end,
+                                            final double t)
+  {
+    if (t == 0.0) {
+      return start;
+    } else if (t == 1.0) {
+      return end;
+    } else {
+      final double x1 = start.getX();
+      final double y1 = start.getY();
+      final double x2 = end.getX();
+      final double y2 = end.getY();
+      final double xc = control.getX();
+      final double yc = control.getY();
+      final double t2 = t * t;
+      final double tbar = 1.0 - t;
+      final double tbar2 = tbar * tbar;
+      final double tt = 2.0 * t * tbar;
+      final double x = tbar2 * x1 + tt * xc + t2 * x2;
+      final double y = tbar2 * y1 + tt * yc + t2 * y2;
+      return new Point2D.Double(x, y);
+    }
   }
 
   /**

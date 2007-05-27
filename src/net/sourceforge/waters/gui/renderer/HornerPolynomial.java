@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.renderer
 //# CLASS:   HornerPolynomial
 //###########################################################################
-//# $Id: HornerPolynomial.java,v 1.3 2007-05-24 20:20:57 robi Exp $
+//# $Id: HornerPolynomial.java,v 1.4 2007-05-27 16:30:06 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.renderer;
@@ -277,7 +277,7 @@ public class HornerPolynomial
       roots[0] = apex - sqrt;
       roots[1] = apex + sqrt;
       return roots;
-    }      
+    }
   }
 
 
@@ -352,6 +352,97 @@ public class HornerPolynomial
     }
   }
 
+  public double[] findBiquadraticPseudoMinimals
+    (final double x0, final double x1)
+  {
+    checkBiquadratic();
+    if (mCoefficients[0] <= 0) {
+      throw new IllegalStateException
+        ("Leading coefficient of biquadratic must be positive!");
+    }
+    if (x1 <= x0) {
+      throw new IllegalArgumentException("Illegal range: " + x0 + ".." + x1);
+    }
+    final double yy0 = getFirstDerivativeValue(x0);
+    final double yy1 = getFirstDerivativeValue(x1);
+    final HornerPolynomial derivative1 = getFirstDerivative();
+    final HornerPolynomial derivative2 = derivative1.getFirstDerivative();
+    final double apex = derivative2.findQuadraticApex();
+    final double aslope = derivative2.getValue(apex);
+    final double pseudo0;
+    final double pseudo1;
+    if (aslope >= 0.0) {
+      // Only one global minimum.
+      pseudo0 = findClosestBetween(apex, x0, x1);
+      if (yy0 >= 0.0) {
+        pseudo1 = x0;
+      } else if (yy1 <= 0.0) {
+        pseudo1 = x1;
+      } else if (derivative1.getValue(apex) > 0.0) {
+        pseudo1 = derivative1.newtonIteration(x0);
+      } else {
+        pseudo1 = derivative1.newtonIteration(x1);
+      }
+    } else {
+      // Slope at apex negative, may be more than one global minimum.
+      // Check extremals of 1st derivative ...
+      final double[] extremals = derivative2.findQuadraticRoots();
+      final double extremal0 = extremals[0];
+      final double extremal1 = extremals[extremals.length - 1];
+      if (derivative1.getValue(extremal1) > 0.0) {
+        // The first derivative has two extremals,
+        // but they are both in the positive range (f(xe)>0).
+        pseudo0 = findClosestBetween(extremal1, x0, x1);
+        if (yy0 >= 0.0) {
+          pseudo1 = x0;
+        } else if (yy1 <= 0.0) {
+          pseudo1 = x1;
+        } else {
+          pseudo1 = derivative1.newtonIteration(x0);
+        }
+      } else if (derivative1.getValue(extremal0) < 0.0) {
+        // The first derivative has two extremals,
+        // but they are both in the negative range (f(xe)<0).
+        pseudo0 = findClosestBetween(extremal0, x0, x1);
+        if (yy1 <= 0.0) {
+          pseudo1 = x1;
+        } else if (yy0 >= 0.0) {
+          pseudo1 = x0;
+        } else {
+          pseudo1 = derivative1.newtonIteration(x1);
+        }
+      } else {
+        // The first derivative has two extremals.
+        // The first is in the positive range,
+        // and the second in the negative range.
+        if (x0 > extremal0 || yy0 >= 0.0) {
+          pseudo0 = x0;
+        } else if (yy1 <= 0.0) {
+          pseudo0 = x1;
+        } else {
+          pseudo0 = derivative1.newtonIteration(x0);
+        }
+        if (x1 < extremal1 || yy1 <= 0.0) {
+          pseudo1 = x1;
+        } else if (yy0 >= 0.0) {
+          pseudo1 = x0;
+        } else {
+          pseudo1 = derivative1.newtonIteration(x1);
+        }
+      }
+    }
+    if (pseudo0 == pseudo1) {
+      final double[] result = new double[1];
+      result[0] = pseudo0;
+      return result;
+    } else {
+      final double[] result = new double[2];
+      result[0] = pseudo0;
+      result[1] = pseudo1;
+      return result;
+    }
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -369,6 +460,19 @@ public class HornerPolynomial
       mResults[current] = prev * mCurrentInput + upper[top];
       mLowerRow = mUpperRow;
       mUpperRow = lower;
+    }
+  }
+
+  private static double findClosestBetween(final double x,
+                                           final double x0,
+                                           final double x1)
+  {
+    if (x <= x0) {
+      return x0;
+    } else if (x >= x1) {
+      return x1;
+    } else {
+      return x;
     }
   }
 
