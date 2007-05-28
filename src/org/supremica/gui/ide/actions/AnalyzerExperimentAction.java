@@ -3,9 +3,18 @@ package org.supremica.gui.ide.actions;
 import java.util.List;
 import javax.swing.Action;
 import java.awt.event.ActionEvent;
+import java.util.Collection;
 import java.util.Iterator;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
+import org.supremica.automata.algorithms.minimization.AutomataMinimizer;
+import org.supremica.automata.algorithms.minimization.MinimizationOptions;
+import org.supremica.log.Logger;
+import org.supremica.log.LoggerFactory;
 
 /**
  * A new action
@@ -13,7 +22,9 @@ import org.supremica.automata.Automaton;
 public class AnalyzerExperimentAction
     extends IDEAction
 {
-    private static final long serialVersionUID = 1L;
+    private static Logger logger = LoggerFactory.createLogger(AnalyzerExperimentAction.class);
+
+     private static final long serialVersionUID = 1L;
     
     /**
      * Constructor.
@@ -42,13 +53,15 @@ public class AnalyzerExperimentAction
      */
     public void doAction()
     {
+        logger.info("Experiment started...");
+
         Automata automata = ide.getSelectedAutomata();
-        Automaton automaton = automata.getFirstAutomaton();
         
-        Iterator alphIt = automaton.getAlphabet().iterator();
-        while (alphIt.hasNext())
+        // EXPERIMENT!
         {
-            System.err.println(alphIt.next());
-        }        
+            logger.info("Test: " + automata);
+        }
+        
+        logger.info("Experiment finished.");
     }
 }
