@@ -478,7 +478,7 @@ public class AutomatonSynthesizer
                 State toState = currArc.getToState();
                 // Expand unvisited states
                 //if (!toState.isVisited() && ((toState.getCost() != State.MAX_COST) || expandForbidden))
-                if (!toState.isVisited() && (expandForbidden || !toState.isForbidden()))
+                if (!toState.isVisited() && (expandForbidden || !(toState.isForbidden() || (toState.getCost() == State.MAX_COST))))
                 {
                     toState.setVisited(true);
                     stateStack.addLast(toState);
