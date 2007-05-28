@@ -51,87 +51,73 @@ package org.supremica.automata.algorithms;
 
 public class StateHolder
 {
-	private int[] theState;
-	private int problemPlant = 0;
-	private int problemEvent = 0;
-	private boolean found = false;
-
-	public StateHolder(int[] theState)
-	{
-		this.theState = theState;
-	}
-
-	public StateHolder(int[] theState, int problemPlant, int problemEvent)
-	{
-		this.theState = theState;
-		this.problemPlant = problemPlant;
-		this.problemEvent = problemEvent;
-	}
-
-	public int[] getArray()
-	{
-		return theState;
-	}
-
-	public int getProblemPlant()
-	{
-		return problemPlant;
-	}
-
-	public int getProblemEvent()
-	{
-		return problemEvent;
-	}
-
-	// ** MF ** Why isn't this code trivially optimised?
-	public boolean equals(Object other)
-	{
-		boolean equal = true;
-		int[] otherState = ((StateHolder) other).getArray();
-
-		for (int i = 0; i < theState.length; i++)
-		{
-			if (theState[i] != otherState[i])
-			{
-				equal = false;
-			}
-		}
-
-		return equal;
-	}
-
-	/*
-	 * MF -- trivial optimization
-	 * public boolean equals(Object other)
-	 * {
-	 *       int[] otherState = ((StateHolder)other).getArray();
-	 *       for (int i = 0; i < theState.length; i++)
-	 *       if (theState[i] != otherState[i]
-	 *               return false;
-	 *       return true;
-	 * }
-	 */
-
-	// Stolen and modified version of the hashCodeIntArray method in IntArrayHashTable
-	public int hashCode()
-	{
-		int hashCode = 1;
-
-		for (int i = 0; i < theState.length; i++)
-		{
-			hashCode = 127 * hashCode + 7 * theState[i];
-		}
-
-		return hashCode;
-	}
-
-	public void setFound(boolean found)
-	{
-		this.found = found;
-	}
-
-	public boolean isFound()
-	{
-		return found;
-	}
+    private int[] theState;
+    private int problemPlant = 0;
+    private int problemEvent = 0;
+    private boolean found = false;
+    
+    public StateHolder(int[] theState)
+    {
+        this.theState = theState;
+    }
+    
+    public StateHolder(int[] theState, int problemPlant, int problemEvent)
+    {
+        this.theState = theState;
+        this.problemPlant = problemPlant;
+        this.problemEvent = problemEvent;
+    }
+    
+    public int[] getArray()
+    {
+        return theState;
+    }
+    
+    public int getProblemPlant()
+    {
+        return problemPlant;
+    }
+    
+    public int getProblemEvent()
+    {
+        return problemEvent;
+    }
+    
+    public boolean equals(Object other)
+    {
+        int[] otherState = ((StateHolder) other).getArray();
+        
+        for (int i = 0; i < theState.length; i++)
+        {
+            if (theState[i] != otherState[i])
+            {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    // Stolen and modified version of the hashCodeIntArray method in IntArrayHashTable
+    public int hashCode()
+    {
+        int hashCode = 1;
+        
+        for (int i = 0; i < theState.length; i++)
+        {
+            hashCode = 127 * hashCode + 7 * theState[i];
+        }
+        
+        return hashCode;
+    }
+    
+    public void setFound(boolean found)
+    {
+        this.found = found;
+    }
+    
+    public boolean isFound()
+    {
+        return found;
+    }
 }

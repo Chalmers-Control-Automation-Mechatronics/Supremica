@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.automata.algorithms.minimization
 //# CLASS:   TestAutomatonMinimizer
 //###########################################################################
-//# $Id: TestAutomatonMinimizer.java,v 1.11 2007-05-26 13:35:32 robi Exp $
+//# $Id: TestAutomatonMinimizer.java,v 1.12 2007-05-28 15:30:14 flordal Exp $
 //###########################################################################
 
 /*
@@ -82,9 +82,8 @@ import org.supremica.automata.IO.*;
 public class TestAutomatonMinimizer
     extends AbstractAnalysisTest
 {
-
-	//#######################################################################
-	//# Entry points in junit.framework.TestCase
+    //#######################################################################
+    //# Entry points in junit.framework.TestCase
     public TestAutomatonMinimizer(final String name)
     {
         super(name);
@@ -100,21 +99,21 @@ public class TestAutomatonMinimizer
         return suite;
     }
     
-	public static void main(final String[] args)
-	{
-		junit.textui.TestRunner.run(suite());
-	}
-
-	protected void setUp() throws Exception
-	{
-		super.setUp();
-		final DocumentManager manager = getDocumentManager();
-		mBuilder = new ProjectBuildFromWaters(manager);
-	}
-
-
-	//#######################################################################
-	//# Supremica Test Cases
+    public static void main(final String[] args)
+    {
+        junit.textui.TestRunner.run(suite());
+    }
+    
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+        final DocumentManager manager = getDocumentManager();
+        mBuilder = new ProjectBuildFromWaters(manager);
+    }
+    
+    
+    //#######################################################################
+    //# Supremica Test Cases
     public void testLanguageEquivalenceMinimization()
     {
         try
@@ -287,100 +286,100 @@ public class TestAutomatonMinimizer
             assertTrue(false);
         }
     }
-
-
-	//#######################################################################
-	//# Waters Test Cases
-	public void testAutomatonMinimizerForWaters()
-		throws Exception
-	{
-		final ProductDESProxy des = getBmwDES();
-		final AutomatonProxy aut = getComfortFunctionAutomaton(des);
-		final Collection<EventProxy> target =
-			getReqCloseHidingAlhabet(des, aut);
-		final Alphabet alphabet = mBuilder.buildAlphabet(target);
-		final MinimizationOptions opt = getMinimizationOptions(aut, alphabet);
-		final Automaton supaut = mBuilder.build(aut);
-		final AutomatonMinimizer minimizer = new AutomatonMinimizer(supaut);
-		final AutomatonProxy minaut = minimizer.getMinimizedAutomaton(opt);
-		final Collection<EventProxy> minevents = minaut.getEvents();
-		assertEquals("Unexpected event set in result!", target, minevents);
-	}
-
-	public void testAutomataMinimizerForWaters()
-		throws Exception
-	{
-		final ProductDESProxy des = getBmwDES();
-		final AutomatonProxy aut = getComfortFunctionAutomaton(des);
-		final Collection<EventProxy> target =
-			getReqCloseHidingAlhabet(des, aut);
-		final Alphabet alphabet = mBuilder.buildAlphabet(target);
-		final MinimizationOptions opt = getMinimizationOptions(aut, alphabet);
-		final Automaton supaut = mBuilder.build(aut);
-		final Automata supmodel = new Automata(supaut);
-		final AutomataMinimizer minimizer = new AutomataMinimizer(supmodel);
-		final ProductDESProxy minmodel =
-			minimizer.getCompositionalMinimization(opt);
-		assertEquals("Unexpected number of automata in result!",
-					 1, minmodel.getAutomata().size());
-		final AutomatonProxy minaut = minmodel.getAutomata().iterator().next();
-		final Collection<EventProxy> minevents = minaut.getEvents();
-		assertEquals("Unexpected event set in result!", target, minevents);
-	}
-
-
-	//#######################################################################
-	//# Auxiliary Methods for Waters Test
-	private ProductDESProxy getBmwDES()
-		throws Exception
-	{
-		final String groupname = "valid";
-		final String subdirname = "bmw_fh";
-		final String filename = "bmw_fh.wdes";
-		final File rootdir = getInputRoot();
-		final File groupdir = new File(rootdir, groupname);
-		final File subdir = new File(groupdir, subdirname);
-		final File file = new File(subdir, filename);
-		return getCompiledDES(file);
-	}
-
-	private AutomatonProxy getComfortFunctionAutomaton
-		(final ProductDESProxy des)
-	{
-		final String autname = "comfort_function";
-		return findAutomaton(des, autname);
-	}
-
-	private Collection<EventProxy>
-		getReqCloseHidingAlhabet(final ProductDESProxy des,
-								 final AutomatonProxy aut)
-	{
-		final String eventname = "REQ[CLOSE]";
-		final EventProxy victim = findEvent(des, eventname);
-		final Collection<EventProxy> target =
-			new HashSet<EventProxy>(aut.getEvents());
-		target.remove(victim);
-		return target;
-	}
-
-	private MinimizationOptions getMinimizationOptions
-		(final AutomatonProxy aut, final Alphabet target)
-	{
-		final int numstates = aut.getStates().size();
-		final MinimizationOptions opt = new MinimizationOptions();
-		opt.setAlsoTransitions(true);
-		opt.setComponentSizeLimit(10 * numstates);
-		opt.setCompositionalMinimization(true);
-		opt.setIgnoreMarking(true);
-		opt.setKeepOriginal(false);
-		opt.setMinimizationType(EquivalenceRelation.LANGUAGEEQUIVALENCE);
-		opt.setTargetAlphabet(target);
-		return opt;
-	}
-
-
-	//#######################################################################
-	//# Data Members
-	private ProjectBuildFromWaters mBuilder;
-
+    
+    
+    //#######################################################################
+    //# Waters Test Cases
+    public void testAutomatonMinimizerForWaters()
+    throws Exception
+    {
+        final ProductDESProxy des = getBmwDES();
+        final AutomatonProxy aut = getComfortFunctionAutomaton(des);
+        final Collection<EventProxy> target =
+            getReqCloseHidingAlhabet(des, aut);
+        final Alphabet alphabet = mBuilder.buildAlphabet(target);
+        final MinimizationOptions opt = getMinimizationOptions(aut, alphabet);
+        final Automaton supaut = mBuilder.build(aut);
+        final AutomatonMinimizer minimizer = new AutomatonMinimizer(supaut);
+        final AutomatonProxy minaut = minimizer.getMinimizedAutomaton(opt);
+        final Collection<EventProxy> minevents = minaut.getEvents();
+        assertEquals("Unexpected event set in result!", target, minevents);
+    }
+    
+    public void testAutomataMinimizerForWaters()
+    throws Exception
+    {
+        final ProductDESProxy des = getBmwDES();
+        final AutomatonProxy aut = getComfortFunctionAutomaton(des);
+        final Collection<EventProxy> target =
+            getReqCloseHidingAlhabet(des, aut);
+        final Alphabet alphabet = mBuilder.buildAlphabet(target);
+        final MinimizationOptions opt = getMinimizationOptions(aut, alphabet);
+        final Automaton supaut = mBuilder.build(aut);
+        final Automata supmodel = new Automata(supaut);
+        final AutomataMinimizer minimizer = new AutomataMinimizer(supmodel);
+        final ProductDESProxy minmodel =
+            minimizer.getCompositionalMinimization(opt);
+        assertEquals("Unexpected number of automata in result!",
+            1, minmodel.getAutomata().size());
+        final AutomatonProxy minaut = minmodel.getAutomata().iterator().next();
+        final Collection<EventProxy> minevents = minaut.getEvents();
+        assertEquals("Unexpected event set in result!", target, minevents);
+    }
+    
+    
+    //#######################################################################
+    //# Auxiliary Methods for Waters Test
+    private ProductDESProxy getBmwDES()
+    throws Exception
+    {
+        final String groupname = "valid";
+        final String subdirname = "bmw_fh";
+        final String filename = "bmw_fh.wdes";
+        final File rootdir = getInputRoot();
+        final File groupdir = new File(rootdir, groupname);
+        final File subdir = new File(groupdir, subdirname);
+        final File file = new File(subdir, filename);
+        return getCompiledDES(file);
+    }
+    
+    private AutomatonProxy getComfortFunctionAutomaton
+        (final ProductDESProxy des)
+    {
+        final String autname = "comfort_function";
+        return findAutomaton(des, autname);
+    }
+    
+    private Collection<EventProxy>
+        getReqCloseHidingAlhabet(final ProductDESProxy des,
+        final AutomatonProxy aut)
+    {
+        final String eventname = "REQ[CLOSE]";
+        final EventProxy victim = findEvent(des, eventname);
+        final Collection<EventProxy> target =
+            new HashSet<EventProxy>(aut.getEvents());
+        target.remove(victim);
+        return target;
+    }
+    
+    private MinimizationOptions getMinimizationOptions
+        (final AutomatonProxy aut, final Alphabet target)
+    {
+        final int numstates = aut.getStates().size();
+        final MinimizationOptions opt = new MinimizationOptions();
+        opt.setAlsoTransitions(true);
+        opt.setComponentSizeLimit(10 * numstates);
+        opt.setCompositionalMinimization(true);
+        opt.setIgnoreMarking(true);
+        opt.setKeepOriginal(false);
+        opt.setMinimizationType(EquivalenceRelation.LANGUAGEEQUIVALENCE);
+        opt.setTargetAlphabet(target);
+        return opt;
+    }
+    
+    
+    //#######################################################################
+    //# Data Members
+    private ProjectBuildFromWaters mBuilder;
+    
 }

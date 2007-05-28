@@ -865,7 +865,8 @@ public final class AutomataSynchronizerHelper
                 }
             }
             
-            String reason = "the event " + theAutomaton.getAlphabet().getEventWithIndex(problemEvent) +
+            //String reason = "the event " + theAutomata.getAlphabet().getEventWithIndex(problemEvent) +
+            String reason = "the event " + theAutomataIndexForm.getAutomataIndexMap().getEventAt(problemEvent) +
                 " is enabled in " + problemAutomaton;
             
             // Log the message
