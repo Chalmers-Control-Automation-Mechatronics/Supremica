@@ -71,27 +71,27 @@ public class AutomataMinimizationWorker
     implements Stoppable
 {
     private static Logger logger = LoggerFactory.createLogger(AutomataMinimizationWorker.class);
-
+    
     private Frame frame;
     private Automata theAutomata;
     private Project theProject;
     private MinimizationOptions options;
-
+    
     // For the stopping
     private ExecutionDialog executionDialog;
     private boolean stopRequested = false;
     private ArrayList threadsToStop = new ArrayList();
-
+    
     public AutomataMinimizationWorker(Frame frame, Automata theAutomata, Project theProject, MinimizationOptions options)
     {
         this.frame = frame;
         this.theAutomata = theAutomata;
         this.theProject = theProject;
         this.options = options;
-
+        
         this.start();
     }
-
+    
     public void run()
     {
         // Initialize the ExecutionDialog
@@ -106,7 +106,7 @@ public class AutomataMinimizationWorker
         {
             executionDialog.setMode(ExecutionDialogMode.MINIMIZINGSINGLE);
         }
-
+        
         // OK options?
         String errorMessage = options.validOptions();
         if (errorMessage != null)
@@ -115,15 +115,15 @@ public class AutomataMinimizationWorker
             requestStop();
             return;
         }
-
+        
         // Timer
         ActionTimer timer = new ActionTimer();
         timer.start();
-
+        
         // The result...
         Automata result = new Automata();
-
-        // Minimize either compositionally (involves composing automata and hiding local events) or 
+        
+        // Minimize either compositionally (involves composing automata and hiding local events) or
         // not (just minimise the components individually).
         if (!options.getCompositionalMinimization())
         {
@@ -131,21 +131,21 @@ public class AutomataMinimizationWorker
             {
                 executionDialog.initProgressBar(0, theAutomata.size());
             }
-
+            
             // Iterate over automata and minimize each individually
             int i = 0;
             Iterator autIt = theAutomata.iterator();
             while (autIt.hasNext())
             {
                 Automaton currAutomaton = (Automaton) autIt.next();
-
+                
                 // Do we have to care about the original?
                 if (options.getKeepOriginal())
                 {
                     // We need a copy since we might need to fiddle with the original
                     currAutomaton = new Automaton(currAutomaton);
                 }
-
+                
                 // Minimize this one
                 try
                 {
@@ -156,20 +156,21 @@ public class AutomataMinimizationWorker
                     }
                     threadsToStop.add(minimizer);
                     final Automaton newAutomaton =
-		      minimizer.getMinimizedAutomaton(options);
+                        minimizer.getMinimizedAutomaton(options);
                     threadsToStop.remove(minimizer);
-                    if (stopRequested) {
+                    if (stopRequested)
+                    {
                         break;
                     }
                     newAutomaton.setComment
-		      ("min(" + newAutomaton.getName() + ")");
+                        ("min(" + newAutomaton.getName() + ")");
                     newAutomaton.setName(null);
                     // Update execution dialog
                     if (executionDialog != null)
                     {
                         executionDialog.setProgress(++i);
                     }
-
+                    
                     result.addAutomaton(newAutomaton);
                 }
                 catch (Exception ex)
@@ -178,7 +179,7 @@ public class AutomataMinimizationWorker
                         currAutomaton.getName() + " " + ex);
                     logger.debug(ex.getStackTrace());
                 }
-
+                
                 if (!options.getKeepOriginal())
                 {
                     theProject.removeAutomaton(currAutomaton);
@@ -190,12 +191,20 @@ public class AutomataMinimizationWorker
             // Compositional minimization!
             try
             {
-                AutomataMinimizer minimizer = new AutomataMinimizer(theAutomata);
+                // Do we have to care about the original?
+                Automata task = theAutomata;
+                if (options.getKeepOriginal())
+                {
+                    // We need a copy since we might need to fiddle with the original
+                    task = new Automata(theAutomata);
+                }
+
+                AutomataMinimizer minimizer = new AutomataMinimizer(task);
                 threadsToStop.add(minimizer);
                 minimizer.setExecutionDialog(executionDialog);
                 Automata newAutomata = minimizer.getCompositionalMinimization(options);
                 threadsToStop.remove(minimizer);
-
+                
                 // Minimized!
                 if (newAutomata != null)
                 {
@@ -209,16 +218,16 @@ public class AutomataMinimizationWorker
                 logger.debug(ex.getStackTrace());
                 requestStop();
             }
-
+            
             if (!options.getKeepOriginal())
             {
                 theProject.removeAutomata(theAutomata);
             }
         }
-
+        
         // Timer
         timer.stop();
-
+        
         // Hide execution dialog
         EventQueue.invokeLater(new Runnable()
         {
@@ -230,12 +239,12 @@ public class AutomataMinimizationWorker
                 }
             }
         });
-
+        
         // How did it go?
         if (!stopRequested)
         {
             logger.info("Execution completed after " + timer.toString());
-
+            
             // Add new automata
             try
             {
@@ -250,7 +259,7 @@ public class AutomataMinimizationWorker
         {
             logger.info("Execution stopped after " + timer.toString());
         }
-
+        
         // We're finished! Make sure to kill the ExecutionDialog!
         if (executionDialog != null)
         {
@@ -258,7 +267,7 @@ public class AutomataMinimizationWorker
             executionDialog = null;
         }
     }
-
+    
     /**
      * Method that stops AutomataMinimizationWorker as soon as possible.
      *
@@ -267,21 +276,21 @@ public class AutomataMinimizationWorker
     public void requestStop()
     {
         stopRequested = true;
-
+        
         for (Iterator exIt = threadsToStop.iterator(); exIt.hasNext(); )
         {
             ((Stoppable) exIt.next()).requestStop();
         }
         threadsToStop.clear();
-
+        
         logger.debug("AutomataMinimizationWorker requested to stop.");
-
+        
         if (executionDialog != null)
         {
             executionDialog.setMode(ExecutionDialogMode.HIDE);
         }
     }
-
+    
     public boolean isStopped()
     {
         return stopRequested;

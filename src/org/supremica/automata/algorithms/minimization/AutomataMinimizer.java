@@ -54,6 +54,7 @@ import org.supremica.gui.*;
 import org.supremica.util.ActionTimer;
 import org.supremica.properties.Config;
 import java.util.*;
+
 public class AutomataMinimizer
     implements Stoppable
 {
@@ -774,11 +775,6 @@ public class AutomataMinimizer
         else
         {
             aut = automata.getFirstAutomaton();
-            // This could be one of the originals, so we might need to make a copy!
-            if (options.getKeepOriginal())
-            {
-                aut = new Automaton(aut);
-            }
         }
         
         // If supervisione equivalence, make the result a kripke automaton!

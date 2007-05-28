@@ -50,22 +50,22 @@
 package org.supremica.automata;
 
 public class KripkeAutomaton
-	extends Automaton
+    extends Automaton
 {
-	/**
-	 * Creates a new KripkeAutomaton.
-	 */
-	public KripkeAutomaton()
-	{
-		super();
-	}
-
-	/**
-	 * Creates a KripkeAutomaton out of an Automaton.
-	 */
-	public KripkeAutomaton(Automaton automaton)
-	{
-		// Make deep copy (shallow copy is ok, though).
-		super(automaton);
-	}
+    /**
+     * Creates a new KripkeAutomaton.
+     */
+    public KripkeAutomaton()
+    {
+        super();
+    }
+    
+    /**
+     * Creates a KripkeAutomaton out of an Automaton.
+     */
+    public KripkeAutomaton(Automaton automaton)
+    {
+        // Make deep copy (shallow copy is ok, though).
+        super(automaton);
+    }
 }
