@@ -185,6 +185,10 @@ public class AutomataMinimizer
         
         ActionTimer timer = new ActionTimer();
         
+        // If there's just one automaton, the user must have wanted it minimised!
+        if (theAutomata.size() == 1)
+            theAutomata = new Automata(monolithicMinimization(theAutomata, AlphabetHelpers.minus(theAutomata.getUnionAlphabet(), options.getTargetAlphabet())));
+        
         // As long as there are at least two automata,
         // select some automata to compose and minimize!
         while (theAutomata.size() >= 2)
@@ -257,7 +261,7 @@ public class AutomataMinimizer
                 {
                     // Return a one state blocking automaton (min for example)
                     logger.info("Early termination--a blocking state can be reached silently!");
-                    min.hide(new Alphabet(min.getAlphabet()), false);
+                    min.hide(new Alphabet(min.getAlphabet()).minus(options.getTargetAlphabet()), false);
                     theAutomata = new Automata(min);
                     continue;
                 }
@@ -783,9 +787,6 @@ public class AutomataMinimizer
             aut = new KripkeAutomaton(aut);
         }
         
-        // Hide the events!
-        boolean preserveControllability = options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE;
-        aut.hide(hideThese, preserveControllability);
         // Examine for largest sizes
         if (aut.nbrOfStates() > mostStates)
         {
@@ -802,13 +803,13 @@ public class AutomataMinimizer
         
         // Is it at all possible to minimize? (It may actually be possible even
         // if there are no epsilons)
-        if (aut.nbrOfEpsilonTransitions() > 0)
+        if (hideThese.size() > 0 || aut.nbrOfEpsilonTransitions() > 0)
         {
             // Minimize!
             AutomatonMinimizer minimizer = new AutomatonMinimizer(aut);
             minimizer.useShortStateNames(useShortStateNames);
             threadToStop = minimizer;
-            Automaton newAut = minimizer.getMinimizedAutomaton(options);
+            Automaton newAut = minimizer.getMinimizedAutomaton(options, hideThese);
             aut = newAut;
             threadToStop = null;
             if (stopRequested)

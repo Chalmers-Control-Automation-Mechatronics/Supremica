@@ -92,15 +92,39 @@ public class AutomatonMinimizer
     
     /**
      * Returns minimized automaton, minimized with respect to the supplied options.
+     * Hides all events except for the ones in "targetAlphabet".
      */
     public Automaton getMinimizedAutomaton(MinimizationOptions options)
     throws Exception
     {
+        if (options.getTargetAlphabet() != null)
+        {
+            return getMinimizedAutomaton(options, AlphabetHelpers.minus(theAutomaton.getAlphabet(), options.getTargetAlphabet()));
+        }
+        else
+        {
+            return getMinimizedAutomaton(options, new Alphabet());
+        }
+    }
+    /**
+     * Returns minimized automaton, minimized with respect to the supplied options.
+     */
+    public Automaton getMinimizedAutomaton(MinimizationOptions options, Alphabet hideThese)
+    throws Exception
+    {
         this.options = options;
         
+        // Check sanity
+        if (options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE && !theAutomaton.isPlant())
+            throw new Exception("Automaton " + theAutomaton + " must be plantified before minimisation.");
+            
         // Don't notify listeners!
         theAutomaton.beginTransaction();
         
+        // Hide the events!
+        boolean preserveControllability = options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE;
+        theAutomaton.hide(hideThese, preserveControllability);
+
         // Message
         int before = theAutomaton.nbrOfStates();
         int epsilons = theAutomaton.nbrOfEpsilonTransitions();

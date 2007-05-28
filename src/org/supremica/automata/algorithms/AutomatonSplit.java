@@ -196,12 +196,12 @@ public class AutomatonSplit
             // options.setKeepOriginal(false);
             result = minimizer.getMinimizedAutomaton(options);
             
-                        /*
+            /*
                         // Merge states and examine if it was redundant
                         for (ArcIterator arcIt = result.arcIterator(); arcIt.hasNext();)
                         {
                                         Arc arc = arcIt.nextArc();
-                         
+             
                                         // Merge states in transition, make selfloop
                                         Automaton reduction = removeTransition(result, arc);
                          

@@ -54,30 +54,30 @@ import junit.framework.TestSuite;
 import org.supremica.automata.algorithms.minimization.TestAutomatonMinimizer;
 
 public class TestPackageAlgorithms
-	extends TestCase
+    extends TestCase
 {
-
-	public TestPackageAlgorithms(String name)
-	{
-		super(name);
-	}
-
-	/**
-	 * Assembles and returns a test suite
-	 * containing all known tests.
-	 */
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite();
-		// suite.addTest(TestProjectBuildFromXml.suite());
-		suite.addTest(TestAutomataSynchronizer.suite());
-		suite.addTest(TestAutomatonSynthesizer.suite());
-		suite.addTest(TestAutomataSynthesizer.suite());
-		suite.addTest(TestAutomataVerifier.suite());
-		suite.addTest(TestAutomatonSplit.suite());
-		suite.addTest(TestAutomatonMinimizer.suite());
-		// suite.addTest(TestAutomataToXml.suite());
-		// suite.addTest(TestProjectToSP.suite());
-		return suite;
-	}
+    
+    public TestPackageAlgorithms(String name)
+    {
+        super(name);
+    }
+    
+    /**
+     * Assembles and returns a test suite
+     * containing all known tests.
+     */
+    public static Test suite()
+    {
+        TestSuite suite = new TestSuite();
+        // suite.addTest(TestProjectBuildFromXml.suite());
+        suite.addTest(TestAutomatonMinimizer.suite());
+        suite.addTest(TestAutomataSynchronizer.suite());
+        suite.addTest(TestAutomatonSynthesizer.suite());
+        suite.addTest(TestAutomataSynthesizer.suite());
+        suite.addTest(TestAutomataVerifier.suite());
+        suite.addTest(TestAutomatonSplit.suite());
+        // suite.addTest(TestAutomataToXml.suite());
+        // suite.addTest(TestProjectToSP.suite());
+        return suite;
+    }
 }
