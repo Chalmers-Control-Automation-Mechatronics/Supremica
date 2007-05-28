@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   ProjectingModelVerifierFactory
 //###########################################################################
-//# $Id: ProjectingModelVerifierFactory.java,v 1.1 2007-05-25 07:53:02 robi Exp $
+//# $Id: ProjectingModelVerifierFactory.java,v 1.2 2007-05-28 01:13:19 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular.supremica;
@@ -17,6 +17,7 @@ import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.ModelVerifierFactory;
 import net.sourceforge.waters.model.analysis.LanguageInclusionChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
 
 
 /**
@@ -36,7 +37,7 @@ public class ProjectingModelVerifierFactory implements ModelVerifierFactory
     return new ProjectingControllabilityChecker
       (null,
        factory,
-       new NativeControllabilityChecker(factory),
+       new MonolithicControllabilityChecker(factory),
        new MaxCommonEventsHeuristic(HeuristicType.PREFERREALPLANT),
        false);
   }

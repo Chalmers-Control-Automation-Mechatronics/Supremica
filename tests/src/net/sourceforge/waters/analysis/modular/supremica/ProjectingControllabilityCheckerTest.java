@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.monolithic
 //# CLASS:   ProjectingControllabilityCheckerTest
 //###########################################################################
-//# $Id: ProjectingControllabilityCheckerTest.java,v 1.1 2007-05-24 20:23:03 robi Exp $
+//# $Id: ProjectingControllabilityCheckerTest.java,v 1.2 2007-05-28 01:13:19 siw4 Exp $
 //###########################################################################
 
 package net.sourceforge.waters.analysis.modular.supremica;
@@ -21,6 +21,7 @@ import net.sourceforge.waters.model.analysis.
   AbstractControllabilityCheckerTest;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.analysis.monolithic.MonolithicControllabilityChecker;
 
 
 public class ProjectingControllabilityCheckerTest
@@ -49,7 +50,7 @@ public class ProjectingControllabilityCheckerTest
     return
       new ProjectingControllabilityChecker
             (null, factory,
-             new NativeControllabilityChecker(factory),
+             new MonolithicControllabilityChecker(factory),
              new MaxCommonEventsHeuristic(HeuristicType.PREFERREALPLANT), false);
   }
 }
