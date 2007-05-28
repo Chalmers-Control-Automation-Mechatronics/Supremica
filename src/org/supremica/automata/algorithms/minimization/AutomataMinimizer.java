@@ -214,7 +214,7 @@ public class AutomataMinimizer
             {
                 return null;
             }
-            
+                      
             // Perform the minimization, unless of course this is the last step
             // and it should be skipped...
             Automaton min;
