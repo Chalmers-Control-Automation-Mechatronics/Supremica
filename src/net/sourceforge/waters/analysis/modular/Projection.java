@@ -36,8 +36,11 @@ public class Projection
     mFactory = factory;
     mHide = hide;
     mForbidden = new HashSet<EventProxy>(forbidden);
+    mForbidden.retainAll(mHide);
+    System.out.println("forbidden + hidden:" + mForbidden);
+    mForbidden.addAll(forbidden);
     mForbidden.retainAll(mModel.getEvents());
-    mStateLimit = 500000;
+    mStateLimit = 10000;
     mDisabled = new HashSet<EventProxy>(mModel.getEvents());
     numStates = 1;
   }
@@ -50,11 +53,14 @@ public class Projection
   public AutomatonProxy project()
     throws Exception
   {
+    System.out.println(mForbidden);
+    System.out.println("Hidden: " + mHide);
     states = new IntMap(mStateLimit/2);
     trans = new ArrayList<TransitionProxy>();
     events = mModel.getEvents().toArray(new EventProxy[mModel.getEvents().size()]);
     int numAutomata = mModel.getAutomata().size();
     AutomatonProxy[] aut = mModel.getAutomata().toArray(new AutomatonProxy[numAutomata]);
+    eventAutomaton = new int[events.length][numAutomata];
     int stateLength = numAutomata;
     int l = 0;
     // transitions indexed first by automaton then by event then by source state
@@ -114,6 +120,26 @@ public class Projection
                    [stateMap.get(t.getSource())] = stateMap.get(t.getTarget());
       }
     }
+    for (int i = 0; i < events.length; i++) {
+      IntDouble[] list = new IntDouble[numAutomata];
+      for (int j = 0; j < aut.length; j++) {
+        list[j] = new IntDouble(j, 0);
+        if (transitions[j][i] != null) {
+          for (int k = 0; k < transitions[j][i].length; k++) {
+            if (transitions[j][i][k] != -1) {
+              list[j].mDouble++;
+            }
+          }
+          list[j].mDouble /= (double)transitions[j][i].length;
+        } else {
+          list[j].mDouble = Double.POSITIVE_INFINITY;
+        }
+      }
+      Arrays.sort(list);
+      for (int j = 0; j < eventAutomaton[i].length; j++) {
+        eventAutomaton[i][j] = list[j].mInt;
+      }
+    }
     // don't need these anymore
     aut = null;
     eventToIndex = null;
@@ -121,7 +147,7 @@ public class Projection
     // Time to start building the automaton
     numStates = 1;
     currentState = encode(actualState(new int[][] {currentState}));
-    states.put(currentState, mFactory.createStateProxy("0", true, new ArrayList<EventProxy>()));//new MemStateProxy(0));
+    states.put(currentState, new MemStateProxy(0));
     unvisited = new ArrayBag(100);
     unvisited.offer(currentState);
     while (!unvisited.isEmpty()) {
@@ -131,19 +157,18 @@ public class Projection
         explore(currentState, false);
       }
     }
-    Collection<StateProxy> st = new ArrayList<StateProxy>(states.values());
     Collection<EventProxy> ev = new ArrayList<EventProxy>(mModel.getEvents());
     ev.removeAll(mHide);
-    states = null;
-    System.out.println(st.size());
+
     StringBuffer name = new StringBuffer();
     for (AutomatonProxy a : mModel.getAutomata()) {
       name.append(a.getName());
     }
     AutomatonProxy result = mFactory.createAutomatonProxy(name.toString(),
                                                           ComponentKind.PLANT,
-                                                          ev, st, trans);
-    st = null;
+                                                          ev, states.values(), trans);
+    System.out.println(states.values().size());
+    states = null;
     trans = null;
     return result;
   }
@@ -169,12 +194,18 @@ public class Projection
       for (int j = 0; j < state.length / numAutomata; j++) {
         int[] suc = new int[numAutomata];
         for (int l = 0; l < numAutomata; l++) {
-          if (transitions[l][i] != null) {
-            suc[l] = transitions[l][i][state[j*numAutomata+l]];
+          int automaton = eventAutomaton[i][l];
+          if (transitions[automaton][i] != null) {
+            suc[automaton] = transitions[automaton][i][state[j*numAutomata+automaton]];
           } else {
-            suc[l] = state[j*numAutomata+l];
+            suc[automaton] = state[j*numAutomata+automaton];
           }
-          if (suc[l] == -1) {
+          if (suc[automaton] == -1) {
+            if (l > 0) {
+              int t = eventAutomaton[i][l];
+              eventAutomaton[i][l] = eventAutomaton[i][l - 1];
+              eventAutomaton[i][l - 1] = t;
+            }
             continue diffstates;
           }
         }
@@ -190,7 +221,7 @@ public class Projection
           int[] truestate = encode(actualState(successorarray));
           StateProxy target = states.get(truestate);
           if (target == null) {
-            target = mFactory.createStateProxy(Integer.toString(numStates));//new MemStateProxy(numStates);
+            target = new MemStateProxy(numStates);
             states.put(truestate, target);
             numStates++;
             if (numStates > mStateLimit) {
@@ -235,12 +266,18 @@ public class Projection
       for (int i = 0; i < numHidden; i++) {
         int[] newstate = new int[numAutomata];
         for (int j = 0; j < numAutomata; j++) {
-          if (transitions[j][i] != null) {
-            newstate[j] = transitions[j][i][s[j]];
+          int automaton = eventAutomaton[i][j];
+          if (transitions[automaton][i] != null) {
+            newstate[automaton] = transitions[automaton][i][s[automaton]];
           } else {
-            newstate[j] = s[j];
+            newstate[automaton] = s[automaton];
           }
-          if (newstate[j] == -1) {
+          if (newstate[automaton] == -1) {
+            if (j > 0) {
+              int t = eventAutomaton[i][j];
+              eventAutomaton[i][j] = eventAutomaton[i][j - 1];
+              eventAutomaton[i][j - 1] = t;
+            }
             continue events;
           }
           //System.out.println("current: " + s[j] + " successor: " + transitions[j][i][s[j]]);
@@ -502,6 +539,29 @@ public class Projection
     }
   }
   
+  private static class IntDouble
+    implements Comparable<IntDouble>
+  {
+    final public int mInt;
+    public double mDouble;
+    
+    public IntDouble(int i, double d)
+    {
+      mInt = i;
+      mDouble = d;
+    }
+    
+    public int compareTo(IntDouble id)
+    {
+      if (mDouble < id.mDouble) {
+        return -1;
+      } else if (mDouble > id.mDouble){
+        return 1;
+      }
+      return 0;
+    }
+  }
+  
   private int mStateLimit;
   private ProductDESProxy mModel;
   private ProductDESProxyFactory mFactory;
@@ -514,4 +574,5 @@ public class Projection
   private int[][][] transitions;
   private int numStates;
   private Bag unvisited;
+  private int[][] eventAutomaton;
 }

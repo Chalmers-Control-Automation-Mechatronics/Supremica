@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ProjectingControllabilityChecker
 //###########################################################################
-//# $Id: ProjectingControllabilityChecker.java,v 1.8 2007-05-28 07:07:08 robi Exp $
+//# $Id: ProjectingControllabilityChecker.java,v 1.9 2007-05-28 09:04:29 siw4 Exp $
 //###########################################################################
 
 
@@ -80,7 +80,7 @@ public class ProjectingControllabilityChecker
     mTranslator = IdenticalKindTranslator.getInstance();
     mStates = 0;
     mLeast = least;
-    setStateLimit(2000000);
+    setStateLimit(5000000);
   }
   
   public SafetyTraceProxy getCounterExample()
@@ -139,14 +139,15 @@ public class ProjectingControllabilityChecker
     return new AutomatonProxy[] {plant, spec};
   }
   
-  public ProjectionList project(ProductDESProxy model, EventProxy special)
+  public ProjectionList project(ProductDESProxy model, Set<EventProxy> forbiddenEvents)
   {
+    Map<Set<AutomatonProxy>, AutomataHidden> newMap = new HashMap<Set<AutomatonProxy>, AutomataHidden>();
     Set<AutomatonProxy> automata = model.getAutomata();
     ProjectionList p = null;
     while (true) {
       Map<Set<AutomatonProxy>, Integer> numoccuring = new HashMap<Set<AutomatonProxy>, Integer>();
       for (EventProxy e : model.getEvents()) {
-        if (e != special) {
+        if (!forbiddenEvents.contains(e)) {
           Set<AutomatonProxy> possess = new HashSet<AutomatonProxy>();
           for (AutomatonProxy a : automata) {
             if (a.getEvents().contains(e)) {
@@ -193,15 +194,18 @@ public class ProjectingControllabilityChecker
         break;
       }
       try {
-        ProjectionList t = new ProjectionList(p, automata, minset, special);
+        ProjectionList t = new ProjectionList(p, automata, minset, forbiddenEvents);
         p = t;
+        /*newMap.put(minset, p.mCache);*/
         automata = p.getModel().getAutomata();
       } catch (Throwable t) {
         t.printStackTrace();
+        mMinAutMap = newMap;
         //System.out.println(p);
         return p;
       }
     }
+    mMinAutMap = newMap;
     //System.out.println(p);
     return p;
   }
@@ -217,6 +221,9 @@ public class ProjectingControllabilityChecker
     final Map<AutomatonProxy, AutomatonProxy> getplant = new HashMap<AutomatonProxy, AutomatonProxy>();
     final Set<AutomatonProxy> plants = new HashSet<AutomatonProxy>();
     final Set<AutomatonProxy> specplants = new HashSet<AutomatonProxy>();
+    final Set<EventProxy> forbiddenEvents = new HashSet<EventProxy>();
+    final Map<AutomatonProxy, AutomatonProxy> spectospec = new HashMap<AutomatonProxy, AutomatonProxy>();
+    final Map<AutomatonProxy, AutomatonProxy> spectoplant = new HashMap<AutomatonProxy, AutomatonProxy>();
     final SortedSet<AutomatonProxy> specs = 
       new TreeSet<AutomatonProxy>(new Comparator<AutomatonProxy>() {
       public int compare(AutomatonProxy a1, AutomatonProxy a2)
@@ -243,12 +250,17 @@ public class ProjectingControllabilityChecker
       switch (getKindTranslator().getComponentKind(automaton)) {
         case PLANT :  plants.add(automaton);
                       break;
-        case SPEC  :  specs.add(automaton);
+        case SPEC  :  AutomatonProxy[] aut = convertSpec(automaton);
+                      spectospec.put(automaton, aut[1]);
+                      spectoplant.put(automaton, aut[0]);
+                      forbiddenEvents.addAll(aut[1].getEvents());
+                      specs.add(automaton);
                       break;
         default : break;
       }
     }
     //System.out.println(specs);
+    System.out.println(forbiddenEvents);
     while (!specs.isEmpty()) {
       Collection<AutomatonProxy> composition = new ArrayList<AutomatonProxy>();
       Set<EventProxy> events = new HashSet<EventProxy>();
@@ -258,13 +270,13 @@ public class ProjectingControllabilityChecker
       uncomposedplants.addAll(plants);
       uncomposedspecplants.addAll(specplants);
       uncomposedspecs.addAll(specs);
-      AutomatonProxy spec = mLeast ? specs.first() : specs.last();
-      final AutomatonProxy[] aut = convertSpec(spec);
-      composition.add(aut[1]);
-      composition.add(aut[0]);
-      EventProxy uncont = aut[1].getEvents().iterator().next();
-      events.addAll(aut[1].getEvents());
-      events.addAll(aut[0].getEvents());
+      final AutomatonProxy spec = mLeast ? specs.first() : specs.last();
+      composition.add(spectoplant.get(spec));
+      composition.add(spectospec.get(spec));
+      //forbiddenEvents = aut[1].getEvents();
+      for (AutomatonProxy a : composition) {
+        events.addAll(a.getEvents());
+      }
       uncomposedspecs.remove(spec);
       ProductDESProxy comp = getFactory().createProductDESProxy("comp", events, composition);
       ProjectionList proj = null;
@@ -280,13 +292,15 @@ public class ProjectingControllabilityChecker
         
         public ComponentKind getComponentKind(AutomatonProxy a)
         {
-          return a == aut[1] ? ComponentKind.SPEC : ComponentKind.PLANT;
+          return a == spectospec.get(spec) ? ComponentKind.SPEC : ComponentKind.PLANT;
         }
       });
       while (!mChecker.run()) {
         //System.out.println("start");
         mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
+        System.out.println("getTrace");
         TraceProxy counter = proj == null ? mChecker.getCounterExample() : proj.getTrace(mChecker.getCounterExample(), comp);
+        System.out.println("gotTrace");
         Collection<AutomatonProxy> newComp =
           mHeuristic.heur(comp,
                           uncomposedplants,
@@ -304,13 +318,13 @@ public class ProjectingControllabilityChecker
           uncomposedplants.remove(automaton);
           uncomposedspecplants.remove(automaton);
           if (uncomposedspecs.remove(automaton)) {
-            automaton = convertSpec(automaton)[0];
+            automaton = spectoplant.get(automaton);
           }
           composition.add(automaton);
           events.addAll(automaton.getEvents());
         }
         comp = getFactory().createProductDESProxy("comp", events, composition);
-        proj = project(comp, uncont);
+        proj = project(comp, forbiddenEvents);
         mChecker.setModel(proj == null ? comp : proj.getModel());
         //System.out.println(mChecker.getModel());
       }
@@ -359,6 +373,7 @@ public class ProjectingControllabilityChecker
     final Set<EventProxy> mOriginalAlphabet;
     final Set<EventProxy> mHidden;
     final ProductDESProxy mModel;
+    final AutomataHidden mCache;
     
     public ProjectionList(ProjectionList parent, Set<AutomatonProxy> automata,
                           Set<AutomatonProxy> compAutomata, EventProxy special, boolean supremica)
@@ -442,10 +457,11 @@ public class ProjectingControllabilityChecker
       mAutomata.add(minAutomaton);
       mModel = getFactory().createProductDESProxy("model", targ, automata);
       System.out.println("end");
+      mCache = new AutomataHidden(minAutomaton, mHidden);
     }
     
     public ProjectionList(ProjectionList parent, Set<AutomatonProxy> automata,
-                          Set<AutomatonProxy> compAutomata, EventProxy special)
+                          Set<AutomatonProxy> compAutomata, Set<EventProxy> forbiddenEvents)
       throws Exception
     {
       //System.out.println("start");
@@ -458,8 +474,6 @@ public class ProjectingControllabilityChecker
         events.addAll(a.getEvents());
       }
       mOriginalAlphabet = events;
-      ProductDESProxy comp = getFactory().createProductDESProxy("comp", events,
-                                                                compAutomata);
       mHidden = new HashSet<EventProxy>(events);
       /*for (AutomatonProxy a : compAutomata) {
         mHidden.retainAll(a.getEvents());
@@ -467,16 +481,27 @@ public class ProjectingControllabilityChecker
       for (AutomatonProxy a : mAutomata) {
         mHidden.removeAll(a.getEvents());
       }
-      mHidden.remove(special);
-      //System.out.println(mHidden);
-      Projection proj = new Projection(comp, getFactory(), mHidden, Collections.singleton(special));
-      AutomatonProxy minAutomaton = proj.project();
+      mHidden.removeAll(forbiddenEvents);
+      AutomatonProxy minAutomaton = null;
+      AutomataHidden cache = mMinAutMap.get(compAutomata);
+      if (cache != null && cache.mHidden.equals(mHidden)) {
+        minAutomaton = cache.mAutomaton;
+        System.out.println("used cache:" + minAutomaton.getStates().size());
+      }
+      if (minAutomaton == null) {
+        ProductDESProxy comp = getFactory().createProductDESProxy("comp", events,
+                                                                  compAutomata);
+        //System.out.println(mHidden);
+        Projection proj = new Projection(comp, getFactory(), mHidden, forbiddenEvents);
+        minAutomaton = proj.project();
+      }
       mAutomata.add(minAutomaton);
       Set<EventProxy> targ = new HashSet<EventProxy>();
       for (AutomatonProxy a : mAutomata) {
         targ.addAll(a.getEvents());
       }
       mModel = getFactory().createProductDESProxy("model", targ, mAutomata);
+      mCache = cache == null ? new AutomataHidden(minAutomaton, mHidden) : cache;
       //System.out.println("end");
     }
     
@@ -661,6 +686,18 @@ public class ProjectingControllabilityChecker
       }
     }
   }
+  
+  private static class AutomataHidden
+  {
+    public final AutomatonProxy mAutomaton;
+    public final Set<EventProxy> mHidden;
+    
+    public AutomataHidden(AutomatonProxy automon, Set<EventProxy> hidden)
+    {
+      mAutomaton = automon;
+      mHidden = hidden;
+    }
+  }
 
 
   //#########################################################################
@@ -670,6 +707,7 @@ public class ProjectingControllabilityChecker
   private KindTranslator mTranslator;
   private int mStates;
   private final boolean mLeast;
+  private Map<Set<AutomatonProxy>, AutomataHidden> mMinAutMap = new HashMap<Set<AutomatonProxy>, AutomataHidden>();
 
 
   //#########################################################################
