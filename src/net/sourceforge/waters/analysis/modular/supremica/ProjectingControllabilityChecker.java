@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ProjectingControllabilityChecker
 //###########################################################################
-//# $Id: ProjectingControllabilityChecker.java,v 1.7 2007-05-28 01:13:19 siw4 Exp $
+//# $Id: ProjectingControllabilityChecker.java,v 1.8 2007-05-28 07:07:08 robi Exp $
 //###########################################################################
 
 
@@ -209,6 +209,8 @@ public class ProjectingControllabilityChecker
   public boolean run()
     throws AnalysisException
   {
+    LOGGER.debug("ProjectingControllabilityChecker: STARTING on " +
+                 getModel().getName());
     mStates = 0;
     mChecker.setStateLimit(getStateLimit());
     final Map<AutomatonProxy, AutomatonProxy> getorig = new HashMap<AutomatonProxy, AutomatonProxy>();

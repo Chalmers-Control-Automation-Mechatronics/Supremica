@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.junit
 //# CLASS:   AbstractWatersTest
 //###########################################################################
-//# $Id: AbstractWatersTest.java,v 1.5 2007-05-26 11:29:22 robi Exp $
+//# $Id: AbstractWatersTest.java,v 1.6 2007-05-28 07:07:08 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.junit;
@@ -45,11 +45,22 @@ public abstract class AbstractWatersTest
       final Method method = lclazz.getMethod("logToFile", File.class);
       final File dir = getOutputDirectory();
       final String name = "log4j.log";
-      final File logfile = new File(dir, name);
-      method.invoke(null, logfile);
+      mLogFile = new File(dir, name);
+      method.invoke(null, mLogFile);
     } catch (final ClassNotFoundException exception) {
       // No loggers---no trouble ...
     }
+  }
+
+  protected void tearDown() throws Exception
+  {
+    if (mLogFile != null) {
+      final ClassLoader loader = AbstractWatersTest.class.getClassLoader();
+      final Class<?> lclazz = loader.loadClass(LOGGERFACTORY);
+      final Method method = lclazz.getMethod("cancelLogToFile", File.class);
+      method.invoke(null, mLogFile);
+    }
+    super.tearDown();
   }
 
 
@@ -102,6 +113,8 @@ public abstract class AbstractWatersTest
   //# Data Members
   private final File mInputRoot;
   private final File mOutputRoot;
+
+  private File mLogFile;
 
 
   //#########################################################################

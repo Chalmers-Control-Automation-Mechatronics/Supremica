@@ -674,6 +674,9 @@ Class-Path: ${manifest.pathlist}</echo>
 
 <target name="run_supremica_tests" depends="jar_supremica,jar_supremica_tests">
   <mkdir dir="${logs.results}"/>
+  <delete>
+    <fileset dir="${logs.results}" includes="**/log4j.log"/>
+  </delete>
   <junit printsummary="on" fork="true" maxmemory="512m">
     <formatter type="xml"/>
     <batchtest todir="${logs.results}">
@@ -731,6 +734,9 @@ Class-Path: ${manifest.pathlist}</echo>
 
 <target name="run_test_controllability" depends="jar_supremica,jar_supremica_tests">
   <mkdir dir="${logs.results}"/>
+  <delete>
+    <fileset dir="${logs.results}/analysis" includes="**/log4j.log"/>
+  </delete>
   <junit printsummary="on" fork="true" maxmemory="512m">
     <formatter type="xml"/>
     <batchtest todir="${logs.results}">

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.log
 //# CLASS:   LoggerFactory
 //###########################################################################
-//# $Id: LoggerFactory.java,v 1.16 2007-05-25 07:53:02 robi Exp $
+//# $Id: LoggerFactory.java,v 1.17 2007-05-28 07:07:08 robi Exp $
 //###########################################################################
 
 /*
@@ -60,6 +60,8 @@ package org.supremica.log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
@@ -153,17 +155,38 @@ public class LoggerFactory
     public static void logToFile(final File file)
 		throws FileNotFoundException
 	{
-		final PrintStream stream = new PrintStream(file);
-		logToStream(stream);
+		final String name = file.toString();
+		final OutputStream fstream = new FileOutputStream(file, true);
+		final PrintStream pstream = new PrintStream(fstream, true);
+		logToStream(pstream, name);
 	}
 
 	public static void logToStream(final PrintStream stream)
 	{
+		logToStream(stream, null);
+	}
+
+	public static void logToStream(final PrintStream stream,
+								   final String name)
+	{
         final PrintWriter writer = new PrintWriter(stream);
         final Appender appender = new WriterAppender(mLayout, writer);
+		if (name != null) {
+			appender.setName(name);
+		}
         final org.apache.log4j.Logger root =
             org.apache.log4j.Logger.getRootLogger();
 		root.addAppender(appender);
+	}
+
+    public static void cancelLogToFile(final File file)
+	{
+		final String name = file.toString();
+        final org.apache.log4j.Logger root =
+            org.apache.log4j.Logger.getRootLogger();
+		final Appender appender = root.getAppender(name);
+		root.removeAppender(appender);
+		appender.close();
 	}
 
 
