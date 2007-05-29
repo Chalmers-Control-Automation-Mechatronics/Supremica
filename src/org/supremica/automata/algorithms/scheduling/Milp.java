@@ -10,7 +10,9 @@ import org.supremica.gui.Gui;
 import org.supremica.gui.ScheduleDialog;
 import org.supremica.log.*;
 import org.supremica.util.ActionTimer;
+import org.supremica.util.BDD.solvers.TSPSolver;
 
+//TODO: Strukturera upp koden. Kommentera. 
 public class Milp
         implements Scheduler
 {
@@ -24,7 +26,7 @@ public class Milp
     private static final int NO_PATH_SPLIT_INDEX = -1;
     
     /** A big enough value used by the MILP-solver (should be greater than any time-variable). */
-    private static final int BIG_M_VALUE = 250000;
+    private static final int BIG_M_VALUE = 120000;
     
     /** The involved automata, plants, zone specifications */
     private Automata theAutomata, plants, zones, externalSpecs;
@@ -86,13 +88,35 @@ public class Milp
     /** The output string */
     private String outputStr = "";
     
-    /** The constrainst represented by external specifications, in string form */
+    /** The constrainst represented by external specifications, in string form. */
     private String externalConstraints = "";
+    
+//TODO: Remove "reverse"-variables when the other thing works. @Deprecated    
+//    /** 
+//     *  The declaration of variables, used to invalidate (reverse) multi-plant 
+//     *  precedence constraints. 
+//     */
+//    private String precReversalVarDecl = "";
     
     /*
      * The thread that performs the search for the optimal solution
      */
     private Thread milpThread;
+    
+    /**
+     *  The safety buffer between unbooking and booking, used in MILP. To use the 
+     *  automatic deduction of epsilon from the optmal time values in  
+     *  @see{buildScheduleAutomaton}, it should be a power of 10. For correct 
+     *  functioning, this variable should be strictly smaller than 10^(-x), where
+     *  x is the total number of (individual) plant states. 
+     */
+    private final double EPSILON = 0.001;
+    
+    /**
+     *  Used to round off the optimal times, as returned by MILP, thus removing
+     *  the added epsilons.
+     */
+    private double roundOffCoeff = -1;
     
     /****************************************************************************************/
     /*                                 CONSTUCTORS                                          */
@@ -214,9 +238,9 @@ public class Milp
      * by the MILP-solver can be accessed by the getSchedule-method
      */
     public void buildScheduleAutomaton()
-    throws Exception
-    {
-        //temp (fulhack)
+        throws Exception
+    {                
+        //TODO: temp (fulhack) - fixa bättre schemabygge.
         SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
         synthesizerOptions.setSynthesisType(SynthesisType.NONBLOCKINGCONTROLLABLE);
         synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.MONOLITHIC);
@@ -291,7 +315,7 @@ public class Milp
             
             // Stores the highest firing times for each active synchronizing event
             Hashtable<LabeledEvent, Double> synchArcsInfo = new Hashtable<LabeledEvent, Double>();
-            
+     
             // Which automaton fires the "cheapest" transition...
             for (Iterator<Automaton> autIt = theAutomata.iterator(); autIt.hasNext(); )
             {
@@ -307,7 +331,7 @@ public class Milp
                     
                     State currState = indexMap.getStateAt(currPlant, currComposedStateIndices[plantIndex]);
                     double currTime = optimalTimes[plantIndex][currComposedStateIndices[plantIndex]];
-                    
+                   
                     // Choose the smallest time (as long as it is not smaller than the previously scheduled time)...
                     if (currTime <= smallestTime)
                     {
@@ -379,6 +403,9 @@ public class Milp
                 }
             }
             
+            // Remove the added epsilons from the smallest time, thus obtaining the true smallest time
+            smallestTime = removeEpsilons(smallestTime);
+            
             // Add the transition time to the name of the state-to-be-in-the-schedule
             currScheduledState.setName(currScheduledState.getName() + ";  firing_time = " + smallestTime);
             //			currScheduledState.setCost(smallestTime);
@@ -386,7 +413,7 @@ public class Milp
             // Make a transition (in the synchronizer) to the state that is reachable in one step at cheapest cost
             // This state will be the next parting point in our walk
             currComposedStateIndices = stepper.step(currComposedStateIndices, currOptimalEvent);
-            
+
             // Update the schedule automaton
             State nextScheduledState = makeScheduleState(currComposedStateIndices);
             
@@ -398,7 +425,7 @@ public class Milp
             
             //temp (fulhack)
             synthState = synthState.nextState(currOptimalEvent);
-            
+
             currScheduledState = nextScheduledState;
             
             // If all the states that build up the current state are accepting, make the composed state accepting too
@@ -415,6 +442,7 @@ public class Milp
             {
                 if (smallestTime != makespan)
                 {
+                    logger.info("curroptimalevent = " + currOptimalEvent.getName());
                     throw new Exception("Makespan value does NOT correspond to the cost of the final state of the schedule (sched_time = " + smallestTime + "; makespan = " + makespan + "). Something went wrong...");
                 }
                 
@@ -464,10 +492,13 @@ public class Milp
     {
         modelFile = File.createTempFile("milp", ".mod");
         modelFile.deleteOnExit();
-logger.info("model: " + modelFile.getPath());
+
         solutionFile = File.createTempFile("milp", ".sol");
         solutionFile.deleteOnExit();
-logger.info("solution: " + solutionFile.getPath());        
+        
+        logger.info("model: " + modelFile.getPath());
+        logger.info("solution: " + solutionFile.getPath());        
+        
         indexMap = new AutomataIndexMap(theAutomata);
         pathCutTable = new Hashtable<State,String>();
         
@@ -833,7 +864,7 @@ logger.info("solution: " + solutionFile.getPath());
                     
                     if (pathSplitState[0] != NO_PATH_SPLIT_INDEX)
                     {
-                        specStr += "R" + indexMap.getAutomatonIndex(currPlant) + "_from_" + pathSplitState[0] + "_to_" + pathSplitState[1] + " + ";
+                        specStr += makeAltPathsVariable(indexMap.getAutomatonIndex(currPlant), pathSplitState[0], pathSplitState[1]) + " + ";
                     }
                     else
                     {
@@ -876,7 +907,7 @@ logger.info("solution: " + solutionFile.getPath());
     }
     
     private void createPrecedenceConstraints(Automaton currSpec)
-    throws Exception
+        throws Exception
     {
         // Replace some characters that the GLPK-solver would not accept
         String specName = currSpec.getName().trim();
@@ -930,11 +961,14 @@ logger.info("solution: " + solutionFile.getPath());
         int[] currPrecedingPlantAndState = null;
         String timeSpecStr = "\n";
         String logicSpecStr = " = ";
+//TODO: @Deprecated        
+//        String reversalSumStr = "";
         int counter = 1;
         boolean firstLoop = true;
         for (Iterator<int[]> followingRobotIt = followingEventsInfo.iterator(); followingRobotIt.hasNext(); )
         {
             int[] currFollowingIndices = followingRobotIt.next();
+            int nrPathSplitsInFollowingPlant = 0;
             
             if (currFollowingIndices.length == 1)
             {
@@ -945,8 +979,9 @@ logger.info("solution: " + solutionFile.getPath());
                 String followingEventPathSplitVariableStr = "";
                 if (currFollowingIndices[0] != NO_PATH_SPLIT_INDEX)
                 {
-                    followingEventPathSplitVariableStr = " - bigM*(1 - R" + currFollowingPlantAndState[0] + "_from_" + currFollowingIndices[0] + "_to_" + currFollowingIndices[1] + ")";
-                    logicSpecStr += "R" + currFollowingPlantAndState[0] + "_from_" + currFollowingIndices[0] + "_to_" + currFollowingIndices[1] + " + ";
+                    nrPathSplitsInFollowingPlant++;
+                    followingEventPathSplitVariableStr = " - " + makeAltPathsVariable(currFollowingPlantAndState[0], currFollowingIndices[0], currFollowingIndices[1]);
+                    logicSpecStr += makeAltPathsVariable(currFollowingPlantAndState[0], currFollowingIndices[0], currFollowingIndices[1]) + " + ";
                 }
                 else
                 {
@@ -956,6 +991,7 @@ logger.info("solution: " + solutionFile.getPath());
                 for (Iterator<int[]> precedingRobotIt = precedingEventsInfo.iterator(); precedingRobotIt.hasNext(); )
                 {
                     int[] currPrecedingIndices = precedingRobotIt.next();
+                    int nrPathSplitsInPrecedingPlant = 0;
                     
                     if (currPrecedingIndices.length == 1)
                     {
@@ -967,7 +1003,7 @@ logger.info("solution: " + solutionFile.getPath());
                         {
                             if (currPrecedingIndices[0] != NO_PATH_SPLIT_INDEX)
                             {
-                                logicSpecStr = " + R" + currPrecedingPlantAndState[0] + "_from_" + currPrecedingIndices[0] + "_to_" + currPrecedingIndices[1] + logicSpecStr;
+                                logicSpecStr = " + " + makeAltPathsVariable(currPrecedingPlantAndState[0], currPrecedingIndices[0], currPrecedingIndices[1]) + logicSpecStr;
                             }
                             else
                             {
@@ -978,10 +1014,37 @@ logger.info("solution: " + solutionFile.getPath());
                         String precedingEventPathSplitVariableStr = "";
                         if (currPrecedingIndices[0] != NO_PATH_SPLIT_INDEX)
                         {
-                            precedingEventPathSplitVariableStr = " - bigM*(1 - R" + currPrecedingPlantAndState[0] + "_from_" + currPrecedingIndices[0] + "_to_" + currPrecedingIndices[1] + ")";
+                            nrPathSplitsInPrecedingPlant++;
+                            precedingEventPathSplitVariableStr = " - " + makeAltPathsVariable(currPrecedingPlantAndState[0], currPrecedingIndices[0], currPrecedingIndices[1]);
                         }
-                        
-                        timeSpecStr += "multi_plant_prec_" + specName + "_" + counter++ + " : time[" + currFollowingPlantAndState[0] + ", " + currFollowingPlantAndState[1] + "] >= time[" + currPrecedingPlantAndState[0] + ", " + currPrecedingPlantAndState[1] + "]" + precedingEventPathSplitVariableStr + followingEventPathSplitVariableStr + ";\n";
+  
+//TODO: @Deprecated                        
+//                        String reversalVariable = specName + "_reverse_" + counter;
+                        timeSpecStr += "multi_plant_prec_" + specName + "_" + counter++ + " : time[" + 
+                                currFollowingPlantAndState[0] + ", " + currFollowingPlantAndState[1] + "] >= time[" + 
+                                currPrecedingPlantAndState[0] + ", " + currPrecedingPlantAndState[1] + "]";
+                        if (nrPathSplitsInFollowingPlant + nrPathSplitsInPrecedingPlant > 0)
+                        {
+                            timeSpecStr += " - bigM*(" + (nrPathSplitsInFollowingPlant + nrPathSplitsInPrecedingPlant) + 
+                                    precedingEventPathSplitVariableStr + followingEventPathSplitVariableStr + ")";
+                        }
+                        timeSpecStr += " + epsilon;\n";
+
+//TODO: @Deprecated                        
+//                        timeSpecStr += "dual_multi_plant_prec_" + specName + "_" + counter++ + " : time[" + 
+//                                currPrecedingPlantAndState[0] + ", " + currPrecedingPlantAndState[1] + "] >= time[" +
+//                                currFollowingPlantAndState[0] + ", " + currFollowingPlantAndState[1] + "]"; 
+//                        if (nrPathSplitsInFollowingPlant + nrPathSplitsInPrecedingPlant > 0)
+//                        {
+//                            timeSpecStr += " - bigM*(" + (nrPathSplitsInFollowingPlant + nrPathSplitsInPrecedingPlant + 1) + 
+//                                    " - " + reversalVariable + " - " + precedingEventPathSplitVariableStr + 
+//                                    " - " + followingEventPathSplitVariableStr + ")";
+//                        }
+//                        timeSpecStr += " + epsilon;\n";                       
+//                        precReversalVarDecl += "var " + reversalVariable + ", binary;\n";                       
+//                        timeSpecStr += "limit_" + reversalVariable + " : (" + precedingEventPathSplitVariableStr + " + " + 
+//                                followingEventPathSplitVariableStr + ") / 2 >= " + reversalVariable + ";\n"; 
+//                        reversalSumStr += reversalVariable + " + ";
                     }
                 }
                 firstLoop = false;
@@ -1000,6 +1063,10 @@ logger.info("solution: " + solutionFile.getPath());
         }
         logicSpecStr = logicSpecStr.substring(cutStartIndex, cutEndIndex).trim() + ";\n";
         externalConstraints += timeSpecStr + "multi_plant_prec_" + specName + "_TOT : " + logicSpecStr;
+        
+//TODO: @Deprecated        
+//        precReversalVarDecl += "var " +  
+//        externalConstraints += "multi_plant_prec_" + specName + "_reversal_TOT : " + reversalSumStr + " = " + 
     }
     
 // 	private StateSet findCommonEventFiringStatesInPlant(Automaton plant, Automaton spec)
@@ -1162,7 +1229,7 @@ logger.info("solution: " + solutionFile.getPath());
         String altPathsConstraints = "";
         
         // The string containing alternative paths variables
-        String altPathsVariables = "";
+        String altPathsVarDecl = "";
         
         // The string containing the cycle time constraints
         String cycleTimeConstraints = "";
@@ -1218,7 +1285,7 @@ logger.info("solution: " + solutionFile.getPath());
                 {
                     if (currState.isInitial())
                     {
-                        initPrecConstraints += "initial_" + "R" + currPlantIndex + "_" + currStateIndex + " : ";
+                        initPrecConstraints += "initial_" + "r" + currPlantIndex + "_" + currStateIndex + " : ";
                         initPrecConstraints += "time[" + i + ", " + currStateIndex + "] >= deltaTime[" + i + ", " + currStateIndex + "];\n";
                     }
                     
@@ -1230,8 +1297,10 @@ logger.info("solution: " + solutionFile.getPath());
                         State nextState = nextStates.next();
                         int nextStateIndex = indexMap.getStateIndex(currPlant, nextState);
                         
-                        precConstraints += "prec_" + "R" + currPlantIndex + "_" + currStateIndex + "_" + nextStateIndex + " : ";
-                        precConstraints += "time[" + i + ", " + nextStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + ", " + nextStateIndex + "];\n";
+                        //TODO: fixa epsilon så det blir rätt tid i buildScheduleAutomaton()
+                        precConstraints += "prec_" + "r" + currPlantIndex + "_" + currStateIndex + "_" + nextStateIndex + " : " + 
+                                "time[" + i + ", " + nextStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + 
+                                ", " + nextStateIndex + "] + epsilon;\n";
                     }
 //                     // If there are two successors, add one alternative-path variable and corresponding constraint
 //                     else if (nbrOfOutgoingMultiArcs == 2)
@@ -1241,16 +1310,16 @@ logger.info("solution: " + solutionFile.getPath());
 //                         int nextLeftStateIndex = indexMap.getStateIndex(currPlant, nextLeftState);
 //                         int nextRightStateIndex = indexMap.getStateIndex(currPlant, nextRightState);
                     
-//                         String currAltPathsVariable = "R" + currPlantIndex + "_from_" + currStateIndex + "_to_" + nextLeftStateIndex;
+//                         String currAltPathsVariable = "r" + currPlantIndex + "_from_" + currStateIndex + "_to_" + nextLeftStateIndex;
                     
-//                         altPathsVariables += "var " + currAltPathsVariable + ", binary;\n";
+//                         altPathsVarDecl += "var " + currAltPathsVariable + ", binary;\n";
                     
-//                         altPathsConstraints += "alt_paths_" + "R" + currPlantIndex + "_" + currStateIndex + " : ";
+//                         altPathsConstraints += "alt_paths_" + "r" + currPlantIndex + "_" + currStateIndex + " : ";
 //                         altPathsConstraints += "time[" + i + ", " + nextLeftStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + ", "  + nextLeftStateIndex + "] - bigM*(1 - " + currAltPathsVariable + ");\n";
                     
 //                         pathCutTable.put(nextLeftState, currAltPathsVariable);
                     
-//                         altPathsConstraints += "dual_alt_paths_" + "R" + currPlantIndex + "_" + currStateIndex + " : ";
+//                         altPathsConstraints += "dual_alt_paths_" + "r" + currPlantIndex + "_" + currStateIndex + " : ";
 //                         altPathsConstraints += "time[" + i + ", " + nextRightStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + ", "  + nextRightStateIndex + "] - bigM*" + currAltPathsVariable + ";\n";
                     
 //                         pathCutTable.put(nextRightState, "(1 - " + currAltPathsVariable + ")");
@@ -1259,20 +1328,23 @@ logger.info("solution: " + solutionFile.getPath());
                     else
                     {
                         int currAlternative = 0;
-                        String sumConstraint = "alt_paths_" + "R" + currPlantIndex + "_" + currStateIndex + "_TOT : ";
+                        String sumConstraint = "alt_paths_" + "r" + currPlantIndex + "_" + currStateIndex + "_TOT : ";
                         
                         while (nextStates.hasNext())
                         {
                             State nextState = nextStates.next();
                             int nextStateIndex = indexMap.getStateIndex(currPlant, nextState);
                             
-                            String currAltPathsVariable = "R" + currPlantIndex + "_from_" + currStateIndex + "_to_" + nextStateIndex;
+                            String currAltPathsVariable = makeAltPathsVariable(currPlantIndex, currStateIndex, nextStateIndex);
                             sumConstraint += currAltPathsVariable + " + ";
                             
-                            altPathsVariables += "var " + currAltPathsVariable + ", binary;\n";
+                            altPathsVarDecl += "var " + currAltPathsVariable + ", binary;\n";
                             
-                            altPathsConstraints += "alt_paths_" + currAltPathsVariable + " : ";
-                            altPathsConstraints += "time[" + i + ", " + nextStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + ", "  + nextStateIndex + "] - bigM*(1 - " + currAltPathsVariable + ");\n";
+                            //TODO: hantera epsilon i buildSheduleAutomaton()
+                            altPathsConstraints += "alt_paths_" + currAltPathsVariable + " : " + 
+                                    "time[" + i + ", " + nextStateIndex + "] >= time[" + i + ", " + currStateIndex + 
+                                    "] + deltaTime[" + i + ", "  + nextStateIndex + "] - bigM*(1 - " + 
+                                    currAltPathsVariable + ") + epsilon;\n";
                             
                             pathCutTable.put(nextState, "(1 - " + currAltPathsVariable + ")");
                             
@@ -1296,7 +1368,7 @@ logger.info("solution: " + solutionFile.getPath());
                             
                             if (currPathSplit[0] != NO_PATH_SPLIT_INDEX)
                             {
-                                altPathsConstraints += "R" + currPlantIndex + "_from_" + currPathSplit[0] + "_to_" + currPathSplit[1] + " + ";
+                                altPathsConstraints += makeAltPathsVariable(currPlantIndex, currPathSplit[0], currPathSplit[1]) + " + ";
                             }
                             else
                             {
@@ -1313,7 +1385,7 @@ logger.info("solution: " + solutionFile.getPath());
                 {
                     // If the current state is accepting, a cycle time constaint is added,
                     // ensuring that the makespan is at least as long as the minimum cycle time of this plant
-                    cycleTimeConstraints += "cycle_time_" + "R" + currPlantIndex + " : c >= " + "time[" + i + ", " + currStateIndex + "];\n";
+                    cycleTimeConstraints += "cycle_time_" + "r" + currPlantIndex + " : c >= " + "time[" + i + ", " + currStateIndex + "];\n";
                 }
             }
             
@@ -1349,9 +1421,6 @@ logger.info("solution: " + solutionFile.getPath());
         // Constructing the mutex constraints
         // for every zone...
         
-        // The safety buffer
-        double epsilon = 0.1;
-        
         for (int i=0; i<bookingTics.length; i++)
         {
             // for every plant pair...
@@ -1375,21 +1444,95 @@ logger.info("solution: " + solutionFile.getPath());
                                 
                                 mutexVariables += "var " + currMutexVariable + ", binary;\n";
                                 
-                                mutexConstraints += "mutex_Z" + i + "_R" + j1 + "_R" + j2 + "_var" + repeatedBooking + " : time[" + j1 + ", " + bookingTics[i][j1][k1] + "] >= " + "time[" + j2 + ", " + unbookingTics[i][j2][k2] + "] - bigM*" + currMutexVariable + " + " + epsilon;
-                                
-                                String pathCutEnsurance = pathCutTable.get(indexMap.getStateAt(plants.getAutomatonAt(j1), k1));
-                                if (pathCutEnsurance != null)
+                                //test
+                                ArrayList<int[]> bList = new ArrayList<int[]>();
+                                Automaton bPlant = indexMap.getAutomatonAt(j1);
+                                State bState = indexMap.getStateAt(bPlant, bookingTics[i][j1][k1]);
+                                findNearestPathSplits(bPlant, bState, bList);
+                                ArrayList<int[]> uList = new ArrayList<int[]>();
+                                Automaton uPlant = indexMap.getAutomatonAt(j2);
+                                State uState = indexMap.getStateAt(uPlant, unbookingTics[i][j2][k2]);
+                                findNearestPathSplits(uPlant, uState, uList);
+                                int totalNrOfPathSplits = 0;
+                                String altPathsCoupling = "";
+                                for (int[] bSplitState : bList)
                                 {
-                                    mutexConstraints += " - bigM*" + pathCutEnsurance;
+                                    if (bSplitState[0] != NO_PATH_SPLIT_INDEX)
+                                    {
+                                        totalNrOfPathSplits++;
+                                        altPathsCoupling += " - " + makeAltPathsVariable(j1, bSplitState[0], bSplitState[1]);
+                                    }                       
                                 }
-                                mutexConstraints += ";\n";
-                                mutexConstraints += "dual_mutex_Z" + i + "_R" + j1 + "_R" + j2  + "_var" + repeatedBooking + " : time[" + j2 + ", " + bookingTics[i][j2][k2] + "] >= " + "time[" + j1 + ", " + unbookingTics[i][j1][k1] + "] - bigM*(1 - " + currMutexVariable + ")" + " + " + epsilon;
-                                pathCutEnsurance = pathCutTable.get(indexMap.getStateAt(plants.getAutomatonAt(j2), k2));
-                                if (pathCutEnsurance != null)
+                                for (int[] uSplitState : uList)
                                 {
-                                    mutexConstraints += " - bigM*" + pathCutEnsurance;
+                                    if (uSplitState[0] != NO_PATH_SPLIT_INDEX)
+                                    {
+                                        totalNrOfPathSplits++;
+                                        altPathsCoupling += " - " + makeAltPathsVariable(j2, uSplitState[0], uSplitState[1]);
+                                    }                       
                                 }
-                                mutexConstraints += ";\n";
+                                mutexConstraints += "mutex_z" + i + "_r" + j1 + "_r" + j2 + "_var" + repeatedBooking + " : time[" + j1 + ", " + bookingTics[i][j1][k1] + "] >= " + "time[" + j2 + ", " + unbookingTics[i][j2][k2] + "] - bigM*";
+                                if (totalNrOfPathSplits > 0)
+                                {
+                                    mutexConstraints += "(" + totalNrOfPathSplits + " + " + currMutexVariable + altPathsCoupling + ")";
+                                }     
+                                else
+                                {
+                                    mutexConstraints += currMutexVariable;
+                                }
+                                mutexConstraints += " + epsilon;\n";    
+                                //test (forts...)
+                                bList = new ArrayList<int[]>();
+                                bPlant = uPlant;
+                                bState = indexMap.getStateAt(bPlant, bookingTics[i][j2][k2]);
+                                findNearestPathSplits(bPlant, bState, bList);
+                                uList = new ArrayList<int[]>();
+                                uPlant = indexMap.getAutomatonAt(j1);
+                                uState = indexMap.getStateAt(uPlant, unbookingTics[i][j1][k1]);
+                                findNearestPathSplits(uPlant, uState, uList);
+                                totalNrOfPathSplits = 0;
+                                altPathsCoupling = "";
+                                for (int[] bSplitState : bList)
+                                {
+                                    if (bSplitState[0] != NO_PATH_SPLIT_INDEX)
+                                    {
+                                        totalNrOfPathSplits++;
+                                        altPathsCoupling += " - " + makeAltPathsVariable(j2, bSplitState[0], bSplitState[1]);
+                                    }                       
+                                }
+                                for (int[] uSplitState : uList)
+                                {
+                                    if (uSplitState[0] != NO_PATH_SPLIT_INDEX)
+                                    {
+                                        totalNrOfPathSplits++;
+                                        altPathsCoupling += " - " + makeAltPathsVariable(j1, uSplitState[0], uSplitState[1]);
+                                    }                       
+                                }
+                                mutexConstraints += "dual_mutex_z" + i + "_r" + j1 + "_r" + j2  + "_var" + repeatedBooking + " : time[" + j2 + ", " + bookingTics[i][j2][k2] + "] >= " + "time[" + j1 + ", " + unbookingTics[i][j1][k1] + "] - bigM*(";
+                                if (totalNrOfPathSplits > 0)
+                                {
+                                    mutexConstraints += (totalNrOfPathSplits+1) + " - " + currMutexVariable + altPathsCoupling + ")";
+                                }     
+                                else
+                                {
+                                    mutexConstraints += "1 - " + currMutexVariable + ")";
+                                }   
+                                mutexConstraints += " + epsilon;\n";
+
+// Replace by the test above
+//                                String pathCutEnsurance = pathCutTable.get(indexMap.getStateAt(plants.getAutomatonAt(j1), k1));
+//                                if (pathCutEnsurance != null)
+//                                {
+//                                    mutexConstraints += " - bigM*" + pathCutEnsurance;
+//                                }
+//                                mutexConstraints += ";\n";
+//                                mutexConstraints += "dual_mutex_z" + i + "_r" + j1 + "_r" + j2  + "_var" + repeatedBooking + " : time[" + j2 + ", " + bookingTics[i][j2][k2] + "] >= " + "time[" + j1 + ", " + unbookingTics[i][j1][k1] + "] - bigM*(1 - " + currMutexVariable + ")" + " + " + epsilon;
+//                                pathCutEnsurance = pathCutTable.get(indexMap.getStateAt(plants.getAutomatonAt(j2), k2));
+//                                if (pathCutEnsurance != null)
+//                                {
+//                                    mutexConstraints += " - bigM*" + pathCutEnsurance;
+//                                }
+//                                mutexConstraints += ";\n";
                             }
                         }
                     }
@@ -1412,6 +1555,8 @@ logger.info("solution: " + solutionFile.getPath());
         w.newLine();
         w.write("param bigM;");
         w.newLine();
+        w.write("param epsilon >= 0;");
+        w.newLine();
         
         // Definitions of sets
         w.newLine();
@@ -1433,8 +1578,10 @@ logger.info("solution: " + solutionFile.getPath());
         w.newLine();
         w.write("var c;");
         w.newLine();
-        w.write(altPathsVariables);
+        w.write(altPathsVarDecl);
         w.write(mutexVariables);
+//TODO: @Deprecated        
+//        w.write(precReversalVarDecl);
         w.newLine();
         
         // The objective function
@@ -1490,6 +1637,7 @@ logger.info("solution: " + solutionFile.getPath());
         // Behovs maxTic verkligen???
         w.write("param maxTic := " + (nrOfTics - 1) + ";");
         w.newLine();
+        w.write("param epsilon := " + EPSILON + ";");
         
         w.newLine();
         w.write(deltaTimeStr);
@@ -1505,7 +1653,7 @@ logger.info("solution: " + solutionFile.getPath());
     }
     
     private void processSolutionFile()
-    throws Exception
+        throws Exception
     {
         // tillf...
         // 		for (int i=0; i<plants.size(); i++)
@@ -1552,11 +1700,11 @@ logger.info("solution: " + solutionFile.getPath());
             else if (str.indexOf("c ") >  -1)
             {
                 String strMakespan = str.substring(str.indexOf("c") + 1).trim();
-                makespan = (new Double(strMakespan)).doubleValue();
+                makespan = removeEpsilons((new Double(strMakespan)).doubleValue());
             }
             else if (str.indexOf(" prec_") > -1)
             {
-                str = str.substring(str.indexOf("_R") + 2);
+                str = str.substring(str.indexOf("_r") + 2);
                 String strPlantIndex = str.substring(0, str.indexOf("_"));
                 String strStartStateIndex = str.substring(str.indexOf("_") + 1, str.lastIndexOf("_"));
                 String strEndStateIndex = str.substring(str.lastIndexOf("_") + 1);
@@ -1573,7 +1721,7 @@ logger.info("solution: " + solutionFile.getPath());
             }
             else if (str.indexOf("_from") > -1 && str.indexOf("alt_paths") < 0)
             {
-                String strPlantIndex = str.substring(str.indexOf("R") + 1, str.indexOf("_"));
+                String strPlantIndex = str.substring(str.indexOf("r") + 1, str.indexOf("_"));
                 str = str.substring(str.indexOf("_from_") + 6);
                 String strStartStateIndex = str.substring(0, str.indexOf("_"));
                 String strEndStateIndex = str.substring(str.lastIndexOf("_") + 1);
@@ -1651,7 +1799,7 @@ logger.info("solution: " + solutionFile.getPath());
 //                 // 					outputStr += "\t" + milpEchoStr + "\n";
 //                 // 				}
 //             }
-            if (milpEchoStr.contains("NO FEASIBLE SOLUTION"))
+            if (milpEchoStr.contains("NO FEASIBLE SOLUTION") || milpEchoStr.contains("NO PRIMAL FEASIBLE SOLUTION"))
             {
                 throw new Exception(milpEchoStr + " (specifications should be relaxed if possible).");
             }
@@ -1864,6 +2012,36 @@ logger.info("solution: " + solutionFile.getPath());
     public Automaton getSchedule()
     {
         return schedule;
+    }
+    
+    private String makeAltPathsVariable(int plantIndex, int fromStateIndex, int toStateIndex)
+    {
+        return "r" + plantIndex + "_from_" + fromStateIndex + "_to_" + toStateIndex;
+    }
+    
+    /**
+     *  Removes epsilons from the supplied time variable, by returning closest
+     *  value that is smaller than time and cannot be affected by the sum of 
+     *  epsilons.
+     *
+     *  @param - time 
+     *  @return - the time without epsilons
+     */
+    private double removeEpsilons(double time)
+    {
+        // Initialize roundOffCoeff if this has not been done
+        if (roundOffCoeff == -1)
+        {
+            int totalNrOfTimes = 0;
+            for (int i = 0; i < optimalTimes.length; i++)
+            {
+                totalNrOfTimes += optimalTimes[i].length;
+            }
+            roundOffCoeff = EPSILON * Math.pow(10, ("" + totalNrOfTimes).length());
+        }
+        
+        //Remove epsilons from the current time
+        return Math.floor(time / roundOffCoeff) * roundOffCoeff;
     }
 }
 
