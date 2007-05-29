@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventTableModel
 //###########################################################################
-//# $Id: EventTableModel.java,v 1.28 2007-01-03 00:49:08 robi Exp $
+//# $Id: EventTableModel.java,v 1.29 2007-05-29 11:49:02 robi Exp $
 //###########################################################################
 
 
@@ -464,24 +464,26 @@ public class EventTableModel
      */
     private void addCommandsFromList(final EventListExpressionSubject list)
     {
-      ListIterator<AbstractSubject> li =
-        list.getEventListModifiable().listIterator();
-      boolean removal = false;
-      boolean add = true;
-      int index = 0;
-      while (li.hasNext()) {
-        final AbstractSubject a = li.next();
-        if (a.equalsByContents(mNew)) {
-          add = false;
+      if (list != null) {
+        final ListIterator<AbstractSubject> iter =
+          list.getEventListModifiable().listIterator();
+        boolean removal = false;
+        boolean add = true;
+        int index = 0;
+        while (iter.hasNext()) {
+          final AbstractSubject a = iter.next();
+          if (a.equalsByContents(mNew)) {
+            add = false;
+          }
+          if (a.equalsByContents(mOld)) {
+            mCommands.addCommand(new RemoveEventCommand(list, a));
+            removal = true;
+            index = iter.nextIndex() - 1;
+          }
         }
-        if (a.equalsByContents(mOld)) {
-          mCommands.addCommand(new RemoveEventCommand(list, a));
-          removal = true;
-          index = li.nextIndex() - 1;
+        if (add && removal) {
+          mCommands.addCommand(new AddEventCommand(list, mNew, index));
         }
-      }
-      if (add && removal) {
-        mCommands.addCommand(new AddEventCommand(list, mNew, index));
       }
     }
 
