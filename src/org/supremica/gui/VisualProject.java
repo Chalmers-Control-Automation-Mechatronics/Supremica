@@ -136,6 +136,8 @@ public class VisualProject
 
     public void automatonRenamed(Automaton aut, String oldName)
     {
+        //System.err.println("Rename " + aut + " from " + oldName);
+        
         AutomatonViewer theViewer = (AutomatonViewer) theAutomatonViewerContainer.get(oldName);
 
         if (theViewer != null)

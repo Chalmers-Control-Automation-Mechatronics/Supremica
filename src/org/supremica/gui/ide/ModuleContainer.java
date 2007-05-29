@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.53 2007-05-28 11:29:55 flordal Exp $
+//# $Id: ModuleContainer.java,v 1.54 2007-05-29 12:19:51 flordal Exp $
 //###########################################################################
 
 
@@ -316,14 +316,14 @@ public class ModuleContainer implements UndoInterface
     public boolean addAutomaton(Automaton theAutomaton)
     {
         getVisualProject().addAutomaton(theAutomaton);
-        return true;// To Do Fix
+        return true; // This is not always the correct return value!!!
     }
     
     
     public int addAutomata(Automata theAutomata)
     {
         getVisualProject().addAutomata(theAutomata);
-        return theAutomata.size(); // TO DO Fix
+        return theAutomata.size(); // This is not always the correct return value!!!
     }
     
     

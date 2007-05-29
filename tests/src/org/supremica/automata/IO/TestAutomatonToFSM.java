@@ -59,68 +59,68 @@ import org.supremica.testhelpers.*;
 import org.supremica.automata.*;
 
 public class TestAutomatonToFSM
-	extends TestCase
+    extends TestCase
 {
-	private static final String tempFilePrefix = "SupremicaDummyFile";
-	private static final String tempFileSuffix = "xml";
-
-	public TestAutomatonToFSM(String name)
-	{
-		super(name);
-	}
-
-	/**
-	 * Sets up the test fixture.
-	 * Called before every test case method.
-	 */
-	protected void setUp()
-	{
-	}
-
-	/**
-	 * Tears down the test fixture.
-	 * Called after every test case method.
-	 */
-	protected void tearDown()
-	{
-	}
-
-	/**
-	 * Assembles and returns a test suite
-	 * for all the test methods of this test case.
-	 */
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(TestAutomatonToFSM.class);
-		return suite;
-	}
-
-	public void testReadWriteRead()
-	{
-		try
-		{
-			File testFileAgv = TestFiles.getFile(TestFiles.UMDES_2);
-			ProjectBuildFromFSM originalBuilder = new ProjectBuildFromFSM();
-			Project theOriginalProject = originalBuilder.build(testFileAgv.toURL());
-			assertTrue(theOriginalProject.nbrOfAutomata() == 1);
-
-			File tempFile = File.createTempFile(tempFilePrefix, tempFileSuffix);
-			AutomatonToFSM exporter = new AutomatonToFSM(theOriginalProject.getFirstAutomaton());
-			exporter.serialize(tempFile);
-			ProjectBuildFromFSM secondBuilder = new ProjectBuildFromFSM();
-			Project theSecondProject = secondBuilder.build(tempFile.toURL());
-			tempFile.delete();
-			assertTrue(theOriginalProject != null);
-			assertTrue(theSecondProject != null);
-			theOriginalProject.getFirstAutomaton().setName("Dummy");
-			theSecondProject.getFirstAutomaton().setName("Dummy");
-			assertTrue(theOriginalProject.equalProject(theSecondProject));
-		}
-		catch (Exception ex)
-		{
-			ex.printStackTrace();
-			assertTrue(false);
-		}
-	}
-
+    private static final String tempFilePrefix = "SupremicaDummyFile";
+    private static final String tempFileSuffix = "xml";
+    
+    public TestAutomatonToFSM(String name)
+    {
+        super(name);
+    }
+    
+    /**
+     * Sets up the test fixture.
+     * Called before every test case method.
+     */
+    protected void setUp()
+    {
+    }
+    
+    /**
+     * Tears down the test fixture.
+     * Called after every test case method.
+     */
+    protected void tearDown()
+    {
+    }
+    
+    /**
+     * Assembles and returns a test suite
+     * for all the test methods of this test case.
+     */
+    public static Test suite()
+    {
+        TestSuite suite = new TestSuite(TestAutomatonToFSM.class);
+        return suite;
+    }
+    
+    public void testReadWriteRead()
+    {
+        try
+        {
+            File testFileAgv = TestFiles.getFile(TestFiles.UMDES_2);
+            ProjectBuildFromFSM originalBuilder = new ProjectBuildFromFSM();
+            Project theOriginalProject = originalBuilder.build(testFileAgv.toURL());
+            assertTrue(theOriginalProject.nbrOfAutomata() == 1);
+            
+            File tempFile = File.createTempFile(tempFilePrefix, tempFileSuffix);
+            AutomatonToFSM exporter = new AutomatonToFSM(theOriginalProject.getFirstAutomaton());
+            exporter.serialize(tempFile);
+            ProjectBuildFromFSM secondBuilder = new ProjectBuildFromFSM();
+            Project theSecondProject = secondBuilder.build(tempFile.toURL());
+            tempFile.delete();
+            assertTrue(theOriginalProject != null);
+            assertTrue(theSecondProject != null);
+            theOriginalProject.getFirstAutomaton().setName("Dummy");
+            theSecondProject.getFirstAutomaton().setName("Dummy");
+            assertTrue(theOriginalProject.equalProject(theSecondProject));
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            assertTrue(false);
+        }
+    }
+    
 }

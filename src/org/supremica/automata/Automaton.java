@@ -111,7 +111,8 @@ public class Automaton
     {
         this();
 
-        setName(name);
+        this.name = name;
+        //setName(name);
     }
 
     /**
@@ -205,8 +206,7 @@ public class Automaton
                                 throw new IllegalArgumentException("Name must be non-null");
                 }
                  */
-        String oldName = this.name;
-
+        String oldName = this.getName();
         this.name = name;
 
         notifyListeners(AutomatonListeners.MODE_AUTOMATON_RENAMED, oldName);

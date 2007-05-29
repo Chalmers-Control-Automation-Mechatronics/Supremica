@@ -73,7 +73,7 @@ public class AutomataSynthesisWorker
     
     private IDEReportInterface gui;
     private Automata theAutomata;
-    private SynthesizerOptions options;
+    private SynthesizerOptions synthOptions;
     
     private ExecutionDialog executionDialog;
     private boolean stopRequested = false;
@@ -83,7 +83,7 @@ public class AutomataSynthesisWorker
     {
         this.gui = gui;
         this.theAutomata = theAutomata;
-        this.options = options;
+        this.synthOptions = options;
         
         this.start();
     }
@@ -97,7 +97,7 @@ public class AutomataSynthesisWorker
         executionDialog.setMode(ExecutionDialogMode.SYNTHESIZING);
         
         // OK options?
-        String errorMessage = options.validOptions();
+        String errorMessage = synthOptions.validOptions();
         if (errorMessage != null)
         {
             JOptionPane.showMessageDialog(gui.getFrame(), errorMessage, "Alert", JOptionPane.ERROR_MESSAGE);
@@ -120,7 +120,7 @@ public class AutomataSynthesisWorker
             try
             {
                 AutomataSynthesizer synthesizer = new AutomataSynthesizer(theAutomata, syncOptions,
-                    options);
+                    synthOptions);
                 synthesizer.setExecutionDialog(executionDialog);
                 threadsToStop.add(synthesizer);
                 result.addAutomata(synthesizer.execute());
@@ -144,7 +144,7 @@ public class AutomataSynthesisWorker
                 //AutomatonSynthesizer synthesizer = (options.getSynthesisAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
                 //? new AutomatonSynthesizerSingleFixpoint(theAutomaton, options)
                 //: new AutomatonSynthesizer(theAutomaton, options);
-                AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton, options);
+                AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton, synthOptions);
                 threadsToStop.add(synthesizer);
                 synthesizer.synthesize();
                 result.addAutomaton(synthesizer.getAutomaton());
@@ -175,7 +175,7 @@ public class AutomataSynthesisWorker
         // Present result
         if (!stopRequested)
         {
-            logger.info("Execution completed after " + timer.toString());
+            logger.info("Synthesis completed after " + timer.toString() + ".");
             
             // Add new automata
             try
@@ -217,7 +217,7 @@ public class AutomataSynthesisWorker
             try
             {
                 AutomataSynthesizer synthesizer = new AutomataSynthesizer(theAutomata, syncOptions,
-                    options);
+                    synthOptions);
                 result.addAutomata(synthesizer.execute());
             }
             catch (Exception ex)
@@ -237,7 +237,7 @@ public class AutomataSynthesisWorker
                 //AutomatonSynthesizer synthesizer = (options.getSynthesisAlgorithm() == SynthesisAlgorithm.MonolithicSingleFixpoint)
                 //? new AutomatonSynthesizerSingleFixpoint(theAutomaton, options)
                 //: new AutomatonSynthesizer(theAutomaton, options);
-                AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton, options);
+                AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton, synthOptions);
                     
                 // AutomatonSynthesizer synthesizer = new AutomatonSynthesizer(theAutomaton,synthesizerOptions);
                 synthesizer.synthesize();

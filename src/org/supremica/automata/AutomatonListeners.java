@@ -52,64 +52,64 @@ package org.supremica.automata;
 import java.util.*;
 
 public class AutomatonListeners
-	extends Listeners
+    extends Listeners
 {
-	public static final int MODE_STATE_ADDED = 1;
-	public static final int MODE_STATE_REMOVED = 2;
-	public static final int MODE_ARC_ADDED = 3;
-	public static final int MODE_ARC_REMOVED = 4;
-	public static final int MODE_ATTRIBUTE_CHANGED = 5;
-	public static final int MODE_AUTOMATON_RENAMED = 6;
-
-	public AutomatonListeners(Object owner)
-	{
-		super(owner);
-	}
-
-	public void notifyListeners(int mode, Object o)
-	{
-		if (batchUpdate)
-		{
-			updateNeeded = true;
-		}
-		else
-		{
-			if (listeners != null)
-			{
-				Iterator listenerIt = listeners.iterator();
-
-				while (listenerIt.hasNext())
-				{
-					AutomatonListener currListener = (AutomatonListener) listenerIt.next();
-
-					if (mode == MODE_STATE_ADDED)
-					{
-						currListener.stateAdded((Automaton) owner, (State) o);
-					}
-					else if (mode == MODE_STATE_REMOVED)
-					{
-						currListener.stateRemoved((Automaton) owner, (State) o);
-					}
-					else if (mode == MODE_ARC_ADDED)
-					{
-						currListener.arcAdded((Automaton) owner, (Arc) o);
-					}
-					else if (mode == MODE_ARC_REMOVED)
-					{
-						currListener.arcRemoved((Automaton) owner, (Arc) o);
-					}
-					else if (mode == MODE_ATTRIBUTE_CHANGED)
-					{
-						currListener.attributeChanged((Automaton) owner);
-					}
-					else if (mode == MODE_AUTOMATON_RENAMED)
-					{
-						currListener.automatonRenamed((Automaton) owner, (String) o);
-					}
-				}
-			}
-
-			updateNeeded = false;
-		}
-	}
+    public static final int MODE_STATE_ADDED = 1;
+    public static final int MODE_STATE_REMOVED = 2;
+    public static final int MODE_ARC_ADDED = 3;
+    public static final int MODE_ARC_REMOVED = 4;
+    public static final int MODE_ATTRIBUTE_CHANGED = 5;
+    public static final int MODE_AUTOMATON_RENAMED = 6;
+    
+    public AutomatonListeners(Object owner)
+    {
+        super(owner);
+    }
+    
+    public void notifyListeners(int mode, Object o)
+    {
+        if (batchUpdate)
+        {
+            updateNeeded = true;
+        }
+        else
+        {
+            if (listeners != null)
+            {
+                Iterator listenerIt = listeners.iterator();
+                
+                while (listenerIt.hasNext())
+                {
+                    AutomatonListener currListener = (AutomatonListener) listenerIt.next();
+                    
+                    if (mode == MODE_STATE_ADDED)
+                    {
+                        currListener.stateAdded((Automaton) owner, (State) o);
+                    }
+                    else if (mode == MODE_STATE_REMOVED)
+                    {
+                        currListener.stateRemoved((Automaton) owner, (State) o);
+                    }
+                    else if (mode == MODE_ARC_ADDED)
+                    {
+                        currListener.arcAdded((Automaton) owner, (Arc) o);
+                    }
+                    else if (mode == MODE_ARC_REMOVED)
+                    {
+                        currListener.arcRemoved((Automaton) owner, (Arc) o);
+                    }
+                    else if (mode == MODE_ATTRIBUTE_CHANGED)
+                    {
+                        currListener.attributeChanged((Automaton) owner);
+                    }
+                    else if (mode == MODE_AUTOMATON_RENAMED)
+                    {
+                        currListener.automatonRenamed((Automaton) owner, (String) o);
+                    }
+                }
+            }
+            
+            updateNeeded = false;
+        }
+    }
 }
