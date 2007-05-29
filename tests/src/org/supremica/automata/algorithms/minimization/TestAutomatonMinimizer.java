@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.automata.algorithms.minimization
 //# CLASS:   TestAutomatonMinimizer
 //###########################################################################
-//# $Id: TestAutomatonMinimizer.java,v 1.12 2007-05-28 15:30:14 flordal Exp $
+//# $Id: TestAutomatonMinimizer.java,v 1.13 2007-05-29 09:08:10 robi Exp $
 //###########################################################################
 
 /*
@@ -62,11 +62,14 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
+import net.sourceforge.waters.model.base.NameNotFoundException;
+import net.sourceforge.waters.model.base.DuplicateNameException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -295,15 +298,16 @@ public class TestAutomatonMinimizer
     {
         final ProductDESProxy des = getBmwDES();
         final AutomatonProxy aut = getComfortFunctionAutomaton(des);
-        final Collection<EventProxy> target =
-            getReqCloseHidingAlhabet(des, aut);
+        final Set<EventProxy> target = getReqCloseHidingAlhabet(des, aut);
         final Alphabet alphabet = mBuilder.buildAlphabet(target);
         final MinimizationOptions opt = getMinimizationOptions(aut, alphabet);
         final Automaton supaut = mBuilder.build(aut);
         final AutomatonMinimizer minimizer = new AutomatonMinimizer(supaut);
         final AutomatonProxy minaut = minimizer.getMinimizedAutomaton(opt);
-        final Collection<EventProxy> minevents = minaut.getEvents();
-        assertEquals("Unexpected event set in result!", target, minevents);
+        final Set<EventProxy> minevents = minaut.getEvents();
+        final Set<EventProxy> fixedevents =
+			getUniqueWatersEvents(minevents, des);
+        assertEquals("Unexpected event set in result!", target, fixedevents);
     }
     
     public void testAutomataMinimizerForWaters()
@@ -311,8 +315,7 @@ public class TestAutomatonMinimizer
     {
         final ProductDESProxy des = getBmwDES();
         final AutomatonProxy aut = getComfortFunctionAutomaton(des);
-        final Collection<EventProxy> target =
-            getReqCloseHidingAlhabet(des, aut);
+        final Set<EventProxy> target = getReqCloseHidingAlhabet(des, aut);
         final Alphabet alphabet = mBuilder.buildAlphabet(target);
         final MinimizationOptions opt = getMinimizationOptions(aut, alphabet);
         final Automaton supaut = mBuilder.build(aut);
@@ -323,8 +326,10 @@ public class TestAutomatonMinimizer
         assertEquals("Unexpected number of automata in result!",
             1, minmodel.getAutomata().size());
         final AutomatonProxy minaut = minmodel.getAutomata().iterator().next();
-        final Collection<EventProxy> minevents = minaut.getEvents();
-        assertEquals("Unexpected event set in result!", target, minevents);
+        final Set<EventProxy> minevents = minaut.getEvents();
+        final Set<EventProxy> fixedevents =
+			getUniqueWatersEvents(minevents, des);
+        assertEquals("Unexpected event set in result!", target, fixedevents);
     }
     
     
@@ -350,13 +355,12 @@ public class TestAutomatonMinimizer
         return findAutomaton(des, autname);
     }
     
-    private Collection<EventProxy>
-        getReqCloseHidingAlhabet(final ProductDESProxy des,
-        final AutomatonProxy aut)
+    private Set<EventProxy> getReqCloseHidingAlhabet
+		(final ProductDESProxy des, final AutomatonProxy aut)
     {
         final String eventname = "REQ[CLOSE]";
         final EventProxy victim = findEvent(des, eventname);
-        final Collection<EventProxy> target =
+        final Set<EventProxy> target =
             new HashSet<EventProxy>(aut.getEvents());
         target.remove(victim);
         return target;
@@ -376,7 +380,44 @@ public class TestAutomatonMinimizer
         opt.setTargetAlphabet(target);
         return opt;
     }
-    
+
+	/**
+	 * Gets the original WATERS events from a Supremica alphabet.
+	 * WATERS requires unique {@link EventProxy} objects, unfortunately
+	 * Supremica does not provide them. This method is but an ugly and
+	 * inefficient workaround to the problem.
+	 * @param  alphabet A collection of events obtained from a Supremica
+	 *                  automaton. Typically these are {@link LabeledEvent}
+	 *                  objects.
+	 * @param  des      The product DES that provides the set of WATERS
+	 *                  {@link EventProxy} objects to be used.
+	 * @return The set of those {@link EventProxy} objects in the alphabet
+	 *         of the given product DES that have the same names as the
+	 *         events in the given alphabet.
+	 * @throws NameNotFoundException to indicate that an event name was not
+	 *                  found in the product DES
+	 * @throws DuplicateNameException to indicate that a name was used
+	 *                  more than once.
+	 */
+	private Set<EventProxy> getUniqueWatersEvents
+		(final Collection<EventProxy> alphabet, final ProductDESProxy des)
+		throws DuplicateNameException, NameNotFoundException
+	{
+		final int size = alphabet.size();
+		final Set<EventProxy> result = new HashSet<EventProxy>(size);
+		for (final EventProxy supevent : alphabet) {
+			final String name = supevent.getName();
+			final EventProxy event = findEvent(des, name);
+			final boolean added = result.add(event);
+			if (!added) {
+				throw new DuplicateNameException
+					("Duplicate event name '" + name +
+					 "' in Supremica alphabet!");
+			}
+		}
+		return result;
+	}
+
     
     //#######################################################################
     //# Data Members
