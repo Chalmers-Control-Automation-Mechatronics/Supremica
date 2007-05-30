@@ -55,7 +55,6 @@ import org.supremica.automata.algorithms.GeneticAlgorithms;
 
 public enum MinimizationHeuristic
 {
-    //LeastFanning("Least fanning increase", Type.MINIMIZE),
     MostLocal("Highest local ratio", Type.MAXIMIZE),
     MostCommon("Highest common ratio", Type.MAXIMIZE),
     LeastExtension("Least extension of alphabet", Type.MINIMIZE),
@@ -68,6 +67,7 @@ public enum MinimizationHeuristic
     MostEvents("Most events", Type.MAXIMIZE),
     MostAutomata("Most automata", Type.MAXIMIZE),
     GeneticAlgorithm("Genetic algorithm prediction", Type.MINIMIZE),
+    LeastFanning("Least fanning increase", Type.MINIMIZE),
     Random("Random order", Type.MAXIMIZE);
     
     private enum Type {MAXIMIZE, MINIMIZE, SPECIAL}
@@ -182,7 +182,6 @@ public enum MinimizationHeuristic
         {
             return Math.random();
         }
-        /*
         else if (this == LeastFanning)
         {
             // How many connections does the most connected component in the selection have 
@@ -203,9 +202,9 @@ public enum MinimizationHeuristic
                     mostNeighbours = autNeighbours.size();
             }
             selectionNeighbours.removeAutomata(selection);
-            return mostNeighbours - selectionNeighbours.size();
+            // Return the difference, i.e. the increase in connections
+            return selectionNeighbours.size() - mostNeighbours;
         }
-        */
         
         throw new Exception("Unknown heuristic.");
     }
