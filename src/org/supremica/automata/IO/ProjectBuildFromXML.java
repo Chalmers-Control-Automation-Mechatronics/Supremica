@@ -395,17 +395,15 @@ public class ProjectBuildFromXML
     public final void doAutomaton(Attributes attributes)
     throws SAXException
     {
-        currAutomaton = new Automaton();
-        currAlphabet = currAutomaton.getAlphabet();
-        
         String name = attributes.getValue("name");
-        
-        if (name == null)
+                if (name == null)
         {
             throwException("name attribute is missing");
         }
         
-        currAutomaton.setName(name);
+        currAutomaton = new Automaton(name);
+        currAlphabet = currAutomaton.getAlphabet();
+        
         
         String type = attributes.getValue("type");
         

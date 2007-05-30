@@ -177,9 +177,7 @@ public class ComputerHumanExtender
             throw new IllegalStateException("m must be >= 1");
         }
         
-        newAutomaton = new Automaton();
-        
-        newAutomaton.setName("E^{k=" + k + ", m=" + m +"}");
+        newAutomaton = new Automaton("E^{k=" + k + ", m=" + m +"}");
         newAutomaton.setType(AutomatonType.PLANT);
         
         Alphabet newAutAlphabet = newAutomaton.getAlphabet();

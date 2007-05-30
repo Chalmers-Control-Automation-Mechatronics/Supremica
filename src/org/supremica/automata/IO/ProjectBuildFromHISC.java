@@ -294,7 +294,7 @@ public class ProjectBuildFromHISC
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         
         // The result
-        Automaton aut = new Automaton();
+        Automaton aut = new Automaton("new");
         
         // Loop over lines
         for (String line = readLineNoComments(reader); line != null;

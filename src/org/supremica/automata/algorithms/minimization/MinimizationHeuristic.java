@@ -55,6 +55,7 @@ import org.supremica.automata.algorithms.GeneticAlgorithms;
 
 public enum MinimizationHeuristic
 {
+    //LeastFanning("Least fanning increase", Type.MINIMIZE),
     MostLocal("Highest local ratio", Type.MAXIMIZE),
     MostCommon("Highest common ratio", Type.MAXIMIZE),
     LeastExtension("Least extension of alphabet", Type.MINIMIZE),
@@ -102,7 +103,7 @@ public enum MinimizationHeuristic
      *
      * @param eventToAutomataMap is a map from all (global) events to all (global) automata.
      */
-    public double value(Automata selection, Map<LabeledEvent,Automata> eventToAutomataMap, Alphabet targetAlphabet)
+    public final double value(Automata selection, Map<LabeledEvent,Automata> eventToAutomataMap, Alphabet targetAlphabet)
     throws Exception
     {
         if (this == MostLocal)
@@ -181,6 +182,30 @@ public enum MinimizationHeuristic
         {
             return Math.random();
         }
+        /*
+        else if (this == LeastFanning)
+        {
+            // How many connections does the most connected component in the selection have 
+            // and how many connections will the composition have?
+            // (not counting in-selection connections)
+            int mostNeighbours = 0;
+            final Automata selectionNeighbours = new Automata();
+            for (Automaton aut : selection)
+            {
+                final Automata autNeighbours = new Automata();
+                for (LabeledEvent event : aut.getAlphabet())
+                {
+                    autNeighbours.addAutomata(eventToAutomataMap.get(event));
+                    selectionNeighbours.addAutomata(eventToAutomataMap.get(event));
+                }
+                autNeighbours.removeAutomata(selection);
+                if (mostNeighbours < autNeighbours.size())
+                    mostNeighbours = autNeighbours.size();
+            }
+            selectionNeighbours.removeAutomata(selection);
+            return mostNeighbours - selectionNeighbours.size();
+        }
+        */
         
         throw new Exception("Unknown heuristic.");
     }
