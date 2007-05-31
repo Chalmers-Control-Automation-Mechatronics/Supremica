@@ -756,6 +756,19 @@ Class-Path: ${manifest.pathlist}</echo>
   </junit>
 </target>
 
+<target name="run_test6" depends="build">
+  <java classname="net.sourceforge.waters.analysis.modular.SpeedComparison" fork="true" maxmemory="512m">
+    <classpath>
+      <pathelement location="${dist}/Supremica.jar"/>
+      <pathelement location="${dist}/SupremicaLib.jar"/>
+      <pathelement location="${dist}/SupremicaTest.jar"/>
+      <pathelement path="${java.class.path}"/>
+    </classpath>
+    <sysproperty key="waters.test.inputdir" value="${waters.examples}"/>
+    <sysproperty key="waters.test.outputdir" value="${logs.results}"/>
+    <sysproperty key="java.library.path" value="${dist}"/>
+  </java>
+</target>
 
 <target name="run_tests" depends="run_supremica_tests"/>
 <target name="run_tests_short" depends="run_supremica_tests_short"/>

@@ -40,7 +40,7 @@ public class Projection
     System.out.println("forbidden + hidden:" + mForbidden);
     mForbidden.addAll(forbidden);
     mForbidden.retainAll(mModel.getEvents());
-    mStateLimit = 10000;
+    mStateLimit = 1000;
     mDisabled = new HashSet<EventProxy>(mModel.getEvents());
     numStates = 1;
   }

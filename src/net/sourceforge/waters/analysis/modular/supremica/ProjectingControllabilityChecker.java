@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ProjectingControllabilityChecker
 //###########################################################################
-//# $Id: ProjectingControllabilityChecker.java,v 1.9 2007-05-28 09:04:29 siw4 Exp $
+//# $Id: ProjectingControllabilityChecker.java,v 1.10 2007-05-31 01:46:49 siw4 Exp $
 //###########################################################################
 
 
@@ -113,7 +113,7 @@ public class ProjectingControllabilityChecker
     for (TransitionProxy t : a.getTransitions()) {
       if (getKindTranslator().getEventKind(t.getEvent()) == EventKind.UNCONTROLLABLE) {
         stateevents.get(t.getSource()).add(t.getEvent());
-      } 
+      }
     }
     EventProxy uncontrollable = getFactory().createEventProxy(a.getName() + "uncont", EventKind.UNCONTROLLABLE);
     StateProxy uncontstate = getFactory().createStateProxy("dumph");
@@ -144,8 +144,10 @@ public class ProjectingControllabilityChecker
     Map<Set<AutomatonProxy>, AutomataHidden> newMap = new HashMap<Set<AutomatonProxy>, AutomataHidden>();
     Set<AutomatonProxy> automata = model.getAutomata();
     ProjectionList p = null;
+    System.out.println(4);
     while (true) {
       Map<Set<AutomatonProxy>, Integer> numoccuring = new HashMap<Set<AutomatonProxy>, Integer>();
+      System.out.println("5");
       for (EventProxy e : model.getEvents()) {
         if (!forbiddenEvents.contains(e)) {
           Set<AutomatonProxy> possess = new HashSet<AutomatonProxy>();
@@ -158,16 +160,17 @@ public class ProjectingControllabilityChecker
             if (numoccuring.get(possess) == null) {
               numoccuring.put(possess, 0);
             }
-            //System.out.println(possess.size() + "," + e);
+            System.out.println(possess.size() + "," + e);
             numoccuring.put(possess, numoccuring.get(possess) + 1);
           }
         }
       }
       Set<AutomatonProxy> minset = null;
-      long num = Long.MAX_VALUE;
+      double num = Double.POSITIVE_INFINITY;
+      System.out.println(6);
       for (Set<AutomatonProxy> s : numoccuring.keySet()) {
         Set<EventProxy> ev = new HashSet<EventProxy>();
-        long numstates = 1;
+        double numstates = 1;
         for (AutomatonProxy a : s) {
           ev.addAll(a.getEvents());
           numstates *= a.getStates().size();
@@ -190,9 +193,12 @@ public class ProjectingControllabilityChecker
           minset = s;
         }*/
       }
+      System.out.println(minset == null? null :minset.size());
+      System.out.println(7);
       if (minset == null || minset.size() + 1 >= automata.size()) {
         break;
       }
+      System.out.println(8);
       try {
         ProjectionList t = new ProjectionList(p, automata, minset, forbiddenEvents);
         p = t;
@@ -308,12 +314,14 @@ public class ProjectingControllabilityChecker
                           uncomposedspecs,
                           counter,
                           getKindTranslator());
+        System.out.println("1");
         if (newComp == null) {
           List<EventProxy> e = counter.getEvents();
           counter = getFactory().createSafetyTraceProxy(comp, e.subList(0, e.size() - 1));
           setFailedResult(counter);
           return false;
         }
+        System.out.println("2");
         for (AutomatonProxy automaton : newComp) {
           uncomposedplants.remove(automaton);
           uncomposedspecplants.remove(automaton);
@@ -323,10 +331,12 @@ public class ProjectingControllabilityChecker
           composition.add(automaton);
           events.addAll(automaton.getEvents());
         }
+        System.out.println("3");
         comp = getFactory().createProductDESProxy("comp", events, composition);
         proj = project(comp, forbiddenEvents);
         mChecker.setModel(proj == null ? comp : proj.getModel());
         //System.out.println(mChecker.getModel());
+        System.out.println(10);
       }
       mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
       /*specs.removeAll(composition);
