@@ -761,7 +761,8 @@ public class AutomataMinimizer
         //System.err.println("Minimizing " + automata + ", hiding: " + hideThese);
         
         // Do we care about state names?
-        boolean useShortStateNames = options.getMinimizationType() != EquivalenceRelation.SUPERVISIONEQUIVALENCE;
+        //boolean useShortStateNames = options.getMinimizationType() != EquivalenceRelation.SUPERVISIONEQUIVALENCE; //**
+        boolean useShortStateNames = true;
         // Synchronize, or if there's just one automaton, just find it
         Automaton aut;
         if (automata.size() > 1)
@@ -784,7 +785,7 @@ public class AutomataMinimizer
         // If supervisione equivalence, make the result a kripke automaton!
         if (options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE)
         {
-            aut = new KripkeAutomaton(aut);
+            //aut = new KripkeAutomaton(aut); //**
         }
         
         // Examine for largest sizes

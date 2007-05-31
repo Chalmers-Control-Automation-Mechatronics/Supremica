@@ -224,7 +224,7 @@ public class AutomataSynthesizer
             }
             
             // Present result
-            if (false && Config.VERBOSE_MODE.isTrue() && (min.size() == 1) && (min.getFirstAutomaton().nbrOfStates() < 100))
+            if (Config.VERBOSE_MODE.isTrue() && (min.size() == 1) && (min.getFirstAutomaton().nbrOfStates() < 100))
             {
                 // This may not be true if more advanced simplification rules have been used!
                 logger.info("The following states are allowed by the maximally permissive, "
