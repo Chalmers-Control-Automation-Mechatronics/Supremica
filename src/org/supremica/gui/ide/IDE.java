@@ -1,10 +1,10 @@
 //# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Supremica/Waters IDE
-//# PACKAGE: org.supremica.gui.IDE
+//# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.78 2007-05-11 02:07:10 robi Exp $
+//# $Id: IDE.java,v 1.79 2007-06-04 14:42:13 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;

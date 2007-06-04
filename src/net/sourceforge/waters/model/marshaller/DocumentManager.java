@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   DocumentManager
 //###########################################################################
-//# $Id: DocumentManager.java,v 1.9 2006-11-20 15:36:40 torda Exp $
+//# $Id: DocumentManager.java,v 1.10 2007-06-04 14:42:13 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -12,6 +12,7 @@ package net.sourceforge.waters.model.marshaller;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -24,6 +25,7 @@ import java.util.Map;
 import javax.swing.filechooser.FileFilter;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.unchecked.Casting;
 
 
@@ -37,6 +39,12 @@ import net.sourceforge.waters.model.unchecked.Casting;
  * implement the {@link DocumentProxy} interface. Once loaded, they are
  * stored in the cache, so they can be quickly retrieved when needed a
  * second time.</P>
+ *
+ * <P>The caching mechanism provides some protection against modification
+ * of external files through third parties. Whenever a document is found in
+ * the cache, it is checked, whether the external file has been changed
+ * after the document was loaded, and if so, it is reloaded from the
+ * modified file.</P>
  *
  * <P>After creation of a document manager, it must be provided with the
  * appropriate proxy marshaller for each class of documents to be
@@ -79,7 +87,7 @@ public class DocumentManager {
     mExtensionUnmarshallerMap =
       new HashMap<String,ProxyUnmarshaller<? extends DocumentProxy>>(4);
     mFileFilters = new LinkedList<FileFilter>();
-    mDocumentCache = new HashMap<URI,DocumentProxy>(32);
+    mDocumentCache = new HashMap<URI,DocumentEntry>(32);
   }
 
 
@@ -115,12 +123,14 @@ public class DocumentManager {
     for (final ProxyUnmarshaller<? extends DD> unmarshaller : unmarshallers) {
       final String extname = name + unmarshaller.getDefaultExtension();
       final URI resolved = resolve(uri, extname);
-      final DocumentProxy cached = mDocumentCache.get(resolved);
+      final DocumentProxy cached = getCachedDocument(resolved);
       if (cached != null) {
         return clazz.cast(cached);
       }
+      final long time = System.currentTimeMillis();
       final DD loaded = unmarshaller.unmarshal(resolved);
-      mDocumentCache.put(resolved, loaded);
+      final DocumentEntry entry = new DocumentEntry(resolved, loaded, time);
+      mDocumentCache.put(resolved, entry);
       return loaded;
     }
     throw new FileNotFoundException
@@ -144,7 +154,7 @@ public class DocumentManager {
   public DocumentProxy load(final URI uri)
     throws WatersUnmarshalException, IOException
   {
-    final DocumentProxy cached = mDocumentCache.get(uri);
+    final DocumentProxy cached = getCachedDocument(uri);
     if (cached != null) {
       return cached;
     }
@@ -157,8 +167,10 @@ public class DocumentManager {
     if (unmarshaller == null) {
       throw new BadFileTypeException(uri);
     }
+    final long time = System.currentTimeMillis();
     final DocumentProxy loaded = unmarshaller.unmarshal(uri);
-    mDocumentCache.put(uri, loaded);
+    final DocumentEntry entry = new DocumentEntry(uri, loaded, time);
+    mDocumentCache.put(uri, entry);
     return loaded;
   }
 
@@ -193,13 +205,15 @@ public class DocumentManager {
       final String extname = name + unmarshaller.getDefaultExtension();
       final File filename = new File(path, extname);
       final URI uri = filename.toURI();
-      final DocumentProxy cached = mDocumentCache.get(uri);
+      final DocumentProxy cached = getCachedDocument(uri);
       if (cached != null) {
         return clazz.cast(cached);
       }
       if (filename.canRead()) {
+        final long time = System.currentTimeMillis();
         final DD loaded = unmarshaller.unmarshal(uri);
-        mDocumentCache.put(uri, loaded);
+        final DocumentEntry entry = new DocumentEntry(uri, loaded, time);
+        mDocumentCache.put(uri, entry);
         return loaded;
       }
     }
@@ -252,6 +266,46 @@ public class DocumentManager {
   }
 
   /**
+   * Checks whether a cached document has been modified externally.
+   * This method checks whether file for the document the document, given
+   * by its URI, has been modified since it has last been accessed through
+   * the document manager. The check is only performed for file URIs, other
+   * URIs are assumed never to change their contents, so this method always
+   * returns <CODE>false</CODE> for them.
+   * @throws MalformedURLException if the given URI is not a proper URI.
+   * @throws IllegalArgumentException if the given URI does not represent
+   *                      a document currently in the cache.
+   */
+  public boolean hasBeenModified(final URI uri)
+    throws MalformedURLException
+  {
+    final DocumentEntry entry = mDocumentCache.get(uri);
+    if (uri != null) {
+      return entry.hasBeenModified();
+    } else {
+      throw new IllegalArgumentException("URI " + uri + " not in cache!");
+    }
+  }
+
+  /**
+   * Checks whether a cached document has been modified externally.
+   * This method checks whether file for the document the document, given
+   * by its file name, has been modified since it has last been accessed
+   * through the document manager.
+   * @throws IllegalArgumentException if the given file name does not
+   *                      represent a document currently in the cache.
+   */
+  public boolean hasBeenModified(final File filename)
+  {
+    try {
+      final URI uri = filename.toURI();
+      return hasBeenModified(uri);
+    } catch (final MalformedURLException exception) {
+      throw new WatersRuntimeException(exception);
+    }
+  }
+
+  /**
    * Saves a document to a file.
    * This methods writes a document to a given file name, using the
    * marshaller appropriate to the document's class. If the file name
@@ -276,13 +330,12 @@ public class DocumentManager {
     final URI newuri = filename.toURI();
     final URI olduri = doc.getLocation();
     marshaller.marshal(doc, filename);
-    if (!newuri.equals(olduri)) {
-      mDocumentCache.remove(olduri);
-      doc.setLocation(newuri);
-      mDocumentCache.put(newuri, doc);
-    }
+    mDocumentCache.remove(olduri);
+    final long time = System.currentTimeMillis();
+    final DocumentEntry entry = new DocumentEntry(newuri, doc, time);
+    doc.setLocation(newuri);
+    mDocumentCache.put(newuri, entry);
   }
-
 
   /**
    * Adds a new document to this document manager.
@@ -298,7 +351,18 @@ public class DocumentManager {
   public void newDocument(final DocumentProxy doc)
   {
     final URI uri = doc.getLocation();
-    mDocumentCache.put(uri, doc);
+    final DocumentEntry entry = new DocumentEntry(uri, doc, 0);
+    mDocumentCache.put(uri, entry);
+  }
+
+
+  /**
+   * Removes a document from the cache. This method removes any cached
+   * document for the given URI, in order to save some memory.
+   */
+  public void remove(final URI uri)
+  {
+    mDocumentCache.remove(uri);
   }
 
 
@@ -411,16 +475,24 @@ public class DocumentManager {
     return Collections.unmodifiableList(mFileFilters);
   }
 
-  public void unloadFromCache(DocumentProxy objectToUnload) {
-	for (Map.Entry<URI, DocumentProxy> entry : mDocumentCache.entrySet()) {
-	  if (entry.getValue() == objectToUnload) {
-	    mDocumentCache.remove(entry.getKey());
-	  }
-	}
-  }
 
   //#########################################################################
   //# Auxiliary Methods
+  private DocumentProxy getCachedDocument(final URI uri)
+    throws WatersUnmarshalException
+  {
+    try {
+      final DocumentEntry entry = mDocumentCache.get(uri);
+      if (entry == null || entry.hasBeenModified()) {
+        return null;
+      } else {
+        return entry.getDocument();
+      }
+    } catch (final MalformedURLException exception) {
+      throw new WatersUnmarshalException(exception);
+    }
+  }
+
   private ProxyMarshaller getProxyMarshaller(final Class clazz)
   {
     if (DocumentProxy.class.isAssignableFrom(clazz)) {
@@ -467,6 +539,76 @@ public class DocumentManager {
     }
   }
 
+
+  //#########################################################################
+  //# Inner Class DocumentEntry
+  private static class DocumentEntry
+  {
+
+    //#######################################################################
+    //# Constructors
+    private DocumentEntry(final URI uri,
+                          final DocumentProxy doc,
+                          final long time)
+    {
+      mURI = uri;
+      mDocument = doc;
+      mOpeningTime = time;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private URI getURI()
+    {
+      return mURI;
+    }
+
+    private DocumentProxy getDocument()
+    {
+      return mDocument;
+    }
+
+    private long getOpeningTime()
+    {
+      return mOpeningTime;
+    }
+
+    //#######################################################################
+    //# Checking for File Modification
+    private boolean hasBeenModified()
+      throws MalformedURLException
+    {
+      final File file = getFile();
+      if (file != null) {
+        final long modtime = file.lastModified();
+        return modtime >= mOpeningTime;
+      } else {
+        return false;
+      }
+    }
+
+    private File getFile()
+      throws MalformedURLException
+    {
+      final URL url = mURI.toURL();
+      final String proto = url.getProtocol();
+      if (proto.equals("file")) {
+        final String path = mURI.getPath();
+        return new File(path);
+      } else {
+        return null;
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final URI mURI;
+    private final DocumentProxy mDocument;
+    private final long mOpeningTime;
+
+  }
+
+
   //#########################################################################
   //# Data Members
   private final Map<Class<? extends DocumentProxy>,
@@ -478,6 +620,6 @@ public class DocumentManager {
   private final Map<String,ProxyUnmarshaller<? extends DocumentProxy>>
     mExtensionUnmarshallerMap;
   private final List<FileFilter> mFileFilters;
-  private final Map<URI,DocumentProxy> mDocumentCache;
+  private final Map<URI,DocumentEntry> mDocumentCache;
 
 }
