@@ -62,6 +62,7 @@ public class AutomataSynchronizerHelperStatistics
     
     public String getStatisticsLineLaTeX()
     {
+        // Total number of examined states and transitions
         return getNumberOfReachableStates() + " & " + getNumberOfExaminedTransitions();        
     }
 }

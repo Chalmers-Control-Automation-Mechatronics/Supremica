@@ -125,12 +125,12 @@ public class BenchmarkAutomataVerifier
         MinimizationStrategy[] strategyArray =
         {
             /*
-             */
             MinimizationStrategy.FewestTransitionsFirst,
-            /*
+             */
             MinimizationStrategy.AtLeastOneLocal,
             MinimizationStrategy.AtLeastOneLocalMaxThree,
             MinimizationStrategy.MostStatesFirst,
+            /*
             MinimizationStrategy.FewestStatesFirst,
             MinimizationStrategy.FewestEventsFirst,
             MinimizationStrategy.RandomFirst
@@ -142,13 +142,14 @@ public class BenchmarkAutomataVerifier
         {
             /*
              */ 
-            MinimizationHeuristic.MostLocal,
+            MinimizationHeuristic.MostLocal, 
+            //MinimizationHeuristic.FewestStates,
+            MinimizationHeuristic.FewestTransitions,
+            MinimizationHeuristic.LeastFanning
             /*
-            MinimizationHeuristic.MostCommon,
-            MinimizationHeuristic.FewestStates,
+			MinimizationHeuristic.MostCommon,
             MinimizationHeuristic.LeastExtension,
             MinimizationHeuristic.FewestEvents,
-            MinimizationHeuristic.FewestTransitions
              */
         };
         
@@ -186,12 +187,56 @@ public class BenchmarkAutomataVerifier
                 file.write("Primary 2:nd stage heuristic: " + mOptions.getMinimizationHeuristic() + "\n");
                 file.flush();
                 
-                ///////////////////////////////////
-                // Instantiated model benchmarks //
-                ///////////////////////////////////
-                
-                if (false)
+              
+                if (true)
                 {
+					///////////////////////////////////
+					// "Industrial" model benchmarks //
+					///////////////////////////////////
+					
+					// Benchmark path
+					String prefix = "benchmarks/benchmarkfiles/";
+					// Benchmarks
+					String[] test =
+					{
+						/*
+						"agv", "agvb",
+						"verriegel3", "verriegel3b",
+						"verriegel4", "verriegel4b",
+						//"bmw_fh",
+						"big_bmw",
+						//"FMS",
+						"SMS",
+						"PMS",
+						"IPC",
+						*/
+						"ftechnik", 
+						//"ftechnik_nocoll", // Includes some "property" specifications
+						"tbed_valid",
+						//"tbed_ctct"
+						//"fzelle", // All states are marked!?
+						"AIP_minus_AS3_TU4",
+						"PLanTS",
+						"profisafe_i4"
+						/*
+						*/
+					};
+					
+					// Run tests
+					for (int k=0; k<test.length; k++)
+					{
+						ProjectBuildFromXML builder = new ProjectBuildFromXML();
+						Project theProject = builder.build(new File(prefix + test[k] + ".xml"));
+						theProject.setName(test[k]);
+						runBenchmark(test[k], theProject, vOptions, sOptions, mOptions);
+					}
+				}
+				else
+				{
+					///////////////////////////////////
+					// Instantiated model benchmarks //
+					///////////////////////////////////
+
                     Project theProject;
                     
                     // Dining philosophers
@@ -226,44 +271,6 @@ public class BenchmarkAutomataVerifier
                     theProject = arbiter.getProject();
                     runBenchmark("512arbiter", theProject, vOptions, sOptions, mOptions);
                 }
-                
-                ///////////////////////////////////
-                // "Industrial" model benchmarks //
-                ///////////////////////////////////
-                
-                // Benchmark path
-                String prefix = "benchmarks/benchmarkfiles/";
-                // Benchmarks
-                String[] test =
-                {
-                    /*
-                     */
-                    "agv", "agvb",
-                    "verriegel3", "verriegel3b",
-                    "verriegel4", "verriegel4b",
-                    //"bmw_fh",
-                    "big_bmw",
-                    //"FMS",
-                    "SMS",
-                    "PMS",
-                    "IPC",
-                    "ftechnik", "ftechnik_nocoll",
-                    "tbed_valid",
-                    //"tbed_ctct",
-                    "fzelle",
-                    "AIP_minus_AS3_TU4",
-                    "PLanTS",
-                    "profisafe_i4"
-                };
-                
-                // Run tests
-                for (int k=0; k<test.length; k++)
-                {
-                    ProjectBuildFromXML builder = new ProjectBuildFromXML();
-                    Project theProject = builder.build(new File(prefix + test[k] + ".xml"));
-                    theProject.setName(test[k]);
-                    runBenchmark(test[k], theProject, vOptions, sOptions, mOptions);
-                }
             }
         }
         file.write("BENCHMARKING COMPLETED\n");
@@ -295,17 +302,18 @@ public class BenchmarkAutomataVerifier
                 message = message.replaceFirst(" milliseconds", "m");
                 message = message.replaceFirst(" seconds", "s");
                 message = message.replaceAll("_", "\u005c\_");
+                message = message.replaceFirst("ALGO1", mOptions.getMinimizationStrategy().toStringAbbreviated());
+                message = message.replaceFirst("ALGO2", mOptions.getMinimizationHeuristic().toStringAbbreviated());
                 file.write(message + "\n");
                 file.flush();
             }
             System.out.println("TIME: " + timer + ", RESULT (NONBLOCKING/CONTROLLABLE): " + nonblocking);
-            collectGarbage();
         }
         catch (Throwable ex)
         {
             System.out.println("Failed! " + ex);
         }
-        
+		collectGarbage();        
     }
     
     private void collectGarbage()

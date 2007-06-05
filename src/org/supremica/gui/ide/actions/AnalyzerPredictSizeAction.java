@@ -26,7 +26,7 @@ public class AnalyzerPredictSizeAction
         setAnalyzerActiveRequired(true);
         
         putValue(Action.NAME, "Predict size");
-        putValue(Action.SHORT_DESCRIPTION, "Predict composition size, works best for two automata");
+        putValue(Action.SHORT_DESCRIPTION, "Predict composition size using genetically evolved algorithm, works best for two automata");
         //putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
         //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
         //putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Icon.gif")));

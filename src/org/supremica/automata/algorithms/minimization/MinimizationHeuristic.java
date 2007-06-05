@@ -55,11 +55,11 @@ import org.supremica.automata.algorithms.GeneticAlgorithms;
 
 public enum MinimizationHeuristic
 {
-    MostLocal("Highest local ratio", Type.MAXIMIZE),
-    MostCommon("Highest common ratio", Type.MAXIMIZE),
+    MostLocal("Highest local ratio", "maxL", Type.MAXIMIZE),
+    MostCommon("Highest common ratio", "maxC", Type.MAXIMIZE),
     LeastExtension("Least extension of alphabet", Type.MINIMIZE),
     FewestTransitions("Fewest transitions", Type.MINIMIZE),
-    FewestStates("Fewest states", Type.MINIMIZE),
+    FewestStates("Fewest states", "minS", Type.MINIMIZE),
     FewestEvents("Fewest events", Type.MINIMIZE),
     FewestAutomata("Fewest automata", Type.MINIMIZE),
     MostTransitions("Most transitions", Type.MAXIMIZE),
@@ -67,17 +67,27 @@ public enum MinimizationHeuristic
     MostEvents("Most events", Type.MAXIMIZE),
     MostAutomata("Most automata", Type.MAXIMIZE),
     GeneticAlgorithm("Genetic algorithm prediction", Type.MINIMIZE),
-    LeastFanning("Least fanning increase", Type.MINIMIZE),
+    LeastFanning("Least fanning increase", "minFan", Type.MINIMIZE),
     Random("Random order", Type.MAXIMIZE);
     
     private enum Type {MAXIMIZE, MINIMIZE, SPECIAL}
     
-    private String description = null;
+    /** Textual description. */
+    private final String description;
+    /** Textual description abbreviated. */
+    private final String abbreviation;
+
     private Type type;
     
     private MinimizationHeuristic(String description, Type type)
     {
+		this(description, description, type);
+    }
+
+    private MinimizationHeuristic(String description, String abbreviation, Type type)
+    {
         this.description = description;
+		this.abbreviation = abbreviation; 
         this.type = type;
     }
     
@@ -86,6 +96,11 @@ public enum MinimizationHeuristic
         return description;
     }
 
+    public String toStringAbbreviated()
+    {
+        return abbreviation;
+    }
+    
     public static MinimizationHeuristic toHeuristic(String description)
     {
         for (MinimizationHeuristic heuristic: values())

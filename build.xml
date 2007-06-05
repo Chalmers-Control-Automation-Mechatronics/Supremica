@@ -544,14 +544,17 @@ Class-Path: ${manifest.pathlist}</echo>
 </target>
 
 <target name="startfiles_local_supremica">
+<!--
 	<copy file="${templates}/SupremicaJGrafchartLocal" todir="${dist}"/>
 	<chmod file="${dist}/SupremicaJGrafchartLocal" perm="644"/>
 	<copy file="${templates}/SupremicaJGrafchartLocal.cmd" todir="${dist}"/>
 	<chmod file="${dist}/SupremicaJGrafchartLocal.cmd" perm="644"/>
+-->
 	<copy file="${templates}/manufacturingTablesTestLocal" todir="${dist}"/>
 	<chmod file="${dist}/manufacturingTablesTestLocal" perm="644"/>
 	<copy file="${templates}/manufacturingTablesTestLocal.cmd" todir="${dist}"/>
 	<chmod file="${dist}/manufacturingTablesTestLocal.cmd" perm="644"/>
+<!--
 	<copy file="${templates}/IDELocal.cmd" todir="${dist}"/>
 	<chmod file="${dist}/IDELocal.cmd" perm="644"/>
 	<copy file="${templates}/IDELocal" todir="${dist}"/>	
@@ -562,10 +565,13 @@ Class-Path: ${manifest.pathlist}</echo>
 	<chmod file="${dist}/SupremicaLocalMoreMem.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaLocal" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaLocal" perm="755"/>
+-->
 	<copy file="${templates}/SFCtoSMV.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/SFCtoSMV.cmd" perm="644"/>
+<!--
 	<copy file="${templates}/SupremicaBDD.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaBDD.cmd" perm="644"/>
+-->
 	<copy file="${templates}/RelationExtraction.cmd" todir="${dist}"/>	
 	<chmod file="${dist}/RelationExtraction.cmd" perm="644"/>
 </target>
@@ -603,12 +609,14 @@ Class-Path: ${manifest.pathlist}</echo>
 	<chmod file="${dist}/manufacturingTablesTest" perm="755"/>
 	<copy file="${templates}/manufacturingTablesTest.cmd" todir="${dist}"/>
 	<chmod file="${dist}/manufacturingTablesTest.cmd" perm="755"/>
+<!--
 	<copy file="${templates}/SupremicaProfiling.cmd" todir="${dist}"/>
 	<chmod file="${dist}/SupremicaProfiling.cmd" perm="644"/>
 	<copy file="${templates}/SupremicaProfiling" todir="${dist}"/>	
 	<chmod file="${dist}/SupremicaProfiling" perm="755"/>
 	<copy file="${templates}/SupremicaStandard.cmd" todir="${dist}"/>
 	<chmod file="${dist}/SupremicaStandard.cmd" perm="644"/>
+-->
 	<copy file="${templates}/SupremicaApplet.html" todir="${dist}"/>
 	<chmod file="${dist}/SupremicaApplet.html" perm="644"/>	
 	<copy file="${templates}/SupremicaAppletViewer.html" todir="${dist}"/>
@@ -660,8 +668,8 @@ Class-Path: ${manifest.pathlist}</echo>
 <target name="run_benchmarks_supremica" depends="compile_supremica,compile_benchmarks_supremica">
 	<java fork="yes" classname="junit.textui.TestRunner" taskname="junit" failonerror="true">
 		<arg value="org.supremica.BenchmarkPackageSupremica"/>
-        <jvmarg value="-Xmx1500m"/>
-        <jvmarg value="-Xms1500m"/>
+        <jvmarg value="-Xmx128m"/>
+        <jvmarg value="-Xms128m"/>
         <jvmarg value="-Djava.library.path=${dist}"/>
 		<classpath>	
 			<pathelement location="${build}" />

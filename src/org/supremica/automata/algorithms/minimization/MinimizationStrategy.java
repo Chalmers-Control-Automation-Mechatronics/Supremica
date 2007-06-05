@@ -53,13 +53,13 @@ import org.supremica.automata.*;
 
 public enum MinimizationStrategy
 {
-    AtLeastOneLocal("At least one local", Type.SPECIAL),
+    AtLeastOneLocal("At least one local", "mustL", Type.SPECIAL),
     AtLeastOneLocalMaxThree("At least one local, max three", Type.SPECIAL),
-    FewestTransitionsFirst("Pair with fewest transition automaton", Type.MINIMIZE),
-    FewestStatesFirst("Pair with fewest states automaton", Type.MINIMIZE),
-    FewestEventsFirst("Pair with fewest events automaton", Type.MINIMIZE),
+    FewestTransitionsFirst("Pair with fewest transition automaton", "minT", Type.MINIMIZE),
+    FewestStatesFirst("Pair with fewest states automaton", "minS", Type.MINIMIZE),
+    FewestEventsFirst("Pair with fewest events automaton", "minE", Type.MINIMIZE),
     MostTransitionsFirst("Pair with most transitions automaton", Type.MAXIMIZE),
-    MostStatesFirst("Pair with most states automaton", Type.MAXIMIZE),
+    MostStatesFirst("Pair with most states automaton", "maxS",Type.MAXIMIZE),
     MostEventsFirst("Pair with most events automaton", Type.MAXIMIZE),
     RandomFirst("Pair with random automaton", Type.MAXIMIZE),
     ExperimentalMin("Experimental min", Type.MINIMIZE),
@@ -69,18 +69,31 @@ public enum MinimizationStrategy
     
     /** Textual description. */
     private final String description;
+    /** Textual description abbreviated. */
+    private final String abbreviation;
     
     private final Type type;
     
     private MinimizationStrategy(String description, Type type)
     {
+		this(description, description, type);
+    }
+
+    private MinimizationStrategy(String description, String abbreviation, Type type)
+    {
         this.description = description;
+		this.abbreviation = abbreviation;
         this.type = type;
     }
     
     public String toString()
     {
         return description;
+    }
+
+    public String toStringAbbreviated()
+    {
+        return abbreviation;
     }
     
     public static MinimizationStrategy toStrategy(String description)

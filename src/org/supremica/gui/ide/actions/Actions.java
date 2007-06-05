@@ -78,6 +78,7 @@ public class Actions
     // Analyzer experimental
     public IDEAction analyzerExperimentAction = new AnalyzerExperimentAction(allActions);    
     public IDEAction analyzerPredictSizeAction = new AnalyzerPredictSizeAction(allActions);    
+    public IDEAction analyzerCountReachableAction = new AnalyzerCountReachableAction(allActions);    
 
     // Examples Actions
     public IDEAction toolsTestCasesAction = new ToolsTestCasesAction(allActions);

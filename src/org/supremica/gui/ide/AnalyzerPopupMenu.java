@@ -36,6 +36,7 @@ class AnalyzerPopupMenu
     throws Exception
     {
         JMenu viewMenu = new JMenu("View");
+        viewMenu.setToolTipText("Different graphical representations of the selected automata");
         viewMenu.setIcon(new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Zoom16.gif")));
         add(viewMenu);
         viewMenu.add(ide.getActions().analyzerViewAutomatonAction.getMenuItem());
@@ -66,9 +67,14 @@ class AnalyzerPopupMenu
 
         if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.get())
         {
-            addSeparator();
-            add(ide.getActions().analyzerPredictSizeAction.getMenuItem());
-            add(ide.getActions().analyzerExperimentAction.getMenuItem());
+            JMenu experimentMenu = new JMenu("Experimental");
+            experimentMenu.setToolTipText("Experimental functions (under development)");
+            experimentMenu.setIcon(new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/development/Jar16.gif")));
+            add(experimentMenu);
+
+            experimentMenu.add(ide.getActions().analyzerPredictSizeAction.getMenuItem());
+            experimentMenu.add(ide.getActions().analyzerExperimentAction.getMenuItem());
+            experimentMenu.add(ide.getActions().analyzerCountReachableAction.getMenuItem());
         }
     }
 }

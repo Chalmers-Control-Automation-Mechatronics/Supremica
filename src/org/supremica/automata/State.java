@@ -113,7 +113,6 @@ public class State
      */
     protected double accumulatedCost = UNDEF_COST;
 
-
     /**
      * Creates a new state with a specified name.
      */
@@ -1030,39 +1029,38 @@ public class State
     {
         return name.compareTo(((State) partner).name);
     }
-
-    //////////////////
-    // Kripke stuff //
-    //////////////////
     
-    /**
-     * The set of labels in this state.
-     */
-    private Set<KripkeLabel> labels = null;
-
-    /**
-     * Returns the set of labels in this state.
-     */
-    public Set<KripkeLabel> getKripkeLabels()
-    {
-        if (labels == null)
-        {
-            // The default label set of a state is a set containing just one label (based on the name).
-            labels = new TreeSet<KripkeLabel>();
-            labels.add(new KripkeLabel(getName()));
-            return labels;
-        }
-        return labels;
-    }
-
-    /**
-     * Sets the set of labels in this state.
-     */
-    public void setKripkeLabels(Set<KripkeLabel> set)
-    {
-        labels = set;
-    }
-
+//    //////////////////
+//    // Kripke stuff //
+//    //////////////////
+//    
+//    /**
+//     * The set of labels in this state.
+//     */
+//    private Set<KripkeLabel> labels = null;
+//
+//    /**
+//     * Returns the set of labels in this state.
+//     */
+//    public Set<KripkeLabel> getKripkeLabels()
+//    {
+//        if (labels == null)
+//        {
+//            // The default label set of a state is a set containing just one label (based on the name).
+//            labels = new TreeSet<KripkeLabel>();
+//            labels.add(new KripkeLabel(getName()));
+//            return labels;
+//        }
+//        return labels;
+//    }
+//
+//    /**
+//     * Sets the set of labels in this state.
+//     */
+//    public void setKripkeLabels(Set<KripkeLabel> set)
+//    {
+//        labels = set;
+//    }
 
     public Object acceptVisitor(final ProxyVisitor visitor)
     throws VisitorException

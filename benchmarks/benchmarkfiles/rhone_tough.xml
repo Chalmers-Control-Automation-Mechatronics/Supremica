@@ -1,0 +1,1610 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<Automata name="" major="0" minor="9">
+<Automaton name="h_PalletArvGateSenCL[TU1]" type="Plant">
+	<Events>
+		<Event id="0" label="LibPallet[TU1]"/>
+		<Event id="1" label="NoTrnsfEL[TU1]"/>
+		<Event id="2" label="PalletArvGCL[TU1]" controllable="false"/>
+		<Event id="3" label="TrnsfCplToEL[TU1]"/>
+		<Event id="4" label="TrnsfToEL[TU1]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="2" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_GlobOfProt" type="Specification">
+	<Events>
+		<Event id="0" label="IntroPallet"/>
+		<Event id="1" label="PalletRmvd" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+		<State id="5" name="s5"/>
+		<State id="6" name="s6"/>
+		<State id="7" name="s7"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="2" dest="1" event="1"/>
+		<Transition source="3" dest="4" event="0"/>
+		<Transition source="3" dest="2" event="1"/>
+		<Transition source="4" dest="5" event="0"/>
+		<Transition source="4" dest="3" event="1"/>
+		<Transition source="5" dest="6" event="0"/>
+		<Transition source="5" dest="4" event="1"/>
+		<Transition source="6" dest="7" event="0"/>
+		<Transition source="6" dest="5" event="1"/>
+		<Transition source="7" dest="6" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_IntfTU[TU2]" type="Plant">
+	<Events>
+		<Event id="0" label="LibPallet[TU2]"/>
+		<Event id="1" label="NoTrnsfEL[TU2]"/>
+		<Event id="2" label="PalletRlsd[TU2]"/>
+		<Event id="3" label="TrnsfCplToCL[TU2]"/>
+		<Event id="4" label="TrnsfCplToEL[TU2]"/>
+		<Event id="5" label="TrnsfELToCL[TU2]"/>
+		<Event id="6" label="TrnsfToEL[TU2]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="3" event="0"/>
+		<Transition source="0" dest="2" event="5"/>
+		<Transition source="0" dest="1" event="6"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="2" dest="0" event="3"/>
+		<Transition source="3" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_DepConvSectCL_3" type="Plant">
+	<Events>
+		<Event id="0" label="LibPallet[TU3]"/>
+		<Event id="1" label="PalletArvGCL[TU4]" controllable="false"/>
+		<Event id="2" label="TrnsfCplToCL[TU3]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="2" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="2" dest="1" event="1"/>
+		<Transition source="2" dest="3" event="2"/>
+		<Transition source="3" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_DepConvSectCL_4" type="Plant">
+	<Events>
+		<Event id="0" label="LibPallet[TU4]"/>
+		<Event id="1" label="PalletArvGCL[TU1]" controllable="false"/>
+		<Event id="2" label="TrnsfCplToCL[TU4]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="2" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="2" dest="1" event="1"/>
+		<Transition source="2" dest="3" event="2"/>
+		<Transition source="3" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_DepConvSectCL_1" type="Plant">
+	<Events>
+		<Event id="0" label="LibPallet[TU1]"/>
+		<Event id="1" label="PalletArvGCL[TU2]" controllable="false"/>
+		<Event id="2" label="TrnsfCplToCL[TU1]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="2" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="2" dest="1" event="1"/>
+		<Transition source="2" dest="3" event="2"/>
+		<Transition source="3" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_InterConvSectCL" type="Plant">
+	<Events>
+		<Event id="0" label="InterCLFull[TU1]"/>
+		<Event id="1" label="InterCLFull[TU2]"/>
+		<Event id="2" label="InterCLFull[TU3]"/>
+		<Event id="3" label="InterCLFull[TU4]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="0" event="1"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_DepConvSectCL_2" type="Plant">
+	<Events>
+		<Event id="0" label="LibPallet[TU2]"/>
+		<Event id="1" label="PalletArvGCL[TU3]" controllable="false"/>
+		<Event id="2" label="TrnsfCplToCL[TU2]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="2" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="2" dest="3" event="0"/>
+		<Transition source="2" dest="1" event="1"/>
+		<Transition source="2" dest="3" event="2"/>
+		<Transition source="3" dest="2" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_OFProtEL1" type="Specification">
+	<Events>
+		<Event id="0" label="IsPalletCL[TU1]" controllable="false"/>
+		<Event id="1" label="LibPallet[TU1]"/>
+		<Event id="2" label="NoTrnsfEL[TU1]"/>
+		<Event id="3" label="StnDwn[AS1]" controllable="false"/>
+		<Event id="4" label="StnUp[AS1]" controllable="false"/>
+		<Event id="5" label="TrnsfCplToCL[TU1]"/>
+		<Event id="6" label="TrnsfCplToEL[TU1]"/>
+		<Event id="7" label="TrnsfToEL[TU1]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="3" event="0"/>
+		<Transition source="0" dest="2" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="1" event="6"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="1" dest="1" event="0"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="0" event="5"/>
+		<Transition source="2" dest="0" event="1"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="3" dest="2" event="3"/>
+		<Transition source="3" dest="0" event="4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_OFProtEL2" type="Specification">
+	<Events>
+		<Event id="0" label="IsPalletCL[TU2]" controllable="false"/>
+		<Event id="1" label="LibPallet[TU2]"/>
+		<Event id="2" label="NoTrnsfEL[TU2]"/>
+		<Event id="3" label="StnDwn[AS2]" controllable="false"/>
+		<Event id="4" label="StnUp[AS2]" controllable="false"/>
+		<Event id="5" label="TrnsfCplToCL[TU2]"/>
+		<Event id="6" label="TrnsfCplToEL[TU2]"/>
+		<Event id="7" label="TrnsfToEL[TU2]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="3" event="0"/>
+		<Transition source="0" dest="2" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="1" event="6"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="1" dest="1" event="0"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="0" event="5"/>
+		<Transition source="2" dest="0" event="1"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="2" dest="2" event="4"/>
+		<Transition source="3" dest="2" event="3"/>
+		<Transition source="3" dest="0" event="4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_OFProtEL3" type="Specification">
+	<Events>
+		<Event id="0" label="LibPallet[TU3]"/>
+		<Event id="1" label="NoTrnsfEL[TU3]"/>
+		<Event id="2" label="TrnsfCplToCL[TU3]"/>
+		<Event id="3" label="TrnsfCplToEL[TU3]"/>
+		<Event id="4" label="TrnsfToEL3_1D"/>
+		<Event id="5" label="TrnsfToEL3_2D"/>
+		<Event id="6" label="TrnsfToEL3_BD"/>
+		<Event id="7" label="TrnsfToEL3_Up"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="3" event="1"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="1" dest="4" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="2" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="2" dest="2" event="0"/>
+		<Transition source="2" dest="1" event="2"/>
+		<Transition source="3" dest="0" event="0"/>
+		<Transition source="4" dest="1" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_PalletArvGateSenEL_2[AS1]" type="Plant">
+	<Events>
+		<Event id="0" label="PalletArvGEL_2[AS1]" controllable="false"/>
+		<Event id="1" label="ProcPallet[AS1]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_QueryPalletAtEL[TU2]" type="Plant">
+	<Events>
+		<Event id="0" label="IsPalletEL[TU2]" controllable="false"/>
+		<Event id="1" label="NoPalletEL[TU2]" controllable="false"/>
+		<Event id="2" label="PalletArvGEL_1[TU2]" controllable="false"/>
+		<Event id="3" label="QPalletAtEL[TU2]"/>
+		<Event id="4" label="TrnsfELToCL[TU2]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2" initial="true" accepting="true"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="3" event="4"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="2" event="4"/>
+		<Transition source="2" dest="1" event="2"/>
+		<Transition source="2" dest="3" event="3"/>
+		<Transition source="3" dest="2" event="1"/>
+		<Transition source="3" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_QueryPalletAtCL[TU1]" type="Plant">
+	<Events>
+		<Event id="0" label="IsPalletCL[TU1]" controllable="false"/>
+		<Event id="1" label="LibPallet[TU1]"/>
+		<Event id="2" label="NoPalletCL[TU1]" controllable="false"/>
+		<Event id="3" label="PalletArvGCL[TU1]" controllable="false"/>
+		<Event id="4" label="QPalletAtCL[TU1]"/>
+		<Event id="5" label="TrnsfCplToEL[TU1]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2" initial="true" accepting="true"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="3" event="1"/>
+		<Transition source="0" dest="3" event="5"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="1" dest="2" event="5"/>
+		<Transition source="2" dest="1" event="3"/>
+		<Transition source="2" dest="3" event="4"/>
+		<Transition source="3" dest="2" event="2"/>
+		<Transition source="3" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_DetWhichStnUp" type="Specification">
+	<Events>
+		<Event id="0" label="DetStnsUp"/>
+		<Event id="1" label="LibPallet[TU3]"/>
+		<Event id="2" label="QStnUp[AS1]"/>
+		<Event id="3" label="QStnUp[AS2]"/>
+		<Event id="4" label="StnDwn[AS1]" controllable="false"/>
+		<Event id="5" label="StnDwn[AS2]" controllable="false"/>
+		<Event id="6" label="StnUp[AS1]" controllable="false"/>
+		<Event id="7" label="StnUp[AS2]" controllable="false"/>
+		<Event id="8" label="TrnsfToEL3_1D"/>
+		<Event id="9" label="TrnsfToEL3_2D"/>
+		<Event id="10" label="TrnsfToEL3_BD"/>
+		<Event id="11" label="TrnsfToEL3_Up"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+		<State id="5" name="s5"/>
+		<State id="6" name="s6"/>
+		<State id="7" name="s7"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="0" dest="0" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="0" dest="0" event="5"/>
+		<Transition source="0" dest="0" event="6"/>
+		<Transition source="0" dest="0" event="7"/>
+		<Transition source="1" dest="1" event="2"/>
+		<Transition source="1" dest="5" event="4"/>
+		<Transition source="1" dest="2" event="6"/>
+		<Transition source="2" dest="2" event="3"/>
+		<Transition source="2" dest="4" event="5"/>
+		<Transition source="2" dest="3" event="7"/>
+		<Transition source="3" dest="0" event="1"/>
+		<Transition source="3" dest="0" event="11"/>
+		<Transition source="4" dest="0" event="1"/>
+		<Transition source="4" dest="0" event="9"/>
+		<Transition source="5" dest="5" event="3"/>
+		<Transition source="5" dest="6" event="5"/>
+		<Transition source="5" dest="7" event="7"/>
+		<Transition source="6" dest="0" event="1"/>
+		<Transition source="6" dest="0" event="10"/>
+		<Transition source="7" dest="0" event="1"/>
+		<Transition source="7" dest="0" event="8"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_IntfAssmbStn[AS1]" type="Plant">
+	<Events>
+		<Event id="0" label="ASDwn[AS1]"/>
+		<Event id="1" label="DoRpr[AS1]"/>
+		<Event id="2" label="ProcCpl[AS1]"/>
+		<Event id="3" label="ProcErr[AS1]"/>
+		<Event id="4" label="ProcPallet[AS1]"/>
+		<Event id="5" label="RobUp[AS1]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="2" event="1"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="2" dest="0" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_PalletArvGateSenEL_1[TU2]" type="Plant">
+	<Events>
+		<Event id="0" label="PalletArvGEL_1[TU2]" controllable="false"/>
+		<Event id="1" label="TrnsfELToCL[TU2]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_DepConvSect3_2" type="Plant">
+	<Events>
+		<Event id="0" label="PalletArvGEL_1[TU3]" controllable="false"/>
+		<Event id="1" label="PalletRepd[AS3]"/>
+		<Event id="2" label="ProcCpl[AS3]"/>
+		<Event id="3" label="ProcErr[AS3]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="1" dest="2" event="3"/>
+		<Transition source="2" dest="1" event="0"/>
+		<Transition source="2" dest="3" event="1"/>
+		<Transition source="2" dest="3" event="2"/>
+		<Transition source="2" dest="3" event="3"/>
+		<Transition source="3" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_DepConvSect3_1" type="Plant">
+	<Events>
+		<Event id="0" label="PalletArvGEL_2[AS3]" controllable="false"/>
+		<Event id="1" label="TrnsfCplToEL[TU3]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="2" dest="1" event="0"/>
+		<Transition source="2" dest="3" event="1"/>
+		<Transition source="3" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_IntfTU[TU1]" type="Plant">
+	<Events>
+		<Event id="0" label="LibPallet[TU1]"/>
+		<Event id="1" label="NoTrnsfEL[TU1]"/>
+		<Event id="2" label="PalletRlsd[TU1]"/>
+		<Event id="3" label="TrnsfCplToCL[TU1]"/>
+		<Event id="4" label="TrnsfCplToEL[TU1]"/>
+		<Event id="5" label="TrnsfELToCL[TU1]"/>
+		<Event id="6" label="TrnsfToEL[TU1]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="3" event="0"/>
+		<Transition source="0" dest="2" event="5"/>
+		<Transition source="0" dest="1" event="6"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="2" dest="0" event="3"/>
+		<Transition source="3" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_QueryPalletAtCL[TU4]" type="Plant">
+	<Events>
+		<Event id="0" label="IsPalletCL[TU4]" controllable="false"/>
+		<Event id="1" label="LibPallet[TU4]"/>
+		<Event id="2" label="NoPalletCL[TU4]" controllable="false"/>
+		<Event id="3" label="PalletArvGCL[TU4]" controllable="false"/>
+		<Event id="4" label="QPalletAtCL[TU4]"/>
+		<Event id="5" label="TrnsfCplToEL[TU4]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2" initial="true" accepting="true"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="3" event="1"/>
+		<Transition source="0" dest="3" event="5"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="1" dest="2" event="5"/>
+		<Transition source="2" dest="1" event="3"/>
+		<Transition source="2" dest="3" event="4"/>
+		<Transition source="3" dest="2" event="2"/>
+		<Transition source="3" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_DepConvSect4_2" type="Plant">
+	<Events>
+		<Event id="0" label="PalletArvGEL_1[TU4]" controllable="false"/>
+		<Event id="1" label="PalletIntrod"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="2" dest="1" event="0"/>
+		<Transition source="2" dest="3" event="1"/>
+		<Transition source="3" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_DepConvSect4_1" type="Plant">
+	<Events>
+		<Event id="0" label="PalletArvG4_2" controllable="false"/>
+		<Event id="1" label="TrnsfCplToEL[TU4]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="2" dest="1" event="0"/>
+		<Transition source="2" dest="3" event="1"/>
+		<Transition source="3" dest="2" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_ManageTU1" type="Specification">
+	<Events>
+		<Event id="0" label="InterCLFull[TU1]"/>
+		<Event id="1" label="IsPalletCL[TU1]" controllable="false"/>
+		<Event id="2" label="IsPalletEL[TU1]" controllable="false"/>
+		<Event id="3" label="LibPallet[TU1]"/>
+		<Event id="4" label="NoPalletCL[TU1]" controllable="false"/>
+		<Event id="5" label="NoPalletEL[TU1]" controllable="false"/>
+		<Event id="6" label="NoTrnsfEL[TU1]"/>
+		<Event id="7" label="PalletRlsd[TU1]"/>
+		<Event id="8" label="QPalletAtCL[TU1]"/>
+		<Event id="9" label="QPalletAtEL[TU1]"/>
+		<Event id="10" label="QStnUp[AS1]"/>
+		<Event id="11" label="StnDwn[AS1]" controllable="false"/>
+		<Event id="12" label="StnUp[AS1]" controllable="false"/>
+		<Event id="13" label="TrnsfCplToCL[TU1]"/>
+		<Event id="14" label="TrnsfCplToEL[TU1]"/>
+		<Event id="15" label="TrnsfELToCL[TU1]"/>
+		<Event id="16" label="TrnsfToEL[TU1]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+		<State id="5" name="s5"/>
+		<State id="6" name="s6"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="3" event="5"/>
+		<Transition source="0" dest="0" event="9"/>
+		<Transition source="0" dest="0" event="10"/>
+		<Transition source="0" dest="0" event="11"/>
+		<Transition source="0" dest="0" event="12"/>
+		<Transition source="1" dest="3" event="0"/>
+		<Transition source="1" dest="1" event="10"/>
+		<Transition source="1" dest="1" event="11"/>
+		<Transition source="1" dest="1" event="12"/>
+		<Transition source="1" dest="2" event="15"/>
+		<Transition source="2" dest="2" event="10"/>
+		<Transition source="2" dest="2" event="11"/>
+		<Transition source="2" dest="2" event="12"/>
+		<Transition source="2" dest="3" event="13"/>
+		<Transition source="3" dest="4" event="1"/>
+		<Transition source="3" dest="0" event="4"/>
+		<Transition source="3" dest="3" event="8"/>
+		<Transition source="3" dest="3" event="10"/>
+		<Transition source="3" dest="3" event="11"/>
+		<Transition source="3" dest="3" event="12"/>
+		<Transition source="4" dest="4" event="10"/>
+		<Transition source="4" dest="6" event="11"/>
+		<Transition source="4" dest="5" event="12"/>
+		<Transition source="5" dest="5" event="3"/>
+		<Transition source="5" dest="6" event="6"/>
+		<Transition source="5" dest="0" event="7"/>
+		<Transition source="5" dest="5" event="10"/>
+		<Transition source="5" dest="5" event="11"/>
+		<Transition source="5" dest="5" event="12"/>
+		<Transition source="5" dest="0" event="14"/>
+		<Transition source="5" dest="5" event="16"/>
+		<Transition source="6" dest="6" event="3"/>
+		<Transition source="6" dest="0" event="7"/>
+		<Transition source="6" dest="6" event="10"/>
+		<Transition source="6" dest="6" event="11"/>
+		<Transition source="6" dest="6" event="12"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_ManageTU2" type="Specification">
+	<Events>
+		<Event id="0" label="InterCLFull[TU2]"/>
+		<Event id="1" label="IsPalletCL[TU2]" controllable="false"/>
+		<Event id="2" label="IsPalletEL[TU2]" controllable="false"/>
+		<Event id="3" label="LibPallet[TU2]"/>
+		<Event id="4" label="NoPalletCL[TU2]" controllable="false"/>
+		<Event id="5" label="NoPalletEL[TU2]" controllable="false"/>
+		<Event id="6" label="NoTrnsfEL[TU2]"/>
+		<Event id="7" label="PalletRlsd[TU2]"/>
+		<Event id="8" label="QPalletAtCL[TU2]"/>
+		<Event id="9" label="QPalletAtEL[TU2]"/>
+		<Event id="10" label="QStnUp[AS2]"/>
+		<Event id="11" label="StnDwn[AS2]" controllable="false"/>
+		<Event id="12" label="StnUp[AS2]" controllable="false"/>
+		<Event id="13" label="TrnsfCplToCL[TU2]"/>
+		<Event id="14" label="TrnsfCplToEL[TU2]"/>
+		<Event id="15" label="TrnsfELToCL[TU2]"/>
+		<Event id="16" label="TrnsfToEL[TU2]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+		<State id="5" name="s5"/>
+		<State id="6" name="s6"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="3" event="5"/>
+		<Transition source="0" dest="0" event="9"/>
+		<Transition source="0" dest="0" event="10"/>
+		<Transition source="0" dest="0" event="11"/>
+		<Transition source="0" dest="0" event="12"/>
+		<Transition source="1" dest="3" event="0"/>
+		<Transition source="1" dest="1" event="10"/>
+		<Transition source="1" dest="1" event="11"/>
+		<Transition source="1" dest="1" event="12"/>
+		<Transition source="1" dest="2" event="15"/>
+		<Transition source="2" dest="2" event="10"/>
+		<Transition source="2" dest="2" event="11"/>
+		<Transition source="2" dest="2" event="12"/>
+		<Transition source="2" dest="3" event="13"/>
+		<Transition source="3" dest="4" event="1"/>
+		<Transition source="3" dest="0" event="4"/>
+		<Transition source="3" dest="3" event="8"/>
+		<Transition source="3" dest="3" event="10"/>
+		<Transition source="3" dest="3" event="11"/>
+		<Transition source="3" dest="3" event="12"/>
+		<Transition source="4" dest="4" event="10"/>
+		<Transition source="4" dest="6" event="11"/>
+		<Transition source="4" dest="5" event="12"/>
+		<Transition source="5" dest="5" event="3"/>
+		<Transition source="5" dest="6" event="6"/>
+		<Transition source="5" dest="0" event="7"/>
+		<Transition source="5" dest="5" event="10"/>
+		<Transition source="5" dest="5" event="11"/>
+		<Transition source="5" dest="5" event="12"/>
+		<Transition source="5" dest="0" event="14"/>
+		<Transition source="5" dest="5" event="16"/>
+		<Transition source="6" dest="6" event="3"/>
+		<Transition source="6" dest="0" event="7"/>
+		<Transition source="6" dest="6" event="10"/>
+		<Transition source="6" dest="6" event="11"/>
+		<Transition source="6" dest="6" event="12"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_PalletArvGateSenEL_2[AS2]" type="Plant">
+	<Events>
+		<Event id="0" label="PalletArvGEL_2[AS2]" controllable="false"/>
+		<Event id="1" label="ProcPallet[AS2]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_ManageTU3" type="Specification">
+	<Events>
+		<Event id="0" label="DetStnsUp"/>
+		<Event id="1" label="InterCLFull[TU3]"/>
+		<Event id="2" label="IsPalletCL[TU3]" controllable="false"/>
+		<Event id="3" label="IsPalletEL[TU3]" controllable="false"/>
+		<Event id="4" label="LibPallet[TU3]"/>
+		<Event id="5" label="NoPalletCL[TU3]" controllable="false"/>
+		<Event id="6" label="NoPalletEL[TU3]" controllable="false"/>
+		<Event id="7" label="NoTrnsfEL[TU3]"/>
+		<Event id="8" label="PalletRlsd[TU3]"/>
+		<Event id="9" label="QPalletAtCL[TU3]"/>
+		<Event id="10" label="QPalletAtEL[TU3]"/>
+		<Event id="11" label="TrnsfCplToCL[TU3]"/>
+		<Event id="12" label="TrnsfCplToEL[TU3]"/>
+		<Event id="13" label="TrnsfELToCL[TU3]"/>
+		<Event id="14" label="TrnsfToEL3_1D"/>
+		<Event id="15" label="TrnsfToEL3_2D"/>
+		<Event id="16" label="TrnsfToEL3_BD"/>
+		<Event id="17" label="TrnsfToEL3_Up"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+		<State id="5" name="s5"/>
+		<State id="6" name="s6"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="3" event="6"/>
+		<Transition source="0" dest="0" event="10"/>
+		<Transition source="1" dest="3" event="1"/>
+		<Transition source="1" dest="2" event="13"/>
+		<Transition source="2" dest="3" event="11"/>
+		<Transition source="3" dest="6" event="2"/>
+		<Transition source="3" dest="0" event="5"/>
+		<Transition source="3" dest="3" event="9"/>
+		<Transition source="4" dest="4" event="4"/>
+		<Transition source="4" dest="5" event="7"/>
+		<Transition source="4" dest="0" event="8"/>
+		<Transition source="4" dest="0" event="12"/>
+		<Transition source="4" dest="4" event="14"/>
+		<Transition source="4" dest="4" event="15"/>
+		<Transition source="4" dest="4" event="16"/>
+		<Transition source="4" dest="4" event="17"/>
+		<Transition source="5" dest="5" event="4"/>
+		<Transition source="5" dest="0" event="8"/>
+		<Transition source="6" dest="4" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_ManageTU4" type="Specification">
+	<Events>
+		<Event id="0" label="InterCLFull[TU4]"/>
+		<Event id="1" label="IsPalletCL[TU4]" controllable="false"/>
+		<Event id="2" label="IsPalletEL[TU4]" controllable="false"/>
+		<Event id="3" label="LibPallet[TU4]"/>
+		<Event id="4" label="NoPalletCL[TU4]" controllable="false"/>
+		<Event id="5" label="NoPalletEL[TU4]" controllable="false"/>
+		<Event id="6" label="NoTrnsfEL[TU4]"/>
+		<Event id="7" label="PalletRlsd[TU4]"/>
+		<Event id="8" label="QPalletAtCL[TU4]"/>
+		<Event id="9" label="QPalletAtEL[TU4]"/>
+		<Event id="10" label="TrnsfCplToCL[TU4]"/>
+		<Event id="11" label="TrnsfCplToEL[TU4]"/>
+		<Event id="12" label="TrnsfELToCL[TU4]"/>
+		<Event id="13" label="TrnsfToEL[TU4]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+		<State id="5" name="s5"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="3" event="5"/>
+		<Transition source="0" dest="0" event="9"/>
+		<Transition source="1" dest="3" event="0"/>
+		<Transition source="1" dest="2" event="12"/>
+		<Transition source="2" dest="3" event="10"/>
+		<Transition source="3" dest="4" event="1"/>
+		<Transition source="3" dest="0" event="4"/>
+		<Transition source="3" dest="3" event="8"/>
+		<Transition source="4" dest="4" event="3"/>
+		<Transition source="4" dest="5" event="6"/>
+		<Transition source="4" dest="0" event="7"/>
+		<Transition source="4" dest="0" event="11"/>
+		<Transition source="4" dest="4" event="13"/>
+		<Transition source="5" dest="5" event="3"/>
+		<Transition source="5" dest="0" event="7"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_DepConvSect2_2" type="Plant">
+	<Events>
+		<Event id="0" label="ASDwn[AS2]"/>
+		<Event id="1" label="PalletArvGEL_1[TU2]" controllable="false"/>
+		<Event id="2" label="ProcCpl[AS2]"/>
+		<Event id="3" label="ProcErr[AS2]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="1" dest="2" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="1" dest="2" event="3"/>
+		<Transition source="2" dest="1" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_DepConvSect2_1" type="Plant">
+	<Events>
+		<Event id="0" label="PalletArvGEL_2[AS2]" controllable="false"/>
+		<Event id="1" label="TrnsfCplToEL[TU2]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="2" dest="1" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_ASStoreUpState[AS1]" type="Plant">
+	<Events>
+		<Event id="0" label="ASDwn[AS1]"/>
+		<Event id="1" label="QStnUp[AS1]"/>
+		<Event id="2" label="RobUp[AS1]"/>
+		<Event id="3" label="StnDwn[AS1]" controllable="false"/>
+		<Event id="4" label="StnUp[AS1]" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2" initial="true" accepting="true"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="3" event="2"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="2" dest="1" event="0"/>
+		<Transition source="2" dest="3" event="1"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="3" dest="0" event="0"/>
+		<Transition source="3" dest="3" event="2"/>
+		<Transition source="3" dest="2" event="4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_PalletArvGateSenEL_1[TU1]" type="Plant">
+	<Events>
+		<Event id="0" label="PalletArvGEL_1[TU1]" controllable="false"/>
+		<Event id="1" label="TrnsfELToCL[TU1]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_DepConvSect1_1" type="Plant">
+	<Events>
+		<Event id="0" label="PalletArvGEL_2[AS1]" controllable="false"/>
+		<Event id="1" label="TrnsfCplToEL[TU1]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="2" dest="1" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_DepConvSect1_2" type="Plant">
+	<Events>
+		<Event id="0" label="ASDwn[AS1]"/>
+		<Event id="1" label="PalletArvGEL_1[TU1]" controllable="false"/>
+		<Event id="2" label="ProcCpl[AS1]"/>
+		<Event id="3" label="ProcErr[AS1]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="1" dest="2" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="1" dest="2" event="3"/>
+		<Transition source="2" dest="1" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_QueryPalletAtEL[TU3]" type="Plant">
+	<Events>
+		<Event id="0" label="IsPalletEL[TU3]" controllable="false"/>
+		<Event id="1" label="NoPalletEL[TU3]" controllable="false"/>
+		<Event id="2" label="PalletArvGEL_1[TU3]" controllable="false"/>
+		<Event id="3" label="QPalletAtEL[TU3]"/>
+		<Event id="4" label="TrnsfELToCL[TU3]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2" initial="true" accepting="true"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="3" event="4"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="2" event="4"/>
+		<Transition source="2" dest="1" event="2"/>
+		<Transition source="2" dest="3" event="3"/>
+		<Transition source="3" dest="2" event="1"/>
+		<Transition source="3" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_IntfAssmbStn3" type="Plant">
+	<Events>
+		<Event id="0" label="PalletRepd[AS3]"/>
+		<Event id="1" label="ProcCpl[AS3]"/>
+		<Event id="2" label="ProcErr[AS3]"/>
+		<Event id="3" label="ProcPallet[AS3]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_PalletArvGateSenCL[TU4]" type="Plant">
+	<Events>
+		<Event id="0" label="LibPallet[TU4]"/>
+		<Event id="1" label="NoTrnsfEL[TU4]"/>
+		<Event id="2" label="PalletArvGCL[TU4]" controllable="false"/>
+		<Event id="3" label="TrnsfCplToEL[TU4]"/>
+		<Event id="4" label="TrnsfToEL[TU4]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="2" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_QueryPalletAtCL[TU3]" type="Plant">
+	<Events>
+		<Event id="0" label="IsPalletCL[TU3]" controllable="false"/>
+		<Event id="1" label="LibPallet[TU3]"/>
+		<Event id="2" label="NoPalletCL[TU3]" controllable="false"/>
+		<Event id="3" label="PalletArvGCL[TU3]" controllable="false"/>
+		<Event id="4" label="QPalletAtCL[TU3]"/>
+		<Event id="5" label="TrnsfCplToEL[TU3]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2" initial="true" accepting="true"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="3" event="1"/>
+		<Transition source="0" dest="3" event="5"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="1" dest="2" event="5"/>
+		<Transition source="2" dest="1" event="3"/>
+		<Transition source="2" dest="3" event="4"/>
+		<Transition source="3" dest="2" event="2"/>
+		<Transition source="3" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_ASStoreUpState[AS2]" type="Plant">
+	<Events>
+		<Event id="0" label="ASDwn[AS2]"/>
+		<Event id="1" label="QStnUp[AS2]"/>
+		<Event id="2" label="RobUp[AS2]"/>
+		<Event id="3" label="StnDwn[AS2]" controllable="false"/>
+		<Event id="4" label="StnUp[AS2]" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2" initial="true" accepting="true"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="0" event="0"/>
+		<Transition source="0" dest="3" event="2"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="1" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="2" event="2"/>
+		<Transition source="2" dest="1" event="0"/>
+		<Transition source="2" dest="3" event="1"/>
+		<Transition source="2" dest="2" event="2"/>
+		<Transition source="3" dest="0" event="0"/>
+		<Transition source="3" dest="3" event="2"/>
+		<Transition source="3" dest="2" event="4"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_IntfIOStation" type="Plant">
+	<Events>
+		<Event id="0" label="IntroPallet"/>
+		<Event id="1" label="PalletIntrod"/>
+		<Event id="2" label="PalletRmvd" controllable="false"/>
+		<Event id="3" label="RmvPallet"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="2" event="0"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="2" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_PalletArvGateSen4_2" type="Plant">
+	<Events>
+		<Event id="0" label="PalletArvG4_2" controllable="false"/>
+		<Event id="1" label="RmvPallet"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_RepairAS[AS1]" type="Specification">
+	<Events>
+		<Event id="0" label="ASDwn[AS1]"/>
+		<Event id="1" label="DoRpr[AS1]"/>
+		<Event id="2" label="ProcPallet[AS1]"/>
+		<Event id="3" label="RobUp[AS1]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_IntfTU3" type="Plant">
+	<Events>
+		<Event id="0" label="LibPallet[TU3]"/>
+		<Event id="1" label="NoTrnsfEL[TU3]"/>
+		<Event id="2" label="PalletRlsd[TU3]"/>
+		<Event id="3" label="TrnsfCplToCL[TU3]"/>
+		<Event id="4" label="TrnsfCplToEL[TU3]"/>
+		<Event id="5" label="TrnsfELToCL[TU3]"/>
+		<Event id="6" label="TrnsfToEL3_1D"/>
+		<Event id="7" label="TrnsfToEL3_2D"/>
+		<Event id="8" label="TrnsfToEL3_BD"/>
+		<Event id="9" label="TrnsfToEL3_Up"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="3" event="0"/>
+		<Transition source="0" dest="2" event="5"/>
+		<Transition source="0" dest="1" event="6"/>
+		<Transition source="0" dest="1" event="7"/>
+		<Transition source="0" dest="1" event="8"/>
+		<Transition source="0" dest="1" event="9"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="2" dest="0" event="3"/>
+		<Transition source="3" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_PalletArvGateSenEL_2[AS3]" type="Plant">
+	<Events>
+		<Event id="0" label="PalletArvGEL_2[AS3]" controllable="false"/>
+		<Event id="1" label="ProcPallet[AS3]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_HndlComEventsAS" type="Specification">
+	<Events>
+		<Event id="0" label="DetStnsUp"/>
+		<Event id="1" label="IsPalletCL[TU1]" controllable="false"/>
+		<Event id="2" label="IsPalletCL[TU2]" controllable="false"/>
+		<Event id="3" label="NoPalletCL[TU1]" controllable="false"/>
+		<Event id="4" label="NoPalletCL[TU2]" controllable="false"/>
+		<Event id="5" label="QPalletAtCL[TU1]"/>
+		<Event id="6" label="QPalletAtCL[TU2]"/>
+		<Event id="7" label="QStnUp[AS1]"/>
+		<Event id="8" label="QStnUp[AS2]"/>
+		<Event id="9" label="StnDwn[AS1]" controllable="false"/>
+		<Event id="10" label="StnDwn[AS2]" controllable="false"/>
+		<Event id="11" label="StnUp[AS1]" controllable="false"/>
+		<Event id="12" label="StnUp[AS2]" controllable="false"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+		<State id="5" name="s5"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="3" event="0"/>
+		<Transition source="0" dest="1" event="5"/>
+		<Transition source="0" dest="2" event="6"/>
+		<Transition source="1" dest="4" event="1"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="2" dest="5" event="2"/>
+		<Transition source="2" dest="0" event="4"/>
+		<Transition source="3" dest="3" event="7"/>
+		<Transition source="3" dest="3" event="8"/>
+		<Transition source="3" dest="3" event="9"/>
+		<Transition source="3" dest="0" event="10"/>
+		<Transition source="3" dest="3" event="11"/>
+		<Transition source="3" dest="0" event="12"/>
+		<Transition source="4" dest="4" event="7"/>
+		<Transition source="4" dest="0" event="9"/>
+		<Transition source="4" dest="0" event="11"/>
+		<Transition source="5" dest="5" event="8"/>
+		<Transition source="5" dest="0" event="10"/>
+		<Transition source="5" dest="0" event="12"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_QueryPalletAtEL[TU4]" type="Plant">
+	<Events>
+		<Event id="0" label="IsPalletEL[TU4]" controllable="false"/>
+		<Event id="1" label="NoPalletEL[TU4]" controllable="false"/>
+		<Event id="2" label="PalletArvGEL_1[TU4]" controllable="false"/>
+		<Event id="3" label="QPalletAtEL[TU4]"/>
+		<Event id="4" label="TrnsfELToCL[TU4]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2" initial="true" accepting="true"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="3" event="4"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="2" event="4"/>
+		<Transition source="2" dest="1" event="2"/>
+		<Transition source="2" dest="3" event="3"/>
+		<Transition source="3" dest="2" event="1"/>
+		<Transition source="3" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_PalletArvGateSenEL_1[TU4]" type="Plant">
+	<Events>
+		<Event id="0" label="PalletArvGEL_1[TU4]" controllable="false"/>
+		<Event id="1" label="TrnsfELToCL[TU4]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_QueryPalletAtCL[TU2]" type="Plant">
+	<Events>
+		<Event id="0" label="IsPalletCL[TU2]" controllable="false"/>
+		<Event id="1" label="LibPallet[TU2]"/>
+		<Event id="2" label="NoPalletCL[TU2]" controllable="false"/>
+		<Event id="3" label="PalletArvGCL[TU2]" controllable="false"/>
+		<Event id="4" label="QPalletAtCL[TU2]"/>
+		<Event id="5" label="TrnsfCplToEL[TU2]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2" initial="true" accepting="true"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="3" event="1"/>
+		<Transition source="0" dest="3" event="5"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="1" dest="2" event="5"/>
+		<Transition source="2" dest="1" event="3"/>
+		<Transition source="2" dest="3" event="4"/>
+		<Transition source="3" dest="2" event="2"/>
+		<Transition source="3" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_RepairAS[AS2]" type="Specification">
+	<Events>
+		<Event id="0" label="ASDwn[AS2]"/>
+		<Event id="1" label="DoRpr[AS2]"/>
+		<Event id="2" label="ProcPallet[AS2]"/>
+		<Event id="3" label="RobUp[AS2]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="0" event="2"/>
+		<Transition source="1" dest="1" event="1"/>
+		<Transition source="1" dest="0" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_OFProtEL5_4" type="Specification">
+	<Events>
+		<Event id="0" label="InterCLFull[TU4]"/>
+		<Event id="1" label="LibPallet[TU4]"/>
+		<Event id="2" label="PalletRlsd[TU1]"/>
+		<Event id="3" label="TrnsfCplToEL[TU1]"/>
+		<Event id="4" label="TrnsfELToCL[TU4]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="2" event="4"/>
+		<Transition source="2" dest="2" event="0"/>
+		<Transition source="2" dest="1" event="2"/>
+		<Transition source="2" dest="1" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_OFProtEL5_3" type="Specification">
+	<Events>
+		<Event id="0" label="InterCLFull[TU3]"/>
+		<Event id="1" label="LibPallet[TU3]"/>
+		<Event id="2" label="PalletRlsd[TU4]"/>
+		<Event id="3" label="TrnsfCplToEL[TU4]"/>
+		<Event id="4" label="TrnsfELToCL[TU3]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="2" event="4"/>
+		<Transition source="2" dest="2" event="0"/>
+		<Transition source="2" dest="1" event="2"/>
+		<Transition source="2" dest="1" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_OFProtEL5_2" type="Specification">
+	<Events>
+		<Event id="0" label="InterCLFull[TU2]"/>
+		<Event id="1" label="LibPallet[TU2]"/>
+		<Event id="2" label="PalletRlsd[TU3]"/>
+		<Event id="3" label="TrnsfCplToEL[TU3]"/>
+		<Event id="4" label="TrnsfELToCL[TU2]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="2" event="4"/>
+		<Transition source="2" dest="2" event="0"/>
+		<Transition source="2" dest="1" event="2"/>
+		<Transition source="2" dest="1" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_IntfAssmbStn[AS2]" type="Plant">
+	<Events>
+		<Event id="0" label="ASDwn[AS2]"/>
+		<Event id="1" label="DoRpr[AS2]"/>
+		<Event id="2" label="ProcCpl[AS2]"/>
+		<Event id="3" label="ProcErr[AS2]"/>
+		<Event id="4" label="ProcPallet[AS2]"/>
+		<Event id="5" label="RobUp[AS2]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="2" event="1"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="2" dest="0" event="5"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_IntfTU[TU4]" type="Plant">
+	<Events>
+		<Event id="0" label="LibPallet[TU4]"/>
+		<Event id="1" label="NoTrnsfEL[TU4]"/>
+		<Event id="2" label="PalletRlsd[TU4]"/>
+		<Event id="3" label="TrnsfCplToCL[TU4]"/>
+		<Event id="4" label="TrnsfCplToEL[TU4]"/>
+		<Event id="5" label="TrnsfELToCL[TU4]"/>
+		<Event id="6" label="TrnsfToEL[TU4]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="3" event="0"/>
+		<Transition source="0" dest="2" event="5"/>
+		<Transition source="0" dest="1" event="6"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="1" dest="0" event="4"/>
+		<Transition source="2" dest="0" event="3"/>
+		<Transition source="3" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_OFProtEL5_1" type="Specification">
+	<Events>
+		<Event id="0" label="InterCLFull[TU1]"/>
+		<Event id="1" label="LibPallet[TU1]"/>
+		<Event id="2" label="PalletRlsd[TU2]"/>
+		<Event id="3" label="TrnsfCplToEL[TU2]"/>
+		<Event id="4" label="TrnsfELToCL[TU1]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="1"/>
+		<Transition source="0" dest="1" event="4"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="2" event="4"/>
+		<Transition source="2" dest="2" event="0"/>
+		<Transition source="2" dest="1" event="2"/>
+		<Transition source="2" dest="1" event="3"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_PalletArvGateSenCl3" type="Plant">
+	<Events>
+		<Event id="0" label="LibPallet[TU3]"/>
+		<Event id="1" label="NoTrnsfEL[TU3]"/>
+		<Event id="2" label="PalletArvGCL[TU3]" controllable="false"/>
+		<Event id="3" label="TrnsfCplToEL[TU3]"/>
+		<Event id="4" label="TrnsfToEL3_1D"/>
+		<Event id="5" label="TrnsfToEL3_2D"/>
+		<Event id="6" label="TrnsfToEL3_BD"/>
+		<Event id="7" label="TrnsfToEL3_Up"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="1" dest="1" event="5"/>
+		<Transition source="1" dest="1" event="6"/>
+		<Transition source="1" dest="1" event="7"/>
+		<Transition source="2" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_QueryPalletAtEL[TU1]" type="Plant">
+	<Events>
+		<Event id="0" label="IsPalletEL[TU1]" controllable="false"/>
+		<Event id="1" label="NoPalletEL[TU1]" controllable="false"/>
+		<Event id="2" label="PalletArvGEL_1[TU1]" controllable="false"/>
+		<Event id="3" label="QPalletAtEL[TU1]"/>
+		<Event id="4" label="TrnsfELToCL[TU1]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2" initial="true" accepting="true"/>
+		<State id="3" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="0" dest="3" event="4"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="2" event="4"/>
+		<Transition source="2" dest="1" event="2"/>
+		<Transition source="2" dest="3" event="3"/>
+		<Transition source="3" dest="2" event="1"/>
+		<Transition source="3" dest="0" event="2"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_OFProtEL4_2" type="Specification">
+	<Events>
+		<Event id="0" label="IntroPallet"/>
+		<Event id="1" label="TrnsfCplToCL[TU4]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="2" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+		<Transition source="2" dest="1" event="1"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_OFProtEL4_1" type="Specification">
+	<Events>
+		<Event id="0" label="LibPallet[TU4]"/>
+		<Event id="1" label="NoTrnsfEL[TU4]"/>
+		<Event id="2" label="PalletRmvd" controllable="false"/>
+		<Event id="3" label="TrnsfCplToEL[TU4]"/>
+		<Event id="4" label="TrnsfToEL[TU4]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s2"/>
+		<State id="3" name="s3"/>
+		<State id="4" name="s4"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="3" event="1"/>
+		<Transition source="0" dest="1" event="3"/>
+		<Transition source="0" dest="0" event="4"/>
+		<Transition source="1" dest="4" event="1"/>
+		<Transition source="1" dest="0" event="2"/>
+		<Transition source="1" dest="2" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="2" dest="2" event="0"/>
+		<Transition source="2" dest="1" event="2"/>
+		<Transition source="3" dest="0" event="0"/>
+		<Transition source="4" dest="1" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_PalletArvGateSenCL[TU2]" type="Plant">
+	<Events>
+		<Event id="0" label="LibPallet[TU2]"/>
+		<Event id="1" label="NoTrnsfEL[TU2]"/>
+		<Event id="2" label="PalletArvGCL[TU2]" controllable="false"/>
+		<Event id="3" label="TrnsfCplToEL[TU2]"/>
+		<Event id="4" label="TrnsfToEL[TU2]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+		<State id="2" name="s3"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="2"/>
+		<Transition source="1" dest="0" event="0"/>
+		<Transition source="1" dest="2" event="1"/>
+		<Transition source="1" dest="0" event="3"/>
+		<Transition source="1" dest="1" event="4"/>
+		<Transition source="2" dest="0" event="0"/>
+	</Transitions>
+</Automaton>
+<Automaton name="h_PalletArvGateSenEL_1[TU3]" type="Plant">
+	<Events>
+		<Event id="0" label="PalletArvGEL_1[TU3]" controllable="false"/>
+		<Event id="1" label="TrnsfELToCL[TU3]"/>
+	</Events>
+	<States>
+		<State id="0" name="s0" initial="true" accepting="true"/>
+		<State id="1" name="s1"/>
+	</States>
+	<Transitions>
+		<Transition source="0" dest="1" event="0"/>
+		<Transition source="1" dest="0" event="1"/>
+	</Transitions>
+</Automaton>
+</Automata>

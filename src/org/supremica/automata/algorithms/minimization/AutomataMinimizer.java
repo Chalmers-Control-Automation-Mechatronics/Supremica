@@ -206,7 +206,8 @@ public class AutomataMinimizer
             
             // Get next automata to minimize
             timer.start();
-            MinimizationTask task = getNextMinimizationTask(false);
+            //MinimizationTask task = getNextMinimizationTask(false); // true = new implementation, false = old
+            MinimizationTask task = getNextMinimizationTask(true); // true = new implementation, false = old
             if (task == null)
             {
                 break;
@@ -726,8 +727,8 @@ public class AutomataMinimizer
                     // Was the system disjoint?
                     if (!((bestLocalRatio > 0) || (bestCommonRatio > 0)))
                     {
-                        logger.warn("The system has disjoint parts. Preferrably, they should " +
-                            "be treated separately if possible.");
+                        logger.warn("The system has disjoint parts. They should " +
+                            "be treated separately.");
                     }
                 }
             }
