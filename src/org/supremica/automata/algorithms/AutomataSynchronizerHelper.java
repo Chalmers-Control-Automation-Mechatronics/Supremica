@@ -682,7 +682,8 @@ public final class AutomataSynchronizerHelper
                 int currEventIndex = executer.findTransition(prevState, nextState);
                 
                 trace.append(" ");
-                trace.append(unionAlphabet.getEventWithIndex(currEventIndex).getLabel());
+                //trace.append(unionAlphabet.getEventWithIndex(currEventIndex).getLabel());
+                trace.append(theAutomataIndexForm.getAutomataIndexMap().getEventAt(currEventIndex));
             }
             
             prevState = nextState;

@@ -1034,7 +1034,7 @@ public class State
     //////////////////
     // Kripke stuff //
     //////////////////
-
+    
     /**
      * The set of labels in this state.
      */
