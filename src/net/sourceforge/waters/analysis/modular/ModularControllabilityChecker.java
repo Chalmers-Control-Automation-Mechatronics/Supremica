@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularControllabilityChecker
 //###########################################################################
-//# $Id: ModularControllabilityChecker.java,v 1.8 2007-01-03 00:49:08 robi Exp $
+//# $Id: ModularControllabilityChecker.java,v 1.9 2007-06-05 13:45:21 robi Exp $
 //###########################################################################
 
 
@@ -22,7 +22,7 @@ import java.util.TreeSet;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
-import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
+import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -52,7 +52,7 @@ public class ModularControllabilityChecker
     super(model, factory);
     mChecker = checker;
     mHeuristic = heuristic;
-    mTranslator = IdenticalKindTranslator.getInstance();
+    mTranslator = ControllabilityKindTranslator.getInstance();
     mStates = 0;
     mLeast = least;
     setStateLimit(2000000);

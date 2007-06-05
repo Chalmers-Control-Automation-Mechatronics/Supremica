@@ -10,7 +10,7 @@ import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
+import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -43,7 +43,7 @@ public class ParallelModularControllabilityChecker
     super(model, factory);
     mChecker = checker;
     mHeuristic = heuristic;
-    mTranslator = IdenticalKindTranslator.getInstance();
+    mTranslator = ControllabilityKindTranslator.getInstance();
     mStates = 0;
     setStateLimit(2000000);
   }

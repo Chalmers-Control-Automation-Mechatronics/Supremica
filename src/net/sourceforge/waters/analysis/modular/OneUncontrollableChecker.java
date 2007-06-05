@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularLanguageInclusionChecker
 //###########################################################################
-//# $Id: OneUncontrollableChecker.java,v 1.3 2007-01-03 00:49:08 robi Exp $
+//# $Id: OneUncontrollableChecker.java,v 1.4 2007-06-05 13:45:21 robi Exp $
 //###########################################################################
 
 
@@ -13,7 +13,7 @@ package net.sourceforge.waters.analysis.modular;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import java.util.Comparator;
-import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
+import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 import java.util.Collections;
@@ -43,7 +43,7 @@ public class OneUncontrollableChecker
   {
     super(model, factory);
     mChecker = checker;
-    mTranslator = IdenticalKindTranslator.getInstance();
+    mTranslator = ControllabilityKindTranslator.getInstance();
     mStates = 0;
     setStateLimit(5000000);
   }

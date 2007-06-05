@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   ControllabilityKindTranslator
 //###########################################################################
-//# $Id: ControllabilityKindTranslator.java,v 1.1 2007-06-05 13:23:52 robi Exp $
+//# $Id: ControllabilityKindTranslator.java,v 1.2 2007-06-05 13:45:21 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -16,12 +16,9 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
- * <P>A kind translator used for language inclusion checking.
- * This translator remaps all event to be uncontrollable,
- * all specs are considered as plants, and all properties are
- * considered as specs. Such a remapping makes it possible to
- * implement language inclusion checking using a controllability
- * checker.</P>
+ * <P>A kind translator used for controllable inclusion checking.
+ * This translator remaps supervisor automata as specifications,
+ * and makes no other changes.</P>
  *
  * @author Robi Malik
  */

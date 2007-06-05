@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ModularLanguageInclusionChecker
 //###########################################################################
-//# $Id: ModularLanguageInclusionChecker.java,v 1.6 2007-01-03 00:49:08 robi Exp $
+//# $Id: ModularLanguageInclusionChecker.java,v 1.7 2007-06-05 13:45:21 robi Exp $
 //###########################################################################
 
 
@@ -14,7 +14,7 @@ import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import java.util.Comparator;
 import java.util.Set;
-import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
+import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 import java.util.Collections;
@@ -49,7 +49,7 @@ public class ModularLanguageInclusionChecker
     super(model, factory);
     mChecker = checker;
     mHeuristic = heuristic;
-    mTranslator = IdenticalKindTranslator.getInstance();
+    mTranslator = ControllabilityKindTranslator.getInstance();
     mStates = 0;
     setStateLimit(10000000);
   }

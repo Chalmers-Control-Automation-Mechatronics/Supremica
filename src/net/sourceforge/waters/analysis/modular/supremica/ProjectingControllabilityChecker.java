@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.analysis.modular
 //# CLASS:   ProjectingControllabilityChecker
 //###########################################################################
-//# $Id: ProjectingControllabilityChecker.java,v 1.10 2007-05-31 01:46:49 siw4 Exp $
+//# $Id: ProjectingControllabilityChecker.java,v 1.11 2007-06-05 13:45:21 robi Exp $
 //###########################################################################
 
 
@@ -30,7 +30,7 @@ import net.sourceforge.waters.analysis.modular.*;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
-import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
+import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -77,7 +77,7 @@ public class ProjectingControllabilityChecker
     super(model, factory);
     mChecker = checker;
     mHeuristic = heuristic;
-    mTranslator = IdenticalKindTranslator.getInstance();
+    mTranslator = ControllabilityKindTranslator.getInstance();
     mStates = 0;
     mLeast = least;
     setStateLimit(5000000);
