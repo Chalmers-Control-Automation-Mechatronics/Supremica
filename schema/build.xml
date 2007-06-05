@@ -88,4 +88,10 @@
     </xjc>
   </target>
 
+  <target name="gen_manufacturingtables_rop_ppn" description="Generate Manufacturing Tables ROP PPNedit JAXB classes.">
+  	<xjc target="${src}" extension="true" removeOldOutput="yes" package="org.supremica.manufacturingTables.xsd.rop_ppn">
+  		<schema dir="${xsd_manufacturingTables}" includes="ROP_PPN.xsd"/>
+  		<produces dir="${src}/org/supremica/manufacturingTables/xsd/rop_ppn"/>
+  	</xjc>
+  </target>
 </project>
