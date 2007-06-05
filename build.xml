@@ -280,7 +280,7 @@
 *	Reuses existing class files, but recompiles those
 *	source files that have changed.
 -->
-<target name="compile_manufacturingTables_jaxb">
+<target name="compile_manufacturingTables_jaxb" depends="build_rop_ppn_jaxb">
 	<javac
 		srcdir="${src}"
 		destdir="${build}"
@@ -521,6 +521,10 @@ Class-Path: ${manifest.pathlist}</echo>
 
 <target name="jar_waters_jaxb">
   <ant dir="${waters.dir}" target="jaxb-jar" inheritAll="false"/>
+</target>
+
+<target name="build_rop_ppn_jaxb" description="builds rop_ppn">
+	<ant dir="schema/" target="gen_manufacturingtables_rop_ppn" inheritAll="false"/>
 </target>
 
 <target name="cpp_waters">
