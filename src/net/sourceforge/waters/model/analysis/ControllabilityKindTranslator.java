@@ -2,9 +2,9 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.model.analysis
-//# CLASS:   LanguageInclusionKindTranslator
+//# CLASS:   ControllabilityKindTranslator
 //###########################################################################
-//# $Id: LanguageInclusionKindTranslator.java,v 1.2 2007-06-05 13:23:52 robi Exp $
+//# $Id: ControllabilityKindTranslator.java,v 1.1 2007-06-05 13:23:52 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -26,20 +26,20 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * @author Robi Malik
  */
 
-public class LanguageInclusionKindTranslator implements KindTranslator
+public class ControllabilityKindTranslator implements KindTranslator
 {
 
   //#########################################################################
   //# Singleton Implementation
-  public static LanguageInclusionKindTranslator getInstance()
+  public static ControllabilityKindTranslator getInstance()
   {
     if (theInstance == null) {
-      theInstance = new LanguageInclusionKindTranslator();
+      theInstance = new ControllabilityKindTranslator();
     }
     return theInstance;
   }
 
-  private LanguageInclusionKindTranslator()
+  private ControllabilityKindTranslator()
   {
   }
 
@@ -47,21 +47,20 @@ public class LanguageInclusionKindTranslator implements KindTranslator
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.KindTranslator
   /**
-   * Returns the component kind of the given automaton in a language
-   * inclusion check.
+   * Returns the component kind of the given automaton in a controllability
+   * check.
    * @return {@link ComponentKind#PLANT}, if the given automaton is
-   *         a plant, spec, or supervisor, or {@link ComponentKind#SPEC} if
-   *         the given automaton is a property.
+   *         a plant, or {@link ComponentKind#SPEC} if the
+   *         given automaton is a spec or supervisor.
    */
   public ComponentKind getComponentKind(final AutomatonProxy aut)
   {
     final ComponentKind kind = aut.getKind();
     switch (kind) {
     case PLANT:
+      return ComponentKind.PLANT;
     case SPEC:
     case SUPERVISOR:
-      return ComponentKind.PLANT;
-    case PROPERTY:
       return ComponentKind.SPEC;
     default:
       return kind;
@@ -75,19 +74,12 @@ public class LanguageInclusionKindTranslator implements KindTranslator
    */
   public EventKind getEventKind(final EventProxy event)
   {
-    final EventKind kind = event.getKind();
-    switch (kind) {
-    case CONTROLLABLE:
-    case UNCONTROLLABLE:
-      return EventKind.UNCONTROLLABLE;
-    default:
-      return kind;
-    }
+    return event.getKind();
   }
 
 
   //#########################################################################
   //# Static Class Variables
-  private static LanguageInclusionKindTranslator theInstance;
+  private static ControllabilityKindTranslator theInstance;
 
 }

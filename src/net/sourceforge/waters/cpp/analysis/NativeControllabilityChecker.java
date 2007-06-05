@@ -4,13 +4,13 @@
 //# PACKAGE: net.sourceforge.waters.cpp.analysis
 //# CLASS:   NativeControllabilityChecker
 //###########################################################################
-//# $Id: NativeControllabilityChecker.java,v 1.4 2006-11-03 05:18:28 robi Exp $
+//# $Id: NativeControllabilityChecker.java,v 1.5 2007-06-05 13:23:52 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.cpp.analysis;
 
 import net.sourceforge.waters.model.analysis.ControllabilityChecker;
-import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
+import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -34,7 +34,7 @@ public class NativeControllabilityChecker
   public NativeControllabilityChecker(final ProductDESProxy model,
 				      final ProductDESProxyFactory factory)
   {
-    super(model, IdenticalKindTranslator.getInstance(), factory);
+    super(model, ControllabilityKindTranslator.getInstance(), factory);
   }
 
 }

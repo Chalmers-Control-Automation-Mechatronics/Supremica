@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   DocumentManager
 //###########################################################################
-//# $Id: DocumentManager.java,v 1.10 2007-06-04 14:42:13 robi Exp $
+//# $Id: DocumentManager.java,v 1.11 2007-06-05 13:23:52 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -42,7 +42,7 @@ import net.sourceforge.waters.model.unchecked.Casting;
  *
  * <P>The caching mechanism provides some protection against modification
  * of external files through third parties. Whenever a document is found in
- * the cache, it is checked, whether the external file has been changed
+ * the cache, it is checked whether the external file has been changed
  * after the document was loaded, and if so, it is reloaded from the
  * modified file.</P>
  *
