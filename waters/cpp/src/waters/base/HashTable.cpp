@@ -4,7 +4,7 @@
 //# PACKAGE: waters.base
 //# CLASS:   HashTable
 //###########################################################################
-//# $Id: HashTable.cpp,v 1.5 2006-09-03 06:38:42 robi Exp $
+//# $Id: HashTable.cpp,v 1.6 2007-06-05 15:09:36 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -68,6 +68,7 @@ public:
   //#########################################################################
   //# Recycling
   void rehash(UntypedHashTable* table);
+  void deleteChain();
 
 private:
   //#########################################################################
@@ -98,7 +99,9 @@ HashOverflowBucket(HashOverflowBucket* next)
 HashOverflowBucket::
 ~HashOverflowBucket()
 {
-  delete mNextBucket;
+  if (mNextBucket) {
+    mNextBucket->deleteChain();
+  }
 }
 
 
@@ -146,6 +149,23 @@ rehash(UntypedHashTable* table)
     if (!accessor->isLink(value)) {
       table->add(value);
     }
+  }
+}
+
+/**
+ * Deletes the chain of hash overflow buckets iteratively, to avoid
+ * stack overflow for long lists. This method works like a call to the
+ * destructor (but it does not work for NULL objects).
+ */
+void HashOverflowBucket::
+deleteChain()
+{
+  HashOverflowBucket* victim = this;
+  while (victim) {
+    HashOverflowBucket* next = victim->mNextBucket;
+    victim->mNextBucket = 0;
+    delete victim;
+    victim = next;
   }
 }
 

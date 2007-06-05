@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   AutomatonEncoding
 //###########################################################################
-//# $Id: AutomatonEncoding.cpp,v 1.9 2006-11-29 22:20:16 robi Exp $
+//# $Id: AutomatonEncoding.cpp,v 1.10 2007-06-05 15:09:36 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__

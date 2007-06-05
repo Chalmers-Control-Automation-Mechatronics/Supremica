@@ -4,7 +4,7 @@
 //# PACKAGE: waters.analysis
 //# CLASS:   SafetyVerifier
 //###########################################################################
-//# $Id: SafetyVerifier.cpp,v 1.11 2007-04-18 03:45:53 robi Exp $
+//# $Id: SafetyVerifier.cpp,v 1.12 2007-06-05 15:09:36 robi Exp $
 //###########################################################################
 
 #ifdef __GNUG__
@@ -344,7 +344,6 @@ checkProperty()
       mDepthMap->add(nextlevel);
     }
   }
-
   return true;
 }
 
