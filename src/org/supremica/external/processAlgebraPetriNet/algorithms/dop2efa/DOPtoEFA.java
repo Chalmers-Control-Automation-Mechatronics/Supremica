@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.Iterator;
 
 import org.supremica.external.iec61499fb2efa.*;
-import org.supremica.manufacturingTables.xsd.rop.*;
+import org.supremica.manufacturingTables.xsd.rop_ppn.*;
 
 /**
  * @author David Millares
