@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="mazes" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="incre"/>
+        <EventDecl Kind="CONTROLLABLE" Name="decre"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT">
+            <SimpleIdentifier Name="calc"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="zero">
+                        <PointGeometry>
+                            <Point Y="176" X="112"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="nonzero">
+                        <PointGeometry>
+                            <Point Y="176" X="272"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="nonzero" Source="zero">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="incre"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="176" X="112"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="141" X="191"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="176" X="272"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <SimpleIdentifier Name="true"/>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="x"/>
+                                    <IntConstant Value="10"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="zero" Source="nonzero">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="decre"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="176" X="272"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="202" X="192"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="176" X="112"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <SimpleIdentifier Name="x"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="x"/>
+                                    <IntConstant Value="0"/>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Target="nonzero" Source="nonzero">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="decre"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="176" X="272"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="141" X="328"/>
+                        </SplineGeometry>
+                        <EndPointGeometry>
+                            <Point Y="176" X="272"/>
+                        </EndPointGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&gt;">
+                                    <SimpleIdentifier Name="x"/>
+                                    <IntConstant Value="1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="x"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="x"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Actions>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>
+
