@@ -2,11 +2,12 @@
 
 <Module xmlns="http://waters.sourceforge.net/xsd/module"
         Name="small_factory_n">
-<ParameterList>
-  <SimpleParameter Name="n">
+<ConstantAliasList>
+  <ConstantAlias Scope="REQUIRED_PARAMETER">
+    <SimpleIdentifier Name="n"/>
     <IntConstant Value="2"/>
-  </SimpleParameter>
-</ParameterList>
+  </ConstantAlias>
+</ConstantAliasList>
 <EventDeclList>
   <EventDecl Name="start" Kind="CONTROLLABLE">
     <BinaryExpression Operator="..">

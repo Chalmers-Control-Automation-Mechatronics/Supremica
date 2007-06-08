@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="key_norock" xmlns="http://waters.sourceforge.net/xsd/module">
-<ParameterList>
-<EventParameter Kind="UNCONTROLLABLE" Name="enter"/>
-<EventParameter Kind="UNCONTROLLABLE" Name="pickup"/>
-<EventParameter Kind="UNCONTROLLABLE" Name="exit"/>
-</ParameterList>
+<EventDeclList>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="enter"/>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="pickup"/>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="exit"/>
+</EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="key_norock"/>

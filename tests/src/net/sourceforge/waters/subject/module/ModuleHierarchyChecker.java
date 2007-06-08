@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ModuleHierarchyChecker
 //###########################################################################
-//# $Id: ModuleHierarchyChecker.java,v 1.5 2007-01-03 00:49:08 robi Exp $
+//# $Id: ModuleHierarchyChecker.java,v 1.6 2007-06-08 10:45:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -23,7 +23,6 @@ import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
-import net.sourceforge.waters.model.module.EventParameterProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
@@ -40,7 +39,6 @@ import net.sourceforge.waters.model.module.PointGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.model.module.SimpleParameterProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
@@ -169,16 +167,6 @@ class ModuleHierarchyChecker
     return null;
   }
 
-  public Object visitEventParameterProxy
-      (final EventParameterProxy proxy)
-    throws VisitorException
-  {
-    visitParameterProxy(proxy);
-    final EventDeclProxy decl = proxy.getEventDecl();
-    visitProxyChild(decl, proxy);
-    return null;
-  }
-
   public Object visitForeachProxy
       (final ForeachProxy proxy)
     throws VisitorException
@@ -279,10 +267,7 @@ class ModuleHierarchyChecker
   {
     final ModuleSubject subject = (ModuleSubject) proxy;
     visitDocumentProxy(proxy);
-    final Collection<ParameterSubject> parameters =
-      subject.getParameterListModifiable();
-    visitProxyCollectionChild(parameters, proxy);
-    final Collection<AliasSubject> constants =
+    final Collection<ConstantAliasSubject> constants =
       subject.getConstantAliasListModifiable();
     visitProxyCollectionChild(constants, proxy);
     final Collection<EventDeclSubject> events =
@@ -314,16 +299,6 @@ class ModuleHierarchyChecker
     visitComponentProxy(proxy);
     final GraphProxy graph = proxy.getGraph();
     visitProxyChild(graph, proxy);
-    return null;
-  }
-
-  public Object visitSimpleParameterProxy
-      (final SimpleParameterProxy proxy)
-    throws VisitorException
-  {
-    visitParameterProxy(proxy);
-    final SimpleExpressionProxy defaultValue = proxy.getDefaultValue();
-    visitProxyChild(defaultValue, proxy);
     return null;
   }
 

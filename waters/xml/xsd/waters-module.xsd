@@ -23,7 +23,6 @@
     <xs:complexContent>
       <xs:extension base="B:DocumentType">
         <xs:sequence>
-          <xs:element ref="M:ParameterList" minOccurs="0"/>
           <xs:element ref="M:ConstantAliasList" minOccurs="0"/>
           <xs:element ref="M:EventDeclList" minOccurs="0"/>
           <xs:element ref="M:EventAliasList" minOccurs="0"/>
@@ -39,53 +38,16 @@
 <!-- Parameters                                                           -->
 <!-- ==================================================================== -->
 
-<xs:element name="ParameterList">
-  <xs:complexType>
-    <xs:complexContent>
-      <xs:extension base="B:ElementType">
-        <xs:sequence>
-          <xs:group ref="M:ParameterListEntry" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="List"/>
-            </xs:appinfo></xs:annotation>
-          </xs:group>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-</xs:element>
-
-<xs:group name="ParameterListEntry">
-  <xs:choice>
-    <xs:element ref="M:SimpleParameter"/>
-    <xs:element ref="M:EventParameter"/>
-  </xs:choice>
-</xs:group>
-
-<xs:element name="SimpleParameter">
-  <xs:complexType>
-    <xs:complexContent>
-      <xs:extension base="B:NamedType">
-        <xs:group ref="M:ArithmeticExpression">
-          <xs:annotation><xs:appinfo>
-            <jaxb:property name="Default"/>
-          </xs:appinfo></xs:annotation>
-        </xs:group>
-        <xs:attribute name="Required" type="xs:boolean" default="true"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-</xs:element>
-
-<xs:element name="EventParameter">
-  <xs:complexType>
-    <xs:complexContent>
-      <xs:extension base="M:EventBaseType">
-        <xs:attribute name="Required" type="xs:boolean" default="true"/>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-</xs:element>
+<xs:simpleType name="ScopeKind">
+  <xs:annotation><xs:appinfo>
+    <jaxb:typesafeEnumClass/>
+  </xs:appinfo></xs:annotation>
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="LOCAL"/>
+    <xs:enumeration value="OPTIONAL_PARAMETER"/>
+    <xs:enumeration value="REQUIRED_PARAMETER"/>
+  </xs:restriction>
+</xs:simpleType>
 
 
 <!-- ==================================================================== -->
@@ -119,6 +81,7 @@
             </xs:appinfo></xs:annotation>
           </xs:group>
         </xs:sequence>
+        <xs:attribute name="Scope" type="M:ScopeKind" default="LOCAL"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -199,28 +162,24 @@
 <xs:element name="EventDecl">
   <xs:complexType>
     <xs:complexContent>
-      <xs:extension base="M:EventBaseType"/>
+      <xs:extension base="B:NamedType">
+        <xs:sequence>
+          <xs:group ref="M:RangeExpression"
+                    minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation><xs:appinfo>
+              <jaxb:property name="Ranges"/>
+            </xs:appinfo></xs:annotation>
+          </xs:group>
+          <xs:element name="Comment" type="xs:string" minOccurs="0"/>
+          <xs:element ref="M:ColorGeometry" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="Kind" type="B:EventKind" use="required"/>
+        <xs:attribute name="Observable" type="xs:boolean" default="true"/>
+        <xs:attribute name="Scope" type="M:ScopeKind" default="LOCAL"/>
+      </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 </xs:element>
-
-<xs:complexType name="EventBaseType">
-  <xs:complexContent>
-    <xs:extension base="B:NamedType">
-      <xs:sequence>
-        <xs:group ref="M:RangeExpression" minOccurs="0" maxOccurs="unbounded">
-          <xs:annotation><xs:appinfo>
-            <jaxb:property name="Ranges"/>
-          </xs:appinfo></xs:annotation>
-        </xs:group>
-        <xs:element name="Comment" type="xs:string" minOccurs="0"/>
-        <xs:element ref="M:ColorGeometry" minOccurs="0"/>
-      </xs:sequence>
-      <xs:attribute name="Kind" type="B:EventKind" use="required"/>
-      <xs:attribute name="Observable" type="xs:boolean" default="true"/>
-    </xs:extension>
-  </xs:complexContent>
-</xs:complexType>
 
 
 <!-- ==================================================================== -->

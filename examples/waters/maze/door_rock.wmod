@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="door_rock" xmlns="http://waters.sourceforge.net/xsd/module">
-<ParameterList>
-<EventParameter Kind="UNCONTROLLABLE" Name="enter"/>
-<EventParameter Kind="UNCONTROLLABLE" Name="crush"/>
-<EventParameter Kind="UNCONTROLLABLE" Name="exit"/>
-<EventParameter Kind="UNCONTROLLABLE" Name="clear"/>
-<EventParameter Kind="UNCONTROLLABLE" Name="unlock"/>
-</ParameterList>
+<EventDeclList>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="enter"/>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="crush"/>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="exit"/>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="clear"/>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="unlock"/>
+</EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="door_rock"/>

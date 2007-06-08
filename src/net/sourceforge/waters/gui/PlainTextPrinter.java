@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   HTMLPrinter
 //###########################################################################
-//# $Id: PlainTextPrinter.java,v 1.2 2006-11-03 15:01:56 torda Exp $
+//# $Id: PlainTextPrinter.java,v 1.3 2007-06-08 10:45:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -16,7 +16,6 @@ import java.util.List;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.EventParameterProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -24,7 +23,6 @@ import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.SimpleParameterProxy;
 import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
 
 
@@ -78,17 +76,6 @@ public class PlainTextPrinter
     return null;
   }
 
-  public Object visitEventParameterProxy
-    (final EventParameterProxy proxy)
-    throws VisitorException
-  {
-    print(proxy.getName());
-    if (proxy.isRequired()) {
-      print(" (required)");
-    }
-    return null;
-  }
-
   public Object visitForeachProxy
       (final ForeachProxy proxy)
     throws VisitorException
@@ -134,20 +121,6 @@ public class PlainTextPrinter
   {
     final IdentifierProxy identifier = proxy.getIdentifier();
     identifier.acceptVisitor(this);
-    return null;
-  }
-
-  public Object visitSimpleParameterProxy
-    (final SimpleParameterProxy proxy)
-    throws VisitorException
-  {
-    print(proxy.getName());
-    print(" = ");
-    final SimpleExpressionProxy defaultValue = proxy.getDefaultValue();
-    defaultValue.acceptVisitor(this);
-    if (proxy.isRequired()) {
-      print(" (required)");
-    }
     return null;
   }
 

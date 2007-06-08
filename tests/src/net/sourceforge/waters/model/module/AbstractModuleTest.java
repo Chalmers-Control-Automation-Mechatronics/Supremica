@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   AbstractModuleTest
 //###########################################################################
-//# $Id: AbstractModuleTest.java,v 1.10 2007-02-28 00:03:24 robi Exp $
+//# $Id: AbstractModuleTest.java,v 1.11 2007-06-08 10:45:20 robi Exp $
 //###########################################################################
 
 
@@ -261,7 +261,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     final List<SimpleComponentProxy> compList =
       Collections.singletonList(comp);
     final ModuleProxy module = factory.createModuleProxy
-      (modname, null, null, null, null, null, null, compList);
+      (modname, null, null, null, null, null, compList);
 
     testHandcraft("handwritten", module);
   }
@@ -297,7 +297,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     final List<SimpleComponentProxy> compList =
       Collections.singletonList(comp);
     final ModuleProxy module = factory.createModuleProxy
-      (modname, null, null, null, null, null, null, compList);
+      (modname, null, null, null, null, null, compList);
 
     testHandcraft("handwritten", module);
   }
@@ -357,7 +357,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     final List<SimpleComponentProxy> compList =
       Collections.singletonList(comp);
     final ModuleProxy module = factory.createModuleProxy
-      (modname, null, null, null, null, eventList, null, compList);
+      (modname, null, null, null, eventList, null, compList);
 
     testHandcraft("handwritten", module);
   }

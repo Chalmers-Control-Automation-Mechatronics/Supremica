@@ -4,14 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ModuleConstantAliasListHandler
 //###########################################################################
-//# $Id: ModuleConstantAliasListHandler.java,v 1.3 2006-07-20 02:28:37 robi Exp $
+//# $Id: ModuleConstantAliasListHandler.java,v 1.4 2007-06-08 10:45:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.util.List;
 
-import net.sourceforge.waters.model.module.AliasProxy;
+import net.sourceforge.waters.model.module.ConstantAliasProxy;
 
 import net.sourceforge.waters.xsd.module.ConstantAliasList;
 import net.sourceforge.waters.xsd.module.Module;
@@ -19,7 +19,7 @@ import net.sourceforge.waters.xsd.module.ObjectFactory;
 
 
 class ModuleConstantAliasListHandler
-  extends JAXBListHandler<Module,ConstantAliasList,AliasProxy>
+  extends JAXBListHandler<Module,ConstantAliasList,ConstantAliasProxy>
 {
 
 

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   HTMLPrinter
 //###########################################################################
-//# $Id: HTMLPrinter.java,v 1.3 2006-11-03 15:01:56 torda Exp $
+//# $Id: HTMLPrinter.java,v 1.4 2007-06-08 10:45:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -18,7 +18,6 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.EventParameterProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -26,7 +25,6 @@ import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.SimpleParameterProxy;
 import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
 
 
@@ -97,19 +95,6 @@ public class HTMLPrinter
     return null;
   }
 
-  public Object visitEventParameterProxy
-    (final EventParameterProxy proxy)
-    throws VisitorException
-  {
-    print("<I>");
-    print(proxy.getName());
-    print("</I>");
-    if (proxy.isRequired()) {
-      print(" (required)");
-    }
-    return null;
-  }
-
   public Object visitForeachProxy
       (final ForeachProxy proxy)
     throws VisitorException
@@ -157,21 +142,6 @@ public class HTMLPrinter
   {
     final IdentifierProxy identifier = proxy.getIdentifier();
     identifier.acceptVisitor(this);
-    return null;
-  }
-
-  public Object visitSimpleParameterProxy
-    (final SimpleParameterProxy proxy)
-    throws VisitorException
-  {
-    print("<I>");
-    print(proxy.getName());
-    print("</I> = ");
-    final SimpleExpressionProxy defaultValue = proxy.getDefaultValue();
-    defaultValue.acceptVisitor(this);
-    if (proxy.isRequired()) {
-      print(" (required)");
-    }
     return null;
   }
 

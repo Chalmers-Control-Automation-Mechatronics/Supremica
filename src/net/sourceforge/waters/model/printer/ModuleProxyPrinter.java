@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.printer
 //# CLASS:   ModuleProxyPrinter
 //###########################################################################
-//# $Id: ModuleProxyPrinter.java,v 1.11 2007-04-23 02:51:11 robi Exp $
+//# $Id: ModuleProxyPrinter.java,v 1.12 2007-06-08 10:45:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.printer;
@@ -27,11 +27,12 @@ import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
+import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
+import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
-import net.sourceforge.waters.model.module.EventParameterProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachComponentProxy;
 import net.sourceforge.waters.model.module.ForeachEventAliasProxy;
@@ -50,14 +51,12 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.model.module.ParameterProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.model.module.SimpleParameterProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
@@ -68,6 +67,7 @@ import net.sourceforge.waters.model.module.BooleanConstantProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.AnchorPosition;
+import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
 public class ModuleProxyPrinter
@@ -212,6 +212,15 @@ public class ModuleProxyPrinter
     return visitIdentifiedProxy(proxy);
   }
 
+  public Object visitConstantAliasProxy(final ConstantAliasProxy proxy)
+    throws VisitorException
+  {
+    visitAliasProxy(proxy);
+    final ScopeKind scope = proxy.getScope();
+    print(scope);
+    return null;
+  }
+
   public Object visitEdgeProxy
       (final EdgeProxy proxy)
     throws VisitorException
@@ -250,6 +259,12 @@ public class ModuleProxyPrinter
     return null;
   }
 
+  public Object visitEventAliasProxy(final EventAliasProxy proxy)
+    throws VisitorException
+  {
+    return visitAliasProxy(proxy);
+  }
+
   public Object visitEventDeclProxy
       (final EventDeclProxy proxy)
     throws VisitorException
@@ -268,6 +283,8 @@ public class ModuleProxyPrinter
       expr.acceptVisitor(this);
       print(']');
     }
+    final ScopeKind scope = proxy.getScope();
+    print(scope);
     return null;
   }
 
@@ -276,15 +293,6 @@ public class ModuleProxyPrinter
     throws VisitorException
   {
     printEmptyCollection(proxy.getEventList());
-    return null;
-  }
-
-  public Object visitEventParameterProxy
-      (final EventParameterProxy proxy)
-    throws VisitorException
-  {
-    visitParameterProxy(proxy);
-    visitEventDeclProxy(proxy.getEventDecl());
     return null;
   }
 
@@ -475,8 +483,7 @@ public class ModuleProxyPrinter
     print("MODULE ");
     print(proxy.getName());
     println(" {");
-    printCollection("PARAMETERS", proxy.getParameterList());
-    printCollection("ALIASES", proxy.getConstantAliasList());
+    printCollection("CONSTANTS", proxy.getConstantAliasList());
     printCollection("EVENTS", proxy.getEventDeclList());
     printCollection("ALIASES", proxy.getEventAliasList());
     printCollection("COMPONENTS", proxy.getComponentList());
@@ -505,18 +512,6 @@ public class ModuleProxyPrinter
     print(" = ");
     final ExpressionProxy expression = proxy.getExpression();
     expression.acceptVisitor(this);
-    return null;
-  }
-
-  public Object visitParameterProxy
-      (final ParameterProxy proxy)
-    throws VisitorException
-  {
-    if (proxy.isRequired()) {
-      print("required ");
-    } else {
-      print("optional ");
-    }
     return null;
   }
 
@@ -587,18 +582,6 @@ public class ModuleProxyPrinter
     return null;
   }
 
-  public Object visitSimpleParameterProxy
-    (final SimpleParameterProxy proxy)
-    throws VisitorException
-  {
-    visitParameterProxy(proxy);
-    print(proxy.getName());
-    print(" = ");
-    final SimpleExpressionProxy defaultValue = proxy.getDefaultValue();
-    defaultValue.acceptVisitor(this);
-    return null;
-  }
-
   public Object visitSplineGeometryProxy
       (final SplineGeometryProxy geo)
     throws VisitorException
@@ -651,6 +634,21 @@ public class ModuleProxyPrinter
 
   //#########################################################################
   //# Auxiliary Methods
+  private void print(final ScopeKind scope)
+    throws VisitorException
+  {
+    switch (scope) {
+    case OPTIONAL_PARAMETER:
+      print(" (optional parameter)");
+      break;
+    case REQUIRED_PARAMETER:
+      print(" (required parameter)");
+      break;
+    default:
+      break;
+    }
+  }
+
   private void print(final Point2D point)
     throws VisitorException
   {

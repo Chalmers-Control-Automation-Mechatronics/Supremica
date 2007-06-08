@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="exit_norock" xmlns="http://waters.sourceforge.net/xsd/module">
-<ParameterList>
-<EventParameter Kind="UNCONTROLLABLE" Name="enter"/>
-<EventParameter Kind="UNCONTROLLABLE" Name="escape"/>
-<EventParameter Kind="UNCONTROLLABLE" Name="exit"/>
-</ParameterList>
+<EventDeclList>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="enter"/>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="escape"/>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="exit"/>
+</EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="exit_norock"/>

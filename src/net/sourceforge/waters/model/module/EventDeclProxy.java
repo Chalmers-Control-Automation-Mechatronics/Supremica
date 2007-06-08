@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   EventDeclProxy
 //###########################################################################
-//# $Id: EventDeclProxy.java,v 1.8 2006-10-26 20:45:18 robi Exp $
+//# $Id: EventDeclProxy.java,v 1.9 2007-06-08 10:45:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -13,6 +13,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
 /**
@@ -67,6 +68,15 @@ public interface EventDeclProxy extends NamedProxy {
    */
   // @default true
   public boolean isObservable();
+
+  /**
+   * Gets the scope of this event declaration.
+   * @return One of {@link ScopeKind#LOCAL},
+   *         {@link ScopeKind#OPTIONAL_PARAMETER}, or
+   *         {@link ScopeKind#REQUIRED_PARAMETER}.
+   */
+  // @default ScopeKind.LOCAL
+  public ScopeKind getScope();
 
   /**
    * Gets the list of index ranges of this event declaration.

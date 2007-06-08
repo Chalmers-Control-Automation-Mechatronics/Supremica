@@ -1,75 +1,67 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="Passenger Land-Transportation System - From 'Supervising Passenger Land-Transportation Systems' by K.T. Seow et al." xmlns="http://waters.sourceforge.net/xsd/module">
-    <ParameterList>
-        <SimpleParameter Required="true" Name="n">
+    <ConstantAliasList>
+        <ConstantAlias Scope="REQUIRED_PARAMETER">
+            <SimpleIdentifier Name="n"/>
             <IntConstant Value="3"/>
-        </SimpleParameter>
-        <SimpleParameter Required="true" Name="m">
+        </ConstantAlias>
+        <ConstantAlias Scope="REQUIRED_PARAMETER">
+            <SimpleIdentifier Name="m"/>
             <IntConstant Value="4"/>
-        </SimpleParameter>
-    </ParameterList>
+        </ConstantAlias>
+    </ConstantAliasList>
     <EventDeclList>
-        <EventDecl Kind="CONTROLLABLE" Observable="true" Name="tstart"/>
-        <EventDecl Kind="CONTROLLABLE" Observable="true" Name="tstop"/>
-        <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="inj">
+        <EventDecl Kind="CONTROLLABLE" Name="tstart"/>
+        <EventDecl Kind="CONTROLLABLE" Name="tstop"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="inj">
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="n"/>
             </BinaryExpression>
         </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="outj">
+        <EventDecl Kind="UNCONTROLLABLE" Name="outj">
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="n"/>
             </BinaryExpression>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Observable="true" Name="st">
+        <EventDecl Kind="CONTROLLABLE" Name="st">
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="n"/>
             </BinaryExpression>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Observable="true" Name="end">
+        <EventDecl Kind="CONTROLLABLE" Name="end">
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="n"/>
             </BinaryExpression>
         </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="dwn">
+        <EventDecl Kind="UNCONTROLLABLE" Name="dwn">
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="n"/>
             </BinaryExpression>
         </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="ret">
+        <EventDecl Kind="UNCONTROLLABLE" Name="ret">
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="n"/>
             </BinaryExpression>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Observable="true" Name="ad">
+        <EventDecl Kind="CONTROLLABLE" Name="ad">
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="m"/>
             </BinaryExpression>
         </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="xx">
+        <EventDecl Kind="UNCONTROLLABLE" Name="xx">
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="m"/>
             </BinaryExpression>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Observable="true" Name="as">
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <SimpleIdentifier Name="m"/>
-            </BinaryExpression>
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <SimpleIdentifier Name="n"/>
-            </BinaryExpression>
-        </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Observable="true" Name="ras">
+        <EventDecl Kind="CONTROLLABLE" Name="as">
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="m"/>
@@ -79,13 +71,7 @@
                 <SimpleIdentifier Name="n"/>
             </BinaryExpression>
         </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="tout">
-            <BinaryExpression Operator="..">
-                <IntConstant Value="1"/>
-                <SimpleIdentifier Name="m"/>
-            </BinaryExpression>
-        </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Observable="true" Name="enter">
+        <EventDecl Kind="CONTROLLABLE" Name="ras">
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="m"/>
@@ -95,7 +81,13 @@
                 <SimpleIdentifier Name="n"/>
             </BinaryExpression>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Observable="true" Name="ecall">
+        <EventDecl Kind="UNCONTROLLABLE" Name="tout">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="1"/>
+                <SimpleIdentifier Name="m"/>
+            </BinaryExpression>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="enter">
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="m"/>
@@ -105,7 +97,7 @@
                 <SimpleIdentifier Name="n"/>
             </BinaryExpression>
         </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Observable="true" Name="leave">
+        <EventDecl Kind="CONTROLLABLE" Name="ecall">
             <BinaryExpression Operator="..">
                 <IntConstant Value="1"/>
                 <SimpleIdentifier Name="m"/>
@@ -115,7 +107,17 @@
                 <SimpleIdentifier Name="n"/>
             </BinaryExpression>
         </EventDecl>
-        <EventDecl Kind="PROPOSITION" Observable="true" Name=":accepting"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="leave">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="1"/>
+                <SimpleIdentifier Name="m"/>
+            </BinaryExpression>
+            <BinaryExpression Operator="..">
+                <IntConstant Value="1"/>
+                <SimpleIdentifier Name="n"/>
+            </BinaryExpression>
+        </EventDecl>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT">
@@ -133,7 +135,7 @@
                             <Point X="-21" Y="2"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="false" Name="a1">
+                    <SimpleNode Name="a1">
                         <PointGeometry>
                             <Point X="128" Y="48"/>
                         </PointGeometry>
@@ -203,7 +205,7 @@
                                     <Point X="5" Y="-24"/>
                                 </LabelGeometry>
                             </SimpleNode>
-                            <SimpleNode Initial="false" Name="b1">
+                            <SimpleNode Name="b1">
                                 <PointGeometry>
                                     <Point X="144" Y="240"/>
                                 </PointGeometry>
@@ -211,7 +213,7 @@
                                     <Point X="-18" Y="10"/>
                                 </LabelGeometry>
                             </SimpleNode>
-                            <SimpleNode Initial="false" Name="b2">
+                            <SimpleNode Name="b2">
                                 <PointGeometry>
                                     <Point X="224" Y="192"/>
                                 </PointGeometry>
@@ -317,7 +319,7 @@
                                     <Point X="-5" Y="12"/>
                                 </LabelGeometry>
                             </SimpleNode>
-                            <SimpleNode Initial="false" Name="c1">
+                            <SimpleNode Name="c1">
                                 <PointGeometry>
                                     <Point X="224" Y="128"/>
                                 </PointGeometry>
@@ -393,7 +395,7 @@
                                     <Point X="9" Y="-22"/>
                                 </LabelGeometry>
                             </SimpleNode>
-                            <SimpleNode Initial="false" Name="d1">
+                            <SimpleNode Name="d1">
                                 <PointGeometry>
                                     <Point X="112" Y="160"/>
                                 </PointGeometry>
@@ -401,7 +403,7 @@
                                     <Point X="13" Y="-14"/>
                                 </LabelGeometry>
                             </SimpleNode>
-                            <SimpleNode Initial="false" Name="d2">
+                            <SimpleNode Name="d2">
                                 <PointGeometry>
                                     <Point X="64" Y="224"/>
                                 </PointGeometry>
@@ -409,7 +411,7 @@
                                     <Point X="-25" Y="-8"/>
                                 </LabelGeometry>
                             </SimpleNode>
-                            <SimpleNode Initial="false" Name="d3">
+                            <SimpleNode Name="d3">
                                 <PointGeometry>
                                     <Point X="240" Y="192"/>
                                 </PointGeometry>
@@ -643,7 +645,7 @@
                                             <Point X="14" Y="-15"/>
                                         </LabelGeometry>
                                     </SimpleNode>
-                                    <SimpleNode Initial="false" Name="e1">
+                                    <SimpleNode Name="e1">
                                         <PointGeometry>
                                             <Point X="176" Y="160"/>
                                         </PointGeometry>
@@ -727,7 +729,7 @@
                                     <Point X="-25" Y="-2"/>
                                 </LabelGeometry>
                             </SimpleNode>
-                            <SimpleNode Initial="false" Name="f1">
+                            <SimpleNode Name="f1">
                                 <PointGeometry>
                                     <Point X="192" Y="176"/>
                                 </PointGeometry>
@@ -735,7 +737,7 @@
                                     <Point X="-15" Y="9"/>
                                 </LabelGeometry>
                             </SimpleNode>
-                            <SimpleNode Initial="false" Name="f2">
+                            <SimpleNode Name="f2">
                                 <PointGeometry>
                                     <Point X="288" Y="176"/>
                                 </PointGeometry>
@@ -867,7 +869,7 @@
                                     <Point X="5" Y="20"/>
                                 </LabelGeometry>
                             </SimpleNode>
-                            <SimpleNode Initial="false" Name="g1">
+                            <SimpleNode Name="g1">
                                 <PointGeometry>
                                     <Point X="288" Y="176"/>
                                 </PointGeometry>
@@ -963,7 +965,7 @@
                                     <Point X="10" Y="-7"/>
                                 </LabelGeometry>
                             </SimpleNode>
-                            <SimpleNode Initial="false" Name="h1">
+                            <SimpleNode Name="h1">
                                 <PointGeometry>
                                     <Point X="208" Y="192"/>
                                 </PointGeometry>
@@ -971,7 +973,7 @@
                                     <Point X="-21" Y="-7"/>
                                 </LabelGeometry>
                             </SimpleNode>
-                            <SimpleNode Initial="false" Name="h2">
+                            <SimpleNode Name="h2">
                                 <PointGeometry>
                                     <Point X="272" Y="192"/>
                                 </PointGeometry>
@@ -1168,7 +1170,7 @@
                                     <Point X="4" Y="-21"/>
                                 </LabelGeometry>
                             </SimpleNode>
-                            <SimpleNode Initial="false" Name="i1">
+                            <SimpleNode Name="i1">
                                 <PointGeometry>
                                     <Point X="304" Y="192"/>
                                 </PointGeometry>
@@ -1176,7 +1178,7 @@
                                     <Point X="2" Y="-21"/>
                                 </LabelGeometry>
                             </SimpleNode>
-                            <SimpleNode Initial="false" Name="i2">
+                            <SimpleNode Name="i2">
                                 <PointGeometry>
                                     <Point X="400" Y="320"/>
                                 </PointGeometry>
@@ -1184,7 +1186,7 @@
                                     <Point X="5" Y="4"/>
                                 </LabelGeometry>
                             </SimpleNode>
-                            <SimpleNode Initial="false" Name="i3">
+                            <SimpleNode Name="i3">
                                 <PointGeometry>
                                     <Point X="528" Y="320"/>
                                 </PointGeometry>
@@ -1192,7 +1194,7 @@
                                     <Point X="-17" Y="3"/>
                                 </LabelGeometry>
                             </SimpleNode>
-                            <SimpleNode Initial="false" Name="i4">
+                            <SimpleNode Name="i4">
                                 <PointGeometry>
                                     <Point X="608" Y="192"/>
                                 </PointGeometry>
@@ -1836,7 +1838,7 @@
                                     <Point X="5" Y="20"/>
                                 </LabelGeometry>
                             </SimpleNode>
-                            <SimpleNode Initial="false" Name="j1">
+                            <SimpleNode Name="j1">
                                 <EventList>
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
@@ -1954,7 +1956,7 @@
                                     <Point X="1" Y="-22"/>
                                 </LabelGeometry>
                             </SimpleNode>
-                            <SimpleNode Initial="false" Name="k1">
+                            <SimpleNode Name="k1">
                                 <EventList>
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
@@ -2080,7 +2082,7 @@
                             <Point X="-24" Y="-4"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="false" Name="l1">
+                    <SimpleNode Name="l1">
                         <PointGeometry>
                             <Point X="176" Y="192"/>
                         </PointGeometry>
@@ -2088,7 +2090,7 @@
                             <Point X="-22" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="false" Name="l2">
+                    <SimpleNode Name="l2">
                         <PointGeometry>
                             <Point X="176" Y="256"/>
                         </PointGeometry>
@@ -2096,7 +2098,7 @@
                             <Point X="-22" Y="-4"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="false" Name="l3">
+                    <SimpleNode Name="l3">
                         <PointGeometry>
                             <Point X="176" Y="320"/>
                         </PointGeometry>
@@ -2104,7 +2106,7 @@
                             <Point X="-22" Y="-5"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Initial="false" Name="l4">
+                    <SimpleNode Name="l4">
                         <PointGeometry>
                             <Point X="176" Y="384"/>
                         </PointGeometry>

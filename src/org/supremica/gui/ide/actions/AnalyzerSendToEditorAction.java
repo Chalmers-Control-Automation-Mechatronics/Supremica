@@ -1,3 +1,13 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica IDE
+//# PACKAGE: org.supremica.gui.ide.actions
+//# CLASS:   AnalyzerSendToEditorAction
+//###########################################################################
+//# $Id: AnalyzerSendToEditorAction.java,v 1.7 2007-06-08 10:45:20 robi Exp $
+//###########################################################################
+
+
 package org.supremica.gui.ide.actions;
 
 import java.util.List;
@@ -6,21 +16,26 @@ import javax.swing.JOptionPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.ImageIcon;
+
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.xsd.module.ScopeKind;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.gui.ide.IDE;
 
+
 /**
- * A new action
+ * The action used to send an automaton from the analyser to the editor.
  */
+
 public class AnalyzerSendToEditorAction
     extends IDEAction
 {
@@ -76,9 +91,14 @@ public class AnalyzerSendToEditorAction
                         {
                             if (!module.getEventDeclListModifiable().containsName(event.getName()))
                             {
-                                EventProxy proxy = (EventProxy) event;
-                                EventDeclSubject eventDecl = new EventDeclSubject(proxy.getName(), proxy.getKind(), proxy.isObservable(), null, null);
-                                module.getEventDeclListModifiable().add(eventDecl);
+                                final EventProxy proxy = (EventProxy) event;
+                                final EventDeclSubject decl =
+									new EventDeclSubject(proxy.getName(),
+														 proxy.getKind(),
+														 proxy.isObservable(),
+														 ScopeKind.LOCAL,
+														 null, null);
+                                module.getEventDeclListModifiable().add(decl);
                             }
                         }
                         else

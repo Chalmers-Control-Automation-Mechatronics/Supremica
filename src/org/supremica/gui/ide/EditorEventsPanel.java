@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorEventsPanel
 //###########################################################################
-//# $Id: EditorEventsPanel.java,v 1.20 2007-01-30 08:51:28 flordal Exp $
+//# $Id: EditorEventsPanel.java,v 1.21 2007-06-08 10:45:20 robi Exp $
 //###########################################################################
 
 
@@ -75,13 +75,13 @@ class EditorEventsPanel
     public void addModuleEvent()
     {
         final EditorPanel panel = moduleContainer.getEditorPanel();
-        new EventEditorDialog(panel, false, false);
+        new EventEditorDialog(panel, false);
     }
     
     public void addComponentEvent()
     {
         final EditorPanel panel = moduleContainer.getEditorPanel();
-        new EventEditorDialog(panel, false, false);
+        new EventEditorDialog(panel, false);
     }
     
     class PopupListener extends MouseAdapter

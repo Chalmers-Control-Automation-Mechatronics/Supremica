@@ -4,22 +4,16 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainers
 //###########################################################################
-//# $Id: ModuleContainers.java,v 1.8 2007-02-07 18:03:58 flordal Exp $
+//# $Id: ModuleContainers.java,v 1.9 2007-06-08 10:45:20 robi Exp $
 //###########################################################################
 
 
 package org.supremica.gui.ide;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.module.AliasProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.model.module.ParameterProxy;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 
 
@@ -133,12 +127,7 @@ public class ModuleContainers
     public ModuleSubject createNewModuleSubject()
     {
         final String name = getNewModuleName("Module");
-        final Collection<ParameterProxy> pl = Collections.emptyList();
-        final Collection<AliasProxy> al = Collections.emptyList();
-        final Collection<EventDeclProxy> el = Collections.emptyList();
-        final Collection<Proxy> prl = Collections.emptyList();
-        final ModuleSubject newModule =
-            new ModuleSubject(name, null, null, pl, al, el, prl, prl);
+        final ModuleSubject newModule = new ModuleSubject(name, null);
         return newModule;
     }
     

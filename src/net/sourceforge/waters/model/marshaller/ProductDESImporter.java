@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ProductDESImporter
 //###########################################################################
-//# $Id: ProductDESImporter.java,v 1.7 2006-11-19 21:12:23 robi Exp $
+//# $Id: ProductDESImporter.java,v 1.8 2007-06-08 10:45:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -37,6 +37,7 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
 /**
@@ -143,7 +144,7 @@ public class ProductDESImporter
       comps.add(comp);
     }
     return mFactory.createModuleProxy
-      (name, comment, location, null, null, decls, null, comps);
+      (name, comment, location, null, decls, null, comps);
   }
 
   /**
@@ -247,7 +248,8 @@ public class ProductDESImporter
     final String name = event.getName();
     final EventKind kind = event.getKind();
     final boolean observable = event.isObservable();
-    return mFactory.createEventDeclProxy(name, kind, observable, null, null);
+    return mFactory.createEventDeclProxy
+      (name, kind, observable, ScopeKind.LOCAL, null, null);
   }
 
   private SimpleIdentifierProxy importEvent(final EventProxy event)

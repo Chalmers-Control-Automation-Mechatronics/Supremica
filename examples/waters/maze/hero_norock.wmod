@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="hero_norock" xmlns="http://waters.sourceforge.net/xsd/module">
-<ParameterList>
-<EventParameter Kind="UNCONTROLLABLE" Name="enter"/>
-<EventParameter Kind="UNCONTROLLABLE" Name="exit"/>
-</ParameterList>
+<EventDeclList>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="enter"/>
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="UNCONTROLLABLE" Name="exit"/>
+</EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="PLANT">
 <SimpleIdentifier Name="hero_norock"/>

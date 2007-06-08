@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.54 2007-05-29 12:19:51 flordal Exp $
+//# $Id: ModuleContainer.java,v 1.55 2007-06-08 10:45:20 robi Exp $
 //###########################################################################
 
 
@@ -51,10 +51,8 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
-import net.sourceforge.waters.subject.module.EventParameterSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.subject.module.ParameterSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -111,20 +109,7 @@ public class ModuleContainer implements UndoInterface
         final IndexedList<EventDeclSubject> decls =
             mModule.getEventDeclListModifiable();
         final EventDeclSubject decl = decls.get(name);
-        if (decl != null)
-        {
-            return decl.getKind();
-        }
-        final IndexedList<ParameterSubject> params =
-            mModule.getParameterListModifiable();
-        final ParameterSubject param = params.get(name);
-        if (param != null && param instanceof EventParameterSubject)
-        {
-            final EventParameterSubject eparam = (EventParameterSubject) param;
-            final EventDeclSubject edecl = eparam.getEventDecl();
-            return edecl.getKind();
-        }
-        return null;
+		return decl == null ? null : decl.getKind();
     }
     
     public void addStandardPropositions()

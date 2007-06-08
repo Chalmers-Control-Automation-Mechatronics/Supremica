@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   CompilerTest
 //###########################################################################
-//# $Id: CompilerTest.java,v 1.13 2007-03-02 05:21:14 robi Exp $
+//# $Id: CompilerTest.java,v 1.14 2007-06-08 10:45:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -35,14 +35,11 @@ import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
-import net.sourceforge.waters.model.module.AliasProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.model.module.ParameterProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
@@ -62,13 +59,8 @@ public class CompilerTest
     throws EvalException
   {
     final String name = "empty";
-    final List<ParameterProxy> paramList = Collections.emptyList();
-    final List<AliasProxy> aliasList = Collections.emptyList();
-    final List<EventDeclProxy> eventList = Collections.emptyList();
-    final List<Proxy> proxyList = Collections.emptyList();
     final ModuleProxy module = mModuleFactory.createModuleProxy
-      (name, null, null,
-       paramList, aliasList, eventList, proxyList, proxyList);
+      (name, null, null, null, null, null, null);
     final ProductDESProxy des = compile(module);
     assertTrue("Unexpected name!", des.getName().equals(name));
     assertTrue("Unexpected location!", des.getLocation() == null);
@@ -84,16 +76,10 @@ public class CompilerTest
     try {
       final SimpleIdentifierProxy ident =
         mModuleFactory.createSimpleIdentifierProxy(instname);
-      final List<ParameterBindingProxy> bindingList = Collections.emptyList();
       final InstanceProxy instance = mModuleFactory.createInstanceProxy
-        (ident, instname, bindingList);
-      final List<ParameterProxy> paramList = Collections.emptyList();
-      final List<AliasProxy> aliasList = Collections.emptyList();
-      final List<EventDeclProxy> eventList = Collections.emptyList();
-      final List<Proxy> proxyList = Collections.emptyList();
+        (ident, instname, null);
       final ModuleProxy module = mModuleFactory.createModuleProxy
-        (modname, null, null,
-         paramList, aliasList, eventList, proxyList,
+        (modname, null, null, null, null, null,
          Collections.singletonList(instance));
       compile(module);
       fail("Expected InstantiationException not caught!");

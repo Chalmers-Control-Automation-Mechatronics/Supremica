@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.30 2006-12-11 02:40:44 siw4 Exp $
+//# $Id: EditorEvents.java,v 1.31 2007-06-08 10:45:20 robi Exp $
 //###########################################################################
 
 
@@ -86,7 +86,7 @@ public class EditorEvents
 		final Dimension ispacing = new Dimension(0, 0);
 		final ExpressionParser parser = root.getExpressionParser();
 		mRoot = root;
-    mWindow = window;
+		mWindow = window;
 
 		setModel(model);
 		setTableHeader(null);

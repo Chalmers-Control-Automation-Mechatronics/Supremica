@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.analysis
 //# CLASS:   AbstractControllabilityCheckerTest
 //###########################################################################
-//# $Id: AbstractControllabilityCheckerTest.java,v 1.10 2007-05-26 11:29:22 robi Exp $
+//# $Id: AbstractControllabilityCheckerTest.java,v 1.11 2007-06-08 10:45:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.analysis;
@@ -145,6 +145,30 @@ public abstract class AbstractControllabilityCheckerTest
 
   //#########################################################################
   //# Test Cases --- tests
+  public void test_BallTimer() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "ball_sorter";
+    final String name = "ball_timer.wmod";
+    runModelVerifier(group, dir, name, true);
+  }
+
+  public void test_BallTimerUncont() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "ball_sorter";
+    final String name = "ball_timer_uncont.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
+  public void test_BallTSorter1() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "ball_sorter";
+    final String name = "robis_ball_sorter_attempt1.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
   public void test_Batchtank2005_amk14() throws Exception
   {
     final String group = "tests";

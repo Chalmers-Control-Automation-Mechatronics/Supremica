@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleExporter
 //###########################################################################
-//# $Id: JAXBModuleExporter.java,v 1.19 2007-02-28 00:03:24 robi Exp $
+//# $Id: JAXBModuleExporter.java,v 1.20 2007-06-08 10:45:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -32,11 +32,12 @@ import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
+import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
+import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
-import net.sourceforge.waters.model.module.EventParameterProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachComponentProxy;
 import net.sourceforge.waters.model.module.ForeachEventAliasProxy;
@@ -55,14 +56,12 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.model.module.ParameterProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.model.module.SimpleParameterProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.unchecked.Casting;
@@ -79,11 +78,9 @@ import net.sourceforge.waters.xsd.module.ConstantAlias;
 import net.sourceforge.waters.xsd.module.Edge;
 import net.sourceforge.waters.xsd.module.EnumSetExpression;
 import net.sourceforge.waters.xsd.module.EventAlias;
-import net.sourceforge.waters.xsd.module.EventBaseType;
 import net.sourceforge.waters.xsd.module.EventDecl;
 import net.sourceforge.waters.xsd.module.EventListExpression;
 import net.sourceforge.waters.xsd.module.EventListType;
-import net.sourceforge.waters.xsd.module.EventParameter;
 import net.sourceforge.waters.xsd.module.ExpressionType;
 import net.sourceforge.waters.xsd.module.ForeachComponent;
 import net.sourceforge.waters.xsd.module.ForeachEventAlias;
@@ -105,11 +102,11 @@ import net.sourceforge.waters.xsd.module.ObjectFactory;
 import net.sourceforge.waters.xsd.module.ParameterBinding;
 import net.sourceforge.waters.xsd.module.PointGeometryType;
 import net.sourceforge.waters.xsd.module.Point;
+import net.sourceforge.waters.xsd.module.ScopeKind;
 import net.sourceforge.waters.xsd.module.SimpleComponent;
 import net.sourceforge.waters.xsd.module.SimpleExpressionType;
 import net.sourceforge.waters.xsd.module.SimpleIdentifier;
 import net.sourceforge.waters.xsd.module.SimpleNode;
-import net.sourceforge.waters.xsd.module.SimpleParameter;
 import net.sourceforge.waters.xsd.module.SplineGeometry;
 import net.sourceforge.waters.xsd.module.SplineKind;
 import net.sourceforge.waters.xsd.module.UnaryExpression;
@@ -165,22 +162,10 @@ public class JAXBModuleExporter
   }
   //--------------------------------
 
-  public ElementType visitAliasProxy(final AliasProxy proxy)
+  public Object visitAliasProxy(final AliasProxy proxy)
     throws VisitorException
   {
-    final ExpressionProxy expr = proxy.getExpression();
-    if (expr instanceof SimpleExpressionProxy) {
-      final ConstantAlias element = mFactory.createConstantAlias();
-      copyConstantAliasProxy(proxy, element);
-      return element;
-    } else if (expr instanceof EventListExpressionProxy) {
-      final EventAlias element = mFactory.createEventAlias();
-      copyEventAliasProxy(proxy, element);
-      return element;
-    } else {
-      throw new ClassCastException
-        ("Unknown expression type in alias '" + proxy.getName() + "'!");
-    }
+    return visitIdentifiedProxy(proxy);
   }
 
   public BinaryExpression visitBinaryExpressionProxy
@@ -198,6 +183,14 @@ public class JAXBModuleExporter
   {
     final BoxGeometry element = mFactory.createBoxGeometry();
     copyBoxGeometryProxy(proxy, element);
+    return element;
+  }
+
+  public ElementType visitConstantAliasProxy(final ConstantAliasProxy proxy)
+    throws VisitorException
+  {
+    final ConstantAlias element = mFactory.createConstantAlias();
+    copyConstantAliasProxy(proxy, element);
     return element;
   }
 
@@ -245,6 +238,14 @@ public class JAXBModuleExporter
     return element;
   }
 
+  public ElementType visitEventAliasProxy(final EventAliasProxy proxy)
+    throws VisitorException
+  {
+    final EventAlias element = mFactory.createEventAlias();
+    copyEventAliasProxy(proxy, element);
+    return element;
+  }
+
   public EventDecl visitEventDeclProxy
       (final EventDeclProxy proxy)
     throws VisitorException
@@ -260,16 +261,6 @@ public class JAXBModuleExporter
   {
     return visitExpressionProxy(proxy);
   }
-
-  public EventParameter visitEventParameterProxy
-      (final EventParameterProxy proxy)
-    throws VisitorException
-  {
-    final EventParameter element = mFactory.createEventParameter();
-    copyEventParameterProxy(proxy, element);
-    return element;
-  }
-
 
   public Object visitExpressionProxy
       (final ExpressionProxy proxy)
@@ -423,13 +414,6 @@ public class JAXBModuleExporter
     return element;
   }
 
-  public Object visitParameterProxy
-      (final ParameterProxy proxy)
-    throws VisitorException
-  {
-    return visitNamedProxy(proxy);
-  }
-
   public EventListExpression visitPlainEventListProxy
       (final PlainEventListProxy proxy)
     throws VisitorException
@@ -479,15 +463,6 @@ public class JAXBModuleExporter
   {
     final SimpleNode element = mFactory.createSimpleNode();
     copySimpleNodeProxy(proxy, element);
-    return element;
-  }
-
-  public SimpleParameter visitSimpleParameterProxy
-      (final SimpleParameterProxy proxy)
-    throws VisitorException
-  {
-    final SimpleParameter element = mFactory.createSimpleParameter();
-    copySimpleParameterProxy(proxy, element);
     return element;
   }
 
@@ -649,7 +624,7 @@ public class JAXBModuleExporter
   }
 
   private void copyConstantAliasProxy
-      (final AliasProxy proxy,
+      (final ConstantAliasProxy proxy,
        final ConstantAlias element)
     throws VisitorException
   {
@@ -658,6 +633,10 @@ public class JAXBModuleExporter
     final SimpleExpressionType expressionElement =
       (SimpleExpressionType) expressionProxy.acceptVisitor(this);
     element.setExpression(expressionElement);
+    final ScopeKind scope = proxy.getScope();
+    if (scope != ScopeKind.LOCAL) {
+      element.setScope(scope);
+    }
   }
   
   private void copyEdgeProxy
@@ -721,7 +700,7 @@ public class JAXBModuleExporter
   }
 
   private void copyEventAliasProxy
-      (final AliasProxy proxy,
+      (final EventAliasProxy proxy,
        final EventAlias element)
     throws VisitorException
   {
@@ -734,13 +713,17 @@ public class JAXBModuleExporter
 
   private void copyEventDeclProxy
       (final EventDeclProxy proxy,
-       final EventBaseType element)
+       final EventDecl element)
     throws VisitorException
   {
     copyNamedProxy(proxy, element);
     element.setKind(proxy.getKind());
     if (!proxy.isObservable()) {
       element.setObservable(false);
+    }
+    final ScopeKind scope = proxy.getScope();
+    if (scope != ScopeKind.LOCAL) {
+      element.setScope(scope);
     }
     final List<SimpleExpressionProxy> rangesProxy = proxy.getRanges();
     final List<ElementType> rangesElement =
@@ -751,18 +734,6 @@ public class JAXBModuleExporter
       final ColorGeometry colorGeometryElement =
         visitColorGeometryProxy(colorGeometryProxy);
       element.setColorGeometry(colorGeometryElement);
-    }
-  }
-
-  private void copyEventParameterProxy
-      (final EventParameterProxy proxy,
-       final EventParameter element)
-    throws VisitorException
-  {
-    final EventDeclProxy eventDeclProxy = proxy.getEventDecl();
-    copyEventDeclProxy(eventDeclProxy, element);
-    if (!proxy.isRequired()) {
-      element.setRequired(false);
     }
   }
 
@@ -971,9 +942,7 @@ public class JAXBModuleExporter
     throws VisitorException
   {
     copyDocumentProxy(proxy, element);
-    final List<ParameterProxy> parameterListProxy = proxy.getParameterList();
-    mModuleParameterListHandler.toJAXB(this, parameterListProxy, element);
-    final List<AliasProxy> constantAliasListProxy =
+    final List<ConstantAliasProxy> constantAliasListProxy =
       proxy.getConstantAliasList();
     mModuleConstantAliasListHandler.toJAXB
       (this, constantAliasListProxy, element);
@@ -1008,14 +977,6 @@ public class JAXBModuleExporter
     final ExpressionType expressionElement =
       (ExpressionType) expressionProxy.acceptVisitor(this);
     element.setExpression(expressionElement);
-  }
-
-  private void copyParameterProxy
-      (final ParameterProxy proxy,
-       final NamedType element)
-    throws VisitorException
-  {
-    copyNamedProxy(proxy, element);
   }
 
   private void copyPlainEventListProxy
@@ -1099,19 +1060,6 @@ public class JAXBModuleExporter
         visitLabelGeometryProxy(labelGeometryProxy);
       element.setLabelGeometry(labelGeometryElement);
     }
-  }
-
-  private void copySimpleParameterProxy
-      (final SimpleParameterProxy proxy,
-       final SimpleParameter element)
-    throws VisitorException
-  {
-    copyParameterProxy(proxy, element);
-    element.setRequired(proxy.isRequired());
-    final SimpleExpressionProxy defaultValueProxy = proxy.getDefaultValue();
-    final SimpleExpressionType defaultValueElement =
-      (SimpleExpressionType) defaultValueProxy.acceptVisitor(this);
-    element.setDefault(defaultValueElement);
   }
 
   private void copySplineGeometryProxy
@@ -1248,8 +1196,5 @@ public class JAXBModuleExporter
   private static final ModuleEventDeclListHandler
     mModuleEventDeclListHandler =
     new ModuleEventDeclListHandler(mFactory);
-  private static final ModuleParameterListHandler
-    mModuleParameterListHandler =
-    new ModuleParameterListHandler(mFactory);
 
 }

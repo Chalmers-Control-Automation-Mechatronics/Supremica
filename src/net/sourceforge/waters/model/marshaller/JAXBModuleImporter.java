@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBModuleImporter
 //###########################################################################
-//# $Id: JAXBModuleImporter.java,v 1.22 2007-05-23 07:23:47 avenir Exp $
+//# $Id: JAXBModuleImporter.java,v 1.23 2007-06-08 10:45:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -32,15 +32,15 @@ import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.VariableProxy;
 import net.sourceforge.waters.model.module.BooleanConstantProxy;
 //-------------
-import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
+import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
+import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
-import net.sourceforge.waters.model.module.EventParameterProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachComponentProxy;
 import net.sourceforge.waters.model.module.ForeachEventAliasProxy;
@@ -57,14 +57,12 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.model.module.ParameterProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.model.module.SimpleParameterProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
@@ -81,10 +79,8 @@ import net.sourceforge.waters.xsd.module.ConstantAlias;
 import net.sourceforge.waters.xsd.module.Edge;
 import net.sourceforge.waters.xsd.module.EnumSetExpression;
 import net.sourceforge.waters.xsd.module.EventAlias;
-import net.sourceforge.waters.xsd.module.EventBaseType;
 import net.sourceforge.waters.xsd.module.EventDecl;
 import net.sourceforge.waters.xsd.module.EventListExpression;
-import net.sourceforge.waters.xsd.module.EventParameter;
 import net.sourceforge.waters.xsd.module.ExpressionType;
 import net.sourceforge.waters.xsd.module.ForeachComponent;
 import net.sourceforge.waters.xsd.module.ForeachEventAlias;
@@ -102,11 +98,11 @@ import net.sourceforge.waters.xsd.module.NodeRef;
 import net.sourceforge.waters.xsd.module.ParameterBinding;
 import net.sourceforge.waters.xsd.module.PointGeometryType;
 import net.sourceforge.waters.xsd.module.Point;
+import net.sourceforge.waters.xsd.module.ScopeKind;
 import net.sourceforge.waters.xsd.module.SimpleComponent;
 import net.sourceforge.waters.xsd.module.SimpleExpressionType;
 import net.sourceforge.waters.xsd.module.SimpleIdentifier;
 import net.sourceforge.waters.xsd.module.SimpleNode;
-import net.sourceforge.waters.xsd.module.SimpleParameter;
 import net.sourceforge.waters.xsd.module.SplineGeometry;
 import net.sourceforge.waters.xsd.module.SplineKind;
 import net.sourceforge.waters.xsd.module.UnaryExpression;
@@ -178,7 +174,7 @@ public class JAXBModuleImporter
     mHandlerMap.put
       (net.sourceforge.waters.xsd.module.Color.class, handler);
     handler = new ImportHandler() {
-      public AliasProxy importElement(final ElementType element)
+      public ConstantAliasProxy importElement(final ElementType element)
       {
         final ConstantAlias downcast = (ConstantAlias) element;
         return importConstantAlias(downcast);
@@ -239,7 +235,7 @@ public class JAXBModuleImporter
     mHandlerMap.put
       (net.sourceforge.waters.xsd.module.EnumSetExpression.class, handler);
     handler = new ImportHandler() {
-      public AliasProxy importElement(final ElementType element)
+      public EventAliasProxy importElement(final ElementType element)
       {
         final EventAlias downcast = (EventAlias) element;
         return importEventAlias(downcast);
@@ -266,15 +262,6 @@ public class JAXBModuleImporter
     };
     mHandlerMap.put
       (net.sourceforge.waters.xsd.module.EventListExpression.class, handler);
-    handler = new ImportHandler() {
-      public EventParameterProxy importElement(final ElementType element)
-      {
-        final EventParameter downcast = (EventParameter) element;
-        return importEventParameter(downcast);
-      }
-    };
-    mHandlerMap.put
-      (net.sourceforge.waters.xsd.module.EventParameter.class, handler);
     handler = new ImportHandler() {
       public ForeachComponentProxy importElement(final ElementType element)
       {
@@ -430,15 +417,6 @@ public class JAXBModuleImporter
     mHandlerMap.put
       (net.sourceforge.waters.xsd.module.SimpleNode.class, handler);
     handler = new ImportHandler() {
-      public SimpleParameterProxy importElement(final ElementType element)
-      {
-        final SimpleParameter downcast = (SimpleParameter) element;
-        return importSimpleParameter(downcast);
-      }
-    };
-    mHandlerMap.put
-      (net.sourceforge.waters.xsd.module.SimpleParameter.class, handler);
-    handler = new ImportHandler() {
       public SplineGeometryProxy importElement(final ElementType element)
       {
         final SplineGeometry downcast = (SplineGeometry) element;
@@ -541,7 +519,7 @@ public class JAXBModuleImporter
     }
   }
 
-  private AliasProxy importConstantAlias(final ConstantAlias element)
+  private ConstantAliasProxy importConstantAlias(final ConstantAlias element)
   {
     final IdentifierType identifierElement = element.getIdentifier();
     final IdentifierProxy identifier =
@@ -549,7 +527,8 @@ public class JAXBModuleImporter
     final ExpressionType expressionElement = element.getExpression();
     final ExpressionProxy expression =
       (ExpressionProxy) importElement(expressionElement);
-    return mFactory.createAliasProxy(identifier, expression);
+    final ScopeKind scope = element.getScope();
+    return mFactory.createConstantAliasProxy(identifier, expression, scope);
   }
   
   
@@ -671,7 +650,7 @@ public class JAXBModuleImporter
     return mFactory.createEnumSetExpressionProxy(text, items);
   }
 
-  private AliasProxy importEventAlias(final EventAlias element)
+  private EventAliasProxy importEventAlias(final EventAlias element)
   {
     final IdentifierType identifierElement = element.getIdentifier();
     final IdentifierProxy identifier =
@@ -679,14 +658,15 @@ public class JAXBModuleImporter
     final EventListExpression eventListElement = element.getExpression();
     final EventListExpressionProxy eventList =
       importPlainEventList(eventListElement);
-    return mFactory.createAliasProxy(identifier, eventList);
+    return mFactory.createEventAliasProxy(identifier, eventList);
   }
 
-  private EventDeclProxy importEventDecl(final EventBaseType element)
+  private EventDeclProxy importEventDecl(final EventDecl element)
   {
     final String name = element.getName();
     final EventKind kind = element.getKind();
     final boolean observable = element.isObservable();
+    final ScopeKind scope = element.getScope();
     final List<SimpleExpressionProxy> ranges =
       new LinkedList<SimpleExpressionProxy>();
     final List<SimpleExpressionType> rangesElement =
@@ -702,17 +682,9 @@ public class JAXBModuleImporter
     return mFactory.createEventDeclProxy(name,
                                          kind,
                                          observable,
+                                         scope,
                                          ranges,
                                          colorGeometry);
-  }
-
-  private EventParameterProxy importEventParameter
-    (final EventParameter element)
-  {
-    final String name = element.getName();
-    final boolean required = element.isRequired();
-    final EventDeclProxy eventDecl = importEventDecl(element);
-    return mFactory.createEventParameterProxy(name, required, eventDecl);
   }
 
   private ForeachComponentProxy importForeachComponent
@@ -897,10 +869,8 @@ public class JAXBModuleImporter
   {
     final String name = element.getName();
     final String comment = element.getComment();
-    final List<ParameterProxy> parameterList =
-      new LinkedList<ParameterProxy>();
-    mModuleParameterListHandler.fromJAXB(this, element, parameterList);
-    final List<AliasProxy> constantAliasList = new LinkedList<AliasProxy>();
+    final List<ConstantAliasProxy> constantAliasList =
+      new LinkedList<ConstantAliasProxy>();
     mModuleConstantAliasListHandler.fromJAXB(this, element, constantAliasList);
     final List<EventDeclProxy> eventDeclList =
       new LinkedList<EventDeclProxy>();
@@ -912,7 +882,6 @@ public class JAXBModuleImporter
     return mFactory.createModuleProxy(name,
                                       comment,
                                       uri,
-                                      parameterList,
                                       constantAliasList,
                                       eventDeclList,
                                       eventAliasList,
@@ -1023,17 +992,6 @@ public class JAXBModuleImporter
                                           labelGeometry);
   }
 
-  private SimpleParameterProxy importSimpleParameter
-    (final SimpleParameter element)
-  {
-    final String name = element.getName();
-    final boolean required = element.isRequired();
-    final SimpleExpressionType defaultValueElement = element.getDefault();
-    final SimpleExpressionProxy defaultValue =
-      (SimpleExpressionProxy) importElement(defaultValueElement);
-    return mFactory.createSimpleParameterProxy(name, required, defaultValue);
-  }
-
   private SplineGeometryProxy importSplineGeometry
     (final SplineGeometry element)
   {
@@ -1117,9 +1075,6 @@ public class JAXBModuleImporter
   private static final ModuleEventDeclListHandler
     mModuleEventDeclListHandler =
     new ModuleEventDeclListHandler();
-  private static final ModuleParameterListHandler
-    mModuleParameterListHandler =
-    new ModuleParameterListHandler();
   private static final NodeEventListHandler
     mNodeEventListHandler =
     new NodeEventListHandler();

@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="transferline" xmlns="http://waters.sourceforge.net/xsd/module">
-<ParameterList>
-<SimpleParameter Required="false" Name="N">
-<IntConstant Value="1"/>
-</SimpleParameter>
-</ParameterList>
 <ConstantAliasList>
+<ConstantAlias Scope="OPTIONAL_PARAMETER">
+<SimpleIdentifier Name="N"/>
+<IntConstant Value="1"/>
+</ConstantAlias>
 <ConstantAlias>
 <SimpleIdentifier Name="GROUPS"/>
 <BinaryExpression Operator="..">

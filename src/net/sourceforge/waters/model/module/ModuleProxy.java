@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleProxy
 //###########################################################################
-//# $Id: ModuleProxy.java,v 1.4 2007-01-31 17:52:14 flordal Exp $
+//# $Id: ModuleProxy.java,v 1.5 2007-06-08 10:45:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -90,16 +90,10 @@ public interface ModuleProxy
   //#########################################################################
   //# Getters and Setters
   /**
-   * Gets the parameter list of this module.
-   * @return The parameter list.
-   */
-  public List<ParameterProxy> getParameterList();
-
-  /**
    * Gets the constant definition list of this module.
    * @return The constant definition list.
    */
-  public List<AliasProxy> getConstantAliasList();
+  public List<ConstantAliasProxy> getConstantAliasList();
 
   /**
    * Gets the event declaration list of this module.

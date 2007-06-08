@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.samples.maze
 //# CLASS:   MazeCompiler
 //###########################################################################
-//# $Id: MazeCompiler.java,v 1.11 2006-09-19 15:53:20 robi Exp $
+//# $Id: MazeCompiler.java,v 1.12 2007-06-08 10:45:20 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.samples.maze;
@@ -44,6 +44,7 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.xsd.module.ScopeKind;
 
 import org.xml.sax.SAXException;
 
@@ -169,7 +170,7 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
       components.add(prop);
     }
     return mFactory.createModuleProxy
-      (name, comment, uri, null, null, mEvents, null, components);
+      (name, comment, uri, null, mEvents, null, components);
   }
 
   private InstanceProxy createInstance(final Square square,
@@ -244,8 +245,7 @@ public class MazeCompiler implements ProxyUnmarshaller<ModuleProxy>
     final String name = action.getName();
     if (!mEvents.containsName(name)) {
       final EventKind kind = EventKind.UNCONTROLLABLE;
-      final EventDeclProxy decl =
-        mFactory.createEventDeclProxy(name, kind, true, null, null);
+      final EventDeclProxy decl = mFactory.createEventDeclProxy(name, kind);
       mEvents.add(decl);
       if (action.isEscapeAction()) {
         escapes.add(action);
