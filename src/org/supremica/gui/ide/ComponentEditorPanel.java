@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.44 2007-05-24 09:02:28 avenir Exp $
+//# $Id: ComponentEditorPanel.java,v 1.45 2007-06-08 09:30:18 avenir Exp $
 //###########################################################################
 
 
@@ -50,6 +50,7 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
@@ -717,10 +718,8 @@ public class ComponentEditorPanel
 					// Update the bounding box			
 					boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, stateLabelShape.getBounds2D(), transform);
 				}
-                                
-                                // Treatment of node groups
-                                if (node instanceof GroupNodeProxy)
-                                {
+                                else if (node instanceof GroupNodeProxy)
+                                { // Treatment of node groups
                                     w.write("% Node group " + node.getName() + "\n");
                                     w.write("newpath\n");
                                     w.write("gsave\n");
@@ -760,9 +759,16 @@ public class ComponentEditorPanel
                                             {
                                                 w.write("stroke\n");
                                                 w.write("grestore\n");
+                                                
+                                                // Update the bounding box
+                                                boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, groupGeometryProxy.getRectangle().getBounds2D(), transform);
                                             }
                                             paths.next();
                                     }
+                                }
+                                else
+                                {
+                                    System.out.println("node " + node.getName() + " UNTREATED... (unheard of)");
                                 }
 
 				// Add an empty line after each state-info
@@ -831,6 +837,20 @@ public class ComponentEditorPanel
 				// For each event attached to this edge...
 				for (Proxy proxyid : edge.getLabelBlock().getEventList())
 				{
+//                                        if (proxyid instanceof IndexedIdentifierProxy)
+//                                        {
+//                                            IndexedIdentifierProxy indexedProxyId = (IndexedIdentifierProxy) proxyid;
+//                                            System.out.println("found indexed identifier, name = " + indexedProxyId.getName());
+//                                            for (SimpleExpressionProxy index : indexedProxyId.getIndexes())
+//                                            {
+//                                                System.out.println("index.text = " + index.getPlainText());
+////                                                net.sourceforge.waters.model.des.ProductDESProxyFactory factory = net.sourceforge.waters.plain.des.ProductDESElementFactory.getInstance();
+////                                                net.sourceforge.waters.model.marshaller.DocumentManager mDocumentManager = new net.sourceforge.waters.model.marshaller.DocumentManager();
+////                                                net.sourceforge.waters.model.compiler.ModuleCompiler compiler = new net.sourceforge.waters.model.compiler.ModuleCompiler(mDocumentManager, factory, surface.getModule());
+////                                                net.sourceforge.waters.model.expr.Value val = compiler.visitIndexedIdentifierProxy(indexedProxyId);
+////                                                System.out.println("value = " + val);
+//                                            }
+//                                        }
 					// Find the left lower corner coordinates of the shape representing this event
 					// and round them off to nearest integers
 					Shape eventShape = producer.getShape(proxyid).getShape();
@@ -866,7 +886,7 @@ public class ComponentEditorPanel
                                 // Add guards and actions to the eps-file
                                 GuardActionBlockProxy guardActionBlock = edge.getGuardActionBlock();
                                 if (guardActionBlock != null)
-                                {
+                                {                                   
                                     for (BinaryExpressionProxy action : guardActionBlock.getActions())
                                     {
                                         Shape actionShape = producer.getShape(action).getShape();
@@ -880,7 +900,7 @@ public class ComponentEditorPanel
                                         boundingBoxLimits = updateBoundingBoxLimits(boundingBoxLimits, actionShape.getBounds2D(), labelTransform);
                                     }
                                     for (SimpleExpressionProxy guard : guardActionBlock.getGuards())
-                                    {
+                                    {                                   
                                         Shape guardShape = producer.getShape(guard).getShape();
                                         Point2D guardAnchor = labelTransform.transform(new Point2D.Double(guardShape.getBounds2D().getMinX(), guardShape.getBounds2D().getMinY()), null);
                                         guardAnchor.setLocation(Math.round(guardAnchor.getX()), Math.round(guardAnchor.getY()));

@@ -1039,6 +1039,10 @@ public class Milp
             }
         }
         
+        //temp
+        logger.warn("nr_p = " + allPPlantStates.size());
+        logger.warn("nr_f = " + allFPlantStates.size());
+        
         //Create the constraint specifying that the number of preceding and succeeding events should be equal
         String equalNumberConstrStr = " = ";
         for (ArrayList<int[]> plantStateInfo : allPPlantStates)

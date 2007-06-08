@@ -910,6 +910,37 @@ Class-Path: ${manifest.pathlist}</echo>
 	</java>
 </target>
 
+<target name="runSupremica">
+	<java classname="${supremica_basepackage}.apps.Supremica" fork="yes">
+	     <arg value="-p"/>
+             <arg value="dist/SupremicaProperties.cfg"/>
+		<classpath>
+			<pathelement location="${dist}/Supremica.jar" />
+			<pathelement location="${dist}/SupremicaLib.jar" />
+			<pathelement path="${java.class.path}" />
+		</classpath>
+                <jvmarg value="-Xms128M"/>
+                <jvmarg value="-Xmx512M" />  
+	</java>                
+</target>
+
+<target name="runSupremicaLocal">
+	<java classname="${supremica_basepackage}.apps.Supremica" fork="yes">
+	     <arg value="-p"/>
+             <arg value="dist/SupremicaProperties.cfg"/>
+		<classpath>
+			<pathelement location="build" />
+			<pathelement location="lib/unjared" />
+			<pathelement location="images" />
+			<pathelement location="examples" />
+			<pathelement path="${java.class.path}" />
+		</classpath>
+
+                <jvmarg value="-Xms128M"/>
+                <jvmarg value="-Xmx512M" />       
+	</java>
+</target>
+
 <target name="run_fbruntime">
 	<java classname="${supremica_basepackage}.apps.FBRuntime" fork="yes">
 		<classpath>
