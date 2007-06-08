@@ -424,6 +424,7 @@
       </packageset>
       <packageset dir="${supremica.src}">
         <include name="net/sourceforge/waters/**"/>
+        <exclude name="net/sourceforge/waters/analysis/modular/supremica/**"/>
         <exclude name="net/sourceforge/waters/build/**"/>
         <exclude name="net/sourceforge/waters/gui/**"/>
       </packageset>

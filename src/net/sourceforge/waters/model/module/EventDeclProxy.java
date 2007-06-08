@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   EventDeclProxy
 //###########################################################################
-//# $Id: EventDeclProxy.java,v 1.9 2007-06-08 10:45:20 robi Exp $
+//# $Id: EventDeclProxy.java,v 1.10 2007-06-08 10:57:34 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -45,6 +45,15 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  * rendered.</DD>
  * </DL>
  *
+ * <P>An event can be declared as a parameter to be bound to an event or
+ * set of events when a module is compiled. An event parameter behaves like
+ * an event declaration in that it introduces an event or event array that
+ * can be used in the module's components.  The only difference is that the
+ * events do not come from their module itself, but from another module
+ * from which their module is instantiated. The documentation of class
+ * {@link ModuleProxy} contains an example demonstrating the use of event
+ * parameters.</P>
+ *
  * @author Robi Malik
  */
 // @short event declaration
@@ -81,7 +90,7 @@ public interface EventDeclProxy extends NamedProxy {
   /**
    * Gets the list of index ranges of this event declaration.
    * @return A (modifiable) list of expressions, each identifying
-   *         range of array indexes for the correspoding dimension.
+   *         range of array indexes for the corresponding dimension.
    *         Each element is of type {@link SimpleExpressionProxy}.
    */
   public List<SimpleExpressionProxy> getRanges();
@@ -109,7 +118,7 @@ public interface EventDeclProxy extends NamedProxy {
   public static final String DEFAULT_MARKING_NAME = ":accepting";
 
   /**
-   * The name to be used for the default fobidden proposition.
+   * The name to be used for the default forbidden proposition.
    * It is recommended that they use proposition events with this default
    * name to label their forbidden states. In this way it is more likely
    * that the same name is used consistently.

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.compiler
 //# CLASS:   IndexOutOfRangeException
 //###########################################################################
-//# $Id: IndexOutOfRangeException.java,v 1.4 2007-06-08 10:45:20 robi Exp $
+//# $Id: IndexOutOfRangeException.java,v 1.5 2007-06-08 10:57:34 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.compiler;
@@ -34,7 +34,7 @@ public class IndexOutOfRangeException extends EvalException {
   /**
    * Constructs a new exception indicating that the given constant alias
    * cannot be used as an array.
-   * @param  value    The alias which has wrongly been tried to use as array.
+   * @param  alias    The alias which has wrongly been tried to use as array.
    */
   public IndexOutOfRangeException(final ConstantAliasProxy alias)
   {

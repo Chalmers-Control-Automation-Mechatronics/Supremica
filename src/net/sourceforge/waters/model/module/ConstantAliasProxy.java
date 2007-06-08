@@ -4,7 +4,7 @@
 //# PACKAGE: net.ourceforge.waters.model.module
 //# CLASS:   ConstantAliasProxy
 //###########################################################################
-//# $Id: ConstantAliasProxy.java,v 1.3 2007-06-08 10:45:20 robi Exp $
+//# $Id: ConstantAliasProxy.java,v 1.4 2007-06-08 10:57:34 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.module;
@@ -17,7 +17,7 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  *
  * <P>A constant alias is used to assign a simple constant to a name.  The
  * name of a constant alias must be a simple identifier ({@link
- * net.sourceforge.waters.model.expr.SimpleIdentifierProxy}).</P>
+ * SimpleIdentifierProxy}).</P>
  *
  * <P>A constant alias may be a <I>parameter</I>, in which case the value
  * in the declaration only is a default that can be overridden by
