@@ -1,0 +1,782 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="Robis_Ball_Sorter" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment></ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
+        <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="enter_portvakt"/>
+        <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="drop_portvakt"/>
+        <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="exit_portvakt"/>
+        <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="drop_portvakt_maetlyft"/>
+        <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="enter_maetlyft"/>
+        <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="drop_maetlyft"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="tick"/>
+        <EventDecl Observable="false" Kind="UNCONTROLLABLE" Name="transfer_maetlyft_maetstation"/>
+        <EventDecl Kind="CONTROLLABLE" Name="InPortvakt">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="0"/>
+                <IntConstant Value="1"/>
+            </BinaryExpression>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="UrPortvakt">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="0"/>
+                <IntConstant Value="1"/>
+            </BinaryExpression>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="KulaPortvakt"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="KulaMaetlyft"/>
+        <EventDecl Kind="CONTROLLABLE" Name="UppMaetlyft">
+            <BinaryExpression Operator="..">
+                <IntConstant Value="0"/>
+                <IntConstant Value="1"/>
+            </BinaryExpression>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="MaetlyftNere"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="MaetlyftUppe"/>
+    </EventDeclList>
+    <ComponentList>
+        <Instance ModuleName="ball_control">
+            <SimpleIdentifier Name="InPortvakt_control"/>
+            <ParameterBinding Name="control">
+                <SimpleIdentifier Name="InPortvakt"/>
+            </ParameterBinding>
+        </Instance>
+        <Instance ModuleName="ball_control">
+            <SimpleIdentifier Name="UrPortvakt_control"/>
+            <ParameterBinding Name="control">
+                <SimpleIdentifier Name="UrPortvakt"/>
+            </ParameterBinding>
+        </Instance>
+        <Instance ModuleName="ball_control">
+            <SimpleIdentifier Name="UppMaetlyft_control"/>
+            <ParameterBinding Name="control">
+                <SimpleIdentifier Name="UppMaetlyft"/>
+            </ParameterBinding>
+        </Instance>
+        <SimpleComponent Kind="PLANT">
+            <SimpleIdentifier Name="KulaPortvakt_sensor"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="empty">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="112" X="160"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-17" X="0"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="9" X="-17"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="arrived">
+                        <PointGeometry>
+                            <Point Y="112" X="272"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-23" X="-12"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="detected">
+                        <PointGeometry>
+                            <Point Y="208" X="272"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="8" X="-47"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="arrived" Source="empty">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="enter_portvakt"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-21" X="-48"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="96" X="219"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="empty" Source="arrived">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit_portvakt"/>
+                            <SimpleIdentifier Name="drop_portvakt"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="1" X="-38"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="128" X="216"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="detected" Source="arrived">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="KulaPortvakt"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-11" X="6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="detected" Source="detected">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="KulaPortvakt"/>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-18" X="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="209" X="315"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="empty" Source="empty">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-34" X="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="112" X="112"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="empty" Source="detected">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit_portvakt"/>
+                            <SimpleIdentifier Name="drop_portvakt"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-3" X="-83"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="188" X="193"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT">
+            <SimpleIdentifier Name="EnteringPortvakt"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="closed">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="96" X="128"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="9" X="-33"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="open">
+                        <PointGeometry>
+                            <Point Y="96" X="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="8" X="-16"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="closed" Source="open">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="InPortvakt">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-20" X="-40"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="80" X="187"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="open" Source="closed">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="InPortvakt">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="2" X="-37"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="112" X="183"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="open" Source="open">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="enter_portvakt"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-35" X="-39"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="97" X="287"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT">
+            <SimpleIdentifier Name="ExitingPortvakt"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="closed">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="64" X="80"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="9" X="-33"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="open">
+                        <PointGeometry>
+                            <Point Y="64" X="192"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="8" X="-16"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="closed" Source="open">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="UrPortvakt">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-20" X="-40"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="48" X="139"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="open" Source="closed">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="UrPortvakt">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="2" X="-37"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="80" X="135"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="open" Source="open">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit_portvakt"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-35" X="-39"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="65" X="239"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT">
+            <SimpleIdentifier Name="KulaMaetlyft_sensor"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="empty">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="80" X="80"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-20" X="0"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-6" X="11"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="arrived">
+                        <PointGeometry>
+                            <Point Y="80" X="192"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-22" X="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="detected">
+                        <PointGeometry>
+                            <Point Y="176" X="192"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="-49"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="arrived" Source="empty">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="enter_maetlyft"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-21" X="-48"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="64" X="139"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="empty" Source="arrived">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="transfer_maetlyft_maetstation"/>
+                            <SimpleIdentifier Name="drop_maetlyft"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-8" X="-48"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="96" X="136"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="detected" Source="arrived">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="KulaMaetlyft"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="0" X="-1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="empty" Source="detected">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="transfer_maetlyft_maetstation"/>
+                            <SimpleIdentifier Name="drop_maetlyft"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-18" X="-107"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="150" X="112"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="detected" Source="detected">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="KulaMaetlyft"/>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-17" X="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="175" X="240"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="empty" Source="empty">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-7" X="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="79" X="29"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT">
+            <SimpleIdentifier Name="EnteringMaetlyft"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="idle">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="96" X="112"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-17" X="0"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="5" X="7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="coming0">
+                        <PointGeometry>
+                            <Point Y="96" X="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-6" X="8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="coming1">
+                        <PointGeometry>
+                            <Point Y="192" X="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-8" X="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <GroupNode Name="G0">
+                        <NodeRef Name="coming0"/>
+                        <NodeRef Name="coming1"/>
+                        <BoxGeometry>
+                            <Box Y="80" X="208" Width="96" Height="128"/>
+                        </BoxGeometry>
+                    </GroupNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="coming0" Source="idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="exit_portvakt"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-23" X="-43"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="idle" Source="G0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="enter_maetlyft"/>
+                            <SimpleIdentifier Name="drop_portvakt_maetlyft"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="1" X="-87"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <StartPointGeometry>
+                            <Point Y="170" X="208"/>
+                        </StartPointGeometry>
+                        <SplineGeometry>
+                            <Point Y="152" X="143"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="coming1" Source="coming0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-6" X="7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="idle" Source="idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-39" X="7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="94" X="63"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT">
+            <SimpleIdentifier Name="Maetlyft"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="lower">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="256" X="160"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="0" X="-23"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-8" X="11"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="go_up">
+                        <PointGeometry>
+                            <Point Y="160" X="96"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-21" X="-42"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="upper">
+                        <PointGeometry>
+                            <Point Y="64" X="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-9" X="-48"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="go_down">
+                        <PointGeometry>
+                            <Point Y="160" X="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-23" X="-2"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="go_up" Source="lower">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="UppMaetlyft">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="3" X="-56"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="upper" Source="go_up">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MaetlyftUppe"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-24" X="-64"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="go_down" Source="upper">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="UppMaetlyft">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-22" X="-27"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="lower" Source="go_down">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MaetlyftNere"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-3" X="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="go_down" Source="go_up">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="UppMaetlyft">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-22" X="-45"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="178" X="161"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="go_up" Source="go_down">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="UppMaetlyft">
+                                <IntConstant Value="1"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-16" X="-42"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="143" X="159"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="lower" Source="lower">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="enter_maetlyft"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-26" X="-45"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="307" X="161"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="upper" Source="upper">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="transfer_maetlyft_maetstation"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="11" X="-92"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="13" X="159"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT">
+            <SimpleIdentifier Name="EnteringMaetStation"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="down_empty">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="224" X="160"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="0" X="-18"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="6" X="-82"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="down_full">
+                        <PointGeometry>
+                            <Point Y="224" X="288"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="4" X="4"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="up_empty">
+                        <PointGeometry>
+                            <Point Y="112" X="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-18" X="-69"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="up_full">
+                        <PointGeometry>
+                            <Point Y="112" X="288"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="-7" X="11"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="down_full" Source="down_empty">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="enter_maetlyft"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-16" X="-42"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="210" X="226"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="down_empty" Source="down_full">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="drop_maetlyft"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="1" X="-35"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="239" X="219"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="up_empty" Source="up_full">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="drop_maetlyft"/>
+                            <SimpleIdentifier Name="transfer_maetlyft_maetstation"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-41" X="-51"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Target="down_empty" Source="up_empty">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="UppMaetlyft">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-18" X="-26"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="167" X="174"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="up_empty" Source="down_empty">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MaetlyftUppe"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-3" X="-83"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="167" X="141"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="down_full" Source="up_full">
+                        <LabelBlock>
+                            <IndexedIdentifier Name="UppMaetlyft">
+                                <IntConstant Value="0"/>
+                            </IndexedIdentifier>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-27" X="-2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="170" X="302"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="up_full" Source="down_full">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="MaetlyftUppe"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="0" X="-51"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="169" X="275"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="up_empty" Source="up_empty">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-24" X="-1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="76" X="122"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="down_empty" Source="down_empty">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="5" X="-2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="259" X="127"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="down_full" Source="down_full">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="3" X="-25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="259" X="323"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="ball_timer" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<ns2:Comment></ns2:Comment>
+<EventDeclList>
+<EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="timer"/>
+<EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="timeout"/>
+<EventDecl Kind="CONTROLLABLE" Scope="OPTIONAL_PARAMETER" Name="reset"/>
+<EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="control">
+<BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</EventDecl>
+<EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="sensor"/>
+<EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
+<EventDecl Kind="PROPOSITION" Name=":forbidden"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="timer"/>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="idle">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="96" X="224"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-5" X="-5"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="10"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="running">
+<PointGeometry>
+<Point Y="192" X="224"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="11"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="running" Source="idle">
+<LabelBlock>
+<SimpleIdentifier Name="timer"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="-43"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="148" X="208"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="idle" Source="running">
+<LabelBlock>
+<SimpleIdentifier Name="timeout"/>
+<SimpleIdentifier Name="reset"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-10" X="8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="145" X="240"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PLANT">
+<SimpleIdentifier Name="sensor"/>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="idle">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="160" X="240"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-5" X="-5"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="-36"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="active">
+<PointGeometry>
+<Point Y="256" X="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="-45"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="waiting">
+<PointGeometry>
+<Point Y="352" X="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-6" X="-54"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="active" Source="idle">
+<LabelBlock>
+<IndexedIdentifier Name="control">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="7"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="waiting" Source="active">
+<LabelBlock>
+<SimpleIdentifier Name="timer"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="6"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="idle" Source="waiting">
+<LabelBlock>
+<SimpleIdentifier Name="timeout"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-20" X="6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="257" X="128"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="active" Source="active">
+<LabelBlock>
+<SimpleIdentifier Name="sensor"/>
+<IndexedIdentifier Name="control">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<SimpleIdentifier Name="timeout"/>
+<SimpleIdentifier Name="reset"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-30" X="2"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="256" X="298"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="waiting" Source="waiting">
+<LabelBlock>
+<SimpleIdentifier Name="sensor"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="4"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="355" X="297"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="active" Source="waiting">
+<LabelBlock>
+<SimpleIdentifier Name="reset"/>
+<IndexedIdentifier Name="control">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-14" X="-47"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="303" X="221"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="idle" Source="idle">
+<LabelBlock>
+<SimpleIdentifier Name="timer"/>
+<SimpleIdentifier Name="timeout"/>
+<SimpleIdentifier Name="reset"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-23" X="6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="159" X="298"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="disable_control"/>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="S0">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="96" X="112"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-15" X="13"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="10" X="-16"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S1">
+<PointGeometry>
+<Point Y="96" X="240"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="6" X="2"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="S2">
+<PointGeometry>
+<Point Y="192" X="176"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="12"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="S1" Source="S0">
+<LabelBlock>
+<IndexedIdentifier Name="control">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-19" X="-32"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="S2" Source="S1">
+<LabelBlock>
+<SimpleIdentifier Name="sensor"/>
+<SimpleIdentifier Name="timeout"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-4" X="5"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="S0" Source="S2">
+<LabelBlock>
+<IndexedIdentifier Name="control">
+<IntConstant Value="0"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-1" X="-65"/>
+</LabelGeometry>
+</LabelBlock>
+</Edge>
+<Edge Target="S1" Source="S1">
+<LabelBlock>
+<SimpleIdentifier Name="timer"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-19" X="3"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="64" X="283"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="S0" Source="S0">
+<LabelBlock>
+<SimpleIdentifier Name="timeout"/>
+<SimpleIdentifier Name="reset"/>
+<SimpleIdentifier Name="sensor"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-48" X="-14"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="65" X="68"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="S2" Source="S2">
+<LabelBlock>
+<SimpleIdentifier Name="timeout"/>
+<SimpleIdentifier Name="reset"/>
+<SimpleIdentifier Name="sensor"/>
+<LabelGeometry Anchor="NW">
+<Point Y="2" X="-6"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="248" X="177"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="SPEC">
+<SimpleIdentifier Name="enable_control"/>
+<Graph>
+<NodeList>
+<SimpleNode Initial="true" Name="idle">
+<EventList>
+<SimpleIdentifier Name=":accepting"/>
+</EventList>
+<PointGeometry>
+<Point Y="112" X="224"/>
+</PointGeometry>
+<InitialArrowGeometry>
+<Point Y="-5" X="-5"/>
+</InitialArrowGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-7" X="-38"/>
+</LabelGeometry>
+</SimpleNode>
+<SimpleNode Name="running">
+<PointGeometry>
+<Point Y="208" X="224"/>
+</PointGeometry>
+<LabelGeometry Anchor="NW">
+<Point Y="-9" X="-61"/>
+</LabelGeometry>
+</SimpleNode>
+</NodeList>
+<EdgeList>
+<Edge Target="running" Source="idle">
+<LabelBlock>
+<SimpleIdentifier Name="timer"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-12" X="-43"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="164" X="208"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="idle" Source="running">
+<LabelBlock>
+<SimpleIdentifier Name="timeout"/>
+<SimpleIdentifier Name="reset"/>
+<LabelGeometry Anchor="NW">
+<Point Y="-10" X="8"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="161" X="240"/>
+</SplineGeometry>
+</Edge>
+<Edge Target="idle" Source="idle">
+<LabelBlock>
+<IndexedIdentifier Name="control">
+<IntConstant Value="1"/>
+</IndexedIdentifier>
+<LabelGeometry Anchor="NW">
+<Point Y="-35" X="-43"/>
+</LabelGeometry>
+</LabelBlock>
+<SplineGeometry>
+<Point Y="114" X="268"/>
+</SplineGeometry>
+</Edge>
+</EdgeList>
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>
