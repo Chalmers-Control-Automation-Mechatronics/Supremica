@@ -20,6 +20,7 @@ import net.sourceforge.waters.subject.module.EdgeSubject
 import net.sourceforge.waters.model.expr.Operator
 import org.supremica.gui.ide.IDE
 import org.supremica.gui.InterfaceManager
+import net.sourceforge.waters.xsd.module.ScopeKind
 
 class ModuleBuilder extends BuilderSupport {
 
@@ -84,6 +85,7 @@ class ModuleBuilder extends BuilderSupport {
 				factory.createEventDeclProxy(label,
                             attributes.controllable == null || attributes.controllable ? EventKind.CONTROLLABLE : EventKind.UNCONTROLLABLE,
                             true,
+                            ScopeKind.LOCAL,
                             attributes.ranges?.collect{createRangeExpression(it)},
                             null)
             }
@@ -149,7 +151,7 @@ class ModuleBuilder extends BuilderSupport {
 			['range'].each{attributes.remove(it)}
 			break
 		case 'eventAlias':
-			node = factory.createAliasProxy(parser.parseIdentifier(attributes.name), factory.createPlainEventListProxy(attributes.events.collect{parser.parse(it)}))
+			node = factory.createEventAliasProxy(parser.parseIdentifier(attributes.name), factory.createPlainEventListProxy(attributes.events.collect{parser.parse(it)}))
 			['events'].each{attributes.remove(it)}
 			break
 		default:
