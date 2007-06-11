@@ -24,6 +24,7 @@ import org.supremica.gui.InterfaceManager
 import org.supremica.automata.IO.ProjectBuildFromWaters
 import org.supremica.automata.Project
 import org.supremica.automata.algorithms.AutomataVerifier
+import net.sourceforge.waters.model.marshaller.DocumentManager
 
 class Util {
 	private static final factory = ModuleSubjectFactory.instance
@@ -74,7 +75,7 @@ class Util {
 		ide.installContainer(module)
 	}
 	public static boolean verifyNonblocking(ModuleProxy module) {
-		def supremicaProjBuilderFromWatersModule = new ProjectBuildFromWaters();
+		def supremicaProjBuilderFromWatersModule = new ProjectBuildFromWaters(new DocumentManager());
         Project supremicaProject = supremicaProjBuilderFromWatersModule.build(module);
        	AutomataVerifier.verifyMonolithicNonblocking(supremicaProject)
 	}
