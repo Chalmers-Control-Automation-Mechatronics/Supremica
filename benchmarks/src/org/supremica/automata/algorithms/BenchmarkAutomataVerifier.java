@@ -101,7 +101,7 @@ public class BenchmarkAutomataVerifier
         
         // Controllability / Nonblocking
         vOptions = VerificationOptions.getDefaultNonblockingOptions();
-        int type = 2;
+        int type = 0;
         if (type == 0)
             // Nonblocking
             vOptions.setVerificationType(VerificationType.NONBLOCKING);
@@ -126,13 +126,13 @@ public class BenchmarkAutomataVerifier
         {
             MinimizationStrategy.FewestTransitionsFirst,
             /*
-            MinimizationStrategy.MostStatesFirst,
              */
-            /*
+            MinimizationStrategy.MostStatesFirst,
             MinimizationStrategy.AtLeastOneLocal,
             MinimizationStrategy.AtLeastOneLocalMaxThree,
             //MinimizationStrategy.FewestStatesFirst,
             //MinimizationStrategy.FewestEventsFirst,
+            /*
             MinimizationStrategy.RandomFirst
              */
             MinimizationStrategy.FewestNeighboursFirst,
@@ -141,14 +141,14 @@ public class BenchmarkAutomataVerifier
         // Heuristics
         MinimizationHeuristic[] heuristicArray =
         {
-            /*
             MinimizationHeuristic.MostLocal, 
+            /*
              */ 
             /*
+             */
             //MinimizationHeuristic.FewestStates,
             //MinimizationHeuristic.LeastExtension,
             //MinimizationHeuristic.FewestTransitions,
-             */
 			MinimizationHeuristic.MostCommon,
             //MinimizationHeuristic.FewestEvents,
             MinimizationHeuristic.LeastFanning
@@ -201,8 +201,8 @@ public class BenchmarkAutomataVerifier
 					String[] test =
 					{
 						/*
-						"agv", "agvb",
  						*/
+						"agv", "agvb",
 						"verriegel3", "verriegel3b",
 						"verriegel4", "verriegel4b",
 						//"bmw_fh",
@@ -246,20 +246,21 @@ public class BenchmarkAutomataVerifier
                     Project theProject;
                     
 					/*
+					*/
                     // Dining philosophers
 					philo = new DiningPhilosophers(256, true, true, false, false,
                         false, false);
                     theProject = philo.getProject();
                     runBenchmark("256philo", theProject, vOptions, sOptions, mOptions);
-                    philo = new DiningPhilosophers(512, true, true, false, false, false, false);
-                    theProject = philo.getProject();
-                    runBenchmark("512philo", theProject, vOptions, sOptions, mOptions);
-                    philo = new DiningPhilosophers(1024, true, true, false, false, false, false);
-                    theProject = philo.getProject();
+					philo = new DiningPhilosophers(512, true, true, false, false, false, false);
+					theProject = philo.getProject();
+					runBenchmark("512philo", theProject, vOptions, sOptions, mOptions);
+					philo = new DiningPhilosophers(1024, true, true, false, false, false, false);
+					theProject = philo.getProject();
                     runBenchmark("1024philo", theProject, vOptions, sOptions, mOptions);
-                    philo = new DiningPhilosophers(2048, true, true, false, false, false, false);
-                    theProject = philo.getProject();
-                    runBenchmark("2048philo", theProject, vOptions, sOptions, mOptions);
+					//philo = new DiningPhilosophers(2048, true, true, false, false, false, false);
+                    //theProject = philo.getProject();
+                    //runBenchmark("2048philo", theProject, vOptions, sOptions, mOptions);
                     // Transfer line
 					line = new TransferLine(128, 3, 1, false);
                     theProject = line.getProject();
@@ -277,7 +278,6 @@ public class BenchmarkAutomataVerifier
                     arbiter = new Arbiter(256, false);
                     theProject = arbiter.getProject();
                     runBenchmark("256arbiter", theProject, vOptions, sOptions, mOptions);
-					*/
                     arbiter = new Arbiter(512, false);
                     theProject = arbiter.getProject();
                     runBenchmark("512arbiter", theProject, vOptions, sOptions, mOptions);

@@ -19,6 +19,8 @@ public class Arbiter
     Automata arbiters = new Automata();
     Automata users = new Automata();
     
+    private int length;
+    
     public Arbiter(int nbrOfUsers, boolean doSynchronize)
     throws Exception
     {
@@ -26,12 +28,14 @@ public class Arbiter
         
         project.setComment("Tree arbiter cell structure adapted from 'Compositional Model Checking' by E.M. Clarke et. al. Each arbiter cell has three communication channels, two users and one server. The cell gets requests from its two users and as a response, initiates requests events to the server. Each user/server initates two requests before returning to its initial state. The system is nonblocking for any number of users.");
         
+        length = ("" + nbrOfUsers).length();
+        
         // Synchronize arbiter?
         this.doSynchronize = doSynchronize;
         
         // Start the recursion with the root node, the server
         String serverName = buildServer();
-        String arbiterName = "a" + arbiterCount++;
+        String arbiterName = "a" + pad(arbiterCount++);
         
         // Split the users between the two branches!
         int half = nbrOfUsers / 2;
@@ -47,7 +51,7 @@ public class Arbiter
             Automata sortedArbiters = new Automata();
             for (int i=0; i<arbiterCount; i++)
             {
-                Automaton arb = arbiters.getAutomaton("Arbiter cell a" + i);
+                Automaton arb = arbiters.getAutomaton("Arbiter cell a" + pad(i));
                 sortedArbiters.addAutomaton(arb);
             }
             arbiters = sortedArbiters;
@@ -57,7 +61,7 @@ public class Arbiter
             Automata sortedArbiters = new Automata();
             for (int i=0; i<arbiterCount; i++)
             {
-                Automaton arb = arbiters.getAutomaton("Arbiter a" + i);
+                Automaton arb = arbiters.getAutomaton("Arbiter a" + pad(i));
                 sortedArbiters.addAutomaton(arb);
                 int index = arbiters.getAutomatonIndex(arb);
                 sortedArbiters.addAutomaton(arbiters.getAutomatonAt(index+1));
@@ -82,7 +86,7 @@ public class Arbiter
         }
         
         // This is an arbiter cell with two users (possibly arbiters)!
-        String name = "a" + arbiterCount++;
+        String name = "a" + pad(arbiterCount++);
         
         // Split the users between the two branches!
         int half = nbrOfUsers / 2;
@@ -322,7 +326,7 @@ public class Arbiter
     
     private String buildUser()
     {
-        String name = "u" + userCount++;
+        String name = "u" + pad(userCount++);
         Automaton user = new Automaton("User " + name);
         Alphabet alpha = user.getAlphabet();
         State[] states = {new State("0"), new State("1"), new State("2"),
@@ -356,5 +360,13 @@ public class Arbiter
     public Project getProject()
     {
         return project;
+    }
+    
+    private String pad(int num)
+    {
+        String returnValue = "" + num;
+        while (returnValue.length() < length)
+            returnValue = "0" + returnValue;
+        return returnValue;
     }
 }

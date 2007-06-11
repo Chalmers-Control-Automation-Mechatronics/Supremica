@@ -609,19 +609,28 @@ public class AutomataMinimizer
                                 }
                                 int nextStrategyBest = nextStrategy.value(bestAutomaton, eventToAutomataMap);
                                 int nextStrategyThis = nextStrategy.value(aut, eventToAutomataMap);
+                                // Better?
                                 if ((nextStrategy.maximize() && nextStrategyThis > nextStrategyBest) ||
                                     (nextStrategy.minimize() && nextStrategyThis < nextStrategyBest))
                                 {
                                     bestAutomaton = aut;
                                     continue loop;
                                 }
-                                else if (!(nextStrategyThis == nextStrategyBest))
+                                // Worse?
+                                if (!(nextStrategyThis == nextStrategyBest))
                                 {
-                                    // Worse value!
                                     continue loop;
                                 }
                             }
+                            // Equal in all regards? Compare alphabetical order to get reproducible results
+                            if (aut.getName().compareTo(bestAutomaton.getName()) > 0)
+                            {
+                                //logger.info(aut + " " + bestAutomaton);
+                                //logger.info(bestAutomaton + " " + aut);
+                                bestAutomaton = aut;
+                            }
                         }
+                        //logger.info("Apa: " + aut);
                     }
                     // Got no result?
                     if (bestAutomaton == null)

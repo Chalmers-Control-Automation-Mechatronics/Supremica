@@ -2,6 +2,7 @@
 /** DiningPhilosophers.java ***************** */
 package org.supremica.testcases;
 
+import org.omg.CORBA.portable.IDLEntity;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Project;
@@ -188,7 +189,9 @@ class EatingPhilosopher
     static Automaton philo = null;
     static boolean inited = false;
     
-    public EatingPhilosopher(boolean l_take, boolean r_take, boolean l_put, boolean r_put)
+    private int length;
+    
+    public EatingPhilosopher(boolean l_take, boolean r_take, boolean l_put, boolean r_put, int length)
     throws Exception
     {
         if (inited)
@@ -243,6 +246,7 @@ class EatingPhilosopher
         philo.addArc(new Arc(states[R_DN], states[INIT], events[L_PUT]));
         
         inited = true;
+        this.length = length;
     }
     
     // Fake renaming, must replace the event due to immutability
@@ -260,24 +264,32 @@ class EatingPhilosopher
     {
         // deep copy, I hope
         Automaton sm = new Automaton(philo);
-        sm.setName("Philo" + NAME_SEP + id);
+        sm.setName("Philo" + NAME_SEP + pad(id));
         
         // adjust the event names according to l_fork and r_fork
         // L_take becomes take<id>.<l_fork>
         // R_take becomes take<id>.<r_fork>
         // L_put becomes put<id>.<l_fork>
         // R_put becomes put<id>.<r_fork>
-        renameEvent(sm, L_TAKE, "take" + id + LABEL_SEP + l_fork);
-        renameEvent(sm, R_TAKE, "take" + id + LABEL_SEP + r_fork);
-        renameEvent(sm, L_PUT, "put" + id + LABEL_SEP + l_fork);
-        renameEvent(sm, R_PUT, "put" + id + LABEL_SEP + r_fork);
-        renameEvent(sm, START_EATING, "start_eating" + id);
+        renameEvent(sm, L_TAKE, "take" + pad(id) + LABEL_SEP + pad(l_fork));
+        renameEvent(sm, R_TAKE, "take" + pad(id) + LABEL_SEP + pad(r_fork));
+        renameEvent(sm, L_PUT, "put" + pad(id) + LABEL_SEP + pad(l_fork));
+        renameEvent(sm, R_PUT, "put" + pad(id) + LABEL_SEP + pad(r_fork));
+        renameEvent(sm, START_EATING, "start_eating" + pad(id));
         
         // Used Automaton::replaceEvent, so no need to rehash
         // // must rehash since we've changed the label (that's the way it works (unfortunately))
         // alpha.rehash();
         
         return sm;
+    }
+    
+    private String pad(int num)
+    {
+        String returnValue = "" + num;
+        while (returnValue.length() < length)
+            returnValue = "0" + returnValue;
+        return returnValue;
     }
     
     static void fixAnimation(Automaton currPhil, int id, int nextId, Actions currActions, Controls currControls)
@@ -374,8 +386,9 @@ class Chopstick
     static Automaton fork = null;
     static Automaton memoryfork = null;
     static boolean inited = false;
+    private int length;
     
-    public Chopstick(boolean l_take, boolean r_take, boolean l_put, boolean r_put)
+    public Chopstick(boolean l_take, boolean r_take, boolean l_put, boolean r_put, int length)
     throws Exception
     {
         if (inited)
@@ -417,6 +430,7 @@ class Chopstick
         }
         
         inited = true;
+        this.length = length;
     }
     
     // Fake renaming, must replace the event due to immutability
@@ -435,14 +449,14 @@ class Chopstick
         Automaton sm = new Automaton(fork);
         
         // deep copy, I hope
-        sm.setName("Fork" + NAME_SEP + id);
+        sm.setName("Fork" + NAME_SEP + pad(id));
         
         // Alphabet alpha = sm.getAlphabet();
         
-        renameEvent(sm, L_TAKE, "take" + l_philo + LABEL_SEP + id);
-        renameEvent(sm, R_TAKE, "take" + r_philo + LABEL_SEP + id);
-        renameEvent(sm, L_PUT, "put" + l_philo + LABEL_SEP + id);
-        renameEvent(sm, R_PUT, "put" + r_philo + LABEL_SEP + id);
+        renameEvent(sm, L_TAKE, "take" + pad(l_philo) + LABEL_SEP + pad(id));
+        renameEvent(sm, R_TAKE, "take" + pad(r_philo) + LABEL_SEP + pad(id));
+        renameEvent(sm, L_PUT, "put" + pad(l_philo) + LABEL_SEP + pad(id));
+        renameEvent(sm, R_PUT, "put" + pad(r_philo) + LABEL_SEP + pad(id));
         
         // alpha.getEvent(events[L_TAKE].getLabel()).setLabel("take" + l_philo + LABEL_SEP + id);
         // alpha.getEvent(events[R_TAKE].getLabel()).setLabel("take" + r_philo + LABEL_SEP + id);
@@ -453,6 +467,14 @@ class Chopstick
         // alpha.rehash();
         
         return sm;
+    }
+        
+    private String pad(int num)
+    {
+        String returnValue = "" + num;
+        while (returnValue.length() < length)
+            returnValue = "0" + returnValue;
+        return returnValue;
     }
 }
 
@@ -484,8 +506,9 @@ class MemoryChopstick
     // Need not be the same everywhere
     static Automaton fork = null;
     static boolean inited = false;
+    int length;
     
-    public MemoryChopstick(boolean l_take, boolean r_take, boolean l_put, boolean r_put)
+    public MemoryChopstick(boolean l_take, boolean r_take, boolean l_put, boolean r_put, int length)
     throws Exception
     {
         if (inited)
@@ -527,6 +550,7 @@ class MemoryChopstick
         }
         
         inited = true;
+        this.length = length;
     }
     
     // Fake renaming, must replace the event due to immutability
@@ -545,14 +569,14 @@ class MemoryChopstick
         Automaton sm = new Automaton(fork);
         
         // deep copy, I hope
-        sm.setName("Fork" + NAME_SEP + id);
+        sm.setName("Fork" + NAME_SEP + pad(id));
         
         // Alphabet alpha = sm.getAlphabet();
         
-        renameEvent(sm, L_TAKE, "take" + l_philo + LABEL_SEP + id);
-        renameEvent(sm, R_TAKE, "take" + r_philo + LABEL_SEP + id);
-        renameEvent(sm, L_PUT, "put" + l_philo + LABEL_SEP + id);
-        renameEvent(sm, R_PUT, "put" + r_philo + LABEL_SEP + id);
+        renameEvent(sm, L_TAKE, "take" + pad(l_philo) + LABEL_SEP + pad(id));
+        renameEvent(sm, R_TAKE, "take" + pad(r_philo) + LABEL_SEP + pad(id));
+        renameEvent(sm, L_PUT, "put" + pad(l_philo) + LABEL_SEP + pad(id));
+        renameEvent(sm, R_PUT, "put" + pad(r_philo) + LABEL_SEP + pad(id));
         
         // alpha.getEvent(events[L_TAKE].getLabel()).setLabel("take" + l_philo + LABEL_SEP + id);
         // alpha.getEvent(events[R_TAKE].getLabel()).setLabel("take" + r_philo + LABEL_SEP + id);
@@ -563,6 +587,14 @@ class MemoryChopstick
         // alpha.rehash();
         
         return sm;
+    }
+    
+    private String pad(int num)
+    {
+        String returnValue = "" + num;
+        while (returnValue.length() < length)
+            returnValue = "0" + returnValue;
+        return returnValue;
     }
 }
 
@@ -607,9 +639,11 @@ public class DiningPhilosophers
         // Add comment
         project.setComment("The classical dining philosophers problem, here with " + num + " philosophers.");
         
+        int idLength = ("" + num).length();
+        
         // First the philosphers
         // Philosopher philo = new Philosopher(l_take, r_take, l_put, r_put);
-        EatingPhilosopher philo = new EatingPhilosopher(l_take, r_take, l_put, r_put);
+        EatingPhilosopher philo = new EatingPhilosopher(l_take, r_take, l_put, r_put, idLength);
         
         for (int i = 0; i < num; ++i)
         {
@@ -675,11 +709,11 @@ public class DiningPhilosophers
         ChopstickBuilder fork;
         if (forkmemory)
         {
-            fork = new MemoryChopstick(l_take, r_take, l_put, r_put);
+            fork = new MemoryChopstick(l_take, r_take, l_put, r_put, idLength);
         }
         else
         {
-            fork = new Chopstick(l_take, r_take, l_put, r_put);
+            fork = new Chopstick(l_take, r_take, l_put, r_put, idLength);
         }
         for (int i = 0; i < num; ++i)
         {
