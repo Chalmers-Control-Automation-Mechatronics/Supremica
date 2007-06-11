@@ -603,7 +603,7 @@ class ControlCodeBuilderTest extends GroovyTestCase {
 			SR('SR1', S:'y1', R:'y2 and u2')
 			'u5 := SR1.Q'()
 			RS1(S:'y1', R:'y2 and u2', Q:'u6')
-			P('Py2', in:'y2')
+			R_TRIG('Py2', in:'y2')
 			'u4 := Py2.Q and y1'()
 			FB1('FB1instance', y1:'y2', y2:'y3', u1:'u7')
 			'u8 := y1 or y2'('y3')
