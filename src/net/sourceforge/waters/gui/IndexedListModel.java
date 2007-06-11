@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   IndexedListModel
 //###########################################################################
-//# $Id: IndexedListModel.java,v 1.4 2007-06-11 05:59:18 robi Exp $
+//# $Id: IndexedListModel.java,v 1.5 2007-06-11 15:07:51 robi Exp $
 //###########################################################################
 
 
@@ -12,8 +12,11 @@ package net.sourceforge.waters.gui;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import javax.swing.AbstractListModel;
+import javax.swing.ListSelectionModel;
 
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.IndexedListSubject;
@@ -56,6 +59,14 @@ public class IndexedListModel<E extends NamedSubject>
 
 
   //#########################################################################
+  //# Accessing the Selection
+  public Iterable<E> getSelectedSubjects(final ListSelectionModel selection)
+  {
+    return new SelectionIterable(selection);
+  }
+
+
+  //#########################################################################
   //# Interface javax.swing.ListModel
   public E getElementAt(final int index)
   {
@@ -70,7 +81,6 @@ public class IndexedListModel<E extends NamedSubject>
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.ModelObserver
-  @SuppressWarnings("unchecked")
   public void modelChanged(final ModelChangeEvent event)
   {
     Subject source = event.getSource();
@@ -105,7 +115,7 @@ public class IndexedListModel<E extends NamedSubject>
     switch (kind) {
     case ModelChangeEvent.ITEM_ADDED:
       {
-        final E value = (E) event.getValue();
+        final E value = uncheckedCast(event.getValue());
         final int index = Collections.binarySearch(mSortedMirror, value);
         if (index >= 0) {
           final String name = value.getName();
@@ -165,6 +175,86 @@ public class IndexedListModel<E extends NamedSubject>
     } else {
       return getChangeRoot(parent);
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  private E uncheckedCast(final Object value)
+  {
+    return (E) value;
+  }
+
+
+  //#########################################################################
+  //# Inner Class SelectionIterable
+  private class SelectionIterable implements Iterable<E>
+  {
+    //#######################################################################
+    //# Constructor
+    SelectionIterable(final ListSelectionModel selection)
+    {
+      mSelection = selection;
+    }
+
+    //#######################################################################
+    //# Interface java.util.Iterable
+    public Iterator<E> iterator()
+    {
+      return new SelectionIterator(mSelection);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final ListSelectionModel mSelection;
+  }
+
+
+  //#########################################################################
+  //# Inner Class SelectionIterator
+  private class SelectionIterator implements Iterator<E>
+  {
+    //#######################################################################
+    //# Constructor
+    SelectionIterator(final ListSelectionModel selection)
+    {
+      mSelection = selection;
+      mIndex = selection.getMinSelectionIndex();
+    }
+
+    //#######################################################################
+    //# Interface java.util.Iterator
+    public boolean hasNext()
+    {
+      return mIndex >= 0;
+    }
+
+    public E next()
+    {
+      if (mIndex >= 0) {
+        final E result = getElementAt(mIndex);
+        final int stop = mSelection.getMaxSelectionIndex();
+        while (++mIndex <= stop) {
+          if (mSelection.isSelectedIndex(mIndex)) {
+            return result;
+          }
+        }
+        mIndex = -1;
+        return result;
+      } else {
+        throw new NoSuchElementException
+          ("No more elements in list selection iteration!");
+      }
+    }
+
+    public void remove()
+    {
+      throw new UnsupportedOperationException
+        ("List selection iteration does not support removal of items!");
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final ListSelectionModel mSelection;
+    private int mIndex;
   }
 
 

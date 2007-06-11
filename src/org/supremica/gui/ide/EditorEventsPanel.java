@@ -4,177 +4,64 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorEventsPanel
 //###########################################################################
-//# $Id: EditorEventsPanel.java,v 1.22 2007-06-11 05:59:18 robi Exp $
+//# $Id: EditorEventsPanel.java,v 1.23 2007-06-11 15:07:51 robi Exp $
 //###########################################################################
 
 
 package org.supremica.gui.ide;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.JScrollPane;
 import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
-import net.sourceforge.waters.gui.EventEditorDialog;
 import net.sourceforge.waters.gui.EventDeclListView;
+import net.sourceforge.waters.gui.EventEditorDialog;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
-import net.sourceforge.waters.subject.base.IndexedListSubject;
-import net.sourceforge.waters.subject.module.EventDeclSubject;
-import net.sourceforge.waters.subject.module.ModuleSubject;
-import net.sourceforge.waters.xsd.base.EventKind;
-import org.supremica.gui.WhiteScrollPane;
 
 
 class EditorEventsPanel
-    extends WhiteScrollPane
+    extends JScrollPane
 {
-    private static final long serialVersionUID = 1L;
-    
-    private String name;
-    private ModuleContainer moduleContainer;
-    
-    private final JList mEventList;
-    
-    EditorModuleEventPopupMenu popup = new EditorModuleEventPopupMenu();
-    PopupListener popupListener;
-    
+   
     //######################################################################
     //# Constructor
-    EditorEventsPanel(final ModuleWindowInterface root,
-					  final ModuleContainer moduleContainer,
-					  final String name)
+    EditorEventsPanel(final ModuleWindowInterface root, final String name)
     {
-        this.moduleContainer = moduleContainer;
-        this.name = name;
-        mEventList = new EventDeclListView(root);
-        getViewport().add(mEventList);
-        
-        popupListener = new PopupListener();
-        addMouseListener(popupListener);
-        mEventList.addMouseListener(popupListener);
-        JMenu setKindMenu = new JMenu("Set controllability");
-        popup.add(setKindMenu);
-        
-        JMenuItem setControllabilityMenu = new JMenuItem("Controllable");
-        setKindMenu.add(setControllabilityMenu);
-        setControllabilityMenu.addActionListener(new SetControllableAction());
-        
-        JMenuItem setUncontrollabilityMenu = new JMenuItem("Uncontrollable");       
-        setKindMenu.add(setUncontrollabilityMenu);
-        setUncontrollabilityMenu.addActionListener(new SetUncontrollableAction());
+		mRoot = root;
+		mName = name;
+        final JList list = new EventDeclListView(root);
+        getViewport().add(list);
+    }
 
-        JMenuItem setDeleteMenu = new JMenuItem("Delete event");       
-        popup.add(setDeleteMenu);
-        setDeleteMenu.addActionListener(new SetDeleteAction());        
-    }
-    
-    public String getName()
-    {
-        return name;
-    }
-    
+
+    //######################################################################
+    //# Simple Access
+	public String getName()
+	{
+		return mName;
+	}
+
+
+    //######################################################################
+    //# Actions
     public void addModuleEvent()
     {
-        final EditorPanel panel = moduleContainer.getEditorPanel();
-        new EventEditorDialog(panel, false);
+        new EventEditorDialog(mRoot, false);
     }
     
     public void addComponentEvent()
     {
-        final EditorPanel panel = moduleContainer.getEditorPanel();
-        new EventEditorDialog(panel, false);
+        new EventEditorDialog(mRoot, false);
     }
-    
-    class PopupListener extends MouseAdapter
-    {
-        public void mousePressed(MouseEvent e)
-        {
-            maybeShowPopup(e);
-        }
-        
-        public void mouseReleased(MouseEvent e)
-        {
-            maybeShowPopup(e);
-        }
-        
-        private void maybeShowPopup(MouseEvent e)
-        {
-            if (e.isPopupTrigger() && 
-                    !mEventList.isSelectionEmpty() && 
-                    (mEventList.locationToIndex(e.getPoint()) == mEventList.getSelectedIndex()))
-            {
-                popup.show(mEventList, e.getX(), e.getY());
-            }
-        }
-    }
-    
-    class SetControllableAction
-        implements ActionListener
-    {
-        public void actionPerformed(ActionEvent e)
-        {
-            int selectedIndex = mEventList.getSelectedIndex();
-            Object selectedObject = mEventList.getModel().getElementAt(selectedIndex);
-            if (selectedObject instanceof EventDeclSubject)
-            {
-                EventDeclSubject selectedEvent = (EventDeclSubject)selectedObject;
-                if (selectedEvent.getKind() == EventKind.UNCONTROLLABLE)
-                {
-                    selectedEvent.setKind(EventKind.CONTROLLABLE);
-                }
-            }
-            else
-            {
-                System.err.println("SetControllableAction: Unknown selectedObject type");
-            }
-        }
-    }
-    
-    class SetUncontrollableAction
-        implements ActionListener
-    {
-        public void actionPerformed(ActionEvent e)
-        {
-            int selectedIndex = mEventList.getSelectedIndex();
-            Object selectedObject = mEventList.getModel().getElementAt(selectedIndex);
-            if (selectedObject instanceof EventDeclSubject)
-            {
-                EventDeclSubject selectedEvent = (EventDeclSubject)selectedObject;
-                if (selectedEvent.getKind() == EventKind.CONTROLLABLE)
-                {
-                    selectedEvent.setKind(EventKind.UNCONTROLLABLE);
-                }
-            }
-            else
-            {
-                System.err.println("SetUncontrollableAction: Unknown selectedObject type");
-            }            
-        }
-    }   
 
-    class SetDeleteAction
-        implements ActionListener
-    {
-        public void actionPerformed(ActionEvent e)
-        {
-            int selectedIndex = mEventList.getSelectedIndex();
-            Object selectedObject = mEventList.getModel().getElementAt(selectedIndex);
-            if (selectedObject instanceof EventDeclSubject)
-            {
-                EventDeclSubject selectedEvent = (EventDeclSubject)selectedObject;
-                if (selectedEvent.getKind() == EventKind.CONTROLLABLE || selectedEvent.getKind() == EventKind.UNCONTROLLABLE)
-                {
-                    IndexedListSubject<EventDeclSubject> events = moduleContainer.getModule().getEventDeclListModifiable();
-                    events.remove(selectedEvent);
-                }
-            }
-            else
-            {
-                System.err.println("SetUncontrollableAction: Unknown selectedObject type");
-            }            
-        }
-    }   
+
+	//#########################################################################
+	//# Data Members 
+	private final ModuleWindowInterface mRoot;
+	private final String mName;
+
+
+    //######################################################################
+    //# Static Class Constants
+    private static final long serialVersionUID = 1L;
+    
 }

@@ -4,16 +4,19 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventDeclListView
 //###########################################################################
-//# $Id: EventDeclListView.java,v 1.4 2007-06-11 05:59:18 robi Exp $
+//# $Id: EventDeclListView.java,v 1.5 2007-06-11 15:07:51 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.ArrayList;
 import java.awt.Point;
 import java.awt.datatransfer.Transferable;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -26,7 +29,17 @@ import java.awt.dnd.DragSourceAdapter;
 import java.awt.dnd.DragSourceListener;
 import java.awt.dnd.InvalidDnDOperationException;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
+
+import net.sourceforge.waters.gui.command.Command;
+import net.sourceforge.waters.gui.command.CompoundCommand;
+import net.sourceforge.waters.gui.command.DeleteEventDeclCommand;
+import net.sourceforge.waters.gui.command.EditEventDeclCommand;
 
 import net.sourceforge.waters.subject.base.IndexedListSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
@@ -57,6 +70,7 @@ public class EventDeclListView
   public EventDeclListView(final ModuleWindowInterface root)
   {
     mRoot = root;
+    setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
     final ModuleSubject module = root.getModuleSubject();
     final IndexedListSubject<EventDeclSubject> events =
@@ -78,6 +92,199 @@ public class EventDeclListView
 
 
   //#########################################################################
+  //# Commands
+  private void doCreateEvent()
+  {
+    new EventEditorDialog(mRoot, false);
+  }
+
+  private void doDeleteEvents(final Iterable<EventDeclSubject> victims)
+  {
+    if (victims.iterator().hasNext()) {
+      final ModuleSubject module = mRoot.getModuleSubject();
+      final Command command = new DeleteEventDeclCommand(victims, module);
+      mRoot.getUndoInterface().executeCommand(command);
+    }
+  }
+
+  private void doSetEventsKind(final Iterable<EventDeclSubject> decls,
+                               final EventKind kind)
+  {
+    final CompoundCommand compound = new CompoundCommand("Change Events Kind");
+    for (final EventDeclSubject decl : decls) {
+      if (decl.getKind() != kind) {
+        final EventDeclSubject template = decl.clone();
+        template.setKind(kind);
+        final Command command = new EditEventDeclCommand(decl, template);
+        compound.addCommand(command);
+      }
+    }
+    if (!compound.isEmpty()) {
+      compound.end();
+      mRoot.getUndoInterface().executeCommand(compound);
+    }
+  }
+
+  private void doSetEventsObservable(final Iterable<EventDeclSubject> decls,
+                                     final boolean observable)
+  {
+    final CompoundCommand compound =
+      new CompoundCommand("Change Events Observability");
+    for (final EventDeclSubject decl : decls) {
+      if (decl.isObservable() != observable) {
+        final EventDeclSubject template = decl.clone();
+        template.setObservable(observable);
+        final Command command = new EditEventDeclCommand(decl, template);
+        compound.addCommand(command);
+      }
+    }
+    if (!compound.isEmpty()) {
+      compound.end();
+      mRoot.getUndoInterface().executeCommand(compound);
+    }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private EventDeclSubject getClickedItem(final MouseEvent event)
+  {
+    final Point point = event.getPoint();
+    final int index = locationToIndex(point);
+    if (index >= 0 && index < mModel.getSize()) {
+      return mModel.getElementAt(index);
+    } else {
+      return null;
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class EventDeclPopup
+  private class EventDeclPopup extends JPopupMenu
+  {
+    //#######################################################################
+    //# Constructor
+    EventDeclPopup(final MouseEvent event)
+    {
+      final Iterable<EventDeclSubject> decls;
+      final ListSelectionModel selection =
+        EventDeclListView.this.getSelectionModel();
+      final Point point = event.getPoint();
+      final int index = locationToIndex(point);
+      if (index < 0 ||
+          index >= mModel.getSize() ||
+          selection.isSelectedIndex(index)) {
+        decls = mModel.getSelectedSubjects(selection);
+      } else {
+        final EventDeclSubject clicked = mModel.getElementAt(index);
+        decls = Collections.singletonList(clicked);
+      }
+
+      int declcount = 0;
+      int kindcount = 0;
+      EventKind kind = null;
+      int obscount = 0;
+      boolean observable = true;
+      for (final EventDeclSubject decl : decls) {
+        declcount++;
+        switch (kindcount) {
+        case 0:
+          kind = decl.getKind();
+          kindcount = 1;
+          break;
+        case 1:
+          if (kind != decl.getKind()) {
+            kindcount = 2;
+            kind = null;
+          }
+          break;
+        default:
+          break;
+        }
+        switch (obscount) {
+        case 0:
+          observable = decl.isObservable();
+          obscount = 1;
+          break;
+        case 1:
+          if (observable != decl.isObservable()) {
+            obscount = 2;
+          }
+          break;
+        default:
+          break;
+        }
+      }
+
+      final JMenuItem newItem = new JMenuItem("Create Event ...");
+      newItem.addActionListener(new ActionListener() {
+          public void actionPerformed(final ActionEvent event) {
+            doCreateEvent();
+          }
+        });
+      add(newItem);
+      final String deltext = declcount == 1 ? "Delete Event" : "Delete Events";
+      final JMenuItem deleteItem = new JMenuItem(deltext);
+      deleteItem.setEnabled(declcount > 0);
+      deleteItem.addActionListener(new ActionListener() {
+          public void actionPerformed(final ActionEvent event) {
+            doDeleteEvents(decls);
+          }
+        });
+      add(deleteItem);
+      final JMenu kindMenu = new JMenu("Set kind");
+      add(kindMenu);
+      for (final EventKind itemkind : EventKind.values()) {
+        final String title = getTitle(itemkind);
+        final boolean selected = kindcount == 1 && itemkind == kind;
+        final JRadioButtonMenuItem item =
+          new JRadioButtonMenuItem(title, selected);
+        item.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent event) {
+              doSetEventsKind(decls, itemkind);
+            }
+          });
+        kindMenu.add(item);
+      }
+      kindMenu.addSeparator();
+      final JRadioButtonMenuItem observableItem =
+        new JRadioButtonMenuItem("Observable", obscount == 1 && observable);
+      observableItem.addActionListener(new ActionListener() {
+          public void actionPerformed(final ActionEvent event) {
+            doSetEventsObservable(decls, true);
+          }
+        });
+      kindMenu.add(observableItem);
+      final JRadioButtonMenuItem unobservableItem =
+        new JRadioButtonMenuItem("Unobservable", obscount == 1 && !observable);
+      unobservableItem.addActionListener(new ActionListener() {
+          public void actionPerformed(final ActionEvent event) {
+            doSetEventsObservable(decls, false);
+          }
+        });
+      kindMenu.add(unobservableItem);
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private String getTitle(final EventKind kind)
+    {
+      final String text = kind.toString();
+      final int len = text.length();
+      final StringBuffer buffer = new StringBuffer(len);
+      buffer.append(text.charAt(0));
+      for (int i = 1; i < len; i++) {
+        final char upper = text.charAt(i);
+        final char lower = Character.toLowerCase(upper);
+        buffer.append(lower);
+      }
+      return buffer.toString();
+    }        
+  }
+
+
+  //#########################################################################
   //# Inner Class EventDeclMouseListener
   /**
    * A simple mouse listener to trigger opening the event declaration
@@ -85,7 +292,6 @@ public class EventDeclListView
    */
   private class EventDeclMouseListener extends MouseAdapter
   {
-
     //#######################################################################
     //# Interface java.awt.MouseListener
     public void mouseClicked(final MouseEvent event)
@@ -117,7 +323,10 @@ public class EventDeclListView
     private void maybeShowPopup(final MouseEvent event)
     {
       if (event.isPopupTrigger()) {
-        // not yet implemented ...
+        final JPopupMenu popup = new EventDeclPopup(event);
+        final int x = event.getX();
+        final int y = event.getY();
+        popup.show(EventDeclListView.this, x, y);
       }
     }
 
@@ -128,7 +337,6 @@ public class EventDeclListView
   //# Inner Class EventDeclDragGestureListener
   private class EventDeclDragGestureListener implements DragGestureListener
   {
-
     //#######################################################################
     //# Interface java.awt.dnd.DragGestureListener
     public void dragGestureRecognized(final DragGestureEvent event)
