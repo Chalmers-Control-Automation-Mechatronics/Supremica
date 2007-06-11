@@ -598,7 +598,7 @@ public class AutomataMinimizer
                         }
                         else if (bestValue == thisValue)
                         {
-                            // They were equal! Use lower priority strategy to make a decision!
+                            // They werue equal! Use lower priority strategy to make a decision!
                             //for (MinimizationStrategy nextStrategy: strategyList)
                             for (int i = strategyIndex+1; i<strategyList.size(); i++)
                             {
@@ -623,9 +623,8 @@ public class AutomataMinimizer
                                 }
                             }
                             // Equal in all regards? Compare alphabetical order to get reproducible results
-                            if (aut.getName().compareTo(bestAutomaton.getName()) > 0)
+                            if (aut.compareTo(bestAutomaton) < 0)
                             {
-                                //logger.info(aut + " " + bestAutomaton);
                                 //logger.info(bestAutomaton + " " + aut);
                                 bestAutomaton = aut;
                             }
@@ -656,10 +655,12 @@ public class AutomataMinimizer
                             neighbours.addAutomata(eventToAutomataMap.get(event));
                     }
                     neighbours.removeAutomaton(bestAutomaton);
+                    /*
                     if (neighbours.size() == 0)
                     {
                         logger.info("Disjoint!! " + bestAutomaton + " size " + bestAutomaton.nbrOfStates());
                     }
+                     */
                     loop: for (Automaton aut: neighbours)
                     {
                         // Skip all the too large automata
@@ -943,13 +944,13 @@ public class AutomataMinimizer
         }
          */
             
-        /*
+		/*
         if (useShortStateNames)
         {
             aut.setName("");
             aut.setComment("" + nameIndex++);
         }
-         */
+		*/
 
         return aut;
     }

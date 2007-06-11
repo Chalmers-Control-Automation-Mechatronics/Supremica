@@ -188,8 +188,8 @@ public class BenchmarkAutomataVerifier
                 file.write("Primary 2:nd stage heuristic: " + mOptions.getMinimizationHeuristic() + "\n");
                 file.flush();
                 
-				//if (false) // Academic
-				if (true) // Industrial
+				if (false) // Academic
+					//if (true) // Industrial
                 {
 					///////////////////////////////////
 					// "Industrial" model benchmarks //
@@ -246,10 +246,8 @@ public class BenchmarkAutomataVerifier
                     Project theProject;
                     
 					/*
-					*/
                     // Dining philosophers
-					philo = new DiningPhilosophers(256, true, true, false, false,
-                        false, false);
+					philo = new DiningPhilosophers(256, true, true, false, false, false, false);
                     theProject = philo.getProject();
                     runBenchmark("256philo", theProject, vOptions, sOptions, mOptions);
 					philo = new DiningPhilosophers(512, true, true, false, false, false, false);
@@ -271,6 +269,7 @@ public class BenchmarkAutomataVerifier
                     line = new TransferLine(512, 3, 1, false);
                     theProject = line.getProject();
                     runBenchmark("512transfer", theProject, vOptions, sOptions, mOptions);
+					*/
                     // Arbiter
 					arbiter = new Arbiter(128, false);
                     theProject = arbiter.getProject();

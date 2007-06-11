@@ -56,6 +56,7 @@ public enum MinimizationStrategy
 {
     AtLeastOneLocal("At least one local", "mustL", Type.SPECIAL),
     AtLeastOneLocalMaxThree("At least one local, max three", "mustL3", Type.SPECIAL),
+    //AutomatonWithNeighbours("Automaton with neighbours", "neigh", Type.SPECIAL),
     FewestTransitionsFirst("Pair with fewest transition automaton", "minT", Type.MINIMIZE),
     FewestStatesFirst("Pair with fewest states automaton", "minS", Type.MINIMIZE),
     FewestEventsFirst("Pair with fewest events automaton", "minE", Type.MINIMIZE),
