@@ -521,7 +521,7 @@ public class AutomataVerifier
         }
         
         //return "\\texttt{NAME} & " + initialNbrOfAutomata + " & SIZE & " + mostStates + " & " + mostTransitions + " & TIME & BLOCK & " + AutomatonMinimizer.getWodesStatisticsLaTeX() + " & ALGO1 & ALGO2 \\\\";
-        message = "\\texttt{NAME} & " + theAutomata.size() + " & SIZE & " + synchHelper.getStatisticsLineLatex() + " & TIME & " + !allModulesControllable;
+        message = "\\texttt{NAME} & " + theAutomata.size() + " & SIZE & " + synchHelper.getStatisticsLineLatex() + " & TIME & " + allModulesControllable;
 
         return allModulesControllable;
     }

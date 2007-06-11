@@ -129,7 +129,8 @@ public enum MinimizationStrategy
             final Automata autNeighbours = new Automata();
             for (LabeledEvent event : aut.getAlphabet())
             {
-                autNeighbours.addAutomata(eventToAutomataMap.get(event));
+                if (event.isObservable())
+                    autNeighbours.addAutomata(eventToAutomataMap.get(event));
             }
             return autNeighbours.size()-1;
         }

@@ -101,7 +101,7 @@ public class BenchmarkAutomataVerifier
         
         // Controllability / Nonblocking
         vOptions = VerificationOptions.getDefaultNonblockingOptions();
-        int type = 0;
+        int type = 2;
         if (type == 0)
             // Nonblocking
             vOptions.setVerificationType(VerificationType.NONBLOCKING);
@@ -126,33 +126,33 @@ public class BenchmarkAutomataVerifier
         {
             MinimizationStrategy.FewestTransitionsFirst,
             /*
-             */
             MinimizationStrategy.MostStatesFirst,
+             */
             /*
             MinimizationStrategy.AtLeastOneLocal,
             MinimizationStrategy.AtLeastOneLocalMaxThree,
-            MinimizationStrategy.FewestStatesFirst,
-            MinimizationStrategy.FewestEventsFirst,
+            //MinimizationStrategy.FewestStatesFirst,
+            //MinimizationStrategy.FewestEventsFirst,
             MinimizationStrategy.RandomFirst
-            MinimizationStrategy.FewestNeighboursFirst,
              */
+            MinimizationStrategy.FewestNeighboursFirst,
         };
         
         // Heuristics
         MinimizationHeuristic[] heuristicArray =
         {
-            MinimizationHeuristic.MostLocal, 
             /*
-            MinimizationHeuristic.FewestStates,
+            MinimizationHeuristic.MostLocal, 
              */ 
             /*
-            MinimizationHeuristic.LeastExtension,
-            MinimizationHeuristic.FewestTransitions,
-			MinimizationHeuristic.MostCommon,
-            MinimizationHeuristic.FewestEvents,
-            MinimizationHeuristic.LeastFanning
+            //MinimizationHeuristic.FewestStates,
+            //MinimizationHeuristic.LeastExtension,
+            //MinimizationHeuristic.FewestTransitions,
              */
-        };
+			MinimizationHeuristic.MostCommon,
+            //MinimizationHeuristic.FewestEvents,
+            MinimizationHeuristic.LeastFanning
+		};
         
         try
         {
@@ -201,8 +201,8 @@ public class BenchmarkAutomataVerifier
 					String[] test =
 					{
 						/*
- 						*/
 						"agv", "agvb",
+ 						*/
 						"verriegel3", "verriegel3b",
 						"verriegel4", "verriegel4b",
 						//"bmw_fh",
