@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EventEditorDialog
 //###########################################################################
-//# $Id: EventEditorDialog.java,v 1.16 2007-06-08 10:45:20 robi Exp $
+//# $Id: EventEditorDialog.java,v 1.17 2007-06-11 05:59:18 robi Exp $
 //###########################################################################
 
 
@@ -52,11 +52,13 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
+import net.sourceforge.waters.gui.command.Command;
+import net.sourceforge.waters.gui.command.CreateEventDeclCommand;
+import net.sourceforge.waters.gui.command.EditEventDeclCommand;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.subject.base.IndexedListSubject;
-import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
@@ -78,44 +80,37 @@ public class EventEditorDialog
   }
 
   public EventEditorDialog(final ModuleWindowInterface root,
+                           final EventDeclSubject decl)
+  {
+    this(root, usesMoreOptions(decl), decl);
+  }
+
+  public EventEditorDialog(final ModuleWindowInterface root,
                            final boolean moreoptions)
   {
-    this(root, true, moreoptions, createDefaultItem());
+    this(root, moreoptions, null);
   }
 
   public EventEditorDialog(final ModuleWindowInterface root,
                            final boolean moreoptions,
                            final EventDeclSubject decl)
   {
-    this(root, false, moreoptions, decl);
-  }
-
-  private EventEditorDialog(final ModuleWindowInterface root,
-                            final boolean createnew,
-                            final boolean moreoptions,
-                            final EventDeclSubject decl)
-  {
     super(root.getRootWindow());
-    if (createnew) {
+    final EventDeclSubject template;
+    if (decl == null) {
       setTitle("Creating new event declation");
     } else {
       setTitle("Editing event declation '" + decl.getName() + "'");
     }
     mRoot = root;
-    mCreating = createnew;
     mDisplayingMoreOptions = moreoptions;
-    mEditedItem = decl;
+    mEventDecl = decl;
     createComponents();
     layoutComponents();
     setLocationRelativeTo(mRoot.getRootWindow());
     mNameInput.requestFocusInWindow();
     setVisible(true);
     mActionListeners = new LinkedList<ActionListener>();
-  }
-
-  private static EventDeclSubject createDefaultItem()
-  {
-    return new EventDeclSubject("", EventKind.CONTROLLABLE);
   }
 
 
@@ -128,7 +123,7 @@ public class EventEditorDialog
    */
   public EventDeclSubject getEditedItem()
   {
-    return mEditedItem;
+    return mEventDecl;
   }
 
 
@@ -139,7 +134,7 @@ public class EventEditorDialog
    * event editor dialog are triggered when the user commits the dialog,
    * after the event declaration has been created and added
    * to the module. Therefore, they can query the value of {@link
-   * #getEditedItem()} to determine which subject was created. The
+   * #getEventDecl()} to determine which subject was created. The
    * {@link ActionEvent} passed to the listener is the event that caused
    * the dialog to be comitted.
    */
@@ -168,6 +163,8 @@ public class EventEditorDialog
    */
   private void createComponents()
   {
+    final EventDeclSubject template =
+      mEventDecl == null ? TEMPLATE : mEventDecl;
     ActionListener commithandler = null;
     if (mNamePanel == null) {
       // Initialising for the first time. Everything needs to be done.
@@ -176,7 +173,7 @@ public class EventEditorDialog
       mNamePanel = new RaisedDialogPanel();
       mNameLabel = new JLabel("Name:");
       final FormattedInputParser parser = new EventNameInputParser();
-      mNameInput = new SimpleExpressionCell(mEditedItem.getName(), parser);
+      mNameInput = new SimpleExpressionCell(template.getName(), parser);
       commithandler = new ActionListener() {
           public void actionPerformed(final ActionEvent event)
           {
@@ -205,7 +202,7 @@ public class EventEditorDialog
       mPropositionButton.setRequestFocusEnabled(false);
       mPropositionButton.setEnabled(advanced);
       mKindGroup.add(mPropositionButton);
-      switch (mEditedItem.getKind()) {
+      switch (template.getKind()) {
       case CONTROLLABLE:
         mControllableButton.setSelected(true);
         break;
@@ -252,8 +249,8 @@ public class EventEditorDialog
       // Need to create extra components for name panel ...
       mObservableButton = new JCheckBox("Observable");
       mObservableButton.setRequestFocusEnabled(false);
-      mObservableButton.setSelected(mEditedItem.isObservable());
-      final ScopeKind scope = mEditedItem.getScope();
+      mObservableButton.setSelected(template.isObservable());
+      final ScopeKind scope = template.getScope();
       mParameterButton = new JCheckBox("Parameter");
       mParameterButton.setRequestFocusEnabled(false);
       mParameterButton.setSelected(scope != ScopeKind.LOCAL);
@@ -266,7 +263,7 @@ public class EventEditorDialog
 
       mRequiredButton = new JCheckBox("Required");
       mRequiredButton.setRequestFocusEnabled(false);
-      mRequiredButton.setSelected(scope == ScopeKind.REQUIRED_PARAMETER);
+      mRequiredButton.setSelected(scope != ScopeKind.OPTIONAL_PARAMETER);
       updateRequiredEnabled();
       mColourButton = new JButton("Color ...");
       mColourButton.setRequestFocusEnabled(false);
@@ -284,7 +281,7 @@ public class EventEditorDialog
       // ... and create index panel.
       mIndexPanel = new RaisedDialogPanel();
       final List<SimpleExpressionSubject> ranges =
-        mEditedItem.getRangesModifiable();
+        template.getRangesModifiable();
       final List<SimpleExpressionSubject> copy =
         new ArrayList<SimpleExpressionSubject>(ranges);
       mIndexModel = new ListTableModel<SimpleExpressionSubject>
@@ -662,7 +659,8 @@ public class EventEditorDialog
   private void updateColourEnabled()
   {
     if (mColourButton != null) {
-      final boolean enable = mPropositionButton.isSelected();
+      // final boolean enable = mPropositionButton.isSelected();
+      final boolean enable = false;
       mColourButton.setEnabled(enable);
     }
   }
@@ -865,36 +863,57 @@ public class EventEditorDialog
       }
     } else {
       final String name = mNameInput.getText();
-      mEditedItem.setName(name);
+      final EventKind kind;
       if (mControllableButton.isSelected()) {
-        mEditedItem.setKind(EventKind.CONTROLLABLE);
+        kind = EventKind.CONTROLLABLE;
       } else if (mUncontrollableButton.isSelected()) {
-        mEditedItem.setKind(EventKind.UNCONTROLLABLE);
+        kind = EventKind.UNCONTROLLABLE;
       } else if (mPropositionButton.isSelected()) {
-        mEditedItem.setKind(EventKind.PROPOSITION);
+        kind = EventKind.PROPOSITION;
       } else {
         throw new IllegalStateException("Event kind not selected!");
       }
-      if (mIndexPanel != null) {
-        final boolean observable = mObservableButton.isSelected();
-        mEditedItem.setObservable(observable);
-        final ListSubject<SimpleExpressionSubject> ranges =
-          mEditedItem.getRangesModifiable();
-        final List<SimpleExpressionSubject> newranges = mIndexModel.getList();
-        ranges.assignFrom(newranges);
+      final boolean observable;
+      final ScopeKind scope;
+      final List<SimpleExpressionSubject> ranges;
+      if (mIndexPanel == null) {
+        observable = true;
+        scope = ScopeKind.LOCAL;
+        ranges = null;
+      } else {
+        observable = mObservableButton.isSelected();
         if (!mParameterButton.isSelected()) {
-          mEditedItem.setScope(ScopeKind.LOCAL);
+          scope = ScopeKind.LOCAL;
         } else if (mRequiredButton.isSelected()) {
-          mEditedItem.setScope(ScopeKind.REQUIRED_PARAMETER);
+          scope = ScopeKind.REQUIRED_PARAMETER;
         } else {
-          mEditedItem.setScope(ScopeKind.OPTIONAL_PARAMETER);
+          scope = ScopeKind.OPTIONAL_PARAMETER;
         }
+        // *** BUG ***
+        // This copying would not be necessary if assignFrom() could accept
+        // proxies.
+        final List<SimpleExpressionSubject> origranges = mIndexModel.getList();
+        ranges = new ArrayList<SimpleExpressionSubject>(origranges.size());
+        for (final SimpleExpressionSubject range : origranges) {
+          if (range.getParent() == null) {
+            ranges.add(range);
+          } else {
+            ranges.add(range.clone());
+          }
+        }
+        // ***
       }
-      if (mCreating) {
+      final EventDeclSubject template =
+        new EventDeclSubject(name, kind, observable, scope, ranges, null);
+      if (mEventDecl == null) {
+        // Creating new event declaration.
         final ModuleSubject module = getModule();
-        final IndexedListSubject<EventDeclSubject> events =
-          module.getEventDeclListModifiable();
-        events.add(mEditedItem);
+        final Command command = new CreateEventDeclCommand(template, module);
+        mEventDecl = template;
+        mRoot.getUndoInterface().executeCommand(command);
+      } else if (!mEventDecl.equalsWithGeometry(template)) {
+        final Command command = new EditEventDeclCommand(mEventDecl, template);
+        mRoot.getUndoInterface().executeCommand(command);
       }
       dispose();
     }
@@ -922,6 +941,17 @@ public class EventEditorDialog
 
 
   //#########################################################################
+  //# Auxiliary Static Methods
+  private static boolean usesMoreOptions(final EventDeclSubject decl)
+  {
+    return
+      !decl.isObservable() ||
+      decl.getScope() != ScopeKind.LOCAL ||
+      !decl.getRanges().isEmpty();
+  }
+
+
+  //#########################################################################
   //# Local Class EventNameInputParser
   private class EventNameInputParser
     extends DocumentFilter
@@ -935,7 +965,7 @@ public class EventEditorDialog
     {
       final ExpressionParser parser = getExpressionParser();
       parser.parseSimpleIdentifier(text);
-      final String oldname = mEditedItem.getName();
+      final String oldname = mEventDecl == null ? "" : mEventDecl.getName();
       if (!text.equals(oldname)) {
         final ModuleSubject module = getModule();
         final IndexedListSubject<EventDeclSubject> eventlist =
@@ -1035,7 +1065,6 @@ public class EventEditorDialog
   //# Data Members
   // Dialog state
   private final ModuleWindowInterface mRoot;
-  private boolean mCreating;
   private boolean mDisplayingMoreOptions;
 
   // Swing components
@@ -1068,18 +1097,23 @@ public class EventEditorDialog
 
   // Created Item
   /**
-   * The Waters event declaration subject edited by this dialog.
-   * This is a reference to the actual object that is being edited,
-   * or, if a new item is being created, it is a blank object filled
-   * with default values.
-   * The edited state is stored only in the dialog. Changes are only
-   * committed to the model when the OK button is pressed.
+   * <P>The Waters event declaration subject edited by this dialog.</P>
+   *
+   * <P>This is a reference to the actual object that is being edited.  If
+   * a new event declaorration is being created, it is <CODE>null</CODE>
+   * until the dialog is commited and the actually created subject is
+   * assigned.</P>
+   *
+   * <P>The edited state is stored only in the dialog. Changes are only
+   * committed to the model when the OK button is pressed.</P>
    */
-  private EventDeclSubject mEditedItem;
+  private EventDeclSubject mEventDecl;
 
 
   //#########################################################################
   //# Class Constants
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
+  private static final EventDeclSubject TEMPLATE =
+    new EventDeclSubject("", EventKind.CONTROLLABLE);
 
 }

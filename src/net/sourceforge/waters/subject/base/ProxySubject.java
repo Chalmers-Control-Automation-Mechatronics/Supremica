@@ -1,10 +1,10 @@
-//# -*- indent-tabs-mode: nil  c-basic-offproxy: 2 -*-
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   ProxySubject
 //###########################################################################
-//# $Id: ProxySubject.java,v 1.2 2005-11-03 01:24:16 robi Exp $
+//# $Id: ProxySubject.java,v 1.3 2007-06-11 05:59:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -34,5 +34,18 @@ public interface ProxySubject
    * to the clone.
    */
   public ProxySubject clone();
+
+  /**
+   * Assigns the contents of another subject to this subject.  This method
+   * ensures that the contents of this subject are equal to the contents of
+   * the given subject according to the {@link
+   * net.sourceforge.waters.model.base.Proxy#equalsWithGeometry(Proxy)
+   * equalsWithGeometry()} method. Items already contained in this subject
+   * are reused if possible, and may be changed in position as
+   * needed. Items not contained are cloned from the given subject. The
+   * method tries to produce as few model change notifications as possible.
+   * @param  subject  The subject to be copied from.
+   */
+  public boolean assignFrom(ProxySubject partner);
 
 }

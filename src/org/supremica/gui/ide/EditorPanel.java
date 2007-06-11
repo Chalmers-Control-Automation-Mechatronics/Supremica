@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorPanel
 //###########################################################################
-//# $Id: EditorPanel.java,v 1.53 2007-06-08 10:45:20 robi Exp $
+//# $Id: EditorPanel.java,v 1.54 2007-06-11 05:59:18 robi Exp $
 //###########################################################################
 
 
@@ -52,7 +52,7 @@ public class EditorPanel
         componentsPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
         tabPanel.add(componentsPanel);
         
-        eventsPanel = new EditorEventsPanel(moduleContainer, "Events");
+        eventsPanel = new EditorEventsPanel(this, moduleContainer, "Events");
         eventsPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
         eventsPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
         tabPanel.add(eventsPanel);

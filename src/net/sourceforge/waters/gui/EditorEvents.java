@@ -4,15 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.31 2007-06-08 10:45:20 robi Exp $
+//# $Id: EditorEvents.java,v 1.32 2007-06-11 05:59:18 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import net.sourceforge.waters.xsd.base.EventKind;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -31,6 +28,8 @@ import java.awt.dnd.DragSourceAdapter;
 import java.awt.dnd.DragSourceDragEvent;
 import java.awt.dnd.DragSourceListener;
 import java.awt.dnd.InvalidDnDOperationException;
+import java.util.ArrayList;
+import java.util.Collection;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.ImageIcon;
@@ -52,11 +51,11 @@ import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
- * <p>The Events window which sits to the right of the editor window.</p>
+ * <p>The Events panel which sits next to the graph editor panel.</p>
  *
  * <p>This is used to view the module events which have been selected for
  * use with this particular component, and selecting other events from the

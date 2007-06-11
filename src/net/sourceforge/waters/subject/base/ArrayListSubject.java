@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   ArrayListSubject
 //###########################################################################
-//# $Id: ArrayListSubject.java,v 1.5 2007-02-26 21:41:18 robi Exp $
+//# $Id: ArrayListSubject.java,v 1.6 2007-06-11 05:59:18 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -233,7 +233,7 @@ public class ArrayListSubject<P extends ProxySubject>
       used[i] = false;
     }
     i = 0;
-    final Iterator<? extends P> iter = list.iterator();
+    final Iterator<P> iter = iterator();
     for (final P newproxy : list) {
       if (iter.hasNext()) {
         final P oldproxy = iter.next();

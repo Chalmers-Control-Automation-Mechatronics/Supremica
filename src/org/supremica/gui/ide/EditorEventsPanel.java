@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorEventsPanel
 //###########################################################################
-//# $Id: EditorEventsPanel.java,v 1.21 2007-06-08 10:45:20 robi Exp $
+//# $Id: EditorEventsPanel.java,v 1.22 2007-06-11 05:59:18 robi Exp $
 //###########################################################################
 
 
@@ -20,6 +20,7 @@ import java.awt.event.MouseEvent;
 
 import net.sourceforge.waters.gui.EventEditorDialog;
 import net.sourceforge.waters.gui.EventDeclListView;
+import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.subject.base.IndexedListSubject;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -40,12 +41,15 @@ class EditorEventsPanel
     EditorModuleEventPopupMenu popup = new EditorModuleEventPopupMenu();
     PopupListener popupListener;
     
-    EditorEventsPanel(ModuleContainer moduleContainer, String name)
+    //######################################################################
+    //# Constructor
+    EditorEventsPanel(final ModuleWindowInterface root,
+					  final ModuleContainer moduleContainer,
+					  final String name)
     {
         this.moduleContainer = moduleContainer;
         this.name = name;
-        final ModuleSubject module = moduleContainer.getModule();
-        mEventList = new EventDeclListView(module);
+        mEventList = new EventDeclListView(root);
         getViewport().add(mEventList);
         
         popupListener = new PopupListener();

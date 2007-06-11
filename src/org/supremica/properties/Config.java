@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.properties
 //# CLASS:   Config
 //###########################################################################
-//# $Id: Config.java,v 1.34 2007-05-14 17:53:39 flordal Exp $
+//# $Id: Config.java,v 1.35 2007-06-11 05:59:18 robi Exp $
 //###########################################################################
 
 /*
@@ -142,7 +142,7 @@ public final class Config
     // GENERAL_LOG
     public static final AppenderProperty LOG_TO_CONSOLE =
       new AppenderProperty(PropertyType.GENERAL_LOG, "logToConsole",
-			   false, "Log to Console");
+			   true, "Log to Console");
     public static final AppenderProperty LOG_TO_GUI =
       new AppenderProperty(PropertyType.GENERAL_LOG, "logToGUI",
 			   false, "Log to Graphical User Interface");
@@ -151,7 +151,7 @@ public final class Config
 			   true, "Redirect stdout");
     public static final RedirectProperty GENERAL_REDIRECT_STDERR =
       new RedirectProperty(PropertyType.GENERAL_LOG, "generalRedirectStderr",
-			   true, "Redirect stderr");
+			   false, "Redirect stderr");
     public static final BooleanProperty VERBOSE_MODE =
       new BooleanProperty(PropertyType.GENERAL_LOG, "verboseMode",
 			  false, "Verbose mode");

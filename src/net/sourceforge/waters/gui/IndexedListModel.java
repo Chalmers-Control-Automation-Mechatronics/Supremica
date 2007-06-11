@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   IndexedListModel
 //###########################################################################
-//# $Id: IndexedListModel.java,v 1.3 2007-03-20 12:11:31 knut Exp $
+//# $Id: IndexedListModel.java,v 1.4 2007-06-11 05:59:18 robi Exp $
 //###########################################################################
 
 
@@ -32,7 +32,7 @@ public class IndexedListModel<E extends NamedSubject>
   public IndexedListModel(final IndexedListSubject<E> subject)
   {
     mSubject = subject;
-    mSortedMirror = new ArrayList<NamedSubject>(subject);
+    mSortedMirror = new ArrayList<E>(subject);
     Collections.sort(mSortedMirror);
     subject.addModelObserver(this);
   }
@@ -57,7 +57,7 @@ public class IndexedListModel<E extends NamedSubject>
 
   //#########################################################################
   //# Interface javax.swing.ListModel
-  public NamedSubject getElementAt(final int index)
+  public E getElementAt(final int index)
   {
     return mSortedMirror.get(index);
   }
@@ -70,13 +70,42 @@ public class IndexedListModel<E extends NamedSubject>
 
   //#########################################################################
   //# Interface net.sourceforge.waters.subject.base.ModelObserver
+  @SuppressWarnings("unchecked")
   public void modelChanged(final ModelChangeEvent event)
   {
-    final Subject source = event.getSource();
-    switch (event.getKind()) {
+    Subject source = event.getSource();
+    int kind = event.getKind();
+    if (source == mSubject) {
+      switch (kind) {
+      case ModelChangeEvent.ITEM_ADDED:
+      case ModelChangeEvent.ITEM_REMOVED:
+        break;
+      default:
+        throw new IllegalStateException
+          ("Unexpected notification " + kind + " for list subject!");
+      }
+    } else if (source.getParent() == mSubject) {
+      switch (kind) {
+      case ModelChangeEvent.NAME_CHANGED:
+      case ModelChangeEvent.STATE_CHANGED:
+        break;
+      case ModelChangeEvent.GEOMETRY_CHANGED:
+        return;
+      default:
+        throw new IllegalStateException
+          ("Unexpected notification " + kind + " for list member!");
+      }
+    } else {
+      if (kind == ModelChangeEvent.GEOMETRY_CHANGED) {
+        return;
+      }
+      source = getChangeRoot(source);
+      kind = ModelChangeEvent.STATE_CHANGED;
+    }
+    switch (kind) {
     case ModelChangeEvent.ITEM_ADDED:
-      if (source == mSubject) {
-        final NamedSubject value = (NamedSubject) event.getValue();
+      {
+        final E value = (E) event.getValue();
         final int index = Collections.binarySearch(mSortedMirror, value);
         if (index >= 0) {
           final String name = value.getName();
@@ -89,7 +118,7 @@ public class IndexedListModel<E extends NamedSubject>
       }
       break;
     case ModelChangeEvent.ITEM_REMOVED:
-      if (source == mSubject) {
+      {
         final NamedSubject value = (NamedSubject) event.getValue();
         final int index = Collections.binarySearch(mSortedMirror, value);
         if (index < 0) {
@@ -102,7 +131,7 @@ public class IndexedListModel<E extends NamedSubject>
       }
       break;
     case ModelChangeEvent.NAME_CHANGED:
-      if (source.getParent() == mSubject) {
+      {
         Collections.sort(mSortedMirror);
         final int last = mSortedMirror.size() - 1;
         fireContentsChanged(this, 0, last);
@@ -110,10 +139,10 @@ public class IndexedListModel<E extends NamedSubject>
       break;
     case ModelChangeEvent.STATE_CHANGED:
       {
-        final NamedSubject value = getChangeRoot(source);
-        final int index = Collections.binarySearch(mSortedMirror, value);
+        final NamedSubject named = (NamedSubject) source;
+        final int index = Collections.binarySearch(mSortedMirror, named);
         if (index < 0) {
-          final String name = value.getName();
+          final String name = named.getName();
           throw new IllegalStateException
             ("Modified item '" + name + "' not found in mirror!");
         }
@@ -142,6 +171,6 @@ public class IndexedListModel<E extends NamedSubject>
   //#########################################################################
   //# Data Members
   private IndexedListSubject<E> mSubject;
-  private List<NamedSubject> mSortedMirror;
+  private List<E> mSortedMirror;
 
 }
