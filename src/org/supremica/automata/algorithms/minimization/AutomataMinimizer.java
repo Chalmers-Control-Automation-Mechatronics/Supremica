@@ -211,8 +211,9 @@ public class AutomataMinimizer
         int globalAlphabetSize = eventToAutomataMap.size() - options.getTargetAlphabet().size();
         // Current alphabet size...
         int currentAlphabetSize = globalAlphabetSize;
-        
-        ActionTimer timer = new ActionTimer();
+
+		// Measure the time for the task selection
+        ActionTimer taskSelectionTimer = new ActionTimer();
         
         // If there's just one automaton, the user must have wanted it minimised!
         if (theAutomata.size() == 1)
@@ -235,7 +236,7 @@ public class AutomataMinimizer
              */
             
             // Get next automata to minimize
-            timer.start();
+            taskSelectionTimer.start();
             
             //MinimizationTask task = getNextMinimizationTask(false); // old implementation
             MinimizationTask task = getNextMinimizationTask(true); // new implementation
@@ -255,7 +256,7 @@ public class AutomataMinimizer
                 hideThese = selection.getUnionAlphabet();
                 hideThese.minus(options.getTargetAlphabet());
             }
-            timer.stop();
+            taskSelectionTimer.stop();
             if (stopRequested)
             {
                 return null;
@@ -387,7 +388,7 @@ public class AutomataMinimizer
             //logger.info("The automaton with the most states had " + mostStates + " states.");
             //logger.info("The automaton with the most transitions had " + mostTransitions + " transitions.");
         }
-        logger.info("Timer time: " + timer);
+        //logger.info("Timer time: " + taskSelectionTimer);
         //logger.info(theAutomata.getName() + " & " + initialNbrOfAutomata + " & & " + mostStates + " & " + mostTransitions + " & TIME & true/false & " + AutomatonMinimizer.getWodesStatisticsLaTeX() + " & ALGO \\\\");
         // Return the result of the minimization!
         return theAutomata;
@@ -580,7 +581,7 @@ public class AutomataMinimizer
                         // If the automaton has no transitions, add it to the task without further ado
                         if (aut.nbrOfTransitions() == 0)
                         {
-                            logger.info("It happened!!" + aut);
+                            //logger.info("It happened!!" + aut);
                             taskExtra.addAutomaton(aut);
                             continue;
                         }
@@ -809,7 +810,7 @@ public class AutomataMinimizer
         // Which events should be hidden?
         Alphabet hideThese = MinimizationHelper.getLocalEvents(taskAutomata, eventToAutomataMap);
         hideThese.minus(targetAlphabet);
-        System.out.println("Task: " + taskAutomata + ", " + hideThese);
+        //System.out.println("Task: " + taskAutomata + ", " + hideThese);
         // Result found! Return!
         return new MinimizationTask(taskAutomata, hideThese);
     }

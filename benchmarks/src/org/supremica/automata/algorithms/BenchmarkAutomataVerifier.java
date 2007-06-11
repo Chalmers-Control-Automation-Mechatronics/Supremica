@@ -188,8 +188,8 @@ public class BenchmarkAutomataVerifier
                 file.write("Primary 2:nd stage heuristic: " + mOptions.getMinimizationHeuristic() + "\n");
                 file.flush();
                 
-				if (false) // Academic
-					//if (true) // Industrial
+				//if (false) // Academic
+				if (true) // Industrial
                 {
 					///////////////////////////////////
 					// "Industrial" model benchmarks //
@@ -201,12 +201,13 @@ public class BenchmarkAutomataVerifier
 					String[] test =
 					{
 						/*
+ 						*/
 						"agv", "agvb",
 						"verriegel3", "verriegel3b",
 						"verriegel4", "verriegel4b",
 						//"bmw_fh",
 						"big_bmw",
-						//"FMS",
+						"FMS",
 						"SMS",
 						"PMS",
 						"IPC",
@@ -215,7 +216,6 @@ public class BenchmarkAutomataVerifier
 						//"fzelle", // All states are marked!?
 						"rhone_tough",
 						//"tbed_ctct"
- 						*/
 						"AIP_minus_AS3_TU4",
 						"tbed_valid",
 						"PLanTS",
