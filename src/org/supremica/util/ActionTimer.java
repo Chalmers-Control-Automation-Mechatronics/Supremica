@@ -61,10 +61,6 @@ import java.util.Date;
  */
 public class ActionTimer
 {
-    private final static String hours = " hours";
-    private final static String minutes = " minutes";
-    private final static String seconds = " seconds";
-    private final static String milliseconds = " milliseconds";
     private Date startDate = null;
     private Date stopDate = null;
     
@@ -146,6 +142,11 @@ public class ActionTimer
      */
     public String toString()
     {
+        final String hours = " hours";
+        final String minutes = " minutes";
+        final String seconds = " seconds";
+        final String milliseconds = " milliseconds";
+
         // Calculate time
         long time = elapsedTime();    // time is in millisecs
         int hrs = (int) (time / (60 * 60 * 1000.0));
@@ -175,6 +176,42 @@ public class ActionTimer
         else
         {
             sbuf.append(millis + milliseconds);
+        }
+        
+        return sbuf.toString();
+    }
+    
+    /**
+     * Returns a nice, readable string presenting the currently elapsed time.
+     */
+    public String toStringShort()
+    {
+        final String hours = " h";
+        final String minutes = " m";
+        final String seconds = " s";
+        final String milliseconds = " mi";
+
+        // Calculate time
+        long time = elapsedTime();    // time is in millisecs
+
+        // Produce message
+        StringBuffer sbuf = new StringBuffer();
+        if (time >= 60 * 60 * 1000.0)
+        {
+            // Hours
+            sbuf.append((Math.round(time/(60*60*10.0))/100.0) + hours);
+        }
+		/*
+        else if (time >= 60 * 1000.0)
+        {
+            // Minutes
+            sbuf.append((Math.round(time/(60*10.0))/100.0) + minutes);
+        }
+		*/
+        else
+        {
+            // Seconds
+            sbuf.append((Math.round(time/(10.0))/100.0) + seconds);
         }
         
         return sbuf.toString();

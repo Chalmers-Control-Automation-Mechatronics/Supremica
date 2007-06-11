@@ -58,17 +58,17 @@ public enum MinimizationHeuristic
     MostLocal("Highest local ratio", "maxL", Type.MAXIMIZE),
     MostCommon("Highest common ratio", "maxC", Type.MAXIMIZE),
     LeastExtension("Least extension of alphabet", Type.MINIMIZE),
-    FewestTransitions("Fewest transitions", Type.MINIMIZE),
+    FewestTransitions("Fewest transitions", "minT", Type.MINIMIZE),
     FewestStates("Fewest states", "minS", Type.MINIMIZE),
-    FewestEvents("Fewest events", Type.MINIMIZE),
-    FewestAutomata("Fewest automata", Type.MINIMIZE),
-    MostTransitions("Most transitions", Type.MAXIMIZE),
-    MostStates("Most states", Type.MAXIMIZE),
-    MostEvents("Most events", Type.MAXIMIZE),
-    MostAutomata("Most automata", Type.MAXIMIZE),
-    GeneticAlgorithm("Genetic algorithm prediction", Type.MINIMIZE),
+    FewestEvents("Fewest events", "minE", Type.MINIMIZE),
+    FewestAutomata("Fewest automata", "minA", Type.MINIMIZE),
+    MostTransitions("Most transitions", "maxT", Type.MAXIMIZE),
+    MostStates("Most states", "maxS", Type.MAXIMIZE),
+    MostEvents("Most events", "maxE", Type.MAXIMIZE),
+    MostAutomata("Most automata", "maxA", Type.MAXIMIZE),
+    GeneticAlgorithm("Genetic algorithm prediction", "genetic", Type.MINIMIZE),
     LeastFanning("Least fanning increase", "minFan", Type.MINIMIZE),
-    Random("Random order", Type.MAXIMIZE);
+    Random("Random order", "rand", Type.MAXIMIZE);
     
     private enum Type {MAXIMIZE, MINIMIZE, SPECIAL}
     
@@ -118,7 +118,7 @@ public enum MinimizationHeuristic
      *
      * @param eventToAutomataMap is a map from all (global) events to all (global) automata.
      */
-    public final double value(Automata selection, Map<LabeledEvent,Automata> eventToAutomataMap, Alphabet targetAlphabet)
+    public final double value(final Automata selection, final Map<LabeledEvent, Automata> eventToAutomataMap, final Alphabet targetAlphabet)
     throws Exception
     {
         if (this == MostLocal)
@@ -209,8 +209,11 @@ public enum MinimizationHeuristic
                 final Automata autNeighbours = new Automata();
                 for (LabeledEvent event : aut.getAlphabet())
                 {
-                    autNeighbours.addAutomata(eventToAutomataMap.get(event));
-                    selectionNeighbours.addAutomata(eventToAutomataMap.get(event));
+                    if (event.isObservable())
+                    {
+                        autNeighbours.addAutomata(eventToAutomataMap.get(event));
+                        selectionNeighbours.addAutomata(eventToAutomataMap.get(event));
+                    }
                 }
                 autNeighbours.removeAutomata(selection);
                 if (mostNeighbours < autNeighbours.size())

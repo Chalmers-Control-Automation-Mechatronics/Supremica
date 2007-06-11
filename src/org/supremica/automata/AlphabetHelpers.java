@@ -182,7 +182,7 @@ public class AlphabetHelpers
     
     /**
      * Builds an returns a map mapping events to sets of automata.
-     * (LabeledEvent) -> (Set of Automaton-objects).
+     * (LabeledEvent) -> (Automata).
      */
     public static EventToAutomataMap buildEventToAutomataMap(Automata automata)
     {
@@ -195,8 +195,9 @@ public class AlphabetHelpers
             // Loop over alphabet
             for (LabeledEvent event : automaton.getAlphabet())
             {
-                // Insert in map
-                map.insert(event, automaton);
+                // Insert in map if observable
+                if (event.isObservable())
+                    map.insert(event, automaton);
             }
         }
         

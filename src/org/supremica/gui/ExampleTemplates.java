@@ -185,6 +185,7 @@ public class ExampleTemplates
         thisGroup.addItem(new TemplateItem("Ball Process", prefix + "ballProcess.xml"));
         thisGroup.addItem(new TemplateItem("Ball Process - Gatekeeper", prefix + "ballProcessGatekeeper.xml"));
         thisGroup.addItem(new TemplateItem("Car Window Control System", prefix + "big_bmw.xml"));
+        thisGroup.addItem(new TemplateItem("Car fh", prefix + "/ModuleExamples/car_fh/car_fh.wmod"));
         thisGroup.addItem(new TemplateItem("Coffee Machine", prefix + "CoffeeMachine.wmod"));
         thisGroup.addItem(new TemplateItem("Observation Equivalence Execise", prefix + "ObservationEquivalenceExercise.xml"));
         //thisGroup.addItem(new TemplateItem("Passenger Land-Transportation System", prefix + "PLanTS.xml"));
@@ -227,19 +228,23 @@ public class ExampleTemplates
         String prefix = basePrefix + "/OtherExamples/centralLock/";
         
         // THREE DOORS
-        //thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors", prefix + "verriegel3.xml"));
-        thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors", basePrefix + "/ModuleExamples/central_locking/verriegel3.wmod"));
-        //thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Uncontrollable", prefix + "verriegel3_uncontrollable.xml"));
-        thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Language Inclusion", prefix + "verriegel3_language_inclusion.xml"));
-        thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Language Exclusion", prefix + "verriegel3_language_exclusion.xml"));
-        //thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Synchronized Plants", prefix + "verriegel3_joint.xml"));
-        //thisGroup.addItem(new TemplateItem("Central Lock - 3 Doors - Synchronized Plants Uncontrollable", prefix + "verriegel3_joint_uncontrollable.xml"));
+        //thisGroup.addItem(new TemplateItem("Central Locking - 3 Doors", prefix + "verriegel3.xml"));
+        thisGroup.addItem(new TemplateItem("Central Locking - 3 Doors", basePrefix + "/ModuleExamples/central_locking/verriegel3.wmod"));
+        //thisGroup.addItem(new TemplateItem("Central Locking - 3 Doors - Uncontrollable", prefix + "verriegel3_uncontrollable.xml"));
+        thisGroup.addItem(new TemplateItem("Central Locking - 3 Doors - Language Inclusion", prefix + "verriegel3_language_inclusion.xml"));
+        thisGroup.addItem(new TemplateItem("Central Locking - 3 Doors - Language Exclusion", prefix + "verriegel3_language_exclusion.xml"));
+        //thisGroup.addItem(new TemplateItem("Central Locking - 3 Doors - Synchronized Plants", prefix + "verriegel3_joint.xml"));
+        //thisGroup.addItem(new TemplateItem("Central Locking - 3 Doors - Synchronized Plants Uncontrollable", prefix + "verriegel3_joint_uncontrollable.xml"));
         
         // FOUR DOORS
         //thisGroup.addItem(new TemplateItem("Central Lock - 4 Doors", prefix + "verriegel4.xml"));
         thisGroup.addItem(new TemplateItem("Central Lock - 4 Doors", basePrefix + "/ModuleExamples/central_locking/verriegel4.wmod"));
         thisGroup.addItem(new TemplateItem("Central Lock - 4 Doors - Language Inclusion", prefix + "verriegel4_language_inclusion.xml"));
         thisGroup.addItem(new TemplateItem("Central Lock - 4 Doors - Language Exclusion", prefix + "verriegel4_language_exclusion.xml"));
+
+		// Subsystems
+        thisGroup.addItem(new TemplateItem("Central Locking - ftuer", prefix + "/ModuleExamples/central_locking/ftuer.wmod"));
+        thisGroup.addItem(new TemplateItem("Central Locking - koordwsp", prefix + "/ModuleExamples/central_locking/koordwsp.wmod"));
     }
     
     private void initializeOperatorSupervisorExamples()
@@ -290,7 +295,7 @@ public class ExampleTemplates
         thisGroup.addItem(new TemplateItem("Intertwined Product Cycles", prefix + "IntertwinedProductCycles.xml"));
         thisGroup.addItem(new TemplateItem("Machine Buffer Machine", prefix + "machineBufferMachine.xml"));
         thisGroup.addItem(new TemplateItem("Parallel Manufacturing Example", prefix + "parallelManufacturingExample.xml"));
-        thisGroup.addItem(new TemplateItem("Production Cell for Mounting Frames", prefix + "fzelle.wmod"));
+        thisGroup.addItem(new TemplateItem("Production Cell for Mounting Frames (incomplete)", prefix + "fzelle.wmod"));
         thisGroup.addItem(new TemplateItem("Robot Assembly Cell", prefix + "robotAssemblyCell.xml"));
         thisGroup.addItem(new TemplateItem("Simple Manufacturing Example", prefix + "simpleManufacturingExample.xml"));
         thisGroup.addItem(new TemplateItem("Tank Process", prefix + "tankProcess.xml"));
@@ -310,10 +315,7 @@ public class ExampleTemplates
         String prefix = basePrefix + "/ModuleExamples/";
         
         thisGroup.addItem(new TemplateItem("Big Factory", prefix + "big_factory/bfactory.wmod"));
-        thisGroup.addItem(new TemplateItem("Car fh", prefix + "car_fh/car_fh.wmod"));
         thisGroup.addItem(new TemplateItem("Central Locking - Dreitueren", prefix + "central_locking/dreitueren.wmod"));
-        thisGroup.addItem(new TemplateItem("Central Locking - ftuer", prefix + "central_locking/ftuer.wmod"));
-        thisGroup.addItem(new TemplateItem("Central Locking - koordwsp", prefix + "central_locking/koordwsp.wmod"));
         //thisGroup.addItem(new TemplateItem("Central Locking - verriegel3", prefix + "central_locking/verriegel3.wmod");
         //thisGroup.addItem(new TemplateItem("Central Locking - verriegel4", prefix + "central_locking/verriegel4.wmod");
         //thisGroup.addItem(new TemplateItem("Fischertechnik", prefix + "fischertechnik/fischertechnik.wmod"));

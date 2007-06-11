@@ -76,17 +76,17 @@ public class Automata
     extends DocumentElement
     implements AutomatonListener, Iterable<Automaton>, ProductDESProxy
 {
-    private static final String defaultName = "Untitled";
+    private static final String DEFAULT_NAME = "Untitled";
     private static Logger logger = LoggerFactory.createLogger(Automata.class);
     private ArrayList<Automaton> theAutomata;
     private HashMap<String,Automaton> nameMap;
-    private String name = defaultName;
+    private String name = DEFAULT_NAME;
     private String comment = null;
     private AutomataListeners listeners = null;
     
     public Automata()
     {
-        super(defaultName);
+        super(DEFAULT_NAME);
         theAutomata = new ArrayList<Automaton>();
         nameMap = new HashMap<String,Automaton>();
     }
@@ -131,7 +131,7 @@ public class Automata
     public Automata(URL url)
     throws Exception
     {
-        super(defaultName);
+        super(DEFAULT_NAME);
         ProjectBuildFromXML builder = new ProjectBuildFromXML();
         Project theProject = builder.build(url);
         shallowAutomataCopy(theProject);
@@ -1021,7 +1021,7 @@ public class Automata
     
     public void clear()
     {
-        setName(defaultName);
+        setName(DEFAULT_NAME);
         setComment(null);
         
         while (size() != 0)

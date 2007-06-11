@@ -124,32 +124,33 @@ public class BenchmarkAutomataVerifier
         // Strategies
         MinimizationStrategy[] strategyArray =
         {
-            /*
             MinimizationStrategy.FewestTransitionsFirst,
+            /*
              */
-            MinimizationStrategy.AtLeastOneLocal,
-            MinimizationStrategy.AtLeastOneLocalMaxThree,
             MinimizationStrategy.MostStatesFirst,
             /*
+            MinimizationStrategy.AtLeastOneLocal,
+            MinimizationStrategy.AtLeastOneLocalMaxThree,
             MinimizationStrategy.FewestStatesFirst,
             MinimizationStrategy.FewestEventsFirst,
             MinimizationStrategy.RandomFirst
+            MinimizationStrategy.FewestNeighboursFirst,
              */
         };
         
         // Heuristics
         MinimizationHeuristic[] heuristicArray =
         {
-            /*
-             */ 
             MinimizationHeuristic.MostLocal, 
-            //MinimizationHeuristic.FewestStates,
-            MinimizationHeuristic.FewestTransitions,
-            MinimizationHeuristic.LeastFanning
             /*
-			MinimizationHeuristic.MostCommon,
+            MinimizationHeuristic.FewestStates,
+             */ 
+            /*
             MinimizationHeuristic.LeastExtension,
+            MinimizationHeuristic.FewestTransitions,
+			MinimizationHeuristic.MostCommon,
             MinimizationHeuristic.FewestEvents,
+            MinimizationHeuristic.LeastFanning
              */
         };
         
@@ -187,8 +188,8 @@ public class BenchmarkAutomataVerifier
                 file.write("Primary 2:nd stage heuristic: " + mOptions.getMinimizationHeuristic() + "\n");
                 file.flush();
                 
-              
-                if (true)
+				if (false) // Academic
+					//if (true) // Industrial
                 {
 					///////////////////////////////////
 					// "Industrial" model benchmarks //
@@ -209,15 +210,16 @@ public class BenchmarkAutomataVerifier
 						"SMS",
 						"PMS",
 						"IPC",
-						*/
 						"ftechnik", 
 						//"ftechnik_nocoll", // Includes some "property" specifications
-						"tbed_valid",
-						//"tbed_ctct"
 						//"fzelle", // All states are marked!?
+						"rhone_tough",
+						//"tbed_ctct"
+ 						*/
 						"AIP_minus_AS3_TU4",
+						"tbed_valid",
 						"PLanTS",
-						"profisafe_i4"
+						"profisafe_i4",
 						/*
 						*/
 					};
@@ -237,10 +239,15 @@ public class BenchmarkAutomataVerifier
 					// Instantiated model benchmarks //
 					///////////////////////////////////
 
+                    DiningPhilosophers philo;
+                    TransferLine line;
+                    Arbiter arbiter;
+
                     Project theProject;
                     
+					/*
                     // Dining philosophers
-                    DiningPhilosophers philo = new DiningPhilosophers(256, true, true, false, false,
+					philo = new DiningPhilosophers(256, true, true, false, false,
                         false, false);
                     theProject = philo.getProject();
                     runBenchmark("256philo", theProject, vOptions, sOptions, mOptions);
@@ -250,23 +257,27 @@ public class BenchmarkAutomataVerifier
                     philo = new DiningPhilosophers(1024, true, true, false, false, false, false);
                     theProject = philo.getProject();
                     runBenchmark("1024philo", theProject, vOptions, sOptions, mOptions);
+                    philo = new DiningPhilosophers(2048, true, true, false, false, false, false);
+                    theProject = philo.getProject();
+                    runBenchmark("2048philo", theProject, vOptions, sOptions, mOptions);
                     // Transfer line
-                    TransferLine line = new TransferLine(128, 3, 1, false);
+					line = new TransferLine(128, 3, 1, false);
                     theProject = line.getProject();
                     runBenchmark("128transfer", theProject, vOptions, sOptions, mOptions);
                     line = new TransferLine(256, 3, 1, false);
                     theProject = line.getProject();
-                    runBenchmark("256ansfer", theProject, vOptions, sOptions, mOptions);
+                    runBenchmark("256transfer", theProject, vOptions, sOptions, mOptions);
                     line = new TransferLine(512, 3, 1, false);
                     theProject = line.getProject();
                     runBenchmark("512transfer", theProject, vOptions, sOptions, mOptions);
                     // Arbiter
-                    Arbiter arbiter = new Arbiter(128, false);
+					arbiter = new Arbiter(128, false);
                     theProject = arbiter.getProject();
                     runBenchmark("128arbiter", theProject, vOptions, sOptions, mOptions);
                     arbiter = new Arbiter(256, false);
                     theProject = arbiter.getProject();
                     runBenchmark("256arbiter", theProject, vOptions, sOptions, mOptions);
+					*/
                     arbiter = new Arbiter(512, false);
                     theProject = arbiter.getProject();
                     runBenchmark("512arbiter", theProject, vOptions, sOptions, mOptions);
@@ -285,7 +296,7 @@ public class BenchmarkAutomataVerifier
     {
         try
         {
-            System.out.println("CURRENT BENCHMARK: " + name);
+            System.out.println("  CURRENT BENCHMARK: " + name);
             AutomataVerifier verifier = new AutomataVerifier(theProject, vOptions, sOptions, mOptions);
             ActionTimer timer = new ActionTimer();
             //System.out.println("Verifying...");
@@ -297,17 +308,18 @@ public class BenchmarkAutomataVerifier
                 // Write to logfile
                 String message = verifier.getTheMessage();
                 message = message.replaceFirst("NAME", name);
-                message = message.replaceFirst("TIME", "" + timer);
-                message = message.replaceFirst("BLOCK", "" + !nonblocking);
+                message = message.replaceFirst("TIME", "" + timer.toStringShort());
+                message = message.replaceFirst("BLOCK", "" + nonblocking);
                 message = message.replaceFirst(" milliseconds", "m");
                 message = message.replaceFirst(" seconds", "s");
-                message = message.replaceAll("_", "\u005c\_");
+                //message = message.replaceAll("_", "\u005c\_");
+                message = message.replaceAll("_", "\\_");
                 message = message.replaceFirst("ALGO1", mOptions.getMinimizationStrategy().toStringAbbreviated());
                 message = message.replaceFirst("ALGO2", mOptions.getMinimizationHeuristic().toStringAbbreviated());
                 file.write(message + "\n");
                 file.flush();
             }
-            System.out.println("TIME: " + timer + ", RESULT (NONBLOCKING/CONTROLLABLE): " + nonblocking);
+            System.out.println("  TIME: " + timer + "\n  RESULT (NONBLOCKING/CONTROLLABLE): " + nonblocking);
         }
         catch (Throwable ex)
         {

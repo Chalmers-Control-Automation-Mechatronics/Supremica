@@ -1608,6 +1608,8 @@ public class Automaton
 
     /**
      * Hides (makes unobservable) the supplied events. Optionally preserving controllability.
+     *
+     * Selfloops that hare hidden are removed!
      */
     public void hide(Alphabet alpha, boolean preserveControllability)
     {
@@ -1643,15 +1645,26 @@ public class Automaton
             }
 
             // Modify arcs
+            final LinkedList<Arc> toBeRemoved = new LinkedList<Arc>();
             for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
             {
                 Arc arc = arcIt.next();
-
+              
                 // Hide this one?
                 if (alpha.contains(arc.getEvent()))
                 {
                     arc.setEvent(tau);
+
+                    // Remove if silent selfloop!
+                    if (arc.isSelfLoop())
+                    {
+                        toBeRemoved.add(arc);
+                    }
                 }
+            }            
+            for (Arc arc: toBeRemoved)
+            {
+                removeArc(arc);
             }
         }
         else
@@ -1704,10 +1717,17 @@ public class Automaton
             }
             
             // Modify arcs
+            final LinkedList<Arc> toBeRemoved = new LinkedList<Arc>();
             for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
             {
                 Arc arc = arcIt.next();
 
+                // Remove if silent selfloop!
+                if (arc.isSelfLoop())
+                {
+                    toBeRemoved.add(arc);
+                }
+                
                 // Hide this one?
                 if (alpha.contains(arc.getEvent()))
                 {
@@ -1716,6 +1736,10 @@ public class Automaton
                     else
                         arc.setEvent(tau_u);
                 }
+            }
+            for (Arc arc: toBeRemoved)
+            {
+                removeArc(arc);
             }
         }
     }
@@ -2109,7 +2133,7 @@ public class Automaton
 
     /**
      * Returns the alphabet of obviously "inadequate" events (there
-     * may (but rarely are) be more). With "adequate" as defined in
+     * may be (but rarely are) more). With "adequate" as defined in
      * "On the set of certain conflicts of a given language" by Robi
      * Malik.
      *
@@ -2119,16 +2143,22 @@ public class Automaton
      * events can safely be removed from specification/supervisors and
      * from plants IF the event is present in some other plant of the
      * system.
+     *
+     * Unobservable events are ignored.
      */
     public Alphabet getInadequateEvents()
+    {
+        return getInadequateEvents(false);
+    }
+    public Alphabet getInadequateEvents(final boolean ignoreBlockingStates)
     {
         Alphabet inadequate = new Alphabet();
 
         // For all events...
-        eventLoop: for (Iterator<LabeledEvent> evIt = eventIterator(); evIt.hasNext(); )
+        eventLoop: for (LabeledEvent event: getAlphabet())
         {
-            LabeledEvent event = evIt.next();
-            if (isPlant() && !event.isControllable())
+            // Ignore unobservable events and, if controllability is important, also uncontrollable plant events
+            if (event.isUnobservable() || (!ignoreBlockingStates && isPlant() && !event.isControllable()))
             {
                 continue eventLoop;
             }
@@ -2136,7 +2166,12 @@ public class Automaton
             stateLoop: for (Iterator<State> stIt = stateIterator(); stIt.hasNext(); )
             {
                 State state = stIt.next();
-                // ... there must be a self-loop ...
+                // If blocking, we don't care
+                if (ignoreBlockingStates && !state.isAccepting() && state.isDeadlock())
+                {
+                    continue stateLoop;
+                }
+                // ... otherwise there must be a self-loop ...
                 for (Iterator<Arc> arcIt = state.outgoingArcsIterator(); arcIt.hasNext(); )
                 {
                     Arc arc = arcIt.next();
@@ -2151,6 +2186,33 @@ public class Automaton
             inadequate.addEvent(event);
         }
         return inadequate;
+    }
+    
+    /**
+     * Returns the alphabet of "blocked" events, that is, events that are disabled 
+     * in all states in this automaton.
+     */
+    public Alphabet getBlockedEvents()
+    {
+        Alphabet foundEvents = new Alphabet();
+        
+        int unobservable = getAlphabet().nbrOfUnobservableEvents();
+        int observable = getAlphabet().size() - unobservable;
+
+        // Check events that occur in transitions!
+        for (Iterator<Arc> arcIt = arcIterator(); arcIt.hasNext(); )
+        {
+            Arc arc = arcIt.next();
+            // Already found or unobservable?
+            if (arc.getEvent().isUnobservable() || foundEvents.contains(arc.getEvent()))
+                continue;
+            // Add event
+            foundEvents.addEvent(arc.getEvent());
+            if (foundEvents.size() == observable)
+                return null;
+        }
+        
+        return AlphabetHelpers.minus(getAlphabet(), foundEvents);
     }
 
     public static void main(String[] args)

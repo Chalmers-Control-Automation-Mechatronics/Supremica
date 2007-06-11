@@ -49,19 +49,21 @@
  */
 package org.supremica.automata.algorithms.minimization;
 
+import java.util.Map;
 import org.supremica.automata.*;
 
 public enum MinimizationStrategy
 {
     AtLeastOneLocal("At least one local", "mustL", Type.SPECIAL),
-    AtLeastOneLocalMaxThree("At least one local, max three", Type.SPECIAL),
+    AtLeastOneLocalMaxThree("At least one local, max three", "mustL3", Type.SPECIAL),
     FewestTransitionsFirst("Pair with fewest transition automaton", "minT", Type.MINIMIZE),
     FewestStatesFirst("Pair with fewest states automaton", "minS", Type.MINIMIZE),
     FewestEventsFirst("Pair with fewest events automaton", "minE", Type.MINIMIZE),
-    MostTransitionsFirst("Pair with most transitions automaton", Type.MAXIMIZE),
-    MostStatesFirst("Pair with most states automaton", "maxS",Type.MAXIMIZE),
-    MostEventsFirst("Pair with most events automaton", Type.MAXIMIZE),
-    RandomFirst("Pair with random automaton", Type.MAXIMIZE),
+    MostTransitionsFirst("Pair with most transitions automaton", "maxT", Type.MAXIMIZE),
+    MostStatesFirst("Pair with most states automaton", "maxS", Type.MAXIMIZE),
+    MostEventsFirst("Pair with most events automaton", "maxE", Type.MAXIMIZE),
+    FewestNeighboursFirst("Pair with fewest neighbours automaton", "minN", Type.MINIMIZE),
+    RandomFirst("Pair with random automaton", "rand", Type.MAXIMIZE),
     ExperimentalMin("Experimental min", Type.MINIMIZE),
     ExperimentalMax("Experimental max", Type.MAXIMIZE);
     
@@ -76,13 +78,13 @@ public enum MinimizationStrategy
     
     private MinimizationStrategy(String description, Type type)
     {
-		this(description, description, type);
+        this(description, description, type);
     }
 
     private MinimizationStrategy(String description, String abbreviation, Type type)
     {
         this.description = description;
-		this.abbreviation = abbreviation;
+        this.abbreviation = abbreviation;
         this.type = type;
     }
     
@@ -111,7 +113,7 @@ public enum MinimizationStrategy
     /**
      * Return the value of automata in this strategy.
      */
-    public int value(Automaton aut)
+    public int value(final Automaton aut, final Map<LabeledEvent, Automata> eventToAutomataMap)
     throws Exception
     {
         if (this == MostStatesFirst || this == FewestStatesFirst)
@@ -122,6 +124,15 @@ public enum MinimizationStrategy
             return aut.nbrOfEvents();
         else if (this == ExperimentalMax || this == ExperimentalMin)
             return aut.nbrOfTransitions() + 1*aut.nbrOfEpsilonTransitions();
+        else if (this == FewestNeighboursFirst)
+        {
+            final Automata autNeighbours = new Automata();
+            for (LabeledEvent event : aut.getAlphabet())
+            {
+                autNeighbours.addAutomata(eventToAutomataMap.get(event));
+            }
+            return autNeighbours.size()-1;
+        }
         else if (this == RandomFirst)
             return (int) (Math.random()*10000.0);
         else

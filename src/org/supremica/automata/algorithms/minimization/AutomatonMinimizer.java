@@ -972,6 +972,13 @@ public class AutomatonMinimizer
         int countCC = 0;
         int countOSO = 0;
         
+        //final Rule[] order = { Rule.SC, Rule.AE, Rule.OSI, Rule.CC, Rule.OSO}; // "Original" order
+        //final Rule[] order = { Rule.AE, Rule.SC, Rule.OSO, Rule.OSI, Rule.CC}; // Good order
+        //final Rule[] order = { Rule.AE, Rule.SC, Rule.CC, Rule.OSO, Rule.OSI, };
+        //final Rule[] order = { Rule.CC, Rule.AE, Rule.SC, Rule.OSO, Rule.OSI};
+        final Rule[] order = { Rule.AE, Rule.SC, Rule.CC, Rule.OSO, Rule.AE, Rule.SC, Rule.OSI, }; // Works for arbiter
+        //final Rule[] order = { Rule.AE, Rule.SC, Rule.OSO, Rule.OSI, Rule.CC, Rule.AE, Rule.SC, };
+        
         try
         {
             boolean rerunNeeded;
@@ -980,14 +987,15 @@ public class AutomatonMinimizer
                 rerunNeeded = false;
                 
                 // Run the rules in the specified order...
-                //final Rule[] order = { Rule.SC, Rule.AE, Rule.OSI, Rule.CC, Rule.OSO}; // "Original" order
-                final Rule[] order = { Rule.AE, Rule.SC, Rule.OSO, Rule.OSI, Rule.CC};
                 for (Rule rule : order)
                 {
                     int count;
                     boolean change = false;
                     do
                     {
+                        // This must never happen as it is assumed by many of the rules
+                        assert(!hasEpsilonLoops(aut));
+
                         count = 0;
                         switch (rule)
                         {
@@ -1037,10 +1045,9 @@ public class AutomatonMinimizer
                             change = true;
 
                         //System.out.println("Rule: " + rule + " count: " + count);
-                        
-                        // This must never happen as it is assumed by many of the rules
-                        assert(!hasEpsilonLoops(aut));
-                    } while(false && (rule == Rule.OSO || rule == Rule.OSI || rule == Rule.AE) && count > 0);
+                    //} while(false);
+                    //} while((rule == Rule.OSO || rule == Rule.OSI || rule == Rule.AE) && count > 0);
+                    } while((rule == Rule.SC || rule == Rule.AE) && count > 0);
 
                     // Has anything happened to the number of states?
                     if (change)

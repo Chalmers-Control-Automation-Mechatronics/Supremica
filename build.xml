@@ -672,8 +672,8 @@ Class-Path: ${manifest.pathlist}</echo>
 <target name="run_benchmarks_supremica" depends="compile_supremica,compile_benchmarks_supremica">
 	<java fork="yes" classname="junit.textui.TestRunner" taskname="junit" failonerror="true">
 		<arg value="org.supremica.BenchmarkPackageSupremica"/>
-        <jvmarg value="-Xmx128m"/>
-        <jvmarg value="-Xms128m"/>
+        <jvmarg value="-Xmx1000m"/>
+        <jvmarg value="-Xms1000m"/>
         <jvmarg value="-Djava.library.path=${dist}"/>
 		<classpath>	
 			<pathelement location="${build}" />
