@@ -21,7 +21,7 @@ class FunctionBlockCall {
 		FunctionBlock block
 		if (!instance) {
 			block = callingScope.namedElement(type)
-			assert "Undeclared function block $type, referenced from ${callingScope.fullName}"
+			assert block, "Undeclared function block $type, referenced from ${callingScope.fullName}"
 		}
 		Scope instanceScope
 		if (instance instanceof FunctionBlock || block) {

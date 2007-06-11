@@ -39,7 +39,7 @@ class ControlCodeBuilder extends BuilderSupport {
 				'Q := not R and (Q or S)'()
 			}
 		}
-		standardFBs << functionblock('P') {
+		standardFBs << functionblock('R_TRIG') {
 			input 'in'
 			output 'Q'
 			variable 'old'
@@ -48,7 +48,7 @@ class ControlCodeBuilder extends BuilderSupport {
 				'old := in'()
 			}
 		}
-		standardFBs << functionblock('N') {
+		standardFBs << functionblock('F_TRIG') {
 			input 'in'
 			output 'Q'
 			variable 'old'
