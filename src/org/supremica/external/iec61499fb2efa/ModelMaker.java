@@ -84,6 +84,10 @@ class ModelMaker
 
 	private ExtendedAutomata automata;
 
+	// maximum value of an integer variable
+	private final int intVarMaxValue = 20;
+
+
 	public static void main(String args[])
     {
 		String outputFileName = null;
@@ -1156,8 +1160,6 @@ class ModelMaker
 		final int evMaxID = ((Integer) eventsMaxID.get(fbName)).intValue();
 		eventQueue.addIntegerVariable("queuing_event_" + fbName, 0, evMaxID, 0, null);
 
-		// maximum value of an integer variable
-		final int varMaxValue = 10;
 
 		// event input variables
 		if (theType.getInterfaceList().isSetInputVars())
@@ -1182,7 +1184,7 @@ class ModelMaker
 				String curDataType =  curDeclaration.getType();
 				if (curDataType.toLowerCase().equals("int"))
 				{
-					eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName, 0, varMaxValue, 0, null);
+					eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName, 0, intVarMaxValue, 0, null);
 				}
 				else if (curDataType.toLowerCase().equals("bool"))
 				{
@@ -1222,7 +1224,7 @@ class ModelMaker
 				String curDataType =  curDeclaration.getType();
 				if (curDataType.toLowerCase().equals("int"))
 				{
-					eventQueue.addIntegerVariable("data_" + curDataOutputName + "_" + fbName, 0, varMaxValue, 0, null);
+					eventQueue.addIntegerVariable("data_" + curDataOutputName + "_" + fbName, 0, intVarMaxValue, 0, null);
 				}
 				else if (curDataType.toLowerCase().equals("bool"))
 				{
@@ -1269,7 +1271,7 @@ class ModelMaker
 					String curDataType =  curDeclaration.getType();
 					if (curDataType.toLowerCase().equals("int"))
 					{
-						eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName + "_place_" + i, 0, varMaxValue, 0, null);
+						eventQueue.addIntegerVariable("data_" + curDataInputName + "_" + fbName + "_place_" + i, 0, intVarMaxValue, 0, null);
 					}
 					else if (curDataType.toLowerCase().equals("bool"))
 					{
@@ -1388,9 +1390,6 @@ class ModelMaker
 		
 		ExtendedAutomaton ecc = new ExtendedAutomaton("Execution Control Chart " + fbName, automata);
 
-		// maximum value of an integer variable
-		final int varMaxValue = 10;
-
 		// local variables
 		if (theType.getBasicFB().isSetInternalVars())
 		{
@@ -1402,7 +1401,7 @@ class ModelMaker
 				String curType =  curDeclaration.getType();
 				if (curType.toLowerCase().equals("int"))
 				{
-					ecc.addIntegerVariable("internal_" + curName + "_" + fbName, 0, varMaxValue, 0, null);
+					ecc.addIntegerVariable("internal_" + curName + "_" + fbName, 0, intVarMaxValue, 0, null);
 				}
 				else if (curType.toLowerCase().equals("bool"))
 				{
@@ -1430,6 +1429,12 @@ class ModelMaker
 				}
 			}
 		}
+
+		
+		
+
+
+
 		automata.addAutomaton(ecc);	
 	}
 

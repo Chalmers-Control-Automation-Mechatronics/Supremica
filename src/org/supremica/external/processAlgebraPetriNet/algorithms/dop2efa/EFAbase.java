@@ -7,8 +7,8 @@ package org.supremica.external.processAlgebraPetriNet.algorithms.dop2efa;
 import java.io.File;
 import java.util.LinkedList;
 
-import org.supremica.external.iec61499fb2efa.ExtendedAutomata;
-import org.supremica.external.iec61499fb2efa.ExtendedAutomaton;
+import org.supremica.automata.ExtendedAutomata;
+import org.supremica.automata.ExtendedAutomaton;
 
 class EFAbase {
 	
