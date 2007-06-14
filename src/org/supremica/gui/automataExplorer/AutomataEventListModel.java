@@ -53,10 +53,13 @@ import org.supremica.automata.algorithms.*;
 import javax.swing.*;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
+import org.supremica.log.*;
 
 public class AutomataEventListModel
 	extends AbstractListModel
 {
+    private static Logger logger = LoggerFactory.createLogger(AutomataEventListModel.class);
+
 	private int[] currState;
 
 	// / private ArrayList currArcs = new ArrayList();
@@ -143,11 +146,13 @@ public class AutomataEventListModel
 
 		try
 		{
-			currEvent = theAlphabet.getEventWithIndex(events[index]);
+			currEvent = helper.getIndexMap().getEventAt(index);
+			//currEvent = theAlphabet.getEventWithIndex(events[index]);
 		}
 		catch (Exception e)
 		{
-			System.err.println("Error: Could not find event in alphabet!\n");
+			logger.error(e);
+			//System.err.println("Error: Could not find event in alphabet!\n");
 
 			return null;
 		}

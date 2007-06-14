@@ -58,6 +58,7 @@ import java.util.*;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
 import org.supremica.automata.AutomataIndexFormHelper;
+import org.supremica.automata.AutomataIndexMap;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonListener;
 import org.supremica.automata.State;
@@ -75,8 +76,8 @@ public class AutomataExplorer
 	private AutomataExplorerController controller;
 	private AutomataSynchronizerHelper helper;
 
-	//private AutomataOnlineSynchronizer onlineSynchronizer;
 	private AutomataSynchronizerExecuter onlineSynchronizer;
+	private AutomataIndexMap indexMap;
 
 	public AutomataExplorer(Automata theAutomata)
 		throws Exception
@@ -91,6 +92,8 @@ public class AutomataExplorer
 		// Get helper
 		helper = new AutomataSynchronizerHelper(theAutomata, syncOptions);
 
+		indexMap = new AutomataIndexMap(theAutomata);
+
 		// Build the initial state
 		Automaton currAutomaton;
 		State currInitialState;
@@ -103,7 +106,8 @@ public class AutomataExplorer
 		{
 			currAutomaton = (Automaton) autIt.next();
 			currInitialState = currAutomaton.getInitialState();
-			initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
+//			initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
+			initialState[indexMap.getAutomatonIndex(currAutomaton)] = indexMap.getStateIndex(currAutomaton, currInitialState);
 		}
 
 		AutomataExplorerHelper.setInitialState(initialState);
