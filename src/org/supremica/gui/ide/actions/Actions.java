@@ -17,6 +17,7 @@ public class Actions
     public IDEAction openAction = new OpenAction(allActions);
     public IDEAction closeAction = new CloseAction(allActions);
     public IDEAction saveAction = new SaveAction(allActions);
+    public IDEAction saveAsAction = new SaveAsAction(allActions);
     public IDEAction exitAction = new ExitAction(allActions);
     
     // Printing Actions

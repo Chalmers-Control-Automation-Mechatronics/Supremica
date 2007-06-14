@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.37 2007-05-23 15:47:29 flordal Exp $
+//# $Id: IDEMenuBar.java,v 1.38 2007-06-14 14:42:43 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -86,7 +86,8 @@ public class IDEMenuBar
         menu.add(ide.getActions().openAction.getMenuItem());
         menu.add(ide.getActions().closeAction.getMenuItem());
         menu.addSeparator();
-        menu.add(ide.getActions().saveAction.getMenuItem());
+        //menu.add(ide.getActions().saveAction.getMenuItem());
+        menu.add(ide.getActions().saveAsAction.getMenuItem());
         menu.addSeparator();
         //		menu.add(ide.getActions().importAction));
         menu.add(ide.getActions().editorPrintAction.getMenuItem());

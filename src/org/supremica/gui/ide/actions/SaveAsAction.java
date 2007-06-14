@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   SaveAction
 //###########################################################################
-//# $Id: SaveAction.java,v 1.11 2007-06-14 14:42:43 flordal Exp $
+//# $Id: SaveAsAction.java,v 1.1 2007-06-14 14:42:43 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -19,25 +19,15 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
-import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.gui.*;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.expr.OperatorTable;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.WatersMarshalException;
-import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 import org.supremica.gui.ide.IDE;
 import org.supremica.log.*;
 
-import org.xml.sax.SAXException;
-
-
-public class SaveAction
+public class SaveAsAction
         extends IDEAction
 {
     private static final long serialVersionUID = 1L;
@@ -47,12 +37,12 @@ public class SaveAction
     
     private JFileChooser fileSaveChooser = new JFileChooser(".");
     
-    public SaveAction(List<IDEAction> actionList)
+    public SaveAsAction(List<IDEAction> actionList)
     {
         super(actionList);
         
-        putValue(Action.NAME, "Save");
-        putValue(Action.SHORT_DESCRIPTION, "Save the project");
+        putValue(Action.NAME, "Save As...");
+        putValue(Action.SHORT_DESCRIPTION, "Save the project with a new name");
         putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_S));
         putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Save16.gif")));
@@ -90,30 +80,11 @@ public class SaveAction
     
     private void saveWmodFile(File wmodf)
     {
-        //logEntry("Saving module to: " + wmodf);
+       //logEntry("Saving module to: " + wmodf);
         try
         {
-            final ModuleProxyFactory factory =
-                    ModuleSubjectFactory.getInstance();
-            final OperatorTable optable = CompilerOperatorTable.getInstance();
-            final ProxyMarshaller<ModuleProxy> marshaller =
-                    new JAXBModuleMarshaller(factory, optable);
-            marshaller.marshal(ide.getActiveModuleContainer().getModule(),
-                    wmodf);
-        }
-        catch (final JAXBException exception)
-        {
-            JOptionPane.showMessageDialog(ide.getFrame(),
-                    "Error saving module file:" +
-                    exception.getMessage());
-            //logEntry("JAXBException - Failed to save  '" + wmodf + "'!");
-        }
-        catch (final SAXException exception)
-        {
-            JOptionPane.showMessageDialog(ide.getFrame(),
-                    "Error saving module file:" +
-                    exception.getMessage());
-            //logEntry("SAXException - Failed to save  '" + wmodf + "'!");
+            DocumentManager documentManager = ide.getIDE().getDocumentManager();
+            documentManager.saveAs(ide.getActiveModuleContainer().getModule(), wmodf);
         }
         catch (final WatersMarshalException exception)
         {

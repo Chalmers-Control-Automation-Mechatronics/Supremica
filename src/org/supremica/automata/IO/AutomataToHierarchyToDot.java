@@ -200,8 +200,9 @@ public class AutomataToHierarchyToDot
                 Alphabet otherAlphabet = otherAutomaton.getAlphabet();
                 
                 Alphabet intersection = AlphabetHelpers.intersect(currAlphabet, otherAlphabet);
-                int eventTotal = intersection.nbrOfEvents();
-                int uncon = intersection.nbrOfUncontrollableEvents();
+                Alphabet unconIntersection = intersection.getUncontrollableAlphabet();
+                int eventTotal = intersection.nbrOfEvents() - intersection.nbrOfUnobservableEvents();
+                int uncon = unconIntersection.nbrOfEvents() - unconIntersection.nbrOfUnobservableEvents();
                 
                 if (eventTotal > 0)
                 {                    

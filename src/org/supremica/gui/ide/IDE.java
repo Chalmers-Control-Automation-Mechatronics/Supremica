@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.79 2007-06-04 14:42:13 robi Exp $
+//# $Id: IDE.java,v 1.80 2007-06-14 14:42:43 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -304,7 +304,8 @@ public class IDE
         // Set standard actions
         ideToolBar.add(getActions().newAction);
         ideToolBar.add(getActions().openAction);
-        ideToolBar.add(getActions().saveAction);
+        //ideToolBar.add(getActions().saveAction);
+        ideToolBar.add(getActions().saveAsAction);
         ideToolBar.add(getActions().editorPrintAction);
         ideToolBar.addSeparator();
         ideToolBar.add(getActions().editorStopEmbedderAction);
