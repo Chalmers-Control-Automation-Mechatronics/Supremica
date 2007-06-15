@@ -1,3 +1,11 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica IDE
+//# PACKAGE: org.supremica.gui.ide.actions
+//# CLASS:   IDEAction
+//###########################################################################
+//# $Id: IDEAction.java,v 1.10 2007-06-15 07:50:38 robi Exp $
+//###########################################################################
 
 package org.supremica.gui.ide.actions;
 
@@ -14,7 +22,6 @@ public abstract class IDEAction
     private int minimumNumberOfSelectedComponents = 0;
     private boolean editorActiveRequired = false;
     private boolean analyzerActiveRequired = false;
-//    private JMenuItem menuItem = null;
 
     public IDEAction(List<IDEAction> actionList)
     {
@@ -73,6 +80,8 @@ public abstract class IDEAction
 
     public boolean isEnabled()
     {
+		// *** BUG ***
         return super.isEnabled();
     }
+
 }
