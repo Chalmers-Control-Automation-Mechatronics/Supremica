@@ -13,7 +13,7 @@ public class OpenTreeComparator
 	}
 
 	/**
-	 * If two node have equal estimate function value, the new node is placed
+	 * If two nodes have equal estimate function value, the new node is placed
 	 * first, to direct the search in depth rather than breadth direction.
 	 */
 	public int compare(int[] newNode, int[] openNode)

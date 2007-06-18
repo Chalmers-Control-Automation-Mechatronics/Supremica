@@ -1,5 +1,6 @@
 package org.supremica.automata.algorithms.scheduling;
 
+import bsh.This;
 import java.util.*;
 import java.io.*;
 
@@ -26,7 +27,7 @@ public class Milp
     private static final int NO_PATH_SPLIT_INDEX = -1;
     
     /** A big enough value used by the MILP-solver (should be greater than any time-variable). */
-    private static final int BIG_M_VALUE = 10000;
+    private static final int BIG_M_VALUE = 1000;
     
     /** The involved automata, plants, zone specifications */
     private Automata theAutomata, plants, zones, externalSpecs;
@@ -941,11 +942,11 @@ public class Milp
             
             if (commonActiveAlphabet.size() > 0)
             {
-                for (Iterator<LabeledEvent> eventIt = commonActiveAlphabet.iterator(); eventIt.hasNext(); )
+                //test
+                for (Iterator<State> stateIt = currSpec.stateIterator(); stateIt.hasNext();)
                 {
-                    LabeledEvent currEvent = eventIt.next();
-                    
-                    if (initialStateInSpec.activeEvents(false).contains(currEvent))
+                    State specState = stateIt.next();
+                    if (specState.isInitial())
                     {
                         currEventsInfo = precedingEventsInfo;
                         //TODO: alternative precedence
@@ -958,24 +959,72 @@ public class Milp
                         currPlantStates = followingPlantStates;                        
                     }
                     
-                    for (Iterator <State> plantStateIt = plant.stateIterator(); plantStateIt.hasNext(); )
+                    for (Iterator<LabeledEvent> eventIt = specState.activeEvents(false).iterator(); eventIt.hasNext();)
                     {
-                        State plantState = plantStateIt.next();
-                        
-                        if (plantState.activeEvents(false).contains(currEvent))
+                        LabeledEvent currEvent = eventIt.next();
+                        if (commonActiveAlphabet.contains(currEvent))
                         {
-                            // Add a plant/state-delimiter
-                            currEventsInfo.add(new int[]{-1});
-                            // Add info about the plant and state indices
-                            currEventsInfo.add(new int[]{indexMap.getAutomatonIndex(plant), indexMap.getStateIndex(plant, plantState)});
-                            // Find nearest path splits above the current state
-                            findNearestPathSplits(plant, plantState.nextState(currEvent), currEventsInfo, currEvent);
-                            
-                            //TODO: alternative precedence
-                            currPlantStates.add(new int[]{indexMap.getAutomatonIndex(plant), indexMap.getStateIndex(plant, plantState)});
+                            for (Iterator <State> plantStateIt = plant.stateIterator(); plantStateIt.hasNext(); )
+                            {
+                                State plantState = plantStateIt.next();
+
+                                if (plantState.activeEvents(false).contains(currEvent))
+                                {
+                                    // Add a plant/state-delimiter
+                                    currEventsInfo.add(new int[]{-1});
+                                    // Add info about the plant and state indices
+                                    currEventsInfo.add(new int[]{indexMap.getAutomatonIndex(plant), indexMap.getStateIndex(plant, plantState)});
+                                    // Find nearest path splits above the current state
+                                    findNearestPathSplits(plant, plantState.nextState(currEvent), currEventsInfo, currEvent);
+
+                                    //TODO: alternative precedence
+                                    currPlantStates.add(new int[]{indexMap.getAutomatonIndex(plant), indexMap.getStateIndex(plant, plantState)});
+                                }
+                            }
                         }
                     }
                 }
+  
+//@Deprecated                
+//                for (Iterator<LabeledEvent> eventIt = commonActiveAlphabet.iterator(); eventIt.hasNext(); )
+//                {
+//                    LabeledEvent currEvent = eventIt.next();
+//                    
+//                    if (initialStateInSpec.activeEvents(false).contains(currEvent))
+//                    {
+//                        currEventsInfo = precedingEventsInfo;
+//                        //TODO: alternative precedence
+//                        currPlantStates = precedingPlantStates;
+//                        //temp
+//                        logger.info("checking " + currEvent.getLabel() + ", preceding");
+//                    }
+//                    else
+//                    {
+//                        currEventsInfo = followingEventsInfo;
+//                        //TODO: alternative precedence
+//                        currPlantStates = followingPlantStates;                        
+//                        //temp
+//                        logger.info("checking " + currEvent.getLabel() + ", following");
+//                    }
+//                    
+//                    for (Iterator <State> plantStateIt = plant.stateIterator(); plantStateIt.hasNext(); )
+//                    {
+//                        State plantState = plantStateIt.next();
+//                        
+//                        if (plantState.activeEvents(false).contains(currEvent))
+//                        {
+//                            // Add a plant/state-delimiter
+//                            currEventsInfo.add(new int[]{-1});
+//                            // Add info about the plant and state indices
+//                            currEventsInfo.add(new int[]{indexMap.getAutomatonIndex(plant), indexMap.getStateIndex(plant, plantState)});
+//                            // Find nearest path splits above the current state
+//                            findNearestPathSplits(plant, plantState.nextState(currEvent), currEventsInfo, currEvent);
+//                            
+//                            //TODO: alternative precedence
+//                            currPlantStates.add(new int[]{indexMap.getAutomatonIndex(plant), indexMap.getStateIndex(plant, plantState)});
+//                        }
+//                    }
+//                }
             }
         }
                
@@ -1006,7 +1055,11 @@ public class Milp
             }
         }
         
-        Hashtable<IntKey, String> internalPrecVarsTable = new Hashtable<IntKey, String>();                
+        int nrInternalPrecVars = (allPPlantStates.size() * (allPPlantStates.size() - 1) + 
+                allFPlantStates.size() * (allFPlantStates.size() - 1)) / 2;
+        Hashtable<IntKey, InternalPrecVariable> internalPrecVarsTable = 
+                new Hashtable<IntKey, InternalPrecVariable>((int)Math.ceil(1.5 * nrInternalPrecVars));     
+        int idCounter = 0;
         for (int i = 0; i < allPPlantStates.size() - 1; i++)
         {
             ArrayList<int[]> firstPlantStateInfo = allPPlantStates.get(i);
@@ -1018,10 +1071,10 @@ public class Milp
                 String internalPrecedenceVar = "r" + firstPlantState[0] + "_st" + firstPlantState[1] + 
                         "_before_r" + secondPlantState[0] + "_st" + secondPlantState[1];
 
-                internalPrecVarsTable.put(new IntKey(firstPlantState, secondPlantState), internalPrecedenceVar);
+                internalPrecVarsTable.put(new IntKey(firstPlantState, secondPlantState), 
+                        new InternalPrecVariable(internalPrecedenceVar, idCounter++));
                 internalPrecVarDecl += "var " + internalPrecedenceVar + ", binary;\n"; 
             }
-
         }
         for (int i = 0; i < allFPlantStates.size() - 1; i++)
         {
@@ -1034,96 +1087,213 @@ public class Milp
                 String internalPrecedenceVar = "r" + firstPlantState[0] + "_st" + firstPlantState[1] + 
                         "_before_r" + secondPlantState[0] + "_st" + secondPlantState[1];
 
-                internalPrecVarsTable.put(new IntKey(firstPlantState, secondPlantState), internalPrecedenceVar);
+                internalPrecVarsTable.put(new IntKey(firstPlantState, secondPlantState), 
+                        new InternalPrecVariable(internalPrecedenceVar, idCounter++));
                 internalPrecVarDecl += "var " + internalPrecedenceVar + ", binary;\n";   
             }
         }
-        
-        //temp
-        logger.warn("nr_p = " + allPPlantStates.size());
-        logger.warn("nr_f = " + allFPlantStates.size());
-        
-        //Create the constraint specifying that the number of preceding and succeeding events should be equal
-        String equalNumberConstrStr = " = ";
-        for (ArrayList<int[]> plantStateInfo : allPPlantStates)
-        {
-            int[] plantState = plantStateInfo.get(0);
-            for (int i = 1; i < plantStateInfo.size(); i++)
-            {
-                int[] pathSplit = plantStateInfo.get(i);
-                if (pathSplit[0] != NO_PATH_SPLIT_INDEX)
-                {
-                    equalNumberConstrStr = " + " + makeAltPathsVariable(plantState[0], pathSplit[0], pathSplit[1]) + equalNumberConstrStr;
-                }
-                else
-                {
-                    equalNumberConstrStr = " + 1" + equalNumberConstrStr;
-                }   
-            }
-        }
-        for (ArrayList<int[]> plantStateInfo : allFPlantStates)
-        {
-            int[] plantState = plantStateInfo.get(0);
-            for (int i = 1; i < plantStateInfo.size(); i++)
-            {
-                int[] pathSplit = plantStateInfo.get(i);
-                if (pathSplit[0] != NO_PATH_SPLIT_INDEX)
-                {
-                    equalNumberConstrStr += makeAltPathsVariable(plantState[0], pathSplit[0], pathSplit[1]) + " + ";
-                }
-                else
-                {
-                    equalNumberConstrStr += "1 + ";
-                }
-            }
-        }
-        
-        //TODO: rename cut(S/E)Index to cut(Start/End)Index
-        int cutSIndex = 0;
-        int cutEIndex = equalNumberConstrStr.length();
-        if (equalNumberConstrStr.startsWith(" +"))
-        {
-            cutSIndex = equalNumberConstrStr.indexOf("+") + 2;
-        }
-        if (equalNumberConstrStr.endsWith("+ "))
-        {
-            cutEIndex = equalNumberConstrStr.lastIndexOf("+");
-        }
-        equalNumberConstrStr = equalNumberConstrStr.substring(cutSIndex, cutEIndex).trim() + ";\n";
+
+//@Deprecated        
+//        //Create the constraint specifying that the number of preceding and succeeding events should be equal
+//        String equalNumberConstrStr = " = ";
+//        for (ArrayList<int[]> plantStateInfo : allPPlantStates)
+//        {
+//            int[] plantState = plantStateInfo.get(0);
+//            for (int i = 1; i < plantStateInfo.size(); i++)
+//            {
+//                int[] pathSplit = plantStateInfo.get(i);
+//                if (pathSplit[0] != NO_PATH_SPLIT_INDEX)
+//                {
+//                    equalNumberConstrStr = " + " + makeAltPathsVariable(plantState[0], pathSplit[0], pathSplit[1]) + equalNumberConstrStr;
+//                }
+//                else
+//                {
+//                    equalNumberConstrStr = " + 1" + equalNumberConstrStr;
+//                }   
+//            }
+//        }
+//        for (ArrayList<int[]> plantStateInfo : allFPlantStates)
+//        {
+//            int[] plantState = plantStateInfo.get(0);
+//            for (int i = 1; i < plantStateInfo.size(); i++)
+//            {
+//                int[] pathSplit = plantStateInfo.get(i);
+//                if (pathSplit[0] != NO_PATH_SPLIT_INDEX)
+//                {
+//                    equalNumberConstrStr += makeAltPathsVariable(plantState[0], pathSplit[0], pathSplit[1]) + " + ";
+//                }
+//                else
+//                {
+//                    equalNumberConstrStr += "1 + ";
+//                }
+//            }
+//        }
+//        
+//        //TODO: rename cut(S/E)Index to cut(Start/End)Index
+//        int cutSIndex = 0;
+//        int cutEIndex = equalNumberConstrStr.length();
+//        if (equalNumberConstrStr.startsWith(" +"))
+//        {
+//            cutSIndex = equalNumberConstrStr.indexOf("+") + 2;
+//        }
+//        if (equalNumberConstrStr.endsWith("+ "))
+//        {
+//            cutEIndex = equalNumberConstrStr.lastIndexOf("+");
+//        }
+//        equalNumberConstrStr = equalNumberConstrStr.substring(cutSIndex, cutEIndex).trim() + ";\n";
         
         //TODO: rename all(P/F)PlantStates into all(Preceding/Following)PlantStates (i sinom tid)
         ArrayList<ArrayList> allAlternatingPlantStatesInfo = getEveryAlternatingOrdering(allPPlantStates, allFPlantStates);
 
+        BooleanCombinationTreeSet usedVariableCombinations = new BooleanCombinationTreeSet();
+        
         int caseCounter = 0;
         externalConstraints += "\n\n";
         for (ArrayList<ArrayList<int[]>> currAlternatingPlantStateInfoArray : allAlternatingPlantStatesInfo)
-        {
+        {            
+            String equalNumberPConstrStr = "";
+            String equalNumberFConstrStr = "";
+            
             externalConstraints += "/* " + specName + ", case " + ++caseCounter + " */\n";            
             int constrCounter = 1;
+            
+            // -1 if the internal prec.variable with corresponding index is not used in this case,
+            // otherwise the variable value that makes this case possible.
+            int[] currVariableCombination = new int[internalPrecVarsTable.keySet().size()];
+            for (int i = 0; i < currVariableCombination.length; i++)
+            {
+                currVariableCombination[i] = -1;
+            }
             
             // Get the correct internal precedence variables for this combination of events
             String internalPrecStr = "";
             int nrDefaultInternalPrec = 0;
-            for (int i = 0; i < currAlternatingPlantStateInfoArray.size() - 2; i++)
+            ArrayList<int[]> checkedPPlantStates = new ArrayList<int[]>();
+            ArrayList<int[]> checkedFPlantStates = new ArrayList<int[]>();
+            ArrayList<int[]> currCheckedPlantStates = null;
+            ArrayList<ArrayList> currAllPlantStates = null;
+            for (int i = 0; i < currAlternatingPlantStateInfoArray.size(); i++)
             {
-                int[] firstPlantState = currAlternatingPlantStateInfoArray.get(i).get(0);
-                int[] secondPlantState = currAlternatingPlantStateInfoArray.get(i+2).get(0);
-                
-                if (internalPrecVarsTable.get(new IntKey(firstPlantState, secondPlantState)) != null)
+                boolean isPreceding = true;
+                if (Math.IEEEremainder(i, 2) == 0)
                 {
-                    nrDefaultInternalPrec++;
-                    internalPrecStr += " - " + internalPrecVarsTable.get(new IntKey(firstPlantState, secondPlantState));
-                }
-                else if (internalPrecVarsTable.get(new IntKey(secondPlantState, firstPlantState)) != null)
-                {
-                    internalPrecStr += " + " + internalPrecVarsTable.get(new IntKey(secondPlantState, firstPlantState));
+                    currCheckedPlantStates = checkedPPlantStates;
+                    currAllPlantStates = allPPlantStates;
                 }
                 else
                 {
-                    throw new Exception("MILP Exception --> Key \"" + internalPrecVarsTable.get(new IntKey(firstPlantState, secondPlantState)) + 
-                            "\" not found in the internal_precedence hashtable...");
+                    currCheckedPlantStates = checkedFPlantStates;
+                    currAllPlantStates = allFPlantStates;
+                    isPreceding = false;
                 }
+                
+                ArrayList<int[]> currPlantStateInfo = currAlternatingPlantStateInfoArray.get(i);
+                int[] currPlantState = currPlantStateInfo.get(0);
+                
+                for (int j = 1; j < currPlantStateInfo.size(); j++)
+                {
+                    int[] pathSplit = currPlantStateInfo.get(j);
+                    if (pathSplit[0] != NO_PATH_SPLIT_INDEX)
+                    {
+                        if (isPreceding)
+                        {
+                            equalNumberPConstrStr += makeAltPathsVariable(currPlantState[0], pathSplit[0], pathSplit[1]) + " + ";
+                        }
+                        else
+                        {
+                            equalNumberFConstrStr += makeAltPathsVariable(currPlantState[0], pathSplit[0], pathSplit[1]) + " + ";
+                        }
+                    }
+                    else
+                    {
+                        if (isPreceding)
+                        {
+                            equalNumberPConstrStr += "1 + ";
+                        }
+                        else
+                        {
+                            equalNumberFConstrStr += "1 + ";
+                        }
+                    }   
+                }
+                
+                currCheckedPlantStates.add(currPlantState);
+                for (int j = 0; j < currAllPlantStates.size(); j++)
+                {
+                    int[] followingPlantState = (int[]) currAllPlantStates.get(j).get(0);
+                    if (!currCheckedPlantStates.contains(followingPlantState))
+                    {
+                        if (internalPrecVarsTable.get(new IntKey(currPlantState, followingPlantState)) != null)
+                        {
+                            nrDefaultInternalPrec++;
+                            InternalPrecVariable currInternalPrecVar = internalPrecVarsTable.get(new IntKey(currPlantState, followingPlantState));
+                            internalPrecStr += " - " + currInternalPrecVar.getName();
+                            currVariableCombination[currInternalPrecVar.getIndex()] = 1;
+                        }
+                        else if (internalPrecVarsTable.get(new IntKey(followingPlantState, currPlantState)) != null)
+                        {
+                            InternalPrecVariable currInternalPrecVar = internalPrecVarsTable.get(new IntKey(followingPlantState, currPlantState));
+                            internalPrecStr += " + " + currInternalPrecVar.getName();
+                            currVariableCombination[currInternalPrecVar.getIndex()] = 0;
+                        }
+                        else
+                        {
+                            throw new Exception("MILP Exception --> No key found (in the internal_precedence hashtable) for \"" + 
+                                    currPlantState[0] + "_" + currPlantState[1] + ", " + followingPlantState[0] + "_" + followingPlantState[1] + "\"...");
+                        }
+                    }
+                }     
             }
+            
+            usedVariableCombinations.add(currVariableCombination);
+            
+            //TODO: rename cut(S/E)Index to cut(Start/End)Index
+            int cutIndex = equalNumberPConstrStr.length();
+            if (equalNumberPConstrStr.endsWith("+ "))
+            {
+                cutIndex = equalNumberPConstrStr.lastIndexOf("+");
+            }
+            equalNumberPConstrStr = equalNumberPConstrStr.substring(0, cutIndex).trim();
+            
+            cutIndex = equalNumberFConstrStr.length();
+            if (equalNumberFConstrStr.endsWith("+ "))
+            {
+                cutIndex = equalNumberFConstrStr.lastIndexOf("+");
+            }
+            equalNumberFConstrStr = equalNumberFConstrStr.substring(0, cutIndex).trim();
+
+            String tailStr = ";\n";
+            if (internalPrecStr != "")
+            {
+                tailStr = " - bigM*(" + nrDefaultInternalPrec + internalPrecStr + ")" + tailStr;
+            }           
+//            externalConstraints += "/* " + specName + ", nr_starting_events == nr_finishing_events */\n";
+            externalConstraints += "multi_plant_prec_" + specName + "_TOT_" + caseCounter + " : " + equalNumberPConstrStr +
+                    " >= " + equalNumberFConstrStr + tailStr;
+            externalConstraints += "multi_plant_prec_" + specName + "_TOT_dual" + caseCounter + " : " + equalNumberFConstrStr +
+                    " >= " + equalNumberPConstrStr + tailStr;            
+            
+//@Deprecated
+//            for (int i = 0; i < currAlternatingPlantStateInfoArray.size() - 2; i++)
+//            {
+//                int[] firstPlantState = currAlternatingPlantStateInfoArray.get(i).get(0);
+//                int[] secondPlantState = currAlternatingPlantStateInfoArray.get(i+2).get(0);
+//                
+//                if (internalPrecVarsTable.get(new IntKey(firstPlantState, secondPlantState)) != null)
+//                {
+//                    nrDefaultInternalPrec++;
+//                    internalPrecStr += " - " + internalPrecVarsTable.get(new IntKey(firstPlantState, secondPlantState));
+//                }
+//                else if (internalPrecVarsTable.get(new IntKey(secondPlantState, firstPlantState)) != null)
+//                {
+//                    internalPrecStr += " + " + internalPrecVarsTable.get(new IntKey(secondPlantState, firstPlantState));
+//                }
+//                else
+//                {
+//                    throw new Exception("MILP Exception --> Key \"" + internalPrecVarsTable.get(new IntKey(firstPlantState, secondPlantState)) + 
+//                            "\" not found in the internal_precedence hashtable...");
+//                }
+//            }
                        
             for (int fIndex = 1; fIndex < currAlternatingPlantStateInfoArray.size(); fIndex++)
             {
@@ -1244,15 +1414,126 @@ public class Milp
                 }
 //                externalConstraints += "/* sigma_finish always preceeded by a sigma_start : */\n";
                 externalConstraints += startFinishLogicStrLeft + " >= " + startFinishLogicStrRight;
-                if (nrDefaultInternalPrec > 0)
+                if (internalPrecStr != "" || nrDefaultInternalPrec > 0)
                 {
                     externalConstraints += " - bigM*(" + nrDefaultInternalPrec + internalPrecStr + ")";
                 }
                 externalConstraints += ";\n";          
             }
+
+            ArrayList<ArrayList> allPlantStates = new ArrayList<ArrayList>(allPPlantStates);
+            allPlantStates.addAll(allFPlantStates);
+            for (ArrayList<int[]> unusedPlantStateInfo : allPlantStates)
+            {
+                if (!isPlantStateInArray(currAlternatingPlantStateInfoArray, unusedPlantStateInfo)) //fulhack denna isPlantStateInArray
+                {
+                    String unusedPlantStateConstr = "0 >= time[" + unusedPlantStateInfo.get(0)[0] + ", " + unusedPlantStateInfo.get(0)[1] + "]";
+                    
+                    int nrPathSplits = 0;
+                    String pathSplitVarStr = "";
+                    for (int i = 1; i < unusedPlantStateInfo.size(); i++)
+                    {
+                        if (unusedPlantStateInfo.get(i)[0] != NO_PATH_SPLIT_INDEX)
+                        {
+                            nrPathSplits++;
+                            pathSplitVarStr += " - " + makeAltPathsVariable(unusedPlantStateInfo.get(0)[0], 
+                                unusedPlantStateInfo.get(i)[0], unusedPlantStateInfo.get(i)[1]);
+                        }
+                    }
+                    
+                    externalConstraints += "multi_plant_prec_" + specName + "_" + caseCounter + "_" + constrCounter++ + " : " + 
+                                unusedPlantStateConstr;
+                    if (internalPrecStr != "" || nrPathSplits > 0)
+                    {
+                       externalConstraints += " - bigM*(" + (nrPathSplits + nrDefaultInternalPrec) + 
+                                pathSplitVarStr + internalPrecStr + ") + epsilon;\n";
+                    }       
+                }
+            }
+            
+//@Deprecated            
+//            ArrayList<ArrayList> allPlantStates = new ArrayList<ArrayList>(allPPlantStates);
+//            allPlantStates.addAll(allFPlantStates);
+//            for (ArrayList<int[]> unusedPlantStateInfo : allPlantStates)
+//            {
+//                if (!isPlantStateInArray(currAlternatingPlantStateInfoArray, unusedPlantStateInfo)) //fulhack denna isPlantStateInArray
+//                {
+//                    String leftHandSideStr = "time[" + unusedPlantStateInfo.get(0)[0] + ", " + unusedPlantStateInfo.get(0)[1] + "] >= ";
+//                    
+//                    int nrFPathSplits = 0;
+//                    String fPathSplitVarStr = "";
+//                    for (int i = 1; i < unusedPlantStateInfo.size(); i++)
+//                    {
+//                        if (unusedPlantStateInfo.get(i)[0] != NO_PATH_SPLIT_INDEX)
+//                        {
+//                            nrFPathSplits++;
+//                            fPathSplitVarStr += " - " + makeAltPathsVariable(unusedPlantStateInfo.get(0)[0], 
+//                                unusedPlantStateInfo.get(i)[0], unusedPlantStateInfo.get(i)[1]);
+//                        }
+//                    }
+//                    
+//                    for (ArrayList<int[]> usedPlantStateInfo : currAlternatingPlantStateInfoArray)
+//                    {
+//                        externalConstraints += "multi_plant_prec_" + specName + "_" + caseCounter + "_" + constrCounter++ + " :" + 
+//                                leftHandSideStr + "time[" + usedPlantStateInfo.get(0)[0] + ", " + usedPlantStateInfo.get(0)[1] + "]";
+//                        
+//                        int nrPPathSplits = 0;
+//                        String pPathSplitVarStr = "";
+//                        for (int i = 1; i < usedPlantStateInfo.size(); i++)
+//                        {
+//                            if (usedPlantStateInfo.get(i)[0] != NO_PATH_SPLIT_INDEX)
+//                            {
+//                                nrPPathSplits++;
+//                                pPathSplitVarStr += " - " + makeAltPathsVariable(usedPlantStateInfo.get(0)[0], 
+//                                    usedPlantStateInfo.get(i)[0], usedPlantStateInfo.get(i)[1]);
+//                            }
+//                        }    
+//                        
+//                        if (internalPrecStr != "" || (nrFPathSplits + nrPPathSplits) > 0)
+//                        {
+//                           externalConstraints += " - bigM*(" + (nrFPathSplits + nrPPathSplits + nrDefaultInternalPrec) + 
+//                                    fPathSplitVarStr + pPathSplitVarStr + internalPrecStr + ") + epsilon;\n";
+//                        }                             
+//                    }
+//                }
+//            }
+        }        
+                
+        externalConstraints += "/* Unused combinations should never occur...*/\n";
+        ArrayList<int[]> allBooleanCombinations = getAllBooleanVarCombinations(nrInternalPrecVars, null);
+        for (int i = 0; i<allBooleanCombinations.size(); i++)
+        {
+            int[] currBoolCombination = allBooleanCombinations.get(i);
+            
+            if (!usedVariableCombinations.contains(currBoolCombination))
+            {
+                externalConstraints += "unused_internal_prec_combination_" + i + " : 0 >= 1";
+            
+                String unusedCombinationConstraint = "";
+                int nrActiveInternalVars = 0;
+                for (InternalPrecVariable internalVar : internalPrecVarsTable.values())
+                {
+                    if (currBoolCombination[internalVar.getIndex()] == 1)
+                    {
+                        unusedCombinationConstraint += " - ";
+                        nrActiveInternalVars++;
+                    }
+                    else
+                    {
+                        unusedCombinationConstraint += " + ";
+                    }
+                    unusedCombinationConstraint += internalVar.getName();
+                }
+
+                externalConstraints += " - bigM*(" + nrActiveInternalVars + unusedCombinationConstraint + ");\n";
+            }  
         }
-        externalConstraints += "/* " + specName + ", nr_starting_events == nr_finishing_events */\n";
-        externalConstraints += "multi_plant_prec_" + specName + "_TOT : " + equalNumberConstrStr;
+  
+//@Deprecated        
+//        externalConstraints += "/* " + specName + ", nr_starting_events == nr_finishing_events */\n";
+//        externalConstraints += "multi_plant_prec_" + specName + "_TOT : " + equalNumberConstrStr;
+        
+
         
         // Adding 101/010-constraints that make sure that certain combinations of internal precedece variables,
         // such as c<a<b<c and c>a>b>c are disregarded by the MILP-solver.
@@ -1265,12 +1546,12 @@ public class Milp
             for (int j = i+1; j < nrPPlantStates - 1; j++)
             {
                 int[] secondPlantState = ((ArrayList<int[]>)allPPlantStates.get(j)).get(0);
-                String firstAlpha = internalPrecVarsTable.get(new IntKey(firstPlantState, secondPlantState));
+                String firstAlpha = internalPrecVarsTable.get(new IntKey(firstPlantState, secondPlantState)).getName();
                 for (int k = j+1; k < nrPPlantStates; k++)
                 {
                     int[] thirdPlantState = ((ArrayList<int[]>)allPPlantStates.get(k)).get(0);
-                    String secondAlpha = internalPrecVarsTable.get(new IntKey(firstPlantState, thirdPlantState));
-                    String thirdAlpha = internalPrecVarsTable.get(new IntKey(secondPlantState, thirdPlantState));
+                    String secondAlpha = internalPrecVarsTable.get(new IntKey(firstPlantState, thirdPlantState)).getName();
+                    String thirdAlpha = internalPrecVarsTable.get(new IntKey(secondPlantState, thirdPlantState)).getName();
                     
                     String oneZeroOneDisablement = "2 - " + firstAlpha + " + " + secondAlpha + " - " + thirdAlpha + " >= 1;\n";
                     String zeroOneZeroDisablement = "1 + " + firstAlpha + " - " + secondAlpha + " + " + thirdAlpha + " >= 1;\n";
@@ -1286,12 +1567,12 @@ public class Milp
             for (int j = i+1; j < nrFPlantStates - 1; j++)
             {
                 int[] secondPlantState = ((ArrayList<int[]>)allFPlantStates.get(j)).get(0);
-                String firstAlpha = internalPrecVarsTable.get(new IntKey(firstPlantState, secondPlantState));
+                String firstAlpha = internalPrecVarsTable.get(new IntKey(firstPlantState, secondPlantState)).getName();
                 for (int k = j+1; k < nrFPlantStates; k++)
                 {
                     int[] thirdPlantState = ((ArrayList<int[]>)allFPlantStates.get(k)).get(0);
-                    String secondAlpha = internalPrecVarsTable.get(new IntKey(firstPlantState, thirdPlantState));
-                    String thirdAlpha = internalPrecVarsTable.get(new IntKey(secondPlantState, thirdPlantState));
+                    String secondAlpha = internalPrecVarsTable.get(new IntKey(firstPlantState, thirdPlantState)).getName();
+                    String thirdAlpha = internalPrecVarsTable.get(new IntKey(secondPlantState, thirdPlantState)).getName();
                     
                     String oneZeroOneDisablement = "2 - " + firstAlpha + " + " + secondAlpha + " - " + thirdAlpha + " >= 1;\n";
                     String zeroOneZeroDisablement = "1 + " + firstAlpha + " - " + secondAlpha + " + " + thirdAlpha + " >= 1;\n";
@@ -2420,6 +2701,27 @@ public class Milp
     
     private ArrayList<ArrayList> getEveryAlternatingOrdering(ArrayList<ArrayList> toOrder1, ArrayList<ArrayList> toOrder2)
     {
+        //test
+        for (int i = 0; i < toOrder1.size(); i++)
+        {
+            int[] plantStateInOrder1 = (int[]) toOrder1.get(i).get(0);
+            for (int j = 0; j < toOrder2.size(); j++)
+            {
+                int[] plantStateInOrder2 = (int[]) toOrder2.get(j).get(0);
+                if ((plantStateInOrder1[0] == plantStateInOrder2[0]) && (plantStateInOrder1[1] == plantStateInOrder2[1]))
+                {
+                    ArrayList<ArrayList> newToOrder1 = new ArrayList<ArrayList>(toOrder1);
+                    ArrayList<ArrayList> newToOrder2 = new ArrayList<ArrayList>(toOrder2);
+                    newToOrder1.remove(i);
+                    newToOrder2.remove(j);
+                    
+                    ArrayList<ArrayList> combinedAlternativeOrderings = getEveryAlternatingOrdering(toOrder1, newToOrder2);
+                    combinedAlternativeOrderings.addAll(getEveryAlternatingOrdering(newToOrder1, toOrder2));
+                    return combinedAlternativeOrderings;
+                }
+            }
+        }
+        
         ArrayList<ArrayList> allOrderings1 = new ArrayList<ArrayList>();
         ArrayList<ArrayList> allOrderings2 = new ArrayList<ArrayList>();
         getEveryOrdering(toOrder1, new ArrayList<ArrayList>(), allOrderings1);
@@ -2453,7 +2755,7 @@ public class Milp
 //            logger.warn("str...... = " + str);
 //        }
     }
-  
+    
 //@Deprecated    
 //    private String getKeyFromPlantStates(int[] firstPlantState, int[] secondPlantState)
 //    {
@@ -2469,6 +2771,67 @@ public class Milp
 //
 //        return key;
 //    }
+
+    //FULHACK
+    private boolean isPlantStateInArray(ArrayList<ArrayList<int[]>> array, ArrayList<int[]> plantStateInfo)
+    {
+        int[] plantState = plantStateInfo.get(0);
+        for (ArrayList<int[]> inArray : array)
+        {
+            if (plantState[0] == inArray.get(0)[0] && plantState[1] == inArray.get(0)[1])
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private ArrayList<int[]> getAllBooleanVarCombinations(int length, ArrayList<int[]> combinationList)
+    {
+        ArrayList<int[]> newCombinationList = new ArrayList<int[]>();
+        
+        if (combinationList == null)
+        {
+            combinationList = new ArrayList<int[]>();
+            
+            int[] newElement = new int[length];
+            for (int i = 0; i < newElement.length; i++)
+            {
+                newElement[i] = -1;
+            }
+            combinationList.add(newElement);
+        }
+        
+        for (Iterator<int[]> it = combinationList.iterator(); it.hasNext();)
+        {
+            int[] element = it.next();
+            for (int i = 0; i < element.length; i++)
+            {
+                if (element[i] == -1)
+                {
+                    element[i] = 0;
+                    newCombinationList.add(element);
+                    
+                    int[] dualElement = new int[length];
+                    for (int j = 0; j < dualElement.length; j++)
+                    {
+                        dualElement[j] = element[j];
+                    }
+                    dualElement[i] = 1;
+                    newCombinationList.add(dualElement);
+                    
+                    break;
+                }
+            }
+        }
+        
+        if (newCombinationList.get(0)[length-1] != -1)
+        {
+            return newCombinationList;
+        }
+        
+        return getAllBooleanVarCombinations(length, newCombinationList);
+    }
 }
 
 // class PathSplipIndexComparator
@@ -2528,5 +2891,102 @@ class IntKey
     public int[] getSecondInt()
     {
         return secondInt;
+    }
+}
+
+class InternalPrecVariable
+{
+    private String name;
+    private int index;
+    
+    InternalPrecVariable(String name, int index)
+    {
+        this.name = name;
+        this.index = index;
+    }
+    
+    String getName()
+    {
+        return name;
+    }
+    
+    int getIndex()
+    {
+        return index;
+    }
+}
+
+class IntArrayComparator
+	implements Comparator<int[]>
+{
+    public int compare(int[] newNode, int[] oldNode)
+    {
+        for (int i = 0; i < newNode.length; i++)
+        {
+            int currDiff = newNode[i] - oldNode[i];
+            if (currDiff != 0)
+            {
+                return currDiff;
+            }
+        }
+
+        return 0;
+    }
+}
+
+class BooleanCombinationTreeSet
+        extends TreeSet<int[]>
+{
+    BooleanCombinationTreeSet()
+    {
+        super(new IntArrayComparator());
+    }
+    
+    public boolean add(int[] boolCombination)
+    {
+        ArrayList<int[]> combinationsToBeAdded = new ArrayList<int[]>();
+        combinationsToBeAdded.add(boolCombination);
+        
+        return addArray(combinationsToBeAdded);
+    }
+    
+    private boolean addArray(ArrayList<int[]> combinationsToBeAdded)
+    {
+        ArrayList<int[]> newCombinationsToBeAdded = new ArrayList<int[]>();
+        for (int i = 0; i < combinationsToBeAdded.get(0).length; i++)
+        {
+            if (combinationsToBeAdded.get(0)[i] == -1)
+            {
+                for (Iterator<int[]> it = combinationsToBeAdded.iterator(); it.hasNext();)
+                {
+                    int[] currCombination = it.next();
+                    
+                    currCombination[i] = 0;
+                    newCombinationsToBeAdded.add(currCombination);
+                    
+                    int[] newCombination = new int[currCombination.length];
+                    for (int j = 0; j < currCombination.length; j++)
+                    {
+                        newCombination[j] = currCombination[j];
+                    }
+                    newCombination[i] = 1;
+                    newCombinationsToBeAdded.add(newCombination);
+                }
+                
+                return addArray(newCombinationsToBeAdded);
+            }
+        }
+        
+        boolean elementAdded = false;
+        for (Iterator<int[]> it = combinationsToBeAdded.iterator(); it.hasNext();)
+        {
+            int[] currCombination = it.next();
+            if (super.add(currCombination))
+            {
+                elementAdded = true;
+            }
+        }
+        
+        return elementAdded;
     }
 }

@@ -267,6 +267,26 @@
   </javac>
 </target>
 
+<target name="compile_supremica_xlint" depends="startfiles_local_supremica">
+  <javac debug="on"
+         debuglevel="lines,source,vars"
+         srcdir="${src}"
+         destdir="${build}"
+         deprecation="false"
+         verbose="false"
+         nowarn="true"
+         excludes="${jgrafchart_basedir}/**,
+                   ${supremica_basedir}/external/robotCoordination/**"
+         source="1.5"
+         fork="true"
+         memoryMaximumSize="128M">
+    <classpath>    
+      <pathelement location="${lib}/${unjared}"/>
+    </classpath>
+    <compilerarg value="-Xlint"/>
+  </javac>
+</target>
+
 <target name="compile_supremica_groovy" depends="compile_supremica" description="--> compiles groovy src files that depend on Supremica">
 	<groovyc srcdir="${src}" destdir="${build}">
 		<classpath>    
