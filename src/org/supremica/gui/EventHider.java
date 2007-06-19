@@ -41,13 +41,12 @@ class EventHiderDialog
     
     private IDEReportInterface ide;
     
-    private boolean preserveControllability = false;
+    private boolean preserveControllability = true;
     
     public EventHiderDialog(IDEReportInterface ide, Automata automata, Alphabet globalAlphabet)
     {
         super(automata, globalAlphabet);
-        super.setTitle("Event hider");
-        
+        super.setTitle("Event hider");       
         super.okButton = new OkButton();
         
         // Add menu for choosing whether to preserve controllabilty or not.

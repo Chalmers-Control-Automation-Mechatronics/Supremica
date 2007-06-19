@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentEditorPanel
 //###########################################################################
-//# $Id: ComponentEditorPanel.java,v 1.45 2007-06-08 09:30:18 avenir Exp $
+//# $Id: ComponentEditorPanel.java,v 1.46 2007-06-19 11:47:01 flordal Exp $
 //###########################################################################
 
 
@@ -799,7 +799,7 @@ public class ComponentEditorPanel
 					{
 						// The ps-commands are either "moveto", using 2 arguments,
 						// "curveto" using 4 arguments (in java SEG_QUADTO) or 
-                                                // "curveto" using 6 arguments (Bézier interpolation) (in java SEG_CUBICTO)
+                                                // "curveto" using 6 arguments (Bï¿½zier interpolation) (in java SEG_CUBICTO)
 						int nrOfCoords = 2;
 						if (res == PathIterator.SEG_QUADTO)
 						{
@@ -1119,14 +1119,14 @@ public class ComponentEditorPanel
             PrinterJob printJob = PrinterJob.getPrinterJob();
             if (printJob.getPrintService() == null)
             {
-                System.err.println("No default printer set.");
+                mModuleContainer.getIDE().error("No default printer set.");
                 return;
             }
             printJob.setPrintable(surface);
          
             // Printing attributes
             PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
-            PrintRequestAttribute name = new JobName("Supremica Printing", Locale.ENGLISH);
+            PrintRequestAttribute name = new JobName("Supremica Printing", Locale.ENGLISH);           
             attributes.add(name);
          
             // Show printing dialog
