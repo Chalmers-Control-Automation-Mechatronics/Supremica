@@ -64,6 +64,7 @@ import org.supremica.gui.help.*;
 import org.supremica.properties.Config;
 import org.supremica.automata.*;
 import org.supremica.automata.IO.*;
+import org.supremica.gui.ide.actions.IDEActionInterface;
 
 public class Supremica
     extends JFrame

@@ -1427,27 +1427,32 @@ public class Milp
             {
                 if (!isPlantStateInArray(currAlternatingPlantStateInfoArray, unusedPlantStateInfo)) //fulhack denna isPlantStateInArray
                 {
-                    String unusedPlantStateConstr = "0 >= time[" + unusedPlantStateInfo.get(0)[0] + ", " + unusedPlantStateInfo.get(0)[1] + "]";
-                    
-                    int nrPathSplits = 0;
-                    String pathSplitVarStr = "";
+                    String unusedPlantStateConstr = "0 >= ";
+
                     for (int i = 1; i < unusedPlantStateInfo.size(); i++)
                     {
                         if (unusedPlantStateInfo.get(i)[0] != NO_PATH_SPLIT_INDEX)
                         {
-                            nrPathSplits++;
-                            pathSplitVarStr += " - " + makeAltPathsVariable(unusedPlantStateInfo.get(0)[0], 
-                                unusedPlantStateInfo.get(i)[0], unusedPlantStateInfo.get(i)[1]);
+                            unusedPlantStateConstr += makeAltPathsVariable(unusedPlantStateInfo.get(0)[0], 
+                                unusedPlantStateInfo.get(i)[0], unusedPlantStateInfo.get(i)[1]) + " + ";
+                        }
+                        else
+                        {
+                            unusedPlantStateConstr += "1 + ";
                         }
                     }
                     
+                    if (unusedPlantStateConstr.contains("+"))
+                    {
+                        unusedPlantStateConstr = unusedPlantStateConstr.substring(0, unusedPlantStateConstr.lastIndexOf("+")).trim();
+                    }                
+                    
                     externalConstraints += "multi_plant_prec_" + specName + "_" + caseCounter + "_" + constrCounter++ + " : " + 
                                 unusedPlantStateConstr;
-                    if (internalPrecStr != "" || nrPathSplits > 0)
+                    if (internalPrecStr != "") // || nrPathSplits > 0)
                     {
-                       externalConstraints += " - bigM*(" + (nrPathSplits + nrDefaultInternalPrec) + 
-                                pathSplitVarStr + internalPrecStr + ") + epsilon;\n";
-                    }       
+                        externalConstraints += " - bigM*(" + nrDefaultInternalPrec + internalPrecStr + ");\n";
+                    }
                 }
             }
             
@@ -2775,20 +2780,44 @@ public class Milp
     //FULHACK
     private boolean isPlantStateInArray(ArrayList<ArrayList<int[]>> array, ArrayList<int[]> plantStateInfo)
     {
-        int[] plantState = plantStateInfo.get(0);
-        for (ArrayList<int[]> inArray : array)
+        mainloop: for (ArrayList<int[]> inArray : array)
         {
-            if (plantState[0] == inArray.get(0)[0] && plantState[1] == inArray.get(0)[1])
+            if (inArray.size() != plantStateInfo.size())
             {
-                return true;
+                continue mainloop;
             }
+            
+            for (int i = 0; i < inArray.size(); i++)
+            {
+                if (inArray.get(i).length != plantStateInfo.get(i).length)
+                {
+                    continue mainloop;
+                }
+                
+                for (int j = 0; j < inArray.get(i).length; j++)
+                {
+                    if (inArray.get(i)[j] != plantStateInfo.get(i)[j])
+                    {
+                        continue mainloop;
+                    }
+                }
+            }
+
+            // If this point has been reached, then two identical plantStateInfos have been found 
+            return true;
         }
+
         return false;
     }
     
     private ArrayList<int[]> getAllBooleanVarCombinations(int length, ArrayList<int[]> combinationList)
-    {
+    {                
         ArrayList<int[]> newCombinationList = new ArrayList<int[]>();
+
+        if (length == 0)
+        {
+            return newCombinationList;
+        }
         
         if (combinationList == null)
         {

@@ -561,7 +561,15 @@ public class ProjectBuildFromXML
             }
             else if (nameStr.equals(currName))
             {
-                name = attributes.getValue(i);
+                String stateName = attributes.getValue(i);
+                if (name == null)
+                {
+                    name = stateName;
+                }
+                else
+                {
+                    name = stateName + name;
+                }
             }
             else if (initialStr.equals(currName))
             {
@@ -578,6 +586,11 @@ public class ProjectBuildFromXML
             else if (costStr.equals(currName))
             {
                 cost = Double.valueOf(attributes.getValue(i)).doubleValue();
+                if (name == null)
+                {
+                    name = "";
+                }
+                name += ", cost=" + cost;
             }
         }
         

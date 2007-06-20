@@ -917,6 +917,8 @@ Class-Path: ${manifest.pathlist}</echo>
 
 <target name="runLocal">
 	<java classname="${supremica_basepackage}.gui.ide.IDE" fork="yes">
+	     <arg value="-p"/>
+             <arg value="dist/SupremicaProperties.cfg"/>
 		<classpath>
 			<pathelement location="build" />
 			<pathelement location="lib/unjared" />

@@ -75,6 +75,7 @@ class AnalyzerPopupMenu
             experimentMenu.add(ide.getActions().analyzerPredictSizeAction.getMenuItem());
             experimentMenu.add(ide.getActions().analyzerExperimentAction.getMenuItem());
             experimentMenu.add(ide.getActions().analyzerCountReachableAction.getMenuItem());
+            experimentMenu.add(ide.getActions().analyzerScheduleAction.getMenuItem());
         }
     }
 }

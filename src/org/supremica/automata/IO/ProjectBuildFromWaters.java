@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.automata.IO
 //# CLASS:   ProjectBuildFromWaters
 //###########################################################################
-//# $Id: ProjectBuildFromWaters.java,v 1.25 2007-05-28 11:29:55 flordal Exp $
+//# $Id: ProjectBuildFromWaters.java,v 1.26 2007-06-20 12:47:36 avenir Exp $
 //###########################################################################
 
 /*
@@ -58,6 +58,7 @@
 package org.supremica.automata.IO;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -165,6 +166,7 @@ public class ProjectBuildFromWaters
         for (final AutomatonProxy aut : des.getAutomata())
         {
             final Automaton supaut = build(aut);
+            addCostToStates(supaut);
             currProject.addAutomaton(supaut);
         }
         return currProject;
@@ -288,6 +290,54 @@ public class ProjectBuildFromWaters
             }
         }
         return alphabet;
+    }
+    
+    /**
+     * Goes through the states of the supplied automaton and adds costs if the 
+     * code name, "cost", is found in the WATERS product DES.
+     *
+     * @param   aut The automaton that may need addition of cost to its states
+     */ 
+    private void addCostToStates(Automaton aut)
+        throws EvalException
+    {
+        for (Iterator<State> stateIt = aut.iterator(); stateIt.hasNext();)
+        {
+            State state = stateIt.next();
+            String stateName = state.getName();
+            if (stateName.contains("cost") && stateName.contains("="))
+            {
+                Double costValue = null;
+                String costStr = stateName.substring(stateName.lastIndexOf("=") + 1).trim();
+                while (costStr.length() > 0)
+                {
+                    try
+                    {
+                        costValue = new Double(costStr);
+                        break;
+                    }
+                    catch (NumberFormatException ex)
+                    {
+                        costStr = costStr.substring(0, costStr.length() - 1);
+                    }                        
+                }
+
+                if (costValue == null)
+                {
+                    throw new EvalException("The cost, defined in state '" + stateName + "', could not be parsed");
+                }
+                else
+                {
+                    stateName = stateName.substring(0, stateName.indexOf("cost")).trim();
+                    if (stateName.endsWith(","))
+                    {
+                        stateName = stateName.substring(0, stateName.length() - 1).trim();
+                    }
+                    state.setName(stateName);
+                    state.setCost(costValue.doubleValue());
+                }
+            }
+        }
     }
 }
 

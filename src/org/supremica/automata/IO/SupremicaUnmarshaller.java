@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   SupremicaUnmarshaller
 //###########################################################################
-//# $Id: SupremicaUnmarshaller.java,v 1.9 2007-05-09 11:54:46 flordal Exp $
+//# $Id: SupremicaUnmarshaller.java,v 1.10 2007-06-20 12:47:36 avenir Exp $
 //###########################################################################
 
 package org.supremica.automata.IO;
@@ -107,22 +107,22 @@ public class SupremicaUnmarshaller
     private final ProductDESImporter mImporter;
     
     /**
-     * Examines if there are conversion problems in an automata. For example,
+     * Examines if there are conversion problems in an automata. (Deprecated: For example,
      * the State cost feature has no correspondance in the Waters models, the 
-     * user should be alerted of this fact...
+     * user should be alerted of this fact...)
      */
     private void validate(Automata automata)
     {
         for (Automaton aut : automata)
         {
-            for (State state : aut)
-            {
-                if (state.getCost() != State.UNDEF_COST)
-                {
-                    logger.warn("State cost information in the imported automata model was lost in the conversion; optimisation is not possible.");
-                    return;
-                }
-            }
+//            for (State state : aut)
+//            {
+//                if (state.getCost() != State.UNDEF_COST)
+//                {
+//                    logger.warn("State cost information in the imported automata model was lost in the conversion; optimisation is not possible.");
+//                    return;
+//                }
+//            }
         }
     }
 }
