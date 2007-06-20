@@ -3,6 +3,7 @@ package org.supremica.gui.ide;
 import javax.swing.JFrame;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Automata;
+import org.supremica.automata.Project;
 
 public interface IDEReportInterface
 {
@@ -19,5 +20,13 @@ public interface IDEReportInterface
     
     boolean addAutomaton(Automaton theAutomaton);
     
-    int addAutomata(Automata theAutomata);    
+    int addAutomata(Automata theAutomata);
+    
+    public Project getActiveProject();
+    
+    public Automata getSelectedAutomata();
+    
+    public Automata getUnselectedAutomata();
+    
+    public String getNewAutomatonName(String str, String def);
 }

@@ -13,7 +13,7 @@ import org.supremica.automata.Project;
 public interface IDEActionInterface
     extends IDEReportInterface
 {
-	public ModuleSubject createNewModuleSubject();
+    public ModuleSubject createNewModuleSubject();
     public ModuleContainer getActiveModuleContainer();
     public void add(ModuleContainer module);
     public void remove(ModuleContainer module);
@@ -24,9 +24,6 @@ public interface IDEActionInterface
     public void repaint();
     public void setEditorMode(IDEAction theAction);
     public EditorWindowInterface getActiveEditorWindowInterface();
-    public Automata getSelectedAutomata();
-    public Project getActiveProject();
     public Automata getAllAutomata();
-    public Automata getUnselectedAutomata();
     // int addAutomata(Automata theAutomata);
 }
