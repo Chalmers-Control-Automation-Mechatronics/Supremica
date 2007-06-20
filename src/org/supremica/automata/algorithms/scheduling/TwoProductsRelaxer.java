@@ -113,7 +113,7 @@ public class TwoProductsRelaxer
 
 					// The scheduling is performed from the current state
 					//					logger.warn("Startar ny oneProdRelaxer för robotarna " + firstRelaxationPlantAutomaton.getName() + " och " + secondRelaxationPlantAutomaton.getName() + "; nr_of_plants = " + relaxationAutomata.getPlantAutomata().size());
-					ModifiedAstar oneProdRelaxer = new ModifiedAstar(theAutomata, "1-prod relax", scheduler.isManualExpansion(), false, true, scheduler.getGui());
+					ModifiedAstar oneProdRelaxer = new ModifiedAstar(theAutomata, "1-prod relax", scheduler.isManualExpansion(), false, true, scheduler.getScheduleDialog());
 					try 
 					{
 						while (!oneProdRelaxer.isInitialized())

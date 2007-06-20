@@ -8,7 +8,7 @@ import java.awt.event.*;
 import java.awt.Frame;
 import java.io.*;
 
-import org.supremica.gui.ide.actions.IDEActionInterface;
+import org.supremica.gui.ide.IDEReportInterface;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.automata.Automata;
@@ -41,33 +41,20 @@ public class ScheduleDialog
     private java.util.ArrayList filesToSchedule = new java.util.ArrayList();
     
     private Automata selectedAutomata = null;
+    private IDEReportInterface ide = null;
 
     Scheduler sched = null;
     public Thread milpThread = null;
 
     private BufferedWriter writer = null; //Tillf
-
-
-    public ScheduleDialog()
+   
+    public ScheduleDialog(IDEReportInterface ide)
     {
-        this(ActionMan.getGui().getFrame());
-    }
+        super(ide.getFrame(), "Schedule Selected Automata", true);
 
-    public ScheduleDialog(JFrame frame)
-    {
-        super(frame, "Schedule Selected Automata", true);
+        this.ide = ide;
+        selectedAutomata = ide.getSelectedAutomata();
         
-        // Ugly hack, should be replaced by unifying the interfaces for Supremica and IDE 
-        // (i.e. Gui.java and IDEActionInterface.java)
-        if (frame instanceof Gui)
-        {
-            selectedAutomata = ((Gui) frame).getSelectedAutomata();
-        }
-        else if (frame instanceof IDEActionInterface)
-        {
-            selectedAutomata = ((IDEActionInterface) frame).getSelectedAutomata();
-        }
-
         /******** Base components of the dialog ***********/
         okButton = new JButton("Schedule");
         cancelButton = new JButton("Cancel");
@@ -283,83 +270,88 @@ public class ScheduleDialog
      */
     public void done()
     {
-		try
-		{
-			if (autoTestButton.isEnabled())
-			{
-				setVisible(false);
-				dispose();
-				getParent().repaint();
-			}
-			else
-			{
-				// Write the results of previous scheduling operation
-				if (sched != null)
-				{
-					writer.write(sched.getOutputString());
-					writer.newLine();
-					writer.newLine();
-				}
+        try
+        {
+            if (autoTestButton.isEnabled())
+            {
+                setVisible(false);
+                dispose();
+                getParent().repaint();
+            }
+            else
+            {
+                // Write the results of previous scheduling operation
+                if (sched != null)
+                {
+                    writer.write(sched.getOutputString());
+                    writer.newLine();
+                    writer.newLine();
+                }
 
-				if (filesToSchedule.size() > 0)
-				{
-					// 				getParent().repaint();
+                if (filesToSchedule.size() > 0)
+                {
+                    // 				getParent().repaint();
 
-					File currFile = (File)filesToSchedule.remove(0);
+                    File currFile = (File)filesToSchedule.remove(0);
 
-					writer.write(currFile.getName());
-					writer.newLine();
+                    writer.write(currFile.getName());
+                    writer.newLine();
 
-					if (currFile.getName().contains(".xml"))
-					{
-						ActionMan.automataDeleteAll_actionPerformed(ActionMan.getGui());
-						ActionMan.openFile(ActionMan.getGui(), currFile);
-						ActionMan.getGui().invertSelection();
-						// 					getParent().repaint();
+                    if (currFile.getName().contains(".xml"))
+                    {
+                        ActionMan.automataDeleteAll_actionPerformed(ActionMan.getGui());
+                        ActionMan.openFile(ActionMan.getGui(), currFile);
+                        ActionMan.getGui().invertSelection();
+                        // 					getParent().repaint();
 
-						doit();
-					}
-					else
-					{
-						done();
-					}
-				}
-				else
-				{
-					writer.flush();
-					writer.close();
+                        doit();
+                    }
+                    else
+                    {
+                        done();
+                    }
+                }
+                else
+                {
+                    writer.flush();
+                    writer.close();
 
-					autoTestButton.setEnabled(true);
-					done();
-				}
-			}
-		}
-		catch (IOException ioe)
-		{
-			logger.error("Error at writing the results of scheduling to file");
-		}
+                    autoTestButton.setEnabled(true);
+                    done();
+                }
+            }
+        }
+        catch (IOException ioe)
+        {
+            logger.error("Error at writing the results of scheduling to file");
+        }
     }
 
     void readMemoryCapacity() {
 		memoryCapacity = (int) (new Integer(memoryCapacityField.getText()));
     }
 
-	/**
-	 * Resets the buttons and the scheduler-instance
-	 */
-	public void reset()
-	{
-		cancelButton.setText("Cancel");
-		okButton.setEnabled(true);
+    /**
+     * Resets the buttons and the scheduler-instance
+     */
+    public void reset()
+    {
+            cancelButton.setText("Cancel");
+            okButton.setEnabled(true);
 
-		sched = null;
-	}
+            sched = null;
+    }
 
-	public void close()
-	{
-		setVisible(false);
-		dispose();
-	}
+    public void close()
+    {
+            setVisible(false);
+            dispose();
+    }
+    
+    public IDEReportInterface getIde()
+    {
+        return ide;
+    }
 }
 
 

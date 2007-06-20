@@ -13,57 +13,44 @@ import org.supremica.gui.*;
 public class ScheduleAction
 	extends AbstractAction
 {
-	private static Logger logger = LoggerFactory.createLogger(ScheduleAction.class);
+    private static Logger logger = LoggerFactory.createLogger(ScheduleAction.class);
 
-	public ScheduleAction()
-	{
-		super("Schedule...", null);
+    public ScheduleAction()
+    {
+            super("Schedule...", null);
 
-		putValue(SHORT_DESCRIPTION, "Schedule selected automata (experimental)");
-	}
+            putValue(SHORT_DESCRIPTION, "Schedule selected automata (experimental)");
+    }
 
-	/**
-	 *      Calls the ScheduleDialog if the number of selected automata is equal to one.
-	 *      (Otherwise, synchronization is strongly recommended.)
-	 */
-	public void actionPerformed(ActionEvent e)
-	{
-		ScheduleDialog dlg = null;
+    /**
+     *      Calls the ScheduleDialog if the number of selected automata is equal to one.
+     *      (Otherwise, synchronization is strongly recommended.)
+     */
+    public void actionPerformed(ActionEvent e)
+    {
+        launchScheduleDialog();
+    }
 
-		try 
-		{
-			dlg = new ScheduleDialog();
-			dlg.show();
-		}
-		catch (Exception ex) 
-		{
-			if (ex.getMessage().contains("javax") || ex.getMessage().contains("java.awt"))
-			{
-			}
-			else if (dlg != null)
-			{
-				dlg.done();
-			}
-		}
-	}
+    private void launchScheduleDialog()
+    {
+        ScheduleDialog dlg = null;
 
-	private void launchScheduleDialog()
-		throws Exception
-	{
-		try 
-		{
-			ScheduleDialog dlg = new ScheduleDialog();
-			dlg.show();
-		}
-		catch (Exception ex) 
-		{
-			if (ex.getMessage().contains("javax") || ex.getMessage().contains("java.awt"))
-			{
-			}
-			else
-			{
-				throw ex;
-			}
-		}
-	}
+        try 
+        {
+            dlg = new ScheduleDialog(ActionMan.getGui());
+            dlg.setVisible(true);
+        }
+        catch (Exception ex) 
+        {
+            if (ex.getMessage().contains("javax") || ex.getMessage().contains("java.awt"))
+            {}
+            else
+            {
+                if (dlg != null)
+                {
+                    dlg.done();
+                }
+            }
+        }
+    }
 }

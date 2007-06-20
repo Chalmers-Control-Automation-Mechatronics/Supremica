@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.80 2007-06-14 14:42:43 flordal Exp $
+//# $Id: IDE.java,v 1.81 2007-06-20 15:04:35 avenir Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -340,6 +340,8 @@ public class IDE
     {
         if (editorActive())
         {
+            getActiveModuleContainer().updateAutomata();
+            
             getActiveModuleContainer().getEditorPanel().enablePanel();
             getActiveModuleContainer().getAnalyzerPanel().disablePanel();
             

@@ -9,6 +9,8 @@ import org.supremica.automata.algorithms.*;
 import org.supremica.gui.ActionMan;
 import org.supremica.gui.Gui;
 import org.supremica.gui.ScheduleDialog;
+import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.IDEReportInterface;
 import org.supremica.log.*;
 import org.supremica.util.ActionTimer;
 import org.supremica.util.BDD.solvers.TSPSolver;
@@ -260,13 +262,12 @@ public class Milp
         synthAll.setName("SYNTH_OVER_ALL");
         synthAll.setType(AutomatonType.PLANT);
         State synthState = synthAll.getInitialState();
-        
-        
+            
         // Create the automaton with a chosen name
         String scheduleName = "";
         while (scheduleName != null && scheduleName.trim() == "")
         {
-            scheduleName = ActionMan.getGui().getNewAutomatonName("Enter a name for the schedule", "Schedule");
+            scheduleName = scheduleDialog.getIde().getNewAutomatonName("Enter a name for the schedule", "Schedule");
         }       
         if (scheduleName == null)
         {
@@ -473,6 +474,7 @@ public class Milp
         // ...But then also the participating plants should have this event in their initial states
         for (Automaton plantAuto : theAutomata.getPlantAutomata())
         {
+            plantAuto.getAlphabet().addEvent(resetEvent);
             plantAuto.addArc(new Arc(plantAuto.getInitialState(), plantAuto.getInitialState(), resetEvent));
         }
         
@@ -2582,16 +2584,16 @@ public class Milp
     {
         if (scheduleDialog != null)
         {
-            Gui theGui = null;
+            IDEReportInterface ide = null;
             
             try
             {
-                theGui = ActionMan.getGui();
-                theGui.addAutomaton(auto);
+                ide = scheduleDialog.getIde();
+                ide.addAutomaton(auto);
             }
             catch (Exception ex)
             {
-                logger.warn("EXceptiON, gui = " + theGui);
+                logger.warn("EXceptiON, ide = " + ide);
                 
                 throw ex;
             }
@@ -2603,20 +2605,21 @@ public class Milp
     {
         if (scheduleDialog != null)
         {
-            Gui theGui = null;
+            IDEReportInterface ide = null;
             
             try
             {
-                theGui = ActionMan.getGui();
+                ide = scheduleDialog.getIde();
                 
                 // Remove old automata
-                Automata selectedAutos = theGui.getSelectedAutomata();
+                Automata selectedAutos = ide.getSelectedAutomata();
                 for (Iterator<Automaton> autIt = selectedAutos.iterator(); autIt.hasNext(); )
                 {
                     Automaton selectedAuto = autIt.next();
                     if (!autos.containsAutomaton(selectedAuto.getName()))
                     {
-                        theGui.getVisualProjectContainer().getActiveProject().removeAutomaton(selectedAuto);
+//                        ide.getVisualProjectContainer().getActiveProject().removeAutomaton(selectedAuto);
+                        ide.getActiveProject().removeAutomaton(selectedAuto);
                     }
                 }
                 
@@ -2626,13 +2629,13 @@ public class Milp
                     Automaton auto = autIt.next();
                     if (!selectedAutos.containsAutomaton(auto.getName()))
                     {
-                        theGui.addAutomaton(auto);
+                        ide.addAutomaton(auto);
                     }
                 }
             }
             catch (Exception ex)
             {
-                logger.warn("EXceptiON, gui = " + theGui);
+                logger.warn("EXceptiON, ide = " + ide);
                 
                 throw ex;
             }

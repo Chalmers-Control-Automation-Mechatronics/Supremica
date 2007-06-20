@@ -56,10 +56,6 @@ public interface Gui
 
 	Collection getSelectedAutomataAsCollection();
 
-	Automata getSelectedAutomata();
-
-	Automata getUnselectedAutomata();
-
 	Project getSelectedProject();
 
 	void show();

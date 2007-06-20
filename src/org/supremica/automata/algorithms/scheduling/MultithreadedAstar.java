@@ -67,22 +67,22 @@ public class MultithreadedAstar
 // 	private int nrOfSubthreads = 0;
 // 	private int maxClosedSize = 0;
     
-    public MultithreadedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider, ScheduleDialog gui)
+    public MultithreadedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider, ScheduleDialog scheduleDialog)
     throws Exception
     {
-        this(theAutomata, heuristic, manualExpansion, buildSchedule, isRelaxationProvider, gui, null);
+        this(theAutomata, heuristic, manualExpansion, buildSchedule, isRelaxationProvider, scheduleDialog, null);
     }
     
-    public MultithreadedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider, ScheduleDialog gui, MultithreadedNode rootNode)
+    public MultithreadedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider, ScheduleDialog scheduleDialog, MultithreadedNode rootNode)
     throws Exception
     {
-        this(theAutomata, heuristic, manualExpansion, buildSchedule, isRelaxationProvider, gui, rootNode, DEFAULT_PROBABILITY);
+        this(theAutomata, heuristic, manualExpansion, buildSchedule, isRelaxationProvider, scheduleDialog, rootNode, DEFAULT_PROBABILITY);
     }
     
-    public MultithreadedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider, ScheduleDialog gui, MultithreadedNode rootNode, double branchingProbality)
+    public MultithreadedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider, ScheduleDialog scheduleDialog, MultithreadedNode rootNode, double branchingProbality)
     throws Exception
     {
-        super(theAutomata, heuristic, manualExpansion, buildSchedule, isRelaxationProvider, gui);
+        super(theAutomata, heuristic, manualExpansion, buildSchedule, isRelaxationProvider, scheduleDialog);
         
         this.rootNode = rootNode;
         this.branchingProbality = branchingProbality;
@@ -102,7 +102,7 @@ public class MultithreadedAstar
         manualExpansion = parentThread.isManualExpansion();
         buildSchedule = parentThread.getBuildSchedule();
         isRelaxationProvider = true; // If there is a parent thread, then this thread is a subthread, i.e. a relaxationProvider
-        gui = parentThread.getGui();
+        scheduleDialog = parentThread.getScheduleDialog();
         expander = parentThread.getNodeExpander();
         relaxer = parentThread.getRelaxer();
         keyMapping = parentThread.getKeyMapping();
@@ -457,7 +457,7 @@ public class MultithreadedAstar
             }
             
             logger.info("Schedule was built in " + timer.elapsedTime() + "ms");
-            ActionMan.getGui().addAutomaton(scheduleAuto);
+            scheduleDialog.getIde().addAutomaton(scheduleAuto);
         }
     }
     

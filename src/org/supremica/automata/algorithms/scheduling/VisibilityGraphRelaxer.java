@@ -211,7 +211,7 @@ public class VisibilityGraphRelaxer
 				automataPair.addAutomaton(currAuto);
 				key += currAuto.getName();				
 
-				VisGraphScheduler vgSched = new VisGraphScheduler(automataPair, scheduler.getAllAutomata().getSpecificationAutomata(), false, true, scheduler.getGui());
+				VisGraphScheduler vgSched = new VisGraphScheduler(automataPair, scheduler.getAllAutomata().getSpecificationAutomata(), false, true, scheduler.getScheduleDialog());
 				try 
 				{
 					while (!vgSched.isInitialized())

@@ -143,7 +143,7 @@ public class ModifiedAstar
     protected volatile boolean isRunning = false;
     
     /** The dialog box that launched this scheduler */
-    protected ScheduleDialog gui;
+    protected ScheduleDialog scheduleDialog;
     
     /** Decides if the schedule should be built */
     protected boolean buildSchedule;
@@ -196,7 +196,7 @@ public class ModifiedAstar
     
 	public ModifiedAstar() {}
 
-    public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider, ScheduleDialog gui)
+    public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, boolean isRelaxationProvider, ScheduleDialog scheduleDialog)
 		throws Exception
     {
         this.theAutomata = theAutomata;
@@ -204,13 +204,13 @@ public class ModifiedAstar
 		this.manualExpansion = manualExpansion;
 		this.buildSchedule = buildSchedule;
         this.isRelaxationProvider = isRelaxationProvider;
-        this.gui = gui;
+        this.scheduleDialog = scheduleDialog;
     }    
 	
-	public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, ScheduleDialog gui)
+	public ModifiedAstar(Automata theAutomata, String heuristic, boolean manualExpansion, boolean buildSchedule, ScheduleDialog scheduleDialog)
 		throws Exception
 	{
-		this(theAutomata, heuristic, manualExpansion, buildSchedule, false, gui);
+		this(theAutomata, heuristic, manualExpansion, buildSchedule, false, scheduleDialog);
 	}
 
 
@@ -264,7 +264,7 @@ public class ModifiedAstar
                 else
                 {
                     logger.warn("Scheduling interrupted, openTree.size = " + openTree.size() + "; closedTree.size = " + closedTree.size());
-                    gui.reset();
+                    scheduleDialog.reset();
                 }
             }
         }
@@ -420,14 +420,14 @@ public class ModifiedAstar
         return !isRunning;
     }
     
-    public void requestStop(boolean disposeGui)
+    public void requestStop(boolean disposescheduleDialog)
     {
         isRunning = false;
         astarThread = null;
         
-        if (disposeGui)
+        if (disposescheduleDialog)
         {
-            gui.done();
+            scheduleDialog.done();
         }
     }
     
@@ -979,7 +979,7 @@ public class ModifiedAstar
         String scheduleName = "";
         while (scheduleName != null && scheduleName.trim() == "")
         {
-            scheduleName = ActionMan.getGui().getNewAutomatonName("Enter a name for the schedule", "Schedule");
+            scheduleName = scheduleDialog.getIde().getNewAutomatonName("Enter a name for the schedule", "Schedule");
         }       
         if (scheduleName == null)
         {
@@ -994,7 +994,7 @@ public class ModifiedAstar
         nextState.setAccepting(true);
         scheduleAuto.addState(nextState);
 
-		Node currNode = acceptingNode;
+        Node currNode = acceptingNode;
         
         while (hasParent(currNode))
         {
@@ -1061,7 +1061,7 @@ public class ModifiedAstar
         }
         
         logger.info("Schedule was built in " + timer.elapsedTime() + "ms");
-        ActionMan.getGui().addAutomaton(scheduleAuto);
+        scheduleDialog.getIde().addAutomaton(scheduleAuto);
     }
 
 	/**
@@ -1567,9 +1567,9 @@ public class ModifiedAstar
 		return indexMap;
 	}
 
-	public ScheduleDialog getGui()
+	public ScheduleDialog getScheduleDialog()
 	{
-		return gui;
+		return scheduleDialog;
 	}
 
 	public void sleep (long ms)

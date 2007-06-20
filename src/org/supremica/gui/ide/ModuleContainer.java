@@ -4,12 +4,13 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.55 2007-06-08 10:45:20 robi Exp $
+//# $Id: ModuleContainer.java,v 1.56 2007-06-20 15:04:35 avenir Exp $
 //###########################################################################
 
 
 package org.supremica.gui.ide;
 
+import java.util.Iterator;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -464,6 +465,8 @@ public class ModuleContainer implements UndoInterface
             final DocumentManager manager = getIDE().getDocumentManager();
             builder = new ProjectBuildFromWaters(manager);
             supremicaProject = builder.build(mModule);
+            
+            
         }
         catch (EvalException eex)
         {
@@ -483,7 +486,7 @@ public class ModuleContainer implements UndoInterface
         mVisualProject.clear();
         mVisualProject.addAutomata(supremicaProject);
         mVisualProject.updated();
-        
+               
         if (Config.GUI_ANALYZER_AUTOMATONVIEWER_USE_CONTROLLED_SURFACE.isTrue())
         {
             ProductDESImporter importer = new ProductDESImporter(ModuleSubjectFactory.getInstance());
