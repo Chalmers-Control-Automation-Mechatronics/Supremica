@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.39 2007-05-27 16:30:06 robi Exp $
+//# $Id: SpringEmbedder.java,v 1.40 2007-06-20 05:00:58 robi Exp $
 //###########################################################################
 
 
@@ -208,6 +208,23 @@ public class SpringEmbedder
 
 
   //#########################################################################
+  //# Stopping
+  public static void stopAll()
+  {
+    synchronized(mSpringEmbedders) {
+      for (SpringEmbedder embedder : mSpringEmbedders) {
+        embedder.stop();
+      }
+    }
+  }
+
+  public void stop()
+  {
+    mStop = true;
+  }
+  
+
+  //#########################################################################
   //# Observer Pattern
   private void fireEvent(final EmbedderEvent event)
   {
@@ -253,7 +270,7 @@ public class SpringEmbedder
 
 
   //##########################################################################
-  //# Auxiliary Methods
+  //# Algorithm
   private void createWrappers()
   {
     final int numnodes = mNodes.size();
@@ -337,7 +354,7 @@ public class SpringEmbedder
     }
   }
 
-  private synchronized double calculateDisplacements()
+  private double calculateDisplacements()
   {
     if (mPass == 1 && mInitialStateAttraction > 0.0) {
       mInitialStateAttraction -= INITIALSTATE_DECAY;
@@ -430,13 +447,16 @@ public class SpringEmbedder
     return mPass == 0 ? mEdgeMap.values() : mWrapperSet;
   }
 
-  private synchronized void updateModel()
+  private void updateModel()
   {
     for (final GeometryWrapper wrapper : mWrapperSet) {
       wrapper.updateModel();
     }
   }
 
+
+  //##########################################################################
+  //# Geometry Auxiliaries
   private Point2D repulsion(final Point2D p1,
                             final Point2D p2,
                             final double constant)
@@ -500,20 +520,21 @@ public class SpringEmbedder
     }
   }
 
-  public static void stopAll()
+
+  private static Point2D addPoints(final Point2D pt1, final Point2D pt2)
   {
-    synchronized(mSpringEmbedders) {
-      for (SpringEmbedder embedder : mSpringEmbedders) {
-        embedder.stop();
-      }
+    if (pt1 == null) {
+      return pt2;
+    } else if (pt2 == null) {
+      return pt1;
+    } else {
+      final double x = pt1.getX() + pt2.getX();
+      final double y = pt1.getY() + pt2.getY();
+      pt1.setLocation(x, y);
+      return pt1;
     }
   }
 
-  public void stop()
-  {
-    mStop = true;
-  }
-  
 
   //#########################################################################
   //# Inner Class GeometryWrapper
@@ -872,7 +893,6 @@ public class SpringEmbedder
         final Point2D closest;
         final Point2D alternative;
         if (biquadratic == null) {
-          //System.err.println("biquadratic == null");
           final Point2D candidate1 =
             GeometryTools.findClosestPointOnLine(start, turn, point);
           final Point2D candidate2 =
@@ -908,16 +928,37 @@ public class SpringEmbedder
         }
         if (node.isJumping(this, closest)) {
           return POINT_ZERO;
-        } else if (alternative == null) {
-          return repulsion(closest, point, mNodeEdgeRepulsion);
+        }
+        Point2D result = null;
+        double weight = mNodeEdgeRepulsion;
+        final double distsq = start.distanceSq(end);
+        final double dist0sq = start.distanceSq(turn);
+        final double dist1sq = end.distanceSq(turn);
+        if (dist0sq > 0.0 && dist1sq > 0.0) {
+          final double dist0 = Math.sqrt(dist0sq);
+          final double dist1 = Math.sqrt(dist1sq);
+          final double flatness =
+            - (dist0sq + dist1sq - distsq) / (2.0 * dist0 * dist1);
+          if (flatness > EDGE_FLATNESS_THRESHOLD) {
+            final double fweight =
+              (flatness - EDGE_FLATNESS_THRESHOLD) /
+              (1.0 - EDGE_FLATNESS_THRESHOLD);
+            final double constant = weight * fweight;
+            final Point2D flat =
+              GeometryTools.findClosestPointOnLine(start, end, point);
+            result = repulsion(flat, point, constant);
+            weight -= constant;
+          }
+        }
+        if (alternative == null) {
+          final Point2D repulsion0 = repulsion(closest, point, weight);
+          return addPoints(result, repulsion0);
         } else {
-          final double constant = 0.5 * mNodeEdgeRepulsion;
+          final double constant = 0.5 * weight;
           final Point2D repulsion0 = repulsion(closest, point, constant);
+          result = addPoints(result, repulsion0);
           final Point2D repulsion1 = repulsion(alternative, point, constant);
-          final double dx = repulsion0.getX() + repulsion1.getX();
-          final double dy = repulsion0.getY() + repulsion1.getY();
-          repulsion0.setLocation(dx, dy);
-          return repulsion0;
+          return addPoints(result, repulsion1);
         }
       }
     }
@@ -1167,6 +1208,7 @@ public class SpringEmbedder
   private static final double SELFLOOP_REPULSION = 100.0;
   private static final double EDGE_REPULSION = 25.0;
   private static final double NODEEDGE_REPULSION = 200.0;
+  private static final double EDGE_FLATNESS_THRESHOLD = 0.985;
 
   private static final double GRAPH_MARGINAL_CONST = 48.0;
   private static final double CENTER_MOVE_CONST = 0.01;
