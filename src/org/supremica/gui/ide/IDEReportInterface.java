@@ -18,15 +18,7 @@ public interface IDEReportInterface
     
     JFrame getFrame();
     
-    boolean addAutomaton(Automaton theAutomaton);
-    
-    int addAutomata(Automata theAutomata);
-    
     public Project getActiveProject();
-    
-    public Automata getSelectedAutomata();
-    
-    public Automata getUnselectedAutomata();
     
     public String getNewAutomatonName(String str, String def);
 }

@@ -42,7 +42,7 @@ public class AnalyzerVerifierAction
     public void doAction()
     {
         // Retrieve the selected automata and make a sanity check
-        Automata selectedAutomata = ide.getSelectedAutomata();
+        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
         if (!selectedAutomata.sanityCheck(ide.getFrame(), 1, true, false, true, true))
         {
             return;
@@ -59,7 +59,7 @@ public class AnalyzerVerifierAction
         }
         if (vOptions.getVerificationType() == VerificationType.LANGUAGEINCLUSION)
         {
-            vOptions.setInclusionAutomata(ide.getUnselectedAutomata());
+            vOptions.setInclusionAutomata(ide.getActiveDocumentContainer().getAnalyzerPanel().getUnselectedAutomata());
         }
         SynchronizationOptions sOptions = SynchronizationOptions.getDefaultVerificationOptions();
         

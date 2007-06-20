@@ -39,6 +39,6 @@ public class AnalyzerCountReachableAction
      */
     public void doAction()
     {
-        org.supremica.util.BDD.test.DeveloperTest.DoReachability(ide.getSelectedAutomata());
+        org.supremica.util.BDD.test.DeveloperTest.DoReachability(ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata());
     }
 }

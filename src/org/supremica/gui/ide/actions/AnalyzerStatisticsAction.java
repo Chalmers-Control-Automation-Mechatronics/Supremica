@@ -44,10 +44,10 @@ public class AnalyzerStatisticsAction
      */
     public void doAction()
     {
-        int nbrOfAutomata = ide.getActiveModuleContainer().getVisualProject().nbrOfAutomata();
+        int nbrOfAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().nbrOfAutomata();
         //gui.info("Number of automata: " + nbrOfAutomata);
 
-        Automata selectedAutomata = ide.getSelectedAutomata();
+        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1, false, false, true, true))
         {
             return;

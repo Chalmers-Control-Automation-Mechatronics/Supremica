@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   AnalyzerSendToEditorAction
 //###########################################################################
-//# $Id: AnalyzerSendToEditorAction.java,v 1.7 2007-06-08 10:45:20 robi Exp $
+//# $Id: AnalyzerSendToEditorAction.java,v 1.8 2007-06-20 19:43:38 flordal Exp $
 //###########################################################################
 
 
@@ -62,61 +62,64 @@ public class AnalyzerSendToEditorAction
     {
         doAction();
     }
-    
+
     /**
      * The code that is run when the action is invoked.
      */
     public void doAction()
     {
-        Automata selectedAutomata = ide.getSelectedAutomata();
-        
-        // Compile into Waters module
-        ProductDESImporter importer = new ProductDESImporter(ModuleSubjectFactory.getInstance());
-        for (Automaton aut : selectedAutomata)
+        if (ide.getActiveDocumentContainer().getEditorPanel() != null)
         {
-            SimpleComponentProxy component = importer.importComponent(aut);
-            if (ide.getActiveModuleContainer().getEditorPanel().getEditorPanelInterface().componentNameAvailable(component.getName()))
+            Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+            
+            // Compile into Waters module
+            ProductDESImporter importer = new ProductDESImporter(ModuleSubjectFactory.getInstance());
+            for (Automaton aut : selectedAutomata)
             {
-                // Add to current module
-                try
+                SimpleComponentProxy component = importer.importComponent(aut);
+                if (ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().componentNameAvailable(component.getName()))
                 {
-                    ide.getActiveModuleContainer().getEditorPanel().getEditorPanelInterface().addComponent((AbstractSubject) component);
-                    
-                    // Add all (new) events to the module
-                    ModuleSubject module = ide.getActiveModuleContainer().getEditorPanel().getEditorPanelInterface().getModuleSubject();
-                    boolean problem = false;
-                    for (LabeledEvent event: aut.getAlphabet())
+                    // Add to current module
+                    try
                     {
-                        if (!event.getName().contains("[")) 
+                        ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().addComponent((AbstractSubject) component);
+                        
+                        // Add all (new) events to the module
+                        ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().getModuleSubject();
+                        boolean problem = false;
+                        for (LabeledEvent event: aut.getAlphabet())
                         {
-                            if (!module.getEventDeclListModifiable().containsName(event.getName()))
+                            if (!event.getName().contains("["))
                             {
-                                final EventProxy proxy = (EventProxy) event;
-                                final EventDeclSubject decl =
-									new EventDeclSubject(proxy.getName(),
-														 proxy.getKind(),
-														 proxy.isObservable(),
-														 ScopeKind.LOCAL,
-														 null, null);
-                                module.getEventDeclListModifiable().add(decl);
+                                if (!module.getEventDeclListModifiable().containsName(event.getName()))
+                                {
+                                    final EventProxy proxy = (EventProxy) event;
+                                    final EventDeclSubject decl =
+                                        new EventDeclSubject(proxy.getName(),
+                                        proxy.getKind(),
+                                        proxy.isObservable(),
+                                        ScopeKind.LOCAL,
+                                        null, null);
+                                    module.getEventDeclListModifiable().add(decl);
+                                }
+                            }
+                            else
+                            {
+                                problem = true;
                             }
                         }
-                        else
-                        {
-                            problem = true;
-                        }
+                        if (problem)
+                            JOptionPane.showMessageDialog(ide.getFrame(), "There is a problem in the back-translation of parametrised events.", "Alert", JOptionPane.WARNING_MESSAGE);
                     }
-                    if (problem)
-                        JOptionPane.showMessageDialog(ide.getFrame(), "There is a problem in the back-translation of parametrised events.", "Alert", JOptionPane.WARNING_MESSAGE);
+                    catch (Exception ex)
+                    {
+                        ide.getIDE().error("Could not add " + aut + " to editor." + ex);
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    ide.getIDE().error("Could not add " + aut + " to editor." + ex);
+                    JOptionPane.showMessageDialog(ide.getFrame(), "Component: " + component.getName() + " already exists in editor", "Duplicate Name", JOptionPane.ERROR_MESSAGE);
                 }
-            }
-            else
-            {
-                JOptionPane.showMessageDialog(ide.getFrame(), "Component: " + component.getName() + " already exists in editor", "Duplicate Name", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

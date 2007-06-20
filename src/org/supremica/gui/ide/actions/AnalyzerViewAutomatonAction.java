@@ -50,7 +50,7 @@ public class AnalyzerViewAutomatonAction
     {
         // gui.debug("ActionMan to the rescue!");
         // Retrieve the selected automata and make a sanity check
-        Automata selectedAutomata = ide.getSelectedAutomata();
+        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
 
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1, true, false, false, false))
         {
@@ -61,7 +61,7 @@ public class AnalyzerViewAutomatonAction
         {
             try
             {
-                AutomatonViewer viewer = ide.getActiveModuleContainer().getVisualProject().getAutomatonViewer(currAutomaton.getName());
+                AutomatonViewer viewer = ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().getAutomatonViewer(currAutomaton.getName());
             }
             catch (Exception ex)
             {

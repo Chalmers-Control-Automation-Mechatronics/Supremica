@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainers
 //###########################################################################
-//# $Id: ModuleContainers.java,v 1.9 2007-06-08 10:45:20 robi Exp $
+//# $Id: ModuleContainers.java,v 1.10 2007-06-20 19:43:38 flordal Exp $
 //###########################################################################
 
 
@@ -20,9 +20,9 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 public class ModuleContainers
 {
     private IDE ide;
-    private List<ModuleContainer> moduleContainers =
-        new LinkedList<ModuleContainer>();
-    private ModuleContainer activeModuleContainer = null;
+    private List<DocumentContainer> documentContainers =
+        new LinkedList<DocumentContainer>();
+    private DocumentContainer activeDocumentContainer = null;
     
     private int newModuleCounter = 1;
     
@@ -31,64 +31,64 @@ public class ModuleContainers
         this.ide = ide;
     }
     
-    public ModuleContainer getModuleContainer(final String name)
+    public DocumentContainer getDocumentContainer(final String name)
     {
-        for (final ModuleContainer currModuleContainer : moduleContainers)
+        for (final DocumentContainer currDocumentContainer : documentContainers)
         {
-            if (name.equals(currModuleContainer.getName()))
+            if (name.equals(currDocumentContainer.getName()))
             {
-                return currModuleContainer;
+                return currDocumentContainer;
             }
         }
         return null;
     }
     
-    public void add(ModuleContainer moduleContainer)
+    public void add(DocumentContainer documentContainer)
     {
-        moduleContainers.add(moduleContainer);
+        documentContainers.add(documentContainer);
     }
     
-    public void remove(ModuleContainer moduleContainer)
+    public void remove(DocumentContainer documentContainer)
     {
-        moduleContainers.remove(moduleContainer);
-        if (moduleContainer == activeModuleContainer)
+        documentContainers.remove(documentContainer);
+        if (documentContainer == activeDocumentContainer)
         {
-            activeModuleContainer = null;
+            activeDocumentContainer = null;
         }
     }    
     
-    void setActive(ModuleContainer moduleContainer)
+    void setActive(DocumentContainer documentContainer)
     {        
-        if (getActiveModuleContainer() != moduleContainer)
+        if (getActiveModuleContainer() != documentContainer)
         {
-            activeModuleContainer = moduleContainer;
+            activeDocumentContainer = documentContainer;
         }
-        ide.setTitle(ide.getName() + " [" + moduleContainer.getName() + "]");
+        ide.setTitle(ide.getName() + " [" + documentContainer.getName() + "]");
     }
     
     
-    public ModuleContainer getActiveModuleContainer()
+    public DocumentContainer getActiveModuleContainer()
     {
-        return activeModuleContainer;
+        return activeDocumentContainer;
     }
     
     
-    public ModuleContainer getFirst()
+    public DocumentContainer getFirst()
     {
-        return (ModuleContainer) moduleContainers.get(0);
+        return (DocumentContainer) documentContainers.get(0);
     }
     
     
-    public ModuleContainer getLast()
+    public DocumentContainer getLast()
     {
-        final int index = moduleContainers.size() - 1;
-        return (ModuleContainer) moduleContainers.get(index);
+        final int index = documentContainers.size() - 1;
+        return (DocumentContainer) documentContainers.get(index);
     }
     
     
-    public ModuleContainer getNext(ModuleContainer moduleContainer)
+    public DocumentContainer getNext(DocumentContainer documentContainer)
     {
-        int moduleIndex = moduleContainers.indexOf(moduleContainer);
+        int moduleIndex = documentContainers.indexOf(documentContainer);
         int nextModuleIndex = moduleIndex + 1;
         if (nextModuleIndex == size())
         {
@@ -96,7 +96,7 @@ public class ModuleContainers
         }
         if (size() >= 1)
         {
-            return (ModuleContainer)moduleContainers.get(nextModuleIndex);
+            return (DocumentContainer)documentContainers.get(nextModuleIndex);
         }
         return null;
     }
@@ -104,24 +104,23 @@ public class ModuleContainers
     
     public int size()
     {
-        return moduleContainers.size();
+        return documentContainers.size();
     }
     
     
-    public Iterator<ModuleContainer> iterator()
+    public Iterator<DocumentContainer> iterator()
     {
-        return moduleContainers.iterator();
+        return documentContainers.iterator();
     }
         
     public String getNewModuleName(String prefix)
     {
         String nameSuggestion = prefix + newModuleCounter++;
-        while (getModuleContainer(nameSuggestion) != null)
+        while (getDocumentContainer(nameSuggestion) != null)
         {
             nameSuggestion = prefix + newModuleCounter++;
         }
-        return nameSuggestion;
-        
+        return nameSuggestion;        
     }
     
     public ModuleSubject createNewModuleSubject()
@@ -138,6 +137,5 @@ public class ModuleContainers
         final ModuleContainer newModuleContainer =
             new ModuleContainer(ide, newModule);
         return newModuleContainer;
-    }
-    
+    }    
 }

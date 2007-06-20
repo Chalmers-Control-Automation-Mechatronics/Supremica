@@ -46,7 +46,7 @@ public class AnalyzerRenameAction
      */
     public void doAction()
     {
-        Automata selectedAutomata = ide.getSelectedAutomata();
+        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
 
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1))
         {
@@ -64,7 +64,7 @@ public class AnalyzerRenameAction
 
                 if (newName != null)
                 {
-                    ide.getActiveModuleContainer().getVisualProject().renameAutomaton(currAutomaton, newName);
+                    ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().renameAutomaton(currAutomaton, newName);
                 }
             }
             catch (Exception ex)

@@ -47,7 +47,7 @@ public class EditorSavePostscriptAction
     {
         try
         {
-            ide.getActiveModuleContainer().getEditorPanel().getActiveEditorWindowInterface().exportPostscript();
+            ide.getActiveDocumentContainer().getEditorPanel().getActiveEditorWindowInterface().exportPostscript();
         }
         catch (NullPointerException ex)
         {

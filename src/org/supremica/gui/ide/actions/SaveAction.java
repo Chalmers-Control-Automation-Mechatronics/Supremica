@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   SaveAction
 //###########################################################################
-//# $Id: SaveAction.java,v 1.11 2007-06-14 14:42:43 flordal Exp $
+//# $Id: SaveAction.java,v 1.12 2007-06-20 19:43:38 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -98,7 +98,7 @@ public class SaveAction
             final OperatorTable optable = CompilerOperatorTable.getInstance();
             final ProxyMarshaller<ModuleProxy> marshaller =
                     new JAXBModuleMarshaller(factory, optable);
-            marshaller.marshal(ide.getActiveModuleContainer().getModule(),
+            marshaller.marshal(ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject(),
                     wmodf);
         }
         catch (final JAXBException exception)

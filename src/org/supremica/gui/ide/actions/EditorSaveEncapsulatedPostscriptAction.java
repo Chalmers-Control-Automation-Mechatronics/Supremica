@@ -39,7 +39,7 @@ public class EditorSaveEncapsulatedPostscriptAction
     {
         try
         {
-            ide.getActiveModuleContainer().getEditorPanel().getActiveEditorWindowInterface().exportEncapsulatedPostscript();
+            ide.getActiveDocumentContainer().getEditorPanel().getActiveEditorWindowInterface().exportEncapsulatedPostscript();
         }
         catch (NullPointerException ex)
         {

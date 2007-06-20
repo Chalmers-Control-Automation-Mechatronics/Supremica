@@ -37,7 +37,7 @@ public class EditorPrintAction
     {
         try
         {
-            ide.getActiveModuleContainer().getEditorPanel().getActiveEditorWindowInterface().printFigure();
+            ide.getActiveDocumentContainer().getEditorPanel().getActiveEditorWindowInterface().printFigure();
         }
         catch (NullPointerException ex)
         {

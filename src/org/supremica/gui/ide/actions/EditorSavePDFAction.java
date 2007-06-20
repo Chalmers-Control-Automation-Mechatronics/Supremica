@@ -33,7 +33,7 @@ public class EditorSavePDFAction
     {
         try
         {
-            ide.getActiveModuleContainer().getEditorPanel().getActiveEditorWindowInterface().exportPDF();
+            ide.getActiveDocumentContainer().getEditorPanel().getActiveEditorWindowInterface().exportPDF();
         }
         catch (NullPointerException ex)
         {

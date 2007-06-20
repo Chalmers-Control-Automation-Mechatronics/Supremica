@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentViewPanel
 //###########################################################################
-//# $Id: ComponentViewPanel.java,v 1.5 2007-05-23 16:28:16 robi Exp $
+//# $Id: ComponentViewPanel.java,v 1.6 2007-06-20 19:43:38 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -83,7 +83,7 @@ public class ComponentViewPanel
         surface.setPreferredSize(IDEDimensions.rightAnalyzerPreferredSize);
         surface.setMinimumSize(IDEDimensions.rightAnalyzerMinimumSize);
         
-        final ModuleWindowInterface root = mModuleContainer.getAnalyzerPanel();
+        final ModuleWindowInterface root = mModuleContainer.getEditorPanel();
         events = new EditorEvents(root, element, this);
         menu = new EditorMenu(surface, this);
         

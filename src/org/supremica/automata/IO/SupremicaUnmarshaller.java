@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   SupremicaUnmarshaller
 //###########################################################################
-//# $Id: SupremicaUnmarshaller.java,v 1.10 2007-06-20 12:47:36 avenir Exp $
+//# $Id: SupremicaUnmarshaller.java,v 1.11 2007-06-20 19:43:38 flordal Exp $
 //###########################################################################
 
 package org.supremica.automata.IO;
@@ -15,7 +15,9 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.text.html.parser.DocumentParser;
 import javax.xml.bind.JAXBException;
+import net.sourceforge.waters.model.base.DocumentProxy;
 
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
@@ -35,7 +37,7 @@ import org.xml.sax.SAXException;
 
 
 public class SupremicaUnmarshaller
-    implements ProxyUnmarshaller<ModuleProxy>
+    implements ProxyUnmarshaller<DocumentProxy>
 {
     protected static Logger logger = LoggerFactory.createLogger(SupremicaUnmarshaller.class);
 
@@ -50,29 +52,32 @@ public class SupremicaUnmarshaller
     
     //#########################################################################
     //# Interface net.sourceforge.waters.model.marshaller.ProxyUnmarshaller
-    public ModuleProxy unmarshal(final URI uri)
+    public DocumentProxy unmarshal(final URI uri)
     throws WatersUnmarshalException, IOException
     {
         URL url = uri.toURL();
-        final ProductDESProxy des;
+        final Automata automata;
         try
         {
-            des = builder.build(url);
-            
-            // Examine the result
-            validate((Automata) des);
+            automata = builder.build(url);
         }
         catch (Exception ex)
         {
             throw new WatersUnmarshalException(ex);
         }
-                
-        return mImporter.importModule(des);
+            
+        // Examine the result
+        if (validate(automata))                
+            return mImporter.importModule(automata);
+        else
+            // Would like to import it directly into the analyzer not to miss out
+            // on the Supremica-specific parts...
+            return automata;
     }       
     
-    public Class<ModuleProxy> getDocumentClass()
+    public Class<DocumentProxy> getDocumentClass()
     {
-        return ModuleProxy.class;
+        return DocumentProxy.class;
     }
     
     public String getDefaultExtension()
@@ -111,18 +116,19 @@ public class SupremicaUnmarshaller
      * the State cost feature has no correspondance in the Waters models, the 
      * user should be alerted of this fact...)
      */
-    private void validate(Automata automata)
+    private boolean validate(Automata automata)
     {
         for (Automaton aut : automata)
         {
-//            for (State state : aut)
-//            {
-//                if (state.getCost() != State.UNDEF_COST)
-//                {
-//                    logger.warn("State cost information in the imported automata model was lost in the conversion; optimisation is not possible.");
-//                    return;
-//                }
-//            }
+            for (State state : aut)
+            {
+                if (state.getCost() != State.UNDEF_COST)
+                {
+                    //logger.warn("State cost information in the imported automata model was lost in the conversion; optimisation is not possible.");
+                    return false;
+                }
+            }
         }
+        return true;
     }
 }

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorAddEventAction
 //###########################################################################
-//# $Id: EditorAddModuleEventAction.java,v 1.7 2007-05-23 07:24:11 avenir Exp $
+//# $Id: EditorAddModuleEventAction.java,v 1.8 2007-06-20 19:43:38 flordal Exp $
 //###########################################################################
 
 
@@ -45,8 +45,7 @@ public class EditorAddModuleEventAction
     
     public void doAction()
     {
-        ModuleContainer activeModule = ide.getActiveModuleContainer();
-        activeModule.getEditorPanel().getEditorPanelInterface().addModuleEvent();
+        ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().addModuleEvent();
     }
 
 	public static final String KEY = "Module_EVENT";

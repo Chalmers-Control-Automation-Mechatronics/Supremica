@@ -49,7 +49,7 @@ public class AnalyzerViewModularStructureAction
      */
     public void doAction()
     {
-       Automata selectedAutomata = ide.getSelectedAutomata();
+       Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
 
         // Sanity check
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 2, false, false, true, false))

@@ -32,7 +32,7 @@ public class EditorOptionsAction
     {
         try
         {
-            ide.getActiveModuleContainer().getEditorPanel().getActiveEditorWindowInterface().getControlledSurface().setOptionsVisible(true);
+            ide.getActiveDocumentContainer().getEditorPanel().getActiveEditorWindowInterface().getControlledSurface().setOptionsVisible(true);
         }
         catch (NullPointerException ex)
         {

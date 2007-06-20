@@ -4,24 +4,33 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorPanel
 //###########################################################################
-//# $Id: EditorPanel.java,v 1.55 2007-06-11 15:07:51 robi Exp $
+//# $Id: EditorPanel.java,v 1.56 2007-06-20 19:43:38 flordal Exp $
 //###########################################################################
 
 
 package org.supremica.gui.ide;
 
+import java.awt.Frame;
 import java.awt.GridBagLayout;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.ModuleWindowInterface;
+import net.sourceforge.waters.gui.command.UndoInterface;
+import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+import net.sourceforge.waters.xsd.base.EventKind;
+import org.supremica.gui.ide.actions.Actions;
 
 
 public class EditorPanel
     extends MainPanel
+    implements ModuleWindowInterface
 {
     private static final long serialVersionUID = 1L;
     
@@ -33,9 +42,12 @@ public class EditorPanel
     private EditorComponentsPanel componentsPanel;
     private ButtonGroup editorButtonGroup;
     
+    private final ModuleContainer mModuleContainer;
+    
     public EditorPanel(ModuleContainer moduleContainer, String name)
     {
-        super(moduleContainer, name);
+        super(name);
+        mModuleContainer = moduleContainer;
         tabPanel = new JTabbedPane(JTabbedPane.BOTTOM);
         tabPanel.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
         tabPanel.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
@@ -70,6 +82,59 @@ public class EditorPanel
         add(splitPanelHorizontal);
     }
         
+        //######################################################################
+    //# Interface net.sourceforge.waters.gui.ModuleWindowInterface
+    public UndoInterface getUndoInterface()
+    {
+        return mModuleContainer;
+    }
+    
+    public ModuleSubject getModuleSubject()
+    {
+        return mModuleContainer.getModule();
+    }
+    
+    public ExpressionParser getExpressionParser()
+    {
+        return mModuleContainer.getExpressionParser();
+    }
+    
+    public EventKind guessEventKind(final IdentifierProxy ident)
+    {
+        return mModuleContainer.guessEventKind(ident);
+    }
+    
+    public Frame getRootWindow()
+    {
+        return (Frame) getTopLevelAncestor();
+    }
+    
+    public EditorWindowInterface showEditor(SimpleComponentSubject component)
+    {
+        final EditorPanel editorPanel = mModuleContainer.getEditorPanel();
+        if (component != null)
+        {
+            editorPanel.setRightComponent(mModuleContainer.getComponentEditorPanel(component));
+        }
+        return editorPanel.getActiveEditorWindowInterface();
+    }
+
+    private CommentPanel commentPanel = null;
+    
+    /**
+     * Displays a comment about the module.
+     */   
+    public void showComment()
+    {
+        if (commentPanel == null)
+        {
+            commentPanel = new CommentPanel(getModuleSubject());
+        }
+        
+        final EditorPanel editorPanel = mModuleContainer.getEditorPanel();
+        editorPanel.setRightComponent(commentPanel);
+    }
+
     //######################################################################
     //#
     public void addToolBarEntries(IDEToolBar toolBar)
@@ -169,5 +234,10 @@ public class EditorPanel
         {
             return componentsPanel.componentNameAvailable(name);
         }
+    }
+    
+    public Actions getActions()
+    {
+        return mModuleContainer.getIDE().getActions();
     }
 }

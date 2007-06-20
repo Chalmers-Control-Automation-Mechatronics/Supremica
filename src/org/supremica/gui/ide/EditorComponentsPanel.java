@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.36 2007-05-23 07:24:11 avenir Exp $
+//# $Id: EditorComponentsPanel.java,v 1.37 2007-06-20 19:43:38 flordal Exp $
 //###########################################################################
 
 
@@ -361,8 +361,8 @@ class EditorComponentsPanel
 
         if("add simple component".equals(e.getActionCommand()))
         {
-            moduleContainer.getActions().editorAddSimpleComponentAction.doAction();
-        }
+            moduleContainer.getIDE().getActions().editorAddSimpleComponentAction.doAction();
+        }        
         
         if("show comment".equals(e.getActionCommand()))
         {

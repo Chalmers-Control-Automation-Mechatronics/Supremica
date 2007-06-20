@@ -34,11 +34,11 @@ public class EditorUndoAction
 
         public void doAction()
         {
-            if (ide.getActiveModuleContainer() != null)
+            if (ide.getActiveDocumentContainer() != null)
             {
-                if (ide.getActiveModuleContainer().canUndo())
+                if (ide.getActiveDocumentContainer().getEditorPanel().getUndoInterface().canUndo())
                 {
-                    ide.getActiveModuleContainer().undo();
+                    ide.getActiveDocumentContainer().getEditorPanel().getUndoInterface().undo();
                 }
             }
         }

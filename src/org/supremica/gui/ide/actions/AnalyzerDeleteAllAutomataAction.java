@@ -43,6 +43,6 @@ public class AnalyzerDeleteAllAutomataAction
      */
     public void doAction()
     {
-        ide.getAllAutomata().removeAutomata(new Automata(ide.getAllAutomata()));
+        ide.getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata().removeAutomata(new Automata(ide.getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata()));
     }
 }

@@ -48,7 +48,7 @@ public class AnalyzerViewAlphabetAction
     public void doAction()
     {
        //logger.debug("ActionMan::automatonAlphabet_actionPerformed(gui)");
-        Automata selectedAutomata = ide.getSelectedAutomata();
+        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
 
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1, false, false, true, false))
         {

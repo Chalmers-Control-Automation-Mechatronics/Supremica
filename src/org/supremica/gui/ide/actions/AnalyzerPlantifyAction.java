@@ -24,7 +24,7 @@ public class AnalyzerPlantifyAction
         super(actionList);
 
         setEditorActiveRequired(false);
-        setAnalyzerActiveRequired(false);
+        setAnalyzerActiveRequired(true);
 
         putValue(Action.NAME, "Plantify");
         putValue(Action.SHORT_DESCRIPTION, "Turns specifications and supervisors into plants");
@@ -43,7 +43,7 @@ public class AnalyzerPlantifyAction
      */
     public void doAction()
     {
-        Automata selectedAutomata = ide.getSelectedAutomata();
+        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
         MinimizationHelper.plantify(selectedAutomata);
     }
 }

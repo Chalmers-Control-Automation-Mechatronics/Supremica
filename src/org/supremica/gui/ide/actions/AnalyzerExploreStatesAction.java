@@ -51,7 +51,7 @@ public class AnalyzerExploreStatesAction
     public void doAction()
     {
        // Retrieve the selected automata and make a sanity check
-        Automata selectedAutomata = ide.getSelectedAutomata();
+        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
 
         // Sanitycheck
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1, true, false, false, true))
@@ -71,7 +71,7 @@ public class AnalyzerExploreStatesAction
             // Get AutomatonExplorer
             try
             {
-                AutomatonExplorer explorer = ide.getActiveModuleContainer().getVisualProject().getAutomatonExplorer(currAutomatonName);
+                AutomatonExplorer explorer = ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().getAutomatonExplorer(currAutomatonName);
             }
             catch (Exception ex)
             {

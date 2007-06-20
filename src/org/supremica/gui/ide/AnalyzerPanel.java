@@ -5,11 +5,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
+import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
 import org.supremica.automata.Automata;
-
+import org.supremica.automata.Automaton;
+import org.supremica.automata.IO.ProjectBuildFromWaters;
+import org.supremica.automata.Project;
+import org.supremica.gui.VisualProject;
+import org.supremica.gui.ide.actions.Actions;
 
 public class AnalyzerPanel
     extends MainPanel
@@ -20,11 +27,15 @@ public class AnalyzerPanel
     private JComponent automatonViewerPanel;
     private AnalyzerAutomataPanel automataPanel;
     
-    public AnalyzerPanel(ModuleContainer moduleContainer, String name)
+    private final DocumentContainer mDocumentContainer;
+    
+    public AnalyzerPanel(DocumentContainer moduleContainer, String name)
     {
-        super(moduleContainer, name);
+        super(name);
         setPreferredSize(IDEDimensions.mainPanelPreferredSize);
         setMinimumSize(IDEDimensions.mainPanelMinimumSize);
+        
+        mDocumentContainer = moduleContainer;
         
         tabPanel = new JTabbedPane(JTabbedPane.BOTTOM);
         tabPanel.setPreferredSize(IDEDimensions.leftAnalyzerPreferredSize);
@@ -85,7 +96,53 @@ public class AnalyzerPanel
     {
         return automataPanel.getAllAutomata();
     }
+            
+    /**
+     * Updates the automata in the analyzer-tab.
+     */
+    public boolean updateAutomata()
+    {
+        ProjectBuildFromWaters builder = null;
+        Project supremicaProject = null;
+        try
+        {
+            final DocumentManager manager = mDocumentContainer.getIDE().getDocumentManager();
+            builder = new ProjectBuildFromWaters(manager);
+            supremicaProject = builder.build(mDocumentContainer.getEditorPanel().getModuleSubject());
+        }
+        catch (EvalException eex)
+        {
+            JOptionPane.showMessageDialog(mDocumentContainer.getIDE(), eex.getMessage(),
+                "Error in graph",
+                JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            JOptionPane.showMessageDialog(mDocumentContainer.getIDE(), ex.getMessage(),
+                "Error in graph",
+                JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+            return false;
+        }
+        mVisualProject.clear();
+        mVisualProject.addAutomata(supremicaProject);
+        mVisualProject.updated();
+        
+        /*
+        if (Config.GUI_ANALYZER_AUTOMATONVIEWER_USE_CONTROLLED_SURFACE.isTrue())
+        {
+            ProductDESImporter importer = new ProductDESImporter(ModuleSubjectFactory.getInstance());
+            ModuleSubject flatModule = (ModuleSubject) importer.importModule(mVisualProject);
+            flatModuleContainer = new ModuleContainer(getIDE(), flatModule);
+        }
+         */
+        
+        return true;
+    }
     
+    //    private ModuleSubject flatModule = null;
+    //private ModuleContainer flatModuleContainer = null;
     
     public void addToolBarEntries(IDEToolBar toolBar)
     {
@@ -100,4 +157,39 @@ public class AnalyzerPanel
     {
         getActions().enableAnalyzerActions(true);
     }
+    
+    public VisualProject getVisualProject()
+    {
+        return mVisualProject;
+    }
+
+    public Actions getActions()
+    {
+        return mDocumentContainer.getIDE().getActions();
+    }
+
+    private VisualProject mVisualProject = new VisualProject();
+    
+    
+    
+    
+    
+    
+    public int numberOfSelectedAutomata()
+    {
+        return getSelectedAutomata().size();
+    }
+    
+    public boolean addAutomaton(Automaton theAutomaton)
+    {
+        mVisualProject.addAutomaton(theAutomaton);
+        return true; // This is not always the correct return value!!!
+    }
+    
+    public int addAutomata(Automata theAutomata)
+    {
+        mVisualProject.addAutomata(theAutomata);
+        return theAutomata.size(); // This is not always the correct return value!!!
+    }
+
 }

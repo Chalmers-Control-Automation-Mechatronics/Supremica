@@ -47,13 +47,13 @@ public class AnalyzerEventHiderAction
      */
     public void doAction()
     {
-        Automata selectedAutomata = ide.getSelectedAutomata();
+        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
         
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1, false, false, true, false))
         {
             return;
         }
         EventHider eventHider = new EventHider(ide.getIDE());
-        eventHider.doAction(selectedAutomata, ide.getUnselectedAutomata().getUnionAlphabet());
+        eventHider.doAction(selectedAutomata, ide.getActiveDocumentContainer().getAnalyzerPanel().getUnselectedAutomata().getUnionAlphabet());
     }
 }

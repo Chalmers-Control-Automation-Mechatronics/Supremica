@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   MainPanel
 //###########################################################################
-//# $Id: MainPanel.java,v 1.30 2007-02-07 18:03:58 flordal Exp $
+//# $Id: MainPanel.java,v 1.31 2007-06-20 19:43:38 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -22,7 +22,6 @@ import javax.swing.JToolBar;
 
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
-import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -37,7 +36,6 @@ import org.supremica.gui.ide.actions.Actions;
 
 abstract class MainPanel
     extends JPanel
-    implements ModuleWindowInterface
 {
     private IDEToolBar thisToolBar = null;
     private IDEToolBar currParentToolBar = null;
@@ -46,14 +44,12 @@ abstract class MainPanel
     
     private EmptyRightPanel emptyRightPanel = new EmptyRightPanel();
     
-    private ModuleContainer moduleContainer;
     private String name;
     
     protected JSplitPane splitPanelHorizontal;
     
-    public MainPanel(ModuleContainer moduleContainer, String name)
+    public MainPanel(String name)
     {
-        this.moduleContainer = moduleContainer;
         this.name = name;
         
         setPreferredSize(IDEDimensions.mainPanelPreferredSize);
@@ -68,70 +64,12 @@ abstract class MainPanel
         constraints.weightx = 1.0;
         constraints.fill = GridBagConstraints.BOTH;
     }
-    
-    //######################################################################
-    //# Interface net.sourceforge.waters.gui.ModuleWindowInterface
-    public UndoInterface getUndoInterface()
-    {
-        return moduleContainer;
-    }
-    
-    public ModuleSubject getModuleSubject()
-    {
-        return moduleContainer.getModule();
-    }
-    
-    public ExpressionParser getExpressionParser()
-    {
-        return moduleContainer.getExpressionParser();
-    }
-    
-    public EventKind guessEventKind(final IdentifierProxy ident)
-    {
-        return moduleContainer.guessEventKind(ident);
-    }
-    
-    public Frame getRootWindow()
-    {
-        return (Frame) getTopLevelAncestor();
-    }
-    
-    public EditorWindowInterface showEditor(SimpleComponentSubject component)
-    {
-        final EditorPanel editorPanel = moduleContainer.getEditorPanel();
-        if (component != null)
-        {
-            editorPanel.setRightComponent(moduleContainer.getComponentEditorPanel(component));
-        }
-        return editorPanel.getActiveEditorWindowInterface();
-    }
-
-    private CommentPanel commentPanel = null;
-    
-    /**
-     * Displays a comment about the module.
-     */   
-    public void showComment()
-    {
-        if (commentPanel == null)
-        {
-            commentPanel = new CommentPanel(getModuleSubject());
-        }
         
-        final EditorPanel editorPanel = moduleContainer.getEditorPanel();
-        editorPanel.setRightComponent(commentPanel);
-    }
-    
     //######################################################################
     //#
     public String getName()
     {
         return name;
-    }
-    
-    public Actions getActions()
-    {
-        return moduleContainer.getActions();
     }
     
     protected GridBagConstraints getGridBagConstraints()

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   OpenAction
 //###########################################################################
-//# $Id: OpenAction.java,v 1.20 2007-01-30 22:41:12 flordal Exp $
+//# $Id: OpenAction.java,v 1.21 2007-06-20 19:43:38 flordal Exp $
 //###########################################################################
 
 
@@ -20,7 +20,9 @@ import javax.swing.JFileChooser;
 import java.util.List;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
+import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.subject.module.ModuleSubject;
+import org.supremica.automata.Automata;
 import org.supremica.gui.ide.IDE;
 import org.supremica.properties.Config;
 
@@ -99,11 +101,11 @@ public class OpenAction
         //# Overrides for Base Class org.supremica.gui.ide.actions.FileImporter
         void openFile(final File file)
         {
-            ModuleSubject module;
+            DocumentProxy document;
             try
             {
                 // The documentmanager does the loading, by extension
-                module = (ModuleSubject) ide.getIDE().getDocumentManager().load(file);
+                document = ide.getIDE().getDocumentManager().load(file);
             }
             catch (RuntimeException ex)
             {
@@ -114,7 +116,7 @@ public class OpenAction
                 ide.getIDE().error(ex.getMessage());
                 return;
             }
-            ide.getIDE().installContainer(module);
+            ide.getIDE().installContainer(document);
         }
     }
 }

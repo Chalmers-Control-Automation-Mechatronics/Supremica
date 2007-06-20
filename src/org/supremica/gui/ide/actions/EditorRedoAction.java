@@ -33,11 +33,11 @@ public class EditorRedoAction
     
     public void doAction()
     {
-        if (ide.getActiveModuleContainer() != null)
+        if (ide.getActiveDocumentContainer() != null)
         {
-            if (ide.getActiveModuleContainer().canRedo())
+            if (ide.getActiveDocumentContainer().getEditorPanel().getUndoInterface().canRedo())
             {
-                ide.getActiveModuleContainer().redo();
+                ide.getActiveDocumentContainer().getEditorPanel().getUndoInterface().redo();
             }
         }
     }

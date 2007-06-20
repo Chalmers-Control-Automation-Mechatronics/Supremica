@@ -2,6 +2,7 @@
 
 package org.supremica.gui.ide;
 
+import java.awt.Frame;
 import javax.swing.*;
 import org.supremica.util.VPopupMenu;
 import org.supremica.log.*;
@@ -17,7 +18,7 @@ class AnalyzerPopupMenu
     private static final long serialVersionUID = 1L;
     private IDEActionInterface ide;
     
-    public AnalyzerPopupMenu(JFrame parent, IDEActionInterface ide)
+    public AnalyzerPopupMenu(Frame parent, IDEActionInterface ide)
     {
         setInvoker(parent);
         this.ide = ide;

@@ -35,7 +35,6 @@ public class EditorAddSimpleComponentAction
     
     public void doAction()
     {
-        ModuleContainer activeModule = ide.getActiveModuleContainer();
-        activeModule.getEditorPanel().getEditorPanelInterface().addComponent();
+        ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().addComponent();
     }
 }

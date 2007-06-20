@@ -4,17 +4,18 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.81 2007-06-20 15:04:35 avenir Exp $
+//# $Id: IDE.java,v 1.82 2007-06-20 19:43:38 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
 
 import javax.xml.bind.JAXBException;
+import net.sourceforge.waters.model.base.DocumentProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.valid.ValidUnmarshaller;
-import org.supremica.automata.LabeledEvent;
 import org.supremica.util.ProcessCommandLineArguments;
 import org.supremica.gui.ide.actions.IDEAction;
 import org.supremica.gui.ide.actions.IDEActionInterface;
@@ -31,6 +32,7 @@ import java.io.File;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
@@ -71,11 +73,11 @@ public class IDE
     private final ModuleProxyFactory mModuleFactory;
     private final JAXBModuleMarshaller mModuleMarshaller;
     private final ProxyUnmarshaller<ModuleProxy> validUnmarshaller;
-    private final ProxyUnmarshaller<ModuleProxy> supremicaUnmarshaller;
+    private final ProxyUnmarshaller<DocumentProxy> supremicaUnmarshaller;
     private final ProxyUnmarshaller<ModuleProxy> hiscUnmarshaller;
     private final ProxyUnmarshaller<ModuleProxy> umdesUnmarshaller;
     private final ProxyUnmarshaller<ModuleProxy> adsUnmarshaller;
-	private final DocumentManager mDocumentManager;
+    private final DocumentManager mDocumentManager;
     
     private Actions theActions;
     
@@ -86,7 +88,7 @@ public class IDE
     private IDEToolBar ideToolBar;
     private JToolBar currToolBar = null;
     
-    private ModuleContainers moduleContainers;
+    private ModuleContainers mDocumentContainers;
     
     private LogPanel logPanel;
     
@@ -102,12 +104,12 @@ public class IDE
         //setTitle(getName());
         
         // Create a default module
-        moduleContainers = new ModuleContainers(this);        
+        mDocumentContainers = new ModuleContainers(this);
         ModuleContainer defaultModuleContainer = createNewModuleContainer();
         defaultModuleContainer.addStandardPropositions();
         add(defaultModuleContainer);
-        moduleContainers.setActive(defaultModuleContainer);
-
+        mDocumentContainers.setActive(defaultModuleContainer);
+        
         // Set up a factory for Module:s
         mModuleFactory = ModuleSubjectFactory.getInstance();
         final OperatorTable opTable = CompilerOperatorTable.getInstance();
@@ -117,7 +119,7 @@ public class IDE
         hiscUnmarshaller = new HISCUnmarshaller(mModuleFactory);
         umdesUnmarshaller = new UMDESUnmarshaller(mModuleFactory);
         adsUnmarshaller = new ADSUnmarshaller(mModuleFactory);
-
+        
         // Document management
         mDocumentManager = new DocumentManager();
         // Add marshallers in order of importance (shows up in the file.save dialog)
@@ -130,32 +132,30 @@ public class IDE
         mDocumentManager.registerUnmarshaller(umdesUnmarshaller);
         mDocumentManager.registerUnmarshaller(adsUnmarshaller);
         
-        // Instantiate all actions 
+        // Instantiate all actions
         theActions = new Actions(this);
         
         // Create GUI
         contentPanel = (JPanel)getContentPane();
         contentLayout = new BorderLayout();
-        contentPanel.setLayout(contentLayout);        
+        contentPanel.setLayout(contentLayout);
         menuBar = new IDEMenuBar(this);
-        setJMenuBar(menuBar);        
-        setToolBar(createToolBar());        
+        setJMenuBar(menuBar);
+        setToolBar(createToolBar());
         tabPanel = new JTabbedPane();
         tabPanel.addChangeListener(this);
-        tabPanel.add(defaultModuleContainer.getEditorPanel());
-        tabPanel.add(defaultModuleContainer.getAnalyzerPanel());
-        //tabPanel.add(defaultModuleContainer.getSimulatorPanel());        
+        defaultModuleContainer.addToTabPanel(tabPanel);
         tabPanel.validate();
         logPanel = new LogPanel(this, "Logger");
         splitPanelVertical = new JSplitPane(JSplitPane.VERTICAL_SPLIT, tabPanel, logPanel);
         splitPanelVertical.setContinuousLayout(false);
         splitPanelVertical.setOneTouchExpandable(false);
         splitPanelVertical.setDividerLocation(0.8);
-        splitPanelVertical.setResizeWeight(1.0);        
-        contentPanel.add(splitPanelVertical, BorderLayout.CENTER);        
+        splitPanelVertical.setResizeWeight(1.0);
+        contentPanel.add(splitPanelVertical, BorderLayout.CENTER);
         //pack();
         //validate();
-
+        
         // Show comment
         defaultModuleContainer.getEditorPanel().showComment();
         
@@ -167,65 +167,62 @@ public class IDE
         return theActions;
     }
     
-    public Iterator moduleContainerIterator()
+    public Iterator<DocumentContainer> documentContainerIterator()
     {
-        return moduleContainers.iterator();
+        return mDocumentContainers.iterator();
     }
     
-    public void add(ModuleContainer moduleContainer)
+    public void add(DocumentContainer container)
     {
-        moduleContainers.add(moduleContainer);
+        mDocumentContainers.add(container);
     }
     
-    public void remove(ModuleContainer moduleContainer)
+    public void remove(DocumentContainer moduleContainer)
     {
-        ModuleContainer activeModuleContainer = getActiveModuleContainer();
-        ModuleContainer nextModuleContainer = null;
+        DocumentContainer activeModuleContainer = getActiveDocumentContainer();
+        DocumentContainer nextModuleContainer = null;
         
         if (activeModuleContainer == moduleContainer)
         {
-            if (moduleContainers.size() <= 1)
+            if (mDocumentContainers.size() <= 1)
             {
                 installContainer(createNewModuleSubject());
-                nextModuleContainer = getActiveModuleContainer(); // Ugly fix
+                nextModuleContainer = getActiveDocumentContainer(); // Ugly fix
                 //nextModuleContainer = createNewModuleContainer();
                 //moduleContainers.add(nextModuleContainer);
             }
             else
             {
-                nextModuleContainer = moduleContainers.getNext(moduleContainer);
+                nextModuleContainer = mDocumentContainers.getNext(moduleContainer);
             }
         }
         setActive(nextModuleContainer);
-        moduleContainers.remove(moduleContainer);
+        mDocumentContainers.remove(moduleContainer);
     }
     
-    public ModuleContainer getActiveModuleContainer()
+    public DocumentContainer getActiveDocumentContainer()
     {
-        return moduleContainers.getActiveModuleContainer();
+        return mDocumentContainers.getActiveModuleContainer();
     }
     
-    public void setActive(ModuleContainer moduleContainer)
+    public void setActive(DocumentContainer documentContainer)
     {
-        ModuleContainer oldModuleContainer = getActiveModuleContainer();
-        if (moduleContainer != oldModuleContainer)
+        DocumentContainer oldDocumentContainer = getActiveDocumentContainer();
+        if (documentContainer != oldDocumentContainer)
         {
-            moduleContainers.setActive(moduleContainer);
+            mDocumentContainers.setActive(documentContainer);
             
-            if (oldModuleContainer != null)
+            if (oldDocumentContainer != null)
             {
-                oldModuleContainer.setSelectedComponent(tabPanel.getSelectedComponent());
-
-                tabPanel.remove(oldModuleContainer.getEditorPanel());
-                tabPanel.remove(oldModuleContainer.getAnalyzerPanel());
-                //tabPanel.remove(oldModuleContainer.getSimulatorPanel());
+                oldDocumentContainer.rememberSelectedComponent(tabPanel);
+                
+                // Clear tabPanel
+                tabPanel.removeAll();
             }
             
-            tabPanel.add(moduleContainer.getEditorPanel());
-            tabPanel.add(moduleContainer.getAnalyzerPanel());
-            //tabPanel.add(moduleContainer.getSimulatorPanel());
-            
-            tabPanel.setSelectedComponent(moduleContainer.getSelectedComponent());
+            // Add the panels for this module
+            documentContainer.addToTabPanel(tabPanel);
+            documentContainer.restoreSelectedComponent(tabPanel);
         }
     }
     
@@ -236,32 +233,62 @@ public class IDE
     
     public ModuleSubject createNewModuleSubject()
     {
-        return moduleContainers.createNewModuleSubject();
+        return mDocumentContainers.createNewModuleSubject();
     }
     
     public ModuleContainer createNewModuleContainer()
     {
-        return moduleContainers.createNewModuleContainer();
+        return mDocumentContainers.createNewModuleContainer();
     }
     
     //###################################################################
     //# Auxiliary Methods
-    public void installContainer(final ModuleSubject module)
+    public void installContainer(final DocumentProxy document)
     {
-        installContainer(module, true);
+        if (document instanceof ModuleSubject)
+        {
+            installContainer((ModuleSubject) document);
+        }
+        else if (document instanceof Automata)
+        {
+            int choice = JOptionPane.showConfirmDialog(getFrame(), "This file contains attributes not supported by the editor.\nDo you want to edit it (and lose the unsupported features)?", "Warning", JOptionPane.YES_NO_OPTION);
+            switch (choice)
+            {
+                case JOptionPane.YES_OPTION:
+                    ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
+                    final ProductDESImporter importer = new ProductDESImporter(factory);
+                    ModuleProxy module = importer.importModule((ProductDESProxy)document);
+                    installContainer(module);
+                    break;
+                case JOptionPane.NO_OPTION:
+                    installContainer((Automata) document);
+                    break;          
+                default:
+                    break;
+            }
+        }
+        else
+            throw new ClassCastException("Bad document type.");
     }
     
-    public void installContainer(final ModuleSubject module, boolean showComment)
+    public void installContainer(final ModuleSubject module)
     {
-        final ModuleContainer moduleContainer = new ModuleContainer(this, module);
-        moduleContainer.addStandardPropositions();
+        //installContainer(module);
+        final ModuleContainer container = new ModuleContainer(this, module);
+        container.addStandardPropositions();
         
-        add(moduleContainer);
-        setActive(moduleContainer);
-        if (showComment)
-        {
-            moduleContainer.getEditorPanel().showComment();
-        }
+        add(container);
+        setActive(container);
+        container.getEditorPanel().showComment();
+    }
+    
+    public void installContainer(final Automata automata)
+    {
+        //installContainer(module);
+        final AutomataContainer container = new AutomataContainer(this, automata);        
+        
+        add(container);
+        setActive(container);
     }
     
     public JFrame getFrame()
@@ -310,8 +337,8 @@ public class IDE
         ideToolBar.addSeparator();
         ideToolBar.add(getActions().editorStopEmbedderAction);
         
-        getActiveModuleContainer().getAnalyzerPanel().addToolBarEntries(ideToolBar);
-        getActiveModuleContainer().getEditorPanel().addToolBarEntries(ideToolBar);
+        getActiveDocumentContainer().getAnalyzerPanel().addToolBarEntries(ideToolBar);
+        getActiveDocumentContainer().getEditorPanel().addToolBarEntries(ideToolBar);
         return ideToolBar;
     }
     
@@ -338,31 +365,20 @@ public class IDE
      */
     public void stateChanged(ChangeEvent e)
     {
+        getActiveDocumentContainer().updateActiveTab(tabPanel);
+        
         if (editorActive())
         {
-            getActiveModuleContainer().updateAutomata();
-            
-            getActiveModuleContainer().getEditorPanel().enablePanel();
-            getActiveModuleContainer().getAnalyzerPanel().disablePanel();
-            
             menuBar.getEditorMenu().setEnabled(true);//.enable();
             menuBar.getAnalyzerMenu().setEnabled(false);//.disable();
         }
-        if (analyzerActive())
+        else if (analyzerActive())
         {
-            if (getActiveModuleContainer().updateAutomata())
-            {
-                getActiveModuleContainer().getEditorPanel().disablePanel();
-                getActiveModuleContainer().getAnalyzerPanel().enablePanel();
-            }
-            else
-            {
-                tabPanel.setSelectedComponent(getActiveModuleContainer().getEditorPanel());
-            }
-
+            System.out.println("Hello");
             menuBar.getEditorMenu().setEnabled(false);//.disable();
             menuBar.getAnalyzerMenu().setEnabled(true);//.enable();
         }
+        
         repaint();
     }
     
@@ -373,47 +389,23 @@ public class IDE
     
     public EditorWindowInterface getActiveEditorWindowInterface()
     {
-        return getActiveModuleContainer().getActiveEditorWindowInterface();
+        return getActiveDocumentContainer().getEditorPanel().getActiveEditorWindowInterface();
     }
     
     public boolean editorActive()
     {
-        return tabPanel.getSelectedComponent() == getActiveModuleContainer().getEditorPanel();
+        return tabPanel.getSelectedComponent() == getActiveDocumentContainer().getEditorPanel();
     }
     
     public boolean analyzerActive()
-    {
-        return tabPanel.getSelectedComponent() == getActiveModuleContainer().getAnalyzerPanel();
-    }
-    
-    public int numberOfSelectedAutomata()
-    {
-        ModuleContainer activeModuleContainer = getActiveModuleContainer();
-        return activeModuleContainer.numberOfSelectedAutomata();
-    }
-    
-    public Automata getSelectedAutomata()
-    {
-        ModuleContainer activeModuleContainer = getActiveModuleContainer();
-        return activeModuleContainer.getSelectedAutomata();
+    {       
+        return tabPanel.getSelectedComponent() == getActiveDocumentContainer().getAnalyzerPanel();
     }
     
     public Project getActiveProject()
     {
-        ModuleContainer activeModuleContainer = getActiveModuleContainer();
-        return activeModuleContainer.getVisualProject();
-    }
-    
-    public Automata getAllAutomata()
-    {
-        ModuleContainer activeModuleContainer = getActiveModuleContainer();
-        return activeModuleContainer.getAllAutomata();
-    }
-    
-    public Automata getUnselectedAutomata()
-    {
-        ModuleContainer activeModuleContainer = getActiveModuleContainer();
-        return activeModuleContainer.getUnselectedAutomata();
+        DocumentContainer activeContainer = getActiveDocumentContainer();
+        return activeContainer.getAnalyzerPanel().getVisualProject();
     }
     
     public boolean openFiles(List<File> filesToOpen)
@@ -445,12 +437,12 @@ public class IDE
     
     public boolean addAutomaton(Automaton theAutomaton)
     {
-        return getActiveModuleContainer().addAutomaton(theAutomaton);
+        return getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(theAutomaton);
     }
     
     public int addAutomata(Automata theAutomata)
     {
-        return getActiveModuleContainer().addAutomata(theAutomata);
+        return getActiveDocumentContainer().getAnalyzerPanel().addAutomata(theAutomata);
     }
     
     public String getNewAutomatonName(String msg, String nameSuggestion)
@@ -470,7 +462,7 @@ public class IDE
             {
                 JOptionPane.showMessageDialog(this, "An empty name is not allowed.", "Alert", JOptionPane.ERROR_MESSAGE);
             }
-            else if (getActiveModuleContainer().getVisualProject().containsAutomaton(newName))
+            else if (getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().containsAutomaton(newName))
             {
                 JOptionPane.showMessageDialog(this, "'" + newName + "' already exists.", "Alert", JOptionPane.ERROR_MESSAGE);
             }
@@ -485,12 +477,12 @@ public class IDE
     
     public static void main(String args[])
     throws Exception
-    {   
-        List<File> filesToOpen = ProcessCommandLineArguments.process(args); 
+    {
+        List<File> filesToOpen = ProcessCommandLineArguments.process(args);
         
         interfaceManager = InterfaceManager.getInstance();
         interfaceManager.initLookAndFeel();
-
+        
         IDE ide = new IDE();
         ide.setVisible(true);
         ide.openFiles(filesToOpen);

@@ -56,7 +56,7 @@ public class AnalyzerExportAction
      */
     public void doAction()
     {
-        Automata selectedAutomata = ide.getSelectedAutomata();
+        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
 
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1))
         {
@@ -87,7 +87,7 @@ public class AnalyzerExportAction
     // OO was invented just to avoid the type of code below. It's a maintenance nightmare!!
     private void automataExport(ExportFormat exportMode)
     {
-        Automata selectedAutomata = ide.getSelectedAutomata();
+        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
 
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1))
         {

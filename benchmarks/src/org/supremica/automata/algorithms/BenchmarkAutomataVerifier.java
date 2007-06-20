@@ -1,4 +1,3 @@
-
 /*
  *  Supremica Software License Agreement
  *
@@ -101,7 +100,7 @@ public class BenchmarkAutomataVerifier
         
         // Controllability / Nonblocking
         vOptions = VerificationOptions.getDefaultNonblockingOptions();
-        int type = 0;
+        int type = 1;
         if (type == 0)
             // Nonblocking
             vOptions.setVerificationType(VerificationType.NONBLOCKING);
@@ -188,8 +187,8 @@ public class BenchmarkAutomataVerifier
                 file.write("Primary 2:nd stage heuristic: " + mOptions.getMinimizationHeuristic() + "\n");
                 file.flush();
                 
-				if (false) // Academic
-					//if (true) // Industrial
+				//if (false) // Academic
+				if (true) // Industrial
                 {
 					///////////////////////////////////
 					// "Industrial" model benchmarks //

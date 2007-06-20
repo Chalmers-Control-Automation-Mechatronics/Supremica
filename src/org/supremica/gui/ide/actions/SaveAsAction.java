@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   SaveAction
 //###########################################################################
-//# $Id: SaveAsAction.java,v 1.1 2007-06-14 14:42:43 flordal Exp $
+//# $Id: SaveAsAction.java,v 1.2 2007-06-20 19:43:38 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -84,7 +84,7 @@ public class SaveAsAction
         try
         {
             DocumentManager documentManager = ide.getIDE().getDocumentManager();
-            documentManager.saveAs(ide.getActiveModuleContainer().getModule(), wmodf);
+            documentManager.saveAs(ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject(), wmodf);
         }
         catch (final WatersMarshalException exception)
         {

@@ -50,8 +50,8 @@ public class WorkbenchAction
     {
         try
         {
-            VisualProject visualProject = ide.getIDE().getActiveModuleContainer().getVisualProject();
-            Automata selection = ide.getIDE().getActiveModuleContainer().getAnalyzerPanel().getSelectedAutomata();
+            VisualProject visualProject = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getVisualProject();
+            Automata selection = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
 
             if (selection.size() <= 0)
             {

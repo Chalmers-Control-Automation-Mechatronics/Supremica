@@ -55,7 +55,7 @@ public class AnalyzerExperimentAction
     {
         logger.info("Experiment started...");
 
-        Automata automata = ide.getSelectedAutomata();
+        Automata automata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
         
         // EXPERIMENT!
         {

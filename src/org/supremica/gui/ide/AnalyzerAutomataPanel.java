@@ -1,5 +1,6 @@
 package org.supremica.gui.ide;
 
+import java.awt.Frame;
 import javax.swing.*;
 import java.util.*;
 import org.supremica.gui.WhiteScrollPane;
@@ -32,7 +33,7 @@ public class AnalyzerAutomataPanel
     private static Logger logger = LoggerFactory.createLogger(AnalyzerAutomataPanel.class);
     
     private AnalyzerPanel analyzerPanel;
-    private ModuleContainer moduleContainer;
+    private DocumentContainer moduleContainer;
     private String name;
     private JTable theAutomatonTable;
     private TableSorter theTableSorter;
@@ -45,12 +46,12 @@ public class AnalyzerAutomataPanel
     public static int TABLE_EVENTS_COLUMN = 3;
     public static int TABLE_TRANSITIONS_COLUMN = 4;
     
-    AnalyzerAutomataPanel(AnalyzerPanel analyzerPanel, ModuleContainer moduleContainer, String name)
+    AnalyzerAutomataPanel(AnalyzerPanel analyzerPanel, DocumentContainer moduleContainer, String name)
     {
         this.analyzerPanel = analyzerPanel;
         this.moduleContainer = moduleContainer;
         this.name = name;
-        analyzerPopupMenu = new AnalyzerPopupMenu(moduleContainer.getFrame(), moduleContainer.getIDE());
+        analyzerPopupMenu = new AnalyzerPopupMenu((Frame) analyzerPanel.getTopLevelAncestor(), moduleContainer.getIDE());
         
         setPreferredSize(IDEDimensions.leftAnalyzerPreferredSize);
         setMinimumSize(IDEDimensions.leftAnalyzerMinimumSize);
@@ -178,7 +179,7 @@ public class AnalyzerAutomataPanel
                                 
                                 try
                                 {
-                                    AutomatonViewer viewer = moduleContainer.getVisualProject().getAutomatonViewer(currAutomaton.getName());
+                                    AutomatonViewer viewer = analyzerPanel.getVisualProject().getAutomatonViewer(currAutomaton.getName());
                                 }
                                 catch (Exception ex)
                                 {
@@ -189,12 +190,13 @@ public class AnalyzerAutomataPanel
                         }
                         else if (selectedAutomata.size() == 1)
                         {
-                            if (!Config.GUI_ANALYZER_AUTOMATONVIEWER_USE_CONTROLLED_SURFACE.isTrue())
+                            if (Config.GUI_ANALYZER_AUTOMATONVIEWER_USE_CONTROLLED_SURFACE.isFalse())
                             {
                                 Automaton selectedAutomaton = selectedAutomata.getFirstAutomaton();
-                                AnalyzerAutomatonViewerPanel automatonPanel = new AnalyzerAutomatonViewerPanel(moduleContainer, "Dot View", selectedAutomaton);
+                                AnalyzerAutomatonViewerPanel automatonPanel = new AnalyzerAutomatonViewerPanel("Dot View", selectedAutomaton);
                                 analyzerPanel.setRightComponent(automatonPanel);
                             }
+                            /*
                             else
                             {
                                 Automaton selectedAutomaton = selectedAutomata.getFirstAutomaton();
@@ -202,18 +204,16 @@ public class AnalyzerAutomataPanel
                                 
                                 //GraphProxy currGraphProxy = moduleContainer.getFlatGraphProxy(selectedAutomaton.getName());
                                 //ModuleProxy currModuleProxy = moduleContainer.getFlatModuleProxy();
-                                                                /*
-                                                                if (currGraphProxy == null)
-                                                                {
-                                                                        logger.error("AnalyzerAutomataPanel.currGraphProxy == null");
-                                                                        return;
-                                                                }
-                                                                if (currModuleProxy == null)
-                                                                {
-                                                                        logger.error("AnalyzerAutomataPanel.currModuleProxy == null");
-                                                                        return;
-                                                                }
-                                                                 */
+//                                                                if (currGraphProxy == null)
+//                                                                {
+//                                                                        logger.error("AnalyzerAutomataPanel.currGraphProxy == null");
+//                                                                        return;
+//                                                                }
+//                                                                if (currModuleProxy == null)
+//                                                                {
+//                                                                        logger.error("AnalyzerAutomataPanel.currModuleProxy == null");
+//                                                                        return;
+//                                                                }
                                 
                                 //boolean isSubject = currGraphProxy instanceof GraphSubject;
                                 //logger.info("isGraphSubject: " + isSubject);
@@ -236,6 +236,7 @@ public class AnalyzerAutomataPanel
                                 }
                                 
                             }
+                             */
                         }
                         else
                         {
@@ -289,7 +290,7 @@ public class AnalyzerAutomataPanel
     
     private VisualProject getActiveProject()
     {
-        return moduleContainer.getVisualProject();
+        return analyzerPanel.getVisualProject();
     }
     
     public void valueChanged(ListSelectionEvent e)

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.38 2007-06-14 14:42:43 flordal Exp $
+//# $Id: IDEMenuBar.java,v 1.39 2007-06-20 19:43:38 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -20,9 +20,9 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+import net.sourceforge.waters.model.base.DocumentProxy;
 
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
-import net.sourceforge.waters.subject.module.ModuleSubject;
 
 import org.supremica.automata.templates.TemplateGroup;
 import org.supremica.automata.templates.TemplateItem;
@@ -50,11 +50,11 @@ public class IDEMenuBar
 
         public void actionPerformed(ActionEvent e)
         {
-            ModuleSubject module;
+            DocumentProxy document;
             try
             {
                 // The documentmanager does the loading, by extension
-                module = (ModuleSubject) ide.getIDE().getDocumentManager().load(TemplateItem.class.getResource(item.getPath()));
+                document = ide.getIDE().getDocumentManager().load(TemplateItem.class.getResource(item.getPath()));
             }
             catch (IOException ex)
             {
@@ -66,7 +66,7 @@ public class IDEMenuBar
                 ide.error("Exception loading " + item.getPath() + ".", ex);
                 return;
             }
-            ide.getIDE().installContainer(module);
+            ide.getIDE().installContainer(document);
         }
     }
 
@@ -209,7 +209,7 @@ public class IDEMenuBar
         {
             public void menuSelected(MenuEvent ev)
             {
-                createModuleList(ev);
+                createDocumentList(ev);
             }
 
             public void menuDeselected(MenuEvent ev)
@@ -242,7 +242,7 @@ public class IDEMenuBar
         return analyzerMenu;
     }
 
-    public void createModuleList(MenuEvent ev)
+    public void createDocumentList(MenuEvent ev)
     {
         if (startPoint < 0)
         {
@@ -257,30 +257,30 @@ public class IDEMenuBar
             menu.remove(startPoint);
         }
 
-        for (Iterator modIt = ide.moduleContainerIterator(); modIt.hasNext(); )
+        for (Iterator<DocumentContainer> modIt = ide.documentContainerIterator(); modIt.hasNext(); )
         {
-            ModuleContainer currContainer = (ModuleContainer)modIt.next();
+            DocumentContainer currContainer = modIt.next();
             JMenuItem currMenuItem = new JMenuItem(currContainer.getName());
-            currMenuItem.addActionListener(new ModuleMenuActionListener(ide, currContainer));
+            currMenuItem.addActionListener(new DocumentMenuActionListener(ide, currContainer));
             menu.add(currMenuItem);
         }
     }
 
-    private class ModuleMenuActionListener
+    private class DocumentMenuActionListener
         implements ActionListener
     {
         private IDE ide;
-        private ModuleContainer moduleContainer;
+        private DocumentContainer mContainer;
 
-        public ModuleMenuActionListener(IDE ide, ModuleContainer moduleContainer)
+        public DocumentMenuActionListener(IDE ide, DocumentContainer container)
         {
             this.ide = ide;
-            this.moduleContainer = moduleContainer;
+            this.mContainer = container;
         }
 
         public void actionPerformed(ActionEvent e)
         {
-            ide.setActive(moduleContainer);
+            ide.setActive(mContainer);
         }
     }
 }

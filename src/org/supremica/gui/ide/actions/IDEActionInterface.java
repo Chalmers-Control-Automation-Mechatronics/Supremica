@@ -9,21 +9,20 @@ import net.sourceforge.waters.gui.EditorWindowInterface;
 import javax.swing.JFrame;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Project;
+import org.supremica.gui.ide.DocumentContainer;
 
 public interface IDEActionInterface
     extends IDEReportInterface
 {
     public ModuleSubject createNewModuleSubject();
-    public ModuleContainer getActiveModuleContainer();
-    public void add(ModuleContainer module);
-    public void remove(ModuleContainer module);
-    public void setActive(ModuleContainer module);
+    public DocumentContainer getActiveDocumentContainer();
+    public void add(DocumentContainer container);
+    public void remove(DocumentContainer container);
+    public void setActive(DocumentContainer container);
     public JFrame getFrame();
     public IDE getIDE();
     public Actions getActions();
     public void repaint();
     public void setEditorMode(IDEAction theAction);
     public EditorWindowInterface getActiveEditorWindowInterface();
-    public Automata getAllAutomata();
-    // int addAutomata(Automata theAutomata);
 }

@@ -40,7 +40,7 @@ public class AnalyzerSynthesizerAction
     public void doAction()
     {        
         // Retrieve the selected automata and make a sanity check
-        Automata selectedAutomata = ide.getSelectedAutomata();
+        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1, true, true, true, true))
         {
             return;
