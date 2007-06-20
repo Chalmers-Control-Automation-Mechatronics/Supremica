@@ -1,3 +1,16 @@
+The following packages are released under the 
+Supremica Software License Agreement: 
+
+org.supremica.automata.*
+
+The following packages are released under the 
+GNU GENERAL PUBLIC LICENSE, Version 2:
+
+org.supremica.gui.*
+org.supremica.log.*
+net.sourceforge.waters.*
+
+--------------------------------------------------------------
 
 Supremica Software License Agreement
 
