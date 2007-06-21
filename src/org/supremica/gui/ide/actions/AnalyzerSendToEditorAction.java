@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   AnalyzerSendToEditorAction
 //###########################################################################
-//# $Id: AnalyzerSendToEditorAction.java,v 1.8 2007-06-20 19:43:38 flordal Exp $
+//# $Id: AnalyzerSendToEditorAction.java,v 1.9 2007-06-21 11:16:23 robi Exp $
 //###########################################################################
 
 
@@ -41,9 +41,9 @@ public class AnalyzerSendToEditorAction
 {
     private static final long serialVersionUID = 1L;
     
-    /**
-     * Constructor.
-     */
+
+	//#######################################################################
+	//# Constructor
     public AnalyzerSendToEditorAction(List<IDEAction> actionList)
     {
         super(actionList);
@@ -57,7 +57,10 @@ public class AnalyzerSendToEditorAction
         //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/toEditor16.gif")));
     }
+
     
+	//#######################################################################
+	//# Invocation
     public void actionPerformed(ActionEvent e)
     {
         doAction();
@@ -123,4 +126,5 @@ public class AnalyzerSendToEditorAction
             }
         }
     }
+
 }

@@ -1,3 +1,12 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica IDE
+//# PACKAGE: org.supremica.gui.ide
+//# CLASS:   AnalyzerPanel
+//###########################################################################
+//# $Id: AnalyzerPanel.java,v 1.29 2007-06-21 11:16:23 robi Exp $
+//###########################################################################
+
 package org.supremica.gui.ide;
 
 import java.awt.GridBagLayout;
@@ -17,6 +26,7 @@ import org.supremica.automata.IO.ProjectBuildFromWaters;
 import org.supremica.automata.Project;
 import org.supremica.gui.VisualProject;
 import org.supremica.gui.ide.actions.Actions;
+
 
 public class AnalyzerPanel
     extends MainPanel
@@ -102,7 +112,7 @@ public class AnalyzerPanel
      */
     public boolean updateAutomata()
     {
-        if (mDocumentContainer.getE != null)
+        if (mDocumentContainer.getEditorPanel() != null)
         {
             ProjectBuildFromWaters builder = null;
             Project supremicaProject = null;

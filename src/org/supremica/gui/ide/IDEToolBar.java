@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEToolBar
 //###########################################################################
-//# $Id: IDEToolBar.java,v 1.13 2007-02-12 21:38:49 robi Exp $
+//# $Id: IDEToolBar.java,v 1.14 2007-06-21 11:16:23 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -130,7 +130,8 @@ public class IDEToolBar
     public void setCommand(String c)
     {
         command = c;
-        fireEditorChangedEvent(new ToolbarChangedEvent());
+		final EditorChangedEvent event = new ToolbarChangedEvent(this); 
+        fireEditorChangedEvent(event);
     }
     
     public void attach(Observer o)

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.133 2007-05-24 18:58:54 robi Exp $
+//# $Id: ControlledSurface.java,v 1.134 2007-06-21 11:16:23 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -175,7 +175,7 @@ public class ControlledSurface
   //# Interface net.sourceforge.waters.gui.Observer
   public void update(final EditorChangedEvent event)
   {
-    if (event instanceof ToolbarChangedEvent && mEmbedder == null) {
+    if (event.getSource() == mToolbar && mEmbedder == null) {
       updateTool();
     }
   }

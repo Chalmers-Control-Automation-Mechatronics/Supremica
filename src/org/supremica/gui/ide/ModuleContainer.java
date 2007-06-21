@@ -4,18 +4,17 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.57 2007-06-20 19:43:38 flordal Exp $
+//# $Id: ModuleContainer.java,v 1.58 2007-06-21 11:16:23 robi Exp $
 //###########################################################################
 
 
 package org.supremica.gui.ide;
 
-import java.util.Iterator;
-import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +37,7 @@ import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.UndoRedoEvent;
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.model.base.NamedProxy;
@@ -239,21 +239,15 @@ public class ModuleContainer
     
     public void addUndoable(UndoableEdit e)
     {
-        if (e.isSignificant())
-        {
+        if (e.isSignificant()) {
             mInsignificant.end();
             mUndoManager.addEdit(mInsignificant);
             mInsignificant = new CompoundEdit();
             mUndoManager.addEdit(e);
-            fireEditorChangedEvent(new UndoRedoEvent());
-        }
-        else
-        {
+			fireUndoRedoEvent();
+        } else {
             mInsignificant.addEdit(e);
         }
-        getIDE().getActions().editorRedoAction.setEnabled(canRedo());
-        getIDE().getActions().editorUndoAction.setEnabled(canUndo());
-        fireEditorChangedEvent(new UndoRedoEvent());
     }
     
     
@@ -278,7 +272,7 @@ public class ModuleContainer
     public void clearList()
     {
         mUndoManager.discardAllEdits();
-        fireEditorChangedEvent(new UndoRedoEvent());
+ 		fireUndoRedoEvent();
     }
     
     public String getRedoPresentationName()
@@ -297,10 +291,8 @@ public class ModuleContainer
         mInsignificant.undo();
         mInsignificant = new CompoundEdit();
         mUndoManager.redo();
-        getIDE().getActions().editorRedoAction.setEnabled(canRedo());
-        getIDE().getActions().editorUndoAction.setEnabled(canUndo());
-        fireEditorChangedEvent(new UndoRedoEvent());
-    }
+ 		fireUndoRedoEvent();
+   }
     
     public void undo() throws CannotUndoException
     {
@@ -308,11 +300,18 @@ public class ModuleContainer
         mInsignificant.undo();
         mInsignificant = new CompoundEdit();
         mUndoManager.undo();
+		fireUndoRedoEvent();
+    }
+
+	private void fireUndoRedoEvent()
+	{
+		final EditorChangedEvent event = new UndoRedoEvent(this);
+		fireEditorChangedEvent(event);
         getIDE().getActions().editorRedoAction.setEnabled(canRedo());
         getIDE().getActions().editorUndoAction.setEnabled(canUndo());
-        fireEditorChangedEvent(new UndoRedoEvent());
-    }
-    
+	}
+
+
     //#######################################################################
     //# Observer Support
     public void attach(final Observer o)
@@ -325,47 +324,19 @@ public class ModuleContainer
         mObservers.remove(o);
     }
     
-    public void fireEditorChangedEvent(EditorChangedEvent e)
+    public void fireEditorChangedEvent(final EditorChangedEvent event)
     {
-        for (final Observer o : mObservers)
-        {
-            o.update(e);
+		// Just in case they try to register or deregister observers
+		// in response to the update ...
+		final Collection<Observer> copy = new LinkedList<Observer>(mObservers);
+        for (final Observer observer : copy) {
+            observer.update(event);
         }
     }
     
-/*
-    public GraphProxy getFlatGraphProxy(String name)
-    {
-        List<Proxy> components = flatModule.getComponentList();
-        for (Proxy proxy : components)
-        {
-            if (proxy instanceof NamedProxy)
-            {
-                NamedProxy namedProxy = (NamedProxy)proxy;
-                if (name.equals(namedProxy.getName()))
-                {
-                    if (proxy instanceof SimpleComponentProxy)
-                    {
-                        return ((SimpleComponentProxy)proxy).getGraph();
-                    }
-                    else
-                    {
-                        System.err.println("ModuleContainer.getFlatGraphProxy proxy: " + name + " not a GraphProxy");
-                        return null;
-                    }
-                }
-            }
-        }
- 
-        return null;
-    }
- 
-    public ModuleProxy getFlatModuleProxy()
-    {
-        return flatModule;
-    }
- */    
-    
+
+    //#######################################################################
+    //#
     public void rememberSelectedComponent(JTabbedPane tabPanel)
     {
         mSelectedComponent = tabPanel.getSelectedComponent();

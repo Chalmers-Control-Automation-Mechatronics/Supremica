@@ -1,3 +1,12 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica/Waters IDE
+//# PACKAGE: org.supremica.gui.ide
+//# CLASS:   AnalyzerAutomataPanel
+//###########################################################################
+//# $Id: AnalyzerAutomataPanel.java,v 1.28 2007-06-21 11:16:23 robi Exp $
+//###########################################################################
+
 package org.supremica.gui.ide;
 
 import java.awt.Frame;
@@ -38,7 +47,6 @@ public class AnalyzerAutomataPanel
     private JTable theAutomatonTable;
     private TableSorter theTableSorter;
     private TableModel analyzerTableModel;
-    private AnalyzerPopupMenu analyzerPopupMenu;
     
     public static int TABLE_NAME_COLUMN = 0;
     public static int TABLE_TYPE_COLUMN = 1;
@@ -51,7 +59,6 @@ public class AnalyzerAutomataPanel
         this.analyzerPanel = analyzerPanel;
         this.moduleContainer = moduleContainer;
         this.name = name;
-        analyzerPopupMenu = new AnalyzerPopupMenu((Frame) analyzerPanel.getTopLevelAncestor(), moduleContainer.getIDE());
         
         setPreferredSize(IDEDimensions.leftAnalyzerPreferredSize);
         setMinimumSize(IDEDimensions.leftAnalyzerMinimumSize);
@@ -278,8 +285,11 @@ public class AnalyzerAutomataPanel
                         theAutomatonTable.clearSelection();
                         theAutomatonTable.setRowSelectionInterval(currRow, currRow);
                     }
-                    
-                    analyzerPopupMenu.show(e.getComponent(), e.getX(), e.getY());
+		    final Frame root =
+		      (Frame) analyzerPanel.getTopLevelAncestor();
+		    final JPopupMenu popup =
+		      new AnalyzerPopupMenu(root, moduleContainer.getIDE());
+                    popup.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
         });
