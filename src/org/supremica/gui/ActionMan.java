@@ -122,7 +122,7 @@ public class ActionMan
     // gui here is filled in by (who?)
     public static Gui gui = null;
     public static final LanguageRestrictor languageRestrictor = new LanguageRestrictor();
-    public static final EventHider eventHider = new EventHider(getGui());
+    //public static final EventHider eventHider = new EventHider(getGui());
     public static final FindStates findStates = new FindStates();
     public static final StateEnumerator stateEnumerator = new StateEnumerator();
     public static final HelpAction helpAction = new HelpAction();
@@ -1138,7 +1138,8 @@ public class ActionMan
         }
 
         // Start worker thread - perform the task.
-        AutomataSynchronizerWorker worker = new AutomataSynchronizerWorker(gui, selectedAutomata, "" /* newAutomatonName */, synchronizationOptions);
+        //AutomataSynchronizerWorker worker = new AutomataSynchronizerWorker(gui, selectedAutomata, "" /* newAutomatonName */, synchronizationOptions);
+        System.err.println("Migrate to IDE, old Supremica no longer supported.");
     }
 
     // ** Synthesize
@@ -1161,7 +1162,8 @@ public class ActionMan
             return;
         }
 
-        AutomataSynthesisWorker worker = new AutomataSynthesisWorker(gui, selectedAutomata, options);
+        //AutomataSynthesisWorker worker = new AutomataSynthesisWorker(gui, selectedAutomata, options);
+        System.err.println("Migrate to IDE, old Supremica no longer supported.");
 
         /*
           ActionTimer timer = null;

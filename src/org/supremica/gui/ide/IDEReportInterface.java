@@ -17,8 +17,4 @@ public interface IDEReportInterface
     void debug(String msg);
     
     JFrame getFrame();
-    
-    public Project getActiveProject();
-    
-    public String getNewAutomatonName(String str, String def);
 }

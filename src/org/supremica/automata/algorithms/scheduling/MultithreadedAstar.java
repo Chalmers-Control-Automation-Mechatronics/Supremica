@@ -457,7 +457,7 @@ public class MultithreadedAstar
             }
             
             logger.info("Schedule was built in " + timer.elapsedTime() + "ms");
-            scheduleDialog.getIde().addAutomaton(scheduleAuto);
+            scheduleDialog.getIde().getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(scheduleAuto);
         }
     }
     

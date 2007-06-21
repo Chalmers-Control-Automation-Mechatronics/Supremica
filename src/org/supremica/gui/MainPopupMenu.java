@@ -187,8 +187,10 @@ class MainPopupMenu
                  */
         
         // Do this...
+        /*
         JMenuItem eventHider = new SupremicaMenuItem(ActionMan.eventHider);
         menuHandler.add(eventHider, 1);
+         */
         
                 /* ...and you can forget about this
                 languageRestrictor.addActionListener(new ActionListener()

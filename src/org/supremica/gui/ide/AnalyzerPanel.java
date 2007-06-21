@@ -170,9 +170,35 @@ public class AnalyzerPanel
 
     private VisualProject mVisualProject = new VisualProject();
     
-    
-    
-    
+    public String getNewAutomatonName(String msg, String nameSuggestion)
+    {
+        boolean finished = false;
+        String newName = "";
+        
+        while (!finished)
+        {
+            newName = (String) JOptionPane.showInputDialog(this, msg, "Enter a new name.", JOptionPane.QUESTION_MESSAGE, null, null, nameSuggestion);
+            
+            if (newName == null)
+            {
+                return null;
+            }
+            else if (newName.equals(""))
+            {
+                JOptionPane.showMessageDialog(this, "An empty name is not allowed.", "Alert", JOptionPane.ERROR_MESSAGE);
+            }
+            else if (getVisualProject().containsAutomaton(newName))
+            {
+                JOptionPane.showMessageDialog(this, "'" + newName + "' already exists.", "Alert", JOptionPane.ERROR_MESSAGE);
+            }
+            else
+            {
+                finished = true;
+            }
+        }
+        
+        return newName;
+    }
     
     
     public int numberOfSelectedAutomata()

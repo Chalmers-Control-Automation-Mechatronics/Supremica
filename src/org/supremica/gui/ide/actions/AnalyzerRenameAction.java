@@ -60,7 +60,7 @@ public class AnalyzerRenameAction
 
             try
             {
-                String newName = ide.getIDE().getNewAutomatonName("Enter a new name for " + currAutomatonName, currAutomatonName);
+                String newName = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getNewAutomatonName("Enter a new name for " + currAutomatonName, currAutomatonName);
 
                 if (newName != null)
                 {

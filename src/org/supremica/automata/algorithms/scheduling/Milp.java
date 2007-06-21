@@ -1,19 +1,15 @@
 package org.supremica.automata.algorithms.scheduling;
 
-import bsh.This;
 import java.util.*;
 import java.io.*;
 
 import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
-import org.supremica.gui.ActionMan;
-import org.supremica.gui.Gui;
 import org.supremica.gui.ScheduleDialog;
-import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.IDEReportInterface;
+import org.supremica.gui.ide.actions.IDEActionInterface;
 import org.supremica.log.*;
 import org.supremica.util.ActionTimer;
-import org.supremica.util.BDD.solvers.TSPSolver;
 
 //TODO: Strukturera upp koden. Kommentera. 
 public class Milp
@@ -241,8 +237,7 @@ public class Milp
     public void buildScheduleAutomaton()
         throws Exception
     {                
-        //TODO: Kan man hantera epsilon snyggare?
-        //TODO: temp (fulhack) - fixa bättre schemabygge.
+        //TODO: temp (fulhack) - fixa bï¿½ttre schemabygge.
         SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
         synthesizerOptions.setSynthesisType(SynthesisType.NONBLOCKINGCONTROLLABLE);
         synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.MONOLITHIC);
@@ -261,7 +256,7 @@ public class Milp
         String scheduleName = "";
         while (scheduleName != null && scheduleName.trim() == "")
         {
-            scheduleName = scheduleDialog.getIde().getNewAutomatonName("Enter a name for the schedule", "Schedule");
+            scheduleName = scheduleDialog.getIde().getActiveDocumentContainer().getAnalyzerPanel().getNewAutomatonName("Enter a name for the schedule", "Schedule");
         }       
         if (scheduleName == null)
         {
@@ -908,7 +903,7 @@ public class Milp
 // 		}
     }
     
-    //TODO: rensa upp här...
+    //TODO: rensa upp hï¿½r...
     private void createPrecedenceConstraints(Automaton currSpec)
         throws Exception
     {                 
@@ -1182,7 +1177,7 @@ public class Milp
                 ArrayList<int[]> followingPlantStateInfo = currAlternatingPlantStateInfoArray.get(fIndex);
                 int[] followingPlantState = followingPlantStateInfo.get(0);
                 
-                //TODO: hitta på bättre namn (även för pIsFEvent)
+                //TODO: hitta pï¿½ bï¿½ttre namn (ï¿½ven fï¿½r pIsFEvent)
                 boolean fIsFEvent = true;
                 if (Math.IEEEremainder(fIndex, 2) == 0)
                 {
@@ -1620,6 +1615,7 @@ public class Milp
                         State nextState = nextStates.next();
                         int nextStateIndex = indexMap.getStateIndex(currPlant, nextState);
                         
+                        //TODO: fixa epsilon sï¿½ det blir rï¿½tt tid i buildScheduleAutomaton()
                         precConstraints += "prec_" + "r" + currplantIndex + "_" + currStateIndex + "_" + nextStateIndex + " : " + 
                                 "time[" + i + ", " + nextStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + 
                                 ", " + nextStateIndex + "] + epsilon;\n";
@@ -2269,12 +2265,12 @@ public class Milp
     {
         if (scheduleDialog != null)
         {
-            IDEReportInterface ide = null;
+            IDEActionInterface ide = null;
             
             try
             {
                 ide = scheduleDialog.getIde();
-                ide.addAutomaton(auto);
+                ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(auto);
             }
             catch (Exception ex)
             {
@@ -2290,21 +2286,21 @@ public class Milp
     {
         if (scheduleDialog != null)
         {
-            IDEReportInterface ide = null;
+            IDEActionInterface ide = null;
             
             try
             {
                 ide = scheduleDialog.getIde();
                 
                 // Remove old automata
-                Automata selectedAutos = ide.getSelectedAutomata();
+                Automata selectedAutos = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
                 for (Iterator<Automaton> autIt = selectedAutos.iterator(); autIt.hasNext(); )
                 {
                     Automaton selectedAuto = autIt.next();
                     if (!autos.containsAutomaton(selectedAuto.getName()))
                     {
 //                        ide.getVisualProjectContainer().getActiveProject().removeAutomaton(selectedAuto);
-                        ide.getActiveProject().removeAutomaton(selectedAuto);
+                        ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().removeAutomaton(selectedAuto);
                     }
                 }
                 
@@ -2314,7 +2310,7 @@ public class Milp
                     Automaton auto = autIt.next();
                     if (!selectedAutos.containsAutomaton(auto.getName()))
                     {
-                        ide.addAutomaton(auto);
+                        ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(auto);
                     }
                 }
             }

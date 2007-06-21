@@ -58,6 +58,7 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.util.ActionTimer;
 import org.supremica.gui.ide.IDEReportInterface;
+import org.supremica.gui.ide.actions.IDEActionInterface;
 
 /**
  * Thread dealing with synthesis.
@@ -71,7 +72,7 @@ public class AutomataSynthesisWorker
 {
     private static Logger logger = LoggerFactory.createLogger(AutomataSynthesisWorker.class);
     
-    private IDEReportInterface gui;
+    private IDEActionInterface ide;
     private Automata theAutomata;
     private SynthesizerOptions synthOptions;
     
@@ -79,9 +80,9 @@ public class AutomataSynthesisWorker
     private boolean stopRequested = false;
     private EventQueue eventQueue = new EventQueue();
     
-    public AutomataSynthesisWorker(IDEReportInterface gui, Automata theAutomata, SynthesizerOptions options)
+    public AutomataSynthesisWorker(IDEActionInterface gui, Automata theAutomata, SynthesizerOptions options)
     {
-        this.gui = gui;
+        this.ide = gui;
         this.theAutomata = theAutomata;
         this.synthOptions = options;
         
@@ -93,14 +94,14 @@ public class AutomataSynthesisWorker
         // Initialize the ExecutionDialog
         ArrayList threadsToStop = new ArrayList();
         threadsToStop.add(this);
-        executionDialog = new ExecutionDialog(gui.getFrame(), "Synthesizing", threadsToStop);
+        executionDialog = new ExecutionDialog(ide.getFrame(), "Synthesizing", threadsToStop);
         executionDialog.setMode(ExecutionDialogMode.SYNTHESIZING);
         
         // OK options?
         String errorMessage = synthOptions.validOptions();
         if (errorMessage != null)
         {
-            JOptionPane.showMessageDialog(gui.getFrame(), errorMessage, "Alert", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(ide.getFrame(), errorMessage, "Alert", JOptionPane.ERROR_MESSAGE);
             requestStop();
             return;
         }
@@ -180,7 +181,7 @@ public class AutomataSynthesisWorker
             // Add new automata
             try
             {
-                gui.addAutomata(result);
+                ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomata(result);
             }
             catch (Exception ex)
             {

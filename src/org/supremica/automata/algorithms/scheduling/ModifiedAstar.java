@@ -979,7 +979,7 @@ public class ModifiedAstar
         String scheduleName = "";
         while (scheduleName != null && scheduleName.trim() == "")
         {
-            scheduleName = scheduleDialog.getIde().getNewAutomatonName("Enter a name for the schedule", "Schedule");
+            scheduleName = scheduleDialog.getIde().getActiveDocumentContainer().getAnalyzerPanel().getNewAutomatonName("Enter a name for the schedule", "Schedule");
         }       
         if (scheduleName == null)
         {
@@ -1061,7 +1061,7 @@ public class ModifiedAstar
         }
         
         logger.info("Schedule was built in " + timer.elapsedTime() + "ms");
-        scheduleDialog.getIde().addAutomaton(scheduleAuto);
+        scheduleDialog.getIde().getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(scheduleAuto);
     }
 
 	/**

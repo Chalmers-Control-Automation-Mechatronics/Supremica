@@ -54,14 +54,14 @@ import javax.swing.*;
 import java.util.*;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
+import org.supremica.gui.ide.actions.IDEActionInterface;
 import org.supremica.util.ActionTimer;
-import org.supremica.gui.ide.IDEReportInterface;
 
 public class AutomataSynchronizerWorker
     extends Thread
     implements Stoppable
 {
-    private IDEReportInterface workbench = null;
+    private IDEActionInterface ide = null;
     private Automata theAutomata = null;
     private String newAutomatonName = null;
     private final static int MODE_SYNC = 1;
@@ -71,9 +71,9 @@ public class AutomataSynchronizerWorker
     private SynchronizationOptions syncOptions;
     private boolean stopRequested = false;
     
-    public AutomataSynchronizerWorker(IDEReportInterface workbench, Automata theAutomata, String newAutomatonName, SynchronizationOptions syncOptions)
+    public AutomataSynchronizerWorker(IDEActionInterface workbench, Automata theAutomata, String newAutomatonName, SynchronizationOptions syncOptions)
     {
-        this.workbench = workbench;
+        this.ide = workbench;
         this.theAutomata = theAutomata;
         this.newAutomatonName = newAutomatonName;
         this.syncOptions = syncOptions;
@@ -100,10 +100,10 @@ public class AutomataSynchronizerWorker
                 timer.stop();
                 
                 // -- MF -- should really put up a message box here? Why not let the Gui manage that?
-                JOptionPane.showMessageDialog(workbench.getFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(ide.getFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 
                 // logger.error(e.getMessage());
-                workbench.error(e.getMessage());
+                ide.error(e.getMessage());
                 
                 return;
             }
@@ -112,7 +112,7 @@ public class AutomataSynchronizerWorker
             ArrayList threadsToStop = new ArrayList();
             threadsToStop.add(theSynchronizer);
             threadsToStop.add(this);
-            ExecutionDialog executionDialog = new ExecutionDialog(workbench.getFrame(), "Synchronizing", threadsToStop);
+            ExecutionDialog executionDialog = new ExecutionDialog(ide.getFrame(), "Synchronizing", threadsToStop);
             theSynchronizer.getHelper().setExecutionDialog(executionDialog);
             executionDialog.setMode(ExecutionDialogMode.SYNCHRONIZING);
             
@@ -124,7 +124,7 @@ public class AutomataSynchronizerWorker
             catch (Exception ex)
             {
                 timer.stop();
-                workbench.error("Exception while executing AutomataSynchronizer");
+                ide.error("Exception while executing AutomataSynchronizer");
                 
                 // logger.error("Exception while executing AutomataSynchronizer");
                 // logger.debug(ex.getStackTrace());
@@ -143,7 +143,7 @@ public class AutomataSynchronizerWorker
                     timer.stop();
                     
                     // -- MF -- logger.error("Exception in AutomatonSynchronizer while getting the automaton" + ex);
-                    workbench.error("Exception in AutomatonSynchronizer while getting the automaton" + ex);
+                    ide.error("Exception in AutomatonSynchronizer while getting the automaton" + ex);
                     ex.printStackTrace();
                     
                     // logger.debug(ex.getStackTrace());
@@ -163,7 +163,7 @@ public class AutomataSynchronizerWorker
                 
                 // logger.info("Execution completed after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds.");
                 // workbench.info("Execution completed after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds.");
-                workbench.info("Execution completed after " + timer.toString());
+                ide.info("Execution completed after " + timer.toString());
             }
             else
             {
@@ -172,7 +172,7 @@ public class AutomataSynchronizerWorker
                 
                 // logger.info("Execution stopped after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds!");
                 // workbench.info("Execution stopped after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds!");
-                workbench.info("Execution stopped after " + timer.toString());
+                ide.info("Execution stopped after " + timer.toString());
             }
             
             theSynchronizer.displayInfo();
@@ -187,14 +187,14 @@ public class AutomataSynchronizerWorker
                 {
                     // -- MF -- container.add(theAutomaton);
                     // workbench.getVisualProjectContainer().getActiveProject().addAutomaton(theAutomaton);
-                    workbench.addAutomaton(theAutomaton);
+                    ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(theAutomaton);
                 }
             }
             catch (Exception ex)
             {
                 // logger.error("Could not add the new automaton after synchronization");
                 // logger.debug(ex.getStackTrace());
-                workbench.error("Could not add the new automaton after synchronization");
+                ide.error("Could not add the new automaton after synchronization");
                 
                 return;
             }

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.82 2007-06-20 19:43:38 flordal Exp $
+//# $Id: IDE.java,v 1.83 2007-06-21 09:51:56 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -374,7 +374,6 @@ public class IDE
         }
         else if (analyzerActive())
         {
-            System.out.println("Hello");
             menuBar.getEditorMenu().setEnabled(false);//.disable();
             menuBar.getAnalyzerMenu().setEnabled(true);//.enable();
         }
@@ -433,46 +432,6 @@ public class IDE
     public void debug(String msg)
     {
         logger.debug(msg);
-    }
-    
-    public boolean addAutomaton(Automaton theAutomaton)
-    {
-        return getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(theAutomaton);
-    }
-    
-    public int addAutomata(Automata theAutomata)
-    {
-        return getActiveDocumentContainer().getAnalyzerPanel().addAutomata(theAutomata);
-    }
-    
-    public String getNewAutomatonName(String msg, String nameSuggestion)
-    {
-        boolean finished = false;
-        String newName = "";
-        
-        while (!finished)
-        {
-            newName = (String) JOptionPane.showInputDialog(this, msg, "Enter a new name.", JOptionPane.QUESTION_MESSAGE, null, null, nameSuggestion);
-            
-            if (newName == null)
-            {
-                return null;
-            }
-            else if (newName.equals(""))
-            {
-                JOptionPane.showMessageDialog(this, "An empty name is not allowed.", "Alert", JOptionPane.ERROR_MESSAGE);
-            }
-            else if (getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().containsAutomaton(newName))
-            {
-                JOptionPane.showMessageDialog(this, "'" + newName + "' already exists.", "Alert", JOptionPane.ERROR_MESSAGE);
-            }
-            else
-            {
-                finished = true;
-            }
-        }
-        
-        return newName;
     }
     
     public static void main(String args[])

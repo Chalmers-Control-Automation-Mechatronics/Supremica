@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   SaveAction
 //###########################################################################
-//# $Id: SaveAsAction.java,v 1.2 2007-06-20 19:43:38 flordal Exp $
+//# $Id: SaveAsAction.java,v 1.3 2007-06-21 09:51:56 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -23,24 +23,35 @@ import javax.swing.KeyStroke;
 import net.sourceforge.waters.gui.*;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.WatersMarshalException;
+import org.supremica.automata.Automata;
+import org.supremica.automata.IO.AutomataToXML;
+import org.supremica.gui.SupremicaXMLFileFilter;
+import org.supremica.gui.ide.AutomataContainer;
 
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.log.*;
 
 public class SaveAsAction
-        extends IDEAction
+    extends IDEAction
 {
     private static final long serialVersionUID = 1L;
     
     private static Logger logger =
-            LoggerFactory.createLogger(SaveAction.class);
+        LoggerFactory.createLogger(SaveAction.class);
     
     private JFileChooser fileSaveChooser = new JFileChooser(".");
+    private WmodFileFilter wmodFilter = new WmodFileFilter();
+    private SupremicaXMLFileFilter supFilter = new SupremicaXMLFileFilter();
     
     public SaveAsAction(List<IDEAction> actionList)
     {
         super(actionList);
         
+        fileSaveChooser.addChoosableFileFilter(wmodFilter);
+        fileSaveChooser.addChoosableFileFilter(supFilter);
+        fileSaveChooser.setFileFilter(wmodFilter);
+
         putValue(Action.NAME, "Save As...");
         putValue(Action.SHORT_DESCRIPTION, "Save the project with a new name");
         putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_S));
@@ -54,19 +65,31 @@ public class SaveAsAction
     }
     
     public void doAction()
-    {
-        WmodFileFilter filter = new WmodFileFilter();
-        fileSaveChooser.setFileFilter(filter);
+    {        
         int returnVal = fileSaveChooser.showSaveDialog(ide.getFrame());
         if (returnVal == JFileChooser.APPROVE_OPTION)
         {
             File file = fileSaveChooser.getSelectedFile();
-            if (!filter.accept(file))
-            {
-                file = new File(file.getPath() + "." + WmodFileFilter.WMOD);
-            }
             
-            saveWmodFile(file);
+            // Branch depending on chosen file filter
+            if (fileSaveChooser.getFileFilter() instanceof SupremicaXMLFileFilter)
+            {
+                // Supremica XML
+                if (!supFilter.accept(file))
+                {
+                    file = new File(file.getPath() + "." + SupremicaXMLFileFilter.SUPXML);
+                }
+                saveSupFile(file);
+            }
+            else
+            {
+                // Default
+                if (!wmodFilter.accept(file))
+                {
+                    file = new File(file.getPath() + "." + WmodFileFilter.WMOD);
+                }
+                saveWmodFile(file);
+            }
             
             //modified = false;
             
@@ -78,27 +101,42 @@ public class SaveAsAction
         }
     }
     
-    private void saveWmodFile(File wmodf)
+    private void saveSupFile(File file)
     {
-       //logEntry("Saving module to: " + wmodf);
+        try
+        {
+            Automata automata = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata();
+            AutomataToXML exporter = new AutomataToXML(automata);
+            exporter.serialize(file.getAbsolutePath());
+        }
+        catch (Exception ex)
+        {
+            logger.error("Exception while SaveAs " + file.getAbsolutePath(), ex);
+            logger.debug(ex.getStackTrace());
+        }
+    }
+    
+    private void saveWmodFile(File file)
+    {
+        //logEntry("Saving module to: " + wmodf);
         try
         {
             DocumentManager documentManager = ide.getIDE().getDocumentManager();
-            documentManager.saveAs(ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject(), wmodf);
+            documentManager.saveAs(ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject(), file);
         }
         catch (final WatersMarshalException exception)
         {
             JOptionPane.showMessageDialog(ide.getFrame(),
-                    "Error saving module file:" +
-                    exception.getMessage());
+                "Error saving module file:" +
+                exception.getMessage());
             //logEntry("WatersMarshalException - Failed to save  '" +
             //         wmodf + "'!");
         }
         catch (final IOException exception)
         {
             JOptionPane.showMessageDialog(ide.getFrame(),
-                    "Error saving module file:" +
-                    exception.getMessage());
+                "Error saving module file:" +
+                exception.getMessage());
             //logEntry("IOException - Failed to save  '" + wmodf + "'!");
         }
     }

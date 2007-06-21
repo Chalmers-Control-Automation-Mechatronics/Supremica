@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   SupremicaUnmarshaller
 //###########################################################################
-//# $Id: SupremicaUnmarshaller.java,v 1.11 2007-06-20 19:43:38 flordal Exp $
+//# $Id: SupremicaUnmarshaller.java,v 1.12 2007-06-21 09:51:56 flordal Exp $
 //###########################################################################
 
 package org.supremica.automata.IO;
@@ -124,7 +124,7 @@ public class SupremicaUnmarshaller
             {
                 if (state.getCost() != State.UNDEF_COST)
                 {
-                    //logger.warn("State cost information in the imported automata model was lost in the conversion; optimisation is not possible.");
+                    logger.warn("State cost information in the imported automata model is not supported by the editor.");
                     return false;
                 }
             }

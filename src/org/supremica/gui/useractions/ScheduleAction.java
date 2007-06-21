@@ -11,17 +11,17 @@ import org.supremica.gui.*;
  *      Implements the dialog box allowing to choose different scheduling techniques.
  */
 public class ScheduleAction
-	extends AbstractAction
+    extends AbstractAction
 {
     private static Logger logger = LoggerFactory.createLogger(ScheduleAction.class);
-
+    
     public ScheduleAction()
     {
-            super("Schedule...", null);
-
-            putValue(SHORT_DESCRIPTION, "Schedule selected automata (experimental)");
+        super("Schedule...", null);
+        
+        putValue(SHORT_DESCRIPTION, "Schedule selected automata (experimental)");
     }
-
+    
     /**
      *      Calls the ScheduleDialog if the number of selected automata is equal to one.
      *      (Otherwise, synchronization is strongly recommended.)
@@ -30,17 +30,17 @@ public class ScheduleAction
     {
         launchScheduleDialog();
     }
-
+    
     private void launchScheduleDialog()
     {
         ScheduleDialog dlg = null;
-
-        try 
+        
+        try
         {
-            dlg = new ScheduleDialog(ActionMan.getGui());
+            //dlg = new ScheduleDialog(ActionMan.getGui());
             dlg.setVisible(true);
         }
-        catch (Exception ex) 
+        catch (Exception ex)
         {
             if (ex.getMessage().contains("javax") || ex.getMessage().contains("java.awt"))
             {}

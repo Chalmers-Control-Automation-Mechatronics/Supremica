@@ -12,7 +12,6 @@
 // when it or one of its children is selected (or only allow level 1 nodes to be selected
 package org.supremica.gui;
 
-import java.awt.MenuBar;
 import java.util.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -22,7 +21,8 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
-import org.supremica.gui.ide.IDEReportInterface;
+import org.supremica.gui.ide.actions.IDEActionInterface;
+import org.supremica.gui.*;
 
 /**
  * Lets the user choose events to be hidden.
@@ -39,11 +39,11 @@ class EventHiderDialog
     
     private static Logger logger = LoggerFactory.createLogger(EventHiderDialog.class);
     
-    private IDEReportInterface ide;
+    private IDEActionInterface ide;
     
     private boolean preserveControllability = true;
     
-    public EventHiderDialog(IDEReportInterface ide, Automata automata, Alphabet globalAlphabet)
+    public EventHiderDialog(IDEActionInterface ide, Automata automata, Alphabet globalAlphabet)
     {
         super(automata, globalAlphabet);
         super.setTitle("Event hider");       
@@ -145,7 +145,7 @@ class EventHiderDialog
         
         try
         {
-            ide.addAutomata(newAutomata);
+            ide.getActiveDocumentContainer().getAnalyzerPanel().addAutomata(newAutomata);
         }
         catch (Exception ex)
         {
@@ -161,9 +161,9 @@ public class EventHider
     private static final long serialVersionUID = 1L;
     
     private static Logger logger = LoggerFactory.createLogger(EventHider.class);
-    private IDEReportInterface ide;
+    private IDEActionInterface ide;
     
-    public EventHider(IDEReportInterface ide)
+    public EventHider(IDEActionInterface ide)
     {
         putValue(NAME, "Event hider");
         putValue(SHORT_DESCRIPTION, "Stop observing selected events");
@@ -176,7 +176,7 @@ public class EventHider
         Automata automata = ActionMan.getGui().getSelectedAutomata();
         
         // Throw up the dialog, let the user select the alphabet
-        EventHiderDialog dlg = new EventHiderDialog(ide, automata, ActionMan.getGui().getUnselectedAutomata().getUnionAlphabet());
+        EventHiderDialog dlg = new EventHiderDialog(ide, automata, ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getUnselectedAutomata().getUnionAlphabet());
     }
     
     public void doAction(Automata theAutomata, Alphabet othersAlphabet)
