@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.41 2007-06-21 11:16:23 robi Exp $
+//# $Id: EditorMenu.java,v 1.42 2007-06-21 15:57:55 robi Exp $
 //###########################################################################
 
 
@@ -331,7 +331,7 @@ public class EditorMenu
 
     public void update(EditorChangedEvent e)
     {
-        if (e.getType() == EditorChangedEvent.Type.UNDOREDO)
+        if (e.getKind() == EditorChangedEvent.Kind.UNDOREDO)
         {
             mEditRedo.setEnabled(root.getUndoInterface().canRedo());
             mEditUndo.setEnabled(root.getUndoInterface().canUndo());

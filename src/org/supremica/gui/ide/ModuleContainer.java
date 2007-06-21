@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.58 2007-06-21 11:16:23 robi Exp $
+//# $Id: ModuleContainer.java,v 1.59 2007-06-21 15:57:55 robi Exp $
 //###########################################################################
 
 
@@ -307,8 +307,6 @@ public class ModuleContainer
 	{
 		final EditorChangedEvent event = new UndoRedoEvent(this);
 		fireEditorChangedEvent(event);
-        getIDE().getActions().editorRedoAction.setEnabled(canRedo());
-        getIDE().getActions().editorUndoAction.setEnabled(canUndo());
 	}
 
 
@@ -332,6 +330,7 @@ public class ModuleContainer
         for (final Observer observer : copy) {
             observer.update(event);
         }
+		getIDE().fireEditorChangedEvent(event);
     }
     
 
@@ -351,22 +350,9 @@ public class ModuleContainer
     public void updateActiveTab(JTabbedPane tabPanel)
     {
         mSelectedComponent = tabPanel.getSelectedComponent();
-        if (mSelectedComponent == getEditorPanel())
-        {
-            getEditorPanel().enablePanel();
-            getAnalyzerPanel().disablePanel();
-        }
-        else if (mSelectedComponent == getAnalyzerPanel())
-        {
-            if (getAnalyzerPanel().updateAutomata())
-            {
-                getEditorPanel().disablePanel();
-                getAnalyzerPanel().enablePanel();
-            }
-            else
-            {
-                tabPanel.setSelectedComponent(getEditorPanel());
-            }
+        if (mSelectedComponent == getAnalyzerPanel() &&
+			!getAnalyzerPanel().updateAutomata()) {
+			tabPanel.setSelectedComponent(getEditorPanel());
         }
     }
 

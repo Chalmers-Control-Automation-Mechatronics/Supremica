@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   MainPanel
 //###########################################################################
-//# $Id: MainPanel.java,v 1.31 2007-06-20 19:43:38 flordal Exp $
+//# $Id: MainPanel.java,v 1.32 2007-06-21 15:57:55 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -79,10 +79,6 @@ abstract class MainPanel
     
     public abstract void addToolBarEntries(IDEToolBar toolbar);
     
-    public abstract void disablePanel();
-    
-    public abstract void enablePanel();
-    
     public void setRightComponent(JComponent newComponent)
     {
         JComponent oldComponent = getRightComponent();
@@ -100,17 +96,13 @@ abstract class MainPanel
             
             if (newComponent == null || newComponent == getEmptyRightPanel())
             {
-                // emptyRightPanel.setPreferredScrollableViewportSize(oldSize);
                 emptyRightPanel.setPreferredSize(oldSize);
                 splitPanelHorizontal.setRightComponent(emptyRightPanel);
-                disablePanel();
             }
             else
             {
-                //				newComponent.setPreferredScrollableViewportSize(oldSize);
                 newComponent.setPreferredSize(oldSize);
                 splitPanelHorizontal.setRightComponent(newComponent);
-                enablePanel();
             }
             splitPanelHorizontal.setDividerLocation(dividerLocation);
         }

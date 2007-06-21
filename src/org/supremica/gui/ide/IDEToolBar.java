@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEToolBar
 //###########################################################################
-//# $Id: IDEToolBar.java,v 1.14 2007-06-21 11:16:23 robi Exp $
+//# $Id: IDEToolBar.java,v 1.15 2007-06-21 15:57:55 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -133,25 +133,29 @@ public class IDEToolBar
 		final EditorChangedEvent event = new ToolbarChangedEvent(this); 
         fireEditorChangedEvent(event);
     }
+
     
-    public void attach(Observer o)
+	//#######################################################################
+	//# Interface net.sourceforge.waters.gui.observer.Subject
+    public void attach(final Observer observer)
     {
-        //System.err.println("IDEToolBar attach");
-        mObservers.add(o);
+        mObservers.add(observer);
     }
-    
-    public void detach(Observer o)
+
+    public void detach(final Observer observer)
     {
-        //System.err.println("IDEToolBar detach");
-        mObservers.remove(o);
+        mObservers.remove(observer);
     }
-    
-    public void fireEditorChangedEvent(EditorChangedEvent e)
+
+    public void fireEditorChangedEvent(final EditorChangedEvent event)
     {
-        //System.err.println("IDEToolBar fireEditorChangedEvent size: " + mObservers.size());
-        for (Observer o : mObservers)
-        {
-            o.update(e);
+		// Just in case they try to register or deregister observers
+		// in response to the update ...
+		final Collection<Observer> copy = new LinkedList<Observer>(mObservers);
+        for (final Observer observer : copy) {
+            observer.update(event);
         }
+		ide.fireEditorChangedEvent(event);
     }
+
 }

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.39 2007-06-20 19:43:38 flordal Exp $
+//# $Id: IDEMenuBar.java,v 1.40 2007-06-21 15:57:55 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -13,20 +13,24 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
-import java.util.*;
+import java.util.Iterator;
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
-import net.sourceforge.waters.model.base.DocumentProxy;
 
+import net.sourceforge.waters.gui.actions.WatersUndoAction;
+import net.sourceforge.waters.gui.actions.WatersRedoAction;
+import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 
 import org.supremica.automata.templates.TemplateGroup;
 import org.supremica.automata.templates.TemplateItem;
 import org.supremica.gui.ExampleTemplates;
+import org.supremica.gui.ide.actions.Actions;
 
 
 public class IDEMenuBar
@@ -99,12 +103,13 @@ public class IDEMenuBar
         add(menu);
 
         // Edit
+		final Actions actions = ide.getActions();
         menu = new JMenu("Edit");
         menu.setMnemonic(KeyEvent.VK_E);
-        menu.add(ide.getActions().editorUndoAction.getMenuItem());
-        ide.getActions().editorUndoAction.setEnabled(false);
-        menu.add(ide.getActions().editorRedoAction.getMenuItem());
-        ide.getActions().editorRedoAction.setEnabled(false);
+		final Action undo = actions.getAction(WatersUndoAction.class);
+        menu.add(new JMenuItem(undo));
+		final Action redo = actions.getAction(WatersRedoAction.class);
+        menu.add(new JMenuItem(redo));
         menu.addSeparator();
         menu.add(ide.getActions().editorCutAction.getMenuItem());
         //menu.add(ide.getActions().editorCopyAsWMFAction.getMenuItem());

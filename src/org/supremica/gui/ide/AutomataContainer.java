@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   AutomataContainer
 //###########################################################################
-//# $Id: AutomataContainer.java,v 1.2 2007-06-21 15:47:42 flordal Exp $
+//# $Id: AutomataContainer.java,v 1.3 2007-06-21 15:57:55 robi Exp $
 //###########################################################################
 
 
@@ -22,7 +22,6 @@ public class AutomataContainer
     {
         super(ide, project);
         getAnalyzerPanel().addProject(project);
-        getAnalyzerPanel().enablePanel();
     }
     
     public Project getAutomata()

@@ -1,135 +1,160 @@
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Supremica/Waters IDE
+//# PACKAGE: org.supremica.gui.ide.actions
+//# CLASS:   Actions
+//###########################################################################
+//# $Id: Actions.java,v 1.46 2007-06-21 15:57:55 robi Exp $
+//###########################################################################
 
 package org.supremica.gui.ide.actions;
 
-import java.util.*;
+import java.util.List;
+import java.util.LinkedList;
 
-public class Actions
+import net.sourceforge.waters.gui.actions.WatersActionManager;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import org.supremica.gui.ide.IDE;
+
+
+public class Actions extends WatersActionManager
 {
-    /** The ide to which the actions in this class applies. */
-    private IDEActionInterface ide;
 
-    /** A list of all actions. This is needed because we would like to set
-     * the ideActionInterface automatically */
-    private List<IDEAction> allActions = new LinkedList<IDEAction>();
-
-    // General Actions
-    public IDEAction newAction = new NewAction(allActions);
-    public IDEAction openAction = new OpenAction(allActions);
-    public IDEAction closeAction = new CloseAction(allActions);
-    public IDEAction saveAction = new SaveAction(allActions);
-    public IDEAction saveAsAction = new SaveAsAction(allActions);
-    public IDEAction exitAction = new ExitAction(allActions);
-    
-    // Printing Actions
-    public IDEAction editorPrintAction = new EditorPrintAction(allActions);
-    public IDEAction editorSavePDFAction = new EditorSavePDFAction(allActions);
-    public IDEAction editorSavePostscriptAction = new EditorSavePostscriptAction(allActions);
-    public IDEAction editorSaveEncapsulatedPostscriptAction = new EditorSaveEncapsulatedPostscriptAction(allActions);
-
-    // Editor Actions
-    public IDEAction editorCopyAction = new EditorCopyAction(allActions);
-    public IDEAction editorCutAction = new EditorCutAction(allActions);
-    public IDEAction editorPasteAction = new EditorPasteAction(allActions);
-    public IDEAction editorCopyAsWMFAction = new EditorCopyAsWMFAction(allActions);
-    public IDEAction editorUndoAction = new EditorUndoAction(allActions);
-    public IDEAction editorRedoAction = new EditorRedoAction(allActions);
-    public IDEAction editorSelectAction = new EditorSelectAction(allActions);
-    public IDEAction editorAddNodeAction = new EditorAddNodeAction(allActions);
-    public IDEAction editorAddNodeGroupAction = new EditorAddNodeGroupAction(allActions);
-    public IDEAction editorAddEdgeAction = new EditorAddEdgeAction(allActions);
-    public IDEAction editorAddComponentEventAction = new EditorAddComponentEventAction(allActions);
-    public IDEAction editorAddModuleEventAction = new EditorAddModuleEventAction(allActions);
-    public IDEAction editorOptionsAction = new EditorOptionsAction(allActions);
-    public IDEAction editorAddSimpleComponentAction = new EditorAddSimpleComponentAction(allActions);
-    public IDEAction editorAddForeachComponentAction = new EditorAddForeachComponentAction(allActions);
-    public IDEAction editorAddInstanceAction = new EditorAddInstanceAction(allActions);
-    public IDEAction editorAddBindingAction = new EditorAddBindingAction(allActions);
-    public IDEAction editorRunEmbedderAction = new EditorRunEmbedderAction(allActions);
-    public IDEAction editorStopEmbedderAction = new EditorStopEmbedderAction(allActions);
-
-    // Analyzer Options
-    public IDEAction analyzerOptionsAction = new AnalyzerOptionsAction(allActions);
-
-    // Analyzer Actions
-    public IDEAction analyzerStatisticsAction = new AnalyzerStatisticsAction(allActions);
-    public IDEAction analyzerExploreStatesAction = new AnalyzerExploreStatesAction(allActions);
-    public IDEAction analyzerFindStatesAction = new AnalyzerFindStatesAction(allActions);
-
-    // Analyzer View Actions
-    public IDEAction analyzerViewAutomatonAction = new AnalyzerViewAutomatonAction(allActions);
-    public IDEAction analyzerViewAlphabetAction = new AnalyzerViewAlphabetAction(allActions);
-    public IDEAction analyzerViewStatesAction = new AnalyzerViewStatesAction(allActions);
-    public IDEAction analyzerViewModularStructureAction = new AnalyzerViewModularStructureAction(allActions);
-
-
-    public IDEAction analyzerWorkbenchAction = new WorkbenchAction(allActions);
-    public IDEAction analyzerSynchronizerAction = new AnalyzerSynchronizerAction(allActions);
-    public IDEAction analyzerSynthesizerAction = new AnalyzerSynthesizerAction(allActions);
-    public IDEAction analyzerVerifierAction = new AnalyzerVerifierAction(allActions);
-    public IDEAction analyzerSendToEditorAction = new AnalyzerSendToEditorAction(allActions);
-    public IDEAction analyzerDeleteSelectedAction = new AnalyzerDeleteSelectedAutomataAction(allActions);
-    public IDEAction analyzerDeleteAllAction = new AnalyzerDeleteAllAutomataAction(allActions);
-    public IDEAction analyzerMinimizeAction = new AnalyzerMinimizeAction(allActions);
-    public IDEAction analyzerPurgeAction = new AnalyzerPurgeAction(allActions);
-    public IDEAction analyzerEventHiderAction = new AnalyzerEventHiderAction(allActions);
-    public IDEAction analyzerRenameAction = new AnalyzerRenameAction(allActions);
-    public IDEAction analyzerExportAction = new AnalyzerExportAction(allActions);
-    public IDEAction analyzerPlantifyAction = new AnalyzerPlantifyAction(allActions);    
-
-    // Analyzer experimental
-    public IDEAction analyzerExperimentAction = new AnalyzerExperimentAction(allActions);    
-    public IDEAction analyzerPredictSizeAction = new AnalyzerPredictSizeAction(allActions);    
-    public IDEAction analyzerCountReachableAction = new AnalyzerCountReachableAction(allActions);
-    public IDEAction analyzerScheduleAction = new AnalyzerScheduleAction(allActions);
-    public IDEAction simulatorLaunchAnimatorAction = new SimulatorLaunchAnimatorAction(allActions);
-
-    // Examples Actions
-    public IDEAction toolsTestCasesAction = new ToolsTestCasesAction(allActions);
-
-    // Help Actions
-    public IDEAction helpWebAction = new HelpWebAction(allActions);
-    public IDEAction helpAboutAction = new HelpAboutAction(allActions);
-
-    /**
-     * Creates a new <code>Actions</code> instance.
-     *
-     * @param ide an <code>IDEActionInterface</code> value
-     */
-    public Actions(IDEActionInterface ide)
+	//#######################################################################
+	//# Constructor
+    public Actions(final IDE ide)
     {
-        this.ide = ide;
-
-        for (IDEAction action : allActions)
-        {
+		super(ide);
+		mIDE = ide;
+        for (final IDEAction action : mIDEActions) {
             action.setIDEActionInterface(ide);
         }
     }
-    
+
+
+	//#######################################################################
+	//# Interface net.sourceforge.waters.gui.observer.Observer
+	public void update(final EditorChangedEvent event)
+	{
+		super.update(event);
+		switch (event.getKind()) {
+		case MAINPANEL_SWITCH:
+			updateEnabledStatus();
+			break;
+		default:
+			break;
+		}
+	}
+
+
+
+	//#######################################################################
+	//# Enabling and Disabling
     /**
-     * Enable/disable all actions that have been flagged as "editor actions".
+     * Enable/disable all actions that have been flagged as editor-only or
+	 * anlyzer-only.
      */
-    public void enableEditorActions(boolean enable)
-    {
-        for (IDEAction action : allActions)
-        {
-            if (action.getEditorActiveRequired())
-            {
-                action.setEnabled(enable);
+	private void updateEnabledStatus()
+	{
+		final boolean editorActive = mIDE.editorActive();
+		final boolean analyzerActive = mIDE.analyzerActive();
+        for (final IDEAction action : mIDEActions) {
+            if (action.getEditorActiveRequired()) {
+                action.setEnabled(editorActive);
+            } else if (action.getAnalyzerActiveRequired()) {
+                action.setEnabled(analyzerActive);
             }
         }
     }
 
+
+	//#######################################################################
+	//# Data Members
+	/**
+	 * The IDE that uses these actions.
+	 */
+	private final IDE mIDE;
+
     /**
-     * Enable/disable all actions that have been flagged as "analyzer actions".
-     */
-    public void enableAnalyzerActions(boolean enable)
-    {
-        for (IDEAction action : allActions)
-        {
-            if (action.getAnalyzerActiveRequired())
-            {
-                action.setEnabled(enable);
-            }
-        }
-    }
+	 * The list of all actions. This is needed because we would like to set
+     * the ideActionInterface automatically
+	 */
+    private List<IDEAction> mIDEActions = new LinkedList<IDEAction>();
+
+    // General Actions
+    public IDEAction newAction = new NewAction(mIDEActions);
+    public IDEAction openAction = new OpenAction(mIDEActions);
+    public IDEAction closeAction = new CloseAction(mIDEActions);
+    public IDEAction saveAction = new SaveAction(mIDEActions);
+    public IDEAction saveAsAction = new SaveAsAction(mIDEActions);
+    public IDEAction exitAction = new ExitAction(mIDEActions);
+    
+    // Printing Actions
+    public IDEAction editorPrintAction = new EditorPrintAction(mIDEActions);
+    public IDEAction editorSavePDFAction = new EditorSavePDFAction(mIDEActions);
+    public IDEAction editorSavePostscriptAction = new EditorSavePostscriptAction(mIDEActions);
+    public IDEAction editorSaveEncapsulatedPostscriptAction = new EditorSaveEncapsulatedPostscriptAction(mIDEActions);
+
+    // Editor Actions
+    public IDEAction editorCopyAction = new EditorCopyAction(mIDEActions);
+    public IDEAction editorCutAction = new EditorCutAction(mIDEActions);
+    public IDEAction editorPasteAction = new EditorPasteAction(mIDEActions);
+    public IDEAction editorCopyAsWMFAction = new EditorCopyAsWMFAction(mIDEActions);
+    public IDEAction editorSelectAction = new EditorSelectAction(mIDEActions);
+    public IDEAction editorAddNodeAction = new EditorAddNodeAction(mIDEActions);
+    public IDEAction editorAddNodeGroupAction = new EditorAddNodeGroupAction(mIDEActions);
+    public IDEAction editorAddEdgeAction = new EditorAddEdgeAction(mIDEActions);
+    public IDEAction editorAddComponentEventAction = new EditorAddComponentEventAction(mIDEActions);
+    public IDEAction editorAddModuleEventAction = new EditorAddModuleEventAction(mIDEActions);
+    public IDEAction editorOptionsAction = new EditorOptionsAction(mIDEActions);
+    public IDEAction editorAddSimpleComponentAction = new EditorAddSimpleComponentAction(mIDEActions);
+    public IDEAction editorAddForeachComponentAction = new EditorAddForeachComponentAction(mIDEActions);
+    public IDEAction editorAddInstanceAction = new EditorAddInstanceAction(mIDEActions);
+    public IDEAction editorAddBindingAction = new EditorAddBindingAction(mIDEActions);
+    public IDEAction editorRunEmbedderAction = new EditorRunEmbedderAction(mIDEActions);
+    public IDEAction editorStopEmbedderAction = new EditorStopEmbedderAction(mIDEActions);
+
+    // Analyzer Options
+    public IDEAction analyzerOptionsAction = new AnalyzerOptionsAction(mIDEActions);
+
+    // Analyzer Actions
+    public IDEAction analyzerStatisticsAction = new AnalyzerStatisticsAction(mIDEActions);
+    public IDEAction analyzerExploreStatesAction = new AnalyzerExploreStatesAction(mIDEActions);
+    public IDEAction analyzerFindStatesAction = new AnalyzerFindStatesAction(mIDEActions);
+
+    // Analyzer View Actions
+    public IDEAction analyzerViewAutomatonAction = new AnalyzerViewAutomatonAction(mIDEActions);
+    public IDEAction analyzerViewAlphabetAction = new AnalyzerViewAlphabetAction(mIDEActions);
+    public IDEAction analyzerViewStatesAction = new AnalyzerViewStatesAction(mIDEActions);
+    public IDEAction analyzerViewModularStructureAction = new AnalyzerViewModularStructureAction(mIDEActions);
+
+
+    public IDEAction analyzerWorkbenchAction = new WorkbenchAction(mIDEActions);
+    public IDEAction analyzerSynchronizerAction = new AnalyzerSynchronizerAction(mIDEActions);
+    public IDEAction analyzerSynthesizerAction = new AnalyzerSynthesizerAction(mIDEActions);
+    public IDEAction analyzerVerifierAction = new AnalyzerVerifierAction(mIDEActions);
+    public IDEAction analyzerSendToEditorAction = new AnalyzerSendToEditorAction(mIDEActions);
+    public IDEAction analyzerDeleteSelectedAction = new AnalyzerDeleteSelectedAutomataAction(mIDEActions);
+    public IDEAction analyzerDeleteAllAction = new AnalyzerDeleteAllAutomataAction(mIDEActions);
+    public IDEAction analyzerMinimizeAction = new AnalyzerMinimizeAction(mIDEActions);
+    public IDEAction analyzerPurgeAction = new AnalyzerPurgeAction(mIDEActions);
+    public IDEAction analyzerEventHiderAction = new AnalyzerEventHiderAction(mIDEActions);
+    public IDEAction analyzerRenameAction = new AnalyzerRenameAction(mIDEActions);
+    public IDEAction analyzerExportAction = new AnalyzerExportAction(mIDEActions);
+    public IDEAction analyzerPlantifyAction = new AnalyzerPlantifyAction(mIDEActions);    
+
+    // Analyzer experimental
+    public IDEAction analyzerExperimentAction = new AnalyzerExperimentAction(mIDEActions);    
+    public IDEAction analyzerPredictSizeAction = new AnalyzerPredictSizeAction(mIDEActions);    
+    public IDEAction analyzerCountReachableAction = new AnalyzerCountReachableAction(mIDEActions);
+    public IDEAction analyzerScheduleAction = new AnalyzerScheduleAction(mIDEActions);
+    public IDEAction simulatorLaunchAnimatorAction = new SimulatorLaunchAnimatorAction(mIDEActions);
+
+    // Examples Actions
+    public IDEAction toolsTestCasesAction = new ToolsTestCasesAction(mIDEActions);
+
+    // Help Actions
+    public IDEAction helpWebAction = new HelpWebAction(mIDEActions);
+    public IDEAction helpAboutAction = new HelpAboutAction(mIDEActions);
+
 }

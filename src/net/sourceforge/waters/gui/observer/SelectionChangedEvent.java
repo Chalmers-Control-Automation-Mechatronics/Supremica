@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.observer
 //# CLASS:   SelectionChangedEvent
 //###########################################################################
-//# $Id: SelectionChangedEvent.java,v 1.1 2007-06-21 11:16:23 robi Exp $
+//# $Id: SelectionChangedEvent.java,v 1.2 2007-06-21 15:57:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.observer;
@@ -36,9 +36,9 @@ public class SelectionChangedEvent
 	
   //#########################################################################
   //# Simple Access
-  public EditorChangedEvent.Type getType()
+  public EditorChangedEvent.Kind getKind()
   {
-    return EditorChangedEvent.Type.SELECTION_CHANGED;
+    return EditorChangedEvent.Kind.SELECTION_CHANGED;
   }
 
 }

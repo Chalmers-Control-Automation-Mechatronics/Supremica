@@ -4,58 +4,63 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.84 2007-06-21 15:47:42 flordal Exp $
+//# $Id: IDE.java,v 1.85 2007-06-21 15:57:55 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
 
-import javax.xml.bind.JAXBException;
-import net.sourceforge.waters.model.base.DocumentProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
-import net.sourceforge.waters.model.module.ModuleProxy;
-import net.sourceforge.waters.valid.ValidUnmarshaller;
-import org.supremica.util.ProcessCommandLineArguments;
-import org.supremica.gui.ide.actions.IDEAction;
-import org.supremica.gui.ide.actions.IDEActionInterface;
-import net.sourceforge.waters.gui.EditorWindowInterface;
-
-
-import javax.swing.*;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
 import java.awt.BorderLayout;
 import java.awt.event.WindowEvent;
-import java.util.*;
 import java.io.File;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.xml.bind.JAXBException;
+
+import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.actions.WatersUndoAction;
+import net.sourceforge.waters.gui.actions.WatersRedoAction;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.observer.MainPanelSwitchEvent;
+import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.gui.observer.Subject;
+import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.expr.OperatorTable;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
+import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import org.supremica.gui.Utility;
-import org.supremica.gui.InterfaceManager;
-import org.supremica.gui.ide.actions.Actions;
-import org.supremica.gui.ide.actions.OpenAction;
-import org.supremica.properties.Config;
-import org.supremica.automata.Automata;
-import org.supremica.automata.Project;
+import net.sourceforge.waters.valid.ValidUnmarshaller;
 
+import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.log.*;
-import org.supremica.Version;
+import org.supremica.automata.IO.ADSUnmarshaller;
 import org.supremica.automata.IO.HISCUnmarshaller;
 import org.supremica.automata.IO.SupremicaUnmarshaller;
 import org.supremica.automata.IO.UMDESUnmarshaller;
-import org.supremica.automata.IO.ADSUnmarshaller;
+import org.supremica.automata.Project;
+import org.supremica.gui.ide.actions.Actions;
+import org.supremica.gui.ide.actions.IDEAction;
+import org.supremica.gui.ide.actions.IDEActionInterface;
+import org.supremica.gui.ide.actions.OpenAction;
+import org.supremica.gui.InterfaceManager;
+import org.supremica.gui.Utility;
+import org.supremica.log.*;
+import org.supremica.properties.Config;
+import org.supremica.util.ProcessCommandLineArguments;
+import org.supremica.Version;
 import org.xml.sax.SAXException;
 
 public class IDE
     extends JFrame
-    implements ChangeListener, IDEActionInterface, IDEReportInterface
+    implements ChangeListener, IDEActionInterface, IDEReportInterface, Subject
 {
     private static final long serialVersionUID = 1L;
     
@@ -79,8 +84,10 @@ public class IDE
     private final ProxyUnmarshaller<ModuleProxy> adsUnmarshaller;
     private final DocumentManager mDocumentManager;
     
-    private Actions theActions;
-    
+    // Actions
+    private final Collection<Observer> mObservers;
+    private final Actions theActions;
+
     private JPanel contentPanel;
     private BorderLayout contentLayout;
     
@@ -98,7 +105,7 @@ public class IDE
     private static final String IDENAME = "Supremica";
     
     public IDE()
-    throws JAXBException, SAXException
+		throws JAXBException, SAXException
     {
         Utility.setupFrame(this, IDEDimensions.mainWindowPreferredSize);
         //setTitle(getName());
@@ -133,6 +140,7 @@ public class IDE
         mDocumentManager.registerUnmarshaller(adsUnmarshaller);
         
         // Instantiate all actions
+		mObservers = new LinkedList<Observer>();
         theActions = new Actions(this);
         
         // Create GUI
@@ -345,6 +353,9 @@ public class IDE
         ideToolBar.add(getActions().saveAsAction);
         ideToolBar.add(getActions().editorPrintAction);
         ideToolBar.addSeparator();
+		ideToolBar.add(getActions().getAction(WatersUndoAction.class));
+		ideToolBar.add(getActions().getAction(WatersRedoAction.class));
+        ideToolBar.addSeparator();
         ideToolBar.add(getActions().editorStopEmbedderAction);
         
         getActiveDocumentContainer().getAnalyzerPanel().addToolBarEntries(ideToolBar);
@@ -369,28 +380,52 @@ public class IDE
             getActions().exitAction.doAction();
         }
     }
+
     
-    /**
-     * ChangeListener interface
-     */
-    public void stateChanged(ChangeEvent e)
+	//#######################################################################
+	//# Interface javax.swing.event.ChangeListener
+    public void stateChanged(final ChangeEvent event)
     {
         getActiveDocumentContainer().updateActiveTab(tabPanel);
-        
-        if (editorActive())
-        {
-            menuBar.getEditorMenu().setEnabled(true);//.enable();
-            menuBar.getAnalyzerMenu().setEnabled(false);//.disable();
+        if (editorActive()) {
+            menuBar.getEditorMenu().setEnabled(true);
+            menuBar.getAnalyzerMenu().setEnabled(false);
+        } else if (analyzerActive()) {
+            menuBar.getEditorMenu().setEnabled(false);
+            menuBar.getAnalyzerMenu().setEnabled(true);
         }
-        else if (analyzerActive())
-        {
-            menuBar.getEditorMenu().setEnabled(false);//.disable();
-            menuBar.getAnalyzerMenu().setEnabled(true);//.enable();
+
+		final Object source = event.getSource();
+		final EditorChangedEvent eevent = new MainPanelSwitchEvent(source);
+		fireEditorChangedEvent(eevent);
+    }
+
+
+	//#######################################################################
+	//# Interface net.sourceforge.waters.gui.observer.Subject
+    public void attach(final Observer observer)
+    {
+        mObservers.add(observer);
+    }
+
+    public void detach(final Observer observer)
+    {
+        mObservers.remove(observer);
+    }
+
+    public void fireEditorChangedEvent(final EditorChangedEvent event)
+    {
+		// Just in case they try to register or deregister observers
+		// in response to the update ...
+		final Collection<Observer> copy = new LinkedList<Observer>(mObservers);
+        for (final Observer observer : copy) {
+            observer.update(event);
         }
-        
-        repaint();
     }
     
+
+	//#######################################################################
+	//#
     public void setEditorMode(IDEAction theAction)
     {
         ideToolBar.setCommand((String)theAction.getValue(Action.ACTION_COMMAND_KEY));

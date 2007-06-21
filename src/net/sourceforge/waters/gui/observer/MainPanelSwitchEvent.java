@@ -2,33 +2,30 @@
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: net.sourceforge.waters.gui.observer
-//# CLASS:   UndoRedoEvent
+//# CLASS:   MainPanelSwitchdEvent
 //###########################################################################
-//# $Id: UndoRedoEvent.java,v 1.3 2007-06-21 15:57:55 robi Exp $
+//# $Id: MainPanelSwitchEvent.java,v 1.1 2007-06-21 15:57:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.observer;
 
-import net.sourceforge.waters.gui.command.UndoInterface;
-
 
 /**
- * <P>A notification sent by the undo manager.</P>
+ * A notification sent by the IDE to indicate a switch of main panels.
+ * This event is sent when the user has switched between the editor and
+ * analyzer panels. This event is also produced when a new file is opened
+ * or activated.
  *
- * <P>This notification is sent to notify observers of a change of the
- * the undo manager's state, caused by invoking issuing an 'undo' or
- * 'redo' action.</P>
- *
- * @author Simon Ware, Robi Malik
+ * @author Robi Malik
  */
 
-public class UndoRedoEvent
+public class MainPanelSwitchEvent
   extends EditorChangedEvent
 {
 
   //#########################################################################
   //# Constructors
-  public UndoRedoEvent(final UndoInterface source)
+  public MainPanelSwitchEvent(final Object source)
   {
     super(source);
   }
@@ -36,14 +33,9 @@ public class UndoRedoEvent
 	
   //#########################################################################
   //# Simple Access
-  public UndoInterface getSource()
-  {
-    return (UndoInterface) super.getSource();
-  }
-
   public EditorChangedEvent.Kind getKind()
   {
-    return EditorChangedEvent.Kind.UNDOREDO;
+    return EditorChangedEvent.Kind.MAINPANEL_SWITCH;
   }
 
 }

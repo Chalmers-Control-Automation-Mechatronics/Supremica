@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorPanel
 //###########################################################################
-//# $Id: EditorPanel.java,v 1.56 2007-06-20 19:43:38 flordal Exp $
+//# $Id: EditorPanel.java,v 1.57 2007-06-21 15:57:55 robi Exp $
 //###########################################################################
 
 
@@ -147,16 +147,6 @@ public class EditorPanel
         toolBar.add(getActions().editorAddNodeGroupAction, editorButtonGroup);
         toolBar.add(getActions().editorAddEdgeAction, editorButtonGroup);
 //		toolBar.add(getActions().editorAddEventAction, editorButtonGroup);
-    }
-    
-    public void disablePanel()
-    {
-        getActions().enableEditorActions(false);
-    }
-    
-    public void enablePanel()
-    {
-        getActions().enableEditorActions(true);
     }
     
     public EditorWindowInterface getActiveEditorWindowInterface()

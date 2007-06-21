@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.observer
 //# CLASS:   ToolbarChangedEvent
 //###########################################################################
-//# $Id: ToolbarChangedEvent.java,v 1.2 2007-06-21 11:16:23 robi Exp $
+//# $Id: ToolbarChangedEvent.java,v 1.3 2007-06-21 15:57:55 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.observer;
@@ -44,9 +44,9 @@ public class ToolbarChangedEvent
     return (ControlledToolbar) super.getSource();
   }
 
-  public EditorChangedEvent.Type getType()
+  public EditorChangedEvent.Kind getKind()
   {
-    return EditorChangedEvent.Type.TOOL_SWITCH;
+    return EditorChangedEvent.Kind.TOOL_SWITCH;
   }
 
 }
