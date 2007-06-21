@@ -1,21 +1,37 @@
-
+//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
 //###########################################################################
-//# PROJECT: Waters
-//# PACKAGE: waters.gui
+//# PROJECT: Waters GUI
+//# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   WmodFileFilter
 //###########################################################################
-//# $Id: WmodFileFilter.java,v 1.6 2007-06-21 09:51:56 flordal Exp $
+//# $Id: WmodFileFilter.java,v 1.7 2007-06-21 20:56:53 robi Exp $
 //###########################################################################
+
+
 package net.sourceforge.waters.gui;
 
 import java.io.File;
-import javax.swing.filechooser.*;
+import javax.swing.filechooser.FileFilter;
+
 
 public class WmodFileFilter
     extends FileFilter
 {
-    public static final String WMOD = "wmod";
-    
+
+	//#######################################################################
+	//# Singleton Pattern
+	public static WmodFileFilter getInstance()
+	{
+		return theInstance;
+	}
+
+	private WmodFileFilter()
+	{
+	}
+
+
+	//#######################################################################
+	//# Overrides for Base Class javax.swing.filechooser.FileFilter
     public static String getExtension(File f)
     {
         String ext = null;
@@ -57,4 +73,12 @@ public class WmodFileFilter
     {
         return "Waters Module Files";
     }
+
+
+	//#######################################################################
+	//# Class Constants
+    public static final String WMOD = "wmod";
+
+    private static final WmodFileFilter theInstance = new WmodFileFilter();
+    
 }

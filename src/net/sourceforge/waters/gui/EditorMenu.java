@@ -4,34 +4,34 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorMenu
 //###########################################################################
-//# $Id: EditorMenu.java,v 1.42 2007-06-21 15:57:55 robi Exp $
+//# $Id: EditorMenu.java,v 1.43 2007-06-21 20:56:53 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.event.*;
+import java.awt.Toolkit;
+import java.util.ArrayList;
+import java.util.Collection;
 import javax.swing.*;
 
+import net.sourceforge.waters.gui.command.Command;
+import net.sourceforge.waters.gui.command.CopyGraphCommand;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
 import net.sourceforge.waters.gui.transfer.GraphContainer;
 import net.sourceforge.waters.gui.transfer.ObjectTransfer;
-import net.sourceforge.waters.subject.module.GraphSubject;
-import net.sourceforge.waters.subject.base.ProxySubject;
-import net.sourceforge.waters.subject.base.IndexedSetSubject;
-import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.base.IndexedHashSetSubject;
+import net.sourceforge.waters.subject.base.IndexedSetSubject;
+import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
-import java.util.Collection;
-import java.util.ArrayList;
-import java.awt.Toolkit;
-import net.sourceforge.waters.gui.command.Command;
-import net.sourceforge.waters.gui.command.CopyGraphCommand;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Clipboard;
+import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.NodeSubject;
 
 
 /**
@@ -59,8 +59,8 @@ public class EditorMenu
 	public final JMenuItem editExportPostscriptMenu = null;
 	public final JMenuItem editExportPDFMenu;
 	public final JMenuItem mEmbedder;
-  public final JMenuItem mCopy;
-  public final JMenuItem mPaste;
+	public final JMenuItem mCopy;
+	public final JMenuItem mPaste;
 	EditorWindowInterface root;
 	ControlledSurface surface;
 	JFileChooser fileChooser;
@@ -222,7 +222,7 @@ public class EditorMenu
 		menu.add(menuItem);
 
 		fileChooser = new JFileChooser();
-		fileChooser.addChoosableFileFilter(new WmodFileFilter());
+		fileChooser.addChoosableFileFilter(WmodFileFilter.getInstance());
 	}
 
 	public void actionPerformed(ActionEvent e)

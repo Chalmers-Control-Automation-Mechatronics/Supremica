@@ -4,81 +4,39 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   WatersAction
 //###########################################################################
-//# $Id: WatersAction.java,v 1.1 2007-06-21 15:57:55 robi Exp $
+//# $Id: WatersAction.java,v 1.2 2007-06-21 20:56:53 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui.actions;
 
-import javax.swing.AbstractAction;
-
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.UndoInterface;
-import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import org.supremica.gui.ide.DocumentContainer;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
 
+/**
+ * The class of all actions that can be applied to a module in the editor
+ * panel. This is a more convenient subclass of {@link IDEAction} for
+ * actions that expect the presence of an editor panel and a module. It
+ * provides some support for access to the editor panel, and some more
+ * specific enablement conditions.
+ *
+ * @author Robi Malik
+ */
+
 public abstract class WatersAction
-  extends AbstractAction
-  implements Observer
+  extends IDEAction
 {
 
   //#########################################################################
   //# Constructors
-  public WatersAction(final IDE ide)
+  protected WatersAction(final IDE ide)
   {
-    mIDE = ide;
-    setEnabled(false);
-  }
-
-
-  //#########################################################################
-  //# Accessing the IDE
-  public IDE getIDE()
-  {
-    return mIDE;
-  }
-
-  public ModuleWindowInterface getActiveModuleWindowInterface()
-  {
-    if (!mIDE.editorActive()) {
-      return null;
-    }
-    final DocumentContainer container = mIDE.getActiveDocumentContainer();
-    if (container == null || !(container instanceof ModuleContainer)) {
-      return null;
-    }
-    final ModuleContainer mcontainer = (ModuleContainer) container;
-    return mcontainer.getEditorPanel();    
-  }
-
-  public UndoInterface getActiveUndoInterface()
-  {
-    if (!mIDE.editorActive()) {
-      return null;
-    }
-    final DocumentContainer container = mIDE.getActiveDocumentContainer();
-    if (container == null || !(container instanceof ModuleContainer)) {
-      return null;
-    }
-    return (ModuleContainer) container;
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.gui.observer.Observer
-  public void update(final EditorChangedEvent event)
-  {
-    switch (event.getKind()) {
-    case MAINPANEL_SWITCH:
-      updateEnabledStatus();
-      break;
-    default:
-      break;
-    }
+    super(ide);
   }
 
 
@@ -94,7 +52,43 @@ public abstract class WatersAction
 
 
   //#########################################################################
-  //# Data Members
-  private final IDE mIDE;
+  //# Accessing the IDE
+  /**
+   * Retrieves a references to the active editor panel.
+   * @return  A module window interface to access the active editor panel,
+   *          or <CODE>null</CODE> if no editor panel is currently active.
+   */
+  ModuleWindowInterface getActiveModuleWindowInterface()
+  {
+    final IDE ide = getIDE();
+    if (!ide.editorActive()) {
+      return null;
+    }
+    final DocumentContainer container = ide.getActiveDocumentContainer();
+    if (container == null || !(container instanceof ModuleContainer)) {
+      return null;
+    }
+    final ModuleContainer mcontainer = (ModuleContainer) container;
+    return mcontainer.getEditorPanel();    
+  }
+
+  /**
+   * Retrieves a references to undo interface for the currently edited module.
+   * @return  An undo interface that can be used to send commands to the
+   *          current module, or <CODE>null</CODE> if no editor panel is
+   *          currently active.
+   */
+  UndoInterface getActiveUndoInterface()
+  {
+    final IDE ide = getIDE();
+    if (!ide.editorActive()) {
+      return null;
+    }
+    final DocumentContainer container = ide.getActiveDocumentContainer();
+    if (container == null || !(container instanceof ModuleContainer)) {
+      return null;
+    }
+    return (ModuleContainer) container;
+  }
 
 }

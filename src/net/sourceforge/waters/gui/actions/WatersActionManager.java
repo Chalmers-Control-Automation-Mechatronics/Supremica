@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   WatersActionManager
 //###########################################################################
-//# $Id: WatersActionManager.java,v 1.1 2007-06-21 15:57:55 robi Exp $
+//# $Id: WatersActionManager.java,v 1.2 2007-06-21 20:56:53 robi Exp $
 //###########################################################################
 
 
@@ -15,6 +15,7 @@ import java.util.Map;
 
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+
 import org.supremica.gui.ide.IDE;
 
 
@@ -26,7 +27,7 @@ public abstract class WatersActionManager
   //# Constructor
   public WatersActionManager(final IDE ide)
   {
-    mActionMap = new HashMap<Class<? extends WatersAction>, WatersAction>();
+    mActionMap = new HashMap<Class<? extends IDEAction>, IDEAction>();
     addAction(new WatersUndoAction(ide));
     addAction(new WatersRedoAction(ide));
     ide.attach(this);
@@ -35,7 +36,7 @@ public abstract class WatersActionManager
 
   //#########################################################################
   //# Access to Actions
-  public WatersAction getAction(final Class<? extends WatersAction> clazz)
+  public IDEAction getAction(final Class<? extends IDEAction> clazz)
   {
     return mActionMap.get(clazz);
   }
@@ -45,7 +46,7 @@ public abstract class WatersActionManager
   //# Interface net.sourceforge.waters.gui.observer.Observer
   public void update(final EditorChangedEvent event)
   {
-    for (final WatersAction action : mActionMap.values()) {
+    for (final IDEAction action : mActionMap.values()) {
       action.update(event);
     }
   }
@@ -53,15 +54,15 @@ public abstract class WatersActionManager
 
   //#########################################################################
   //# Initialization
-  private void addAction(final WatersAction action)
+  protected void addAction(final IDEAction action)
   {
-    final Class<? extends WatersAction> clazz = action.getClass();
+    final Class<? extends IDEAction> clazz = action.getClass();
     mActionMap.put(clazz, action);
   }
 
 
   //#######################################################################
   //# Data Members
-  private final Map<Class<? extends WatersAction>, WatersAction> mActionMap;
+  private final Map<Class<? extends IDEAction>, IDEAction> mActionMap;
 
 }

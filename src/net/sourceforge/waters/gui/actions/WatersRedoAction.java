@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   WatersRedoAction
 //###########################################################################
-//# $Id: WatersRedoAction.java,v 1.1 2007-06-21 15:57:55 robi Exp $
+//# $Id: WatersRedoAction.java,v 1.2 2007-06-21 20:56:53 robi Exp $
 //###########################################################################
 
 
@@ -27,7 +27,7 @@ public class WatersRedoAction
 
   //#########################################################################
   //# Constructor
-  public WatersRedoAction(final IDE ide)
+  WatersRedoAction(final IDE ide)
   {
     super(ide);
     putValue(Action.NAME, "Redo");

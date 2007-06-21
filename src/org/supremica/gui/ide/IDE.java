@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.85 2007-06-21 15:57:55 robi Exp $
+//# $Id: IDE.java,v 1.86 2007-06-21 20:56:53 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -50,6 +50,7 @@ import org.supremica.gui.ide.actions.Actions;
 import org.supremica.gui.ide.actions.IDEAction;
 import org.supremica.gui.ide.actions.IDEActionInterface;
 import org.supremica.gui.ide.actions.OpenAction;
+import org.supremica.gui.ide.actions.SaveAction;
 import org.supremica.gui.InterfaceManager;
 import org.supremica.gui.Utility;
 import org.supremica.log.*;
@@ -349,8 +350,7 @@ public class IDE
         // Set standard actions
         ideToolBar.add(getActions().newAction);
         ideToolBar.add(getActions().openAction);
-        //ideToolBar.add(getActions().saveAction);
-        ideToolBar.add(getActions().saveAsAction);
+        ideToolBar.add(getActions().getAction(SaveAction.class));
         ideToolBar.add(getActions().editorPrintAction);
         ideToolBar.addSeparator();
 		ideToolBar.add(getActions().getAction(WatersUndoAction.class));

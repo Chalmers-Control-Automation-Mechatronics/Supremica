@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.40 2007-06-21 15:57:55 robi Exp $
+//# $Id: IDEMenuBar.java,v 1.41 2007-06-21 20:56:53 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -31,6 +31,8 @@ import org.supremica.automata.templates.TemplateGroup;
 import org.supremica.automata.templates.TemplateItem;
 import org.supremica.gui.ExampleTemplates;
 import org.supremica.gui.ide.actions.Actions;
+import org.supremica.gui.ide.actions.SaveAction;
+import org.supremica.gui.ide.actions.SaveAsAction;
 
 
 public class IDEMenuBar
@@ -83,17 +85,19 @@ public class IDEMenuBar
 
     private void initMenubar()
     {
+		final Actions actions = ide.getActions();
+
         // File
         JMenu menu = new JMenu("File");
         menu.setMnemonic(KeyEvent.VK_F);
         menu.add(ide.getActions().newAction.getMenuItem());
         menu.add(ide.getActions().openAction.getMenuItem());
+		final Action save = actions.getAction(SaveAction.class);
+        menu.add(new JMenuItem(save));
+		final Action saveas = actions.getAction(SaveAsAction.class);
+        menu.add(new JMenuItem(saveas));
         menu.add(ide.getActions().closeAction.getMenuItem());
         menu.addSeparator();
-        //menu.add(ide.getActions().saveAction.getMenuItem());
-        menu.add(ide.getActions().saveAsAction.getMenuItem());
-        menu.addSeparator();
-        //		menu.add(ide.getActions().importAction));
         menu.add(ide.getActions().editorPrintAction.getMenuItem());
         menu.add(ide.getActions().editorSavePostscriptAction.getMenuItem());
         menu.add(ide.getActions().editorSaveEncapsulatedPostscriptAction.getMenuItem());
@@ -103,7 +107,6 @@ public class IDEMenuBar
         add(menu);
 
         // Edit
-		final Actions actions = ide.getActions();
         menu = new JMenu("Edit");
         menu.setMnemonic(KeyEvent.VK_E);
 		final Action undo = actions.getAction(WatersUndoAction.class);
