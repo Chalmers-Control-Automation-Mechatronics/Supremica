@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   SaveAction
 //###########################################################################
-//# $Id: SaveAsAction.java,v 1.4 2007-06-21 11:03:54 flordal Exp $
+//# $Id: SaveAsAction.java,v 1.5 2007-06-21 11:21:50 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -21,15 +21,19 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.gui.*;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.marshaller.WatersMarshalException;
+import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import org.supremica.automata.Automata;
 import org.supremica.automata.IO.AutomataToXML;
+import org.supremica.automata.IO.SupremicaUnmarshaller;
 import org.supremica.gui.SupremicaXMLFileFilter;
-import org.supremica.gui.ide.AutomataContainer;
 
 import org.supremica.gui.ide.IDE;
-import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.log.*;
 
 public class SaveAsAction
@@ -79,7 +83,14 @@ public class SaveAsAction
                 {
                     file = new File(file.getPath() + "." + SupremicaXMLFileFilter.SUPXML);
                 }
-                saveSupFile(file);
+                
+                // If editor active, update analyzer
+                if (ide.getIDE().editorActive())
+                {
+                    ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().updateAutomata();
+                }
+
+                saveSupFile(file, ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata());
             }
             else
             {
@@ -88,7 +99,35 @@ public class SaveAsAction
                 {
                     file = new File(file.getPath() + "." + WmodFileFilter.WMOD);
                 }
-                saveWmodFile(file);
+                
+                // If analyzer active, check if there are unsupported features in the project
+                ModuleProxy module = null;
+                if (ide.getIDE().analyzerActive())
+                {
+                    if (!SupremicaUnmarshaller.validate(ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata()))
+                    {
+                        int choice = JOptionPane.showConfirmDialog(ide.getFrame(), "This project contains attributes not supported by the wmod-format.\nDo you save (and lose the unsupported features)?", "Warning", JOptionPane.YES_NO_OPTION);
+                        switch (choice)
+                        {
+                            case JOptionPane.YES_OPTION:
+                                ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
+                                final ProductDESImporter importer = new ProductDESImporter(factory);
+                                module = importer.importModule((ProductDESProxy)ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata());
+                                break;
+                            case JOptionPane.NO_OPTION:
+                                return;
+                            default:
+                                break;
+                        }
+                    }
+                }
+                else
+                {
+                    module = ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
+                }
+                
+                if (module != null)
+                    saveWmodFile(file, module);
             }
             
             //modified = false;
@@ -101,12 +140,10 @@ public class SaveAsAction
         }
     }
     
-    private void saveSupFile(File file)
+    private void saveSupFile(File file, Automata automata)
     {
         try
         {
-            ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().updateAutomata();
-            Automata automata = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata();
             AutomataToXML exporter = new AutomataToXML(automata);
             exporter.serialize(file.getAbsolutePath());
         }
@@ -117,13 +154,13 @@ public class SaveAsAction
         }
     }
     
-    private void saveWmodFile(File file)
+    private void saveWmodFile(File file, ModuleProxy module)
     {
         //logEntry("Saving module to: " + wmodf);
         try
         {
             DocumentManager documentManager = ide.getIDE().getDocumentManager();
-            documentManager.saveAs(ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject(), file);
+            documentManager.saveAs(module, file);
         }
         catch (final WatersMarshalException exception)
         {

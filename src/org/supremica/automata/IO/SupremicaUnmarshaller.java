@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   SupremicaUnmarshaller
 //###########################################################################
-//# $Id: SupremicaUnmarshaller.java,v 1.13 2007-06-21 11:03:54 flordal Exp $
+//# $Id: SupremicaUnmarshaller.java,v 1.14 2007-06-21 11:21:50 flordal Exp $
 //###########################################################################
 
 package org.supremica.automata.IO;
@@ -112,9 +112,7 @@ public class SupremicaUnmarshaller
     private final ProductDESImporter mImporter;
     
     /**
-     * Examines if there are conversion problems in an automata. (For example,
-     * the State cost feature has no correspondance in the Waters models, the 
-     * user should be alerted of this fact...)
+     * Examines if there are conversion problems in an automata. 
      */
     public static boolean validate(Automata automata)
     {
@@ -122,11 +120,14 @@ public class SupremicaUnmarshaller
         {
             for (State state : aut)
             {
+                // This now works?
+                /*
                 if (state.getCost() != State.UNDEF_COST)
                 {
-                    logger.warn("State cost information in the imported automata model is not supported by the editor.");
+                    logger.warn("State cost information in the automata model is not supported by the editor.");
                     return false;
                 }
+                 */
             }
         }
         return true;
