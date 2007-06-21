@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   SaveAction
 //###########################################################################
-//# $Id: SaveAsAction.java,v 1.5 2007-06-21 11:21:50 flordal Exp $
+//# $Id: SaveAsAction.java,v 1.6 2007-06-21 12:00:53 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -104,7 +104,7 @@ public class SaveAsAction
                 ModuleProxy module = null;
                 if (ide.getIDE().analyzerActive())
                 {
-                    if (!SupremicaUnmarshaller.validate(ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata()))
+                    if (!SupremicaUnmarshaller.validate(ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getVisualProject()))
                     {
                         int choice = JOptionPane.showConfirmDialog(ide.getFrame(), "This project contains attributes not supported by the wmod-format.\nDo you save (and lose the unsupported features)?", "Warning", JOptionPane.YES_NO_OPTION);
                         switch (choice)

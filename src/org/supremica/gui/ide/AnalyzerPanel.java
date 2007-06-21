@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   AnalyzerPanel
 //###########################################################################
-//# $Id: AnalyzerPanel.java,v 1.29 2007-06-21 11:16:23 robi Exp $
+//# $Id: AnalyzerPanel.java,v 1.30 2007-06-21 12:00:53 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -181,8 +181,6 @@ public class AnalyzerPanel
         return mDocumentContainer.getIDE().getActions();
     }
     
-    private VisualProject mVisualProject = new VisualProject();
-    
     public String getNewAutomatonName(String msg, String nameSuggestion)
     {
         boolean finished = false;
@@ -231,4 +229,5 @@ public class AnalyzerPanel
         return theAutomata.size(); // This is not always the correct return value!!!
     }
     
+    private VisualProject mVisualProject = new VisualProject();
 }
