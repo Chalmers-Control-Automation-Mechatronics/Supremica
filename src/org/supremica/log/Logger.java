@@ -51,44 +51,44 @@ package org.supremica.log;
 
 public interface Logger
 {
-	void debug(Object message);
-
-	void debug(StackTraceElement[] stackTrace);
-
-	void debug(Object message, Throwable t);
-
-	void error(Object message);
-
-	void error(StackTraceElement[] stackTrace);
-
-	void error(Object message, Throwable t);
-
-	void error(Throwable t);
-
-	void fatal(Object message);
-
-	void fatal(StackTraceElement[] stackTrace);
-
-	void fatal(Object message, Throwable t);
-
-	void warn(Object message);
-
-	void warn(StackTraceElement[] stackTrace);
-
-	void warn(Object message, Throwable t);
-
-	void info(Object message);
-
-	void info(StackTraceElement[] stackTrace);
-
-	void info(Object message, Throwable t);
-
-	/**
-	 * Logs the message as an "info"-message only if currently in "verbose mode".
-	 */
-	void verbose(Object message);
-
-	boolean isDebugEnabled();
-
-	void setLogToConsole(boolean log);
+    void debug(Object message);
+    
+    void debug(StackTraceElement[] stackTrace);
+    
+    void debug(Object message, Throwable t);
+    
+    void error(Object message);
+    
+    void error(StackTraceElement[] stackTrace);
+    
+    void error(Object message, Throwable t);
+    
+    void error(Throwable t);
+    
+    void fatal(Object message);
+    
+    void fatal(StackTraceElement[] stackTrace);
+    
+    void fatal(Object message, Throwable t);
+    
+    void warn(Object message);
+    
+    void warn(StackTraceElement[] stackTrace);
+    
+    void warn(Object message, Throwable t);
+    
+    void info(Object message);
+    
+    void info(StackTraceElement[] stackTrace);
+    
+    void info(Object message, Throwable t);
+    
+    /**
+     * Logs the message as an "info"-message only if currently in "verbose mode".
+     */
+    void verbose(Object message);
+    
+    boolean isDebugEnabled();
+    
+    void setLogToConsole(boolean log);
 }

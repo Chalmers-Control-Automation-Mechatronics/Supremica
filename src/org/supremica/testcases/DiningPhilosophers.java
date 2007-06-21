@@ -11,6 +11,7 @@ import org.supremica.automata.State;
 import org.supremica.automata.Arc;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.execution.*;
+import uk.ac.ic.doc.scenebeans.Null;
 
 // Builds a Philo automaton
 class EatingPhilosopher
@@ -56,6 +57,7 @@ class EatingPhilosopher
     
     // Need not be the same everywhere
     static Automaton philo = null;
+    
     static boolean inited = false;
     
     private int length;
@@ -162,18 +164,24 @@ class EatingPhilosopher
         return returnValue;
     }
     
-    static void fixAnimation(Automaton currPhil, int id, int nextId, Actions currActions, Controls currControls)
+    public void fixAnimation(Automaton currPhil, int id, int nextId, Actions currActions, Controls currControls)
     throws Exception
     {
         Alphabet alpha = currPhil.getAlphabet();
-        LabeledEvent lTake = alpha.getEvent(events[L_TAKE].getLabel());
-        LabeledEvent rTake = alpha.getEvent(events[R_TAKE].getLabel());
-        LabeledEvent lPut = alpha.getEvent(events[L_PUT].getLabel());
-        LabeledEvent rPut = alpha.getEvent(events[R_PUT].getLabel());
-        LabeledEvent startEating = alpha.getEvent(events[START_EATING].getLabel());
+        //throw new Exception("Event labels are messed up!");
+        //LabeledEvent lTake = alpha.getEvent(events[L_TAKE].getLabel());
+        //LabeledEvent rTake = alpha.getEvent(events[R_TAKE].getLabel());
+        //LabeledEvent lPut = alpha.getEvent(events[L_PUT].getLabel());
+        //LabeledEvent rPut = alpha.getEvent(events[R_PUT].getLabel());
+        //LabeledEvent startEating = alpha.getEvent(events[START_EATING].getLabel());
+        LabeledEvent lTake = alpha.getEvent("take" + pad(id) + LABEL_SEP + pad(id));
+        LabeledEvent rTake = alpha.getEvent("take" + pad(id) + LABEL_SEP + pad(nextId));
+        LabeledEvent lPut = alpha.getEvent("put" + pad(id) + LABEL_SEP + pad(id));
+        LabeledEvent rPut = alpha.getEvent("put" + pad(id) + LABEL_SEP + pad(nextId));
+        LabeledEvent startEating = alpha.getEvent("start_eating" + pad(id));
         
-//              Actions currActions = project.getActions();
-//              Controls currControls = project.getControls();
+        //              Actions currActions = project.getActions();
+        //              Controls currControls = project.getControls();
         // The forks in the animation are numbered 0 to nbr of forks - 1
         Action lTakeAction = new Action(lTake.getLabel());
         
@@ -535,8 +543,9 @@ public class DiningPhilosophers
             // To his right a philo has fork #id, and to his left is fork #id-1
             if (animation)
             {
-                EatingPhilosopher.fixAnimation(currPhil, id, nextId(id, num), project.getActions(), project.getControls());
-                
+                // Needs to be fixed...
+                philo.fixAnimation(currPhil, id, nextId(id, num), project.getActions(), project.getControls());
+
 //                              Alphabet alpha = currPhil.getAlphabet();
 //                              LabeledEvent lTake = alpha.getEventWithId("L_take");
 //                              LabeledEvent rTake = alpha.getEventWithId("R_take");

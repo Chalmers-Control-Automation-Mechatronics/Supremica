@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.valid
 //# CLASS:   SupremicaUnmarshaller
 //###########################################################################
-//# $Id: SupremicaUnmarshaller.java,v 1.15 2007-06-21 12:00:53 flordal Exp $
+//# $Id: SupremicaUnmarshaller.java,v 1.16 2007-06-21 15:47:42 flordal Exp $
 //###########################################################################
 
 package org.supremica.automata.IO;
@@ -44,7 +44,7 @@ public class SupremicaUnmarshaller
     throws JAXBException, SAXException
     {
         builder = new ProjectBuildFromXML();
-        mImporter = new ProductDESImporter(modfactory);
+        //mImporter = new ProductDESImporter(modfactory);
     }    
     
     //#########################################################################
@@ -63,13 +63,15 @@ public class SupremicaUnmarshaller
             throw new WatersUnmarshalException(ex);
         }
             
+        /*
         // Examine the result
         if (validate(project))                
             return mImporter.importModule(project);
         else
             // Would like to import it directly into the analyzer not to miss out
             // on the Supremica-specific parts...
-            return project;
+         */
+        return project;
     }       
     
     public Class<DocumentProxy> getDocumentClass()
@@ -95,18 +97,21 @@ public class SupremicaUnmarshaller
     
     public DocumentManager getDocumentManager()
     {
-        return mImporter.getDocumentManager();
+        //return mImporter.getDocumentManager();
+        return documentManager;
     }
     
     public void setDocumentManager(DocumentManager manager)
     {
-        mImporter.setDocumentManager(manager);
+        //mImporter.setDocumentManager(manager);
+        documentManager = manager;
     }    
     
     //#########################################################################
     //# Data Members
     private final ProjectBuildFromXML builder;
-    private final ProductDESImporter mImporter;
+    //private final ProductDESImporter mImporter;
+    private DocumentManager documentManager;
     
     /**
      * Examines if there are conversion problems in an automata. 

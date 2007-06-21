@@ -5,9 +5,7 @@ package org.supremica.gui;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import net.sourceforge.waters.model.marshaller.ProductDESImporter;
-import net.sourceforge.waters.subject.module.ModuleSubject;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.model.base.DocumentProxy;
 import org.supremica.automata.Project;
 import org.supremica.gui.ide.IDE;
 import org.supremica.log.*;
@@ -745,12 +743,8 @@ public class TestCasesDialog
             // Get Supremica project
             Project project = getProject();
 
-            // Compile into Waters module
-            ProductDESImporter importer = new ProductDESImporter(ModuleSubjectFactory.getInstance());
-            ModuleSubject module = (ModuleSubject) importer.importModule(project);
-
-            // Add as a new module (see OpenFileAction)
-            ide.installContainer(module);
+            // Present to the IDE as a DocumentProxy, the IDE will figure out what to do...
+            ide.installContainer((DocumentProxy) project);
         }
         dispose();
     }

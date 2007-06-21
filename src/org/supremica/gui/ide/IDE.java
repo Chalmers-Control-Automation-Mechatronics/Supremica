@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.83 2007-06-21 09:51:56 flordal Exp $
+//# $Id: IDE.java,v 1.84 2007-06-21 15:47:42 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -249,23 +249,33 @@ public class IDE
         {
             installContainer((ModuleSubject) document);
         }
-        else if (document instanceof Automata)
+        else if (document instanceof Project)
         {
-            int choice = JOptionPane.showConfirmDialog(getFrame(), "This file contains attributes not supported by the editor.\nDo you want to edit it (and lose the unsupported features)?", "Warning", JOptionPane.YES_NO_OPTION);
-            switch (choice)
+            if (SupremicaUnmarshaller.validate((Project) document))
             {
-                case JOptionPane.YES_OPTION:
-                    ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
-                    final ProductDESImporter importer = new ProductDESImporter(factory);
-                    ModuleProxy module = importer.importModule((ProductDESProxy)document);
-                    installContainer(module);
-                    break;
-                case JOptionPane.NO_OPTION:
-                    installContainer((Automata) document);
-                    break;          
-                default:
-                    break;
+                ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
+                final ProductDESImporter importer = new ProductDESImporter(factory);
+                ModuleProxy module = importer.importModule((ProductDESProxy)document);
+                installContainer(module);
             }
+            else
+            {
+                int choice = JOptionPane.showConfirmDialog(getFrame(), "This file contains attributes not supported by the editor.\nDo you want to edit it (and lose the unsupported features)?", "Warning", JOptionPane.YES_NO_OPTION);
+                switch (choice)
+                {
+                    case JOptionPane.YES_OPTION:
+                        ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
+                        final ProductDESImporter importer = new ProductDESImporter(factory);
+                        ModuleProxy module = importer.importModule((ProductDESProxy)document);
+                        installContainer(module);
+                        break;
+                    case JOptionPane.NO_OPTION:
+                        installContainer((Project) document);
+                        break;
+                    default:
+                        break;
+                }
+            }            
         }
         else
             throw new ClassCastException("Bad document type.");
@@ -282,10 +292,10 @@ public class IDE
         container.getEditorPanel().showComment();
     }
     
-    public void installContainer(final Automata automata)
+    public void installContainer(final Project project)
     {
         //installContainer(module);
-        final AutomataContainer container = new AutomataContainer(this, automata);        
+        final AutomataContainer container = new AutomataContainer(this, project);        
         
         add(container);
         setActive(container);

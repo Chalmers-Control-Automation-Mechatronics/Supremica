@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   AnalyzerPanel
 //###########################################################################
-//# $Id: AnalyzerPanel.java,v 1.30 2007-06-21 12:00:53 flordal Exp $
+//# $Id: AnalyzerPanel.java,v 1.31 2007-06-21 15:47:42 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -219,15 +219,25 @@ public class AnalyzerPanel
     
     public boolean addAutomaton(Automaton theAutomaton)
     {
+        int size = mVisualProject.nbrOfAutomata();
         mVisualProject.addAutomaton(theAutomaton);
-        return true; // This is not always the correct return value!!!
+        return mVisualProject.nbrOfAutomata() > size;
     }
     
     public int addAutomata(Automata theAutomata)
     {
+        int size = mVisualProject.nbrOfAutomata();
         mVisualProject.addAutomata(theAutomata);
-        return theAutomata.size(); // This is not always the correct return value!!!
+        return mVisualProject.nbrOfAutomata() - size;
     }
-    
+
+    public int addProject(Project project)
+    {
+        mVisualProject.clear();
+        mVisualProject.addAutomata(project);
+        mVisualProject.addAttributes(project);
+        return project.size();
+    }
+
     private VisualProject mVisualProject = new VisualProject();
 }

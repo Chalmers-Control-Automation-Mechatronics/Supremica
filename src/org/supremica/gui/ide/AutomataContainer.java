@@ -4,30 +4,30 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   AutomataContainer
 //###########################################################################
-//# $Id: AutomataContainer.java,v 1.1 2007-06-20 19:43:38 flordal Exp $
+//# $Id: AutomataContainer.java,v 1.2 2007-06-21 15:47:42 flordal Exp $
 //###########################################################################
 
 
 package org.supremica.gui.ide;
 
 import javax.swing.JTabbedPane;
-import org.supremica.automata.Automata;
+import org.supremica.automata.Project;
 
 public class AutomataContainer 
     extends DocumentContainer
 {
     //#######################################################################
     //# Constructor
-    public AutomataContainer(final IDE ide, final Automata automata)
+    public AutomataContainer(final IDE ide, final Project project)
     {
-        super(ide, automata);
-        getAnalyzerPanel().addAutomata(automata);
+        super(ide, project);
+        getAnalyzerPanel().addProject(project);
         getAnalyzerPanel().enablePanel();
     }
     
-    public Automata getAutomata()
+    public Project getAutomata()
     {
-        return (Automata) getDocument();
+        return (Project) getDocument();
     }
     
     public void addToTabPanel(JTabbedPane tabPanel)

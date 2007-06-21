@@ -81,6 +81,7 @@ public class Actions
     public IDEAction analyzerPredictSizeAction = new AnalyzerPredictSizeAction(allActions);    
     public IDEAction analyzerCountReachableAction = new AnalyzerCountReachableAction(allActions);
     public IDEAction analyzerScheduleAction = new AnalyzerScheduleAction(allActions);
+    public IDEAction simulatorLaunchAnimatorAction = new SimulatorLaunchAnimatorAction(allActions);
 
     // Examples Actions
     public IDEAction toolsTestCasesAction = new ToolsTestCasesAction(allActions);

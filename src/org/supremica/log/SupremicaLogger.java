@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.log
 //# CLASS:   SupremicaLogger
 //###########################################################################
-//# $Id: SupremicaLogger.java,v 1.1 2007-05-02 00:25:29 robi Exp $
+//# $Id: SupremicaLogger.java,v 1.2 2007-06-21 15:47:42 flordal Exp $
 //###########################################################################
 
 /*
@@ -68,18 +68,16 @@ import org.supremica.properties.Config;
 
 class SupremicaLogger
     implements Logger
-{
-    
-	//#######################################################################
-	//# Constructors
+{    
+    //#######################################################################
+    //# Constructors
     SupremicaLogger(final org.apache.log4j.Logger logger)
     {
         mLogger = logger;
-    }
+    }  
     
-
-	//#######################################################################
-	//# Interface org.apache.log4j.Logger
+    //#######################################################################
+    //# Interface org.apache.log4j.Logger
     public void debug(final Object message)
     {
         mLogger.debug(message);
@@ -115,7 +113,8 @@ class SupremicaLogger
     public void error(final Throwable t)
     {
         mLogger.error(t.toString());
-        mLogger.debug(t.getStackTrace());
+        //mLogger.debug(t.getStackTrace());
+        mLogger.debug(getStackTraceAsString(t));
     }
     
     /**
@@ -183,7 +182,7 @@ class SupremicaLogger
     
     /**
      * Logs the message as an "info"-message only if Supremica is
-	 * currently in "verbose mode".
+     * currently in "verbose mode".
      */
     public void verbose(final Object message)
     {
@@ -208,15 +207,18 @@ class SupremicaLogger
     {
         return mLogger.isDebugEnabled();
     }
-
+    
     public void setLogToConsole(final boolean log)
     {
-		final Appender appender = LoggerFactory.getConsoleAppender();
-        if (log) {
-			mLogger.addAppender(appender);
-        } else {
-			mLogger.removeAppender(appender);
-		}
+        final Appender appender = LoggerFactory.getConsoleAppender();
+        if (log)
+        {
+            mLogger.addAppender(appender);
+        }
+        else
+        {
+            mLogger.removeAppender(appender);
+        }
     }
     
     private String getStackTraceAsString(final Throwable t)
@@ -227,10 +229,8 @@ class SupremicaLogger
         StringBuffer error = stringWriter.getBuffer();
         return error.toString();
     }
-
-
-	//#######################################################################
-	//# Data Members
-    private final org.apache.log4j.Logger mLogger;
     
+    //#######################################################################
+    //# Data Members
+    private final org.apache.log4j.Logger mLogger;
 }
