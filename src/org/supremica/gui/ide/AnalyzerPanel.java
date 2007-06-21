@@ -59,7 +59,7 @@ public class AnalyzerPanel
         ((GridBagLayout)getLayout()).setConstraints(splitPanelHorizontal, getGridBagConstraints());
         
         add(splitPanelHorizontal);
-
+        
         // Add CTRL-A as a "Select All" action
         this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK), "SelectAll");
         this.getActionMap().put("SelectAll",
@@ -96,47 +96,50 @@ public class AnalyzerPanel
     {
         return automataPanel.getAllAutomata();
     }
-            
+    
     /**
      * Updates the automata in the analyzer-tab.
      */
     public boolean updateAutomata()
     {
-        ProjectBuildFromWaters builder = null;
-        Project supremicaProject = null;
-        try
+        if (mDocumentContainer.getE != null)
         {
-            final DocumentManager manager = mDocumentContainer.getIDE().getDocumentManager();
-            builder = new ProjectBuildFromWaters(manager);
-            supremicaProject = builder.build(mDocumentContainer.getEditorPanel().getModuleSubject());
+            ProjectBuildFromWaters builder = null;
+            Project supremicaProject = null;
+            try
+            {
+                final DocumentManager manager = mDocumentContainer.getIDE().getDocumentManager();
+                builder = new ProjectBuildFromWaters(manager);
+                supremicaProject = builder.build(mDocumentContainer.getEditorPanel().getModuleSubject());
+            }
+            catch (EvalException eex)
+            {
+                JOptionPane.showMessageDialog(mDocumentContainer.getIDE(), eex.getMessage(),
+                    "Error in graph",
+                    JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                JOptionPane.showMessageDialog(mDocumentContainer.getIDE(), ex.getMessage(),
+                    "Error in graph",
+                    JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+                return false;
+            }
+            mVisualProject.clear();
+            mVisualProject.addAutomata(supremicaProject);
+            mVisualProject.updated();
+            
+            /*
+            if (Config.GUI_ANALYZER_AUTOMATONVIEWER_USE_CONTROLLED_SURFACE.isTrue())
+            {
+                ProductDESImporter importer = new ProductDESImporter(ModuleSubjectFactory.getInstance());
+                ModuleSubject flatModule = (ModuleSubject) importer.importModule(mVisualProject);
+                flatModuleContainer = new ModuleContainer(getIDE(), flatModule);
+            }
+             */
         }
-        catch (EvalException eex)
-        {
-            JOptionPane.showMessageDialog(mDocumentContainer.getIDE(), eex.getMessage(),
-                "Error in graph",
-                JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        catch (Exception ex)
-        {
-            JOptionPane.showMessageDialog(mDocumentContainer.getIDE(), ex.getMessage(),
-                "Error in graph",
-                JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-            return false;
-        }
-        mVisualProject.clear();
-        mVisualProject.addAutomata(supremicaProject);
-        mVisualProject.updated();
-        
-        /*
-        if (Config.GUI_ANALYZER_AUTOMATONVIEWER_USE_CONTROLLED_SURFACE.isTrue())
-        {
-            ProductDESImporter importer = new ProductDESImporter(ModuleSubjectFactory.getInstance());
-            ModuleSubject flatModule = (ModuleSubject) importer.importModule(mVisualProject);
-            flatModuleContainer = new ModuleContainer(getIDE(), flatModule);
-        }
-         */
         
         return true;
     }
@@ -162,12 +165,12 @@ public class AnalyzerPanel
     {
         return mVisualProject;
     }
-
+    
     public Actions getActions()
     {
         return mDocumentContainer.getIDE().getActions();
     }
-
+    
     private VisualProject mVisualProject = new VisualProject();
     
     public String getNewAutomatonName(String msg, String nameSuggestion)
@@ -217,5 +220,5 @@ public class AnalyzerPanel
         mVisualProject.addAutomata(theAutomata);
         return theAutomata.size(); // This is not always the correct return value!!!
     }
-
+    
 }

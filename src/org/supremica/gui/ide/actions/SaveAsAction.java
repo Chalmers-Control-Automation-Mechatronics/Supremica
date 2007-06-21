@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   SaveAction
 //###########################################################################
-//# $Id: SaveAsAction.java,v 1.3 2007-06-21 09:51:56 flordal Exp $
+//# $Id: SaveAsAction.java,v 1.4 2007-06-21 11:03:54 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -105,6 +105,7 @@ public class SaveAsAction
     {
         try
         {
+            ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().updateAutomata();
             Automata automata = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata();
             AutomataToXML exporter = new AutomataToXML(automata);
             exporter.serialize(file.getAbsolutePath());
