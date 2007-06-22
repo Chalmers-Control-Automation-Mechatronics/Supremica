@@ -29,10 +29,7 @@ public class Milp
     
     /** The involved automata, plants, zone specifications */
     private Automata theAutomata, plants, zones, externalSpecs;
-    
-    // prec_temp
-    // private Automata specs;
-    
+       
     /** The project used for return result */
     // NOT USED YET...
     // private Project theProject;
@@ -237,7 +234,7 @@ public class Milp
     public void buildScheduleAutomaton()
         throws Exception
     {                
-        //TODO: temp (fulhack) - fixa bï¿½ttre schemabygge.
+        //TODO: temp (fulhack) - fixa bättre schemabygge.
         SynthesizerOptions synthesizerOptions = new SynthesizerOptions();
         synthesizerOptions.setSynthesisType(SynthesisType.NONBLOCKINGCONTROLLABLE);
         synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.MONOLITHIC);
@@ -902,8 +899,7 @@ public class Milp
         // 	}
 // 		}
     }
-    
-    //TODO: rensa upp hï¿½r...
+
     private void createPrecedenceConstraints(Automaton currSpec)
         throws Exception
     {                 
@@ -918,9 +914,9 @@ public class Milp
         ArrayList<int[]> currEventsInfo = null;
         
         //TODO: used for the alternative precedence
-        ArrayList<int[]> precedingPlantStates = new ArrayList<int[]>();
-        ArrayList<int[]> followingPlantStates = new ArrayList<int[]>();
-        ArrayList<int[]> currPlantStates = null;
+//        ArrayList<int[]> precedingPlantStates = new ArrayList<int[]>();
+//        ArrayList<int[]> followingPlantStates = new ArrayList<int[]>();
+//        ArrayList<int[]> currPlantStates = null;
         
         // Loops through the plant automata and finds the states in which the preceding/following
         // (starting/finishing) events of this spec are enabled. Also, the infos needed to retrieve 
@@ -941,13 +937,13 @@ public class Milp
                     {
                         currEventsInfo = precedingEventsInfo;
                         //TODO: alternative precedence
-                        currPlantStates = precedingPlantStates;
+//                        currPlantStates = precedingPlantStates;
                     }
                     else
                     {
                         currEventsInfo = followingEventsInfo;
                         //TODO: alternative precedence
-                        currPlantStates = followingPlantStates;                        
+//                        currPlantStates = followingPlantStates;                        
                     }
                     
                     for (Iterator<LabeledEvent> eventIt = specState.activeEvents(false).iterator(); eventIt.hasNext();)
@@ -969,7 +965,7 @@ public class Milp
                                     findNearestPathSplits(plant, plantState.nextState(currEvent), currEventsInfo, currEvent);
 
                                     //TODO: alternative precedence
-                                    currPlantStates.add(new int[]{indexMap.getAutomatonIndex(plant), indexMap.getStateIndex(plant, plantState)});
+//                                    currPlantStates.add(new int[]{indexMap.getAutomatonIndex(plant), indexMap.getStateIndex(plant, plantState)});
                                 }
                             }
                         }
@@ -977,7 +973,9 @@ public class Milp
                 }
             }
         }
-               
+         
+        // Partition eventsInfo into allPlantStates. Every super-array of allPlantStates
+        // contains info about one plantState and its altPaths
         ArrayList<ArrayList> allPPlantStates = new ArrayList<ArrayList>();
         for (int[] info : precedingEventsInfo)
         {
@@ -1003,10 +1001,15 @@ public class Milp
             }
         }
         
+        // The nr of internal variables is the sum of all possible pairs of the variables
         int nrInternalPrecVars = (allPPlantStates.size() * (allPPlantStates.size() - 1) + 
                 allFPlantStates.size() * (allFPlantStates.size() - 1)) / 2;
+        // Hashtable for the internal precedence variables. Its size is increased 
+        // somewhat to avoid its enlargement later on
         Hashtable<IntKey, InternalPrecVariable> internalPrecVarsTable = 
-                new Hashtable<IntKey, InternalPrecVariable>((int)Math.ceil(1.5 * nrInternalPrecVars));     
+                new Hashtable<IntKey, InternalPrecVariable>((int)Math.ceil(1.5 * nrInternalPrecVars));    
+        // Construct every possible internal precedence variable and put it into 
+        // the hashtable, together with the corresponding id
         int idCounter = 0;
         for (int i = 0; i < allPPlantStates.size() - 1; i++)
         {
@@ -1041,9 +1044,11 @@ public class Milp
             }
         }
         
-        //TODO: rename all(P/F)PlantStates into all(Preceding/Following)PlantStates (i sinom tid)
+        // Get every possible (precedence-)event sequence (of maximal length)
         ArrayList<ArrayList> allAlternatingPlantStatesInfo = getEveryAlternatingOrdering(allPPlantStates, allFPlantStates);
 
+        // Kepps track of the internal precedence variable values that are used 
+        // (the others will be forbidden by additional MILP-constraints)
         BooleanCombinationTreeSet usedVariableCombinations = new BooleanCombinationTreeSet();
         
         int caseCounter = 0;
@@ -1056,8 +1061,10 @@ public class Milp
             externalConstraints += "/* " + specName + ", case " + ++caseCounter + " */\n";            
             int constrCounter = 1;
             
-            // -1 if the internal prec.variable with corresponding index is not used in this case,
-            // otherwise the variable value that makes this case possible.
+            // Create the object representing curring combination of variable values.
+            // -1 if the default internal prec.variable value, otherwise the 
+            // variable value that makes this case possible (0 or 1) will be stored 
+            // in each element of currVariableCombination (index = variable.getId()).
             int[] currVariableCombination = new int[internalPrecVarsTable.keySet().size()];
             for (int i = 0; i < currVariableCombination.length; i++)
             {
@@ -1073,6 +1080,7 @@ public class Milp
             ArrayList<ArrayList> currAllPlantStates = null;
             for (int i = 0; i < currAlternatingPlantStateInfoArray.size(); i++)
             {
+                // Check if the current event is "preceding" or "following"
                 boolean isPreceding = true;
                 if (Math.IEEEremainder(i, 2) == 0)
                 {
@@ -1089,6 +1097,8 @@ public class Milp
                 ArrayList<int[]> currPlantStateInfo = currAlternatingPlantStateInfoArray.get(i);
                 int[] currPlantState = currPlantStateInfo.get(0);
                 
+                // This constructs "equalNumberConstr" making sure that the numbers 
+                // of preceding and following events that actually occur are equal.
                 for (int j = 1; j < currPlantStateInfo.size(); j++)
                 {
                     int[] pathSplit = currPlantStateInfo.get(j);
@@ -1116,6 +1126,9 @@ public class Milp
                     }   
                 }
                 
+                // Create the case variable (combination of internal precedence variables)
+                // that accepts or negates this case. Also update the info about 
+                // currently used variable values (currVariableCombination).
                 currCheckedPlantStates.add(currPlantState);
                 for (int j = 0; j < currAllPlantStates.size(); j++)
                 {
@@ -1124,6 +1137,9 @@ public class Milp
                     {
                         if (internalPrecVarsTable.get(new IntKey(currPlantState, followingPlantState)) != null)
                         {
+                            // If currInternalPrecVar should be true for this case to hold, then 
+                            // "(1 - currInternalPrecVar)" should be added to the case variable, 
+                            // thus nrDefaultInternalPrec is incremented.
                             nrDefaultInternalPrec++;
                             InternalPrecVariable currInternalPrecVar = internalPrecVarsTable.get(new IntKey(currPlantState, followingPlantState));
                             internalPrecStr += " - " + currInternalPrecVar.getName();
@@ -1144,16 +1160,16 @@ public class Milp
                 }     
             }
             
+            // Remember this combination of internal precedence variable values
             usedVariableCombinations.add(currVariableCombination);
             
-            //TODO: rename cut(S/E)Index to cut(Start/End)Index
+            // Remove the trailing "+" in the constraint strings
             int cutIndex = equalNumberPConstrStr.length();
             if (equalNumberPConstrStr.endsWith("+ "))
             {
                 cutIndex = equalNumberPConstrStr.lastIndexOf("+");
             }
             equalNumberPConstrStr = equalNumberPConstrStr.substring(0, cutIndex).trim();
-            
             cutIndex = equalNumberFConstrStr.length();
             if (equalNumberFConstrStr.endsWith("+ "))
             {
@@ -1161,32 +1177,41 @@ public class Milp
             }
             equalNumberFConstrStr = equalNumberFConstrStr.substring(0, cutIndex).trim();
 
+            // Add the case variable, if it exists, to the constraint string
             String tailStr = ";\n";
             if (internalPrecStr != "")
             {
                 tailStr = " - bigM*(" + nrDefaultInternalPrec + internalPrecStr + ")" + tailStr;
-            }           
-//            externalConstraints += "/* " + specName + ", nr_starting_events == nr_finishing_events */\n";
+            }   
+            
+            // nr_starting_events == nr_finishing_events 
+            // (to devalidate this constraint if this case is not chosen, the equality is implemented 
+            // with help of "... >= ... - M*f_case" and "... <= ... - M*f_case"
             externalConstraints += "multi_plant_prec_" + specName + "_TOT_" + caseCounter + " : " + equalNumberPConstrStr +
                     " >= " + equalNumberFConstrStr + tailStr;
             externalConstraints += "multi_plant_prec_" + specName + "_TOT_dual" + caseCounter + " : " + equalNumberFConstrStr +
                     " >= " + equalNumberPConstrStr + tailStr;            
                        
+            // Constructs several types of constraints. Firstly, there are precedence 
+            // constraints, making sure that each plant-state comes after every plant-state 
+            // that has lower index in the current variable ordering (precedingAltPathsStr/followingAltPathsStr). 
+            // Sedondly the  "start_before_finish"- and "finish_before_start"-logic 
+            // is constructed, preventing 2 consecutive start-events or finish-events.
             for (int fIndex = 1; fIndex < currAlternatingPlantStateInfoArray.size(); fIndex++)
             {
                 ArrayList<int[]> followingPlantStateInfo = currAlternatingPlantStateInfoArray.get(fIndex);
                 int[] followingPlantState = followingPlantStateInfo.get(0);
                 
-                //TODO: hitta pï¿½ bï¿½ttre namn (ï¿½ven fï¿½r pIsFEvent)
-                boolean fIsFEvent = true;
+                // Checks whether the current event belongs to the finish-events
+                boolean fIsFinishEvent = true;
                 if (Math.IEEEremainder(fIndex, 2) == 0)
                 {
-                    fIsFEvent = false;
+                    fIsFinishEvent = false;
                 }
                 
                 String startFinishLogicStrLeft = "";
                 String startFinishLogicStrRight = "";
-                if (fIsFEvent)
+                if (fIsFinishEvent)
                 {
                     startFinishLogicStrLeft = "start_before_finish";
                 }
@@ -1194,9 +1219,11 @@ public class Milp
                 {
                     startFinishLogicStrLeft = "finish_before_start";
                 }
-                // As well caseCounter as constrCounter are used to give this constraint unique id
+                // As well caseCounter as constrCounter are used to give this constraint a unique id
                 startFinishLogicStrLeft += "_r" + followingPlantState[0] + "_st" + followingPlantState[1] + "_" + caseCounter + "_" +  constrCounter + " : ";              
                 
+                // Adds corresponding path split variables that negate the constraint 
+                // if the involved "following" event never happen
                 int nrFPathSplits = 0;
                 String followingAltPathsStr = "";
                 for (int j = 1; j < followingPlantStateInfo.size(); j++)
@@ -1215,22 +1242,26 @@ public class Milp
                     }
                 }       
                 
+                // Every event prior to the current (fIndex) event in the current 
+                // variable order is treated
                 for (int pIndex = 0; pIndex < fIndex; pIndex++)
                 {
                     ArrayList<int[]> precedingPlantStateInfo = currAlternatingPlantStateInfoArray.get(pIndex);         
                     int[] precedingPlantState = precedingPlantStateInfo.get(0);
                     
-                    boolean pIsFEvent = true;
+                    // Correct sign is chosen depending on whether the preceding 
+                    // event is starting or finishing
+                    boolean pIsFinishEvent = true;
                     if (Math.IEEEremainder(pIndex, 2) == 0)
                     {
-                        pIsFEvent = false;
+                        pIsFinishEvent = false;
                     }
                     
-                    if (fIsFEvent)
+                    if (fIsFinishEvent)
                     {
                         if (pIndex != 0)
                         {
-                            if (pIsFEvent)
+                            if (pIsFinishEvent)
                             {
                                 startFinishLogicStrLeft += " - ";
                             }
@@ -1242,7 +1273,7 @@ public class Milp
                     }
                     else
                     {
-                        if (pIsFEvent)
+                        if (pIsFinishEvent)
                         {
                             startFinishLogicStrLeft += " + ";
                         }
@@ -1252,6 +1283,8 @@ public class Milp
                         }
                     }
  
+                    // Adds corresponding path split variables that negate the constraint 
+                    // if the involved "preceding" event never happen
                     String precedingAltPathsStr = "";
                     int nrPPathSplits = 0;
                     for (int j = 1; j < precedingPlantStateInfo.size(); j++)
@@ -1270,9 +1303,11 @@ public class Milp
                         }
                     }                       
 
+                    // Finally a constraint per treated plant-state-pair is added to the MILP-formulation
                     externalConstraints += "multi_plant_prec_" + specName + "_" + caseCounter + "_" + constrCounter++ + " : time[" + 
                             followingPlantState[0] + ", " + followingPlantState[1] + "] >= time[" + 
                             precedingPlantState[0] + ", " + precedingPlantState[1] + "]";
+                    // If there exist variables that possibly negate this case, they are added to the constraint
                     if (internalPrecStr != "" || (nrPPathSplits + nrFPathSplits) > 0)
                     {
                         externalConstraints += " - bigM*(" + (nrDefaultInternalPrec + nrPPathSplits + nrFPathSplits) + 
@@ -1281,15 +1316,17 @@ public class Milp
                     externalConstraints += " + epsilon;\n";
                 }
                 
+                // Cuts the last "+"-term
                 if (startFinishLogicStrRight.contains("+"))
                 {
                     startFinishLogicStrRight = startFinishLogicStrRight.substring(0, startFinishLogicStrRight.lastIndexOf("+")).trim();
                 }
-                if (!fIsFEvent)
+                // Adds -1 if this is a start-event
+                if (!fIsFinishEvent)
                 {
                     startFinishLogicStrRight += " - 1";
                 }
-//                externalConstraints += "/* sigma_finish always preceeded by a sigma_start : */\n";
+                // "sigma_finish always preceeded by a sigma_start" is added
                 externalConstraints += startFinishLogicStrLeft + " >= " + startFinishLogicStrRight;
                 if (internalPrecStr != "" || nrDefaultInternalPrec > 0)
                 {
@@ -1298,6 +1335,10 @@ public class Milp
                 externalConstraints += ";\n";          
             }
 
+            // For each event that does not belong to the current variable ordering,
+            // a constraint, "0 >= alt_paths - M*(x -  f_case) is added. This makes
+            // sure that the paths leading to the corresponding plant-state is never 
+            // reached if this variable ordering (case) is chosen.
             ArrayList<ArrayList> allPlantStates = new ArrayList<ArrayList>(allPPlantStates);
             allPlantStates.addAll(allFPlantStates);
             for (ArrayList<int[]> unusedPlantStateInfo : allPlantStates)
@@ -1311,7 +1352,7 @@ public class Milp
                         if (unusedPlantStateInfo.get(i)[0] != NO_PATH_SPLIT_INDEX)
                         {
                             unusedPlantStateConstr += makeAltPathsVariable(unusedPlantStateInfo.get(0)[0], 
-                                unusedPlantStateInfo.get(i)[0], unusedPlantStateInfo.get(i)[1]) + " + ";
+                            unusedPlantStateInfo.get(i)[0], unusedPlantStateInfo.get(i)[1]) + " + ";
                         }
                         else
                         {
@@ -1326,14 +1367,18 @@ public class Milp
                     
                     externalConstraints += "multi_plant_prec_" + specName + "_" + caseCounter + "_" + constrCounter++ + " : " + 
                                 unusedPlantStateConstr;
-                    if (internalPrecStr != "") // || nrPathSplits > 0)
+                    if (internalPrecStr != "") 
                     {
                         externalConstraints += " - bigM*(" + nrDefaultInternalPrec + internalPrecStr + ");\n";
                     }
                 }
             }
         }        
-                
+        
+        // A constraint per unused combination of internal precedence variable 
+        // values is added. The constraint looks as "0 >= 1 -  M*f_unused_case.
+        // Thus, an unused variable combination can never occur, meaning that
+        // one case (one variable ordering) is always chosen (if a solution exists). 
         externalConstraints += "/* Unused combinations should never occur...*/\n";
         ArrayList<int[]> allBooleanCombinations = getAllBooleanVarCombinations(nrInternalPrecVars, null);
         for (int i = 0; i<allBooleanCombinations.size(); i++)
@@ -1364,10 +1409,17 @@ public class Milp
             }  
         }
         
-        // Adding 101/010-constraints that make sure that certain combinations of internal precedece variables,
-        // such as c<a<b<c and c>a>b>c are disregarded by the MILP-solver.
+        // Adding 101/010-constraints that make sure that certain combinations of 
+        // internal precedece variables, such as c<a<b<c and c>a>b>c are disregarded 
+        // by the MILP-solver. Nice thought, but may be unnecessary now that 
+        // unusedCombinationConstraints are added. However, if they do not duplicate 
+        // completely (check), then they could remain (the more constraints the better, 
+        // unless this affects pre-processing time significantly). 
+        // TODO: se kommentarerna precis ovan.
         externalConstraints += "/* 101- & 010-disablement, avoiding impossible event sequences */\n";
+        // The index to separate different 101/010-constraint instances
         int disablementCounter = 1;
+        // For start-event...
         int nrPPlantStates = allPPlantStates.size();
         for (int i = 0; i < nrPPlantStates - 2; i++)
         {           
@@ -1382,13 +1434,16 @@ public class Milp
                     String secondAlpha = internalPrecVarsTable.get(new IntKey(firstPlantState, thirdPlantState)).getName();
                     String thirdAlpha = internalPrecVarsTable.get(new IntKey(secondPlantState, thirdPlantState)).getName();
                     
+                    // 101-constraint
                     String oneZeroOneDisablement = "2 - " + firstAlpha + " + " + secondAlpha + " - " + thirdAlpha + " >= 1;\n";
-                    String zeroOneZeroDisablement = "1 + " + firstAlpha + " - " + secondAlpha + " + " + thirdAlpha + " >= 1;\n";
                     externalConstraints += "ozo_disablement_" + disablementCounter++ +  " : " + oneZeroOneDisablement;
+                    // 010-constraint
+                    String zeroOneZeroDisablement = "1 + " + firstAlpha + " - " + secondAlpha + " + " + thirdAlpha + " >= 1;\n";
                     externalConstraints += "zoz_disablement_" + disablementCounter++ +  " : " + zeroOneZeroDisablement;
                 }
             }
         }
+        // ...and for finish-events
         int nrFPlantStates = allFPlantStates.size();
         for (int i = 0; i < nrFPlantStates - 2; i++)
         {           
@@ -1403,9 +1458,11 @@ public class Milp
                     String secondAlpha = internalPrecVarsTable.get(new IntKey(firstPlantState, thirdPlantState)).getName();
                     String thirdAlpha = internalPrecVarsTable.get(new IntKey(secondPlantState, thirdPlantState)).getName();
                     
+                    // 101-constraint
                     String oneZeroOneDisablement = "2 - " + firstAlpha + " + " + secondAlpha + " - " + thirdAlpha + " >= 1;\n";
-                    String zeroOneZeroDisablement = "1 + " + firstAlpha + " - " + secondAlpha + " + " + thirdAlpha + " >= 1;\n";
                     externalConstraints += "ozo_disablement_" + disablementCounter++ +  " : " + oneZeroOneDisablement;
+                    // 010-constraint
+                    String zeroOneZeroDisablement = "1 + " + firstAlpha + " - " + secondAlpha + " + " + thirdAlpha + " >= 1;\n";
                     externalConstraints += "zoz_disablement_" + disablementCounter++ +  " : " + zeroOneZeroDisablement;
                 }
             }
@@ -1479,40 +1536,7 @@ public class Milp
                 }
             }
         }
-    }
-    
-// 	private TreeSet<int[]> replaceFalsePathSplits(Automaton auto, TreeSet<int[]> altPathVariables)
-// 	{
-// 		boolean falseAltPathFound = false;
-// 		TreeSet<int[]> newAltPathVariables = new TreeSet<int[]>(new PathSplipIndexComparator());
-// 		SortedSet<int[]> tail = altPathVariables.tailSet(new int[]{0, 0, -1});
-    
-// 		while (!tail.isEmpty())
-// 		{
-// 			int startStateIndex = tail.first()[0];
-// 			int[] separatingElement = new int[]{startStateIndex + 1, 0, -1};
-// 			SortedSet<int[]> head = tail.headSet(separatingElement);
-// 			tail = tail.tailSet(separatingElement);
-// 			State startState = indexMap.getStateAt(auto, startStateIndex);
-// 			if (startState.nbrOfOutgoingMultiArcs() != head.size())
-// 			{
-// 				newAltPathVariables.addAll(head);
-// 			}
-// 			else
-// 			{
-// 				falseAltPathFound = true;
-// 				findNearestPathSplits(auto, startState, newAltPathVariables);
-// 			}
-// 		}
-    
-// 		if (falseAltPathFound)
-// 		{
-// 			return replaceFalsePathSplits(auto, newAltPathVariables);
-// 		}
-    
-// 		return newAltPathVariables;
-// 	}
-    
+    }    
     
     /****************************************************************************************/
     /*                                 THE AUTOMATA-MILP-BRIDGE-METHODS                     */
@@ -1615,7 +1639,6 @@ public class Milp
                         State nextState = nextStates.next();
                         int nextStateIndex = indexMap.getStateIndex(currPlant, nextState);
                         
-                        //TODO: fixa epsilon sï¿½ det blir rï¿½tt tid i buildScheduleAutomaton()
                         precConstraints += "prec_" + "r" + currplantIndex + "_" + currStateIndex + "_" + nextStateIndex + " : " + 
                                 "time[" + i + ", " + nextStateIndex + "] >= time[" + i + ", " + currStateIndex + "] + deltaTime[" + i + 
                                 ", " + nextStateIndex + "] + epsilon;\n";
