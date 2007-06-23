@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ComponentViewPanel
 //###########################################################################
-//# $Id: ComponentViewPanel.java,v 1.6 2007-06-20 19:43:38 flordal Exp $
+//# $Id: ComponentViewPanel.java,v 1.7 2007-06-23 10:33:12 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -23,7 +23,6 @@ import javax.swing.*;
 import net.sourceforge.waters.gui.ControlledSurface;
 import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.EditorEvents;
-import net.sourceforge.waters.gui.EditorMenu;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.UndoInterface;
@@ -53,7 +52,6 @@ public class ComponentViewPanel
     private ModuleContainer mModuleContainer;
     private ControlledSurface surface;
     private EditorEvents events;
-    private EditorMenu menu;
     private SimpleComponentSubject element = null;
     private ModuleSubject mModule = null;
     private boolean isSaved = false;
@@ -85,7 +83,6 @@ public class ComponentViewPanel
         
         final ModuleWindowInterface root = mModuleContainer.getEditorPanel();
         events = new EditorEvents(root, element, this);
-        menu = new EditorMenu(surface, this);
         
         final LayoutManager layout = new BorderLayout();
         setLayout(layout);

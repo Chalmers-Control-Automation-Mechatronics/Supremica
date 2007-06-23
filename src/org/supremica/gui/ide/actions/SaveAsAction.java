@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   SaveAsAction
 //###########################################################################
-//# $Id: SaveAsAction.java,v 1.8 2007-06-23 10:16:00 robi Exp $
+//# $Id: SaveAsAction.java,v 1.9 2007-06-23 10:33:12 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -20,7 +20,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
-import net.sourceforge.waters.gui.WmodFileFilter;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.marshaller.DocumentManager;

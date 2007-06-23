@@ -56,9 +56,19 @@ class Util {
 		assert generatedModule.name == manualModule.name, "\ngenerated:${generatedModule.name}\nmanual:   ${manualModule.name}\n"
 //		assert generatedModule.equalsByContents(manualModule)
 	}
-	
+
+/*
+ * Sorry, I can't fix this, for lack of Groovy knowledge. You have to
+ * use the document manager to get the marshaller for ModuleProxy.class,
+ * and call its getDefaultExtension() method, to get the extension for
+ * module files. ~~~Robi
 	public static void saveModuleToFile(ModuleProxy module, String filename = "./${module.name}.${WmodFileFilter.WMOD}") {
     	saveModuleToFile(module, [filename] as File)
+	}
+ */
+
+	public static void saveModuleToFile(ModuleProxy module, String filename) {
+            assert false
 	}
 	
 	public static void saveModuleToFile(ModuleProxy module, File file) {
