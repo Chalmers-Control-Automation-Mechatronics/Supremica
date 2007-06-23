@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ModuleWindowInterface
 //###########################################################################
-//# $Id: ModuleWindowInterface.java,v 1.9 2007-06-15 07:50:38 robi Exp $
+//# $Id: ModuleWindowInterface.java,v 1.10 2007-06-23 10:58:09 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -33,10 +33,6 @@ import net.sourceforge.waters.xsd.base.EventKind;
  */
 
 public interface ModuleWindowInterface
-    // *** BUG ***
-    // Action code should be in the action class !!!
-    // ***
-    extends ActionListener
 {
     
     /**

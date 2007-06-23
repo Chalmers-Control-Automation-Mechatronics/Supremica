@@ -1,10 +1,10 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
-//# PACKAGE: net.sourceforge.waters.valid
+//# PACKAGE: org.supremica.automata.IO
 //# CLASS:   SupremicaUnmarshaller
 //###########################################################################
-//# $Id: SupremicaUnmarshaller.java,v 1.17 2007-06-23 10:16:00 robi Exp $
+//# $Id: SupremicaUnmarshaller.java,v 1.18 2007-06-23 10:58:09 robi Exp $
 //###########################################################################
 
 package org.supremica.automata.IO;

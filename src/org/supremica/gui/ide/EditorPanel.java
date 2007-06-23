@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorPanel
 //###########################################################################
-//# $Id: EditorPanel.java,v 1.57 2007-06-21 15:57:55 robi Exp $
+//# $Id: EditorPanel.java,v 1.58 2007-06-23 10:58:09 robi Exp $
 //###########################################################################
 
 
@@ -185,11 +185,6 @@ public class EditorPanel
     public EditorPanelInterface getEditorPanelInterface()
     {
         return new EditorPanelInterfaceImpl();
-    }
-    
-    public void actionPerformed(ActionEvent e)
-    {
-        componentsPanel.actionPerformed(e);
     }
     
     class EditorPanelInterfaceImpl

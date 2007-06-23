@@ -1,12 +1,21 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.gui
+//# CLASS:   ModuleTree
+//###########################################################################
+//# $Id: ModuleTree.java,v 1.14 2007-06-23 10:58:09 robi Exp $
+//###########################################################################
+
 package net.sourceforge.waters.gui;
-import javax.swing.JOptionPane;
-import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
+
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
-
+import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -15,6 +24,7 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.model.module.VariableProxy;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.subject.base.AbstractSubject;
@@ -30,16 +40,19 @@ public class ModuleTree extends JTree
     private DefaultMutableTreeNode mRootNode;
     private final ProxyPrinter mPrinter;
     private ModuleSubject mModule;
-    private ModuleWindowInterface mModuleWindow;
+    private final ModuleWindowInterface mModuleWindow;
+    private final ActionListener mPopupActionListener;
     private ModuleTree mSelfRef;
     
-    public ModuleTree(ModuleWindowInterface moduleWindow)
+    public ModuleTree(final ModuleWindowInterface root,
+                      final ActionListener popuplistener)
     {
         super();
         
         mPrinter = new PlainTextPrinter();
-        mModule = moduleWindow.getModuleSubject();
-        mModuleWindow = moduleWindow;
+        mModule = root.getModuleSubject();
+        mModuleWindow = root;
+        mPopupActionListener = popuplistener;
         mSelfRef = this;
         
         ArrayList l;
@@ -175,7 +188,7 @@ public class ModuleTree extends JTree
                         (((ComponentInfo) nodeInfo).getComponent());
                     
                     ModuleTreePopupMenu popup = new ModuleTreePopupMenu(
-                        mSelfRef, mModuleWindow, component);
+                        mSelfRef, mPopupActionListener, component);
                     popup.show(mSelfRef, e.getX(), e.getY());                    
                 }
             }            

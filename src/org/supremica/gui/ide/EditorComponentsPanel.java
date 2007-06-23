@@ -4,13 +4,14 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorComponentsPanel
 //###########################################################################
-//# $Id: EditorComponentsPanel.java,v 1.37 2007-06-20 19:43:38 flordal Exp $
+//# $Id: EditorComponentsPanel.java,v 1.38 2007-06-23 10:58:09 robi Exp $
 //###########################################################################
 
 
 package org.supremica.gui.ide;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.tree.*;
 
 import java.util.*;
@@ -45,7 +46,7 @@ import org.supremica.gui.WhiteScrollPane;
  */
 class EditorComponentsPanel
     extends WhiteScrollPane
-    implements EditorPanelInterface
+    implements EditorPanelInterface, ActionListener
 {
     private static final long serialVersionUID = 1L;
     
@@ -76,7 +77,7 @@ class EditorComponentsPanel
     
     private void createContentPane(final ModuleWindowInterface root)
     {
-        moduleSelectTree = new ModuleTree(root);
+        moduleSelectTree = new ModuleTree(root, this);
         getViewport().add(moduleSelectTree);
     }
     

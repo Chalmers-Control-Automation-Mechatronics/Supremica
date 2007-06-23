@@ -1,12 +1,25 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters
+//# PACKAGE: net.sourceforge.waters.gui
+//# CLASS:   ModuleTreePopupMenu
+//###########################################################################
+//# $Id$
+//###########################################################################
+
+
 package net.sourceforge.waters.gui;
 
 import java.awt.event.*;
 import javax.swing.*;
-import org.supremica.util.VPopupMenu;
+
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.VariableSubject;
+
+import org.supremica.util.VPopupMenu;
+
 
 /**
  * Popup for editing attributes of a node.
@@ -27,47 +40,50 @@ class ModuleTreePopupMenu
     private JMenuItem toSupervisorTypeItem;    
     private AbstractSubject mInvokingComponent;
     private ModuleTree mTree;
-    private ModuleWindowInterface mWindow;
     
-    public ModuleTreePopupMenu(ModuleTree tree, ModuleWindowInterface moduleWindow, AbstractSubject c)
+    public ModuleTreePopupMenu(final ModuleTree tree,
+			       final ActionListener listener,
+			       final AbstractSubject c)
     {
         mInvokingComponent = c;
         mTree = tree;
-        mWindow = moduleWindow;
-        init();
+        init(listener);
     }
     
     /**
      * Initialize the menu.
      */
-    private void init()
+    private void init(final ActionListener listener)
     {
         JMenuItem item;
         
-        // These "actions" are typically executed by the "EditorComponentsPanel"
+        // *** BUG ***
+        // These "actions" are executed by the "EditorComponentsPanel",
+        // but they should be implemented as WatersAction subclasses!
+        // ***
         if(mInvokingComponent instanceof SimpleComponentSubject)
         {
             item = new JMenuItem("Add variable");
             item.setActionCommand("add variable");
-            item.addActionListener(mWindow);
+            item.addActionListener(listener);
             this.add(item);
             addVariableItem = item;
             
             item = new JMenuItem("Delete component");
             item.setActionCommand("delete component");
-            item.addActionListener(mWindow);
+            item.addActionListener(listener);
             this.add(item);
             deleteComponentItem = item;
 
             item = new JMenuItem("Copy component");
             item.setActionCommand("copy component");
-            item.addActionListener(mWindow);
+            item.addActionListener(listener);
             this.add(item);
             copyComponentItem = item;
             
             item = new JMenuItem("Rename component");
             item.setActionCommand("rename component");
-            item.addActionListener(mWindow);
+            item.addActionListener(listener);
             this.add(item);
             renameComponentItem = item;
 
@@ -76,19 +92,19 @@ class ModuleTreePopupMenu
             
             item = new JMenuItem("Plant");
             item.setActionCommand("toPlantType");
-            item.addActionListener(mWindow);
+            item.addActionListener(listener);
             typeMenu.add(item);
             toPlantTypeItem = item;
             
             item = new JMenuItem("Specification");
             item.setActionCommand("toSpecificationType");
-            item.addActionListener(mWindow);
+            item.addActionListener(listener);
             typeMenu.add(item);
             toSpecificationTypeItem = item;
             
             item = new JMenuItem("Supervisor");
             item.setActionCommand("toSupervisorType");
-            item.addActionListener(mWindow);
+            item.addActionListener(listener);
             typeMenu.add(item);
             toSupervisorTypeItem = item;
         }
@@ -96,13 +112,13 @@ class ModuleTreePopupMenu
         {
             item = new JMenuItem("Delete variable");
             item.setActionCommand("delete variable");
-            item.addActionListener(mWindow);
+            item.addActionListener(listener);
             this.add(item);
             deleteVariableItem = item;
             
             item = new JMenuItem("Edit variable");
             item.setActionCommand("edit variable");
-            item.addActionListener((ActionListener)mWindow);
+            item.addActionListener((ActionListener)listener);
             this.add(item);
             editVariableItem = item;
         }
@@ -110,13 +126,13 @@ class ModuleTreePopupMenu
         {
             item = new JMenuItem("Add component");
             item.setActionCommand("add simple component");
-            item.addActionListener(mWindow);
+            item.addActionListener(listener);
             this.add(item);
             addComponentItem = item;
 
             item = new JMenuItem("Show comment");
             item.setActionCommand("show comment");
-            item.addActionListener(mWindow);
+            item.addActionListener(listener);
             this.add(item);
             showCommentItem = item;
         }
