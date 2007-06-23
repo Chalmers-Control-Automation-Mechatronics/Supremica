@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   WatersAction
 //###########################################################################
-//# $Id: WatersAction.java,v 1.2 2007-06-21 20:56:53 robi Exp $
+//# $Id: WatersAction.java,v 1.3 2007-06-23 10:16:00 robi Exp $
 //###########################################################################
 
 
@@ -22,8 +22,9 @@ import org.supremica.gui.ide.ModuleContainer;
  * The class of all actions that can be applied to a module in the editor
  * panel. This is a more convenient subclass of {@link IDEAction} for
  * actions that expect the presence of an editor panel and a module. It
- * provides some support for access to the editor panel, and some more
- * specific enablement conditions.
+ * provides some support for access to the editor panel. It also provides a
+ * more specific enablement condition, implementing an action that is
+ * enabled only if the Waters module editor is active.
  *
  * @author Robi Malik
  */
@@ -37,11 +38,35 @@ public abstract class WatersAction
   protected WatersAction(final IDE ide)
   {
     super(ide);
+    setEnabled(false);
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.observer.Observer
+  /**
+   * Callback for state changes of the IDE. This default implementation
+   * only calls {@link #updateEnabledStatus()} if the user has switched
+   * main panels.
+   */
+  public void update(final EditorChangedEvent event)
+  {
+    switch (event.getKind()) {
+    case MAINPANEL_SWITCH:
+      updateEnabledStatus();
+      break;
+    default:
+      break;
+    }
   }
 
 
   //#########################################################################
   //# Enabling and Disabling
+  /**
+   * Enables or disables this action. This default implementation enables
+   * the action if the Waters module editor is active.
+   */
   public boolean updateEnabledStatus()
   {
     final ModuleWindowInterface gui = getActiveModuleWindowInterface();
@@ -85,10 +110,10 @@ public abstract class WatersAction
       return null;
     }
     final DocumentContainer container = ide.getActiveDocumentContainer();
-    if (container == null || !(container instanceof ModuleContainer)) {
+    if (container == null || !(container instanceof UndoInterface)) {
       return null;
     }
-    return (ModuleContainer) container;
+    return (UndoInterface) container;
   }
 
 }

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   DocumentManager
 //###########################################################################
-//# $Id: DocumentManager.java,v 1.11 2007-06-05 13:23:52 robi Exp $
+//# $Id: DocumentManager.java,v 1.12 2007-06-23 10:16:00 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -267,11 +267,11 @@ public class DocumentManager {
 
   /**
    * Checks whether a cached document has been modified externally.
-   * This method checks whether file for the document the document, given
-   * by its URI, has been modified since it has last been accessed through
-   * the document manager. The check is only performed for file URIs, other
-   * URIs are assumed never to change their contents, so this method always
-   * returns <CODE>false</CODE> for them.
+   * This method checks whether file for the document, given by its URI,
+   * has been modified since it has last been accessed through the document
+   * manager. The check is only performed for file URIs, other URIs are
+   * assumed never to change their contents, so this method always returns
+   * <CODE>false</CODE> for them.
    * @throws MalformedURLException if the given URI is not a proper URI.
    * @throws IllegalArgumentException if the given URI does not represent
    *                      a document currently in the cache.
@@ -289,9 +289,9 @@ public class DocumentManager {
 
   /**
    * Checks whether a cached document has been modified externally.
-   * This method checks whether file for the document the document, given
-   * by its file name, has been modified since it has last been accessed
-   * through the document manager.
+   * This method checks whether the file for the document, given by its
+   * file name, has been modified since it has last been accessed through
+   * the document manager.
    * @throws IllegalArgumentException if the given file name does not
    *                      represent a document currently in the cache.
    */
@@ -470,7 +470,7 @@ public class DocumentManager {
     }
   }
 
-  public Collection<FileFilter> getSupportedFileFilters()
+  public List<FileFilter> getSupportedFileFilters()
   {
     return Collections.unmodifiableList(mFileFilters);
   }

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   IDEAction
 //###########################################################################
-//# $Id: IDEAction.java,v 1.1 2007-06-21 20:56:53 robi Exp $
+//# $Id: IDEAction.java,v 1.2 2007-06-23 10:16:00 robi Exp $
 //###########################################################################
 
 
@@ -67,7 +67,7 @@ public abstract class IDEAction
   protected IDEAction(final IDE ide)
   {
     mIDE = ide;
-    setEnabled(false);
+    setEnabled(true);
   }
 
 
@@ -114,13 +114,18 @@ public abstract class IDEAction
    * Enables or disables this action.
    * This method is called by the {@link #update(EditorChangedEvent)
    * update()} method when a significant change in the IDE has been
-   * detected. It has to reevaluate the state and enable or * disable this
-   * action accordingly using the {@link *
-   * javax.swing.Action@setEnabled(boolean) setEnabled()} method. Some more
-   * specific subclasses may provide a default implementation of this
-   * method.
+   * detected. It has to reevaluate the state and enable or disable this
+   * action accordingly using the {@link
+   * javax.swing.Action@setEnabled(boolean) setEnabled()} method. This
+   * default implementation does nothing, producing an action that is
+   * always enabled.
+   * @return The new enablement status, <CODE>true</CODE> if this action
+   *         now is enabled, <CODE>false</CODE> otherwise.
    */
-  public abstract boolean updateEnabledStatus();
+  public boolean updateEnabledStatus()
+  {
+    return true;
+  }
 
 
   //#########################################################################

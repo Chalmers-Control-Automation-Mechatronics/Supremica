@@ -2,9 +2,9 @@
 //###########################################################################
 //# PROJECT: Waters/Supremica IDE
 //# PACKAGE: org.supremica.gui.ide.actions
-//# CLASS:   AbstractSaveAsAction
+//# CLASS:   AbstractSaveAction
 //###########################################################################
-//# $Id: AbstractSaveAction.java,v 1.1 2007-06-21 20:56:53 robi Exp $
+//# $Id: AbstractSaveAction.java,v 1.2 2007-06-23 10:16:00 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -17,25 +17,38 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
-import net.sourceforge.waters.gui.WmodFileFilter;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
+import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
+import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
 import net.sourceforge.waters.model.marshaller.WatersMarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.unchecked.Casting;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
-import org.supremica.automata.Automata;
-import org.supremica.automata.IO.AutomataToXML;
+import org.supremica.automata.Project;
 import org.supremica.automata.IO.SupremicaUnmarshaller;
-import org.supremica.gui.SupremicaXMLFileFilter;
 import org.supremica.gui.ide.AutomataContainer;
 import org.supremica.gui.ide.DocumentContainer;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
+
+/**
+ * A common base class for saving actions.
+ * This action class unifies the 'save' and 'save-as' actions for IDE
+ * documents, ensuring that they share the same file chooser and also code.
+ *
+ * The action handles both Waters modules and Supremica projects,
+ * and the conversion between these two formats when the user chooses a
+ * different file filter.
+ *
+ * @author Robi Malik, Hugo Flordal
+ */
 
 public abstract class AbstractSaveAction
   extends net.sourceforge.waters.gui.actions.IDEAction
@@ -46,9 +59,24 @@ public abstract class AbstractSaveAction
   AbstractSaveAction(final IDE ide)
   {
     super(ide);
+    setEnabled(false);
   }
     
     
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.observer.Observer
+  public void update(final EditorChangedEvent event)
+  {
+    switch (event.getKind()) {
+    case MAINPANEL_SWITCH:
+      updateEnabledStatus();
+      break;
+    default:
+      break;
+    }
+  }
+
+
   //#########################################################################
   //# Enabling and Disabling
   public boolean updateEnabledStatus()
@@ -76,21 +104,15 @@ public abstract class AbstractSaveAction
     final IDE ide = getIDE();
     final DocumentContainer container = ide.getActiveDocumentContainer();
     final DocumentProxy doc = container.getDocument();
-    File file = null;
     try {
-      file = doc.getFileLocation();
+      final File file = doc.getFileLocation();
+      if (file == null) {
+        invokeSaveAsAction();
+      } else {
+        saveDocument(file);
+      }
     } catch (final MalformedURLException exception) {
-      // No proper file---keep it null and invoke "save as" ...
-    }
-    if (file == null) {
       invokeSaveAsAction();
-    } else if (doc instanceof ModuleProxy) {
-      saveDocument(WmodFileFilter.getInstance(), file);
-    } else if (doc instanceof Automata) {
-      saveDocument(SupremicaXMLFileFilter.getInstance(), file);
-    } else {
-      throw new ClassCastException("Unexpected document type: " +
-                                   doc.getClass().getName() + "!");
     }
   }
 
@@ -109,40 +131,47 @@ public abstract class AbstractSaveAction
 
 
   //#########################################################################
-  //# Accessing the File Chooser
-  JFileChooser getFileChooser()
+  //# Auxiliary Methods
+  private JFileChooser getFileChooser()
   {
     final IDE ide = getIDE();
-    final Actions actions = ide.getActions();
-    final SaveAsAction saveas =
-      (SaveAsAction) actions.getAction(SaveAsAction.class);
-    return saveas.getFileChooser();
+    final JFileChooser chooser = ide.getFileChooser();
+    final DocumentManager manager = ide.getDocumentManager();
+    final FileFilter modfilter =
+      manager.findProxyMarshaller(ModuleProxy.class).getDefaultFileFilter();
+    final FileFilter supfilter =
+      manager.findProxyMarshaller(Project.class).getDefaultFileFilter();
+    final FileFilter current = chooser.getFileFilter();
+    chooser.setDialogType(JFileChooser.SAVE_DIALOG);
+    chooser.setMultiSelectionEnabled(false);
+    chooser.resetChoosableFileFilters();
+    chooser.addChoosableFileFilter(modfilter);
+    chooser.addChoosableFileFilter(supfilter);
+    if (current == modfilter || current == supfilter) {
+      chooser.setFileFilter(current);
+    } else {
+      chooser.setFileFilter(modfilter);
+    }
+    return chooser;
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private void saveDocument(final FileFilter filter, File file)
+  private void saveDocument(final FileFilter filter, final File file)
   {
     final IDE ide = getIDE();
+    final DocumentManager manager = ide.getDocumentManager();
     final DocumentContainer container = ide.getActiveDocumentContainer();
-    // Branch depending on chosen file filter
-    if (filter instanceof SupremicaXMLFileFilter) {
-      // Supremica XML
-      if (!filter.accept(file)) {
-        file = new File(file.getPath() + "." +
-                        SupremicaXMLFileFilter.SUPXML);
-      }
-      // If editor active, update analyzer
-      if (ide.editorActive()) {
-        container.getAnalyzerPanel().updateAutomata();
-      }
-      saveSupFile(file, container.getAnalyzerPanel().getAllAutomata());
-    } else if (filter instanceof WmodFileFilter) {
-      // Waters WMOD
-      if (!filter.accept(file)) {
-        file = new File(file.getPath() + "." + WmodFileFilter.WMOD);
-      }
+    final DocumentProxy doc = container.getDocument();
+    final Class<? extends DocumentProxy> clazz = doc.getClass();
+    final ProxyMarshaller<? extends DocumentProxy> marshaller =
+      manager.findProxyMarshaller(clazz);
+    final FileFilter docfilter = marshaller.getDefaultFileFilter();
+    if (docfilter == filter) {
+      final String ext = marshaller.getDefaultExtension();
+      final File extfile =
+        StandardExtensionFileFilter.ensureDefaultExtension(file, ext);
+      saveDocument(extfile);
+    } else if (doc instanceof Project) {
+      // Converting Supremica >> Waters ...
       // If analyzer active, check if there are unsupported features
       // in the project ...
       if (ide.analyzerActive() &&
@@ -154,56 +183,89 @@ public abstract class AbstractSaveAction
           return;
         }
       }
-      final ModuleProxy module;
       if (container instanceof ModuleContainer) {
-        module = container.getEditorPanel().getModuleSubject();
+        final ModuleProxy module =
+          container.getEditorPanel().getModuleSubject();
+        marshalDocument(file, module);
       } else if (container instanceof AutomataContainer) {
         final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
         final ProductDESImporter importer = new ProductDESImporter(factory);
-        final ProductDESProxy des =
-          container.getAnalyzerPanel().getAllAutomata();
-        module = importer.importModule(des);
+        final Project project = (Project) doc;
+        final ModuleProxy module = importer.importModule(project);
+        marshalDocument(file, module);
       } else {
         throw new ClassCastException
           ("Unknown document container type: " +
            container.getClass().getName() + "!");
       }
-      saveWmodFile(file, module);
+    } else if (doc instanceof ModuleProxy) {
+      // Converting Waters >> Supremica ...
+      if (ide.editorActive()) {
+        container.getAnalyzerPanel().updateAutomata();
+      }
+      final Project project = container.getAnalyzerPanel().getVisualProject();
+      marshalDocument(file, project);
     } else {
       throw new ClassCastException
-        ("Unknown file filter type: " + filter.getClass().getName() + "!");
+        ("Unknown document type: " + clazz.getName() + "!");
     }
   }
 
-  private void saveSupFile(final File file, final Automata automata)
+  private void marshalDocument(final File file, final DocumentProxy doc)
   {
     final IDE ide = getIDE();
+    final DocumentManager manager = ide.getDocumentManager();
+    final Class<DocumentProxy> clazz = Casting.toClass(doc.getClass());
+    final ProxyMarshaller<DocumentProxy> marshaller =
+      manager.findProxyMarshaller(clazz);
+    final String ext = marshaller.getDefaultExtension();
+    final File extfile =
+      StandardExtensionFileFilter.ensureDefaultExtension(file, ext);
+    final String type = getTypeString(doc);
     try {
-      final AutomataToXML exporter = new AutomataToXML(automata);
-      exporter.serialize(file.getAbsolutePath());
-      ide.info("Supremica project saved to " + file);
+      marshaller.marshal(doc, extfile);
+      ide.info(type + " saved to " + file);
+    } catch (final WatersMarshalException exception) {
+      JOptionPane.showMessageDialog(ide.getFrame(),
+                                    "Error saving " + type + " file:" +
+                                    exception.getMessage());
     } catch (final IOException exception) {
       JOptionPane.showMessageDialog(ide.getFrame(),
-                                    "Error saving Supremica file:" +
+                                    "Error saving " + type + " file:" +
                                     exception.getMessage());
     }
   }
-    
-  private void saveWmodFile(final File file, final ModuleProxy module)
+
+  private void saveDocument(final File file)
   {
     final IDE ide = getIDE();
+    final DocumentContainer container = ide.getActiveDocumentContainer();
+    final DocumentProxy doc = container.getDocument();
+    final DocumentManager manager = ide.getDocumentManager();
+    final String type = getTypeString(doc);
     try {
-      DocumentManager documentManager = ide.getDocumentManager();
-      documentManager.saveAs(module, file);
-      ide.info("Waters module saved to " + file);
+      manager.saveAs(doc, file);
+      ide.info(type + " saved to " + file);
     } catch (final WatersMarshalException exception) {
       JOptionPane.showMessageDialog(ide.getFrame(),
-                                    "Error saving module file:" +
+                                    "Error saving " + type + " file:" +
                                     exception.getMessage());
     } catch (final IOException exception) {
       JOptionPane.showMessageDialog(ide.getFrame(),
-                                    "Error saving module file:" +
+                                    "Error saving " + type + " file:" +
                                     exception.getMessage());
+    }
+  }
+
+  private String getTypeString(final DocumentProxy doc)
+  {
+    if (doc instanceof Project) {
+      return "Supremica project";
+    } else if (doc instanceof ModuleProxy) {
+      return "Waters module";
+    } else {
+      throw new ClassCastException
+        ("Unknown document type: " + doc.getClass().getName() + "!");
     }
   }
 

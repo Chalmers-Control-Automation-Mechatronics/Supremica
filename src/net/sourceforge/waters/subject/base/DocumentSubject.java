@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.base
 //# CLASS:   DocumentSubject
 //###########################################################################
-//# $Id: DocumentSubject.java,v 1.6 2007-04-19 09:39:54 avenir Exp $
+//# $Id: DocumentSubject.java,v 1.7 2007-06-23 10:16:00 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.base;
@@ -112,7 +112,6 @@ public abstract class DocumentSubject
     if (mLocation == null) {
       return null;
     }
-
     final URL url = mLocation.toURL();
     final String proto = url.getProtocol();
     if (proto.equals("file")) {

@@ -1,5 +1,5 @@
 //# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
-//# $Id: FileDialogs.java,v 1.32 2006-09-14 21:10:21 flordal Exp $
+//# $Id: FileDialogs.java,v 1.33 2007-06-23 10:16:00 robi Exp $
 
 /*
  * Supremica Software License Agreement
@@ -51,10 +51,13 @@
  */
 package org.supremica.gui;
 
-import org.supremica.properties.Config;
-import org.supremica.automata.IO.FileFormats;
 import javax.swing.filechooser.*;
 import javax.swing.*;
+
+import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
+import org.supremica.properties.Config;
+import org.supremica.automata.IO.FileFormats;
+
 
 public class FileDialogs
 {

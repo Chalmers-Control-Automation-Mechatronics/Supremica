@@ -52,6 +52,8 @@ package org.supremica.gui;
 import javax.swing.filechooser.*;
 import javax.swing.*;
 import java.io.File;
+
+import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
 import org.supremica.log.*;
 
 public class StandardExtensionFileChooser
@@ -133,13 +135,6 @@ public class StandardExtensionFileChooser
 			return newFile;
 		}
 
-		if (!standardFileFilter.hasExtension(fileName))
-		{
-			File newFile = new File(orgFile.getAbsolutePath() + standardFileFilter.getExtension());
-
-			return newFile;
-		}
-
-		return orgFile;
+		return standardFileFilter.ensureDefaultExtension(orgFile);
 	}
 }

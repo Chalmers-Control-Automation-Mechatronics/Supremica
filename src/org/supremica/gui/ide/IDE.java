@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.86 2007-06-21 20:56:53 robi Exp $
+//# $Id: IDE.java,v 1.87 2007-06-23 10:16:00 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -32,6 +32,7 @@ import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
+import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -44,6 +45,7 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.IO.ADSUnmarshaller;
 import org.supremica.automata.IO.HISCUnmarshaller;
 import org.supremica.automata.IO.SupremicaUnmarshaller;
+import org.supremica.automata.IO.SupremicaMarshaller;
 import org.supremica.automata.IO.UMDESUnmarshaller;
 import org.supremica.automata.Project;
 import org.supremica.gui.ide.actions.Actions;
@@ -63,7 +65,45 @@ public class IDE
     extends JFrame
     implements ChangeListener, IDEActionInterface, IDEReportInterface, Subject
 {
+
+	//#######################################################################
+	//# Data Members
+    private static Logger logger = LoggerFactory.createLogger(IDE.class);
+    private static InterfaceManager interfaceManager;
+    
+    // Document importing
+    private final ModuleProxyFactory mModuleFactory;
+    private final JAXBModuleMarshaller mModuleMarshaller;
+    private final ProxyUnmarshaller<ModuleProxy> validUnmarshaller;
+    private final ProxyUnmarshaller<Project> supremicaUnmarshaller;
+    private final ProxyMarshaller<Project> mSupremicaMarshaller;
+    private final ProxyUnmarshaller<ModuleProxy> hiscUnmarshaller;
+    private final ProxyUnmarshaller<ModuleProxy> umdesUnmarshaller;
+    private final ProxyUnmarshaller<ModuleProxy> adsUnmarshaller;
+    private final DocumentManager mDocumentManager;
+    
+    // GUI Components
+    private JPanel contentPanel;
+    private BorderLayout contentLayout;
+    private IDEMenuBar menuBar;
+    private IDEToolBar ideToolBar;
+    private JToolBar currToolBar = null;
+    private JTabbedPane tabPanel;
+    private JSplitPane splitPanelVertical;
+    private LogPanel logPanel;
+	private final JFileChooser mFileChooser;
+
+    private ModuleContainers mDocumentContainers;
+
+    // Actions
+    private final Collection<Observer> mObservers;
+    private final Actions theActions;
+
+    
+	//#######################################################################
+	//# Static Class Constants
     private static final long serialVersionUID = 1L;
+	private static final String IDENAME = "Supremica";
     
     static
     {
@@ -72,39 +112,10 @@ public class IDE
         Config.LOG_TO_CONSOLE.set(false);
         Config.LOG_TO_GUI.set(true);
     }
-    private static Logger logger = LoggerFactory.createLogger(IDE.class);
-    private static InterfaceManager interfaceManager;
-    
-    // Document importing
-    private final ModuleProxyFactory mModuleFactory;
-    private final JAXBModuleMarshaller mModuleMarshaller;
-    private final ProxyUnmarshaller<ModuleProxy> validUnmarshaller;
-    private final ProxyUnmarshaller<DocumentProxy> supremicaUnmarshaller;
-    private final ProxyUnmarshaller<ModuleProxy> hiscUnmarshaller;
-    private final ProxyUnmarshaller<ModuleProxy> umdesUnmarshaller;
-    private final ProxyUnmarshaller<ModuleProxy> adsUnmarshaller;
-    private final DocumentManager mDocumentManager;
-    
-    // Actions
-    private final Collection<Observer> mObservers;
-    private final Actions theActions;
 
-    private JPanel contentPanel;
-    private BorderLayout contentLayout;
-    
-    private IDEMenuBar menuBar;
-    private IDEToolBar ideToolBar;
-    private JToolBar currToolBar = null;
-    
-    private ModuleContainers mDocumentContainers;
-    
-    private LogPanel logPanel;
-    
-    private JTabbedPane tabPanel;
-    private JSplitPane splitPanelVertical;
-    
-    private static final String IDENAME = "Supremica";
-    
+
+	//#######################################################################
+	//# Constructor
     public IDE()
 		throws JAXBException, SAXException
     {
@@ -123,6 +134,7 @@ public class IDE
         final OperatorTable opTable = CompilerOperatorTable.getInstance();
         mModuleMarshaller = new JAXBModuleMarshaller(mModuleFactory, opTable);
         supremicaUnmarshaller = new SupremicaUnmarshaller(mModuleFactory);
+        mSupremicaMarshaller = new SupremicaMarshaller();
         validUnmarshaller = new ValidUnmarshaller(mModuleFactory, opTable);
         hiscUnmarshaller = new HISCUnmarshaller(mModuleFactory);
         umdesUnmarshaller = new UMDESUnmarshaller(mModuleFactory);
@@ -132,6 +144,7 @@ public class IDE
         mDocumentManager = new DocumentManager();
         // Add marshallers in order of importance (shows up in the file.save dialog)
         mDocumentManager.registerMarshaller(mModuleMarshaller);
+        mDocumentManager.registerMarshaller(mSupremicaMarshaller);
         // Add unmarshallers in order of importance (shows up in the file.open dialog)
         mDocumentManager.registerUnmarshaller(mModuleMarshaller);
         mDocumentManager.registerUnmarshaller(supremicaUnmarshaller);
@@ -164,11 +177,21 @@ public class IDE
         contentPanel.add(splitPanelVertical, BorderLayout.CENTER);
         //pack();
         //validate();
-        
+
+		final File startdir = new File(Config.FILE_OPEN_PATH.get());
+		mFileChooser = new JFileChooser(startdir);
+
         // Show comment
         defaultModuleContainer.getEditorPanel().showComment();
         
         logger.info("Supremica version: " + (new Version()).toString());
+    }
+    
+	//#######################################################################
+	//# Simple Access
+    public String getName()
+    {
+        return IDENAME;
     }
     
     public Actions getActions()
@@ -176,6 +199,9 @@ public class IDE
         return theActions;
     }
     
+
+	//#######################################################################
+	//# Document Containers
     public Iterator<DocumentContainer> documentContainerIterator()
     {
         return mDocumentContainers.iterator();
@@ -235,11 +261,6 @@ public class IDE
         }
     }
     
-    public String getName()
-    {
-        return IDENAME;
-    }
-    
     public ModuleSubject createNewModuleSubject()
     {
         return mDocumentContainers.createNewModuleSubject();
@@ -250,8 +271,6 @@ public class IDE
         return mDocumentContainers.createNewModuleContainer();
     }
     
-    //###################################################################
-    //# Auxiliary Methods
     public void installContainer(final DocumentProxy document)
     {
         if (document instanceof ModuleSubject)
@@ -309,7 +328,10 @@ public class IDE
         add(container);
         setActive(container);
     }
-    
+
+
+	//#######################################################################
+    //#
     public JFrame getFrame()
     {
         return this;
@@ -324,7 +346,15 @@ public class IDE
     {
         return mDocumentManager;
     }
+
+	public JFileChooser getFileChooser()
+	{
+		return mFileChooser;
+	}
+
     
+	//#######################################################################
+    //# Toolbar
     private void setToolBar(JToolBar toolBar)
     {
         if (toolBar == null)
@@ -349,7 +379,7 @@ public class IDE
         
         // Set standard actions
         ideToolBar.add(getActions().newAction);
-        ideToolBar.add(getActions().openAction);
+        ideToolBar.add(getActions().getAction(OpenAction.class));
         ideToolBar.add(getActions().getAction(SaveAction.class));
         ideToolBar.add(getActions().editorPrintAction);
         ideToolBar.addSeparator();
@@ -367,7 +397,10 @@ public class IDE
     {
         return ideToolBar;
     }
+
     
+	//#######################################################################
+	//# Listeners
     /**
      * Overridden so we can exit when window is closed
      */
@@ -451,14 +484,23 @@ public class IDE
         DocumentContainer activeContainer = getActiveDocumentContainer();
         return activeContainer.getAnalyzerPanel().getVisualProject();
     }
-    
-    public boolean openFiles(List<File> filesToOpen)
+
+    public boolean openFiles(final List<File> filesToOpen)
     {
-        ((OpenAction)theActions.openAction).doAction(filesToOpen);
-        return true;
+		final OpenAction action =
+			(OpenAction) theActions.getAction(OpenAction.class);
+		boolean result = true;
+		for (final File file : filesToOpen) {
+			if (!action.openFile(file)) {
+				result = false;
+			}
+		}
+		return result;
     }
-    
-    // ** MF ** Implementation of Gui stuff
+
+
+	//#######################################################################
+	//# Interface org.supremica.gui.ide.IDEReportInterface
     public void error(String msg)
     {
         logger.error(msg);
@@ -479,15 +521,18 @@ public class IDE
         logger.debug(msg);
     }
     
+
+	//#######################################################################
+	//# Main Program
     public static void main(String args[])
-    throws Exception
+		throws Exception
     {
         List<File> filesToOpen = ProcessCommandLineArguments.process(args);
         
         interfaceManager = InterfaceManager.getInstance();
         interfaceManager.initLookAndFeel();
         
-        IDE ide = new IDE();
+        final IDE ide = new IDE();
         ide.setVisible(true);
         ide.openFiles(filesToOpen);
     }

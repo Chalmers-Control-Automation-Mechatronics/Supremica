@@ -1,10 +1,10 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# PROJECT: Waters/Supremica IDE
-//# PACKAGE:  org.supremica.gui.ide.actions
+//# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   SaveAsAction
 //###########################################################################
-//# $Id: SaveAsAction.java,v 1.7 2007-06-21 20:56:53 robi Exp $
+//# $Id: SaveAsAction.java,v 1.8 2007-06-23 10:16:00 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -33,7 +33,6 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import org.supremica.automata.Automata;
 import org.supremica.automata.IO.AutomataToXML;
 import org.supremica.automata.IO.SupremicaUnmarshaller;
-import org.supremica.gui.SupremicaXMLFileFilter;
 import org.supremica.gui.ide.AutomataContainer;
 import org.supremica.gui.ide.DocumentContainer;
 import org.supremica.gui.ide.IDE;
@@ -48,19 +47,11 @@ public class SaveAsAction extends AbstractSaveAction
   public SaveAsAction(final IDE ide)
   {
     super(ide);
-
     putValue(Action.NAME, "Save As ...");
     putValue(Action.SHORT_DESCRIPTION, "Save the module using a new name");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_A);
     putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource
               ("/toolbarButtonGraphics/general/Save16.gif")));
-
-    mFileChooser = new JFileChooser(".");
-    final FileFilter modfilter = WmodFileFilter.getInstance();
-    final FileFilter supfilter = SupremicaXMLFileFilter.getInstance();
-    mFileChooser.addChoosableFileFilter(modfilter);
-    mFileChooser.addChoosableFileFilter(supfilter);
-    mFileChooser.setFileFilter(modfilter);
   }
 
 
@@ -78,18 +69,5 @@ public class SaveAsAction extends AbstractSaveAction
   {
     return "Save the " + type + "using a new name";
   }
-
-
-  //#########################################################################
-  //# Accessing the File Chooser
-  JFileChooser getFileChooser()
-  {
-    return mFileChooser;
-  }
-
-
-  //#########################################################################
-  //# Data Members
-  private final JFileChooser mFileChooser;
 
 }

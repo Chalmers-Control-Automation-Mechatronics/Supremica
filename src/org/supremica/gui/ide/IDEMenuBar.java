@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.41 2007-06-21 20:56:53 robi Exp $
+//# $Id: IDEMenuBar.java,v 1.42 2007-06-23 10:16:00 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -31,6 +31,7 @@ import org.supremica.automata.templates.TemplateGroup;
 import org.supremica.automata.templates.TemplateItem;
 import org.supremica.gui.ExampleTemplates;
 import org.supremica.gui.ide.actions.Actions;
+import org.supremica.gui.ide.actions.OpenAction;
 import org.supremica.gui.ide.actions.SaveAction;
 import org.supremica.gui.ide.actions.SaveAsAction;
 
@@ -91,7 +92,8 @@ public class IDEMenuBar
         JMenu menu = new JMenu("File");
         menu.setMnemonic(KeyEvent.VK_F);
         menu.add(ide.getActions().newAction.getMenuItem());
-        menu.add(ide.getActions().openAction.getMenuItem());
+		final Action open = actions.getAction(OpenAction.class);
+        menu.add(new JMenuItem(open));
 		final Action save = actions.getAction(SaveAction.class);
         menu.add(new JMenuItem(save));
 		final Action saveas = actions.getAction(SaveAsAction.class);

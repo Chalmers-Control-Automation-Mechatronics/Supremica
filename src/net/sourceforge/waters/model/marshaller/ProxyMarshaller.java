@@ -4,13 +4,14 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   ProxyMarshaller
 //###########################################################################
-//# $Id: ProxyMarshaller.java,v 1.3 2006-11-03 15:01:57 torda Exp $
+//# $Id: ProxyMarshaller.java,v 1.4 2007-06-23 10:16:00 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
 
 import java.io.File;
 import java.io.IOException;
+import javax.swing.filechooser.FileFilter;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 
@@ -52,5 +53,12 @@ public interface ProxyMarshaller<D extends DocumentProxy>
    * Gets a default extension for the files written by this marshaller.
    */
   public String getDefaultExtension();
+
+  /**
+   * Gets a default file filter that accepts the files with default
+   * extension.  Only one file filter is created, and this method ensures
+   * that the same object is returned by each call.
+   */
+  public FileFilter getDefaultFileFilter();
 
 }

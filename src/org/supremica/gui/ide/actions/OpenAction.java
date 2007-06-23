@@ -1,10 +1,10 @@
-//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters/Supremica IDE
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   OpenAction
 //###########################################################################
-//# $Id: OpenAction.java,v 1.21 2007-06-20 19:43:38 flordal Exp $
+//# $Id: OpenAction.java,v 1.22 2007-06-23 10:16:00 robi Exp $
 //###########################################################################
 
 
@@ -13,110 +13,113 @@ package org.supremica.gui.ide.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
-
-import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
+
 import net.sourceforge.waters.model.base.DocumentProxy;
-import net.sourceforge.waters.subject.module.ModuleSubject;
-import org.supremica.automata.Automata;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import org.supremica.gui.ide.IDE;
-import org.supremica.properties.Config;
 
 
 public class OpenAction
-    extends IDEAction
+    extends net.sourceforge.waters.gui.actions.IDEAction
 {
-    private static final long serialVersionUID = 1L;
 
-    private JFileChooser chooser;
-
-    public OpenAction(List<IDEAction> actionList)
+    //#######################################################################
+    //# Constructor
+    OpenAction(final IDE ide)
     {
-        super(actionList);
-
+        super(ide);
         putValue(Action.NAME, "Open/Import...");
         putValue(Action.SHORT_DESCRIPTION, "Open/import a project");
-        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_O));
-        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Open16.gif")));
+        putValue(Action.MNEMONIC_KEY, KeyEvent.VK_O);
+        putValue(Action.ACCELERATOR_KEY,
+                 KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+        putValue(Action.SMALL_ICON,
+                 new ImageIcon(IDE.class.getResource
+                               ("/toolbarButtonGraphics/general/Open16.gif")));
     }
 
-    /**
-     * Ugly override, we need the IDE for initialisation...
-     */
-    public void setIDEActionInterface(IDEActionInterface ide)
-    {
-        super.setIDEActionInterface(ide);
 
-        // Initialise the filechooser
-        chooser = new JFileChooser();
+    //#######################################################################
+    //# Interface java.awt.event.ActionListener
+    public void actionPerformed(final ActionEvent event)
+    {
+        // Get the state and dialog ...
+        final IDE ide = getIDE();
+        final DocumentManager manager = ide.getDocumentManager();
+        final JFileChooser chooser = ide.getFileChooser();
+        final FileFilter current = chooser.getFileFilter();
+        // Set up the dialog ...
         chooser.setDialogType(JFileChooser.OPEN_DIALOG);
-        chooser.setCurrentDirectory(new java.io.File(Config.FILE_OPEN_PATH.get()));
         chooser.setMultiSelectionEnabled(true);
-        for (FileFilter filter : ide.getIDE().getDocumentManager().getSupportedFileFilters())
-        {
+        chooser.resetChoosableFileFilters();
+        final List<FileFilter> filters = manager.getSupportedFileFilters();
+        boolean reselect = false;
+        for (final FileFilter filter : filters) {
             chooser.addChoosableFileFilter(filter);
+            if (filter == current) {
+                reselect = true;
+            }
         }
-        // Select the first filter
-        chooser.setFileFilter(ide.getIDE().getDocumentManager().getSupportedFileFilters().iterator().next());
+        // Select the first filter ...
+        final FileFilter first =
+            reselect ? current : filters.iterator().next();
+        chooser.setFileFilter(first);
+        // Show the dialog ...
+        new WatersFileImporter(chooser);
     }
 
-    public void actionPerformed(ActionEvent e)
+
+    //#######################################################################
+    //# Opening Files
+    public boolean openFile(final File file)
     {
-        doAction();
+        final IDE ide = getIDE();
+        try {
+            // The documentmanager does the loading, by extension.
+            final DocumentManager manager = ide.getDocumentManager();
+            final DocumentProxy document = manager.load(file);
+            ide.installContainer(document);
+            return true;
+        } catch (final WatersUnmarshalException exception) {
+            JOptionPane.showMessageDialog(ide.getFrame(),
+                                          "Error opening file:" +
+                                          exception.getMessage());
+            return false;
+        } catch (final IOException exception) {
+            JOptionPane.showMessageDialog(ide.getFrame(),
+                                          "Error opening file:" +
+                                          exception.getMessage());
+            return false;
+        }
     }
 
-    public void doAction()
-    {
-        final FileImporter importer = new WatersFileImporter(chooser);
-    }
-
-    public void doAction(List<File> theFiles)
-    {
-        final FileImporter importer = new WatersFileImporter(theFiles);
-    }
 
     //#######################################################################
     //# Local Class WatersFileImporter
-    private
-        class WatersFileImporter extends FileImporter
+    private class WatersFileImporter extends FileImporter
     {
         //###################################################################
         //# Constructors
-        private WatersFileImporter(JFileChooser chooser)
+        private WatersFileImporter(final JFileChooser chooser)
         {
-            super(chooser, ide);
-        }
-
-        private WatersFileImporter(List<File> theFiles)
-        {
-            super(theFiles, ide);
+            super(chooser, getIDE());
         }
 
         //###################################################################
         //# Overrides for Base Class org.supremica.gui.ide.actions.FileImporter
         void openFile(final File file)
         {
-            DocumentProxy document;
-            try
-            {
-                // The documentmanager does the loading, by extension
-                document = ide.getIDE().getDocumentManager().load(file);
-            }
-            catch (RuntimeException ex)
-            {
-                throw ex;
-            }
-            catch (Exception ex)
-            {
-                ide.getIDE().error(ex.getMessage());
-                return;
-            }
-            ide.getIDE().installContainer(document);
+            OpenAction.this.openFile(file);
         }
     }
+
 }

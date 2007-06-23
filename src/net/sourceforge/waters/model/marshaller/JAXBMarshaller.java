@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   JAXBMarshaller
 //###########################################################################
-//# $Id: JAXBMarshaller.java,v 1.6 2006-09-15 09:26:13 robi Exp $
+//# $Id: JAXBMarshaller.java,v 1.7 2007-06-23 10:16:00 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -141,12 +141,16 @@ public abstract class JAXBMarshaller
     return Collections.singletonList(ext);
   }
 
-  public Collection<FileFilter> getSupportedFileFilters()
+  public FileFilter getDefaultFileFilter()
   {
     final String ext = getDefaultExtension();
     final String description = getDescription();
-    final FileFilter filter =
-      new StandardExtensionFileFilter(ext, description);
+    return StandardExtensionFileFilter.getFilter(ext, description);
+  }
+
+  public Collection<FileFilter> getSupportedFileFilters()
+  {
+    final FileFilter filter = getDefaultFileFilter();
     return Collections.singletonList(filter);
   }
 
