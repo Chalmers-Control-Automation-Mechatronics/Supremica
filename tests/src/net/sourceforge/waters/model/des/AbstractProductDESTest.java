@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   AbstractProductDESTest
 //###########################################################################
-//# $Id: AbstractProductDESTest.java,v 1.2 2006-07-20 02:28:38 robi Exp $
+//# $Id: AbstractProductDESTest.java,v 1.3 2007-06-23 09:18:31 robi Exp $
 //###########################################################################
 
 
@@ -16,6 +16,7 @@ import java.io.PrintWriter;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.marshaller.AbstractJAXBTest;
+import net.sourceforge.waters.model.marshaller.DocumentIntegrityChecker;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
@@ -73,8 +74,9 @@ public abstract class AbstractProductDESTest
     return mPrinter;
   }
 
-  protected void checkIntegrity(ProductDESProxy des)
+  protected DocumentIntegrityChecker getIntegrityChecker()
   {
+    return DocumentIntegrityChecker.getInstance();
   }
 
 

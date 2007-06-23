@@ -3,7 +3,7 @@
 //# PACKAGE: net.sourceforge.waters.plain.base
 //# CLASS:   DocumentElement
 //###########################################################################
-//# $Id: DocumentElement.java,v 1.5 2006-09-19 15:53:20 robi Exp $
+//# $Id: DocumentElement.java,v 1.6 2007-06-23 09:18:31 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.plain.base;
@@ -100,6 +100,9 @@ public abstract class DocumentElement
 
   public File getFileLocation() throws MalformedURLException
   {
+    if (mLocation == null) {
+      return null;
+    }
     final URL url = mLocation.toURL();
     final String proto = url.getProtocol();
     if (proto.equals("file")) {

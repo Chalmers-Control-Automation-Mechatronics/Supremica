@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   AbstractModuleTest
 //###########################################################################
-//# $Id: AbstractModuleTest.java,v 1.11 2007-06-08 10:45:20 robi Exp $
+//# $Id: AbstractModuleTest.java,v 1.12 2007-06-23 09:18:31 robi Exp $
 //###########################################################################
 
 
@@ -380,10 +380,9 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     return mPrinter;
   }
 
-  protected void checkIntegrity(final ModuleProxy module)
-    throws Exception
+  protected ModuleIntegrityChecker getIntegrityChecker()
   {
-    mIntegrityChecker.check(module);
+    return ModuleIntegrityChecker.getInstance();
   }
 
 
@@ -398,7 +397,6 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     mMarshaller = new JAXBModuleMarshaller(factory, optable);
     final PrintWriter writer = new PrintWriter(System.out);
     mPrinter = new ModuleProxyPrinter(writer);
-    mIntegrityChecker = ModuleIntegrityChecker.getInstance();
   }
 
   protected void tearDown()
@@ -419,6 +417,5 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
   //# Data Members
   private JAXBModuleMarshaller mMarshaller;
   private ProxyPrinter mPrinter;
-  private ModuleIntegrityChecker mIntegrityChecker;
 
 }

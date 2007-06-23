@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   SubjectModuleTest
 //###########################################################################
-//# $Id: SubjectModuleTest.java,v 1.5 2006-11-03 15:01:57 torda Exp $
+//# $Id: SubjectModuleTest.java,v 1.6 2007-06-23 09:18:31 robi Exp $
 //###########################################################################
 
 
@@ -44,33 +44,9 @@ public class SubjectModuleTest extends AbstractModuleTest
   //#########################################################################
   //# Overrides for Abstract Base Class
   //# net.sourceforge.waters.model.marshaller.AbstractJAXBTest
-  protected void checkIntegrity(final ModuleProxy module)
-    throws Exception
+  protected ModuleSubjectIntegrityChecker getIntegrityChecker()
   {
-    super.checkIntegrity(module);
-    mChecker.check(module);
+    return ModuleSubjectIntegrityChecker.getInstance();
   }
-
-
-  //#########################################################################
-  //# Overrides for junit.framework.TestCase
-  protected void setUp()
-    throws Exception
-  { 
-    super.setUp();
-    mChecker = new ModuleHierarchyChecker();
-  }
-
-  protected void tearDown()
-    throws Exception
-  {
-    mChecker = null;
-    super.tearDown();
-  }
-
-
-  //#########################################################################
-  //# Data Members
-  private ModuleHierarchyChecker mChecker;
 
 }

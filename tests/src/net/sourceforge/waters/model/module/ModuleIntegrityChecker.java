@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.module
 //# CLASS:   ModuleIntegrityChecker
 //###########################################################################
-//# $Id: ModuleIntegrityChecker.java,v 1.1 2006-09-14 11:31:12 robi Exp $
+//# $Id: ModuleIntegrityChecker.java,v 1.2 2007-06-23 09:18:31 robi Exp $
 //###########################################################################
 
 
@@ -16,10 +16,13 @@ import java.util.List;
 import java.util.Set;
 import junit.framework.Assert;
 
+import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.marshaller.DocumentIntegrityChecker;
 
 
 public class ModuleIntegrityChecker
+  extends DocumentIntegrityChecker
 {
 
   //#########################################################################
@@ -32,15 +35,24 @@ public class ModuleIntegrityChecker
     return theInstance;
   }
 
-  private ModuleIntegrityChecker()
+  protected ModuleIntegrityChecker()
   {
   }
 
 
   //#########################################################################
   //# Invocation
-  public void check(final ModuleProxy module)
+  public void check(final DocumentProxy doc)
+    throws Exception
   {
+    final ModuleProxy module = (ModuleProxy) doc;
+    check(module);
+  }
+
+  public void check(final ModuleProxy module)
+    throws Exception
+  {
+    super.check(module);
     checkModuleIntegrity(module);
   }
 

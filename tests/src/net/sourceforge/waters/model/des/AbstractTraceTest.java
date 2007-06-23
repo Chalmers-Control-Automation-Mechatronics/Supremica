@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.des
 //# CLASS:   AbstractTraceTest
 //###########################################################################
-//# $Id: AbstractTraceTest.java,v 1.3 2006-09-12 14:57:53 robi Exp $
+//# $Id: AbstractTraceTest.java,v 1.4 2007-06-23 09:18:31 robi Exp $
 //###########################################################################
 
 
@@ -15,6 +15,7 @@ import java.io.PrintWriter;
 
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.marshaller.DocumentIntegrityChecker;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.AbstractJAXBTest;
@@ -103,8 +104,9 @@ public abstract class AbstractTraceTest extends AbstractJAXBTest<TraceProxy>
     return mPrinter;
   }
 
-  protected void checkIntegrity(TraceProxy des)
+  protected DocumentIntegrityChecker getIntegrityChecker()
   {
+    return DocumentIntegrityChecker.getInstance();
   }
 
 

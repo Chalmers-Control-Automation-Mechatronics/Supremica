@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   ModuleHierarchyChecker
 //###########################################################################
-//# $Id: ModuleHierarchyChecker.java,v 1.6 2007-06-08 10:45:20 robi Exp $
+//# $Id: ModuleHierarchyChecker.java,v 1.7 2007-06-23 09:18:31 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.subject.module;
@@ -51,7 +51,15 @@ class ModuleHierarchyChecker
 
   //#########################################################################
   //# Constructors
-  public ModuleHierarchyChecker()
+  public static ModuleHierarchyChecker getInstance()
+  {
+    if (theInstance == null) {
+      theInstance = new ModuleHierarchyChecker();
+    }
+    return theInstance;
+  }
+
+  protected ModuleHierarchyChecker()
   {
   }
 
@@ -409,5 +417,10 @@ class ModuleHierarchyChecker
   //#########################################################################
   //# Data Members
   private Collection<NodeSubject> mNodeSet;
+
+
+  //#########################################################################
+  //# Class Variables
+  private static ModuleHierarchyChecker theInstance = null;
 
 }

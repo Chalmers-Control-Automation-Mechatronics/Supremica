@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.subject.module
 //# CLASS:   NodeSetSubjectTest
 //###########################################################################
-//# $Id: NodeSetSubjectTest.java,v 1.2 2006-11-17 03:38:22 robi Exp $
+//# $Id: NodeSetSubjectTest.java,v 1.3 2007-06-23 09:18:31 robi Exp $
 //###########################################################################
 
 
@@ -183,7 +183,7 @@ public class NodeSetSubjectTest extends AbstractWatersTest
     throws Exception
   { 
     super.setUp();
-    mChecker = new ModuleHierarchyChecker();
+    mChecker = ModuleHierarchyChecker.getInstance();
     mNode1 = new SimpleNodeSubject("s1");
     mNode2 = new SimpleNodeSubject("s2");
     mNode3 = new SimpleNodeSubject("s3");

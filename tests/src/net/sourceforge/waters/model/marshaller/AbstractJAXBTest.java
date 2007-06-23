@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   AbstractJAXBTest
 //###########################################################################
-//# $Id: AbstractJAXBTest.java,v 1.3 2006-11-03 15:01:57 torda Exp $
+//# $Id: AbstractJAXBTest.java,v 1.4 2007-06-23 09:18:31 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.model.marshaller;
@@ -253,6 +253,13 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
     return cloned;
   }
 
+  protected void checkIntegrity(final D document)
+    throws Exception
+  {
+    final DocumentIntegrityChecker checker = getIntegrityChecker();
+    checker.check(document);
+  }
+
 
   //#########################################################################
   //# Creating a Document Manager
@@ -274,7 +281,7 @@ public abstract class AbstractJAXBTest<D extends DocumentProxy>
   protected abstract ProxyMarshaller<D> getProxyMarshaller();
   protected abstract ProxyUnmarshaller<D> getProxyUnmarshaller();
   protected abstract ProxyPrinter getPrinter();
-  protected abstract void checkIntegrity(D document) throws Exception;
+  protected abstract DocumentIntegrityChecker getIntegrityChecker();
 
 
   //#########################################################################
