@@ -14,11 +14,7 @@ import org.supremica.gui.ide.DocumentContainer;
 public interface IDEActionInterface
     extends IDEReportInterface
 {
-    public ModuleSubject createNewModuleSubject();
     public DocumentContainer getActiveDocumentContainer();
-    public void add(DocumentContainer container);
-    public void remove(DocumentContainer container);
-    public void setActive(DocumentContainer container);
     public JFrame getFrame();
     public IDE getIDE();
     public Actions getActions();

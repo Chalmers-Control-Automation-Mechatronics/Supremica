@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   IDEAction
 //###########################################################################
-//# $Id: IDEAction.java,v 1.2 2007-06-23 10:16:00 robi Exp $
+//# $Id: IDEAction.java,v 1.3 2007-06-24 18:40:06 robi Exp $
 //###########################################################################
 
 
@@ -90,41 +90,14 @@ public abstract class IDEAction
    * Callback for state changes of the IDE. This method gets called
    * automatically when the user changes the IDE state, switches panels,
    * load new modules, etc. In response, it should check the new state
-   * of the IDE and enable or disable the action accordingly. The default
-   * implementation only calls {@link #updateEnabledStatus()} if the user
-   * has switched main panels.
+   * of the IDE and enable or disable the action accordingly. This
+   * default implementation does nothing, producing an action that is
+   * always enabled.
    * @param  event  An event object providing some details on what exactly
    *                has changed.
    */
   public void update(final EditorChangedEvent event)
   {
-    switch (event.getKind()) {
-    case MAINPANEL_SWITCH:
-      updateEnabledStatus();
-      break;
-    default:
-      break;
-    }
-  }
-
-
-  //#########################################################################
-  //# Enabling and Disabling
-  /**
-   * Enables or disables this action.
-   * This method is called by the {@link #update(EditorChangedEvent)
-   * update()} method when a significant change in the IDE has been
-   * detected. It has to reevaluate the state and enable or disable this
-   * action accordingly using the {@link
-   * javax.swing.Action@setEnabled(boolean) setEnabled()} method. This
-   * default implementation does nothing, producing an action that is
-   * always enabled.
-   * @return The new enablement status, <CODE>true</CODE> if this action
-   *         now is enabled, <CODE>false</CODE> otherwise.
-   */
-  public boolean updateEnabledStatus()
-  {
-    return true;
   }
 
 

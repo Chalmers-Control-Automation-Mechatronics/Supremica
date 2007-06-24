@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.observer
 //# CLASS:   MainPanelSwitchdEvent
 //###########################################################################
-//# $Id: MainPanelSwitchEvent.java,v 1.1 2007-06-21 15:57:55 robi Exp $
+//# $Id: MainPanelSwitchEvent.java,v 1.2 2007-06-24 18:40:06 robi Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui.observer;
@@ -13,8 +13,7 @@ package net.sourceforge.waters.gui.observer;
 /**
  * A notification sent by the IDE to indicate a switch of main panels.
  * This event is sent when the user has switched between the editor and
- * analyzer panels. This event is also produced when a new file is opened
- * or activated.
+ * analyzer panels.
  *
  * @author Robi Malik
  */

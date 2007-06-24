@@ -4,48 +4,64 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   AutomataContainer
 //###########################################################################
-//# $Id: AutomataContainer.java,v 1.3 2007-06-21 15:57:55 robi Exp $
+//# $Id: AutomataContainer.java,v 1.4 2007-06-24 18:40:06 robi Exp $
 //###########################################################################
 
 
 package org.supremica.gui.ide;
 
-import javax.swing.JTabbedPane;
+import java.awt.Component;
+
 import org.supremica.automata.Project;
+
 
 public class AutomataContainer 
     extends DocumentContainer
 {
+
     //#######################################################################
     //# Constructor
     public AutomataContainer(final IDE ide, final Project project)
     {
         super(ide, project);
-        getAnalyzerPanel().addProject(project);
+		mAnalyzerPanel = new AnalyzerPanel(this, "Analyzer");
+        mAnalyzerPanel.addProject(project);
     }
     
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+	//# org.supremica.gui.ide.DocumentContainer
+    public Component getPanel()
+	{
+		return mAnalyzerPanel;
+	}
+
+    public EditorPanel getEditorPanel()
+	{
+		return null;
+	}
+
+    public AnalyzerPanel getAnalyzerPanel()
+	{
+		return mAnalyzerPanel;
+	}
+	public boolean isEditorActive()
+	{
+		return false;
+	}
+
+	public boolean isAnalyzerActive()
+	{
+		return true;
+	}
+
+
+    //#######################################################################
+    //# Simple Access
     public Project getAutomata()
     {
         return (Project) getDocument();
-    }
-    
-    public void addToTabPanel(JTabbedPane tabPanel)
-    {
-        tabPanel.add(getAnalyzerPanel());
-    }
-    
-    public EditorPanel getEditorPanel()
-    {
-        return null;
-    }
-    
-    public AnalyzerPanel getAnalyzerPanel()
-    {
-        if (analyzerPanel == null)
-        {
-            analyzerPanel = new AnalyzerPanel(this, "Analyzer");
-        }
-        return analyzerPanel;
     }
     
     public SimulatorPanel getSimulatorPanel()
@@ -57,10 +73,10 @@ public class AutomataContainer
         return simulatorPanel;
     }
     
-    public void updateActiveTab(JTabbedPane tabPanel)
-    {
-    }
-    
-    private AnalyzerPanel analyzerPanel = null;
+
+    //#######################################################################
+    //# Data Members
+	private final AnalyzerPanel mAnalyzerPanel;
     private SimulatorPanel simulatorPanel = null;
+
 }

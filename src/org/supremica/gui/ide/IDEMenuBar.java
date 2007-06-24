@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.42 2007-06-23 10:16:00 robi Exp $
+//# $Id: IDEMenuBar.java,v 1.43 2007-06-24 18:40:06 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -12,7 +12,11 @@ package org.supremica.gui.ide;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Iterator;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
@@ -24,13 +28,17 @@ import javax.swing.event.MenuListener;
 
 import net.sourceforge.waters.gui.actions.WatersUndoAction;
 import net.sourceforge.waters.gui.actions.WatersRedoAction;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.model.base.DocumentProxy;
-import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 import org.supremica.automata.templates.TemplateGroup;
 import org.supremica.automata.templates.TemplateItem;
 import org.supremica.gui.ExampleTemplates;
 import org.supremica.gui.ide.actions.Actions;
+import org.supremica.gui.ide.actions.CloseAction;
+import org.supremica.gui.ide.actions.NewAction;
 import org.supremica.gui.ide.actions.OpenAction;
 import org.supremica.gui.ide.actions.SaveAction;
 import org.supremica.gui.ide.actions.SaveAsAction;
@@ -38,13 +46,19 @@ import org.supremica.gui.ide.actions.SaveAsAction;
 
 public class IDEMenuBar
     extends JMenuBar
+	implements Observer
 {
-    private IDE ide;
-    private int startPoint = 0;
 
+    //#######################################################################
+    //# Data Members
+    private final IDE ide;
     private JMenu editorMenu;
     private JMenu analyzerMenu;
-    
+    private JMenu mModulesMenu;
+
+
+    //#######################################################################
+    //# Inner Class NewFromTemplateHandler
     class NewFromTemplateHandler
         implements ActionListener
     {
@@ -57,31 +71,27 @@ public class IDEMenuBar
 
         public void actionPerformed(ActionEvent e)
         {
-            DocumentProxy document;
-            try
-            {
-                // The documentmanager does the loading, by extension
-                document = ide.getIDE().getDocumentManager().load(TemplateItem.class.getResource(item.getPath()));
-            }
-            catch (IOException ex)
-            {
-                ide.error("Exception loading " + item.getPath() + ".", ex);
-                return;
-            }
-            catch (WatersUnmarshalException ex)
-            {
-                ide.error("Exception loading " + item.getPath() + ".", ex);
-                return;
-            }
-            ide.getIDE().installContainer(document);
+			try {
+				final String path = item.getPath();
+				final URL url = TemplateItem.class.getResource(path);
+				final URI uri = url.toURI();
+				final DocumentContainerManager manager =
+					ide.getDocumentContainerManager();
+				manager.openContainer(uri);
+			} catch (final URISyntaxException exception) {
+				throw new WatersRuntimeException(exception);
+			}
         }
     }
 
+
+    //#######################################################################
+    //# Constructor
     public IDEMenuBar(IDE ide)
     {
         this.ide = ide;
-
         initMenubar();
+		ide.attach(this);
     }
 
     private void initMenubar()
@@ -91,14 +101,16 @@ public class IDEMenuBar
         // File
         JMenu menu = new JMenu("File");
         menu.setMnemonic(KeyEvent.VK_F);
-        menu.add(ide.getActions().newAction.getMenuItem());
+		final Action newmod = actions.getAction(NewAction.class);
+        menu.add(new JMenuItem(newmod));
 		final Action open = actions.getAction(OpenAction.class);
         menu.add(new JMenuItem(open));
 		final Action save = actions.getAction(SaveAction.class);
         menu.add(new JMenuItem(save));
 		final Action saveas = actions.getAction(SaveAsAction.class);
         menu.add(new JMenuItem(saveas));
-        menu.add(ide.getActions().closeAction.getMenuItem());
+		final Action close = actions.getAction(CloseAction.class);
+        menu.add(new JMenuItem(close));
         menu.addSeparator();
         menu.add(ide.getActions().editorPrintAction.getMenuItem());
         menu.add(ide.getActions().editorSavePostscriptAction.getMenuItem());
@@ -121,7 +133,7 @@ public class IDEMenuBar
         menu.add(ide.getActions().editorCopyAction.getMenuItem());
         menu.add(ide.getActions().editorPasteAction.getMenuItem());
         menu.addSeparator();
-	// Embedder should probably go to 'Tools' menu?
+		// Embedder should probably go to 'Tools' menu?
         menu.add(ide.getActions().editorRunEmbedderAction.getMenuItem());
         add(menu);
 
@@ -134,21 +146,24 @@ public class IDEMenuBar
         //menu.add(ide.getActions().editorAddForeachComponentAction.getMenuItem());
         //menu.add(ide.getActions().editorAddInstanceAction.getMenuItem());
         //menu.add(ide.getActions().editorAddBindingAction.getMenuItem());
-        add(menu);
         editorMenu = menu;
+		editorMenu.setEnabled(false);
+        add(menu);
+
+        // View (submenu)
+		final JMenu viewMenu = new JMenu("View");
+        viewMenu.add
+			(actions.analyzerViewAutomatonAction.getMenuItem());
+        viewMenu.add
+			(actions.analyzerViewAlphabetAction.getMenuItem());
+        viewMenu.add(actions.analyzerViewStatesAction.getMenuItem());
+        viewMenu.add
+			(actions.analyzerViewModularStructureAction.getMenuItem());
 
         // Analyze
         menu = new JMenu("Analyze");
         menu.setMnemonic(KeyEvent.VK_A);
-        JMenu viewMenu = new JMenu("View");
-        viewMenu.setIcon(new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Zoom16.gif")));
-        viewMenu.add(ide.getActions().analyzerViewAutomatonAction.getMenuItem());
-        viewMenu.add(ide.getActions().analyzerViewAlphabetAction.getMenuItem());
-        viewMenu.add(ide.getActions().analyzerViewStatesAction.getMenuItem());
-        viewMenu.add(ide.getActions().analyzerViewModularStructureAction.getMenuItem());
         menu.add(viewMenu);
-
-        menu.addSeparator();
         menu.add(ide.getActions().analyzerSynchronizerAction.getMenuItem());
         menu.add(ide.getActions().analyzerSynthesizerAction.getMenuItem());
         menu.add(ide.getActions().analyzerVerifierAction.getMenuItem());
@@ -168,6 +183,7 @@ public class IDEMenuBar
         menu.add(ide.getActions().analyzerRenameAction.getMenuItem());
         menu.add(ide.getActions().analyzerSendToEditorAction.getMenuItem());
         analyzerMenu = menu;
+		analyzerMenu.setEnabled(false);
         add(menu);
 
         // Examples
@@ -177,9 +193,6 @@ public class IDEMenuBar
         add(menu);
 
         // File.NewFromTemplate
-        //JMenu menuFileNewFromTemplate = new JMenu();
-        //menuFileNewFromTemplate.setText("Static examples");
-        //menu.add(menuFileNewFromTemplate);
         ExampleTemplates exTempl = ExampleTemplates.getInstance();
         for (Iterator groupIt = exTempl.iterator(); groupIt.hasNext(); )
         {
@@ -210,27 +223,10 @@ public class IDEMenuBar
         menu.add(ide.getActions().analyzerOptionsAction.getMenuItem());
 
         // Modules
-        menu = new JMenu("Modules");
-        menu.setMnemonic(KeyEvent.VK_M);
-        add(menu);
-        menu.addMenuListener
-            (
-            new MenuListener()
-        {
-            public void menuSelected(MenuEvent ev)
-            {
-                createDocumentList(ev);
-            }
-
-            public void menuDeselected(MenuEvent ev)
-            {
-            }
-
-            public void menuCanceled(MenuEvent ev)
-            {
-            }
-        }
-        );
+        mModulesMenu = new JMenu("Modules");
+        mModulesMenu.setMnemonic(KeyEvent.VK_M);
+		mModulesMenu.setEnabled(false);
+        add(mModulesMenu);
 
         // Help
         menu = new JMenu();
@@ -242,57 +238,87 @@ public class IDEMenuBar
         menu.add(ide.getActions().helpAboutAction.getMenuItem());
     }
 
-    public JMenu getEditorMenu()
-    {
-        return editorMenu;
-    }
 
-    public JMenu getAnalyzerMenu()
-    {
-        return analyzerMenu;
-    }
+	//#######################################################################
+	//# Interface net.sourceforge.waters.gui.observer.Observer
+	public void update(final EditorChangedEvent event)
+	{
+		switch (event.getKind()) {
+		case CONTAINER_SWITCH:
+			updateModulesMenu();
+			updateEnabledStatus();
+			break;
+		case MAINPANEL_SWITCH:
+			updateEnabledStatus();
+			break;
+		default:
+			break;
+		}
+	}
 
-    public void createDocumentList(MenuEvent ev)
-    {
-        if (startPoint < 0)
-        {
-            return;
-        }
 
-        JMenu menu = (JMenu) ev.getSource();
+    //#######################################################################
+    //# Auxiliary Methods
+	private void updateEnabledStatus()
+	{
+		final boolean editor = ide.editorActive();
+		final boolean analyzer = ide.analyzerActive();
+		editorMenu.setEnabled(editor);
+		analyzerMenu.setEnabled(analyzer);
+	}
 
-        // Remove any windows now in the list
-        while (startPoint < menu.getItemCount())
-        {
-            menu.remove(startPoint);
-        }
+	private void updateModulesMenu()
+	{
+        final DocumentContainerManager manager =
+            ide.getDocumentContainerManager();
+		final DocumentContainer active = manager.getActiveContainer();
+		mModulesMenu.removeAll();
+		int enabled = 0;
+		for (final DocumentContainer container : manager.getRecent()) {
+			final JMenuItem item = createMenuItem(container);
+			if (container == active) {
+				item.setEnabled(false);
+			} else {
+				item.setEnabled(true);
+				enabled++;
+			}
+			mModulesMenu.add(item);
+		}
+		mModulesMenu.setEnabled(enabled > 0);
+	}
 
-        for (Iterator<DocumentContainer> modIt = ide.documentContainerIterator(); modIt.hasNext(); )
-        {
-            DocumentContainer currContainer = modIt.next();
-            JMenuItem currMenuItem = new JMenuItem(currContainer.getName());
-            currMenuItem.addActionListener(new DocumentMenuActionListener(ide, currContainer));
-            menu.add(currMenuItem);
-        }
-    }
+	private JMenuItem createMenuItem(final DocumentContainer container)
+	{
+		final JMenuItem item = new JMenuItem();
+		final DocumentProxy doc = container.getDocument();
+		File file = null;
+		try {
+			file = doc.getFileLocation();
+		} catch (final MalformedURLException exception) {
+			// Not a file ...
+		}
+		if (file == null) {
+			String name = doc.getName();
+			if (name == null || name.equals("")) {
+				name = "<nameless>";
+			}
+			item.setText(name);
+		} else {
+			final String path = file.getPath();
+			final int index = path.lastIndexOf(File.separatorChar);
+			final String tail = index >= 0 ? path.substring(index + 1) : path;
+			item.setText(tail);
+			item.setToolTipText(path);
+		}
+		final ActionListener listener = new ActionListener() {
+				public void actionPerformed(final ActionEvent event) {
+					final DocumentContainerManager manager =
+						ide.getDocumentContainerManager();
+					manager.setActiveContainer(container);
+				}
+			};
+		item.addActionListener(listener);
+		return item;
+	}
 
-    private class DocumentMenuActionListener
-        implements ActionListener
-    {
-        private IDE ide;
-        private DocumentContainer mContainer;
-
-        public DocumentMenuActionListener(IDE ide, DocumentContainer container)
-        {
-            this.ide = ide;
-            this.mContainer = container;
-        }
-
-        public void actionPerformed(ActionEvent e)
-        {
-            ide.setActive(mContainer);
-        }
-    }
 }
-
-

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   OpenAction
 //###########################################################################
-//# $Id: OpenAction.java,v 1.22 2007-06-23 10:16:00 robi Exp $
+//# $Id: OpenAction.java,v 1.23 2007-06-24 18:40:06 robi Exp $
 //###########################################################################
 
 
@@ -14,10 +14,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
@@ -25,6 +27,7 @@ import javax.swing.filechooser.FileFilter;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
+import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
 
 
@@ -54,14 +57,14 @@ public class OpenAction
     {
         // Get the state and dialog ...
         final IDE ide = getIDE();
-        final DocumentManager manager = ide.getDocumentManager();
+        final DocumentManager dmanager = ide.getDocumentManager();
         final JFileChooser chooser = ide.getFileChooser();
         final FileFilter current = chooser.getFileFilter();
         // Set up the dialog ...
         chooser.setDialogType(JFileChooser.OPEN_DIALOG);
         chooser.setMultiSelectionEnabled(true);
         chooser.resetChoosableFileFilters();
-        final List<FileFilter> filters = manager.getSupportedFileFilters();
+        final List<FileFilter> filters = dmanager.getSupportedFileFilters();
         boolean reselect = false;
         for (final FileFilter filter : filters) {
             chooser.addChoosableFileFilter(filter);
@@ -74,51 +77,15 @@ public class OpenAction
             reselect ? current : filters.iterator().next();
         chooser.setFileFilter(first);
         // Show the dialog ...
-        new WatersFileImporter(chooser);
-    }
-
-
-    //#######################################################################
-    //# Opening Files
-    public boolean openFile(final File file)
-    {
-        final IDE ide = getIDE();
-        try {
-            // The documentmanager does the loading, by extension.
-            final DocumentManager manager = ide.getDocumentManager();
-            final DocumentProxy document = manager.load(file);
-            ide.installContainer(document);
-            return true;
-        } catch (final WatersUnmarshalException exception) {
-            JOptionPane.showMessageDialog(ide.getFrame(),
-                                          "Error opening file:" +
-                                          exception.getMessage());
-            return false;
-        } catch (final IOException exception) {
-            JOptionPane.showMessageDialog(ide.getFrame(),
-                                          "Error opening file:" +
-                                          exception.getMessage());
-            return false;
-        }
-    }
-
-
-    //#######################################################################
-    //# Local Class WatersFileImporter
-    private class WatersFileImporter extends FileImporter
-    {
-        //###################################################################
-        //# Constructors
-        private WatersFileImporter(final JFileChooser chooser)
-        {
-            super(chooser, getIDE());
-        }
-
-        //###################################################################
-        //# Overrides for Base Class org.supremica.gui.ide.actions.FileImporter
-        void openFile(final File file)
-        {
-            OpenAction.this.openFile(file);
+        final JFrame frame = ide.getFrame();
+        final int choice = chooser.showOpenDialog(frame);
+        // Load the files ...
+        if (choice == JFileChooser.APPROVE_OPTION) {
+            final File[] filearray = chooser.getSelectedFiles();
+            final List<File> filelist = Arrays.asList(filearray);
+            final DocumentContainerManager cmanager =
+                ide.getDocumentContainerManager();
+            cmanager.openContainers(filelist);
         }
     }
 

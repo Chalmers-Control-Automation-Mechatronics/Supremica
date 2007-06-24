@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.59 2007-06-21 15:57:55 robi Exp $
+//# $Id: ModuleContainer.java,v 1.60 2007-06-24 18:40:06 robi Exp $
 //###########################################################################
 
 
@@ -14,7 +14,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +22,8 @@ import javax.swing.JFrame;
 import javax.swing.JToolBar;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.CompoundEdit;
@@ -35,7 +36,9 @@ import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoableCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.observer.MainPanelSwitchEvent;
 import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.gui.observer.Subject;
 import net.sourceforge.waters.gui.observer.UndoRedoEvent;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.model.base.Proxy;
@@ -47,7 +50,6 @@ import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
-
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -57,8 +59,9 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 public class ModuleContainer 
     extends DocumentContainer
-    implements UndoInterface
+    implements UndoInterface, Subject, ChangeListener
 {
+
     //#######################################################################
     //# Constructor
     public ModuleContainer(final IDE ide, final ModuleSubject module)
@@ -69,9 +72,72 @@ public class ModuleContainer
         final OperatorTable optable = CompilerOperatorTable.getInstance();
         mExpressionParser = new ExpressionParser(factory, optable);
         mPrinter = new HTMLPrinter();
-        mSelectedComponent = getEditorPanel();
+
+        mTabPanel = new JTabbedPane();
+		mEditorPanel = new EditorPanel(this, "Editor");
+		mAnalyzerPanel = new AnalyzerPanel(this, "Analyzer");
+        mTabPanel.add(mEditorPanel);
+        mTabPanel.add(mAnalyzerPanel);
+        mTabPanel.addChangeListener(this);
+		mEditorPanel.showComment();
     }
     
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+	//# org.supremica.gui.ide.DocumentContainer
+    public Component getPanel()
+	{
+		return mTabPanel;
+	}
+
+    public EditorPanel getEditorPanel()
+	{
+		return mEditorPanel;
+	}
+
+    public AnalyzerPanel getAnalyzerPanel()
+	{
+		return mAnalyzerPanel;
+	}
+
+	public boolean isEditorActive()
+	{
+		return mTabPanel.getSelectedComponent() == mEditorPanel;
+	}
+
+	public boolean isAnalyzerActive()
+	{
+		return mTabPanel.getSelectedComponent() == mAnalyzerPanel;
+	}
+
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.gui.observer.Subject
+    public void attach(final Observer o)
+    {
+        mObservers.add(o);
+    }
+    
+    public void detach(final Observer o)
+    {
+        mObservers.remove(o);
+    }
+    
+    public void fireEditorChangedEvent(final EditorChangedEvent event)
+    {
+		// Just in case they try to register or deregister observers
+		// in response to the update ...
+		final Collection<Observer> copy = new LinkedList<Observer>(mObservers);
+        for (final Observer observer : copy) {
+            observer.update(event);
+        }
+		getIDE().fireEditorChangedEvent(event);
+    }
+    
+
+    //#######################################################################
+    //# Simple Access
     public ModuleSubject getModule()
     {
         return (ModuleSubject) getDocument();
@@ -122,30 +188,6 @@ public class ModuleContainer
         return getAnalyzerPanel().getToolBar(mainToolBar);
     }
         
-    public void addToTabPanel(JTabbedPane tabPanel)
-    {
-        tabPanel.add(getEditorPanel());
-        tabPanel.add(getAnalyzerPanel());
-    }
-    
-    public EditorPanel getEditorPanel()
-    {
-        if (editorPanel == null)
-        {
-            editorPanel = new EditorPanel(this, "Editor");
-        }
-        return editorPanel;
-    }
-    
-    public AnalyzerPanel getAnalyzerPanel()
-    {
-        if (analyzerPanel == null)
-        {
-            analyzerPanel = new AnalyzerPanel(this, "Analyzer");
-        }
-        return analyzerPanel;
-    }
-    
     public SimulatorPanel getSimulatorPanel()
     {
         if (simulatorPanel == null)
@@ -229,14 +271,15 @@ public class ModuleContainer
     {
         return getIDE().getFrame();
     }
-    
-    //#######################################################################
-    //# Undo & Redo
+
     public EditorWindowInterface getActiveEditorWindowInterface()
     {
         return getEditorPanel().getActiveEditorWindowInterface();
     }
-    
+
+
+    //#######################################################################
+    //# Undo & Redo
     public void addUndoable(UndoableEdit e)
     {
         if (e.isSignificant()) {
@@ -250,13 +293,10 @@ public class ModuleContainer
         }
     }
     
-    
     public void executeCommand(Command c)
     {
         c.execute();
-        //if (c instanceof UndoableEdit) {
         addUndoable(new UndoableCommand(c));
-        //}
     }
     
     public boolean canRedo()
@@ -310,68 +350,39 @@ public class ModuleContainer
 	}
 
 
-    //#######################################################################
-    //# Observer Support
-    public void attach(final Observer o)
+	//#######################################################################
+	//# Interface javax.swing.event.ChangeListener
+    public void stateChanged(final ChangeEvent event)
     {
-        mObservers.add(o);
-    }
-    
-    public void detach(final Observer o)
-    {
-        mObservers.remove(o);
-    }
-    
-    public void fireEditorChangedEvent(final EditorChangedEvent event)
-    {
-		// Just in case they try to register or deregister observers
-		// in response to the update ...
-		final Collection<Observer> copy = new LinkedList<Observer>(mObservers);
-        for (final Observer observer : copy) {
-            observer.update(event);
+		final Component selected = mTabPanel.getSelectedComponent();
+        if (selected == mAnalyzerPanel &&
+			!mAnalyzerPanel.updateAutomata()) {
+			mTabPanel.setSelectedComponent(mEditorPanel);
         }
-		getIDE().fireEditorChangedEvent(event);
-    }
-    
-
-    //#######################################################################
-    //#
-    public void rememberSelectedComponent(JTabbedPane tabPanel)
-    {
-        mSelectedComponent = tabPanel.getSelectedComponent();
+		final EditorChangedEvent eevent = new MainPanelSwitchEvent(this);
+		fireEditorChangedEvent(eevent);
     }
 
-    public void restoreSelectedComponent(JTabbedPane tabPanel)
-    {
-        if (mSelectedComponent != null)
-            tabPanel.setSelectedComponent(mSelectedComponent);
-    }
-
-    public void updateActiveTab(JTabbedPane tabPanel)
-    {
-        mSelectedComponent = tabPanel.getSelectedComponent();
-        if (mSelectedComponent == getAnalyzerPanel() &&
-			!getAnalyzerPanel().updateAutomata()) {
-			tabPanel.setSelectedComponent(getEditorPanel());
-        }
-    }
 
     //#######################################################################
     //# Data Members
-    private final ExpressionParser mExpressionParser;
-    private final ProxyPrinter mPrinter;
-    private final UndoManager mUndoManager = new UndoManager();
-    private CompoundEdit mInsignificant = new CompoundEdit();
-    private final Collection<Observer> mObservers = new LinkedList<Observer>();
+	private final JTabbedPane mTabPanel;
+    private final EditorPanel mEditorPanel;
+    private final AnalyzerPanel mAnalyzerPanel;
+    private SimulatorPanel simulatorPanel = null;
+
     private final Map<SimpleComponentSubject,ComponentEditorPanel>
         mComponentToPanelMap =
         new HashMap<SimpleComponentSubject,ComponentEditorPanel>();
     private final Map<SimpleComponentSubject,ComponentViewPanel>
         mComponentToViewPanelMap =
         new HashMap<SimpleComponentSubject,ComponentViewPanel>();
-    
-    private EditorPanel editorPanel = null;
-    private AnalyzerPanel analyzerPanel = null;
-    private SimulatorPanel simulatorPanel = null;
-    private Component mSelectedComponent = null;
+
+    private final ExpressionParser mExpressionParser;
+    private final ProxyPrinter mPrinter;
+
+    private final UndoManager mUndoManager = new UndoManager();
+    private CompoundEdit mInsignificant = new CompoundEdit();
+    private final Collection<Observer> mObservers = new LinkedList<Observer>();
+
 }

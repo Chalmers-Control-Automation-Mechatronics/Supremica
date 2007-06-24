@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   Actions
 //###########################################################################
-//# $Id: Actions.java,v 1.48 2007-06-23 10:16:00 robi Exp $
+//# $Id: Actions.java,v 1.49 2007-06-24 18:40:06 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -25,9 +25,11 @@ public class Actions extends WatersActionManager
     public Actions(final IDE ide)
     {
 		super(ide);
+		addAction(new NewAction(ide));
 		addAction(new OpenAction(ide));
 		addAction(new SaveAction(ide));
 		addAction(new SaveAsAction(ide));
+		addAction(new CloseAction(ide));
 
 		mIDE = ide;
         for (final IDEAction action : mIDEActions) {
@@ -49,7 +51,6 @@ public class Actions extends WatersActionManager
 			break;
 		}
 	}
-
 
 
 	//#######################################################################
@@ -86,8 +87,6 @@ public class Actions extends WatersActionManager
     private List<IDEAction> mIDEActions = new LinkedList<IDEAction>();
 
     // General Actions
-    public IDEAction newAction = new NewAction(mIDEActions);
-    public IDEAction closeAction = new CloseAction(mIDEActions);
     public IDEAction exitAction = new ExitAction(mIDEActions);
     
     // Printing Actions

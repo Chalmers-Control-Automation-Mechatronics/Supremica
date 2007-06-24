@@ -1,13 +1,18 @@
 
 /********************** TestCasesDialog.java ************************/
+
+
 package org.supremica.gui;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+
 import net.sourceforge.waters.model.base.DocumentProxy;
+
 import org.supremica.automata.Project;
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.log.*;
 import org.supremica.testcases.Users;
 import org.supremica.testcases.BricksGame;
@@ -738,13 +743,11 @@ public class TestCasesDialog
         }
         else if (gui instanceof IDE)
         {
-            IDE ide = (IDE) gui;
-
-            // Get Supremica project
-            Project project = getProject();
-
-            // Present to the IDE as a DocumentProxy, the IDE will figure out what to do...
-            ide.installContainer((DocumentProxy) project);
+            final IDE ide = (IDE) gui;
+            final Project project = getProject();
+            final DocumentContainerManager manager =
+                ide.getDocumentContainerManager();
+	    manager.newContainer(project);
         }
         dispose();
     }

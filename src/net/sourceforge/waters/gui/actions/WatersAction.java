@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   WatersAction
 //###########################################################################
-//# $Id: WatersAction.java,v 1.3 2007-06-23 10:16:00 robi Exp $
+//# $Id: WatersAction.java,v 1.4 2007-06-24 18:40:06 robi Exp $
 //###########################################################################
 
 
@@ -46,33 +46,21 @@ public abstract class WatersAction
   //# Interface net.sourceforge.waters.gui.observer.Observer
   /**
    * Callback for state changes of the IDE. This default implementation
-   * only calls {@link #updateEnabledStatus()} if the user has switched
-   * main panels.
+   * only updates the status if the user has switched main panels, enabling
+   * the action if the editor is active.
    */
   public void update(final EditorChangedEvent event)
   {
     switch (event.getKind()) {
+    case CONTAINER_SWITCH:
     case MAINPANEL_SWITCH:
-      updateEnabledStatus();
+      final ModuleWindowInterface gui = getActiveModuleWindowInterface();
+      final boolean enabled = gui != null;
+      setEnabled(enabled);
       break;
     default:
       break;
     }
-  }
-
-
-  //#########################################################################
-  //# Enabling and Disabling
-  /**
-   * Enables or disables this action. This default implementation enables
-   * the action if the Waters module editor is active.
-   */
-  public boolean updateEnabledStatus()
-  {
-    final ModuleWindowInterface gui = getActiveModuleWindowInterface();
-    final boolean enabled = gui != null;
-    setEnabled(enabled);
-    return enabled;
   }
 
 

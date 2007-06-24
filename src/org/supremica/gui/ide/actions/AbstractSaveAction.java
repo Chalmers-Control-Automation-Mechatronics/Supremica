@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   AbstractSaveAction
 //###########################################################################
-//# $Id: AbstractSaveAction.java,v 1.2 2007-06-23 10:16:00 robi Exp $
+//# $Id: AbstractSaveAction.java,v 1.3 2007-06-24 18:40:06 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -34,6 +34,7 @@ import org.supremica.automata.Project;
 import org.supremica.automata.IO.SupremicaUnmarshaller;
 import org.supremica.gui.ide.AutomataContainer;
 import org.supremica.gui.ide.DocumentContainer;
+import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
@@ -68,7 +69,7 @@ public abstract class AbstractSaveAction
   public void update(final EditorChangedEvent event)
   {
     switch (event.getKind()) {
-    case MAINPANEL_SWITCH:
+    case CONTAINER_SWITCH:
       updateEnabledStatus();
       break;
     default:
@@ -79,7 +80,7 @@ public abstract class AbstractSaveAction
 
   //#########################################################################
   //# Enabling and Disabling
-  public boolean updateEnabledStatus()
+  private void updateEnabledStatus()
   {
     final IDE ide = getIDE();
     final DocumentContainer container = ide.getActiveDocumentContainer();
@@ -91,7 +92,6 @@ public abstract class AbstractSaveAction
       final String text = getShortDescription(type);
       putValue(Action.SHORT_DESCRIPTION, text);
     }
-    return enabled;
   }
 
   abstract String getShortDescription(final String type);
@@ -102,14 +102,16 @@ public abstract class AbstractSaveAction
   void invokeSaveAction()
   {
     final IDE ide = getIDE();
-    final DocumentContainer container = ide.getActiveDocumentContainer();
+    final DocumentContainerManager manager =
+      ide.getDocumentContainerManager();
+    final DocumentContainer container = manager.getActiveContainer();
     final DocumentProxy doc = container.getDocument();
     try {
       final File file = doc.getFileLocation();
       if (file == null) {
         invokeSaveAsAction();
       } else {
-        saveDocument(file);
+        manager.saveContainer(container, file);
       }
     } catch (final MalformedURLException exception) {
       invokeSaveAsAction();
@@ -158,18 +160,20 @@ public abstract class AbstractSaveAction
   private void saveDocument(final FileFilter filter, final File file)
   {
     final IDE ide = getIDE();
-    final DocumentManager manager = ide.getDocumentManager();
-    final DocumentContainer container = ide.getActiveDocumentContainer();
+    final DocumentContainerManager cmanager =
+      ide.getDocumentContainerManager();
+    final DocumentManager dmanager = cmanager.getDocumentManager();
+    final DocumentContainer container = cmanager.getActiveContainer();
     final DocumentProxy doc = container.getDocument();
     final Class<? extends DocumentProxy> clazz = doc.getClass();
     final ProxyMarshaller<? extends DocumentProxy> marshaller =
-      manager.findProxyMarshaller(clazz);
+      dmanager.findProxyMarshaller(clazz);
     final FileFilter docfilter = marshaller.getDefaultFileFilter();
     if (docfilter == filter) {
       final String ext = marshaller.getDefaultExtension();
       final File extfile =
         StandardExtensionFileFilter.ensureDefaultExtension(file, ext);
-      saveDocument(extfile);
+      cmanager.saveContainer(container, file);
     } else if (doc instanceof Project) {
       // Converting Supremica >> Waters ...
       // If analyzer active, check if there are unsupported features
@@ -221,7 +225,7 @@ public abstract class AbstractSaveAction
     final String ext = marshaller.getDefaultExtension();
     final File extfile =
       StandardExtensionFileFilter.ensureDefaultExtension(file, ext);
-    final String type = getTypeString(doc);
+    final String type = DocumentContainerManager.getTypeString(doc);
     try {
       marshaller.marshal(doc, extfile);
       ide.info(type + " saved to " + file);
@@ -233,39 +237,6 @@ public abstract class AbstractSaveAction
       JOptionPane.showMessageDialog(ide.getFrame(),
                                     "Error saving " + type + " file:" +
                                     exception.getMessage());
-    }
-  }
-
-  private void saveDocument(final File file)
-  {
-    final IDE ide = getIDE();
-    final DocumentContainer container = ide.getActiveDocumentContainer();
-    final DocumentProxy doc = container.getDocument();
-    final DocumentManager manager = ide.getDocumentManager();
-    final String type = getTypeString(doc);
-    try {
-      manager.saveAs(doc, file);
-      ide.info(type + " saved to " + file);
-    } catch (final WatersMarshalException exception) {
-      JOptionPane.showMessageDialog(ide.getFrame(),
-                                    "Error saving " + type + " file:" +
-                                    exception.getMessage());
-    } catch (final IOException exception) {
-      JOptionPane.showMessageDialog(ide.getFrame(),
-                                    "Error saving " + type + " file:" +
-                                    exception.getMessage());
-    }
-  }
-
-  private String getTypeString(final DocumentProxy doc)
-  {
-    if (doc instanceof Project) {
-      return "Supremica project";
-    } else if (doc instanceof ModuleProxy) {
-      return "Waters module";
-    } else {
-      throw new ClassCastException
-        ("Unknown document type: " + doc.getClass().getName() + "!");
     }
   }
 

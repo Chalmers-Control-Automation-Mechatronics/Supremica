@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.observer
 //# CLASS:   EditorChangedEvent
 //###########################################################################
-//# $Id: EditorChangedEvent.java,v 1.4 2007-06-21 15:57:55 robi Exp $
+//# $Id: EditorChangedEvent.java,v 1.5 2007-06-24 18:40:06 robi Exp $
 //###########################################################################
 
 
@@ -23,6 +23,9 @@ import java.util.EventObject;
  *
  * <TABLE>
  * <TR><TH>Enumeration value</TH> <TH>Subclass</TH> <TH>Description</TH></TR>
+ * <TR><TD>CONTAINER_SWITCH</TD> <TD>{@link MainPanelSwitchEvent}</TD>
+ * <TD>The user has switched document containers, e.g., opened or closed a
+ * file.</TD></TR>
  * <TR><TD>MAINPANEL_SWITCH</TD> <TD>{@link MainPanelSwitchEvent}</TD>
  * <TD>The user has switched main panels, e.g., changed from editor
  * to analyzer or vice versa.</TD></TR>
@@ -60,6 +63,7 @@ public abstract class EditorChangedEvent extends EventObject
   //#########################################################################
   //# Kind Enumeration
   public enum Kind {
+    CONTAINER_SWITCH,
     MAINPANEL_SWITCH,
     SUBPANEL_SWITCH,
     TOOL_SWITCH,

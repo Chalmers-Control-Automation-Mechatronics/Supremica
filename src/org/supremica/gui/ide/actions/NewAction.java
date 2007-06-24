@@ -1,40 +1,53 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica IDE
+//# PACKAGE: org.supremica.gui.ide.actions
+//# CLASS:   OpenAction
+//###########################################################################
+//# $Id: NewAction.java,v 1.12 2007-06-24 18:40:06 robi Exp $
+//###########################################################################
+
+
 package org.supremica.gui.ide.actions;
 
-import javax.swing.Action;
-import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import net.sourceforge.waters.subject.module.ModuleSubject;
-import org.supremica.gui.ide.IDE;
-import java.util.List;
+import javax.swing.Action;
+import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 
+import org.supremica.gui.ide.DocumentContainerManager;
+import org.supremica.gui.ide.IDE;
+
+
 public class NewAction
-    extends IDEAction
+    extends net.sourceforge.waters.gui.actions.IDEAction
 {
-    private static final long serialVersionUID = 1L;
-    
-    public NewAction(List<IDEAction> actionList)
+
+    //#######################################################################
+    //# Constructor
+    NewAction(final IDE ide)
     {
-        super(actionList);
-        
+        super(ide);
         putValue(Action.NAME, "New");
-        putValue(Action.SHORT_DESCRIPTION, "New module");
-        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_N));
-        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
-        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/New16.gif")));
+        putValue(Action.SHORT_DESCRIPTION, "New Module");
+        putValue(Action.MNEMONIC_KEY, KeyEvent.VK_N);
+        putValue(Action.ACCELERATOR_KEY,
+                 KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+        putValue(Action.SMALL_ICON,
+                 new ImageIcon(IDE.class.getResource
+                               ("/toolbarButtonGraphics/general/New16.gif")));
     }
-    
-    public void actionPerformed(ActionEvent e)
+
+
+    //#######################################################################
+    //# Interface java.awt.event.ActionListener
+    public void actionPerformed(final ActionEvent event)
     {
-        doAction();
+        final IDE ide = getIDE();
+        final DocumentContainerManager manager =
+            ide.getDocumentContainerManager();
+        manager.newModuleContainer();
     }
-    
-    public void doAction()
-    {
-        ModuleSubject moduleSubject = ide.createNewModuleSubject();
-        ide.getIDE().installContainer(moduleSubject);
-        //		ide.add(moduleContainer);
-        //		ide.setActive(moduleContainer);
-    }
+
 }

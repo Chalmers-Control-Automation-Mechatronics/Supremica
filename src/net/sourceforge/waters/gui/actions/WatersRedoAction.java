@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   WatersRedoAction
 //###########################################################################
-//# $Id: WatersRedoAction.java,v 1.2 2007-06-21 20:56:53 robi Exp $
+//# $Id: WatersRedoAction.java,v 1.3 2007-06-24 18:40:06 robi Exp $
 //###########################################################################
 
 
@@ -57,6 +57,7 @@ public class WatersRedoAction
   public void update(final EditorChangedEvent event)
   {
     switch (event.getKind()) {
+    case CONTAINER_SWITCH:
     case MAINPANEL_SWITCH:
     case UNDOREDO:
       updateEnabledStatus();
@@ -68,8 +69,8 @@ public class WatersRedoAction
 
 
   //#########################################################################
-  //# Enabling and Disabling
-  public boolean updateEnabledStatus()
+  //# Auxiliary Methods
+  private void updateEnabledStatus()
   {
     final UndoInterface umanager = getActiveUndoInterface();
     final boolean enabled = umanager != null && umanager.canRedo();
@@ -78,7 +79,6 @@ public class WatersRedoAction
       enabled ? umanager.getRedoPresentationName() : "Can't redo";
     putValue(Action.NAME, text);
     putValue(Action.SHORT_DESCRIPTION, text);
-    return enabled;
   }
 
 }

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.actions
 //# CLASS:   WatersUndoAction
 //###########################################################################
-//# $Id: WatersUndoAction.java,v 1.2 2007-06-21 20:56:53 robi Exp $
+//# $Id: WatersUndoAction.java,v 1.3 2007-06-24 18:40:06 robi Exp $
 //###########################################################################
 
 
@@ -57,6 +57,7 @@ public class WatersUndoAction
   public void update(final EditorChangedEvent event)
   {
     switch (event.getKind()) {
+    case CONTAINER_SWITCH:
     case MAINPANEL_SWITCH:
     case UNDOREDO:
       updateEnabledStatus();
@@ -68,8 +69,8 @@ public class WatersUndoAction
 
 
   //#########################################################################
-  //# Enabling and Disabling
-  public boolean updateEnabledStatus()
+  //# Auxiliary Methods
+  private void updateEnabledStatus()
   {
     final UndoInterface umanager = getActiveUndoInterface();
     final boolean enabled = umanager != null && umanager.canUndo();
@@ -78,7 +79,6 @@ public class WatersUndoAction
       enabled ? umanager.getUndoPresentationName() : "Can't undo";
     putValue(Action.NAME, text);
     putValue(Action.SHORT_DESCRIPTION, text);
-    return enabled;
   }
 
 }

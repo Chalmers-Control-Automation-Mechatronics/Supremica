@@ -1,47 +1,72 @@
-//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
 //###########################################################################
-//# PROJECT: Supremica/Waters IDE
+//# PROJECT: Waters/Supremica IDE
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   CloseAction
 //###########################################################################
-//# $Id: CloseAction.java,v 1.9 2007-06-20 19:43:38 flordal Exp $
+//# $Id: CloseAction.java,v 1.10 2007-06-24 18:40:06 robi Exp $
 //###########################################################################
+
 
 package org.supremica.gui.ide.actions;
 
 import java.awt.event.ActionEvent;
-import java.net.URI;
-import java.util.List;
+import java.awt.event.KeyEvent;
 import javax.swing.Action;
-import net.sourceforge.waters.model.base.DocumentProxy;
+import javax.swing.ImageIcon;
+import javax.swing.KeyStroke;
+
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+
 import org.supremica.gui.ide.DocumentContainer;
+import org.supremica.gui.ide.DocumentContainerManager;
+import org.supremica.gui.ide.IDE;
 
 
 public class CloseAction
-    extends IDEAction
+    extends net.sourceforge.waters.gui.actions.IDEAction
 {
 
-    private static final long serialVersionUID = 1L;
-    
-    public CloseAction(List<IDEAction> actionList)
+    //#######################################################################
+    //# Constructor
+    CloseAction(final IDE ide)
     {
-        super(actionList);
-        
+        super(ide);
+        setEnabled(false);
         putValue(Action.NAME, "Close");
-        putValue(Action.SHORT_DESCRIPTION, "Close module");
+        putValue(Action.SHORT_DESCRIPTION, "Close the current module");
+        putValue(Action.MNEMONIC_KEY, KeyEvent.VK_C);
     }
-    
-    public void actionPerformed(ActionEvent e)
+
+
+    //#######################################################################
+    //# Interface java.awt.event.ActionListener
+    public void actionPerformed(final ActionEvent event)
     {
-        doAction();
+        final IDE ide = getIDE();
+        final DocumentContainerManager manager =
+            ide.getDocumentContainerManager();
+        final DocumentContainer container = manager.getActiveContainer();
+        manager.closeContainer(container);
     }
-    
-    public void doAction()
+
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.gui.observer.Observer
+    public void update(final EditorChangedEvent event)
     {
-        final DocumentContainer container = ide.getActiveDocumentContainer();
-		final DocumentProxy module = container.getDocument();
-		final URI uri = module.getLocation();
-        ide.remove(container);
-        ide.getIDE().getDocumentManager().remove(uri);
+        switch (event.getKind()) {
+        case CONTAINER_SWITCH:
+            final IDE ide = getIDE();
+            final DocumentContainerManager manager =
+                ide.getDocumentContainerManager();
+            final DocumentContainer container = manager.getActiveContainer();
+            final boolean enabled = container != null;
+            setEnabled(enabled);
+            break;
+        default:
+            break;
+        }
     }
+
 }
