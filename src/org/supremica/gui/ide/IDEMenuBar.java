@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.44 2007-06-25 07:42:27 robi Exp $
+//# $Id: IDEMenuBar.java,v 1.45 2007-06-25 20:18:48 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -47,14 +47,6 @@ public class IDEMenuBar
     extends JMenuBar
 	implements Observer
 {
-
-    //#######################################################################
-    //# Data Members
-    private final IDE ide;
-    private JMenu editorMenu;
-    private JMenu analyzerMenu;
-    private JMenu mModulesMenu;
-
 
     //#######################################################################
     //# Inner Class NewFromTemplateHandler
@@ -224,6 +216,7 @@ public class IDEMenuBar
         // Modules
         mModulesMenu = new JMenu("Modules");
         mModulesMenu.setMnemonic(KeyEvent.VK_M);
+		mModulesMenu.setEnabled(false);
         add(mModulesMenu);
 
         // Help
@@ -271,11 +264,16 @@ public class IDEMenuBar
             ide.getDocumentContainerManager();
 		final DocumentContainer active = manager.getActiveContainer();
 		mModulesMenu.removeAll();
+		int count = 0;
 		for (final DocumentContainer container : manager.getRecent()) {
 			final JMenuItem item = createMenuItem(container);
 			item.setEnabled(container != active);
 			mModulesMenu.add(item);
+			if (++count >= MAX_MODULES) {
+				return;
+			}
 		}
+		mModulesMenu.setEnabled(count > 0);
 	}
 
 	private JMenuItem createMenuItem(final DocumentContainer container)
@@ -307,5 +305,18 @@ public class IDEMenuBar
 		item.addActionListener(listener);
 		return item;
 	}
+
+
+    //#######################################################################
+    //# Data Members
+    private final IDE ide;
+    private JMenu editorMenu;
+    private JMenu analyzerMenu;
+    private JMenu mModulesMenu;
+
+
+    //#######################################################################
+    //# Class Constants
+    private static final int MAX_MODULES = 24;
 
 }

@@ -1,15 +1,14 @@
 
 package org.supremica.gui.ide.actions;
 
-import net.sourceforge.waters.subject.module.ModuleSubject;
-import org.supremica.gui.ide.ModuleContainer;
+import javax.swing.JFrame;
+
+import net.sourceforge.waters.gui.EditorWindowInterface;
+
+import org.supremica.gui.ide.DocumentContainer;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.IDEReportInterface;
-import net.sourceforge.waters.gui.EditorWindowInterface;
-import javax.swing.JFrame;
-import org.supremica.automata.Automata;
-import org.supremica.automata.Project;
-import org.supremica.gui.ide.DocumentContainer;
+
 
 public interface IDEActionInterface
     extends IDEReportInterface
@@ -19,6 +18,5 @@ public interface IDEActionInterface
     public IDE getIDE();
     public Actions getActions();
     public void repaint();
-    public void setEditorMode(IDEAction theAction);
     public EditorWindowInterface getActiveEditorWindowInterface();
 }

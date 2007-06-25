@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   IDEAction
 //###########################################################################
-//# $Id: IDEAction.java,v 1.10 2007-06-15 07:50:38 robi Exp $
+//# $Id: IDEAction.java,v 1.11 2007-06-25 20:18:48 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -17,7 +17,7 @@ import java.util.List;
 public abstract class IDEAction
     extends AbstractAction
 {
-    private AbstractButton theButton = null;
+
     protected IDEActionInterface ide;
     private int minimumNumberOfSelectedComponents = 0;
     private boolean editorActiveRequired = false;
@@ -37,16 +37,6 @@ public abstract class IDEAction
     }
 
     public abstract void doAction();
-
-    public void setButton(AbstractButton theButton)
-    {
-        this.theButton = theButton;
-    }
-
-    public AbstractButton getButton()
-    {
-        return theButton;
-    }
 
     public JMenuItem getMenuItem()
     {

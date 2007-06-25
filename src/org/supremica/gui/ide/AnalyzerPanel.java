@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   AnalyzerPanel
 //###########################################################################
-//# $Id: AnalyzerPanel.java,v 1.32 2007-06-21 15:57:55 robi Exp $
+//# $Id: AnalyzerPanel.java,v 1.33 2007-06-25 20:18:48 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -152,13 +152,6 @@ public class AnalyzerPanel
         }
         
         return true;
-    }
-    
-    //    private ModuleSubject flatModule = null;
-    //private ModuleContainer flatModuleContainer = null;
-    
-    public void addToolBarEntries(IDEToolBar toolBar)
-    {
     }
     
     public VisualProject getVisualProject()

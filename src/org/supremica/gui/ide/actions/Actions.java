@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   Actions
 //###########################################################################
-//# $Id: Actions.java,v 1.49 2007-06-24 18:40:06 robi Exp $
+//# $Id: Actions.java,v 1.50 2007-06-25 20:18:48 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -100,10 +100,6 @@ public class Actions extends WatersActionManager
     public IDEAction editorCutAction = new EditorCutAction(mIDEActions);
     public IDEAction editorPasteAction = new EditorPasteAction(mIDEActions);
     public IDEAction editorCopyAsWMFAction = new EditorCopyAsWMFAction(mIDEActions);
-    public IDEAction editorSelectAction = new EditorSelectAction(mIDEActions);
-    public IDEAction editorAddNodeAction = new EditorAddNodeAction(mIDEActions);
-    public IDEAction editorAddNodeGroupAction = new EditorAddNodeGroupAction(mIDEActions);
-    public IDEAction editorAddEdgeAction = new EditorAddEdgeAction(mIDEActions);
     public IDEAction editorAddComponentEventAction = new EditorAddComponentEventAction(mIDEActions);
     public IDEAction editorAddModuleEventAction = new EditorAddModuleEventAction(mIDEActions);
     public IDEAction editorOptionsAction = new EditorOptionsAction(mIDEActions);

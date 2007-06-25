@@ -1,142 +1,93 @@
-//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters/Supremica IDE
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEToolBar
 //###########################################################################
-//# $Id: IDEToolBar.java,v 1.15 2007-06-21 15:57:55 robi Exp $
+//# $Id: IDEToolBar.java,v 1.16 2007-06-25 20:18:48 robi Exp $
 //###########################################################################
+
 
 package org.supremica.gui.ide;
 
 import java.awt.Insets;
-import javax.swing.*;
-import java.util.*;
-import org.supremica.gui.ide.actions.IDEAction;
-import org.supremica.log.*;
-import net.sourceforge.waters.gui.ControlledToolbar;
+import java.util.LinkedList;
+import java.util.List;
+import javax.swing.AbstractButton;
+import javax.swing.Action;
+import javax.swing.ButtonGroup;
+import javax.swing.JToolBar;
+import javax.swing.JButton;
+import javax.swing.JToggleButton;
 
-import net.sourceforge.waters.gui.observer.Observer;
-import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import net.sourceforge.waters.gui.observer.ToolbarChangedEvent;
 import net.sourceforge.waters.gui.ControlledToolbar;
+import net.sourceforge.waters.gui.actions.ToolEdgeAction;
+import net.sourceforge.waters.gui.actions.ToolGroupNodeAction;
+import net.sourceforge.waters.gui.actions.ToolNodeAction;
+import net.sourceforge.waters.gui.actions.ToolSelectAction;
+import net.sourceforge.waters.gui.actions.WatersRedoAction;
+import net.sourceforge.waters.gui.actions.WatersUndoAction;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.gui.observer.ToolbarChangedEvent;
+
+import org.supremica.gui.ide.actions.Actions;
+import org.supremica.gui.ide.actions.NewAction;
+import org.supremica.gui.ide.actions.OpenAction;
+import org.supremica.gui.ide.actions.SaveAction;
+
 
 public class IDEToolBar
     extends JToolBar
     implements ControlledToolbar
 {
-    private static Logger logger = LoggerFactory.createLogger(IDEToolBar.class);
-    private static final Insets theInsets = new Insets(0, 0, 0, 0);
-    // note do this nicer
-    private String command = "";
-    
-    private List<Observer> mObservers = new ArrayList<Observer>();
-    
-    private List collection = new LinkedList();
-    
-    private IDE ide;
-    
-    public IDEToolBar(IDE ide)
+
+    //#######################################################################
+    //# Constructor
+    public IDEToolBar(final IDE ide)
     {
-        this.ide = ide;
+        mIDE = ide;
+        mObservers = new LinkedList<Observer>();
+        mTool = ControlledToolbar.Tool.SELECT;
         setRollover(true);
         setFloatable(false);
+
+		final Actions actions = ide.getActions();
+        addAction(actions.getAction(NewAction.class));
+        addAction(actions.getAction(OpenAction.class));
+        addAction(actions.getAction(SaveAction.class));
+        addAction(actions.editorPrintAction);
+        addSeparator();
+		addAction(actions.getAction(WatersUndoAction.class));
+		addAction(actions.getAction(WatersRedoAction.class));
+        addSeparator();
+        addAction(actions.editorStopEmbedderAction);
+        addSeparator();
+        final ButtonGroup group = new ButtonGroup();
+		addAction(actions.getAction(ToolSelectAction.class), group);
+		addAction(actions.getAction(ToolNodeAction.class), group);
+		addAction(actions.getAction(ToolGroupNodeAction.class), group);
+		addAction(actions.getAction(ToolEdgeAction.class), group);
     }
-    
-    public IDEToolBar(IDEToolBar toolBar)
-    {
-        this(toolBar.ide);
-//		logger.debug("Toolbar copy constructor");
-        for (Iterator actIt = toolBar.collection.iterator(); actIt.hasNext(); )
-        {
-            Action currAction = (Action)actIt.next();
-            if (currAction == null)
-            {
-                addSeparator();
-//				logger.debug("Added separator");
-            }
-            else
-            {
-                add(currAction);
-                
-// Huh - note that the button is stored in an action. Possible two buttons may true to save
-// themselves in the action -> problems
-// The above solution works because not a third instance tries to add members to the toolbar.
-// Fix as soon as possible...
-/*
-                                if (currAction instanceof IDEAction)
-                                {
-                                        add(((IDEAction)currAction).getButton());
-                                        logger.debug("Added IDEAction");
-                                }
-                                else
-                                {
-                                        add(currAction);
-                                        logger.debug("Added Action");
-                                }
- */
-            }
-        }
-        
-        // Also copy observers
-        mObservers.addAll(toolBar.mObservers);
-    }
-    
-    public JToggleButton add(Action theAction, ButtonGroup theButtonGroup)
-    {
-        JToggleButton theButton = new JToggleButton(theAction);
-        theButton.setText("");
-        add(theButton);
-        theButtonGroup.add(theButton);
-        collection.add(theAction);
-        if (theAction instanceof IDEAction)
-        {
-            ((IDEAction)theAction).setButton(theButton);
-        }
-        theButton.setMargin(theInsets);
-        
-        return theButton;
-    }
-    
-    public JButton add(Action theAction)
-    {
-        JButton theButton = super.add(theAction);
-        collection.add(theAction);
-        if (theAction instanceof IDEAction)
-        {
-            ((IDEAction)theAction).setButton(theButton);
-        }
-        theButton.setMargin(theInsets);
-        
-        return theButton;
-    }
-    
-    public void addSeparator()
-    {
-        collection.add(null);
-        super.addSeparator();
-    }
-    
-    public int nbrOfActions()
-    {
-        return collection.size();
-    }
-    
+
+
+    //#######################################################################
+    //# Accessing the Drawing Tool
     public ControlledToolbar.Tool getTool()
     {
-        return Enum.valueOf(ControlledToolbar.Tool.class, command);
+        return mTool;
     }
-    
-    public void setCommand(String c)
+
+    public void setTool(final ControlledToolbar.Tool tool)
     {
-        command = c;
-		final EditorChangedEvent event = new ToolbarChangedEvent(this); 
+        mTool = tool;
+        final EditorChangedEvent event = new ToolbarChangedEvent(this, tool);
         fireEditorChangedEvent(event);
     }
 
-    
-	//#######################################################################
-	//# Interface net.sourceforge.waters.gui.observer.Subject
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.gui.observer.Subject
     public void attach(final Observer observer)
     {
         mObservers.add(observer);
@@ -149,13 +100,43 @@ public class IDEToolBar
 
     public void fireEditorChangedEvent(final EditorChangedEvent event)
     {
-		// Just in case they try to register or deregister observers
-		// in response to the update ...
-		final Collection<Observer> copy = new LinkedList<Observer>(mObservers);
+        // Just in case they try to register or deregister observers
+        // in response to the update ...
+        final List<Observer> copy = new LinkedList<Observer>(mObservers);
         for (final Observer observer : copy) {
             observer.update(event);
         }
-		ide.fireEditorChangedEvent(event);
+        mIDE.fireEditorChangedEvent(event);
     }
+
+
+    //#######################################################################
+    //# Creating the Buttons
+	private void addAction(final Action action)
+	{
+		final JButton button = add(action);
+		button.setMargin(INSETS);
+	}
+
+	private void addAction(final Action action, final ButtonGroup group)
+	{
+		final JToggleButton button = new JToggleButton(action);
+		button.setText("");
+		button.setMargin(INSETS);
+		group.add(button);
+		add(button);
+	}
+
+
+    //#######################################################################
+    //# Data Members
+    private final IDE mIDE;
+    private final List<Observer> mObservers;
+    private ControlledToolbar.Tool mTool;
+
+
+    //#######################################################################
+    //# Class Constants
+    private static final Insets INSETS = new Insets(0, 0, 0, 0);
 
 }

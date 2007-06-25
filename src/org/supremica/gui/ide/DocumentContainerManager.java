@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   DocumentContainerManager
 //###########################################################################
-//# $Id: DocumentContainerManager.java,v 1.2 2007-06-25 07:42:27 robi Exp $
+//# $Id: DocumentContainerManager.java,v 1.3 2007-06-25 20:18:48 robi Exp $
 //###########################################################################
 
 
@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.JFrame;
@@ -356,12 +355,6 @@ public class DocumentContainerManager
         final URI uri = doc.getLocation();
         mAllContainers.add(container);
         mURIContainerMap.put(uri, container);
-        while (mRecentList.size() >= MAX_RECENT) {
-            final ListIterator<DocumentContainer> iter =
-                mRecentList.listIterator();
-            iter.previous();
-            iter.remove();
-        }
         mRecentList.add(0, container);
         fireContainerSwitch();
     }
@@ -460,7 +453,5 @@ public class DocumentContainerManager
 
     private static final String WARN_FILE_EXISTS =
         "exists already.\nWould you like to overwrite?";
-
-    private static final int MAX_RECENT = 24;
 
 }

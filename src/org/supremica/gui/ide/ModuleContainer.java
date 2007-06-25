@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.61 2007-06-25 07:42:27 robi Exp $
+//# $Id: ModuleContainer.java,v 1.62 2007-06-25 20:18:48 robi Exp $
 //###########################################################################
 
 
@@ -181,16 +181,6 @@ public class ModuleContainer
     public ProxyPrinter getPrinter()
     {
         return mPrinter;
-    }
-    
-    public JToolBar getEditorToolBar(JToolBar mainToolBar)
-    {
-        return getEditorPanel().getToolBar(mainToolBar);
-    }
-    
-    public JToolBar getAnalyzerToolBar(JToolBar mainToolBar)
-    {
-        return getAnalyzerPanel().getToolBar(mainToolBar);
     }
         
     public SimulatorPanel getSimulatorPanel()

@@ -1,10 +1,10 @@
-//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters/Supremica IDE
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorPanel
 //###########################################################################
-//# $Id: EditorPanel.java,v 1.58 2007-06-23 10:58:09 robi Exp $
+//# $Id: EditorPanel.java,v 1.59 2007-06-25 20:18:48 robi Exp $
 //###########################################################################
 
 
@@ -15,7 +15,6 @@ import java.awt.GridBagLayout;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
-import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.UndoInterface;
@@ -25,6 +24,7 @@ import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
+
 import org.supremica.gui.ide.actions.Actions;
 
 
@@ -82,7 +82,7 @@ public class EditorPanel
         add(splitPanelHorizontal);
     }
         
-        //######################################################################
+    //######################################################################
     //# Interface net.sourceforge.waters.gui.ModuleWindowInterface
     public UndoInterface getUndoInterface()
     {
@@ -135,20 +135,9 @@ public class EditorPanel
         editorPanel.setRightComponent(commentPanel);
     }
 
+
     //######################################################################
     //#
-    public void addToolBarEntries(IDEToolBar toolBar)
-    {
-        editorButtonGroup = new ButtonGroup();
-        toolBar.addSeparator();
-        (toolBar.add(getActions().editorSelectAction, editorButtonGroup)).setSelected(true);
-        toolBar.setCommand(ControlledToolbar.Tool.SELECT.toString());
-        toolBar.add(getActions().editorAddNodeAction, editorButtonGroup);
-        toolBar.add(getActions().editorAddNodeGroupAction, editorButtonGroup);
-        toolBar.add(getActions().editorAddEdgeAction, editorButtonGroup);
-//		toolBar.add(getActions().editorAddEventAction, editorButtonGroup);
-    }
-    
     public EditorWindowInterface getActiveEditorWindowInterface()
     {
         if (getRightComponent() instanceof EditorWindowInterface)
@@ -156,7 +145,7 @@ public class EditorPanel
             return (EditorWindowInterface)getRightComponent();
         }
         return null;
-        //	    return getEditorWindowInterface();
+        //      return getEditorWindowInterface();
     }
     
     public void setRightComponent(JComponent newComponent)
@@ -225,4 +214,5 @@ public class EditorPanel
     {
         return mModuleContainer.getIDE().getActions();
     }
+
 }
