@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   AutomataContainer
 //###########################################################################
-//# $Id: AutomataContainer.java,v 1.4 2007-06-24 18:40:06 robi Exp $
+//# $Id: AutomataContainer.java,v 1.5 2007-06-25 07:42:27 robi Exp $
 //###########################################################################
 
 
@@ -56,6 +56,11 @@ public class AutomataContainer
 		return true;
 	}
 
+	public String getTypeString()
+	{
+		return TYPE_STRING;
+	}
+
 
     //#######################################################################
     //# Simple Access
@@ -78,5 +83,10 @@ public class AutomataContainer
     //# Data Members
 	private final AnalyzerPanel mAnalyzerPanel;
     private SimulatorPanel simulatorPanel = null;
+
+
+    //#######################################################################
+    //# Class Constants
+	static final String TYPE_STRING = "Supremica project";
 
 }

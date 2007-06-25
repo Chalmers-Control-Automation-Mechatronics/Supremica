@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.88 2007-06-24 18:40:06 robi Exp $
+//# $Id: IDE.java,v 1.89 2007-06-25 07:42:27 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -55,6 +55,7 @@ public class IDE
     private IDEMenuBar menuBar;
     private IDEToolBar ideToolBar;
     private JToolBar currToolBar = null;
+	private final JPanel mBlankPanel;
     private final JSplitPane mSplitPaneVertical;
     private final LogPanel mLogPanel;
 	private final JFileChooser mFileChooser;
@@ -99,14 +100,15 @@ public class IDE
         menuBar = new IDEMenuBar(this);
         setJMenuBar(menuBar);
         setToolBar(createToolBar());
+		mBlankPanel = new JPanel();
         mLogPanel = new LogPanel(this, "Logger");
-        mSplitPaneVertical = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        mSplitPaneVertical =
+			new JSplitPane(JSplitPane.VERTICAL_SPLIT, mBlankPanel, mLogPanel);
         mSplitPaneVertical.setContinuousLayout(false);
         mSplitPaneVertical.setOneTouchExpandable(false);
         mSplitPaneVertical.setDividerLocation(0.8);
         mSplitPaneVertical.setResizeWeight(1.0);
         contentPanel.add(mSplitPaneVertical, BorderLayout.CENTER);
-		mSplitPaneVertical.setBottomComponent(mLogPanel);
 
 		final File startdir = new File(Config.FILE_OPEN_PATH.get());
 		mFileChooser = new JFileChooser(startdir);
@@ -114,10 +116,7 @@ public class IDE
         // Initialise Document Managers
         mDocumentContainerManager = new DocumentContainerManager(this);
 		mDocumentContainerManager.attach(this);
-		final ModuleContainer container =
-			mDocumentContainerManager.newModuleContainer();
-		final Component panel = container.getPanel();
-		mSplitPaneVertical.setTopComponent(panel);
+		mDocumentContainerManager.newModuleContainer();
 
 		// *** BUG ***
 		// Toolbar must be set up without document loaded ...
@@ -237,10 +236,13 @@ public class IDE
 			final DocumentContainer container =
 				mDocumentContainerManager.getActiveContainer();
 			if (container == null) {
-				// To be done ...
+				mSplitPaneVertical.setTopComponent(mBlankPanel);
+				setTitle(IDENAME);
 			} else {
 				final Component panel = container.getPanel();
 				mSplitPaneVertical.setTopComponent(panel);
+				final String title = container.getWindowTitle();
+				setTitle(title);
 			}
 			break;
 		default:

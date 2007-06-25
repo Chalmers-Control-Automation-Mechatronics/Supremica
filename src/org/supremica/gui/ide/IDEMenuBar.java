@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.43 2007-06-24 18:40:06 robi Exp $
+//# $Id: IDEMenuBar.java,v 1.44 2007-06-25 07:42:27 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -13,7 +13,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -225,7 +224,6 @@ public class IDEMenuBar
         // Modules
         mModulesMenu = new JMenu("Modules");
         mModulesMenu.setMnemonic(KeyEvent.VK_M);
-		mModulesMenu.setEnabled(false);
         add(mModulesMenu);
 
         // Help
@@ -273,36 +271,25 @@ public class IDEMenuBar
             ide.getDocumentContainerManager();
 		final DocumentContainer active = manager.getActiveContainer();
 		mModulesMenu.removeAll();
-		int enabled = 0;
 		for (final DocumentContainer container : manager.getRecent()) {
 			final JMenuItem item = createMenuItem(container);
-			if (container == active) {
-				item.setEnabled(false);
-			} else {
-				item.setEnabled(true);
-				enabled++;
-			}
+			item.setEnabled(container != active);
 			mModulesMenu.add(item);
 		}
-		mModulesMenu.setEnabled(enabled > 0);
 	}
 
 	private JMenuItem createMenuItem(final DocumentContainer container)
 	{
 		final JMenuItem item = new JMenuItem();
-		final DocumentProxy doc = container.getDocument();
-		File file = null;
-		try {
-			file = doc.getFileLocation();
-		} catch (final MalformedURLException exception) {
-			// Not a file ...
-		}
+		final File file = container.getFileLocation();
 		if (file == null) {
-			String name = doc.getName();
+			final DocumentProxy doc = container.getDocument();
+			final String name = doc.getName();
 			if (name == null || name.equals("")) {
-				name = "<nameless>";
+				item.setText("<nameless>");
+			} else {
+				item.setText(name);
 			}
-			item.setText(name);
 		} else {
 			final String path = file.getPath();
 			final int index = path.lastIndexOf(File.separatorChar);

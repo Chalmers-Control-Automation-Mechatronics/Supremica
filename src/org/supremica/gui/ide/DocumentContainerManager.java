@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   DocumentContainerManager
 //###########################################################################
-//# $Id: DocumentContainerManager.java,v 1.1 2007-06-24 18:40:06 robi Exp $
+//# $Id: DocumentContainerManager.java,v 1.2 2007-06-25 07:42:27 robi Exp $
 //###########################################################################
 
 
@@ -12,7 +12,6 @@ package org.supremica.gui.ide;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
@@ -272,9 +271,9 @@ public class DocumentContainerManager
     public static String getTypeString(final DocumentProxy doc)
     {
         if (doc instanceof Project) {
-            return "Supremica project";
+            return AutomataContainer.TYPE_STRING;
         } else if (doc instanceof ModuleProxy) {
-            return "Waters module";
+            return ModuleContainer.TYPE_STRING;
         } else {
             throw new ClassCastException
                 ("Unknown document type: " + doc.getClass().getName() + "!");
@@ -412,12 +411,7 @@ public class DocumentContainerManager
 
     private String getWarningText(final DocumentProxy doc, final String msg)
     {
-        File file = null;
-        try {
-            file = doc.getFileLocation();
-        } catch (final MalformedURLException exception) {
-            // Not a file ...
-        }
+        final File file = DocumentContainer.getFileLocation(doc);
         if (file != null) {
             return getWarningText(file, msg);
         } else if (doc instanceof ModuleProxy) {

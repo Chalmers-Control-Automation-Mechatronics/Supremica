@@ -4,13 +4,15 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: DocumentContainer.java,v 1.2 2007-06-24 18:40:06 robi Exp $
+//# $Id: DocumentContainer.java,v 1.3 2007-06-25 07:42:27 robi Exp $
 //###########################################################################
 
 
 package org.supremica.gui.ide;
 
 import java.awt.Component;
+import java.io.File;
+import java.net.MalformedURLException;
 import javax.swing.JTabbedPane;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -54,6 +56,48 @@ public abstract class DocumentContainer
 	public abstract boolean isEditorActive();
 
 	public abstract boolean isAnalyzerActive();
+
+	public abstract String getTypeString();
+
+
+    //#######################################################################
+    //# Titling
+	public File getFileLocation()
+	{
+		final DocumentProxy doc = getDocument();
+		return getFileLocation(doc);
+	}
+
+	public String getWindowTitle()
+	{
+		final String type = getTypeString();
+		final DocumentProxy doc = getDocument();
+		final String name = doc.getName();
+		final File file = getFileLocation();
+		final StringBuffer buffer = new StringBuffer(type);
+		if (name != null && !name.equals("")) {
+			buffer.append(": ");
+			buffer.append(name);
+		}
+		if (file != null) {
+			buffer.append(" [");
+			buffer.append(file);
+			buffer.append(']');
+		}
+		return buffer.toString();
+	}
+
+
+    //#######################################################################
+    //# Auxiliary Static Access
+	static File getFileLocation(final DocumentProxy doc)
+	{
+		try {
+			return doc.getFileLocation();
+		} catch (final MalformedURLException exception) {
+			return null;
+		}
+	}
 
 
     //#######################################################################

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.60 2007-06-24 18:40:06 robi Exp $
+//# $Id: ModuleContainer.java,v 1.61 2007-06-25 07:42:27 robi Exp $
 //###########################################################################
 
 
@@ -109,6 +109,11 @@ public class ModuleContainer
 	public boolean isAnalyzerActive()
 	{
 		return mTabPanel.getSelectedComponent() == mAnalyzerPanel;
+	}
+
+	public String getTypeString()
+	{
+		return TYPE_STRING;
 	}
 
 
@@ -384,5 +389,10 @@ public class ModuleContainer
     private final UndoManager mUndoManager = new UndoManager();
     private CompoundEdit mInsignificant = new CompoundEdit();
     private final Collection<Observer> mObservers = new LinkedList<Observer>();
+
+
+    //#######################################################################
+    //# Class Constants
+	static final String TYPE_STRING = "Waters module";
 
 }
