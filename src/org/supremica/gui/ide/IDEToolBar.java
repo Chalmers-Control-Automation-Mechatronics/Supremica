@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEToolBar
 //###########################################################################
-//# $Id: IDEToolBar.java,v 1.17 2007-06-26 05:34:09 robi Exp $
+//# $Id: IDEToolBar.java,v 1.18 2007-06-26 05:46:55 robi Exp $
 //###########################################################################
 
 
@@ -42,7 +42,7 @@ import org.supremica.gui.ide.actions.SaveAction;
  *
  * <P>Presently, there is only one toolbar in the IDE, which contains
  * buttons for file operations, editing, and the graph drawing tools. Some
- * buttons are enabled and disabled, as the user switches between panels,
+ * buttons are enabled and disabled as the user switches between panels,
  * but there is no switching of toolbars.</P>
  *
  * <P>This class is a straightforward extension of Swing's {@link

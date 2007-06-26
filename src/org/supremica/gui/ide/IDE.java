@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.90 2007-06-25 20:18:48 robi Exp $
+//# $Id: IDE.java,v 1.91 2007-06-26 05:46:55 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -16,7 +16,10 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.List;
 import java.util.LinkedList;
-import javax.swing.*;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.gui.EditorWindowInterface;
@@ -38,6 +41,16 @@ import org.supremica.util.ProcessCommandLineArguments;
 import org.supremica.Version;
 import org.xml.sax.SAXException;
 
+
+/**
+ * The IDE's main window.
+ *
+ * This class represents the IDE's main window, and provides a central
+ * access point to all components of the graphical user interface. It
+ * also is the main entry point to the program.
+ *
+ * @author Knut &Aring;kesson
+ */
 
 public class IDE
     extends JFrame

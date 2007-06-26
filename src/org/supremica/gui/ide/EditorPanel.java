@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   EditorPanel
 //###########################################################################
-//# $Id: EditorPanel.java,v 1.59 2007-06-25 20:18:48 robi Exp $
+//# $Id: EditorPanel.java,v 1.60 2007-06-26 05:46:55 robi Exp $
 //###########################################################################
 
 
@@ -40,7 +40,6 @@ public class EditorPanel
     private EditorEventsPanel eventsPanel;
     private EditorAliasesPanel aliasesPanel;
     private EditorComponentsPanel componentsPanel;
-    private ButtonGroup editorButtonGroup;
     
     private final ModuleContainer mModuleContainer;
     
