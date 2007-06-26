@@ -509,7 +509,7 @@ public class AutomataToIEC61499
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext();)
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = currEvent.getSynchIndex();
+			int currEventIndex = currEvent.getIndex();
 
 			if (comments)
 			{
@@ -604,7 +604,7 @@ public class AutomataToIEC61499
 			while (alphIt.hasNext())
 			{
 				LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-				int currEventIndex = currEvent.getSynchIndex();
+				int currEventIndex = currEvent.getIndex();
 
 				if (comments)
 				{

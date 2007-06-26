@@ -109,7 +109,7 @@ public class AutomataToC
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = currEvent.getSynchIndex();
+			int currEventIndex = currEvent.getIndex();
 
 			printBooleanVariableDeclaration(pw, "e_" + currEventIndex, currEvent.getLabel() + (currEvent.isControllable()
 																							   ? " controllable"
@@ -206,7 +206,7 @@ public class AutomataToC
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = currEvent.getSynchIndex();
+			int currEventIndex = currEvent.getIndex();
 
 			pw.println("\n\t\t// Enable condition for event \"" + currEvent.getLabel() + "\"");
 
@@ -285,7 +285,7 @@ public class AutomataToC
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = currEvent.getSynchIndex();
+			int currEventIndex = currEvent.getIndex();
 
 			pw.println("\n\t\t// Enable condition for event \"" + currEvent.getLabel() + "\"");
 			pw.println("\t\tenabled_" + currEvent.getLabel() + "(e_" + currEventIndex + ");");
@@ -312,7 +312,7 @@ public class AutomataToC
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = currEvent.getSynchIndex();
+			int currEventIndex = currEvent.getIndex();
 
 			pw.println("\n// External enable condition for event \"" + currEvent.getLabel() + "\"");
 			pw.println("void enabled_" + currEvent.getLabel() + "(int& e)");
@@ -333,7 +333,7 @@ public class AutomataToC
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = currEvent.getSynchIndex();
+			int currEventIndex = currEvent.getIndex();
 
 			pw.println("\n// Action for event \"" + currEvent.getLabel() + "\"");
 			pw.println("void do_" + currEvent.getLabel() + "()");
@@ -355,7 +355,7 @@ public class AutomataToC
 				alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = currEvent.getSynchIndex();
+			int currEventIndex = currEvent.getIndex();
 
 			pw.println("\n\t\t// Enable condition for event \"" + currEvent.getLabel() + "\"");
 			pw.println("\t\te_" + currEventIndex + " = " + "e_" + currEventIndex + " && !enabledEvent;");
@@ -366,7 +366,7 @@ public class AutomataToC
 				alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = currEvent.getSynchIndex();
+			int currEventIndex = currEvent.getIndex();
 
 			pw.println("\n\t\t// Enable condition for event \"" + currEvent.getLabel() + "\"");
 			pw.println("\t\te_" + currEventIndex + " = " + "e_" + currEventIndex + " && !enabledEvent;");
@@ -459,7 +459,7 @@ public class AutomataToC
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = currEvent.getSynchIndex();
+			int currEventIndex = currEvent.getIndex();
 
 			pw.println("\n\t\t// Transition for event \"" + currEvent.getLabel() + "\"");
 

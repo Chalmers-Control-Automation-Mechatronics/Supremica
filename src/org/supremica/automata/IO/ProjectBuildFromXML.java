@@ -306,7 +306,7 @@ public class ProjectBuildFromXML
         {
             doAutomata(attributes);
         }
- /*       
+ /*
         else if (layoutStr.equals(name))
         {
             doLayout(attributes);
@@ -315,7 +315,7 @@ public class ProjectBuildFromXML
         {
             doStateLayout(attributes);
         }
- */
+  */
         else if (executionStr.equals(name))
         {
             doExecution(attributes);
@@ -396,7 +396,7 @@ public class ProjectBuildFromXML
     throws SAXException
     {
         String name = attributes.getValue("name");
-                if (name == null)
+        if (name == null)
         {
             throwException("name attribute is missing");
         }
@@ -625,7 +625,7 @@ public class ProjectBuildFromXML
     
     public final void doTransition(Attributes attributes)
     throws SAXException
-    {        
+    {
         // Transition ::source
         String sourceId = attributes.getValue("source");
         
@@ -678,20 +678,20 @@ public class ProjectBuildFromXML
         
         // Create and add the arc
         Arc arc = new Arc(sourceState, destState, event);
-
-	// TEMP-solution (use EFA instead)
-	String probabilityStr = attributes.getValue("probability");
-	if (probabilityStr != null)
-	{
-	    double probability = Double.valueOf(probabilityStr).doubleValue();
-	    
-	    if (probability < 0 || probability > 1)
-	    {
-		throwException("the probability value is out of range");
-	    }
-
-	    arc.setProbability(probability);
-	}
+        
+        // TEMP-solution (use EFA instead)
+        String probabilityStr = attributes.getValue("probability");
+        if (probabilityStr != null)
+        {
+            double probability = Double.valueOf(probabilityStr).doubleValue();
+            
+            if (probability < 0 || probability > 1)
+            {
+                throwException("the probability value is out of range");
+            }
+            
+            arc.setProbability(probability);
+        }
         
         // Arc arc = new Arc(sourceState, destState, eventId);
         try
@@ -758,60 +758,60 @@ public class ProjectBuildFromXML
             throw new SAXException("Unsupported file format.");
         }
     }
- 
+    
     /*
     public final void doLayout(Attributes attributes)
     throws SAXException
     {
         String width = attributes.getValue("width");
-        
+     
         if (width != null)
         {
             int iWidth = Integer.parseInt(width);
-            
+     
             currAutomaton.setWidth(iWidth);
         }
-        
+     
         String height = attributes.getValue("height");
-        
+     
         if (height != null)
         {
             int iHeight = Integer.parseInt(height);
-            
+     
             currAutomaton.setHeight(iHeight);
         }
-        
+     
         currAutomaton.setHasLayout(true);
     }
      */
-
+    
     /*
     public final void doStateLayout(Attributes attributes)
     throws SAXException
     {
         String id = attributes.getValue("id");
-        
+     
         if (id == null)
         {
             throwException("id attribute is missing");
         }
-        
+     
         State currState = (State) idStateMap.get(id);
-        
+     
         // State currState = currAutomaton.getStateWithId(id);
         if (currState == null)
         {
             throwException("Cannot find state: " + id);
         }
-        
+     
         String x = attributes.getValue("x");
         String y = attributes.getValue("y");
-        
+     
         if ((x != null) && (y != null))
         {
             int iX = Integer.parseInt(x);
             int iY = Integer.parseInt(y);
-            
+     
             currState.setXY(iX, iY);
         }
     }
@@ -821,7 +821,7 @@ public class ProjectBuildFromXML
     public final void doTransitionLayout(Attributes attributes)
     throws SAXException
     {}
-    */
+     */
     
     public final void doExecution(Attributes attributes)
     throws SAXException

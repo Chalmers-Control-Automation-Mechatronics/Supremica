@@ -54,42 +54,42 @@ import java.awt.event.*;
 import javax.swing.*;
 
 class SimulatorExecuterController
-	extends JPanel
+    extends JPanel
 {
-	private static final long serialVersionUID = 1L;
-
-	private SimulatorStateViewer stateViewer;
-
+    private static final long serialVersionUID = 1L;
+    
+    private SimulatorStateViewer stateViewer;
+    
 //      private Automata theAutomata;
 //      private JButton undoButton;
 //      private JButton redoButton;
-	private JCheckBox executeUncontrollableEvents;
-	private JCheckBox executeControllableEvents;
-
-	public SimulatorExecuterController(SimulatorStateViewer stateViewer, boolean executerIsExternal)
-	{
-		setLayout(new BorderLayout());
-
-		this.stateViewer = stateViewer;
-
+    private JCheckBox executeUncontrollableEvents;
+    private JCheckBox executeControllableEvents;
+    
+    public SimulatorExecuterController(SimulatorStateViewer stateViewer, boolean executerIsExternal)
+    {
+        setLayout(new BorderLayout());
+        
+        this.stateViewer = stateViewer;
+        
 //              this.theAutomata = synchHelper.getAutomata();
-		Box redoBox = new Box(BoxLayout.Y_AXIS);
-
+        Box redoBox = new Box(BoxLayout.Y_AXIS);
+        
 //              ImageIcon forwardImg = new ImageIcon(SimulatorExecuterController.class.getResource("/toolbarButtonGraphics/navigation/Forward24.gif"));
 //              ImageIcon backwardImg = new ImageIcon(SimulatorExecuterController.class.getResource("/toolbarButtonGraphics/navigation/Back24.gif"));
 //              ImageIcon homeImg = new ImageIcon(SimulatorExecuterController.class.getResource("/toolbarButtonGraphics/navigation/Home24.gif"));
-		executeUncontrollableEvents = new JCheckBox("Automatically execute uncontrollable events");
-		executeControllableEvents = new JCheckBox("Automatically execute controllable events");
-
+        executeUncontrollableEvents = new JCheckBox("Automatically execute uncontrollable events");
+        executeControllableEvents = new JCheckBox("Automatically execute controllable events");
+        
 //              undoButton = new JButton(backwardImg);
 //              undoButton.setToolTipText("Back");
 //              redoButton = new JButton(forwardImg);
 //              redoButton.setToolTipText("Forward");
 //              JButton resetButton = new JButton(homeImg);
 //              resetButton.setToolTipText("Go to the initial state");
-		redoBox.add(executeUncontrollableEvents);
-		redoBox.add(executeControllableEvents);
-
+        redoBox.add(executeUncontrollableEvents);
+        redoBox.add(executeControllableEvents);
+        
 //              redoBox.add(Box.createHorizontalGlue());
 //              redoBox.add(Box.createHorizontalGlue());
 ////            redoBox.add(undoButton);
@@ -99,29 +99,29 @@ class SimulatorExecuterController
 ////            redoBox.add(resetButton);
 //              redoBox.add(Box.createHorizontalGlue());
 //              redoBox.add(Box.createHorizontalGlue());
-		add(redoBox, BorderLayout.NORTH);
-
-		if (executerIsExternal)
-		{
-			executeUncontrollableEvents.setEnabled(false);
-			executeControllableEvents.setEnabled(false);
-		}
-
-		executeUncontrollableEvents.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				executeUncontrollableEvents_actionPerformed(e);
-			}
-		});
-		executeControllableEvents.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				executeControllableEvents_actionPerformed(e);
-			}
-		});
-
+        add(redoBox, BorderLayout.NORTH);
+        
+        if (executerIsExternal)
+        {
+            executeUncontrollableEvents.setEnabled(false);
+            executeControllableEvents.setEnabled(false);
+        }
+        
+        executeUncontrollableEvents.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                executeUncontrollableEvents_actionPerformed(e);
+            }
+        });
+        executeControllableEvents.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                executeControllableEvents_actionPerformed(e);
+            }
+        });
+        
 //              undoButton.addActionListener(new ActionListener()
 //              {
 //                      public void actionPerformed(ActionEvent e)
@@ -143,8 +143,8 @@ class SimulatorExecuterController
 //                              reset_actionPerformed(e);
 //                      }
 //              });
-	}
-
+    }
+    
 //      public void reset_actionPerformed(ActionEvent e)
 //      {
 //              stateViewer.goToInitialState();
@@ -161,16 +161,16 @@ class SimulatorExecuterController
 //      {
 //              stateViewer.redoState();
 //      }
-	public void executeUncontrollableEvents_actionPerformed(ActionEvent e)
-	{
-		stateViewer.executeUncontrollableEvents(executeUncontrollableEvents.isSelected());
-	}
-
-	public void executeControllableEvents_actionPerformed(ActionEvent e)
-	{
-		stateViewer.executeControllableEvents(executeControllableEvents.isSelected());
-	}
-
+    public void executeUncontrollableEvents_actionPerformed(ActionEvent e)
+    {
+        stateViewer.executeUncontrollableEvents(executeUncontrollableEvents.isSelected());
+    }
+    
+    public void executeControllableEvents_actionPerformed(ActionEvent e)
+    {
+        stateViewer.executeControllableEvents(executeControllableEvents.isSelected());
+    }
+    
 //      public void update()
 //      {
 //              undoButton.setEnabled(stateViewer.undoEnabled());

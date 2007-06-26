@@ -139,7 +139,7 @@ public class AutomataToIEC1131
 	for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 	{
 	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-	    int currEventIndex = currEvent.getSynchIndex();
+	    int currEventIndex = currEvent.getIndex();
 
 	    theHelper.printBooleanVariableDeclaration(pw, "e_" + currEventIndex, currEvent.getLabel() + (currEvent.isControllable()
 													 ? " controllable"
@@ -354,7 +354,7 @@ public class AutomataToIEC1131
 	    while (alphIt.hasNext())
 	    {
 		LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-		int currEventIndex = currEvent.getSynchIndex();
+		int currEventIndex = currEvent.getIndex();
 
 		pw.println("\n\t(* Enable condition for event \"" + currEvent.getLabel() + "\" *)");
 
@@ -465,7 +465,7 @@ public class AutomataToIEC1131
 	for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 	{
 	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-	    int currEventIndex = currEvent.getSynchIndex();
+	    int currEventIndex = currEvent.getIndex();
 
 	    theHelper.printILComment(pw, "Enable condition for event \"" + currEvent.getLabel() + "\"");
 
@@ -550,7 +550,7 @@ public class AutomataToIEC1131
 	for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 	{
 	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-	    int currEventIndex = currEvent.getSynchIndex();
+	    int currEventIndex = currEvent.getIndex();
 
 	    theHelper.printILComment(pw, "Enable condition for event \"" + currEvent.getLabel() + "\"");
 	    theHelper.printILCommand(pw, "JMP", "check_e_" + currEventIndex);
@@ -580,7 +580,7 @@ public class AutomataToIEC1131
 	    }
 
 	    LabeledEvent currEvent = allEvents.getEvent(currTimeoutLabel);
-	    int currEventIndex = currEvent.getSynchIndex();
+	    int currEventIndex = currEvent.getIndex();
 
 	    theHelper.printILComment(pw, "Timeout event is \"" + currEvent.getLabel() + "\"");
 	    theHelper.printILCommand(pw, "LD", "e_" + currEventIndex);
@@ -623,7 +623,7 @@ public class AutomataToIEC1131
 	    }
 
 	    LabeledEvent currEvent = allEvents.getEvent(currTimeoutLabel);
-	    int currEventIndex = currEvent.getSynchIndex();
+	    int currEventIndex = currEvent.getIndex();
 
 	    theHelper.printILComment(pw, "Start event is \"" + currEvent.getLabel() + "\"");
 	    theHelper.printILCommand(pw, "LD", "e_" + currEventIndex);
@@ -732,7 +732,7 @@ public class AutomataToIEC1131
 	    while (alphIt.hasNext())
 	    {
 		LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-		int currEventIndex = currEvent.getSynchIndex();
+		int currEventIndex = currEvent.getIndex();
 
 		pw.println("\n\t(* Transition for event \"" + currEvent.getLabel() + "\" *)");
 
@@ -840,7 +840,7 @@ public class AutomataToIEC1131
 	    while (alphIt.hasNext())
 	    {
 		LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-		int currEventIndex = currEvent.getSynchIndex();
+		int currEventIndex = currEvent.getIndex();
 
 		theHelper.printILComment(pw, "Transition for event \"" + currEvent.getLabel() + "\"");
 
@@ -922,7 +922,7 @@ public class AutomataToIEC1131
 	     alphIt.hasNext(); )
 	{
 	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-	    int currEventIndex = currEvent.getSynchIndex();
+	    int currEventIndex = currEvent.getIndex();
 
 	    theHelper.printILComment(pw, "Enable condition for event \"" + currEvent.getLabel() + "\"");
 	    theHelper.printILCommand(pw, "LD", "e_" + currEventIndex);
@@ -936,7 +936,7 @@ public class AutomataToIEC1131
 	     alphIt.hasNext(); )
 	{
 	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-	    int currEventIndex = currEvent.getSynchIndex();
+	    int currEventIndex = currEvent.getIndex();
 
 	    theHelper.printILComment(pw, "Enable condition for event \"" + currEvent.getLabel() + "\"");
 	    theHelper.printILCommand(pw, "LD", "e_" + currEventIndex);
@@ -958,7 +958,7 @@ public class AutomataToIEC1131
 	     alphIt.hasNext(); )
 	{
 	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-	    int currEventIndex = currEvent.getSynchIndex();
+	    int currEventIndex = currEvent.getIndex();
 
 	    pw.println("\n\t(* Enable condition for event \"" + currEvent.getLabel() + "\" *)");
 	    pw.println("\te_" + currEventIndex + " = " + "e_" + currEventIndex + " AND (NOT enabledEvent);");
@@ -969,7 +969,7 @@ public class AutomataToIEC1131
 	     alphIt.hasNext(); )
 	{
 	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-	    int currEventIndex = currEvent.getSynchIndex();
+	    int currEventIndex = currEvent.getIndex();
 
 	    pw.println("\n\t(* Enable condition for event \"" + currEvent.getLabel() + "\" *)");
 	    pw.println("\te_" + currEventIndex + " = " + "e_" + currEventIndex + " AND (NOT enabledEvent);");
@@ -989,7 +989,7 @@ public class AutomataToIEC1131
 	for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 	{
 	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-	    int currEventIndex = currEvent.getSynchIndex();
+	    int currEventIndex = currEvent.getIndex();
 
 	    theHelper.printILLabel(pw, "do_e_" + currEventIndex);
 	    theHelper.printILComment(pw, "Action for event " + currEvent.getLabel());
@@ -1037,7 +1037,7 @@ public class AutomataToIEC1131
 	for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 	{
 	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-	    int currEventIndex = currEvent.getSynchIndex();
+	    int currEventIndex = currEvent.getIndex();
 
 	    theHelper.printILLabel(pw, "check_e_" + currEventIndex);
 	    theHelper.printILComment(pw, "Condition for event " + currEvent.getLabel());

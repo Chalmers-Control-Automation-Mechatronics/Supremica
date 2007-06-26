@@ -755,11 +755,15 @@ public final class AutomataSynchronizerHelper
                 {
                     if (prevString.equals(""))
                     {
-                        return prevString + unionAlphabet.getEventWithIndex(currEventIndex);
+                        //return prevString + unionAlphabet.getEventWithIndex(currEventIndex);
+                        LabeledEvent event = getIndexMap().getEventAt(currEventIndex);
+                        return prevString + event;
                     }
                     else
                     {
-                        return prevString + " -> " + unionAlphabet.getEventWithIndex(currEventIndex);
+                        //return prevString + " -> " + unionAlphabet.getEventWithIndex(currEventIndex);
+                        LabeledEvent event = getIndexMap().getEventAt(currEventIndex);
+                        return prevString + " -> " + event;
                     }
                     
                     // logger.info(unionAlphabet.getEventWithIndex(currEventIndex).getLabel());

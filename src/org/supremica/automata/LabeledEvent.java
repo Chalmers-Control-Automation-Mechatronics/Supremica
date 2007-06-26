@@ -256,19 +256,14 @@ public class LabeledEvent
         return label.hashCode();
     }
     
-    public int getSynchIndex()
+    public int getIndex()
     {
         return index;
     }
     
-    void setSynchIndex(int index)
+    void setIndex(int index)
     {
         this.index = index;
-    }
-    
-    public int getIndex()
-    {
-        return getSynchIndex();
     }
     
 /*

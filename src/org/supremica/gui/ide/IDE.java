@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.93 2007-06-26 20:45:14 robi Exp $
+//# $Id: IDE.java,v 1.94 2007-06-26 21:42:27 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -56,160 +56,170 @@ public class IDE
     extends JFrame
     implements IDEActionInterface, Observer, Subject
 {
-
-	//#######################################################################
-	//# Constructor
+    
+    //#######################################################################
+    //# Constructor
     public IDE()
-		throws JAXBException, SAXException
+    throws JAXBException, SAXException
     {
         Utility.setupFrame(this, IDEDimensions.mainWindowPreferredSize);
         setTitle(getName());
         
         // Instantiate all actions
-		mObservers = new LinkedList<Observer>();
+        mObservers = new LinkedList<Observer>();
         mActions = new Actions(this);
         
         // Create GUI
-		final BorderLayout layout = new BorderLayout();
-		final JPanel contents = (JPanel) getContentPane();
+        final BorderLayout layout = new BorderLayout();
+        final JPanel contents = (JPanel) getContentPane();
         contents.setLayout(layout);
         menuBar = new IDEMenuBar(this);
         setJMenuBar(menuBar);
-		mToolBar = new IDEToolBar(this);
-		contents.add(mToolBar, BorderLayout.NORTH);
-		mBlankPanel = new JPanel();
-		mBlankPanel.setPreferredSize(IDEDimensions.mainWindowPreferredSize);
+        mToolBar = new IDEToolBar(this);
+        contents.add(mToolBar, BorderLayout.NORTH);
+        mBlankPanel = new JPanel();
+        mBlankPanel.setPreferredSize(IDEDimensions.mainWindowPreferredSize);
         mLogPanel = new LogPanel(this, "Logger");
         mSplitPaneVertical =
-			new JSplitPane(JSplitPane.VERTICAL_SPLIT, mBlankPanel, mLogPanel);
+            new JSplitPane(JSplitPane.VERTICAL_SPLIT, mBlankPanel, mLogPanel);
         mSplitPaneVertical.setContinuousLayout(false);
         mSplitPaneVertical.setOneTouchExpandable(false);
         mSplitPaneVertical.setDividerLocation(0.8);
         mSplitPaneVertical.setResizeWeight(1.0);
         contents.add(mSplitPaneVertical, BorderLayout.CENTER);
-
-		final File startdir = new File(Config.FILE_OPEN_PATH.get());
-		mFileChooser = new JFileChooser(startdir);
-
+        
+        final File startdir = new File(Config.FILE_OPEN_PATH.get());
+        mFileChooser = new JFileChooser(startdir);
+        
         // Initialise Document Managers
         mDocumentContainerManager = new DocumentContainerManager(this);
-		mDocumentContainerManager.attach(this);
+        mDocumentContainerManager.attach(this);
         
         info("Supremica version: " + (new Version()).toString());
     }
-
     
-	//#######################################################################
-	//# Simple Access
+    
+    //#######################################################################
+    //# Simple Access
     public String getName()
     {
         return IDENAME;
     }
-
+    
     public JFrame getFrame()
     {
         return this;
     }
-
+    
     public IDE getIDE()
     {
         return this;
     }
-
-	public IDEToolBar getToolBar()
-	{
-		return mToolBar;
-	}
-
+    
+    public IDEToolBar getToolBar()
+    {
+        return mToolBar;
+    }
+    
     public Actions getActions()
     {
         return mActions;
     }
-
-	public DocumentContainerManager getDocumentContainerManager()
-	{
-		return mDocumentContainerManager;
-	}
-
+    
+    public DocumentContainerManager getDocumentContainerManager()
+    {
+        return mDocumentContainerManager;
+    }
+    
     public DocumentManager getDocumentManager()
     {
         return mDocumentContainerManager.getDocumentManager();
     }
-
-	public JFileChooser getFileChooser()
-	{
-		return mFileChooser;
-	}
-
-
-	//#######################################################################
-	//# Listeners
-    public void processWindowEvent(final WindowEvent event)
+    public JFileChooser getFileChooser()
     {
-        if (event.getID() == WindowEvent.WINDOW_CLOSING) {
-			final Action action = mActions.getAction(ExitAction.class);
-			action.actionPerformed(null);
-        } else {
-			super.processWindowEvent(event);
-		}
+        return mFileChooser;
     }
-
     
-	//#######################################################################
-	//# Interface net.sourceforge.waters.gui.observer.Observer
-	public void update(final EditorChangedEvent event)
-	{
-		switch (event.getKind()) {
-		case CONTAINER_SWITCH:
-			final DocumentContainer container =
-				mDocumentContainerManager.getActiveContainer();
-			if (container == null) {
-				mSplitPaneVertical.setTopComponent(mBlankPanel);
-				setTitle(IDENAME);
-			} else {
-				final Component panel = container.getPanel();
-				mSplitPaneVertical.setTopComponent(panel);
-				final String title = container.getWindowTitle();
-				setTitle(title);
-			}
-			break;
-		default:
-			break;
-		}
-	}
-
-
-	//#######################################################################
-	//# Interface net.sourceforge.waters.gui.observer.Subject
+    
+    //#######################################################################
+    //# Listeners
+    /**
+     * Overridden so we can exit when window is closed
+     */
+    protected void processWindowEvent(WindowEvent event)
+    {
+        if (event.getID() == WindowEvent.WINDOW_CLOSING)
+        {
+            final Action action = mActions.getAction(ExitAction.class);
+            action.actionPerformed(null);
+        }
+        else
+        {
+            super.processWindowEvent(event);
+        }
+    }
+    
+    
+    //#######################################################################
+    //# Interface net.sourceforge.waters.gui.observer.Observer
+    public void update(final EditorChangedEvent event)
+    {
+        switch (event.getKind())
+        {
+            case CONTAINER_SWITCH:
+                final DocumentContainer container =
+                    mDocumentContainerManager.getActiveContainer();
+                if (container == null)
+                {
+                    mSplitPaneVertical.setTopComponent(mBlankPanel);
+                    setTitle(IDENAME);
+                }
+                else
+                {
+                    final Component panel = container.getPanel();
+                    mSplitPaneVertical.setTopComponent(panel);
+                    final String title = container.getWindowTitle();
+                    setTitle(title);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    
+    
+    //#######################################################################
+    //# Interface net.sourceforge.waters.gui.observer.Subject
     public void attach(final Observer observer)
     {
         mObservers.add(observer);
     }
-
+    
     public void detach(final Observer observer)
     {
         mObservers.remove(observer);
     }
-
+    
     public void fireEditorChangedEvent(final EditorChangedEvent event)
     {
-		// Just in case they try to register or deregister observers
-		// in response to the update ...
-		final List<Observer> copy = new LinkedList<Observer>(mObservers);
-        for (final Observer observer : copy) {
+        // Just in case they try to register or deregister observers
+        // in response to the update ...
+        final List<Observer> copy = new LinkedList<Observer>(mObservers);
+        for (final Observer observer : copy)
+        {
             observer.update(event);
         }
     }
-
-
-	//#######################################################################
-	//# Public Shortcuts
-	//# (use with caution --- these should be considered as deprecated)
-	public DocumentContainer getActiveDocumentContainer()
-	{
-		return mDocumentContainerManager.getActiveContainer();
-	}
-
+    
+    
+    //#######################################################################
+    //# Public Shortcuts
+    //# (use with caution --- these should be considered as deprecated)
+    public DocumentContainer getActiveDocumentContainer()
+    {
+        return mDocumentContainerManager.getActiveContainer();
+    }
+    
     public EditorWindowInterface getActiveEditorWindowInterface()
     {
         return getActiveDocumentContainer().getEditorPanel().getActiveEditorWindowInterface();
@@ -218,32 +228,32 @@ public class IDE
     public boolean editorActive()
     {
         final DocumentContainer active =
-			mDocumentContainerManager.getActiveContainer();
+            mDocumentContainerManager.getActiveContainer();
         return active != null && active.isEditorActive();
     }
     
     public boolean analyzerActive()
-    {       
+    {
         final DocumentContainer active =
-			mDocumentContainerManager.getActiveContainer();
+            mDocumentContainerManager.getActiveContainer();
         return active != null && active.isAnalyzerActive();
     }
     
     public Project getActiveProject()
     {
         final DocumentContainer active =
-			mDocumentContainerManager.getActiveContainer();
+            mDocumentContainerManager.getActiveContainer();
         return active.getAnalyzerPanel().getVisualProject();
     }
-
+    
     private boolean openFiles(final List<File> filesToOpen)
     {
-		return mDocumentContainerManager.openContainers(filesToOpen);
+        return mDocumentContainerManager.openContainers(filesToOpen);
     }
-
-
-	//#######################################################################
-	//# Interface org.supremica.gui.ide.IDEReportInterface
+    
+    
+    //#######################################################################
+    //# Interface org.supremica.gui.ide.IDEReportInterface
     public void error(String msg)
     {
         LOGGER.error(msg);
@@ -264,11 +274,11 @@ public class IDE
         LOGGER.debug(msg);
     }
     
-
-	//#######################################################################
-	//# Main Program
+    
+    //#######################################################################
+    //# Main Program
     public static void main(String args[])
-		throws Exception
+    throws Exception
     {
         final List<File> files = ProcessCommandLineArguments.process(args);
         final InterfaceManager manager = InterfaceManager.getInstance();
@@ -277,30 +287,30 @@ public class IDE
         ide.setVisible(true);
         ide.openFiles(files);
     }
-
-
-	//#######################################################################
-	//# Data Members
+    
+    
+    //#######################################################################
+    //# Data Members
     // GUI Components
-	private final DocumentContainerManager mDocumentContainerManager;
+    private final DocumentContainerManager mDocumentContainerManager;
     private final IDEMenuBar menuBar;
     private final IDEToolBar mToolBar;
-	private final JPanel mBlankPanel;
+    private final JPanel mBlankPanel;
     private final JSplitPane mSplitPaneVertical;
     private final LogPanel mLogPanel;
-	private final JFileChooser mFileChooser;
-
+    private final JFileChooser mFileChooser;
+    
     // Actions
     private final Actions mActions;
     private final List<Observer> mObservers;
-
-
-	//#######################################################################
-	//# Static Class Constants
+    
+    
+    //#######################################################################
+    //# Static Class Constants
     private static final long serialVersionUID = 1L;
-	private static final String IDENAME = "Supremica";
+    private static final String IDENAME = "Supremica";
     private static final Logger LOGGER = LoggerFactory.createLogger(IDE.class);
-
+    
     static
     {
         Config.XML_RPC_ACTIVE.set(false);
@@ -308,5 +318,4 @@ public class IDE
         Config.LOG_TO_CONSOLE.set(false);
         Config.LOG_TO_GUI.set(true);
     }
-
 }

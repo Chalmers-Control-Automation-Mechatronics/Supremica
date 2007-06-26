@@ -49,6 +49,7 @@
  */
 package org.supremica.gui.simulator;
 
+import org.supremica.automata.AutomataIndexMap;
 import org.supremica.gui.*;
 import org.supremica.log.*;
 import org.supremica.automata.algorithms.*;
@@ -72,299 +73,303 @@ import uk.ac.ic.doc.scenebeans.animation.CommandException;
 import org.supremica.util.SupremicaException;
 
 public class SimulatorExecuter
-	extends JFrame
-	implements AutomatonListener, AnimationListener
+    extends JFrame
+    implements AutomatonListener, AnimationListener
 {
-	private static final long serialVersionUID = 1L;
-	private static Logger logger = LoggerFactory.createLogger(SimulatorExecuter.class);
-	private BorderLayout layout = new BorderLayout();
-	private JPanel contentPane;
-	private JMenuBar menuBar = new JMenuBar();
-	private SimulatorStateViewer stateViewer;
-	private SimulatorExecuterController controller;
-	private AutomataSynchronizerHelper helper;
-
-	//private AutomataOnlineSynchronizer onlineSynchronizer;
-	private AutomataSynchronizerExecuter onlineSynchronizer;
-	private Actions theActions;
-	private Controls theControls;
-	private VisualProject theProject;
-	private Animator theAnimator;
-	private Animation theAnimation;
-	private AnimationSignals theAnimationSignals;
-	private int[] currState;
-
-	public SimulatorExecuter(VisualProject theProject, boolean useExternalExecuter)
-		throws Exception
-	{
-		this.theProject = theProject;
-		this.theActions = theProject.getActions();
-		this.theControls = theProject.getControls();
-		theAnimator = theProject.getAnimator();
-
-		if (theAnimator == null)
-		{
-			String msg = "Could not open animator: " + theProject.getAnimationURL();
-
-			logger.error(msg);
-
-			throw new SupremicaException("Could not open animator: " + theProject.getAnimationURL());
-		}
-
-		theAnimation = theAnimator.getAnimation();
-
-		theAnimation.addAnimationListener(this);
-
-		theAnimationSignals = new AnimationSignals(theAnimation);
-
-		SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultVerificationOptions();
-
-		//SynchronizationOptions syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, false, Config.VERBOSE_MODE.isTrue(), false, true, false);
-		helper = new AutomataSynchronizerHelper(theProject, syncOptions);
-
-		// Build the initial state
-		Automaton currAutomaton;
-		State currInitialState;
-		int[] initialState = AutomataIndexFormHelper.createState(this.theProject.size());
-
-		// + 1 status field
-		Iterator autIt = this.theProject.iterator();
-
-		while (autIt.hasNext())
-		{
-			currAutomaton = (Automaton) autIt.next();
-			currInitialState = currAutomaton.getInitialState();
-			initialState[currAutomaton.getIndex()] = currInitialState.getIndex();
-		}
-
-		SimulatorExecuterHelper.setInitialState(initialState);
-
-		//onlineSynchronizer = new AutomataOnlineSynchronizer(helper);
-		onlineSynchronizer = new AutomataSynchronizerExecuter(helper);
-
-		onlineSynchronizer.initialize();
-		onlineSynchronizer.setCurrState(initialState);
-
-		currState = initialState;
-
-		helper.setCoExecuter(onlineSynchronizer);
-
-		//theProject.getListeners().addListener(this);
-		setBackground(Color.white);
-
-		contentPane = (JPanel) getContentPane();
-
-		contentPane.setLayout(layout);
-
-		// contentPane.add(toolBar, BorderLayout.NORTH);
-		// setTitle(theAutomaton.getName());
-		setTitle("Supremica Simulator");
-		setSize(400, 500);
-
-		// Center the window
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		Dimension frameSize = getSize();
-
-		if (frameSize.height > screenSize.height)
-		{
-			frameSize.height = screenSize.height;
-		}
-
-		if (frameSize.width > screenSize.width)
-		{
-			frameSize.width = screenSize.width;
-		}
-
-		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
-		addWindowListener(new WindowAdapter()
-		{
-			public void windowClosing(WindowEvent e)
-			{
-				close();
-			}
-		});
-		initMenubar();
-
-		stateViewer = new SimulatorStateViewer(this, helper, useExternalExecuter);
-
-		contentPane.add(stateViewer, BorderLayout.CENTER);
-
-		//controller = new ExplorerController(stateViewer, theAutomaton);
-		controller = new SimulatorExecuterController(stateViewer, useExternalExecuter);
-
-		contentPane.add(controller, BorderLayout.SOUTH);
-		stateViewer.setController(controller);
-
-		//stateViewer.goToInitialState();
-		update();
-	}
-
-	public void initialize()
-	{
-		setIconImage(Supremica.cornerImage);
-		stateViewer.initialize();
-	}
-
-	private void initMenubar()
-	{
-		setJMenuBar(menuBar);
-
-		// File
-		JMenu menuFile = new JMenu();
-
-		menuFile.setText("File");
-		menuFile.setMnemonic(KeyEvent.VK_F);
-
-		// File.Close
-		JMenuItem menuFileClose = new JMenuItem();
-
-		menuFileClose.setText("Close");
-		menuFile.add(menuFileClose);
-		menuBar.add(menuFile);
-		menuFileClose.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				setVisible(false);
-				dispose();
-			}
-		});
-	}
-
-	private void close()
-	{
-		setVisible(false);
-
-		if (stateViewer != null)
-		{
-			stateViewer.close();
-		}
-
-		dispose();
-	}
-
-	public void updated(Object o) {}
-
-	public void stateAdded(Automaton aut, State q)
-	{
-		updated(aut);
-	}
-
-	public void stateRemoved(Automaton aut, State q)
-	{
-		updated(aut);
-	}
-
-	public void arcAdded(Automaton aut, Arc a)
-	{
-		updated(aut);
-	}
-
-	public void arcRemoved(Automaton aut, Arc a)
-	{
-		updated(aut);
-	}
-
-	public void attributeChanged(Automaton aut)
-	{
-		updated(aut);
-	}
-
-	public void automatonRenamed(Automaton aut, String oldName)
-	{
-		updated(aut);
-	}
-
-	public void animationEvent(AnimationEvent ev)
-	{
-
-		//logger.info("AnimationEvent: " + ev.getName());
-	}
-
-	public int[] getCurrentState()
-	{
-		return currState;
-	}
-
-	public void registerSignalObserver(SignalObserver listener)
-	{
-		theAnimationSignals.registerInterest(listener);
-	}
-
-	public boolean isTrue(Condition theCondition)
-	{
-		return theAnimationSignals.isTrue(theCondition.getLabel());
-	}
-
+    private static final long serialVersionUID = 1L;
+    private static Logger logger = LoggerFactory.createLogger(SimulatorExecuter.class);
+    private BorderLayout layout = new BorderLayout();
+    private JPanel contentPane;
+    private JMenuBar menuBar = new JMenuBar();
+    private SimulatorStateViewer stateViewer;
+    private SimulatorExecuterController controller;
+    private AutomataSynchronizerHelper helper;
+    
+    //private AutomataOnlineSynchronizer onlineSynchronizer;
+    private AutomataSynchronizerExecuter onlineSynchronizer;
+    private Actions theActions;
+    private Controls theControls;
+    private VisualProject theProject;
+    private Animator theAnimator;
+    private Animation theAnimation;
+    private AnimationSignals theAnimationSignals;
+    private int[] currState;
+    
+    public SimulatorExecuter(VisualProject project, boolean useExternalExecuter)
+    throws Exception
+    {
+        this.theProject = project;
+        this.theActions = project.getActions();
+        this.theControls = project.getControls();
+        theAnimator = project.getAnimator();
+        
+        if (theAnimator == null)
+        {
+            String msg = "Could not open animator: " + project.getAnimationURL();
+            
+            logger.error(msg);
+            
+            throw new SupremicaException("Could not open animator: " + project.getAnimationURL());
+        }
+        
+        theAnimation = theAnimator.getAnimation();
+        
+        theAnimation.addAnimationListener(this);
+        
+        theAnimationSignals = new AnimationSignals(theAnimation);
+        
+        SynchronizationOptions syncOptions = SynchronizationOptions.getDefaultVerificationOptions();
+        
+        //SynchronizationOptions syncOptions = new SynchronizationOptions(SupremicaProperties.syncNbrOfExecuters(), SynchronizationType.Prioritized, SupremicaProperties.syncInitialHashtableSize(), SupremicaProperties.syncExpandHashtable(), SupremicaProperties.syncForbidUncontrollableStates(), SupremicaProperties.syncExpandForbiddenStates(), false, false, false, Config.VERBOSE_MODE.isTrue(), false, true, false);
+        helper = new AutomataSynchronizerHelper(project, syncOptions);
+        AutomataIndexMap indexMap = helper.getIndexMap();
+        
+        // Build the initial state
+        Automaton automaton;
+        State state;
+        int[] initialState = AutomataIndexFormHelper.createState(this.theProject.size());
+        
+        // + 1 status field
+        Iterator autIt = this.theProject.iterator();
+        
+        while (autIt.hasNext())
+        {
+            automaton = (Automaton) autIt.next();
+            state = automaton.getInitialState();
+            //initialState[automaton.getIndex()] = state.getIndex();
+            initialState[indexMap.getAutomatonIndex(automaton)] = indexMap.getStateIndex(automaton, state);
+        }
+        
+        SimulatorExecuterHelper.setInitialState(initialState);
+        
+        //onlineSynchronizer = new AutomataOnlineSynchronizer(helper);
+        onlineSynchronizer = new AutomataSynchronizerExecuter(helper);
+        
+        onlineSynchronizer.initialize();
+        onlineSynchronizer.setCurrState(initialState);
+        
+        currState = initialState;
+        
+        helper.setCoExecuter(onlineSynchronizer);
+        
+        //theProject.getListeners().addListener(this);
+        setBackground(Color.white);
+        
+        contentPane = (JPanel) getContentPane();
+        
+        contentPane.setLayout(layout);
+        
+        // contentPane.add(toolBar, BorderLayout.NORTH);
+        // setTitle(theAutomaton.getName());
+        setTitle("Supremica Simulator");
+        setSize(400, 500);
+        
+        // Center the window
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension frameSize = getSize();
+        
+        if (frameSize.height > screenSize.height)
+        {
+            frameSize.height = screenSize.height;
+        }
+        
+        if (frameSize.width > screenSize.width)
+        {
+            frameSize.width = screenSize.width;
+        }
+        
+        setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
+        addWindowListener(new WindowAdapter()
+        {
+            public void windowClosing(WindowEvent e)
+            {
+                close();
+            }
+        });
+        initMenubar();
+        
+        stateViewer = new SimulatorStateViewer(this, helper, useExternalExecuter);
+        
+        contentPane.add(stateViewer, BorderLayout.CENTER);
+        
+        //controller = new ExplorerController(stateViewer, theAutomaton);
+        controller = new SimulatorExecuterController(stateViewer, useExternalExecuter);
+        
+        contentPane.add(controller, BorderLayout.SOUTH);
+        stateViewer.setController(controller);
+        
+        //stateViewer.goToInitialState();
+        update();
+    }
+    
+    public void initialize()
+    {
+        setIconImage(Supremica.cornerImage);
+        stateViewer.initialize();
+    }
+    
+    private void initMenubar()
+    {
+        setJMenuBar(menuBar);
+        
+        // File
+        JMenu menuFile = new JMenu();
+        
+        menuFile.setText("File");
+        menuFile.setMnemonic(KeyEvent.VK_F);
+        
+        // File.Close
+        JMenuItem menuFileClose = new JMenuItem();
+        
+        menuFileClose.setText("Close");
+        menuFile.add(menuFileClose);
+        menuBar.add(menuFile);
+        menuFileClose.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                setVisible(false);
+                dispose();
+            }
+        });
+    }
+    
+    private void close()
+    {
+        setVisible(false);
+        
+        if (stateViewer != null)
+        {
+            stateViewer.close();
+        }
+        
+        dispose();
+    }
+    
+    public void updated(Object o)
+    {}
+    
+    public void stateAdded(Automaton aut, State q)
+    {
+        updated(aut);
+    }
+    
+    public void stateRemoved(Automaton aut, State q)
+    {
+        updated(aut);
+    }
+    
+    public void arcAdded(Automaton aut, Arc a)
+    {
+        updated(aut);
+    }
+    
+    public void arcRemoved(Automaton aut, Arc a)
+    {
+        updated(aut);
+    }
+    
+    public void attributeChanged(Automaton aut)
+    {
+        updated(aut);
+    }
+    
+    public void automatonRenamed(Automaton aut, String oldName)
+    {
+        updated(aut);
+    }
+    
+    public void animationEvent(AnimationEvent ev)
+    {
+        
+        //logger.info("AnimationEvent: " + ev.getName());
+    }
+    
+    public int[] getCurrentState()
+    {
+        return currState;
+    }
+    
+    public void registerSignalObserver(SignalObserver listener)
+    {
+        theAnimationSignals.registerInterest(listener);
+    }
+    
+    public boolean isTrue(Condition theCondition)
+    {
+        return theAnimationSignals.isTrue(theCondition.getLabel());
+    }
+    
 /*
-		protected void updateSignals()
-		{
-				theAnimationSignals.updateSignals();
-		}
-*/
-	public boolean executeEvent(LabeledEvent event)
-	{
-		String label = event.getLabel();
-
-		if (theControls != null) {}
-
-		if (theActions != null)
-		{
-			if (theActions.hasAction(label))
-			{
-				org.supremica.automata.execution.Action currAction = theActions.getAction(label);
-
-				for (Iterator cmdIt = currAction.commandIterator();
-						cmdIt.hasNext(); )
-				{
-					Command currCommand = (Command) cmdIt.next();
-
-					try
-					{
-						theAnimation.invokeCommand(currCommand.getLabel());
-					}
-					catch (CommandException ex)
-					{
-						logger.error("Exception while executing command: " + currCommand + "\nMessage: " + ex.getMessage());
-						logger.debug(ex.getStackTrace());
-					}
-				}
-			}
-		}
-
-		// Update the state here
-		onlineSynchronizer.setCurrState(currState);
-
-		if (onlineSynchronizer.isEnabled(event))
-		{
-			currState = onlineSynchronizer.doTransition(currState, event);
-
-			// return onlineSynchronizer.doTransition(events[index]);
-			update();
-		}
-		else
-		{
-			logger.error("The event " + event + " is not enabled");
-		}
-
-		return currState != null;
-	}
-
-	public void resetAnimation()
-	{
-
-		//logger.info("Reset animation");
-		//theAnimator.reset();
-	}
-
-	public Project getProject()
-	{
-		return theProject;
-	}
-
-	public void update()
-	{
-
-		//theAnimationSignals.notifyObservers();
-	}
+                protected void updateSignals()
+                {
+                                theAnimationSignals.updateSignals();
+                }
+ */
+    public boolean executeEvent(LabeledEvent event)
+    {
+        String label = event.getLabel();
+        
+        if (theControls != null)
+        {}
+        
+        if (theActions != null)
+        {
+            if (theActions.hasAction(label))
+            {
+                org.supremica.automata.execution.Action currAction = theActions.getAction(label);
+                
+                for (Iterator cmdIt = currAction.commandIterator();
+                cmdIt.hasNext(); )
+                {
+                    Command currCommand = (Command) cmdIt.next();
+                    
+                    try
+                    {
+                        theAnimation.invokeCommand(currCommand.getLabel());
+                    }
+                    catch (CommandException ex)
+                    {
+                        logger.error("Exception while executing command: " + currCommand + "\nMessage: " + ex.getMessage());
+                        logger.debug(ex.getStackTrace());
+                    }
+                }
+            }
+        }
+        
+        // Update the state here
+        onlineSynchronizer.setCurrState(currState);
+        
+        if (onlineSynchronizer.isEnabled(event))
+        {
+            currState = onlineSynchronizer.doTransition(currState, event);
+            
+            // return onlineSynchronizer.doTransition(events[index]);
+            update();
+        }
+        else
+        {
+            logger.error("The event " + event + " is not enabled");
+        }
+        
+        return currState != null;
+    }
+    
+    public void resetAnimation()
+    {
+        
+        //logger.info("Reset animation");
+        //theAnimator.reset();
+    }
+    
+    public Project getProject()
+    {
+        return theProject;
+    }
+    
+    public void update()
+    {
+        
+        //theAnimationSignals.notifyObservers();
+    }
 }

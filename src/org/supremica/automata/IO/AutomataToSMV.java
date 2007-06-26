@@ -134,7 +134,7 @@ public class AutomataToSMV
 		for (Iterator alphIt = allEvents.iterator(); alphIt.hasNext(); )
 		{
 			LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-			int currEventIndex = currEvent.getSynchIndex();
+			int currEventIndex = currEvent.getIndex();
 
 			pw.print("e_" + currEventIndex);
 
@@ -166,7 +166,7 @@ public class AutomataToSMV
 			{
 				LabeledEvent currEvent = evIt.next().getEvent();
 
-				pw.print("\t\t\t(s.event = e_" + currEvent.getSynchIndex() + ") & ");
+				pw.print("\t\t\t(s.event = e_" + currEvent.getIndex() + ") & ");
 				pw.print("(s.q_" + currAutomatonIndex + " = q_" + currAutomatonIndex + "_" + currState.getSynchIndex() + ") & ");
 				pw.print("TRUE");    // Broadcast synchronization
 
@@ -249,7 +249,7 @@ public class AutomataToSMV
 	String getEnableCondition(LabeledEvent currEvent, boolean filter, boolean selectPlant)
 	{
 		StringBuffer buff = new StringBuffer("(");
-		int currEventIndex = currEvent.getSynchIndex();
+		int currEventIndex = currEvent.getIndex();
 		boolean previousCondition = false;
 
 		for (Iterator autIt = theAutomata.iterator(); autIt.hasNext(); )

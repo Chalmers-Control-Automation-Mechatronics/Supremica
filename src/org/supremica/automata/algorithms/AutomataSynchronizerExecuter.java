@@ -99,7 +99,7 @@ public final class AutomataSynchronizerExecuter
     private int[] automataIndices;
     private int[] currPlantAutomata;
     private int[] currEnabledEvents;
-    private int[] currDisabledEvents;
+    private int[] disabledEvents;
     private boolean controllableState;
     private final static int IMMEDIATE_NOT_AVAILABLE = -1;
     private int immediateEvent = IMMEDIATE_NOT_AVAILABLE;
@@ -313,7 +313,7 @@ public final class AutomataSynchronizerExecuter
         currEnabledEvents = new int[nbrOfEvents + 1];
         
         // +1 status field (always end with Integer.MAX_VALUE)
-        currDisabledEvents = new int[nbrOfEvents + 1];
+        disabledEvents = new int[nbrOfEvents + 1];
     }
     
     /**
@@ -531,7 +531,7 @@ public final class AutomataSynchronizerExecuter
                 // This is used when synthesizing supervisors with partial observability
                 if (canExecuteInPlant)
                 {
-                    currDisabledEvents[nbrOfDisabledEvents++] = currEventIndex;
+                    disabledEvents[nbrOfDisabledEvents++] = currEventIndex;
                 }
             }
             
@@ -554,7 +554,7 @@ public final class AutomataSynchronizerExecuter
         
         // Always add Integer.MAX_VALUE as the last element
         currEnabledEvents[nbrOfEnabledEvents++] = Integer.MAX_VALUE;
-        currDisabledEvents[nbrOfDisabledEvents++] = Integer.MAX_VALUE;
+        disabledEvents[nbrOfDisabledEvents++] = Integer.MAX_VALUE;
         
         if (expandEventsUsingPriority)
         {
@@ -1106,17 +1106,18 @@ public final class AutomataSynchronizerExecuter
                     {
                         i = 0;
                         
-                        int currDisabledEventIndex = currDisabledEvents[i];
+                        int disabledEventIndex = disabledEvents[i];
                         
                         // Handle all events
-                        while (currDisabledEventIndex != Integer.MAX_VALUE)
+                        while (disabledEventIndex != Integer.MAX_VALUE)
                         {
-                            LabeledEvent theEvent = theAlphabet.getEventWithIndex(currDisabledEventIndex);
-                            Arc newArc = new Arc(thisState, dumpState, theEvent);
+                            //LabeledEvent theEvent = theAlphabet.getEventWithIndex(currDisabledEventIndex);
+                            LabeledEvent event = helper.getIndexMap().getEventAt(disabledEventIndex);
+                            Arc newArc = new Arc(thisState, dumpState, event);
                             
                             theAutomaton.addArc(newArc);
                             
-                            currDisabledEventIndex = currDisabledEvents[++i];
+                            disabledEventIndex = disabledEvents[++i];
                         }
                     }
                 }
@@ -1443,7 +1444,7 @@ public final class AutomataSynchronizerExecuter
      */
     public void setCurrUncontrollableEvent(LabeledEvent event)
     {
-        currUncontrollableEvent = event.getSynchIndex();
+        currUncontrollableEvent = event.getIndex();
     }
     
     // ****************************************************** //
@@ -1452,7 +1453,7 @@ public final class AutomataSynchronizerExecuter
     // ****************************************************** //
     public boolean isEnabled(LabeledEvent theEvent)
     {
-        return isEnabled(theEvent.getSynchIndex());
+        return isEnabled(theEvent.getIndex());
     }
     
     public boolean isEnabled(int eventIndex)
@@ -1485,7 +1486,7 @@ public final class AutomataSynchronizerExecuter
      */
     public int[] doTransition(int[] currState, LabeledEvent theEvent)
     {
-        return doTransition(currState, theEvent.getSynchIndex());
+        return doTransition(currState, theEvent.getIndex());
     }
     
     /**

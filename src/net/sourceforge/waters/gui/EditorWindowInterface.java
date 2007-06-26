@@ -4,7 +4,7 @@
 //# PACKAGE: waters.gui
 //# CLASS:   EditorWindow
 //###########################################################################
-//# $Id: EditorWindowInterface.java,v 1.13 2007-05-23 16:28:16 robi Exp $
+//# $Id: EditorWindowInterface.java,v 1.14 2007-06-26 21:42:27 flordal Exp $
 //###########################################################################
 
 
@@ -17,9 +17,9 @@ import net.sourceforge.waters.gui.command.UndoInterface;
 
 public interface EditorWindowInterface
 {
-
-	public ModuleWindowInterface getModuleWindowInterface();
-
+    
+    public ModuleWindowInterface getModuleWindowInterface();
+    
     public ControlledSurface getControlledSurface();
     
     public EditorEvents getEventPane();
@@ -41,14 +41,14 @@ public interface EditorWindowInterface
     public void printFigure();
     
     public void createEvent();
-
-	// *** BUG ***
-	// The following functions should be in ModuleWindowInterface !!!
+    
+    // *** BUG ***
+    // The following functions should be in ModuleWindowInterface !!!
     public boolean isSaved();
     
     public void setSaved(boolean s);
-
+    
     public JFrame getFrame();
     // ***
-
+    
 }

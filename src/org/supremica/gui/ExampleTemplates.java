@@ -94,8 +94,8 @@ public class ExampleTemplates
         initializeCommunicationSystemExamples();
         initializeGames();
         initializeModuleExamples();
-		initializeSchedulingExamples();
-		initializeOtherExamples();
+        initializeSchedulingExamples();
+        initializeOtherExamples();
         //initializeStandardComponents();
     }
     
@@ -187,6 +187,7 @@ public class ExampleTemplates
         thisGroup.addItem(new TemplateItem("Car Window Control System", prefix + "big_bmw.xml"));
         thisGroup.addItem(new TemplateItem("Car fh", prefix + "/ModuleExamples/car_fh/car_fh.wmod"));
         thisGroup.addItem(new TemplateItem("Coffee Machine", prefix + "CoffeeMachine.wmod"));
+        thisGroup.addItem(new TemplateItem("Mars Pathfinder", prefix + "MarsPathfinder.wmod"));
         thisGroup.addItem(new TemplateItem("Observation Equivalence Execise", prefix + "ObservationEquivalenceExercise.xml"));
         //thisGroup.addItem(new TemplateItem("Passenger Land-Transportation System", prefix + "PLanTS.xml"));
         thisGroup.addItem(new TemplateItem("Passenger Land-Transportation System", basePrefix + "/ModuleExamples/other/PLanTS.wmod"));
@@ -241,8 +242,8 @@ public class ExampleTemplates
         thisGroup.addItem(new TemplateItem("Central Lock - 4 Doors", basePrefix + "/ModuleExamples/central_locking/verriegel4.wmod"));
         thisGroup.addItem(new TemplateItem("Central Lock - 4 Doors - Language Inclusion", prefix + "verriegel4_language_inclusion.xml"));
         thisGroup.addItem(new TemplateItem("Central Lock - 4 Doors - Language Exclusion", prefix + "verriegel4_language_exclusion.xml"));
-
-		// Subsystems
+        
+        // Subsystems
         thisGroup.addItem(new TemplateItem("Central Locking - ftuer", prefix + "/ModuleExamples/central_locking/ftuer.wmod"));
         thisGroup.addItem(new TemplateItem("Central Locking - koordwsp", prefix + "/ModuleExamples/central_locking/koordwsp.wmod"));
     }
@@ -336,8 +337,8 @@ public class ExampleTemplates
         //thisGroup.addItem(new TemplateItem("Wine Merchant's Problem", prefix + "WineMerchant.xml"));
         thisGroup.addItem(new TemplateItem("Wine Merchant's Problem", basePrefix + "/ModuleExamples/other/winemerchant.wmod"));
     }
-
-private void initializeSchedulingExamples()
+    
+    private void initializeSchedulingExamples()
     {
         TemplateGroup thisGroup = SchedulingExamples;
         
@@ -347,8 +348,8 @@ private void initializeSchedulingExamples()
         
         thisGroup.addItem(new TemplateItem("2 robots (from HBS)", prefix + "hbs_example.xml"));
         thisGroup.addItem(new TemplateItem("2 robots with alternatives (from PV35)", prefix + "pv35_example.xml"));
-		thisGroup.addItem(new TemplateItem("3 robots", prefix + "3_2.xml"));
-		thisGroup.addItem(new TemplateItem("2 robots, uncontrollable alternatives", prefix + "uc_alternatives.xml"));
+        thisGroup.addItem(new TemplateItem("3 robots", prefix + "3_2.xml"));
+        thisGroup.addItem(new TemplateItem("2 robots, uncontrollable alternatives", prefix + "uc_alternatives.xml"));
     }
     
     /*

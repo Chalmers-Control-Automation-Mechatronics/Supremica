@@ -149,7 +149,7 @@ public class TestAlphabet
 		for (Iterator<LabeledEvent> evIt = alph1.iterator(); evIt.hasNext(); )
 		{
 			LabeledEvent currEvent = evIt.next();
-			int currIndex = currEvent.getSynchIndex();
+			int currIndex = currEvent.getIndex();
 			assertTrue(currIndex >= minIndex);
 			assertTrue(currIndex <= maxIndex);
 		}

@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   ControlledSurface
 //###########################################################################
-//# $Id: ControlledSurface.java,v 1.134 2007-06-21 11:16:23 robi Exp $
+//# $Id: ControlledSurface.java,v 1.135 2007-06-26 21:42:26 flordal Exp $
 //###########################################################################
 
 package net.sourceforge.waters.gui;
@@ -56,7 +56,7 @@ import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.gui.renderer.RenderingInformation;
 import net.sourceforge.waters.gui.renderer.SimpleNodeProxyShape;
 import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
-import net.sourceforge.waters.gui.springembedder.EmbedderEvent;
+import net.sourceforge.waters.gui.springembedder.EmbedderEvent; 
 import net.sourceforge.waters.gui.springembedder.EmbedderObserver;
 import net.sourceforge.waters.gui.springembedder.SpringEmbedder;
 import net.sourceforge.waters.gui.transfer.GraphContainer;

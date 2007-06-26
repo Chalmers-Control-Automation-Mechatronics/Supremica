@@ -156,7 +156,7 @@ public class AutomataToXML
                 
                 if (debugMode)
                 {
-                    pw.print(" synchIndex=" + event.getSynchIndex());
+                    pw.print(" synchIndex=" + event.getIndex());
                 }
                 
                 pw.println("/>");

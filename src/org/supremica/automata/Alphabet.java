@@ -281,22 +281,6 @@ public class Alphabet
         return theEvents.get(label);
     }
     
-    public LabeledEvent getEventWithIndex(int index)
-    throws IllegalArgumentException
-    {
-        for (Iterator<LabeledEvent> evIt = iterator(); evIt.hasNext(); )
-        {
-            LabeledEvent currEvent = evIt.next();
-            
-            if (currEvent.getIndex() == index)
-            {
-                return currEvent;
-            }
-        }
-        
-        throw new IllegalArgumentException("No event with index '" + index + "' exists");
-    }
-    
     /**
      * Returns the number of controllable events.
      */
@@ -645,7 +629,7 @@ public class Alphabet
         {
             LabeledEvent currEvent = evIt.next();
             
-            currEvent.setSynchIndex(i++);
+            currEvent.setIndex(i++);
         }
     }
     
@@ -662,7 +646,7 @@ public class Alphabet
                 throw new IllegalArgumentException("otherAlphabet must contains all events in this alphabet");
             }
             
-            currEvent.setSynchIndex(otherEvent.getSynchIndex());
+            currEvent.setIndex(otherEvent.getIndex());
         }
     }
     

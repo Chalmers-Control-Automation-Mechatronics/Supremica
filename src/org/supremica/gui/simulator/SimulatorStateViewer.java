@@ -56,69 +56,69 @@ import org.supremica.automata.Project;
 import org.supremica.automata.Automata;
 
 public class SimulatorStateViewer
-	extends JPanel
-
+    extends JPanel
+    
 //      implements SignalObserver
 {
-	private static final long serialVersionUID = 1L;
-	private Automata theAutomata;
-	private Project theProject;
-	private AutomataSynchronizerHelper helper;
-
+    private static final long serialVersionUID = 1L;
+    private Automata theAutomata;
+    private Project theProject;
+    private AutomataSynchronizerHelper helper;
+    
 //      private int[] currState;
-	private SimulatorEventList forwardEvents;
-
+    private SimulatorEventList forwardEvents;
+    
 //      private SimulatorEventList backwardEvents;
-	private SimulatorExecuterController controller;
-	private SimulatorStateDisplayer stateDisplayer;
-
+    private SimulatorExecuterController controller;
+    private SimulatorStateDisplayer stateDisplayer;
+    
 //      private JSplitPane eventSplitter;
-	private JSplitPane stateEventSplitter;
-
+    private JSplitPane stateEventSplitter;
+    
 //      private LinkedList prevStates = new LinkedList();
 //      private LinkedList nextStates = new LinkedList();
-	private SimulatorExecuter simulator;
-	private EventExecuter theExecuter;
-	private boolean executerIsExternal;
-
-	public SimulatorStateViewer(SimulatorExecuter simulator, AutomataSynchronizerHelper helper, boolean executerIsExternal)
-	{
-		setLayout(new BorderLayout());
-
-		this.simulator = simulator;
-		theProject = simulator.getProject();
-		theAutomata = helper.getAutomata();
-		this.helper = helper;
-		forwardEvents = new SimulatorEventList(simulator, helper, theProject);
-
-		//backwardEvents = new SimulatorEventList(this, helper, theProject, theAnimationSignals, true);
-		//eventSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, forwardEvents, backwardEvents);
-		stateDisplayer = new SimulatorStateDisplayer(helper);
-		stateEventSplitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, stateDisplayer, forwardEvents);
-
-		add(stateEventSplitter, BorderLayout.CENTER);
-
-		//theAnimationSignals.registerInterest(this);
-		this.executerIsExternal = executerIsExternal;
-		theExecuter = executerIsExternal
-					  ? new ExternalEventExecuter(simulator, forwardEvents.getEventListModel())
-					  : new EventExecuter(simulator, forwardEvents.getEventListModel());
-	}
-
-	public void initialize()
-	{
-
+    private SimulatorExecuter simulator;
+    private EventExecuter theExecuter;
+    private boolean executerIsExternal;
+    
+    public SimulatorStateViewer(SimulatorExecuter simulator, AutomataSynchronizerHelper helper, boolean executerIsExternal)
+    {
+        setLayout(new BorderLayout());
+        
+        this.simulator = simulator;
+        theProject = simulator.getProject();
+        theAutomata = helper.getAutomata();
+        this.helper = helper;
+        forwardEvents = new SimulatorEventList(simulator, helper, theProject);
+        
+        //backwardEvents = new SimulatorEventList(this, helper, theProject, theAnimationSignals, true);
+        //eventSplitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, forwardEvents, backwardEvents);
+        stateDisplayer = new SimulatorStateDisplayer(helper);
+        stateEventSplitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, stateDisplayer, forwardEvents);
+        
+        add(stateEventSplitter, BorderLayout.CENTER);
+        
+        //theAnimationSignals.registerInterest(this);
+        this.executerIsExternal = executerIsExternal;
+        theExecuter = executerIsExternal
+            ? new ExternalEventExecuter(simulator, forwardEvents.getEventListModel())
+            : new EventExecuter(simulator, forwardEvents.getEventListModel());
+    }
+    
+    public void initialize()
+    {
+        
 //              eventSplitter.setDividerLocation(0.5);
-		stateEventSplitter.setDividerLocation(0.6);
-		theExecuter.start();
-	}
-
-	/** we do not use the built in executer /Arash */
-	public boolean isExternal()
-	{
-		return executerIsExternal;
-	}
-
+        stateEventSplitter.setDividerLocation(0.6);
+        theExecuter.start();
+    }
+    
+    /** we do not use the built in executer /Arash */
+    public boolean isExternal()
+    {
+        return executerIsExternal;
+    }
+    
 //      public void setCurrState(int[] newState)
 //      {
 //              setCurrState(newState, false);
@@ -182,7 +182,7 @@ public class SimulatorStateViewer
 //      }
 //      public void update()
 //      {
-	// The order of theese are changed, for states to be properly forbidden...
+    // The order of theese are changed, for states to be properly forbidden...
 //              forwardEvents.setCurrState(currState);
 //              backwardEvents.setCurrState(currState);
 //              stateDisplayer.setCurrState(currState);
@@ -197,29 +197,29 @@ public class SimulatorStateViewer
 //              simulator.executeEvent(event);
 //              setCurrState(newState);
 //      }
-	public void setController(SimulatorExecuterController controller)
-	{
-		this.controller = controller;
-	}
-
-	public void executeControllableEvents(boolean doExecute)
-	{
-		theExecuter.executeControllableEvents(doExecute);
-	}
-
-	public void executeUncontrollableEvents(boolean doExecute)
-	{
-		theExecuter.executeUncontrollableEvents(doExecute);
-	}
-
-	public void close()
-	{
-		if (theExecuter != null)
-		{
-			theExecuter.requestStop();
-		}
-	}
-
+    public void setController(SimulatorExecuterController controller)
+    {
+        this.controller = controller;
+    }
+    
+    public void executeControllableEvents(boolean doExecute)
+    {
+        theExecuter.executeControllableEvents(doExecute);
+    }
+    
+    public void executeUncontrollableEvents(boolean doExecute)
+    {
+        theExecuter.executeUncontrollableEvents(doExecute);
+    }
+    
+    public void close()
+    {
+        if (theExecuter != null)
+        {
+            theExecuter.requestStop();
+        }
+    }
+    
 //      public SimulatorExecuter getSimulatorExecuter()
 //      {
 //              return simulator;

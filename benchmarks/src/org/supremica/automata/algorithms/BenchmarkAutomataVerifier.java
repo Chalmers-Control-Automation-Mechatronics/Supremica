@@ -140,18 +140,18 @@ public class BenchmarkAutomataVerifier
         // Heuristics
         MinimizationHeuristic[] heuristicArray =
         {
-            MinimizationHeuristic.MostLocal, 
+            MinimizationHeuristic.MostLocal,
             /*
-             */ 
+             */
             /*
              */
             //MinimizationHeuristic.FewestStates,
             //MinimizationHeuristic.LeastExtension,
             //MinimizationHeuristic.FewestTransitions,
-			MinimizationHeuristic.MostCommon,
+            MinimizationHeuristic.MostCommon,
             //MinimizationHeuristic.FewestEvents,
             MinimizationHeuristic.LeastFanning
-		};
+        };
         
         try
         {
@@ -187,79 +187,79 @@ public class BenchmarkAutomataVerifier
                 file.write("Primary 2:nd stage heuristic: " + mOptions.getMinimizationHeuristic() + "\n");
                 file.flush();
                 
-				//if (false) // Academic
-				if (true) // Industrial
+                //if (false) // Academic
+                if (true) // Industrial
                 {
-					///////////////////////////////////
-					// "Industrial" model benchmarks //
-					///////////////////////////////////
-					
-					// Benchmark path
-					String prefix = "benchmarks/benchmarkfiles/";
-					// Benchmarks
-					String[] test =
-					{
-						/*
- 						*/
-						"agv", "agvb",
-						"verriegel3", "verriegel3b",
-						"verriegel4", "verriegel4b",
-						//"bmw_fh",
-						"big_bmw",
-						"FMS",
-						"SMS",
-						"PMS",
-						"IPC",
-						"ftechnik", 
-						//"ftechnik_nocoll", // Includes some "property" specifications
-						//"fzelle", // All states are marked!?
-						"rhone_tough",
-						//"tbed_ctct"
-						"AIP_minus_AS3_TU4",
-						"tbed_valid",
-						"PLanTS",
-						"profisafe_i4",
-						/*
-						*/
-					};
-					
-					// Run tests
-					for (int k=0; k<test.length; k++)
-					{
-						ProjectBuildFromXML builder = new ProjectBuildFromXML();
-						Project theProject = builder.build(new File(prefix + test[k] + ".xml"));
-						theProject.setName(test[k]);
-						runBenchmark(test[k], theProject, vOptions, sOptions, mOptions);
-					}
-				}
-				else
-				{
-					///////////////////////////////////
-					// Instantiated model benchmarks //
-					///////////////////////////////////
-
+                    ///////////////////////////////////
+                    // "Industrial" model benchmarks //
+                    ///////////////////////////////////
+                    
+                    // Benchmark path
+                    String prefix = "benchmarks/benchmarkfiles/";
+                    // Benchmarks
+                    String[] test =
+                    {
+                                                /*
+                                                 */
+                        "agv", "agvb",
+                        "verriegel3", "verriegel3b",
+                        "verriegel4", "verriegel4b",
+                        //"bmw_fh",
+                        "big_bmw",
+                        "FMS",
+                        "SMS",
+                        "PMS",
+                        "IPC",
+                        "ftechnik",
+                        //"ftechnik_nocoll", // Includes some "property" specifications
+                        //"fzelle", // All states are marked!?
+                        "rhone_tough",
+                        //"tbed_ctct"
+                        "AIP_minus_AS3_TU4",
+                        "tbed_valid",
+                        "PLanTS",
+                        "profisafe_i4",
+                                                /*
+                                                 */
+                    };
+                    
+                    // Run tests
+                    for (int k=0; k<test.length; k++)
+                    {
+                        ProjectBuildFromXML builder = new ProjectBuildFromXML();
+                        Project theProject = builder.build(new File(prefix + test[k] + ".xml"));
+                        theProject.setName(test[k]);
+                        runBenchmark(test[k], theProject, vOptions, sOptions, mOptions);
+                    }
+                }
+                else
+                {
+                    ///////////////////////////////////
+                    // Instantiated model benchmarks //
+                    ///////////////////////////////////
+                    
                     DiningPhilosophers philo;
                     TransferLine line;
                     Arbiter arbiter;
-
+                    
                     Project theProject;
                     
-					/*
+                                        /*
                     // Dining philosophers
-					philo = new DiningPhilosophers(256, true, true, false, false, false, false);
+                                        philo = new DiningPhilosophers(256, true, true, false, false, false, false);
                     theProject = philo.getProject();
                     runBenchmark("256philo", theProject, vOptions, sOptions, mOptions);
-					philo = new DiningPhilosophers(512, true, true, false, false, false, false);
-					theProject = philo.getProject();
-					runBenchmark("512philo", theProject, vOptions, sOptions, mOptions);
-					philo = new DiningPhilosophers(1024, true, true, false, false, false, false);
-					theProject = philo.getProject();
+                                        philo = new DiningPhilosophers(512, true, true, false, false, false, false);
+                                        theProject = philo.getProject();
+                                        runBenchmark("512philo", theProject, vOptions, sOptions, mOptions);
+                                        philo = new DiningPhilosophers(1024, true, true, false, false, false, false);
+                                        theProject = philo.getProject();
                     runBenchmark("1024philo", theProject, vOptions, sOptions, mOptions);
-					//philo = new DiningPhilosophers(2048, true, true, false, false, false, false);
+                                        //philo = new DiningPhilosophers(2048, true, true, false, false, false, false);
                     //theProject = philo.getProject();
                     //runBenchmark("2048philo", theProject, vOptions, sOptions, mOptions);
                     // Transfer line
-					line = new TransferLine(128, 3, 1, false);
+                                        line = new TransferLine(128, 3, 1, false);
                     theProject = line.getProject();
                     runBenchmark("128transfer", theProject, vOptions, sOptions, mOptions);
                     line = new TransferLine(256, 3, 1, false);
@@ -268,9 +268,9 @@ public class BenchmarkAutomataVerifier
                     line = new TransferLine(512, 3, 1, false);
                     theProject = line.getProject();
                     runBenchmark("512transfer", theProject, vOptions, sOptions, mOptions);
-					*/
+                                         */
                     // Arbiter
-					arbiter = new Arbiter(128, false);
+                    arbiter = new Arbiter(128, false);
                     theProject = arbiter.getProject();
                     runBenchmark("128arbiter", theProject, vOptions, sOptions, mOptions);
                     arbiter = new Arbiter(256, false);
@@ -323,7 +323,7 @@ public class BenchmarkAutomataVerifier
         {
             System.out.println("Failed! " + ex);
         }
-		collectGarbage();        
+        collectGarbage();
     }
     
     private void collectGarbage()

@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   Actions
 //###########################################################################
-//# $Id: Actions.java,v 1.52 2007-06-26 20:45:14 robi Exp $
+//# $Id: Actions.java,v 1.53 2007-06-26 21:42:27 flordal Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -138,12 +138,15 @@ public class Actions extends WatersActionManager
     public IDEAction analyzerExportAction = new AnalyzerExportAction(mIDEActions);
     public IDEAction analyzerPlantifyAction = new AnalyzerPlantifyAction(mIDEActions);    
 
+    // Simulator
+    public IDEAction simulatorLaunchAnimatorAction = new SimulatorLaunchAnimatorAction(mIDEActions);
+    public IDEAction simulatorLaunchSimulatorAction = new SimulatorLaunchSimulatorAction(mIDEActions);
+
     // Analyzer experimental
     public IDEAction analyzerExperimentAction = new AnalyzerExperimentAction(mIDEActions);    
     public IDEAction analyzerPredictSizeAction = new AnalyzerPredictSizeAction(mIDEActions);    
     public IDEAction analyzerCountReachableAction = new AnalyzerCountReachableAction(mIDEActions);
     public IDEAction analyzerScheduleAction = new AnalyzerScheduleAction(mIDEActions);
-    public IDEAction simulatorLaunchAnimatorAction = new SimulatorLaunchAnimatorAction(mIDEActions);
 
     // Examples Actions
     public IDEAction toolsTestCasesAction = new ToolsTestCasesAction(mIDEActions);

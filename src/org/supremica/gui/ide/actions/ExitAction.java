@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   ExitAction
 //###########################################################################
-//# $Id: ExitAction.java,v 1.7 2007-06-26 20:45:14 robi Exp $
+//# $Id: ExitAction.java,v 1.8 2007-06-26 21:42:27 flordal Exp $
 //###########################################################################
 
 
@@ -26,7 +26,7 @@ import org.supremica.gui.ide.IDE;
 public class ExitAction
     extends net.sourceforge.waters.gui.actions.IDEAction
 {
-
+    
     //#######################################################################
     //# Constructor
     ExitAction(final IDE ide)
@@ -36,10 +36,10 @@ public class ExitAction
         putValue(Action.SHORT_DESCRIPTION, "Exit the IDE");
         putValue(Action.MNEMONIC_KEY, KeyEvent.VK_X);
         putValue(Action.ACCELERATOR_KEY,
-                 KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
+            KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
     }
-
-
+    
+    
     //#######################################################################
     //# Interface java.awt.event.ActionListener
     public void actionPerformed(final ActionEvent event)
@@ -47,10 +47,11 @@ public class ExitAction
         final IDE ide = getIDE();
         final DocumentContainerManager manager =
             ide.getDocumentContainerManager();
-        if (manager.closeAllContainers()) {
+        if (manager.closeAllContainers())
+        {
             System.exit(0);
         }
     }
-
-
+    
+    
 }

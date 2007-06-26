@@ -116,7 +116,7 @@ public class TestAutomata
 				for (Iterator<LabeledEvent> evIt = currAlphabet.iterator(); evIt.hasNext(); )
 				{
 					LabeledEvent currEvent = evIt.next();
-					int currIndex = currEvent.getSynchIndex();
+					int currIndex = currEvent.getIndex();
 					//System.err.println(currIndex);
 					assertTrue(currIndex >= minIndex);
 					assertTrue(currIndex <= maxIndex);

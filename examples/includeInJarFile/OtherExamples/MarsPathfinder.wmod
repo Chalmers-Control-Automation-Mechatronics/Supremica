@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="Mars Pathfinder" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+    <ns2:Comment>From 'Efficient Analysis of Discrete Event Systems' by A. Vahidi.
+
+A much simplified model of the software bug that caused the Sojourner rover, a vehicle supposed to navigate the surface of Mars, to sometimes mysteriously reset the system causing loss om important data. The model features two tasks, a low priority task and a high priority task in the need to, under mutual exclusion, access a common resource; an information bus. The priority of the tasks are maintained by a scheduler that essentially disables the low priority task when the high priority task is active. </ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="l_start"/>
+        <EventDecl Kind="CONTROLLABLE" Name="l_book"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="l_unbook"/>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="h_start"/>
+        <EventDecl Kind="CONTROLLABLE" Name="h_book"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="h_unbook"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT">
+            <SimpleIdentifier Name="HighPrioTask"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="h_idle">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="57" X="57"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="h_wait">
+                        <PointGeometry>
+                            <Point Y="144" X="81"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="h_run">
+                        <PointGeometry>
+                            <Point Y="81" X="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="h_wait" Source="h_idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="h_start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="3" X="-47"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="103" X="61"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="h_run" Source="h_wait">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="h_book"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="118" X="118"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="h_idle" Source="h_run">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="h_unbook"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-21" X="-3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="61" X="103"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT">
+            <SimpleIdentifier Name="LowPrioTask"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="l_idle">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="57" X="58"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="l_wait">
+                        <PointGeometry>
+                            <Point Y="143" X="83"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="l_run">
+                        <PointGeometry>
+                            <Point Y="80" X="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="l_wait" Source="l_idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="l_start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="-41"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="102" X="62"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="l_run" Source="l_wait">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="l_book"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="117" X="119"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="l_idle" Source="l_run">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="l_unbook"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-23" X="-5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="61" X="103"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC">
+            <SimpleIdentifier Name="BusMutex"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="free">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="116" X="116"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="low">
+                        <PointGeometry>
+                            <Point Y="53" X="183"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="high">
+                        <PointGeometry>
+                            <Point Y="182" X="53"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="low" Source="free">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="l_book"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="89" X="160"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="high" Source="free">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="h_book"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="10" X="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="160" X="90"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="free" Source="low">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="l_unbook"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-28" X="-57"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="73" X="145"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="free" Source="high">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="h_unbook"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-33" X="-50"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="144" X="73"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC">
+            <SimpleIdentifier Name="Scheduler"/>
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="normal">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point Y="98" X="101"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point Y="-5" X="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="3" X="-52"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="priority">
+                        <PointGeometry>
+                            <Point Y="161" X="167"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point Y="10" X="0"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Target="priority" Source="normal">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="h_start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-9" X="11"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="121" X="142"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="normal" Source="priority">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="h_unbook"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="6" X="-42"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="137" X="126"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Target="normal" Source="normal">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="l_unbook"/>
+                            <SimpleIdentifier Name="l_book"/>
+                            <SimpleIdentifier Name="l_start"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point Y="-37" X="39"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point Y="61" X="63"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>
