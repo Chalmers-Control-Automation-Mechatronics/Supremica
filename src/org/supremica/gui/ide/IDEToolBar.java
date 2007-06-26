@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEToolBar
 //###########################################################################
-//# $Id: IDEToolBar.java,v 1.16 2007-06-25 20:18:48 robi Exp $
+//# $Id: IDEToolBar.java,v 1.17 2007-06-26 05:34:09 robi Exp $
 //###########################################################################
 
 
@@ -36,6 +36,21 @@ import org.supremica.gui.ide.actions.NewAction;
 import org.supremica.gui.ide.actions.OpenAction;
 import org.supremica.gui.ide.actions.SaveAction;
 
+
+/**
+ * <P>The IDE's main toolbar.</P>
+ *
+ * <P>Presently, there is only one toolbar in the IDE, which contains
+ * buttons for file operations, editing, and the graph drawing tools. Some
+ * buttons are enabled and disabled, as the user switches between panels,
+ * but there is no switching of toolbars.</P>
+ *
+ * <P>This class is a straightforward extension of Swing's {@link
+ * JToolBar}, with some additional support for changing and reading the
+ * current graph drawing tool.</P>
+ *
+ * @author Knut &Aring;kesson, Simon Ware, Robi Malik
+ */
 
 public class IDEToolBar
     extends JToolBar
@@ -73,16 +88,27 @@ public class IDEToolBar
 
     //#######################################################################
     //# Accessing the Drawing Tool
+    /**
+     * Gets the current graph drawing tool.
+     */
     public ControlledToolbar.Tool getTool()
     {
         return mTool;
     }
 
+    /**
+     * Changes the current graph drawing tool. A {@link ToolbarChangedEvent}
+     * will be sent to all registered listeners on this toolbar and the
+     * {@link IDE}.
+     */
     public void setTool(final ControlledToolbar.Tool tool)
     {
-        mTool = tool;
-        final EditorChangedEvent event = new ToolbarChangedEvent(this, tool);
-        fireEditorChangedEvent(event);
+        if (tool != mTool) {
+            mTool = tool;
+            final EditorChangedEvent event =
+                new ToolbarChangedEvent(this, tool);
+            fireEditorChangedEvent(event);
+        }
     }
 
 
