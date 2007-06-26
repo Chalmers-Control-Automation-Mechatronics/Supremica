@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.92 2007-06-26 14:43:25 robi Exp $
+//# $Id: IDE.java,v 1.93 2007-06-26 20:45:14 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -15,6 +15,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.List;
 import java.util.LinkedList;
+import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -29,7 +30,7 @@ import net.sourceforge.waters.model.marshaller.DocumentManager;
 
 import org.supremica.automata.Project;
 import org.supremica.gui.ide.actions.Actions;
-import org.supremica.gui.ide.actions.IDEAction;
+import org.supremica.gui.ide.actions.ExitAction;
 import org.supremica.gui.ide.actions.IDEActionInterface;
 import org.supremica.gui.InterfaceManager;
 import org.supremica.gui.Utility;
@@ -143,17 +144,14 @@ public class IDE
 
 	//#######################################################################
 	//# Listeners
-    /**
-     * Overridden so we can exit when window is closed
-     */
-    protected void processWindowEvent(WindowEvent e)
+    public void processWindowEvent(final WindowEvent event)
     {
-        super.processWindowEvent(e);
-        
-        if (e.getID() == WindowEvent.WINDOW_CLOSING)
-        {
-            mActions.exitAction.doAction();
-        }
+        if (event.getID() == WindowEvent.WINDOW_CLOSING) {
+			final Action action = mActions.getAction(ExitAction.class);
+			action.actionPerformed(null);
+        } else {
+			super.processWindowEvent(event);
+		}
     }
 
     

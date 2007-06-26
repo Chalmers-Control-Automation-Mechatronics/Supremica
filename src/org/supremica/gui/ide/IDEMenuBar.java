@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.45 2007-06-25 20:18:48 robi Exp $
+//# $Id: IDEMenuBar.java,v 1.46 2007-06-26 20:45:14 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -37,6 +37,7 @@ import org.supremica.automata.templates.TemplateItem;
 import org.supremica.gui.ExampleTemplates;
 import org.supremica.gui.ide.actions.Actions;
 import org.supremica.gui.ide.actions.CloseAction;
+import org.supremica.gui.ide.actions.ExitAction;
 import org.supremica.gui.ide.actions.NewAction;
 import org.supremica.gui.ide.actions.OpenAction;
 import org.supremica.gui.ide.actions.SaveAction;
@@ -108,7 +109,8 @@ public class IDEMenuBar
         menu.add(ide.getActions().editorSaveEncapsulatedPostscriptAction.getMenuItem());
         menu.add(ide.getActions().editorSavePDFAction.getMenuItem());
         menu.addSeparator();
-        menu.add(ide.getActions().exitAction.getMenuItem());
+		final Action exit = actions.getAction(ExitAction.class);
+        menu.add(new JMenuItem(exit));
         add(menu);
 
         // Edit

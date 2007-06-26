@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   SaveAction
 //###########################################################################
-//# $Id: SaveAction.java,v 1.13 2007-06-21 20:56:53 robi Exp $
+//# $Id: SaveAction.java,v 1.14 2007-06-26 20:45:14 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -15,7 +15,9 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 
+import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
+
 
 public class SaveAction extends AbstractSaveAction
 {
@@ -39,7 +41,9 @@ public class SaveAction extends AbstractSaveAction
   //# Interface java.awt.event.ActionListener
   public void actionPerformed(final ActionEvent event)
   {
-    invokeSaveAction();
+    final IDE ide = getIDE();
+    final DocumentContainerManager manager = ide.getDocumentContainerManager();
+    manager.saveActiveContainer();
   }
 
 

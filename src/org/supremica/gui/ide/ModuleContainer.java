@@ -1,10 +1,10 @@
-//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Waters
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: ModuleContainer.java,v 1.62 2007-06-25 20:18:48 robi Exp $
+//# $Id: ModuleContainer.java,v 1.63 2007-06-26 20:45:14 robi Exp $
 //###########################################################################
 
 
@@ -74,47 +74,57 @@ public class ModuleContainer
         mPrinter = new HTMLPrinter();
 
         mTabPanel = new JTabbedPane();
-		mEditorPanel = new EditorPanel(this, "Editor");
-		mAnalyzerPanel = new AnalyzerPanel(this, "Analyzer");
+        mEditorPanel = new EditorPanel(this, "Editor");
+        mAnalyzerPanel = new AnalyzerPanel(this, "Analyzer");
         mTabPanel.add(mEditorPanel);
         mTabPanel.add(mAnalyzerPanel);
         mTabPanel.addChangeListener(this);
-		mEditorPanel.showComment();
+        mEditorPanel.showComment();
     }
     
 
     //#######################################################################
     //# Overrides for Abstract Base Class
-	//# org.supremica.gui.ide.DocumentContainer
-    public Component getPanel()
+    //# org.supremica.gui.ide.DocumentContainer
+	public boolean hasUnsavedChanges()
 	{
-		return mTabPanel;
+		return mUndoIndex != mUndoCheckPoint;
 	}
+
+	public void setCheckPoint()
+	{
+		mUndoCheckPoint = mUndoIndex;
+	}
+
+    public Component getPanel()
+    {
+        return mTabPanel;
+    }
 
     public EditorPanel getEditorPanel()
-	{
-		return mEditorPanel;
-	}
+    {
+        return mEditorPanel;
+    }
 
     public AnalyzerPanel getAnalyzerPanel()
-	{
-		return mAnalyzerPanel;
-	}
+    {
+        return mAnalyzerPanel;
+    }
 
-	public boolean isEditorActive()
-	{
-		return mTabPanel.getSelectedComponent() == mEditorPanel;
-	}
+    public boolean isEditorActive()
+    {
+        return mTabPanel.getSelectedComponent() == mEditorPanel;
+    }
 
-	public boolean isAnalyzerActive()
-	{
-		return mTabPanel.getSelectedComponent() == mAnalyzerPanel;
-	}
+    public boolean isAnalyzerActive()
+    {
+        return mTabPanel.getSelectedComponent() == mAnalyzerPanel;
+    }
 
-	public String getTypeString()
-	{
-		return TYPE_STRING;
-	}
+    public String getTypeString()
+    {
+        return TYPE_STRING;
+    }
 
 
     //#######################################################################
@@ -131,13 +141,13 @@ public class ModuleContainer
     
     public void fireEditorChangedEvent(final EditorChangedEvent event)
     {
-		// Just in case they try to register or deregister observers
-		// in response to the update ...
-		final Collection<Observer> copy = new LinkedList<Observer>(mObservers);
+        // Just in case they try to register or deregister observers
+        // in response to the update ...
+        final Collection<Observer> copy = new LinkedList<Observer>(mObservers);
         for (final Observer observer : copy) {
             observer.update(event);
         }
-		getIDE().fireEditorChangedEvent(event);
+        getIDE().fireEditorChangedEvent(event);
     }
     
 
@@ -159,7 +169,7 @@ public class ModuleContainer
         final IndexedList<EventDeclSubject> decls =
             getModule().getEventDeclListModifiable();
         final EventDeclSubject decl = decls.get(name);
-		return decl == null ? null : decl.getKind();
+        return decl == null ? null : decl.getKind();
     }
     
     public void addStandardPropositions()
@@ -203,7 +213,7 @@ public class ModuleContainer
             final Dimension oldsize = right.getSize();
             try
             {
-                panel =	new ComponentEditorPanel(this, scp, oldsize);
+                panel = new ComponentEditorPanel(this, scp, oldsize);
                 mComponentToPanelMap.put(scp, panel);
             }
             catch (GeometryAbsentException g)
@@ -225,7 +235,7 @@ public class ModuleContainer
             final Dimension oldsize = right.getSize();
             try
             {
-                panel =	new ComponentViewPanel(this, scp, oldsize);
+                panel = new ComponentViewPanel(this, scp, oldsize);
                 mComponentToViewPanelMap.put(scp, panel);
             }
             catch (GeometryAbsentException g)
@@ -274,7 +284,13 @@ public class ModuleContainer
 
 
     //#######################################################################
-    //# Undo & Redo
+    //# Interface net.sourceforge.waters.gui.command.UndoInterface
+    public void executeCommand(Command c)
+    {
+        c.execute();
+        addUndoable(new UndoableCommand(c));
+    }
+    
     public void addUndoable(UndoableEdit e)
     {
         if (e.isSignificant()) {
@@ -282,16 +298,13 @@ public class ModuleContainer
             mUndoManager.addEdit(mInsignificant);
             mInsignificant = new CompoundEdit();
             mUndoManager.addEdit(e);
-			fireUndoRedoEvent();
+			if (mUndoIndex++ < mUndoCheckPoint) {
+				mUndoCheckPoint = -1;
+			}
+            fireUndoRedoEvent();
         } else {
             mInsignificant.addEdit(e);
         }
-    }
-    
-    public void executeCommand(Command c)
-    {
-        c.execute();
-        addUndoable(new UndoableCommand(c));
     }
     
     public boolean canRedo()
@@ -307,7 +320,8 @@ public class ModuleContainer
     public void clearList()
     {
         mUndoManager.discardAllEdits();
- 		fireUndoRedoEvent();
+		mUndoIndex = 0;
+        fireUndoRedoEvent();
     }
     
     public String getRedoPresentationName()
@@ -326,7 +340,8 @@ public class ModuleContainer
         mInsignificant.undo();
         mInsignificant = new CompoundEdit();
         mUndoManager.redo();
- 		fireUndoRedoEvent();
+		mUndoIndex++;
+        fireUndoRedoEvent();
    }
     
     public void undo() throws CannotUndoException
@@ -335,33 +350,37 @@ public class ModuleContainer
         mInsignificant.undo();
         mInsignificant = new CompoundEdit();
         mUndoManager.undo();
-		fireUndoRedoEvent();
+		mUndoIndex--;
+        fireUndoRedoEvent();
     }
 
-	private void fireUndoRedoEvent()
-	{
-		final EditorChangedEvent event = new UndoRedoEvent(this);
-		fireEditorChangedEvent(event);
-	}
 
-
-	//#######################################################################
-	//# Interface javax.swing.event.ChangeListener
+    //#######################################################################
+    //# Interface javax.swing.event.ChangeListener
     public void stateChanged(final ChangeEvent event)
     {
-		final Component selected = mTabPanel.getSelectedComponent();
+        final Component selected = mTabPanel.getSelectedComponent();
         if (selected == mAnalyzerPanel &&
-			!mAnalyzerPanel.updateAutomata()) {
-			mTabPanel.setSelectedComponent(mEditorPanel);
+            !mAnalyzerPanel.updateAutomata()) {
+            mTabPanel.setSelectedComponent(mEditorPanel);
         }
-		final EditorChangedEvent eevent = new MainPanelSwitchEvent(this);
-		fireEditorChangedEvent(eevent);
+        final EditorChangedEvent eevent = new MainPanelSwitchEvent(this);
+        fireEditorChangedEvent(eevent);
+    }
+
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private void fireUndoRedoEvent()
+    {
+        final EditorChangedEvent event = new UndoRedoEvent(this);
+        fireEditorChangedEvent(event);
     }
 
 
     //#######################################################################
     //# Data Members
-	private final JTabbedPane mTabPanel;
+    private final JTabbedPane mTabPanel;
     private final EditorPanel mEditorPanel;
     private final AnalyzerPanel mAnalyzerPanel;
     private SimulatorPanel simulatorPanel = null;
@@ -378,11 +397,13 @@ public class ModuleContainer
 
     private final UndoManager mUndoManager = new UndoManager();
     private CompoundEdit mInsignificant = new CompoundEdit();
+	private int mUndoIndex = 0;
+	private int mUndoCheckPoint = 0;
     private final Collection<Observer> mObservers = new LinkedList<Observer>();
 
 
     //#######################################################################
     //# Class Constants
-	static final String TYPE_STRING = "Waters module";
+    static final String TYPE_STRING = "Waters module";
 
 }

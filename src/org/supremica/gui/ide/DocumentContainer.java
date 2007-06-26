@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   ModuleContainer
 //###########################################################################
-//# $Id: DocumentContainer.java,v 1.3 2007-06-25 07:42:27 robi Exp $
+//# $Id: DocumentContainer.java,v 1.4 2007-06-26 20:45:14 robi Exp $
 //###########################################################################
 
 
@@ -46,6 +46,17 @@ public abstract class DocumentContainer
     {
         return mDocument;
     }
+
+    //#######################################################################
+    //# To be Overriden by Subclasses
+	public boolean hasUnsavedChanges()
+	{
+		return false;
+	}
+
+	public void setCheckPoint()
+	{
+	}
 
     public abstract Component getPanel();
 

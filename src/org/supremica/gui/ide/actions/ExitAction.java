@@ -1,29 +1,56 @@
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
+//###########################################################################
+//# PROJECT: Waters/Supremica IDE
+//# PACKAGE: org.supremica.gui.ide.actions
+//# CLASS:   ExitAction
+//###########################################################################
+//# $Id: ExitAction.java,v 1.7 2007-06-26 20:45:14 robi Exp $
+//###########################################################################
+
+
 package org.supremica.gui.ide.actions;
 
-import javax.swing.Action;
 import java.awt.event.ActionEvent;
-import java.util.List;
+import java.awt.event.KeyEvent;
+import javax.swing.Action;
+import javax.swing.ImageIcon;
+import javax.swing.KeyStroke;
+
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+
+import org.supremica.gui.ide.DocumentContainer;
+import org.supremica.gui.ide.DocumentContainerManager;
+import org.supremica.gui.ide.IDE;
+
 
 public class ExitAction
-    extends IDEAction
+    extends net.sourceforge.waters.gui.actions.IDEAction
 {
-    private static final long serialVersionUID = 1L;
-    
-    public ExitAction(List<IDEAction> actionList)
+
+    //#######################################################################
+    //# Constructor
+    ExitAction(final IDE ide)
     {
-        super(actionList);
-        
+        super(ide);
         putValue(Action.NAME, "Exit");
-        putValue(Action.SHORT_DESCRIPTION, "Exit");
+        putValue(Action.SHORT_DESCRIPTION, "Exit the IDE");
+        putValue(Action.MNEMONIC_KEY, KeyEvent.VK_X);
+        putValue(Action.ACCELERATOR_KEY,
+                 KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
     }
-    
-    public void actionPerformed(ActionEvent e)
+
+
+    //#######################################################################
+    //# Interface java.awt.event.ActionListener
+    public void actionPerformed(final ActionEvent event)
     {
-        doAction();
+        final IDE ide = getIDE();
+        final DocumentContainerManager manager =
+            ide.getDocumentContainerManager();
+        if (manager.closeAllContainers()) {
+            System.exit(0);
+        }
     }
-    
-    public void doAction()
-    {
-        System.exit(0);
-    }
+
+
 }

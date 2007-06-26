@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   SaveAsAction
 //###########################################################################
-//# $Id: SaveAsAction.java,v 1.9 2007-06-23 10:33:12 robi Exp $
+//# $Id: SaveAsAction.java,v 1.10 2007-06-26 20:45:14 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -34,6 +34,7 @@ import org.supremica.automata.IO.AutomataToXML;
 import org.supremica.automata.IO.SupremicaUnmarshaller;
 import org.supremica.gui.ide.AutomataContainer;
 import org.supremica.gui.ide.DocumentContainer;
+import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
@@ -58,7 +59,9 @@ public class SaveAsAction extends AbstractSaveAction
   //# Interface java.awt.event.ActionListener
   public void actionPerformed(final ActionEvent event)
   {
-    invokeSaveAsAction();
+    final IDE ide = getIDE();
+    final DocumentContainerManager manager = ide.getDocumentContainerManager();
+    manager.saveActiveContainerAs();
   }
 
 

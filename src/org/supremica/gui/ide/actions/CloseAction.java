@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   CloseAction
 //###########################################################################
-//# $Id: CloseAction.java,v 1.10 2007-06-24 18:40:06 robi Exp $
+//# $Id: CloseAction.java,v 1.11 2007-06-26 20:45:14 robi Exp $
 //###########################################################################
 
 
@@ -35,7 +35,6 @@ public class CloseAction
         setEnabled(false);
         putValue(Action.NAME, "Close");
         putValue(Action.SHORT_DESCRIPTION, "Close the current module");
-        putValue(Action.MNEMONIC_KEY, KeyEvent.VK_C);
     }
 
 
@@ -46,8 +45,7 @@ public class CloseAction
         final IDE ide = getIDE();
         final DocumentContainerManager manager =
             ide.getDocumentContainerManager();
-        final DocumentContainer container = manager.getActiveContainer();
-        manager.closeContainer(container);
+        manager.closeActiveContainer();
     }
 
 
