@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   DocumentContainerManager
 //###########################################################################
-//# $Id: DocumentContainerManager.java,v 1.3 2007-06-25 20:18:48 robi Exp $
+//# $Id: DocumentContainerManager.java,v 1.4 2007-06-26 13:07:11 robi Exp $
 //###########################################################################
 
 
@@ -376,7 +376,9 @@ public class DocumentContainerManager
                             final boolean maycancel)
     {
         final JFrame frame = mIDE.getFrame();
-        final String text = "Error accesing file: " + exception.getMessage();
+        final String msg = exception.getMessage();
+        final String text =
+            "Error accesing file:\n" + wrapExceptionMessage(msg); 
         final String title = "I/O Error";
         if (maycancel) {
             final int choice = JOptionPane.showConfirmDialog
@@ -425,6 +427,11 @@ public class DocumentContainerManager
         buffer.append("'\n");
         buffer.append(msg);
         return buffer.toString();
+    }
+
+    private String wrapExceptionMessage(final String msg)
+    {
+        return msg.replaceAll(": +", ":\n");
     }
 
 
