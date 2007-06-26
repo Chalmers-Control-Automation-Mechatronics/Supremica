@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   AbstractSaveAction
 //###########################################################################
-//# $Id: AbstractSaveAction.java,v 1.3 2007-06-24 18:40:06 robi Exp $
+//# $Id: AbstractSaveAction.java,v 1.4 2007-06-26 12:59:14 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -173,7 +173,7 @@ public abstract class AbstractSaveAction
       final String ext = marshaller.getDefaultExtension();
       final File extfile =
         StandardExtensionFileFilter.ensureDefaultExtension(file, ext);
-      cmanager.saveContainer(container, file);
+      cmanager.saveContainer(container, extfile);
     } else if (doc instanceof Project) {
       // Converting Supremica >> Waters ...
       // If analyzer active, check if there are unsupported features

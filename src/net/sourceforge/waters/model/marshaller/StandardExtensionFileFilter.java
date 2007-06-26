@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.model.marshaller
 //# CLASS:   StandardExtensionFileFilter
 //###########################################################################
-//# $Id: StandardExtensionFileFilter.java,v 1.2 2007-06-23 10:16:00 robi Exp $
+//# $Id: StandardExtensionFileFilter.java,v 1.3 2007-06-26 12:59:14 robi Exp $
 //###########################################################################
 
 
@@ -150,7 +150,7 @@ public class StandardExtensionFileFilter
     if (hasExtension(file, ext)) {
       return file;
     } else {
-      return new File(file.getPath() + "." + ext);
+      return new File(file.getPath() + ext);
     }
   }
 
