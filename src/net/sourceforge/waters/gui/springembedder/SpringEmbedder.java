@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.40 2007-06-20 05:00:58 robi Exp $
+//# $Id: SpringEmbedder.java,v 1.41 2007-06-26 14:43:25 robi Exp $
 //###########################################################################
 
 
@@ -316,12 +316,20 @@ public class SpringEmbedder
         }
       }        
     }
+    int maxfanout = 1;
+    for (final NodeWrapper wrapper : mNodeWrappers) {
+      final int fanout = wrapper.getFanout();
+      if (fanout > maxfanout) {
+        maxfanout = fanout;
+      }
+    }
     mWrapperSet = new WrapperSet();
     mBackgroundAttraction = BACKGROUND_ATTRACTION / numnodes;
     mInitialStateAttraction = INITIALSTATE_ATTRACTION;
     mNodeRepulsion = NODE_REPULSION / numnodes;
     mNodeEdgeRepulsion = NODEEDGE_REPULSION / numnodes;
     mEdgeRepulsion = EDGE_REPULSION;
+    mMaxAttraction = 0.5 / maxfanout;
     mCenter = (Point2D) POINT_CENTER.clone();
     mTotalJumpsAvailable = numnodes;
   }
@@ -489,8 +497,8 @@ public class SpringEmbedder
     final double dy = p1.getY() - p2.getY();
     final int pass = mPass > 0 ? mPass : 1;
     double factor = pass * constant;
-    if (factor > 0.5) {
-      factor = 0.5;
+    if (factor > mMaxAttraction) {
+      factor = mMaxAttraction;
     }
     return new Point2D.Double(-dx * factor, -dy * factor);
   }
@@ -681,6 +689,11 @@ public class SpringEmbedder
       return mIsInitial;
     }
 
+    int getFanout()
+    {
+      return mNeighbours.size();
+    }
+
     //#######################################################################
     //# Auxiliary Methods
     private void addNeighbours(final EdgeWrapper edge)
@@ -691,11 +704,11 @@ public class SpringEmbedder
       } else if (edge.getTarget() == this) {
         other = edge.getSource();
       } else {
-        other = null;
+        return;
       }
       if (other == this) {
         mSelfLoopFactor *= SELFLOOP_WEIGHT;
-      } else if (other != null) {
+      } else {
         final Double weight = mNeighbours.get(other);
         if (weight == null) {
           mNeighbours.put(other, 1.0);
@@ -1171,6 +1184,13 @@ public class SpringEmbedder
   private double mNodeRepulsion;
   private double mNodeEdgeRepulsion;
   private double mEdgeRepulsion;
+  /**
+   * Constant limiting attraction. To avoid divergent behaviour, attraction
+   * must not cause objects to move past the objects they are attracted
+   * to. Therefore, attraction is limited by a constant that depends on the
+   * maximum fanout of nodes in the graph.
+   */
+  private double mMaxAttraction;
   private Point2D mCenter;
   private double mInitialStateAttraction;
   private int mNextWrapperId;

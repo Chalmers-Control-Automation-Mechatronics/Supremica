@@ -4,13 +4,12 @@
 //# PACKAGE: net.sourceforge.waters.gui
 //# CLASS:   EditorEvents
 //###########################################################################
-//# $Id: EditorEvents.java,v 1.33 2007-06-25 20:18:48 robi Exp $
+//# $Id: EditorEvents.java,v 1.34 2007-06-26 14:43:25 robi Exp $
 //###########################################################################
 
 
 package net.sourceforge.waters.gui;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -88,7 +87,6 @@ public class EditorEvents
 		mRoot = root;
 		mWindow = window;
 
-		setBackground(Color.WHITE);
 		setModel(model);
 		setTableHeader(null);
 		setRowHeight(22);

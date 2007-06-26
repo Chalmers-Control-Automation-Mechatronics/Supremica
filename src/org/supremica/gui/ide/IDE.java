@@ -4,13 +4,12 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.91 2007-06-26 05:46:55 robi Exp $
+//# $Id: IDE.java,v 1.92 2007-06-26 14:43:25 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -78,7 +77,6 @@ public class IDE
 		mToolBar = new IDEToolBar(this);
 		contents.add(mToolBar, BorderLayout.NORTH);
 		mBlankPanel = new JPanel();
-		mBlankPanel.setBackground(Color.WHITE);
 		mBlankPanel.setPreferredSize(IDEDimensions.mainWindowPreferredSize);
         mLogPanel = new LogPanel(this, "Logger");
         mSplitPaneVertical =
