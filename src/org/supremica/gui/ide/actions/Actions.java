@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   Actions
 //###########################################################################
-//# $Id: Actions.java,v 1.50 2007-06-25 20:18:48 robi Exp $
+//# $Id: Actions.java,v 1.51 2007-06-26 11:28:14 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide.actions;
@@ -44,6 +44,7 @@ public class Actions extends WatersActionManager
 	{
 		super.update(event);
 		switch (event.getKind()) {
+		case CONTAINER_SWITCH:
 		case MAINPANEL_SWITCH:
 			updateEnabledStatus();
 			break;
