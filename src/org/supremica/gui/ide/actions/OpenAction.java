@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide.actions
 //# CLASS:   OpenAction
 //###########################################################################
-//# $Id: OpenAction.java,v 1.23 2007-06-24 18:40:06 robi Exp $
+//# $Id: OpenAction.java,v 1.24 2007-06-26 16:53:59 robi Exp $
 //###########################################################################
 
 
@@ -79,6 +79,9 @@ public class OpenAction
         // Show the dialog ...
         final JFrame frame = ide.getFrame();
         final int choice = chooser.showOpenDialog(frame);
+        System.err.println(choice);
+        System.err.println(chooser.getSelectedFile());
+        System.err.println(chooser.getSelectedFiles().length);
         // Load the files ...
         if (choice == JFileChooser.APPROVE_OPTION) {
             final File[] filearray = chooser.getSelectedFiles();
