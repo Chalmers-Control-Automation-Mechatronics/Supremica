@@ -52,8 +52,8 @@ package org.supremica.gui;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
-import org.supremica.automata.Automaton;
 
 // I changed AlphabetViewer to accept Automata objects and to show the alphabets
 // of all selected Automaton in the same window. That's probably what you want if
@@ -68,26 +68,15 @@ public class AlphabetViewer
     //private AlphabetViewerPanel alphabetPanel;
     private EventsViewerPanel alphabetPanel;
     
-    public AlphabetViewer(Automaton automaton)
-    throws Exception
-    {
-        Automata automata = new Automata();
-        
-        automata.addAutomaton(automaton);
-        init(automata);
-    }
-    
-    public AlphabetViewer(Automata theAutomata)
-    throws Exception
-    {
-        init(theAutomata);
-    }
-    
-    private void init(Automata theAutomata)
+    /**
+     * Shows the events in the intersection of alphabetSubset and the union alphabet of <code>automata</code> 
+     * and shows which of the automata in <code>automata</code> share those events.
+     */
+    public AlphabetViewer(Automata automata, Alphabet alphabetSubset)
     throws Exception
     {
         //this.alphabetPanel = new AlphabetViewerPanel(theAutomata);
-        this.alphabetPanel = new EventsViewerPanel(theAutomata);
+        this.alphabetPanel = new EventsViewerPanel(automata, alphabetSubset);
         contentPane = (JPanel) getContentPane();
         
         // contentPane.setLayout(new BorderLayout());
@@ -153,11 +142,11 @@ public class AlphabetViewer
         menuBar.add(menuFile);
         
         // View
-        JMenu viewMenu = new JMenu("View");        
+        JMenu viewMenu = new JMenu("View");
         viewMenu.setMnemonic(KeyEvent.VK_V);
         
         // View.Union (default, therefore initially checked)
-        JRadioButtonMenuItem viewMenuUnion = new JRadioButtonMenuItem("Union", true);        
+        JRadioButtonMenuItem viewMenuUnion = new JRadioButtonMenuItem("Union", true);
         viewMenuUnion.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
@@ -167,7 +156,7 @@ public class AlphabetViewer
         });
         
         // View.Intersection
-        JRadioButtonMenuItem viewMenuIntersection = new JRadioButtonMenuItem("Intersection");        
+        JRadioButtonMenuItem viewMenuIntersection = new JRadioButtonMenuItem("Intersection");
         viewMenuIntersection.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)

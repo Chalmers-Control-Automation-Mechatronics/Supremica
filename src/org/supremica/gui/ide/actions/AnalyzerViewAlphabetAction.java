@@ -5,6 +5,7 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
 import org.supremica.gui.AlphabetViewer;
 import org.supremica.gui.ide.IDE;
@@ -47,9 +48,10 @@ public class AnalyzerViewAlphabetAction
      */
     public void doAction()
     {
-       //logger.debug("ActionMan::automatonAlphabet_actionPerformed(gui)");
         Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
-
+        Alphabet alphabetSubset = selectedAutomata.getUnionAlphabet();
+        Automata allAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata();
+        
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1, false, false, true, false))
         {
             return;
@@ -59,9 +61,7 @@ public class AnalyzerViewAlphabetAction
         // automata object?? Use AutomataViewer instead!
         try
         {
-            AlphabetViewer alphabetViewer = new AlphabetViewer(selectedAutomata);
-            //AutomataViewer alphabetViewer = new AutomataViewer(selectedAutomata, true, false);
-
+            AlphabetViewer alphabetViewer = new AlphabetViewer(allAutomata, alphabetSubset);
             alphabetViewer.setVisible(true);
         }
         catch (Exception ex)

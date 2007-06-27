@@ -34,6 +34,9 @@ class EventHiderDialog
     // There should be a "EventSelectorDialog" or something that should be used for the selection.
     // Other classes may want to do this, you know. I didn't have the energy to do all that so this
     // is an ugly fix using the LanguageRestrictorDialog.
+    
+    // LanguageRestictorDialog is no longer used by itself! It was used from old Supremica (ActionMan) before.
+    // The function is not in the AutomataMinimizer.
 
     private static final long serialVersionUID = 1L;
     
@@ -114,6 +117,7 @@ class EventHiderDialog
         
         // Get the events selected by the user (may be for keeping or for hiding)
         Alphabet alpha = restrictEvents.getAlphabet();
+        Alphabet toBeHidden;
         
         // Loop over the selected automata
         Iterator autit = automata.iterator();
@@ -124,17 +128,23 @@ class EventHiderDialog
             newAutomaton.setName(null);
             
             // Find out which events should be hidden
-            if (!restrictEvents.toErase())
+            if (restrictEvents.toErase())
             {
-                alpha = AlphabetHelpers.minus(automaton.getAlphabet(), alpha);
+                // Take the chosen ones
+                toBeHidden = alpha;
+            }
+            else
+            {
+                // Invert
+                toBeHidden = AlphabetHelpers.minus(automaton.getAlphabet(), alpha);
             }
             
             // Do the hiding (preserve controllability!)
-            newAutomaton.hide(alpha, preserveControllability);
+            newAutomaton.hide(toBeHidden, preserveControllability);
             
             // Set appropriate comment
             newAutomaton.setComment(automaton.getName() + "//" +
-                AlphabetHelpers.intersect(automaton.getAlphabet(), alpha));
+                AlphabetHelpers.intersect(automaton.getAlphabet(), toBeHidden));
             
             // Add automaton
             newAutomata.addAutomaton(newAutomaton);

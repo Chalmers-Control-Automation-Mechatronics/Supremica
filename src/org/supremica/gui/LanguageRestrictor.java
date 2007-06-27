@@ -78,16 +78,24 @@ class EventsViewerPanel    // compare AlphabetViewerPanel
     private JTree theTree = new JTree();
     private SupremicaTreeNode root = new SupremicaTreeNode();
     private JScrollPane scrollPanel = new JScrollPane(theTree);
-    Automata automata = null;
     
-    EventsViewerPanel(Automata automata)
+    private Automata automata = null;
+    private Alphabet alphabetSubset;
+    
+    EventsViewerPanel(Automata automata, Alphabet alphabetSubset)
     {
         this.automata = automata;
+        this.alphabetSubset = alphabetSubset;
         
         build(false);
         init();
     }
-    
+
+    EventsViewerPanel(Automata automata)
+    {
+        this(automata, automata.getUnionAlphabet());
+    }
+
     private void init()
     {
         theTree.setCellRenderer(new SupremicaTreeCellRenderer());    // EventNodeRenderer());
@@ -114,21 +122,15 @@ class EventsViewerPanel    // compare AlphabetViewerPanel
         // AutomatonTreeCache automatonTreeCache = new AutomatonTreeCache();
         // This cache is only for storing whether we have already seen the event or not
         HashSet eventTreeCache = new HashSet();
-        Iterator autit = automata.iterator();
         
-        while (autit.hasNext())
+        // Loop over automata and add events to dialog
+        for (Automaton aut: automata)
         {
-            Automaton aut = (Automaton) autit.next();
-            
             // Iterate over the events, for each event not already encountered, calc its subtree
             // Then add as children all the automata containing this event
-            Iterator eventit = aut.getAlphabet().iterator();
-            
-            while (eventit.hasNext())
+            for (LabeledEvent event: aut.getAlphabet())
             {
-                LabeledEvent event = (LabeledEvent) eventit.next();
-                
-                if (!eventTreeCache.contains(event))    // if not already seen
+                if (alphabetSubset.contains(event) && !eventTreeCache.contains(event))    // if not already seen
                 {
                     EventSubTree eventsubtree = new EventSubTree(event);
                     

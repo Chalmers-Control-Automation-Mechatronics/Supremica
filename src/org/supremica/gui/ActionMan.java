@@ -121,7 +121,7 @@ public class ActionMan
     // Ugly fixx here. We need a good way to globally get at the selected automata, the current project etc
     // gui here is filled in by (who?)
     public static Gui gui = null;
-    public static final LanguageRestrictor languageRestrictor = new LanguageRestrictor();
+    //public static final LanguageRestrictor languageRestrictor = new LanguageRestrictor();
     //public static final EventHider eventHider = new EventHider(getGui());
     public static final FindStates findStates = new FindStates();
     public static final StateEnumerator stateEnumerator = new StateEnumerator();

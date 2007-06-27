@@ -385,47 +385,6 @@ public class VisualProject
         }
     }
 
-    public AlphabetViewer getAlphabetViewer(String automaton)
-    throws Exception
-    {
-        logger.debug("VisualProject::getAlphabetViewer(" + automaton + ")");
-
-        if (theAlphabetViewerContainer.containsKey(automaton))
-        {
-            AlphabetViewer viewer = (AlphabetViewer) theAlphabetViewerContainer.get(automaton);
-
-            viewer.setVisible(true);
-
-            return viewer;
-        }
-        else
-        {
-            Automaton currAutomaton = getAutomaton(automaton);
-
-            if (currAutomaton != null)
-            {
-                try
-                {
-                    AlphabetViewer viewer = new AlphabetViewer(currAutomaton);
-
-                    theAlphabetViewerContainer.put(automaton, viewer);
-                    viewer.setVisible(true);
-                    viewer.initialize();
-
-                    return viewer;
-                }
-                catch (Exception ex)
-                {
-                    throw new SupremicaException("Error while viewing: " + automaton);
-                }
-            }
-            else
-            {
-                throw new SupremicaException(automaton + " does not exist in VisualProjectContainer");
-            }
-        }
-    }
-
     public ActionAndControlViewer getActionAndControlViewer()
     throws Exception
     {
