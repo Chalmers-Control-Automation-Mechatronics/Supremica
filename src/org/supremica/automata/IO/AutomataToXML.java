@@ -93,6 +93,9 @@ public class AutomataToXML
             pw.print(" name=\"" + EncodingHelper.normalize(automata.getName()) + "\"");
         }
         
+        // To keep track of indices
+        //AutomataIndexMap indexMap = new AutomataIndexMap(automata);
+        
         pw.print(" major=\"" + majorFileVersion + "\"");
         pw.print(" minor=\"" + minorFileVersion + "\"");
         
@@ -114,8 +117,7 @@ public class AutomataToXML
             int eventId = 0;
             
             for (LabeledEvent event : aut.getAlphabet())
-            {
-         
+            {         
                 eventIdMap.put(event, eventId);
                 pw.print("\t\t<Event id=\"" + eventId + "\" label=\"" + EncodingHelper.normalize(event.getLabel()) + "\"");
                 
@@ -156,7 +158,7 @@ public class AutomataToXML
                 
                 if (debugMode)
                 {
-                    pw.print(" synchIndex=" + event.getIndex());
+                    pw.print(" index=" + event.getIndex());
                 }
                 
                 pw.println("/>");
@@ -170,8 +172,7 @@ public class AutomataToXML
             int stateId = 0;    // we need to make up id
             
             for(State state: aut)
-            {
-         
+            {         
                 stateIdMap.put(state, stateId);    // The arc must be able to find it fast
                 pw.print("\t\t<State id=\"" + stateId + "\"");    // no longer need to normalize
                 

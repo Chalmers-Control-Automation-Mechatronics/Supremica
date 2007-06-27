@@ -58,77 +58,78 @@ import org.supremica.testhelpers.*;
 import org.supremica.automata.IO.*;
 
 public class TestAutomata
-	extends TestCase
+    extends TestCase
 {
-
-	public TestAutomata(String name)
-	{
-		super(name);
-	}
-
-	/**
-	 * Sets up the test fixture.
-	 * Called before every test case method.
-	 */
-	protected void setUp()
-	{
-	}
-
-	/**
-	 * Tears down the test fixture.
-	 * Called after every test case method.
-	 */
-	protected void tearDown()
-	{
-	}
-
-	/**
-	 * Assembles and returns a test suite
-	 * for all the test methods of this test case.
-	 */
-	public static Test suite()
-	{
-		TestSuite suite = new TestSuite(TestAutomata.class);
-		return suite;
-	}
-
-	public void testEx45b()
-	{
-		try
-		{
-			ProjectBuildFromXML builder = new ProjectBuildFromXML();
-			Project theProject = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
-			assertTrue(theProject.nbrOfAutomata() == 3);
-
-			theProject.setIndices();
-
-			Alphabet unionAlphabet = AlphabetHelpers.getUnionAlphabet(theProject);
-			assertTrue(unionAlphabet.size() == 5);
-			//System.err.println("******");
-			for (Iterator autIt = theProject.iterator(); autIt.hasNext(); )
-			{
-				Automaton currAutomaton = (Automaton)autIt.next();
-				//System.err.println("******");
-				// Check event indicies
-				Alphabet currAlphabet = currAutomaton.getAlphabet();
-				int minIndex = 0;
-				int maxIndex = unionAlphabet.size() - 1;
-				for (Iterator<LabeledEvent> evIt = currAlphabet.iterator(); evIt.hasNext(); )
-				{
-					LabeledEvent currEvent = evIt.next();
-					int currIndex = currEvent.getIndex();
-					//System.err.println(currIndex);
-					assertTrue(currIndex >= minIndex);
-					assertTrue(currIndex <= maxIndex);
-				}
-			}
-		}
-		catch (Exception ex)
-		{
-			ex.printStackTrace();
-			assertTrue(false);
-		}
-	}
-
+    
+    public TestAutomata(String name)
+    {
+        super(name);
+    }
+    
+    /**
+     * Sets up the test fixture.
+     * Called before every test case method.
+     */
+    protected void setUp()
+    {
+    }
+    
+    /**
+     * Tears down the test fixture.
+     * Called after every test case method.
+     */
+    protected void tearDown()
+    {
+    }
+    
+    /**
+     * Assembles and returns a test suite
+     * for all the test methods of this test case.
+     */
+    public static Test suite()
+    {
+        TestSuite suite = new TestSuite(TestAutomata.class);
+        return suite;
+    }
+    
+    public void testEx45b()
+    {
+        try
+        {
+            ProjectBuildFromXML builder = new ProjectBuildFromXML();
+            Project project = builder.build(TestFiles.getFile(TestFiles.Ex4_5_b));
+            AutomataIndexMap indexMap = new AutomataIndexMap(project);
+            assertTrue(project.nbrOfAutomata() == 3);
+            
+            project.setIndices();
+            
+            Alphabet unionAlphabet = AlphabetHelpers.getUnionAlphabet(project);
+            assertTrue(unionAlphabet.size() == 5);
+            //System.err.println("******");
+            for (Iterator autIt = project.iterator(); autIt.hasNext(); )
+            {
+                Automaton automaton = (Automaton)autIt.next();
+                //System.err.println("******");
+                // Check event indicies
+                Alphabet alphabet = automaton.getAlphabet();
+                int minIndex = 0;
+                int maxIndex = unionAlphabet.size() - 1;
+                for (Iterator<LabeledEvent> evIt = alphabet.iterator(); evIt.hasNext(); )
+                {
+                    LabeledEvent event = evIt.next();
+                    int index = indexMap.getEventIndex(event);
+                    //System.err.println(currIndex);
+                    assertTrue(index >= minIndex);
+                    assertTrue(index <= maxIndex);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            assertTrue(false);
+        }
+    }
+    
 }
 
