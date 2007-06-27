@@ -586,11 +586,6 @@ public class ProjectBuildFromXML
             else if (costStr.equals(currName))
             {
                 cost = Double.valueOf(attributes.getValue(i)).doubleValue();
-                if (name == null)
-                {
-                    name = "";
-                }
-                name += ", cost=" + cost;
             }
         }
         
@@ -604,9 +599,14 @@ public class ProjectBuildFromXML
             name = id;
         }
         
+        if (cost != State.UNDEF_COST)
+        {
+            name += ", cost=" + cost;
+        }
+        
         if (currAutomaton.containsStateWithName(name))
         {
-            throwException("several states with the same name");
+            throwException("several states with the same name (" + name + ")");
         }
         
         State currState = new State(name);

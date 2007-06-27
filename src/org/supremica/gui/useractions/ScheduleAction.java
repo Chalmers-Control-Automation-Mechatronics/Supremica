@@ -37,7 +37,7 @@ public class ScheduleAction
         
         try
         {
-            //dlg = new ScheduleDialog(ActionMan.getGui());
+            // dlg = new ScheduleDialog(ActionMan.getGui());
             dlg.setVisible(true);
         }
         catch (Exception ex)

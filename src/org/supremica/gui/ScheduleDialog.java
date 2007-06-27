@@ -41,6 +41,8 @@ public class ScheduleDialog
     private java.util.ArrayList filesToSchedule = new java.util.ArrayList();
     
     private Automata selectedAutomata = null;
+    // TODO: do something with this ugly implementation (search for "ugly" in this file)
+    // Ugly implementation due to difference between the interfaces for Supremica.java and IDE.java
     private IDEActionInterface ide = null;
     
     Scheduler sched = null;
@@ -53,8 +55,9 @@ public class ScheduleDialog
         super(ide.getFrame(), "Schedule Selected Automata", true);
         
         this.ide = ide;
-        selectedAutomata = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
-        
+//        selectedAutomata = getSelectedAutomata();
+        selectedAutomata = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();  
+
         /******** Base components of the dialog ***********/
         okButton = new JButton("Schedule");
         cancelButton = new JButton("Cancel");
@@ -349,11 +352,24 @@ public class ScheduleDialog
         setVisible(false);
         dispose();
     }
-    
+
     public IDEActionInterface getIde()
     {
         return ide;
     }
+    
+//    // Ugly implementation 
+//    public Automata getSelectedAutomata()
+//    {
+//        if (ide instanceof Gui)
+//        {
+//            return ((Gui) ide).getSelectedAutomata();
+//        }
+//        else if (ide instanceof IDEActionInterface)
+//        {
+//            return ((IDEActionInterface) ide).getIDE().getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+//        }
+//    }
 }
 
 

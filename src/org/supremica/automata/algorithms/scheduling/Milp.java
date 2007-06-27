@@ -185,6 +185,9 @@ public class Milp
         // Converts automata to constraints that the MILP-solver takes as input (*.mod file)
         if (isRunning)
         {
+            //TODO:temp
+//            int anr = scheduleDialog.getIde().getIDE().getActiveProject().getAutomata().size();
+            
             convertAutomataToMilp();
         }
         
