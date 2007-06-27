@@ -146,8 +146,8 @@ public class AutomataMinimizer
         }
 
         // Preserve controllablity during hiding?
-        preserveControllability = options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE;
-        //preserveControllability = true;
+        //preserveControllability = options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE;
+        preserveControllability = true;
         // Ignore blocking states when checking for inadequateness?
         inadequateIgnoreBlocking = options.getMinimizationType() == EquivalenceRelation.CONFLICTEQUIVALENCE;
         // Do we care about state names?

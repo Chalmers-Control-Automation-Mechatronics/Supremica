@@ -1611,16 +1611,16 @@ public class Automaton
      *
      * Selfloops that hare hidden are removed!
      */
-    public void hide(Alphabet alpha, boolean preserveControllability)
+    public void hide(Alphabet hideThese, boolean preserveControllability)
     {
         // Don't hide nothing!
-        if ((alpha == null) || (alpha.size() == 0))
+        if ((hideThese == null) || (hideThese.size() == 0))
         {
             return;
         }
 
         // Remove the hidden events from alphabet
-        getAlphabet().minus(alpha);
+        getAlphabet().minus(hideThese);
 
         // Do we care about controllability?
         if (!preserveControllability)
@@ -1651,7 +1651,7 @@ public class Automaton
                 Arc arc = arcIt.next();
               
                 // Hide this one?
-                if (alpha.contains(arc.getEvent()))
+                if (hideThese.contains(arc.getEvent()))
                 {
                     arc.setEvent(tau);
 
@@ -1673,7 +1673,7 @@ public class Automaton
             // tau_c
             String silentCName = Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.get();
             LabeledEvent tau_c = getAlphabet().getEvent(silentCName);
-            if(alpha.getControllableAlphabet().size() > 0)
+            if(hideThese.getControllableAlphabet().size() > 0)
             {
                 if (tau_c == null)
                 {
@@ -1696,7 +1696,7 @@ public class Automaton
             // tau_u
             String silentUName = Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.get();
             LabeledEvent tau_u = getAlphabet().getEvent(silentUName);
-            if (alpha.getUncontrollableAlphabet().size() > 0)
+            if (hideThese.getUncontrollableAlphabet().size() > 0)
             {
                 if (tau_u == null)
                 {
@@ -1723,13 +1723,13 @@ public class Automaton
                 Arc arc = arcIt.next();
 
                 // Remove if silent selfloop!
-                if (arc.isSelfLoop())
+                if (hideThese.contains(arc.getEvent()) && arc.isSelfLoop())
                 {
                     toBeRemoved.add(arc);
                 }
                 
                 // Hide this one?
-                if (alpha.contains(arc.getEvent()))
+                if (hideThese.contains(arc.getEvent()))
                 {
                     if (arc.getEvent().isControllable())
                         arc.setEvent(tau_c);
