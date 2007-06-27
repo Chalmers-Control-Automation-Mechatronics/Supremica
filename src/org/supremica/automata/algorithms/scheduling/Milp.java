@@ -7,6 +7,7 @@ import org.supremica.automata.*;
 import org.supremica.automata.algorithms.*;
 import org.supremica.gui.ScheduleDialog;
 import org.supremica.gui.ide.IDEReportInterface;
+import org.supremica.gui.ide.actions.IDEAction;
 import org.supremica.gui.ide.actions.IDEActionInterface;
 import org.supremica.log.*;
 import org.supremica.util.ActionTimer;
@@ -2289,6 +2290,12 @@ public class Milp
     private synchronized void addAutomatonToGui(Automaton auto)
     throws Exception
     {
+        addAutomatonToGui(auto, true);
+    }
+    
+    private synchronized void addAutomatonToGui(Automaton auto, boolean addToEditor)
+    throws Exception
+    {
         if (scheduleDialog != null)
         {
             IDEActionInterface ide = null;
@@ -2297,11 +2304,74 @@ public class Milp
             {
                 ide = scheduleDialog.getIde();
                 ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(auto);
+                
+                // The following part should be somewhere else, but unfortunately the communication between the editor
+                // and the analyzer are not automatic in the IDE, tuff luck...
+                if (addToEditor)
+                {
+                    if (ide.getActiveDocumentContainer().getEditorPanel() != null)
+                    {
+                        // Compile into Waters module
+                        net.sourceforge.waters.model.marshaller.ProductDESImporter importer = 
+                                new net.sourceforge.waters.model.marshaller.ProductDESImporter(net.sourceforge.waters.subject.module.ModuleSubjectFactory.getInstance());
+
+                        net.sourceforge.waters.model.module.SimpleComponentProxy component = importer.importComponent(schedule);
+                        if (ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().componentNameAvailable(component.getName()))
+                        {
+                            // Add to current module
+                            try
+                            {
+                                ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().addComponent((net.sourceforge.waters.subject.base.AbstractSubject) component);
+
+                                // Add all (new) events to the module
+                                net.sourceforge.waters.subject.module.ModuleSubject module = ide.getActiveDocumentContainer().getEditorPanel().getEditorPanelInterface().getModuleSubject();
+                                boolean problem = false;
+                                for (LabeledEvent event: schedule.getAlphabet())
+                                {
+                                    if (!event.getName().contains("["))
+                                    {
+                                        if (!module.getEventDeclListModifiable().containsName(event.getName()))
+                                        {
+                                            final net.sourceforge.waters.model.des.EventProxy proxy = 
+                                                    (net.sourceforge.waters.model.des.EventProxy) event;
+                                            final net.sourceforge.waters.subject.module.EventDeclSubject decl =
+                                                new net.sourceforge.waters.subject.module.EventDeclSubject(proxy.getName(),
+                                                proxy.getKind(),
+                                                proxy.isObservable(),
+                                                net.sourceforge.waters.xsd.module.ScopeKind.LOCAL,
+                                                null, null);
+                                            module.getEventDeclListModifiable().add(decl);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        problem = true;
+                                    }
+                                }
+                                if (problem)
+                                {
+                                    javax.swing.JOptionPane.showMessageDialog(ide.getFrame(), "There is a problem in the back-translation of parametrised events.", "Alert", javax.swing.JOptionPane.WARNING_MESSAGE);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                ide.getIDE().error("Could not add " + schedule + " to editor." + ex);
+                            }
+                        }
+                        else
+                        {
+                            javax.swing.JOptionPane.showMessageDialog(ide.getFrame(), "Component: " + component.getName() + " already exists in editor", "Duplicate Name", javax.swing.JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                    else
+                    {
+                        javax.swing.JOptionPane.showMessageDialog(ide.getFrame(), "The editor is unknown. The schedule was not added.", "Editor null", javax.swing.JOptionPane.ERROR_MESSAGE);
+                    }
+                }
             }
             catch (Exception ex)
             {
-                logger.warn("EXceptiON, ide = " + ide);
-                
+                logger.warn("EXceptiON, ide = " + ide);            
                 throw ex;
             }
         }
