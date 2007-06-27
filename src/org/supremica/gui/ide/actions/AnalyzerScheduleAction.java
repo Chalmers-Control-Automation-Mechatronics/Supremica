@@ -31,7 +31,7 @@ public class AnalyzerScheduleAction
     {
         super(actionList);
         
-        setEditorActiveRequired(true);
+        setEditorActiveRequired(false);
         setAnalyzerActiveRequired(true);
         
         putValue(Action.NAME, "Schedule...");
