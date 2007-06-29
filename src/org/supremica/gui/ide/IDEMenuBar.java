@@ -4,7 +4,7 @@
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDEMenuBar
 //###########################################################################
-//# $Id: IDEMenuBar.java,v 1.47 2007-06-26 21:42:27 flordal Exp $
+//# $Id: IDEMenuBar.java,v 1.48 2007-06-29 18:03:25 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
@@ -276,9 +276,8 @@ public class IDEMenuBar
             final JMenuItem item = createMenuItem(container);
             item.setEnabled(container != active);
             mModulesMenu.add(item);
-            if (++count >= MAX_MODULES)
-            {
-                return;
+            if (++count >= MAX_MODULES) {
+                break;
             }
         }
         mModulesMenu.setEnabled(count > 0);

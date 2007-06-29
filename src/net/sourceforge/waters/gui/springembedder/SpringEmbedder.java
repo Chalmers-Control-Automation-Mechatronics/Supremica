@@ -4,7 +4,7 @@
 //# PACKAGE: net.sourceforge.waters.gui.springembedder
 //# CLASS:   SpringEmbedder
 //###########################################################################
-//# $Id: SpringEmbedder.java,v 1.41 2007-06-26 14:43:25 robi Exp $
+//# $Id: SpringEmbedder.java,v 1.42 2007-06-29 18:03:25 robi Exp $
 //###########################################################################
 
 
@@ -122,6 +122,20 @@ public class SpringEmbedder
 
   //#########################################################################
   //# Geometry Setup
+  /**
+   * Sets up initial geometry for this embedder's graph.
+   * This method checks whether the nodes of the embedder's graph have
+   * got geometry associated with them, and fills in random positions
+   * for any simple nodes that have not. Labels without geometry are placed
+   * at their default positions.
+   * @return <CODE>true</CODE> if any node has been assigned geometry.
+   *         In this case, the GUI should invoke the spring embedder
+   *         to layout the graph.
+   * @throws GeometryAbsentException if a group node without geometry
+   *         has been found. Group nodes cannot be assigned geometry
+   *         automatically, and therefore the graph cannot be rendered
+   *         when this exception is thrown.
+   */
   public boolean setUpGeometry()
     throws GeometryAbsentException
   {

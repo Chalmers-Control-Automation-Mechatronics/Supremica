@@ -1,16 +1,17 @@
-//# -*- tab-width: 4  indent-tabs-mode: t  c-basic-offset: 4 -*-
+//# -*- tab-width: 4  indent-tabs-mode: nil  c-basic-offset: 4 -*-
 //###########################################################################
 //# PROJECT: Supremica/Waters IDE
 //# PACKAGE: org.supremica.gui.ide
 //# CLASS:   IDE
 //###########################################################################
-//# $Id: IDE.java,v 1.94 2007-06-26 21:42:27 flordal Exp $
+//# $Id: IDE.java,v 1.95 2007-06-29 18:03:25 robi Exp $
 //###########################################################################
 
 package org.supremica.gui.ide;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.List;
@@ -144,14 +145,16 @@ public class IDE
     //#######################################################################
     //# Listeners
     /**
-     * Overridden so we can exit when window is closed
+     * Overriden to exit safely when the application window is closed.
      */
     protected void processWindowEvent(WindowEvent event)
     {
         if (event.getID() == WindowEvent.WINDOW_CLOSING)
         {
             final Action action = mActions.getAction(ExitAction.class);
-            action.actionPerformed(null);
+            final ActionEvent aevent =
+				new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null);
+            action.actionPerformed(aevent);
         }
         else
         {
